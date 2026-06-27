@@ -338,7 +338,7 @@ the automatic dispatch span. See [Observability](/explanation/observability/) fo
 {{ comp callout { type: "important", title: "Aspire first, then jobs" } }}
 The workers plugin persists job definitions to Postgres and uses Deno KV for execution state,
 so bring orchestration up before you exercise it. Step&nbsp;1 is the database service;
-step&nbsp;2 is Aspire: <code>cd aspire &amp;&amp; aspire run</code> provisions Postgres and
+step&nbsp;2 is Aspire: <code>cd aspire &amp;&amp; aspire start</code> provisions Postgres and
 Garnet, then <code>netscript db init --name init</code> / <code>netscript db generate</code>
 wire the schema. Only after Aspire is up will <code>:8091</code> resolve jobs and record
 executions. See <a href="/how-to/database-migration/">Database &amp; migration</a>.

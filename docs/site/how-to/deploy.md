@@ -139,7 +139,7 @@ boot.
 {{ comp callout { type: "warning", title: "Aspire is step 2: Postgres comes up before any db command" } }}
 Every <code>netscript db &lt;cmd&gt;</code> talks to a live Postgres. In the scaffold that
 Postgres is provisioned <strong>by Aspire</strong>. So the order is always:
-<code>cd aspire &amp;&amp; aspire run</code> (which brings Postgres and Garnet up)
+<code>cd aspire &amp;&amp; aspire start</code> (which brings Postgres and Garnet up)
 <strong>before</strong> any <code>netscript db init</code> / <code>db generate</code> /
 <code>db seed</code>. Running a DB command with no Postgres reachable — for example in an
 isolated CI container — fails fast. In production, point the same commands at your managed
@@ -196,7 +196,7 @@ This is the real fork in the road. Pick based on whether your target understands
   {
     label: "Keep Aspire",
     lang: "bash",
-    code: "# The AppHost is a TypeScript/Node project under aspire/ (apphost.mts).\n# Locally it provisions Postgres + Garnet and wires every process.\ncd aspire\naspire restore   # one-time: restore the TS AppHost SDK\naspire run       # boots the full graph; dashboard at http://localhost:18888\n\n# Aspire 13.x can also publish a deployment manifest from the same AppHost\n# (e.g. `aspire publish`). The scaffold wires the AppHost graph; it does NOT\n# pre-select a cloud target for you — you point publish at your platform."
+    code: "# The AppHost is a TypeScript/Node project under aspire/ (apphost.mts).\n# Locally it provisions Postgres + Garnet and wires every process.\ncd aspire\naspire restore   # one-time: restore the TS AppHost SDK\naspire start       # boots the full graph; dashboard at http://localhost:18888\n\n# Aspire 13.x can also publish a deployment manifest from the same AppHost\n# (e.g. `aspire publish`). The scaffold wires the AppHost graph; it does NOT\n# pre-select a cloud target for you — you point publish at your platform."
   },
   {
     label: "Drop Aspire (--no-aspire)",
@@ -300,7 +300,7 @@ deployment is live.
   },
   {
     title: "Database migration",
-    body: "Run db init → generate → seed → status against Postgres — and why aspire run comes first.",
+    body: "Run db init → generate → seed → status against Postgres — and why aspire start comes first.",
     href: "/how-to/database-migration/",
     icon: "▣"
   },

@@ -451,12 +451,12 @@ choice above.
 
 {{ comp callout { type: "warning", title: "Aspire first, then anything stateful" } }}
 The sagas service needs Postgres and Garnet up before it can persist and list
-instances. Bring orchestration up first — <code>cd aspire &amp;&amp; aspire run</code>
+instances. Bring orchestration up first — <code>cd aspire &amp;&amp; aspire start</code>
 (dashboard at <a href="http://localhost:18888"><code>http://localhost:18888</code></a>) —
 <em>before</em> any <code>netscript db</code> command or before you expect
 <code>/api/v1/sagas/instances</code> to return durable state. This holds for both
 backends: <code>kv</code> needs Garnet/KV up, and <code>prisma</code> needs Postgres up
-with the <code>saga_runtime_*</code> tables migrated. DB commands require Aspire running
+with the <code>saga_runtime_*</code> tables migrated. DB commands require aspire startning
 first.
 {{ /comp }}
 

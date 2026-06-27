@@ -53,7 +53,7 @@ The third idea is what turns a pile of packages into a system you can *run*. Net
 
 {{ comp.diagram({ src: "/assets/diagrams/aspire-resource-graph.svg", alt: "The AppHost graph: Postgres and Garnet at the base; service, workers-api, sagas, triggers, auth-api, and streams resources above them; the Aspire dashboard observing all of them.", caption: "One command brings up the whole graph: data stores first, then every service and background resource, with the dashboard wired in for traces and logs." }) }}
 
-The flow is two commands — `cd aspire && aspire run` brings up Postgres and Garnet *before* any `netscript db` command touches the database — and you watch the result in the Aspire dashboard at `:18888`.
+The flow is two commands — `cd aspire && aspire start` brings up Postgres and Garnet *before* any `netscript db` command touches the database — and you watch the result in the Aspire dashboard at `:18888`.
 
 {{ comp.apiTable({
   caption: "What comes up when you run the workspace (ports are range-allocated conventions; the dashboard is the authority)",

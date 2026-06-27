@@ -179,7 +179,7 @@ first-party plugin enabled.
 ```
 
 Read the picture in three bands. **Aspire** sits on top as the local
-orchestrator: `cd aspire && aspire run` brings up Postgres and Garnet and starts
+orchestrator: `cd aspire && aspire start` brings up Postgres and Garnet and starts
 every service *before* any `netscript db` command runs, with traces, logs, and
 health landing in the dashboard at `http://localhost:18888`. **Plugin services**
 sit in the middle, each owning exactly one service on a fixed port; your own
@@ -320,7 +320,7 @@ persists through a selectable `kv` or `prisma` store. The full flow is covered i
 ## Observability is built into the substrate
 
 Because every plugin composes the same packages, observability is wired once and
-inherited everywhere. Aspire runs an OTLP collector, and the worker job path —
+inherited everywhere. aspire starts an OTLP collector, and the worker job path —
 dispatch, execution, scheduler, and subprocess continuation — emits **real
 OpenTelemetry spans automatically**, so job traces appear in the Aspire dashboard
 without any handler code.

@@ -32,12 +32,12 @@ records — fully independent from the primary database and the auth tables.
 
 ## Before you begin
 
-You need the auth layer from [chapter 2](/tutorials/workspace/02-auth/) and **Aspire running**. The
+You need the auth layer from [chapter 2](/tutorials/workspace/02-auth/) and **aspire startning**. The
 second database is provisioned as its own container in the Aspire graph, so Docker must be up too.
 Confirm the primary is migrated and Aspire is live:
 
 ```sh
-# In my-workspace/, with `aspire run` up in another terminal
+# In my-workspace/, with `aspire start` up in another terminal
 netscript db status        # primary datasource is migrated (chapter 2)
 docker info                # Docker engine is running
 ```
@@ -81,7 +81,7 @@ graph. Restart the AppHost so it provisions:
 
 ```sh
 cd aspire
-aspire run
+aspire start
 ```
 
 Open the dashboard at [http://localhost:18888](http://localhost:18888) and confirm the new
@@ -127,7 +127,7 @@ resolves for a signed-in user, so a workspace member is "this auth identity, in 
 
 The `netscript db` operations are **multi-database aware**: every one takes a `--db <target>` flag,
 where the target is a config key, a database name, or `all`. Point each command at the `workspace`
-datasource. Run these from the workspace root with `aspire run` up:
+datasource. Run these from the workspace root with `aspire start` up:
 
 {{ comp.tabbedCode({ tabs: [
   {

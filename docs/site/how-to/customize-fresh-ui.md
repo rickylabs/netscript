@@ -49,7 +49,7 @@ its own when you only need the UI loop:
   {
     label: "Under Aspire (recommended)",
     lang: "bash",
-    code: "# Brings up Postgres + Garnet AND the dashboard; Aspire dashboard graph at http://localhost:18888\ncd aspire && aspire run"
+    code: "# Brings up Postgres + Garnet AND the dashboard; Aspire dashboard graph at http://localhost:18888\ncd aspire && aspire start"
   },
   {
     label: "Fresh app only",
@@ -74,7 +74,7 @@ file-system routing, with NetScript conventions layered on top:
 {{ comp.apiTable({
   caption: "apps/dashboard/ — what each path owns",
   rows: [
-    { name: "main.ts", type: "app entry", desc: "Bootstraps the Fresh app with defineFreshApp from @netscript/fresh/server. Reads PORT and prints the startup banner you see in aspire run logs." },
+    { name: "main.ts", type: "app entry", desc: "Bootstraps the Fresh app with defineFreshApp from @netscript/fresh/server. Reads PORT and prints the startup banner you see in aspire start logs." },
     { name: "routes/", type: "pages + layouts", desc: "File-system routes. index.tsx, dashboard.tsx, health.tsx, examples/, plus _app.tsx (HTML shell) and _layout.tsx (chrome). Groups like (_components)/, (_shared)/, and (_islands)/ are non-routing co-location folders." },
     { name: "islands/", type: "client interactivity", desc: "Hydrated Preact components (ThemeToggle, SidebarToggle, Toast). Everything else renders on the server only." },
     { name: "components/ui/", type: "app-owned UI", desc: "The copied @netscript/fresh-ui primitives — Button, Card, Badge, PageHeader, StatsGrid, and friends. Edit these freely; they are yours after the copy. Barrel at components/ui/mod.ts." },
@@ -93,7 +93,7 @@ and components:
   {
     label: "apps/dashboard/main.ts",
     lang: "ts",
-    code: "import { defineFreshApp } from '@netscript/fresh/server';\nimport type { State } from '@app/utils.ts';\n\nexport const app = defineFreshApp<State>({ name: 'dashboard' });\n\n// PORT is supplied by Aspire; defaults locally. The banner shows in `aspire run` logs.\nconst port = parseInt(Deno.env.get('PORT') || '8010');\nconsole.log(`[dashboard] listening on http://localhost:${port}`);"
+    code: "import { defineFreshApp } from '@netscript/fresh/server';\nimport type { State } from '@app/utils.ts';\n\nexport const app = defineFreshApp<State>({ name: 'dashboard' });\n\n// PORT is supplied by Aspire; defaults locally. The banner shows in `aspire start` logs.\nconst port = parseInt(Deno.env.get('PORT') || '8010');\nconsole.log(`[dashboard] listening on http://localhost:${port}`);"
   }
 ] }) }}
 
@@ -274,7 +274,7 @@ exactly as you would with any vendored source.
 
 With the app running, confirm the loop end to end:
 
-1. Watch the Vite dev server (or `aspire run` logs) recompile on save — Fresh hot
+1. Watch the Vite dev server (or `aspire start` logs) recompile on save — Fresh hot
    module replacement updates the page without a full reload.
 2. Open `/design/components` to see restyled primitives render against the active
    theme, and `/design/tokens` to confirm token edits took effect.

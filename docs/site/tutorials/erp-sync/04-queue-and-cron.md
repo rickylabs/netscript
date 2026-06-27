@@ -32,7 +32,7 @@ Aspire.
 ## Before you begin
 
 You need the `my-erp/` workspace from [Chapter 2](/tutorials/erp-sync/02-import-job/) with the
-`import-products` job and `product-import-trigger` working, and `aspire run` healthy. Confirm the job
+`import-products` job and `product-import-trigger` working, and `aspire start` healthy. Confirm the job
 is registered:
 
 ```sh
@@ -109,7 +109,7 @@ runner-mode knobs are in [Tune the worker runtime](/how-to/tune-worker-runtime/)
 There are <strong>two</strong> concurrency env names in play and they are <em>not</em> the same
 variable. The worker entrypoint reads <code>WORKERS_CONCURRENCY</code> (note the <strong>S</strong>)
 and defaults it to <code>1</code>. The Aspire contribution, however, declares and injects
-<code>WORKER_CONCURRENCY</code> (no S). Under <code>aspire run</code> today the injected
+<code>WORKER_CONCURRENCY</code> (no S). Under <code>aspire start</code> today the injected
 <code>WORKER_CONCURRENCY</code> does <em>not</em> feed the entrypoint's <code>WORKERS_CONCURRENCY</code>
 read, so the Aspire value is silently ignored and the process pool falls back to its default. Treat
 the config-driven <code>concurrency</code> (and per-topic <code>scaling.concurrency</code>) above as
@@ -175,7 +175,7 @@ The scheduled trigger has to be picked up by the triggers runtime. Regenerate th
 netscript generate plugins
 ```
 
-Then restart `aspire run` (or let it hot-reload) so the triggers processor loads
+Then restart `aspire start` (or let it hot-reload) so the triggers processor loads
 `daily-resync-schedule`.
 
 ## Verify your progress

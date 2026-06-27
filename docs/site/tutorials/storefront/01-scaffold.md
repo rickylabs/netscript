@@ -26,7 +26,7 @@ the Garnet cache, and an example service all running together behind one dashboa
 
 By the end of this chapter you will have a real NetScript workspace named `my-shop/` on disk — with a
 shared `contracts/` workspace, a `products` service, a Fresh app, and a Postgres database — and you
-will have watched it boot under a single `aspire run`, with the Aspire dashboard live on
+will have watched it boot under a single `aspire start`, with the Aspire dashboard live on
 `http://localhost:18888` and Postgres plus Garnet reporting healthy.
 
 ## Before you begin
@@ -93,7 +93,7 @@ A few `init` options you will reach for (run `netscript init --help` for the ful
 {{ comp.apiTable({ caption: "Common netscript init options", rows: [
   { name: "--service --service-name <name> --service-port <port>", type: "flag group", desc: "Include an example oRPC service on the given port. We use products on 3001." },
   { name: "--db <engine>", type: "flag", desc: "Scaffold a database workspace (postgres, mysql, …). Omit or use --db none to skip database tooling." },
-  { name: "--no-aspire", type: "flag", desc: "Skip the Aspire orchestration files — you would then wire infrastructure yourself. Do NOT pass this for the track; we rely on aspire run." },
+  { name: "--no-aspire", type: "flag", desc: "Skip the Aspire orchestration files — you would then wire infrastructure yourself. Do NOT pass this for the track; we rely on aspire start." },
   { name: "--editor <none|zed|vscode>", type: "flag", desc: "Generate editor settings for the chosen editor." },
   { name: "--dry-run", type: "flag", desc: "Plan the scaffold and print totals without writing any files." }
 ] }) }}
@@ -109,7 +109,7 @@ Open `my-shop/` and you will find this shape:
     { name: "services/products/", comment: "The example oRPC service (src/main.ts, router.ts, routers/)" },
     { name: "plugins/", comment: "Plugin registry + manifests — empty until chapter 4" },
     { name: "aspire/", children: [
-      { name: "apphost.mts", comment: "Entry point for aspire run" },
+      { name: "apphost.mts", comment: "Entry point for aspire start" },
       { name: "aspire.config.json", comment: "AppHost language + SDK pin" }
     ] },
     { name: "appsettings.json", comment: "Infrastructure config (Services / Databases / Persistent)" },
@@ -132,7 +132,7 @@ What each piece is for:
   backend, so you will not edit it.
 - **`plugins/`** — where background capabilities (workers, sagas, triggers, streams) register. Empty
   until you add the sagas plugin in [chapter 4](/tutorials/storefront/04-checkout-saga/).
-- **`aspire/`** — the orchestrator. `aspire run` reads `apphost.mts` and starts every resource your
+- **`aspire/`** — the orchestrator. `aspire start` reads `apphost.mts` and starts every resource your
   app declares — Postgres, the Garnet cache, your services — with one command.
 - **`appsettings.json`** — the infrastructure manifest Aspire reads: which services, databases, and
   persistent resources to provision.
@@ -153,10 +153,10 @@ before any `netscript db` command.** Run it from the `aspire/` subfolder so the 
 ```sh
 cd aspire
 aspire restore   # once per machine: restores the Aspire SDK modules into .aspire/
-aspire run       # starts the AppHost and every declared resource
+aspire start       # starts the AppHost and every declared resource
 ```
 
-`aspire run` brings up the Postgres database, the Garnet cache, and your `products` service
+`aspire start` brings up the Postgres database, the Garnet cache, and your `products` service
 together, then prints a URL and a one-time login token for the **Aspire dashboard**:
 
 ```
@@ -164,17 +164,17 @@ http://localhost:18888
 ```
 
 The dashboard lists every resource (`postgres`, `garnet`, your service), live console logs, and
-distributed traces. Leave `aspire run` running in this terminal — it is your storefront's control
+distributed traces. Leave `aspire start` running in this terminal — it is your storefront's control
 plane for the rest of the track.
 
 {{ comp callout { type: "important", title: "Aspire is step 2 — database commands need it running" } }}
-The Postgres container only exists while <code>aspire run</code> is up. So <code>netscript db init</code>, <code>db generate</code>, and <code>db seed</code> must be run <strong>after</strong> Aspire has started — never before. You use them in <a href="/tutorials/storefront/02-catalog-service/">chapter 2</a>.
+The Postgres container only exists while <code>aspire start</code> is up. So <code>netscript db init</code>, <code>db generate</code>, and <code>db seed</code> must be run <strong>after</strong> Aspire has started — never before. You use them in <a href="/tutorials/storefront/02-catalog-service/">chapter 2</a>.
 {{ /comp }}
 
 ## Verify your progress
 
 The example `products` service exposes a plain health endpoint. In a second terminal — leave
-`aspire run` going in the first — confirm the service answers on port **3001**:
+`aspire start` going in the first — confirm the service answers on port **3001**:
 
 ```sh
 curl http://localhost:3001/health
@@ -191,13 +191,13 @@ A clean check, plus a healthy `curl`, means the scaffold is sound.
 
 - [ ] `netscript --help` lists the public command groups.
 - [ ] `my-shop/` exists with `contracts/`, `services/products/`, and `aspire/`.
-- [ ] `aspire run` is up; the dashboard at `http://localhost:18888` shows `postgres` and `garnet`
+- [ ] `aspire start` is up; the dashboard at `http://localhost:18888` shows `postgres` and `garnet`
       healthy.
 - [ ] `curl http://localhost:3001/health` returns healthy JSON.
 - [ ] `deno task check` passes with no errors.
 
 {{ comp callout { type: "tip", title: "If something is not green" } }}
-Three quick checks cover most first-run snags: (1) is <code>aspire run</code> still up in its terminal, with <code>postgres</code> and <code>garnet</code> healthy in the <a href="/explanation/aspire/">dashboard</a>? (2) is Docker running (<code>docker info</code>)? (3) did you <code>cd aspire</code> before <code>aspire run</code>, so it found <code>apphost.mts</code>? A failed <code>curl</code> usually means the service has not finished starting — give it a few seconds and retry.
+Three quick checks cover most first-run snags: (1) is <code>aspire start</code> still up in its terminal, with <code>postgres</code> and <code>garnet</code> healthy in the <a href="/explanation/aspire/">dashboard</a>? (2) is Docker running (<code>docker info</code>)? (3) did you <code>cd aspire</code> before <code>aspire start</code>, so it found <code>apphost.mts</code>? A failed <code>curl</code> usually means the service has not finished starting — give it a few seconds and retry.
 {{ /comp }}
 
 ## What you built

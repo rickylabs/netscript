@@ -16,7 +16,7 @@ AppHost works the way it does, read [Orchestration with Aspire](/explanation/asp
 
 {{ comp callout { type: "important", title: "The order is: scaffold → orchestrate → database" } }}
 Aspire is <strong>step 2</strong>, before any database command. <code>netscript init</code> writes
-the <code>aspire/</code> AppHost; <code>aspire run</code> provisions Postgres and Garnet and starts
+the <code>aspire/</code> AppHost; <code>aspire start</code> provisions Postgres and Garnet and starts
 every process; <strong>only then</strong> do <code>netscript db init/generate/seed</code> work,
 because those commands migrate the database <em>through</em> the running AppHost. Run a db command
 with no Aspire up and it fails — there is no Postgres for it to reach. See
@@ -30,7 +30,7 @@ with no Aspire up and it fails — there is no Postgres for it to reach. See
   rows: [
     { name: "A scaffolded workspace", type: "netscript init", desc: "Created WITHOUT --no-aspire, so the aspire/ AppHost folder exists. See the CLI reference for init flags." },
     { name: "Docker daemon running", type: "container engine", desc: "Aspire provisions Postgres and Garnet as local Docker containers. No daemon = the default workflow does not start." },
-    { name: "The Aspire CLI", type: "aspire (external)", desc: "The aspire restore / aspire run commands are the external .NET Aspire CLI, run from inside aspire/ — not netscript subcommands." },
+    { name: "The Aspire CLI", type: "aspire (external)", desc: "The aspire restore / aspire start commands are the external .NET Aspire CLI, run from inside aspire/ — not netscript subcommands." },
     { name: "A reachable port range", type: "ports", desc: "Dashboard :18888 (HTTPS) / :18889 (HTTP), OTLP :4318, services from :3000, plugin APIs :8091–8099, the Fresh app :8010." }
   ]
 }) }}
@@ -38,7 +38,7 @@ with no Aspire up and it fails — there is no Postgres for it to reach. See
 {{ comp callout { type: "note", title: "No --no-aspire" } }}
 This recipe assumes the orchestration layer was scaffolded. If you ran
 <code>netscript init my-app --no-aspire</code> there is <strong>no</strong> <code>aspire/</code>
-folder and no <code>aspire run</code> — you start the Deno processes yourself and supply your own
+folder and no <code>aspire start</code> — you start the Deno processes yourself and supply your own
 infrastructure. That path is covered in the {{ comp.xref({ key: "howto:deploy", text: "Deploy" }) }}
 recipe and the [Aspire explanation](/explanation/aspire/).
 {{ /comp }}
@@ -80,20 +80,20 @@ aspire restore
 
 ## Step 3 — Start the resource graph
 
-A single `aspire run` translates `appsettings.json` plus the plugin contributions into a coherent
+A single `aspire start` translates `appsettings.json` plus the plugin contributions into a coherent
 resource graph and boots all of it — infrastructure first, then services, plugin APIs, and
 background processors, with cross-references resolved into injected environment variables:
 
 ```bash
 # Still inside aspire/. Boots the whole graph; prints the dashboard URL + a login token.
-aspire run
+aspire start
 ```
 
-When boot finishes, `aspire run` prints the dashboard address and a one-time login token. The
+When boot finishes, `aspire start` prints the dashboard address and a one-time login token. The
 graph a single run stands up:
 
 {{ comp.apiTable({
-  caption: "What `aspire run` brings up (the local resource graph)",
+  caption: "What `aspire start` brings up (the local resource graph)",
   rows: [
     { name: "aspire (dashboard)", type: "https://localhost:18888 / http://localhost:18889", desc: "The Aspire dashboard. Live resource list, console logs, structured logs and traces. A login token is printed on start." },
     { name: "OTLP collector", type: "http://localhost:4318", desc: "OpenTelemetry endpoint (http/protobuf) the dashboard runs; framework spans and structured logs land here automatically." },
@@ -118,10 +118,10 @@ port each resource bound, not a memorized number. Read it from there.
 ## Step 4 — Initialize the database (through the running AppHost)
 
 With Aspire up, Postgres is live and the `netscript db` commands can reach it. Run them from the
-**workspace root** (a second terminal — leave `aspire run` running in the first):
+**workspace root** (a second terminal — leave `aspire start` running in the first):
 
 ```bash
-# From the workspace root, with `aspire run` still up in another terminal.
+# From the workspace root, with `aspire start` still up in another terminal.
 netscript db init --name init   # create + apply the first migration
 netscript db generate           # generate the Prisma client
 netscript db seed               # optional: seed development data
@@ -133,7 +133,7 @@ say), point them at your own database via `POSTGRES_URI` / `DATABASE_URL` instea
 
 ## Step 5 — Use the dashboard
 
-Open `https://localhost:18888`, paste the login token `aspire run` printed, and you have a single
+Open `https://localhost:18888`, paste the login token `aspire start` printed, and you have a single
 pane over the running graph:
 
 {{ comp.apiTable({
@@ -153,22 +153,22 @@ for the framework-vs-scaffold span boundary.
 ## In-production pitfalls
 
 {{ comp callout { type: "warning", title: "Aspire is the LOCAL story — not a production deployer" } }}
-<code>aspire run</code> exists to make <code>git clone</code> → one command produce a complete,
+<code>aspire start</code> exists to make <code>git clone</code> → one command produce a complete,
 observable, correctly-wired stack on <strong>one machine</strong>. The Postgres and Garnet it
 starts are throwaway Docker containers for dev convenience — <strong>not</strong> your production
 database or cache. For a remote target you point processes at managed infrastructure and let your
 platform own lifecycle; that is the {{ comp.xref({ key: "howto:deploy", text: "Deploy" }) }} recipe.
 {{ /comp }}
 
-{{ comp callout { type: "warning", title: "Footguns when `aspire run` will not boot" } }}
+{{ comp callout { type: "warning", title: "Footguns when `aspire start` will not boot" } }}
 <ul>
 <li><strong>Docker not running.</strong> Aspire provisions Postgres + Garnet through Docker; no
 daemon means the default local workflow cannot start. Start Docker, or use the <code>--no-aspire</code> path
 with your own infrastructure.</li>
-<li><strong>Wrong directory.</strong> <code>aspire restore</code> and <code>aspire run</code> run
+<li><strong>Wrong directory.</strong> <code>aspire restore</code> and <code>aspire start</code> run
 from inside <code>aspire/</code>. <code>netscript db</code> commands run from the
 <strong>workspace root</strong>. Mixing them up is the most common first-run error.</li>
-<li><strong>db command before <code>aspire run</code>.</strong> Every <code>netscript db</code>
+<li><strong>db command before <code>aspire start</code>.</strong> Every <code>netscript db</code>
 command needs a live Postgres. Run it with no Aspire up and it fails fast — bring the graph up
 first.</li>
 <li><strong>Ports in use.</strong> The dashboard wants <code>:18888</code>/<code>:18889</code> and
@@ -187,7 +187,7 @@ value from the earlier C# AppHost shape. The <strong>real, generated</strong> Ap
 TypeScript <code>aspire/apphost.mts</code> + <code>aspire.config.json</code> described above — those
 on-disk files are authoritative. (Pass <code>--legacy-aspire</code> at <code>init</code> only if you
 explicitly want the old C# <code>dotnet/AppHost</code> shape, started with
-<code>dotnet run</code> instead of <code>aspire run</code>.)
+<code>dotnet run</code> instead of <code>aspire start</code>.)
 {{ /comp }}
 
 ## See also

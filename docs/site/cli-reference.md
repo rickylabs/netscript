@@ -20,9 +20,9 @@ contributor-only shape — a normal install has no <code>packages/</code> tree. 
 use <code>netscript</code>.
 {{ /comp }}
 
-{{ comp callout { type: "important", title: "Database commands need Aspire running first" } }}
+{{ comp callout { type: "important", title: "Database commands need aspire startning first" } }}
 The <code>netscript db ...</code> commands provision and talk to Postgres <strong>through Aspire</strong>. Aspire is
-step 2 of the everyday flow: <code>cd aspire &amp;&amp; aspire run</code> brings up Postgres and Garnet via Docker and
+step 2 of the everyday flow: <code>cd aspire &amp;&amp; aspire start</code> brings up Postgres and Garnet via Docker and
 opens the dashboard at <a href="http://localhost:18888">:18888</a> — <strong>before</strong> any <code>db init</code>,
 <code>db generate</code>, <code>db seed</code>, or <code>db status</code>. Run a <code>db</code> command with Aspire down and it fails to
 find the database. See the <a href="/how-to/database-migration/">database &amp; migration how-to</a>.
@@ -70,7 +70,7 @@ and the order matters: **Aspire (step 2) must be up before any `db` command (ste
   },
   {
     title: "2 · Orchestrate",
-    body: "cd aspire && aspire run brings up Postgres and Garnet and opens the dashboard at :18888. Do this before any db command.",
+    body: "cd aspire && aspire start brings up Postgres and Garnet and opens the dashboard at :18888. Do this before any db command.",
     icon: "▶"
   },
   {
@@ -221,7 +221,7 @@ same `generate` / `migrate` pass. The full task walkthrough is in the
 
 {{ comp callout { type: "warning", title: "“aspire start failed: project file does not exist”" } }}
 This almost always means a <code>db</code> command was run with Aspire down (or from the wrong directory).
-The fix is the dev flow order: <code>cd aspire &amp;&amp; aspire run</code> first, leave it running, then run
+The fix is the dev flow order: <code>cd aspire &amp;&amp; aspire start</code> first, leave it running, then run
 <code>netscript db init</code> from the project root in a second terminal.
 {{ /comp }}
 
@@ -260,7 +260,7 @@ the scaffold exists. Use `--cwd <member>` to target a specific workspace member.
 {{ comp.apiTable({
   caption: "Run and gate the workspace",
   rows: [
-    { name: "Run the dashboard", type: "deno task --cwd apps/dashboard dev", desc: "Start the Fresh frontend (or let <code>aspire run</code> orchestrate it for you)." },
+    { name: "Run the dashboard", type: "deno task --cwd apps/dashboard dev", desc: "Start the Fresh frontend (or let <code>aspire start</code> orchestrate it for you)." },
     { name: "Run a service", type: "deno task --cwd services/users dev", desc: "Start the example <code>users</code> oRPC service on port 3001." },
     { name: "Type-check", type: "deno task check", desc: "Type-check the whole workspace." },
     { name: "Lint", type: "deno task lint", desc: "Lint the workspace sources." },
@@ -300,7 +300,7 @@ flag — generated directly from the published package — see the reference:
   },
   {
     title: "Quickstart",
-    body: "Install → init → aspire run → db → hit an endpoint, in about five minutes.",
+    body: "Install → init → aspire start → db → hit an endpoint, in about five minutes.",
     href: "/quickstart/",
     icon: "▸"
   },

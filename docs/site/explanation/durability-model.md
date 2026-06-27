@@ -391,7 +391,7 @@ will meet:
   spans).
 - Its API surfaces (`:8091`, `:8092`, `:8093`) and the Postgres/Garnet backing store — including the
   Postgres tables behind the `prisma` saga store — are brought up by Aspire. Remember the ordering:
-  `cd aspire && aspire run` is what makes the durable infrastructure available **before** any
+  `cd aspire && aspire start` is what makes the durable infrastructure available **before** any
   `netscript db` command. See {{ comp.xref({ key: "cap:kv-queues-cron" }) }} for the KV/queue
   primitives the runtime leans on, and {{ comp.xref({ key: "cap:streams" }) }} for the streaming
   counterpart to message-driven sagas.

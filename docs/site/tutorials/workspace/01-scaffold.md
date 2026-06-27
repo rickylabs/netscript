@@ -131,21 +131,21 @@ Run it from the `aspire/` subfolder so the CLI finds `apphost.mts`:
 ```sh
 cd aspire
 aspire restore   # once per machine: restores the Aspire SDK modules
-aspire run       # starts the AppHost and every declared resource
+aspire start       # starts the AppHost and every declared resource
 ```
 
-`aspire run` brings up the Postgres database, the Garnet cache, and your `workspace` service together,
+`aspire start` brings up the Postgres database, the Garnet cache, and your `workspace` service together,
 then prints the **Aspire dashboard** URL and a one-time login token. Open it:
 
 ```
 http://localhost:18888
 ```
 
-Leave `aspire run` running in this terminal — it is your app's control plane for the entire track. The
+Leave `aspire start` running in this terminal — it is your app's control plane for the entire track. The
 dashboard's resource list is the authority for the exact port each resource bound.
 
 {{ comp callout { type: "important", title: "Aspire is step 2 — database commands need it running" } }}
-The Postgres container only exists while <code>aspire run</code> is up. So
+The Postgres container only exists while <code>aspire start</code> is up. So
 <code>netscript db init</code>, <code>db generate</code>, and <code>db seed</code> — which you use from
 chapter 2 onward — must run <strong>after</strong> Aspire has started, never before. A db command with
 no Aspire up fails fast: there is no Postgres for it to reach.
@@ -153,7 +153,7 @@ no Aspire up fails fast: there is no Postgres for it to reach.
 
 ## Verify your progress
 
-In a second terminal (leave `aspire run` going in the first), confirm the `workspace` service is up
+In a second terminal (leave `aspire start` going in the first), confirm the `workspace` service is up
 and the workspace type-checks:
 
 ```sh
@@ -166,14 +166,14 @@ the scaffold, contracts, and service all line up.
 
 - [ ] `netscript --help` lists the public command groups.
 - [ ] `my-workspace/` exists with `services/workspace/`, `plugins/`, `database/`, and `aspire/`.
-- [ ] `aspire run` is up; `postgres` and `garnet` are green in the dashboard on `:18888`.
+- [ ] `aspire start` is up; `postgres` and `garnet` are green in the dashboard on `:18888`.
 - [ ] `curl http://localhost:3001/health` returns a healthy response.
 - [ ] `deno task check` passes.
 
 {{ comp callout { type: "tip", title: "If something is not green" } }}
-Three checks cover most first-run snags: (1) is <code>aspire run</code> still up, with
+Three checks cover most first-run snags: (1) is <code>aspire start</code> still up, with
 <code>postgres</code> and <code>garnet</code> healthy in the dashboard? (2) is Docker running
-(<code>docker info</code>)? (3) did you <code>cd aspire</code> before <code>aspire run</code>, so it
+(<code>docker info</code>)? (3) did you <code>cd aspire</code> before <code>aspire start</code>, so it
 found <code>apphost.mts</code>? A failed <code>curl</code> usually means the service has not finished
 starting — wait a few seconds and retry.
 {{ /comp }}

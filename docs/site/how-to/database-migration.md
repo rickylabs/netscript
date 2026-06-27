@@ -16,7 +16,7 @@ client, seed it, and confirm the schema is applied — using only the public
 This is a task-oriented recipe. The single most important fact, and the one most people
 trip over: **`netscript db` commands provision and talk to Postgres _through_ Aspire**.
 Aspire is step 2, not an afterthought. You bring the database up first with
-`cd aspire && aspire run`, _then_ the `db` commands have something to connect to. Skip
+`cd aspire && aspire start`, _then_ the `db` commands have something to connect to. Skip
 that ordering and `db init` fails with `aspire start failed` before it ever reaches
 Prisma. Everything below assumes the default Aspire layout; the `--no-aspire` escape hatch
 is called out where it differs.
@@ -24,7 +24,7 @@ is called out where it differs.
 {{ comp callout { type: "important", title: "Aspire must be running first" } }}
 Every <code>netscript db</code> command needs a live Postgres instance. In the default
 (Aspire) layout, Postgres is a container that <strong>Aspire</strong> provisions — so
-<code>cd aspire &amp;&amp; aspire run</code> has to be up <strong>before</strong> you run
+<code>cd aspire &amp;&amp; aspire start</code> has to be up <strong>before</strong> you run
 <code>netscript db init</code>. Running a <code>db</code> command against a stopped AppHost
 fails with <code>aspire start failed: … Project file does not exist</code>. That is the
 dependency, not a bug — see <a href="/explanation/aspire/">Orchestration with Aspire</a>
@@ -40,7 +40,7 @@ on disk and applied, a generated Prisma client (with matching zod schemas) under
 Aspire is keeping alive in a second terminal.
 
 {{ comp.apiTable({ caption: "The migration workflow at a glance", rows: [
-  { name: "aspire run", type: "from aspire/", desc: "Provisions the Postgres + Garnet containers. Must be up first and stay running." },
+  { name: "aspire start", type: "from aspire/", desc: "Provisions the Postgres + Garnet containers. Must be up first and stay running." },
   { name: "netscript db init --name init", type: "from workspace root", desc: "Initializes tooling, creates the first migration from schema.prisma, applies it to Postgres." },
   { name: "netscript db generate", type: "from workspace root", desc: "Generates the Deno-runtime Prisma client + zod schemas into .generated. Re-run after every schema edit." },
   { name: "netscript db seed", type: "from workspace root", desc: "Runs database/postgres/scripts/seed.ts to populate baseline rows." },
@@ -123,15 +123,15 @@ separate from the Deno workspace, so the commands run from there:
 ```bash
 cd aspire
 aspire restore   # one-time: downloads the AppHost SDK modules
-aspire run       # provisions Postgres + Garnet containers and starts the resource graph
+aspire start       # provisions Postgres + Garnet containers and starts the resource graph
 ```
 
-Leave `aspire run` running in this terminal. It provisions both the Postgres database and
+Leave `aspire start` running in this terminal. It provisions both the Postgres database and
 the Garnet cache (your KV/queue backend) as Docker containers — no manual `docker run` and
 no local Postgres install required. When it settles you'll have:
 
 - The **Aspire dashboard** at [http://localhost:18888](http://localhost:18888) — the access
-  token is printed in the `aspire run` output. Open it and confirm the `postgres` and
+  token is printed in the `aspire start` output. Open it and confirm the `postgres` and
   `garnet` resources are green.
 - Resources named `postgres`, `garnet`, and the per-capability services/processors
   (`workers-api`, `workers`, `sagas-api`, `sagas`, `triggers-api`, `triggers`). If you also
@@ -141,14 +141,14 @@ no local Postgres install required. When it settles you'll have:
 {{ comp callout { type: "warning", title: "If db commands fail with \"aspire start failed\"" } }}
 That error means the AppHost is not running, or you ran the <code>db</code> command from a
 directory where Aspire can't find <code>aspire/apphost.mts</code>. Fix: start
-<code>aspire run</code> from the <code>aspire/</code> folder <strong>first</strong>, keep it
+<code>aspire start</code> from the <code>aspire/</code> folder <strong>first</strong>, keep it
 running, and run the <code>netscript db</code> commands from the <strong>workspace
 root</strong> in a separate terminal.
 {{ /comp }}
 
 ## Step 3 — Run the migration workflow
 
-Open a **second terminal** at the workspace root (keep `aspire run` going in the first).
+Open a **second terminal** at the workspace root (keep `aspire start` going in the first).
 Now Postgres is reachable, run the four-command database workflow in order:
 
 {{ comp.tabbedCode({ tabs: [
@@ -219,8 +219,8 @@ import the generated client in a service or worker and read the rows the seed wr
 
 {{ comp callout { type: "warning", title: "Production pitfalls" } }}
 <ul>
-<li><strong>Forgetting Aspire.</strong> The most common failure: running <code>netscript db init</code> with no <code>aspire run</code> up. Start Aspire first.</li>
-<li><strong>Wrong directory.</strong> Run <code>aspire run</code> from <code>aspire/</code>, but run the <code>netscript db</code> commands from the workspace root (or pass <code>--project-root</code>).</li>
+<li><strong>Forgetting Aspire.</strong> The most common failure: running <code>netscript db init</code> with no <code>aspire start</code> up. Start Aspire first.</li>
+<li><strong>Wrong directory.</strong> Run <code>aspire start</code> from <code>aspire/</code>, but run the <code>netscript db</code> commands from the workspace root (or pass <code>--project-root</code>).</li>
 <li><strong>Stale client after a schema change.</strong> Editing a <code>.prisma</code> file without re-running <code>netscript db generate</code> leaves your code typed against the old shape. Generate after every schema change.</li>
 <li><strong>Docker not running.</strong> Aspire provisions Postgres and Garnet as containers; if Docker/Podman is down, the <code>postgres</code> resource never goes green.</li>
 <li><strong>Treating <code>db reset</code> as routine.</strong> It is destructive — it drops the database. Keep it to local dev.</li>

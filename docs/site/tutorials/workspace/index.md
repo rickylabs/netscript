@@ -62,7 +62,7 @@ Three ideas carry the whole track, and each chapter adds exactly one:
 You should be comfortable with the basics from the [core tutorial ladder](/tutorials/) — scaffolding
 a workspace, the contract → service flow, and bringing up Aspire. This track does not re-teach those;
 it assumes you can scaffold and boot, then layers authentication on top. If `netscript init` and
-`aspire run` are new to you, walk the [Quickstart](/quickstart/) first.
+`aspire start` are new to you, walk the [Quickstart](/quickstart/) first.
 
 ## The six chapters
 

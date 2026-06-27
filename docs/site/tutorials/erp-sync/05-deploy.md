@@ -10,7 +10,7 @@ next: { label: "How-to guides", href: "/how-to/" }
 
 You have built the whole ERP sync: a file-watch import job, a queue, and a cron schedule, plus an
 understanding of polyglot transform tasks. This final chapter runs all of it together — workers,
-triggers, queue, and cron processors — on one machine under `aspire run`, and shows you how to read
+triggers, queue, and cron processors — on one machine under `aspire start`, and shows you how to read
 the running system from the dashboard. It is the **local** orchestration story: one command,
 one observable stack, throwaway infrastructure.
 
@@ -25,13 +25,13 @@ one observable stack, throwaway infrastructure.
 ## What you will build
 
 By the end of this chapter you will bring the full `my-erp/` resource graph up with a single
-`aspire run` — Postgres, Garnet, the workers API + processor, and the triggers API + processor (which
+`aspire start` — Postgres, Garnet, the workers API + processor, and the triggers API + processor (which
 runs your file-watch and cron triggers) — initialize the database through the running AppHost, and
 read the live import pipeline in the Aspire dashboard: resources, console logs, and the traces that
 stitch a file drop to its job execution.
 
 {{ comp callout { type: "important", title: "Aspire is the LOCAL story — not a production deployer" } }}
-<code>aspire run</code> exists to make <code>git clone</code> → one command produce a complete,
+<code>aspire start</code> exists to make <code>git clone</code> → one command produce a complete,
 observable, correctly-wired stack on <strong>one machine</strong>. The Postgres and Garnet it starts
 are throwaway Docker containers for dev convenience — <strong>not</strong> your production database or
 cache. Shipping to a remote target (managed infrastructure, your own process lifecycle) is the
@@ -56,10 +56,10 @@ Expected: both files exist. `netscript init` generated them in Chapter 1; you ne
 
 The resource graph is **derived from your installed plugins** at boot via `composeAppHost` — add a
 plugin and its API plus background processor appear; remove it and they vanish, no edit to
-`apphost.mts`. With workers and triggers installed, a single `aspire run` stands up this graph:
+`apphost.mts`. With workers and triggers installed, a single `aspire start` stands up this graph:
 
 {{ comp.apiTable({
-  caption: "What aspire run brings up for the ERP sync",
+  caption: "What aspire start brings up for the ERP sync",
   rows: [
     { name: "aspire (dashboard)", type: "https://localhost:18888 / http://localhost:18889", desc: "Live resource list, console logs, structured logs and traces. A login token is printed on start." },
     { name: "OTLP collector", type: "http://localhost:4318", desc: "OpenTelemetry endpoint the dashboard runs; framework spans and structured logs land here automatically." },
@@ -85,16 +85,16 @@ into your Deno workspace. Restore once per machine, then run — both from insid
 ```sh
 cd aspire
 aspire restore   # one-time SDK restore (and after an SDK bump)
-aspire run       # boots the whole graph; prints the dashboard URL + a login token
+aspire start       # boots the whole graph; prints the dashboard URL + a login token
 ```
 
-`aspire run` brings up infrastructure first, then the plugin APIs and background processors, with
+`aspire start` brings up infrastructure first, then the plugin APIs and background processors, with
 cross-references resolved into injected environment variables. Leave it running.
 
 ## Step 3 — Initialize the database through the running AppHost
 
 With Aspire up, Postgres is live and the `netscript db` commands can reach it. Run them from the
-**workspace root** in a second terminal (leave `aspire run` going in the first):
+**workspace root** in a second terminal (leave `aspire start` going in the first):
 
 ```sh
 netscript db init --name init   # create + apply the first migration
@@ -107,7 +107,7 @@ there is no Postgres for them to reach.
 
 {{ comp callout { type: "warning", title: "Order matters: scaffold → orchestrate → database" } }}
 The single most common first-run error is running a <code>netscript db</code> command before
-<code>aspire run</code>. <code>aspire restore</code> and <code>aspire run</code> run from inside
+<code>aspire start</code>. <code>aspire restore</code> and <code>aspire start</code> run from inside
 <code>aspire/</code>; <code>netscript db</code> commands run from the <strong>workspace root</strong>,
 <strong>after</strong> the graph is up. Mixing the directories or the order is what breaks. There is
 no <code>netscript generate aspire</code> — the AppHost is produced by <code>netscript init</code>.
@@ -125,7 +125,7 @@ CSV
 mv .data/incoming/products_live.csv .data/incoming/products/products_live.csv
 ```
 
-Then open `https://localhost:18888`, paste the login token `aspire run` printed, and use the three
+Then open `https://localhost:18888`, paste the login token `aspire start` printed, and use the three
 dashboard surfaces:
 
 {{ comp.apiTable({
@@ -166,16 +166,16 @@ curl 'http://localhost:8091/api/v1/workers/executions?limit=10'
 Expected: both health checks return healthy JSON, and the executions feed shows a completed
 `import-products` run for `products_live.csv`.
 
-- [ ] `aspire run` is up; the dashboard lists `postgres`, `garnet`, workers, and triggers all green.
+- [ ] `aspire start` is up; the dashboard lists `postgres`, `garnet`, workers, and triggers all green.
 - [ ] `netscript db init/generate` succeeded against the Aspire Postgres.
 - [ ] `curl :8091/health` and `curl :8093/health` both return healthy.
 - [ ] A file drop produced an `import-products` execution and a dispatch/execution trace in the dashboard.
 
-{{ comp callout { type: "warning", title: "Footguns when aspire run will not boot" } }}
+{{ comp callout { type: "warning", title: "Footguns when aspire start will not boot" } }}
 <ul>
 <li><strong>Docker not running</strong> — Aspire provisions Postgres + Garnet through Docker; no
 daemon means the happy path does not start.</li>
-<li><strong>Wrong directory</strong> — <code>aspire restore</code>/<code>aspire run</code> run from
+<li><strong>Wrong directory</strong> — <code>aspire restore</code>/<code>aspire start</code> run from
 <code>aspire/</code>; <code>netscript db</code> runs from the workspace root.</li>
 <li><strong>Ports in use</strong> — the dashboard wants <code>:18888</code>/<code>:18889</code> and
 OTLP <code>:4318</code>; a stale prior run holding a port blocks boot. Free it and retry.</li>
@@ -185,7 +185,7 @@ OTLP <code>:4318</code>; a stale prior run holding a port blocks boot. Free it a
 ## What you built
 
 You ran the complete ERP sync — workers, triggers, queue, and cron — on one machine under a single
-`aspire run`, initialized the database through the running AppHost, and watched a file drop flow into
+`aspire start`, initialized the database through the running AppHost, and watched a file drop flow into
 a durable job execution with its trace in the dashboard. You now have an end-to-end durable
 background-processing backend, and you know exactly where the local story ends and a production
 deployment begins.

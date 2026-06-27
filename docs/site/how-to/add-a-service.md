@@ -228,7 +228,7 @@ the auth <strong>plugin</strong> backends; see <a href="/capabilities/auth/">Aut
 
 ## Step 5 — Run and verify
 
-Start just this service workspace directly, or let `aspire run` orchestrate it alongside
+Start just this service workspace directly, or let `aspire start` orchestrate it alongside
 the rest of your resources:
 
 ```bash

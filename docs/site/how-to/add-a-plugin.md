@@ -49,7 +49,7 @@ You need:
 
 - **Aspire up if you plan to run the plugin.** Adding and registering a plugin is offline,
   but several plugins (workers, sagas, auth) need Postgres and Garnet to actually run. Bring
-  the local stack up first — `cd aspire && aspire run` — exactly as in
+  the local stack up first — `cd aspire && aspire start` — exactly as in
   [Run the stack with Aspire](/explanation/aspire/). You do **not** need it up just to
   scaffold and register.
 
@@ -163,7 +163,7 @@ netscript generate runtime-schemas
 ```
 
 Plugins that contribute Prisma models (workers, sagas, and **auth**) need their tables
-created. With Aspire already running (`cd aspire && aspire run`), apply migrations and
+created. With Aspire already running (`cd aspire && aspire start`), apply migrations and
 generate the client:
 
 {{ comp.tabbedCode({ tabs: [
@@ -174,7 +174,7 @@ generate the client:
 
 {{ comp callout { type: "note", title: "Aspire is step 2, the database is step 3" } }}
 <code>netscript db</code> talks to the Postgres that Aspire provisions. Always
-<code>cd aspire &amp;&amp; aspire run</code> <strong>before</strong> any <code>db</code>
+<code>cd aspire &amp;&amp; aspire start</code> <strong>before</strong> any <code>db</code>
 command — see <a href="/explanation/aspire/">Run the stack with Aspire</a>. Skip these
 database steps only when every plugin you added is stateless.
 {{ /comp }}
@@ -200,13 +200,13 @@ plugin is registered, wired, and ready to use.
 
 {{ comp.tabbedCode({ tabs: [
   { label: "Inspect one plugin", lang: "bash", code: "# Detailed info for a single installed plugin\nnetscript plugin info @netscript/plugin-auth" },
-  { label: "Run the service", lang: "bash", code: "# Bring the whole stack up and exercise the plugin's service\ncd aspire && aspire run\n# Aspire dashboard: http://localhost:18888\n# auth-api:         http://localhost:8094" }
+  { label: "Run the service", lang: "bash", code: "# Bring the whole stack up and exercise the plugin's service\ncd aspire && aspire start\n# Aspire dashboard: http://localhost:18888\n# auth-api:         http://localhost:8094" }
 ] }) }}
 
 {{ comp callout { type: "tip", title: "Confirm in the Aspire dashboard" } }}
 Service-bearing plugins appear as resources in the Aspire dashboard at
 <a href="http://localhost:18888"><code>http://localhost:18888</code></a> once
-<code>aspire run</code> is up. A green resource on the plugin's port (workers
+<code>aspire start</code> is up. A green resource on the plugin's port (workers
 <code>:8091</code>, sagas <code>:8092</code>, triggers <code>:8093</code>, auth
 <code>:8094</code>, streams <code>:4437</code>) confirms the plugin is live end to end.
 {{ /comp }}

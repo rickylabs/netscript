@@ -10,10 +10,10 @@ next: { label: "Capabilities", href: "/capabilities/" }
 
 A NetScript app is never one process. This essay explains *why* it needs an orchestrator at
 all, *how* the orchestrator's resource graph is generated from your plugins rather than
-hand-wired, and *what* a single `aspire run` actually stands up — so you can reason about the
+hand-wired, and *what* a single `aspire start` actually stands up — so you can reason about the
 running system instead of treating it as a black box.
 
-{{ comp.diagram({ src: "/assets/diagrams/aspire-resource-graph.svg", alt: "The Aspire AppHost resource graph: appsettings.json and plugin contributions feed createNetScriptAppHost, which registers infrastructure (Postgres, Garnet), services, plugin APIs, and background processors, with cross-references resolved into injected environment variables, all observed by the dashboard at :18888.", caption: "One `aspire run` derives a coherent resource graph from your plugins, resolves the wiring between resources, and surfaces the whole thing in a dashboard." }) }}
+{{ comp.diagram({ src: "/assets/diagrams/aspire-resource-graph.svg", alt: "The Aspire AppHost resource graph: appsettings.json and plugin contributions feed createNetScriptAppHost, which registers infrastructure (Postgres, Garnet), services, plugin APIs, and background processors, with cross-references resolved into injected environment variables, all observed by the dashboard at :18888.", caption: "One `aspire start` derives a coherent resource graph from your plugins, resolves the wiring between resources, and surfaces the whole thing in a dashboard." }) }}
 
 ## Why an orchestrator at all
 
@@ -53,7 +53,7 @@ runtime.
 {{ comp callout { type: "important", title: "Aspire is step 2 — before any database command" } }}
 The canonical workflow is <strong>scaffold → orchestrate → database</strong>. After
 <code>netscript init</code>, you run <code>cd aspire &amp;&amp; aspire restore</code> once, then
-<code>aspire run</code>. That command provisions Postgres and Garnet through Docker and brings up
+<code>aspire start</code>. That command provisions Postgres and Garnet through Docker and brings up
 every service. <strong>Only then</strong> do <code>netscript db init</code>,
 <code>db generate</code>, and <code>db seed</code> work — because those commands provision and
 migrate the database <em>through</em> the running AppHost. Run a db command with no Aspire up and
@@ -64,7 +64,7 @@ and the {{ comp.xref({ key: "cli:reference", text: "CLI reference" }) }} for the
 ## The AppHost: a generated TypeScript program
 
 The heart of orchestration is the **AppHost** — a small TypeScript/Node program scaffolded into
-the `aspire/` subfolder at `aspire/apphost.mts`. It is the entry point `aspire run` executes. It
+the `aspire/` subfolder at `aspire/apphost.mts`. It is the entry point `aspire start` executes. It
 is deliberately tiny: it builds an Aspire builder, hands it your project's `appsettings.json`,
 and runs the resulting graph.
 
@@ -213,7 +213,7 @@ runs, the URLs it needs are in `Deno.env` — it never has to "discover" anythin
 is exactly why there is no service-registry client in your handler code.
 
 ```text
-                          aspire run  (from aspire/)
+                          aspire start  (from aspire/)
                                  │
                                  ▼
               ┌──────────────────────────────────────────┐
@@ -243,9 +243,9 @@ runtime resource is consolidated under {{ comp.xref({ key: "ref:aspire", text: "
 treat that as canonical and this essay as the orientation.
 
 {{ comp.apiTable({
-  caption: "The resource graph a single `aspire run` brings up",
+  caption: "The resource graph a single `aspire start` brings up",
   rows: [
-    { name: "aspire (dashboard)", type: "http://localhost:18888", desc: "The Aspire dashboard. `aspire run` prints a login token. Live resource list, logs, structured traces, and the OTLP collector (:4318) surface here." },
+    { name: "aspire (dashboard)", type: "http://localhost:18888", desc: "The Aspire dashboard. `aspire start` prints a login token. Live resource list, logs, structured traces, and the OTLP collector (:4318) surface here." },
     { name: "postgres", type: "Container", desc: "Provisioned via Docker. Engine Postgres, persistent (DataPath .data/postgres). The database that `netscript db` commands target — reachable only once Aspire is up." },
     { name: "garnet", type: "Container (cache)", desc: "Redis-compatible cache. Engine Garnet, the primary cache. Backs KV/queue workloads for the runtime plugins." },
     { name: "users", type: ":3001", desc: "Example oRPC service (defineService). Routes /api/v1/users/* and the RPC surface at /api/rpc/*." },
@@ -265,13 +265,13 @@ graph nodes above.
 
 ## The dashboard: the local observability surface
 
-When `aspire run` finishes booting, it prints a URL and a one-time login token for the dashboard
+When `aspire start` finishes booting, it prints a URL and a one-time login token for the dashboard
 at `http://localhost:18888`. The dashboard is the single pane of glass over the running graph:
 
 - **Resources** — every container and executable above, with status, endpoints, and environment.
 - **Console logs** — stdout/stderr per resource, so a failing background processor is one click
   away rather than buried in a terminal.
-- **Structured logs and traces** — Aspire runs an OTLP collector at `http://localhost:4318`, and
+- **Structured logs and traces** — aspire starts an OTLP collector at `http://localhost:4318`, and
   the spans and structured logs your handlers emit land here, correlated by `traceparent`, so a
   request that fans out across services is a single trace rather than scattered log lines.
 
@@ -304,12 +304,12 @@ connection strings.
   {
     label: "Default — with Aspire",
     lang: "bash",
-    code: "netscript init my-app --db postgres --service --service-name users --service-port 3001 --yes\n\n# Step 2: orchestration brings up Postgres + Garnet + every process.\ncd aspire && aspire restore   # once\naspire run                    # dashboard at http://localhost:18888\n\n# Step 3: database commands now work (provisioned through Aspire).\nnetscript db init --name init"
+    code: "netscript init my-app --db postgres --service --service-name users --service-port 3001 --yes\n\n# Step 2: orchestration brings up Postgres + Garnet + every process.\ncd aspire && aspire restore   # once\naspire start                    # dashboard at http://localhost:18888\n\n# Step 3: database commands now work (provisioned through Aspire).\nnetscript db init --name init"
   },
   {
     label: "Escape hatch — --no-aspire",
     lang: "bash",
-    code: "# Scaffold WITHOUT the orchestration layer. No aspire/ folder is created.\nnetscript init my-app --db postgres --no-aspire --yes\n\n# There is no `aspire run`. Start processes yourself:\ndeno task --cwd apps/dashboard dev\n\n# You now own infrastructure: bring your own Postgres + cache and supply\n# connection strings to each process. `netscript db` has no AppHost to\n# provision through, so manage migrations against your own database URL."
+    code: "# Scaffold WITHOUT the orchestration layer. No aspire/ folder is created.\nnetscript init my-app --db postgres --no-aspire --yes\n\n# There is no `aspire start`. Start processes yourself:\ndeno task --cwd apps/dashboard dev\n\n# You now own infrastructure: bring your own Postgres + cache and supply\n# connection strings to each process. `netscript db` has no AppHost to\n# provision through, so manage migrations against your own database URL."
   }
 ] }) }}
 
@@ -341,7 +341,7 @@ would be hand-rebuilding exactly the wiring the contributions generate for free.
 Choosing Aspire as the default is an opinion, and this essay states its boundaries.
 
 **Aspire is the local-development orchestration story.** Its job is to make `git clone` →
-`aspire run` produce a complete, observable, correctly-wired stack on one machine. It excels at
+`aspire start` produce a complete, observable, correctly-wired stack on one machine. It excels at
 that. What it deliberately does **not** try to be:
 
 - **A production deployment system.** The AppHost provisions Postgres and Garnet as local Docker
@@ -370,7 +370,7 @@ The remaining trade-offs of the default path:
   extending `AspireNSPluginContribution` and returning `AspireResource[]` from `contribute(...)`.
 - **Resource** — any node Aspire manages: a `container` (Postgres, Garnet), a `database`, a
   `cache`, a `deno-service`, or a `deno-background` processor.
-- **OTLP** — the OpenTelemetry protocol endpoint (`http://localhost:4318`) Aspire runs so the
+- **OTLP** — the OpenTelemetry protocol endpoint (`http://localhost:4318`) aspire starts so the
   dashboard can collect the spans and structured logs your handlers emit.
 
 ## Where to go next

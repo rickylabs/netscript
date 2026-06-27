@@ -33,7 +33,7 @@ factory adds per-procedure helpers — `queryOptions()`, `clientKey()`, and the 
 ## Before you begin
 
 You should have completed [chapter 2](/tutorials/live-dashboard/02-contract-to-service/): the
-`orders` service answering on **3002**, the database seeded, and `aspire run` up. Confirm the typed
+`orders` service answering on **3002**, the database seeded, and `aspire start` up. Confirm the typed
 read-model still returns data:
 
 ```sh
@@ -124,7 +124,7 @@ deno task check
 
 A clean check confirms `createServiceClient<typeof ordersContract>` and the query factory typed
 themselves off your chapter-2 contract. To prove the discovery key resolves end to end, leave
-`aspire run` up — the next chapter renders the page that calls through this client, and a missing
+`aspire start` up — the next chapter renders the page that calls through this client, and a missing
 `services__orders__http__0` shows up there as a clear "Service URL not found" error.
 
 - [ ] `apps/dashboard/lib/api-clients.ts` exports `ordersClient`, `baseQueries`, and

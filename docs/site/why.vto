@@ -84,7 +84,7 @@ Tracing isn't a follow-up ticket. Spans wrap the work itself: `withSpan` runs yo
 
 ### 4. Orchestrated with Aspire
 
-Your database, services, workers, and a real dashboard come up together — locally and on the way to deploy — through NetScript's .NET Aspire integration. The flow is two commands: `cd aspire && aspire run` brings up Postgres and Garnet and the dashboard *before* any `netscript db` command touches the database. One workspace wires the resources; you get the Aspire dashboard (`:18888`) for traces and logs without standing up your own. Don't want the .NET footprint? `netscript init --no-aspire` and it's gone.
+Your database, services, workers, and a real dashboard come up together — locally and on the way to deploy — through NetScript's .NET Aspire integration. The flow is two commands: `cd aspire && aspire start` brings up Postgres and Garnet and the dashboard *before* any `netscript db` command touches the database. One workspace wires the resources; you get the Aspire dashboard (`:18888`) for traces and logs without standing up your own. Don't want the .NET footprint? `netscript init --no-aspire` and it's gone.
 
 ### 5. Composable plugins
 

@@ -29,7 +29,7 @@ change as we move toward beta. Pin versions in real projects.
   steps: [
     { label: "Install the CLI", detail: "One global install puts a netscript command on your PATH." },
     { label: "Scaffold a workspace", detail: "netscript init lays down the whole opinionated repo." },
-    { label: "Start it under Aspire", detail: "cd aspire && aspire run brings up Postgres, Garnet, and the dashboard." }
+    { label: "Start it under Aspire", detail: "cd aspire && aspire start brings up Postgres, Garnet, and the dashboard." }
   ]
 }) }}
 
@@ -89,7 +89,7 @@ Next steps:
   1. cd my-app
   2. cd aspire  # TS AppHost lives here, isolated from the Deno workspace
   3. aspire restore  # download TypeScript AppHost SDK modules (run once)
-  4. aspire run  # start TypeScript AppHost
+  4. aspire start  # start TypeScript AppHost
 ```
 
 If you see that success line and the numbered steps, the scaffold worked. The exact
@@ -97,7 +97,7 @@ file count and the next steps adapt to the options you chose (a database, an exa
 service, and so on) — on the strict happy path above, the four steps are sufficient.
 
 {{ comp callout { type: "note", title: "Aspire comes before any database command" } }}
-On the default path, <strong>Aspire is step&nbsp;2 of running your app</strong>: <code>cd aspire &amp;&amp; aspire run</code>
+On the default path, <strong>Aspire is step&nbsp;2 of running your app</strong>: <code>cd aspire &amp;&amp; aspire start</code>
 provisions Postgres and Garnet first. Any <code>netscript db</code> command (init, generate, seed) runs
 <em>after</em> Aspire is up, because it needs that database to exist. See
 <a href="/how-to/database-migration/">Database migrations</a> for the full flow.
@@ -113,7 +113,7 @@ and every wired service come up together:
 ```bash
 cd my-app/aspire
 aspire restore   # one-time: downloads the AppHost SDK modules
-aspire run       # boots Postgres + Garnet + services, opens the dashboard
+aspire start       # boots Postgres + Garnet + services, opens the dashboard
 ```
 
 {{ comp callout { type: "note", title: "Prefer no orchestration?" } }}
@@ -148,7 +148,7 @@ Prefer a builder? The fluent equivalent of <code>defineService(...)</code> is th
 
 ## What you see
 
-Once `aspire run` settles, you have a live workspace to poke at:
+Once `aspire start` settles, you have a live workspace to poke at:
 
 - **The Aspire dashboard** at [http://localhost:18888](http://localhost:18888) —
   every resource (Postgres, Garnet, your services), its health, logs, and distributed
@@ -165,7 +165,7 @@ Once `aspire run` settles, you have a live workspace to poke at:
 <ul>
 <li>A port is already in use — <code>18888</code> (dashboard) or <code>8000</code> (Fresh app). Stop the other process or change the port.</li>
 <li>The first <code>aspire restore</code> downloads the AppHost SDK and can take a minute.</li>
-<li>If a <code>netscript db</code> command can't connect, confirm <code>aspire run</code> is still up — Postgres lives inside Aspire.</li>
+<li>If a <code>netscript db</code> command can't connect, confirm <code>aspire start</code> is still up — Postgres lives inside Aspire.</li>
 <li><code>deno: command not found</code> means Deno isn't on your PATH.</li>
 </ul>
 {{ /comp }}

@@ -22,7 +22,7 @@ are aggregated into a single generated client over one primary datasource.
 {{ comp callout { type: "important", title: "Aspire is step 2 — before any db command" } }}
 Every <code>netscript db</code> command talks to Postgres <strong>through Aspire</strong>.
 In the default layout Postgres is a container that <strong>Aspire</strong> provisions, so
-<code>cd aspire &amp;&amp; aspire run</code> must be up <strong>before</strong> you run
+<code>cd aspire &amp;&amp; aspire start</code> must be up <strong>before</strong> you run
 <code>netscript db init</code>. Run a <code>db</code> command against a stopped AppHost and
 it fails with <code>aspire start failed: … Project file does not exist</code>. That is the
 dependency, not a bug — bring orchestration up first, then run the db workflow from the
@@ -116,7 +116,7 @@ the matching migration.
 
 ## The database workflow
 
-With `aspire run` up (Postgres reachable), run the public `netscript db` commands from the
+With `aspire start` up (Postgres reachable), run the public `netscript db` commands from the
 workspace root in this order. The first three are the create-and-fill cycle; `status`
 confirms it landed and `migrate` evolves the schema later.
 
@@ -312,15 +312,15 @@ Aspire resources and the connection-string env vars the workspace resolves.
   rows: [
     { name: "postgres", type: "Aspire resource", desc: "The Postgres container Aspire provisions from appsettings.json NetScript.Databases.postgres. Watch it go green in the dashboard." },
     { name: "garnet", type: "Aspire resource", desc: "Garnet cache backing KV/queues — a separate concern from Postgres; see KV, queues & cron." },
-    { name: "http://localhost:18888", type: "dashboard", desc: "Aspire dashboard (token printed by `aspire run`) — confirm the postgres resource is healthy." },
+    { name: "http://localhost:18888", type: "dashboard", desc: "Aspire dashboard (token printed by `aspire start`) — confirm the postgres resource is healthy." },
     { name: "POSTGRES_URI / DATABASE_URL", type: "env", desc: "Connection string resolved by prisma.config.ts and normalized to a URL. Set these yourself under --no-aspire." }
   ]
 }) }}
 
 {{ comp callout { type: "warning", title: "Production pitfalls" } }}
 <ul>
-<li><strong>Forgetting Aspire.</strong> The most common failure: running <code>netscript db init</code> with no <code>aspire run</code> up. Start orchestration first, from the <code>aspire/</code> folder.</li>
-<li><strong>Wrong directory.</strong> Run <code>aspire run</code> from <code>aspire/</code>, but run the <code>netscript db</code> commands from the workspace <strong>root</strong> (or pass <code>--project-root</code>).</li>
+<li><strong>Forgetting Aspire.</strong> The most common failure: running <code>netscript db init</code> with no <code>aspire start</code> up. Start orchestration first, from the <code>aspire/</code> folder.</li>
+<li><strong>Wrong directory.</strong> Run <code>aspire start</code> from <code>aspire/</code>, but run the <code>netscript db</code> commands from the workspace <strong>root</strong> (or pass <code>--project-root</code>).</li>
 <li><strong>Stale client after a schema change.</strong> Editing a <code>.prisma</code> file without re-running <code>netscript db generate</code> leaves your code typed against the old model.</li>
 <li><strong>Calling getClient() before setClient().</strong> A second-database adapter throws until you hand it the constructed <code>PrismaClient</code> via <code>setClient()</code>.</li>
 <li><strong>Tracing wired too late.</strong> <code>enablePrismaTracing()</code> must run <em>before</em> the first <code>PrismaClient</code> is constructed, or early query spans are lost.</li>

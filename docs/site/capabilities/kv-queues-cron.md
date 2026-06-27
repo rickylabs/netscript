@@ -77,7 +77,7 @@ for you with no manual instrumentation.
   },
   {
     title: "Understand — Orchestration with Aspire",
-    body: "How the scaffold wires Garnet (Redis) and message brokers as resources, and why auto-detection just works once aspire run is up.",
+    body: "How the scaffold wires Garnet (Redis) and message brokers as resources, and why auto-detection just works once aspire start is up.",
     href: "/explanation/aspire/",
     icon: "◎"
   }
@@ -119,7 +119,7 @@ transactional database as your domain data.
 {{ comp callout { type: "important", title: "Aspire first — then the production adapters appear" } }}
 Auto-detection upgrades to Redis/Garnet and RabbitMQ only when those resources are
 <strong>running</strong>. Bring orchestration up first:
-<code>cd aspire &amp;&amp; aspire run</code> provisions Postgres, Garnet, and any message broker
+<code>cd aspire &amp;&amp; aspire start</code> provisions Postgres, Garnet, and any message broker
 (dashboard at <a href="http://localhost:18888">http://localhost:18888</a>)
 <strong>before</strong> any <code>netscript db</code> command or service that expects those
 backends. Without Aspire, KV falls back to local Deno KV, the queue falls back to Deno KV, and
@@ -363,7 +363,7 @@ for business-hours schedules. <strong>(5)</strong> always <code>await scheduler.
   },
   {
     title: "Understand — Orchestration with Aspire",
-    body: "How the scaffold wires Garnet (Redis) and message brokers as resources, and why auto-detection just works once aspire run is up.",
+    body: "How the scaffold wires Garnet (Redis) and message brokers as resources, and why auto-detection just works once aspire start is up.",
     href: "/explanation/aspire/",
     icon: "◎"
   },

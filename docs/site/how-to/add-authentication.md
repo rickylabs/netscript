@@ -23,9 +23,9 @@ the *how*, stay here.
 {{ comp callout { type: "important", title: "Aspire is the control plane — start it first" } }}
 The <code>auth-api</code> service and its Postgres/KV dependencies run as resources in the Aspire
 graph. Bring orchestration up <strong>before</strong> you run any <code>netscript db</code> command
-or hit an auth endpoint: from the project root, <code>cd aspire &amp;&amp; aspire run</code>
+or hit an auth endpoint: from the project root, <code>cd aspire &amp;&amp; aspire start</code>
 (dashboard at <a href="http://localhost:18888">http://localhost:18888</a>). DB commands require
-Aspire running first. See <a href="/explanation/aspire/">the Aspire explanation</a> for the resource
+aspire startning first. See <a href="/explanation/aspire/">the Aspire explanation</a> for the resource
 graph.
 {{ /comp }}
 
@@ -47,7 +47,7 @@ both Postgres and KV (Garnet) must be in the Aspire graph.
   rows: [
     { name: "Workspace", type: "netscript init", desc: "An existing project. If you have none, scaffold one first — see the tutorials." },
     { name: "netscript CLI", type: "on PATH", desc: "Installed globally: deno install --global --allow-all --name netscript jsr:@netscript/cli. Confirm with netscript --help." },
-    { name: "Aspire", type: "aspire run", desc: "Postgres + Garnet up via the AppHost before any db command or endpoint call (cd aspire && aspire run)." },
+    { name: "Aspire", type: "aspire start", desc: "Postgres + Garnet up via the AppHost before any db command or endpoint call (cd aspire && aspire start)." },
     { name: "OAuth credentials", type: "client id / secret", desc: "For the default kv-oauth backend you need a real OAuth/OIDC app (e.g. a Google client id + secret + redirect URI). Without provider env, signin/callback are non-functional stubs." }
   ]
 }) }}
@@ -134,7 +134,7 @@ through Prisma. The migration runs regardless; it is the persistence path for th
 backend.
 {{ /comp }}
 
-With Aspire running (Step 0), generate and apply the migration the same way you do for any plugin
+With aspire startning (Step 0), generate and apply the migration the same way you do for any plugin
 schema:
 
 ```sh
@@ -206,7 +206,7 @@ architecture behind this, read [the authentication model](/explanation/auth-mode
 
 ## Step 6 — Start the service and the auth endpoints
 
-With Aspire running, the `auth-api` service binds **port 8094** and mounts five endpoints under the
+With aspire startning, the `auth-api` service binds **port 8094** and mounts five endpoints under the
 public REST prefix **`/api/v1/auth/*`** (the oRPC surface is mirrored at `/api/rpc/v1/auth/*`):
 
 {{ comp.apiTable({
@@ -285,7 +285,7 @@ version.</li>
 but no real sign-in is possible.</li>
 <li><strong>Aspire down</strong> — a 404 on <code>:8094</code> or a DB error during
 <code>netscript db</code> almost always means orchestration is not running. <code>cd aspire &amp;&amp;
-aspire run</code> first.</li>
+aspire start</code> first.</li>
 </ul>
 {{ /comp }}
 

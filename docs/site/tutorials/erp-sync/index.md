@@ -80,7 +80,7 @@ one chapter you read rather than run end-to-end — and it says so plainly.
   },
   {
     title: "5 · Deploy locally",
-    body: "Run the whole ERP backend — workers, triggers, queue, and cron processors — on one machine under <code>aspire run</code>, and read it from the dashboard. Shows local-vs-production topology clearly.",
+    body: "Run the whole ERP backend — workers, triggers, queue, and cron processors — on one machine under <code>aspire start</code>, and read it from the dashboard. Shows local-vs-production topology clearly.",
     href: "/tutorials/erp-sync/05-deploy/"
   }
 ] }) }}

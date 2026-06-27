@@ -15,7 +15,7 @@ subprocess hand-off, and task execution in real OTel spans, and structured logs 
 the framework `logger`. The viewing surface is the **Aspire dashboard at
 `http://localhost:18888`**, which collects OTLP traces, metrics, and structured logs from
 every resource in the app graph (services, plugin APIs, background processors) the moment you
-run `aspire run`. You do not stand up Jaeger, Grafana, or a log shipper to get started — the
+run `aspire start`. You do not stand up Jaeger, Grafana, or a log shipper to get started — the
 AppHost provisions the OTLP collector and the dashboard for you.
 
 {{ comp.diagram({
@@ -33,7 +33,7 @@ each unit, follow the reference links: the telemetry primitives live at
 {{ comp callout { type: "important", title: "Aspire first, then telemetry" } }}
 The dashboard, the OTLP collector, and the per-resource trace/log views all come up with the
 orchestrator — they are not separate processes you start by hand. Run
-<code>cd aspire &amp;&amp; aspire run</code> <strong>before</strong> any <code>netscript db</code>
+<code>cd aspire &amp;&amp; aspire start</code> <strong>before</strong> any <code>netscript db</code>
 command (Aspire provisions Postgres and Garnet first), then open the dashboard URL printed in
 the console (<code>http://localhost:18888</code>, with a one-time auth token). Until Aspire is
 running there is no <code>:18888</code> surface to view traces or logs on. See
@@ -112,7 +112,7 @@ spans *inside* a job handler — and even there the `@netscript/telemetry` helpe
 
 Tracing turns on from the **environment** — `@netscript/telemetry/config` resolves a
 `TelemetryConfig` from the standard `OTEL_*` variables, and the Aspire AppHost already sets
-them for you. The fastest path is to run `aspire run`, trigger any job, and the
+them for you. The fastest path is to run `aspire start`, trigger any job, and the
 runtime's automatic spans show up in the dashboard with no code change. The tab below adds a
 **custom** span on top of that automatic trace.
 
@@ -130,7 +130,7 @@ runtime's automatic spans show up in the dashboard with no code change. The tab 
 ] }) }}
 
 {{ comp callout { type: "tip", title: "Lowest-effort observability path" } }}
-Run <code>aspire run</code>, trigger a job, and open <code>:18888</code> → <strong>Traces</strong>.
+Run <code>aspire start</code>, trigger a job, and open <code>:18888</code> → <strong>Traces</strong>.
 You will see the dispatch span, the execution span, progress and step events, and — for
 subprocess or polyglot tasks — a continued trace across the process boundary. None of that
 requires editing the scaffold. Reach for custom instrumentation only when you want spans
@@ -307,7 +307,7 @@ by Aspire. These are the real addresses you interact with, validated by the CLI 
 {{ comp.apiTable({
   caption: "Observability surfaces (link to /reference/telemetry/ and /reference/logger/ for the generated APIs)",
   rows: [
-    { name: "http://localhost:18888", type: "dashboard", desc: "Aspire dashboard — traces, structured logs, metrics, and resource state for the whole app graph. Auth token printed by `aspire run`." },
+    { name: "http://localhost:18888", type: "dashboard", desc: "Aspire dashboard — traces, structured logs, metrics, and resource state for the whole app graph. Auth token printed by `aspire start`." },
     { name: "http://localhost:4318", type: "OTLP/HTTP", desc: "OTLP ingest endpoint the AppHost configures (aspire.config.json https profile). Runtimes export spans and logs here; the dashboard reads them back. This is the seam you point at a hosted backend." },
     { name: "GET :8091/health", type: "liveness", desc: "Workers API health probe — reported as resource health in the dashboard." },
     { name: "GET :8092/health/live", type: "liveness", desc: "Sagas API liveness route." },
@@ -318,7 +318,7 @@ by Aspire. These are the real addresses you interact with, validated by the CLI 
 
 ## View it in Aspire
 
-With `aspire run` up, the dashboard at `http://localhost:18888` gives you four views over the
+With `aspire start` up, the dashboard at `http://localhost:18888` gives you four views over the
 same telemetry stream — there is no separate tool to configure.
 
 {{ comp.apiTable({
@@ -335,7 +335,7 @@ same telemetry stream — there is no separate tool to configure.
 Reach for the dashboard whenever you need to answer <strong>"what happened and where"</strong>:
 which resource is unhealthy, what a service logged for a given request, why a job failed, or how
 a call fanned out across services and subprocesses. Because Aspire wires OTLP for you, the
-lowest-effort observability path is to run <code>aspire run</code> and open
+lowest-effort observability path is to run <code>aspire start</code> and open
 <code>:18888</code> — no extra dependency, no collector to deploy. When you outgrow the local
 dashboard, the same OTLP export (<code>http://localhost:4318</code>) is the seam you point at a
 hosted backend.

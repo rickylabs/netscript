@@ -253,7 +253,7 @@ The key moves:
 
 ## Verify your progress
 
-Make sure `aspire run` is up, then open the route in a browser:
+Make sure `aspire start` is up, then open the route in a browser:
 
 ```
 http://localhost:8010/dashboard/orders/
@@ -275,7 +275,7 @@ deno task check
 - [ ] `deno task check` is clean.
 
 {{ comp callout { type: "tip", title: "Table is empty or spinning forever?" } }}
-A perpetually empty table usually means the KV cache is cold and the loader returned <code>undefined</code> with nothing to refetch — confirm <code>aspire run</code> is up so <code>services__orders__http__0</code> resolves, and that <code>netscript db seed</code> ran. The first request warms the cache; reload once.
+A perpetually empty table usually means the KV cache is cold and the loader returned <code>undefined</code> with nothing to refetch — confirm <code>aspire start</code> is up so <code>services__orders__http__0</code> resolves, and that <code>netscript db seed</code> ran. The first request warms the cache; reload once.
 {{ /comp }}
 
 ## What you built

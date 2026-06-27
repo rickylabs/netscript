@@ -95,7 +95,7 @@ Open `my-dashboard/`. The shape that matters for this track:
   ] },
   { name: "plugins/", comment: "Plugin registry + manifests — empty until you add one" },
   { name: "aspire/", children: [
-    { name: "apphost.mts", comment: "Entry point for aspire run (TypeScript/Node, not C#)" }
+    { name: "apphost.mts", comment: "Entry point for aspire start (TypeScript/Node, not C#)" }
   ] },
   { name: "appsettings.json", comment: "Infrastructure manifest Aspire reads" },
   { name: "deno.json", comment: "Workspace root: members, tasks, dependency catalog" },
@@ -171,25 +171,25 @@ subfolder so the CLI finds `apphost.mts`:
 ```sh
 cd aspire
 aspire restore   # once: restores the Aspire SDK modules into .aspire/
-aspire run       # starts the AppHost and every declared resource
+aspire start       # starts the AppHost and every declared resource
 ```
 
-`aspire run` brings up the Postgres database, the Garnet cache, your `orders` service, and the Fresh
+`aspire start` brings up the Postgres database, the Garnet cache, your `orders` service, and the Fresh
 app together, then prints a URL and login token for the **Aspire dashboard**:
 
 ```
 http://localhost:18888
 ```
 
-Leave `aspire run` running in this terminal; it is your control plane for the rest of the track.
+Leave `aspire start` running in this terminal; it is your control plane for the rest of the track.
 
 {{ comp callout { type: "important", title: "Aspire is step 2 — before any database command" } }}
-The Postgres container only exists while <code>aspire run</code> is up. So <code>netscript db init</code>, <code>db generate</code>, and <code>db seed</code> must run <strong>after</strong> Aspire has started — never before. You will run them in chapter 2.
+The Postgres container only exists while <code>aspire start</code> is up. So <code>netscript db init</code>, <code>db generate</code>, and <code>db seed</code> must run <strong>after</strong> Aspire has started — never before. You will run them in chapter 2.
 {{ /comp }}
 
 ## Verify your progress
 
-In a second terminal (leave `aspire run` going in the first), confirm the `orders` service answers
+In a second terminal (leave `aspire start` going in the first), confirm the `orders` service answers
 its health endpoint:
 
 ```sh
@@ -206,12 +206,12 @@ A clean check confirms the scaffold, contracts, and service line up.
 
 - [ ] `netscript --help` lists the public command groups.
 - [ ] `my-dashboard/` exists with `apps/dashboard/`, `contracts/`, and `services/orders/`.
-- [ ] `aspire run` is up; the dashboard at `:18888` lists `postgres`, `garnet`, and `orders`.
+- [ ] `aspire start` is up; the dashboard at `:18888` lists `postgres`, `garnet`, and `orders`.
 - [ ] `curl http://localhost:3002/health` returns a healthy response.
 - [ ] `deno task check` is clean.
 
 {{ comp callout { type: "tip", title: "If something is not green" } }}
-Three checks cover most first-run snags: (1) is <code>aspire run</code> still up, with <code>postgres</code> and <code>garnet</code> healthy in the <a href="/explanation/aspire/">dashboard</a>? (2) is Docker running (<code>docker info</code>)? (3) did you <code>cd aspire</code> before <code>aspire run</code> so it found <code>apphost.mts</code>? A failed <code>curl</code> usually means the service is still starting — wait a few seconds and retry.
+Three checks cover most first-run snags: (1) is <code>aspire start</code> still up, with <code>postgres</code> and <code>garnet</code> healthy in the <a href="/explanation/aspire/">dashboard</a>? (2) is Docker running (<code>docker info</code>)? (3) did you <code>cd aspire</code> before <code>aspire start</code> so it found <code>apphost.mts</code>? A failed <code>curl</code> usually means the service is still starting — wait a few seconds and retry.
 {{ /comp }}
 
 ## What you built
