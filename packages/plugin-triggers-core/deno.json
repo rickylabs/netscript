@@ -1,6 +1,6 @@
 {
   "name": "@netscript/plugin-triggers-core",
-  "version": "0.0.1-alpha.9",
+  "version": "0.0.1-alpha.10",
   "description": "Trigger DSL, runtime ports, adapters, telemetry, config, and testing primitives for NetScript trigger plugins.",
   "license": "MIT",
   "exports": {
