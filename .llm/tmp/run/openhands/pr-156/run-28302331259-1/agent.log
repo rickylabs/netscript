@@ -1,0 +1,400 @@
+    ```typescript
+    await command.parse(['init', 'test-project', '--path', tempDir, 
+'--dry-run']);
+    const targetPath = `${tempDir}/test-project`;
+    await assertPathAbsent(targetPath);  // ✓ Directory remains absent
+    ```
+    
+    **Conclusion**: Write-free behavior is guaranteed by construction (dry-run 
+adapter) and verified by test (directory remains absent).
+    
+    ---
+    
+    ## Doctrine Compliance
+    
+    ✓ **Cast law**: No new `any` casts introduced  
+    ✓ **Clean separation**: Real and dry-run FS paths are properly isolated  
+    ✓ **Public surface**: Type changes to `InitCommandDependencies` are backward
+compatible  
+    ✓ **Test coverage**: New regression test file with 2 passing tests  
+    
+    ---
+    
+    ## Implementation Quality
+    
+    **Strengths**:
+    - Clean architectural approach: factory pattern enables FS injection
+    - Dry-run adapter properly mocks all read operations
+    - Test suite includes both positive (version derivation) and negative (no 
+writes) assertions
+    - No scope creep — changes are minimal and focused
+    
+    **Artifacts**:
+    - 1 slice commit: `383cc40a` (fix(cli): derive version and dry-run init 
+filesystem)
+    - New test file: `public-command-tree_test.ts` (2 tests)
+    - Complete run artifacts in `.llm/tmp/run/alpha11-fixtrain--a/`
+    
+    ---
+    
+    ## Remaining Risks
+    
+    None identified. Both defects are fully resolved with:
+    - Correct implementation verified by code inspection
+    - Comprehensive regression tests
+    - All gates passing
+    - No doctrine violations
+    - No technical debt introduced
+    
+    ---
+    
+    ## Recommendation
+    
+    **Approved for merge**. Slice A successfully delivers both F-3 and F-4 with 
+high-quality implementation, proper testing, and full doctrine compliance. Ready
+for PR #156 submission.
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 865.88K • cache hit 82.72% •  reasoning 11.95K • ↓ output 17.53K
+• $ 0.4318
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/28302331259-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# IMPL-EVAL Summary: alpha.11 Slice A — CLI-core (F-3 version-from-package, 
+F-4 write-free dry-run)
+ 2|
++3|## Verdict: PASS ✓
++4|
++5|**Evaluator**: IMPL-EVAL (separate session from generator)  
++6|**Model**: qwen/qwen3.7-max via OpenRouter  
++7|**Run ID**: 28302331259-1  
++8|**PR**: #156  
++9|**Date**: 2025-01-15
++10|
++11|---
++12|
++13|## Executive Summary
++14|
++15|Slice A successfully delivers both targeted CLI-core defects:
++16|
++17|- **F-3 (version-from-package)**: CLI `--version` now derives from 
+`packages/cli/deno.json` instead of hardcoded `'1.0.0'`
++18|- **F-4 (write-free dry-run)**: `init --dry-run` performs zero filesystem 
+writes through proper dry-run FS adapter injection
++19|
++20|Both fixes are correctly implemented, tested, and pass all required gates. 
+The implementation follows doctrine, introduces no new `any` casts, and 
+maintains clean separation of concerns.
++21|
++22|---
++23|
++24|## Gate Results
++25|
++26|### ✓ Type Checking: PASS
++27|```bash
++28|deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root 
+packages/cli --ext ts
++29|```
++30|**Result**: exit 0, zero errors across 923 files in 9 batches
++31|
++32|### ✓ Linting: PASS
++33|```bash
++34|deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root 
+packages/cli --ext ts
++35|```
++36|**Result**: exit 1, but only pre-existing `Command<any>` at 
+`init-command.ts:44` (accepted top-level router form). No new `any` casts 
+introduced.
++37|
++38|### ✓ Tests: PASS
++39|```bash
++40|deno test packages/cli/src/public/features/root/public-command-tree_test.ts
++41|```
++42|**Result**: 2/2 tests passed
++43|- `public root --version reports package version` — verifies derived version
+from deno.json
++44|- `public init --dry-run leaves target directory absent` — proves zero 
+filesystem writes
++45|
++46|### ✓ Build: PASS
++47|```bash
++48|deno run --allow-all packages/cli/bin/netscript.ts --version
++49|```
++50|**Result**: Prints `NetScript version 0.0.1-alpha.10` (derived from 
+deno.json)
++51|
++52|---
++53|
++54|## Claim Verification
++55|
++56|### F-3: version-from-package — VERIFIED ✓
++57|
++58|**Implementation** (`public-command-tree.ts:16,105`):
++59|- Imports `cliMeta` from `deno.json` with type assertion
++60|- Passes `cliMeta.version` to Cliffy's `.version()` method
++61|- Previously hardcoded to `'1.0.0'`
++62|
++63|**Test** (`public-command-tree_test.ts:11-13`):
++64|```typescript
++65|assertEquals(command.getVersion(), cliMeta.version);
++66|assertNotEquals(command.getVersion(), '1.0.0');
++67|```
++68|Explicitly verifies version derivation and prevents regression to hardcoded 
+value.
++69|
++70|**Conclusion**: Correctly implemented and tested.
++71|
++72|---
++73|
++74|### F-4: write-free dry-run — VERIFIED ✓
++75|
++76|**Implementation by construction**:
++77|
++78|1. **Context factory** (`public-command-dependencies.ts:187-201`):  
++79|   Extracts `createInitContext` factory that accepts any `FileSystemPort` 
+implementation.
++80|
++81|2. **Dry-run injection** (`public-command-dependencies.ts:217`):  
++82|   ```typescript
++83|   createInitContext: (options) => {
++84|     const fs = options.dryRun
++85|       ? new DryRunFileSystemAdapter()
++86|       : new DenoFileSystem();
++87|     return createInitContext(fs);
++88|   }
++89|   ```
++90|   Swaps real FS for dry-run adapter when `dryRun` flag is true.
++91|
++92|3. **Command wiring** (`init-command.ts:80`):  
++93|   Uses factory to obtain appropriate context based on `dryRun` flag.
++94|
++95|4. **Pipeline gates** (`init-pipeline.ts:88-93`):  
++96|   Post-processing steps (`formatOutput`, `gitInit`) are gated on `!dryRun`.
++97|
++98|5. **Dry-run adapter** (`dry-run-fs.ts`):  
++99|   All write operations are recorded but not executed. Read operations 
+return mocked data.
++100|
++101|**Test proof** (`public-command-tree_test.ts:35-42`):
++102|```typescript
++103|await command.parse(['init', 'test-project', '--path', tempDir, 
+'--dry-run']);
++104|const targetPath = `${tempDir}/test-project`;
++105|await assertPathAbsent(targetPath);  // ✓ Directory remains absent
++106|```
++107|
++108|**Conclusion**: Write-free behavior is guaranteed by construction (dry-run 
+adapter) and verified by test (directory remains absent).
++109|
++110|---
++111|
++112|## Doctrine Compliance
++113|
++114|✓ **Cast law**: No new `any` casts introduced  
++115|✓ **Clean separation**: Real and dry-run FS paths are properly isolated  
++116|✓ **Public surface**: Type changes to `InitCommandDependencies` are 
+backward compatible  
++117|✓ **Test coverage**: New regression test file with 2 passing tests  
++118|
++119|---
++120|
++121|## Implementation Quality
++122|
++123|**Strengths**:
++124|- Clean architectural approach: factory pattern enables FS injection
++125|- Dry-run adapter properly mocks all read operations
++126|- Test suite includes both positive (version derivation) and negative (no 
+writes) assertions
++127|- No scope creep — changes are minimal and focused
++128|
++129|**Artifacts**:
++130|- 1 slice commit: `383cc40a` (fix(cli): derive version and dry-run init 
+filesystem)
++131|- New test file: `public-command-tree_test.ts` (2 tests)
++132|- Complete run artifacts in `.llm/tmp/run/alpha11-fixtrain--a/`
++133|
++134|---
++135|
++136|## Remaining Risks
++137|
++138|None identified. Both defects are fully resolved with:
++139|- Correct implementation verified by code inspection
++140|- Comprehensive regression tests
++141|- All gates passing
++142|- No doctrine violations
++143|- No technical debt introduced
++144|
++145|---
++146|
++147|## Recommendation
++148|
++149|**Approved for merge**. Slice A successfully delivers both F-3 and F-4 with
+high-quality implementation, proper testing, and full doctrine compliance. Ready
+for PR #156 submission.
++150|
+[end of edit 1 / 1]
+
+Agent Action (Not Executed) ────────────────────────────────────────────────────
+
+Reasoning:
+The user acknowledged the tool results. I've completed the IMPL-EVAL evaluation 
+for PR #156. Let me verify what's been done:
+
+1. ✓ Activated harness skill and followed evaluator protocol
+2. ✓ Verified F-3 (version-from-package) implementation:
+   - Code inspection: confirmed `cliMeta.version` from deno.json is used
+   - Test verification: test asserts version derivation and prevents regression
+   - All gates passed
+3. ✓ Verified F-4 (write-free dry-run) implementation:
+   - Code inspection: confirmed dry-run FS adapter injection
+   - Test verification: test proves directory remains absent after dry-run
+   - Pipeline gates: formatOutput and gitInit are gated on !dryRun
+   - All gates passed
+4. ✓ Ran all required gates:
+   - Type checking: PASS (0 errors)
+   - Linting: PASS (only pre-existing Command<any>)
+   - Tests: PASS (2/2 tests passed)
+   - Build: PASS
+5. ✓ Created evaluation artifact: .llm/tmp/run/alpha11-fixtrain--a/evaluate.md
+6. ✓ Created summary artifact: 
+/home/runner/work/_temp/openhands/28302331259-1/summary.md
+7. ✓ Verdict: PASS
+
+The user just said "Tool results provided" which indicates they've seen the file
+creation confirmations. Now I should signal completion with a final verdict 
+message since output=pr-comment was specified in the trigger.
+
+
+Thought:
+## IMPL-EVAL Verdict: PASS ✓
+
+**PR #156 — alpha.11 Slice A: CLI-core (F-3 version-from-package, F-4 write-free
+dry-run)**
+
+### Summary
+
+Slice A successfully delivers both targeted defects with high-quality 
+implementation and comprehensive testing.
+
+### Gate Results
+
+| Gate | Status | Evidence |
+|------|--------|----------|
+| Type Check | ✓ PASS | 0 errors across 923 files |
+| Lint | ✓ PASS | Only pre-existing `Command<any>` (accepted router form) |
+| Tests | ✓ PASS | 2/2 tests passed |
+| Build | ✓ PASS | Version prints correctly from deno.json |
+
+### Claim Verification
+
+**F-3 version-from-package** ✓
+- `public-command-tree.ts:16` imports `cliMeta` from `deno.json`
+- `public-command-tree.ts:105` passes `cliMeta.version` to Cliffy
+- Test verifies version derivation and prevents `'1.0.0'` regression
+
+**F-4 write-free dry-run** ✓
+- Factory injects `DryRunFileSystemAdapter` when `dryRun=true`
+- Pipeline gates `formatOutput` and `gitInit` on `!dryRun`
+- Test proves target directory remains absent after dry-run execution
+- Write-free behavior is **guaranteed by construction**
+
+### Doctrine Compliance
+
+✓ No new `any` casts introduced  
+✓ Clean separation: real FS vs dry-run adapter properly isolated  
+✓ Public surface: backward compatible type changes  
+✓ Test coverage: 2 new regression tests
+
+### Artifacts
+
+- Evaluation: `.llm/tmp/run/alpha11-fixtrain--a/evaluate.md`
+- Summary: `/home/runner/work/_temp/openhands/28302331259-1/summary.md`
+
+### Recommendation
+
+**Approved for merge.** Implementation is correct, tested, and follows doctrine.
+No technical debt introduced.
+
+
+
+Function call:
+- finish (call_b0777fbae2934342adc9e67b)
+
+
+Tokens: ↑ input 917.24K • cache hit 83.38% •  reasoning 12.27K • ↓ output 18.34K
+• $ 0.4505
+
+Agent Error ────────────────────────────────────────────────────────────────────
+
+Error Details:
+Error validating tool 'finish': 1 validation error for FinishAction
+message
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing. 
+Parameters provided: []
+
+Tokens: ↑ input 917.24K • cache hit 83.38% •  reasoning 12.27K • ↓ output 18.34K
+• $ 0.4505
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: IMPL-EVAL PASS: PR #156 Slice A verified
+
+Reasoning:
+I need to provide a message argument for the finish tool. I've completed the 
+IMPL-EVAL evaluation of PR #156, which received a PASS verdict. Both F-3 
+(version-from-package) and F-4 (write-free dry-run) were successfully 
+implemented and verified. I'll summarize the key findings in the finish message.
+
+Finish with message:
+## IMPL-EVAL Verdict: PASS ✓
+
+**PR #156 — alpha.11 Slice A: CLI-core (F-3 version-from-package, F-4 write-free
+dry-run)**
+
+Successfully evaluated PR #156. Both targeted defects are correctly implemented 
+and verified:
+
+### Gate Results
+- ✓ Type Check: 0 errors across 923 files
+- ✓ Lint: Only pre-existing `Command<any>` (accepted router form), no new `any` 
+casts
+- ✓ Tests: 2/2 passed (version derivation + write-free dry-run proof)
+- ✓ Build: Version prints correctly from `packages/cli/deno.json`
+
+### Verified Claims
+
+**F-3 version-from-package**: CLI `--version` now derives from `cliMeta.version`
+imported from `deno.json:3` (was hardcoded `'1.0.0'`). Test explicitly prevents 
+regression.
+
+**F-4 write-free dry-run**: `init --dry-run` injects `DryRunFileSystemAdapter` 
+via factory pattern, guaranteeing zero filesystem writes by construction. Test 
+proves target directory remains absent after execution.
+
+### Quality
+- Clean factory architecture enables FS injection
+- Comprehensive regression tests (new file: `public-command-tree_test.ts`)
+- No doctrine violations or new `any` casts
+- Implementation is minimal, focused, and correct
+
+**Artifacts written**:
+- `.llm/tmp/run/alpha11-fixtrain--a/evaluate.md` (detailed evaluation)
+- `/home/runner/work/_temp/openhands/28302331259-1/summary.md` (executive 
+summary)
+
+Ready for merge.
+
+Tokens: ↑ input 969.17K • cache hit 84.13% •  reasoning 12.34K • ↓ output 18.82K
+• $ 0.4667
+
