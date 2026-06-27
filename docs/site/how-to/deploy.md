@@ -54,7 +54,7 @@ production:
 {{ comp.featureGrid({ items: [
   {
     title: "1. Backing services",
-    body: "Postgres (primary database) and Redis (KV/cache — the default `--cache-backend`; `garnet` and `deno-kv` are alternatives). In dev, Aspire provisions both as containers. In production you bring your own — managed Postgres, managed Redis-compatible cache.",
+    body: "Postgres (the recommended default database; `mysql`, `mssql`, or `sqlite` are first-class alternatives via `--db`) and Redis (KV/cache — the default `--cache-backend`; `garnet` and `deno-kv` are alternatives). In dev, Aspire provisions Postgres/MySQL/SQL Server as containers (`sqlite` is file-backed, no container) and Redis as a container. In production you bring your own — managed database, managed Redis-compatible cache.",
     icon: "▣"
   },
   {

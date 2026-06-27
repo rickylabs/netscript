@@ -65,6 +65,10 @@ contracts, a plugin registry, and the Aspire orchestration layer:
 netscript init my-app --db postgres
 ```
 
+{{ comp callout { type: "note", title: "Pick your database engine" } }}
+Postgres is the recommended default shown throughout these docs. The database is polyglot — swap <code>--db postgres</code> for <code>mysql</code>, <code>mssql</code>, or <code>sqlite</code> to scaffold a Prisma-backed schema for that engine instead. (<code>postgres</code> / <code>mysql</code> / <code>mssql</code> run as an Aspire container resource; <code>sqlite</code> is file-backed with no container.)
+{{ /comp }}
+
 {{ comp callout { type: "tip" } }}
 Want to see the plan before anything touches disk? Add <code>--dry-run</code> —
 <code>netscript init my-app --db postgres --dry-run</code> previews every file it would create and writes
@@ -187,8 +191,8 @@ A complete, type-checked workspace — not a starter you have to assemble:
     icon: "▶"
   },
   {
-    title: "Postgres + Redis, provisioned",
-    body: "Aspire stands up the database and cache for you — no docker-compose to babysit, no connection strings to copy.",
+    title: "A database + Redis, provisioned",
+    body: "Aspire stands up the database (Postgres by default; or mysql / mssql / sqlite via --db) and cache for you — no docker-compose to babysit, no connection strings to copy.",
     icon: "▦"
   },
   {

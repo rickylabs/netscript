@@ -37,7 +37,7 @@ authentication seam.
   { title: "The plugin system", icon: "🧩", href: "/explanation/plugin-system/", body: "How a plugin relates to its core package, what it contributes through its manifest, and how the host discovers it through generated registries." },
   { title: "Durability model", icon: "🔁", href: "/explanation/durability-model/", body: "Sagas as explicit state machines: correlation, the kv or prisma durable store, and compensation modeled as message-handler effects." },
   { title: "Observability", icon: "📡", href: "/explanation/observability/", body: "Where OpenTelemetry traces are real and automatic, where the scaffold handler helpers are still no-op stubs, and how Aspire collects it all." },
-  { title: "The Aspire orchestrator", icon: "🛰️", href: "/explanation/aspire/", body: "The generated TypeScript AppHost, the resource graph (Postgres, Redis, every *-api service), and the dashboard on :18888." },
+  { title: "The Aspire orchestrator", icon: "🛰️", href: "/explanation/aspire/", body: "The generated TypeScript AppHost, the resource graph (the Postgres container by default — or mysql / mssql via --db; sqlite is file-backed with no container — plus Redis and every *-api service), and the dashboard on :18888." },
   { title: "The pure-backend auth model", icon: "🔐", href: "/explanation/auth-model/", body: "Core defines the AuthBackendPort; backends are pure adapters; the plugin composes exactly one active backend. Why only kv-oauth is interactive." }
 ] }) }}
 

@@ -76,7 +76,7 @@ completion the CLI prints a **next steps** summary tailored to your options — 
   caption: "init options this track uses (run netscript init --help for the full list)",
   rows: [
     { name: "--service --service-name orders --service-port 3002", type: "flags", desc: "Include an example oRPC service named orders on port 3002 — the read-model the dashboard consumes." },
-    { name: "--db postgres", type: "flag", desc: "Scaffold a Postgres database workspace. The orders read-model is persisted here." },
+    { name: "--db postgres", type: "flag", desc: "Scaffold a Postgres database workspace. The orders read-model is persisted here. Postgres is this track's stack; swap --db postgres for mysql, mssql, or sqlite for a different engine." },
     { name: "--dry-run", type: "flag", desc: "Plan the scaffold and print totals without writing any files (Step 1)." }
   ]
 }) }}

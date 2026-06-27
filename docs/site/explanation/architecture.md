@@ -239,8 +239,10 @@ capability hub is [Authentication]({{ comp.xref({ key: "cap:auth" }) }}).
 You will see the same port-and-adapter shape everywhere: the
 <a href="/reference/queue/"><code>queue</code></a> defines one port behind four
 backends (Deno&nbsp;KV, Redis, RabbitMQ, and PostgreSQL), the
-<a href="/reference/database/"><code>database</code></a> wraps Postgres behind a
-port, and durable sagas persist through a <code>kv</code> or <code>prisma</code>
+<a href="/reference/database/"><code>database</code></a> wraps a relational engine
+behind a port — Postgres (the default; or <code>mysql</code> / <code>mssql</code> /
+<code>sqlite</code> via <code>--db</code> at scaffold time) — and durable sagas persist
+through a <code>kv</code> or <code>prisma</code>
 store. Auth simply makes the pattern most visible because it ships three adapters
 in the box.
 {{ /comp }}
@@ -277,8 +279,10 @@ This is also where the capability switches live — the saga durable store
 (`NETSCRIPT_SAGA_STORE=kv|prisma`), the queue provider, and the active auth
 backend (`NETSCRIPT_AUTH_BACKEND`) are all selected here rather than in code. It
 is also why the database docs note a scaffold reality: `databases.config` can be
-empty in `netscript.config.ts` while Postgres is still provisioned by Aspire and
-described in `appsettings.json`. See
+empty in `netscript.config.ts` while the chosen engine — Postgres by default, or
+`mysql` / `mssql` / `sqlite` selected with `--db` at scaffold time — is still
+provisioned by Aspire (sqlite is file-backed, so it has no Aspire container
+resource) and described in `appsettings.json`. See
 [Runtime configuration]({{ comp.xref({ key: "cap:runtime-config" }) }}).
 
 ### Naming is part of the contract

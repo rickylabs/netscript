@@ -63,6 +63,8 @@ creating a brand-new project, pass the service flags straight to `netscript init
 netscript init my-app --db postgres --service --service-name users --service-port 3001 --yes
 ```
 
+`--db postgres` is the recommended default; swap it for `mysql`, `mssql`, or `sqlite` to scaffold a different Prisma-backed engine (`sqlite` is file-backed and runs without an Aspire container).
+
 To add a service to a workspace that already exists, use the `netscript service add`
 subcommand with the `--name` and `--port` flags (the `service` group also has `list` and
 `generate` subcommands; `service generate` only regenerates Aspire helper files):
@@ -276,7 +278,7 @@ Wire persistence with the database recipe before you depend on durability.
   { title: "Tutorial: Build a service", body: "The guided, learning-oriented version — contract to typed client to a Fresh island, explained step by step.", href: "/tutorials/storefront/02-catalog-service/", icon: "→" },
   { title: "Service API reference", body: "The full generated surface of defineService and createService — every option, builder method, and return type.", href: "/reference/service/", icon: "◆" },
   { title: "Contracts, explained", body: "How an oRPC contract flows from service to typed client to UI without a codegen step.", href: "/explanation/contracts/", icon: "◎" },
-  { title: "Database & migration", body: "Replace the seeded in-memory records with real Postgres persistence — init, generate, seed (Aspire up first).", href: "/how-to/database-migration/", icon: "▣" }
+  { title: "Database & migration", body: "Replace the seeded in-memory records with real Prisma-backed persistence — Postgres by default, or mysql / mssql / sqlite via --db — init, generate, seed (Aspire up first).", href: "/how-to/database-migration/", icon: "▣" }
 ] }) }}
 
 Manage the service over its lifetime by editing its contract under `contracts/versions/`

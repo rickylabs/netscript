@@ -72,7 +72,7 @@ can check.
 {{ comp.featureGrid({ items: [
   {
     title: "1 · Scaffold",
-    body: "Create <code>my-shop/</code> with the <code>netscript</code> CLI and boot it under Aspire. Postgres, the Redis cache, and your service come up together; the dashboard answers on :18888.",
+    body: "Create <code>my-shop/</code> with the <code>netscript</code> CLI and boot it under Aspire. Postgres (the default; swap <code>--db postgres</code> for <code>mysql</code>, <code>mssql</code>, or <code>sqlite</code>), the Redis cache, and your service come up together; the dashboard answers on :18888.",
     href: "/tutorials/storefront/01-scaffold/"
   },
   {

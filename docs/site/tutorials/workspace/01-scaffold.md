@@ -71,6 +71,10 @@ netscript init my-workspace --service --service-name workspace --service-port 30
 A clean dry run validates your flag combination — it rejects bad mixes (an unknown `--db` engine, for
 example) here, before any files exist. Treat a clean plan as a green light to scaffold for real.
 
+This track uses `--db postgres`, the recommended default. The database is polyglot, so you can swap
+`--db postgres` for `mysql`, `mssql`, or `sqlite` and follow along the same way (sqlite is file-backed,
+so it has no Aspire container).
+
 ## Step 2 — Create `my-workspace/`
 
 Run the same command without `--dry-run`. This track uses an example service named `workspace` on port

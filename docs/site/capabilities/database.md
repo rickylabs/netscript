@@ -32,7 +32,9 @@ workspace root. See <a href="/explanation/aspire/">Orchestration with Aspire</a>
 {{ comp callout { type: "tip", title: "Use this when" } }}
 Reach for the database layer when you need <strong>durable, relational state</strong> —
 records that survive restarts, are queried with a typed client, and are shared across your
-service and its plugins. For <em>ephemeral or high-throughput</em> state (counters, locks,
+service and its plugins. The engine is polyglot: pick it at scaffold time with
+<code>--db</code> — Postgres (the default; or <code>mysql</code> / <code>mssql</code> /
+<code>sqlite</code>). For <em>ephemeral or high-throughput</em> state (counters, locks,
 work queues, scheduled triggers) reach for <a href="/capabilities/kv-queues-cron/">KV,
 queues &amp; cron</a> instead; the scaffold uses both — Postgres for records, Redis/KV for
 execution state. Postgres can <em>also</em> back the work queue itself — see <a
@@ -48,9 +50,14 @@ href="/capabilities/kv-queues-cron/">the Postgres queue backend</a> below.
 
 ## How persistence is wired
 
-The default `--db postgres` scaffold lays down a `database/postgres/` workspace. A few
-facts are worth internalizing before you run anything, because they differ from a typical
-single-file Prisma setup.
+The scaffold engine is chosen with the `--db` flag —
+`netscript init my-app --db postgres|mysql|mssql|sqlite`. Postgres is the recommended
+default (and what every tutorial uses); `mysql`, `mssql`, and `sqlite` are first-class
+alternatives. `postgres` / `mysql` / `mssql` provision an Aspire container; `sqlite` is
+file-backed with **no** Aspire container resource. The default `--db postgres` scaffold
+lays down a `database/postgres/` workspace (a different engine lays down
+`database/<engine>/`). A few facts are worth internalizing before you run anything, because
+they differ from a typical single-file Prisma setup.
 
 ```text
 my-app/

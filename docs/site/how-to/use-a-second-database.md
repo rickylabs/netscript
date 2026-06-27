@@ -9,13 +9,26 @@ next: { label: "Choose a queue provider", href: "/how-to/choose-a-queue-provider
 # Use a second database
 
 **Goal:** add a *second* database — a second Postgres, or a MySQL/SQL Server instance —
-to a NetScript workspace that already has its default Postgres, so each datasource gets its
+to a NetScript workspace that already has its primary datasource, so each datasource gets its
 own Prisma schema, migrations, and generated client.
+
+This recipe assumes the primary datasource is Postgres (the recommended default — every tutorial
+scaffolds with `--db postgres`), but the primary engine is itself chosen at scaffold time: pass
+`--db mysql`, `--db mssql`, or `--db sqlite` to `netscript init` for a MySQL, SQL Server, or
+file-backed SQLite primary instead. Everything below applies regardless of which engine your
+primary uses; the examples simply show the common Postgres-primary case.
 
 NetScript's default scaffold gives you **one primary datasource** that every plugin
 aggregates its `.prisma` models into (see [Database & migration](/how-to/database-migration/)).
 A second database is the opposite shape: a **separate** Prisma schema workspace with its own
 `generate` output and its own migration history. It never merges into the primary aggregation.
+
+The second datasource is polyglot the same way the primary is: `netscript db add <engine>`
+accepts the same four engines as `netscript init` — `postgres`, `mysql`, `mssql`, and `sqlite`.
+The container-mode engines (`postgres`/`mysql`/`mssql`) are provisioned as an Aspire container
+resource (`addPostgres` / `addMySql` / `addSqlServer`); `sqlite` is **file-backed and has no
+Aspire container resource**, so the Aspire/Docker prerequisites below apply only to the
+container engines.
 
 There are two ways to add one, and they answer different needs:
 
@@ -29,7 +42,7 @@ There are two ways to add one, and they answer different needs:
 ## Before you start
 
 {{ comp.apiTable({ caption: "Prerequisites", rows: [
-  { name: "A scaffolded workspace", type: "with a primary db", desc: "An existing NetScript project whose primary Postgres is already wired — ideally migrated once via the Database & migration recipe so you know the single-datasource loop." },
+  { name: "A scaffolded workspace", type: "with a primary db", desc: "An existing NetScript project whose primary datasource is already wired (Postgres by default, or whichever engine you passed to netscript init via --db) — ideally migrated once via the Database & migration recipe so you know the single-datasource loop." },
   { name: "netscript CLI", type: "on PATH", desc: "deno install --global --allow-all --name netscript jsr:@netscript/cli. netscript db add --help should print." },
   { name: "Aspire CLI + Docker", type: "for container mode", desc: "The scaffolded second database is provisioned as a container by Aspire (addMySql / addPostgres / addSqlServer). Docker or Podman must be running. Skip only for an external/hand-wired database." },
   { name: "Deno", type: "2.x", desc: "Prisma client generation runs under the Deno runtime (the generated schema sets runtime=\"deno\")." }

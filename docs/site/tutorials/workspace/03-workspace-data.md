@@ -66,6 +66,13 @@ In one pass, `db add` scaffolds a workspace at `database/workspace/` (its own
 `appsettings.json` under `NetScript.Databases.workspace`, adds it as a project member, and regenerates
 the Aspire config so the new container joins the resource graph.
 
+{{ comp callout { type: "note", title: "The engine is swappable" } }}
+This track uses <code>postgres</code>, but <code>db add</code> is polyglot: swap <code>postgres</code> for
+<code>mysql</code>, <code>mssql</code>, or <code>sqlite</code> to scaffold that engine instead. Postgres,
+MySQL, and SQL Server each provision an Aspire container; SQLite is file-backed and adds no container
+resource. Keep <code>postgres</code> to follow the rest of this tutorial as written.
+{{ /comp }}
+
 {{ comp callout { type: "note", title: "The new datasource starts empty" } }}
 <code>db add</code> scaffolds the workspace and registers the datasource, but it does
 <strong>not</strong> run a migration or generate a client — the new

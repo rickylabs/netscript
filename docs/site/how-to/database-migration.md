@@ -8,10 +8,17 @@ next: { label: "Queue / KV / cron", href: "/how-to/queue-kv-cron/" }
 
 # Database & migration
 
-**Goal:** take a freshly scaffolded NetScript workspace and stand up its Postgres
-database — bring up the AppHost, create the first migration, generate the typed Prisma
+**Goal:** take a freshly scaffolded NetScript workspace and stand up its database —
+bring up the AppHost, create the first migration, generate the typed Prisma
 client, seed it, and confirm the schema is applied — using only the public
 `netscript db` commands.
+
+This recipe uses **Postgres**, the recommended default and the engine every tutorial
+builds on. The database is polyglot, though: NetScript scaffolds a Prisma-backed database
+for four engines, chosen at scaffold time with `--db` —
+`netscript init my-app --db postgres|mysql|mssql|sqlite`. Postgres, MySQL, and MSSQL come
+up as Aspire container resources; SQLite is file-backed and needs no container. The
+migration loop below is identical on every engine; only the provisioning differs.
 
 This is a task-oriented recipe. The single most important fact, and the one most people
 trip over: **`netscript db` commands provision and talk to Postgres _through_ Aspire**.
@@ -50,7 +57,7 @@ Aspire is keeping alive in a second terminal.
 ## Before you start
 
 {{ comp.apiTable({ caption: "Prerequisites", rows: [
-  { name: "NetScript workspace", type: "netscript init …", desc: "A workspace scaffolded with a database. The default --db postgres lays down database/postgres/ with a Prisma schema, prisma.config.ts, and seed scripts." },
+  { name: "NetScript workspace", type: "netscript init …", desc: "A workspace scaffolded with a database. This recipe uses --db postgres (the recommended default), which lays down database/postgres/ with a Prisma schema, prisma.config.ts, and seed scripts. Swap --db postgres for mysql, mssql, or sqlite for a different engine — the workflow is the same, only the database/<engine>/ directory differs." },
   { name: "netscript CLI", type: "on PATH", desc: "Install with deno install --global --allow-all --name netscript jsr:@netscript/cli" + releaseSpecifier + " — then netscript --help should print." },
   { name: "Aspire CLI", type: "aspire", desc: "Used to provision Postgres and Redis as containers via Docker. Confirm with aspire --version. Docker/Podman must be running." },
   { name: "Deno", type: "2.x", desc: "deno --version. Prisma generation runs under the Deno runtime (the schema sets runtime=\"deno\")." }

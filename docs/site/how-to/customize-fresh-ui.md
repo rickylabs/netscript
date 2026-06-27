@@ -41,8 +41,9 @@ You need:
   `deno install --global --allow-all --name netscript jsr:@netscript/cli{{ releaseSpecifier }}`.
 
 Run the app while you work so you can see each change live. Aspire is step 2 of the
-normal startup flow — it brings up Postgres and Redis before any `netscript db`
-command and orchestrates the dashboard for you. You can also run the Fresh app on
+normal startup flow — it brings up your database (Postgres by default; or `mysql` /
+`mssql` / `sqlite` chosen at scaffold time via `--db`) and Redis before any
+`netscript db` command and orchestrates the dashboard for you. You can also run the Fresh app on
 its own when you only need the UI loop:
 
 {{ comp.tabbedCode({ tabs: [

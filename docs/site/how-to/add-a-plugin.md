@@ -48,7 +48,9 @@ You need:
 ] }) }}
 
 - **Aspire up if you plan to run the plugin.** Adding and registering a plugin is offline,
-  but several plugins (workers, sagas, auth) need Postgres and Redis to actually run. Bring
+  but several plugins (workers, sagas, auth) need a database and Redis to actually run. The
+  database is Postgres by default (or `mysql` / `mssql` / `sqlite`, chosen at scaffold time
+  with `--db`). Bring
   the local stack up first — `cd aspire && aspire start` — exactly as in
   [Run the stack with Aspire](/explanation/aspire/). You do **not** need it up just to
   scaffold and register.
@@ -173,7 +175,10 @@ generate the client:
 ] }) }}
 
 {{ comp callout { type: "note", title: "Aspire is step 2, the database is step 3" } }}
-<code>netscript db</code> talks to the Postgres that Aspire provisions. Always
+<code>netscript db</code> talks to the database that Aspire provisions — Postgres by
+default, or <code>mysql</code> / <code>mssql</code> / <code>sqlite</code> if you chose a
+different engine with <code>--db</code> at scaffold time (sqlite is file-backed, so it has no
+Aspire container resource). Always
 <code>cd aspire &amp;&amp; aspire start</code> <strong>before</strong> any <code>db</code>
 command — see <a href="/explanation/aspire/">Run the stack with Aspire</a>. Skip these
 database steps only when every plugin you added is stateless.

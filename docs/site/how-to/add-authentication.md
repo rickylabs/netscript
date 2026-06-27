@@ -21,8 +21,9 @@ This is the task-oriented companion to the [authentication capability hub](/capa
 the *how*, stay here.
 
 {{ comp callout { type: "important", title: "Aspire is the control plane — start it first" } }}
-The <code>auth-api</code> service and its Postgres/KV dependencies run as resources in the Aspire
-graph. Bring orchestration up <strong>before</strong> you run any <code>netscript db</code> command
+The <code>auth-api</code> service and its database/KV dependencies run as resources in the Aspire
+graph (the database is Postgres by default; <code>mysql</code> / <code>mssql</code> run as Aspire
+containers too, while <code>sqlite</code> is file-backed — pick one at scaffold with <code>--db</code>). Bring orchestration up <strong>before</strong> you run any <code>netscript db</code> command
 or hit an auth endpoint: from the project root, <code>cd aspire &amp;&amp; aspire start</code>
 (dashboard at <a href="http://localhost:18888">http://localhost:18888</a>). DB commands require
 aspire startning first. See <a href="/explanation/aspire/">the Aspire explanation</a> for the resource
@@ -40,7 +41,10 @@ sources, generated registry entries, and Aspire resources together.
 
 You need an existing workspace with a database, because the `kv-oauth` and `better-auth` backends
 persist sessions and accounts. The `auth` plugin sets `requiresDb: true` and `requiresKv: true`, so
-both Postgres and KV (Redis) must be in the Aspire graph.
+both a database and KV (Redis) must be in the Aspire graph. The database is polyglot — Postgres is
+the recommended default, but `mysql`, `mssql`, or `sqlite` are first-class alternatives selected at
+scaffold time with `netscript init --db <engine>`. (Postgres/MySQL/SQL Server run as an Aspire
+container resource; SQLite is file-backed with no container.)
 
 {{ comp.apiTable({
   caption: "Prerequisites",

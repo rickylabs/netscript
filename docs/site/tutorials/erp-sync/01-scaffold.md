@@ -70,7 +70,7 @@ real.
 
 ## Step 2 — Create the workspace
 
-This track needs a database to anchor durable execution, so scaffold with Postgres:
+This track needs a database to anchor durable execution, so scaffold with Postgres — the recommended default. `--db` is polyglot: swap `postgres` for `mysql`, `mssql`, or `sqlite` and the rest of the track works the same (this track uses `postgres` throughout):
 
 ```sh
 netscript init my-erp --db postgres

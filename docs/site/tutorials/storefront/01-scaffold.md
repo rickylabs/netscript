@@ -88,11 +88,15 @@ This scaffolds `my-shop/`, formats the output with `deno fmt`, and initializes a
 completion the CLI prints a **next steps** summary tailored to your options — keep it handy; the
 steps below mirror the common path.
 
+This track uses Postgres, but the database is polyglot: swap `--db postgres` for `mysql`, `mssql`, or
+`sqlite` and the scaffold wires Prisma for that engine instead (sqlite is file-backed, with no Aspire
+container). Keep `--db postgres` to follow along.
+
 A few `init` options you will reach for (run `netscript init --help` for the full list):
 
 {{ comp.apiTable({ caption: "Common netscript init options", rows: [
   { name: "--service --service-name <name> --service-port <port>", type: "flag group", desc: "Include an example oRPC service on the given port. We use products on 3001." },
-  { name: "--db <engine>", type: "flag", desc: "Scaffold a database workspace (postgres, mysql, …). Omit or use --db none to skip database tooling." },
+  { name: "--db <engine>", type: "flag", desc: "Scaffold a Prisma-backed database workspace. First-class engines: postgres (default for this track), mysql, mssql, sqlite. Omit or use --db none to skip database tooling." },
   { name: "--no-aspire", type: "flag", desc: "Skip the Aspire orchestration files — you would then wire infrastructure yourself. Do NOT pass this for the track; we rely on aspire start." },
   { name: "--editor <none|zed|vscode>", type: "flag", desc: "Generate editor settings for the chosen editor." },
   { name: "--dry-run", type: "flag", desc: "Plan the scaffold and print totals without writing any files." }

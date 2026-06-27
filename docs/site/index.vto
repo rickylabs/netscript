@@ -24,7 +24,7 @@ you upgrade.
 
 {{ comp.tabbedCode({ tabs: [
   { label: "Define a service", lang: "ts", code: "// One preset wires CORS, request logging, OpenAPI JSON, Scalar docs,\n// RPC (served at /api/rpc/*), service info, and health endpoints —\n// instead of ~40 lines of Hono setup.\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\nconst service = await defineService(router, {\n  name: 'users',\n  port: 3000,\n});\n\nawait service.stop();" },
-  { label: "Install & scaffold", lang: "sh", code: "# Install the netscript command from JSR\ndeno install --global --allow-all --name netscript jsr:@netscript/cli" + releaseSpecifier + "\n\n# Scaffold a complete, type-checked workspace\nnetscript init my-app --db postgres\n\n# Prefer to keep .NET Aspire out of the loop? Opt out:\nnetscript init my-app --db postgres --no-aspire" },
+  { label: "Install & scaffold", lang: "sh", code: "# Install the netscript command from JSR\ndeno install --global --allow-all --name netscript jsr:@netscript/cli" + releaseSpecifier + "\n\n# Scaffold a complete, type-checked workspace.\n# Postgres is the default engine; swap --db postgres for mysql, mssql, or sqlite.\nnetscript init my-app --db postgres\n\n# Prefer to keep .NET Aspire out of the loop? Opt out:\nnetscript init my-app --db postgres --no-aspire" },
   { label: "Bring it up", lang: "sh", code: "# Aspire is step 2: it brings up Postgres and Redis first\ncd my-app/aspire && aspire start\n\n# Then, in the workspace root, initialize the database\nnetscript db init\n\n# Open the Aspire dashboard at http://localhost:18888 to see\n# every resource, service, trace, and log in one place." }
 ] }) }}
 

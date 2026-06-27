@@ -21,7 +21,8 @@ use <code>netscript</code>.
 {{ /comp }}
 
 {{ comp callout { type: "important", title: "Database commands need aspire startning first" } }}
-The <code>netscript db ...</code> commands provision and talk to Postgres <strong>through Aspire</strong>. Aspire is
+The <code>netscript db ...</code> commands provision and talk to your database <strong>through Aspire</strong> — Postgres
+by default, or <code>mysql</code> / <code>mssql</code> / <code>sqlite</code> when you scaffold with <code>--db</code>. Aspire is
 step 2 of the everyday flow: <code>cd aspire &amp;&amp; aspire start</code> brings up Postgres and Redis via Docker and
 opens the dashboard at <a href="http://localhost:18888">:18888</a> — <strong>before</strong> any <code>db init</code>,
 <code>db generate</code>, <code>db seed</code>, or <code>db status</code>. Run a <code>db</code> command with Aspire down and it fails to
@@ -70,7 +71,7 @@ and the order matters: **Aspire (step 2) must be up before any `db` command (ste
   },
   {
     title: "2 · Orchestrate",
-    body: "cd aspire && aspire start brings up Postgres and Redis and opens the dashboard at :18888. Do this before any db command.",
+    body: "cd aspire && aspire start brings up your database (Postgres by default; or mysql/mssql/sqlite via --db) and Redis, and opens the dashboard at :18888. Do this before any db command.",
     icon: "▶"
   },
   {
@@ -95,7 +96,7 @@ Aspire orchestration files. The flags below match the verified scaffold run.
   caption: "Scaffold a workspace",
   rows: [
     { name: "netscript init", type: "netscript init my-app", desc: "Create a NetScript workspace in <code>my-app/</code> — contracts, plugin registry, Fresh app, a default Redis cache, and the Aspire layer. On a terminal it prompts for anything you omit (name, database, service, cache); add <code>--dry-run</code> to preview every file without writing." },
-    { name: "init (full happy path)", type: "netscript init my-app --db postgres --service --service-name users --service-port 3001 --yes", desc: "The fully-specified, non-interactive form (<code>--yes</code>): Postgres database support, an example oRPC <code>users</code> service on port 3001, and the default Redis cache resource." },
+    { name: "init (full happy path)", type: "netscript init my-app --db postgres --service --service-name users --service-port 3001 --yes", desc: "The fully-specified, non-interactive form (<code>--yes</code>): Postgres database support (swap <code>--db postgres</code> for <code>mysql</code>, <code>mssql</code>, or <code>sqlite</code>), an example oRPC <code>users</code> service on port 3001, and the default Redis cache resource." },
     { name: "init --cache / --cache-backend", type: "netscript init my-app --cache-backend garnet", desc: "The shared cache is on by default with the <code>redis</code> backend. Pick another with <code>--cache-backend</code>: <code>redis</code> (default) or <code>garnet</code> are provisioned as Aspire container resources; <code>deno-kv</code> is app-level and needs no container. Pass <code>--cache=false</code> to scaffold without a cache." },
     { name: "init --no-aspire", type: "netscript init my-app --no-aspire", desc: "Scaffold without the .NET Aspire footprint. You start the Fresh app directly with <code>deno task --cwd apps/dashboard dev</code> and lose the dashboard + multi-resource wiring." },
     { name: "init --path / --editor", type: "netscript init my-app --path ./apps --editor zed", desc: "Place the project under a different directory and emit editor settings (<code>none</code> | <code>zed</code> | <code>vscode</code>)." }
@@ -201,10 +202,13 @@ at `/api/rpc/*`.
 
 ## Database
 
-The database workflow uses Prisma with a Deno runtime. **All of these require Aspire to
-be running** — Aspire provisions Postgres, so start it first with `cd aspire && aspire
-start`. Plugin schemas (`workers`, `sagas`, `triggers`, **`auth`**) are picked up by the
-same `generate` / `migrate` pass. The full task walkthrough is in the
+The database workflow uses Prisma with a Deno runtime, and the engine is **polyglot**:
+`netscript init --db postgres` (the recommended default) or `mysql`, `mssql`, or `sqlite`.
+Postgres, MySQL, and SQL Server each run as an Aspire container resource; **`sqlite` is
+file-backed and has no Aspire container**. **All of the container-backed engines require
+Aspire to be running** — Aspire provisions the database, so start it first with
+`cd aspire && aspire start`. Plugin schemas (`workers`, `sagas`, `triggers`, **`auth`**)
+are picked up by the same `generate` / `migrate` pass. The full task walkthrough is in the
 [database & migration how-to](/how-to/database-migration/).
 
 {{ comp.apiTable({
