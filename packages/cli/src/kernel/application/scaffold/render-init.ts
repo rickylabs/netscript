@@ -133,6 +133,8 @@ export async function scaffoldAspire(
     appName: options.appName,
     appPort,
     dbEngine: options.dbEngine,
+    cache: options.cache,
+    cacheBackend: options.cacheBackend,
     service: options.includeExampleService && options.serviceName && options.servicePort
       ? { name: options.serviceName, port: options.servicePort }
       : undefined,

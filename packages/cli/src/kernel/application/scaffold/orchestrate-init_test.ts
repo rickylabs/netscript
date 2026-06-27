@@ -19,6 +19,8 @@ function baseOptions(overrides: Partial<ValidatedInitOptions> = {}): ValidatedIn
     noAspire: false,
     legacyAspire: false,
     dbEngine: 'none',
+    cache: true,
+    cacheBackend: 'redis',
     includeExampleService: false,
     ...overrides,
   };

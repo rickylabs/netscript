@@ -11,6 +11,7 @@
 
 import { PORT_RANGES } from '../../constants/port-ranges.ts';
 import { SCAFFOLD_DEFAULTS } from '../../constants/scaffold/scaffold-defaults.ts';
+import type { CacheBackendChoice } from '../../domain/cache-backend.ts';
 import type { DbEngineChoice } from '../../domain/db-engine.ts';
 
 /** Example service wiring for `generateAppsettings()`. */
@@ -35,6 +36,10 @@ export interface AppsettingsOptions {
   readonly dashboardPort?: number;
   /** Database engine to register. `'none'` omits the Databases block. */
   readonly dbEngine?: DbEngineChoice;
+  /** Whether to register a shared cache resource. */
+  readonly cache?: boolean;
+  /** Shared cache backend to register. */
+  readonly cacheBackend?: CacheBackendChoice;
   /** Optional example service to register. */
   readonly service?: AppsettingsServiceOption;
 }
@@ -53,6 +58,14 @@ interface ToolBlock {
   readonly TaskName: string;
   readonly Database: string;
   readonly Description: string;
+}
+
+/** JSON shape of a Cache entry. */
+export interface CacheBlock {
+  readonly Engine: 'Redis' | 'Garnet' | 'DenoKv';
+  readonly Mode: 'Container' | 'External';
+  readonly DataPath?: string;
+  readonly Port?: number;
 }
 
 /**
@@ -193,6 +206,50 @@ export function buildDefaultTools(
 }
 
 /**
+ * Build the `Cache` section and `PrimaryCache` key for a chosen backend.
+ *
+ * The generated keys reuse the existing env-contract convention:
+ * `CACHE_PROVIDER`, `CACHE_MODE`, provider-specific `REDIS_URI`/`GARNET_URI`,
+ * and `DENO_KV_PATH` for file-backed Deno KV.
+ *
+ * @param backend - Cache backend selected by `--cache-backend`.
+ * @returns Cache config key and block.
+ */
+export function buildCacheBlock(
+  backend: CacheBackendChoice,
+): { readonly key: string; readonly block: CacheBlock } {
+  switch (backend) {
+    case 'redis':
+      return {
+        key: 'redis',
+        block: {
+          Engine: 'Redis',
+          Mode: 'Container',
+          DataPath: '.data/redis',
+        },
+      };
+    case 'garnet':
+      return {
+        key: 'garnet',
+        block: {
+          Engine: 'Garnet',
+          Mode: 'Container',
+          DataPath: '.data/garnet',
+        },
+      };
+    case 'deno-kv':
+      return {
+        key: 'deno-kv',
+        block: {
+          Engine: 'DenoKv',
+          Mode: 'External',
+          DataPath: 'data/kv',
+        },
+      };
+  }
+}
+
+/**
  * Generate the contents of `appsettings.json`.
  *
  * Produces a config compatible with `@netscript/aspire` `parseAppSettings()`.
@@ -206,8 +263,11 @@ export function generateAppsettings(options?: AppsettingsOptions): string {
   const appPort = options?.appPort ?? PORT_RANGES.APP.start;
   const otelPort = options?.otelPort ?? PORT_RANGES.OTEL_COLLECTOR;
   const dbEngine = options?.dbEngine ?? SCAFFOLD_DEFAULTS.DB_ENGINE;
+  const cacheEnabled = options?.cache ?? SCAFFOLD_DEFAULTS.CACHE_ENABLED;
+  const cacheBackend = options?.cacheBackend ?? SCAFFOLD_DEFAULTS.CACHE_BACKEND;
 
   const db = buildDatabaseBlock(dbEngine, name);
+  const cache = cacheEnabled ? buildCacheBlock(cacheBackend) : undefined;
 
   const services: Record<string, unknown> = {};
   if (options?.service) {
@@ -230,10 +290,13 @@ export function generateAppsettings(options?: AppsettingsOptions): string {
   if (db) {
     netScriptConfig.PrimaryDatabase = db.key;
   }
+  if (cache) {
+    netScriptConfig.PrimaryCache = cache.key;
+  }
 
   Object.assign(netScriptConfig, {
     Databases: db ? { [db.key]: db.block } : {},
-    Cache: {},
+    Cache: cache ? { [cache.key]: cache.block } : {},
     Services: services,
     Plugins: {},
     BackgroundProcessors: {},

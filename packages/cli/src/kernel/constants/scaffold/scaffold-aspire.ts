@@ -28,4 +28,12 @@ export const SCAFFOLD_ASPIRE_INTEGRATIONS = {
     PACKAGE_ID: 'Aspire.Hosting.Redis',
     VERSION: '13.4.6',
   },
+  GARNET: {
+    PACKAGE_ID: 'Aspire.Hosting.Garnet',
+    VERSION: '13.4.6',
+  },
+  DENO_KV: {
+    PACKAGE_ID: 'CommunityToolkit.Aspire.Hosting.Deno',
+    VERSION: '13.4.0',
+  },
 } as const;
