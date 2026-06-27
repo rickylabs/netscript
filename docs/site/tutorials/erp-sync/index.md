@@ -80,7 +80,7 @@ one chapter you read rather than run end-to-end — and it says so plainly.
   },
   {
     title: "5 · Deploy locally",
-    body: "Run the whole ERP backend — workers, triggers, queue, and cron processors — on one machine under <code>aspire run</code>, and read it from the dashboard. Shows local-vs-production topology clearly.",
+    body: "Run the whole ERP backend — workers, triggers, queue, and cron processors — on one machine under <code>aspire start</code>, and read it from the dashboard. Shows local-vs-production topology clearly.",
     href: "/tutorials/erp-sync/05-deploy/"
   }
 ] }) }}
@@ -89,7 +89,8 @@ one chapter you read rather than run end-to-end — and it says so plainly.
 
 This track assumes the same local toolchain as the main ladder: a recent
 [Deno](https://deno.com/) and the [.NET Aspire](https://learn.microsoft.com/dotnet/aspire/) CLI on
-your `PATH`, plus Docker running so Aspire can provision Postgres and Garnet. If NetScript is brand
+your `PATH`, plus Docker running so Aspire can provision Postgres and Redis. This track uses
+Postgres (the default; swap `--db postgres` for `mysql`, `mssql`, or `sqlite` when you scaffold). If NetScript is brand
 new to you, walk the [Storefront tutorial](/tutorials/storefront/) first — it
 explains every generated directory in more depth than we re-cover here. This track then re-grounds
 you from a fresh scaffold, so you can start either place.

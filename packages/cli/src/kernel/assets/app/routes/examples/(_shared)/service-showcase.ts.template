@@ -18,6 +18,12 @@ export interface ServiceSummaryPanelProps {
   readonly updatedAtLabel: string;
 }
 
+type ServiceStatusCounts = {
+  active: number;
+  draft: number;
+  archived: number;
+};
+
 export function formatServiceTimestamp(value: string | number): string {
   return new Intl.DateTimeFormat('en', {
     month: 'short',
@@ -30,7 +36,7 @@ export function buildServiceSummary(
   data: ServiceShowcaseListData,
   snapshotAt: number = Date.now(),
 ): ServiceSummaryPanelProps {
-  const counts = data.items.reduce(
+  const counts = data.items.reduce<ServiceStatusCounts>(
     (summary, item) => {
       summary[item.status] += 1;
       return summary;
@@ -54,12 +60,12 @@ export async function loadServiceShowcaseSummary(): Promise<ServiceSummaryPanelP
 
 export async function loadServiceShowcaseData() {
   const queryClient = createNetScriptQueryClient();
-  const initialList = await queryClient.fetchQuery(
-    exampleServiceQueries.list.queryOptions(SERVICE_SHOWCASE_INPUT),
-  );
-  const cachedAt = queryClient.getQueryState(
-    exampleServiceQueries.list.clientKey(SERVICE_SHOWCASE_INPUT),
-  )?.dataUpdatedAt;
+  const queryOptions = exampleServiceQueries.list.queryOptions(SERVICE_SHOWCASE_INPUT);
+  const cachedAt = Date.now();
+  const initialList = await queryClient.fetchQuery<ServiceShowcaseListData>({
+    queryKey: queryOptions.queryKey,
+    queryFn: queryOptions.queryFn,
+  });
 
   return {
     dehydratedState: dehydrateQueryClient(queryClient),

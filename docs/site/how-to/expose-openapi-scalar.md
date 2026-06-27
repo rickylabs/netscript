@@ -69,7 +69,7 @@ This wires three routes onto the service:
 ### 2. Hit the endpoints
 
 With the service running (directly via `deno task --cwd services/users dev`, or
-under `aspire run` for DB-backed services), open the docs UI and fetch the raw
+under `aspire start` for DB-backed services), open the docs UI and fetch the raw
 spec:
 
 ```sh

@@ -367,7 +367,7 @@ The triggers API service (port <code>8093</code>) is the HTTP edge — it hosts
 <code>createTriggerIngress</code> behind a raw Hono router. The actual trigger
 processing — cron, file-watch, and DLQ handling — runs in a separate background
 processor entrypoint at <code>plugins/triggers/src/runtime/trigger-processor.ts</code>. Aspire wires
-both as resources (<code>triggers-api</code> and <code>trigger-processor</code>) when you <code>aspire run</code>.
+both as resources (<code>triggers-api</code> and <code>trigger-processor</code>) when you <code>aspire start</code>.
 {{ /comp }}
 
 ## Endpoints & port

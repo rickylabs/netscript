@@ -68,7 +68,7 @@ export function generateReadme(options: ReadmeOptions): string {
         '# (run from the aspire/ subfolder so `aspire` sees apphost.mts + aspire.config.json)',
       );
       lines.push('cd aspire && aspire restore');
-      lines.push('aspire run');
+      lines.push('aspire start');
     }
   } else {
     lines.push('# Start the Fresh app directly (no Aspire orchestration)');
@@ -93,7 +93,7 @@ export function generateReadme(options: ReadmeOptions): string {
     lines.push(
       '├── aspire/           # Aspire TypeScript orchestration (isolated Node.js runtime)',
     );
-    lines.push('│   ├── apphost.mts   # Entry point for `aspire run`');
+    lines.push('│   ├── apphost.mts   # Entry point for `aspire start`');
     lines.push('│   ├── .helpers/     # Generated register-*.mts helpers');
     lines.push('│   ├── .aspire/      # Aspire SDK modules (aspire restore output)');
     lines.push('│   └── package.json  # tsx + vscode-jsonrpc (isolated from the Deno workspace)');
@@ -126,7 +126,9 @@ export function generateReadme(options: ReadmeOptions): string {
     if (options.legacyAspire) {
       lines.push('| `dotnet run --project dotnet/AppHost` | Start Aspire orchestration (C#) |');
     } else {
-      lines.push('| `cd aspire && aspire run` | Start Aspire orchestration (TypeScript AppHost) |');
+      lines.push(
+        '| `cd aspire && aspire start` | Start Aspire orchestration (TypeScript AppHost) |',
+      );
       lines.push('| `cd aspire && aspire restore` | Restore Aspire SDK modules (run once) |');
     }
   }
@@ -170,7 +172,7 @@ export function generateReadme(options: ReadmeOptions): string {
       lines.push(
         `Primary database: **${engineLabel}** (key \`${options.dbEngine}\` in ` +
           '`appsettings.json`). The Aspire orchestration layer provisions it ' +
-          `on \`${options.legacyAspire ? 'dotnet run' : 'aspire run'}\` — no manual container ` +
+          `on \`${options.legacyAspire ? 'dotnet run' : 'aspire start'}\` — no manual container ` +
           'setup required.',
       );
     }

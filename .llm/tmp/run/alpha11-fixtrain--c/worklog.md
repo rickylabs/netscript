@@ -87,3 +87,25 @@ To add another cache backend, update `CACHE_BACKEND_CHOICES`, `buildCacheBlock()
 
 - Slice D must update CLI reference docs for `--cache` and `--cache-backend`.
 - Deno KV backend status is thin: config/schema only, no managed Aspire resource.
+
+## Merge Reconcile: origin/main 2026-06-28
+
+Resolved PR #159 against `origin/main` after first fast-forwarding to
+`origin/feat/cli-cache-interactive-alpha11-c`.
+
+| File | Resolution |
+| ---- | ---------- |
+| `.llm/tmp/run/alpha11-fixtrain--c/drift.md` | Kept ours; this branch owns the Slice C run artifact. |
+| `.llm/tmp/run/alpha11-fixtrain--c/plan.md` | Kept ours; this branch owns the Slice C run artifact. |
+| `.llm/tmp/run/alpha11-fixtrain--c/research.md` | Kept ours; this branch owns the Slice C run artifact. |
+| `packages/cli/src/kernel/domain/cache-backend.ts` | Kept ours; both sides were byte-identical cache backend vocabulary. |
+| `packages/cli/src/public/features/init/init-command.ts` | Combined Slice C cache/interactive init flags with Slice A dry-run context selection via `createInitContext({ dryRun })`. |
+| `packages/cli/src/public/features/root/public-command-dependencies.ts` | Preserved Slice A `DryRunFileSystemAdapter` factory and retained the existing public init dependency graph used by Slice C. |
+
+### Merge Gates
+
+| Gate | Result | Evidence |
+| ---- | ------ | -------- |
+| CLI check | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` exited 0; 527 files selected, 5 batches, 0 findings. |
+| Root/init regression tests | PASS | `deno test --unstable-kv --allow-all packages/cli/src/public/features/root/public-command-tree_test.ts packages/cli/src/public/features/init/init-command_test.ts` exited 0; 5 passed / 0 failed. |
+| Cast check | PASS | `git diff origin/main...HEAD -- '*.ts' '*.tsx' | grep -E "as unknown|as any"` reports only the pre-existing PR test fixture cast `} as unknown as InitPipelineContext;`; no new merge-resolution casts and no `as any` additions. |

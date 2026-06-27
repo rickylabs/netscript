@@ -32,18 +32,18 @@ Aspire dashboard.
 ## Before you begin
 
 You need the workspace database from [chapter 3](/tutorials/workspace/03-workspace-data/) with
-**Aspire running**. The workers plugin ships an API service and a background processor that Aspire
+**aspire startning**. The workers plugin ships an API service and a background processor that Aspire
 orchestrates. Confirm the workspace datasource is ready:
 
 ```sh
-# In my-workspace/, with `aspire run` up in another terminal
+# In my-workspace/, with `aspire start` up in another terminal
 netscript db status --db workspace   # the workspace datasource from chapter 3
 ```
 
 {{ comp callout { type: "important", title: "Aspire first, then everything else" } }}
 The Workers API on <code>:8091</code> and its background processor are resources in the Aspire graph,
 and so is the <a href="http://localhost:18888">dashboard on <code>:18888</code></a> where you read job
-traces. Start <code>aspire run</code> from <code>aspire/</code> <strong>before</strong> you add the
+traces. Start <code>aspire start</code> from <code>aspire/</code> <strong>before</strong> you add the
 plugin or trigger a job, and leave it running.
 {{ /comp }}
 
@@ -167,7 +167,7 @@ This scans `plugins/workers/jobs` and writes a registry the running service load
 `provision-member` is addressable over the API.
 
 {{ comp callout { type: "note", title: "Restart the processor if it was already running" } }}
-If <code>aspire run</code> was up before you generated the registry, restart it (or let it hot-reload)
+If <code>aspire start</code> was up before you generated the registry, restart it (or let it hot-reload)
 so the Workers API and its background processor pick up the new job.
 {{ /comp }}
 
@@ -221,7 +221,7 @@ automatically.
 {{ comp callout { type: "important", title: "If the execution never appears" } }}
 <ul>
 <li><strong>Aspire isn't running</strong> — the background processor that drains the queue is an Aspire
-resource. Start <code>aspire run</code> from <code>aspire/</code> and retry.</li>
+resource. Start <code>aspire start</code> from <code>aspire/</code> and retry.</li>
 <li><strong>The job isn't registered</strong> — re-run <code>netscript generate plugins</code> so
 <code>provision-member</code> is in the registry, then restart Aspire.</li>
 <li><strong>Wrong id</strong> — the trigger path uses the job's <code>id</code>

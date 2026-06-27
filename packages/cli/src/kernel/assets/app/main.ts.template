@@ -13,7 +13,7 @@ import type { State } from '@app/utils.ts';
 
 export const app = defineFreshApp<State>({ name: '{{appName}}' });
 
-// Startup banner — visible in `aspire run` console logs and local `deno task dev`.
+// Startup banner — visible in `aspire start` console logs and local `deno task dev`.
 const port = parseInt(Deno.env.get('PORT') || '{{appPort}}');
 const mode = Deno.env.get('MODE') ?? 'development';
 

@@ -36,7 +36,7 @@ import the contract, construct the client — that is the whole recipe.
     { name: "The callee service", type: "services/<name>/", desc: "A target service that answers on its own port over /api/rpc/* — e.g. the example users service on :3001. See the Add a service recipe to create one." },
     { name: "@netscript/sdk", type: "import alias", desc: "The SDK provides the typed client (createServiceClient / defineServices) and the discovery readers (@netscript/sdk/discovery). It is a workspace dependency of apps and consuming services." },
     { name: "The shared contract", type: "@<project>/contracts", desc: "Both the service and the caller import the SAME oRPC contract object through the project alias, so the client's input/output types are inferred — never duplicated." },
-    { name: "Aspire (for resolved URLs)", type: "aspire run", desc: "Aspire injects the services__<name>__http__<index> env vars that discovery reads. Without it you must set those vars yourself (see pitfalls)." }
+    { name: "Aspire (for resolved URLs)", type: "aspire start", desc: "Aspire injects the services__<name>__http__<index> env vars that discovery reads. Without it you must set those vars yourself (see pitfalls)." }
   ]
 }) }}
 
@@ -90,7 +90,7 @@ netscript service generate
 ```
 
 `service generate` only rewrites the Aspire helper files (it does not touch your service
-code). The next `aspire run` will inject the `services__users__http__0` variable into the
+code). The next `aspire start` will inject the `services__users__http__0` variable into the
 caller's environment.
 
 ## Step 3 — Construct the typed client
@@ -211,7 +211,7 @@ services__users__http__0=http://localhost:3001 deno task --cwd web dev
 stable in the scaffold but may shift before <code>1.0</code>. Pin the version you build on.</li>
 <li><strong>The reference must be declared, then generated.</strong> Adding a
 <code>ServiceReferences</code> entry does nothing until you re-run <code>netscript service
-generate</code> and restart <code>aspire run</code>. A missing reference means
+generate</code> and restart <code>aspire start</code>. A missing reference means
 <code>getServiceUrl</code> throws <em>"Service URL not found … Expected environment variable:
 services__&lt;name&gt;__http__0"</em>.</li>
 <li><strong>The discovery key must match.</strong> <code>serviceName</code> (and the

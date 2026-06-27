@@ -32,12 +32,12 @@ records — fully independent from the primary database and the auth tables.
 
 ## Before you begin
 
-You need the auth layer from [chapter 2](/tutorials/workspace/02-auth/) and **Aspire running**. The
+You need the auth layer from [chapter 2](/tutorials/workspace/02-auth/) and **aspire startning**. The
 second database is provisioned as its own container in the Aspire graph, so Docker must be up too.
 Confirm the primary is migrated and Aspire is live:
 
 ```sh
-# In my-workspace/, with `aspire run` up in another terminal
+# In my-workspace/, with `aspire start` up in another terminal
 netscript db status        # primary datasource is migrated (chapter 2)
 docker info                # Docker engine is running
 ```
@@ -66,6 +66,13 @@ In one pass, `db add` scaffolds a workspace at `database/workspace/` (its own
 `appsettings.json` under `NetScript.Databases.workspace`, adds it as a project member, and regenerates
 the Aspire config so the new container joins the resource graph.
 
+{{ comp callout { type: "note", title: "The engine is swappable" } }}
+This track uses <code>postgres</code>, but <code>db add</code> is polyglot: swap <code>postgres</code> for
+<code>mysql</code>, <code>mssql</code>, or <code>sqlite</code> to scaffold that engine instead. Postgres,
+MySQL, and SQL Server each provision an Aspire container; SQLite is file-backed and adds no container
+resource. Keep <code>postgres</code> to follow the rest of this tutorial as written.
+{{ /comp }}
+
 {{ comp callout { type: "note", title: "The new datasource starts empty" } }}
 <code>db add</code> scaffolds the workspace and registers the datasource, but it does
 <strong>not</strong> run a migration or generate a client — the new
@@ -81,11 +88,11 @@ graph. Restart the AppHost so it provisions:
 
 ```sh
 cd aspire
-aspire run
+aspire start
 ```
 
 Open the dashboard at [http://localhost:18888](http://localhost:18888) and confirm the new
-`workspace` resource goes green alongside the existing `postgres` and `garnet`.
+`workspace` resource goes green alongside the existing `postgres` and `redis`.
 
 {{ comp callout { type: "warning", title: "Restart is not optional" } }}
 The new container only appears because <code>db add</code> <strong>regenerated the Aspire helpers</strong>.
@@ -127,7 +134,7 @@ resolves for a signed-in user, so a workspace member is "this auth identity, in 
 
 The `netscript db` operations are **multi-database aware**: every one takes a `--db <target>` flag,
 where the target is a config key, a database name, or `all`. Point each command at the `workspace`
-datasource. Run these from the workspace root with `aspire run` up:
+datasource. Run these from the workspace root with `aspire start` up:
 
 {{ comp.tabbedCode({ tabs: [
   {

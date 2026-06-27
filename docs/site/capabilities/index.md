@@ -38,7 +38,7 @@ the host application never changes.
 These are the slices you bolt on with `netscript plugin add`. Each is an isolated
 background processor or service that exposes its own HTTP API on a dedicated
 port, wired into Aspire automatically. Bring Aspire up first — `cd aspire &&
-aspire run` provisions Postgres and Garnet and starts the dashboard at
+aspire start` provisions Postgres and a shared cache — `redis` by default, or `garnet` / `deno-kv` via `--cache-backend` — and starts the dashboard at
 `http://localhost:18888` — **before** any `netscript db` command or plugin call,
 so the plugin services and their dependencies exist when you reach for them.
 
@@ -65,7 +65,7 @@ primitives, observability, and UI the whole workspace shares.
 
 {{ comp.featureGrid({ items: [
   { title: "Services & contracts", icon: "🔌", body: "defineService(router, {...}) for one-shot services, or the fluent createService(...).serve() builder. oRPC + zod contracts via implement(); RPC mounts at /api/rpc/*. Example users service on :3001.", href: "/capabilities/services/" },
-  { title: "Database & Prisma", icon: "🗄️", body: "Prisma 7.8 with runtime=\"deno\" over Postgres. Per-plugin .prisma files aggregate under database/postgres/schema/plugins/<plugin>/. Requires Aspire up first.", href: "/capabilities/database/" },
+  { title: "Database & Prisma", icon: "🗄️", body: "Prisma 7.8 with runtime=\"deno\" over Postgres (the default; or mysql / mssql / sqlite via --db at scaffold time). Per-plugin .prisma files aggregate under database/postgres/schema/plugins/<plugin>/. Requires Aspire up first.", href: "/capabilities/database/" },
   { title: "KV, queues & cron", icon: "⏱️", body: "Deno KV, queue, and cron primitives behind the workspace's unstable:[\"kv\"] flag. The queue has four backends including Postgres — the durable substrate jobs and sagas build on.", href: "/capabilities/kv-queues-cron/" },
   { title: "Telemetry & logging", icon: "🔭", body: "OpenTelemetry and structured logs are wired into handlers, RPC, job dispatch, and SSE from line one — observable by default, with traces visible in the Aspire dashboard.", href: "/capabilities/telemetry/" },
   { title: "Fresh UI & design", icon: "🎨", body: "apps/dashboard is a Fresh + Preact + Tailwind v4 + Vite frontend. Copy-source: the CLI copies components into your repo and the code is yours.", href: "/capabilities/fresh-ui/" }
@@ -88,7 +88,7 @@ surface — these hubs orient, the reference enumerates.
     { name: "Triggers & ingress", type: "plugin · :8093 (Hono)", desc: "defineWebhook → enqueueJob; POST /api/v1/webhooks/inbound/generic. defer throws + DLQs. Full API at /reference/triggers/." },
     { name: "Durable streams", type: "plugin · :4437", desc: "createDurableStream producer runtime is real; plugin-streams manifest helpers throw StreamUnsupportedOperationError. Full API at /reference/streams/." },
     { name: "Authentication", type: "plugin · :8094", desc: "auth-api oRPC; /api/v1/auth/{signin,callback,signout,session,me}; one active backend (kv-oauth | workos | better-auth). Full API at /capabilities/auth/." },
-    { name: "Database & Prisma", type: "platform · Postgres", desc: "Prisma runtime=\"deno\", per-plugin schema aggregation. Full API at /reference/database/." },
+    { name: "Database & Prisma", type: "platform · Postgres", desc: "Prisma runtime=\"deno\", per-plugin schema aggregation; Postgres is the default engine, with mysql / mssql / sqlite selectable via --db. Full API at /reference/database/." },
     { name: "KV, queues & cron", type: "platform · primitives", desc: "Deno KV / queue (four backends incl. postgres) / cron behind unstable:[\"kv\"]. Full API at /reference/kv/, /reference/queue/, /reference/cron/." },
     { name: "Telemetry & logging", type: "platform · OTel", desc: "@opentelemetry/api spans + structured logs in handlers, RPC, and job dispatch. Full API at /reference/telemetry/ and /reference/logger/." },
     { name: "Fresh UI & design", type: "platform · copy-source", desc: "Fresh + Preact + Tailwind v4 dashboard you own. Full API at /reference/fresh/ and /reference/fresh-ui/." }

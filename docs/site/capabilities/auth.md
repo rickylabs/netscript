@@ -310,7 +310,9 @@ and no-op until the durable-streams service is wired. Treat the audit surface as
 trail for operational and security review, not a tamper-evident, write-once compliance log. See
 {{ comp.xref({ key: "explain:observability" }) }}.</li>
 <li><strong>Run the <code>auth.prisma</code> migration after Aspire is up.</strong> The
-better-auth backend's tables (and any DB-backed flow) need Postgres provisioned first — the same
+better-auth backend's tables (and any DB-backed flow) need your database provisioned first
+(Postgres by default; or <code>mysql</code> / <code>mssql</code> / <code>sqlite</code> via
+<code>--db</code> — better-auth persists through Prisma, so it is not Postgres-specific) — the same
 Aspire-first ordering every plugin schema follows.</li>
 </ul>
 {{ /comp }}

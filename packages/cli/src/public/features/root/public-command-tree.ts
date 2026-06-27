@@ -13,6 +13,7 @@ import {
   createPublicCommandDependencies,
   type PublicCommandDependencies,
 } from './public-command-dependencies.ts';
+import cliMeta from '../../../../deno.json' with { type: 'json' };
 
 /** Host services supplied by the binary edge. */
 export interface PublicCliHost {
@@ -26,6 +27,8 @@ export interface PublicCliHost {
 export interface PublicCliCommand {
   /** Parse command-line arguments. */
   readonly parse: (args?: string[]) => Promise<unknown> | unknown;
+  /** Return the command version printed by `--version`. */
+  readonly getVersion: () => string | undefined;
 }
 
 /** Context passed to public command factories. */
@@ -99,7 +102,7 @@ export function createPublicCommandTree(host: PublicCliHost): PublicCliCommand {
 
   return registry.program({
     name: 'netscript',
-    version: '1.0.0',
+    version: cliMeta.version,
     description: 'NetScript - enterprise-grade polyglot backend framework CLI',
     context: { host, dependencies },
   });

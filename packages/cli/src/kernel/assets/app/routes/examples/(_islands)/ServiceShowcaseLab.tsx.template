@@ -42,23 +42,20 @@ function ServiceShowcaseLabInner(props: Props) {
 
   const queryClient = useQueryClient();
   const currentKey = exampleServiceQueries.list.clientKey(props.input);
-  const currentState = queryClient.getQueryState<ServiceListData>(currentKey);
   const {
     data,
-    isPending,
-    isRefetching,
+    status,
+    isLoading,
     refetch,
   } = useQuery({
     ...exampleServiceQueries.list.queryOptions(props.input),
     initialData: props.initialList,
-    initialDataUpdatedAt: props.cachedAt,
     staleTime: 15_000,
   });
 
   const statusMutation = useMutation({
     ...exampleServiceQueries.updateStatus.mutationOptions(),
     onMutate: async (variables) => {
-      await queryClient.cancelQueries({ queryKey: currentKey });
       const previous = queryClient.getQueryData<ServiceListData>(currentKey);
 
       if (previous) {
@@ -95,7 +92,7 @@ function ServiceShowcaseLabInner(props: Props) {
     <div class='ns-stack ns-stack--md'>
       <div class='grid gap-3 md:grid-cols-4'>
         <StatCard label='Hydration' value={hydratedRef.current ? 'warm cache' : 'pending'} />
-        <StatCard label='List state' value={currentState?.status ?? 'missing'} />
+        <StatCard label='List state' value={status} />
         <StatCard label='Rows' value={String(items.length)} />
         <StatCard
           label='Cached at'
@@ -107,10 +104,10 @@ function ServiceShowcaseLabInner(props: Props) {
         <Button
           type='button'
           variant='outline'
-          loading={isPending || isRefetching}
+          loading={isLoading}
           onClick={() => void refetch()}
         >
-          {isRefetching ? 'Refreshing list' : `Refresh ${exampleServiceName}`}
+          {isLoading ? 'Refreshing list' : `Refresh ${exampleServiceName}`}
         </Button>
         <Button
           type='button'

@@ -179,11 +179,11 @@ describe('generateAppDenoJson', () => {
       '../../packages/fresh-ui/interactive.ts',
     );
     assertEquals(config.imports['@netscript/sdk'], '../../packages/sdk/mod.ts');
-    assertEquals(config.imports['@netscript/sdk/client'], '../../packages/sdk/client/mod.ts');
-    assertEquals(config.imports['@netscript/sdk/query'], '../../packages/sdk/query/mod.ts');
+    assertEquals(config.imports['@netscript/sdk/client'], '../../packages/sdk/src/client/mod.ts');
+    assertEquals(config.imports['@netscript/sdk/query'], '../../packages/sdk/src/query/mod.ts');
     assertEquals(
       config.imports['@netscript/sdk/query-client'],
-      '../../packages/sdk/query-client/mod.ts',
+      '../../packages/sdk/src/query-client/mod.ts',
     );
     assertEquals(config.imports['@test/contracts'], '../../contracts/mod.ts');
     assertEquals(config.imports['tailwindcss'], SCAFFOLD_APP_IMPORTS.tailwindcss);

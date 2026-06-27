@@ -20,7 +20,7 @@ never drops work mid-flight.
     { name: "@netscript/service", type: "package", desc: "Provides createService().onShutdown().serve() — signal handling and request draining live here." },
     { name: "@netscript/plugin-workers-core/shutdown", type: "subpath export", desc: "ShutdownManager for draining worker/scheduler resources; the worker runtime also exposes a runtime.shutdown handle." },
     { name: "@netscript/queue", type: "package (if you consume a queue)", desc: "MessageQueue.listen(handler, { signal }) + stop() let an AbortSignal stop consumption gracefully." },
-    { name: "A long-running entrypoint", type: "main.ts", desc: "A service or worker process you start with deno run / aspire run that needs to stop cleanly." }
+    { name: "A long-running entrypoint", type: "main.ts", desc: "A service or worker process you start with deno run / aspire start that needs to stop cleanly." }
   ]
 }) }}
 

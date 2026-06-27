@@ -110,7 +110,7 @@ The dashboard's own dev server reads <code>PORT</code> and defaults to <strong>8
 (<code>http://localhost:8010</code>, health at <code>/health</code>). That is distinct from the
 <strong>Aspire dashboard</strong> at <a href="http://localhost:18888">http://localhost:18888</a>,
 which orchestrates the whole resource graph. Bring the platform up first with
-<code>cd aspire &amp;&amp; aspire run</code> (Postgres/Garnet + every service), or run the app
+<code>cd aspire &amp;&amp; aspire start</code> (Postgres/Redis + every service), or run the app
 standalone with <code>deno task --cwd apps/dashboard dev</code>.
 {{ /comp }}
 
@@ -210,7 +210,7 @@ durable surface — the app is one application of it.
   rows: [
     { name: ":8010", type: "port", desc: "Dashboard dev server (Deno.env.get('PORT') || '8010'). Standalone: deno task --cwd apps/dashboard dev." },
     { name: "/health", type: "HTTP", desc: "App health route logged at startup (http://localhost:8010/health)." },
-    { name: ":18888", type: "Aspire", desc: "Aspire dashboard that orchestrates the dashboard alongside services/plugins; token printed by aspire run." },
+    { name: ":18888", type: "Aspire", desc: "Aspire dashboard that orchestrates the dashboard alongside services/plugins; token printed by aspire start." },
     { name: ":3001", type: "upstream", desc: "The users service the dashboard's typed client calls — same UsersContractV1, no drift." },
     { name: ":4437", type: "streams", desc: "The durable-streams Aspire service the @netscript/fresh/streams client consumes over HTTP/SSE (producer runtime in @netscript/plugin-streams-core)." }
   ]
