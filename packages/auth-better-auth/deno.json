@@ -1,6 +1,6 @@
 {
   "name": "@netscript/auth-better-auth",
-  "version": "0.0.1-alpha.9",
+  "version": "0.0.1-alpha.10",
   "description": "better-auth integration helpers for NetScript services.",
   "license": "MIT",
   "exports": {

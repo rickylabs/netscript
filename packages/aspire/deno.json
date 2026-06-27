@@ -1,6 +1,6 @@
 {
   "name": "@netscript/aspire",
-  "version": "0.0.1-alpha.9",
+  "version": "0.0.1-alpha.10",
   "description": "Config parsing, contribution ports, and SDK-agnostic helpers for Aspire TypeScript AppHost.",
   "license": "MIT",
   "exports": {
