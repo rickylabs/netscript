@@ -116,11 +116,12 @@ export NETSCRIPT_AUTH_BACKEND=kv-oauth
 ## Step 3 — Run the auth database migration
 
 The `auth` plugin contributes a Prisma schema, **`plugins/auth/database/auth.prisma`**, which is
-aggregated into your project's Postgres schema at `db generate`. It defines four better-auth-shaped
-models mapped to these tables:
+aggregated into your project's database schema at `db generate` (Postgres by default; or `mysql` /
+`mssql` / `sqlite` — the auth models persist through Prisma, so they follow whichever engine you
+scaffolded with `--db`). It defines four better-auth-shaped models mapped to these tables:
 
 {{ comp.apiTable({
-  caption: "auth.prisma models → Postgres tables",
+  caption: "auth.prisma models → your database tables",
   rows: [
     { name: "User", type: "auth_users", desc: "Authenticated principals. Populated by backends that persist users (better-auth)." },
     { name: "Session", type: "auth_sessions", desc: "Server-side session records. kv-oauth keeps sessions in KV; this table backs the Prisma-persisting backend." },

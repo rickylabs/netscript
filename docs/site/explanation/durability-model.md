@@ -138,7 +138,7 @@ them, chosen at startup:
   caption: "Durable saga store backends — NETSCRIPT_SAGA_STORE",
   rows: [
     { name: "kv", type: "KvSagaStore", desc: "Persists saga runtime state to Deno KV. The default scaffold backend — zero external dependencies, ideal for local development and KV-native deployments." },
-    { name: "prisma", type: "PrismaSagaStore", desc: "Persists saga runtime state through a host-owned Prisma client into Postgres, across three saga_runtime_* tables. Choose this when you already run Postgres (the Aspire stack does) and want saga state in your relational store. Requires a Prisma client at construction." }
+    { name: "prisma", type: "PrismaSagaStore", desc: "Persists saga runtime state through a host-owned Prisma client into your scaffolded relational database (Postgres by default; mysql / mssql / sqlite all work — the store follows your Prisma client, it is not Postgres-specific), across three saga_runtime_* tables. Choose this when you want saga state in your relational store alongside the rest of your data. Requires a Prisma client at construction." }
   ]
 }) }}
 
@@ -181,8 +181,10 @@ Both backends implement the same `SagaStorePort`, so the choice is operational, 
 - **`kv` (default).** Zero external dependencies — state lives in Deno KV. Lowest-friction for local
   development and for deployments that are already KV-native. This is what the scaffold uses out of
   the box, so a fresh project is durable with nothing else running.
-- **`prisma`.** Routes the durable write path into Postgres. Pick it when you already operate
-  Postgres (the {{ comp.xref({ key: "cap:database" }) }} stack and Aspire bring one up) and want saga
+- **`prisma`.** Routes the durable write path into your relational database — Postgres by default,
+  or `mysql` / `mssql` / `sqlite` if that is what you scaffolded with `--db` (the store writes
+  through your Prisma client, so it is not tied to Postgres). Pick it when you already operate that
+  database (the {{ comp.xref({ key: "cap:database" }) }} stack and Aspire bring one up) and want saga
   state queryable alongside the rest of your relational data — at the cost of a running database and
   a Prisma client to hand the store at construction.
 
