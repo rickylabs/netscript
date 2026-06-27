@@ -2,7 +2,7 @@
 
 ## Status
 
-Implementation complete; commit/push/PR pending at artifact creation time.
+Implementation committed; push/PR pending at artifact update time.
 
 ## Branch / thread
 
