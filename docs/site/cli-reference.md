@@ -94,8 +94,9 @@ Aspire orchestration files. The flags below match the verified scaffold run.
 {{ comp.apiTable({
   caption: "Scaffold a workspace",
   rows: [
-    { name: "netscript init", type: "netscript init my-app", desc: "Create a NetScript workspace in <code>my-app/</code> — contracts, plugin registry, Fresh app, and the Aspire layer. Add <code>--dry-run</code> to preview every file without writing." },
-    { name: "init (full happy path)", type: "netscript init my-app --db postgres --service --service-name users --service-port 3001 --yes", desc: "The fully-specified form: Postgres database support, an example oRPC <code>users</code> service on port 3001, non-interactive (<code>--yes</code>)." },
+    { name: "netscript init", type: "netscript init my-app", desc: "Create a NetScript workspace in <code>my-app/</code> — contracts, plugin registry, Fresh app, a default Redis cache, and the Aspire layer. On a terminal it prompts for anything you omit (name, database, service, cache); add <code>--dry-run</code> to preview every file without writing." },
+    { name: "init (full happy path)", type: "netscript init my-app --db postgres --service --service-name users --service-port 3001 --yes", desc: "The fully-specified, non-interactive form (<code>--yes</code>): Postgres database support, an example oRPC <code>users</code> service on port 3001, and the default Redis cache resource." },
+    { name: "init --cache / --cache-backend", type: "netscript init my-app --cache-backend garnet", desc: "The shared cache is on by default. Pick the backend with <code>--cache-backend</code>: <code>redis</code> (default) or <code>garnet</code> are provisioned as Aspire container resources; <code>deno-kv</code> is app-level and needs no container. Pass <code>--no-cache</code> to scaffold without a cache." },
     { name: "init --no-aspire", type: "netscript init my-app --no-aspire", desc: "Scaffold without the .NET Aspire footprint. You start the Fresh app directly with <code>deno task --cwd apps/dashboard dev</code> and lose the dashboard + multi-resource wiring." },
     { name: "init --path / --editor", type: "netscript init my-app --path ./apps --editor zed", desc: "Place the project under a different directory and emit editor settings (<code>none</code> | <code>zed</code> | <code>vscode</code>)." }
   ]
@@ -104,6 +105,15 @@ Aspire orchestration files. The flags below match the verified scaffold run.
 {{ comp callout { type: "tip", title: "Preview before you commit to disk" } }}
 <code>netscript init my-app --dry-run</code> prints every file and directory it would create and writes
 nothing — a safe way to inspect the scaffold plan first.
+{{ /comp }}
+
+{{ comp callout { type: "note", title: "Interactive vs non-interactive" } }}
+On a terminal, <code>netscript init</code> prompts for any option you do not pass on the command line —
+the project name, database engine, example service, and the two cache questions (enable the cache,
+then choose <code>redis</code> | <code>garnet</code> | <code>deno-kv</code>). For scripts and CI, pass
+<code>--yes</code> (accept defaults) or <code>--ci</code> (non-interactive) to skip every prompt; the
+defaults are a Postgres-ready workspace with a Redis cache. Run <code>netscript --version</code> to print
+the installed CLI version.
 {{ /comp }}
 
 ## Plugins
