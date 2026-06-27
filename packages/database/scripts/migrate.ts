@@ -69,12 +69,16 @@ export interface MigrationOptions {
  * with a premature stream close before establishing connectivity, which is
  * non-deterministic and clears on a fresh spawn.
  */
-const TRANSIENT_ENGINE_FAILURE =
-  /ERR_STREAM_PREMATURE_CLOSE|Premature close|Schema engine exited|schema-engine(?:-[\w]+)?(?:\.exe)?\s+cli\s+can-connect-to-database|Timed out waiting for Prisma schema engine/i;
+const PREMATURE_CLOSE_FAILURE = /ERR_STREAM_PREMATURE_CLOSE|Premature close/i;
+const SCHEMA_ENGINE_CAN_CONNECT_FAILURE =
+  /Schema engine exited[\s\S]*schema-engine(?:-[\w]+)?(?:\.exe)?\s+cli\s+can-connect-to-database|schema-engine(?:-[\w]+)?(?:\.exe)?\s+cli\s+can-connect-to-database[\s\S]*Schema engine exited/i;
+const OWNED_ENGINE_TIMEOUT_FAILURE = /Timed out waiting for Prisma schema engine/i;
 
 /** Determine whether a failed Prisma invocation matches the transient, retriable signature. */
 export function isRetriableMigrationFailure(stderr: string): boolean {
-  return TRANSIENT_ENGINE_FAILURE.test(stderr);
+  return PREMATURE_CLOSE_FAILURE.test(stderr) ||
+    SCHEMA_ENGINE_CAN_CONNECT_FAILURE.test(stderr) ||
+    OWNED_ENGINE_TIMEOUT_FAILURE.test(stderr);
 }
 
 function delay(ms: number): Promise<void> {
