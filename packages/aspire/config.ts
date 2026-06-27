@@ -57,7 +57,7 @@ export type AspireSafeParseResult<Output> =
 /** Database engine variants supported by Aspire hosting integrations. */
 export type DatabaseEngine = 'Postgres' | 'Mssql' | 'Mysql' | 'Sqlite';
 /** Cache engine variants supported by Aspire hosting integrations. */
-export type CacheEngine = 'Redis' | 'Garnet';
+export type CacheEngine = 'Redis' | 'Garnet' | 'DenoKv';
 /** Resource provisioning mode for managed resources. */
 export type ResourceMode = 'Container' | 'External';
 /** Application entry variants supported by the AppHost config. */
@@ -292,7 +292,7 @@ const DatabaseEngineZod = z.enum(['Postgres', 'Mssql', 'Mysql', 'Sqlite']).meta(
 export const DatabaseEngineSchema: AspireSchema<DatabaseEngine> = DatabaseEngineZod;
 
 /** Cache engine variants supported by Aspire hosting integrations. */
-const CacheEngineZod = z.enum(['Redis', 'Garnet']).meta({
+const CacheEngineZod = z.enum(['Redis', 'Garnet', 'DenoKv']).meta({
   title: 'CacheEngine',
   description: 'Supported cache engine types',
 });

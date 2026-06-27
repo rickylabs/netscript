@@ -8,6 +8,8 @@ export const SCAFFOLD_DEFAULTS = {
   APP_NAME: 'dashboard',
   SERVICE_NAME: 'users',
   DB_ENGINE: 'none' as const,
+  CACHE_ENABLED: true,
+  CACHE_BACKEND: 'redis' as const,
   EDITOR: 'none' as const,
   ASPIRE_LEGACY_APPHOST_PATH: 'dotnet/AppHost',
   ASPIRE_TS_APPHOST_PATH: 'aspire/apphost.mts',

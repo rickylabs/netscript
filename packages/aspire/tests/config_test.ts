@@ -115,6 +115,26 @@ Deno.test('config', async (t) => {
     assertEquals(garnet.Port, 6379);
   });
 
+  await t.step('AppSettingsSchema: accepts Deno KV cache entries', () => {
+    const result = AppSettingsSchema.parse({
+      NetScript: {
+        Name: 'deno-kv-app',
+        Version: '1.0.0',
+        PrimaryCache: 'deno-kv',
+        Cache: {
+          'deno-kv': {
+            Engine: 'DenoKv',
+            Mode: 'External',
+            DataPath: 'data/kv',
+          },
+        },
+      },
+    });
+
+    assertEquals(result.NetScript.PrimaryCache, 'deno-kv');
+    assertEquals(result.NetScript.Cache['deno-kv']?.Engine, 'DenoKv');
+  });
+
   await t.step('parseAppSettings: parses tools', async () => {
     const { config } = await parseAppSettings(REAL_CONFIG_PATH);
 

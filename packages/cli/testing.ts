@@ -281,6 +281,8 @@ export function buildMinimalPromptAnswers(
     serviceName: 'users',
     servicePort: 3000,
     dbEngine: 'postgres',
+    cache: true,
+    cacheBackend: 'redis',
     editor: 'none',
     confirm: true,
     ...overrides,
