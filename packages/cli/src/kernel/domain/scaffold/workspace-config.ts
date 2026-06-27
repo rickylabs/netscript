@@ -3,6 +3,7 @@
  */
 
 import type { DbEngineChoice } from '../db-engine.ts';
+import type { CacheBackendChoice } from '../cache-backend.ts';
 import type { ScaffoldResult } from '../core-types.ts';
 
 /** Optional editor config scaffolded into the workspace root. */
@@ -62,6 +63,12 @@ export interface InitPromptAnswers {
 
   /** Database engine selection. */
   readonly dbEngine: DbEngineChoice;
+
+  /** Whether to include a shared cache scaffold. */
+  readonly cache: boolean;
+
+  /** Shared cache backend selection. */
+  readonly cacheBackend: CacheBackendChoice;
 
   /** Optional editor-specific config scaffold. */
   readonly editor: EditorChoice;

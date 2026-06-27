@@ -110,6 +110,39 @@ describe('generateAppsettings', () => {
     assertEquals(config.NetScript.PrimaryDatabase, undefined);
   });
 
+  it('defaults shared cache to redis', () => {
+    const config = JSON.parse(generateAppsettings());
+
+    assertEquals(config.NetScript.PrimaryCache, 'redis');
+    assertEquals(config.NetScript.Cache.redis.Engine, 'Redis');
+    assertEquals(config.NetScript.Cache.redis.Mode, 'Container');
+    assertEquals(config.NetScript.Cache.redis.DataPath, '.data/redis');
+  });
+
+  it('can omit shared cache emission', () => {
+    const config = JSON.parse(generateAppsettings({ cache: false }));
+
+    assertEquals(config.NetScript.PrimaryCache, undefined);
+    assertEquals(config.NetScript.Cache, {});
+  });
+
+  it('emits garnet cache appsettings when selected', () => {
+    const config = JSON.parse(generateAppsettings({ cacheBackend: 'garnet' }));
+
+    assertEquals(config.NetScript.PrimaryCache, 'garnet');
+    assertEquals(config.NetScript.Cache.garnet.Engine, 'Garnet');
+    assertEquals(config.NetScript.Cache.garnet.DataPath, '.data/garnet');
+  });
+
+  it('emits deno-kv cache appsettings when selected', () => {
+    const config = JSON.parse(generateAppsettings({ cacheBackend: 'deno-kv' }));
+
+    assertEquals(config.NetScript.PrimaryCache, 'deno-kv');
+    assertEquals(config.NetScript.Cache['deno-kv'].Engine, 'DenoKv');
+    assertEquals(config.NetScript.Cache['deno-kv'].Mode, 'External');
+    assertEquals(config.NetScript.Cache['deno-kv'].DataPath, 'data/kv');
+  });
+
   it('should register Postgres engine when dbEngine is postgres', () => {
     const config = JSON.parse(
       generateAppsettings({ name: 'alpha-app', dbEngine: 'postgres' }),
@@ -167,6 +200,7 @@ describe('generateAppsettings', () => {
       'Name',
       'Version',
       'Otel',
+      'PrimaryCache',
       'Databases',
       'Cache',
       'Services',
@@ -191,6 +225,7 @@ describe('generateAppsettings', () => {
       'Version',
       'Otel',
       'PrimaryDatabase',
+      'PrimaryCache',
       'Databases',
       'Cache',
       'Services',

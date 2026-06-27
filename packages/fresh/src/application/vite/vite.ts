@@ -89,21 +89,8 @@ export interface NetScriptVitePluginOptions {
   routeManifest?: NetScriptRouteManifestOptions;
 }
 
-/** Package-owned view of the Vite plugin hooks used by NetScript Fresh. */
-export interface NetScriptVitePlugin {
-  /** Vite plugin name. */
-  readonly name: string;
-  /** Vite hook ordering. */
-  readonly enforce: 'pre';
-  /** Return Vite config defaults for NetScript Fresh workspaces. */
-  config(config: Record<string, unknown>, env: Record<string, unknown>): Record<string, unknown>;
-  /** Resolve NetScript app aliases to absolute file paths. */
-  resolveId(source: string): string | undefined;
-  /** Generate route manifests when the Vite build starts. */
-  buildStart(): void;
-  /** Register development-server watchers for route manifests. */
-  configureServer(server: unknown): void;
-}
+/** Package-owned Vite plugin type used by NetScript Fresh. */
+export type NetScriptVitePlugin = Plugin;
 
 function dedupe(values: string[]): string[] {
   return Array.from(new Set(values));
@@ -319,5 +306,5 @@ export function createNetScriptVitePlugin(
     },
   };
 
-  return plugin as unknown as NetScriptVitePlugin;
+  return plugin;
 }

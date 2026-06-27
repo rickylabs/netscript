@@ -135,6 +135,21 @@ verdicts are not seeded here.
   `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` passes with the workaround
   removed.
 
+## packages/cli — Deno KV cache backend TypeScript AppHost resource emission deferred
+
+- **Reason:** Alpha.11 Slice C adds `netscript init --cache-backend deno-kv` config/schema support,
+  but the generated TypeScript AppHost does not create a managed Deno KV cache resource. It emits
+  `NetScript.Cache["deno-kv"]` with `Engine: "DenoKv"` and a file-backed infrastructure comment
+  only. Redis and Garnet have concrete container resource emission in this slice.
+- **Owner:** CLI Aspire scaffold follow-up.
+- **Target:** Dedicated Deno KV runtime/AppHost integration slice before beta if `deno-kv` is kept
+  as a first-class init backend.
+- **Linked plan:** `.llm/tmp/run/alpha11-fixtrain--c/plan.md`
+- **Created:** 2026-06-27
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when `--cache-backend deno-kv` produces a generated workspace whose AppHost can
+  provide the intended KV runtime/env contract and a focused runtime smoke proves it.
+
 ## packages/cron — AP-17 / doctrine verdict Refactor
 
 - **Reason:** `interfaces/` should become `ports/`; adapter classes should be named by technology.
