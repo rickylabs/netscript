@@ -43,3 +43,4 @@
 | Check gate | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` selected 527 files in 5 batches, 0 failed batches. |
 | Regression test | PASS | `deno test --unstable-kv --allow-all packages/cli/src/public/features/root/public-command-tree_test.ts`: 2 passed, 0 failed. |
 | Cast scan | PASS | Staged TypeScript diff added no `as unknown` or `as any` lines before commit. |
+| Exact cast scan | PASS | `git -C /home/codex/repos/netscript-a11-a diff origin/main...HEAD -- '*.ts' '*.tsx' \| grep -E "as unknown\|as any"` exited 1 with no matches. |
