@@ -77,7 +77,7 @@ and runs the resulting graph.
   {
     label: "aspire/aspire.config.json (generated)",
     lang: "json",
-    code: "{\n  \"appHost\": { \"path\": \"apphost.mts\", \"language\": \"typescript/nodejs\" },\n  \"sdk\": { \"version\": \"13.4.4\" },\n  \"profiles\": {\n    \"https\": {\n      \"applicationUrl\": \"https://localhost:18888;http://localhost:18889\",\n      \"environmentVariables\": {\n        \"ASPIRE_DASHBOARD_OTLP_HTTP_ENDPOINT_URL\": \"http://localhost:4318\",\n        \"ASPIRE_ALLOW_UNSECURED_TRANSPORT\": \"true\",\n        \"ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS\": \"true\"\n      }\n    }\n  },\n  \"packages\": { \"Aspire.Hosting.PostgreSQL\": \"13.4.4\" }\n}"
+    code: "{\n  \"appHost\": { \"path\": \"apphost.mts\", \"language\": \"typescript/nodejs\" },\n  \"sdk\": { \"version\": \"13.4.6\" },\n  \"profiles\": {\n    \"https\": {\n      \"applicationUrl\": \"https://localhost:18888;http://localhost:18889\",\n      \"environmentVariables\": {\n        \"ASPIRE_DASHBOARD_OTLP_HTTP_ENDPOINT_URL\": \"http://localhost:4318\",\n        \"ASPIRE_ALLOW_UNSECURED_TRANSPORT\": \"true\",\n        \"ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS\": \"true\"\n      }\n    }\n  },\n  \"packages\": { \"Aspire.Hosting.PostgreSQL\": \"13.4.6\" }\n}"
   }
 ] }) }}
 

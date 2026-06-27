@@ -14,18 +14,18 @@ export const SCAFFOLD_COMMUNITY_TOOLKIT = {
 export const SCAFFOLD_ASPIRE_INTEGRATIONS = {
   POSTGRES: {
     PACKAGE_ID: 'Aspire.Hosting.PostgreSQL',
-    VERSION: '13.4.4',
+    VERSION: '13.4.6',
   },
   MYSQL: {
     PACKAGE_ID: 'Aspire.Hosting.MySql',
-    VERSION: '13.4.4',
+    VERSION: '13.4.6',
   },
   MSSQL: {
     PACKAGE_ID: 'Aspire.Hosting.SqlServer',
-    VERSION: '13.4.4',
+    VERSION: '13.4.6',
   },
   REDIS: {
     PACKAGE_ID: 'Aspire.Hosting.Redis',
-    VERSION: '13.4.4',
+    VERSION: '13.4.6',
   },
 } as const;

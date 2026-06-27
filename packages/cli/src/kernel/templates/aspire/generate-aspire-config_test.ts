@@ -40,9 +40,9 @@ describe('generateTsAspireConfig', () => {
     };
 
     assert(config.packages);
-    assertEquals(config.packages['Aspire.Hosting.PostgreSQL'], '13.4.4');
-    assertEquals(config.packages['Aspire.Hosting.MySql'], '13.4.4');
-    assertEquals(config.packages['Aspire.Hosting.SqlServer'], '13.4.4');
+    assertEquals(config.packages['Aspire.Hosting.PostgreSQL'], '13.4.6');
+    assertEquals(config.packages['Aspire.Hosting.MySql'], '13.4.6');
+    assertEquals(config.packages['Aspire.Hosting.SqlServer'], '13.4.6');
     assert(!('sqlite' in config.packages));
   });
 });
