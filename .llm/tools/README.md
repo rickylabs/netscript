@@ -96,7 +96,7 @@ re-querying registries by hand. The `netscript-deno-toolchain` skill is the cano
 | `deps:outdated` | `deps/outdated.ts` | Lock-aware/transitive view: wraps `deno outdated --recursive --latest`, parses the table to JSON, and flags pre-release "Latest" rows. |
 | `deps:why` | `deps/why.ts` | Dead-import detection: combines source-usage grep with `deno why <pkg>` graph provenance (`likelyDeadImport` / `fullyRemovable`). |
 | `deps:audit` | `deps/audit.ts` | Advisory check: wraps `deno audit --level <floor>`, normalized to JSON. Flags: `--level`, `--fail-on-find`. |
-| `deps:prod-install` | `deps/prod-install.ts` | Proves the production (non-dev) surface installs against a frozen lock (`deno ci --prod --frozen`). Additive to the quality lane. |
+| `deps:prod-install` | `deps/prod-install.ts` | Proves the production (non-dev) surface installs against the frozen lock enforced by `deno ci --prod`. Additive to the quality lane. |
 | `deps:census` | `deps/census.ts` | Workspace dependency census. |
 | `deps:check` | `deps/scan-jsr-centralization.ts`, `deps/audit-file-link.ts`, `deps/scan-npm-catalog-compliance.ts` | Centralization, file-link, and npm-catalog-compliance scan gates (run together by the task). |
 
