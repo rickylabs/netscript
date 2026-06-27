@@ -66,6 +66,9 @@ jobs:
           JSR_API_TOKEN: ${{ secrets.JSR_TOKEN }}
         run: deno run --allow-net --allow-read --allow-env .llm/tools/jsr-provision-packages.ts
 
+      - name: Release preflight
+        run: deno task release:preflight
+
       - name: Publish dry-run
         run: deno run --allow-read --allow-write --allow-run .llm/tools/run-publish.ts --dry-run
 
