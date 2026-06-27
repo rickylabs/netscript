@@ -55,7 +55,7 @@ ls aspire/apphost.mts aspire/aspire.config.json
 ```
 
 `aspire.config.json` pins `language: "typescript/nodejs"`, `appHost.path: "apphost.mts"`, and the
-Aspire SDK version `13.4.4`. The graph inside the AppHost is **derived from your installed
+Aspire SDK version `13.4.6`. The graph inside the AppHost is **derived from your installed
 plugins** at boot via `composeAppHost` (from `@netscript/aspire/application`) — add a plugin and
 its API plus background processor appear in the graph; remove it and they vanish, no edit to
 `apphost.mts` required. The mechanics are in [Orchestration with Aspire](/explanation/aspire/).

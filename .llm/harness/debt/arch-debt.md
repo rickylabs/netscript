@@ -118,6 +118,23 @@ verdicts are not seeded here.
 - **Gate:** `deno task audit:critical`; close when full `deno audit` passes without suppressing the
   deferred high-severity advisory.
 
+## packages/cli — CommunityToolkit Deno/SQLite TypeScript AppHost re-enable deferred
+
+- **Reason:** The scaffold still uses `_aspire-compat.mjs` plus generated `builder.addExecutable(...)`
+  registrations for Deno resources. Current Aspire 13.4 docs state
+  `CommunityToolkit.Aspire.Hosting.Deno` does not expose `addDenoApp` or `addDenoTask` APIs in the
+  TypeScript SDK, and SQLite hosting is C#-only for AppHost APIs with TypeScript directed to
+  `builder.addConnectionString(...)`.
+- **Owner:** Aspire scaffold follow-up.
+- **Target:** Dedicated CommunityToolkit Deno/SQLite TypeScript AppHost integration slice.
+- **Linked plan:** `.llm/tmp/run/chore-align-aspire-13.4.6--impl/plan.md`
+- **Created:** 2026-06-27
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when Aspire/CommunityToolkit exposes the required TypeScript SDK APIs or a
+  redesigned scaffold uses documented TypeScript connection-string modeling, and
+  `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` passes with the workaround
+  removed.
+
 ## packages/cron — AP-17 / doctrine verdict Refactor
 
 - **Reason:** `interfaces/` should become `ports/`; adapter classes should be named by technology.

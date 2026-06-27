@@ -41,7 +41,7 @@ jobs:
 
       - name: Install Aspire CLI
         env:
-          ASPIRE_CLI_VERSION: '13.4.4'
+          ASPIRE_CLI_VERSION: '13.4.6'
         run: |
           dotnet tool install Aspire.Cli --tool-path "$HOME/.aspire/bin" --version "$ASPIRE_CLI_VERSION"
           echo "$HOME/.aspire/bin" >> "$GITHUB_PATH"

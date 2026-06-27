@@ -2,7 +2,7 @@
  * Version constants for scaffold dependencies.
  */
 export const SCAFFOLD_VERSIONS = {
-  ASPIRE_SDK: '13.4.4',
+  ASPIRE_SDK: '13.4.6',
   DOTNET_SDK: '10.0.0',
   NETSCRIPT_NUGET: '1.0.0',
   OTEL_COLLECTOR: '0.115.0',
