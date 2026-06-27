@@ -165,7 +165,7 @@ Deno.test('generateReadme — TS AppHost with service + postgres', () => {
   });
   assertStringIncludes(md, '# AlphaApp');
   assertStringIncludes(md, 'aspire restore');
-  assertStringIncludes(md, 'aspire run');
+  assertStringIncludes(md, 'aspire start');
   assertStringIncludes(md, 'apphost.mts');
   assertStringIncludes(md, 'services/users');
   assertStringIncludes(md, 'PostgreSQL');
@@ -182,6 +182,7 @@ Deno.test('generateReadme — TS AppHost with service + postgres', () => {
   assertStringIncludes(md, 'deno run -A packages/cli/bin/netscript-dev.ts db status');
   assertStringIncludes(md, '`users.health.check` via `/api/rpc`');
   assert(!md.includes('dotnet run'), 'TS AppHost README should not mention dotnet run');
+  assert(!md.includes('aspire run'), 'TS AppHost README should not mention aspire run');
 });
 
 Deno.test('generateReadme — legacy C# AppHost', () => {

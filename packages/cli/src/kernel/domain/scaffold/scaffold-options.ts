@@ -5,6 +5,7 @@
  */
 
 import type { DbEngineChoice } from '../db-engine.ts';
+import type { CacheBackendChoice } from '../cache-backend.ts';
 import type { EditorChoice } from './workspace-config.ts';
 
 /** Legacy scaffold import mode. */
@@ -71,6 +72,12 @@ export interface InitOptions {
 
   /** Example service port. */
   readonly servicePort?: number;
+
+  /** Whether to scaffold a shared cache resource. */
+  readonly cache?: boolean;
+
+  /** Shared cache backend to scaffold. */
+  readonly cacheBackend?: CacheBackendChoice;
 }
 
 /** Validated init options with all defaults resolved. */
@@ -107,6 +114,12 @@ export interface ValidatedInitOptions extends
 
   /** Resolved database engine. */
   readonly dbEngine: DbEngineChoice;
+
+  /** Whether to scaffold a shared cache resource. */
+  readonly cache: boolean;
+
+  /** Resolved shared cache backend. */
+  readonly cacheBackend: CacheBackendChoice;
 
   /** Whether to scaffold an example oRPC service. */
   readonly includeExampleService: boolean;

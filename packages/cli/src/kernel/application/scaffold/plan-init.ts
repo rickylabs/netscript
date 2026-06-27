@@ -152,6 +152,8 @@ export async function scaffoldRoot(
       appName: options.appName,
       appPort: options.legacyAspire ? PORT_RANGES.APP.start : PORT_RANGES.APP.start + 10,
       dbEngine: options.dbEngine,
+      cache: options.cache,
+      cacheBackend: options.cacheBackend,
       service: plan.service,
     });
     const appsettingsPath = join(targetPath, SCAFFOLD_FILES.APPSETTINGS);

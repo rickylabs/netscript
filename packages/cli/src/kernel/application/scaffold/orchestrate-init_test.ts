@@ -19,6 +19,8 @@ function baseOptions(overrides: Partial<ValidatedInitOptions> = {}): ValidatedIn
     noAspire: false,
     legacyAspire: false,
     dbEngine: 'none',
+    cache: true,
+    cacheBackend: 'redis',
     includeExampleService: false,
     ...overrides,
   };
@@ -36,7 +38,7 @@ Deno.test('initNextSteps includes public database preparation steps for JSR init
     'netscript db generate',
     'netscript db seed',
     'cd aspire',
-    'aspire run  # start TypeScript AppHost',
+    'aspire start  # start TypeScript AppHost',
     '# Postgres provisioned by Aspire (see "Databases" in appsettings.json)',
   ]);
 });
@@ -78,7 +80,7 @@ Deno.test('initNextSteps includes local database preparation steps for maintaine
     'deno run -A packages/cli/bin/netscript-dev.ts db generate',
     'deno run -A packages/cli/bin/netscript-dev.ts db seed',
     'cd aspire',
-    'aspire run  # start TypeScript AppHost',
+    'aspire start  # start TypeScript AppHost',
     '# Postgres provisioned by Aspire (see "Databases" in appsettings.json)',
   ]);
 });

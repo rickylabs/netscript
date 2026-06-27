@@ -108,7 +108,7 @@ export function initNextSteps(options: ValidatedInitOptions): string[] {
       addDatabaseSteps(steps, dbCommand);
       steps.push('cd aspire');
     }
-    steps.push('aspire run  # start TypeScript AppHost');
+    steps.push('aspire start  # start TypeScript AppHost');
   } else {
     if (options.dbEngine !== 'none') {
       steps.push(`${dbCommand} generate  # generate database client after configuring DATABASE_URL`);

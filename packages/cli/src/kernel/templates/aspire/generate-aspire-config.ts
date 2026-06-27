@@ -11,6 +11,7 @@ import { PORT_RANGES } from '../../constants/port-ranges.ts';
 import { SCAFFOLD_ASPIRE_INTEGRATIONS } from '../../constants/scaffold/scaffold-aspire.ts';
 import { SCAFFOLD_DEFAULTS } from '../../constants/scaffold/scaffold-defaults.ts';
 import { SCAFFOLD_VERSIONS } from '../../constants/scaffold/scaffold-versions.ts';
+import type { CacheBackendChoice } from '../../domain/cache-backend.ts';
 import type { DbEngineChoice } from '../../domain/db-engine.ts';
 
 /** Options for generating `aspire.config.json`. */
@@ -57,12 +58,16 @@ export interface TsAspireConfigOptions {
   readonly dbEngine?: DbEngineChoice;
   /** All configured database engines when more than one is present. */
   readonly dbEngines?: readonly DbEngineChoice[];
+  /** Selected cache backend. */
+  readonly cacheBackend?: CacheBackendChoice;
+  /** Whether a cache resource is configured. */
+  readonly cache?: boolean;
 }
 
 /**
  * Generate the contents of `aspire.config.json` for TypeScript AppHost mode.
  *
- * Produces the configuration for `aspire run` / `aspire restore` pointing
+ * Produces the configuration for `aspire start` / `aspire restore` pointing
  * to `apphost.mts` as the TypeScript entry point. The `packages` section is
  * populated based on `options` so every `builder.addXxx(...)` capability
  * emitted by the helpers generator has a matching SDK export after
@@ -103,6 +108,13 @@ export function generateTsAspireConfig(options?: TsAspireConfigOptions): string 
         // No integration NuGet needed.
         break;
     }
+  }
+
+  if (options?.cache !== false && options?.cacheBackend !== 'deno-kv') {
+    const integration = options?.cacheBackend === 'garnet'
+      ? SCAFFOLD_ASPIRE_INTEGRATIONS.GARNET
+      : SCAFFOLD_ASPIRE_INTEGRATIONS.REDIS;
+    packages[integration.PACKAGE_ID] = integration.VERSION;
   }
 
   const config: Record<string, unknown> = {

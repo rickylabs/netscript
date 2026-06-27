@@ -101,6 +101,11 @@ export function generateRegisterInfrastructure(options: RegisterInfrastructureOp
     const id = safeIdentifier(name);
     const mode = entry.Mode ?? 'Container';
 
+    if (entry.Engine === 'DenoKv') {
+      cacheBlocks.push(`  // ${name} (DenoKv, file-backed — no Aspire cache resource needed)`);
+      continue;
+    }
+
     if (mode === 'External') {
       cacheBlocks.push(`  // ${name} (${entry.Engine}, External)
   const ${id} = await builder.addConnectionString('${name}');

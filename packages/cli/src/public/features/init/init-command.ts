@@ -1,12 +1,18 @@
 import { Command } from '@cliffy/command';
+import {
+  CACHE_BACKEND_CHOICES,
+  type CacheBackendChoice,
+} from '../../../kernel/domain/cache-backend.ts';
 import { DB_ENGINE_CHOICES, type DbEngineChoice } from '../../../kernel/domain/db-engine.ts';
 import type { EditorChoice } from '../../../kernel/domain/scaffold/workspace-config.ts';
 import type { InitPipelineContext } from '../../../kernel/application/scaffold/context.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../kernel/application/registries/template-registry.ts';
 import { executeInit } from '../../../kernel/application/scaffold/orchestrate-init.ts';
 import { PresetRegistry } from '../../../kernel/application/registries/preset-registry.ts';
+import type { PromptPort } from '../../../kernel/ports/prompt-port.ts';
 import type { ProjectNameResolver } from '../../presentation/support.ts';
 import type { InitCommandInput } from './init-input.ts';
+import { resolveInteractiveInitInput } from './init-interactive.ts';
 
 const EDITOR_CHOICES: readonly EditorChoice[] = ['none', 'zed', 'vscode'];
 
@@ -14,8 +20,12 @@ const EDITOR_CHOICES: readonly EditorChoice[] = ['none', 'zed', 'vscode'];
 export interface InitCommandDependencies {
   /** Application context for the scaffold pipeline. */
   readonly initContext: InitPipelineContext;
+  /** Create the scaffold pipeline context for a parsed init invocation. */
+  readonly createInitContext?: (options: { readonly dryRun: boolean }) => InitPipelineContext;
   /** Default name when the command is invoked without an argument. */
   readonly defaultProjectName: ProjectNameResolver;
+  /** Prompt adapter used by interactive terminal init. */
+  readonly prompt: PromptPort;
 }
 
 function dbEngine(raw: string | undefined): DbEngineChoice | undefined {
@@ -36,6 +46,19 @@ function editor(raw: string | undefined): EditorChoice | undefined {
   return normalized;
 }
 
+function cacheBackend(raw: string | undefined): CacheBackendChoice | undefined {
+  if (raw === undefined) return undefined;
+  const normalized = raw.toLowerCase();
+  if (!isCacheBackendChoice(normalized)) {
+    throw new Error(`--cache-backend must be one of: ${CACHE_BACKEND_CHOICES.join(', ')}`);
+  }
+  return normalized;
+}
+
+function isCacheBackendChoice(value: string): value is CacheBackendChoice {
+  return CACHE_BACKEND_CHOICES.some((choice) => choice === value);
+}
+
 /** Create the public `init` command. */
 export function createInitCommand(
   dependencies: InitCommandDependencies,
@@ -46,9 +69,14 @@ export function createInitCommand(
     .arguments('[name:string]')
     .option('--app-name <name:string>', 'Frontend application name (kebab-case)')
     .option('--db <engine:string>', `Database engine (${DB_ENGINE_CHOICES.join(' | ')})`)
-    .option('--service [enabled:boolean]', 'Scaffold an example oRPC service', { default: false })
+    .option('--service [enabled:boolean]', 'Scaffold an example oRPC service')
     .option('--service-name <name:string>', 'Example service name')
     .option('--service-port <port:number>', 'Example service port')
+    .option('--cache [enabled:boolean]', 'Scaffold a shared cache resource')
+    .option(
+      '--cache-backend <backend:string>',
+      `Shared cache backend (${CACHE_BACKEND_CHOICES.join(' | ')})`,
+    )
     .option('--editor <editor:string>', `Editor config (${EDITOR_CHOICES.join(' | ')})`)
     .option('--no-aspire', 'Skip Aspire orchestration layer')
     .option('--legacy-aspire', 'Generate legacy C# AppHost', { default: false })
@@ -71,28 +99,40 @@ export function createInitCommand(
           throw new Error(`preset "${options.from}" is not registered`);
         }
       }
-      const includeService = options.service === true ||
-        options.serviceName !== undefined ||
-        options.servicePort !== undefined;
-      await executeInit(dependencies.initContext, {
-        name: nameArg ?? dependencies.defaultProjectName(),
-        appName: options.appName,
-        path: options.path,
+      const resolved = await resolveInteractiveInitInput(
+        dependencies.prompt,
+        options,
+        nameArg,
+        dependencies.defaultProjectName,
+        Deno.stdin.isTerminal(),
+      );
+      const resolvedOptions = resolved.options;
+      const includeService = resolvedOptions.service === true ||
+        resolvedOptions.serviceName !== undefined ||
+        resolvedOptions.servicePort !== undefined;
+      const dryRun = resolvedOptions.dryRun ?? false;
+      const initContext = dependencies.createInitContext?.({ dryRun }) ?? dependencies.initContext;
+      await executeInit(initContext, {
+        name: resolved.name,
+        appName: resolvedOptions.appName,
+        path: resolvedOptions.path,
         importMode: 'jsr',
-        editor: editor(options.editor),
-        force: options.force ?? false,
-        ci: options.ci ?? false,
-        yes: options.yes ?? false,
-        dryRun: options.dryRun ?? false,
-        json: options.json ?? false,
-        from: options.from,
-        noGit: options.git === false,
-        noAspire: options.aspire === false,
-        legacyAspire: options.legacyAspire ?? false,
-        dbEngine: dbEngine(options.db),
+        editor: editor(resolvedOptions.editor),
+        force: resolvedOptions.force ?? false,
+        ci: resolvedOptions.ci ?? false,
+        yes: resolvedOptions.yes ?? false,
+        dryRun: resolvedOptions.dryRun ?? false,
+        json: resolvedOptions.json ?? false,
+        from: resolvedOptions.from,
+        noGit: resolvedOptions.git === false,
+        noAspire: resolvedOptions.aspire === false,
+        legacyAspire: resolvedOptions.legacyAspire ?? false,
+        dbEngine: dbEngine(resolvedOptions.db),
+        cache: resolvedOptions.cache,
+        cacheBackend: cacheBackend(resolvedOptions.cacheBackend),
         includeExampleService: includeService,
-        serviceName: options.serviceName,
-        servicePort: options.servicePort,
+        serviceName: resolvedOptions.serviceName,
+        servicePort: resolvedOptions.servicePort,
       });
     });
 }

@@ -17,6 +17,8 @@ function makeOptions(overrides: Partial<ValidatedInitOptions> = {}): ValidatedIn
     noAspire: true,
     legacyAspire: false,
     dbEngine: 'none',
+    cache: true,
+    cacheBackend: 'redis',
     includeExampleService: false,
     ...overrides,
   };
