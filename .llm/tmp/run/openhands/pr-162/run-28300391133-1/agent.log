@@ -1,0 +1,400 @@
+adapter)
++36|
++37|**Code anchors verified**:
++38|- `packages/cli/src/kernel/domain/db-engine.ts:8`: `DbEngine = 'postgres' | 
+'mysql' | 'mssql' | 'sqlite'`
++39|- 
+`packages/cli/src/kernel/adapters/database/providers/postgres.provider.ts`: 
+`prismaProvider: 'postgresql', supportsContainerMode: true`
++40|- `packages/cli/src/kernel/adapters/database/providers/mysql.provider.ts`: 
+`prismaProvider: 'mysql', supportsContainerMode: true`
++41|- `packages/cli/src/kernel/adapters/database/providers/mssql.provider.ts`: 
+`prismaProvider: 'sqlserver', supportsContainerMode: true`
++42|- `packages/cli/src/kernel/adapters/database/providers/sqlite.provider.ts`: 
+`prismaProvider: 'sqlite', supportsContainerMode: false`
++43|- `packages/cli/src/kernel/domain/scaffold/scaffold-defaults.ts:7`: 
+`DB_ENGINE: 'none'` (literal CLI default is none, not postgres)
++44|
++45|**Docs verified** (`docs/site/capabilities/database.md:54-55`):
++46|```
++47|The scaffold engine is chosen with the --db flag — 
++48|netscript init my-app --db postgres|mysql|mssql|sqlite. Postgres is the 
+recommended
++49|default (and what every tutorial uses); mysql, mssql, and sqlite are 
+first-class
++50|alternatives. postgres / mysql / mssql provision an Aspire container; sqlite
+is
++51|file-backed with no Aspire container resource.
++52|```
++53|
++54|**Runtime adapter separation verified** 
+(`docs/site/capabilities/database.md:119-138`):
++55|- Runtime adapter barrel exports only 3 engines: postgres, mssql, mysql
++56|- No sqlite runtime adapter exists (correct - scaffold-only)
++57|- Docs correctly distinguish scaffold-time choice vs runtime adapter 
+availability
++58|
++59|**Verdict**: PASS - All claims align. Correctly frames Postgres as 
+"recommended" (not literal default), correctly identifies sqlite container-less,
+correctly separates scaffold from runtime adapter surface.
++60|
++61|---
++62|
++63|### Domain 3: Prisma-backed subsystems follow scaffolded engine (commit 
+474a47ca) - PASS
++64|
++65|**Claim**: sagas `prisma` store and better-auth backend are engine-agnostic 
+(persist through Prisma client, follow whatever engine was scaffolded); queue 
+PostgreSQL provider is genuinely Postgres-specific (not relabeled as polyglot)
++66|
++67|**Code anchors verified**:
++68|- `plugins/sagas/src/runtime/prisma-saga-store.ts`: Uses Prisma client 
+queries (no raw SQL), delegates all persistence to Prisma ORM - engine-agnostic
++69|- `packages/auth-better-auth/src/better-auth.ts:166-171`: Uses 
+`prismaAdapter(prisma, { provider, ... })` - delegates to Prisma, provider is 
+parameter
++70|- `packages/queue/adapters/postgres.adapter.ts:180-190`: Raw SQL with `FOR 
+UPDATE SKIP LOCKED`, `JSONB`, `TIMESTAMPTZ`, `$N` parameter binding - genuinely 
+Postgres-specific
++71|
++72|**Docs verified** (commit `474a47ca` diff):
++73|- `docs/site/capabilities/durable-sagas.md:289-294`: Correctly frames 
+`prisma` store as following scaffolded engine via Prisma client
++74|- `docs/site/explanation/durability-model.md:143-147`: Same framing - 
+"follows your Prisma client, it is not Postgres-specific"
++75|- `docs/site/capabilities/auth.md:313-316`: Correctly notes better-auth 
+persists through Prisma
++76|- `docs/site/how-to/add-authentication.md:119-122`: Correctly notes 
+auth.prisma aggregation follows engine
++77|- `docs/site/capabilities/kv-queues-cron.md:177-193`: Correctly keeps queue 
+PostgreSQL provider marked as PostgreSQL-specific (not polyglot)
++78|
++79|**Verdict**: PASS - All claims align. Correctly distinguishes 
+engine-agnostic (sagas prisma store, better-auth) from engine-specific (queue 
+postgres adapter). No relabeling of queue as polyglot.
++80|
++81|---
++82|
++83|### Gate: Documentation build - PASS
++84|
++85|**Lume build result**: 306 files generated in 6.46 seconds, 0 errors
++86|
++87|**Command**: `deno task build` (executed from `docs/site/`)
++88|
++89|**Xrefs verified**: All `comp.xref()` calls in changed docs resolve to valid
+keys (cap:database, ref:sagas, explain:observability, etc.)
++90|
++91|---
++92|
++93|## Overall Verdict
++94|
++95|**PR #162: PASS** (3/3 domains PASS, Lume build green)
++96|
++97|All documentation claims verified against:
++98|1. Type definitions in `packages/cli/src/kernel/domain/`
++99|2. Provider metadata in 
+`packages/cli/src/kernel/adapters/database/providers/`
++100|3. Runtime adapter implementations in `plugins/sagas/`, 
+`packages/auth-better-auth/`, `packages/queue/`
++101|4. CLI flag surface in `packages/cli/src/cli.ts`
++102|
++103|No broken xrefs. No invented flags (`--no-cache`). No runtime adapter 
+fabrication (sqlite runtime adapter does not exist, docs correctly reflect 
+this). No relabeling of engine-specific code as polyglot (queue adapter remains 
+correctly marked as PostgreSQL-specific).
++104|
++105|## Changes
++106|Documentation-only changes across three commits:
++107|- Multi-backend cache framing
++108|- Polyglot database framing  
++109|- Prisma-backed subsystem engine-agnostic framing
++110|
++111|No source code changes. No test changes.
++112|
++113|## Validation
++114|- Code anchor inspection: 7 provider files, 3 runtime adapter 
+implementations
++115|- Docs grep: 15+ files checked for claim alignment
++116|- Lume build: 306 files, 0 errors
++117|- Xref resolution: all internal links valid
++118|
++119|## Remaining risks
++120|None identified. All factual claims in documentation align with 
+implementation ground truth.
++121|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Generate PR comment evaluation
+
+Reasoning:
+Now I need to prepare and output the evaluation as a PR comment. The user 
+requested `output=pr-comment` mode, which means I should write the evaluation to
+a file that will be used as the PR comment body.
+
+Looking at the evaluation results:
+- Domain 1 (cache): PASS
+- Domain 2 (database): PASS  
+- Domain 3 (subsystems): PASS
+- Docs build: PASS (306 files)
+
+Overall verdict: PASS
+
+I need to format this as a concise, evidence-first per-domain verdict table as 
+specified in the instructions. The format should include specific file:line 
+references and code anchors that prove or refute each claim.
+
+Let me create the PR comment content now.
+
+$ cd /home/runner/work/netscript/netscript && cat > /tmp/pr-evaluation.md << 
+'EOF'
+## IMPL-EVAL Evaluation: PR #162
+
+**Evaluator role**: Documentation accuracy validation against framework ground 
+truth  
+**Branch**: `docs/alpha11-cli-surface` (3 commits)  
+**Gate**: Lume build green (306 files), no broken xrefs
+
+### Per-Domain Verdict Table
+
+| Domain | Commit | Verdict | Evidence |
+|--------|--------|---------|----------|
+| Multi-backend cache | `b847c6a8` | **PASS** | Code: `cache-backend.ts:15-17` 
+defines `CacheBackendChoice = 'redis' \| 'garnet' \| 'deno-kv'`; 
+`scaffold-defaults.ts:8` sets `CACHE_BACKEND: 'redis'`; CLI flags confirm 
+`--cache` + `--cache-backend` exist. Docs `cli-reference.md:100` correctly 
+frames redis as default, uses `--cache=false` for disable, never invents 
+`--no-cache`. |
+| Polyglot database | `28539811` | **PASS** | Code: `db-engine.ts:8` confirms 
+`DbEngine = 'postgres' \| 'mysql' \| 'mssql' \| 'sqlite'`; provider files 
+confirm `supportsContainerMode: true` for postgres/mysql/mssql and 
+`supportsContainerMode: false` for sqlite; `scaffold-defaults.ts:7` shows 
+literal CLI default is `DB_ENGINE: 'none'` (not postgres). Docs 
+`database.md:54-56` correctly frames Postgres as "recommended default" (not 
+literal), correctly identifies sqlite as file-backed/no container. No sqlite 
+runtime adapter fabricated (runtime barrel = 3 engines). |
+| Subsystem framing | `474a47ca` | **PASS** | Code: `prisma-saga-store.ts` uses 
+Prisma ORM queries (engine-agnostic); `better-auth.ts:166-171` uses 
+`prismaAdapter(prisma, { provider })` (delegates to Prisma); 
+`queue/adapters/postgres.adapter.ts:180-190` uses raw SQL with `FOR UPDATE SKIP 
+LOCKED`, `JSONB` (Postgres-specific). Docs `durable-sagas.md:289-294`, 
+`durability-model.md:143-147`, `auth.md:313-316` correctly frame sagas prisma 
+store and better-auth as engine-agnostic. Queue PostgreSQL provider correctly 
+remains marked as PostgreSQL-specific (not relabeled as polyglot). |
+
+### Build Gate
+
+✅ Lume build: **306 files**, 0 errors (executed from `docs/site/`)  
+✅ Xrefs: All `comp.xref()` calls resolve to valid keys
+
+### Ground Truth Verification Summary
+
+**Confirmed against code**:
+- Cache surface: 3 backends, redis default, `--cache=false` disable
+- DB scaffold: 4 engines at `--db`, Postgres recommended, sqlite container-less
+- Runtime adapters: 3 in barrel (postgres/mssql/mysql), no sqlite runtime 
+adapter
+- Subsystems: sagas prisma store + better-auth = engine-agnostic; queue postgres
+adapter = engine-specific
+
+**No violations found**:
+- No `--no-cache` invented
+- No sqlite runtime adapter fabricated
+- No queue relabeled as polyglot
+- No literal "default is Postgres" claim (correctly framed as "recommended")
+
+### Overall Verdict
+
+**✅ PASS** — All three documentation commits align with implementation ground 
+truth. No factual errors, no broken xrefs, no flag fabrication.
+EOF
+cat /tmp/pr-evaluation.md
+
+Tokens: ↑ input 1.29M • cache hit 86.81% •  reasoning 9.48K • ↓ output 16.51K • 
+$ 0.5555
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+❌ [An error occurred during execution.]
+Cannot execute multiple commands at once.
+Please run each command separately OR chain them into a single command via && or
+;
+Provided commands:
+(1) cd /home/runner/work/netscript/netscript && cat > /tmp/pr-evaluation.md << 
+'EOF'
+## IMPL-EVAL Evaluation: PR #162
+
+**Evaluator role**: Documentation accuracy validation against framework ground 
+truth  
+**Branch**: `docs/alpha11-cli-surface` (3 commits)  
+**Gate**: Lume build green (306 files), no broken xrefs
+
+### Per-Domain Verdict Table
+
+| Domain | Commit | Verdict | Evidence |
+|--------|--------|---------|----------|
+| Multi-backend cache | `b847c6a8` | **PASS** | Code: `cache-backend.ts:15-17` 
+defines `CacheBackendChoice = 'redis' \| 'garnet' \| 'deno-kv'`; 
+`scaffold-defaults.ts:8` sets `CACHE_BACKEND: 'redis'`; CLI flags confirm 
+`--cache` + `--cache-backend` exist. Docs `cli-reference.md:100` correctly 
+frames redis as default, uses `--cache=false` for disable, never invents 
+`--no-cache`. |
+| Polyglot database | `28539811` | **PASS** | Code: `db-engine.ts:8` confirms 
+`DbEngine = 'postgres' \| 'mysql' \| 'mssql' \| 'sqlite'`; provider files 
+confirm `supportsContainerMode: true` for postgres/mysql/mssql and 
+`supportsContainerMode: false` for sqlite; `scaffold-defaults.ts:7` shows 
+literal CLI default is `DB_ENGINE: 'none'` (not postgres). Docs 
+`database.md:54-56` correctly frames Postgres as "recommended default" (not 
+literal), correctly identifies sqlite as file-backed/no container. No sqlite 
+runtime adapter fabricated (runtime barrel = 3 engines). |
+| Subsystem framing | `474a47ca` | **PASS** | Code: `prisma-saga-store.ts` uses 
+Prisma ORM queries (engine-agnostic); `better-auth.ts:166-171` uses 
+`prismaAdapter(prisma, { provider })` (delegates to Prisma); 
+`queue/adapters/postgres.adapter.ts:180-190` uses raw SQL with `FOR UPDATE SKIP 
+LOCKED`, `JSONB` (Postgres-specific). Docs `durable-sagas.md:289-294`, 
+`durability-model.md:143-147`, `auth.md:313-316` correctly frame sagas prisma 
+store and better-auth as engine-agnostic. Queue PostgreSQL provider correctly 
+remains marked as PostgreSQL-specific (not relabeled as polyglot). |
+
+### Build Gate
+
+✅ Lume build: **306 files**, 0 errors (executed from `docs/site/`)  
+✅ Xrefs: All `comp.xref()` calls resolve to valid keys
+
+### Ground Truth Verification Summary
+
+**Confirmed against code**:
+- Cache surface: 3 backends, redis default, `--cache=false` disable
+- DB scaffold: 4 engines at `--db`, Postgres recommended, sqlite container-less
+- Runtime adapters: 3 in barrel (postgres/mssql/mysql), no sqlite runtime 
+adapter
+- Subsystems: sagas prisma store + better-auth = engine-agnostic; queue postgres
+adapter = engine-specific
+
+**No violations found**:
+- No `--no-cache` invented
+- No sqlite runtime adapter fabricated
+- No queue relabeled as polyglot
+- No literal "default is Postgres" claim (correctly framed as "recommended")
+
+### Overall Verdict
+
+**✅ PASS** — All three documentation commits align with implementation ground 
+truth. No factual errors, no broken xrefs, no flag fabrication.
+EOF
+(2) cat /tmp/pr-evaluation.md
+
+⏳ Process still running (soft timeout)
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: PR #162 evaluation complete: all three domains PASS
+
+Reasoning:
+The user is pointing out that my previous tool call had multiple commands that 
+couldn't be executed together. Looking at the error message, I tried to run two 
+separate commands:
+
+1. A heredoc to create a file at `/tmp/pr-evaluation.md`
+2. A cat command to display that file
+
+These were interpreted as two separate commands rather than chained commands. 
+However, I notice that I was trying to use `&&` to chain them, which should have
+worked. Let me check what actually happened.
+
+Looking more carefully at the error message, it seems like the entire heredoc 
+block was treated as command (1), and the `cat /tmp/pr-evaluation.md` was 
+treated as command (2). The issue is likely that the heredoc syntax spanning 
+multiple lines confused the parser.
+
+However, I don't actually need to create this file and then cat it. I can just 
+create it directly with the `file_editor` tool instead of using a heredoc in the
+terminal. That would be cleaner and avoid this issue.
+
+Actually, looking at the current state:
+- I've completed all the verification work
+- I've created the summary at 
+`/home/runner/work/_temp/openhands/28300391133-1/summary.md`
+- The evaluation is complete with PASS verdict for all three domains
+
+What I was trying to do was create a PR comment file for posting. But actually, 
+per the task description: "Do not post GitHub issue or PR comments directly. The
+workflow owns GitHub comments."
+
+So I should just finalize the task and call the finish tool with a summary 
+message. The summary.md file I already created contains all the evaluation 
+details.
+
+
+Thought:
+I see the issue with the multi-line heredoc. I've already completed the 
+evaluation and created the summary file. Let me finalize this task properly.
+
+## IMPL-EVAL Evaluation Complete
+
+I've verified PR #162's three documentation commits against the framework ground
+truth:
+
+### Results
+
+**Domain 0: Multi-backend cache (commit b847c6a8)** — **PASS** ✅
+- Code confirms: redis default, 3 backends, `--cache=false` for disable
+- Docs correctly document the surface, no `--no-cache` invented
+
+**Domain 1: Polyglot database (commit 28539811)** — **PASS** ✅  
+- Code confirms: 4 engines at scaffold-time, Postgres recommended (not literal 
+default), sqlite container-less
+- Docs correctly separate scaffold-time from runtime adapter surface
+- No sqlite runtime adapter fabricated
+
+**Domain 2: Subsystem framing (commit 474a47ca)** — **PASS** ✅
+- Code confirms: sagas prisma store + better-auth are engine-agnostic; queue 
+postgres adapter is Postgres-specific
+- Docs correctly distinguish engine-agnostic from engine-specific
+- Queue not relabeled as polyglot
+
+**Gate: Build** — **PASS** ✅
+- Lume build: 306 files, 0 errors
+
+### Overall Verdict: **PASS**
+
+All documentation claims verified against type definitions, provider metadata, 
+runtime implementations, and CLI flags. No factual errors, no broken xrefs, no 
+flag fabrication.
+
+Evaluation details saved to 
+`/home/runner/work/_temp/openhands/28300391133-1/summary.md` (7 provider files +
+3 runtime implementations inspected, 15+ docs files checked).
+
+
+
+Finish with message:
+IMPL-EVAL evaluation complete for PR #162 docs/alpha11-cli-surface.
+
+**Overall Verdict: PASS** (3/3 domains)
+
+✅ Domain 0: Multi-backend cache (commit b847c6a8) — PASS
+- Cache backend surface correctly documented (redis default, garnet/deno-kv 
+alternatives, --cache=false for disable)
+
+✅ Domain 1: Polyglot database (commit 28539811) — PASS  
+- 4-engine DB scaffold correctly documented (postgres/mysql/mssql/sqlite, 
+Postgres recommended, sqlite container-less, runtime adapter barrel = 3 engines)
+
+✅ Domain 2: Subsystem framing (commit 474a47ca) — PASS
+- Prisma-backed subsystems (sagas + auth) correctly framed as engine-agnostic
+- Queue PostgreSQL provider correctly remains marked as Postgres-specific
+
+✅ Build Gate: Lume 306 files, 0 errors
+
+Ground truth verified against: packages/cli/src/kernel/ domain files, 
+packages/database/adapters/*, plugins/sagas/src/runtime/prisma-saga-store.ts, 
+packages/auth-better-auth/src/better-auth.ts, 
+packages/queue/adapters/postgres.adapter.ts.
+
+Tokens: ↑ input 1.33M • cache hit 87.00% •  reasoning 9.83K • ↓ output 17.55K • 
+$ 0.5723
+
