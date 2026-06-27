@@ -67,7 +67,7 @@ export interface TsAspireConfigOptions {
 /**
  * Generate the contents of `aspire.config.json` for TypeScript AppHost mode.
  *
- * Produces the configuration for `aspire run` / `aspire restore` pointing
+ * Produces the configuration for `aspire start` / `aspire restore` pointing
  * to `apphost.mts` as the TypeScript entry point. The `packages` section is
  * populated based on `options` so every `builder.addXxx(...)` capability
  * emitted by the helpers generator has a matching SDK export after
