@@ -9,6 +9,7 @@ import type { ValidatedInitOptions } from '../../domain/scaffold/scaffold-option
 import { generateTsAspireConfig } from '../../templates/aspire/generate-aspire-config.ts';
 import {
   buildDefaultTools,
+  buildCacheBlock,
   deriveContainerDbResourceName,
   deriveSqliteDbFileName,
 } from '../../templates/aspire/generate-appsettings.ts';
@@ -40,6 +41,8 @@ export async function scaffoldTsAppHost(
   // throws "is not a function" at apphost start.
   const aspireConfigContent = generateTsAspireConfig({
     dbEngine: options.dbEngine,
+    cache: options.cache,
+    cacheBackend: options.cacheBackend,
   });
   const aspireConfigPath = join(aspireDir, SCAFFOLD_FILES.ASPIRE_CONFIG);
   if (await context.scaffolder.writeFile(aspireConfigPath, aspireConfigContent, options.force)) {
@@ -183,10 +186,21 @@ export async function scaffoldTsAppHost(
       break;
   }
 
+  const cache = options.cache ? buildCacheBlock(options.cacheBackend) : undefined;
+  const caches: NetScriptConfig['Cache'] = cache
+    ? {
+      [cache.key]: {
+        Enabled: true,
+        ...cache.block,
+      },
+    }
+    : {};
+
   const initConfig: NetScriptConfig = {
     Name: options.name,
     Version: SCAFFOLD_DEFAULTS.VERSION,
     ...(primaryDatabase ? { PrimaryDatabase: primaryDatabase } : {}),
+    ...(cache ? { PrimaryCache: cache.key } : {}),
     Otel: {
       HttpEndpoint: `http://localhost:${PORT_RANGES.OTEL_COLLECTOR}`,
       Protocol: 'http/protobuf',
@@ -214,7 +228,7 @@ export async function scaffoldTsAppHost(
     Plugins: {},
     BackgroundProcessors: {},
     Databases: databases,
-    Cache: {},
+    Cache: caches,
     Tools: buildDefaultTools(primaryDatabase),
   };
 

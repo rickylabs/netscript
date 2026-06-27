@@ -36,7 +36,7 @@ You should have finished [chapter 4](/tutorials/storefront/04-checkout-saga/), s
 
 - `my-shop/` has the `products` service, the `cart` contract, and the `sagas` plugin with your
   `CheckoutSaga` and the `process-payment` worker job.
-- `aspire run` is up (the dashboard answers at [http://localhost:18888](http://localhost:18888)). The
+- `aspire start` is up (the dashboard answers at [http://localhost:18888](http://localhost:18888)). The
   triggers processor and its job hand-off depend on Deno KV and the workers runtime, so Aspire must be
   up before you start.
 
@@ -185,7 +185,7 @@ The `hmac-sha256` verifier needs its secret in the environment. Set it before st
 export WEBHOOK_SHIPPING_SECRET=dev-shipping-secret
 ```
 
-If `aspire run` is up it orchestrates the triggers API and its background processor for you (look for
+If `aspire start` is up it orchestrates the triggers API and its background processor for you (look for
 the `triggers-api` and `triggers` resources in the [dashboard](http://localhost:18888)). To run the
 API on its own during development, start it from the plugin workspace:
 
@@ -236,7 +236,7 @@ durable job.
 
 {{ comp callout { type: "warning", title: "If the job does not appear" } }}
 <ul>
-<li>Make sure <code>aspire run</code> is up — the workers runtime and KV must be live for the enqueued job to execute.</li>
+<li>Make sure <code>aspire start</code> is up — the workers runtime and KV must be live for the enqueued job to execute.</li>
 <li>Check that <code>WEBHOOK_SHIPPING_SECRET</code> is set and that your request's signature matches; a failed HMAC verification rejects the request before the handler runs.</li>
 <li>Confirm the job id in <code>enqueueJob(...)</code> matches a registered worker job. An unknown id is accepted at the webhook but has nothing to run.</li>
 <li>Check the <code>triggers</code> processor resource in the Aspire <a href="http://localhost:18888">dashboard</a> for errors — the background processor, not the API, drains the effects.</li>

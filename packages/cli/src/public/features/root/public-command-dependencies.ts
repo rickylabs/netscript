@@ -21,6 +21,7 @@ import { resolveManifest } from '../../../kernel/adapters/deploy/commands/manife
 import { DenoProcess } from '../../../kernel/adapters/runtime/process/deno-process.ts';
 import { DenoFileSystem } from '../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
 import { DryRunFileSystemAdapter } from '../../../kernel/adapters/scaffold/dry-run-fs.ts';
+import { CliffyPrompt } from '../../../kernel/adapters/runtime/prompt/cliffy-prompt.ts';
 import { Scaffolder } from '../../../kernel/adapters/scaffold/scaffolder.ts';
 import { StringTemplateAdapter } from '../../../kernel/adapters/scaffold/template-adapter.ts';
 import { PluginRegistryScaffolder } from '../../../kernel/adapters/plugin/registry-scaffolder.ts';
@@ -73,6 +74,7 @@ export interface PublicCommandDependencies {
   /** Dependencies for public init. */
   readonly initCommandDependencies: {
     readonly defaultProjectName: () => string;
+    readonly prompt: CliffyPrompt;
     readonly initContext: InitPipelineContext;
     readonly createInitContext: (options: { readonly dryRun: boolean }) => InitPipelineContext;
   };
@@ -149,6 +151,7 @@ export function createPublicCommandDependencies(
 ): PublicCommandDependencies {
   const fs = new DenoFileSystem();
   const process = new DenoProcess();
+  const prompt = new CliffyPrompt();
   const templateAdapter = new StringTemplateAdapter(fs);
   const scaffolder = new Scaffolder(templateAdapter, fs);
   const pluginRegistry = new PluginKindRegistry();
@@ -212,6 +215,7 @@ export function createPublicCommandDependencies(
     resolveProjectRoot,
     initCommandDependencies: {
       defaultProjectName: () => host.cwd().split(/[/\\]/).pop() ?? 'my-app',
+      prompt,
       initContext,
       createInitContext: ({ dryRun }) =>
         dryRun ? createInitContext(new DryRunFileSystemAdapter(fs)) : initContext,

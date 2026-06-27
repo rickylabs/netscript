@@ -33,7 +33,7 @@ factory adds per-procedure helpers — `queryOptions()`, `clientKey()`, and the 
 ## Before you begin
 
 You should have completed [chapter 2](/tutorials/live-dashboard/02-contract-to-service/): the
-`orders` service answering on **3002**, the database seeded, and `aspire run` up. Confirm the typed
+`orders` service answering on **3002**, the database seeded, and `aspire start` up. Confirm the typed
 read-model still returns data:
 
 ```sh
@@ -99,7 +99,7 @@ each a small object of typed helpers. The four you will use across the next chap
 }) }}
 
 {{ comp callout { type: "tip", title: "Why KV, and why cache-first" } }}
-The cache is backed by KV (Garnet in your Aspire stack — the Redis adapter you saw registered at the top of <code>main.ts</code> in chapter 1). Cache-first means a page render does not block on the service: <code>getCachedEntry</code> returns immediately from KV when warm, and the stale entry refreshes in the background. A cold cache returns <code>undefined</code>, which the page handles with a skeleton — you wire that in chapter 4.
+The cache is backed by KV (Redis in your Aspire stack — the default <code>--cache-backend</code>, registered at the top of <code>main.ts</code> in chapter 1; <code>garnet</code> and <code>deno-kv</code> are alternatives). Cache-first means a page render does not block on the service: <code>getCachedEntry</code> returns immediately from KV when warm, and the stale entry refreshes in the background. A cold cache returns <code>undefined</code>, which the page handles with a skeleton — you wire that in chapter 4.
 {{ /comp }}
 
 ## Step 3 — Understand the calling shapes
@@ -124,7 +124,7 @@ deno task check
 
 A clean check confirms `createServiceClient<typeof ordersContract>` and the query factory typed
 themselves off your chapter-2 contract. To prove the discovery key resolves end to end, leave
-`aspire run` up — the next chapter renders the page that calls through this client, and a missing
+`aspire start` up — the next chapter renders the page that calls through this client, and a missing
 `services__orders__http__0` shows up there as a clear "Service URL not found" error.
 
 - [ ] `apps/dashboard/lib/api-clients.ts` exports `ordersClient`, `baseQueries`, and

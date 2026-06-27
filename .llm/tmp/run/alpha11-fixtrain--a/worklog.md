@@ -31,3 +31,15 @@
 | `deno fmt --no-config --check --line-width 100 --indent-width 2 --single-quote --ext ts <changed files>` | PASS | Checked the 4 changed TS files. |
 | `deno lint --no-config <changed files>` | FAIL | Reports only the pre-existing accepted `Command<any, ...>` return type in `init-command.ts`; no new `any` or casts were introduced. |
 | `git diff --check -- <changed paths>` | PASS | No whitespace errors. |
+
+## Merge Reconciliation
+
+| Item | Result | Notes |
+| --- | --- | --- |
+| Merge commit | `fdd1b58a5b4b16bbbe4976fe06c1f2a39fbc9148` | Reconciled `fix/cli-core-alpha11-a` with `origin/main`. |
+| Harness conflicts | Resolved | Kept branch content for `.llm/tmp/run/alpha11-fixtrain--a/drift.md`, `plan.md`, and `research.md`. |
+| `init-command.ts` | Resolved | Kept main's interactive init/cache option flow and Slice A's dry-run context selection before `executeInit`. |
+| `public-command-dependencies.ts` | Resolved | Kept main's `CliffyPrompt` dependency and Slice A's `createInitContext({ dryRun })` `DryRunFileSystemAdapter` swap. |
+| Check gate | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` selected 527 files in 5 batches, 0 failed batches. |
+| Regression test | PASS | `deno test --unstable-kv --allow-all packages/cli/src/public/features/root/public-command-tree_test.ts`: 2 passed, 0 failed. |
+| Cast scan | PASS | Staged TypeScript diff added no `as unknown` or `as any` lines before commit. |

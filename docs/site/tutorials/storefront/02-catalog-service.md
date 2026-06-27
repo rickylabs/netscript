@@ -36,11 +36,11 @@ it ever reaches your handler.
 You should have finished [chapter 1](/tutorials/storefront/01-scaffold/), so:
 
 - `my-shop/` exists with `services/products/` and `contracts/` directories.
-- `aspire run` is up from the `aspire/` folder, so the dashboard at
+- `aspire start` is up from the `aspire/` folder, so the dashboard at
   [http://localhost:18888](http://localhost:18888) is live and Postgres is online.
 
 With Aspire up, initialize the database so the catalog has real tables to read and write. Run these
-from the **workspace root** (a second terminal — leave `aspire run` going in the first):
+from the **workspace root** (a second terminal — leave `aspire start` going in the first):
 
 ```sh
 netscript db init --name init   # create + apply the first migration
@@ -57,8 +57,8 @@ curl http://localhost:3001/health
 A healthy JSON response means the scaffolded `products` service is up on port **3001** and ready to
 turn into a real catalog.
 
-{{ comp callout { type: "important", title: "db commands need Aspire running first" } }}
-<code>netscript db init / generate / seed</code> reach the Postgres container <em>through</em> the running AppHost. If <code>aspire run</code> is not up, there is no database to migrate and these commands fail fast. Bring Aspire up first — always.
+{{ comp callout { type: "important", title: "db commands need aspire startning first" } }}
+<code>netscript db init / generate / seed</code> reach the Postgres container <em>through</em> the running AppHost. If <code>aspire start</code> is not up, there is no database to migrate and these commands fail fast. Bring Aspire up first — always.
 {{ /comp }}
 
 ## Step 1 — Define the catalog contract
@@ -245,7 +245,7 @@ Either form binds the same router and exposes the same surface on port **3001**:
 
 ## Verify your progress
 
-If `aspire run` is orchestrating everything, the `products` service is already live on `:3001` with
+If `aspire start` is orchestrating everything, the `products` service is already live on `:3001` with
 your new handlers. From a second terminal, list the catalog over the OpenAPI projection:
 
 ```sh

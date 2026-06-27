@@ -38,7 +38,7 @@ NetScript's durable-streams runtime mirrors execution state — saga instances, 
 
 You should have completed [chapter 4](/tutorials/live-dashboard/04-definePage-QueryIsland/): the
 orders page rendering through `definePage` with a hydrated `QueryIsland`. The live layer needs the
-streams runtime reachable. With `aspire run` up, confirm it answers on **4437**:
+streams runtime reachable. With `aspire start` up, confirm it answers on **4437**:
 
 ```sh
 curl http://localhost:4437/health
@@ -144,7 +144,7 @@ island rehydrates from `dehydratedState`, so the inventory is present immediatel
 stream in on top.
 
 {{ comp callout { type: "warning", title: "Streams is its own runtime — and it must be up" } }}
-The durable-streams producer is a <strong>separate Aspire service on :4437</strong>, not part of your orders service. <code>getStreamsUrl()</code> resolves its address from the environment the same way <code>getServiceUrl</code> does for services — so it only works when <code>aspire run</code> has brought the streams runtime up. With no streams runtime, <code>useLiveQuery</code> has nothing to subscribe to and the live table stays empty (the <code>useQuery</code> inventory still renders from cache). See <a href="/capabilities/streams/">Durable streams</a>.
+The durable-streams producer is a <strong>separate Aspire service on :4437</strong>, not part of your orders service. <code>getStreamsUrl()</code> resolves its address from the environment the same way <code>getServiceUrl</code> does for services — so it only works when <code>aspire start</code> has brought the streams runtime up. With no streams runtime, <code>useLiveQuery</code> has nothing to subscribe to and the live table stays empty (the <code>useQuery</code> inventory still renders from cache). See <a href="/capabilities/streams/">Durable streams</a>.
 {{ /comp }}
 
 ## Step 4 — Wrap the island in QueryIsland
@@ -175,7 +175,7 @@ takes over the live rows.
 
 ## Verify your progress
 
-With `aspire run` up, open the live monitor in the browser and watch it update. The showcase serves
+With `aspire start` up, open the live monitor in the browser and watch it update. The showcase serves
 it at the plugin route; in your workspace the live saga monitor renders wherever you mount
 `SagasLiveIsland`. To *see* it move, trigger a saga — creating an order publishes an `OrderCreated`
 saga message (chapter 2's service does this), which advances a saga instance and pushes a change down
@@ -202,7 +202,7 @@ deno task check
 - [ ] `deno task check` is clean.
 
 {{ comp callout { type: "tip", title: "Nothing moves when you create an order?" } }}
-Two usual causes: the sagas plugin (and its streams runtime on :4437) is not installed/booted — check the <a href="/explanation/aspire/">dashboard</a> resource list; or <code>getStreamsUrl()</code> resolved nothing because <code>aspire run</code> is down. The <code>useQuery</code> inventory still renders from cache, which is why the panel looks alive but never moves.
+Two usual causes: the sagas plugin (and its streams runtime on :4437) is not installed/booted — check the <a href="/explanation/aspire/">dashboard</a> resource list; or <code>getStreamsUrl()</code> resolved nothing because <code>aspire start</code> is down. The <code>useQuery</code> inventory still renders from cache, which is why the panel looks alive but never moves.
 {{ /comp }}
 
 ## What you built

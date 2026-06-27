@@ -33,7 +33,7 @@ register the job so the trigger can address it by `id`.
 ## Before you begin
 
 You need the workspace from [Chapter 1](/tutorials/erp-sync/01-scaffold/) with **both** the workers
-and triggers plugins installed, and `aspire run` healthy. Confirm the prior state from the project
+and triggers plugins installed, and `aspire start` healthy. Confirm the prior state from the project
 root:
 
 ```sh
@@ -197,7 +197,7 @@ services load. After this, `import-products` is addressable, and `product-import
 by the file-watch processor.
 
 {{ comp callout { type: "note", title: "Restart the processors after generating" } }}
-If <code>aspire run</code> was up before you generated the registry, restart it (or let it
+If <code>aspire start</code> was up before you generated the registry, restart it (or let it
 hot-reload) so the workers runtime and the file-watch processor pick up the new job and trigger.
 {{ /comp }}
 
@@ -239,7 +239,7 @@ completed `import-products` run whose result is `{ "fileName": "products_2024.cs
 {{ comp callout { type: "warning", title: "If the job never runs" } }}
 <ul>
 <li><strong>Aspire isn't up</strong> — the file-watch processor and the workers runtime are Aspire
-resources. Start <code>aspire run</code> from <code>aspire/</code> and retry.</li>
+resources. Start <code>aspire start</code> from <code>aspire/</code> and retry.</li>
 <li><strong>The job isn't registered</strong> — re-run <code>netscript generate plugins</code> so
 <code>import-products</code> is in the generated registry, then restart Aspire.</li>
 <li><strong>Filename didn't match</strong> — the pattern is <code>products_*.csv</code>. A file

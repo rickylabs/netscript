@@ -39,16 +39,16 @@ directly — shown in Step 3. Structured logging via <code>log.*</code> is real 
 
 {{ comp.apiTable({ caption: "What this recipe assumes", rows: [
   { name: "netscript workspace", type: "netscript init", desc: "An existing workspace. If you have none, scaffold one first — see the tutorials." },
-  { name: "Aspire running", type: "cd aspire && aspire run", desc: "The AppHost provisions Postgres, Garnet, the OTLP collector, and the dashboard. Start it BEFORE you expect traces. Dashboard at http://localhost:18888." },
+  { name: "aspire startning", type: "cd aspire && aspire start", desc: "The AppHost provisions Postgres, Redis, the OTLP collector, and the dashboard. Start it BEFORE you expect traces. Dashboard at http://localhost:18888." },
   { name: "@netscript/telemetry", type: "OTel facade", desc: "Wraps @opentelemetry/api and ships the worker/scheduler/queue/SSE instrumentation. Already wired into the generated handlers — no install step." },
   { name: "A service or plugin to trace", type: "services/users or plugins/workers", desc: "The users service (:3001) and the workers/sagas/triggers/auth plugins all emit health + trace data once running." }
 ] }) }}
 
 {{ comp callout { type: "warning", title: "Aspire first, always" } }}
 The OTLP endpoint and the trace UI are <strong>Aspire resources</strong>. Aspire is step 2 of
-the workflow: <code>cd aspire &amp;&amp; aspire run</code> brings up Postgres, Garnet, the
+the workflow: <code>cd aspire &amp;&amp; aspire start</code> brings up Postgres, Redis, the
 collector, and the dashboard <strong>before</strong> any <code>netscript db</code> command or
-service. If <code>aspire run</code> is not up, there is nowhere for spans to go and nothing to
+service. If <code>aspire start</code> is not up, there is nowhere for spans to go and nothing to
 view. Start orchestration from the <code>aspire/</code> folder before you run a service,
 trigger a job, or open the dashboard.
 {{ /comp }}
@@ -77,11 +77,11 @@ handler is fully instrumented.
 ## Step 1 — Bring up Aspire and confirm the collector
 
 From the workspace root, start orchestration. The AppHost registers the OTLP collector and
-the dashboard, then boots Postgres, Garnet, and every service/plugin resource.
+the dashboard, then boots Postgres, Redis, and every service/plugin resource.
 
 ```bash
 cd aspire
-aspire run
+aspire start
 # dashboard: http://localhost:18888  (login token printed in the console)
 ```
 
@@ -90,7 +90,7 @@ printed, and select the **Traces** tab. With nothing exercised yet it is empty �
 expected. Leave it open; it updates live.
 
 {{ comp callout { type: "note", title: "Resources you should see" } }}
-The Aspire resource graph lists <code>postgres</code>, <code>garnet</code>,
+The Aspire resource graph lists <code>postgres</code>, <code>redis</code>,
 <code>workers-api</code> (<code>:8091</code>), <code>workers</code>,
 <code>sagas-api</code> (<code>:8092</code>), <code>sagas</code>,
 <code>triggers-api</code> (<code>:8093</code>), <code>triggers</code>, the
@@ -242,7 +242,7 @@ helpers (<code>withChildSpan</code>, <code>recordJobProgress</code>,
 Spans are only collected while Aspire is running and the OTLP endpoint
 (<code>http://localhost:4318</code>) is reachable. Running a service standalone with
 <code>--no-aspire</code> means tracing has nowhere to export to. If the Traces tab is empty,
-check that <code>aspire run</code> is up first — Aspire provisions the collector and dashboard used by the examples.
+check that <code>aspire start</code> is up first — Aspire provisions the collector and dashboard used by the examples.
 {{ /comp }}
 
 {{ comp callout { type: "tip", title: "Set attributes, not log lines, for span data" } }}

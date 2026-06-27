@@ -26,7 +26,7 @@ environment variable read by the worker entrypoint. See
     { name: "workers plugin", type: "plugins/workers/", desc: "Public install: netscript plugin add @netscript/plugin-workers. Local contributor samples: deno run -A packages/cli/bin/netscript-dev.ts plugin add worker --name workers --samples. The :8091 API enqueues; a separate background process executes." },
     { name: "config/official-plugins/mod.ts", type: "defineWorkers(...)", desc: "The generated worker config block — where concurrency, queueProvider, and per-topic scaling live." },
     { name: "@netscript/plugin-workers-core/config", type: "import", desc: "defineWorkers, defineJobs, and the WorkersConfig / ScalingConfig / TaskConfig types." },
-    { name: "Aspire up (for live runs)", type: "cd aspire && aspire run", desc: "The background runner needs Postgres + KV. Aspire injects the worker env vars; see Production pitfalls." }
+    { name: "Aspire up (for live runs)", type: "cd aspire && aspire start", desc: "The background runner needs Postgres + KV. Aspire injects the worker env vars; see Production pitfalls." }
   ]
 }) }}
 
@@ -201,7 +201,7 @@ same variable. The worker entrypoint (<code>plugins/workers/bin/runtime.ts</code
 <code>WORKERS_CONCURRENCY</code> (note the <strong>S</strong>) and defaults it to
 <code>1</code>. The Aspire contribution, however, declares and injects
 <code>WORKER_CONCURRENCY</code> (no S, value <code>2</code>) via its
-<code>concurrencyEnvVar</code>. Under <code>aspire run</code> today, the injected
+<code>concurrencyEnvVar</code>. Under <code>aspire start</code> today, the injected
 <code>WORKER_CONCURRENCY</code> does <em>not</em> feed the entrypoint's
 <code>WORKERS_CONCURRENCY</code> read, so the process pool falls back to its default. Set
 <code>WORKERS_CONCURRENCY</code> explicitly on the background resource if you need a specific

@@ -9,13 +9,26 @@ next: { label: "Choose a queue provider", href: "/how-to/choose-a-queue-provider
 # Use a second database
 
 **Goal:** add a *second* database — a second Postgres, or a MySQL/SQL Server instance —
-to a NetScript workspace that already has its default Postgres, so each datasource gets its
+to a NetScript workspace that already has its primary datasource, so each datasource gets its
 own Prisma schema, migrations, and generated client.
+
+This recipe assumes the primary datasource is Postgres (the recommended default — every tutorial
+scaffolds with `--db postgres`), but the primary engine is itself chosen at scaffold time: pass
+`--db mysql`, `--db mssql`, or `--db sqlite` to `netscript init` for a MySQL, SQL Server, or
+file-backed SQLite primary instead. Everything below applies regardless of which engine your
+primary uses; the examples simply show the common Postgres-primary case.
 
 NetScript's default scaffold gives you **one primary datasource** that every plugin
 aggregates its `.prisma` models into (see [Database & migration](/how-to/database-migration/)).
 A second database is the opposite shape: a **separate** Prisma schema workspace with its own
 `generate` output and its own migration history. It never merges into the primary aggregation.
+
+The second datasource is polyglot the same way the primary is: `netscript db add <engine>`
+accepts the same four engines as `netscript init` — `postgres`, `mysql`, `mssql`, and `sqlite`.
+The container-mode engines (`postgres`/`mysql`/`mssql`) are provisioned as an Aspire container
+resource (`addPostgres` / `addMySql` / `addSqlServer`); `sqlite` is **file-backed and has no
+Aspire container resource**, so the Aspire/Docker prerequisites below apply only to the
+container engines.
 
 There are two ways to add one, and they answer different needs:
 
@@ -29,7 +42,7 @@ There are two ways to add one, and they answer different needs:
 ## Before you start
 
 {{ comp.apiTable({ caption: "Prerequisites", rows: [
-  { name: "A scaffolded workspace", type: "with a primary db", desc: "An existing NetScript project whose primary Postgres is already wired — ideally migrated once via the Database & migration recipe so you know the single-datasource loop." },
+  { name: "A scaffolded workspace", type: "with a primary db", desc: "An existing NetScript project whose primary datasource is already wired (Postgres by default, or whichever engine you passed to netscript init via --db) — ideally migrated once via the Database & migration recipe so you know the single-datasource loop." },
   { name: "netscript CLI", type: "on PATH", desc: "deno install --global --allow-all --name netscript jsr:@netscript/cli. netscript db add --help should print." },
   { name: "Aspire CLI + Docker", type: "for container mode", desc: "The scaffolded second database is provisioned as a container by Aspire (addMySql / addPostgres / addSqlServer). Docker or Podman must be running. Skip only for an external/hand-wired database." },
   { name: "Deno", type: "2.x", desc: "Prisma client generation runs under the Deno runtime (the generated schema sets runtime=\"deno\")." }
@@ -78,7 +91,7 @@ What `netscript db add` does, in one pass:
   primary Postgres uses.
 - **Adds the workspace** as a member of the project so tooling discovers it.
 - **Regenerates the Aspire config and AppHost helper files** so the new container (for example
-  the MySQL resource via `addMySql`) joins the resource graph the next time you run `aspire run`.
+  the MySQL resource via `addMySql`) joins the resource graph the next time you run `aspire start`.
 
 {{ comp callout { type: "note", title: "The new datasource starts empty" } }}
 <code>db add</code> scaffolds the workspace and registers the datasource, but it does
@@ -97,12 +110,12 @@ resource graph. Start (or restart) the AppHost so it provisions:
 # database/migration recipe covers this in full — restart so Aspire picks up
 # the regenerated config and provisions the new container (e.g. the mysql resource).
 cd aspire
-aspire run
+aspire start
 ```
 
 Open the Aspire dashboard at [http://localhost:18888](http://localhost:18888) (the access
-token is printed by `aspire run`) and confirm the new resource — `mysql`, `analytics`, or
-whatever your config key is — goes green alongside the existing `postgres` and `garnet`.
+token is printed by `aspire start`) and confirm the new resource — `mysql`, `analytics`, or
+whatever your config key is — goes green alongside the existing `postgres` and `redis`.
 
 {{ comp callout { type: "warning", title: "If you skipped db add and only edited appsettings" } }}
 The container only appears because <code>db add</code> <strong>regenerated the Aspire
@@ -117,7 +130,7 @@ that is the whole point of <code>db add</code>.
 The `netscript db` operations are **multi-database aware**: every one takes a `--db <target>`
 flag, where the target is a **config key**, a database name, or `all`. With the second database
 registered under `NetScript.Databases.mysql`, point each command at it with `--db mysql`. Run
-these from the workspace root, with `aspire run` up in another terminal:
+these from the workspace root, with `aspire start` up in another terminal:
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -234,7 +247,7 @@ The order is always: build the adapter, call <code>getDriverAdapter()</code>, pa
 {{ comp callout { type: "warning", title: "Watch for these" } }}
 <ul>
 <li><strong>Forgetting <code>--db</code>.</strong> A bare <code>netscript db migrate</code> targets the <strong>primary</strong> datasource. Always pass <code>--db &lt;configKey&gt;</code> (e.g. <code>--db mysql</code>) for the second one, or <code>--db all</code> to fan out — otherwise you migrate the wrong database.</li>
-<li><strong>Aspire not restarted after <code>db add</code>.</strong> The new container only joins the resource graph after the regenerated Aspire config is loaded. Restart <code>aspire run</code> before the new datasource is reachable.</li>
+<li><strong>Aspire not restarted after <code>db add</code>.</strong> The new container only joins the resource graph after the regenerated Aspire config is loaded. Restart <code>aspire start</code> before the new datasource is reachable.</li>
 <li><strong>Stale second client.</strong> Each datasource has its <em>own</em> <code>.generated/</code>. Editing <code>database/mysql/schema/schema.prisma</code> without <code>netscript db generate --db mysql</code> leaves your code typed against the old shape — same trap as the primary, once per datasource.</li>
 <li><strong>Importing the wrong client.</strong> The primary is <code>database/postgres/schema/.generated/client.server.ts</code>; the second is <code>database/mysql/schema/.generated/client.server.ts</code>. They are distinct <code>PrismaClient</code>s — crossing the imports queries the wrong database.</li>
 <li><strong>Calling <code>getClient()</code> before <code>setClient()</code></strong> on a hand-wired adapter throws — see the callout above.</li>

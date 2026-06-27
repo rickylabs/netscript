@@ -112,6 +112,8 @@ export async function validateOptions(
     noAspire: options.noAspire,
     legacyAspire: options.legacyAspire,
     dbEngine,
+    cache: options.cache ?? SCAFFOLD_DEFAULTS.CACHE_ENABLED,
+    cacheBackend: options.cacheBackend ?? SCAFFOLD_DEFAULTS.CACHE_BACKEND,
     includeExampleService,
     serviceName,
     servicePort,

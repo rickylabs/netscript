@@ -45,7 +45,7 @@ connection error). If any are missing, the [quickstart](/quickstart/) walks thro
 Install the NetScript CLI once:
 
 ```sh
-deno install --global --allow-all --name netscript jsr:@netscript/cli
+deno install --global --allow-all --name netscript jsr:@netscript/cli{{ releaseSpecifier }}
 ```
 
 {{ comp callout { type: "note", title: "New to NetScript? Walk the main ladder first" } }}
@@ -85,7 +85,7 @@ in the browser, type-checked at every hop. Each chapter adds exactly one link:
   },
   {
     title: "6 · Run it all under Aspire",
-    body: "Bring the whole graph up locally — service, Fresh app, streams runtime, Postgres, Garnet — with one <code>aspire run</code>. Clear about what local orchestration is and is not.",
+    body: "Bring the whole graph up locally — service, Fresh app, streams runtime, Postgres (the default; swap <code>--db</code> for <code>mysql</code> / <code>mssql</code> / <code>sqlite</code> at scaffold time), Redis — with one <code>aspire start</code>. Clear about what local orchestration is and is not.",
     href: "/tutorials/live-dashboard/06-deploy/"
   }
 ] }) }}
