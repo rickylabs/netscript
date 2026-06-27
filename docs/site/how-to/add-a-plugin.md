@@ -43,7 +43,7 @@ You need:
   the command is missing, install it:
 
 {{ comp.tabbedCode({ tabs: [
-  { label: "Install the CLI", lang: "bash", code: "deno install --global --allow-all --name netscript jsr:@netscript/cli" },
+  { label: "Install the CLI", lang: "bash", code: "deno install --global --allow-all --name netscript jsr:@netscript/cli" + releaseSpecifier + "" },
   { label: "Confirm it resolves", lang: "bash", code: "netscript --help\nnetscript plugin --help" }
 ] }) }}
 

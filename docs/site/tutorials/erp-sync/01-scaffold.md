@@ -41,7 +41,7 @@ You need the same local toolchain the [main tutorials](/tutorials/) use:
 Install the NetScript CLI from JSR once, then confirm it:
 
 ```sh
-deno install --global --allow-all --name netscript jsr:@netscript/cli
+deno install --global --allow-all --name netscript jsr:@netscript/cli{{ releaseSpecifier }}
 netscript --help
 ```
 
@@ -51,7 +51,7 @@ a fresh terminal.
 
 {{ comp callout { type: "tip", title: "Prefer not to install globally?" } }}
 Run any command ad-hoc with
-<code>deno x jsr:@netscript/cli &lt;command&gt;</code>. The rest of this track
+<code>deno x jsr:@netscript/cli{{ releaseSpecifier }} &lt;command&gt;</code>. The rest of this track
 assumes the installed <code>netscript</code> form.
 {{ /comp }}
 

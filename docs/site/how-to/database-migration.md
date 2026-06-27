@@ -51,7 +51,7 @@ Aspire is keeping alive in a second terminal.
 
 {{ comp.apiTable({ caption: "Prerequisites", rows: [
   { name: "NetScript workspace", type: "netscript init …", desc: "A workspace scaffolded with a database. The default --db postgres lays down database/postgres/ with a Prisma schema, prisma.config.ts, and seed scripts." },
-  { name: "netscript CLI", type: "on PATH", desc: "Install with deno install --global --allow-all --name netscript jsr:@netscript/cli — then netscript --help should print." },
+  { name: "netscript CLI", type: "on PATH", desc: "Install with deno install --global --allow-all --name netscript jsr:@netscript/cli" + releaseSpecifier + " — then netscript --help should print." },
   { name: "Aspire CLI", type: "aspire", desc: "Used to provision Postgres and Garnet as containers via Docker. Confirm with aspire --version. Docker/Podman must be running." },
   { name: "Deno", type: "2.x", desc: "deno --version. Prisma generation runs under the Deno runtime (the schema sets runtime=\"deno\")." }
 ] }) }}

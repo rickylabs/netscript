@@ -45,7 +45,7 @@ connection error). If any are missing, the [quickstart](/quickstart/) walks thro
 Install the NetScript CLI once:
 
 ```sh
-deno install --global --allow-all --name netscript jsr:@netscript/cli
+deno install --global --allow-all --name netscript jsr:@netscript/cli{{ releaseSpecifier }}
 ```
 
 {{ comp callout { type: "note", title: "New to NetScript? Walk the main ladder first" } }}

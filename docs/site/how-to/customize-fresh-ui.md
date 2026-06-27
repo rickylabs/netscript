@@ -38,7 +38,7 @@ You need:
 - The `netscript` command on your path. Run `netscript --help` to confirm, and
   `netscript ui:init --help` / `netscript ui:add --help` for the exact option
   spelling in your installed version. If `netscript` is not found, install it with
-  `deno install --global --allow-all --name netscript jsr:@netscript/cli`.
+  `deno install --global --allow-all --name netscript jsr:@netscript/cli{{ releaseSpecifier }}`.
 
 Run the app while you work so you can see each change live. Aspire is step 2 of the
 normal startup flow — it brings up Postgres and Garnet before any `netscript db`

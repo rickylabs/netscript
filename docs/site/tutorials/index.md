@@ -83,7 +83,7 @@ scaffold, so you can start in either place.
 A recent <a href="https://deno.com/">Deno</a> and the
 <a href="https://learn.microsoft.com/dotnet/aspire/">.NET Aspire</a> CLI on your
 PATH. Install the NetScript CLI with
-<code>deno install --global --allow-all --name netscript jsr:@netscript/cli</code>.
+<code>deno install --global --allow-all --name netscript jsr:@netscript/cli{{ releaseSpecifier }}</code>.
 Each chapter lists its own prerequisite state, so you always know which earlier
 chapters it builds on.
 {{ /comp }}

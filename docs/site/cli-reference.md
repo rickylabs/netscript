@@ -37,22 +37,22 @@ The CLI is published to JSR as `@netscript/cli`. Install it globally for a tidy
   {
     label: "Global install",
     lang: "bash",
-    code: "# Installs a `netscript` command on your PATH\ndeno install --global --allow-all --name netscript jsr:@netscript/cli\n\nnetscript --help"
+    code: "# Installs a `netscript` command on your PATH\ndeno install --global --allow-all --name netscript jsr:@netscript/cli" + releaseSpecifier + "\n\nnetscript --help"
   },
   {
     label: "Ad-hoc (no install)",
     lang: "bash",
-    code: "# Run the same CLI without installing anything\ndeno x jsr:@netscript/cli --help"
+    code: "# Run the same CLI without installing anything\ndeno x jsr:@netscript/cli" + releaseSpecifier + " --help"
   },
   {
     label: "Upgrade",
     lang: "bash",
-    code: "# Re-run the install with --force to pull the latest published version\ndeno install --global --allow-all --force --name netscript jsr:@netscript/cli"
+    code: "# Re-run the install with --force to pull the latest published version\ndeno install --global --allow-all --force --name netscript jsr:@netscript/cli" + releaseSpecifier + ""
   }
 ] }) }}
 
 {{ comp callout { type: "tip" } }}
-Use <code>deno x jsr:@netscript/cli</code> for ad-hoc runs, or install the same default export as
+Use <code>deno x jsr:@netscript/cli{{ releaseSpecifier }}</code> for ad-hoc runs, or install the same default export as
 <code>netscript</code> when you want a PATH command.
 {{ /comp }}
 
