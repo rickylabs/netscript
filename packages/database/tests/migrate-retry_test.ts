@@ -65,10 +65,11 @@ describe('isRetriableMigrationFailure', () => {
   it('matches the schema-engine premature-close signature', () => {
     assertEquals(isRetriableMigrationFailure(PREMATURE_CLOSE), true);
     assertEquals(isRetriableMigrationFailure('Error [ERR_STREAM_PREMATURE_CLOSE]'), true);
-    assertEquals(isRetriableMigrationFailure('Schema engine exited.'), true);
     assertEquals(isRetriableMigrationFailure('xxx Premature close yyy'), true);
     assertEquals(
-      isRetriableMigrationFailure('schema-engine-windows.exe cli can-connect-to-database'),
+      isRetriableMigrationFailure(
+        'Error: Schema engine exited. schema-engine-windows.exe cli can-connect-to-database',
+      ),
       true,
     );
     assertEquals(
@@ -80,6 +81,7 @@ describe('isRetriableMigrationFailure', () => {
   it('does not match real schema/SQL errors', () => {
     assertEquals(isRetriableMigrationFailure(REAL_SCHEMA_ERROR), false);
     assertEquals(isRetriableMigrationFailure("P1001: Can't reach database server"), false);
+    assertEquals(isRetriableMigrationFailure('Schema engine exited.'), false);
     assertEquals(isRetriableMigrationFailure(''), false);
   });
 });
