@@ -8,6 +8,7 @@ import { assertEquals } from 'jsr:@std/assert@^1';
 import { MemoryFileSystemAdapter } from '../scaffold/memory-fs.ts';
 import { PluginWorkspaceMutator } from './workspace-mutator.ts';
 import type { PluginKindProvider } from '../../domain/plugin-kind.ts';
+import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
 
 const backgroundProvider: PluginKindProvider = {
   kind: 'background',
@@ -78,7 +79,7 @@ Deno.test('PluginWorkspaceMutator injects first-party plugin core imports into r
       {
         workspace: ['./plugins/*'],
         imports: {
-          '@netscript/plugin': 'jsr:@netscript/plugin@0.0.1-alpha.9',
+          '@netscript/plugin': netscriptJsrSpecifier('plugin'),
         },
       },
       null,
@@ -97,19 +98,19 @@ Deno.test('PluginWorkspaceMutator injects first-party plugin core imports into r
 
   assertEquals(
     config.imports['@netscript/plugin-workers-core/schemas'],
-    'jsr:@netscript/plugin-workers-core@0.0.1-alpha.9/schemas',
+    netscriptJsrSpecifier('plugin-workers-core', '/schemas'),
   );
   assertEquals(
     config.imports['@netscript/plugin-sagas-core/domain'],
-    'jsr:@netscript/plugin-sagas-core@0.0.1-alpha.9/domain',
+    netscriptJsrSpecifier('plugin-sagas-core', '/domain'),
   );
   assertEquals(
     config.imports['@netscript/plugin-triggers-core/builders'],
-    'jsr:@netscript/plugin-triggers-core@0.0.1-alpha.9/builders',
+    netscriptJsrSpecifier('plugin-triggers-core', '/builders'),
   );
   assertEquals(
     config.imports['@netscript/plugin-auth-core/contracts/v1'],
-    'jsr:@netscript/plugin-auth-core@0.0.1-alpha.9/contracts/v1',
+    netscriptJsrSpecifier('plugin-auth-core', '/contracts/v1'),
   );
 });
 
