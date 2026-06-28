@@ -1,0 +1,24 @@
+/**
+ * Shared primitives for plugin-owned scaffold entrypoints.
+ *
+ * @example Define a scaffold artifact
+ * ```ts
+ * import type { ScaffoldArtifact } from "@netscript/plugin/scaffold";
+ *
+ * const artifact: ScaffoldArtifact = {
+ *   path: "plugins/example/mod.ts",
+ *   content: "export const name = 'example';\n",
+ * };
+ * ```
+ *
+ * @module
+ */
+
+export type { PluginLogger } from '../domain/mod.ts';
+export type {
+  PluginScaffoldEntrypoint,
+  ScaffolderContext,
+  ScaffoldResult,
+} from '../protocol/mod.ts';
+export type { ScaffoldArtifact } from './artifact.ts';
+export { scaffoldSchemaUrl } from './schema-url.ts';

@@ -10,6 +10,7 @@
     "./cli": "./src/cli/mod.ts",
     "./loader": "./loader.ts",
     "./protocol": "./src/protocol/mod.ts",
+    "./scaffold": "./src/scaffold/mod.ts",
     "./schema": "./schema/scaffold.plugin.schema.json",
     "./sdk": "./src/sdk/mod.ts",
     "./testing": "./src/testing/mod.ts",
@@ -18,11 +19,12 @@
   "imports": {
     "@std/assert": "jsr:@std/assert@^1",
     "@std/path": "jsr:@std/path@^1",
+    "@std/text": "jsr:@std/text@^1",
     "zod": "jsr:@zod/zod@4.4.3",
     "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0"
   },
   "tasks": {
-    "check": "deno check --unstable-kv mod.ts src/abstracts/mod.ts src/config/mod.ts src/cli/mod.ts loader.ts src/protocol/mod.ts src/sdk/mod.ts src/testing/mod.ts src/templates/mod.ts",
+    "check": "deno check --unstable-kv mod.ts src/abstracts/mod.ts src/config/mod.ts src/cli/mod.ts loader.ts src/protocol/mod.ts src/scaffold/mod.ts src/sdk/mod.ts src/testing/mod.ts src/templates/mod.ts",
     "fmt": "deno fmt",
     "lint": "deno lint",
     "test": "deno test --allow-all",
