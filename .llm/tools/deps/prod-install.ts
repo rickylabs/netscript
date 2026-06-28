@@ -1,33 +1,37 @@
 /**
  * deps/prod-install.ts — structured wrapper over `deno ci --prod`.
  *
- * `deno ci --prod` performs a frozen install of the **production** dependency
+ * `deno ci --prod` performs a lockfile-frozen install of the **production** dependency
  * surface only (excludes devDependencies). It proves the *published* surface
  * resolves and installs without dev tooling — the thing a consumer of the
  * `@netscript/*` packages actually gets. This is ADDITIVE to the quality lane:
  * `check`/`lint`/`fmt` still need dev deps, so this does not replace the plain
  * `deno ci` in the `ci` task.
  *
- * `--frozen` (implied by `ci`) fails if the lockfile would change — exactly the
- * signal we want in CI: the prod graph must already be locked.
+ * `ci` fails if the lockfile would change — exactly the signal we want in CI:
+ * the prod graph must already be locked.
  *
  * Usage:
  *   deno run --allow-read --allow-write --allow-net --allow-run --allow-env \
  *     .llm/tools/deps/prod-install.ts [--skip-types] [--pretty]
  *
- * Note: this mutates deno.lock only if the prod graph drifted; with `--frozen`
- * it instead fails. Never pass a reload flag here.
+ * Note: this fails rather than mutating deno.lock when the prod graph drifted.
+ * Never pass a reload flag here.
  */
 
-function parseArgs(argv: string[]): { skipTypes: boolean; pretty: boolean } {
+export function parseArgs(argv: string[]): { skipTypes: boolean; pretty: boolean } {
   return { skipTypes: argv.includes('--skip-types'), pretty: argv.includes('--pretty') };
+}
+
+export function buildDenoCiArgs(args: { skipTypes: boolean }): string[] {
+  const cmdArgs = ['ci', '--prod'];
+  if (args.skipTypes) cmdArgs.push('--skip-types');
+  return cmdArgs;
 }
 
 async function main() {
   const args = parseArgs(Deno.args);
-  const cmdArgs = ['ci', '--prod', '--frozen'];
-  if (args.skipTypes) cmdArgs.push('--skip-types');
-
+  const cmdArgs = buildDenoCiArgs(args);
   const start = performance.now();
   const command = new Deno.Command('deno', { args: cmdArgs, stdout: 'piped', stderr: 'piped' });
   const output = await command.output();
@@ -55,4 +59,6 @@ async function main() {
   Deno.exit(output.code);
 }
 
-await main();
+if (import.meta.main) {
+  await main();
+}

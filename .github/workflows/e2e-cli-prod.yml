@@ -1,8 +1,9 @@
 name: e2e-cli-prod
 
 on:
-  release:
-    types: [published]
+  workflow_run:
+    workflows: ["publish"]
+    types: [completed]
   workflow_dispatch:
     inputs:
       published-version:
@@ -11,6 +12,7 @@ on:
         type: string
 
 permissions:
+  actions: read
   contents: read
 
 concurrency:
@@ -20,6 +22,7 @@ concurrency:
 jobs:
   scaffold-runtime-jsr:
     name: scaffold-runtime (published JSR CLI)
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 75
     steps:
@@ -43,13 +46,25 @@ jobs:
           dotnet tool install Aspire.Cli --tool-path "$HOME/.aspire/bin" --version "$ASPIRE_CLI_VERSION"
           echo "$HOME/.aspire/bin" >> "$GITHUB_PATH"
 
+      - name: Download published version
+        if: github.event_name == 'workflow_run'
+        uses: actions/download-artifact@v4
+        with:
+          name: netscript-published-version-${{ github.event.workflow_run.id }}
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+          path: .llm/tmp/published-version
+
       - name: Resolve published version
         id: version
         env:
           DISPATCH_VERSION: ${{ github.event.inputs['published-version'] }}
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          VERSION_FILE: .llm/tmp/published-version/version.txt
         run: |
-          version="${DISPATCH_VERSION:-${RELEASE_TAG#v}}"
+          version="${DISPATCH_VERSION:-}"
+          if [ -z "$version" ] && [ -f "$VERSION_FILE" ]; then
+            version="$(cat "$VERSION_FILE")"
+          fi
           if [ -z "$version" ]; then
             echo "A published version is required." >&2
             exit 1

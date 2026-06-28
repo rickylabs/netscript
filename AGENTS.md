@@ -14,6 +14,8 @@ API-inspection work — it maps the native Deno 2.9 toolchain (`outdated`, `why`
 `ci`/`ci --prod`, `bump-version`, `publish`, `doc`) and the repo's `.llm/tools/deps/` wrappers so
 you stop hand-rolling registry curls and version checks. Use `.agents/skills/netscript-pr` whenever
 creating a branch, opening/updating a PR, posting a phase summary comment, or applying labels.
+Use `.agents/skills/netscript-release` for release cuts, publish handoffs, race-free production E2E
+verification, and rollback.
 
 When the user says `use harness`, activate the harness workflow. The evaluator must be a separate
 session from the implementation session — the full evaluator protocol (PLAN-EVAL / IMPL-EVAL,

@@ -56,8 +56,8 @@ command map.
 
 ### `deps/prod-install.ts` — published-surface install (`deno task deps:prod-install`)
 
-- Purpose: wrap `deno ci --prod --frozen` — proves the production (non-dev) surface installs against
-  a frozen lock. **Additive** to the quality lane (`check`/`lint` still need dev deps).
+- Purpose: wrap `deno ci --prod` — proves the production (non-dev) surface installs against the
+  lockfile enforced by `deno ci`. **Additive** to the quality lane (`check`/`lint` still need dev deps).
 - Flags: `--skip-types`, `--pretty`.
 
 ## Full CLI E2E
