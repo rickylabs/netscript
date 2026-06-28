@@ -1,0 +1,2 @@
+export const authTemplate8 =
+  "/** @module @netscript/plugin-auth/plugin */\n\nexport { authPlugin, inspectAuth } from '../public/mod.ts';\nexport type {\n  AuthContractVersionContribution,\n  AuthPluginContributions,\n  AuthPluginDependencies,\n  AuthPluginDependencyManifest,\n  AuthPluginInspection,\n  AuthPluginManifest,\n  AuthRuntimeConfigTopicContribution,\n  AuthServiceContribution,\n} from '../public/mod.ts';\n";

@@ -8,6 +8,7 @@
     "./public": "./src/public/mod.ts",
     "./plugin": "./src/plugin/mod.ts",
     "./contracts": "./contracts.ts",
+    "./scaffold": "./scaffold.ts",
     "./services": "./services/src/main.ts",
     "./streams": "./streams/mod.ts",
     "./streams/server": "./streams/server.ts"
@@ -30,11 +31,11 @@
     "zod": "jsr:@zod/zod@4.4.3"
   },
   "tasks": {
-    "check": "deno check --unstable-kv mod.ts src/public/mod.ts src/plugin/mod.ts contracts.ts services/src/main.ts streams/mod.ts streams/server.ts",
+    "check": "deno check --unstable-kv mod.ts scaffold.ts src/public/mod.ts src/plugin/mod.ts src/scaffold/mod.ts contracts.ts services/src/main.ts streams/mod.ts streams/server.ts",
     "test": "deno test --unstable-kv --allow-all",
     "dev": "deno run --allow-net --allow-env --allow-read --watch services/src/main.ts",
     "start": "deno run --allow-net --allow-env --allow-read services/src/main.ts",
-    "doc-lint": "deno doc --lint mod.ts src/public/mod.ts src/plugin/mod.ts contracts.ts services/src/main.ts streams/mod.ts streams/server.ts",
+    "doc-lint": "deno doc --lint mod.ts scaffold.ts src/public/mod.ts src/plugin/mod.ts src/scaffold/mod.ts contracts.ts services/src/main.ts streams/mod.ts streams/server.ts",
     "publish:dry-run": "deno publish --dry-run --allow-dirty",
     "verify": "deno run --allow-read verify-plugin.ts"
   },
@@ -44,6 +45,7 @@
       "deno.json",
       "scaffold.plugin.json",
       "package.json",
+      "scaffold.ts",
       "mod.ts",
       "contracts.ts",
       "verify-plugin.ts",

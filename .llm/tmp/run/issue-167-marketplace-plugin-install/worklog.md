@@ -769,3 +769,95 @@ Timestamp: 2026-06-28T14:35:00Z
   reverted, and the scaffolder writer was changed to avoid adding `@std/path`.
 - No new TypeScript casts were introduced in source or generated scaffold templates.
 - S9 did not remove or rewire the CLI copier/official-source path; that remains deferred to S5.
+
+## S10 Evidence — Auth Plugin-Owned Scaffold Entrypoint
+
+Timestamp: 2026-06-28T10:45:00Z
+
+### Scope
+
+- Added `plugins/auth/scaffold.ts` and `plugins/auth/src/scaffold/` implementing the S1
+  `scaffold(context): Promise<ScaffoldResult>` protocol for the auth plugin.
+- Ported the auth artifact set from the existing official plugin source path into deterministic
+  plugin-owned scaffold templates: `database/auth.prisma`, public manifest files, unified auth
+  service composition, v1 oRPC handlers, backend registry for `kv-oauth` / `workos` /
+  `better-auth`, auth stream schema/factory/producer/server, package metadata, and verifier.
+- Updated `plugins/auth/deno.json` to export, check, doc-lint, and publish `./scaffold`.
+- Added focused CLI integration coverage for auth local-path add, dry-run no-write behavior, and
+  rerun idempotency.
+- Fixed an auth stream public doc-surface issue found by the expanded doc-lint path:
+  `SerializedTraceContext` is now a local exported structural type and is re-exported by
+  `streams/server.ts`.
+
+### PLAN-EVAL Note 4 — Self-Contained Import Graph
+
+- Verified the new auth `./scaffold` graph has no `@netscript/cli` or `packages/cli` import:
+  `deno info --json plugins/auth/scaffold.ts` filtered for CLI references returned
+  `NO_CLI_IMPORTS`.
+- The graph contains `@netscript/plugin/protocol`, `plugins/auth/scaffold.ts`,
+  `plugins/auth/src/scaffold/{mod.ts,artifacts.ts,files.ts}`, and grouped
+  `plugins/auth/src/scaffold/templates/{root,src,services,streams,database}/*` modules.
+- The scaffolder is self-contained for `deno x` / `deno run`: it does not read from the monorepo
+  source tree at runtime and does not import `@netscript/cli`. It embeds the emitted auth files as
+  package-owned template constants and writes only beneath `workspaceRoot`.
+
+### Idempotency and Dry-Run Evidence
+
+- Real auth local-path add:
+  `deno test -A --unstable-kv packages/cli/src/public/features/plugins/add/add-plugin_test.ts`
+  includes `runs the real auth local-path scaffolder through plugin add` and passed. It asserts
+  `pluginOwnedScaffold.status === "applied"`, `databaseMigrationsAdded === true`, emitted
+  `plugins/auth/database/auth.prisma`, emitted `plugins/auth/services/src/backend-registry.ts`,
+  wrote the better-auth `model User` schema, includes the three backend union values, and emits the
+  auth stream producer.
+- Dry-run:
+  the same command includes `previews the real auth local-path scaffolder without writing files` and
+  passed. It asserts planned auth v1 handler artifacts and absence of
+  `plugins/auth/mod.ts` / `plugins/auth/database/auth.prisma` on disk.
+- Re-run idempotency:
+  the same command includes `reruns the real auth scaffolder idempotently` and passed. The first
+  direct `dispatchPluginScaffold()` call returned `applied`; the second returned `skipped` with
+  empty `createdFiles` and `modifiedFiles`, and `databaseMigrationsAdded === true`.
+
+### Fitness Gates Touched
+
+| Gate | S10 evidence |
+| ---- | ------------ |
+| F-3 | New plugin scaffolder code stays under the auth plugin surface; no CLI implementation import. |
+| F-5 | `./scaffold` is an explicit public subpath export with module docs and public context/result types. |
+| F-6 | `deno task publish:dry-run` from `plugins/auth` passed with `scaffold.ts` and `src/scaffold/*` included. |
+| F-7 | JSR audit helper exits 0; `doc-lint` exits 0 after making the auth stream trace context public. |
+| F-8 | No compiler lib override changed. |
+| F-9 | Manifest permissions remain declared for `./scaffold`; S4 tests run the local path under first-party flags. |
+| F-10 | Added real local-path add, dry-run no-write, and re-run idempotency tests for auth. |
+| F-11 | New folders are role-named `src/scaffold` and grouped `templates/{root,src,services,streams,database}`. |
+| F-12 | New names are domain-specific (`buildAuthScaffoldArtifacts`, `writePlannedFiles`, `runScaffoldCli`). |
+| F-13 | Auth runtime artifacts include service composition, backend selection, auth session streams, and database schema. |
+| F-14 | Runtime JSON output uses `Deno.stdout.write`; no `console.*` in the new scaffolder source. |
+| F-15 | No upstream package re-export introduced by the new scaffold public surface. |
+| F-16 | Scaffold template files are grouped by concern to keep immediate folder cardinality below the cap. |
+| F-18 | No subdirectory barrel; `src/scaffold/mod.ts` is reached through the declared root `scaffold.ts` export. |
+| F-CLI-11 | Local-path source mode is exercised against the real auth plugin path. |
+| F-CLI-16 | Process execution stays behind `DenoProcess` / `dispatchPluginScaffold()` in tests. |
+| F-CLI-19 | Dry-run returns planned files and writes nothing. |
+| F-CLI-21 | CLI test additions stay in the existing add-flow test file and do not add a new command surface. |
+
+### Gate Results
+
+| Gate | Command | Result |
+| ---- | ------- | ------ |
+| Check wrapper | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/auth --root packages/cli --ext ts,tsx` | PASS; 600 files, 0 occurrences. |
+| Auth lint wrapper | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root plugins/auth --ext ts,tsx` | PASS; 59 files, 0 occurrences. |
+| Auth fmt wrapper | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/auth --ext ts,tsx` | PASS; 59 files, 0 findings. |
+| CLI lint/fmt fallback | `deno lint --no-config packages/cli/src/public/features/plugins/add/add-plugin_test.ts && deno fmt --check --no-config --line-width 100 --indent-width 2 --single-quote --no-semicolons=false packages/cli/src/public/features/plugins/add/add-plugin_test.ts` | PASS; checked 1 touched test file for lint and format. Package-root lint/fmt wrappers still exit 1 with 0 findings due the known CLI config exclusion behavior recorded in S2/S9. |
+| Focused S10 tests | `deno test -A --unstable-kv packages/cli/src/public/features/plugins/add/add-plugin_test.ts` | PASS; 1 test suite, 22 steps, 0 failed. |
+| Doc lint | `deno task doc-lint` from `plugins/auth` | PASS; exits 0. Emits upstream `@types/node` package-resolution warnings but no documentation lint errors. |
+| Import graph | `deno info --json plugins/auth/scaffold.ts` filtered for CLI references | PASS; no `@netscript/cli` / `packages/cli` import. |
+| JSR audit | `deno run --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root plugins/auth --text` | PASS; exits 0. Remaining warning is the helper's slow-types banner overcount; `publish:dry-run` itself succeeds. |
+| Publish dry-run | `deno task publish:dry-run` from `plugins/auth` | PASS; includes `scaffold.ts` and `src/scaffold/*`; reports `Success Dry run complete`. Existing dynamic-import warning in `services/src/main.ts` remains. |
+
+### Notes
+
+- `deno.lock` was not touched.
+- No new TypeScript casts were introduced.
+- S10 did not remove or rewire the CLI copier/official-source path; that remains deferred to S5.

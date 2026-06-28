@@ -132,6 +132,26 @@ const streamsProvider: PluginKindProvider = {
   infrastructureOptionalDeps: [],
 };
 
+const authProvider: PluginKindProvider = {
+  kind: 'auth',
+  displayName: 'Auth',
+  category: 'plugin',
+  portRangeKey: 'PLUGIN_API',
+  defaultPermissions: ['--unstable-kv', '--allow-net', '--allow-env', '--allow-read'],
+  watchFlag: '--watch',
+  defaultEntrypoint: 'services/src/main.ts',
+  defaultServiceEntrypoint: 'services/src/main.ts',
+  defaultRequiresDb: true,
+  defaultRequiresKv: true,
+  pluginType: 'utility',
+  supportsConcurrency: false,
+  concurrencyEnvVar: null,
+  defaultConcurrency: null,
+  defaultTelemetry: true,
+  infrastructureRequires: ['db', 'kv'],
+  infrastructureOptionalDeps: [],
+};
+
 describe('public add plugin flow', () => {
   it('plans a starter plugin request from project metadata', async () => {
     const fs = new MemoryFileSystemAdapter();
@@ -1038,6 +1058,147 @@ describe('public add plugin flow', () => {
       await Deno.remove(projectRoot, { recursive: true });
     }
   });
+
+  it('runs the real auth local-path scaffolder through plugin add', async () => {
+    const projectRoot = await Deno.makeTempDir();
+    const authRoot = resolve('plugins/auth');
+    try {
+      await writeRealProjectFiles(projectRoot);
+      const fs = new DenoFileSystem();
+      const templateAdapter = new StringTemplateAdapter(fs);
+      const scaffolder = new Scaffolder(templateAdapter, fs);
+      const registry = new PluginKindRegistry();
+
+      const result = await addPlugin({
+        kind: 'auth',
+        pluginName: 'auth',
+        serviceReferences: [],
+        pluginReferences: ['streams'],
+        noDb: false,
+        includeSamples: true,
+        localPath: authRoot,
+        projectRoot,
+        overwrite: false,
+      }, {
+        fs,
+        scaffolder,
+        templateAdapter,
+        registry,
+        pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
+        registryScaffolder: new PluginRegistryScaffolder(scaffolder),
+        workspaceMutator: new PluginWorkspaceMutator(fs),
+        processRunner: new DenoProcess(),
+        regenerateHelpers: () => Promise.resolve([]),
+      });
+
+      assertEquals(result.pluginOwnedScaffold?.status, 'applied');
+      assertEquals(result.pluginOwnedScaffold?.databaseMigrationsAdded, true);
+      assertStringIncludes(
+        result.pluginOwnedScaffold?.createdFiles.join('\n') ?? '',
+        'plugins/auth/database/auth.prisma',
+      );
+      assertStringIncludes(
+        result.pluginOwnedScaffold?.createdFiles.join('\n') ?? '',
+        'plugins/auth/services/src/backend-registry.ts',
+      );
+      assertStringIncludes(
+        await Deno.readTextFile(join(projectRoot, 'plugins/auth/database/auth.prisma')),
+        'model User',
+      );
+      assertStringIncludes(
+        await Deno.readTextFile(join(projectRoot, 'plugins/auth/services/src/backend-registry.ts')),
+        "type AuthPluginBackendName = 'kv-oauth' | 'workos' | 'better-auth'",
+      );
+      assertStringIncludes(
+        await Deno.readTextFile(join(projectRoot, 'plugins/auth/streams/producer.ts')),
+        'emitOidcCompleted',
+      );
+    } finally {
+      await Deno.remove(projectRoot, { recursive: true });
+    }
+  });
+
+  it('previews the real auth local-path scaffolder without writing files', async () => {
+    const projectRoot = await Deno.makeTempDir();
+    const authRoot = resolve('plugins/auth');
+    try {
+      await writeRealProjectFiles(projectRoot);
+      const fs = new DenoFileSystem();
+      const templateAdapter = new StringTemplateAdapter(fs);
+      const scaffolder = new Scaffolder(templateAdapter, fs);
+      const registry = new PluginKindRegistry();
+
+      const result = await addPlugin({
+        kind: 'auth',
+        pluginName: 'auth',
+        serviceReferences: [],
+        pluginReferences: ['streams'],
+        noDb: false,
+        includeSamples: true,
+        dryRun: true,
+        localPath: authRoot,
+        projectRoot,
+        overwrite: false,
+      }, {
+        fs,
+        scaffolder,
+        templateAdapter,
+        registry,
+        pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
+        registryScaffolder: new PluginRegistryScaffolder(scaffolder),
+        workspaceMutator: new PluginWorkspaceMutator(fs),
+        processRunner: new DenoProcess(),
+        regenerateHelpers: () => Promise.resolve([]),
+      });
+
+      assertEquals(result.pluginOwnedScaffold?.status, 'planned');
+      assertEquals(result.pluginOwnedScaffold?.databaseMigrationsAdded, true);
+      assertStringIncludes(
+        result.pluginOwnedScaffold?.createdFiles.join('\n') ?? '',
+        'plugins/auth/services/src/routers/v1-handlers.ts',
+      );
+      await assertFalseExists(join(projectRoot, 'plugins/auth/mod.ts'));
+      await assertFalseExists(join(projectRoot, 'plugins/auth/database/auth.prisma'));
+    } finally {
+      await Deno.remove(projectRoot, { recursive: true });
+    }
+  });
+
+  it('reruns the real auth scaffolder idempotently', async () => {
+    const projectRoot = await Deno.makeTempDir();
+    const authRoot = resolve('plugins/auth');
+    const descriptor = authDescriptor();
+    try {
+      await writeRealProjectFiles(projectRoot);
+
+      const first = await dispatchPluginScaffold({
+        descriptor,
+        source: { kind: 'local-path', path: authRoot },
+        projectRoot,
+        pluginName: 'auth',
+        dryRun: false,
+        permissionFlags: ['-A'],
+        processRunner: new DenoProcess(),
+      });
+      const second = await dispatchPluginScaffold({
+        descriptor,
+        source: { kind: 'local-path', path: authRoot },
+        projectRoot,
+        pluginName: 'auth',
+        dryRun: false,
+        permissionFlags: ['-A'],
+        processRunner: new DenoProcess(),
+      });
+
+      assertEquals(first.status, 'applied');
+      assertEquals(second.status, 'skipped');
+      assertEquals(second.createdFiles, []);
+      assertEquals(second.modifiedFiles, []);
+      assertEquals(second.databaseMigrationsAdded, true);
+    } finally {
+      await Deno.remove(projectRoot, { recursive: true });
+    }
+  });
 });
 
 class FixturePluginValidator implements JsrPluginValidatorPort {
@@ -1460,6 +1621,77 @@ function streamsDescriptor(): ValidatedPluginDescriptor {
     details: {
       description:
         'Durable Streams service, CLI, Aspire, E2E, and scaffolding plugin for NetScript.',
+      score: 95,
+    },
+  };
+}
+
+function authDescriptor(): ValidatedPluginDescriptor {
+  return {
+    package: {
+      requestedSpec: 'auth',
+      source: 'bare-alias',
+      scope: 'netscript',
+      packageName: 'plugin-auth',
+      packageSpecifier: '@netscript/plugin-auth',
+      jsrSpecifier: 'jsr:@netscript/plugin-auth',
+      alias: 'auth',
+    },
+    version: '0.0.1-alpha.12',
+    manifest: {
+      schemaVersion: 1,
+      name: '@netscript/plugin-auth',
+      version: '0.0.1-alpha.12',
+      displayName: 'Auth',
+      description:
+        'NetScript plugin for a unified auth API, auth database schema, and auth session streams.',
+      peerDependencies: {
+        '@netscript/plugin': '0.0.1-alpha.12',
+      },
+      capabilities: {
+        hasDatabaseMigrations: true,
+        hasRoutes: true,
+        hasBackgroundWorkers: false,
+      },
+      scaffolder: {
+        export: './scaffold',
+        requiredPermissions: {
+          net: [],
+          read: ['<workspaceRoot>'],
+          write: ['<workspaceRoot>'],
+        },
+      },
+      provider: {
+        kind: authProvider.kind,
+        displayName: authProvider.displayName,
+        category: authProvider.category,
+        portRangeKey: authProvider.portRangeKey,
+        defaultPermissions: authProvider.defaultPermissions,
+        watchFlag: authProvider.watchFlag,
+        defaultEntrypoint: authProvider.defaultEntrypoint,
+        defaultServiceEntrypoint: authProvider.defaultServiceEntrypoint ?? '',
+        defaultRequiresDb: authProvider.defaultRequiresDb,
+        defaultRequiresKv: authProvider.defaultRequiresKv,
+        pluginType: authProvider.pluginType,
+        supportsConcurrency: authProvider.supportsConcurrency,
+        concurrencyEnvVar: authProvider.concurrencyEnvVar,
+        defaultConcurrency: authProvider.defaultConcurrency,
+        defaultTelemetry: authProvider.defaultTelemetry,
+        infrastructureRequires: authProvider.infrastructureRequires,
+        infrastructureOptionalDeps: authProvider.infrastructureOptionalDeps,
+      },
+    },
+    packageMetadata: {
+      latest: '0.0.1-alpha.12',
+      isYanked: false,
+    },
+    versionMetadata: {
+      exports: { '.': './mod.ts', './scaffold': './scaffold.ts' },
+      files: { '/scaffold.plugin.json': 'sha256-good' },
+    },
+    details: {
+      description:
+        'NetScript plugin for a unified auth API, auth database schema, and auth session streams.',
       score: 95,
     },
   };

@@ -1,5 +1,5 @@
 import { createDurableStream, type DurableStreamProducer } from '@netscript/plugin-streams-core';
-import { injectContext, type SerializedTraceContext } from '@netscript/telemetry/context';
+import { injectContext } from '@netscript/telemetry/context';
 import { type AuthSession, type AuthStreamEvent, authStreamSchema } from './schema.ts';
 
 export type { DurableStreamProducer, StreamProducerPort } from '@netscript/plugin-streams-core';
@@ -13,6 +13,14 @@ export type {
   StateSchema,
   StreamStateDefinition,
 } from './schema.ts';
+
+/** Serialized W3C trace context persisted with auth stream events. */
+export interface SerializedTraceContext {
+  /** W3C traceparent header value. */
+  readonly traceparent: string;
+  /** Optional W3C tracestate header value. */
+  readonly tracestate?: string;
+}
 
 const STREAM_PATH = '/auth/sessions';
 const PRODUCER_ID = 'auth-service';
