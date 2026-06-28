@@ -16,9 +16,10 @@ export const FIXTURE_VERSION = '0.0.1-alpha.12';
 /**
  * Spec reproducing `plugins/streams/scaffold.plugin.json`.
  *
- * The workers spec previously lived here too; S2a moved it to its plugin package at
- * `plugins/workers/src/scaffold/spec.ts` (`workersManifestSpec`), where its own byte-identity test
- * now owns the workers manifest. The remaining four are still fixtures until S2b thins them.
+ * The workers and sagas specs previously lived here too; S2a moved workers to
+ * `plugins/workers/src/scaffold/spec.ts` (`workersManifestSpec`) and S2b moved sagas to
+ * `plugins/sagas/src/scaffold/spec.ts` (`sagasManifestSpec`), where their own byte-identity tests
+ * now own those manifests. The remaining specs are fixtures until S2b finishes thinning them.
  */
 export const streamsSpec: PluginScaffoldManifestSpec = {
   name: '@netscript/plugin-streams',
@@ -80,61 +81,6 @@ export const streamsSpec: PluginScaffoldManifestSpec = {
       '--allow-sys',
       '--allow-ffi',
     ],
-  },
-};
-
-/** Spec reproducing `plugins/sagas/scaffold.plugin.json`. */
-export const sagasSpec: PluginScaffoldManifestSpec = {
-  name: '@netscript/plugin-sagas',
-  displayName: 'Saga Orchestrator',
-  description:
-    'NetScript plugin for durable saga orchestration, workflow APIs, and saga runtime metadata.',
-  capabilities: {
-    hasDatabaseMigrations: true,
-    hasRoutes: true,
-    hasBackgroundWorkers: true,
-  },
-  scaffolder: {
-    export: './scaffold',
-    requiredPermissions: {
-      net: [],
-      read: ['<workspaceRoot>'],
-      write: ['<workspaceRoot>'],
-    },
-  },
-  provider: {
-    kind: 'saga',
-    displayName: 'Saga Orchestrator',
-    category: 'background-processor',
-    portRangeKey: 'INFRA_PLUGIN',
-    defaultPermissions: ['--unstable-kv', '--allow-all'],
-    watchFlag: '--watch',
-    defaultEntrypoint: 'bin/combined.ts',
-    defaultServiceEntrypoint: 'services/src/main.ts',
-    defaultRequiresDb: true,
-    defaultRequiresKv: true,
-    pluginType: 'background-processor',
-    supportsConcurrency: true,
-    concurrencyEnvVar: 'SAGA_CONCURRENCY',
-    defaultConcurrency: 2,
-    defaultTelemetry: true,
-    infrastructureRequires: ['kv'],
-    infrastructureOptionalDeps: ['db'],
-  },
-  officialSource: {
-    canonicalName: 'sagas',
-    pluginDir: 'sagas',
-    backgroundDir: 'sagas',
-    serviceEntrypoint: 'services/src/main.ts',
-    backgroundEntrypoint: 'bin/combined.ts',
-    serviceConfigKey: 'sagas-api',
-    servicePort: 8092,
-    backgroundPort: 8092,
-    dependencies: ['streams'],
-    requiresDb: true,
-    requiresKv: true,
-    permissions: ['--unstable-kv', '--allow-all'],
-    pluginReferences: ['workers-api'],
   },
 };
 
@@ -251,7 +197,6 @@ export const committedSpecs: ReadonlyArray<
   { readonly dir: string; readonly spec: PluginScaffoldManifestSpec }
 > = [
   { dir: 'streams', spec: streamsSpec },
-  { dir: 'sagas', spec: sagasSpec },
   { dir: 'triggers', spec: triggersSpec },
   { dir: 'auth', spec: authSpec },
 ];
