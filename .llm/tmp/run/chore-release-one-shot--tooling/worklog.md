@@ -81,3 +81,21 @@ Gate evidence:
 | YAML parse via `deno eval` + `jsr:@std/yaml` | PASS | Both `.github/workflows/e2e-cli-prod.yml` and `.github/workflows/publish.yml` parsed successfully. |
 | `git diff --check -- .github/workflows/e2e-cli-prod.yml .github/workflows/publish.yml` | PASS | No whitespace errors. |
 | Manual YAML sanity read | PASS | Trigger, guard, versioned artifact name, `run-id`, `github-token`, and dispatch fallback are present; no real release was triggered. |
+
+### S5 — D5 release skill
+
+- Added `.agents/skills/netscript-release/SKILL.md` with prerequisites, the single `release:cut`
+  command, gate meanings, merge/publish/prod-E2E flow, issue rationale, and rollback/retry guidance.
+- Regenerated `.claude/skills/netscript-release/SKILL.md` with `deno task agentic:sync-claude`.
+- Updated `AGENTS.md` to point release-cut and rollback work at `netscript-release`.
+- Removed incidental `deno.lock` churn caused by the one-off YAML parser used for S4 validation; no
+  lock change is part of S5.
+
+Gate evidence:
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| `deno task agentic:sync-claude` | PASS | Synced 17 skills / 21 mirrored files; generated the new `netscript-release` mirror. |
+| `deno task agentic:sync-claude:check` | PASS | Mirror check OK for 17 skills / 21 mirrored files. |
+| `deno run --no-lock --allow-read --allow-run .llm/tools/agentic/validate-claude-surface.ts --pretty` | PASS | CLAUDE.md, settings, gitignore, skills mirror, and hook lock check OK. |
+| `git diff -- deno.lock` | PASS | No lock diff after removing incidental `@std/yaml` resolution. |
