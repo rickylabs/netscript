@@ -1,5 +1,6 @@
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import { Command } from '@cliffy/command';
+import { join } from '@std/path';
 import {
   parseList,
   type ProjectRootResolver,
@@ -15,6 +16,8 @@ export interface LocalPluginAddCommandDependencies {
   readonly addPluginDependencies: AddLocalPluginDependencies;
   /** Resolve the project root from flags or environment. */
   readonly resolveProjectRoot: ProjectRootResolver;
+  /** Directory used to resolve the default local plugin source path. */
+  readonly sourceRootStartDir: string;
   /** Print completion lines. */
   readonly print?: (message: string) => void;
 }
@@ -37,6 +40,11 @@ export function createLocalPluginAddCommand(
     .option('--saga-store-backend <backend:string>', 'Saga durable store backend: kv or prisma')
     .option('--samples', 'Scaffold plugin sample files', { default: true })
     .option('--no-samples', 'Skip plugin sample files')
+    .option('--dry-run', 'Preview plugin-owned scaffold changes without writing files', {
+      default: false,
+    })
+    .option('--jsr-url <specifier:string>', 'Install the plugin from an explicit JSR package')
+    .option('--local-path <path:string>', 'Install the plugin from a local package directory')
     .option(
       '--no-copy-source',
       'Generate a thin local-import stub instead of copying the official plugin source tree.',
@@ -59,6 +67,11 @@ export function createLocalPluginAddCommand(
         noDb: options.db === false,
         sagaStoreBackend: parseSagaStoreBackendOption(options.sagaStoreBackend),
         includeSamples: options.samples !== false,
+        dryRun: options.dryRun ?? false,
+        jsrUrl: options.jsrUrl,
+        localPath: options.jsrUrl === undefined
+          ? options.localPath ?? join(dependencies.sourceRootStartDir, 'plugins', kind)
+          : options.localPath,
         noCopySource: options.copySource === false,
         projectRoot,
         overwrite: options.force ?? false,

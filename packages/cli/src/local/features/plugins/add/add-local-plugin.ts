@@ -12,6 +12,7 @@ import { SCAFFOLD_DIRS } from '../../../../kernel/constants/scaffold/scaffold-di
 import { SCAFFOLD_FILES } from '../../../../kernel/constants/scaffold/scaffold-files.ts';
 import type { PluginScaffoldResult } from '../../../../kernel/domain/plugin-kind.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
+import type { ProcessPort } from '../../../../kernel/ports/process-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../../../kernel/ports/template-port.ts';
 import {
   canCopyOfficialPlugin,
@@ -27,6 +28,8 @@ import type {
   PluginRenderResult,
 } from '../../../../public/domain/plugin-add-plan.ts';
 import type { AddPluginInput } from '../../../../public/features/plugins/add/add-plugin-input.ts';
+import type { JsrPluginValidatorPort } from '../../../../public/features/plugins/add/jsr-plugin-validator-port.ts';
+import type { JsrPackageFileFetcher } from '../../../../public/infra/jsr/verify-jsr-package-integrity.ts';
 import { planPluginAdd } from '../../../../public/features/plugins/add/plan-plugin-add.ts';
 import {
   ensurePluginServiceContext,
@@ -69,6 +72,12 @@ export interface AddLocalPluginDependencies {
   readonly registryScaffolder: PluginRegistryScaffolder;
   /** Workspace config mutator for root project updates. */
   readonly workspaceMutator: PluginWorkspaceMutator;
+  /** Static JSR validator used when local mode is explicitly pointed at JSR. */
+  readonly pluginValidator?: JsrPluginValidatorPort;
+  /** Process runner reserved for plugin-owned scaffold execution. */
+  readonly processRunner?: ProcessPort;
+  /** JSR file fetcher used for plugin-owned scaffold integrity checks. */
+  readonly packageFileFetcher?: JsrPackageFileFetcher;
   /** Discover a first-party plugin source checkout. */
   readonly findSourceRoot?: typeof findOfficialPluginSourceRoot;
   /** Resolve first-party plugin metadata. */

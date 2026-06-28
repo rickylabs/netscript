@@ -16,6 +16,7 @@ export type {
   PluginManifestParseError,
   PluginManifestParseIssue,
   PluginManifestParseResult,
+  PluginManifestPostScript,
   PluginManifestProvider,
   PluginManifestScaffolder,
   PluginScaffolderRequiredPermissions,

@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "name": "@acme/plugin-fixture",
+  "version": "1.0.0",
+  "displayName": "Fixture Plugin",
+  "description": "Fixture plugin used by CLI scaffold-runner tests.",
+  "peerDependencies": {},
+  "capabilities": {
+    "hasDatabaseMigrations": true,
+    "hasRoutes": false,
+    "hasBackgroundWorkers": true
+  },
+  "scaffolder": {
+    "export": "./scaffold",
+    "requiredPermissions": {
+      "net": [],
+      "read": [],
+      "write": []
+    }
+  },
+  "postScripts": [
+    {
+      "export": "./post-script"
+    }
+  ],
+  "provider": {
+    "kind": "fixture",
+    "displayName": "Fixture",
+    "category": "background-processor",
+    "portRangeKey": "INFRA_PLUGIN",
+    "defaultPermissions": ["--allow-read", "--allow-write"],
+    "watchFlag": "--watch",
+    "defaultEntrypoint": "bin/combined.ts",
+    "defaultServiceEntrypoint": "services/src/main.ts",
+    "defaultRequiresDb": false,
+    "defaultRequiresKv": false,
+    "pluginType": "background-processor",
+    "supportsConcurrency": true,
+    "concurrencyEnvVar": "FIXTURE_CONCURRENCY",
+    "defaultConcurrency": 1,
+    "defaultTelemetry": false,
+    "infrastructureRequires": [],
+    "infrastructureOptionalDeps": []
+  }
+}

@@ -1,4 +1,9 @@
 import type { PluginEntry } from '@netscript/aspire/types';
+import {
+  parsePluginManifest,
+  type ScaffoldResult as PluginOwnedScaffoldResult,
+} from '@netscript/plugin/protocol';
+import { join } from '@std/path';
 import { copyPluginSchemasToRootDb } from '../../../../kernel/adapters/plugin/db-integration.ts';
 import { PluginKindRegistry } from '../../../../kernel/application/registries/plugin-kind-registry.ts';
 import { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/workspace-mutator.ts';
@@ -13,6 +18,7 @@ import type {
 import type { PluginScaffoldResult } from '../../../../kernel/domain/plugin-kind.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import type { PromptPort } from '../../../../kernel/ports/prompt-port.ts';
+import type { ProcessPort } from '../../../../kernel/ports/process-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../../../kernel/ports/template-port.ts';
 import type { AddPluginResult, PluginAddPlan } from '../../../domain/plugin-add-plan.ts';
 import { ScaffoldValidationError } from '../../../../kernel/domain/errors.ts';
@@ -41,6 +47,12 @@ import {
   resolvePluginPackageSpec,
 } from './plugin-package-resolver.ts';
 import { confirmPluginInstall } from './confirm-plugin-install.ts';
+import { buildPluginScaffoldPermissionFlags } from '../../../infra/permissions/plugin-scaffold-permissions.ts';
+import {
+  dispatchPluginScaffold,
+  type PluginScaffoldDispatchSource,
+} from '../dispatch/dispatch-plugin-verb.ts';
+import type { JsrPackageFileFetcher } from '../../../infra/jsr/verify-jsr-package-integrity.ts';
 
 interface OfficialPluginRenderResult {
   readonly plugin: PluginScaffoldResult;
@@ -58,6 +70,7 @@ interface DependencyPluginEntry {
 interface ResolvedPluginBeforePlanning {
   readonly descriptor: ValidatedPluginDescriptor;
   readonly planningKind?: string;
+  readonly source: PluginScaffoldDispatchSource;
 }
 
 /** Dependencies used by the public add-plugin flow. */
@@ -70,6 +83,12 @@ export interface AddPluginDependencies extends RenderPluginDependencies {
 
   /** Prompt adapter used for third-party package confirmation. */
   readonly prompt?: PromptPort;
+
+  /** Process runner used for plugin-owned scaffold and post-script dispatch. */
+  readonly processRunner?: ProcessPort;
+
+  /** JSR package file fetcher used for integrity verification. */
+  readonly packageFileFetcher?: JsrPackageFileFetcher;
 
   /** Discover a first-party plugin source checkout. */
   readonly findSourceRoot?: typeof findOfficialPluginSourceRoot;
@@ -114,9 +133,10 @@ export async function addPlugin(
 ): Promise<AddPluginResult> {
   const registry = dependencies.registry ?? new PluginKindRegistry();
   const resolvedPlugin = await resolvePluginDescriptorBeforePlanning(
-    request.kind,
+    request,
     registry,
     dependencies.pluginValidator,
+    dependencies.fs,
   );
   if (resolvedPlugin !== undefined && dependencies.prompt !== undefined) {
     await confirmPluginInstall({
@@ -137,6 +157,12 @@ export async function addPlugin(
     fs: dependencies.fs,
     registry,
   });
+  const pluginOwned = resolvedPlugin === undefined || dependencies.processRunner === undefined
+    ? undefined
+    : await runPluginOwnedScaffold(plan, resolvedPlugin, request, dependencies);
+  if (request.dryRun === true && pluginOwned !== undefined && resolvedPlugin !== undefined) {
+    return createDryRunAddResult(plan, resolvedPlugin.descriptor, pluginOwned);
+  }
   const rendered = await renderPlugin(plan, dependencies);
   const official = await maybeCopyOfficialPlugin(plan, dependencies, sourceRoot);
   const plugin = official?.plugin ?? rendered.plugin;
@@ -200,6 +226,7 @@ export async function addPlugin(
   return {
     ...rendered,
     resolvedPlugin: resolvedPlugin?.descriptor,
+    pluginOwnedScaffold: pluginOwned,
     plugin,
     provisionedCache,
     schemaCopies,
@@ -208,10 +235,16 @@ export async function addPlugin(
 }
 
 async function resolvePluginDescriptorBeforePlanning(
-  spec: string,
+  request: AddPluginInput,
   registry: PluginKindRegistry,
   validator: JsrPluginValidatorPort | undefined,
+  fs: FileSystemPort,
 ): Promise<ResolvedPluginBeforePlanning | undefined> {
+  if (request.localPath !== undefined) {
+    return await resolveLocalPluginDescriptor(request.localPath, registry, fs);
+  }
+
+  const spec = request.jsrUrl ?? request.kind;
   const alias = BARE_PLUGIN_PACKAGE_ALIASES[spec.trim().toLowerCase()];
   const shouldResolvePackage = alias !== undefined || spec.trim().startsWith('@') ||
     spec.trim().startsWith('jsr:');
@@ -238,6 +271,106 @@ async function resolvePluginDescriptorBeforePlanning(
   return {
     descriptor: validation.descriptor,
     planningKind: provider?.kind,
+    source: { kind: 'jsr', specifier: validation.descriptor.package.jsrSpecifier },
+  };
+}
+
+async function resolveLocalPluginDescriptor(
+  localPath: string,
+  registry: PluginKindRegistry,
+  fs: FileSystemPort,
+): Promise<ResolvedPluginBeforePlanning> {
+  const manifestJson = JSON.parse(await fs.readFile(join(localPath, 'scaffold.plugin.json')));
+  const parsed = parsePluginManifest(manifestJson);
+  if (!parsed.ok) {
+    throw new ScaffoldValidationError(parsed.error.message, {
+      code: 'invalid-manifest',
+      package: localPath,
+    });
+  }
+  const provider = normalizeManifestProvider(parsed.manifest.provider);
+  if (provider !== undefined) {
+    registry.register(provider.kind, provider);
+  }
+  const resolvedPackage = resolvePluginPackageSpec(parsed.manifest.name);
+  return {
+    descriptor: {
+      package: resolvedPackage,
+      version: parsed.manifest.version,
+      manifest: parsed.manifest,
+      packageMetadata: { latest: parsed.manifest.version, isYanked: false },
+      versionMetadata: {
+        exports: { [parsed.manifest.scaffolder.export]: parsed.manifest.scaffolder.export },
+        files: {},
+      },
+      details: { description: parsed.manifest.description },
+    },
+    planningKind: provider?.kind,
+    source: { kind: 'local-path', path: localPath },
+  };
+}
+
+async function runPluginOwnedScaffold(
+  plan: PluginAddPlan,
+  resolvedPlugin: ResolvedPluginBeforePlanning,
+  request: AddPluginInput,
+  dependencies: AddPluginDependencies,
+): Promise<PluginOwnedScaffoldResult> {
+  const processRunner = dependencies.processRunner;
+  if (processRunner === undefined) {
+    throw new ScaffoldValidationError('Plugin-owned scaffolding requires a process runner.');
+  }
+  const permissionFlags = buildPluginScaffoldPermissionFlags({
+    descriptor: resolvedPlugin.descriptor,
+    projectRoot: plan.projectRoot,
+    pluginName: plan.pluginName,
+    allowFreshFirstPartyDependency: true,
+  });
+  return await dispatchPluginScaffold({
+    descriptor: resolvedPlugin.descriptor,
+    source: resolvedPlugin.source,
+    projectRoot: plan.projectRoot,
+    pluginName: plan.pluginName,
+    dryRun: request.dryRun === true,
+    permissionFlags,
+    processRunner,
+    fileFetcher: dependencies.packageFileFetcher,
+  });
+}
+
+function createDryRunAddResult(
+  plan: PluginAddPlan,
+  descriptor: ValidatedPluginDescriptor,
+  scaffold: PluginOwnedScaffoldResult,
+): AddPluginResult {
+  const filesCreated = scaffold.createdFiles.map((path) => join(plan.projectRoot, path));
+  const pluginDir = join(plan.projectRoot, SCAFFOLD_DIRS.PLUGINS, plan.pluginName);
+  return {
+    resolvedPlugin: descriptor,
+    pluginOwnedScaffold: scaffold,
+    plugin: {
+      scaffoldResult: {
+        filesCreated,
+        directoriesCreated: [],
+        filesSkipped: scaffold.modifiedFiles.map((path) => join(plan.projectRoot, path)),
+        totalOperations: scaffold.createdFiles.length + scaffold.modifiedFiles.length,
+        durationMs: 0,
+      },
+      pluginDir,
+      kind: plan.kind,
+      port: plan.port ?? plan.provider.defaultConcurrency ?? 0,
+      servicePort: plan.port ?? 0,
+      configSection: plan.provider.category === 'plugin' ? 'Plugins' : 'BackgroundProcessors',
+      configKey: plan.pluginName,
+      serviceConfigKey: `${plan.pluginName}-api`,
+      serviceWorkdir: toWorkspaceRelativePath(plan.projectRoot, pluginDir),
+    },
+    registryFilesCreated: 0,
+    wroteServiceContext: false,
+    provisionedDatabase: null,
+    provisionedCache: false,
+    schemaCopies: [],
+    helperFiles: [],
   };
 }
 

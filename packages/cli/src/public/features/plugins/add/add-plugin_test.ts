@@ -1,6 +1,9 @@
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import { assertEquals, assertFalse, assertStringIncludes } from 'jsr:@std/assert@^1';
+import { join, resolve } from '@std/path';
 
+import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
+import { DenoProcess } from '../../../../kernel/adapters/runtime/process/deno-process.ts';
 import { MemoryFileSystemAdapter } from '../../../../kernel/adapters/scaffold/memory-fs.ts';
 import { Scaffolder } from '../../../../kernel/adapters/scaffold/scaffolder.ts';
 import { StringTemplateAdapter } from '../../../../kernel/adapters/scaffold/template-adapter.ts';
@@ -359,6 +362,48 @@ describe('public add plugin flow', () => {
     assertEquals(rootDenoJson.workspace.includes('./plugins/*'), true);
     assertEquals(rootDenoJson.workspace.includes('./workers'), true);
   });
+
+  it('previews a local-path plugin-owned scaffolder without writing files', async () => {
+    const projectRoot = await Deno.makeTempDir();
+    const fixtureRoot = resolve('packages/cli/tests/fixtures/plugin-scaffolder');
+    try {
+      await writeRealProjectFiles(projectRoot);
+      const fs = new DenoFileSystem();
+      const templateAdapter = new StringTemplateAdapter(fs);
+      const scaffolder = new Scaffolder(templateAdapter, fs);
+      const registry = new PluginKindRegistry();
+
+      const result = await addPlugin({
+        kind: 'fixture',
+        pluginName: 'fixture',
+        serviceReferences: [],
+        pluginReferences: [],
+        noDb: true,
+        includeSamples: false,
+        dryRun: true,
+        localPath: fixtureRoot,
+        projectRoot,
+        overwrite: false,
+      }, {
+        fs,
+        scaffolder,
+        templateAdapter,
+        registry,
+        pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
+        registryScaffolder: new PluginRegistryScaffolder(scaffolder),
+        workspaceMutator: new PluginWorkspaceMutator(fs),
+        processRunner: new DenoProcess(),
+        regenerateHelpers: () => Promise.resolve([]),
+      });
+
+      assertEquals(result.pluginOwnedScaffold?.status, 'planned');
+      assertEquals(result.pluginOwnedScaffold?.createdFiles, ['plugins/fixture/generated.txt']);
+      await assertFalseExists(join(projectRoot, 'plugins/fixture/generated.txt'));
+      await assertFalseExists(join(projectRoot, 'post-script-ran.txt'));
+    } finally {
+      await Deno.remove(projectRoot, { recursive: true });
+    }
+  });
 });
 
 class FixturePluginValidator implements JsrPluginValidatorPort {
@@ -459,4 +504,38 @@ async function writeProjectFiles(fs: MemoryFileSystemAdapter): Promise<void> {
     '/workspace/alpha/deno.json',
     JSON.stringify({ workspace: ['apps/web'] }, null, 2) + '\n',
   );
+}
+
+async function writeRealProjectFiles(projectRoot: string): Promise<void> {
+  await Deno.writeTextFile(
+    join(projectRoot, 'appsettings.json'),
+    JSON.stringify(
+      {
+        NetScript: {
+          Name: 'alpha-app',
+          Services: {},
+          Plugins: {},
+          BackgroundProcessors: {},
+        },
+      },
+      null,
+      2,
+    ) + '\n',
+  );
+  await Deno.writeTextFile(
+    join(projectRoot, 'deno.json'),
+    JSON.stringify({ workspace: ['apps/web'] }, null, 2) + '\n',
+  );
+}
+
+async function assertFalseExists(path: string): Promise<void> {
+  try {
+    await Deno.stat(path);
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) {
+      return;
+    }
+    throw error;
+  }
+  throw new Error(`Expected ${path} not to exist.`);
 }

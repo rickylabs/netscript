@@ -40,6 +40,11 @@ export function createPluginAddCommand(
     .option('--no-samples', 'Skip plugin sample files')
     .option('--skip-confirmation', 'Skip third-party plugin confirmation', { default: false })
     .option('--ci', 'Non-interactive mode', { default: false })
+    .option('--dry-run', 'Preview plugin-owned scaffold changes without writing files', {
+      default: false,
+    })
+    .option('--jsr-url <specifier:string>', 'Install the plugin from an explicit JSR package')
+    .option('--local-path <path:string>', 'Install the plugin from a local package directory')
     .option(
       '--no-copy-source',
       'Generate a thin local-import stub instead of copying the official plugin source tree.',
@@ -65,6 +70,9 @@ export function createPluginAddCommand(
         includeSamples: options.samples !== false,
         skipConfirmation: options.skipConfirmation ?? false,
         ci: options.ci ?? false,
+        dryRun: options.dryRun ?? false,
+        jsrUrl: options.jsrUrl,
+        localPath: options.localPath,
         noCopySource: options.copySource === false,
         projectRoot,
         overwrite: options.force ?? false,

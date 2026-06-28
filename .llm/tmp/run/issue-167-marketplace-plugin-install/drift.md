@@ -29,3 +29,14 @@
 - Resolution: publish the protocol as `@netscript/plugin/protocol` and re-export from
   `@netscript/plugin`. This preserves the locked D3 decision to defer a standalone
   `@netscript/plugin-protocol` package and avoids any plugin dependency on `@netscript/cli`.
+
+## 2026-06-28 — S4 local-path uses `deno run`, not `deno x`
+
+- Severity: **minor**.
+- The S4 brief said the runner builds `deno x <S3-confined-flags> <target>/scaffold <args>` for both
+  JSR and local-path sources. A direct Deno 2.9 check showed local files are rejected by `deno x` with
+  `Use 'deno run' to run a local file directly, 'deno x' is intended for running commands from packages.`
+- Resolution: keep the production JSR shape as
+  `deno x <flags> jsr:@scope/pkg/scaffold --context-json <json>`, and use the executable local-path
+  maintainer shape `deno run <flags> <local-path>/scaffold.ts --context-json <json>`. This preserves
+  D4 plugin-owned scaffolding while making S11's local fixture/userland validation runnable on Deno 2.9.

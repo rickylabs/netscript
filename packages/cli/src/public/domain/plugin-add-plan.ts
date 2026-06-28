@@ -8,6 +8,7 @@ import type {
   SagaStoreBackend,
 } from '../../kernel/domain/plugin-kind.ts';
 import type { ValidatedPluginDescriptor } from '../features/plugins/add/jsr-plugin-validator-port.ts';
+import type { ScaffoldResult as PluginOwnedScaffoldResult } from '@netscript/plugin/protocol';
 
 /** User request for adding one starter plugin workspace. */
 export interface PluginAddRequest {
@@ -40,6 +41,15 @@ export interface PluginAddRequest {
 
   /** Whether the command is running in non-interactive CI mode. */
   readonly ci?: boolean;
+
+  /** Whether plugin-owned scaffolding should preview changes without writing files. */
+  readonly dryRun?: boolean;
+
+  /** Explicit JSR package specifier used instead of the positional kind. */
+  readonly jsrUrl?: string;
+
+  /** Explicit local plugin package directory used for maintainer validation. */
+  readonly localPath?: string;
 
   /** Maintainer-only: generate a thin local stub instead of copying official source. */
   readonly noCopySource?: boolean;
@@ -88,6 +98,9 @@ export interface PluginRenderResult {
 export interface AddPluginResult extends PluginRenderResult {
   /** Static JSR descriptor resolved before any plugin code executes. */
   readonly resolvedPlugin?: ValidatedPluginDescriptor;
+
+  /** Preview or applied result returned by a plugin-owned scaffolder. */
+  readonly pluginOwnedScaffold?: PluginOwnedScaffoldResult;
 
   /** Whether a shared cache resource was added. */
   readonly provisionedCache: boolean;

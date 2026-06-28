@@ -42,10 +42,12 @@ import type { GeneratePluginRegistriesCommandDependencies } from '../generate/pl
 import type { GenerateRuntimeSchemasCommandDependencies } from '../generate/runtime-schemas/generate-runtime-schemas-command.ts';
 import type { InitPipelineContext } from '../../../kernel/application/scaffold/context.ts';
 import type { FileSystemPort } from '../../../kernel/ports/file-system-port.ts';
+import type { ProcessPort } from '../../../kernel/ports/process-port.ts';
 import { createPluginDispatchPort } from '../plugins/dispatch/dispatch-plugin-verb.ts';
 import type { PluginDispatchPort } from '../plugins/dispatch/plugin-dispatch-port.ts';
 import type { DoctorPluginCommandDependencies } from '../plugins/doctor/doctor-plugin-command.ts';
 import type { JsrPluginValidatorPort } from '../plugins/add/jsr-plugin-validator-port.ts';
+import type { JsrPackageFileFetcher } from '../../infra/jsr/verify-jsr-package-integrity.ts';
 import { doctorPlugin } from '../plugins/doctor/doctor-plugin-use-case.ts';
 import {
   createPluginHostLoader,
@@ -114,6 +116,8 @@ export interface PublicCommandDependencies {
     readonly workspaceMutator: PluginWorkspaceMutator;
     readonly pluginValidator?: JsrPluginValidatorPort;
     readonly prompt: CliffyPrompt;
+    readonly processRunner?: ProcessPort;
+    readonly packageFileFetcher?: JsrPackageFileFetcher;
     readonly sourceRootStartDir?: string;
   };
   /** Dependencies for host-side plugin loading. */
@@ -243,6 +247,7 @@ export function createPublicCommandDependencies(
       workspaceMutator: new PluginWorkspaceMutator(fs),
       pluginValidator: new FetchJsrPluginValidator(),
       prompt,
+      processRunner: process,
       sourceRootStartDir: host.cwd(),
     },
     pluginHostDependencies: {

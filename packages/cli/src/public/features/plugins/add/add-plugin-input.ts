@@ -12,6 +12,9 @@ export interface AddPluginCommandInput {
   readonly copySource?: boolean;
   readonly skipConfirmation?: boolean;
   readonly ci?: boolean;
+  readonly dryRun?: boolean;
+  readonly jsrUrl?: string;
+  readonly localPath?: string;
   readonly projectRoot?: string;
   readonly force?: boolean;
 }

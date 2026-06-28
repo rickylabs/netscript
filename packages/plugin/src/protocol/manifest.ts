@@ -31,6 +31,14 @@ export interface PluginManifestScaffolder {
   readonly requiredPermissions: PluginScaffolderRequiredPermissions;
 }
 
+/** Script export executed after a plugin-owned scaffold succeeds. */
+export interface PluginManifestPostScript {
+  /** Published export path or local script path to execute. */
+  readonly export: string;
+  /** Static arguments passed to the post-script. */
+  readonly args?: readonly string[];
+}
+
 /** Compatibility metadata for existing plugin-kind provider registration. */
 export interface PluginManifestProvider {
   /** Plugin kind registered by the provider. */
@@ -117,6 +125,8 @@ export interface PluginInstallerManifest {
   readonly capabilities: PluginManifestCapabilities;
   /** Plugin-owned scaffold entrypoint metadata. */
   readonly scaffolder: PluginManifestScaffolder;
+  /** Optional plugin-owned scripts executed after a successful scaffold. */
+  readonly postScripts?: readonly PluginManifestPostScript[];
   /** Existing provider metadata retained for first-party compatibility. */
   readonly provider?: PluginManifestProvider;
   /** Existing source metadata retained for first-party compatibility. */
@@ -140,6 +150,11 @@ const capabilitiesSchema: z.ZodType<PluginManifestCapabilities> = z.object({
 const scaffolderSchema: z.ZodType<PluginManifestScaffolder> = z.object({
   export: z.string().min(1),
   requiredPermissions: requiredPermissionsSchema,
+}).strict();
+
+const postScriptSchema: z.ZodType<PluginManifestPostScript> = z.object({
+  export: z.string().min(1),
+  args: z.array(z.string()).readonly().optional(),
 }).strict();
 
 const providerSchema: z.ZodType<PluginManifestProvider> = z.object({
@@ -188,6 +203,7 @@ export const PluginInstallerManifestSchema: z.ZodType<PluginInstallerManifest> =
   peerDependencies: z.record(z.string().min(1), z.string().min(1)),
   capabilities: capabilitiesSchema,
   scaffolder: scaffolderSchema,
+  postScripts: z.array(postScriptSchema).readonly().optional(),
   provider: providerSchema.optional(),
   officialSource: officialSourceSchema.optional(),
 }).strict();

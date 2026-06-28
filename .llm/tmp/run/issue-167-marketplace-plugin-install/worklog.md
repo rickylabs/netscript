@@ -285,3 +285,118 @@ alpha installs.
 - No new TypeScript casts were introduced.
 - S4 seam: `buildPluginScaffoldPermissionFlags()` returns the exact `deno x` flags the future
   scaffold runner should prepend before the resolved scaffolder specifier.
+
+## S4 Evidence — Scaffold Runner + Integrity + Post-Scripts + Dry-Run + Source Modes
+
+Timestamp: 2026-06-28T13:18:00Z
+
+### Scope
+
+- Added `dispatchPluginScaffold()` beside the existing plugin verb dispatcher. It runs a
+  plugin-owned `./scaffold` entrypoint with S3 permission flags, sends a JSON
+  `ScaffolderContext` payload via `--context-json`, parses the child `ScaffoldResult` from stdout,
+  and runs declared post-scripts only after a non-dry successful scaffold.
+- Added JSR package integrity verification against S2 `_meta.json` per-file `sha256-*` checksums
+  before any JSR source scaffolder executes.
+- Added source-mode request/command fields for `--jsr-url`, `--local-path`, and `--dry-run` on the
+  public plugin add command and the local contributor command.
+- Added local manifest resolution for `--local-path` using `parsePluginManifest`; local-path sources
+  are maintainer-selected disk code, so JSR checksum integrity does not apply.
+- Added a deterministic local fixture under `packages/cli/tests/fixtures/plugin-scaffolder/` that
+  exposes `scaffold.plugin.json`, `scaffold.ts`, and a post-script.
+- Kept the legacy checkout/copy/render path in place. S4 adds the plugin-owned runner path and
+  dry-run preview; S5 still owns retiring the copier from the userland default.
+
+### PLAN-EVAL Note 1 — Dispatch Shape
+
+Decision: implement `scaffold` as a sibling function, `dispatchPluginScaffold()`, in the existing
+`dispatch/dispatch-plugin-verb.ts` module rather than adding `scaffold` to the existing
+`FrameworkVerb` discriminated union.
+
+Rationale: the current union represents framework-owned operational verbs dispatched to
+`deno x -A jsr:<pkg>/cli <verb>`. The S4 scaffold runner has a different target (`./scaffold`),
+permission source (S3 confined flags), integrity preflight, context/result JSON contract, dry-run
+semantics, and post-script phase. A sibling keeps existing `/cli` verb dispatch stable while keeping
+plugin subprocess control centralized in the same dispatch module.
+
+### PLAN-EVAL Note 5 — `--local-path` Invocation Shape
+
+Public mode defaults to JSR resolution from the positional plugin spec or `--jsr-url <specifier>`;
+`--local-path <dir>` overrides that and reads `<dir>/scaffold.plugin.json`.
+
+Local contributor mode defaults to `--local-path <sourceRootStartDir>/plugins/<kind>` unless
+`--jsr-url` is supplied; an explicit `--local-path <dir>` overrides the default.
+
+Execution shape:
+
+- JSR source: `deno x <S3-confined-flags> jsr:@scope/pkg/scaffold --context-json <json>`.
+- Local source: `deno run <S3-confined-flags> <local-path>/scaffold.ts --context-json <json>`.
+
+Reason for the local `deno run` shape: Deno 2.9 rejects `deno x <local-file>` with
+`Use 'deno run' to run a local file directly, 'deno x' is intended for running commands from packages.`
+The local-path fixture uses the executable-equivalent `deno run` form so S11 can validate maintainer
+scaffolders without relying on unsupported Deno behavior.
+
+### Files
+
+| Path | Purpose |
+| ---- | ------- |
+| `packages/cli/src/public/features/plugins/dispatch/dispatch-plugin-verb.ts` | Adds scaffold dispatch, source target resolution, context JSON, result parsing, dry-run post-script skip. |
+| `packages/cli/src/public/infra/jsr/verify-jsr-package-integrity.ts` | Fetches published package files and checks sha256 against S2 version metadata. |
+| `packages/cli/src/public/features/plugins/add/add-plugin.ts` | Resolves JSR/local descriptors, invokes the plugin-owned runner when available, returns dry-run preview without legacy writes. |
+| `packages/cli/src/public/features/plugins/add/add-plugin-command.ts` | Adds `--dry-run`, `--jsr-url`, and `--local-path` to public plugin add. |
+| `packages/cli/src/local/features/plugins/add/add-local-plugin-command.ts` | Adds symmetric flags and local contributor default local-path source. |
+| `packages/cli/src/public/domain/plugin-add-plan.ts` / `add-plugin-input.ts` | Carries source-mode and dry-run request/result fields. |
+| `packages/plugin/src/protocol/manifest.ts` / `mod.ts` | Adds optional `postScripts` manifest protocol field. |
+| `packages/cli/tests/fixtures/plugin-scaffolder/*` | Local deterministic fixture scaffolder and post-script. |
+| `*_test.ts` beside add/dispatch | Runner, dry-run, integrity, post-script, argv, and add-flow fixture tests. |
+
+### Fitness Gates Touched
+
+| Gate | S4 evidence |
+| ---- | ----------- |
+| F-3 | Scaffold orchestration lives in public feature/dispatch; JSR file fetching is public infra; protocol stays in `@netscript/plugin`. |
+| F-5 | `@netscript/plugin/protocol` public type surface adds documented `PluginManifestPostScript`; `deno doc --lint` passed. |
+| F-6 | `@netscript/plugin` and `@netscript/cli` publish dry-runs passed. |
+| F-8 | No compiler lib override changed. |
+| F-9 | Runner consumes S3 flags; third-party argv test asserts confined flags are passed to `deno x`. |
+| F-10 | Added local fixture runner, dry-run no-write, integrity pass/fail, post-script, and add-flow preview tests. |
+| F-11 | New folders are named by role (`infra/jsr`, `tests/fixtures/plugin-scaffolder`); no generic helpers folder introduced. |
+| F-12 | New types use doctrine naming conventions (`PluginScaffoldDispatchSource`, `JsrPackageFileFetcher`). |
+| F-15 | No upstream package re-export introduced. |
+| F-16 | Existing add/dispatch files grew, but no new flat command-surface folder was introduced; S5 may split if the runner expands. |
+| F-18 | No new subdirectory barrel introduced. |
+| F-CLI-3 | Public add flow still owns user request orchestration; local contributor command only maps flags/defaults. |
+| F-CLI-4 | Kernel remains independent of public resolver/runner/infra code. |
+| F-CLI-11 | Source-mode selection is explicit (`jsr` vs `local-path`) and does not depend on monorepo checkout probing. |
+| F-CLI-16 | Process and JSR file effects are injected behind `ProcessPort` / `JsrPackageFileFetcher`; tests use fixtures. |
+| F-CLI-19 | `--dry-run` returns the plugin-owned preview and skips legacy writes and post-scripts. |
+| F-CLI-21 | New files follow existing feature/use-case and infra naming. |
+| F-CLI-28 | JSR integrity fetch is injectable; unit tests do not hit the real network. |
+
+### Gate Results
+
+| Gate | Command | Result |
+| ---- | ------- | ------ |
+| Check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --root packages/plugin --ext ts,tsx` | PASS; 650 files, 0 occurrences. |
+| Required CLI tests | `deno test -A --unstable-kv packages/cli/...` | BLOCKED by Deno path handling: literal `packages/cli/...` resolves as a missing file URL. |
+| Required CLI tests fallback | `deno test -A --unstable-kv packages/cli` from repo root | PASS; 173 tests, 349 steps, 0 failed. |
+| Focused S4 tests | `deno test -A --unstable-kv packages/cli/src/public/features/plugins/dispatch/dispatch-plugin-verb_test.ts packages/cli/src/public/features/plugins/add/add-plugin_test.ts` | PASS; local fixture scaffold/post-script, dry-run no-write, third-party argv, integrity pass/fail, and add-flow preview covered. |
+| Lint wrapper | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/cli --root packages/plugin --ext ts,tsx` | BLOCKED by existing CLI exclusion behavior; wrapper selected 650 files but exited 1 with 0 occurrences. |
+| Format wrapper | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cli --root packages/plugin --ext ts,tsx` | BLOCKED by existing CLI exclusion behavior; wrapper selected 650 files but exited 1 with 0 findings. |
+| Plugin lint wrapper | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin --ext ts,tsx` | PASS; 109 files, 0 occurrences. |
+| Plugin fmt wrapper | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin --ext ts,tsx` | PASS; 109 files, 0 findings. |
+| CLI lint fallback | `deno lint .` from `packages/cli` | PASS; checked 75 files. |
+| CLI fmt fallback | `deno fmt --check --no-config --line-width 100 --indent-width 2 --single-quote --no-semicolons=false <S4 CLI files>` | PASS; checked 14 files. |
+| Plugin tests | `deno test --allow-all` from `packages/plugin` | PASS; 25 tests, 0 failed. |
+| Plugin doc lint | `deno doc --lint src/protocol/mod.ts mod.ts` from `packages/plugin` | PASS; checked 2 files. |
+| Plugin publish dry-run | `deno task publish:dry-run` from `packages/plugin` | PASS; existing slow-types allowance and existing dynamic-import warning remain. |
+| CLI publish dry-run | `deno task publish:dry-run` from `packages/cli` | PASS; existing dynamic-import warnings remain. |
+
+### Notes
+
+- `deno.lock` was not touched.
+- No new TypeScript casts were introduced.
+- No real JSR package code or network was executed in unit tests.
+- Local-path integrity is intentionally not checked against JSR `_meta.json` checksums; local path is
+  an explicit maintainer-selected source, and the manifest is parsed from disk before execution.
