@@ -111,3 +111,37 @@
 | Full scaffold runtime e2e | PASS | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` — 48 passed, 0 failed. |
 | Generated pin inspection | PASS | Latest retained workspace `.llm/tmp/cli-e2e/plugin-smoke-20260628-174019` pins generated plugin manifests and `@netscript/*` plugin dependencies to current package version `0.0.1-alpha.12`; this branch is not version-bumped to alpha.13 yet. |
 | Lock hygiene | PASS | `git status --short deno.lock` returned no changes. |
+
+## S5 progress
+
+- Removed `packages/cli/src/public/templates/plugins/public-plugin-generators.ts`, a public
+  re-export barrel for the older CLI-embedded plugin generator surface.
+- Verified the underlying kernel plugin generators remain in use by `PluginScaffolder`; only the
+  unreferenced public barrel was removed.
+- Left public `plugin scaffold` command wiring and the active `packages/cli/scaffolding.ts` surface
+  intact because they are still referenced by tests and module exports.
+- No ambiguous dead-code candidates were deleted.
+
+### S5 gate evidence
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Scoped check | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --root packages/plugin --root plugins --ext ts,tsx` — 949 selected files, 0 failed batches. |
+| Full lint | PASS | `deno task lint` — 1266 selected files, 0 occurrences. |
+| Scoped fmt | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cli/src/public/templates --ext ts,tsx --pretty --ignore-line-endings` — 0 selected files after the deleted barrel, 0 findings. |
+| `plugins:check` | PASS | `deno task plugins:check` — `plugins:check passed`. |
+| `arch:check` | PASS | `deno task arch:check` exited 0; existing dependency/doctrine findings remain warning-only. |
+| Full test | PASS | `deno task test` — 927 passed, 0 failed, 12 ignored. |
+| Full scaffold runtime e2e | PASS | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` — 48 passed, 0 failed. |
+| Lock hygiene | PASS | `git status --short deno.lock` returned no changes. |
+
+## Final implementation summary
+
+- S1 added the generated canonical scaffold manifest JSON Schema, raw `./schema` package export, and
+  `$schema` strip-before-parse tolerance without widening the strict manifest contract.
+- S2 wired schema hints into all five committed plugin manifests and userland emitted manifests.
+- S3 added deterministic `plugins:check` coverage and promoted `arch:check` into CI for #156.
+- S4 removed hardcoded scaffold version pins and derived emitted pins from each plugin package
+  `deno.json`, leaving `release:cut` untouched.
+- S5 removed the only provably unreferenced CLI public plugin-generator barrel found in the
+  dead-code sweep, with full test and scaffold runtime gates green.
