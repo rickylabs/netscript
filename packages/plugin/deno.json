@@ -10,6 +10,7 @@
     "./cli": "./src/cli/mod.ts",
     "./loader": "./loader.ts",
     "./protocol": "./src/protocol/mod.ts",
+    "./schema": "./schema/scaffold.plugin.schema.json",
     "./sdk": "./src/sdk/mod.ts",
     "./testing": "./src/testing/mod.ts",
     "./templates": "./src/templates/mod.ts"
@@ -33,6 +34,7 @@
       "deno.json",
       "loader.ts",
       "mod.ts",
+      "schema/scaffold.plugin.schema.json",
       "src/**/*.ts",
       "src/templates/**/*.template"
     ],

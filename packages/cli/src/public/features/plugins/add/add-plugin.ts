@@ -1,6 +1,7 @@
 import {
   parsePluginManifest,
   type ScaffoldResult as PluginOwnedScaffoldResult,
+  stripPluginManifestSchemaKey,
 } from '@netscript/plugin/protocol';
 import { join } from '@std/path';
 import { copyPluginSchemasToRootDb } from '../../../../kernel/adapters/plugin/db-integration.ts';
@@ -234,7 +235,7 @@ export async function resolveLocalPluginDescriptor(
   fs: FileSystemPort,
 ): Promise<ResolvedPluginBeforePlanning> {
   const manifestJson = JSON.parse(await fs.readFile(join(localPath, 'scaffold.plugin.json')));
-  const parsed = parsePluginManifest(manifestJson);
+  const parsed = parsePluginManifest(stripPluginManifestSchemaKey(manifestJson));
   if (!parsed.ok) {
     throw new ScaffoldValidationError(parsed.error.message, {
       code: 'invalid-manifest',

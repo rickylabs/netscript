@@ -1,4 +1,4 @@
-import { parsePluginManifest } from '@netscript/plugin/protocol';
+import { parsePluginManifest, stripPluginManifestSchemaKey } from '@netscript/plugin/protocol';
 import type {
   JsrHttpClient,
   JsrHttpResponse,
@@ -94,7 +94,9 @@ export class FetchJsrPluginValidator implements JsrPluginValidatorPort {
       );
     }
 
-    const manifestResult = parsePluginManifest(await manifestResponse.json());
+    const manifestResult = parsePluginManifest(
+      stripPluginManifestSchemaKey(await manifestResponse.json()),
+    );
     if (!manifestResult.ok) {
       return {
         ok: false,

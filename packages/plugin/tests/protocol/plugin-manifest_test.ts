@@ -1,5 +1,12 @@
 import { assertEquals, assertStringIncludes } from '@std/assert';
-import { parsePluginManifest, PLUGIN_MANIFEST_SCHEMA_VERSION } from '../../src/protocol/mod.ts';
+import { generatePluginManifestSchemaText } from '../../../../.llm/tools/plugin/manifest-schema.ts';
+import {
+  parsePluginManifest,
+  PLUGIN_MANIFEST_SCHEMA_VERSION,
+  stripPluginManifestSchemaKey,
+} from '../../src/protocol/mod.ts';
+
+const committedSchemaPath = '../../schema/scaffold.plugin.schema.json';
 
 const shippedManifestPaths = [
   '../../../../plugins/auth/scaffold.plugin.json',
@@ -44,10 +51,16 @@ Deno.test('parsePluginManifest accepts a known-good installer manifest', () => {
 Deno.test('parsePluginManifest accepts all shipped plugin manifests', async () => {
   for (const path of shippedManifestPaths) {
     const manifest = JSON.parse(await Deno.readTextFile(new URL(path, import.meta.url)));
-    const result = parsePluginManifest(manifest);
+    const result = parsePluginManifest(stripPluginManifestSchemaKey(manifest));
 
     assertEquals(result.ok, true, path);
   }
+});
+
+Deno.test('plugin manifest JSON Schema is byte-stable', async () => {
+  const committed = await Deno.readTextFile(new URL(committedSchemaPath, import.meta.url));
+
+  assertEquals(generatePluginManifestSchemaText(), committed);
 });
 
 Deno.test('parsePluginManifest rejects malformed manifests with useful issues', () => {
@@ -78,6 +91,67 @@ Deno.test('parsePluginManifest rejects unsupported schemaVersion values', () => 
 
   assertStringIncludes(result.error.message, 'schemaVersion 999');
   assertEquals(result.error.issues[0]?.path, 'schemaVersion');
+});
+
+Deno.test('stripPluginManifestSchemaKey allows editor schema hints before strict parsing', () => {
+  const result = parsePluginManifest(stripPluginManifestSchemaKey({
+    $schema: 'jsr:@netscript/plugin/schema',
+    schemaVersion: PLUGIN_MANIFEST_SCHEMA_VERSION,
+    name: '@netscript/plugin-workers',
+    version: '0.0.1-alpha.12',
+    displayName: 'Background Worker',
+    description: 'NetScript plugin for background job scheduling.',
+    peerDependencies: {
+      '@netscript/plugin': '0.0.1-alpha.12',
+    },
+    capabilities: {
+      hasDatabaseMigrations: true,
+      hasRoutes: true,
+      hasBackgroundWorkers: true,
+    },
+    scaffolder: {
+      export: './scaffold',
+      requiredPermissions: {
+        net: [],
+        read: ['<workspaceRoot>'],
+        write: ['<workspaceRoot>'],
+      },
+    },
+  }));
+
+  assertEquals(result.ok, true);
+});
+
+Deno.test('parsePluginManifest still rejects non-schema unknown keys', () => {
+  const result = parsePluginManifest({
+    schemaVersion: PLUGIN_MANIFEST_SCHEMA_VERSION,
+    name: '@netscript/plugin-workers',
+    version: '0.0.1-alpha.12',
+    displayName: 'Background Worker',
+    description: 'NetScript plugin for background job scheduling.',
+    peerDependencies: {
+      '@netscript/plugin': '0.0.1-alpha.12',
+    },
+    capabilities: {
+      hasDatabaseMigrations: true,
+      hasRoutes: true,
+      hasBackgroundWorkers: true,
+    },
+    scaffolder: {
+      export: './scaffold',
+      requiredPermissions: {
+        net: [],
+        read: ['<workspaceRoot>'],
+        write: ['<workspaceRoot>'],
+      },
+    },
+    unexpected: true,
+  });
+
+  assertEquals(result.ok, false);
+  if (result.ok) return;
+
+  assertEquals(result.error.issues.some((issue) => issue.path === '<root>'), true);
 });
 
 Deno.test('parsePluginManifest rejects unsafe scaffolder and post-script exports', () => {

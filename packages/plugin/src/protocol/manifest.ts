@@ -147,7 +147,12 @@ const capabilitiesSchema: z.ZodType<PluginManifestCapabilities> = z.object({
   hasBackgroundWorkers: z.boolean(),
 }).strict();
 
-const exportPathSchema = z.string().min(1).refine(isSafeExportPath, {
+const SAFE_EXPORT_PATH_PATTERN =
+  '^\\./(?!(?:.*(?:^|/)\\.\\.?)(?:/|$))[^\\\\\\u0000/]+(?:/[^\\\\\\u0000/]+)*$';
+
+const exportPathSchema = z.string().min(1).regex(new RegExp(SAFE_EXPORT_PATH_PATTERN), {
+  message: 'Expected a relative package export path such as "./scaffold" without traversal.',
+}).refine(isSafeExportPath, {
   message: 'Expected a relative package export path such as "./scaffold" without traversal.',
 });
 
@@ -259,6 +264,26 @@ export function parsePluginManifest(json: unknown): PluginManifestParseResult {
   );
 }
 
+/**
+ * Return a manifest-shaped value with the editor-only `$schema` key removed.
+ *
+ * The canonical manifest contract remains strict; callers use this before parsing JSON files that
+ * may carry a JSON Schema hint for editor tooling.
+ */
+export function stripPluginManifestSchemaKey(json: unknown): unknown {
+  if (!isRecord(json) || !('$schema' in json)) {
+    return json;
+  }
+
+  const stripped: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(json)) {
+    if (key !== '$schema') {
+      stripped[key] = value;
+    }
+  }
+  return stripped;
+}
+
 function readSchemaVersion(json: unknown): unknown {
   if (typeof json !== 'object' || json === null || !('schemaVersion' in json)) {
     return undefined;
@@ -276,6 +301,10 @@ function isSafeExportPath(value: string): boolean {
     return false;
   }
   return segments.every((segment) => segment.length > 0 && segment !== '.' && segment !== '..');
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 function invalidManifest(

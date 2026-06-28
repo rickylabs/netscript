@@ -8,6 +8,7 @@ export {
   parsePluginManifest,
   PLUGIN_MANIFEST_SCHEMA_VERSION,
   PluginInstallerManifestSchema,
+  stripPluginManifestSchemaKey,
 } from './manifest.ts';
 export type {
   PluginInstallerManifest,
