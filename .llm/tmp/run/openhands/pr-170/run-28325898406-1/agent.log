@@ -1,0 +1,400 @@
+  command: "create"
+  path: "/home/runner/work/_temp/openhands/28325898406-1/replies.json"
+  file_text: 
+    [
+      {
+        "comment_id": null,
+        "body": "## PLAN-EVAL Verdict — #167 scaffolder hardening\n\n**Verdict: 
+`FAIL_PLAN`** — implementation must NOT begin until the listed fixes are 
+made.\n\nThe plan is well-researched, slices are appropriately scoped, and the 
+single-source Zod→JSON Schema claim is sound (verified `zod@4.4.3` ships 
+`z.toJSONSchema()`; `.strict()` semantics and `parsePluginManifest` 
+non-stripping confirmed at `packages/plugin/src/protocol/manifest.ts:174,243`). 
+However, the plan has a **CI wiring gap** that will silently nullify the gate it
+introduces (`arch:check` is not currently in `.github/workflows/ci.yml`), an 
+uncommitted `$schema` tolerance decision, an underdetermined version-coherence 
+`release:cut` extension, and an under-bound S5 acceptance gate.\n\n### 
+Spot-checks performed\n- `zod@4.4.3` exports `toJSONSchema()` ✅\n- 
+`PluginInstallerManifestSchema` is `.strict()` (rejects `$schema`) ✅\n- 
+`parsePluginManifest` does NOT strip `$schema` before `safeParse` ✅\n- JSON 
+text-imports of `deno.json` work from published `@netscript/cli` tarball 
+(precedent at `jsr-specifiers.ts:5`, `editor-config.ts:9`) — primary path of 
+decision 4 is plausible ✅\n- `release:cut` (`findVersionResidue` + 
+`bumpVersion`) walks `deno.json`, `deno.lock`, `scaffold.plugin.json`; 
+residue-scan extension is feasible ✅\n- `arch:check` is NOT in 
+`.github/workflows/ci.yml` — verified `ci.yml` line-by-line (only `check`, 
+`test`, `lint`, `fmt:check`, `check:scaffold-versions`, `publish:dry-run`, 
+`audit:critical`, `deps:latest`) ⚠️\n\n### Required fixes (most important 
+first)\n\n1. **CI gate wiring.** Add an explicit step in 
+`.github/workflows/ci.yml` that runs `deno task arch:check` (which will now 
+include `plugins:check`). Without this, `plugins:check` is local-only and #156's
+CI-enforced requirement is unmet. Promote `arch:check` from local-only to CI in 
+the same commit.\n\n2. **`$schema` tolerance: pre-commit to 
+strip-before-parse.** Update decision 2 to commit to: strip `$schema` (and only 
+`$schema`) before `PluginInstallerManifestSchema.safeParse()` in CLI validator 
+call sites (`fetch-jsr-plugin-validator.ts:90` and any other JSR/HTTPS fetch 
+path). Do NOT add `$schema` as an optional field to the canonical published 
+schema — that widens the published protocol. Strip is localized, deterministic, 
+and preserves `parsePluginManifest` semantics.\n\n3. **Version-coherence 
+single-source: bind `release:cut` deterministically.** Update decision 4: if the
+prod userland-install e2e (S4) proves the JSON text-import of plugin's own 
+`deno.json` resolves at scaffold-runtime from a published JSR tarball → adopt 
+the primary path; record in `drift.md`; do NOT extend `release:cut` to a new 
+file. Otherwise, adopt the fallback (`src/scaffold/version.ts`) AND extend 
+`findVersionResidue()` + `bumpVersion()` to cover that path. The residue-scan 
+regex must be updated in the same S4 commit as the source-of-truth 
+decision.\n\n4. **Bind S5 acceptance gate explicitly.** S5 must require, before 
+commit: (a) `deno task check`, (b) `deno task lint`, (c) `deno task fmt:check 
+--ext ts,tsx`, (d) `deno task test` (full repo — catches plugin-registry 
+regressions from dead-code removal), (e) `deno task e2e:cli run scaffold.runtime
+--cleanup --format pretty` (catches userland-install regressions). Static 
+\"unused-export\" tools cannot reliably detect dynamic imports or 
+plugin-registry lookups, so behavior tests are required.\n\n5. **jsr-audit 
+publishability for the additive schema asset.** Document in plan § Decisions 
+that `packages/plugin/schema/scaffold.plugin.schema.json` will be added to 
+`packages/plugin/deno.json` publish.include, and optionally re-exported as 
+`./schema` (`\"./schema\": \"./schema/mod.ts\"` or a barrel file) so plugin 
+authors can reference the canonical URL form (`jsr:@netscript/plugin/schema`) 
+for `$schema` in JSR-published userland manifests. Consistent with the asset 
+doctrine (`@netscript/cli` precedent at `assets/schema/**/*.json`).\n\n6. 
+**Mandate a Zod↔JSON-Schema round-trip test in S1.** Add to S1: (a) 
+`parsePluginManifest` accepts the 5 committed manifests (regression guard), (b) 
+regenerating the schema and feeding it back through `parsePluginManifest` is 
+byte-stable for valid input, (c) an invalid manifest with extra unknown keys 
+fails. Addresses the \"Debt / risk\" entry on zod→json-schema fidelity 
+concretely instead of deferring it.\n\n### Notes\n- Plan's slice count (5) is 
+comfortable and well-shaped; all 6 fixes are tweaks, not redesigns.\n- zod v4 
+`toJSONSchema()` fidelity is generally strong for the constructs used 
+(`z.string`, `z.number`, `z.boolean`, `z.enum`, `z.record`, `z.array.readonly`, 
+`.strict()`, `.literal`, `.refine`). The `isSafeExportPath` refine will 
+serialize as a `format`/`pattern` annotation — sufficient for editor 
+IntelliSense even though `parsePluginManifest` retains the refine check at 
+runtime.\n- Lock hygiene preserved: no `deno.lock` or source churn from this 
+evaluator session.\n\nAfter the generator revises the plan to address these 6 
+fixes, re-trigger PLAN-EVAL for a fresh cycle. (Per protocol, two `FAIL_PLAN` 
+cycles are allowed before escalating to the user.)"
+      }
+    ]
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 3.3M • cache hit 93.19% •  reasoning 1.18K • ↓ output 25.33K • $
+0.2827
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/28325898406-1/replies.json edited with 1
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|[
++2|  {
++3|    "comment_id": null,
++4|    "body": "## PLAN-EVAL Verdict — #167 scaffolder hardening\n\n**Verdict: 
+`FAIL_PLAN`** — implementation must NOT begin until the listed fixes are 
+made.\n\nThe plan is well-researched, slices are appropriately scoped, and the 
+single-source Zod→JSON Schema claim is sound (verified `zod@4.4.3` ships 
+`z.toJSONSchema()`; `.strict()` semantics and `parsePluginManifest` 
+non-stripping confirmed at `packages/plugin/src/protocol/manifest.ts:174,243`). 
+However, the plan has a **CI wiring gap** that will silently nullify the gate it
+introduces (`arch:check` is not currently in `.github/workflows/ci.yml`), an 
+uncommitted `$schema` tolerance decision, an underdetermined version-coherence 
+`release:cut` extension, and an under-bound S5 acceptance gate.\n\n### 
+Spot-checks performed\n- `zod@4.4.3` exports `toJSONSchema()` ✅\n- 
+`PluginInstallerManifestSchema` is `.strict()` (rejects `$schema`) ✅\n- 
+`parsePluginManifest` does NOT strip `$schema` before `safeParse` ✅\n- JSON 
+text-imports of `deno.json` work from published `@netscript/cli` tarball 
+(precedent at `jsr-specifiers.ts:5`, `editor-config.ts:9`) — primary path of 
+decision 4 is plausible ✅\n- `release:cut` (`findVersionResidue` + 
+`bumpVersion`) walks `deno.json`, `deno.lock`, `scaffold.plugin.json`; 
+residue-scan extension is feasible ✅\n- `arch:check` is NOT in 
+`.github/workflows/ci.yml` — verified `ci.yml` line-by-line (only `check`, 
+`test`, `lint`, `fmt:check`, `check:scaffold-versions`, `publish:dry-run`, 
+`audit:critical`, `deps:latest`) ⚠️\n\n### Required fixes (most important 
+first)\n\n1. **CI gate wiring.** Add an explicit step in 
+`.github/workflows/ci.yml` that runs `deno task arch:check` (which will now 
+include `plugins:check`). Without this, `plugins:check` is local-only and #156's
+CI-enforced requirement is unmet. Promote `arch:check` from local-only to CI in 
+the same commit.\n\n2. **`$schema` tolerance: pre-commit to 
+strip-before-parse.** Update decision 2 to commit to: strip `$schema` (and only 
+`$schema`) before `PluginInstallerManifestSchema.safeParse()` in CLI validator 
+call sites (`fetch-jsr-plugin-validator.ts:90` and any other JSR/HTTPS fetch 
+path). Do NOT add `$schema` as an optional field to the canonical published 
+schema — that widens the published protocol. Strip is localized, deterministic, 
+and preserves `parsePluginManifest` semantics.\n\n3. **Version-coherence 
+single-source: bind `release:cut` deterministically.** Update decision 4: if the
+prod userland-install e2e (S4) proves the JSON text-import of plugin's own 
+`deno.json` resolves at scaffold-runtime from a published JSR tarball → adopt 
+the primary path; record in `drift.md`; do NOT extend `release:cut` to a new 
+file. Otherwise, adopt the fallback (`src/scaffold/version.ts`) AND extend 
+`findVersionResidue()` + `bumpVersion()` to cover that path. The residue-scan 
+regex must be updated in the same S4 commit as the source-of-truth 
+decision.\n\n4. **Bind S5 acceptance gate explicitly.** S5 must require, before 
+commit: (a) `deno task check`, (b) `deno task lint`, (c) `deno task fmt:check 
+--ext ts,tsx`, (d) `deno task test` (full repo — catches plugin-registry 
+regressions from dead-code removal), (e) `deno task e2e:cli run scaffold.runtime
+--cleanup --format pretty` (catches userland-install regressions). Static 
+\"unused-export\" tools cannot reliably detect dynamic imports or 
+plugin-registry lookups, so behavior tests are required.\n\n5. **jsr-audit 
+publishability for the additive schema asset.** Document in plan § Decisions 
+that `packages/plugin/schema/scaffold.plugin.schema.json` will be added to 
+`packages/plugin/deno.json` publish.include, and optionally re-exported as 
+`./schema` (`\"./schema\": \"./schema/mod.ts\"` or a barrel file) so plugin 
+authors can reference the canonical URL form (`jsr:@netscript/plugin/schema`) 
+for `$schema` in JSR-published userland manifests. Consistent with the asset 
+doctrine (`@netscript/cli` precedent at `assets/schema/**/*.json`).\n\n6. 
+**Mandate a Zod↔JSON-Schema round-trip test in S1.** Add to S1: (a) 
+`parsePluginManifest` accepts the 5 committed manifests (regression guard), (b) 
+regenerating the schema and feeding it back through `parsePluginManifest` is 
+byte-stable for valid input, (c) an invalid manifest with extra unknown keys 
+fails. Addresses the \"Debt / risk\" entry on zod→json-schema fidelity 
+concretely instead of deferring it.\n\n### Notes\n- Plan's slice count (5) is 
+comfortable and well-shaped; all 6 fixes are tweaks, not redesigns.\n- zod v4 
+`toJSONSchema()` fidelity is generally strong for the constructs used 
+(`z.string`, `z.number`, `z.boolean`, `z.enum`, `z.record`, `z.array.readonly`, 
+`.strict()`, `.literal`, `.refine`). The `isSafeExportPath` refine will 
+serialize as a `format`/`pattern` annotation — sufficient for editor 
+IntelliSense even though `parsePluginManifest` retains the refine check at 
+runtime.\n- Lock hygiene preserved: no `deno.lock` or source churn from this 
+evaluator session.\n\nAfter the generator revises the plan to address these 6 
+fixes, re-trigger PLAN-EVAL for a fresh cycle. (Per protocol, two `FAIL_PLAN` 
+cycles are allowed before escalating to the user.)"
++5|  }
++6|]
+ 7|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Verify deliverables
+
+Thought:
+Now verify the JSON is valid and the files are in place:
+
+$ python3 -c "import json; 
+data=json.load(open('/home/runner/work/_temp/openhands/28325898406-1/replies.jso
+n')); print('OK,', len(data), 'entries'); print('body length:', 
+len(data[0]['body']))" && ls -la 
+/home/runner/work/_temp/openhands/28325898406-1/
+
+Tokens: ↑ input 3.34M • cache hit 93.22% •  reasoning 1.18K • ↓ output 25.47K • 
+$ 0.2854
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+OK, 1 entries
+body length: 5080
+total 504
+drwxr-xr-x 2 runner runner   4096 Jun 28 15:01 .
+drwxr-xr-x 3 runner runner   4096 Jun 28 14:47 ..
+-rw-r--r-- 1 runner runner 453591 Jun 28 15:01 agent.log
+-rw-r--r-- 1 runner runner      2 Jun 28 14:48 bootstrap-exit-code.txt
+-rw-r--r-- 1 runner runner   2775 Jun 28 14:48 bootstrap.log
+-rw-r--r-- 1 runner runner   7759 Jun 28 14:47 issue-comments.json
+-rw-r--r-- 1 runner runner      3 Jun 28 14:47 pr-review-comments.json
+-rw------- 1 runner runner   5209 Jun 28 15:01 replies.json
+-rw-r--r-- 1 runner runner   5548 Jun 28 14:47 request.md
+-rw------- 1 runner runner  14571 Jun 28 15:01 summary.md
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Confirm deliverables
+
+$ git -C /home/runner/work/netscript/netscript status -s 2>/dev/null | head -10 
+&& echo "---repo tree untouched---" && git -C 
+/home/runner/work/netscript/netscript log --oneline -1 2>/dev/null
+
+Tokens: ↑ input 3.38M • cache hit 93.28% •  reasoning 1.18K • ↓ output 25.58K • 
+$ 0.2878
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+M .llm/tmp/run/openhands/pr-17/run-27493382997-1/request.md
+ M .llm/tmp/run/openhands/pr-25/run-27305429810-1/request.md
+ M .llm/tmp/run/openhands/pr-32/run-27433712260-1/request.md
+ M .llm/tmp/run/openhands/pr-35/run-27454103300-1/request.md
+ M .llm/tmp/run/openhands/pr-35/run-27454169329-1/request.md
+ M .llm/tmp/run/openhands/pr-37/run-27454273181-1/request.md
+?? .llm/tmp/run/openhands/pr-170/
+---repo tree untouched---
+96c94c5b (HEAD -> chore/plugin-167-harden, origin/chore/plugin-167-harden) 
+chore(plugin): #167-harden run plan (schema-gen + \ + plugins:check + 
+version-coherence + dead-code)
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Condensation ───────────────────────────────────────────────────────────────────
+
+Auto Conversation Condensation Triggered.
+Forgetting 43 events
+
+[Summary of Events Being Forgotten]
+USER_CONTEXT: PLAN-EVAL session for issue #167 scaffolder hardening in netscript
+project. Archetype 5 (Plugin) + Archetype 2/3 (packages/plugin protocol, 
+packages/cli). Goal: harden plugin scaffolder for pre-alpha.13 release. Branch: 
+`chore/plugin-167-harden`. Run-id: `plugin-167-harden--impl`. Re-baselined 
+against main @ 35f7dbd3 (post #168, post #169 tooling).
+
+TASK_TRACKING:
+- [Active] Validate plan.md against harness protocol (PLAN-EVAL) — reading 
+plan.md (89 lines)
+- [Active] Verify zod version supports `z.toJSONSchema()` — CONFIRMED: 
+`jsr:@zod/zod@4.4.3` pinned in @netscript/plugin deno.json
+- [Active] Verify plan's proposed schema asset location matches existing 
+convention — CONFIRMED: `@netscript/cli` publishes `assets/schema/**/*.json`
+- [Active] Check CI wiring of `arch:check` — FINDING: `arch:check` defined in 
+root deno.json but NOT currently invoked in `.github/workflows/ci.yml`
+- [Active] Cross-check plan claims about CLI `add-plugin.ts` manifest handling
+- [Pending] Synthesize final PLAN-EVAL verdict with required amendments
+
+COMPLETED:
+- Inspected `packages/plugin/src/protocol/manifest.ts` (zod-based, 
+`PLUGIN_MANIFEST_SCHEMA_VERSION = 1`, exports `PluginInstallerManifestSchema`, 
+`parsePluginManifest`)
+- Inspected plugin manifest interfaces: `PluginScaffolderRequiredPermissions`, 
+`PluginManifestOfficialSource`, `PluginManifestParseError`, 
+`PluginManifestParseIssue`, `PluginManifestParseResult`
+- Inspected install-protocol manifest fetch/parse path — 
+`manifestResponse.json()` → `parsePluginManifest(...)` (no `$schema` transform 
+applied)
+- Inspected `packages/plugin/mod.ts` exports: `.`, `./abstracts`, `./config`, 
+`./cli`, `./loader`, `./protocol`, `./sdk`, `./testing`, `./template` (plus 
+future `./schema`?)
+- Confirmed zod 4.4.3 in `@netscript/plugin` deno.json imports (has 
+`z.toJSONSchema()`)
+- Found existing JSON Schema precedent: 
+`packages/cli/src/kernel/adapters/windows/runtime/runtime-config-schema.ts` + 
+`runtime-config-schema-types.ts`
+- Verified `@netscript/cli` publish.include pattern: `"assets/schema/**/*.json"`
+- Identified existing CI lanes: `check`, `test`, `lint`, `fmt:check`, 
+`check:scaffold-versions`, `publish:dry-run`, `audit:critical`, `deps:latest` — 
+`arch:check` ABSENT
+
+PENDING:
+- Finish CI/lint coverage gap analysis (does plan add a new lint rule? does plan
+add `arch:check` to CI explicitly?)
+- Verify `check-doctrine.ts` and `check-scaffold-versions.ts` interaction with 
+new `plugins:check` task
+- Finalize PLAN-EVAL amendment list (critical: explicit CI wiring of arch:check;
+schema asset path consistency check)
+- Produce final verdict output
+
+CURRENT_STATE:
+- Plan file: `plan.md` (89 lines) — being evaluated
+- Validator path: `packages/plugin/src/protocol/manifest.ts` (zod schema with 
+`z.toJSONSchema()` capability available)
+- CLI consumer path: `add-plugin.ts` (uses `parsePluginManifest`, no `$schema` 
+rewrite)
+- Convention: `assets/schema/**/*.json` published in `@netscript/cli`
+- Plan proposes: `packages/plugin/schema/scaffold.plugin.schema.json` (path 
+consistent with asset doctrine)
+- CI gap: plan says "wire `plugins:check` into `arch:check` + CI" but 
+`arch:check` itself is not in `ci.yml` — plan must explicitly add `arch:check` 
+(or `plugins:check` directly) to CI
+
+CODE_STATE:
+- `packages/plugin/src/protocol/manifest.ts` — zod schemas, 
+`parsePluginManifest`
+- `packages/plugin/mod.ts` — barrel exports (no `./schema` export yet)
+- `packages/cli/src/kernel/adapters/windows/runtime/runtime-config-schema.ts` — 
+JSON Schema precedent
+- `deno.json` (root) — defines `arch:check` (composite task) but not in CI
+- `.github/workflows/ci.yml` — runs quality + test lanes, omits `arch:check`
+
+CHANGES: None (PLAN-EVAL is read-only review phase)
+
+DEPS:
+- `jsr:@zod/zod@4.4.3` (supports `z.toJSONSchema()`) — pinned in 
+`@netscript/plugin`
+- No new deps anticipated; relies on existing zod capability
+
+VERSION_CONTROL_STATUS:
+- Branch: `chore/plugin-167-harden`
+- Run-id: `plugin-167-harden--impl`
+- Base: main @ 35f7dbd3 (post #168, post #169 tooling merge)
+- No commits made yet (review phase)
+
+
+Tokens: ↑ input 3.38M • cache hit 93.16% •  reasoning 1.57K • ↓ output 27.03K • 
+$ 0.2909
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Emit PLAN-EVAL FAIL_PLAN verdict
+
+Thought:
+Repo source tree and `deno.lock` are untouched. Only 
+`.llm/tmp/run/openhands/pr-170/` was added (the new run dir — expected and 
+outside the source tree). Deliverables in place:
+
+Finish with message:
+## PLAN-EVAL complete — verdict emitted
+
+**Verdict: `FAIL_PLAN`** (PR #170 / run `plugin-167-harden--impl`)
+
+The plan is well-researched, sound on the Zod→JSON-Schema single-source claim 
+(verified `zod@4.4.3` ships `z.toJSONSchema()`), and the slices are 
+appropriately sized — but it has a **CI wiring gap that would silently nullify 
+the gate it introduces**, an uncommitted `$schema` tolerance decision, an 
+underdetermined version-coherence `release:cut` extension, and an under-bound S5
+acceptance gate.
+
+### Deliverables (run-scoped paths)
+
+- `/home/runner/work/_temp/openhands/28325898406-1/summary.md` — full PLAN-EVAL 
+write-up: checklist table, 7 spot-checks, open-decision sweep, verdict, 6 
+numbered required fixes, and remaining risks. Phase-A reporting included.
+- `/home/runner/work/_temp/openhands/28325898406-1/replies.json` — PR-comment 
+body (workflow owns GitHub posting per operational contract). Single entry with 
+`comment_id: null` (top-level comment, no thread parent).
+
+### Required fixes, most important first
+
+1. **CI gate wiring** — `arch:check` is NOT currently in 
+`.github/workflows/ci.yml` (verified line-by-line). Plan must explicitly add 
+`deno task arch:check` (now incl. `plugins:check`) to CI; otherwise the entire 
+gate is local-only and #156's CI-enforced requirement is unmet.
+2. **`$schema` tolerance: pre-commit to strip-before-parse.** Localized to CLI 
+validator call sites; preserves published protocol semantics.
+3. **Version-coherence: bind `release:cut` deterministically.** Decide 
+JSON-text-import vs. `version.ts` fallback in S4; extend `findVersionResidue` + 
+`bumpVersion` accordingly in the same commit; record in `drift.md`.
+4. **Bind S5 acceptance gate** to `check` + `lint` + `fmt:check --ext ts,tsx` + 
+`test` (full repo) + prod userland-install e2e — dead-code removal is high-risk 
+for behavior change.
+5. **jsr-audit publishability for the additive schema asset.** Document 
+`packages/plugin/schema/scaffold.plugin.schema.json` in publish.include; 
+optionally re-export as `./schema` for `jsr:@netscript/plugin/schema` URL form.
+6. **Mandate a Zod↔JSON-Schema round-trip test in S1.** Regression guard for the
+5 committed manifests + invalid-manifest rejection + byte-stability of 
+regenerate.
+
+### Lock hygiene preserved
+
+- No source-tree edits; `deno.lock` untouched.
+- No implementation work begun; only `.llm/tmp/run/openhands/pr-170/` added (new
+run dir, outside source tree).
+- Branch `chore/plugin-167-harden` unchanged at base commit `96c94c5b` (the 
+plan-record commit only).
+
+Generator should revise plan.md against these 6 fixes and re-trigger PLAN-EVAL. 
+Per protocol, two `FAIL_PLAN` cycles are allowed before escalating to the user.
+
+Tokens: ↑ input 3.41M • cache hit 92.71% •  reasoning 1.57K • ↓ output 27.79K • 
+$ 0.2975
+
