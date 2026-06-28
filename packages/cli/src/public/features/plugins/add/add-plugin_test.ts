@@ -10,6 +10,10 @@ import { PluginScaffolder } from '../../../../kernel/adapters/plugin/scaffolder.
 import { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/workspace-mutator.ts';
 import type { PluginKindProvider } from '../../../../kernel/domain/plugin-kind.ts';
 import { addPlugin } from './add-plugin.ts';
+import type {
+  JsrPluginValidationResult,
+  JsrPluginValidatorPort,
+} from './jsr-plugin-validator-port.ts';
 import { planPluginAdd } from './plan-plugin-add.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../kernel/application/registries/template-registry.ts';
 
@@ -148,6 +152,38 @@ describe('public add plugin flow', () => {
     assertFalse(await fs.exists('/workspace/alpha/plugins/workers/worker/worker.ts'));
     assertFalse(await fs.exists('/workspace/alpha/plugins/workers/scaffold.plugin.json'));
     assertFalse(await fs.exists('/workspace/alpha/workers'));
+  });
+
+  it('resolves a bare plugin alias before kind-registry planning', async () => {
+    const fs = new MemoryFileSystemAdapter();
+    await writeProjectFiles(fs);
+    const templateAdapter = new StringTemplateAdapter(fs);
+    const scaffolder = new Scaffolder(templateAdapter, fs);
+    const registry = new PluginKindRegistry();
+
+    const result = await addPlugin({
+      kind: 'workers',
+      pluginName: 'workers',
+      serviceReferences: [],
+      pluginReferences: [],
+      noDb: true,
+      includeSamples: false,
+      projectRoot: '/workspace/alpha',
+      overwrite: false,
+    }, {
+      fs,
+      scaffolder,
+      templateAdapter,
+      registry,
+      pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
+      registryScaffolder: new PluginRegistryScaffolder(scaffolder),
+      workspaceMutator: new PluginWorkspaceMutator(fs),
+      pluginValidator: new FixturePluginValidator(workerProvider),
+      regenerateHelpers: () => Promise.resolve(['/workspace/alpha/aspire/apphost.mts']),
+    });
+
+    assertEquals(result.resolvedPlugin?.package.packageSpecifier, '@netscript/plugin-workers');
+    assertEquals(result.plugin.kind, 'worker');
   });
 
   it('respects --no-copy-source by rendering the JSR stub instead of copying official source', async () => {
@@ -324,6 +360,76 @@ describe('public add plugin flow', () => {
     assertEquals(rootDenoJson.workspace.includes('./workers'), true);
   });
 });
+
+class FixturePluginValidator implements JsrPluginValidatorPort {
+  constructor(private readonly provider: PluginKindProvider) {}
+
+  validate(): Promise<JsrPluginValidationResult> {
+    return Promise.resolve({
+      ok: true,
+      descriptor: {
+        package: {
+          requestedSpec: 'workers',
+          source: 'bare-alias',
+          scope: 'netscript',
+          packageName: 'plugin-workers',
+          packageSpecifier: '@netscript/plugin-workers',
+          jsrSpecifier: 'jsr:@netscript/plugin-workers',
+          alias: 'workers',
+        },
+        version: '0.0.1-alpha.12',
+        manifest: {
+          schemaVersion: 1,
+          name: '@netscript/plugin-workers',
+          version: '0.0.1-alpha.12',
+          displayName: 'Background Worker',
+          description: 'Workers plugin',
+          peerDependencies: {},
+          capabilities: {
+            hasDatabaseMigrations: true,
+            hasRoutes: true,
+            hasBackgroundWorkers: true,
+          },
+          scaffolder: {
+            export: './scaffold',
+            requiredPermissions: { net: [], read: [], write: [] },
+          },
+          provider: {
+            kind: this.provider.kind,
+            displayName: this.provider.displayName,
+            category: this.provider.category,
+            portRangeKey: this.provider.portRangeKey,
+            defaultPermissions: this.provider.defaultPermissions,
+            watchFlag: this.provider.watchFlag,
+            defaultEntrypoint: this.provider.defaultEntrypoint,
+            defaultServiceEntrypoint: this.provider.defaultServiceEntrypoint ?? '',
+            defaultRequiresDb: this.provider.defaultRequiresDb,
+            defaultRequiresKv: this.provider.defaultRequiresKv,
+            pluginType: this.provider.pluginType,
+            supportsConcurrency: this.provider.supportsConcurrency,
+            concurrencyEnvVar: this.provider.concurrencyEnvVar,
+            defaultConcurrency: this.provider.defaultConcurrency,
+            defaultTelemetry: this.provider.defaultTelemetry,
+            infrastructureRequires: this.provider.infrastructureRequires,
+            infrastructureOptionalDeps: this.provider.infrastructureOptionalDeps,
+          },
+        },
+        packageMetadata: {
+          latest: '0.0.1-alpha.12',
+          isYanked: false,
+        },
+        versionMetadata: {
+          exports: { '.': './mod.ts', './scaffold': './src/scaffold/mod.ts' },
+          files: { '/scaffold.plugin.json': 'sha256-good' },
+        },
+        details: {
+          description: 'Workers plugin',
+          score: 95,
+        },
+      },
+    });
+  }
+}
 
 async function writeProjectFiles(fs: MemoryFileSystemAdapter): Promise<void> {
   await fs.writeFile(

@@ -7,6 +7,7 @@ import type {
   PluginSchemaCopyResult,
   SagaStoreBackend,
 } from '../../kernel/domain/plugin-kind.ts';
+import type { ValidatedPluginDescriptor } from '../features/plugins/add/jsr-plugin-validator-port.ts';
 
 /** User request for adding one starter plugin workspace. */
 export interface PluginAddRequest {
@@ -79,6 +80,9 @@ export interface PluginRenderResult {
 
 /** Result of the public add-plugin application flow. */
 export interface AddPluginResult extends PluginRenderResult {
+  /** Static JSR descriptor resolved before any plugin code executes. */
+  readonly resolvedPlugin?: ValidatedPluginDescriptor;
+
   /** Whether a shared cache resource was added. */
   readonly provisionedCache: boolean;
 

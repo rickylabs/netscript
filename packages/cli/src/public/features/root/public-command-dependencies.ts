@@ -35,6 +35,7 @@ import { DbEngineRegistry } from '../../../kernel/application/registries/db-engi
 import { PluginKindRegistry } from '../../../kernel/application/registries/plugin-kind-registry.ts';
 import { DEFAULT_SERVY_CLI_PATH } from '../../../kernel/constants/windows.ts';
 import { JsrImportResolver } from '../../adapters/jsr-import-resolver.ts';
+import { FetchJsrPluginValidator } from '../../infra/jsr/fetch-jsr-plugin-validator.ts';
 import { ServyCliAdapter } from '../../adapters/servy-cli.ts';
 import type { ServiceManifest } from '../../ports/service-manifest-port.ts';
 import type { GeneratePluginRegistriesCommandDependencies } from '../generate/plugins/generate-plugin-registries-command.ts';
@@ -44,6 +45,7 @@ import type { FileSystemPort } from '../../../kernel/ports/file-system-port.ts';
 import { createPluginDispatchPort } from '../plugins/dispatch/dispatch-plugin-verb.ts';
 import type { PluginDispatchPort } from '../plugins/dispatch/plugin-dispatch-port.ts';
 import type { DoctorPluginCommandDependencies } from '../plugins/doctor/doctor-plugin-command.ts';
+import type { JsrPluginValidatorPort } from '../plugins/add/jsr-plugin-validator-port.ts';
 import { doctorPlugin } from '../plugins/doctor/doctor-plugin-use-case.ts';
 import {
   createPluginHostLoader,
@@ -110,6 +112,7 @@ export interface PublicCommandDependencies {
     readonly pluginScaffolder: PluginScaffolder;
     readonly registryScaffolder: PluginRegistryScaffolder;
     readonly workspaceMutator: PluginWorkspaceMutator;
+    readonly pluginValidator?: JsrPluginValidatorPort;
     readonly sourceRootStartDir?: string;
   };
   /** Dependencies for host-side plugin loading. */
@@ -237,6 +240,7 @@ export function createPublicCommandDependencies(
       pluginScaffolder: new PluginScaffolder(scaffolder, fs, pluginRegistry),
       registryScaffolder: new PluginRegistryScaffolder(scaffolder),
       workspaceMutator: new PluginWorkspaceMutator(fs),
+      pluginValidator: new FetchJsrPluginValidator(),
       sourceRootStartDir: host.cwd(),
     },
     pluginHostDependencies: {
