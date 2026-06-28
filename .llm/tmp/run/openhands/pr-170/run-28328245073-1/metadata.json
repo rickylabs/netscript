@@ -1,0 +1,17 @@
+{
+  "run_id": "28328245073",
+  "run_attempt": "1",
+  "run_url": "https://github.com/rickylabs/netscript/actions/runs/28328245073",
+  "bootstrap_outcome": "success",
+  "agent_outcome": "success",
+  "verdict": "completed",
+  "summary_source": "agent",
+  "model": "openrouter/qwen/qwen3.7-max",
+  "provider": "OPENROUTER",
+  "output_mode": "pr-comment",
+  "issue_number": "170",
+  "checkout_repo": "rickylabs/netscript",
+  "checkout_ref": "chore/plugin-167-harden",
+  "summary_path": "/home/runner/work/_temp/openhands/28328245073-1/summary.md",
+  "trace_dir": ".llm/tmp/run/openhands/pr-170/run-28328245073-1"
+}

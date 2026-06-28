@@ -1,0 +1,400 @@
+(Adversarial MAJOR) \u2014 \u2705 OK\n- 
+`plugins/auth/src/scaffold/artifacts.ts:31` \u2014 emits 
+`https://jsr.io/@netscript/plugin/${NETSCRIPT_VERSION}/schema/scaffold.plugin.sc
+hema.json`\n- 
+`plugins/{sagas,streams,triggers,workers}/src/scaffold/artifacts.ts:31` \u2014 
+same pattern\n- `packages/plugin/schema/scaffold.plugin.schema.json:7` \u2014 
+committed `$id`: 
+`https://rickylabs.github.io/netscript/schemas/scaffold.plugin.schema.json` 
+(stable, versionless)\n- \u2705 No `jsr:@netscript/plugin/schema` specifier 
+remains (except test fixture at `plugin-manifest_test.ts:98`, which is arbitrary
+test data)\n\n### 4. Version Single-Source \u2014 \u2705 OK\n- 
+`plugins/auth/src/scaffold/artifacts.ts:11` \u2014 `import packageConfig from 
+'../../deno.json' with { type: 'json' }`\n- 
+`plugins/{sagas,streams,triggers,workers}/src/scaffold/artifacts.ts:11` \u2014 
+same import\n- `plugins/auth/src/scaffold/artifacts.ts:15` \u2014 `const 
+NETSCRIPT_VERSION = packageConfig.version` (no hardcoded literal)\n- 
+`.llm/tools/plugin/check-plugins.ts:11-13` \u2014 
+`NETSCRIPT_VERSION_CONST_PATTERN` catches any literal assignment\n- \u2705 `deno
+task plugins:check` \u2192 zero stale-pin findings\n\n### 5. CI Enforcement 
+\u2014 \u2705 OK\n- `.github/workflows/ci.yml:111` \u2014 `deno task arch:check`
+step present\n- `deno.json:18` \u2014 `arch:check` invokes `plugins:check` via 
+`deps:check && plugins:check && doctrine checks`\n- 
+`.llm/tools/plugin/check-plugins.ts:34-36` \u2014 uses `Deno.exitCode = 1` on 
+violation (not warning-only)\n- \u2705 YAML valid, enforcement wired 
+end-to-end\n\n### 6. JSR Publish Surface \u2014 \u2705 OK\n- \u2705 `deno 
+publish --dry-run` for `@netscript/plugin` \u2192 exit 0\n  - Includes 
+`schema/scaffold.plugin.schema.json` (7.74KB)\n  - `./schema` export resolves\n-
+\u2705 `deno publish --dry-run` for all 5 plugins (auth, sagas, streams, 
+triggers, workers) \u2192 exit 0\n  - Each plugin's `deno.json` is tarball-safe 
+(no parent-escape)\n\n### 7. Dead-Code + Hygiene \u2014 \u2705 OK\n- 
+`packages/cli/templates/plugins/templates/public-plugin-generators.ts` \u2014 
+removed in commit `4f832606`\n  - \u2705 Zero references remain (`grep -rn 
+'public-plugin-generators'` \u2192 no results)\n  - \u2705 No over-removal (no 
+dynamic registry path depends on it)\n- \u2705 No new `any` types, no 
+`deno.lock` churn, commit messages map 1:1 to slices\n\n### 8. Gate Re-Run 
+\u2014 \u2705 OK\nAll gates passed:\n1. `deno task plugins:check` \u2014 exit 
+0\n2. `deno task arch:check` \u2014 exit 0 (warnings only, no FAILs)\n3. Scoped 
+check on `packages/plugin`, `packages/cli`, `plugins` \u2014 exit 0\n4. Scoped 
+lint on `packages/plugin`, `packages/cli`, `plugins` \u2014 exit 0\n5. Scoped 
+fmt on `packages/plugin`, `plugins` \u2014 exit 0\n6. `deno task test` \u2014 
+exit 0 (927 passed, 0 failed)\n7. `deno publish --dry-run` (all 6 packages) 
+\u2014 exit 0\n\n## Adversarial Review Fixes \u2014 \u2705 All Discharged\n\n1. 
+**MAJOR: Userland schema URL** \u2014 \u2705 Fixed in commit `010d560c`\n   - 
+Now emits fetchable HTTPS URL, not `jsr:` specifier\n2. **MINOR: `plugins:check`
+stale-pin scan** \u2014 \u2705 Fixed in commit `010d560c`\n   - 
+`NETSCRIPT_VERSION_CONST_PATTERN` fails on any literal\n3. **MINOR: Unused 
+import** \u2014 \u2705 Fixed in commit `010d560c`\n   - Removed from 
+`packages/cli/src/maintainer/adapters/official-plugin-source.ts`\n\n## Remaining
+Risks (Not Blocking)\n\n- Pre-existing doctrine warnings in `arch:check` (README
+code-fences, missing architecture docs)\n- Pre-existing NPM catalog warnings in 
+`deps:check` (packages not using root catalog)\n- Pre-existing dynamic import 
+warning in JSR dry-run (unanalyzable but runtime-safe)\n- None introduced by 
+this PR\n\n## Merge Readiness\n\n\u2705 All verification areas pass  \n\u2705 
+All gates pass  \n\u2705 Adversarial review fixes complete  \n\u2705 Working 
+tree clean  \n\u2705 Ready for alpha.13 cut\n\n---\n*IMPL-EVAL completed by 
+OpenHands agent for rickylabs on 2025-01-15*\n"}
+
+Reasoning:
+I've created the summary file and the trace metadata directory. Now I need to 
+write the final IMPL-EVAL verdict as the tool response. According to the task, I
+need to:
+1. Write a PR comment with per-area OK/ISSUE + file:line citations
+2. Provide overall verdict: PASS, FAIL_FIX, FAIL_RESCOPE, or FAIL_DEBT
+3. Return a tool response that will be sent to the user
+
+Let me compose the final PR comment with all the verification results and the 
+PASS verdict.
+
+Action: FileEditorAction
+
+Arguments:
+  command: "create"
+  path: 
+"/home/runner/work/netscript/netscript/.llm/tmp/run/openhands/pr-170/run-2832824
+5073-1/verdict.md"
+  file_text: 
+    # IMPL-EVAL Final Verdict: PR #170
+    
+    **Verdict**: ✅ **PASS** — Ready to merge
+    
+    ## Per-Area Verification
+    
+    ### 1. Schema Fidelity — ✅ OK
+    - `packages/plugin/schema/scaffold.plugin.schema.json:1-103` — faithful 
+encoding of `PluginInstallerManifestSchema`
+      - `.strict()` → root `additionalProperties: false` at line 7
+      - `z.record(z.string())` for `peerDependencies` at lines 58-61
+      - Enums (`PluginKind`, `PluginArch`) at lines 12, 28
+      - Nullable fields properly typed
+      - Safe-export-path regex as `pattern` at lines 18, 34, 50, 66, 83
+    - ✅ `deno task plugins:schema:gen` → byte-stable regen (zero git diff)
+    
+    ### 2. `$schema` Tolerance — ✅ OK
+    - `packages/plugin/src/protocol/manifest.ts:150-156` — 
+`stripPluginManifestSchemaKey()` clones, strips ONLY `$schema`
+    - `packages/cli/src/public/infra/jsr/fetch-jsr-plugin-validator.ts:98` — 
+applied
+    - `packages/cli/src/public/features/plugins/add/add-plugin.ts:238` — applied
+    - `packages/plugin/src/config/validators/manifest-schema.ts:62` — Schema 
+stays `.strict()`
+    - `packages/plugin/tests/protocol/plugin-manifest_test.ts:96-119` — proves 
+accept-all-5 + $schema-strip + extra-key-fails
+    
+    ### 3. Userland Schema URL (Adversarial MAJOR) — ✅ OK
+    - `plugins/auth/src/scaffold/artifacts.ts:31` — emits 
+`https://jsr.io/@netscript/plugin/${NETSCRIPT_VERSION}/schema/scaffold.plugin.sc
+hema.json`
+    - `plugins/{sagas,streams,triggers,workers}/src/scaffold/artifacts.ts:31` — 
+same pattern
+    - `packages/plugin/schema/scaffold.plugin.schema.json:7` — committed `$id`: 
+`https://rickylabs.github.io/netscript/schemas/scaffold.plugin.schema.json` 
+(stable, versionless)
+    - ✅ No `jsr:@netscript/plugin/schema` specifier remains (except test 
+fixture at `plugin-manifest_test.ts:98`, which is arbitrary test data)
+    
+    ### 4. Version Single-Source — ✅ OK
+    - `plugins/auth/src/scaffold/artifacts.ts:11` — `import packageConfig from 
+'../../deno.json' with { type: 'json' }`
+    - `plugins/{sagas,streams,triggers,workers}/src/scaffold/artifacts.ts:11` — 
+same import
+    - `plugins/auth/src/scaffold/artifacts.ts:15` — `const NETSCRIPT_VERSION = 
+packageConfig.version` (no hardcoded literal)
+    - `.llm/tools/plugin/check-plugins.ts:11-13` — 
+`NETSCRIPT_VERSION_CONST_PATTERN` catches any literal assignment
+    - ✅ `deno task plugins:check` → zero stale-pin findings
+    
+    ### 5. CI Enforcement — ✅ OK
+    - `.github/workflows/ci.yml:111` — `deno task arch:check` step present
+    - `deno.json:18` — `arch:check` invokes `plugins:check` via `deps:check && 
+plugins:check && doctrine checks`
+    - `.llm/tools/plugin/check-plugins.ts:34-36` — uses `Deno.exitCode = 1` on 
+violation (not warning-only)
+    - ✅ YAML valid, enforcement wired end-to-end
+    
+    ### 6. JSR Publish Surface — ✅ OK
+    - ✅ `deno publish --dry-run` for `@netscript/plugin` → exit 0
+      - Includes `schema/scaffold.plugin.schema.json` (7.74KB)
+      - `./schema` export resolves
+    - ✅ `deno publish --dry-run` for all 5 plugins (auth, sagas, streams, 
+triggers, workers) → exit 0
+      - Each plugin's `deno.json` is tarball-safe (no parent-escape)
+    
+    ### 7. Dead-Code + Hygiene — ✅ OK
+    - `packages/cli/templates/plugins/templates/public-plugin-generators.ts` — 
+removed in commit `4f832606`
+      - ✅ Zero references remain (`grep -rn 'public-plugin-generators'` → no 
+results)
+      - ✅ No over-removal (no dynamic registry path depends on it)
+    - ✅ No new `any` types, no `deno.lock` churn, commit messages map 1:1 to 
+slices
+    
+    ### 8. Gate Re-Run — ✅ OK
+    All gates passed:
+    1. `deno task plugins:check` — exit 0
+    2. `deno task arch:check` — exit 0 (warnings only, no FAILs)
+    3. Scoped check on `packages/plugin`, `packages/cli`, `plugins` — exit 0
+    4. Scoped lint on `packages/plugin`, `packages/cli`, `plugins` — exit 0
+    5. Scoped fmt on `packages/plugin`, `plugins` — exit 0
+    6. `deno task test` — exit 0 (927 passed, 0 failed)
+    7. `deno publish --dry-run` (all 6 packages) — exit 0
+    
+    ## Adversarial Review Fixes — ✅ All Discharged
+    
+    1. **MAJOR: Userland schema URL** — ✅ Fixed in commit `010d560c`
+       - Now emits fetchable HTTPS URL, not `jsr:` specifier
+    2. **MINOR: `plugins:check` stale-pin scan** — ✅ Fixed in commit `010d560c`
+       - `NETSCRIPT_VERSION_CONST_PATTERN` fails on any literal
+    3. **MINOR: Unused import** — ✅ Fixed in commit `010d560c`
+       - Removed from 
+`packages/cli/src/maintainer/adapters/official-plugin-source.ts`
+    
+    ## Remaining Risks (Not Blocking)
+    
+    - Pre-existing doctrine warnings in `arch:check` (README code-fences, 
+missing architecture docs)
+    - Pre-existing NPM catalog warnings in `deps:check` (packages not using root
+catalog)
+    - Pre-existing dynamic import warning in JSR dry-run (unanalyzable but 
+runtime-safe)
+    - None introduced by this PR
+    
+    ## Merge Readiness
+    
+    ✅ All verification areas pass  
+    ✅ All gates pass  
+    ✅ Adversarial review fixes complete  
+    ✅ Working tree clean  
+    ✅ Ready for alpha.13 cut
+    
+    ---
+    *IMPL-EVAL completed by OpenHands agent for rickylabs on 2025-01-15*
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 1.55M • cache hit 83.26% •  reasoning 5.94K • ↓ output 16.39K • 
+$ 0.7072
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File 
+/home/runner/work/netscript/netscript/.llm/tmp/run/openhands/pr-170/run-28328245
+073-1/verdict.md edited with 1 changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# IMPL-EVAL Final Verdict: PR #170
+ 2|
++3|**Verdict**: ✅ **PASS** — Ready to merge
++4|
++5|## Per-Area Verification
++6|
++7|### 1. Schema Fidelity — ✅ OK
++8|- `packages/plugin/schema/scaffold.plugin.schema.json:1-103` — faithful 
+encoding of `PluginInstallerManifestSchema`
++9|  - `.strict()` → root `additionalProperties: false` at line 7
++10|  - `z.record(z.string())` for `peerDependencies` at lines 58-61
++11|  - Enums (`PluginKind`, `PluginArch`) at lines 12, 28
++12|  - Nullable fields properly typed
++13|  - Safe-export-path regex as `pattern` at lines 18, 34, 50, 66, 83
++14|- ✅ `deno task plugins:schema:gen` → byte-stable regen (zero git diff)
++15|
++16|### 2. `$schema` Tolerance — ✅ OK
++17|- `packages/plugin/src/protocol/manifest.ts:150-156` — 
+`stripPluginManifestSchemaKey()` clones, strips ONLY `$schema`
++18|- `packages/cli/src/public/infra/jsr/fetch-jsr-plugin-validator.ts:98` — 
+applied
++19|- `packages/cli/src/public/features/plugins/add/add-plugin.ts:238` — applied
++20|- `packages/plugin/src/config/validators/manifest-schema.ts:62` — Schema 
+stays `.strict()`
++21|- `packages/plugin/tests/protocol/plugin-manifest_test.ts:96-119` — proves 
+accept-all-5 + $schema-strip + extra-key-fails
++22|
++23|### 3. Userland Schema URL (Adversarial MAJOR) — ✅ OK
++24|- `plugins/auth/src/scaffold/artifacts.ts:31` — emits 
+`https://jsr.io/@netscript/plugin/${NETSCRIPT_VERSION}/schema/scaffold.plugin.sc
+hema.json`
++25|- `plugins/{sagas,streams,triggers,workers}/src/scaffold/artifacts.ts:31` — 
+same pattern
++26|- `packages/plugin/schema/scaffold.plugin.schema.json:7` — committed `$id`: 
+`https://rickylabs.github.io/netscript/schemas/scaffold.plugin.schema.json` 
+(stable, versionless)
++27|- ✅ No `jsr:@netscript/plugin/schema` specifier remains (except test 
+fixture at `plugin-manifest_test.ts:98`, which is arbitrary test data)
++28|
++29|### 4. Version Single-Source — ✅ OK
++30|- `plugins/auth/src/scaffold/artifacts.ts:11` — `import packageConfig from 
+'../../deno.json' with { type: 'json' }`
++31|- `plugins/{sagas,streams,triggers,workers}/src/scaffold/artifacts.ts:11` — 
+same import
++32|- `plugins/auth/src/scaffold/artifacts.ts:15` — `const NETSCRIPT_VERSION = 
+packageConfig.version` (no hardcoded literal)
++33|- `.llm/tools/plugin/check-plugins.ts:11-13` — 
+`NETSCRIPT_VERSION_CONST_PATTERN` catches any literal assignment
++34|- ✅ `deno task plugins:check` → zero stale-pin findings
++35|
++36|### 5. CI Enforcement — ✅ OK
++37|- `.github/workflows/ci.yml:111` — `deno task arch:check` step present
++38|- `deno.json:18` — `arch:check` invokes `plugins:check` via `deps:check && 
+plugins:check && doctrine checks`
++39|- `.llm/tools/plugin/check-plugins.ts:34-36` — uses `Deno.exitCode = 1` on 
+violation (not warning-only)
++40|- ✅ YAML valid, enforcement wired end-to-end
++41|
++42|### 6. JSR Publish Surface — ✅ OK
++43|- ✅ `deno publish --dry-run` for `@netscript/plugin` → exit 0
++44|  - Includes `schema/scaffold.plugin.schema.json` (7.74KB)
++45|  - `./schema` export resolves
++46|- ✅ `deno publish --dry-run` for all 5 plugins (auth, sagas, streams, 
+triggers, workers) → exit 0
++47|  - Each plugin's `deno.json` is tarball-safe (no parent-escape)
++48|
++49|### 7. Dead-Code + Hygiene — ✅ OK
++50|- `packages/cli/templates/plugins/templates/public-plugin-generators.ts` — 
+removed in commit `4f832606`
++51|  - ✅ Zero references remain (`grep -rn 'public-plugin-generators'` → no 
+results)
++52|  - ✅ No over-removal (no dynamic registry path depends on it)
++53|- ✅ No new `any` types, no `deno.lock` churn, commit messages map 1:1 to 
+slices
++54|
++55|### 8. Gate Re-Run — ✅ OK
++56|All gates passed:
++57|1. `deno task plugins:check` — exit 0
++58|2. `deno task arch:check` — exit 0 (warnings only, no FAILs)
++59|3. Scoped check on `packages/plugin`, `packages/cli`, `plugins` — exit 0
++60|4. Scoped lint on `packages/plugin`, `packages/cli`, `plugins` — exit 0
++61|5. Scoped fmt on `packages/plugin`, `plugins` — exit 0
++62|6. `deno task test` — exit 0 (927 passed, 0 failed)
++63|7. `deno publish --dry-run` (all 6 packages) — exit 0
++64|
++65|## Adversarial Review Fixes — ✅ All Discharged
++66|
++67|1. **MAJOR: Userland schema URL** — ✅ Fixed in commit `010d560c`
++68|   - Now emits fetchable HTTPS URL, not `jsr:` specifier
++69|2. **MINOR: `plugins:check` stale-pin scan** — ✅ Fixed in commit `010d560c`
++70|   - `NETSCRIPT_VERSION_CONST_PATTERN` fails on any literal
++71|3. **MINOR: Unused import** — ✅ Fixed in commit `010d560c`
++72|   - Removed from 
+`packages/cli/src/maintainer/adapters/official-plugin-source.ts`
++73|
++74|## Remaining Risks (Not Blocking)
++75|
++76|- Pre-existing doctrine warnings in `arch:check` (README code-fences, 
+missing architecture docs)
++77|- Pre-existing NPM catalog warnings in `deps:check` (packages not using root
+catalog)
++78|- Pre-existing dynamic import warning in JSR dry-run (unanalyzable but 
+runtime-safe)
++79|- None introduced by this PR
++80|
++81|## Merge Readiness
++82|
++83|✅ All verification areas pass  
++84|✅ All gates pass  
++85|✅ Adversarial review fixes complete  
++86|✅ Working tree clean  
++87|✅ Ready for alpha.13 cut
++88|
++89|---
++90|*IMPL-EVAL completed by OpenHands agent for rickylabs on 2025-01-15*
++91|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: IMPL-EVAL verdict: PASS — ready to merge
+
+Reasoning:
+The current rewritten thinking ends mid-sentence with "Now write the P" - this 
+appears to be the start of "Now write the PR comment body" based on the context.
+
+I need to ask: What comes after this? You've provided:
+- The current rewritten thinking (which is just "Now write the P")
+- Guidelines for how to rewrite
+- A request to rewrite the next thinking
+
+But I don't see the actual "next thinking" content that you want me to rewrite. 
+Could you provide the next thinking chunk that needs to be rewritten?
+
+Thought:
+.
+
+
+
+Finish with message:
+## IMPL-EVAL Final Verdict: ✅ PASS
+
+PR #170 `chore/plugin-167-harden` passes all 8 verification areas and all gates.
+The implementation faithfully delivers the #167 scaffolder-hardening plan and is
+ready to merge.
+
+### Verification Summary
+
+1. **Schema Fidelity** ✅ — `scaffold.plugin.schema.json` faithfully encodes 
+`PluginInstallerManifestSchema` with `.strict()` semantics; byte-stable regen 
+verified
+2. **$schema Tolerance** ✅ — `stripPluginManifestSchemaKey()` applied at both 
+CLI call sites, clones without mutation, preserves strict validation
+3. **Userland Schema URL** ✅ — Adversarial fix complete: emits fetchable HTTPS 
+URL 
+(`https://jsr.io/@netscript/plugin/${NETSCRIPT_VERSION}/schema/scaffold.plugin.s
+chema.json`), no stale `jsr:` specifiers
+4. **Version Single-Source** ✅ — All 5 plugins derive version from `deno.json`;
+`NETSCRIPT_VERSION_CONST_PATTERN` catches any hardcoded literal
+5. **CI Enforcement** ✅ — `arch:check` wired to invoke `plugins:check`; both 
+exit non-zero on violations
+6. **JSR Publish Surface** ✅ — All 6 packages (`@netscript/plugin` + 5 plugins)
+dry-run successfully; schema file included in tarballs
+7. **Dead-Code + Hygiene** ✅ — Removed barrel is provably unreferenced; no 
+over-removal; no new `any` types; zero `deno.lock` churn
+8. **Gate Re-Run** ✅ — All gates pass: `plugins:check`, `arch:check`, scoped 
+check/lint/fmt, `test` (927 passed), `publish --dry-run`
+
+### Adversarial Review Fixes
+
+All 3 issues discharged in commit `010d560c`:
+- MAJOR: Userland schema URL (now fetchable HTTPS)
+- MINOR: `plugins:check` stale-pin scan (now fails on any literal)
+- MINOR: Unused import (removed)
+
+### Next Steps
+
+1. Merge PR #170
+2. Cut alpha.13 release
+3. Verify alpha.13 publish to JSR includes the new schema surface
+
+**Artifacts**: Summary at 
+`/home/runner/work/_temp/openhands/28328245073-1/summary.md`, verdict trace at 
+`.llm/tmp/run/openhands/pr-170/run-28328245073-1/verdict.md`
+
+---
+*IMPL-EVAL completed by OpenHands agent on behalf of rickylabs*
+
+Tokens: ↑ input 1.58M • cache hit 83.35% •  reasoning 6.06K • ↓ output 17.13K • 
+$ 0.7203
+
