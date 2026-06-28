@@ -1,6 +1,6 @@
 {
   "name": "@netscript/database",
-  "version": "0.0.1-alpha.11",
+  "version": "0.0.1-alpha.12",
   "description": "Database adapter contracts, Prisma driver helpers, tracing, and schema tooling for NetScript packages.",
   "license": "MIT",
   "exports": {
