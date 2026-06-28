@@ -27,6 +27,7 @@
     "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.1-alpha.12",
     "@std/async": "jsr:@std/async@^1",
     "@std/path": "jsr:@std/path@^1",
+    "@std/text": "jsr:@std/text@^1",
     "@orpc/server": "npm:@orpc/server@^1.14.6",
     "@orpc/openapi": "npm:@orpc/openapi@^1.14.6",
     "@orpc/zod": "npm:@orpc/zod@^1.14.6",

@@ -1,23 +1,34 @@
 import packageConfig from '../../deno.json' with { type: 'json' };
+import { buildScaffoldPluginJson, PluginScaffolder } from '@netscript/plugin/scaffold';
+import type {
+  PluginScaffoldManifestSpec,
+  ScaffoldArtifact,
+  ScaffolderContext,
+} from '@netscript/plugin/scaffold';
+import { toCamelCase, toKebabCase, toPascalCase, toSnakeCase } from '@std/text';
 
-interface WorkerScaffoldArtifact {
-  readonly path: string;
-  readonly content: string;
-}
+import { WORKER_SERVICE_PORT, workersScaffoldSpec } from './spec.ts';
 
 interface WorkerScaffoldOptions {
   readonly pluginName: string;
 }
 
 const NETSCRIPT_VERSION = packageConfig.version;
-const SCAFFOLD_SCHEMA_URL =
-  `https://jsr.io/@netscript/plugin/${NETSCRIPT_VERSION}/schema/scaffold.plugin.schema.json`;
-const WORKER_SERVICE_PORT = 8091;
+
+/** Scaffolder for workers plugin-specific artifacts. */
+export class WorkersScaffolder extends PluginScaffolder {
+  readonly pluginName = 'workers';
+  readonly manifestSpec: PluginScaffoldManifestSpec = workersScaffoldSpec;
+
+  protected buildArtifacts(context: ScaffolderContext): readonly ScaffoldArtifact[] {
+    return buildWorkerScaffoldArtifacts({ pluginName: readPluginName(context.options) });
+  }
+}
 
 /** Build the deterministic files emitted by the workers plugin scaffolder. */
-export function buildWorkerScaffoldArtifacts(
+function buildWorkerScaffoldArtifacts(
   options: WorkerScaffoldOptions,
-): readonly WorkerScaffoldArtifact[] {
+): readonly ScaffoldArtifact[] {
   const pluginName = options.pluginName;
   const pascalName = toPascalCase(pluginName);
   const camelName = toCamelCase(pluginName);
@@ -72,81 +83,7 @@ export function buildWorkerScaffoldArtifacts(
 }
 
 function generateScaffoldPluginJson(): string {
-  const manifest = {
-    $schema: SCAFFOLD_SCHEMA_URL,
-    schemaVersion: 1,
-    name: '@netscript/plugin-workers',
-    version: NETSCRIPT_VERSION,
-    displayName: 'Background Worker',
-    description:
-      'NetScript plugin for background job scheduling, task execution, and worker API endpoints.',
-    peerDependencies: {
-      '@netscript/plugin': NETSCRIPT_VERSION,
-    },
-    capabilities: {
-      hasDatabaseMigrations: true,
-      hasRoutes: true,
-      hasBackgroundWorkers: true,
-    },
-    scaffolder: {
-      export: './scaffold',
-      requiredPermissions: {
-        net: [],
-        read: ['<workspaceRoot>'],
-        write: ['<workspaceRoot>'],
-      },
-    },
-    provider: {
-      kind: 'worker',
-      displayName: 'Background Worker',
-      category: 'background-processor',
-      portRangeKey: 'INFRA_PLUGIN',
-      defaultPermissions: [
-        '--unstable-kv',
-        '--allow-net',
-        '--allow-env',
-        '--allow-read',
-        '--allow-write',
-        '--allow-run',
-      ],
-      watchFlag: '--watch',
-      defaultEntrypoint: 'bin/combined.ts',
-      defaultServiceEntrypoint: 'services/src/main.ts',
-      defaultRequiresDb: true,
-      defaultRequiresKv: true,
-      pluginType: 'background-processor',
-      supportsConcurrency: true,
-      concurrencyEnvVar: 'WORKER_CONCURRENCY',
-      defaultConcurrency: 2,
-      defaultTelemetry: true,
-      infrastructureRequires: ['kv'],
-      infrastructureOptionalDeps: ['db'],
-    },
-    officialSource: {
-      canonicalName: 'workers',
-      pluginDir: 'workers',
-      backgroundDir: 'workers',
-      serviceEntrypoint: 'services/src/main.ts',
-      backgroundEntrypoint: 'bin/combined.ts',
-      serviceConfigKey: 'workers-api',
-      servicePort: WORKER_SERVICE_PORT,
-      backgroundPort: WORKER_SERVICE_PORT,
-      dependencies: ['streams'],
-      requiresDb: true,
-      requiresKv: true,
-      permissions: [
-        '--unstable-kv',
-        '--allow-net',
-        '--allow-env',
-        '--allow-read',
-        '--allow-write',
-        '--allow-run',
-      ],
-      pluginReferences: [],
-    },
-  };
-
-  return `${JSON.stringify(manifest, null, 2)}\n`;
+  return buildScaffoldPluginJson(workersScaffoldSpec, NETSCRIPT_VERSION);
 }
 
 function generateDenoJson(pluginName: string): string {
@@ -577,27 +514,10 @@ export * from '../plugins/${pluginName}/tasks/validate-payload.ts';
 `;
 }
 
-function toPascalCase(value: string): string {
-  return value
-    .split(/[^A-Za-z0-9]+/)
-    .filter((part) => part.length > 0)
-    .map((part) => `${part.charAt(0).toUpperCase()}${part.slice(1).toLowerCase()}`)
-    .join('') || 'Workers';
-}
-
-function toCamelCase(value: string): string {
-  const pascal = toPascalCase(value);
-  return `${pascal.charAt(0).toLowerCase()}${pascal.slice(1)}`;
-}
-
-function toKebabCase(value: string): string {
-  return value
-    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
-    .replace(/[^A-Za-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .toLowerCase();
-}
-
-function toSnakeCase(value: string): string {
-  return toKebabCase(value).replaceAll('-', '_');
+function readPluginName(options: Readonly<Record<string, unknown>>): string {
+  const pluginName = Reflect.get(options, 'pluginName');
+  if (typeof pluginName !== 'string' || !/^[a-z][a-z0-9-]*$/.test(pluginName)) {
+    throw new Error('Workers scaffolder requires a kebab-case options.pluginName.');
+  }
+  return pluginName;
 }

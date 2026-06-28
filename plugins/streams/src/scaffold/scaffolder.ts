@@ -1,23 +1,34 @@
 import packageConfig from '../../deno.json' with { type: 'json' };
+import { buildScaffoldPluginJson, PluginScaffolder } from '@netscript/plugin/scaffold';
+import type {
+  PluginScaffoldManifestSpec,
+  ScaffoldArtifact,
+  ScaffolderContext,
+} from '@netscript/plugin/scaffold';
+import { toCamelCase, toPascalCase } from '@std/text';
 
-interface StreamsScaffoldArtifact {
-  readonly path: string;
-  readonly content: string;
-}
+import { STREAMS_SERVICE_PORT, streamsScaffoldSpec } from './spec.ts';
 
 interface StreamsScaffoldOptions {
   readonly pluginName: string;
 }
 
 const NETSCRIPT_VERSION = packageConfig.version;
-const SCAFFOLD_SCHEMA_URL =
-  `https://jsr.io/@netscript/plugin/${NETSCRIPT_VERSION}/schema/scaffold.plugin.schema.json`;
-const STREAMS_SERVICE_PORT = 4437;
+
+/** Scaffolder for streams plugin-specific artifacts. */
+export class StreamsScaffolder extends PluginScaffolder {
+  readonly pluginName = 'streams';
+  readonly manifestSpec: PluginScaffoldManifestSpec = streamsScaffoldSpec;
+
+  protected buildArtifacts(context: ScaffolderContext): readonly ScaffoldArtifact[] {
+    return buildStreamsScaffoldArtifacts({ pluginName: readPluginName(context.options) });
+  }
+}
 
 /** Build the deterministic files emitted by the streams plugin scaffolder. */
-export function buildStreamsScaffoldArtifacts(
+function buildStreamsScaffoldArtifacts(
   options: StreamsScaffoldOptions,
-): readonly StreamsScaffoldArtifact[] {
+): readonly ScaffoldArtifact[] {
   const pluginName = options.pluginName;
   const pascalName = toPascalCase(pluginName);
   const camelName = toCamelCase(pluginName);
@@ -60,76 +71,7 @@ export function buildStreamsScaffoldArtifacts(
 }
 
 function generateScaffoldPluginJson(): string {
-  const manifest = {
-    $schema: SCAFFOLD_SCHEMA_URL,
-    schemaVersion: 1,
-    name: '@netscript/plugin-streams',
-    version: NETSCRIPT_VERSION,
-    displayName: 'Durable Streams',
-    description: 'Durable Streams service, CLI, Aspire, E2E, and scaffolding plugin for NetScript.',
-    peerDependencies: {
-      '@netscript/plugin': NETSCRIPT_VERSION,
-    },
-    capabilities: {
-      hasDatabaseMigrations: false,
-      hasRoutes: true,
-      hasBackgroundWorkers: false,
-    },
-    scaffolder: {
-      export: './scaffold',
-      requiredPermissions: {
-        net: [],
-        read: ['<workspaceRoot>'],
-        write: ['<workspaceRoot>'],
-      },
-    },
-    provider: {
-      kind: 'stream',
-      displayName: 'Durable Streams',
-      category: 'plugin',
-      portRangeKey: 'PLUGIN_API',
-      defaultPermissions: [
-        '--allow-net',
-        '--allow-env',
-        '--allow-read',
-        '--allow-write',
-        '--allow-sys',
-        '--allow-ffi',
-      ],
-      watchFlag: '--watch',
-      defaultEntrypoint: 'services/src/main.ts',
-      defaultServiceEntrypoint: 'services/src/main.ts',
-      defaultRequiresDb: false,
-      defaultRequiresKv: false,
-      pluginType: 'utility',
-      supportsConcurrency: false,
-      concurrencyEnvVar: null,
-      defaultConcurrency: null,
-      defaultTelemetry: true,
-      infrastructureRequires: [],
-      infrastructureOptionalDeps: [],
-    },
-    officialSource: {
-      canonicalName: 'streams',
-      pluginDir: 'streams',
-      serviceEntrypoint: 'services/src/main.ts',
-      serviceConfigKey: 'streams',
-      servicePort: STREAMS_SERVICE_PORT,
-      backgroundPort: STREAMS_SERVICE_PORT,
-      requiresDb: false,
-      requiresKv: false,
-      permissions: [
-        '--allow-net',
-        '--allow-env',
-        '--allow-read',
-        '--allow-write',
-        '--allow-sys',
-        '--allow-ffi',
-      ],
-    },
-  };
-
-  return `${JSON.stringify(manifest, null, 2)}\n`;
+  return buildScaffoldPluginJson(streamsScaffoldSpec, NETSCRIPT_VERSION);
 }
 
 function generateDenoJson(pluginName: string): string {
@@ -426,15 +368,10 @@ if (!response.ok) {
 `;
 }
 
-function toPascalCase(value: string): string {
-  return value
-    .split(/[-_]/)
-    .filter((part) => part.length > 0)
-    .map((part) => `${part[0]?.toUpperCase() ?? ''}${part.slice(1)}`)
-    .join('');
-}
-
-function toCamelCase(value: string): string {
-  const pascal = toPascalCase(value);
-  return `${pascal[0]?.toLowerCase() ?? ''}${pascal.slice(1)}`;
+function readPluginName(options: Readonly<Record<string, unknown>>): string {
+  const pluginName = Reflect.get(options, 'pluginName');
+  if (typeof pluginName !== 'string' || !/^[a-z][a-z0-9-]*$/.test(pluginName)) {
+    throw new Error('Streams scaffolder requires a kebab-case options.pluginName.');
+  }
+  return pluginName;
 }
