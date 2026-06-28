@@ -16,9 +16,11 @@ import { addPlugin } from './add-plugin.ts';
 import type {
   JsrPluginValidationResult,
   JsrPluginValidatorPort,
+  ValidatedPluginDescriptor,
 } from './jsr-plugin-validator-port.ts';
 import { planPluginAdd } from './plan-plugin-add.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../kernel/application/registries/template-registry.ts';
+import { dispatchPluginScaffold } from '../dispatch/dispatch-plugin-verb.ts';
 
 // This flow renders plugin/workspace files via sync template generators, which
 // require a previously-awaited registry hydration. The test drives the flow
@@ -404,6 +406,137 @@ describe('public add plugin flow', () => {
       await Deno.remove(projectRoot, { recursive: true });
     }
   });
+
+  it('adds workers from the real local-path plugin-owned scaffolder', async () => {
+    const projectRoot = await Deno.makeTempDir();
+    const workersRoot = resolve('plugins/workers');
+    try {
+      await writeRealProjectFiles(projectRoot);
+      const fs = new DenoFileSystem();
+      const templateAdapter = new StringTemplateAdapter(fs);
+      const scaffolder = new Scaffolder(templateAdapter, fs);
+      const registry = new PluginKindRegistry();
+
+      const result = await addPlugin({
+        kind: 'workers',
+        pluginName: 'workers',
+        serviceReferences: [],
+        pluginReferences: [],
+        noDb: true,
+        includeSamples: true,
+        localPath: workersRoot,
+        projectRoot,
+        overwrite: false,
+      }, {
+        fs,
+        scaffolder,
+        templateAdapter,
+        registry,
+        pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
+        registryScaffolder: new PluginRegistryScaffolder(scaffolder),
+        workspaceMutator: new PluginWorkspaceMutator(fs),
+        processRunner: new DenoProcess(),
+        regenerateHelpers: () => Promise.resolve([]),
+      });
+
+      assertEquals(result.pluginOwnedScaffold?.status, 'applied');
+      assertEquals(result.pluginOwnedScaffold?.databaseMigrationsAdded, true);
+      assertStringIncludes(
+        result.pluginOwnedScaffold?.createdFiles.join('\n') ?? '',
+        'plugins/workers/services/src/main.ts',
+      );
+      assertStringIncludes(
+        await Deno.readTextFile(join(projectRoot, 'plugins/workers/mod.ts')),
+        "definePlugin('workers', '0.1.0')",
+      );
+      assertStringIncludes(
+        await Deno.readTextFile(join(projectRoot, 'plugins/workers/database/schema.prisma')),
+        'model WorkersRecord',
+      );
+    } finally {
+      await Deno.remove(projectRoot, { recursive: true });
+    }
+  });
+
+  it('previews the real workers local-path scaffolder without writing files', async () => {
+    const projectRoot = await Deno.makeTempDir();
+    const workersRoot = resolve('plugins/workers');
+    try {
+      await writeRealProjectFiles(projectRoot);
+      const fs = new DenoFileSystem();
+      const templateAdapter = new StringTemplateAdapter(fs);
+      const scaffolder = new Scaffolder(templateAdapter, fs);
+      const registry = new PluginKindRegistry();
+
+      const result = await addPlugin({
+        kind: 'workers',
+        pluginName: 'workers',
+        serviceReferences: [],
+        pluginReferences: [],
+        noDb: true,
+        includeSamples: true,
+        dryRun: true,
+        localPath: workersRoot,
+        projectRoot,
+        overwrite: false,
+      }, {
+        fs,
+        scaffolder,
+        templateAdapter,
+        registry,
+        pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
+        registryScaffolder: new PluginRegistryScaffolder(scaffolder),
+        workspaceMutator: new PluginWorkspaceMutator(fs),
+        processRunner: new DenoProcess(),
+        regenerateHelpers: () => Promise.resolve([]),
+      });
+
+      assertEquals(result.pluginOwnedScaffold?.status, 'planned');
+      assertStringIncludes(
+        result.pluginOwnedScaffold?.createdFiles.join('\n') ?? '',
+        'plugins/workers/bin/combined.ts',
+      );
+      await assertFalseExists(join(projectRoot, 'plugins/workers/mod.ts'));
+      await assertFalseExists(join(projectRoot, 'plugins/workers/database/schema.prisma'));
+    } finally {
+      await Deno.remove(projectRoot, { recursive: true });
+    }
+  });
+
+  it('reruns the real workers scaffolder idempotently', async () => {
+    const projectRoot = await Deno.makeTempDir();
+    const workersRoot = resolve('plugins/workers');
+    const descriptor = workersDescriptor();
+    try {
+      await writeRealProjectFiles(projectRoot);
+
+      const first = await dispatchPluginScaffold({
+        descriptor,
+        source: { kind: 'local-path', path: workersRoot },
+        projectRoot,
+        pluginName: 'workers',
+        dryRun: false,
+        permissionFlags: ['-A'],
+        processRunner: new DenoProcess(),
+      });
+      const second = await dispatchPluginScaffold({
+        descriptor,
+        source: { kind: 'local-path', path: workersRoot },
+        projectRoot,
+        pluginName: 'workers',
+        dryRun: false,
+        permissionFlags: ['-A'],
+        processRunner: new DenoProcess(),
+      });
+
+      assertEquals(first.status, 'applied');
+      assertEquals(second.status, 'skipped');
+      assertEquals(second.createdFiles, []);
+      assertEquals(second.modifiedFiles, []);
+    } finally {
+      await Deno.remove(projectRoot, { recursive: true });
+    }
+  });
 });
 
 class FixturePluginValidator implements JsrPluginValidatorPort {
@@ -538,4 +671,82 @@ async function assertFalseExists(path: string): Promise<void> {
     throw error;
   }
   throw new Error(`Expected ${path} not to exist.`);
+}
+
+function workersDescriptor(): ValidatedPluginDescriptor {
+  return {
+    package: {
+      requestedSpec: 'workers',
+      source: 'bare-alias',
+      scope: 'netscript',
+      packageName: 'plugin-workers',
+      packageSpecifier: '@netscript/plugin-workers',
+      jsrSpecifier: 'jsr:@netscript/plugin-workers',
+      alias: 'workers',
+    },
+    version: '0.0.1-alpha.12',
+    manifest: {
+      schemaVersion: 1,
+      name: '@netscript/plugin-workers',
+      version: '0.0.1-alpha.12',
+      displayName: 'Background Worker',
+      description:
+        'NetScript plugin for background job scheduling, task execution, and worker API endpoints.',
+      peerDependencies: {
+        '@netscript/plugin': '0.0.1-alpha.12',
+      },
+      capabilities: {
+        hasDatabaseMigrations: true,
+        hasRoutes: true,
+        hasBackgroundWorkers: true,
+      },
+      scaffolder: {
+        export: './scaffold',
+        requiredPermissions: {
+          net: [],
+          read: ['<workspaceRoot>'],
+          write: ['<workspaceRoot>'],
+        },
+      },
+      provider: {
+        kind: 'worker',
+        displayName: 'Background Worker',
+        category: 'background-processor',
+        portRangeKey: 'INFRA_PLUGIN',
+        defaultPermissions: [
+          '--unstable-kv',
+          '--allow-net',
+          '--allow-env',
+          '--allow-read',
+          '--allow-write',
+          '--allow-run',
+        ],
+        watchFlag: '--watch',
+        defaultEntrypoint: 'bin/combined.ts',
+        defaultServiceEntrypoint: 'services/src/main.ts',
+        defaultRequiresDb: true,
+        defaultRequiresKv: true,
+        pluginType: 'background-processor',
+        supportsConcurrency: true,
+        concurrencyEnvVar: 'WORKER_CONCURRENCY',
+        defaultConcurrency: 2,
+        defaultTelemetry: true,
+        infrastructureRequires: ['kv'],
+        infrastructureOptionalDeps: ['db'],
+      },
+    },
+    packageMetadata: {
+      latest: '0.0.1-alpha.12',
+      isYanked: false,
+    },
+    versionMetadata: {
+      exports: { '.': './mod.ts', './scaffold': './src/scaffold/mod.ts' },
+      files: { '/scaffold.plugin.json': 'sha256-good' },
+    },
+    details: {
+      description:
+        'NetScript plugin for background job scheduling, task execution, and worker API endpoints.',
+      score: 95,
+    },
+  };
 }

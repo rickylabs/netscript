@@ -400,3 +400,100 @@ scaffolders without relying on unsupported Deno behavior.
 - No real JSR package code or network was executed in unit tests.
 - Local-path integrity is intentionally not checked against JSR `_meta.json` checksums; local path is
   an explicit maintainer-selected source, and the manifest is parsed from disk before execution.
+
+## S6 Evidence — `plugin-workers` DX `./scaffold` Entrypoint + Manifest
+
+Timestamp: 2026-06-28T14:35:00Z
+
+### Scope
+
+- Added the workers plugin-owned scaffold entrypoint:
+  - `plugins/workers/scaffold.ts` is the local-path executable wrapper S4 resolves from
+    `scaffold.plugin.json` (`deno run <local-path>/scaffold.ts ...`).
+  - `plugins/workers/src/scaffold/mod.ts` exports
+    `scaffold(ctx: ScaffolderContext): Promise<ScaffoldResult>` and parses the S4
+    `--context-json` argv contract when run as a CLI.
+  - `plugins/workers/src/scaffold/artifacts.ts` owns the deterministic workers artifact list:
+    plugin `deno.json`, manifest `mod.ts`, service/router, contracts, Prisma schema, background
+    entrypoint, and sample job/task files.
+  - `plugins/workers/src/scaffold/files.ts` writes only missing or changed files and returns
+    workspace-relative `createdFiles` / `modifiedFiles`.
+- Updated `plugins/workers/deno.json` to export `./scaffold`, check `scaffold.ts` and
+  `src/scaffold/mod.ts`, and publish the root `scaffold.ts` wrapper.
+- Added focused S6 coverage to
+  `packages/cli/src/public/features/plugins/add/add-plugin_test.ts`:
+  real `--local-path` workers add via the S4 runner, real workers dry-run no-write, and direct
+  re-run idempotency through `dispatchPluginScaffold()`.
+- Added a minimal `@module` tag to the existing public `./cli` export entrypoint so the full
+  workers export map passes the JSR audit after adding `./scaffold`.
+
+### PLAN-EVAL Note 4 — Self-Contained Import Graph
+
+- Verified the new workers scaffolder does not import `@netscript/cli` or any `packages/cli` path.
+- Command: `rtk rg -n " as |@netscript/cli|packages/cli" plugins/workers/scaffold.ts plugins/workers/src/scaffold plugins/workers/deno.json`
+  returned no matches.
+- The source import graph for the new scaffolder is limited to:
+  - `@netscript/plugin/protocol` type import in `src/scaffold/mod.ts`.
+  - `@std/path` in `src/scaffold/files.ts`.
+  - Relative imports within `plugins/workers/src/scaffold/`.
+- This keeps the `deno x jsr:@netscript/plugin-workers/scaffold` and `deno run
+  plugins/workers/scaffold.ts` paths independent of `@netscript/cli` and a monorepo checkout.
+
+### Idempotency and Dry-Run Evidence
+
+- Real workers local-path add:
+  `deno test -A --unstable-kv packages/cli/src/public/features/plugins/add/add-plugin_test.ts`
+  includes `adds workers from the real local-path plugin-owned scaffolder` and passed. It asserts
+  `pluginOwnedScaffold.status === "applied"`, `databaseMigrationsAdded === true`, and emitted
+  workers service + Prisma artifacts from the plugin-owned runner.
+- Dry-run:
+  the same test command includes `previews the real workers local-path scaffolder without writing
+  files` and passed. It asserts planned workers artifacts and absence of
+  `plugins/workers/mod.ts` / `plugins/workers/database/schema.prisma` on disk.
+- Re-run idempotency:
+  the same test command includes `reruns the real workers scaffolder idempotently` and passed. The
+  first direct `dispatchPluginScaffold()` call returned `applied`; the second returned `skipped`
+  with empty `createdFiles` and `modifiedFiles`.
+
+### Fitness Gates Touched
+
+| Gate | S6 evidence |
+| ---- | ----------- |
+| F-3 | New plugin scaffolder code stays under the workers plugin surface; no CLI implementation import. |
+| F-5 | `./scaffold` is an explicit public subpath export with module docs via `scaffold.ts` / `src/scaffold/mod.ts`. |
+| F-6 | `deno task publish:dry-run` from `plugins/workers` passed with the new export included. |
+| F-7 | JSR audit helper exits 0 for the full workers export map after adding the existing `./cli` module tag. |
+| F-8 | No compiler lib override changed. |
+| F-9 | Manifest permissions remain declared for `./scaffold`; S4 tests run the local path under first-party flags. |
+| F-10 | Added real local-path add, dry-run no-write, and re-run idempotency tests. |
+| F-11 | New folder is role-named `src/scaffold`; no generic helper/common folder introduced. |
+| F-12 | New names are domain-specific (`buildWorkerScaffoldArtifacts`, `writePlannedFiles`, `runScaffoldCli`). |
+| F-14 | Runtime JSON output uses `Deno.stdout.write`; no `console.*` in the new scaffolder source. |
+| F-15 | No upstream package re-export introduced. |
+| F-16 | New `src/scaffold` directory has three files, below cardinality cap. |
+| F-18 | No subdirectory barrel; `src/scaffold/mod.ts` is a declared public export target through root `scaffold.ts`. |
+| F-CLI-11 | Local-path source mode is exercised against the real workers plugin path. |
+| F-CLI-16 | Process execution stays behind `DenoProcess` / `dispatchPluginScaffold()` in tests. |
+| F-CLI-19 | Dry-run returns planned files and writes nothing. |
+| F-CLI-21 | CLI test additions stay in the existing add-flow test file and do not add a new command surface. |
+
+### Gate Results
+
+| Gate | Command | Result |
+| ---- | ------- | ------ |
+| Check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/workers --root packages/cli --ext ts,tsx` | PASS; 622 files, 0 occurrences. |
+| Plugin lint wrapper | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root plugins/workers --ext ts,tsx` | PASS; 81 files, 0 occurrences. |
+| Plugin fmt wrapper | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/workers --ext ts,tsx` | PASS; 81 files, 0 findings. |
+| CLI lint fallback | `deno lint --no-config packages/cli/src/public/features/plugins/add/add-plugin_test.ts` | PASS; checked 1 file. The root config excludes `packages/cli`, so wrapper/raw config lint reports no target files or exits 1 with 0 findings for this legacy root. |
+| CLI fmt fallback | `deno fmt --check --no-config --single-quote --line-width 100 --indent-width 2 --no-semicolons=false packages/cli/src/public/features/plugins/add/add-plugin_test.ts` | PASS; checked 1 file. |
+| Focused S6 tests | `deno test -A --unstable-kv packages/cli/src/public/features/plugins/add/add-plugin_test.ts` | PASS; 1 test suite, 10 steps, 0 failed. |
+| JSR audit | `deno run --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root plugins/workers --text` | PASS; exits 0. Remaining warnings are pre-existing folder cardinality and the helper's known slow-types banner overcount; raw publish dry-run is clean for slow types. |
+| Publish dry-run | `deno task publish:dry-run` from `plugins/workers` | PASS; includes `scaffold.ts` and `src/scaffold/*`; existing dynamic-import warnings remain. |
+
+### Notes
+
+- `deno.lock` was not touched.
+- No new TypeScript casts were introduced in source or generated scaffold templates.
+- The prompt-requested `deno doc @netscript/plugin/protocol` did not resolve as a bare local
+  specifier in this checkout; the equivalent protocol source
+  `packages/plugin/src/protocol/scaffolder.ts` was read and matched exactly.
