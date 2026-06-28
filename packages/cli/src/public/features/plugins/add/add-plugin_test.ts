@@ -105,6 +105,33 @@ const triggerProvider: PluginKindProvider = {
   infrastructureOptionalDeps: ['db'],
 };
 
+const streamsProvider: PluginKindProvider = {
+  kind: 'stream',
+  displayName: 'Durable Streams',
+  category: 'plugin',
+  portRangeKey: 'PLUGIN_API',
+  defaultPermissions: [
+    '--allow-net',
+    '--allow-env',
+    '--allow-read',
+    '--allow-write',
+    '--allow-sys',
+    '--allow-ffi',
+  ],
+  watchFlag: '--watch',
+  defaultEntrypoint: 'services/src/main.ts',
+  defaultServiceEntrypoint: 'services/src/main.ts',
+  defaultRequiresDb: false,
+  defaultRequiresKv: false,
+  pluginType: 'utility',
+  supportsConcurrency: false,
+  concurrencyEnvVar: null,
+  defaultConcurrency: null,
+  defaultTelemetry: true,
+  infrastructureRequires: [],
+  infrastructureOptionalDeps: [],
+};
+
 describe('public add plugin flow', () => {
   it('plans a starter plugin request from project metadata', async () => {
     const fs = new MemoryFileSystemAdapter();
@@ -870,6 +897,147 @@ describe('public add plugin flow', () => {
       await Deno.remove(projectRoot, { recursive: true });
     }
   });
+
+  it('runs the real streams local-path scaffolder through plugin add', async () => {
+    const projectRoot = await Deno.makeTempDir();
+    const streamsRoot = resolve('plugins/streams');
+    try {
+      await writeRealProjectFiles(projectRoot);
+      const fs = new DenoFileSystem();
+      const templateAdapter = new StringTemplateAdapter(fs);
+      const scaffolder = new Scaffolder(templateAdapter, fs);
+      const registry = new PluginKindRegistry();
+
+      const result = await addPlugin({
+        kind: 'streams',
+        pluginName: 'streams',
+        serviceReferences: [],
+        pluginReferences: [],
+        noDb: true,
+        includeSamples: true,
+        localPath: streamsRoot,
+        projectRoot,
+        overwrite: false,
+      }, {
+        fs,
+        scaffolder,
+        templateAdapter,
+        registry,
+        pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
+        registryScaffolder: new PluginRegistryScaffolder(scaffolder),
+        workspaceMutator: new PluginWorkspaceMutator(fs),
+        processRunner: new DenoProcess(),
+        regenerateHelpers: () => Promise.resolve([]),
+      });
+
+      assertEquals(result.pluginOwnedScaffold?.status, 'applied');
+      assertEquals(result.pluginOwnedScaffold?.databaseMigrationsAdded, false);
+      assertStringIncludes(
+        result.pluginOwnedScaffold?.createdFiles.join('\n') ?? '',
+        'plugins/streams/services/src/routes.ts',
+      );
+      assertStringIncludes(
+        result.pluginOwnedScaffold?.createdFiles.join('\n') ?? '',
+        'plugins/streams/src/streams/mod.ts',
+      );
+      assertStringIncludes(
+        await Deno.readTextFile(join(projectRoot, 'plugins/streams/mod.ts')),
+        "definePlugin('streams', '0.1.0')",
+      );
+      assertStringIncludes(
+        await Deno.readTextFile(join(projectRoot, 'plugins/streams/services/src/routes.ts')),
+        'DurableStreamTestServer',
+      );
+      assertStringIncludes(
+        await Deno.readTextFile(join(projectRoot, 'plugins/streams/src/aspire/mod.ts')),
+        "entrypoint: 'plugins/streams/services/src/main.ts'",
+      );
+    } finally {
+      await Deno.remove(projectRoot, { recursive: true });
+    }
+  });
+
+  it('previews the real streams local-path scaffolder without writing files', async () => {
+    const projectRoot = await Deno.makeTempDir();
+    const streamsRoot = resolve('plugins/streams');
+    try {
+      await writeRealProjectFiles(projectRoot);
+      const fs = new DenoFileSystem();
+      const templateAdapter = new StringTemplateAdapter(fs);
+      const scaffolder = new Scaffolder(templateAdapter, fs);
+      const registry = new PluginKindRegistry();
+
+      const result = await addPlugin({
+        kind: 'streams',
+        pluginName: 'streams',
+        serviceReferences: [],
+        pluginReferences: [],
+        noDb: true,
+        includeSamples: true,
+        dryRun: true,
+        localPath: streamsRoot,
+        projectRoot,
+        overwrite: false,
+      }, {
+        fs,
+        scaffolder,
+        templateAdapter,
+        registry,
+        pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
+        registryScaffolder: new PluginRegistryScaffolder(scaffolder),
+        workspaceMutator: new PluginWorkspaceMutator(fs),
+        processRunner: new DenoProcess(),
+        regenerateHelpers: () => Promise.resolve([]),
+      });
+
+      assertEquals(result.pluginOwnedScaffold?.status, 'planned');
+      assertEquals(result.pluginOwnedScaffold?.databaseMigrationsAdded, false);
+      assertStringIncludes(
+        result.pluginOwnedScaffold?.createdFiles.join('\n') ?? '',
+        'plugins/streams/services/src/main.ts',
+      );
+      await assertFalseExists(join(projectRoot, 'plugins/streams/mod.ts'));
+      await assertFalseExists(join(projectRoot, 'plugins/streams/services/src/routes.ts'));
+    } finally {
+      await Deno.remove(projectRoot, { recursive: true });
+    }
+  });
+
+  it('reruns the real streams scaffolder idempotently', async () => {
+    const projectRoot = await Deno.makeTempDir();
+    const streamsRoot = resolve('plugins/streams');
+    const descriptor = streamsDescriptor();
+    try {
+      await writeRealProjectFiles(projectRoot);
+
+      const first = await dispatchPluginScaffold({
+        descriptor,
+        source: { kind: 'local-path', path: streamsRoot },
+        projectRoot,
+        pluginName: 'streams',
+        dryRun: false,
+        permissionFlags: ['-A'],
+        processRunner: new DenoProcess(),
+      });
+      const second = await dispatchPluginScaffold({
+        descriptor,
+        source: { kind: 'local-path', path: streamsRoot },
+        projectRoot,
+        pluginName: 'streams',
+        dryRun: false,
+        permissionFlags: ['-A'],
+        processRunner: new DenoProcess(),
+      });
+
+      assertEquals(first.status, 'applied');
+      assertEquals(second.status, 'skipped');
+      assertEquals(second.createdFiles, []);
+      assertEquals(second.modifiedFiles, []);
+      assertEquals(second.databaseMigrationsAdded, false);
+    } finally {
+      await Deno.remove(projectRoot, { recursive: true });
+    }
+  });
 });
 
 class FixturePluginValidator implements JsrPluginValidatorPort {
@@ -1221,6 +1389,77 @@ function triggersDescriptor(): ValidatedPluginDescriptor {
     details: {
       description:
         'NetScript plugin for trigger ingress, scheduling, file watching, and trigger runtime APIs.',
+      score: 95,
+    },
+  };
+}
+
+function streamsDescriptor(): ValidatedPluginDescriptor {
+  return {
+    package: {
+      requestedSpec: 'streams',
+      source: 'bare-alias',
+      scope: 'netscript',
+      packageName: 'plugin-streams',
+      packageSpecifier: '@netscript/plugin-streams',
+      jsrSpecifier: 'jsr:@netscript/plugin-streams',
+      alias: 'streams',
+    },
+    version: '0.0.1-alpha.12',
+    manifest: {
+      schemaVersion: 1,
+      name: '@netscript/plugin-streams',
+      version: '0.0.1-alpha.12',
+      displayName: 'Durable Streams',
+      description:
+        'Durable Streams service, CLI, Aspire, E2E, and scaffolding plugin for NetScript.',
+      peerDependencies: {
+        '@netscript/plugin': '0.0.1-alpha.12',
+      },
+      capabilities: {
+        hasDatabaseMigrations: false,
+        hasRoutes: true,
+        hasBackgroundWorkers: false,
+      },
+      scaffolder: {
+        export: './scaffold',
+        requiredPermissions: {
+          net: [],
+          read: ['<workspaceRoot>'],
+          write: ['<workspaceRoot>'],
+        },
+      },
+      provider: {
+        kind: streamsProvider.kind,
+        displayName: streamsProvider.displayName,
+        category: streamsProvider.category,
+        portRangeKey: streamsProvider.portRangeKey,
+        defaultPermissions: streamsProvider.defaultPermissions,
+        watchFlag: streamsProvider.watchFlag,
+        defaultEntrypoint: streamsProvider.defaultEntrypoint,
+        defaultServiceEntrypoint: streamsProvider.defaultServiceEntrypoint ?? '',
+        defaultRequiresDb: streamsProvider.defaultRequiresDb,
+        defaultRequiresKv: streamsProvider.defaultRequiresKv,
+        pluginType: streamsProvider.pluginType,
+        supportsConcurrency: streamsProvider.supportsConcurrency,
+        concurrencyEnvVar: streamsProvider.concurrencyEnvVar,
+        defaultConcurrency: streamsProvider.defaultConcurrency,
+        defaultTelemetry: streamsProvider.defaultTelemetry,
+        infrastructureRequires: streamsProvider.infrastructureRequires,
+        infrastructureOptionalDeps: streamsProvider.infrastructureOptionalDeps,
+      },
+    },
+    packageMetadata: {
+      latest: '0.0.1-alpha.12',
+      isYanked: false,
+    },
+    versionMetadata: {
+      exports: { '.': './mod.ts', './scaffold': './scaffold.ts' },
+      files: { '/scaffold.plugin.json': 'sha256-good' },
+    },
+    details: {
+      description:
+        'Durable Streams service, CLI, Aspire, E2E, and scaffolding plugin for NetScript.',
       score: 95,
     },
   };

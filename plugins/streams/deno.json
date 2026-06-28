@@ -5,6 +5,7 @@
   "license": "MIT",
   "exports": {
     ".": "./mod.ts",
+    "./scaffold": "./scaffold.ts",
     "./cli": "./src/cli/composition/main.ts",
     "./scaffolding": "./src/scaffolding/mod.ts",
     "./e2e": "./src/e2e/mod.ts",
@@ -26,7 +27,7 @@
     "zod": "jsr:@zod/zod@4.4.3"
   },
   "tasks": {
-    "check": "deno check --unstable-kv mod.ts src/cli/composition/main.ts src/scaffolding/mod.ts src/e2e/mod.ts src/e2e/probes/*.ts src/aspire/mod.ts verify-plugin.ts services/src/main.ts",
+    "check": "deno check --unstable-kv mod.ts scaffold.ts src/scaffold/mod.ts src/cli/composition/main.ts src/scaffolding/mod.ts src/e2e/mod.ts src/e2e/probes/*.ts src/aspire/mod.ts verify-plugin.ts services/src/main.ts",
     "dev": "deno run --allow-net --allow-env --allow-read --allow-write --allow-sys --allow-ffi --watch services/src/main.ts",
     "start": "deno run --allow-net --allow-env --allow-read --allow-write --allow-sys --allow-ffi services/src/main.ts",
     "streams:e2e": "deno run --allow-net --allow-env src/e2e/probes/health.ts && deno run --allow-all src/e2e/probes/publish.ts && deno run --allow-net --allow-env src/e2e/probes/subscribe.ts",
@@ -38,6 +39,7 @@
       "README.md",
       "deno.json",
       "scaffold.plugin.json",
+      "scaffold.ts",
       "mod.ts",
       "src/**/*.ts",
       "services/**/*.ts"

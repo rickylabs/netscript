@@ -679,3 +679,93 @@ Timestamp: 2026-06-28T14:35:00Z
   matched cast in touched files is the pre-existing `kv as Deno.Kv` in
   `plugins/triggers/services/src/main.ts`.
 - S8 did not remove or rewire the CLI copier/official-source path; that remains deferred to S5.
+
+## S9 — `plugin-streams` dx `./scaffold` entrypoint
+
+### Implementation Summary
+
+- Added `plugins/streams/scaffold.ts` as the package-owned executable `./scaffold` entrypoint.
+- Added `plugins/streams/src/scaffold/{mod.ts,artifacts.ts,files.ts}` implementing the S1
+  `scaffold(ctx: ScaffolderContext): Promise<ScaffoldResult>` contract with the S4
+  `--context-json` CLI contract.
+- Ported streams-specific artifact emission into the plugin package: durable streams service
+  entrypoint, service routes around `DurableStreamTestServer`, stream topic wiring,
+  `src/aspire/mod.ts`, and a health E2E module. The scaffolder reports
+  `databaseMigrationsAdded: false`.
+- Updated `plugins/streams/deno.json` to export and publish `./scaffold`.
+- Added minimal `@module` docs to existing public `./cli` entrypoint because expanding the export
+  map made the package-level JSR audit evaluate that sibling entrypoint.
+- Updated the focused CLI integration test to drive the real `plugins/streams` local path through
+  `addPlugin()` / `dispatchPluginScaffold()` for add, dry-run, and rerun-idempotency coverage.
+
+### PLAN-EVAL Note 4 — Self-Contained Import Graph
+
+- Verified the new streams `./scaffold` graph has no `@netscript/cli` or `packages/cli` import:
+  `deno info --json plugins/streams/scaffold.ts` filtered to local modules returned only:
+  `packages/plugin/src/domain/*`, `packages/plugin/src/protocol/*`,
+  `plugins/streams/scaffold.ts`, and `plugins/streams/src/scaffold/*`.
+- Runtime imports are confined to the streams scaffolder files and a type-only
+  `@netscript/plugin/protocol` contract import. The writer uses local path normalization instead of
+  adding `@std/path`, so no new dependency or lockfile entry is required.
+
+### Idempotency and Dry-Run Evidence
+
+- Real streams local-path add:
+  `deno test -A --unstable-kv packages/cli/src/public/features/plugins/add/add-plugin_test.ts`
+  includes `runs the real streams local-path scaffolder through plugin add` and passed. It asserts
+  `pluginOwnedScaffold.status === "applied"`, `databaseMigrationsAdded === false`, emitted
+  `plugins/streams/services/src/routes.ts`, emitted `plugins/streams/src/streams/mod.ts`, wrote
+  `definePlugin('streams', '0.1.0')`, included `DurableStreamTestServer`, and emitted Aspire wiring
+  for `plugins/streams/services/src/main.ts`.
+- Dry-run:
+  the same command includes `previews the real streams local-path scaffolder without writing files`
+  and passed. It asserts planned service artifacts and absence of
+  `plugins/streams/mod.ts` / `plugins/streams/services/src/routes.ts` on disk.
+- Re-run idempotency:
+  the same command includes `reruns the real streams scaffolder idempotently` and passed. The first
+  direct `dispatchPluginScaffold()` call returned `applied`; the second returned `skipped` with
+  empty `createdFiles` and `modifiedFiles`, and `databaseMigrationsAdded === false`.
+
+### Fitness Gates Touched
+
+| Gate | S9 evidence |
+| ---- | ----------- |
+| F-3 | New plugin scaffolder code stays under the streams plugin surface; no CLI implementation import. |
+| F-5 | `./scaffold` is an explicit public subpath export with module docs and public context/result types. |
+| F-6 | `deno task publish:dry-run` from `plugins/streams` passed with `scaffold.ts` and `src/scaffold/*` included. |
+| F-7 | JSR audit helper exits 0 for the full streams export map after adding missing module docs to existing `./cli`. |
+| F-8 | No compiler lib override changed. |
+| F-9 | Manifest permissions remain declared for `./scaffold`; S4 tests run the local path under first-party flags. |
+| F-10 | Added real local-path add, dry-run no-write, and re-run idempotency tests for streams. |
+| F-11 | New folder is role-named `src/scaffold`; no generic helper/common folder introduced. |
+| F-12 | New names are domain-specific (`buildStreamsScaffoldArtifacts`, `writePlannedFiles`, `runScaffoldCli`). |
+| F-13 | Streams runtime artifacts include durable stream service routing, stream topic wiring, Aspire, and E2E health contribution; no database migration is expected. |
+| F-14 | Runtime JSON output uses `Deno.stdout.write`; no `console.*` in the new scaffolder source. |
+| F-15 | No upstream package re-export introduced. |
+| F-16 | New `src/scaffold` directory has three files, below cardinality cap. |
+| F-18 | No subdirectory barrel; `src/scaffold/mod.ts` is reached through the declared root `scaffold.ts` export. |
+| F-CLI-11 | Local-path source mode is exercised against the real streams plugin path. |
+| F-CLI-16 | Process execution stays behind `DenoProcess` / `dispatchPluginScaffold()` in tests. |
+| F-CLI-19 | Dry-run returns planned files and writes nothing. |
+| F-CLI-21 | CLI test additions stay in the existing add-flow test file and do not add a new command surface. |
+
+### Gate Results
+
+| Gate | Command | Result |
+| ---- | ------- | ------ |
+| Streams check wrapper | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/streams --ext ts,tsx` | PASS; 25 files, 0 occurrences. |
+| CLI check wrapper | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | PASS; 541 files, 0 occurrences. |
+| Streams lint wrapper | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root plugins/streams --ext ts,tsx` | PASS; 25 files, 0 occurrences. |
+| Streams fmt wrapper | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/streams --ext ts,tsx` | PASS; 25 files, 0 findings. |
+| CLI lint/fmt fallback | `deno lint --no-config packages/cli/src/public/features/plugins/add/add-plugin_test.ts && deno fmt --check --no-config --line-width 100 --indent-width 2 --single-quote --no-semicolons=false packages/cli/src/public/features/plugins/add/add-plugin_test.ts` | PASS; checked 1 touched test file for lint and format. Package-root lint/fmt wrappers still exit 1 with 0 findings due the known CLI config exclusion behavior. |
+| Focused S9 tests | `deno test -A --unstable-kv packages/cli/src/public/features/plugins/add/add-plugin_test.ts` | PASS; 1 test suite, 19 steps, 0 failed. |
+| Import graph | `deno info --json plugins/streams/scaffold.ts` filtered to local modules | PASS; no `@netscript/cli` / `packages/cli` import; only plugin protocol and streams scaffold modules. |
+| JSR audit | `deno run --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root plugins/streams --text` | PASS; exits 0. Remaining warning is the helper's slow-types banner overcount; `publish:dry-run` itself succeeds. |
+| Publish dry-run | `deno task publish:dry-run` from `plugins/streams` | PASS; includes `scaffold.ts` and `src/scaffold/*`; reports `Success Dry run complete`. |
+
+### Notes
+
+- `deno.lock` was not touched in the final diff. An intermediate dependency-resolution move was
+  reverted, and the scaffolder writer was changed to avoid adding `@std/path`.
+- No new TypeScript casts were introduced in source or generated scaffold templates.
+- S9 did not remove or rewire the CLI copier/official-source path; that remains deferred to S5.
