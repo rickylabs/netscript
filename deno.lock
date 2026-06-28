@@ -86,6 +86,7 @@
     "jsr:@std/text@^1.0.19": "1.0.19",
     "jsr:@std/ulid@1": "1.0.0",
     "jsr:@std/uuid@^1.0.9": "1.1.1",
+    "jsr:@std/yaml@1": "1.1.1",
     "jsr:@zod/zod@4.4.3": "4.4.3",
     "npm:@durable-streams/client@~0.2.6": "0.2.6",
     "npm:@durable-streams/server@~0.3.7": "0.3.7_@tanstack+db@0.6.8__typescript@6.0.3",
@@ -524,6 +525,9 @@
       "dependencies": [
         "jsr:@std/bytes@^1.0.6"
       ]
+    },
+    "@std/yaml@1.1.1": {
+      "integrity": "a57665ecf3d17b926380593a56625d8a10cc7281802f1e993b5ebc94a48e71f8"
     },
     "@zod/zod@4.4.3": {
       "integrity": "4712ac0967efaa718b37c36eaffb4e1d4457e1a266aef6efb3ab36f54a6fefe4"
