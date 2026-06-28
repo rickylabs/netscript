@@ -16,6 +16,8 @@
 - C5 `a55d2190`: `refactor(plugins): migrate sagas triggers and auth scaffolders`
 - C5b `bdd95445`: `feat(plugin): extract scaffold skeleton helpers`
 - C6 final verification evidence commit: this commit.
+- C7a `b6d38104`: `fix(plugin): harden scaffold core entrypoint`
+- C7b `ce64a2bf`: `feat(plugin): centralize auth scaffold deno config`
 
 ## Final State
 
@@ -23,6 +25,12 @@
 - Core owns scaffold value types, schema URL generation, manifest generation, filesystem-backed
   base scaffolder, CLI `--context-json` runner, generated-plugin `deno.json` envelope, and standard
   root artifact trio.
+- C7 kept the abstract `PluginScaffolder` base per supervisor disposition, removed the concrete
+  filesystem adapter default from the base constructor, and constructs `DenoFileSystemAdapter` at
+  the `toEntrypoint` composition edge.
+- Core now owns the shared `options.pluginName` parser/validator as `readScaffoldPluginName(...)`.
+- Core `buildPluginDenoJson(...)` now accepts auth's package metadata, publish filters, task/import
+  map, and compiler-option data while preserving previous auth generated `deno.json` bytes.
 - Workers, streams, sagas, triggers, and auth expose thin `./scaffold` surfaces through
   `toEntrypoint(...)` and core `runScaffoldCli(...)`.
 - Plugin-local `files.ts` / `writePlannedFiles` adapters were removed.
@@ -32,18 +40,18 @@
 
 ## Drift / Debt
 
-- `drift.md` records the C5b byte-stability boundary: auth keeps its published-package
-  `deno.json` template because centralizing it through the generated-plugin envelope would change
-  package name/version, publish config, compiler options, and task fields.
+- `drift.md` records C7 dispositions: Finding 1 was narrow hardening only, Finding 2 was a false
+  positive documented in JSDoc with no behavior or manifest-byte change, and C7b superseded the C5b
+  auth `deno.json` boundary by centralizing it byte-stably.
 - No new architecture debt was added for the scaffold-core implementation.
 
 ## Final Gate Results
 
 - `deno task plugins:check`: PASS.
 - `deno task arch:check`: PASS, warnings only.
-- Full scaffold doc lint over all `packages/plugin/src/scaffold/*.ts`: PASS, 8 files checked.
-- Scoped check/lint/fmt on `packages/plugin` + `plugins`: PASS, 420 TS/TSX files selected.
-- `deno task test`: PASS, 935 passed, 0 failed, 12 ignored.
+- Full scaffold doc lint over all `packages/plugin/src/scaffold/*.ts`: PASS, 10 files checked.
+- Scoped check/lint/fmt on `packages/plugin` + `plugins`: PASS, 421 TS/TSX files selected.
+- `deno task test`: PASS, 939 passed, 0 failed, 12 ignored.
 - `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`: PASS, passed=48 failed=0.
 - Publish dry-runs for `@netscript/plugin` and all five plugins: PASS, existing dynamic-import
   warnings only.

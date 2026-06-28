@@ -14,3 +14,4 @@
 - bdd95445: feat(plugin): extract scaffold skeleton helpers
 - C6-final: chore(harness): record scaffold core verification
 - b6d38104: fix(plugin): harden scaffold core entrypoint
+- ce64a2bf: feat(plugin): centralize auth scaffold deno config

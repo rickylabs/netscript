@@ -230,6 +230,28 @@
 | Full scaffold doc lint | PASS | `deno doc --lint packages/plugin/src/scaffold/*.ts` — checked 10 files. |
 | Manifest check | PASS | `deno task plugins:check` — `plugins:check passed`. |
 | Full test | PASS | `deno task test` — 939 passed, 0 failed, 12 ignored. |
+
+## C7 final verification
+
+- Re-ran the full merge-readiness verification matrix after C7a and C7b were committed.
+- Runtime E2E smoke completed from the native worktree with cleanup enabled.
+- Publish dry-runs completed for `@netscript/plugin`, workers, streams, sagas, triggers, and auth.
+- Restored resolver-only `deno.lock` churn to HEAD; no lockfile change is committed.
+
+### C7 final gate evidence
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Manifest check | PASS | `deno task plugins:check` — `plugins:check passed`. |
+| Architecture check | PASS | `deno task arch:check` — exit 0; warnings only, no failures. |
+| Full scaffold doc lint | PASS | `deno doc --lint packages/plugin/src/scaffold/*.ts` — checked 10 files. |
+| Scoped package/plugin check | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin --root plugins --ext ts,tsx` — 421 files selected, 0 failed batches. |
+| Scoped package/plugin lint | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin --root plugins --ext ts,tsx` — 421 files selected, 0 occurrences. |
+| Scoped package/plugin fmt | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin --root plugins --ext ts,tsx` — 421 files selected, 0 findings. |
+| Full test | PASS | `deno task test` — 939 passed, 0 failed, 12 ignored. |
+| Runtime E2E | PASS | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` — raw exit 0, passed=48 failed=0. |
+| Publish dry-runs | PASS | `deno publish --dry-run --allow-dirty` from `packages/plugin`, `plugins/workers`, `plugins/streams`, `plugins/sagas`, `plugins/triggers`, and `plugins/auth` — all exited 0; existing dynamic-import warnings only. |
+| Lock hygiene | PASS | `git checkout -- deno.lock` restored resolver churn before final artifact staging; `deno.lock` is not committed. |
 | Lock hygiene | PASS | `git checkout -- deno.lock` restored resolver churn before commit; `deno.lock` was not committed. |
 
 ## C2 progress — scaffold manifest builder
