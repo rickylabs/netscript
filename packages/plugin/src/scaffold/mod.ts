@@ -16,9 +16,17 @@
 
 export type { PluginLogger } from '../domain/mod.ts';
 export type {
+  PluginManifestCapabilities,
+  PluginManifestOfficialSource,
+  PluginManifestPostScript,
+  PluginManifestProvider,
+  PluginManifestScaffolder,
   PluginScaffoldEntrypoint,
+  PluginScaffolderRequiredPermissions,
   ScaffolderContext,
   ScaffoldResult,
 } from '../protocol/mod.ts';
 export type { ScaffoldArtifact } from './artifact.ts';
+export { buildScaffoldPluginJson } from './manifest-spec.ts';
+export type { PluginScaffoldManifestSpec } from './manifest-spec.ts';
 export { scaffoldSchemaUrl } from './schema-url.ts';
