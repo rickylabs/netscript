@@ -1,0 +1,400 @@
+    2. `plugins:check` task absent today — confirmed via `grep "plugins:check" 
+deno.json` (no hit).
+       Decision 3 adds it.
+    3. `packages/plugin/deno.json` has no `./scaffold/version` export today — 
+confirmed by
+       inspection. Decision 4 fallback adds it; primary path doesn't need it.
+    4. `findVersionResidue()` in `.llm/tools/release/cut.ts:51` scans only 
+`.json` files — confirmed.
+       Decision 4 fallback's residue-scan extension to `.ts` is a concrete 
+delta.
+    5. Third `parsePluginManifest` call site at 
+`packages/cli/src/public/features/plugins/add/
+       add-plugin.ts:237` — confirmed by `grep -rn "parsePluginManifest\b" 
+packages/cli/src/public/`.
+       Cycle-1 scope was "JSR fetch paths," so this is a watcher note, not a 
+required fix.
+    6. `packages/plugin/tests/protocol/plugin-manifest_test.ts` exists and 
+covers (a) accepts-all-5 +
+       the strict-rejection class. Plan's Decision 6 commits to adding (b) 
+byte-stability and the
+       `$schema`-strip-passes case — named location, named assertions, discharge
+of the
+       zod→json-schema fidelity risk.
+    
+    Cycle-2 plan diff (`96c94c5b..4d601e6a`) shows 192 line edits concentrated 
+in the
+    "Research summary," "Locked decisions," "Gates," "Commit slices," and a new 
+"Cycle-1 fix map"
+    section — the right shape for a revision that pre-commits hedges.
+    
+    ## Responses to review comments or issue comments when relevant
+    
+    Cycle-1 verdict (run `28325898406-1`) returned `FAIL_PLAN` with 6 required 
+fixes. This cycle-2
+    evaluation addresses each and renders `PASS`. No new review comments 
+received on this PR between
+    cycles.
+    
+    ## Remaining risks
+    
+    - Watcher note #1: local-path `$schema` strip coverage (see eval doc). 
+Implementer must choose
+      between (a) push strip into `parsePluginManifest` (changes Decision 2's 
+"parsePluginManifest
+      stays unchanged" clause), (b) duplicate the strip at `add-plugin.ts:237`, 
+or (c) document the
+      gap and defer. Recommend (b) — smallest delta.
+    - Watcher note #2: `./schema` export shape — raw JSON vs thin 
+`./schema/mod.ts` barrel —
+      intentionally left to S1. Both publishable; verify via `deno publish 
+--dry-run --allow-dirty` for
+      `@netscript/plugin` at S1.
+    - Watcher note #3: Risk register is inline (Decisions 3/4/6 + "Debt / risk" 
+section) rather than
+      a separate heading. Plan-gate item met; optional nit if a future cycle 
+wants stricter audit shape.
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 1.91M • cache hit 92.42% •  reasoning 889 • ↓ output 14.73K • $ 
+0.1673
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/28326573122-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# PLAN-EVAL cycle 2 — `plugin-167-harden--impl`
+ 2|
++3|## Summary
++4|
++5|Evaluated the cycle-2 revised plan (`4d601e6a`) against the plan-gate 
+checklist and the six
++6|cycle-1 fixes. All six cycle-1 fixes are concretely resolved: Decisions 2/3/4
+are no longer hedged
++7|(strip-before-parse at JSR fetch sites, explicit `arch:check` step in CI, 
+e2e-determined
++8|version-coherence with fallback in the same S4 commit), Decisions 5/6 add the
+publishable schema
++9|asset and the round-trip test, and S5 acceptance is bound to the full gate 
+set in-slice. Verdict:
++10|**PASS_PLAN**, implementation may begin. Three non-blocking watcher notes 
+for IMPL-EVAL are
++11|recorded (most important: the local-path parse site at `add-plugin.ts:237` 
+is a third
++12|`parsePluginManifest` call site that cycle-1 didn't scope, but S2 will add 
+`$schema` to all
++13|committed manifests so the strip needs to land there too — or be pushed down
+into
++14|`parsePluginManifest`).
++15|
++16|## Changes
++17|
++18|- Created `.llm/tmp/run/plugin-167-harden--impl/eval-cycle2.md` — full 
+evaluation doc with the
++19|  cycle-1 fix map, plan-gate walkthrough, and watcher notes.
++20|- No source code changes. Branch unchanged at `4d601e6a`. Lock file 
+untouched.
++21|
++22|## Validation
++23|
++24|Spot-checked six load-bearing claims against the tree:
++25|
++26|1. `arch:check` not in CI — confirmed via `grep "arch:check\|plugins:check" 
+.github/workflows/`
++27|   (zero hits); ci.yml quality job (L58-98) confirmed to lack it. Decision 
+3/S3's delta is real.
++28|2. `plugins:check` task absent today — confirmed via `grep "plugins:check" 
+deno.json` (no hit).
++29|   Decision 3 adds it.
++30|3. `packages/plugin/deno.json` has no `./scaffold/version` export today — 
+confirmed by
++31|   inspection. Decision 4 fallback adds it; primary path doesn't need it.
++32|4. `findVersionResidue()` in `.llm/tools/release/cut.ts:51` scans only 
+`.json` files — confirmed.
++33|   Decision 4 fallback's residue-scan extension to `.ts` is a concrete 
+delta.
++34|5. Third `parsePluginManifest` call site at 
+`packages/cli/src/public/features/plugins/add/
++35|   add-plugin.ts:237` — confirmed by `grep -rn "parsePluginManifest\b" 
+packages/cli/src/public/`.
++36|   Cycle-1 scope was "JSR fetch paths," so this is a watcher note, not a 
+required fix.
++37|6. `packages/plugin/tests/protocol/plugin-manifest_test.ts` exists and 
+covers (a) accepts-all-5 +
++38|   the strict-rejection class. Plan's Decision 6 commits to adding (b) 
+byte-stability and the
++39|   `$schema`-strip-passes case — named location, named assertions, discharge
+of the
++40|   zod→json-schema fidelity risk.
++41|
++42|Cycle-2 plan diff (`96c94c5b..4d601e6a`) shows 192 line edits concentrated 
+in the
++43|"Research summary," "Locked decisions," "Gates," "Commit slices," and a new 
+"Cycle-1 fix map"
++44|section — the right shape for a revision that pre-commits hedges.
++45|
++46|## Responses to review comments or issue comments when relevant
++47|
++48|Cycle-1 verdict (run `28325898406-1`) returned `FAIL_PLAN` with 6 required 
+fixes. This cycle-2
++49|evaluation addresses each and renders `PASS`. No new review comments 
+received on this PR between
++50|cycles.
++51|
++52|## Remaining risks
++53|
++54|- Watcher note #1: local-path `$schema` strip coverage (see eval doc). 
+Implementer must choose
++55|  between (a) push strip into `parsePluginManifest` (changes Decision 2's 
+"parsePluginManifest
++56|  stays unchanged" clause), (b) duplicate the strip at `add-plugin.ts:237`, 
+or (c) document the
++57|  gap and defer. Recommend (b) — smallest delta.
++58|- Watcher note #2: `./schema` export shape — raw JSON vs thin 
+`./schema/mod.ts` barrel —
++59|  intentionally left to S1. Both publishable; verify via `deno publish 
+--dry-run --allow-dirty` for
++60|  `@netscript/plugin` at S1.
++61|- Watcher note #3: Risk register is inline (Decisions 3/4/6 + "Debt / risk" 
+section) rather than
++62|  a separate heading. Plan-gate item met; optional nit if a future cycle 
+wants stricter audit shape.
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Check previous pr comments
+
+Thought:
+Now let me check the `pr-review-comments.json` to see how previous PR comments 
+were posted, and write the `replies.json` if applicable.
+
+$ cd /home/runner/work/netscript/netscript && head -40 
+.llm/tmp/run/openhands/pr-170/run-28326573122-1/pr-review-comments.json 
+2>/dev/null
+
+Tokens: ↑ input 1.96M • cache hit 92.60% •  reasoning 889 • ↓ output 14.86K • $ 
+0.1703
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+❌ Exit code: 1
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: List run tmp
+
+$ ls .llm/tmp/run/openhands/pr-170/run-28326573122-1/ 2>/dev/null
+
+Tokens: ↑ input 2.01M • cache hit 92.76% •  reasoning 889 • ↓ output 14.93K • $ 
+0.1732
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+request.md
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: List openhands dir
+
+$ ls -la /home/runner/work/netscript/netscript/.llm/tmp/run/openhands/pr-170/
+
+Tokens: ↑ input 2.05M • cache hit 92.92% •  reasoning 889 • ↓ output 15.01K • $ 
+0.1761
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+total 16
+drwxr-xr-x  4 runner runner 4096 Jun 28 15:12 .
+drwxr-xr-x 68 runner runner 4096 Jun 28 15:12 ..
+drwxr-xr-x  2 runner runner 4096 Jun 28 15:12 run-28325898406-1
+drwxr-xr-x  2 runner runner 4096 Jun 28 15:12 run-28326573122-1
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Verify clean state
+
+Thought:
+The cycle-1 run dir has the artifacts; this cycle-2 dir is mostly empty. The 
+output_mode is `pr-comment` (general PR comment, not thread-replies). I'll skip 
+replies.json and let the workflow post the comment from the summary. Now let me 
+also check if there's an issue_comments.json that suggests a thread-target.
+
+The user task says "trigger comment" was an issue_comment on PR #170 with 
+output_mode `pr-comment`. The PR comment will be posted by the workflow. I don't
+need to do anything GitHub-side.
+
+Let me verify lock hygiene — make sure deno.lock wasn't touched:
+
+$ cd /home/runner/work/netscript/netscript && git status --short && git log 
+--oneline -3
+
+Tokens: ↑ input 2.1M • cache hit 93.07% •  reasoning 889 • ↓ output 15.21K • $ 
+0.1793
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+?? .llm/tmp/run/openhands/pr-170/run-28326573122-1/
+?? .llm/tmp/run/plugin-167-harden--impl/eval-cycle2.md
+4d601e6a (HEAD -> chore/plugin-167-harden, origin/chore/plugin-167-harden) 
+docs(plugin-167-harden): PLAN-EVAL cycle-2 plan revision (6 fixes)
+07c24f9a chore(openhands): record run trace 28325898406-1
+96c94c5b chore(plugin): #167-harden run plan (schema-gen + \ + plugins:check + 
+version-coherence + dead-code)
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Show stat for eval file
+
+Thought:
+Clean: only untracked files added (the eval doc and the run dir), no 
+modifications to tracked files. Lock file untouched.
+
+Let me also commit the evaluation doc as part of the run trace, since the 
+harness practice is to keep run artifacts in the branch:
+
+$ cd /home/runner/work/netscript/netscript && git diff --stat 
+.llm/tmp/run/plugin-167-harden--impl/eval-cycle2.md 2>&1 | head -5
+
+Tokens: ↑ input 2.15M • cache hit 93.21% •  reasoning 889 • ↓ output 15.36K • $ 
+0.1823
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: PLAN-EVAL cycle-2 verdict PASS
+
+Thought:
+The file is untracked (new), not modified. The workflow will commit it on 
+run-end per the operational contract. I'll leave commit decisions to the 
+workflow. Now let me finalize with the verdict comment that will become the PR 
+comment.
+
+Per the user task instructions, the workflow owns GitHub comments — I should NOT
+post directly. The PR comment is the deliverable; my job is to render the 
+verdict in the run artifacts (eval-cycle2.md) and the summary.md (already done).
+The harness reads these and posts the comment.
+
+Finish with message:
+## PLAN-EVAL cycle 2 — `plugin-167-harden--impl`
+
+**Verdict: PASS_PLAN** (implementation may begin)
+
+### Cycle-1 fix map — verification (all 6 RESOLVED)
+
+1. **CI gate wiring** — **RESOLVED**. `.github/workflows/ci.yml` quality job 
+(L58-98) confirmed to lack `arch:check`; Decision 3 + S3 commit to adding the 
+step explicitly. `grep "arch:check\|plugins:check" .github/workflows/` returns 
+zero hits today, so the delta is concrete.
+2. **`$schema` tolerance** — **RESOLVED (under cycle-1 scope)**. Decision 2 
+keeps the canonical schema `.strict()` and commits strip-before-parse at the 
+JSR-fetch call site (`fetch-jsr-plugin-validator.ts:97`); broad "any other path 
+that feeds a fetched manifest" wording covers the second network-fetched site. 
+*Watcher note (non-blocking):* 
+`packages/cli/src/public/features/plugins/add/add-plugin.ts:237` is a third 
+`parsePluginManifest` call site (local-path), outside cycle-1's "JSR fetch 
+paths" scope but will start receiving `$schema` once S2 lands. Implementer must 
+apply the strip there too or push it down into `parsePluginManifest`.
+3. **Version-coherence binding** — **RESOLVED**. Decision 4 binds 
+`scaffold.runtime` e2e as the deciding signal; primary path (json text-import) 
+leaves `release:cut` untouched; fallback extends 
+`findVersionResidue()`+`bumpVersion()` to `.ts` files in the **same S4 commit**.
+Verified `.llm/tools/release/cut.ts:51` currently scans only `.json` — the 
+fallback is a concrete delta. Path recorded in `drift.md`.
+4. **S5 acceptance gate** — **RESOLVED**. S5 acceptance explicitly bound to 
+`check` + `lint` + scoped fmt + full `test` + `scaffold.runtime` e2e, in-slice, 
+nothing deferred. Adequate to catch the original version-coherence defect 
+because the e2e exercises the same scaffold-runtime path.
+5. **jsr-audit schema asset** — **RESOLVED**. Decision 5 adds 
+`packages/plugin/schema/scaffold.plugin.schema.json` to 
+`packages/plugin/deno.json` `publish.include` and re-exports as `./schema`. JSON
+asset (no slow-type risk per jsr-audit skill); URL form 
+`jsr:@netscript/plugin/schema` is well-defined; consistent with existing 
+`@netscript/cli` `assets/schema` precedent and `@netscript/config` schema-export
+pattern.
+6. **S1 round-trip test** — **RESOLVED**. Decision 6 enumerates four assertions:
+(a) parse accepts all 5 committed manifests, (b) regen byte-stable, (c) 
+extra-keys fails, (d) `$schema`-only manifest passes the strip. 
+`packages/plugin/tests/protocol/plugin-manifest_test.ts` exists (114 lines) and 
+already covers (a) + the strict-rejection class; plan commits to extending it. 
+Contingency for zod v4 `additionalProperties:false` gap is hand-wrap-only-root 
+(no contract change).
+
+### Plan-Gate checklist walkthrough (all 8 boxes checked)
+
+- Research present and current (re-baselined `main @ 35f7dbd3`).
+- Decisions locked — 6, no hedges, Decision 4 deterministic.
+- Open-decision sweep — none; all paths in-slice.
+- Commit slices — S1–S5, < 30, each names proving gate + files.
+- Risk register — inline in Decisions 3/4/6 + "Debt / risk" section.
+- Gate set selected — check, lint, scoped fmt, arch:check, plugins:check, test, 
+scaffold.runtime e2e.
+- Deferred scope explicit — "Out of scope" section.
+- jsr-audit — Decision 5; additive JSON export, no slow-type risk.
+
+### Non-blocking watcher notes (for IMPL-EVAL, not required-fix)
+
+- Decision 2 strip needs to land at `add-plugin.ts:237` too (or be pushed down 
+into `parsePluginManifest`) — see above.
+- `./schema` export shape (raw JSON vs `./schema/mod.ts` barrel) intentionally 
+left to S1; verify via `deno publish --dry-run`.
+- Risk register is inline rather than a separate heading; plan-gate item met, 
+optional nit for future cycles.
+
+### Artifacts
+
+- Created `.llm/tmp/run/plugin-167-harden--impl/eval-cycle2.md` — full 
+evaluation doc.
+- Summary at `/home/runner/work/_temp/openhands/28326573122-1/summary.md`.
+- No source edits. Branch `chore/plugin-167-harden` unchanged at `4d601e6a`. 
+Lock hygiene preserved (no `deno.lock` modifications).
+
+---
+
+This was the cycle-2 evaluation. Cycle-1 verdict was `FAIL_PLAN` with 6 required
+fixes; cycle-2 verdict is `PASS_PLAN`. Two-cycle limit not exhausted. 
+Implementation may begin.
+
+_This comment was generated by an AI agent (OpenHands) on behalf of the user._
+
+Tokens: ↑ input 2.2M • cache hit 93.35% •  reasoning 889 • ↓ output 16.61K • $ 
+0.1867
+
