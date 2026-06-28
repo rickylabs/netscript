@@ -27,6 +27,9 @@ export type {
   ScaffoldResult,
 } from '../protocol/mod.ts';
 export type { ScaffoldArtifact } from './artifact.ts';
+export { parseScaffolderContextArgs, runScaffoldCli } from './cli.ts';
 export { buildScaffoldPluginJson } from './manifest-spec.ts';
 export type { PluginScaffoldManifestSpec } from './manifest-spec.ts';
+export { PluginScaffolder, toEntrypoint } from './plugin-scaffolder.ts';
+export type { PluginScaffolderConstructor } from './plugin-scaffolder.ts';
 export { scaffoldSchemaUrl } from './schema-url.ts';
