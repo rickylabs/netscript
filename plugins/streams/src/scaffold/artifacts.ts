@@ -57,6 +57,7 @@ export function buildStreamsScaffoldArtifacts(
 
 function generateScaffoldPluginJson(): string {
   const manifest = {
+    $schema: 'jsr:@netscript/plugin/schema',
     schemaVersion: 1,
     name: '@netscript/plugin-streams',
     version: NETSCRIPT_VERSION,

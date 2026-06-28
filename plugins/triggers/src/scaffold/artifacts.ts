@@ -104,6 +104,7 @@ export async function buildTriggersScaffoldArtifacts(
 
 function generateScaffoldPluginJson(): string {
   const manifest = {
+    $schema: 'jsr:@netscript/plugin/schema',
     schemaVersion: 1,
     name: '@netscript/plugin-triggers',
     version: NETSCRIPT_VERSION,

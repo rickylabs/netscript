@@ -69,6 +69,7 @@ export function buildWorkerScaffoldArtifacts(
 
 function generateScaffoldPluginJson(): string {
   const manifest = {
+    $schema: 'jsr:@netscript/plugin/schema',
     schemaVersion: 1,
     name: '@netscript/plugin-workers',
     version: NETSCRIPT_VERSION,

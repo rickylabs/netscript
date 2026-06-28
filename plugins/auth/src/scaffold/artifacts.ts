@@ -77,6 +77,7 @@ export function buildAuthScaffoldArtifacts(
 
 function generateScaffoldPluginJson(): string {
   const manifest = {
+    $schema: 'jsr:@netscript/plugin/schema',
     schemaVersion: 1,
     name: '@netscript/plugin-auth',
     version: '0.0.1-alpha.12',

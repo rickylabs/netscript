@@ -96,6 +96,7 @@ export async function buildSagasScaffoldArtifacts(
 
 function generateScaffoldPluginJson(): string {
   const manifest = {
+    $schema: 'jsr:@netscript/plugin/schema',
     schemaVersion: 1,
     name: '@netscript/plugin-sagas',
     version: NETSCRIPT_VERSION,

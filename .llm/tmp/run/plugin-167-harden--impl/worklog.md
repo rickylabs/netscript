@@ -47,3 +47,21 @@
 | Schema stability | PASS | `deno task plugins:schema:gen && git diff --exit-code -- packages/plugin/schema/scaffold.plugin.schema.json`. |
 | Plugin publish dry-run | PASS | `deno publish --dry-run --allow-dirty --allow-slow-types` from `packages/plugin`; schema JSON checked and included in simulated file list. Existing package slow-type/dynamic-import warnings remain unchanged. |
 | Lock hygiene | PASS | `git status --short deno.lock` returned no changes. |
+
+## S2 progress
+
+- Added the relative `$schema` path as the first key in all five committed
+  `plugins/*/scaffold.plugin.json` manifests:
+  `../../packages/plugin/schema/scaffold.plugin.schema.json`.
+- Added the published schema export URL `jsr:@netscript/plugin/schema` as the first emitted manifest
+  key in the five plugin-owned scaffold artifact generators.
+
+### S2 gate evidence
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Manifest suite | PASS | `deno test --allow-all packages/plugin/tests/protocol/plugin-manifest_test.ts` — 8 passed with committed `$schema` keys. |
+| Parse all 5 manifests | PASS | `deno eval ... parsePluginManifest(stripPluginManifestSchemaKey(json))` — parsed 5 manifests. |
+| Scoped lint | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --file plugins/*/src/scaffold/artifacts.ts --pretty` — 5 selected files, 0 occurrences. |
+| Scoped TS fmt | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --file plugins/*/src/scaffold/artifacts.ts --pretty --ignore-line-endings` — 5 selected files, 0 findings. |
+| Manifest JSON fmt | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --file plugins/*/scaffold.plugin.json --pretty --ignore-line-endings` — 5 selected files, 0 findings. |
