@@ -49,16 +49,14 @@ export async function scanPublishSurface(root: string): Promise<TextImportFindin
         includeDirs: false,
         exts: [...sourceExtensions],
         skip: [
-          /(?:^|[/\\])tests?(?:[/\\]|$)/,
-          /(?:^|[/\\])__fixtures__(?:[/\\]|$)/,
           /(?:^|[/\\])node_modules(?:[/\\]|$)/,
           /(?:^|[/\\])\.generated(?:[/\\]|$)/,
           /(?:^|[/\\])\.git(?:[/\\]|$)/,
-          /(?:^|[/\\])\.llm(?:[/\\]|$)/,
         ],
       })
     ) {
-      if (isSourceFile(entry.path) && !isTestFile(entry.path)) {
+      const relativePath = normalize(relative(root, entry.path));
+      if (isSourceFile(entry.path) && !isTestFile(relativePath)) {
         files.push(entry.path);
       }
     }
