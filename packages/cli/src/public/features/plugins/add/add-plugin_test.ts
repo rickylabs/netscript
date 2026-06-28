@@ -53,6 +53,32 @@ const workerProvider: PluginKindProvider = {
   infrastructureOptionalDeps: ['db'],
 };
 
+const sagaProvider: PluginKindProvider = {
+  kind: 'saga',
+  displayName: 'Saga Orchestrator',
+  category: 'background-processor',
+  portRangeKey: 'INFRA_PLUGIN',
+  defaultPermissions: [
+    '--unstable-kv',
+    '--allow-net',
+    '--allow-env',
+    '--allow-read',
+    '--allow-write',
+  ],
+  watchFlag: '--watch',
+  defaultEntrypoint: 'src/runtime/saga-runner.ts',
+  defaultServiceEntrypoint: 'services/src/main.ts',
+  defaultRequiresDb: true,
+  defaultRequiresKv: true,
+  pluginType: 'background-processor',
+  supportsConcurrency: true,
+  concurrencyEnvVar: 'SAGA_CONCURRENCY',
+  defaultConcurrency: 2,
+  defaultTelemetry: true,
+  infrastructureRequires: ['kv'],
+  infrastructureOptionalDeps: ['db'],
+};
+
 describe('public add plugin flow', () => {
   it('plans a starter plugin request from project metadata', async () => {
     const fs = new MemoryFileSystemAdapter();
@@ -537,6 +563,146 @@ describe('public add plugin flow', () => {
       await Deno.remove(projectRoot, { recursive: true });
     }
   });
+
+  it('runs the real sagas local-path scaffolder through plugin add', async () => {
+    const projectRoot = await Deno.makeTempDir();
+    const sagasRoot = resolve('plugins/sagas');
+    try {
+      await writeRealProjectFiles(projectRoot);
+      const fs = new DenoFileSystem();
+      const templateAdapter = new StringTemplateAdapter(fs);
+      const scaffolder = new Scaffolder(templateAdapter, fs);
+      const registry = new PluginKindRegistry();
+
+      const result = await addPlugin({
+        kind: 'sagas',
+        pluginName: 'sagas',
+        serviceReferences: [],
+        pluginReferences: ['workers-api'],
+        noDb: true,
+        includeSamples: true,
+        localPath: sagasRoot,
+        projectRoot,
+        overwrite: false,
+        sagaStoreBackend: 'prisma',
+      }, {
+        fs,
+        scaffolder,
+        templateAdapter,
+        registry,
+        pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
+        registryScaffolder: new PluginRegistryScaffolder(scaffolder),
+        workspaceMutator: new PluginWorkspaceMutator(fs),
+        processRunner: new DenoProcess(),
+        regenerateHelpers: () => Promise.resolve([]),
+      });
+
+      assertEquals(result.pluginOwnedScaffold?.status, 'applied');
+      assertEquals(result.pluginOwnedScaffold?.databaseMigrationsAdded, true);
+      assertStringIncludes(
+        result.pluginOwnedScaffold?.createdFiles.join('\n') ?? '',
+        'plugins/sagas/database/sagas.prisma',
+      );
+      assertStringIncludes(
+        result.pluginOwnedScaffold?.createdFiles.join('\n') ?? '',
+        'plugins/sagas/sagas/user-registration-saga.ts',
+      );
+      assertStringIncludes(
+        await Deno.readTextFile(join(projectRoot, 'plugins/sagas/mod.ts')),
+        "definePlugin('sagas', '0.1.0')",
+      );
+      assertStringIncludes(
+        await Deno.readTextFile(join(projectRoot, 'plugins/sagas/database/sagas.prisma')),
+        'model SagaRuntimeState',
+      );
+      assertStringIncludes(
+        await Deno.readTextFile(join(projectRoot, 'appsettings.json')),
+        '"Backend": "prisma"',
+      );
+    } finally {
+      await Deno.remove(projectRoot, { recursive: true });
+    }
+  });
+
+  it('previews the real sagas local-path scaffolder without writing files', async () => {
+    const projectRoot = await Deno.makeTempDir();
+    const sagasRoot = resolve('plugins/sagas');
+    try {
+      await writeRealProjectFiles(projectRoot);
+      const fs = new DenoFileSystem();
+      const templateAdapter = new StringTemplateAdapter(fs);
+      const scaffolder = new Scaffolder(templateAdapter, fs);
+      const registry = new PluginKindRegistry();
+
+      const result = await addPlugin({
+        kind: 'sagas',
+        pluginName: 'sagas',
+        serviceReferences: [],
+        pluginReferences: ['workers-api'],
+        noDb: true,
+        includeSamples: true,
+        dryRun: true,
+        localPath: sagasRoot,
+        projectRoot,
+        overwrite: false,
+      }, {
+        fs,
+        scaffolder,
+        templateAdapter,
+        registry,
+        pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
+        registryScaffolder: new PluginRegistryScaffolder(scaffolder),
+        workspaceMutator: new PluginWorkspaceMutator(fs),
+        processRunner: new DenoProcess(),
+        regenerateHelpers: () => Promise.resolve([]),
+      });
+
+      assertEquals(result.pluginOwnedScaffold?.status, 'planned');
+      assertStringIncludes(
+        result.pluginOwnedScaffold?.createdFiles.join('\n') ?? '',
+        'plugins/sagas/src/runtime/saga-runner.ts',
+      );
+      await assertFalseExists(join(projectRoot, 'plugins/sagas/mod.ts'));
+      await assertFalseExists(join(projectRoot, 'plugins/sagas/database/sagas.prisma'));
+    } finally {
+      await Deno.remove(projectRoot, { recursive: true });
+    }
+  });
+
+  it('reruns the real sagas scaffolder idempotently', async () => {
+    const projectRoot = await Deno.makeTempDir();
+    const sagasRoot = resolve('plugins/sagas');
+    const descriptor = sagasDescriptor();
+    try {
+      await writeRealProjectFiles(projectRoot);
+
+      const first = await dispatchPluginScaffold({
+        descriptor,
+        source: { kind: 'local-path', path: sagasRoot },
+        projectRoot,
+        pluginName: 'sagas',
+        dryRun: false,
+        permissionFlags: ['-A'],
+        processRunner: new DenoProcess(),
+      });
+      const second = await dispatchPluginScaffold({
+        descriptor,
+        source: { kind: 'local-path', path: sagasRoot },
+        projectRoot,
+        pluginName: 'sagas',
+        dryRun: false,
+        permissionFlags: ['-A'],
+        processRunner: new DenoProcess(),
+      });
+
+      assertEquals(first.status, 'applied');
+      assertEquals(second.status, 'skipped');
+      assertEquals(second.createdFiles, []);
+      assertEquals(second.modifiedFiles, []);
+    } finally {
+      await Deno.remove(projectRoot, { recursive: true });
+    }
+  });
 });
 
 class FixturePluginValidator implements JsrPluginValidatorPort {
@@ -746,6 +912,77 @@ function workersDescriptor(): ValidatedPluginDescriptor {
     details: {
       description:
         'NetScript plugin for background job scheduling, task execution, and worker API endpoints.',
+      score: 95,
+    },
+  };
+}
+
+function sagasDescriptor(): ValidatedPluginDescriptor {
+  return {
+    package: {
+      requestedSpec: 'sagas',
+      source: 'bare-alias',
+      scope: 'netscript',
+      packageName: 'plugin-sagas',
+      packageSpecifier: '@netscript/plugin-sagas',
+      jsrSpecifier: 'jsr:@netscript/plugin-sagas',
+      alias: 'sagas',
+    },
+    version: '0.0.1-alpha.12',
+    manifest: {
+      schemaVersion: 1,
+      name: '@netscript/plugin-sagas',
+      version: '0.0.1-alpha.12',
+      displayName: 'Saga Orchestrator',
+      description:
+        'NetScript plugin for durable saga orchestration, workflow APIs, and saga runtime metadata.',
+      peerDependencies: {
+        '@netscript/plugin': '0.0.1-alpha.12',
+      },
+      capabilities: {
+        hasDatabaseMigrations: true,
+        hasRoutes: true,
+        hasBackgroundWorkers: true,
+      },
+      scaffolder: {
+        export: './scaffold',
+        requiredPermissions: {
+          net: [],
+          read: ['<workspaceRoot>'],
+          write: ['<workspaceRoot>'],
+        },
+      },
+      provider: {
+        kind: sagaProvider.kind,
+        displayName: sagaProvider.displayName,
+        category: sagaProvider.category,
+        portRangeKey: sagaProvider.portRangeKey,
+        defaultPermissions: sagaProvider.defaultPermissions,
+        watchFlag: sagaProvider.watchFlag,
+        defaultEntrypoint: sagaProvider.defaultEntrypoint,
+        defaultServiceEntrypoint: sagaProvider.defaultServiceEntrypoint ?? '',
+        defaultRequiresDb: sagaProvider.defaultRequiresDb,
+        defaultRequiresKv: sagaProvider.defaultRequiresKv,
+        pluginType: sagaProvider.pluginType,
+        supportsConcurrency: sagaProvider.supportsConcurrency,
+        concurrencyEnvVar: sagaProvider.concurrencyEnvVar,
+        defaultConcurrency: sagaProvider.defaultConcurrency,
+        defaultTelemetry: sagaProvider.defaultTelemetry,
+        infrastructureRequires: sagaProvider.infrastructureRequires,
+        infrastructureOptionalDeps: sagaProvider.infrastructureOptionalDeps,
+      },
+    },
+    packageMetadata: {
+      latest: '0.0.1-alpha.12',
+      isYanked: false,
+    },
+    versionMetadata: {
+      exports: { '.': './mod.ts', './scaffold': './scaffold.ts' },
+      files: { '/scaffold.plugin.json': 'sha256-good' },
+    },
+    details: {
+      description:
+        'NetScript plugin for durable saga orchestration, workflow APIs, and saga runtime metadata.',
       score: 95,
     },
   };
