@@ -35,6 +35,7 @@ interface AuthScaffoldOptions {
 }
 
 const AUTH_ARTIFACT_SOURCES = [
+  { sourcePath: 'scaffold.plugin.json', content: generateScaffoldPluginJson() },
   { sourcePath: 'README.md', content: authTemplate0 },
   { sourcePath: 'package.json', content: authTemplate1 },
   { sourcePath: 'deno.json', content: authTemplate2 },
@@ -72,4 +73,63 @@ export function buildAuthScaffoldArtifacts(
     path: `${pluginRoot}/${artifact.sourcePath}`,
     content: artifact.content,
   }));
+}
+
+function generateScaffoldPluginJson(): string {
+  const manifest = {
+    schemaVersion: 1,
+    name: '@netscript/plugin-auth',
+    version: '0.0.1-alpha.12',
+    displayName: 'Auth',
+    description:
+      'NetScript plugin for a unified auth API, auth database schema, and auth session streams.',
+    peerDependencies: {
+      '@netscript/plugin': '0.0.1-alpha.12',
+    },
+    capabilities: {
+      hasDatabaseMigrations: true,
+      hasRoutes: true,
+      hasBackgroundWorkers: false,
+    },
+    scaffolder: {
+      export: './scaffold',
+      requiredPermissions: {
+        net: [],
+        read: ['<workspaceRoot>'],
+        write: ['<workspaceRoot>'],
+      },
+    },
+    provider: {
+      kind: 'auth',
+      displayName: 'Auth',
+      category: 'plugin',
+      portRangeKey: 'PLUGIN_API',
+      defaultPermissions: ['--unstable-kv', '--allow-net', '--allow-env', '--allow-read'],
+      watchFlag: '--watch',
+      defaultEntrypoint: 'services/src/main.ts',
+      defaultServiceEntrypoint: 'services/src/main.ts',
+      defaultRequiresDb: true,
+      defaultRequiresKv: true,
+      pluginType: 'utility',
+      supportsConcurrency: false,
+      concurrencyEnvVar: null,
+      defaultConcurrency: null,
+      defaultTelemetry: true,
+      infrastructureRequires: ['db', 'kv'],
+      infrastructureOptionalDeps: [],
+    },
+    officialSource: {
+      canonicalName: 'auth',
+      pluginDir: 'auth',
+      serviceEntrypoint: 'services/src/main.ts',
+      serviceConfigKey: 'auth',
+      servicePort: 8094,
+      backgroundPort: 8094,
+      requiresDb: true,
+      requiresKv: true,
+      permissions: ['--unstable-kv', '--allow-net', '--allow-env', '--allow-read'],
+    },
+  };
+
+  return `${JSON.stringify(manifest, null, 2)}\n`;
 }

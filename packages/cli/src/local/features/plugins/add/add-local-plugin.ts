@@ -1,5 +1,4 @@
 import { join } from '@std/path';
-import type { PluginEntry } from '@netscript/aspire/types';
 import {
   copyPluginSchemasToRootDb,
   provisionDatabaseIfNeeded,
@@ -10,17 +9,9 @@ import { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/works
 import { regenerateAspireHelpers } from '../../../../kernel/adapters/service/workspace-mutator.ts';
 import { SCAFFOLD_DIRS } from '../../../../kernel/constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../../../kernel/constants/scaffold/scaffold-files.ts';
-import type { PluginScaffoldResult } from '../../../../kernel/domain/plugin-kind.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import type { ProcessPort } from '../../../../kernel/ports/process-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../../../kernel/ports/template-port.ts';
-import {
-  canCopyOfficialPlugin,
-  copyOfficialPlugin,
-  findOfficialPluginSourceRoot,
-  getOfficialPluginSource,
-  registerOfficialPluginKindProviders,
-} from '../../../../maintainer/maintainer-api.ts';
 import { PluginKindRegistry } from '../../../../kernel/application/registries/plugin-kind-registry.ts';
 import type {
   AddPluginResult,
@@ -30,14 +21,16 @@ import type {
 import type { AddPluginInput } from '../../../../public/features/plugins/add/add-plugin-input.ts';
 import type { JsrPluginValidatorPort } from '../../../../public/features/plugins/add/jsr-plugin-validator-port.ts';
 import type { JsrPackageFileFetcher } from '../../../../public/infra/jsr/verify-jsr-package-integrity.ts';
-import { planPluginAdd } from '../../../../public/features/plugins/add/plan-plugin-add.ts';
 import {
-  ensurePluginServiceContext,
-  mergeUniqueReferences,
-  resolveOfficialPluginSourceRoot,
-  toWorkspaceRelativePath,
-  usesPluginOwnedBackgroundEntrypoint,
-} from './add-local-plugin-helpers.ts';
+  createPluginOwnedPluginResult,
+  resolvePluginDescriptorBeforePlanning,
+  runPluginOwnedScaffold,
+} from '../../../../public/features/plugins/add/add-plugin.ts';
+import { planPluginAdd } from '../../../../public/features/plugins/add/plan-plugin-add.ts';
+import { resolvePluginPackageSpec } from '../../../../public/features/plugins/add/plugin-package-resolver.ts';
+import { renderPluginSupport } from '../../../../public/features/plugins/add/render-plugin.ts';
+import { ensurePluginServiceContext, mergeUniqueReferences } from './add-local-plugin-helpers.ts';
+import { resolveOfficialPluginSourceRoot } from './add-local-plugin-helpers.ts';
 
 export { resolveOfficialPluginSourceRoot } from './add-local-plugin-helpers.ts';
 
@@ -45,12 +38,6 @@ interface LocalPluginRenderResult extends PluginRenderResult {
   readonly workspaceMembers: readonly string[];
   readonly pluginReferences: readonly string[];
   readonly serviceReferences: readonly string[];
-  readonly dependencyEntries: readonly DependencyPluginEntry[];
-}
-
-interface DependencyPluginEntry {
-  readonly configKey: string;
-  readonly entry: PluginEntry;
 }
 
 const ROOT_LOCAL_BASE = '.';
@@ -79,13 +66,7 @@ export interface AddLocalPluginDependencies {
   /** JSR file fetcher used for plugin-owned scaffold integrity checks. */
   readonly packageFileFetcher?: JsrPackageFileFetcher;
   /** Discover a first-party plugin source checkout. */
-  readonly findSourceRoot?: typeof findOfficialPluginSourceRoot;
-  /** Resolve first-party plugin metadata. */
-  readonly getSource?: typeof getOfficialPluginSource;
-  /** Copy a first-party plugin implementation. */
-  readonly copyPlugin?: typeof copyOfficialPlugin;
-  /** Decide whether a first-party implementation can satisfy this request. */
-  readonly canCopyPlugin?: typeof canCopyOfficialPlugin;
+  readonly findSourceRoot?: (startDir?: string) => Promise<string | null>;
   /** Starting directory used to discover the contributor source checkout. */
   readonly sourceRootStartDir?: string;
   /** Helper regeneration override for tests. */
@@ -103,15 +84,38 @@ export async function addLocalPlugin(
   dependencies: AddLocalPluginDependencies,
 ): Promise<AddPluginResult> {
   const registry = dependencies.registry ?? new PluginKindRegistry();
-  const sourceRoot = await resolveOfficialPluginSourceRoot(request.projectRoot, dependencies);
-  if (sourceRoot) {
-    await registerOfficialPluginKindProviders(registry, sourceRoot);
-  }
-  const plan = await planPluginAdd(request, {
+  const descriptorRequest = await withDefaultLocalPath(request, dependencies);
+  const resolvedPlugin = await resolvePluginDescriptorBeforePlanning(
+    descriptorRequest,
+    registry,
+    dependencies.pluginValidator,
+    dependencies.fs,
+  );
+  const planningRequest = resolvedPlugin?.planningKind === undefined
+    ? descriptorRequest
+    : { ...descriptorRequest, kind: resolvedPlugin.planningKind };
+  const plan = await planPluginAdd(planningRequest, {
     fs: dependencies.fs,
     registry,
   });
-  const rendered = await renderLocalPlugin(plan, dependencies, sourceRoot);
+  const pluginOwned = resolvedPlugin === undefined || dependencies.processRunner === undefined
+    ? undefined
+    : await runPluginOwnedScaffold(plan, resolvedPlugin, descriptorRequest, dependencies);
+  const rendered = pluginOwned === undefined || resolvedPlugin === undefined
+    ? await renderLocalPlugin(plan, dependencies)
+    : {
+      ...await renderPluginSupport(plan, dependencies, {
+        importMode: 'local',
+        localBase: ROOT_LOCAL_BASE,
+      }),
+      plugin: createPluginOwnedPluginResult(plan, resolvedPlugin.descriptor, pluginOwned),
+      workspaceMembers: [],
+      pluginReferences: mergeUniqueReferences(
+        plan.pluginReferences,
+        resolvedPlugin.descriptor.manifest.officialSource?.pluginReferences ?? [],
+      ),
+      serviceReferences: plan.serviceReferences,
+    };
 
   const schemaCopies = await copyPluginSchemasToRootDb(
     plan.projectRoot,
@@ -120,17 +124,6 @@ export async function addLocalPlugin(
     { fs: dependencies.fs, scaffolder: dependencies.scaffolder },
     { overwrite: plan.overwrite },
   );
-  for (const dependency of rendered.dependencyEntries) {
-    await dependencies.workspaceMutator.upsertPluginAppsettingsEntry(
-      plan.projectRoot,
-      dependency.configKey,
-      dependency.entry,
-    );
-    await dependencies.workspaceMutator.ensureNetScriptConfigPlugin(
-      plan.projectRoot,
-      dependency.configKey,
-    );
-  }
   await dependencies.workspaceMutator.updateAppsettings(
     plan.projectRoot,
     rendered.plugin,
@@ -171,10 +164,40 @@ export async function addLocalPlugin(
   };
 }
 
+async function withDefaultLocalPath(
+  request: AddPluginInput,
+  dependencies: AddLocalPluginDependencies,
+): Promise<AddPluginInput> {
+  if (request.localPath !== undefined || request.jsrUrl !== undefined) {
+    return request;
+  }
+
+  const sourceRoot = await resolveOfficialPluginSourceRoot(request.projectRoot, dependencies);
+  if (sourceRoot === null) {
+    return request;
+  }
+
+  return {
+    ...request,
+    localPath: resolveDefaultLocalPluginPath(sourceRoot, request.kind),
+  };
+}
+
+function resolveDefaultLocalPluginPath(sourceRoot: string, kind: string): string {
+  try {
+    const resolved = resolvePluginPackageSpec(kind);
+    if (resolved.scope === 'netscript' && resolved.packageName.startsWith('plugin-')) {
+      return join(sourceRoot, SCAFFOLD_DIRS.PLUGINS, resolved.packageName.slice('plugin-'.length));
+    }
+  } catch {
+    // Non-package local kinds fall back to the raw plugin directory name.
+  }
+  return join(sourceRoot, SCAFFOLD_DIRS.PLUGINS, kind);
+}
+
 async function renderLocalPlugin(
   plan: PluginAddPlan,
   dependencies: AddLocalPluginDependencies,
-  sourceRoot: string | null,
 ): Promise<LocalPluginRenderResult> {
   const provisionedDatabase = await provisionDatabaseIfNeeded(
     plan.projectRoot,
@@ -197,19 +220,6 @@ async function renderLocalPlugin(
     plan.overwrite,
   );
   const registryFilesCreated = await ensurePluginRegistry(plan, dependencies);
-  const official = await maybeCopyOfficialPlugin(plan, dependencies, sourceRoot);
-  if (official) {
-    return {
-      plugin: official.plugin,
-      registryFilesCreated,
-      wroteServiceContext,
-      provisionedDatabase,
-      workspaceMembers: official.workspaceMembers,
-      pluginReferences: official.pluginReferences,
-      serviceReferences: official.serviceReferences,
-      dependencyEntries: official.dependencyEntries,
-    };
-  }
 
   const plugin = await dependencies.pluginScaffolder.scaffold({
     projectName: plan.projectName,
@@ -234,85 +244,6 @@ async function renderLocalPlugin(
     workspaceMembers: [],
     pluginReferences: [],
     serviceReferences: [],
-    dependencyEntries: [],
-  };
-}
-
-async function maybeCopyOfficialPlugin(
-  plan: PluginAddPlan,
-  dependencies: AddLocalPluginDependencies,
-  sourceRoot: string | null,
-): Promise<
-  {
-    readonly plugin: PluginScaffoldResult;
-    readonly workspaceMembers: readonly string[];
-    readonly pluginReferences: readonly string[];
-    readonly serviceReferences: readonly string[];
-    readonly dependencyEntries: readonly DependencyPluginEntry[];
-  } | null
-> {
-  const getSource = dependencies.getSource ?? getOfficialPluginSource;
-  if (!sourceRoot) {
-    return null;
-  }
-  if (plan.noCopySource === true) {
-    return null;
-  }
-
-  const canCopyPlugin = dependencies.canCopyPlugin ?? canCopyOfficialPlugin;
-  if (!await canCopyPlugin(sourceRoot, plan.kind, plan.pluginName)) {
-    return null;
-  }
-
-  const copyPlugin = dependencies.copyPlugin ?? copyOfficialPlugin;
-  const result = await copyPlugin({
-    sourceRoot,
-    targetPath: plan.projectRoot,
-    projectName: plan.projectName,
-    kind: plan.kind,
-    pluginName: plan.pluginName,
-    importMode: 'local',
-    force: plan.overwrite,
-    includeSamples: plan.includeSamples,
-  });
-  const source = await getSource(sourceRoot, plan.kind);
-
-  return {
-    plugin: {
-      scaffoldResult: result.scaffoldResult,
-      pluginDir: result.pluginDir,
-      kind: plan.kind,
-      port: result.backgroundPort,
-      servicePort: result.servicePort,
-      configSection: plan.provider.category === 'plugin' ? 'Plugins' : 'BackgroundProcessors',
-      configKey: result.pluginName,
-      serviceConfigKey: result.serviceConfigKey,
-      backgroundWorkdir: usesPluginOwnedBackgroundEntrypoint(result)
-        ? toWorkspaceRelativePath(plan.projectRoot, result.pluginDir)
-        : result.backgroundDir
-        ? toWorkspaceRelativePath(plan.projectRoot, result.backgroundDir)
-        : undefined,
-      serviceWorkdir: toWorkspaceRelativePath(plan.projectRoot, result.pluginDir),
-    },
-    workspaceMembers: result.workspaceMembers,
-    pluginReferences: mergeUniqueReferences(
-      source.pluginReferences ?? [],
-      result.dependencies.map((dependency) => dependency.configKey),
-    ),
-    serviceReferences: [],
-    dependencyEntries: result.dependencies.map((dependency) => ({
-      configKey: dependency.configKey,
-      entry: {
-        Enabled: true,
-        Runtime: 'deno',
-        Port: dependency.servicePort,
-        Entrypoint: dependency.serviceEntrypoint,
-        Workdir: `${SCAFFOLD_DIRS.PLUGINS}/${dependency.pluginDir}`,
-        RequiresDb: dependency.requiresDb,
-        RequiresKv: dependency.requiresKv,
-        Permissions: [...dependency.permissions],
-      },
-    })),
   };
 }
 

@@ -118,7 +118,6 @@ export interface PublicCommandDependencies {
     readonly prompt: CliffyPrompt;
     readonly processRunner?: ProcessPort;
     readonly packageFileFetcher?: JsrPackageFileFetcher;
-    readonly sourceRootStartDir?: string;
   };
   /** Dependencies for host-side plugin loading. */
   readonly pluginHostDependencies: {
@@ -248,7 +247,6 @@ export function createPublicCommandDependencies(
       pluginValidator: new FetchJsrPluginValidator(),
       prompt,
       processRunner: process,
-      sourceRootStartDir: host.cwd(),
     },
     pluginHostDependencies: {
       resolveProjectRoot,

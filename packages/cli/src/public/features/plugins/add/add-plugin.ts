@@ -1,4 +1,3 @@
-import type { PluginEntry } from '@netscript/aspire/types';
 import {
   parsePluginManifest,
   type ScaffoldResult as PluginOwnedScaffoldResult,
@@ -23,17 +22,8 @@ import type { ScaffolderPort, TemplatePort } from '../../../../kernel/ports/temp
 import type { AddPluginResult, PluginAddPlan } from '../../../domain/plugin-add-plan.ts';
 import { ScaffoldValidationError } from '../../../../kernel/domain/errors.ts';
 import {
-  canCopyOfficialPlugin,
-  copyOfficialPlugin,
-  findOfficialPluginSourceRoot,
-  getOfficialPluginSource,
-  registerOfficialPluginKindProviders,
-} from '../../../../maintainer/maintainer-api.ts';
-import {
   mergeUniqueReferences,
-  resolveOfficialPluginSourceRoot,
   toWorkspaceRelativePath,
-  usesPluginOwnedBackgroundEntrypoint,
 } from '../../../../local/features/plugins/add/add-local-plugin-helpers.ts';
 import type { AddPluginInput } from './add-plugin-input.ts';
 import type {
@@ -41,7 +31,11 @@ import type {
   ValidatedPluginDescriptor,
 } from './jsr-plugin-validator-port.ts';
 import { planPluginAdd } from './plan-plugin-add.ts';
-import { renderPlugin, type RenderPluginDependencies } from './render-plugin.ts';
+import {
+  renderPlugin,
+  type RenderPluginDependencies,
+  renderPluginSupport,
+} from './render-plugin.ts';
 import {
   BARE_PLUGIN_PACKAGE_ALIASES,
   resolvePluginPackageSpec,
@@ -54,27 +48,23 @@ import {
 } from '../dispatch/dispatch-plugin-verb.ts';
 import type { JsrPackageFileFetcher } from '../../../infra/jsr/verify-jsr-package-integrity.ts';
 
-interface OfficialPluginRenderResult {
-  readonly plugin: PluginScaffoldResult;
-  readonly pluginReferences: readonly string[];
-  readonly serviceReferences: readonly string[];
-  readonly dependencyEntries: readonly DependencyPluginEntry[];
-  readonly workspaceMembers: readonly string[];
+export interface PluginOwnedScaffoldDependencies {
+  /** Process runner used for plugin-owned scaffold and post-script dispatch. */
+  readonly processRunner?: ProcessPort;
+
+  /** JSR package file fetcher used for integrity verification. */
+  readonly packageFileFetcher?: JsrPackageFileFetcher;
 }
 
-interface DependencyPluginEntry {
-  readonly configKey: string;
-  readonly entry: PluginEntry;
-}
-
-interface ResolvedPluginBeforePlanning {
+export interface ResolvedPluginBeforePlanning {
   readonly descriptor: ValidatedPluginDescriptor;
   readonly planningKind?: string;
   readonly source: PluginScaffoldDispatchSource;
 }
 
 /** Dependencies used by the public add-plugin flow. */
-export interface AddPluginDependencies extends RenderPluginDependencies {
+export interface AddPluginDependencies
+  extends RenderPluginDependencies, PluginOwnedScaffoldDependencies {
   /** Plugin kind registry. */
   readonly registry?: PluginKindRegistry;
 
@@ -83,27 +73,6 @@ export interface AddPluginDependencies extends RenderPluginDependencies {
 
   /** Prompt adapter used for third-party package confirmation. */
   readonly prompt?: PromptPort;
-
-  /** Process runner used for plugin-owned scaffold and post-script dispatch. */
-  readonly processRunner?: ProcessPort;
-
-  /** JSR package file fetcher used for integrity verification. */
-  readonly packageFileFetcher?: JsrPackageFileFetcher;
-
-  /** Discover a first-party plugin source checkout. */
-  readonly findSourceRoot?: typeof findOfficialPluginSourceRoot;
-
-  /** Resolve first-party plugin metadata. */
-  readonly getSource?: typeof getOfficialPluginSource;
-
-  /** Copy a first-party plugin implementation. */
-  readonly copyPlugin?: typeof copyOfficialPlugin;
-
-  /** Decide whether a first-party implementation can satisfy this request. */
-  readonly canCopyPlugin?: typeof canCopyOfficialPlugin;
-
-  /** Starting directory used to discover the source checkout in prod-local mode. */
-  readonly sourceRootStartDir?: string;
 
   /** Workspace config mutator for root project updates. */
   readonly workspaceMutator: PluginWorkspaceMutator;
@@ -149,10 +118,6 @@ export async function addPlugin(
   const planningRequest = resolvedPlugin?.planningKind === undefined
     ? request
     : { ...request, kind: resolvedPlugin.planningKind };
-  const sourceRoot = await resolveOfficialPluginSourceRoot(request.projectRoot, dependencies);
-  if (sourceRoot) {
-    await registerOfficialPluginKindProviders(registry, sourceRoot);
-  }
   const plan = await planPluginAdd(planningRequest, {
     fs: dependencies.fs,
     registry,
@@ -163,9 +128,18 @@ export async function addPlugin(
   if (request.dryRun === true && pluginOwned !== undefined && resolvedPlugin !== undefined) {
     return createDryRunAddResult(plan, resolvedPlugin.descriptor, pluginOwned);
   }
-  const rendered = await renderPlugin(plan, dependencies);
-  const official = await maybeCopyOfficialPlugin(plan, dependencies, sourceRoot);
-  const plugin = official?.plugin ?? rendered.plugin;
+  const rendered = pluginOwned === undefined || resolvedPlugin === undefined
+    ? await renderPlugin(plan, dependencies)
+    : {
+      ...await renderPluginSupport(plan, dependencies, { importMode: 'jsr' }),
+      plugin: createPluginOwnedPluginResult(plan, resolvedPlugin.descriptor, pluginOwned),
+    };
+  const pluginReferences = resolvedPlugin === undefined
+    ? plan.pluginReferences
+    : mergeUniqueReferences(
+      plan.pluginReferences,
+      resolvedPlugin.descriptor.manifest.officialSource?.pluginReferences ?? [],
+    );
 
   const schemaCopies = await copyPluginSchemasToRootDb(
     plan.projectRoot,
@@ -174,30 +148,13 @@ export async function addPlugin(
     { fs: dependencies.fs, scaffolder: dependencies.scaffolder },
     { overwrite: plan.overwrite },
   );
-  for (const dependency of official?.dependencyEntries ?? []) {
-    await dependencies.workspaceMutator.upsertPluginAppsettingsEntry(
-      plan.projectRoot,
-      dependency.configKey,
-      dependency.entry,
-    );
-    await dependencies.workspaceMutator.ensureNetScriptConfigPlugin(
-      plan.projectRoot,
-      dependency.configKey,
-    );
-  }
   await dependencies.workspaceMutator.updateAppsettings(
     plan.projectRoot,
-    plugin,
+    rendered.plugin,
     plan.provider,
     {
-      serviceReferences: mergeUniqueReferences(
-        plan.serviceReferences,
-        official?.serviceReferences ?? [],
-      ),
-      pluginReferences: mergeUniqueReferences(
-        plan.pluginReferences,
-        official?.pluginReferences ?? [],
-      ),
+      serviceReferences: plan.serviceReferences,
+      pluginReferences,
       sagaStoreBackend: plan.sagaStoreBackend,
     },
   );
@@ -210,10 +167,7 @@ export async function addPlugin(
     ? await dependencies.workspaceMutator.ensureSharedCache(plan.projectRoot)
     : false;
 
-  await dependencies.workspaceMutator.ensureWorkspaceMember(
-    plan.projectRoot,
-    official?.workspaceMembers ?? [],
-  );
+  await dependencies.workspaceMutator.ensureWorkspaceMember(plan.projectRoot);
 
   const regenerateHelpers = dependencies.regenerateHelpers ?? regenerateAspireHelpers;
   const helperFiles = await regenerateHelpers(
@@ -227,14 +181,13 @@ export async function addPlugin(
     ...rendered,
     resolvedPlugin: resolvedPlugin?.descriptor,
     pluginOwnedScaffold: pluginOwned,
-    plugin,
     provisionedCache,
     schemaCopies,
     helperFiles,
   };
 }
 
-async function resolvePluginDescriptorBeforePlanning(
+export async function resolvePluginDescriptorBeforePlanning(
   request: AddPluginInput,
   registry: PluginKindRegistry,
   validator: JsrPluginValidatorPort | undefined,
@@ -275,7 +228,7 @@ async function resolvePluginDescriptorBeforePlanning(
   };
 }
 
-async function resolveLocalPluginDescriptor(
+export async function resolveLocalPluginDescriptor(
   localPath: string,
   registry: PluginKindRegistry,
   fs: FileSystemPort,
@@ -310,11 +263,11 @@ async function resolveLocalPluginDescriptor(
   };
 }
 
-async function runPluginOwnedScaffold(
+export async function runPluginOwnedScaffold(
   plan: PluginAddPlan,
   resolvedPlugin: ResolvedPluginBeforePlanning,
   request: AddPluginInput,
-  dependencies: AddPluginDependencies,
+  dependencies: PluginOwnedScaffoldDependencies,
 ): Promise<PluginOwnedScaffoldResult> {
   const processRunner = dependencies.processRunner;
   if (processRunner === undefined) {
@@ -338,7 +291,7 @@ async function runPluginOwnedScaffold(
   });
 }
 
-function createDryRunAddResult(
+export function createDryRunAddResult(
   plan: PluginAddPlan,
   descriptor: ValidatedPluginDescriptor,
   scaffold: PluginOwnedScaffoldResult,
@@ -371,6 +324,42 @@ function createDryRunAddResult(
     provisionedCache: false,
     schemaCopies: [],
     helperFiles: [],
+  };
+}
+
+/** Convert a plugin-owned scaffold result into the host appsettings plugin shape. */
+export function createPluginOwnedPluginResult(
+  plan: PluginAddPlan,
+  descriptor: ValidatedPluginDescriptor,
+  scaffold: PluginOwnedScaffoldResult,
+): PluginScaffoldResult {
+  const officialSource = descriptor.manifest.officialSource;
+  const pluginDir = join(plan.projectRoot, SCAFFOLD_DIRS.PLUGINS, plan.pluginName);
+  const servicePort = plan.port ?? officialSource?.servicePort ?? 0;
+  const backgroundPort = plan.port ?? officialSource?.backgroundPort ?? servicePort;
+  const serviceConfigKey = plan.provider.category === 'plugin'
+    ? plan.pluginName
+    : officialSource?.serviceConfigKey ?? `${plan.pluginName}-api`;
+
+  return {
+    scaffoldResult: {
+      filesCreated: scaffold.createdFiles.map((path) => join(plan.projectRoot, path)),
+      directoriesCreated: [],
+      filesSkipped: scaffold.modifiedFiles.map((path) => join(plan.projectRoot, path)),
+      totalOperations: scaffold.createdFiles.length + scaffold.modifiedFiles.length,
+      durationMs: 0,
+    },
+    pluginDir,
+    kind: plan.kind,
+    port: backgroundPort,
+    servicePort,
+    configSection: plan.provider.category === 'plugin' ? 'Plugins' : 'BackgroundProcessors',
+    configKey: plan.pluginName,
+    serviceConfigKey,
+    backgroundWorkdir: plan.provider.category === 'background-processor'
+      ? toWorkspaceRelativePath(plan.projectRoot, pluginDir)
+      : undefined,
+    serviceWorkdir: toWorkspaceRelativePath(plan.projectRoot, pluginDir),
   };
 }
 
@@ -450,75 +439,4 @@ function parseInfrastructureDependencies(
     parsed.push(value);
   }
   return parsed;
-}
-
-async function maybeCopyOfficialPlugin(
-  plan: PluginAddPlan,
-  dependencies: AddPluginDependencies,
-  sourceRoot: string | null,
-): Promise<OfficialPluginRenderResult | null> {
-  if (!sourceRoot) {
-    return null;
-  }
-
-  if (plan.noCopySource === true) {
-    return null;
-  }
-
-  const canCopyPlugin = dependencies.canCopyPlugin ?? canCopyOfficialPlugin;
-  if (!await canCopyPlugin(sourceRoot, plan.kind, plan.pluginName)) {
-    return null;
-  }
-
-  const copyPlugin = dependencies.copyPlugin ?? copyOfficialPlugin;
-  const result = await copyPlugin({
-    sourceRoot,
-    targetPath: plan.projectRoot,
-    projectName: plan.projectName,
-    kind: plan.kind,
-    pluginName: plan.pluginName,
-    importMode: 'jsr',
-    force: plan.overwrite,
-    includeSamples: plan.includeSamples,
-  });
-  const getSource = dependencies.getSource ?? getOfficialPluginSource;
-  const source = await getSource(sourceRoot, plan.kind);
-
-  return {
-    plugin: {
-      scaffoldResult: result.scaffoldResult,
-      pluginDir: result.pluginDir,
-      kind: plan.kind,
-      port: result.backgroundPort,
-      servicePort: result.servicePort,
-      configSection: plan.provider.category === 'plugin' ? 'Plugins' : 'BackgroundProcessors',
-      configKey: result.pluginName,
-      serviceConfigKey: result.serviceConfigKey,
-      backgroundWorkdir: usesPluginOwnedBackgroundEntrypoint(result)
-        ? toWorkspaceRelativePath(plan.projectRoot, result.pluginDir)
-        : result.backgroundDir
-        ? toWorkspaceRelativePath(plan.projectRoot, result.backgroundDir)
-        : undefined,
-      serviceWorkdir: toWorkspaceRelativePath(plan.projectRoot, result.pluginDir),
-    },
-    pluginReferences: mergeUniqueReferences(
-      source.pluginReferences ?? [],
-      result.dependencies.map((dependency) => dependency.configKey),
-    ),
-    serviceReferences: [],
-    dependencyEntries: result.dependencies.map((dependency) => ({
-      configKey: dependency.configKey,
-      entry: {
-        Enabled: true,
-        Runtime: 'deno',
-        Port: dependency.servicePort,
-        Entrypoint: dependency.serviceEntrypoint,
-        Workdir: `${SCAFFOLD_DIRS.PLUGINS}/${dependency.pluginDir}`,
-        RequiresDb: dependency.requiresDb,
-        RequiresKv: dependency.requiresKv,
-        Permissions: [...dependency.permissions],
-      },
-    })),
-    workspaceMembers: result.workspaceMembers,
-  };
 }

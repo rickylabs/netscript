@@ -40,3 +40,28 @@
   `deno x <flags> jsr:@scope/pkg/scaffold --context-json <json>`, and use the executable local-path
   maintainer shape `deno run <flags> <local-path>/scaffold.ts --context-json <json>`. This preserves
   D4 plugin-owned scaffolding while making S11's local fixture/userland validation runnable on Deno 2.9.
+
+## 2026-06-28 — S5 scaffold.runtime readers satisfied by emitted dx artifacts
+
+- Severity: **significant**, expected by the risk register.
+- Removing the copier exposed runtime-reader assumptions that had previously been satisfied by copied
+  monorepo trees: installer metadata files, root contribution barrels, current smoke API endpoints, and
+  cross-service OTEL spans. Reintroducing the copier would violate D4, so S5 resolved these as
+  plugin-owned scaffold output.
+- Resolution: all five plugin scaffolders now emit `plugins/<name>/scaffold.plugin.json`; workers,
+  sagas, and triggers emit root contribution barrels; workers/sagas/triggers emit smoke-service
+  endpoints expected by `scaffold.runtime`; workers/triggers emit a root `.netscript/generated`
+  OTEL bridge so the background `workers` resource produces the required dequeue/execute spans linked
+  to `triggers-api` enqueue.
+- Evidence: `scaffold.runtime` passed from the native WSL worktree with exit 0,
+  `passed=48 failed=0 skipped=0`, elapsed 178753 ms. This validates only the maintainer/local-path path
+  pre-publish; production `deno x jsr:` remains post-publish S11/e2e-cli-prod scope.
+
+## 2026-06-28 — S5 doctrine checker skips scaffold templates
+
+- Severity: **minor tooling drift**.
+- `deno task arch:check` became CPU-bound scanning plugin scaffold template folders as if they were
+  first-class source roots, especially `plugins/auth/src/scaffold/templates`. These templates are emitted
+  artifact payloads, not architecture units.
+- Resolution: `.llm/tools/fitness/check-doctrine.ts` now skips `/src/scaffold/templates/` during module
+  and folder walking. The gate then completed with exit 0 and no FAIL findings.

@@ -11,6 +11,8 @@ import { createMaintainerCommandDependencies } from './maintainer-command-depend
 export interface MaintainerCliHost {
   /** Return the current working directory. */
   readonly cwd: () => string;
+  /** Return the source checkout root when the binary is invoked from another cwd. */
+  readonly sourceRoot?: () => string;
   /** Resolve a path from the current working directory. */
   readonly resolvePath: (path?: string) => string;
 }

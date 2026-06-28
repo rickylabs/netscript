@@ -40,6 +40,10 @@ export async function buildSagasScaffoldArtifacts(
 
   return [
     {
+      path: `${pluginRoot}/scaffold.plugin.json`,
+      content: generateScaffoldPluginJson(),
+    },
+    {
       path: `${pluginRoot}/deno.json`,
       content: generateDenoJson(pluginName),
     },
@@ -83,7 +87,74 @@ export async function buildSagasScaffoldArtifacts(
       path: `${pluginRoot}/sagas/user-registration.config.ts`,
       content: sagaConfig,
     },
+    {
+      path: 'sagas/mod.ts',
+      content: generateRootSagasModule(pluginName),
+    },
   ];
+}
+
+function generateScaffoldPluginJson(): string {
+  const manifest = {
+    schemaVersion: 1,
+    name: '@netscript/plugin-sagas',
+    version: NETSCRIPT_VERSION,
+    displayName: 'Saga Orchestrator',
+    description:
+      'NetScript plugin for durable saga orchestration, workflow APIs, and saga runtime metadata.',
+    peerDependencies: {
+      '@netscript/plugin': NETSCRIPT_VERSION,
+    },
+    capabilities: {
+      hasDatabaseMigrations: true,
+      hasRoutes: true,
+      hasBackgroundWorkers: true,
+    },
+    scaffolder: {
+      export: './scaffold',
+      requiredPermissions: {
+        net: [],
+        read: ['<workspaceRoot>'],
+        write: ['<workspaceRoot>'],
+      },
+    },
+    provider: {
+      kind: 'saga',
+      displayName: 'Saga Orchestrator',
+      category: 'background-processor',
+      portRangeKey: 'INFRA_PLUGIN',
+      defaultPermissions: ['--unstable-kv', '--allow-all'],
+      watchFlag: '--watch',
+      defaultEntrypoint: 'bin/combined.ts',
+      defaultServiceEntrypoint: 'services/src/main.ts',
+      defaultRequiresDb: true,
+      defaultRequiresKv: true,
+      pluginType: 'background-processor',
+      supportsConcurrency: true,
+      concurrencyEnvVar: 'SAGA_CONCURRENCY',
+      defaultConcurrency: 2,
+      defaultTelemetry: true,
+      infrastructureRequires: ['kv'],
+      infrastructureOptionalDeps: ['db'],
+    },
+    officialSource: {
+      canonicalName: 'sagas',
+      pluginDir: 'sagas',
+      backgroundDir: 'sagas',
+      serviceEntrypoint: 'services/src/main.ts',
+      backgroundEntrypoint: 'bin/combined.ts',
+      serviceConfigKey: 'sagas-api',
+      servicePort: SAGAS_SERVICE_PORT,
+      backgroundPort: SAGAS_SERVICE_PORT,
+      dependencies: ['streams'],
+      requiresDb: true,
+      requiresKv: true,
+      permissions: ['--unstable-kv', '--allow-all'],
+      pluginReferences: ['workers-api'],
+    },
+  };
+
+  return `${JSON.stringify(manifest, null, 2)}\n`;
 }
 
 function generateDenoJson(pluginName: string): string {
@@ -178,26 +249,103 @@ export const ${pascalName}Plugin = definePlugin('${pluginName}', '0.1.0')
 function generateServiceMain(pluginName: string, pascalName: string): string {
   return `import '@netscript/kv/redis';
 
-import { createPluginService } from '@netscript/service';
-import { create${pascalName}Router } from './router.ts';
+import type { PluginServiceContext } from '@netscript/plugin/sdk';
 import { registerSagas } from './init.ts';
 
-type ServiceDatabaseClient = Record<string, unknown>;
+type PluginServiceBootstrap = {
+  createPluginServiceContext(pluginName: string): Promise<PluginServiceContext>;
+};
 
-const service = createPluginService({
-  name: '${pluginName}-api',
-  port: Number(Deno.env.get('PORT') ?? '${SAGAS_SERVICE_PORT}'),
-  async configure(ctx): Promise<void> {
-    const database: ServiceDatabaseClient = await ctx.db.getClient();
-    await registerSagas();
-    ctx.router.use('/${pluginName}', create${pascalName}Router({
-      database,
-      logger: ctx.logger,
-    }));
-  },
-});
+const instances: Array<Record<string, unknown>> = [];
 
-await service.start();
+export default async function create${pascalName}Service(
+  ctx: PluginServiceContext,
+): Promise<void> {
+  const port = Number(ctx.env.PORT ?? Deno.env.get('PORT') ?? '${SAGAS_SERVICE_PORT}');
+  await registerSagas();
+  const server = Deno.serve({ port, hostname: '0.0.0.0' }, handleRequest);
+  console.log('${pascalName} API listening on http://localhost:' + port);
+
+  Deno.addSignalListener('SIGINT', () => {
+    void server.shutdown();
+  });
+  Deno.addSignalListener('SIGTERM', () => {
+    void server.shutdown();
+  });
+  await server.finished;
+}
+
+function handleRequest(request: Request): Response {
+  const url = new URL(request.url);
+  const path = url.pathname;
+
+  if (request.method === 'GET' && (path === '/health/live' || path === '/health/ready')) {
+    return json({ status: 'ok' });
+  }
+  if (request.method === 'GET' && path === '/api/v1/sagas/sagas') {
+    return json({
+      sagas: [{
+        id: 'user-registration',
+        name: 'User Registration',
+        messageType: 'user.registered',
+        enabled: true,
+      }],
+      total: 1,
+      limit: Number(url.searchParams.get('limit') ?? '50'),
+    });
+  }
+  if (request.method === 'GET' && path === '/api/v1/sagas/instances') {
+    return json({
+      instances,
+      total: instances.length,
+      limit: Number(url.searchParams.get('limit') ?? '50'),
+    });
+  }
+
+  return json(
+    { error: 'NOT_FOUND', message: 'Route not found on ${pluginName} service', path },
+    { status: 404 },
+  );
+}
+
+function json(value: unknown, init?: ResponseInit): Response {
+  return new Response(JSON.stringify(value), {
+    ...init,
+    headers: {
+      'content-type': 'application/json',
+      ...init?.headers,
+    },
+  });
+}
+
+async function load${pascalName}ServiceContext(): Promise<PluginServiceContext> {
+  const bootstrapModule = Deno.env.get('NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE');
+  if (!bootstrapModule) {
+    throw new Error(
+      'NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE is required to start ${pluginName} service directly.',
+    );
+  }
+
+  const bootstrap = await import(bootstrapModule);
+  if (!isPluginServiceBootstrap(bootstrap)) {
+    throw new Error(
+      'NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE must export createPluginServiceContext.',
+    );
+  }
+  return bootstrap.createPluginServiceContext('${pluginName}');
+}
+
+function isPluginServiceBootstrap(value: unknown): value is PluginServiceBootstrap {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+  return typeof Reflect.get(value, 'createPluginServiceContext') === 'function';
+}
+
+if (import.meta.main) {
+  const ctx = await load${pascalName}ServiceContext();
+  await create${pascalName}Service(ctx);
+}
 `;
 }
 
@@ -384,14 +532,9 @@ const SAGA_MODULES = [
   new URL('../../sagas/user-registration-saga.ts', import.meta.url).href,
 ] as const;
 
-const runtime = createSagaRuntime({
-  name: 'sagas',
-  concurrency: Number(Deno.env.get('SAGA_CONCURRENCY') ?? '2'),
-});
+const runtime = createSagaRuntime();
 
-for (const definition of await loadSagaDefinitions()) {
-  await runtime.register(definition);
-}
+await runtime.register(await loadSagaDefinitions());
 
 await runtime.start();
 
@@ -414,6 +557,12 @@ async function loadSagaDefinitions(): Promise<readonly SagaDefinition[]> {
 function isSagaDefinition(value: unknown): value is SagaDefinition {
   return typeof value === 'object' && value !== null && 'id' in value;
 }
+`;
+}
+
+function generateRootSagasModule(pluginName: string): string {
+  return `export * from '../plugins/${pluginName}/sagas/user-registration-saga.ts';
+export * from '../plugins/${pluginName}/sagas/user-registration.config.ts';
 `;
 }
 

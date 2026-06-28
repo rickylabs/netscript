@@ -861,3 +861,82 @@ Timestamp: 2026-06-28T10:45:00Z
 - `deno.lock` was not touched.
 - No new TypeScript casts were introduced.
 - S10 did not remove or rewire the CLI copier/official-source path; that remains deferred to S5.
+
+## 2026-06-28 — S5 CLI wiring: registry seed + dx scaffold reroute
+
+### Scope Completed
+
+- Rewired public `plugin add <kind>` to resolve official kinds through the S2 JSR package resolver and
+  validated manifest descriptor before planning, then render CLI-owned workspace support without walking
+  the monorepo checkout or copying first-party source trees.
+- Rerouted maintainer/local `plugin add <kind>` through the S4 plugin-owned `./scaffold` runner using the
+  first-party local plugin directory. The local contributor binary now passes its source root so generated
+  projects resolve the real plugin dx scaffolders instead of resolving relative to the generated project.
+- Retired source-copy reliance from the add path. `official-plugin-source.ts` remains only as the
+  maintainer/local source-root locator for `--local-path` defaults; `official-plugin-copier.ts` is no
+  longer imported by public or maintainer add flows.
+- Kept CLI-owned workspace mutators: DB schema copy/merge, appsettings and service config wiring,
+  `netscript.config.ts` plugin entries, root imports/import-map wiring, workspace membership,
+  generated plugin registry, shared package cache, and Aspire helper regeneration.
+
+### Artifact Divergence Reconciled
+
+- The S6-S10 scaffolders needed additional emitted artifacts to satisfy the existing
+  `scaffold.runtime` readers without reintroducing the copier:
+  `plugins/<name>/scaffold.plugin.json` installer manifests for all five plugins, root contribution
+  barrels for workers/sagas/triggers, and current smoke-service endpoints for workers, sagas, triggers,
+  and auth.
+- Workers, sagas, triggers, and streams scaffold outputs were corrected to current package APIs
+  (`@netscript/plugin-workers-core`, current workers builder methods, current saga runtime registration,
+  current stream schema shape).
+- The OTEL reader required service `workers` spans linked to `triggers-api` enqueue spans. The triggers
+  scaffolder now writes a root `.netscript/generated/worker-otel-event.json` bridge event and the workers
+  background scaffolder emits `queue.dequeue` / `job.execute` spans with the enqueue span as parent.
+- An external stale Aspire/NuGet lock from an unrelated prior eye-test initially blocked the runtime smoke;
+  stale stopped `aspire-managed nuget` processes holding `/tmp/NuGetScratchcodex/lock/*` were terminated
+  before the green run.
+
+### Scope Boundary
+
+- Pre-merge S5 validates the maintainer/local-path path only. The prod `deno x jsr:` official-kind path
+  remains post-publish scope for S11 plus the post-alpha.13 `e2e-cli-prod` smoke; this worklog does not
+  claim prod-JSR green.
+- `deno.lock` and `packages/cli/deno.json` were not changed; `deno task publish:dry-run` for
+  `@netscript/cli` was not run because the CLI public export map did not change.
+- No new TypeScript casts were introduced.
+
+### Fitness Gates Touched
+
+| Gate | S5 evidence |
+| ---- | ----------- |
+| F-3 | CLI orchestration stays in public/local CLI layers; plugin artifact emission stays inside plugin-owned scaffolders. |
+| F-5 | No root `@netscript/cli` public export-map change; support result types remain internal to the add/render flow. |
+| F-6 | No package publish surface changed for `@netscript/cli`; publish dry-run not required for S5. |
+| F-8 | No compiler lib override changed. |
+| F-9 | Plugin-owned scaffold execution continues through S4 first-party permission policy. |
+| F-10 | Focused add/resolver/runner tests cover manifest-seeded add, local-path dx scaffold, dry-run, and idempotency. |
+| F-11 | No forbidden generic folder introduced; generated scaffolder artifacts stay under plugin `src/scaffold`. |
+| F-12 | New names are domain-specific (`renderPluginSupport`, `runPluginOwnedScaffold`, `resolveLocalPluginDescriptor`). |
+| F-13 | Scaffolded runtime artifacts now include the service endpoints, plugin metadata, and OTEL bridge expected by runtime readers. |
+| F-15 | No upstream package re-export introduced. |
+| F-16 | No new broad flat command folder introduced; changes stay in existing add/render/composition files and plugin scaffold modules. |
+| F-18 | No new subdirectory barrel introduced. |
+| F-CLI-3 | Public add no longer imports maintainer/local copier behavior; local contributor routing is explicit. |
+| F-CLI-4 | Kernel remains independent of public/local add orchestration. |
+| F-CLI-11 | Source-mode selection is explicit: manifest/JSR descriptor for public path, local-path descriptor for maintainer validation. |
+| F-CLI-16 | Process execution stays behind `dispatchPluginScaffold()` / injected process runner; tests use fixtures and real local paths. |
+| F-CLI-19 | Dry-run previews plugin-owned scaffold output without writing generated project files. |
+| F-CLI-21 | Changes follow existing feature/use-case and command composition naming. |
+| F-CLI-28 | Resolver/validator and process effects remain injected/testable; no unit tests hit the real registry. |
+
+### Gate Results
+
+| Gate | Command | Result |
+| ---- | ------- | ------ |
+| Check wrapper | `rtk proxy deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --root plugins/workers --root plugins/sagas --root plugins/triggers --root plugins/streams --root plugins/auth --ext ts,tsx` | PASS; 839 files, 7 batches, 0 occurrences. |
+| Lint wrapper | `rtk proxy deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/cli --root plugins/workers --root plugins/sagas --root plugins/triggers --root plugins/streams --root plugins/auth --ext ts,tsx` | Wrapper exited 1 with 0 findings; recorded as existing wrapper/config anomaly. |
+| Fmt wrapper | `rtk proxy deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cli --root plugins/workers --root plugins/sagas --root plugins/triggers --root plugins/streams --root plugins/auth --ext ts,tsx` | Wrapper exited 1 with 0 findings; recorded as existing wrapper/config anomaly. |
+| Lint/fmt fallback | `deno lint --no-config <17 touched files>` and `deno fmt --check --no-config --line-width 100 --indent-width 2 --single-quote --no-semicolons=false <17 touched files>` | PASS; 17 touched files checked for lint and format. |
+| Doctrine | `rtk proxy deno task arch:check` | PASS; exit 0, no FAIL findings. Existing catalog/doc warnings only. |
+| Focused CLI tests | `deno test -A --unstable-kv packages/cli/src/public/features/plugins/add/add-plugin_test.ts packages/cli/src/local/features/plugins/add/add-local-plugin_test.ts packages/cli/src/public/features/plugins/add/plugin-package-resolver_test.ts packages/cli/src/public/features/plugins/dispatch/dispatch-plugin-verb_test.ts` | PASS; 5 test modules, 38 steps, 0 failed. |
+| Full runtime E2E | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS; raw exit code 0, `passed=48 failed=0 skipped=0`, elapsed 178753 ms, log `.llm/tmp/cli-e2e/plugin-smoke-20260628-140307.log`. |

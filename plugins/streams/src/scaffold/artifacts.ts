@@ -21,6 +21,10 @@ export function buildStreamsScaffoldArtifacts(
 
   return [
     {
+      path: `${pluginRoot}/scaffold.plugin.json`,
+      content: generateScaffoldPluginJson(),
+    },
+    {
       path: `${pluginRoot}/deno.json`,
       content: generateDenoJson(pluginName),
     },
@@ -49,6 +53,78 @@ export function buildStreamsScaffoldArtifacts(
       content: generateE2eModule(pluginName),
     },
   ];
+}
+
+function generateScaffoldPluginJson(): string {
+  const manifest = {
+    schemaVersion: 1,
+    name: '@netscript/plugin-streams',
+    version: NETSCRIPT_VERSION,
+    displayName: 'Durable Streams',
+    description: 'Durable Streams service, CLI, Aspire, E2E, and scaffolding plugin for NetScript.',
+    peerDependencies: {
+      '@netscript/plugin': NETSCRIPT_VERSION,
+    },
+    capabilities: {
+      hasDatabaseMigrations: false,
+      hasRoutes: true,
+      hasBackgroundWorkers: false,
+    },
+    scaffolder: {
+      export: './scaffold',
+      requiredPermissions: {
+        net: [],
+        read: ['<workspaceRoot>'],
+        write: ['<workspaceRoot>'],
+      },
+    },
+    provider: {
+      kind: 'stream',
+      displayName: 'Durable Streams',
+      category: 'plugin',
+      portRangeKey: 'PLUGIN_API',
+      defaultPermissions: [
+        '--allow-net',
+        '--allow-env',
+        '--allow-read',
+        '--allow-write',
+        '--allow-sys',
+        '--allow-ffi',
+      ],
+      watchFlag: '--watch',
+      defaultEntrypoint: 'services/src/main.ts',
+      defaultServiceEntrypoint: 'services/src/main.ts',
+      defaultRequiresDb: false,
+      defaultRequiresKv: false,
+      pluginType: 'utility',
+      supportsConcurrency: false,
+      concurrencyEnvVar: null,
+      defaultConcurrency: null,
+      defaultTelemetry: true,
+      infrastructureRequires: [],
+      infrastructureOptionalDeps: [],
+    },
+    officialSource: {
+      canonicalName: 'streams',
+      pluginDir: 'streams',
+      serviceEntrypoint: 'services/src/main.ts',
+      serviceConfigKey: 'streams',
+      servicePort: STREAMS_SERVICE_PORT,
+      backgroundPort: STREAMS_SERVICE_PORT,
+      requiresDb: false,
+      requiresKv: false,
+      permissions: [
+        '--allow-net',
+        '--allow-env',
+        '--allow-read',
+        '--allow-write',
+        '--allow-sys',
+        '--allow-ffi',
+      ],
+    },
+  };
+
+  return `${JSON.stringify(manifest, null, 2)}\n`;
 }
 
 function generateDenoJson(pluginName: string): string {
@@ -261,12 +337,15 @@ function generateStreamsModule(pluginName: string, pascalName: string, camelName
 import { z } from 'zod';
 
 export const ${camelName}EventSchema = defineStreamSchema({
-  type: '${pluginName}.event',
-  schema: z.object({
-    id: z.string(),
-    type: z.string(),
-    payload: z.record(z.string(), z.unknown()),
-  }),
+  event: {
+    type: '${pluginName}.event',
+    primaryKey: 'id',
+    schema: z.object({
+      id: z.string(),
+      type: z.string(),
+      payload: z.record(z.string(), z.unknown()),
+    }),
+  },
 });
 
 /** Create the default ${pascalName} durable event stream wiring. */

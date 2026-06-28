@@ -8,7 +8,11 @@ import { SCAFFOLD_FILES } from '../../../../kernel/constants/scaffold/scaffold-f
 import { generatePluginServiceContext } from '../../../../kernel/templates/plugins/plugin-generators.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../../../kernel/ports/template-port.ts';
-import type { PluginAddPlan, PluginRenderResult } from '../../../domain/plugin-add-plan.ts';
+import type {
+  PluginAddPlan,
+  PluginRenderResult,
+  PluginRenderSupportResult,
+} from '../../../domain/plugin-add-plan.ts';
 
 /** Dependencies used to render starter plugin files. */
 export interface RenderPluginDependencies {
@@ -33,26 +37,7 @@ export async function renderPlugin(
   plan: PluginAddPlan,
   dependencies: RenderPluginDependencies,
 ): Promise<PluginRenderResult> {
-  const provisionedDatabase = await provisionDatabaseIfNeeded(
-    plan.projectRoot,
-    plan.dbDetection,
-    {
-      projectName: plan.projectName,
-      importMode: 'jsr',
-      overwrite: plan.overwrite,
-    },
-    {
-      fs: dependencies.fs,
-      scaffolder: dependencies.scaffolder,
-      templateAdapter: dependencies.templateAdapter,
-    },
-  );
-  const wroteServiceContext = await ensurePluginServiceContext(
-    plan.projectRoot,
-    dependencies.scaffolder,
-    plan.overwrite,
-  );
-  const registryFilesCreated = await ensurePluginRegistry(plan, dependencies);
+  const support = await renderPluginSupport(plan, dependencies, { importMode: 'jsr' });
   const plugin = await dependencies.pluginScaffolder.scaffold({
     projectName: plan.projectName,
     targetPath: plan.projectRoot,
@@ -68,7 +53,43 @@ export async function renderPlugin(
   });
 
   return {
+    ...support,
     plugin,
+  };
+}
+
+/** Render CLI-owned plugin workspace support files without rendering plugin artifacts. */
+export async function renderPluginSupport(
+  plan: PluginAddPlan,
+  dependencies: RenderPluginDependencies,
+  options: {
+    readonly importMode: 'jsr' | 'local';
+    readonly localBase?: string;
+  },
+): Promise<PluginRenderSupportResult> {
+  const provisionedDatabase = await provisionDatabaseIfNeeded(
+    plan.projectRoot,
+    plan.dbDetection,
+    {
+      projectName: plan.projectName,
+      importMode: options.importMode,
+      localBase: options.localBase,
+      overwrite: plan.overwrite,
+    },
+    {
+      fs: dependencies.fs,
+      scaffolder: dependencies.scaffolder,
+      templateAdapter: dependencies.templateAdapter,
+    },
+  );
+  const wroteServiceContext = await ensurePluginServiceContext(
+    plan.projectRoot,
+    dependencies.scaffolder,
+    plan.overwrite,
+  );
+  const registryFilesCreated = await ensurePluginRegistry(plan, dependencies);
+
+  return {
     registryFilesCreated,
     wroteServiceContext,
     provisionedDatabase,

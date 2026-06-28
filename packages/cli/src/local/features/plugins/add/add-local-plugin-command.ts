@@ -1,6 +1,5 @@
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import { Command } from '@cliffy/command';
-import { join } from '@std/path';
 import {
   parseList,
   type ProjectRootResolver,
@@ -25,7 +24,7 @@ export interface LocalPluginAddCommandDependencies {
 /** Create the local contributor `plugin add` command. */
 export function createLocalPluginAddCommand(
   dependencies: LocalPluginAddCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+) {
   const print = dependencies.print ?? outputText;
   return new Command()
     .name('add')
@@ -69,9 +68,7 @@ export function createLocalPluginAddCommand(
         includeSamples: options.samples !== false,
         dryRun: options.dryRun ?? false,
         jsrUrl: options.jsrUrl,
-        localPath: options.jsrUrl === undefined
-          ? options.localPath ?? join(dependencies.sourceRootStartDir, 'plugins', kind)
-          : options.localPath,
+        localPath: options.localPath,
         noCopySource: options.copySource === false,
         projectRoot,
         overwrite: options.force ?? false,

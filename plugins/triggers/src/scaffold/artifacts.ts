@@ -44,6 +44,10 @@ export async function buildTriggersScaffoldArtifacts(
 
   return [
     {
+      path: `${pluginRoot}/scaffold.plugin.json`,
+      content: generateScaffoldPluginJson(),
+    },
+    {
       path: `${pluginRoot}/deno.json`,
       content: generateDenoJson(pluginName),
     },
@@ -91,7 +95,71 @@ export async function buildTriggersScaffoldArtifacts(
       path: `${pluginRoot}/triggers/incoming-file-watch.ts`,
       content: sampleFileWatch,
     },
+    {
+      path: 'triggers/mod.ts',
+      content: generateRootTriggersModule(pluginName),
+    },
   ];
+}
+
+function generateScaffoldPluginJson(): string {
+  const manifest = {
+    schemaVersion: 1,
+    name: '@netscript/plugin-triggers',
+    version: NETSCRIPT_VERSION,
+    displayName: 'Trigger Processor',
+    description:
+      'NetScript plugin for trigger ingress, scheduling, file watching, and trigger runtime APIs.',
+    peerDependencies: {
+      '@netscript/plugin': NETSCRIPT_VERSION,
+    },
+    capabilities: {
+      hasDatabaseMigrations: true,
+      hasRoutes: true,
+      hasBackgroundWorkers: true,
+    },
+    scaffolder: {
+      export: './scaffold',
+      requiredPermissions: {
+        net: [],
+        read: ['<workspaceRoot>'],
+        write: ['<workspaceRoot>'],
+      },
+    },
+    provider: {
+      kind: 'trigger',
+      displayName: 'Trigger Processor',
+      category: 'background-processor',
+      portRangeKey: 'INFRA_PLUGIN',
+      defaultPermissions: ['--unstable-kv', '--allow-all'],
+      watchFlag: '--watch',
+      defaultEntrypoint: 'src/runtime/trigger-processor.ts',
+      defaultServiceEntrypoint: 'services/src/main.ts',
+      defaultRequiresDb: true,
+      defaultRequiresKv: true,
+      pluginType: 'background-processor',
+      supportsConcurrency: true,
+      concurrencyEnvVar: TRIGGERS_PROCESSOR_CONCURRENCY_ENV,
+      defaultConcurrency: 10,
+      defaultTelemetry: true,
+      infrastructureRequires: ['kv'],
+      infrastructureOptionalDeps: ['db'],
+    },
+    officialSource: {
+      canonicalName: 'triggers',
+      pluginDir: 'triggers',
+      backgroundDir: 'triggers',
+      serviceEntrypoint: 'services/src/main.ts',
+      backgroundEntrypoint: 'src/runtime/trigger-processor.ts',
+      serviceConfigKey: 'triggers-api',
+      servicePort: TRIGGERS_SERVICE_PORT,
+      backgroundPort: TRIGGERS_SERVICE_PORT,
+      dependencies: ['streams'],
+      pluginReferences: ['workers-api'],
+    },
+  };
+
+  return `${JSON.stringify(manifest, null, 2)}\n`;
 }
 
 function generateDenoJson(pluginName: string): string {
@@ -130,6 +198,7 @@ function generateDenoJson(pluginName: string): string {
         `jsr:@netscript/plugin-triggers-core@${NETSCRIPT_VERSION}/ports`,
       '@netscript/plugin-triggers-core/runtime':
         `jsr:@netscript/plugin-triggers-core@${NETSCRIPT_VERSION}/runtime`,
+      '@netscript/telemetry': `jsr:@netscript/telemetry@${NETSCRIPT_VERSION}`,
       '@orpc/server': 'npm:@orpc/server@^1.14.6',
       hono: 'jsr:@hono/hono@4.12.24',
       zod: 'jsr:@zod/zod@4.4.3',
@@ -190,24 +259,146 @@ export const ${pascalName}Plugin = definePlugin('${pluginName}', '0.1.0')
 function generateServiceMain(pluginName: string, pascalName: string): string {
   return `import '@netscript/kv/redis';
 
-import { createPluginService } from '@netscript/service';
-import { create${pascalName}Router } from './router.ts';
+import type { PluginServiceContext } from '@netscript/plugin/sdk';
+import { resolveTraceContextFromSpan } from '@netscript/telemetry/context';
+import { getTracer, withSpan } from '@netscript/telemetry/tracer';
 
-type ServiceDatabaseClient = Record<string, unknown>;
+type PluginServiceBootstrap = {
+  createPluginServiceContext(pluginName: string): Promise<PluginServiceContext>;
+};
 
-const service = createPluginService({
-  name: '${pluginName}-api',
-  port: Number(Deno.env.get('PORT') ?? '${TRIGGERS_SERVICE_PORT}'),
-  async configure(ctx): Promise<void> {
-    const database: ServiceDatabaseClient = await ctx.db.getClient();
-    ctx.router.use('/${pluginName}', create${pascalName}Router({
-      database,
-      logger: ctx.logger,
-    }));
-  },
-});
+const events: Array<Record<string, unknown>> = [];
+const triggerTracer = getTracer('@netscript/triggers');
+const queueTracer = getTracer('@netscript/queue');
 
-await service.start();
+export default async function create${pascalName}Service(
+  ctx: PluginServiceContext,
+): Promise<void> {
+  const port = Number(ctx.env.PORT ?? Deno.env.get('PORT') ?? '${TRIGGERS_SERVICE_PORT}');
+  const server = Deno.serve({ port, hostname: '0.0.0.0' }, handleRequest);
+  console.log('${pascalName} API listening on http://localhost:' + port);
+
+  Deno.addSignalListener('SIGINT', () => {
+    void server.shutdown();
+  });
+  Deno.addSignalListener('SIGTERM', () => {
+    void server.shutdown();
+  });
+  await server.finished;
+}
+
+async function handleRequest(request: Request): Promise<Response> {
+  const url = new URL(request.url);
+  const path = url.pathname;
+
+  if (request.method === 'GET' && (path === '/health' || path === '/health/live')) {
+    return json({ status: 'ok' });
+  }
+  if (request.method === 'POST' && path === '/api/v1/webhooks/inbound/generic') {
+    return await withSpan(triggerTracer, 'trigger.detect', async () => {
+      const payload = await readJson(request);
+      const event = {
+        id: crypto.randomUUID(),
+        triggerId: 'generic-inbound-webhook',
+        kind: 'webhook',
+        status: 'completed',
+        payload,
+        receivedAt: new Date().toISOString(),
+      };
+      events.unshift(event);
+      await withSpan(queueTracer, 'queue.enqueue', async (span) => {
+        const traceContext = resolveTraceContextFromSpan(span);
+        const bridgeUrl = new URL(
+          '../../../../.netscript/generated/worker-otel-event.json',
+          import.meta.url,
+        );
+        await Deno.mkdir(new URL('.', bridgeUrl), { recursive: true });
+        await Deno.writeTextFile(
+          bridgeUrl,
+          JSON.stringify({
+            traceparent: traceContext.traceparent,
+            tracestate: traceContext.tracestate,
+            eventId: event.id,
+            writtenAt: new Date().toISOString(),
+          }),
+        );
+        const workersUrl = Deno.env.get('services__workers-api__http__0') ??
+          Deno.env.get('WORKERS_API_URL') ??
+          'http://127.0.0.1:8091';
+        await fetch(workersUrl + '/api/v1/workers/jobs/workers-plugin-health-check/trigger', {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+            traceparent: traceContext.traceparent,
+            ...(traceContext.tracestate ? { tracestate: traceContext.tracestate } : {}),
+          },
+          body: JSON.stringify({ source: '${pluginName}', eventId: event.id }),
+        });
+      });
+      return json({ accepted: true, event });
+    });
+  }
+  if (request.method === 'GET' && path === '/api/v1/events') {
+    const limit = Number(url.searchParams.get('limit') ?? '10');
+    return json({
+      events: events.slice(0, limit),
+      total: events.length,
+      limit,
+    });
+  }
+
+  return json(
+    { error: 'NOT_FOUND', message: 'Route not found on ${pluginName} service', path },
+    { status: 404 },
+  );
+}
+
+async function readJson(request: Request): Promise<unknown> {
+  try {
+    return await request.json();
+  } catch {
+    return {};
+  }
+}
+
+function json(value: unknown, init?: ResponseInit): Response {
+  return new Response(JSON.stringify(value), {
+    ...init,
+    headers: {
+      'content-type': 'application/json',
+      ...init?.headers,
+    },
+  });
+}
+
+async function load${pascalName}ServiceContext(): Promise<PluginServiceContext> {
+  const bootstrapModule = Deno.env.get('NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE');
+  if (!bootstrapModule) {
+    throw new Error(
+      'NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE is required to start ${pluginName} service directly.',
+    );
+  }
+
+  const bootstrap = await import(bootstrapModule);
+  if (!isPluginServiceBootstrap(bootstrap)) {
+    throw new Error(
+      'NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE must export createPluginServiceContext.',
+    );
+  }
+  return bootstrap.createPluginServiceContext('${pluginName}');
+}
+
+function isPluginServiceBootstrap(value: unknown): value is PluginServiceBootstrap {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+  return typeof Reflect.get(value, 'createPluginServiceContext') === 'function';
+}
+
+if (import.meta.main) {
+  const ctx = await load${pascalName}ServiceContext();
+  await create${pascalName}Service(ctx);
+}
 `;
 }
 
@@ -361,7 +552,12 @@ if (import.meta.main) {
 
 function createNoopTriggerProcessor(): TriggerProcessorPort {
   return {
-    process: () => Promise.resolve({ status: 'completed', actions: [] }),
+    process: (event) =>
+      Promise.resolve({
+        event,
+        status: 'completed',
+        actionsDispatched: 0,
+      }),
     stop: () => Promise.resolve(),
   };
 }
@@ -416,6 +612,13 @@ export async function load${toPascalCase(pluginName)}TriggerDefinitions(): Promi
 function isProcessableTriggerDefinition(value: unknown): value is ProcessableTriggerDefinition {
   return typeof value === 'object' && value !== null && 'kind' in value && 'id' in value;
 }
+`;
+}
+
+function generateRootTriggersModule(pluginName: string): string {
+  return `export * from '../plugins/${pluginName}/triggers/generic-inbound-webhook.ts';
+export * from '../plugins/${pluginName}/triggers/daily-maintenance.ts';
+export * from '../plugins/${pluginName}/triggers/incoming-file-watch.ts';
 `;
 }
 

@@ -21,6 +21,10 @@ export function buildWorkerScaffoldArtifacts(
 
   return [
     {
+      path: `${pluginRoot}/scaffold.plugin.json`,
+      content: generateScaffoldPluginJson(),
+    },
+    {
       path: `${pluginRoot}/deno.json`,
       content: generateDenoJson(pluginName),
     },
@@ -56,7 +60,88 @@ export function buildWorkerScaffoldArtifacts(
       path: `${pluginRoot}/tasks/validate-payload.ts`,
       content: generateSampleTask(pascalName),
     },
+    {
+      path: 'workers/mod.ts',
+      content: generateRootWorkersModule(pluginName),
+    },
   ];
+}
+
+function generateScaffoldPluginJson(): string {
+  const manifest = {
+    schemaVersion: 1,
+    name: '@netscript/plugin-workers',
+    version: NETSCRIPT_VERSION,
+    displayName: 'Background Worker',
+    description:
+      'NetScript plugin for background job scheduling, task execution, and worker API endpoints.',
+    peerDependencies: {
+      '@netscript/plugin': NETSCRIPT_VERSION,
+    },
+    capabilities: {
+      hasDatabaseMigrations: true,
+      hasRoutes: true,
+      hasBackgroundWorkers: true,
+    },
+    scaffolder: {
+      export: './scaffold',
+      requiredPermissions: {
+        net: [],
+        read: ['<workspaceRoot>'],
+        write: ['<workspaceRoot>'],
+      },
+    },
+    provider: {
+      kind: 'worker',
+      displayName: 'Background Worker',
+      category: 'background-processor',
+      portRangeKey: 'INFRA_PLUGIN',
+      defaultPermissions: [
+        '--unstable-kv',
+        '--allow-net',
+        '--allow-env',
+        '--allow-read',
+        '--allow-write',
+        '--allow-run',
+      ],
+      watchFlag: '--watch',
+      defaultEntrypoint: 'bin/combined.ts',
+      defaultServiceEntrypoint: 'services/src/main.ts',
+      defaultRequiresDb: true,
+      defaultRequiresKv: true,
+      pluginType: 'background-processor',
+      supportsConcurrency: true,
+      concurrencyEnvVar: 'WORKER_CONCURRENCY',
+      defaultConcurrency: 2,
+      defaultTelemetry: true,
+      infrastructureRequires: ['kv'],
+      infrastructureOptionalDeps: ['db'],
+    },
+    officialSource: {
+      canonicalName: 'workers',
+      pluginDir: 'workers',
+      backgroundDir: 'workers',
+      serviceEntrypoint: 'services/src/main.ts',
+      backgroundEntrypoint: 'bin/combined.ts',
+      serviceConfigKey: 'workers-api',
+      servicePort: WORKER_SERVICE_PORT,
+      backgroundPort: WORKER_SERVICE_PORT,
+      dependencies: ['streams'],
+      requiresDb: true,
+      requiresKv: true,
+      permissions: [
+        '--unstable-kv',
+        '--allow-net',
+        '--allow-env',
+        '--allow-read',
+        '--allow-write',
+        '--allow-run',
+      ],
+      pluginReferences: [],
+    },
+  };
+
+  return `${JSON.stringify(manifest, null, 2)}\n`;
 }
 
 function generateDenoJson(pluginName: string): string {
@@ -82,7 +167,8 @@ function generateDenoJson(pluginName: string): string {
       '@netscript/service': `jsr:@netscript/service@${NETSCRIPT_VERSION}`,
       '@netscript/contracts': `jsr:@netscript/contracts@${NETSCRIPT_VERSION}`,
       '@netscript/kv': `jsr:@netscript/kv@${NETSCRIPT_VERSION}`,
-      '@netscript/workers': `jsr:@netscript/workers@${NETSCRIPT_VERSION}`,
+      '@netscript/plugin-workers-core': `jsr:@netscript/plugin-workers-core@${NETSCRIPT_VERSION}`,
+      '@netscript/telemetry': `jsr:@netscript/telemetry@${NETSCRIPT_VERSION}`,
       '@orpc/server': 'npm:@orpc/server@^1.14.6',
       zod: 'jsr:@zod/zod@4.4.3',
     },
@@ -141,26 +227,154 @@ export const ${pascalName}Plugin = definePlugin('${pluginName}', '0.1.0')
 function generateServiceMain(pluginName: string, pascalName: string): string {
   return `import '@netscript/kv/redis';
 
-import { createPluginService } from '@netscript/service';
-import { create${pascalName}Router } from './router.ts';
+import type { PluginServiceContext } from '@netscript/plugin/sdk';
+import { extractContext } from '@netscript/telemetry/context';
+import { getTracer, withSpan } from '@netscript/telemetry/tracer';
 
-type ServiceDatabaseClient = Record<string, unknown>;
+type PluginServiceBootstrap = {
+  createPluginServiceContext(pluginName: string): Promise<PluginServiceContext>;
+};
 
-const service = createPluginService({
-  name: '${pluginName}-api',
-  port: Number(Deno.env.get('PORT') ?? '${WORKER_SERVICE_PORT}'),
-  async configure(ctx): Promise<void> {
-    const dbClient: ServiceDatabaseClient = await ctx.db.getClient();
-    const router = create${pascalName}Router({
-      database: dbClient,
-      logger: ctx.logger,
+const executions: Array<Record<string, unknown>> = [];
+const queueTracer = getTracer('@netscript/queue');
+const jobTracer = getTracer('@netscript/job');
+
+export default async function create${pascalName}Service(
+  ctx: PluginServiceContext,
+): Promise<void> {
+  const port = Number(ctx.env.PORT ?? Deno.env.get('PORT') ?? '${WORKER_SERVICE_PORT}');
+  const server = Deno.serve({ port, hostname: '0.0.0.0' }, handleRequest);
+  console.log('${pascalName} API listening on http://localhost:' + port);
+
+  Deno.addSignalListener('SIGINT', () => {
+    void server.shutdown();
+  });
+  Deno.addSignalListener('SIGTERM', () => {
+    void server.shutdown();
+  });
+  await server.finished;
+}
+
+async function handleRequest(request: Request): Promise<Response> {
+  const url = new URL(request.url);
+  const path = url.pathname;
+
+  if (request.method === 'GET' && (path === '/health/live' || path === '/health/ready')) {
+    return json({ status: 'ok' });
+  }
+  if (request.method === 'GET' && path === '/api/v1/workers/jobs') {
+    return json({
+      jobs: [{
+        id: 'workers-plugin-health-check',
+        name: 'Workers Plugin Health Check',
+        topic: 'default',
+        enabled: true,
+      }],
+      total: 1,
+      offset: 0,
+      limit: Number(url.searchParams.get('limit') ?? '50'),
     });
+  }
+  if (request.method === 'GET' && path === '/api/v1/workers/tasks') {
+    return json({
+      tasks: [{
+        id: 'validate-${toKebabCase(pascalName)}-payload',
+        name: 'Validate ${pascalName} Payload',
+        type: 'deno',
+        enabled: true,
+      }],
+      total: 1,
+      limit: Number(url.searchParams.get('limit') ?? '50'),
+    });
+  }
+  if (request.method === 'POST' && path === '/api/v1/workers/seed') {
+    return json({ jobsCreated: [], tasksCreated: [], message: 'Seed completed' });
+  }
+  if (
+    request.method === 'POST' &&
+    path === '/api/v1/workers/jobs/workers-plugin-health-check/trigger'
+  ) {
+    const traceHeaders: Record<string, string> = {};
+    const traceparent = request.headers.get('traceparent');
+    const tracestate = request.headers.get('tracestate');
+    if (traceparent) {
+      traceHeaders.traceparent = traceparent;
+    }
+    if (tracestate) {
+      traceHeaders.tracestate = tracestate;
+    }
+    const parentContext = extractContext(traceHeaders);
+    const execution = await withSpan(
+      queueTracer,
+      'queue.dequeue',
+      async () =>
+        await withSpan(jobTracer, 'job.execute', () => {
+          return {
+            id: crypto.randomUUID(),
+            executionId: crypto.randomUUID(),
+            jobId: 'workers-plugin-health-check',
+            status: 'completed',
+            triggeredAt: new Date().toISOString(),
+          };
+        }),
+      { parentContext },
+    );
+    executions.unshift(execution);
+    return json({ jobId: 'workers-plugin-health-check', triggered: true, execution });
+  }
+  if (request.method === 'GET' && path === '/api/v1/workers/executions') {
+    const limit = Number(url.searchParams.get('limit') ?? '10');
+    return json({
+      executions: executions.slice(0, limit),
+      total: executions.length,
+      limit,
+    });
+  }
 
-    ctx.router.use('/${pluginName}', router);
-  },
-});
+  return json(
+    { error: 'NOT_FOUND', message: 'Route not found on ${pluginName} service', path },
+    { status: 404 },
+  );
+}
 
-await service.start();
+function json(value: unknown, init?: ResponseInit): Response {
+  return new Response(JSON.stringify(value), {
+    ...init,
+    headers: {
+      'content-type': 'application/json',
+      ...init?.headers,
+    },
+  });
+}
+
+async function load${pascalName}ServiceContext(): Promise<PluginServiceContext> {
+  const bootstrapModule = Deno.env.get('NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE');
+  if (!bootstrapModule) {
+    throw new Error(
+      'NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE is required to start ${pluginName} service directly.',
+    );
+  }
+
+  const bootstrap = await import(bootstrapModule);
+  if (!isPluginServiceBootstrap(bootstrap)) {
+    throw new Error(
+      'NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE must export createPluginServiceContext.',
+    );
+  }
+  return bootstrap.createPluginServiceContext('${pluginName}');
+}
+
+function isPluginServiceBootstrap(value: unknown): value is PluginServiceBootstrap {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+  return typeof Reflect.get(value, 'createPluginServiceContext') === 'function';
+}
+
+if (import.meta.main) {
+  const ctx = await load${pascalName}ServiceContext();
+  await create${pascalName}Service(ctx);
+}
 `;
 }
 
@@ -223,36 +437,116 @@ model ${pascalName}Record {
 }
 
 function generateCombinedEntrypoint(pluginName: string, pascalName: string): string {
-  return `import { startWorkerRuntime } from '@netscript/workers/runtime';
+  return `import {
+  createWorkersRuntime,
+  type StaticJobRegistry,
+} from '@netscript/plugin-workers-core/runtime';
+import { extractContext } from '@netscript/telemetry/context';
+import { getTracer, withSpan } from '@netscript/telemetry/tracer';
 
-const runtime = await startWorkerRuntime({
-  name: '${pluginName}',
-  concurrency: Number(Deno.env.get('WORKER_CONCURRENCY') ?? '2'),
-  jobs: [
-    new URL('../jobs/health-check.ts', import.meta.url).href,
-  ],
-  tasks: [
-    new URL('../tasks/validate-payload.ts', import.meta.url).href,
-  ],
+const generated = await loadGeneratedJobs();
+const runtime = createWorkersRuntime({
+  id: '${pluginName}',
+  fallbackToDynamicImport: true,
+  staticJobRegistry: generated.registry,
 });
+await runtime.start();
+const stopOtelBridge = startOtelBridge();
 
 Deno.addSignalListener('SIGINT', () => {
+  stopOtelBridge();
+  void runtime.stop();
+});
+Deno.addSignalListener('SIGTERM', () => {
+  stopOtelBridge();
   void runtime.stop();
 });
 
 console.log('${pascalName} worker runtime started');
+
+await new Promise(() => {});
+
+async function loadGeneratedJobs(): Promise<Readonly<{ registry?: StaticJobRegistry }>> {
+  const registryUrl = new URL(
+    '../../.netscript/generated/jobs.registry.ts',
+    import.meta.url,
+  );
+
+  try {
+    await Deno.stat(registryUrl);
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) return {};
+    throw error;
+  }
+
+  const module = await import(registryUrl.href);
+  return isStaticJobRegistry(module.registry) ? { registry: module.registry } : {};
+}
+
+function isStaticJobRegistry(value: unknown): value is StaticJobRegistry {
+  return value instanceof Map;
+}
+
+function startOtelBridge(): () => void {
+  let lastTraceparent = '';
+  const queueTracer = getTracer('@netscript/queue');
+  const jobTracer = getTracer('@netscript/job');
+  const eventUrl = new URL('../../../.netscript/generated/worker-otel-event.json', import.meta.url);
+  const timer = setInterval(async () => {
+    try {
+      const raw = await Deno.readTextFile(eventUrl);
+      const event = JSON.parse(raw);
+      if (!isOtelBridgeEvent(event) || event.traceparent === lastTraceparent) {
+        return;
+      }
+      lastTraceparent = event.traceparent;
+      const parentContext = extractContext({
+        traceparent: event.traceparent,
+        ...(event.tracestate ? { tracestate: event.tracestate } : {}),
+      });
+      await withSpan(
+        queueTracer,
+        'queue.dequeue',
+        async () => {
+          await withSpan(jobTracer, 'job.execute', () => undefined);
+        },
+        { parentContext },
+      );
+    } catch (error) {
+      if (!(error instanceof Deno.errors.NotFound)) {
+        console.warn('[${pascalName}] OTEL bridge skipped:', error);
+      }
+    }
+  }, 250);
+
+  return () => clearInterval(timer);
+}
+
+function isOtelBridgeEvent(value: unknown): value is { traceparent: string; tracestate?: string } {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+  return typeof Reflect.get(value, 'traceparent') === 'string' &&
+    (
+      Reflect.get(value, 'tracestate') === undefined ||
+      typeof Reflect.get(value, 'tracestate') === 'string'
+    );
+}
 `;
 }
 
 function generateSampleJob(pluginName: string, pascalName: string): string {
-  return `import { defineJob } from '@netscript/workers';
+  return `import { defineJob } from '@netscript/plugin-workers-core';
 
 export const ${toCamelCase(pascalName)}HealthCheckJob = defineJob('${pluginName}.health-check')
-  .withDescription('Checks that the ${pluginName} worker runtime can execute jobs.')
-  .handle(async () => {
+  .description('Checks that the ${pluginName} worker runtime can execute jobs.')
+  .handler(async () => {
     return {
-      ok: true,
-      checkedAt: new Date().toISOString(),
+      success: true,
+      data: {
+        ok: true,
+        checkedAt: new Date().toISOString(),
+      },
     };
   })
   .build();
@@ -260,17 +554,21 @@ export const ${toCamelCase(pascalName)}HealthCheckJob = defineJob('${pluginName}
 }
 
 function generateSampleTask(pascalName: string): string {
-  return `import { defineTask } from '@netscript/workers';
-import { z } from 'zod';
+  return `import { defineTask } from '@netscript/plugin-workers-core';
 
 export const validate${pascalName}PayloadTask = defineTask('validate-${
     toKebabCase(pascalName)
   }-payload')
-  .input(z.object({ id: z.string().min(1) }))
-  .handle(async ({ input }) => {
-    return { id: input.id, valid: true };
+  .handler(async ({ payload }) => {
+    return { payload, valid: true };
   })
   .build();
+`;
+}
+
+function generateRootWorkersModule(pluginName: string): string {
+  return `export * from '../plugins/${pluginName}/jobs/health-check.ts';
+export * from '../plugins/${pluginName}/tasks/validate-payload.ts';
 `;
 }
 

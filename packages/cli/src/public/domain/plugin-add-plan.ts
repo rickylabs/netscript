@@ -80,10 +80,7 @@ export interface PluginAddPlan extends Omit<PluginAddRequest, 'kind'> {
 }
 
 /** Files and resources produced while rendering the plugin workspace. */
-export interface PluginRenderResult {
-  /** Result of starter plugin scaffolding. */
-  readonly plugin: PluginScaffoldResult;
-
+export interface PluginRenderSupportResult {
   /** Number of plugin registry files initialized. */
   readonly registryFilesCreated: number;
 
@@ -92,6 +89,12 @@ export interface PluginRenderResult {
 
   /** Database workspace scaffold result when the plugin required a new database. */
   readonly provisionedDatabase: DatabaseScaffoldResult | null;
+}
+
+/** Files and resources produced while rendering the plugin workspace. */
+export interface PluginRenderResult extends PluginRenderSupportResult {
+  /** Result of starter plugin scaffolding. */
+  readonly plugin: PluginScaffoldResult;
 }
 
 /** Result of the public add-plugin application flow. */

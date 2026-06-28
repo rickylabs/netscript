@@ -317,49 +317,6 @@ describe('public add plugin flow', () => {
       registryScaffolder: new PluginRegistryScaffolder(scaffolder),
       workspaceMutator: new PluginWorkspaceMutator(fs),
       regenerateHelpers: () => Promise.resolve(['/workspace/alpha/aspire/apphost.mts']),
-      findSourceRoot: () => Promise.resolve('/repo'),
-      canCopyPlugin: () => Promise.resolve(true),
-      copyPlugin: async () => {
-        await fs.writeFile('/workspace/alpha/plugins/workers/mod.ts', 'export {};\n');
-        await fs.writeFile('/workspace/alpha/workers/mod.ts', 'export {};\n');
-        return {
-          scaffoldResult: {
-            filesCreated: [
-              '/workspace/alpha/plugins/workers/mod.ts',
-              '/workspace/alpha/workers/mod.ts',
-            ],
-            directoriesCreated: ['/workspace/alpha/plugins/workers', '/workspace/alpha/workers'],
-            filesSkipped: [],
-            totalOperations: 4,
-            durationMs: 0,
-          },
-          pluginName: 'workers',
-          pluginDir: '/workspace/alpha/plugins/workers',
-          backgroundDir: '/workspace/alpha/workers',
-          serviceConfigKey: 'workers-api',
-          servicePort: 8091,
-          serviceEntrypoint: 'services/src/main.ts',
-          backgroundPort: 8091,
-          backgroundEntrypoint: 'bin/combined.ts',
-          dependencies: [],
-          pluginReferences: [],
-          workspaceMembers: ['workers'],
-        };
-      },
-      getSource: () =>
-        Promise.resolve({
-          kind: 'worker',
-          canonicalName: 'workers',
-          pluginDir: 'workers',
-          backgroundDir: 'workers',
-          serviceEntrypoint: 'services/src/main.ts',
-          backgroundEntrypoint: 'bin/combined.ts',
-          serviceConfigKey: 'workers-api',
-          servicePort: 8091,
-          backgroundPort: 8091,
-          dependencies: [],
-          pluginReferences: [],
-        }),
     });
 
     assertFalse(await fs.exists('/workspace/alpha/workers/mod.ts'));
@@ -369,7 +326,7 @@ describe('public add plugin flow', () => {
     assertStringIncludes(pluginMod, "import { definePlugin } from '@netscript/plugin';");
   });
 
-  it('registers copied official background workspaces as Deno workspace members', async () => {
+  it('does not register retired copied background workspaces as Deno workspace members', async () => {
     const fs = new MemoryFileSystemAdapter();
     await writeProjectFiles(fs);
     const templateAdapter = new StringTemplateAdapter(fs);
@@ -413,55 +370,12 @@ describe('public add plugin flow', () => {
       registryScaffolder: new PluginRegistryScaffolder(scaffolder),
       workspaceMutator: new PluginWorkspaceMutator(fs),
       regenerateHelpers: () => Promise.resolve(['/workspace/alpha/aspire/apphost.mts']),
-      findSourceRoot: () => Promise.resolve('/repo'),
-      canCopyPlugin: () => Promise.resolve(true),
-      copyPlugin: async () => {
-        await fs.writeFile('/workspace/alpha/plugins/workers/mod.ts', 'export {};\n');
-        await fs.writeFile('/workspace/alpha/workers/mod.ts', 'export {};\n');
-        return {
-          scaffoldResult: {
-            filesCreated: [
-              '/workspace/alpha/plugins/workers/mod.ts',
-              '/workspace/alpha/workers/mod.ts',
-            ],
-            directoriesCreated: ['/workspace/alpha/plugins/workers', '/workspace/alpha/workers'],
-            filesSkipped: [],
-            totalOperations: 4,
-            durationMs: 0,
-          },
-          pluginName: 'workers',
-          pluginDir: '/workspace/alpha/plugins/workers',
-          backgroundDir: '/workspace/alpha/workers',
-          serviceConfigKey: 'workers-api',
-          servicePort: 8091,
-          serviceEntrypoint: 'services/src/main.ts',
-          backgroundPort: 8091,
-          backgroundEntrypoint: 'bin/combined.ts',
-          dependencies: [],
-          pluginReferences: [],
-          workspaceMembers: ['workers'],
-        };
-      },
-      getSource: () =>
-        Promise.resolve({
-          kind: 'worker',
-          canonicalName: 'workers',
-          pluginDir: 'workers',
-          backgroundDir: 'workers',
-          serviceEntrypoint: 'services/src/main.ts',
-          backgroundEntrypoint: 'bin/combined.ts',
-          serviceConfigKey: 'workers-api',
-          servicePort: 8091,
-          backgroundPort: 8091,
-          dependencies: [],
-          pluginReferences: [],
-        }),
     });
 
     const rootDenoJson = JSON.parse(await fs.readFile('/workspace/alpha/deno.json'));
 
     assertEquals(rootDenoJson.workspace.includes('./plugins/*'), true);
-    assertEquals(rootDenoJson.workspace.includes('./workers'), true);
+    assertEquals(rootDenoJson.workspace.includes('./workers'), false);
   });
 
   it('previews a local-path plugin-owned scaffolder without writing files', async () => {
