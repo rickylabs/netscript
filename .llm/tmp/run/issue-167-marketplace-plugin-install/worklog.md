@@ -940,3 +940,67 @@ Timestamp: 2026-06-28T10:45:00Z
 | Doctrine | `rtk proxy deno task arch:check` | PASS; exit 0, no FAIL findings. Existing catalog/doc warnings only. |
 | Focused CLI tests | `deno test -A --unstable-kv packages/cli/src/public/features/plugins/add/add-plugin_test.ts packages/cli/src/local/features/plugins/add/add-local-plugin_test.ts packages/cli/src/public/features/plugins/add/plugin-package-resolver_test.ts packages/cli/src/public/features/plugins/dispatch/dispatch-plugin-verb_test.ts` | PASS; 5 test modules, 38 steps, 0 failed. |
 | Full runtime E2E | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS; raw exit code 0, `passed=48 failed=0 skipped=0`, elapsed 178753 ms, log `.llm/tmp/cli-e2e/plugin-smoke-20260628-140307.log`. |
+
+## 2026-06-28 — S11 true-userland e2e install gate
+
+### Scope Completed
+
+- Added built-in suite `scaffold.userland-install` to the CLI E2E runner.
+- The suite uses the public CLI entrypoint `packages/cli/bin/netscript.ts`, scaffolds a scratch
+  project under the OS temp root (`/tmp/netscript-userland-install-*`), and runs a real
+  `plugin add worker` through the S4/S5 plugin-owned scaffolder path.
+- The plugin install uses `--local-path /home/codex/repos/netscript-wave5-apps/plugins/workers` so
+  pre-merge validation can execute an unpublished first-party `./scaffold` export while the target
+  user project remains outside the monorepo checkout.
+- Added assertion gate `userland-install.assertions`:
+  - requires expected userland artifacts: `deno.json`, `plugins/workers/mod.ts`,
+    `plugins/workers/scaffold.plugin.json`, `plugins/workers/services/src/main.ts`,
+    `plugins/workers/database/schema.prisma`, and `workers/mod.ts`;
+  - rejects copied framework/plugin source indicators: `packages/`, `plugins/workers/src`,
+    `plugins/workers/scaffold.ts`, `plugins/workers/worker`, `plugins/workers/tests`, monorepo
+    absolute paths, `file://` monorepo paths, and local `../packages/` / `../../packages/` imports.
+- Added cleanup gate `cleanup.userland-smoke-root`, which removes the scratch project and then the
+  empty temp parent.
+
+### Scope Boundary
+
+- S11 does **not** claim the production `deno x jsr:@netscript/plugin-workers/scaffold` path is
+  green before publish. The pre-merge proof is a true-userland project outside the checkout plus
+  explicit first-party `--local-path` execution. The prod JSR leg remains the post-alpha.13
+  `e2e-cli-prod` / release smoke.
+- `deno.lock` was not touched.
+- No new TypeScript casts were introduced.
+- No `drift.md` entry was needed; implementation matched the S11 plan boundary.
+
+### Fitness Gates Touched
+
+| Gate | S11 evidence |
+| ---- | ------------ |
+| F-3 | E2E suite wiring stays under `packages/cli/e2e`; public plugin add still owns the install path. |
+| F-5 | No published `@netscript/cli` export map changed; only the E2E runner surface adds suite/gate ids. |
+| F-8 | No compiler lib override changed. |
+| F-9 | True userland install runs the first-party plugin-owned scaffolder via existing S4 permission dispatch. |
+| F-10 | Added focused suite-registry coverage for the new suite and ran the new E2E suite. |
+| F-11 | New file is domain-specific (`true-userland-install-suite.ts`); no generic helper folder introduced. |
+| F-12 | New names are domain terms: `USERLAND_INSTALL`, `USERLAND_INSTALL_ASSERTIONS`, `CLEANUP_USERLAND_SMOKE_ROOT`. |
+| F-13 | Assertion gate proves expected generated plugin artifacts are present. |
+| F-16 | Suite file is added under the existing `suites/scaffold` E2E folder; no broad flat command folder introduced. |
+| F-18 | No new package subpath export or barrel introduced. |
+| F-CLI-3 | The true-userland suite uses the public CLI entrypoint and explicit local-path plugin package; no maintainer copier path. |
+| F-CLI-11 | Source mode is explicit in the gate command: `--local-path <repo>/plugins/workers`; scratch project is outside checkout. |
+| F-CLI-16 | Process execution remains behind existing command gates and the existing plugin-owned dispatch path. |
+| F-CLI-19 | No-copy assertion rejects source trees and local framework references in the generated userland project. |
+| F-CLI-21 | Suite/gate names follow existing E2E suite and gate vocabulary. |
+| F-CLI-28 | Runner registration is covered by focused presentation tests; no live registry call is used. |
+
+### Gate Results
+
+| Gate | Command | Result |
+| ---- | ------- | ------ |
+| Check wrapper | `rtk proxy deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | PASS; 542 files, 5 batches, 0 occurrences. |
+| Lint wrapper | `rtk proxy deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/cli --ext ts,tsx` | Wrapper exited 1 with 0 findings; same existing wrapper/config anomaly recorded in S5. |
+| Fmt wrapper | `rtk proxy deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cli --ext ts,tsx` | Wrapper exited 1 with 0 findings; same existing wrapper/config anomaly recorded in S5. |
+| Lint/fmt fallback | `deno lint --no-config <5 touched files>` and `deno fmt --check <5 touched files>` | PASS; 5 touched files checked. |
+| Focused CLI/E2E presentation tests | `deno test --allow-all packages/cli/e2e/tests/presentation/suite-registry_test.ts packages/cli/e2e/tests/presentation/cli-program_test.ts packages/cli/e2e/tests/presentation/cli-options_test.ts` | PASS; 9 passed, 0 failed. |
+| True userland E2E | `deno task e2e:cli run scaffold.userland-install --cleanup --format pretty` | PASS; raw exit code 0, `passed=5 failed=0 skipped=0`, elapsed 895 ms, log `.llm/tmp/cli-e2e/plugin-smoke-20260628-142035.log`. Scratch project `/tmp/netscript-userland-install-b725a9e1b483d082/plugin-smoke-20260628-142035` was outside checkout and cleanup removed the scratch root. |
+| Full runtime E2E | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS; raw exit code 0, `passed=48 failed=0 skipped=0`, elapsed 170366 ms, log `.llm/tmp/cli-e2e/plugin-smoke-20260628-142102.log`. |

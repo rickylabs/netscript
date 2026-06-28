@@ -7,6 +7,7 @@ export const SCAFFOLD = {
   INFRASTRUCTURE: 'scaffold.infrastructure',
   PLUGIN: 'scaffold.plugins',
   RUNTIME: 'scaffold.runtime',
+  USERLAND_INSTALL: 'scaffold.userland-install',
 } as const;
 
 /** Stable titles for built-in suites. */
@@ -16,6 +17,7 @@ export const SCAFFOLD_TITLE = {
   INFRASTRUCTURE: 'Infrastructure scaffold capability smoke',
   PLUGIN: 'Official plugin scaffold smoke',
   RUNTIME: 'Runtime scaffold capability smoke',
+  USERLAND_INSTALL: 'True userland plugin install smoke',
 } as const;
 
 /** Gate phases in suite execution order. */
@@ -74,8 +76,10 @@ export const GATE = {
   BEHAVIOR_AUTH_READY: 'behavior.auth-ready',
   BEHAVIOR_AUTH_SESSION: 'behavior.auth-session',
   BEHAVIOR_PLUGINS_HEALTH: 'behavior.plugins-health',
+  USERLAND_INSTALL_ASSERTIONS: 'userland-install.assertions',
   BEHAVIOR_OTEL_WEBHOOK: 'behavior.otel.webhook',
   BEHAVIOR_OTEL_TRACES: 'behavior.otel.traces',
+  CLEANUP_USERLAND_SMOKE_ROOT: 'cleanup.userland-smoke-root',
   CLEANUP_ASPIRE_STOP: 'cleanup.aspire-stop',
   CLEANUP_DOCKER_CREATED_CONTAINERS: 'cleanup.docker-created-containers',
 } as const;

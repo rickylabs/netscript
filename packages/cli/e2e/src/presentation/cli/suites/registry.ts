@@ -1,3 +1,4 @@
+import { SCAFFOLD, SCAFFOLD_TITLE } from '../../../domain/cli-surface.ts';
 import type { GateId, SuiteId } from '../../../domain/cli-surface.ts';
 import type { RunOptions } from '../../../domain/run-context.ts';
 import type { SuiteDefinition } from '../../../domain/suite-definition.ts';
@@ -5,6 +6,7 @@ import {
   createScaffoldCapabilitySuite,
   scaffoldCapabilitySuites,
 } from '../../../../suites/scaffold/capability-suites.ts';
+import { createTrueUserlandInstallSuite } from '../../../../suites/scaffold/true-userland-install-suite.ts';
 
 /** Built-in suite descriptor. */
 export interface BuiltInSuite {
@@ -13,14 +15,23 @@ export interface BuiltInSuite {
   create(overrides?: Partial<RunOptions>): SuiteDefinition;
 }
 
-/** Registry of built-in suites. */
-export const builtInSuites: readonly BuiltInSuite[] = scaffoldCapabilitySuites.map((
+const scaffoldBuiltInSuites: readonly BuiltInSuite[] = scaffoldCapabilitySuites.map((
   capability,
 ) => ({
   id: capability.id,
   title: capability.title,
-  create: (overrides) => createScaffoldCapabilitySuite(capability, overrides),
+  create: (overrides?: Partial<RunOptions>) => createScaffoldCapabilitySuite(capability, overrides),
 }));
+
+/** Registry of built-in suites. */
+export const builtInSuites: readonly BuiltInSuite[] = [
+  ...scaffoldBuiltInSuites,
+  {
+    id: SCAFFOLD.USERLAND_INSTALL,
+    title: SCAFFOLD_TITLE.USERLAND_INSTALL,
+    create: createTrueUserlandInstallSuite,
+  },
+];
 
 /** Resolve a suite by id. */
 export function resolveSuite(id: string, overrides: Partial<RunOptions> = {}): SuiteDefinition {

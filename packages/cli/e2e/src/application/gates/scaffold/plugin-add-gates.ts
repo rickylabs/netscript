@@ -1,5 +1,6 @@
-import { GATE_PHASE } from '../../../domain/cli-surface.ts';
+import { GATE_PHASE, SCAFFOLD } from '../../../domain/cli-surface.ts';
 import { PACKAGE_SOURCE, PLUGIN, type PluginKind } from '../../../domain/extension-axes.ts';
+import { join } from '@std/path';
 import type {
   CommandFactory,
   GateDefinition,
@@ -11,6 +12,14 @@ import { cli, commandGate } from './gate-factory.ts';
 function pluginName(kind: PluginKind): string {
   if (kind === PLUGIN.AUTH) return 'auth';
   return `${kind}s`;
+}
+
+function localPluginDir(kind: PluginKind): string {
+  if (kind === PLUGIN.WORKER) return 'workers';
+  if (kind === PLUGIN.SAGA) return 'sagas';
+  if (kind === PLUGIN.TRIGGER) return 'triggers';
+  if (kind === PLUGIN.STREAM) return 'streams';
+  return 'auth';
 }
 
 function pluginAddCommand(
@@ -29,6 +38,15 @@ function pluginAddCommand(
       state.samples ? '--samples' : '--no-samples',
       '--force',
     ];
+
+    if (context.request.suiteId === SCAFFOLD.USERLAND_INSTALL) {
+      args.push(
+        '--ci',
+        '--local-path',
+        join(context.project.repoRoot, 'plugins', localPluginDir(kind)),
+      );
+      return cli(context, ...args);
+    }
 
     if (context.request.options.packageSource === PACKAGE_SOURCE.JSR) return cli(context, ...args);
 
