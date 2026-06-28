@@ -5,25 +5,42 @@
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
 **The official auth plugin for NetScript: it contributes a unified auth API service,
-single-active-backend selection, the auth Prisma schema, and durable session-stream projections to a
-generated app.**
+single-active-backend selection, the auth database schema, and durable session-stream projections to
+a generated app through a single declarative manifest.**
 
 ---
 
 ## 🚀 Quick Start
 
-### Installation
+### Add it to a NetScript app
+
+From the root of a generated NetScript project:
 
 ```bash
-# Deno (recommended)
+netscript plugin add auth
+```
+
+`plugin add` resolves `@netscript/plugin-auth` from JSR and runs the plugin's own scaffolder — the
+plugin owns its setup, so the CLI ships no embedded templates. The scaffolder wires the auth API
+service, the auth database schema, session streams, and Aspire resources into your workspace, then
+pins the matching `@netscript/*` versions.
+
+> **Provisioning:** auth requires both Postgres (for the auth schema) and Deno KV (for sessions).
+> `plugin add` records these requirements from the manifest so `netscript db` and Aspire
+> orchestration provision them for you.
+
+### Use it as a library
+
+To consume the plugin programmatically (custom hosts, tests, tooling):
+
+```bash
+# Deno
 deno add jsr:@netscript/plugin-auth
 
 # Node.js / Bun
 npx jsr add @netscript/plugin-auth
 bunx jsr add @netscript/plugin-auth
 ```
-
-### Usage
 
 ```typescript
 import { authPlugin, inspectAuth } from '@netscript/plugin-auth';
@@ -46,14 +63,37 @@ console.log(inspection.name, inspection.version, inspection.axes);
 - **Unified auth service**: contributes the `auth-api` oRPC service (default port `8094`) exposing
   `signin`, `callback`, `signout`, `session`, and `me` procedures over a versioned v1 contract.
 - **Single-active backend**: selects one backend per app via `NETSCRIPT_AUTH_BACKEND` across
-  `kv-oauth` (interactive OAuth/OIDC), `workos`, and `better-auth`; unsupported operations return
-  typed auth-provider errors instead of faking parity.
+  `kv-oauth` (interactive OAuth/OIDC), `workos`, and `better-auth`. Operations a backend does not
+  support return typed auth-provider errors, so capability differences surface explicitly at the API
+  boundary.
 - **Schema contribution**: ships the auth-owned Prisma schema so generated workspaces provision auth
   tables alongside the rest of the database.
 - **Durable session streams**: the browser-safe `./streams` subpath builds a `StreamDB` for the
   `authSession` entity projection, with server-side emit helpers on `./streams/server`.
 - **Scaffold-native**: registers as an official `auth` plugin through `scaffold.plugin.json`, wiring
   database and KV requirements into the NetScript CLI and Aspire orchestration.
+
+---
+
+## 🧩 Install manifest
+
+The plugin root ships `scaffold.plugin.json` — the declarative contract `plugin add` reads to
+install the plugin. It is editor-validated through a bundled JSON Schema (`$schema`), so the
+manifest gives you IntelliSense and validation in any schema-aware editor.
+
+```jsonc
+{
+  "$schema": "...", // @netscript/plugin scaffold.plugin.schema.json
+  "name": "@netscript/plugin-auth",
+  "provider": { "kind": "auth", "category": "plugin" },
+  "capabilities": {
+    "hasDatabaseMigrations": true,
+    "hasRoutes": true,
+    "hasBackgroundWorkers": false
+  },
+  "scaffolder": { "export": "./scaffold" }
+}
+```
 
 ---
 

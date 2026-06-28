@@ -12,22 +12,34 @@ durable streams, and Aspire process wiring through a single declarative manifest
 
 ## 🚀 Quick Start
 
-### Installation
+### Add it to a NetScript app
+
+From the root of a generated NetScript project:
 
 ```bash
-# Deno (recommended)
+netscript plugin add worker
+```
+
+`plugin add` resolves `@netscript/plugin-workers` from JSR and runs the plugin's own scaffolder —
+the plugin owns its setup, so the CLI ships no embedded templates. The scaffolder wires the Workers
+API service, background processors, stream topics, database schema, and Aspire resources into your
+workspace, then pins the matching `@netscript/*` versions.
+
+> **Provisioning:** workers require Deno KV and optionally Postgres. `plugin add` records these
+> requirements from the manifest so `netscript db` and Aspire orchestration provision them for you.
+
+### Use it as a library
+
+To consume the plugin programmatically (custom hosts, tests, tooling):
+
+```bash
+# Deno
 deno add jsr:@netscript/plugin-workers
 
 # Node.js / Bun
 npx jsr add @netscript/plugin-workers
 bunx jsr add @netscript/plugin-workers
 ```
-
-### Usage
-
-Register the plugin manifest with the NetScript host. The manifest is data: loading it wires the
-service, background processors, stream topics, and Aspire resources without starting a worker
-process.
 
 ```typescript
 import { inspectWorkers, workersPlugin } from '@netscript/plugin-workers';
@@ -59,6 +71,28 @@ console.log(summary.axes); // ["services", "backgroundProcessors", "streamTopics
 
 The reusable job/task/workflow definition builders and runtime composition live in
 `@netscript/plugin-workers-core`; this package binds them to the host.
+
+---
+
+## 🧩 Install manifest
+
+The plugin root ships `scaffold.plugin.json` — the declarative contract `plugin add` reads to
+install the plugin. It is editor-validated through a bundled JSON Schema (`$schema`), so the
+manifest gives you IntelliSense and validation in any schema-aware editor.
+
+```jsonc
+{
+  "$schema": "...", // @netscript/plugin scaffold.plugin.schema.json
+  "name": "@netscript/plugin-workers",
+  "provider": { "kind": "worker", "category": "background-processor" },
+  "capabilities": {
+    "hasDatabaseMigrations": true,
+    "hasRoutes": true,
+    "hasBackgroundWorkers": true
+  },
+  "scaffolder": { "export": "./scaffold" }
+}
+```
 
 ---
 
