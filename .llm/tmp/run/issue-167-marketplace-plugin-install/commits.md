@@ -9,3 +9,4 @@
 - 7b64e233f7ddc1cad15acfdea08f29f57baadad8: feat(plugin-triggers): add owned scaffold entrypoint
 - a14708ec: feat(plugin-streams): add owned scaffold entrypoint
 - 4a5988d6: feat(plugin-auth): add owned scaffold entrypoint
+- b729796723bd93a0ede5b006df2576ce7f9b8aa0: feat(cli): route plugin add through dx scaffolders
