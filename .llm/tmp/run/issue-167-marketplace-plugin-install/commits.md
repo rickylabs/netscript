@@ -4,3 +4,4 @@
 - 79e4cf08668c32f603705cfd913d4e46cf70f4f2: feat(cli): add plugin JSR resolver validation
 - bde482fd: feat(cli): add plugin install confirmation gate
 - d20d7118: feat(cli): run plugin-owned scaffolders
+- 719888139c949441852fe26645c68c9cec299161: feat(plugin-workers): add owned scaffold entrypoint
