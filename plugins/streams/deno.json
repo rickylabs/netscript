@@ -1,6 +1,6 @@
 {
   "name": "@netscript/plugin-streams",
-  "version": "0.0.1-alpha.11",
+  "version": "0.0.1-alpha.12",
   "description": "Durable Streams service, CLI, Aspire, E2E, and scaffolding plugin for NetScript.",
   "license": "MIT",
   "exports": {
@@ -13,11 +13,11 @@
   "imports": {
     "@durable-streams/client": "npm:@durable-streams/client@^0.2.6",
     "@durable-streams/server": "npm:@durable-streams/server@^0.3.7",
-    "@netscript/aspire": "jsr:@netscript/aspire@0.0.1-alpha.11",
-    "@netscript/contracts": "jsr:@netscript/contracts@0.0.1-alpha.11",
-    "@netscript/plugin": "jsr:@netscript/plugin@0.0.1-alpha.11",
-    "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.1-alpha.11",
-    "@netscript/service": "jsr:@netscript/service@0.0.1-alpha.11",
+    "@netscript/aspire": "jsr:@netscript/aspire@0.0.1-alpha.12",
+    "@netscript/contracts": "jsr:@netscript/contracts@0.0.1-alpha.12",
+    "@netscript/plugin": "jsr:@netscript/plugin@0.0.1-alpha.12",
+    "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.1-alpha.12",
+    "@netscript/service": "jsr:@netscript/service@0.0.1-alpha.12",
     "@orpc/server": "npm:@orpc/server@^1.14.6",
     "@std/net": "jsr:@std/net@^1",
     "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",

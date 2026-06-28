@@ -1,6 +1,6 @@
 {
   "name": "@netscript/logger",
-  "version": "0.0.1-alpha.11",
+  "version": "0.0.1-alpha.12",
   "description": "Structured logging for NetScript services, packages, workers, and Hono/oRPC integrations.",
   "license": "MIT",
   "exports": {
