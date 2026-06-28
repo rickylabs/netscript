@@ -497,3 +497,92 @@ Timestamp: 2026-06-28T14:35:00Z
 - The prompt-requested `deno doc @netscript/plugin/protocol` did not resolve as a bare local
   specifier in this checkout; the equivalent protocol source
   `packages/plugin/src/protocol/scaffolder.ts` was read and matched exactly.
+
+## S7 — plugin-sagas dx `./scaffold` entrypoint
+
+- Commit: `0b795230 feat(plugin-sagas): add owned scaffold entrypoint`
+- Scope:
+  - Added `plugins/sagas/scaffold.ts` as the package-owned dx entrypoint and exported
+    `./scaffold` from `plugins/sagas/deno.json`.
+  - Added `plugins/sagas/src/scaffold/{mod.ts,artifacts.ts,files.ts}` mirroring the S6 structure:
+    S4 `--context-json` CLI runner, deterministic artifact builder, and idempotent planned-file
+    writer.
+  - Ported sagas-specific artifact emission into the plugin package: `database/sagas.prisma`
+    durable Prisma store schema, service/router/init files, runtime runner, Aspire contribution,
+    contracts, and `sagas/user-registration-saga.ts` plus config generated through the existing
+    sagas item scaffolders.
+  - Updated the focused CLI integration test to drive the real `plugins/sagas` local path through
+    `addPlugin()` / `dispatchPluginScaffold()` for add, dry-run, and rerun-idempotency coverage.
+
+### PLAN-EVAL Note 4 — Self-Contained Import Graph
+
+- Verified the new sagas `./scaffold` graph has no `@netscript/cli` or `packages/cli` import:
+  `deno info --json plugins/sagas/scaffold.ts` + module filtering returned `NO_CLI_IMPORTS`.
+- Relevant graph entries are limited to `plugins/sagas/src/scaffold/*`,
+  `plugins/sagas/src/scaffolding/{input,saga-scaffolders,sagas-item-scaffolder}.ts`, and a
+  type-only S1 protocol import in `src/scaffold/mod.ts` for the private compile-time
+  `PluginScaffoldEntrypoint` assignment.
+- No new `deno.lock` churn remains; the writer is self-contained and does not add a new dependency.
+
+### Idempotency and Dry-Run Evidence
+
+- Real sagas local-path add:
+  `deno test -A --unstable-kv packages/cli/src/public/features/plugins/add/add-plugin_test.ts`
+  includes `runs the real sagas local-path scaffolder through plugin add` and passed. It asserts
+  `pluginOwnedScaffold.status === "applied"`, `databaseMigrationsAdded === true`, emitted
+  `plugins/sagas/database/sagas.prisma`, emitted `plugins/sagas/sagas/user-registration-saga.ts`,
+  and wrote saga appsettings with `Sagas.Store.Backend = "prisma"`.
+- Dry-run:
+  the same command includes `previews the real sagas local-path scaffolder without writing files`
+  and passed. It asserts planned runtime artifacts and absence of
+  `plugins/sagas/mod.ts` / `plugins/sagas/database/sagas.prisma` on disk.
+- Re-run idempotency:
+  the same command includes `reruns the real sagas scaffolder idempotently` and passed. The first
+  direct `dispatchPluginScaffold()` call returned `applied`; the second returned `skipped` with
+  empty `createdFiles` and `modifiedFiles`.
+
+### Fitness Gates Touched
+
+| Gate | S7 evidence |
+| ---- | ----------- |
+| F-3 | New plugin scaffolder code stays under the sagas plugin surface; no CLI implementation import. |
+| F-5 | `./scaffold` is an explicit public subpath export with module docs and public context/result types. |
+| F-6 | `deno task publish:dry-run` from `plugins/sagas` passed with `scaffold.ts` and `src/scaffold/*` included. |
+| F-7 | JSR audit helper exits 0 for the full sagas export map; existing warnings remain documented below. |
+| F-8 | No compiler lib override changed. |
+| F-9 | Manifest permissions remain declared for `./scaffold`; S4 tests run the local path under first-party flags. |
+| F-10 | Added real local-path add, dry-run no-write, and re-run idempotency tests for sagas. |
+| F-11 | New folder is role-named `src/scaffold`; no generic helper/common folder introduced. |
+| F-12 | New names are domain-specific (`buildSagasScaffoldArtifacts`, `writePlannedFiles`, `runScaffoldCli`). |
+| F-13 | Sagas artifacts include durable Prisma runtime state/correlation/transition schema and a generated saga definition. |
+| F-14 | Runtime JSON output uses `Deno.stdout.write`; no `console.*` in the new scaffolder source. |
+| F-15 | No upstream package re-export introduced. |
+| F-16 | New `src/scaffold` directory has three files, below cardinality cap. |
+| F-18 | No subdirectory barrel; `src/scaffold/mod.ts` is a declared public export target through root `scaffold.ts`. |
+| F-CLI-11 | Local-path source mode is exercised against the real sagas plugin path. |
+| F-CLI-16 | Process execution stays behind `DenoProcess` / `dispatchPluginScaffold()` in tests. |
+| F-CLI-19 | Dry-run returns planned files and writes nothing. |
+| F-CLI-21 | CLI test additions stay in the existing add-flow test file and do not add a new command surface. |
+
+### Gate Results
+
+| Gate | Command | Result |
+| ---- | ------- | ------ |
+| Sagas check wrapper | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/sagas --ext ts,tsx` | PASS; 74 files, 0 occurrences. |
+| CLI focused check wrapper | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx --include packages/cli/src/public/features/plugins/add/add-plugin_test.ts` | PASS; 1 file, 0 occurrences. |
+| Sagas lint wrapper | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root plugins/sagas --ext ts,tsx` | PASS; 74 files, 0 occurrences. |
+| Sagas fmt wrapper | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/sagas --ext ts,tsx` | PASS; 74 files, 0 findings. |
+| CLI lint/fmt note | `run-deno-lint.ts` / `run-deno-fmt.ts` on `packages/cli` with the single test include | The wrappers/raw repo-config commands select no lint/fmt target for this publish-excluded legacy test file or exit 1 with 0 findings. The file was formatted with repo config via `deno fmt packages/cli/src/public/features/plugins/add/add-plugin_test.ts`; focused `deno check` and test execution passed. |
+| Scaffold doc lint | `deno doc --lint plugins/sagas/scaffold.ts` | PASS; checked 1 file after exporting the scaffold context/result types from the root entrypoint. |
+| Focused S7 tests | `deno test -A --unstable-kv packages/cli/src/public/features/plugins/add/add-plugin_test.ts` | PASS; 1 test suite, 13 steps, 0 failed. |
+| Import graph | `deno info --json plugins/sagas/scaffold.ts` filtered for `@netscript/cli` / `packages/cli` | PASS; `NO_CLI_IMPORTS`. |
+| JSR audit | `deno run --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root plugins/sagas --text` | PASS; exits 0. Existing warnings: directory cardinality for package root and `src/runtime`, plus helper slow-types banner overcount. |
+| Publish dry-run | `deno task publish:dry-run` from `plugins/sagas` | PASS; includes `scaffold.ts` and `src/scaffold/*`; existing dynamic-import warnings remain in `services/src/main.ts` and `src/runtime/saga-runner.ts`. |
+
+### Notes
+
+- `deno.lock` was not touched in the final diff.
+- No new TypeScript casts were introduced in source or generated scaffold templates.
+- The initial `deno doc @netscript/plugin/protocol` bare specifier did not resolve in this checkout;
+  `packages/plugin/src/protocol/scaffolder.ts` was read and the new scaffolder carries a private
+  `PluginScaffoldEntrypoint` assignment against that protocol.

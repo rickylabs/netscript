@@ -5,3 +5,4 @@
 - bde482fd: feat(cli): add plugin install confirmation gate
 - d20d7118: feat(cli): run plugin-owned scaffolders
 - 719888139c949441852fe26645c68c9cec299161: feat(plugin-workers): add owned scaffold entrypoint
+- 0b795230: feat(plugin-sagas): add owned scaffold entrypoint
