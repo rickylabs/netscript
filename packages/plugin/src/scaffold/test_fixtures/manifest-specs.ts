@@ -13,76 +13,13 @@ import type { PluginScaffoldManifestSpec } from '../manifest-spec.ts';
 /** Build version pinned across the committed manifests under test. */
 export const FIXTURE_VERSION = '0.0.1-alpha.12';
 
-/** Spec reproducing `plugins/workers/scaffold.plugin.json`. */
-export const workersSpec: PluginScaffoldManifestSpec = {
-  name: '@netscript/plugin-workers',
-  displayName: 'Background Worker',
-  description:
-    'NetScript plugin for background job scheduling, task execution, and worker API endpoints.',
-  capabilities: {
-    hasDatabaseMigrations: true,
-    hasRoutes: true,
-    hasBackgroundWorkers: true,
-  },
-  scaffolder: {
-    export: './scaffold',
-    requiredPermissions: {
-      net: [],
-      read: ['<workspaceRoot>'],
-      write: ['<workspaceRoot>'],
-    },
-  },
-  provider: {
-    kind: 'worker',
-    displayName: 'Background Worker',
-    category: 'background-processor',
-    portRangeKey: 'INFRA_PLUGIN',
-    defaultPermissions: [
-      '--unstable-kv',
-      '--allow-net',
-      '--allow-env',
-      '--allow-read',
-      '--allow-write',
-      '--allow-run',
-    ],
-    watchFlag: '--watch',
-    defaultEntrypoint: 'bin/combined.ts',
-    defaultServiceEntrypoint: 'services/src/main.ts',
-    defaultRequiresDb: true,
-    defaultRequiresKv: true,
-    pluginType: 'background-processor',
-    supportsConcurrency: true,
-    concurrencyEnvVar: 'WORKER_CONCURRENCY',
-    defaultConcurrency: 2,
-    defaultTelemetry: true,
-    infrastructureRequires: ['kv'],
-    infrastructureOptionalDeps: ['db'],
-  },
-  officialSource: {
-    canonicalName: 'workers',
-    pluginDir: 'workers',
-    backgroundDir: 'workers',
-    serviceEntrypoint: 'services/src/main.ts',
-    backgroundEntrypoint: 'bin/combined.ts',
-    serviceConfigKey: 'workers-api',
-    servicePort: 8091,
-    backgroundPort: 8091,
-    dependencies: ['streams'],
-    requiresDb: true,
-    requiresKv: true,
-    permissions: [
-      '--unstable-kv',
-      '--allow-net',
-      '--allow-env',
-      '--allow-read',
-      '--allow-write',
-      '--allow-run',
-    ],
-    pluginReferences: [],
-  },
-};
-
-/** Spec reproducing `plugins/streams/scaffold.plugin.json`. */
+/**
+ * Spec reproducing `plugins/streams/scaffold.plugin.json`.
+ *
+ * The workers spec previously lived here too; S2a moved it to its plugin package at
+ * `plugins/workers/src/scaffold/spec.ts` (`workersManifestSpec`), where its own byte-identity test
+ * now owns the workers manifest. The remaining four are still fixtures until S2b thins them.
+ */
 export const streamsSpec: PluginScaffoldManifestSpec = {
   name: '@netscript/plugin-streams',
   displayName: 'Durable Streams',
@@ -304,11 +241,15 @@ export const authSpec: PluginScaffoldManifestSpec = {
   },
 };
 
-/** All five committed plugin specs keyed by directory name. */
+/**
+ * The committed plugin specs keyed by directory name.
+ *
+ * Workers is intentionally absent: S2a relocated it to `plugins/workers/src/scaffold/spec.ts` and
+ * its byte-identity assertion moved with it. The remaining four stay here until S2b thins them.
+ */
 export const committedSpecs: ReadonlyArray<
   { readonly dir: string; readonly spec: PluginScaffoldManifestSpec }
 > = [
-  { dir: 'workers', spec: workersSpec },
   { dir: 'streams', spec: streamsSpec },
   { dir: 'sagas', spec: sagasSpec },
   { dir: 'triggers', spec: triggersSpec },

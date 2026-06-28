@@ -37,7 +37,7 @@
     "@durable-streams/state": "npm:@durable-streams/state@^0.3.1"
   },
   "tasks": {
-    "check": "deno check --unstable-kv mod.ts scaffold.ts src/aspire/mod.ts src/cli/composition/main.ts contracts/v1/mod.ts src/scaffold/mod.ts src/scaffolding/mod.ts services/src/main.ts streams/mod.ts streams/server.ts worker/mod.ts",
+    "check": "deno check --unstable-kv mod.ts scaffold.ts src/aspire/mod.ts src/cli/composition/main.ts contracts/v1/mod.ts src/scaffold/mod.ts src/scaffold/stubs/mod.ts src/scaffolding/mod.ts services/src/main.ts streams/mod.ts streams/server.ts worker/mod.ts",
     "test": "deno test --allow-all",
     "dev": "deno run --allow-net --allow-env --allow-read --watch services/src/main.ts",
     "start": "deno run --allow-net --allow-env --allow-read services/src/main.ts",
