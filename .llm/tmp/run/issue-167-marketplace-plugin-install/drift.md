@@ -1,0 +1,21 @@
+# Drift — issue-167-marketplace-plugin-install
+
+## 2026-06-28 — PLAN-EVAL PASS; implementation launch blocked on daemon repair
+
+- **PLAN-EVAL PASS** recorded (OpenHands minimax-M3, PR #168, action run 28315132546). All 8 Plan-Gate
+  boxes checked; 5 non-blocking IMPL notes in `plan-eval.md`. Implementation S1→S12 is approved.
+- **Implementation lane (WSL Codex daemon-attached) is BLOCKED.** The codex app-server daemon is in the
+  "running but not managed by codex app-server daemon" state, so a mobile-visible `send-message-v2`
+  session cannot be launched (harness requires daemon-attached, mobile-visible slices). The standard
+  anchored-PID repair (kill the app-server PIDs + remove the control socket + `remote-control start`)
+  was **denied by the autonomy classifier** ("Interfere With Workloads": a pre-existing daemon with
+  unverifiable attached-work state). Severity: **significant** (blocks slice launch, not the plan).
+- **Observed environment cruft:** ~20 orphaned alpha-12 eye-test processes under
+  `/home/codex/eyetest/live-dashboard-alpha12` running 4–5h — `deno task db:studio` / `prisma studio`
+  (:5555), `deno task dev` / `vite`, and a swarm of hung `aspire-managed nuget search`. Leftover from a
+  prior #135 eye-test, unrelated to #167. These are why the classifier could not confirm the daemon was
+  idle.
+- **Resolution needed (user):** repair the daemon — run
+  `start-codex-wsl-remote.ps1` (Windows), or approve the anchored-PID repair — and optionally reap the
+  orphaned eye-test processes. Then resume at **S1 (plugin protocol contract)**.
+- No source changed; lock untouched. Plan + research + grounding committed; PR #168 reflects true state.
