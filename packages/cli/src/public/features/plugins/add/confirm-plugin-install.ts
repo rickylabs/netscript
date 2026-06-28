@@ -10,8 +10,7 @@ import {
 /** Reason a plugin-install confirmation gate completed without prompting. */
 export type PluginInstallConfirmationSkipReason =
   | 'first-party'
-  | 'skip-confirmation'
-  | 'ci';
+  | 'skip-confirmation';
 
 /** Confirmation decision returned before plugin-owned scaffold execution. */
 export type PluginInstallConfirmationDecision =
@@ -34,12 +33,12 @@ export interface ConfirmPluginInstallOptions {
   /** Validated JSR descriptor returned by the static validator. */
   readonly descriptor: ValidatedPluginDescriptor;
   /** Prompt port used for interactive confirmation. */
-  readonly prompt: PromptPort;
+  readonly prompt?: PromptPort;
   /** Precomputed trust decision, when the caller already classified the descriptor. */
   readonly trust?: PluginTrustDecision;
   /** User-supplied bypass for third-party confirmation. */
   readonly skipConfirmation?: boolean;
-  /** Non-interactive mode; bypasses the third-party prompt. */
+  /** Non-interactive mode; requires an explicit third-party bypass. */
   readonly ci?: boolean;
 }
 
@@ -55,7 +54,19 @@ export async function confirmPluginInstall(
     return skipped(options.descriptor, trust, 'skip-confirmation');
   }
   if (options.ci === true) {
-    return skipped(options.descriptor, trust, 'ci');
+    throw new ScaffoldValidationError(
+      `Plugin installation for ${options.descriptor.package.packageSpecifier} requires explicit ` +
+        '--skip-confirmation in --ci mode.',
+      { package: options.descriptor.package.packageSpecifier },
+    );
+  }
+
+  if (options.prompt === undefined) {
+    throw new ScaffoldValidationError(
+      `Plugin installation for ${options.descriptor.package.packageSpecifier} requires ` +
+        'an interactive prompt or explicit --skip-confirmation.',
+      { package: options.descriptor.package.packageSpecifier },
+    );
   }
 
   const confirmed = await options.prompt.confirm(

@@ -64,19 +64,44 @@ describe('confirmPluginInstall', () => {
     assertEquals(prompt.messages, []);
   });
 
-  it('skips third-party prompts in --ci mode', async () => {
+  it('rejects third-party packages in --ci mode without an explicit bypass', async () => {
+    await assertRejects(
+      () =>
+        confirmPluginInstall({
+          descriptor: descriptorFor('acme', 'plugin-billing'),
+          prompt: new RecordingPrompt([false]),
+          ci: true,
+        }),
+      Error,
+      '--skip-confirmation in --ci mode',
+    );
+  });
+
+  it('rejects third-party packages when no prompt is available', async () => {
+    await assertRejects(
+      () =>
+        confirmPluginInstall({
+          descriptor: descriptorFor('acme', 'plugin-billing'),
+        }),
+      Error,
+      'requires an interactive prompt or explicit --skip-confirmation',
+    );
+  });
+
+  it('allows --ci only when --skip-confirmation is explicit', async () => {
     const prompt = new RecordingPrompt([false]);
 
     const decision = await confirmPluginInstall({
       descriptor: descriptorFor('acme', 'plugin-billing'),
       prompt,
       ci: true,
+      skipConfirmation: true,
     });
 
     assertEquals(decision, {
       confirmed: true,
       prompted: false,
-      skippedBecause: 'ci',
+      skippedBecause: 'skip-confirmation',
       trustTier: 'third-party',
       packageSpecifier: '@acme/plugin-billing',
     });

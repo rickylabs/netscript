@@ -147,13 +147,17 @@ const capabilitiesSchema: z.ZodType<PluginManifestCapabilities> = z.object({
   hasBackgroundWorkers: z.boolean(),
 }).strict();
 
+const exportPathSchema = z.string().min(1).refine(isSafeExportPath, {
+  message: 'Expected a relative package export path such as "./scaffold" without traversal.',
+});
+
 const scaffolderSchema: z.ZodType<PluginManifestScaffolder> = z.object({
-  export: z.string().min(1),
+  export: exportPathSchema,
   requiredPermissions: requiredPermissionsSchema,
 }).strict();
 
 const postScriptSchema: z.ZodType<PluginManifestPostScript> = z.object({
-  export: z.string().min(1),
+  export: exportPathSchema,
   args: z.array(z.string()).readonly().optional(),
 }).strict();
 
@@ -261,6 +265,17 @@ function readSchemaVersion(json: unknown): unknown {
   }
 
   return json.schemaVersion;
+}
+
+function isSafeExportPath(value: string): boolean {
+  if (!value.startsWith('./') || value.includes('\\') || value.includes('\0')) {
+    return false;
+  }
+  const segments = value.slice(2).split('/');
+  if (segments.length === 0) {
+    return false;
+  }
+  return segments.every((segment) => segment.length > 0 && segment !== '.' && segment !== '..');
 }
 
 function invalidManifest(

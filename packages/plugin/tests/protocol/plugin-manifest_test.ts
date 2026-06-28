@@ -79,3 +79,36 @@ Deno.test('parsePluginManifest rejects unsupported schemaVersion values', () => 
   assertStringIncludes(result.error.message, 'schemaVersion 999');
   assertEquals(result.error.issues[0]?.path, 'schemaVersion');
 });
+
+Deno.test('parsePluginManifest rejects unsafe scaffolder and post-script exports', () => {
+  const result = parsePluginManifest({
+    schemaVersion: PLUGIN_MANIFEST_SCHEMA_VERSION,
+    name: '@netscript/plugin-workers',
+    version: '0.0.1-alpha.12',
+    displayName: 'Background Worker',
+    description: 'NetScript plugin for background job scheduling.',
+    peerDependencies: {},
+    capabilities: {
+      hasDatabaseMigrations: true,
+      hasRoutes: true,
+      hasBackgroundWorkers: true,
+    },
+    scaffolder: {
+      export: '../escape',
+      requiredPermissions: {
+        net: [],
+        read: ['<workspaceRoot>'],
+        write: ['<workspaceRoot>'],
+      },
+    },
+    postScripts: [
+      { export: './scripts/../escape' },
+    ],
+  });
+
+  assertEquals(result.ok, false);
+  if (result.ok) return;
+
+  assertEquals(result.error.issues.some((issue) => issue.path === 'scaffolder.export'), true);
+  assertEquals(result.error.issues.some((issue) => issue.path === 'postScripts.0.export'), true);
+});

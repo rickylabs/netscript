@@ -396,6 +396,7 @@ describe('public add plugin flow', () => {
         noDb: true,
         includeSamples: false,
         dryRun: true,
+        skipConfirmation: true,
         localPath: fixtureRoot,
         projectRoot,
         overwrite: false,

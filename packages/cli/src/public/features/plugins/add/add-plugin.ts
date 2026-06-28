@@ -107,7 +107,7 @@ export async function addPlugin(
     dependencies.pluginValidator,
     dependencies.fs,
   );
-  if (resolvedPlugin !== undefined && dependencies.prompt !== undefined) {
+  if (resolvedPlugin !== undefined) {
     await confirmPluginInstall({
       descriptor: resolvedPlugin.descriptor,
       prompt: dependencies.prompt,
