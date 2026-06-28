@@ -19,3 +19,13 @@
   `start-codex-wsl-remote.ps1` (Windows), or approve the anchored-PID repair — and optionally reap the
   orphaned eye-test processes. Then resume at **S1 (plugin protocol contract)**.
 - No source changed; lock untouched. Plan + research + grounding committed; PR #168 reflects true state.
+
+## 2026-06-28 — S1 protocol home resolved to `@netscript/plugin/protocol`
+
+- Severity: **minor**.
+- The S1 row hinted at `kernel/domain/plugin-protocol.ts`, but implementation research found no
+  `packages/shared` package and confirmed all five first-party plugin packages plus `packages/cli`
+  already depend on the existing neutral `@netscript/plugin` authoring package.
+- Resolution: publish the protocol as `@netscript/plugin/protocol` and re-export from
+  `@netscript/plugin`. This preserves the locked D3 decision to defer a standalone
+  `@netscript/plugin-protocol` package and avoids any plugin dependency on `@netscript/cli`.

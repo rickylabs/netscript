@@ -6,7 +6,8 @@
  * The root entrypoint is the plugin authoring contract. Host tooling, CLI
  * integration, SDK discovery, adapters, and fixtures live on subpaths:
  * `@netscript/plugin/config`, `@netscript/plugin/cli`,
- * `@netscript/plugin/sdk`, and `@netscript/plugin/testing`.
+ * `@netscript/plugin/protocol`, `@netscript/plugin/sdk`, and
+ * `@netscript/plugin/testing`.
  *
  * @example Define a plugin
  * ```ts
@@ -53,3 +54,22 @@ export type {
   InspectablePluginRegistry,
   InspectionReport,
 } from './src/diagnostics/mod.ts';
+export {
+  parsePluginManifest,
+  PLUGIN_MANIFEST_SCHEMA_VERSION,
+  PluginInstallerManifestSchema,
+} from './src/protocol/mod.ts';
+export type {
+  PluginInstallerManifest,
+  PluginManifestCapabilities,
+  PluginManifestOfficialSource,
+  PluginManifestParseError,
+  PluginManifestParseIssue,
+  PluginManifestParseResult,
+  PluginManifestProvider,
+  PluginManifestScaffolder,
+  PluginScaffoldEntrypoint,
+  PluginScaffolderRequiredPermissions,
+  ScaffolderContext,
+  ScaffoldResult,
+} from './src/protocol/mod.ts';

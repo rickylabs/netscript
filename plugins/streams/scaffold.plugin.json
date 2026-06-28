@@ -1,5 +1,25 @@
 {
   "schemaVersion": 1,
+  "name": "@netscript/plugin-streams",
+  "version": "0.0.1-alpha.12",
+  "displayName": "Durable Streams",
+  "description": "Durable Streams service, CLI, Aspire, E2E, and scaffolding plugin for NetScript.",
+  "peerDependencies": {
+    "@netscript/plugin": "0.0.1-alpha.12"
+  },
+  "capabilities": {
+    "hasDatabaseMigrations": false,
+    "hasRoutes": true,
+    "hasBackgroundWorkers": false
+  },
+  "scaffolder": {
+    "export": "./scaffold",
+    "requiredPermissions": {
+      "net": [],
+      "read": ["<workspaceRoot>"],
+      "write": ["<workspaceRoot>"]
+    }
+  },
   "provider": {
     "kind": "stream",
     "displayName": "Durable Streams",
