@@ -6,17 +6,20 @@
 | ----- | ----- |
 | Run ID | `fix-service-openapi-asset-embed--asset-read` |
 | Branch | `fix/service-openapi-asset-embed` |
-| Current phase | `implement` |
+| Current phase | `impl-eval` |
 | Archetype | `4 - Public DSL / Builder` |
 | Scope overlays | `service` |
 
 ## Current State
 
-Single implementation slice is committed locally at
+Single implementation slice is pushed and PR #165 is open. Implementation commit:
 `f02e153d83e69abfc77eae7f2798c3f5ef9f6a7d`: Scalar JS is embedded through a generated string
 constant, `createScalarJs()` no longer performs a runtime asset read, and requested gates are green
 except the literal user-provided wrapper command form which is incompatible with the current wrapper
 CLI and was rerun in the supported equivalent form.
+
+PR: `https://github.com/rickylabs/netscript/pull/165`
+IMPL comment: `https://github.com/rickylabs/netscript/pull/165#issuecomment-4823686091`
 
 ## Completed
 
@@ -31,13 +34,13 @@ CLI and was rerun in the supported equivalent form.
 
 ## In Progress
 
-- Run-record metadata commit, push, PR creation, and PR comment.
+- Branch push, PR creation, and IMPL evidence comment.
 
 ## Next Steps
 
-1. Commit run-record metadata update.
-2. Push explicit refspec.
-3. Open PR and post IMPL evidence comment.
+1. Launch/request separate-session IMPL-EVAL.
+2. Evaluator should independently rerun the gate set and write `evaluate.md`.
+3. Do not merge until IMPL-EVAL passes.
 
 ## Key Decisions
 
