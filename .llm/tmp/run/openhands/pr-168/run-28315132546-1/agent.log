@@ -1,0 +1,400 @@
+    S5+≥1 plugin; S12 closeout); risk register with concrete owners (S5/S11 owns
+the
+    readers-vs-copier question with two resolutions + evidence mandate; 
+pre/post-publish split
+    is explicit); gate set selected from `archetype-gate-matrix.md` plus the 
+service scope
+    overlay; six deferred scope items explicit; `jsr-audit` + `publish:dry-run` 
+wired into
+    per-slice validation.
+    
+    No unsound assumptions; no decision deferred that would force rework.
+    Implementation may begin on S1 → S12.
+    
+    ## Changes
+    
+    - **Added** `.llm/tmp/run/issue-167-marketplace-plugin-install/plan-eval.md`
+(90 lines)
+      - Per-checkbox findings table
+      - Read-only repo verification (every cited file:line anchor spot-checked)
+      - Fitness gate coverage check against `archetype-gate-matrix.md`
+      - Doctrine / archetype drift check (no violations introduced or deepened)
+      - Open-decision sweep (evaluator-run)
+      - Five non-blocking notes for IMPL-EVAL
+      - Verdict: PASS
+    
+    ## Read-only verification (anchors confirmed)
+    
+    - `findOfficialPluginSourceRoot` at 
+`packages/cli/src/kernel/application/registries/plugin-kind-registry.ts:157` 
+(also `hasOfficialPluginSources` at :267)
+    - `PluginKindProvider` interface at line 53 of plugin-kind-providers
+    - `createOfficialPluginCopier` at 
+`packages/cli/src/maintainer/infra/official-plugin-copier.ts:12`
+    - `add-plugin.ts` imports `PluginWorkspaceMutator`, 
+`copyPluginSchemasToRootDb`, `PluginKindRegistry`
+    - `ScaffoldPluginManifest` / `OfficialSourceManifest` at 
+`packages/cli/src/maintainer/adapters/official-plugin-source.ts:88-94`
+    - Official plugins at v0.0.1-alpha.12 (workers, auth, streams, sagas, 
+triggers)
+    - `auth` is the outlier: no `./cli`, no `./scaffolding` today (confirmed)
+    - `workers` has scaffolding templates at 
+`plugins/workers/src/scaffolding/templates` and `bin/combined.ts`
+    - e2e gate readers exist (database-gates, runtime-gates)
+    - `create-default-runner.ts` has no plugin-install path (true-userland 
+install gate is a real gap, confirms S11's value)
+    
+    ## Notes for IMPL-EVAL (non-blocking)
+    
+    1. **S4 dispatch extension shape** — state in S4's worklog whether 
+`scaffold` becomes a new
+       verb member on the existing dispatch discriminated union or a sibling 
+function.
+       Affects whether `dispatchPluginVerb` is the single point of plugin 
+subprocess control.
+    2. **F-CLI-* enumeration** — name each F-CLI-* gate the slice touches in its
+worklog
+       (Phase A reporting permits PENDING_SCRIPT; naming the gates now cuts 
+IMPL-EVAL drift).
+    3. **Alias-map evaluation point (S2)** — clarify that the bare-kind alias 
+map is consulted
+       *before* `PluginKindRegistry.get` throws, OR that the registry is 
+pre-seeded at the top
+       of `add-plugin`. Without this, "Unsupported plugin kind" can still fire 
+for bare names.
+    4. **jsr-audit: new `./scaffold` export** — must be self-contained for `deno
+x` invocation
+       (no implicit cross-imports to non-exported plugin internals). Per-slice 
+check.
+    5. **S11 `--local-path` invocation shape** — when building the 
+userland-install suite, the
+       runner must point at a `deno task` that uses `--local-path <plugin dir>`.
+Resolvable in S11.
+    
+    ## Validation
+    
+    - Verdict computed by applying `.llm/harness/gates/plan-gate.md` checklist 
+verbatim to
+      `.llm/tmp/run/issue-167-marketplace-plugin-install/plan.md`, 
+`research.md`, and
+      `grounding-deno-native.md`.
+    - Cross-referenced against `.llm/harness/gates/archetype-gate-matrix.md` for
+fitness-gate
+      coverage (Archetype-5 universal F-* + F-13 subtype for runtime; 
+Archetype-6 universal F-*
+      + F-CLI-* via proxies per Phase A reporting rule).
+    - Read-only file:line anchors verified against current `main` (no source 
+edits).
+    - `deno.lock` not touched (lock hygiene preserved per operational contract).
+    
+    ## Remaining risks
+    
+    None blocking. The five notes above are for the implementation lane (WSL 
+Codex daemon-attached
+    slices) to act on; none require re-evaluation by PLAN-EVAL.
+    
+    ## PR comment
+    
+    Per the operational contract, "the workflow owns GitHub comments" — no `gh 
+pr comment` issued
+    from this session. The verdict and notes are captured in `plan-eval.md` and 
+this summary;
+    the workflow will surface the PR comment for PR #168.
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 2.17M • cache hit 91.33% •  reasoning 640 • ↓ output 17.06K • $ 
+0.1962
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/28315132546-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# PLAN-EVAL — issue-167-marketplace-plugin-install (PR #168)
+ 2|
++3|**Verdict: PASS**
++4|
++5|## Summary
++6|
++7|PLAN-EVAL session for the Deno-native JSR plugin installer / marketplace 
+foundation plan
++8|(PR #168, branch `feat/plugin-install-jsr-dx`). The plan 
+(`.llm/tmp/run/issue-167-marketplace-plugin-install/plan.md`)
++9|describes a 12-slice implementation: a new userland install pipeline in 
+`packages/cli`
++10|(Archetype-6) plus per-plugin `./scaffold` entrypoints and a versioned
++11|`scaffold.plugin.json` manifest on the five `@netscript/plugin-*` packages 
+(Archetype-5).
++12|
++13|All eight Plan-Gate boxes checked. Decisions D1–D8 locked with rationale; 12
+commit slices
++14|ordered (S1→S2→S3→S4→S5 ordered CLI core; S6–S10 parallelizable plugin 
+ports; S11 depends on
++15|S5+≥1 plugin; S12 closeout); risk register with concrete owners (S5/S11 owns
+the
++16|readers-vs-copier question with two resolutions + evidence mandate; 
+pre/post-publish split
++17|is explicit); gate set selected from `archetype-gate-matrix.md` plus the 
+service scope
++18|overlay; six deferred scope items explicit; `jsr-audit` + `publish:dry-run` 
+wired into
++19|per-slice validation.
++20|
++21|No unsound assumptions; no decision deferred that would force rework.
++22|Implementation may begin on S1 → S12.
++23|
++24|## Changes
++25|
++26|- **Added** `.llm/tmp/run/issue-167-marketplace-plugin-install/plan-eval.md`
+(90 lines)
++27|  - Per-checkbox findings table
++28|  - Read-only repo verification (every cited file:line anchor spot-checked)
++29|  - Fitness gate coverage check against `archetype-gate-matrix.md`
++30|  - Doctrine / archetype drift check (no violations introduced or deepened)
++31|  - Open-decision sweep (evaluator-run)
++32|  - Five non-blocking notes for IMPL-EVAL
++33|  - Verdict: PASS
++34|
++35|## Read-only verification (anchors confirmed)
++36|
++37|- `findOfficialPluginSourceRoot` at 
+`packages/cli/src/kernel/application/registries/plugin-kind-registry.ts:157` 
+(also `hasOfficialPluginSources` at :267)
++38|- `PluginKindProvider` interface at line 53 of plugin-kind-providers
++39|- `createOfficialPluginCopier` at 
+`packages/cli/src/maintainer/infra/official-plugin-copier.ts:12`
++40|- `add-plugin.ts` imports `PluginWorkspaceMutator`, 
+`copyPluginSchemasToRootDb`, `PluginKindRegistry`
++41|- `ScaffoldPluginManifest` / `OfficialSourceManifest` at 
+`packages/cli/src/maintainer/adapters/official-plugin-source.ts:88-94`
++42|- Official plugins at v0.0.1-alpha.12 (workers, auth, streams, sagas, 
+triggers)
++43|- `auth` is the outlier: no `./cli`, no `./scaffolding` today (confirmed)
++44|- `workers` has scaffolding templates at 
+`plugins/workers/src/scaffolding/templates` and `bin/combined.ts`
++45|- e2e gate readers exist (database-gates, runtime-gates)
++46|- `create-default-runner.ts` has no plugin-install path (true-userland 
+install gate is a real gap, confirms S11's value)
++47|
++48|## Notes for IMPL-EVAL (non-blocking)
++49|
++50|1. **S4 dispatch extension shape** — state in S4's worklog whether 
+`scaffold` becomes a new
++51|   verb member on the existing dispatch discriminated union or a sibling 
+function.
++52|   Affects whether `dispatchPluginVerb` is the single point of plugin 
+subprocess control.
++53|2. **F-CLI-* enumeration** — name each F-CLI-* gate the slice touches in its
+worklog
++54|   (Phase A reporting permits PENDING_SCRIPT; naming the gates now cuts 
+IMPL-EVAL drift).
++55|3. **Alias-map evaluation point (S2)** — clarify that the bare-kind alias 
+map is consulted
++56|   *before* `PluginKindRegistry.get` throws, OR that the registry is 
+pre-seeded at the top
++57|   of `add-plugin`. Without this, "Unsupported plugin kind" can still fire 
+for bare names.
++58|4. **jsr-audit: new `./scaffold` export** — must be self-contained for `deno
+x` invocation
++59|   (no implicit cross-imports to non-exported plugin internals). Per-slice 
+check.
++60|5. **S11 `--local-path` invocation shape** — when building the 
+userland-install suite, the
++61|   runner must point at a `deno task` that uses `--local-path <plugin dir>`.
+Resolvable in S11.
++62|
++63|## Validation
++64|
++65|- Verdict computed by applying `.llm/harness/gates/plan-gate.md` checklist 
+verbatim to
++66|  `.llm/tmp/run/issue-167-marketplace-plugin-install/plan.md`, 
+`research.md`, and
++67|  `grounding-deno-native.md`.
++68|- Cross-referenced against `.llm/harness/gates/archetype-gate-matrix.md` for
+fitness-gate
++69|  coverage (Archetype-5 universal F-* + F-13 subtype for runtime; 
+Archetype-6 universal F-*
++70|  + F-CLI-* via proxies per Phase A reporting rule).
++71|- Read-only file:line anchors verified against current `main` (no source 
+edits).
++72|- `deno.lock` not touched (lock hygiene preserved per operational contract).
++73|
++74|## Remaining risks
++75|
++76|None blocking. The five notes above are for the implementation lane (WSL 
+Codex daemon-attached
++77|slices) to act on; none require re-evaluation by PLAN-EVAL.
++78|
++79|## PR comment
++80|
++81|Per the operational contract, "the workflow owns GitHub comments" — no `gh 
+pr comment` issued
++82|from this session. The verdict and notes are captured in `plan-eval.md` and 
+this summary;
++83|the workflow will surface the PR comment for PR #168.
++84|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Verify final state
+
+$ cd /home/runner/work/netscript/netscript && git log --oneline -3 && echo "---"
+&& git status && echo "---" && ls -la 
+/home/runner/work/_temp/openhands/28315132546-1/summary.md 
+.llm/tmp/run/issue-167-marketplace-plugin-install/plan-eval.md
+
+Tokens: ↑ input 2.21M • cache hit 91.42% •  reasoning 640 • ↓ output 17.19K • $ 
+0.1987
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+5ac05dcb (HEAD -> feat/plugin-install-jsr-dx) PLAN-EVAL: PASS for 
+issue-167-marketplace-plugin-install (PR #168)
+23962cb5 (origin/feat/plugin-install-jsr-dx) docs(#167): harness research + plan
+for Deno-native JSR plugin installer
+9d477461 (tag: v0.0.1-alpha.12, origin/main) chore(release): cut 0.0.1-alpha.12 
+(#166)
+---
+On branch feat/plugin-install-jsr-dx
+Your branch is ahead of 'origin/feat/plugin-install-jsr-dx' by 1 commit.
+  (use "git push" to publish your local commits)
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   .llm/tmp/run/openhands/pr-17/run-27493382997-1/request.md
+        modified:   .llm/tmp/run/openhands/pr-25/run-27305429810-1/request.md
+        modified:   .llm/tmp/run/openhands/pr-32/run-27433712260-1/request.md
+        modified:   .llm/tmp/run/openhands/pr-35/run-27454103300-1/request.md
+        modified:   .llm/tmp/run/openhands/pr-35/run-27454169329-1/request.md
+        modified:   .llm/tmp/run/openhands/pr-37/run-27454273181-1/request.md
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        .llm/tmp/run/openhands/pr-168/
+
+no changes added to commit (use "git add" and/or "git commit -a")
+---
+-rw------- 1 runner runner 11873 Jun 28 07:37 
+.llm/tmp/run/issue-167-marketplace-plugin-install/plan-eval.md
+-rw------- 1 runner runner  4884 Jun 28 07:39 
+/home/runner/work/_temp/openhands/28315132546-1/summary.md
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Finalize task list
+
+Thought:
+Final state is clean:
+- Plan-eval.md committed (only run-dir file, lock hygiene preserved)
+- summary.md written to the run-scoped path
+- The 6 `modified` files are pre-existing changes from other PR runs (PR #17, 
+#25, #32, #35, #37) — not mine
+- No `deno.lock` touched
+- No source code touched
+
+📋 Update Task List (8 tasks)
+
+Tokens: ↑ input 2.25M • cache hit 91.54% •  reasoning 640 • ↓ output 17.63K • $ 
+0.2015
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: task_tracker
+Result:
+✅ Task list updated: 8 done
+
+✅ 1. PLAN-EVAL session for issue-167-marketplace-plugin-install
+   Notes: Verdict: PASS. plan-eval.md committed; summary.md written.
+✅ 2. Read harness evaluator protocol files
+✅ 3. Read plan, research, grounding for issue #167
+✅ 4. Verify plan against repo reality (read-only)
+✅ 5. Stress D1/D2/D3/S5 risk decisions
+✅ 6. Write plan-eval.md verdict
+✅ 7. Commit plan-eval.md (only run-dir file)
+✅ 8. Write summary.md before exit
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: PLAN-EVAL verdict PASS for issue #167
+
+Finish with message:
+## PLAN-EVAL Verdict: **PASS**
+
+Plan-Gate evaluation for issue-167-marketplace-plugin-install (PR #168, branch 
+`feat/plugin-install-jsr-dx`).
+
+### Checklist (all 8 boxes satisfied)
+
+| Plan-Gate item | Result | Notes |
+| -------------- | ------ | ----- |
+| Research present + re-baselined | PASS | research.md + 
+grounding-deno-native.md populated; anchors re-verified against current main |
+| Decisions locked | PASS | D1–D8 with rationale |
+| Open-decision sweep | PASS | One implementer-detail left to S4 (dispatch 
+extension shape) |
+| Commit slices | PASS | 12 slices, ordered, each with gate + files + 
+what-it-proves |
+| Risk register | PASS | 7 risks with mitigations; S5/S11 own the 
+readers-vs-copier question |
+| Gate set selected | PASS (PENDING_SCRIPT) | F-CLI-* covered via universal F-* 
+proxies per Phase A reporting rule |
+| Deferred scope explicit | PASS | 6 items with backlog rationale |
+| jsr-audit surface scan | PASS (light) | Per-slice jsr-audit + publish:dry-run 
+wired |
+
+### Read-only verification (anchors confirmed)
+All cited file:line anchors spot-checked against current main — 
+`findOfficialPluginSourceRoot` at plugin-kind-registry.ts:157, 
+`PluginKindProvider` interface at :53, `createOfficialPluginCopier` at 
+official-plugin-copier.ts:12, `add-plugin.ts:88-148` (copy path), 
+`create-default-runner.ts` has no plugin-install path (confirms S11's value), 
+`auth` lacks `./cli`/`./scaffolding` (net-new for S10).
+
+### Deliverables
+- `.llm/tmp/run/issue-167-marketplace-plugin-install/plan-eval.md` — committed 
+(commit `5ac05dcb`)
+- `/home/runner/work/_temp/openhands/28315132546-1/summary.md` — run-scoped 
+summary
+
+### Non-blocking notes for IMPL-EVAL
+1. S4 — state in worklog whether `scaffold` becomes a new verb member on the 
+dispatch discriminated union or a sibling function.
+2. Name F-CLI-* gates touched per slice in worklogs (cuts IMPL-EVAL drift).
+3. S2 — alias map must precede `PluginKindRegistry.get` throw (or pre-seed the 
+registry).
+4. New `./scaffold` export must be self-contained for `deno x` (no implicit 
+cross-imports to non-exported internals).
+5. S11 — userland-install suite must point at a `deno task` that uses 
+`--local-path`.
+
+### Lock hygiene
+- `deno.lock` not touched.
+- No source code modified; only `plan-eval.md` added under the run dir.
+- Pre-existing `modified` files under `pr-17`/`pr-25`/`pr-32`/`pr-35`/`pr-37` 
+are unrelated to this session.
+
+### Verdict
+**`PASS`** — implementation may begin on S1 → S12.
+
+Per the operational contract, the workflow owns the PR comment; the verdict is 
+captured in `plan-eval.md` and the run-scoped summary for the workflow to 
+surface.
+
+Tokens: ↑ input 2.28M • cache hit 91.52% •  reasoning 640 • ↓ output 18.36K • $ 
+0.2054
+
