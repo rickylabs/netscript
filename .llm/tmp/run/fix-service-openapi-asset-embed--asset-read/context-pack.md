@@ -12,7 +12,8 @@
 
 ## Current State
 
-Single implementation slice is complete locally: Scalar JS is embedded through a generated string
+Single implementation slice is committed locally at
+`f02e153d83e69abfc77eae7f2798c3f5ef9f6a7d`: Scalar JS is embedded through a generated string
 constant, `createScalarJs()` no longer performs a runtime asset read, and requested gates are green
 except the literal user-provided wrapper command form which is incompatible with the current wrapper
 CLI and was rerun in the supported equivalent form.
@@ -30,11 +31,11 @@ CLI and was rerun in the supported equivalent form.
 
 ## In Progress
 
-- Commit, push, PR creation, and PR comment.
+- Run-record metadata commit, push, PR creation, and PR comment.
 
 ## Next Steps
 
-1. Commit the single slice.
+1. Commit run-record metadata update.
 2. Push explicit refspec.
 3. Open PR and post IMPL evidence comment.
 
@@ -77,4 +78,4 @@ CLI and was rerun in the supported equivalent form.
 
 ## Commits
 
-- none yet.
+- f02e153d83e69abfc77eae7f2798c3f5ef9f6a7d: fix(service): embed scalar.min.js as string const (JSR-safe), drop readTextFile
