@@ -4,6 +4,7 @@ import {
   buildScaffoldPluginJson,
   buildStandardScaffoldArtifacts,
   PluginScaffolder,
+  readScaffoldPluginName,
 } from '@netscript/plugin/scaffold';
 import type {
   PluginScaffoldManifestSpec,
@@ -26,7 +27,9 @@ export class WorkersScaffolder extends PluginScaffolder {
   readonly manifestSpec: PluginScaffoldManifestSpec = workersScaffoldSpec;
 
   protected buildArtifacts(context: ScaffolderContext): readonly ScaffoldArtifact[] {
-    return buildWorkerScaffoldArtifacts({ pluginName: readPluginName(context.options) });
+    return buildWorkerScaffoldArtifacts({
+      pluginName: readScaffoldPluginName(context.options, { scaffolderName: 'Workers' }),
+    });
   }
 }
 
@@ -504,12 +507,4 @@ function generateRootWorkersModule(pluginName: string): string {
   return `export * from '../plugins/${pluginName}/jobs/health-check.ts';
 export * from '../plugins/${pluginName}/tasks/validate-payload.ts';
 `;
-}
-
-function readPluginName(options: Readonly<Record<string, unknown>>): string {
-  const pluginName = Reflect.get(options, 'pluginName');
-  if (typeof pluginName !== 'string' || !/^[a-z][a-z0-9-]*$/.test(pluginName)) {
-    throw new Error('Workers scaffolder requires a kebab-case options.pluginName.');
-  }
-  return pluginName;
 }

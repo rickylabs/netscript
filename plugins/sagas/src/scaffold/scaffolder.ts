@@ -4,6 +4,7 @@ import {
   buildScaffoldPluginJson,
   buildStandardScaffoldArtifacts,
   PluginScaffolder,
+  readScaffoldPluginName,
 } from '@netscript/plugin/scaffold';
 import type {
   PluginScaffoldManifestSpec,
@@ -28,7 +29,9 @@ export class SagasScaffolder extends PluginScaffolder {
   readonly manifestSpec: PluginScaffoldManifestSpec = sagasScaffoldSpec;
 
   protected async buildArtifacts(context: ScaffolderContext): Promise<readonly ScaffoldArtifact[]> {
-    return await buildSagasScaffoldArtifacts({ pluginName: readPluginName(context.options) });
+    return await buildSagasScaffoldArtifacts({
+      pluginName: readScaffoldPluginName(context.options, { scaffolderName: 'Sagas' }),
+    });
   }
 }
 
@@ -549,12 +552,4 @@ export class SagasAspireContribution {
   }
 }
 `;
-}
-
-function readPluginName(options: Readonly<Record<string, unknown>>): string {
-  const pluginName = Reflect.get(options, 'pluginName');
-  if (typeof pluginName !== 'string' || !/^[a-z][a-z0-9-]*$/.test(pluginName)) {
-    throw new Error('Sagas scaffolder requires a kebab-case options.pluginName.');
-  }
-  return pluginName;
 }

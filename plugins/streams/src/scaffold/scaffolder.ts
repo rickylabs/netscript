@@ -4,6 +4,7 @@ import {
   buildScaffoldPluginJson,
   buildStandardScaffoldArtifacts,
   PluginScaffolder,
+  readScaffoldPluginName,
 } from '@netscript/plugin/scaffold';
 import type {
   PluginScaffoldManifestSpec,
@@ -26,7 +27,9 @@ export class StreamsScaffolder extends PluginScaffolder {
   readonly manifestSpec: PluginScaffoldManifestSpec = streamsScaffoldSpec;
 
   protected buildArtifacts(context: ScaffolderContext): readonly ScaffoldArtifact[] {
-    return buildStreamsScaffoldArtifacts({ pluginName: readPluginName(context.options) });
+    return buildStreamsScaffoldArtifacts({
+      pluginName: readScaffoldPluginName(context.options, { scaffolderName: 'Streams' }),
+    });
   }
 }
 
@@ -358,12 +361,4 @@ if (!response.ok) {
   throw new Error('${pluginName} streams health check failed.');
 }
 `;
-}
-
-function readPluginName(options: Readonly<Record<string, unknown>>): string {
-  const pluginName = Reflect.get(options, 'pluginName');
-  if (typeof pluginName !== 'string' || !/^[a-z][a-z0-9-]*$/.test(pluginName)) {
-    throw new Error('Streams scaffolder requires a kebab-case options.pluginName.');
-  }
-  return pluginName;
 }

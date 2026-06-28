@@ -10,7 +10,13 @@ import { scaffoldSchemaUrl } from './schema-url.ts';
 
 /** Data a plugin supplies to build its canonical `scaffold.plugin.json` manifest. */
 export interface PluginScaffoldManifestSpec {
-  /** Optional schema URL override for repository-local manifests. */
+  /**
+   * Optional caller-provided schema URL.
+   *
+   * Committed first-party manifests pass the repository-local relative schema path for editor
+   * IntelliSense, while userland-generated manifests use the published JSR schema URL from
+   * {@link scaffoldSchemaUrl} by default.
+   */
   readonly schemaUrl?: string;
   /** Published plugin package name. */
   readonly name: string;
@@ -32,6 +38,10 @@ export interface PluginScaffoldManifestSpec {
 
 /**
  * Build the canonical `scaffold.plugin.json` text for a plugin.
+ *
+ * The schema URL is caller-provided through `spec.schemaUrl`: repository-local committed manifests
+ * can retain their relative `$schema`, and userland-generated manifests default to the JSR URL for
+ * the supplied version.
  *
  * @param spec - Plugin-specific manifest data.
  * @param version - Published plugin and `@netscript/plugin` peer version.

@@ -4,6 +4,7 @@ import {
   buildScaffoldPluginJson,
   buildStandardScaffoldArtifacts,
   PluginScaffolder,
+  readScaffoldPluginName,
 } from '@netscript/plugin/scaffold';
 import type {
   PluginScaffoldManifestSpec,
@@ -32,7 +33,9 @@ export class TriggersScaffolder extends PluginScaffolder {
   readonly manifestSpec: PluginScaffoldManifestSpec = triggersScaffoldSpec;
 
   protected async buildArtifacts(context: ScaffolderContext): Promise<readonly ScaffoldArtifact[]> {
-    return await buildTriggersScaffoldArtifacts({ pluginName: readPluginName(context.options) });
+    return await buildTriggersScaffoldArtifacts({
+      pluginName: readScaffoldPluginName(context.options, { scaffolderName: 'Triggers' }),
+    });
   }
 }
 
@@ -591,12 +594,4 @@ function generateAspireContribution(pluginName: string): string {
   ],
 };
 `;
-}
-
-function readPluginName(options: Readonly<Record<string, unknown>>): string {
-  const pluginName = Reflect.get(options, 'pluginName');
-  if (typeof pluginName !== 'string' || !/^[a-z][a-z0-9-]*$/.test(pluginName)) {
-    throw new Error('Triggers scaffolder requires a kebab-case options.pluginName.');
-  }
-  return pluginName;
 }

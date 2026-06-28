@@ -1,5 +1,9 @@
 import packageConfig from '../../deno.json' with { type: 'json' };
-import { buildScaffoldPluginJson, PluginScaffolder } from '@netscript/plugin/scaffold';
+import {
+  buildScaffoldPluginJson,
+  PluginScaffolder,
+  readScaffoldPluginName,
+} from '@netscript/plugin/scaffold';
 import type {
   PluginScaffoldManifestSpec,
   ScaffoldArtifact,
@@ -76,7 +80,9 @@ export class AuthScaffolder extends PluginScaffolder {
   readonly manifestSpec: PluginScaffoldManifestSpec = authScaffoldSpec;
 
   protected buildArtifacts(context: ScaffolderContext): readonly ScaffoldArtifact[] {
-    return buildAuthScaffoldArtifacts({ pluginName: readPluginName(context.options) });
+    return buildAuthScaffoldArtifacts({
+      pluginName: readScaffoldPluginName(context.options, { scaffolderName: 'Auth' }),
+    });
   }
 }
 
@@ -93,12 +99,4 @@ function buildAuthScaffoldArtifacts(
 
 function generateScaffoldPluginJson(): string {
   return buildScaffoldPluginJson(authScaffoldSpec, NETSCRIPT_VERSION);
-}
-
-function readPluginName(options: Readonly<Record<string, unknown>>): string {
-  const pluginName = Reflect.get(options, 'pluginName');
-  if (typeof pluginName !== 'string' || !/^[a-z][a-z0-9-]*$/.test(pluginName)) {
-    throw new Error('Auth scaffolder requires a kebab-case options.pluginName.');
-  }
-  return pluginName;
 }

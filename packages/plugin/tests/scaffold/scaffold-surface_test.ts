@@ -1,7 +1,7 @@
-import { assertEquals } from '@std/assert';
+import { assertEquals, assertThrows } from '@std/assert';
 import { toCamelCase, toKebabCase, toPascalCase, toSnakeCase } from '@std/text';
 
-import { scaffoldSchemaUrl } from '../../src/scaffold/mod.ts';
+import { readScaffoldPluginName, scaffoldSchemaUrl } from '../../src/scaffold/mod.ts';
 
 Deno.test('scaffoldSchemaUrl builds the published scaffold manifest schema URL', () => {
   assertEquals(
@@ -19,6 +19,29 @@ Deno.test('std text casing matches committed first-party scaffold names', () => 
     assertEquals(toKebabCase(pluginName), legacyKebabCase(pluginName));
     assertEquals(toSnakeCase(pluginName), legacySnakeCase(pluginName));
   }
+});
+
+Deno.test('readScaffoldPluginName returns a valid kebab-case plugin name', () => {
+  assertEquals(
+    readScaffoldPluginName({ pluginName: 'billing-workers' }, { scaffolderName: 'Workers' }),
+    'billing-workers',
+  );
+});
+
+Deno.test('readScaffoldPluginName rejects invalid plugin names with caller context', () => {
+  assertThrows(
+    () => readScaffoldPluginName({ pluginName: 'BillingWorkers' }, { scaffolderName: 'Workers' }),
+    Error,
+    'Workers scaffolder requires a kebab-case options.pluginName.',
+  );
+});
+
+Deno.test('readScaffoldPluginName rejects missing plugin names with caller context', () => {
+  assertThrows(
+    () => readScaffoldPluginName({}, { scaffolderName: 'Auth' }),
+    Error,
+    'Auth scaffolder requires a kebab-case options.pluginName.',
+  );
 });
 
 function legacyPascalCase(value: string): string {

@@ -1,20 +1,9 @@
 import { join, normalize } from '@std/path';
 
-import { DenoFileSystemAdapter } from '../adapters/mod.ts';
 import type { FileSystemPort } from '../ports/mod.ts';
-import type {
-  PluginScaffoldEntrypoint,
-  ScaffolderContext,
-  ScaffoldResult,
-} from '../protocol/mod.ts';
+import type { ScaffolderContext, ScaffoldResult } from '../protocol/mod.ts';
 import type { ScaffoldArtifact } from './artifact.ts';
 import type { PluginScaffoldManifestSpec } from './manifest-spec.ts';
-
-/** Constructor shape accepted by {@link toEntrypoint}. */
-export interface PluginScaffolderConstructor {
-  /** Create a plugin scaffolder with its default filesystem adapter. */
-  new (): PluginScaffolder;
-}
 
 /** Base class for plugin-owned scaffolders that write planned artifacts through a filesystem port. */
 export abstract class PluginScaffolder {
@@ -28,7 +17,7 @@ export abstract class PluginScaffolder {
    *
    * @param fileSystem - File system port used for writes and dry-run comparisons.
    */
-  constructor(private readonly fileSystem: FileSystemPort = new DenoFileSystemAdapter()) {}
+  constructor(private readonly fileSystem: FileSystemPort) {}
 
   /**
    * Build plugin-specific artifacts for the supplied scaffold context.
@@ -78,19 +67,6 @@ export abstract class PluginScaffolder {
       databaseMigrationsAdded: artifacts.some((artifact) => artifact.path.endsWith('.prisma')),
     };
   }
-}
-
-/**
- * Convert a scaffolder class into the protocol entrypoint consumed by installers.
- *
- * @param constructor - Scaffolder constructor with default dependencies.
- * @returns Protocol-compatible scaffold entrypoint.
- */
-export function toEntrypoint(
-  constructor: PluginScaffolderConstructor,
-): PluginScaffoldEntrypoint {
-  return (context: ScaffolderContext): Promise<ScaffoldResult> =>
-    new constructor().scaffold(context);
 }
 
 function safeJoin(workspaceRoot: string, relativePath: string): string {
