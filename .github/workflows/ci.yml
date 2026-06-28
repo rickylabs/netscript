@@ -79,6 +79,9 @@ jobs:
       - name: Scaffold version guard (no preview pins)
         run: deno task check:scaffold-versions
 
+      - name: Architecture checks
+        run: deno task arch:check
+
       - name: Publish dry-run (0 slow-types across all units)
         run: deno task publish:dry-run
 

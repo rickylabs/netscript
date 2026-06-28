@@ -65,3 +65,25 @@
 | Scoped lint | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --file plugins/*/src/scaffold/artifacts.ts --pretty` — 5 selected files, 0 occurrences. |
 | Scoped TS fmt | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --file plugins/*/src/scaffold/artifacts.ts --pretty --ignore-line-endings` — 5 selected files, 0 findings. |
 | Manifest JSON fmt | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --file plugins/*/scaffold.plugin.json --pretty --ignore-line-endings` — 5 selected files, 0 findings. |
+
+## S3 progress
+
+- Added deterministic `deno task plugins:check` via `.llm/tools/plugin/check-plugins.ts`.
+- The gate validates all five committed manifests through the `$schema` strip path, byte-compares
+  the committed schema against regenerated schema text, and scans plugin scaffold sources for stale
+  NetScript version pins against the root workspace version.
+- Wired `plugins:check` into `deno task arch:check`.
+- Added an explicit `Architecture checks` step to the CI `quality` job, promoting `arch:check` from
+  local-only to CI-enforced for #156.
+
+### S3 gate evidence
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| `plugins:check` | PASS | `deno task plugins:check` — `plugins:check passed`. |
+| `arch:check` | PASS | `deno task arch:check` exited 0; includes `deps:check`, `plugins:check`, and existing doctrine checks. Existing dependency/doctrine warnings remain warnings only. |
+| Tool check/lint | PASS | `deno lint --config /dev/null .llm/tools/plugin/check-plugins.ts && deno check .llm/tools/plugin/check-plugins.ts`. |
+| Scoped fmt | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --file .llm/tools/plugin/check-plugins.ts --file .llm/tools/plugin/manifest-schema.ts --file .llm/tools/plugin/generate-manifest-schema.ts --file deno.json --file .github/workflows/ci.yml --pretty --ignore-line-endings` — 4 selected files, 0 findings. |
+| CI YAML | PASS | `deno eval --no-lock 'import { parse } from "jsr:@std/yaml@^1"; ...'` — `ci.yml yaml valid`. |
+| Schema stability | PASS | `deno task plugins:schema:gen && git diff --exit-code -- packages/plugin/schema/scaffold.plugin.schema.json`. |
+| Lock hygiene | PASS | `deno.lock` churn from YAML validation was removed; no `deno.lock` change remains. |
