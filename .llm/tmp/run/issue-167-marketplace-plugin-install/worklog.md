@@ -586,3 +586,96 @@ Timestamp: 2026-06-28T14:35:00Z
 - The initial `deno doc @netscript/plugin/protocol` bare specifier did not resolve in this checkout;
   `packages/plugin/src/protocol/scaffolder.ts` was read and the new scaffolder carries a private
   `PluginScaffoldEntrypoint` assignment against that protocol.
+
+## S8 — `plugin-triggers` dx `./scaffold` entrypoint
+
+### Implementation Summary
+
+- Commit: `7b64e233f7ddc1cad15acfdea08f29f57baadad8`
+  (`feat(plugin-triggers): add owned scaffold entrypoint`).
+- Added `plugins/triggers/scaffold.ts` as the package-owned executable `./scaffold` entrypoint.
+- Added `plugins/triggers/src/scaffold/{mod.ts,artifacts.ts,files.ts}` implementing the S1
+  `scaffold(ctx: ScaffolderContext): Promise<ScaffoldResult>` contract with the same S4
+  `--context-json` CLI contract as S6/S7.
+- Ported trigger-specific artifact emission into the plugin package: trigger service/router
+  scaffolding, `database/triggers.prisma`, `src/runtime/trigger-processor.ts`,
+  `src/runtime/project-trigger-registry.ts`, `src/aspire/mod.ts`, contracts, and webhook/scheduled/
+  file-watch sample trigger modules generated through the existing trigger definition scaffolders.
+- Updated `plugins/triggers/deno.json` to export and publish `./scaffold`, and added minimal
+  `@module` docs to existing public `./cli` and `./services` entrypoints so the package-level JSR
+  audit passes.
+- Updated the focused CLI integration test to drive the real `plugins/triggers` local path through
+  `addPlugin()` / `dispatchPluginScaffold()` for add, dry-run, and rerun-idempotency coverage.
+
+### PLAN-EVAL Note 4 — Self-Contained Import Graph
+
+- Verified the new triggers `./scaffold` graph has no `@netscript/cli` or `packages/cli` import:
+  `deno info --json plugins/triggers/scaffold.ts` filtered for those strings returned no matches.
+- Relevant graph entries are limited to `plugins/triggers/scaffold.ts`,
+  `plugins/triggers/src/scaffold/*`, `plugins/triggers/src/scaffolding/{input,trigger-scaffolders}.ts`,
+  `@netscript/plugin/protocol` for the private compile-time `PluginScaffoldEntrypoint` assignment,
+  and `@netscript/plugin-triggers-core` imports inside generated artifact strings only.
+- No `deno.lock` churn was introduced; the writer is self-contained and does not import
+  `@netscript/cli`.
+
+### Idempotency and Dry-Run Evidence
+
+- Real triggers local-path add:
+  `deno test -A --unstable-kv packages/cli/src/public/features/plugins/add/add-plugin_test.ts`
+  includes `runs the real triggers local-path scaffolder through plugin add` and passed. It asserts
+  `pluginOwnedScaffold.status === "applied"`, `databaseMigrationsAdded === true`, emitted
+  `plugins/triggers/database/triggers.prisma`, emitted
+  `plugins/triggers/triggers/generic-inbound-webhook.ts`, and wrote trigger-specific sample
+  artifacts such as `defineScheduledTrigger`.
+- Dry-run:
+  the same command includes `previews the real triggers local-path scaffolder without writing files`
+  and passed. It asserts planned runtime artifacts and absence of
+  `plugins/triggers/mod.ts` / `plugins/triggers/database/triggers.prisma` on disk.
+- Re-run idempotency:
+  the same command includes `reruns the real triggers scaffolder idempotently` and passed. The first
+  direct `dispatchPluginScaffold()` call returned `applied`; the second returned `skipped` with
+  empty `createdFiles` and `modifiedFiles`.
+
+### Fitness Gates Touched
+
+| Gate | S8 evidence |
+| ---- | ----------- |
+| F-3 | New plugin scaffolder code stays under the triggers plugin surface; no CLI implementation import. |
+| F-5 | `./scaffold` is an explicit public subpath export with module docs and public context/result types. |
+| F-6 | `deno task publish:dry-run` from `plugins/triggers` passed with `scaffold.ts` and `src/scaffold/*` included. |
+| F-7 | JSR audit helper exits 0 for the full triggers export map after adding missing module docs to existing public entrypoints. |
+| F-8 | No compiler lib override changed. |
+| F-9 | Manifest permissions remain declared for `./scaffold`; S4 tests run the local path under first-party flags. |
+| F-10 | Added real local-path add, dry-run no-write, and re-run idempotency tests for triggers. |
+| F-11 | New folder is role-named `src/scaffold`; no generic helper/common folder introduced. |
+| F-12 | New names are domain-specific (`buildTriggersScaffoldArtifacts`, `writePlannedFiles`, `runScaffoldCli`). |
+| F-13 | Trigger artifacts include webhook, scheduled, file-watch, runtime processor, Aspire, and Prisma schema contributions. |
+| F-14 | Runtime JSON output uses `Deno.stdout.write`; no `console.*` in the new scaffolder source. |
+| F-15 | No upstream package re-export introduced. |
+| F-16 | New `src/scaffold` directory has three files, below cardinality cap. |
+| F-18 | No subdirectory barrel; `src/scaffold/mod.ts` is a declared public export target through root `scaffold.ts`. |
+| F-CLI-11 | Local-path source mode is exercised against the real triggers plugin path. |
+| F-CLI-16 | Process execution stays behind `DenoProcess` / `dispatchPluginScaffold()` in tests. |
+| F-CLI-19 | Dry-run returns planned files and writes nothing. |
+| F-CLI-21 | CLI test additions stay in the existing add-flow test file and do not add a new command surface. |
+
+### Gate Results
+
+| Gate | Command | Result |
+| ---- | ------- | ------ |
+| Triggers + focused CLI check wrapper | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/triggers --root packages/cli/src/public/features/plugins/add --ext ts,tsx` | PASS; 72 files, 0 occurrences. |
+| Triggers + focused CLI lint wrapper | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root plugins/triggers --root packages/cli/src/public/features/plugins/add --ext ts,tsx` | PASS; 72 files, 0 occurrences. |
+| Triggers + focused CLI fmt wrapper | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/triggers --root packages/cli/src/public/features/plugins/add --ext ts,tsx` | PASS; 72 files, 0 findings. |
+| Scaffold doc lint | `deno doc --lint plugins/triggers/scaffold.ts` | PASS; checked 1 file. |
+| Focused S8 tests | `deno test -A --unstable-kv packages/cli/src/public/features/plugins/add/add-plugin_test.ts` | PASS; 1 test suite, 16 steps, 0 failed. |
+| Import graph | `deno info --json plugins/triggers/scaffold.ts` filtered for `@netscript/cli` / `packages/cli` | PASS; no matches. |
+| JSR audit | `deno run --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root plugins/triggers --text` | PASS; exits 0. Remaining warnings are existing root folder cardinality and the helper slow-types banner count. |
+| Publish dry-run | `deno task publish:dry-run` from `plugins/triggers` | PASS; includes `scaffold.ts` and `src/scaffold/*`; existing dynamic-import warnings remain in `src/cli/triggers-cli-backend.ts` and `src/runtime/project-trigger-registry.ts`. |
+
+### Notes
+
+- `deno.lock` was not touched.
+- No new TypeScript casts were introduced in source or generated scaffold templates; the only
+  matched cast in touched files is the pre-existing `kv as Deno.Kv` in
+  `plugins/triggers/services/src/main.ts`.
+- S8 did not remove or rewire the CLI copier/official-source path; that remains deferred to S5.
