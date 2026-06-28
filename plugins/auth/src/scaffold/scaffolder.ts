@@ -1,5 +1,6 @@
 import packageConfig from '../../deno.json' with { type: 'json' };
 import {
+  buildPluginDenoJson,
   buildScaffoldPluginJson,
   PluginScaffolder,
   readScaffoldPluginName,
@@ -12,7 +13,6 @@ import type {
 
 import { authTemplate0 } from './templates/root/README-md.ts';
 import { authTemplate1 } from './templates/root/package-json.ts';
-import { authTemplate2 } from './templates/root/deno-json.ts';
 import { authTemplate3 } from './templates/root/mod-ts.ts';
 import { authTemplate4 } from './templates/root/contracts-ts.ts';
 import { authTemplate5 } from './templates/root/verify-plugin-ts.ts';
@@ -48,7 +48,7 @@ const AUTH_ARTIFACT_SOURCES = [
   { sourcePath: 'scaffold.plugin.json', content: generateScaffoldPluginJson() },
   { sourcePath: 'README.md', content: authTemplate0 },
   { sourcePath: 'package.json', content: authTemplate1 },
-  { sourcePath: 'deno.json', content: authTemplate2(NETSCRIPT_VERSION) },
+  { sourcePath: 'deno.json', content: generateDenoJson() },
   { sourcePath: 'mod.ts', content: authTemplate3 },
   { sourcePath: 'contracts.ts', content: authTemplate4 },
   { sourcePath: 'verify-plugin.ts', content: authTemplate5 },
@@ -99,4 +99,79 @@ function buildAuthScaffoldArtifacts(
 
 function generateScaffoldPluginJson(): string {
   return buildScaffoldPluginJson(authScaffoldSpec, NETSCRIPT_VERSION);
+}
+
+function generateDenoJson(): string {
+  return buildPluginDenoJson({
+    pluginName: 'auth',
+    packageName: '@netscript/plugin-auth',
+    packageVersion: NETSCRIPT_VERSION,
+    description:
+      'NetScript plugin for a unified auth API, single-active backend selection, auth database schema, and auth session streams.',
+    license: 'MIT',
+    exports: {
+      '.': './mod.ts',
+      './public': './src/public/mod.ts',
+      './plugin': './src/plugin/mod.ts',
+      './contracts': './contracts.ts',
+      './scaffold': './scaffold.ts',
+      './services': './services/src/main.ts',
+      './streams': './streams/mod.ts',
+      './streams/server': './streams/server.ts',
+    },
+    imports: {
+      '@netscript/contracts': `jsr:@netscript/contracts@${NETSCRIPT_VERSION}`,
+      '@netscript/auth-better-auth': `jsr:@netscript/auth-better-auth@${NETSCRIPT_VERSION}`,
+      '@netscript/auth-kv-oauth': `jsr:@netscript/auth-kv-oauth@${NETSCRIPT_VERSION}`,
+      '@netscript/auth-workos': `jsr:@netscript/auth-workos@${NETSCRIPT_VERSION}`,
+      '@netscript/kv': `jsr:@netscript/kv@${NETSCRIPT_VERSION}`,
+      '@netscript/plugin': `jsr:@netscript/plugin@${NETSCRIPT_VERSION}`,
+      '@netscript/plugin-auth-core': `jsr:@netscript/plugin-auth-core@${NETSCRIPT_VERSION}`,
+      '@netscript/plugin-streams-core': `jsr:@netscript/plugin-streams-core@${NETSCRIPT_VERSION}`,
+      '@netscript/service': `jsr:@netscript/service@${NETSCRIPT_VERSION}`,
+      '@netscript/telemetry': `jsr:@netscript/telemetry@${NETSCRIPT_VERSION}`,
+      '@orpc/contract': 'npm:@orpc/contract@^1.14.6',
+      '@orpc/server': 'npm:@orpc/server@^1.14.6',
+      '@workos-inc/node': 'npm:@workos-inc/node@^10.4.0',
+      '@durable-streams/state': 'npm:@durable-streams/state@^0.3.1',
+      zod: 'jsr:@zod/zod@4.4.3',
+    },
+    tasks: {
+      check:
+        'deno check --unstable-kv mod.ts scaffold.ts src/public/mod.ts src/plugin/mod.ts src/scaffold/mod.ts contracts.ts services/src/main.ts streams/mod.ts streams/server.ts',
+      test: 'deno test --unstable-kv --allow-all',
+      dev: 'deno run --allow-net --allow-env --allow-read --watch services/src/main.ts',
+      start: 'deno run --allow-net --allow-env --allow-read services/src/main.ts',
+      'doc-lint':
+        'deno doc --lint mod.ts scaffold.ts src/public/mod.ts src/plugin/mod.ts src/scaffold/mod.ts contracts.ts services/src/main.ts streams/mod.ts streams/server.ts',
+      'publish:dry-run': 'deno publish --dry-run --allow-dirty',
+      verify: 'deno run --allow-read verify-plugin.ts',
+    },
+    publish: {
+      include: [
+        'README.md',
+        'deno.json',
+        'scaffold.plugin.json',
+        'package.json',
+        'scaffold.ts',
+        'mod.ts',
+        'contracts.ts',
+        'verify-plugin.ts',
+        'src/**/*.ts',
+        'services/**/*.ts',
+        'streams/**/*.ts',
+        'database/**/*.prisma',
+      ],
+      exclude: [
+        '**/*_test.ts',
+        '**/*.test.ts',
+        '**/test_utils/**',
+      ],
+    },
+    compilerOptions: {
+      strict: true,
+      noImplicitAny: true,
+      strictNullChecks: true,
+    },
+  }, NETSCRIPT_VERSION);
 }

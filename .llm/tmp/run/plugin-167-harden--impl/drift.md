@@ -81,3 +81,28 @@
   exclude, `doc-lint`/`publish:dry-run`/`verify` tasks, and strict/noImplicitAny/strictNullChecks
   compiler options). Forcing it through the generated-plugin envelope would change those fields and
   violate the byte-identical scaffold-output invariant.
+
+## Drift — C7 adversarial-review dispositions
+
+- Date: 2026-06-28. Severity: low (post-review scope clarification, no behavior drift).
+- Finding 1 disposition: the raw review cited doctrine AP-4/AP-6 against the exported
+  `PluginScaffolder` base. The supervisor triage governs this hardening slice: keep the
+  plan-sanctioned abstract base and template-method `scaffold()` architecture, and only remove the
+  concrete filesystem adapter default from the base constructor. The real `DenoFileSystemAdapter`
+  now lives at the `toEntrypoint` composition edge.
+- Finding 2 disposition: the raw review's manifest-byte drift finding is a false positive for this
+  slice. The committed `plugins/*/scaffold.plugin.json` files intentionally pass their own
+  repository-local `schemaUrl`; userland-generated manifests intentionally default to the JSR URL
+  from `scaffoldSchemaUrl(version)`. C7 changed JSDoc only and left manifest bytes and builder
+  behavior unchanged.
+
+## Drift — C7 auth deno.json boundary superseded
+
+- Date: 2026-06-28. Severity: low (prior drift note closed by C7b).
+- Supersedes the C5b byte-stability boundary for auth `deno.json`: auth no longer keeps a
+  plugin-local full-string `deno.json` template.
+- The core `buildPluginDenoJson(spec, version)` envelope now accepts the auth-required fields as
+  data (`packageName`, `packageVersion`, `description`, `license`, `publish`, tasks/imports/exports,
+  and compiler options). `packages/plugin/tests/scaffold/deno-json_test.ts` proves the builder output
+  remains byte-identical to the previous auth template output.
+- No auth `deno.json` residue remains outside data supplied to the core builder.

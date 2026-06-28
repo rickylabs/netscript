@@ -31,6 +31,7 @@ export type { ScaffoldArtifact } from './artifact.ts';
 export { parseScaffolderContextArgs, runScaffoldCli } from './cli.ts';
 export { buildPluginDenoJson } from './deno-json.ts';
 export type { PluginDenoJsonCompilerOptions, PluginDenoJsonSpec } from './deno-json.ts';
+export type { PluginDenoJsonPublish } from './deno-json.ts';
 export { toEntrypoint } from './entrypoint.ts';
 export type { PluginScaffolderConstructor } from './entrypoint.ts';
 export { buildScaffoldPluginJson } from './manifest-spec.ts';

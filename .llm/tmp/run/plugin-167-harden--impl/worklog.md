@@ -202,6 +202,36 @@
 | Full test | PASS | `deno task test` — 929 passed, 0 failed, 12 ignored. |
 | Lock hygiene | PASS | `git diff -- deno.lock` returned no diff before commit. |
 
+## C7a progress — post-review scaffold core hardening
+
+- Applied the supervisor disposition for Finding 1 narrowly: kept the plan-sanctioned abstract
+  `PluginScaffolder` template-method base, removed the concrete `new DenoFileSystemAdapter()`
+  default from the base constructor, and moved real adapter construction to the `toEntrypoint`
+  composition edge.
+- Applied the supervisor disposition for Finding 2 as documentation only: clarified
+  `PluginScaffoldManifestSpec.schemaUrl` and `buildScaffoldPluginJson(...)` so repository-local
+  committed manifests can keep their relative `$schema` while userland manifests default to
+  `scaffoldSchemaUrl(version)`. No manifest builder behavior or manifest bytes changed.
+- Applied Finding 3: added documented core `readScaffoldPluginName(...)`, exported it from
+  `@netscript/plugin/scaffold`, and migrated workers, streams, sagas, triggers, and auth while
+  preserving the exact plugin-specific error messages.
+- Restored resolver-only `deno.lock` churn to HEAD; no lockfile change is committed.
+- C7a commit: `b6d38104` (`fix(plugin): harden scaffold core entrypoint`).
+- Posted PR #170 comment:
+  https://github.com/rickylabs/netscript/pull/170#issuecomment-4827112384
+
+### C7a gate evidence
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Scoped check | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin --root plugins --ext ts,tsx` — 421 files selected, 0 failed batches. |
+| Scoped lint | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin --root plugins --ext ts,tsx` — 421 files selected, 0 occurrences. |
+| Scoped fmt | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin --root plugins --ext ts,tsx` — 421 files selected, 0 findings. |
+| Full scaffold doc lint | PASS | `deno doc --lint packages/plugin/src/scaffold/*.ts` — checked 10 files. |
+| Manifest check | PASS | `deno task plugins:check` — `plugins:check passed`. |
+| Full test | PASS | `deno task test` — 939 passed, 0 failed, 12 ignored. |
+| Lock hygiene | PASS | `git checkout -- deno.lock` restored resolver churn before commit; `deno.lock` was not committed. |
+
 ## C2 progress — scaffold manifest builder
 
 - Added `PluginScaffoldManifestSpec` and `buildScaffoldPluginJson(spec, version)` to the scaffold
@@ -353,3 +383,29 @@
 | Runtime E2E | PASS | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` — passed=48 failed=0. |
 | Publish dry-runs | PASS | `deno publish --dry-run --allow-dirty` from `packages/plugin`, `plugins/workers`, `plugins/streams`, `plugins/sagas`, `plugins/triggers`, and `plugins/auth` — all exited 0; existing dynamic-import warnings only. |
 | Lock hygiene | PASS | `git diff -- deno.lock` returned no diff before commit. |
+
+## C7b progress — auth deno.json envelope centralization
+
+- Applied Finding 4: extended core `buildPluginDenoJson(spec, version)` so the generated
+  `deno.json` envelope accepts data for package name/version, description, license, publish filters,
+  extra compiler options, exports, imports, and tasks.
+- Moved auth's generated `deno.json` values into the auth scaffolder as data consumed by
+  `buildPluginDenoJson(...)`.
+- Deleted the plugin-local `plugins/auth/src/scaffold/templates/root/deno-json.ts` full-string
+  template.
+- Added focused byte-equality coverage proving the expanded core builder reproduces the previous
+  auth `deno.json` bytes exactly.
+- Kept all committed `plugins/*/scaffold.plugin.json` bytes unchanged.
+- Restored resolver-only `deno.lock` churn to HEAD before staging; no lockfile change is committed.
+
+### C7b gate evidence
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Focused auth deno.json byte equality | PASS | `deno test --allow-read packages/plugin/tests/scaffold/deno-json_test.ts` — 3 passed, including previous auth `deno.json` byte equality. |
+| Scoped check | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin --root plugins --ext ts,tsx` — 421 files selected, 0 failed batches. |
+| Scoped lint | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin --root plugins --ext ts,tsx` — 421 files selected, 0 occurrences. |
+| Scoped fmt | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin --root plugins --ext ts,tsx` — 421 files selected, 0 findings. |
+| Full scaffold doc lint | PASS | `deno doc --lint packages/plugin/src/scaffold/*.ts` — checked 10 files. |
+| Manifest check | PASS | `deno task plugins:check` — `plugins:check passed`. |
+| Full test | PASS | `deno task test` — 939 passed, 0 failed, 12 ignored. |
