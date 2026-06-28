@@ -52,6 +52,8 @@ To update the bundled Scalar asset, replace `packages/service/assets/scalar.min.
 | 2026-06-28 | research | confirm bug | Confirmed `openapi.ts` uses `Deno.readTextFile(scalarJsUrl)` from `import.meta.url` and `createScalarJs(): ServiceHandler` is public. |
 | 2026-06-28 | 1 | implement | Added service generated asset target, generated `scalar.generated.ts`, and switched `createScalarJs()` to serve `SCALAR_MIN_JS`. |
 | 2026-06-28 | 1 | gates | Requested wrapper command with explicit `--unstable-kv` exited 1 because the wrapper defaults to `--unstable-kv` and accepts `--deno-arg`/`--no-unstable-kv`; reran supported form successfully. |
+| 2026-06-28 | follow-up lint | implement | CI quality lint flagged `require-await` in `createScalarJs()` because the handler no longer awaits. Confirmed `ServiceHandler = Handler`; changed only the returned handler from `async (c): Promise<Response>` to sync `(c): Response`. |
+| 2026-06-28 | follow-up lint | gates | Reran lint, service check, service tests, doc signature, and lock diff check; all passed. |
 
 ## Decisions
 
@@ -80,6 +82,11 @@ To update the bundled Scalar asset, replace `packages/service/assets/scalar.min.
 | service tests | `cd packages/service && deno task test` | PASS | exit 0; 57 passed, 0 failed. |
 | forbidden read | `git grep -nF "Deno.readTextFile" packages/service/src/primitives/openapi.ts` | PASS | zero matches; command exits 1 for no matches. |
 | forbidden text import/new casts | `git diff -- '*.ts' | rg -n "^\\+.*\\bas\\b|with \\{ type: ['\\\"]text['\\\"] \\}"` | PASS | zero added casts and zero added text import attributes. |
+| follow-up lint | `deno task lint` | PASS | exit 0; wrapper selected 1215 files in 7 batches, 0 total occurrences, 0 rules, 0 paths. |
+| follow-up service check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --ext ts` | PASS | exit 0; `deno check --quiet --unstable-kv <files>`, 35 files, 0 occurrences. |
+| follow-up service tests | `cd packages/service && deno task test` | PASS | exit 0; 57 passed, 0 failed. |
+| follow-up public surface | `deno doc --filter createScalarJs packages/service/mod.ts` | PASS | exit 0; signature remains `function createScalarJs(): ServiceHandler`. |
+| follow-up lock hygiene | `git diff --name-only origin/main -- deno.lock` | PASS | no output; `deno.lock` unchanged vs `origin/main`. |
 
 ### Fitness Gates
 

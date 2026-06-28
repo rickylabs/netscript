@@ -150,7 +150,7 @@ export function createScalarDocs(options: ScalarDocsOptions): ServiceHandler {
  * ```
  */
 export function createScalarJs(): ServiceHandler {
-  return async (c): Promise<Response> => {
+  return (c): Response => {
     return c.body(SCALAR_MIN_JS, 200, {
       'Content-Type': 'application/javascript',
       'Cache-Control': SCALAR_JS_CACHE_CONTROL,
