@@ -1,3 +1,9 @@
+/**
+ * Trigger plugin CLI composition entrypoint.
+ *
+ * @module
+ */
+
 import { TriggersCli } from '../triggers-cli.ts';
 import { LocalTriggersCliBackend } from '../triggers-cli-backend.ts';
 

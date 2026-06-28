@@ -10,6 +10,7 @@
     "./public": "./src/public/mod.ts",
     "./plugin": "./src/plugin/mod.ts",
     "./runtime": "./src/runtime/mod.ts",
+    "./scaffold": "./scaffold.ts",
     "./scaffolding": "./src/scaffolding/mod.ts",
     "./services": "./services/src/main.ts",
     "./streams": "./streams/mod.ts",
@@ -31,7 +32,7 @@
     "zod": "jsr:@zod/zod@4.4.3"
   },
   "tasks": {
-    "check": "deno check --unstable-kv mod.ts src/aspire/mod.ts src/cli/composition/main.ts src/public/mod.ts src/plugin/mod.ts src/runtime/mod.ts src/scaffolding/mod.ts services/src/main.ts streams/mod.ts streams/server.ts",
+    "check": "deno check --unstable-kv mod.ts scaffold.ts src/aspire/mod.ts src/cli/composition/main.ts src/public/mod.ts src/plugin/mod.ts src/runtime/mod.ts src/scaffold/mod.ts src/scaffolding/mod.ts services/src/main.ts streams/mod.ts streams/server.ts",
     "test": "deno test --allow-all --unstable-kv",
     "triggers:e2e": "deno test --allow-net --allow-env --unstable-kv tests/e2e",
     "dev": "deno run --unstable-kv --allow-net --allow-env --allow-read --watch services/src/main.ts",
@@ -44,6 +45,7 @@
       "deno.json",
       "scaffold.plugin.json",
       "scaffold.runtime.json",
+      "scaffold.ts",
       "mod.ts",
       "src/**/*.ts",
       "contracts/**/*.ts",

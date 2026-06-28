@@ -79,6 +79,32 @@ const sagaProvider: PluginKindProvider = {
   infrastructureOptionalDeps: ['db'],
 };
 
+const triggerProvider: PluginKindProvider = {
+  kind: 'triggers',
+  displayName: 'Trigger Processor',
+  category: 'background-processor',
+  portRangeKey: 'INFRA_PLUGIN',
+  defaultPermissions: [
+    '--unstable-kv',
+    '--allow-net',
+    '--allow-env',
+    '--allow-read',
+    '--allow-write',
+  ],
+  watchFlag: '--watch',
+  defaultEntrypoint: 'src/runtime/trigger-processor.ts',
+  defaultServiceEntrypoint: 'services/src/main.ts',
+  defaultRequiresDb: true,
+  defaultRequiresKv: true,
+  pluginType: 'background-processor',
+  supportsConcurrency: true,
+  concurrencyEnvVar: 'TRIGGER_CONCURRENCY',
+  defaultConcurrency: 10,
+  defaultTelemetry: true,
+  infrastructureRequires: ['kv'],
+  infrastructureOptionalDeps: ['db'],
+};
+
 describe('public add plugin flow', () => {
   it('plans a starter plugin request from project metadata', async () => {
     const fs = new MemoryFileSystemAdapter();
@@ -703,6 +729,147 @@ describe('public add plugin flow', () => {
       await Deno.remove(projectRoot, { recursive: true });
     }
   });
+
+  it('runs the real triggers local-path scaffolder through plugin add', async () => {
+    const projectRoot = await Deno.makeTempDir();
+    const triggersRoot = resolve('plugins/triggers');
+    try {
+      await writeRealProjectFiles(projectRoot);
+      const fs = new DenoFileSystem();
+      const templateAdapter = new StringTemplateAdapter(fs);
+      const scaffolder = new Scaffolder(templateAdapter, fs);
+      const registry = new PluginKindRegistry();
+
+      const result = await addPlugin({
+        kind: 'triggers',
+        pluginName: 'triggers',
+        serviceReferences: [],
+        pluginReferences: ['workers-api'],
+        noDb: true,
+        includeSamples: true,
+        localPath: triggersRoot,
+        projectRoot,
+        overwrite: false,
+      }, {
+        fs,
+        scaffolder,
+        templateAdapter,
+        registry,
+        pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
+        registryScaffolder: new PluginRegistryScaffolder(scaffolder),
+        workspaceMutator: new PluginWorkspaceMutator(fs),
+        processRunner: new DenoProcess(),
+        regenerateHelpers: () => Promise.resolve([]),
+      });
+
+      assertEquals(result.pluginOwnedScaffold?.status, 'applied');
+      assertEquals(result.pluginOwnedScaffold?.databaseMigrationsAdded, true);
+      assertStringIncludes(
+        result.pluginOwnedScaffold?.createdFiles.join('\n') ?? '',
+        'plugins/triggers/database/triggers.prisma',
+      );
+      assertStringIncludes(
+        result.pluginOwnedScaffold?.createdFiles.join('\n') ?? '',
+        'plugins/triggers/triggers/generic-inbound-webhook.ts',
+      );
+      assertStringIncludes(
+        await Deno.readTextFile(join(projectRoot, 'plugins/triggers/mod.ts')),
+        "definePlugin('triggers', '0.1.0')",
+      );
+      assertStringIncludes(
+        await Deno.readTextFile(join(projectRoot, 'plugins/triggers/database/triggers.prisma')),
+        'model TriggerEvent',
+      );
+      assertStringIncludes(
+        await Deno.readTextFile(
+          join(projectRoot, 'plugins/triggers/triggers/daily-maintenance.ts'),
+        ),
+        'defineScheduledTrigger',
+      );
+    } finally {
+      await Deno.remove(projectRoot, { recursive: true });
+    }
+  });
+
+  it('previews the real triggers local-path scaffolder without writing files', async () => {
+    const projectRoot = await Deno.makeTempDir();
+    const triggersRoot = resolve('plugins/triggers');
+    try {
+      await writeRealProjectFiles(projectRoot);
+      const fs = new DenoFileSystem();
+      const templateAdapter = new StringTemplateAdapter(fs);
+      const scaffolder = new Scaffolder(templateAdapter, fs);
+      const registry = new PluginKindRegistry();
+
+      const result = await addPlugin({
+        kind: 'triggers',
+        pluginName: 'triggers',
+        serviceReferences: [],
+        pluginReferences: ['workers-api'],
+        noDb: true,
+        includeSamples: true,
+        dryRun: true,
+        localPath: triggersRoot,
+        projectRoot,
+        overwrite: false,
+      }, {
+        fs,
+        scaffolder,
+        templateAdapter,
+        registry,
+        pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
+        registryScaffolder: new PluginRegistryScaffolder(scaffolder),
+        workspaceMutator: new PluginWorkspaceMutator(fs),
+        processRunner: new DenoProcess(),
+        regenerateHelpers: () => Promise.resolve([]),
+      });
+
+      assertEquals(result.pluginOwnedScaffold?.status, 'planned');
+      assertStringIncludes(
+        result.pluginOwnedScaffold?.createdFiles.join('\n') ?? '',
+        'plugins/triggers/src/runtime/trigger-processor.ts',
+      );
+      await assertFalseExists(join(projectRoot, 'plugins/triggers/mod.ts'));
+      await assertFalseExists(join(projectRoot, 'plugins/triggers/database/triggers.prisma'));
+    } finally {
+      await Deno.remove(projectRoot, { recursive: true });
+    }
+  });
+
+  it('reruns the real triggers scaffolder idempotently', async () => {
+    const projectRoot = await Deno.makeTempDir();
+    const triggersRoot = resolve('plugins/triggers');
+    const descriptor = triggersDescriptor();
+    try {
+      await writeRealProjectFiles(projectRoot);
+
+      const first = await dispatchPluginScaffold({
+        descriptor,
+        source: { kind: 'local-path', path: triggersRoot },
+        projectRoot,
+        pluginName: 'triggers',
+        dryRun: false,
+        permissionFlags: ['-A'],
+        processRunner: new DenoProcess(),
+      });
+      const second = await dispatchPluginScaffold({
+        descriptor,
+        source: { kind: 'local-path', path: triggersRoot },
+        projectRoot,
+        pluginName: 'triggers',
+        dryRun: false,
+        permissionFlags: ['-A'],
+        processRunner: new DenoProcess(),
+      });
+
+      assertEquals(first.status, 'applied');
+      assertEquals(second.status, 'skipped');
+      assertEquals(second.createdFiles, []);
+      assertEquals(second.modifiedFiles, []);
+    } finally {
+      await Deno.remove(projectRoot, { recursive: true });
+    }
+  });
 });
 
 class FixturePluginValidator implements JsrPluginValidatorPort {
@@ -983,6 +1150,77 @@ function sagasDescriptor(): ValidatedPluginDescriptor {
     details: {
       description:
         'NetScript plugin for durable saga orchestration, workflow APIs, and saga runtime metadata.',
+      score: 95,
+    },
+  };
+}
+
+function triggersDescriptor(): ValidatedPluginDescriptor {
+  return {
+    package: {
+      requestedSpec: 'triggers',
+      source: 'bare-alias',
+      scope: 'netscript',
+      packageName: 'plugin-triggers',
+      packageSpecifier: '@netscript/plugin-triggers',
+      jsrSpecifier: 'jsr:@netscript/plugin-triggers',
+      alias: 'triggers',
+    },
+    version: '0.0.1-alpha.12',
+    manifest: {
+      schemaVersion: 1,
+      name: '@netscript/plugin-triggers',
+      version: '0.0.1-alpha.12',
+      displayName: 'Trigger Processor',
+      description:
+        'NetScript plugin for trigger ingress, scheduling, file watching, and trigger runtime APIs.',
+      peerDependencies: {
+        '@netscript/plugin': '0.0.1-alpha.12',
+      },
+      capabilities: {
+        hasDatabaseMigrations: true,
+        hasRoutes: true,
+        hasBackgroundWorkers: true,
+      },
+      scaffolder: {
+        export: './scaffold',
+        requiredPermissions: {
+          net: [],
+          read: ['<workspaceRoot>'],
+          write: ['<workspaceRoot>'],
+        },
+      },
+      provider: {
+        kind: triggerProvider.kind,
+        displayName: triggerProvider.displayName,
+        category: triggerProvider.category,
+        portRangeKey: triggerProvider.portRangeKey,
+        defaultPermissions: triggerProvider.defaultPermissions,
+        watchFlag: triggerProvider.watchFlag,
+        defaultEntrypoint: triggerProvider.defaultEntrypoint,
+        defaultServiceEntrypoint: triggerProvider.defaultServiceEntrypoint ?? '',
+        defaultRequiresDb: triggerProvider.defaultRequiresDb,
+        defaultRequiresKv: triggerProvider.defaultRequiresKv,
+        pluginType: triggerProvider.pluginType,
+        supportsConcurrency: triggerProvider.supportsConcurrency,
+        concurrencyEnvVar: triggerProvider.concurrencyEnvVar,
+        defaultConcurrency: triggerProvider.defaultConcurrency,
+        defaultTelemetry: triggerProvider.defaultTelemetry,
+        infrastructureRequires: triggerProvider.infrastructureRequires,
+        infrastructureOptionalDeps: triggerProvider.infrastructureOptionalDeps,
+      },
+    },
+    packageMetadata: {
+      latest: '0.0.1-alpha.12',
+      isYanked: false,
+    },
+    versionMetadata: {
+      exports: { '.': './mod.ts', './scaffold': './scaffold.ts' },
+      files: { '/scaffold.plugin.json': 'sha256-good' },
+    },
+    details: {
+      description:
+        'NetScript plugin for trigger ingress, scheduling, file watching, and trigger runtime APIs.',
       score: 95,
     },
   };

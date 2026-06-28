@@ -1,3 +1,9 @@
+/**
+ * Trigger HTTP ingress service entrypoint.
+ *
+ * @module
+ */
+
 import {
   HmacSha256WebhookVerifier,
   MemoryWebhookVerifier,
