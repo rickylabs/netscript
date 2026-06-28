@@ -4,4 +4,4 @@
 - 9c109834: chore(plugins): wire scaffold manifest schemas
 - a97202a6: ci(plugins): enforce scaffold manifest checks
 - 8af4f7ca: fix(plugins): derive scaffold pins from package versions
-- 00819726: chore(cli): remove unused plugin generator barrel
+- 4f832606: chore(cli): remove unused plugin generator barrel
