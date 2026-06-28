@@ -4,18 +4,36 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The NetScript plugin that turns webhooks, cron schedules, and file-watch events into durable
-background work — it contributes a plugin manifest that wires the trigger ingress HTTP service, the
-cron and watcher runtimes, and Aspire resources into a NetScript app.**
+**The trigger-processing plugin for NetScript. It binds the host plugin system to trigger ingress,
+scheduling, file watching, a Trigger API service, CLI commands, durable streams, and Aspire process
+wiring through a single declarative manifest.**
 
 ---
 
 ## 🚀 Quick Start
 
-### Installation
+### Add it to a NetScript app
+
+From the root of a generated NetScript project:
 
 ```bash
-# Deno (recommended)
+netscript plugin add trigger
+```
+
+`plugin add` resolves `@netscript/plugin-triggers` from JSR and runs the plugin's own scaffolder —
+the plugin owns its setup, so the CLI ships no embedded templates. The scaffolder wires the Trigger
+API service, the trigger processor runtime, stream topics, database schema, and Aspire resources
+into your workspace, then pins the matching `@netscript/*` versions.
+
+> **Provisioning:** triggers require Deno KV and optionally Postgres. `plugin add` records these
+> requirements from the manifest so `netscript db` and Aspire orchestration provision them for you.
+
+### Use it as a library
+
+To consume the plugin programmatically (custom hosts, tests, tooling):
+
+```bash
+# Deno
 deno add jsr:@netscript/plugin-triggers
 
 # Node.js / Bun
@@ -23,44 +41,59 @@ npx jsr add @netscript/plugin-triggers
 bunx jsr add @netscript/plugin-triggers
 ```
 
-### Usage
-
-The root entrypoint exposes the plugin manifest and a lifecycle-free inspection helper. A host
-registers the manifest with its plugin runtime and can inspect it without invoking hooks:
-
 ```typescript
-import {
-  inspectTriggers,
-  TRIGGERS_API_DEFAULT_PORT,
-  triggersPlugin,
-} from '@netscript/plugin-triggers';
+import { inspectTriggers, triggersPlugin } from '@netscript/plugin-triggers';
 
-const inspection = inspectTriggers(triggersPlugin);
+// Hand the manifest to the host plugin loader.
+export const plugins = [triggersPlugin];
 
-console.log(inspection.name); // "@netscript/plugin-triggers"
-console.log(inspection.axes); // contribution groups: services, aspire, e2e, ...
-console.log(TRIGGERS_API_DEFAULT_PORT); // 8093
+// Inspect declared contribution axes without invoking lifecycle hooks.
+const summary = inspectTriggers();
+console.log(summary.name); // "@netscript/plugin-triggers"
+console.log(summary.axes); // ["services", "backgroundProcessors", "streamTopics", ...]
 ```
-
-Application trigger definitions import the handler-first authoring DSL (`defineWebhook`,
-`defineScheduledTrigger`, `defineFileWatch`, `enqueueJob`) from the sibling core package,
-`@netscript/plugin-triggers-core`, not from this plugin.
 
 ---
 
 ## 📦 Key Capabilities
 
-- **Ack-then-process ingress**: contributes the `triggers-api` HTTP service (default port `8093`)
-  that verifies, records, and schedules webhook events asynchronously, returning `202` without
-  waiting on handler execution.
-- **Scheduled and file-watch runtimes**: wraps `@netscript/cron` and `@netscript/watchers` into
-  cron-backed scheduled triggers and file-watch adapters.
-- **T1 durability**: the shipped processor pipeline applies at-least-once delivery, retries,
-  deduplication, dead-letter queueing, and a circuit breaker with explicit status transitions.
-- **Cross-axis integration**: declares typed dependencies on the workers, streams, and sagas core
-  packages so triggers can enqueue jobs, publish stream events, and start sagas.
-- **Aspire and scaffolding contributions**: emits Aspire resources for trigger services and
-  background workers, and generates handler-first trigger definition modules.
+- **Declarative manifest**: `triggersPlugin` declares services, the trigger processor, stream
+  topics, database schema, runtime-config topics, contract versions, E2E gates, and Aspire resources
+  as typed contribution axes.
+- **Trigger ingress + scheduling**: ingest external events, schedule recurring triggers, and watch
+  the filesystem; the `./runtime` subpath exposes the trigger processor that drains and dispatches
+  them with at-least-once delivery.
+- **High concurrency**: the processor defaults to a concurrency of 10 (`TRIGGER_CONCURRENCY`) for
+  fan-out workloads.
+- **CLI surface**: `./cli` mounts the trigger command group into the host CLI walker; `./public` and
+  `./plugin` expose the typed trigger surface and host binding.
+- **Durable streams + Aspire**: `./streams` exposes a StreamDB factory for trigger entities;
+  `./aspire` contributes the trigger Aspire resource to the AppHost.
+
+The reusable trigger definition builders and runtime composition live in
+`@netscript/plugin-triggers-core`; this package binds them to the host.
+
+---
+
+## 🧩 Install manifest
+
+The plugin root ships `scaffold.plugin.json` — the declarative contract `plugin add` reads to
+install the plugin. It is editor-validated through a bundled JSON Schema (`$schema`), so the
+manifest gives you IntelliSense and validation in any schema-aware editor.
+
+```jsonc
+{
+  "$schema": "...", // @netscript/plugin scaffold.plugin.schema.json
+  "name": "@netscript/plugin-triggers",
+  "provider": { "kind": "trigger", "category": "background-processor" },
+  "capabilities": {
+    "hasDatabaseMigrations": true,
+    "hasRoutes": true,
+    "hasBackgroundWorkers": true
+  },
+  "scaffolder": { "export": "./scaffold" }
+}
+```
 
 ---
 
@@ -68,8 +101,8 @@ Application trigger definitions import the handler-first authoring DSL (`defineW
 
 - **Reference**:
   [rickylabs.github.io/netscript/reference/triggers/](https://rickylabs.github.io/netscript/reference/triggers/)
-- **Durable Workflows**:
-  [rickylabs.github.io/netscript/durable-workflows/](https://rickylabs.github.io/netscript/durable-workflows/)
+- **Background Processing**:
+  [rickylabs.github.io/netscript/background-processing/](https://rickylabs.github.io/netscript/background-processing/)
 
 ---
 
