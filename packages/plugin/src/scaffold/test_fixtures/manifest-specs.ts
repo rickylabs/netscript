@@ -16,10 +16,11 @@ export const FIXTURE_VERSION = '0.0.1-alpha.12';
 /**
  * Spec reproducing `plugins/streams/scaffold.plugin.json`.
  *
- * The workers and sagas specs previously lived here too; S2a moved workers to
+ * The workers, sagas, and triggers specs previously lived here too; S2a moved workers to
  * `plugins/workers/src/scaffold/spec.ts` (`workersManifestSpec`) and S2b moved sagas to
- * `plugins/sagas/src/scaffold/spec.ts` (`sagasManifestSpec`), where their own byte-identity tests
- * now own those manifests. The remaining specs are fixtures until S2b finishes thinning them.
+ * `plugins/sagas/src/scaffold/spec.ts` (`sagasManifestSpec`) and triggers to
+ * `plugins/triggers/src/scaffold/spec.ts` (`triggersManifestSpec`), where their own byte-identity
+ * tests now own those manifests. The remaining specs are fixtures until S2b finishes thinning them.
  */
 export const streamsSpec: PluginScaffoldManifestSpec = {
   name: '@netscript/plugin-streams',
@@ -84,58 +85,6 @@ export const streamsSpec: PluginScaffoldManifestSpec = {
   },
 };
 
-/** Spec reproducing `plugins/triggers/scaffold.plugin.json`. */
-export const triggersSpec: PluginScaffoldManifestSpec = {
-  name: '@netscript/plugin-triggers',
-  displayName: 'Trigger Processor',
-  description:
-    'NetScript plugin for trigger ingress, scheduling, file watching, and trigger runtime APIs.',
-  capabilities: {
-    hasDatabaseMigrations: true,
-    hasRoutes: true,
-    hasBackgroundWorkers: true,
-  },
-  scaffolder: {
-    export: './scaffold',
-    requiredPermissions: {
-      net: [],
-      read: ['<workspaceRoot>'],
-      write: ['<workspaceRoot>'],
-    },
-  },
-  provider: {
-    kind: 'trigger',
-    displayName: 'Trigger Processor',
-    category: 'background-processor',
-    portRangeKey: 'INFRA_PLUGIN',
-    defaultPermissions: ['--unstable-kv', '--allow-all'],
-    watchFlag: '--watch',
-    defaultEntrypoint: 'src/runtime/trigger-processor.ts',
-    defaultServiceEntrypoint: 'services/src/main.ts',
-    defaultRequiresDb: true,
-    defaultRequiresKv: true,
-    pluginType: 'background-processor',
-    supportsConcurrency: true,
-    concurrencyEnvVar: 'TRIGGER_CONCURRENCY',
-    defaultConcurrency: 10,
-    defaultTelemetry: true,
-    infrastructureRequires: ['kv'],
-    infrastructureOptionalDeps: ['db'],
-  },
-  officialSource: {
-    canonicalName: 'triggers',
-    pluginDir: 'triggers',
-    backgroundDir: 'triggers',
-    serviceEntrypoint: 'services/src/main.ts',
-    backgroundEntrypoint: 'src/runtime/trigger-processor.ts',
-    serviceConfigKey: 'triggers-api',
-    servicePort: 8093,
-    backgroundPort: 8093,
-    dependencies: ['streams'],
-    pluginReferences: ['workers-api'],
-  },
-};
-
 /** Spec reproducing `plugins/auth/scaffold.plugin.json`. */
 export const authSpec: PluginScaffoldManifestSpec = {
   name: '@netscript/plugin-auth',
@@ -190,13 +139,13 @@ export const authSpec: PluginScaffoldManifestSpec = {
 /**
  * The committed plugin specs keyed by directory name.
  *
- * Workers is intentionally absent: S2a relocated it to `plugins/workers/src/scaffold/spec.ts` and
- * its byte-identity assertion moved with it. The remaining four stay here until S2b thins them.
+ * Workers, sagas, and triggers are intentionally absent: S2a relocated workers and S2b relocated
+ * sagas and triggers to `plugins/<kind>/src/scaffold/spec.ts`, where their byte-identity assertions
+ * moved with them. The remaining specs stay here until S2b finishes thinning them.
  */
 export const committedSpecs: ReadonlyArray<
   { readonly dir: string; readonly spec: PluginScaffoldManifestSpec }
 > = [
   { dir: 'streams', spec: streamsSpec },
-  { dir: 'triggers', spec: triggersSpec },
   { dir: 'auth', spec: authSpec },
 ];
