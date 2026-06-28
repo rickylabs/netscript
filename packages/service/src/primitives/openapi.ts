@@ -21,13 +21,12 @@ import { OpenAPIGenerator } from '@orpc/openapi';
 import { ZodToJsonSchemaConverter } from '@orpc/zod/zod4';
 import type { ServiceHandler, ServiceRouter } from '../types.ts';
 import { isOrpcRouter } from './orpc-router.ts';
+import { SCALAR_MIN_JS } from './scalar.generated.ts';
 
 const DEFAULT_OPENAPI_SERVER_URL = '/api';
 const DEFAULT_SCALAR_TITLE = 'API Documentation';
 const DEFAULT_SCALAR_THEME = 'kepler';
 const SCALAR_JS_CACHE_CONTROL = 'public, max-age=31536000, immutable';
-const scalarJsUrl = new URL('../../assets/scalar.min.js', import.meta.url);
-let scalarJsCache: string | undefined;
 
 /**
  * Configuration for OpenAPI spec generation.
@@ -152,10 +151,7 @@ export function createScalarDocs(options: ScalarDocsOptions): ServiceHandler {
  */
 export function createScalarJs(): ServiceHandler {
   return async (c): Promise<Response> => {
-    const scalarJs = scalarJsCache ?? await Deno.readTextFile(scalarJsUrl);
-    scalarJsCache = scalarJs;
-
-    return c.body(scalarJs, 200, {
+    return c.body(SCALAR_MIN_JS, 200, {
       'Content-Type': 'application/javascript',
       'Cache-Control': SCALAR_JS_CACHE_CONTROL,
     });
