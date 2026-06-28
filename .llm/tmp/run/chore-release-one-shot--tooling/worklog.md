@@ -99,3 +99,12 @@ Gate evidence:
 | `deno task agentic:sync-claude:check` | PASS | Mirror check OK for 17 skills / 21 mirrored files. |
 | `deno run --no-lock --allow-read --allow-run .llm/tools/agentic/validate-claude-surface.ts --pretty` | PASS | CLAUDE.md, settings, gitignore, skills mirror, and hook lock check OK. |
 | `git diff -- deno.lock` | PASS | No lock diff after removing incidental `@std/yaml` resolution. |
+
+## Final Summary
+
+Implementation slices S1-S5 were committed, pushed to `chore/release-one-shot`, and commented on PR
+#164. The tooling implementation is complete for the locked plan, with one material evaluator item:
+the new `release:preflight` gate correctly reports a true existing package-source finding in
+`packages/service/src/primitives/openapi.ts:155`. This implementation scope forbids `packages/`
+source edits, so the finding is recorded and not suppressed. It blocks a fully green
+`release:cut --dry-run` gate until fixed in package scope.
