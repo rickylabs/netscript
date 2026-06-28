@@ -10,3 +10,4 @@
 - a14708ec: feat(plugin-streams): add owned scaffold entrypoint
 - 4a5988d6: feat(plugin-auth): add owned scaffold entrypoint
 - b729796723bd93a0ede5b006df2576ce7f9b8aa0: feat(cli): route plugin add through dx scaffolders
+- 8bff51cb363ac7b8b3e50a563802197200209524: feat(cli): add true userland plugin install e2e
