@@ -10,7 +10,7 @@ import { createPublicCli } from '../../public/composition/create-public-cli.ts';
 /** Compose the local contributor CLI from maintainer and public command trees. */
 export function composeLocalContributorCommandTree(
   host: MaintainerCliHost,
-): Command<any, any, any, any, any, any, any, any> {
+) {
   const maintainerCli = createMaintainerCli(host) as Command;
   const publicCli = createPublicCli(host) as Command;
   const publicDependencies = createPublicCommandDependencies(host);
@@ -19,7 +19,10 @@ export function composeLocalContributorCommandTree(
   for (const command of publicCli.getCommands()) {
     if (existing.has(command.getName())) continue;
     if (command.getName() === 'plugin') {
-      maintainerCli.command('plugin', createLocalPluginCommand(publicDependencies, host.cwd()));
+      maintainerCli.command(
+        'plugin',
+        createLocalPluginCommand(publicDependencies, host.sourceRoot?.() ?? host.cwd()),
+      );
       continue;
     }
     maintainerCli.command(command.getName(), command);

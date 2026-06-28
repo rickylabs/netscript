@@ -135,6 +135,129 @@ verdicts are not seeded here.
   `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` passes with the workaround
   removed.
 
+## packages/cli — ISSUE-167-PLUGIN-REMOVE-UNINSTALL
+
+- **ID:** `ISSUE-167-PLUGIN-REMOVE-UNINSTALL`
+- **Title:** `plugin remove` / uninstall is not implemented.
+- **Context:** Issue #167 makes plugin install add-only: the CLI resolves, validates, confirms, runs
+  the plugin-owned `./scaffold`, verifies integrity, and applies deterministic artifacts. No reverse
+  operation removes generated files, config entries, DB schema additions, Aspire contributions, or
+  post-install side effects.
+- **Why deferred:** The approved #167 scope is the marketplace install foundation. D5 intentionally
+  required deterministic, self-contained scaffold outputs so uninstall can be designed later without
+  blocking official plugin installation or the true-userland no-copy gate.
+- **Trigger to revisit:** User-gated `plugin remove` / uninstall program; require an uninstall
+  manifest or reverse-plan contract plus add/remove/re-add e2e coverage for at least one official
+  plugin before advertising removal.
+- **Reason:** Add-only install is intentionally accepted for #167; removal semantics need separate
+  design for ownership, conflict handling, generated DB artifacts, and user-edited files.
+- **Owner:** Future CLI plugin lifecycle program.
+- **Target:** Before marketplace uninstall is documented or exposed as supported.
+- **Linked plan:** `.llm/tmp/run/issue-167-marketplace-plugin-install/plan.md` (Non-Scope, D5,
+  S12).
+- **Created:** 2026-06-28
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** New uninstall contract and `e2e:cli` add/remove/re-add suite pass without orphaned
+  generated artifacts or user-authored file deletion.
+
+## marketplace — ISSUE-167-MARKETPLACE-PORTAL-SIGNATURES
+
+- **ID:** `ISSUE-167-MARKETPLACE-PORTAL-SIGNATURES`
+- **Title:** Marketplace portal and publisher-signature curation are future work.
+- **Context:** Issue #167 establishes the JSR package scope, static plugin protocol, trust tiers, and
+  confirmation boundary needed for a marketplace, but it does not build `market.netscript.dev`,
+  `plugin search`, curated registry metadata, publisher signatures, provenance attestations, or
+  verified publisher workflows.
+- **Why deferred:** The approved slice set was the install foundation. Portal discovery and signature
+  curation require product, trust, release, and governance decisions that should be user-gated and
+  evaluated separately from the installer mechanics.
+- **Trigger to revisit:** Marketplace roadmap Phase 2/3 or any plan to advertise curated third-party
+  plugin discovery; require a publisher trust model, provenance gate, registry ingestion policy, and
+  UI/API ownership decision.
+- **Reason:** Static JSR validation plus confirmation is sufficient for #167; curated discovery and
+  publisher-signature trust are deliberately not claimed.
+- **Owner:** Future NetScript marketplace program.
+- **Target:** Before public marketplace discovery or verified-publisher trust claims.
+- **Linked plan:** `.llm/tmp/run/issue-167-marketplace-plugin-install/plan.md` (Non-Scope,
+  Marketplace roadmap, S12).
+- **Created:** 2026-06-28
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Marketplace plan lands with signature/provenance validation, curated registry policy,
+  and e2e evidence that installer confirmation/trust metadata matches the portal's claims.
+
+## plugins/* — ISSUE-167-OPTION-B-PACKAGE-RENAME
+
+- **ID:** `ISSUE-167-OPTION-B-PACKAGE-RENAME`
+- **Title:** Option B package rename from `@netscript/plugin-<kind>` to `@netscript/<kind>` deferred.
+- **Context:** D1 kept the existing published package names and added a bare-kind alias map
+  (`workers` -> `@netscript/plugin-workers`, etc.) as the verified-scope guard. The cleaner
+  marketplace identity of `@netscript/<kind>` was considered and explicitly deferred.
+- **Why deferred:** Renaming all official packages would break alpha consumers, require republishing
+  and import-map migration, orphan existing package identities, and distract from the install
+  foundation. The alias map solves the immediate typosquat and bare-name DX problem without forcing
+  a package identity migration.
+- **Trigger to revisit:** Marketplace identity/versioning program or beta naming freeze; require a
+  migration plan for existing alpha imports, package deprecation messaging, and dual-name install
+  compatibility if needed.
+- **Reason:** D1 is intentionally locked for #167; Option B remains a separate identity decision.
+- **Owner:** Future marketplace identity / package naming program.
+- **Target:** Before beta naming freeze, only if user approves package identity migration.
+- **Linked plan:** `.llm/tmp/run/issue-167-marketplace-plugin-install/plan.md` (D1, Non-Scope,
+  Open-Decision Sweep).
+- **Created:** 2026-06-28
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Approved rename plan with compatibility tests for bare-kind resolution, JSR install,
+  docs, import maps, and deprecation behavior.
+
+## packages/plugin — ISSUE-167-STANDALONE-PLUGIN-PROTOCOL
+
+- **ID:** `ISSUE-167-STANDALONE-PLUGIN-PROTOCOL`
+- **Title:** Dedicated `@netscript/plugin-protocol` package extraction deferred.
+- **Context:** S1 published the manifest and scaffolder protocol from the neutral existing
+  `@netscript/plugin/protocol` subpath and re-exported it from `@netscript/plugin`. This avoided a
+  new package while keeping plugin authors and the CLI on a shared contract.
+- **Why deferred:** A standalone package is additive and not required for #167. Extracting it would
+  add package/release choreography before the protocol has enough independent lifecycle pressure to
+  justify its own package.
+- **Trigger to revisit:** Multiple non-plugin packages need the protocol without depending on
+  `@netscript/plugin`, or protocol versioning needs to move independently from plugin authoring
+  APIs.
+- **Reason:** D8/D3-backlog intentionally chose inline-first protocol publication in
+  `@netscript/plugin`; standalone extraction is future work.
+- **Owner:** Plugin platform maintainers.
+- **Target:** Before protocol versioning needs an independent release cadence.
+- **Linked plan:** `.llm/tmp/run/issue-167-marketplace-plugin-install/plan.md` (D8, D3 backlog,
+  S1 drift).
+- **Created:** 2026-06-28
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** New package plan proves export compatibility, migration path, publish dry-run, and
+  consumer updates for CLI plus all first-party plugins.
+
+## packages/cli — ISSUE-167-PROD-JSR-SCAFFOLD-E2E
+
+- **ID:** `ISSUE-167-PROD-JSR-SCAFFOLD-E2E`
+- **Title:** Production `deno x jsr:<pkg>/scaffold` validation is post-publish.
+- **Context:** S4 drift established that local files must run with `deno run`, not `deno x`; S11
+  therefore validates a true userland project outside the checkout with explicit `--local-path`.
+  The production JSR command shape remains `deno x <flags> jsr:@netscript/plugin-<kind>/scaffold`
+  and cannot be fully exercised until the new `./scaffold` exports are published.
+- **Why deferred:** Pre-merge validation cannot execute unpublished JSR package exports. Claiming
+  prod-JSR green before alpha.13 would overstate the evidence.
+- **Trigger to revisit:** Immediately after alpha.13 publication; run `e2e-cli-prod` against the
+  published CLI and official plugin packages.
+- **Reason:** The #167 implementation is green for local-path true userland and maintainer runtime
+  gates; the post-publish production JSR leg remains a release validation item.
+- **Owner:** Release / e2e-cli-prod owner for alpha.13.
+- **Target:** Alpha.13 post-publish verification.
+- **Linked plan:** `.llm/tmp/run/issue-167-marketplace-plugin-install/plan.md` (Hidden Scope,
+  Risk Register, S11 Scope Boundary); `.llm/tmp/run/issue-167-marketplace-plugin-install/drift.md`
+  (S4 local-path drift).
+- **Created:** 2026-06-28
+- **Status:** open, DEBT_ACCEPTED until alpha.13 post-publish smoke passes.
+- **Gate:** `e2e-cli-prod` proves official plugin install through
+  `deno x jsr:@netscript/plugin-<kind>/scaffold` after alpha.13; close by recording raw exit code and
+  suite/test counts.
+
 ## packages/cli — Deno KV cache backend TypeScript AppHost resource emission deferred
 
 - **Reason:** Alpha.11 Slice C adds `netscript init --cache-backend deno-kv` config/schema support,

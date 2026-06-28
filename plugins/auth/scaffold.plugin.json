@@ -1,5 +1,25 @@
 {
   "schemaVersion": 1,
+  "name": "@netscript/plugin-auth",
+  "version": "0.0.1-alpha.12",
+  "displayName": "Auth",
+  "description": "NetScript plugin for a unified auth API, auth database schema, and auth session streams.",
+  "peerDependencies": {
+    "@netscript/plugin": "0.0.1-alpha.12"
+  },
+  "capabilities": {
+    "hasDatabaseMigrations": true,
+    "hasRoutes": true,
+    "hasBackgroundWorkers": false
+  },
+  "scaffolder": {
+    "export": "./scaffold",
+    "requiredPermissions": {
+      "net": [],
+      "read": ["<workspaceRoot>"],
+      "write": ["<workspaceRoot>"]
+    }
+  },
   "provider": {
     "kind": "auth",
     "displayName": "Auth",

@@ -1,3 +1,9 @@
+/**
+ * CLI entrypoint for the streams plugin.
+ *
+ * @module
+ */
+
 import { StreamsCli } from '../streams-cli.ts';
 
 /** CLI command group for the streams plugin. */

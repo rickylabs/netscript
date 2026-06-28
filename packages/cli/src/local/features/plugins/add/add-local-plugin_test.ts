@@ -70,7 +70,7 @@ describe('local contributor add plugin flow', () => {
       pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
       registryScaffolder: new PluginRegistryScaffolder(scaffolder),
       workspaceMutator: new PluginWorkspaceMutator(fs),
-      findSourceRoot: () => Promise.resolve('/repo'),
+      findSourceRoot: () => Promise.resolve(null),
       regenerateHelpers: () => Promise.resolve(['/workspace/alpha/aspire/apphost.mts']),
     });
 
@@ -85,7 +85,7 @@ describe('local contributor add plugin flow', () => {
     assertEquals(result.plugin.configKey, 'worker');
   });
 
-  it('copies official canonical plugins with local workspace members and references', async () => {
+  it('renders canonical plugins without copying source when no local path is supplied', async () => {
     const fs = new MemoryFileSystemAdapter();
     await writeProjectFiles(fs);
     const templateAdapter = new StringTemplateAdapter(fs);
@@ -110,63 +110,20 @@ describe('local contributor add plugin flow', () => {
       pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
       registryScaffolder: new PluginRegistryScaffolder(scaffolder),
       workspaceMutator: new PluginWorkspaceMutator(fs),
-      findSourceRoot: () => Promise.resolve('/repo'),
-      canCopyPlugin: () => Promise.resolve(true),
-      getSource: (_sourceRoot, kind) => {
-        const source: Record<
-          string,
-          { canonicalName: string; pluginReferences: readonly string[] }
-        > = {
-          worker: { canonicalName: 'workers', pluginReferences: [] },
-          saga: { canonicalName: 'sagas', pluginReferences: ['workers-api'] },
-          trigger: { canonicalName: 'triggers', pluginReferences: ['workers-api'] },
-        };
-        return Promise.resolve(source[kind] as never);
-      },
-      copyPlugin: () =>
-        Promise.resolve({
-          scaffoldResult: {
-            filesCreated: ['/workspace/alpha/plugins/workers/mod.ts'],
-            directoriesCreated: ['/workspace/alpha/plugins/workers', '/workspace/alpha/workers'],
-            filesSkipped: [],
-            totalOperations: 3,
-            durationMs: 0,
-          },
-          pluginName: 'workers',
-          pluginDir: '/workspace/alpha/plugins/workers',
-          backgroundDir: '/workspace/alpha/workers',
-          serviceConfigKey: 'workers-api',
-          servicePort: 8091,
-          serviceEntrypoint: 'services/src/main.ts',
-          backgroundPort: 8091,
-          backgroundEntrypoint: 'bin/combined.ts',
-          dependencies: [{
-            pluginDir: 'streams',
-            configKey: 'streams',
-            servicePort: 4437,
-            serviceEntrypoint: 'services/src/main.ts',
-            requiresDb: false,
-            requiresKv: false,
-            permissions: ['--allow-net'],
-          }],
-          pluginReferences: [],
-          workspaceMembers: ['workers'],
-        }),
+      findSourceRoot: () => Promise.resolve(null),
       regenerateHelpers: () => Promise.resolve(['/workspace/alpha/aspire/apphost.mts']),
     });
 
     const appsettings = JSON.parse(await fs.readFile('/workspace/alpha/appsettings.json'));
     const rootDenoJson = JSON.parse(await fs.readFile('/workspace/alpha/deno.json'));
 
-    assertEquals(result.plugin.backgroundWorkdir, 'workers');
-    assertEquals(appsettings.NetScript.BackgroundProcessors.workers.Workdir, 'workers');
+    assertEquals(result.plugin.backgroundWorkdir, undefined);
+    assertEquals(appsettings.NetScript.BackgroundProcessors.workers.Workdir, 'plugins/workers');
     assertEquals(appsettings.NetScript.BackgroundProcessors.workers.PluginReferences, [
-      'streams',
       'workers-api',
     ]);
-    assertEquals(appsettings.NetScript.Plugins.streams.Port, 4437);
-    assertEquals(appsettings.NetScript.Plugins['workers-api'].PluginReferences, ['streams']);
-    assertEquals(rootDenoJson.workspace.includes('./workers'), true);
+    assertEquals(appsettings.NetScript.Plugins?.streams, undefined);
+    assertEquals(rootDenoJson.workspace.includes('./workers'), false);
   });
 
   it('writes thin local-import stubs for canonical plugins when source copy is disabled', async () => {
@@ -195,13 +152,7 @@ describe('local contributor add plugin flow', () => {
       pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
       registryScaffolder: new PluginRegistryScaffolder(scaffolder),
       workspaceMutator: new PluginWorkspaceMutator(fs),
-      findSourceRoot: () => Promise.resolve('/repo'),
-      canCopyPlugin: () => {
-        throw new Error('canCopyPlugin should not run when noCopySource is true.');
-      },
-      copyPlugin: () => {
-        throw new Error('copyPlugin should not run when noCopySource is true.');
-      },
+      findSourceRoot: () => Promise.resolve(null),
       regenerateHelpers: () => Promise.resolve(['/workspace/alpha/aspire/apphost.mts']),
     });
 

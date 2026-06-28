@@ -9,6 +9,7 @@ Deno.test('registry exposes scaffold capability suites from constants', () => {
     SCAFFOLD.INFRASTRUCTURE,
     SCAFFOLD.PLUGIN,
     SCAFFOLD.RUNTIME,
+    SCAFFOLD.USERLAND_INSTALL,
   ]);
 });
 
@@ -35,6 +36,17 @@ Deno.test('plugin suite includes all official plugin and generated-check gates',
     GATE.SCAFFOLD_PLUGIN_LIST,
     GATE.GENERATED_PLUGINS_CHECK,
     GATE.BEHAVIOR_PLUGINS_HEALTH,
+  ]);
+});
+
+Deno.test('true userland suite runs init, one local-path plugin add, assertion, and cleanup', () => {
+  const userland = resolveSuite(SCAFFOLD.USERLAND_INSTALL);
+  assertEquals(userland.gates.map((gate) => gate.id), [
+    GATE.PREFLIGHT_DENO,
+    GATE.SCAFFOLD_INIT,
+    'scaffold.plugin.worker',
+    GATE.USERLAND_INSTALL_ASSERTIONS,
+    GATE.CLEANUP_USERLAND_SMOKE_ROOT,
   ]);
 });
 

@@ -34,6 +34,7 @@ export type {
   AuthStreamSchema,
   AuthStreamSchemaResult,
   DurableStreamProducer,
+  SerializedTraceContext,
   StateSchema,
   StreamProducerPort,
   StreamStateDefinition,

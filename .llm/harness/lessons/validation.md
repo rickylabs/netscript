@@ -90,3 +90,28 @@ generated-trigger track).
 - Targeted `deno check` for these packages must pass `--unstable-kv`.
 - cron pins `deno.unstable` in `compilerOptions.lib`; queue passes `--unstable-kv`.
   No `skipLibCheck`.
+
+## Userland install gates must run outside the checkout
+
+Source run:
+
+- `.llm/tmp/run/issue-167-marketplace-plugin-install`
+
+CLI scaffold and plugin-install gates can pass falsely when the generated project lives inside the
+monorepo: checkout walk-up logic, local import maps, copied source trees, and unpublished package
+paths can mask the actual published-user experience. The #167 baseline had exactly this blind spot:
+`scaffold.runtime` passed in the monorepo while `jsr:@netscript/cli` users could not install official
+plugins at all.
+
+Reusable rule: any gate claiming "published userland" behavior must create its project under an OS
+temp root outside the checkout and assert both presence and absence:
+
+- expected generated artifacts exist;
+- framework/plugin source directories are absent;
+- generated files contain no monorepo absolute paths, `file://` worktree URLs, or local
+  `../packages` imports.
+
+For unpublished package exports, pre-merge validation may use an explicit `--local-path` only if the
+project root is still outside the checkout and the worklog states that the real `deno x jsr:` leg is
+post-publish validation. Do not report production-JSR green until the published package path is
+exercised by a prod smoke such as `e2e-cli-prod`.

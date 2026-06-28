@@ -23,6 +23,7 @@ export function createLocalPluginCommand(
       'add',
       createLocalPluginAddCommand({
         resolveProjectRoot: dependencies.resolveProjectRoot,
+        sourceRootStartDir,
         addPluginDependencies: {
           fs: dependencies.fs,
           scaffolder: dependencies.scaffolder,
@@ -31,6 +32,8 @@ export function createLocalPluginCommand(
           pluginScaffolder: dependencies.pluginAddDependencies.pluginScaffolder,
           registryScaffolder: dependencies.pluginAddDependencies.registryScaffolder,
           workspaceMutator: dependencies.pluginAddDependencies.workspaceMutator,
+          processRunner: dependencies.process,
+          pluginValidator: dependencies.pluginAddDependencies.pluginValidator,
           sourceRootStartDir,
         },
       }),

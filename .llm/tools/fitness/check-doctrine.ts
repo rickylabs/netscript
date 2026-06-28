@@ -139,6 +139,7 @@ for await (
       /\.test\.ts$/,
       /tests\//,
       /examples\//,
+      /src\/scaffold\/templates\//,
       /_fresh/,
       /\.deploy/,
     ],
@@ -491,7 +492,7 @@ const authScanFiles: string[] = [];
 for await (
   const entry of walk(ROOT, {
     match: [/\.ts$/],
-    skip: [/node_modules/, /_fresh/, /\.deploy/],
+    skip: [/node_modules/, /src\/scaffold\/templates\//, /_fresh/, /\.deploy/],
   })
 ) authScanFiles.push(entry.path);
 

@@ -1,3 +1,9 @@
+/**
+ * Workers plugin CLI composition entrypoint.
+ *
+ * @module
+ */
+
 import { WorkersCli } from '../workers-cli.ts';
 import { LocalWorkersCliBackend } from '../workers-cli-backend.ts';
 

@@ -9,6 +9,7 @@
     "./config": "./src/config/mod.ts",
     "./cli": "./src/cli/mod.ts",
     "./loader": "./loader.ts",
+    "./protocol": "./src/protocol/mod.ts",
     "./sdk": "./src/sdk/mod.ts",
     "./testing": "./src/testing/mod.ts",
     "./templates": "./src/templates/mod.ts"
@@ -20,7 +21,7 @@
     "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0"
   },
   "tasks": {
-    "check": "deno check --unstable-kv mod.ts src/abstracts/mod.ts src/config/mod.ts src/cli/mod.ts loader.ts src/sdk/mod.ts src/testing/mod.ts src/templates/mod.ts",
+    "check": "deno check --unstable-kv mod.ts src/abstracts/mod.ts src/config/mod.ts src/cli/mod.ts loader.ts src/protocol/mod.ts src/sdk/mod.ts src/testing/mod.ts src/templates/mod.ts",
     "fmt": "deno fmt",
     "lint": "deno lint",
     "test": "deno test --allow-all",
