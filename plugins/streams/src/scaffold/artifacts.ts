@@ -1,3 +1,5 @@
+import packageConfig from '../../deno.json' with { type: 'json' };
+
 interface StreamsScaffoldArtifact {
   readonly path: string;
   readonly content: string;
@@ -7,7 +9,7 @@ interface StreamsScaffoldOptions {
   readonly pluginName: string;
 }
 
-const NETSCRIPT_VERSION = '0.0.1-alpha.12';
+const NETSCRIPT_VERSION = packageConfig.version;
 const STREAMS_SERVICE_PORT = 4437;
 
 /** Build the deterministic files emitted by the streams plugin scaffolder. */

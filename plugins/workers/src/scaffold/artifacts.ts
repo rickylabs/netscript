@@ -1,3 +1,5 @@
+import packageConfig from '../../deno.json' with { type: 'json' };
+
 interface WorkerScaffoldArtifact {
   readonly path: string;
   readonly content: string;
@@ -7,7 +9,7 @@ interface WorkerScaffoldOptions {
   readonly pluginName: string;
 }
 
-const NETSCRIPT_VERSION = '0.0.1-alpha.12';
+const NETSCRIPT_VERSION = packageConfig.version;
 const WORKER_SERVICE_PORT = 8091;
 
 /** Build the deterministic files emitted by the workers plugin scaffolder. */

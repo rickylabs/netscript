@@ -87,3 +87,27 @@
 | CI YAML | PASS | `deno eval --no-lock 'import { parse } from "jsr:@std/yaml@^1"; ...'` — `ci.yml yaml valid`. |
 | Schema stability | PASS | `deno task plugins:schema:gen && git diff --exit-code -- packages/plugin/schema/scaffold.plugin.schema.json`. |
 | Lock hygiene | PASS | `deno.lock` churn from YAML validation was removed; no `deno.lock` change remains. |
+
+## S4 progress
+
+- Adopted the primary version-coherence path: plugin scaffold artifact emitters import their own
+  package `deno.json` and derive `NETSCRIPT_VERSION` from that JSON import.
+- Removed hardcoded `0.0.1-alpha.12` literals from the workers, sagas, streams, triggers, and auth
+  scaffold emitters.
+- Normalized auth to the same pattern for its scaffold manifest and generated root `deno.json`; the
+  auth root deno-json template now uses `__NETSCRIPT_VERSION__` placeholders replaced from the
+  imported package version.
+- Did not touch `.llm/tools/release/cut.ts`; release tooling already bumps plugin `deno.json`, which
+  is now the single source.
+
+### S4 gate evidence
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Stale-pin scan | PASS | `deno task plugins:check` — `plugins:check passed`; `rg "0\\.0\\.1-alpha\\.12" plugins/*/src/scaffold -n` found no matches. |
+| Scoped plugin check | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins --ext ts,tsx` — 299 selected files, 0 failed batches. |
+| Scoped lint | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --file plugins/*/src/scaffold/artifacts.ts --file plugins/auth/src/scaffold/templates/root/deno-json.ts --pretty` — 6 selected files, 0 occurrences. |
+| Scoped fmt | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --file plugins/*/src/scaffold/artifacts.ts --file plugins/auth/src/scaffold/templates/root/deno-json.ts --pretty --ignore-line-endings` — 6 selected files, 0 findings. |
+| Full scaffold runtime e2e | PASS | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` — 48 passed, 0 failed. |
+| Generated pin inspection | PASS | Latest retained workspace `.llm/tmp/cli-e2e/plugin-smoke-20260628-174019` pins generated plugin manifests and `@netscript/*` plugin dependencies to current package version `0.0.1-alpha.12`; this branch is not version-bumped to alpha.13 yet. |
+| Lock hygiene | PASS | `git status --short deno.lock` returned no changes. |

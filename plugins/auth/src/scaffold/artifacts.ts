@@ -1,3 +1,4 @@
+import packageConfig from '../../deno.json' with { type: 'json' };
 import { authTemplate0 } from './templates/root/README-md.ts';
 import { authTemplate1 } from './templates/root/package-json.ts';
 import { authTemplate2 } from './templates/root/deno-json.ts';
@@ -25,6 +26,8 @@ import { authTemplate23 } from './templates/streams/streams-schema-ts.ts';
 import { authTemplate24 } from './templates/streams/streams-server-ts.ts';
 import { authTemplate25 } from './templates/database/database-auth-prisma.ts';
 
+const NETSCRIPT_VERSION = packageConfig.version;
+
 interface AuthScaffoldArtifact {
   readonly path: string;
   readonly content: string;
@@ -38,7 +41,7 @@ const AUTH_ARTIFACT_SOURCES = [
   { sourcePath: 'scaffold.plugin.json', content: generateScaffoldPluginJson() },
   { sourcePath: 'README.md', content: authTemplate0 },
   { sourcePath: 'package.json', content: authTemplate1 },
-  { sourcePath: 'deno.json', content: authTemplate2 },
+  { sourcePath: 'deno.json', content: authTemplate2(NETSCRIPT_VERSION) },
   { sourcePath: 'mod.ts', content: authTemplate3 },
   { sourcePath: 'contracts.ts', content: authTemplate4 },
   { sourcePath: 'verify-plugin.ts', content: authTemplate5 },
@@ -80,12 +83,12 @@ function generateScaffoldPluginJson(): string {
     $schema: 'jsr:@netscript/plugin/schema',
     schemaVersion: 1,
     name: '@netscript/plugin-auth',
-    version: '0.0.1-alpha.12',
+    version: NETSCRIPT_VERSION,
     displayName: 'Auth',
     description:
       'NetScript plugin for a unified auth API, auth database schema, and auth session streams.',
     peerDependencies: {
-      '@netscript/plugin': '0.0.1-alpha.12',
+      '@netscript/plugin': NETSCRIPT_VERSION,
     },
     capabilities: {
       hasDatabaseMigrations: true,

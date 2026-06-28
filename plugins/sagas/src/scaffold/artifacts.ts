@@ -1,3 +1,4 @@
+import packageConfig from '../../deno.json' with { type: 'json' };
 import { SagaConfigScaffolder, SagaDefinitionScaffolder } from '../scaffolding/saga-scaffolders.ts';
 
 interface SagasScaffoldArtifact {
@@ -9,7 +10,7 @@ interface SagasScaffoldOptions {
   readonly pluginName: string;
 }
 
-const NETSCRIPT_VERSION = '0.0.1-alpha.12';
+const NETSCRIPT_VERSION = packageConfig.version;
 const SAGAS_SERVICE_PORT = 8092;
 const SAMPLE_SAGA_ID = 'user-registration';
 

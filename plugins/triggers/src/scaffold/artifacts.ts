@@ -1,3 +1,4 @@
+import packageConfig from '../../deno.json' with { type: 'json' };
 import {
   FileWatchTriggerScaffolder,
   ScheduledTriggerScaffolder,
@@ -13,7 +14,7 @@ interface TriggersScaffoldOptions {
   readonly pluginName: string;
 }
 
-const NETSCRIPT_VERSION = '0.0.1-alpha.12';
+const NETSCRIPT_VERSION = packageConfig.version;
 const TRIGGERS_SERVICE_PORT = 8093;
 const TRIGGERS_PROCESSOR_CONCURRENCY_ENV = 'TRIGGERS_PROCESSOR_CONCURRENCY';
 
