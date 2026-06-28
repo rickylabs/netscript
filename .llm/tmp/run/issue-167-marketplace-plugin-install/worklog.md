@@ -206,3 +206,82 @@ JSR publish include list ships `scaffold.plugin.json`. If a package omits it, S2
 - No new TypeScript casts were introduced.
 - Static classification uses `parsePluginManifest` from `@netscript/plugin/protocol`; manifest
   parsing was not reimplemented in the CLI.
+
+## S3 Evidence — Confirmation Gate + Confined Permission Flags
+
+Timestamp: 2026-06-28T11:23:42Z
+
+### Scope
+
+- Added `classifyPluginTrust()` under `packages/cli/src/public/features/plugins/add/`.
+- Added injectable `confirmPluginInstall()` under the same add feature. It consumes S2's
+  `ValidatedPluginDescriptor`, renders JSR metadata from `details`, prompts through `PromptPort`,
+  and never calls `prompt()` directly.
+- Added `buildPluginScaffoldPermissionFlags()` under `packages/cli/src/public/infra/permissions/`.
+- Lightly wired `plugin add` to pass `--skip-confirmation` / `--ci` and to run the confirmation gate
+  after S2 validation but before the existing render path. S4 still owns dx scaffolder execution.
+
+### Trust And Permission Matrix
+
+| Tier | Classifier | Confirmation | Deno x flags |
+| ---- | ---------- | ------------ | ------------ |
+| First-party trusted | `descriptor.package.scope.toLowerCase() === "netscript"` | Skipped as first-party | `-A`; optional first-party-only `--minimum-dependency-age=0` when explicitly requested by the future runner. |
+| Third-party confined | Any non-`@netscript` scope | Required unless `--skip-confirmation` or `--ci` | `--allow-read=<projectRoot>`, one scoped `--allow-write=<projectRoot>/plugins/<pluginName>,<projectRoot>/services,<projectRoot>/database,<projectRoot>/aspire,<projectRoot>/.aspire`, `--deny-net`, `--deny-run`. |
+
+Third-party packages keep Deno's default `--minimum-dependency-age`; S3 does not inject
+`--minimum-dependency-age=0` for third-party even when the future runner opts into fresh first-party
+alpha installs.
+
+### Files
+
+| Path | Purpose |
+| ---- | ------- |
+| `packages/cli/src/public/features/plugins/add/plugin-trust-tier.ts` | Pure descriptor-scope trust classifier. |
+| `packages/cli/src/public/features/plugins/add/confirm-plugin-install.ts` | Feature-level confirmation gate using `PromptPort`. |
+| `packages/cli/src/public/infra/permissions/plugin-scaffold-permissions.ts` | Infra-level Deno flag builder for S4's runner. |
+| `packages/cli/src/public/features/plugins/add/add-plugin-command.ts` | Adds `--skip-confirmation` and `--ci` options. |
+| `packages/cli/src/public/features/plugins/add/add-plugin.ts` | Runs the confirmation gate before existing rendering when S2 returned a descriptor. |
+| `*_test.ts` beside the new units | Trust, confirmation, and exact flag-string assertions. |
+
+### Fitness Gates Touched
+
+| Gate | S3 evidence |
+| ---- | ----------- |
+| F-3 | Confirmation stays in the add feature; Deno flag construction stays in public infra; no kernel import from public code was introduced. |
+| F-5 | No `packages/cli/deno.json` export-map change; no new root `@netscript/cli` public export. |
+| F-6 | Publish dry-run not required because the package export map and root public surface did not change. |
+| F-8 | No compiler lib override changed. |
+| F-9 | Third-party scaffold execution uses explicit read/write/deny flag policy; plugin-declared permissions do not widen the confined matrix. |
+| F-10 | Added unit tests for trust classification, confirmation bypass/prompting, and exact flag strings. |
+| F-11 | No forbidden generic folder introduced; `infra/permissions` names the external permission concern. |
+| F-12 | New public-layer types use doctrine naming conventions. |
+| F-15 | No upstream package re-export introduced. |
+| F-16 | New feature and infra folders remain below cardinality limits. |
+| F-18 | No new subdirectory barrel introduced. |
+| F-CLI-3 | Feature-level confirmation does not import infra; the infra flag builder imports only descriptor type/classifier and constants. |
+| F-CLI-4 | Kernel remains independent of the public add feature and permission builder. |
+| F-CLI-11 | Trust classification is derived from resolved package scope, not local checkout state. |
+| F-CLI-16 | No new network or process effect; prompt is injected, and permission flags are pure strings. |
+| F-CLI-21 | New files follow vertical feature naming and infra concern naming. |
+| F-CLI-28 | Confirmation prompt is injectable; tests use fake prompt ports. |
+
+### Gate Results
+
+| Gate | Command | Result |
+| ---- | ------- | ------ |
+| Check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | PASS; 538 files, 0 occurrences. |
+| S3 unit tests | `deno test -A --unstable-kv packages/cli/src/public/features/plugins/add/plugin-trust-tier_test.ts packages/cli/src/public/features/plugins/add/confirm-plugin-install_test.ts packages/cli/src/public/infra/permissions/plugin-scaffold-permissions_test.ts` | PASS; 3 modules, 11 steps, 0 failed. |
+| Add/resolver regression tests | `deno test -A --unstable-kv packages/cli/src/public/features/plugins/add/add-plugin_test.ts packages/cli/src/public/features/plugins/add/plugin-package-resolver_test.ts packages/cli/src/public/infra/jsr/fetch-jsr-plugin-validator_test.ts packages/cli/src/public/features/plugins/add/plugin-trust-tier_test.ts packages/cli/src/public/features/plugins/add/confirm-plugin-install_test.ts packages/cli/src/public/infra/permissions/plugin-scaffold-permissions_test.ts` | PASS; 6 modules, 26 steps, 0 failed. |
+| Lint wrapper | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --cwd packages/cli --file <S3 files> --ext ts,tsx` | BLOCKED by existing CLI exclusion behavior; wrapper selected 11 files but `deno lint` exited 1 with 0 occurrences because Deno still applied the workspace config exclusion for `packages/cli`. |
+| Lint fallback | `deno lint --config /dev/null --rules-exclude=no-import-prefix,no-explicit-any <S3 files>` from `packages/cli` | PASS; checked 11 files. The exclusions match existing CLI test inline `jsr:` imports and Cliffy `Command<any,...>` return types. |
+| Format wrapper | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --cwd packages/cli --file <S3 files> --ext ts,tsx` | BLOCKED by existing CLI exclusion behavior; wrapper selected 11 files but `deno fmt --check` exited 1 with 0 findings. |
+| Format fallback | `deno fmt --no-config --single-quote --line-width 100 --check <S3 files>` from `packages/cli` | PASS; checked 11 files. |
+| Publish dry-run | Not run | Not required: S3 did not change `packages/cli/deno.json` exports or the published root `mod.ts` surface. |
+
+### Notes
+
+- Commit: `bde482fd` (`feat(cli): add plugin install confirmation gate`).
+- `deno.lock` was not touched.
+- No new TypeScript casts were introduced.
+- S4 seam: `buildPluginScaffoldPermissionFlags()` returns the exact `deno x` flags the future
+  scaffold runner should prepend before the resolved scaffolder specifier.
