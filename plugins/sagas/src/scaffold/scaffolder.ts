@@ -1,25 +1,36 @@
 import packageConfig from '../../deno.json' with { type: 'json' };
-import { SagaConfigScaffolder, SagaDefinitionScaffolder } from '../scaffolding/saga-scaffolders.ts';
+import { buildScaffoldPluginJson, PluginScaffolder } from '@netscript/plugin/scaffold';
+import type {
+  PluginScaffoldManifestSpec,
+  ScaffoldArtifact,
+  ScaffolderContext,
+} from '@netscript/plugin/scaffold';
+import { toCamelCase, toPascalCase } from '@std/text';
 
-interface SagasScaffoldArtifact {
-  readonly path: string;
-  readonly content: string;
-}
+import { SagaConfigScaffolder, SagaDefinitionScaffolder } from '../scaffolding/saga-scaffolders.ts';
+import { SAGAS_SERVICE_PORT, sagasScaffoldSpec } from './spec.ts';
 
 interface SagasScaffoldOptions {
   readonly pluginName: string;
 }
 
 const NETSCRIPT_VERSION = packageConfig.version;
-const SCAFFOLD_SCHEMA_URL =
-  `https://jsr.io/@netscript/plugin/${NETSCRIPT_VERSION}/schema/scaffold.plugin.schema.json`;
-const SAGAS_SERVICE_PORT = 8092;
 const SAMPLE_SAGA_ID = 'user-registration';
 
+/** Scaffolder for sagas plugin-specific artifacts. */
+export class SagasScaffolder extends PluginScaffolder {
+  readonly pluginName = 'sagas';
+  readonly manifestSpec: PluginScaffoldManifestSpec = sagasScaffoldSpec;
+
+  protected async buildArtifacts(context: ScaffolderContext): Promise<readonly ScaffoldArtifact[]> {
+    return await buildSagasScaffoldArtifacts({ pluginName: readPluginName(context.options) });
+  }
+}
+
 /** Build the deterministic files emitted by the sagas plugin scaffolder. */
-export async function buildSagasScaffoldArtifacts(
+async function buildSagasScaffoldArtifacts(
   options: SagasScaffoldOptions,
-): Promise<readonly SagasScaffoldArtifact[]> {
+): Promise<readonly ScaffoldArtifact[]> {
   const pluginName = options.pluginName;
   const pascalName = toPascalCase(pluginName);
   const camelName = toCamelCase(pluginName);
@@ -98,67 +109,7 @@ export async function buildSagasScaffoldArtifacts(
 }
 
 function generateScaffoldPluginJson(): string {
-  const manifest = {
-    $schema: SCAFFOLD_SCHEMA_URL,
-    schemaVersion: 1,
-    name: '@netscript/plugin-sagas',
-    version: NETSCRIPT_VERSION,
-    displayName: 'Saga Orchestrator',
-    description:
-      'NetScript plugin for durable saga orchestration, workflow APIs, and saga runtime metadata.',
-    peerDependencies: {
-      '@netscript/plugin': NETSCRIPT_VERSION,
-    },
-    capabilities: {
-      hasDatabaseMigrations: true,
-      hasRoutes: true,
-      hasBackgroundWorkers: true,
-    },
-    scaffolder: {
-      export: './scaffold',
-      requiredPermissions: {
-        net: [],
-        read: ['<workspaceRoot>'],
-        write: ['<workspaceRoot>'],
-      },
-    },
-    provider: {
-      kind: 'saga',
-      displayName: 'Saga Orchestrator',
-      category: 'background-processor',
-      portRangeKey: 'INFRA_PLUGIN',
-      defaultPermissions: ['--unstable-kv', '--allow-all'],
-      watchFlag: '--watch',
-      defaultEntrypoint: 'bin/combined.ts',
-      defaultServiceEntrypoint: 'services/src/main.ts',
-      defaultRequiresDb: true,
-      defaultRequiresKv: true,
-      pluginType: 'background-processor',
-      supportsConcurrency: true,
-      concurrencyEnvVar: 'SAGA_CONCURRENCY',
-      defaultConcurrency: 2,
-      defaultTelemetry: true,
-      infrastructureRequires: ['kv'],
-      infrastructureOptionalDeps: ['db'],
-    },
-    officialSource: {
-      canonicalName: 'sagas',
-      pluginDir: 'sagas',
-      backgroundDir: 'sagas',
-      serviceEntrypoint: 'services/src/main.ts',
-      backgroundEntrypoint: 'bin/combined.ts',
-      serviceConfigKey: 'sagas-api',
-      servicePort: SAGAS_SERVICE_PORT,
-      backgroundPort: SAGAS_SERVICE_PORT,
-      dependencies: ['streams'],
-      requiresDb: true,
-      requiresKv: true,
-      permissions: ['--unstable-kv', '--allow-all'],
-      pluginReferences: ['workers-api'],
-    },
-  };
-
-  return `${JSON.stringify(manifest, null, 2)}\n`;
+  return buildScaffoldPluginJson(sagasScaffoldSpec, NETSCRIPT_VERSION);
 }
 
 function generateDenoJson(pluginName: string): string {
@@ -608,15 +559,10 @@ export class SagasAspireContribution {
 `;
 }
 
-function toPascalCase(value: string): string {
-  return value
-    .split(/[^A-Za-z0-9]+/)
-    .filter((part) => part.length > 0)
-    .map((part) => `${part.charAt(0).toUpperCase()}${part.slice(1).toLowerCase()}`)
-    .join('') || 'Sagas';
-}
-
-function toCamelCase(value: string): string {
-  const pascal = toPascalCase(value);
-  return `${pascal.charAt(0).toLowerCase()}${pascal.slice(1)}`;
+function readPluginName(options: Readonly<Record<string, unknown>>): string {
+  const pluginName = Reflect.get(options, 'pluginName');
+  if (typeof pluginName !== 'string' || !/^[a-z][a-z0-9-]*$/.test(pluginName)) {
+    throw new Error('Sagas scaffolder requires a kebab-case options.pluginName.');
+  }
+  return pluginName;
 }

@@ -1,29 +1,40 @@
 import packageConfig from '../../deno.json' with { type: 'json' };
+import { buildScaffoldPluginJson, PluginScaffolder } from '@netscript/plugin/scaffold';
+import type {
+  PluginScaffoldManifestSpec,
+  ScaffoldArtifact,
+  ScaffolderContext,
+} from '@netscript/plugin/scaffold';
+import { toCamelCase, toPascalCase, toSnakeCase } from '@std/text';
+
 import {
   FileWatchTriggerScaffolder,
   ScheduledTriggerScaffolder,
   WebhookTriggerScaffolder,
 } from '../scaffolding/trigger-scaffolders.ts';
-
-interface TriggersScaffoldArtifact {
-  readonly path: string;
-  readonly content: string;
-}
+import { TRIGGERS_SERVICE_PORT, triggersScaffoldSpec } from './spec.ts';
 
 interface TriggersScaffoldOptions {
   readonly pluginName: string;
 }
 
 const NETSCRIPT_VERSION = packageConfig.version;
-const SCAFFOLD_SCHEMA_URL =
-  `https://jsr.io/@netscript/plugin/${NETSCRIPT_VERSION}/schema/scaffold.plugin.schema.json`;
-const TRIGGERS_SERVICE_PORT = 8093;
 const TRIGGERS_PROCESSOR_CONCURRENCY_ENV = 'TRIGGERS_PROCESSOR_CONCURRENCY';
 
+/** Scaffolder for triggers plugin-specific artifacts. */
+export class TriggersScaffolder extends PluginScaffolder {
+  readonly pluginName = 'triggers';
+  readonly manifestSpec: PluginScaffoldManifestSpec = triggersScaffoldSpec;
+
+  protected async buildArtifacts(context: ScaffolderContext): Promise<readonly ScaffoldArtifact[]> {
+    return await buildTriggersScaffoldArtifacts({ pluginName: readPluginName(context.options) });
+  }
+}
+
 /** Build the deterministic files emitted by the triggers plugin scaffolder. */
-export async function buildTriggersScaffoldArtifacts(
+async function buildTriggersScaffoldArtifacts(
   options: TriggersScaffoldOptions,
-): Promise<readonly TriggersScaffoldArtifact[]> {
+): Promise<readonly ScaffoldArtifact[]> {
   const pluginName = options.pluginName;
   const pascalName = toPascalCase(pluginName);
   const camelName = toCamelCase(pluginName);
@@ -106,64 +117,7 @@ export async function buildTriggersScaffoldArtifacts(
 }
 
 function generateScaffoldPluginJson(): string {
-  const manifest = {
-    $schema: SCAFFOLD_SCHEMA_URL,
-    schemaVersion: 1,
-    name: '@netscript/plugin-triggers',
-    version: NETSCRIPT_VERSION,
-    displayName: 'Trigger Processor',
-    description:
-      'NetScript plugin for trigger ingress, scheduling, file watching, and trigger runtime APIs.',
-    peerDependencies: {
-      '@netscript/plugin': NETSCRIPT_VERSION,
-    },
-    capabilities: {
-      hasDatabaseMigrations: true,
-      hasRoutes: true,
-      hasBackgroundWorkers: true,
-    },
-    scaffolder: {
-      export: './scaffold',
-      requiredPermissions: {
-        net: [],
-        read: ['<workspaceRoot>'],
-        write: ['<workspaceRoot>'],
-      },
-    },
-    provider: {
-      kind: 'trigger',
-      displayName: 'Trigger Processor',
-      category: 'background-processor',
-      portRangeKey: 'INFRA_PLUGIN',
-      defaultPermissions: ['--unstable-kv', '--allow-all'],
-      watchFlag: '--watch',
-      defaultEntrypoint: 'src/runtime/trigger-processor.ts',
-      defaultServiceEntrypoint: 'services/src/main.ts',
-      defaultRequiresDb: true,
-      defaultRequiresKv: true,
-      pluginType: 'background-processor',
-      supportsConcurrency: true,
-      concurrencyEnvVar: TRIGGERS_PROCESSOR_CONCURRENCY_ENV,
-      defaultConcurrency: 10,
-      defaultTelemetry: true,
-      infrastructureRequires: ['kv'],
-      infrastructureOptionalDeps: ['db'],
-    },
-    officialSource: {
-      canonicalName: 'triggers',
-      pluginDir: 'triggers',
-      backgroundDir: 'triggers',
-      serviceEntrypoint: 'services/src/main.ts',
-      backgroundEntrypoint: 'src/runtime/trigger-processor.ts',
-      serviceConfigKey: 'triggers-api',
-      servicePort: TRIGGERS_SERVICE_PORT,
-      backgroundPort: TRIGGERS_SERVICE_PORT,
-      dependencies: ['streams'],
-      pluginReferences: ['workers-api'],
-    },
-  };
-
-  return `${JSON.stringify(manifest, null, 2)}\n`;
+  return buildScaffoldPluginJson(triggersScaffoldSpec, NETSCRIPT_VERSION);
 }
 
 function generateDenoJson(pluginName: string): string {
@@ -647,19 +601,10 @@ function generateAspireContribution(pluginName: string): string {
 `;
 }
 
-function toPascalCase(value: string): string {
-  return value
-    .split(/[^a-zA-Z0-9]+/)
-    .filter((part) => part.length > 0)
-    .map((part) => part.slice(0, 1).toUpperCase() + part.slice(1))
-    .join('');
-}
-
-function toCamelCase(value: string): string {
-  const pascal = toPascalCase(value);
-  return pascal.slice(0, 1).toLowerCase() + pascal.slice(1);
-}
-
-function toSnakeCase(value: string): string {
-  return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+function readPluginName(options: Readonly<Record<string, unknown>>): string {
+  const pluginName = Reflect.get(options, 'pluginName');
+  if (typeof pluginName !== 'string' || !/^[a-z][a-z0-9-]*$/.test(pluginName)) {
+    throw new Error('Triggers scaffolder requires a kebab-case options.pluginName.');
+  }
+  return pluginName;
 }

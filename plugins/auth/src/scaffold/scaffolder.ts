@@ -1,4 +1,11 @@
 import packageConfig from '../../deno.json' with { type: 'json' };
+import { buildScaffoldPluginJson, PluginScaffolder } from '@netscript/plugin/scaffold';
+import type {
+  PluginScaffoldManifestSpec,
+  ScaffoldArtifact,
+  ScaffolderContext,
+} from '@netscript/plugin/scaffold';
+
 import { authTemplate0 } from './templates/root/README-md.ts';
 import { authTemplate1 } from './templates/root/package-json.ts';
 import { authTemplate2 } from './templates/root/deno-json.ts';
@@ -25,15 +32,9 @@ import { authTemplate22 } from './templates/streams/streams-producer-ts.ts';
 import { authTemplate23 } from './templates/streams/streams-schema-ts.ts';
 import { authTemplate24 } from './templates/streams/streams-server-ts.ts';
 import { authTemplate25 } from './templates/database/database-auth-prisma.ts';
+import { authScaffoldSpec } from './spec.ts';
 
 const NETSCRIPT_VERSION = packageConfig.version;
-const SCAFFOLD_SCHEMA_URL =
-  `https://jsr.io/@netscript/plugin/${NETSCRIPT_VERSION}/schema/scaffold.plugin.schema.json`;
-
-interface AuthScaffoldArtifact {
-  readonly path: string;
-  readonly content: string;
-}
 
 interface AuthScaffoldOptions {
   readonly pluginName: string;
@@ -69,10 +70,20 @@ const AUTH_ARTIFACT_SOURCES = [
   { sourcePath: 'database/auth.prisma', content: authTemplate25 },
 ] as const;
 
+/** Scaffolder for auth plugin-specific artifacts. */
+export class AuthScaffolder extends PluginScaffolder {
+  readonly pluginName = 'auth';
+  readonly manifestSpec: PluginScaffoldManifestSpec = authScaffoldSpec;
+
+  protected buildArtifacts(context: ScaffolderContext): readonly ScaffoldArtifact[] {
+    return buildAuthScaffoldArtifacts({ pluginName: readPluginName(context.options) });
+  }
+}
+
 /** Build the deterministic files emitted by the auth plugin scaffolder. */
-export function buildAuthScaffoldArtifacts(
+function buildAuthScaffoldArtifacts(
   options: AuthScaffoldOptions,
-): readonly AuthScaffoldArtifact[] {
+): readonly ScaffoldArtifact[] {
   const pluginRoot = `plugins/${options.pluginName}`;
   return AUTH_ARTIFACT_SOURCES.map((artifact) => ({
     path: `${pluginRoot}/${artifact.sourcePath}`,
@@ -81,61 +92,13 @@ export function buildAuthScaffoldArtifacts(
 }
 
 function generateScaffoldPluginJson(): string {
-  const manifest = {
-    $schema: SCAFFOLD_SCHEMA_URL,
-    schemaVersion: 1,
-    name: '@netscript/plugin-auth',
-    version: NETSCRIPT_VERSION,
-    displayName: 'Auth',
-    description:
-      'NetScript plugin for a unified auth API, auth database schema, and auth session streams.',
-    peerDependencies: {
-      '@netscript/plugin': NETSCRIPT_VERSION,
-    },
-    capabilities: {
-      hasDatabaseMigrations: true,
-      hasRoutes: true,
-      hasBackgroundWorkers: false,
-    },
-    scaffolder: {
-      export: './scaffold',
-      requiredPermissions: {
-        net: [],
-        read: ['<workspaceRoot>'],
-        write: ['<workspaceRoot>'],
-      },
-    },
-    provider: {
-      kind: 'auth',
-      displayName: 'Auth',
-      category: 'plugin',
-      portRangeKey: 'PLUGIN_API',
-      defaultPermissions: ['--unstable-kv', '--allow-net', '--allow-env', '--allow-read'],
-      watchFlag: '--watch',
-      defaultEntrypoint: 'services/src/main.ts',
-      defaultServiceEntrypoint: 'services/src/main.ts',
-      defaultRequiresDb: true,
-      defaultRequiresKv: true,
-      pluginType: 'utility',
-      supportsConcurrency: false,
-      concurrencyEnvVar: null,
-      defaultConcurrency: null,
-      defaultTelemetry: true,
-      infrastructureRequires: ['db', 'kv'],
-      infrastructureOptionalDeps: [],
-    },
-    officialSource: {
-      canonicalName: 'auth',
-      pluginDir: 'auth',
-      serviceEntrypoint: 'services/src/main.ts',
-      serviceConfigKey: 'auth',
-      servicePort: 8094,
-      backgroundPort: 8094,
-      requiresDb: true,
-      requiresKv: true,
-      permissions: ['--unstable-kv', '--allow-net', '--allow-env', '--allow-read'],
-    },
-  };
+  return buildScaffoldPluginJson(authScaffoldSpec, NETSCRIPT_VERSION);
+}
 
-  return `${JSON.stringify(manifest, null, 2)}\n`;
+function readPluginName(options: Readonly<Record<string, unknown>>): string {
+  const pluginName = Reflect.get(options, 'pluginName');
+  if (typeof pluginName !== 'string' || !/^[a-z][a-z0-9-]*$/.test(pluginName)) {
+    throw new Error('Auth scaffolder requires a kebab-case options.pluginName.');
+  }
+  return pluginName;
 }
