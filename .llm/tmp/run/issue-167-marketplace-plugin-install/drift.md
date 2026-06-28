@@ -65,3 +65,22 @@
   artifact payloads, not architecture units.
 - Resolution: `.llm/tools/fitness/check-doctrine.ts` now skips `/src/scaffold/templates/` during module
   and folder walking. The gate then completed with exit 0 and no FAIL findings.
+
+## 2026-06-28 — Adversarial review tightened confirmation and rollback semantics
+
+- Severity: **significant**.
+- The original plan allowed `--ci` to bypass the third-party confirmation prompt, but the adversarial
+  review checklist required non-interactive paths to avoid silent third-party confirmation unless the
+  bypass is explicit. Implementation also skipped confirmation entirely when programmatic
+  `addPlugin()` dependencies did not provide a prompt adapter.
+- Resolution: fix commit `2ba8d596bc737da3b76ea5182f93fa416ef88e5f` makes third-party `--ci` fail
+  closed unless `--skip-confirmation` is also explicit, and routes every resolved package through the
+  confirmation gate even when no prompt adapter exists.
+- The same pass found two hardening gaps not called out by the original slice authors:
+  `scaffolder.export` / `postScripts[].export` accepted arbitrary non-empty strings, and the five
+  official plugin scaffolders could leave partial file writes if a later write failed.
+- Resolution: `2ba8d596bc737da3b76ea5182f93fa416ef88e5f` constrains manifest executable paths to safe
+  `./...` export paths and adds rollback-on-failure semantics to all five official
+  `writePlannedFiles()` implementations.
+- Evidence: focused CLI/plugin tests passed; `deno task arch:check` passed; `scaffold.userland-install`
+  passed `5/0`; `scaffold.runtime` passed `48/0`; six publish dry-runs passed.

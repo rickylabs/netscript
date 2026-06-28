@@ -12,3 +12,4 @@
 - b729796723bd93a0ede5b006df2576ce7f9b8aa0: feat(cli): route plugin add through dx scaffolders
 - 8bff51cb363ac7b8b3e50a563802197200209524: feat(cli): add true userland plugin install e2e
 - e934ab4e: docs(harness): close plugin install marketplace run
+- 2ba8d596bc737da3b76ea5182f93fa416ef88e5f: fix(plugin): harden installer confirmation and scaffold writes

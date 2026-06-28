@@ -1035,3 +1035,51 @@ Timestamp: 2026-06-28T10:45:00Z
 - The run remains honest that pre-merge validation proves a true userland project using
   `--local-path`, while production `deno x jsr:@netscript/plugin-<kind>/scaffold` must be validated
   after alpha.13 by `e2e-cli-prod`.
+
+## 2026-06-28 — Adversarial Implementation Review Hardening
+
+### Review Scope
+
+This pass reset the branch to `origin/feat/plugin-install-jsr-dx` at `ae324374`, read the #167 run
+artifacts and issue mandate, attacked the built installer against the 11 adversarial checklist
+items, fixed every confirmed blocker/major finding, and re-ran the required gates from the native WSL
+worktree.
+
+### Structured Findings
+
+| ID | Severity | File:line | Finding | Disposition |
+| -- | -------- | --------- | ------- | ----------- |
+| ADV-001 | BLOCKER | `packages/cli/src/public/features/plugins/add/confirm-plugin-install.ts:56` | Third-party installs in `--ci` mode were treated as confirmed without an explicit user bypass, and programmatic `addPlugin()` skipped confirmation entirely when no prompt adapter was supplied. This violated the explicit confirmation gate for external packages. | Fixed in `2ba8d596bc737da3b76ea5182f93fa416ef88e5f`: `--ci` now fails closed unless `--skip-confirmation` is also explicit, and `addPlugin()` always routes resolved packages through the confirmation gate. |
+| ADV-002 | BLOCKER | `packages/plugin/src/protocol/manifest.ts:150` | `scaffolder.export` and `postScripts[].export` accepted any non-empty string, so a hostile or malformed manifest could supply traversal-like local-path targets before the runner built `deno run <local>/...` or `deno x jsr:<pkg>/...`. | Fixed in `2ba8d596bc737da3b76ea5182f93fa416ef88e5f`: manifest parsing now requires `./` package export paths and rejects backslashes, NULs, empty segments, `.`, and `..`; protocol tests cover scaffolder and post-script rejection. |
+| ADV-003 | MAJOR | `plugins/workers/src/scaffold/files.ts:56` | The five official plugin scaffolders wrote files incrementally. If a later write failed, earlier created/modified files could remain in the user project, contradicting the robustness requirement for a failed scaffolder to avoid half-written output. | Fixed in `2ba8d596bc737da3b76ea5182f93fa416ef88e5f`: all five `writePlannedFiles()` implementations now pre-plan writes and roll back already-applied file changes on failure; `plugins/workers/src/scaffold/files_test.ts` covers created-file cleanup and modified-file restoration. |
+| ADV-004 | FALSE-ALARM | `packages/cli/src/public/infra/jsr/fetch-jsr-plugin-validator.ts:21` | Static-only validation was challenged for hidden execution. | Verified fine: the validator uses only HTTP metadata/file fetches plus `parsePluginManifest`; no `import()`, `deno run`, `eval`, or dynamic require is used before confirmation. |
+| ADV-005 | FALSE-ALARM | `packages/cli/src/public/infra/permissions/plugin-scaffold-permissions.ts:31` | Permission confinement was challenged for blanket third-party privileges. | Verified fine after ADV-001: third-party flags remain `--allow-read=<projectRoot>`, scoped write directories, `--deny-net`, and `--deny-run`; plugin manifest permission declarations are not used to widen the matrix. First-party `@netscript/*` remains the planned trusted tier. |
+| ADV-006 | FALSE-ALARM | `packages/cli/src/public/features/plugins/dispatch/dispatch-plugin-verb.ts:96` | Integrity failure was challenged as possibly warn-only. | Verified fine: JSR scaffold dispatch aborts with `RemoteError` before execution when `verifyJsrPackageIntegrity()` returns a mismatch; the integrity source is `_meta.json` version metadata, not manifest self-reporting. |
+| ADV-007 | FALSE-ALARM | `packages/cli/src/public/features/plugins/add/add-plugin.ts:123` | Userland no-leak was challenged for residual copier/source-walk use in public `plugin add`. | Verified fine through code and gates: public add uses plugin-owned scaffold plus support rendering; maintainer `copy-official-plugin` remains under `src/maintainer/**`; `scaffold.userland-install` passed and rejects copied `src/`, monorepo paths, and local package imports. |
+| ADV-008 | FALSE-ALARM | `plugins/workers/scaffold.ts:7` | The five plugin `./scaffold` entrypoints were challenged for importing `@netscript/cli`. | Verified fine: the scaffold entrypoints import their local `src/scaffold/**` and `@netscript/plugin/protocol`; grep found no `@netscript/cli` import in the five scaffold graphs. |
+| ADV-009 | FALSE-ALARM | `packages/cli/src/public/features/plugins/add/add-plugin.ts:188` | Dry-run/idempotency were challenged for disk mutation or duplicate output. | Verified fine with additional hardening: dry-run returns before workspace mutators and official scaffolders skip writes when content is unchanged; focused idempotency tests and both E2E suites passed. |
+| ADV-010 | FALSE-ALARM | `.llm/harness/debt/arch-debt.md:239` | The honesty boundary was challenged for pre-publish prod-JSR overclaiming. | Verified fine: plan, context-pack, drift, and debt explicitly state pre-merge evidence is true-userland `--local-path`; production `deno x jsr:<pkg>/scaffold` remains post-alpha.13 `e2e-cli-prod`. |
+| ADV-011 | FALSE-ALARM | `packages/cli/src/public/features/plugins/add/plugin-package-resolver.ts:14` | Bare-kind alias order and malformed/missing JSR failures were challenged. | Verified fine: alias lookup happens before registry planning, malformed specs throw clear errors, validator returns actionable `not-found`, `manifest-missing`, `invalid-manifest`, `version-yanked`, and `invalid-metadata` errors. |
+
+### Post-Fix Gate Results
+
+| Gate | Command | Result |
+| ---- | ------- | ------ |
+| Check wrapper | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --root packages/plugin --root plugins/workers --root plugins/sagas --root plugins/triggers --root plugins/streams --root plugins/auth --ext ts,tsx` | PASS; raw exit 0, 950 files, 8 batches, 0 occurrences. |
+| Lint wrapper | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/cli --root packages/plugin --root plugins/workers --root plugins/sagas --root plugins/triggers --root plugins/streams --root plugins/auth --ext ts,tsx` | Wrapper exited 1 with 0 findings, matching the existing wrapper/config anomaly recorded in S2/S3/S11. |
+| Fmt wrapper | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cli --root packages/plugin --root plugins/workers --root plugins/sagas --root plugins/triggers --root plugins/streams --root plugins/auth --ext ts,tsx` | Wrapper exited 1 with 0 findings, matching the existing wrapper/config anomaly recorded in S2/S3/S11. |
+| File-scoped lint fallback | `deno lint --config /dev/null --rules-exclude=no-import-prefix <12 touched source/test files>` | PASS; raw exit 0, 12 files checked. |
+| File-scoped fmt fallback | `deno fmt --check --no-config --single-quote --line-width 100 <12 touched source/test files>` | PASS; raw exit 0, 12 files checked. |
+| Focused CLI/plugin tests | `deno test -A --unstable-kv packages/cli/src/public/features/plugins/add/add-plugin_test.ts packages/cli/src/public/features/plugins/add/confirm-plugin-install_test.ts packages/cli/src/public/features/plugins/add/plugin-package-resolver_test.ts packages/cli/src/public/infra/jsr/fetch-jsr-plugin-validator_test.ts packages/cli/src/public/features/plugins/dispatch/dispatch-plugin-verb_test.ts packages/cli/src/public/infra/permissions/plugin-scaffold-permissions_test.ts` | PASS; raw exit 0, 7 test modules, 50 steps, 0 failed. |
+| Protocol tests | `deno task test` from `packages/plugin` | PASS; raw exit 0, 26 passed, 0 failed. |
+| Protocol doc lint | `deno doc --lint mod.ts src/protocol/mod.ts` from `packages/plugin` | PASS; raw exit 0. |
+| Arch check | `deno task arch:check` | PASS; raw exit 0; existing WARN/INFO only, FAIL=0. |
+| Publish dry-run | `deno task publish:dry-run` from `packages/plugin`, `plugins/workers`, `plugins/sagas`, `plugins/triggers`, `plugins/streams`, `plugins/auth` | PASS; raw exit 0 for all six. Existing dynamic-import warnings remain in package/plugin surfaces; no new slow-type failure. |
+| True userland E2E | `deno task e2e:cli run scaffold.userland-install --cleanup --format pretty` | PASS; raw exit 0, `passed=5 failed=0`. |
+| Full runtime E2E | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS; raw exit 0, `passed=48 failed=0`. |
+
+### Review Verdict
+
+All confirmed BLOCKER and MAJOR findings from this adversarial pass are fixed in
+`2ba8d596bc737da3b76ea5182f93fa416ef88e5f`. The mechanism is ready for the separate OpenHands
+IMPL-EVAL, with the already-recorded post-publish prod-JSR validation debt still open by design.
