@@ -31,7 +31,7 @@
     "zod": "jsr:@zod/zod@4.4.3"
   },
   "tasks": {
-    "check": "deno check --unstable-kv mod.ts scaffold.ts src/public/mod.ts src/plugin/mod.ts src/scaffold/mod.ts contracts.ts services/src/main.ts streams/mod.ts streams/server.ts",
+    "check": "deno check --unstable-kv mod.ts scaffold.ts src/public/mod.ts src/plugin/mod.ts src/scaffold/mod.ts src/scaffold/stubs/mod.ts contracts.ts services/src/main.ts streams/mod.ts streams/server.ts",
     "test": "deno test --unstable-kv --allow-all",
     "dev": "deno run --allow-net --allow-env --allow-read --watch services/src/main.ts",
     "start": "deno run --allow-net --allow-env --allow-read services/src/main.ts",
