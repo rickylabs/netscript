@@ -36,3 +36,32 @@
 - Deferred to arch-debt (not dropped): `SCAFFOLD-CASING-CLI-DUP` (dedupe the `packages/cli`
   template-adapter casing vs the new core `naming.ts`), `SCAFFOLD-DENOJSON-ENVELOPE` (optional common
   `deno.json` envelope extraction, only if byte-stable).
+
+## Drift — PLAN-EVAL cycle-3 PASS_PLAN + consolidated-plan promotion (no re-gate)
+
+- Date: 2026-06-28. Severity: significant (plan tightening, no architecture change).
+- PLAN-EVAL cycle-3 (OpenHands minimax-M3, run `28329181305`, separate session) returned
+  **PASS_PLAN** — all 8 Plan-Gate criteria `OK`. Trace committed to branch at
+  `.llm/tmp/run/openhands/pr-170/run-28329181305-1/plan-eval-verdict.md`.
+- The eval read the prior 145-line plan (its criterion 5 names a core `naming.ts`). The plan was then
+  consolidated to the SOTA layered shape the user directed ("base class, adapter, port, abstract
+  public surface; @std/text; jsr-audit doc bar"). The consolidated `plan-scaffold-core.md` (this
+  promotion) is the authoritative version Codex implements.
+- Deltas vs the PASSed plan, and why no cycle-4 re-gate:
+  - Watcher-note 1 (delete per-plugin local `ScaffolderContext`/`ScaffoldResult` re-decls → import
+    from `@netscript/plugin/protocol`) — folded in.
+  - Watcher-note 2 (real `PluginScaffolder` abstract base over a `defineScaffold` factory) — locked.
+  - Watcher-note 3 (`deno doc` of the new export in C6) — added as `deno doc --lint` over the full
+    export map.
+  - Watcher-note 4 (`buildArtifacts(context: ScaffolderContext)`, not custom `TInput`) — specified.
+  - Doctrine Rule #3: hand-rolled casing → `@std/text` (delete `naming.ts`); a strict reduction of
+    core surface in the direction the eval flagged casing as "reinvented" (criterion 1).
+  - `SCAFFOLD-DENOJSON-ENVELOPE` elevated from approved-debt to in-scope **when byte-stable** (C5b),
+    guarded by the same byte-identical invariant the eval blessed; stays debt if not byte-stable.
+  - Rationale: deltas (1)–(4) + the std swap are tightenings the evaluator itself recommended or that
+    strictly shrink the public surface; re-gating them re-evaluates the evaluator's own notes. C5b is
+    invariant-guarded. The whole branch still faces adversarial impl review + IMPL-EVAL
+    (OpenHands qwen3.7-max) before merge — the real net for the broadened scope.
+- Implementation: WSL Codex daemon-attached session on `chore/plugin-167-harden`
+  (`/home/codex/repos/netscript-wave5-apps`, daemon 0.142.3 managed). C1→C6 + C5b, slice-by-slice
+  commit→push→PR-comment→append commits.md.
