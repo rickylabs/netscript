@@ -55,7 +55,7 @@
     "docs:maintenance": "deno task docs:links && deno task agentic:sync-claude:check && deno task agentic:check-claude",
     "agentic:smoke-claude-remote": "deno run --no-lock --allow-read --allow-run .llm/tools/agentic/claude-remote-smoke.ts --env-aware --pretty",
     "gen:assets-barrel": "deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-cli-assets-barrel.ts",
-    "check:assets-barrel": "deno task gen:assets-barrel && git diff --exit-code -- packages/cli/src/kernel/assets/embedded.generated.ts packages/plugin/src/kernel/assets/embedded.generated.ts packages/fresh-ui/registry.generated.ts",
+    "check:assets-barrel": "deno task gen:assets-barrel && git diff --exit-code -- packages/cli/src/kernel/assets/embedded.generated.ts packages/plugin/src/kernel/assets/embedded.generated.ts packages/fresh-ui/registry.generated.ts packages/service/src/primitives/scalar.generated.ts",
     "check:scaffold-versions": "deno run .llm/tools/check-scaffold-versions.ts --pretty",
     "release:preflight": "deno run --allow-read .llm/tools/release/preflight-text-imports.ts",
     "release:cut": "deno run --allow-read --allow-write --allow-run --allow-env .llm/tools/release/cut.ts",

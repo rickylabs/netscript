@@ -28,7 +28,6 @@
     "include": [
       "mod.ts",
       "src/**/*.ts",
-      "assets/scalar.min.js",
       "README.md",
       "deno.json"
     ],
