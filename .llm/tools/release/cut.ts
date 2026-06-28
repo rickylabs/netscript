@@ -56,6 +56,12 @@ export async function findVersionResidue(root: string, oldVersion: string): Prom
       skip: [
         /(?:^|[/\\])\.git(?:[/\\]|$)/,
         /(?:^|[/\\])node_modules(?:[/\\]|$)/,
+        // Prune agent/e2e scratch trees: leftover scaffolded test projects
+        // under .llm/tmp can contain container-owned Postgres .data dirs that
+        // are not readdir-able by this user, which would otherwise crash the
+        // residue walk (a release-determinism hazard, #147).
+        /(?:^|[/\\])\.llm[/\\]tmp(?:[/\\]|$)/,
+        /(?:^|[/\\])\.data(?:[/\\]|$)/,
       ],
     })
   ) {
@@ -146,7 +152,7 @@ async function discoverMemberDenoJsonFiles(root: string): Promise<string[]> {
       for await (
         const entry of walk(parentPath, {
           includeDirs: false,
-          match: [/deno\.json$/],
+          match: [/deno\.json$/, /scaffold\.plugin\.json$/],
           skip: [
             /(?:^|[/\\])node_modules(?:[/\\]|$)/,
             /(?:^|[/\\])\.generated(?:[/\\]|$)/,

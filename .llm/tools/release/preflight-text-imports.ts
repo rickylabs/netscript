@@ -30,11 +30,124 @@ export async function scanFile(path: string): Promise<TextImportFinding[]> {
 
 /** Scan source text for the narrow preflight read patterns. */
 export function scanSource(source: string, path: string): TextImportFinding[] {
-  const importMetaPaths = collectImportMetaPathIdentifiers(source);
+  // Blank template-literal text first: scaffolder emitters return userland
+  // source as template strings, and an import.meta-relative read inside that
+  // emitted string runs in the user's project (local file), not in the
+  // published package. Stripping keeps real code + ${...} interpolations
+  // scannable while removing false positives. (Comments + allowlist survive.)
+  const scannable = blankTemplateLiterals(source);
+  const importMetaPaths = collectImportMetaPathIdentifiers(scannable);
   return [
-    ...findIdentifierReads(source, path, importMetaPaths),
-    ...findInlineReads(source, path),
+    ...findIdentifierReads(scannable, path, importMetaPaths),
+    ...findInlineReads(scannable, path),
   ];
+}
+
+/**
+ * Replace the *text* content of template literals with spaces (newlines
+ * preserved) so emitted-code strings are not scanned as runtime reads, while
+ * keeping ordinary code and `${...}` interpolation code intact. Ordinary
+ * string literals and comments are copied verbatim so a stray backtick inside
+ * them cannot toggle template state and blank real code below.
+ */
+export function blankTemplateLiterals(source: string): string {
+  const out: string[] = [];
+  // Each open template literal records the interpolation brace depth at which
+  // its text resumes; deeper braceDepth means we are inside a `${...}`.
+  const templates: Array<{ braceDepth: number }> = [];
+  let braceDepth = 0;
+  const inTemplateText = (): boolean =>
+    templates.length > 0 &&
+    braceDepth === templates[templates.length - 1].braceDepth;
+  const n = source.length;
+  let i = 0;
+  while (i < n) {
+    const c = source[i];
+    const next = source[i + 1];
+    if (inTemplateText()) {
+      if (c === '\\') {
+        out.push(' ');
+        out.push(next === '\n' ? '\n' : ' ');
+        i += 2;
+        continue;
+      }
+      if (c === '`') {
+        out.push('`');
+        templates.pop();
+        i += 1;
+        continue;
+      }
+      if (c === '$' && next === '{') {
+        out.push('$');
+        out.push('{');
+        braceDepth += 1;
+        i += 2;
+        continue;
+      }
+      out.push(c === '\n' ? '\n' : ' ');
+      i += 1;
+      continue;
+    }
+    if (c === '/' && next === '/') {
+      while (i < n && source[i] !== '\n') {
+        out.push(source[i]);
+        i += 1;
+      }
+      continue;
+    }
+    if (c === '/' && next === '*') {
+      out.push('/');
+      out.push('*');
+      i += 2;
+      while (i < n && !(source[i] === '*' && source[i + 1] === '/')) {
+        out.push(source[i]);
+        i += 1;
+      }
+      if (i < n) {
+        out.push('*');
+        out.push('/');
+        i += 2;
+      }
+      continue;
+    }
+    if (c === "'" || c === '"') {
+      out.push(c);
+      i += 1;
+      while (i < n) {
+        const d = source[i];
+        out.push(d);
+        if (d === '\\') {
+          if (i + 1 < n) out.push(source[i + 1]);
+          i += 2;
+          continue;
+        }
+        i += 1;
+        if (d === c) break;
+      }
+      continue;
+    }
+    if (c === '`') {
+      out.push('`');
+      templates.push({ braceDepth });
+      i += 1;
+      continue;
+    }
+    if (c === '{') {
+      braceDepth += 1;
+      out.push(c);
+      i += 1;
+      continue;
+    }
+    if (c === '}') {
+      if (braceDepth > 0) braceDepth -= 1;
+      out.push(c);
+      i += 1;
+      continue;
+    }
+    out.push(c);
+    i += 1;
+  }
+  return out.join('');
 }
 
 /** Discover publishable workspace source files and scan them. */
