@@ -62,3 +62,22 @@ Gate evidence:
 | `deno fmt --check .llm/tools/release/cut.ts .llm/tools/release/cut_test.ts` | PASS | Checked after scoped formatting. |
 | `rg -n "\bas\b" .llm/tools/release/cut.ts .llm/tools/release/cut_test.ts` | PASS | Exit 1, zero matches; no new type casts in S3. |
 | `deno task release:cut -- 0.0.1-alpha.99 --dry-run` in copied checkout under `.llm/tmp/release-cut-dry-run-copy` | BLOCKED BY TRUE FINDING | Bump and residue completed, then fail-fast stopped at `release:preflight` on `packages/service/src/primitives/openapi.ts:155`. No branch, commit, push, or PR was created. Copy was removed after the run. |
+
+### S4 — D4 e2e-cli-prod ordering
+
+- Replaced `e2e-cli-prod.yml` release trigger with `workflow_run` on successful `publish` completion
+  plus the existing manual `workflow_dispatch` path.
+- Added the job-level success guard.
+- Added publish-side `version.txt` upload with the run-id-named artifact
+  `netscript-published-version-${{ github.run_id }}`.
+- Added e2e-side `actions/download-artifact@v4` from `github.event.workflow_run.id` and version
+  resolution from the downloaded file; manual dispatch still uses `inputs.published-version`.
+
+Gate evidence:
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| `actionlint .github/workflows/e2e-cli-prod.yml .github/workflows/publish.yml` | SKIPPED | `actionlint` is not installed in this environment. |
+| YAML parse via `deno eval` + `jsr:@std/yaml` | PASS | Both `.github/workflows/e2e-cli-prod.yml` and `.github/workflows/publish.yml` parsed successfully. |
+| `git diff --check -- .github/workflows/e2e-cli-prod.yml .github/workflows/publish.yml` | PASS | No whitespace errors. |
+| Manual YAML sanity read | PASS | Trigger, guard, versioned artifact name, `run-id`, `github-token`, and dispatch fallback are present; no real release was triggered. |

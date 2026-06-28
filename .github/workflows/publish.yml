@@ -98,6 +98,18 @@ jobs:
         if: steps.release.outputs.dry_run != 'true'
         run: deno run --allow-read --allow-write --allow-run .llm/tools/run-publish.ts
 
+      - name: Write published version
+        if: steps.release.outputs.dry_run != 'true'
+        run: printf '%s\n' "${{ steps.release.outputs.version }}" > version.txt
+
+      - name: Upload published version
+        if: steps.release.outputs.dry_run != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: netscript-published-version-${{ github.run_id }}
+          path: version.txt
+          if-no-files-found: error
+
       # Master switch for the settings reconciliation below. Reads
       # `applyOnPublish` from jsr-package-settings.json (absent => true for
       # back-compat). Set it false when the JSR presentation settings are already
