@@ -82,7 +82,13 @@ async function checkScaffoldVersionPins(): Promise<Failure[]> {
 
   for (const path of files) {
     const text = await Deno.readTextFile(path);
-    for (const version of findVersionPins(text)) {
+    for (const version of findLiteralNetscriptVersionConsts(text)) {
+      failures.push({
+        path,
+        message: `hardcoded NETSCRIPT_VERSION ${version}; derive from the plugin deno.json import`,
+      });
+    }
+    for (const version of findNetscriptPackagePins(text)) {
       if (version !== workspaceVersion) {
         failures.push({
           path,
@@ -103,11 +109,14 @@ async function readWorkspaceVersion(): Promise<string> {
   return json.version;
 }
 
-function findVersionPins(text: string): string[] {
+function findLiteralNetscriptVersionConsts(text: string): string[] {
+  return matchVersions(text, NETSCRIPT_VERSION_CONST_PATTERN);
+}
+
+function findNetscriptPackagePins(text: string): string[] {
   return [
     ...matchVersions(text, NETSCRIPT_PACKAGE_VERSION_PATTERN),
     ...matchVersions(text, NETSCRIPT_RECORD_VERSION_PATTERN),
-    ...matchVersions(text, NETSCRIPT_VERSION_CONST_PATTERN),
   ];
 }
 

@@ -11,6 +11,8 @@ interface SagasScaffoldOptions {
 }
 
 const NETSCRIPT_VERSION = packageConfig.version;
+const SCAFFOLD_SCHEMA_URL =
+  `https://jsr.io/@netscript/plugin/${NETSCRIPT_VERSION}/schema/scaffold.plugin.schema.json`;
 const SAGAS_SERVICE_PORT = 8092;
 const SAMPLE_SAGA_ID = 'user-registration';
 
@@ -97,7 +99,7 @@ export async function buildSagasScaffoldArtifacts(
 
 function generateScaffoldPluginJson(): string {
   const manifest = {
-    $schema: 'jsr:@netscript/plugin/schema',
+    $schema: SCAFFOLD_SCHEMA_URL,
     schemaVersion: 1,
     name: '@netscript/plugin-sagas',
     version: NETSCRIPT_VERSION,

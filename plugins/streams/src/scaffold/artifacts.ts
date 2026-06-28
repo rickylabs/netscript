@@ -10,6 +10,8 @@ interface StreamsScaffoldOptions {
 }
 
 const NETSCRIPT_VERSION = packageConfig.version;
+const SCAFFOLD_SCHEMA_URL =
+  `https://jsr.io/@netscript/plugin/${NETSCRIPT_VERSION}/schema/scaffold.plugin.schema.json`;
 const STREAMS_SERVICE_PORT = 4437;
 
 /** Build the deterministic files emitted by the streams plugin scaffolder. */
@@ -59,7 +61,7 @@ export function buildStreamsScaffoldArtifacts(
 
 function generateScaffoldPluginJson(): string {
   const manifest = {
-    $schema: 'jsr:@netscript/plugin/schema',
+    $schema: SCAFFOLD_SCHEMA_URL,
     schemaVersion: 1,
     name: '@netscript/plugin-streams',
     version: NETSCRIPT_VERSION,

@@ -145,3 +145,35 @@
   `deno.json`, leaving `release:cut` untouched.
 - S5 removed the only provably unreferenced CLI public plugin-generator barrel found in the
   dead-code sweep, with full test and scaffold runtime gates green.
+
+## Adversarial review fixes
+
+- Fixed the load-bearing schema URL finding: emitted userland scaffold manifests now set `$schema`
+  to the version-pinned, fetchable JSR raw asset URL derived from the imported plugin package
+  version:
+  `https://jsr.io/@netscript/plugin/${NETSCRIPT_VERSION}/schema/scaffold.plugin.schema.json`.
+- Kept the five committed in-repo `plugins/*/scaffold.plugin.json` manifests on their relative
+  schema path for local editor use.
+- Regenerated the committed schema with the stable HTTPS `$id`
+  `https://rickylabs.github.io/netscript/schemas/scaffold.plugin.schema.json`; see `drift.md` for
+  the docs-domain rationale.
+- Hardened `plugins:check` so a literal `NETSCRIPT_VERSION = "<semver>"` under
+  `plugins/*/src/scaffold/**/*.ts` fails even when the literal equals the current workspace version.
+- Removed the missed unused `SCAFFOLD_FILES` import from
+  `packages/cli/src/maintainer/adapters/official-plugin-source.ts`.
+
+### Adversarial fix gate evidence
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| JSR raw URL form | PASS | `curl -I -L https://jsr.io/@std/assert/1.0.14/mod.ts` and `/deno.json` returned HTTP 200; `https://jsr.io/@std/assert@1.0.14/mod.ts` returned 404, confirming the `<version>/<path>` form. |
+| Schema regeneration + check | PASS | `deno task plugins:schema:gen && deno task plugins:check` — `plugins:check passed`. |
+| No stale userland schema/literal pins | PASS | `rg "NETSCRIPT_VERSION\\s*=\\s*['\\\"][0-9]+\\.[0-9]+\\.[0-9]+|jsr:@netscript/plugin/schema" plugins/*/src/scaffold packages/plugin/schema .llm/tools/plugin` returned no matches. |
+| `arch:check` | PASS | `deno task arch:check` exited 0; existing dependency/doctrine findings remain warning-only. |
+| Scoped check | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --root packages/plugin --root plugins --ext ts,tsx` — 949 selected files, 0 failed batches. |
+| Scoped lint | PASS | Wrapper lint passed for owned tool/plugin files (8 files), `packages/plugin` + `plugins` (408 files), and Deno root config intentionally excludes `packages/cli`; `deno check` covers the changed CLI file. |
+| Scoped fmt | PASS | Wrapper fmt passed for owned tool/plugin files (8 files), `packages/plugin` + `plugins` (408 files), and Deno root config intentionally excludes `packages/cli`; no source formatting changes were needed. |
+| Plugin publish dry-run | PASS | `deno publish --dry-run --allow-dirty` from `packages/plugin` exited 0 and included `schema/scaffold.plugin.schema.json`; existing dynamic-import warning remains unchanged. |
+| Full test | PASS | `deno task test` — 927 passed, 0 failed, 12 ignored. |
+| Lock hygiene | PASS | `git status --short deno.lock` returned no changes. |
+| Scaffold runtime e2e | SKIPPED | Not rerun; the fix changes emitted `$schema` string content only, and the previously green runtime smoke does not assert that value. |

@@ -3,7 +3,6 @@ import { fromFileUrl } from '@std/path/from-file-url';
 import { basename, dirname, join } from '@std/path';
 
 import { SCAFFOLD_DIRS } from '../../kernel/constants/scaffold/scaffold-dirs.ts';
-import { SCAFFOLD_FILES } from '../../kernel/constants/scaffold/scaffold-files.ts';
 import { ScaffoldValidationError } from '../../kernel/domain/errors.ts';
 import type { PackageSourceMode } from '../../kernel/domain/scaffold/scaffold-options.ts';
 import type { ScaffoldResult } from '../../kernel/domain/core-types.ts';

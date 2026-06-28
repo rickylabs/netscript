@@ -12,3 +12,10 @@
   `.llm/tmp/cli-e2e/plugin-smoke-20260628-174019`; those artifacts pin the current branch version
   `0.0.1-alpha.12`. The branch has not been bumped to alpha.13, so the alpha.13 train proof is the
   same single-source mechanism rather than a literal alpha.13 string in this pre-release branch.
+- 2026-06-28 adversarial fix: replaced the generated schema `$id` with the stable HTTPS docs-site
+  URL `https://rickylabs.github.io/netscript/schemas/scaffold.plugin.schema.json`. The docs site is
+  configured for GitHub Pages at `https://rickylabs.github.io/netscript/`; keeping `$id` unversioned
+  avoids release-bump churn in the committed schema and `plugins:check` byte-stability gate. Editors
+  fetch the instance `$schema`, not `$id`, so emitted userland manifests now use the version-pinned
+  JSR raw asset URL
+  `https://jsr.io/@netscript/plugin/${NETSCRIPT_VERSION}/schema/scaffold.plugin.schema.json`.

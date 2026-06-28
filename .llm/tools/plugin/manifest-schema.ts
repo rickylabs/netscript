@@ -3,7 +3,7 @@ import { PluginInstallerManifestSchema } from '../../../packages/plugin/src/prot
 
 export const PLUGIN_MANIFEST_SCHEMA_PATH = 'packages/plugin/schema/scaffold.plugin.schema.json';
 
-const SCHEMA_ID = 'jsr:@netscript/plugin/schema';
+const SCHEMA_ID = 'https://rickylabs.github.io/netscript/schemas/scaffold.plugin.schema.json';
 const SCHEMA_TITLE = 'NetScript plugin scaffold manifest';
 
 /** Generate the canonical `scaffold.plugin.json` JSON Schema text. */

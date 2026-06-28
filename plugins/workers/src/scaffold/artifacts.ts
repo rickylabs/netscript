@@ -10,6 +10,8 @@ interface WorkerScaffoldOptions {
 }
 
 const NETSCRIPT_VERSION = packageConfig.version;
+const SCAFFOLD_SCHEMA_URL =
+  `https://jsr.io/@netscript/plugin/${NETSCRIPT_VERSION}/schema/scaffold.plugin.schema.json`;
 const WORKER_SERVICE_PORT = 8091;
 
 /** Build the deterministic files emitted by the workers plugin scaffolder. */
@@ -71,7 +73,7 @@ export function buildWorkerScaffoldArtifacts(
 
 function generateScaffoldPluginJson(): string {
   const manifest = {
-    $schema: 'jsr:@netscript/plugin/schema',
+    $schema: SCAFFOLD_SCHEMA_URL,
     schemaVersion: 1,
     name: '@netscript/plugin-workers',
     version: NETSCRIPT_VERSION,

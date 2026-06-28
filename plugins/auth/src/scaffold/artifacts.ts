@@ -27,6 +27,8 @@ import { authTemplate24 } from './templates/streams/streams-server-ts.ts';
 import { authTemplate25 } from './templates/database/database-auth-prisma.ts';
 
 const NETSCRIPT_VERSION = packageConfig.version;
+const SCAFFOLD_SCHEMA_URL =
+  `https://jsr.io/@netscript/plugin/${NETSCRIPT_VERSION}/schema/scaffold.plugin.schema.json`;
 
 interface AuthScaffoldArtifact {
   readonly path: string;
@@ -80,7 +82,7 @@ export function buildAuthScaffoldArtifacts(
 
 function generateScaffoldPluginJson(): string {
   const manifest = {
-    $schema: 'jsr:@netscript/plugin/schema',
+    $schema: SCAFFOLD_SCHEMA_URL,
     schemaVersion: 1,
     name: '@netscript/plugin-auth',
     version: NETSCRIPT_VERSION,

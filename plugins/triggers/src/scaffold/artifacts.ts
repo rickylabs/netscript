@@ -15,6 +15,8 @@ interface TriggersScaffoldOptions {
 }
 
 const NETSCRIPT_VERSION = packageConfig.version;
+const SCAFFOLD_SCHEMA_URL =
+  `https://jsr.io/@netscript/plugin/${NETSCRIPT_VERSION}/schema/scaffold.plugin.schema.json`;
 const TRIGGERS_SERVICE_PORT = 8093;
 const TRIGGERS_PROCESSOR_CONCURRENCY_ENV = 'TRIGGERS_PROCESSOR_CONCURRENCY';
 
@@ -105,7 +107,7 @@ export async function buildTriggersScaffoldArtifacts(
 
 function generateScaffoldPluginJson(): string {
   const manifest = {
-    $schema: 'jsr:@netscript/plugin/schema',
+    $schema: SCAFFOLD_SCHEMA_URL,
     schemaVersion: 1,
     name: '@netscript/plugin-triggers',
     version: NETSCRIPT_VERSION,
