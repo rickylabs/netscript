@@ -1,5 +1,10 @@
 import packageConfig from '../../deno.json' with { type: 'json' };
-import { buildScaffoldPluginJson, PluginScaffolder } from '@netscript/plugin/scaffold';
+import {
+  buildPluginDenoJson,
+  buildScaffoldPluginJson,
+  buildStandardScaffoldArtifacts,
+  PluginScaffolder,
+} from '@netscript/plugin/scaffold';
 import type {
   PluginScaffoldManifestSpec,
   ScaffoldArtifact,
@@ -53,18 +58,12 @@ async function buildSagasScaffoldArtifacts(
   });
 
   return [
-    {
-      path: `${pluginRoot}/scaffold.plugin.json`,
-      content: generateScaffoldPluginJson(),
-    },
-    {
-      path: `${pluginRoot}/deno.json`,
-      content: generateDenoJson(pluginName),
-    },
-    {
-      path: `${pluginRoot}/mod.ts`,
-      content: generateMod(pluginName, pascalName),
-    },
+    ...buildStandardScaffoldArtifacts({
+      pluginName,
+      manifestJson: generateScaffoldPluginJson(),
+      denoJson: generateDenoJson(pluginName),
+      modTs: generateMod(pluginName, pascalName),
+    }),
     {
       path: `${pluginRoot}/services/src/main.ts`,
       content: generateServiceMain(pluginName, pascalName),
@@ -113,9 +112,8 @@ function generateScaffoldPluginJson(): string {
 }
 
 function generateDenoJson(pluginName: string): string {
-  const config = {
-    name: `@netscript-app/plugin-${pluginName}`,
-    version: '0.1.0',
+  return buildPluginDenoJson({
+    pluginName,
     exports: {
       '.': './mod.ts',
       './contracts': './contracts/v1/mod.ts',
@@ -148,13 +146,7 @@ function generateDenoJson(pluginName: string): string {
       '@orpc/server': 'npm:@orpc/server@^1.14.6',
       zod: 'jsr:@zod/zod@4.4.3',
     },
-    compilerOptions: {
-      lib: ['deno.ns', 'deno.unstable', 'dom', 'dom.iterable'],
-      strict: true,
-    },
-  };
-
-  return `${JSON.stringify(config, null, 2)}\n`;
+  }, NETSCRIPT_VERSION);
 }
 
 function generateMod(pluginName: string, pascalName: string): string {

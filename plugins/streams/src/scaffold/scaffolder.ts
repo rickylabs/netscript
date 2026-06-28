@@ -1,5 +1,10 @@
 import packageConfig from '../../deno.json' with { type: 'json' };
-import { buildScaffoldPluginJson, PluginScaffolder } from '@netscript/plugin/scaffold';
+import {
+  buildPluginDenoJson,
+  buildScaffoldPluginJson,
+  buildStandardScaffoldArtifacts,
+  PluginScaffolder,
+} from '@netscript/plugin/scaffold';
 import type {
   PluginScaffoldManifestSpec,
   ScaffoldArtifact,
@@ -35,18 +40,12 @@ function buildStreamsScaffoldArtifacts(
   const pluginRoot = `plugins/${pluginName}`;
 
   return [
-    {
-      path: `${pluginRoot}/scaffold.plugin.json`,
-      content: generateScaffoldPluginJson(),
-    },
-    {
-      path: `${pluginRoot}/deno.json`,
-      content: generateDenoJson(pluginName),
-    },
-    {
-      path: `${pluginRoot}/mod.ts`,
-      content: generateMod(pluginName, pascalName),
-    },
+    ...buildStandardScaffoldArtifacts({
+      pluginName,
+      manifestJson: generateScaffoldPluginJson(),
+      denoJson: generateDenoJson(pluginName),
+      modTs: generateMod(pluginName, pascalName),
+    }),
     {
       path: `${pluginRoot}/services/src/main.ts`,
       content: generateServiceMain(),
@@ -75,9 +74,8 @@ function generateScaffoldPluginJson(): string {
 }
 
 function generateDenoJson(pluginName: string): string {
-  const config = {
-    name: `@netscript-app/plugin-${pluginName}`,
-    version: '0.1.0',
+  return buildPluginDenoJson({
+    pluginName,
     exports: {
       '.': './mod.ts',
       './services': './services/src/main.ts',
@@ -107,13 +105,7 @@ function generateDenoJson(pluginName: string): string {
       'hono/cors': 'jsr:@hono/hono@4.12.24/cors',
       zod: 'jsr:@zod/zod@4.4.3',
     },
-    compilerOptions: {
-      lib: ['deno.ns', 'deno.unstable', 'dom', 'dom.iterable'],
-      strict: true,
-    },
-  };
-
-  return `${JSON.stringify(config, null, 2)}\n`;
+  }, NETSCRIPT_VERSION);
 }
 
 function generateMod(pluginName: string, pascalName: string): string {

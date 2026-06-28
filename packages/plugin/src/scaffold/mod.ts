@@ -28,8 +28,12 @@ export type {
 } from '../protocol/mod.ts';
 export type { ScaffoldArtifact } from './artifact.ts';
 export { parseScaffolderContextArgs, runScaffoldCli } from './cli.ts';
+export { buildPluginDenoJson } from './deno-json.ts';
+export type { PluginDenoJsonCompilerOptions, PluginDenoJsonSpec } from './deno-json.ts';
 export { buildScaffoldPluginJson } from './manifest-spec.ts';
 export type { PluginScaffoldManifestSpec } from './manifest-spec.ts';
 export { PluginScaffolder, toEntrypoint } from './plugin-scaffolder.ts';
 export type { PluginScaffolderConstructor } from './plugin-scaffolder.ts';
 export { scaffoldSchemaUrl } from './schema-url.ts';
+export { buildStandardScaffoldArtifacts } from './standard-artifacts.ts';
+export type { StandardScaffoldArtifactsSpec } from './standard-artifacts.ts';

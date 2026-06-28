@@ -65,3 +65,19 @@
 - Implementation: WSL Codex daemon-attached session on `chore/plugin-167-harden`
   (`/home/codex/repos/netscript-wave5-apps`, daemon 0.142.3 managed). C1→C6 + C5b, slice-by-slice
   commit→push→PR-comment→append commits.md.
+
+## Drift — C5b byte-stable skeleton extraction boundary
+
+- Date: 2026-06-28. Severity: low (documented byte-stability boundary, no behavior drift).
+- Extracted to core: `buildPluginDenoJson(spec, version)` for the generated-plugin `deno.json`
+  envelope (`name`, fixed generated version `0.1.0`, exports/tasks/imports, default
+  Deno/DOM compiler options) and `buildStandardScaffoldArtifacts(...)` for the standard first
+  artifact trio (`scaffold.plugin.json`, `deno.json`, `mod.ts`).
+- Applied to: workers, streams, sagas, and triggers scaffolders. These scaffolders still supply the
+  plugin-specific exports, tasks, imports, and file-template bodies.
+- Left per-plugin by byte-stability guard: auth `deno.json` remains in
+  `plugins/auth/src/scaffold/templates/root/deno-json.ts` because it is a published-package template
+  (`name: @netscript/plugin-auth`, branch package version, description/license, `publish` include /
+  exclude, `doc-lint`/`publish:dry-run`/`verify` tasks, and strict/noImplicitAny/strictNullChecks
+  compiler options). Forcing it through the generated-plugin envelope would change those fields and
+  violate the byte-identical scaffold-output invariant.
