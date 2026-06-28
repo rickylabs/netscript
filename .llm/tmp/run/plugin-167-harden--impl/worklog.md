@@ -177,3 +177,179 @@
 | Full test | PASS | `deno task test` — 927 passed, 0 failed, 12 ignored. |
 | Lock hygiene | PASS | `git status --short deno.lock` returned no changes. |
 | Scaffold runtime e2e | SKIPPED | Not rerun; the fix changes emitted `$schema` string content only, and the previously green runtime smoke does not assert that value. |
+
+## C1 progress — scaffold value surface
+
+- Added the additive `@netscript/plugin/scaffold` export map entry.
+- Added the documented C1 value primitives: `ScaffoldArtifact` and `scaffoldSchemaUrl(version)`.
+- Added a documented scaffold barrel with `@module` and `@example`; re-exported the protocol
+  scaffold types and `PluginLogger` so the full doc-lint surface is complete.
+- Added `@std/text` to the `@netscript/plugin` import map and added `src/scaffold/mod.ts` to the
+  package check task.
+- Added a first-party casing parity test for `workers`, `sagas`, `streams`, `triggers`, and `auth`.
+- Inspected and removed resolver-only `deno.lock` churn; no lockfile change is committed.
+
+### C1 gate evidence
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Scoped check | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin --ext ts,tsx` — 113 files selected, 0 failed batches. |
+| Scoped lint | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin --ext ts,tsx` — 113 files selected, 0 occurrences. |
+| Scoped fmt | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin --ext ts,tsx` — 113 files selected, 0 findings. |
+| Focused scaffold test | PASS | `deno test --allow-all packages/plugin/tests/scaffold/scaffold-surface_test.ts` — 2 passed. |
+| Scaffold doc lint | PASS | `deno doc --lint packages/plugin/src/scaffold/mod.ts` — checked 1 file. |
+| Plugin publish dry-run | PASS | `deno publish --dry-run --allow-dirty --allow-slow-types` from `packages/plugin` — dry run complete; existing package slow-type/dynamic-import warnings unchanged. |
+| Full test | PASS | `deno task test` — 929 passed, 0 failed, 12 ignored. |
+| Lock hygiene | PASS | `git diff -- deno.lock` returned no diff before commit. |
+
+## C2 progress — scaffold manifest builder
+
+- Added `PluginScaffoldManifestSpec` and `buildScaffoldPluginJson(spec, version)` to the scaffold
+  subpath.
+- Centralized the manifest envelope: schema URL, schema version, plugin version, `@netscript/plugin`
+  peer dependency, and the standard scaffolder permission declaration.
+- Kept the builder default on the JSR schema URL while allowing a documented `schemaUrl` override
+  for repository-local committed manifests.
+- Added byte-equality coverage for all five committed `plugins/*/scaffold.plugin.json` files.
+- Added a small JSON formatter inside the builder so output matches Deno-formatted committed
+  manifests, including inline short scalar arrays.
+- Inspected and removed resolver-only `deno.lock` churn; no lockfile change is committed.
+
+### C2 gate evidence
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Manifest byte equality | PASS | `deno test --allow-all packages/plugin/tests/scaffold/scaffold-manifest-spec_test.ts` — 1 passed, all five committed manifests byte-equal. |
+| Scoped check | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin --ext ts,tsx` — 115 files selected, 0 failed batches. |
+| Scoped lint | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin --ext ts,tsx` — 115 files selected, 0 occurrences. |
+| Scoped fmt | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin --ext ts,tsx` — 115 files selected, 0 findings. |
+| Scaffold doc lint | PASS | `deno doc --lint packages/plugin/src/scaffold/mod.ts` — checked 1 file. |
+| Full test | PASS | `deno task test` — 930 passed, 0 failed, 12 ignored. |
+| Lock hygiene | PASS | `git diff -- deno.lock` returned no diff before commit. |
+
+## C3 progress — scaffold base and CLI runner
+
+- Added `DenoFileSystemAdapter` implementing the existing `FileSystemPort` with parent-directory
+  creation.
+- Added `PluginScaffolder`, a constructor-injected abstract base that owns the common
+  `ScaffolderContext` → artifact diff/write → `ScaffoldResult` flow.
+- Added `toEntrypoint()` so plugin `./scaffold` modules can expose the protocol entrypoint in one
+  line.
+- Added `parseScaffolderContextArgs()` and `runScaffoldCli(entrypoint)` preserving the existing
+  `--context-json` CLI invocation contract.
+- Added memory-adapter unit coverage for dry-run planning, write application, empty plans,
+  `.prisma` database migration detection, and context-json parsing.
+- Inspected and restored resolver-only `deno.lock` churn to HEAD; no lockfile change is committed.
+
+### C3 gate evidence
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Base scaffolder tests | PASS | `deno test --allow-all packages/plugin/tests/scaffold/plugin-scaffolder_test.ts` — 5 passed. |
+| Scoped check | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin --ext ts,tsx` — 119 files selected, 0 failed batches. |
+| Scoped lint | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin --ext ts,tsx` — 119 files selected, 0 occurrences. |
+| Scoped fmt | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin --ext ts,tsx` — 119 files selected, 0 findings. |
+| Scaffold doc lint | PASS | `deno doc --lint packages/plugin/src/scaffold/mod.ts` — checked 1 file. |
+| Full test | PASS | `deno task test` — 935 passed, 0 failed, 12 ignored. |
+| Lock hygiene | PASS | `git diff -- deno.lock` returned no diff before commit. |
+
+## C4 progress — workers and streams migration
+
+- Migrated workers and streams from duplicated scaffold primitives to the core scaffold surface.
+- Added per-plugin `spec.ts` files and concrete `WorkersScaffolder` / `StreamsScaffolder` classes
+  extending `PluginScaffolder`.
+- Slimmed both plugin `src/scaffold/mod.ts` files to `toEntrypoint(...)` plus core
+  `runScaffoldCli(scaffold)`.
+- Updated both top-level `scaffold.ts` wrappers to call the core CLI runner.
+- Replaced local casing helpers with direct `@std/text` imports.
+- Replaced local manifest-envelope generation with `buildScaffoldPluginJson`.
+- Deleted workers/streams local `files.ts`; deleted workers `files_test.ts` because C3 core tests now
+  cover the port/base behavior.
+- Inspected and restored resolver-only `deno.lock` churn to HEAD; no lockfile change is committed.
+
+### C4 gate evidence
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Scoped workers/streams check | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/workers --root plugins/streams --ext ts,tsx` — 106 files selected, 0 failed batches. |
+| Scoped workers/streams lint | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root plugins/workers --root plugins/streams --ext ts,tsx` — 106 files selected, 0 occurrences. |
+| Scoped workers/streams fmt | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/workers --root plugins/streams --ext ts,tsx` — 106 files selected, 0 findings. |
+| Manifest check | PASS | `deno task plugins:check` — `plugins:check passed`. |
+| Focused manifest tests | PASS | `deno test --allow-all plugins/workers/tests/public/manifest_test.ts plugins/streams/tests/public/manifest_test.ts` — 2 passed. |
+| Full test | PASS | `deno task test` — 933 passed, 0 failed, 12 ignored. |
+| Lock hygiene | PASS | `git diff -- deno.lock` returned no diff before commit. |
+
+## C5b progress — common scaffold skeleton extraction
+
+- Added core `buildPluginDenoJson(spec, version)` for the generated-plugin `deno.json` envelope.
+- Added core `buildStandardScaffoldArtifacts(...)` for the standard first artifact trio:
+  `scaffold.plugin.json`, `deno.json`, and `mod.ts`.
+- Updated workers, streams, sagas, and triggers to use the core helpers while keeping
+  plugin-specific exports, tasks, imports, and template bodies local.
+- Recorded the auth byte-stability boundary in `drift.md`; auth keeps its published-package
+  `deno.json` template because centralizing it would change package metadata, publish config,
+  compiler options, and task fields.
+- Restored resolver-only `deno.lock` churn to HEAD; no lockfile change is committed.
+- Posted PR #170 comment: https://github.com/rickylabs/netscript/pull/170#issuecomment-4827034967
+
+### C5b gate evidence
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Focused scaffold helper tests | PASS | `deno test --allow-all packages/plugin/tests/scaffold/deno-json_test.ts packages/plugin/tests/scaffold/scaffold-manifest-spec_test.ts` — 3 passed. |
+| Scoped check | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin --root plugins/workers --root plugins/streams --root plugins/sagas --root plugins/triggers --ext ts,tsx` — 361 files selected, 0 failed batches. |
+| Scaffold doc lint | PASS | `deno doc --lint packages/plugin/src/scaffold/mod.ts` — checked 1 file. |
+| Scoped lint | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin --root plugins/workers --root plugins/streams --root plugins/sagas --root plugins/triggers --ext ts,tsx` — 361 files selected, 0 occurrences. |
+| Scoped fmt | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin --root plugins/workers --root plugins/streams --root plugins/sagas --root plugins/triggers --ext ts,tsx` — 361 files selected, 0 findings. |
+| Manifest check | PASS | `deno task plugins:check` — `plugins:check passed`. |
+| Full test | PASS | `deno task test` — 935 passed, 0 failed, 12 ignored. |
+| Lock hygiene | PASS | `git diff -- deno.lock` returned no diff before commit. |
+
+## C5 progress — sagas, triggers, and auth migration
+
+- Migrated sagas, triggers, and auth onto the core scaffold surface.
+- Added per-plugin `spec.ts` data files and concrete `SagasScaffolder`,
+  `TriggersScaffolder`, and `AuthScaffolder` classes extending `PluginScaffolder`.
+- Slimmed all three plugin `src/scaffold/mod.ts` files to `toEntrypoint(...)` plus core
+  `runScaffoldCli(scaffold)`.
+- Updated all three top-level `scaffold.ts` wrappers to call the core CLI runner.
+- Replaced sagas/triggers local casing helpers with direct `@std/text` imports.
+- Replaced local manifest-envelope generation with `buildScaffoldPluginJson`.
+- Deleted sagas/triggers/auth local `files.ts` adapters.
+- Restored resolver-only `deno.lock` churn to HEAD; no lockfile change is committed.
+- Posted PR #170 comment: https://github.com/rickylabs/netscript/pull/170#issuecomment-4827019505
+
+### C5 gate evidence
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Scoped sagas/triggers/auth check | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/sagas --root plugins/triggers --root plugins/auth --ext ts,tsx` — 192 files selected, 0 failed batches. |
+| Scoped sagas/triggers/auth lint | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root plugins/sagas --root plugins/triggers --root plugins/auth --ext ts,tsx` — 192 files selected, 0 occurrences. |
+| Scoped sagas/triggers/auth fmt | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/sagas --root plugins/triggers --root plugins/auth --ext ts,tsx` — 192 files selected, 0 findings. |
+| Manifest check | PASS | `deno task plugins:check` — `plugins:check passed`. |
+| Focused manifest tests | PASS | `deno test --allow-all plugins/sagas/tests/public/manifest_test.ts plugins/triggers/tests/public/manifest_test.ts plugins/auth/tests/public/manifest_test.ts plugins/auth/tests/scaffold/manifest_test.ts` — 5 passed. |
+| Full test | PASS | `deno task test` — 933 passed, 0 failed, 12 ignored. |
+| Lock hygiene | PASS | `git diff -- deno.lock` returned no diff before commit. |
+
+## C6 progress — final verification
+
+- Ran the full merge-readiness verification matrix for scaffold-core centralization.
+- Runtime E2E smoke completed from the native worktree with cleanup enabled.
+- Publish dry-runs completed for `@netscript/plugin`, workers, streams, sagas, triggers, and auth.
+- Restored resolver-only `deno.lock` churn to HEAD; no lockfile change is committed.
+- C6 commit: this final verification evidence commit.
+
+### C6 gate evidence
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Manifest check | PASS | `deno task plugins:check` — `plugins:check passed`. |
+| Architecture check | PASS | `deno task arch:check` — exit 0; warnings only, no failures. |
+| Full scaffold doc lint | PASS | `deno doc --lint packages/plugin/src/scaffold/artifact.ts packages/plugin/src/scaffold/cli.ts packages/plugin/src/scaffold/deno-json.ts packages/plugin/src/scaffold/manifest-spec.ts packages/plugin/src/scaffold/mod.ts packages/plugin/src/scaffold/plugin-scaffolder.ts packages/plugin/src/scaffold/schema-url.ts packages/plugin/src/scaffold/standard-artifacts.ts` — checked 8 files. |
+| Scoped package/plugin check | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin --root plugins --ext ts,tsx` — 420 files selected, 0 failed batches. |
+| Scoped package/plugin lint | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin --root plugins --ext ts,tsx` — 420 files selected, 0 occurrences. |
+| Scoped package/plugin fmt | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin --root plugins --ext ts,tsx` — 420 files selected, 0 findings. |
+| Full test | PASS | `deno task test` — 935 passed, 0 failed, 12 ignored. |
+| Runtime E2E | PASS | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` — passed=48 failed=0. |
+| Publish dry-runs | PASS | `deno publish --dry-run --allow-dirty` from `packages/plugin`, `plugins/workers`, `plugins/streams`, `plugins/sagas`, `plugins/triggers`, and `plugins/auth` — all exited 0; existing dynamic-import warnings only. |
+| Lock hygiene | PASS | `git diff -- deno.lock` returned no diff before commit. |
