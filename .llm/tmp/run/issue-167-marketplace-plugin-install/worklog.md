@@ -1004,3 +1004,34 @@ Timestamp: 2026-06-28T10:45:00Z
 | Focused CLI/E2E presentation tests | `deno test --allow-all packages/cli/e2e/tests/presentation/suite-registry_test.ts packages/cli/e2e/tests/presentation/cli-program_test.ts packages/cli/e2e/tests/presentation/cli-options_test.ts` | PASS; 9 passed, 0 failed. |
 | True userland E2E | `deno task e2e:cli run scaffold.userland-install --cleanup --format pretty` | PASS; raw exit code 0, `passed=5 failed=0 skipped=0`, elapsed 895 ms, log `.llm/tmp/cli-e2e/plugin-smoke-20260628-142035.log`. Scratch project `/tmp/netscript-userland-install-b725a9e1b483d082/plugin-smoke-20260628-142035` was outside checkout and cleanup removed the scratch root. |
 | Full runtime E2E | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS; raw exit code 0, `passed=48 failed=0 skipped=0`, elapsed 170366 ms, log `.llm/tmp/cli-e2e/plugin-smoke-20260628-142102.log`. |
+
+## 2026-06-28 — S12 closeout: context pack, backlog debt, and lesson promotion
+
+### Scope Completed
+
+- Created `.llm/tmp/run/issue-167-marketplace-plugin-install/context-pack.md` with a resumable summary
+  of the delivered #167 mechanism, the six-step installer pipeline, trust tiers, confined permission
+  matrix, userland no-leak guarantee, and the pre-merge `--local-path` / post-publish `deno x jsr:`
+  validation boundary.
+- Appended record-only backlog entries to `.llm/harness/debt/arch-debt.md` for:
+  `ISSUE-167-PLUGIN-REMOVE-UNINSTALL`, `ISSUE-167-MARKETPLACE-PORTAL-SIGNATURES`,
+  `ISSUE-167-OPTION-B-PACKAGE-RENAME`, `ISSUE-167-STANDALONE-PLUGIN-PROTOCOL`, and
+  `ISSUE-167-PROD-JSR-SCAFFOLD-E2E`.
+- Promoted the outside-checkout true-userland e2e fence to `.llm/harness/lessons/validation.md`
+  because the pattern is a reusable CLI/scaffold validation guard, not only a #167 note.
+
+### Manual Validation
+
+| Check | Result |
+| ----- | ------ |
+| S1-S11 commit hashes in `context-pack.md` match `commits.md` | PASS |
+| Arch-debt entries include owner, target, linked plan, created date, status, and closing gate | PASS |
+| S12 touched only allowed artifact/debt/lesson paths and no framework/plugin source | PASS |
+| `deno.lock` unchanged | PASS |
+
+### Scope Boundary
+
+- No code gates were run for S12; the approved S12 gate is manual artifact consistency.
+- The run remains honest that pre-merge validation proves a true userland project using
+  `--local-path`, while production `deno x jsr:@netscript/plugin-<kind>/scaffold` must be validated
+  after alpha.13 by `e2e-cli-prod`.
