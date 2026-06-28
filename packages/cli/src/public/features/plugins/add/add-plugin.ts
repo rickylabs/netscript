@@ -12,6 +12,7 @@ import type {
 } from '../../../../kernel/domain/plugin-kind.ts';
 import type { PluginScaffoldResult } from '../../../../kernel/domain/plugin-kind.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
+import type { PromptPort } from '../../../../kernel/ports/prompt-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../../../kernel/ports/template-port.ts';
 import type { AddPluginResult, PluginAddPlan } from '../../../domain/plugin-add-plan.ts';
 import { ScaffoldValidationError } from '../../../../kernel/domain/errors.ts';
@@ -39,6 +40,7 @@ import {
   BARE_PLUGIN_PACKAGE_ALIASES,
   resolvePluginPackageSpec,
 } from './plugin-package-resolver.ts';
+import { confirmPluginInstall } from './confirm-plugin-install.ts';
 
 interface OfficialPluginRenderResult {
   readonly plugin: PluginScaffoldResult;
@@ -65,6 +67,9 @@ export interface AddPluginDependencies extends RenderPluginDependencies {
 
   /** Static JSR validator used to resolve package specs before planning. */
   readonly pluginValidator?: JsrPluginValidatorPort;
+
+  /** Prompt adapter used for third-party package confirmation. */
+  readonly prompt?: PromptPort;
 
   /** Discover a first-party plugin source checkout. */
   readonly findSourceRoot?: typeof findOfficialPluginSourceRoot;
@@ -113,6 +118,14 @@ export async function addPlugin(
     registry,
     dependencies.pluginValidator,
   );
+  if (resolvedPlugin !== undefined && dependencies.prompt !== undefined) {
+    await confirmPluginInstall({
+      descriptor: resolvedPlugin.descriptor,
+      prompt: dependencies.prompt,
+      skipConfirmation: request.skipConfirmation,
+      ci: request.ci,
+    });
+  }
   const planningRequest = resolvedPlugin?.planningKind === undefined
     ? request
     : { ...request, kind: resolvedPlugin.planningKind };

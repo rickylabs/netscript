@@ -35,6 +35,12 @@ export interface PluginAddRequest {
   /** Whether starter samples should be generated. */
   readonly includeSamples: boolean;
 
+  /** Whether third-party plugin confirmation should be skipped. */
+  readonly skipConfirmation?: boolean;
+
+  /** Whether the command is running in non-interactive CI mode. */
+  readonly ci?: boolean;
+
   /** Maintainer-only: generate a thin local stub instead of copying official source. */
   readonly noCopySource?: boolean;
 

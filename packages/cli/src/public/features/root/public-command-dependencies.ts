@@ -113,6 +113,7 @@ export interface PublicCommandDependencies {
     readonly registryScaffolder: PluginRegistryScaffolder;
     readonly workspaceMutator: PluginWorkspaceMutator;
     readonly pluginValidator?: JsrPluginValidatorPort;
+    readonly prompt: CliffyPrompt;
     readonly sourceRootStartDir?: string;
   };
   /** Dependencies for host-side plugin loading. */
@@ -241,6 +242,7 @@ export function createPublicCommandDependencies(
       registryScaffolder: new PluginRegistryScaffolder(scaffolder),
       workspaceMutator: new PluginWorkspaceMutator(fs),
       pluginValidator: new FetchJsrPluginValidator(),
+      prompt,
       sourceRootStartDir: host.cwd(),
     },
     pluginHostDependencies: {

@@ -38,6 +38,8 @@ export function createPluginAddCommand(
     .option('--saga-store-backend <backend:string>', 'Saga durable store backend: kv or prisma')
     .option('--samples', 'Scaffold plugin sample files', { default: true })
     .option('--no-samples', 'Skip plugin sample files')
+    .option('--skip-confirmation', 'Skip third-party plugin confirmation', { default: false })
+    .option('--ci', 'Non-interactive mode', { default: false })
     .option(
       '--no-copy-source',
       'Generate a thin local-import stub instead of copying the official plugin source tree.',
@@ -61,6 +63,8 @@ export function createPluginAddCommand(
         noDb: options.db === false,
         sagaStoreBackend: parseSagaStoreBackendOption(options.sagaStoreBackend),
         includeSamples: options.samples !== false,
+        skipConfirmation: options.skipConfirmation ?? false,
+        ci: options.ci ?? false,
         noCopySource: options.copySource === false,
         projectRoot,
         overwrite: options.force ?? false,

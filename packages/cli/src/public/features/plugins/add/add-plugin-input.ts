@@ -10,6 +10,8 @@ export interface AddPluginCommandInput {
   readonly sagaStoreBackend?: string;
   readonly samples?: boolean;
   readonly copySource?: boolean;
+  readonly skipConfirmation?: boolean;
+  readonly ci?: boolean;
   readonly projectRoot?: string;
   readonly force?: boolean;
 }
