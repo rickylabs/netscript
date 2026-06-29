@@ -13,6 +13,7 @@
 
 import { definePlugin } from '@netscript/plugin';
 import type { StreamTopicContribution } from '@netscript/plugin';
+import denoJson from '../../deno.json' with { type: 'json' };
 import {
   PublicJobDefinitionSchema,
   PublicTaskDefinitionSchema,
@@ -143,7 +144,10 @@ function toTopicContribution(
   };
 }
 
-const workersManifest = definePlugin('@netscript/plugin-workers', '0.0.1-alpha.0')
+/** Plugin package version, single-sourced from the package `deno.json`. */
+const VERSION: string = denoJson.version;
+
+const workersManifest = definePlugin('@netscript/plugin-workers', VERSION)
   .withDisplayName('Background Workers')
   .withType('background-processor')
   .withDescription('Background job scheduling and execution for NetScript applications.')

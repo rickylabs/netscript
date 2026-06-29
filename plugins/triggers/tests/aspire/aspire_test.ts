@@ -7,6 +7,7 @@ import {
   TriggersAspireContribution,
   type TriggersContributionContext,
 } from '../../src/aspire/mod.ts';
+import { TRIGGERS_PLUGIN_VERSION } from '../../src/constants.ts';
 
 Deno.test('TriggersAspireContribution registers API and processor resources', () => {
   const builder = new MemoryAspireBuilder();
@@ -49,7 +50,7 @@ Deno.test('TriggersAspireContribution registers API and processor resources', ()
       '--allow-write',
     ],
     env: {
-      TRIGGERS_PLUGIN_VERSION: '0.1.0',
+      TRIGGERS_PLUGIN_VERSION,
     },
   });
 

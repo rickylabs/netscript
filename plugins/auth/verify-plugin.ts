@@ -4,63 +4,34 @@
  * @module
  */
 
-import { type InspectionReport, inspectPlugin } from '@netscript/plugin';
-import { AUTH_PLUGIN_VERSION, authPlugin } from './mod.ts';
+import {
+  type PluginVerificationResult,
+  runPluginVerificationCli,
+  verifyPlugin,
+} from '@netscript/plugin';
+import { authPlugin } from './mod.ts';
+import denoJson from './deno.json' with { type: 'json' };
 
 export type { InspectionReport } from '@netscript/plugin';
 
-/** Result returned by the auth plugin verifier. */
-export interface AuthPluginVerificationResult {
-  /** Whether the manifest satisfied the expected plugin contract. */
-  readonly ok: boolean;
-  /** Plugin inspector report for the manifest. */
-  readonly inspection: InspectionReport;
-  /** Human-readable verification findings. */
-  readonly findings: readonly string[];
-}
-
 /** Verify that the auth plugin manifest exposes the expected contribution axes. */
-export function verifyAuthPlugin(): AuthPluginVerificationResult {
-  const findings: string[] = [];
-  const inspection = inspectPlugin(authPlugin);
-
-  if (authPlugin.name !== '@netscript/plugin-auth') {
-    findings.push(`expected plugin name @netscript/plugin-auth, got ${authPlugin.name}`);
-  }
-
-  if (authPlugin.version !== AUTH_PLUGIN_VERSION) {
-    findings.push(`expected version ${AUTH_PLUGIN_VERSION}, got ${authPlugin.version}`);
-  }
-
-  if (
-    authPlugin.contributions.services?.some((service) => service.name === 'auth-api') !== true
-  ) {
-    findings.push('expected an auth-api service contribution');
-  }
-
-  if (
-    authPlugin.contributions.contractVersions?.some((contract) =>
-      contract.version === 'v1' && contract.loader === './contracts.ts'
-    ) !== true
-  ) {
-    findings.push('expected the auth v1 contract contribution');
-  }
-
-  if (
-    authPlugin.contributions.runtimeConfigTopics?.some((topic) => topic.name === 'auth') !== true
-  ) {
-    findings.push('expected the auth runtime config topic contribution');
-  }
-
-  return {
-    ok: findings.length === 0,
-    inspection,
-    findings,
-  };
+export function verifyAuthPlugin(): PluginVerificationResult {
+  return verifyPlugin(authPlugin, {
+    name: '@netscript/plugin-auth',
+    version: denoJson.version,
+    services: [{ name: 'auth-api', message: 'expected an auth-api service contribution' }],
+    contractVersions: [{
+      version: 'v1',
+      loader: './contracts.ts',
+      message: 'expected the auth v1 contract contribution',
+    }],
+    runtimeConfigTopics: [{
+      name: 'auth',
+      message: 'expected the auth runtime config topic contribution',
+    }],
+  });
 }
 
 if (import.meta.main) {
-  const result = verifyAuthPlugin();
-  console.log(JSON.stringify(result, null, 2));
-  Deno.exitCode = result.ok ? 0 : 1;
+  runPluginVerificationCli(verifyAuthPlugin());
 }

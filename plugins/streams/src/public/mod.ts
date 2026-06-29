@@ -11,6 +11,10 @@ import {
   StreamUnsupportedOperationError,
   unsupportedStreamOperation,
 } from './stream-api.ts';
+import denoJson from '../../deno.json' with { type: 'json' };
+
+/** Plugin package version, single-sourced from the package `deno.json`. */
+const VERSION: string = denoJson.version;
 
 const STREAMS_SERVICE_PERMISSIONS = [
   '--allow-net',
@@ -81,7 +85,7 @@ export interface StreamsPluginManifest extends PluginManifest {
  * console.log(streamsPlugin.contributions?.services?.[0]?.name);
  * ```
  */
-const streamsManifest = definePlugin('@netscript/plugin-streams', '0.0.1-alpha.0')
+const streamsManifest = definePlugin('@netscript/plugin-streams', VERSION)
   .withDisplayName('Durable Streams')
   .withType('utility')
   .withDescription('Durable Streams service and tooling for NetScript applications.')

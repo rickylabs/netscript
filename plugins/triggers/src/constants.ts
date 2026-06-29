@@ -1,8 +1,10 @@
+import denoJson from '../deno.json' with { type: 'json' };
+
 /** Stable plugin identifier for NetScript triggers. */
 export const TRIGGERS_PLUGIN_ID = 'triggers' as const;
 
-/** Initial plugin package version. */
-export const TRIGGERS_PLUGIN_VERSION = '0.1.0' as const;
+/** Plugin package version, single-sourced from the package `deno.json`. */
+export const TRIGGERS_PLUGIN_VERSION: string = denoJson.version;
 
 /** Default HTTP service name for trigger ingress and management APIs. */
 export const TRIGGERS_API_SERVICE_NAME = 'triggers-api' as const;

@@ -48,11 +48,29 @@ export type { PluginContext, PluginLogger } from './src/domain/mod.ts';
 export { DuplicatePluginError, PluginError, PluginValidationError } from './src/domain/mod.ts';
 export { PluginContribution } from './src/abstracts/mod.ts';
 export type { ContributionAxis } from './src/abstracts/mod.ts';
-export { inspectPlugin } from './src/diagnostics/mod.ts';
+export { inspectPlugin, runPluginVerificationCli, verifyPlugin } from './src/diagnostics/mod.ts';
 export type {
+  ExpectedAspire,
+  ExpectedContractVersion,
+  ExpectedDbSchema,
+  ExpectedDependency,
+  ExpectedE2eGate,
+  ExpectedHelper,
+  ExpectedNamed,
+  ExpectedRuntimeConfigTopic,
+  ExpectedService,
   InspectablePluginManifest,
   InspectablePluginRegistry,
   InspectionReport,
+  PluginExpectations,
+  PluginVerificationResult,
+  VerifiableContractContribution,
+  VerifiableContributions,
+  VerifiableDbSchemaContribution,
+  VerifiableE2eContribution,
+  VerifiableNamedContribution,
+  VerifiablePluginManifest,
+  VerifiableRuntimeConfigContribution,
 } from './src/diagnostics/mod.ts';
 export {
   parsePluginManifest,

@@ -8,6 +8,10 @@ import { definePlugin, type PluginManifest } from '@netscript/plugin';
 import { streamsPlugin, type StreamsPluginManifest } from '@netscript/plugin-streams';
 import { workersPlugin, type WorkersPluginManifest } from '@netscript/plugin-workers';
 import { SAGAS_API_DEFAULT_PORT, SAGAS_API_SERVICE_NAME, SAGAS_PLUGIN_ID } from '../constants.ts';
+import denoJson from '../../deno.json' with { type: 'json' };
+
+/** Plugin package version, single-sourced from the package `deno.json`. */
+const VERSION: string = denoJson.version;
 
 const SAGAS_SERVICE_PERMISSIONS = [
   '--unstable-kv',
@@ -121,7 +125,7 @@ const sagasPluginDependencies = Object.freeze(
 
 const sagasManifest: PluginManifest = definePlugin(
   '@netscript/plugin-sagas',
-  '0.1.0',
+  VERSION,
 )
   .withDisplayName('Saga Orchestration')
   .withType('background-processor')
