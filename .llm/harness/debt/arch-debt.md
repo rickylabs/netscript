@@ -398,6 +398,43 @@ verdicts are not seeded here.
   zero `any` / `Record<string,unknown>` handler maps; scoped check/lint/test green and
   `deno publish --dry-run` Success without `--allow-slow-types`.
 
+## plugins/streams — connector SOUND convergence deferred (`streams-connector-sound-deferred`)
+
+- **Reason:** Streams is the one plugin with NO oRPC contract surface —
+  `@netscript/plugin-streams-core` exposes producer ports, the `defineStreamSchema` /
+  `createDurableStream` builders, domain event types, diagnostics, and telemetry, but no
+  `contracts/v1`. So there is no "Hole A" contract-soundness slice to run (unlike
+  workers/sagas/triggers-core/auth). The streams connector (`plugins/streams/services/src/main.ts`)
+  is a **pure transparent proxy**: it starts the upstream `@durable-streams/server`
+  `DurableStreamTestServer` on an internal port and fronts it with a Hono app that serves
+  `/health[/live|/ready]` and then `app.all('/*')` proxies every other request (including the
+  raw streaming body, via `c.req.raw.body` + `duplex: 'half'`) to the upstream. That catch-all
+  passthrough cannot be expressed as an oRPC router, and `createPluginService`
+  (`@netscript/plugin/service`) is entirely `withRPC`-driven — so migrating the connector to the
+  canonical `createPluginService(...).serve()` shape requires the **same raw-route escape hatch**
+  the deferred triggers connector needs (see `triggers-connector-sound-deferred`). The connector
+  itself has no `any` / `Record<string,unknown>` handler maps; its only escapes are a
+  platform-gap `@ts-ignore` for `RequestInit.duplex` (not yet in Deno's lib types) in the proxy
+  body. Pre-existing minor `-core` casts unrelated to service-typesafety: `import.meta.env as any`
+  cross-runtime env probe in `stream-url-resolver.ts` and two `as unknown as` bridges to the
+  upstream `@durable-streams` generic types in `define-stream-schema.ts` — neither is an oRPC
+  Hole-A/Hole-B hole; left as-is pending the connector slice.
+- **Owner:** #172 plugin convergence — proxy-connector slice (fold with
+  `triggers-connector-sound-deferred`: both connectors are blocked on the one
+  `createPluginService` raw-route capability and should land in the same PLAN-EVAL-gated,
+  daemon-attached WSL Codex slice that builds it once).
+- **Target:** Before #172 is considered fully converged (all five plugins on the canonical
+  thin-connector shape).
+- **Linked plan:** to be authored jointly with the triggers connector slice — framework-source +
+  feature build (the raw-route escape hatch), not a doc/contract refactor.
+- **Created:** 2026-06-30
+- **Status:** open
+- **Gate:** streams connector `main.ts` migrated to `createPluginService(...).serve()` with the
+  upstream proxy served through the sanctioned `createPluginService` raw-route capability,
+  base-meta (`describe` + health) preserved, the `duplex` platform escape kept only if no typed
+  Deno equivalent exists; scoped check/lint/test green and `deno publish --dry-run` Success without
+  `--allow-slow-types`.
+
 ## plugins/sagas — deferred Prisma SagaIdempotencyPort parity
 
 - **Reason:** `PrismaSagaStore` now provides durable saga state persistence, but idempotency and
