@@ -32,5 +32,6 @@ export { type PluginCapabilities, PluginCapabilitiesSchema } from './domain/capa
 export {
   BASE_PLUGIN_CONTRACT_ROUTES,
   type BasePluginContract,
-  type BasePluginContractProcedure,
+  type BasePluginDescribeProcedure,
+  type BasePluginDescribeRoute,
 } from './domain/base-contract.ts';

@@ -10,7 +10,7 @@
  */
 
 import type { PluginCapabilities } from '@netscript/plugin/contract-base';
-import { router } from './router-context.ts';
+import { router, type WorkersHandlers } from './router-context.ts';
 
 /**
  * Capabilities document advertised by the running workers service.
@@ -44,6 +44,6 @@ const workersCapabilities: PluginCapabilities = {
 };
 
 /** Handler for the mandatory base seam `describe` route. */
-export const describeHandlers: Record<string, unknown> = {
+export const describeHandlers: WorkersHandlers<'describe'> = {
   describe: router.describe.handler(() => workersCapabilities),
 };

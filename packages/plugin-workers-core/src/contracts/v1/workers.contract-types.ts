@@ -1,4 +1,8 @@
 import type { PluginCapabilities } from '@netscript/plugin/contract-base';
+import type {
+  WorkersContractDefinition,
+  workersContractV1,
+} from './workers.contract-definition.ts';
 
 /** Result returned by contract schema validation. */
 export type ContractSchemaResult<TOutput> =
@@ -24,24 +28,6 @@ export type TaskDefinitionResponse = Readonly<Record<string, unknown>>;
 
 /** Server-sent event payload emitted by the workers service. */
 export type SSEEvent = Readonly<Record<string, unknown>>;
-
-/** Structural Standard Schema reference used by contract metadata. */
-export type StandardSchemaLike<TInput = unknown, TOutput = TInput> = Readonly<{
-  '~standard': Readonly<{
-    types?: Readonly<{
-      input: TInput;
-      output: TOutput;
-    }>;
-  }>;
-}>;
-
-/** Structural oRPC procedure reference used by worker contracts. */
-export type ContractProcedureLike<TInput = unknown, TOutput = unknown> = Readonly<{
-  '~orpc': Readonly<{
-    inputSchema?: StandardSchemaLike<TInput>;
-    outputSchema?: StandardSchemaLike<unknown, TOutput>;
-  }>;
-}>;
 
 /** Input accepted by the trigger-job procedure. */
 export type JobTriggerInput = Readonly<{
@@ -69,40 +55,44 @@ export type TaskTriggerInput = Readonly<{
 /** Output returned by the trigger-task procedure. */
 export type TaskTriggerOutput = Readonly<{ taskId: string; triggered: boolean }>;
 
-/** Explicit public contract shape for worker service clients. */
-export type WorkersContract = Readonly<{
-  describe: ContractProcedureLike<void, PluginCapabilities>;
-  listJobs: ContractProcedureLike;
-  getJob: ContractProcedureLike;
-  createJob: ContractProcedureLike;
-  updateJob: ContractProcedureLike;
-  deleteJob: ContractProcedureLike;
-  triggerJob: ContractProcedureLike<JobTriggerInput, JobTriggerOutput>;
-  listExecutions: ContractProcedureLike;
-  getExecution: ContractProcedureLike;
-  batchQueryExecutions: ContractProcedureLike;
-  listExecutionsByCorrelationId: ContractProcedureLike;
-  listTasks: ContractProcedureLike;
-  getTask: ContractProcedureLike;
-  triggerTask: ContractProcedureLike<TaskTriggerInput, TaskTriggerOutput>;
-  listTaskExecutions: ContractProcedureLike;
-  getTaskExecution: ContractProcedureLike;
-  cleanup: ContractProcedureLike;
-  cleanupDbExecutions: ContractProcedureLike;
-  archiveExecutions: ContractProcedureLike;
-  seed: ContractProcedureLike;
-  subscribe: ContractProcedureLike;
-  listTopics: ContractProcedureLike;
-}>;
+/**
+ * Public contract shape for worker service clients.
+ *
+ * Derived directly from {@link WorkersContractDefinition} — the real,
+ * fully-inferred oRPC contract router built in `workers.contract-definition.ts`.
+ * This is no longer a hand-authored structural shim: it carries the precise
+ * per-route input/output/error types, so client generation and
+ * `implement(...)` stay sound and can never drift from the Zod schemas.
+ */
+export type WorkersContract = WorkersContractDefinition;
 
-/** Structural route handler exposed by the implemented worker router. */
-export type WorkersRouteHandler = Readonly<{
-  // deno-lint-ignore no-explicit-any -- structural oRPC server-contract export keeps JSR slow types contained.
-  handler: <THandler extends (options: any) => unknown>(handler: THandler) => ReturnType<THandler>;
-}>;
+/**
+ * Context-binding implementer for the v1 worker contract.
+ *
+ * Derived from the {@link workersContractV1} value (`implement(definition)`),
+ * so `WorkersContractV1['$context']<Ctx>()` returns the precisely-typed router
+ * implementer whose `<route>.handler(...)` calls are checked against the
+ * contract IO. Replaces the previous `$context: <T>() => WorkersRouter` shim.
+ */
+export type WorkersContractV1 = typeof workersContractV1;
 
-/** Structural worker router returned after binding a context. */
-export type WorkersRouter = Readonly<{ [TKey in keyof WorkersContract]: WorkersRouteHandler }>;
+/**
+ * The context-bound worker router implementer.
+ *
+ * Derived from {@link WorkersContractV1} by binding an opaque request context,
+ * so each `WorkersRouter[route]` is the real oRPC procedure implementer (not a
+ * `(options: any) => unknown` structural stand-in). Connectors bind their own
+ * concrete context via `workersContractV1.$context<TheirContext>()`.
+ */
+export type WorkersRouter = ReturnType<
+  typeof workersContractV1.$context<Record<never, never>>
+>;
 
-/** Context-binding contract wrapper for the v1 worker contract. */
-export type WorkersContractV1 = Readonly<{ $context: <TContext>() => WorkersRouter }>;
+/**
+ * Public, capability-document shape returned by the mandatory `describe` route.
+ *
+ * Kept as a named public alias of {@link PluginCapabilities} so consumers can
+ * reference the workers describe-output type without reaching into
+ * `@netscript/plugin`.
+ */
+export type WorkersCapabilities = PluginCapabilities;

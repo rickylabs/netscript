@@ -24,6 +24,7 @@
     "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
     "@netscript/contracts": "jsr:@netscript/contracts@0.0.1-alpha.12",
     "@netscript/service": "jsr:@netscript/service@0.0.1-alpha.12",
+    "@orpc/contract": "npm:@orpc/contract@^1.14.6",
     "@orpc/server": "npm:@orpc/server@^1.14.6"
   },
   "tasks": {

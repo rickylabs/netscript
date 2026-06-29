@@ -5,12 +5,21 @@
  */
 
 import { implement } from '@orpc/server';
-import { baseContract } from '@netscript/contracts';
+import { type BaseContractProcedure, baseContract } from '@netscript/contracts';
 import { z } from 'zod';
 
 const startTime = Date.now();
 
-const healthContract = {
+/**
+ * Version-agnostic health contract.
+ *
+ * Each member is annotated as the contracts package's public
+ * {@link BaseContractProcedure} (the type `baseContract.route().input().output()`
+ * returns). The explicit annotation is what lets JSR `--isolatedDeclarations`
+ * emit `healthContractV1`'s type (and, downstream, the exported `health` handler
+ * map) without inferring the inline builder chain.
+ */
+const healthContract: { check: BaseContractProcedure; ping: BaseContractProcedure } = {
   check: baseContract
     .route({ method: 'GET', path: '/health' })
     .input(z.object({}).optional())
@@ -31,13 +40,30 @@ const healthContract = {
     })),
 };
 
-const healthContractV1 = implement(healthContract);
+const healthContractV1: ReturnType<typeof implement<typeof healthContract>> = implement(
+  healthContract,
+);
+
+/**
+ * Precise handler-map type for the version-agnostic health contract.
+ *
+ * Each value is exactly the `ImplementedProcedure` that
+ * `healthContractV1[K].handler(...)` returns. JSR `--isolatedDeclarations` cannot
+ * infer the type of an exported handler map built from `.handler(...)` call
+ * expressions, so this explicit (non-`readonly`, to stay assignable to oRPC's
+ * mutable `Router`) mapped type is the annotation — preserving per-route
+ * precision with no `any` / `Record<string, unknown>` erasure.
+ */
+type HealthHandlers<K extends keyof typeof healthContractV1> = {
+  [P in K]: (typeof healthContractV1)[P] extends { handler: (...args: never[]) => infer R } ? R
+    : never;
+};
 
 // ============================================================================
 // HEALTH CHECK HANDLERS
 // ============================================================================
 
-export const health: Record<string, unknown> = {
+export const health: HealthHandlers<'check' | 'ping'> = {
   /**
    * Health check endpoint - for testing oRPC connectivity
    */
@@ -54,7 +80,7 @@ export const health: Record<string, unknown> = {
   /**
    * Simple ping endpoint - for testing oRPC connectivity
    */
-  ping: healthContractV1.ping.handler(({ input }: { input?: { message?: string } }) => {
+  ping: healthContractV1.ping.handler(({ input }) => {
     return {
       message: input?.message ? `Pong: ${input.message}` : 'Pong!',
       timestamp: new Date().toISOString(),

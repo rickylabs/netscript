@@ -2,6 +2,8 @@ import {
   DEFAULT_TOPIC,
   type JobMessage,
   type TaskMessage,
+  type TriggerType,
+  TriggerTypeSchema,
   type WorkerIdempotencyClaim,
 } from '@netscript/plugin-workers-core/runtime';
 import type { MessageContext } from '@netscript/queue';
@@ -16,6 +18,19 @@ import { executeWorkerJob } from './job-execution.ts';
 import type { JobExecutionContext, WorkerDispatchContext } from './worker-options.ts';
 import { recordIdempotentSkip } from './worker-idempotency-events.ts';
 
+/**
+ * Narrow a wire-supplied `triggeredBy` string to the canonical {@link TriggerType}.
+ *
+ * Queue messages carry `triggeredBy` as an untyped `string` (JSON at rest); the
+ * execution-state record requires the enum. Parsing through the canonical
+ * `TriggerTypeSchema` is the type-honest narrowing — it performs the same
+ * validation that `executionState.create` runs downstream, so behavior is
+ * unchanged for the valid values that already succeed.
+ */
+function normalizeTriggeredBy(triggeredBy: string): TriggerType {
+  return TriggerTypeSchema.parse(triggeredBy);
+}
+
 /** Process a queued job message. */
 export async function processWorkerJob(
   context: WorkerDispatchContext,
@@ -26,7 +41,7 @@ export async function processWorkerJob(
   const { jobId, payload, correlationId } = message;
   const traceHeaders = getTraceHeaders(message, tracedContext);
   const parentContext = tracedContext?.parentContext ?? getParentContextFromHeaders(traceHeaders);
-  const triggeredBy = message.triggeredBy;
+  const triggeredBy = normalizeTriggeredBy(message.triggeredBy);
 
   console.log(`[Worker ${context.workerId}] Processing job '${jobId}' (trigger: ${triggeredBy})`);
 
@@ -58,7 +73,11 @@ export async function processWorkerJob(
     const execution = await context.executionState.create({
       jobId,
       topic,
-      triggeredBy: message.triggeredBy,
+      // Narrow the wire `string` `triggeredBy` to the canonical `TriggerType`
+      // via the same schema the execution record is validated against. This is
+      // not a cast: invalid values throw here exactly as they would inside
+      // `executionState.create` -> `ExecutionRecordSchema.parse` downstream.
+      triggeredBy: normalizeTriggeredBy(message.triggeredBy),
       payload,
       correlationId,
       traceparent: traceHeaders['traceparent'],
@@ -157,7 +176,8 @@ export async function processWorkerTask(
   message: TaskMessage,
   queueContext?: MessageContext,
 ): Promise<void> {
-  const { taskId, payload, correlationId, triggeredBy } = message;
+  const { taskId, payload, correlationId } = message;
+  const triggeredBy = normalizeTriggeredBy(message.triggeredBy);
   const topic = message.topic ?? DEFAULT_TOPIC;
   let executionId: string | undefined;
   let claim: WorkerIdempotencyClaim | undefined;

@@ -1,14 +1,13 @@
 import { withEventMeta } from '@orpc/server';
-import type { SSEEvent } from '../../../contracts/v1/mod.ts';
 import {
   DEFAULT_TOPIC,
   type ExecutionRecord,
   SSEEventTypes,
 } from '@netscript/plugin-workers-core/runtime';
 import { getKv } from '@netscript/kv';
-import { getWorkersRuntime, router } from './router-context.ts';
+import { getWorkersRuntime, router, type WorkersHandlers } from './router-context.ts';
 
-export const subscribeHandlers: Record<string, unknown> = {
+export const subscribeHandlers: WorkersHandlers<'subscribe' | 'listTopics'> = {
   subscribe: router.subscribe.handler(async function* (
     { input, lastEventId, signal, context },
   ) {
@@ -24,7 +23,7 @@ export const subscribeHandlers: Record<string, unknown> = {
         type: SSEEventTypes.heartbeat,
         data: { connected: true, topic: topicFilter || 'all', concept },
         timestamp: new Date().toISOString(),
-      } as SSEEvent,
+      },
       { id: String(++eventId), retry: 5000 },
     );
 
@@ -38,7 +37,7 @@ export const subscribeHandlers: Record<string, unknown> = {
           type: SSEEventTypes.tasks,
           data: { tasks: filteredTasks },
           timestamp: new Date().toISOString(),
-        } as SSEEvent,
+        },
         { id: String(++eventId), retry: 5000 },
       );
     } else {
@@ -51,7 +50,7 @@ export const subscribeHandlers: Record<string, unknown> = {
           type: SSEEventTypes.jobs,
           data: { jobs: filteredJobs },
           timestamp: new Date().toISOString(),
-        } as SSEEvent,
+        },
         { id: String(++eventId), retry: 5000 },
       );
     }
@@ -69,7 +68,7 @@ export const subscribeHandlers: Record<string, unknown> = {
         type: SSEEventTypes.executions,
         data: { executions },
         timestamp: new Date().toISOString(),
-      } as SSEEvent,
+      },
       { id: String(++eventId), retry: 5000 },
     );
 
@@ -105,7 +104,7 @@ export const subscribeHandlers: Record<string, unknown> = {
             data: execution,
             timestamp: new Date().toISOString(),
             id: execution.id,
-          } as SSEEvent,
+          },
           { id: String(++eventId), retry: 5000 },
         );
 
@@ -116,7 +115,7 @@ export const subscribeHandlers: Record<string, unknown> = {
               type: SSEEventTypes.heartbeat,
               data: { timestamp: new Date().toISOString() },
               timestamp: new Date().toISOString(),
-            } as SSEEvent,
+            },
             { id: String(++eventId), retry: 5000 },
           );
           lastHeartbeat = now;

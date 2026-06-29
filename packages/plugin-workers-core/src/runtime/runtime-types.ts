@@ -1,3 +1,5 @@
+import type { ExecutionStatus, TriggerType } from '../domain/constants.ts';
+
 /** Runtime job identifier. */
 export type JobId<TId extends string = string> = TId & { readonly __brand: 'JobId' };
 
@@ -106,15 +108,24 @@ export type TaskDefinition<TId extends string = string, TPayload = unknown, TRes
     }
   >;
 
-/** Runtime execution record. */
+/**
+ * Runtime execution record.
+ *
+ * `status` and `triggeredBy` are the canonical domain enums (not bare `string`),
+ * and the record carries no `Record<string, unknown>` index signature. Both were
+ * deliberate corrections: the previous `string` fields and index signature caused
+ * the workers connector handlers — which annotate their working arrays with this
+ * type — to widen `status`/`triggeredBy` to `string`, breaking conformance with
+ * the `ExecutionRecordResponse` contract enums.
+ */
 export type ExecutionRecord = Readonly<
-  Record<string, unknown> & {
+  {
     readonly id: string;
     readonly concept: 'job' | 'task';
     readonly jobId: string;
-    readonly status: string;
+    readonly status: ExecutionStatus;
     readonly topic: string;
-    readonly triggeredBy: string;
+    readonly triggeredBy: TriggerType;
     readonly triggeredAt: string;
     readonly startedAt: string | null;
     readonly completedAt: string | null;

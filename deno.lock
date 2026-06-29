@@ -100,6 +100,7 @@
     "npm:@orpc/client@^1.14.6": "1.14.6_@opentelemetry+api@1.9.1",
     "npm:@orpc/contract@^1.14.6": "1.14.6_@opentelemetry+api@1.9.1",
     "npm:@orpc/openapi@^1.14.6": "1.14.6_@opentelemetry+api@1.9.1",
+    "npm:@orpc/server@*": "1.14.6_@opentelemetry+api@1.9.1",
     "npm:@orpc/server@^1.14.6": "1.14.6_@opentelemetry+api@1.9.1",
     "npm:@orpc/tanstack-query@1.14.6": "1.14.6_@orpc+client@1.14.6__@opentelemetry+api@1.9.1_@tanstack+query-core@5.101.0",
     "npm:@orpc/tanstack-query@^1.14.6": "1.14.6_@orpc+client@1.14.6__@opentelemetry+api@1.9.1_@tanstack+query-core@5.101.0",
@@ -3145,6 +3146,7 @@
           "jsr:@std/assert@1",
           "jsr:@std/path@1",
           "jsr:@zod/zod@4.4.3",
+          "npm:@orpc/contract@^1.14.6",
           "npm:@orpc/server@^1.14.6"
         ]
       },
@@ -3197,10 +3199,13 @@
       "packages/plugin-workers-core": {
         "dependencies": [
           "jsr:@david/dax@0.48",
+          "jsr:@netscript/plugin@0.0.1-alpha.12",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
           "jsr:@std/path@1",
-          "jsr:@zod/zod@4.4.3"
+          "jsr:@zod/zod@4.4.3",
+          "npm:@orpc/contract@^1.14.6",
+          "npm:@orpc/server@^1.14.6"
         ],
         "packageJson": {
           "dependencies": [

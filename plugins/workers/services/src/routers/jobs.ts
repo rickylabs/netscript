@@ -1,8 +1,10 @@
 import { DEFAULT_TOPIC, type JobMessage } from '@netscript/plugin-workers-core/runtime';
 import { notFound } from '@netscript/contracts';
-import { getJobQueue, getWorkersRuntime, router } from './router-context.ts';
+import { getJobQueue, getWorkersRuntime, router, type WorkersHandlers } from './router-context.ts';
 
-export const jobHandlers: Record<string, unknown> = {
+export const jobHandlers: WorkersHandlers<
+  'listJobs' | 'getJob' | 'createJob' | 'updateJob' | 'deleteJob' | 'triggerJob'
+> = {
   listJobs: router.listJobs.handler(async ({ input, context }) => {
     const { limit, offset, enabled, scheduled, source, pluginId, tags } = input;
     const { jobRegistry: registry } = getWorkersRuntime(context);

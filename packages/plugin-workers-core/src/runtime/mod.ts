@@ -4,10 +4,23 @@
  * Worker runtime composition and runner contracts.
  */
 
-import { DEFAULT_TOPIC, JobKvKeys as DomainJobKvKeys, SSEEventTypes } from '../domain/mod.ts';
+import {
+  DEFAULT_TOPIC,
+  JobKvKeys as DomainJobKvKeys,
+  SSEEventTypes,
+  TriggerTypeSchema,
+} from '../domain/mod.ts';
 import type { RuntimeJobKvKeyFactories } from './runtime-types.ts';
 
 export { DEFAULT_TOPIC, SSEEventTypes };
+// Canonical execution status / trigger enums. Re-exported from the runtime
+// entrypoint so consumer ports (e.g. the worker `WorkerExecutionState`) can
+// type `status` / `triggeredBy` with the same enums the runtime records carry,
+// instead of widening them to bare `string`. The `TriggerTypeSchema` value is
+// re-exported so wire-message consumers can narrow an untyped `triggeredBy`
+// string back to the enum at the deserialization boundary.
+export { TriggerTypeSchema };
+export type { ExecutionStatus, TriggerType } from '../domain/constants.ts';
 export { createWorkersRuntime } from './composition-root.ts';
 export { resolveWorkerIdempotencyKey } from './worker-idempotency.ts';
 export type { WorkerResolvedIdempotencyKey } from './worker-idempotency.ts';

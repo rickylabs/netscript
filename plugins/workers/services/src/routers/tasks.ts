@@ -4,9 +4,15 @@ import {
   type TaskMessage,
 } from '@netscript/plugin-workers-core/runtime';
 import { notFound } from '@netscript/contracts';
-import { getTaskQueue, getWorkersRuntime, router } from './router-context.ts';
+import { getTaskQueue, getWorkersRuntime, router, type WorkersHandlers } from './router-context.ts';
 
-export const taskHandlers: Record<string, unknown> = {
+export const taskHandlers: WorkersHandlers<
+  | 'listTasks'
+  | 'getTask'
+  | 'triggerTask'
+  | 'listTaskExecutions'
+  | 'getTaskExecution'
+> = {
   listTasks: router.listTasks.handler(async ({ input, context }) => {
     const { limit, type, source, pluginId } = input;
     const { taskRegistry: registry } = getWorkersRuntime(context);

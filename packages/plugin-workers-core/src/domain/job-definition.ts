@@ -160,23 +160,32 @@ export const JobResponseSchema: z.ZodObject<typeof JobResponseShape> = z.object(
 /** API-safe job response. */
 export type JobResponse = z.output<typeof JobResponseSchema>;
 
+// NOTE: each field is annotated with its CONCRETE Zod schema type rather than a
+// `z.ZodType<T>` upcast. Under Zod v4, a `z.ZodType<string>` annotation erases
+// the schema's `_output` to `unknown` once the object is run through
+// `.omit().extend()` (as the API response schema does), which silently widened
+// the published `ExecutionRecordResponse` contract fields to `unknown`. Concrete
+// constructor types (`z.ZodString`, `z.ZodNullable<…>`, `z.ZodDefault<…>`)
+// preserve precise output inference end-to-end, so the response contract reports
+// real `string`/`number`/enum fields and the connector handlers type-check
+// against it without any cast.
 type ExecutionRecordShape = {
-  id: z.ZodType<string>;
-  concept: z.ZodType<'job' | 'task'>;
-  jobId: z.ZodType<string>;
-  topic: z.ZodType<string>;
+  id: z.ZodString;
+  concept: z.ZodDefault<z.ZodEnum<{ job: 'job'; task: 'task' }>>;
+  jobId: z.ZodString;
+  topic: z.ZodDefault<z.ZodString>;
   status: typeof ExecutionStatusSchema;
   triggeredBy: typeof TriggerTypeSchema;
-  triggeredAt: z.ZodType<string>;
-  startedAt: z.ZodType<string | null>;
-  completedAt: z.ZodType<string | null>;
-  exitCode: z.ZodType<number | null>;
-  duration: z.ZodType<number | null>;
-  error: z.ZodType<string | null>;
-  result: z.ZodType<Record<string, unknown> | null>;
-  workerId: z.ZodType<string | null>;
-  attempt: z.ZodType<number>;
-  maxAttempts: z.ZodType<number>;
+  triggeredAt: z.ZodString;
+  startedAt: z.ZodNullable<z.ZodString>;
+  completedAt: z.ZodNullable<z.ZodString>;
+  exitCode: z.ZodNullable<z.ZodNumber>;
+  duration: z.ZodNullable<z.ZodNumber>;
+  error: z.ZodNullable<z.ZodString>;
+  result: z.ZodNullable<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
+  workerId: z.ZodNullable<z.ZodString>;
+  attempt: z.ZodDefault<z.ZodNumber>;
+  maxAttempts: z.ZodDefault<z.ZodNumber>;
   payload: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
   correlationId: z.ZodOptional<z.ZodString>;
   traceparent: z.ZodOptional<z.ZodString>;
