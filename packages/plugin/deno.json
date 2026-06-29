@@ -13,16 +13,21 @@
     "./protocol": "./src/protocol/mod.ts",
     "./sdk": "./src/sdk/mod.ts",
     "./testing": "./src/testing/mod.ts",
-    "./templates": "./src/templates/mod.ts"
+    "./templates": "./src/templates/mod.ts",
+    "./contract-base": "./src/contract-base/mod.ts",
+    "./service": "./src/service/mod.ts"
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@^1",
     "@std/path": "jsr:@std/path@^1",
     "zod": "jsr:@zod/zod@4.4.3",
-    "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0"
+    "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
+    "@netscript/contracts": "jsr:@netscript/contracts@0.0.1-alpha.12",
+    "@netscript/service": "jsr:@netscript/service@0.0.1-alpha.12",
+    "@orpc/server": "npm:@orpc/server@^1.14.6"
   },
   "tasks": {
-    "check": "deno check --unstable-kv mod.ts src/abstracts/mod.ts src/adapter/mod.ts src/config/mod.ts src/cli/mod.ts loader.ts src/protocol/mod.ts src/sdk/mod.ts src/testing/mod.ts src/templates/mod.ts",
+    "check": "deno check --unstable-kv mod.ts src/abstracts/mod.ts src/adapter/mod.ts src/config/mod.ts src/cli/mod.ts loader.ts src/protocol/mod.ts src/sdk/mod.ts src/testing/mod.ts src/templates/mod.ts src/contract-base/mod.ts src/service/mod.ts",
     "fmt": "deno fmt",
     "lint": "deno lint",
     "test": "deno test --allow-all",
