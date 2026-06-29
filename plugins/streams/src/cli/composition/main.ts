@@ -20,7 +20,11 @@ export const streamsCli: StreamsCli = new StreamsCli();
 
 if (import.meta.main) {
   const [command = 'list-topics', ...values] = Deno.args;
-  const result = await streamsCli.run({ command, values });
+  const args = { command, values };
+  const handler = streamsCli.commands().find((item) => item.name === command);
+  const result = handler
+    ? await handler.run(args)
+    : { code: 1, message: `Unknown streams command: ${command}` };
   if (result.message) {
     if (result.code === 0) {
       console.log(result.message);
