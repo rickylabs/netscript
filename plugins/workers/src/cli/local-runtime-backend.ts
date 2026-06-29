@@ -217,15 +217,19 @@ function parseWorkerRuntimeConfig(content: string | undefined): WorkerRuntimeCon
   if (typeof parsed !== 'object' || parsed === null || !('jobs' in parsed)) {
     return { jobs: {} };
   }
-  const jobs = (parsed as { readonly jobs?: unknown }).jobs;
-  return typeof jobs === 'object' && jobs !== null ? { jobs: normalizeJobs(jobs) } : { jobs: {} };
+  for (const [key, value] of Object.entries(parsed)) {
+    if (key === 'jobs' && typeof value === 'object' && value !== null) {
+      return { jobs: normalizeJobs(value) };
+    }
+  }
+  return { jobs: {} };
 }
 
 function normalizeJobs(input: object): Record<string, { readonly enabled?: boolean }> {
   const jobs: Record<string, { readonly enabled?: boolean }> = {};
   for (const [key, value] of Object.entries(input)) {
     if (typeof value === 'object' && value !== null) {
-      const enabled = (value as { readonly enabled?: unknown }).enabled;
+      const enabled = Object.entries(value).find(([field]) => field === 'enabled')?.[1];
       jobs[key] = typeof enabled === 'boolean' ? { enabled } : {};
     }
   }

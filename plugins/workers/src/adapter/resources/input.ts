@@ -110,7 +110,7 @@ export function parseTaskRuntime(value: string | undefined): WorkersTaskRuntime 
 }
 
 function isWorkersTaskRuntime(value: string): value is WorkersTaskRuntime {
-  return WORKERS_TASK_RUNTIMES.includes(value as WorkersTaskRuntime);
+  return WORKERS_TASK_RUNTIMES.some((runtime) => runtime === value);
 }
 
 function stringFlag(args: PluginCliArgs, name: string): string | undefined {
