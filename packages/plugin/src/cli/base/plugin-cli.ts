@@ -1,4 +1,4 @@
-import type { PluginCliArgs, PluginCliCommand, PluginCliResult } from '../types.ts';
+import type { PluginCliCommand } from '../types.ts';
 
 /** Abstract base class for plugin-owned CLI command groups. */
 export abstract class PluginCli {
@@ -22,13 +22,4 @@ export abstract class PluginCli {
    * ```
    */
   abstract commands(): readonly PluginCliCommand[];
-
-  /** Run a named command from this CLI. */
-  async run(args: PluginCliArgs): Promise<PluginCliResult> {
-    const command = this.commands().find((item) => item.name === args.command);
-    if (!command) {
-      return { code: 1, message: `Unknown command: ${args.command}` };
-    }
-    return await command.run(args);
-  }
 }

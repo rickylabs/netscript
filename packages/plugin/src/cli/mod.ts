@@ -1,7 +1,5 @@
 export type { PluginCliArgs, PluginCliCommand, PluginCliResult } from './types.ts';
 export { PluginCli } from './base/plugin-cli.ts';
-export { PluginItemScaffolder } from './base/plugin-item-scaffolder.ts';
-export type { PluginScaffoldResult } from './base/plugin-item-scaffolder.ts';
 export { PluginRuntimeConfigCli } from './base/plugin-runtime-config-cli.ts';
 export { isDoctorReportPassing } from './base/doctor-report.ts';
 export type { DoctorCheck, DoctorReport } from './base/doctor-report.ts';

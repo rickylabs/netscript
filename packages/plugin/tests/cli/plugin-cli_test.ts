@@ -4,12 +4,13 @@ import {
   isDoctorReportPassing,
   mountPluginCli,
   PluginCli,
-  PluginItemScaffolder,
   PluginRuntimeConfigCli,
   routeVerb,
   runMountedCommand,
 } from '../../src/cli/mod.ts';
-import type { PluginCliCommand, PluginCliResult, PluginScaffoldResult } from '../../src/cli/mod.ts';
+import { textArtifact } from '../../src/adapter/mod.ts';
+import type { ItemScaffolder } from '../../src/adapter/mod.ts';
+import type { PluginCliCommand, PluginCliResult } from '../../src/cli/mod.ts';
 
 class ExampleCli extends PluginCli {
   readonly name = 'example';
@@ -24,13 +25,12 @@ class ExampleCli extends PluginCli {
   }
 }
 
-class ExampleScaffolder extends PluginItemScaffolder<{ readonly name: string }> {
-  readonly itemName = 'service';
-
-  scaffold(input: { readonly name: string }): PluginScaffoldResult {
-    return { files: [`services/${input.name}/main.ts`] };
-  }
-}
+const exampleScaffolder: ItemScaffolder<{ readonly name: string }> = {
+  name: 'service',
+  emit(input) {
+    return [textArtifact(`services/${input.name}/main.ts`, 'export {};')];
+  },
+};
 
 class ExampleRuntimeConfigCli extends PluginRuntimeConfigCli {
   readonly topic = 'example';
@@ -43,13 +43,6 @@ class ExampleRuntimeConfigCli extends PluginRuntimeConfigCli {
     return { code: 0, message: 'written' };
   }
 }
-
-Deno.test('PluginCli runs named commands and reports unknown commands', async () => {
-  const cli = new ExampleCli();
-
-  assertEquals(await cli.run({ command: 'doctor' }), { code: 0, message: 'ok' });
-  assertEquals((await cli.run({ command: 'missing' })).code, 1);
-});
 
 Deno.test('mounted plugin CLI commands run through composition helpers', async () => {
   const commands = mountPluginCli([new ExampleCli()]);
@@ -65,13 +58,10 @@ Deno.test('mounted plugin CLI commands run through composition helpers', async (
   assertStringIncludes(formatPluginHelp(commands), 'example:doctor');
 });
 
-Deno.test('PluginItemScaffolder and PluginRuntimeConfigCli bases define stable contracts', () => {
-  const scaffolder = new ExampleScaffolder();
+Deno.test('ItemScaffolder and PluginRuntimeConfigCli define stable contracts', () => {
   const config = new ExampleRuntimeConfigCli();
 
-  assertEquals(scaffolder.scaffold({ name: 'users' }), {
-    files: ['services/users/main.ts'],
-  });
+  assertEquals(exampleScaffolder.emit({ name: 'users' })[0]?.path, 'services/users/main.ts');
   assertEquals(config.read({ command: 'read' }).code, 0);
   assertEquals(config.write({ command: 'write' }).message, 'written');
 });

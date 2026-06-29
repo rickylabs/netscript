@@ -56,3 +56,17 @@ reinvent) · JSR-ready (jsr-audit green) · doctrine+fitness = actual merge gate
 
 #157 (umbrella) · #160 S1 core · #161 S2 workers · #162 S3 other plugins · #163 S4 CLI · #164 S5 gates
 · #165 PLAN-EVAL gate (blocks #160) · #166 S7 verify · #158 doctrine LAW (S6).
+
+## S1 v2 implementation status (2026-06-29)
+
+S1 v2 implemented the `@netscript/plugin/adapter` core contract in `packages/plugin/src/adapter/*`,
+removed `PluginCli.run()` orchestration, deleted the v1 `packages/plugin/src/scaffold/*` replacement,
+removed the duplicate `PluginItemScaffolder` base, removed the unpublished template/scaffolder
+adapter path, and added the `./adapter` export. Package-scoped gates are green: scoped
+check/lint/fmt, `deno test --allow-all packages/plugin` (`33 passed`), adapter doc-lint
+(`totalErrors:0`), and package-local publish dry-run (`Success Dry run complete`).
+
+Material drift: workspace-level `deno task test --filter plugin` and the workspace-only
+`run-publish-dry-run.ts` currently fail on `plugins/auth` importing the deleted v1
+`@netscript/plugin/scaffold` export. S1 did not touch `plugins/*`; S2-S4 own that connector/CLI
+repointing before final workspace gates.

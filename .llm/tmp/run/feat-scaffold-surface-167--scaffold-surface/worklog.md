@@ -634,3 +634,55 @@ scaffolder thinning slice; recorded for S4.
 (S2c). Every plugin now uses the thin `createPluginScaffold` composition over
 `@netscript/plugin/scaffold`, emits userland-only glue, and owns its byte-identity test in-package.
 The central `test_fixtures/manifest-specs.ts` is fully retired.
+
+## S1 v2 implementation — core adapter contract + mandatory commands
+
+### Scope
+
+Built `packages/plugin/src/adapter/*` as the unified `@netscript/plugin/adapter` surface:
+`NetScriptPlugin`, mandatory command seam interfaces, `PluginResource`, `PluginCommandSpec`, the
+single `ItemScaffolder<TInput>`, typed `ScaffoldArtifact`, typed named-token substitution, mandatory
+command owner modules (`install`, `doctor`, `info`, `update`, `remove`), `plugin-cli-runner`,
+`createPluginAdapter`, defaults, and the public `mod.ts` barrel. Added `./adapter` to
+`packages/plugin/deno.json`.
+
+### A4 fix
+
+Removed the concrete orchestration body from `PluginCli.run()`. The spine class is stub-only again;
+dispatch now lives in `packages/plugin/src/adapter/runner/plugin-cli-runner.ts`.
+
+### Reconcile
+
+Deleted the wrong v1 replacement `packages/plugin/src/scaffold/*`, the duplicate
+`PluginItemScaffolder` base, and the unpublished `StringTemplateAdapter`/`FilesystemScaffolder`
+template path. The v1 `./scaffold` package export was removed from `packages/plugin` so the new
+adapter is the only S1-owned command/scaffold contract in the package.
+
+### Tests
+
+Added focused unit tests for:
+
+- `ItemScaffolder<TInput>` artifact emission.
+- typed named-token substitution, including a `@ts-expect-error` proof that missing tokens fail
+  type-check.
+- install command artifact writing through the shared emit path.
+- runner routing for mandatory `info`, resource `add`, and plugin-owned extra commands.
+- factory-created CLI and scaffold entrypoints.
+
+### Gates (raw)
+
+| gate | command | result |
+| --- | --- | --- |
+| check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin --ext ts,tsx` | `filesSelected:123`, `batches:2`, `failedBatches:0`, `totalOccurrences:0`, exit 0. |
+| lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin --ext ts,tsx` | `filesSelected:123`, `totalOccurrences:0`, `uniqueRules:0`, exit 0. |
+| fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin --ext ts,tsx` | `filesSelected:123`, `failedBatches:0`, `findings:0`, exit 0. |
+| test | `deno test --allow-all packages/plugin` | `ok | 33 passed | 0 failed`, exit 0. |
+| adapter doc lint | `deno run -A .llm/tools/run-deno-doc-lint.ts --root packages/plugin --entrypoints src/adapter/mod.ts --pretty` | `totalErrors:0`, `totalPrivateTypeRef:0`, `totalMissingJSDoc:0`, exit 0. |
+| package dry-run | `cd packages/plugin && deno publish --dry-run --allow-dirty --allow-slow-types` | `Success Dry run complete`, exit 0. Existing package-level `--allow-slow-types` carve-out warning and pre-existing SDK dynamic-import warning remain; adapter tests/fixtures are excluded from the file list. |
+
+### Gate drift recorded
+
+The requested workspace-level `deno task test --filter plugin` and `.llm/tools/run-publish-dry-run.ts`
+commands traverse `plugins/*`. Those connectors still import the deleted v1
+`@netscript/plugin/scaffold` export and are explicitly S2-S4 scope. S1 did not touch `plugins/*` or
+`packages/cli`; see `drift.md`.
