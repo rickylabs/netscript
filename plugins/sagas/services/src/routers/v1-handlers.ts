@@ -1,10 +1,12 @@
 import { withEventMeta } from '@orpc/server';
-import { sagasContractV1, type SagaSSEEvent } from '../../../contracts/v1/mod.ts';
+import type { PluginCapabilities } from '@netscript/plugin/contract-base';
+import type { SagaSSEEvent } from '@netscript/plugin-sagas-core/contracts/v1';
 import { getKv } from '@netscript/kv';
 import { notFound } from '@netscript/contracts';
 import { getTraceContext } from '@netscript/telemetry/context';
 import { getSagaMetadata, listSagaMetadata } from '../saga-registry.ts';
 import { SagasError } from '@netscript/plugin-sagas-core/domain';
+import { router, type SagasHandlers } from './router-context.ts';
 import {
   buildSagaInstanceWhere,
   getSagaDb,
@@ -23,10 +25,42 @@ import type {
   SagaServiceContext,
 } from './v1-types.ts';
 
-const router = sagasContractV1.$context<SagaServiceContext>();
+/**
+ * Capabilities document advertised by the running sagas service.
+ *
+ * Grounded in sagas ground truth: the published plugin package name, the served
+ * contract versions, the v1 contract route groups, and the plugin's advertised
+ * capability tags.
+ */
+const sagasCapabilities: PluginCapabilities = {
+  pluginName: '@netscript/plugin-sagas',
+  contractVersions: ['v1'],
+  routeGroups: ['sagas', 'instances', 'history', 'publish', 'subscribe'],
+  capabilities: [
+    'saga-orchestration',
+    'message-publishing',
+    'instance-tracking',
+    'sse-streaming',
+  ],
+};
 
-/** V1 saga contract handlers. */
-export const sagasV1: Record<string, unknown> = {
+/** Every v1 route key the sagas contract exposes (incl. the base `describe`). */
+type SagasV1RouteKey =
+  | 'describe'
+  | 'listSagas'
+  | 'getSaga'
+  | 'listInstances'
+  | 'getInstance'
+  | 'getInstanceHistory'
+  | 'publish'
+  | 'subscribe';
+
+/** V1 saga contract handlers, contract-bound and precisely typed per route. */
+export const sagasV1: SagasHandlers<SagasV1RouteKey> = {
+  /** Mandatory base seam `describe` route. */
+  describe: router.describe.handler(() => sagasCapabilities),
+
+
   /** List all registered saga definitions with optional filtering. */
   listSagas: router.listSagas.handler(async ({ input }) => {
     const { limit, offset, topic, enabled } = input;

@@ -7,7 +7,7 @@
  */
 
 import { z } from 'zod';
-import { baseContract } from '@netscript/contracts';
+import { type BaseContractProcedure, baseContract } from '@netscript/contracts';
 import { implement } from '@orpc/server';
 import { getKv } from '@netscript/kv';
 import { listSagaMetadata } from '../saga-registry.ts';
@@ -34,7 +34,11 @@ const HealthCheckResultSchema = z.object({
 // HEALTH CONTRACT
 // ============================================================================
 
-const healthContract = {
+const healthContract: {
+  live: BaseContractProcedure;
+  ready: BaseContractProcedure;
+  check: BaseContractProcedure;
+} = {
   /**
    * Liveness probe - is the process alive?
    * Fast and simple, fails only if process is deadlocked.
@@ -68,13 +72,30 @@ const healthContract = {
     .output(HealthCheckResultSchema),
 };
 
-const healthContractV1 = implement(healthContract);
+const healthContractV1: ReturnType<typeof implement<typeof healthContract>> = implement(
+  healthContract,
+);
+
+/**
+ * Precise handler-map type for the sagas health contract.
+ *
+ * Each value is exactly the `ImplementedProcedure` that
+ * `healthContractV1[K].handler(...)` returns. JSR `--isolatedDeclarations` cannot
+ * infer the type of an exported handler map built from `.handler(...)` call
+ * expressions, so this explicit (non-`readonly`, to stay assignable to oRPC's
+ * mutable `Router`) mapped type is the annotation — preserving per-route
+ * precision with no `any` / `Record<string, unknown>` erasure.
+ */
+type HealthHandlers<K extends keyof typeof healthContractV1> = {
+  [P in K]: (typeof healthContractV1)[P] extends { handler: (...args: never[]) => infer R } ? R
+    : never;
+};
 
 // ============================================================================
 // HEALTH HANDLERS
 // ============================================================================
 
-export const health: Record<string, unknown> = {
+export const health: HealthHandlers<'live' | 'ready' | 'check'> = {
   /**
    * Liveness probe - always returns OK if process is running
    */

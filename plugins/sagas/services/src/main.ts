@@ -18,7 +18,8 @@
 import '@netscript/kv/redis';
 
 import type { PluginServiceContext } from '@netscript/plugin/sdk';
-import { createService, type RunningService } from '@netscript/service';
+import type { RunningService } from '@netscript/service';
+import { createPluginService } from '@netscript/plugin/service';
 import type { SagaRuntime } from '@netscript/plugin-sagas-core/runtime';
 import { type SagaStreamPrismaClient, startSagasStreamMirror } from '../../streams/server.ts';
 import {
@@ -62,24 +63,17 @@ export default async function createSagasService(
   let sagaRuntime: SagaRuntime | undefined;
   let durableRuntime: DurableSagaRuntime | undefined;
 
-  const running = await createService(router, {
+  return await createPluginService(router, {
     name: 'sagas',
     version: '1.0.0',
     port,
-  })
-    .withCors()
-    .withLogger()
-    .withOpenAPI({
+    openApi: {
       title: 'Sagas API',
       description: 'Sagas service for workflow orchestration and management',
-    })
-    .withDocs()
-    .withDatabase(dbClient)
-    .withContext(() => ({ sagaRuntime }))
-    .withRPC({ traceContext: true })
-    .withHealth()
-    .withServiceInfo()
-    .onStartup(async () => {
+    },
+    database: { context: dbClient },
+    context: () => ({ sagaRuntime }),
+    onStartup: [async () => {
       const definitions = await registerSagas();
       const kv = await openSagaRuntimeKv();
       durableRuntime = await createDurableSagaRuntime({
@@ -105,20 +99,20 @@ export default async function createSagasService(
         });
 
       console.log(`[Sagas API] Running on http://localhost:${port}`);
-    })
-    .serve();
-
-  return Object.freeze({
-    ...running,
-    stop: async () => {
+    }],
+    // Graceful shutdown: stop the saga runtime, then dispose the durable
+    // runtime. This preserves the previous `stop()` wrapper's stop→dispose order
+    // (the previous code stopped the runtime in a `try` and disposed in
+    // `finally`); a single hook keeps that ordering deterministic rather than
+    // relying on reverse-order hook execution.
+    onShutdown: [async () => {
       try {
         await sagaRuntime?.stop('sagas-service-stop');
       } finally {
         await durableRuntime?.dispose();
-        await running.stop();
       }
-    },
-  });
+    }],
+  }).serve();
 }
 
 function serviceAppsettings(ctx: PluginServiceContext): SagaServiceContextSettings | undefined {

@@ -103,7 +103,7 @@ export function hasPrismaSagaInstanceClient(
 /** Build a provider-aware Prisma where clause for saga instance lists. */
 export function buildSagaInstanceWhere(
   sagaName: string | undefined,
-  status: SagaInstanceApiStatus | undefined,
+  status: SagaInstanceApiStatus | null | undefined,
 ): SagaInstanceWhereInput {
   const dbProvider = Deno.env.get('DB_PROVIDER') || 'mysql';
   const jsonPath = dbProvider === 'postgres' ? ['status'] : '$.status';
@@ -151,9 +151,16 @@ export function mapStateToInstance(
 
   return {
     sagaName,
+    // Decision-B identifiers: surfaced from durable-store metadata/state when
+    // present. They are optional on the contract, so undefined is conformant.
+    sagaId: metadata?.sagaId ?? (stateRecord.sagaId as string | undefined),
+    instanceId: state.id ?? (stateRecord.instanceId as string | undefined),
     correlationId,
+    correlationKey: (stateRecord.correlationKey as string | undefined) ?? correlationId,
     state: state as Record<string, unknown>,
-    status: isCompleted ? 'completed' : 'active',
+    // Non-completed instances normalize to the canonical `'running'` status
+    // (the contract vocabulary has no `'active'`).
+    status: isCompleted ? 'completed' : 'running',
     createdAt: toISOString(metadata?.createdAt ?? state.createdAt),
     updatedAt: toISOString(metadata?.updatedAt ?? state.updatedAt),
     completedAt: isCompleted ? toISOString(metadata?.updatedAt ?? state.updatedAt) : undefined,
@@ -190,6 +197,9 @@ export function mapSagaToResponse(saga: SagaMetadataView): SagaDefinitionRespons
     enabled: saga.enabled ?? true,
     entrypoint: '',
     tags: [] as string[],
+    // Decision-B: durability tier defaults to the contract's `'t1'` baseline
+    // until per-saga tier metadata is surfaced by the registry.
+    durabilityTier: 't1',
     timeout: undefined as { completionTimeout?: number } | undefined,
     retry: undefined as {
       maxAttempts?: number;

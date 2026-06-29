@@ -1,3 +1,8 @@
+import type {
+  SagaDurabilityTier,
+  SagaInstanceStatus,
+} from '@netscript/plugin-sagas-core/domain';
+
 /** Service context available to V1 saga route handlers. */
 export type SagaServiceContext = Readonly<{
   /** Database client provided by the plugin service host. */
@@ -102,15 +107,29 @@ export type SagaPublishMessageOutput = Readonly<{
   correlationId?: string;
 }>;
 
-/** Saga instance API status values. */
-export type SagaInstanceApiStatus = 'pending' | 'active' | 'completed' | 'failed' | 'compensating';
+/**
+ * Saga instance API status values.
+ *
+ * Aligned with the canonical contract vocabulary (`SAGA_INSTANCE_STATUSES` in
+ * `@netscript/plugin-sagas-core/domain`) so handler outputs conform UP to the
+ * published `SagaInstanceResponse` contract without loosening it. The previous
+ * connector-local `'active'` value was not a contract status; non-completed
+ * instances normalize to `'running'`.
+ */
+export type SagaInstanceApiStatus = SagaInstanceStatus;
 
 /** Saga instance response returned by V1 APIs. */
 export type SagaInstanceResponse = Readonly<{
   /** Saga definition name. */
   sagaName: string;
+  /** Optional saga definition identifier (Decision-B). */
+  sagaId?: string;
+  /** Optional durable instance identifier (Decision-B). */
+  instanceId?: string;
   /** Correlation identifier. */
   correlationId: string;
+  /** Optional saga correlation key (Decision-B). */
+  correlationKey?: string;
   /** Business state payload. */
   state: Record<string, unknown>;
   /** Normalized instance status. */
@@ -155,8 +174,10 @@ export type SagaDefinitionResponse = Readonly<{
   enabled: boolean;
   /** Optional source entrypoint. */
   entrypoint: string;
-  /** Tags used for discovery. */
-  tags: readonly string[];
+  /** Tags used for discovery (mutable to match the contract output schema). */
+  tags: string[];
+  /** Durability tier advertised for the saga definition (Decision-B). */
+  durabilityTier: SagaDurabilityTier;
   /** Optional timeout policy. */
   timeout?: { completionTimeout?: number };
   /** Optional retry policy. */
