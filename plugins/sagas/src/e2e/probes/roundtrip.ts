@@ -1,10 +1,8 @@
+import { assertSuccessfulProbe, joinProbeUrl, summarizeResponse } from '@netscript/plugin';
 import {
-  assertSuccessfulProbe,
   createSagasRoundtripPayload,
-  joinProbeUrl,
   resolveSagasProbeUrl,
   resolveSagasRoundtripPath,
-  summarizeResponse,
 } from './probe-context.ts';
 
 const response = await fetch(joinProbeUrl(resolveSagasProbeUrl(), resolveSagasRoundtripPath()), {

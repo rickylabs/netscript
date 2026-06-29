@@ -1,10 +1,5 @@
-import {
-  assertSuccessfulProbe,
-  joinProbeUrl,
-  resolveSagasHealthPath,
-  resolveSagasProbeUrl,
-  summarizeResponse,
-} from './probe-context.ts';
+import { assertSuccessfulProbe, joinProbeUrl, summarizeResponse } from '@netscript/plugin';
+import { resolveSagasHealthPath, resolveSagasProbeUrl } from './probe-context.ts';
 
 const response = await fetch(joinProbeUrl(resolveSagasProbeUrl(), resolveSagasHealthPath()), {
   signal: AbortSignal.timeout(5_000),

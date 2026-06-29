@@ -5,6 +5,15 @@ export type {
   InspectionReport,
 } from './inspect-plugin.ts';
 export { inspectWalkerOutput } from './inspect-walker-output.ts';
+export type { PluginE2eGate } from './e2e-gate.ts';
+export {
+  assertSuccessfulProbe,
+  joinProbeUrl,
+  normalizeProbePath,
+  resolveProbeUrl,
+  summarizeResponse,
+} from './probes.ts';
+export type { ProbeHttpResult, ResolveProbeUrlOptions } from './probes.ts';
 export { runPluginVerificationCli, verifyPlugin } from './verify-plugin.ts';
 export type {
   ExpectedAspire,
