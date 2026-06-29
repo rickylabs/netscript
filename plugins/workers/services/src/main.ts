@@ -17,7 +17,7 @@
 import '@netscript/kv/redis';
 
 import type { PluginServiceContext } from '@netscript/plugin/sdk';
-import { createService } from '@netscript/service';
+import { createPluginService } from '@netscript/plugin/service';
 import { router } from './router.ts';
 import { registerPluginJobs } from './init.ts';
 import { createStreamMutationHook } from '../../streams/server.ts';
@@ -45,32 +45,25 @@ export default async function createWorkersService(
   const dbClient = await ctx.db.getClient() as ServiceDatabaseClient;
   const runtime = await createWorkersServiceRuntime();
 
-  await createService(router, {
+  await createPluginService(router, {
     name: 'workers',
     version: '1.0.0',
     port,
-  })
-    .withCors()
-    .withLogger()
-    .withOpenAPI({
+    openApi: {
       title: 'Workers API',
       description: 'Workers service for job management and execution',
-    })
-    .withDocs()
-    .withDatabase(dbClient)
-    .withContext(() => ({ workers: runtime }))
-    .withRPC({ traceContext: true })
-    .withHealth()
-    .withServiceInfo()
-    .onStartup(async () => {
+    },
+    database: { context: dbClient },
+    context: () => ({ workers: runtime }),
+    onStartup: [async () => {
       await registerPluginJobs(runtime);
       runtime.executionState.setMutationHook(createStreamMutationHook());
 
       console.log(
         `Subscribe: http://localhost:${port}/api/v1/workers/subscribe (KV watch SSE)`,
       );
-    })
-    .serve();
+    }],
+  }).serve();
 }
 
 async function loadWorkersServiceContext(): Promise<PluginServiceContext> {

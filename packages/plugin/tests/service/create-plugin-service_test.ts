@@ -54,3 +54,24 @@ Deno.test('createPluginService serves health, service info, and the describe oRP
   assertEquals(describeBody.pluginName, '@netscript/plugin-sample');
   assertEquals(describeBody.contractVersions, ['v1']);
 });
+
+Deno.test('createPluginService runs onStartup hooks on serve()', async () => {
+  let started = false;
+
+  const running = await createPluginService(router, {
+    name: 'sample',
+    version: '9.9.9',
+    onStartup: [
+      async () => {
+        await Promise.resolve();
+        started = true;
+      },
+    ],
+  }).serve({ port: 0 });
+
+  try {
+    assertEquals(started, true);
+  } finally {
+    await running.stop();
+  }
+});

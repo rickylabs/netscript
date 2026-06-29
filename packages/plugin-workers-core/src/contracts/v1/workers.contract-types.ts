@@ -1,3 +1,5 @@
+import type { PluginCapabilities } from '@netscript/plugin/contract-base';
+
 /** Result returned by contract schema validation. */
 export type ContractSchemaResult<TOutput> =
   | { readonly success: true; readonly data: TOutput }
@@ -69,6 +71,7 @@ export type TaskTriggerOutput = Readonly<{ taskId: string; triggered: boolean }>
 
 /** Explicit public contract shape for worker service clients. */
 export type WorkersContract = Readonly<{
+  describe: ContractProcedureLike<void, PluginCapabilities>;
   listJobs: ContractProcedureLike;
   getJob: ContractProcedureLike;
   createJob: ContractProcedureLike;

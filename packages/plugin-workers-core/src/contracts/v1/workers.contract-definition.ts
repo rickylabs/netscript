@@ -1,6 +1,11 @@
 import { oc } from '@orpc/contract';
 import { eventIterator, implement } from '@orpc/server';
 import { z } from 'zod';
+import {
+  BASE_PLUGIN_CONTRACT_ROUTES,
+  BASE_PLUGIN_ERRORS,
+  type BasePluginContract,
+} from '@netscript/plugin/contract-base';
 import type { WorkersContract, WorkersContractV1 } from './workers.contract-types.ts';
 import {
   ExecutionFiltersZodSchema,
@@ -21,30 +26,31 @@ import {
   TaskTriggerInputZodSchema,
 } from './workers.contract-schemas.ts';
 
-const baseContractValue: ReturnType<typeof oc.errors> = oc.errors({
-  NOT_FOUND: {
-    status: 404,
-    message: 'Resource not found',
-    data: z.object({
-      resourceType: z.string(),
-      resourceId: z.union([z.string(), z.number()]),
-    }),
-  },
-  VALIDATION_ERROR: {
-    status: 422,
-    message: 'Validation failed',
-    data: z.object({
-      formErrors: z.array(z.string()),
-      fieldErrors: z.record(z.string(), z.array(z.string()).optional()),
-    }),
-  },
-});
+// Converge onto the shared plugin error vocabulary: NOT_FOUND, VALIDATION_ERROR,
+// and INTERNAL are reported with identical status codes, messages, and payload
+// shapes across every NetScript feature plugin. The base map types `data` as
+// `unknown`, so it crosses into the oRPC builder via the sanctioned centralized
+// contract boundary cast (the same pattern `BASE_PLUGIN_CONTRACT_ROUTES` uses).
+const baseContractValue: ReturnType<typeof oc.errors> = oc.errors(
+  { ...BASE_PLUGIN_ERRORS } as unknown as Parameters<typeof oc.errors>[0],
+);
 
 type BaseContract = typeof baseContractValue;
 const baseContract: BaseContract = baseContractValue;
 
 function createWorkersContractDefinitionInferred(): Parameters<typeof implement>[0] {
-  return {
+  // The contract object spreads the mandatory base seam `describe` route and the
+  // plugin-specific routes. `satisfies BasePluginContract` is the type-level
+  // guard that the seam's `describe` route is present and correctly typed; the
+  // oRPC `describe` value is phantom-typed by the seam, so handing the object to
+  // `implement()` crosses into the oRPC builder via the sanctioned centralized
+  // contract boundary cast (the same `as unknown as` pattern the seam and
+  // `workersContract` below already use).
+  const definition = {
+    // Mandatory base seam route: every feature plugin contract carries the typed
+    // `describe` route (GET /describe) returning a `PluginCapabilities` document.
+    ...BASE_PLUGIN_CONTRACT_ROUTES,
+
     listJobs: baseContract
       .route({ method: 'GET', path: '/jobs' })
       .input(OffsetPaginationQuerySchema.extend(JobFiltersZodSchema.shape))
@@ -232,7 +238,9 @@ function createWorkersContractDefinitionInferred(): Parameters<typeof implement>
           executionCount: nonNegativeInt('Number of recent executions'),
         })),
       })),
-  } satisfies Parameters<typeof implement>[0];
+  } satisfies BasePluginContract;
+
+  return definition as unknown as Parameters<typeof implement>[0];
 }
 
 type WorkersContractDefinition = ReturnType<typeof createWorkersContractDefinitionInferred>;

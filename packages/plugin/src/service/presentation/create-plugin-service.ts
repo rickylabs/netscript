@@ -62,14 +62,19 @@ export interface PluginServiceConfig extends ServiceConfig {
   readonly docs?: { specUrl?: string };
   /** Health checks applied via `withHealth({ checks })`. */
   readonly healthChecks?: readonly HealthCheck[];
+  /** Async startup hooks applied via `onStartup()`, run in order before the server starts. */
+  readonly onStartup?: readonly (() => Promise<void>)[];
+  /** Async shutdown hooks applied via `onShutdown()`, run in reverse order during graceful shutdown. */
+  readonly onShutdown?: readonly (() => Promise<void>)[];
 }
 
 /**
  * Builds a plugin service builder with the mandated chain pre-applied.
  *
  * The chain order is fixed: cors → logger → openapi → docs → database →
- * use(middleware) → context → withRPC → withHealth → withServiceInfo. The caller
- * receives a ready {@link ServiceBuilder} and only calls `.serve()`.
+ * use(middleware) → context → withRPC → withHealth → withServiceInfo →
+ * onStartup(hooks) → onShutdown(hooks). The caller receives a ready
+ * {@link ServiceBuilder} and only calls `.serve()`.
  *
  * @typeParam TRouter - The oRPC router type served by the plugin.
  * @param router - The oRPC router to serve.
@@ -129,6 +134,14 @@ export function createPluginService<TRouter extends ServiceRouter>(
   );
 
   builder = builder.withServiceInfo();
+
+  for (const hook of config.onStartup ?? []) {
+    builder = builder.onStartup(hook);
+  }
+
+  for (const hook of config.onShutdown ?? []) {
+    builder = builder.onShutdown(hook);
+  }
 
   return builder;
 }
