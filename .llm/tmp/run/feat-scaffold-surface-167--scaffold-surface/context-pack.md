@@ -32,10 +32,16 @@ config wiring + `copyPluginSchemasToRootDb` kept; only `renderPlugin()` full-sou
 
 1. Commit the harness artifacts (research/plan/context-pack/commits) to the branch.
 2. Dispatch PLAN-EVAL (OpenHands minimax-M3, separate session) on research.md + plan.md — hard gate.
-3. On PASS: implement slices S1→S7 via WSL Codex daemon-attached, gated, one commit each, pushed +
+3. On PASS: implement slices S1→S9 via WSL Codex daemon-attached, gated, one commit each, pushed +
    PR-commented per slice. S1 = core adapter contract (see plan.md §A for the exact API surface).
 4. S6 = record plugin-thinness/core-centralization LAW + adapter-contract pattern as doctrine (#158).
-5. S7 = full verify matrix + dead-code sweep + adversarial review + IMPL-EVAL (qwen3.7-max) → merge.
+5. S8 = `plugin verify` author doctor (deno doc --lint + publish --dry-run + manifest + arch:check +
+   contract-completeness → one report); S9 = `plugin new` starter generator (dogfoods the item
+   generator; emits a skeleton that passes `plugin verify` + publish dry-run). Marketplace author side.
+6. S7 = full verify matrix + dead-code sweep + adversarial review + IMPL-EVAL (qwen3.7-max) → merge.
+
+DoD bar (every slice): skill-first+harness · Deno-native first (@std/Deno/native toolchain, wrap not
+reinvent) · JSR-ready (jsr-audit green) · doctrine+fitness = actual merge gates · zero dead/dup code.
 
 ## Key files
 

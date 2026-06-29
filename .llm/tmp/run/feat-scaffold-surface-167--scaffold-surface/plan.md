@@ -173,8 +173,61 @@ not line-array `join`). `install` calls each starter resource's `emit(defaultInp
   Adversarial Claude review of the built artifact; fix every caveat. Update `context-pack.md` + PR
   #172 body. Then ready-for-merge.
 
-Order: S0 → S1 → S2 → S3 → S4 → S5; S6 anytime after S1; S7 last. No `deno.lock` churn committed; no
-new casts beyond the 2 sanctioned; no `any`; explicit-path staging only; no force-push.
+### Maintainer-facing tooling (user, 2026-06-29) — the marketplace AUTHOR side
+
+The same contract that lets core own the shape also lets us give third-party plugin authors a
+`create-vite`-grade on-ramp and a `deno publish --dry-run`-grade verifier. Both reinforce "core owns
+the shape": the generator emits the conforming shape; the verifier proves conformance. Both are
+ARCHETYPE-6 CLI surfaces built on the SAME core machinery (dogfooding — no new third mechanism).
+
+- **`netscript plugin verify [path]` — author-grade plugin doctor (the "exactly what's wrong"
+  report).** Distinct from the consumer-facing `doctor` (which health-checks an *installed* plugin in
+  a user's project). `verify` is what a plugin AUTHOR runs on their own package. It composes existing
+  Deno-native + repo tools into ONE structured pass/fail report — reusing, never re-implementing:
+  `deno doc --lint` (slow types / doc coverage, via `.llm/tools/run-deno-doc-lint.ts`),
+  `deno publish --dry-run` (tarball + file list, via `.llm/tools/run-publish-dry-run.ts`),
+  `parsePluginManifest` + the `scaffold.plugin.json` JSON Schema (manifest integrity),
+  `check-doctrine.ts` (archetype-5 fitness), and a NEW **adapter-contract completeness check**
+  (every mandatory seam present + well-typed, resources well-formed, no plugin TS source reachable in
+  the emit set). Output mirrors `jsr-audit`'s report template + a per-check remediation line, so the
+  author "KNOWS EXACTLY WHAT IS WRONG." JSR-ready, `@std`/Deno-native, no bespoke linters.
+
+- **`netscript plugin new <name>` — conforming starter-shape generator (the author on-ramp).** Emits
+  a new plugin package skeleton that already satisfies the adapter contract: the `NetScriptPlugin`
+  object (`src/adapter/plugin.ts`) with one sample resource + ItemScaffolder on a type-checked stub,
+  `cli.ts`/`scaffold.ts` (~3 LOC each), a valid `scaffold.plugin.json`, `deno.json` (exports +
+  publish include/exclude + JSR metadata), a `database/*.prisma` stub, README, and `@module` docs —
+  i.e. a package that passes `plugin verify` on creation. Built on the SAME core item generator and
+  typed-emit machinery as install/`add <resource>` (the framework scaffolds plugins the same typesafe
+  way plugins scaffold userland). This is the marketplace author on-ramp under #167/#157.
+
+- **S8 — `plugin verify` author doctor.** Build the composed verifier (core report model in
+  `@netscript/plugin/adapter` + `@netscript/cli` presentation command) reusing the Deno-native + repo
+  gate tools above + the new contract-completeness check. Gates: scoped check/lint/fmt; test (verify
+  a known-good plugin PASSES and a seeded-broken fixture reports each defect); doc-lint; publish
+  dry-run. Self-test: run `plugin verify` over all 5 first-party plugins → all green.
+- **S9 — `plugin new` generator.** Build the starter-shape generator on the unified item generator;
+  emit a conforming skeleton. Gates: scoped check/lint/fmt; test; **e2e: generated skeleton passes
+  `plugin verify` + `deno publish --dry-run` with zero edits** (closes the author loop).
+
+Order: S0(folded) → S1 → S2 → S3 → S4 → S5; S6 anytime after S1; S8 after S1+S4; S9 after S1+S8; S7
+last (verify includes S8/S9 in the matrix). No `deno.lock` churn committed; no new casts beyond the 2
+sanctioned; no `any`; explicit-path staging only; no force-push.
+
+### Definition of done (user-owned bar; every slice honors these)
+
+- **Skill-first + harness:** every implementation agent begins `use harness` + activates the matching
+  skills (`netscript-harness`, `netscript-doctrine`, `jsr-audit`, `netscript-tools`,
+  `netscript-deno-toolchain`, `netscript-cli`, `netscript-pr`).
+- **Deno-native first:** reach for `@std/*`, `Deno.*`, Web Platform, and the native toolchain
+  (`deno doc`, `deno publish`, `deno check/lint/fmt`) before any local abstraction (Rule #3 wrap,
+  don't reinvent). No hand-rolled linters/printers where a Deno-native path exists.
+- **JSR-ready:** every produced package/export passes `jsr-audit` — explicit return types (no slow
+  types), `@module` + symbol JSDoc with `@example`, clean publish file list, `publish:dry-run` green.
+- **Doctrine + fitness as ACTUAL gates:** `arch:check` (extended over `packages/plugin` + 5 plugins)
+  and `plugins:check` are merge-blocking, not advisory.
+- **Zero dead/duplicate code:** the three old mechanisms + three forked item bases + `.template`
+  files + v1 `src/scaffold/*` are deleted, not stranded; a dead-code sweep (S7) proves it.
 
 ## Open confirmations folded in (already locked by user 2026-06-29)
 
