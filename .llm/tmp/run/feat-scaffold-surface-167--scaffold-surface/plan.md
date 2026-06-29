@@ -1,96 +1,185 @@
-# Plan — Scaffold Surface Re-Architecture (#157)
+# Plan v2 — Plugin Adapter Unification (#157, full unification)
 
-Archetype: `@netscript/plugin` = ARCHETYPE-2/3 (the `./scaffold` export is library/runtime); plugins
-= ARCHETYPE-5; CLI = ARCHETYPE-6. Overlays: none (framework source). Lane: Claude sub-agents, gated.
-See `research.md` for grounding + locked decisions (D-*).
+> Supersedes plan v1 (thin-scaffold-only). User locked **full unification** on 2026-06-29:
+> one core-owned plugin **command contract** (Vite-plugin-style composition, NOT cross-package
+> inheritance), shared mandatory-command logic in core, the per-plugin connector supplies **seams**.
+> Archetypes: `@netscript/plugin` = ARCHETYPE-2/3 (contract + runtime); `@netscript/cli` =
+> ARCHETYPE-6; plugins = ARCHETYPE-5. Lane: Claude sub-agents, **gates are the verification**
+> (D-LANE, user-set). See `research.md` §"RE-ARCHITECTURE v2" for grounding + locked decisions.
+
+## The thesis (user, 2026-06-29, verbatim intent)
+
+- **Core is never aware of any specific plugin.** Plugins use core; core never imports a plugin.
+- The plugin package is the **"NetScript adapter" / connector**: it plugs plugin-core's
+  implementation into the NetScript ecosystem (services, setup, scaffold, commands).
+- The adapter gets its command behavior by consuming a **base contract from core + seams** — modeled
+  on **Vite's plugin architecture** (core owns the pipeline and calls well-known hooks; a plugin is a
+  typed contract object), made **more restrictive** than Vite (single-target → strong defaults).
+- **MANDATORY commands** (every plugin has them; logic is similar → lives in core, parameterized by
+  plugin-supplied inputs): `install`, `doctor`, `info`, `update`, `remove`.
+- **OPTIONAL commands** (per-plugin specifics; core defines the contract/shape like an oRPC contract,
+  plugin implements): `add <resource>`, `generate <resource>`, plus any plugin verbs
+  (`list`/`run`/`logs`/`inspect`/`enable`/`disable`…).
+- **`@netscript/plugin` + `@netscript/cli` own the logic and rule the shapes/output.** Plugins are
+  thin connectors.
+
+## What already exists (build on it, do not reinvent)
+
+- `packages/cli/.../dispatch-plugin-verb.ts`: `FRAMEWORK_VERBS =
+  ['add','remove','enable','disable','sync','setup','update','doctor','info']`;
+  `dispatchPluginVerb` runs `deno x -A jsr:<pkg>/cli <verb> …`. → core already owns a verb taxonomy +
+  dispatch. We rename `add→install`, canonicalize the mandatory set, and route resources through it.
+- `packages/cli/.../add/add-plugin.ts`: host-side install orchestration — config wiring
+  (`updateAppsettings`, `ensureNetScriptConfigPlugin`, `ensureRootImportsForPluginKind`,
+  `ensureSharedCache`, `ensureWorkspaceMember`, `regenerateAspireHelpers`, service-context) +
+  `copyPluginSchemasToRootDb`. **KEEP** (plugin-agnostic, correct). The `renderPlugin()` full-source
+  branch is the disease → **DELETE**.
+- `packages/plugin/src/cli/*`: `PluginCli` (has a forbidden orchestrating `run()` — A4 violation to
+  fix), `PluginItemScaffolder`, `DoctorReport`/`isDoctorReportPassing`, `PluginRuntimeConfigCli`,
+  `mountPluginCli`, `routeVerb`. → the **bones** of the contract; unify + fix.
+- `scaffold.plugin.json` provider block already carries static seams (kind, portRangeKey,
+  requiresDb/Kv, defaultEntrypoint, permissions…). → the host-readable face of the contract.
+- Per-plugin `src/scaffolding/` (workers 7 / sagas 2 / triggers 3 scaffolders; streams/auth none) +
+  `src/cli/*-cli-backend.ts` + my branch `src/scaffold/stubs/*`. → THREE forked item-generators to
+  collapse into ONE.
 
 ## Target shape
 
-`@netscript/plugin/scaffold` (new export, composition — NO abstract base):
+### A. Core contract — `@netscript/plugin/adapter` (new export; consolidates `/cli`, `/scaffold`, `/protocol/scaffolder`)
+
+A plugin is a **typed contract object** (Vite-plugin shape), returned by a factory. Core owns every
+command's logic; the plugin supplies seams + optional resource handlers. No `plugins/*` class
+`extends` anything from core (doctrine 03 L162-175). Strong single-target defaults baked in.
+
+```ts
+/** The NetScript plugin adapter contract. Core consumes this; it never imports the plugin. */
+export interface NetScriptPlugin {
+  readonly name: string;        // "@netscript/plugin-workers"
+  readonly kind: string;        // "workers"
+  readonly displayName: string;
+
+  /** Seams the MANDATORY commands consume. Core owns the algorithms. */
+  readonly install: InstallSpec; // depSpecifier, starterResources[], configParams, prismaContract?, wiringEntry
+  readonly doctor?: DoctorSpec;  // healthEndpoint (sensible default), requiredConfigKeys, extraChecks?
+  readonly info?: InfoSpec;      // capabilities, versionSource (defaults to manifest)
+  // update/remove use install's seams + core defaults; override only if a plugin needs to.
+  readonly update?: UpdateSpec;
+  readonly remove?: RemoveSpec;
+
+  /** OPTIONAL resource commands. Contract-shaped; plugin implements. */
+  readonly resources?: readonly PluginResource[]; // {name:"job", scaffolder, list?, describe?}
+  readonly commands?: readonly PluginCommandSpec[]; // extra plugin verbs (run/logs/…)
+}
+```
+
+Core spine (stub-only, A4-clean) + layer-2 (R-BASE-L2, doctrine-sanctioned for shared bodies) +
+factory + runner:
 
 ```
-packages/plugin/src/scaffold/
-  artifact.ts          # ScaffoldArtifact value type (typed file descriptor)
-  code-model.ts        # typed code IR (imports/exports/decls) + deterministic printer
-  manifest-spec.ts     # PluginScaffoldManifestSpec + buildScaffoldPluginJson(spec, version)
-  schema-url.ts        # scaffoldSchemaUrl(version)
-  options.ts           # readScaffoldPluginName(context|options) — centralized name parse/validate
-  scaffold.ts          # createPluginScaffold(spec): composition factory (holds FileSystemPort,
-                       #   builds artifacts via injected buildArtifacts, writes via the port)
-  cli.ts               # runScaffoldCli + parseScaffolderContextArgs (--context-json contract)
-  mod.ts               # @module + @example barrel; re-exports the public surface
+packages/plugin/src/adapter/
+  contract.ts        # NetScriptPlugin + *Spec seam interfaces + PluginResource + PluginCommandSpec
+  item/
+    item-scaffolder.ts   # ONE item-generator contract: ItemScaffolder<TInput> { name; emit(input): ScaffoldArtifact[] }
+    artifact.ts          # typed file descriptor (path + typed body source)
+    substitute.ts        # typed identifier-substitution over a type-checked stub source (named tokens)
+  commands/          # core-owned MANDATORY command logic (layer-2 shared bodies + free fns)
+    install.ts       # the install algorithm: emits userland glue via item scaffolders + returns ScaffoldResult
+    doctor.ts        # health-check algorithm → DoctorReport (uses healthEndpoint default)
+    info.ts  update.ts  remove.ts
+  runner/
+    plugin-cli-runner.ts # routes a verb → mandatory command logic OR plugin resource/command handler
+                         #   (replaces PluginCli.run() orchestration; spine stays stub-only)
+  factory.ts         # createPluginAdapter(plugin): { toCli(): PluginCliEntrypoint; toScaffold(): PluginScaffoldEntrypoint }
+  defaults.ts        # strong single-target defaults (Vite-style conventions, restrictive)
+  mod.ts             # @module + @example; public surface barrel
 ```
-Reuse `protocol/{scaffolder,manifest}.ts` + `ports/file-system-port.ts` as-is. The new surface owns
-NO casing module (import `@std/text` directly — Rule #3). Add `"./scaffold"` to
-`packages/plugin/deno.json` exports.
 
-Each plugin (`plugins/<kind>/src/scaffold/`):
+Reuse `protocol/{scaffolder,manifest}.ts` + `ports/file-system-port.ts`. Add `"./adapter"` to
+`packages/plugin/deno.json` exports. Fix `PluginCli.run()` by moving dispatch to `plugin-cli-runner`.
+
+### B. Core CLI — `@netscript/cli` (owns host-side orchestration + the verb taxonomy)
+
+- Canonical mandatory verbs: `install` (rename of `add`), `doctor`, `info`, `update`, `remove`
+  (+ keep `enable`/`disable`/`sync`/`setup` as today). Update `FRAMEWORK_VERBS` + the `netscript
+  plugin <verb> <kind>` surface; per-kind resource verbs route as `netscript <kind> <verb>
+  <resource>`.
+- KEEP all host-side config wiring + `copyPluginSchemasToRootDb`.
+- DELETE the `renderPlugin()` full-source branch in `add-plugin.ts`; install always uses the thin
+  path (plugin subprocess emits userland glue via the unified item generator).
+- Dispatch unchanged in mechanism (`deno x jsr:<pkg>/cli <verb>`); `install` stops being a
+  special-cased `./scaffold` and becomes the `install` verb against the same contract.
+
+### C. Per-plugin connector — `plugins/<kind>/` (thin; supplies seams, owns sample/resource source)
+
 ```
-  spec.ts              # data only (kind, displayName, ports, sample-stub manifest, dep specifier)
-  stubs/*.ts           # REAL type-checked user-owned sample sources (job/task/saga/trigger)
-  scaffolder.ts        # buildArtifacts(ctx): returns ONLY userland artifacts:
-                       #   1) wiring entrypoint/barrel importing jsr:@netscript/plugin-<kind> + core
-                       #   2) the sample stubs (typed identifier-substitution, not String.replace)
-  mod.ts               # ~5-10 LOC: createPluginScaffold(spec) -> toEntrypoint + runScaffoldCli
+plugins/<kind>/
+  src/adapter/
+    plugin.ts        # the NetScriptPlugin object: kind, install/doctor/info seams, resources[]
+    resources/<r>/   # ONE scaffolder per resource (job/task/saga/trigger/…):
+      <r>.ts         #   ItemScaffolder built on a type-checked stub source-of-truth
+      <r>.stub.ts    #   REAL, type-checked sample source (gated by the plugin's own check/lint)
+  cli.ts             # export default createPluginAdapter(plugin).toCli()      (~3 LOC)
+  scaffold.ts        # export default createPluginAdapter(plugin).toScaffold()  (~3 LOC)
 ```
-DELETE: `artifacts.ts` `generate{ServiceMain,Router,Contracts,ServiceInit,CombinedEntrypoint,
-DatabaseSchema,Mod,...}` + `files.ts`/`writePlannedFiles` + auth `templates/**` + local
-`ScaffolderContext`/`ScaffoldResult` re-declarations (import from `@netscript/plugin/protocol`).
 
-CLI (`packages/cli`): KEEP all config wiring (appsettings, netscript.config, deno.json imports,
-register-plugins, service-context) + `copyPluginSchemasToRootDb`. REMOVE the `renderPlugin()`
-full-source branch so first-party uses the same thin path as JSR. `dispatchPluginScaffold` invokes
-the thinned plugin scaffolder unchanged (same `--context-json` contract).
+DELETE per plugin: `src/scaffolding/` (string `generate()` + `.template` + forked `*ItemScaffolder`
+bases), `src/cli/*-cli-backend.ts` glue that re-implements item writing, my branch `src/scaffold/
+{spec,scaffolder,stubs,mod}.ts`, `artifacts.ts` source factories, auth `templates/**`. The ONE
+scaffolder per resource is reused by BOTH `install` (starter set) and `add <resource>` (user id).
+streams/auth (no resources today) declare `resources: []` and only emit a wiring barrel.
 
-## Userland surface emitted by `plugin add <kind>` (the corrected, complete list)
+### D. The ONE item generator (kills the THREE mechanisms)
 
-1. **CLI config edits** (unchanged, correct): appsettings.json entry; `netscript.config.ts`
-   `plugins[]` specifier; `deno.json` imports (`jsr:@netscript/plugin-<kind>`) + workspace; Aspire
-   `register-plugins.mts`; `services/_shared/plugin-service-context.ts`; shared cache if required.
-2. **Plugin prisma** (unchanged, correct): copied from the dep tarball into
-   `database/<engine>/schema/plugins/<kind>/`.
-3. **Thin plugin-owned glue** (NEW, typesafe): a wiring entrypoint/barrel at the userland `<kind>/`
-   root importing the dep + core, plus 1–3 user-owned sample stubs. NO plugin TS source.
+`ItemScaffolder<TInput> { readonly name; emit(input): readonly ScaffoldArtifact[] }`. Body =
+type-checked stub source-of-truth + typed identifier-substitution (named tokens, not `String.replace`,
+not line-array `join`). `install` calls each starter resource's `emit(defaultInput)`; `add
+<resource> <id>` calls `emit({id})`. Same code path → zero duplication.
 
-NEVER emitted any more: `plugins/<name>/{mod.ts,deno.json,services/**,contracts/**,src/runtime/**,
-src/aspire/**,bin/**,streams/**}` — all resolved from `jsr:@netscript/plugin-<kind>`.
+## Slices (one commit each, gated green before the next; no PR re-open until S7)
 
-## Slices (one commit each; gate + push are per-slice but no PR until S5 — fresh branch)
+- **S0 — folded into S1 (forward-only reconcile).** The branch is pushed (PR #172) → **no
+  force-push**; reconcile is forward commits only. The v1 deletions (artifacts.ts source factories,
+  auth `templates/**`, `renderPlugin()` full-source copy) are correct and STAY deleted. The wrong v1
+  replacement (`src/scaffold/{spec,scaffolder,stubs,mod}.ts` + `createPluginScaffold`) is deleted and
+  superseded by `src/adapter/*` IN S1 — the reshape is the reconcile. No separate baseline commit.
+- **S1 — core contract + item generator.** Build `packages/plugin/src/adapter/*`: `NetScriptPlugin`
+  + seam interfaces, the ONE `ItemScaffolder` + artifact + typed substitution, the mandatory command
+  logic (`install/doctor/info/update/remove`), `plugin-cli-runner` (fixes `PluginCli.run()` A4
+  violation), `createPluginAdapter`, strong `defaults.ts`, `./adapter` export, full JSDoc +
+  `@module`/`@example`. Gates: scoped check/lint/fmt `packages/plugin`; `deno task test`; doc-lint
+  over the FULL `./adapter` export set; `deno publish --dry-run @netscript/plugin`.
+- **S2 — workers connector (reference).** Rewrite to `src/adapter/plugin.ts` + `resources/{job,task}`
+  ItemScaffolders on type-checked stubs; `cli.ts`/`scaffold.ts` 3-LOC; delete `scaffolding/` +
+  `cli/*-cli-backend.ts` + my `scaffold/*` + `artifacts.ts`. Prove `add job <id>` and the install
+  starter set come from the SAME scaffolder. Gates: scoped check/lint/fmt; test; publish dry-run;
+  manifest byte-identity.
+- **S3 — sagas / triggers / streams / auth connectors.** Same shape; streams/auth = `resources:[]` +
+  wiring barrel only. Per-plugin gates as S2.
+- **S4 — CLI unification.** Rename `add→install`, canonical mandatory verbs, per-kind resource
+  routing, delete `renderPlugin()` full-source branch, keep config wiring + prisma copy, point
+  install at the `install` verb/contract. Gates: scoped check/lint/fmt `packages/cli`; test.
+- **S5 — gates as gates.** Extend `arch:check` (`check-doctrine.ts`) over `packages/plugin` + all 5
+  plugins; wire `jsr-audit`/doc-lint + `plugins:check` into the merge matrix; ADD negative e2e (no
+  plugin TS source — `services/`,`contracts/`,`src/runtime/`,`src/aspire/`,`bin/` — in userland) +
+  a positive e2e (install starter set + `add <resource>` produce identical-shape source from one
+  scaffolder). Gates: `deno task arch:check` green; e2e assertions pass.
+- **S6 — doctrine (#158).** Record the plugin-thinness / core-centralization LAW + the
+  adapter-contract pattern (Vite-style composition, no cross-package inheritance, strong defaults) as
+  an append-only doctrine entry; record any waivers (e.g. plugin-core base-class location) in
+  `arch-debt.md`.
+- **S7 — verify + sweep + promote.** Full merge-readiness matrix: `arch:check`, `plugins:check`,
+  scoped check/lint/fmt over `packages/plugin`+`plugins`+`packages/cli`, `test`, doc-lint,
+  `publish:dry-run` ×6, `e2e:cli run scaffold.runtime --cleanup --format pretty`. Dead-code sweep.
+  Adversarial Claude review of the built artifact; fix every caveat. Update `context-pack.md` + PR
+  #172 body. Then ready-for-merge.
 
-- **S1 core surface** — build `packages/plugin/src/scaffold/*` per Target shape. Typed code model +
-  factory + cli runner + typed manifest builder + name helper + barrel + `./scaffold` export. Every
-  public symbol JSDoc'd; `@module`+`@example` on barrel.
-  Gates: `run-deno-{check,lint,fmt}.ts --root packages/plugin --ext ts,tsx`; `deno task test`;
-  `run-deno-doc-lint.ts` over the FULL `./scaffold` export set; `deno publish --dry-run`
-  `@netscript/plugin`.
-- **S2 thin plugins (×5: workers, streams, sagas, triggers, auth)** — rewrite each `scaffolder.ts`/
-  `mod.ts`/`spec.ts`, add `stubs/*.ts`, delete all DEP-INTERNAL generators + auth templates. Prove
-  `scaffold.plugin.json` byte-identity (typed `buildScaffoldPluginJson` equality test per plugin).
-  Gates per plugin: scoped check/lint/fmt `--ext ts,tsx`; test; `deno publish --dry-run`;
-  `deno task plugins:check` (manifests byte-unchanged).
-- **S3 CLI no-copy** — delete `renderPlugin()` full-source branch + any now-dead CLI plugin
-  source-copy templates (`kernel/templates/plugins/generate-plugin-*`, `kernel/assets/.../
-  generate-plugin-*.ts.template`, maintainer `official-plugin-source.ts` copier where it copies TS
-  source); confirm config wiring + prisma copy intact. Drop `plugins/*` workspace-member add iff no
-  source lands there.
-  Gates: scoped check/lint/fmt on `packages/cli`; test.
-- **S4 gates-as-gates** — extend `arch:check` to run `check-doctrine.ts` over `packages/plugin` +
-  all 5 plugins; add a negative e2e assertion (scaffolded userland contains NO plugin TS source:
-  `services/`, `contracts/`, `src/runtime/`, `src/aspire/`, `bin/`); ensure doc-lint + plugins:check
-  are in the merge matrix.
-  Gates: `deno task arch:check` green; targeted e2e assertion compiles/passes.
-- **S5 verify + sweep** — full merge-readiness matrix: `arch:check`, `plugins:check`, scoped
-  check/lint/fmt on `packages/plugin`+`plugins`+`packages/cli`, `test`, doc-lint over `./scaffold`,
-  `publish:dry-run` for `@netscript/plugin` + 5 plugins, `e2e:cli run scaffold.runtime --cleanup
-  --format pretty`. Dead-code sweep (orphaned scaffold files/exports/imports). Record root-schema
-  typed-builder as arch-debt (deferred, justified). Update `context-pack.md`.
+Order: S0 → S1 → S2 → S3 → S4 → S5; S6 anytime after S1; S7 last. No `deno.lock` churn committed; no
+new casts beyond the 2 sanctioned; no `any`; explicit-path staging only; no force-push.
 
-Order: S1 → S2 → S3; S4 after S2; S5 last. No `deno.lock` churn committed; no new casts beyond the 2
-sanctioned; no `any`; stage explicit paths only; no force-push.
+## Open confirmations folded in (already locked by user 2026-06-29)
 
-## Open item the implementing agent confirms before S2 (cheap read, not a blocker)
-
-Exact userland location + barrel shape for sample stubs in the no-copy model — confirm against the
-live CLI render path (`add-plugin.ts`, `render-plugin.ts`, `dispatch-plugin-verb.ts`) + Agent A's
-root-barrel finding (`workers/mod.ts` etc. at root). Default per D-EMIT: root `<kind>/` userland dir
-+ root barrel. Record the confirmed layout in `worklog.md`.
+- Mandatory set = install/doctor/info/**update/remove** (full lifecycle). ✓
+- Full rename + namespacing (`plugin install <kind>`, `<kind> add <resource>`, `<kind> generate
+  <resource>`). Breaking CLI surface — acceptable pre-1.0. ✓
+- Extension = contract + composition + seams (Vite model), core packages own the logic/rules,
+  strong single-target defaults; NO cross-package `extends`. ✓

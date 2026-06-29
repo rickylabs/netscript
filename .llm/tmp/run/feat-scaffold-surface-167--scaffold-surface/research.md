@@ -120,3 +120,74 @@ is part of the disease → DELETE (schema comes from the dep tarball, not re-str
   `buildScaffoldPluginJson` + equality test).
 
 See `plan.md` for the slice decomposition + gates.
+
+## RE-ARCHITECTURE v2 — full unification (user-locked 2026-06-29)
+
+v1 (above) fixed only the no-copy emit. The user escalated to **full unification**: the v1 thin
+scaffold is correct but is still only ONE of THREE overlapping mechanisms. Unify the entire
+`netscript plugin <verb> <kind>` surface around ONE core-owned command contract.
+
+### The duplication to kill (mapped via 3 read-only Explore agents + doctrine reads)
+
+1. CLI-owned `PluginScaffolder` → `kernel/templates/plugins/generate-plugin-*` → `renderPlugin()`
+   emits FULL plugin source for first-party (the disease).
+2. v1's `src/scaffold/buildArtifacts` + hand-written `stubs/` (the wrong third copy I added).
+3. `src/scaffolding/` + `<kind> add-job` verb → real item generator on STRING concatenation
+   (`[...].join('\n')`) + dead `.template` files (e.g. `job-handler.ts.template` mustache parallel
+   to `generate()`).
+
+Plus THREE forked, base-less item-scaffolder contracts: core `PluginItemScaffolder<TInput>`,
+`WorkersItemScaffolder` (in plugin-workers-core), inline `SagasItemScaffolder`, bare
+`TriggerDefinitionScaffolder` interface. → collapse to ONE `ItemScaffolder<TInput>`.
+
+### Decisive existing surface (the bones to unify, not replace)
+
+- `packages/cli/.../dispatch-plugin-verb.ts`: `FRAMEWORK_VERBS =
+  ['add','remove','enable','disable','sync','setup','update','doctor','info']` ALREADY exists —
+  core already owns a mandatory-verb taxonomy + `deno x -A jsr:<pkg>/cli <verb>` dispatch. The
+  unification renames `add→install`, canonicalizes the mandatory set, and routes resource verbs
+  through the same contract.
+- `add-plugin.ts` host-side config wiring + `copyPluginSchemasToRootDb` are correct → KEEP; only the
+  `renderPlugin()` full-source branch is deleted.
+
+### Vite grounding (user's anchor — WebFetch confirmed)
+
+Vite plugin = a plain typed **contract object** (NOT inheritance), authored as a **factory** that
+returns the object (`name` required + `enforce`/`apply` + hooks). Core owns the pipeline and calls
+hooks sequentially (pull-based); plugins never invoke each other or extend a base class.
+Conventions = strong defaults. NetScript adopts this and adds MORE restriction (single-target →
+stronger defaults). This is exactly the doctrine-sanctioned shape (contract + composition + typed
+seams), and it sidesteps the doctrine-03 cross-package-inheritance ban (L162-175).
+
+### Doctrine reconciliation (decisive)
+
+- Doctrine 03 L162-175: **cross-package implementation inheritance FORBIDDEN** (Bloch 18) — a
+  `plugins/*` adapter literally `extends`-ing a base from `@netscript/plugin` is doctrine-ILLEGAL.
+  Extension across packages = interfaces + registration, not inheritance. → the user's "extend a
+  base class" intent is realized as **contract + composition + seams** (the user confirmed: "option
+  1 but in the spirit of option 2", anchored on Vite).
+- Doctrine 03 ALSO ENABLES the shared mandatory-command logic: layer-2 abstracts (R-BASE-L2) MAY
+  carry concrete shared bodies when ≥2 concretes exist and they don't orchestrate the lifecycle
+  (doctrine's own `ScaffoldCommand extends CliCommand` example) — but this lives WITHIN
+  `@netscript/plugin`, consumed by the plugin via composition, not subclassed across the package
+  boundary.
+- A4: the existing `PluginCli.run()` orchestration VIOLATES "spine stub-only" → move dispatch to a
+  `plugin-cli-runner`.
+
+### Locked decisions v2 (supersede D-SHAPE / D-EMIT framing; D-LANE / D-NOCOPY / D-CONFIG-KEEP /
+### D-PRISMA / D-BYTE still hold)
+
+- **D-UNIFY:** ONE core-owned command contract `@netscript/plugin/adapter` (consolidates `/cli`,
+  `/scaffold`, `/protocol/scaffolder`); plugins supply a typed `NetScriptPlugin` object via
+  `createPluginAdapter`. No `plugins/*` cross-package `extends`.
+- **D-MANDATORY:** core owns `install` (rename of `add`) / `doctor` / `info` / `update` / `remove`
+  with shared logic parameterized by plugin-supplied typed seams (Vite-style strong defaults).
+- **D-OPTIONAL:** `add <resource>` / `generate <resource>` + extra plugin verbs are contract-shaped
+  optionals the plugin implements (oRPC-contract analogy).
+- **D-ONE-ITEM:** ONE `ItemScaffolder<TInput>` drives BOTH install's starter set AND `add
+  <resource>`; type-checked stub source + typed identifier substitution; no string concat, no
+  `.template`.
+- **D-RENAME:** full CLI rename + namespace (`plugin install <kind>`, `<kind> add <resource>`,
+  `<kind> generate <resource>`) — breaking, acceptable pre-1.0.
+- **D-OWN:** `@netscript/plugin` + `@netscript/cli` own the command logic + shapes; plugins are thin
+  connectors.
