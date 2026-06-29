@@ -19,6 +19,7 @@
 export {
   createPluginService,
   type PluginDatabaseConfig,
+  type PluginRawRoute,
   type PluginServiceConfig,
 } from './presentation/create-plugin-service.ts';
 
@@ -34,6 +35,8 @@ export type {
   DbContext,
   HealthCheck,
   ServiceConfig,
+  ServiceHandler,
   ServiceMiddleware,
+  ServiceRouteMethod,
   ServiceRouter,
 } from '@netscript/service';

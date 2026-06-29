@@ -214,6 +214,9 @@ export type ServiceMiddleware = MiddlewareHandler;
 /** Service route handler accepted by the builder route API. */
 export type ServiceHandler = Handler;
 
+/** HTTP method accepted by the service builder's raw `route()` API. `'all'` matches every method (used for transparent proxies / catch-all passthrough). */
+export type ServiceRouteMethod = 'get' | 'post' | 'put' | 'delete' | 'patch' | 'all';
+
 /** Not-found handler used by service applications. */
 export type ServiceNotFoundHandler = NotFoundHandler;
 

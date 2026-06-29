@@ -17,7 +17,9 @@ import {
   type HealthCheck,
   type ServiceBuilder,
   type ServiceConfig,
+  type ServiceHandler,
   type ServiceMiddleware,
+  type ServiceRouteMethod,
   type ServiceRouter,
 } from '@netscript/service';
 
@@ -32,6 +34,22 @@ export interface PluginDatabaseConfig {
   readonly context: DbContext;
   /** Optional client used for the database health/readiness check. */
   readonly healthClient?: { $queryRaw(query: TemplateStringsArray): Promise<unknown> };
+}
+
+/**
+ * A raw (non-oRPC) HTTP route mounted directly on the service.
+ *
+ * Use for ingress that cannot be expressed as an oRPC handler — e.g. a webhook
+ * that verifies an HMAC signature over the raw request bytes, or a transparent
+ * proxy catch-all (`method: 'all'`, `path: '/*'`).
+ */
+export interface PluginRawRoute {
+  /** HTTP method; `'all'` matches every method. */
+  readonly method: ServiceRouteMethod;
+  /** Hono route path (supports params like `/webhooks/:id` and catch-all `/*`). */
+  readonly path: string;
+  /** Hono handler receiving the raw request context. */
+  readonly handler: ServiceHandler;
 }
 
 /**
@@ -62,6 +80,16 @@ export interface PluginServiceConfig extends ServiceConfig {
   readonly docs?: { specUrl?: string };
   /** Health checks applied via `withHealth({ checks })`. */
   readonly healthChecks?: readonly HealthCheck[];
+  /**
+   * Raw (non-oRPC) routes mounted via `route()` after the oRPC wiring. For HMAC
+   * webhook ingress or a transparent proxy catch-all.
+   */
+  readonly rawRoutes?: readonly PluginRawRoute[];
+  /**
+   * When `false`, the oRPC router is NOT wired (`withRPC` is skipped) — for pure
+   * passthrough/proxy connectors that have no oRPC contract. Defaults to `true`.
+   */
+  readonly serveRpc?: boolean;
   /** Async startup hooks applied via `onStartup()`, run in order before the server starts. */
   readonly onStartup?: readonly (() => Promise<void>)[];
   /** Async shutdown hooks applied via `onShutdown()`, run in reverse order during graceful shutdown. */
@@ -72,9 +100,9 @@ export interface PluginServiceConfig extends ServiceConfig {
  * Builds a plugin service builder with the mandated chain pre-applied.
  *
  * The chain order is fixed: cors → logger → openapi → docs → database →
- * use(middleware) → context → withRPC → withHealth → withServiceInfo →
- * onStartup(hooks) → onShutdown(hooks). The caller receives a ready
- * {@link ServiceBuilder} and only calls `.serve()`.
+ * use(middleware) → context → withRPC(optional) → withHealth → withServiceInfo →
+ * route(rawRoutes) → onStartup(hooks) → onShutdown(hooks). The caller receives a
+ * ready {@link ServiceBuilder} and only calls `.serve()`.
  *
  * @typeParam TRouter - The oRPC router type served by the plugin.
  * @param router - The oRPC router to serve.
@@ -127,13 +155,19 @@ export function createPluginService<TRouter extends ServiceRouter>(
     builder = builder.withContext(config.context);
   }
 
-  builder = builder.withRPC({ traceContext: config.traceContext ?? true });
+  if (config.serveRpc !== false) {
+    builder = builder.withRPC({ traceContext: config.traceContext ?? true });
+  }
 
   builder = builder.withHealth(
     config.healthChecks !== undefined ? { checks: [...config.healthChecks] } : undefined,
   );
 
   builder = builder.withServiceInfo();
+
+  for (const rawRoute of config.rawRoutes ?? []) {
+    builder = builder.route(rawRoute.method, rawRoute.path, rawRoute.handler);
+  }
 
   for (const hook of config.onStartup ?? []) {
     builder = builder.onStartup(hook);
