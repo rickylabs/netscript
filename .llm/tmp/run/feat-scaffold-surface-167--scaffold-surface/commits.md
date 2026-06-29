@@ -10,3 +10,6 @@
 - 3b6f16e6071d790ba802bc4212a9e36b831c4753: feat(plugin-workers): connect workers to plugin adapter contract
 - f652199e740b91ae80e985da25848a339f714dbb: fix(plugin-workers): remove casts from adapter connector
 - 640102a5: feat(plugin-sagas): S3a sagas connector on @netscript/plugin/adapter
+- c6b4020d: feat(plugin-triggers): S3a triggers connector on @netscript/plugin/adapter
+- 635dec6c557524e079c12b69428640ca54eb53f6: feat(plugin-streams): S3b streams connector on @netscript/plugin/adapter (one ItemScaffolder; delete legacy scaffolders)
+- 900df5d790f0d14cf47c5e0c310998d5d9805ae9: feat(plugin-auth): S3b auth connector on @netscript/plugin/adapter (install-only; delete legacy scaffolder)

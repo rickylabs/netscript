@@ -1,18 +1,12 @@
-/**
- * Auth plugin-owned scaffold CLI entrypoint.
- *
- * This is the published `./scaffold` target the CLI installer invokes over the `--context-json` argv
- * contract. It re-exports the composed {@linkcode scaffold} entrypoint and, when run as the main
- * module, drives it through the shared {@linkcode runScaffoldCli} runner.
+/** Auth plugin adapter scaffold entrypoint.
  *
  * @module
  */
 
-import { runScaffoldCli } from '@netscript/plugin/scaffold';
-import { scaffold } from './src/scaffold/mod.ts';
+import { createPluginAdapter, type PluginScaffoldEntrypoint } from '@netscript/plugin/adapter';
+import { authAdapterPlugin } from './src/adapter/plugin.ts';
 
-export { scaffold } from './src/scaffold/mod.ts';
+/** Auth adapter scaffold entrypoint. */
+const scaffold: PluginScaffoldEntrypoint = createPluginAdapter(authAdapterPlugin).toScaffold();
 
-if (import.meta.main) {
-  await runScaffoldCli({ entrypoint: scaffold });
-}
+export default scaffold;
