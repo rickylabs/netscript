@@ -63,7 +63,7 @@ The following entrypoints are published alongside the root export.
 | --- | --- | --- |
 | `@netscript/plugin-triggers` | `./mod.ts` | Public plugin manifest surface (documented above). |
 | `@netscript/plugin-triggers/public` | `./src/public/mod.ts` | Public manifest re-export (identical to the root surface). |
-| `@netscript/plugin-triggers/plugin` | `./src/plugin/mod.ts` | Plugin lifecycle composition. |
+| `@netscript/plugin-triggers/plugin` | `./src/public/mod.ts` | Plugin lifecycle composition (alias of the public surface). |
 | `@netscript/plugin-triggers/runtime` | `./src/runtime/mod.ts` | Trigger runtime wiring. |
 | `@netscript/plugin-triggers/scaffolding` | `./src/scaffolding/mod.ts` | Handler-first trigger definition scaffolders (webhook, scheduled, file-watch). |
 | `@netscript/plugin-triggers/aspire` | `./src/aspire/mod.ts` | Aspire contribution for trigger services and background workers. |

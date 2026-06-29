@@ -23,7 +23,7 @@ The plugin publishes the following entrypoints. Each is generated from its own `
 | --- | --- | --- |
 | `@netscript/plugin-sagas` | `./mod.ts` | Plugin manifest, identifiers, and inspection helper (documented below). |
 | `@netscript/plugin-sagas/public` | `./src/public/mod.ts` | Curated public manifest surface for host integration. |
-| `@netscript/plugin-sagas/plugin` | `./src/plugin/mod.ts` | Plugin manifest and contribution types. |
+| `@netscript/plugin-sagas/plugin` | `./src/public/mod.ts` | Plugin manifest and contribution types (alias of the public surface). |
 | `@netscript/plugin-sagas/runtime` | `./src/runtime/mod.ts` | Executable saga runtime, engine, scheduler, publisher, and supervisor. |
 | `@netscript/plugin-sagas/contracts` | `./contracts/v1/mod.ts` | Versioned API contract (`sagasContract`) and router types. |
 | `@netscript/plugin-sagas/streams` | `./streams/mod.ts` | Browser-safe saga stream schema and collection. |

@@ -9,7 +9,7 @@
     "./aspire": "./src/aspire/mod.ts",
     "./cli": "./src/cli/composition/main.ts",
     "./public": "./src/public/mod.ts",
-    "./plugin": "./src/plugin/mod.ts",
+    "./plugin": "./src/public/mod.ts",
     "./runtime": "./src/runtime/mod.ts",
     "./scaffold": "./scaffold.ts",
     "./services": "./services/src/main.ts",
@@ -32,7 +32,7 @@
     "zod": "jsr:@zod/zod@4.4.3"
   },
   "tasks": {
-    "check": "deno check --unstable-kv mod.ts cli.ts scaffold.ts src/adapter/plugin.ts src/adapter/resources/mod.ts src/aspire/mod.ts src/cli/composition/main.ts src/public/mod.ts src/plugin/mod.ts src/runtime/mod.ts services/src/main.ts streams/mod.ts streams/server.ts",
+    "check": "deno check --unstable-kv mod.ts cli.ts scaffold.ts src/adapter/plugin.ts src/adapter/resources/mod.ts src/aspire/mod.ts src/cli/composition/main.ts src/public/mod.ts src/runtime/mod.ts services/src/main.ts streams/mod.ts streams/server.ts",
     "test": "deno test --allow-all --unstable-kv",
     "triggers:e2e": "deno test --allow-net --allow-env --unstable-kv tests/e2e",
     "dev": "deno run --unstable-kv --allow-net --allow-env --allow-read --watch services/src/main.ts",

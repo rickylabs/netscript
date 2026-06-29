@@ -10,7 +10,7 @@ Deno.test('authPlugin manifest exposes service, contract, and config axes', () =
   assert(authPlugin.contributions.services?.some((service) => service.name === 'auth-api'));
   assert(
     authPlugin.contributions.contractVersions?.some((contract) =>
-      contract.version === 'v1' && contract.loader === './contracts.ts'
+      contract.version === 'v1' && contract.loader === './contracts/v1/mod.ts'
     ),
   );
   assert(authPlugin.contributions.runtimeConfigTopics?.some((topic) => topic.name === 'auth'));

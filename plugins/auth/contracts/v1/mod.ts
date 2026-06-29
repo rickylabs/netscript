@@ -1,5 +1,8 @@
 /**
- * Contract-only export for the auth plugin service.
+ * Auth Plugin Contracts - Version 1.
+ *
+ * Re-exports the auth core contract surface owned by
+ * `@netscript/plugin-auth-core`.
  *
  * @module
  */

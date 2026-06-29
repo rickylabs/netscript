@@ -22,7 +22,7 @@ export function verifyAuthPlugin(): PluginVerificationResult {
     services: [{ name: 'auth-api', message: 'expected an auth-api service contribution' }],
     contractVersions: [{
       version: 'v1',
-      loader: './contracts.ts',
+      loader: './contracts/v1/mod.ts',
       message: 'expected the auth v1 contract contribution',
     }],
     runtimeConfigTopics: [{

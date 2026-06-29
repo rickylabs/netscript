@@ -101,7 +101,7 @@ const authManifest: AuthPluginManifest = definePlugin(
     entrypoint: './services/src/main.ts',
     port: AUTH_API_DEFAULT_PORT,
   })
-  .withContractVersions([{ version: 'v1', loader: './contracts.ts' }])
+  .withContractVersions([{ version: 'v1', loader: './contracts/v1/mod.ts' }])
   .withRuntimeConfigTopics([{ name: AUTH_PLUGIN_ID }])
   .withMetadata({
     repository: 'https://github.com/rickylabs/netscript',
