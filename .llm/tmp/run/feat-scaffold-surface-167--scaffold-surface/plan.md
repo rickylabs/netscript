@@ -214,6 +214,30 @@ Order: S0(folded) → S1 → S2 → S3 → S4 → S5; S6 anytime after S1; S8 af
 last (verify includes S8/S9 in the matrix). No `deno.lock` churn committed; no new casts beyond the 2
 sanctioned; no `any`; explicit-path staging only; no force-push.
 
+### Re-architecture license (user, 2026-06-29)
+
+The slices are **not** constrained to graft the unified contract onto the existing `packages/plugin`
+and `packages/cli` structure. The user explicitly authorizes **rethinking and re-architecting the
+internal design of both packages** where a cleaner shape serves the one-contract goal — do not
+preserve current folders/classes/dispatch for their own sake:
+
+- `packages/plugin` — its internal layering may be **redesigned** to the proper doctrine layering
+  (`domain → ports → application → adapters → presentation`). The current `src/cli/*` bones
+  (`PluginCli`, `PluginItemScaffolder`, `mountPluginCli`, `routeVerb`, the forked item bases) are
+  raw material to **reshape or replace**, not a structure to keep. `FRAMEWORK_VERBS` is a useful
+  discovery, not a mandate to retain its current dispatch implementation.
+- `packages/cli` — the plugin command/dispatch surface (`dispatch-plugin-verb.ts`, `add-plugin.ts`,
+  the `PluginScaffolder`/`renderPlugin` path) may be **restructured** end-to-end so the unified
+  install/`add <resource>` flow is the spine, not a branch bolted beside the old one.
+
+This **widens latitude, not the bar.** All invariants still hold and are non-negotiable: doctrine
+layering + axioms (A4 spine stub-only, A5 composition, no cross-package inheritance), JSR-readiness,
+no plugin-source leak into userland, host-side config-wiring **behavior** preserved (its
+implementation may be restructured), the 2-cast limit, no `any`, no `deno.lock` churn, forward-only.
+Bigger structural moves are encouraged where they reduce duplication and sharpen the contract; record
+any doctrine waivers in `arch-debt.md`. When a reshape materially exceeds a slice's footprint, split
+it and record the rescope in `drift.md`.
+
 ### Definition of done (user-owned bar; every slice honors these)
 
 - **Skill-first + harness:** every implementation agent begins `use harness` + activates the matching

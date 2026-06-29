@@ -5,6 +5,15 @@ re-architecture on branch `feat/scaffold-surface-167` (PR #172, issue #167, task
 hard Plan-Gate: **no implementation may begin until this returns `PASS`.** Do not implement anything.
 Read, evaluate against the plan-gate, and emit a verdict.
 
+**Scope note (user-granted re-architecture license, 2026-06-29):** the plan is explicitly authorized
+to **rethink and re-architect the internal design of `packages/plugin` and `packages/cli`** — not
+merely graft the unified contract onto the existing structure. Judge bold restructuring (new doctrine
+layering, replacing the `src/cli/*` bones, rebuilding the CLI dispatch spine) as legitimate and
+**preferred where it reduces duplication** — do NOT `FAIL_PLAN` for departing from current structure.
+The bar that does bind: doctrine layering + axioms, no cross-package inheritance, JSR-readiness, no
+plugin-source leak, host-side config-wiring **behavior** preserved, the cast/`any`/lock invariants.
+See the plan's "Re-architecture license" section.
+
 ## SKILL
 
 Activate these repo skills before evaluating (each applies):
