@@ -1,4 +1,5 @@
-import { dirname, join } from '@std/path';
+import { dirname } from '@std/path';
+import { join as posixJoin } from '@std/path/posix';
 
 import type { FileSystemPort } from '../ports/mod.ts';
 
@@ -45,6 +46,12 @@ export function createDenoFileSystem(): FileSystemPort {
 /**
  * Resolve a workspace-relative path against a workspace root.
  *
+ * Joins with POSIX separators so the resolved key is byte-deterministic across
+ * operating systems: artifact paths are authored POSIX-relative, and Deno
+ * accepts forward-slash paths for file-system writes on Windows. Using the
+ * platform-native join here would emit backslash keys on Windows, diverging
+ * from the POSIX `createdFiles` paths the command reports.
+ *
  * @param workspaceRoot Absolute or relative workspace root.
  * @param artifactPath Workspace-relative artifact path.
  * @returns Path suitable for the file-system port.
@@ -55,5 +62,5 @@ export function createDenoFileSystem(): FileSystemPort {
  * ```
  */
 export function resolveWorkspacePath(workspaceRoot: string, artifactPath: string): string {
-  return join(workspaceRoot, artifactPath);
+  return posixJoin(workspaceRoot, artifactPath);
 }
