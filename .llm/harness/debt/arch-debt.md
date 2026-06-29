@@ -1562,3 +1562,56 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** Close when the scaffolded `aspire/package.json` ships with a pinned companion lock (or
   the npm island is removed) so a generated AppHost resolves without an unpinned manual
   `npm install`.
+
+## plugins/triggers connector — TRIGGERS-CONNECTOR-DEFERRED-ROUTES + missing triggers-core backing (#172)
+
+- **Reason:** The triggers connector (`plugins/triggers/services/src/`) was converged onto the
+  canonical thin-connector shape (`createPluginService(router, {...}).serve()`) and now serves the
+  full 11-route `@netscript/plugin-triggers-core` v1 contract. Five routes are **backed** by real
+  runtime state (`describe`, `listTriggers`, `getTrigger`, `listEvents`, `getEvent`) and the raw
+  HMAC webhook ingress is preserved as a `rawRoutes` entry. The remaining **six** routes
+  (`fireTrigger`, `testWebhook`, `previewSchedule`, `enableTrigger`, `disableTrigger`,
+  `subscribeEvents`) are **honestly deferred**: each throws with a "pending triggers-core runtime
+  backing" message that oRPC maps to a server error (`subscribeEvents` is an async generator that
+  throws immediately and never yields, so its SSE output schema is never violated). No backing was
+  fabricated and no triggers-core capability was invented in this slice.
+- **Why it is debt:** the deferred routes have no sound runtime seam in `@netscript/plugin-triggers-core`
+  yet, and two backed routes synthesize/omit fields because the domain lacks them. The net-new
+  triggers-core surface required to fully back the contract:
+  1. **Manual / test-fire helper** — a runtime entrypoint to dispatch a trigger on demand (backs
+     `fireTrigger`) and a webhook test-delivery helper (backs `testWebhook`).
+  2. **Persistent enabled-state store** — there is no enabled/disabled store, so `listTriggers`/
+     `getTrigger` currently **synthesize `enabled: true`** for every definition; `enableTrigger`/
+     `disableTrigger` cannot persist state. Needs an enabled-state port plus
+     `TriggerDefinitionBase.enabled` (and a domain `name` field — the connector currently **omits
+     `name`** because the domain carries none, though the contract response allows it).
+  3. **Cron preview engine** — a next-fire-times computation over a scheduled trigger's cron spec
+     (backs `previewSchedule`).
+  4. **Event-subscription / SSE seam** — a live event-stream port (backs `subscribeEvents`).
+  - Note: the connector is **cast-free** — the raw webhook handler resolves the external path
+    parameter against the loaded definitions and passes the definition's already-branded `.id` to
+    `ingress.accept` (the same brand-free string-equality pattern as `listEvents`/`getEvent`), so no
+    `TriggerId` brand cast is retained. A public `toTriggerId` / `toTriggerEventId` constructor in
+    `@netscript/plugin-triggers-core/domain` would still be a convenience for net-new write paths,
+    but it is **not** connector-soundness debt.
+  - Separately: the triggers v1 contract erases its typed `errors` map through the sanctioned
+    `as unknown as Parameters<typeof oc.errors>[0]` cast, so handlers cannot call
+    `errors.INTERNAL(...)`; deferral throws a plain `Error` (oRPC -> 5xx) and `notFound` is used via
+    the centralized `@netscript/contracts` helper (which casts `errors` internally). A typed
+    `internalError({ errors, message })` helper in `@netscript/contracts` (mirroring `notFound`)
+    would let deferrals/500s carry the typed `INTERNAL` shape.
+- **Owner:** Triggers plugin + `@netscript/plugin-triggers-core` runtime (framework architecture).
+- **Target:** A PLAN-EVAL-gated triggers-core runtime follow-up that adds the seams above; each
+  unblocks its routes one at a time. Any `TriggerDefinitionBase` field addition (`enabled`, `name`)
+  and any new domain brand constructor is a `@netscript/plugin-triggers-core` source change and must
+  run as a WSL Codex daemon-attached slice, not the connector slice.
+- **Linked plan:** `feat/scaffold-surface-167` triggers thin-connector convergence slice (#172).
+- **Created:** 2026-06-30.
+- **Status:** open, DEBT_ACCEPTED — recorded as part of the additive thin-connector convergence; the
+  connector compiles/lints clean, the smoke test passes, and `deno publish --dry-run` succeeds.
+- **Gate:** Close each route as its triggers-core seam lands (manual/test-fire helper -> `fireTrigger`
+  + `testWebhook`; enabled-state store + `enabled`/`name` fields -> `enableTrigger`/`disableTrigger`
+  + un-synthesized `listTriggers`/`getTrigger`; cron preview engine -> `previewSchedule`; event SSE
+  seam -> `subscribeEvents`), each with its own contract-route assertion and the connector smoke
+  test extended to assert the now-backed behavior. Remove the webhook brand cast when a public brand
+  constructor lands.
