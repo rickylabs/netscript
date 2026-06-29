@@ -1,22 +1,24 @@
 import type { PluginCliArgs, PluginCliResult } from '@netscript/plugin/cli';
+import { artifactText, type ScaffoldArtifact } from '@netscript/plugin/adapter';
+import { parseSagaInput, sagaScaffolder } from '../adapter/resources/mod.ts';
 import { LocalProjectFiles, type ProjectFiles } from './adapters/local-project-files.ts';
 import { codemodSagaImports } from './codemod.ts';
 import type { SagasCliBackend, SagasCliCommandDefinition } from './command-types.ts';
 import { generateSagaRegistry } from './registry-generator.ts';
 import { inspectSagasProject } from './saga-inspector.ts';
 
-/** Options for local sagas CLI command execution. */
-export interface LocalSagasCliBackendOptions {
+/** Options for local sagas runtime CLI command execution. */
+export interface LocalSagasRuntimeBackendOptions {
   /** Project file adapter. */
   readonly files?: ProjectFiles;
 }
 
 /** Local backend that implements sagas CLI verbs against project files. */
-export class LocalSagasCliBackend implements SagasCliBackend {
+export class LocalSagasRuntimeBackend implements SagasCliBackend {
   private readonly files: ProjectFiles;
 
-  /** Create a local sagas CLI backend. */
-  constructor(options: LocalSagasCliBackendOptions = {}) {
+  /** Create a local sagas runtime backend. */
+  constructor(options: LocalSagasRuntimeBackendOptions = {}) {
     this.files = options.files ?? new LocalProjectFiles();
   }
 
@@ -59,7 +61,22 @@ export class LocalSagasCliBackend implements SagasCliBackend {
           result,
         );
       }
+      case 'add-saga':
+        return await this.writeArtifacts(
+          'Saga definition created.',
+          sagaScaffolder.emit(parseSagaInput(args)),
+        );
     }
+  }
+
+  private async writeArtifacts(
+    message: string,
+    artifacts: readonly ScaffoldArtifact[],
+  ): Promise<PluginCliResult> {
+    for (const artifact of artifacts) {
+      await this.files.writeTextFile(artifact.path, artifactText(artifact));
+    }
+    return ok(message, { files: artifacts.map((artifact) => artifact.path) });
   }
 }
 

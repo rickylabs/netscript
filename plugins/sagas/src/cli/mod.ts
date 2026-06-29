@@ -19,6 +19,7 @@ export type {
   CodemodSagaImportsResult,
 } from './codemod.ts';
 export {
+  AddSagaCommand,
   CodemodCommand,
   GenerateRegistryCommand,
   InspectCommand,
@@ -39,8 +40,8 @@ export type {
   GenerateSagaRegistryResult,
 } from './registry-generator.ts';
 export { SagasCli } from './sagas-cli.ts';
-export { LocalSagasCliBackend } from './sagas-cli-backend.ts';
-export type { LocalSagasCliBackendOptions } from './sagas-cli-backend.ts';
+export { LocalSagasRuntimeBackend } from './local-runtime-backend.ts';
+export type { LocalSagasRuntimeBackendOptions } from './local-runtime-backend.ts';
 export { inspectSagasProject } from './saga-inspector.ts';
 export type {
   InspectSagasOptions,
