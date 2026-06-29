@@ -371,6 +371,33 @@ verdicts are not seeded here.
 - **Gate:** Replace the S2 DLQ rejection test with a deferred-dispatch test after a package-owned
   scheduler/replay port is designed.
 
+## plugins/triggers — connector SOUND convergence deferred (`triggers-connector-sound-deferred`)
+
+- **Reason:** The #172a-2d slice (commit `74656d71`) landed Hole-A contract soundness on
+  `@netscript/plugin-triggers-core`, but the triggers connector (`plugins/triggers/services`) is a
+  raw Hono + `Deno.serve` service that does NOT bind the oRPC contract: only ~3 of the 10 business
+  routes are implemented (list/get events, webhook ingress, health), and the webhook ingress reads
+  the raw `Request` (`c.req.raw`) to verify HMAC signatures over the exact bytes — incompatible with
+  oRPC's Zod input parsing, which would consume and transform the body and break signature
+  verification. Converging it to the `createPluginService` + contract-bound-implementer shape (as
+  workers/sagas/auth now do) requires implementing the 8 missing routes AND adding a new
+  `createPluginService` raw-route escape hatch in `@netscript/plugin/service` for HMAC webhooks —
+  a feature build + package-core change, not a soundness refactor. Split out per user decision
+  ("Defer to planned slice"); the other four plugins (workers/sagas/triggers-core/auth) are now
+  SOUND.
+- **Owner:** #172 plugin convergence — triggers connector slice.
+- **Target:** Before #172 is considered fully converged (all five plugins on the canonical
+  thin-connector shape).
+- **Linked plan:** to be authored — PLAN-EVAL-gated, daemon-attached WSL Codex slice (per harness
+  implementation lane; this is a framework-source + feature build, not a doc/contract refactor).
+- **Created:** 2026-06-30
+- **Status:** open
+- **Gate:** triggers connector assembled via `triggersContractV1.$context<...>().router()` with all
+  10 business routes + describe implemented, the raw-body webhook served through a sanctioned
+  `createPluginService` raw-route capability, `main.ts` migrated to `createPluginService(...).serve()`,
+  zero `any` / `Record<string,unknown>` handler maps; scoped check/lint/test green and
+  `deno publish --dry-run` Success without `--allow-slow-types`.
+
 ## plugins/sagas — deferred Prisma SagaIdempotencyPort parity
 
 - **Reason:** `PrismaSagaStore` now provides durable saga state persistence, but idempotency and
