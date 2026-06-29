@@ -4,14 +4,14 @@
  * @module
  */
 
-export { LocalProjectFiles } from './adapters/local-project-files.ts';
+export { LocalProjectFiles } from '@netscript/plugin/cli';
 export type {
   PluginCli,
   PluginCliArgs,
   PluginCliCommand,
   PluginCliResult,
 } from '@netscript/plugin/cli';
-export type { ProjectFileEntry, ProjectFiles } from './adapters/local-project-files.ts';
+export type { ProjectFileEntry, ProjectFiles } from '@netscript/plugin/cli';
 export { codemodSagaImports } from './codemod.ts';
 export type {
   CodemodSagaImportsChange,

@@ -10,7 +10,7 @@ import {
   scheduledScaffolder,
   webhookScaffolder,
 } from '../adapter/resources/mod.ts';
-import { LocalProjectFiles, type ProjectFiles } from './adapters/local-project-files.ts';
+import { LocalProjectFiles, type ProjectFiles } from '@netscript/plugin/cli';
 import type { TriggersCliBackend, TriggersCliCommandDefinition } from './command-types.ts';
 import { compileTriggerRegistry } from './trigger-registry-compiler.ts';
 import {

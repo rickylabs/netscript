@@ -1,4 +1,4 @@
-import type { ProjectFileEntry, ProjectFiles } from './adapters/local-project-files.ts';
+import type { ProjectFileEntry, ProjectFiles } from '@netscript/plugin/cli';
 import { inspectSagasProject } from './saga-inspector.ts';
 
 /** Options for generating the static saga registry. */
@@ -114,7 +114,7 @@ async function toEntries(
     const content = await files.readTextFile(path);
     return content === undefined
       ? undefined
-      : Object.freeze({ relativePath: path, size: content.length });
+      : Object.freeze({ path: files.resolve(path), relativePath: path, size: content.length });
   }));
   return Object.freeze(entries.filter(isProjectFileEntry));
 }

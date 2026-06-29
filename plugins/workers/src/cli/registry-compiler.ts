@@ -1,5 +1,5 @@
 import { dirname, relative } from '@std/path';
-import type { ProjectFileEntry, ProjectFiles } from './adapters/local-project-files.ts';
+import type { ProjectFileEntry, ProjectFiles } from '@netscript/plugin/cli';
 
 /** Result returned after compiling a static job registry. */
 export interface CompileRegistryResult {

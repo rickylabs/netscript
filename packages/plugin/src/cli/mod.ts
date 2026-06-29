@@ -7,3 +7,5 @@ export { runMountedCommand } from './composition/cliffy-runner.ts';
 export { mountPluginCli } from './composition/mount-plugin-cli.ts';
 export { formatPluginHelp } from './presentation/help-formatter.ts';
 export { routeVerb } from './presentation/verb-router.ts';
+export { LocalProjectFiles, resolveProjectRoot } from './adapters/project-files.ts';
+export type { ProjectFileEntry, ProjectFiles } from './adapters/project-files.ts';

@@ -1,4 +1,4 @@
-import { LocalProjectFiles } from './adapters/local-project-files.ts';
+import { LocalProjectFiles } from '@netscript/plugin/cli';
 import { generateSagaRegistry } from './registry-generator.ts';
 
 interface Args {

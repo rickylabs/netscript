@@ -1,4 +1,4 @@
-import type { ProjectFiles } from './adapters/local-project-files.ts';
+import type { ProjectFiles } from '@netscript/plugin/cli';
 
 /** Result returned after compiling the trigger runtime registry. */
 export type TriggerRegistryCompileResult = Readonly<{

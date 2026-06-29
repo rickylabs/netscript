@@ -12,7 +12,7 @@ import {
   taskScaffolder,
   workflowScaffolder,
 } from '../adapter/resources/mod.ts';
-import { LocalProjectFiles, type ProjectFiles } from './adapters/local-project-files.ts';
+import { LocalProjectFiles, type ProjectFiles } from '@netscript/plugin/cli';
 import type { WorkersCliBackend, WorkersCliCommandDefinition } from './command-types.ts';
 import { compileWorkersRegistry } from './registry-compiler.ts';
 

@@ -1,7 +1,7 @@
 import type { PluginCliArgs, PluginCliResult } from '@netscript/plugin/cli';
 import { artifactText, type ScaffoldArtifact } from '@netscript/plugin/adapter';
 import { parseSagaInput, sagaScaffolder } from '../adapter/resources/mod.ts';
-import { LocalProjectFiles, type ProjectFiles } from './adapters/local-project-files.ts';
+import { LocalProjectFiles, type ProjectFiles } from '@netscript/plugin/cli';
 import { codemodSagaImports } from './codemod.ts';
 import type { SagasCliBackend, SagasCliCommandDefinition } from './command-types.ts';
 import { generateSagaRegistry } from './registry-generator.ts';
