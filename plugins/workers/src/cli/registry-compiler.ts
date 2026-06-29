@@ -1,5 +1,8 @@
-import { dirname, relative } from '@std/path';
-import type { ProjectFileEntry, ProjectFiles } from '@netscript/plugin/cli';
+import {
+  type ProjectFileEntry,
+  type ProjectFiles,
+  renderRegistryModule,
+} from '@netscript/plugin/cli';
 
 /** Result returned after compiling a static job registry. */
 export interface CompileRegistryResult {
@@ -27,50 +30,45 @@ function renderRegistrySource(
   registryPath: string,
   jobs: readonly ProjectFileEntry[],
 ): string {
-  const registryDir = dirname(registryPath);
-  const imports = jobs.map((job, index) => {
-    const specifier = toRelativeImport(registryDir, job.relativePath);
-    return `import * as job${index} from ${JSON.stringify(specifier)};`;
+  return renderRegistryModule({
+    registryPath,
+    items: jobs,
+    alias: (index) => `job${index}`,
+    renderImport: (alias, specifier) => `import * as ${alias} from ${JSON.stringify(specifier)};`,
+    renderEntry: (alias, job) => [
+      `  [${JSON.stringify(toJobId(job.relativePath))}, resolveJobHandler(${alias}, ${
+        JSON.stringify(job.relativePath)
+      })],`,
+    ],
+    header: [
+      "import type { StaticJobRegistry } from '@netscript/plugin-workers-core/runtime';",
+    ],
+    body: (entries) => [
+      'type StaticJobHandler = StaticJobRegistry extends ReadonlyMap<string, infer THandler>',
+      '  ? THandler',
+      '  : never;',
+      '',
+      'const entries: readonly [string, StaticJobHandler][] = [',
+      ...entries,
+      '];',
+      '',
+      'export const jobRegistry: StaticJobRegistry = new Map(entries);',
+      'export const registry: StaticJobRegistry = jobRegistry;',
+      '',
+      'function resolveJobHandler(module: Record<string, unknown>, path: string): StaticJobHandler {',
+      '  const candidate = module.default ?? module.handler ?? firstFunctionExport(module);',
+      '  if (typeof candidate !== "function") {',
+      '    throw new Error(`Worker job module ${path} does not export a function handler.`);',
+      '  }',
+      '  return candidate as StaticJobHandler;',
+      '}',
+      '',
+      'function firstFunctionExport(module: Record<string, unknown>): unknown {',
+      '  return Object.values(module).find((value) => typeof value === "function");',
+      '}',
+      '',
+    ],
   });
-  const entries = jobs.map((job, index) =>
-    `  [${JSON.stringify(toJobId(job.relativePath))}, resolveJobHandler(job${index}, ${
-      JSON.stringify(job.relativePath)
-    })],`
-  );
-
-  return [
-    "import type { StaticJobRegistry } from '@netscript/plugin-workers-core/runtime';",
-    ...imports,
-    '',
-    'type StaticJobHandler = StaticJobRegistry extends ReadonlyMap<string, infer THandler>',
-    '  ? THandler',
-    '  : never;',
-    '',
-    'const entries: readonly [string, StaticJobHandler][] = [',
-    ...entries,
-    '];',
-    '',
-    'export const jobRegistry: StaticJobRegistry = new Map(entries);',
-    'export const registry: StaticJobRegistry = jobRegistry;',
-    '',
-    'function resolveJobHandler(module: Record<string, unknown>, path: string): StaticJobHandler {',
-    '  const candidate = module.default ?? module.handler ?? firstFunctionExport(module);',
-    '  if (typeof candidate !== "function") {',
-    '    throw new Error(`Worker job module ${path} does not export a function handler.`);',
-    '  }',
-    '  return candidate as StaticJobHandler;',
-    '}',
-    '',
-    'function firstFunctionExport(module: Record<string, unknown>): unknown {',
-    '  return Object.values(module).find((value) => typeof value === "function");',
-    '}',
-    '',
-  ].join('\n');
-}
-
-function toRelativeImport(fromDir: string, target: string): string {
-  const specifier = relative(fromDir, target).replace(/\\/g, '/');
-  return specifier.startsWith('.') ? specifier : `./${specifier}`;
 }
 
 function toJobId(path: string): string {
