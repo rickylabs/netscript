@@ -9,8 +9,8 @@ export type { PluginCliArgs, PluginCliCommand, PluginCliResult } from '@netscrip
 export { TriggersCli } from './triggers-cli.ts';
 export { LocalProjectFiles, resolveProjectRoot } from './adapters/local-project-files.ts';
 export type { ProjectFileEntry, ProjectFiles } from './adapters/local-project-files.ts';
-export { LocalTriggersCliBackend } from './triggers-cli-backend.ts';
-export type { LocalTriggersCliBackendOptions } from './triggers-cli-backend.ts';
+export { LocalTriggersRuntimeBackend } from './local-runtime-backend.ts';
+export type { LocalTriggersRuntimeBackendOptions } from './local-runtime-backend.ts';
 export {
   AddFileWatchCommand,
   AddScheduledCommand,

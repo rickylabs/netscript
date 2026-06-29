@@ -1,13 +1,17 @@
 import type { PluginCliArgs, PluginCliResult } from '@netscript/plugin/cli';
+import { artifactText, type ScaffoldArtifact } from '@netscript/plugin/adapter';
 import type { TriggerContext, TriggerDefinition } from '@netscript/plugin-triggers-core/domain';
+import {
+  fileStem,
+  fileWatchScaffolder,
+  parseFileWatchInput,
+  parseScheduledInput,
+  parseWebhookInput,
+  scheduledScaffolder,
+  webhookScaffolder,
+} from '../adapter/resources/mod.ts';
 import { LocalProjectFiles, type ProjectFiles } from './adapters/local-project-files.ts';
 import type { TriggersCliBackend, TriggersCliCommandDefinition } from './command-types.ts';
-import {
-  toTriggerFileStem,
-  triggerScaffolder,
-  type TriggerScaffoldKind,
-} from '../scaffolding/mod.ts';
-import { StaticTriggersCliBackend } from './commands.ts';
 import { compileTriggerRegistry } from './trigger-registry-compiler.ts';
 import {
   booleanFlag,
@@ -21,24 +25,22 @@ import {
   previewCron,
   requiredValue,
   resolveTriggerDefinition,
-  scaffoldInput,
   type TriggerInspectionEntry,
   type TriggersRuntimeConfig,
 } from './triggers-cli-backend-support.ts';
 
-/** Options for local triggers CLI command execution. */
-export interface LocalTriggersCliBackendOptions {
+/** Options for local triggers runtime CLI command execution. */
+export interface LocalTriggersRuntimeBackendOptions {
   /** Project file adapter. */
   readonly files?: ProjectFiles;
 }
 
 /** Local backend that implements trigger scaffold commands against project files. */
-export class LocalTriggersCliBackend implements TriggersCliBackend {
+export class LocalTriggersRuntimeBackend implements TriggersCliBackend {
   private readonly files: ProjectFiles;
-  private readonly fallback = new StaticTriggersCliBackend();
 
-  /** Create a local triggers CLI backend. */
-  constructor(options: LocalTriggersCliBackendOptions = {}) {
+  /** Create a local triggers runtime backend. */
+  constructor(options: LocalTriggersRuntimeBackendOptions = {}) {
     this.files = options.files ?? new LocalProjectFiles();
   }
 
@@ -60,12 +62,18 @@ export class LocalTriggersCliBackend implements TriggersCliBackend {
     args: PluginCliArgs,
   ): Promise<PluginCliResult> {
     switch (definition.name) {
-      case 'add-webhook':
-        return await this.addTrigger('webhook', args);
-      case 'add-file-watch':
-        return await this.addTrigger('file-watch', args);
-      case 'add-scheduled':
-        return await this.addTrigger('scheduled', args);
+      case 'add-webhook': {
+        const input = parseWebhookInput(args);
+        return await this.addTrigger(webhookScaffolder.emit(input), input.force ?? false);
+      }
+      case 'add-file-watch': {
+        const input = parseFileWatchInput(args);
+        return await this.addTrigger(fileWatchScaffolder.emit(input), input.force ?? false);
+      }
+      case 'add-scheduled': {
+        const input = parseScheduledInput(args);
+        return await this.addTrigger(scheduledScaffolder.emit(input), input.force ?? false);
+      }
       case 'list':
         return await this.listTriggers(args);
       case 'test':
@@ -81,25 +89,24 @@ export class LocalTriggersCliBackend implements TriggersCliBackend {
     }
   }
 
-  /** Scaffold one trigger definition and refresh the generated registry. */
+  /** Write one trigger definition and refresh the generated registry. */
   private async addTrigger(
-    kind: TriggerScaffoldKind,
-    args: PluginCliArgs,
+    artifacts: readonly ScaffoldArtifact[],
+    force: boolean,
   ): Promise<PluginCliResult> {
-    const id = requiredValue(args, 'trigger id');
-    const input = scaffoldInput(kind, id, args);
-    const content = await triggerScaffolder(kind).generate(input);
-    const path = `triggers/${toTriggerFileStem(id)}-trigger.ts`;
+    const [artifact] = artifacts;
+    if (artifact === undefined) {
+      return fail('No trigger artifact generated.');
+    }
+    const path = artifact.path;
     const existing = await this.files.readTextFile(path);
-    if (existing !== undefined && !input.force) {
+    if (existing !== undefined && !force) {
       return fail(`Trigger file already exists: ${path}. Pass --force to overwrite.`);
     }
-    await this.files.writeTextFile(path, content);
+    await this.files.writeTextFile(path, artifactText(artifact));
     const registry = await compileTriggerRegistry(this.files);
     return ok('Trigger definition created.', {
       files: [path, registry.registryPath],
-      kind,
-      id,
       registry,
     });
   }
@@ -198,7 +205,7 @@ export class LocalTriggersCliBackend implements TriggersCliBackend {
 
   /** Find the project-relative module path for a trigger id. */
   private async findTriggerPath(id: string): Promise<string | undefined> {
-    const conventional = `triggers/${toTriggerFileStem(id)}-trigger.ts`;
+    const conventional = `triggers/${fileStem(id)}-trigger.ts`;
     if (await this.files.readTextFile(conventional) !== undefined) {
       return conventional;
     }
