@@ -5,6 +5,7 @@ import type { WorkersCommandDefinition } from '@netscript/plugin-workers-core/ab
 export const WORKERS_CLI_COMMANDS = [
   'add-job',
   'add-task',
+  'add-workflow',
   'list-jobs',
   'list-tasks',
   'run',

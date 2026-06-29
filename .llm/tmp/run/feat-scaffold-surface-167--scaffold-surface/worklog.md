@@ -686,3 +686,65 @@ The requested workspace-level `deno task test --filter plugin` and `.llm/tools/r
 commands traverse `plugins/*`. Those connectors still import the deleted v1
 `@netscript/plugin/scaffold` export and are explicitly S2-S4 scope. S1 did not touch `plugins/*` or
 `packages/cli`; see `drift.md`.
+
+## S2 implementation — workers connector reference on `@netscript/plugin/adapter`
+
+### Scope
+
+Rewrote `plugins/workers` as the reference connector for the unified adapter contract. Added
+`src/adapter/plugin.ts` with the `NetScriptPlugin` seams and `resources/{job,task,workflow,barrel}`.
+`job` and `task` are shared by install starter resources and `add <resource>`; `workflow` is
+add-only; `barrel` is install-only. Replaced top-level `scaffold.ts` with
+`createPluginAdapter(workersAdapterPlugin).toScaffold()` and added top-level `cli.ts` as the adapter
+CLI entrypoint.
+
+### One item generator
+
+Deleted the legacy v1 thin scaffolder tree (`src/scaffold/*`), the legacy item template tree
+(`src/scaffolding/*` and `templates/*.template`), and `src/cli/workers-cli-backend.ts`. The remaining
+runtime CLI backend is `src/cli/local-runtime-backend.ts`; its `add-job`, `add-task`, and
+`add-workflow` cases call the adapter resource scaffolders and write their emitted
+`ScaffoldArtifact`s. Registry generation, local run/log/config commands, Aspire, E2E, services,
+streams, and worker runtime files were left intact.
+
+### Export map
+
+Workers `deno.json` exports after S2:
+
+```json
+{
+  ".": "./mod.ts",
+  "./adapter-cli": "./cli.ts",
+  "./aspire": "./src/aspire/mod.ts",
+  "./cli": "./src/cli/composition/main.ts",
+  "./contracts": "./contracts/v1/mod.ts",
+  "./scaffold": "./scaffold.ts",
+  "./services": "./services/src/main.ts",
+  "./streams": "./streams/mod.ts",
+  "./streams/server": "./streams/server.ts",
+  "./worker": "./worker/mod.ts"
+}
+```
+
+### Tests added/updated
+
+- `plugins/workers/src/adapter/resources/resources.test.ts` proves install's default job artifact is
+  byte-identical to `jobScaffolder.emit(DEFAULT_JOB_INPUT)`, proves a user id emits the same shape at
+  `workers/jobs/<id>.ts`, asserts the install set is only `workers/jobs/health-check.ts`,
+  `workers/tasks/validate-payload.ts`, and `workers/mod.ts`, covers task multi-runtime paths, proves
+  workflow is add-only, and includes a `@ts-expect-error` token-map proof.
+- `plugins/workers/tests/cli/workers-cli_test.ts` now routes through `commands()` because S1 made
+  `PluginCli` stub-only and removed the old base `run()` body.
+
+### Gates (raw)
+
+| gate | command | result |
+| --- | --- | --- |
+| check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/workers --root packages/plugin --ext ts,tsx` | `filesSelected:208`, `batches:2`, `failedBatches:0`, `totalOccurrences:0`, exit 0. |
+| lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root plugins/workers --root packages/plugin --ext ts,tsx` | `filesSelected:208`, `batches:2`, `totalOccurrences:0`, `uniqueRules:0`, exit 0. |
+| fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/workers --root packages/plugin --ext ts,tsx` | `filesSelected:208`, `batches:2`, `failedBatches:0`, `findings:0`, exit 0. |
+| test | `deno test --allow-all --unstable-kv plugins/workers packages/plugin` | `ok | 52 passed | 0 failed`, exit 0. |
+| publish | `cd plugins/workers && deno publish --dry-run --allow-dirty` | `Success Dry run complete`, exit 0. Warnings: existing `bin/combined.ts` and `services/src/main.ts` dynamic imports plus preserved runtime CLI `local-runtime-backend.ts` local job import. No slow-type errors. |
+| scaffold versions | `deno task check:scaffold-versions` | `E-12 OK — 10 scaffold pin(s) are stable (no prerelease suffix).`, exit 0. |
+| manifest byte identity | `git diff --stat -- plugins/workers/scaffold.plugin.json` | empty, exit 0. |
+| lock churn | `git status --porcelain deno.lock` | empty, exit 0. |

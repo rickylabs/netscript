@@ -1,28 +1,33 @@
-import type { PluginCliArgs, PluginCliResult } from '@netscript/plugin/cli';
 import {
-  DenoTaskScaffolder,
-  JobHandlerScaffolder,
-  PsTaskScaffolder,
-  PythonTaskScaffolder,
-  ShellTaskScaffolder,
-} from '../scaffolding/mod.ts';
-import type { WorkersScaffoldInput, WorkersTaskScaffoldRuntime } from '../scaffolding/mod.ts';
+  artifactText,
+  type PluginCliArgs,
+  type PluginCliResult,
+  type ScaffoldArtifact,
+} from '@netscript/plugin/adapter';
+import {
+  jobScaffolder,
+  parseJobInput,
+  parseTaskInput,
+  parseWorkflowInput,
+  taskScaffolder,
+  workflowScaffolder,
+} from '../adapter/resources/mod.ts';
 import { LocalProjectFiles, type ProjectFiles } from './adapters/local-project-files.ts';
 import type { WorkersCliBackend, WorkersCliCommandDefinition } from './command-types.ts';
 import { compileWorkersRegistry } from './registry-compiler.ts';
 
 /** Options for local workers CLI command execution. */
-export interface LocalWorkersCliBackendOptions {
+export interface LocalWorkersRuntimeBackendOptions {
   /** Project file adapter. */
   readonly files?: ProjectFiles;
 }
 
-/** Local backend that implements workers CLI verbs against project files. */
-export class LocalWorkersCliBackend implements WorkersCliBackend {
+/** Local backend that implements workers runtime CLI verbs against project files. */
+export class LocalWorkersRuntimeBackend implements WorkersCliBackend {
   private readonly files: ProjectFiles;
 
-  /** Create a local workers CLI backend. */
-  constructor(options: LocalWorkersCliBackendOptions = {}) {
+  /** Create a local workers runtime backend. */
+  constructor(options: LocalWorkersRuntimeBackendOptions = {}) {
     this.files = options.files ?? new LocalProjectFiles();
   }
 
@@ -44,9 +49,21 @@ export class LocalWorkersCliBackend implements WorkersCliBackend {
   ): Promise<PluginCliResult> {
     switch (definition.name) {
       case 'add-job':
-        return await this.addJob(args);
-      case 'add-task':
-        return await this.addTask(args);
+        return await this.writeArtifacts(
+          'Worker job created.',
+          jobScaffolder.emit(parseJobInput(args)),
+        );
+      case 'add-task': {
+        const input = parseTaskInput(args);
+        return await this.writeArtifacts('Worker task created.', taskScaffolder.emit(input), {
+          runtime: input.runtime,
+        });
+      }
+      case 'add-workflow':
+        return await this.writeArtifacts(
+          'Worker workflow created.',
+          workflowScaffolder.emit(parseWorkflowInput(args)),
+        );
       case 'list-jobs':
         return await this.listFiles('workers/jobs', ['.ts'], 'jobs');
       case 'list-tasks':
@@ -68,21 +85,15 @@ export class LocalWorkersCliBackend implements WorkersCliBackend {
     }
   }
 
-  private async addJob(args: PluginCliArgs): Promise<PluginCliResult> {
-    const id = requiredValue(args, 'job id');
-    const content = await new JobHandlerScaffolder().generate(scaffoldInput(id, args));
-    const path = `workers/jobs/${fileStem(id)}.ts`;
-    await this.files.writeTextFile(path, content);
-    return ok('Worker job created.', { files: [path] });
-  }
-
-  private async addTask(args: PluginCliArgs): Promise<PluginCliResult> {
-    const id = requiredValue(args, 'task id');
-    const runtime = flag(args, 'runtime') as WorkersTaskScaffoldRuntime | undefined ?? 'deno';
-    const content = await taskScaffolder(runtime).generate(scaffoldInput(id, args));
-    const path = taskPath(id, runtime);
-    await this.files.writeTextFile(path, content);
-    return ok('Worker task created.', { files: [path], runtime });
+  private async writeArtifacts(
+    message: string,
+    artifacts: readonly ScaffoldArtifact[],
+    extra: Readonly<Record<string, unknown>> = {},
+  ): Promise<PluginCliResult> {
+    for (const artifact of artifacts) {
+      await this.files.writeTextFile(artifact.path, artifactText(artifact));
+    }
+    return ok(message, { files: artifacts.map((artifact) => artifact.path), ...extra });
   }
 
   private async listFiles(
@@ -153,16 +164,16 @@ export class LocalWorkersCliBackend implements WorkersCliBackend {
     const id = requiredValue(args, 'job id');
     const path = '.netscript/runtime/workers.json';
     const content = await this.files.readTextFile(path);
-    const config = content ? JSON.parse(content) as WorkerRuntimeConfig : { jobs: {} };
+    const config = parseWorkerRuntimeConfig(content);
     const jobs = { ...config.jobs, [id]: { ...config.jobs[id], enabled } };
     await this.files.writeTextFile(path, `${JSON.stringify({ ...config, jobs }, null, 2)}\n`);
     return ok(enabled ? 'Worker job enabled.' : 'Worker job disabled.', { id, enabled, path });
   }
 }
 
-type WorkerRuntimeConfig = {
+interface WorkerRuntimeConfig {
   readonly jobs: Record<string, { readonly enabled?: boolean }>;
-};
+}
 
 type RunnableJob = (context: unknown) => unknown | Promise<unknown>;
 
@@ -193,57 +204,32 @@ function flag(args: PluginCliArgs, name: string): string | undefined {
   return undefined;
 }
 
-function scaffoldInput(id: string, args: PluginCliArgs): WorkersScaffoldInput {
-  return {
-    id,
-    runtime: flag(args, 'runtime') as WorkersTaskScaffoldRuntime | undefined,
-    topic: flag(args, 'topic'),
-    schedule: flag(args, 'schedule'),
-    timeoutMs: numericFlag(args, 'timeout'),
-    maxRetries: numericFlag(args, 'max-retries'),
-    tags: flag(args, 'tags')?.split(',').map((tag) => tag.trim()).filter(Boolean),
-  };
-}
-
-function numericFlag(args: PluginCliArgs, name: string): number | undefined {
-  const value = flag(args, name);
-  if (value === undefined) {
-    return undefined;
-  }
-  const number = Number(value);
-  if (!Number.isFinite(number)) {
-    throw new Error(`Flag --${name} must be a number.`);
-  }
-  return number;
-}
-
 function parseJsonFlag(args: PluginCliArgs, name: string): unknown {
   const value = flag(args, name);
   return value === undefined ? undefined : JSON.parse(value);
 }
 
-function taskScaffolder(runtime: WorkersTaskScaffoldRuntime) {
-  switch (runtime) {
-    case 'deno':
-      return new DenoTaskScaffolder();
-    case 'python':
-      return new PythonTaskScaffolder();
-    case 'shell':
-      return new ShellTaskScaffolder();
-    case 'powershell':
-      return new PsTaskScaffolder();
+function parseWorkerRuntimeConfig(content: string | undefined): WorkerRuntimeConfig {
+  if (content === undefined) {
+    return { jobs: {} };
   }
+  const parsed: unknown = JSON.parse(content);
+  if (typeof parsed !== 'object' || parsed === null || !('jobs' in parsed)) {
+    return { jobs: {} };
+  }
+  const jobs = (parsed as { readonly jobs?: unknown }).jobs;
+  return typeof jobs === 'object' && jobs !== null ? { jobs: normalizeJobs(jobs) } : { jobs: {} };
 }
 
-function taskPath(id: string, runtime: WorkersTaskScaffoldRuntime): string {
-  const extension = runtime === 'python'
-    ? '.py'
-    : runtime === 'shell'
-    ? '.sh'
-    : runtime === 'powershell'
-    ? '.ps1'
-    : '.ts';
-  return `workers/tasks/${fileStem(id)}${extension}`;
+function normalizeJobs(input: object): Record<string, { readonly enabled?: boolean }> {
+  const jobs: Record<string, { readonly enabled?: boolean }> = {};
+  for (const [key, value] of Object.entries(input)) {
+    if (typeof value === 'object' && value !== null) {
+      const enabled = (value as { readonly enabled?: unknown }).enabled;
+      jobs[key] = typeof enabled === 'boolean' ? { enabled } : {};
+    }
+  }
+  return jobs;
 }
 
 function fileStem(id: string): string {
@@ -253,5 +239,9 @@ function fileStem(id: string): string {
 function resolveRunnable(module: Record<string, unknown>): RunnableJob | undefined {
   const candidate = module.default ?? module.handler ??
     Object.values(module).find((value) => typeof value === 'function');
-  return typeof candidate === 'function' ? candidate as RunnableJob : undefined;
+  return isRunnableJob(candidate) ? candidate : undefined;
+}
+
+function isRunnableJob(value: unknown): value is RunnableJob {
+  return typeof value === 'function';
 }

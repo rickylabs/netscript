@@ -9,11 +9,12 @@ export { PluginCli } from '@netscript/plugin/cli';
 export type { PluginCliArgs, PluginCliCommand, PluginCliResult } from '@netscript/plugin/cli';
 export { CliCommand, WorkersCommand } from '@netscript/plugin-workers-core/abstracts';
 export type { WorkersCommandDefinition } from '@netscript/plugin-workers-core/abstracts';
-export { LocalWorkersCliBackend } from './workers-cli-backend.ts';
-export type { LocalWorkersCliBackendOptions } from './workers-cli-backend.ts';
+export { LocalWorkersRuntimeBackend } from './local-runtime-backend.ts';
+export type { LocalWorkersRuntimeBackendOptions } from './local-runtime-backend.ts';
 export {
   AddJobCommand,
   AddTaskCommand,
+  AddWorkflowCommand,
   CompileRegistryCommand,
   ConfigEditCommand,
   ConfigPublishCommand,

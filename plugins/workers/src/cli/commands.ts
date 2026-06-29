@@ -5,7 +5,7 @@ import type {
   WorkersCliCategory,
   WorkersCliCommandDefinition,
 } from './command-types.ts';
-import { LocalWorkersCliBackend } from './workers-cli-backend.ts';
+import { LocalWorkersRuntimeBackend } from './local-runtime-backend.ts';
 
 /** Default backend for mounted worker commands before host runtime wiring. */
 export class StaticWorkersCliBackend implements WorkersCliBackend {
@@ -28,7 +28,7 @@ export class StaticWorkersCliBackend implements WorkersCliBackend {
   }
 }
 
-const defaultBackend: WorkersCliBackend = new LocalWorkersCliBackend();
+const defaultBackend: WorkersCliBackend = new LocalWorkersRuntimeBackend();
 
 /** Base class for concrete workers CLI commands. */
 export abstract class WorkersCliCommand extends WorkersCommand {
@@ -97,6 +97,19 @@ export class AddTaskCommand extends WorkersCliCommand {
         { name: 'entrypoint', description: 'Task entrypoint path.' },
         { name: 'timeout', description: 'Task timeout in milliseconds.' },
       ],
+    }, backend);
+  }
+}
+
+/** Create a worker workflow definition file. */
+export class AddWorkflowCommand extends WorkersCliCommand {
+  /** Create an add-workflow command with an optional backend override. */
+  constructor(backend?: WorkersCliBackend) {
+    super({
+      name: 'add-workflow',
+      category: 'runtime',
+      description: 'Create a worker workflow definition.',
+      usage: 'ns-workers add workflow <id>',
     }, backend);
   }
 }

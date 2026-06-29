@@ -70,3 +70,24 @@ Material drift: workspace-level `deno task test --filter plugin` and the workspa
 `run-publish-dry-run.ts` currently fail on `plugins/auth` importing the deleted v1
 `@netscript/plugin/scaffold` export. S1 did not touch `plugins/*`; S2-S4 own that connector/CLI
 repointing before final workspace gates.
+
+## S2 workers connector status (2026-06-29)
+
+S2 rewrote `plugins/workers` as the reference connector on `@netscript/plugin/adapter`.
+`src/adapter/plugin.ts` defines the `NetScriptPlugin`; `src/adapter/resources/{job,task,workflow}`
+define the add resources; `resources/barrel` emits the install-only `workers/mod.ts`. Install
+starter set is exactly `job(health-check)`, `task(validate-payload)`, and `barrel`; `workflow` is
+add-only. `plugins/workers/scaffold.ts` is the adapter scaffold entrypoint and `plugins/workers/cli.ts`
+is exported as `./adapter-cli`; the existing runtime `./cli` export remains
+`src/cli/composition/main.ts`.
+
+Deleted the duplicate workers mechanisms: `src/scaffold/*`, `src/scaffolding/*` including
+`templates/*.template`, and `src/cli/workers-cli-backend.ts`. The replacement
+`src/cli/local-runtime-backend.ts` preserves genuine runtime commands and delegates `add-job`,
+`add-task`, and `add-workflow` to the adapter resources.
+
+S2 gates are green: scoped check/lint/fmt over `plugins/workers` + `packages/plugin`; full
+`deno test --allow-all --unstable-kv plugins/workers packages/plugin` (`52 passed`); workers
+package publish dry-run (`Success Dry run complete`, dynamic-import warnings only); scaffold version
+pin check; manifest diff empty; `deno.lock` status empty. Drift records S4 host repoint sites and
+the wrapper dry-run workspace limitation.

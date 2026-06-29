@@ -5,7 +5,7 @@
  */
 
 import { WorkersCli } from '../workers-cli.ts';
-import { LocalWorkersCliBackend } from '../workers-cli-backend.ts';
+import { LocalWorkersRuntimeBackend } from '../local-runtime-backend.ts';
 
 export { WorkersCli } from '../workers-cli.ts';
 export { PluginCli } from '@netscript/plugin/cli';
@@ -15,6 +15,7 @@ export type { WorkersCommandDefinition } from '@netscript/plugin-workers-core/ab
 export {
   AddJobCommand,
   AddTaskCommand,
+  AddWorkflowCommand,
   CompileRegistryCommand,
   ConfigEditCommand,
   ConfigPublishCommand,
@@ -36,11 +37,14 @@ export type {
 } from '../command-types.ts';
 
 /** Default CLI instance used by the host CLI walker. */
-export const workersCli: WorkersCli = new WorkersCli(new LocalWorkersCliBackend());
+export const workersCli: WorkersCli = new WorkersCli(new LocalWorkersRuntimeBackend());
 
 if (import.meta.main) {
   const args = toWorkersCliArgs(Deno.args);
-  const result = await workersCli.run(args);
+  const command = workersCli.commands().find((item) => item.name === args.command);
+  const result = command
+    ? await command.run(args)
+    : { code: 1, message: `Unknown workers command: ${args.command}` };
   if (result.message) {
     if (result.code === 0) {
       console.log(result.message);
@@ -70,6 +74,9 @@ function normalizeCommand(first: string, second?: string): string {
   }
   if (first === 'add' && second === 'task') {
     return 'add-task';
+  }
+  if (first === 'add' && second === 'workflow') {
+    return 'add-workflow';
   }
   if (first === 'config' && second === 'edit') {
     return 'config-edit';
