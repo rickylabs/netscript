@@ -19,18 +19,12 @@ are carried by sub-path exports documented below.
 
 ## Plugin manifest (`@netscript/plugin-workers`)
 
-The root entrypoint exposes the plugin manifest consumed by the NetScript host and a pure
-inspection helper.
+The root entrypoint exposes the plugin manifest consumed by the NetScript host. Shared manifest
+inspection is provided by `inspectPlugin` from `@netscript/plugin`.
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
 | `workersPlugin` | variable | Plugin manifest for NetScript background workers. |
-| `inspectWorkers` | function | Inspect the workers plugin manifest without invoking lifecycle hooks. |
-| `WorkersPluginManifest` | interface | Public manifest shape for the workers plugin. |
-| `WorkersPluginContributions` | interface | Public contribution groups exposed by the workers plugin. |
-| `WorkersPluginDependencyManifest` | interface | Public dependency-manifest shape exposed by the workers plugin manifest. |
-| `WorkersPluginDependencies` | type alias | Typed dependencies consumed by the workers plugin manifest. |
-| `WorkersPluginInspection` | interface | Inspection summary for the workers plugin manifest. |
 
 ## Sub-path exports
 

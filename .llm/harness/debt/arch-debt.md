@@ -4,6 +4,23 @@ Seeded from `docs/architecture/doctrine/10-codebase-verdict-and-handoff.md` on 2
 track packages with `Refactor`, `Restructure`, or `Rewrite` doctrine verdicts. `Keep` and `Defer`
 verdicts are not seeded here.
 
+## plugins/auth — AUTH-BACKEND-ENV-CENTRALIZATION
+
+- **ID:** `AUTH-BACKEND-ENV-CENTRALIZATION`
+- **Title:** Per-backend auth environment construction remains connector-local.
+- **Context:** Plugin re-architecture v2 Decision C centralizes manifest inspection, service router
+  assembly, and health routing for `@netscript/plugin-auth`, but locked decision Q4 defers widening
+  the per-backend environment construction helpers into a shared auth-core sibling contract.
+- **Why deferred:** Moving backend-specific env construction is a breaking auth backend contract
+  change and needs a separately gated sub-wave with backend compatibility tests.
+- **Owner:** Future auth backend contract wave.
+- **Target:** Before beta auth backend API freeze.
+- **Linked plan:** `.llm/tmp/run/chore-plugin-rearch-v2--184/plan.md` (Q4).
+- **Created:** 2026-07-01
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when env construction moves behind an auth-core contract and all configured
+  backends pass compatibility and service boot tests.
+
 ## packages/cli — PLUGIN-USERLAND-SOURCE-COPY
 
 - **Reason:** Maintainer/local `plugin add` copied full first-party plugin source into generated

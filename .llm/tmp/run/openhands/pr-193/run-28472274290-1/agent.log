@@ -1,0 +1,400 @@
+    - Did NOT run `deno task` checks (PLAN-EVAL is read-only, gate runs on 
+IMPL-EVAL).
+    
+    ## Responses to review comments or issue comments when relevant
+    N/A — this is a planning-only evaluation. No source churn means no 
+review-comment thread to address.
+    
+    ## Remaining risks
+    - **Loop-limit**: a second `FAIL_PLAN` cycle on the same items will escalate
+per plan-gate loop-limit. The 6 required fixes are all planning-quality (not 
+architecture-quality), so a single revision should pass.
+    - **#192 merge hazard**: if PR #192 (`feat/triggers-feature-backing`) merges
+in a way that diverges from the assumption baked into plan line 197 (the 6 
+deferred routes are backed), the plan needs to re-validate that the 4 hot shared
+files (`plugin-manifest.ts`, `contract-base/`, `ports/`, `service/`) are still 
+in the assumed state.
+    - **Cast-mechanism choice (A vs B)**: whichever path the planner picks, 
+`inspectWorkers` / `inspectSagas` / `inspectTriggers` / `inspectStreams` / 
+`inspectAuth` typed signatures will change. Downstream consumers of these 
+functions (if any) need a separate review pass.
+    - **JSR-publishability**: the jsr-audit rubric needs to be applied to the 
+new `@netscript/plugin/scaffold` net-new surface and to each trimmed `-core` 
+subpath before S-core-1 lands.
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 3.73M • cache hit 94.23% •  reasoning 1.98K • ↓ output 30.25K • 
+$ 0.3120
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/28472274290-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# PLAN-EVAL summary — chore-plugin-rearch-v2--184
+ 2|
++3|## Summary
++4|Plan-evaluator session for harness run `chore-plugin-rearch-v2--184` (PR 
+#193, issue #184 tracking #191). Read-only evaluation of `plan.md` + 
+`research.md` against the Plan-Gate hard-stop rubric. **Verdict: FAIL_PLAN** 
+with 3 hard findings + 3 minor findings. No source churn; no lock-file edits.
++5|
++6|## Changes
++7|- Created `.llm/tmp/run/chore-plugin-rearch-v2--184/plan-eval.md` (verdict 
+document with checklist results, hard-check results, required fixes, evaluator 
+open-decision sweep).
++8|- Wrote this summary under the run-scoped path from `OPENHANDS_SUMMARY_PATH`.
++9|- Did not commit source or `deno.lock`.
++10|- Did not post a PR comment (per the operational contract: "The workflow 
+owns GitHub comments."). The verdict body that would be posted is captured in 
+`plan-eval.md` § "Verdict" and the per-check subsections.
++11|
++12|## Validation
++13|- Read `gates/plan-gate.md`, `evaluator/plan-protocol.md`, 
+`templates/plan-eval.md` (harness skill).
++14|- Read `.agents/skills/netscript-harness/SKILL.md`, 
+`.agents/skills/netscript-doctrine/SKILL.md`, 
+`.agents/skills/netscript-deno-toolchain/SKILL.md`, 
+`.agents/skills/jsr-audit/SKILL.md`.
++15|- Read `AGENTS.md`.
++16|- Read `research.md` (160 L), `plan.md` (231 L) end-to-end.
++17|- Independently confirmed base-truth (Check a): `packages/plugin/deno.json` 
+v0.0.1-alpha.16 exports 12 subpaths; `./adapter`, `./protocol`, 
+`./contract-base`, `./service` already present; only `./scaffold` is net-new.
++18|- Confirmed aspire base (Check c): `AspireNSPluginContribution` at 
+`packages/aspire/src/runtime/aspire-ns-plugin-contribution.base.ts:10`.
++19|- Confirmed `serveRpc:false` proxy path (Check b): 
+`packages/plugin/src/service/presentation/create-plugin-service.ts:92, 158`.
++20|- Structural narrowing analysis (Check e): `WorkersPluginDependencyManifest`
+⊂ `PluginManifest` (subset, not superset). The plan's "delete every local 
+`*PluginManifest` + remove the third cast" is self-contradictory without picking
+a resolution path.
++21|- Confirmed PR #192 (Triggers feature-backing) is **OPEN, PLANNING** via `gh
+pr list --state open` (Check d.1). Plan's "AFTER #181 lands" is not safe to 
+defer as currently worded.
++22|- Confirmed streams deletion hazard (Check d.2): 
+`plugins/streams/src/public/mod.ts:71-75, 139-141` not enumerated in 
+S-conform-streams.
++23|- Confirmed `runtime/` subpath ambiguity (Open-decision 3): plan line 82 
+keeps `./runtime` while line 155-156 renames `-core/src/runtime/` orchestration 
+→ `application/`.
++24|- Did NOT run `deno task` checks (PLAN-EVAL is read-only, gate runs on 
+IMPL-EVAL).
++25|
++26|## Responses to review comments or issue comments when relevant
++27|N/A — this is a planning-only evaluation. No source churn means no 
+review-comment thread to address.
++28|
++29|## Remaining risks
++30|- **Loop-limit**: a second `FAIL_PLAN` cycle on the same items will escalate
+per plan-gate loop-limit. The 6 required fixes are all planning-quality (not 
+architecture-quality), so a single revision should pass.
++31|- **#192 merge hazard**: if PR #192 (`feat/triggers-feature-backing`) merges
+in a way that diverges from the assumption baked into plan line 197 (the 6 
+deferred routes are backed), the plan needs to re-validate that the 4 hot shared
+files (`plugin-manifest.ts`, `contract-base/`, `ports/`, `service/`) are still 
+in the assumed state.
++32|- **Cast-mechanism choice (A vs B)**: whichever path the planner picks, 
+`inspectWorkers` / `inspectSagas` / `inspectTriggers` / `inspectStreams` / 
+`inspectAuth` typed signatures will change. Downstream consumers of these 
+functions (if any) need a separate review pass.
++33|- **JSR-publishability**: the jsr-audit rubric needs to be applied to the 
+new `@netscript/plugin/scaffold` net-new surface and to each trimmed `-core` 
+subpath before S-core-1 lands.
++34|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Write replies.json
+
+Thought:
+Now write the PR-comment body as a replies.json (per operational contract, 
+replies.json is for thread-replies, but I'll also include the body in 
+plan-eval.md for the workflow):
+
+Action: FileEditorAction
+
+Arguments:
+  command: "create"
+  path: "/home/runner/work/_temp/openhands/28472274290-1/replies.json"
+  file_text: 
+    [{"comment_id": 0, "body": "## PLAN-EVAL — chore-plugin-rearch-v2--184 (PR 
+#193, issue #184 / #191)\n\n**Verdict: FAIL_PLAN**\n\nPlan-evaluator session. 
+Read-only. No source churn, no `deno.lock` edits. Full checklist + per-check 
+evidence in `.llm/tmp/run/chore-plugin-rearch-v2--184/plan-eval.md`.\n\n### Hard
+checks (a–g)\n\n- **(a) BASE DIVERGENCE — PASS.** Independently confirmed 
+`packages/plugin/deno.json` v0.0.1-alpha.16 exports 12 subpaths. `./adapter`, 
+`./protocol`, `./contract-base`, `./service` already present. Only `./scaffold` 
+is net-new. Synthesizer's alpha.5 alarm confirmed stale-worktree false alarm 
+against live alpha.16.\n- **(b) DECISION A — streams proxy, no contract — 
+PASS.** Plan line 173–177 explicitly says DELETE not add. `serveRpc:false` 
+factory path exists in `createPluginService`. `capabilities.hasRoutes:false` 
+correction is right.\n- **(c) ASPIRE base extension — PASS.** 
+`AspireNSPluginContribution` abstract class confirmed at 
+`packages/aspire/src/runtime/aspire-ns-plugin-contribution.base.ts:10`. No plan 
+to invent a parallel aspire-contract.\n- **(d) A11 / removal hazards — FAIL (two
+findings).**\n  - **d.1 — #181 sequencing invalid.** PR #192 
+(`feat/triggers-feature-backing`) is **OPEN, PLANNING**, not landed. Plan's 
+\"AFTER #181 lands\" (line 197) is not safe to defer as currently worded. The 4 
+hot shared files (`plugin-manifest.ts`, `contract-base/`, `ports/`, `service/`) 
+make a parallel rebase hazardous. Needs explicit BLOCK + rebase/verify gate on 
+S-conform-triggers.\n  - **d.2 — streams `src/public/mod.ts` deletion hazard.** 
+Plan says DELETE `stream-api.ts` + local manifest types but 
+`plugins/streams/src/public/mod.ts:71-75, 139-141` (manifest fields) are also 
+deletion candidates, plus live consumers at `src/e2e/probes/probe-context.ts:2` 
+and `tests/public/stream-api_test.ts:3-5`. Not enumerated in 
+S-conform-streams.\n- **(e) CAST budget — FAIL (oversimplification).** Plan line
+149–150 says `build() → PluginManifest` → \"delete every local `*PluginManifest`
++ the `as unknown as` cast\". Structural narrowing analysis: 
+`WorkersPluginDependencyManifest` ⊂ `PluginManifest` (subset: no 
+`description?`/`displayName?`/`type?`/`author?`/`license?`/`tags?`/`permissions?
+`/`metadata?`/`hooks?`). The cast at `plugins/workers/src/public/mod.ts:245` is 
+a **downcast** (narrowing), not a widening. The plan contradicts itself: 
+deleting local interfaces removes the narrowing → cast becomes a no-op; keeping 
+local interfaces requires `build()` to return a `Pick<...>`-shaped type for the 
+cast to be removable. Plan must pick a resolution path (A: preserve narrowing 
+via `Pick<>`; B: drop narrowing, refactor `inspect*` signatures).\n- **(f) 
+GREENFIELD-FIRST ordering — PASS.** S9 is slice 2 (BEFORE S-conform-*). 5-gate 
+merge bar present (arch:check, scoped check/lint/fmt, publish:dry-run both 
+tiers, scaffold.runtime E2E, byte-identical). D2 (typesafe AST/factory codegen) 
+is provable via gate (4). `.template` skeleton retirement scoped to Q5.\n- **(g)
+e2e-cli-prod = HARD gate — PASS.** Plan line 218: \"**`e2e-cli-prod` (HARD)** 
+JSR-installed `scaffold.runtime --source jsr` green (never accept red as drift —
+user mandate)\". Plan line 231 acceptance: \"`e2e-cli-prod` green\".\n\n### 
+Plan-Gate checklist\n\n| Item | Result |\n|---|---|\n| Research present and 
+current | PASS |\n| Decisions locked | PASS |\n| Open-decision sweep | **FAIL** 
+(#181 sequencing) |\n| Commit slices (< 30, gate + files each) | PASS |\n| 
+**Risk register** | **FAIL** (no explicit risk section) |\n| Gate set selected |
+PASS |\n| Deferred scope explicit | PASS |\n| jsr-audit surface scan | **FAIL** 
+(no slow-type / @module / explicit-return-types enumeration) |\n\n### Other 
+grading\n\n- **Layering of `runtime/` → `application/` rename** — partially 
+FAIL. Plan line 82 keeps `./runtime` as a subpath while line 155–156 renames 
+`-core/src/runtime/` orchestration → `application/`. The subpath is either stale
+(should be removed) or refers to a different `runtime/` (e.g., runtime-launch 
+binding). Plan does not disambiguate. Affects line 163 workers trim (\"trim 17 
+subpaths → `. ./contracts/v1 ./runtime ./testing`\") and line 82 parenthetical 
+(`./config`/`./telemetry`/`./transports`).\n- **-core public-subpath trim** — 
+partial. Same issue as above for `./runtime`. 
+`./config`/`./telemetry`/`./transports` need a \"real external consumer needs 
+them\" justification, otherwise they should be removed too.\n- **`pluginNewSpec`
+dual-tier lockstep + workspace member wiring** — PASS. Plan line 136–138 + 
+140–145: S9 gate (3) `publish:dry-run` BOTH tiers + gate (1) `arch:check` covers
+workspace member list + import map.\n- **Q4 deferral 
+(`AUTH-BACKEND-ENV-CENTRALIZATION`)** — PASS. Per-backend env construction → 
+siblings via separately-gated breaking sub-wave. No consumer outside the auth 
+plugin reads `backend-registry.ts` internals.\n- **Unified 
+#164/#166/#167-task/#168 folding** — PASS. #168 → S9 + acceptance. 
+#164/#166/#167-task → S-verify. No orphans.\n\n### Required fixes (in 
+order)\n\n1. **Add an explicit Risk register** with mitigations. The \"Locked 
+decisions\" section does not substitute.\n2. **Tighten #181 sequencing** to an 
+explicit BLOCK gate on S-conform-triggers: \"BLOCK until PR #192 is merged into 
+`chore/plugin-rearch-v2`. On resume: rebase + run `arch:check` + scoped 
+`run-deno-check` over the 4 hot shared files before touching 
+`plugins/triggers/`.\"\n3. **Resolve cast mechanism** — pick Resolution A 
+(preserve narrowing, `build() → Pick<PluginManifest, ...>`) or Resolution B 
+(drop narrowing, refactor `inspect*` to take `PluginManifest`). Update line 
+149–150 to be self-consistent.\n4. **Make streams deletion explicit** — extend 
+S-conform-streams to include `plugins/streams/src/public/mod.ts:71-75, 139-141`,
+`src/e2e/probes/probe-context.ts:2`, `tests/public/stream-api_test.ts`.\n5. 
+**Disambiguate `runtime/` subpath retention** — either remove `./runtime` from 
+line 82/163 (since orchestration is renamed) or document which `runtime/` 
+content is exported.\n6. **Apply jsr-audit rubric explicitly** — add a \"JSR 
+publishability\" section enumerating slow-type / explicit return types / 
+`@module` docs for the net-new `@netscript/plugin/scaffold` surface + each 
+trimmed `-core` subpath.\n\nThe plan is structurally sound — greenfield-first, 
+base-truth correct, aspire base consumed not duplicated, e2e-cli-prod is hard, 
+retire-`.template` is well-scoped, Q4 deferral is appropriate. All 6 required 
+fixes are **planning-quality** issues, not architecture-quality. None require 
+re-architecting. After the 6 fixes, the plan should pass.\n\nA second 
+`FAIL_PLAN` cycle on the same items will escalate to the user per plan-gate 
+loop-limit.\n\n— plan-evaluator (openhands / minimax-M3)"}]
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 3.76M • cache hit 94.27% •  reasoning 1.98K • ↓ output 32.2K • $
+0.3162
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/28472274290-1/replies.json edited with 1
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|[{"comment_id": 0, "body": "## PLAN-EVAL — chore-plugin-rearch-v2--184 (PR 
+#193, issue #184 / #191)\n\n**Verdict: FAIL_PLAN**\n\nPlan-evaluator session. 
+Read-only. No source churn, no `deno.lock` edits. Full checklist + per-check 
+evidence in `.llm/tmp/run/chore-plugin-rearch-v2--184/plan-eval.md`.\n\n### Hard
+checks (a–g)\n\n- **(a) BASE DIVERGENCE — PASS.** Independently confirmed 
+`packages/plugin/deno.json` v0.0.1-alpha.16 exports 12 subpaths. `./adapter`, 
+`./protocol`, `./contract-base`, `./service` already present. Only `./scaffold` 
+is net-new. Synthesizer's alpha.5 alarm confirmed stale-worktree false alarm 
+against live alpha.16.\n- **(b) DECISION A — streams proxy, no contract — 
+PASS.** Plan line 173–177 explicitly says DELETE not add. `serveRpc:false` 
+factory path exists in `createPluginService`. `capabilities.hasRoutes:false` 
+correction is right.\n- **(c) ASPIRE base extension — PASS.** 
+`AspireNSPluginContribution` abstract class confirmed at 
+`packages/aspire/src/runtime/aspire-ns-plugin-contribution.base.ts:10`. No plan 
+to invent a parallel aspire-contract.\n- **(d) A11 / removal hazards — FAIL (two
+findings).**\n  - **d.1 — #181 sequencing invalid.** PR #192 
+(`feat/triggers-feature-backing`) is **OPEN, PLANNING**, not landed. Plan's 
+\"AFTER #181 lands\" (line 197) is not safe to defer as currently worded. The 4 
+hot shared files (`plugin-manifest.ts`, `contract-base/`, `ports/`, `service/`) 
+make a parallel rebase hazardous. Needs explicit BLOCK + rebase/verify gate on 
+S-conform-triggers.\n  - **d.2 — streams `src/public/mod.ts` deletion hazard.** 
+Plan says DELETE `stream-api.ts` + local manifest types but 
+`plugins/streams/src/public/mod.ts:71-75, 139-141` (manifest fields) are also 
+deletion candidates, plus live consumers at `src/e2e/probes/probe-context.ts:2` 
+and `tests/public/stream-api_test.ts:3-5`. Not enumerated in 
+S-conform-streams.\n- **(e) CAST budget — FAIL (oversimplification).** Plan line
+149–150 says `build() → PluginManifest` → \"delete every local `*PluginManifest`
++ the `as unknown as` cast\". Structural narrowing analysis: 
+`WorkersPluginDependencyManifest` ⊂ `PluginManifest` (subset: no 
+`description?`/`displayName?`/`type?`/`author?`/`license?`/`tags?`/`permissions?
+`/`metadata?`/`hooks?`). The cast at `plugins/workers/src/public/mod.ts:245` is 
+a **downcast** (narrowing), not a widening. The plan contradicts itself: 
+deleting local interfaces removes the narrowing → cast becomes a no-op; keeping 
+local interfaces requires `build()` to return a `Pick<...>`-shaped type for the 
+cast to be removable. Plan must pick a resolution path (A: preserve narrowing 
+via `Pick<>`; B: drop narrowing, refactor `inspect*` signatures).\n- **(f) 
+GREENFIELD-FIRST ordering — PASS.** S9 is slice 2 (BEFORE S-conform-*). 5-gate 
+merge bar present (arch:check, scoped check/lint/fmt, publish:dry-run both 
+tiers, scaffold.runtime E2E, byte-identical). D2 (typesafe AST/factory codegen) 
+is provable via gate (4). `.template` skeleton retirement scoped to Q5.\n- **(g)
+e2e-cli-prod = HARD gate — PASS.** Plan line 218: \"**`e2e-cli-prod` (HARD)** 
+JSR-installed `scaffold.runtime --source jsr` green (never accept red as drift —
+user mandate)\". Plan line 231 acceptance: \"`e2e-cli-prod` green\".\n\n### 
+Plan-Gate checklist\n\n| Item | Result |\n|---|---|\n| Research present and 
+current | PASS |\n| Decisions locked | PASS |\n| Open-decision sweep | **FAIL** 
+(#181 sequencing) |\n| Commit slices (< 30, gate + files each) | PASS |\n| 
+**Risk register** | **FAIL** (no explicit risk section) |\n| Gate set selected |
+PASS |\n| Deferred scope explicit | PASS |\n| jsr-audit surface scan | **FAIL** 
+(no slow-type / @module / explicit-return-types enumeration) |\n\n### Other 
+grading\n\n- **Layering of `runtime/` → `application/` rename** — partially 
+FAIL. Plan line 82 keeps `./runtime` as a subpath while line 155–156 renames 
+`-core/src/runtime/` orchestration → `application/`. The subpath is either stale
+(should be removed) or refers to a different `runtime/` (e.g., runtime-launch 
+binding). Plan does not disambiguate. Affects line 163 workers trim (\"trim 17 
+subpaths → `. ./contracts/v1 ./runtime ./testing`\") and line 82 parenthetical 
+(`./config`/`./telemetry`/`./transports`).\n- **-core public-subpath trim** — 
+partial. Same issue as above for `./runtime`. 
+`./config`/`./telemetry`/`./transports` need a \"real external consumer needs 
+them\" justification, otherwise they should be removed too.\n- **`pluginNewSpec`
+dual-tier lockstep + workspace member wiring** — PASS. Plan line 136–138 + 
+140–145: S9 gate (3) `publish:dry-run` BOTH tiers + gate (1) `arch:check` covers
+workspace member list + import map.\n- **Q4 deferral 
+(`AUTH-BACKEND-ENV-CENTRALIZATION`)** — PASS. Per-backend env construction → 
+siblings via separately-gated breaking sub-wave. No consumer outside the auth 
+plugin reads `backend-registry.ts` internals.\n- **Unified 
+#164/#166/#167-task/#168 folding** — PASS. #168 → S9 + acceptance. 
+#164/#166/#167-task → S-verify. No orphans.\n\n### Required fixes (in 
+order)\n\n1. **Add an explicit Risk register** with mitigations. The \"Locked 
+decisions\" section does not substitute.\n2. **Tighten #181 sequencing** to an 
+explicit BLOCK gate on S-conform-triggers: \"BLOCK until PR #192 is merged into 
+`chore/plugin-rearch-v2`. On resume: rebase + run `arch:check` + scoped 
+`run-deno-check` over the 4 hot shared files before touching 
+`plugins/triggers/`.\"\n3. **Resolve cast mechanism** — pick Resolution A 
+(preserve narrowing, `build() → Pick<PluginManifest, ...>`) or Resolution B 
+(drop narrowing, refactor `inspect*` to take `PluginManifest`). Update line 
+149–150 to be self-consistent.\n4. **Make streams deletion explicit** — extend 
+S-conform-streams to include `plugins/streams/src/public/mod.ts:71-75, 139-141`,
+`src/e2e/probes/probe-context.ts:2`, `tests/public/stream-api_test.ts`.\n5. 
+**Disambiguate `runtime/` subpath retention** — either remove `./runtime` from 
+line 82/163 (since orchestration is renamed) or document which `runtime/` 
+content is exported.\n6. **Apply jsr-audit rubric explicitly** — add a \"JSR 
+publishability\" section enumerating slow-type / explicit return types / 
+`@module` docs for the net-new `@netscript/plugin/scaffold` surface + each 
+trimmed `-core` subpath.\n\nThe plan is structurally sound — greenfield-first, 
+base-truth correct, aspire base consumed not duplicated, e2e-cli-prod is hard, 
+retire-`.template` is well-scoped, Q4 deferral is appropriate. All 6 required 
+fixes are **planning-quality** issues, not architecture-quality. None require 
+re-architecting. After the 6 fixes, the plan should pass.\n\nA second 
+`FAIL_PLAN` cycle on the same items will escalate to the user per plan-gate 
+loop-limit.\n\n— plan-evaluator (openhands / minimax-M3)"}]
+ 2|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: PLAN-EVAL verdict: FAIL_PLAN
+
+Thought:
+Now finish:
+
+Finish with message:
+PLAN-EVAL complete for harness run `chore-plugin-rearch-v2--184` (PR #193, issue
+#184/#191).
+
+**Verdict: FAIL_PLAN** — read-only evaluation, no source churn, no `deno.lock` 
+edits.
+
+### Hard checks (a–g)
+- **(a) BASE DIVERGENCE — PASS.** Independently confirmed 
+`packages/plugin/deno.json` v0.0.1-alpha.16 already exports `./adapter`, 
+`./protocol`, `./contract-base`, `./service`. Only `./scaffold` is net-new. 
+Synthesizer's alpha.5 alarm is a stale-worktree false alarm.
+- **(b) DECISION A — streams proxy, no contract — PASS.** Plan line 173–177 
+explicitly says DELETE not add. `serveRpc:false` factory path exists. 
+`capabilities.hasRoutes:false` correction is right.
+- **(c) ASPIRE base extension — PASS.** `AspireNSPluginContribution` confirmed 
+at `packages/aspire/src/runtime/aspire-ns-plugin-contribution.base.ts:10`. No 
+plan to invent a parallel aspire-contract.
+- **(d) A11 / removal hazards — FAIL** (2 findings): (d.1) #181 sequencing 
+invalid because PR #192 is OPEN, PLANNING — needs explicit BLOCK + rebase/verify
+gate; (d.2) streams `src/public/mod.ts:71-75, 139-141` not enumerated in 
+S-conform-streams.
+- **(e) CAST budget — FAIL (oversimplification).** Plan line 149–150 is 
+self-contradictory: `WorkersPluginDependencyManifest` is a NARROWER subset of 
+`PluginManifest`, so the `as unknown as WorkersPluginManifest` cast is a 
+downcast, not a widening. Plan must pick Resolution A (preserve narrowing via 
+`Pick<>`) or Resolution B (drop narrowing, refactor `inspect*`).
+- **(f) GREENFIELD-FIRST ordering — PASS.** S9 is slice 2 (BEFORE S-conform-*). 
+5-gate merge bar present. `.template` skeleton retirement scoped to Q5.
+- **(g) e2e-cli-prod = HARD gate — PASS.** Plan line 218 explicitly hard-gates, 
+line 231 acceptance requires green.
+
+### Plan-Gate checklist
+3 hard FAILs: (1) no explicit Risk register, (2) #181 sequencing needs explicit 
+BLOCK gate, (3) jsr-audit rubric not applied to new surface.
+
+### Deliverables
+- `.llm/tmp/run/chore-plugin-rearch-v2--184/plan-eval.md` — full verdict 
+document (checklist + per-check evidence + required fixes).
+- `/home/runner/work/_temp/openhands/28472274290-1/summary.md` — run summary.
+- `/home/runner/work/_temp/openhands/28472274290-1/replies.json` — PR-comment 
+body (the workflow owns the actual comment posting).
+
+### Required fixes (in order)
+1. Add explicit Risk register section.
+2. Tighten #181 sequencing to an explicit BLOCK + rebase/verify gate on 
+S-conform-triggers.
+3. Resolve cast mechanism — pick A (Pick<>) or B (drop narrowing), update line 
+149–150 to be self-consistent.
+4. Extend S-conform-streams to include `src/public/mod.ts:71-75, 139-141` and 
+live consumers.
+5. Disambiguate `runtime/` subpath retention (line 82 keeps, line 155–156 
+renames — contradiction).
+6. Apply jsr-audit rubric explicitly (slow types, explicit return types, 
+`@module` docs).
+
+The plan is structurally sound — greenfield-first, base-truth correct, aspire 
+consumed, e2e-cli-prod is hard, retire-`.template` well-scoped, Q4 deferral 
+appropriate. All 6 fixes are **planning-quality** issues, not 
+architecture-quality. None require re-architecting. A single revision should 
+pass; a second `FAIL_PLAN` cycle will escalate per plan-gate loop-limit.
+
+Tokens: ↑ input 3.8M • cache hit 94.32% •  reasoning 1.98K • ↓ output 33.1K • $ 
+0.3192
+

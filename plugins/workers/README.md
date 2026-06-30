@@ -42,15 +42,16 @@ bunx jsr add @netscript/plugin-workers
 ```
 
 ```typescript
-import { inspectWorkers, workersPlugin } from '@netscript/plugin-workers';
+import { inspectPlugin } from '@netscript/plugin';
+import { workersPlugin } from '@netscript/plugin-workers';
 
 // Hand the manifest to the host plugin loader.
 export const plugins = [workersPlugin];
 
 // Inspect declared contribution axes without invoking lifecycle hooks.
-const summary = inspectWorkers();
-console.log(summary.name); // "@netscript/plugin-workers"
-console.log(summary.axes); // ["services", "backgroundProcessors", "streamTopics", ...]
+const summary = inspectPlugin(workersPlugin);
+console.log(summary.target); // "@netscript/plugin-workers"
+console.log(summary.details.contributionGroups); // number of declared contribution groups
 ```
 
 ---

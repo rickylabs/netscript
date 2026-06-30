@@ -27,12 +27,7 @@ live in the internal `@netscript/plugin-streams-core` package, documented in
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
-| `streamsPlugin` | variable | `const streamsPlugin: StreamsPluginManifest` | Plugin manifest for the NetScript Durable Streams service. |
-| `StreamsPluginManifest` | interface | `interface StreamsPluginManifest` | Public manifest shape for the streams plugin. |
-| `StreamsPluginContributions` | interface | `interface StreamsPluginContributions` | Public contribution groups exposed by the streams plugin. |
-| `StreamsServiceContribution` | interface | `interface StreamsServiceContribution` | Service contributed by the streams plugin. |
-| `StreamsTelemetryContribution` | interface | `interface StreamsTelemetryContribution` | Telemetry contribution exposed by the streams plugin. |
-| `StreamsE2eContribution` | interface | `interface StreamsE2eContribution` | E2E contribution exposed by the streams plugin. |
+| `streamsPlugin` | variable | `const streamsPlugin: PluginManifest` | Plugin manifest for the NetScript Durable Streams service. |
 
 ## Topic authoring
 
@@ -49,8 +44,7 @@ live in the internal `@netscript/plugin-streams-core` package, documented in
 ### Re-exported plugin framework types
 
 The root export re-exports the shared NetScript plugin-framework contribution types unchanged from
-[`@netscript/plugin`](/reference/plugin/); they describe the manifest contract that
-`StreamsPluginManifest` specializes. See the [`@netscript/plugin` reference](/reference/plugin/)
+[`@netscript/plugin`](/reference/plugin/). See the [`@netscript/plugin` reference](/reference/plugin/)
 for their full definitions.
 
 | Symbol | Kind |

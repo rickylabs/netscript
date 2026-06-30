@@ -11,6 +11,7 @@
     "./cli": "./src/cli/mod.ts",
     "./loader": "./loader.ts",
     "./protocol": "./src/protocol/mod.ts",
+    "./scaffold": "./src/scaffold/mod.ts",
     "./sdk": "./src/sdk/mod.ts",
     "./testing": "./src/testing/mod.ts",
     "./templates": "./src/templates/mod.ts",
@@ -28,7 +29,7 @@
     "@orpc/server": "npm:@orpc/server@^1.14.6"
   },
   "tasks": {
-    "check": "deno check --unstable-kv mod.ts src/abstracts/mod.ts src/adapter/mod.ts src/config/mod.ts src/cli/mod.ts loader.ts src/protocol/mod.ts src/sdk/mod.ts src/testing/mod.ts src/templates/mod.ts src/contract-base/mod.ts src/service/mod.ts",
+    "check": "deno check --unstable-kv mod.ts src/abstracts/mod.ts src/adapter/mod.ts src/config/mod.ts src/cli/mod.ts loader.ts src/protocol/mod.ts src/scaffold/mod.ts src/sdk/mod.ts src/testing/mod.ts src/templates/mod.ts src/contract-base/mod.ts src/service/mod.ts",
     "fmt": "deno fmt",
     "lint": "deno lint",
     "test": "deno test --allow-all",

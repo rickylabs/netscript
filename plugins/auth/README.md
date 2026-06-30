@@ -43,17 +43,22 @@ bunx jsr add @netscript/plugin-auth
 ```
 
 ```typescript
-import { authPlugin, inspectAuth } from '@netscript/plugin-auth';
+import { inspectPlugin } from '@netscript/plugin';
+import { authPlugin } from '@netscript/plugin-auth';
 
 // Register the auth plugin manifest with a NetScript app, then verify
-// the contribution axes it brings before the app boots its services.
-const inspection = inspectAuth(authPlugin);
+// the contribution groups it brings before the app boots its services.
+const inspection = inspectPlugin(authPlugin);
 
-if (!inspection.axes.includes('services')) {
+if (inspection.details.contributionGroups === 0) {
   throw new Error('auth service contribution is required');
 }
 
-console.log(inspection.name, inspection.version, inspection.axes);
+console.log(
+  inspection.target,
+  inspection.details.version,
+  inspection.details.contributionGroups,
+);
 ```
 
 ---

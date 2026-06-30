@@ -1,0 +1,17 @@
+{
+  "run_id": "28475266261",
+  "run_attempt": "1",
+  "run_url": "https://github.com/rickylabs/netscript/actions/runs/28475266261",
+  "bootstrap_outcome": "success",
+  "agent_outcome": "success",
+  "verdict": "completed",
+  "summary_source": "agent",
+  "model": "openrouter/minimax/minimax-m3",
+  "provider": "OPENROUTER",
+  "output_mode": "pr-comment",
+  "issue_number": "193",
+  "checkout_repo": "rickylabs/netscript",
+  "checkout_ref": "chore/plugin-rearch-v2",
+  "summary_path": "/home/runner/work/_temp/openhands/28475266261-1/summary.md",
+  "trace_dir": ".llm/tmp/run/openhands/pr-193/run-28475266261-1"
+}

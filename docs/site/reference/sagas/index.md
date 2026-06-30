@@ -36,33 +36,17 @@ The plugin publishes the following entrypoints. Each is generated from its own `
 
 ## Plugin manifest (`@netscript/plugin-sagas`)
 
-The root entrypoint exposes the plugin manifest, stable identifiers, and an inspection helper.
+The root entrypoint exposes the plugin manifest and stable identifiers. Shared manifest inspection
+is provided by `inspectPlugin` from `@netscript/plugin`.
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
-| `sagasPlugin` | variable | `SagasPluginManifest` | Plugin manifest for NetScript sagas. |
-| `inspectSagas` | function | `inspectSagas(manifest?: SagasPluginManifest): SagasPluginInspection` | Inspect the sagas plugin manifest without invoking lifecycle hooks. |
+| `sagasPlugin` | variable | `PluginManifest` | Plugin manifest for NetScript sagas. |
 | `SAGAS_PLUGIN_ID` | variable | `"sagas"` | Stable plugin identifier used by manifests, scaffolding, and runtime ownership checks. |
 | `SAGAS_PLUGIN_VERSION` | variable | `"1.0.0"` | Plugin manifest version advertised to the NetScript host. |
 | `SAGAS_API_SERVICE_NAME` | variable | `"sagas-api"` | Service contribution name for the sagas API process. |
 | `SAGAS_API_DEFAULT_PORT` | variable | `8092` | Default HTTP port for the sagas API process. |
 
-### Manifest types
-
-| Symbol | Kind | Description |
-| --- | --- | --- |
-| `SagasPluginManifest` | interface | Public manifest shape for the sagas plugin. |
-| `SagasPluginContributions` | interface | Public contribution groups exposed by the sagas plugin. |
-| `SagasPluginInspection` | interface | Inspection summary for the sagas plugin manifest. |
-| `SagasPluginDependencies` | type alias | Typed dependencies consumed by the sagas plugin manifest. |
-| `SagasPluginDependencyManifest` | type alias | Structural plugin manifest dependency reference. |
-| `SagasServiceContribution` | type alias | Structural service contribution in the manifest. |
-| `SagasDbSchemaContribution` | type alias | Structural database schema contribution in the manifest. |
-| `SagasMigrationContribution` | type alias | Structural migration contribution in the manifest. |
-| `SagasContractVersionContribution` | type alias | Structural contract version contribution in the manifest. |
-| `SagasRuntimeConfigTopicContribution` | type alias | Structural runtime config topic contribution in the manifest. |
-| `SagasTelemetryContribution` | type alias | Structural telemetry contribution in the manifest. |
-| `SagasE2eContribution` | type alias | Structural E2E contribution in the manifest. |
 
 ## Runtime (`@netscript/plugin-sagas/runtime`)
 

@@ -22,6 +22,19 @@ export {
   type PluginRawRoute,
   type PluginServiceConfig,
 } from './presentation/create-plugin-service.ts';
+export type {
+  BoundPluginContract,
+  PluginContractAssemblyConfig,
+  PluginContractBinder,
+  PluginContractHandlers,
+  PluginContractImplementer,
+  PluginContractRouteKey,
+  PluginContractRouter,
+} from './presentation/plugin-contract-binder.ts';
+export {
+  assemblePluginContractRouter,
+  bindPluginContract,
+} from './presentation/plugin-contract-binder.ts';
 
 // Re-export the leaf `@netscript/service` contracts this surface names directly
 // so the documented public API is self-complete for the JSR `private-type-ref`

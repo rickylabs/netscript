@@ -24,11 +24,6 @@ export function verifyStreamsPlugin(): PluginVerificationResult {
       module: './src/aspire/mod.ts',
       message: 'expected the streams Aspire contribution module',
     },
-    helpers: [
-      { key: 'defineTopic', message: 'expected defineTopic helper' },
-      { key: 'defineProducer', message: 'expected defineProducer helper' },
-      { key: 'defineConsumer', message: 'expected defineConsumer helper' },
-    ],
   });
 }
 

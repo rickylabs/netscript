@@ -9,18 +9,14 @@ Public plugin manifest for NetScript auth. This page is generated from the packa
 public surface with `deno doc`. For the auth package map, return to the
 [auth reference hub](/reference/auth/).
 
-The root entrypoint exposes the plugin manifest, auth contribution shapes, plugin
-metadata constants, and a small manifest inspector.
+The root entrypoint exposes the plugin manifest and auth metadata constants. Shared manifest
+inspection is provided by `inspectPlugin` from `@netscript/plugin`.
 
 ## Plugin manifest
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
 | `authPlugin` | constant | Plugin manifest for NetScript auth. |
-| `inspectAuth` | function | Inspect an `AuthPluginManifest` and return dependency and contribution-axis metadata. |
-| `AuthPluginManifest` | interface | Manifest shape exported by the auth plugin package. |
-| `AuthPluginContributions` | interface | Auth plugin contribution groups, including services, runtime config topics, and contract versions. |
-| `AuthPluginInspection` | interface | JSON-stable inspection result returned by `inspectAuth`. |
 
 ## Constants
 
@@ -31,21 +27,11 @@ metadata constants, and a small manifest inspector.
 | `AUTH_API_SERVICE_NAME` | `"auth-api"` | Service name contributed by the auth plugin. |
 | `AUTH_API_DEFAULT_PORT` | `8094` | Default auth-api service port. |
 
-## Contribution types
-
-| Symbol | Kind | Description |
-| --- | --- | --- |
-| `AuthServiceContribution` | type alias | Service contribution record for auth-api. |
-| `AuthRuntimeConfigTopicContribution` | type alias | Runtime-config topic contribution record. |
-| `AuthContractVersionContribution` | type alias | Contract-version contribution record. |
-| `AuthPluginDependencies` | type alias | Dependency record accepted by the plugin manifest. |
-| `AuthPluginDependencyManifest` | type alias | Dependency manifest shape used inside `AuthPluginDependencies`. |
-
 ## Sub-path exports
 
 | Export | Purpose |
 | --- | --- |
-| `@netscript/plugin-auth` | Root plugin manifest and inspector. |
+| `@netscript/plugin-auth` | Root plugin manifest. |
 | `@netscript/plugin-auth/public` | Public plugin entrypoint. |
 | `@netscript/plugin-auth/plugin` | Plugin manifest entrypoint. |
 | `@netscript/plugin-auth/contracts` | Auth contract contribution entrypoint. |
