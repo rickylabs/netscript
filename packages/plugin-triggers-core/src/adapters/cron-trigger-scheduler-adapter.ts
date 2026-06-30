@@ -7,12 +7,12 @@ import {
   type TriggerEventId,
   type TriggerId,
   TriggersError,
-} from '@netscript/plugin-triggers-core/domain';
+} from '../domain/mod.ts';
 import type {
   ScheduledTriggerHandle,
   TriggerSchedulerPort,
   TriggerSchedulerStopOptions,
-} from '@netscript/plugin-triggers-core/ports';
+} from '../ports/mod.ts';
 
 /** Cron provider selector accepted by the runtime adapter. */
 export type RuntimeCronProvider =

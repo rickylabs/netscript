@@ -7,8 +7,8 @@ import type {
   TriggerEvent,
   TriggerEventId,
   TriggerId,
-} from '@netscript/plugin-triggers-core/domain';
-import type { FileWatcherHandle, FileWatcherPort } from '@netscript/plugin-triggers-core/ports';
+} from '../domain/mod.ts';
+import type { FileWatcherHandle, FileWatcherPort } from '../ports/mod.ts';
 
 /** Minimal file metadata emitted by a runtime watcher. */
 export type RuntimeWatchFileInfo = Readonly<{
