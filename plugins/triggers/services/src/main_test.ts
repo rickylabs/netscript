@@ -8,8 +8,7 @@
  * - `withServiceInfo` serves the service-info root;
  * - a backed oRPC route (`listTriggers`) returns the mapped definition set over
  *   the OpenAPI surface;
- * - a deferred oRPC route (`fireTrigger`) returns a server error (the honest
- *   "pending triggers-core runtime backing" deferral);
+ * - `fireTrigger` persists and accepts a manual-fire event;
  * - the raw HMAC webhook route is mounted at `POST /api/v1/webhooks/:triggerId`:
  *   an unknown trigger id resolves (cast-free) to a 404 before ingress, and a
  *   known trigger id is resolved against the definitions and reaches the ingress.
@@ -19,7 +18,11 @@
 
 import { assertEquals, assertExists } from '@std/assert';
 import type { RunningService } from '@netscript/service';
-import { defineWebhook } from '@netscript/plugin-triggers-core/builders';
+import {
+  HmacSha256WebhookVerifier,
+  MemoryWebhookVerifier,
+} from '@netscript/plugin-triggers-core/adapters';
+import { defineScheduledTrigger, defineWebhook } from '@netscript/plugin-triggers-core/builders';
 import type {
   TriggerEvent,
   TriggerEventId,
@@ -36,6 +39,16 @@ import type {
   TriggerIngressRequest,
   TriggerIngressResponse,
 } from '@netscript/plugin-triggers-core/ports';
+import {
+  InlineTriggerProcessor,
+  MemoryTriggerEnabledStateStore,
+} from '@netscript/plugin-triggers-core/testing';
+import {
+  createEventSubscription,
+  createManualDispatcher,
+  createTriggerIngress,
+  createWebhookTestDelivery,
+} from '@netscript/plugin-triggers-core/runtime';
 import { createTriggersService } from './main.ts';
 import type { TriggerServiceContext } from './routers/v1-types.ts';
 
@@ -78,21 +91,30 @@ const failingIngress: TriggerIngressPort = {
 };
 
 function buildContext(): TriggerServiceContext {
+  const eventStore = new InMemoryEventStore();
+  const eventSubscription = createEventSubscription();
   const definitions: readonly ProcessableTriggerDefinition[] = [
-    {
+    defineScheduledTrigger(() => Promise.resolve([]), {
       id: 'sched-1',
-      kind: 'scheduled',
-      durability: 't1',
+      name: 'Fixture Schedule',
+      cron: '0 0 * * *',
+      timezone: 'UTC',
       description: 'A scheduled trigger fixture.',
       tags: ['fixture'],
-      // The handler is never invoked by the read-only smoke paths.
-      handler: () => Promise.resolve(),
-    } as unknown as ProcessableTriggerDefinition,
+    }),
   ];
   return {
     definitions,
-    eventStore: new InMemoryEventStore(),
+    eventStore,
+    enabledState: new MemoryTriggerEnabledStateStore(),
     ingress: failingIngress,
+    manualDispatcher: createManualDispatcher({
+      eventStore,
+      processor: new InlineTriggerProcessor(),
+      createEventId: () => 'trg_evt_connector_manual' as TriggerEventId,
+    }),
+    webhookTestDelivery: createWebhookTestDelivery({ ingress: failingIngress }),
+    eventSubscription,
   };
 }
 
@@ -104,9 +126,12 @@ function buildWebhookPathContext(acceptedTriggerIds: string[]): TriggerServiceCo
       verifier: 'memory',
     }),
   ];
+  const eventStore = new InMemoryEventStore();
+  const eventSubscription = createEventSubscription();
   return {
     definitions,
-    eventStore: new InMemoryEventStore(),
+    eventStore,
+    enabledState: new MemoryTriggerEnabledStateStore(),
     ingress: {
       accept(request: TriggerIngressRequest): Promise<TriggerIngressResponse> {
         acceptedTriggerIds.push(request.triggerId);
@@ -116,6 +141,12 @@ function buildWebhookPathContext(acceptedTriggerIds: string[]): TriggerServiceCo
         });
       },
     },
+    manualDispatcher: createManualDispatcher({
+      eventStore,
+      processor: new InlineTriggerProcessor(),
+    }),
+    webhookTestDelivery: createWebhookTestDelivery({ ingress: failingIngress }),
+    eventSubscription,
   };
 }
 
@@ -131,10 +162,48 @@ function buildEventsContext(): TriggerServiceContext {
     payload: {},
     metadata: {},
   } as unknown as TriggerEvent;
+  const eventStore = new InMemoryEventStore([event]);
+  const eventSubscription = createEventSubscription();
   return {
     definitions: [],
-    eventStore: new InMemoryEventStore([event]),
+    eventStore,
+    enabledState: new MemoryTriggerEnabledStateStore(),
     ingress: failingIngress,
+    manualDispatcher: createManualDispatcher({
+      eventStore,
+      processor: new InlineTriggerProcessor(),
+    }),
+    webhookTestDelivery: createWebhookTestDelivery({ ingress: failingIngress }),
+    eventSubscription,
+  };
+}
+
+function buildWebhookTestContext(): TriggerServiceContext {
+  const definition = defineWebhook(() => Promise.resolve([]), {
+    id: 'test-webhook',
+    path: '/test-webhook',
+    verifier: 'memory',
+  });
+  const eventStore = new InMemoryEventStore();
+  const processor = new InlineTriggerProcessor();
+  const eventSubscription = createEventSubscription();
+  const memoryVerifier = new MemoryWebhookVerifier({ idempotencyKey: 'test-webhook-idem' });
+  const ingress = createTriggerIngress({
+    definitions: [definition],
+    eventStore,
+    processor,
+    verifier: new HmacSha256WebhookVerifier({ signatureHeader: 'x-hub-signature-256' }),
+    selectVerifier: () => memoryVerifier,
+    createEventId: () => 'trg_evt_connector_webhook_test' as TriggerEventId,
+  });
+  return {
+    definitions: [definition],
+    eventStore,
+    enabledState: new MemoryTriggerEnabledStateStore(),
+    ingress,
+    manualDispatcher: createManualDispatcher({ eventStore, processor }),
+    webhookTestDelivery: createWebhookTestDelivery({ ingress }),
+    eventSubscription,
   };
 }
 
@@ -189,9 +258,57 @@ Deno.test('triggers connector smoke', async (t) => {
       const body = await res.json() as { triggers: unknown[]; total: number };
       assertEquals(body.total, 1);
       assertEquals(body.triggers.length, 1);
+      assertEquals(body.triggers[0], {
+        id: 'sched-1',
+        kind: 'scheduled',
+        name: 'Fixture Schedule',
+        description: 'A scheduled trigger fixture.',
+        enabled: true,
+        durabilityTier: 't1',
+        tags: ['fixture'],
+      });
     });
 
-    await t.step('deferred route fireTrigger returns a server error', async () => {
+    await t.step('enable and disable routes round-trip stored state', async () => {
+      const disableRoute = await findRoute(
+        baseUrl,
+        (method, path) => method === 'POST' && /\/disable$/.test(path),
+      );
+      const disableRes = await fetch(
+        `${baseUrl}/api${disableRoute.path.replace('{id}', 'sched-1')}`,
+        {
+          method: 'POST',
+        },
+      );
+      assertEquals(disableRes.status, 200);
+      const disabled = await disableRes.json() as { enabled: boolean };
+      assertEquals(disabled.enabled, false);
+
+      const listRoute = await findRoute(
+        baseUrl,
+        (method, path) => method === 'GET' && /\/triggers$/.test(path),
+      );
+      const disabledList = await fetch(`${baseUrl}/api${listRoute.path}?enabled=false`);
+      assertEquals(disabledList.status, 200);
+      const disabledBody = await disabledList.json() as { triggers: Array<{ id: string }> };
+      assertEquals(disabledBody.triggers.map((trigger) => trigger.id), ['sched-1']);
+
+      const enableRoute = await findRoute(
+        baseUrl,
+        (method, path) => method === 'POST' && /\/enable$/.test(path),
+      );
+      const enableRes = await fetch(
+        `${baseUrl}/api${enableRoute.path.replace('{id}', 'sched-1')}`,
+        {
+          method: 'POST',
+        },
+      );
+      assertEquals(enableRes.status, 200);
+      const enabled = await enableRes.json() as { enabled: boolean };
+      assertEquals(enabled.enabled, true);
+    });
+
+    await t.step('fireTrigger accepts a manual fire event', async () => {
       const route = await findRoute(
         baseUrl,
         (method, path) => method === 'POST' && /\/fire$/.test(path),
@@ -200,11 +317,59 @@ Deno.test('triggers connector smoke', async (t) => {
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({}),
+        body: JSON.stringify({ payload: { orderId: 'o-1' }, reason: 'manual replay' }),
       });
-      // oRPC maps the uncaught deferral throw to a 5xx server error.
-      assertEquals(res.status >= 500, true, `expected 5xx, got ${res.status}`);
-      await res.body?.cancel();
+      assertEquals(res.status, 200);
+      const body = await res.json() as {
+        accepted: boolean;
+        eventId: string;
+        triggerId: string;
+        status: string;
+      };
+      assertEquals(body, {
+        accepted: true,
+        eventId: 'trg_evt_connector_manual',
+        triggerId: 'sched-1',
+        status: 'pending',
+      });
+    });
+
+    await t.step('previewSchedule returns next fire times', async () => {
+      const route = await findRoute(
+        baseUrl,
+        (method, path) => method === 'GET' && /\/triggers\/\{id\}\/preview$/.test(path),
+      );
+      const res = await fetch(
+        `${baseUrl}/api${route.path.replace('{id}', 'sched-1')}?count=2`,
+      );
+      assertEquals(res.status, 200);
+      const body = await res.json() as {
+        triggerId: string;
+        nextFireAt: string[];
+        timezone: string;
+        persistent: boolean;
+      };
+      assertEquals(body.triggerId, 'sched-1');
+      assertEquals(body.nextFireAt.length, 2);
+      assertEquals(body.timezone, 'UTC');
+      assertEquals(body.persistent, true);
+    });
+
+    await t.step('subscribeEvents streams a heartbeat', async () => {
+      const route = await findRoute(
+        baseUrl,
+        (method, path) => method === 'GET' && /\/events\/subscribe$/.test(path),
+      );
+      const controller = new AbortController();
+      const res = await fetch(`${baseUrl}/api${route.path}`, { signal: controller.signal });
+      assertEquals(res.status, 200);
+      const reader = res.body?.getReader();
+      assertExists(reader);
+      const chunk = await reader.read();
+      controller.abort();
+      reader.releaseLock();
+      const text = new TextDecoder().decode(chunk.value);
+      assertEquals(text.includes('heartbeat'), true);
     });
 
     await t.step('raw webhook unknown trigger id resolves to a 404', async () => {
@@ -261,6 +426,42 @@ Deno.test('triggers webhook public path resolves to definition id', async () => 
     });
     assertEquals(res.status, 202);
     assertEquals(acceptedTriggerIds, ['generic-inbound-webhook']);
+  } finally {
+    await running.stop();
+  }
+});
+
+Deno.test('triggers testWebhook route accepts a synthetic delivery', async () => {
+  const running: RunningService = await createTriggersService(
+    buildWebhookTestContext(),
+    { port: 0 },
+  ).serve({ port: 0 });
+  const host = running.addr.hostname === '0.0.0.0' ? '127.0.0.1' : running.addr.hostname;
+  const baseUrl = `http://${host}:${running.addr.port}`;
+
+  try {
+    const route = await findRoute(
+      baseUrl,
+      (method, path) => method === 'POST' && /\/webhooks\/\{id\}\/test$/.test(path),
+    );
+    const res = await fetch(`${baseUrl}/api${route.path.replace('{id}', 'test-webhook')}`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ payload: { ok: true } }),
+    });
+    assertEquals(res.status, 200);
+    const body = await res.json() as {
+      accepted: boolean;
+      eventId: string;
+      triggerId: string;
+      status: string;
+    };
+    assertEquals(body, {
+      accepted: true,
+      eventId: 'trg_evt_connector_webhook_test',
+      triggerId: 'test-webhook',
+      status: 'pending',
+    });
   } finally {
     await running.stop();
   }

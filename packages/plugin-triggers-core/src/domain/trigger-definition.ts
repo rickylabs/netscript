@@ -24,6 +24,8 @@ export type TriggerDefinitionBase<
 > = Readonly<{
   id: TriggerId<TId>;
   kind: TKind;
+  name?: string;
+  enabled?: boolean;
   durability: TriggerDurabilityTier;
   handler: TriggerHandler<TEvent, TContext>;
   retry?: TriggerRetryPolicy;

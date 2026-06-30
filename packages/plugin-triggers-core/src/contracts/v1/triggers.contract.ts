@@ -400,11 +400,11 @@ const TriggerFiltersShape: {
       }>
     >
   >;
-  enabled: z.ZodOptional<z.ZodCoercedBoolean<unknown>>;
+  enabled: z.ZodOptional<ReturnType<typeof z.stringbool>>;
   tags: z.ZodOptional<z.ZodString>;
 } = {
   kind: z.enum(TRIGGER_KINDS).nullable().optional(),
-  enabled: z.coerce.boolean().optional(),
+  enabled: z.stringbool().optional(),
   tags: z.string().optional(),
 };
 

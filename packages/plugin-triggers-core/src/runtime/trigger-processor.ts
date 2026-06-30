@@ -20,6 +20,7 @@ import {
 import type {
   ProcessableTriggerDefinition,
   TriggerDlqPort,
+  TriggerEventSubscriptionPort,
   TriggerIdempotencyPort,
   TriggerProcessorPort,
   TriggerProcessorStopOptions,
@@ -44,6 +45,7 @@ export type TriggerProcessorOptions = Readonly<{
   logger?: LoggerPort;
   now?: () => Date;
   random?: () => number;
+  eventSubscription?: TriggerEventSubscriptionPort;
 }>;
 
 type CircuitBreakerState = Readonly<{
@@ -66,6 +68,7 @@ export class TriggerProcessor implements TriggerProcessorPort {
   readonly #logger: LoggerPort;
   readonly #now: () => Date;
   readonly #random: () => number;
+  readonly #eventSubscription?: TriggerEventSubscriptionPort;
   readonly #inFlight = new Set<Promise<unknown>>();
   readonly #concurrency = new Map<string, ConcurrencySlot>();
   readonly #circuits = new Map<string, CircuitBreakerState>();
@@ -79,6 +82,7 @@ export class TriggerProcessor implements TriggerProcessorPort {
     this.#logger = options.logger ?? new NoopLogger();
     this.#now = options.now ?? (() => new Date());
     this.#random = options.random ?? Math.random;
+    this.#eventSubscription = options.eventSubscription;
   }
 
   /** Process a unified trigger event through the T1 pipeline. */
@@ -114,6 +118,11 @@ export class TriggerProcessor implements TriggerProcessorPort {
     event: TriggerEvent,
     definition: RunnableTriggerDefinition,
   ): Promise<TriggerProcessResult> {
+    await this.#eventSubscription?.publish({
+      type: 'trigger:started',
+      timestamp: this.#now().toISOString(),
+      event,
+    });
     const claim = await this.#idempotency.resolveKey({
       event,
       requestHeaders: event.requestHeaders,

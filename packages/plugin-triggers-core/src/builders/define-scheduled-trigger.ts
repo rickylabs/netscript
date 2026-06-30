@@ -21,6 +21,8 @@ export type ScheduledTriggerHandler = TriggerHandler<
 export type DefineScheduledTriggerSpec<TId extends string = string> =
   & Readonly<{
     id: TId;
+    name?: string;
+    enabled?: boolean;
     description?: string;
     tags?: readonly string[];
     metadata?: Readonly<Record<string, unknown>>;
@@ -51,6 +53,8 @@ export function defineScheduledTrigger<TId extends string>(
   return Object.freeze({
     id: spec.id as TriggerId<TId>,
     kind: 'scheduled',
+    name: spec.name,
+    enabled: spec.enabled,
     durability: DEFAULT_TRIGGER_DURABILITY_TIER,
     handler,
     cron: spec.cron as CronExpression,

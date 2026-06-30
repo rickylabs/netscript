@@ -12,9 +12,15 @@
 
 import type {
   ProcessableTriggerDefinition,
+  TriggerEnabledStatePort,
   TriggerEventStorePort,
+  TriggerEventSubscriptionPort,
   TriggerIngressPort,
 } from '@netscript/plugin-triggers-core/ports';
+import type {
+  ManualDispatcher,
+  WebhookTestDelivery,
+} from '@netscript/plugin-triggers-core/runtime';
 
 /**
  * Service context available to every v1 trigger route handler.
@@ -29,6 +35,14 @@ export type TriggerServiceContext = Readonly<{
   definitions: readonly ProcessableTriggerDefinition[];
   /** Persistent trigger event store (read paths for list/get events). */
   eventStore: TriggerEventStorePort;
+  /** Persistent enabled-state override store for enable/disable routes. */
+  enabledState: TriggerEnabledStatePort;
   /** Fast ack-then-process ingress boundary (raw webhook route). */
   ingress: TriggerIngressPort;
+  /** Explicit manual-fire dispatcher for `fireTrigger`. */
+  manualDispatcher: ManualDispatcher;
+  /** Signed synthetic webhook delivery helper for `testWebhook`. */
+  webhookTestDelivery: WebhookTestDelivery;
+  /** In-process live event subscription stream for `subscribeEvents`. */
+  eventSubscription: TriggerEventSubscriptionPort;
 }>;

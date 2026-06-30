@@ -27,7 +27,11 @@ import {
   HmacSha256WebhookVerifier,
   MemoryWebhookVerifier,
 } from '@netscript/plugin-triggers-core/adapters';
-import { KvTriggerEventStore, openTriggerRuntimeKv } from '@netscript/plugin-triggers-core/stores';
+import {
+  createKvTriggerEnabledStateStore,
+  KvTriggerEventStore,
+  openTriggerRuntimeKv,
+} from '@netscript/plugin-triggers-core/stores';
 import { TriggersError } from '@netscript/plugin-triggers-core/domain';
 import type {
   TriggerEvent,
@@ -37,14 +41,23 @@ import type {
 } from '@netscript/plugin-triggers-core/domain';
 import type {
   ProcessableTriggerDefinition,
+  TriggerEnabledStatePort,
   TriggerEventListOptions,
   TriggerEventStorePort,
+  TriggerEventSubscriptionPort,
   TriggerIngressPort,
   TriggerIngressRequest,
   TriggerIngressResponse,
   TriggerProcessorPort,
 } from '@netscript/plugin-triggers-core/ports';
-import { createTriggerIngress } from '@netscript/plugin-triggers-core/runtime';
+import {
+  createEventSubscription,
+  createManualDispatcher,
+  createTriggerIngress,
+  createWebhookTestDelivery,
+  type ManualDispatcher,
+  type WebhookTestDelivery,
+} from '@netscript/plugin-triggers-core/runtime';
 import { TRIGGERS_API_DEFAULT_PORT, TRIGGERS_API_SERVICE_NAME } from '../../src/constants.ts';
 import denoJson from '../../deno.json' with { type: 'json' };
 import type { KvStore } from '@netscript/kv';
@@ -135,8 +148,16 @@ export type TriggersServiceOptions = Readonly<{
   definitions?: readonly ProcessableTriggerDefinition[];
   /** Event store; defaults to a KV-backed store. */
   eventStore?: TriggerEventStorePort;
+  /** Enabled-state store; defaults to a KV-backed override store. */
+  enabledState?: TriggerEnabledStatePort;
   /** Trigger processor backing the ingress; defaults to the runtime processor. */
   processor?: TriggerProcessorPort;
+  /** Manual-fire dispatcher; defaults to eventStore + processor. */
+  manualDispatcher?: ManualDispatcher;
+  /** Webhook test-delivery helper; defaults to the configured ingress. */
+  webhookTestDelivery?: WebhookTestDelivery;
+  /** In-process event subscription port; defaults to a single-replica hub. */
+  eventSubscription?: TriggerEventSubscriptionPort;
   /** Pre-opened KV adapter; defaults to the runtime KV. */
   kv?: KvStore;
 }>;
@@ -150,11 +171,18 @@ export async function createTriggersServiceContext(
   // when both are supplied no KV is needed. Resolving to a concrete `KvStore`
   // when needed keeps the store constructor cast-free.
   const definitions = options.definitions ?? await loadProjectTriggerDefinitions();
-  const needsKv = options.eventStore === undefined || options.processor === undefined;
+  const needsKv = options.eventStore === undefined || options.enabledState === undefined ||
+    options.processor === undefined;
   const kv: KvStore | undefined = needsKv ? options.kv ?? await openTriggerRuntimeKv() : options.kv;
   const eventStore = options.eventStore ??
     new KvTriggerEventStore({ kv: requireKv(kv) });
-  const processor = options.processor ?? await createRuntimeTriggerProcessor({ kv });
+  const enabledState = options.enabledState ??
+    createKvTriggerEnabledStateStore({ kv: requireKv(kv) });
+  const eventSubscription = options.eventSubscription ?? createEventSubscription();
+  const processor = options.processor ??
+    await createRuntimeTriggerProcessor({ kv, eventSubscription });
+  const manualDispatcher = options.manualDispatcher ??
+    createManualDispatcher({ eventStore, processor });
   const hmacVerifier = new HmacSha256WebhookVerifier({
     signatureHeader: 'x-hub-signature-256',
   });
@@ -167,8 +195,23 @@ export async function createTriggersServiceContext(
     selectVerifier: (definition) => definition.verifier === 'memory' ? memoryVerifier : undefined,
     resolveSecret: (definition) =>
       definition.secretEnv === undefined ? undefined : Deno.env.get(definition.secretEnv),
+    eventSubscription,
   });
-  return { definitions, eventStore, ingress };
+  const webhookTestDelivery = options.webhookTestDelivery ??
+    createWebhookTestDelivery({
+      ingress,
+      resolveSecret: (definition) =>
+        definition.secretEnv === undefined ? undefined : Deno.env.get(definition.secretEnv),
+    });
+  return {
+    definitions,
+    eventStore,
+    enabledState,
+    ingress,
+    manualDispatcher,
+    webhookTestDelivery,
+    eventSubscription,
+  };
 }
 
 /**
@@ -239,7 +282,11 @@ function createUnavailableTriggersServiceContext(): TriggerServiceContext {
   return {
     definitions: [],
     eventStore: new UnavailableTriggerEventStore(),
+    enabledState: unavailableTriggerEnabledState,
     ingress: unavailableTriggerIngress,
+    manualDispatcher: unavailableManualDispatcher,
+    webhookTestDelivery: unavailableWebhookTestDelivery,
+    eventSubscription: unavailableEventSubscription,
   };
 }
 
@@ -263,6 +310,47 @@ class UnavailableTriggerEventStore implements TriggerEventStorePort {
 
 const unavailableTriggerIngress: TriggerIngressPort = {
   accept(_request: TriggerIngressRequest): Promise<TriggerIngressResponse> {
+    return Promise.reject(triggerRuntimeUnavailable());
+  },
+};
+
+const unavailableTriggerEnabledState: TriggerEnabledStatePort = {
+  isEnabled(): Promise<boolean> {
+    return Promise.resolve(false);
+  },
+  setEnabled(): Promise<void> {
+    return Promise.reject(triggerRuntimeUnavailable());
+  },
+  list(): Promise<readonly []> {
+    return Promise.resolve([]);
+  },
+};
+
+const unavailableManualDispatcher: ManualDispatcher = {
+  fire(): Promise<never> {
+    return Promise.reject(triggerRuntimeUnavailable());
+  },
+};
+
+const unavailableWebhookTestDelivery: WebhookTestDelivery = {
+  deliver(): Promise<never> {
+    return Promise.reject(triggerRuntimeUnavailable());
+  },
+};
+
+const unavailableEventSubscription: TriggerEventSubscriptionPort = {
+  subscribe(): AsyncIterable<never> {
+    return {
+      [Symbol.asyncIterator](): AsyncIterator<never> {
+        return {
+          next(): Promise<IteratorResult<never>> {
+            return Promise.reject(triggerRuntimeUnavailable());
+          },
+        };
+      },
+    };
+  },
+  publish(): Promise<never> {
     return Promise.reject(triggerRuntimeUnavailable());
   },
 };
