@@ -425,6 +425,28 @@ export const freshUiRegistryManifest: RegistryManifest = {
       css: [{ layer: 'components', content: "@import './ui/badge.css';" }],
     },
     {
+      name: 'avatar',
+      kind: 'component',
+      layer: 2,
+      description:
+        'Identity chip for a person or agent — initials or image with size, presence, and agent variants.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['identity', 'presence', 'primitive'],
+      files: [
+        {
+          source: 'registry/components/ui/avatar.tsx',
+          target: '@ui/avatar.tsx',
+        },
+        {
+          source: 'registry/components/ui/avatar.css',
+          target: '@assets/ui/avatar.css',
+        },
+      ],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/avatar.css';" }],
+    },
+    {
       name: 'separator',
       kind: 'component',
       layer: 2,
