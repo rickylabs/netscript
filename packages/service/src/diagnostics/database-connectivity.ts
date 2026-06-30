@@ -10,6 +10,16 @@ import type { Database } from '../types.ts';
 type DbEngine = 'mysql' | 'postgres' | 'mssql';
 type ConnectivityFailureReason = 'TCP_UNREACHABLE' | 'QUERY_FAILED';
 
+/**
+ * Outcome of resolving the configured database engine for the startup probe.
+ *
+ * - A {@linkcode DbEngine} means a TCP-reachable engine that should be probed.
+ * - `'skip'` means the configured engine has no TCP endpoint to probe
+ *   (e.g. `sqlite`, which is file-based) or is unrecognized; the probe is a
+ *   no-op rather than falling back to MySQL.
+ */
+export type ProbeEngine = DbEngine | 'skip';
+
 interface EngineConfig {
   displayName: string;
   defaultPort: number;
@@ -127,7 +137,20 @@ async function verifyDatabaseConnectivity(
   database: Database,
 ): Promise<void> {
   const logger = createServiceLogger(serviceName);
-  const engineCfg = getEngineConfig();
+
+  const engine = resolveProbeEngine();
+  if (engine === 'skip') {
+    // The configured PrimaryDatabase engine has no TCP endpoint to probe
+    // (e.g. sqlite, which is file-based) or is unrecognized. Skip the probe
+    // instead of falling back to a spurious MySQL connectivity check (#175).
+    logger.info('Skipping database connectivity probe for configured engine', {
+      service: serviceName,
+      provider: readConfiguredProvider() ?? '(not set)',
+    });
+    return;
+  }
+
+  const engineCfg = ENGINE_CONFIGS[engine];
   const { host, port } = resolveDatabaseEndpoint(engineCfg);
 
   logger.info(`Verifying ${engineCfg.displayName} connectivity`, {
@@ -193,13 +216,51 @@ async function verifyDatabaseConnectivity(
   }
 }
 
-function getEngineConfig(): EngineConfig {
-  const provider = Deno.env.get('DB_PROVIDER');
-  return isDbEngine(provider) ? ENGINE_CONFIGS[provider] : ENGINE_CONFIGS[DEFAULT_DB_ENGINE];
+/**
+ * Read the configured database provider (the runtime projection of
+ * `NetScript.PrimaryDatabase` / `Databases.active`).
+ *
+ * Services receive this as `DB_PROVIDER` (with `DATABASE_PROVIDER` as an alias)
+ * in their environment, written from the configured provider during deployment.
+ */
+function readConfiguredProvider(): string | undefined {
+  return Deno.env.get('DB_PROVIDER') ?? Deno.env.get('DATABASE_PROVIDER') ?? undefined;
 }
 
-function isDbEngine(value: string | null | undefined): value is DbEngine {
-  return value === 'mysql' || value === 'postgres' || value === 'mssql';
+/**
+ * Resolve which engine the startup probe should target based on the configured
+ * `PrimaryDatabase` provider.
+ *
+ * - Recognized TCP engines (`mysql`, `postgres`/`postgresql`, `mssql`/
+ *   `sqlserver`) are probed.
+ * - `sqlite` has no TCP endpoint, so the probe is skipped.
+ * - An unset provider falls back to the legacy default (`mysql`) to preserve
+ *   existing MySQL deployments that do not export the provider.
+ * - Any other (unrecognized) value is skipped rather than probing MySQL, so a
+ *   sqlite-configured service never logs a spurious MySQL `ERR` (#175).
+ *
+ * Exported for unit testing.
+ */
+export function resolveProbeEngine(
+  provider: string | null | undefined = readConfiguredProvider(),
+): ProbeEngine {
+  if (provider === undefined || provider === null || provider === '') {
+    return DEFAULT_DB_ENGINE;
+  }
+
+  switch (provider.toLowerCase()) {
+    case 'mysql':
+      return 'mysql';
+    case 'postgres':
+    case 'postgresql':
+      return 'postgres';
+    case 'mssql':
+    case 'sqlserver':
+      return 'mssql';
+    default:
+      // sqlite and any unrecognized provider: no TCP endpoint to probe.
+      return 'skip';
+  }
 }
 
 function resolveDatabaseEndpoint(engineCfg: EngineConfig): { host: string; port: number } {
