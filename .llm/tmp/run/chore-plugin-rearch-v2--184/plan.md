@@ -184,11 +184,12 @@ this does NOT collide with the retained public `./runtime` subpath).
   the `defineTopic/Producer/Consumer` attachment and the `as StreamsPluginManifest` cast; the three
   `defineStream*` factories STAY as the existing standalone named exports (`src/public/mod.ts:144-147`).
   (ii) Connector `plugins/streams/mod.ts` — DELETE the `StreamsPluginManifest` type re-export.
-  (iii) Live consumers repoint to the standalone factories (NOT off the manifest), and dead stream-api
-  references are removed: `e2e/probes/probe-context.ts:2` and `tests/public/stream-api_test.ts:3-5`
-  must import `defineStreamTopic/Producer/Consumer` from `@netscript/plugin-streams` directly. After
-  the deletions, grep `StreamsPluginManifest` MUST return zero hits — that is the slice's no-dangling
-  gate.
+  (iii) Live consumers that reference the `StreamsPluginManifest` TYPE repoint to the standalone
+  factories / `PluginManifest` directly (NOT off the manifest type): `tests/public/stream-api_test.ts:3-5`.
+  Note: `e2e/probes/probe-context.ts:2` imports `StreamPayloadSchema` from `public/stream-api.ts`
+  (NOT the manifest type and NOT a `defineStream*` factory) — it is unaffected and left unchanged. The
+  authoritative acceptance is the grep gate: after the deletions, `grep StreamsPluginManifest` MUST
+  return zero hits.
 - **auth** (Decision C — reference, thinnest engine): DELETE bespoke health router; fold
   router/v1/types/helpers into the binder; doctor `/auth/health`→`/health` in lockstep; thin
   `backend-registry.ts` to `resolveActiveBackendName` (per-backend env construction → siblings via
@@ -237,9 +238,11 @@ this does NOT collide with the retained public `./runtime` subpath).
 
 ## Gates (each slice + the whole)
 `deno task arch:check` (layering + thinness over `@netscript/plugin` + 5 plugins) · scoped
-`run-deno-check`/`run-deno-lint`/`run-deno-fmt --ext ts,tsx` (2-cast budget; NO `any`; no new
-`as unknown as` beyond the sanctioned centralized-contract cast — the `AnyRouter` boundary should
-VANISH once `createPluginService` owns annotated assembly) · `deno task publish:dry-run` per package ·
+`run-deno-check`/`run-deno-lint`/`run-deno-fmt --ext ts,tsx` (NO-NEW-CAST budget: no new
+`as unknown as` beyond the sanctioned centralized-contract cast, and the `as *PluginManifest` cast is
+DELETED per Resolution B; existing in-`core` `as unknown as` casts are grandfathered, NOT counted;
+NO new `any`; the `AnyRouter` boundary should VANISH once `createPluginService` owns annotated
+assembly) · `deno task publish:dry-run` per package ·
 `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` · **`e2e-cli-prod` (HARD)**
 JSR-installed `scaffold.runtime --source jsr` green (never accept red as drift — user mandate) ·
 byte-identical generated-output guard at every scaffold-touching step.
@@ -266,9 +269,13 @@ the per-connector narrow type has no consumer that survives the slice:
   breaks" — is VOID under B because `inspect*` is deleted, not retyped; its single call shape
   (`inspect<Name>()` with no arg in README/test) is served by `inspectPlugin(<name>Plugin)`.
 - **No-dangling gate (per connector):** after the slice, `grep '<Name>PluginManifest'` returns zero
-  hits and `grep 'inspect<Name>'` returns zero hits. Surviving sanctioned cast budget = exactly the
-  one centralized-contract `as unknown as` in each `-core` contract; no new `any`; the `AnyRouter`
-  cast VANISHES once `createPluginService` owns annotated router assembly.
+  hits and `grep 'inspect<Name>'` returns zero hits. Cast rule = NO NEW `as unknown as` introduced by
+  this slice beyond the sanctioned centralized-contract one in each `-core` contract, and the
+  `as *PluginManifest` connector cast is DELETED. Pre-existing `as unknown as` casts already in the
+  `-core` engines (e.g. `plugin-workers-core` carries 20+ in `streams/`, `config/`, `composition-root`,
+  `public/root`, `builders/`) are GRANDFATHERED and not in scope for this re-architecture — the gate
+  counts NET-NEW casts, not the absolute total. No new `any`; the `AnyRouter` cast VANISHES once
+  `createPluginService` owns annotated router assembly.
 
 ## Open-decision 3 resolution — `runtime/` rename vs `./runtime` subpath
 
