@@ -29,6 +29,10 @@ Decide whether sagas needs a background processor (no `bin/` exists today; the o
 launched a missing entrypoint). Inspect `plugins/sagas` service vs runtime; pick (a) add a real
 `src/runtime` start + `./runtime` export, or (b) set `provider.category='plugin'` + drop
 `backgroundEntrypoint` so only `sagas-api` registers.
+- **PLAN-EVAL refinement:** option (a) is largely a `deno.json` re-export — `sagas/src/runtime/saga-runner.ts`
+  already exposes `runSagaRunner`/`startSagaRuntime` (its `registryModule` option is already
+  parameterized, so glue passes `.netscript/generated/plugin-sagas/sagas.registry.ts` in — no
+  `import.meta.url` resolution inside the library).
 - Files: `plugins/sagas/scaffold.plugin.json` (provider block), possibly `plugins/sagas/src/runtime/mod.ts`.
 - Gate: `cd plugins/sagas && deno task check`; `deno publish --dry-run --allow-dirty`.
 
@@ -44,6 +48,8 @@ Leave `bin/combined.ts` for local `deno task` use; do not export it.
 Confirm `src/runtime/trigger-processor.ts` exposes a documented start fn reachable from `./runtime`
 (`src/runtime/mod.ts`); if not, add `"./runtime/processor"` export or re-export the start fn.
 Standardize the start-fn name/signature with workers (core-centralization, R6).
+- **PLAN-EVAL refinement:** standardize via an ADDITIVE shim (a new uniform-named re-export), NOT a
+  rename — triggers' `./runtime` is already published; do not break its existing API.
 - Files: `plugins/triggers/deno.json`, `plugins/triggers/src/runtime/mod.ts`.
 - Gate: `cd plugins/triggers && deno task check && deno publish --dry-run --allow-dirty`.
 
@@ -58,7 +64,9 @@ Add a runtime-glue scaffolder (sibling to `barrelScaffolder`) for background plu
 `workers/runtime.ts` (and triggers equivalent) importing `@netscript/plugin-<x>/runtime`
 `startCombinedProcess`, performing the project-relative jobs-registry discovery currently in
 `bin/combined.ts`, self-starting under `import.meta.main`.
-- Files: `plugins/workers/src/adapter/resources/` (new glue resource + stub alongside `barrel/`),
+- **PLAN-EVAL refinement:** lock the glue-resource folder as `plugins/<x>/src/adapter/resources/glue/`
+  (sibling to `barrel/`) before implementing.
+- Files: `plugins/workers/src/adapter/resources/glue/` (new glue resource + stub alongside `barrel/`),
   wired into `workersStarterResources` in `plugins/workers/src/adapter/plugin.ts`; triggers analog.
 - Gate: `cd plugins/workers && deno task check`; `cd packages/cli && deno test src/public/features/plugins/install/install-plugin_test.ts`.
 
@@ -105,7 +113,9 @@ gates pass with NO `plugins/<x>` workdirs. Verify behavior gates (`behavior.work
 - **R5 bootstrap-module URL coupling.** Service depends on `NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE`
   → user project `services/_shared/plugin-service-context.ts` (helper-relative). Launching by `jsr:`
   spec must NOT change that env wiring. Mitigate: keep helper-relative URL (lines 68-69/80); only
-  change `Entrypoint`.
+  change `Entrypoint`. PLAN-EVAL note: Aspire `WithEnvironment` env-var propagation is process-scope
+  and survives a `jsr:`-spec launch (the env reaches the child `deno` process regardless of
+  entrypoint form), so the bootstrap module still resolves.
 - **R6 per-plugin runtime divergence.** Triggers background entrypoint differs from workers.
   Mitigate: standardize `./runtime` start-fn name/signature across background plugins (uniform glue).
 
