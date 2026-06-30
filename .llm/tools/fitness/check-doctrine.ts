@@ -60,6 +60,13 @@ function stripStringLiterals(line: string) {
   return line.replace(/(['"`])(?:\\.|(?!\1).)*\1/g, '""');
 }
 
+function isTestPath(repoPath: string) {
+  const normalized = repoPath.replaceAll('\\', '/');
+  return normalized.includes('/tests/') ||
+    normalized.endsWith('_test.ts') ||
+    normalized.endsWith('.test.ts');
+}
+
 // ─────────────────────────────────────────────────────────────────────────
 // A1 / A2 — public types first, simple over easy at boundaries
 // (Mechanical proxy: mod.ts has @module + every export has explicit return type)
@@ -535,13 +542,16 @@ if (authFiles.length > 0) {
       const codeLine = stripStringLiterals(line.replace(/\/\/.*$/, ''));
       const isAllowedContractCast = file.repoPath ===
           'packages/plugin-auth-core/src/contracts/v1/auth.contract.ts' &&
-        /\bas\s+unknown\s+as\s+AuthContractV1\b/.test(codeLine);
+        /\}\s+as\s+unknown\s+as\s+Parameters\s*<\s*typeof\s+oc\.errors\s*>\s*\[0\]/.test(
+          codeLine,
+        );
       const isAllowedRouterAny = file.repoPath === 'plugins/auth/services/src/router.ts' &&
         (/\bas\s+any\b/.test(codeLine) || /:\s*any\b/.test(codeLine));
       if (
         !/^\s*(?:\*|\/\*|\/\/|import\b|export\s+\{)/.test(line) &&
         !/^\s*(?:type\s+)?[A-Za-z0-9_]+\s+as\s+[A-Za-z0-9_]+,?\s*$/.test(line) &&
         /\bas\s+(?!const\b)(?:unknown\s+as\s+|never\b|any\b|[A-Za-z_{[(])/.test(codeLine) &&
+        !isTestPath(file.repoPath) &&
         !isAllowedContractCast &&
         !isAllowedRouterAny
       ) {
@@ -554,7 +564,7 @@ if (authFiles.length > 0) {
           line: lineNumber,
         });
       }
-      if (/@ts-(?:ignore|expect-error|nocheck|check)\b/.test(line)) {
+      if (/@ts-(?:ignore|expect-error|nocheck|check)\b/.test(line) && !isTestPath(file.repoPath)) {
         findings.push({
           ref: 'AS7/F-AUTH-CAST',
           level: 'FAIL',

@@ -1656,3 +1656,23 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** per touched package scoped check/lint/fmt (`--ext ts,tsx`) + targeted `deno test
   --unstable-kv` + `deno publish --dry-run --allow-dirty` (no new slow types) + `deno task arch:check`
   (no connector→core leak); new workspace deps land via normal resolution, no `deno.lock` hand-edit.
+
+## packages/plugin-auth-core — AUTH-FITNESS-GATE-OVERFLAG
+
+- **ID:** `AUTH-FITNESS-GATE-OVERFLAG`
+- **Reason:** `AS7/F-AUTH-CAST` over-flagged two sanctioned auth type-soundness sites: the centralized
+  oRPC error-map contract cast in `src/contracts/v1/auth.contract.ts`, and test-only
+  `@ts-expect-error` / `as unknown` guards in `tests/contracts/auth-contract-soundness_test.ts`.
+  The production auth code was already type-sound; the fitness gate was stricter than the AS7 intent
+  and stricter than the equivalent sagas/workers contract soundness test treatment.
+- **Fix:** Narrowed `.llm/tools/fitness/check-doctrine.ts` so the auth scanner recognizes the exact
+  centralized `Parameters<typeof oc.errors>[0]` contract cast, keeps the router `any` exemplar as
+  the only router exception, and exempts test paths (`tests/`, `_test.ts`, `.test.ts`) from the auth
+  cast / `@ts-*` scan without relaxing production source checks.
+- **Owner:** Architecture fitness gate maintainers.
+- **Target:** #172 follow-up S-e.
+- **Linked plan:** `.llm/tmp/run/feat-scaffold-surface-167--adapter-relocation/plan.md`
+- **Created:** 2026-06-30.
+- **Status:** closed 2026-06-30 — gate-correctness fix landed; auth production source and auth
+  soundness tests were not edited.
+- **Gate:** `deno task arch:check` green over all 13 configured roots (`FAIL=0` for every root).

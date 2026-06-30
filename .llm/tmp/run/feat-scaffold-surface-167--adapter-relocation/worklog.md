@@ -87,3 +87,53 @@ S-b/c/d implementation slices are committed, pushed, and PR-commented. Final `de
 is not green in this checkout because it fails before touched roots on pre-existing
 `packages/plugin-auth-core` findings; do not mark ready for IMPL-EVAL until the full 13-root gate is
 green or the auth-core baseline failure is accepted outside this slice scope.
+
+### S-e — auth-core arch:check unblock
+
+- Scope held to the fitness gate and run records: `.llm/tools/fitness/check-doctrine.ts`,
+  `.llm/harness/debt/arch-debt.md`, and this run's worklog/drift artifacts. No auth production
+  source or auth test source was edited.
+- Live verification confirmed the production finding at
+  `packages/plugin-auth-core/src/contracts/v1/auth.contract.ts:177` is the centralized
+  `{ ...BASE_PLUGIN_ERRORS, ...AUTH_SPECIFIC_ERRORS } as unknown as Parameters<typeof oc.errors>[0]`
+  contract cast.
+- Live verification confirmed `packages/plugin-auth-core/tests/contracts/auth-contract-soundness_test.ts`
+  uses `@ts-expect-error` and `as unknown` only in test-only type-soundness regression guards, matching
+  the established sagas contract soundness test pattern.
+- Updated `AS7/F-AUTH-CAST` so production auth source still permits only the exact centralized contract
+  cast and router `any` exemplar, while test paths (`tests/`, `_test.ts`, `.test.ts`) are not scanned
+  for auth cast / `@ts-*` failures.
+
+Gate evidence:
+
+| Gate | Result |
+| --- | --- |
+| `deno fmt .llm/tools/fitness/check-doctrine.ts` | exit 0; checked 1 file |
+| `rtk proxy deno task arch:check` | exit 0; deps check warning-only; all 13 doctrine roots `FAIL=0` |
+
+`deno task arch:check` per-root summary:
+
+| Root | Summary |
+| --- | --- |
+| `packages/plugin-auth-core` | `FAIL=0 WARN=2 INFO=1` |
+| `packages/auth-workos` | `FAIL=0 WARN=1 INFO=1` |
+| `packages/auth-better-auth` | `FAIL=0 WARN=1 INFO=1` |
+| `packages/auth-kv-oauth` | `FAIL=0 WARN=1 INFO=1` |
+| `plugins/auth` | `FAIL=0 WARN=5 INFO=1` |
+| `packages/plugin` | `FAIL=0 WARN=3 INFO=1` |
+| `plugins/workers` | `FAIL=0 WARN=9 INFO=2` |
+| `plugins/sagas` | `FAIL=0 WARN=8 INFO=2` |
+| `plugins/triggers` | `FAIL=0 WARN=12 INFO=2` |
+| `plugins/streams` | `FAIL=0 WARN=4 INFO=1` |
+| `packages/plugin-sagas-core` | `FAIL=0 WARN=3 INFO=2` |
+| `packages/plugin-triggers-core` | `FAIL=0 WARN=2 INFO=2` |
+| `packages/plugin-workers-core` | `FAIL=0 WARN=7 INFO=2` |
+
+Diff evidence:
+
+- `git diff --name-only` for S-e-owned paths shows only
+  `.llm/tools/fitness/check-doctrine.ts`, `.llm/harness/debt/arch-debt.md`,
+  `.llm/tmp/run/feat-scaffold-surface-167--adapter-relocation/worklog.md`, and
+  `.llm/tmp/run/feat-scaffold-surface-167--adapter-relocation/drift.md`.
+- Repository-wide `git diff --name-only` still includes pre-existing unrelated
+  `.llm/tmp/run/openhands/pr-*/request.md` line-ending drift that predates S-e and remains unstaged.
