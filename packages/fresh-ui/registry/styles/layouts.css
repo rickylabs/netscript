@@ -496,6 +496,7 @@
   align-items: center;
   gap: 0;
   min-width: 0;
+  flex-shrink: 1;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -526,6 +527,7 @@
 .ns-breadcrumb__current {
   color: var(--ns-fg);
   font-weight: 600;
+  max-width: 30ch;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
