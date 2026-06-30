@@ -27,7 +27,8 @@ hubs stay deliberately thin so they orient rather than duplicate the reference.
 The capabilities you <em>add</em> are plugins. The public command installs a plugin package
 (for example <code>netscript plugin install @netscript/plugin-workers</code>); local-source contributor
 samples use <code>deno run -A packages/cli/bin/netscript-dev.ts plugin install &lt;kind&gt; --name &lt;name&gt; --samples</code>.
-Each installed plugin lands under <code>plugins/&lt;name&gt;/</code>. The remaining five are
+Public install emits dependency-backed glue and samples that your workspace owns; contributor installs
+can materialize full local source. The remaining five are
 <strong>platform capabilities</strong>: services, database, KV/queues/cron, telemetry, and the
 Fresh UI come from the scaffold itself. Plugins register their contributions through their manifest;
 the host application never changes.

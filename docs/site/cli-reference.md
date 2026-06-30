@@ -121,8 +121,8 @@ unless you pass <code>--db</code>. Run <code>netscript --version</code> to print
 ## Plugins
 
 Plugins add capabilities — background workers, durable sagas, webhook triggers, durable
-streams, and authentication. Each one lands as a canonical install under `plugins/<name>/`
-and registers its contributions; the host application never changes. After adding plugins,
+streams, and authentication. Public install adds the plugin package dependency, emits
+workspace-owned glue and samples that import it, and registers its contributions; the host application never changes. After adding plugins,
 regenerate the registry so the project picks them up.
 
 {{ comp.apiTable({
@@ -149,19 +149,21 @@ regenerate the registry so the project picks them up.
   ]
 }) }}
 
-{{ comp callout { type: "note", title: "Plugins live under plugins/<name>/" } }}
-A <code>plugin install</code> installs into <code>plugins/workers</code>, <code>plugins/sagas</code>, <code>plugins/triggers</code>,
-<code>plugins/auth</code>, or <code>plugins/streams</code> — the canonical, config-referenced location.
-<code>netscript.config.ts</code> points only at <code>./plugins/&lt;name&gt;/mod.ts</code>. See the
+{{ comp callout { type: "note", title: "Public install emits glue, not copied internals" } }}
+A public <code>plugin install</code> runs the plugin package's scaffolder and emits user-owned glue
+such as <code>workers/mod.ts</code>, <code>workers/runtime.ts</code>, or <code>auth/mod.ts</code>.
+The plugin's service, runtime, contract, and schema internals stay in the installed dependency.
+Contributor workflows can still materialize full local source from a NetScript checkout. See the
 <a href="/how-to/add-a-plugin/">add-a-plugin how-to</a>.
 {{ /comp }}
 
 ### Authentication plugin
 
 The `auth` plugin is a first-class official plugin scaffolded exactly like the others —
-`netscript plugin install auth` installs `plugins/auth/`, registers the `auth-api` service on
-port 8094, and contributes `plugins/auth/database/auth.prisma`, which is migrated by the
-standard `netscript db` workflow alongside every other plugin schema. It composes **one
+`netscript plugin install auth` installs the `@netscript/plugin-auth` dependency, emits
+the user-owned `auth/mod.ts` glue barrel, registers the `auth-api` service on port 8094,
+and contributes the package-provided `auth.prisma` schema to the standard `netscript db`
+workflow alongside every other plugin schema. It composes **one
 active backend** at a time, chosen at runtime by the `NETSCRIPT_AUTH_BACKEND` env var.
 
 {{ comp.apiTable({
@@ -175,7 +177,7 @@ active backend** at a time, chosen at runtime by the `NETSCRIPT_AUTH_BACKEND` en
 
 {{ comp callout { type: "note", title: "Auth migrates like any other plugin schema" } }}
 After <code>netscript plugin install auth</code>, run the normal database workflow with Aspire up:
-<code>netscript db generate</code> then <code>netscript db migrate</code> picks up <code>plugins/auth/database/auth.prisma</code>
+<code>netscript db generate</code> then <code>netscript db migrate</code> picks up the auth plugin's package-provided Prisma schema
 (the better-auth-shaped <code>auth_users</code>, <code>auth_sessions</code>, <code>auth_accounts</code>, <code>auth_verifications</code>
 tables) exactly like the other plugins. Only the <code>better-auth</code> backend reads these tables —
 <code>kv-oauth</code> stores sessions in KV and <code>workos</code> is stateless. Full env table and happy-path setup

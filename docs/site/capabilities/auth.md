@@ -248,7 +248,7 @@ together: sign users in with the plugin, then gate individual service routes wit
 
 ## Database & runtime events
 
-The plugin contributes a Prisma schema, `plugins/auth/database/auth.prisma`, with four
+The plugin contributes a package-provided `auth.prisma` schema with four
 better-auth-shaped models — `User` → `auth_users`, `Session` → `auth_sessions`,
 `Account` → `auth_accounts`, `Verification` → `auth_verifications`. These tables back the
 better-auth adapter; `kv-oauth` keeps its sessions in Deno KV, and WorkOS is stateless. As with

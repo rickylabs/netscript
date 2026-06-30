@@ -97,9 +97,10 @@ Pick the kind for the capability you need:
 
 {{ comp callout { type: "note", title: "auth is a first-class official plugin" } }}
 Auth is now added the same way as workers, sagas, triggers, and streams — through
-<code>netscript plugin install auth</code>. It scaffolds a <code>plugins/auth/</code> workspace,
-registers the <code>auth-api</code> service on port <strong>8094</strong>, and contributes
-its Prisma models. The active backend is selected at runtime with
+<code>netscript plugin install auth</code>. It installs the <code>@netscript/plugin-auth</code>
+dependency, emits a user-owned <code>auth/mod.ts</code> glue barrel, registers the
+<code>auth-api</code> service on port <strong>8094</strong>, and contributes its package-provided
+Prisma models. The active backend is selected at runtime with
 <code>NETSCRIPT_AUTH_BACKEND</code> (default <code>kv-oauth</code>). See
 <a href="/how-to/add-authentication/">Configure authentication</a> for the backend setup.
 {{ /comp }}

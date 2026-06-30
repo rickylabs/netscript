@@ -69,7 +69,7 @@ as a <a href="/capabilities/durable-sagas/">durable saga</a>; jobs and sagas com
 
 ## Minimal example
 
-Add the workers plugin to a published workspace with the public package dispatcher:
+Add the workers plugin to a published workspace with the public package install flow:
 
 ```bash
 netscript plugin install @netscript/plugin-workers

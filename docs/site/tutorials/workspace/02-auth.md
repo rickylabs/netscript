@@ -116,7 +116,7 @@ NetScript, stay on <code>kv-oauth</code>.
 
 ## Step 3 — Run the auth database migration
 
-The `auth` plugin contributes a Prisma schema, **`plugins/auth/database/auth.prisma`**, that
+The `auth` plugin contributes a package-provided **`auth.prisma`** schema that
 aggregates into your primary Postgres at `db generate`. With aspire startning, run the standard database
 loop from the workspace root:
 

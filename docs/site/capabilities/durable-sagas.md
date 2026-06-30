@@ -38,7 +38,7 @@ config-time companion (<code>defineSagaConfig</code>) comes from
 (<code>createDurableSagaRuntime</code>) and the HTTP publisher
 (<code>createSagaPublisher</code>) come from the
 <code>@netscript/plugin-sagas/runtime</code> subpath. Add it to a workspace with
-the public package dispatcher (<code>netscript plugin install @netscript/plugin-sagas</code>).
+the public package install flow (<code>netscript plugin install @netscript/plugin-sagas</code>).
 For local-source contributor samples inside this monorepo, run
 <code>deno run -A packages/cli/bin/netscript-dev.ts plugin install saga --name sagas --samples</code>.
 {{ /comp }}
