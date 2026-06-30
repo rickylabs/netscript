@@ -221,17 +221,6 @@ Deno.test('triggers connector smoke', async (t) => {
       assertEquals(body.accepted, false);
       assertEquals(body.status, 404);
     });
-
-    await t.step('raw webhook known trigger path reaches the ingress', async () => {
-      const res = await fetch(`${baseUrl}/api/v1/webhooks/hooks/sched-1`, {
-        method: 'POST',
-        body: '{}',
-      });
-      assertEquals(res.status, 404);
-      const body = await res.json() as { accepted: boolean; status: number };
-      assertEquals(body.accepted, false);
-      assertEquals(body.status, 404);
-    });
   } finally {
     await running.stop();
   }

@@ -9,7 +9,7 @@ import { defineStub, type StubSource } from '@netscript/plugin/adapter';
 export const webhookStub: StubSource<
   'PATH' | 'SECRET_ENV_LINE' | 'TRIGGER_EXPORT' | 'TRIGGER_ID' | 'VERIFIER'
 > = defineStub({
-    source: `import { defineWebhook } from '@netscript/plugin-triggers-core/builders';
+  source: `import { defineWebhook } from '@netscript/plugin-triggers-core/builders';
 import type {
   TriggerContext,
   TriggerEvent,
@@ -38,5 +38,5 @@ export const %%TRIGGER_EXPORT%%: WebhookDefinition<
 
 export default %%TRIGGER_EXPORT%%;
 `,
-    tokens: ['PATH', 'SECRET_ENV_LINE', 'TRIGGER_EXPORT', 'TRIGGER_ID', 'VERIFIER'] as const,
-  });
+  tokens: ['PATH', 'SECRET_ENV_LINE', 'TRIGGER_EXPORT', 'TRIGGER_ID', 'VERIFIER'] as const,
+});
