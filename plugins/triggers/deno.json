@@ -17,7 +17,6 @@
     "./streams/server": "./streams/server.ts"
   },
   "imports": {
-    "@durable-streams/state": "npm:@durable-streams/state@^0.3.1",
     "@netscript/contracts": "jsr:@netscript/contracts@0.0.1-alpha.12",
     "@netscript/kv": "jsr:@netscript/kv@0.0.1-alpha.12",
     "@netscript/plugin": "jsr:@netscript/plugin@0.0.1-alpha.12",
@@ -43,6 +42,7 @@
     "include": [
       "README.md",
       "deno.json",
+      "package.json",
       "scaffold.plugin.json",
       "scaffold.runtime.json",
       "cli.ts",

@@ -3317,17 +3317,15 @@
           "jsr:@netscript/plugin@0.0.1-alpha.12",
           "jsr:@netscript/service@0.0.1-alpha.12",
           "jsr:@netscript/telemetry@0.0.1-alpha.12",
-          "jsr:@zod/zod@4.4.3",
-          "npm:@durable-streams/state@~0.3.1",
-          "npm:@orpc/contract@^1.14.6",
-          "npm:@orpc/server@^1.14.6",
-          "npm:@workos-inc/node@^10.4.0"
+          "jsr:@zod/zod@4.4.3"
         ],
         "packageJson": {
           "dependencies": [
+            "npm:@durable-streams/state@~0.3.1",
             "npm:@orpc/contract@^1.14.6",
             "npm:@orpc/server@^1.14.6",
-            "npm:@orpc/zod@^1.14.6"
+            "npm:@orpc/zod@^1.14.6",
+            "npm:@workos-inc/node@^10.4.0"
           ]
         }
       },
@@ -3342,10 +3340,7 @@
           "jsr:@netscript/service@0.0.1-alpha.12",
           "jsr:@netscript/telemetry@0.0.1-alpha.12",
           "jsr:@std/async@1",
-          "jsr:@zod/zod@4.4.3",
-          "npm:@durable-streams/state@~0.3.1",
-          "npm:@orpc/contract@^1.14.6",
-          "npm:@orpc/server@^1.14.6"
+          "jsr:@zod/zod@4.4.3"
         ],
         "packageJson": {
           "dependencies": [
@@ -3369,15 +3364,13 @@
           "jsr:@netscript/service@0.0.1-alpha.12",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/net@1",
-          "jsr:@zod/zod@4.4.3",
-          "npm:@durable-streams/client@~0.2.6",
-          "npm:@durable-streams/server@~0.3.7",
-          "npm:@orpc/server@^1.14.6"
+          "jsr:@zod/zod@4.4.3"
         ],
         "packageJson": {
           "dependencies": [
             "npm:@durable-streams/client@~0.2.6",
-            "npm:@durable-streams/server@~0.3.7"
+            "npm:@durable-streams/server@~0.3.7",
+            "npm:@orpc/server@^1.14.6"
           ]
         }
       },
@@ -3394,8 +3387,7 @@
           "jsr:@netscript/telemetry@0.0.1-alpha.12",
           "jsr:@std/assert@1",
           "jsr:@std/path@1",
-          "jsr:@zod/zod@4.4.3",
-          "npm:@durable-streams/state@~0.3.1"
+          "jsr:@zod/zod@4.4.3"
         ],
         "packageJson": {
           "dependencies": [
@@ -3420,11 +3412,7 @@
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/async@1",
           "jsr:@std/path@1",
-          "jsr:@zod/zod@4.4.3",
-          "npm:@durable-streams/state@~0.3.1",
-          "npm:@orpc/openapi@^1.14.6",
-          "npm:@orpc/server@^1.14.6",
-          "npm:@orpc/zod@^1.14.6"
+          "jsr:@zod/zod@4.4.3"
         ],
         "packageJson": {
           "dependencies": [

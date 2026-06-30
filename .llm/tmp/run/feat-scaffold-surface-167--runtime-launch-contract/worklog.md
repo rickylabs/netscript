@@ -53,3 +53,19 @@
 | CLI tests first run | `cd packages/cli && deno test --unstable-kv --allow-all` | 1 | Failed on old contract assertions and cwd-relative test fixture paths exposed by running from `packages/cli`; fixed assertions/path anchors. |
 | CLI tests rerun | `cd packages/cli && deno test --unstable-kv --allow-all` | 0 | `ok \| 177 passed (363 steps) \| 0 failed`. |
 | root lint | `rtk proxy deno task lint` | 0 | `exitCode=0`; selected 1302 files, total lint occurrences 0. |
+
+## Catalog correction — Shared npm package catalog dependency surface
+
+| Gate | Command | Exit | Evidence |
+| --- | --- | ---: | --- |
+| auth check | `cd plugins/auth && deno task check` | 0 | Package resolves shared npm dependencies through `package.json` catalog entries. |
+| sagas check | `cd plugins/sagas && deno task check` | 0 | Package resolves shared npm dependencies through `package.json` catalog entries. |
+| streams check | `cd plugins/streams && deno task check` | 0 | Package resolves shared npm dependencies through `package.json` catalog entries. |
+| triggers check | `cd plugins/triggers && deno task check` | 0 | Package resolves shared npm dependencies through `package.json` catalog entries. |
+| workers check | `cd plugins/workers && deno task check` | 0 | Package resolves shared npm dependencies through `package.json` catalog entries. |
+| catalog scan | `deno task deps:check:npm-catalog` | 0 | No warnings for `plugins/auth`, `plugins/sagas`, `plugins/streams`, `plugins/triggers`, or `plugins/workers`; remaining warnings are pre-existing outside this plugin correction. |
+| auth publish dry-run | `cd plugins/auth && deno publish --dry-run --allow-dirty` | 0 | `Success Dry run complete`; existing unanalyzable dynamic-import warning for service bootstrap. |
+| sagas publish dry-run | `cd plugins/sagas && deno publish --dry-run --allow-dirty` | 0 | `Success Dry run complete`; existing unanalyzable dynamic-import warnings for service bootstrap and runtime importer. |
+| streams publish dry-run | `cd plugins/streams && deno publish --dry-run --allow-dirty` | 0 | `Success Dry run complete`; `package.json` included in publish file list. |
+| triggers publish dry-run | `cd plugins/triggers && deno publish --dry-run --allow-dirty` | 0 | `Success Dry run complete`; existing unanalyzable dynamic-import warnings for CLI/runtime dynamic imports. |
+| workers publish dry-run | `cd plugins/workers && deno publish --dry-run --allow-dirty` | 0 | `Success Dry run complete`; existing unanalyzable dynamic-import warnings for local combined wrapper, service bootstrap, and CLI local runtime backend. |
