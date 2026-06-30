@@ -44,12 +44,14 @@ import type {
   TriggerEnabledStatePort,
   TriggerEventListOptions,
   TriggerEventStorePort,
+  TriggerEventSubscriptionPort,
   TriggerIngressPort,
   TriggerIngressRequest,
   TriggerIngressResponse,
   TriggerProcessorPort,
 } from '@netscript/plugin-triggers-core/ports';
 import {
+  createEventSubscription,
   createManualDispatcher,
   createTriggerIngress,
   createWebhookTestDelivery,
@@ -154,6 +156,8 @@ export type TriggersServiceOptions = Readonly<{
   manualDispatcher?: ManualDispatcher;
   /** Webhook test-delivery helper; defaults to the configured ingress. */
   webhookTestDelivery?: WebhookTestDelivery;
+  /** In-process event subscription port; defaults to a single-replica hub. */
+  eventSubscription?: TriggerEventSubscriptionPort;
   /** Pre-opened KV adapter; defaults to the runtime KV. */
   kv?: KvStore;
 }>;
@@ -174,7 +178,9 @@ export async function createTriggersServiceContext(
     new KvTriggerEventStore({ kv: requireKv(kv) });
   const enabledState = options.enabledState ??
     createKvTriggerEnabledStateStore({ kv: requireKv(kv) });
-  const processor = options.processor ?? await createRuntimeTriggerProcessor({ kv });
+  const eventSubscription = options.eventSubscription ?? createEventSubscription();
+  const processor = options.processor ??
+    await createRuntimeTriggerProcessor({ kv, eventSubscription });
   const manualDispatcher = options.manualDispatcher ??
     createManualDispatcher({ eventStore, processor });
   const hmacVerifier = new HmacSha256WebhookVerifier({
@@ -189,6 +195,7 @@ export async function createTriggersServiceContext(
     selectVerifier: (definition) => definition.verifier === 'memory' ? memoryVerifier : undefined,
     resolveSecret: (definition) =>
       definition.secretEnv === undefined ? undefined : Deno.env.get(definition.secretEnv),
+    eventSubscription,
   });
   const webhookTestDelivery = options.webhookTestDelivery ??
     createWebhookTestDelivery({
@@ -196,7 +203,15 @@ export async function createTriggersServiceContext(
       resolveSecret: (definition) =>
         definition.secretEnv === undefined ? undefined : Deno.env.get(definition.secretEnv),
     });
-  return { definitions, eventStore, enabledState, ingress, manualDispatcher, webhookTestDelivery };
+  return {
+    definitions,
+    eventStore,
+    enabledState,
+    ingress,
+    manualDispatcher,
+    webhookTestDelivery,
+    eventSubscription,
+  };
 }
 
 /**
@@ -271,6 +286,7 @@ function createUnavailableTriggersServiceContext(): TriggerServiceContext {
     ingress: unavailableTriggerIngress,
     manualDispatcher: unavailableManualDispatcher,
     webhookTestDelivery: unavailableWebhookTestDelivery,
+    eventSubscription: unavailableEventSubscription,
   };
 }
 
@@ -318,6 +334,23 @@ const unavailableManualDispatcher: ManualDispatcher = {
 
 const unavailableWebhookTestDelivery: WebhookTestDelivery = {
   deliver(): Promise<never> {
+    return Promise.reject(triggerRuntimeUnavailable());
+  },
+};
+
+const unavailableEventSubscription: TriggerEventSubscriptionPort = {
+  subscribe(): AsyncIterable<never> {
+    return {
+      [Symbol.asyncIterator](): AsyncIterator<never> {
+        return {
+          next(): Promise<IteratorResult<never>> {
+            return Promise.reject(triggerRuntimeUnavailable());
+          },
+        };
+      },
+    };
+  },
+  publish(): Promise<never> {
     return Promise.reject(triggerRuntimeUnavailable());
   },
 };

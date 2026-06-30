@@ -44,6 +44,7 @@ import {
   MemoryTriggerEnabledStateStore,
 } from '@netscript/plugin-triggers-core/testing';
 import {
+  createEventSubscription,
   createManualDispatcher,
   createTriggerIngress,
   createWebhookTestDelivery,
@@ -91,6 +92,7 @@ const failingIngress: TriggerIngressPort = {
 
 function buildContext(): TriggerServiceContext {
   const eventStore = new InMemoryEventStore();
+  const eventSubscription = createEventSubscription();
   const definitions: readonly ProcessableTriggerDefinition[] = [
     defineScheduledTrigger(() => Promise.resolve([]), {
       id: 'sched-1',
@@ -112,6 +114,7 @@ function buildContext(): TriggerServiceContext {
       createEventId: () => 'trg_evt_connector_manual' as TriggerEventId,
     }),
     webhookTestDelivery: createWebhookTestDelivery({ ingress: failingIngress }),
+    eventSubscription,
   };
 }
 
@@ -124,6 +127,7 @@ function buildWebhookPathContext(acceptedTriggerIds: string[]): TriggerServiceCo
     }),
   ];
   const eventStore = new InMemoryEventStore();
+  const eventSubscription = createEventSubscription();
   return {
     definitions,
     eventStore,
@@ -142,6 +146,7 @@ function buildWebhookPathContext(acceptedTriggerIds: string[]): TriggerServiceCo
       processor: new InlineTriggerProcessor(),
     }),
     webhookTestDelivery: createWebhookTestDelivery({ ingress: failingIngress }),
+    eventSubscription,
   };
 }
 
@@ -158,6 +163,7 @@ function buildEventsContext(): TriggerServiceContext {
     metadata: {},
   } as unknown as TriggerEvent;
   const eventStore = new InMemoryEventStore([event]);
+  const eventSubscription = createEventSubscription();
   return {
     definitions: [],
     eventStore,
@@ -168,6 +174,7 @@ function buildEventsContext(): TriggerServiceContext {
       processor: new InlineTriggerProcessor(),
     }),
     webhookTestDelivery: createWebhookTestDelivery({ ingress: failingIngress }),
+    eventSubscription,
   };
 }
 
@@ -179,6 +186,7 @@ function buildWebhookTestContext(): TriggerServiceContext {
   });
   const eventStore = new InMemoryEventStore();
   const processor = new InlineTriggerProcessor();
+  const eventSubscription = createEventSubscription();
   const memoryVerifier = new MemoryWebhookVerifier({ idempotencyKey: 'test-webhook-idem' });
   const ingress = createTriggerIngress({
     definitions: [definition],
@@ -195,6 +203,7 @@ function buildWebhookTestContext(): TriggerServiceContext {
     ingress,
     manualDispatcher: createManualDispatcher({ eventStore, processor }),
     webhookTestDelivery: createWebhookTestDelivery({ ingress }),
+    eventSubscription,
   };
 }
 
@@ -344,6 +353,23 @@ Deno.test('triggers connector smoke', async (t) => {
       assertEquals(body.nextFireAt.length, 2);
       assertEquals(body.timezone, 'UTC');
       assertEquals(body.persistent, true);
+    });
+
+    await t.step('subscribeEvents streams a heartbeat', async () => {
+      const route = await findRoute(
+        baseUrl,
+        (method, path) => method === 'GET' && /\/events\/subscribe$/.test(path),
+      );
+      const controller = new AbortController();
+      const res = await fetch(`${baseUrl}/api${route.path}`, { signal: controller.signal });
+      assertEquals(res.status, 200);
+      const reader = res.body?.getReader();
+      assertExists(reader);
+      const chunk = await reader.read();
+      controller.abort();
+      reader.releaseLock();
+      const text = new TextDecoder().decode(chunk.value);
+      assertEquals(text.includes('heartbeat'), true);
     });
 
     await t.step('raw webhook unknown trigger id resolves to a 404', async () => {

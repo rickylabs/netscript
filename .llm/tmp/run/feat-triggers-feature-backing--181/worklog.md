@@ -169,7 +169,7 @@ Notes:
 
 ## Slice 5 — Cron Next-Fire Preview
 
-Status: implemented, gated, ready to commit.
+Status: implemented, gated, committed as `e710297f`.
 
 Files:
 - `packages/plugin-triggers-core/src/runtime/compute-next-fire-times.ts`
@@ -202,3 +202,65 @@ Notes:
   Asia/Tokyo, omitted `from`, `persistent: false`, leap day, invalid cron typed error, and
   every-N-minutes interval baseline.
 - `CRON-NEXT-FIRE-ENGINE` is recorded in `.llm/harness/debt/arch-debt.md`.
+
+## Slice 6 — Event Subscription / SSE
+
+Status: implemented, gated, ready to commit.
+
+Files:
+- `packages/plugin-triggers-core/src/ports/trigger-event-subscription-port.ts`
+- `packages/plugin-triggers-core/src/ports/mod.ts`
+- `packages/plugin-triggers-core/src/runtime/create-event-subscription.ts`
+- `packages/plugin-triggers-core/src/runtime/create-event-subscription_test.ts`
+- `packages/plugin-triggers-core/src/runtime/create-trigger-ingress.ts`
+- `packages/plugin-triggers-core/src/runtime/trigger-processor.ts`
+- `packages/plugin-triggers-core/src/runtime/mod.ts`
+- `packages/plugin-triggers-core/src/public/mod.ts`
+- `plugins/triggers/src/runtime/trigger-runtime-processor.ts`
+- `plugins/triggers/services/src/routers/v1-types.ts`
+- `plugins/triggers/services/src/routers/v1.ts`
+- `plugins/triggers/services/src/main.ts`
+- `plugins/triggers/services/src/main_test.ts`
+- `.llm/harness/debt/arch-debt.md`
+
+Gate evidence:
+- `run-deno-check` core: PASS, exit 0, 74 files, `--unstable-kv`.
+- `run-deno-check` plugin triggers: PASS, exit 0, 65 files, `--unstable-kv`.
+- `run-deno-lint` core: PASS, exit 0, 0 findings.
+- `run-deno-lint` plugin triggers: PASS, exit 0, 0 findings after replacing the unavailable
+  generator stub.
+- `run-deno-fmt` core: PASS, exit 0, 0 findings.
+- `run-deno-fmt` plugin triggers: PASS, exit 0, 0 findings after formatting touched connector files.
+- `rtk proxy deno task test --unstable-kv packages/plugin-triggers-core/src/runtime/create-event-subscription_test.ts packages/plugin-triggers-core/src/runtime/compute-next-fire-times_test.ts packages/plugin-triggers-core/tests/contracts/triggers-contract-soundness_test.ts`: PASS, exit 0, 11 passed.
+- `rtk proxy deno task test --unstable-kv plugins/triggers/services/src/main_test.ts`: PASS, exit 0, 4 passed, 9 steps.
+- `deno publish --dry-run --allow-dirty` in `packages/plugin-triggers-core`: PASS, exit 0.
+- `deno publish --dry-run --allow-dirty` in `plugins/triggers`: PASS, exit 0; pre-existing
+  dynamic-import warnings only.
+- `rtk proxy deno task arch:check`: PASS, exit 0, `FAIL=0` with existing warnings plus new warnings
+  for `plugins/triggers/services/src/main.ts` exceeding 500 lines and
+  `plugin-triggers-core/src/runtime` exceeding the immediate-child cap.
+
+Notes:
+- Added `TriggerEventSubscriptionPort` and `createEventSubscription`; public root exports the
+  factory as a value and port types via `export type`.
+- Ingress publishes `trigger:accepted` and terminal lifecycle messages; the processor publishes
+  `trigger:started`; the connector maps subscription messages to `TriggerSSEEvent`.
+- `TRIGGERS-SSE-MULTI-REPLICA` is recorded as open debt and
+  `TRIGGERS-CONNECTOR-DEFERRED-ROUTES` is closed in `.llm/harness/debt/arch-debt.md`.
+
+## Final Summary
+
+Status: implementation complete through Slice 6; final commit pending.
+
+Per-slice commits:
+- Slice 1: `a79e13ea`
+- Slice 2: `a19ca64f`
+- Slice 3: `6ead7da4`
+- Slice 4: `3ef180f7`
+- Slice 5: `e710297f`
+- Slice 6: pending
+
+Debt:
+- Opened `CRON-NEXT-FIRE-ENGINE`.
+- Opened `TRIGGERS-SSE-MULTI-REPLICA`.
+- Closed `TRIGGERS-CONNECTOR-DEFERRED-ROUTES`.

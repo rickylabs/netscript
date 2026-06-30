@@ -9,6 +9,7 @@ import { TriggersError } from '@netscript/plugin-triggers-core/domain';
 import type {
   ProcessableTriggerDefinition,
   TriggerDlqPort,
+  TriggerEventSubscriptionPort,
   TriggerIdempotencyPort,
   TriggerProcessorPort,
   TriggerProcessorStopOptions,
@@ -31,6 +32,7 @@ export type RuntimeTriggerProcessorOptions = Readonly<{
   idempotency?: TriggerIdempotencyPort;
   dlq?: TriggerDlqPort;
   jobQueue?: ReturnType<typeof createQueue<JobMessage>>;
+  eventSubscription?: TriggerEventSubscriptionPort;
 }>;
 
 /** Create the trigger processor used by plugin service and background runtimes. */
@@ -46,6 +48,7 @@ export async function createRuntimeTriggerProcessor(
     dispatchAction: async (action, event, definition) => {
       await dispatchTriggerAction(action, event, definition, queue);
     },
+    eventSubscription: options.eventSubscription,
   });
 
   return new TracedTriggerProcessor(processor);

@@ -23,9 +23,14 @@ import {
   type TriggerContractKind,
   type TriggerDefinitionResponse,
   type TriggerEventResponse,
+  type TriggerSSEEvent,
 } from '@netscript/plugin-triggers-core/contracts/v1';
 import type { PluginCapabilities } from '@netscript/plugin/contract-base';
-import type { ProcessableTriggerDefinition } from '@netscript/plugin-triggers-core/ports';
+import type {
+  ProcessableTriggerDefinition,
+  TriggerEventSubscriptionFilter,
+  TriggerEventSubscriptionMessage,
+} from '@netscript/plugin-triggers-core/ports';
 import type {
   TriggerEvent,
   TriggerEventStatus,
@@ -33,12 +38,9 @@ import type {
 } from '@netscript/plugin-triggers-core/domain';
 import { computeNextFireTimes } from '@netscript/plugin-triggers-core/runtime';
 import { notFound } from '@netscript/contracts';
+import { withEventMeta } from '@orpc/server';
 import { router, type TriggersHandlers } from './router-context.ts';
 import type { TriggerServiceContext } from './v1-types.ts';
-
-/** Message used by every route that defers to its pending triggers-core backing. */
-const PENDING_BACKING_MESSAGE =
-  'Not implemented — pending triggers-core runtime backing (see arch-debt).';
 
 /**
  * Trigger definition response as the contract's Zod schema actually infers it.
@@ -235,14 +237,25 @@ export const triggersV1: TriggersHandlers<TriggersV1RouteKey> = {
     return response;
   }),
 
-  // The streaming route still satisfies the `eventIterator` return type by being
-  // an async generator; it throws immediately because no event-subscription seam
-  // exists yet. The generator never yields, so the SSE output schema is never
-  // violated.
   subscribeEvents: router.subscribeEvents.handler(
-    // deno-lint-ignore require-yield
-    async function* (): AsyncGenerator<never, void, unknown> {
-      throw new Error(PENDING_BACKING_MESSAGE);
+    async function* ({ input, signal, context }) {
+      let eventId = 0;
+      yield withEventMeta(
+        {
+          type: 'heartbeat',
+          timestamp: new Date().toISOString(),
+          data: { connected: true },
+        } satisfies TriggerSSEEvent,
+        { id: String(++eventId), retry: 5000 },
+      );
+
+      const stream = context.eventSubscription.subscribe(toSubscriptionFilter(input), { signal });
+      for await (const message of stream) {
+        if (signal?.aborted) {
+          break;
+        }
+        yield withEventMeta(toSseEvent(message), { id: String(++eventId), retry: 5000 });
+      }
     },
   ),
 };
@@ -369,4 +382,33 @@ function toEventStatus(
   status: TriggerContractEventStatus | null | undefined,
 ): TriggerEventStatus | undefined {
   return status == null ? undefined : status;
+}
+
+function toSubscriptionFilter(
+  input:
+    | Readonly<{
+      triggerId?: string;
+      kind?: TriggerKind | null;
+      status?: TriggerEventStatus | null;
+    }>
+    | undefined,
+): TriggerEventSubscriptionFilter {
+  return {
+    triggerId: input?.triggerId,
+    kind: input?.kind ?? undefined,
+    status: input?.status ?? undefined,
+  };
+}
+
+function toSseEvent(message: TriggerEventSubscriptionMessage): TriggerSSEEvent {
+  return {
+    type: message.type,
+    timestamp: message.timestamp,
+    triggerId: String(message.event.triggerId),
+    eventId: String(message.event.id),
+    data: {
+      kind: message.event.kind,
+      status: message.event.status,
+    },
+  };
 }

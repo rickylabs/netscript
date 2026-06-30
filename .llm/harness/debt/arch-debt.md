@@ -1632,14 +1632,38 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   run as a WSL Codex daemon-attached slice, not the connector slice.
 - **Linked plan:** `feat/scaffold-surface-167` triggers thin-connector convergence slice (#172).
 - **Created:** 2026-06-30.
-- **Status:** open, DEBT_ACCEPTED — recorded as part of the additive thin-connector convergence; the
-  connector compiles/lints clean, the smoke test passes, and `deno publish --dry-run` succeeds.
+- **Status:** closed 2026-06-30 by #181 Slices 1-6. The connector now backs the six deferred routes
+  through triggers-core seams: enabled/name fields + enabled-state store, manual dispatcher, webhook
+  test delivery, cron preview engine, and in-process event subscription.
 - **Gate:** Close each route as its triggers-core seam lands (manual/test-fire helper -> `fireTrigger`
   + `testWebhook`; enabled-state store + `enabled`/`name` fields -> `enableTrigger`/`disableTrigger`
   + un-synthesized `listTriggers`/`getTrigger`; cron preview engine -> `previewSchedule`; event SSE
   seam -> `subscribeEvents`), each with its own contract-route assertion and the connector smoke
   test extended to assert the now-backed behavior. Remove the webhook brand cast when a public brand
   constructor lands.
+- **Closing evidence:** #181 per-slice gates passed with scoped core/connector check/lint/fmt,
+  focused contract/connector tests, `deno publish --dry-run --allow-dirty` for
+  `@netscript/plugin-triggers-core` and `@netscript/plugin-triggers`, and `deno task arch:check`
+  exiting 0 (`FAIL=0`). Slice 6 connector smoke asserts `subscribeEvents` streams a heartbeat.
+
+## plugin-triggers-core — TRIGGERS-SSE-MULTI-REPLICA
+
+- **ID:** `TRIGGERS-SSE-MULTI-REPLICA`
+- **Reason:** #181 Slice 6 backs `subscribeEvents` with `createEventSubscription`, an in-process
+  single-replica event hub. It is appropriate for local service/runtime smoke and preserves the thin
+  connector boundary, but it does not fan out events across multiple service replicas or processes.
+- **Why it is debt:** Production deployments with more than one triggers service replica need a
+  shared subscription backend, likely KV watch, pub/sub, or the eventual durable trigger event bus.
+  Without that backend, a client subscribed to replica A will not receive lifecycle messages
+  published by replica B.
+- **Owner:** `@netscript/plugin-triggers-core` runtime + triggers connector deployment maintainers.
+- **Target:** Multi-replica triggers service follow-up after #181.
+- **Linked plan:** `.llm/tmp/run/feat-triggers-feature-backing--181/plan.md` Slice 6 / L11.
+- **Created:** 2026-06-30.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when `TriggerEventSubscriptionPort` has a shared backend with tests proving
+  cross-process or cross-replica delivery while keeping the current in-process adapter as the local
+  testing/smoke implementation.
 
 ## plugins/{sagas,triggers,workers} — PLUGIN-RUNTIME-ADAPTER-RELOCATION (#172b/c/d)
 

@@ -5,6 +5,7 @@ export { createTriggerIngress } from './create-trigger-ingress.ts';
 export { createManualDispatcher } from './create-manual-dispatcher.ts';
 export { createWebhookTestDelivery } from './create-webhook-test-delivery.ts';
 export { computeNextFireTimes } from './compute-next-fire-times.ts';
+export { createEventSubscription } from './create-event-subscription.ts';
 export { NoopLogger } from './logger.ts';
 export { defaultRetryPolicy, TriggerProcessor } from './trigger-processor.ts';
 export type {
@@ -38,6 +39,11 @@ export type {
   TriggerDlqPort,
   TriggerEventListOptions,
   TriggerEventStorePort,
+  TriggerEventSubscriptionFilter,
+  TriggerEventSubscriptionMessage,
+  TriggerEventSubscriptionOptions,
+  TriggerEventSubscriptionPort,
+  TriggerEventSubscriptionType,
   TriggerIdempotencyClaim,
   TriggerIdempotencyKeyInput,
   TriggerIdempotencyPort,

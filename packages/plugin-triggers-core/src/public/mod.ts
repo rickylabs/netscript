@@ -28,6 +28,11 @@ export type {
   TriggerEnabledStatePort,
   TriggerEventListOptions,
   TriggerEventStorePort,
+  TriggerEventSubscriptionFilter,
+  TriggerEventSubscriptionMessage,
+  TriggerEventSubscriptionOptions,
+  TriggerEventSubscriptionPort,
+  TriggerEventSubscriptionType,
   TriggerIdempotencyClaim,
   TriggerIdempotencyKeyInput,
   TriggerIdempotencyPort,
@@ -45,6 +50,7 @@ export type {
 } from '../ports/mod.ts';
 export {
   computeNextFireTimes,
+  createEventSubscription,
   createManualDispatcher,
   createTriggerIngress,
   createTriggerProcessor,

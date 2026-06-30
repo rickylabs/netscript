@@ -9,6 +9,7 @@ import {
 } from '../domain/mod.ts';
 import type {
   TriggerEventStorePort,
+  TriggerEventSubscriptionPort,
   TriggerIngressPort,
   TriggerIngressRequest,
   TriggerIngressResponse,
@@ -39,6 +40,7 @@ export type TriggerIngressOptions = Readonly<{
   now?: () => Date;
   createEventId?: TriggerIngressEventIdFactory;
   resolveSecret?: (definition: RuntimeWebhookDefinition) => string | undefined;
+  eventSubscription?: TriggerEventSubscriptionPort;
 }>;
 
 /** Create an ack-then-process webhook ingress boundary. */
@@ -61,6 +63,7 @@ class DefaultTriggerIngress implements TriggerIngressPort {
   readonly #resolveSecret: (
     definition: RuntimeWebhookDefinition,
   ) => string | undefined;
+  readonly #eventSubscription?: TriggerEventSubscriptionPort;
 
   constructor(options: TriggerIngressOptions) {
     for (const definition of options.definitions) {
@@ -75,6 +78,7 @@ class DefaultTriggerIngress implements TriggerIngressPort {
     this.#now = options.now ?? (() => new Date());
     this.#createEventId = options.createEventId ?? defaultEventId;
     this.#resolveSecret = options.resolveSecret ?? (() => undefined);
+    this.#eventSubscription = options.eventSubscription;
   }
 
   async accept(request: TriggerIngressRequest): Promise<TriggerIngressResponse> {
@@ -96,6 +100,7 @@ class DefaultTriggerIngress implements TriggerIngressPort {
 
     const event = this.#createEvent(request, definition, body, verification.idempotencyKey);
     await this.#eventStore.save(event);
+    await this.#publish('trigger:accepted', event);
     this.#processLater(event, definition);
 
     const acceptedAt = this.#now().toISOString();
@@ -190,6 +195,12 @@ class DefaultTriggerIngress implements TriggerIngressPort {
   ): Promise<void> {
     try {
       await this.#eventStore.updateStatus(event.id, status, metadata);
+      await this.#publish(toSubscriptionType(status), {
+        ...event,
+        status,
+        updatedAt: this.#now().toISOString(),
+        metadata: metadata ?? event.metadata,
+      });
     } catch (error) {
       this.#logger.error('trigger.ingress.status_update_failed', {
         triggerId: event.triggerId,
@@ -199,6 +210,29 @@ class DefaultTriggerIngress implements TriggerIngressPort {
       });
     }
   }
+
+  async #publish(
+    type: 'trigger:accepted' | 'trigger:completed' | 'trigger:failed' | 'trigger:dlq',
+    event: TriggerEvent,
+  ): Promise<void> {
+    await this.#eventSubscription?.publish({
+      type,
+      timestamp: this.#now().toISOString(),
+      event,
+    });
+  }
+}
+
+function toSubscriptionType(
+  status: TriggerEvent['status'],
+): 'trigger:completed' | 'trigger:failed' | 'trigger:dlq' {
+  if (status === 'failed') {
+    return 'trigger:failed';
+  }
+  if (status === 'dlq') {
+    return 'trigger:dlq';
+  }
+  return 'trigger:completed';
 }
 
 function normalizeWebhookPath(path: string): string {

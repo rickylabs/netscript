@@ -14,6 +14,7 @@ import type {
   ProcessableTriggerDefinition,
   TriggerEnabledStatePort,
   TriggerEventStorePort,
+  TriggerEventSubscriptionPort,
   TriggerIngressPort,
 } from '@netscript/plugin-triggers-core/ports';
 import type {
@@ -42,4 +43,6 @@ export type TriggerServiceContext = Readonly<{
   manualDispatcher: ManualDispatcher;
   /** Signed synthetic webhook delivery helper for `testWebhook`. */
   webhookTestDelivery: WebhookTestDelivery;
+  /** In-process live event subscription stream for `subscribeEvents`. */
+  eventSubscription: TriggerEventSubscriptionPort;
 }>;
