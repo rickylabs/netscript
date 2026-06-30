@@ -35,6 +35,8 @@ Implemented:
 - Added `@netscript/plugin/service` `bindPluginContract` and `assemblePluginContractRouter`.
 - Added net-new `@netscript/plugin/scaffold` subpath with public `ItemScaffolder`/`defineStub`
   facade and deterministic registry/runtime-registry source generators.
+- Added `@netscript/plugin/cli` base metadata commands (`status`, `health`, `info`), generic argv
+  normalize/parse helpers, and a generic generated-project registry loader.
 - Added tests for a real workers contract binder and scaffold generator output.
 - Updated `packages/plugin/deno.json` export map and package `check` task to include `./scaffold`.
 
@@ -42,11 +44,10 @@ Gate results:
 
 | Gate | Command | Result |
 |---|---|---|
-| scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin --ext ts,tsx` | PASS — 146 files, 2 batches, 0 diagnostics |
-| scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin --ext ts,tsx` | PASS — 146 files, 0 diagnostics |
-| scoped fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin --ext ts,tsx` | PASS — 146 files, 0 findings |
-| focused tests | `deno test --allow-all packages/plugin/tests/service/plugin-contract-binder_test.ts packages/plugin/tests/scaffold/scaffold-generators_test.ts` | PASS — 3 passed, 0 failed |
-| package tests | `cd packages/plugin && rtk proxy deno task test` | PASS — 69 passed, 0 failed |
-| publish dry-run | `cd packages/plugin && rtk proxy deno task publish:dry-run` | PASS — dry run complete; pre-existing package slow-type carve-out and dynamic import warning remain |
+| scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin --ext ts,tsx` | PASS — 152 files, 2 batches, 0 diagnostics |
+| scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin --ext ts,tsx` | PASS — 152 files, 0 diagnostics |
+| scoped fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin --ext ts,tsx` | PASS — 152 files, 0 findings |
+| focused tests | `deno test --allow-all packages/plugin/tests/cli/argv_test.ts packages/plugin/tests/cli/base-meta-commands_test.ts packages/plugin/tests/cli/generated-project-registry_test.ts packages/plugin/tests/service/plugin-contract-binder_test.ts packages/plugin/tests/scaffold/scaffold-generators_test.ts` | PASS — 8 passed, 0 failed |
+| package tests | `cd packages/plugin && rtk proxy deno task test` | PASS — 74 passed, 0 failed |
+| publish dry-run | `cd packages/plugin && rtk proxy deno task publish:dry-run` | PASS — dry run complete; pre-existing slow-type carve-out remains; dynamic-import warnings now include the pre-existing manifest resolver plus the new generated-registry loader |
 | arch check | `rtk proxy deno task arch:check` | PASS exit 0 — `FAIL=0`; existing WARN/INFO doctrine findings remain across the wave |
-
