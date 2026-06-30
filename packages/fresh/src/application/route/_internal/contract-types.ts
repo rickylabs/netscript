@@ -71,7 +71,7 @@ type InferRoutePatternSegment<TSegment extends string> = TSegment extends `[[...
   ? { [TKey in TParam]?: readonly string[] }
   : TSegment extends `[...${infer TParam}]` ? { [TKey in TParam]: readonly string[] }
   : TSegment extends `[${infer TParam}]` ? { [TKey in TParam]: string }
-  : EmptyRecord;
+  : {};
 
 type InferRoutePatternPathSegments<TPattern extends string> = TPattern extends '' ? EmptyRecord
   : TPattern extends `${infer TSegment}/${infer TRest}`

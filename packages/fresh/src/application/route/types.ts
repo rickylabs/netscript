@@ -111,13 +111,13 @@ export type InferRoutePatternSegment<TSegment extends string> = TSegment extends
   `[[...${infer TParam}]]` ? { [TKey in TParam]?: readonly string[] }
   : TSegment extends `[...${infer TParam}]` ? { [TKey in TParam]: readonly string[] }
   : TSegment extends `[${infer TParam}]` ? { [TKey in TParam]: string }
-  : EmptyRecord;
+  : {};
 
 /** Infer typed path params from the stripped Fresh route pattern. */
 export type InferRoutePatternPathSegments<TPattern extends string> = TPattern extends ''
   ? EmptyRecord
   : TPattern extends `${infer TSegment}/${infer TRest}`
-    ? InferRoutePatternSegment<TSegment> & InferRoutePatternPathSegments<TRest>
+    ? InferRoutePatternSegment<TSegment> & InferRoutePatternPathSegments<TRest> & {}
   : InferRoutePatternSegment<TPattern>;
 
 /**
