@@ -1,6 +1,6 @@
 import { assert, assertEquals } from 'jsr:@std/assert@^1';
+import { inspectPlugin } from '@netscript/plugin';
 import {
-  inspectTriggers,
   TRIGGERS_API_DEFAULT_PORT,
   TRIGGERS_API_SERVICE_NAME,
   TRIGGERS_PLUGIN_ID,
@@ -41,17 +41,13 @@ Deno.test('triggersPlugin manifest exposes core dependencies, service, contract,
   );
   assertEquals(triggersPlugin.contributions.aspire, './src/aspire/mod.ts');
 
-  const inspection = inspectTriggers();
-  assertEquals(inspection.name, '@netscript/plugin-triggers');
-  assertEquals(inspection.version, TRIGGERS_PLUGIN_VERSION);
-  assertEquals(inspection.dependencies, ['workersCore', 'streamsCore', 'sagasCore']);
-  assertEquals(inspection.axes, [
-    'services',
-    'contractVersions',
-    'runtimeConfigTopics',
-    'e2e',
-    'aspire',
-  ]);
+  const inspection = inspectPlugin(triggersPlugin);
+  assertEquals(inspection.target, '@netscript/plugin-triggers');
+  assertEquals(inspection.details.version, TRIGGERS_PLUGIN_VERSION);
+  assertEquals(
+    inspection.details.contributionGroups,
+    Object.keys(triggersPlugin.contributions).length,
+  );
 
   const verification = verifyTriggersPlugin();
   assertEquals(verification.ok, true);

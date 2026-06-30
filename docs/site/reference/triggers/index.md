@@ -10,10 +10,10 @@ This page is generated from the package's public surface with `deno doc` (US-2).
 index of packages and plugins return to the [reference overview](/reference/).
 
 The plugin's root entrypoint (`@netscript/plugin-triggers`) exposes the public **plugin manifest**
-surface — the manifest value, its metadata constants, the inspection helper, and the manifest
-types. The handler-first authoring DSL (`defineWebhook`, `defineScheduledTrigger`,
-`defineFileWatch`, `enqueueJob`) and the runtime ports live in the sibling core package and are
-documented in [Internals](#internals) below.
+surface — the manifest value and its metadata constants. Shared manifest inspection is provided by
+`inspectPlugin` from `@netscript/plugin`. The handler-first authoring DSL (`defineWebhook`,
+`defineScheduledTrigger`, `defineFileWatch`, `enqueueJob`) and the runtime ports live in the sibling
+core package and are documented in [Internals](#internals) below.
 
 Additional integration entrypoints are published as [sub-path exports](#sub-path-exports):
 `./public`, `./plugin`, `./runtime`, `./scaffolding`, `./aspire`, `./cli`, `./services`,
@@ -24,8 +24,7 @@ Additional integration entrypoints are published as [sub-path exports](#sub-path
 
 | Symbol | Signature | Description |
 | --- | --- | --- |
-| `triggersPlugin` | `const triggersPlugin: TriggersPluginManifest` | Plugin manifest for NetScript triggers. |
-| `inspectTriggers` | `function inspectTriggers(manifest: TriggersPluginManifest): TriggersPluginInspection` | Inspect the triggers plugin manifest without invoking lifecycle hooks. |
+| `triggersPlugin` | `const triggersPlugin: PluginManifest` | Plugin manifest for NetScript triggers. |
 
 ## Manifest constants
 
@@ -40,17 +39,6 @@ Additional integration entrypoints are published as [sub-path exports](#sub-path
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
-| `TriggersPluginManifest` | interface | Public manifest shape for the triggers plugin. |
-| `TriggersPluginInspection` | interface | Inspection summary for the triggers plugin manifest. |
-| `TriggersPluginContributions` | interface | Public contribution groups exposed by the triggers plugin. |
-| `TriggersPluginServiceContribution` | interface | Service contribution shape exposed by the triggers manifest. |
-| `TriggersPluginDependencyManifest` | interface | Plugin manifest shape needed by trigger dependency declarations. |
-| `TriggersStreamProducerPort` | interface | Stream producer capability consumed by trigger actions. |
-| `TriggersPluginMetadata` | type alias | Runtime-safe metadata attached to trigger plugin manifests. |
-| `TriggersPluginDependencies` | type alias | Typed plugin dependency manifests for sibling core packages. |
-| `TriggersPluginCoreDependencies` | type alias | Type-only sibling-core capabilities consumed by trigger actions and adapters. |
-| `TriggersDefineSaga` | type alias | Saga definition factory accepted by trigger plugin integrations. |
-| `TriggersWorkerJobDefinition` | type alias | Worker job shape consumed by trigger actions. |
 | `TriggersPluginId` | type alias | Literal type for the triggers plugin id. |
 | `TriggersPluginVersion` | type alias | Literal type for the triggers plugin version. |
 | `TriggersApiServiceName` | type alias | Literal type for the triggers API service name. |

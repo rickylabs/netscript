@@ -42,15 +42,16 @@ bunx jsr add @netscript/plugin-triggers
 ```
 
 ```typescript
-import { inspectTriggers, triggersPlugin } from '@netscript/plugin-triggers';
+import { inspectPlugin } from '@netscript/plugin';
+import { triggersPlugin } from '@netscript/plugin-triggers';
 
 // Hand the manifest to the host plugin loader.
 export const plugins = [triggersPlugin];
 
-// Inspect declared contribution axes without invoking lifecycle hooks.
-const summary = inspectTriggers(triggersPlugin);
-console.log(summary.name); // "@netscript/plugin-triggers"
-console.log(summary.axes); // ["services", "backgroundProcessors", "streamTopics", ...]
+// Inspect declared contribution groups without invoking lifecycle hooks.
+const summary = inspectPlugin(triggersPlugin);
+console.log(summary.target); // "@netscript/plugin-triggers"
+console.log(summary.details.contributionGroups); // 5
 ```
 
 ---
