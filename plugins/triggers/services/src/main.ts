@@ -17,6 +17,9 @@
  * @module
  */
 
+// Register Redis/Garnet KV adapter - must run before any getKv() call.
+import '@netscript/kv/redis';
+
 import type { Context } from 'hono';
 import type { ServiceBuilder } from '@netscript/service';
 import { createPluginService } from '@netscript/plugin/service';
@@ -121,6 +124,8 @@ const VERSION: string = denoJson.version;
 
 /** External path prefix preserved for the raw HMAC webhook ingress. */
 const WEBHOOK_PATH_PREFIX = '/api/v1/webhooks/' as const;
+/** Legacy event-list path preserved for scaffold runtime smoke gates. */
+const LEGACY_EVENTS_PATH = '/api/v1/events' as const;
 
 /** Options for assembling the triggers service runtime context. */
 export type TriggersServiceOptions = Readonly<{
@@ -184,6 +189,10 @@ export function createTriggersService(
     const resolvedContext = resolveContext();
     return acceptWebhook(c, resolvedContext.ingress, resolvedContext.definitions);
   };
+  const listEventsHandler = (c: Context): Promise<Response> => {
+    const resolvedContext = resolveContext();
+    return listTriggerEvents(c, resolvedContext.eventStore);
+  };
   return createPluginService(router, {
     name: TRIGGERS_API_SERVICE_NAME,
     version: VERSION,
@@ -196,6 +205,7 @@ export function createTriggersService(
     docs: {},
     context: resolveContext,
     rawRoutes: [
+      { method: 'get', path: LEGACY_EVENTS_PATH, handler: listEventsHandler },
       { method: 'post', path: `${WEBHOOK_PATH_PREFIX}:triggerId`, handler: webhookHandler },
       { method: 'post', path: `${WEBHOOK_PATH_PREFIX}:triggerId/*`, handler: webhookHandler },
     ],
@@ -269,6 +279,22 @@ function requireKv(kv: KvStore | undefined): KvStore {
   return kv;
 }
 
+async function listTriggerEvents(
+  c: Context,
+  eventStore: TriggerEventStorePort,
+): Promise<Response> {
+  const limit = parsePositiveInteger(c.req.query('limit'), 50);
+  const offset = parseNonNegativeInteger(c.req.query('offset'), 0);
+  const triggerId = c.req.query('triggerId');
+  const status = c.req.query('status');
+  const all = await eventStore.list({ status: toTriggerEventStatus(status) });
+  const matched = triggerId === undefined
+    ? all
+    : all.filter((event) => event.triggerId === triggerId);
+  const events = matched.slice(offset, offset + limit);
+  return c.json({ events, total: matched.length, limit, offset });
+}
+
 async function acceptWebhook(
   c: Context,
   ingress: TriggerIngressPort,
@@ -312,6 +338,30 @@ async function acceptWebhook(
       message: failure.message,
     }, failure.status);
   }
+}
+
+function parsePositiveInteger(value: string | undefined, fallback: number): number {
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function parseNonNegativeInteger(value: string | undefined, fallback: number): number {
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed >= 0 ? parsed : fallback;
+}
+
+function toTriggerEventStatus(value: string | undefined): TriggerEventStatus | undefined {
+  if (
+    value === 'pending' ||
+    value === 'in-flight' ||
+    value === 'deferred' ||
+    value === 'completed' ||
+    value === 'failed' ||
+    value === 'dlq'
+  ) {
+    return value;
+  }
+  return undefined;
 }
 
 function resolveWebhookTarget(path: string): string {

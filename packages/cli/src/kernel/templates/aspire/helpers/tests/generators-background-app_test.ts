@@ -170,7 +170,7 @@ describe('generateRegisterBackground', () => {
     );
   });
 
-  it('should point triggers background at the userland trigger registry module', () => {
+  it('should point triggers background at the generated trigger registry module', () => {
     const triggerProcessor: BackgroundProcessorEntry = {
       ...fixtures.MINIMAL_BACKGROUND,
       Entrypoint: 'triggers/runtime.ts',
@@ -181,7 +181,7 @@ describe('generateRegisterBackground', () => {
     });
     assertStringIncludes(
       output,
-      "new URL('../../triggers/mod.ts', import.meta.url).href",
+      "new URL('../../.netscript/generated/plugin-triggers/triggers.registry.ts', import.meta.url).href",
     );
     assertStringIncludes(
       output,

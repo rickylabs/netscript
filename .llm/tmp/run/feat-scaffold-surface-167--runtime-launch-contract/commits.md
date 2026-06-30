@@ -9,3 +9,4 @@
 - ca43a538: Launch plugins through runtime contract
 - bc4511fa: Honor plugin npm catalog dependencies
 - 1784b5a5: Resolve plugin launch specifiers in generated workspaces
+- 8aaddbc1: feat(cli): follow .netscript-source-root marker for local plugin source discovery

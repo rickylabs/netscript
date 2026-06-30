@@ -74,7 +74,7 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
     );
     if (isTriggersBackgroundResource(name, entrypoint)) {
       lines.push(
-        `    const ${id}_triggerRegistryModule = new URL('../../triggers/mod.ts', import.meta.url).href;`,
+        `    const ${id}_triggerRegistryModule = new URL('../../.netscript/generated/plugin-triggers/triggers.registry.ts', import.meta.url).href;`,
       );
       lines.push(
         `    await ${id}.withEnvironment('NETSCRIPT_TRIGGER_REGISTRY_MODULE', ${id}_triggerRegistryModule);`,

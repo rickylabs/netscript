@@ -81,7 +81,7 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
     );
     if (isTriggersApiResource(name, entrypoint)) {
       lines.push(
-        `    const triggerRegistryModule = new URL('../../triggers/mod.ts', import.meta.url).href;`,
+        `    const triggerRegistryModule = new URL('../../.netscript/generated/plugin-triggers/triggers.registry.ts', import.meta.url).href;`,
       );
       lines.push(
         `    await resource.withEnvironment('NETSCRIPT_TRIGGER_REGISTRY_MODULE', triggerRegistryModule);`,

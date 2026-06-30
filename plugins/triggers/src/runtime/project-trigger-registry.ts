@@ -9,6 +9,10 @@ export async function loadProjectTriggerDefinitions(
     defaultRegistryModule(),
 ): Promise<readonly ProcessableTriggerDefinition[]> {
   if (registryModule.startsWith('file:') && !(await fileExists(fromFileUrl(registryModule)))) {
+    const fallbackModule = projectTriggerBarrelModuleForMissingRegistry(registryModule);
+    if (fallbackModule !== registryModule && await fileExists(fromFileUrl(fallbackModule))) {
+      return loadProjectTriggerDefinitions(fallbackModule);
+    }
     return [];
   }
 
@@ -19,6 +23,20 @@ export async function loadProjectTriggerDefinitions(
 /** Default trigger registry module for a generated project. */
 export function defaultRegistryModule(): string {
   return toFileUrl(generatedRegistryPath(resolveProjectRoot())).href;
+}
+
+/** Default user trigger barrel module for projects without a generated registry yet. */
+export function projectTriggerBarrelModule(): string {
+  return toFileUrl(join(resolveProjectRoot(), 'triggers', 'mod.ts')).href;
+}
+
+function projectTriggerBarrelModuleForMissingRegistry(registryModule: string): string {
+  const registryPath = fromFileUrl(registryModule);
+  const suffix = join('.netscript', 'generated', 'plugin-triggers', 'triggers.registry.ts');
+  if (registryPath.endsWith(suffix)) {
+    return toFileUrl(join(registryPath.slice(0, -suffix.length), 'triggers', 'mod.ts')).href;
+  }
+  return projectTriggerBarrelModule();
 }
 
 function resolveProjectRoot(): string {

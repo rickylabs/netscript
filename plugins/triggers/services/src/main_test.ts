@@ -119,6 +119,25 @@ function buildWebhookPathContext(acceptedTriggerIds: string[]): TriggerServiceCo
   };
 }
 
+function buildEventsContext(): TriggerServiceContext {
+  const event = {
+    id: 'trg_evt_fixture',
+    triggerId: 'inbound/generic',
+    kind: 'webhook',
+    status: 'completed',
+    attempt: 0,
+    detectedAt: new Date(0).toISOString(),
+    updatedAt: new Date(0).toISOString(),
+    payload: {},
+    metadata: {},
+  } as unknown as TriggerEvent;
+  return {
+    definitions: [],
+    eventStore: new InMemoryEventStore([event]),
+    ingress: failingIngress,
+  };
+}
+
 async function findRoute(
   baseUrl: string,
   predicate: (method: string, path: string) => boolean,
@@ -242,6 +261,26 @@ Deno.test('triggers webhook public path resolves to definition id', async () => 
     });
     assertEquals(res.status, 202);
     assertEquals(acceptedTriggerIds, ['generic-inbound-webhook']);
+  } finally {
+    await running.stop();
+  }
+});
+
+Deno.test('triggers legacy events path lists stored events', async () => {
+  const running: RunningService = await createTriggersService(
+    buildEventsContext(),
+    { port: 0 },
+  ).serve({ port: 0 });
+  const host = running.addr.hostname === '0.0.0.0' ? '127.0.0.1' : running.addr.hostname;
+  const baseUrl = `http://${host}:${running.addr.port}`;
+
+  try {
+    const res = await fetch(`${baseUrl}/api/v1/events?limit=10`);
+    assertEquals(res.status, 200);
+    const body = await res.json() as { events?: unknown[]; total?: number };
+    assertEquals(Array.isArray(body.events), true);
+    assertEquals(body.events?.length, 1);
+    assertEquals(body.total, 1);
   } finally {
     await running.stop();
   }

@@ -20,7 +20,7 @@ const FORBIDDEN_PREFIXES = [
   'deno.json',
 ] as const;
 
-Deno.test('triggers install starter webhook is byte-identical to add webhook default emission', () => {
+Deno.test('triggers install starter webhook enqueues the workers health-check job', () => {
   const installWebhook = collectInstallArtifacts(triggersAdapterPlugin).find((artifact) =>
     artifact.path === 'triggers/generic-inbound-webhook.ts'
   );
@@ -29,6 +29,8 @@ Deno.test('triggers install starter webhook is byte-identical to add webhook def
   assertEquals(installWebhook?.path, addWebhook.path);
   assertEquals(installWebhook ? artifactText(installWebhook) : undefined, artifactText(addWebhook));
   assertStringIncludes(artifactText(addWebhook), "id: 'inbound/generic'");
+  assertStringIncludes(artifactText(addWebhook), 'enqueueJob');
+  assertStringIncludes(artifactText(addWebhook), 'workers-plugin-health-check');
 });
 
 Deno.test('triggers add resources emit the same shape at user-named paths', () => {

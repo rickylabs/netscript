@@ -276,7 +276,7 @@ describe('generateRegisterPlugins', () => {
     );
   });
 
-  it('should point triggers API at the userland trigger registry module', () => {
+  it('should point triggers API at the generated trigger registry module', () => {
     const triggerPlugin: PluginEntry = {
       ...fixtures.MINIMAL_PLUGIN,
       Entrypoint: 'jsr:@netscript/plugin-triggers@0.0.1-alpha.12/services',
@@ -287,7 +287,7 @@ describe('generateRegisterPlugins', () => {
     });
     assertStringIncludes(
       output,
-      "new URL('../../triggers/mod.ts', import.meta.url).href",
+      "new URL('../../.netscript/generated/plugin-triggers/triggers.registry.ts', import.meta.url).href",
     );
     assertStringIncludes(
       output,
