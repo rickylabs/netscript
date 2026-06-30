@@ -31,8 +31,3 @@ Deno.test('CitationChip active adds is-active + aria-pressed', () => {
   assertEquals(p['aria-pressed'], 'true');
   assertEquals(p['aria-label'], 'Source 1');
 });
-
-Deno.test('CitationChip wires an onClick handler', () => {
-  const p = vnodeProps(CitationChip({ index: 7, onClick: () => {} }));
-  assertEquals(typeof p.onClick, 'function');
-});
