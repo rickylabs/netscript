@@ -94,6 +94,60 @@ Gate results:
 | source publish dry-run | `cd packages/plugin && rtk proxy deno task publish:dry-run`; `cd packages/cli && rtk proxy deno task publish:dry-run` | PASS — both dry runs complete; existing dynamic-import warnings remain |
 | arch check | `rtk proxy deno task arch:check` | PASS exit 0 — `FAIL=0`; existing WARN/INFO doctrine findings remain |
 
+## Final Summary
+
+### Slice commits
+
+| Slice | Commit(s) | Verdict |
+|---|---|---|
+| S-core-1 | `629e903f`, `1efba6d9` | Complete |
+| S9 greenfield | `baec0909` | Complete |
+| S-conform-workers | `f7fb8493` | Complete |
+| S-conform-sagas | `36271e86` | Complete |
+| S-conform-streams | `265e08ec` | Complete |
+| S-conform-auth | `31e63c74` | Complete |
+| S-conform-triggers unblock | `38d1cef0` | Forward merge from `origin/main` after PR #192 / squash `6e67f956` |
+| S-conform-triggers | `26b0e07b` | Complete |
+
+### Final verification
+
+| Gate | Command | Result |
+|---|---|---|
+| full arch check | `rtk proxy deno task arch:check` | PASS exit 0 — `FAIL=0`; existing WARN/INFO doctrine findings remain |
+| dead-code sweep | `rg "(Workers\|Sagas\|Streams\|Auth\|Triggers)PluginManifest\|inspectWorkers\|inspectSagas\\(\|inspectAuth\|inspectTriggers" plugins packages docs/site/reference -n` | PASS — 0 hits after stale reference docs were updated |
+| workers verifier | `deno run --allow-read plugins/workers/verify-plugin.ts` | PASS — `ok: true`, 0 findings |
+| sagas verifier | `deno run --allow-read plugins/sagas/verify-plugin.ts` | PASS — `ok: true`, 0 findings |
+| triggers verifier | `deno run --allow-read plugins/triggers/verify-plugin.ts` | PASS — `ok: true`, 0 findings |
+| streams verifier | `deno run --allow-read plugins/streams/verify-plugin.ts` | PASS — `ok: true`, 0 findings |
+| auth verifier | `deno run --allow-read plugins/auth/verify-plugin.ts` | PASS — `ok: true`, 0 findings |
+| local runtime smoke | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS — `passed=48 failed=0` |
+
+### Debt and drift
+
+- Added `.llm/harness/debt/arch-debt.md` entry `AUTH-BACKEND-ENV-CENTRALIZATION` for locked Q4:
+  per-backend auth environment construction remains connector-local and is deferred to a separately
+  gated breaking sub-wave.
+- The earlier triggers skip is resolved: PR #192 merged to `main`, this branch merged forward at
+  `38d1cef0`, and `S-conform-triggers` completed at `26b0e07b`.
+- No JSR-installed `e2e-cli-prod` was run; final smoke used the required local source suite only.
+
+### `./scaffold` export inventory
+
+`@netscript/plugin/scaffold` is the net-new S-core-1 subpath. Its public inventory now covers:
+
+- `ItemScaffolder` and typed emitted-artifact/resource input surfaces.
+- `defineStub` and token-substitution helpers for type-checked userland glue generation.
+- Core package generator primitives for plugin engine packages.
+- Connector package generator primitives for thin plugin adapters.
+- Runtime registry generator primitives used by `netscript plugin new` and scaffold runtime smoke.
+
+### Trigger status
+
+`S-conform-triggers` is no longer skipped. The post-#181 route set was verified from the merged
+`plugin-triggers-core` contract and preserved: `describe`, `listTriggers`, `getTrigger`,
+`listEvents`, `getEvent`, `fireTrigger`, `testWebhook`, `previewSchedule`, `enableTrigger`,
+`disableTrigger`, and `subscribeEvents`.
+
 ### S-conform-auth
 
 - Scope: auth connector reference conformance.
