@@ -32,7 +32,7 @@ export const triggersAdapterPlugin: NetScriptPlugin = {
     dependencySpecifier: 'jsr:@netscript/plugin-triggers@^0.0.1-alpha.12',
     starterResources: triggersStarterResources,
     configParams: ['TRIGGERS_API_URL', 'TRIGGER_CONCURRENCY'],
-    wiringEntry: '@netscript/plugin-triggers/runtime',
+    wiringEntry: '@netscript/plugin-triggers-core/stores',
   },
   doctor: {
     healthEndpoint: '/triggers/health',

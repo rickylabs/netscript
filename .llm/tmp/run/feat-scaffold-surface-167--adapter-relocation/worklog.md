@@ -33,3 +33,28 @@ Gate evidence:
 | `deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/plugin-sagas-core` | exit 0; `FAIL=0` |
 | `deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root plugins/sagas` | exit 0; `FAIL=0` |
 | `rtk proxy deno task arch:check` | exit 1; fails before touched roots on pre-existing `packages/plugin-auth-core` `FAIL=12` findings; recorded in `drift.md` |
+
+### S-c — triggers
+
+- Relocated `KvTriggerEventStore`, `KvTriggerIdempotencyStore`, and `KvTriggerDlqStore` into `packages/plugin-triggers-core/src/stores/`.
+- Relocated `CronTriggerSchedulerAdapter` and `WatchersFileWatcherAdapter` into `packages/plugin-triggers-core/src/adapters/`.
+- Migrated production trigger KV stores to injected `@netscript/kv` `KvStore` handles with atomic writes through `KvStore.atomic`; production store/runtime code has no `Deno.openKv` / raw `Deno.Kv` handle or `as Deno.Kv` cast.
+- S-c.5 fixture rename: chose `DenoKvTriggerEventStoreDouble` because `MemoryTriggerEventStore` was already taken. Grep for the old testing fixture path/name in `packages/plugin-triggers-core/src/testing` found no `kv-trigger-event-store` file/export or `class KvTriggerEventStore`; only the new `DenoKvTriggerEventStoreDouble` export remains.
+- Dependency checks: `deno task deps:why @netscript/kv`, `@netscript/cron`, and `@netscript/watchers` exit 0 and show the new `packages/plugin-triggers-core` source hits.
+- Lock delta: `deno.lock` gained the expected `jsr:@netscript/kv@0.0.1-alpha.12`, `jsr:@netscript/cron@0.0.1-alpha.12`, and `jsr:@netscript/watchers@0.0.1-alpha.12` dependency entries under `@netscript/plugin-triggers-core`; no hand edit.
+
+Gate evidence:
+
+| Gate | Result |
+| --- | --- |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin-triggers-core --ext ts,tsx` | exit 0; 60 files; 0 occurrences |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/triggers --ext ts,tsx` | exit 0; 62 files; 0 occurrences |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin-triggers-core --ext ts,tsx` | exit 0; 60 files; 0 occurrences |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root plugins/triggers --ext ts,tsx` | exit 0; 62 files; 0 occurrences |
+| explicit-file `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts ... --ext ts,tsx,json` over S-c touched files | exit 0; 14 files; 0 findings |
+| `deno test --unstable-kv --allow-all packages/plugin-triggers-core plugins/triggers` | exit 0; 32 passed, 12 ignored, 0 failed |
+| `(cd packages/plugin-triggers-core && deno publish --dry-run --allow-dirty --allow-slow-types)` | exit 0; existing slow-types warning allowed |
+| `(cd plugins/triggers && deno publish --dry-run --allow-dirty)` | exit 0; warning-only existing unanalyzable dynamic imports |
+| `deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/plugin-triggers-core` | exit 0; `FAIL=0` |
+| `deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root plugins/triggers` | exit 0; `FAIL=0` |
+| `rtk proxy deno task arch:check` | exit 1; same pre-existing `packages/plugin-auth-core` `FAIL=12` findings before touched roots; recorded in `drift.md` |

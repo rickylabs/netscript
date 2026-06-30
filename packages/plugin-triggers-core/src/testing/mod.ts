@@ -1,7 +1,7 @@
 /** @module @netscript/plugin-triggers-core/testing */
 
 export { InlineTriggerProcessor } from './inline-trigger-processor.ts';
-export { KvTriggerEventStore } from './kv-trigger-event-store.ts';
+export { DenoKvTriggerEventStoreDouble } from './deno-kv-trigger-event-store-double.ts';
 export { MemoryFileWatcherAdapter } from './memory-file-watcher-adapter.ts';
 export { MemoryTriggerEventStore } from './memory-trigger-event-store.ts';
 export { MemoryTriggerIdempotencyStore } from './memory-trigger-idempotency-store.ts';

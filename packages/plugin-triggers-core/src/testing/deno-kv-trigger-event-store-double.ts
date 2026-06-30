@@ -1,8 +1,8 @@
 import type { TriggerEvent, TriggerEventId, TriggerEventStatus } from '../domain/mod.ts';
 import type { TriggerEventListOptions, TriggerEventStorePort } from '../ports/mod.ts';
 
-/** Deno KV-backed trigger event store for integration tests. */
-export class KvTriggerEventStore implements TriggerEventStorePort {
+/** Deno KV-backed trigger event store double for integration tests. */
+export class DenoKvTriggerEventStoreDouble implements TriggerEventStorePort {
   readonly #kv: Deno.Kv;
   readonly #prefix: readonly Deno.KvKeyPart[];
   readonly #now: () => Date;

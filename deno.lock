@@ -3187,6 +3187,9 @@
       },
       "packages/plugin-triggers-core": {
         "dependencies": [
+          "jsr:@netscript/cron@0.0.1-alpha.12",
+          "jsr:@netscript/kv@0.0.1-alpha.12",
+          "jsr:@netscript/watchers@0.0.1-alpha.12",
           "jsr:@std/assert@1",
           "jsr:@zod/zod@4.4.3"
         ],

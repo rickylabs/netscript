@@ -8,10 +8,13 @@ import type {
   TriggerProcessorPort,
   TriggerSchedulerPort,
 } from '@netscript/plugin-triggers-core/ports';
-import { CronTriggerSchedulerAdapter } from './cron-trigger-scheduler-adapter.ts';
+import type { KvStore } from '@netscript/kv';
+import {
+  CronTriggerSchedulerAdapter,
+  WatchersFileWatcherAdapter,
+} from '@netscript/plugin-triggers-core/adapters';
 import { loadProjectTriggerDefinitions } from './project-trigger-registry.ts';
 import { createRuntimeTriggerProcessor } from './trigger-runtime-processor.ts';
-import { WatchersFileWatcherAdapter } from './watchers-file-watcher-adapter.ts';
 
 /** Options for starting the background trigger processor runtime. */
 export type TriggerProcessorRuntimeOptions = Readonly<{
@@ -20,7 +23,7 @@ export type TriggerProcessorRuntimeOptions = Readonly<{
   processor?: TriggerProcessorPort;
   scheduler?: TriggerSchedulerPort;
   fileWatcher?: FileWatcherPort;
-  kv?: Deno.Kv;
+  kv?: KvStore;
   drainTimeoutMs?: number;
 }>;
 

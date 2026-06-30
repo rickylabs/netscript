@@ -24,6 +24,7 @@ import {
   HmacSha256WebhookVerifier,
   MemoryWebhookVerifier,
 } from '@netscript/plugin-triggers-core/adapters';
+import { KvTriggerEventStore, openTriggerRuntimeKv } from '@netscript/plugin-triggers-core/stores';
 import { TriggersError } from '@netscript/plugin-triggers-core/domain';
 import type { WebhookDefinition } from '@netscript/plugin-triggers-core/domain';
 import type {
@@ -35,10 +36,7 @@ import type {
 import { createTriggerIngress } from '@netscript/plugin-triggers-core/runtime';
 import { TRIGGERS_API_DEFAULT_PORT, TRIGGERS_API_SERVICE_NAME } from '../../src/constants.ts';
 import denoJson from '../../deno.json' with { type: 'json' };
-import {
-  KvTriggerEventStore,
-  openTriggerRuntimeKv,
-} from '../../src/runtime/kv-trigger-runtime-stores.ts';
+import type { KvStore } from '@netscript/kv';
 import { loadProjectTriggerDefinitions } from '../../src/runtime/project-trigger-registry.ts';
 import { createRuntimeTriggerProcessor } from '../../src/runtime/trigger-runtime-processor.ts';
 import { router } from './router.ts';
@@ -126,8 +124,8 @@ export type TriggersServiceOptions = Readonly<{
   eventStore?: TriggerEventStorePort;
   /** Trigger processor backing the ingress; defaults to the runtime processor. */
   processor?: TriggerProcessorPort;
-  /** Pre-opened Deno KV database; defaults to the runtime KV. */
-  kv?: Deno.Kv;
+  /** Pre-opened KV adapter; defaults to the runtime KV. */
+  kv?: KvStore;
 }>;
 
 /** Assemble the triggers service runtime context from the supplied or default ports. */
@@ -135,12 +133,11 @@ export async function createTriggersServiceContext(
   options: TriggersServiceOptions = {},
 ): Promise<TriggerServiceContext> {
   // Open KV only when a default event store or processor must be constructed;
-  // when both are supplied no KV is needed. Resolving to a concrete `Deno.Kv`
-  // (rather than `Deno.Kv | undefined`) when needed keeps the store constructor
-  // cast-free.
+  // when both are supplied no KV is needed. Resolving to a concrete `KvStore`
+  // when needed keeps the store constructor cast-free.
   const definitions = options.definitions ?? await loadProjectTriggerDefinitions();
   const needsKv = options.eventStore === undefined || options.processor === undefined;
-  const kv: Deno.Kv | undefined = needsKv ? options.kv ?? await openTriggerRuntimeKv() : options.kv;
+  const kv: KvStore | undefined = needsKv ? options.kv ?? await openTriggerRuntimeKv() : options.kv;
   const eventStore = options.eventStore ??
     new KvTriggerEventStore({ kv: requireKv(kv) });
   const processor = options.processor ?? await createRuntimeTriggerProcessor({ kv });
@@ -208,7 +205,7 @@ export async function startTriggersService(
 }
 
 /** Assert a KV handle is present (always true on the default-event-store path). */
-function requireKv(kv: Deno.Kv | undefined): Deno.Kv {
+function requireKv(kv: KvStore | undefined): KvStore {
   if (kv === undefined) {
     throw new Error('Trigger runtime KV is required to construct the default event store.');
   }
