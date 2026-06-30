@@ -66,3 +66,16 @@ A re-issue of `plan.md` after applying (1)–(4) above (do not touch `deno.lock`
 - The "D1 / minimize -core deps" ghost has been cleanly removed from both `plan.md` and `research.md`; the doctrine-correct statement that `-core` SHOULD depend on NetScript primitives is the right framing and is consistently reflected in the debt entry text.
 - All five Plan-Gate boxes that are PASS are PASS on substantive grounds, not on absence of evidence — research re-baselines, the slice ordering is sensible, gate selection is correct, scope is bounded.
 - This evaluator ran only `cat`/`grep`/type-reading tools. No `deno check`/`lint`/`fmt`/`publish --dry-run` was executed (those are IMPL-EVAL's job). No `deno.lock` or source files were modified.
+
+---
+
+## Cycle-2 dispatch (supervisor, 2026-06-30)
+
+All four cycle-1 required fixes applied (plan/research/verification only — no `deno.lock`/source/`packages/`/`plugins/` touched) and committed:
+
+1. **D2 doc-fence** (`e0d85440`) — `research.md` §"Pre-flight verification" pastes the full connector-path grep; sole break = `docs/site/capabilities/durable-sagas.md:331`; `plan.md` S-b.5 splits that one fence import (no shim) + re-greps to zero. D2 stays zero-compat (no re-export shim).
+2. **S-c `KvTriggerEventStore` deconflict** (`e0d85440`) — `research.md` §"Name collision discovered" + `plan.md` S-c.5 rename the testing fixture `KvTriggerEventStore`→`MemoryTriggerEventStore` (per `extension-axes.md:18` taxonomy), gated by a zero-ref grep.
+3. **`## Risks` block** (`e0d85440`) — `plan.md` now carries R1 (D2 break) / R2 (collision) / R3 (KV-migration semantic drift + `FAIL_PLAN` stop condition, no `Deno.openKv` escape hatch) / R4 (arch:check denominator) / R5 (lock churn).
+4. **arch:check denominator** (`e999a9ea`) — `deno.json:89` `arch:check` now enumerates `packages/plugin-{sagas,triggers,workers}-core`; all 13 roots gate `FAIL=0`, `deno task arch:check` EXIT=0 (supervisor-verified).
+
+Cycle-2 PLAN-EVAL re-dispatched to OpenHands `openrouter/minimax/minimax-m3` on PR #172 (comment `4839015840`). The evaluator will append its cycle-2 verdict below. Hard Plan-Gate stop remains in force: no S-b/S-c/S-d implementation slice may start before a cycle-2 `PASS`.
