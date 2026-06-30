@@ -16,3 +16,10 @@
 | --- | --- | ---: | --- |
 | sagas check | `cd plugins/sagas && deno task check` | 0 | Checked `mod.ts`, `cli.ts`, `scaffold.ts`, adapter/resources, public/CLI/E2E/Aspire/runtime/contracts/services/streams entrypoints. |
 | sagas publish dry-run | `cd plugins/sagas && deno publish --dry-run --allow-dirty` | 0 | `Success Dry run complete`; existing unanalyzable dynamic-import warnings for service bootstrap and runtime importer. |
+
+## Slice 1 — Workers runtime export
+
+| Gate | Command | Exit | Evidence |
+| --- | --- | ---: | --- |
+| workers check | `cd plugins/workers && deno task check` | 0 | Checked new `bin/runtime.ts` export plus existing mod/CLI/scaffold/adapter/Aspire/contracts/services/streams/worker entrypoints. |
+| workers publish dry-run | `cd plugins/workers && deno publish --dry-run --allow-dirty` | 0 | `Success Dry run complete`; existing unanalyzable dynamic-import warnings for `bin/combined.ts`, service bootstrap, and CLI local runtime backend. |
