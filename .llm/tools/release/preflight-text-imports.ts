@@ -1,6 +1,6 @@
 import { walk } from 'jsr:@std/fs@^1.0.0/walk';
-import { join, normalize, relative } from 'jsr:@std/path@^1.0.0';
-import { discoverWorkspaceMembers, type WorkspaceMember } from '../deps/workspace.ts';
+import { globToRegExp, join, normalize, relative } from 'jsr:@std/path@^1.0.0';
+import { discoverWorkspaceMembers, readJsonFile, type WorkspaceMember } from '../deps/workspace.ts';
 
 interface ImportMetaPath {
   identifier: string;
@@ -37,6 +37,16 @@ type PreflightFinding = TextImportFinding | FileUrlImportMetaFinding;
 interface Options {
   root: string;
   files: string[];
+}
+
+interface PublishRules {
+  include: readonly string[];
+  exclude: readonly string[];
+}
+
+interface PublishConfig {
+  include?: unknown;
+  exclude?: unknown;
 }
 
 const sourceExtensions = new Set(['.ts', '.tsx']);
@@ -175,8 +185,10 @@ export async function scanPublishSurface(root: string): Promise<PreflightFinding
   const members = await discoverPublishableNetscriptMembers(root);
   const files: string[] = [];
   for (const member of members) {
+    const rules = await readPublishRules(root, member);
+    const memberRoot = join(root, member.root);
     for await (
-      const entry of walk(join(root, member.root), {
+      const entry of walk(memberRoot, {
         includeDirs: false,
         exts: [...sourceExtensions],
         skip: [
@@ -187,7 +199,11 @@ export async function scanPublishSurface(root: string): Promise<PreflightFinding
       })
     ) {
       const relativePath = normalize(relative(root, entry.path));
-      if (isSourceFile(entry.path) && !isTestFile(relativePath)) {
+      const memberRelativePath = normalize(relative(memberRoot, entry.path));
+      if (
+        isSourceFile(entry.path) && !isTestFile(relativePath) &&
+        isPublishedPath(memberRelativePath, rules)
+      ) {
         files.push(entry.path);
       }
     }
@@ -337,6 +353,37 @@ async function discoverPublishableNetscriptMembers(root: string): Promise<Worksp
   return (await discoverWorkspaceMembers(root)).filter((member) =>
     member.publishable && member.name.startsWith('@netscript/')
   );
+}
+
+async function readPublishRules(root: string, member: WorkspaceMember): Promise<PublishRules> {
+  const config = await readJsonFile(join(root, member.denoJsonPath));
+  const publish = config.publish;
+  if (!publish || typeof publish !== 'object' || Array.isArray(publish)) {
+    return { include: [], exclude: [] };
+  }
+  const publishConfig = publish as PublishConfig;
+  const include = Array.isArray(publishConfig.include)
+    ? publishConfig.include.filter((value): value is string => typeof value === 'string')
+    : [];
+  const exclude = Array.isArray(publishConfig.exclude)
+    ? publishConfig.exclude.filter((value): value is string => typeof value === 'string')
+    : [];
+  return { include, exclude };
+}
+
+function isPublishedPath(path: string, rules: PublishRules): boolean {
+  const included = rules.include.length === 0 ||
+    rules.include.some((pattern) => matchesPublishPattern(path, pattern));
+  if (!included) return false;
+  return !rules.exclude.some((pattern) => matchesPublishPattern(path, pattern));
+}
+
+function matchesPublishPattern(path: string, pattern: string): boolean {
+  const normalizedPattern = normalize(pattern).replace(/^\.\//, '');
+  if (normalizedPattern.endsWith('/')) {
+    return path.startsWith(normalizedPattern);
+  }
+  return globToRegExp(normalizedPattern, { extended: true, globstar: true }).test(path);
 }
 
 async function scanFiles(files: string[]): Promise<PreflightFinding[]> {

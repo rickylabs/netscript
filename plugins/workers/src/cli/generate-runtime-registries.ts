@@ -26,9 +26,9 @@ if (import.meta.main) {
 }
 
 function parseArgs(args: readonly string[]): Args {
-  const cliDir = dirname(fromFileUrl(import.meta.url));
+  const cliDir = resolveCliDir();
   let projectRoot = Deno.cwd();
-  let manifest = join(cliDir, '..', '..', 'scaffold.runtime.json');
+  let manifest = cliDir ? join(cliDir, '..', '..', 'scaffold.runtime.json') : '';
   let officialSamples = true;
   let profile: string | undefined;
 
@@ -47,7 +47,19 @@ function parseArgs(args: readonly string[]): Args {
     }
   }
 
+  if (manifest.length === 0) {
+    throw new Error('Missing --manifest; default manifest resolution requires a file: module URL.');
+  }
+
   return { manifestPath: manifest, officialSamples, profile, projectRoot };
+}
+
+function resolveCliDir(): string | null {
+  const moduleUrl = new URL(import.meta.url);
+  if (moduleUrl.protocol !== 'file:') {
+    return null;
+  }
+  return dirname(fromFileUrl(moduleUrl));
 }
 
 function requiredValue(args: readonly string[], index: number, flag: string): string {
