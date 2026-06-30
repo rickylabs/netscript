@@ -13,10 +13,19 @@ interface DataTableProps extends DataTableSectionProps {
   interactive?: boolean;
 }
 
+interface DataTableRowProps extends DataTableSectionProps {
+  /**
+   * CSS `grid-template-columns` for this row's cells, e.g. `'2fr 1fr 1fr'` or
+   * `'minmax(0, 1fr) auto'`. Without it the row is a single-column grid and
+   * cells stack — pass the same template to header and body rows to align them.
+   */
+  cols?: string;
+}
+
 type DataTableComponent = ((props: DataTableProps) => VNode) & {
   Header: (props: DataTableSectionProps) => VNode;
   Body: (props: DataTableSectionProps) => VNode;
-  Row: (props: DataTableSectionProps) => VNode;
+  Row: (props: DataTableRowProps) => VNode;
   Footer: (props: DataTableSectionProps) => VNode;
 };
 
@@ -42,8 +51,17 @@ function DataTableBody({ children, class: className, ...props }: DataTableSectio
   return <div {...props} class={cn('divide-y divide-ns-border', className)}>{children}</div>;
 }
 
-function DataTableRow({ children, class: className, ...props }: DataTableSectionProps): VNode {
-  return <div {...props} class={cn('grid gap-4 px-5 py-4', className)}>{children}</div>;
+function DataTableRow(
+  { children, class: className, cols, style, ...props }: DataTableRowProps,
+): VNode {
+  const gridStyle = cols
+    ? { ...(style && typeof style === 'object' ? style : null), gridTemplateColumns: cols }
+    : style;
+  return (
+    <div {...props} style={gridStyle} class={cn('grid gap-4 px-5 py-4', className)}>
+      {children}
+    </div>
+  );
 }
 
 function DataTableFooter({ children, class: className, ...props }: DataTableSectionProps): VNode {
