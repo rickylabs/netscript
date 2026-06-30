@@ -557,6 +557,28 @@ export const freshUiRegistryManifest: RegistryManifest = {
       css: [{ layer: 'components', content: "@import './ui/chart-block.css';" }],
     },
     {
+      name: 'donut',
+      kind: 'component',
+      layer: 2,
+      description:
+        'Token-driven donut/pie chart — SVG arc segments with a center total and legend; segment colors from data-tone or a semantic-token cycle.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['chart', 'analytics', 'primitive'],
+      files: [
+        {
+          source: 'registry/components/ui/donut.tsx',
+          target: '@ui/donut.tsx',
+        },
+        {
+          source: 'registry/components/ui/donut.css',
+          target: '@assets/ui/donut.css',
+        },
+      ],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/donut.css';" }],
+    },
+    {
       name: 'separator',
       kind: 'component',
       layer: 2,
@@ -956,6 +978,7 @@ export const freshUiRegistryManifest: RegistryManifest = {
         'avatar',
         'code-block',
         'chart-block',
+        'donut',
       ],
     },
     {
