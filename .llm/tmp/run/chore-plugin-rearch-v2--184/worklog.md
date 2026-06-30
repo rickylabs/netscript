@@ -121,3 +121,30 @@ Gate results:
 | package tests | `cd plugins/workers && rtk proxy deno task test` | PASS — 16 passed, 0 failed |
 | publish dry-run | `cd plugins/workers && rtk proxy deno task publish:dry-run` | PASS — dry run complete; existing dynamic-import warnings remain |
 | arch check | `rtk proxy deno task arch:check` | PASS exit 0 — `FAIL=0`; existing WARN/INFO doctrine findings remain |
+
+### S-conform-sagas
+
+- Scope: sagas connector conformance.
+- Commit: `36271e86` (`feat(sagas): conform plugin manifest and router assembly`).
+
+Implemented:
+
+- Deleted local `SagasPluginManifest`/contribution/dependency/inspection mirror types.
+- Deleted the connector-local `as unknown as SagasPluginManifest` cast.
+- Deleted `inspectSagas`; tests and README now use core `inspectPlugin(sagasPlugin)`.
+- Replaced connector-local `AnyRouter` service assembly with `assemblePluginContractRouter(...)`
+  from `@netscript/plugin/service`.
+- Reconciled dependencies with the live base by typing workers/streams dependencies as
+  `PluginManifest`.
+
+Gate results:
+
+| Gate | Command | Result |
+|---|---|---|
+| no-dangling grep | `rg "SagasPluginManifest|as unknown as SagasPluginManifest|AnyRouter" plugins/sagas -n` | PASS — 0 hits |
+| scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/sagas --ext ts,tsx` | PASS — 65 files, 0 diagnostics |
+| scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root plugins/sagas --ext ts,tsx` | PASS — 65 files, 0 diagnostics |
+| scoped fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/sagas --ext ts,tsx` | PASS — 65 files, 0 findings |
+| package tests | `cd plugins/sagas && rtk proxy deno task test` | PASS — 24 passed, 0 failed |
+| publish dry-run | `cd plugins/sagas && rtk proxy deno task publish:dry-run` | PASS — dry run complete; existing dynamic-import warnings remain |
+| arch check | `rtk proxy deno task arch:check` | PASS exit 0 — `FAIL=0`; existing WARN/INFO doctrine findings remain |
