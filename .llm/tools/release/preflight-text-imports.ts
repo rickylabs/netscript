@@ -1,6 +1,6 @@
 import { walk } from 'jsr:@std/fs@^1.0.0/walk';
-import { join, normalize, relative } from 'jsr:@std/path@^1.0.0';
-import { discoverWorkspaceMembers, type WorkspaceMember } from '../deps/workspace.ts';
+import { globToRegExp, join, normalize, relative } from 'jsr:@std/path@^1.0.0';
+import { discoverWorkspaceMembers, readJsonFile, type WorkspaceMember } from '../deps/workspace.ts';
 
 interface ImportMetaPath {
   identifier: string;
@@ -8,11 +8,20 @@ interface ImportMetaPath {
 }
 
 export interface TextImportFinding {
+  check: 'text-imports';
   path: string;
   line: number;
   read: 'Deno.readTextFile' | 'Deno.readFile';
   message: string;
   declarationLine?: number;
+}
+
+export interface FileUrlImportMetaFinding {
+  check: 'file-url-import-meta';
+  path: string;
+  line: number;
+  message: string;
+  guardLine?: number;
 }
 
 export interface SelfImportFinding {
@@ -23,21 +32,33 @@ export interface SelfImportFinding {
   message: string;
 }
 
+type PreflightFinding = TextImportFinding | FileUrlImportMetaFinding;
+
 interface Options {
   root: string;
   files: string[];
 }
 
+interface PublishRules {
+  include: readonly string[];
+  exclude: readonly string[];
+}
+
+interface PublishConfig {
+  include?: unknown;
+  exclude?: unknown;
+}
+
 const sourceExtensions = new Set(['.ts', '.tsx']);
 
 /** Scan one source file for import.meta-relative file reads that should be text imports. */
-export async function scanFile(path: string): Promise<TextImportFinding[]> {
+export async function scanFile(path: string): Promise<PreflightFinding[]> {
   const source = await Deno.readTextFile(path);
   return scanSource(source, normalize(path));
 }
 
 /** Scan source text for the narrow preflight read patterns. */
-export function scanSource(source: string, path: string): TextImportFinding[] {
+export function scanSource(source: string, path: string): PreflightFinding[] {
   // Blank template-literal text first: scaffolder emitters return userland
   // source as template strings, and an import.meta-relative read inside that
   // emitted string runs in the user's project (local file), not in the
@@ -48,6 +69,7 @@ export function scanSource(source: string, path: string): TextImportFinding[] {
   return [
     ...findIdentifierReads(scannable, path, importMetaPaths),
     ...findInlineReads(scannable, path),
+    ...findImportMetaFileUrlConversions(scannable, path),
   ];
 }
 
@@ -159,12 +181,14 @@ export function blankTemplateLiterals(source: string): string {
 }
 
 /** Discover publishable workspace source files and scan them. */
-export async function scanPublishSurface(root: string): Promise<TextImportFinding[]> {
+export async function scanPublishSurface(root: string): Promise<PreflightFinding[]> {
   const members = await discoverPublishableNetscriptMembers(root);
   const files: string[] = [];
   for (const member of members) {
+    const rules = await readPublishRules(root, member);
+    const memberRoot = join(root, member.root);
     for await (
-      const entry of walk(join(root, member.root), {
+      const entry of walk(memberRoot, {
         includeDirs: false,
         exts: [...sourceExtensions],
         skip: [
@@ -175,7 +199,11 @@ export async function scanPublishSurface(root: string): Promise<TextImportFindin
       })
     ) {
       const relativePath = normalize(relative(root, entry.path));
-      if (isSourceFile(entry.path) && !isTestFile(relativePath)) {
+      const memberRelativePath = normalize(relative(memberRoot, entry.path));
+      if (
+        isSourceFile(entry.path) && !isTestFile(relativePath) &&
+        isPublishedPath(memberRelativePath, rules)
+      ) {
         files.push(entry.path);
       }
     }
@@ -327,8 +355,39 @@ async function discoverPublishableNetscriptMembers(root: string): Promise<Worksp
   );
 }
 
-async function scanFiles(files: string[]): Promise<TextImportFinding[]> {
-  const findings: TextImportFinding[] = [];
+async function readPublishRules(root: string, member: WorkspaceMember): Promise<PublishRules> {
+  const config = await readJsonFile(join(root, member.denoJsonPath));
+  const publish = config.publish;
+  if (!publish || typeof publish !== 'object' || Array.isArray(publish)) {
+    return { include: [], exclude: [] };
+  }
+  const publishConfig = publish as PublishConfig;
+  const include = Array.isArray(publishConfig.include)
+    ? publishConfig.include.filter((value): value is string => typeof value === 'string')
+    : [];
+  const exclude = Array.isArray(publishConfig.exclude)
+    ? publishConfig.exclude.filter((value): value is string => typeof value === 'string')
+    : [];
+  return { include, exclude };
+}
+
+function isPublishedPath(path: string, rules: PublishRules): boolean {
+  const included = rules.include.length === 0 ||
+    rules.include.some((pattern) => matchesPublishPattern(path, pattern));
+  if (!included) return false;
+  return !rules.exclude.some((pattern) => matchesPublishPattern(path, pattern));
+}
+
+function matchesPublishPattern(path: string, pattern: string): boolean {
+  const normalizedPattern = normalize(pattern).replace(/^\.\//, '');
+  if (normalizedPattern.endsWith('/')) {
+    return path.startsWith(normalizedPattern);
+  }
+  return globToRegExp(normalizedPattern, { extended: true, globstar: true }).test(path);
+}
+
+async function scanFiles(files: string[]): Promise<PreflightFinding[]> {
+  const findings: PreflightFinding[] = [];
   for (const file of files.sort()) {
     findings.push(...await scanFile(file));
   }
@@ -367,6 +426,7 @@ function findIdentifierReads(
     if (!declaration) continue;
     const read = readName(match[1]);
     findings.push({
+      check: 'text-imports',
       path,
       line,
       read,
@@ -388,6 +448,7 @@ function findInlineReads(source: string, path: string): TextImportFinding[] {
     if (hasAllowlist(source, line)) continue;
     const read = readName(match[1]);
     findings.push({
+      check: 'text-imports',
       path,
       line,
       read,
@@ -397,8 +458,42 @@ function findInlineReads(source: string, path: string): TextImportFinding[] {
   return findings;
 }
 
+function findImportMetaFileUrlConversions(
+  source: string,
+  path: string,
+): FileUrlImportMetaFinding[] {
+  const findings: FileUrlImportMetaFinding[] = [];
+  const fileUrlConversion =
+    /(?:\bdirname\s*\(\s*)?\bfromFileUrl\s*\(\s*(?:import\.meta\.url|new\s+URL\s*\(\s*(['"`])(?:\\.|(?!\1).)*\1\s*,\s*import\.meta\.url\s*\))\s*\)/g;
+  for (const match of source.matchAll(fileUrlConversion)) {
+    if (match.index === undefined) continue;
+    const line = lineAt(source, match.index);
+    if (hasAllowlist(source, line)) continue;
+    const guardLine = nearbyFileProtocolGuardLine(source, line);
+    if (guardLine !== undefined) continue;
+    findings.push({
+      check: 'file-url-import-meta',
+      path,
+      line,
+      message:
+        'fromFileUrl converts import.meta.url without a nearby file: protocol guard; published JSR source may run with an https: import.meta.url.',
+    });
+  }
+  return findings;
+}
+
 function readName(name: string | undefined): 'Deno.readTextFile' | 'Deno.readFile' {
   return name === 'readFile' ? 'Deno.readFile' : 'Deno.readTextFile';
+}
+
+function isTextImportFinding(finding: PreflightFinding): finding is TextImportFinding {
+  return finding.check === 'text-imports';
+}
+
+function isFileUrlImportMetaFinding(
+  finding: PreflightFinding,
+): finding is FileUrlImportMetaFinding {
+  return finding.check === 'file-url-import-meta';
 }
 
 function lineAt(source: string, index: number): number {
@@ -408,6 +503,21 @@ function lineAt(source: string, index: number): number {
 function hasAllowlist(source: string, line: number): boolean {
   const text = source.split('\n')[line - 1] ?? '';
   return /\/\/\s*preflight-allow:\s*\S+/.test(text);
+}
+
+function nearbyFileProtocolGuardLine(source: string, line: number): number | undefined {
+  // Heuristic: direct fromFileUrl(import.meta.url) conversions are acceptable only when the same
+  // small block guards import.meta-derived URLs with `protocol ===/!== 'file:'`.
+  // Lazy default parameters are not exempt unless they carry that nearby guard.
+  const lines = source.split('\n');
+  const start = Math.max(0, line - 4);
+  const end = Math.min(lines.length, line + 3);
+  for (let index = start; index < end; index++) {
+    if (/\bprotocol\s*(?:={2,3}|!==?)\s*['"]file:/.test(lines[index] ?? '')) {
+      return index + 1;
+    }
+  }
+  return undefined;
 }
 
 function escapeRegExp(value: string): string {
@@ -471,25 +581,36 @@ async function main(): Promise<void> {
   const textImportFindings = options.files.length > 0
     ? await scanFiles(options.files)
     : await scanPublishSurface(options.root);
+  const textReadFindings = textImportFindings.filter(isTextImportFinding);
+  const fileUrlFindings = textImportFindings.filter(isFileUrlImportMetaFinding);
   const selfImportFindings = options.files.length > 0 ? [] : await scanSelfImports(options.root);
 
-  if (textImportFindings.length === 0 && selfImportFindings.length === 0) {
+  if (
+    textReadFindings.length === 0 && fileUrlFindings.length === 0 && selfImportFindings.length === 0
+  ) {
     console.log('release:preflight text-imports — PASS');
+    console.log('release:preflight file-url-import-meta — PASS (0 findings)');
     if (options.files.length === 0) {
       console.log('release:preflight self-imports — PASS (0 findings)');
     }
     return;
   }
 
-  if (textImportFindings.length > 0) {
+  if (textReadFindings.length > 0) {
     console.error('release:preflight text-imports — FAIL');
-    for (const finding of textImportFindings) {
+    for (const finding of textReadFindings) {
       const declaration = finding.declarationLine
         ? ` (URL declaration line ${finding.declarationLine})`
         : '';
       console.error(
         `${relative(Deno.cwd(), finding.path)}:${finding.line}: ${finding.message}${declaration}`,
       );
+    }
+  }
+  if (fileUrlFindings.length > 0) {
+    console.error('release:preflight file-url-import-meta — FAIL');
+    for (const finding of fileUrlFindings) {
+      console.error(`${relative(Deno.cwd(), finding.path)}:${finding.line}: ${finding.message}`);
     }
   }
   if (selfImportFindings.length > 0) {

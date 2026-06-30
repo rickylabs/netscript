@@ -3,7 +3,6 @@ import { fromFileUrl } from '@std/path/from-file-url';
 import { basename, dirname, join } from '@std/path';
 
 import { SCAFFOLD_DIRS } from '../../kernel/constants/scaffold/scaffold-dirs.ts';
-import { SCAFFOLD_FILES } from '../../kernel/constants/scaffold/scaffold-files.ts';
 import { ScaffoldValidationError } from '../../kernel/domain/errors.ts';
 import type { PackageSourceMode } from '../../kernel/domain/scaffold/scaffold-options.ts';
 import type { ScaffoldResult } from '../../kernel/domain/core-types.ts';
@@ -154,10 +153,22 @@ export async function canCopyOfficialPlugin(
   return sources.get(kind)?.canonicalName === pluginName;
 }
 
+function defaultOfficialPluginSourceStartDir(): string | null {
+  const sourceUrl = new URL(import.meta.url);
+  if (sourceUrl.protocol !== 'file:') {
+    return null;
+  }
+  return dirname(fromFileUrl(sourceUrl));
+}
+
 /** Find a monorepo root that contains plugin-owned scaffold manifests. */
 export async function findOfficialPluginSourceRoot(
-  startDir: string = dirname(fromFileUrl(import.meta.url)),
+  startDir: string | null = defaultOfficialPluginSourceStartDir(),
 ): Promise<string | null> {
+  if (startDir === null) {
+    return null;
+  }
+
   let current = startDir;
 
   while (true) {
