@@ -52,6 +52,20 @@ describe('generateServiceDenoJson', () => {
     assertEquals(config.imports['@netscript/service'], '../../packages/service/mod.ts');
   });
 
+  it('should run the server with --unstable-no-legacy-abort (Deno 2.9, #176)', () => {
+    const config = JSON.parse(generateServiceDenoJson({
+      projectName: 'test-project',
+      serviceName: 'team-members',
+      importMode: 'jsr',
+    }));
+
+    // The oRPC runtime observes request.signal for cancellation; opting into the
+    // non-legacy Deno.serve behavior avoids the per-request deprecation warning
+    // while preserving genuine client-disconnect cancellation.
+    assertStringIncludes(config.tasks.start, '--unstable-no-legacy-abort');
+    assertStringIncludes(config.tasks.dev, '--unstable-no-legacy-abort');
+  });
+
   it('should end with a trailing newline', () => {
     assert(
       generateServiceDenoJson({
