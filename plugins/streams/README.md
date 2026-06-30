@@ -84,7 +84,7 @@ manifest gives you IntelliSense and validation in any schema-aware editor.
   "provider": { "kind": "stream", "category": "plugin" },
   "capabilities": {
     "hasDatabaseMigrations": false,
-    "hasRoutes": true,
+    "hasRoutes": false,
     "hasBackgroundWorkers": false
   },
   "scaffolder": { "export": "./scaffold" }

@@ -13,10 +13,6 @@ Deno.test('streamsPlugin manifest exposes service, telemetry, E2E, Aspire, and h
   assert(streamsPlugin.contributions.e2e?.some((gate) => gate.name === 'streams-health'));
   assertEquals(streamsPlugin.contributions.aspire, './src/aspire/mod.ts');
 
-  assertEquals(typeof streamsPlugin.defineTopic, 'function');
-  assertEquals(typeof streamsPlugin.defineProducer, 'function');
-  assertEquals(typeof streamsPlugin.defineConsumer, 'function');
-
   const verification = verifyStreamsPlugin();
   assertEquals(verification.ok, true);
   assertEquals(verification.findings, []);

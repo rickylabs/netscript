@@ -25,56 +25,6 @@ const STREAMS_SERVICE_PERMISSIONS = [
   '--allow-ffi',
 ] as const;
 
-/** Service contributed by the streams plugin. */
-export interface StreamsServiceContribution {
-  /** Logical service name. */
-  readonly name: string;
-  /** Service entrypoint path. */
-  readonly entrypoint: string;
-  /** Service port. */
-  readonly port?: number;
-}
-
-/** Telemetry contribution exposed by the streams plugin. */
-export interface StreamsTelemetryContribution {
-  /** Instrumentation contribution name. */
-  readonly name: string;
-  /** Instrumentation module specifier. */
-  readonly module: string;
-}
-
-/** E2E contribution exposed by the streams plugin. */
-export interface StreamsE2eContribution {
-  /** Gate name. */
-  readonly name: string;
-  /** Command used to execute the gate. */
-  readonly command: string;
-}
-
-/** Public contribution groups exposed by the streams plugin. */
-export interface StreamsPluginContributions {
-  /** Service contributions registered by the plugin. */
-  readonly services?: readonly StreamsServiceContribution[];
-  /** Telemetry contributions registered by the plugin. */
-  readonly telemetry?: readonly StreamsTelemetryContribution[];
-  /** End-to-end gate contributions registered by the plugin. */
-  readonly e2e?: readonly StreamsE2eContribution[];
-  /** Aspire contribution module reference. */
-  readonly aspire?: string;
-}
-
-/** Public manifest shape for the streams plugin. */
-export interface StreamsPluginManifest extends PluginManifest {
-  /** Declared contribution axes. */
-  readonly contributions: StreamsPluginContributions;
-  /** Define a typed stream topic. */
-  readonly defineTopic: typeof defineStreamTopic;
-  /** Define a typed stream producer handle. */
-  readonly defineProducer: typeof defineStreamProducer;
-  /** Define a typed stream consumer handle. */
-  readonly defineConsumer: typeof defineStreamConsumer;
-}
-
 /**
  * Plugin manifest for the NetScript Durable Streams service.
  *
@@ -85,7 +35,7 @@ export interface StreamsPluginManifest extends PluginManifest {
  * console.log(streamsPlugin.contributions?.services?.[0]?.name);
  * ```
  */
-const streamsManifest = definePlugin('@netscript/plugin-streams', VERSION)
+export const streamsPlugin: PluginManifest = definePlugin('@netscript/plugin-streams', VERSION)
   .withDisplayName('Durable Streams')
   .withType('utility')
   .withDescription('Durable Streams service and tooling for NetScript applications.')
@@ -132,14 +82,6 @@ const streamsManifest = definePlugin('@netscript/plugin-streams', VERSION)
     },
   })
   .build();
-
-/** Plugin manifest for the NetScript Durable Streams service. */
-export const streamsPlugin: StreamsPluginManifest = Object.freeze({
-  ...streamsManifest,
-  defineTopic: defineStreamTopic,
-  defineProducer: defineStreamProducer,
-  defineConsumer: defineStreamConsumer,
-}) as StreamsPluginManifest;
 
 export {
   defineStreamConsumer,

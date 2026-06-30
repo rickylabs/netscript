@@ -19,7 +19,7 @@ import {
   PublicTaskDefinitionSchema,
   PublicWorkflowDefinitionSchema,
 } from '@netscript/plugin-workers-core/schemas';
-import { streamsPlugin } from '@netscript/plugin-streams';
+import { defineStreamTopic, streamsPlugin } from '@netscript/plugin-streams';
 import type { StreamTopicDefinition } from '@netscript/plugin-streams';
 import type { StandardSchemaV1 } from '@standard-schema/spec';
 
@@ -79,21 +79,21 @@ const workersManifest = definePlugin('@netscript/plugin-workers', VERSION)
     name: 'workers-scheduler',
     entrypoint: './bin/scheduler.ts',
   })
-  .withStreamTopics(({ deps }) => [
+  .withStreamTopics(() => [
     toTopicContribution(
-      deps.streams.defineTopic<WorkerTopicPayload>(
+      defineStreamTopic<WorkerTopicPayload>(
         'workers.jobs',
         PublicJobDefinitionSchema as WorkerTopicSchema,
       ),
     ),
     toTopicContribution(
-      deps.streams.defineTopic<WorkerTopicPayload>(
+      defineStreamTopic<WorkerTopicPayload>(
         'workers.tasks',
         PublicTaskDefinitionSchema as WorkerTopicSchema,
       ),
     ),
     toTopicContribution(
-      deps.streams.defineTopic<WorkerTopicPayload>(
+      defineStreamTopic<WorkerTopicPayload>(
         'workers.workflows',
         PublicWorkflowDefinitionSchema as WorkerTopicSchema,
       ),

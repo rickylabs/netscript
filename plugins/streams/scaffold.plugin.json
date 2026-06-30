@@ -9,7 +9,7 @@
   },
   "capabilities": {
     "hasDatabaseMigrations": false,
-    "hasRoutes": true,
+    "hasRoutes": false,
     "hasBackgroundWorkers": false
   },
   "scaffolder": {
