@@ -51,3 +51,46 @@ Gate results:
 | package tests | `cd packages/plugin && rtk proxy deno task test` | PASS — 74 passed, 0 failed |
 | publish dry-run | `cd packages/plugin && rtk proxy deno task publish:dry-run` | PASS — dry run complete; pre-existing slow-type carve-out remains; dynamic-import warnings now include the pre-existing manifest resolver plus the new generated-registry loader |
 | arch check | `rtk proxy deno task arch:check` | PASS exit 0 — `FAIL=0`; existing WARN/INFO doctrine findings remain across the wave |
+
+### S9
+
+- Scope: greenfield `netscript plugin new <name>` dual-tier generator.
+- Commit: `baec0909` (`feat(cli): generate dual-tier plugins`).
+- Public surface touched: `@netscript/cli` `plugin new` command and `@netscript/plugin/scaffold`
+  registry renderer output.
+- Output contract exercised with throwaway `s9-smoke` generated under the native
+  `/home/codex/repos/netscript-plugin-rearch-v2` worktree, then removed before commit.
+
+Implemented:
+
+- Added `netscript plugin new <name>` command.
+- Added greenfield generator for `packages/plugin-<name>-core/` and `plugins/<name>/`.
+- Generated connector default is `kind: "proxy"` with `capabilities.hasRoutes: false` and
+  `starterResources: []`.
+- Generated code uses `@netscript/plugin/scaffold` primitives, `definePlugin().build()`,
+  `inspectPlugin`, `createPluginAdapter`, `bindPluginContract`, and `createPluginService`.
+- Added generated core and connector tests so fresh package `deno task test` has a real test module.
+- Tightened registry source rendering to emit isolated-declaration-clean, formatter-clean code.
+
+Gate results:
+
+| Gate | Command | Result |
+|---|---|---|
+| generated core check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin-s9-smoke-core --ext ts,tsx` | PASS — 8 files, 0 diagnostics |
+| generated connector check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/s9-smoke --ext ts,tsx` | PASS — 13 files, 0 diagnostics |
+| generated core lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin-s9-smoke-core --ext ts,tsx` | PASS — 8 files, 0 diagnostics |
+| generated connector lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root plugins/s9-smoke --ext ts,tsx` | PASS — 13 files, 0 diagnostics |
+| generated core fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin-s9-smoke-core --ext ts,tsx` | PASS — 8 files, 0 findings |
+| generated connector fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/s9-smoke --ext ts,tsx` | PASS — 13 files, 0 findings |
+| generated core test | `cd packages/plugin-s9-smoke-core && rtk proxy deno task test` | PASS — 1 passed, 0 failed |
+| generated connector test | `cd plugins/s9-smoke && rtk proxy deno task test` | PASS — 1 passed, 0 failed |
+| generated core publish | `cd packages/plugin-s9-smoke-core && rtk proxy deno task publish:dry-run` | PASS — dry run complete, no slow-type findings |
+| generated connector publish | `cd plugins/s9-smoke && rtk proxy deno task publish:dry-run` | PASS — dry run complete, no slow-type findings |
+| byte-identical guard | regenerate `s9-smoke --force` and compare tree SHA | PASS — `d78cad0767f67bbff54a7d135ff0ade07158e3466c0c4c7fd3b1e4468d631904` both runs |
+| source plugin check/lint/fmt | scoped wrappers for `packages/plugin` | PASS — check 152 files, lint 152 files, fmt 152 files |
+| source cli check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | PASS — 547 files, 0 diagnostics |
+| source cli lint/fmt | `deno lint --no-config ...new/*.ts ...plugins-group.ts`; `deno fmt --no-config --check ...` | PASS — wrapper hits CLI root exclusion with no diagnostics, direct touched-file lint/fmt both clean |
+| focused source tests | `rtk proxy deno test --allow-all packages/cli/src/public/features/plugins/new/new-plugin_test.ts`; `rtk proxy deno test --allow-all packages/plugin/tests/scaffold/scaffold-generators_test.ts` | PASS — CLI 1 suite/3 steps, plugin 2 tests |
+| source publish dry-run | `cd packages/plugin && rtk proxy deno task publish:dry-run`; `cd packages/cli && rtk proxy deno task publish:dry-run` | PASS — both dry runs complete; existing dynamic-import warnings remain |
+| arch check | `rtk proxy deno task arch:check` | PASS exit 0 — `FAIL=0`; existing WARN/INFO doctrine findings remain |
+| local runtime smoke | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS — `passed=48 failed=0` |

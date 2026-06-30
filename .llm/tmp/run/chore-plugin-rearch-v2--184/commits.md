@@ -2,3 +2,4 @@
 
 - 629e903f: feat(plugin): centralize service binding and scaffold surface
 - 1efba6d9: feat(plugin): add shared plugin cli primitives
+- baec0909: feat(cli): generate dual-tier plugins
