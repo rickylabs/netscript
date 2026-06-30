@@ -82,3 +82,8 @@ Gate evidence:
 | `deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/plugin-workers-core` | exit 0; `FAIL=0` |
 | `deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root plugins/workers` | exit 0; `FAIL=0` |
 | `rtk proxy deno task arch:check` | exit 1; same pre-existing `packages/plugin-auth-core` `FAIL=12` findings before touched roots; recorded in `drift.md` |
+
+S-b/c/d implementation slices are committed, pushed, and PR-commented. Final `deno task arch:check`
+is not green in this checkout because it fails before touched roots on pre-existing
+`packages/plugin-auth-core` findings; do not mark ready for IMPL-EVAL until the full 13-root gate is
+green or the auth-core baseline failure is accepted outside this slice scope.
