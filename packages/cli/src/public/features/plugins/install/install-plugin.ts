@@ -231,8 +231,12 @@ export async function resolvePluginDescriptorBeforePlanning(
   return {
     descriptor: validation.descriptor,
     planningKind: provider?.kind,
-    source: { kind: 'jsr', specifier: validation.descriptor.package.jsrSpecifier },
+    source: { kind: 'jsr', specifier: versionedJsrSpecifier(validation.descriptor) },
   };
+}
+
+function versionedJsrSpecifier(descriptor: ValidatedPluginDescriptor): string {
+  return `jsr:${descriptor.package.packageSpecifier}@${descriptor.version}`;
 }
 
 export async function resolveLocalPluginDescriptor(

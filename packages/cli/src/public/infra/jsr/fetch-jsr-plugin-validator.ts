@@ -1,4 +1,5 @@
 import { parsePluginManifest } from '@netscript/plugin/protocol';
+import { compare, parse } from '@std/semver';
 import type {
   JsrHttpClient,
   JsrHttpResponse,
@@ -147,7 +148,7 @@ function jsrPackageFileUrl(
   version: string,
   path: string,
 ): string {
-  return `https://jsr.io/@${resolvedPackage.scope}/${resolvedPackage.packageName}@${version}/${path}`;
+  return `https://jsr.io/@${resolvedPackage.scope}/${resolvedPackage.packageName}/${version}/${path}`;
 }
 
 function invalidMetadata(message: string): JsrPluginValidationResult {
@@ -158,9 +159,9 @@ function readPackageMeta(
   json: unknown,
 ): { readonly latest: string; readonly isYanked: boolean } | undefined {
   const record = asRecord(json);
-  const latest = record.latest;
   const versions = asRecord(record.versions);
-  if (typeof latest !== 'string') {
+  const latest = resolveInstallableVersion(record.latest, versions);
+  if (latest === undefined) {
     return undefined;
   }
   const latestMetadata = asRecord(versions[latest]);
@@ -168,6 +169,45 @@ function readPackageMeta(
     latest,
     isYanked: latestMetadata.yanked === true,
   };
+}
+
+function resolveInstallableVersion(
+  latest: unknown,
+  versions: Record<string, unknown>,
+): string | undefined {
+  if (
+    typeof latest === 'string' && latest.trim().length > 0 &&
+    versions[latest] !== undefined
+  ) {
+    return latest;
+  }
+
+  return greatestNonYankedVersion(versions);
+}
+
+function greatestNonYankedVersion(versions: Record<string, unknown>): string | undefined {
+  let greatestVersion: string | undefined;
+  let greatestSemver: ReturnType<typeof parse> | undefined;
+
+  for (const [version, metadata] of Object.entries(versions)) {
+    if (asRecord(metadata).yanked === true) {
+      continue;
+    }
+
+    let semver: ReturnType<typeof parse>;
+    try {
+      semver = parse(version);
+    } catch {
+      continue;
+    }
+
+    if (greatestSemver === undefined || compare(semver, greatestSemver) > 0) {
+      greatestVersion = version;
+      greatestSemver = semver;
+    }
+  }
+
+  return greatestVersion;
 }
 
 function readVersionMetadata(json: unknown): JsrVersionMetadata | undefined {

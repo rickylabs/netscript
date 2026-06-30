@@ -211,9 +211,7 @@ function buildScriptArgs(
   args: readonly string[],
 ): readonly string[] {
   const target = resolvePluginScaffoldTarget(source, exportPath);
-  return source.kind === 'jsr'
-    ? ['x', ...permissionFlags, target, ...args]
-    : ['run', ...permissionFlags, target, ...args];
+  return ['run', ...permissionFlags, target, ...args];
 }
 
 function parseScaffoldResult(stdout: string): ScaffoldResult {

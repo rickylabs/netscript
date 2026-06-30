@@ -48,20 +48,20 @@ export class WebJsrPackageFileFetcher implements JsrPackageFileFetcher {
 function jsrPackageFileUrl(descriptor: ValidatedPluginDescriptor, path: string): string {
   const cleanPath = path.startsWith('/') ? path.slice(1) : path;
   const pkg = descriptor.package;
-  return `https://jsr.io/@${pkg.scope}/${pkg.packageName}@${descriptor.version}/${cleanPath}`;
+  return `https://jsr.io/@${pkg.scope}/${pkg.packageName}/${descriptor.version}/${cleanPath}`;
 }
 
 async function sha256Checksum(bytes: Uint8Array): Promise<string> {
   const input = new ArrayBuffer(bytes.byteLength);
   new Uint8Array(input).set(bytes);
   const digest = await crypto.subtle.digest('SHA-256', input);
-  return `sha256-${base64(new Uint8Array(digest))}`;
+  return `sha256-${hex(new Uint8Array(digest))}`;
 }
 
-function base64(bytes: Uint8Array): string {
-  let binary = '';
+function hex(bytes: Uint8Array): string {
+  let output = '';
   for (const byte of bytes) {
-    binary += String.fromCharCode(byte);
+    output += byte.toString(16).padStart(2, '0');
   }
-  return btoa(binary);
+  return output;
 }
