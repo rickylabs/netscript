@@ -207,6 +207,68 @@ Deno.test('PluginWorkspaceMutator registers background plugins with companion AP
   });
 });
 
+Deno.test('PluginWorkspaceMutator honors absolute local source service entrypoints', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile(
+    '/project/appsettings.json',
+    JSON.stringify({ NetScript: {} }, null, 2) + '\n',
+  );
+
+  await new PluginWorkspaceMutator(fs).updateAppsettings(
+    '/project',
+    {
+      scaffoldResult: {
+        filesCreated: [],
+        directoriesCreated: [],
+        filesSkipped: [],
+        totalOperations: 0,
+        durationMs: 0,
+      },
+      pluginDir: '/project/plugins/triggers',
+      kind: 'trigger',
+      port: 4400,
+      servicePort: 8093,
+      configSection: 'BackgroundProcessors',
+      configKey: 'triggers',
+      serviceConfigKey: 'triggers-api',
+    },
+    {
+      ...backgroundProvider,
+      kind: 'trigger',
+      displayName: 'Triggers',
+      defaultServiceEntrypoint:
+        '/home/codex/repos/netscript-scaffold-167/plugins/triggers/services/src/main.ts',
+    },
+  );
+
+  const config = JSON.parse(await fs.readFile('/project/appsettings.json')) as {
+    NetScript: {
+      Plugins: Record<string, unknown>;
+    };
+  };
+
+  assertEquals(
+    config.NetScript.Plugins['triggers-api'],
+    {
+      Enabled: true,
+      Runtime: 'deno',
+      Port: 8093,
+      Entrypoint:
+        '/home/codex/repos/netscript-scaffold-167/plugins/triggers/services/src/main.ts',
+      Workdir: '.',
+      RequiresKv: true,
+      RequiresDb: true,
+      Permissions: [
+        '--allow-net',
+        '--allow-env',
+        '--allow-read',
+        '--allow-write',
+        '--allow-run',
+      ],
+    },
+  );
+});
+
 Deno.test('PluginWorkspaceMutator writes saga store backend appsettings for saga plugins', async () => {
   const fs = new MemoryFileSystemAdapter();
   await fs.writeFile(
