@@ -23,3 +23,10 @@
 | --- | --- | ---: | --- |
 | workers check | `cd plugins/workers && deno task check` | 0 | Checked new `bin/runtime.ts` export plus existing mod/CLI/scaffold/adapter/Aspire/contracts/services/streams/worker entrypoints. |
 | workers publish dry-run | `cd plugins/workers && deno publish --dry-run --allow-dirty` | 0 | `Success Dry run complete`; existing unanalyzable dynamic-import warnings for `bin/combined.ts`, service bootstrap, and CLI local runtime backend. |
+
+## Slice 2 — Triggers runtime processor export
+
+| Gate | Command | Exit | Evidence |
+| --- | --- | ---: | --- |
+| triggers check | `cd plugins/triggers && deno task check` | 0 | Checked runtime export plus mod/CLI/scaffold/adapter/Aspire/public/services/streams entrypoints. |
+| triggers publish dry-run | `cd plugins/triggers && deno publish --dry-run --allow-dirty` | 0 | `Success Dry run complete`; existing unanalyzable dynamic-import warnings for CLI local runtime backend and project trigger registry. |

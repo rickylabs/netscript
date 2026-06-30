@@ -5,6 +5,7 @@ export {
   loadProjectTriggerDefinitions,
 } from './project-trigger-registry.ts';
 export { createRuntimeTriggerProcessor } from './trigger-runtime-processor.ts';
+export { startCombinedProcess, startTriggerProcessorRuntime } from './trigger-processor.ts';
 export {
   TRIGGER_ACTION_KINDS,
   TRIGGER_BACKFILL_POLICIES,

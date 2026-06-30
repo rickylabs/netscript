@@ -67,6 +67,13 @@ export async function startTriggerProcessorRuntime(
   ]);
 }
 
+/** Start the trigger background processor using the shared runtime-launch verb. */
+export async function startCombinedProcess(
+  options: TriggerProcessorRuntimeOptions = {},
+): Promise<void> {
+  await startTriggerProcessorRuntime(options);
+}
+
 if (import.meta.main) {
   const controller = new AbortController();
   Deno.addSignalListener('SIGINT', () => controller.abort());
