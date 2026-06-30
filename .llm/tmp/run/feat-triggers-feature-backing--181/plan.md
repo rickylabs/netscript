@@ -9,10 +9,15 @@ lands green end-to-end.
 
 ## Locked decisions
 
-- **L1** — #181 is **core-only feature-backing**; connector convergence and the service-assembly
-  (`main.ts`) are NOT re-touched (already converged). Connector edits limited to `v1.ts` handler
-  bodies (un-defer, un-synthesize, include `name`) and `v1-types.ts` context (new ports the routes
-  read).
+- **L1** — #181 is **core-only feature-backing**; the service-assembly **method**
+  (`createPluginService(router, {...}).serve()` shape) is NOT restructured. The single permitted
+  `main.ts` edit is **default-port construction inside `createTriggersServiceContext`** (the
+  established seam that already constructs `eventStore`/`processor`): each new port (enabledState,
+  dispatcher, test-delivery, subscription) is constructed there as a KV-/in-process-backed default.
+  Connector edits otherwise limited to `v1.ts` handler bodies (un-defer, un-synthesize, include
+  `name`) and `v1-types.ts` context (new ports the routes read). *(PLAN-EVAL F1: reconciled to
+  "default-port construction only, no service-assembly restructure" — the honest reading of the
+  slice bodies.)*
 - **L2** — **Deno.openKv→@netscript/kv migration: DROPPED** (already complete for production code;
   only a test-double remains). No functional credit, not gated. Optional micro-cleanup may ride
   Slice 1.
@@ -22,7 +27,10 @@ lands green end-to-end.
   domain field is an authoring default), and sets `name: definition.name`.
 - **L4** — Enabled-state persistence = **NEW port + KV adapter** following the workers structural-port
   pattern, engine-agnostic via `@netscript/kv`, prefix `['triggers','enabled-state']`. Default =
-  enabled; the store records overrides.
+  enabled; the store records **overrides only** — `list()` returns stored overrides, and a stale
+  override (id present in store, absent from current `definitions`) is filtered out **by the
+  connector** at response time, so the store stays engine-agnostic (no definition lookup)
+  (PLAN-EVAL F5).
 - **L5** — Manual-fire = **NEW runtime entrypoint** in triggers-core (`createManualDispatcher` /
   `fireTrigger`): builds a `ManualTriggerPayload` event (trigger-event.ts:50), persists via
   `TriggerEventStorePort`, dispatches via `TriggerProcessorPort`, returns
@@ -39,8 +47,15 @@ lands green end-to-end.
   subscription port surfaces existing DLQ enqueue as the `trigger:dlq` SSE type (c:358).
 - **L9** — `testWebhook` helper **genuinely HMAC-signs a synthetic canonical request** using the
   configured verifier/secret and routes through the existing ingress (does not weaken HMAC on the
-  real path). If no secret is configured, uses `MemoryWebhookVerifier` semantics. *(Locked default;
-  the alternative — bypass verification and inject directly — was rejected as less faithful.)*
+  real path). Synthetic-request contract (PLAN-EVAL F2): (1) resolve the verifier the same way
+  `DefaultTriggerIngress.#selectVerifier` does (honor `memory` vs `hmac-sha256`); (2) resolve the
+  secret through the same path ingress uses (`Deno.env.get(definition.secretEnv)`), falling back to
+  `MemoryWebhookVerifier` semantics if absent; (3) construct a `Request` with the verifier-expected
+  signature header (`x-hub-signature-256: sha256=<hex>`) computed over the exact body bytes the
+  helper writes; (4) `await TriggerIngressPort.accept(...)` and map the returned
+  `TriggerIngressResponse` into `triggerFireResponseSchema` (`{accepted,eventId,triggerId,status}`)
+  — the helper must **not** call `verifier.verify` directly, so the real ingress path is exercised
+  end-to-end. *(Locked default; bypass-and-inject was rejected as less faithful.)*
 - **L10** — No new public brand constructor required (connector stays cast-free via string-equality +
   `definition.id`). A `toTriggerId` convenience may be added but is not gated.
 - **L11 (durability)** — `subscribeEvents` is **in-process / single-replica** for now; multi-replica
@@ -48,6 +63,13 @@ lands green end-to-end.
 - **L12 (sequencing vs #184)** — **#181 lands first, in full; then #184 absorbs the relocation.**
   Both PLAN lanes may run concurrently (planning touches no source). See §coordination. *(Locked
   default; user may override to the single-lane fallback.)*
+- **L13 (JSR surface budget, PLAN-EVAL F4)** — keep new public roots **minimum-stable**: export the
+  **factories** (`createManualDispatcher`, `createWebhookTestDelivery`, `computeNextFireTimes`,
+  `createEventSubscription`, `createKvTriggerEnabledStateStore`) as runtime values; re-export the
+  **port interfaces** (`TriggerEnabledStatePort`, `TriggerEventSubscriptionPort`) **type-only**
+  (`export type`), not as runtime surface, holding the `public/mod.ts` export budget (matches the
+  "add only stable root exports" posture). Memory testing adapters stay on the `testing` subpath,
+  never `public/mod.ts`.
 
 ## Slices (dependency-ordered)
 
@@ -96,7 +118,14 @@ lands green end-to-end.
   + `public/mod.ts`. Do NOT reuse cron heuristic (research §6).
 - Connector: `v1.ts` `previewSchedule` replaces throw (:172) — resolve scheduled def, call engine,
   map to `{triggerId,nextFireAt,timezone,persistent}`.
-- Test: core table-test (known crons → expected next N across DST/timezone); connector smoke.
+- Test: core table-test — **commit to 8 cases (PLAN-EVAL F3):** (1) spring-forward
+  `America/New_York` 2024-03-10 02:00 → non-existent 02:00 skips to 03:00; (2) fall-back
+  `America/New_York` 2024-11-03 01:00 → 01:00 occurs twice (return both; document first-occurrence
+  if disambiguating); (3) UTC-offset no-DST `Asia/Tokyo` sanity; (4) `from?` omitted → defaults to
+  `new Date()`; (5) `spec.persistent` honoring tied to `triggerPreviewResponseSchema.persistent`
+  semantics (re-read the contract field; persistent=false → single non-recurring occurrence);
+  (6) leap-day Feb 29 valid recurrence; (7) invalid cron (e.g. `0 0 30 2 *` / Feb 30) → typed error,
+  not silent empty; (8) plain interval (every-N-minutes) baseline. Connector smoke.
 - Gate: as above. Record `CRON-NEXT-FIRE-ENGINE` upstream-debt.
 
 ### Slice 6 — Event-subscription / SSE port; back `subscribeEvents` (deps S2/S3; most novel)
