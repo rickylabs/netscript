@@ -97,3 +97,12 @@
 | arch check | `deno task arch:check` | 0 | All 13 doctrine roots reported `FAIL=0`; existing warnings only. |
 | CLI publish dry-run | `cd packages/cli && deno publish --dry-run --allow-dirty` | 0 | `Success Dry run complete`; existing unanalyzable dynamic-import warnings in CLI plugin registry/UI registry. |
 | triggers publish dry-run | `cd plugins/triggers && deno publish --dry-run --allow-dirty` | 0 | `Success Dry run complete`; existing unanalyzable dynamic-import warnings in local runtime backend and project trigger registry. |
+
+## Check-test finalization — repo-wide merge gate
+
+| Gate | Command | Exit | Evidence |
+| --- | --- | ---: | --- |
+| focused check-test regressions | `deno test --unstable-kv --allow-all packages/cli/src/kernel/templates/aspire/helpers/tests/generators-service-plugin_test.ts packages/cli/src/public/features/plugins/install/install-plugin_test.ts plugins/auth/tests/scaffold/manifest_test.ts packages/cli/src/kernel/constants/version-drift_test.ts` | 0 | `ok \| 6 passed (44 steps) \| 0 failed`; pinned trigger fixture, workers appsettings service entry, auth manifest, and version-drift guard all passed. |
+| saga KV isolation focused tests | `deno test --unstable-kv --allow-all plugins/sagas/src/runtime/saga-supervisor_test.ts packages/plugin-sagas-core/src/stores/kv-saga-store_test.ts` | 0 | `ok \| 8 passed \| 0 failed`; `NETSCRIPT_SAGA_KV_PATH` now opens the requested Deno KV path and the supervisor fixture resets shared KV state. |
+| repo check | `deno task check` | 0 | `failedBatches=0`; selected 1847 files across 16 batches. |
+| repo test | `deno task test` | 0 | `ok \| 1017 passed (431 steps) \| 0 failed \| 12 ignored`. |

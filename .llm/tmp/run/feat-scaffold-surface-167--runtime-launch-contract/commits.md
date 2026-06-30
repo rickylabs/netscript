@@ -11,3 +11,6 @@
 - 1784b5a5: Resolve plugin launch specifiers in generated workspaces
 - 8aaddbc1: feat(cli): follow .netscript-source-root marker for local plugin source discovery
 - 4a991d16: fix(triggers): expose registry to package-launched service
+- fd82f58b: test(cli): derive trigger service fixture specifier
+- c062aac5: fix(cli): keep official plugin services package-launched
+- 4fb5fc3d: fix(sagas): honor runtime kv path in supervisor tests
