@@ -43,15 +43,16 @@ bunx jsr add @netscript/plugin-sagas
 ```
 
 ```typescript
-import { inspectSagas, sagasPlugin } from '@netscript/plugin-sagas';
+import { inspectPlugin } from '@netscript/plugin';
+import { sagasPlugin } from '@netscript/plugin-sagas';
 
 // Hand the manifest to the host plugin loader.
 export const plugins = [sagasPlugin];
 
 // Inspect declared contribution axes without invoking lifecycle hooks.
-const summary = inspectSagas();
-console.log(summary.name); // "@netscript/plugin-sagas"
-console.log(summary.axes); // ["services", "backgroundProcessors", "streamTopics", ...]
+const summary = inspectPlugin(sagasPlugin);
+console.log(summary.target); // "@netscript/plugin-sagas"
+console.log(summary.details.contributionGroups); // number of declared contribution groups
 ```
 
 ---
