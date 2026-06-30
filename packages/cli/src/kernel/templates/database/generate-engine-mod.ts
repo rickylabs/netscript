@@ -72,6 +72,9 @@ function buildAdapterImport(provider: DbEngineProvider): string {
   if (provider.engine === 'mssql') {
     return "import { PrismaMssql } from '@prisma/adapter-mssql';";
   }
+  if (provider.engine === 'sqlite') {
+    return "import { PrismaLibSql } from '@prisma/adapter-libsql';";
+  }
   return '';
 }
 
@@ -114,6 +117,17 @@ function buildAdapterFactory(provider: DbEngineProvider, envPrefix: string): str
       password: url.password ? decodeURIComponent(url.password) : undefined,
     });
     client = new ${toPascalIdentifier(provider.engine)}Client({ adapter });`;
+  }
+  if (provider.engine === 'sqlite') {
+    return `    const connectionString = resolveConnectionString('sqlite', '${envPrefix}_URI');
+    if (!connectionString) {
+      throw new Error('${provider.displayName} connection string not found.');
+    }
+    Deno.env.set('${envPrefix}_URI', connectionString);
+    Deno.env.set('DATABASE_URL', connectionString);
+    client = new ${toPascalIdentifier(provider.engine)}Client({
+      adapter: new PrismaLibSql({ url: connectionString }),
+    });`;
   }
   return `    const connectionString = resolveConnectionString('${provider.engine}', '${envPrefix}_URI');
     if (connectionString) {

@@ -147,6 +147,34 @@ describe('database template generators', () => {
     assertStringIncludes(output, 'readonly mssql: MssqlClient');
   });
 
+  it('constructs the sqlite engine module with the libsql driver adapter', () => {
+    const sqlite = registry.get('sqlite');
+    const output = generateEngineMod(sqlite, { configKey: 'primary-db' });
+
+    // Prisma 7 requires a driver adapter; the sqlite facade must supply one.
+    assertStringIncludes(output, "import { PrismaLibSql } from '@prisma/adapter-libsql'");
+    assertStringIncludes(output, "resolveConnectionString('sqlite', 'PRIMARY_DB_URI')");
+    assertStringIncludes(output, 'new PrismaLibSql({ url: connectionString })');
+    assertStringIncludes(output, 'adapter: new PrismaLibSql(');
+    // Regression guard: must never construct the client with no adapter.
+    assertEquals(output.includes('new SqliteClient();'), false);
+  });
+
+  it('includes the libsql adapter import for the sqlite database deno.json', () => {
+    const sqlite = registry.get('sqlite');
+    const config = JSON.parse(
+      generateDatabaseDenoJson(sqlite, {
+        projectName: 'alpha-app',
+        importMode: 'jsr',
+      }),
+    );
+
+    assertEquals(
+      config.imports['@prisma/adapter-libsql'],
+      'npm:@prisma/adapter-libsql@^7.4.2',
+    );
+  });
+
   it('generates the root database facade for the selected engine', () => {
     const mysql = registry.get('mysql');
     const output = generateDatabaseFacadeMod(mysql);

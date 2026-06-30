@@ -141,5 +141,8 @@ function adapterImports(
   if (engine === 'mssql') {
     return { '@prisma/adapter-mssql': 'npm:@prisma/adapter-mssql@^7.4.2' };
   }
+  if (engine === 'sqlite') {
+    return { '@prisma/adapter-libsql': 'npm:@prisma/adapter-libsql@^7.4.2' };
+  }
   return {};
 }
