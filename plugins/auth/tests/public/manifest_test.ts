@@ -1,5 +1,6 @@
 import { assert, assertEquals } from 'jsr:@std/assert@^1';
-import { AUTH_PLUGIN_VERSION, authPlugin, inspectAuth } from '../../mod.ts';
+import { inspectPlugin } from '@netscript/plugin';
+import { AUTH_PLUGIN_VERSION, authPlugin } from '../../mod.ts';
 import { verifyAuthPlugin } from '../../verify-plugin.ts';
 
 Deno.test('authPlugin manifest exposes service, contract, and config axes', () => {
@@ -15,10 +16,13 @@ Deno.test('authPlugin manifest exposes service, contract, and config axes', () =
   );
   assert(authPlugin.contributions.runtimeConfigTopics?.some((topic) => topic.name === 'auth'));
 
-  const inspection = inspectAuth();
-  assertEquals(inspection.name, '@netscript/plugin-auth');
-  assertEquals(inspection.version, AUTH_PLUGIN_VERSION);
-  assertEquals(inspection.dependencies, []);
+  const inspection = inspectPlugin(authPlugin);
+  assertEquals(inspection.target, '@netscript/plugin-auth');
+  assertEquals(inspection.details.version, AUTH_PLUGIN_VERSION);
+  assertEquals(
+    inspection.details.contributionGroups,
+    Object.keys(authPlugin.contributions).length,
+  );
 
   const verification = verifyAuthPlugin();
   assertEquals(verification.ok, true);

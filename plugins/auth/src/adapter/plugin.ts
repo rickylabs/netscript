@@ -24,7 +24,7 @@ export const authAdapterPlugin: NetScriptPlugin = {
     wiringEntry: '@netscript/plugin-auth/services',
   },
   doctor: {
-    healthEndpoint: '/auth/health',
+    healthEndpoint: '/health',
     requiredConfigKeys: ['NETSCRIPT_AUTH_BACKEND'],
   },
   info: {
