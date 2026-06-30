@@ -7,3 +7,5 @@
 - 36271e86: feat(sagas): conform plugin manifest and router assembly
 - 265e08ec: feat(streams): conform proxy manifest surface
 - 31e63c74: feat(auth): conform manifest and health routing
+- 38d1cef0: Merge remote-tracking branch 'origin/main' into chore/plugin-rearch-v2
+- 26b0e07b: feat(triggers): conform manifest and router assembly

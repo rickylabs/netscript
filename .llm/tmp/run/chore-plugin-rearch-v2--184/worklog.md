@@ -121,6 +121,43 @@ Gate results:
 | package tests | `cd plugins/auth && rtk proxy deno task test` | PASS — 23 passed, 0 failed |
 | publish dry-run | `cd plugins/auth && rtk proxy deno task publish:dry-run` | PASS — dry run complete; existing bootstrap dynamic-import warning remains |
 | arch check | `rtk proxy deno task arch:check` | PASS exit 0 — `FAIL=0`; existing WARN/INFO doctrine findings remain |
+
+### S-conform-triggers
+
+- Unblock merge: `38d1cef0`
+  (`Merge remote-tracking branch 'origin/main' into chore/plugin-rearch-v2`).
+- Scope: triggers connector conformance against post-#181 / PR #192 triggers-core backing.
+- Commit: `26b0e07b` (`feat(triggers): conform manifest and router assembly`).
+
+Implemented:
+
+- Merged `origin/main` forward after PR #192 landed as squash `6e67f956`; no rebase or force-push.
+- Verified the merged triggers v1 contract exports `triggersContract` and `triggersContractV1` via
+  `deno doc` on both the core source subpath and connector re-export.
+- Preserved the now-backed v1 route set:
+  `describe`, `listTriggers`, `getTrigger`, `listEvents`, `getEvent`, `fireTrigger`, `testWebhook`,
+  `previewSchedule`, `enableTrigger`, `disableTrigger`, and `subscribeEvents`.
+- Deleted local `TriggersPluginManifest`/contribution/dependency/inspection mirror types.
+- Deleted `inspectTriggers`; tests, README, and reference docs now use or point to shared
+  `inspectPlugin(triggersPlugin)`.
+- Replaced connector-local `AnyRouter` service assembly with `assemblePluginContractRouter(...)`
+  from `@netscript/plugin/service`.
+
+Gate results:
+
+| Gate | Command | Result |
+|---|---|---|
+| route doc | `deno doc packages/plugin-triggers-core/src/contracts/v1/mod.ts`; `deno doc plugins/triggers/contracts/v1/mod.ts` | PASS — `triggersContract`/`triggersContractV1` exported; route block includes the five prior routes plus six PR #192 backed routes |
+| no-dangling grep | `rg "TriggersPluginManifest|inspectTriggers" -n` | PASS — 0 hits |
+| connector router grep | `rg "AnyRouter" plugins/triggers/services/src/router.ts -n` | PASS — 0 hits |
+| scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin-triggers-core --root plugins/triggers --ext ts,tsx` | PASS — 139 files, 0 diagnostics |
+| scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin-triggers-core --root plugins/triggers --ext ts,tsx` | PASS — 139 files, 0 diagnostics |
+| scoped fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin-triggers-core --root plugins/triggers --ext ts,tsx` | PASS — 139 files, 0 findings |
+| connector tests | `cd plugins/triggers && rtk proxy deno task test` | PASS — 19 passed (9 steps), 0 failed, 12 ignored |
+| core tests | `cd packages/plugin-triggers-core && rtk proxy deno task test` | PASS — 33 passed, 0 failed |
+| connector publish | `cd plugins/triggers && rtk proxy deno task publish:dry-run` | PASS — dry run complete; existing dynamic-import warnings remain |
+| core publish | `cd packages/plugin-triggers-core && rtk proxy deno task publish:dry-run` | PASS — dry run complete using existing `--allow-slow-types` carve-out |
+| arch check | `rtk proxy deno task arch:check` | PASS exit 0 — `FAIL=0`; existing WARN/INFO doctrine findings remain |
 | local runtime smoke | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS — `passed=48 failed=0` |
 
 ### S-conform-workers
