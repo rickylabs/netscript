@@ -157,7 +157,7 @@ confirms it landed and `migrate` evolves the schema later.
 
 ## Plugins contribute models
 
-Adding a first-party plugin adds its Prisma models to the *same* datasource — there is no
+Adding a first-party plugin installs its Prisma models to the *same* datasource — there is no
 second database. The aggregated tables land under
 `database/postgres/schema/plugins/<plugin>/` and migrate in the same `db init`/`migrate`
 cycle as your app.

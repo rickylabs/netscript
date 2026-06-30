@@ -23,7 +23,7 @@ environment variable read by the worker entrypoint. See
 {{ comp.apiTable({
   caption: "What you need before tuning",
   rows: [
-    { name: "workers plugin", type: "plugins/workers/", desc: "Public install: netscript plugin add @netscript/plugin-workers. Local contributor samples: deno run -A packages/cli/bin/netscript-dev.ts plugin add worker --name workers --samples. The :8091 API enqueues; a separate background process executes." },
+    { name: "workers plugin", type: "plugins/workers/", desc: "Public install: netscript plugin install @netscript/plugin-workers. Local contributor samples: deno run -A packages/cli/bin/netscript-dev.ts plugin install worker --name workers --samples. The :8091 API enqueues; a separate background process executes." },
     { name: "config/official-plugins/mod.ts", type: "defineWorkers(...)", desc: "The generated worker config block — where concurrency, queueProvider, and per-topic scaling live." },
     { name: "@netscript/plugin-workers-core/config", type: "import", desc: "defineWorkers, defineJobs, and the WorkersConfig / ScalingConfig / TaskConfig types." },
     { name: "Aspire up (for live runs)", type: "cd aspire && aspire start", desc: "The background runner needs Postgres + KV. Aspire injects the worker env vars; see Production pitfalls." }

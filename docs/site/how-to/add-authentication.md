@@ -33,8 +33,8 @@ graph.
 {{ comp callout { type: "note", title: "Alpha package pins" } }}
 The CLI scaffold emits exact alpha specifiers such as
 <code>jsr:@netscript/plugin-auth-core{{ releaseSpecifier }}</code>. Add the plugin through
-<code>netscript plugin add @netscript/plugin-auth</code> so the workspace gets the matching auth
-sources, generated registry entries, and Aspire resources together.
+<code>netscript plugin install @netscript/plugin-auth</code> so the workspace gets the matching auth
+dependency, generated glue, registry entries, and Aspire resources together.
 {{ /comp }}
 
 ## Before you start
@@ -61,15 +61,16 @@ Throughout, run commands from your workspace root.
 ## Step 1 — Add the `auth` plugin
 
 The `auth` plugin is a first-class official plugin installed the same way as `workers`, `sagas`,
-`triggers`, and `streams`. Add it with `plugin add`:
+`triggers`, and `streams`. Add it with `plugin install`:
 
 ```sh
-netscript plugin add @netscript/plugin-auth
+netscript plugin install @netscript/plugin-auth
 ```
 
-This scaffolds the unified `@netscript/plugin-auth` plugin into your workspace and registers it. The
-plugin composes **one active backend** behind the `auth-api` oRPC service and contributes a Prisma
-schema (`auth.prisma`), a service entry (`services/src/main.ts`), and the `/api/v1/auth/*` routes.
+This installs the unified `@netscript/plugin-auth` dependency, emits the user-owned `auth/mod.ts`
+glue barrel, and registers it. The plugin package composes **one active backend** behind the
+`auth-api` oRPC service and contributes the Prisma schema (`auth.prisma`), service entry, and
+`/api/v1/auth/*` routes.
 
 {{ comp callout { type: "note", title: "One plugin, one active backend" } }}
 <code>@netscript/plugin-auth</code> is a thin composition layer. The real authentication logic lives
@@ -115,7 +116,7 @@ export NETSCRIPT_AUTH_BACKEND=kv-oauth
 
 ## Step 3 — Run the auth database migration
 
-The `auth` plugin contributes a Prisma schema, **`plugins/auth/database/auth.prisma`**, which is
+The `auth` plugin contributes a package-provided **`auth.prisma`** schema, which is
 aggregated into your project's database schema at `db generate` (Postgres by default; or `mysql` /
 `mssql` / `sqlite` — the auth models persist through Prisma, so they follow whichever engine you
 scaffolded with `--db`). It defines four better-auth-shaped models mapped to these tables:

@@ -72,7 +72,7 @@ production:
 ## Step 1 — Know your deployable units (`appsettings.json`)
 
 `appsettings.json` is the single source of truth for *what runs*. The CLI writes it during
-`netscript init` and updates it as you `netscript plugin add`. Every Aspire resource — and
+`netscript init` and updates it as you `netscript plugin install`. Every Aspire resource — and
 every process you would deploy by hand — is described there. From a workspace with the four
 first-party plugins installed, the graph looks like this:
 

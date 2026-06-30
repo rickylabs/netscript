@@ -8,7 +8,7 @@ next: null
 
 # Authentication
 
-NetScript ships authentication as a first-class official plugin: `netscript plugin add @netscript/plugin-auth`
+NetScript ships authentication as a first-class official plugin: `netscript plugin install @netscript/plugin-auth`
 adds an `auth-api` oRPC service that boots on port **8094** alongside your workers, sagas, and
 triggers. The plugin is **pure-backend** — it owns the session lifecycle, OAuth/OIDC redirect
 flow, and a stable five-endpoint REST/RPC surface, but it does **not** ship UI. You compose
@@ -92,7 +92,7 @@ fourteen built-in presets.
   {
     label: "Simple — provider preset",
     lang: "ts",
-    code: "// Add the plugin from the workspace root:\n//   netscript plugin add @netscript/plugin-auth\n// Default backend is already kv-oauth (NETSCRIPT_AUTH_BACKEND=kv-oauth).\n\nimport { createKvOAuthBackend, getRequiredEnv, providers } from '@netscript/auth-kv-oauth';\n\n// One of 14 presets: github, google, gitlab, discord, slack, spotify,\n// facebook, twitter, auth0, okta, awsCognito, azureAd, logto, clerk.\nexport const backend = await createKvOAuthBackend({\n  provider: providers.google({\n    clientId: getRequiredEnv('NETSCRIPT_AUTH_CLIENT_ID'),\n    clientSecret: getRequiredEnv('NETSCRIPT_AUTH_CLIENT_SECRET'),\n    redirectUri: getRequiredEnv('NETSCRIPT_AUTH_REDIRECT_URI'),\n  }),\n});\n\n// backend.name === 'kv-oauth' — the only adapter with backend.interactive."
+    code: "// Add the plugin from the workspace root:\n//   netscript plugin install @netscript/plugin-auth\n// Default backend is already kv-oauth (NETSCRIPT_AUTH_BACKEND=kv-oauth).\n\nimport { createKvOAuthBackend, getRequiredEnv, providers } from '@netscript/auth-kv-oauth';\n\n// One of 14 presets: github, google, gitlab, discord, slack, spotify,\n// facebook, twitter, auth0, okta, awsCognito, azureAd, logto, clerk.\nexport const backend = await createKvOAuthBackend({\n  provider: providers.google({\n    clientId: getRequiredEnv('NETSCRIPT_AUTH_CLIENT_ID'),\n    clientSecret: getRequiredEnv('NETSCRIPT_AUTH_CLIENT_SECRET'),\n    redirectUri: getRequiredEnv('NETSCRIPT_AUTH_REDIRECT_URI'),\n  }),\n});\n\n// backend.name === 'kv-oauth' — the only adapter with backend.interactive."
   },
   {
     label: "Advanced — explicit provider",
@@ -104,7 +104,7 @@ fourteen built-in presets.
 {{ comp callout { type: "note", title: "Alpha package pins" } }}
 The scaffold pins <code>jsr:@netscript/plugin-auth-core{{ releaseSpecifier }}</code> and siblings
 at the exact aligned NetScript version. Add auth through
-<code>netscript plugin add @netscript/plugin-auth</code>, which wires the workspace correctly for
+<code>netscript plugin install @netscript/plugin-auth</code>, which wires the workspace correctly for
 the alpha instead of hand-editing imports.
 {{ /comp }}
 
@@ -248,7 +248,7 @@ together: sign users in with the plugin, then gate individual service routes wit
 
 ## Database & runtime events
 
-The plugin contributes a Prisma schema, `plugins/auth/database/auth.prisma`, with four
+The plugin contributes a package-provided `auth.prisma` schema with four
 better-auth-shaped models — `User` → `auth_users`, `Session` → `auth_sessions`,
 `Account` → `auth_accounts`, `Verification` → `auth_verifications`. These tables back the
 better-auth adapter; `kv-oauth` keeps its sessions in Deno KV, and WorkOS is stateless. As with

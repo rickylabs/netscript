@@ -24,10 +24,11 @@ it, and the generated [API reference](/reference/) for the full surface. The
 hubs stay deliberately thin so they orient rather than duplicate the reference.
 
 {{ comp callout { type: "note", title: "Five composable plugins + the platform underneath them" } }}
-The capabilities you <em>add</em> are plugins. The public command dispatches to a plugin package
-(for example <code>netscript plugin add @netscript/plugin-workers</code>); local-source contributor
-samples use <code>deno run -A packages/cli/bin/netscript-dev.ts plugin add &lt;kind&gt; --name &lt;name&gt; --samples</code>.
-Each installed plugin lands under <code>plugins/&lt;name&gt;/</code>. The remaining five are
+The capabilities you <em>add</em> are plugins. The public command installs a plugin package
+(for example <code>netscript plugin install @netscript/plugin-workers</code>); local-source contributor
+samples use <code>deno run -A packages/cli/bin/netscript-dev.ts plugin install &lt;kind&gt; --name &lt;name&gt; --samples</code>.
+Public install emits dependency-backed glue and samples that your workspace owns; contributor installs
+can materialize full local source. The remaining five are
 <strong>platform capabilities</strong>: services, database, KV/queues/cron, telemetry, and the
 Fresh UI come from the scaffold itself. Plugins register their contributions through their manifest;
 the host application never changes.
@@ -35,7 +36,7 @@ the host application never changes.
 
 ## The five composable plugins
 
-These are the slices you bolt on with `netscript plugin add`. Each is an isolated
+These are the slices you bolt on with `netscript plugin install`. Each is an isolated
 background processor or service that exposes its own HTTP API on a dedicated
 port, wired into Aspire automatically. Bring Aspire up first — `cd aspire &&
 aspire start` provisions Postgres and a shared cache — `redis` by default, or `garnet` / `deno-kv` via `--cache-backend` — and starts the dashboard at
@@ -59,7 +60,7 @@ A few seams are intentionally not-yet-live and the hubs say so plainly. The stre
 
 ## The platform capabilities
 
-These ship with the scaffold — no `plugin add` required. Services and contracts
+These ship with the scaffold — no `plugin install` required. Services and contracts
 are the backbone the five plugins lean on; the rest are the persistence,
 primitives, observability, and UI the whole workspace shares.
 

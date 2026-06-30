@@ -157,7 +157,7 @@ registry — the host's own source is untouched. This is the discipline that kee
 independently versioned and independently removable.
 {{ /comp }}
 
-The practical sequence — `netscript plugin add …` followed by the registry-generation step — is
+The practical sequence — `netscript plugin install …` followed by the registry-generation step — is
 covered in the {{ comp.xref({ key: "howto:add-a-plugin", text: "add-a-plugin how-to" }) }} and the
 {{ comp.xref({ key: "cli:reference", text: "CLI reference" }) }}. Regenerating the registry is
 what makes a freshly added plugin visible to the runtime.
