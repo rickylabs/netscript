@@ -140,6 +140,24 @@ const lightTokens = await loadDictionaryTokens({
   source: ['tokens/themes/light.tokens.json'],
 });
 
+// Default theme is LIGHT (no attribute). semantic.tokens.json carries the base +
+// theme-invariant roles; light.tokens.json overrides the theme-variant roles
+// (LIGHT_GROUPS) to light. So `:root` = semantic with light applied (full light),
+// and `[data-theme='dark']` = the semantic (dark) values for just the variant roles.
+const lightFileTokens = lightTokens.filter(
+  (token) => token.filePath?.endsWith('tokens/themes/light.tokens.json'),
+);
+const lightByVar = new Map(
+  lightFileTokens.map((token) => [tokenSourceCssVar(token), token] as const),
+);
+const lightRootTokens = rootTokens.map(
+  (token) => lightByVar.get(tokenSourceCssVar(token)) ?? token,
+);
+const variantNames = new Set(LIGHT_GROUPS.flat());
+const darkOverrideTokens = rootTokens.filter((token) =>
+  variantNames.has(tokenSourceCssVar(token)?.replace(/^--ns-/, '') ?? '')
+);
+
 const css = [
   '/*',
   ' * Initial token seed for @netscript/fresh-ui.',
@@ -153,17 +171,12 @@ const css = [
   ' *   - this file becomes a generated artifact',
   ' */',
   '',
-  ':root,',
-  "[data-theme='dark'] {",
-  ...renderBlock(rootTokens, themeColorScheme(darkTheme, 'dark'), ROOT_GROUPS),
+  ':root {',
+  ...renderBlock(lightRootTokens, themeColorScheme(lightTheme, 'light'), ROOT_GROUPS),
   '}',
   '',
-  "[data-theme='light'] {",
-  ...renderBlock(
-    lightTokens.filter((token) => token.filePath?.endsWith('tokens/themes/light.tokens.json')),
-    themeColorScheme(lightTheme, 'light'),
-    LIGHT_GROUPS,
-  ),
+  "[data-theme='dark'] {",
+  ...renderBlock(darkOverrideTokens, themeColorScheme(darkTheme, 'dark'), LIGHT_GROUPS),
   '}',
 ].join('\n');
 
@@ -174,7 +187,7 @@ await Deno.writeTextFile(
 );
 await Deno.writeTextFile(
   'registry/theme/tokens.json',
-  `${JSON.stringify(renderTokensJson(rootTokens, lightTokens), null, 2)}\n`,
+  `${JSON.stringify(renderTokensJson(lightRootTokens, darkOverrideTokens), null, 2)}\n`,
 );
 
 async function loadDictionaryTokens(
@@ -347,16 +360,14 @@ function renderThemeBridge(tokens: DictionaryToken[]) {
 
 function renderTokensJson(
   rootTokens: DictionaryToken[],
-  lightTokens: DictionaryToken[],
+  darkTokens: DictionaryToken[],
 ) {
   return {
     version: 1,
     generatedBy: 'packages/fresh-ui/scripts/build-tokens.ts',
     tokens: flatTokenMap(rootTokens),
     themes: {
-      light: flatTokenMap(
-        lightTokens.filter((token) => token.filePath?.endsWith('tokens/themes/light.tokens.json')),
-      ),
+      dark: flatTokenMap(darkTokens),
     },
   };
 }
