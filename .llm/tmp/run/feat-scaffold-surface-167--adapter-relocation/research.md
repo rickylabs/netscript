@@ -102,6 +102,54 @@ tests move with the files; add a `@netscript/kv` memory-adapter test proving eng
 `--allow-slow-types`, must not regress further); `deno task arch:check`; new deps land via normal
 resolution, no `deno.lock` hand-edit; zero new `any`/casts (only the 2 sanctioned categories).
 
+## Pre-flight verification (supervisor-run, 2026-06-30 — PLAN-EVAL cycle-1 fixes #1/#2)
+
+Re-ran the D2 surface-break grep across `docs/`, `packages/{cli,sdk,service,plugin}`,
+`plugins/*/services`, `e2e`, and tests for every connector `./runtime` import of a **relocated**
+symbol. Findings (full repo, `node_modules` excluded):
+
+- **Sole import that breaks under D2:** `docs/site/capabilities/durable-sagas.md:331` — a rendered
+  `{{ comp.tabbedCode }}` fence whose `code:` string is
+  `import { createDurableSagaRuntime, resolveSagaStoreBackend } from '@netscript/plugin-sagas/runtime';`.
+  `resolveSagaStoreBackend` **relocates** (D3 → `-core/stores`); `createDurableSagaRuntime` **stays**
+  in the connector `./runtime`. Fix = split the import (see S-b sub-step), not delete the fence.
+- **All other `@netscript/plugin-<kind>/runtime` references import symbols that STAY** and are
+  therefore NOT broken by D2:
+  - `docs/site/explanation/durability-model.md:158,302`, `docs/site/tutorials/storefront/04-checkout-saga.md:217`,
+    `plugins/workers/src/cli/official-sample-configuration.ts:378` → import `createDurableSagaRuntime`
+    / `createSagaPublisher` (both stay in connector `./runtime`). Valid post-D2.
+  - `durable-sagas.md:40,313,355`, `explanation/plugin-system.md:69`, `reference/sagas/index.md:27,67`,
+    `reference/triggers/index.md:67` → prose describing the `./runtime` subpath (which still exists).
+  - `plugins/{sagas,triggers}/src/adapter/plugin.ts` `wiringEntry:` + `plugins/*/src/runtime/mod.ts`
+    `@module` tags → connector-internal, rewritten by the slice itself.
+- **Reference-page store mentions are PORT interfaces, not relocated concrete stores:**
+  `reference/sagas/index.md:95,211` (`SagaStorePort`) and `reference/triggers/index.md:139`
+  (`TriggerEventStorePort`) already point at `@netscript/plugin-<kind>-core/ports` — the relocated
+  concrete classes (`KvSagaStore`/`PrismaSagaStore`/`resolveSagaStoreBackend`/the triggers KV stores)
+  are **not** enumerated as connector-`./runtime` exports anywhere in `docs/site/reference`. No
+  reference-page rewrite needed.
+
+**Net D2 doc surface: exactly one line** (`durable-sagas.md:331`), handled by S-b sub-step S-b.5
+below. The implementer re-runs this grep post-migration and pastes the zero-match result into
+`worklog.md` (Gate evidence).
+
+### Name collision discovered (PLAN-EVAL fix #2)
+
+`packages/plugin-triggers-core/src/testing/kv-trigger-event-store.ts:5` already defines
+`export class KvTriggerEventStore implements TriggerEventStorePort` (a `Deno.Kv`-typed **test
+double**), re-exported from `src/testing/mod.ts:4`. The relocated production store (also named
+`KvTriggerEventStore`, currently `plugins/triggers/src/runtime/kv-trigger-runtime-stores.ts:32`,
+consumed by `plugins/triggers/services/src/main.ts:39,145` via `runtime/mod.ts:6`) lands in
+`-core/src/stores/` — a hard name collision inside the same package.
+
+The repo's own taxonomy resolves it: `.llm/harness/profiles/triggers/extension-axes.md:18` documents
+the event-store axis implementers as **`KvTriggerEventStore` (the real KV store) + `MemoryTriggerEventStore` +
+`RecordingTriggerEventStore`** — i.e. the testing fixture is *misnamed* `Kv*` when its sibling test
+doubles are `Memory*`/`Recording*`. Deconflict = **rename the testing fixture
+`KvTriggerEventStore` → `MemoryTriggerEventStore`** (aligning it with the documented taxonomy),
+freeing the canonical `KvTriggerEventStore` name for the relocated `@netscript/kv`-backed production
+store. See S-c sub-step S-c.5.
+
 ## Implementation lane
 Net-new framework-source relocation + behavior-affecting persistence migration → **WSL Codex
 daemon-attached slice**, supervisor verifies + commits + pushes. Gated on PLAN-EVAL PASS.
