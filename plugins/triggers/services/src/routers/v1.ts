@@ -236,6 +236,7 @@ function toTriggerDefinitionResponse(
   return {
     id: definition.id,
     kind,
+    name: definition.name,
     description: definition.description,
     enabled: true,
     durabilityTier: definition.durability,

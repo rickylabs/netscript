@@ -82,6 +82,7 @@ function buildContext(): TriggerServiceContext {
     {
       id: 'sched-1',
       kind: 'scheduled',
+      name: 'Fixture Schedule',
       durability: 't1',
       description: 'A scheduled trigger fixture.',
       tags: ['fixture'],
@@ -189,6 +190,15 @@ Deno.test('triggers connector smoke', async (t) => {
       const body = await res.json() as { triggers: unknown[]; total: number };
       assertEquals(body.total, 1);
       assertEquals(body.triggers.length, 1);
+      assertEquals(body.triggers[0], {
+        id: 'sched-1',
+        kind: 'scheduled',
+        name: 'Fixture Schedule',
+        description: 'A scheduled trigger fixture.',
+        enabled: true,
+        durabilityTier: 't1',
+        tags: ['fixture'],
+      });
     });
 
     await t.step('deferred route fireTrigger returns a server error', async () => {

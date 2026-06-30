@@ -26,6 +26,8 @@ export type WebhookSpec<TId extends string = string> = Readonly<{
   path: string;
   verifier: WebhookVerifierKind;
   secretEnv?: string;
+  name?: string;
+  enabled?: boolean;
   description?: string;
   tags?: readonly string[];
   metadata?: Readonly<Record<string, unknown>>;
@@ -54,6 +56,8 @@ export function defineWebhook<TId extends string, TPayload = unknown>(
     id: spec.id as TriggerId<TId>,
     webhookId: spec.id as WebhookId<TId>,
     kind: 'webhook',
+    name: spec.name,
+    enabled: spec.enabled,
     durability: DEFAULT_TRIGGER_DURABILITY_TIER,
     handler,
     path: spec.path,
