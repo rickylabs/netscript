@@ -8,7 +8,17 @@
 
 import type { PluginServiceContext } from '@netscript/plugin/sdk';
 import { createPluginLogger } from '@netscript/plugin/loader';
-import { getKv } from '@netscript/kv';
+import {
+  getKv,
+  type KvEntry,
+  type KvKey,
+  type KvListOptions,
+  type KvSetOptions,
+  type WatchableKv,
+  type WatchEvent,
+  type WatchOptions,
+  type WatchPrefixOptions,
+} from '@netscript/kv';
 import { baseContract } from '@netscript/contracts';
 
 type DatabaseModule = {
@@ -25,6 +35,76 @@ async function getDatabaseClient(): Promise<unknown> {
   return databaseModule.db.getClient();
 }
 
+class LazyPluginKv implements WatchableKv {
+  readonly supportsWatch = true;
+  #kv: Promise<WatchableKv> | undefined;
+
+  get<T = unknown>(key: KvKey): Promise<KvEntry<T> | null> {
+    return this.resolve().then((kv) => kv.get<T>(key));
+  }
+
+  set(key: KvKey, value: unknown, options?: KvSetOptions): Promise<void> {
+    return this.resolve().then((kv) => kv.set(key, value, options));
+  }
+
+  delete(key: KvKey): Promise<void> {
+    return this.resolve().then((kv) => kv.delete(key));
+  }
+
+  has(key: KvKey): Promise<boolean> {
+    return this.resolve().then((kv) => kv.has(key));
+  }
+
+  list<T = unknown>(options: KvListOptions): AsyncIterable<KvEntry<T>> {
+    return this.listResolved<T>(options);
+  }
+
+  watch<T = unknown>(
+    keys: KvKey[],
+    options?: WatchOptions,
+  ): AsyncIterable<WatchEvent<T>[]> {
+    return this.watchResolved<T>(keys, options);
+  }
+
+  watchPrefix<T = unknown>(
+    prefix: KvKey,
+    options?: WatchPrefixOptions,
+  ): AsyncIterable<WatchEvent<T>> {
+    return this.watchPrefixResolved<T>(prefix, options);
+  }
+
+  close(): Promise<void> {
+    return this.resolve().then((kv) => kv.close());
+  }
+
+  [Symbol.asyncDispose](): Promise<void> {
+    return this.close();
+  }
+
+  private resolve(): Promise<WatchableKv> {
+    this.#kv ??= getKv();
+    return this.#kv;
+  }
+
+  private async *listResolved<T>(options: KvListOptions): AsyncIterable<KvEntry<T>> {
+    yield* (await this.resolve()).list<T>(options);
+  }
+
+  private async *watchResolved<T>(
+    keys: KvKey[],
+    options?: WatchOptions,
+  ): AsyncIterable<WatchEvent<T>[]> {
+    yield* (await this.resolve()).watch<T>(keys, options);
+  }
+
+  private async *watchPrefixResolved<T>(
+    prefix: KvKey,
+    options?: WatchPrefixOptions,
+  ): AsyncIterable<WatchEvent<T>> {
+    yield* (await this.resolve()).watchPrefix<T>(prefix, options);
+  }
+}
+
 export async function createPluginServiceContext(
   pluginName: string,
 ): Promise<PluginServiceContext> {
@@ -36,7 +116,7 @@ export async function createPluginServiceContext(
       base: baseContract,
       versions: {},
     },
-    kv: await getKv(),
+    kv: new LazyPluginKv(),
     logger: createPluginLogger(pluginName),
     env: Deno.env.toObject(),
   };
