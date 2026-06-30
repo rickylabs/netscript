@@ -275,13 +275,11 @@ async function acceptWebhook(
   definitions: readonly ProcessableTriggerDefinition[],
 ): Promise<Response> {
   const target = resolveWebhookTarget(c.req.path);
-  // Resolve the external path parameter against the loaded definitions and pass
-  // the definition's already-branded `.id` to ingress — same brand-free pattern
-  // as listEvents/getEvent (string equality against the branded id, which is a
-  // string subtype). This avoids a brand cast at the boundary. Resolve against
-  // ALL definitions (not just webhook ones) so ingress retains its own kind
-  // validation exactly as before.
-  const definition = definitions.find((d) => d.id === target);
+  // Resolve the external path parameter against loaded definitions and pass the
+  // definition's already-branded `.id` to ingress. Webhook definitions also
+  // expose a public path, so generated `/webhooks/inbound/generic` routes map to
+  // the stable trigger id without a brand cast at the boundary.
+  const definition = resolveWebhookDefinition(definitions, target);
   if (definition === undefined) {
     // Behavior-equivalent to ingress's unknown-id 404: ingress's known set is a
     // subset of context.definitions, so any id ingress would accept is present
@@ -322,6 +320,26 @@ function resolveWebhookTarget(path: string): string {
     return decodeURIComponent(path.slice(markerIndex + WEBHOOK_PATH_PREFIX.length));
   }
   return path;
+}
+
+function resolveWebhookDefinition(
+  definitions: readonly ProcessableTriggerDefinition[],
+  target: string,
+): ProcessableTriggerDefinition | undefined {
+  const normalizedTarget = normalizeWebhookPath(target);
+  return definitions.find((definition) => {
+    if (definition.id === target) {
+      return true;
+    }
+    if (isWebhookDefinition(definition)) {
+      return normalizeWebhookPath(definition.path) === normalizedTarget;
+    }
+    return false;
+  });
+}
+
+function normalizeWebhookPath(path: string): string {
+  return path.replace(/^\/+/, '').replace(/\/+$/, '');
 }
 
 function webhookFailure(error: unknown): Readonly<{

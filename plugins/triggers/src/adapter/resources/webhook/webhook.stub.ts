@@ -6,8 +6,9 @@
 import { defineStub, type StubSource } from '@netscript/plugin/adapter';
 
 /** Type-checked webhook trigger stub with named substitution tokens. */
-export const webhookStub: StubSource<'PATH' | 'SECRET_ENV_LINE' | 'TRIGGER_EXPORT' | 'TRIGGER_ID'> =
-  defineStub({
+export const webhookStub: StubSource<
+  'PATH' | 'SECRET_ENV_LINE' | 'TRIGGER_EXPORT' | 'TRIGGER_ID' | 'VERIFIER'
+> = defineStub({
     source: `import { defineWebhook } from '@netscript/plugin-triggers-core/builders';
 import type {
   TriggerContext,
@@ -31,11 +32,11 @@ export const %%TRIGGER_EXPORT%%: WebhookDefinition<
   {
     id: '%%TRIGGER_ID%%',
     path: '%%PATH%%',
-    verifier: 'hmac-sha256'%%SECRET_ENV_LINE%%
+    verifier: '%%VERIFIER%%'%%SECRET_ENV_LINE%%
   },
 );
 
 export default %%TRIGGER_EXPORT%%;
 `,
-    tokens: ['PATH', 'SECRET_ENV_LINE', 'TRIGGER_EXPORT', 'TRIGGER_ID'] as const,
+    tokens: ['PATH', 'SECRET_ENV_LINE', 'TRIGGER_EXPORT', 'TRIGGER_ID', 'VERIFIER'] as const,
   });

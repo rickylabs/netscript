@@ -34,6 +34,7 @@ export const webhookScaffolder: ItemScaffolder<WebhookInput> = {
             : '',
           TRIGGER_EXPORT: `${exportStem(input.id)}Trigger`,
           TRIGGER_ID: input.id,
+          VERIFIER: input.secretEnv ? 'hmac-sha256' : 'memory',
         }),
       ),
     ];

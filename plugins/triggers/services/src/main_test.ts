@@ -19,6 +19,7 @@
 
 import { assertEquals, assertExists } from '@std/assert';
 import type { RunningService } from '@netscript/service';
+import { defineWebhook } from '@netscript/plugin-triggers-core/builders';
 import type {
   TriggerEvent,
   TriggerEventId,
@@ -92,6 +93,29 @@ function buildContext(): TriggerServiceContext {
     definitions,
     eventStore: new InMemoryEventStore(),
     ingress: failingIngress,
+  };
+}
+
+function buildWebhookPathContext(acceptedTriggerIds: string[]): TriggerServiceContext {
+  const definitions: readonly ProcessableTriggerDefinition[] = [
+    defineWebhook(() => Promise.resolve([]), {
+      id: 'generic-inbound-webhook',
+      path: 'inbound/generic',
+      verifier: 'memory',
+    }),
+  ];
+  return {
+    definitions,
+    eventStore: new InMemoryEventStore(),
+    ingress: {
+      accept(request: TriggerIngressRequest): Promise<TriggerIngressResponse> {
+        acceptedTriggerIds.push(request.triggerId);
+        return Promise.resolve({
+          status: 202,
+          acceptedAt: new Date(0).toISOString(),
+        });
+      },
+    },
   };
 }
 
@@ -197,6 +221,38 @@ Deno.test('triggers connector smoke', async (t) => {
       assertEquals(body.accepted, false);
       assertEquals(body.status, 404);
     });
+
+    await t.step('raw webhook known trigger path reaches the ingress', async () => {
+      const res = await fetch(`${baseUrl}/api/v1/webhooks/hooks/sched-1`, {
+        method: 'POST',
+        body: '{}',
+      });
+      assertEquals(res.status, 404);
+      const body = await res.json() as { accepted: boolean; status: number };
+      assertEquals(body.accepted, false);
+      assertEquals(body.status, 404);
+    });
+  } finally {
+    await running.stop();
+  }
+});
+
+Deno.test('triggers webhook public path resolves to definition id', async () => {
+  const acceptedTriggerIds: string[] = [];
+  const running: RunningService = await createTriggersService(
+    buildWebhookPathContext(acceptedTriggerIds),
+    { port: 0 },
+  ).serve({ port: 0 });
+  const host = running.addr.hostname === '0.0.0.0' ? '127.0.0.1' : running.addr.hostname;
+  const baseUrl = `http://${host}:${running.addr.port}`;
+
+  try {
+    const res = await fetch(`${baseUrl}/api/v1/webhooks/inbound/generic`, {
+      method: 'POST',
+      body: '{}',
+    });
+    assertEquals(res.status, 202);
+    assertEquals(acceptedTriggerIds, ['generic-inbound-webhook']);
   } finally {
     await running.stop();
   }
