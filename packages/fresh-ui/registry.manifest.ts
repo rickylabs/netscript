@@ -513,6 +513,28 @@ export const freshUiRegistryManifest: RegistryManifest = {
       css: [{ layer: 'components', content: "@import './ui/model-selector.css';" }],
     },
     {
+      name: 'tool-call-card',
+      kind: 'component',
+      layer: 2,
+      description:
+        'Inline MCP/tool invocation + result as a native <details> disclosure with status badge and IO panel.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['ai', 'tool', 'primitive'],
+      files: [
+        {
+          source: 'registry/components/ui/tool-call-card.tsx',
+          target: '@ui/tool-call-card.tsx',
+        },
+        {
+          source: 'registry/components/ui/tool-call-card.css',
+          target: '@assets/ui/tool-call-card.css',
+        },
+      ],
+      registryDependencies: ['theme-seed', 'badge', 'spinner'],
+      css: [{ layer: 'components', content: "@import './ui/tool-call-card.css';" }],
+    },
+    {
       name: 'separator',
       kind: 'component',
       layer: 2,
@@ -921,6 +943,7 @@ export const freshUiRegistryManifest: RegistryManifest = {
         'theme-seed',
         'citation-chip',
         'model-selector',
+        'tool-call-card',
       ],
     },
     {

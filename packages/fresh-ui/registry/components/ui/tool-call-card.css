@@ -1,0 +1,105 @@
+.ns-tool-call {
+  overflow: hidden;
+  border: 1px solid var(--ns-border);
+  border-radius: var(--ns-radius-md);
+  background: var(--ns-surface);
+}
+
+.ns-tool-call summary {
+  display: flex;
+  align-items: center;
+  gap: var(--ns-space-2);
+  padding: var(--ns-space-2) var(--ns-space-3);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.ns-tool-call summary::-webkit-details-marker {
+  display: none;
+}
+
+.ns-tool-call summary:focus-visible {
+  outline: 2px solid var(--ns-ring);
+  outline-offset: -2px;
+}
+
+.ns-tool-call__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--ns-space-5);
+  height: var(--ns-space-5);
+  border-radius: var(--ns-radius-sm);
+  background: var(--ns-muted);
+  color: var(--ns-muted-fg);
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-xs);
+}
+
+.ns-tool-call__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-xs);
+  color: var(--ns-fg);
+}
+
+.ns-tool-call__chevron {
+  flex-shrink: 0;
+  color: var(--ns-muted-fg);
+  font-size: var(--ns-text-xs);
+  transition: transform var(--ns-ease-fast);
+}
+
+.ns-tool-call[open] .ns-tool-call__chevron {
+  transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ns-tool-call__chevron {
+    transition: none;
+  }
+}
+
+.ns-tool-call__panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ns-space-3);
+  padding: var(--ns-space-3);
+  border-top: 1px solid var(--ns-border);
+}
+
+.ns-tool-call__io {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ns-space-1);
+}
+
+.ns-tool-call__io-label {
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--ns-label-tracking);
+  color: var(--ns-muted-fg);
+}
+
+.ns-tool-call__io pre {
+  margin: 0;
+  padding: var(--ns-space-2);
+  overflow-x: auto;
+  border-radius: var(--ns-radius-sm);
+  background: var(--ns-surface-raised);
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-2xs);
+  line-height: var(--ns-leading-normal);
+  color: var(--ns-fg);
+}
+
+.ns-tool-call[data-status='error'] {
+  border-color: var(--ns-destructive-border);
+}
