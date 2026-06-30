@@ -24,8 +24,35 @@ bunx jsr add @netscript/fresh
 
 ### Usage
 
-Define a typed, paginated page from a route contract. Each capability lives on an explicit subpath,
-so you import only the layer you need:
+With the NetScript Vite plugin enabled, the route binding is **codegen-owned**: you author the
+contract body and the plugin inserts the binding call from the page module's path under `routes/`.
+Three authoring forms converge on the same generated `routes.<key>` tree.
+
+**Form A — inline contract.** Write `.withRouteContract({ pathSchema?, searchSchema? })`; the
+generator inserts `$route: routePatterns.<key>.$route` and the `routePatterns` import:
+
+```typescript
+import { z } from 'zod';
+import { definePage } from '@netscript/fresh/builders';
+
+// routes/orders/[id].tsx — you write only the contract body.
+export const ordersDetailPage = definePage()
+  .withRouteContract({
+    pathSchema: z.object({ id: z.string().min(1) }),
+  })
+  .withMeta(() => ({ title: 'Order' }))
+  .build();
+```
+
+**Form B — sidecar contract.** Put the contract in a sibling `routes/orders/[id].route.ts`; the
+generator inserts `.withRoute(routes.orders.$id.$route)` and the `routes` import. **Form C — no
+contract.** Write neither; the generator inserts a default `.withRoute(routes.<key>.$route)` backed
+by `createRouteReference`. Set the Vite plugin option `pageModuleRouteBinding: false` to opt out and
+keep hand-written bindings.
+
+The manual `bindRoutePattern(...)` + `.withRoute(...)` form below still works and is what the
+generator emits under the hood. Prefer Form A/B/C when the Vite plugin is enabled; reach for the
+manual form only for ad-hoc routes built outside the codegen flow:
 
 ```typescript
 import { definePage } from '@netscript/fresh/builders';
