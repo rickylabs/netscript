@@ -1,7 +1,7 @@
-import type { PluginAddRequest } from '../../../domain/plugin-add-plan.ts';
+import type { PluginInstallRequest } from '../../../domain/plugin-install-plan.ts';
 
-/** Parsed options accepted by the public `plugin add` command. */
-export interface AddPluginCommandInput {
+/** Parsed options accepted by the public `plugin install` command. */
+export interface InstallPluginCommandInput {
   readonly name?: string;
   readonly port?: number;
   readonly serviceRefs?: string;
@@ -19,5 +19,5 @@ export interface AddPluginCommandInput {
   readonly force?: boolean;
 }
 
-/** User request handled by the public add-plugin use case. */
-export type AddPluginInput = PluginAddRequest;
+/** User request handled by the public install-plugin use case. */
+export type InstallPluginInput = PluginInstallRequest;

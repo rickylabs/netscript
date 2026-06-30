@@ -14,25 +14,25 @@ import type { ProcessPort } from '../../../../kernel/ports/process-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../../../kernel/ports/template-port.ts';
 import { PluginKindRegistry } from '../../../../kernel/application/registries/plugin-kind-registry.ts';
 import type {
-  AddPluginResult,
-  PluginAddPlan,
+  InstallPluginResult,
+  PluginInstallPlan,
   PluginRenderResult,
-} from '../../../../public/domain/plugin-add-plan.ts';
-import type { AddPluginInput } from '../../../../public/features/plugins/add/add-plugin-input.ts';
-import type { JsrPluginValidatorPort } from '../../../../public/features/plugins/add/jsr-plugin-validator-port.ts';
+} from '../../../../public/domain/plugin-install-plan.ts';
+import type { InstallPluginInput } from '../../../../public/features/plugins/install/install-plugin-input.ts';
+import type { JsrPluginValidatorPort } from '../../../../public/features/plugins/install/jsr-plugin-validator-port.ts';
 import type { JsrPackageFileFetcher } from '../../../../public/infra/jsr/verify-jsr-package-integrity.ts';
 import {
   createPluginOwnedPluginResult,
   resolvePluginDescriptorBeforePlanning,
   runPluginOwnedScaffold,
-} from '../../../../public/features/plugins/add/add-plugin.ts';
-import { planPluginAdd } from '../../../../public/features/plugins/add/plan-plugin-add.ts';
-import { resolvePluginPackageSpec } from '../../../../public/features/plugins/add/plugin-package-resolver.ts';
-import { renderPluginSupport } from '../../../../public/features/plugins/add/render-plugin.ts';
-import { ensurePluginServiceContext, mergeUniqueReferences } from './add-local-plugin-helpers.ts';
-import { resolveOfficialPluginSourceRoot } from './add-local-plugin-helpers.ts';
+} from '../../../../public/features/plugins/install/install-plugin.ts';
+import { planPluginInstall } from '../../../../public/features/plugins/install/plan-plugin-install.ts';
+import { resolvePluginPackageSpec } from '../../../../public/features/plugins/install/plugin-package-resolver.ts';
+import { renderPluginSupport } from '../../../../public/features/plugins/install/render-plugin.ts';
+import { ensurePluginServiceContext, mergeUniqueReferences } from './install-local-plugin-helpers.ts';
+import { resolveOfficialPluginSourceRoot } from './install-local-plugin-helpers.ts';
 
-export { resolveOfficialPluginSourceRoot } from './add-local-plugin-helpers.ts';
+export { resolveOfficialPluginSourceRoot } from './install-local-plugin-helpers.ts';
 
 interface LocalPluginRenderResult extends PluginRenderResult {
   readonly workspaceMembers: readonly string[];
@@ -43,8 +43,8 @@ interface LocalPluginRenderResult extends PluginRenderResult {
 const ROOT_LOCAL_BASE = '.';
 const PLUGIN_LOCAL_BASE = '../..';
 
-/** Dependencies used by the local contributor plugin-add flow. */
-export interface AddLocalPluginDependencies {
+/** Dependencies used by the local contributor plugin-install flow. */
+export interface InstallLocalPluginDependencies {
   /** Filesystem used for validation and workspace mutation. */
   readonly fs: FileSystemPort;
   /** Scaffold writer used by starter and DB flows. */
@@ -78,11 +78,11 @@ export interface AddLocalPluginDependencies {
   ) => Promise<readonly string[]>;
 }
 
-/** Add a plugin workspace to a local contributor project using local imports. */
-export async function addLocalPlugin(
-  request: AddPluginInput,
-  dependencies: AddLocalPluginDependencies,
-): Promise<AddPluginResult> {
+/** Install a plugin workspace into a local contributor project using local imports. */
+export async function installLocalPlugin(
+  request: InstallPluginInput,
+  dependencies: InstallLocalPluginDependencies,
+): Promise<InstallPluginResult> {
   const registry = dependencies.registry ?? new PluginKindRegistry();
   const descriptorRequest = await withDefaultLocalPath(request, dependencies);
   const resolvedPlugin = await resolvePluginDescriptorBeforePlanning(
@@ -94,7 +94,7 @@ export async function addLocalPlugin(
   const planningRequest = resolvedPlugin?.planningKind === undefined
     ? descriptorRequest
     : { ...descriptorRequest, kind: resolvedPlugin.planningKind };
-  const plan = await planPluginAdd(planningRequest, {
+  const plan = await planPluginInstall(planningRequest, {
     fs: dependencies.fs,
     registry,
   });
@@ -165,9 +165,9 @@ export async function addLocalPlugin(
 }
 
 async function withDefaultLocalPath(
-  request: AddPluginInput,
-  dependencies: AddLocalPluginDependencies,
-): Promise<AddPluginInput> {
+  request: InstallPluginInput,
+  dependencies: InstallLocalPluginDependencies,
+): Promise<InstallPluginInput> {
   if (request.localPath !== undefined || request.jsrUrl !== undefined) {
     return request;
   }
@@ -196,8 +196,8 @@ function resolveDefaultLocalPluginPath(sourceRoot: string, kind: string): string
 }
 
 async function renderLocalPlugin(
-  plan: PluginAddPlan,
-  dependencies: AddLocalPluginDependencies,
+  plan: PluginInstallPlan,
+  dependencies: InstallLocalPluginDependencies,
 ): Promise<LocalPluginRenderResult> {
   const provisionedDatabase = await provisionDatabaseIfNeeded(
     plan.projectRoot,
@@ -248,8 +248,8 @@ async function renderLocalPlugin(
 }
 
 async function ensurePluginRegistry(
-  plan: PluginAddPlan,
-  dependencies: AddLocalPluginDependencies,
+  plan: PluginInstallPlan,
+  dependencies: InstallLocalPluginDependencies,
 ): Promise<number> {
   if (!await needsRegistryBootstrap(plan.projectRoot, dependencies.fs)) {
     return 0;

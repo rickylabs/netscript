@@ -19,20 +19,19 @@ import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.t
 import type { PromptPort } from '../../../../kernel/ports/prompt-port.ts';
 import type { ProcessPort } from '../../../../kernel/ports/process-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../../../kernel/ports/template-port.ts';
-import type { AddPluginResult, PluginAddPlan } from '../../../domain/plugin-add-plan.ts';
+import type { InstallPluginResult, PluginInstallPlan } from '../../../domain/plugin-install-plan.ts';
 import { ScaffoldValidationError } from '../../../../kernel/domain/errors.ts';
 import {
   mergeUniqueReferences,
   toWorkspaceRelativePath,
-} from '../../../../local/features/plugins/add/add-local-plugin-helpers.ts';
-import type { AddPluginInput } from './add-plugin-input.ts';
+} from '../../../../local/features/plugins/install/install-local-plugin-helpers.ts';
+import type { InstallPluginInput } from './install-plugin-input.ts';
 import type {
   JsrPluginValidatorPort,
   ValidatedPluginDescriptor,
 } from './jsr-plugin-validator-port.ts';
-import { planPluginAdd } from './plan-plugin-add.ts';
+import { planPluginInstall } from './plan-plugin-install.ts';
 import {
-  renderPlugin,
   type RenderPluginDependencies,
   renderPluginSupport,
 } from './render-plugin.ts';
@@ -62,8 +61,8 @@ export interface ResolvedPluginBeforePlanning {
   readonly source: PluginScaffoldDispatchSource;
 }
 
-/** Dependencies used by the public add-plugin flow. */
-export interface AddPluginDependencies
+/** Dependencies used by the public install-plugin flow. */
+export interface InstallPluginDependencies
   extends RenderPluginDependencies, PluginOwnedScaffoldDependencies {
   /** Plugin kind registry. */
   readonly registry?: PluginKindRegistry;
@@ -95,11 +94,11 @@ export interface AddPluginDependencies
   ) => Promise<readonly string[]>;
 }
 
-/** Add a starter plugin workspace to an existing NetScript project. */
-export async function addPlugin(
-  request: AddPluginInput,
-  dependencies: AddPluginDependencies,
-): Promise<AddPluginResult> {
+/** Install a starter plugin workspace into an existing NetScript project. */
+export async function installPlugin(
+  request: InstallPluginInput,
+  dependencies: InstallPluginDependencies,
+): Promise<InstallPluginResult> {
   const registry = dependencies.registry ?? new PluginKindRegistry();
   const resolvedPlugin = await resolvePluginDescriptorBeforePlanning(
     request,
@@ -118,7 +117,7 @@ export async function addPlugin(
   const planningRequest = resolvedPlugin?.planningKind === undefined
     ? request
     : { ...request, kind: resolvedPlugin.planningKind };
-  const plan = await planPluginAdd(planningRequest, {
+  const plan = await planPluginInstall(planningRequest, {
     fs: dependencies.fs,
     registry,
   });
@@ -126,14 +125,20 @@ export async function addPlugin(
     ? undefined
     : await runPluginOwnedScaffold(plan, resolvedPlugin, request, dependencies);
   if (request.dryRun === true && pluginOwned !== undefined && resolvedPlugin !== undefined) {
-    return createDryRunAddResult(plan, resolvedPlugin.descriptor, pluginOwned);
+    return createDryRunInstallResult(plan, resolvedPlugin.descriptor, pluginOwned);
   }
-  const rendered = pluginOwned === undefined || resolvedPlugin === undefined
-    ? await renderPlugin(plan, dependencies)
-    : {
-      ...await renderPluginSupport(plan, dependencies, { importMode: 'jsr' }),
-      plugin: createPluginOwnedPluginResult(plan, resolvedPlugin.descriptor, pluginOwned),
-    };
+  if (pluginOwned === undefined || resolvedPlugin === undefined) {
+    throw new ScaffoldValidationError(
+      'Plugin installation requires a resolvable plugin package and a process runner to ' +
+        'dispatch the plugin-owned scaffolder. Provide --jsr-url or --local-path for a plugin ' +
+        'whose package exposes a scaffolder, and ensure a process runner is configured.',
+      { package: request.jsrUrl ?? request.localPath ?? request.kind },
+    );
+  }
+  const rendered = {
+    ...await renderPluginSupport(plan, dependencies, { importMode: 'jsr' }),
+    plugin: createPluginOwnedPluginResult(plan, resolvedPlugin.descriptor, pluginOwned),
+  };
   const pluginReferences = resolvedPlugin === undefined
     ? plan.pluginReferences
     : mergeUniqueReferences(
@@ -188,7 +193,7 @@ export async function addPlugin(
 }
 
 export async function resolvePluginDescriptorBeforePlanning(
-  request: AddPluginInput,
+  request: InstallPluginInput,
   registry: PluginKindRegistry,
   validator: JsrPluginValidatorPort | undefined,
   fs: FileSystemPort,
@@ -264,9 +269,9 @@ export async function resolveLocalPluginDescriptor(
 }
 
 export async function runPluginOwnedScaffold(
-  plan: PluginAddPlan,
+  plan: PluginInstallPlan,
   resolvedPlugin: ResolvedPluginBeforePlanning,
-  request: AddPluginInput,
+  request: InstallPluginInput,
   dependencies: PluginOwnedScaffoldDependencies,
 ): Promise<PluginOwnedScaffoldResult> {
   const processRunner = dependencies.processRunner;
@@ -291,11 +296,11 @@ export async function runPluginOwnedScaffold(
   });
 }
 
-export function createDryRunAddResult(
-  plan: PluginAddPlan,
+export function createDryRunInstallResult(
+  plan: PluginInstallPlan,
   descriptor: ValidatedPluginDescriptor,
   scaffold: PluginOwnedScaffoldResult,
-): AddPluginResult {
+): InstallPluginResult {
   const filesCreated = scaffold.createdFiles.map((path) => join(plan.projectRoot, path));
   const pluginDir = join(plan.projectRoot, SCAFFOLD_DIRS.PLUGINS, plan.pluginName);
   return {
@@ -329,7 +334,7 @@ export function createDryRunAddResult(
 
 /** Convert a plugin-owned scaffold result into the host appsettings plugin shape. */
 export function createPluginOwnedPluginResult(
-  plan: PluginAddPlan,
+  plan: PluginInstallPlan,
   descriptor: ValidatedPluginDescriptor,
   scaffold: PluginOwnedScaffoldResult,
 ): PluginScaffoldResult {

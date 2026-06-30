@@ -13,7 +13,7 @@ export interface CommandOptionDefinition {
 /**
  * Layer-2 command base for scaffold-style commands.
  *
- * Demonstrated concretes: `init`, `service add`, `plugin add`, and `db add`.
+ * Demonstrated concretes: `init`, `service add`, `plugin install`, and `db add`.
  */
 export abstract class ScaffoldCommand<TDefinition = unknown> extends CliCommand<TDefinition> {
   /** Resource name used in generated descriptions and diagnostics. */

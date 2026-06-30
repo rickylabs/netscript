@@ -12,14 +12,14 @@ import {
   isFrameworkVerb,
   resolvePluginCliSpecifier,
 } from './dispatch-plugin-verb.ts';
-import type { ValidatedPluginDescriptor } from '../add/jsr-plugin-validator-port.ts';
+import type { ValidatedPluginDescriptor } from '../install/jsr-plugin-validator-port.ts';
 import { verifyJsrPackageIntegrity } from '../../../infra/jsr/verify-jsr-package-integrity.ts';
 
 describe('plugin verb dispatch', () => {
   it('routes framework verbs through deno x and the plugin cli subpath', async () => {
     const processRunner = new RecordingProcess(0);
 
-    const result = await dispatchPluginVerb('add', '@example/plugin-alpha', ['--yes'], {
+    const result = await dispatchPluginVerb('install', '@example/plugin-alpha', ['--yes'], {
       projectRoot: '/workspace/app',
       processRunner,
     });
@@ -27,7 +27,7 @@ describe('plugin verb dispatch', () => {
     assertEquals(result.stdout, 'plugin output');
     assertEquals(processRunner.commands, [{
       command: 'deno',
-      args: ['x', '-A', 'jsr:@example/plugin-alpha/cli', 'add', '--yes'],
+      args: ['x', '-A', 'jsr:@example/plugin-alpha/cli', 'install', '--yes'],
       cwd: '/workspace/app',
     }]);
   });

@@ -11,12 +11,12 @@ export const BARE_PLUGIN_PACKAGE_ALIASES: Readonly<Record<string, string>> = Obj
   workers: '@netscript/plugin-workers',
 });
 
-/** Source branch used to resolve a plugin add package spec. */
+/** Source branch used to resolve a plugin install package spec. */
 export type PluginPackageSpecSource = 'bare-alias' | 'scoped-name' | 'explicit-jsr';
 
 /** JSR package identity resolved before plugin kind registry lookup. */
 export interface ResolvedPluginPackageSpec {
-  /** Original value supplied to `plugin add`. */
+  /** Original value supplied to `plugin install`. */
   readonly requestedSpec: string;
   /** Resolution branch used by the resolver. */
   readonly source: PluginPackageSpecSource;
@@ -32,7 +32,7 @@ export interface ResolvedPluginPackageSpec {
   readonly alias?: string;
 }
 
-/** Resolve a plugin add spec to a JSR package before any kind-registry lookup. */
+/** Resolve a plugin install spec to a JSR package before any kind-registry lookup. */
 export function resolvePluginPackageSpec(spec: string): ResolvedPluginPackageSpec {
   const requestedSpec = spec.trim();
   if (requestedSpec.length === 0) {

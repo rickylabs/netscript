@@ -7,11 +7,11 @@ import type {
   PluginSchemaCopyResult,
   SagaStoreBackend,
 } from '../../kernel/domain/plugin-kind.ts';
-import type { ValidatedPluginDescriptor } from '../features/plugins/add/jsr-plugin-validator-port.ts';
+import type { ValidatedPluginDescriptor } from '../features/plugins/install/jsr-plugin-validator-port.ts';
 import type { ScaffoldResult as PluginOwnedScaffoldResult } from '@netscript/plugin/protocol';
 
-/** User request for adding one starter plugin workspace. */
-export interface PluginAddRequest {
+/** User request for installing one starter plugin workspace. */
+export interface PluginInstallRequest {
   /** Raw plugin kind received from the command surface. */
   readonly kind: string;
 
@@ -64,8 +64,8 @@ export interface PluginAddRequest {
   readonly overwrite: boolean;
 }
 
-/** Planned plugin addition with workspace metadata resolved. */
-export interface PluginAddPlan extends Omit<PluginAddRequest, 'kind'> {
+/** Planned plugin installation with workspace metadata resolved. */
+export interface PluginInstallPlan extends Omit<PluginInstallRequest, 'kind'> {
   /** Plugin kind identifier. */
   readonly kind: PluginKind;
 
@@ -97,8 +97,8 @@ export interface PluginRenderResult extends PluginRenderSupportResult {
   readonly plugin: PluginScaffoldResult;
 }
 
-/** Result of the public add-plugin application flow. */
-export interface AddPluginResult extends PluginRenderResult {
+/** Result of the public install-plugin application flow. */
+export interface InstallPluginResult extends PluginRenderResult {
   /** Static JSR descriptor resolved before any plugin code executes. */
   readonly resolvedPlugin?: ValidatedPluginDescriptor;
 

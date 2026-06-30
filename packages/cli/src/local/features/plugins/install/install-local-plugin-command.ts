@@ -1,33 +1,34 @@
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import { Command } from '@cliffy/command';
-import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../kernel/application/registries/template-registry.ts';
-import { addPlugin, type AddPluginDependencies } from './add-plugin.ts';
 import {
   parseList,
   type ProjectRootResolver,
   requireProjectRoot,
   requireString,
-} from '../../../presentation/support.ts';
-import type { AddPluginCommandInput } from './add-plugin-input.ts';
+} from '../../../../public/presentation/support.ts';
+import type { InstallPluginCommandInput } from '../../../../public/features/plugins/install/install-plugin-input.ts';
+import { installLocalPlugin, type InstallLocalPluginDependencies } from './install-local-plugin.ts';
 
-/** Dependencies for the public `plugin add` command handler. */
-export interface PluginAddCommandDependencies {
-  /** Application dependencies for adding a plugin workspace. */
-  readonly addPluginDependencies: AddPluginDependencies;
+/** Dependencies for the local contributor `plugin install` command handler. */
+export interface LocalPluginInstallCommandDependencies {
+  /** Application dependencies for installing a plugin workspace. */
+  readonly installPluginDependencies: InstallLocalPluginDependencies;
   /** Resolve the project root from flags or environment. */
   readonly resolveProjectRoot: ProjectRootResolver;
+  /** Directory used to resolve the default local plugin source path. */
+  readonly sourceRootStartDir: string;
   /** Print completion lines. */
   readonly print?: (message: string) => void;
 }
 
-/** Create the public `plugin add` command. */
-export function createPluginAddCommand(
-  dependencies: PluginAddCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+/** Create the local contributor `plugin install` command. */
+export function createLocalPluginInstallCommand(
+  dependencies: LocalPluginInstallCommandDependencies,
+) {
   const print = dependencies.print ?? outputText;
   return new Command()
-    .name('add')
-    .description('Add a plugin workspace and register it with Aspire')
+    .name('install')
+    .description('Install a plugin workspace and register it with local contributor wiring')
     .arguments('<kind:string>')
     .option('--name <name:string>', 'Plugin name (kebab-case)')
     .option('--port <port:number>', 'Plugin port override')
@@ -38,8 +39,6 @@ export function createPluginAddCommand(
     .option('--saga-store-backend <backend:string>', 'Saga durable store backend: kv or prisma')
     .option('--samples', 'Scaffold plugin sample files', { default: true })
     .option('--no-samples', 'Skip plugin sample files')
-    .option('--skip-confirmation', 'Skip third-party plugin confirmation', { default: false })
-    .option('--ci', 'Non-interactive mode', { default: false })
     .option('--dry-run', 'Preview plugin-owned scaffold changes without writing files', {
       default: false,
     })
@@ -51,14 +50,13 @@ export function createPluginAddCommand(
     )
     .option('--project-root <path:string>', 'Project root directory')
     .option('--force', 'Overwrite generated files if they already exist', { default: false })
-    .action(async (options: AddPluginCommandInput, kind: string): Promise<void> => {
-      await DEFAULT_TEMPLATE_REGISTRY.hydrate();
+    .action(async (options: InstallPluginCommandInput, kind: string): Promise<void> => {
       const projectRoot = await requireProjectRoot(
         dependencies.resolveProjectRoot,
         options.projectRoot,
       );
       const pluginName = requireString('--name', options.name);
-      const result = await addPlugin({
+      const result = await installLocalPlugin({
         kind,
         pluginName,
         port: options.port,
@@ -68,19 +66,18 @@ export function createPluginAddCommand(
         noDb: options.db === false,
         sagaStoreBackend: parseSagaStoreBackendOption(options.sagaStoreBackend),
         includeSamples: options.samples !== false,
-        skipConfirmation: options.skipConfirmation ?? false,
-        ci: options.ci ?? false,
         dryRun: options.dryRun ?? false,
         jsrUrl: options.jsrUrl,
         localPath: options.localPath,
         noCopySource: options.copySource === false,
         projectRoot,
         overwrite: options.force ?? false,
-      }, dependencies.addPluginDependencies);
+      }, dependencies.installPluginDependencies);
 
-      const plugin = result.plugin;
-      print(`Added ${plugin.kind} plugin "${plugin.configKey}" on port ${plugin.servicePort}.`);
-      print(`Created ${plugin.scaffoldResult.filesCreated.length} plugin files.`);
+      print(
+        `Installed ${result.plugin.kind} plugin "${result.plugin.configKey}" on port ${result.plugin.servicePort}.`,
+      );
+      print(`Created ${result.plugin.scaffoldResult.filesCreated.length} plugin files.`);
       print(`Regenerated ${result.helperFiles.length} Aspire helper files.`);
     });
 }

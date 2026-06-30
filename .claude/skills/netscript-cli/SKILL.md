@@ -1,6 +1,6 @@
 ---
 name: netscript-cli
-description: NetScript CLI, scaffold, maintainer, plugin, and E2E command guide. Use whenever a task mentions netscript init, netscript-dev, maintainer CLI, scaffold output, generated projects, plugin add/sync/list/doctor, generate plugins/runtime-schemas, DB/service commands, Aspire scaffold validation, full CLI E2E, or OpenHands/Copilot requests to run CLI scaffold suites.
+description: NetScript CLI, scaffold, maintainer, plugin, and E2E command guide. Use whenever a task mentions netscript init, netscript-dev, maintainer CLI, scaffold output, generated projects, plugin install/sync/list/doctor, generate plugins/runtime-schemas, DB/service commands, Aspire scaffold validation, full CLI E2E, or OpenHands/Copilot requests to run CLI scaffold suites.
 ---
 
 # NetScript CLI
@@ -78,14 +78,14 @@ deno run -A packages/cli/bin/netscript-dev.ts init full-test `
   --editor zed `
   --ci --yes --no-git --force
 
-deno run -A packages/cli/bin/netscript-dev.ts plugin add worker --name workers --project-root scaffold/full-test --samples --force
+deno run -A packages/cli/bin/netscript-dev.ts plugin install worker --name workers --project-root scaffold/full-test --samples --force
 
 Push-Location scaffold/full-test
-deno run -A packages/cli/bin/netscript-dev.ts plugin add saga --name sagas --project-root . --samples --force
-deno run -A ..\..\packages\cli\bin\netscript-dev.ts plugin add trigger --name triggers --project-root . --samples --force
+deno run -A packages/cli/bin/netscript-dev.ts plugin install saga --name sagas --project-root . --samples --force
+deno run -A ..\..\packages\cli\bin\netscript-dev.ts plugin install trigger --name triggers --project-root . --samples --force
 Pop-Location
 
-deno run -A packages/cli/bin/netscript-dev.ts plugin add stream --name streams --project-root scaffold/full-test --samples --force
+deno run -A packages/cli/bin/netscript-dev.ts plugin install stream --name streams --project-root scaffold/full-test --samples --force
 
 deno run -A packages/cli/bin/netscript-dev.ts plugin list --project-root scaffold/full-test
 
@@ -117,7 +117,7 @@ deno run -A packages/cli/bin/netscript-dev.ts sync packages --project-root <proj
 deno run -A packages/cli/bin/netscript-dev.ts sync plugin <kind> [name] --project-root <project> --force
 deno run -A packages/cli/bin/netscript-dev.ts sync templates --target-path <project>
 deno run -A packages/cli/bin/netscript-dev.ts test scaffold scaffold.runtime --cleanup --format pretty
-deno run -A packages/cli/bin/netscript-dev.ts plugin add <kind> --name <name> --project-root <project> --force
+deno run -A packages/cli/bin/netscript-dev.ts plugin install <kind> --name <name> --project-root <project> --force
 deno run -A packages/cli/bin/netscript-dev.ts db init --project-root <project> --db <engine> --name init
 deno run -A packages/cli/bin/netscript-dev.ts db generate --project-root <project> --db <engine>
 deno run -A packages/cli/bin/netscript-dev.ts db seed --project-root <project> --db <engine>
@@ -133,7 +133,7 @@ Plugin kinds and conventional names:
 | `trigger` | `triggers`     |
 | `stream`  | `streams`      |
 
-`plugin add` scaffolds/registers plugin workspace wiring. `sync plugin` copies official local plugin
+`plugin install` scaffolds/registers plugin workspace wiring. `sync plugin` copies official local plugin
 implementation sources from the monorepo into an existing scaffold.
 
 ## Source Docs

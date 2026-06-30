@@ -5,8 +5,8 @@ import { FetchJsrPluginValidator } from './fetch-jsr-plugin-validator.ts';
 import type {
   JsrHttpClient,
   JsrHttpResponse,
-} from '../../features/plugins/add/jsr-plugin-validator-port.ts';
-import { resolvePluginPackageSpec } from '../../features/plugins/add/plugin-package-resolver.ts';
+} from '../../features/plugins/install/jsr-plugin-validator-port.ts';
+import { resolvePluginPackageSpec } from '../../features/plugins/install/plugin-package-resolver.ts';
 
 describe('FetchJsrPluginValidator', () => {
   it('returns a validated plugin descriptor for a published NetScript manifest', async () => {

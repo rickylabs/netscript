@@ -8,7 +8,7 @@ import { SCAFFOLD_DIRS } from '../../../../kernel/constants/scaffold/scaffold-di
 import { SCAFFOLD_FILES } from '../../../../kernel/constants/scaffold/scaffold-files.ts';
 import { ScaffoldValidationError } from '../../../../kernel/domain/errors.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
-import type { PluginAddPlan, PluginAddRequest } from '../../../domain/plugin-add-plan.ts';
+import type { PluginInstallPlan, PluginInstallRequest } from '../../../domain/plugin-install-plan.ts';
 
 interface ExistingPluginConfigShape {
   NetScript?: {
@@ -17,8 +17,8 @@ interface ExistingPluginConfigShape {
   };
 }
 
-/** Dependencies used while planning a plugin-add flow. */
-export interface PlanPluginAddDependencies {
+/** Dependencies used while planning a plugin-install flow. */
+export interface PlanPluginInstallDependencies {
   /** Filesystem used to read project metadata. */
   readonly fs: FileSystemPort;
 
@@ -26,11 +26,11 @@ export interface PlanPluginAddDependencies {
   readonly registry?: PluginKindRegistry;
 }
 
-/** Resolve and validate the starter plugin add request. */
-export async function planPluginAdd(
-  request: PluginAddRequest,
-  dependencies: PlanPluginAddDependencies,
-): Promise<PluginAddPlan> {
+/** Resolve and validate the starter plugin install request. */
+export async function planPluginInstall(
+  request: PluginInstallRequest,
+  dependencies: PlanPluginInstallDependencies,
+): Promise<PluginInstallPlan> {
   const registry = dependencies.registry ?? new PluginKindRegistry();
   const kind = parsePluginKind(request.kind, registry);
   const provider = registry.get(kind);
@@ -95,7 +95,7 @@ function resolveSagaStoreBackendOption(
 async function assertPluginNameAvailable(
   projectRoot: string,
   pluginName: string,
-  provider: PluginAddPlan['provider'],
+  provider: PluginInstallPlan['provider'],
   fs: FileSystemPort,
   overwrite: boolean,
 ): Promise<void> {

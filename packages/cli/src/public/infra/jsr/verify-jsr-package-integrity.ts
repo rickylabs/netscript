@@ -1,4 +1,4 @@
-import type { ValidatedPluginDescriptor } from '../../features/plugins/add/jsr-plugin-validator-port.ts';
+import type { ValidatedPluginDescriptor } from '../../features/plugins/install/jsr-plugin-validator-port.ts';
 
 /** Fetcher used to read published package files for integrity verification. */
 export interface JsrPackageFileFetcher {

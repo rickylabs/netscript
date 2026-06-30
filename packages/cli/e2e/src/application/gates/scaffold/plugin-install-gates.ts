@@ -22,14 +22,14 @@ function localPluginDir(kind: PluginKind): string {
   return 'auth';
 }
 
-function pluginAddCommand(
+function pluginInstallCommand(
   kind: PluginKind,
   state: PluginSuiteState,
 ): CommandFactory {
   return (context) => {
     const args = [
       'plugin',
-      'add',
+      'install',
       kind,
       '--name',
       pluginName(kind),
@@ -57,7 +57,7 @@ function pluginAddCommand(
   };
 }
 
-function pluginAddCwd(kind: PluginKind): WorkingDirectoryFactory {
+function pluginInstallCwd(kind: PluginKind): WorkingDirectoryFactory {
   return (context) =>
     kind === PLUGIN.SAGA || kind === PLUGIN.TRIGGER || kind === PLUGIN.AUTH
       ? context.project.projectRoot
@@ -65,14 +65,14 @@ function pluginAddCwd(kind: PluginKind): WorkingDirectoryFactory {
 }
 
 /** Create scaffold gates that install every requested official plugin. */
-export function createPluginAddGates(state: PluginSuiteState): readonly GateDefinition[] {
+export function createPluginInstallGates(state: PluginSuiteState): readonly GateDefinition[] {
   return state.plugins.map((kind) =>
     commandGate(
       `scaffold.plugin.${kind}`,
-      `Add official ${kind} plugin`,
+      `Install official ${kind} plugin`,
       GATE_PHASE.SCAFFOLD,
-      pluginAddCommand(kind, state),
-      pluginAddCwd(kind),
+      pluginInstallCommand(kind, state),
+      pluginInstallCwd(kind),
     )
   );
 }

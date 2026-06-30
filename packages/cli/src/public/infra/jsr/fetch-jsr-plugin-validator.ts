@@ -6,8 +6,8 @@ import type {
   JsrPluginValidationResult,
   JsrPluginValidatorPort,
   JsrVersionMetadata,
-} from '../../features/plugins/add/jsr-plugin-validator-port.ts';
-import type { ResolvedPluginPackageSpec } from '../../features/plugins/add/plugin-package-resolver.ts';
+} from '../../features/plugins/install/jsr-plugin-validator-port.ts';
+import type { ResolvedPluginPackageSpec } from '../../features/plugins/install/plugin-package-resolver.ts';
 
 const JSON_HEADERS: Readonly<Record<string, string>> = Object.freeze({
   Accept: 'application/json',

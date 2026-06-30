@@ -4,7 +4,7 @@ import type { GateDefinition } from '../../../domain/gate-definition.ts';
 import type { RunContext } from '../../../domain/run-context.ts';
 import type { PluginSuiteState } from '../../builders/scaffold/plugin-suite-state.ts';
 import { cli, commandGate } from './gate-factory.ts';
-import { createPluginAddGates } from './plugin-add-gates.ts';
+import { createPluginInstallGates } from './plugin-install-gates.ts';
 
 /** Create preflight gates for required CLI tooling. */
 export function createPreflightGates(): readonly GateDefinition[] {
@@ -79,7 +79,7 @@ export function createScaffoldGates(state: PluginSuiteState): readonly GateDefin
       GATE_PHASE.SCAFFOLD,
       (context) => cli(context, 'contract', 'list', '--path', context.project.projectRoot),
     ),
-    ...createPluginAddGates(state),
+    ...createPluginInstallGates(state),
     commandGate(
       GATE.SCAFFOLD_PLUGIN_LIST,
       'List configured plugins',

@@ -35,7 +35,7 @@ export interface PluginDbFlags {
   readonly noDb?: boolean;
 }
 
-/** Project/package options needed when provisioning a database from plugin add. */
+/** Project/package options needed when provisioning a database from plugin install. */
 export interface PluginDbProvisioningOptions {
   /** Project name used for generated package names and DB resource names. */
   readonly projectName: string;

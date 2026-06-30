@@ -2,17 +2,15 @@ import { join } from '@std/path';
 
 import { provisionDatabaseIfNeeded } from '../../../../kernel/adapters/plugin/db-integration.ts';
 import { PluginRegistryScaffolder } from '../../../../kernel/adapters/plugin/registry-scaffolder.ts';
-import { PluginScaffolder } from '../../../../kernel/adapters/plugin/scaffolder.ts';
 import { SCAFFOLD_DIRS } from '../../../../kernel/constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../../../kernel/constants/scaffold/scaffold-files.ts';
 import { generatePluginServiceContext } from '../../../../kernel/templates/plugins/plugin-generators.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../../../kernel/ports/template-port.ts';
 import type {
-  PluginAddPlan,
-  PluginRenderResult,
+  PluginInstallPlan,
   PluginRenderSupportResult,
-} from '../../../domain/plugin-add-plan.ts';
+} from '../../../domain/plugin-install-plan.ts';
 
 /** Dependencies used to render starter plugin files. */
 export interface RenderPluginDependencies {
@@ -25,42 +23,13 @@ export interface RenderPluginDependencies {
   /** Template renderer used by database provisioning. */
   readonly templateAdapter: TemplatePort;
 
-  /** Starter plugin scaffolder. */
-  readonly pluginScaffolder: PluginScaffolder;
-
   /** Empty plugin registry scaffolder. */
   readonly registryScaffolder: PluginRegistryScaffolder;
 }
 
-/** Render starter plugin workspace files and any required supporting files. */
-export async function renderPlugin(
-  plan: PluginAddPlan,
-  dependencies: RenderPluginDependencies,
-): Promise<PluginRenderResult> {
-  const support = await renderPluginSupport(plan, dependencies, { importMode: 'jsr' });
-  const plugin = await dependencies.pluginScaffolder.scaffold({
-    projectName: plan.projectName,
-    targetPath: plan.projectRoot,
-    kind: plan.kind,
-    pluginName: plan.pluginName,
-    importMode: 'jsr',
-    port: plan.port,
-    serviceReferences: plan.serviceReferences,
-    pluginReferences: plan.pluginReferences,
-    requiresDb: plan.dbDetection.requiresDb,
-    includeSamples: plan.includeSamples,
-    force: plan.overwrite,
-  });
-
-  return {
-    ...support,
-    plugin,
-  };
-}
-
 /** Render CLI-owned plugin workspace support files without rendering plugin artifacts. */
 export async function renderPluginSupport(
-  plan: PluginAddPlan,
+  plan: PluginInstallPlan,
   dependencies: RenderPluginDependencies,
   options: {
     readonly importMode: 'jsr' | 'local';
@@ -97,7 +66,7 @@ export async function renderPluginSupport(
 }
 
 async function ensurePluginRegistry(
-  plan: PluginAddPlan,
+  plan: PluginInstallPlan,
   dependencies: RenderPluginDependencies,
 ): Promise<number> {
   if (!await needsRegistryBootstrap(plan.projectRoot, dependencies.fs)) {

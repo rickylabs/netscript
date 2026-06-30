@@ -1,6 +1,12 @@
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
-import { assertEquals, assertFalse, assertStringIncludes } from 'jsr:@std/assert@^1';
+import {
+  assertEquals,
+  assertFalse,
+  assertRejects,
+  assertStringIncludes,
+} from 'jsr:@std/assert@^1';
 import { join, resolve } from '@std/path';
+import { ScaffoldValidationError } from '../../../../kernel/domain/errors.ts';
 
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
 import { DenoProcess } from '../../../../kernel/adapters/runtime/process/deno-process.ts';
@@ -9,16 +15,15 @@ import { Scaffolder } from '../../../../kernel/adapters/scaffold/scaffolder.ts';
 import { StringTemplateAdapter } from '../../../../kernel/adapters/scaffold/template-adapter.ts';
 import { PluginKindRegistry } from '../../../../kernel/application/registries/plugin-kind-registry.ts';
 import { PluginRegistryScaffolder } from '../../../../kernel/adapters/plugin/registry-scaffolder.ts';
-import { PluginScaffolder } from '../../../../kernel/adapters/plugin/scaffolder.ts';
 import { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/workspace-mutator.ts';
 import type { PluginKindProvider } from '../../../../kernel/domain/plugin-kind.ts';
-import { addPlugin } from './add-plugin.ts';
+import { installPlugin } from './install-plugin.ts';
 import type {
   JsrPluginValidationResult,
   JsrPluginValidatorPort,
   ValidatedPluginDescriptor,
 } from './jsr-plugin-validator-port.ts';
-import { planPluginAdd } from './plan-plugin-add.ts';
+import { planPluginInstall } from './plan-plugin-install.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../kernel/application/registries/template-registry.ts';
 import { dispatchPluginScaffold } from '../dispatch/dispatch-plugin-verb.ts';
 
@@ -152,12 +157,12 @@ const authProvider: PluginKindProvider = {
   infrastructureOptionalDeps: [],
 };
 
-describe('public add plugin flow', () => {
+describe('public install plugin flow', () => {
   it('plans a starter plugin request from project metadata', async () => {
     const fs = new MemoryFileSystemAdapter();
     await writeProjectFiles(fs);
 
-    const plan = await planPluginAdd({
+    const plan = await planPluginInstall({
       kind: 'api',
       pluginName: 'payments',
       serviceReferences: [],
@@ -176,206 +181,77 @@ describe('public add plugin flow', () => {
     assertEquals(plan.dbDetection.requiresDb, false);
   });
 
-  it('writes starter plugin files with JSR imports and updates workspace config', async () => {
+  it('rejects an unresolvable plugin (no JSR/local descriptor) instead of CLI-side rendering', async () => {
     const fs = new MemoryFileSystemAdapter();
     await writeProjectFiles(fs);
     const templateAdapter = new StringTemplateAdapter(fs);
     const scaffolder = new Scaffolder(templateAdapter, fs);
     const registry = new PluginKindRegistry();
 
-    const result = await addPlugin({
-      kind: 'api',
-      pluginName: 'payments',
-      serviceReferences: ['users'],
-      pluginReferences: [],
-      noDb: true,
-      includeSamples: false,
-      projectRoot: '/workspace/alpha',
-      overwrite: false,
-    }, {
-      fs,
-      scaffolder,
-      templateAdapter,
-      registry,
-      pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
-      registryScaffolder: new PluginRegistryScaffolder(scaffolder),
-      workspaceMutator: new PluginWorkspaceMutator(fs),
-      regenerateHelpers: () => Promise.resolve(['/workspace/alpha/aspire/apphost.mts']),
-    });
-
-    const pluginDenoJson = JSON.parse(
-      await fs.readFile('/workspace/alpha/plugins/payments/deno.json'),
+    // `kind: 'api'` does not resolve to a JSR package and no validator/processRunner
+    // is supplied, so the plugin-owned scaffold path cannot run. The command must
+    // throw a typed error rather than silently fall back to CLI-side rendering.
+    const error = await assertRejects(
+      () =>
+        installPlugin({
+          kind: 'api',
+          pluginName: 'payments',
+          serviceReferences: ['users'],
+          pluginReferences: [],
+          noDb: true,
+          includeSamples: false,
+          projectRoot: '/workspace/alpha',
+          overwrite: false,
+        }, {
+          fs,
+          scaffolder,
+          templateAdapter,
+          registry,
+          registryScaffolder: new PluginRegistryScaffolder(scaffolder),
+          workspaceMutator: new PluginWorkspaceMutator(fs),
+          regenerateHelpers: () => Promise.resolve(['/workspace/alpha/aspire/apphost.mts']),
+        }),
+      ScaffoldValidationError,
     );
-    const appsettings = JSON.parse(await fs.readFile('/workspace/alpha/appsettings.json'));
-    const rootDenoJson = JSON.parse(await fs.readFile('/workspace/alpha/deno.json'));
-
-    assertStringIncludes(pluginDenoJson.imports['@netscript/plugin'], 'jsr:@netscript/plugin');
-    assertEquals(appsettings.NetScript.Plugins.payments.ServiceReferences, ['users']);
-    assertEquals(rootDenoJson.workspace.includes('./plugins/*'), true);
-    assertFalse(await fs.exists('/workspace/alpha/plugins/registry.ts'));
-    assertEquals(result.helperFiles.length, 1);
+    assertStringIncludes(error.message, 'process runner');
+    assertFalse(await fs.exists('/workspace/alpha/plugins/payments/deno.json'));
   });
 
-  it('keeps canonical plugin add on the JSR stub path without copying official source', async () => {
+  it('rejects a resolvable plugin when no process runner can dispatch its scaffolder', async () => {
     const fs = new MemoryFileSystemAdapter();
     await writeProjectFiles(fs);
     const templateAdapter = new StringTemplateAdapter(fs);
     const scaffolder = new Scaffolder(templateAdapter, fs);
     const registry = new PluginKindRegistry();
-    registry.register(workerProvider.kind, workerProvider);
 
-    await addPlugin({
-      kind: 'worker',
-      pluginName: 'workers',
-      serviceReferences: [],
-      pluginReferences: [],
-      noDb: true,
-      includeSamples: false,
-      projectRoot: '/workspace/alpha',
-      overwrite: false,
-    }, {
-      fs,
-      scaffolder,
-      templateAdapter,
-      registry,
-      pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
-      registryScaffolder: new PluginRegistryScaffolder(scaffolder),
-      workspaceMutator: new PluginWorkspaceMutator(fs),
-      regenerateHelpers: () => Promise.resolve(['/workspace/alpha/aspire/apphost.mts']),
-    });
-
-    const pluginDenoJson = JSON.parse(
-      await fs.readFile('/workspace/alpha/plugins/workers/deno.json'),
+    // The validator resolves a descriptor, but without a processRunner the
+    // plugin-owned scaffolder cannot be dispatched, so the command must throw.
+    const error = await assertRejects(
+      () =>
+        installPlugin({
+          kind: 'workers',
+          pluginName: 'workers',
+          serviceReferences: [],
+          pluginReferences: [],
+          noDb: true,
+          includeSamples: false,
+          skipConfirmation: true,
+          projectRoot: '/workspace/alpha',
+          overwrite: false,
+        }, {
+          fs,
+          scaffolder,
+          templateAdapter,
+          registry,
+          registryScaffolder: new PluginRegistryScaffolder(scaffolder),
+          workspaceMutator: new PluginWorkspaceMutator(fs),
+          pluginValidator: new FixturePluginValidator(workerProvider),
+          regenerateHelpers: () => Promise.resolve(['/workspace/alpha/aspire/apphost.mts']),
+        }),
+      ScaffoldValidationError,
     );
-    const pluginMod = await fs.readFile('/workspace/alpha/plugins/workers/mod.ts');
-
-    assertStringIncludes(pluginDenoJson.imports['@netscript/plugin'], 'jsr:@netscript/plugin');
-    assertStringIncludes(pluginMod, "import { definePlugin } from '@netscript/plugin';");
-    assertFalse(pluginMod.includes('./src/public/mod.ts'));
-    assertFalse(await fs.exists('/workspace/alpha/plugins/workers/src/public/mod.ts'));
-    assertFalse(await fs.exists('/workspace/alpha/plugins/workers/worker/worker.ts'));
-    assertFalse(await fs.exists('/workspace/alpha/plugins/workers/scaffold.plugin.json'));
-    assertFalse(await fs.exists('/workspace/alpha/workers'));
-  });
-
-  it('resolves a bare plugin alias before kind-registry planning', async () => {
-    const fs = new MemoryFileSystemAdapter();
-    await writeProjectFiles(fs);
-    const templateAdapter = new StringTemplateAdapter(fs);
-    const scaffolder = new Scaffolder(templateAdapter, fs);
-    const registry = new PluginKindRegistry();
-
-    const result = await addPlugin({
-      kind: 'workers',
-      pluginName: 'workers',
-      serviceReferences: [],
-      pluginReferences: [],
-      noDb: true,
-      includeSamples: false,
-      projectRoot: '/workspace/alpha',
-      overwrite: false,
-    }, {
-      fs,
-      scaffolder,
-      templateAdapter,
-      registry,
-      pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
-      registryScaffolder: new PluginRegistryScaffolder(scaffolder),
-      workspaceMutator: new PluginWorkspaceMutator(fs),
-      pluginValidator: new FixturePluginValidator(workerProvider),
-      regenerateHelpers: () => Promise.resolve(['/workspace/alpha/aspire/apphost.mts']),
-    });
-
-    assertEquals(result.resolvedPlugin?.package.packageSpecifier, '@netscript/plugin-workers');
-    assertEquals(result.plugin.kind, 'worker');
-  });
-
-  it('respects --no-copy-source by rendering the JSR stub instead of copying official source', async () => {
-    const fs = new MemoryFileSystemAdapter();
-    await writeProjectFiles(fs);
-    const templateAdapter = new StringTemplateAdapter(fs);
-    const scaffolder = new Scaffolder(templateAdapter, fs);
-    const registry = new PluginKindRegistry();
-    registry.register(workerProvider.kind, workerProvider);
-
-    await addPlugin({
-      kind: 'worker',
-      pluginName: 'workers',
-      serviceReferences: [],
-      pluginReferences: [],
-      noDb: true,
-      includeSamples: false,
-      noCopySource: true,
-      projectRoot: '/workspace/alpha',
-      overwrite: false,
-    }, {
-      fs,
-      scaffolder,
-      templateAdapter,
-      registry,
-      pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
-      registryScaffolder: new PluginRegistryScaffolder(scaffolder),
-      workspaceMutator: new PluginWorkspaceMutator(fs),
-      regenerateHelpers: () => Promise.resolve(['/workspace/alpha/aspire/apphost.mts']),
-    });
-
-    assertFalse(await fs.exists('/workspace/alpha/workers/mod.ts'));
-    const rootDenoJson = JSON.parse(await fs.readFile('/workspace/alpha/deno.json'));
-    assertEquals(rootDenoJson.workspace.includes('./workers'), false);
-    const pluginMod = await fs.readFile('/workspace/alpha/plugins/workers/mod.ts');
-    assertStringIncludes(pluginMod, "import { definePlugin } from '@netscript/plugin';");
-  });
-
-  it('does not register retired copied background workspaces as Deno workspace members', async () => {
-    const fs = new MemoryFileSystemAdapter();
-    await writeProjectFiles(fs);
-    const templateAdapter = new StringTemplateAdapter(fs);
-    const scaffolder = new Scaffolder(templateAdapter, fs);
-    const registry = new PluginKindRegistry();
-    registry.register('worker', {
-      kind: 'worker',
-      displayName: 'Background Worker',
-      category: 'background-processor',
-      portRangeKey: 'INFRA_PLUGIN',
-      defaultPermissions: ['--unstable-kv', '--allow-all'],
-      watchFlag: '--watch',
-      defaultEntrypoint: 'bin/combined.ts',
-      defaultServiceEntrypoint: 'services/src/main.ts',
-      defaultRequiresDb: false,
-      defaultRequiresKv: true,
-      pluginType: 'background-processor',
-      supportsConcurrency: true,
-      concurrencyEnvVar: 'WORKER_CONCURRENCY',
-      defaultConcurrency: 2,
-      defaultTelemetry: true,
-      infrastructureRequires: ['kv'],
-      infrastructureOptionalDeps: [],
-    });
-
-    await addPlugin({
-      kind: 'worker',
-      pluginName: 'workers',
-      serviceReferences: [],
-      pluginReferences: [],
-      noDb: true,
-      includeSamples: false,
-      projectRoot: '/workspace/alpha',
-      overwrite: false,
-    }, {
-      fs,
-      scaffolder,
-      templateAdapter,
-      registry,
-      pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
-      registryScaffolder: new PluginRegistryScaffolder(scaffolder),
-      workspaceMutator: new PluginWorkspaceMutator(fs),
-      regenerateHelpers: () => Promise.resolve(['/workspace/alpha/aspire/apphost.mts']),
-    });
-
-    const rootDenoJson = JSON.parse(await fs.readFile('/workspace/alpha/deno.json'));
-
-    assertEquals(rootDenoJson.workspace.includes('./plugins/*'), true);
-    assertEquals(rootDenoJson.workspace.includes('./workers'), false);
+    assertStringIncludes(error.message, 'process runner');
+    assertFalse(await fs.exists('/workspace/alpha/plugins/workers/mod.ts'));
   });
 
   it('previews a local-path plugin-owned scaffolder without writing files', async () => {
@@ -388,7 +264,7 @@ describe('public add plugin flow', () => {
       const scaffolder = new Scaffolder(templateAdapter, fs);
       const registry = new PluginKindRegistry();
 
-      const result = await addPlugin({
+      const result = await installPlugin({
         kind: 'fixture',
         pluginName: 'fixture',
         serviceReferences: [],
@@ -405,7 +281,6 @@ describe('public add plugin flow', () => {
         scaffolder,
         templateAdapter,
         registry,
-        pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
         registryScaffolder: new PluginRegistryScaffolder(scaffolder),
         workspaceMutator: new PluginWorkspaceMutator(fs),
         processRunner: new DenoProcess(),
@@ -431,7 +306,7 @@ describe('public add plugin flow', () => {
       const scaffolder = new Scaffolder(templateAdapter, fs);
       const registry = new PluginKindRegistry();
 
-      const result = await addPlugin({
+      const result = await installPlugin({
         kind: 'workers',
         pluginName: 'workers',
         serviceReferences: [],
@@ -446,7 +321,6 @@ describe('public add plugin flow', () => {
         scaffolder,
         templateAdapter,
         registry,
-        pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
         registryScaffolder: new PluginRegistryScaffolder(scaffolder),
         workspaceMutator: new PluginWorkspaceMutator(fs),
         processRunner: new DenoProcess(),
@@ -482,7 +356,7 @@ describe('public add plugin flow', () => {
       const scaffolder = new Scaffolder(templateAdapter, fs);
       const registry = new PluginKindRegistry();
 
-      const result = await addPlugin({
+      const result = await installPlugin({
         kind: 'workers',
         pluginName: 'workers',
         serviceReferences: [],
@@ -498,7 +372,6 @@ describe('public add plugin flow', () => {
         scaffolder,
         templateAdapter,
         registry,
-        pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
         registryScaffolder: new PluginRegistryScaffolder(scaffolder),
         workspaceMutator: new PluginWorkspaceMutator(fs),
         processRunner: new DenoProcess(),
@@ -552,7 +425,7 @@ describe('public add plugin flow', () => {
     }
   });
 
-  it('runs the real sagas local-path scaffolder through plugin add', async () => {
+  it('runs the real sagas local-path scaffolder through plugin install', async () => {
     const projectRoot = await Deno.makeTempDir();
     const sagasRoot = resolve('plugins/sagas');
     try {
@@ -562,7 +435,7 @@ describe('public add plugin flow', () => {
       const scaffolder = new Scaffolder(templateAdapter, fs);
       const registry = new PluginKindRegistry();
 
-      const result = await addPlugin({
+      const result = await installPlugin({
         kind: 'sagas',
         pluginName: 'sagas',
         serviceReferences: [],
@@ -578,7 +451,6 @@ describe('public add plugin flow', () => {
         scaffolder,
         templateAdapter,
         registry,
-        pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
         registryScaffolder: new PluginRegistryScaffolder(scaffolder),
         workspaceMutator: new PluginWorkspaceMutator(fs),
         processRunner: new DenoProcess(),
@@ -622,7 +494,7 @@ describe('public add plugin flow', () => {
       const scaffolder = new Scaffolder(templateAdapter, fs);
       const registry = new PluginKindRegistry();
 
-      const result = await addPlugin({
+      const result = await installPlugin({
         kind: 'sagas',
         pluginName: 'sagas',
         serviceReferences: [],
@@ -638,7 +510,6 @@ describe('public add plugin flow', () => {
         scaffolder,
         templateAdapter,
         registry,
-        pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
         registryScaffolder: new PluginRegistryScaffolder(scaffolder),
         workspaceMutator: new PluginWorkspaceMutator(fs),
         processRunner: new DenoProcess(),
@@ -692,7 +563,7 @@ describe('public add plugin flow', () => {
     }
   });
 
-  it('runs the real triggers local-path scaffolder through plugin add', async () => {
+  it('runs the real triggers local-path scaffolder through plugin install', async () => {
     const projectRoot = await Deno.makeTempDir();
     const triggersRoot = resolve('plugins/triggers');
     try {
@@ -702,7 +573,7 @@ describe('public add plugin flow', () => {
       const scaffolder = new Scaffolder(templateAdapter, fs);
       const registry = new PluginKindRegistry();
 
-      const result = await addPlugin({
+      const result = await installPlugin({
         kind: 'triggers',
         pluginName: 'triggers',
         serviceReferences: [],
@@ -717,7 +588,6 @@ describe('public add plugin flow', () => {
         scaffolder,
         templateAdapter,
         registry,
-        pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
         registryScaffolder: new PluginRegistryScaffolder(scaffolder),
         workspaceMutator: new PluginWorkspaceMutator(fs),
         processRunner: new DenoProcess(),
@@ -763,7 +633,7 @@ describe('public add plugin flow', () => {
       const scaffolder = new Scaffolder(templateAdapter, fs);
       const registry = new PluginKindRegistry();
 
-      const result = await addPlugin({
+      const result = await installPlugin({
         kind: 'triggers',
         pluginName: 'triggers',
         serviceReferences: [],
@@ -779,7 +649,6 @@ describe('public add plugin flow', () => {
         scaffolder,
         templateAdapter,
         registry,
-        pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
         registryScaffolder: new PluginRegistryScaffolder(scaffolder),
         workspaceMutator: new PluginWorkspaceMutator(fs),
         processRunner: new DenoProcess(),
@@ -833,7 +702,7 @@ describe('public add plugin flow', () => {
     }
   });
 
-  it('runs the real streams local-path scaffolder through plugin add', async () => {
+  it('runs the real streams local-path scaffolder through plugin install', async () => {
     const projectRoot = await Deno.makeTempDir();
     const streamsRoot = resolve('plugins/streams');
     try {
@@ -843,7 +712,7 @@ describe('public add plugin flow', () => {
       const scaffolder = new Scaffolder(templateAdapter, fs);
       const registry = new PluginKindRegistry();
 
-      const result = await addPlugin({
+      const result = await installPlugin({
         kind: 'streams',
         pluginName: 'streams',
         serviceReferences: [],
@@ -858,7 +727,6 @@ describe('public add plugin flow', () => {
         scaffolder,
         templateAdapter,
         registry,
-        pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
         registryScaffolder: new PluginRegistryScaffolder(scaffolder),
         workspaceMutator: new PluginWorkspaceMutator(fs),
         processRunner: new DenoProcess(),
@@ -902,7 +770,7 @@ describe('public add plugin flow', () => {
       const scaffolder = new Scaffolder(templateAdapter, fs);
       const registry = new PluginKindRegistry();
 
-      const result = await addPlugin({
+      const result = await installPlugin({
         kind: 'streams',
         pluginName: 'streams',
         serviceReferences: [],
@@ -918,7 +786,6 @@ describe('public add plugin flow', () => {
         scaffolder,
         templateAdapter,
         registry,
-        pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
         registryScaffolder: new PluginRegistryScaffolder(scaffolder),
         workspaceMutator: new PluginWorkspaceMutator(fs),
         processRunner: new DenoProcess(),
@@ -974,7 +841,7 @@ describe('public add plugin flow', () => {
     }
   });
 
-  it('runs the real auth local-path scaffolder through plugin add', async () => {
+  it('runs the real auth local-path scaffolder through plugin install', async () => {
     const projectRoot = await Deno.makeTempDir();
     const authRoot = resolve('plugins/auth');
     try {
@@ -984,7 +851,7 @@ describe('public add plugin flow', () => {
       const scaffolder = new Scaffolder(templateAdapter, fs);
       const registry = new PluginKindRegistry();
 
-      const result = await addPlugin({
+      const result = await installPlugin({
         kind: 'auth',
         pluginName: 'auth',
         serviceReferences: [],
@@ -999,7 +866,6 @@ describe('public add plugin flow', () => {
         scaffolder,
         templateAdapter,
         registry,
-        pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
         registryScaffolder: new PluginRegistryScaffolder(scaffolder),
         workspaceMutator: new PluginWorkspaceMutator(fs),
         processRunner: new DenoProcess(),
@@ -1043,7 +909,7 @@ describe('public add plugin flow', () => {
       const scaffolder = new Scaffolder(templateAdapter, fs);
       const registry = new PluginKindRegistry();
 
-      const result = await addPlugin({
+      const result = await installPlugin({
         kind: 'auth',
         pluginName: 'auth',
         serviceReferences: [],
@@ -1059,7 +925,6 @@ describe('public add plugin flow', () => {
         scaffolder,
         templateAdapter,
         registry,
-        pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
         registryScaffolder: new PluginRegistryScaffolder(scaffolder),
         workspaceMutator: new PluginWorkspaceMutator(fs),
         processRunner: new DenoProcess(),

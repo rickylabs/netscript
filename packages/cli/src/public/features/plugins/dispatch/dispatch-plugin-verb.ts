@@ -2,7 +2,7 @@ import { RemoteError } from '../../../../kernel/domain/errors/cli-exit-error.ts'
 import type { ProcessPort } from '../../../../kernel/ports/process-port.ts';
 import type { ScaffoldResult } from '@netscript/plugin/protocol';
 import { EXIT_CODES } from '../host/plugin-loader.ts';
-import type { ValidatedPluginDescriptor } from '../add/jsr-plugin-validator-port.ts';
+import type { ValidatedPluginDescriptor } from '../install/jsr-plugin-validator-port.ts';
 import {
   type JsrPackageFileFetcher,
   verifyJsrPackageIntegrity,
@@ -11,7 +11,7 @@ import type { PluginDispatchPort, PluginDispatchResult } from './plugin-dispatch
 
 /** Framework-owned plugin verbs. */
 export const FRAMEWORK_VERBS = [
-  'add',
+  'install',
   'remove',
   'enable',
   'disable',

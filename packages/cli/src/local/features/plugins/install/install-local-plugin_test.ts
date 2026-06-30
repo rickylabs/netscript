@@ -10,7 +10,7 @@ import { PluginRegistryScaffolder } from '../../../../kernel/adapters/plugin/reg
 import { PluginScaffolder } from '../../../../kernel/adapters/plugin/scaffolder.ts';
 import { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/workspace-mutator.ts';
 import type { PluginKindProvider } from '../../../../kernel/domain/plugin-kind.ts';
-import { addLocalPlugin, resolveOfficialPluginSourceRoot } from './add-local-plugin.ts';
+import { installLocalPlugin, resolveOfficialPluginSourceRoot } from './install-local-plugin.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../kernel/application/registries/template-registry.ts';
 
 // This flow renders plugin/workspace files via sync template generators, which
@@ -44,7 +44,7 @@ const workerProvider: PluginKindProvider = {
   infrastructureOptionalDeps: ['db'],
 };
 
-describe('local contributor add plugin flow', () => {
+describe('local contributor install plugin flow', () => {
   it('writes starter plugin files with local imports for non-canonical plugin names', async () => {
     const fs = new MemoryFileSystemAdapter();
     await writeProjectFiles(fs);
@@ -53,7 +53,7 @@ describe('local contributor add plugin flow', () => {
     const registry = new PluginKindRegistry();
     registry.register(workerProvider.kind, workerProvider);
 
-    const result = await addLocalPlugin({
+    const result = await installLocalPlugin({
       kind: 'worker',
       pluginName: 'worker',
       serviceReferences: [],
@@ -93,7 +93,7 @@ describe('local contributor add plugin flow', () => {
     const registry = new PluginKindRegistry();
     registry.register(workerProvider.kind, workerProvider);
 
-    const result = await addLocalPlugin({
+    const result = await installLocalPlugin({
       kind: 'worker',
       pluginName: 'workers',
       serviceReferences: [],
@@ -134,7 +134,7 @@ describe('local contributor add plugin flow', () => {
     const registry = new PluginKindRegistry();
     registry.register(workerProvider.kind, workerProvider);
 
-    const result = await addLocalPlugin({
+    const result = await installLocalPlugin({
       kind: 'worker',
       pluginName: 'workers',
       serviceReferences: [],

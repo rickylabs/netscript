@@ -34,7 +34,7 @@ export interface OfficialPluginDependency {
   readonly permissions: readonly string[];
 }
 
-/** Source mode accepted by `netscript plugin add --source`. */
+/** Source mode accepted by `netscript plugin install --source`. */
 export type PluginSourceMode = 'auto' | 'starter' | 'local';
 
 /** Result of copying an official plugin implementation. */

@@ -1,5 +1,5 @@
 import { dirname, join, relative, resolve } from '@std/path';
-import type { AddLocalPluginDependencies } from './add-local-plugin.ts';
+import type { InstallLocalPluginDependencies } from './install-local-plugin.ts';
 import { SCAFFOLD_DIRS } from '../../../../kernel/constants/scaffold/scaffold-dirs.ts';
 import type { ScaffolderPort } from '../../../../kernel/ports/template-port.ts';
 import { generatePluginServiceContext } from '../../../../kernel/templates/plugins/plugin-generators.ts';
@@ -43,7 +43,7 @@ export async function ensurePluginServiceContext(
 /** Find the contributor checkout without selecting the generated project itself. */
 export async function resolveOfficialPluginSourceRoot(
   projectRoot: string,
-  dependencies: AddLocalPluginDependencies,
+  dependencies: InstallLocalPluginDependencies,
 ): Promise<string | null> {
   const findSourceRoot = dependencies.findSourceRoot ?? findOfficialPluginSourceRoot;
   const normalizedProjectRoot = normalizePath(projectRoot);
