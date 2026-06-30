@@ -62,7 +62,7 @@ export default async function createSagasService(
     env: { ...Deno.env.toObject(), ...ctx.env },
     appsettings: serviceAppsettings(ctx),
   });
-  let dbClient: SagaServiceDatabaseClient = unavailableSagaDatabaseClient;
+  let dbClient: SagaServiceDatabaseClient = emptySagaDatabaseClient;
   let sagaRuntime: SagaRuntime | undefined;
   let durableRuntime: DurableSagaRuntime | undefined;
 
@@ -125,19 +125,27 @@ export default async function createSagasService(
   return service;
 }
 
-const unavailableSagaDatabaseClient: SagaServiceDatabaseClient = Object.freeze({
+const emptySagaDatabaseClient: SagaServiceDatabaseClient = Object.freeze({
   sagaInstance: Object.freeze({
-    findMany: rejectUnavailableDatabase,
-    count: rejectUnavailableDatabase,
+    findMany: listNoSagaInstances,
+    count: countNoSagaRows,
   }),
   sagaExecutionHistory: Object.freeze({
-    findMany: rejectUnavailableDatabase,
-    count: rejectUnavailableDatabase,
+    findMany: listNoSagaHistory,
+    count: countNoSagaRows,
   }),
 });
 
-function rejectUnavailableDatabase(): Promise<never> {
-  return Promise.reject(new Error('Sagas database client is not ready yet.'));
+function listNoSagaInstances(): Promise<[]> {
+  return Promise.resolve([]);
+}
+
+function listNoSagaHistory(): Promise<[]> {
+  return Promise.resolve([]);
+}
+
+function countNoSagaRows(): Promise<0> {
+  return Promise.resolve(0);
 }
 
 function assertServiceDatabaseClient(value: unknown): asserts value is ServiceDatabaseClient {
