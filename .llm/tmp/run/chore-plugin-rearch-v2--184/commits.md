@@ -5,3 +5,4 @@
 - baec0909: feat(cli): generate dual-tier plugins
 - f7fb8493: feat(workers): conform plugin manifest and router assembly
 - 36271e86: feat(sagas): conform plugin manifest and router assembly
+- 265e08ec: feat(streams): conform proxy manifest surface

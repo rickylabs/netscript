@@ -157,3 +157,31 @@ Gate results:
   `feat/triggers-feature-backing`.
 - Action: did not touch `plugins/triggers` or `packages/plugin-triggers-core`; proceeding to streams
   until the supervisor explicitly steers back to the post-#181 rebase + route re-verification.
+
+### S-conform-streams
+
+- Scope: streams proxy connector conformance.
+- Commit: `265e08ec` (`feat(streams): conform proxy manifest surface`).
+
+Implemented:
+
+- Deleted `StreamsPluginManifest` and local contribution mirror types.
+- Collapsed `streamsPlugin` to the `PluginManifest` returned by `definePlugin().build()`.
+- Kept standalone `defineStreamTopic`, `defineStreamProducer`, and `defineStreamConsumer` exports.
+- Repointed the workers manifest consumer to standalone `defineStreamTopic`.
+- Removed helper-key expectations from streams manifest verification/tests.
+- Set `capabilities.hasRoutes` to `false` in `scaffold.plugin.json` and README.
+
+Gate results:
+
+| Gate | Command | Result |
+|---|---|---|
+| authority grep | `rg "StreamsPluginManifest" plugins packages -n` | PASS — 0 hits |
+| scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/streams --root plugins/workers --ext ts,tsx` | PASS — 116 files, 0 diagnostics |
+| scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root plugins/streams --root plugins/workers --ext ts,tsx` | PASS — 116 files, 0 diagnostics |
+| scoped fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/streams --root plugins/workers --ext ts,tsx` | PASS — 116 files, 0 findings |
+| streams tests | `cd plugins/streams && rtk proxy deno task test` | PASS — 12 passed, 0 failed |
+| workers tests | `cd plugins/workers && rtk proxy deno task test` | PASS — 16 passed, 0 failed |
+| streams publish | `cd plugins/streams && rtk proxy deno task publish:dry-run` | PASS — dry run complete, no slow-type warnings |
+| workers publish | `cd plugins/workers && rtk proxy deno task publish:dry-run` | PASS — dry run complete; existing dynamic-import warnings remain |
+| arch check | `rtk proxy deno task arch:check` | PASS exit 0 — `FAIL=0`; existing WARN/INFO doctrine findings remain |
