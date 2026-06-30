@@ -469,6 +469,28 @@ export const freshUiRegistryManifest: RegistryManifest = {
       css: [{ layer: 'components', content: "@import './ui/citation-chip.css';" }],
     },
     {
+      name: 'code-block',
+      kind: 'component',
+      layer: 2,
+      description:
+        'Fenced code surface with filename/language header and a copy affordance for assistant messages.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['code', 'ai', 'primitive'],
+      files: [
+        {
+          source: 'registry/components/ui/code-block.tsx',
+          target: '@ui/code-block.tsx',
+        },
+        {
+          source: 'registry/components/ui/code-block.css',
+          target: '@assets/ui/code-block.css',
+        },
+      ],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/code-block.css';" }],
+    },
+    {
       name: 'separator',
       kind: 'component',
       layer: 2,
