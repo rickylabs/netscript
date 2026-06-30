@@ -24,6 +24,101 @@ describe('FetchJsrPluginValidator', () => {
     }
   });
 
+  it('resolves the semver-greatest prerelease when JSR latest is null', async () => {
+    const fixtures = validFixtures();
+    fixtures.set('https://jsr.io/@netscript/plugin-workers/meta.json', {
+      status: 200,
+      body: {
+        latest: null,
+        versions: {
+          '0.0.1-alpha.2': {},
+          '0.0.1-alpha.9': {},
+          '0.0.1-alpha.12': {},
+        },
+      },
+    });
+    const validator = new FetchJsrPluginValidator(new FixtureHttpClient(fixtures));
+
+    const result = await validator.validate(resolvePluginPackageSpec('workers'));
+
+    assertEquals(result.ok, true);
+    if (result.ok) {
+      assertEquals(result.descriptor.version, '0.0.1-alpha.12');
+      assertEquals(result.descriptor.manifest.version, '0.0.1-alpha.12');
+      assertEquals(result.descriptor.versionMetadata.files['/scaffold.plugin.json'], 'sha256-good');
+    }
+  });
+
+  it('skips yanked versions when falling back from null latest', async () => {
+    const fixtures = validFixtures();
+    fixtures.set('https://jsr.io/@netscript/plugin-workers/meta.json', {
+      status: 200,
+      body: {
+        latest: null,
+        versions: {
+          '0.0.1-alpha.2': {},
+          '0.0.1-alpha.9': {},
+          '0.0.1-alpha.12': { yanked: true },
+        },
+      },
+    });
+    fixtures.set('https://jsr.io/@netscript/plugin-workers/0.0.1-alpha.9_meta.json', {
+      status: 200,
+      body: {
+        exports: {
+          '.': './mod.ts',
+          './scaffold': './src/scaffold/mod.ts',
+        },
+        manifest: {
+          '/mod.ts': { checksum: 'sha256-mod' },
+          '/scaffold.plugin.json': { checksum: 'sha256-alpha9' },
+        },
+      },
+    });
+    fixtures.set('https://jsr.io/@netscript/plugin-workers/0.0.1-alpha.9/scaffold.plugin.json', {
+      status: 200,
+      body: {
+        ...validPluginManifest(),
+        version: '0.0.1-alpha.9',
+      },
+    });
+    const validator = new FetchJsrPluginValidator(new FixtureHttpClient(fixtures));
+
+    const result = await validator.validate(resolvePluginPackageSpec('workers'));
+
+    assertEquals(result.ok, true);
+    if (result.ok) {
+      assertEquals(result.descriptor.version, '0.0.1-alpha.9');
+      assertEquals(result.descriptor.manifest.version, '0.0.1-alpha.9');
+      assertEquals(result.descriptor.versionMetadata.files['/scaffold.plugin.json'], 'sha256-alpha9');
+    }
+  });
+
+  it('reports invalid metadata when no non-yanked version is installable', async () => {
+    const fixtures = validFixtures();
+    fixtures.set('https://jsr.io/@netscript/plugin-workers/meta.json', {
+      status: 200,
+      body: {
+        latest: null,
+        versions: {
+          '0.0.1-alpha.2': { yanked: true },
+          '0.0.1-alpha.9': { yanked: true },
+        },
+      },
+    });
+    const validator = new FetchJsrPluginValidator(new FixtureHttpClient(fixtures));
+
+    const result = await validator.validate(resolvePluginPackageSpec('workers'));
+
+    assertEquals(result, {
+      ok: false,
+      error: {
+        code: 'invalid-metadata',
+        message: 'JSR package metadata for @netscript/plugin-workers is invalid.',
+      },
+    });
+  });
+
   it('reports missing JSR packages as not found', async () => {
     const fixtures = validFixtures();
     fixtures.set('https://jsr.io/@netscript/plugin-workers/meta.json', {
@@ -69,7 +164,7 @@ describe('FetchJsrPluginValidator', () => {
 
   it('reports packages that do not publish scaffold.plugin.json', async () => {
     const fixtures = validFixtures();
-    fixtures.set('https://jsr.io/@netscript/plugin-workers@0.0.1-alpha.12/scaffold.plugin.json', {
+    fixtures.set('https://jsr.io/@netscript/plugin-workers/0.0.1-alpha.12/scaffold.plugin.json', {
       status: 404,
       body: {},
     });
@@ -88,7 +183,7 @@ describe('FetchJsrPluginValidator', () => {
 
   it('reports invalid plugin manifests without executing package code', async () => {
     const fixtures = validFixtures();
-    fixtures.set('https://jsr.io/@netscript/plugin-workers@0.0.1-alpha.12/scaffold.plugin.json', {
+    fixtures.set('https://jsr.io/@netscript/plugin-workers/0.0.1-alpha.12/scaffold.plugin.json', {
       status: 200,
       body: { schemaVersion: 1, name: '@netscript/plugin-workers' },
     });
@@ -164,7 +259,7 @@ function validFixtures(): Map<string, FixtureResponse> {
       },
     ],
     [
-      'https://jsr.io/@netscript/plugin-workers@0.0.1-alpha.12/scaffold.plugin.json',
+      'https://jsr.io/@netscript/plugin-workers/0.0.1-alpha.12/scaffold.plugin.json',
       {
         status: 200,
         body: validPluginManifest(),

@@ -143,7 +143,7 @@ describe('plugin scaffold dispatch', () => {
     }
   });
 
-  it('builds deno x argv with confined flags for third-party JSR scaffolders', async () => {
+  it('builds deno run argv with confined flags for third-party JSR scaffolders', async () => {
     const processRunner = new RecordingProcess(
       0,
       '',
@@ -157,7 +157,7 @@ describe('plugin scaffold dispatch', () => {
 
     await dispatchPluginScaffold({
       descriptor: thirdPartyDescriptor(await checksumBytes(new TextEncoder().encode('mod'))),
-      source: { kind: 'jsr', specifier: 'jsr:@acme/plugin-fixture' },
+      source: { kind: 'jsr', specifier: 'jsr:@acme/plugin-fixture@1.0.0' },
       projectRoot: '/workspace/app',
       pluginName: 'fixture',
       dryRun: false,
@@ -174,12 +174,12 @@ describe('plugin scaffold dispatch', () => {
     assertEquals(processRunner.commands[0], {
       command: 'deno',
       args: [
-        'x',
+        'run',
         '--allow-read=/workspace/app',
         '--allow-write=/workspace/app/plugins/fixture',
         '--deny-net',
         '--deny-run',
-        'jsr:@acme/plugin-fixture/scaffold',
+        'jsr:@acme/plugin-fixture@1.0.0/scaffold',
         '--context-json',
         '{"workspaceRoot":"/workspace/app","options":{"pluginName":"fixture"},"dryRun":false}',
       ],
@@ -277,13 +277,13 @@ async function checksumBytes(bytes: Uint8Array): Promise<string> {
   const input = new ArrayBuffer(bytes.byteLength);
   new Uint8Array(input).set(bytes);
   const digest = await crypto.subtle.digest('SHA-256', input);
-  return `sha256-${base64(new Uint8Array(digest))}`;
+  return `sha256-${hex(new Uint8Array(digest))}`;
 }
 
-function base64(bytes: Uint8Array): string {
-  let binary = '';
+function hex(bytes: Uint8Array): string {
+  let output = '';
   for (const byte of bytes) {
-    binary += String.fromCharCode(byte);
+    output += byte.toString(16).padStart(2, '0');
   }
-  return btoa(binary);
+  return output;
 }
