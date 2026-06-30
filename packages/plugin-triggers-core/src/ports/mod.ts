@@ -5,6 +5,10 @@ export type { TriggerClockPort } from './trigger-clock-port.ts';
 export type { TriggerDlqEntry, TriggerDlqListOptions, TriggerDlqPort } from './trigger-dlq-port.ts';
 export type { TriggerEventListOptions, TriggerEventStorePort } from './trigger-event-store-port.ts';
 export type {
+  TriggerEnabledStateOverride,
+  TriggerEnabledStatePort,
+} from './trigger-enabled-state-port.ts';
+export type {
   TriggerIdempotencyClaim,
   TriggerIdempotencyKeyInput,
   TriggerIdempotencyPort,

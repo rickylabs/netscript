@@ -3,6 +3,7 @@
 export { InlineTriggerProcessor } from './inline-trigger-processor.ts';
 export { DenoKvTriggerEventStoreDouble } from './deno-kv-trigger-event-store-double.ts';
 export { MemoryFileWatcherAdapter } from './memory-file-watcher-adapter.ts';
+export { MemoryTriggerEnabledStateStore } from './memory-trigger-enabled-state-store.ts';
 export { MemoryTriggerEventStore } from './memory-trigger-event-store.ts';
 export { MemoryTriggerIdempotencyStore } from './memory-trigger-idempotency-store.ts';
 export { MemoryTriggerSchedulerAdapter } from './memory-trigger-scheduler-adapter.ts';
@@ -18,6 +19,8 @@ export type {
   ProcessableTriggerDefinition,
   ScheduledTriggerHandle,
   TriggerClockPort,
+  TriggerEnabledStateOverride,
+  TriggerEnabledStatePort,
   TriggerEventListOptions,
   TriggerEventStorePort,
   TriggerIdempotencyClaim,

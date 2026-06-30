@@ -1,6 +1,11 @@
 /** @module @netscript/plugin-triggers-core/stores */
 
 export {
+  createKvTriggerEnabledStateStore,
+  KvTriggerEnabledStateStore,
+} from './kv-trigger-enabled-state-store.ts';
+export type { KvTriggerEnabledStateStoreOptions } from './kv-trigger-enabled-state-store.ts';
+export {
   KvTriggerDlqStore,
   KvTriggerEventStore,
   KvTriggerIdempotencyStore,
@@ -11,6 +16,8 @@ export type {
   TriggerDlqEntry,
   TriggerDlqListOptions,
   TriggerDlqPort,
+  TriggerEnabledStateOverride,
+  TriggerEnabledStatePort,
   TriggerEventListOptions,
   TriggerEventStorePort,
   TriggerIdempotencyClaim,

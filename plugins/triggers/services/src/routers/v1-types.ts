@@ -12,6 +12,7 @@
 
 import type {
   ProcessableTriggerDefinition,
+  TriggerEnabledStatePort,
   TriggerEventStorePort,
   TriggerIngressPort,
 } from '@netscript/plugin-triggers-core/ports';
@@ -29,6 +30,8 @@ export type TriggerServiceContext = Readonly<{
   definitions: readonly ProcessableTriggerDefinition[];
   /** Persistent trigger event store (read paths for list/get events). */
   eventStore: TriggerEventStorePort;
+  /** Persistent enabled-state override store for enable/disable routes. */
+  enabledState: TriggerEnabledStatePort;
   /** Fast ack-then-process ingress boundary (raw webhook route). */
   ingress: TriggerIngressPort;
 }>;

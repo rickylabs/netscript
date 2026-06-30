@@ -2,14 +2,12 @@
  * Triggers v1 contract handler map.
  *
  * Assembles all 11 routes of the triggers v1 contract, contract-bound and
- * precisely typed per route. Six routes are backed by real runtime state
- * (`describe`, `listTriggers`, `getTrigger`, `listEvents`, `getEvent`); the
- * remaining six mutating/streaming routes (`fireTrigger`, `testWebhook`,
- * `previewSchedule`, `enableTrigger`, `disableTrigger`, `subscribeEvents`) have
- * no sound backing yet and defer by throwing with a clear "pending triggers-core
- * runtime backing" message. oRPC maps an uncaught throw to a generic `500`
- * server error, so callers receive a server-error response without the connector
- * inventing a NOT_IMPLEMENTED code or fabricating backing. (The triggers contract
+ * precisely typed per route. Introspection, event reads, webhook ingress, and
+ * enable/disable state are backed by real runtime state. Remaining mutating and
+ * streaming routes defer by throwing with a clear "pending triggers-core runtime
+ * backing" message. oRPC maps an uncaught throw to a generic `500` server error,
+ * so callers receive a server-error response without the connector inventing a
+ * NOT_IMPLEMENTED code or fabricating backing. (The triggers contract
  * erases its typed `errors` map through a sanctioned `as unknown` cast in
  * `@netscript/plugin-triggers-core`, so the typed `errors.INTERNAL(...)`
  * constructor is not available in handlers — only the centralized `notFound`
@@ -35,6 +33,7 @@ import type {
 } from '@netscript/plugin-triggers-core/domain';
 import { notFound } from '@netscript/contracts';
 import { router, type TriggersHandlers } from './router-context.ts';
+import type { TriggerServiceContext } from './v1-types.ts';
 
 /** Message used by every route that defers to its pending triggers-core backing. */
 const PENDING_BACKING_MESSAGE =
@@ -94,10 +93,11 @@ export const triggersV1: TriggersHandlers<TriggersV1RouteKey> = {
   /** Mandatory base seam `describe` route. */
   describe: router.describe.handler(() => triggersCapabilities),
 
-  listTriggers: router.listTriggers.handler(({ input, context }) => {
-    const matched = filterDefinitions(context.definitions, input);
-    const responses = matched
-      .map(toTriggerDefinitionResponse)
+  listTriggers: router.listTriggers.handler(async ({ input, context }) => {
+    const matched = await filterDefinitions(context.definitions, input, context.enabledState);
+    const responses = (await Promise.all(
+      matched.map((definition) => toTriggerDefinitionResponse(definition, context.enabledState)),
+    ))
       .filter((response): response is TriggerDefinitionResponseValue => response !== undefined);
     const page = responses.slice(input.offset, input.offset + input.limit);
     return {
@@ -108,12 +108,12 @@ export const triggersV1: TriggersHandlers<TriggersV1RouteKey> = {
     };
   }),
 
-  getTrigger: router.getTrigger.handler(({ input, errors, path, context }) => {
+  getTrigger: router.getTrigger.handler(async ({ input, errors, path, context }) => {
     const definition = context.definitions.find((candidate) => candidate.id === input.id);
     if (definition === undefined) {
       notFound({ errors, path, resourceId: input.id });
     }
-    const response = toTriggerDefinitionResponse(definition);
+    const response = await toTriggerDefinitionResponse(definition, context.enabledState);
     if (response === undefined) {
       throw new Error(`Trigger ${input.id} has an unrepresentable kind.`);
     }
@@ -173,12 +173,30 @@ export const triggersV1: TriggersHandlers<TriggersV1RouteKey> = {
     throw new Error(PENDING_BACKING_MESSAGE);
   }),
 
-  enableTrigger: router.enableTrigger.handler(() => {
-    throw new Error(PENDING_BACKING_MESSAGE);
+  enableTrigger: router.enableTrigger.handler(async ({ input, errors, path, context }) => {
+    const definition = context.definitions.find((candidate) => candidate.id === input.id);
+    if (definition === undefined) {
+      notFound({ errors, path, resourceId: input.id });
+    }
+    await context.enabledState.setEnabled(definition.id, true);
+    const response = await toTriggerDefinitionResponse(definition, context.enabledState);
+    if (response === undefined) {
+      throw new Error(`Trigger ${input.id} has an unrepresentable kind.`);
+    }
+    return response;
   }),
 
-  disableTrigger: router.disableTrigger.handler(() => {
-    throw new Error(PENDING_BACKING_MESSAGE);
+  disableTrigger: router.disableTrigger.handler(async ({ input, errors, path, context }) => {
+    const definition = context.definitions.find((candidate) => candidate.id === input.id);
+    if (definition === undefined) {
+      notFound({ errors, path, resourceId: input.id });
+    }
+    await context.enabledState.setEnabled(definition.id, false);
+    const response = await toTriggerDefinitionResponse(definition, context.enabledState);
+    if (response === undefined) {
+      throw new Error(`Trigger ${input.id} has an unrepresentable kind.`);
+    }
+    return response;
   }),
 
   // The streaming route still satisfies the `eventIterator` return type by being
@@ -196,18 +214,24 @@ export const triggersV1: TriggersHandlers<TriggersV1RouteKey> = {
 /** Filter loaded definitions by the contract's trigger list query. */
 function filterDefinitions(
   definitions: readonly ProcessableTriggerDefinition[],
-  input: Readonly<{ kind?: TriggerContractKind | null; tags?: string }>,
-): readonly ProcessableTriggerDefinition[] {
+  input: Readonly<{ kind?: TriggerContractKind | null; tags?: string; enabled?: boolean }>,
+  enabledState: TriggerServiceContext['enabledState'],
+): Promise<readonly ProcessableTriggerDefinition[]> {
   const requestedTags = input.tags
     ? input.tags.split(',').map((tag) => tag.trim()).filter((tag) => tag.length > 0)
     : [];
-  return definitions.filter((definition) => {
+  return filterDefinitionsAsync(definitions, async (definition) => {
     if (input.kind != null && definition.kind !== input.kind) {
       return false;
     }
     if (
       requestedTags.length > 0 &&
       !requestedTags.every((tag) => (definition.tags ?? []).includes(tag))
+    ) {
+      return false;
+    }
+    if (
+      input.enabled !== undefined && await enabledState.isEnabled(definition.id) !== input.enabled
     ) {
       return false;
     }
@@ -228,23 +252,45 @@ function filterDefinitions(
  */
 function toTriggerDefinitionResponse(
   definition: ProcessableTriggerDefinition,
-): TriggerDefinitionResponseValue | undefined {
+  enabledState: TriggerServiceContext['enabledState'],
+): Promise<TriggerDefinitionResponseValue | undefined> {
   const kind = toContractKind(definition.kind);
   if (kind === undefined) {
-    return undefined;
+    return Promise.resolve(undefined);
   }
+  return toTriggerDefinitionResponseValue(definition, kind, enabledState);
+}
+
+async function toTriggerDefinitionResponseValue(
+  definition: ProcessableTriggerDefinition,
+  kind: TriggerContractKind,
+  enabledState: TriggerServiceContext['enabledState'],
+): Promise<TriggerDefinitionResponseValue> {
   return {
     id: definition.id,
     kind,
     name: definition.name,
     description: definition.description,
-    enabled: true,
+    enabled: await enabledState.isEnabled(definition.id),
     durabilityTier: definition.durability,
     // The contract response declares `tags?: string[]` (mutable); the domain
     // definition carries `readonly string[]`. Spread into a fresh mutable array
     // to satisfy the contract output type without weakening the domain type.
     tags: definition.tags === undefined ? undefined : [...definition.tags],
   };
+}
+
+async function filterDefinitionsAsync(
+  definitions: readonly ProcessableTriggerDefinition[],
+  predicate: (definition: ProcessableTriggerDefinition) => Promise<boolean>,
+): Promise<readonly ProcessableTriggerDefinition[]> {
+  const matched: ProcessableTriggerDefinition[] = [];
+  for (const definition of definitions) {
+    if (await predicate(definition)) {
+      matched.push(definition);
+    }
+  }
+  return matched;
 }
 
 /**

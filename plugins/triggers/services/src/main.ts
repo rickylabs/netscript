@@ -27,7 +27,11 @@ import {
   HmacSha256WebhookVerifier,
   MemoryWebhookVerifier,
 } from '@netscript/plugin-triggers-core/adapters';
-import { KvTriggerEventStore, openTriggerRuntimeKv } from '@netscript/plugin-triggers-core/stores';
+import {
+  createKvTriggerEnabledStateStore,
+  KvTriggerEventStore,
+  openTriggerRuntimeKv,
+} from '@netscript/plugin-triggers-core/stores';
 import { TriggersError } from '@netscript/plugin-triggers-core/domain';
 import type {
   TriggerEvent,
@@ -37,6 +41,7 @@ import type {
 } from '@netscript/plugin-triggers-core/domain';
 import type {
   ProcessableTriggerDefinition,
+  TriggerEnabledStatePort,
   TriggerEventListOptions,
   TriggerEventStorePort,
   TriggerIngressPort,
@@ -135,6 +140,8 @@ export type TriggersServiceOptions = Readonly<{
   definitions?: readonly ProcessableTriggerDefinition[];
   /** Event store; defaults to a KV-backed store. */
   eventStore?: TriggerEventStorePort;
+  /** Enabled-state store; defaults to a KV-backed override store. */
+  enabledState?: TriggerEnabledStatePort;
   /** Trigger processor backing the ingress; defaults to the runtime processor. */
   processor?: TriggerProcessorPort;
   /** Pre-opened KV adapter; defaults to the runtime KV. */
@@ -150,10 +157,13 @@ export async function createTriggersServiceContext(
   // when both are supplied no KV is needed. Resolving to a concrete `KvStore`
   // when needed keeps the store constructor cast-free.
   const definitions = options.definitions ?? await loadProjectTriggerDefinitions();
-  const needsKv = options.eventStore === undefined || options.processor === undefined;
+  const needsKv = options.eventStore === undefined || options.enabledState === undefined ||
+    options.processor === undefined;
   const kv: KvStore | undefined = needsKv ? options.kv ?? await openTriggerRuntimeKv() : options.kv;
   const eventStore = options.eventStore ??
     new KvTriggerEventStore({ kv: requireKv(kv) });
+  const enabledState = options.enabledState ??
+    createKvTriggerEnabledStateStore({ kv: requireKv(kv) });
   const processor = options.processor ?? await createRuntimeTriggerProcessor({ kv });
   const hmacVerifier = new HmacSha256WebhookVerifier({
     signatureHeader: 'x-hub-signature-256',
@@ -168,7 +178,7 @@ export async function createTriggersServiceContext(
     resolveSecret: (definition) =>
       definition.secretEnv === undefined ? undefined : Deno.env.get(definition.secretEnv),
   });
-  return { definitions, eventStore, ingress };
+  return { definitions, eventStore, enabledState, ingress };
 }
 
 /**
@@ -239,6 +249,7 @@ function createUnavailableTriggersServiceContext(): TriggerServiceContext {
   return {
     definitions: [],
     eventStore: new UnavailableTriggerEventStore(),
+    enabledState: unavailableTriggerEnabledState,
     ingress: unavailableTriggerIngress,
   };
 }
@@ -264,6 +275,18 @@ class UnavailableTriggerEventStore implements TriggerEventStorePort {
 const unavailableTriggerIngress: TriggerIngressPort = {
   accept(_request: TriggerIngressRequest): Promise<TriggerIngressResponse> {
     return Promise.reject(triggerRuntimeUnavailable());
+  },
+};
+
+const unavailableTriggerEnabledState: TriggerEnabledStatePort = {
+  isEnabled(): Promise<boolean> {
+    return Promise.resolve(false);
+  },
+  setEnabled(): Promise<void> {
+    return Promise.reject(triggerRuntimeUnavailable());
+  },
+  list(): Promise<readonly []> {
+    return Promise.resolve([]);
   },
 };
 

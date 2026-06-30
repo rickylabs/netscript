@@ -36,6 +36,7 @@ import type {
   TriggerIngressRequest,
   TriggerIngressResponse,
 } from '@netscript/plugin-triggers-core/ports';
+import { MemoryTriggerEnabledStateStore } from '@netscript/plugin-triggers-core/testing';
 import { createTriggersService } from './main.ts';
 import type { TriggerServiceContext } from './routers/v1-types.ts';
 
@@ -93,6 +94,7 @@ function buildContext(): TriggerServiceContext {
   return {
     definitions,
     eventStore: new InMemoryEventStore(),
+    enabledState: new MemoryTriggerEnabledStateStore(),
     ingress: failingIngress,
   };
 }
@@ -108,6 +110,7 @@ function buildWebhookPathContext(acceptedTriggerIds: string[]): TriggerServiceCo
   return {
     definitions,
     eventStore: new InMemoryEventStore(),
+    enabledState: new MemoryTriggerEnabledStateStore(),
     ingress: {
       accept(request: TriggerIngressRequest): Promise<TriggerIngressResponse> {
         acceptedTriggerIds.push(request.triggerId);
@@ -135,6 +138,7 @@ function buildEventsContext(): TriggerServiceContext {
   return {
     definitions: [],
     eventStore: new InMemoryEventStore([event]),
+    enabledState: new MemoryTriggerEnabledStateStore(),
     ingress: failingIngress,
   };
 }
@@ -199,6 +203,45 @@ Deno.test('triggers connector smoke', async (t) => {
         durabilityTier: 't1',
         tags: ['fixture'],
       });
+    });
+
+    await t.step('enable and disable routes round-trip stored state', async () => {
+      const disableRoute = await findRoute(
+        baseUrl,
+        (method, path) => method === 'POST' && /\/disable$/.test(path),
+      );
+      const disableRes = await fetch(
+        `${baseUrl}/api${disableRoute.path.replace('{id}', 'sched-1')}`,
+        {
+          method: 'POST',
+        },
+      );
+      assertEquals(disableRes.status, 200);
+      const disabled = await disableRes.json() as { enabled: boolean };
+      assertEquals(disabled.enabled, false);
+
+      const listRoute = await findRoute(
+        baseUrl,
+        (method, path) => method === 'GET' && /\/triggers$/.test(path),
+      );
+      const disabledList = await fetch(`${baseUrl}/api${listRoute.path}?enabled=false`);
+      assertEquals(disabledList.status, 200);
+      const disabledBody = await disabledList.json() as { triggers: Array<{ id: string }> };
+      assertEquals(disabledBody.triggers.map((trigger) => trigger.id), ['sched-1']);
+
+      const enableRoute = await findRoute(
+        baseUrl,
+        (method, path) => method === 'POST' && /\/enable$/.test(path),
+      );
+      const enableRes = await fetch(
+        `${baseUrl}/api${enableRoute.path.replace('{id}', 'sched-1')}`,
+        {
+          method: 'POST',
+        },
+      );
+      assertEquals(enableRes.status, 200);
+      const enabled = await enableRes.json() as { enabled: boolean };
+      assertEquals(enabled.enabled, true);
     });
 
     await t.step('deferred route fireTrigger returns a server error', async () => {

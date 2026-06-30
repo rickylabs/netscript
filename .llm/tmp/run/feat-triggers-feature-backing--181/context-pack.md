@@ -21,4 +21,7 @@ Hard constraints:
 
 Latest slice:
 - Slice 1 implemented optional definition `name`/`enabled`, builder propagation, and connector
-  response `name` mapping. Gates are green; commit `485959e3` is recorded in `commits.md`.
+  response `name` mapping. Gates are green; commit `a79e13ea` is recorded in `commits.md`.
+- Slice 2 implemented `TriggerEnabledStatePort`, KV and memory stores, public
+  `createKvTriggerEnabledStateStore`, connector enable/disable backing, and `enabled=false` list
+  filtering. Gates are green; final SHA is recorded in `commits.md`.

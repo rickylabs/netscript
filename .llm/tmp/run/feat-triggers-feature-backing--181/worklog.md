@@ -26,7 +26,7 @@ Run-id: `feat-triggers-feature-backing--181`
 
 ## Slice 1 — Domain fields `enabled` + `name`
 
-Status: implemented, gated, committed as `485959e3`.
+Status: implemented, gated, committed as `a79e13ea`.
 
 Files:
 - `packages/plugin-triggers-core/src/domain/trigger-definition.ts`
@@ -55,3 +55,42 @@ Notes:
 - Initial check wrapper attempts incorrectly passed `-- --unstable-kv`, causing wrapper operator
   errors before code was checked. Reruns used the wrapper correctly; it passes `--unstable-kv` by
   default.
+
+## Slice 2 — Enabled-State Port And KV Adapter
+
+Status: implemented, gated, commit pending final SHA.
+
+Files:
+- `packages/plugin-triggers-core/src/ports/trigger-enabled-state-port.ts`
+- `packages/plugin-triggers-core/src/ports/mod.ts`
+- `packages/plugin-triggers-core/src/stores/kv-trigger-enabled-state-store.ts`
+- `packages/plugin-triggers-core/src/stores/kv-trigger-enabled-state-store_test.ts`
+- `packages/plugin-triggers-core/src/stores/mod.ts`
+- `packages/plugin-triggers-core/src/testing/memory-trigger-enabled-state-store.ts`
+- `packages/plugin-triggers-core/src/testing/mod.ts`
+- `packages/plugin-triggers-core/src/public/mod.ts`
+- `packages/plugin-triggers-core/src/contracts/v1/triggers.contract.ts`
+- `plugins/triggers/services/src/routers/v1-types.ts`
+- `plugins/triggers/services/src/routers/v1.ts`
+- `plugins/triggers/services/src/main.ts`
+- `plugins/triggers/services/src/main_test.ts`
+
+Gate evidence:
+- `run-deno-check` core: PASS, exit 0, 65 files, `--unstable-kv`.
+- `run-deno-check` connector services: PASS, exit 0, 6 files, `--unstable-kv`.
+- `run-deno-lint` core: PASS, exit 0, 0 findings.
+- `run-deno-lint` connector services: PASS, exit 0, 0 findings.
+- `run-deno-fmt` core: PASS, exit 0, 0 findings after formatting touched files.
+- `run-deno-fmt` connector services: PASS, exit 0, 0 findings after formatting touched files.
+- `rtk proxy deno task test --unstable-kv packages/plugin-triggers-core/src/stores/kv-trigger-enabled-state-store_test.ts packages/plugin-triggers-core/src/builders/trigger-definition-fields_test.ts packages/plugin-triggers-core/tests/contracts/triggers-contract-soundness_test.ts`: PASS, exit 0, 4 passed.
+- `rtk proxy deno task test --unstable-kv plugins/triggers/services/src/main_test.ts`: PASS, exit 0, 3 passed, 7 steps.
+- `deno publish --dry-run --allow-dirty` in `packages/plugin-triggers-core`: PASS, exit 0.
+- `deno publish --dry-run --allow-dirty` in `plugins/triggers`: PASS, exit 0; pre-existing
+  dynamic-import warnings only.
+- `rtk proxy deno task arch:check`: PASS, exit 0, `FAIL=0` with existing warnings.
+
+Notes:
+- The `enabled=false` connector smoke exposed that the existing contract used `z.coerce.boolean()`,
+  which parses non-empty query strings such as `"false"` as `true`. Slice 2 changed only the triggers
+  filter schema to `z.stringbool().optional()` so the already-public `TriggerFilters.enabled?:
+  boolean` contract works over HTTP query strings.

@@ -24,6 +24,8 @@ export type {
   TriggerDlqEntry,
   TriggerDlqListOptions,
   TriggerDlqPort,
+  TriggerEnabledStateOverride,
+  TriggerEnabledStatePort,
   TriggerEventListOptions,
   TriggerEventStorePort,
   TriggerIdempotencyClaim,
@@ -42,6 +44,7 @@ export type {
   WebhookVerifierPort,
 } from '../ports/mod.ts';
 export { createTriggerIngress, createTriggerProcessor, TriggerProcessor } from '../runtime/mod.ts';
+export { createKvTriggerEnabledStateStore } from '../stores/mod.ts';
 export {
   TRIGGER_BACKFILL_POLICIES,
   TRIGGER_DURABILITY_TIERS,
