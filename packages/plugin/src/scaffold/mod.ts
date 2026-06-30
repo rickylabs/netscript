@@ -87,7 +87,7 @@ export function renderRegistrySource(module: RegistryModule): string {
     ...renderHeader(module.header),
     ...module.imports.map(renderImport),
     module.imports.length > 0 ? '' : undefined,
-    `export const ${module.exportName} = [`,
+    `export const ${module.exportName}: readonly unknown[] = [`,
     ...module.entries.map((entry) => `  ${entry},`),
     '] as const;',
     '',
@@ -117,5 +117,5 @@ function renderHeader(header: readonly string[] | undefined): readonly string[] 
 }
 
 function renderImport(entry: RegistryImport): string {
-  return `import * as ${entry.alias} from ${JSON.stringify(entry.specifier)};`;
+  return `import * as ${entry.alias} from '${entry.specifier.replaceAll("'", "\\'")}';`;
 }

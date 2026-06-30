@@ -8,6 +8,7 @@ import { createDoctorPluginCommand } from './doctor/doctor-plugin-command.ts';
 import { createHostPluginCommand } from './host/host-plugin-command.ts';
 import { createInfoPluginCommand } from './info/info-plugin-command.ts';
 import { createPluginListCommand } from './list/list-plugins-command.ts';
+import { createNewPluginCommand } from './new/new-plugin-command.ts';
 import { createRemovePluginCommand } from './remove/remove-plugin-command.ts';
 import { createPluginScaffoldCommand } from './scaffold/scaffold-plugin-command.ts';
 import { createUpdatePluginCommand } from './update/update-plugin-command.ts';
@@ -35,6 +36,13 @@ export function createPluginCommand(
     .command(
       'list',
       createPluginListCommand({ loadConfig: dependencies.loadConfig }),
+    )
+    .command(
+      'new',
+      createNewPluginCommand({
+        newPluginDependencies: dependencies.pluginScaffoldDependencies,
+        resolveProjectRoot: dependencies.resolveProjectRoot,
+      }),
     )
     .command(
       'scaffold',
