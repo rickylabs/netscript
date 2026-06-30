@@ -268,13 +268,26 @@ For each page module file F (apps/<app>/routes/**/*.tsx excluding layout/island/
      If equal -> no-op (idempotency)
 
   6. Update .generated/routes.ts:
-     Form A: emit const routeContract<N> = defineRouteContract({ ...inlineSchemaFields });
-             then bindRoutePattern(routeContract<N>, routePatterns.<key>, {...}).
+     Form A: createRouteReference(routePatterns.<key>).
      Form B: bindRoutePattern(<importedSidecarContract>, routePatterns.<key>, {...}).
      Form C: createRouteReference(routePatterns.<key>).
 
-     N is the index in the order pages are discovered. The index is stable
-     across rebuilds because the discovery algorithm sorts by file path.
+     N (the routeContract<N> import alias for Form B) is the index in the order
+     pages are discovered. The index is stable across rebuilds because the
+     discovery algorithm sorts by file path.
+
+     RESOLVED (implementation, 2026-06-30): Form A does NOT synthesize a
+     `defineRouteContract({ ...inlineSchemaFields })` into `.generated/routes.ts`.
+     The inline schema body references page-module-scoped imports (e.g. `z`,
+     custom param schemas) that are not in scope in `.generated/routes.ts`, so
+     re-emitting the body there would not type-check. Instead, Form A's typed
+     runtime binding lives in the page module itself: the generator inserts
+     `$route: routePatterns.<key>.$route` and the restored
+     `.withRouteContract({ $route, ...schemaBody })` builder method binds the
+     contract at runtime (via `bindRoutePattern(defineRouteContract({...}),
+     $route)`). The `routes.<key>` leaf for a Form A page is a schema-free
+     `createRouteReference(routePatterns.<key>)` — a navigable reference for
+     external `Link`/`href` consumers, identical in shape to Form C.
 
   7. If .generated/routes.ts content changed -> write file
 ```
@@ -481,11 +494,17 @@ and skips the write as idempotent.
 5. **Build warning vs error for inline+sidecar?** - Author decision
    (2026-06-26): warning. Sidecar stays in place. Author decides whether to
    delete.
-6. **Where does the synthesized inline contract live?** - In
-   `.generated/routes.ts` as `routeContract<N>`, using the existing
-   `routeContract0` / `routeContract1` / ... naming pattern. The const is
-   emitted alongside the bound route, and the same `<alias>/.generated/routes.ts`
-   import path remains the Form B/C surface.
+6. **Where does the synthesized inline contract live?** - RESOLVED
+   (implementation, 2026-06-30): it lives in the **page module**, not in
+   `.generated/routes.ts`. The page module's restored
+   `.withRouteContract({ $route: routePatterns.<key>.$route, ...schemaBody })`
+   call binds the inline contract at runtime where its schema imports (`z`,
+   custom param schemas) are in scope. `.generated/routes.ts` therefore cannot
+   re-emit the inline body (those symbols are not in its scope), so a Form A
+   route's `routes.<key>` leaf is a schema-free
+   `createRouteReference(routePatterns.<key>)` — same shape as Form C. The
+   `routeContract<N>` import-alias naming pattern remains in use for Form B
+   sidecar contracts only.
 
 ## Status
 
