@@ -113,6 +113,7 @@ interface ManifestEntry {
 }
 
 const SCAFFOLD_PLUGIN_MANIFEST = 'scaffold.plugin.json';
+const SOURCE_ROOT_MARKER = '.netscript-source-root';
 
 /** Register plugin-owned provider metadata from a source checkout when present. */
 export async function registerOfficialPluginKindProviders(
@@ -163,12 +164,28 @@ export async function findOfficialPluginSourceRoot(
     if (await hasOfficialPluginSources(current)) {
       return current;
     }
+    const markedRoot = await readMarkedSourceRoot(current);
+    if (markedRoot && await hasOfficialPluginSources(markedRoot)) {
+      return markedRoot;
+    }
 
     const parent = dirname(current);
     if (parent === current) {
       return null;
     }
     current = parent;
+  }
+}
+
+async function readMarkedSourceRoot(directory: string): Promise<string | null> {
+  try {
+    const sourceRoot = (await Deno.readTextFile(join(directory, SOURCE_ROOT_MARKER))).trim();
+    return sourceRoot.length === 0 ? null : sourceRoot;
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) {
+      return null;
+    }
+    throw error;
   }
 }
 
