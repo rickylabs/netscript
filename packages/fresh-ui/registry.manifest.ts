@@ -447,6 +447,28 @@ export const freshUiRegistryManifest: RegistryManifest = {
       css: [{ layer: 'components', content: "@import './ui/avatar.css';" }],
     },
     {
+      name: 'citation-chip',
+      kind: 'component',
+      layer: 2,
+      description:
+        'Inline per-claim source marker [n] that pairs with a sources list — the grounded-agent citation UX.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['citation', 'ai', 'primitive'],
+      files: [
+        {
+          source: 'registry/components/ui/citation-chip.tsx',
+          target: '@ui/citation-chip.tsx',
+        },
+        {
+          source: 'registry/components/ui/citation-chip.css',
+          target: '@assets/ui/citation-chip.css',
+        },
+      ],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/citation-chip.css';" }],
+    },
+    {
       name: 'separator',
       kind: 'component',
       layer: 2,
