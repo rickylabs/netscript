@@ -225,3 +225,153 @@ export function scanPageModuleRouteBinding(source: string): PageModuleScanResult
     prefilledRoute,
   };
 }
+
+/** Input describing how to rewrite a single page module's route binding. */
+export interface PageModuleRewriteInput {
+  /** Current page module source text. */
+  readonly source: string;
+  /** Authoring form for this page module. */
+  readonly form: PageModuleRouteForm;
+  /** Dotted route key path including the trailing `$route` (e.g. `dashboard.orders.$id.$route`). */
+  readonly routeKey: string;
+  /** Import specifier for the generated manifest module (e.g. `@app/.generated/manifest.ts`). */
+  readonly manifestImportSpecifier: string;
+  /** Import specifier for the generated routes module (e.g. `@app/.generated/routes.ts`). */
+  readonly routesImportSpecifier: string;
+  /** Whether a sibling sidecar also exists (drives the inline-precedence warning). */
+  readonly hasSidecar?: boolean;
+}
+
+/** Result of computing a page-module rewrite. */
+export interface PageModuleRewriteResult {
+  /** Target page module source (equals input source when no change is needed). */
+  readonly content: string;
+  /** Whether the target differs from the input source. */
+  readonly changed: boolean;
+  /** Build warning to surface (e.g. inline form taking precedence over a sidecar). */
+  readonly warning?: string;
+}
+
+/** Insert an import line if `specifierMatch` is not already imported. */
+function ensureImport(
+  source: string,
+  importLine: string,
+  specifierMatch: RegExp,
+): string {
+  if (specifierMatch.test(source)) {
+    return source;
+  }
+
+  // Place the new import after the final existing top-level import for stable
+  // output; fall back to prepending when the module has no imports yet.
+  const lastImportMatch = [...source.matchAll(/^import\b[^\n]*\n/gm)].at(-1);
+  if (lastImportMatch && lastImportMatch.index !== undefined) {
+    const insertAt = lastImportMatch.index + lastImportMatch[0].length;
+    return `${source.slice(0, insertAt)}${importLine}\n${source.slice(insertAt)}`;
+  }
+
+  return `${importLine}\n${source}`;
+}
+
+/**
+ * Compute the generator-owned target source for a page module's route binding.
+ *
+ * - Form A inserts `$route: <manifest>.<key>` as the first field of the inline
+ *   `.withRouteContract({...})` object and ensures the `routePatterns` import.
+ * - Form B and Form C insert `.withRoute(<routes>.<key>)` immediately after the
+ *   `definePage()` call and ensure the `routes` import.
+ *
+ * The function is idempotent: when the source already matches the target it
+ * returns `changed: false` and the original source unchanged.
+ *
+ * @param input - Rewrite input.
+ * @returns The target source, a changed flag, and any build warning.
+ */
+export function computePageModuleRewrite(input: PageModuleRewriteInput): PageModuleRewriteResult {
+  const warning = input.form === 'inline' && input.hasSidecar
+    ? `Page has both inline .withRouteContract and sibling sidecar. Inline form ` +
+      `takes precedence. Delete the sidecar to silence this warning.`
+    : undefined;
+
+  if (input.form === 'inline') {
+    return rewriteInlineForm(input, warning);
+  }
+
+  return rewriteWithRouteForm(input, warning);
+}
+
+function rewriteInlineForm(
+  input: PageModuleRewriteInput,
+  warning: string | undefined,
+): PageModuleRewriteResult {
+  const routeAccessor = `routePatterns.${input.routeKey}`;
+  const contractOpen = findBuilderCall(input.source, WITH_ROUTE_CONTRACT_TOKEN, '{');
+  if (contractOpen === -1) {
+    return { content: input.source, changed: false, warning };
+  }
+
+  const contractClose = matchBalanced(input.source, contractOpen);
+  if (contractClose === -1) {
+    return { content: input.source, changed: false, warning };
+  }
+
+  const innerBody = input.source.slice(contractOpen + 1, contractClose);
+  const fields = splitTopLevelFields(innerBody);
+  const retained: string[] = [];
+  for (const field of fields) {
+    const match = field.match(/^\s*(?:'\$route'|"\$route"|\$route)\s*:/);
+    if (match) {
+      // Drop any existing $route field; the generator re-inserts the canonical one.
+      continue;
+    }
+    if (field.trim().length > 0) {
+      retained.push(field.trim());
+    }
+  }
+
+  const fieldParts = [`$route: ${routeAccessor}`, ...retained];
+  const rebuiltObject = `{ ${fieldParts.join(', ')} }`;
+  let next = `${input.source.slice(0, contractOpen)}${rebuiltObject}${
+    input.source.slice(contractClose + 1)
+  }`;
+  next = ensureImport(
+    next,
+    `import { routePatterns } from '${input.manifestImportSpecifier}';`,
+    /\broutePatterns\b[^\n]*\bfrom\b/,
+  );
+
+  return { content: next, changed: next !== input.source, warning };
+}
+
+function rewriteWithRouteForm(
+  input: PageModuleRewriteInput,
+  warning: string | undefined,
+): PageModuleRewriteResult {
+  const routeAccessor = `routes.${input.routeKey}`;
+  const bindingCall = `.withRoute(${routeAccessor})`;
+
+  // Idempotency: if the exact binding already exists, only ensure the import.
+  if (input.source.includes(bindingCall)) {
+    const ensured = ensureImport(
+      input.source,
+      `import { routes } from '${input.routesImportSpecifier}';`,
+      /\broutes\b[^\n]*\bfrom\b/,
+    );
+    return { content: ensured, changed: ensured !== input.source, warning };
+  }
+
+  const defineCall = input.source.match(/definePage\s*(?:<[^>]*>)?\s*\(\s*\)/);
+  if (!defineCall || defineCall.index === undefined) {
+    return { content: input.source, changed: false, warning };
+  }
+
+  const insertAt = defineCall.index + defineCall[0].length;
+  let next = `${input.source.slice(0, insertAt)}\n  ${bindingCall}${input.source.slice(insertAt)}`;
+  next = ensureImport(
+    next,
+    `import { routes } from '${input.routesImportSpecifier}';`,
+    /\broutes\b[^\n]*\bfrom\b/,
+  );
+
+  return { content: next, changed: next !== input.source, warning };
+}

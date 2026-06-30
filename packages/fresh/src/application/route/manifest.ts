@@ -1,5 +1,5 @@
 import { dirname, extname, relative, resolve } from '@std/path';
-import { scanPageModuleRouteBinding } from './manifest-page-module.ts';
+import { computePageModuleRewrite, scanPageModuleRouteBinding } from './manifest-page-module.ts';
 import type { PageModuleRouteForm } from './manifest-page-module.ts';
 import type {
   DiscoveredNetScriptRoute,
@@ -527,5 +527,77 @@ export function writeNetScriptRouteManifestSync(
     boundRouteCount:
       routes.filter((route) => route.routeContractImportPath && route.pageModuleForm !== 'inline')
         .length,
+  };
+}
+
+/** Options controlling page-module route-binding codegen. */
+export interface PageModuleBindingOptions {
+  /** Import specifier for the generated manifest module (Form A). */
+  manifestImportSpecifier: string;
+  /** Import specifier for the generated routes module (Form B/C). */
+  routesImportSpecifier: string;
+}
+
+/** Result of a page-module route-binding pass. */
+export interface PageModuleBindingResult {
+  /** Whether any page module on disk was rewritten. */
+  changed: boolean;
+  /** Number of page modules rewritten. */
+  rewrittenCount: number;
+  /** Build warnings emitted (e.g. inline form taking precedence over a sidecar). */
+  warnings: string[];
+}
+
+/**
+ * Rewrite page modules so the generator owns the route-binding call (WI-12).
+ *
+ * Form A page modules receive `$route: routePatterns.<key>.$route` as the first
+ * field of their inline `.withRouteContract({...})`; Form B/C page modules
+ * receive `.withRoute(routes.<key>.$route)` after `definePage()`. Writes are
+ * idempotent — a module whose content already matches the target is left
+ * untouched.
+ *
+ * @param options - Resolved manifest options.
+ * @param bindingOptions - Import specifiers for the generated modules.
+ * @returns Summary of rewrites and warnings.
+ */
+export function writeNetScriptPageModuleBindingsSync(
+  options: ResolvedNetScriptRouteManifestOptions,
+  bindingOptions: PageModuleBindingOptions,
+): PageModuleBindingResult {
+  const routes = discoverNetScriptRoutes(options);
+  const warnings: string[] = [];
+  let rewrittenCount = 0;
+
+  for (const route of routes) {
+    const source = tryReadTextFileSync(route.routeFilePath);
+    if (source === undefined) {
+      continue;
+    }
+
+    const form = route.pageModuleForm ?? 'default';
+    const rewrite = computePageModuleRewrite({
+      source,
+      form,
+      routeKey: route.routeKeyPath.join('.'),
+      manifestImportSpecifier: bindingOptions.manifestImportSpecifier,
+      routesImportSpecifier: bindingOptions.routesImportSpecifier,
+      hasSidecar: form === 'inline' && resolveRouteSidecarPath(route.routeFilePath) !== undefined,
+    });
+
+    if (rewrite.warning) {
+      warnings.push(`${route.relativeRouteFilePath}: ${rewrite.warning}`);
+    }
+
+    if (rewrite.changed) {
+      Deno.writeTextFileSync(route.routeFilePath, rewrite.content);
+      rewrittenCount += 1;
+    }
+  }
+
+  return {
+    changed: rewrittenCount > 0,
+    rewrittenCount,
+    warnings,
   };
 }
