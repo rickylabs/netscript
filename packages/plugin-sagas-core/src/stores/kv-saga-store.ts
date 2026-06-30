@@ -25,7 +25,8 @@ export type KvSagaStoreOptions = Readonly<{
 
 /** Open the shared KV adapter used by production saga runtime stores. */
 export function openSagaRuntimeKv(): Promise<KvStore> {
-  return getKv({ path: Deno.env.get(SAGA_KV_PATH_ENV) });
+  const path = Deno.env.get(SAGA_KV_PATH_ENV);
+  return path === undefined ? getKv() : getKv({ provider: 'deno-kv', path });
 }
 
 /** KV-backed saga state store for durable native saga execution. */
