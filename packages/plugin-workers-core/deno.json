@@ -1,6 +1,6 @@
 {
   "name": "@netscript/plugin-workers-core",
-  "version": "0.0.1-alpha.15",
+  "version": "0.0.1-alpha.16",
   "description": "Job, task, workflow, runtime, config, and testing primitives for NetScript workers plugins.",
   "license": "MIT",
   "exports": {
@@ -28,8 +28,8 @@
     "@std/path": "jsr:@std/path@^1",
     "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
     "zod": "jsr:@zod/zod@4.4.3",
-    "@netscript/kv": "jsr:@netscript/kv@0.0.1-alpha.15",
-    "@netscript/plugin": "jsr:@netscript/plugin@0.0.1-alpha.15",
+    "@netscript/kv": "jsr:@netscript/kv@0.0.1-alpha.16",
+    "@netscript/plugin": "jsr:@netscript/plugin@0.0.1-alpha.16",
     "@orpc/contract": "npm:@orpc/contract@^1.14.6",
     "@orpc/server": "npm:@orpc/server@^1.14.6"
   },

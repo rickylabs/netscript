@@ -1,6 +1,6 @@
 {
   "name": "@netscript/sdk",
-  "version": "0.0.1-alpha.15",
+  "version": "0.0.1-alpha.16",
   "description": "Service discovery, oRPC clients, and cache-backed query factories for NetScript.",
   "license": "MIT",
   "exports": {
