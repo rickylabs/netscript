@@ -9,6 +9,7 @@ import { generateRegisterServices } from '../register/generate-register-services
 import { generateRegisterPlugins } from '../register/generate-register-plugins.ts';
 import * as fixtures from './generators-test-support.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../application/registries/template-registry.ts';
+import { netscriptJsrSpecifier } from '../../../../constants/jsr-specifiers.ts';
 
 // These generators read templates synchronously, which requires a previously-
 // awaited registry hydration. The tests exercise them directly (outside the CLI
@@ -279,7 +280,7 @@ describe('generateRegisterPlugins', () => {
   it('should point triggers API at the generated trigger registry module', () => {
     const triggerPlugin: PluginEntry = {
       ...fixtures.MINIMAL_PLUGIN,
-      Entrypoint: 'jsr:@netscript/plugin-triggers@0.0.1-alpha.12/services',
+      Entrypoint: netscriptJsrSpecifier('plugin-triggers', '/services'),
     };
     const output = generateRegisterPlugins({
       ...emptyOptions,
