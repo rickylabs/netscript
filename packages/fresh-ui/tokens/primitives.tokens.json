@@ -803,6 +803,33 @@
           "cssVar": "--ns-text-4xl"
         }
       }
+    },
+    "3xs": {
+      "$type": "dimension",
+      "$value": "0.625rem",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-text-3xs"
+        }
+      }
+    },
+    "2xs": {
+      "$type": "dimension",
+      "$value": "0.6875rem",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-text-2xs"
+        }
+      }
+    },
+    "chat": {
+      "$type": "dimension",
+      "$value": "0.9375rem",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-text-chat"
+        }
+      }
     }
   },
   "leading": {
@@ -1007,6 +1034,130 @@
           "cssVar": "--ns-space-1-5"
         }
       }
+    },
+    "2-5": {
+      "$type": "dimension",
+      "$value": "0.625rem",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-space-2-5"
+        }
+      }
+    },
+    "3-5": {
+      "$type": "dimension",
+      "$value": "0.875rem",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-space-3-5"
+        }
+      }
+    },
+    "7": {
+      "$type": "dimension",
+      "$value": "1.75rem",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-space-7"
+        }
+      }
+    },
+    "9": {
+      "$type": "dimension",
+      "$value": "2.25rem",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-space-9"
+        }
+      }
+    },
+    "11": {
+      "$type": "dimension",
+      "$value": "2.75rem",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-space-11"
+        }
+      }
+    },
+    "14": {
+      "$type": "dimension",
+      "$value": "3.5rem",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-space-14"
+        }
+      }
+    },
+    "24": {
+      "$type": "dimension",
+      "$value": "6rem",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-space-24"
+        }
+      }
+    }
+  },
+  "size": {
+    "avatar-sm": {
+      "$type": "dimension",
+      "$value": "1.5rem",
+      "$extensions": { "netscript": { "cssVar": "--ns-avatar-sm" } }
+    },
+    "avatar-md": {
+      "$type": "dimension",
+      "$value": "2rem",
+      "$extensions": { "netscript": { "cssVar": "--ns-avatar-md" } }
+    },
+    "avatar-lg": {
+      "$type": "dimension",
+      "$value": "2.5rem",
+      "$extensions": { "netscript": { "cssVar": "--ns-avatar-lg" } }
+    },
+    "control-h": {
+      "$type": "dimension",
+      "$value": "2.25rem",
+      "$extensions": { "netscript": { "cssVar": "--ns-control-h" } }
+    },
+    "control-h-sm": {
+      "$type": "dimension",
+      "$value": "2rem",
+      "$extensions": { "netscript": { "cssVar": "--ns-control-h-sm" } }
+    }
+  },
+  "layout": {
+    "app-nav": {
+      "$type": "dimension",
+      "$value": "17rem",
+      "$extensions": { "netscript": { "cssVar": "--ns-app-nav" } }
+    },
+    "app-rail": {
+      "$type": "dimension",
+      "$value": "20rem",
+      "$extensions": { "netscript": { "cssVar": "--ns-app-rail" } }
+    },
+    "topbar-h": {
+      "$type": "dimension",
+      "$value": "3.5rem",
+      "$extensions": { "netscript": { "cssVar": "--ns-topbar-h" } }
+    },
+    "shell-content": {
+      "$type": "dimension",
+      "$value": "67.5rem",
+      "$extensions": { "netscript": { "cssVar": "--ns-shell-content" } }
+    }
+  },
+  "label": {
+    "size": {
+      "$type": "dimension",
+      "$value": "0.6875rem",
+      "$extensions": { "netscript": { "cssVar": "--ns-label-size" } }
+    },
+    "tracking": {
+      "$type": "dimension",
+      "$value": "0.06em",
+      "$extensions": { "netscript": { "cssVar": "--ns-label-tracking" } }
     }
   },
   "radius": {

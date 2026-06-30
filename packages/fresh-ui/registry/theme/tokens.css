@@ -162,6 +162,9 @@
   --ns-text-2xl: 1.5rem;
   --ns-text-3xl: 1.875rem;
   --ns-text-4xl: 2.25rem;
+  --ns-text-3xs: 0.625rem;
+  --ns-text-2xs: 0.6875rem;
+  --ns-text-chat: 0.9375rem;
 
   --ns-leading-tight: 1.1;
   --ns-leading-snug: 1.3;
@@ -187,6 +190,27 @@
   --ns-space-12: 3rem;
   --ns-space-16: 4rem;
   --ns-space-20: 5rem;
+  --ns-space-2-5: 0.625rem;
+  --ns-space-3-5: 0.875rem;
+  --ns-space-7: 1.75rem;
+  --ns-space-9: 2.25rem;
+  --ns-space-11: 2.75rem;
+  --ns-space-14: 3.5rem;
+  --ns-space-24: 6rem;
+
+  --ns-avatar-sm: 1.5rem;
+  --ns-avatar-md: 2rem;
+  --ns-avatar-lg: 2.5rem;
+  --ns-control-h: 2.25rem;
+  --ns-control-h-sm: 2rem;
+
+  --ns-app-nav: 17rem;
+  --ns-app-rail: 20rem;
+  --ns-topbar-h: 3.5rem;
+  --ns-shell-content: 67.5rem;
+
+  --ns-label-size: 0.6875rem;
+  --ns-label-tracking: 0.06em;
 
   --ns-radius-sm: 4px;
   --ns-radius-md: 6px;
