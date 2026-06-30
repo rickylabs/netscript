@@ -26,7 +26,11 @@ Deno.test('DataTable.Row applies cols as grid-template-columns', () => {
 });
 
 Deno.test('DataTable.Row merges cols with an incoming style object', () => {
-  const row = DataTable.Row({ cols: 'minmax(0, 1fr) auto', style: { opacity: 0.5 }, children: 'c' });
+  const row = DataTable.Row({
+    cols: 'minmax(0, 1fr) auto',
+    style: { opacity: 0.5 },
+    children: 'c',
+  });
   const style = vnodeProps(row).style as Record<string, unknown>;
   assertEquals(style.gridTemplateColumns, 'minmax(0, 1fr) auto');
   assertEquals(style.opacity, 0.5);

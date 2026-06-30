@@ -10,7 +10,7 @@
 
 import type { JSX, VNode } from 'preact';
 import { cn } from '../../lib/cn.ts';
-import { ModelSelector, type ModelOption } from './model-selector.tsx';
+import { type ModelOption, ModelSelector } from './model-selector.tsx';
 
 /**
  * Submit metadata passed alongside the prompt text.

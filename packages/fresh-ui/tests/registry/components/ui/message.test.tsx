@@ -1,5 +1,9 @@
 import { assert } from '@std/assert';
-import { Message, renderInline, TypingIndicator } from '../../../../registry/components/ui/message.tsx';
+import {
+  Message,
+  renderInline,
+  TypingIndicator,
+} from '../../../../registry/components/ui/message.tsx';
 
 interface VNodeLike {
   type: unknown;

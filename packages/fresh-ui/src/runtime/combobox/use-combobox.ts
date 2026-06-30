@@ -75,7 +75,12 @@ export function useCombobox({
 
   const moveHighlight = useCallback((direction: ComboboxDirection) => {
     const order = itemOrder.current;
-    const nextIndex = getNextComboboxIndex(direction, order.indexOf(highlighted), order.length, loop);
+    const nextIndex = getNextComboboxIndex(
+      direction,
+      order.indexOf(highlighted),
+      order.length,
+      loop,
+    );
     const nextValue = order[nextIndex];
     if (!nextValue) return;
     setHighlighted(nextValue);
@@ -174,7 +179,10 @@ export function useCombobox({
   );
 
   const getItemProps = useCallback(
-    (itemValue: string, props: JSX.HTMLAttributes<HTMLDivElement> = {}): ComboboxItemElementProps => {
+    (
+      itemValue: string,
+      props: JSX.HTMLAttributes<HTMLDivElement> = {},
+    ): ComboboxItemElementProps => {
       const selected = selectedValue === itemValue;
       const isHighlighted = highlighted === itemValue;
       return {
