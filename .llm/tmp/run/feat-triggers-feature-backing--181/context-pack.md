@@ -33,4 +33,5 @@ Latest slice:
 - Slice 5 implemented `computeNextFireTimes` and backed connector `previewSchedule`. Gates are
   green; commit `e710297f` is recorded in `commits.md`.
 - Slice 6 implemented `TriggerEventSubscriptionPort`, `createEventSubscription`, lifecycle
-  publishing, and connector `subscribeEvents`. Gates are green; commit pending.
+  publishing, and connector `subscribeEvents`. Gates are green; commit `24c03bf3` is recorded in
+  `commits.md`.

@@ -205,7 +205,7 @@ Notes:
 
 ## Slice 6 — Event Subscription / SSE
 
-Status: implemented, gated, ready to commit.
+Status: implemented, gated, committed as `24c03bf3`.
 
 Files:
 - `packages/plugin-triggers-core/src/ports/trigger-event-subscription-port.ts`
@@ -250,7 +250,7 @@ Notes:
 
 ## Final Summary
 
-Status: implementation complete through Slice 6; final commit pending.
+Status: implementation complete through Slice 6.
 
 Per-slice commits:
 - Slice 1: `a79e13ea`
@@ -258,7 +258,7 @@ Per-slice commits:
 - Slice 3: `6ead7da4`
 - Slice 4: `3ef180f7`
 - Slice 5: `e710297f`
-- Slice 6: pending
+- Slice 6: `24c03bf3`
 
 Debt:
 - Opened `CRON-NEXT-FIRE-ENGINE`.
