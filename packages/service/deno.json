@@ -1,6 +1,6 @@
 {
   "name": "@netscript/service",
-  "version": "0.0.1-alpha.15",
+  "version": "0.0.1-alpha.16",
   "description": "Service bootstrap builders, health probes, and Hono/oRPC runtime wiring for NetScript applications.",
   "license": "MIT",
   "exports": {
