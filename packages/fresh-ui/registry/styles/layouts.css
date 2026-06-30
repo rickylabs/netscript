@@ -629,3 +629,188 @@
 .ns-rule-top {
   border-top: 1px solid var(--ns-border);
 }
+
+/* ------------------------------------------------------------------ *
+ * App shell — 3-pane workspace layout (nav │ main │ context rail).
+ * Token-driven; dims from --ns-app-nav/-rail, --ns-topbar-h,
+ * --ns-shell-content. Collapse panes with [data-nav='off'] /
+ * [data-rail='off']; rail folds < 1024px, nav < 640px.
+ * ------------------------------------------------------------------ */
+
+.ns-app {
+  display: grid;
+  grid-template-columns: var(--ns-app-nav) minmax(0, 1fr) var(--ns-app-rail);
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.ns-app[data-nav='off'] {
+  grid-template-columns: 0 minmax(0, 1fr) var(--ns-app-rail);
+}
+
+.ns-app[data-rail='off'] {
+  grid-template-columns: var(--ns-app-nav) minmax(0, 1fr) 0;
+}
+
+.ns-app[data-nav='off'][data-rail='off'] {
+  grid-template-columns: 0 minmax(0, 1fr) 0;
+}
+
+@media (max-width: 1024px) {
+  .ns-app,
+  .ns-app[data-rail='off'] {
+    grid-template-columns: var(--ns-app-nav) minmax(0, 1fr);
+  }
+
+  .ns-app[data-nav='off'] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .ns-app,
+  .ns-app[data-rail='off'],
+  .ns-app[data-nav='off'] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Left rail shell: sticky full-height column, scrollable body. */
+.ns-nav {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  border-right: 1px solid var(--ns-border);
+  background: var(--ns-bg);
+}
+
+.ns-nav__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ns-space-3);
+  min-height: var(--ns-topbar-h);
+  padding: var(--ns-space-3) var(--ns-space-4);
+  border-bottom: 1px solid var(--ns-border);
+}
+
+.ns-nav__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ns-space-1);
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--ns-space-3) var(--ns-space-2-5);
+}
+
+.ns-nav__foot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ns-space-2);
+  padding: var(--ns-space-3) var(--ns-space-2-5);
+  border-top: 1px solid var(--ns-border);
+}
+
+/* Center column: sticky topbar + scroll region + centered padded body. */
+.ns-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.ns-main__scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.ns-main__pad {
+  width: min(var(--ns-shell-content), 100%);
+  margin-inline: auto;
+  padding: var(--ns-space-8) var(--ns-space-8) var(--ns-space-16);
+}
+
+/* Session (chat) column: scroll region above a docked composer. */
+.ns-session {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  min-height: 0;
+  height: 100%;
+}
+
+.ns-session__scroll {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--ns-space-6) var(--ns-space-6) var(--ns-space-8);
+}
+
+.ns-session__composer {
+  border-top: 1px solid var(--ns-border);
+  background: var(--ns-bg);
+  padding: var(--ns-space-4) var(--ns-space-6) var(--ns-space-5);
+}
+
+/* Secondary sticky topbar (in-column, distinct from the page .ns-topbar). */
+.ns-topbar2 {
+  position: sticky;
+  top: 0;
+  z-index: var(--ns-z-sticky);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ns-space-4);
+  min-height: var(--ns-topbar-h);
+  padding-inline: var(--ns-space-6);
+  border-bottom: 1px solid var(--ns-border);
+  background: color-mix(in srgb, var(--ns-bg) 88%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.ns-topbar2__title {
+  display: flex;
+  align-items: center;
+  gap: var(--ns-space-2);
+  min-width: 0;
+  font-weight: 600;
+  color: var(--ns-fg);
+}
+
+.ns-topbar2__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--ns-space-2);
+  flex-shrink: 0;
+}
+
+/* Small layout utilities. */
+.ns-divider-y {
+  align-self: stretch;
+  width: 1px;
+  background: var(--ns-border);
+}
+
+.ns-kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--ns-space-5);
+  padding: 0 var(--ns-space-1-5);
+  border: 1px solid var(--ns-border);
+  border-radius: var(--ns-radius-sm);
+  background: var(--ns-surface);
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-2xs);
+  line-height: calc(var(--ns-space-5) - 2px);
+  color: var(--ns-muted-fg);
+}
