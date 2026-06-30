@@ -26,11 +26,19 @@ import {
 } from '@netscript/plugin-triggers-core/adapters';
 import { KvTriggerEventStore, openTriggerRuntimeKv } from '@netscript/plugin-triggers-core/stores';
 import { TriggersError } from '@netscript/plugin-triggers-core/domain';
-import type { WebhookDefinition } from '@netscript/plugin-triggers-core/domain';
+import type {
+  TriggerEvent,
+  TriggerEventId,
+  TriggerEventStatus,
+  WebhookDefinition,
+} from '@netscript/plugin-triggers-core/domain';
 import type {
   ProcessableTriggerDefinition,
+  TriggerEventListOptions,
   TriggerEventStorePort,
   TriggerIngressPort,
+  TriggerIngressRequest,
+  TriggerIngressResponse,
   TriggerProcessorPort,
 } from '@netscript/plugin-triggers-core/ports';
 import { createTriggerIngress } from '@netscript/plugin-triggers-core/runtime';
@@ -127,6 +135,7 @@ export type TriggersServiceOptions = Readonly<{
   /** Pre-opened KV adapter; defaults to the runtime KV. */
   kv?: KvStore;
 }>;
+type TriggerServiceContextSource = TriggerServiceContext | (() => TriggerServiceContext);
 
 /** Assemble the triggers service runtime context from the supplied or default ports. */
 export async function createTriggersServiceContext(
@@ -166,12 +175,15 @@ export async function createTriggersServiceContext(
  * (and `/:triggerId/*`) paths existing senders use.
  */
 export function createTriggersService(
-  context: TriggerServiceContext,
+  context: TriggerServiceContextSource,
   options: Readonly<{ port?: number }> = {},
 ): ServiceBuilder<typeof router> {
   const port = options.port ?? Number(Deno.env.get('PORT') ?? TRIGGERS_API_DEFAULT_PORT);
-  const webhookHandler = (c: Context): Promise<Response> =>
-    acceptWebhook(c, context.ingress, context.definitions);
+  const resolveContext = () => typeof context === 'function' ? context() : context;
+  const webhookHandler = (c: Context): Promise<Response> => {
+    const resolvedContext = resolveContext();
+    return acceptWebhook(c, resolvedContext.ingress, resolvedContext.definitions);
+  };
   return createPluginService(router, {
     name: TRIGGERS_API_SERVICE_NAME,
     version: VERSION,
@@ -182,7 +194,7 @@ export function createTriggersService(
       description: 'Trigger introspection, event introspection, and webhook ingress.',
     },
     docs: {},
-    context: () => context,
+    context: resolveContext,
     rawRoutes: [
       { method: 'post', path: `${WEBHOOK_PATH_PREFIX}:triggerId`, handler: webhookHandler },
       { method: 'post', path: `${WEBHOOK_PATH_PREFIX}:triggerId/*`, handler: webhookHandler },
@@ -199,9 +211,54 @@ export function createTriggersService(
 export async function startTriggersService(
   options: TriggersServiceOptions = {},
 ): Promise<void> {
-  const context = await createTriggersServiceContext(options);
+  let context = createUnavailableTriggersServiceContext();
   const port = options.port ?? Number(Deno.env.get('PORT') ?? TRIGGERS_API_DEFAULT_PORT);
-  await createTriggersService(context, { port }).serve();
+  await createTriggersService(() => context, { port }).serve();
+
+  queueMicrotask(async () => {
+    try {
+      context = await createTriggersServiceContext(options);
+      console.log(`[Triggers API] Running on http://localhost:${port}`);
+    } catch (error) {
+      console.error('[Triggers API] Failed to finish post-listen startup:', error);
+    }
+  });
+}
+
+function createUnavailableTriggersServiceContext(): TriggerServiceContext {
+  return {
+    definitions: [],
+    eventStore: new UnavailableTriggerEventStore(),
+    ingress: unavailableTriggerIngress,
+  };
+}
+
+class UnavailableTriggerEventStore implements TriggerEventStorePort {
+  save(_event: TriggerEvent): Promise<void> {
+    return Promise.reject(triggerRuntimeUnavailable());
+  }
+
+  load(_eventId: TriggerEventId): Promise<TriggerEvent | undefined> {
+    return Promise.resolve(undefined);
+  }
+
+  updateStatus(_eventId: TriggerEventId, _status: TriggerEventStatus): Promise<void> {
+    return Promise.reject(triggerRuntimeUnavailable());
+  }
+
+  list(_options?: TriggerEventListOptions): Promise<readonly TriggerEvent[]> {
+    return Promise.resolve([]);
+  }
+}
+
+const unavailableTriggerIngress: TriggerIngressPort = {
+  accept(_request: TriggerIngressRequest): Promise<TriggerIngressResponse> {
+    return Promise.reject(triggerRuntimeUnavailable());
+  },
+};
+
+function triggerRuntimeUnavailable(): Error {
+  return new Error('Triggers runtime context is not ready yet.');
 }
 
 /** Assert a KV handle is present (always true on the default-event-store path). */
