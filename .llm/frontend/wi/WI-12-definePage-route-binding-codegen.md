@@ -506,8 +506,49 @@ and skips the write as idempotent.
    `routeContract<N>` import-alias naming pattern remains in use for Form B
    sidecar contracts only.
 
-## Status
+## Implementation status (2026-06-30, Claude Opus 4.8)
 
-DRAFT PR. Planning artifact only; the implementation will land in subsequent
-commits on this branch by a separate Claude Code (Opus 4.8) session after the
-plan-eval approves the design.
+Implemented and green on `deno task check` + `deno task test` for
+`packages/fresh` (157 tests passing), plus `deno lint` / `deno fmt --check` on
+all touched files:
+
+- Commit 1 — restored `.withRouteContract({ $route?, pathSchema?, searchSchema? })`
+  builder method with type-state promotion (mirrors `.withRoute`).
+- Commit 2 — dependency-free page-module scanner + Form A/B/C discovery; build
+  error for `.withRoute` + `.withRouteContract` in one module.
+- Commits 3-5 — idempotent page-module rewriter (`computePageModuleRewrite`),
+  disk orchestrator (`writeNetScriptPageModuleBindingsSync`), Vite plugin
+  `pageModuleRouteBinding` option (default `true`), inline+sidecar warning.
+- Commit 6 — unit tests across builder / manifest / scanner-rewriter / vite.
+- Commit 8 — README + `docs/site/web-layer/builders.md` updated for Form A/B/C,
+  deprecating the manual `bindRoutePattern` primacy.
+
+End-to-end proof (manual, not committed): a temp app with a Form A inline page,
+a Form B sidecar page, and a Form C page was run through
+`writeNetScriptRouteManifestSync` + `writeNetScriptPageModuleBindingsSync`, then
+`deno check`'d against the real `@netscript/fresh` package — all three forms
+typecheck clean and `.generated/routes.ts` binds the sidecar contract while
+emitting `createRouteReference` for Form A/C.
+
+### `paths?` field
+
+The WI signature lists `withRouteContract({ pathSchema?, searchSchema?, paths? })`,
+but the current `defineRouteContract` runtime has no `paths` concept anywhere in
+the package (the historical `paths` builder was already gone). The implemented
+method accepts `{ $route?, pathSchema?, searchSchema? }` — the exact shape
+`defineRouteContract` supports. `paths` is intentionally omitted; reintroducing
+it would require a separate route-contract runtime change out of WI-12 scope.
+
+### Commit 7 (CLI template migration) — DEFERRED, see PR comment
+
+The 6 named CLI scaffold templates are all schemaless static routes that bind via
+the app's curated `@app/router.ts` (`appRoutes.<x>`), and several `appRoutes`
+entries (e.g. `designComponents`, `telemetryExample`) are hand-authored
+`createRouteReference(...)` consts in `router.ts` that do NOT exist in the
+generated `routes` tree. Migrating these live templates to Form A/B and routing
+them through `@app/.generated/routes.ts` would bypass the intentional `router.ts`
+indirection and risk routes that do not resolve. The proving gate for that change
+is the toolchain-heavy `scaffold.runtime` E2E lane (aspire + docker + postgres),
+which cannot be run in this environment. Rather than ship an unproven mutation to
+every scaffolded app, the live-template migration is left for the maintainer; the
+feature itself is proven end-to-end above.
