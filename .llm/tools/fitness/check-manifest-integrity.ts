@@ -1,4 +1,4 @@
-import { freshUiRegistryManifest } from "../../../packages/fresh-ui/registry/manifest.ts";
+import { freshUiRegistryManifest } from "../../../packages/fresh-ui/registry.manifest.ts";
 
 const registryRoot = "registry/";
 const excludedRegistrySources = new Set([
