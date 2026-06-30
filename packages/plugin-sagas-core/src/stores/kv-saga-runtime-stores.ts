@@ -1,3 +1,4 @@
+import type { AtomicMutation, KvKey, KvStore } from '@netscript/kv';
 import type {
   SagaAppliedKeyOutcome,
   SagaAppliedKeyStore,
@@ -9,45 +10,46 @@ import type {
 import { sagaIdempotencyKey } from '@netscript/plugin-sagas-core/runtime';
 
 const DEFAULT_SAGA_IDEMPOTENCY_TTL_MS = 24 * 60 * 60 * 1000;
+const DEFAULT_SAGA_KV_PREFIX = ['sagas'] as const satisfies KvKey;
 
 type SagaIdempotencyReservationRecord = Readonly<{
   reservedAt: string;
   expiresAt: string;
 }>;
 
-/** Shared options for Deno KV-backed saga runtime stores. */
+/** Shared options for KV-backed saga runtime stores. */
 export type SagaRuntimeKvStoreOptions = Readonly<{
-  kv: Deno.Kv;
-  prefix?: readonly Deno.KvKeyPart[];
+  kv: KvStore;
+  prefix?: KvKey;
   now?: () => Date;
 }>;
 
-/** Options for Deno KV-backed saga transport idempotency reservations. */
+/** Options for KV-backed saga transport idempotency reservations. */
 export type KvSagaIdempotencyStoreOptions =
   & SagaRuntimeKvStoreOptions
   & Readonly<{
     ttlMs?: number;
   }>;
 
-/** Options for Deno KV-backed saga applied-key records. */
+/** Options for KV-backed saga applied-key records. */
 export type KvSagaAppliedKeyStoreOptions =
   & SagaRuntimeKvStoreOptions
   & Readonly<{
     activeTtlMs?: number;
   }>;
 
-/** Deno KV-backed saga transport idempotency reservation store. */
+/** KV-backed saga transport idempotency reservation store. */
 export class KvSagaIdempotencyStore implements SagaIdempotencyPort {
-  readonly #kv: Deno.Kv;
-  readonly #prefix: readonly Deno.KvKeyPart[];
+  readonly #kv: KvStore;
+  readonly #prefix: KvKey;
   readonly #now: () => Date;
   readonly #ttlMs: number;
 
-  /** Create an idempotency store over the supplied Deno KV database. */
+  /** Create an idempotency store over the supplied KV adapter. */
   constructor(options: KvSagaIdempotencyStoreOptions) {
     validatePositiveTtl(options.ttlMs ?? DEFAULT_SAGA_IDEMPOTENCY_TTL_MS, 'ttlMs');
     this.#kv = options.kv;
-    this.#prefix = options.prefix ?? ['sagas'];
+    this.#prefix = options.prefix ?? DEFAULT_SAGA_KV_PREFIX;
     this.#now = options.now ?? (() => new Date());
     this.#ttlMs = options.ttlMs ?? DEFAULT_SAGA_IDEMPOTENCY_TTL_MS;
   }
@@ -62,17 +64,18 @@ export class KvSagaIdempotencyStore implements SagaIdempotencyPort {
     const expiresAt = new Date(now.getTime() + this.#ttlMs);
     const reservationKey = this.#reservationKey(key);
     const current = await this.#kv.get<SagaIdempotencyReservationRecord>(reservationKey);
-    if (current.value && new Date(current.value.expiresAt) <= now) {
+    if (current?.value && new Date(current.value.expiresAt) <= now) {
       await this.#kv.delete(reservationKey);
     }
-    const result = await this.#kv.atomic()
-      .check({ key: reservationKey, versionstamp: null })
-      .set(
-        reservationKey,
-        Object.freeze({ reservedAt: now.toISOString(), expiresAt: expiresAt.toISOString() }),
-        { expireIn: this.#ttlMs },
-      )
-      .commit();
+    const result = await requireAtomic(this.#kv)(
+      [{ key: reservationKey, versionstamp: null }],
+      [{
+        type: 'set',
+        key: reservationKey,
+        value: Object.freeze({ reservedAt: now.toISOString(), expiresAt: expiresAt.toISOString() }),
+        expireIn: this.#ttlMs,
+      }],
+    );
 
     return Object.freeze({
       accepted: result.ok,
@@ -81,25 +84,25 @@ export class KvSagaIdempotencyStore implements SagaIdempotencyPort {
     });
   }
 
-  #reservationKey(key: string): Deno.KvKey {
+  #reservationKey(key: string): KvKey {
     return [...this.#prefix, 'idempotency', key];
   }
 }
 
-/** Deno KV-backed saga applied-key store for exactly-once-effective handler effects. */
+/** KV-backed saga applied-key store for exactly-once-effective handler effects. */
 export class KvSagaAppliedKeyStore implements SagaAppliedKeyStore {
-  readonly #kv: Deno.Kv;
-  readonly #prefix: readonly Deno.KvKeyPart[];
+  readonly #kv: KvStore;
+  readonly #prefix: KvKey;
   readonly #now: () => Date;
   readonly #activeTtlMs?: number;
 
-  /** Create an applied-key store over the supplied Deno KV database. */
+  /** Create an applied-key store over the supplied KV adapter. */
   constructor(options: KvSagaAppliedKeyStoreOptions) {
     if (options.activeTtlMs !== undefined) {
       validatePositiveTtl(options.activeTtlMs, 'activeTtlMs');
     }
     this.#kv = options.kv;
-    this.#prefix = options.prefix ?? ['sagas'];
+    this.#prefix = options.prefix ?? DEFAULT_SAGA_KV_PREFIX;
     this.#now = options.now ?? (() => new Date());
     this.#activeTtlMs = options.activeTtlMs;
   }
@@ -110,24 +113,25 @@ export class KvSagaAppliedKeyStore implements SagaAppliedKeyStore {
     idempotencyKey: string,
   ): Promise<SagaAppliedKeyOutcome> {
     const value = Object.freeze({ appliedAt: this.#now().toISOString() });
-    const atomic = this.#kv.atomic()
-      .check({ key: this.#appliedKey(instanceId, idempotencyKey), versionstamp: null });
+    const key = this.#appliedKey(instanceId, idempotencyKey);
+    const mutation: AtomicMutation = this.#activeTtlMs === undefined
+      ? { type: 'set', key, value }
+      : { type: 'set', key, value, expireIn: this.#activeTtlMs };
 
-    if (this.#activeTtlMs === undefined) {
-      atomic.set(this.#appliedKey(instanceId, idempotencyKey), value);
-    } else {
-      atomic.set(this.#appliedKey(instanceId, idempotencyKey), value, {
-        expireIn: this.#activeTtlMs,
-      });
-    }
-
-    const result = await atomic.commit();
+    const result = await requireAtomic(this.#kv)([{ key, versionstamp: null }], [mutation]);
     return Object.freeze({ applied: result.ok });
   }
 
-  #appliedKey(instanceId: SagaInstanceId, idempotencyKey: string): Deno.KvKey {
+  #appliedKey(instanceId: SagaInstanceId, idempotencyKey: string): KvKey {
     return [...this.#prefix, 'applied', instanceId, idempotencyKey];
   }
+}
+
+function requireAtomic(kv: KvStore): NonNullable<KvStore['atomic']> {
+  if (!kv.atomic) {
+    throw new Error('Saga KV runtime store requires atomic compare-and-swap support.');
+  }
+  return kv.atomic.bind(kv);
 }
 
 function validatePositiveTtl(value: number, name: string): void {

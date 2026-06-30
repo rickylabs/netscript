@@ -1,19 +1,12 @@
 /**
  * @module @netscript/plugin-sagas/runtime
  *
- * Plugin-layer publisher, runner, and supervisor processes.
+ * Plugin-layer publisher, runner, and supervisor processes. Concrete stores
+ * are exported from `@netscript/plugin-sagas-core/stores`.
  */
 
 export { createSagaPublisher, HttpSagaPublisher } from './saga-publisher.ts';
 export { createDurableSagaRuntime } from './create-durable-saga-runtime.ts';
-export { KvSagaStore, openSagaRuntimeKv } from './kv-saga-store.ts';
-export { PrismaSagaStore } from './prisma-saga-store.ts';
-export {
-  resolveSagaStoreBackend,
-  SAGA_STORE_BACKEND_ENV,
-  SAGA_STORE_BACKENDS,
-} from './saga-store-backend.ts';
-export { KvSagaAppliedKeyStore, KvSagaIdempotencyStore } from './kv-saga-runtime-stores.ts';
 export { loadSagaRegistryModule, runSagaRunner, startSagaRunner } from './saga-runner.ts';
 export { SagaRuntimeSupervisor } from './saga-supervisor.ts';
 export {
@@ -90,11 +83,6 @@ export type {
   SagaStoreWriteOptions,
 } from '@netscript/plugin-sagas-core/runtime';
 export type {
-  KvSagaAppliedKeyStoreOptions,
-  KvSagaIdempotencyStoreOptions,
-  SagaRuntimeKvStoreOptions,
-} from './kv-saga-runtime-stores.ts';
-export type {
   HttpSagaPublisherOptions,
   SagaPublisherEnvReader,
   SagaPublisherFetch,
@@ -105,11 +93,7 @@ export type {
 export type {
   DurableSagaRuntime,
   DurableSagaRuntimeOptions,
-  DurableSagaStoreBackend,
 } from './create-durable-saga-runtime.ts';
-export type { KvSagaStoreOptions } from './kv-saga-store.ts';
-export type { PrismaSagaStoreClient, PrismaSagaStoreOptions } from './prisma-saga-store.ts';
-export type { SagaStoreBackendResolutionInput } from './saga-store-backend.ts';
 export type {
   RunSagaRunnerOptions,
   SagaRunnerEnvReader,

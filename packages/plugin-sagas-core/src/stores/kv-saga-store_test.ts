@@ -1,6 +1,7 @@
 import { assertEquals, assertRejects } from 'jsr:@std/assert@^1';
 
 import { SagasError } from '@netscript/plugin-sagas-core/domain';
+import { DenoKvAdapter, type KvStore, MemoryKvAdapter } from '@netscript/kv';
 import type {
   SagaCorrelationKey,
   SagaId,
@@ -12,18 +13,20 @@ import type {
 
 import { KvSagaStore } from './kv-saga-store.ts';
 
-Deno.test('KvSagaStore round-trips state envelopes', async () => {
-  await using fixture = await createStoreFixture();
-  const envelope = createEnvelope({ count: 1 }, 1);
+for (const backend of ['memory', 'deno-kv'] as const) {
+  Deno.test(`KvSagaStore round-trips state envelopes with ${backend}`, async () => {
+    await using fixture = await createStoreFixture(backend);
+    const envelope = createEnvelope({ count: 1 }, 1);
 
-  await fixture.store.save(envelope);
+    await fixture.store.save(envelope);
 
-  assertEquals(await fixture.store.load(envelope.metadata.instanceId), envelope);
-  assertEquals(await fixture.store.entries(), [envelope]);
-});
+    assertEquals(await fixture.store.load(envelope.metadata.instanceId), envelope);
+    assertEquals(await fixture.store.entries(), [envelope]);
+  });
+}
 
 Deno.test('KvSagaStore saves and resolves correlations', async () => {
-  await using fixture = await createStoreFixture();
+  await using fixture = await createStoreFixture('memory');
   const sagaId = 'billing-saga' as SagaId;
   const correlationKey = 'order-1' as SagaCorrelationKey;
   const instanceId = 'billing-saga:order-1' as SagaInstanceId;
@@ -34,7 +37,7 @@ Deno.test('KvSagaStore saves and resolves correlations', async () => {
 });
 
 Deno.test('KvSagaStore appends transition log records in version order', async () => {
-  await using fixture = await createStoreFixture();
+  await using fixture = await createStoreFixture('memory');
   const instanceId = 'billing-saga:order-1' as SagaInstanceId;
   const first = createTransition(1, { status: 'started' }, { status: 'charged' });
   const second = createTransition(2, { status: 'charged' }, { status: 'completed' });
@@ -45,23 +48,25 @@ Deno.test('KvSagaStore appends transition log records in version order', async (
   assertEquals(await fixture.store.transitions(instanceId), [first, second]);
 });
 
-Deno.test('KvSagaStore rejects stale expected versions', async () => {
-  await using fixture = await createStoreFixture();
-  const first = createEnvelope({ count: 1 }, 1);
-  const second = createEnvelope({ count: 2 }, 2);
+for (const backend of ['memory', 'deno-kv'] as const) {
+  Deno.test(`KvSagaStore rejects stale expected versions with ${backend}`, async () => {
+    await using fixture = await createStoreFixture(backend);
+    const first = createEnvelope({ count: 1 }, 1);
+    const second = createEnvelope({ count: 2 }, 2);
 
-  await fixture.store.save(first);
+    await fixture.store.save(first);
 
-  const error = await assertRejects(
-    () => fixture.store.save(second, { expectedVersion: 0 }),
-    SagasError,
-    'Saga store version mismatch',
-  );
-  assertEquals(error.code, 'SAGA_VALIDATION_FAILED');
-});
+    const error = await assertRejects(
+      () => fixture.store.save(second, { expectedVersion: 0 }),
+      SagasError,
+      'Saga store version mismatch',
+    );
+    assertEquals(error.code, 'SAGA_VALIDATION_FAILED');
+  });
+}
 
 Deno.test('KvSagaStore deletes state, transitions, and matching correlations', async () => {
-  await using fixture = await createStoreFixture();
+  await using fixture = await createStoreFixture('memory');
   const envelope = createEnvelope({ count: 1 }, 1);
   const sagaId = 'billing-saga' as SagaId;
   const correlationKey = 'order-1' as SagaCorrelationKey;
@@ -88,16 +93,22 @@ type StoreFixture =
     store: KvSagaStore;
   }>;
 
-async function createStoreFixture(): Promise<StoreFixture> {
-  const kv = await Deno.openKv(':memory:');
+async function createStoreFixture(backend: 'memory' | 'deno-kv'): Promise<StoreFixture> {
+  const kv = await createKvStore(backend);
   const store = new KvSagaStore({ kv, prefix: ['test-sagas', crypto.randomUUID()] });
   return {
     store,
-    [Symbol.asyncDispose](): Promise<void> {
-      store.close();
-      return Promise.resolve();
+    async [Symbol.asyncDispose](): Promise<void> {
+      await store.close();
     },
   };
+}
+
+async function createKvStore(backend: 'memory' | 'deno-kv'): Promise<KvStore> {
+  if (backend === 'memory') {
+    return new MemoryKvAdapter();
+  }
+  return new DenoKvAdapter(await Deno.openKv(':memory:'));
 }
 
 function createEnvelope<TState extends SagaState>(

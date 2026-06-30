@@ -328,7 +328,7 @@ KV handle it opened).
   {
     label: "resolve from env / appsettings",
     lang: "ts",
-    code: "import {\n  createDurableSagaRuntime,\n  resolveSagaStoreBackend,\n} from '@netscript/plugin-sagas/runtime';\n\n// Read the backend from the environment (or appsettings) — throws if unset.\nconst backend = resolveSagaStoreBackend({\n  env: Deno.env.toObject(),\n  // appsettings: loadedAppsettings, // sagas.store.backend\n});\n\nconst runtime = await createDurableSagaRuntime({\n  backend,\n  prisma: backend === 'prisma' ? prismaClient : undefined,\n});"
+    code: "import { createDurableSagaRuntime } from '@netscript/plugin-sagas/runtime';\nimport { resolveSagaStoreBackend } from '@netscript/plugin-sagas-core/stores';\n\n// Read the backend from the environment (or appsettings) — throws if unset.\nconst backend = resolveSagaStoreBackend({\n  env: Deno.env.toObject(),\n  // appsettings: loadedAppsettings, // sagas.store.backend\n});\n\nconst runtime = await createDurableSagaRuntime({\n  backend,\n  prisma: backend === 'prisma' ? prismaClient : undefined,\n});"
   }
 ] }) }}
 

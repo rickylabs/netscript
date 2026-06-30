@@ -1,5 +1,6 @@
 import { assertEquals, assertRejects } from 'jsr:@std/assert@^1';
 
+import { MemoryKvAdapter } from '@netscript/kv';
 import { SagasError } from '@netscript/plugin-sagas-core/domain';
 import type {
   SagaCorrelationKey,
@@ -13,7 +14,7 @@ import { defineSaga } from '../../../../packages/plugin-sagas-core/mod.ts';
 import { createDurableSagaRuntime } from './create-durable-saga-runtime.ts';
 
 Deno.test('createDurableSagaRuntime resumes saga state across runtime restart', async () => {
-  const kv = await Deno.openKv(':memory:');
+  const kv = new MemoryKvAdapter();
   const observedCounts: number[] = [];
   const definition = createCounterSaga(observedCounts);
 
@@ -45,7 +46,7 @@ Deno.test('createDurableSagaRuntime resumes saga state across runtime restart', 
 });
 
 Deno.test('createDurableSagaRuntime store rejects stale expected versions', async () => {
-  const kv = await Deno.openKv(':memory:');
+  const kv = new MemoryKvAdapter();
   const durable = await createDurableSagaRuntime({ kv });
   const first = createEnvelope(1, { count: 1 });
   const second = createEnvelope(2, { count: 2 });

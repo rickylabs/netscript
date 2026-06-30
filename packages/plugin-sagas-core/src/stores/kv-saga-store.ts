@@ -1,4 +1,6 @@
 import { SagasError } from '@netscript/plugin-sagas-core/domain';
+import { getKv } from '@netscript/kv';
+import type { AtomicMutation, KvKey, KvStore } from '@netscript/kv';
 import type {
   SagaCorrelationIndexEntry,
   SagaCorrelationKey,
@@ -11,29 +13,29 @@ import type {
   SagaTransitionRecord,
 } from '@netscript/plugin-sagas-core/runtime';
 
-const DEFAULT_SAGA_KV_PREFIX = ['sagas'] as const satisfies readonly Deno.KvKeyPart[];
+const DEFAULT_SAGA_KV_PREFIX = ['sagas'] as const satisfies KvKey;
 const SAGA_KV_PATH_ENV = 'NETSCRIPT_SAGA_KV_PATH';
 
-/** Options for the Deno KV-backed saga runtime store. */
+/** Options for the KV-backed saga runtime store. */
 export type KvSagaStoreOptions = Readonly<{
-  kv: Deno.Kv;
-  prefix?: readonly Deno.KvKeyPart[];
+  kv: KvStore;
+  prefix?: KvKey;
   now?: () => Date;
 }>;
 
-/** Open the Deno KV database used by production saga runtime stores. */
-export function openSagaRuntimeKv(): Promise<Deno.Kv> {
-  return Deno.openKv(Deno.env.get(SAGA_KV_PATH_ENV));
+/** Open the shared KV adapter used by production saga runtime stores. */
+export function openSagaRuntimeKv(): Promise<KvStore> {
+  return getKv({ path: Deno.env.get(SAGA_KV_PATH_ENV) });
 }
 
-/** Deno KV-backed saga state store for durable native saga execution. */
+/** KV-backed saga state store for durable native saga execution. */
 export class KvSagaStore implements SagaStorePort {
   /** Stable store identifier used by runtime diagnostics. */
   readonly id = 'kv-saga-store';
-  readonly #kv: Deno.Kv;
-  readonly #prefix: readonly Deno.KvKeyPart[];
+  readonly #kv: KvStore;
+  readonly #prefix: KvKey;
 
-  /** Create a saga store over the supplied Deno KV database. */
+  /** Create a saga store over the supplied KV adapter. */
   constructor(options: KvSagaStoreOptions) {
     this.#kv = options.kv;
     this.#prefix = options.prefix ?? DEFAULT_SAGA_KV_PREFIX;
@@ -44,7 +46,7 @@ export class KvSagaStore implements SagaStorePort {
     instanceId: SagaInstanceId,
   ): Promise<SagaStateEnvelope<TState> | undefined> {
     const entry = await this.#kv.get<SagaStateEnvelope<TState>>(this.#stateKey(instanceId));
-    return entry.value ?? undefined;
+    return entry?.value ?? undefined;
   }
 
   /** Save a saga state envelope with optimistic version checking. */
@@ -56,15 +58,15 @@ export class KvSagaStore implements SagaStorePort {
     const current = await this.#kv.get<SagaStateEnvelope>(key);
     if (
       options.expectedVersion !== undefined &&
-      current.value?.metadata.version !== options.expectedVersion
+      current?.value?.metadata.version !== options.expectedVersion
     ) {
       throw versionMismatch(envelope.metadata.instanceId);
     }
 
-    const result = await this.#kv.atomic()
-      .check({ key, versionstamp: current.versionstamp })
-      .set(key, envelope)
-      .commit();
+    const result = await requireAtomic(this.#kv)(
+      [{ key, versionstamp: current?.versionstamp ?? null }],
+      [{ type: 'set', key, value: envelope }],
+    );
 
     if (!result.ok) {
       throw versionMismatch(envelope.metadata.instanceId);
@@ -85,7 +87,7 @@ export class KvSagaStore implements SagaStorePort {
     correlationKey: SagaCorrelationKey,
   ): Promise<SagaInstanceId | undefined> {
     const entry = await this.#kv.get<SagaInstanceId>(this.#correlationKey(sagaId, correlationKey));
-    return entry.value ?? undefined;
+    return entry?.value ?? undefined;
   }
 
   /** Save or update the correlation index for an instance. */
@@ -98,25 +100,25 @@ export class KvSagaStore implements SagaStorePort {
 
   /** Delete persisted state, transition history, and matching correlation indexes. */
   async delete(instanceId: SagaInstanceId): Promise<void> {
-    const atomic = this.#kv.atomic().delete(this.#stateKey(instanceId));
+    const mutations: AtomicMutation[] = [{ type: 'delete', key: this.#stateKey(instanceId) }];
 
     for await (
       const entry of this.#kv.list<SagaTransitionRecord>({
         prefix: this.#transitionPrefix(instanceId),
       })
     ) {
-      atomic.delete(entry.key);
+      mutations.push({ type: 'delete', key: entry.key });
     }
 
     for await (
       const entry of this.#kv.list<SagaInstanceId>({ prefix: this.#correlationsPrefix() })
     ) {
       if (entry.value === instanceId) {
-        atomic.delete(entry.key);
+        mutations.push({ type: 'delete', key: entry.key });
       }
     }
 
-    await atomic.commit();
+    await requireAtomic(this.#kv)([], mutations);
   }
 
   /** Return all stored state envelopes for diagnostics and tests. */
@@ -148,37 +150,44 @@ export class KvSagaStore implements SagaStorePort {
   }
 
   /** Close the underlying KV handle. */
-  close(): void {
-    this.#kv.close();
+  close(): Promise<void> {
+    return this.#kv.close();
   }
 
-  #statesPrefix(): Deno.KvKey {
+  #statesPrefix(): KvKey {
     return [...this.#prefix, 'state'];
   }
 
-  #stateKey(instanceId: SagaInstanceId): Deno.KvKey {
+  #stateKey(instanceId: SagaInstanceId): KvKey {
     return [...this.#statesPrefix(), instanceId];
   }
 
-  #correlationsPrefix(): Deno.KvKey {
+  #correlationsPrefix(): KvKey {
     return [...this.#prefix, 'correlation'];
   }
 
-  #correlationKey(sagaId: SagaId, correlationKey: SagaCorrelationKey): Deno.KvKey {
+  #correlationKey(sagaId: SagaId, correlationKey: SagaCorrelationKey): KvKey {
     return [...this.#correlationsPrefix(), sagaId, correlationKey];
   }
 
-  #transitionsPrefix(): Deno.KvKey {
+  #transitionsPrefix(): KvKey {
     return [...this.#prefix, 'transition'];
   }
 
-  #transitionPrefix(instanceId: SagaInstanceId): Deno.KvKey {
+  #transitionPrefix(instanceId: SagaInstanceId): KvKey {
     return [...this.#transitionsPrefix(), instanceId];
   }
 
-  #transitionKey(instanceId: SagaInstanceId, version: number): Deno.KvKey {
+  #transitionKey(instanceId: SagaInstanceId, version: number): KvKey {
     return [...this.#transitionPrefix(instanceId), version];
   }
+}
+
+function requireAtomic(kv: KvStore): NonNullable<KvStore['atomic']> {
+  if (!kv.atomic) {
+    throw SagasError.validationFailed('Saga KV store requires atomic compare-and-swap support.');
+  }
+  return kv.atomic.bind(kv);
 }
 
 function versionMismatch(instanceId: SagaInstanceId): SagasError {

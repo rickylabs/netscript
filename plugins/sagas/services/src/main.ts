@@ -21,16 +21,15 @@ import type { PluginServiceContext } from '@netscript/plugin/sdk';
 import type { RunningService } from '@netscript/service';
 import { createPluginService } from '@netscript/plugin/service';
 import type { SagaRuntime } from '@netscript/plugin-sagas-core/runtime';
-import { type SagaStreamPrismaClient, startSagasStreamMirror } from '../../streams/server.ts';
 import {
-  createDurableSagaRuntime,
-  type DurableSagaRuntime,
   KvSagaAppliedKeyStore,
   KvSagaIdempotencyStore,
   openSagaRuntimeKv,
   type PrismaSagaStoreClient,
   resolveSagaStoreBackend,
-} from '../../src/runtime/mod.ts';
+} from '@netscript/plugin-sagas-core/stores';
+import { type SagaStreamPrismaClient, startSagasStreamMirror } from '../../streams/server.ts';
+import { createDurableSagaRuntime, type DurableSagaRuntime } from '../../src/runtime/mod.ts';
 import { createSagaTelemetry } from '../../src/telemetry/otel-saga-tracer.ts';
 import { router } from './router.ts';
 import { registerSagas } from './init.ts';

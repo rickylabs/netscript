@@ -1,4 +1,5 @@
-import type { DurableSagaStoreBackend } from './create-durable-saga-runtime.ts';
+/** Durable saga store backend variants supported by the plugin runtime. */
+export type DurableSagaStoreBackend = 'kv' | 'prisma';
 
 /** Environment variable used to select the durable saga state backend. */
 export const SAGA_STORE_BACKEND_ENV = 'NETSCRIPT_SAGA_STORE';

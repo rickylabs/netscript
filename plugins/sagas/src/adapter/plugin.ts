@@ -26,7 +26,7 @@ export const sagasAdapterPlugin: NetScriptPlugin = {
     dependencySpecifier: 'jsr:@netscript/plugin-sagas@^0.0.1-alpha.12',
     starterResources: sagasStarterResources,
     configParams: ['SAGAS_API_URL', 'SAGA_CONCURRENCY'],
-    wiringEntry: '@netscript/plugin-sagas/runtime',
+    wiringEntry: '@netscript/plugin-sagas-core/stores',
   },
   doctor: {
     healthEndpoint: '/sagas/health',

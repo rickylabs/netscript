@@ -3161,6 +3161,7 @@
       "packages/plugin-sagas-core": {
         "dependencies": [
           "jsr:@hono/hono@4.12.24",
+          "jsr:@netscript/kv@0.0.1-alpha.12",
           "jsr:@std/assert@1",
           "jsr:@zod/zod@4.4.3"
         ],
