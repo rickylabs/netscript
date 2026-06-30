@@ -52,8 +52,13 @@ export function generateServiceDenoJson(options: ServiceDenoJsonOptions): string
     exports: './src/main.ts',
     tasks: {
       check: 'deno check src/**/*.ts',
-      dev: 'deno run -A --watch src/main.ts',
-      start: 'deno run -A src/main.ts',
+      // `--unstable-no-legacy-abort` opts into the non-legacy Deno.serve behavior
+      // where `request.signal` aborts only on a genuine client disconnect, not on
+      // a successful response. The service runtime's oRPC handler observes
+      // `request.signal` for request cancellation; without this flag Deno 2.9 logs
+      // a deprecation warning on every successful request (denoland/deno#29111).
+      dev: 'deno run -A --unstable-no-legacy-abort --watch src/main.ts',
+      start: 'deno run -A --unstable-no-legacy-abort src/main.ts',
       test: 'deno test -A src/',
     },
     imports: {

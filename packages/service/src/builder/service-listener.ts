@@ -6,6 +6,15 @@
  * builder class so the listener concern can evolve (e.g. TLS, clustering) without
  * touching the fluent API.
  *
+ * Per-request cancellation note (Deno 2.9, denoland/deno#29111): the request
+ * handler returns the app's response directly so per-request teardown happens on
+ * the handler's return path, not via a side-effecting `request.signal` listener
+ * installed here. The oRPC runtime still observes `request.signal` for genuine
+ * client-disconnect cancellation; to avoid Deno's legacy abort-on-success
+ * deprecation warning while preserving that cancellation, scaffolded services run
+ * with `--unstable-no-legacy-abort` (see the generated service `deno.json`
+ * tasks). The listener itself never depends on the signal firing on success.
+ *
  * @module
  */
 
