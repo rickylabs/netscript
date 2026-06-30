@@ -6,3 +6,4 @@
 - f7fb8493: feat(workers): conform plugin manifest and router assembly
 - 36271e86: feat(sagas): conform plugin manifest and router assembly
 - 265e08ec: feat(streams): conform proxy manifest surface
+- 31e63c74: feat(auth): conform manifest and health routing

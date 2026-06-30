@@ -93,6 +93,34 @@ Gate results:
 | focused source tests | `rtk proxy deno test --allow-all packages/cli/src/public/features/plugins/new/new-plugin_test.ts`; `rtk proxy deno test --allow-all packages/plugin/tests/scaffold/scaffold-generators_test.ts` | PASS — CLI 1 suite/3 steps, plugin 2 tests |
 | source publish dry-run | `cd packages/plugin && rtk proxy deno task publish:dry-run`; `cd packages/cli && rtk proxy deno task publish:dry-run` | PASS — both dry runs complete; existing dynamic-import warnings remain |
 | arch check | `rtk proxy deno task arch:check` | PASS exit 0 — `FAIL=0`; existing WARN/INFO doctrine findings remain |
+
+### S-conform-auth
+
+- Scope: auth connector reference conformance.
+- Commit: `31e63c74` (`feat(auth): conform manifest and health routing`).
+
+Implemented:
+
+- Deleted local `AuthPluginManifest`/contribution/dependency/inspection mirror types.
+- Deleted `inspectAuth`; tests and README now use core `inspectPlugin(authPlugin)`.
+- Replaced connector-local `AnyRouter` service assembly with `assemblePluginContractRouter(...)`
+  from `@netscript/plugin/service`.
+- Deleted the bespoke auth health router and moved adapter doctor metadata from `/auth/health` to
+  the shared `/health` service endpoint.
+- Preserved `./adapter-cli` and deferred per-backend env construction as
+  `AUTH-BACKEND-ENV-CENTRALIZATION` debt.
+
+Gate results:
+
+| Gate | Command | Result |
+|---|---|---|
+| no-dangling grep | `rg "AuthPluginManifest|inspectAuth|AnyRouter|/auth/health" plugins/auth -n` | PASS — 0 hits |
+| scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/auth --ext ts,tsx` | PASS — 35 files, 0 diagnostics |
+| scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root plugins/auth --ext ts,tsx` | PASS — 35 files, 0 diagnostics |
+| scoped fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/auth --ext ts,tsx` | PASS — 35 files, 0 findings |
+| package tests | `cd plugins/auth && rtk proxy deno task test` | PASS — 23 passed, 0 failed |
+| publish dry-run | `cd plugins/auth && rtk proxy deno task publish:dry-run` | PASS — dry run complete; existing bootstrap dynamic-import warning remains |
+| arch check | `rtk proxy deno task arch:check` | PASS exit 0 — `FAIL=0`; existing WARN/INFO doctrine findings remain |
 | local runtime smoke | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS — `passed=48 failed=0` |
 
 ### S-conform-workers
