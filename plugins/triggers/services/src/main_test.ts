@@ -22,7 +22,7 @@ import {
   HmacSha256WebhookVerifier,
   MemoryWebhookVerifier,
 } from '@netscript/plugin-triggers-core/adapters';
-import { defineWebhook } from '@netscript/plugin-triggers-core/builders';
+import { defineScheduledTrigger, defineWebhook } from '@netscript/plugin-triggers-core/builders';
 import type {
   TriggerEvent,
   TriggerEventId,
@@ -92,15 +92,14 @@ const failingIngress: TriggerIngressPort = {
 function buildContext(): TriggerServiceContext {
   const eventStore = new InMemoryEventStore();
   const definitions: readonly ProcessableTriggerDefinition[] = [
-    {
+    defineScheduledTrigger(() => Promise.resolve([]), {
       id: 'sched-1',
-      kind: 'scheduled',
       name: 'Fixture Schedule',
-      durability: 't1',
+      cron: '0 0 * * *',
+      timezone: 'UTC',
       description: 'A scheduled trigger fixture.',
       tags: ['fixture'],
-      handler: () => Promise.resolve([]),
-    } as unknown as ProcessableTriggerDefinition,
+    }),
   ];
   return {
     definitions,
@@ -324,6 +323,27 @@ Deno.test('triggers connector smoke', async (t) => {
         triggerId: 'sched-1',
         status: 'pending',
       });
+    });
+
+    await t.step('previewSchedule returns next fire times', async () => {
+      const route = await findRoute(
+        baseUrl,
+        (method, path) => method === 'GET' && /\/triggers\/\{id\}\/preview$/.test(path),
+      );
+      const res = await fetch(
+        `${baseUrl}/api${route.path.replace('{id}', 'sched-1')}?count=2`,
+      );
+      assertEquals(res.status, 200);
+      const body = await res.json() as {
+        triggerId: string;
+        nextFireAt: string[];
+        timezone: string;
+        persistent: boolean;
+      };
+      assertEquals(body.triggerId, 'sched-1');
+      assertEquals(body.nextFireAt.length, 2);
+      assertEquals(body.timezone, 'UTC');
+      assertEquals(body.persistent, true);
     });
 
     await t.step('raw webhook unknown trigger id resolves to a 404', async () => {

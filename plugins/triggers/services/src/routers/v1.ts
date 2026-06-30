@@ -31,6 +31,7 @@ import type {
   TriggerEventStatus,
   TriggerKind,
 } from '@netscript/plugin-triggers-core/domain';
+import { computeNextFireTimes } from '@netscript/plugin-triggers-core/runtime';
 import { notFound } from '@netscript/contracts';
 import { router, type TriggersHandlers } from './router-context.ts';
 import type { TriggerServiceContext } from './v1-types.ts';
@@ -192,8 +193,20 @@ export const triggersV1: TriggersHandlers<TriggersV1RouteKey> = {
     };
   }),
 
-  previewSchedule: router.previewSchedule.handler(() => {
-    throw new Error(PENDING_BACKING_MESSAGE);
+  previewSchedule: router.previewSchedule.handler(({ input, errors, path, context }) => {
+    const definition = context.definitions.find((candidate) => candidate.id === input.id);
+    if (definition === undefined) {
+      notFound({ errors, path, resourceId: input.id });
+    }
+    if (definition.kind !== 'scheduled') {
+      throw new Error(`Trigger ${input.id} is not a scheduled trigger.`);
+    }
+    return {
+      triggerId: definition.id,
+      nextFireAt: computeNextFireTimes(definition, input.count ?? 5),
+      timezone: definition.timezone,
+      persistent: definition.persistent ?? true,
+    };
   }),
 
   enableTrigger: router.enableTrigger.handler(async ({ input, errors, path, context }) => {

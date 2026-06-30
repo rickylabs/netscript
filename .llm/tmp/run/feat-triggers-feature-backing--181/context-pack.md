@@ -28,4 +28,7 @@ Latest slice:
 - Slice 3 implemented `createManualDispatcher` and backed connector `fireTrigger`. Gates are green;
   commit `6ead7da4` is recorded in `commits.md`.
 - Slice 4 implemented `createWebhookTestDelivery` and backed connector `testWebhook` through
-  ingress-signed synthetic requests. Gates are green; commit pending.
+  ingress-signed synthetic requests. Gates are green; commit `3ef180f7` is recorded in
+  `commits.md`.
+- Slice 5 implemented `computeNextFireTimes` and backed connector `previewSchedule`. Gates are
+  green; commit pending.

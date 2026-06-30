@@ -44,6 +44,7 @@ export type {
   WebhookVerifierPort,
 } from '../ports/mod.ts';
 export {
+  computeNextFireTimes,
   createManualDispatcher,
   createTriggerIngress,
   createTriggerProcessor,

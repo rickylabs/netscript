@@ -1450,6 +1450,31 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** none (record-only until the maintainer decision; a future unification run selects
   gates).
 
+## plugin-triggers-core — CRON-NEXT-FIRE-ENGINE
+
+- **ID:** `CRON-NEXT-FIRE-ENGINE`
+- **Reason:** #181 Slice 5 introduced a triggers-core-owned `computeNextFireTimes` helper so the
+  connector can back `previewSchedule` without calling the `@netscript/cron` scheduler heuristic.
+  The helper is deliberately bounded and self-contained: it parses five-field cron expressions,
+  projects UTC minutes through `Intl.DateTimeFormat`, preserves fall-back duplicates, and maps
+  spring-forward nonexistent wall times to the first valid minute after the gap. It covers the
+  locked DST/timezone/leap-day table, but it is still a preview engine, not yet a shared canonical
+  cron subsystem for workers, triggers, and durable scheduling.
+- **Why it is debt:** The repo still has multiple cron-related surfaces (`@netscript/cron`, workers
+  `.schedule()`, trigger scheduler adapters, and this preview helper). Follow-up should either
+  upstream the preview semantics into the canonical cron primitive or replace this helper with an
+  equivalent shared engine once the cron subsystem decision is made, without regressing the #181
+  DST table.
+- **Owner:** `@netscript/plugin-triggers-core` runtime + cron subsystem maintainers.
+- **Target:** Cron subsystem unification follow-up after #181.
+- **Linked plan:** `.llm/tmp/run/feat-triggers-feature-backing--181/plan.md` Slice 5 / L6.
+- **Created:** 2026-06-30.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when `computeNextFireTimes` is backed by the canonical shared cron engine or the
+  helper is explicitly blessed as that engine, with table coverage for spring-forward skip,
+  fall-back duplicate, fixed-offset timezone, omitted `from`, one-shot `persistent: false`, leap
+  day, impossible dates, and every-N-minutes intervals.
+
 ## repo-wide — RUN-ARTIFACT-ARCHIVAL-POLICY (`.llm/tmp/run/` evidence tonnage)
 
 - **Reason:** `.llm/tmp/run/` carries large tracked harness-evidence volume. The bulk is durable by

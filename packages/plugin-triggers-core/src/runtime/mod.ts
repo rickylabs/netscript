@@ -4,6 +4,7 @@ export { createTriggerProcessor } from './create-trigger-processor.ts';
 export { createTriggerIngress } from './create-trigger-ingress.ts';
 export { createManualDispatcher } from './create-manual-dispatcher.ts';
 export { createWebhookTestDelivery } from './create-webhook-test-delivery.ts';
+export { computeNextFireTimes } from './compute-next-fire-times.ts';
 export { NoopLogger } from './logger.ts';
 export { defaultRetryPolicy, TriggerProcessor } from './trigger-processor.ts';
 export type {

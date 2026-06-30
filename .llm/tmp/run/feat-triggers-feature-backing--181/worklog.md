@@ -133,7 +133,7 @@ Notes:
 
 ## Slice 4 — Webhook Test Delivery
 
-Status: implemented, gated, ready to commit.
+Status: implemented, gated, committed as `3ef180f7`.
 
 Files:
 - `packages/plugin-triggers-core/src/runtime/create-webhook-test-delivery.ts`
@@ -166,3 +166,39 @@ Notes:
   to the trigger-fire response contract.
 - `createTriggersServiceContext` constructs the default helper from the existing ingress and
   `Deno.env` secret lookup only; the service assembly remains unchanged.
+
+## Slice 5 — Cron Next-Fire Preview
+
+Status: implemented, gated, ready to commit.
+
+Files:
+- `packages/plugin-triggers-core/src/runtime/compute-next-fire-times.ts`
+- `packages/plugin-triggers-core/src/runtime/compute-next-fire-times_test.ts`
+- `packages/plugin-triggers-core/src/runtime/mod.ts`
+- `packages/plugin-triggers-core/src/public/mod.ts`
+- `plugins/triggers/services/src/routers/v1.ts`
+- `plugins/triggers/services/src/main_test.ts`
+- `.llm/harness/debt/arch-debt.md`
+
+Gate evidence:
+- `run-deno-check` core: PASS, exit 0, 71 files, `--unstable-kv`.
+- `run-deno-check` connector services: PASS, exit 0, 6 files, `--unstable-kv`.
+- `run-deno-lint` core: PASS, exit 0, 0 findings.
+- `run-deno-lint` connector services: PASS, exit 0, 0 findings.
+- `run-deno-fmt` core: PASS, exit 0, 0 findings after formatting the new cron file.
+- `run-deno-fmt` connector services: PASS, exit 0, 0 findings.
+- `rtk proxy deno task test --unstable-kv packages/plugin-triggers-core/src/runtime/compute-next-fire-times_test.ts packages/plugin-triggers-core/src/runtime/create-webhook-test-delivery_test.ts packages/plugin-triggers-core/tests/contracts/triggers-contract-soundness_test.ts`: PASS, exit 0, 11 passed.
+- `rtk proxy deno task test --unstable-kv plugins/triggers/services/src/main_test.ts`: PASS, exit 0, 4 passed, 8 steps.
+- `deno publish --dry-run --allow-dirty` in `packages/plugin-triggers-core`: PASS, exit 0.
+- `deno publish --dry-run --allow-dirty` in `plugins/triggers`: PASS, exit 0; pre-existing
+  dynamic-import warnings only.
+- `rtk proxy deno task arch:check`: PASS, exit 0, `FAIL=0` with existing warnings plus the
+  `plugin-triggers-core/src/runtime` 13-child warning introduced by this new runtime file.
+
+Notes:
+- `previewSchedule` now resolves scheduled definitions, calls `computeNextFireTimes`, and maps
+  `{ triggerId, nextFireAt, timezone, persistent }`.
+- Core table coverage includes the locked eight cases: spring-forward skip, fall-back duplicate,
+  Asia/Tokyo, omitted `from`, `persistent: false`, leap day, invalid cron typed error, and
+  every-N-minutes interval baseline.
+- `CRON-NEXT-FIRE-ENGINE` is recorded in `.llm/harness/debt/arch-debt.md`.
