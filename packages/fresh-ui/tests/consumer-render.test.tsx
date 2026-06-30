@@ -11,7 +11,16 @@
 
 import { assert } from '@std/assert';
 import type { VNode } from 'preact';
-import { Accordion, Dialog, Drawer, Popover, Sheet, Tabs, Tooltip } from '../interactive.ts';
+import {
+  Accordion,
+  Combobox,
+  Dialog,
+  Drawer,
+  Popover,
+  Sheet,
+  Tabs,
+  Tooltip,
+} from '../interactive.ts';
 import { Show, SrOnly, VisuallyHidden } from '../primitives.tsx';
 
 const accordion: VNode = (
@@ -100,6 +109,17 @@ const tooltip: VNode = (
   </Tooltip.Root>
 );
 
+const combobox: VNode = (
+  <Combobox.Root defaultInputValue=''>
+    <Combobox.Input placeholder='Search…' />
+    <Combobox.Content>
+      <Combobox.Item value='one'>One</Combobox.Item>
+      <Combobox.Item value='two'>Two</Combobox.Item>
+      <Combobox.Empty>No matches</Combobox.Empty>
+    </Combobox.Content>
+  </Combobox.Root>
+);
+
 const primitives: VNode = (
   <Show when>
     <VisuallyHidden>hidden</VisuallyHidden>
@@ -109,7 +129,7 @@ const primitives: VNode = (
 
 Deno.test('runtime namespaces construct consumer-shaped JSX trees', () => {
   for (
-    const tree of [accordion, dialog, drawer, popover, sheet, tabs, tooltip, primitives]
+    const tree of [accordion, combobox, dialog, drawer, popover, sheet, tabs, tooltip, primitives]
   ) {
     assert(tree && typeof tree === 'object' && 'type' in tree);
   }
