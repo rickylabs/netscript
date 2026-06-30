@@ -1,10 +1,5 @@
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
-import {
-  assertEquals,
-  assertFalse,
-  assertRejects,
-  assertStringIncludes,
-} from 'jsr:@std/assert@^1';
+import { assertEquals, assertFalse, assertRejects, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { join, resolve } from '@std/path';
 import { ScaffoldValidationError } from '../../../../kernel/domain/errors.ts';
 
@@ -328,18 +323,18 @@ describe('public install plugin flow', () => {
       });
 
       assertEquals(result.pluginOwnedScaffold?.status, 'applied');
-      assertEquals(result.pluginOwnedScaffold?.databaseMigrationsAdded, true);
+      assertEquals(result.pluginOwnedScaffold?.databaseMigrationsAdded, false);
       assertStringIncludes(
         result.pluginOwnedScaffold?.createdFiles.join('\n') ?? '',
-        'plugins/workers/services/src/main.ts',
+        'workers/jobs/health-check.ts',
       );
       assertStringIncludes(
-        await Deno.readTextFile(join(projectRoot, 'plugins/workers/mod.ts')),
-        "definePlugin('workers', '0.1.0')",
+        await Deno.readTextFile(join(projectRoot, 'workers/mod.ts')),
+        'export { healthCheckJob }',
       );
       assertStringIncludes(
-        await Deno.readTextFile(join(projectRoot, 'plugins/workers/database/schema.prisma')),
-        'model WorkersRecord',
+        await Deno.readTextFile(join(projectRoot, 'appsettings.json')),
+        '"Workdir": "plugins/workers"',
       );
     } finally {
       await Deno.remove(projectRoot, { recursive: true });
@@ -381,10 +376,9 @@ describe('public install plugin flow', () => {
       assertEquals(result.pluginOwnedScaffold?.status, 'planned');
       assertStringIncludes(
         result.pluginOwnedScaffold?.createdFiles.join('\n') ?? '',
-        'plugins/workers/bin/combined.ts',
+        'workers/mod.ts',
       );
-      await assertFalseExists(join(projectRoot, 'plugins/workers/mod.ts'));
-      await assertFalseExists(join(projectRoot, 'plugins/workers/database/schema.prisma'));
+      await assertFalseExists(join(projectRoot, 'workers/mod.ts'));
     } finally {
       await Deno.remove(projectRoot, { recursive: true });
     }
@@ -458,22 +452,18 @@ describe('public install plugin flow', () => {
       });
 
       assertEquals(result.pluginOwnedScaffold?.status, 'applied');
-      assertEquals(result.pluginOwnedScaffold?.databaseMigrationsAdded, true);
+      assertEquals(result.pluginOwnedScaffold?.databaseMigrationsAdded, false);
       assertStringIncludes(
         result.pluginOwnedScaffold?.createdFiles.join('\n') ?? '',
-        'plugins/sagas/database/sagas.prisma',
+        'sagas/user-registration-saga.ts',
       );
       assertStringIncludes(
         result.pluginOwnedScaffold?.createdFiles.join('\n') ?? '',
-        'plugins/sagas/sagas/user-registration-saga.ts',
+        'sagas/mod.ts',
       );
       assertStringIncludes(
-        await Deno.readTextFile(join(projectRoot, 'plugins/sagas/mod.ts')),
-        "definePlugin('sagas', '0.1.0')",
-      );
-      assertStringIncludes(
-        await Deno.readTextFile(join(projectRoot, 'plugins/sagas/database/sagas.prisma')),
-        'model SagaRuntimeState',
+        await Deno.readTextFile(join(projectRoot, 'sagas/mod.ts')),
+        'UserRegistrationSaga',
       );
       assertStringIncludes(
         await Deno.readTextFile(join(projectRoot, 'appsettings.json')),
@@ -519,10 +509,9 @@ describe('public install plugin flow', () => {
       assertEquals(result.pluginOwnedScaffold?.status, 'planned');
       assertStringIncludes(
         result.pluginOwnedScaffold?.createdFiles.join('\n') ?? '',
-        'plugins/sagas/src/runtime/saga-runner.ts',
+        'sagas/mod.ts',
       );
-      await assertFalseExists(join(projectRoot, 'plugins/sagas/mod.ts'));
-      await assertFalseExists(join(projectRoot, 'plugins/sagas/database/sagas.prisma'));
+      await assertFalseExists(join(projectRoot, 'sagas/mod.ts'));
     } finally {
       await Deno.remove(projectRoot, { recursive: true });
     }
@@ -595,26 +584,22 @@ describe('public install plugin flow', () => {
       });
 
       assertEquals(result.pluginOwnedScaffold?.status, 'applied');
-      assertEquals(result.pluginOwnedScaffold?.databaseMigrationsAdded, true);
+      assertEquals(result.pluginOwnedScaffold?.databaseMigrationsAdded, false);
       assertStringIncludes(
         result.pluginOwnedScaffold?.createdFiles.join('\n') ?? '',
-        'plugins/triggers/database/triggers.prisma',
+        'triggers/generic-inbound-webhook.ts',
       );
       assertStringIncludes(
         result.pluginOwnedScaffold?.createdFiles.join('\n') ?? '',
-        'plugins/triggers/triggers/generic-inbound-webhook.ts',
+        'triggers/mod.ts',
       );
       assertStringIncludes(
-        await Deno.readTextFile(join(projectRoot, 'plugins/triggers/mod.ts')),
-        "definePlugin('triggers', '0.1.0')",
-      );
-      assertStringIncludes(
-        await Deno.readTextFile(join(projectRoot, 'plugins/triggers/database/triggers.prisma')),
-        'model TriggerEvent',
+        await Deno.readTextFile(join(projectRoot, 'triggers/mod.ts')),
+        'genericInboundWebhookTrigger',
       );
       assertStringIncludes(
         await Deno.readTextFile(
-          join(projectRoot, 'plugins/triggers/triggers/daily-maintenance.ts'),
+          join(projectRoot, 'triggers/daily-maintenance.ts'),
         ),
         'defineScheduledTrigger',
       );
@@ -658,10 +643,9 @@ describe('public install plugin flow', () => {
       assertEquals(result.pluginOwnedScaffold?.status, 'planned');
       assertStringIncludes(
         result.pluginOwnedScaffold?.createdFiles.join('\n') ?? '',
-        'plugins/triggers/src/runtime/trigger-processor.ts',
+        'triggers/mod.ts',
       );
-      await assertFalseExists(join(projectRoot, 'plugins/triggers/mod.ts'));
-      await assertFalseExists(join(projectRoot, 'plugins/triggers/database/triggers.prisma'));
+      await assertFalseExists(join(projectRoot, 'triggers/mod.ts'));
     } finally {
       await Deno.remove(projectRoot, { recursive: true });
     }
@@ -737,23 +721,15 @@ describe('public install plugin flow', () => {
       assertEquals(result.pluginOwnedScaffold?.databaseMigrationsAdded, false);
       assertStringIncludes(
         result.pluginOwnedScaffold?.createdFiles.join('\n') ?? '',
-        'plugins/streams/services/src/routes.ts',
+        'streams/notifications-stream.ts',
       );
       assertStringIncludes(
         result.pluginOwnedScaffold?.createdFiles.join('\n') ?? '',
-        'plugins/streams/src/streams/mod.ts',
+        'streams/mod.ts',
       );
       assertStringIncludes(
-        await Deno.readTextFile(join(projectRoot, 'plugins/streams/mod.ts')),
-        "definePlugin('streams', '0.1.0')",
-      );
-      assertStringIncludes(
-        await Deno.readTextFile(join(projectRoot, 'plugins/streams/services/src/routes.ts')),
-        'DurableStreamTestServer',
-      );
-      assertStringIncludes(
-        await Deno.readTextFile(join(projectRoot, 'plugins/streams/src/aspire/mod.ts')),
-        "entrypoint: 'plugins/streams/services/src/main.ts'",
+        await Deno.readTextFile(join(projectRoot, 'streams/mod.ts')),
+        'notificationsStream',
       );
     } finally {
       await Deno.remove(projectRoot, { recursive: true });
@@ -796,10 +772,9 @@ describe('public install plugin flow', () => {
       assertEquals(result.pluginOwnedScaffold?.databaseMigrationsAdded, false);
       assertStringIncludes(
         result.pluginOwnedScaffold?.createdFiles.join('\n') ?? '',
-        'plugins/streams/services/src/main.ts',
+        'streams/mod.ts',
       );
-      await assertFalseExists(join(projectRoot, 'plugins/streams/mod.ts'));
-      await assertFalseExists(join(projectRoot, 'plugins/streams/services/src/routes.ts'));
+      await assertFalseExists(join(projectRoot, 'streams/mod.ts'));
     } finally {
       await Deno.remove(projectRoot, { recursive: true });
     }
@@ -873,26 +848,14 @@ describe('public install plugin flow', () => {
       });
 
       assertEquals(result.pluginOwnedScaffold?.status, 'applied');
-      assertEquals(result.pluginOwnedScaffold?.databaseMigrationsAdded, true);
+      assertEquals(result.pluginOwnedScaffold?.databaseMigrationsAdded, false);
       assertStringIncludes(
         result.pluginOwnedScaffold?.createdFiles.join('\n') ?? '',
-        'plugins/auth/database/auth.prisma',
+        'auth/mod.ts',
       );
       assertStringIncludes(
-        result.pluginOwnedScaffold?.createdFiles.join('\n') ?? '',
-        'plugins/auth/services/src/backend-registry.ts',
-      );
-      assertStringIncludes(
-        await Deno.readTextFile(join(projectRoot, 'plugins/auth/database/auth.prisma')),
-        'model User',
-      );
-      assertStringIncludes(
-        await Deno.readTextFile(join(projectRoot, 'plugins/auth/services/src/backend-registry.ts')),
-        "type AuthPluginBackendName = 'kv-oauth' | 'workos' | 'better-auth'",
-      );
-      assertStringIncludes(
-        await Deno.readTextFile(join(projectRoot, 'plugins/auth/streams/producer.ts')),
-        'emitOidcCompleted',
+        await Deno.readTextFile(join(projectRoot, 'auth/mod.ts')),
+        'AuthSessionResponseSchema',
       );
     } finally {
       await Deno.remove(projectRoot, { recursive: true });
@@ -932,13 +895,12 @@ describe('public install plugin flow', () => {
       });
 
       assertEquals(result.pluginOwnedScaffold?.status, 'planned');
-      assertEquals(result.pluginOwnedScaffold?.databaseMigrationsAdded, true);
+      assertEquals(result.pluginOwnedScaffold?.databaseMigrationsAdded, false);
       assertStringIncludes(
         result.pluginOwnedScaffold?.createdFiles.join('\n') ?? '',
-        'plugins/auth/services/src/routers/v1-handlers.ts',
+        'auth/mod.ts',
       );
-      await assertFalseExists(join(projectRoot, 'plugins/auth/mod.ts'));
-      await assertFalseExists(join(projectRoot, 'plugins/auth/database/auth.prisma'));
+      await assertFalseExists(join(projectRoot, 'auth/mod.ts'));
     } finally {
       await Deno.remove(projectRoot, { recursive: true });
     }
@@ -974,7 +936,7 @@ describe('public install plugin flow', () => {
       assertEquals(second.status, 'skipped');
       assertEquals(second.createdFiles, []);
       assertEquals(second.modifiedFiles, []);
-      assertEquals(second.databaseMigrationsAdded, true);
+      assertEquals(second.databaseMigrationsAdded, false);
     } finally {
       await Deno.remove(projectRoot, { recursive: true });
     }

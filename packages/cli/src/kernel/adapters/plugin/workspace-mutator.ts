@@ -227,13 +227,20 @@ export class PluginWorkspaceMutator {
   }
 
   /** Ensure `netscript.config.ts` declares a project-local plugin module. */
-  async ensureNetScriptConfigPlugin(projectRoot: string, pluginName: string): Promise<boolean> {
+  async ensureNetScriptConfigPlugin(
+    projectRoot: string,
+    pluginName: string,
+    pluginDir?: string,
+  ): Promise<boolean> {
     const configPath = join(projectRoot, 'netscript.config.ts');
     if (!await this.fs.exists(configPath)) {
       return false;
     }
 
-    const specifier = `./${SCAFFOLD_DIRS.PLUGINS}/${pluginName}/mod.ts`;
+    const relativePluginDir = pluginDir
+      ? normalizeWorkspaceRelativePath(projectRoot, pluginDir)
+      : join(SCAFFOLD_DIRS.PLUGINS, pluginName);
+    const specifier = `./${normalizePath(join(relativePluginDir, 'mod.ts'))}`;
     const quotedSpecifier = `'${specifier}'`;
     const source = await this.fs.readFile(configPath);
     if (source.includes(quotedSpecifier) || source.includes(`"${specifier}"`)) {
@@ -312,5 +319,20 @@ export class PluginWorkspaceMutator {
     await this.fs.writeFile(configPath, JSON.stringify(raw, null, 2) + '\n');
     return !hadCache;
   }
+}
 
+function normalizeWorkspaceRelativePath(projectRoot: string, path: string): string {
+  const normalizedProjectRoot = normalizePath(projectRoot).replace(/\/+$/, '');
+  const normalizedPath = normalizePath(path);
+  if (normalizedPath === normalizedProjectRoot) {
+    return '.';
+  }
+  if (normalizedPath.startsWith(`${normalizedProjectRoot}/`)) {
+    return normalizedPath.slice(normalizedProjectRoot.length + 1);
+  }
+  return normalizedPath.replace(/^\.\/+/, '');
+}
+
+function normalizePath(path: string): string {
+  return path.replace(/\\/g, '/');
 }

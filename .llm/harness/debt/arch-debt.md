@@ -1693,6 +1693,30 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Target:** Follow-up #173 plugin registry/list slice.
 - **Linked evidence:** `.llm/tmp/run/feat-scaffold-surface-167--adapter-relocation/worklog.md` S-f.
 - **Created:** 2026-06-30.
-- **Status:** open, DEBT_ACCEPTED for S-f only.
+- **Status:** closed by S-g (`fix(cli): reconcile plugin install list contract`).
 - **Gate:** Close when `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` reaches
   `failed=0` past `scaffold.plugin-list` without weakening plugin scaffold execution.
+- **Closing evidence:** S-g fresh-project reproduction changed from `plugin list` exit 1 on missing
+  `plugins/workers/scaffold.plugin.json` to exit 0 with `workers` listed from `./workers/mod.ts`.
+  The full `scaffold.runtime` suite now passes `scaffold.plugin-list` and advances to the distinct
+  `runtime.wait.workers-api` boundary recorded below.
+
+## plugin packages — PLUGIN-RUNTIME-DEPENDENCY-ENTRYPOINT-EXPORTS
+
+- **ID:** `PLUGIN-RUNTIME-DEPENDENCY-ENTRYPOINT-EXPORTS`
+- **Reason:** The #157 thin-dependency model forbids copying official plugin internals into generated
+  projects. After S-g reconciled config registration and `plugin list`, the full runtime E2E fails at
+  `runtime.wait.workers-api` because appsettings runtime resources still point at copied-package
+  workdirs such as `plugins/workers`, which are intentionally absent. Moving runtime resources to
+  package-spec execution requires an explicit public plugin executable-entrypoint contract for both
+  service and background processes. Service packages already expose `./services`; background
+  executables such as `@netscript/plugin-workers/bin/combined.ts` are not exported today.
+- **Why deferred:** Adding exported runtime executable subpaths is a new public package-surface
+  contract, not an install/register/list reconciliation. S-g's escape hatch required stopping rather
+  than folding that contract into this slice.
+- **Owner:** CLI plugin runtime / official plugin package maintainers.
+- **Linked evidence:** `.llm/tmp/run/feat-scaffold-surface-167--adapter-relocation/worklog.md` S-g.
+- **Status:** open, DEBT_ACCEPTED for S-g escape hatch.
+- **Gate:** Close when official plugin packages expose supported executable entrypoints for the
+  thin-dependency runtime and `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`
+  reaches `failed=0` without copying plugin internals into generated user projects.

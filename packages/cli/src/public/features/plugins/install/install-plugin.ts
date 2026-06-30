@@ -19,7 +19,10 @@ import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.t
 import type { PromptPort } from '../../../../kernel/ports/prompt-port.ts';
 import type { ProcessPort } from '../../../../kernel/ports/process-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../../../kernel/ports/template-port.ts';
-import type { InstallPluginResult, PluginInstallPlan } from '../../../domain/plugin-install-plan.ts';
+import type {
+  InstallPluginResult,
+  PluginInstallPlan,
+} from '../../../domain/plugin-install-plan.ts';
 import { ScaffoldValidationError } from '../../../../kernel/domain/errors.ts';
 import {
   mergeUniqueReferences,
@@ -31,10 +34,7 @@ import type {
   ValidatedPluginDescriptor,
 } from './jsr-plugin-validator-port.ts';
 import { planPluginInstall } from './plan-plugin-install.ts';
-import {
-  type RenderPluginDependencies,
-  renderPluginSupport,
-} from './render-plugin.ts';
+import { type RenderPluginDependencies, renderPluginSupport } from './render-plugin.ts';
 import {
   BARE_PLUGIN_PACKAGE_ALIASES,
   resolvePluginPackageSpec,
@@ -166,6 +166,7 @@ export async function installPlugin(
   await dependencies.workspaceMutator.ensureNetScriptConfigPlugin(
     plan.projectRoot,
     plan.pluginName,
+    resolvePluginConfigDirectory(plan, pluginOwned),
   );
   await dependencies.workspaceMutator.ensureRootImportsForPluginKind(plan.projectRoot, plan.kind);
   const provisionedCache = plan.provider.defaultRequiresKv
@@ -302,7 +303,7 @@ export function createDryRunInstallResult(
   scaffold: PluginOwnedScaffoldResult,
 ): InstallPluginResult {
   const filesCreated = scaffold.createdFiles.map((path) => join(plan.projectRoot, path));
-  const pluginDir = join(plan.projectRoot, SCAFFOLD_DIRS.PLUGINS, plan.pluginName);
+  const pluginDir = resolvePluginRuntimeDirectory(plan);
   return {
     resolvedPlugin: descriptor,
     pluginOwnedScaffold: scaffold,
@@ -339,7 +340,7 @@ export function createPluginOwnedPluginResult(
   scaffold: PluginOwnedScaffoldResult,
 ): PluginScaffoldResult {
   const officialSource = descriptor.manifest.officialSource;
-  const pluginDir = join(plan.projectRoot, SCAFFOLD_DIRS.PLUGINS, plan.pluginName);
+  const pluginDir = resolvePluginRuntimeDirectory(plan);
   const servicePort = plan.port ?? officialSource?.servicePort ?? 0;
   const backgroundPort = plan.port ?? officialSource?.backgroundPort ?? servicePort;
   const serviceConfigKey = plan.provider.category === 'plugin'
@@ -366,6 +367,36 @@ export function createPluginOwnedPluginResult(
       : undefined,
     serviceWorkdir: toWorkspaceRelativePath(plan.projectRoot, pluginDir),
   };
+}
+
+export function resolvePluginConfigDirectory(
+  plan: PluginInstallPlan,
+  scaffold: PluginOwnedScaffoldResult,
+): string {
+  const generatedMod = findGeneratedPluginMod(plan, scaffold);
+  const pluginDir = generatedMod ? plan.pluginName : join(SCAFFOLD_DIRS.PLUGINS, plan.pluginName);
+  return join(plan.projectRoot, pluginDir);
+}
+
+function resolvePluginRuntimeDirectory(
+  plan: PluginInstallPlan,
+): string {
+  const pluginDir = join(SCAFFOLD_DIRS.PLUGINS, plan.pluginName);
+  return join(plan.projectRoot, pluginDir);
+}
+
+function findGeneratedPluginMod(
+  plan: PluginInstallPlan,
+  scaffold: PluginOwnedScaffoldResult,
+): string | undefined {
+  return scaffold.createdFiles.find((path) =>
+    normalizePath(path) === `${plan.pluginName}/mod.ts`
+  ) ??
+    scaffold.modifiedFiles.find((path) => normalizePath(path) === `${plan.pluginName}/mod.ts`);
+}
+
+function normalizePath(path: string): string {
+  return path.replace(/\\/g, '/');
 }
 
 function normalizeManifestProvider(provider: ValidatedPluginDescriptor['manifest']['provider']):

@@ -23,13 +23,17 @@ import type { JsrPluginValidatorPort } from '../../../../public/features/plugins
 import type { JsrPackageFileFetcher } from '../../../../public/infra/jsr/verify-jsr-package-integrity.ts';
 import {
   createPluginOwnedPluginResult,
+  resolvePluginConfigDirectory,
   resolvePluginDescriptorBeforePlanning,
   runPluginOwnedScaffold,
 } from '../../../../public/features/plugins/install/install-plugin.ts';
 import { planPluginInstall } from '../../../../public/features/plugins/install/plan-plugin-install.ts';
 import { resolvePluginPackageSpec } from '../../../../public/features/plugins/install/plugin-package-resolver.ts';
 import { renderPluginSupport } from '../../../../public/features/plugins/install/render-plugin.ts';
-import { ensurePluginServiceContext, mergeUniqueReferences } from './install-local-plugin-helpers.ts';
+import {
+  ensurePluginServiceContext,
+  mergeUniqueReferences,
+} from './install-local-plugin-helpers.ts';
 import { resolveOfficialPluginSourceRoot } from './install-local-plugin-helpers.ts';
 
 export { resolveOfficialPluginSourceRoot } from './install-local-plugin-helpers.ts';
@@ -137,6 +141,9 @@ export async function installLocalPlugin(
   await dependencies.workspaceMutator.ensureNetScriptConfigPlugin(
     plan.projectRoot,
     plan.pluginName,
+    pluginOwned === undefined
+      ? rendered.plugin.pluginDir
+      : resolvePluginConfigDirectory(plan, pluginOwned),
   );
   await dependencies.workspaceMutator.ensureRootImportsForPluginKind(plan.projectRoot, plan.kind);
   const provisionedCache = plan.provider.defaultRequiresKv

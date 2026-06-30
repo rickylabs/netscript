@@ -25,3 +25,21 @@
 - 2026-06-30 — S-f root-scoped fmt wrapper over `packages/plugin` plus the five plugin roots reports
   five pre-existing unrelated formatting findings outside the bridge files. S-f did not mutate those
   files; touched-file fmt over the bridge diff is green.
+- 2026-06-30 — S-g reproduced the plugin install/register/list failure before editing. The write side
+  registered `./plugins/workers/mod.ts`, but plugin-owned scaffold output wrote userland glue to
+  `workers/mod.ts`, `workers/jobs/health-check.ts`, and `workers/tasks/validate-payload.ts`; no
+  `plugins/workers/mod.ts` and no `plugins/workers/scaffold.plugin.json` existed. The list side then
+  failed by hard-reading `plugins/workers/scaffold.plugin.json`.
+- 2026-06-30 — S-g fixed that existing config-driven contract without copying plugin internals:
+  registration now points at generated userland glue when it exists, and `plugin list` derives a
+  manifest-free fallback from `config.plugins`. The full `scaffold.runtime` suite now passes
+  `scaffold.plugin-list`.
+- 2026-06-30 — S-g then hit a distinct later runtime boundary at `runtime.wait.workers-api`. The
+  thin-dependency model leaves appsettings runtime entries pointing at dependency runtime workdirs
+  such as `plugins/workers`, but those package internals are no longer copied into the generated
+  tree. Making runtime entries execute package specs instead of copied files requires a new public
+  plugin package executable-entrypoint contract: service packages currently export `./services`, but
+  background executables such as `bin/combined.ts` are not exported (`deno run
+  jsr:@netscript/plugin-workers@0.0.1-alpha.12/bin/combined.ts` fails with unknown export). Per the
+  S-g escape hatch, this was recorded as follow-up debt rather than implemented inside the
+  install/list reconciliation slice.

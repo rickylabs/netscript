@@ -197,3 +197,75 @@ Gate evidence:
 S-f stops at the distinct `plugin list` manifest-registration blocker per the safety valve. The
 scaffold-CLI bridge regression is fixed and proven by direct subprocess output plus all five E2E
 plugin install gates passing.
+
+### S-g — plugin install/register/list reconciliation
+
+- Reproduced the S-g failure before editing with a fresh project at
+  `.llm/tmp/s-g-repro/sg-plugin-list-20260630-052850`.
+- `netscript.config.ts` registered `plugins: ['./plugins/workers/mod.ts']`.
+- Actual plugin-owned scaffold output landed in userland glue paths:
+  `workers/mod.ts`, `workers/jobs/health-check.ts`, and `workers/tasks/validate-payload.ts`;
+  the project also had only `plugins/deno.json` and `plugins/mod.ts`.
+- The registered specifier resolved to `<project>/plugins/workers/mod.ts`, which did not exist.
+- No userland `plugins/workers/scaffold.plugin.json` existed.
+- `netscript plugin list --project-root <project>` exited 1 with:
+  `No such file or directory (os error 2): readfile '<project>/plugins/workers/scaffold.plugin.json'`.
+- Fixed the config-driven list path so a missing userland manifest falls back to display metadata
+  derived from the registered specifier instead of failing.
+- Fixed registration so plugin-owned scaffold output that writes `<name>/mod.ts` registers
+  `./<name>/mod.ts` in `netscript.config.ts`, while runtime appsettings remain on the dependency
+  runtime path (`plugins/<name>`) instead of pointing at userland glue.
+- Added focused tests for manifest-free plugin-list success and generated glue registration.
+
+Post-fix spot check:
+
+| Evidence | Result |
+| --- | --- |
+| Fresh install project | `.llm/tmp/s-g-verify/sg-plugin-list-fixed-20260630-054614` |
+| `netscript.config.ts` plugin spec | `plugins: ['./workers/mod.ts']` |
+| Resolved specifier | `<project>/workers/mod.ts` exists |
+| Runtime appsettings workdir | `plugins/workers` for `workers-api` and `workers` |
+| `netscript plugin list --project-root <project>` | exit 0; listed `workers` with `Workdir=workers` |
+
+Gate evidence:
+
+| Gate | Result |
+| --- | --- |
+| Focused `deno test --unstable-kv --allow-all` over install/list/workspace-mutator tests | exit 0; `16 passed (23 steps)`, `0 failed` |
+| `deno fmt --check --no-config --single-quote --line-width 100 --indent-width 2 <S-g touched TS files>` | exit 0; `Checked 8 files` |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | exit 0; `failedBatches=0`, `totalOccurrences=0` |
+| `deno lint --no-config <S-g touched TS files>` | exit 0; `Checked 8 files`; wrapper is not authoritative for `packages/cli` because repo lint config excludes that root |
+| `deno test --unstable-kv --allow-all packages/cli` | exit 0; `177 passed (363 steps)`, `0 failed` |
+| `(cd packages/cli && deno publish --dry-run --allow-dirty)` | exit 0; existing unanalyzable dynamic import warnings only |
+| `rtk proxy deno task arch:check` | exit 0; deps check warning-only; all 13 doctrine roots `FAIL=0` |
+| `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | exit 1 after the original `scaffold.plugin-list` blocker passed; summary `passed=21 failed=1`; failed at `runtime.wait.workers-api` because appsettings points to a dependency runtime directory (`plugins/workers`) that is not materialized under the thin-dependency install model |
+
+`deno task arch:check` per-root summary:
+
+| Root | Summary |
+| --- | --- |
+| `packages/plugin-auth-core` | `FAIL=0 WARN=2 INFO=1` |
+| `packages/auth-workos` | `FAIL=0 WARN=1 INFO=1` |
+| `packages/auth-better-auth` | `FAIL=0 WARN=1 INFO=1` |
+| `packages/auth-kv-oauth` | `FAIL=0 WARN=1 INFO=1` |
+| `plugins/auth` | `FAIL=0 WARN=5 INFO=1` |
+| `packages/plugin` | `FAIL=0 WARN=3 INFO=1` |
+| `plugins/workers` | `FAIL=0 WARN=9 INFO=2` |
+| `plugins/sagas` | `FAIL=0 WARN=8 INFO=2` |
+| `plugins/triggers` | `FAIL=0 WARN=12 INFO=2` |
+| `plugins/streams` | `FAIL=0 WARN=4 INFO=1` |
+| `packages/plugin-sagas-core` | `FAIL=0 WARN=3 INFO=2` |
+| `packages/plugin-triggers-core` | `FAIL=0 WARN=2 INFO=2` |
+| `packages/plugin-workers-core` | `FAIL=0 WARN=7 INFO=2` |
+
+Escape-hatch finding:
+
+- The original install/register/list contract is restored: `scaffold.plugin-list` now passes in the
+  full runtime suite.
+- The remaining runtime failure is a distinct public package-surface issue. A fully thin runtime
+  cannot run copied `plugins/<name>/...` files, and converting runtime resources to `deno run
+  jsr:@netscript/plugin-<kind>@<version>/<entrypoint>` requires exported package executable subpaths
+  for both services and background processors. Services have `./services`; background processors do
+  not have exported executable subpaths today (`@netscript/plugin-workers@0.0.1-alpha.12/bin/combined.ts`
+  is rejected as an unknown export).
+- Per the S-g escape hatch, no new public runtime-entrypoint contract was added in this slice.

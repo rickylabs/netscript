@@ -319,3 +319,35 @@ Deno.test('PluginWorkspaceMutator appends project-local plugin config specs', as
   assertEquals(config.includes("'./plugins/workers/mod.ts',"), true);
   assertEquals(config.includes("'./plugins/sagas/mod.ts',"), true);
 });
+
+Deno.test('PluginWorkspaceMutator registers generated plugin glue entrypoints', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile(
+    '/project/netscript.config.ts',
+    [
+      "import { defineConfig } from '@netscript/config';",
+      '',
+      'export default defineConfig({',
+      "  name: 'sample-app',",
+      '  databases: {',
+      '    config: [],',
+      '  },',
+      '  plugins: [],',
+      '});',
+      '',
+    ].join('\n'),
+  );
+
+  const mutator = new PluginWorkspaceMutator(fs);
+  assertEquals(
+    await mutator.ensureNetScriptConfigPlugin('/project', 'workers', '/project/workers'),
+    true,
+  );
+  assertEquals(
+    await mutator.ensureNetScriptConfigPlugin('/project', 'workers', '/project/workers'),
+    false,
+  );
+
+  const config = await fs.readFile('/project/netscript.config.ts');
+  assertEquals(config.includes("'./workers/mod.ts'"), true);
+});
