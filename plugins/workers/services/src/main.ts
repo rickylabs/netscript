@@ -17,6 +17,7 @@
 import '@netscript/kv/redis';
 
 import type { PluginServiceContext } from '@netscript/plugin/sdk';
+import type { RunningService } from '@netscript/service';
 import { createPluginService } from '@netscript/plugin/service';
 import { router } from './router.ts';
 import { registerPluginJobs } from './init.ts';
@@ -25,7 +26,6 @@ import { createWorkersServiceRuntime } from './service-runtime.ts';
 
 export type { PluginServiceContext } from '@netscript/plugin/sdk';
 
-type ServiceDatabaseClient = Record<string, unknown>;
 type PluginServiceBootstrap = {
   createPluginServiceContext(pluginName: string): Promise<PluginServiceContext>;
 };
@@ -33,19 +33,20 @@ type PluginServiceBootstrap = {
 /**
  * Starts the Workers API service using host-provided infrastructure.
  *
- * The plugin service receives database access through `PluginServiceContext`
- * instead of importing the host application's database package.
+ * The plugin service receives host-owned runtime context without importing the
+ * host application's database package. Workers routes store their mutable state
+ * in KV-backed registries, so the opaque database client is not resolved on the
+ * liveness path.
  *
  * @param ctx - Host-provided plugin service context
  */
 export default async function createWorkersService(
   ctx: PluginServiceContext,
-): Promise<void> {
+): Promise<RunningService> {
   const port = parseInt(ctx.env.PORT ?? Deno.env.get('PORT') ?? '8091');
-  const dbClient = await ctx.db.getClient() as ServiceDatabaseClient;
   const runtime = await createWorkersServiceRuntime();
 
-  await createPluginService(router, {
+  const running = await createPluginService(router, {
     name: 'workers',
     version: '1.0.0',
     port,
@@ -53,7 +54,6 @@ export default async function createWorkersService(
       title: 'Workers API',
       description: 'Workers service for job management and execution',
     },
-    database: { context: dbClient },
     context: () => ({ workers: runtime }),
   }).serve();
 
@@ -69,6 +69,8 @@ export default async function createWorkersService(
       console.error('[Workers Plugin] Failed to finish post-listen startup:', error);
     }
   });
+
+  return running;
 }
 
 async function loadWorkersServiceContext(): Promise<PluginServiceContext> {
