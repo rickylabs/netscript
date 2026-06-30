@@ -55,15 +55,20 @@ export default async function createWorkersService(
     },
     database: { context: dbClient },
     context: () => ({ workers: runtime }),
-    onStartup: [async () => {
+  }).serve();
+
+  queueMicrotask(async () => {
+    try {
       await registerPluginJobs(runtime);
       runtime.executionState.setMutationHook(createStreamMutationHook());
 
       console.log(
         `Subscribe: http://localhost:${port}/api/v1/workers/subscribe (KV watch SSE)`,
       );
-    }],
-  }).serve();
+    } catch (error) {
+      console.error('[Workers Plugin] Failed to finish post-listen startup:', error);
+    }
+  });
 }
 
 async function loadWorkersServiceContext(): Promise<PluginServiceContext> {

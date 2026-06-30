@@ -8,3 +8,4 @@
 - a4cbc6ab: Emit plugin runtime launch glue
 - ca43a538: Launch plugins through runtime contract
 - bc4511fa: Honor plugin npm catalog dependencies
+- 1784b5a5: Resolve plugin launch specifiers in generated workspaces

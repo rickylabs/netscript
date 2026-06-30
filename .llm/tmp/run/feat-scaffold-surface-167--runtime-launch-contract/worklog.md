@@ -76,3 +76,11 @@
 | --- | --- | ---: | --- |
 | CLI tests | `cd packages/cli && deno test --unstable-kv --allow-all` | 0 | `ok \| 178 passed (363 steps) \| 0 failed`. |
 | root lint | `rtk proxy deno task lint` | 0 | `exitCode=0`; selected 1302 files, total lint occurrences 0. |
+
+## Final E2E follow-up — Seed typing and Aspire port cleanup
+
+| Gate | Command | Exit | Evidence |
+| --- | --- | ---: | --- |
+| scaffold.runtime rerun | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | 1 | Generated workspace reached `database.seed` and `generated.deno-check`; failed at `runtime.aspire-start` because an overlapping AppHost from `plugin-smoke-20260630-074042` held `https://127.0.0.1:18891`. |
+| Aspire cleanup | `aspire stop --apphost .llm/tmp/cli-e2e/plugin-smoke-20260630-074042/aspire/apphost.mts --non-interactive --nologo` | 0 | Stopped overlapping AppHost; `ss -ltnp` showed no remaining `1888*`/`4318` listeners afterward. |
+| focused CLI regression tests | `cd packages/cli && deno test --unstable-kv --allow-all src/kernel/adapters/plugin/workspace-mutator_test.ts src/kernel/templates/database/generators_test.ts src/kernel/application/registries/template-registry_test.ts` | 0 | `ok \| 11 passed (7 steps) \| 0 failed`. |

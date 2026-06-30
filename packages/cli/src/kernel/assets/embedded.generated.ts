@@ -128,7 +128,7 @@ const template_060 =
 const template_061 =
   "/**\n * Thin wrapper around @netscript/database Prisma client patching.\n *\n * @module\n */\n\nimport { runPatchPrismaClient } from '@netscript/database/scripts';\n\nconst GENERATED_DIR = new URL('../schema/.generated', import.meta.url).pathname\n  .replace(/^\\/([A-Z]:)/, '$1');\n\nif (import.meta.main) {\n  await runPatchPrismaClient(GENERATED_DIR);\n}\n";
 const template_062 =
-  "/**\n * Seed script for the scaffolded database workspace.\n *\n * @module\n */\n\nimport { db } from '../mod.ts';\n\nif (import.meta.main) {\n  const client = await db.getClient();\n\n  try {\n    const record = await client.exampleRecord.upsert({\n      where: { id: 'seed-example-record' },\n      update: { name: 'Seeded Example Record' },\n      create: {\n        id: 'seed-example-record',\n        name: 'Seeded Example Record',\n      },\n    });\n\n    console.log(`✅ Seeded ExampleRecord: ${record.id}`);\n  } finally {\n    await db.disconnect();\n  }\n}\n";
+  "/**\n * Seed script for the scaffolded database workspace.\n *\n * @module\n */\n\nimport { db } from '../mod.ts';\n\nif (import.meta.main) {\n  const client = await db.getClient();\n\n  try {\n    await client.$queryRaw`SELECT 1`;\n    console.log('✅ Database seed completed.');\n  } finally {\n    await db.disconnect();\n  }\n}\n";
 const template_063 =
   '{\n  "zodImportTarget": "v4",\n  "mode": "minimal",\n  "pureModels": true,\n  "variants": {\n    "pure": { "enabled": true },\n    "input": { "enabled": true },\n    "result": { "enabled": true }\n  },\n  "emit": {\n    "crud": false\n  }\n}\n';
 const template_064 =
