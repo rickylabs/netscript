@@ -45,3 +45,11 @@
 | workers check | `cd plugins/workers && deno task check` | 0 | Checked workers runtime export plus adapter/resources with glue resource wired into install starters. |
 | install test first run | `cd packages/cli && deno test --unstable-kv --allow-all src/public/features/plugins/install/install-plugin_test.ts` | 1 | Failed before glue assertions because local plugin fixture paths were cwd-relative under `packages/cli`; fixed test path anchoring to repo root. |
 | install test rerun | `cd packages/cli && deno test --unstable-kv --allow-all src/public/features/plugins/install/install-plugin_test.ts` | 0 | `ok \| 1 passed (19 steps) \| 0 failed`; workers/sagas/triggers installs assert generated `runtime.ts` glue files. |
+
+## Slice 5 — CLI launch contract generation
+
+| Gate | Command | Exit | Evidence |
+| --- | --- | ---: | --- |
+| CLI tests first run | `cd packages/cli && deno test --unstable-kv --allow-all` | 1 | Failed on old contract assertions and cwd-relative test fixture paths exposed by running from `packages/cli`; fixed assertions/path anchors. |
+| CLI tests rerun | `cd packages/cli && deno test --unstable-kv --allow-all` | 0 | `ok \| 177 passed (363 steps) \| 0 failed`. |
+| root lint | `rtk proxy deno task lint` | 0 | `exitCode=0`; selected 1302 files, total lint occurrences 0. |

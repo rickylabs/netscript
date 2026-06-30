@@ -22,9 +22,6 @@ import { RESOURCE_DEFAULTS } from '@netscript/aspire/constants';
 import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 import { renderTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
 
-/** Default entrypoint for background processors (workers, sagas, triggers). */
-const DEFAULT_BACKGROUND_ENTRYPOINT = 'bin/combined.ts';
-
 /**
  * Generates the register-background.mts file content.
  *
@@ -39,8 +36,8 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
 
   for (const [name, entry] of entries) {
     const id = safeIdentifier(name);
-    const workdir = entry.Workdir ?? name;
-    const entrypoint = entry.Entrypoint ?? DEFAULT_BACKGROUND_ENTRYPOINT;
+    const workdir = entry.Workdir ?? '.';
+    const entrypoint = entry.Entrypoint ?? `${name}/runtime.ts`;
     const telemetry = entry.Telemetry !== false;
     const watchMode = entry.WatchMode ?? false;
 

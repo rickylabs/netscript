@@ -21,7 +21,6 @@
 import type { RegisterPluginsOptions } from '../types.ts';
 import { extractSagaStoreBackend, fileHeader, safeIdentifier } from '../_utils.ts';
 import { SCAFFOLD_ASPIRE_MODULES } from '../../../../constants/scaffold/scaffold-aspire.ts';
-import { SCAFFOLD_DIRS } from '../../../../constants/scaffold/scaffold-dirs.ts';
 import { RESOURCE_DEFAULTS } from '@netscript/aspire/constants';
 import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 import { renderTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
@@ -44,8 +43,8 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
   const pass1Blocks: string[] = [];
 
   for (const [name, entry] of entries) {
-    const workdir = entry.Workdir ?? `${SCAFFOLD_DIRS.PLUGINS}/${name}`;
-    const entrypoint = entry.Entrypoint ?? RESOURCE_DEFAULTS.ServiceEntrypoint;
+    const workdir = entry.Workdir ?? '.';
+    const entrypoint = entry.Entrypoint ?? `jsr:@netscript/plugin-${name}/services`;
 
     const lines: string[] = [];
     lines.push(`  // --- ${name} ---`);

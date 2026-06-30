@@ -344,7 +344,15 @@ describe('public install plugin flow', () => {
       );
       assertStringIncludes(
         await Deno.readTextFile(join(projectRoot, 'appsettings.json')),
-        '"Workdir": "plugins/workers"',
+        '"Entrypoint": "jsr:@netscript/plugin-workers/services"',
+      );
+      assertStringIncludes(
+        await Deno.readTextFile(join(projectRoot, 'appsettings.json')),
+        '"Entrypoint": "workers/runtime.ts"',
+      );
+      assertStringIncludes(
+        await Deno.readTextFile(join(projectRoot, 'appsettings.json')),
+        '"Workdir": "."',
       );
     } finally {
       await Deno.remove(projectRoot, { recursive: true });

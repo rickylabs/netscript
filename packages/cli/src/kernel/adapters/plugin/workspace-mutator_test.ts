@@ -153,8 +153,8 @@ Deno.test('PluginWorkspaceMutator registers background plugins with companion AP
     Enabled: true,
     Runtime: 'deno',
     Port: 8091,
-    Entrypoint: 'services/src/main.ts',
-    Workdir: 'plugins/billing-worker',
+    Entrypoint: 'jsr:@netscript/plugin-billing-worker/services',
+    Workdir: '.',
     RequiresKv: true,
     RequiresDb: true,
     Permissions: [
@@ -168,8 +168,8 @@ Deno.test('PluginWorkspaceMutator registers background plugins with companion AP
   assertEquals(config.NetScript.BackgroundProcessors['billing-worker'], {
     Enabled: true,
     Runtime: 'deno',
-    Entrypoint: 'bin/combined.ts',
-    Workdir: 'plugins/billing-worker',
+    Entrypoint: 'billing-worker/runtime.ts',
+    Workdir: '.',
     Telemetry: true,
     WatchMode: true,
     RequiresDb: true,

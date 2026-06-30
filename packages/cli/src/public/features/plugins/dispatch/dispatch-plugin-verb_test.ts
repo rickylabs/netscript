@@ -1,6 +1,6 @@
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import { assert, assertEquals, assertRejects } from 'jsr:@std/assert@^1';
-import { join, resolve } from '@std/path';
+import { dirname, fromFileUrl, join, resolve } from '@std/path';
 
 import { DenoProcess } from '../../../../kernel/adapters/runtime/process/deno-process.ts';
 import type { ProcessPort, ProcessResult } from '../../../../kernel/ports/process-port.ts';
@@ -14,6 +14,12 @@ import {
 } from './dispatch-plugin-verb.ts';
 import type { ValidatedPluginDescriptor } from '../install/jsr-plugin-validator-port.ts';
 import { verifyJsrPackageIntegrity } from '../../../infra/jsr/verify-jsr-package-integrity.ts';
+
+const REPO_ROOT = resolve(dirname(fromFileUrl(import.meta.url)), '../../../../../../..');
+
+function repoPath(path: string): string {
+  return join(REPO_ROOT, path);
+}
 
 describe('plugin verb dispatch', () => {
   it('routes framework verbs through deno x and the plugin cli subpath', async () => {
@@ -79,7 +85,7 @@ describe('plugin verb dispatch', () => {
 describe('plugin scaffold dispatch', () => {
   it('invokes a local fixture scaffolder and runs declared post-scripts', async () => {
     const projectRoot = await Deno.makeTempDir();
-    const fixtureRoot = resolve('packages/cli/tests/fixtures/plugin-scaffolder');
+    const fixtureRoot = repoPath('packages/cli/tests/fixtures/plugin-scaffolder');
     try {
       const result = await dispatchPluginScaffold({
         descriptor: fixtureDescriptor(),
@@ -108,7 +114,7 @@ describe('plugin scaffold dispatch', () => {
 
   it('passes dry-run context to the fixture without writing project files', async () => {
     const projectRoot = await Deno.makeTempDir();
-    const fixtureRoot = resolve('packages/cli/tests/fixtures/plugin-scaffolder');
+    const fixtureRoot = repoPath('packages/cli/tests/fixtures/plugin-scaffolder');
     try {
       const result = await dispatchPluginScaffold({
         descriptor: {

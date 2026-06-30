@@ -118,7 +118,11 @@ describe('local contributor install plugin flow', () => {
     const rootDenoJson = JSON.parse(await fs.readFile('/workspace/alpha/deno.json'));
 
     assertEquals(result.plugin.backgroundWorkdir, undefined);
-    assertEquals(appsettings.NetScript.BackgroundProcessors.workers.Workdir, 'plugins/workers');
+    assertEquals(appsettings.NetScript.BackgroundProcessors.workers.Workdir, '.');
+    assertEquals(
+      appsettings.NetScript.BackgroundProcessors.workers.Entrypoint,
+      'workers/runtime.ts',
+    );
     assertEquals(appsettings.NetScript.BackgroundProcessors.workers.PluginReferences, [
       'workers-api',
     ]);
@@ -167,7 +171,11 @@ describe('local contributor install plugin flow', () => {
       '../../packages/plugin/mod.ts',
     );
     assertEquals(result.plugin.configKey, 'workers');
-    assertEquals(appsettings.NetScript.BackgroundProcessors.workers.Workdir, 'plugins/workers');
+    assertEquals(appsettings.NetScript.BackgroundProcessors.workers.Workdir, '.');
+    assertEquals(
+      appsettings.NetScript.BackgroundProcessors.workers.Entrypoint,
+      'workers/runtime.ts',
+    );
     assertFalse(rootDenoJson.workspace.includes('./workers'));
     assertFalse(await fs.exists('/workspace/alpha/workers'));
   });

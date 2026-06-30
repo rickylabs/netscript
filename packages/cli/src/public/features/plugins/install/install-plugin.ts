@@ -362,10 +362,8 @@ export function createPluginOwnedPluginResult(
     configSection: plan.provider.category === 'plugin' ? 'Plugins' : 'BackgroundProcessors',
     configKey: plan.pluginName,
     serviceConfigKey,
-    backgroundWorkdir: plan.provider.category === 'background-processor'
-      ? toWorkspaceRelativePath(plan.projectRoot, pluginDir)
-      : undefined,
-    serviceWorkdir: toWorkspaceRelativePath(plan.projectRoot, pluginDir),
+    backgroundWorkdir: undefined,
+    serviceWorkdir: undefined,
   };
 }
 
