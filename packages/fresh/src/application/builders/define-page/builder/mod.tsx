@@ -18,7 +18,7 @@ import { createDefinePageHooks, createRouteNav, type TypedRouteTarget } from '..
 import { executePagePipeline, prepareRequestState } from '../runtime/mod.tsx';
 import { createDefaultConfig, retagConfig } from './factory.ts';
 import { createWithFormHandler, isWithFormResult, mergeInitialFormValues } from './form-support.ts';
-import { promoteRouteConfig } from './route-support.ts';
+import { promoteRouteConfig, promoteRouteContractConfig } from './route-support.ts';
 import {
   normalizeLayerComponent,
   resolveConfiguredRoutePattern,
@@ -49,6 +49,7 @@ import type {
   DefinePageRequestContext,
   DefinePageResourceFactoryFor,
   DefinePageRootTypeState,
+  DefinePageRouteContractInput,
   DefinePageRoutedDefinitionFor,
   DefinePageRouteFor,
   DefinePageRouteNavFor,
@@ -61,6 +62,7 @@ import type {
   DefinePageWithResource,
   DefinePageWithResources,
   DefinePageWithRoute,
+  DefinePageWithRouteContract,
   DefinePageWithSearchParams,
   EmptyRecord,
   PathParamSchema,
@@ -283,6 +285,7 @@ function createBuilder<TTypes extends AnyDefinePageTypeState, THasConfiguredRout
       }) as DefinePageBuilder<DefinePageWithSearchParams<TTypes, TSchema>, THasConfiguredRoute>;
     },
     withRoute,
+    withRouteContract,
     withPolicy(policy) {
       return createBuilder<TTypes, THasConfiguredRoute>({ ...config, policy });
     },
@@ -447,6 +450,12 @@ function createBuilder<TTypes extends AnyDefinePageTypeState, THasConfiguredRout
   ): DefinePageBuilder<DefinePageWithRoute<TTypes, TRoute>, true> {
     type TRouteTypes = DefinePageWithRoute<TTypes, TRoute>;
     return createBuilder<TRouteTypes, true>(promoteRouteConfig(config, route));
+  }
+  function withRouteContract<TPathSchema = unknown, TSearchSchema = unknown>(
+    contract: DefinePageRouteContractInput<TPathSchema, TSearchSchema>,
+  ): DefinePageBuilder<DefinePageWithRouteContract<TTypes, TPathSchema, TSearchSchema>, true> {
+    type TRouteTypes = DefinePageWithRouteContract<TTypes, TPathSchema, TSearchSchema>;
+    return createBuilder<TRouteTypes, true>(promoteRouteContractConfig(config, contract));
   }
 }
 export function definePage(): DefinePageRootBuilder;

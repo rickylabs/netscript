@@ -104,6 +104,29 @@ export interface PageBuilder<
     TLayerData,
     true
   >;
+  /**
+   * Bind the page to a route using an inline route contract.
+   *
+   * The NetScript Vite plugin inserts the `$route` pattern from the page
+   * module's path during codegen; authors write only the schema body.
+   */
+  withRouteContract<
+    TPathSchema extends PagePathSchema<object> | undefined = undefined,
+    TSearchSchema extends PageSearchSchema<object> | undefined = undefined,
+  >(
+    contract: {
+      readonly $route?: string;
+      readonly pathSchema?: TPathSchema;
+      readonly searchSchema?: TSearchSchema;
+    },
+  ): PageBuilder<
+    TState,
+    TResources,
+    SchemaOutput<TPathSchema, TPath>,
+    SchemaOutput<TSearchSchema, TSearch>,
+    TLayerData,
+    true
+  >;
   /** Configure defer policy defaults for the page. */
   withPolicy(
     policy: PageDeferPolicyInput | PageDeferPolicyProfile,

@@ -19,6 +19,7 @@ import type {
   DefinePageMethodHandlerFor,
   DefinePageResourceFactoryFor,
   DefinePageRootTypeState,
+  DefinePageRouteContractInput,
   DefinePageRoutedDefinitionFor,
   DefinePageRouteNavFor,
   DefinePageTelemetryConfig,
@@ -29,6 +30,7 @@ import type {
   DefinePageWithResource,
   DefinePageWithResources,
   DefinePageWithRoute,
+  DefinePageWithRouteContract,
   DefinePageWithSearchParams,
   EmptyRecord,
   PathParamSchema,
@@ -85,6 +87,20 @@ export interface DefinePageBuilder<
   withRoute<TRoute extends TypedRouteTarget<object, object>>(
     route: TRoute,
   ): DefinePageBuilder<DefinePageWithRoute<TTypes, TRoute>, true>;
+
+  /**
+   * Bind the page to a route using an inline route contract.
+   *
+   * The contract body (`pathSchema`, `searchSchema`) lives in the page module;
+   * the NetScript Vite plugin inserts the `$route` pattern from the page
+   * module's path during codegen, so authors typically omit `$route`.
+   */
+  withRouteContract<TPathSchema = unknown, TSearchSchema = unknown>(
+    contract: DefinePageRouteContractInput<TPathSchema, TSearchSchema>,
+  ): DefinePageBuilder<
+    DefinePageWithRouteContract<TTypes, TPathSchema, TSearchSchema>,
+    true
+  >;
 
   /** Configure default deferred layer policy. */
   withPolicy(
