@@ -1,6 +1,6 @@
 {
   "name": "@netscript/plugin-auth-core",
-  "version": "0.0.1-alpha.14",
+  "version": "0.0.1-alpha.15",
   "description": "Auth plugin contracts, backend ports, stream schemas, config schemas, and testing primitives for NetScript auth plugins.",
   "license": "MIT",
   "exports": {
