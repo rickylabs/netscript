@@ -29,6 +29,11 @@ const REAL_SCHEMA_ERROR = [
   'error: Argument "provider" is missing in data source block "db".',
 ].join('\n');
 
+const DATABASE_NOT_READY = [
+  "Error: P1001: Can't reach database server at `localhost:42991`",
+  'Please make sure your database server is running at `localhost:42991`.',
+].join('\n');
+
 function noopLog(_message: string): void {}
 
 function createRetryOptions(
@@ -76,11 +81,11 @@ describe('isRetriableMigrationFailure', () => {
       isRetriableMigrationFailure('Timed out waiting for Prisma schema engine after 45000ms'),
       true,
     );
+    assertEquals(isRetriableMigrationFailure(DATABASE_NOT_READY), true);
   });
 
   it('does not match real schema/SQL errors', () => {
     assertEquals(isRetriableMigrationFailure(REAL_SCHEMA_ERROR), false);
-    assertEquals(isRetriableMigrationFailure("P1001: Can't reach database server"), false);
     assertEquals(isRetriableMigrationFailure('Schema engine exited.'), false);
     assertEquals(isRetriableMigrationFailure(''), false);
   });
@@ -108,6 +113,27 @@ describe('runPrismaWithRetry', () => {
     assertEquals(calls(), 3);
     assertEquals(sleeps, [10, 20]);
     assertEquals(options().map((option) => option.timeoutMs), [45_000, 45_000, 45_000]);
+  });
+
+  it('retries a database-not-ready failure and then succeeds', async () => {
+    const { spawn, calls } = scriptedSpawn([
+      { code: 1, stderr: DATABASE_NOT_READY },
+      { code: 0, stderr: '' },
+    ]);
+    const sleeps: number[] = [];
+    const code = await runPrismaWithRetry(
+      { label: 'migrate dev', args: ['migrate', 'dev'] },
+      createRetryOptions({
+        spawn,
+        sleep: (ms) => {
+          sleeps.push(ms);
+          return Promise.resolve();
+        },
+      }),
+    );
+    assertEquals(code, 0);
+    assertEquals(calls(), 2);
+    assertEquals(sleeps, [10]);
   });
 
   it('stops at maxAttempts when the transient failure persists', async () => {
