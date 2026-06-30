@@ -49,7 +49,11 @@ import type {
   TriggerIngressResponse,
   TriggerProcessorPort,
 } from '@netscript/plugin-triggers-core/ports';
-import { createTriggerIngress } from '@netscript/plugin-triggers-core/runtime';
+import {
+  createManualDispatcher,
+  createTriggerIngress,
+  type ManualDispatcher,
+} from '@netscript/plugin-triggers-core/runtime';
 import { TRIGGERS_API_DEFAULT_PORT, TRIGGERS_API_SERVICE_NAME } from '../../src/constants.ts';
 import denoJson from '../../deno.json' with { type: 'json' };
 import type { KvStore } from '@netscript/kv';
@@ -144,6 +148,8 @@ export type TriggersServiceOptions = Readonly<{
   enabledState?: TriggerEnabledStatePort;
   /** Trigger processor backing the ingress; defaults to the runtime processor. */
   processor?: TriggerProcessorPort;
+  /** Manual-fire dispatcher; defaults to eventStore + processor. */
+  manualDispatcher?: ManualDispatcher;
   /** Pre-opened KV adapter; defaults to the runtime KV. */
   kv?: KvStore;
 }>;
@@ -165,6 +171,8 @@ export async function createTriggersServiceContext(
   const enabledState = options.enabledState ??
     createKvTriggerEnabledStateStore({ kv: requireKv(kv) });
   const processor = options.processor ?? await createRuntimeTriggerProcessor({ kv });
+  const manualDispatcher = options.manualDispatcher ??
+    createManualDispatcher({ eventStore, processor });
   const hmacVerifier = new HmacSha256WebhookVerifier({
     signatureHeader: 'x-hub-signature-256',
   });
@@ -178,7 +186,7 @@ export async function createTriggersServiceContext(
     resolveSecret: (definition) =>
       definition.secretEnv === undefined ? undefined : Deno.env.get(definition.secretEnv),
   });
-  return { definitions, eventStore, enabledState, ingress };
+  return { definitions, eventStore, enabledState, ingress, manualDispatcher };
 }
 
 /**
@@ -251,6 +259,7 @@ function createUnavailableTriggersServiceContext(): TriggerServiceContext {
     eventStore: new UnavailableTriggerEventStore(),
     enabledState: unavailableTriggerEnabledState,
     ingress: unavailableTriggerIngress,
+    manualDispatcher: unavailableManualDispatcher,
   };
 }
 
@@ -287,6 +296,12 @@ const unavailableTriggerEnabledState: TriggerEnabledStatePort = {
   },
   list(): Promise<readonly []> {
     return Promise.resolve([]);
+  },
+};
+
+const unavailableManualDispatcher: ManualDispatcher = {
+  fire(): Promise<never> {
+    return Promise.reject(triggerRuntimeUnavailable());
   },
 };
 

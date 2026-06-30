@@ -43,7 +43,12 @@ export type {
   WebhookVerificationResult,
   WebhookVerifierPort,
 } from '../ports/mod.ts';
-export { createTriggerIngress, createTriggerProcessor, TriggerProcessor } from '../runtime/mod.ts';
+export {
+  createManualDispatcher,
+  createTriggerIngress,
+  createTriggerProcessor,
+  TriggerProcessor,
+} from '../runtime/mod.ts';
 export { createKvTriggerEnabledStateStore } from '../stores/mod.ts';
 export {
   TRIGGER_BACKFILL_POLICIES,
@@ -53,6 +58,11 @@ export {
 } from '../builders/mod.ts';
 export type {
   LoggerPort,
+  ManualDispatcher,
+  ManualDispatcherOptions,
+  ManualTriggerEventIdFactory,
+  ManualTriggerFireInput,
+  ManualTriggerFireResponse,
   RuntimeWebhookDefinition,
   TriggerActionDispatcher,
   TriggerIngressEventIdFactory,

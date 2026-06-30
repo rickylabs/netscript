@@ -58,7 +58,7 @@ Notes:
 
 ## Slice 2 — Enabled-State Port And KV Adapter
 
-Status: implemented, gated, commit pending final SHA.
+Status: implemented, gated, committed as `a19ca64f`.
 
 Files:
 - `packages/plugin-triggers-core/src/ports/trigger-enabled-state-port.ts`
@@ -94,3 +94,39 @@ Notes:
   which parses non-empty query strings such as `"false"` as `true`. Slice 2 changed only the triggers
   filter schema to `z.stringbool().optional()` so the already-public `TriggerFilters.enabled?:
   boolean` contract works over HTTP query strings.
+
+## Slice 3 — Manual-Fire Dispatcher
+
+Status: implemented, gated, commit pending final SHA.
+
+Files:
+- `packages/plugin-triggers-core/src/runtime/create-manual-dispatcher.ts`
+- `packages/plugin-triggers-core/src/runtime/create-manual-dispatcher_test.ts`
+- `packages/plugin-triggers-core/src/runtime/mod.ts`
+- `packages/plugin-triggers-core/src/public/mod.ts`
+- `plugins/triggers/services/src/routers/v1-types.ts`
+- `plugins/triggers/services/src/routers/v1.ts`
+- `plugins/triggers/services/src/main.ts`
+- `plugins/triggers/services/src/main_test.ts`
+- `.llm/tmp/run/feat-triggers-feature-backing--181/drift.md`
+
+Gate evidence:
+- `run-deno-check` core: PASS, exit 0, 67 files, `--unstable-kv`.
+- `run-deno-check` connector services: PASS, exit 0, 6 files, `--unstable-kv`.
+- `run-deno-lint` core: PASS, exit 0, 0 findings.
+- `run-deno-lint` connector services: PASS, exit 0, 0 findings.
+- `run-deno-fmt` core: PASS, exit 0, 0 findings.
+- `run-deno-fmt` connector services: PASS, exit 0, 0 findings.
+- `rtk proxy deno task test --unstable-kv packages/plugin-triggers-core/src/runtime/create-manual-dispatcher_test.ts packages/plugin-triggers-core/src/stores/kv-trigger-enabled-state-store_test.ts packages/plugin-triggers-core/tests/contracts/triggers-contract-soundness_test.ts`: PASS, exit 0, 4 passed.
+- `rtk proxy deno task test --unstable-kv plugins/triggers/services/src/main_test.ts`: PASS, exit 0, 3 passed, 7 steps.
+- `deno publish --dry-run --allow-dirty` in `packages/plugin-triggers-core`: PASS, exit 0.
+- `deno publish --dry-run --allow-dirty` in `plugins/triggers`: PASS, exit 0; pre-existing
+  dynamic-import warnings only.
+- `rtk proxy deno task arch:check`: PASS, exit 0, `FAIL=0` with existing warnings.
+
+Notes:
+- `fireTrigger` now resolves the definition by string equality, persists a manual event, processes
+  through the configured processor, and maps response status to the contract's `pending | deferred`
+  shape.
+- `drift.md` records the local branded-id cast needed by the default manual event-id factory; the
+  package has no public `TriggerEventId` constructor and ingress already uses the same edge pattern.

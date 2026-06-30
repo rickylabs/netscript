@@ -24,4 +24,6 @@ Latest slice:
   response `name` mapping. Gates are green; commit `a79e13ea` is recorded in `commits.md`.
 - Slice 2 implemented `TriggerEnabledStatePort`, KV and memory stores, public
   `createKvTriggerEnabledStateStore`, connector enable/disable backing, and `enabled=false` list
-  filtering. Gates are green; final SHA is recorded in `commits.md`.
+  filtering. Gates are green; commit `a19ca64f` is recorded in `commits.md`.
+- Slice 3 implemented `createManualDispatcher` and backed connector `fireTrigger`. Gates are green;
+  final SHA is recorded in `commits.md`.

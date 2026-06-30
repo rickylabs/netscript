@@ -2,8 +2,16 @@
 
 export { createTriggerProcessor } from './create-trigger-processor.ts';
 export { createTriggerIngress } from './create-trigger-ingress.ts';
+export { createManualDispatcher } from './create-manual-dispatcher.ts';
 export { NoopLogger } from './logger.ts';
 export { defaultRetryPolicy, TriggerProcessor } from './trigger-processor.ts';
+export type {
+  ManualDispatcher,
+  ManualDispatcherOptions,
+  ManualTriggerEventIdFactory,
+  ManualTriggerFireInput,
+  ManualTriggerFireResponse,
+} from './create-manual-dispatcher.ts';
 export type {
   RuntimeWebhookDefinition,
   TriggerIngressEventIdFactory,

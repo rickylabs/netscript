@@ -8,8 +8,7 @@
  * - `withServiceInfo` serves the service-info root;
  * - a backed oRPC route (`listTriggers`) returns the mapped definition set over
  *   the OpenAPI surface;
- * - a deferred oRPC route (`fireTrigger`) returns a server error (the honest
- *   "pending triggers-core runtime backing" deferral);
+ * - `fireTrigger` persists and accepts a manual-fire event;
  * - the raw HMAC webhook route is mounted at `POST /api/v1/webhooks/:triggerId`:
  *   an unknown trigger id resolves (cast-free) to a 404 before ingress, and a
  *   known trigger id is resolved against the definitions and reaches the ingress.
@@ -36,7 +35,11 @@ import type {
   TriggerIngressRequest,
   TriggerIngressResponse,
 } from '@netscript/plugin-triggers-core/ports';
-import { MemoryTriggerEnabledStateStore } from '@netscript/plugin-triggers-core/testing';
+import {
+  InlineTriggerProcessor,
+  MemoryTriggerEnabledStateStore,
+} from '@netscript/plugin-triggers-core/testing';
+import { createManualDispatcher } from '@netscript/plugin-triggers-core/runtime';
 import { createTriggersService } from './main.ts';
 import type { TriggerServiceContext } from './routers/v1-types.ts';
 
@@ -79,6 +82,7 @@ const failingIngress: TriggerIngressPort = {
 };
 
 function buildContext(): TriggerServiceContext {
+  const eventStore = new InMemoryEventStore();
   const definitions: readonly ProcessableTriggerDefinition[] = [
     {
       id: 'sched-1',
@@ -87,15 +91,19 @@ function buildContext(): TriggerServiceContext {
       durability: 't1',
       description: 'A scheduled trigger fixture.',
       tags: ['fixture'],
-      // The handler is never invoked by the read-only smoke paths.
-      handler: () => Promise.resolve(),
+      handler: () => Promise.resolve([]),
     } as unknown as ProcessableTriggerDefinition,
   ];
   return {
     definitions,
-    eventStore: new InMemoryEventStore(),
+    eventStore,
     enabledState: new MemoryTriggerEnabledStateStore(),
     ingress: failingIngress,
+    manualDispatcher: createManualDispatcher({
+      eventStore,
+      processor: new InlineTriggerProcessor(),
+      createEventId: () => 'trg_evt_connector_manual' as TriggerEventId,
+    }),
   };
 }
 
@@ -120,6 +128,10 @@ function buildWebhookPathContext(acceptedTriggerIds: string[]): TriggerServiceCo
         });
       },
     },
+    manualDispatcher: createManualDispatcher({
+      eventStore: new InMemoryEventStore(),
+      processor: new InlineTriggerProcessor(),
+    }),
   };
 }
 
@@ -135,11 +147,16 @@ function buildEventsContext(): TriggerServiceContext {
     payload: {},
     metadata: {},
   } as unknown as TriggerEvent;
+  const eventStore = new InMemoryEventStore([event]);
   return {
     definitions: [],
-    eventStore: new InMemoryEventStore([event]),
+    eventStore,
     enabledState: new MemoryTriggerEnabledStateStore(),
     ingress: failingIngress,
+    manualDispatcher: createManualDispatcher({
+      eventStore,
+      processor: new InlineTriggerProcessor(),
+    }),
   };
 }
 
@@ -244,7 +261,7 @@ Deno.test('triggers connector smoke', async (t) => {
       assertEquals(enabled.enabled, true);
     });
 
-    await t.step('deferred route fireTrigger returns a server error', async () => {
+    await t.step('fireTrigger accepts a manual fire event', async () => {
       const route = await findRoute(
         baseUrl,
         (method, path) => method === 'POST' && /\/fire$/.test(path),
@@ -253,11 +270,21 @@ Deno.test('triggers connector smoke', async (t) => {
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({}),
+        body: JSON.stringify({ payload: { orderId: 'o-1' }, reason: 'manual replay' }),
       });
-      // oRPC maps the uncaught deferral throw to a 5xx server error.
-      assertEquals(res.status >= 500, true, `expected 5xx, got ${res.status}`);
-      await res.body?.cancel();
+      assertEquals(res.status, 200);
+      const body = await res.json() as {
+        accepted: boolean;
+        eventId: string;
+        triggerId: string;
+        status: string;
+      };
+      assertEquals(body, {
+        accepted: true,
+        eventId: 'trg_evt_connector_manual',
+        triggerId: 'sched-1',
+        status: 'pending',
+      });
     });
 
     await t.step('raw webhook unknown trigger id resolves to a 404', async () => {

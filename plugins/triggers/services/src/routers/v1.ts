@@ -161,8 +161,18 @@ export const triggersV1: TriggersHandlers<TriggersV1RouteKey> = {
 
   // --- Deferred routes: no sound backing yet (see arch-debt) ----------------
 
-  fireTrigger: router.fireTrigger.handler(() => {
-    throw new Error(PENDING_BACKING_MESSAGE);
+  fireTrigger: router.fireTrigger.handler(async ({ input, errors, path, context }) => {
+    const definition = context.definitions.find((candidate) => candidate.id === input.id);
+    if (definition === undefined) {
+      notFound({ errors, path, resourceId: input.id });
+    }
+    const response = await context.manualDispatcher.fire(definition, input.body);
+    return {
+      accepted: response.accepted,
+      eventId: response.eventId,
+      triggerId: response.triggerId,
+      status: response.status,
+    };
   }),
 
   testWebhook: router.testWebhook.handler(() => {
