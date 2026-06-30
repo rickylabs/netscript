@@ -4,9 +4,10 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The contract layer for NetScript auth plugins: domain schemas, the `AuthBackendPort` adapter seam,
-the oRPC v1 contract, durable stream schemas, and Zod config that every auth backend implements and
-every service host wires.**
+**The reusable auth primitives for NetScript: domain schemas, the `AuthBackendPort` adapter seam,
+the oRPC v1 contract, durable stream schemas, and Zod config — the contract surface every auth
+backend implements and every service host wires, and the core that the deployable
+`@netscript/plugin-auth` plugin binds to the host.**
 
 ---
 

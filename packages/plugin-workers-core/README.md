@@ -51,17 +51,21 @@ await runtime.stop('done');
 
 ## 📦 Key Capabilities
 
-- **Definition builders**: `defineJob`, `defineTask`, and `defineWorkflow` are typestate-gated
-  builders — `build()` becomes available only after an entrypoint or handler is set, so invalid
-  definitions fail at compile time.
-- **Runtime composition**: `startWorkers()` and `createWorkersRuntime()` assemble a runtime from
-  injected registry, worker, and storage ports, with memory-backed defaults for tests and generated
-  code.
+- **Definition builders** (`./builders`): `defineJob`, `defineTask`, and `defineWorkflow` are
+  typestate-gated builders — `build()` becomes available only after an entrypoint or handler is set,
+  so invalid definitions fail at compile time.
+- **Runtime composition**: `startWorkers()` (`./presets`) and `createWorkersRuntime()` (`./runtime`)
+  assemble a runtime from injected registry, worker, and storage ports, with memory-backed defaults
+  for tests and generated code.
 - **Versioned contracts**: `./contracts/v1` exports the workers API contract and Standard Schema
   wrappers that the Tier 2 service plugin and generated registries bind against.
-- **Pluggable adapters**: registry, state, executor, workflow, shutdown, and telemetry subpaths
-  expose ports and KV-backed implementations without pulling in `@netscript/config` or
-  `@netscript/telemetry`.
+- **Pluggable adapters**: the `./registry`, `./state`, `./executor`, `./workflow`, `./shutdown`, and
+  `./telemetry` subpaths expose ports and KV-backed implementations without pulling in
+  `@netscript/config` or `@netscript/telemetry`; `./streams` carries the stream-integration
+  contracts that bridge runs to durable topics.
+- **Schemas, config, and extension stubs**: `./schemas` ships the public structural schemas for job
+  and task definitions, `./config` the job/task configuration schemas, and `./abstracts` the
+  stub-only abstract contracts that mark workers extension points.
 - **Test primitives**: `./testing` ships memory adapters and fixtures so jobs, tasks, and workflows
   can be exercised with no filesystem, network, or subprocess permissions.
 
