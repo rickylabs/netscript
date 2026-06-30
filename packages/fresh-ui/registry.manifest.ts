@@ -652,6 +652,28 @@ export const freshUiRegistryManifest: RegistryManifest = {
       css: [{ layer: 'components', content: "@import './ui/command-palette.css';" }],
     },
     {
+      name: 'search',
+      kind: 'component',
+      layer: 2,
+      description:
+        'Compact nav search affordance — a button styled as an input with a ⌘K hint that opens the command palette.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['ai', 'search', 'navigation', 'primitive'],
+      files: [
+        {
+          source: 'registry/components/ui/search.tsx',
+          target: '@ui/search.tsx',
+        },
+        {
+          source: 'registry/components/ui/search.css',
+          target: '@assets/ui/search.css',
+        },
+      ],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/search.css';" }],
+    },
+    {
       name: 'dropzone',
       kind: 'component',
       layer: 2,
@@ -1089,6 +1111,7 @@ export const freshUiRegistryManifest: RegistryManifest = {
         'prompt-input',
         'message',
         'command-palette',
+        'search',
       ],
     },
     {
