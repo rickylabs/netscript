@@ -26,6 +26,8 @@ export type FileWatchSpec<TId extends string = string> = Readonly<{
   on: readonly FileWatchLifecycle[];
   debounceMs?: number;
   stabilityThreshold?: FileWatchStabilityThreshold;
+  name?: string;
+  enabled?: boolean;
   description?: string;
   tags?: readonly string[];
   metadata?: Readonly<Record<string, unknown>>;
@@ -61,6 +63,8 @@ export function defineFileWatch<TId extends string>(
   return Object.freeze({
     id: spec.id as TriggerId<TId>,
     kind: 'file-watch',
+    name: spec.name,
+    enabled: spec.enabled,
     durability: DEFAULT_TRIGGER_DURABILITY_TIER,
     handler,
     paths: Object.freeze([...spec.paths]),

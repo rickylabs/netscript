@@ -24,8 +24,15 @@ export type {
   TriggerDlqEntry,
   TriggerDlqListOptions,
   TriggerDlqPort,
+  TriggerEnabledStateOverride,
+  TriggerEnabledStatePort,
   TriggerEventListOptions,
   TriggerEventStorePort,
+  TriggerEventSubscriptionFilter,
+  TriggerEventSubscriptionMessage,
+  TriggerEventSubscriptionOptions,
+  TriggerEventSubscriptionPort,
+  TriggerEventSubscriptionType,
   TriggerIdempotencyClaim,
   TriggerIdempotencyKeyInput,
   TriggerIdempotencyPort,
@@ -41,7 +48,16 @@ export type {
   WebhookVerificationResult,
   WebhookVerifierPort,
 } from '../ports/mod.ts';
-export { createTriggerIngress, createTriggerProcessor, TriggerProcessor } from '../runtime/mod.ts';
+export {
+  computeNextFireTimes,
+  createEventSubscription,
+  createManualDispatcher,
+  createTriggerIngress,
+  createTriggerProcessor,
+  createWebhookTestDelivery,
+  TriggerProcessor,
+} from '../runtime/mod.ts';
+export { createKvTriggerEnabledStateStore } from '../stores/mod.ts';
 export {
   TRIGGER_BACKFILL_POLICIES,
   TRIGGER_DURABILITY_TIERS,
@@ -50,11 +66,21 @@ export {
 } from '../builders/mod.ts';
 export type {
   LoggerPort,
+  ManualDispatcher,
+  ManualDispatcherOptions,
+  ManualTriggerEventIdFactory,
+  ManualTriggerFireInput,
+  ManualTriggerFireResponse,
   RuntimeWebhookDefinition,
   TriggerActionDispatcher,
   TriggerIngressEventIdFactory,
   TriggerIngressOptions,
   TriggerProcessorOptions,
+  WebhookTestDelivery,
+  WebhookTestDeliveryDefinition,
+  WebhookTestDeliveryInput,
+  WebhookTestDeliveryOptions,
+  WebhookTestDeliveryResponse,
 } from '../runtime/mod.ts';
 export type {
   CronExpression,
