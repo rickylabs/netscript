@@ -61,9 +61,9 @@ Deno.test('generatePluginService does not add Redis adapter import for API-only 
 Deno.test('generatePluginServiceContext emits package-resident safe imports', () => {
   const output = generatePluginServiceContext();
 
-  assertStringIncludes(output, `from '${netscriptJsrSpecifier('plugin', '/loader')}'`);
-  assertStringIncludes(output, `from '${netscriptJsrSpecifier('kv')}'`);
-  assertStringIncludes(output, `from '${netscriptJsrSpecifier('contracts')}'`);
-  assertFalse(output.includes("from '@netscript/contracts'"));
+  assertStringIncludes(output, "from '@netscript/plugin/loader'");
+  assertStringIncludes(output, "from '@netscript/kv'");
+  assertStringIncludes(output, "from '@netscript/contracts'");
+  assertFalse(output.includes(netscriptJsrSpecifier('plugin', '/loader')));
   assertFalse(output.includes('../../contracts/versions/v1/mod.ts'));
 });
