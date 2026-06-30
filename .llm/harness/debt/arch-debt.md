@@ -1615,3 +1615,44 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   seam -> `subscribeEvents`), each with its own contract-route assertion and the connector smoke
   test extended to assert the now-backed behavior. Remove the webhook brand cast when a public brand
   constructor lands.
+
+## plugins/{sagas,triggers,workers} — PLUGIN-RUNTIME-ADAPTER-RELOCATION (#172b/c/d)
+
+- **Reason:** Two coupled defects in three connectors that still ship runtime stores/adapters under
+  `plugins/<kind>/src/runtime/`. (1) **Placement:** by the #157→#172 thin-connector law these
+  port→backend adapters belong in `@netscript/plugin-<kind>-core` (`adapters/`/`stores/`), leaving the
+  connector with specifics only. (2) **Primitive-bypass / engine lock:** the **sagas** and **triggers**
+  KV stores hardwire raw `Deno.Kv`/`Deno.openKv` + the Deno-native fluent atomic, bypassing the
+  engine-agnostic `@netscript/kv` primitive — locking them to Deno KV and forfeiting Redis / in-memory /
+  kvdex / reactive-watch. The **workers** `KvWorkerIdempotencyStore` already does it right (depends on
+  `@netscript/kv` types + a `KvStore`-shaped structural port) and is the reference. The PASSed
+  `feat/scaffold-surface-167` plan covered the scaffold-surface contract (S1–S7), not runtime-store
+  placement or engine choice — so this is net-new scope, PLAN-EVAL-gated separately.
+- **Relocation + migration set (grounded against the worktree):**
+  - **sagas (#172b):** `prisma-saga-store.ts` (dep-free structural Prisma delegate, relocate as-is),
+    `kv-saga-store.ts`, `kv-saga-runtime-stores.ts` (**relocate + migrate `Deno.openKv` →
+    `@netscript/kv`**), `saga-store-backend.ts` → `packages/plugin-sagas-core/src/stores/`. **Adds
+    `@netscript/kv` dep — desired.**
+  - **triggers (#172c):** `kv-trigger-runtime-stores.ts` (**relocate + migrate `Deno.openKv` →
+    `@netscript/kv`**) + `cron-trigger-scheduler-adapter.ts` / `watchers-file-watcher-adapter.ts` →
+    `packages/plugin-triggers-core/src/{stores,adapters}/`. Adds **`@netscript/kv` + `@netscript/cron`
+    + `@netscript/watchers`** to triggers-core (currently `@std/assert`+`zod` only).
+  - **workers (#172d):** `worker/worker-idempotency-store.ts` (already on `@netscript/kv`, relocate
+    only) → `packages/plugin-workers-core/src/{stores,adapters}/`. Adds the `@netscript/kv` dep to
+    workers-core.
+- **Why it is debt (open):** authored but PLAN-EVAL-gated and not yet implemented. Decisions deferred to
+  PLAN-EVAL: (D-KV) migrate sagas+triggers KV stores onto `@netscript/kv` (`KvStore` + `AtomicCheck/
+  Mutation/Result`, injected handle, workers structural-port pattern), preserving optimistic-concurrency
+  + idempotency semantics; (D2) the zero-compat public-surface break — stores move from
+  `@netscript/plugin-<kind>/runtime` to `@netscript/plugin-<kind>-core/{stores,adapters}` with no shim.
+  **Note:** an earlier draft framed a "D1" decision over whether `-core` may take `@netscript/*` deps;
+  that was removed — `-core` depending on NetScript primitives is the **encouraged** direction (the
+  reference behavior for community plugin/plugin-core authors), not a tradeoff to weigh.
+- **Owner:** Plugin connectors + `@netscript/plugin-<kind>-core` (framework architecture).
+- **Target:** PLAN-EVAL-gated relocation slices under #172; close when all three merge.
+- **Linked plan:** `.llm/tmp/run/feat-scaffold-surface-167--adapter-relocation/plan.md` (+ `research.md`).
+- **Created:** 2026-06-30.
+- **Status:** open, PLAN-EVAL pending — research + plan authored; no implementation slice before PASS.
+- **Gate:** per touched package scoped check/lint/fmt (`--ext ts,tsx`) + targeted `deno test
+  --unstable-kv` + `deno publish --dry-run --allow-dirty` (no new slow types) + `deno task arch:check`
+  (no connector→core leak); new workspace deps land via normal resolution, no `deno.lock` hand-edit.
