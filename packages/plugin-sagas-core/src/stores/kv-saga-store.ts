@@ -1,4 +1,4 @@
-import { SagasError } from '@netscript/plugin-sagas-core/domain';
+import { SagasError } from '../domain/mod.ts';
 import { getKv } from '@netscript/kv';
 import type { AtomicMutation, KvKey, KvStore } from '@netscript/kv';
 import type {
@@ -11,7 +11,7 @@ import type {
   SagaStorePort,
   SagaStoreWriteOptions,
   SagaTransitionRecord,
-} from '@netscript/plugin-sagas-core/runtime';
+} from '../runtime/mod.ts';
 
 const DEFAULT_SAGA_KV_PREFIX = ['sagas'] as const satisfies KvKey;
 const SAGA_KV_PATH_ENV = 'NETSCRIPT_SAGA_KV_PATH';

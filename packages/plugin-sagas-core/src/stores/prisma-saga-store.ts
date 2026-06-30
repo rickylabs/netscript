@@ -1,4 +1,4 @@
-import { SagasError } from '@netscript/plugin-sagas-core/domain';
+import { SagasError } from '../domain/mod.ts';
 import type {
   SagaCorrelationIndexEntry,
   SagaCorrelationKey,
@@ -9,7 +9,7 @@ import type {
   SagaStorePort,
   SagaStoreWriteOptions,
   SagaTransitionRecord,
-} from '@netscript/plugin-sagas-core/runtime';
+} from '../runtime/mod.ts';
 
 type WriteResult = Readonly<{ count: number }>;
 

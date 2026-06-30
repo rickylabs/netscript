@@ -1,6 +1,6 @@
 import { walk } from 'jsr:@std/fs@^1.0.0/walk';
 import { join, normalize, relative } from 'jsr:@std/path@^1.0.0';
-import { discoverWorkspaceMembers } from '../deps/workspace.ts';
+import { discoverWorkspaceMembers, type WorkspaceMember } from '../deps/workspace.ts';
 
 interface ImportMetaPath {
   identifier: string;
@@ -13,6 +13,14 @@ export interface TextImportFinding {
   read: 'Deno.readTextFile' | 'Deno.readFile';
   message: string;
   declarationLine?: number;
+}
+
+export interface SelfImportFinding {
+  path: string;
+  line: number;
+  member: string;
+  specifier: string;
+  message: string;
 }
 
 interface Options {
@@ -152,9 +160,7 @@ export function blankTemplateLiterals(source: string): string {
 
 /** Discover publishable workspace source files and scan them. */
 export async function scanPublishSurface(root: string): Promise<TextImportFinding[]> {
-  const members = (await discoverWorkspaceMembers(root)).filter((member) =>
-    member.publishable && member.name.startsWith('@netscript/')
-  );
+  const members = await discoverPublishableNetscriptMembers(root);
   const files: string[] = [];
   for (const member of members) {
     for await (
@@ -175,6 +181,150 @@ export async function scanPublishSurface(root: string): Promise<TextImportFindin
     }
   }
   return await scanFiles(files);
+}
+
+/** Discover publishable workspace member source files that import their own bare specifier. */
+export async function scanSelfImports(root: string): Promise<SelfImportFinding[]> {
+  const findings: SelfImportFinding[] = [];
+  const members = await discoverPublishableNetscriptMembers(root);
+  for (const member of members) {
+    const sourceRoot = join(root, member.root, 'src');
+    try {
+      const stat = await Deno.stat(sourceRoot);
+      if (!stat.isDirectory) continue;
+    } catch {
+      continue;
+    }
+    for await (
+      const entry of walk(sourceRoot, {
+        includeDirs: false,
+        exts: [...sourceExtensions],
+        skip: [
+          /(?:^|[/\\])node_modules(?:[/\\]|$)/,
+          /(?:^|[/\\])\.generated(?:[/\\]|$)/,
+          /(?:^|[/\\])\.git(?:[/\\]|$)/,
+        ],
+      })
+    ) {
+      const path = normalize(relative(root, entry.path));
+      const source = await Deno.readTextFile(entry.path);
+      findings.push(...scanSelfImportSource(source, path, member.name));
+    }
+  }
+  return findings;
+}
+
+/** Scan one source string for imports from the owning workspace member's bare specifier. */
+export function scanSelfImportSource(
+  source: string,
+  path: string,
+  memberName: string,
+): SelfImportFinding[] {
+  const findings: SelfImportFinding[] = [];
+  const specifier = new RegExp(
+    `(?:from\\s+)?['"](${escapeRegExp(memberName)}(?:/[a-z0-9/-]+)?)['"]`,
+  );
+  let statement = '';
+  let statementLine = 1;
+  let inDeclaration = false;
+  let inBlockComment = false;
+  const lines = source.split('\n');
+  for (let index = 0; index < lines.length; index++) {
+    const line = lines[index] ?? '';
+    const scannedLine = stripLineComments(line, inBlockComment);
+    inBlockComment = scannedLine.inBlockComment;
+    const trimmed = scannedLine.text.trimStart();
+    if (!inDeclaration && isImportExportDeclarationStart(trimmed)) {
+      statement = scannedLine.text;
+      statementLine = index + 1;
+      inDeclaration = !endsImportExportDeclaration(scannedLine.text);
+      collectSelfImportStatement(statement, statementLine, path, memberName, specifier, findings);
+      if (!inDeclaration) statement = '';
+      continue;
+    }
+    if (inDeclaration) {
+      statement += `\n${scannedLine.text}`;
+      collectSelfImportStatement(statement, statementLine, path, memberName, specifier, findings);
+      if (endsImportExportDeclaration(scannedLine.text)) {
+        inDeclaration = false;
+        statement = '';
+      }
+    }
+  }
+  return findings;
+}
+
+function collectSelfImportStatement(
+  statement: string,
+  line: number,
+  path: string,
+  memberName: string,
+  specifier: RegExp,
+  findings: SelfImportFinding[],
+): void {
+  if (findings.some((finding) => finding.path === path && finding.line === line)) return;
+  const match = statement.match(specifier);
+  const matchedSpecifier = match?.[1];
+  if (!matchedSpecifier) return;
+  findings.push({
+    path,
+    line,
+    member: memberName,
+    specifier: matchedSpecifier,
+    message:
+      `${memberName} source imports its own bare specifier '${matchedSpecifier}'; use a relative path so deno publish cannot resolve the package from JSR.`,
+  });
+}
+
+function isImportExportDeclarationStart(trimmedLine: string): boolean {
+  if (trimmedLine.startsWith('import ')) return true;
+  if (!trimmedLine.startsWith('export ')) return false;
+  return !/^export\s+(?:abstract\s+)?(?:interface|class|function|const|let|var|enum)\b/.test(
+    trimmedLine,
+  ) && !/^export\s+type\s+[A-Z_a-z]/.test(trimmedLine);
+}
+
+function endsImportExportDeclaration(line: string): boolean {
+  return /;\s*$/.test(line) || /^import\s+['"][^'"]+['"]\s*$/.test(line.trim());
+}
+
+function stripLineComments(
+  line: string,
+  inBlockComment: boolean,
+): { text: string; inBlockComment: boolean } {
+  let text = '';
+  let index = 0;
+  while (index < line.length) {
+    if (inBlockComment) {
+      const end = line.indexOf('*/', index);
+      if (end === -1) return { text, inBlockComment: true };
+      index = end + 2;
+      inBlockComment = false;
+      continue;
+    }
+    const blockStart = line.indexOf('/*', index);
+    const lineStart = line.indexOf('//', index);
+    const nextComment = lineStart === -1
+      ? blockStart
+      : blockStart === -1
+      ? lineStart
+      : Math.min(blockStart, lineStart);
+    if (nextComment === -1) {
+      text += line.slice(index);
+      break;
+    }
+    text += line.slice(index, nextComment);
+    if (nextComment === lineStart) break;
+    index = nextComment + 2;
+    inBlockComment = true;
+  }
+  return { text, inBlockComment };
+}
+
+async function discoverPublishableNetscriptMembers(root: string): Promise<WorkspaceMember[]> {
+  return (await discoverWorkspaceMembers(root)).filter((member) =>
+    member.publishable && member.name.startsWith('@netscript/')
+  );
 }
 
 async function scanFiles(files: string[]): Promise<TextImportFinding[]> {
@@ -260,6 +410,10 @@ function hasAllowlist(source: string, line: number): boolean {
   return /\/\/\s*preflight-allow:\s*\S+/.test(text);
 }
 
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function isSourceFile(path: string): boolean {
   return [...sourceExtensions].some((extension) => path.endsWith(extension));
 }
@@ -314,23 +468,35 @@ Options:
 async function main(): Promise<void> {
   const options = parseArgs(Deno.args);
   if (!options) return;
-  const findings = options.files.length > 0
+  const textImportFindings = options.files.length > 0
     ? await scanFiles(options.files)
     : await scanPublishSurface(options.root);
+  const selfImportFindings = options.files.length > 0 ? [] : await scanSelfImports(options.root);
 
-  if (findings.length === 0) {
+  if (textImportFindings.length === 0 && selfImportFindings.length === 0) {
     console.log('release:preflight text-imports — PASS');
+    if (options.files.length === 0) {
+      console.log('release:preflight self-imports — PASS (0 findings)');
+    }
     return;
   }
 
-  console.error('release:preflight text-imports — FAIL');
-  for (const finding of findings) {
-    const declaration = finding.declarationLine
-      ? ` (URL declaration line ${finding.declarationLine})`
-      : '';
-    console.error(
-      `${relative(Deno.cwd(), finding.path)}:${finding.line}: ${finding.message}${declaration}`,
-    );
+  if (textImportFindings.length > 0) {
+    console.error('release:preflight text-imports — FAIL');
+    for (const finding of textImportFindings) {
+      const declaration = finding.declarationLine
+        ? ` (URL declaration line ${finding.declarationLine})`
+        : '';
+      console.error(
+        `${relative(Deno.cwd(), finding.path)}:${finding.line}: ${finding.message}${declaration}`,
+      );
+    }
+  }
+  if (selfImportFindings.length > 0) {
+    console.error('release:preflight self-imports — FAIL');
+    for (const finding of selfImportFindings) {
+      console.error(`${relative(Deno.cwd(), finding.path)}:${finding.line}: ${finding.message}`);
+    }
   }
   Deno.exit(1);
 }

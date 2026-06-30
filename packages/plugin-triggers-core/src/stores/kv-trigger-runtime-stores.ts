@@ -1,10 +1,6 @@
 import { getKv } from '@netscript/kv';
 import type { AtomicMutation, KvKey, KvStore } from '@netscript/kv';
-import type {
-  TriggerEvent,
-  TriggerEventId,
-  TriggerEventStatus,
-} from '@netscript/plugin-triggers-core/domain';
+import type { TriggerEvent, TriggerEventId, TriggerEventStatus } from '../domain/mod.ts';
 import type {
   TriggerDlqEntry,
   TriggerDlqListOptions,
@@ -14,7 +10,7 @@ import type {
   TriggerIdempotencyClaim,
   TriggerIdempotencyKeyInput,
   TriggerIdempotencyPort,
-} from '@netscript/plugin-triggers-core/ports';
+} from '../ports/mod.ts';
 
 const DEFAULT_ACTIVE_CLAIM_TTL_MS = 15 * 60 * 1000;
 const DEFAULT_TRIGGER_KV_PREFIX = ['triggers'] as const satisfies KvKey;

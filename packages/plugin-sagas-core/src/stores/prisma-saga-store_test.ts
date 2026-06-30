@@ -1,6 +1,6 @@
 import { assertEquals, assertRejects } from 'jsr:@std/assert@^1';
 
-import { SagasError } from '@netscript/plugin-sagas-core/domain';
+import { SagasError } from '../domain/mod.ts';
 import type {
   SagaCorrelationKey,
   SagaId,
@@ -8,7 +8,7 @@ import type {
   SagaState,
   SagaStateEnvelope,
   SagaTransitionRecord,
-} from '@netscript/plugin-sagas-core/runtime';
+} from '../runtime/mod.ts';
 
 import { PrismaSagaStore, type PrismaSagaStoreClient } from './prisma-saga-store.ts';
 

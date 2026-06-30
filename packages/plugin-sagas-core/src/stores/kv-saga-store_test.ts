@@ -1,6 +1,6 @@
 import { assertEquals, assertRejects } from 'jsr:@std/assert@^1';
 
-import { SagasError } from '@netscript/plugin-sagas-core/domain';
+import { SagasError } from '../domain/mod.ts';
 import { DenoKvAdapter, type KvStore, MemoryKvAdapter } from '@netscript/kv';
 import type {
   SagaCorrelationKey,
@@ -9,7 +9,7 @@ import type {
   SagaState,
   SagaStateEnvelope,
   SagaTransitionRecord,
-} from '@netscript/plugin-sagas-core/runtime';
+} from '../runtime/mod.ts';
 
 import { KvSagaStore } from './kv-saga-store.ts';
 
