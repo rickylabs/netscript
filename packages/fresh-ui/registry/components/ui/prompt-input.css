@@ -3,14 +3,16 @@
   flex-direction: column;
   gap: var(--ns-space-2);
   padding: var(--ns-space-3);
-  border: 1px solid var(--ns-border);
-  border-radius: var(--ns-radius-lg);
-  background: var(--ns-surface);
-  transition: border-color var(--ns-ease-fast);
+  border: 1px solid var(--ns-input-border);
+  border-radius: var(--ns-radius-2xl);
+  background: var(--ns-card);
+  box-shadow: var(--ns-shadow-sm);
+  transition: border-color var(--ns-ease-normal), box-shadow var(--ns-ease-normal);
 }
 
 .ns-prompt-input:focus-within {
-  border-color: var(--ns-ring);
+  border-color: var(--ns-primary-border);
+  box-shadow: 0 0 0 3px var(--ns-primary-subtle);
 }
 
 .ns-prompt-input[data-compact] {

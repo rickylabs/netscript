@@ -8,8 +8,8 @@
   height: var(--ns-avatar-md);
   border-radius: var(--ns-radius-full);
   background: var(--ns-muted);
-  color: var(--ns-muted-fg);
-  font-family: var(--ns-font-mono);
+  color: var(--ns-fg);
+  font-family: var(--ns-font-sans);
   font-size: var(--ns-text-2xs);
   font-weight: 600;
   line-height: 1;

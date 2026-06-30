@@ -95,9 +95,11 @@
   outline-offset: -1px;
 }
 
-/* User — right-aligned primary bubble */
+/* User — right-aligned solid primary bubble (iMessage idiom, matches prototype) */
 .ns-message--user {
   flex-direction: row-reverse;
+  margin-inline-start: auto;
+  max-width: min(82%, 640px);
 }
 
 .ns-message--user .ns-message__main {
@@ -114,11 +116,10 @@
 
 .ns-message--user .ns-message__body {
   align-items: flex-end;
-  max-width: 80%;
-  padding: var(--ns-space-2-5) var(--ns-space-3);
-  border: 1px solid var(--ns-primary-border);
-  border-radius: var(--ns-radius-lg);
-  background: var(--ns-primary-subtle);
+  padding: var(--ns-space-3) var(--ns-space-4);
+  border-radius: var(--ns-radius-xl) var(--ns-radius-xl) var(--ns-radius-sm) var(--ns-radius-xl);
+  background: var(--ns-primary);
+  color: var(--ns-primary-fg);
 }
 
 /* System — centered muted note */

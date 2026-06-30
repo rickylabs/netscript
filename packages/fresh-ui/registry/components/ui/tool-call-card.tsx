@@ -31,7 +31,7 @@ interface ToolCallCardProps extends Omit<JSX.HTMLAttributes<HTMLDetailsElement>,
 }
 
 const STATUS_VARIANT: Record<ToolCallStatus, BadgeVariant> = {
-  running: 'secondary',
+  running: 'warning',
   done: 'success',
   error: 'destructive',
 };
