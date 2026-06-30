@@ -630,6 +630,28 @@ export const freshUiRegistryManifest: RegistryManifest = {
       css: [{ layer: 'components', content: "@import './ui/message.css';" }],
     },
     {
+      name: 'dropzone',
+      kind: 'component',
+      layer: 2,
+      description:
+        'File-drop affordance — a dashed drop target (label/hint/icon) that wraps a native file input; drag-over via data-active.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['upload', 'forms', 'primitive'],
+      files: [
+        {
+          source: 'registry/components/ui/dropzone.tsx',
+          target: '@ui/dropzone.tsx',
+        },
+        {
+          source: 'registry/components/ui/dropzone.css',
+          target: '@assets/ui/dropzone.css',
+        },
+      ],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/dropzone.css';" }],
+    },
+    {
       name: 'separator',
       kind: 'component',
       layer: 2,
@@ -1030,6 +1052,7 @@ export const freshUiRegistryManifest: RegistryManifest = {
         'code-block',
         'chart-block',
         'donut',
+        'dropzone',
       ],
     },
     {

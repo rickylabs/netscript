@@ -1,0 +1,56 @@
+.ns-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ns-space-2);
+  padding: var(--ns-space-6);
+  text-align: center;
+  border: 1px dashed var(--ns-border-strong);
+  border-radius: var(--ns-radius-lg);
+  background: var(--ns-surface);
+  color: var(--ns-muted-fg);
+  cursor: pointer;
+  transition: border-color var(--ns-ease-fast), background-color var(--ns-ease-fast);
+}
+
+.ns-dropzone:hover,
+.ns-dropzone[data-active] {
+  border-color: var(--ns-primary);
+  background: var(--ns-primary-subtle);
+  color: var(--ns-fg);
+}
+
+.ns-dropzone:focus-within {
+  outline: 2px solid var(--ns-ring);
+  outline-offset: 2px;
+}
+
+.ns-dropzone__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ns-space-9);
+  height: var(--ns-space-9);
+  border-radius: var(--ns-radius-full);
+  background: var(--ns-muted);
+  color: var(--ns-muted-fg);
+  font-size: var(--ns-text-lg);
+}
+
+.ns-dropzone__label {
+  font-size: var(--ns-text-sm);
+  font-weight: 500;
+  color: var(--ns-fg);
+}
+
+.ns-dropzone__hint {
+  font-size: var(--ns-text-2xs);
+  color: var(--ns-muted-fg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ns-dropzone {
+    transition: none;
+  }
+}
