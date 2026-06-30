@@ -1,0 +1,148 @@
+.ns-prompt-input {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ns-space-2);
+  padding: var(--ns-space-3);
+  border: 1px solid var(--ns-border);
+  border-radius: var(--ns-radius-lg);
+  background: var(--ns-surface);
+  transition: border-color var(--ns-ease-fast);
+}
+
+.ns-prompt-input:focus-within {
+  border-color: var(--ns-ring);
+}
+
+.ns-prompt-input[data-compact] {
+  padding: var(--ns-space-2);
+}
+
+.ns-prompt-input__field {
+  width: 100%;
+  max-height: 12rem;
+  min-height: var(--ns-control-h);
+  resize: none;
+  border: 0;
+  background: transparent;
+  color: var(--ns-fg);
+  font-family: inherit;
+  font-size: var(--ns-text-chat);
+  line-height: var(--ns-leading-normal);
+}
+
+.ns-prompt-input__field::placeholder {
+  color: var(--ns-muted-fg);
+}
+
+.ns-prompt-input__field:focus {
+  outline: none;
+}
+
+.ns-prompt-input__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ns-space-1-5);
+}
+
+.ns-prompt-input__spacer {
+  flex: 1;
+}
+
+.ns-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ns-space-1);
+  height: var(--ns-control-h-sm);
+  padding-inline: var(--ns-space-2-5);
+  border: 1px solid var(--ns-border);
+  border-radius: var(--ns-radius-full);
+  background: transparent;
+  color: var(--ns-muted-fg);
+  font-size: var(--ns-text-2xs);
+  cursor: pointer;
+  transition:
+    color var(--ns-ease-fast),
+    border-color var(--ns-ease-fast),
+    background-color var(--ns-ease-fast);
+}
+
+.ns-pill:hover {
+  color: var(--ns-fg);
+  border-color: var(--ns-border-hover);
+}
+
+.ns-pill[aria-pressed='true'] {
+  color: var(--ns-primary);
+  border-color: var(--ns-primary-border);
+  background: var(--ns-primary-subtle);
+}
+
+.ns-pill:focus-visible {
+  outline: 2px solid var(--ns-ring);
+  outline-offset: var(--ns-space-px);
+}
+
+.ns-iconbtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ns-control-h-sm);
+  height: var(--ns-control-h-sm);
+  border: 0;
+  border-radius: var(--ns-radius-md);
+  background: transparent;
+  color: var(--ns-muted-fg);
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-sm);
+  cursor: pointer;
+  transition: color var(--ns-ease-fast), background-color var(--ns-ease-fast);
+}
+
+.ns-iconbtn:hover {
+  color: var(--ns-fg);
+  background: var(--ns-muted);
+}
+
+.ns-iconbtn:focus-visible {
+  outline: 2px solid var(--ns-ring);
+  outline-offset: -2px;
+}
+
+.ns-prompt-input__send {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ns-control-h-sm);
+  height: var(--ns-control-h-sm);
+  border: 0;
+  border-radius: var(--ns-radius-full);
+  background: var(--ns-primary);
+  color: var(--ns-primary-fg);
+  font-size: var(--ns-text-sm);
+  cursor: pointer;
+  transition: background-color var(--ns-ease-fast);
+}
+
+.ns-prompt-input__send:hover {
+  background: var(--ns-primary-hover);
+}
+
+.ns-prompt-input__send:focus-visible {
+  outline: 2px solid var(--ns-ring);
+  outline-offset: 2px;
+}
+
+.ns-prompt-input__hint {
+  font-size: var(--ns-text-2xs);
+  color: var(--ns-muted-fg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ns-prompt-input,
+  .ns-pill,
+  .ns-iconbtn,
+  .ns-prompt-input__send {
+    transition: none;
+  }
+}

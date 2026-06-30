@@ -579,6 +579,28 @@ export const freshUiRegistryManifest: RegistryManifest = {
       css: [{ layer: 'components', content: "@import './ui/donut.css';" }],
     },
     {
+      name: 'prompt-input',
+      kind: 'component',
+      layer: 2,
+      description:
+        'Chat composer: auto-grow textarea with a toolbar of research/grounding pills, model picker, attach/screenshot/voice, and send.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['ai', 'composer', 'primitive'],
+      files: [
+        {
+          source: 'registry/components/ui/prompt-input.tsx',
+          target: '@ui/prompt-input.tsx',
+        },
+        {
+          source: 'registry/components/ui/prompt-input.css',
+          target: '@assets/ui/prompt-input.css',
+        },
+      ],
+      registryDependencies: ['theme-seed', 'model-selector'],
+      css: [{ layer: 'components', content: "@import './ui/prompt-input.css';" }],
+    },
+    {
       name: 'separator',
       kind: 'component',
       layer: 2,
@@ -990,6 +1012,7 @@ export const freshUiRegistryManifest: RegistryManifest = {
         'citation-chip',
         'model-selector',
         'tool-call-card',
+        'prompt-input',
       ],
     },
     {
