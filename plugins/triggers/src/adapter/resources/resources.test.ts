@@ -28,6 +28,7 @@ Deno.test('triggers install starter webhook is byte-identical to add webhook def
 
   assertEquals(installWebhook?.path, addWebhook.path);
   assertEquals(installWebhook ? artifactText(installWebhook) : undefined, artifactText(addWebhook));
+  assertStringIncludes(artifactText(addWebhook), "id: 'inbound/generic'");
 });
 
 Deno.test('triggers add resources emit the same shape at user-named paths', () => {

@@ -15,7 +15,7 @@ import { webhookStub } from './webhook.stub.ts';
 
 /** Canonical starter webhook input emitted during triggers install. */
 export const DEFAULT_WEBHOOK_INPUT: WebhookInput = {
-  id: 'generic-inbound-webhook',
+  id: 'inbound/generic',
   fileName: 'generic-inbound-webhook',
   path: 'inbound/generic',
 };
