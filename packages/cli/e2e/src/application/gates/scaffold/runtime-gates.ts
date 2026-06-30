@@ -138,20 +138,7 @@ export function createRuntimeGates(): readonly GateDefinition[] {
       GATE.BEHAVIOR_TRIGGERS_WEBHOOK,
       'Accept generic trigger webhook',
       GATE_PHASE.BEHAVIOR,
-      () => [
-        'curl',
-        '-sf',
-        '-X',
-        'POST',
-        'http://127.0.0.1:8093/api/v1/webhooks/inbound/generic',
-        '-H',
-        'Content-Type: application/json',
-        '-d',
-        JSON.stringify({
-          message: 'e2e-trigger-gate',
-          timestamp: new Date().toISOString(),
-        }),
-      ],
+      () => ['deno', 'eval', ACCEPT_TRIGGER_WEBHOOK_SCRIPT],
     ),
     commandGate(
       GATE.BEHAVIOR_TRIGGERS_EVENTS,
@@ -291,6 +278,30 @@ const VALIDATE_TRIGGER_EVENTS_SCRIPT = [
   'if (!Array.isArray(body.events)) throw new Error("events response is missing events[]");',
   'if (typeof body.total !== "number") throw new Error("events response is missing total");',
   'if (body.total < 1) throw new Error("expected at least one trigger event after webhook gate");',
+].join('\n');
+
+const ACCEPT_TRIGGER_WEBHOOK_SCRIPT = [
+  'const url = "http://127.0.0.1:8093/api/v1/webhooks/inbound/generic";',
+  'let lastStatus = 0;',
+  'let lastBody = "";',
+  'for (let attempt = 1; attempt <= 30; attempt++) {',
+  '  const response = await fetch(url, {',
+  '    method: "POST",',
+  '    headers: { "Content-Type": "application/json" },',
+  '    body: JSON.stringify({',
+  '      message: "e2e-trigger-gate",',
+  '      timestamp: new Date().toISOString(),',
+  '    }),',
+  '  });',
+  '  lastStatus = response.status;',
+  '  lastBody = await response.text();',
+  '  if (response.ok) {',
+  '    console.info(`trigger webhook accepted: HTTP ${response.status}`);',
+  '    Deno.exit(0);',
+  '  }',
+  '  await new Promise((resolve) => setTimeout(resolve, 500));',
+  '}',
+  'throw new Error(`trigger webhook was not accepted after retries: HTTP ${lastStatus}: ${lastBody}`);',
 ].join('\n');
 
 const AUTH_SMOKE_ENV_SCRIPT = [

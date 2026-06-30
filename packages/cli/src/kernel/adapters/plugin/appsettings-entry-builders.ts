@@ -1,3 +1,4 @@
+import { isAbsolute } from '@std/path';
 import { join as joinPosix } from '@std/path/posix';
 import type { BackgroundProcessorEntry, PluginEntry } from '@netscript/aspire/types';
 import type {
@@ -99,9 +100,7 @@ function buildBasePluginEntry(
     Enabled: options.enabled ?? true,
     Runtime: 'deno',
     Port: scaffoldResult.servicePort,
-    Entrypoint: scaffoldResult.serviceWorkdir
-      ? provider.defaultServiceEntrypoint ?? provider.defaultEntrypoint
-      : servicePackageEntrypoint(scaffoldResult.configKey),
+    Entrypoint: resolveServiceEntrypoint(scaffoldResult, provider),
     Workdir: scaffoldResult.serviceWorkdir ?? PROJECT_ROOT_WORKDIR,
     RequiresKv: provider.defaultRequiresKv,
     RequiresDb: provider.defaultRequiresDb,
@@ -116,6 +115,22 @@ function buildBasePluginEntry(
   }
 
   return entry;
+}
+
+function resolveServiceEntrypoint(
+  scaffoldResult: PluginScaffoldResult,
+  provider: PluginKindProvider,
+): string {
+  if (scaffoldResult.serviceWorkdir) {
+    return provider.defaultServiceEntrypoint ?? provider.defaultEntrypoint;
+  }
+  if (
+    provider.defaultServiceEntrypoint &&
+    isAbsolute(provider.defaultServiceEntrypoint)
+  ) {
+    return provider.defaultServiceEntrypoint;
+  }
+  return servicePackageEntrypoint(scaffoldResult.configKey);
 }
 
 function servicePackageEntrypoint(configKey: string): string {
