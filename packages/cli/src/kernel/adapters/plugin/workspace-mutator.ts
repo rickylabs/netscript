@@ -240,8 +240,6 @@ const OFFICIAL_PLUGIN_RUNTIME_LOCAL_PATHS: Readonly<Record<string, string>> = {
   ),
 };
 
-const REPOSITORY_ROOT = fromFileUrl(new URL('../../../../../../', import.meta.url));
-
 /** Mutates root config files after scaffolding a plugin workspace. */
 export class PluginWorkspaceMutator {
   /** Create a mutator with injected filesystem access. */
@@ -374,9 +372,15 @@ export class PluginWorkspaceMutator {
       return {};
     }
 
+    const repositoryRootUrl = new URL('../../../../../../', import.meta.url);
+    if (repositoryRootUrl.protocol !== 'file:') {
+      return {};
+    }
+
+    const repositoryRoot = fromFileUrl(repositoryRootUrl);
     const imports: Record<string, string> = {};
     for (const [specifier, sourcePath] of Object.entries(OFFICIAL_PLUGIN_RUNTIME_LOCAL_PATHS)) {
-      const absoluteSourcePath = join(REPOSITORY_ROOT, sourcePath);
+      const absoluteSourcePath = join(repositoryRoot, sourcePath);
       if (!await this.fs.exists(absoluteSourcePath)) {
         continue;
       }

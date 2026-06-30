@@ -154,10 +154,22 @@ export async function canCopyOfficialPlugin(
   return sources.get(kind)?.canonicalName === pluginName;
 }
 
+function defaultOfficialPluginSourceStartDir(): string | null {
+  const sourceUrl = new URL(import.meta.url);
+  if (sourceUrl.protocol !== 'file:') {
+    return null;
+  }
+  return dirname(fromFileUrl(sourceUrl));
+}
+
 /** Find a monorepo root that contains plugin-owned scaffold manifests. */
 export async function findOfficialPluginSourceRoot(
-  startDir: string = dirname(fromFileUrl(import.meta.url)),
+  startDir: string | null = defaultOfficialPluginSourceStartDir(),
 ): Promise<string | null> {
+  if (startDir === null) {
+    return null;
+  }
+
   let current = startDir;
 
   while (true) {
