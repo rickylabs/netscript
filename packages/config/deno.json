@@ -1,6 +1,6 @@
 {
   "name": "@netscript/config",
-  "version": "0.0.1-alpha.14",
+  "version": "0.0.1-alpha.15",
   "license": "MIT",
   "description": "Typed NetScript project configuration schemas, loaders, environment helpers, and scaffold constants.",
   "exports": {
