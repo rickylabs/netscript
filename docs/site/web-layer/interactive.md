@@ -93,7 +93,7 @@ helper utilities that are safe to consume as package runtime dependencies, inclu
 - `stripToastFromUrl(url: URL): string` — removes all toast query parameters while preserving path
   and hash.
 
-For the full Web Layer UI surface and the registry copy model, see the pillar hub at
+For the full Web Layer UI surface and the workspace-owned registry components, see the pillar hub at
 [/web-layer/](/web-layer/).
 
 ## Related
