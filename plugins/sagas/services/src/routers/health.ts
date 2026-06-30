@@ -7,7 +7,7 @@
  */
 
 import { z } from 'zod';
-import { type BaseContractProcedure, baseContract } from '@netscript/contracts';
+import { baseContract, type BaseContractProcedure } from '@netscript/contracts';
 import { implement } from '@orpc/server';
 import { getKv } from '@netscript/kv';
 import { listSagaMetadata } from '../saga-registry.ts';

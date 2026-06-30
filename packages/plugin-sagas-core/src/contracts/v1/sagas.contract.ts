@@ -591,7 +591,10 @@ interface SagasContractDefinitionShape extends BasePluginContract {
     typeof getInstanceHistoryInput,
     typeof getInstanceHistoryOutput
   >;
-  readonly publish: Route<typeof PublishMessageInputZodSchema, typeof PublishMessageResponseZodSchema>;
+  readonly publish: Route<
+    typeof PublishMessageInputZodSchema,
+    typeof PublishMessageResponseZodSchema
+  >;
   readonly subscribe: SubscribeRoute;
 }
 

@@ -6,10 +6,7 @@ import type {
   TriggerFireResponse,
 } from '../../src/contracts/v1/mod.ts';
 import { triggersContractV1 } from '../../src/contracts/v1/mod.ts';
-import type {
-  TriggerDurabilityTier,
-  TriggerEventStatus,
-} from '../../src/domain/constants.ts';
+import type { TriggerDurabilityTier, TriggerEventStatus } from '../../src/domain/constants.ts';
 
 // ============================================================================
 // Type-level soundness assertions for the precise triggers contract.

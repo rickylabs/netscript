@@ -23,9 +23,9 @@
  */
 
 export {
+  BASE_PLUGIN_ERRORS,
   type BasePluginErrorCode,
   type BasePluginErrorDefinition,
-  BASE_PLUGIN_ERRORS,
   type InternalErrorData,
 } from './domain/base-errors.ts';
 export { type PluginCapabilities, PluginCapabilitiesSchema } from './domain/capabilities.ts';

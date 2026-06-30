@@ -60,7 +60,6 @@ export const sagasV1: SagasHandlers<SagasV1RouteKey> = {
   /** Mandatory base seam `describe` route. */
   describe: router.describe.handler(() => sagasCapabilities),
 
-
   /** List all registered saga definitions with optional filtering. */
   listSagas: router.listSagas.handler(async ({ input }) => {
     const { limit, offset, topic, enabled } = input;

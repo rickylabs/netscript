@@ -6,10 +6,7 @@ import type {
   SagaInstanceResponse,
 } from '../../src/contracts/v1/mod.ts';
 import { sagasContractV1 } from '../../src/contracts/v1/mod.ts';
-import type {
-  SagaDurabilityTier,
-  SagaInstanceStatus,
-} from '../../src/domain/constants.ts';
+import type { SagaDurabilityTier, SagaInstanceStatus } from '../../src/domain/constants.ts';
 
 // ============================================================================
 // Type-level soundness assertions for the precise sagas contract.
