@@ -235,6 +235,29 @@ Deno.test('createRouteReference infers dynamic, catch-all, optional catch-all, a
   );
 });
 
+Deno.test('createRouteReference with static-before-dynamic segment keeps dynamic path params typed (regression for #177)', () => {
+  // Exact reproduction from issue #177: a STATIC segment ("channel") precedes a
+  // DYNAMIC one ("[id]"). Before #178's `{}`-for-static-segment fix, the static
+  // segment contributed a `Record<string, never>` index signature that poisoned
+  // `id` to `never`, so `.href({ path: { id } })` failed to type-check with
+  // TS2322. These assignments use no `as`/`as unknown as` casts, so any
+  // regression in `InferRoutePatternSegment` / `InferRoutePatternPathSegments`
+  // resurfaces here at type-check time.
+  const channelRoute = createRouteReference('/channel/[id]', {
+    id: 'channel.$id',
+    kind: 'page',
+  });
+
+  const id = 'c-123';
+  const channelPath: InferRouteContractPath<typeof channelRoute> = { id };
+  const href = channelRoute.href({ path: { id } });
+
+  assert(channelPath.id === 'c-123', `Unexpected channel path id: ${channelPath.id}`);
+  assert(href === '/channel/c-123', `Unexpected channel href: ${href}`);
+  assert(channelRoute.$id === 'channel.$id', `Unexpected channel id: ${channelRoute.$id}`);
+  assert(channelRoute.$kind === 'page', `Unexpected channel kind: ${channelRoute.$kind}`);
+});
+
 Deno.test('pairRouteTargets keeps page and partial hrefs aligned', () => {
   const pageRoute = bindRoutePattern(
     defineRouteContract({
