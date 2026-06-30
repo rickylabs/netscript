@@ -491,6 +491,28 @@ export const freshUiRegistryManifest: RegistryManifest = {
       css: [{ layer: 'components', content: "@import './ui/code-block.css';" }],
     },
     {
+      name: 'model-selector',
+      kind: 'component',
+      layer: 2,
+      description:
+        'Disclosure-backed model/provider picker for the prompt composer (native <details>).',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['ai', 'model', 'primitive'],
+      files: [
+        {
+          source: 'registry/components/ui/model-selector.tsx',
+          target: '@ui/model-selector.tsx',
+        },
+        {
+          source: 'registry/components/ui/model-selector.css',
+          target: '@assets/ui/model-selector.css',
+        },
+      ],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/model-selector.css';" }],
+    },
+    {
       name: 'separator',
       kind: 'component',
       layer: 2,
@@ -898,6 +920,7 @@ export const freshUiRegistryManifest: RegistryManifest = {
       items: [
         'theme-seed',
         'citation-chip',
+        'model-selector',
       ],
     },
     {
