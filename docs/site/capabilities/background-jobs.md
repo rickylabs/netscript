@@ -72,14 +72,14 @@ as a <a href="/capabilities/durable-sagas/">durable saga</a>; jobs and sagas com
 Add the workers plugin to a published workspace with the public package dispatcher:
 
 ```bash
-netscript plugin add @netscript/plugin-workers
+netscript plugin install @netscript/plugin-workers
 ```
 
 For local-source contributor work inside this monorepo, use the maintainer binary when you need
 first-party samples:
 
 ```bash
-deno run -A packages/cli/bin/netscript-dev.ts plugin add worker --name workers --samples
+deno run -A packages/cli/bin/netscript-dev.ts plugin install worker --name workers --samples
 ```
 
 That local path lands real, compiling modules you can read and trigger immediately — including

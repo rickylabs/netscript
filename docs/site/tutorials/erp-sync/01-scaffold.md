@@ -102,7 +102,7 @@ NetScript's background capabilities arrive as plugins. Add the **workers** plugi
 jobs so you have a working reference to read and adapt:
 
 ```sh
-deno run -A packages/cli/bin/netscript-dev.ts plugin add worker --name workers --samples
+deno run -A packages/cli/bin/netscript-dev.ts plugin install worker --name workers --samples
 ```
 
 This lands the plugin at **`plugins/workers/`** — the canonical, config-referenced install location
@@ -116,7 +116,7 @@ Now add the **triggers** plugin, which is how NetScript receives events — incl
 trigger you build in [Chapter 2](/tutorials/erp-sync/02-import-job/):
 
 ```sh
-deno run -A packages/cli/bin/netscript-dev.ts plugin add trigger --name triggers --samples
+deno run -A packages/cli/bin/netscript-dev.ts plugin install trigger --name triggers --samples
 ```
 
 This lands a workspace at `plugins/triggers/` and registers it in `netscript.config.ts`

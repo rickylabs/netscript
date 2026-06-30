@@ -55,7 +55,7 @@ The `auth` plugin is a first-class official plugin, installed the same way as `w
 `triggers`. From the workspace root:
 
 ```sh
-netscript plugin add @netscript/plugin-auth
+netscript plugin install @netscript/plugin-auth
 ```
 
 This scaffolds the unified `@netscript/plugin-auth` plugin into `plugins/`, registers it, and
@@ -78,7 +78,7 @@ cross-backend account linking in v1. You pick the backend in Step 2.
 {{ comp callout { type: "note", title: "Alpha package pins" } }}
 The scaffold emits exact alpha specifiers such as
 <code>jsr:@netscript/plugin-auth-core{{ releaseSpecifier }}</code>. Add auth through
-<code>netscript plugin add @netscript/plugin-auth</code>, which wires the workspace correctly for
+<code>netscript plugin install @netscript/plugin-auth</code>, which wires the workspace correctly for
 the aligned alpha train.
 {{ /comp }}
 

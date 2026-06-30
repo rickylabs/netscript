@@ -52,7 +52,7 @@ plugin or trigger a job, and leave it running.
 Add the workers plugin with its sample jobs so you have a working reference to read and adapt:
 
 ```sh
-deno run -A packages/cli/bin/netscript-dev.ts plugin add worker --name workers --samples
+deno run -A packages/cli/bin/netscript-dev.ts plugin install worker --name workers --samples
 netscript plugin list
 ```
 

@@ -58,7 +58,7 @@ You need:
 {{ comp callout { type: "tip", title: "Run commands from the workspace root" } }}
 Every command below runs from your workspace root. To target a different project, pass
 <code>--project-root &lt;path&gt;</code> — it defaults to the current directory. Run
-<code>netscript plugin add --help</code> for the version-accurate option list before you rely
+<code>netscript plugin install --help</code> for the version-accurate option list before you rely
 on any flag.
 {{ /comp }}
 
@@ -97,7 +97,7 @@ Pick the kind for the capability you need:
 
 {{ comp callout { type: "note", title: "auth is a first-class official plugin" } }}
 Auth is now added the same way as workers, sagas, triggers, and streams — through
-<code>netscript plugin add auth</code>. It scaffolds a <code>plugins/auth/</code> workspace,
+<code>netscript plugin install auth</code>. It scaffolds a <code>plugins/auth/</code> workspace,
 registers the <code>auth-api</code> service on port <strong>8094</strong>, and contributes
 its Prisma models. The active backend is selected at runtime with
 <code>NETSCRIPT_AUTH_BACKEND</code> (default <code>kv-oauth</code>). See
@@ -106,39 +106,45 @@ its Prisma models. The active backend is selected at runtime with
 
 ## Step 2 — Add the plugin
 
-In the public `netscript` CLI, `plugin add` takes a published plugin package specifier and dispatches to that plugin's own JSR CLI — it is not a kind-based local scaffolding command. Add an official plugin by package name:
+In the public `netscript` CLI, `plugin install` accepts either an official bare alias
+(`workers`, `sagas`, `triggers`, `auth`, `streams`) or a published plugin package specifier
+such as `@netscript/plugin-workers`. Add an official plugin by alias:
 
 ```bash
-netscript plugin add @netscript/plugin-workers
+netscript plugin install workers --name workers
 ```
 
-Repeat with the matching package for the other plugins: `@netscript/plugin-sagas`, `@netscript/plugin-triggers`, `@netscript/plugin-auth`, `@netscript/plugin-streams`. The only option the public `add` verb accepts is `--project-root <path>` (to target a workspace other than the current directory); it forwards any remaining arguments to the plugin's published CLI. Run `netscript plugin add --help` for the version-accurate surface.
-
-The kind-based form (`netscript plugin add worker --name workers` with `--name`, `--samples`/`--no-samples`, `--port`, `--service-refs`, `--plugin-refs`, `--db`/`--no-db`, `--force`) is available only in the local contributor binary `netscript-dev`, not in the public `netscript` binary.
+Repeat with the matching alias for the other plugins: `sagas`, `triggers`, `auth`, and
+`streams`. The package-spec forms also work, for example
+`netscript plugin install @netscript/plugin-workers --name workers` or an explicit `jsr:`
+specifier. Run `netscript plugin install --help` for the version-accurate surface.
 
 ### Useful options
 
-Run `netscript plugin add --help` for the full, version-accurate list. The public
-`netscript plugin add` command takes the plugin package and forwards the verb to that
-plugin's own CLI; the only framework-level flag it accepts is:
+Run `netscript plugin install --help` for the full, version-accurate list. The public
+`netscript plugin install` command takes the plugin alias or package specifier and applies
+the workspace-level install flags before invoking the plugin-owned scaffolder:
 
 {{ comp apiTable {
-  caption: "netscript plugin add — options",
+  caption: "netscript plugin install — options",
   columns: ["Option", "What it does"],
   rows: [
-    ["<code>--project-root &lt;path&gt;</code>", "Target a workspace other than the current directory."]
+    ["<code>--name &lt;name&gt;</code>", "Plugin workspace and config key, for example <code>workers</code>."],
+    ["<code>--project-root &lt;path&gt;</code>", "Target a workspace other than the current directory."],
+    ["<code>--port &lt;port&gt;</code>", "Override the plugin service port."],
+    ["<code>--db &lt;engine&gt;</code> / <code>--no-db</code>", "Provision or target a database engine, or skip database wiring."],
+    ["<code>--samples</code> / <code>--no-samples</code>", "Include or skip user-owned sample stubs."],
+    ["<code>--jsr-url &lt;specifier&gt;</code> / <code>--local-path &lt;path&gt;</code>", "Use an explicit JSR package or local plugin package directory."],
+    ["<code>--force</code>", "Overwrite generated files if they already exist."]
   ]
 } /}}
 
-{{ comp callout { type: "note", title: "Scaffolding flags belong to the contributor CLI" } }}
-The richer scaffolding flags — <code>--name</code>, <code>--samples</code> /
-<code>--no-samples</code>, <code>--port</code>, <code>--service-refs</code> /
-<code>--plugin-refs</code>, <code>--db</code> / <code>--no-db</code>, and
-<code>--force</code> — are defined on the local contributor command
-<code>netscript-dev plugin add &lt;kind&gt;</code>, not on the public
-<code>netscript plugin add</code> binary. Always run
-<code>netscript plugin add --help</code> for the option list your installed version
-actually exposes.
+{{ comp callout { type: "note", title: "Contributor CLI uses local sources" } }}
+The local contributor command
+<code>deno run -A packages/cli/bin/netscript-dev.ts plugin install &lt;kind&gt;</code>
+accepts the same framework-level install flags, but resolves against the monorepo checkout
+instead of the globally installed public CLI. Always run <code>netscript plugin install --help</code>
+for the option list your installed version actually exposes.
 {{ /comp }}
 
 {{ comp callout { type: "warning", title: "auth needs a database and KV" } }}

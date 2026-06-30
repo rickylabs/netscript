@@ -33,7 +33,7 @@ graph.
 {{ comp callout { type: "note", title: "Alpha package pins" } }}
 The CLI scaffold emits exact alpha specifiers such as
 <code>jsr:@netscript/plugin-auth-core{{ releaseSpecifier }}</code>. Add the plugin through
-<code>netscript plugin add @netscript/plugin-auth</code> so the workspace gets the matching auth
+<code>netscript plugin install @netscript/plugin-auth</code> so the workspace gets the matching auth
 sources, generated registry entries, and Aspire resources together.
 {{ /comp }}
 
@@ -61,10 +61,10 @@ Throughout, run commands from your workspace root.
 ## Step 1 — Add the `auth` plugin
 
 The `auth` plugin is a first-class official plugin installed the same way as `workers`, `sagas`,
-`triggers`, and `streams`. Add it with `plugin add`:
+`triggers`, and `streams`. Add it with `plugin install`:
 
 ```sh
-netscript plugin add @netscript/plugin-auth
+netscript plugin install @netscript/plugin-auth
 ```
 
 This scaffolds the unified `@netscript/plugin-auth` plugin into your workspace and registers it. The

@@ -81,7 +81,7 @@ and the order matters: **Aspire (step 2) must be up before any `db` command (ste
   },
   {
     title: "4 · Extend & generate",
-    body: "netscript plugin add, then netscript generate plugins to wire the registry.",
+    body: "netscript plugin install, then netscript generate plugins to wire the registry.",
     icon: "✶"
   }
 ] }) }}
@@ -126,11 +126,11 @@ and registers its contributions; the host application never changes. After addin
 regenerate the registry so the project picks them up.
 
 {{ comp.apiTable({
-  caption: "Public plugin package dispatch (netscript)",
+  caption: "Public plugin install (netscript)",
   rows: [
-    { name: "netscript plugin add", type: "netscript plugin add <pkg> [args...] [--project-root <path>]", desc: "Run a plugin package's published add command and forward remaining arguments to that package. The public <code>netscript</code> add verb itself accepts only <code>--project-root</code>; package-specific flags belong to the plugin package CLI." },
-    { name: "netscript plugin add workers", type: "netscript plugin add @netscript/plugin-workers", desc: "Dispatch to the published workers plugin package. Use the package's own help for any forwarded arguments supported by that published plugin CLI." },
-    { name: "netscript plugin add auth", type: "netscript plugin add @netscript/plugin-auth", desc: "Dispatch to the published auth plugin package — the <code>auth-api</code> oRPC service on port 8094 exposing <code>/api/v1/auth/{signin,callback,signout,session,me}</code>. Pulls in <code>auth.prisma</code> and a single active backend selected by <code>NETSCRIPT_AUTH_BACKEND</code> (default <code>kv-oauth</code>). See <a href=\"/how-to/add-authentication/\">add authentication</a>." },
+    { name: "netscript plugin install", type: "netscript plugin install <kind-or-package> --name <name> [--project-root <path>]", desc: "Install a plugin dependency, emit the workspace glue that imports it, and register it with Aspire. The positional value accepts official bare aliases such as <code>workers</code> or <code>auth</code>, scoped package specs such as <code>@netscript/plugin-workers</code>, and <code>jsr:</code> package specs." },
+    { name: "netscript plugin install workers", type: "netscript plugin install workers --name workers", desc: "Install the official workers plugin via its verified bare alias. The equivalent package-spec form is <code>netscript plugin install @netscript/plugin-workers --name workers</code>." },
+    { name: "netscript plugin install auth", type: "netscript plugin install auth --name auth", desc: "Install the official auth plugin — the <code>auth-api</code> oRPC service on port 8094 exposing <code>/api/v1/auth/{signin,callback,signout,session,me}</code>. Pulls in <code>auth.prisma</code> and a single active backend selected by <code>NETSCRIPT_AUTH_BACKEND</code> (default <code>kv-oauth</code>). See <a href=\"/how-to/add-authentication/\">add authentication</a>." },
     { name: "netscript plugin list", type: "netscript plugin list", desc: "List the plugins registered in the current workspace." },
     { name: "netscript plugin doctor", type: "netscript plugin doctor", desc: "Check the health of installed NetScript plugins — a fast wiring sanity check." },
     { name: "netscript plugin info", type: "netscript plugin info workers", desc: "Run a plugin's published info command for details about a single plugin." },
@@ -141,16 +141,16 @@ regenerate the registry so the project picks them up.
 {{ comp.apiTable({
   caption: "Local contributor plugin scaffolding (netscript-dev)",
   rows: [
-    { name: "plugin add worker", type: "deno run -A packages/cli/bin/netscript-dev.ts plugin add worker --name workers --samples", desc: "Local-source contributor path for first-party worker samples. The kind-based command is not part of the public <code>netscript</code> package-dispatch surface." },
-    { name: "plugin add saga", type: "deno run -A packages/cli/bin/netscript-dev.ts plugin add saga --name sagas --samples", desc: "Local-source contributor path for sagas samples." },
-    { name: "plugin add trigger", type: "deno run -A packages/cli/bin/netscript-dev.ts plugin add trigger --name triggers --samples", desc: "Local-source contributor path for triggers samples." },
-    { name: "plugin add stream", type: "deno run -A packages/cli/bin/netscript-dev.ts plugin add stream --name streams --samples", desc: "Local-source contributor path for streams samples." },
-    { name: "plugin add options", type: "--name --port --service-refs --plugin-refs --db/--no-db --samples/--no-samples --force", desc: "These flags belong to <code>netscript-dev plugin add &lt;kind&gt;</code>, not to public <code>netscript plugin add</code>." }
+    { name: "plugin install worker", type: "deno run -A packages/cli/bin/netscript-dev.ts plugin install worker --name workers --samples", desc: "Local-source contributor path for first-party worker samples against the monorepo checkout." },
+    { name: "plugin install saga", type: "deno run -A packages/cli/bin/netscript-dev.ts plugin install saga --name sagas --samples", desc: "Local-source contributor path for sagas samples." },
+    { name: "plugin install trigger", type: "deno run -A packages/cli/bin/netscript-dev.ts plugin install trigger --name triggers --samples", desc: "Local-source contributor path for triggers samples." },
+    { name: "plugin install stream", type: "deno run -A packages/cli/bin/netscript-dev.ts plugin install stream --name streams --samples", desc: "Local-source contributor path for streams samples." },
+    { name: "plugin install options", type: "--name --port --service-refs --plugin-refs --db/--no-db --samples/--no-samples --force", desc: "These framework-level install flags are shared with the public <code>netscript plugin install</code> command; <code>netscript-dev</code> uses local monorepo sources for contributor validation." }
   ]
 }) }}
 
 {{ comp callout { type: "note", title: "Plugins live under plugins/<name>/" } }}
-A <code>plugin add</code> installs into <code>plugins/workers</code>, <code>plugins/sagas</code>, <code>plugins/triggers</code>,
+A <code>plugin install</code> installs into <code>plugins/workers</code>, <code>plugins/sagas</code>, <code>plugins/triggers</code>,
 <code>plugins/auth</code>, or <code>plugins/streams</code> — the canonical, config-referenced location.
 <code>netscript.config.ts</code> points only at <code>./plugins/&lt;name&gt;/mod.ts</code>. See the
 <a href="/how-to/add-a-plugin/">add-a-plugin how-to</a>.
@@ -159,7 +159,7 @@ A <code>plugin add</code> installs into <code>plugins/workers</code>, <code>plug
 ### Authentication plugin
 
 The `auth` plugin is a first-class official plugin scaffolded exactly like the others —
-`netscript plugin add auth` installs `plugins/auth/`, registers the `auth-api` service on
+`netscript plugin install auth` installs `plugins/auth/`, registers the `auth-api` service on
 port 8094, and contributes `plugins/auth/database/auth.prisma`, which is migrated by the
 standard `netscript db` workflow alongside every other plugin schema. It composes **one
 active backend** at a time, chosen at runtime by the `NETSCRIPT_AUTH_BACKEND` env var.
@@ -174,7 +174,7 @@ active backend** at a time, chosen at runtime by the `NETSCRIPT_AUTH_BACKEND` en
 }) }}
 
 {{ comp callout { type: "note", title: "Auth migrates like any other plugin schema" } }}
-After <code>netscript plugin add auth</code>, run the normal database workflow with Aspire up:
+After <code>netscript plugin install auth</code>, run the normal database workflow with Aspire up:
 <code>netscript db generate</code> then <code>netscript db migrate</code> picks up <code>plugins/auth/database/auth.prisma</code>
 (the better-auth-shaped <code>auth_users</code>, <code>auth_sessions</code>, <code>auth_accounts</code>, <code>auth_verifications</code>
 tables) exactly like the other plugins. Only the <code>better-auth</code> backend reads these tables —
@@ -238,7 +238,7 @@ registry and runtime schemas stay in sync.
 {{ comp.apiTable({
   caption: "Generate registries & schemas",
   rows: [
-    { name: "netscript generate plugins", type: "netscript generate plugins", desc: "Generate the plugin registries from project source. Run this after every <code>plugin add</code> so the workspace picks up new contributions." },
+    { name: "netscript generate plugins", type: "netscript generate plugins", desc: "Generate the plugin registries from project source. Run this after every <code>plugin install</code> so the workspace picks up new contributions." },
     { name: "netscript generate runtime-schemas", type: "netscript generate runtime-schemas", desc: "Generate runtime configuration schemas from registered plugin metadata." }
   ]
 }) }}

@@ -63,11 +63,11 @@ The fastest way to get a correct skeleton is to install a first-party plugin who
 yours, then read and adapt it:
 
 ```sh
-deno run -A packages/cli/bin/netscript-dev.ts plugin add worker --name workers --samples
+deno run -A packages/cli/bin/netscript-dev.ts plugin install worker --name workers --samples
 ```
 
 A minimal hand-authored plugin needs only a `mod.ts` manifest (built with `definePlugin`) and a
-`scaffold.plugin.json` manifest descriptor. A capability-bearing plugin adds contribution modules, a
+`scaffold.plugin.json` manifest descriptor. A capability-bearing plugin installs contribution modules, a
 `deno.json`, and (optionally) a `services/`, `bin/`, `database/`, and `contracts/` tree:
 
 ```
