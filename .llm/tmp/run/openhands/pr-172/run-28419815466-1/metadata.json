@@ -1,0 +1,17 @@
+{
+  "run_id": "28419815466",
+  "run_attempt": "1",
+  "run_url": "https://github.com/rickylabs/netscript/actions/runs/28419815466",
+  "bootstrap_outcome": "success",
+  "agent_outcome": "success",
+  "verdict": "completed",
+  "summary_source": "agent",
+  "model": "openrouter/minimax/minimax-m3",
+  "provider": "OPENROUTER",
+  "output_mode": "pr-comment",
+  "issue_number": "172",
+  "checkout_repo": "rickylabs/netscript",
+  "checkout_ref": "feat/scaffold-surface-167",
+  "summary_path": "/home/runner/work/_temp/openhands/28419815466-1/summary.md",
+  "trace_dir": ".llm/tmp/run/openhands/pr-172/run-28419815466-1"
+}
