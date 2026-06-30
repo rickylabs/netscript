@@ -1716,7 +1716,12 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   than folding that contract into this slice.
 - **Owner:** CLI plugin runtime / official plugin package maintainers.
 - **Linked evidence:** `.llm/tmp/run/feat-scaffold-surface-167--adapter-relocation/worklog.md` S-g.
-- **Status:** open, DEBT_ACCEPTED for S-g escape hatch.
+- **Status:** closed by PR #172 runtime-launch finalization
+  (`8aaddbc1`, `4a991d16`).
 - **Gate:** Close when official plugin packages expose supported executable entrypoints for the
   thin-dependency runtime and `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`
   reaches `failed=0` without copying plugin internals into generated user projects.
+- **Closing evidence:** `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`
+  exited 0 on 2026-06-30 with `Summary: passed=48 failed=0`. The run used package-launched
+  service/background plugin resources, passed every service/background wait gate, accepted the
+  generic trigger webhook, listed trigger events, and validated the cross-service OTEL trace.

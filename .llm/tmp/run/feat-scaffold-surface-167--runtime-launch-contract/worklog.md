@@ -86,3 +86,14 @@
 | focused CLI regression tests | `cd packages/cli && deno test --unstable-kv --allow-all src/kernel/adapters/plugin/workspace-mutator_test.ts src/kernel/templates/database/generators_test.ts src/kernel/application/registries/template-registry_test.ts` | 0 | `ok \| 11 passed (7 steps) \| 0 failed`. |
 | scaffold.runtime rerun | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | 1 | Runtime launch gates passed through `runtime.wait.triggers` and `runtime.aspire-describe`; failed later at `behavior.workers-health` with a 30s aborted GET to `http://127.0.0.1:8091/health/live`. |
 | bootstrap import-map fix tests | `cd packages/cli && deno test --unstable-kv --allow-all src/kernel/templates/plugins/generate-plugin-service_test.ts src/kernel/application/registries/template-registry_test.ts src/kernel/adapters/plugin/workspace-mutator_test.ts` | 0 | `ok \| 13 passed \| 0 failed`; service-context bootstrap now keeps bare `@netscript/*` imports so generated import maps control local-source/JSR resolution. |
+
+## Finalization — triggers webhook and runtime evidence
+
+| Gate | Command | Exit | Evidence |
+| --- | --- | ---: | --- |
+| source-root marker unit tests | `deno test --unstable-kv --allow-all packages/cli/src/maintainer/adapters/packages-copier_test.ts packages/cli/src/maintainer/adapters/official-plugin-source_test.ts` | 0 | `ok \| 3 passed \| 0 failed`. |
+| focused triggers/generator tests | `deno test --unstable-kv --allow-all plugins/triggers/src/adapter/resources/resources.test.ts plugins/triggers/services/src/main_test.ts plugins/triggers/src/runtime/project-trigger-registry_test.ts` plus Aspire helper generator tests | 0 | Trigger service registry fallback, legacy events alias, starter webhook enqueue action, and generated Aspire registry env assertions passed. |
+| scaffold.runtime final | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | 0 | `Summary: passed=48 failed=0`; `behavior.triggers-webhook`, `behavior.triggers-events`, and `behavior.otel.traces` passed. |
+| arch check | `deno task arch:check` | 0 | All 13 doctrine roots reported `FAIL=0`; existing warnings only. |
+| CLI publish dry-run | `cd packages/cli && deno publish --dry-run --allow-dirty` | 0 | `Success Dry run complete`; existing unanalyzable dynamic-import warnings in CLI plugin registry/UI registry. |
+| triggers publish dry-run | `cd plugins/triggers && deno publish --dry-run --allow-dirty` | 0 | `Success Dry run complete`; existing unanalyzable dynamic-import warnings in local runtime backend and project trigger registry. |
