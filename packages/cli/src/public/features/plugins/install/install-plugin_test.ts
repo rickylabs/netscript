@@ -12,6 +12,7 @@ import { PluginKindRegistry } from '../../../../kernel/application/registries/pl
 import { PluginRegistryScaffolder } from '../../../../kernel/adapters/plugin/registry-scaffolder.ts';
 import { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/workspace-mutator.ts';
 import type { PluginKindProvider } from '../../../../kernel/domain/plugin-kind.ts';
+import { netscriptJsrSpecifier } from '../../../../kernel/constants/jsr-specifiers.ts';
 import { installPlugin } from './install-plugin.ts';
 import type {
   JsrPluginValidationResult,
@@ -344,7 +345,7 @@ describe('public install plugin flow', () => {
       );
       assertStringIncludes(
         await Deno.readTextFile(join(projectRoot, 'appsettings.json')),
-        '"Entrypoint": "jsr:@netscript/plugin-workers/services"',
+        `"Entrypoint": "${netscriptJsrSpecifier('plugin-workers', '/services')}"`,
       );
       assertStringIncludes(
         await Deno.readTextFile(join(projectRoot, 'appsettings.json')),

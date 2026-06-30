@@ -10,7 +10,6 @@ import type { PluginServiceContext } from '@netscript/plugin/sdk';
 import { createPluginLogger } from '@netscript/plugin/loader';
 import { getKv } from '@netscript/kv';
 import { baseContract } from '@netscript/contracts';
-import { v1 } from '../../contracts/versions/v1/mod.ts';
 
 type DatabaseModule = {
   readonly db?: {
@@ -35,7 +34,7 @@ export async function createPluginServiceContext(
     },
     contracts: {
       base: baseContract,
-      versions: { v1 },
+      versions: {},
     },
     kv: await getKv(),
     logger: createPluginLogger(pluginName),

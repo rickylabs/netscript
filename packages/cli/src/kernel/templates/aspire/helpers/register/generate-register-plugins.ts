@@ -24,6 +24,7 @@ import { SCAFFOLD_ASPIRE_MODULES } from '../../../../constants/scaffold/scaffold
 import { RESOURCE_DEFAULTS } from '@netscript/aspire/constants';
 import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 import { renderTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
+import { netscriptJsrSpecifier } from '../../../../constants/jsr-specifiers.ts';
 
 /**
  * Generates the `register-plugins.mts` file content.
@@ -44,7 +45,7 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
 
   for (const [name, entry] of entries) {
     const workdir = entry.Workdir ?? '.';
-    const entrypoint = entry.Entrypoint ?? `jsr:@netscript/plugin-${name}/services`;
+    const entrypoint = entry.Entrypoint ?? netscriptJsrSpecifier(`plugin-${name}`, '/services');
 
     const lines: string[] = [];
     lines.push(`  // --- ${name} ---`);
@@ -70,7 +71,7 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
 
     // Register via addExecutable with HTTP endpoint
     lines.push(
-      `    const resource = builder.addExecutable('${name}', 'deno', workdir, ['run', '--minimum-dependency-age=0', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', ...perms, '${entrypoint}'])`,
+      `    const resource = builder.addExecutable('${name}', 'deno', workdir, ['run', '--config', 'deno.json', '--minimum-dependency-age=0', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', ...perms, '${entrypoint}'])`,
     );
     lines.push(
       `      .withHttpEndpoint({ port: ${entry.Port}, env: '${RESOURCE_DEFAULTS.PortEnvVar}' });`,

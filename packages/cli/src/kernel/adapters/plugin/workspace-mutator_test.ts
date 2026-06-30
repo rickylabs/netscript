@@ -97,12 +97,32 @@ Deno.test('PluginWorkspaceMutator injects first-party plugin core imports into r
   const config = JSON.parse(await fs.readFile('/project/deno.json'));
 
   assertEquals(
+    config.imports['@netscript/contracts'],
+    netscriptJsrSpecifier('contracts'),
+  );
+  assertEquals(
+    config.imports['@netscript/kv'],
+    netscriptJsrSpecifier('kv'),
+  );
+  assertEquals(
+    config.imports['@netscript/plugin-workers/runtime'],
+    netscriptJsrSpecifier('plugin-workers', '/runtime'),
+  );
+  assertEquals(
     config.imports['@netscript/plugin-workers-core/schemas'],
     netscriptJsrSpecifier('plugin-workers-core', '/schemas'),
   );
   assertEquals(
+    config.imports['@netscript/plugin-sagas/runtime'],
+    netscriptJsrSpecifier('plugin-sagas', '/runtime'),
+  );
+  assertEquals(
     config.imports['@netscript/plugin-sagas-core/domain'],
     netscriptJsrSpecifier('plugin-sagas-core', '/domain'),
+  );
+  assertEquals(
+    config.imports['@netscript/plugin-triggers/runtime'],
+    netscriptJsrSpecifier('plugin-triggers', '/runtime'),
   );
   assertEquals(
     config.imports['@netscript/plugin-triggers-core/builders'],
@@ -153,7 +173,7 @@ Deno.test('PluginWorkspaceMutator registers background plugins with companion AP
     Enabled: true,
     Runtime: 'deno',
     Port: 8091,
-    Entrypoint: 'jsr:@netscript/plugin-billing-worker/services',
+    Entrypoint: netscriptJsrSpecifier('plugin-billing-worker', '/services'),
     Workdir: '.',
     RequiresKv: true,
     RequiresDb: true,

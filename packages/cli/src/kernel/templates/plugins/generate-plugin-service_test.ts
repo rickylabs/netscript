@@ -7,7 +7,9 @@ import { assert, assertFalse, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { apiKindProvider } from '../../adapters/plugin/kinds/api.kind.ts';
 import type { PluginKindProvider } from '../../domain/plugin-kind.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../application/registries/template-registry.ts';
+import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
 import { generatePluginService } from './generate-plugin-service.ts';
+import { generatePluginServiceContext } from './generate-plugin-service-context.ts';
 
 // `generatePluginService` reads templates synchronously, which requires a
 // previously-awaited registry hydration. Tests exercise the generator directly
@@ -54,4 +56,14 @@ Deno.test('generatePluginService does not add Redis adapter import for API-only 
 
   assert(output.length > 0);
   assertFalse(output.includes("import '@netscript/kv/redis';"));
+});
+
+Deno.test('generatePluginServiceContext emits package-resident safe imports', () => {
+  const output = generatePluginServiceContext();
+
+  assertStringIncludes(output, `from '${netscriptJsrSpecifier('plugin', '/loader')}'`);
+  assertStringIncludes(output, `from '${netscriptJsrSpecifier('kv')}'`);
+  assertStringIncludes(output, `from '${netscriptJsrSpecifier('contracts')}'`);
+  assertFalse(output.includes("from '@netscript/contracts'"));
+  assertFalse(output.includes('../../contracts/versions/v1/mod.ts'));
 });

@@ -34,8 +34,8 @@
       "--allow-ffi"
     ],
     "watchFlag": "--watch",
-    "defaultEntrypoint": "jsr:@netscript/plugin-streams/services",
-    "defaultServiceEntrypoint": "jsr:@netscript/plugin-streams/services",
+    "defaultEntrypoint": "jsr:@netscript/plugin-streams@0.0.1-alpha.12/services",
+    "defaultServiceEntrypoint": "jsr:@netscript/plugin-streams@0.0.1-alpha.12/services",
     "defaultRequiresDb": false,
     "defaultRequiresKv": false,
     "pluginType": "utility",
@@ -49,7 +49,7 @@
   "officialSource": {
     "canonicalName": "streams",
     "pluginDir": "streams",
-    "serviceEntrypoint": "jsr:@netscript/plugin-streams/services",
+    "serviceEntrypoint": "jsr:@netscript/plugin-streams@0.0.1-alpha.12/services",
     "serviceConfigKey": "streams",
     "servicePort": 4437,
     "backgroundPort": 4437,

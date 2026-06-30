@@ -15,11 +15,14 @@ export type NetscriptPackage =
   | 'kv'
   | 'logger'
   | 'plugin'
+  | 'plugin-workers'
   | 'plugin-auth-core'
   | 'auth-workos'
   | 'auth-better-auth'
   | 'auth-kv-oauth'
+  | 'plugin-sagas'
   | 'plugin-sagas-core'
+  | 'plugin-triggers'
   | 'plugin-triggers-core'
   | 'prisma-adapter-mysql'
   | 'runtime-config'
@@ -53,11 +56,14 @@ export const JSR_SPECIFIERS: Readonly<Record<NetscriptPackage, string>> = {
   kv: netscriptJsrSpecifier('kv'),
   logger: netscriptJsrSpecifier('logger'),
   plugin: netscriptJsrSpecifier('plugin'),
+  'plugin-workers': netscriptJsrSpecifier('plugin-workers'),
   'plugin-auth-core': netscriptJsrSpecifier('plugin-auth-core'),
   'auth-workos': netscriptJsrSpecifier('auth-workos'),
   'auth-better-auth': netscriptJsrSpecifier('auth-better-auth'),
   'auth-kv-oauth': netscriptJsrSpecifier('auth-kv-oauth'),
+  'plugin-sagas': netscriptJsrSpecifier('plugin-sagas'),
   'plugin-sagas-core': netscriptJsrSpecifier('plugin-sagas-core'),
+  'plugin-triggers': netscriptJsrSpecifier('plugin-triggers'),
   'plugin-triggers-core': netscriptJsrSpecifier('plugin-triggers-core'),
   'prisma-adapter-mysql': netscriptJsrSpecifier('prisma-adapter-mysql'),
   'runtime-config': netscriptJsrSpecifier('runtime-config'),

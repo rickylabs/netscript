@@ -69,3 +69,10 @@
 | streams publish dry-run | `cd plugins/streams && deno publish --dry-run --allow-dirty` | 0 | `Success Dry run complete`; `package.json` included in publish file list. |
 | triggers publish dry-run | `cd plugins/triggers && deno publish --dry-run --allow-dirty` | 0 | `Success Dry run complete`; existing unanalyzable dynamic-import warnings for CLI/runtime dynamic imports. |
 | workers publish dry-run | `cd plugins/workers && deno publish --dry-run --allow-dirty` | 0 | `Success Dry run complete`; existing unanalyzable dynamic-import warnings for local combined wrapper, service bootstrap, and CLI local runtime backend. |
+
+## Launch contract follow-up — Versioned JSR specifiers and local runtime imports
+
+| Gate | Command | Exit | Evidence |
+| --- | --- | ---: | --- |
+| CLI tests | `cd packages/cli && deno test --unstable-kv --allow-all` | 0 | `ok \| 178 passed (363 steps) \| 0 failed`. |
+| root lint | `rtk proxy deno task lint` | 0 | `exitCode=0`; selected 1302 files, total lint occurrences 0. |

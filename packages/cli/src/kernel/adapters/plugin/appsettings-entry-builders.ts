@@ -5,6 +5,7 @@ import type {
   PluginScaffoldResult,
   SagaStoreBackend,
 } from '../../domain/plugin-kind.ts';
+import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
 
 const PROJECT_ROOT_WORKDIR = '.';
 
@@ -118,7 +119,7 @@ function buildBasePluginEntry(
 }
 
 function servicePackageEntrypoint(configKey: string): string {
-  return `jsr:@netscript/plugin-${configKey}/services`;
+  return netscriptJsrSpecifier(`plugin-${configKey}`, '/services');
 }
 
 function backgroundRuntimeEntrypoint(configKey: string): string {
