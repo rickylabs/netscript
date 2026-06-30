@@ -72,6 +72,14 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
     lines.push(
       `    await ${id}.withEnvironment('NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE', ${id}_bootstrapModule);`,
     );
+    if (isTriggersBackgroundResource(name, entrypoint)) {
+      lines.push(
+        `    const ${id}_triggerRegistryModule = new URL('../../triggers/mod.ts', import.meta.url).href;`,
+      );
+      lines.push(
+        `    await ${id}.withEnvironment('NETSCRIPT_TRIGGER_REGISTRY_MODULE', ${id}_triggerRegistryModule);`,
+      );
+    }
 
     const sagaStoreBackend = extractSagaStoreBackend(entry);
     if (sagaStoreBackend) {
@@ -203,4 +211,8 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
         : '  // No background processors configured',
     ),
   });
+}
+
+function isTriggersBackgroundResource(name: string, entrypoint: string): boolean {
+  return name === 'triggers' || entrypoint === 'triggers/runtime.ts';
 }

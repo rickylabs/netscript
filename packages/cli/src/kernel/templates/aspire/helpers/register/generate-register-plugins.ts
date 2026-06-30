@@ -79,6 +79,14 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
     lines.push(
       `    await resource.withEnvironment('NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE', bootstrapModule);`,
     );
+    if (isTriggersApiResource(name, entrypoint)) {
+      lines.push(
+        `    const triggerRegistryModule = new URL('../../triggers/mod.ts', import.meta.url).href;`,
+      );
+      lines.push(
+        `    await resource.withEnvironment('NETSCRIPT_TRIGGER_REGISTRY_MODULE', triggerRegistryModule);`,
+      );
+    }
 
     const sagaStoreBackend = extractSagaStoreBackend(entry);
     if (sagaStoreBackend) {
@@ -217,4 +225,8 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
     __slot4__: String(pass1Body),
     __slot5__: String(pass2Body),
   });
+}
+
+function isTriggersApiResource(name: string, entrypoint: string): boolean {
+  return name === 'triggers-api' || entrypoint.includes('plugin-triggers');
 }

@@ -170,6 +170,25 @@ describe('generateRegisterBackground', () => {
     );
   });
 
+  it('should point triggers background at the userland trigger registry module', () => {
+    const triggerProcessor: BackgroundProcessorEntry = {
+      ...fixtures.MINIMAL_BACKGROUND,
+      Entrypoint: 'triggers/runtime.ts',
+    };
+    const output = generateRegisterBackground({
+      ...emptyOptions,
+      processors: { triggers: triggerProcessor },
+    });
+    assertStringIncludes(
+      output,
+      "new URL('../../triggers/mod.ts', import.meta.url).href",
+    );
+    assertStringIncludes(
+      output,
+      "triggers.withEnvironment('NETSCRIPT_TRIGGER_REGISTRY_MODULE', triggers_triggerRegistryModule)",
+    );
+  });
+
   it('should handle empty processors', () => {
     const output = generateRegisterBackground(emptyOptions);
     assertStringIncludes(output, '// No background processors configured');
