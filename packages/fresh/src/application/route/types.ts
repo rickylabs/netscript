@@ -9,6 +9,16 @@ export type * from './pagination-types.ts';
 /** Empty object shape used by route helpers without typed params. */
 export type EmptyRecord = Record<string, never>;
 
+/**
+ * `EmptySegment` is intentionally the empty object type — it tells TypeScript
+ * "no extra properties contributed by this segment" without dragging the
+ * `[k: string]: never` index signature that `EmptyRecord` carries (which
+ * would collapse intersections in `InferRoutePatternPathSegments` to
+ * `never`).
+ */
+// deno-lint-ignore ban-types
+type EmptySegment = {};
+
 /** Primitive search-param value accepted by route helpers. */
 export type SearchParamValue = string | string[] | undefined;
 
@@ -111,13 +121,13 @@ export type InferRoutePatternSegment<TSegment extends string> = TSegment extends
   `[[...${infer TParam}]]` ? { [TKey in TParam]?: readonly string[] }
   : TSegment extends `[...${infer TParam}]` ? { [TKey in TParam]: readonly string[] }
   : TSegment extends `[${infer TParam}]` ? { [TKey in TParam]: string }
-  : EmptyRecord;
+  : EmptySegment;
 
 /** Infer typed path params from the stripped Fresh route pattern. */
 export type InferRoutePatternPathSegments<TPattern extends string> = TPattern extends ''
   ? EmptyRecord
   : TPattern extends `${infer TSegment}/${infer TRest}`
-    ? InferRoutePatternSegment<TSegment> & InferRoutePatternPathSegments<TRest>
+    ? InferRoutePatternSegment<TSegment> & InferRoutePatternPathSegments<TRest> & EmptySegment
   : InferRoutePatternSegment<TPattern>;
 
 /**

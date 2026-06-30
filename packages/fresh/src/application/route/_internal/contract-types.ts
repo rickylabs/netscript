@@ -67,11 +67,19 @@ export type RouteContractSearchOf<TSearchSchema> = InferSchemaOutput<TSearchSche
 type StripLeadingSlash<TPattern extends string> = TPattern extends `/${infer TRest}` ? TRest
   : TPattern;
 
+// `EmptySegment` is intentionally the empty object type — it tells TypeScript
+// "no extra properties contributed by this segment" without dragging the
+// `[k: string]: never` index signature that `EmptyRecord` carries (which
+// would collapse intersections in `InferRoutePatternPathSegments` to
+// `never`).
+// deno-lint-ignore ban-types
+type EmptySegment = {};
+
 type InferRoutePatternSegment<TSegment extends string> = TSegment extends `[[...${infer TParam}]]`
   ? { [TKey in TParam]?: readonly string[] }
   : TSegment extends `[...${infer TParam}]` ? { [TKey in TParam]: readonly string[] }
   : TSegment extends `[${infer TParam}]` ? { [TKey in TParam]: string }
-  : EmptyRecord;
+  : EmptySegment;
 
 type InferRoutePatternPathSegments<TPattern extends string> = TPattern extends '' ? EmptyRecord
   : TPattern extends `${infer TSegment}/${infer TRest}`

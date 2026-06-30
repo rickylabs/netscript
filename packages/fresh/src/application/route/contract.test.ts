@@ -7,6 +7,7 @@ import {
   enumPathParamSchema,
   type InferRouteContractPath,
   type InferRouteContractSearch,
+  type InferRoutePatternPath,
 } from './contract.ts';
 
 function assert(condition: unknown, message: string): asserts condition {
@@ -265,4 +266,63 @@ Deno.test('pairRouteTargets keeps page and partial hrefs aligned', () => {
     `Unexpected partial href: ${linkProps['f-partial']}`,
   );
   assert(linkProps.class === 'ns-link', 'Expected paired link props to preserve anchor props');
+});
+
+Deno.test('InferRoutePatternPath infers static segments as {} (regression for #178)', () => {
+  // Compile-time-only assertions — these reference the public type alias directly
+  // and assign values without `as unknown as` casts, so any regression in
+  // `InferRoutePatternSegment` / `InferRoutePatternPathSegments` surfaces as a
+  // TS2322 here at type-check.
+
+  // Multi-segment dynamic routes must not collapse to `never`.
+  const channel: InferRoutePatternPath<'/channel/[id]'> = { id: 'c-123' };
+  const session: InferRoutePatternPath<'/session/[a]/[b]'> = { a: 'one', b: 'two' };
+
+  // Single dynamic segment with no static prefix is unaffected.
+  const onlyDynamic: InferRoutePatternPath<'/[id]'> = { id: 'd-1' };
+
+  // Static-only routes must resolve to `{}`, not `Record<string, never>`.
+  const staticOnly: InferRoutePatternPath<'/static/only'> = {};
+  // Object literal that has no properties must satisfy `{}`.
+  const emptyObjectLiteral: InferRoutePatternPath<'/static/only'> = {};
+
+  // Optional catch-all keeps its optional shape.
+  const optionalSplat: InferRoutePatternPath<'/posts/[[...slug]]'> = {};
+  const optionalSplatWithValue: InferRoutePatternPath<'/posts/[[...slug]]'> = {
+    slug: ['a', 'b'],
+  };
+
+  // The existing internal test case from issue #178.
+  const dashboardProductEdit: InferRoutePatternPath<'/dashboard/products/[id]/edit'> = {
+    id: 'product-42',
+  };
+
+  // Runtime sanity: the inferred types flow into href() calls without casts.
+  const channelRef = createRouteReference('/channel/[id]');
+  assert(
+    channelRef.href({ path: channel }) === '/channel/c-123',
+    `Unexpected href: ${channelRef.href({ path: channel })}`,
+  );
+  assert(
+    session.a === 'one' && session.b === 'two',
+    'Expected session path fields to be assignable as string',
+  );
+  assert(onlyDynamic.id === 'd-1', 'Expected onlyDynamic.id to be assignable as string');
+  assert(
+    Object.keys(staticOnly).length === 0,
+    'Expected staticOnly to be assignable as empty object',
+  );
+  assert(
+    Object.keys(emptyObjectLiteral).length === 0,
+    'Expected emptyObjectLiteral to satisfy {}',
+  );
+  assert(optionalSplat.slug === undefined, 'Expected optionalSplat.slug to be optional');
+  assert(
+    optionalSplatWithValue.slug?.join('/') === 'a/b',
+    `Unexpected optional splat: ${optionalSplatWithValue.slug?.join('/')}`,
+  );
+  assert(
+    dashboardProductEdit.id === 'product-42',
+    'Expected dashboardProductEdit.id to be assignable as string',
+  );
 });
