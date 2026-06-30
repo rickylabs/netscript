@@ -1,7 +1,6 @@
-import { delay } from '@std/async';
 import { assertEquals, assertRejects } from 'jsr:@std/assert@^1';
 import { MemoryKvAdapter } from '@netscript/kv';
-import { KvWorkerIdempotencyStore } from './worker-idempotency-store.ts';
+import { KvWorkerIdempotencyStore } from './kv-worker-idempotency-store.ts';
 
 Deno.test('KvWorkerIdempotencyStore claims first delivery and rejects duplicate active claim', async () => {
   await using kv = new MemoryKvAdapter();
@@ -81,3 +80,7 @@ Deno.test('KvWorkerIdempotencyStore rejects incomplete KV implementations', asyn
     'missing has',
   );
 });
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

@@ -12,6 +12,7 @@
     "./executor": "./src/executor/mod.ts",
     "./workflow": "./src/workflow/mod.ts",
     "./streams": "./src/streams/mod.ts",
+    "./stores": "./src/stores/mod.ts",
     "./presets": "./src/presets/mod.ts",
     "./shutdown": "./src/shutdown/mod.ts",
     "./schemas": "./src/domain/public-schema.ts",
@@ -27,12 +28,13 @@
     "@std/path": "jsr:@std/path@^1",
     "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
     "zod": "jsr:@zod/zod@4.4.3",
+    "@netscript/kv": "jsr:@netscript/kv@0.0.1-alpha.12",
     "@netscript/plugin": "jsr:@netscript/plugin@0.0.1-alpha.12",
     "@orpc/contract": "npm:@orpc/contract@^1.14.6",
     "@orpc/server": "npm:@orpc/server@^1.14.6"
   },
   "tasks": {
-    "check": "deno check --unstable-kv mod.ts src/builders/mod.ts src/contracts/v1/mod.ts src/registry/mod.ts src/state/mod.ts src/executor/mod.ts src/workflow/mod.ts src/streams/mod.ts src/presets/mod.ts src/shutdown/mod.ts src/domain/public-schema.ts src/telemetry/mod.ts src/abstracts/mod.ts src/testing/mod.ts src/config/mod.ts src/runtime/mod.ts",
+    "check": "deno check --unstable-kv mod.ts src/builders/mod.ts src/contracts/v1/mod.ts src/registry/mod.ts src/state/mod.ts src/executor/mod.ts src/workflow/mod.ts src/streams/mod.ts src/stores/mod.ts src/presets/mod.ts src/shutdown/mod.ts src/domain/public-schema.ts src/telemetry/mod.ts src/abstracts/mod.ts src/testing/mod.ts src/config/mod.ts src/runtime/mod.ts",
     "test": "deno test --allow-all tests/",
     "publish:dry-run": "deno publish --dry-run --allow-dirty"
   },

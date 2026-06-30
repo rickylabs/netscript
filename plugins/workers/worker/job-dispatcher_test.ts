@@ -9,7 +9,7 @@ import type {
 } from '@netscript/plugin-workers-core/runtime';
 import type { MessageContext } from '@netscript/queue';
 import { processWorkerJob, processWorkerTask } from './job-dispatcher.ts';
-import { KvWorkerIdempotencyStore } from './worker-idempotency-store.ts';
+import { KvWorkerIdempotencyStore } from '@netscript/plugin-workers-core/stores';
 import type {
   WorkerCompleteExecutionOptions,
   WorkerCreateExecutionOptions,

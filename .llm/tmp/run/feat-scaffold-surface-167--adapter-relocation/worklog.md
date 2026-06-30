@@ -58,3 +58,27 @@ Gate evidence:
 | `deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/plugin-triggers-core` | exit 0; `FAIL=0` |
 | `deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root plugins/triggers` | exit 0; `FAIL=0` |
 | `rtk proxy deno task arch:check` | exit 1; same pre-existing `packages/plugin-auth-core` `FAIL=12` findings before touched roots; recorded in `drift.md` |
+
+### S-d — workers
+
+- Relocated `KvWorkerIdempotencyStore` into `packages/plugin-workers-core/src/stores/`.
+- Added `@netscript/plugin-workers-core/stores` and rewired workers service/test imports to the core store subpath.
+- Removed the connector `worker/mod.ts` re-export for the relocated store.
+- The store was already on the `@netscript/kv` structural-port pattern; no raw KV migration was needed.
+- Lock delta: `deno.lock` gained the expected `jsr:@netscript/kv@0.0.1-alpha.12` dependency entry under `@netscript/plugin-workers-core`; no hand edit.
+
+Gate evidence:
+
+| Gate | Result |
+| --- | --- |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin-workers-core --ext ts,tsx` | exit 0; 110 files; 0 occurrences |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/workers --ext ts,tsx` | exit 0; 83 files; 0 occurrences |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin-workers-core --ext ts,tsx` | exit 0; 110 files; 0 occurrences |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root plugins/workers --ext ts,tsx` | exit 0; 83 files; 0 occurrences |
+| explicit-file `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts ... --ext ts,tsx,json` over S-d touched files | exit 0; 8 files; 0 findings |
+| `deno test --unstable-kv --allow-all packages/plugin-workers-core plugins/workers` | exit 0; 45 passed; 0 failed |
+| `(cd packages/plugin-workers-core && deno publish --dry-run --allow-dirty)` | exit 0; warning-only existing unanalyzable dynamic import |
+| `(cd plugins/workers && deno publish --dry-run --allow-dirty)` | exit 0; warning-only existing unanalyzable dynamic imports |
+| `deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/plugin-workers-core` | exit 0; `FAIL=0` |
+| `deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root plugins/workers` | exit 0; `FAIL=0` |
+| `rtk proxy deno task arch:check` | exit 1; same pre-existing `packages/plugin-auth-core` `FAIL=12` findings before touched roots; recorded in `drift.md` |

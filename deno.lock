@@ -3203,6 +3203,7 @@
       "packages/plugin-workers-core": {
         "dependencies": [
           "jsr:@david/dax@0.48",
+          "jsr:@netscript/kv@0.0.1-alpha.12",
           "jsr:@netscript/plugin@0.0.1-alpha.12",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",

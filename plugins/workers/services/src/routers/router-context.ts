@@ -2,7 +2,7 @@ import { workersContractV1 } from '../../../contracts/v1/mod.ts';
 import type { JobMessage, TaskMessage } from '@netscript/plugin-workers-core/runtime';
 import type { KvJobRegistry, KvTaskRegistry } from '@netscript/plugin-workers-core/registry';
 import type { KvExecutionState } from '@netscript/plugin-workers-core/state';
-import type { KvWorkerIdempotencyStore } from '../../../worker/worker-idempotency-store.ts';
+import type { KvWorkerIdempotencyStore } from '@netscript/plugin-workers-core/stores';
 import { createQueue } from '@netscript/queue';
 
 /**

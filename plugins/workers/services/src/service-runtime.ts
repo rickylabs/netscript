@@ -5,7 +5,7 @@ import {
   type RegistryKvStore,
 } from '@netscript/plugin-workers-core/registry';
 import { KvExecutionState } from '@netscript/plugin-workers-core/state';
-import { KvWorkerIdempotencyStore } from '../../worker/worker-idempotency-store.ts';
+import { KvWorkerIdempotencyStore } from '@netscript/plugin-workers-core/stores';
 import type { WorkersServiceRuntime } from './routers/router-context.ts';
 
 /** Create explicitly scoped runtime dependencies for the workers service. */
