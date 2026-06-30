@@ -79,3 +79,26 @@ All four cycle-1 required fixes applied (plan/research/verification only — no 
 4. **arch:check denominator** (`e999a9ea`) — `deno.json:89` `arch:check` now enumerates `packages/plugin-{sagas,triggers,workers}-core`; all 13 roots gate `FAIL=0`, `deno task arch:check` EXIT=0 (supervisor-verified).
 
 Cycle-2 PLAN-EVAL re-dispatched to OpenHands `openrouter/minimax/minimax-m3` on PR #172 (comment `4839015840`). The evaluator will append its cycle-2 verdict below. Hard Plan-Gate stop remains in force: no S-b/S-c/S-d implementation slice may start before a cycle-2 `PASS`.
+
+### Cycle-2 verdict (received 2026-06-30) — `PASS`
+
+OpenHands minimax-M3 returned **`PASS`** (PR #172 summary comment; run
+`https://github.com/rickylabs/netscript/actions/runs/28413720834`). All four cycle-1 findings
+RESOLVED; all 8 Plan-Gate boxes + all 4 locked decisions (D-KV/D2/D3/D4) PASS. The evaluator's
+cycle-2 plan-eval.md section was written in its sandbox but NOT pushed (the action's git step
+reported `Job status: failure` — the verdict comment is the authoritative deliverable; no source/lock
+touched). **Plan-Gate is cleared — S-b/S-c/S-d implementation is unblocked.**
+
+Independent re-verification the evaluator ran (recorded for IMPL-EVAL): D2 break bounded to 1 line
+(`durable-sagas.md:331` + 5 prose matches); collision grep = 3 production refs + 1 dead testing-barrel
+re-export; `@netscript/kv` `KvStore` exposes `get/set/delete/has/list({prefix})/atomic?(checks,mutations)/close`
++ `AtomicCheck.versionstamp` (the CAS primitive) + `AtomicResult.ok` (retry signal) — no `Deno.openKv`
+escape hatch needed; `packages/kv|cron|watchers` import zero `plugin-*-core` (one-way deps); 13 arch:check
+roots confirmed; no D1 ghost; no scope creep (streams/auth out, #181 not folded).
+
+**One non-blocking advisory carried into implementation (S-c.5):** the rename target
+`MemoryTriggerEventStore` is itself already taken in the same `testing/` barrel by the in-memory
+test double. The implementer must pick a distinct, non-conflicting name for the relocated/renamed
+fixture (evaluator suggested e.g. `DenoKvTriggerEventStoreDouble`), gated by the same zero-ref grep.
+The Kv test double is dead code (no in- or out-of-package consumer), so this is a seconds-long pick
+at execution time. This advisory is added to the S-c.5 brief.
