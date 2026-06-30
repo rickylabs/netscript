@@ -7,7 +7,12 @@
 
 export { createSagaPublisher, HttpSagaPublisher } from './saga-publisher.ts';
 export { createDurableSagaRuntime } from './create-durable-saga-runtime.ts';
-export { loadSagaRegistryModule, runSagaRunner, startSagaRunner } from './saga-runner.ts';
+export {
+  loadSagaRegistryModule,
+  runSagaRunner,
+  startSagaRunner,
+  startSagaRuntime,
+} from './saga-runner.ts';
 export { SagaRuntimeSupervisor } from './saga-supervisor.ts';
 export {
   CASCADED_MESSAGE_KINDS,
