@@ -630,6 +630,28 @@ export const freshUiRegistryManifest: RegistryManifest = {
       css: [{ layer: 'components', content: "@import './ui/message.css';" }],
     },
     {
+      name: 'command-palette',
+      kind: 'component',
+      layer: 2,
+      description:
+        'Modal ⌘K command palette — the L1 Dialog backdrop/overlay wrapping the L1 Combobox: grouped, searchable commands with icon/hash/kind sub-parts.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['ai', 'command', 'palette', 'primitive'],
+      files: [
+        {
+          source: 'registry/components/ui/command-palette.tsx',
+          target: '@ui/command-palette.tsx',
+        },
+        {
+          source: 'registry/components/ui/command-palette.css',
+          target: '@assets/ui/command-palette.css',
+        },
+      ],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/command-palette.css';" }],
+    },
+    {
       name: 'dropzone',
       kind: 'component',
       layer: 2,
@@ -1066,6 +1088,7 @@ export const freshUiRegistryManifest: RegistryManifest = {
         'tool-call-card',
         'prompt-input',
         'message',
+        'command-palette',
       ],
     },
     {
