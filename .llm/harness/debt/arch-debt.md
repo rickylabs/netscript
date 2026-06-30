@@ -1676,3 +1676,23 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Status:** closed 2026-06-30 — gate-correctness fix landed; auth production source and auth
   soundness tests were not edited.
 - **Gate:** `deno task arch:check` green over all 13 configured roots (`FAIL=0` for every root).
+
+## packages/cli — PLUGIN-LIST-MANIFEST-REGISTRATION-BLOCKER
+
+- **ID:** `PLUGIN-LIST-MANIFEST-REGISTRATION-BLOCKER`
+- **Reason:** After the centralized scaffold-CLI bridge restored execution of all five official plugin
+  scaffolders, `scaffold.runtime` advanced past every `scaffold.plugin.*` install gate and failed at
+  `scaffold.plugin-list`. The generated project contains the plugin sample files under `workers/`,
+  `sagas/`, `triggers/`, `streams/`, and `auth/`, but `netscript plugin list` reads
+  `plugins/<name>/scaffold.plugin.json`; the install path does not materialize that manifest under
+  the generated `plugins/` registry tree.
+- **Why deferred:** This is a distinct host install/list registration defect, not the S-f scaffold
+  subprocess bridge regression. Expanding S-f into the plugin registry/list contract would fold in a
+  separate #173 sub-phase.
+- **Owner:** CLI plugin install/list registration seam.
+- **Target:** Follow-up #173 plugin registry/list slice.
+- **Linked evidence:** `.llm/tmp/run/feat-scaffold-surface-167--adapter-relocation/worklog.md` S-f.
+- **Created:** 2026-06-30.
+- **Status:** open, DEBT_ACCEPTED for S-f only.
+- **Gate:** Close when `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` reaches
+  `failed=0` past `scaffold.plugin-list` without weakening plugin scaffold execution.

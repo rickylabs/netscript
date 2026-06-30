@@ -91,3 +91,4 @@ export type { RunRemoveCommandOptions } from './commands/remove.ts';
 export { runRemoveCommand } from './commands/remove.ts';
 export type { RunPluginCliCommandOptions } from './runner/plugin-cli-runner.ts';
 export { runPluginCliCommand } from './runner/plugin-cli-runner.ts';
+export { runPluginScaffoldCli } from './scaffold-cli-runner.ts';

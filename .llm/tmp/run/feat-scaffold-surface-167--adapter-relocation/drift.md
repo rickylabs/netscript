@@ -11,3 +11,17 @@
   gate comment required auth tests to differ from the equivalent sagas/workers contract soundness
   tests, so the fix exempts test paths from the auth cast / `@ts-*` scanner while preserving the
   production auth no-extra-cast rule.
+- 2026-06-30 — S-f confirmed the #157/#172 convergence dropped the executable scaffold runner from
+  all five official plugin `scaffold.ts` files. Restoring the centralized bridge cleared the original
+  E2E blocker: `scaffold.plugin.worker`, `scaffold.plugin.saga`, `scaffold.plugin.trigger`,
+  `scaffold.plugin.stream`, and `scaffold.plugin.auth` all pass in `scaffold.runtime`.
+- 2026-06-30 — S-f full `scaffold.runtime` then failed at a distinct later gate:
+  `scaffold.plugin-list` exits 1 because `netscript plugin list` reads
+  `plugins/workers/scaffold.plugin.json`, but the generated project has plugin sample files under
+  `workers/`, `sagas/`, `triggers/`, `streams/`, and `auth/` and no installed
+  `plugins/<name>/scaffold.plugin.json` registry entries. This is not the scaffold subprocess
+  bridge class; it is recorded as `PLUGIN-LIST-MANIFEST-REGISTRATION-BLOCKER` debt for a follow-up
+  #173 host install/list registration slice.
+- 2026-06-30 — S-f root-scoped fmt wrapper over `packages/plugin` plus the five plugin roots reports
+  five pre-existing unrelated formatting findings outside the bridge files. S-f did not mutate those
+  files; touched-file fmt over the bridge diff is green.

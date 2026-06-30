@@ -137,3 +137,63 @@ Diff evidence:
   `.llm/tmp/run/feat-scaffold-surface-167--adapter-relocation/drift.md`.
 - Repository-wide `git diff --name-only` still includes pre-existing unrelated
   `.llm/tmp/run/openhands/pr-*/request.md` line-ending drift that predates S-e and remains unstaged.
+
+### S-f — scaffold CLI bridge restore
+
+- Verified the public protocol with `deno doc` before editing:
+  `PluginScaffoldEntrypoint = (context: ScaffolderContext) => Promise<ScaffoldResult>`;
+  `ScaffolderContext` requires `workspaceRoot`, `options`, `dryRun`, and `logger`; `PluginLogger`
+  exposes `debug/info/warn/error`.
+- Verified the host dispatcher contract in
+  `packages/cli/src/public/features/plugins/dispatch/dispatch-plugin-verb.ts`: it executes the
+  plugin scaffolder with `--context-json`, then parses the last non-empty stdout line as a
+  `ScaffoldResult`.
+- Reproduced the defect before the fix:
+  `deno run -A --unstable-kv plugins/workers/scaffold.ts --context-json '{"workspaceRoot":"/tmp/x","options":{"pluginName":"workers"},"dryRun":true}'`
+  returned `exit=0`, `stdout-bytes=0`, `stderr-bytes=0`.
+- Added the centralized bridge in `@netscript/plugin/adapter`:
+  `runPluginScaffoldCli(entrypoint, argv = Deno.args)`, with a validated `--context-json` payload,
+  a stderr-only `PluginLogger`, JSON result emission on stdout, and `Deno.exitCode = 1` on parse or
+  entrypoint failure so the host reports `scaffold command failed` with stderr diagnostics.
+- Restored thin `if (import.meta.main) await runPluginScaffoldCli(scaffold);` wiring in all five
+  official plugin `scaffold.ts` files while preserving their default scaffold exports.
+- Added a subprocess-based package test proving the bridge prints exactly one JSON stdout line and
+  keeps logger output on stderr.
+- Verified the direct worker repro after the fix returns `exit=0` with stdout:
+  `{"status":"planned","createdFiles":["workers/jobs/health-check.ts","workers/tasks/validate-payload.ts","workers/mod.ts"],"modifiedFiles":[],"databaseMigrationsAdded":false}`.
+
+Gate evidence:
+
+| Gate | Result |
+| --- | --- |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin --root plugins/workers --root plugins/sagas --root plugins/triggers --root plugins/streams --root plugins/auth --ext ts,tsx` | exit 0; `filesSelected=417`, `failedBatches=0`, `totalOccurrences=0` |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin --root plugins/workers --root plugins/sagas --root plugins/triggers --root plugins/streams --root plugins/auth --ext ts,tsx` | exit 0; `filesSelected=417`, `batches=3`, `totalOccurrences=0` |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin --root plugins/workers --root plugins/sagas --root plugins/triggers --root plugins/streams --root plugins/auth --ext ts,tsx` | exit 1; pre-existing unrelated fmt findings in `packages/plugin/src/contract-base/mod.ts`, `plugins/sagas/services/src/routers/{health.ts,v1-handlers.ts,v1-types.ts}`, and `plugins/workers/services/src/routers/health.ts`; not mutated in S-f |
+| touched-file `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --file ... --ext ts,tsx` over S-f files | exit 0; `filesSelected=8`, `failedBatches=0`, `findings=0` |
+| `deno test --unstable-kv --allow-all packages/plugin` | exit 0; `66 passed`, `0 failed` |
+| `(cd packages/plugin && deno publish --dry-run --allow-dirty --allow-slow-types)` | exit 0; existing approved slow-types warning and existing unanalyzable dynamic import warning only |
+| `rtk proxy deno task arch:check` | exit 0; deps check warning-only; all 13 doctrine roots `FAIL=0` |
+| `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | exit 1; bridge blocker cleared, all five `scaffold.plugin.*` installs passed; new distinct `scaffold.plugin-list` failure; summary `passed=9 failed=1` |
+| `deno task e2e:cli run scaffold.runtime --cleanup --format json --report .llm/tmp/run/feat-scaffold-surface-167--adapter-relocation/e2e-sf-report.json --log-file .llm/tmp/run/feat-scaffold-surface-167--adapter-relocation/e2e-sf-events.ndjson` | exit 1; JSON evidence: `scaffold.plugin.worker/saga/trigger/stream/auth` all passed; `scaffold.plugin-list` failed with `No such file or directory ... plugins/workers/scaffold.plugin.json`; summary `passed=9 failed=1` |
+
+`deno task arch:check` per-root summary:
+
+| Root | Summary |
+| --- | --- |
+| `packages/plugin-auth-core` | `FAIL=0 WARN=2 INFO=1` |
+| `packages/auth-workos` | `FAIL=0 WARN=1 INFO=1` |
+| `packages/auth-better-auth` | `FAIL=0 WARN=1 INFO=1` |
+| `packages/auth-kv-oauth` | `FAIL=0 WARN=1 INFO=1` |
+| `plugins/auth` | `FAIL=0 WARN=5 INFO=1` |
+| `packages/plugin` | `FAIL=0 WARN=3 INFO=1` |
+| `plugins/workers` | `FAIL=0 WARN=9 INFO=2` |
+| `plugins/sagas` | `FAIL=0 WARN=8 INFO=2` |
+| `plugins/triggers` | `FAIL=0 WARN=12 INFO=2` |
+| `plugins/streams` | `FAIL=0 WARN=4 INFO=1` |
+| `packages/plugin-sagas-core` | `FAIL=0 WARN=3 INFO=2` |
+| `packages/plugin-triggers-core` | `FAIL=0 WARN=2 INFO=2` |
+| `packages/plugin-workers-core` | `FAIL=0 WARN=7 INFO=2` |
+
+S-f stops at the distinct `plugin list` manifest-registration blocker per the safety valve. The
+scaffold-CLI bridge regression is fixed and proven by direct subprocess output plus all five E2E
+plugin install gates passing.
