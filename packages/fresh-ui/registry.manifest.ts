@@ -887,6 +887,17 @@ export const freshUiRegistryManifest: RegistryManifest = {
         'theme-toggle',
         'toast-support',
         'toast',
+        'avatar',
+        'code-block',
+      ],
+    },
+    {
+      name: 'ai',
+      description:
+        'AI / chat surface seams: grounded-agent citations, message thread, composer, model picker, and tool-call disclosure.',
+      items: [
+        'theme-seed',
+        'citation-chip',
       ],
     },
     {
