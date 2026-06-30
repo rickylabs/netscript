@@ -601,6 +601,35 @@ export const freshUiRegistryManifest: RegistryManifest = {
       css: [{ layer: 'components', content: "@import './ui/prompt-input.css';" }],
     },
     {
+      name: 'message',
+      kind: 'component',
+      layer: 2,
+      description:
+        'Chat message: author/time, inline-markup body (bold/code/[n] citations), tool-call + chart/code blocks, follow-up chips, and a typing indicator. Exports renderInline + TypingIndicator.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['ai', 'chat', 'primitive'],
+      files: [
+        {
+          source: 'registry/components/ui/message.tsx',
+          target: '@ui/message.tsx',
+        },
+        {
+          source: 'registry/components/ui/message.css',
+          target: '@assets/ui/message.css',
+        },
+      ],
+      registryDependencies: [
+        'theme-seed',
+        'avatar',
+        'citation-chip',
+        'chart-block',
+        'code-block',
+        'tool-call-card',
+      ],
+      css: [{ layer: 'components', content: "@import './ui/message.css';" }],
+    },
+    {
       name: 'separator',
       kind: 'component',
       layer: 2,
@@ -1013,6 +1042,7 @@ export const freshUiRegistryManifest: RegistryManifest = {
         'model-selector',
         'tool-call-card',
         'prompt-input',
+        'message',
       ],
     },
     {

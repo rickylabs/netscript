@@ -1,0 +1,215 @@
+.ns-message {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ns-space-2-5);
+}
+
+.ns-message__avatar {
+  flex-shrink: 0;
+  padding-top: var(--ns-space-0-5);
+}
+
+.ns-message__main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ns-space-1-5);
+  min-width: 0;
+  flex: 1;
+}
+
+.ns-message__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--ns-space-2);
+}
+
+.ns-message__author {
+  font-size: var(--ns-text-sm);
+  font-weight: 600;
+  color: var(--ns-fg);
+}
+
+.ns-message__model {
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-2xs);
+  color: var(--ns-muted-fg);
+}
+
+.ns-message__time {
+  margin-inline-start: auto;
+  font-size: var(--ns-text-2xs);
+  color: var(--ns-muted-fg);
+}
+
+.ns-message__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ns-space-3);
+  font-size: var(--ns-text-chat);
+  line-height: var(--ns-leading-relaxed);
+  color: var(--ns-fg);
+}
+
+.ns-message__text {
+  margin: 0;
+}
+
+.ns-inline-code {
+  padding: 0 var(--ns-space-1);
+  border-radius: var(--ns-radius-sm);
+  background: var(--ns-muted);
+  color: var(--ns-fg);
+  font-family: var(--ns-font-mono);
+  font-size: 0.9em;
+}
+
+.ns-message__actions {
+  display: flex;
+  gap: var(--ns-space-1);
+  opacity: 0;
+  transition: opacity var(--ns-ease-fast);
+}
+
+.ns-message:hover .ns-message__actions,
+.ns-message:focus-within .ns-message__actions {
+  opacity: 1;
+}
+
+.ns-msg-action {
+  padding: var(--ns-space-0-5) var(--ns-space-1-5);
+  border: 0;
+  border-radius: var(--ns-radius-sm);
+  background: transparent;
+  color: var(--ns-muted-fg);
+  font-size: var(--ns-text-2xs);
+  cursor: pointer;
+}
+
+.ns-msg-action:hover {
+  color: var(--ns-fg);
+  background: var(--ns-muted);
+}
+
+.ns-msg-action:focus-visible {
+  outline: 2px solid var(--ns-ring);
+  outline-offset: -1px;
+}
+
+/* User — right-aligned primary bubble */
+.ns-message--user {
+  flex-direction: row-reverse;
+}
+
+.ns-message--user .ns-message__main {
+  align-items: flex-end;
+}
+
+.ns-message--user .ns-message__head {
+  flex-direction: row-reverse;
+}
+
+.ns-message--user .ns-message__time {
+  margin-inline-start: 0;
+}
+
+.ns-message--user .ns-message__body {
+  align-items: flex-end;
+  max-width: 80%;
+  padding: var(--ns-space-2-5) var(--ns-space-3);
+  border: 1px solid var(--ns-primary-border);
+  border-radius: var(--ns-radius-lg);
+  background: var(--ns-primary-subtle);
+}
+
+/* System — centered muted note */
+.ns-message--system {
+  justify-content: center;
+}
+
+.ns-message--system .ns-message__avatar {
+  display: none;
+}
+
+.ns-message--system .ns-message__body {
+  text-align: center;
+  font-size: var(--ns-text-xs);
+  color: var(--ns-muted-fg);
+}
+
+/* Follow-up chips reuse the shared pill seam (mirrors prompt-input). */
+.ns-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ns-space-1);
+  height: var(--ns-control-h-sm);
+  padding-inline: var(--ns-space-2-5);
+  border: 1px solid var(--ns-border);
+  border-radius: var(--ns-radius-full);
+  background: transparent;
+  color: var(--ns-muted-fg);
+  font-size: var(--ns-text-2xs);
+  cursor: pointer;
+  transition:
+    color var(--ns-ease-fast),
+    border-color var(--ns-ease-fast),
+    background-color var(--ns-ease-fast);
+}
+
+.ns-pill:hover {
+  color: var(--ns-fg);
+  border-color: var(--ns-border-hover);
+}
+
+.ns-pill:focus-visible {
+  outline: 2px solid var(--ns-ring);
+  outline-offset: var(--ns-space-px);
+}
+
+/* Typing indicator */
+.ns-typing {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ns-space-1);
+  padding: var(--ns-space-1) 0;
+}
+
+.ns-typing > span {
+  width: var(--ns-space-1-5);
+  height: var(--ns-space-1-5);
+  border-radius: var(--ns-radius-full);
+  background: var(--ns-muted-fg);
+  animation: ns-typing-bounce 1.2s infinite ease-in-out;
+}
+
+.ns-typing > span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.ns-typing > span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes ns-typing-bounce {
+  0%,
+  60%,
+  100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(calc(-1 * var(--ns-space-1)));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ns-message__actions,
+  .ns-pill {
+    transition: none;
+  }
+
+  .ns-typing > span {
+    animation: none;
+    opacity: 0.6;
+  }
+}
