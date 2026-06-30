@@ -9,3 +9,4 @@
 - 31e63c74: feat(auth): conform manifest and health routing
 - 38d1cef0: Merge remote-tracking branch 'origin/main' into chore/plugin-rearch-v2
 - 26b0e07b: feat(triggers): conform manifest and router assembly
+- 59a4fe91: docs(plugin-rearch-v2): finalize verification summary
