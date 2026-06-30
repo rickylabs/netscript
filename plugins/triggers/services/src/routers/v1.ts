@@ -175,8 +175,21 @@ export const triggersV1: TriggersHandlers<TriggersV1RouteKey> = {
     };
   }),
 
-  testWebhook: router.testWebhook.handler(() => {
-    throw new Error(PENDING_BACKING_MESSAGE);
+  testWebhook: router.testWebhook.handler(async ({ input, errors, path, context }) => {
+    const definition = context.definitions.find((candidate) => candidate.id === input.id);
+    if (definition === undefined) {
+      notFound({ errors, path, resourceId: input.id });
+    }
+    if (definition.kind !== 'webhook') {
+      throw new Error(`Trigger ${input.id} is not a webhook trigger.`);
+    }
+    const response = await context.webhookTestDelivery.deliver(definition, input.body);
+    return {
+      accepted: response.accepted,
+      eventId: response.eventId,
+      triggerId: response.triggerId,
+      status: response.status,
+    };
   }),
 
   previewSchedule: router.previewSchedule.handler(() => {

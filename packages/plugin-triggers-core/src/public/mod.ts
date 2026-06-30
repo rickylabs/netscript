@@ -47,6 +47,7 @@ export {
   createManualDispatcher,
   createTriggerIngress,
   createTriggerProcessor,
+  createWebhookTestDelivery,
   TriggerProcessor,
 } from '../runtime/mod.ts';
 export { createKvTriggerEnabledStateStore } from '../stores/mod.ts';
@@ -68,6 +69,11 @@ export type {
   TriggerIngressEventIdFactory,
   TriggerIngressOptions,
   TriggerProcessorOptions,
+  WebhookTestDelivery,
+  WebhookTestDeliveryDefinition,
+  WebhookTestDeliveryInput,
+  WebhookTestDeliveryOptions,
+  WebhookTestDeliveryResponse,
 } from '../runtime/mod.ts';
 export type {
   CronExpression,

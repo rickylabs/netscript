@@ -52,7 +52,9 @@ import type {
 import {
   createManualDispatcher,
   createTriggerIngress,
+  createWebhookTestDelivery,
   type ManualDispatcher,
+  type WebhookTestDelivery,
 } from '@netscript/plugin-triggers-core/runtime';
 import { TRIGGERS_API_DEFAULT_PORT, TRIGGERS_API_SERVICE_NAME } from '../../src/constants.ts';
 import denoJson from '../../deno.json' with { type: 'json' };
@@ -150,6 +152,8 @@ export type TriggersServiceOptions = Readonly<{
   processor?: TriggerProcessorPort;
   /** Manual-fire dispatcher; defaults to eventStore + processor. */
   manualDispatcher?: ManualDispatcher;
+  /** Webhook test-delivery helper; defaults to the configured ingress. */
+  webhookTestDelivery?: WebhookTestDelivery;
   /** Pre-opened KV adapter; defaults to the runtime KV. */
   kv?: KvStore;
 }>;
@@ -186,7 +190,13 @@ export async function createTriggersServiceContext(
     resolveSecret: (definition) =>
       definition.secretEnv === undefined ? undefined : Deno.env.get(definition.secretEnv),
   });
-  return { definitions, eventStore, enabledState, ingress, manualDispatcher };
+  const webhookTestDelivery = options.webhookTestDelivery ??
+    createWebhookTestDelivery({
+      ingress,
+      resolveSecret: (definition) =>
+        definition.secretEnv === undefined ? undefined : Deno.env.get(definition.secretEnv),
+    });
+  return { definitions, eventStore, enabledState, ingress, manualDispatcher, webhookTestDelivery };
 }
 
 /**
@@ -260,6 +270,7 @@ function createUnavailableTriggersServiceContext(): TriggerServiceContext {
     enabledState: unavailableTriggerEnabledState,
     ingress: unavailableTriggerIngress,
     manualDispatcher: unavailableManualDispatcher,
+    webhookTestDelivery: unavailableWebhookTestDelivery,
   };
 }
 
@@ -301,6 +312,12 @@ const unavailableTriggerEnabledState: TriggerEnabledStatePort = {
 
 const unavailableManualDispatcher: ManualDispatcher = {
   fire(): Promise<never> {
+    return Promise.reject(triggerRuntimeUnavailable());
+  },
+};
+
+const unavailableWebhookTestDelivery: WebhookTestDelivery = {
+  deliver(): Promise<never> {
     return Promise.reject(triggerRuntimeUnavailable());
   },
 };

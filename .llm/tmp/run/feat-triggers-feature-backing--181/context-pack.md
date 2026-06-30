@@ -26,4 +26,6 @@ Latest slice:
   `createKvTriggerEnabledStateStore`, connector enable/disable backing, and `enabled=false` list
   filtering. Gates are green; commit `a19ca64f` is recorded in `commits.md`.
 - Slice 3 implemented `createManualDispatcher` and backed connector `fireTrigger`. Gates are green;
-  final SHA is recorded in `commits.md`.
+  commit `6ead7da4` is recorded in `commits.md`.
+- Slice 4 implemented `createWebhookTestDelivery` and backed connector `testWebhook` through
+  ingress-signed synthetic requests. Gates are green; commit pending.

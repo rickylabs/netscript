@@ -97,7 +97,7 @@ Notes:
 
 ## Slice 3 — Manual-Fire Dispatcher
 
-Status: implemented, gated, commit pending final SHA.
+Status: implemented, gated, committed as `6ead7da4`.
 
 Files:
 - `packages/plugin-triggers-core/src/runtime/create-manual-dispatcher.ts`
@@ -130,3 +130,39 @@ Notes:
   shape.
 - `drift.md` records the local branded-id cast needed by the default manual event-id factory; the
   package has no public `TriggerEventId` constructor and ingress already uses the same edge pattern.
+
+## Slice 4 — Webhook Test Delivery
+
+Status: implemented, gated, ready to commit.
+
+Files:
+- `packages/plugin-triggers-core/src/runtime/create-webhook-test-delivery.ts`
+- `packages/plugin-triggers-core/src/runtime/create-webhook-test-delivery_test.ts`
+- `packages/plugin-triggers-core/src/runtime/mod.ts`
+- `packages/plugin-triggers-core/src/public/mod.ts`
+- `plugins/triggers/services/src/routers/v1-types.ts`
+- `plugins/triggers/services/src/routers/v1.ts`
+- `plugins/triggers/services/src/main.ts`
+- `plugins/triggers/services/src/main_test.ts`
+- `.llm/tmp/run/feat-triggers-feature-backing--181/drift.md`
+
+Gate evidence:
+- `run-deno-check` core: PASS, exit 0, 69 files, `--unstable-kv`.
+- `run-deno-check` connector services: PASS, exit 0, 6 files, `--unstable-kv`.
+- `run-deno-lint` core: PASS, exit 0, 0 findings.
+- `run-deno-lint` connector services: PASS, exit 0, 0 findings.
+- `run-deno-fmt` core: PASS, exit 0, 0 findings.
+- `run-deno-fmt` connector services: PASS, exit 0, 0 findings.
+- `rtk proxy deno task test --unstable-kv packages/plugin-triggers-core/src/runtime/create-webhook-test-delivery_test.ts packages/plugin-triggers-core/src/runtime/create-manual-dispatcher_test.ts packages/plugin-triggers-core/tests/contracts/triggers-contract-soundness_test.ts`: PASS, exit 0, 4 passed.
+- `rtk proxy deno task test --unstable-kv plugins/triggers/services/src/main_test.ts`: PASS, exit 0, 4 passed, 7 steps.
+- `deno publish --dry-run --allow-dirty` in `packages/plugin-triggers-core`: PASS, exit 0.
+- `deno publish --dry-run --allow-dirty` in `plugins/triggers`: PASS, exit 0; pre-existing
+  dynamic-import warnings only.
+- `rtk proxy deno task arch:check`: PASS, exit 0, `FAIL=0` with existing warnings.
+
+Notes:
+- `testWebhook` now resolves the webhook definition, signs a synthetic JSON request with
+  `x-hub-signature-256`, sends it through `TriggerIngressPort.accept`, and maps the ingress result
+  to the trigger-fire response contract.
+- `createTriggersServiceContext` constructs the default helper from the existing ingress and
+  `Deno.env` secret lookup only; the service assembly remains unchanged.

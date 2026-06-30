@@ -3,6 +3,7 @@
 export { createTriggerProcessor } from './create-trigger-processor.ts';
 export { createTriggerIngress } from './create-trigger-ingress.ts';
 export { createManualDispatcher } from './create-manual-dispatcher.ts';
+export { createWebhookTestDelivery } from './create-webhook-test-delivery.ts';
 export { NoopLogger } from './logger.ts';
 export { defaultRetryPolicy, TriggerProcessor } from './trigger-processor.ts';
 export type {
@@ -12,6 +13,13 @@ export type {
   ManualTriggerFireInput,
   ManualTriggerFireResponse,
 } from './create-manual-dispatcher.ts';
+export type {
+  WebhookTestDelivery,
+  WebhookTestDeliveryDefinition,
+  WebhookTestDeliveryInput,
+  WebhookTestDeliveryOptions,
+  WebhookTestDeliveryResponse,
+} from './create-webhook-test-delivery.ts';
 export type {
   RuntimeWebhookDefinition,
   TriggerIngressEventIdFactory,

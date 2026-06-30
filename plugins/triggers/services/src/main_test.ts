@@ -18,6 +18,10 @@
 
 import { assertEquals, assertExists } from '@std/assert';
 import type { RunningService } from '@netscript/service';
+import {
+  HmacSha256WebhookVerifier,
+  MemoryWebhookVerifier,
+} from '@netscript/plugin-triggers-core/adapters';
 import { defineWebhook } from '@netscript/plugin-triggers-core/builders';
 import type {
   TriggerEvent,
@@ -39,7 +43,11 @@ import {
   InlineTriggerProcessor,
   MemoryTriggerEnabledStateStore,
 } from '@netscript/plugin-triggers-core/testing';
-import { createManualDispatcher } from '@netscript/plugin-triggers-core/runtime';
+import {
+  createManualDispatcher,
+  createTriggerIngress,
+  createWebhookTestDelivery,
+} from '@netscript/plugin-triggers-core/runtime';
 import { createTriggersService } from './main.ts';
 import type { TriggerServiceContext } from './routers/v1-types.ts';
 
@@ -104,6 +112,7 @@ function buildContext(): TriggerServiceContext {
       processor: new InlineTriggerProcessor(),
       createEventId: () => 'trg_evt_connector_manual' as TriggerEventId,
     }),
+    webhookTestDelivery: createWebhookTestDelivery({ ingress: failingIngress }),
   };
 }
 
@@ -115,9 +124,10 @@ function buildWebhookPathContext(acceptedTriggerIds: string[]): TriggerServiceCo
       verifier: 'memory',
     }),
   ];
+  const eventStore = new InMemoryEventStore();
   return {
     definitions,
-    eventStore: new InMemoryEventStore(),
+    eventStore,
     enabledState: new MemoryTriggerEnabledStateStore(),
     ingress: {
       accept(request: TriggerIngressRequest): Promise<TriggerIngressResponse> {
@@ -129,9 +139,10 @@ function buildWebhookPathContext(acceptedTriggerIds: string[]): TriggerServiceCo
       },
     },
     manualDispatcher: createManualDispatcher({
-      eventStore: new InMemoryEventStore(),
+      eventStore,
       processor: new InlineTriggerProcessor(),
     }),
+    webhookTestDelivery: createWebhookTestDelivery({ ingress: failingIngress }),
   };
 }
 
@@ -157,6 +168,34 @@ function buildEventsContext(): TriggerServiceContext {
       eventStore,
       processor: new InlineTriggerProcessor(),
     }),
+    webhookTestDelivery: createWebhookTestDelivery({ ingress: failingIngress }),
+  };
+}
+
+function buildWebhookTestContext(): TriggerServiceContext {
+  const definition = defineWebhook(() => Promise.resolve([]), {
+    id: 'test-webhook',
+    path: '/test-webhook',
+    verifier: 'memory',
+  });
+  const eventStore = new InMemoryEventStore();
+  const processor = new InlineTriggerProcessor();
+  const memoryVerifier = new MemoryWebhookVerifier({ idempotencyKey: 'test-webhook-idem' });
+  const ingress = createTriggerIngress({
+    definitions: [definition],
+    eventStore,
+    processor,
+    verifier: new HmacSha256WebhookVerifier({ signatureHeader: 'x-hub-signature-256' }),
+    selectVerifier: () => memoryVerifier,
+    createEventId: () => 'trg_evt_connector_webhook_test' as TriggerEventId,
+  });
+  return {
+    definitions: [definition],
+    eventStore,
+    enabledState: new MemoryTriggerEnabledStateStore(),
+    ingress,
+    manualDispatcher: createManualDispatcher({ eventStore, processor }),
+    webhookTestDelivery: createWebhookTestDelivery({ ingress }),
   };
 }
 
@@ -341,6 +380,42 @@ Deno.test('triggers webhook public path resolves to definition id', async () => 
     });
     assertEquals(res.status, 202);
     assertEquals(acceptedTriggerIds, ['generic-inbound-webhook']);
+  } finally {
+    await running.stop();
+  }
+});
+
+Deno.test('triggers testWebhook route accepts a synthetic delivery', async () => {
+  const running: RunningService = await createTriggersService(
+    buildWebhookTestContext(),
+    { port: 0 },
+  ).serve({ port: 0 });
+  const host = running.addr.hostname === '0.0.0.0' ? '127.0.0.1' : running.addr.hostname;
+  const baseUrl = `http://${host}:${running.addr.port}`;
+
+  try {
+    const route = await findRoute(
+      baseUrl,
+      (method, path) => method === 'POST' && /\/webhooks\/\{id\}\/test$/.test(path),
+    );
+    const res = await fetch(`${baseUrl}/api${route.path.replace('{id}', 'test-webhook')}`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ payload: { ok: true } }),
+    });
+    assertEquals(res.status, 200);
+    const body = await res.json() as {
+      accepted: boolean;
+      eventId: string;
+      triggerId: string;
+      status: string;
+    };
+    assertEquals(body, {
+      accepted: true,
+      eventId: 'trg_evt_connector_webhook_test',
+      triggerId: 'test-webhook',
+      status: 'pending',
+    });
   } finally {
     await running.stop();
   }

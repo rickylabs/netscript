@@ -16,7 +16,10 @@ import type {
   TriggerEventStorePort,
   TriggerIngressPort,
 } from '@netscript/plugin-triggers-core/ports';
-import type { ManualDispatcher } from '@netscript/plugin-triggers-core/runtime';
+import type {
+  ManualDispatcher,
+  WebhookTestDelivery,
+} from '@netscript/plugin-triggers-core/runtime';
 
 /**
  * Service context available to every v1 trigger route handler.
@@ -37,4 +40,6 @@ export type TriggerServiceContext = Readonly<{
   ingress: TriggerIngressPort;
   /** Explicit manual-fire dispatcher for `fireTrigger`. */
   manualDispatcher: ManualDispatcher;
+  /** Signed synthetic webhook delivery helper for `testWebhook`. */
+  webhookTestDelivery: WebhookTestDelivery;
 }>;

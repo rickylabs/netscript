@@ -9,3 +9,7 @@
   already used by `create-trigger-ingress.ts` because `TriggerEventId` has no public constructor.
   The cast is confined to the runtime edge that mints a new event id; callers can still inject a
   typed `createEventId` factory in tests.
+- 2026-06-30: Slice 4 signs every synthetic webhook test request. When no `secretEnv` value is
+  available, the helper uses a deterministic non-empty fallback secret before calling ingress so the
+  memory verifier path preserves MemoryWebhookVerifier semantics and HMAC definitions still fail or
+  pass through the real ingress verifier instead of bypassing it.
