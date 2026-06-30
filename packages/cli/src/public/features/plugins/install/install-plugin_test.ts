@@ -1,6 +1,6 @@
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import { assertEquals, assertFalse, assertRejects, assertStringIncludes } from 'jsr:@std/assert@^1';
-import { join, resolve } from '@std/path';
+import { dirname, fromFileUrl, join, resolve } from '@std/path';
 import { ScaffoldValidationError } from '../../../../kernel/domain/errors.ts';
 
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
@@ -26,6 +26,12 @@ import { dispatchPluginScaffold } from '../dispatch/dispatch-plugin-verb.ts';
 // require a previously-awaited registry hydration. The test drives the flow
 // directly (outside the CLI dispatch path), so hydrate at module load.
 await DEFAULT_TEMPLATE_REGISTRY.hydrate();
+
+const REPO_ROOT = resolve(dirname(fromFileUrl(import.meta.url)), '../../../../../../..');
+
+function repoPath(path: string): string {
+  return join(REPO_ROOT, path);
+}
 
 const workerProvider: PluginKindProvider = {
   kind: 'worker',
@@ -251,7 +257,7 @@ describe('public install plugin flow', () => {
 
   it('previews a local-path plugin-owned scaffolder without writing files', async () => {
     const projectRoot = await Deno.makeTempDir();
-    const fixtureRoot = resolve('packages/cli/tests/fixtures/plugin-scaffolder');
+    const fixtureRoot = repoPath('packages/cli/tests/fixtures/plugin-scaffolder');
     try {
       await writeRealProjectFiles(projectRoot);
       const fs = new DenoFileSystem();
@@ -293,7 +299,7 @@ describe('public install plugin flow', () => {
 
   it('adds workers from the real local-path plugin-owned scaffolder', async () => {
     const projectRoot = await Deno.makeTempDir();
-    const workersRoot = resolve('plugins/workers');
+    const workersRoot = repoPath('plugins/workers');
     try {
       await writeRealProjectFiles(projectRoot);
       const fs = new DenoFileSystem();
@@ -333,6 +339,10 @@ describe('public install plugin flow', () => {
         'export { healthCheckJob }',
       );
       assertStringIncludes(
+        await Deno.readTextFile(join(projectRoot, 'workers/runtime.ts')),
+        "@netscript/plugin-workers/runtime",
+      );
+      assertStringIncludes(
         await Deno.readTextFile(join(projectRoot, 'appsettings.json')),
         '"Workdir": "plugins/workers"',
       );
@@ -343,7 +353,7 @@ describe('public install plugin flow', () => {
 
   it('previews the real workers local-path scaffolder without writing files', async () => {
     const projectRoot = await Deno.makeTempDir();
-    const workersRoot = resolve('plugins/workers');
+    const workersRoot = repoPath('plugins/workers');
     try {
       await writeRealProjectFiles(projectRoot);
       const fs = new DenoFileSystem();
@@ -386,7 +396,7 @@ describe('public install plugin flow', () => {
 
   it('reruns the real workers scaffolder idempotently', async () => {
     const projectRoot = await Deno.makeTempDir();
-    const workersRoot = resolve('plugins/workers');
+    const workersRoot = repoPath('plugins/workers');
     const descriptor = workersDescriptor();
     try {
       await writeRealProjectFiles(projectRoot);
@@ -421,7 +431,7 @@ describe('public install plugin flow', () => {
 
   it('runs the real sagas local-path scaffolder through plugin install', async () => {
     const projectRoot = await Deno.makeTempDir();
-    const sagasRoot = resolve('plugins/sagas');
+    const sagasRoot = repoPath('plugins/sagas');
     try {
       await writeRealProjectFiles(projectRoot);
       const fs = new DenoFileSystem();
@@ -466,6 +476,10 @@ describe('public install plugin flow', () => {
         'UserRegistrationSaga',
       );
       assertStringIncludes(
+        await Deno.readTextFile(join(projectRoot, 'sagas/runtime.ts')),
+        "@netscript/plugin-sagas/runtime",
+      );
+      assertStringIncludes(
         await Deno.readTextFile(join(projectRoot, 'appsettings.json')),
         '"Backend": "prisma"',
       );
@@ -476,7 +490,7 @@ describe('public install plugin flow', () => {
 
   it('previews the real sagas local-path scaffolder without writing files', async () => {
     const projectRoot = await Deno.makeTempDir();
-    const sagasRoot = resolve('plugins/sagas');
+    const sagasRoot = repoPath('plugins/sagas');
     try {
       await writeRealProjectFiles(projectRoot);
       const fs = new DenoFileSystem();
@@ -519,7 +533,7 @@ describe('public install plugin flow', () => {
 
   it('reruns the real sagas scaffolder idempotently', async () => {
     const projectRoot = await Deno.makeTempDir();
-    const sagasRoot = resolve('plugins/sagas');
+    const sagasRoot = repoPath('plugins/sagas');
     const descriptor = sagasDescriptor();
     try {
       await writeRealProjectFiles(projectRoot);
@@ -554,7 +568,7 @@ describe('public install plugin flow', () => {
 
   it('runs the real triggers local-path scaffolder through plugin install', async () => {
     const projectRoot = await Deno.makeTempDir();
-    const triggersRoot = resolve('plugins/triggers');
+    const triggersRoot = repoPath('plugins/triggers');
     try {
       await writeRealProjectFiles(projectRoot);
       const fs = new DenoFileSystem();
@@ -603,6 +617,10 @@ describe('public install plugin flow', () => {
         ),
         'defineScheduledTrigger',
       );
+      assertStringIncludes(
+        await Deno.readTextFile(join(projectRoot, 'triggers/runtime.ts')),
+        "@netscript/plugin-triggers/runtime",
+      );
     } finally {
       await Deno.remove(projectRoot, { recursive: true });
     }
@@ -610,7 +628,7 @@ describe('public install plugin flow', () => {
 
   it('previews the real triggers local-path scaffolder without writing files', async () => {
     const projectRoot = await Deno.makeTempDir();
-    const triggersRoot = resolve('plugins/triggers');
+    const triggersRoot = repoPath('plugins/triggers');
     try {
       await writeRealProjectFiles(projectRoot);
       const fs = new DenoFileSystem();
@@ -653,7 +671,7 @@ describe('public install plugin flow', () => {
 
   it('reruns the real triggers scaffolder idempotently', async () => {
     const projectRoot = await Deno.makeTempDir();
-    const triggersRoot = resolve('plugins/triggers');
+    const triggersRoot = repoPath('plugins/triggers');
     const descriptor = triggersDescriptor();
     try {
       await writeRealProjectFiles(projectRoot);
@@ -688,7 +706,7 @@ describe('public install plugin flow', () => {
 
   it('runs the real streams local-path scaffolder through plugin install', async () => {
     const projectRoot = await Deno.makeTempDir();
-    const streamsRoot = resolve('plugins/streams');
+    const streamsRoot = repoPath('plugins/streams');
     try {
       await writeRealProjectFiles(projectRoot);
       const fs = new DenoFileSystem();
@@ -738,7 +756,7 @@ describe('public install plugin flow', () => {
 
   it('previews the real streams local-path scaffolder without writing files', async () => {
     const projectRoot = await Deno.makeTempDir();
-    const streamsRoot = resolve('plugins/streams');
+    const streamsRoot = repoPath('plugins/streams');
     try {
       await writeRealProjectFiles(projectRoot);
       const fs = new DenoFileSystem();
@@ -782,7 +800,7 @@ describe('public install plugin flow', () => {
 
   it('reruns the real streams scaffolder idempotently', async () => {
     const projectRoot = await Deno.makeTempDir();
-    const streamsRoot = resolve('plugins/streams');
+    const streamsRoot = repoPath('plugins/streams');
     const descriptor = streamsDescriptor();
     try {
       await writeRealProjectFiles(projectRoot);
@@ -818,7 +836,7 @@ describe('public install plugin flow', () => {
 
   it('runs the real auth local-path scaffolder through plugin install', async () => {
     const projectRoot = await Deno.makeTempDir();
-    const authRoot = resolve('plugins/auth');
+    const authRoot = repoPath('plugins/auth');
     try {
       await writeRealProjectFiles(projectRoot);
       const fs = new DenoFileSystem();
@@ -864,7 +882,7 @@ describe('public install plugin flow', () => {
 
   it('previews the real auth local-path scaffolder without writing files', async () => {
     const projectRoot = await Deno.makeTempDir();
-    const authRoot = resolve('plugins/auth');
+    const authRoot = repoPath('plugins/auth');
     try {
       await writeRealProjectFiles(projectRoot);
       const fs = new DenoFileSystem();
@@ -908,7 +926,7 @@ describe('public install plugin flow', () => {
 
   it('reruns the real auth scaffolder idempotently', async () => {
     const projectRoot = await Deno.makeTempDir();
-    const authRoot = resolve('plugins/auth');
+    const authRoot = repoPath('plugins/auth');
     const descriptor = authDescriptor();
     try {
       await writeRealProjectFiles(projectRoot);

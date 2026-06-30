@@ -37,3 +37,11 @@
 | --- | --- | ---: | --- |
 | streams check | `cd plugins/streams && deno task check` | 0 | Checked streams mod/scaffold/CLI/adapter/e2e/Aspire/verify/service entrypoints. |
 | streams publish dry-run | `cd plugins/streams && deno publish --dry-run --allow-dirty` | 0 | `Success Dry run complete`; no publish warnings emitted. |
+
+## Slice 4 — Install runtime glue
+
+| Gate | Command | Exit | Evidence |
+| --- | --- | ---: | --- |
+| workers check | `cd plugins/workers && deno task check` | 0 | Checked workers runtime export plus adapter/resources with glue resource wired into install starters. |
+| install test first run | `cd packages/cli && deno test --unstable-kv --allow-all src/public/features/plugins/install/install-plugin_test.ts` | 1 | Failed before glue assertions because local plugin fixture paths were cwd-relative under `packages/cli`; fixed test path anchoring to repo root. |
+| install test rerun | `cd packages/cli && deno test --unstable-kv --allow-all src/public/features/plugins/install/install-plugin_test.ts` | 0 | `ok \| 1 passed (19 steps) \| 0 failed`; workers/sagas/triggers installs assert generated `runtime.ts` glue files. |

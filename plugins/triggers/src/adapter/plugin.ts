@@ -8,9 +8,11 @@ import {
   barrelScaffolder,
   DEFAULT_BARREL_INPUT,
   DEFAULT_FILE_WATCH_INPUT,
+  DEFAULT_RUNTIME_GLUE_INPUT,
   DEFAULT_SCHEDULED_INPUT,
   DEFAULT_WEBHOOK_INPUT,
   fileWatchResource,
+  runtimeGlueScaffolder,
   scheduledResource,
   webhookResource,
 } from './resources/mod.ts';
@@ -21,6 +23,7 @@ export const triggersStarterResources: readonly InstallStarterResource[] = [
   { scaffolder: scheduledResource.scaffolder, input: DEFAULT_SCHEDULED_INPUT },
   { scaffolder: fileWatchResource.scaffolder, input: DEFAULT_FILE_WATCH_INPUT },
   { scaffolder: barrelScaffolder, input: DEFAULT_BARREL_INPUT },
+  { scaffolder: runtimeGlueScaffolder, input: DEFAULT_RUNTIME_GLUE_INPUT },
 ];
 
 /** Thin connector object consumed by `@netscript/plugin/adapter`. */

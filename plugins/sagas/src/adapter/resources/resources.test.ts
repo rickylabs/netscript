@@ -44,6 +44,7 @@ Deno.test('sagas install emits only userland glue under sagas', () => {
     'sagas/user-registration-saga.ts',
     'sagas/user-registration.config.ts',
     'sagas/mod.ts',
+    'sagas/runtime.ts',
   ]);
   for (const artifact of artifacts) {
     assertEquals(artifact.path.startsWith('sagas/'), true);

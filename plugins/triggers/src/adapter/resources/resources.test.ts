@@ -51,6 +51,7 @@ Deno.test('triggers install emits only userland glue under triggers', () => {
     'triggers/daily-maintenance.ts',
     'triggers/incoming-file-watch.ts',
     'triggers/mod.ts',
+    'triggers/runtime.ts',
   ]);
   for (const artifact of artifacts) {
     assertEquals(artifact.path.startsWith('triggers/'), true);

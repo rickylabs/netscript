@@ -10,6 +10,11 @@ export {
   fileWatchScaffolder,
 } from './file-watch/file-watch.ts';
 export {
+  DEFAULT_RUNTIME_GLUE_INPUT,
+  type RuntimeGlueInput,
+  runtimeGlueScaffolder,
+} from './glue/glue.ts';
+export {
   DEFAULT_SCHEDULED_INPUT,
   scheduledResource,
   scheduledScaffolder,

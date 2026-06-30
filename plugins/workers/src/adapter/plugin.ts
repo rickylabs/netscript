@@ -8,8 +8,10 @@ import {
   barrelScaffolder,
   DEFAULT_BARREL_INPUT,
   DEFAULT_JOB_INPUT,
+  DEFAULT_RUNTIME_GLUE_INPUT,
   DEFAULT_TASK_INPUT,
   jobResource,
+  runtimeGlueScaffolder,
   taskResource,
   workflowResource,
 } from './resources/mod.ts';
@@ -19,6 +21,7 @@ export const workersStarterResources: readonly InstallStarterResource[] = [
   { scaffolder: jobResource.scaffolder, input: DEFAULT_JOB_INPUT },
   { scaffolder: taskResource.scaffolder, input: DEFAULT_TASK_INPUT },
   { scaffolder: barrelScaffolder, input: DEFAULT_BARREL_INPUT },
+  { scaffolder: runtimeGlueScaffolder, input: DEFAULT_RUNTIME_GLUE_INPUT },
 ];
 
 /** Thin connector object consumed by `@netscript/plugin/adapter`. */

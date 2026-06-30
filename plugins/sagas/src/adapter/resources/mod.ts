@@ -4,6 +4,11 @@
  */
 
 export { type BarrelInput, barrelScaffolder, DEFAULT_BARREL_INPUT } from './barrel/barrel.ts';
+export {
+  DEFAULT_RUNTIME_GLUE_INPUT,
+  type RuntimeGlueInput,
+  runtimeGlueScaffolder,
+} from './glue/glue.ts';
 export { DEFAULT_SAGA_INPUT, sagaResource, sagaScaffolder } from './saga/saga.ts';
 export {
   completedStatus,

@@ -7,7 +7,9 @@ import type { InstallStarterResource, NetScriptPlugin } from '@netscript/plugin/
 import {
   barrelScaffolder,
   DEFAULT_BARREL_INPUT,
+  DEFAULT_RUNTIME_GLUE_INPUT,
   DEFAULT_SAGA_INPUT,
+  runtimeGlueScaffolder,
   sagaResource,
 } from './resources/mod.ts';
 
@@ -15,6 +17,7 @@ import {
 export const sagasStarterResources: readonly InstallStarterResource[] = [
   { scaffolder: sagaResource.scaffolder, input: DEFAULT_SAGA_INPUT },
   { scaffolder: barrelScaffolder, input: DEFAULT_BARREL_INPUT },
+  { scaffolder: runtimeGlueScaffolder, input: DEFAULT_RUNTIME_GLUE_INPUT },
 ];
 
 /** Thin connector object consumed by `@netscript/plugin/adapter`. */
