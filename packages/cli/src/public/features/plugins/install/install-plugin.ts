@@ -46,6 +46,7 @@ import {
   type PluginScaffoldDispatchSource,
 } from '../dispatch/dispatch-plugin-verb.ts';
 import type { JsrPackageFileFetcher } from '../../../infra/jsr/verify-jsr-package-integrity.ts';
+import { findOfficialPluginSourceRoot } from '../../../../maintainer/adapters/official-plugin-source.ts';
 
 export interface PluginOwnedScaffoldDependencies {
   /** Process runner used for plugin-owned scaffold and post-script dispatch. */
@@ -139,6 +140,10 @@ export async function installPlugin(
     ...await renderPluginSupport(plan, dependencies, { importMode: 'jsr' }),
     plugin: createPluginOwnedPluginResult(plan, resolvedPlugin.descriptor, pluginOwned),
   };
+  const appsettingsProvider = await resolveAppsettingsProvider(
+    plan.provider,
+    resolvedPlugin.descriptor,
+  );
   const pluginReferences = resolvedPlugin === undefined
     ? plan.pluginReferences
     : mergeUniqueReferences(
@@ -156,7 +161,7 @@ export async function installPlugin(
   await dependencies.workspaceMutator.updateAppsettings(
     plan.projectRoot,
     rendered.plugin,
-    plan.provider,
+    appsettingsProvider,
     {
       serviceReferences: plan.serviceReferences,
       pluginReferences,
@@ -365,6 +370,48 @@ export function createPluginOwnedPluginResult(
     backgroundWorkdir: undefined,
     serviceWorkdir: undefined,
   };
+}
+
+async function resolveAppsettingsProvider(
+  provider: PluginKindProvider,
+  descriptor: ValidatedPluginDescriptor,
+): Promise<PluginKindProvider> {
+  const localServiceEntrypoint = await resolveLocalOfficialServiceEntrypoint(descriptor);
+  if (localServiceEntrypoint === undefined) {
+    return provider;
+  }
+  return { ...provider, defaultServiceEntrypoint: localServiceEntrypoint };
+}
+
+async function resolveLocalOfficialServiceEntrypoint(
+  descriptor: ValidatedPluginDescriptor,
+): Promise<string | undefined> {
+  const pluginDir = descriptor.manifest.officialSource?.pluginDir;
+  if (pluginDir === undefined) {
+    return undefined;
+  }
+  const sourceRoot = await findOfficialPluginSourceRoot();
+  if (sourceRoot === null) {
+    return undefined;
+  }
+
+  const pluginRoot = join(sourceRoot, SCAFFOLD_DIRS.PLUGINS, pluginDir);
+  const exports = getRecordProperty(
+    JSON.parse(await Deno.readTextFile(join(pluginRoot, 'deno.json'))),
+    'exports',
+  );
+  const serviceExport = getRecordProperty(exports, './services');
+  if (typeof serviceExport !== 'string') {
+    return undefined;
+  }
+  return join(pluginRoot, serviceExport.replace(/^\.\//, ''));
+}
+
+function getRecordProperty(value: unknown, key: string): unknown {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    return undefined;
+  }
+  return Object.getOwnPropertyDescriptor(value, key)?.value;
 }
 
 export function resolvePluginConfigDirectory(

@@ -618,7 +618,7 @@ describe('public install plugin flow', () => {
       );
       assertStringIncludes(
         await Deno.readTextFile(join(projectRoot, 'triggers/mod.ts')),
-        'genericInboundWebhookTrigger',
+        'inboundGenericTrigger',
       );
       assertStringIncludes(
         await Deno.readTextFile(
