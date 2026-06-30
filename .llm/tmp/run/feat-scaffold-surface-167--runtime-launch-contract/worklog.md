@@ -30,3 +30,10 @@
 | --- | --- | ---: | --- |
 | triggers check | `cd plugins/triggers && deno task check` | 0 | Checked runtime export plus mod/CLI/scaffold/adapter/Aspire/public/services/streams entrypoints. |
 | triggers publish dry-run | `cd plugins/triggers && deno publish --dry-run --allow-dirty` | 0 | `Success Dry run complete`; existing unanalyzable dynamic-import warnings for CLI local runtime backend and project trigger registry. |
+
+## Slice 3 — Streams services export
+
+| Gate | Command | Exit | Evidence |
+| --- | --- | ---: | --- |
+| streams check | `cd plugins/streams && deno task check` | 0 | Checked streams mod/scaffold/CLI/adapter/e2e/Aspire/verify/service entrypoints. |
+| streams publish dry-run | `cd plugins/streams && deno publish --dry-run --allow-dirty` | 0 | `Success Dry run complete`; no publish warnings emitted. |
