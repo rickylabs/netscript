@@ -153,7 +153,8 @@ const css = [
   ' *   - this file becomes a generated artifact',
   ' */',
   '',
-  ':root {',
+  ':root,',
+  "[data-theme='dark'] {",
   ...renderBlock(rootTokens, themeColorScheme(darkTheme, 'dark'), ROOT_GROUPS),
   '}',
   '',
@@ -241,7 +242,11 @@ function tokenCssDeclarations(name: string, token: DictionaryToken) {
       `  --ns-${name}: ${oklchCssValue(value.components)};`,
     ];
   }
-  return [`  --ns-${name}: ${tokenCssValue(token)};`];
+  // Easing/duration tokens can't be auto-classified as color/space/radius/
+  // shadow/font; annotate them so the design-system token checker files them
+  // under `other` instead of flagging them as unclassified.
+  const kind = /^ease-/.test(name) ? ' /* @kind other */' : '';
+  return [`  --ns-${name}: ${tokenCssValue(token)};${kind}`];
 }
 
 function tokenCssValue(token: DictionaryToken) {
