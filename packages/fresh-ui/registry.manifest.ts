@@ -535,6 +535,28 @@ export const freshUiRegistryManifest: RegistryManifest = {
       css: [{ layer: 'components', content: "@import './ui/tool-call-card.css';" }],
     },
     {
+      name: 'chart-block',
+      kind: 'component',
+      layer: 2,
+      description:
+        'Inline token-driven metric chart — horizontal bars or a vertical column chart with y-axis ticks and data-tone intents.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['chart', 'analytics', 'primitive'],
+      files: [
+        {
+          source: 'registry/components/ui/chart-block.tsx',
+          target: '@ui/chart-block.tsx',
+        },
+        {
+          source: 'registry/components/ui/chart-block.css',
+          target: '@assets/ui/chart-block.css',
+        },
+      ],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/chart-block.css';" }],
+    },
+    {
       name: 'separator',
       kind: 'component',
       layer: 2,
@@ -933,6 +955,7 @@ export const freshUiRegistryManifest: RegistryManifest = {
         'toast',
         'avatar',
         'code-block',
+        'chart-block',
       ],
     },
     {
