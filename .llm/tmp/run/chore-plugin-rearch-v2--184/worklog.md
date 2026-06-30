@@ -148,3 +148,12 @@ Gate results:
 | package tests | `cd plugins/sagas && rtk proxy deno task test` | PASS — 24 passed, 0 failed |
 | publish dry-run | `cd plugins/sagas && rtk proxy deno task publish:dry-run` | PASS — dry run complete; existing dynamic-import warnings remain |
 | arch check | `rtk proxy deno task arch:check` | PASS exit 0 — `FAIL=0`; existing WARN/INFO doctrine findings remain |
+
+### S-conform-triggers
+
+- Status: skipped per continuation instruction.
+- Gate check: `gh pr view 192 --repo rickylabs/netscript --json state,mergedAt,baseRefName,headRefName,title`
+  reports `state: MERGED`, `mergedAt: 2026-06-30T22:02:31Z`, base `main`, head
+  `feat/triggers-feature-backing`.
+- Action: did not touch `plugins/triggers` or `packages/plugin-triggers-core`; proceeding to streams
+  until the supervisor explicitly steers back to the post-#181 rebase + route re-verification.
