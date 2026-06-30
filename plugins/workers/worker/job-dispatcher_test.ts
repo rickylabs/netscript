@@ -9,7 +9,7 @@ import type {
 } from '@netscript/plugin-workers-core/runtime';
 import type { MessageContext } from '@netscript/queue';
 import { processWorkerJob, processWorkerTask } from './job-dispatcher.ts';
-import { KvWorkerIdempotencyStore } from './worker-idempotency-store.ts';
+import { KvWorkerIdempotencyStore } from '@netscript/plugin-workers-core/stores';
 import type {
   WorkerCompleteExecutionOptions,
   WorkerCreateExecutionOptions,
@@ -37,7 +37,7 @@ Deno.test('processWorkerJob skips completed duplicate redelivery without creatin
   const message: JobMessage = {
     jobId: 'send-email',
     topic: 'jobs',
-    triggeredBy: 'test',
+    triggeredBy: 'manual',
     payload: { email: 'a@example.com' },
   };
   const queueContext = messageContext('msg-1');
@@ -66,7 +66,7 @@ Deno.test('processWorkerJob releases a failed claim so redelivery can re-run', a
   const message: JobMessage = {
     jobId: 'sync-account',
     topic: 'jobs',
-    triggeredBy: 'test',
+    triggeredBy: 'manual',
     idempotencyKey: 'evt-sync-1',
     payload: { accountId: 'acct_1' },
   };
@@ -97,7 +97,7 @@ Deno.test('processWorkerTask skips duplicate redelivery after applied marker', a
   const message: TaskMessage = {
     taskId: 'resize-image',
     topic: 'tasks',
-    triggeredBy: 'test',
+    triggeredBy: 'manual',
     payload: { imageId: 'img_1' },
   };
   const queueContext = messageContext('task-msg-1');

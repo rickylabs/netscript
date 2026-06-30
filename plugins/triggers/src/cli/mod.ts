@@ -7,10 +7,10 @@
 export { PluginCli } from '@netscript/plugin/cli';
 export type { PluginCliArgs, PluginCliCommand, PluginCliResult } from '@netscript/plugin/cli';
 export { TriggersCli } from './triggers-cli.ts';
-export { LocalProjectFiles, resolveProjectRoot } from './adapters/local-project-files.ts';
-export type { ProjectFileEntry, ProjectFiles } from './adapters/local-project-files.ts';
-export { LocalTriggersCliBackend } from './triggers-cli-backend.ts';
-export type { LocalTriggersCliBackendOptions } from './triggers-cli-backend.ts';
+export { LocalProjectFiles, resolveProjectRoot } from '@netscript/plugin/cli';
+export type { ProjectFileEntry, ProjectFiles } from '@netscript/plugin/cli';
+export { LocalTriggersRuntimeBackend } from './local-runtime-backend.ts';
+export type { LocalTriggersRuntimeBackendOptions } from './local-runtime-backend.ts';
 export {
   AddFileWatchCommand,
   AddScheduledCommand,

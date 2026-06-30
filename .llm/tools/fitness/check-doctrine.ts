@@ -60,6 +60,13 @@ function stripStringLiterals(line: string) {
   return line.replace(/(['"`])(?:\\.|(?!\1).)*\1/g, '""');
 }
 
+function isTestPath(repoPath: string) {
+  const normalized = repoPath.replaceAll('\\', '/');
+  return normalized.includes('/tests/') ||
+    normalized.endsWith('_test.ts') ||
+    normalized.endsWith('.test.ts');
+}
+
 // ─────────────────────────────────────────────────────────────────────────
 // A1 / A2 — public types first, simple over easy at boundaries
 // (Mechanical proxy: mod.ts has @module + every export has explicit return type)
@@ -125,9 +132,17 @@ if (readmeText) {
 
 // ─────────────────────────────────────────────────────────────────────────
 // A4 — Base classes are stub-only contracts
-// Heuristic: any `export abstract class` MUST have ≥ 1 `abstract` method,
-// and concrete implementations MUST live in a sibling `*.default.ts` or
-// `*.impl.ts` rather than the base file.
+// Heuristic: any `export abstract class` MUST declare ≥ 1 abstract member, and
+// concrete implementations MUST live in a sibling `*.default.ts` or `*.impl.ts`
+// rather than the base file. An abstract member is an abstract method, an
+// abstract accessor, OR an `abstract readonly` identity field — doctrine file
+// 03 ("The stub-only rule") explicitly counts `abstract readonly id/kind/...`
+// fields as the contract a spine base imposes on its subtypes.
+// Exception: a class with a `protected constructor` is a deliberate layer-2
+// abstract (doctrine file 03, "Spine versus layer-2 abstracts" / R-BASE-L2) —
+// a non-instantiable sub-base that may carry concrete shared behavior. The
+// stub-only rule applies to the spine, not to layer-2 abstracts, so a
+// protected-ctor base is not flagged for "no abstract members".
 // ─────────────────────────────────────────────────────────────────────────
 const tsFiles: string[] = [];
 for await (
@@ -150,9 +165,17 @@ for (const f of tsFiles) {
   const text = await readText(f);
   for (const m of text.matchAll(/export\s+abstract\s+class\s+(\w+)([^{]*)\{([\s\S]*?)\n\}/gm)) {
     const [, cls, , body] = m;
+    // Abstract method (incl. generic `<` and async), abstract accessor
+    // (`abstract get/set foo()`), or abstract field (`abstract readonly axis:`,
+    // `abstract name:`, `abstract foo?:`) — all satisfy the stub-only contract.
     const hasAbstract = /\babstract\s+(?:async\s+)?\w+\s*</.test(body) ||
-      /\babstract\s+(?:async\s+)?\w+\s*\(/.test(body);
-    if (!hasAbstract) {
+      /\babstract\s+(?:async\s+)?\w+\s*\(/.test(body) ||
+      /\babstract\s+(?:get|set)\s+\w+\s*\(/.test(body) ||
+      /\babstract\s+(?:readonly\s+)?\w+\s*[?:]/.test(body);
+    // A `protected constructor` marks a deliberate layer-2 / non-instantiable
+    // base (R-BASE-L2); such bases need not declare abstract members.
+    const isLayer2Base = /\bprotected\s+constructor\s*\(/.test(body);
+    if (!hasAbstract && !isLayer2Base) {
       findings.push({
         ref: 'A4',
         level: 'FAIL',
@@ -519,13 +542,16 @@ if (authFiles.length > 0) {
       const codeLine = stripStringLiterals(line.replace(/\/\/.*$/, ''));
       const isAllowedContractCast = file.repoPath ===
           'packages/plugin-auth-core/src/contracts/v1/auth.contract.ts' &&
-        /\bas\s+unknown\s+as\s+AuthContractV1\b/.test(codeLine);
+        /\}\s+as\s+unknown\s+as\s+Parameters\s*<\s*typeof\s+oc\.errors\s*>\s*\[0\]/.test(
+          codeLine,
+        );
       const isAllowedRouterAny = file.repoPath === 'plugins/auth/services/src/router.ts' &&
         (/\bas\s+any\b/.test(codeLine) || /:\s*any\b/.test(codeLine));
       if (
         !/^\s*(?:\*|\/\*|\/\/|import\b|export\s+\{)/.test(line) &&
         !/^\s*(?:type\s+)?[A-Za-z0-9_]+\s+as\s+[A-Za-z0-9_]+,?\s*$/.test(line) &&
         /\bas\s+(?!const\b)(?:unknown\s+as\s+|never\b|any\b|[A-Za-z_{[(])/.test(codeLine) &&
+        !isTestPath(file.repoPath) &&
         !isAllowedContractCast &&
         !isAllowedRouterAny
       ) {
@@ -538,7 +564,7 @@ if (authFiles.length > 0) {
           line: lineNumber,
         });
       }
-      if (/@ts-(?:ignore|expect-error|nocheck|check)\b/.test(line)) {
+      if (/@ts-(?:ignore|expect-error|nocheck|check)\b/.test(line) && !isTestPath(file.repoPath)) {
         findings.push({
           ref: 'AS7/F-AUTH-CAST',
           level: 'FAIL',

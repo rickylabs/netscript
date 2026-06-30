@@ -13,15 +13,19 @@
     "./ports": "./src/ports/mod.ts",
     "./public": "./src/public/mod.ts",
     "./runtime": "./src/runtime/mod.ts",
+    "./stores": "./src/stores/mod.ts",
     "./telemetry": "./src/telemetry/mod.ts",
     "./testing": "./src/testing/mod.ts"
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@^1",
+    "@netscript/cron": "jsr:@netscript/cron@0.0.1-alpha.12",
+    "@netscript/kv": "jsr:@netscript/kv@0.0.1-alpha.12",
+    "@netscript/watchers": "jsr:@netscript/watchers@0.0.1-alpha.12",
     "zod": "jsr:@zod/zod@4.4.3"
   },
   "tasks": {
-    "check": "deno check --unstable-kv mod.ts src/adapters/mod.ts src/builders/mod.ts src/config/mod.ts src/contracts/v1/mod.ts src/domain/mod.ts src/ports/mod.ts src/public/mod.ts src/runtime/mod.ts src/telemetry/mod.ts src/testing/mod.ts",
+    "check": "deno check --unstable-kv mod.ts src/adapters/mod.ts src/builders/mod.ts src/config/mod.ts src/contracts/v1/mod.ts src/domain/mod.ts src/ports/mod.ts src/public/mod.ts src/runtime/mod.ts src/stores/mod.ts src/telemetry/mod.ts src/testing/mod.ts",
     "test": "deno test --allow-all --unstable-kv",
     "publish:dry-run": "deno publish --dry-run --allow-dirty --allow-slow-types"
   },

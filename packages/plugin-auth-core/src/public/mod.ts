@@ -59,11 +59,10 @@ export type {
 } from '../config/mod.ts';
 export { authContract, authContractV1 } from '../contracts/v1/mod.ts';
 export type {
-  AuthContractErrorFactory,
-  AuthContractErrors,
+  AuthCapabilities,
+  AuthContract,
+  AuthContractDefinition,
   AuthContractV1,
-  AuthRouteHandler,
-  AuthRouteHandlerOptions,
   AuthRouter,
   AuthSessionResponse,
   AuthUserResponse,

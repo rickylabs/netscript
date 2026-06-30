@@ -97,12 +97,32 @@ Deno.test('PluginWorkspaceMutator injects first-party plugin core imports into r
   const config = JSON.parse(await fs.readFile('/project/deno.json'));
 
   assertEquals(
+    config.imports['@netscript/contracts'],
+    netscriptJsrSpecifier('contracts'),
+  );
+  assertEquals(
+    config.imports['@netscript/kv'],
+    netscriptJsrSpecifier('kv'),
+  );
+  assertEquals(
+    config.imports['@netscript/plugin-workers/runtime'],
+    netscriptJsrSpecifier('plugin-workers', '/runtime'),
+  );
+  assertEquals(
     config.imports['@netscript/plugin-workers-core/schemas'],
     netscriptJsrSpecifier('plugin-workers-core', '/schemas'),
   );
   assertEquals(
+    config.imports['@netscript/plugin-sagas/runtime'],
+    netscriptJsrSpecifier('plugin-sagas', '/runtime'),
+  );
+  assertEquals(
     config.imports['@netscript/plugin-sagas-core/domain'],
     netscriptJsrSpecifier('plugin-sagas-core', '/domain'),
+  );
+  assertEquals(
+    config.imports['@netscript/plugin-triggers/runtime'],
+    netscriptJsrSpecifier('plugin-triggers', '/runtime'),
   );
   assertEquals(
     config.imports['@netscript/plugin-triggers-core/builders'],
@@ -153,8 +173,8 @@ Deno.test('PluginWorkspaceMutator registers background plugins with companion AP
     Enabled: true,
     Runtime: 'deno',
     Port: 8091,
-    Entrypoint: 'services/src/main.ts',
-    Workdir: 'plugins/billing-worker',
+    Entrypoint: netscriptJsrSpecifier('plugin-billing-worker', '/services'),
+    Workdir: '.',
     RequiresKv: true,
     RequiresDb: true,
     Permissions: [
@@ -168,8 +188,8 @@ Deno.test('PluginWorkspaceMutator registers background plugins with companion AP
   assertEquals(config.NetScript.BackgroundProcessors['billing-worker'], {
     Enabled: true,
     Runtime: 'deno',
-    Entrypoint: 'bin/combined.ts',
-    Workdir: 'plugins/billing-worker',
+    Entrypoint: 'billing-worker/runtime.ts',
+    Workdir: '.',
     Telemetry: true,
     WatchMode: true,
     RequiresDb: true,
@@ -185,6 +205,68 @@ Deno.test('PluginWorkspaceMutator registers background plugins with companion AP
     ConcurrencyEnvVar: 'BACKGROUND_CONCURRENCY',
     PluginReferences: ['billing-worker-api'],
   });
+});
+
+Deno.test('PluginWorkspaceMutator honors absolute local source service entrypoints', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile(
+    '/project/appsettings.json',
+    JSON.stringify({ NetScript: {} }, null, 2) + '\n',
+  );
+
+  await new PluginWorkspaceMutator(fs).updateAppsettings(
+    '/project',
+    {
+      scaffoldResult: {
+        filesCreated: [],
+        directoriesCreated: [],
+        filesSkipped: [],
+        totalOperations: 0,
+        durationMs: 0,
+      },
+      pluginDir: '/project/plugins/triggers',
+      kind: 'trigger',
+      port: 4400,
+      servicePort: 8093,
+      configSection: 'BackgroundProcessors',
+      configKey: 'triggers',
+      serviceConfigKey: 'triggers-api',
+    },
+    {
+      ...backgroundProvider,
+      kind: 'trigger',
+      displayName: 'Triggers',
+      defaultServiceEntrypoint:
+        '/home/codex/repos/netscript-scaffold-167/plugins/triggers/services/src/main.ts',
+    },
+  );
+
+  const config = JSON.parse(await fs.readFile('/project/appsettings.json')) as {
+    NetScript: {
+      Plugins: Record<string, unknown>;
+    };
+  };
+
+  assertEquals(
+    config.NetScript.Plugins['triggers-api'],
+    {
+      Enabled: true,
+      Runtime: 'deno',
+      Port: 8093,
+      Entrypoint:
+        '/home/codex/repos/netscript-scaffold-167/plugins/triggers/services/src/main.ts',
+      Workdir: '.',
+      RequiresKv: true,
+      RequiresDb: true,
+      Permissions: [
+        '--allow-net',
+        '--allow-env',
+        '--allow-read',
+        '--allow-write',
+        '--allow-run',
+      ],
+    },
+  );
 });
 
 Deno.test('PluginWorkspaceMutator writes saga store backend appsettings for saga plugins', async () => {
@@ -318,4 +400,36 @@ Deno.test('PluginWorkspaceMutator appends project-local plugin config specs', as
   const config = await fs.readFile('/project/netscript.config.ts');
   assertEquals(config.includes("'./plugins/workers/mod.ts',"), true);
   assertEquals(config.includes("'./plugins/sagas/mod.ts',"), true);
+});
+
+Deno.test('PluginWorkspaceMutator registers generated plugin glue entrypoints', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile(
+    '/project/netscript.config.ts',
+    [
+      "import { defineConfig } from '@netscript/config';",
+      '',
+      'export default defineConfig({',
+      "  name: 'sample-app',",
+      '  databases: {',
+      '    config: [],',
+      '  },',
+      '  plugins: [],',
+      '});',
+      '',
+    ].join('\n'),
+  );
+
+  const mutator = new PluginWorkspaceMutator(fs);
+  assertEquals(
+    await mutator.ensureNetScriptConfigPlugin('/project', 'workers', '/project/workers'),
+    true,
+  );
+  assertEquals(
+    await mutator.ensureNetScriptConfigPlugin('/project', 'workers', '/project/workers'),
+    false,
+  );
+
+  const config = await fs.readFile('/project/netscript.config.ts');
+  assertEquals(config.includes("'./workers/mod.ts'"), true);
 });

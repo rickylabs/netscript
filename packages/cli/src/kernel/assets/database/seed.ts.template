@@ -10,16 +10,8 @@ if (import.meta.main) {
   const client = await db.getClient();
 
   try {
-    const record = await client.exampleRecord.upsert({
-      where: { id: 'seed-example-record' },
-      update: { name: 'Seeded Example Record' },
-      create: {
-        id: 'seed-example-record',
-        name: 'Seeded Example Record',
-      },
-    });
-
-    console.log(`✅ Seeded ExampleRecord: ${record.id}`);
+    await client.$queryRaw`SELECT 1`;
+    console.log('✅ Database seed completed.');
   } finally {
     await db.disconnect();
   }

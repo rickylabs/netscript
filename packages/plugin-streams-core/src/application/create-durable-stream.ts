@@ -60,11 +60,12 @@ export class DurableStreamProducer<TDef extends StreamStateDefinition>
   }
 
   async #connect(signal?: AbortSignal): Promise<void> {
-    const url = buildStreamUrl(this.streamPath);
-    const headers = getStreamsAuth();
-
+    let url = '';
+    let headers: Record<string, string> = {};
     let handle: DurableStream;
     try {
+      url = buildStreamUrl(this.streamPath);
+      headers = getStreamsAuth();
       handle = await DurableStream.create({
         url,
         contentType: 'application/json',

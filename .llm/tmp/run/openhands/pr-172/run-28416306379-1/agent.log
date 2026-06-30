@@ -1,0 +1,400 @@
+    - Zero stale refs: `grep -rn "kv-trigger-event-store\." 
+packages/plugin-triggers-core/` → exit 1 (zero matches)
+    - Zero relocated-symbol imports via connector `/runtime` path: confirmed via
+inspection
+    
+    ### Verification 4: Gate Change `36d44f7c` Soundness — ✅ PASS
+    **Method:** `git show 36d44f7c -- .llm/tools/fitness/check-doctrine.ts` + 
+inspection of diff.
+    
+    **Result:** Scope held to fitness gate + run records:
+    - Changed files: `.llm/tools/fitness/check-doctrine.ts`, 
+`.llm/harness/debt/arch-debt.md`, run artifacts
+    - No auth production source or auth test source modified
+    - `check-doctrine.ts:144` — corrected contract-cast allow-list regex from 
+`/\bas\s+unknown\s+as\s+AuthContractV1\b/` to 
+`/\}\s+as\s+unknown\s+as\s+Parameters\s*<\s*typeof\s+oc\.errors\s*>\s*\[0\]/` 
+(matches actual sanctioned site at `auth.contract.ts:177`)
+    - `check-doctrine.ts:151,165` — added test-path exemptions (`/tests/`, 
+`_test.ts`, `.test.ts`) for auth cast + `@ts-*` checks
+    
+    Production auth source remains fully gated (no soundness regression).
+    
+    ### Verification 5: Gates Green — ✅ PASS
+    **Method:** Live execution of `deno task arch:check` + inspection of worklog
+evidence.
+    
+    **Result:**
+    - `deno task arch:check` — EXIT=0, all 13 roots FAIL=0 (log captured to 
+`/tmp/arch_check.log`)
+    - Scoped check/lint/fmt: worklog confirms exit 0 for all touched roots 
+(sagas-core, sagas plugin, triggers-core, triggers plugin, workers-core, workers
+plugin)
+    - `deno test --unstable-kv`: worklog confirms sagas 75 passed, triggers 32 
+passed (12 ignored), workers 45 passed
+    - Dry-runs: worklog confirms warning-only (triggers-core 
+`--allow-slow-types` preserved, no new slow types)
+    - `deno.lock`: worklog confirms no hand-edit, only workspace-dep additions
+    - Zero new production `any`/casts: confirmed via grep (only 2 sanctioned 
+categories: auth contract cast + plugin-auth router exemplar)
+    
+    ### Verification 6: Scope Discipline — ✅ PASS
+    **Method:** Inspect plan.md scope boundaries + grep for out-of-scope 
+additions.
+    
+    **Result:**
+    - streams/auth out of scope: no streams/auth files in S-b/S-c/S-d commits
+    - Triggers feature-backing routes (#181 / 
+`TRIGGERS-CONNECTOR-DEFERRED-ROUTES`) NOT folded in: `grep -rn 
+"TRIGGERS-CONNECTOR-DEFERRED-ROUTES\|#181" packages/plugin-triggers-core/src 
+plugins/triggers/src` → exit 1 (zero matches)
+    - Net-new triggers-core feature-backing routes not present
+    
+    ## Remaining Risks
+    
+    All accepted per approved plan.md:
+    
+    - **R1 — D2 zero-compat surface break:** Mitigated by S-b.5 doc-fence split.
+Accepted under alpha zero-compat policy (userland consumers documented in PR + 
+arch-debt).
+    - **R2 — `KvTriggerEventStore` name collision:** Resolved by S-c.5 rename to
+`DenoKvTriggerEventStoreDouble`. Zero stale refs confirmed.
+    - **R3 — KV-migration semantic drift:** Mitigated by dual-backend tests 
+(Deno-KV + `MemoryKvAdapter`). `@netscript/kv` `KvStore.atomic`/`list({prefix})`
+express required semantics (CAS + prefix scan).
+    - **R4 — arch:check denominator:** Closed by commit `e999a9ea` (S5a-2). All 
+13 roots FAIL=0 confirmed live.
+    - **R5 — lock churn:** Expected workspace-dep addition (`@netscript/kv`, 
+`@netscript/cron`, `@netscript/watchers`). No hand-edit. Delta reported in 
+worklog.
+    
+    **No blocking residual risks. Ready to merge into 
+`feat/scaffold-surface-167` for #173 adversarial E2E + IMPL-EVAL.**
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 1.55M • cache hit 82.67% •  reasoning 3.72K • ↓ output 19.71K • 
+$ 0.7290
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/28416306379-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# IMPL-EVAL Run Summary
+ 2|
++3|## Summary
++4|
++5|Executed IMPL-EVAL evaluation for PR #172 adapter relocation + 
+`@netscript/kv` migration on branch `feat/scaffold-surface-167`. Verified five 
+commits against the live tree: `6e907b4b` (S-b sagas), `6c8769c4` (S-c 
+triggers), `87ecf8e6` (S-d workers), `6c7cdd8a` (docs), and `36d44f7c` (auth 
+gate-fix). Evaluated against approved plan.md locked decisions (D-KV, D2, D3, 
+D4), slice definitions (S-b/S-c/S-d incl. S-b.5/S-c.5), and risk register 
+(R1–R5).
++6|
++7|**Verdict: ✅ PASS** — All six verification categories satisfied. No blocking
+issues found.
++8|
++9|## Changes
++10|
++11|### Files Read
++12|- `.agents/skills/netscript-harness/SKILL.md` — harness orchestration, 
+evaluator protocol, verdict definitions
++13|- `.agents/skills/netscript-doctrine/SKILL.md` — archetype-5 connectors, 
+layering, fitness gates
++14|- `.agents/skills/netscript-deno-toolchain/SKILL.md` — `deno doc`/`deno why`
+for migrated stores
++15|- `.agents/skills/jsr-audit/SKILL.md` — publish bar for triggers-core 
+`--allow-slow-types`
++16|- `.llm/harness/evaluator/protocol.md` — IMPL-EVAL protocol
++17|- `.llm/harness/evaluator/verdict-definitions.md` — verdict rules 
+(PASS/FAIL_FIX/FAIL_RESCOPE/FAIL_DEBT)
++18|- `.llm/tmp/run/feat-scaffold-surface-167--adapter-relocation/plan.md` — 
+locked D-KV/D2/D3/D4, slices S-b/S-c/S-d, risks R1–R5
++19|- `.llm/tmp/run/feat-scaffold-surface-167--adapter-relocation/plan-eval.md` 
+— cycle-2 PASS
++20|- `.llm/tmp/run/feat-scaffold-surface-167--adapter-relocation/worklog.md` — 
+gate evidence
++21|- `.llm/tmp/run/feat-scaffold-surface-167--adapter-relocation/commits.md` — 
+commit list
++22|- `.llm/tmp/run/feat-scaffold-surface-167--adapter-relocation/drift.md` — 
+scope drift
++23|- Git commit stats: `6e907b4b`, `6c8769c4`, `87ecf8e6`, `6c7cdd8a`, 
+`36d44f7c`
++24|
++25|### Files Verified (Live Tree Inspection)
++26|- **KV migration soundness:**
++27|  - `packages/plugin-sagas-core/src/stores/kv-saga-store.ts` — confirmed 
+`@netscript/kv` imports, zero `Deno.openKv`
++28|  - `packages/plugin-sagas-core/src/stores/kv-saga-runtime-stores.ts` — 
+confirmed `@netscript/kv` imports, zero `Deno.openKv`
++29|  - `packages/plugin-triggers-core/src/stores/kv-trigger-runtime-stores.ts` 
+— confirmed `@netscript/kv` imports, zero `Deno.openKv`
++30|  - `packages/plugin-workers-core/src/stores/kv-worker-idempotency-store.ts`
+— confirmed `@netscript/kv` imports
++31|  - `packages/plugin-sagas-core/src/stores/kv-saga-store_test.ts` — 
+confirmed `DenoKvAdapter` test (line 111)
++32|  - 
+`packages/plugin-triggers-core/src/stores/kv-trigger-runtime-stores_test.ts` — 
+confirmed `MemoryKvAdapter` imports
++33|  - 
+`packages/plugin-workers-core/src/stores/kv-worker-idempotency-store_test.ts` — 
+confirmed `MemoryKvAdapter` imports
++34|  - 
+`packages/plugin-triggers-core/src/testing/deno-kv-trigger-event-store-double.ts
+` — confirmed S-c.5 rename target
++35|  - `packages/plugin-workers-core/src/domain/job-spec.ts` — confirmed 
+pre-existing `Deno.KvKeyPart` (out of S-d scope)
++36|
++37|- **Relocation correctness:**
++38|  - `packages/plugin-sagas-core/src/stores/` — confirmed target layout (7 
+files + mod.ts)
++39|  - `packages/plugin-triggers-core/src/{stores,adapters}/` — confirmed 
+target layout (3 stores + 2 adapters + mod.ts)
++40|  - `packages/plugin-workers-core/src/stores/` — confirmed target layout (2 
+files + mod.ts)
++41|  - `plugins/sagas/src/runtime/mod.ts` — confirmed connector `./runtime` 
+re-export dropped (no `KvSagaStore`, `PrismaSagaStore`, 
+`resolveSagaStoreBackend`)
++42|  - `plugins/triggers/src/runtime/mod.ts` — confirmed connector `./runtime` 
+re-export dropped (no `KvTriggerEventStore`, `KvTriggerIdempotencyStore`, 
+`KvTriggerDlqStore`, `CronTriggerSchedulerAdapter`, 
+`WatchersFileWatcherAdapter`)
++43|  - `plugins/workers/worker/mod.ts` — confirmed connector re-export dropped 
+(no `KvWorkerIdempotencyStore`)
++44|  - `plugins/sagas/services/src/main.ts` — confirmed composition root 
+imports from `@netscript/plugin-sagas-core/stores`
++45|  - `plugins/triggers/services/src/main.ts` — confirmed composition root 
+imports from `@netscript/plugin-triggers-core/{stores,adapters}`
++46|  - `plugins/workers/services/src/service-runtime.ts` — confirmed 
+composition root imports from `@netscript/plugin-workers-core/stores`
++47|
++48|- **S-b.5 / S-c.5 fence + rename:**
++49|  - `docs/site/capabilities/durable-sagas.md` (lines 331-345) — confirmed 
+fence split (`resolveSagaStoreBackend` imports from `-core/stores`, 
+`createDurableSagaRuntime` stays in connector `/runtime`)
++50|  - 
+`packages/plugin-triggers-core/src/testing/deno-kv-trigger-event-store-double.ts
+` — confirmed S-c.5 rename target
++51|  - Grep verification: zero stale refs to old `kv-trigger-event-store.ts` 
+filename, zero relocated-symbol imports via connector `/runtime` path
++52|
++53|- **Gate change `36d44f7c` soundness:**
++54|  - `git show 36d44f7c -- .llm/tools/fitness/check-doctrine.ts` — confirmed 
+scope (check-doctrine.ts + arch-debt.md + run artifacts only, no auth 
+production/test source)
++55|  - `.llm/tools/fitness/check-doctrine.ts` (lines 144, 151, 165) — confirmed
+auth contract-cast regex correction + test-path exemption
++56|
++57|- **Gates green:**
++58|  - `deno task arch:check` — executed live, EXIT=0, all 13 roots FAIL=0 
+(captured to `/tmp/arch_check.log`)
++59|
++60|### Files Written
++61|- `.llm/tmp/run/feat-scaffold-surface-167--adapter-relocation/evaluate.md` —
+full IMPL-EVAL verdict with six verification categories
++62|- **PR comment:** 
+https://github.com/rickylabs/netscript/pull/172#issuecomment-4839377288 — 
+verdict summary posted to #172
++63|
++64|## Validation
++65|
++66|### Verification 1: KV Migration Soundness (R3 Hard Stop) — ✅ PASS
++67|**Method:** `grep` over production stores 
+(`packages/plugin-{sagas,triggers,workers}-core/src/stores/*.ts` excluding 
+`_test.ts`) for `Deno.openKv` / `Deno.Kv` / `Deno.KvKey` escape hatches.
++68|
++69|**Result:** Zero matches in production code. All three migrated stores use 
+`@netscript/kv` exclusively:
++70|- `kv-saga-store.ts:2-3`: `import { getKv } from '@netscript/kv'; import 
+type { AtomicMutation, KvKey, KvStore } from '@netscript/kv';`
++71|- `kv-trigger-runtime-stores.ts:1-2`: same pattern
++72|- `kv-worker-idempotency-store.ts:8`: same pattern
++73|
++74|**Semantic preservation:** Inspected `kv-saga-store.ts:66-69` (atomic CAS 
+with `versionstamp`), `kv-saga-store.ts:105-111` (prefix scan with 
+`list({prefix})`), `kv-trigger-runtime-stores.ts:129-141` (idempotency with 
+three-tier active/completed keys). All preserve optimistic-concurrency + 
+idempotency + prefix-scan semantics.
++75|
++76|**Engine-agnostic tests:** Confirmed `MemoryKvAdapter` usage in test files:
++77|- `packages/plugin-sagas-core/src/stores/kv-saga-store_test.ts:4`
++78|- 
+`packages/plugin-triggers-core/src/stores/kv-trigger-runtime-stores_test.ts:3`
++79|- 
+`packages/plugin-workers-core/src/stores/kv-worker-idempotency-store_test.ts:2`
++80|
++81|### Verification 2: Relocation Correctness — ✅ PASS
++82|**Method:** Directory listing of target folders 
+(`packages/plugin-{sagas,triggers,workers}-core/src/{stores,adapters}/`) + 
+inspection of connector `mod.ts` files and composition roots.
++83|
++84|**Result:** All four store/adapter sets landed in correct 
+`-core/{stores,adapters}` folders:
++85|- sagas: 7 files in `plugin-sagas-core/src/stores/`
++86|- triggers: 3 files in `plugin-triggers-core/src/stores/`, 2 files in 
+`plugin-triggers-core/src/adapters/`
++87|- workers: 2 files in `plugin-workers-core/src/stores/`
++88|
++89|Connector `./runtime` re-exports dropped (D4 zero-compat honored):
++90|- `plugins/sagas/src/runtime/mod.ts` — no store exports
++91|- `plugins/triggers/src/runtime/mod.ts` — no store/adapter exports
++92|- `plugins/workers/worker/mod.ts` — no store exports
++93|
++94|Composition roots import from `-core` (no connector→core leak):
++95|- `plugins/sagas/services/src/main.ts` — imports from 
+`@netscript/plugin-sagas-core/stores`
++96|- `plugins/triggers/services/src/main.ts` — imports from 
+`@netscript/plugin-triggers-core/{stores,adapters}`
++97|- `plugins/workers/services/src/service-runtime.ts:8` — `import { 
+KvWorkerIdempotencyStore } from '@netscript/plugin-workers-core/stores';`
++98|
++99|### Verification 3: S-b.5 / S-c.5 Fence + Rename — ✅ PASS
++100|**Method:** Inspect `docs/site/capabilities/durable-sagas.md:331-345` + 
+grep for stale refs.
++101|
++102|**Result:**
++103|- S-b.5 fence split: `resolveSagaStoreBackend` imports from 
+`@netscript/plugin-sagas-core/stores` (line 334), `createDurableSagaRuntime` 
+stays in `@netscript/plugin-sagas/runtime` (line 333)
++104|- S-c.5 rename: 
+`packages/plugin-triggers-core/src/testing/deno-kv-trigger-event-store-double.ts
+` exists (S-c.5 rename target)
++105|- Zero stale refs: `grep -rn "kv-trigger-event-store\." 
+packages/plugin-triggers-core/` → exit 1 (zero matches)
++106|- Zero relocated-symbol imports via connector `/runtime` path: confirmed 
+via inspection
++107|
++108|### Verification 4: Gate Change `36d44f7c` Soundness — ✅ PASS
++109|**Method:** `git show 36d44f7c -- .llm/tools/fitness/check-doctrine.ts` + 
+inspection of diff.
++110|
++111|**Result:** Scope held to fitness gate + run records:
++112|- Changed files: `.llm/tools/fitness/check-doctrine.ts`, 
+`.llm/harness/debt/arch-debt.md`, run artifacts
++113|- No auth production source or auth test source modified
++114|- `check-doctrine.ts:144` — corrected contract-cast allow-list regex from 
+`/\bas\s+unknown\s+as\s+AuthContractV1\b/` to 
+`/\}\s+as\s+unknown\s+as\s+Parameters\s*<\s*typeof\s+oc\.errors\s*>\s*\[0\]/` 
+(matches actual sanctioned site at `auth.contract.ts:177`)
++115|- `check-doctrine.ts:151,165` — added test-path exemptions (`/tests/`, 
+`_test.ts`, `.test.ts`) for auth cast + `@ts-*` checks
++116|
++117|Production auth source remains fully gated (no soundness regression).
++118|
++119|### Verification 5: Gates Green — ✅ PASS
++120|**Method:** Live execution of `deno task arch:check` + inspection of 
+worklog evidence.
++121|
++122|**Result:**
++123|- `deno task arch:check` — EXIT=0, all 13 roots FAIL=0 (log captured to 
+`/tmp/arch_check.log`)
++124|- Scoped check/lint/fmt: worklog confirms exit 0 for all touched roots 
+(sagas-core, sagas plugin, triggers-core, triggers plugin, workers-core, workers
+plugin)
++125|- `deno test --unstable-kv`: worklog confirms sagas 75 passed, triggers 32 
+passed (12 ignored), workers 45 passed
++126|- Dry-runs: worklog confirms warning-only (triggers-core 
+`--allow-slow-types` preserved, no new slow types)
++127|- `deno.lock`: worklog confirms no hand-edit, only workspace-dep additions
++128|- Zero new production `any`/casts: confirmed via grep (only 2 sanctioned 
+categories: auth contract cast + plugin-auth router exemplar)
++129|
++130|### Verification 6: Scope Discipline — ✅ PASS
++131|**Method:** Inspect plan.md scope boundaries + grep for out-of-scope 
+additions.
++132|
++133|**Result:**
++134|- streams/auth out of scope: no streams/auth files in S-b/S-c/S-d commits
++135|- Triggers feature-backing routes (#181 / 
+`TRIGGERS-CONNECTOR-DEFERRED-ROUTES`) NOT folded in: `grep -rn 
+"TRIGGERS-CONNECTOR-DEFERRED-ROUTES\|#181" packages/plugin-triggers-core/src 
+plugins/triggers/src` → exit 1 (zero matches)
++136|- Net-new triggers-core feature-backing routes not present
++137|
++138|## Remaining Risks
++139|
++140|All accepted per approved plan.md:
++141|
++142|- **R1 — D2 zero-compat surface break:** Mitigated by S-b.5 doc-fence 
+split. Accepted under alpha zero-compat policy (userland consumers documented in
+PR + arch-debt).
++143|- **R2 — `KvTriggerEventStore` name collision:** Resolved by S-c.5 rename 
+to `DenoKvTriggerEventStoreDouble`. Zero stale refs confirmed.
++144|- **R3 — KV-migration semantic drift:** Mitigated by dual-backend tests 
+(Deno-KV + `MemoryKvAdapter`). `@netscript/kv` `KvStore.atomic`/`list({prefix})`
+express required semantics (CAS + prefix scan).
++145|- **R4 — arch:check denominator:** Closed by commit `e999a9ea` (S5a-2). All
+13 roots FAIL=0 confirmed live.
++146|- **R5 — lock churn:** Expected workspace-dep addition (`@netscript/kv`, 
+`@netscript/cron`, `@netscript/watchers`). No hand-edit. Delta reported in 
+worklog.
++147|
++148|**No blocking residual risks. Ready to merge into 
+`feat/scaffold-surface-167` for #173 adversarial E2E + IMPL-EVAL.**
++149|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: IMPL-EVAL complete: PASS verdict for PR #172
+
+Reasoning:
+The user wants me to stop after writing the summary file. I've completed the 
+IMPL-EVAL evaluation, written the evaluate.md file, posted the PR comment, and 
+now written the summary.md file. I should call the finish tool to complete the 
+task.
+
+
+Finish with message:
+IMPL-EVAL evaluation complete for PR #172 adapter relocation + `@netscript/kv` 
+migration.
+
+**Verdict: ✅ PASS** — All six verification categories satisfied:
+
+1. **KV migration soundness (R3):** Production stores use `@netscript/kv` 
+exclusively with zero `Deno.openKv`/`Deno.Kv` escape hatches. 
+Optimistic-concurrency + idempotency + prefix-scan semantics preserved. 
+Dual-backend tests (Deno-KV + MemoryKvAdapter) prove engine-agnostic behavior.
+
+2. **Relocation correctness:** Four store/adapter sets landed in correct 
+`-core/{stores,adapters}` folders. Connectors import from 
+`@netscript/plugin-<kind>-core` — no connector→core leak, no shim, zero-compat 
+per D4.
+
+3. **S-b.5 / S-c.5 fence + rename:** Single `durable-sagas.md` fence split 
+correctly. Triggers test-double renamed to `DenoKvTriggerEventStoreDouble` with 
+zero stale refs.
+
+4. **Gate change `36d44f7c` soundness:** `check-doctrine.ts` only — corrected 
+auth contract-cast allow-list regex, exempted test paths. Production auth source
+remains fully gated; no auth production/test files modified.
+
+5. **Gates green:** `deno task arch:check` EXIT=0 with all 13 roots FAIL=0. 
+Scoped check/lint/fmt passed. `deno test --unstable-kv` passed (sagas: 75, 
+triggers: 32, workers: 45). Dry-runs warning-only. No `deno.lock` hand-edit; 
+zero new production `any`/casts.
+
+6. **Scope discipline:** No creep beyond relocation + KV migration + 
+gate-unblock. Triggers feature-backing routes (#181) NOT folded in.
+
+**Deliverables:**
+- Evaluation: 
+`.llm/tmp/run/feat-scaffold-surface-167--adapter-relocation/evaluate.md`
+- PR comment: 
+https://github.com/rickylabs/netscript/pull/172#issuecomment-4839377288
+- Summary: `/home/runner/work/_temp/openhands/28416306379-1/summary.md`
+
+Ready to merge into `feat/scaffold-surface-167` for #173 adversarial E2E + 
+IMPL-EVAL.
+
+Tokens: ↑ input 1.62M • cache hit 83.19% •  reasoning 3.77K • ↓ output 20.36K • 
+$ 0.7531
+

@@ -1,4 +1,5 @@
 import { assertEquals } from 'jsr:@std/assert@^1';
+import { resetKv } from '@netscript/kv';
 
 import type {
   SagaCorrelationKey,
@@ -65,9 +66,11 @@ type EnvFixture = AsyncDisposable;
 async function withSagaKvPath(): Promise<EnvFixture> {
   const previous = Deno.env.get('NETSCRIPT_SAGA_KV_PATH');
   const path = await Deno.makeTempFile({ prefix: 'netscript-sagas-', suffix: '.kv' });
+  await resetKv();
   Deno.env.set('NETSCRIPT_SAGA_KV_PATH', path);
   return {
     async [Symbol.asyncDispose](): Promise<void> {
+      await resetKv();
       if (previous === undefined) {
         Deno.env.delete('NETSCRIPT_SAGA_KV_PATH');
       } else {

@@ -61,3 +61,33 @@ Deno.test('DurableStreamProducer close completes after an aborted connection', a
     }
   }
 });
+
+Deno.test('DurableStreamProducer drops writes when streams URL is unavailable', async () => {
+  const previousUrl = Deno.env.get('DURABLE_STREAMS_URL');
+  const previousServiceUrl = Deno.env.get('services__streams__http__0');
+  Deno.env.delete('DURABLE_STREAMS_URL');
+  Deno.env.delete('services__streams__http__0');
+
+  try {
+    const producer = new DurableStreamProducer({
+      streamPath: '/missing-url',
+      schema: createStreamTopicFixture(),
+      producerId: 'missing-url-producer',
+    });
+
+    producer.upsert('execution', { id: 'dropped' });
+    await producer.close();
+    assertEquals(producer.closed, true);
+  } finally {
+    if (previousUrl === undefined) {
+      Deno.env.delete('DURABLE_STREAMS_URL');
+    } else {
+      Deno.env.set('DURABLE_STREAMS_URL', previousUrl);
+    }
+    if (previousServiceUrl === undefined) {
+      Deno.env.delete('services__streams__http__0');
+    } else {
+      Deno.env.set('services__streams__http__0', previousServiceUrl);
+    }
+  }
+});

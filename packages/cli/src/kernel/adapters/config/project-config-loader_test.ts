@@ -1,9 +1,15 @@
 import { assertEquals, assertRejects } from 'jsr:@std/assert@^1';
-import { join, resolve } from '@std/path';
+import { dirname, fromFileUrl, join, resolve } from '@std/path';
 import { toFileUrl } from '@std/path/to-file-url';
 
 import type { ProcessPort, ProcessResult } from '../../ports/process-port.ts';
 import { createProjectConfigLoader, loadProjectConfig } from './project-config-loader.ts';
+
+const REPO_ROOT = resolve(dirname(fromFileUrl(import.meta.url)), '../../../../../..');
+
+function repoPath(path: string): string {
+  return join(REPO_ROOT, path);
+}
 
 Deno.test('loadProjectConfig runs the child loader under the project deno.json', async () => {
   const projectRoot = await createProject({
@@ -84,7 +90,7 @@ async function createProject(options?: {
     join(projectRoot, 'deno.json'),
     JSON.stringify({
       imports: {
-        '@netscript/config': toFileUrl(resolve('packages/config/mod.ts')).href,
+        '@netscript/config': toFileUrl(repoPath('packages/config/mod.ts')).href,
       },
     }),
   );
@@ -101,9 +107,7 @@ async function createProject(options?: {
 
 function childLoaderSpecifier(): string {
   return toFileUrl(
-    resolve(
-      'packages/cli/src/kernel/adapters/config/project-config-loader-child.ts',
-    ),
+    repoPath('packages/cli/src/kernel/adapters/config/project-config-loader-child.ts'),
   )
     .href;
 }

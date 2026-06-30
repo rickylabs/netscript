@@ -34,6 +34,7 @@ import type {
   ServiceApp,
   ServiceHandler,
   ServiceMiddleware,
+  ServiceRouteMethod,
   ServiceRouter,
   ShutdownHook,
 } from '../types.ts';
@@ -42,7 +43,7 @@ import { type RpcWiringOptions, wireRpc } from './service-rpc.ts';
 import { startServiceListener } from './service-listener.ts';
 
 interface DeferredRoute {
-  readonly method: 'get' | 'post' | 'put' | 'delete' | 'patch';
+  readonly method: ServiceRouteMethod;
   readonly path: string;
   readonly handler: ServiceHandler;
 }
@@ -383,7 +384,7 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
    * @param handler - Route handler
    */
   route(
-    method: 'get' | 'post' | 'put' | 'delete' | 'patch',
+    method: ServiceRouteMethod,
     path: string,
     handler: ServiceHandler,
   ): ServiceBuilder<TRouter> {
@@ -480,7 +481,11 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
     }
 
     for (const route of this.deferredRoutes) {
-      this.app[route.method](route.path, route.handler);
+      if (route.method === 'all') {
+        this.app.all(route.path, route.handler);
+      } else {
+        this.app[route.method](route.path, route.handler);
+      }
     }
   }
 

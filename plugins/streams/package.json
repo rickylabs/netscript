@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@durable-streams/client": "catalog:",
-    "@durable-streams/server": "catalog:"
+    "@durable-streams/server": "catalog:",
+    "@orpc/server": "catalog:"
   }
 }

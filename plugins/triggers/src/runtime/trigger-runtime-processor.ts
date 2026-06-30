@@ -15,18 +15,19 @@ import type {
   TriggerProcessResult,
 } from '@netscript/plugin-triggers-core/ports';
 import { createTriggerProcessor } from '@netscript/plugin-triggers-core/runtime';
-import { TriggerSpanNames } from '@netscript/plugin-triggers-core/telemetry';
-import { traceJobDispatch } from '@netscript/telemetry/instrumentation';
-import { getTracer, withSpan } from '@netscript/telemetry/tracer';
 import {
   KvTriggerDlqStore,
   KvTriggerIdempotencyStore,
   openTriggerRuntimeKv,
-} from './kv-trigger-runtime-stores.ts';
+} from '@netscript/plugin-triggers-core/stores';
+import type { KvStore } from '@netscript/kv';
+import { TriggerSpanNames } from '@netscript/plugin-triggers-core/telemetry';
+import { traceJobDispatch } from '@netscript/telemetry/instrumentation';
+import { getTracer, withSpan } from '@netscript/telemetry/tracer';
 
 /** Options for constructing the plugin trigger processor runtime. */
 export type RuntimeTriggerProcessorOptions = Readonly<{
-  kv?: Deno.Kv;
+  kv?: KvStore;
   idempotency?: TriggerIdempotencyPort;
   dlq?: TriggerDlqPort;
   jobQueue?: ReturnType<typeof createQueue<JobMessage>>;
@@ -40,14 +41,21 @@ export async function createRuntimeTriggerProcessor(
   const kv = needsKv ? options.kv ?? await openTriggerRuntimeKv() : options.kv;
   const queue = options.jobQueue ?? createQueue<JobMessage>('jobs');
   const processor = createTriggerProcessor({
-    idempotency: options.idempotency ?? new KvTriggerIdempotencyStore({ kv: kv as Deno.Kv }),
-    dlq: options.dlq ?? new KvTriggerDlqStore({ kv: kv as Deno.Kv }),
+    idempotency: options.idempotency ?? new KvTriggerIdempotencyStore({ kv: requireKv(kv) }),
+    dlq: options.dlq ?? new KvTriggerDlqStore({ kv: requireKv(kv) }),
     dispatchAction: async (action, event, definition) => {
       await dispatchTriggerAction(action, event, definition, queue);
     },
   });
 
   return new TracedTriggerProcessor(processor);
+}
+
+function requireKv(kv: KvStore | undefined): KvStore {
+  if (kv === undefined) {
+    throw new Error('Trigger runtime KV is required to construct default stores.');
+  }
+  return kv;
 }
 
 class TracedTriggerProcessor implements TriggerProcessorPort {

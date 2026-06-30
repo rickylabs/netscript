@@ -102,7 +102,7 @@ Regenerates Aspire helper files from service configuration.
 
 ## Plugins
 
-### `netscript plugin add`
+### `netscript plugin install`
 
 Adds a plugin package and updates workspace plugin registration.
 
@@ -172,14 +172,14 @@ deno run -A packages/cli/bin/netscript-dev.ts init full-test \
 Then add the first-party plugins with the same cwd-sensitive shape as the E2E runtime suite:
 
 ```powershell
-deno run -A packages/cli/bin/netscript-dev.ts plugin add worker --name workers --project-root scaffold/full-test --samples --force
+deno run -A packages/cli/bin/netscript-dev.ts plugin install worker --name workers --project-root scaffold/full-test --samples --force
 
 Push-Location scaffold/full-test
-deno run -A packages/cli/bin/netscript-dev.ts plugin add saga --name sagas --project-root . --samples --force
-deno run -A ..\..\packages\cli\bin\netscript-dev.ts plugin add trigger --name triggers --project-root . --samples --force
+deno run -A packages/cli/bin/netscript-dev.ts plugin install saga --name sagas --project-root . --samples --force
+deno run -A ..\..\packages\cli\bin\netscript-dev.ts plugin install trigger --name triggers --project-root . --samples --force
 Pop-Location
 
-deno run -A packages/cli/bin/netscript-dev.ts plugin add stream --name streams --project-root scaffold/full-test --samples --force
+deno run -A packages/cli/bin/netscript-dev.ts plugin install stream --name streams --project-root scaffold/full-test --samples --force
 
 deno run -A packages/cli/bin/netscript-dev.ts plugin list --project-root scaffold/full-test
 ```

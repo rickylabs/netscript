@@ -1,18 +1,11 @@
 /** @module @netscript/plugin-triggers/runtime */
 
-export { CronTriggerSchedulerAdapter } from './cron-trigger-scheduler-adapter.ts';
-export {
-  KvTriggerDlqStore,
-  KvTriggerEventStore,
-  KvTriggerIdempotencyStore,
-  openTriggerRuntimeKv,
-} from './kv-trigger-runtime-stores.ts';
 export {
   defaultRegistryModule,
   loadProjectTriggerDefinitions,
 } from './project-trigger-registry.ts';
 export { createRuntimeTriggerProcessor } from './trigger-runtime-processor.ts';
-export { WatchersFileWatcherAdapter } from './watchers-file-watcher-adapter.ts';
+export { startCombinedProcess, startTriggerProcessorRuntime } from './trigger-processor.ts';
 export {
   TRIGGER_ACTION_KINDS,
   TRIGGER_BACKFILL_POLICIES,
@@ -22,16 +15,6 @@ export {
   TRIGGER_RESERVED_KINDS,
   TRIGGER_RUNTIME_KINDS,
 } from '@netscript/plugin-triggers-core/domain';
-export type {
-  CronTriggerErrorContext,
-  CronTriggerSchedulerAdapterOptions,
-  RuntimeCronJobContext,
-  RuntimeCronProvider,
-  RuntimeCronScheduledJob,
-  RuntimeCronScheduler,
-  RuntimeCronSchedulerOptions,
-  ScheduledHandler,
-} from './cron-trigger-scheduler-adapter.ts';
 export type {
   CronExpression,
   DeferAction,
@@ -98,14 +81,5 @@ export type {
   TriggerSchedulerPort,
   TriggerSchedulerStopOptions,
 } from '@netscript/plugin-triggers-core/ports';
-export type { TriggerRuntimeKvStoreOptions } from './kv-trigger-runtime-stores.ts';
 export type { RuntimeTriggerProcessorOptions } from './trigger-runtime-processor.ts';
 export type { TriggerProcessorRuntimeOptions } from './trigger-processor.ts';
-export type {
-  FileWatchHandler,
-  RuntimeWatcherOptions,
-  RuntimeWatchEvent,
-  RuntimeWatchFileInfo,
-  WatcherInstance,
-  WatchersFileWatcherAdapterOptions,
-} from './watchers-file-watcher-adapter.ts';

@@ -4,9 +4,9 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The saga-authoring core for NetScript: a fluent DSL for defining durable, multi-step workflows
-plus the runtime ports, native engine, and deterministic testing primitives the
-`@netscript/plugin-sagas` plugin composes into a host application.**
+**The reusable saga primitives for NetScript: a fluent DSL for defining durable, multi-step
+workflows plus the runtime ports, native engine, transports, and deterministic testing primitives —
+the core that the deployable `@netscript/plugin-sagas` plugin binds to the host.**
 
 ---
 
@@ -71,6 +71,14 @@ await runtime.start();
 - **Pluggable runtime ports**: `SagaStorePort`, `SagaBusPort`, `SagaClockPort`,
   `SagaIdempotencyPort`, and `SagaAppliedKeyStore` are the durability seams — swap the in-memory
   defaults for durable backends in production.
+- **Durable transports + stores**: `./transports` ships Redis Streams
+  (`createNetScriptRedisTransport`) and Garnet LIST (`createGarnetListTransport`) delivery adapters;
+  `./stores` re-exports the store port behind a stable role-named subpath so external persistent
+  stores stay out of the root barrel.
+- **HTTP + worker integration**: `./middleware` exposes Hono saga middleware
+  (`createSagaMiddleware`, `createSSEEventsMiddleware`); `./integration/workers` trips saga cascades
+  into worker jobs and tasks (`triggerJob`, `triggerTask`); `./integration/publisher` defines the
+  `SagaPublisherPort` boundary; `./agent` reserves a `defineAgent` authoring surface.
 - **Deterministic testing surface**: the `./testing` subpath ships in-memory stores, a controllable
   clock, and a runtime helper for unit-testing saga logic without external infrastructure.
 

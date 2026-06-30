@@ -1,5 +1,0 @@
-import json
-import sys
-
-payload = json.loads(sys.stdin.read() or "{}")
-print(json.dumps({"taskId": "{{id}}", "payload": payload}))

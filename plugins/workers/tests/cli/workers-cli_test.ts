@@ -38,7 +38,7 @@ Deno.test('WorkersCli exposes the workers command registry', async () => {
   assertEquals(cli.description, 'Background Workers plugin CLI.');
   assertEquals(commands.map((command) => command.name), [...WORKERS_CLI_COMMANDS]);
 
-  const addJob = await cli.run({
+  const addJob = await runWorkersCommand(cli, {
     command: 'add-job',
     values: ['nightly-report'],
     flags: { topic: 'workers.jobs' },
@@ -52,7 +52,7 @@ Deno.test('WorkersCli exposes the workers command registry', async () => {
   });
   assertEquals(backend.handled.map((definition) => definition.name), ['add-job']);
 
-  const missing = await cli.run({ command: 'missing-command' });
+  const missing = await runWorkersCommand(cli, { command: 'missing-command' });
   assertEquals(missing.code, 1);
 });
 
@@ -60,3 +60,13 @@ Deno.test('workersCli composition root provides the default CLI instance', () =>
   assertEquals(workersCli.name, 'workers');
   assertEquals(workersCli.commands().map((command) => command.name), [...WORKERS_CLI_COMMANDS]);
 });
+
+async function runWorkersCommand(
+  cli: WorkersCli,
+  args: PluginCliArgs,
+): Promise<PluginCliResult> {
+  const command = cli.commands().find((item) => item.name === args.command);
+  return command
+    ? await command.run(args)
+    : { code: 1, message: `Unknown workers command: ${args.command}` };
+}

@@ -74,6 +74,13 @@ export async function startSagaRunner(
   return supervisor;
 }
 
+/** Start the saga runtime process and return its supervisor. */
+export async function startSagaRuntime(
+  options: StartSagaRunnerOptions = {},
+): Promise<SagaRuntimeSupervisor> {
+  return await startSagaRunner(options);
+}
+
 /** Run the saga runner until a shutdown signal is received. */
 export async function runSagaRunner(
   options: RunSagaRunnerOptions = {},

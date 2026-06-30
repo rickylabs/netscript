@@ -4,7 +4,7 @@ import type {
   SagasCliCategory,
   SagasCliCommandDefinition,
 } from './command-types.ts';
-import { LocalSagasCliBackend } from './sagas-cli-backend.ts';
+import { LocalSagasRuntimeBackend } from './local-runtime-backend.ts';
 
 /** Static backend for mounted command metadata tests. */
 export class StaticSagasCliBackend implements SagasCliBackend {
@@ -38,7 +38,7 @@ export class SagasCliCommand {
   /** Create a sagas CLI command with optional backend injection. */
   protected constructor(
     definition: SagasCliCommandDefinition,
-    backend: SagasCliBackend = new LocalSagasCliBackend(),
+    backend: SagasCliBackend = new LocalSagasRuntimeBackend(),
   ) {
     this.definition = definition;
     this.category = definition.category;
@@ -65,6 +65,26 @@ export class SagasCliCommand {
       description: this.definition.description,
       run: (args) => this.run(args),
     };
+  }
+}
+
+/** Create a saga definition and config entry. */
+export class AddSagaCommand extends SagasCliCommand {
+  /** Create the saga scaffolding command wrapper. */
+  constructor(backend?: SagasCliBackend) {
+    super({
+      name: 'add-saga',
+      category: 'scaffolding',
+      description: 'Create a saga definition and config entry.',
+      usage: 'ns-sagas add saga <id> [--topic=<topic> --durability=t1]',
+      flags: [
+        { name: 'topic', description: 'Queue or stream topic for the generated config.' },
+        { name: 'durability', description: 'Saga durability tier.' },
+        { name: 'message-type', description: 'Message type handled by the generated saga.' },
+        { name: 'description', description: 'Human-readable saga description.' },
+        { name: 'tags', description: 'Comma-separated config tags.' },
+      ],
+    }, backend);
   }
 }
 

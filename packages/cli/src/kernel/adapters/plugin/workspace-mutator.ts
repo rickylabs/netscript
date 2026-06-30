@@ -1,9 +1,10 @@
-import { join } from '@std/path';
+import { fromFileUrl, join, relative } from '@std/path';
 import type { BackgroundProcessorEntry, CacheEntry, PluginEntry } from '@netscript/aspire/types';
 import { addWorkspaceMember } from '../scaffold/workspace-writer.ts';
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
 import { SCAFFOLD_PACKAGES } from '../../constants/scaffold/scaffold-packages.ts';
+import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
 import { ScaffoldValidationError } from '../../domain/errors.ts';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import type {
@@ -67,11 +68,13 @@ const PLUGIN_KIND_ROOT_IMPORTS: Readonly<Record<string, readonly string[]>> = {
     SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_TESTING,
   ],
   saga: [
+    SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_SAGAS_RUNTIME,
     SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_SAGAS_CORE,
     SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_SAGAS_CORE_DOMAIN,
   ],
   stream: [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN],
   trigger: [
+    SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_RUNTIME,
     SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_CORE,
     SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_CORE_ADAPTERS,
     SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_CORE_BUILDERS,
@@ -84,11 +87,160 @@ const PLUGIN_KIND_ROOT_IMPORTS: Readonly<Record<string, readonly string[]>> = {
     SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS_RUNTIME,
   ],
   worker: [
+    SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_WORKERS_RUNTIME,
     SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS,
     SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS_RUNTIME,
     SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS_SCHEMAS,
   ],
 };
+
+const PLUGIN_SERVICE_BOOTSTRAP_IMPORTS: readonly string[] = [
+  SCAFFOLD_PACKAGES.NETSCRIPT_CONTRACTS,
+  SCAFFOLD_PACKAGES.NETSCRIPT_KV,
+  SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN,
+];
+
+const PLUGIN_SERVICE_SOURCE_IMPORTS: Readonly<Record<string, string>> = {
+  '@durable-streams/client': 'npm:@durable-streams/client@^0.2.6',
+  '@durable-streams/server': 'npm:@durable-streams/server@^0.3.7',
+  '@durable-streams/state': 'npm:@durable-streams/state@^0.3.1',
+  '@durable-streams/state/db': 'npm:@durable-streams/state@^0.3.1/db',
+  '@netscript/cron': netscriptJsrSpecifier('cron'),
+  '@netscript/kv/kvdex': netscriptJsrSpecifier('kv', '/kvdex'),
+  '@netscript/plugin/contract-base': netscriptJsrSpecifier('plugin', '/contract-base'),
+  '@netscript/plugin/loader': netscriptJsrSpecifier('plugin', '/loader'),
+  '@netscript/plugin/sdk': netscriptJsrSpecifier('plugin', '/sdk'),
+  '@netscript/plugin/service': netscriptJsrSpecifier('plugin', '/service'),
+  '@netscript/plugin-auth-core/config': netscriptJsrSpecifier('plugin-auth-core', '/config'),
+  '@netscript/plugin-auth-core/contracts/v1': netscriptJsrSpecifier(
+    'plugin-auth-core',
+    '/contracts/v1',
+  ),
+  '@netscript/plugin-auth-core/domain': netscriptJsrSpecifier('plugin-auth-core', '/domain'),
+  '@netscript/plugin-auth-core/ports': netscriptJsrSpecifier('plugin-auth-core', '/ports'),
+  '@netscript/plugin-auth-core/streams': netscriptJsrSpecifier('plugin-auth-core', '/streams'),
+  '@netscript/plugin-auth-core/telemetry': netscriptJsrSpecifier('plugin-auth-core', '/telemetry'),
+  '@netscript/plugin-sagas-core/contracts/v1': netscriptJsrSpecifier(
+    'plugin-sagas-core',
+    '/contracts/v1',
+  ),
+  '@netscript/plugin-sagas-core/domain': netscriptJsrSpecifier('plugin-sagas-core', '/domain'),
+  '@netscript/plugin-sagas-core/integration/publisher': netscriptJsrSpecifier(
+    'plugin-sagas-core',
+    '/integration/publisher',
+  ),
+  '@netscript/plugin-sagas-core/runtime': netscriptJsrSpecifier('plugin-sagas-core', '/runtime'),
+  '@netscript/plugin-sagas-core/stores': netscriptJsrSpecifier('plugin-sagas-core', '/stores'),
+  '@netscript/plugin-sagas-core/streams': netscriptJsrSpecifier('plugin-sagas-core', '/streams'),
+  '@netscript/plugin-streams-core': netscriptJsrSpecifier('plugin-streams-core'),
+  '@netscript/plugin-triggers-core/adapters': netscriptJsrSpecifier(
+    'plugin-triggers-core',
+    '/adapters',
+  ),
+  '@netscript/plugin-triggers-core/builders': netscriptJsrSpecifier(
+    'plugin-triggers-core',
+    '/builders',
+  ),
+  '@netscript/plugin-triggers-core/config': netscriptJsrSpecifier(
+    'plugin-triggers-core',
+    '/config',
+  ),
+  '@netscript/plugin-triggers-core/contracts/v1': netscriptJsrSpecifier(
+    'plugin-triggers-core',
+    '/contracts/v1',
+  ),
+  '@netscript/plugin-triggers-core/domain': netscriptJsrSpecifier(
+    'plugin-triggers-core',
+    '/domain',
+  ),
+  '@netscript/plugin-triggers-core/ports': netscriptJsrSpecifier(
+    'plugin-triggers-core',
+    '/ports',
+  ),
+  '@netscript/plugin-triggers-core/runtime': netscriptJsrSpecifier(
+    'plugin-triggers-core',
+    '/runtime',
+  ),
+  '@netscript/plugin-triggers-core/stores': netscriptJsrSpecifier(
+    'plugin-triggers-core',
+    '/stores',
+  ),
+  '@netscript/plugin-triggers-core/telemetry': netscriptJsrSpecifier(
+    'plugin-triggers-core',
+    '/telemetry',
+  ),
+  '@netscript/plugin-workers-core/executor': netscriptJsrSpecifier(
+    'plugin-workers-core',
+    '/executor',
+  ),
+  '@netscript/plugin-workers-core/registry': netscriptJsrSpecifier(
+    'plugin-workers-core',
+    '/registry',
+  ),
+  '@netscript/plugin-workers-core/runtime': netscriptJsrSpecifier(
+    'plugin-workers-core',
+    '/runtime',
+  ),
+  '@netscript/plugin-workers-core/schemas': netscriptJsrSpecifier(
+    'plugin-workers-core',
+    '/schemas',
+  ),
+  '@netscript/plugin-workers-core/state': netscriptJsrSpecifier('plugin-workers-core', '/state'),
+  '@netscript/plugin-workers-core/stores': netscriptJsrSpecifier('plugin-workers-core', '/stores'),
+  '@netscript/plugin-workers-core/streams': netscriptJsrSpecifier(
+    'plugin-workers-core',
+    '/streams',
+  ),
+  '@netscript/queue': netscriptJsrSpecifier('queue'),
+  '@netscript/service': netscriptJsrSpecifier('service'),
+  '@netscript/telemetry/attributes': netscriptJsrSpecifier('telemetry', '/attributes'),
+  '@netscript/telemetry/config': netscriptJsrSpecifier('telemetry', '/config'),
+  '@netscript/telemetry/context': netscriptJsrSpecifier('telemetry', '/context'),
+  '@netscript/telemetry/instrumentation': netscriptJsrSpecifier(
+    'telemetry',
+    '/instrumentation',
+  ),
+  '@netscript/telemetry/tracer': netscriptJsrSpecifier('telemetry', '/tracer'),
+  '@orpc/contract': 'npm:@orpc/contract@^1.14.6',
+  '@orpc/openapi': 'npm:@orpc/openapi@^1.14.6',
+  '@orpc/server': 'npm:@orpc/server@^1.14.6',
+  '@orpc/zod': 'npm:@orpc/zod@^1.14.6',
+  '@standard-schema/spec': 'jsr:@standard-schema/spec@1.1.0',
+  '@std/async': 'jsr:@std/async@^1',
+  '@std/net': 'jsr:@std/net@^1',
+  '@std/path': 'jsr:@std/path@^1',
+  '@workos-inc/node': 'npm:@workos-inc/node@^10.4.0',
+  'hono': 'jsr:@hono/hono@4.12.24',
+  'hono/cors': 'jsr:@hono/hono@4.12.24/cors',
+  'zod': 'jsr:@zod/zod@4.4.3',
+};
+
+const LOCAL_SOURCE_MARKER = join(SCAFFOLD_DIRS.PACKAGES, 'cli', SCAFFOLD_FILES.DENO_JSON);
+
+const OFFICIAL_PLUGIN_RUNTIME_LOCAL_PATHS: Readonly<Record<string, string>> = {
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_WORKERS_RUNTIME]: join(
+    'plugins',
+    'workers',
+    'bin',
+    'runtime.ts',
+  ),
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_SAGAS_RUNTIME]: join(
+    'plugins',
+    'sagas',
+    'src',
+    'runtime',
+    'mod.ts',
+  ),
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_RUNTIME]: join(
+    'plugins',
+    'triggers',
+    'src',
+    'runtime',
+    'mod.ts',
+  ),
+};
+
+const REPOSITORY_ROOT = fromFileUrl(new URL('../../../../../../', import.meta.url));
 
 /** Mutates root config files after scaffolding a plugin workspace. */
 export class PluginWorkspaceMutator {
@@ -181,7 +333,10 @@ export class PluginWorkspaceMutator {
       );
     }
 
-    const requiredSpecifiers = PLUGIN_KIND_ROOT_IMPORTS[pluginKind] ?? [];
+    const requiredSpecifiers = [
+      ...PLUGIN_SERVICE_BOOTSTRAP_IMPORTS,
+      ...(PLUGIN_KIND_ROOT_IMPORTS[pluginKind] ?? []),
+    ];
     if (requiredSpecifiers.length === 0) {
       return;
     }
@@ -189,10 +344,18 @@ export class PluginWorkspaceMutator {
     const raw = JSON.parse(await this.fs.readFile(denoJsonPath)) as WorkspaceDenoConfig;
     raw.imports ??= {};
     const resolvedImports = resolveNetScriptImports('jsr');
-    let changed = false;
+    const localRuntimeImports = await this.resolveLocalOfficialRuntimeImports(projectRoot);
+    const requiredImports: Record<string, string> = { ...PLUGIN_SERVICE_SOURCE_IMPORTS };
     for (const specifier of requiredSpecifiers) {
-      const target = resolvedImports[specifier];
-      if (target === undefined || raw.imports[specifier] === target) {
+      const target = localRuntimeImports[specifier] ?? resolvedImports[specifier];
+      if (target !== undefined) {
+        requiredImports[specifier] = target;
+      }
+    }
+
+    let changed = false;
+    for (const [specifier, target] of Object.entries(requiredImports)) {
+      if (raw.imports[specifier] === target) {
         continue;
       }
       raw.imports[specifier] = target;
@@ -202,6 +365,24 @@ export class PluginWorkspaceMutator {
     if (changed) {
       await this.fs.writeFile(denoJsonPath, JSON.stringify(raw, null, 2) + '\n');
     }
+  }
+
+  private async resolveLocalOfficialRuntimeImports(
+    projectRoot: string,
+  ): Promise<Readonly<Record<string, string>>> {
+    if (!await this.fs.exists(join(projectRoot, LOCAL_SOURCE_MARKER))) {
+      return {};
+    }
+
+    const imports: Record<string, string> = {};
+    for (const [specifier, sourcePath] of Object.entries(OFFICIAL_PLUGIN_RUNTIME_LOCAL_PATHS)) {
+      const absoluteSourcePath = join(REPOSITORY_ROOT, sourcePath);
+      if (!await this.fs.exists(absoluteSourcePath)) {
+        continue;
+      }
+      imports[specifier] = normalizeImportPath(relative(projectRoot, absoluteSourcePath));
+    }
+    return imports;
   }
 
   /** Add or replace a direct plugin appsettings entry. */
@@ -227,13 +408,20 @@ export class PluginWorkspaceMutator {
   }
 
   /** Ensure `netscript.config.ts` declares a project-local plugin module. */
-  async ensureNetScriptConfigPlugin(projectRoot: string, pluginName: string): Promise<boolean> {
+  async ensureNetScriptConfigPlugin(
+    projectRoot: string,
+    pluginName: string,
+    pluginDir?: string,
+  ): Promise<boolean> {
     const configPath = join(projectRoot, 'netscript.config.ts');
     if (!await this.fs.exists(configPath)) {
       return false;
     }
 
-    const specifier = `./${SCAFFOLD_DIRS.PLUGINS}/${pluginName}/mod.ts`;
+    const relativePluginDir = pluginDir
+      ? normalizeWorkspaceRelativePath(projectRoot, pluginDir)
+      : join(SCAFFOLD_DIRS.PLUGINS, pluginName);
+    const specifier = `./${normalizePath(join(relativePluginDir, 'mod.ts'))}`;
     const quotedSpecifier = `'${specifier}'`;
     const source = await this.fs.readFile(configPath);
     if (source.includes(quotedSpecifier) || source.includes(`"${specifier}"`)) {
@@ -312,5 +500,28 @@ export class PluginWorkspaceMutator {
     await this.fs.writeFile(configPath, JSON.stringify(raw, null, 2) + '\n');
     return !hadCache;
   }
+}
 
+function normalizeWorkspaceRelativePath(projectRoot: string, path: string): string {
+  const normalizedProjectRoot = normalizePath(projectRoot).replace(/\/+$/, '');
+  const normalizedPath = normalizePath(path);
+  if (normalizedPath === normalizedProjectRoot) {
+    return '.';
+  }
+  if (normalizedPath.startsWith(`${normalizedProjectRoot}/`)) {
+    return normalizedPath.slice(normalizedProjectRoot.length + 1);
+  }
+  return normalizedPath.replace(/^\.\/+/, '');
+}
+
+function normalizePath(path: string): string {
+  return path.replace(/\\/g, '/');
+}
+
+function normalizeImportPath(path: string): string {
+  const normalized = normalizePath(path);
+  if (normalized.startsWith('../') || normalized.startsWith('./') || normalized.startsWith('/')) {
+    return normalized;
+  }
+  return `./${normalized}`;
 }

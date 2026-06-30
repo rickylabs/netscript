@@ -1,11 +1,13 @@
-import { router } from './router-context.ts';
+import { router, type WorkersHandlers } from './router-context.ts';
 
 type JobRetentionConfig = Readonly<{
   archiveToDb: boolean;
   dbRetentionDays: number;
 }>;
 
-export const adminHandlers: Record<string, unknown> = {
+export const adminHandlers: WorkersHandlers<
+  'cleanup' | 'cleanupDbExecutions' | 'archiveExecutions' | 'seed'
+> = {
   cleanup: router.cleanup.handler(() => {
     return {
       deleted: [],

@@ -1,7 +1,9 @@
 {
   "dependencies": {
+    "@durable-streams/state": "catalog:",
     "@orpc/contract": "catalog:",
     "@orpc/server": "catalog:",
-    "@orpc/zod": "catalog:"
+    "@orpc/zod": "catalog:",
+    "@workos-inc/node": "catalog:"
   }
 }

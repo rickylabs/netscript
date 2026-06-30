@@ -6,7 +6,7 @@ import { createPluginListCommand } from '../../../public/features/plugins/list/l
 import { createRemovePluginCommand } from '../../../public/features/plugins/remove/remove-plugin-command.ts';
 import { createUpdatePluginCommand } from '../../../public/features/plugins/update/update-plugin-command.ts';
 import { type PublicCommandDependencies } from '../../../public/features/root/public-command-dependencies.ts';
-import { createLocalPluginAddCommand } from './add/add-local-plugin-command.ts';
+import { createLocalPluginInstallCommand } from './install/install-local-plugin-command.ts';
 
 /** Create the local contributor plugin command group. */
 export function createLocalPluginCommand(
@@ -20,20 +20,20 @@ export function createLocalPluginCommand(
       this.showHelp();
     })
     .command(
-      'add',
-      createLocalPluginAddCommand({
+      'install',
+      createLocalPluginInstallCommand({
         resolveProjectRoot: dependencies.resolveProjectRoot,
         sourceRootStartDir,
-        addPluginDependencies: {
+        installPluginDependencies: {
           fs: dependencies.fs,
           scaffolder: dependencies.scaffolder,
           templateAdapter: dependencies.templateAdapter,
           registry: dependencies.pluginRegistry,
-          pluginScaffolder: dependencies.pluginAddDependencies.pluginScaffolder,
-          registryScaffolder: dependencies.pluginAddDependencies.registryScaffolder,
-          workspaceMutator: dependencies.pluginAddDependencies.workspaceMutator,
+          pluginScaffolder: dependencies.pluginInstallDependencies.pluginScaffolder,
+          registryScaffolder: dependencies.pluginInstallDependencies.registryScaffolder,
+          workspaceMutator: dependencies.pluginInstallDependencies.workspaceMutator,
           processRunner: dependencies.process,
-          pluginValidator: dependencies.pluginAddDependencies.pluginValidator,
+          pluginValidator: dependencies.pluginInstallDependencies.pluginValidator,
           sourceRootStartDir,
         },
       }),

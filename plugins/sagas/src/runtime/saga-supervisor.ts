@@ -5,10 +5,13 @@ import {
   type SagaRuntime,
   type SagaRuntimeAdapter,
 } from '@netscript/plugin-sagas-core/runtime';
+import {
+  KvSagaAppliedKeyStore,
+  KvSagaIdempotencyStore,
+  openSagaRuntimeKv,
+} from '@netscript/plugin-sagas-core/stores';
 import { createSagaTelemetry } from '../telemetry/otel-saga-tracer.ts';
 import { createDurableSagaRuntime } from './create-durable-saga-runtime.ts';
-import { openSagaRuntimeKv } from './kv-saga-store.ts';
-import { KvSagaAppliedKeyStore, KvSagaIdempotencyStore } from './kv-saga-runtime-stores.ts';
 
 /** Lifecycle status exposed by the saga runtime supervisor. */
 export type SagaRuntimeSupervisorStatus =

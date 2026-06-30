@@ -1,10 +1,11 @@
 import { assert, assertEquals } from 'jsr:@std/assert@^1';
 import { inspectWorkers, workersPlugin } from '../../mod.ts';
 import { verifyWorkersPlugin } from '../../verify-plugin.ts';
+import denoJson from '../../deno.json' with { type: 'json' };
 
 Deno.test('workersPlugin manifest exposes service, processor, stream, contract, config, E2E, and Aspire axes', () => {
   assertEquals(workersPlugin.name, '@netscript/plugin-workers');
-  assertEquals(workersPlugin.version, '0.0.1-alpha.0');
+  assertEquals(workersPlugin.version, denoJson.version);
   assertEquals(workersPlugin['type'], 'background-processor');
 
   assert(workersPlugin.dependencies?.streams);
@@ -42,7 +43,7 @@ Deno.test('workersPlugin manifest exposes service, processor, stream, contract, 
 
   const inspection = inspectWorkers();
   assertEquals(inspection.name, '@netscript/plugin-workers');
-  assertEquals(inspection.version, '0.0.1-alpha.0');
+  assertEquals(inspection.version, denoJson.version);
   assertEquals(inspection.dependencies, ['streams']);
 
   const verification = verifyWorkersPlugin();

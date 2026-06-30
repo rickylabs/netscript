@@ -1,12 +1,7 @@
+import type { PluginE2eGate } from '@netscript/plugin';
+
 /** E2E gate definition for the streams plugin. */
-export interface StreamsE2eGate {
-  /** Stable gate identifier. */
-  readonly id: string;
-  /** Human-readable gate summary. */
-  readonly description: string;
-  /** Command used by the evaluator or CLI E2E runner. */
-  readonly command: readonly string[];
-}
+export type StreamsE2eGate = PluginE2eGate;
 
 const STREAMS_E2E_GATES: readonly StreamsE2eGate[] = [
   {

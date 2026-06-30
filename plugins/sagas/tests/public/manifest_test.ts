@@ -1,10 +1,11 @@
 import { assert, assertEquals } from 'jsr:@std/assert@^1';
 import { inspectSagas, sagasPlugin } from '../../mod.ts';
 import { verifySagasPlugin } from '../../verify-plugin.ts';
+import denoJson from '../../deno.json' with { type: 'json' };
 
 Deno.test('sagasPlugin manifest exposes dependencies, service, schema, contract, config, and Aspire axes', () => {
   assertEquals(sagasPlugin.name, '@netscript/plugin-sagas');
-  assertEquals(sagasPlugin.version, '0.1.0');
+  assertEquals(sagasPlugin.version, denoJson.version);
   assertEquals(sagasPlugin['type'], 'background-processor');
 
   assert(sagasPlugin.dependencies?.workers);
@@ -27,7 +28,7 @@ Deno.test('sagasPlugin manifest exposes dependencies, service, schema, contract,
 
   const inspection = inspectSagas();
   assertEquals(inspection.name, '@netscript/plugin-sagas');
-  assertEquals(inspection.version, '0.1.0');
+  assertEquals(inspection.version, denoJson.version);
   assertEquals(inspection.dependencies, ['workers', 'streams']);
 
   const verification = verifySagasPlugin();

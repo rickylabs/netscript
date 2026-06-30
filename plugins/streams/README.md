@@ -66,6 +66,9 @@ console.log(Object.keys(streamsPlugin.contributions)); // ["services", "contract
 - **Self-contained**: no database migrations and no KV requirement — the plugin runs as a standalone
   service utility.
 
+`@netscript/plugin-streams-core` provides the producer and schema primitives; this package wires the
+streams service into the host.
+
 ---
 
 ## 🧩 Install manifest

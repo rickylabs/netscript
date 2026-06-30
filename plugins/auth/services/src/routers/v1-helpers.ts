@@ -13,9 +13,9 @@ export function mapSession(session: AuthSession): AuthSessionResponse {
     providerId: session.providerId,
     state: session.state,
     subject: session.subject,
-    scopes: Object.freeze([...session.scopes]),
-    roles: Object.freeze([...session.roles]),
-    claims: Object.freeze({ ...session.claims }),
+    scopes: [...session.scopes],
+    roles: [...session.roles],
+    claims: { ...session.claims },
     issuedAt: session.issuedAt,
     expiresAt: session.expiresAt,
     refreshedAt: session.refreshedAt,
@@ -32,7 +32,7 @@ export function mapUserFromSession(session: AuthSession): AuthUserResponse {
     email: stringClaim(claims.email),
     emailVerified: booleanClaim(claims.emailVerified ?? claims.email_verified),
     imageUrl: stringClaim(claims.imageUrl ?? claims.picture),
-    claims,
+    claims: { ...claims },
   };
 }
 

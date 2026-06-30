@@ -19,7 +19,6 @@ export {
   SagaSSEEventTypeSchema,
 } from './sagas.contract.ts';
 export type {
-  ContractProcedureLike,
   ContractSchema,
   ContractSchemaResult,
   InstanceFilters,
@@ -29,9 +28,10 @@ export type {
   SagaFilters,
   SagaHistoryEntry,
   SagaInstanceResponse,
+  SagasCapabilities,
+  SagasContract,
   SagasContractDefinition,
   SagasContractV1,
-  SagasRouteHandler,
   SagasRouter,
   SagaSSEEvent,
   SagaSSEEventType,

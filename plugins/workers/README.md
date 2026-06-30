@@ -68,6 +68,8 @@ console.log(summary.axes); // ["services", "backgroundProcessors", "streamTopics
   with at-least-once delivery keyed on `idempotencyKey`.
 - **Durable streams + Aspire**: `./streams` exposes a StreamDB factory for execution and job
   entities; `./aspire` contributes `WorkersAspireContribution` to the AppHost.
+- **Versioned contract**: `./contracts` re-exports the workers API contract so generated registries
+  and consuming services bind against a single pinned surface.
 
 The reusable job/task/workflow definition builders and runtime composition live in
 `@netscript/plugin-workers-core`; this package binds them to the host.

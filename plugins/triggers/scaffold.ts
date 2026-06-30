@@ -1,13 +1,20 @@
-/**
- * Triggers plugin-owned scaffold CLI entrypoint.
+/** Triggers plugin adapter scaffold entrypoint.
  *
  * @module
  */
 
-export { scaffold } from './src/scaffold/mod.ts';
-export type { ScaffolderContext, ScaffoldResult } from './src/scaffold/mod.ts';
-import { runScaffoldCli } from './src/scaffold/mod.ts';
+import {
+  createPluginAdapter,
+  type PluginScaffoldEntrypoint,
+  runPluginScaffoldCli,
+} from '@netscript/plugin/adapter';
+import { triggersAdapterPlugin } from './src/adapter/plugin.ts';
+
+/** Triggers adapter scaffold entrypoint. */
+const scaffold: PluginScaffoldEntrypoint = createPluginAdapter(triggersAdapterPlugin).toScaffold();
+
+export default scaffold;
 
 if (import.meta.main) {
-  await runScaffoldCli();
+  await runPluginScaffoldCli(scaffold);
 }

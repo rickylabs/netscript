@@ -91,27 +91,31 @@ Deno.test('loadRegisteredPluginMetadata reads scaffold manifests without importi
   );
   await Deno.writeTextFile(
     resolve(pluginRoot, 'scaffold.plugin.json'),
-    JSON.stringify({
-      schemaVersion: 1,
-      provider: {
-        displayName: 'Background Worker',
-        defaultPermissions: ['--allow-read'],
-        defaultEntrypoint: 'bin/combined.ts',
-        defaultServiceEntrypoint: 'services/src/main.ts',
-        pluginType: 'background-processor',
-        infrastructureRequires: ['kv'],
-        infrastructureOptionalDeps: ['db'],
-        concurrencyEnvVar: 'WORKER_CONCURRENCY',
-        defaultConcurrency: 2,
+    JSON.stringify(
+      {
+        schemaVersion: 1,
+        provider: {
+          displayName: 'Background Worker',
+          defaultPermissions: ['--allow-read'],
+          defaultEntrypoint: 'bin/combined.ts',
+          defaultServiceEntrypoint: 'services/src/main.ts',
+          pluginType: 'background-processor',
+          infrastructureRequires: ['kv'],
+          infrastructureOptionalDeps: ['db'],
+          concurrencyEnvVar: 'WORKER_CONCURRENCY',
+          defaultConcurrency: 2,
+        },
+        officialSource: {
+          canonicalName: 'workers',
+          pluginDir: 'workers',
+          serviceEntrypoint: 'services/src/main.ts',
+          servicePort: 8091,
+          permissions: ['--allow-read'],
+        },
       },
-      officialSource: {
-        canonicalName: 'workers',
-        pluginDir: 'workers',
-        serviceEntrypoint: 'services/src/main.ts',
-        servicePort: 8091,
-        permissions: ['--allow-read'],
-      },
-    }, null, 2),
+      null,
+      2,
+    ),
   );
 
   const config = await loadConfig({ cwd: projectRoot });
@@ -123,6 +127,35 @@ Deno.test('loadRegisteredPluginMetadata reads scaffold manifests without importi
 
   if (plugins.workers.infrastructure?.requires.join(',') !== 'kv') {
     throw new Error('Expected scaffold manifest infrastructure metadata to be normalized');
+  }
+});
+
+Deno.test('loadRegisteredPluginMetadata falls back when userland scaffold manifest is absent', async () => {
+  const projectRoot = await Deno.makeTempDir();
+  const pluginRoot = resolve(projectRoot, 'workers');
+  await Deno.mkdir(pluginRoot, { recursive: true });
+  await Deno.writeTextFile(
+    resolve(projectRoot, 'netscript.config.ts'),
+    `export default {
+  name: 'fixture-app',
+  databases: { config: [] },
+  plugins: ['./workers/mod.ts'],
+};
+`,
+  );
+  await Deno.writeTextFile(resolve(pluginRoot, 'mod.ts'), `export const jobs = [];\n`);
+
+  const config = await loadConfig({ cwd: projectRoot });
+  const plugins = await loadRegisteredPluginMetadata(projectRoot, config);
+
+  if (plugins.workers?.name !== 'workers') {
+    throw new Error('Expected workers metadata fallback to be derived from the registered spec');
+  }
+
+  if (plugins.workers.workdir !== 'workers') {
+    throw new Error(
+      `Expected workers fallback workdir to be workers, got ${plugins.workers.workdir}`,
+    );
   }
 });
 

@@ -100,6 +100,7 @@
     "npm:@orpc/client@^1.14.6": "1.14.6_@opentelemetry+api@1.9.1",
     "npm:@orpc/contract@^1.14.6": "1.14.6_@opentelemetry+api@1.9.1",
     "npm:@orpc/openapi@^1.14.6": "1.14.6_@opentelemetry+api@1.9.1",
+    "npm:@orpc/server@*": "1.14.6_@opentelemetry+api@1.9.1",
     "npm:@orpc/server@^1.14.6": "1.14.6_@opentelemetry+api@1.9.1",
     "npm:@orpc/tanstack-query@1.14.6": "1.14.6_@orpc+client@1.14.6__@opentelemetry+api@1.9.1_@tanstack+query-core@5.101.0",
     "npm:@orpc/tanstack-query@^1.14.6": "1.14.6_@orpc+client@1.14.6__@opentelemetry+api@1.9.1_@tanstack+query-core@5.101.0",
@@ -3139,10 +3140,14 @@
       },
       "packages/plugin": {
         "dependencies": [
+          "jsr:@netscript/contracts@0.0.1-alpha.12",
+          "jsr:@netscript/service@0.0.1-alpha.12",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
           "jsr:@std/path@1",
-          "jsr:@zod/zod@4.4.3"
+          "jsr:@zod/zod@4.4.3",
+          "npm:@orpc/contract@^1.14.6",
+          "npm:@orpc/server@^1.14.6"
         ]
       },
       "packages/plugin-auth-core": {
@@ -3156,6 +3161,7 @@
       "packages/plugin-sagas-core": {
         "dependencies": [
           "jsr:@hono/hono@4.12.24",
+          "jsr:@netscript/kv@0.0.1-alpha.12",
           "jsr:@std/assert@1",
           "jsr:@zod/zod@4.4.3"
         ],
@@ -3181,6 +3187,9 @@
       },
       "packages/plugin-triggers-core": {
         "dependencies": [
+          "jsr:@netscript/cron@0.0.1-alpha.12",
+          "jsr:@netscript/kv@0.0.1-alpha.12",
+          "jsr:@netscript/watchers@0.0.1-alpha.12",
           "jsr:@std/assert@1",
           "jsr:@zod/zod@4.4.3"
         ],
@@ -3194,10 +3203,14 @@
       "packages/plugin-workers-core": {
         "dependencies": [
           "jsr:@david/dax@0.48",
+          "jsr:@netscript/kv@0.0.1-alpha.12",
+          "jsr:@netscript/plugin@0.0.1-alpha.12",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
           "jsr:@std/path@1",
-          "jsr:@zod/zod@4.4.3"
+          "jsr:@zod/zod@4.4.3",
+          "npm:@orpc/contract@^1.14.6",
+          "npm:@orpc/server@^1.14.6"
         ],
         "packageJson": {
           "dependencies": [
@@ -3304,17 +3317,15 @@
           "jsr:@netscript/plugin@0.0.1-alpha.12",
           "jsr:@netscript/service@0.0.1-alpha.12",
           "jsr:@netscript/telemetry@0.0.1-alpha.12",
-          "jsr:@zod/zod@4.4.3",
-          "npm:@durable-streams/state@~0.3.1",
-          "npm:@orpc/contract@^1.14.6",
-          "npm:@orpc/server@^1.14.6",
-          "npm:@workos-inc/node@^10.4.0"
+          "jsr:@zod/zod@4.4.3"
         ],
         "packageJson": {
           "dependencies": [
+            "npm:@durable-streams/state@~0.3.1",
             "npm:@orpc/contract@^1.14.6",
             "npm:@orpc/server@^1.14.6",
-            "npm:@orpc/zod@^1.14.6"
+            "npm:@orpc/zod@^1.14.6",
+            "npm:@workos-inc/node@^10.4.0"
           ]
         }
       },
@@ -3329,10 +3340,7 @@
           "jsr:@netscript/service@0.0.1-alpha.12",
           "jsr:@netscript/telemetry@0.0.1-alpha.12",
           "jsr:@std/async@1",
-          "jsr:@zod/zod@4.4.3",
-          "npm:@durable-streams/state@~0.3.1",
-          "npm:@orpc/contract@^1.14.6",
-          "npm:@orpc/server@^1.14.6"
+          "jsr:@zod/zod@4.4.3"
         ],
         "packageJson": {
           "dependencies": [
@@ -3356,15 +3364,13 @@
           "jsr:@netscript/service@0.0.1-alpha.12",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/net@1",
-          "jsr:@zod/zod@4.4.3",
-          "npm:@durable-streams/client@~0.2.6",
-          "npm:@durable-streams/server@~0.3.7",
-          "npm:@orpc/server@^1.14.6"
+          "jsr:@zod/zod@4.4.3"
         ],
         "packageJson": {
           "dependencies": [
             "npm:@durable-streams/client@~0.2.6",
-            "npm:@durable-streams/server@~0.3.7"
+            "npm:@durable-streams/server@~0.3.7",
+            "npm:@orpc/server@^1.14.6"
           ]
         }
       },
@@ -3381,8 +3387,7 @@
           "jsr:@netscript/telemetry@0.0.1-alpha.12",
           "jsr:@std/assert@1",
           "jsr:@std/path@1",
-          "jsr:@zod/zod@4.4.3",
-          "npm:@durable-streams/state@~0.3.1"
+          "jsr:@zod/zod@4.4.3"
         ],
         "packageJson": {
           "dependencies": [
@@ -3407,11 +3412,7 @@
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/async@1",
           "jsr:@std/path@1",
-          "jsr:@zod/zod@4.4.3",
-          "npm:@durable-streams/state@~0.3.1",
-          "npm:@orpc/openapi@^1.14.6",
-          "npm:@orpc/server@^1.14.6",
-          "npm:@orpc/zod@^1.14.6"
+          "jsr:@zod/zod@4.4.3"
         ],
         "packageJson": {
           "dependencies": [

@@ -8,7 +8,8 @@
 import '@netscript/kv/redis';
 
 import type { PluginServiceContext } from '@netscript/plugin/sdk';
-import { createService, type DbContext } from '@netscript/service';
+import type { DbContext } from '@netscript/service';
+import { createPluginService } from '@netscript/plugin/service';
 import { createAuthTelemetry } from '@netscript/plugin-auth-core/telemetry';
 import { AUTH_API_DEFAULT_PORT, AUTH_PLUGIN_VERSION } from '../../src/constants.ts';
 import { router } from './router.ts';
@@ -60,25 +61,26 @@ export default async function createAuthService(
     subjectHashSalt: resolveAuditSalt(ctx),
   });
 
-  return await createService(router, {
+  // Data-only description of the auth service. `createPluginService` applies the
+  // mandated builder chain in a fixed order — cors → logger → openapi → docs →
+  // database → use(middleware) → context → withRPC → withHealth →
+  // withServiceInfo — which is exactly the previous chain's order, so behavior
+  // is preserved. The registry is resolved above (via `initializeAuthService`)
+  // and captured by the context closure; no startup work is deferred.
+  return await createPluginService(router, {
     name: 'auth',
     version: AUTH_PLUGIN_VERSION,
     port,
-  })
-    .withCors()
-    .withLogger()
-    .withOpenAPI({
+    openApi: {
       title: 'Auth API',
       description: 'Unified auth service for NetScript applications',
-    })
-    .withDocs()
-    .withDatabase(toDbContext(dbClient))
-    .use(withAuthRequest)
-    .withContext(() => ({ registry, telemetry }))
-    .withRPC({ traceContext: true })
-    .withHealth()
-    .withServiceInfo()
-    .serve();
+    },
+    docs: {},
+    database: { context: toDbContext(dbClient) },
+    middleware: [withAuthRequest],
+    context: () => ({ registry, telemetry }),
+    traceContext: true,
+  }).serve();
 }
 
 function resolveAuditSalt(ctx: PluginServiceContext): string | undefined {

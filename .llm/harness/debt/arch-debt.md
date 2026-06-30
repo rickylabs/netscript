@@ -371,6 +371,70 @@ verdicts are not seeded here.
 - **Gate:** Replace the S2 DLQ rejection test with a deferred-dispatch test after a package-owned
   scheduler/replay port is designed.
 
+## plugins/triggers — connector SOUND convergence deferred (`triggers-connector-sound-deferred`)
+
+- **Reason:** The #172a-2d slice (commit `74656d71`) landed Hole-A contract soundness on
+  `@netscript/plugin-triggers-core`, but the triggers connector (`plugins/triggers/services`) is a
+  raw Hono + `Deno.serve` service that does NOT bind the oRPC contract: only ~3 of the 10 business
+  routes are implemented (list/get events, webhook ingress, health), and the webhook ingress reads
+  the raw `Request` (`c.req.raw`) to verify HMAC signatures over the exact bytes — incompatible with
+  oRPC's Zod input parsing, which would consume and transform the body and break signature
+  verification. Converging it to the `createPluginService` + contract-bound-implementer shape (as
+  workers/sagas/auth now do) requires implementing the 8 missing routes AND adding a new
+  `createPluginService` raw-route escape hatch in `@netscript/plugin/service` for HMAC webhooks —
+  a feature build + package-core change, not a soundness refactor. Split out per user decision
+  ("Defer to planned slice"); the other four plugins (workers/sagas/triggers-core/auth) are now
+  SOUND.
+- **Owner:** #172 plugin convergence — triggers connector slice.
+- **Target:** Before #172 is considered fully converged (all five plugins on the canonical
+  thin-connector shape).
+- **Linked plan:** to be authored — PLAN-EVAL-gated, daemon-attached WSL Codex slice (per harness
+  implementation lane; this is a framework-source + feature build, not a doc/contract refactor).
+- **Created:** 2026-06-30
+- **Status:** open
+- **Gate:** triggers connector assembled via `triggersContractV1.$context<...>().router()` with all
+  10 business routes + describe implemented, the raw-body webhook served through a sanctioned
+  `createPluginService` raw-route capability, `main.ts` migrated to `createPluginService(...).serve()`,
+  zero `any` / `Record<string,unknown>` handler maps; scoped check/lint/test green and
+  `deno publish --dry-run` Success without `--allow-slow-types`.
+
+## plugins/streams — connector SOUND convergence deferred (`streams-connector-sound-deferred`)
+
+- **Reason:** Streams is the one plugin with NO oRPC contract surface —
+  `@netscript/plugin-streams-core` exposes producer ports, the `defineStreamSchema` /
+  `createDurableStream` builders, domain event types, diagnostics, and telemetry, but no
+  `contracts/v1`. So there is no "Hole A" contract-soundness slice to run (unlike
+  workers/sagas/triggers-core/auth). The streams connector (`plugins/streams/services/src/main.ts`)
+  is a **pure transparent proxy**: it starts the upstream `@durable-streams/server`
+  `DurableStreamTestServer` on an internal port and fronts it with a Hono app that serves
+  `/health[/live|/ready]` and then `app.all('/*')` proxies every other request (including the
+  raw streaming body, via `c.req.raw.body` + `duplex: 'half'`) to the upstream. That catch-all
+  passthrough cannot be expressed as an oRPC router, and `createPluginService`
+  (`@netscript/plugin/service`) is entirely `withRPC`-driven — so migrating the connector to the
+  canonical `createPluginService(...).serve()` shape requires the **same raw-route escape hatch**
+  the deferred triggers connector needs (see `triggers-connector-sound-deferred`). The connector
+  itself has no `any` / `Record<string,unknown>` handler maps; its only escapes are a
+  platform-gap `@ts-ignore` for `RequestInit.duplex` (not yet in Deno's lib types) in the proxy
+  body. Pre-existing minor `-core` casts unrelated to service-typesafety: `import.meta.env as any`
+  cross-runtime env probe in `stream-url-resolver.ts` and two `as unknown as` bridges to the
+  upstream `@durable-streams` generic types in `define-stream-schema.ts` — neither is an oRPC
+  Hole-A/Hole-B hole; left as-is pending the connector slice.
+- **Owner:** #172 plugin convergence — proxy-connector slice (fold with
+  `triggers-connector-sound-deferred`: both connectors are blocked on the one
+  `createPluginService` raw-route capability and should land in the same PLAN-EVAL-gated,
+  daemon-attached WSL Codex slice that builds it once).
+- **Target:** Before #172 is considered fully converged (all five plugins on the canonical
+  thin-connector shape).
+- **Linked plan:** to be authored jointly with the triggers connector slice — framework-source +
+  feature build (the raw-route escape hatch), not a doc/contract refactor.
+- **Created:** 2026-06-30
+- **Status:** open
+- **Gate:** streams connector `main.ts` migrated to `createPluginService(...).serve()` with the
+  upstream proxy served through the sanctioned `createPluginService` raw-route capability,
+  base-meta (`describe` + health) preserved, the `duplex` platform escape kept only if no typed
+  Deno equivalent exists; scoped check/lint/test green and `deno publish --dry-run` Success without
+  `--allow-slow-types`.
+
 ## plugins/sagas — deferred Prisma SagaIdempotencyPort parity
 
 - **Reason:** `PrismaSagaStore` now provides durable saga state persistence, but idempotency and
@@ -1498,3 +1562,166 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** Close when the scaffolded `aspire/package.json` ships with a pinned companion lock (or
   the npm island is removed) so a generated AppHost resolves without an unpinned manual
   `npm install`.
+
+## plugins/triggers connector — TRIGGERS-CONNECTOR-DEFERRED-ROUTES + missing triggers-core backing (#172)
+
+- **Reason:** The triggers connector (`plugins/triggers/services/src/`) was converged onto the
+  canonical thin-connector shape (`createPluginService(router, {...}).serve()`) and now serves the
+  full 11-route `@netscript/plugin-triggers-core` v1 contract. Five routes are **backed** by real
+  runtime state (`describe`, `listTriggers`, `getTrigger`, `listEvents`, `getEvent`) and the raw
+  HMAC webhook ingress is preserved as a `rawRoutes` entry. The remaining **six** routes
+  (`fireTrigger`, `testWebhook`, `previewSchedule`, `enableTrigger`, `disableTrigger`,
+  `subscribeEvents`) are **honestly deferred**: each throws with a "pending triggers-core runtime
+  backing" message that oRPC maps to a server error (`subscribeEvents` is an async generator that
+  throws immediately and never yields, so its SSE output schema is never violated). No backing was
+  fabricated and no triggers-core capability was invented in this slice.
+- **Why it is debt:** the deferred routes have no sound runtime seam in `@netscript/plugin-triggers-core`
+  yet, and two backed routes synthesize/omit fields because the domain lacks them. The net-new
+  triggers-core surface required to fully back the contract:
+  1. **Manual / test-fire helper** — a runtime entrypoint to dispatch a trigger on demand (backs
+     `fireTrigger`) and a webhook test-delivery helper (backs `testWebhook`).
+  2. **Persistent enabled-state store** — there is no enabled/disabled store, so `listTriggers`/
+     `getTrigger` currently **synthesize `enabled: true`** for every definition; `enableTrigger`/
+     `disableTrigger` cannot persist state. Needs an enabled-state port plus
+     `TriggerDefinitionBase.enabled` (and a domain `name` field — the connector currently **omits
+     `name`** because the domain carries none, though the contract response allows it).
+  3. **Cron preview engine** — a next-fire-times computation over a scheduled trigger's cron spec
+     (backs `previewSchedule`).
+  4. **Event-subscription / SSE seam** — a live event-stream port (backs `subscribeEvents`).
+  - Note: the connector is **cast-free** — the raw webhook handler resolves the external path
+    parameter against the loaded definitions and passes the definition's already-branded `.id` to
+    `ingress.accept` (the same brand-free string-equality pattern as `listEvents`/`getEvent`), so no
+    `TriggerId` brand cast is retained. A public `toTriggerId` / `toTriggerEventId` constructor in
+    `@netscript/plugin-triggers-core/domain` would still be a convenience for net-new write paths,
+    but it is **not** connector-soundness debt.
+  - Separately: the triggers v1 contract erases its typed `errors` map through the sanctioned
+    `as unknown as Parameters<typeof oc.errors>[0]` cast, so handlers cannot call
+    `errors.INTERNAL(...)`; deferral throws a plain `Error` (oRPC -> 5xx) and `notFound` is used via
+    the centralized `@netscript/contracts` helper (which casts `errors` internally). A typed
+    `internalError({ errors, message })` helper in `@netscript/contracts` (mirroring `notFound`)
+    would let deferrals/500s carry the typed `INTERNAL` shape.
+- **Owner:** Triggers plugin + `@netscript/plugin-triggers-core` runtime (framework architecture).
+- **Target:** A PLAN-EVAL-gated triggers-core runtime follow-up that adds the seams above; each
+  unblocks its routes one at a time. Any `TriggerDefinitionBase` field addition (`enabled`, `name`)
+  and any new domain brand constructor is a `@netscript/plugin-triggers-core` source change and must
+  run as a WSL Codex daemon-attached slice, not the connector slice.
+- **Linked plan:** `feat/scaffold-surface-167` triggers thin-connector convergence slice (#172).
+- **Created:** 2026-06-30.
+- **Status:** open, DEBT_ACCEPTED — recorded as part of the additive thin-connector convergence; the
+  connector compiles/lints clean, the smoke test passes, and `deno publish --dry-run` succeeds.
+- **Gate:** Close each route as its triggers-core seam lands (manual/test-fire helper -> `fireTrigger`
+  + `testWebhook`; enabled-state store + `enabled`/`name` fields -> `enableTrigger`/`disableTrigger`
+  + un-synthesized `listTriggers`/`getTrigger`; cron preview engine -> `previewSchedule`; event SSE
+  seam -> `subscribeEvents`), each with its own contract-route assertion and the connector smoke
+  test extended to assert the now-backed behavior. Remove the webhook brand cast when a public brand
+  constructor lands.
+
+## plugins/{sagas,triggers,workers} — PLUGIN-RUNTIME-ADAPTER-RELOCATION (#172b/c/d)
+
+- **Reason:** Two coupled defects in three connectors that still ship runtime stores/adapters under
+  `plugins/<kind>/src/runtime/`. (1) **Placement:** by the #157→#172 thin-connector law these
+  port→backend adapters belong in `@netscript/plugin-<kind>-core` (`adapters/`/`stores/`), leaving the
+  connector with specifics only. (2) **Primitive-bypass / engine lock:** the **sagas** and **triggers**
+  KV stores hardwire raw `Deno.Kv`/`Deno.openKv` + the Deno-native fluent atomic, bypassing the
+  engine-agnostic `@netscript/kv` primitive — locking them to Deno KV and forfeiting Redis / in-memory /
+  kvdex / reactive-watch. The **workers** `KvWorkerIdempotencyStore` already does it right (depends on
+  `@netscript/kv` types + a `KvStore`-shaped structural port) and is the reference. The PASSed
+  `feat/scaffold-surface-167` plan covered the scaffold-surface contract (S1–S7), not runtime-store
+  placement or engine choice — so this is net-new scope, PLAN-EVAL-gated separately.
+- **Relocation + migration set (grounded against the worktree):**
+  - **sagas (#172b):** `prisma-saga-store.ts` (dep-free structural Prisma delegate, relocate as-is),
+    `kv-saga-store.ts`, `kv-saga-runtime-stores.ts` (**relocate + migrate `Deno.openKv` →
+    `@netscript/kv`**), `saga-store-backend.ts` → `packages/plugin-sagas-core/src/stores/`. **Adds
+    `@netscript/kv` dep — desired.**
+  - **triggers (#172c):** `kv-trigger-runtime-stores.ts` (**relocate + migrate `Deno.openKv` →
+    `@netscript/kv`**) + `cron-trigger-scheduler-adapter.ts` / `watchers-file-watcher-adapter.ts` →
+    `packages/plugin-triggers-core/src/{stores,adapters}/`. Adds **`@netscript/kv` + `@netscript/cron`
+    + `@netscript/watchers`** to triggers-core (currently `@std/assert`+`zod` only).
+  - **workers (#172d):** `worker/worker-idempotency-store.ts` (already on `@netscript/kv`, relocate
+    only) → `packages/plugin-workers-core/src/{stores,adapters}/`. Adds the `@netscript/kv` dep to
+    workers-core.
+- **Why it is debt (open):** authored but PLAN-EVAL-gated and not yet implemented. Decisions deferred to
+  PLAN-EVAL: (D-KV) migrate sagas+triggers KV stores onto `@netscript/kv` (`KvStore` + `AtomicCheck/
+  Mutation/Result`, injected handle, workers structural-port pattern), preserving optimistic-concurrency
+  + idempotency semantics; (D2) the zero-compat public-surface break — stores move from
+  `@netscript/plugin-<kind>/runtime` to `@netscript/plugin-<kind>-core/{stores,adapters}` with no shim.
+  **Note:** an earlier draft framed a "D1" decision over whether `-core` may take `@netscript/*` deps;
+  that was removed — `-core` depending on NetScript primitives is the **encouraged** direction (the
+  reference behavior for community plugin/plugin-core authors), not a tradeoff to weigh.
+- **Owner:** Plugin connectors + `@netscript/plugin-<kind>-core` (framework architecture).
+- **Target:** PLAN-EVAL-gated relocation slices under #172; close when all three merge.
+- **Linked plan:** `.llm/tmp/run/feat-scaffold-surface-167--adapter-relocation/plan.md` (+ `research.md`).
+- **Created:** 2026-06-30.
+- **Status:** open, PLAN-EVAL pending — research + plan authored; no implementation slice before PASS.
+- **Gate:** per touched package scoped check/lint/fmt (`--ext ts,tsx`) + targeted `deno test
+  --unstable-kv` + `deno publish --dry-run --allow-dirty` (no new slow types) + `deno task arch:check`
+  (no connector→core leak); new workspace deps land via normal resolution, no `deno.lock` hand-edit.
+
+## packages/plugin-auth-core — AUTH-FITNESS-GATE-OVERFLAG
+
+- **ID:** `AUTH-FITNESS-GATE-OVERFLAG`
+- **Reason:** `AS7/F-AUTH-CAST` over-flagged two sanctioned auth type-soundness sites: the centralized
+  oRPC error-map contract cast in `src/contracts/v1/auth.contract.ts`, and test-only
+  `@ts-expect-error` / `as unknown` guards in `tests/contracts/auth-contract-soundness_test.ts`.
+  The production auth code was already type-sound; the fitness gate was stricter than the AS7 intent
+  and stricter than the equivalent sagas/workers contract soundness test treatment.
+- **Fix:** Narrowed `.llm/tools/fitness/check-doctrine.ts` so the auth scanner recognizes the exact
+  centralized `Parameters<typeof oc.errors>[0]` contract cast, keeps the router `any` exemplar as
+  the only router exception, and exempts test paths (`tests/`, `_test.ts`, `.test.ts`) from the auth
+  cast / `@ts-*` scan without relaxing production source checks.
+- **Owner:** Architecture fitness gate maintainers.
+- **Target:** #172 follow-up S-e.
+- **Linked plan:** `.llm/tmp/run/feat-scaffold-surface-167--adapter-relocation/plan.md`
+- **Created:** 2026-06-30.
+- **Status:** closed 2026-06-30 — gate-correctness fix landed; auth production source and auth
+  soundness tests were not edited.
+- **Gate:** `deno task arch:check` green over all 13 configured roots (`FAIL=0` for every root).
+
+## packages/cli — PLUGIN-LIST-MANIFEST-REGISTRATION-BLOCKER
+
+- **ID:** `PLUGIN-LIST-MANIFEST-REGISTRATION-BLOCKER`
+- **Reason:** After the centralized scaffold-CLI bridge restored execution of all five official plugin
+  scaffolders, `scaffold.runtime` advanced past every `scaffold.plugin.*` install gate and failed at
+  `scaffold.plugin-list`. The generated project contains the plugin sample files under `workers/`,
+  `sagas/`, `triggers/`, `streams/`, and `auth/`, but `netscript plugin list` reads
+  `plugins/<name>/scaffold.plugin.json`; the install path does not materialize that manifest under
+  the generated `plugins/` registry tree.
+- **Why deferred:** This is a distinct host install/list registration defect, not the S-f scaffold
+  subprocess bridge regression. Expanding S-f into the plugin registry/list contract would fold in a
+  separate #173 sub-phase.
+- **Owner:** CLI plugin install/list registration seam.
+- **Target:** Follow-up #173 plugin registry/list slice.
+- **Linked evidence:** `.llm/tmp/run/feat-scaffold-surface-167--adapter-relocation/worklog.md` S-f.
+- **Created:** 2026-06-30.
+- **Status:** closed by S-g (`fix(cli): reconcile plugin install list contract`).
+- **Gate:** Close when `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` reaches
+  `failed=0` past `scaffold.plugin-list` without weakening plugin scaffold execution.
+- **Closing evidence:** S-g fresh-project reproduction changed from `plugin list` exit 1 on missing
+  `plugins/workers/scaffold.plugin.json` to exit 0 with `workers` listed from `./workers/mod.ts`.
+  The full `scaffold.runtime` suite now passes `scaffold.plugin-list` and advances to the distinct
+  `runtime.wait.workers-api` boundary recorded below.
+
+## plugin packages — PLUGIN-RUNTIME-DEPENDENCY-ENTRYPOINT-EXPORTS
+
+- **ID:** `PLUGIN-RUNTIME-DEPENDENCY-ENTRYPOINT-EXPORTS`
+- **Reason:** The #157 thin-dependency model forbids copying official plugin internals into generated
+  projects. After S-g reconciled config registration and `plugin list`, the full runtime E2E fails at
+  `runtime.wait.workers-api` because appsettings runtime resources still point at copied-package
+  workdirs such as `plugins/workers`, which are intentionally absent. Moving runtime resources to
+  package-spec execution requires an explicit public plugin executable-entrypoint contract for both
+  service and background processes. Service packages already expose `./services`; background
+  executables such as `@netscript/plugin-workers/bin/combined.ts` are not exported today.
+- **Why deferred:** Adding exported runtime executable subpaths is a new public package-surface
+  contract, not an install/register/list reconciliation. S-g's escape hatch required stopping rather
+  than folding that contract into this slice.
+- **Owner:** CLI plugin runtime / official plugin package maintainers.
+- **Linked evidence:** `.llm/tmp/run/feat-scaffold-surface-167--adapter-relocation/worklog.md` S-g.
+- **Status:** closed by PR #172 runtime-launch finalization
+  (`8aaddbc1`, `4a991d16`).
+- **Gate:** Close when official plugin packages expose supported executable entrypoints for the
+  thin-dependency runtime and `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`
+  reaches `failed=0` without copying plugin internals into generated user projects.
+- **Closing evidence:** `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`
+  exited 0 on 2026-06-30 with `Summary: passed=48 failed=0`. The run used package-launched
+  service/background plugin resources, passed every service/background wait gate, accepted the
+  generic trigger webhook, listed trigger events, and validated the cross-service OTEL trace.

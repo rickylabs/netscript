@@ -1,5 +1,5 @@
-import { authContractV1 } from '@netscript/plugin-auth-core/contracts/v1';
 import { getParentContextFromHeaders } from '@netscript/telemetry/context';
+import type { PluginCapabilities } from '@netscript/plugin/contract-base';
 import type {
   CallbackInput,
   CallbackResponse,
@@ -32,6 +32,7 @@ import {
   unsupportedOperation,
 } from './v1-helpers.ts';
 import { type AuthServiceContext, AuthServiceHandlerError } from './v1-types.ts';
+import { type AuthHandlers, router } from './router-context.ts';
 import type { AuthSession } from '@netscript/plugin-auth-core/domain';
 import type { AuthBackendPort, InteractiveFlowPort } from '@netscript/plugin-auth-core/ports';
 import {
@@ -42,11 +43,35 @@ import {
   emitTokenRefreshed,
 } from '../../../streams/server.ts';
 
-const router = authContractV1.$context<AuthServiceContext>();
 const FALLBACK_AUTH_TELEMETRY = createAuthTelemetry({ enabled: false });
 
-/** V1 auth contract handlers. */
-export const authV1: Record<string, unknown> = {
+/**
+ * Capabilities document advertised by the running auth service.
+ *
+ * Grounded in auth ground truth: the published plugin package name, the served
+ * contract versions, the v1 contract route groups, and the plugin's advertised
+ * capability tags.
+ */
+const authCapabilities: PluginCapabilities = {
+  pluginName: '@netscript/plugin-auth',
+  contractVersions: ['v1'],
+  routeGroups: ['signin', 'callback', 'signout', 'session', 'me'],
+  capabilities: [
+    'interactive-signin',
+    'oidc-callback',
+    'session-management',
+    'principal-introspection',
+    'multi-backend',
+  ],
+};
+
+/** Every v1 route key the auth contract exposes (incl. the base `describe`). */
+type AuthV1RouteKey = 'describe' | 'signin' | 'callback' | 'signout' | 'session' | 'me';
+
+/** V1 auth contract handlers, contract-bound and precisely typed per route. */
+export const authV1: AuthHandlers<AuthV1RouteKey> = {
+  /** Mandatory base seam `describe` route. */
+  describe: router.describe.handler(() => authCapabilities),
   signin: router.signin.handler(async ({ input, context }) => await signin(input, context)),
   callback: router.callback.handler(async ({ input, context }) => await callback(input, context)),
   signout: router.signout.handler(async ({ input, context }) => await signout(input, context)),

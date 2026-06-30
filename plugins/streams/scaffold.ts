@@ -1,12 +1,20 @@
-/**
- * Streams plugin-owned scaffold CLI entrypoint.
+/** Streams plugin adapter scaffold entrypoint.
  *
  * @module
  */
 
-export { scaffold } from './src/scaffold/mod.ts';
-import { runScaffoldCli } from './src/scaffold/mod.ts';
+import {
+  createPluginAdapter,
+  type PluginScaffoldEntrypoint,
+  runPluginScaffoldCli,
+} from '@netscript/plugin/adapter';
+import { streamsAdapterPlugin } from './src/adapter/plugin.ts';
+
+/** Streams adapter scaffold entrypoint. */
+const scaffold: PluginScaffoldEntrypoint = createPluginAdapter(streamsAdapterPlugin).toScaffold();
+
+export default scaffold;
 
 if (import.meta.main) {
-  await runScaffoldCli();
+  await runPluginScaffoldCli(scaffold);
 }

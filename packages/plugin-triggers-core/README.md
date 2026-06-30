@@ -4,10 +4,10 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The handler-first trigger DSL and runtime substrate for the NetScript `@netscript/plugin-triggers`
-family: define webhook, scheduled, and file-watch triggers, then process them through an
-ack-then-process ingress and a processor with idempotency, retry, DLQ, and circuit-breaker
-handling.**
+**The reusable trigger primitives for NetScript: a handler-first DSL that defines webhook,
+scheduled, and file-watch triggers, plus an ack-then-process ingress and a durable processor that
+drains them through explicit runtime ports — the core that the deployable
+`@netscript/plugin-triggers` plugin binds to the host.**
 
 ---
 
@@ -27,8 +27,8 @@ bunx jsr add @netscript/plugin-triggers-core
 ### Usage
 
 Trigger definitions are handler-first: the handler is the first argument, the immutable spec is the
-second. Handlers return actions that the processor dispatches after the ingress acknowledges the
-request.
+second. Handlers return actions (such as `enqueueJob`) that the processor dispatches after the
+ingress has acknowledged the request.
 
 ```typescript
 import {
@@ -64,8 +64,11 @@ const ingress = createTriggerIngress({
 });
 ```
 
-Webhook ingress is ack-then-process: verification and persistence complete before the `202`
-response, and handler actions are dispatched after acknowledgement.
+Webhook ingress is **ack-then-process**: `createTriggerIngress` verifies the signature and persists
+the event through its `TriggerEventStorePort` before returning the `202` acknowledgement, then hands
+the handler's actions to the `TriggerProcessorPort` for dispatch. The two phases are separated so a
+slow handler never blocks the acknowledgement and a crash after `202` is recoverable from the
+persisted event.
 
 ---
 
@@ -75,16 +78,18 @@ response, and handler actions are dispatched after acknowledgement.
   produce frozen, type-safe trigger definitions; handlers emit actions such as `enqueueJob` to hand
   work to the worker pool.
 - **Ack-then-process ingress**: `createTriggerIngress` verifies and persists inbound webhook events
-  before responding, then dispatches handler work to the processor.
+  before responding `202`, then dispatches handler work to the processor.
 - **Durable processor runtime**: `createTriggerProcessor` and the `TriggerProcessor` class apply
   idempotency, retry policy, bounded concurrency, dead-letter queueing, and circuit-breaking around
   handler dispatch.
-- **Explicit runtime ports**: ingress, processor, scheduler, event store, idempotency, DLQ, and
-  webhook-verifier boundaries (`TriggerIngressPort`, `TriggerProcessorPort`,
-  `TriggerEventStorePort`, and siblings) are injected, so adapters stay swappable.
-- **Curated sub-path surface**: `./builders`, `./config`, `./contracts/v1`, `./domain`, `./ports`,
-  `./runtime`, `./telemetry`, and `./testing` expose the schemas, branded ids, telemetry, and
-  deterministic in-memory test fixtures that back the public `@netscript/plugin-triggers` plugin.
+- **Explicit runtime ports**: ingress, processor, scheduler, event store, idempotency, DLQ, clock,
+  file-watcher, and webhook-verifier boundaries (`TriggerIngressPort`, `TriggerProcessorPort`,
+  `TriggerEventStorePort`, `TriggerSchedulerPort`, `WebhookVerifierPort`, and siblings) are
+  injected, so adapters stay swappable.
+- **Curated sub-path surface**: `./builders`, `./adapters`, `./config`, `./contracts/v1`,
+  `./domain`, `./ports`, `./runtime`, `./telemetry`, and `./testing` expose the schemas, branded
+  ids, telemetry, and deterministic in-memory test fixtures that back the public
+  `@netscript/plugin-triggers` plugin.
 
 ---
 

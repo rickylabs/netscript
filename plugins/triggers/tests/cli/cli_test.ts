@@ -41,7 +41,7 @@ Deno.test('TriggersCli exposes the triggers command registry', async () => {
   assertEquals(cli.description, 'Trigger ingress and scheduling plugin CLI.');
   assertEquals(commands.map((command) => command.name), [...TRIGGERS_CLI_COMMANDS]);
 
-  const addWebhook = await cli.run({
+  const addWebhook = await runTriggersCommand(cli, {
     command: 'add-webhook',
     values: ['order-created'],
     flags: { path: '/webhooks/order-created', 'secret-env': 'ORDER_WEBHOOK_SECRET' },
@@ -56,7 +56,7 @@ Deno.test('TriggersCli exposes the triggers command registry', async () => {
   });
   assertEquals(backend.handled.map((definition) => definition.name), ['add-webhook']);
 
-  const missing = await cli.run({ command: 'missing-command' });
+  const missing = await runTriggersCommand(cli, { command: 'missing-command' });
   assertEquals(missing.code, 1);
 });
 
@@ -88,3 +88,13 @@ Deno.test('StaticTriggersCliBackend returns command metadata without runtime dep
     values: ['nightly-export'],
   });
 });
+
+async function runTriggersCommand(
+  cli: TriggersCli,
+  args: PluginCliArgs,
+): Promise<PluginCliResult> {
+  const command = cli.commands().find((item) => item.name === args.command);
+  return command
+    ? await command.run(args)
+    : { code: 1, message: `Unknown triggers command: ${args.command}` };
+}

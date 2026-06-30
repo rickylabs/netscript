@@ -1,4 +1,4 @@
-import type { ProjectFiles } from './adapters/local-project-files.ts';
+import type { ProjectFiles } from '@netscript/plugin/cli';
 
 /** Options for the sagas import codemod. */
 export interface CodemodSagaImportsOptions {

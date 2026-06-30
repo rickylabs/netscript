@@ -241,7 +241,7 @@ export interface PluginDbDetectionResult {
   readonly targetConfigKey: string | null;
   /** Target DB engine, either existing or to be provisioned. */
   readonly targetEngine: DbEngine | null;
-  /** Whether plugin add must scaffold and register a DB workspace first. */
+  /** Whether plugin install must scaffold and register a DB workspace first. */
   readonly needsProvisioning: boolean;
 }
 

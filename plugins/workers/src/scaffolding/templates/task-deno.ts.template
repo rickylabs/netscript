@@ -1,8 +1,0 @@
-import { defineTask } from '@netscript/plugin-workers-core';
-
-export const {{exportName}} = defineTask('{{id}}')
-  .runtime('deno')
-  .entrypoint('{{entrypoint}}')
-  .timeout({{timeoutMs}})
-  .retry({{maxRetries}})
-  .build();

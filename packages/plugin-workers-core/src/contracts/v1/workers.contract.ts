@@ -23,7 +23,6 @@ export {
   TaskFiltersSchema,
 } from './workers.contract-schemas.ts';
 export type {
-  ContractProcedureLike,
   ContractSchema,
   ContractSchemaResult,
   ExecutionRecordResponse,
@@ -31,12 +30,11 @@ export type {
   JobTriggerInput,
   JobTriggerOutput,
   SSEEvent,
-  StandardSchemaLike,
   TaskDefinitionResponse,
   TaskTriggerInput,
   TaskTriggerOutput,
+  WorkersCapabilities,
   WorkersContract,
   WorkersContractV1,
-  WorkersRouteHandler,
   WorkersRouter,
 } from './workers.contract-types.ts';

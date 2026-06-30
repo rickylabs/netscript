@@ -34,3 +34,22 @@ export type {
   SagaStoreWriteOptions,
 } from '../ports/mod.ts';
 export { MemorySagaAppliedKeyStore } from '../runtime/mod.ts';
+export { KvSagaAppliedKeyStore, KvSagaIdempotencyStore } from './kv-saga-runtime-stores.ts';
+export { KvSagaStore, openSagaRuntimeKv } from './kv-saga-store.ts';
+export { PrismaSagaStore } from './prisma-saga-store.ts';
+export {
+  resolveSagaStoreBackend,
+  SAGA_STORE_BACKEND_ENV,
+  SAGA_STORE_BACKENDS,
+} from './saga-store-backend.ts';
+export type {
+  KvSagaAppliedKeyStoreOptions,
+  KvSagaIdempotencyStoreOptions,
+  SagaRuntimeKvStoreOptions,
+} from './kv-saga-runtime-stores.ts';
+export type { KvSagaStoreOptions } from './kv-saga-store.ts';
+export type { PrismaSagaStoreClient, PrismaSagaStoreOptions } from './prisma-saga-store.ts';
+export type {
+  DurableSagaStoreBackend,
+  SagaStoreBackendResolutionInput,
+} from './saga-store-backend.ts';

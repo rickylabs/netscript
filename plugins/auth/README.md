@@ -4,9 +4,9 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The official auth plugin for NetScript: it contributes a unified auth API service,
-single-active-backend selection, the auth database schema, and durable session-stream projections to
-a generated app through a single declarative manifest.**
+**The deployable auth plugin for NetScript. It binds the host plugin system to a unified auth API
+service, single-active-backend selection, the auth database schema, and durable session-stream
+projections through a single declarative manifest.**
 
 ---
 
@@ -72,6 +72,9 @@ console.log(inspection.name, inspection.version, inspection.axes);
   `authSession` entity projection, with server-side emit helpers on `./streams/server`.
 - **Scaffold-native**: registers as an official `auth` plugin through `scaffold.plugin.json`, wiring
   database and KV requirements into the NetScript CLI and Aspire orchestration.
+
+The domain schemas, `AuthBackendPort` seam, oRPC v1 contract, and Zod config live in
+`@netscript/plugin-auth-core`; this package binds them to the host.
 
 ---
 

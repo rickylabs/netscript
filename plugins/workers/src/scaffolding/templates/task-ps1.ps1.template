@@ -1,3 +1,0 @@
-$ErrorActionPreference = "Stop"
-
-[Console]::Out.WriteLine('{"taskId":"{{id}}"}')

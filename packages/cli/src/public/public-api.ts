@@ -166,7 +166,7 @@ export { resolvePluginCliSpecifier };
 
 /** Framework-owned plugin verbs. */
 export type FrameworkVerb =
-  | 'add'
+  | 'install'
   | 'remove'
   | 'enable'
   | 'disable'

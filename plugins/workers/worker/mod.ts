@@ -34,7 +34,6 @@ export type {
 // ============================================================================
 
 export { Worker } from './worker.ts';
-export { KvWorkerIdempotencyStore } from './worker-idempotency-store.ts';
 export type {
   QueueTriggerConfig,
   WorkerCompleteExecutionOptions,
@@ -49,8 +48,4 @@ export type {
   WorkerTaskRegistry,
   WorkerTaskResult,
 } from './worker.ts';
-export type {
-  KvWorkerIdempotencyStoreOptions,
-  WorkerIdempotencyKvStore,
-} from './worker-idempotency-store.ts';
 export type { WorkerPoolOptions } from './job-runner-pool.ts';

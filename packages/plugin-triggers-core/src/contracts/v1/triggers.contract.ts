@@ -1,19 +1,37 @@
 import { oc } from '@orpc/contract';
+import type {
+  AnySchema,
+  ContractProcedureBuilderWithInputOutput,
+  ErrorMap,
+  MergedErrorMap,
+} from '@orpc/contract';
 import { eventIterator, implement } from '@orpc/server';
 import { z } from 'zod';
+import {
+  BASE_PLUGIN_CONTRACT_ROUTES,
+  BASE_PLUGIN_ERRORS,
+  type BasePluginContract,
+  type BasePluginDescribeRoute,
+  type PluginCapabilities,
+} from '@netscript/plugin/contract-base';
 import {
   TRIGGER_DURABILITY_TIERS,
   TRIGGER_EVENT_STATUSES,
   TRIGGER_KINDS,
 } from '../../domain/mod.ts';
 
-/** Minimal schema contract exposed without leaking Zod internals. */
-export type TriggerContractSchema<TOutput> = Readonly<{
-  parse(data: unknown): TOutput;
-  safeParse(data: unknown):
-    | { readonly success: true; readonly data: TOutput }
-    | { readonly success: false; readonly error: unknown };
-}>;
+/** Result returned by contract schema validation. */
+export type ContractSchemaResult<TOutput> =
+  | { readonly success: true; readonly data: TOutput }
+  | { readonly success: false; readonly error: unknown };
+
+/** Package-owned structural schema surface for trigger contracts. */
+export interface ContractSchema<TOutput = unknown, TInput = unknown> {
+  /** Parse an input value or throw a validation error. */
+  parse(input: TInput): TOutput;
+  /** Parse an input value and return a result object instead of throwing. */
+  safeParse(input: TInput): ContractSchemaResult<TOutput>;
+}
 
 /** Trigger kinds represented by the v1 trigger contract. */
 export const TRIGGER_CONTRACT_KINDS: readonly [
@@ -57,7 +75,10 @@ const paginationLimit = (description: string): z.ZodDefault<z.ZodNumber> =>
 const paginationOffset = (description: string): z.ZodDefault<z.ZodNumber> =>
   z.number().int().nonnegative().default(0).describe(description);
 
-const OffsetPaginationQueryShape: z.ZodRawShape = {
+const OffsetPaginationQueryShape: {
+  limit: z.ZodDefault<z.ZodCoercedNumber<unknown>>;
+  offset: z.ZodDefault<z.ZodCoercedNumber<unknown>>;
+} = {
   limit: z.coerce.number().int().min(1).max(1000).default(50),
   offset: z.coerce.number().int().nonnegative().default(0),
 };
@@ -73,27 +94,45 @@ const offsetPaginationQuerySchema: z.ZodObject<typeof OffsetPaginationQueryShape
 );
 
 /** Offset pagination query schema accepted by list endpoints. */
-export const OffsetPaginationQuerySchema: TriggerContractSchema<OffsetPaginationQuery> =
-  offsetPaginationQuerySchema as unknown as TriggerContractSchema<OffsetPaginationQuery>;
+export const OffsetPaginationQuerySchema: ContractSchema<OffsetPaginationQuery> =
+  offsetPaginationQuerySchema;
 
-const baseContract = oc.errors({
-  NOT_FOUND: {
-    status: 404,
-    message: 'Resource not found',
-    data: z.object({
-      resourceType: z.string(),
-      resourceId: z.union([z.string(), z.number()]),
-    }),
-  },
-  VALIDATION_ERROR: {
-    status: 422,
-    message: 'Validation failed',
-    data: z.object({
-      formErrors: z.array(z.string()),
-      fieldErrors: z.record(z.string(), z.array(z.string()).optional()),
-    }),
-  },
-});
+// Converge onto the shared plugin error vocabulary: NOT_FOUND, VALIDATION_ERROR,
+// and INTERNAL are reported with identical status codes, messages, and payload
+// shapes across every NetScript feature plugin. `BASE_PLUGIN_ERRORS` types each
+// `data` field as `unknown` (it is a plain error vocabulary, not a builder
+// fragment), so it crosses into the oRPC contract builder via the single
+// sanctioned centralized-contract boundary cast — the same pattern
+// `BASE_PLUGIN_CONTRACT_ROUTES` uses. Everything downstream of `baseContract`
+// (routes, input/output schemas, the contract type, `implement`) is genuinely
+// typed.
+const baseContract: ReturnType<typeof oc.errors> = oc.errors(
+  { ...BASE_PLUGIN_ERRORS } as unknown as Parameters<typeof oc.errors>[0],
+);
+
+/**
+ * Error map carried by every route built from {@link baseContract}.
+ *
+ * `baseContract` applies `.errors(...)`, so each route's error map is the base
+ * vocabulary merged onto an empty map.
+ */
+type BaseErrors = MergedErrorMap<Record<never, never>, ErrorMap>;
+
+/**
+ * Precise type of a route built via `baseContract.route(...).input(...).output(...)`.
+ *
+ * Parameterized on the input and output schemas so `typeof <inputConst>` and
+ * `typeof <outputConst>` (each an explicitly-annotated Zod schema) flow through
+ * to {@link implement}, keeping every handler's input/output precisely typed.
+ */
+type Route<TIn extends AnySchema, TOut extends AnySchema> = ContractProcedureBuilderWithInputOutput<
+  TIn,
+  TOut,
+  BaseErrors,
+  Record<never, never>
+>;
+
+// --- Public response types ---------------------------------------------------
 
 /** Trigger definition returned by v1 contract endpoints. */
 export type TriggerDefinitionResponse = Readonly<{
@@ -177,7 +216,37 @@ export type EventFilters = Readonly<{
   status?: TriggerContractEventStatus | null;
 }>;
 
-const triggerDefinitionResponseSchema: z.ZodType<TriggerDefinitionResponse> = z.object({
+/**
+ * Public, capability-document shape returned by the mandatory `describe` route.
+ *
+ * Named public alias of {@link PluginCapabilities} so consumers can reference
+ * the triggers describe-output type without reaching into `@netscript/plugin`.
+ */
+export type TriggersCapabilities = PluginCapabilities;
+
+// --- Route output / shared schemas -------------------------------------------
+// Every inline `z.object(...)` / `z.enum(...)` is named and explicitly annotated
+// with concrete Zod constructor types so its `typeof` can feed the `Route<...>`
+// alias under `--isolatedDeclarations` and never upcasts to `z.ZodType<T>`
+// (which erases `_output` and reopens the soundness hole).
+
+const triggerDefinitionResponseSchema: z.ZodObject<{
+  id: z.ZodString;
+  kind: z.ZodEnum<{
+    webhook: 'webhook';
+    'file-watch': 'file-watch';
+    scheduled: 'scheduled';
+    queue: 'queue';
+    stream: 'stream';
+    manual: 'manual';
+  }>;
+  name: z.ZodOptional<z.ZodString>;
+  description: z.ZodOptional<z.ZodString>;
+  enabled: z.ZodBoolean;
+  durabilityTier: z.ZodDefault<z.ZodEnum<{ t1: 't1'; t2: 't2'; t3: 't3' }>>;
+  entrypoint: z.ZodOptional<z.ZodString>;
+  tags: z.ZodOptional<z.ZodArray<z.ZodString>>;
+}> = z.object({
   id: z.string(),
   kind: z.enum(TRIGGER_KINDS),
   name: z.string().optional(),
@@ -189,10 +258,34 @@ const triggerDefinitionResponseSchema: z.ZodType<TriggerDefinitionResponse> = z.
 });
 
 /** Trigger definition response schema. */
-export const TriggerDefinitionResponseSchema: TriggerContractSchema<TriggerDefinitionResponse> =
+export const TriggerDefinitionResponseSchema: ContractSchema<TriggerDefinitionResponse> =
   triggerDefinitionResponseSchema;
 
-const triggerEventResponseSchema: z.ZodType<TriggerEventResponse> = z.object({
+const triggerEventResponseSchema: z.ZodObject<{
+  id: z.ZodString;
+  triggerId: z.ZodString;
+  kind: z.ZodEnum<{
+    webhook: 'webhook';
+    'file-watch': 'file-watch';
+    scheduled: 'scheduled';
+    queue: 'queue';
+    stream: 'stream';
+    manual: 'manual';
+  }>;
+  status: z.ZodEnum<{
+    pending: 'pending';
+    'in-flight': 'in-flight';
+    deferred: 'deferred';
+    completed: 'completed';
+    failed: 'failed';
+    dlq: 'dlq';
+  }>;
+  attempt: z.ZodNumber;
+  detectedAt: z.ZodString;
+  updatedAt: z.ZodString;
+  idempotencyKey: z.ZodOptional<z.ZodString>;
+  metadata: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
+}> = z.object({
   id: z.string(),
   triggerId: z.string(),
   kind: z.enum(TRIGGER_KINDS),
@@ -205,10 +298,16 @@ const triggerEventResponseSchema: z.ZodType<TriggerEventResponse> = z.object({
 });
 
 /** Trigger event response schema. */
-export const TriggerEventResponseSchema: TriggerContractSchema<TriggerEventResponse> =
+export const TriggerEventResponseSchema: ContractSchema<TriggerEventResponse> =
   triggerEventResponseSchema;
 
-const triggerFireInputSchema: z.ZodType<TriggerFireInput> = z.object({
+const triggerFireInputSchema: z.ZodObject<{
+  payload: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
+  idempotencyKey: z.ZodOptional<z.ZodString>;
+  reason: z.ZodOptional<z.ZodString>;
+  traceparent: z.ZodOptional<z.ZodString>;
+  tracestate: z.ZodOptional<z.ZodString>;
+}> = z.object({
   payload: z.record(z.string(), z.unknown()).optional(),
   idempotencyKey: z.string().optional(),
   reason: z.string().optional(),
@@ -217,10 +316,14 @@ const triggerFireInputSchema: z.ZodType<TriggerFireInput> = z.object({
 });
 
 /** Trigger fire request schema. */
-export const TriggerFireInputSchema: TriggerContractSchema<TriggerFireInput> =
-  triggerFireInputSchema;
+export const TriggerFireInputSchema: ContractSchema<TriggerFireInput> = triggerFireInputSchema;
 
-const triggerFireResponseSchema: z.ZodType<TriggerFireResponse> = z.object({
+const triggerFireResponseSchema: z.ZodObject<{
+  accepted: z.ZodBoolean;
+  eventId: z.ZodString;
+  triggerId: z.ZodString;
+  status: z.ZodEnum<{ pending: 'pending'; deferred: 'deferred' }>;
+}> = z.object({
   accepted: z.boolean(),
   eventId: z.string(),
   triggerId: z.string(),
@@ -228,10 +331,15 @@ const triggerFireResponseSchema: z.ZodType<TriggerFireResponse> = z.object({
 });
 
 /** Trigger fire response schema. */
-export const TriggerFireResponseSchema: TriggerContractSchema<TriggerFireResponse> =
+export const TriggerFireResponseSchema: ContractSchema<TriggerFireResponse> =
   triggerFireResponseSchema;
 
-const triggerPreviewResponseSchema: z.ZodType<TriggerPreviewResponse> = z.object({
+const triggerPreviewResponseSchema: z.ZodObject<{
+  triggerId: z.ZodString;
+  nextFireAt: z.ZodArray<z.ZodString>;
+  timezone: z.ZodOptional<z.ZodString>;
+  persistent: z.ZodBoolean;
+}> = z.object({
   triggerId: z.string(),
   nextFireAt: z.array(z.string().datetime()),
   timezone: z.string().optional(),
@@ -239,10 +347,17 @@ const triggerPreviewResponseSchema: z.ZodType<TriggerPreviewResponse> = z.object
 });
 
 /** Trigger schedule preview response schema. */
-export const TriggerPreviewResponseSchema: TriggerContractSchema<TriggerPreviewResponse> =
+export const TriggerPreviewResponseSchema: ContractSchema<TriggerPreviewResponse> =
   triggerPreviewResponseSchema;
 
-const triggerSSEEventTypeSchema: z.ZodType<TriggerSSEEventType> = z.enum([
+const triggerSSEEventTypeSchema: z.ZodEnum<{
+  'trigger:accepted': 'trigger:accepted';
+  'trigger:started': 'trigger:started';
+  'trigger:completed': 'trigger:completed';
+  'trigger:failed': 'trigger:failed';
+  'trigger:dlq': 'trigger:dlq';
+  heartbeat: 'heartbeat';
+}> = z.enum([
   'trigger:accepted',
   'trigger:started',
   'trigger:completed',
@@ -252,10 +367,16 @@ const triggerSSEEventTypeSchema: z.ZodType<TriggerSSEEventType> = z.enum([
 ]);
 
 /** Trigger SSE event type schema. */
-export const TriggerSSEEventTypeSchema: TriggerContractSchema<TriggerSSEEventType> =
+export const TriggerSSEEventTypeSchema: ContractSchema<TriggerSSEEventType> =
   triggerSSEEventTypeSchema;
 
-const triggerSSEEventSchema: z.ZodType<TriggerSSEEvent> = z.object({
+const triggerSSEEventSchema: z.ZodObject<{
+  type: typeof triggerSSEEventTypeSchema;
+  timestamp: z.ZodString;
+  triggerId: z.ZodOptional<z.ZodString>;
+  eventId: z.ZodOptional<z.ZodString>;
+  data: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
+}> = z.object({
   type: triggerSSEEventTypeSchema,
   timestamp: z.string().datetime(),
   triggerId: z.string().optional(),
@@ -264,104 +385,306 @@ const triggerSSEEventSchema: z.ZodType<TriggerSSEEvent> = z.object({
 });
 
 /** Trigger SSE event schema. */
-export const TriggerSSEEventSchema: TriggerContractSchema<TriggerSSEEvent> = triggerSSEEventSchema;
+export const TriggerSSEEventSchema: ContractSchema<TriggerSSEEvent> = triggerSSEEventSchema;
 
-const TriggerFiltersShape: z.ZodRawShape = {
+const TriggerFiltersShape: {
+  kind: z.ZodOptional<
+    z.ZodNullable<
+      z.ZodEnum<{
+        webhook: 'webhook';
+        'file-watch': 'file-watch';
+        scheduled: 'scheduled';
+        queue: 'queue';
+        stream: 'stream';
+        manual: 'manual';
+      }>
+    >
+  >;
+  enabled: z.ZodOptional<z.ZodCoercedBoolean<unknown>>;
+  tags: z.ZodOptional<z.ZodString>;
+} = {
   kind: z.enum(TRIGGER_KINDS).nullable().optional(),
   enabled: z.coerce.boolean().optional(),
   tags: z.string().optional(),
 };
 
-const triggerFiltersSchema: z.ZodType<TriggerFilters> = z.object(TriggerFiltersShape);
+const triggerFiltersSchema: z.ZodObject<typeof TriggerFiltersShape> = z.object(TriggerFiltersShape);
 
 /** Trigger list filter schema. */
-export const TriggerFiltersSchema: TriggerContractSchema<TriggerFilters> = triggerFiltersSchema;
+export const TriggerFiltersSchema: ContractSchema<TriggerFilters> = triggerFiltersSchema;
 
-const EventFiltersShape: z.ZodRawShape = {
+const EventFiltersShape: {
+  triggerId: z.ZodOptional<z.ZodString>;
+  kind: z.ZodOptional<
+    z.ZodNullable<
+      z.ZodEnum<{
+        webhook: 'webhook';
+        'file-watch': 'file-watch';
+        scheduled: 'scheduled';
+        queue: 'queue';
+        stream: 'stream';
+        manual: 'manual';
+      }>
+    >
+  >;
+  status: z.ZodOptional<
+    z.ZodNullable<
+      z.ZodEnum<{
+        pending: 'pending';
+        'in-flight': 'in-flight';
+        deferred: 'deferred';
+        completed: 'completed';
+        failed: 'failed';
+        dlq: 'dlq';
+      }>
+    >
+  >;
+} = {
   triggerId: z.string().optional(),
   kind: z.enum(TRIGGER_KINDS).nullable().optional(),
   status: z.enum(TRIGGER_EVENT_STATUSES).nullable().optional(),
 };
 
-const eventFiltersSchema: z.ZodType<EventFilters> = z.object(EventFiltersShape);
+const eventFiltersSchema: z.ZodObject<typeof EventFiltersShape> = z.object(EventFiltersShape);
 
 /** Trigger event list filter schema. */
-export const EventFiltersSchema: TriggerContractSchema<EventFilters> = eventFiltersSchema;
+export const EventFiltersSchema: ContractSchema<EventFilters> = eventFiltersSchema;
 
-function createTriggersContractDefinition(): Parameters<typeof implement>[0] {
-  return {
-    listTriggers: baseContract
-      .route({ method: 'GET', path: '/triggers' })
-      .input(offsetPaginationQuerySchema.extend(TriggerFiltersShape))
-      .output(z.object({
-        triggers: z.array(triggerDefinitionResponseSchema),
-        total: nonNegativeInt('Total count'),
-        limit: paginationLimit('Results per page'),
-        offset: paginationOffset('Current offset'),
-      })),
+// --- Per-route input/output schemas ------------------------------------------
 
-    getTrigger: baseContract
-      .route({ method: 'GET', path: '/triggers/{id}' })
-      .input(z.object({ id: z.string() }))
-      .output(triggerDefinitionResponseSchema),
+const listTriggersInput: z.ZodObject<
+  typeof OffsetPaginationQueryShape & typeof TriggerFiltersShape
+> = offsetPaginationQuerySchema.extend(TriggerFiltersShape);
 
-    listEvents: baseContract
-      .route({ method: 'GET', path: '/events' })
-      .input(offsetPaginationQuerySchema.extend(EventFiltersShape))
-      .output(z.object({
-        events: z.array(triggerEventResponseSchema),
-        total: nonNegativeInt('Total count'),
-        limit: paginationLimit('Results per page'),
-        offset: paginationOffset('Current offset'),
-      })),
+const listTriggersOutput: z.ZodObject<{
+  triggers: z.ZodArray<typeof triggerDefinitionResponseSchema>;
+  total: z.ZodNumber;
+  limit: z.ZodDefault<z.ZodNumber>;
+  offset: z.ZodDefault<z.ZodNumber>;
+}> = z.object({
+  triggers: z.array(triggerDefinitionResponseSchema),
+  total: nonNegativeInt('Total count'),
+  limit: paginationLimit('Results per page'),
+  offset: paginationOffset('Current offset'),
+});
 
-    getEvent: baseContract
-      .route({ method: 'GET', path: '/events/{id}' })
-      .input(z.object({ id: z.string() }))
-      .output(triggerEventResponseSchema),
+const getTriggerInput: z.ZodObject<{ id: z.ZodString }> = z.object({ id: z.string() });
 
-    fireTrigger: baseContract
-      .route({ method: 'POST', path: '/triggers/{id}/fire' })
-      .input(z.object({ id: z.string(), body: triggerFireInputSchema.optional() }))
-      .output(triggerFireResponseSchema),
+const listEventsInput: z.ZodObject<
+  typeof OffsetPaginationQueryShape & typeof EventFiltersShape
+> = offsetPaginationQuerySchema.extend(EventFiltersShape);
 
-    testWebhook: baseContract
-      .route({ method: 'POST', path: '/webhooks/{id}/test' })
-      .input(z.object({ id: z.string(), body: triggerFireInputSchema.optional() }))
-      .output(triggerFireResponseSchema),
+const listEventsOutput: z.ZodObject<{
+  events: z.ZodArray<typeof triggerEventResponseSchema>;
+  total: z.ZodNumber;
+  limit: z.ZodDefault<z.ZodNumber>;
+  offset: z.ZodDefault<z.ZodNumber>;
+}> = z.object({
+  events: z.array(triggerEventResponseSchema),
+  total: nonNegativeInt('Total count'),
+  limit: paginationLimit('Results per page'),
+  offset: paginationOffset('Current offset'),
+});
 
-    previewSchedule: baseContract
-      .route({ method: 'GET', path: '/triggers/{id}/preview' })
-      .input(z.object({
-        id: z.string(),
-        count: z.coerce.number().int().min(1).max(50).default(5).optional(),
-      }))
-      .output(triggerPreviewResponseSchema),
+const getEventInput: z.ZodObject<{ id: z.ZodString }> = z.object({ id: z.string() });
 
-    enableTrigger: baseContract
-      .route({ method: 'POST', path: '/triggers/{id}/enable' })
-      .input(z.object({ id: z.string() }))
-      .output(triggerDefinitionResponseSchema),
+const fireTriggerInput: z.ZodObject<{
+  id: z.ZodString;
+  body: z.ZodOptional<typeof triggerFireInputSchema>;
+}> = z.object({ id: z.string(), body: triggerFireInputSchema.optional() });
 
-    disableTrigger: baseContract
-      .route({ method: 'POST', path: '/triggers/{id}/disable' })
-      .input(z.object({ id: z.string() }))
-      .output(triggerDefinitionResponseSchema),
+const testWebhookInput: z.ZodObject<{
+  id: z.ZodString;
+  body: z.ZodOptional<typeof triggerFireInputSchema>;
+}> = z.object({ id: z.string(), body: triggerFireInputSchema.optional() });
 
-    subscribeEvents: oc
-      .route({ method: 'GET', path: '/events/subscribe' })
-      .input(z.object(EventFiltersShape).optional())
-      .output(eventIterator(triggerSSEEventSchema)),
-  } satisfies Parameters<typeof implement>[0];
+const previewScheduleInput: z.ZodObject<{
+  id: z.ZodString;
+  count: z.ZodOptional<z.ZodDefault<z.ZodCoercedNumber<unknown>>>;
+}> = z.object({
+  id: z.string(),
+  count: z.coerce.number().int().min(1).max(50).default(5).optional(),
+});
+
+const enableTriggerInput: z.ZodObject<{ id: z.ZodString }> = z.object({ id: z.string() });
+
+const disableTriggerInput: z.ZodObject<{ id: z.ZodString }> = z.object({ id: z.string() });
+
+const subscribeEventsInput: z.ZodOptional<z.ZodObject<typeof EventFiltersShape>> = z.object(
+  EventFiltersShape,
+).optional();
+
+// --- subscribeEvents route (built via `oc.route`, not `baseContract`) --------
+// `oc.route` carries no `.errors(...)`, so its error map is an empty
+// `Record<never, never>` rather than {@link BaseErrors}; its output is an
+// `eventIterator` whose type derives from the SSE event schema's input/output.
+
+/** Output type produced by `eventIterator(triggerSSEEventSchema)`. */
+type SubscribeEventsOutput = ReturnType<
+  typeof eventIterator<
+    z.input<typeof triggerSSEEventSchema>,
+    z.output<typeof triggerSSEEventSchema>
+  >
+>;
+
+/** Precise type of the `subscribeEvents` streaming route. */
+type SubscribeEventsRoute = ContractProcedureBuilderWithInputOutput<
+  typeof subscribeEventsInput,
+  SubscribeEventsOutput,
+  Record<never, never>,
+  Record<never, never>
+>;
+
+/**
+ * Explicit, precise type of the triggers v1 contract definition.
+ *
+ * Every member is a real oRPC contract procedure typed against its input and
+ * output Zod schemas. The interface `extends BasePluginContract`, so the
+ * mandatory `describe` route is enforced by the seam and any additional route
+ * must be a real contract router (the `[route: string]: AnyContractRouter`
+ * constraint inherited from {@link BasePluginContract}). Spelling the type
+ * explicitly is required by `--isolatedDeclarations` (the JSR slow-types bar);
+ * because each member derives from a named, annotated schema via `typeof`, the
+ * contract type can never silently drift from the schemas.
+ */
+interface TriggersContractDefinitionShape extends BasePluginContract {
+  readonly describe: BasePluginDescribeRoute;
+  readonly listTriggers: Route<typeof listTriggersInput, typeof listTriggersOutput>;
+  readonly getTrigger: Route<typeof getTriggerInput, typeof triggerDefinitionResponseSchema>;
+  readonly listEvents: Route<typeof listEventsInput, typeof listEventsOutput>;
+  readonly getEvent: Route<typeof getEventInput, typeof triggerEventResponseSchema>;
+  readonly fireTrigger: Route<typeof fireTriggerInput, typeof triggerFireResponseSchema>;
+  readonly testWebhook: Route<typeof testWebhookInput, typeof triggerFireResponseSchema>;
+  readonly previewSchedule: Route<typeof previewScheduleInput, typeof triggerPreviewResponseSchema>;
+  readonly enableTrigger: Route<typeof enableTriggerInput, typeof triggerDefinitionResponseSchema>;
+  readonly disableTrigger: Route<
+    typeof disableTriggerInput,
+    typeof triggerDefinitionResponseSchema
+  >;
+  readonly subscribeEvents: SubscribeEventsRoute;
 }
 
-type TriggersContractDefinition = ReturnType<typeof createTriggersContractDefinition>;
+/**
+ * The triggers v1 contract definition object.
+ *
+ * Spreads the mandatory base seam `describe` route and layers the 10
+ * plugin-specific routes. The explicit {@link TriggersContractDefinitionShape}
+ * annotation makes the precise contract type available to
+ * `--isolatedDeclarations` without erasing it; because the base seam `describe`
+ * is a real oRPC `ContractProcedure` (no phantom marker) and every route is
+ * precisely typed, this object is handed to `implement()` WITHOUT any erasure
+ * cast and every `router.<route>.handler(...)` is checked against the
+ * contract's IO.
+ */
+const triggersContractDefinition: TriggersContractDefinitionShape = {
+  // Mandatory base seam route: every feature plugin contract carries the typed
+  // `describe` route (GET /describe) returning a `PluginCapabilities` document.
+  ...BASE_PLUGIN_CONTRACT_ROUTES,
 
-const triggersContractDefinition: TriggersContractDefinition = createTriggersContractDefinition();
+  listTriggers: baseContract
+    .route({ method: 'GET', path: '/triggers' })
+    .input(listTriggersInput)
+    .output(listTriggersOutput),
 
-/** v1 trigger oRPC contract definition. */
-export const triggersContract: Readonly<Record<string, unknown>> =
-  triggersContractDefinition as unknown as Readonly<Record<string, unknown>>;
+  getTrigger: baseContract
+    .route({ method: 'GET', path: '/triggers/{id}' })
+    .input(getTriggerInput)
+    .output(triggerDefinitionResponseSchema),
 
-/** v1 trigger oRPC implementation builder. */
-export const triggersContractV1: unknown = implement(triggersContractDefinition);
+  listEvents: baseContract
+    .route({ method: 'GET', path: '/events' })
+    .input(listEventsInput)
+    .output(listEventsOutput),
+
+  getEvent: baseContract
+    .route({ method: 'GET', path: '/events/{id}' })
+    .input(getEventInput)
+    .output(triggerEventResponseSchema),
+
+  fireTrigger: baseContract
+    .route({ method: 'POST', path: '/triggers/{id}/fire' })
+    .input(fireTriggerInput)
+    .output(triggerFireResponseSchema),
+
+  testWebhook: baseContract
+    .route({ method: 'POST', path: '/webhooks/{id}/test' })
+    .input(testWebhookInput)
+    .output(triggerFireResponseSchema),
+
+  previewSchedule: baseContract
+    .route({ method: 'GET', path: '/triggers/{id}/preview' })
+    .input(previewScheduleInput)
+    .output(triggerPreviewResponseSchema),
+
+  enableTrigger: baseContract
+    .route({ method: 'POST', path: '/triggers/{id}/enable' })
+    .input(enableTriggerInput)
+    .output(triggerDefinitionResponseSchema),
+
+  disableTrigger: baseContract
+    .route({ method: 'POST', path: '/triggers/{id}/disable' })
+    .input(disableTriggerInput)
+    .output(triggerDefinitionResponseSchema),
+
+  subscribeEvents: oc
+    .route({ method: 'GET', path: '/events/subscribe' })
+    .input(subscribeEventsInput)
+    .output(eventIterator(triggerSSEEventSchema)),
+};
+
+/**
+ * The fully-typed triggers v1 contract definition type.
+ *
+ * Re-exported so {@link TriggersContract} and {@link TriggersContractV1} derive
+ * from it instead of hand-authoring a parallel structural shape.
+ */
+export type TriggersContractDefinition = TriggersContractDefinitionShape;
+
+/**
+ * Trigger service contract definition for client generation.
+ *
+ * Carries the real, precise oRPC contract router type — no erasure cast.
+ */
+export const triggersContract: TriggersContractDefinition = triggersContractDefinition;
+
+/**
+ * The implemented (context-bindable) triggers v1 contract.
+ *
+ * `implement(definition)` precisely types the implementer against the contract,
+ * so every `router.<route>.handler(...)` is checked for input/output/error
+ * conformance. The type is the real `implement` return type — no erasure cast.
+ */
+export const triggersContractV1: ReturnType<typeof implement<TriggersContractDefinition>> =
+  implement(triggersContractDefinition);
+
+/**
+ * Public contract shape for trigger service clients.
+ *
+ * Derived directly from {@link TriggersContractDefinition} — the real,
+ * fully-inferred oRPC contract router. Carries the precise per-route
+ * input/output/error types, so client generation and `implement(...)` stay
+ * sound and can never drift from the Zod schemas.
+ */
+export type TriggersContract = TriggersContractDefinition;
+
+/**
+ * Context-binding implementer for the v1 trigger contract.
+ *
+ * Derived from the {@link triggersContractV1} value (`implement(definition)`),
+ * so `TriggersContractV1['$context']<Ctx>()` returns the precisely-typed router
+ * implementer whose `<route>.handler(...)` calls are checked against the
+ * contract IO.
+ */
+export type TriggersContractV1 = typeof triggersContractV1;
+
+/**
+ * The context-bound trigger router implementer.
+ *
+ * Derived from {@link TriggersContractV1} by binding an opaque request context,
+ * so each `TriggersRouter[route]` is the real oRPC procedure implementer.
+ * Connectors bind their own concrete context via
+ * `triggersContractV1.$context<TheirContext>()`.
+ */
+export type TriggersRouter = ReturnType<
+  typeof triggersContractV1.$context<Record<never, never>>
+>;

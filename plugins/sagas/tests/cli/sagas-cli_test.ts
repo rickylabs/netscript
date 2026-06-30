@@ -1,5 +1,11 @@
 import { assertEquals } from 'jsr:@std/assert@^1';
-import { SAGAS_CLI_COMMANDS, SagasCli, StaticSagasCliBackend } from '../../src/cli/mod.ts';
+import {
+  type PluginCliArgs,
+  type PluginCliResult,
+  SAGAS_CLI_COMMANDS,
+  SagasCli,
+  StaticSagasCliBackend,
+} from '../../src/cli/mod.ts';
 
 Deno.test('SagasCli exposes the sagas command registry', async () => {
   const cli = new SagasCli(new StaticSagasCliBackend());
@@ -9,7 +15,7 @@ Deno.test('SagasCli exposes the sagas command registry', async () => {
   assertEquals(cli.description, 'Saga orchestration plugin CLI.');
   assertEquals(commands.map((command) => command.name), [...SAGAS_CLI_COMMANDS]);
 
-  const inspect = await cli.run({
+  const inspect = await runSagasCommand(cli, {
     command: 'inspect',
     values: ['project/sagas'],
     flags: { root: 'sagas,services' },
@@ -23,7 +29,7 @@ Deno.test('SagasCli exposes the sagas command registry', async () => {
     values: ['project/sagas'],
   });
 
-  const missing = await cli.run({ command: 'missing-command' });
+  const missing = await runSagasCommand(cli, { command: 'missing-command' });
   assertEquals(missing.code, 1);
 });
 
@@ -32,8 +38,19 @@ Deno.test('SagasCli exposes command metadata with categories and flags', () => {
   const definitions = cli.commands();
 
   assertEquals(definitions.map((definition) => definition.description), [
+    'Create a saga definition and config entry.',
     'Generate the static saga registry for compiled runtimes.',
     'Inspect fluent saga definitions in project source.',
     'Rewrite legacy sagas imports to plugin package specifiers.',
   ]);
 });
+
+async function runSagasCommand(
+  cli: SagasCli,
+  args: PluginCliArgs,
+): Promise<PluginCliResult> {
+  const command = cli.commands().find((item) => item.name === args.command);
+  return command
+    ? await command.run(args)
+    : { code: 1, message: `Unknown sagas command: ${args.command}` };
+}

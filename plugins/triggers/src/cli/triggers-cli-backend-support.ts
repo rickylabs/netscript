@@ -10,8 +10,6 @@ import type {
   TriggerKind,
   WebhookTriggerPayload,
 } from '@netscript/plugin-triggers-core/domain';
-import type { TriggerScaffoldInput, TriggerScaffoldKind } from '../scaffolding/mod.ts';
-
 /** Inspection summary parsed from a trigger source file. */
 export type TriggerInspectionEntry = Readonly<{
   id: string;
@@ -73,26 +71,6 @@ export function parseJsonFlag(args: PluginCliArgs, name: string): unknown {
   return value === undefined ? undefined : JSON.parse(value);
 }
 
-export function scaffoldInput(
-  kind: TriggerScaffoldKind,
-  id: string,
-  args: PluginCliArgs,
-): TriggerScaffoldInput {
-  return {
-    id,
-    kind,
-    path: flag(args, 'path'),
-    paths: listFlag(args, 'path', 'paths'),
-    patterns: listFlag(args, 'pattern', 'patterns'),
-    ignored: listFlag(args, 'ignored'),
-    cron: flag(args, 'cron'),
-    timezone: flag(args, 'timezone'),
-    secretEnv: flag(args, 'secret-env'),
-    job: flag(args, 'job'),
-    force: booleanFlag(args, 'force'),
-  };
-}
-
 export function inspectTriggerSource(
   file: string,
   source: string,
@@ -147,13 +125,6 @@ export function previewCron(expression: string, count: number): readonly Date[] 
   }
 
   return dates;
-}
-
-function listFlag(args: PluginCliArgs, ...names: readonly string[]): readonly string[] | undefined {
-  const value = names.map((name) => flag(args, name)).find((item) => item !== undefined);
-  return value === undefined
-    ? undefined
-    : Object.freeze(value.split(',').map((item) => item.trim()).filter(Boolean));
 }
 
 function detectKind(source: string): TriggerInspectionEntry['kind'] {

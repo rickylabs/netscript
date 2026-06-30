@@ -40,6 +40,7 @@ import type {
   ServiceApp,
   ServiceHandler,
   ServiceMiddleware,
+  ServiceRouteMethod,
   ServiceRouter,
   ShutdownHook,
 } from '../types.ts';
@@ -147,9 +148,9 @@ export interface ServiceBuilder<TRouter extends ServiceRouter> {
   /** Adds custom middleware to the service. */
   use(middleware: ServiceMiddleware): ServiceBuilder<TRouter>;
 
-  /** Adds a custom route to the service. */
+  /** Adds a custom (raw, non-oRPC) route to the service. `'all'` matches every method. */
   route(
-    method: 'get' | 'post' | 'put' | 'delete' | 'patch',
+    method: ServiceRouteMethod,
     path: string,
     handler: ServiceHandler,
   ): ServiceBuilder<TRouter>;

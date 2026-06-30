@@ -1,7 +1,7 @@
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import { assertEquals } from 'jsr:@std/assert@^1';
 
-import type { ValidatedPluginDescriptor } from '../../features/plugins/add/jsr-plugin-validator-port.ts';
+import type { ValidatedPluginDescriptor } from '../../features/plugins/install/jsr-plugin-validator-port.ts';
 import { buildPluginScaffoldPermissionFlags } from './plugin-scaffold-permissions.ts';
 
 describe('buildPluginScaffoldPermissionFlags', () => {

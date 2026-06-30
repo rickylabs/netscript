@@ -34,7 +34,7 @@
       "--allow-run"
     ],
     "watchFlag": "--watch",
-    "defaultEntrypoint": "bin/combined.ts",
+    "defaultEntrypoint": "workers/runtime.ts",
     "defaultServiceEntrypoint": "services/src/main.ts",
     "defaultRequiresDb": true,
     "defaultRequiresKv": true,
@@ -51,7 +51,7 @@
     "pluginDir": "workers",
     "backgroundDir": "workers",
     "serviceEntrypoint": "services/src/main.ts",
-    "backgroundEntrypoint": "bin/combined.ts",
+    "backgroundEntrypoint": "workers/runtime.ts",
     "serviceConfigKey": "workers-api",
     "servicePort": 8091,
     "backgroundPort": 8091,

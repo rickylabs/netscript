@@ -72,6 +72,7 @@ const TEST_FILE_SUFFIXES: readonly string[] = [
 ];
 
 const MYSQL_ADAPTER_PACKAGE = "prisma-adapter-mysql";
+const SOURCE_ROOT_MARKER = ".netscript-source-root";
 
 interface RootDenoJson {
   workspace?: unknown;
@@ -146,6 +147,10 @@ export async function copyLocalPackages(
     options.targetPath,
     allPackages,
     sourceCatalog,
+  );
+  await Deno.writeTextFile(
+    join(options.targetPath, SOURCE_ROOT_MARKER),
+    options.sourceRoot + "\n",
   );
 
   if (!allPackages.includes(MYSQL_ADAPTER_PACKAGE)) {

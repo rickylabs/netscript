@@ -4,17 +4,20 @@ import type {
   SagaStorePort,
 } from '@netscript/plugin-sagas-core/runtime';
 import { createSagaRuntime } from '@netscript/plugin-sagas-core/runtime';
+import type { KvStore } from '@netscript/kv';
 
-import { KvSagaStore, openSagaRuntimeKv } from './kv-saga-store.ts';
-import { PrismaSagaStore, type PrismaSagaStoreClient } from './prisma-saga-store.ts';
-
-/** Durable saga store backend variants supported by the plugin runtime. */
-export type DurableSagaStoreBackend = 'kv' | 'prisma';
+import {
+  type DurableSagaStoreBackend,
+  KvSagaStore,
+  openSagaRuntimeKv,
+  PrismaSagaStore,
+  type PrismaSagaStoreClient,
+} from '@netscript/plugin-sagas-core/stores';
 
 /** Options for the plugin-layer durable saga runtime factory. */
 export type DurableSagaRuntimeOptions = Readonly<{
   backend?: DurableSagaStoreBackend;
-  kv?: Deno.Kv;
+  kv?: KvStore;
   prisma?: PrismaSagaStoreClient;
   store?: SagaStorePort;
   native?: SagaRuntimeNativeOptions;
@@ -24,7 +27,7 @@ export type DurableSagaRuntimeOptions = Readonly<{
 export type DurableSagaRuntime = Readonly<{
   runtime: SagaRuntime<'native'>;
   store: SagaStorePort;
-  kv?: Deno.Kv;
+  kv?: KvStore;
   dispose(): Promise<void>;
 }>;
 
@@ -51,7 +54,7 @@ export async function createDurableSagaRuntime(
 
 type DurableSagaStoreResources = Readonly<{
   store: SagaStorePort;
-  kv?: Deno.Kv;
+  kv?: KvStore;
   dispose(): Promise<void>;
 }>;
 
@@ -87,7 +90,7 @@ async function resolveStoreResources(
   });
 }
 
-async function closeStore(store: SagaStorePort, kv?: Deno.Kv): Promise<void> {
+async function closeStore(store: SagaStorePort, kv?: KvStore): Promise<void> {
   const closeable = store as SagaStorePort & { close?: () => void | Promise<void> };
   if (closeable.close) {
     await closeable.close();

@@ -1,11 +1,11 @@
 import { join } from '@std/path';
 
 import { SCAFFOLD_DIRS } from '../../../kernel/constants/scaffold/scaffold-dirs.ts';
-import type { ValidatedPluginDescriptor } from '../../features/plugins/add/jsr-plugin-validator-port.ts';
+import type { ValidatedPluginDescriptor } from '../../features/plugins/install/jsr-plugin-validator-port.ts';
 import {
   classifyPluginTrust,
   type PluginTrustTier,
-} from '../../features/plugins/add/plugin-trust-tier.ts';
+} from '../../features/plugins/install/plugin-trust-tier.ts';
 
 /** Options for building Deno flags for plugin-owned scaffold execution. */
 export interface PluginScaffoldPermissionFlagOptions {

@@ -4,6 +4,7 @@ import type { WorkersCliBackend } from './command-types.ts';
 import {
   AddJobCommand,
   AddTaskCommand,
+  AddWorkflowCommand,
   CompileRegistryCommand,
   ConfigEditCommand,
   ConfigPublishCommand,
@@ -36,6 +37,7 @@ export class WorkersCli extends PluginCli {
     return [
       new AddJobCommand(this.backend),
       new AddTaskCommand(this.backend),
+      new AddWorkflowCommand(this.backend),
       new ListJobsCommand(this.backend),
       new ListTasksCommand(this.backend),
       new RunJobCommand(this.backend),

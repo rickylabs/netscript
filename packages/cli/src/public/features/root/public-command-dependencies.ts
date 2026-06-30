@@ -46,7 +46,7 @@ import type { ProcessPort } from '../../../kernel/ports/process-port.ts';
 import { createPluginDispatchPort } from '../plugins/dispatch/dispatch-plugin-verb.ts';
 import type { PluginDispatchPort } from '../plugins/dispatch/plugin-dispatch-port.ts';
 import type { DoctorPluginCommandDependencies } from '../plugins/doctor/doctor-plugin-command.ts';
-import type { JsrPluginValidatorPort } from '../plugins/add/jsr-plugin-validator-port.ts';
+import type { JsrPluginValidatorPort } from '../plugins/install/jsr-plugin-validator-port.ts';
 import type { JsrPackageFileFetcher } from '../../infra/jsr/verify-jsr-package-integrity.ts';
 import { doctorPlugin } from '../plugins/doctor/doctor-plugin-use-case.ts';
 import {
@@ -105,8 +105,8 @@ export interface PublicCommandDependencies {
     readonly contractScaffolder: ReturnType<typeof createContractScaffolder>;
     readonly serviceScaffolder: ServiceScaffolder;
   };
-  /** Dependencies for plugin add. */
-  readonly pluginAddDependencies: {
+  /** Dependencies for plugin install. */
+  readonly pluginInstallDependencies: {
     readonly fs: DenoFileSystem;
     readonly scaffolder: Scaffolder;
     readonly templateAdapter: StringTemplateAdapter;
@@ -236,7 +236,7 @@ export function createPublicCommandDependencies(
       workspaceMutator: new DatabaseWorkspaceMutator(fs, scaffolder, templateAdapter),
     },
     serviceAddDependencies,
-    pluginAddDependencies: {
+    pluginInstallDependencies: {
       fs,
       scaffolder,
       templateAdapter,

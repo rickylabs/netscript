@@ -5,6 +5,7 @@ import type {
   TaskDefinition,
   TaskExecutionOptions,
   TaskMessage,
+  TriggerType,
   WorkerIdempotencyPort,
 } from '@netscript/plugin-workers-core/runtime';
 import type { TracedMessageContext } from '@netscript/telemetry/instrumentation';
@@ -45,8 +46,8 @@ export type WorkerCreateExecutionOptions = Readonly<{
   jobId: string;
   /** Topic associated with the execution. */
   topic: string;
-  /** Trigger source. */
-  triggeredBy: string;
+  /** Trigger source (canonical {@link TriggerType} enum, not bare `string`). */
+  triggeredBy: TriggerType;
   /** Optional execution payload. */
   payload?: Record<string, unknown>;
   /** Optional correlation identifier. */

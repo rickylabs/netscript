@@ -1,5 +1,6 @@
 import { assert, assertEquals, assertRejects, assertStrictEquals } from 'jsr:@std/assert@^1';
 
+import { MemoryKvAdapter } from '@netscript/kv';
 import type {
   SagaCorrelationIndexEntry,
   SagaCorrelationKey,
@@ -13,11 +14,14 @@ import type {
 } from '@netscript/plugin-sagas-core/runtime';
 
 import { createDurableSagaRuntime } from './create-durable-saga-runtime.ts';
-import { KvSagaStore } from './kv-saga-store.ts';
-import { PrismaSagaStore, type PrismaSagaStoreClient } from './prisma-saga-store.ts';
+import {
+  KvSagaStore,
+  PrismaSagaStore,
+  type PrismaSagaStoreClient,
+} from '@netscript/plugin-sagas-core/stores';
 
 Deno.test('createDurableSagaRuntime injects a KvSagaStore by default', async () => {
-  const kv = await Deno.openKv(':memory:');
+  const kv = new MemoryKvAdapter();
   const durable = await createDurableSagaRuntime({ kv });
   try {
     assertEquals(durable.runtime.adapter, 'native');
@@ -30,7 +34,7 @@ Deno.test('createDurableSagaRuntime injects a KvSagaStore by default', async () 
 });
 
 Deno.test('createDurableSagaRuntime honors injected store and kv', async () => {
-  const kv = await Deno.openKv(':memory:');
+  const kv = new MemoryKvAdapter();
   const store = new RecordingSagaStore();
   const durable = await createDurableSagaRuntime({ kv, store });
   try {

@@ -1,0 +1,39 @@
+Bootstrapping NetScript for OpenHands
+Downloading aspire-cli-linux-x64-13.4.6.tar.gz
+#                                                                          2.2%###############                                                           21.8%###################                                                       27.4%################################                                          45.5%#############################################                             63.3%#########################################################                 79.8%####################################################################      94.6%######################################################################## 100.0%
+Downloading aspire-cli-linux-x64-13.4.6.tar.gz.sha512
+######################################################################## 100.0%
+Aspire CLI successfully installed to: [0;32m/home/runner/.aspire/bin/aspire[0m
+Skipping PATH configuration due to --skip-path flag
+deno 2.9.0 (stable, release, x86_64-unknown-linux-gnu)
+v8 14.9.207.2-rusty
+typescript 6.0.3
+10.0.301
+10.0.109 [/usr/share/dotnet/sdk]
+10.0.204 [/usr/share/dotnet/sdk]
+10.0.301 [/usr/share/dotnet/sdk]
+13.4.6+87fe259e4fc244c599019a7b1304c85a1488f248
+Docker version 29.6.1, build 8900f1d
+Docker Compose version v2.38.2
+[0m[33m╭[0m [0m[1m[33mWarning[0m
+[0m[33m│[0m
+[0m[33m│[0m  Ignored build scripts for packages:
+[0m[33m│[0m  [0m[3mnpm:lmdb@3.5.5[0m
+[0m[33m│[0m  [0m[3mnpm:msgpackr-extract@3.0.4[0m
+[0m[33m│[0m
+[0m[33m│[0m  Lifecycle scripts are only supported when using a `node_modules` directory.
+[0m[33m│[0m  Enable it in your deno config file:
+[0m[33m│[0m  [0m[1m"nodeModulesDir": "auto"[0m
+[0m[33m╰─[0m
+http-cache: /home/runner/.local/share/NuGet/http-cache
+global-packages: /home/runner/.nuget/packages/
+temp: /tmp/NuGetScratchrunner
+plugins-cache: /home/runner/.local/share/NuGet/plugin-cache
+
+Workload version: 10.0.300-manifests.b0c14421
+
+Installed Workload Id      Manifest Version      Installation Source
+--------------------------------------------------------------------
+
+Use `dotnet workload search` to find additional workloads to install.
+

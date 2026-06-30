@@ -17,7 +17,8 @@
 import '@netscript/kv/redis';
 
 import type { PluginServiceContext } from '@netscript/plugin/sdk';
-import { createService } from '@netscript/service';
+import type { RunningService } from '@netscript/service';
+import { createPluginService } from '@netscript/plugin/service';
 import { router } from './router.ts';
 import { registerPluginJobs } from './init.ts';
 import { createStreamMutationHook } from '../../streams/server.ts';
@@ -25,7 +26,6 @@ import { createWorkersServiceRuntime } from './service-runtime.ts';
 
 export type { PluginServiceContext } from '@netscript/plugin/sdk';
 
-type ServiceDatabaseClient = Record<string, unknown>;
 type PluginServiceBootstrap = {
   createPluginServiceContext(pluginName: string): Promise<PluginServiceContext>;
 };
@@ -33,44 +33,44 @@ type PluginServiceBootstrap = {
 /**
  * Starts the Workers API service using host-provided infrastructure.
  *
- * The plugin service receives database access through `PluginServiceContext`
- * instead of importing the host application's database package.
+ * The plugin service receives host-owned runtime context without importing the
+ * host application's database package. Workers routes store their mutable state
+ * in KV-backed registries, so the opaque database client is not resolved on the
+ * liveness path.
  *
  * @param ctx - Host-provided plugin service context
  */
 export default async function createWorkersService(
   ctx: PluginServiceContext,
-): Promise<void> {
+): Promise<RunningService> {
   const port = parseInt(ctx.env.PORT ?? Deno.env.get('PORT') ?? '8091');
-  const dbClient = await ctx.db.getClient() as ServiceDatabaseClient;
   const runtime = await createWorkersServiceRuntime();
 
-  await createService(router, {
+  const running = await createPluginService(router, {
     name: 'workers',
     version: '1.0.0',
     port,
-  })
-    .withCors()
-    .withLogger()
-    .withOpenAPI({
+    openApi: {
       title: 'Workers API',
       description: 'Workers service for job management and execution',
-    })
-    .withDocs()
-    .withDatabase(dbClient)
-    .withContext(() => ({ workers: runtime }))
-    .withRPC({ traceContext: true })
-    .withHealth()
-    .withServiceInfo()
-    .onStartup(async () => {
+    },
+    context: () => ({ workers: runtime }),
+  }).serve();
+
+  queueMicrotask(async () => {
+    try {
       await registerPluginJobs(runtime);
       runtime.executionState.setMutationHook(createStreamMutationHook());
 
       console.log(
         `Subscribe: http://localhost:${port}/api/v1/workers/subscribe (KV watch SSE)`,
       );
-    })
-    .serve();
+    } catch (error) {
+      console.error('[Workers Plugin] Failed to finish post-listen startup:', error);
+    }
+  });
+
+  return running;
 }
 
 async function loadWorkersServiceContext(): Promise<PluginServiceContext> {

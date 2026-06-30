@@ -21,11 +21,10 @@ export {
   SignoutResponseSchema,
 } from './auth.contract.ts';
 export type {
-  AuthContractErrorFactory,
-  AuthContractErrors,
+  AuthCapabilities,
+  AuthContract,
+  AuthContractDefinition,
   AuthContractV1,
-  AuthRouteHandler,
-  AuthRouteHandlerOptions,
   AuthRouter,
   AuthSessionResponse,
   AuthUserResponse,

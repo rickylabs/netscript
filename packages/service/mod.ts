@@ -122,6 +122,7 @@ export type {
   ServiceMiddleware,
   ServiceNotFoundHandler,
   ServiceRequest,
+  ServiceRouteMethod,
   ServiceRouter,
   ShutdownContext,
   ShutdownHook,

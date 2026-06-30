@@ -1,3 +1,9 @@
+/**
+ * Runtime start APIs for Aspire-managed workers plugin background processes.
+ *
+ * @module
+ */
+
 // Register Redis/Garnet KV adapter before createWorkersServiceRuntime() calls getKv().
 import '@netscript/kv/redis';
 import { createDefaultTaskExecutor } from '@netscript/plugin-workers-core/executor';
@@ -5,6 +11,7 @@ import type { RegisterJobInput, StaticJobRegistry } from '@netscript/plugin-work
 import { createWorkersServiceRuntime } from '../services/src/service-runtime.ts';
 import { Scheduler, Worker } from '../worker/mod.ts';
 
+/** Generated static job definitions keyed by job id. */
 export type StaticJobDefinitionRegistry = ReadonlyMap<string, RegisterJobInput>;
 
 type StaticJobDefinitionRegistrar = Readonly<{
@@ -12,20 +19,31 @@ type StaticJobDefinitionRegistrar = Readonly<{
   registerJob(input: RegisterJobInput): Promise<unknown>;
 }>;
 
+/** Options for starting only the workers job execution process. */
 export type StartWorkerProcessOptions = Readonly<{
+  /** Number of jobs the worker may execute concurrently. */
   concurrency?: number;
+  /** Project-generated static job definitions to register before processing. */
   definitions?: StaticJobDefinitionRegistry;
+  /** Project-relative directory containing job modules. */
   jobsDir?: string;
+  /** Queue name consumed by the worker. */
   queueName?: string;
+  /** Worker-pool registry used for isolated job execution. */
   registry?: StaticJobRegistry;
+  /** Stable worker id used for telemetry and execution state. */
   workerId?: string;
 }>;
 
+/** Options for starting only the workers scheduler process. */
 export type StartSchedulerProcessOptions = Readonly<{
+  /** Project-generated static job definitions to register before scheduling. */
   definitions?: StaticJobDefinitionRegistry;
+  /** Queue name used for scheduled job dispatch. */
   queueName?: string;
 }>;
 
+/** Options for starting worker execution and scheduling in one process. */
 export type StartCombinedProcessOptions = StartWorkerProcessOptions & StartSchedulerProcessOptions;
 
 /** Start the plugin worker process. */
@@ -92,6 +110,7 @@ export async function startCombinedProcess(
   return Object.freeze({ scheduler, worker });
 }
 
+/** Register generated static job definitions if the project emitted them. */
 export async function registerStaticJobDefinitions(
   registry: StaticJobDefinitionRegistrar,
   definitions?: StaticJobDefinitionRegistry,

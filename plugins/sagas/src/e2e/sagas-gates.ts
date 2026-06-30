@@ -1,12 +1,7 @@
+import type { PluginE2eGate } from '@netscript/plugin';
+
 /** E2E gate definition for the sagas plugin. */
-export interface SagasE2eGate {
-  /** Stable gate identifier. */
-  readonly id: string;
-  /** Human-readable gate summary. */
-  readonly description: string;
-  /** Command used by the evaluator or CLI E2E runner. */
-  readonly command: readonly string[];
-}
+export type SagasE2eGate = PluginE2eGate;
 
 const SAGAS_E2E_GATES: readonly SagasE2eGate[] = [
   {

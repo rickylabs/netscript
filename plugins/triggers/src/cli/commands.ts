@@ -26,8 +26,6 @@ export class StaticTriggersCliBackend implements TriggersCliBackend {
   }
 }
 
-const defaultBackend: TriggersCliBackend = new StaticTriggersCliBackend();
-
 /** Base command wrapper for triggers plugin CLI commands. */
 export abstract class TriggersCliCommand {
   /** Static command metadata used by help and backend dispatch. */
@@ -39,7 +37,7 @@ export abstract class TriggersCliCommand {
   /** Create a command wrapper over the supplied command metadata. */
   protected constructor(
     definition: TriggersCliCommandDefinition,
-    backend: TriggersCliBackend = defaultBackend,
+    backend: TriggersCliBackend = new StaticTriggersCliBackend(),
   ) {
     this.definition = definition;
     this.category = definition.category;

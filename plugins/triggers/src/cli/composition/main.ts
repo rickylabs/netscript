@@ -5,7 +5,7 @@
  */
 
 import { TriggersCli } from '../triggers-cli.ts';
-import { LocalTriggersCliBackend } from '../triggers-cli-backend.ts';
+import { LocalTriggersRuntimeBackend } from '../local-runtime-backend.ts';
 
 export { PluginCli } from '@netscript/plugin/cli';
 export type { PluginCliArgs, PluginCliCommand, PluginCliResult } from '@netscript/plugin/cli';
@@ -33,10 +33,14 @@ export type {
 } from '../command-types.ts';
 
 /** Default CLI instance used by the host CLI walker. */
-export const triggersCli: TriggersCli = new TriggersCli(new LocalTriggersCliBackend());
+export const triggersCli: TriggersCli = new TriggersCli(new LocalTriggersRuntimeBackend());
 
 if (import.meta.main) {
-  const result = await triggersCli.run(toTriggersCliArgs(Deno.args));
+  const args = toTriggersCliArgs(Deno.args);
+  const command = triggersCli.commands().find((item) => item.name === args.command);
+  const result = command
+    ? await command.run(args)
+    : { code: 1, message: `Unknown triggers command: ${args.command}` };
   if (result.message) {
     if (result.code === 0) {
       console.log(result.message);

@@ -18,25 +18,29 @@
 import '@netscript/kv/redis';
 
 import type { PluginServiceContext } from '@netscript/plugin/sdk';
-import { createService, type RunningService } from '@netscript/service';
+import type { RunningService } from '@netscript/service';
+import { createPluginService } from '@netscript/plugin/service';
 import type { SagaRuntime } from '@netscript/plugin-sagas-core/runtime';
-import { type SagaStreamPrismaClient, startSagasStreamMirror } from '../../streams/server.ts';
 import {
-  createDurableSagaRuntime,
-  type DurableSagaRuntime,
   KvSagaAppliedKeyStore,
   KvSagaIdempotencyStore,
   openSagaRuntimeKv,
   type PrismaSagaStoreClient,
   resolveSagaStoreBackend,
-} from '../../src/runtime/mod.ts';
+} from '@netscript/plugin-sagas-core/stores';
+import { type SagaStreamPrismaClient, startSagasStreamMirror } from '../../streams/server.ts';
+import { createDurableSagaRuntime, type DurableSagaRuntime } from '../../src/runtime/mod.ts';
 import { createSagaTelemetry } from '../../src/telemetry/otel-saga-tracer.ts';
 import { router } from './router.ts';
 import { registerSagas } from './init.ts';
+import type { SagaServiceDatabaseClient } from './routers/v1-types.ts';
 
 export type { PluginServiceContext } from '@netscript/plugin/sdk';
 
-type ServiceDatabaseClient = Record<string, unknown>;
+type ServiceDatabaseClient =
+  & SagaServiceDatabaseClient
+  & PrismaSagaStoreClient
+  & SagaStreamPrismaClient;
 type SagaServiceContextSettings = Readonly<{
   sagas?: { store?: { backend?: string } };
   Sagas?: { Store?: { Backend?: string } };
@@ -54,40 +58,48 @@ export default async function createSagasService(
   ctx: PluginServiceContext,
 ): Promise<RunningService> {
   const port = parseInt(ctx.env.PORT ?? Deno.env.get('PORT') ?? '8092');
-  const dbClient = await ctx.db.getClient() as ServiceDatabaseClient;
   const sagaStoreBackend = resolveSagaStoreBackend({
     env: { ...Deno.env.toObject(), ...ctx.env },
     appsettings: serviceAppsettings(ctx),
   });
+  let dbClient: SagaServiceDatabaseClient = emptySagaDatabaseClient;
   let sagaRuntime: SagaRuntime | undefined;
   let durableRuntime: DurableSagaRuntime | undefined;
 
-  const running = await createService(router, {
+  const service = await createPluginService(router, {
     name: 'sagas',
     version: '1.0.0',
     port,
-  })
-    .withCors()
-    .withLogger()
-    .withOpenAPI({
+    openApi: {
       title: 'Sagas API',
       description: 'Sagas service for workflow orchestration and management',
-    })
-    .withDocs()
-    .withDatabase(dbClient)
-    .withContext(() => ({ sagaRuntime }))
-    .withRPC({ traceContext: true })
-    .withHealth()
-    .withServiceInfo()
-    .onStartup(async () => {
+    },
+    context: () => ({ db: dbClient, sagaRuntime }),
+    // Graceful shutdown: stop the saga runtime, then dispose the durable
+    // runtime. This preserves the previous `stop()` wrapper's stop→dispose order
+    // (the previous code stopped the runtime in a `try` and disposed in
+    // `finally`); a single hook keeps that ordering deterministic rather than
+    // relying on reverse-order hook execution.
+    onShutdown: [async () => {
+      try {
+        await sagaRuntime?.stop('sagas-service-stop');
+      } finally {
+        await durableRuntime?.dispose();
+      }
+    }],
+  }).serve();
+
+  queueMicrotask(async () => {
+    try {
+      const resolvedDbClient = await ctx.db.getClient();
+      assertServiceDatabaseClient(resolvedDbClient);
+      dbClient = resolvedDbClient;
       const definitions = await registerSagas();
       const kv = await openSagaRuntimeKv();
       durableRuntime = await createDurableSagaRuntime({
         backend: sagaStoreBackend,
         kv,
-        prisma: sagaStoreBackend === 'prisma'
-          ? dbClient as unknown as PrismaSagaStoreClient
-          : undefined,
+        prisma: sagaStoreBackend === 'prisma' ? resolvedDbClient : undefined,
         native: {
           idempotency: new KvSagaIdempotencyStore({ kv }),
           instrumentation: createSagaTelemetry(),
@@ -99,26 +111,76 @@ export default async function createSagasService(
       sagaRuntime = durableRuntime.runtime;
       await sagaRuntime.register(definitions);
       await sagaRuntime.start();
-      void startSagasStreamMirror({ prisma: dbClient as unknown as SagaStreamPrismaClient })
+      void startSagasStreamMirror({ prisma: resolvedDbClient })
         .catch((error) => {
           console.warn('[Sagas API] Durable stream hook skipped:', error);
         });
 
       console.log(`[Sagas API] Running on http://localhost:${port}`);
-    })
-    .serve();
-
-  return Object.freeze({
-    ...running,
-    stop: async () => {
-      try {
-        await sagaRuntime?.stop('sagas-service-stop');
-      } finally {
-        await durableRuntime?.dispose();
-        await running.stop();
-      }
-    },
+    } catch (error) {
+      console.error('[Sagas API] Failed to finish post-listen startup:', error);
+    }
   });
+
+  return service;
+}
+
+const emptySagaDatabaseClient: SagaServiceDatabaseClient = Object.freeze({
+  sagaInstance: Object.freeze({
+    findMany: listNoSagaInstances,
+    count: countNoSagaRows,
+  }),
+  sagaExecutionHistory: Object.freeze({
+    findMany: listNoSagaHistory,
+    count: countNoSagaRows,
+  }),
+});
+
+function listNoSagaInstances(): Promise<[]> {
+  return Promise.resolve([]);
+}
+
+function listNoSagaHistory(): Promise<[]> {
+  return Promise.resolve([]);
+}
+
+function countNoSagaRows(): Promise<0> {
+  return Promise.resolve(0);
+}
+
+function assertServiceDatabaseClient(value: unknown): asserts value is ServiceDatabaseClient {
+  if (!isObject(value)) {
+    throw new Error('Sagas database client must be an object.');
+  }
+
+  const sagaInstance = Reflect.get(value, 'sagaInstance');
+  const sagaExecutionHistory = Reflect.get(value, 'sagaExecutionHistory');
+  const sagaRuntimeState = Reflect.get(value, 'sagaRuntimeState');
+  const sagaRuntimeTransition = Reflect.get(value, 'sagaRuntimeTransition');
+  const sagaRuntimeCorrelation = Reflect.get(value, 'sagaRuntimeCorrelation');
+
+  if (
+    !isObject(sagaInstance) ||
+    !hasMethod(sagaInstance, 'findMany') ||
+    !hasMethod(sagaInstance, 'count') ||
+    !isObject(sagaExecutionHistory) ||
+    !hasMethod(sagaExecutionHistory, 'findMany') ||
+    !hasMethod(sagaExecutionHistory, 'count') ||
+    !isObject(sagaRuntimeState) ||
+    !isObject(sagaRuntimeTransition) ||
+    !isObject(sagaRuntimeCorrelation) ||
+    !hasMethod(value, '$transaction')
+  ) {
+    throw new Error('Sagas database client is missing required Prisma delegates.');
+  }
+}
+
+function hasMethod(value: object, key: string): boolean {
+  return typeof Reflect.get(value, key) === 'function';
+}
+
+function isObject(value: unknown): value is object {
+  return typeof value === 'object' && value !== null;
 }
 
 function serviceAppsettings(ctx: PluginServiceContext): SagaServiceContextSettings | undefined {

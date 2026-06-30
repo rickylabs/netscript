@@ -1,10 +1,11 @@
 import { assert, assertEquals } from 'jsr:@std/assert@^1';
 import { streamsPlugin } from '../../mod.ts';
 import { verifyStreamsPlugin } from '../../verify-plugin.ts';
+import denoJson from '../../deno.json' with { type: 'json' };
 
 Deno.test('streamsPlugin manifest exposes service, telemetry, E2E, Aspire, and helper axes', () => {
   assertEquals(streamsPlugin.name, '@netscript/plugin-streams');
-  assertEquals(streamsPlugin.version, '0.0.1-alpha.0');
+  assertEquals(streamsPlugin.version, denoJson.version);
   assertEquals(streamsPlugin.type, 'utility');
 
   assert(streamsPlugin.contributions.services?.some((service) => service.name === 'streams'));

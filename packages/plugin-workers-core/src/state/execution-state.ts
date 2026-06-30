@@ -1,4 +1,8 @@
 import { DEFAULT_TOPIC, ExecutionRecordSchema } from '../domain/mod.ts';
+import type {
+  ExecutionStatus as DomainExecutionStatus,
+  TriggerType as DomainTriggerType,
+} from '../domain/constants.ts';
 import type { RegistryKvStore } from '../registry/mod.ts';
 
 const EXECUTION_PREFIX = ['workers', 'executions'] as const;
@@ -6,22 +10,30 @@ const EXECUTION_PREFIX = ['workers', 'executions'] as const;
 /** Execution concept discriminator. */
 export type ExecutionConcept = 'job' | 'task';
 
-/** Execution trigger discriminator. */
-export type ExecutionTriggerType = 'api' | 'event' | 'manual' | 'schedule' | string;
+/**
+ * Execution trigger discriminator.
+ *
+ * Aliased to the canonical {@link DomainTriggerType} enum (not redefined with a
+ * `| string` escape hatch). The previous local definition collapsed the union
+ * to `string`, which widened the stored `triggeredBy` field and broke
+ * conformance with the `ExecutionRecordResponse` contract enum. Using the
+ * single source of truth keeps the stored record assignable to the contract.
+ */
+export type ExecutionTriggerType = DomainTriggerType;
 
-/** Execution status discriminator. */
-export type ExecutionStatus =
-  | 'cancelled'
-  | 'completed'
-  | 'failed'
-  | 'pending'
-  | 'queued'
-  | 'running'
-  | 'timeout';
+/** Execution status discriminator (canonical domain enum). */
+export type ExecutionStatus = DomainExecutionStatus;
 
 /** Worker execution record stored in KV. */
+// NOTE: this record intentionally does NOT carry a `Record<string, unknown>`
+// index signature. The previous `& Record<string, unknown>` widened every known
+// field back to `unknown` whenever a handler spread the record
+// (`{ ...exec, executionId: exec.id }`), which silently erased the precise
+// `status`/`triggeredBy`/`topic`/… types and broke conformance with the
+// `ExecutionRecordResponse` contract. A fixed, fully-enumerated shape keeps
+// spreads precise so the connector handlers type-check against the contract.
 export type ExecutionRecord = Readonly<
-  Record<string, unknown> & {
+  {
     /** Unique execution identifier. */
     readonly id: string;
     /** Runtime concept represented by this execution. */
@@ -54,8 +66,14 @@ export type ExecutionRecord = Readonly<
     readonly attempt: number;
     /** Maximum retry attempts allowed for the execution. */
     readonly maxAttempts: number;
+    /** Structured payload captured for the execution. */
+    readonly payload?: Record<string, unknown>;
     /** Correlation identifier used to join related executions. */
     readonly correlationId?: string;
+    /** W3C trace context propagated with the execution. */
+    readonly traceparent?: string;
+    /** W3C trace state propagated with the execution. */
+    readonly tracestate?: string;
   }
 >;
 

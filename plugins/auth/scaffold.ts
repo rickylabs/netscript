@@ -1,13 +1,20 @@
-/**
- * Auth plugin-owned scaffold CLI entrypoint.
+/** Auth plugin adapter scaffold entrypoint.
  *
  * @module
  */
 
-export { scaffold } from './src/scaffold/mod.ts';
-export type { ScaffolderContext, ScaffoldResult } from './src/scaffold/mod.ts';
-import { runScaffoldCli } from './src/scaffold/mod.ts';
+import {
+  createPluginAdapter,
+  type PluginScaffoldEntrypoint,
+  runPluginScaffoldCli,
+} from '@netscript/plugin/adapter';
+import { authAdapterPlugin } from './src/adapter/plugin.ts';
+
+/** Auth adapter scaffold entrypoint. */
+const scaffold: PluginScaffoldEntrypoint = createPluginAdapter(authAdapterPlugin).toScaffold();
+
+export default scaffold;
 
 if (import.meta.main) {
-  await runScaffoldCli();
+  await runPluginScaffoldCli(scaffold);
 }

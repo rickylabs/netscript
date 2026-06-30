@@ -71,6 +71,10 @@ Deno.test("copyLocalPackages keeps mysql adapter engine-specific while resolving
     catalog?: Record<string, string>;
   };
   assertEquals(rootConfig.catalog?.["@opentelemetry/api"], "^1.9.0");
+  assertEquals(
+    await Deno.readTextFile(join(targetPath, ".netscript-source-root")),
+    sourceRoot + "\n",
+  );
 });
 
 Deno.test("copyLocalPackages copies mysql adapter only for mysql engine", async () => {

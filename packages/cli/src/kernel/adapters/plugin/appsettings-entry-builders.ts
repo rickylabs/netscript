@@ -1,11 +1,14 @@
+import { isAbsolute } from '@std/path';
 import { join as joinPosix } from '@std/path/posix';
 import type { BackgroundProcessorEntry, PluginEntry } from '@netscript/aspire/types';
-import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import type {
   PluginKindProvider,
   PluginScaffoldResult,
   SagaStoreBackend,
 } from '../../domain/plugin-kind.ts';
+import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
+
+const PROJECT_ROOT_WORKDIR = '.';
 
 interface PluginWorkspaceMutationOptions {
   readonly enabled?: boolean;
@@ -52,9 +55,10 @@ export function buildBackgroundProcessorEntry(
   const entry: BackgroundProcessorEntry = {
     Enabled: options.enabled ?? true,
     Runtime: 'deno',
-    Entrypoint: provider.defaultEntrypoint,
-    Workdir: scaffoldResult.backgroundWorkdir ??
-      joinPosix(SCAFFOLD_DIRS.PLUGINS, scaffoldResult.configKey),
+    Entrypoint: scaffoldResult.backgroundWorkdir
+      ? provider.defaultEntrypoint
+      : backgroundRuntimeEntrypoint(scaffoldResult.configKey),
+    Workdir: scaffoldResult.backgroundWorkdir ?? PROJECT_ROOT_WORKDIR,
     Telemetry: provider.defaultTelemetry,
     WatchMode: true,
     RequiresDb: provider.defaultRequiresDb,
@@ -96,9 +100,8 @@ function buildBasePluginEntry(
     Enabled: options.enabled ?? true,
     Runtime: 'deno',
     Port: scaffoldResult.servicePort,
-    Entrypoint: provider.defaultServiceEntrypoint ?? provider.defaultEntrypoint,
-    Workdir: scaffoldResult.serviceWorkdir ??
-      joinPosix(SCAFFOLD_DIRS.PLUGINS, scaffoldResult.configKey),
+    Entrypoint: resolveServiceEntrypoint(scaffoldResult, provider),
+    Workdir: scaffoldResult.serviceWorkdir ?? PROJECT_ROOT_WORKDIR,
     RequiresKv: provider.defaultRequiresKv,
     RequiresDb: provider.defaultRequiresDb,
     Permissions: [...provider.defaultPermissions],
@@ -112,6 +115,30 @@ function buildBasePluginEntry(
   }
 
   return entry;
+}
+
+function resolveServiceEntrypoint(
+  scaffoldResult: PluginScaffoldResult,
+  provider: PluginKindProvider,
+): string {
+  if (scaffoldResult.serviceWorkdir) {
+    return provider.defaultServiceEntrypoint ?? provider.defaultEntrypoint;
+  }
+  if (
+    provider.defaultServiceEntrypoint &&
+    isAbsolute(provider.defaultServiceEntrypoint)
+  ) {
+    return provider.defaultServiceEntrypoint;
+  }
+  return servicePackageEntrypoint(scaffoldResult.configKey);
+}
+
+function servicePackageEntrypoint(configKey: string): string {
+  return netscriptJsrSpecifier(`plugin-${configKey}`, '/services');
+}
+
+function backgroundRuntimeEntrypoint(configKey: string): string {
+  return joinPosix(configKey, 'runtime.ts');
 }
 
 function applySagaStoreBackend(

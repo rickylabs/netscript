@@ -4,100 +4,72 @@
  * @module
  */
 
-import { type InspectionReport, inspectPlugin } from '@netscript/plugin';
+import {
+  type PluginVerificationResult,
+  runPluginVerificationCli,
+  verifyPlugin,
+} from '@netscript/plugin';
 import { workersPlugin } from './mod.ts';
-
-/** Result returned by the workers plugin verifier. */
-export interface WorkersPluginVerificationResult {
-  /** Whether the manifest satisfied the expected plugin contract. */
-  readonly ok: boolean;
-  /** Plugin inspector report for the manifest. */
-  readonly inspection: InspectionReport;
-  /** Human-readable verification findings. */
-  readonly findings: readonly string[];
-}
+import denoJson from './deno.json' with { type: 'json' };
 
 /** Verify that the workers plugin manifest exposes the expected contribution axes. */
-export function verifyWorkersPlugin(): WorkersPluginVerificationResult {
-  const findings: string[] = [];
-  const inspection = inspectPlugin(workersPlugin);
-
-  if (workersPlugin.name !== '@netscript/plugin-workers') {
-    findings.push(`expected plugin name @netscript/plugin-workers, got ${workersPlugin.name}`);
-  }
-
-  if (workersPlugin.version !== '0.0.1-alpha.0') {
-    findings.push(`expected version 0.0.1-alpha.0, got ${workersPlugin.version}`);
-  }
-
-  if (!workersPlugin.dependencies?.streams) {
-    findings.push('expected streams plugin dependency');
-  }
-
-  if (
-    workersPlugin.contributions.services?.some((service) => service.name === 'workers-api') !== true
-  ) {
-    findings.push('expected a workers-api service contribution');
-  }
-
-  const processors = workersPlugin.contributions.backgroundProcessors ?? [];
-  for (const name of ['workers-combined', 'workers-worker', 'workers-scheduler']) {
-    if (processors.some((processor) => processor.name === name) !== true) {
-      findings.push(`expected ${name} background processor contribution`);
-    }
-  }
-
-  const topics = workersPlugin.contributions.streamTopics ?? [];
-  for (const name of ['workers.jobs', 'workers.tasks', 'workers.workflows']) {
-    if (topics.some((topic) => topic.name === name) !== true) {
-      findings.push(`expected ${name} stream topic contribution`);
-    }
-  }
-
-  if (
-    workersPlugin.contributions.databaseSchemas?.some((schema) =>
-      schema.path === './database/workers.prisma' && schema.engine === 'postgres'
-    ) !== true
-  ) {
-    findings.push('expected the workers Prisma database schema contribution');
-  }
-
-  if (
-    workersPlugin.contributions.contractVersions?.some((contract) =>
-      contract.version === 'v1' && contract.loader === './contracts/v1/mod.ts'
-    ) !== true
-  ) {
-    findings.push('expected the workers v1 contract contribution');
-  }
-
-  if (
-    workersPlugin.contributions.runtimeConfigTopics?.some((topic) => topic.name === 'workers') !==
-      true
-  ) {
-    findings.push('expected the workers runtime config topic contribution');
-  }
-
-  if (
-    workersPlugin.contributions.e2e?.some((gate) =>
-      gate.name === 'workers-health' && gate.command === 'deno task workers:e2e'
-    ) !== true
-  ) {
-    findings.push('expected the workers-health E2E contribution');
-  }
-
-  if (workersPlugin.contributions.aspire !== './src/aspire/mod.ts') {
-    findings.push('expected the workers Aspire contribution module');
-  }
-
-  return {
-    ok: findings.length === 0,
-    inspection,
-    findings,
-  };
+export function verifyWorkersPlugin(): PluginVerificationResult {
+  return verifyPlugin(workersPlugin, {
+    name: '@netscript/plugin-workers',
+    version: denoJson.version,
+    dependencies: [{ alias: 'streams', message: 'expected streams plugin dependency' }],
+    services: [{
+      name: 'workers-api',
+      message: 'expected a workers-api service contribution',
+    }],
+    backgroundProcessors: [
+      {
+        name: 'workers-combined',
+        message: 'expected workers-combined background processor contribution',
+      },
+      {
+        name: 'workers-worker',
+        message: 'expected workers-worker background processor contribution',
+      },
+      {
+        name: 'workers-scheduler',
+        message: 'expected workers-scheduler background processor contribution',
+      },
+    ],
+    streamTopics: [
+      { name: 'workers.jobs', message: 'expected workers.jobs stream topic contribution' },
+      { name: 'workers.tasks', message: 'expected workers.tasks stream topic contribution' },
+      {
+        name: 'workers.workflows',
+        message: 'expected workers.workflows stream topic contribution',
+      },
+    ],
+    databaseSchemas: [{
+      path: './database/workers.prisma',
+      engine: 'postgres',
+      message: 'expected the workers Prisma database schema contribution',
+    }],
+    contractVersions: [{
+      version: 'v1',
+      loader: './contracts/v1/mod.ts',
+      message: 'expected the workers v1 contract contribution',
+    }],
+    runtimeConfigTopics: [{
+      name: 'workers',
+      message: 'expected the workers runtime config topic contribution',
+    }],
+    e2e: [{
+      name: 'workers-health',
+      command: 'deno task workers:e2e',
+      message: 'expected the workers-health E2E contribution',
+    }],
+    aspire: {
+      module: './src/aspire/mod.ts',
+      message: 'expected the workers Aspire contribution module',
+    },
+  });
 }
 
 if (import.meta.main) {
-  const result = verifyWorkersPlugin();
-  console.log(JSON.stringify(result, null, 2));
-  Deno.exitCode = result.ok ? 0 : 1;
+  runPluginVerificationCli(verifyWorkersPlugin());
 }

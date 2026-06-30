@@ -163,11 +163,9 @@ export async function loadRegisteredPluginMetadata(
   const plugins: Record<string, RegisteredPluginConfig> = {};
   for (const spec of resolvePluginSpecs(config)) {
     const metadata = await resolveScaffoldPluginMetadata(projectRoot, spec);
-    if (!metadata) {
-      continue;
-    }
-
-    const plugin = normalizeScaffoldPluginMetadata(projectRoot, metadata, config.paths);
+    const plugin = metadata
+      ? normalizeScaffoldPluginMetadata(projectRoot, metadata, config.paths)
+      : normalizePluginSpecMetadata(projectRoot, spec, config.paths);
     plugins[resolvePluginLocalName(plugin.name)] = plugin;
   }
   return plugins;
@@ -187,8 +185,23 @@ async function resolveScaffoldPluginMetadata(
 
   const resolved = resolve(projectRoot, spec);
   const manifestPath = join(dirname(resolved), SCAFFOLD_PLUGIN_MANIFEST);
-  const raw = JSON.parse(await Deno.readTextFile(manifestPath));
+  const rawText = await readOptionalTextFile(manifestPath);
+  if (rawText === null) {
+    return null;
+  }
+  const raw = JSON.parse(rawText);
   return isScaffoldPluginMetadata(raw) ? raw : null;
+}
+
+async function readOptionalTextFile(path: string): Promise<string | null> {
+  try {
+    return await Deno.readTextFile(path);
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) {
+      return null;
+    }
+    throw error;
+  }
 }
 
 function normalizeScaffoldPluginMetadata(
@@ -216,7 +229,9 @@ function normalizeScaffoldPluginMetadata(
   return {
     name,
     displayName: metadata.provider.displayName,
-    type: metadata.provider.pluginType === 'background-processor' ? 'background-processor' : 'utility',
+    type: metadata.provider.pluginType === 'background-processor'
+      ? 'background-processor'
+      : 'utility',
     workdir,
     rootDir: resolve(projectRoot, workdir),
     permissions: permissions ? [...permissions] : undefined,
@@ -237,6 +252,80 @@ function normalizeScaffoldPluginMetadata(
       }
       : undefined,
   };
+}
+
+function normalizePluginSpecMetadata(
+  projectRoot: string,
+  spec: string,
+  paths?: Pick<PathsConfig, 'plugins'>,
+): RegisteredPluginConfig {
+  const name = resolvePluginNameFromSpec(spec);
+  const workdir = resolvePluginWorkdirFromSpec(spec, name, paths);
+  return {
+    name,
+    displayName: toDisplayName(name),
+    type: undefined,
+    workdir,
+    rootDir: resolve(projectRoot, workdir),
+  };
+}
+
+function resolvePluginNameFromSpec(spec: string): string {
+  const normalized = normalizePath(spec.trim());
+  if (normalized.startsWith('.') || normalized.startsWith('/')) {
+    const segments = normalized.split('/').filter((segment) =>
+      segment.length > 0 && segment !== '.'
+    );
+    const lastSegment = segments.at(-1);
+    const candidate = lastSegment?.endsWith('.ts') ? segments.at(-2) : lastSegment;
+    return resolvePluginLocalName(candidate ?? normalized);
+  }
+
+  const packageSpec = normalized.startsWith('jsr:') ? normalized.slice('jsr:'.length) : normalized;
+  const versionlessSpec = packageSpec.split(/[?#]/, 1)[0] ?? packageSpec;
+  const segments = versionlessSpec.split('/');
+  const packageSegment = versionlessSpec.startsWith('@')
+    ? segments.at(1) ?? versionlessSpec
+    : segments.at(0) ?? versionlessSpec;
+  return resolvePluginLocalName(stripPackageVersion(packageSegment));
+}
+
+function resolvePluginWorkdirFromSpec(
+  spec: string,
+  pluginName: string,
+  paths?: Pick<PathsConfig, 'plugins'>,
+): string {
+  const normalized = normalizePath(spec.trim());
+  if (!normalized.startsWith('.') && !normalized.startsWith('/')) {
+    return resolvePluginWorkdir(pluginName, paths);
+  }
+
+  const candidate = normalized.endsWith('.ts') ? dirname(normalized) : normalized;
+  if (candidate.startsWith('/')) {
+    return candidate;
+  }
+  return stripRelativePrefix(candidate);
+}
+
+function stripPackageVersion(packageSegment: string): string {
+  const versionSeparator = packageSegment.indexOf('@');
+  return versionSeparator === -1 ? packageSegment : packageSegment.slice(0, versionSeparator);
+}
+
+function stripRelativePrefix(path: string): string {
+  let next = path;
+  while (next.startsWith('./')) {
+    next = next.slice(2);
+  }
+  return next;
+}
+
+function toDisplayName(pluginName: string): string {
+  return pluginName
+    .split(/[-_]+/)
+    .filter((part) => part.length > 0)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
 }
 
 function normalizeInfrastructureDependencies(

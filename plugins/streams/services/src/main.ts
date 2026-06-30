@@ -2,9 +2,14 @@
  * Durable Streams service entrypoint.
  *
  * Starts the `@durable-streams/server` `DurableStreamTestServer` on an
- * internal port, then fronts it with a Hono app that:
- *   - Provides `/health`, `/health/live`, `/health/ready` via @netscript/service
- *   - Proxies all other requests to the upstream DurableStreamTestServer
+ * internal port, then fronts it with the mandated `createPluginService`
+ * serving surface configured as a pure transparent proxy:
+ *   - `/health`, `/health/live`, `/health/ready` via `withHealth`
+ *   - all other requests proxied to the upstream DurableStreamTestServer
+ *     through a raw catch-all route (`method: 'all'`, `path: '/*'`)
+ *
+ * Streams is the one plugin with no oRPC contract, so the service is built
+ * with an empty router and `serveRpc: false` (no `withRPC` wiring).
  *
  * When `STREAMS_DATA_DIR` is set the server uses file-backed storage so
  * events survive process restarts.  Omitting the env var uses in-memory
@@ -13,16 +18,15 @@
  * @module
  */
 
-import { type Context, Hono } from 'hono';
-import { cors } from 'hono/cors';
+import type { Context } from 'hono';
 import { getAvailablePort } from '@std/net';
-import {
-  createHealthHandler,
-  createLivenessHandler,
-  createReadinessHandler,
-  healthChecks,
-} from '@netscript/service';
+import { healthChecks } from '@netscript/service';
+import { createPluginService } from '@netscript/plugin/service';
 import { DurableStreamTestServer } from '@durable-streams/server';
+import denoJson from '../../deno.json' with { type: 'json' };
+
+/** Connector version, single-sourced from the streams package `deno.json`. */
+const VERSION: string = denoJson.version;
 
 const port = parseInt(
   Deno.env.get('PORT') ?? Deno.env.get('STREAMS_PORT') ?? '4437',
@@ -60,12 +64,36 @@ const upstreamCheck = healthChecks.custom('durable-streams-server', async () => 
   }
 });
 
-// ── Hono app with health + proxy ──────────────────────────────────────
-const app = new Hono();
+// ── Transparent proxy to the upstream DurableStreamTestServer ─────────
+// Matches all paths (including nested routes like /v1/stream/...) that are
+// not handled by the health endpoints or the service-info root.
+const proxyHandler = async (c: Context): Promise<Response> => {
+  const url = new URL(c.req.url);
+  const target = `http://127.0.0.1:${internalPort}${url.pathname}${url.search}`;
+  try {
+    const proxyReq = new Request(target, {
+      method: c.req.method,
+      headers: c.req.raw.headers,
+      body: c.req.raw.body,
+      // @ts-ignore Deno supports duplex on Request
+      duplex: c.req.raw.body ? 'half' : undefined,
+    });
+    return await fetch(proxyReq);
+  } catch {
+    return c.json({ error: 'Upstream unavailable' }, 502);
+  }
+};
 
-app.use(
-  '*',
-  cors({
+// ── Serve via the mandated createPluginService surface ────────────────
+// Empty router + serveRpc:false → no oRPC wiring (streams has no contract).
+// `serve()` owns the front listener and graceful SIGINT/SIGTERM/SIGBREAK
+// shutdown; the upstream server stop runs as an onShutdown hook.
+const running = await createPluginService({}, {
+  name: 'streams',
+  version: VERSION,
+  port,
+  serveRpc: false,
+  cors: {
     origin: '*',
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'OPTIONS'],
     allowHeaders: [
@@ -93,62 +121,12 @@ app.use(
       'content-encoding',
       'vary',
     ],
-  }),
-);
-
-app.get(
-  '/health',
-  createHealthHandler({
-    version: '1.0.0',
-    checks: [upstreamCheck],
-  }),
-);
-app.get('/health/live', createLivenessHandler());
-app.get(
-  '/health/ready',
-  createReadinessHandler([
-    async () => {
-      try {
-        const res = await fetch(`http://127.0.0.1:${internalPort}/`);
-        return res.status < 500;
-      } catch {
-        return false;
-      }
-    },
-  ]),
-);
-
-// Proxy everything else to the upstream DurableStreamTestServer.
-// Use /* to match all paths including nested routes like /v1/stream/...
-app.all('/*', async (c: Context) => {
-  const url = new URL(c.req.url);
-  const target = `http://127.0.0.1:${internalPort}${url.pathname}${url.search}`;
-  try {
-    const proxyReq = new Request(target, {
-      method: c.req.method,
-      headers: c.req.raw.headers,
-      body: c.req.raw.body,
-      // @ts-ignore Deno supports duplex on Request
-      duplex: c.req.raw.body ? 'half' : undefined,
-    });
-    return await fetch(proxyReq);
-  } catch {
-    return c.json({ error: 'Upstream unavailable' }, 502);
-  }
-});
-
-// ── Start the front proxy ─────────────────────────────────────────────
-const frontServer = Deno.serve({ port, hostname: '0.0.0.0' }, app.fetch);
-
-// ── Graceful shutdown ─────────────────────────────────────────────────
-const shutdown = async () => {
-  try {
-    await frontServer.shutdown();
+  },
+  healthChecks: [upstreamCheck],
+  rawRoutes: [{ method: 'all', path: '/*', handler: proxyHandler }],
+  onShutdown: [async () => {
     await server.stop();
-  } catch {
-    // Ignore stop errors during shutdown
-  }
-};
+  }],
+}).serve();
 
-Deno.addSignalListener('SIGINT', shutdown);
-Deno.addSignalListener('SIGTERM', shutdown);
+void running;

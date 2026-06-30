@@ -3,7 +3,7 @@ import { Command } from '@cliffy/command';
 import { FRAMEWORK_VERBS } from './dispatch/dispatch-plugin-verb.ts';
 import { createPluginVerbCommand } from './dispatch/plugin-verb-command.ts';
 import type { FrameworkVerb } from './dispatch/dispatch-plugin-verb.ts';
-import { createPluginAddCommand } from './add/add-plugin-command.ts';
+import { createPluginInstallCommand } from './install/install-plugin-command.ts';
 import { createDoctorPluginCommand } from './doctor/doctor-plugin-command.ts';
 import { createHostPluginCommand } from './host/host-plugin-command.ts';
 import { createInfoPluginCommand } from './info/info-plugin-command.ts';
@@ -14,7 +14,7 @@ import { createUpdatePluginCommand } from './update/update-plugin-command.ts';
 import type { PublicCommandDependencies } from '../root/public-command-dependencies.ts';
 
 const CONCRETE_VERBS = new Set<FrameworkVerb>([
-  'add',
+  'install',
   'sync',
   'info',
   'update',
@@ -44,9 +44,9 @@ export function createPluginCommand(
       }),
     )
     .command(
-      'add',
-      createPluginAddCommand({
-        addPluginDependencies: dependencies.pluginAddDependencies,
+      'install',
+      createPluginInstallCommand({
+        installPluginDependencies: dependencies.pluginInstallDependencies,
         resolveProjectRoot: dependencies.resolveProjectRoot,
       }),
     )
