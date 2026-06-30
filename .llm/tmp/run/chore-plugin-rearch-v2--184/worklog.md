@@ -94,3 +94,30 @@ Gate results:
 | source publish dry-run | `cd packages/plugin && rtk proxy deno task publish:dry-run`; `cd packages/cli && rtk proxy deno task publish:dry-run` | PASS — both dry runs complete; existing dynamic-import warnings remain |
 | arch check | `rtk proxy deno task arch:check` | PASS exit 0 — `FAIL=0`; existing WARN/INFO doctrine findings remain |
 | local runtime smoke | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS — `passed=48 failed=0` |
+
+### S-conform-workers
+
+- Scope: workers connector reference conformance.
+- Commit: `f7fb8493` (`feat(workers): conform plugin manifest and router assembly`).
+
+Implemented:
+
+- Deleted local `WorkersPluginManifest`/`WorkersPluginContributions`/dependency/inspection mirror
+  interfaces.
+- Deleted the connector-local `as unknown as WorkersPluginManifest` cast.
+- Deleted `inspectWorkers`; tests and README now use core `inspectPlugin(workersPlugin)`.
+- Replaced connector-local `AnyRouter` service assembly with `assemblePluginContractRouter(...)`
+  from `@netscript/plugin/service`.
+- Preserved the contract-bound per-route handler maps and `/api/v1/workers/describe` behavior.
+
+Gate results:
+
+| Gate | Command | Result |
+|---|---|---|
+| no-dangling grep | `rg "WorkersPluginManifest|inspectWorkers|as unknown as WorkersPluginManifest|AnyRouter" plugins/workers -n` | PASS — 0 hits |
+| scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/workers --ext ts,tsx` | PASS — 85 files, 0 diagnostics |
+| scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root plugins/workers --ext ts,tsx` | PASS — 85 files, 0 diagnostics |
+| scoped fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/workers --ext ts,tsx` | PASS — 85 files, 0 findings |
+| package tests | `cd plugins/workers && rtk proxy deno task test` | PASS — 16 passed, 0 failed |
+| publish dry-run | `cd plugins/workers && rtk proxy deno task publish:dry-run` | PASS — dry run complete; existing dynamic-import warnings remain |
+| arch check | `rtk proxy deno task arch:check` | PASS exit 0 — `FAIL=0`; existing WARN/INFO doctrine findings remain |
