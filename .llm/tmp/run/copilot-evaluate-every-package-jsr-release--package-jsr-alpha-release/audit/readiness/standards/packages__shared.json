@@ -1,0 +1,231 @@
+{
+  "root": "packages/shared",
+  "pkg": "shared",
+  "totals": {
+    "fail": 1,
+    "warn": 31,
+    "info": 2
+  },
+  "findings": [
+    {
+      "ref": "NS-S-1.version",
+      "level": "WARN",
+      "message": "version is '1.0.0'; alpha cadence requires '0.0.1-alpha.0'"
+    },
+    {
+      "ref": "NS-S-1.strict",
+      "level": "FAIL",
+      "message": "deno.json compilerOptions.strict must be true"
+    },
+    {
+      "ref": "NS-S-1.task",
+      "level": "WARN",
+      "message": "deno.json `tasks` missing `publish:dry-run` shortcut"
+    },
+    {
+      "ref": "NS-S-3.barrel-only",
+      "level": "WARN",
+      "message": "mod.ts has 26 non-export/non-comment lines — barrels must be export-only"
+    },
+    {
+      "ref": "NS-S-3.sections",
+      "level": "INFO",
+      "message": "mod.ts lacks section comment headers — recommended for navigability"
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'positiveInt' uses non-standard prefix 'positive' — consult STANDARDS § 4.1",
+      "path": "utils/zod/validation-helpers.ts",
+      "line": 22
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'nonNegativeInt' uses non-standard prefix 'non' — consult STANDARDS § 4.1",
+      "path": "utils/zod/validation-helpers.ts",
+      "line": 47
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'paginationLimit' uses non-standard prefix 'pagination' — consult STANDARDS § 4.1",
+      "path": "utils/zod/validation-helpers.ts",
+      "line": 72
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'paginationOffset' uses non-standard prefix 'pagination' — consult STANDARDS § 4.1",
+      "path": "utils/zod/validation-helpers.ts",
+      "line": 99
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'email' uses non-standard prefix 'email' — consult STANDARDS § 4.1",
+      "path": "utils/zod/validation-helpers.ts",
+      "line": 126
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'url' uses non-standard prefix 'url' — consult STANDARDS § 4.1",
+      "path": "utils/zod/validation-helpers.ts",
+      "line": 139
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'boundedString' uses non-standard prefix 'bounded' — consult STANDARDS § 4.1",
+      "path": "utils/zod/validation-helpers.ts",
+      "line": 152
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'positiveNumber' uses non-standard prefix 'positive' — consult STANDARDS § 4.1",
+      "path": "utils/zod/validation-helpers.ts",
+      "line": 171
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'nonNegativeNumber' uses non-standard prefix 'non' — consult STANDARDS § 4.1",
+      "path": "utils/zod/validation-helpers.ts",
+      "line": 184
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'isoDateTime' uses non-standard prefix 'iso' — consult STANDARDS § 4.1",
+      "path": "utils/zod/validation-helpers.ts",
+      "line": 208
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'stringToNumber' uses non-standard prefix 'string' — consult STANDARDS § 4.1",
+      "path": "utils/zod/codecs.ts",
+      "line": 32
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'stringToInt' uses non-standard prefix 'string' — consult STANDARDS § 4.1",
+      "path": "utils/zod/codecs.ts",
+      "line": 57
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'notFound' uses non-standard prefix 'not' — consult STANDARDS § 4.1",
+      "path": "utils/error-helpers.ts",
+      "line": 55
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'nowTemporal' uses non-standard prefix 'now' — consult STANDARDS § 4.1",
+      "path": "utils/datetime.ts",
+      "line": 203
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'now' uses non-standard prefix 'now' — consult STANDARDS § 4.1",
+      "path": "utils/datetime.ts",
+      "line": 233
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'nowISO' uses non-standard prefix 'now' — consult STANDARDS § 4.1",
+      "path": "utils/datetime.ts",
+      "line": 243
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'nowInstant' uses non-standard prefix 'now' — consult STANDARDS § 4.1",
+      "path": "utils/datetime.ts",
+      "line": 259
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'timeAgo' uses non-standard prefix 'time' — consult STANDARDS § 4.1",
+      "path": "utils/datetime.ts",
+      "line": 561
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'convertTimezone' uses non-standard prefix 'convert' — consult STANDARDS § 4.1",
+      "path": "utils/datetime.ts",
+      "line": 896
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'diffMs' uses non-standard prefix 'diff' — consult STANDARDS § 4.1",
+      "path": "utils/datetime.ts",
+      "line": 986
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'addMs' uses non-standard prefix 'add' — consult STANDARDS § 4.1",
+      "path": "utils/datetime.ts",
+      "line": 1012
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'addSeconds' uses non-standard prefix 'add' — consult STANDARDS § 4.1",
+      "path": "utils/datetime.ts",
+      "line": 1032
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'addMinutes' uses non-standard prefix 'add' — consult STANDARDS § 4.1",
+      "path": "utils/datetime.ts",
+      "line": 1039
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'addHours' uses non-standard prefix 'add' — consult STANDARDS § 4.1",
+      "path": "utils/datetime.ts",
+      "line": 1046
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'addDays' uses non-standard prefix 'add' — consult STANDARDS § 4.1",
+      "path": "utils/datetime.ts",
+      "line": 1053
+    },
+    {
+      "ref": "NS-S-6.length",
+      "level": "WARN",
+      "message": "README is 38 lines; minimum is 150"
+    },
+    {
+      "ref": "NS-S-6.sections",
+      "level": "WARN",
+      "message": "README missing 12/12 mandated sections (Overview, Quickstart, Mental model, API, Recipes, Configuration, Testing, Observability, Architecture, Stability, Compatibility, License)"
+    },
+    {
+      "ref": "NS-S-8.location",
+      "level": "WARN",
+      "message": "1 inline *_test.ts files outside tests/ — consolidate under tests/<layer>/"
+    },
+    {
+      "ref": "NS-S-10",
+      "level": "INFO",
+      "message": "mod.ts does not export an `inspect<Noun>()` diagnostic — recommended discoverability axis"
+    }
+  ]
+}

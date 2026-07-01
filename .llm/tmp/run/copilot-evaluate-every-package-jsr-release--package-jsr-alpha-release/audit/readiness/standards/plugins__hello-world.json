@@ -1,0 +1,51 @@
+{
+  "root": "plugins/hello-world",
+  "pkg": "hello-world",
+  "totals": {
+    "fail": 1,
+    "warn": 5,
+    "info": 2
+  },
+  "findings": [
+    {
+      "ref": "NS-S-1.version",
+      "level": "WARN",
+      "message": "version is '1.0.0'; alpha cadence requires '0.0.1-alpha.0'"
+    },
+    {
+      "ref": "NS-S-1.task",
+      "level": "WARN",
+      "message": "deno.json `tasks` missing `publish:dry-run` shortcut"
+    },
+    {
+      "ref": "NS-S-3.barrel-only",
+      "level": "WARN",
+      "message": "mod.ts has 42 non-export/non-comment lines — barrels must be export-only"
+    },
+    {
+      "ref": "NS-S-3.sections",
+      "level": "INFO",
+      "message": "mod.ts lacks section comment headers — recommended for navigability"
+    },
+    {
+      "ref": "NS-S-6.length",
+      "level": "WARN",
+      "message": "README is 17 lines; minimum is 150"
+    },
+    {
+      "ref": "NS-S-6.sections",
+      "level": "WARN",
+      "message": "README missing 12/12 mandated sections (Overview, Quickstart, Mental model, API, Recipes, Configuration, Testing, Observability, Architecture, Stability, Compatibility, License)"
+    },
+    {
+      "ref": "NS-S-8.coverage",
+      "level": "FAIL",
+      "message": "no tests/ directory and no inline *_test.ts files — every package needs meaningful tests"
+    },
+    {
+      "ref": "NS-S-10",
+      "level": "INFO",
+      "message": "mod.ts does not export an `inspect<Noun>()` diagnostic — recommended discoverability axis"
+    }
+  ]
+}

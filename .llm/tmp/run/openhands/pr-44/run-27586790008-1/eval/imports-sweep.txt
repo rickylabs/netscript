@@ -1,0 +1,360 @@
+=== ./deno.json ===
+{}
+=== ./packages/aspire/deno.json ===
+{
+  "@std/assert": "jsr:@std/assert@^1",
+  "@std/fs": "jsr:@std/fs@^1",
+  "@std/path": "jsr:@std/path@^1",
+  "zod": "jsr:@zod/zod@4.4.3"
+}
+=== ./packages/cli/deno.json ===
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import json; d=json.load(open('./packages/cli/deno.json')); print(json.dumps(d.get('imports',{}),indent=2,sort_keys=True))
+                   ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.13.13/x64/lib/python3.13/json/__init__.py", line 298, in load
+    return loads(fp.read(),
+        cls=cls, object_hook=object_hook,
+        parse_float=parse_float, parse_int=parse_int,
+        parse_constant=parse_constant, object_pairs_hook=object_pairs_hook, **kw)
+  File "/opt/hostedtoolcache/Python/3.13.13/x64/lib/python3.13/json/__init__.py", line 352, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "/opt/hostedtoolcache/Python/3.13.13/x64/lib/python3.13/json/decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.13.13/x64/lib/python3.13/json/decoder.py", line 361, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ~~~~~~~~~~~~~~^^^^^^^^
+json.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 45 column 5 (char 1865)
+=== ./packages/cli/e2e/deno.json ===
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import json; d=json.load(open('./packages/cli/e2e/deno.json')); print(json.dumps(d.get('imports',{}),indent=2,sort_keys=True))
+                   ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.13.13/x64/lib/python3.13/json/__init__.py", line 298, in load
+    return loads(fp.read(),
+        cls=cls, object_hook=object_hook,
+        parse_float=parse_float, parse_int=parse_int,
+        parse_constant=parse_constant, object_pairs_hook=object_pairs_hook, **kw)
+  File "/opt/hostedtoolcache/Python/3.13.13/x64/lib/python3.13/json/__init__.py", line 352, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "/opt/hostedtoolcache/Python/3.13.13/x64/lib/python3.13/json/decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.13.13/x64/lib/python3.13/json/decoder.py", line 361, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ~~~~~~~~~~~~~~^^^^^^^^
+json.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 22 column 5 (char 555)
+=== ./packages/config/deno.json ===
+{
+  "@std/fs": "jsr:@std/fs@^1",
+  "@std/path": "jsr:@std/path@^1",
+  "zod": "jsr:@zod/zod@4.4.3"
+}
+=== ./packages/contracts/deno.json ===
+{
+  "@orpc/server": "catalog:",
+  "zod": "jsr:@zod/zod@4.4.3"
+}
+=== ./packages/cron/deno.json ===
+{
+  "@std/assert": "jsr:@std/assert@^1",
+  "@std/async": "jsr:@std/async@^1"
+}
+=== ./packages/database/deno.json ===
+{
+  "@opentelemetry/api": "catalog:",
+  "@prisma/adapter-mssql": "catalog:",
+  "@prisma/adapter-pg": "catalog:",
+  "@prisma/client": "catalog:",
+  "@prisma/instrumentation-contract": "catalog:",
+  "pg": "catalog:"
+}
+=== ./packages/fresh-ui/deno.json ===
+{
+  "@preact/signals": "catalog:",
+  "@std/assert": "jsr:@std/assert@^1",
+  "clsx": "catalog:",
+  "preact": "catalog:",
+  "preact/hooks": "npm:preact@^10.29.1/hooks",
+  "preact/jsx-runtime": "npm:preact@^10.29.1/jsx-runtime",
+  "tailwind-merge": "catalog:"
+}
+=== ./packages/fresh/deno.json ===
+{
+  "@durable-streams/state": "catalog:",
+  "@netscript/logger": "../logger/mod.ts",
+  "@netscript/plugin-streams-core": "../plugin-streams-core/mod.ts",
+  "@netscript/sdk": "../sdk/mod.ts",
+  "@netscript/sdk/query-client": "../sdk/src/query-client/mod.ts",
+  "@netscript/telemetry": "../telemetry/mod.ts",
+  "@preact/signals": "catalog:",
+  "@std/assert": "jsr:@std/assert@^1",
+  "@std/http": "jsr:@std/http@^1",
+  "@std/path": "jsr:@std/path@^1",
+  "@std/text": "jsr:@std/text@^1",
+  "@tanstack/preact-query": "catalog:",
+  "@tanstack/query-core": "catalog:",
+  "@tanstack/react-db": "catalog:",
+  "fresh": "jsr:@fresh/core@^2.3.0",
+  "preact": "catalog:",
+  "preact-render-to-string": "catalog:",
+  "preact-render-to-string/stream": "npm:preact-render-to-string@^6.6.5/stream",
+  "preact/compat": "npm:preact@^10.29.1/compat",
+  "preact/hooks": "npm:preact@^10.29.1/hooks",
+  "preact/jsx-runtime": "npm:preact@^10.29.1/jsx-runtime",
+  "vite": "catalog:",
+  "zod": "jsr:@zod/zod@4.4.3"
+}
+=== ./packages/kv/deno.json ===
+{
+  "@netscript/logger": "../logger/mod.ts",
+  "@olli/kvdex": "jsr:@olli/kvdex@^3.5.0",
+  "@std/assert": "jsr:@std/assert@^1",
+  "@std/async": "jsr:@std/async@^1",
+  "@std/collections": "jsr:@std/collections@^1",
+  "@std/data-structures": "jsr:@std/data-structures@^1",
+  "@std/ulid": "jsr:@std/ulid@^1",
+  "ioredis": "catalog:"
+}
+=== ./packages/logger/deno.json ===
+{
+  "@logtape/logtape": "jsr:@logtape/logtape@^2.0",
+  "@orpc/server/plugins": "npm:@orpc/server@^1.14.6/plugins",
+  "@std/assert": "jsr:@std/assert@^1",
+  "hono": "jsr:@hono/hono@4.12.24"
+}
+=== ./packages/plugin-sagas-core/deno.json ===
+{
+  "@netscript/plugin-streams-core": "../plugin-streams-core/mod.ts",
+  "@netscript/plugin-workers-core": "../plugin-workers-core/mod.ts",
+  "@orpc/contract": "catalog:",
+  "@orpc/server": "catalog:",
+  "@saga-bus/core": "catalog:",
+  "@std/assert": "jsr:@std/assert@^1",
+  "hono": "jsr:@hono/hono@4.12.24",
+  "ioredis": "catalog:",
+  "zod": "jsr:@zod/zod@4.4.3"
+}
+=== ./packages/plugin-streams-core/deno.json ===
+{
+  "@durable-streams/client": "catalog:",
+  "@durable-streams/state": "catalog:",
+  "@std/assert": "jsr:@std/assert@^1"
+}
+=== ./packages/plugin-triggers-core/deno.json ===
+{
+  "@netscript/plugin-workers-core": "../plugin-workers-core/mod.ts",
+  "@orpc/contract": "catalog:",
+  "@orpc/server": "catalog:",
+  "@std/assert": "jsr:@std/assert@^1",
+  "zod": "jsr:@zod/zod@4.4.3"
+}
+=== ./packages/plugin-workers-core/deno.json ===
+{
+  "@david/dax": "jsr:@david/dax@^0.43",
+  "@netscript/plugin-streams-core": "../plugin-streams-core/mod.ts",
+  "@orpc/contract": "catalog:",
+  "@orpc/server": "catalog:",
+  "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
+  "@std/assert": "jsr:@std/assert@^1",
+  "@std/path": "jsr:@std/path@^1",
+  "zod": "jsr:@zod/zod@4.4.3"
+}
+=== ./packages/plugin/deno.json ===
+{
+  "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
+  "@std/assert": "jsr:@std/assert@^1",
+  "@std/path": "jsr:@std/path@^1",
+  "zod": "jsr:@zod/zod@4.4.3"
+}
+=== ./packages/prisma-adapter-mysql/deno.json ===
+{
+  "@prisma/driver-adapter-utils": "catalog:",
+  "mysql2": "catalog:"
+}
+=== ./packages/queue/deno.json ===
+{
+  "@fedify/amqp": "jsr:@fedify/amqp@^1.0.0",
+  "@fedify/denokv": "jsr:@fedify/denokv@^1.0.0",
+  "@fedify/fedify": "jsr:@fedify/fedify@^1.5.0",
+  "@fedify/redis": "jsr:@fedify/redis@^1.0.0",
+  "@netscript/kv": "../kv/mod.ts",
+  "@std/assert": "jsr:@std/assert@^1",
+  "@std/async": "jsr:@std/async@^1",
+  "amqplib": "catalog:",
+  "ioredis": "catalog:",
+  "zod": "jsr:@zod/zod@4.4.3"
+}
+=== ./packages/runtime-config/deno.json ===
+{
+  "@std/path": "jsr:@std/path@^1"
+}
+=== ./packages/sdk/deno.json ===
+{
+  "@netscript/kv": "../kv/mod.ts",
+  "@netscript/plugin-streams-core": "../plugin-streams-core/mod.ts",
+  "@netscript/telemetry": "../telemetry/mod.ts",
+  "@orpc/client": "catalog:",
+  "@orpc/client/fetch": "npm:@orpc/client@^1.14.6/fetch",
+  "@orpc/client/plugins": "npm:@orpc/client@^1.14.6/plugins",
+  "@orpc/client/standard": "npm:@orpc/client@^1.14.6/standard",
+  "@orpc/contract": "catalog:",
+  "@orpc/openapi": "catalog:",
+  "@orpc/server": "catalog:",
+  "@orpc/tanstack-query": "catalog:",
+  "@orpc/zod": "catalog:",
+  "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
+  "@std/assert": "jsr:@std/assert@^1",
+  "@tanstack/db": "catalog:",
+  "@tanstack/query-core": "catalog:",
+  "@tanstack/query-db-collection": "catalog:"
+}
+=== ./packages/service/deno.json ===
+{
+  "@netscript/logger": "../logger/mod.ts",
+  "@netscript/telemetry": "../telemetry/mod.ts",
+  "@orpc/client/plugins": "npm:@orpc/client@^1.14.6/plugins",
+  "@orpc/openapi": "catalog:",
+  "@orpc/openapi/fetch": "npm:@orpc/openapi@^1.14.6/fetch",
+  "@orpc/server": "catalog:",
+  "@orpc/server/fetch": "npm:@orpc/server@^1.14.6/fetch",
+  "@orpc/server/plugins": "npm:@orpc/server@^1.14.6/plugins",
+  "@orpc/zod": "catalog:",
+  "@orpc/zod/zod4": "npm:@orpc/zod@^1.14.6/zod4",
+  "@std/assert": "jsr:@std/assert@^1",
+  "hono": "jsr:@hono/hono@4.12.24",
+  "hono/cors": "jsr:@hono/hono@4.12.24/cors",
+  "hono/logger": "jsr:@hono/hono@4.12.24/logger"
+}
+=== ./packages/telemetry/deno.json ===
+{
+  "@opentelemetry/api": "catalog:",
+  "@orpc/contract": "catalog:",
+  "@std/assert": "jsr:@std/assert@^1"
+}
+=== ./packages/watchers/deno.json ===
+{
+  "@std/assert": "jsr:@std/assert@^1",
+  "@std/async": "jsr:@std/async@^1",
+  "@std/fs": "jsr:@std/fs@^1",
+  "@std/path": "jsr:@std/path@^1"
+}
+=== ./plugins/sagas/deno.json ===
+{
+  "@durable-streams/client": "catalog:",
+  "@durable-streams/state": "catalog:",
+  "@hono/hono": "jsr:@hono/hono@4.12.24",
+  "@netscript/aspire": "../../packages/aspire/src/public/mod.ts",
+  "@netscript/contracts": "../../packages/contracts/mod.ts",
+  "@netscript/fresh/streams": "../../packages/fresh/src/runtime/streams/mod.ts",
+  "@netscript/kv": "../../packages/kv/mod.ts",
+  "@netscript/plugin": "../../packages/plugin/mod.ts",
+  "@netscript/plugin-sagas-core/domain": "../../packages/plugin-sagas-core/src/domain/mod.ts",
+  "@netscript/plugin-sagas-core/integration/publisher": "../../packages/plugin-sagas-core/src/integration/publisher/mod.ts",
+  "@netscript/plugin-sagas-core/runtime": "../../packages/plugin-sagas-core/src/runtime/mod.ts",
+  "@netscript/plugin-sagas-core/streams": "../../packages/plugin-sagas-core/src/streams/mod.ts",
+  "@netscript/plugin-streams": "../streams/mod.ts",
+  "@netscript/plugin-streams-core": "../../packages/plugin-streams-core/mod.ts",
+  "@netscript/plugin-workers": "../workers/mod.ts",
+  "@netscript/queue": "../../packages/queue/mod.ts",
+  "@netscript/service": "../../packages/service/mod.ts",
+  "@netscript/telemetry": "../../packages/telemetry/mod.ts",
+  "@netscript/telemetry/context": "../../packages/telemetry/context.ts",
+  "@orpc/contract": "catalog:",
+  "@orpc/openapi": "catalog:",
+  "@orpc/server": "catalog:",
+  "@orpc/zod": "catalog:",
+  "@std/async": "jsr:@std/async@^1",
+  "@tanstack/db": "catalog:",
+  "hono": "jsr:@hono/hono@4.12.24",
+  "zod": "jsr:@zod/zod@4.4.3"
+}
+=== ./plugins/streams/deno.json ===
+{
+  "@durable-streams/client": "catalog:",
+  "@durable-streams/server": "catalog:",
+  "@netscript/aspire": "../../packages/aspire/src/public/mod.ts",
+  "@netscript/plugin": "../../packages/plugin/mod.ts",
+  "@netscript/plugin-streams-core": "../../packages/plugin-streams-core/mod.ts",
+  "@netscript/service": "../../packages/service/mod.ts",
+  "@netscript/telemetry": "../../packages/telemetry/mod.ts",
+  "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
+  "@std/net": "jsr:@std/net@^1",
+  "hono": "jsr:@hono/hono@4.12.24",
+  "hono/cors": "jsr:@hono/hono@4.12.24/cors"
+}
+=== ./plugins/triggers/deno.json ===
+{
+  "@durable-streams/state": "catalog:",
+  "@netscript/aspire": "../../packages/aspire/src/public/mod.ts",
+  "@netscript/contracts": "../../packages/contracts/mod.ts",
+  "@netscript/cron": "../../packages/cron/mod.ts",
+  "@netscript/plugin": "../../packages/plugin/mod.ts",
+  "@netscript/plugin-sagas-core": "../../packages/plugin-sagas-core/mod.ts",
+  "@netscript/plugin-streams-core": "../../packages/plugin-streams-core/mod.ts",
+  "@netscript/plugin-triggers-core": "../../packages/plugin-triggers-core/mod.ts",
+  "@netscript/plugin-triggers-core/adapters": "../../packages/plugin-triggers-core/src/adapters/mod.ts",
+  "@netscript/plugin-triggers-core/contracts/v1": "../../packages/plugin-triggers-core/src/contracts/v1/mod.ts",
+  "@netscript/plugin-triggers-core/domain": "../../packages/plugin-triggers-core/src/domain/mod.ts",
+  "@netscript/plugin-triggers-core/ports": "../../packages/plugin-triggers-core/src/ports/mod.ts",
+  "@netscript/plugin-triggers-core/runtime": "../../packages/plugin-triggers-core/src/runtime/mod.ts",
+  "@netscript/plugin-triggers-core/telemetry": "../../packages/plugin-triggers-core/src/telemetry/mod.ts",
+  "@netscript/plugin-triggers-core/testing": "../../packages/plugin-triggers-core/src/testing/mod.ts",
+  "@netscript/plugin-workers-core": "../../packages/plugin-workers-core/mod.ts",
+  "@netscript/plugin-workers-core/runtime": "../../packages/plugin-workers-core/src/runtime/mod.ts",
+  "@netscript/queue": "../../packages/queue/mod.ts",
+  "@netscript/service": "../../packages/service/mod.ts",
+  "@netscript/telemetry/instrumentation": "../../packages/telemetry/instrumentation.ts",
+  "@netscript/telemetry/tracer": "../../packages/telemetry/tracer.ts",
+  "@netscript/watchers": "../../packages/watchers/mod.ts",
+  "@orpc/contract": "catalog:",
+  "@orpc/server": "catalog:",
+  "@std/assert": "jsr:@std/assert@^1",
+  "@std/path": "jsr:@std/path@^1",
+  "hono": "jsr:@hono/hono@4.12.24",
+  "zod": "jsr:@zod/zod@4.4.3"
+}
+=== ./plugins/workers/deno.json ===
+{
+  "@durable-streams/client": "catalog:",
+  "@durable-streams/state": "catalog:",
+  "@hono/hono": "jsr:@hono/hono@4.12.24",
+  "@netscript/aspire": "../../packages/aspire/src/public/mod.ts",
+  "@netscript/contracts": "../../packages/contracts/mod.ts",
+  "@netscript/cron": "../../packages/cron/mod.ts",
+  "@netscript/fresh/streams": "../../packages/fresh/src/runtime/streams/mod.ts",
+  "@netscript/kv": "../../packages/kv/mod.ts",
+  "@netscript/plugin": "../../packages/plugin/mod.ts",
+  "@netscript/plugin-streams": "../streams/mod.ts",
+  "@netscript/plugin-streams-core": "../../packages/plugin-streams-core/mod.ts",
+  "@netscript/plugin-workers-core": "../../packages/plugin-workers-core/mod.ts",
+  "@netscript/plugin-workers-core/contracts/v1": "../../packages/plugin-workers-core/src/contracts/v1/mod.ts",
+  "@netscript/plugin-workers-core/executor": "../../packages/plugin-workers-core/src/executor/mod.ts",
+  "@netscript/plugin-workers-core/presets": "../../packages/plugin-workers-core/src/presets/mod.ts",
+  "@netscript/plugin-workers-core/registry": "../../packages/plugin-workers-core/src/registry/mod.ts",
+  "@netscript/plugin-workers-core/runtime": "../../packages/plugin-workers-core/src/runtime/mod.ts",
+  "@netscript/plugin-workers-core/schemas": "../../packages/plugin-workers-core/src/domain/public-schema.ts",
+  "@netscript/plugin-workers-core/state": "../../packages/plugin-workers-core/src/state/mod.ts",
+  "@netscript/plugin-workers-core/streams": "../../packages/plugin-workers-core/src/streams/mod.ts",
+  "@netscript/queue": "../../packages/queue/mod.ts",
+  "@netscript/service": "../../packages/service/mod.ts",
+  "@netscript/telemetry": "../../packages/telemetry/mod.ts",
+  "@orpc/contract": "catalog:",
+  "@orpc/openapi": "catalog:",
+  "@orpc/openapi/fetch": "npm:@orpc/openapi@^1.14.6/fetch",
+  "@orpc/server": "catalog:",
+  "@orpc/server/fetch": "npm:@orpc/server@^1.14.6/fetch",
+  "@orpc/server/plugins": "npm:@orpc/server@^1.14.6/plugins",
+  "@orpc/zod": "catalog:",
+  "@orpc/zod/zod4": "npm:@orpc/zod@^1.14.6/zod4",
+  "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
+  "@std/async": "jsr:@std/async@^1",
+  "@std/path": "jsr:@std/path@^1",
+  "@tanstack/db": "catalog:",
+  "hono": "jsr:@hono/hono@4.12.24",
+  "hono/cors": "jsr:@hono/hono@4.12.24/cors",
+  "zod": "jsr:@zod/zod@4.4.3"
+}

@@ -1,0 +1,400 @@
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: file_editor: {"command": "create", "path": 
+"/home/runner/work/_temp/openhands/28478150691-1/summary.md", "file_text": "# 
+IMPL-EVAL Summary \u2014 PR #190 (feat/fresh-ui-ai-additions)\n\n## 
+Summary\n\nThis IMPL-EVAL session verified the PR #190 implementation against 
+the harness\ngates for the fresh-ui AI/workspace primitive library and NS One 
+fixes. Work was\ninterrupted before completion: 6 of 8 required verification 
+steps ran; 4\nfitness gates and the root `deno task check` passed; the fresh-ui 
+package check\nwas in progress at the time of cutoff; 3 major verification areas
+remain open.\n\n## Changes\n\n- Created run workspace directory at 
+`.llm/tmp/run/pr-190/run-28478150691-1/`.\n- No code changes were made. This was
+a read-only evaluator session.\n\n## Validation\n\n### Gates run and status 
+(confirmed)\n\n| Gate | Result | Evidence |\n|------|--------|----------|\n| 
+`deno task check` (root, workspace) | **PASS** | `/tmp/deno-task-check.log`: 
+1848 files selected, 0 error occurrences, exit 0 |\n| `check-ds-no-raw-hex` | 
+**PASS** | 126 files clean, no raw hex in DS surface |\n| 
+`check-ds-color-utilities` | **PASS** | 127 files clean, no Tailwind color 
+utility leaks |\n| `check-manifest-integrity` | **PASS** | 88/88 registry files 
+claimed (barrel \u2194 manifest \u2194 files) |\n| `check-token-drift` | 
+**PASS** | 3 generated artifacts stable (tokens.css, theme-bridge.css, 
+tokens.json) |\n\n### Gates launched but result not confirmed\n\n- `deno task 
+check` inside `packages/fresh-ui/` \u2014 launched, log showed type-checking 
+reaching combobox, all primitive test files (avatar, chart-block, citation-chip,
+code-block, command-palette, data-table, donut, dropzone, message, 
+model-selector, prompt-input, search, tool-call-card) and consumer-render test. 
+Log showed the check progressing successfully but did not capture the final exit
+code before session cutoff.\n\n### Gates NOT run\n\n- `deno task test` in 
+`packages/fresh-ui` \u2014 not executed.\n- `packages/cli` check and test \u2014
+not executed.\n- `deno task fmt:check` \u2014 not executed.\n- `deno task lint` 
+\u2014 not executed.\n- `tokens:check` determinism inside `packages/fresh-ui` 
+\u2014 not executed (token-drift wrapper passed, but the explicit `tokens:check`
+task was not run).\n\n### Scope verified by file inspection only (no runtime 
+verification)\n\n- Token artifacts inspected: `registry/theme/theme-bridge.css` 
+contains the `@theme inline` block bridging `--ns-*` custom properties to 
+Tailwind tokens (`--color-ns-*`, `--spacing-ns-*`, `--radius-*`, `--shadow-*`, 
+`--font-*`), including the new `--ns-space-*` scale steps.\n- 
+`registry/theme/tokens.css` inspected: `:root` block present with `color-scheme:
+light` default (LIGHT-DEFAULT theme flip fix verified by inspection).\n- 
+`tokens/primitives.tokens.json` inspected: DTCG-format source tokens with oklch 
+color values and `$extensions.netscript.cssVar` metadata.\n- Registry manifest 
+(`registry.manifest.ts`) inspected: schemaVersion 2, copy-based-registry model, 
+manifest-integrity gate confirmed 88/88 files.\n\n## Remaining risks / 
+unverified scope\n\nThe following items from the evaluator scope list were 
+**not** independently verified:\n\n1. **Fresh-ui `deno task test`** \u2014 unit 
+tests for all 13+ primitives, combobox, consumer-render not executed.\n2. 
+**Packages/cli `check` + `test`** \u2014 the `ui:add` collection 
+CSS-registration fix 
+(`packages/cli/src/kernel/application/ui/registry-styles.ts` + 
+`registry-styles.test.ts`) was never executed. The additive CSS install test 
+(which the scope explicitly required) was not run.\n3. **Primitives rendering in
+light AND dark** \u2014 no runtime render was performed; theme coverage was only
+inspected via source (the LIGHT-DEFAULT `color-scheme: light` and 
+`[data-theme='dark']` selector fix in `tokens.css` / `fc8f988a`).\n4. 
+**L0/token/motion contract** \u2014 archetype compliance not formally evaluated 
+against `.llm/harness/archetypes/` profiles.\n5. **5 NS One fixes** \u2014 only 
+the LIGHT-DEFAULT theme flip was spot-checked by file inspection:\n   - 
+DataTable.Row `cols` (`0f3983a1`) \u2014 not runtime-verified.\n   - 
+`--ns-space-*` missing steps (`0065d303`) \u2014 theme-bridge.css shows 
+`--ns-space-2-5`, `--ns-space-3-5`, `--ns-space-7`, `--ns-space-9`, 
+`--ns-space-11`, `--ns-space-14`, `--ns-space-24` present.\n   - `@kind` on ease
+tokens (`0bcd2472`) \u2014 not inspected.\n   - Breadcrumb long-path guard 
+(`921b74f0`) \u2014 not inspected.\n6. **Verdict not emitted** \u2014 neither 
+`PASS` / `FAIL_FIX` / `FAIL_RESCOPE` / `FAIL_DEBT` was determined; `evaluate.md`
+was not written to `.llm/tmp/run/pr-190/run-28478150691-1/`.\n7. **PR comment 
+not posted** \u2014 no GitHub comment was written (this is workflow-owned per 
+the trigger contract).\n\n**Recommendation**: Resume the evaluator session (or 
+re-invoke) to confirm the in-progress fresh-ui `deno task check` exit, run `deno
+task test` in fresh-ui, run `packages/cli` check + test, and verify the CLI 
+additive-CSS install test before finalizing the verdict. The 5 confirmed green 
+gates provide strong signal but are not sufficient per the IMPL-EVAL protocol to
+emit `PASS`.\n"}
+
+Reasoning:
+I need to write a summary.md now describing ONLY what I actually did. Let me 
+review what I accomplished:
+
+1. Read AGENTS.md
+2. Read evaluator protocol and verdict definitions
+3. Explored the git history (26 commits on feat/fresh-ui-ai-additions)
+4. Got the diff stats (57 files, ~4863 insertions, ~314 deletions)
+5. Read task definitions for root and packages/fresh-ui
+6. Ran `deno task check` (root) — PASSED (exit code 0, 1848 files, 0 errors)
+7. Launched fresh-ui `deno task check` — it was in progress, type-checking all 
+TS/TSX files including combobox, all primitive tests, etc.
+8. Launched 4 fitness gates:
+   - `check-ds-no-raw-hex` — PASSED (126 files clean)
+   - `check-ds-color-utilities` — PASSED (127 files clean)
+   - `check-manifest-integrity` — PASSED (88/88 registry files claimed)
+   - `check-token-drift` — re-ran with correct perms — PASSED (3 generated 
+artifacts stable)
+9. Inspected token/theme artifacts (theme-bridge.css, tokens.css, 
+primitives.tokens.json)
+
+What remained incomplete:
+- Fresh-ui deno task check result not confirmed (was still running)
+- `deno task test` for packages/fresh-ui not run
+- packages/cli check and test not run
+- No independent verification of primitives rendering in light AND dark
+- CLI test for additive CSS registration not verified
+- NS One 5 fixes not independently verified
+- L0/token/motion contract compliance not fully verified
+- Verdict not determined
+- evaluate.md not written
+- PR comment not posted
+- summary.md not written
+
+I'll be honest about this.
+
+Action: FileEditorAction
+
+Arguments:
+  command: "create"
+  path: "/home/runner/work/_temp/openhands/28478150691-1/summary.md"
+  file_text: 
+    # IMPL-EVAL Summary — PR #190 (feat/fresh-ui-ai-additions)
+    
+    ## Summary
+    
+    This IMPL-EVAL session verified the PR #190 implementation against the 
+harness
+    gates for the fresh-ui AI/workspace primitive library and NS One fixes. Work
+was
+    interrupted before completion: 6 of 8 required verification steps ran; 4
+    fitness gates and the root `deno task check` passed; the fresh-ui package 
+check
+    was in progress at the time of cutoff; 3 major verification areas remain 
+open.
+    
+    ## Changes
+    
+    - Created run workspace directory at 
+`.llm/tmp/run/pr-190/run-28478150691-1/`.
+    - No code changes were made. This was a read-only evaluator session.
+    
+    ## Validation
+    
+    ### Gates run and status (confirmed)
+    
+    | Gate | Result | Evidence |
+    |------|--------|----------|
+    | `deno task check` (root, workspace) | **PASS** | 
+`/tmp/deno-task-check.log`: 1848 files selected, 0 error occurrences, exit 0 |
+    | `check-ds-no-raw-hex` | **PASS** | 126 files clean, no raw hex in DS 
+surface |
+    | `check-ds-color-utilities` | **PASS** | 127 files clean, no Tailwind color
+utility leaks |
+    | `check-manifest-integrity` | **PASS** | 88/88 registry files claimed 
+(barrel ↔ manifest ↔ files) |
+    | `check-token-drift` | **PASS** | 3 generated artifacts stable (tokens.css,
+theme-bridge.css, tokens.json) |
+    
+    ### Gates launched but result not confirmed
+    
+    - `deno task check` inside `packages/fresh-ui/` — launched, log showed 
+type-checking reaching combobox, all primitive test files (avatar, chart-block, 
+citation-chip, code-block, command-palette, data-table, donut, dropzone, 
+message, model-selector, prompt-input, search, tool-call-card) and 
+consumer-render test. Log showed the check progressing successfully but did not 
+capture the final exit code before session cutoff.
+    
+    ### Gates NOT run
+    
+    - `deno task test` in `packages/fresh-ui` — not executed.
+    - `packages/cli` check and test — not executed.
+    - `deno task fmt:check` — not executed.
+    - `deno task lint` — not executed.
+    - `tokens:check` determinism inside `packages/fresh-ui` — not executed 
+(token-drift wrapper passed, but the explicit `tokens:check` task was not run).
+    
+    ### Scope verified by file inspection only (no runtime verification)
+    
+    - Token artifacts inspected: `registry/theme/theme-bridge.css` contains the 
+`@theme inline` block bridging `--ns-*` custom properties to Tailwind tokens 
+(`--color-ns-*`, `--spacing-ns-*`, `--radius-*`, `--shadow-*`, `--font-*`), 
+including the new `--ns-space-*` scale steps.
+    - `registry/theme/tokens.css` inspected: `:root` block present with 
+`color-scheme: light` default (LIGHT-DEFAULT theme flip fix verified by 
+inspection).
+    - `tokens/primitives.tokens.json` inspected: DTCG-format source tokens with 
+oklch color values and `$extensions.netscript.cssVar` metadata.
+    - Registry manifest (`registry.manifest.ts`) inspected: schemaVersion 2, 
+copy-based-registry model, manifest-integrity gate confirmed 88/88 files.
+    
+    ## Remaining risks / unverified scope
+    
+    The following items from the evaluator scope list were **not** independently
+verified:
+    
+    1. **Fresh-ui `deno task test`** — unit tests for all 13+ primitives, 
+combobox, consumer-render not executed.
+    2. **Packages/cli `check` + `test`** — the `ui:add` collection 
+CSS-registration fix 
+(`packages/cli/src/kernel/application/ui/registry-styles.ts` + 
+`registry-styles.test.ts`) was never executed. The additive CSS install test 
+(which the scope explicitly required) was not run.
+    3. **Primitives rendering in light AND dark** — no runtime render was 
+performed; theme coverage was only inspected via source (the LIGHT-DEFAULT 
+`color-scheme: light` and `[data-theme='dark']` selector fix in `tokens.css` / 
+`fc8f988a`).
+    4. **L0/token/motion contract** — archetype compliance not formally 
+evaluated against `.llm/harness/archetypes/` profiles.
+    5. **5 NS One fixes** — only the LIGHT-DEFAULT theme flip was spot-checked 
+by file inspection:
+       - DataTable.Row `cols` (`0f3983a1`) — not runtime-verified.
+       - `--ns-space-*` missing steps (`0065d303`) — theme-bridge.css shows 
+`--ns-space-2-5`, `--ns-space-3-5`, `--ns-space-7`, `--ns-space-9`, 
+`--ns-space-11`, `--ns-space-14`, `--ns-space-24` present.
+       - `@kind` on ease tokens (`0bcd2472`) — not inspected.
+       - Breadcrumb long-path guard (`921b74f0`) — not inspected.
+    6. **Verdict not emitted** — neither `PASS` / `FAIL_FIX` / `FAIL_RESCOPE` / 
+`FAIL_DEBT` was determined; `evaluate.md` was not written to 
+`.llm/tmp/run/pr-190/run-28478150691-1/`.
+    7. **PR comment not posted** — no GitHub comment was written (this is 
+workflow-owned per the trigger contract).
+    
+    **Recommendation**: Resume the evaluator session (or re-invoke) to confirm 
+the in-progress fresh-ui `deno task check` exit, run `deno task test` in 
+fresh-ui, run `packages/cli` check + test, and verify the CLI additive-CSS 
+install test before finalizing the verdict. The 5 confirmed green gates provide 
+strong signal but are not sufficient per the IMPL-EVAL protocol to emit `PASS`.
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 699.98K • cache hit 82.84% •  reasoning 3.01K • ↓ output 7.61K •
+$ 0.3237
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/28478150691-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# IMPL-EVAL Summary — PR #190 (feat/fresh-ui-ai-additions)
+ 2|
++3|## Summary
++4|
++5|This IMPL-EVAL session verified the PR #190 implementation against the 
+harness
++6|gates for the fresh-ui AI/workspace primitive library and NS One fixes. Work 
+was
++7|interrupted before completion: 6 of 8 required verification steps ran; 4
++8|fitness gates and the root `deno task check` passed; the fresh-ui package 
+check
++9|was in progress at the time of cutoff; 3 major verification areas remain 
+open.
++10|
++11|## Changes
++12|
++13|- Created run workspace directory at 
+`.llm/tmp/run/pr-190/run-28478150691-1/`.
++14|- No code changes were made. This was a read-only evaluator session.
++15|
++16|## Validation
++17|
++18|### Gates run and status (confirmed)
++19|
++20|| Gate | Result | Evidence |
++21||------|--------|----------|
++22|| `deno task check` (root, workspace) | **PASS** | 
+`/tmp/deno-task-check.log`: 1848 files selected, 0 error occurrences, exit 0 |
++23|| `check-ds-no-raw-hex` | **PASS** | 126 files clean, no raw hex in DS 
+surface |
++24|| `check-ds-color-utilities` | **PASS** | 127 files clean, no Tailwind color
+utility leaks |
++25|| `check-manifest-integrity` | **PASS** | 88/88 registry files claimed 
+(barrel ↔ manifest ↔ files) |
++26|| `check-token-drift` | **PASS** | 3 generated artifacts stable (tokens.css,
+theme-bridge.css, tokens.json) |
++27|
++28|### Gates launched but result not confirmed
++29|
++30|- `deno task check` inside `packages/fresh-ui/` — launched, log showed 
+type-checking reaching combobox, all primitive test files (avatar, chart-block, 
+citation-chip, code-block, command-palette, data-table, donut, dropzone, 
+message, model-selector, prompt-input, search, tool-call-card) and 
+consumer-render test. Log showed the check progressing successfully but did not 
+capture the final exit code before session cutoff.
++31|
++32|### Gates NOT run
++33|
++34|- `deno task test` in `packages/fresh-ui` — not executed.
++35|- `packages/cli` check and test — not executed.
++36|- `deno task fmt:check` — not executed.
++37|- `deno task lint` — not executed.
++38|- `tokens:check` determinism inside `packages/fresh-ui` — not executed 
+(token-drift wrapper passed, but the explicit `tokens:check` task was not run).
++39|
++40|### Scope verified by file inspection only (no runtime verification)
++41|
++42|- Token artifacts inspected: `registry/theme/theme-bridge.css` contains the 
+`@theme inline` block bridging `--ns-*` custom properties to Tailwind tokens 
+(`--color-ns-*`, `--spacing-ns-*`, `--radius-*`, `--shadow-*`, `--font-*`), 
+including the new `--ns-space-*` scale steps.
++43|- `registry/theme/tokens.css` inspected: `:root` block present with 
+`color-scheme: light` default (LIGHT-DEFAULT theme flip fix verified by 
+inspection).
++44|- `tokens/primitives.tokens.json` inspected: DTCG-format source tokens with 
+oklch color values and `$extensions.netscript.cssVar` metadata.
++45|- Registry manifest (`registry.manifest.ts`) inspected: schemaVersion 2, 
+copy-based-registry model, manifest-integrity gate confirmed 88/88 files.
++46|
++47|## Remaining risks / unverified scope
++48|
++49|The following items from the evaluator scope list were **not** independently
+verified:
++50|
++51|1. **Fresh-ui `deno task test`** — unit tests for all 13+ primitives, 
+combobox, consumer-render not executed.
++52|2. **Packages/cli `check` + `test`** — the `ui:add` collection 
+CSS-registration fix 
+(`packages/cli/src/kernel/application/ui/registry-styles.ts` + 
+`registry-styles.test.ts`) was never executed. The additive CSS install test 
+(which the scope explicitly required) was not run.
++53|3. **Primitives rendering in light AND dark** — no runtime render was 
+performed; theme coverage was only inspected via source (the LIGHT-DEFAULT 
+`color-scheme: light` and `[data-theme='dark']` selector fix in `tokens.css` / 
+`fc8f988a`).
++54|4. **L0/token/motion contract** — archetype compliance not formally 
+evaluated against `.llm/harness/archetypes/` profiles.
++55|5. **5 NS One fixes** — only the LIGHT-DEFAULT theme flip was spot-checked 
+by file inspection:
++56|   - DataTable.Row `cols` (`0f3983a1`) — not runtime-verified.
++57|   - `--ns-space-*` missing steps (`0065d303`) — theme-bridge.css shows 
+`--ns-space-2-5`, `--ns-space-3-5`, `--ns-space-7`, `--ns-space-9`, 
+`--ns-space-11`, `--ns-space-14`, `--ns-space-24` present.
++58|   - `@kind` on ease tokens (`0bcd2472`) — not inspected.
++59|   - Breadcrumb long-path guard (`921b74f0`) — not inspected.
++60|6. **Verdict not emitted** — neither `PASS` / `FAIL_FIX` / `FAIL_RESCOPE` / 
+`FAIL_DEBT` was determined; `evaluate.md` was not written to 
+`.llm/tmp/run/pr-190/run-28478150691-1/`.
++61|7. **PR comment not posted** — no GitHub comment was written (this is 
+workflow-owned per the trigger contract).
++62|
++63|**Recommendation**: Resume the evaluator session (or re-invoke) to confirm 
+the in-progress fresh-ui `deno task check` exit, run `deno task test` in 
+fresh-ui, run `packages/cli` check + test, and verify the CLI additive-CSS 
+install test before finalizing the verdict. The 5 confirmed green gates provide 
+strong signal but are not sufficient per the IMPL-EVAL protocol to emit `PASS`.
++64|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: IMPL-EVAL summary written with validation results
+
+Reasoning:
+The user is asking me to call a tool. I've already written the summary.md file 
+as requested. Now I should use the finish tool to signal that I've completed the
+required task.
+
+The task was: "Write that file now as markdown with Summary, Changes, 
+Validation, and Remaining risks sections, then stop."
+
+I've written the file at 
+`/home/runner/work/_temp/openhands/28478150691-1/summary.md` with all required 
+sections:
+- Summary
+- Changes
+- Validation
+- Remaining risks / unverified scope
+
+Now I should stop by calling the finish tool.
+
+
+Finish with message:
+Run summary written to 
+`/home/runner/work/_temp/openhands/28478150691-1/summary.md`.
+
+The IMPL-EVAL session was interrupted before completion. Of the 8 required 
+verification steps, 6 were performed:
+
+**Confirmed passing gates (5):**
+- Root `deno task check` — 1848 files, 0 errors
+- `check-ds-no-raw-hex` — 126 files clean
+- `check-ds-color-utilities` — 127 files clean  
+- `check-manifest-integrity` — 88/88 registry files claimed
+- `check-token-drift` — 3 generated artifacts stable
+
+**Not completed:**
+- Fresh-ui `deno task test` — not executed
+- Packages/cli check + test — not executed
+- Fresh-ui `deno task check` exit code — launched but not captured
+- Primitives runtime rendering in light/dark — not performed
+- Final verdict emission — not determined
+- `evaluate.md` artifact — not written
+- PR comment — not posted (workflow-owned)
+
+The summary documents 5 confirmed green gates and lists 7 unverified scope items
+that remain before a final `PASS` verdict can be emitted per the IMPL-EVAL 
+protocol.
+
+Tokens: ↑ input 729.51K • cache hit 83.24% •  reasoning 3.15K • ↓ output 8.07K •
+$ 0.3349
+

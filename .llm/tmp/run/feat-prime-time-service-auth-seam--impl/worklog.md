@@ -1,0 +1,180 @@
+# Worklog: service-auth-seam implementation
+
+## Run Metadata
+
+| Field | Value |
+| --- | --- |
+| Run ID | `feat-prime-time-service-auth-seam--impl` |
+| Branch | `feat/prime-time/service-auth-seam` |
+| Archetype | `ARCHETYPE-4 - Public DSL / Builder` |
+| Scope overlays | `SCOPE-service` |
+
+## Design
+
+### Public Surface
+
+- `createService(...).withAuthn(options).withAuthz(options)` — opt-in fluent auth stages for service builders.
+- `defineService(router, { auth })` — preset pass-through for generated service entrypoints, off by default.
+- `@netscript/service/auth` — auth types, ports, and default factory exports.
+- `ServiceContext.principal` and oRPC `context.principal` — typed identity carrier for authenticated requests.
+
+### Domain Vocabulary
+
+- `Principal` — stable authenticated identity with subject, scopes, roles, scheme, and verified claims.
+- `AuthnRequest` / `AuthnResult` — request view and discriminated authentication result.
+- `AuthzRequest` / `AuthzDecision` — authorization input and discriminated decision.
+- `AuthnOptions` / `AuthzOptions` — builder middleware configuration.
+- `StaticCredential`, `TrustedHeaderAuthenticatorOptions`, `ScopeAuthorizationRule` — default adapter configuration.
+
+### Ports
+
+- `AuthenticatorPort` — consumer-supplied or default adapter boundary that converts a request into a principal or rejection.
+- `AuthorizerPort` — policy boundary that decides whether a principal may proceed.
+
+### Constants
+
+- `DEFAULT_PROTECTED_PREFIXES` — `['/api']`.
+- `DEFAULT_ANONYMOUS_PREFIXES` — `['/health']`.
+- `AUTHN_FAILURE_CODES` — `missing-credential`, `invalid-credential`, `missing-identity-header`.
+- `AUTH_RESPONSE_CODES` — `UNAUTHORIZED`, `FORBIDDEN`.
+
+### Commit Slices
+
+| # | Slice | Gate | Files |
+| - | --- | --- | --- |
+| 1 | Auth port + principal types | check/lint/fmt wrappers | `packages/service/src/auth/types.ts`, `packages/service/src/auth/options.ts` |
+| 2 | Static credential + trusted-header authenticators | targeted auth tests + static wrappers | `packages/service/src/auth/static-credential-authenticator.ts`, `packages/service/src/auth/trusted-header-authenticator.ts`, `packages/service/tests/auth/authenticators_test.ts` |
+| 3 | Scope/role authorizer | targeted auth tests + static wrappers | `packages/service/src/auth/scope-authorizer.ts`, `packages/service/tests/auth/authorizer_test.ts` |
+| 4 | Authn/authz Hono middleware | targeted auth tests + static wrappers | `packages/service/src/auth/auth-middleware.ts`, `packages/service/tests/auth/middleware_test.ts` |
+| 5 | Builder methods + principal context | integration tests + static wrappers | `packages/service/src/builder/service-builder.ts`, `packages/service/src/builder/service-builder-impl.ts`, `packages/service/src/types.ts`, `packages/service/tests/auth/builder-auth_test.ts` |
+| 6 | Auth subpath exports | publish dry-run + doc check + static wrappers | `packages/service/mod.ts`, `packages/service/src/auth/mod.ts`, `packages/service/deno.json` |
+| 7 | defineService auth opt-in + README/examples | full service tests + publish dry-run + consumer checks | `packages/service/src/presets/define-service.ts`, `packages/service/README.md`, `packages/service/tests/_fixtures/readme-examples_test.ts` |
+
+### Deferred Scope
+
+- Bundled asymmetric JWT/OAuth verification — consumer-owned via `AuthenticatorPort`; no new third-party dependency in this slice.
+- Session/cookie stores and multi-tenant policy engines — separate future slices.
+- Scaffold template auth examples — out of scope because generated services remain opt-in unchanged.
+
+### Contributor Path
+
+To add an auth mechanism, implement `AuthenticatorPort` in one focused file under `src/auth/`, cover it in `tests/auth/`, export it from `src/auth/mod.ts` only when it is part of the public `./auth` contract, then use `withAuthn()` or `defineService({ auth })` in consumers.
+
+## Progress Log
+
+| Time | Slice | Step | Notes |
+| --- | --- | --- | --- |
+| 2026-06-20 | bootstrap | pre-flight | Loaded implement brief, plan, plan-meta, doctrine, archetype, scope overlay, gate matrix, and debt registry. |
+| 2026-06-20 | 1 | implementation | Added `Principal`, authn/authz result/request/port contracts, and builder option types. |
+| 2026-06-20 | 1 | gates | Check/lint/fmt wrappers passed. Initial check invocation with explicit `--unstable-kv` failed because the wrapper passes it by default; reran supported form successfully. |
+| 2026-06-20 | 2 | implementation | Added static credential and trusted-header authenticators plus focused unit tests. |
+| 2026-06-20 | 2 | gates | Targeted authenticator tests and check/lint/fmt wrappers passed. Formatter adjusted one owned auth file before final fmt pass. |
+| 2026-06-20 | 3 | implementation | Added ordered scope/role authorizer with deny-by-default behavior and unit tests. |
+| 2026-06-20 | 3 | gates | Targeted authorizer tests and check/lint/fmt wrappers passed. |
+| 2026-06-20 | 4 | implementation | Added authn/authz Hono middleware with guarded-prefix handling, 401/403 envelopes, principal injection, fail-closed authz errors, and structured auth decision logging. |
+| 2026-06-20 | 4 | gates | Middleware tests and check/lint/fmt wrappers passed after typing the bare-Hono test apps with the `principal` variable. |
+| 2026-06-20 | 5 | implementation | Added `withAuthn`/`withAuthz`, deferred protected route/RPC/doc registration until `build()`, and injected Hono principal into oRPC context. |
+| 2026-06-20 | 5 | gates | Builder integration tests and check/lint/fmt wrappers passed. |
+| 2026-06-20 | 6 | implementation | Added `@netscript/service/auth` subpath export for auth contracts and default factory adapters. |
+| 2026-06-20 | 6 | gates | Static wrappers, publish dry-run, `deno doc`, filtered symbol docs, and auth doc lint passed. Dry-run retained the package's pre-existing `--allow-slow-types` warning and completed successfully. |
+| 2026-06-20 | 7 | implementation | Added `defineService({ auth })` opt-in wiring, README auth examples, README fixture checks, and preset integration tests. |
+| 2026-06-20 | 7 | gates | Targeted auth tests, full service tests, static wrappers, publish dry-run, docs, consumer checks, and service-scoped doctrine check passed. Root `deno task arch:check` failed on pre-existing repo-wide findings outside this slice; recorded in drift. |
+| 2026-06-20 | follow-up | implementation | Widened auth contracts for session/cookie and token-IdP adapters without adding provider dependencies: full headers, cookie lookup, success response headers/Set-Cookie, tenant/session/provider claims JSDoc, and external auth router README pattern. |
+| 2026-06-20 | follow-up | gates | Focused auth tests, full service tests, static wrappers, publish dry-run, docs, and service-scoped doctrine passed. |
+
+## Decisions
+
+| Decision | Reason | Source |
+| --- | --- | --- |
+| Use dependency-free auth defaults | Avoid JWT dependency and upstream type leakage while closing inert auth surface. | `plan-meta.json` locked decisions |
+| Defer auth/RPC installation until `build()` | Existing `withRPC()` registered immediately; deferring RPC is needed to preserve deterministic auth-before-RPC ordering independent of chain order. | `plan.md` Step 4 |
+
+## Drift
+
+| Drift | Severity | Logged in drift.md |
+| --- | --- | --- |
+| Root `deno task arch:check` is not a usable slice-green verdict because it fails on pre-existing repo-wide findings outside `packages/service`. | minor | yes |
+
+## Gate Results
+
+### Static Gates
+
+| Gate | Command or check | Result | Notes |
+| --- | --- | --- | --- |
+| check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --ext ts --unstable-kv` | NOT_RUN | Pending implementation slices. |
+| lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/service --ext ts` | NOT_RUN | Pending implementation slices. |
+| fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/service --ext ts` | NOT_RUN | Pending implementation slices. |
+| slice 1 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --ext ts` | PASS | Exit 0; wrapper ran `deno check --quiet --unstable-kv <files>`; 19 files, 0 diagnostics. |
+| slice 1 lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/service --ext ts` | PASS | Exit 0; 19 files, 0 findings. |
+| slice 1 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/service --ext ts` | PASS | Exit 0; 19 files, 0 findings. |
+| slice 2 test | `rtk proxy deno test --allow-all packages/service/tests/auth/authenticators_test.ts` | PASS | Exit 0; 8 passed, 0 failed. |
+| slice 2 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --ext ts` | PASS | Exit 0; 22 files, 0 diagnostics. |
+| slice 2 lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/service --ext ts` | PASS | Exit 0; 22 files, 0 findings. |
+| slice 2 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/service --ext ts` | PASS | Exit 0 after formatting owned auth files; 22 files, 0 findings. |
+| slice 3 test | `rtk proxy deno test --allow-all packages/service/tests/auth/authorizer_test.ts` | PASS | Exit 0; 5 passed, 0 failed. |
+| slice 3 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --ext ts` | PASS | Exit 0; 24 files, 0 diagnostics. |
+| slice 3 lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/service --ext ts` | PASS | Exit 0; 24 files, 0 findings. |
+| slice 3 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/service --ext ts` | PASS | Exit 0; 24 files, 0 findings. |
+| slice 4 test | `rtk proxy deno test --allow-all packages/service/tests/auth/middleware_test.ts` | PASS | Exit 0; 7 passed, 0 failed. |
+| slice 4 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --ext ts` | PASS | Exit 0; 26 files, 0 diagnostics. |
+| slice 4 lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/service --ext ts` | PASS | Exit 0; 26 files, 0 findings. |
+| slice 4 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/service --ext ts` | PASS | Exit 0; 26 files, 0 findings. |
+| slice 5 test | `rtk proxy deno test --allow-all packages/service/tests/auth/builder-auth_test.ts` | PASS | Exit 0; 3 passed, 0 failed. |
+| slice 5 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --ext ts` | PASS | Exit 0; 27 files, 0 diagnostics. |
+| slice 5 lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/service --ext ts` | PASS | Exit 0; 27 files, 0 findings. |
+| slice 5 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/service --ext ts` | PASS | Exit 0; 27 files, 0 findings. |
+| slice 6 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --ext ts` | PASS | Exit 0; 28 files, 0 diagnostics. |
+| slice 6 lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/service --ext ts` | PASS | Exit 0; 28 files, 0 findings. |
+| slice 6 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/service --ext ts` | PASS | Exit 0; 28 files, 0 findings. |
+| slice 6 publish | `cd packages/service && rtk proxy deno publish --dry-run --allow-dirty --allow-slow-types` | PASS | Exit 0; checked `mod.ts` and `src/auth/mod.ts`; dry run complete. Slow-types warning is the accepted package baseline requiring `--allow-slow-types`. |
+| slice 6 docs | `deno doc packages/service/mod.ts`; `deno doc --filter <symbol> packages/service/src/auth/mod.ts`; `deno doc --lint packages/service/src/auth/mod.ts` | PASS | Exit 0; root docs readable, auth symbols visible with JSDoc, doc lint checked 1 file. |
+| slice 7 auth tests | `rtk proxy deno test --allow-all packages/service/tests/auth/` | PASS | Exit 0; 25 passed, 0 failed. |
+| slice 7 full service tests | `rtk proxy deno test --allow-all packages/service/tests/` | PASS | Exit 0; 42 passed, 0 failed. |
+| slice 7 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --ext ts` | PASS | Exit 0; 29 files, 0 diagnostics. |
+| slice 7 lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/service --ext ts` | PASS | Exit 0; 29 files, 0 findings. |
+| slice 7 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/service --ext ts` | PASS | Exit 0 after formatting owned files; 29 files, 0 findings. |
+| slice 7 publish | `cd packages/service && rtk proxy deno publish --dry-run --allow-dirty --allow-slow-types` | PASS | Exit 0; dry run complete. Slow-types warning is the accepted service package baseline. |
+| slice 7 docs | `deno doc packages/service/mod.ts`; `deno doc --filter createStaticCredentialAuthenticator packages/service/src/auth/mod.ts`; `deno doc --lint packages/service/src/auth/mod.ts` | PASS | Exit 0. |
+| root arch | `deno task arch:check` | FAIL | Exit 1; 58 FAIL, 143 WARN, 1 INFO on pre-existing repo-wide doctrine findings outside this slice, mostly CLI/plugin abstract bases and Jest/Vitest globals. |
+| service doctrine | `deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/service` | PASS | Exit 0; FAIL=0, WARN=1 (`docs/architecture.md` lacks archetype number). No service-auth findings. |
+| follow-up auth tests | `rtk proxy deno test --allow-all packages/service/tests/auth/` | PASS | Exit 0; 27 passed, 0 failed. |
+| follow-up full service tests | `rtk proxy deno test --allow-all packages/service/tests/` | PASS | Exit 0; 44 passed, 0 failed. |
+| follow-up check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --ext ts` | PASS | Exit 0; 29 files, 0 diagnostics. |
+| follow-up lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/service --ext ts` | PASS | Exit 0; 29 files, 0 findings. |
+| follow-up fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/service --ext ts` | PASS | Exit 0; 29 files, 0 findings. |
+| follow-up publish | `cd packages/service && rtk proxy deno publish --dry-run --allow-dirty --allow-slow-types` | PASS | Exit 0; dry run complete. Existing service slow-types warning remains under accepted `--allow-slow-types` carve-out. |
+| follow-up docs | `deno doc packages/service/mod.ts`; `deno doc --filter AuthnRequest/AuthnResult/Principal packages/service/src/auth/mod.ts`; `deno doc --lint packages/service/src/auth/mod.ts` | PASS | Exit 0. |
+| follow-up service doctrine | `deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/service` | PASS | Exit 0; FAIL=0, WARN=1 existing docs warning. |
+
+### Fitness Gates
+
+| Gate | Result | Evidence | Notes |
+| --- | --- | --- | --- |
+| F-5/F-6/F-7/F-15 | NOT_RUN | Pending export slices. | Planned for slices 6-7. |
+| F-5/F-7 auth docs | PASS | `deno doc --filter createStaticCredentialAuthenticator`, `createTrustedHeaderAuthenticator`, `createScopeAuthorizer`, `Principal`; `deno doc --lint packages/service/src/auth/mod.ts`. | Auth subpath surface is documented. |
+| F-6 publishability | PASS | `deno publish --dry-run --allow-dirty --allow-slow-types` from `packages/service`; exit 0. | Existing slow-types warning remains within accepted package carve-out. |
+| F-15 upstream re-export lint | PASS | Manual export review of `packages/service/src/auth/mod.ts`; no Hono, jose, or upstream auth library types exported. | Auth subpath exports package-owned types and factories only. |
+| F-1/F-3/F-11/F-14 service doctrine | PASS | `check-doctrine.ts --root packages/service` exit 0. | One existing docs warning, no failures. |
+| adapter-readiness surface | PASS | Manual review + docs + tests. | No better-auth/WorkOS dependency added; new fields are optional/backward-compatible. |
+
+### Runtime Gates
+
+| Gate | Result | Evidence | Notes |
+| --- | --- | --- | --- |
+| auth behavior | NOT_RUN | Pending targeted tests. | Planned for slices 2-7. |
+| auth behavior | PASS | `packages/service/tests/auth/` and full `packages/service/tests/`. | 25 targeted auth tests and 42 full service tests passed. |
+| follow-up auth behavior | PASS | `packages/service/tests/auth/` and full `packages/service/tests/`. | 27 targeted auth tests and 44 full service tests passed. |
+
+### Consumer Gates
+
+| Consumer | Result | Evidence | Notes |
+| --- | --- | --- | --- |
+| plugins service consumers | NOT_RUN | Pending final gate. | Planned for slice 7. |
+| workers services | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/workers/services --ext ts` | Exit 0; 13 files, 0 diagnostics. |
+| sagas services | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/sagas/services --ext ts` | Exit 0; 10 files, 0 diagnostics. |
+| streams services | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/streams/services --ext ts` | Exit 0; 1 file, 0 diagnostics. |
+
+## Handoff Notes
+
+- Inspect `packages/service/src/auth/` first, then builder wiring in `service-builder-impl.ts`.
+- Root `deno task arch:check` is the only non-green named command; service-scoped doctrine evidence is green and the root failures pre-date/outside this slice.

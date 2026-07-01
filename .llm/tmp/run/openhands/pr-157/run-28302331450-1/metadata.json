@@ -1,0 +1,17 @@
+{
+  "run_id": "28302331450",
+  "run_attempt": "1",
+  "run_url": "https://github.com/rickylabs/netscript/actions/runs/28302331450",
+  "bootstrap_outcome": "success",
+  "agent_outcome": "success",
+  "verdict": "completed",
+  "summary_source": "agent",
+  "model": "openrouter/qwen/qwen3.7-max",
+  "provider": "OPENROUTER",
+  "output_mode": "pr-comment",
+  "issue_number": "157",
+  "checkout_repo": "rickylabs/netscript",
+  "checkout_ref": "fix/service-health-e2e-alpha11-e",
+  "summary_path": "/home/runner/work/_temp/openhands/28302331450-1/summary.md",
+  "trace_dir": ".llm/tmp/run/openhands/pr-157/run-28302331450-1"
+}

@@ -1,0 +1,171 @@
+{
+  "pkg": {
+    "name": "@netscript/sagas",
+    "version": "0.1.0",
+    "root": "packages/sagas"
+  },
+  "exports": {
+    ".": "./mod.ts",
+    "./config": "./builders/saga-config-builder.ts",
+    "./publisher": "./integration/mod.ts",
+    "./integration/workers": "./integration/workers-client.ts",
+    "./streams/server": "./streams/server.ts",
+    "./streams/schema": "./streams/schema.ts"
+  },
+  "files": {
+    "total": 31,
+    "loc": 6495,
+    "entries": [
+      {
+        "path": "mod.ts",
+        "bytes": 3908
+      },
+      {
+        "path": "builders/saga-config-builder.ts",
+        "bytes": 4487
+      },
+      {
+        "path": "integration/mod.ts",
+        "bytes": 10047
+      },
+      {
+        "path": "integration/workers-client.ts",
+        "bytes": 9381
+      },
+      {
+        "path": "streams/server.ts",
+        "bytes": 296
+      },
+      {
+        "path": "streams/schema.ts",
+        "bytes": 1382
+      }
+    ]
+  },
+  "docs": {
+    "hasReadme": true,
+    "readmeLines": 627,
+    "hasDocsFolder": false,
+    "moduleTagOnEntries": {
+      ".": true,
+      "./config": true,
+      "./publisher": true,
+      "./integration/workers": true,
+      "./streams/server": true,
+      "./streams/schema": true
+    },
+    "descriptionLen": 0
+  },
+  "surface": {
+    ".": {
+      "exported": [
+        "DEFAULT_TIMEOUT_BOUNDS",
+        "DefaultErrorHandler",
+        "InMemorySagaStore",
+        "InMemoryTransport",
+        "RETRY_HEADERS",
+        "SagaBusMachineBuilder",
+        "SagaProcessingError",
+        "Semaphore",
+        "TransientError",
+        "ValidationError",
+        "completeWith",
+        "continueWith",
+        "createBus",
+        "createErrorHandler",
+        "createHonoSagaMiddleware",
+        "createMessage",
+        "createSSEEventsMiddleware",
+        "createSagaJobContext",
+        "createSagaMiddleware",
+        "createSagaPublisher",
+        "createTypedSaga",
+        "defaultDlqNaming",
+        "defineSaga",
+        "emitSagaEvent",
+        "getHistoryPrismaClient",
+        "hasStatus",
+        "setHistoryPrismaClient",
+        "setSagaStreamHook"
+      ],
+      "rawCount": 36
+    },
+    "./config": {
+      "exported": [
+        "SagaConfigBuilder",
+        "defineSaga"
+      ],
+      "rawCount": 2
+    },
+    "./publisher": {
+      "exported": [
+        "SagaJobContext",
+        "SagaMiddlewareOptions",
+        "SagaPublisher",
+        "SagaPublisherOptions",
+        "createSagaJobContext",
+        "createSagaMiddleware",
+        "createSagaPublisher"
+      ],
+      "rawCount": 7
+    },
+    "./integration/workers": {
+      "exported": [
+        "TriggerJobOptions",
+        "TriggerJobResult",
+        "TriggerTaskResult",
+        "triggerJob",
+        "triggerJobSafe",
+        "triggerTask",
+        "triggerTaskSafe",
+        "workersClient"
+      ],
+      "rawCount": 8
+    },
+    "./streams/server": {
+      "exported": [
+        "SagaInstanceSchema",
+        "getSagasStreamProducer",
+        "sagasStreamSchema",
+        "startSagasStreamMirror"
+      ],
+      "rawCount": 4
+    },
+    "./streams/schema": {
+      "exported": [
+        "SagaInstance",
+        "SagaInstanceSchema",
+        "sagasStreamSchema"
+      ],
+      "rawCount": 3
+    }
+  },
+  "tests": {
+    "fileCount": 0,
+    "files": []
+  },
+  "gates": [
+    {
+      "gate": "F-JSR-4 description",
+      "level": "FAIL",
+      "message": "deno.json lacks `description` (used by JSR discoverability)"
+    },
+    {
+      "gate": "F-DOCT-4 vocabulary",
+      "level": "WARN",
+      "message": "forbidden folder name 'helpers' (utils/helpers/common/lib/interfaces) — needs migration plan + debt entry",
+      "path": "helpers"
+    },
+    {
+      "gate": "F-DOCT-5 cardinality",
+      "level": "WARN",
+      "message": "directory has 17 immediate children; doctrine cap is 12",
+      "path": ""
+    }
+  ],
+  "slowTypes": {
+    "ok": true,
+    "warnings": [],
+    "rawTail": "skipped"
+  }
+}

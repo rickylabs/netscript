@@ -1,0 +1,2 @@
+- 023f9f85: docs(links): repoint two stale tutorial cards on fresh-framework
+- adea307a: docs(gates): internal link-integrity gate over built site

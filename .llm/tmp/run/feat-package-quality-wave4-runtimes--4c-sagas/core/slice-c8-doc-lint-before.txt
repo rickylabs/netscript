@@ -1,0 +1,1241 @@
+[0m[33mWarning[0m Failed resolving types. Could not find package 'zlib' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m117[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'zlib.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m116[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'worker_threads.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m115[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'wasi.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m114[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'vm.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m113[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'v8.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m112[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'util' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m111[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'util.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m110[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'url.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m109[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'tty.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m108[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'trace_events.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m107[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'tls.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m106[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'timers' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m105[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'timers.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m104[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'test' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m103[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'test.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m102[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'string_decoder.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m101[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'stream' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m100[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'stream' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m99[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'stream' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m98[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'stream' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m97[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'stream.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m96[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'sqlite.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m95[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'sea.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m94[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'repl.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m93[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'readline' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m92[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'readline.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m91[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'quic.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m90[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'querystring.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m89[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'punycode.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m88[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'process.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m87[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'perf_hooks.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m86[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'path' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m85[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'path' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m84[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'path.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m83[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'os.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m82[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'net.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m81[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'module.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m80[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'inspector' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m79[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'inspector.generated.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m78[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'inspector.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m77[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'https.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m76[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'http2.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m75[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'http.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m74[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'fs' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m73[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'fs.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m72[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'events.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m71[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'domain.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m70[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'dns' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m69[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'dns.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m68[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'diagnostics_channel.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m67[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'dgram.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m66[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'crypto.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m65[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'constants.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m64[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'console.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m63[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'cluster.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m62[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'child_process.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m61[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'buffer.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m60[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'async_hooks.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m59[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'assert' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m58[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'assert.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m57[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m56[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m55[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m54[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m53[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m52[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m51[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m50[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m49[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m48[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m47[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m46[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m45[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m44[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m43[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m42[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m41[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'globals.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m40[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'buffer.buffer.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m37[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'globals.typedarray.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m36[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'compatibility' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m33[0m:[0m[33m21[0m
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport.ts[0m[0m[33m:25:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m25 | [0m  duplicate(): RedisStreamClient;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport.ts[0m[0m[33m:26:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m26 | [0m  quit(): Promise<unknown>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport.ts[0m[0m[33m:27:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m27 | [0m  xadd(...args: (string | number)[]): Promise<unknown>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport.ts[0m[0m[33m:28:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m28 | [0m  xack(streamKey: string, group: string, messageId: string): Promise<unknown>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport.ts[0m[0m[33m:29:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m29 | [0m  xgroup(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport.ts[0m[0m[33m:36:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m36 | [0m  xreadgroup(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport.ts[0m[0m[33m:47:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m47 | [0m  xpending(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport.ts[0m[0m[33m:54:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m54 | [0m  xclaim(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport.ts[0m[0m[33m:81:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m81 | [0m  debug(message: string, metadata?: Readonly<Record<string, unknown>>): void;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport.ts[0m[0m[33m:82:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m82 | [0m  warn(message: string, metadata?: Readonly<Record<string, unknown>>): void;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport.ts[0m[0m[33m:83:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m83 | [0m  error(message: string, metadata?: Readonly<Record<string, unknown>>): void;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'NetScriptRedisTransport' references private type 'SagaTransportPort'[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport.ts[0m[0m[33m:130:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m130 | [0mexport class NetScriptRedisTransport implements SagaTransportPort {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m34 | [0mexport interface SagaTransportPort {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport.ts[0m[0m[33m:131:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m131 | [0m  readonly id: string;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport.ts[0m[0m[33m:142:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m142 | [0m  constructor(options: NetScriptRedisTransportOptions = {}) {
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport.ts[0m[0m[33m:151:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m151 | [0m  async start(): Promise<void> {
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport.ts[0m[0m[33m:168:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m168 | [0m  async stop(_reason?: string): Promise<void> {
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'NetScriptRedisTransport.prototype.publish' references private type 'SagaMessage'[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport.ts[0m[0m[33m:188:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m188 | [0m  async publish(topic: string, message: SagaMessage): Promise<void> {
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+  [0m[38;5;12m4 | [0mexport type SagaMessage<TType extends string = string, TPayload = unknown> = Readonly<{
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport.ts[0m[0m[33m:188:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m188 | [0m  async publish(topic: string, message: SagaMessage): Promise<void> {
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport.ts[0m[0m[33m:192:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m192 | [0m  async publishDelayed(topic: string, message: SagaMessage, delayMs: number): Promise<void> {
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'NetScriptRedisTransport.prototype.subscribe' references private type 'SagaTransportHandler'[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport.ts[0m[0m[33m:200:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m200 | [0m  async subscribe(
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m28 | [0mexport type SagaTransportHandler<TMessage extends SagaMessage = SagaMessage> = (
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'NetScriptRedisTransport.prototype.subscribe' references private type 'SagaTransportSubscription'[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport.ts[0m[0m[33m:200:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m200 | [0m  async subscribe(
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m20 | [0mexport interface SagaTransportSubscription {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport.ts[0m[0m[33m:200:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m200 | [0m  async subscribe(
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport.ts[0m[0m[33m:219:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m219 | [0m  getSubscriptionCount(): number {
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport.ts[0m[0m[33m:223:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m223 | [0m  isRunning(): boolean {
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport.ts[0m[0m[33m:21:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m21 | [0m  duplicate(): ListTransportClient;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport.ts[0m[0m[33m:22:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m22 | [0m  ping(): Promise<unknown>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport.ts[0m[0m[33m:23:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m23 | [0m  lpush(key: string, value: string): Promise<unknown>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport.ts[0m[0m[33m:24:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m24 | [0m  lrem(key: string, count: number, value: string): Promise<unknown>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport.ts[0m[0m[33m:25:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m25 | [0m  lrange(key: string, start: number, stop: number): Promise<readonly string[]>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport.ts[0m[0m[33m:26:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m26 | [0m  llen(key: string): Promise<number>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport.ts[0m[0m[33m:27:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m27 | [0m  hset(key: string, value: Readonly<Record<string, string>>): Promise<unknown>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport.ts[0m[0m[33m:28:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m28 | [0m  hgetall(key: string): Promise<Readonly<Record<string, string>>>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport.ts[0m[0m[33m:29:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m29 | [0m  hincrby(key: string, field: string, increment: number): Promise<unknown>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport.ts[0m[0m[33m:30:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m30 | [0m  expire(key: string, seconds: number): Promise<unknown>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport.ts[0m[0m[33m:31:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m31 | [0m  del(key: string): Promise<unknown>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'GarnetListTransport' references private type 'SagaTransportPort'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport.ts[0m[0m[33m:79:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m79 | [0mexport class GarnetListTransport implements SagaTransportPort {
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m34 | [0mexport interface SagaTransportPort {
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport.ts[0m[0m[33m:80:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m80 | [0m  readonly id: string;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport.ts[0m[0m[33m:89:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m89 | [0m  constructor(options: GarnetListTransportOptions = {}) {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport.ts[0m[0m[33m:98:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m98 | [0m  async start(): Promise<void> {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport.ts[0m[0m[33m:111:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m111 | [0m  async stop(_reason?: string): Promise<void> {
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'GarnetListTransport.prototype.publish' references private type 'SagaMessage'[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport.ts[0m[0m[33m:128:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m128 | [0m  async publish(topic: string, message: SagaMessage): Promise<void> {
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+  [0m[38;5;12m4 | [0mexport type SagaMessage<TType extends string = string, TPayload = unknown> = Readonly<{
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport.ts[0m[0m[33m:128:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m128 | [0m  async publish(topic: string, message: SagaMessage): Promise<void> {
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport.ts[0m[0m[33m:132:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m132 | [0m  async publishDelayed(topic: string, message: SagaMessage, delayMs: number): Promise<void> {
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'GarnetListTransport.prototype.subscribe' references private type 'SagaTransportHandler'[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport.ts[0m[0m[33m:140:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m140 | [0m  async subscribe(
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m28 | [0mexport type SagaTransportHandler<TMessage extends SagaMessage = SagaMessage> = (
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'GarnetListTransport.prototype.subscribe' references private type 'SagaTransportSubscription'[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport.ts[0m[0m[33m:140:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m140 | [0m  async subscribe(
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m20 | [0mexport interface SagaTransportSubscription {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport.ts[0m[0m[33m:140:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m140 | [0m  async subscribe(
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport.ts[0m[0m[33m:157:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m157 | [0m  getSubscriptionCount(): number {
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport.ts[0m[0m[33m:161:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m161 | [0m  isRunning(): boolean {
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport.ts[0m[0m[33m:165:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m165 | [0m  async getQueueLength(topic: string): Promise<number> {
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport.ts[0m[0m[33m:169:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m169 | [0m  async getProcessingLength(topic: string): Promise<number> {
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport.ts[0m[0m[33m:173:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m173 | [0m  async getDeadLetterLength(topic: string): Promise<number> {
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-delayed.ts[0m[0m[33m:6:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m6 | [0m  rpush(key: string, value: string): Promise<unknown>;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-delayed.ts[0m[0m[33m:7:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m7 | [0m  zadd(key: string, score: number, member: string): Promise<unknown>;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-delayed.ts[0m[0m[33m:8:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m8 | [0m  zrangebyscore(
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-delayed.ts[0m[0m[33m:13:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m13 | [0m  zrem(key: string, member: string): Promise<unknown>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-delayed.ts[0m[0m[33m:43:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m43 | [0m  constructor(options: ListDelayedMessageProcessorOptions) {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-delayed.ts[0m[0m[33m:52:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m52 | [0m  start(): void {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-delayed.ts[0m[0m[33m:57:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m57 | [0m  stop(): void {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'ListDelayedMessageProcessor.prototype.enqueue' references private type 'SagaMessage'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-delayed.ts[0m[0m[33m:63:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m63 | [0m  enqueue(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+ [0m[38;5;12m4 | [0mexport type SagaMessage<TType extends string = string, TPayload = unknown> = Readonly<{
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-delayed.ts[0m[0m[33m:63:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m63 | [0m  enqueue(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-delayed.ts[0m[0m[33m:78:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m78 | [0m  async processDue(): Promise<void> {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'ListStoredEnvelope' references private type 'SagaMessage'[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-subscription.ts[0m[0m[33m:9:1[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m9 | [0mexport type ListStoredEnvelope = Readonly<{
+ [0m[38;5;12m | [0m[0m[1m[31m^[0m
+  [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+ [0m[38;5;12m | [0m
+[0m[38;5;12m4 | [0mexport type SagaMessage<TType extends string = string, TPayload = unknown> = Readonly<{
+ [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+ [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'ListDecodedTransportMessage' references private type 'SagaTransportMessage'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-subscription.ts[0m[0m[33m:18:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m18 | [0mexport type ListDecodedTransportMessage = Readonly<{
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+ [0m[38;5;12m4 | [0mexport type SagaTransportMessage<TMessage extends SagaMessage = SagaMessage> = Readonly<{
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-subscription.ts[0m[0m[33m:29:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m29 | [0m  constructor(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'ListTransportSubscriptionRecord.prototype.handler' references private type 'SagaTransportMessage'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-subscription.ts[0m[0m[33m:33:5[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m33 | [0m    readonly handler: (
+  [0m[38;5;12m | [0m    [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+ [0m[38;5;12m4 | [0mexport type SagaTransportMessage<TMessage extends SagaMessage = SagaMessage> = Readonly<{
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'ListTransportSubscriptionRecord.prototype.handler' references private type 'SagaTransportAck'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-subscription.ts[0m[0m[33m:33:5[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m33 | [0m    readonly handler: (
+  [0m[38;5;12m | [0m    [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m12 | [0mexport interface SagaTransportAck {
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-subscription.ts[0m[0m[33m:39:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m39 | [0m  get blockingClient(): ListBlockingClient | undefined {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-subscription.ts[0m[0m[33m:43:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m43 | [0m  get readLoopPromise(): Promise<void> | undefined {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-subscription.ts[0m[0m[33m:47:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m47 | [0m  get stopping(): boolean {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-subscription.ts[0m[0m[33m:51:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m51 | [0m  attachBlockingClient(client: ListBlockingClient): void {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-subscription.ts[0m[0m[33m:55:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m55 | [0m  attachReadLoop(readLoop: Promise<void>): void {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-subscription.ts[0m[0m[33m:59:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m59 | [0m  requestStop(): void {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-subscription.ts[0m[0m[33m:63:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m63 | [0m  resetStop(): void {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-subscription.ts[0m[0m[33m:67:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m67 | [0m  clearRuntime(): void {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-subscription.ts[0m[0m[33m:75:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m75 | [0m  quit(): Promise<unknown>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-subscription.ts[0m[0m[33m:76:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m76 | [0m  blmove(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-subscription.ts[0m[0m[33m:83:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m83 | [0m  brpoplpush(source: string, destination: string, timeoutSeconds: number): Promise<string | null>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'ListTransportAck' references private type 'SagaTransportAck'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-subscription.ts[0m[0m[33m:87:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m87 | [0mexport class ListTransportAck implements SagaTransportAck {
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m12 | [0mexport interface SagaTransportAck {
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-subscription.ts[0m[0m[33m:90:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m90 | [0m  constructor(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-subscription.ts[0m[0m[33m:101:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m101 | [0m  get settled(): boolean {
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-subscription.ts[0m[0m[33m:105:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m105 | [0m  async ack(): Promise<void> {
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-subscription.ts[0m[0m[33m:111:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m111 | [0m  nack(_reason?: string): Promise<void> {
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'ListTransportSubscription' references private type 'SagaTransportSubscription'[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-subscription.ts[0m[0m[33m:118:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m118 | [0mexport class ListTransportSubscription implements SagaTransportSubscription {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m20 | [0mexport interface SagaTransportSubscription {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-subscription.ts[0m[0m[33m:119:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m119 | [0m  constructor(
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-subscription.ts[0m[0m[33m:124:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m124 | [0m  unsubscribe(): Promise<void> {
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'encodeListTransportMessage' references private type 'SagaMessage'[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\list-transport-subscription.ts[0m[0m[33m:130:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m130 | [0mexport function encodeListTransportMessage(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+  [0m[38;5;12m4 | [0mexport type SagaMessage<TType extends string = string, TPayload = unknown> = Readonly<{
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport-delayed.ts[0m[0m[33m:6:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m6 | [0m  zadd(key: string, score: number, member: string): Promise<unknown>;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport-delayed.ts[0m[0m[33m:7:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m7 | [0m  zrangebyscore(
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport-delayed.ts[0m[0m[33m:12:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m12 | [0m  zrem(key: string, member: string): Promise<unknown>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport-delayed.ts[0m[0m[33m:42:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m42 | [0m  constructor(options: RedisDelayedMessageProcessorOptions) {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport-delayed.ts[0m[0m[33m:51:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m51 | [0m  start(): void {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport-delayed.ts[0m[0m[33m:56:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m56 | [0m  stop(): void {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RedisDelayedMessageProcessor.prototype.enqueue' references private type 'SagaMessage'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport-delayed.ts[0m[0m[33m:62:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m62 | [0m  enqueue(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+ [0m[38;5;12m4 | [0mexport type SagaMessage<TType extends string = string, TPayload = unknown> = Readonly<{
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport-delayed.ts[0m[0m[33m:62:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m62 | [0m  enqueue(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport-delayed.ts[0m[0m[33m:77:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m77 | [0m  async processDue(): Promise<void> {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RedisTransportSubscriptionRecord' references private type 'SagaTransportMessage'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport-subscription.ts[0m[0m[33m:29:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m29 | [0mexport type RedisTransportSubscriptionRecord = Readonly<{
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+ [0m[38;5;12m4 | [0mexport type SagaTransportMessage<TMessage extends SagaMessage = SagaMessage> = Readonly<{
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RedisTransportSubscriptionRecord' references private type 'SagaTransportAck'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport-subscription.ts[0m[0m[33m:29:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m29 | [0mexport type RedisTransportSubscriptionRecord = Readonly<{
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m12 | [0mexport interface SagaTransportAck {
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RedisStoredEnvelope' references private type 'SagaMessage'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport-subscription.ts[0m[0m[33m:39:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m39 | [0mexport type RedisStoredEnvelope = Readonly<{
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+ [0m[38;5;12m4 | [0mexport type SagaMessage<TType extends string = string, TPayload = unknown> = Readonly<{
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RedisTransportAck' references private type 'SagaTransportAck'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport-subscription.ts[0m[0m[33m:47:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m47 | [0mexport class RedisTransportAck implements SagaTransportAck {
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m12 | [0mexport interface SagaTransportAck {
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport-subscription.ts[0m[0m[33m:50:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m50 | [0m  constructor(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport-subscription.ts[0m[0m[33m:56:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m56 | [0m  get settled(): boolean {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport-subscription.ts[0m[0m[33m:60:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m60 | [0m  async ack(): Promise<void> {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport-subscription.ts[0m[0m[33m:66:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m66 | [0m  nack(_reason?: string): Promise<void> {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RedisTransportSubscription' references private type 'SagaTransportSubscription'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport-subscription.ts[0m[0m[33m:73:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m73 | [0mexport class RedisTransportSubscription implements SagaTransportSubscription {
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m20 | [0mexport interface SagaTransportSubscription {
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport-subscription.ts[0m[0m[33m:74:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m74 | [0m  constructor(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport-subscription.ts[0m[0m[33m:79:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m79 | [0m  unsubscribe(): Promise<void> {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'decodeRedisTransportMessage' references private type 'SagaTransportMessage'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport-subscription.ts[0m[0m[33m:85:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m85 | [0mexport function decodeRedisTransportMessage(
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+ [0m[38;5;12m4 | [0mexport type SagaTransportMessage<TMessage extends SagaMessage = SagaMessage> = Readonly<{
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'encodeRedisTransportMessage' references private type 'SagaMessage'[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\transports\redis-transport-subscription.ts[0m[0m[33m:108:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m108 | [0mexport function encodeRedisTransportMessage(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+  [0m[38;5;12m4 | [0mexport type SagaMessage<TType extends string = string, TPayload = unknown> = Readonly<{
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'SagaCorrelationIndexEntry' references private type 'SagaId'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\ports\saga-store-port.ts[0m[0m[33m:16:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m16 | [0mexport type SagaCorrelationIndexEntry = Readonly<{
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+ [0m[38;5;12m2 | [0mexport type SagaId<TId extends string = string> = TId & { readonly __brand: 'SagaId' };
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'SagaCorrelationIndexEntry' references private type 'SagaCorrelationKey'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\ports\saga-store-port.ts[0m[0m[33m:16:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m16 | [0mexport type SagaCorrelationIndexEntry = Readonly<{
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m10 | [0mexport type SagaCorrelationKey<TId extends string = string> = TId & {
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'SagaCorrelationIndexEntry' references private type 'SagaInstanceId'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\ports\saga-store-port.ts[0m[0m[33m:16:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m16 | [0mexport type SagaCorrelationIndexEntry = Readonly<{
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+ [0m[38;5;12m5 | [0mexport type SagaInstanceId<TId extends string = string> = TId & {
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'SagaStorePort["load"]' references private type 'SagaState'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\ports\saga-store-port.ts[0m[0m[33m:27:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m27 | [0m  load<TState extends SagaState>(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m18 | [0mexport type SagaState = Readonly<Record<string, unknown>>;
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'SagaStorePort["load"]' references private type 'SagaInstanceId'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\ports\saga-store-port.ts[0m[0m[33m:27:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m27 | [0m  load<TState extends SagaState>(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+ [0m[38;5;12m5 | [0mexport type SagaInstanceId<TId extends string = string> = TId & {
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'SagaStorePort["load"]' references private type 'SagaStateEnvelope'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\ports\saga-store-port.ts[0m[0m[33m:27:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m27 | [0m  load<TState extends SagaState>(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m21 | [0mexport type SagaStateEnvelope<TState extends SagaState = SagaState> = Readonly<{
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'SagaStorePort["appendTransition"]' references private type 'SagaTransitionRecord'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\ports\saga-store-port.ts[0m[0m[33m:36:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m36 | [0m  appendTransition<TState extends SagaState>(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m29 | [0mexport type SagaTransitionRecord<TState extends SagaState = SagaState> = Readonly<{
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'SagaStorePort["findByCorrelation"]' references private type 'SagaId'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\ports\saga-store-port.ts[0m[0m[33m:41:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m41 | [0m  findByCorrelation(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+ [0m[38;5;12m2 | [0mexport type SagaId<TId extends string = string> = TId & { readonly __brand: 'SagaId' };
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'SagaStorePort["findByCorrelation"]' references private type 'SagaCorrelationKey'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\ports\saga-store-port.ts[0m[0m[33m:41:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m41 | [0m  findByCorrelation(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m10 | [0mexport type SagaCorrelationKey<TId extends string = string> = TId & {
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'SagaIdempotencyPort["reserve"]' references private type 'SagaIdempotencyTarget'[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\ports\saga-idempotency-port.ts[0m[0m[33m:9:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m9 | [0m  reserve(
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+  [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+ [0m[38;5;12m | [0m
+[0m[38;5;12m6 | [0mexport type SagaIdempotencyTarget = Readonly<{
+ [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+ [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'SagaIdempotencyPort["reserve"]' references private type 'SagaIdempotencyReservation'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\ports\saga-idempotency-port.ts[0m[0m[33m:9:3[0m
+  [0m[38;5;12m | [0m
+ [0m[38;5;12m9 | [0m  reserve(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m21 | [0mexport type SagaIdempotencyReservation = Readonly<{
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[0m: Found [0m[1m119[0m documentation lint errors.

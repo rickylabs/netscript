@@ -1,0 +1,400 @@
++9|## Targeted live-page spot-checks (step 2)
++10|
++11|- `ls docs/site/reference/` — 28 reference pages exist (incl. `streams`, 
+`cli`, `sagas`, `triggers`,
++12|  `workers`, `plugin-auth-core`); **no `-core` reference pages** for the 4 
+plugin-*-core packages
++13|  → cross-ref map's "sibling+pillar" treatment is grounded in the actual 
+page set.
++14|- `sed -n '1,25p' docs/site/durable-workflows/index.md` — pillar states it 
+"covers sagas,
++15|  triggers, streams … publishes a durable stream" and the card grid includes
++16|  `API Reference: triggers and streams → /reference/triggers/` and 
+`/reference/sagas/` →
++17|  **XREF-1 confirmed** (streams + streams-core → durable-workflows is 
+meaningful).
++18|- `sed -n '1,20p' docs/site/background-processing/index.md` — pillar covers 
+"workers, queue,
++19|  cron, watchers, runtime adapters" with NO mention of 
+streams/sagas/triggers → **XREF-1
++20|  confirmed** (routing streams here would be a name-match, non-meaningful).
++21|- `ls docs/site/reference/cli docs/site/tutorials` — 
+`/reference/cli/index.md` exists (11KB per
++22|  research) AND `docs/site/tutorials/` has real scaffolds (`erp-sync`, 
+`live-dashboard`,
++23|  `storefront`, `workspace`) → **XREF-2 confirmed** (cli has no pillar but a
+genuine
++24|  how-to/tutorial target exists).
++25|
++26|## Answers to the four questions (decisive)
++27|
++28|1. **Cross-ref soundness.** PASS. XREF-1 and XREF-2 are spot-confirmed 
+against the live pages;
++29|   XREF-3's "hub-level family ref is meaningful" rule is sound — it tightens
+D4 by clarifying
++30|   that the **family** is the unit of meaningfulness, not the package name, 
+and the authoring-spec
++31|   keeps the "reject name-match stubs that don't discuss the package" 
+anti-pattern intact
++32|   (`authoring-spec.md` "Anti-patterns"). No loophole: linking a pillar 
+about a *different*
++33|   family still fails the gate.
++34|
++35|2. **Overrides justified.** PASS.
++36|   - [OVERRIDE-1] unversioned imports per D6 — JSR consumer-pin model + 
+drift-free doctrine; SOTA
++37|     pattern (Hono/Zod/Valibot samples use bare specifiers) aligns.
++38|   - [OVERRIDE-2] 3-target Documentation + no placeholder Discord — 
+placeholder Discord invite
++39|     (`<netscript-discord-invite>`) is exactly the dossier's 
+"placeholder/fake link"
++40|     anti-pattern; stricter 3-target is a clean tightening.
++41|   - [OVERRIDE-3] no per-package maturity callout — centralizes 
+alpha-maturity on root README
++42|     (PR3), avoids 31× repetition; consistent with "Documentation delegates,
+never duplicates".
++43|
++44|3. **Link gate enforceable (C2).** PASS. Static resolve against 
+`docs/site/**` is a trivial
++45|   walk/grep script (~20 lines); the "meaningful" check is reviewer-driven 
+and the plan names
++46|   the reviewer role explicitly in C2. Per `gates/plan-gate.md` Phase A 
+reporting, lack of a
++47|   pre-existing script is acceptable for PLAN-EVAL; the script is an 
+IMPL-EVAL deliverable.
++48|   The gate set (dead-link scan, cross-ref resolution, publish-glob 
+correctness, voice,
++49|   API ground-truth) is complete.
++50|
++51|4. **Boundary + `/docs` removal.** PASS. Lane stays inside CLAUDE.md 
+doc-authoring exception:
++52|   README.md prose + `deno.json` `publish` glob edits only (config, not 
+framework source).
++53|   D5's "strip dead `./docs/*.md` links + drop `docs/**/*.md` publish globs,
+no folder deletion"
++54|   is correct — research.md confirms no in-package `/docs` folders exist on 
+disk, and the
++55|   dead-link candidate set (service, plugin-sagas-core, plugin-workers-core,
+plugin-auth-core,
++56|   plugins/workers, plugins/sagas) is explicitly enumerated for C1 authoring
+agents.
++57|
++58|## Plan-gate checklist (all boxes checked)
++59|
++60|- [x] Research present and current — `research.md` re-baselined against 
+`origin/main` 1b3c63c2.
++61|- [x] Decisions locked — D1–D7 stated with rationale.
++62|- [x] Open-decision sweep — Q1/Q2/Q3 explicitly resolved; no deferred 
+rework-forcing decisions.
++63|- [x] Commit slices — C0 done, C1 authoring + C2 IMPL-EVAL + link gate, all 
+ordered, < 30.
++64|- [x] Risk register — DOC-REF-CORE-PAGES debt entry covers the 4 `-core` 
+ref-page gap.
++65|- [x] Gate set selected — dead-link, cross-ref resolution, publish-glob, 
+voice, API ground-truth.
++66|- [x] Deferred scope explicit — PR3 root README is a separate authoring pass
+AFTER PR2 merges.
++67|- [x] jsr-audit — N/A (doc-only wave; no package/plugin source surface 
+changes).
++68|
++69|## Verdict
++70|
++71|**PASS** — implementation may begin on C1 authoring.
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Commit verdict file
+
+$ git add .llm/tmp/run/docs-readme-revamp/plan-eval.md && git -c 
+user.name=openhands -c user.email=openhands@all-hands.dev commit -m 
+"docs(readme-revamp): PLAN-EVAL verdict (PASS) for PR2 package README revamp
+
+Separate-session plan gate per .llm/harness/gates/plan-gate.md. Spot-checked
+XREF-1/XREF-2 against live docs/site pages; all 4 override and gate-set
+questions resolved with decisive evidence. Plan-gate checklist all boxes
+checked. Verdict: PASS — C1 authoring may begin.
+
+Co-authored-by: openhands <openhands@all-hands.dev>" 2>&1
+
+Tokens: ↑ input 287.24K • cache hit 84.94% •  reasoning 36 • ↓ output 3.88K • $ 
+0.0323
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+git add .llm/tmp/run/docs-readme-revamp/plan-eval.md && git -c 
+user.name=openhands -c user.email=openhands@all-hands.dev commit -m 
+"docs(readme-revamp): PLAN-EVAL verdict (PASS) for PR2 package README revamp
+Separate-session plan gate per .llm/harness/gates/plan-gate.md. Spot-checked
+XREF-1/XREF-2 against live docs/site pages; all 4 override and gate-set
+questions resolved with decisive evidence. Plan-gate checklist all boxes
+checked. Verdict: PASS — C1 authoring may begin.
+Co-authored-by: openhands <openhands@all-hands.dev>" 2>&1
+[docs/readme-revamp 80d0e64b] docs(readme-revamp): PLAN-EVAL verdict (PASS) for 
+PR2 package README revamp
+ 1 file changed, 71 insertions(+)
+ create mode 100644 .llm/tmp/run/docs-readme-revamp/plan-eval.md
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Write run summary
+
+Thought:
+Verdict committed. Now write the run summary.
+
+Action: FileEditorAction
+
+Arguments:
+  command: "create"
+  path: "/home/runner/work/_temp/openhands/28102651876-1/summary.md"
+  file_text: 
+    # Run 28102651876-1 — PLAN-EVAL verdict for PR #117 (package README revamp, 
+PR2)
+    
+    ## Summary
+    
+    Issued the **PASS** verdict for the PR2 package README revamp plan, per
+    `.llm/harness/gates/plan-gate.md`. Single deliverable: 
+`.llm/tmp/run/docs-readme-revamp/plan-eval.md`,
+    committed to the `docs/readme-revamp` branch as `80d0e64b`. No README 
+authoring was performed —
+    this run was scoped to the plan gate only.
+    
+    ## Changes
+    
+    - `.llm/tmp/run/docs-readme-revamp/plan-eval.md` — verdict file with 
+decisive evidence per
+      question (cross-ref soundness, overrides, link gate, boundary + `/docs` 
+removal), and the
+      full plan-gate checklist ticked.
+    - Commit: `80d0e64b` on branch `docs/readme-revamp`.
+    
+    ## Spot-check evidence (per step-2 commands)
+    
+    - `ls docs/site/reference/` — 28 reference pages; confirms 4 `plugin-*-core`
+packages lack own
+      ref pages (matches authoring-spec map → sibling+pillar routing is grounded
+in the page set).
+    - `docs/site/durable-workflows/index.md` — pillar explicitly "covers sagas, 
+triggers, streams …
+      publishes a durable stream"; card grid includes `/reference/sagas/` + 
+`/reference/triggers/`.
+      → **XREF-1 confirmed** (streams → durable-workflows is meaningful).
+    - `docs/site/background-processing/index.md` — covers 
+workers/queue/cron/watchers; **no
+      mention** of streams/sagas/triggers.
+      → **XREF-1 confirmed** (routing streams here would be a name-match, 
+non-meaningful).
+    - `ls docs/site/reference/cli docs/site/tutorials` — 
+`/reference/cli/index.md` exists; tutorials
+      exist (`erp-sync`, `live-dashboard`, `storefront`, `workspace`).
+      → **XREF-2 confirmed** (cli has no pillar but a real tutorial target 
+exists).
+    
+    ## Verdict reasoning (4 questions, decisive)
+    
+    1. **Cross-ref soundness — PASS.** XREF-1 + XREF-2 spot-confirmed; XREF-3 
+("hub-level family ref
+       is meaningful") is sound — it clarifies the family as the meaningfulness 
+unit while keeping
+       the anti-pattern ban on name-match stubs that don't discuss the package. 
+No loophole.
+    2. **Overrides justified — PASS.** All three overrides align with doctrine +
+JSR publish surface:
+       unversioned imports (drift-free + consumer-pins), no placeholder Discord 
+(anti-pattern),
+       no per-package maturity (centralized on root README, avoids 31× 
+repetition).
+    3. **Link gate enforceable — PASS.** Static resolve is a trivial walk/grep; 
+meaningfulness is
+       reviewer-driven and named in C2. Per Phase A reporting, lack of 
+pre-existing script is OK for
+       PLAN-EVAL; script is an IMPL-EVAL deliverable.
+    4. **Boundary + `/docs` removal — PASS.** Lane stays inside CLAUDE.md 
+doc-authoring exception;
+       D5's "strip dead links + drop publish globs, no folder deletion" matches 
+the research finding
+       that no `/docs` folders exist on disk.
+    
+    ## Validation
+    
+    - One targeted commit (`80d0e64b`) on the `docs/readme-revamp` branch.
+    - Verdict file format matches the template-style evidence block required by 
+the task.
+    
+    ## Responses to review comments or issue comments
+    
+    N/A — this run produced a plan-gate verdict, no PR review-thread 
+interactions (output_mode was
+    `pr-comment`, but the deliverable was a single committed verdict file, not a
+PR comment).
+    
+    ## Remaining risks
+    
+    - None for this run. C1 authoring (Claude) is now unblocked; IMPL-EVAL 
+(OpenHands qwen3.7-max,
+      separate session) will enforce the link-verification gate per C2.
+    - The link-verification script is not yet committed — this is acceptable per
+`plan-gate.md`
+      Phase A reporting, but the C2 IMPL-EVAL session must produce it (or record
+`PENDING_SCRIPT`
+      + manual evidence if scoped out).
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 311.35K • cache hit 85.02% •  reasoning 36 • ↓ output 4.87K • $ 
+0.0357
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/28102651876-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# Run 28102651876-1 — PLAN-EVAL verdict for PR #117 (package README revamp, 
+PR2)
+ 2|
++3|## Summary
++4|
++5|Issued the **PASS** verdict for the PR2 package README revamp plan, per
++6|`.llm/harness/gates/plan-gate.md`. Single deliverable: 
+`.llm/tmp/run/docs-readme-revamp/plan-eval.md`,
++7|committed to the `docs/readme-revamp` branch as `80d0e64b`. No README 
+authoring was performed —
++8|this run was scoped to the plan gate only.
++9|
++10|## Changes
++11|
++12|- `.llm/tmp/run/docs-readme-revamp/plan-eval.md` — verdict file with 
+decisive evidence per
++13|  question (cross-ref soundness, overrides, link gate, boundary + `/docs` 
+removal), and the
++14|  full plan-gate checklist ticked.
++15|- Commit: `80d0e64b` on branch `docs/readme-revamp`.
++16|
++17|## Spot-check evidence (per step-2 commands)
++18|
++19|- `ls docs/site/reference/` — 28 reference pages; confirms 4 `plugin-*-core`
+packages lack own
++20|  ref pages (matches authoring-spec map → sibling+pillar routing is grounded
+in the page set).
++21|- `docs/site/durable-workflows/index.md` — pillar explicitly "covers sagas, 
+triggers, streams …
++22|  publishes a durable stream"; card grid includes `/reference/sagas/` + 
+`/reference/triggers/`.
++23|  → **XREF-1 confirmed** (streams → durable-workflows is meaningful).
++24|- `docs/site/background-processing/index.md` — covers 
+workers/queue/cron/watchers; **no
++25|  mention** of streams/sagas/triggers.
++26|  → **XREF-1 confirmed** (routing streams here would be a name-match, 
+non-meaningful).
++27|- `ls docs/site/reference/cli docs/site/tutorials` — 
+`/reference/cli/index.md` exists; tutorials
++28|  exist (`erp-sync`, `live-dashboard`, `storefront`, `workspace`).
++29|  → **XREF-2 confirmed** (cli has no pillar but a real tutorial target 
+exists).
++30|
++31|## Verdict reasoning (4 questions, decisive)
++32|
++33|1. **Cross-ref soundness — PASS.** XREF-1 + XREF-2 spot-confirmed; XREF-3 
+("hub-level family ref
++34|   is meaningful") is sound — it clarifies the family as the meaningfulness 
+unit while keeping
++35|   the anti-pattern ban on name-match stubs that don't discuss the package. 
+No loophole.
++36|2. **Overrides justified — PASS.** All three overrides align with doctrine +
+JSR publish surface:
++37|   unversioned imports (drift-free + consumer-pins), no placeholder Discord 
+(anti-pattern),
++38|   no per-package maturity (centralized on root README, avoids 31× 
+repetition).
++39|3. **Link gate enforceable — PASS.** Static resolve is a trivial walk/grep; 
+meaningfulness is
++40|   reviewer-driven and named in C2. Per Phase A reporting, lack of 
+pre-existing script is OK for
++41|   PLAN-EVAL; script is an IMPL-EVAL deliverable.
++42|4. **Boundary + `/docs` removal — PASS.** Lane stays inside CLAUDE.md 
+doc-authoring exception;
++43|   D5's "strip dead links + drop publish globs, no folder deletion" matches 
+the research finding
++44|   that no `/docs` folders exist on disk.
++45|
++46|## Validation
++47|
++48|- One targeted commit (`80d0e64b`) on the `docs/readme-revamp` branch.
++49|- Verdict file format matches the template-style evidence block required by 
+the task.
++50|
++51|## Responses to review comments or issue comments
++52|
++53|N/A — this run produced a plan-gate verdict, no PR review-thread 
+interactions (output_mode was
++54|`pr-comment`, but the deliverable was a single committed verdict file, not a
+PR comment).
++55|
++56|## Remaining risks
++57|
++58|- None for this run. C1 authoring (Claude) is now unblocked; IMPL-EVAL 
+(OpenHands qwen3.7-max,
++59|  separate session) will enforce the link-verification gate per C2.
++60|- The link-verification script is not yet committed — this is acceptable per
+`plan-gate.md`
++61|  Phase A reporting, but the C2 IMPL-EVAL session must produce it (or record
+`PENDING_SCRIPT`
++62|  + manual evidence if scoped out).
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: PLAN-EVAL verdict committed for PR #117
+
+Finish with message:
+PLAN-EVAL verdict (PASS) for PR #117 (package README revamp, PR2) committed as 
+`80d0e64b` on `docs/readme-revamp`.
+
+**Deliverable:** `.llm/tmp/run/docs-readme-revamp/plan-eval.md` — verdict file 
+with decisive evidence per question.
+
+**Step-2 spot-check results:**
+- `docs/site/reference/` — 28 pages; the 4 `plugin-*-core` packages have no own 
+ref page (grounding for sibling+pillar routing).
+- `docs/site/durable-workflows/index.md` — pillar explicitly "covers sagas, 
+triggers, streams … publishes a durable stream"; `/reference/sagas/` + 
+`/reference/triggers/` cards present → **XREF-1 confirmed**.
+- `docs/site/background-processing/index.md` — covers 
+workers/queue/cron/watchers, **no** streams/sagas/triggers mention → **XREF-1 
+confirmed** (streams → background-processing would be non-meaningful).
+- `docs/site/reference/cli` + `docs/site/tutorials` (erp-sync, live-dashboard, 
+storefront, workspace) → **XREF-2 confirmed**.
+
+**Four-question verdict:**
+1. Cross-ref soundness — PASS (XREF-1/2 spot-confirmed; XREF-3 sound — family is
+the meaningfulness unit, no loophole).
+2. Overrides justified — PASS (unversioned = JSR consumer-pins + drift-free; no 
+Discord = anti-pattern; no per-package maturity = centralized on root).
+3. Link gate enforceable — PASS (static resolve trivial; meaningfulness 
+reviewer-driven in C2; script is an IMPL-EVAL deliverable, acceptable per Phase 
+A reporting).
+4. Boundary + `/docs` removal — PASS (lane stays in CLAUDE.md doc-authoring 
+exception; D5's "no folder deletion" matches research finding).
+
+**Plan-gate checklist:** all 8 boxes checked (research current, decisions 
+locked, open-decision sweep, commit slices <30, risk register, gate set 
+selected, deferred scope explicit, jsr-audit N/A for doc-only wave).
+
+**Summary:** `/home/runner/work/_temp/openhands/28102651876-1/summary.md` 
+written. Stopped per task contract — no README authoring performed.
+
+Tokens: ↑ input 336.49K • cache hit 85.74% •  reasoning 36 • ↓ output 5.39K • $ 
+0.0382
+

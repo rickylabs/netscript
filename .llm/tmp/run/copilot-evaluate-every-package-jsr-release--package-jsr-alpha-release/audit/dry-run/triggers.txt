@@ -1,0 +1,384 @@
+[0m[32mDownload[0m https://jsr.io/@david/dax/meta.json
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2_meta.json
+[0m[32mDownload[0m https://jsr.io/@david/which/meta.json
+[0m[32mDownload[0m https://jsr.io/@david/console-static-text/meta.json
+[0m[32mDownload[0m https://jsr.io/@david/path/meta.json
+[0m[32mDownload[0m https://jsr.io/@std/io/meta.json
+[0m[32mDownload[0m https://jsr.io/@david/which/0.4.2_meta.json
+[0m[32mDownload[0m https://jsr.io/@david/console-static-text/0.3.4_meta.json
+[0m[32mDownload[0m https://jsr.io/@david/path/0.2.0_meta.json
+[0m[32mDownload[0m https://jsr.io/@std/io/0.225.3_meta.json
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/mod.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/command.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/common.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/console/mod.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/request.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/vendor/outdent.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/shell.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/command_handler.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/pipes.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/result.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/commands/executable.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/commands/cat.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/commands/cd.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/commands/cp_mv.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/commands/echo.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/commands/exit.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/commands/export.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/commands/mkdir.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/commands/printenv.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/commands/pwd.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/commands/rm.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/commands/sleep.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/commands/test.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/commands/touch.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/commands/unset.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/commands/which.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/console/progress.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/console/confirm.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/console/logger.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/console/multiSelect.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/console/prompt.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/console/select.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/lib/rs_lib.js
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/runtimes/process.deno.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/runtimes/process.common.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/commands/args.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/console/utils.ts
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/lib/rs_lib.internal.js
+[0m[32mDownload[0m https://jsr.io/@david/dax/0.43.2/src/lib/rs_lib.d.ts
+[0m[32mDownload[0m https://jsr.io/@david/which/0.4.2/mod.ts
+[0m[32mDownload[0m https://jsr.io/@david/console-static-text/0.3.4/mod.ts
+[0m[32mDownload[0m https://jsr.io/@david/path/0.2.0/mod.ts
+[0m[32mDownload[0m https://jsr.io/@std/io/0.225.3/buffer.ts
+[0m[32mDownload[0m https://jsr.io/@std/io/0.225.3/reader_from_stream_reader.ts
+[0m[32mDownload[0m https://jsr.io/@std/io/0.225.3/write_all.ts
+[0m[32mDownload[0m https://jsr.io/@std/io/0.225.3/types.ts
+[0m[32mDownload[0m https://jsr.io/@david/console-static-text/0.3.4/lib/rs_lib.js
+[0m[32mDownload[0m https://jsr.io/@david/console-static-text/0.3.4/lib/rs_lib.internal.js
+[0m[32mDownload[0m https://jsr.io/@david/console-static-text/0.3.4/lib/rs_lib.d.ts
+Checking for slow types in the public API...
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/triggers/schemas.ts[0m[0m[33m:22:14[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m22 | [0mexport const TriggerTypeSchema = z.enum([
+  [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+  [0m[38;5;12m | [0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/triggers/schemas.ts[0m[0m[33m:36:14[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m36 | [0mexport const TriggerEventStatusSchema = z.enum([
+  [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+  [0m[38;5;12m | [0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/triggers/schemas.ts[0m[0m[33m:49:14[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m49 | [0mexport const ActionTypeSchema = z.enum([
+  [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+  [0m[38;5;12m | [0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/triggers/schemas.ts[0m[0m[33m:66:14[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m66 | [0mexport const StabilityThresholdSchema = z.object({
+  [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+  [0m[38;5;12m | [0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/triggers/schemas.ts[0m[0m[33m:75:14[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m75 | [0mexport const FileEventKindSchema = z.enum(['create', 'modify', 'remove']);
+  [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+  [0m[38;5;12m | [0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/triggers/schemas.ts[0m[0m[33m:79:14[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m79 | [0mexport const FileTriggerOptionsSchema = z.object({
+  [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+  [0m[38;5;12m | [0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/triggers/schemas.ts[0m[0m[33m:119:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m119 | [0mexport const FileLifecycleConfigSchema = z.object({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/triggers/schemas.ts[0m[0m[33m:149:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m149 | [0mexport const WebhookTriggerOptionsSchema = z.object({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/triggers/schemas.ts[0m[0m[33m:164:7[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m164 | [0mconst BaseActionSchema = z.object({
+   [0m[38;5;12m | [0m      [0m[1m[31m^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/triggers/schemas.ts[0m[0m[33m:169:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m169 | [0mexport const EnqueueJobActionSchema = BaseActionSchema.extend({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/triggers/schemas.ts[0m[0m[33m:178:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m178 | [0mexport const PublishSagaActionSchema = BaseActionSchema.extend({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/triggers/schemas.ts[0m[0m[33m:185:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m185 | [0mexport const EnqueueMessageActionSchema = BaseActionSchema.extend({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/triggers/schemas.ts[0m[0m[33m:192:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m192 | [0mexport const CallServiceActionSchema = BaseActionSchema.extend({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/triggers/schemas.ts[0m[0m[33m:201:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m201 | [0mexport const ExecuteTaskActionSchema = BaseActionSchema.extend({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/triggers/schemas.ts[0m[0m[33m:212:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m212 | [0mexport const ExecuteBatchActionSchema = BaseActionSchema.extend({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/triggers/schemas.ts[0m[0m[33m:221:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m221 | [0mexport const RunScriptActionSchema = BaseActionSchema.extend({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/triggers/schemas.ts[0m[0m[33m:234:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m234 | [0mexport const CustomActionSchema = BaseActionSchema.extend({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/triggers/schemas.ts[0m[0m[33m:241:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m241 | [0mexport const TriggerActionSchema = z.discriminatedUnion('type', [
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/triggers/schemas.ts[0m[0m[33m:258:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m258 | [0mexport const ThrottleConfigSchema = z.object({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/triggers/schemas.ts[0m[0m[33m:266:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m266 | [0mexport const TriggerMiddlewareSchema = z.object({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/triggers/schemas.ts[0m[0m[33m:277:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m277 | [0mexport const RetryPolicySchema = z.object({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/triggers/schemas.ts[0m[0m[33m:294:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m294 | [0mexport const ActionChainConfigSchema = z.object({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/triggers/schemas.ts[0m[0m[33m:312:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m312 | [0mexport const TriggerDefinitionSchema = z.object({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/triggers/schemas.ts[0m[0m[33m:364:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m364 | [0mexport const FileEventPayloadSchema = z.object({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/triggers/schemas.ts[0m[0m[33m:391:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m391 | [0mexport const ActionResultSchema = z.object({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/triggers/schemas.ts[0m[0m[33m:414:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m414 | [0mexport const TriggerEventSchema = z.object({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/triggers/streams/schema.ts[0m[0m[33m:14:14[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m14 | [0mexport const TriggerEventSchema = z.object({
+  [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+  [0m[38;5;12m | [0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/triggers/streams/schema.ts[0m[0m[33m:36:14[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m36 | [0mexport const triggersStreamSchema = defineStreamSchema({
+  [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+  [0m[38;5;12m | [0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-license][0m: [0m[1mmissing license field or file[0m
+ [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/triggers/deno.json[0m
+  [0m[38;5;12m=[0m [0m[1mhint[0m: add a "license" field. Alternatively, add a LICENSE file to the package and ensure it is not ignored from being published
+
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/missing-license
+
+This package contains errors for slow types. Fixing these errors will:
+
+  1. Significantly improve your package users' type checking performance.
+  2. Improve the automatic documentation generation.
+  3. Enable automatic .d.ts generation for Node.js.
+
+Don't want to bother? You can choose to skip this step by
+providing the --allow-slow-types flag.
+
+[0m[1m[31merror[0m: Found 29 problems

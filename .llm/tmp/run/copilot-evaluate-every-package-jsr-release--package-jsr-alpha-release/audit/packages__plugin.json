@@ -1,0 +1,233 @@
+{
+  "pkg": {
+    "name": "@netscript/plugin",
+    "version": "0.1.0",
+    "description": "Plugin manifest, validation, discovery, and host-context contracts for NetScript.",
+    "root": "packages/plugin"
+  },
+  "exports": {
+    ".": "./mod.ts",
+    "./types": "./types.ts",
+    "./validator": "./validator.ts",
+    "./define": "./define.ts",
+    "./loader": "./loader.ts"
+  },
+  "files": {
+    "total": 5,
+    "loc": 1956,
+    "entries": [
+      {
+        "path": "mod.ts",
+        "bytes": 4371
+      },
+      {
+        "path": "types.ts",
+        "bytes": 33298
+      },
+      {
+        "path": "validator.ts",
+        "bytes": 4648
+      },
+      {
+        "path": "define.ts",
+        "bytes": 5142
+      },
+      {
+        "path": "loader.ts",
+        "bytes": 11337
+      }
+    ]
+  },
+  "docs": {
+    "hasReadme": true,
+    "readmeLines": 35,
+    "hasDocsFolder": false,
+    "moduleTagOnEntries": {
+      ".": true,
+      "./types": true,
+      "./validator": true,
+      "./define": true,
+      "./loader": true
+    },
+    "descriptionLen": 81
+  },
+  "surface": {
+    ".": {
+      "exported": [
+        "ContractLoaderSchema",
+        "DenoPermissionSchema",
+        "PLUGIN_ENTRY_POINTS",
+        "PLUGIN_MANIFEST",
+        "PluginAspireSchema",
+        "PluginContractsSchema",
+        "PluginDatabaseSchema",
+        "PluginEntrypointSchema",
+        "PluginEnvironmentVariableValueSchema",
+        "PluginHooksSchema",
+        "PluginInfrastructureSchema",
+        "PluginNameSchema",
+        "PluginRegistryConfigSchema",
+        "PluginRuntimeConfigSchema",
+        "PluginRuntimeContributionSchema",
+        "PluginServiceSchema",
+        "PluginTypeSchema",
+        "PluginWorkerSchema",
+        "RelativePathSchema",
+        "ResolvedPluginSchema",
+        "ResolvedWorkerSchema",
+        "RuntimeConfigSchemaEntrySchema",
+        "TelemetryConfigSchema",
+        "findPluginEntryPoint",
+        "getPluginKey",
+        "isLocalPlugin",
+        "isValidPlugin",
+        "loadPlugins",
+        "resolvePluginInput",
+        "runPluginsHook",
+        "validateContracts",
+        "validatePluginOrThrow",
+        "validateRegistryOrThrow",
+        "validateService",
+        "validateWorker",
+        "withPluginMeta"
+      ],
+      "rawCount": 36
+    },
+    "./types": {
+      "exported": [
+        "ContractLoaderSchema",
+        "ContractVersionLoader",
+        "DenoPermissionSchema",
+        "GeneratedFile",
+        "GenerationResult",
+        "HookFunction",
+        "PluginAspire",
+        "PluginAspireSchema",
+        "PluginContext",
+        "PluginContracts",
+        "PluginContractsSchema",
+        "PluginDatabase",
+        "PluginDatabaseSchema",
+        "PluginDefinition",
+        "PluginDefinitionSchema",
+        "PluginEntrypoint",
+        "PluginEntrypointSchema",
+        "PluginEnvironmentVariableValue",
+        "PluginEnvironmentVariableValueSchema",
+        "PluginFactory",
+        "PluginGenerationResult",
+        "PluginHooks",
+        "PluginHooksSchema",
+        "PluginInfrastructure",
+        "PluginInfrastructureRequirement",
+        "PluginInfrastructureSchema",
+        "PluginInput",
+        "PluginJobDefinition",
+        "PluginJobDefinitionSchema",
+        "PluginJobs",
+        "PluginJobsSchema",
+        "PluginLogger",
+        "PluginMeta",
+        "PluginMetaSchema",
+        "PluginNameSchema",
+        "PluginOptions",
+        "PluginRegistration",
+        "PluginRegistrationSchema",
+        "PluginRegistryConfig",
+        "PluginRegistryConfigSchema",
+        "PluginRuntimeConfig",
+        "PluginRuntimeConfigSchema",
+        "PluginRuntimeContribution",
+        "PluginRuntimeContributionSchema",
+        "PluginService",
+        "PluginServiceContext",
+        "PluginServiceSchema",
+        "PluginTaskDefinition",
+        "PluginTaskDefinitionSchema",
+        "PluginTaskType",
+        "PluginTaskTypeSchema",
+        "PluginTasks",
+        "PluginTasksSchema",
+        "PluginType",
+        "PluginTypeSchema",
+        "PluginWorker",
+        "PluginWorkerSchema",
+        "RelativePathSchema",
+        "ResolvedPlugin",
+        "ResolvedPluginSchema",
+        "ResolvedService",
+        "ResolvedServiceSchema",
+        "ResolvedWorker",
+        "ResolvedWorkerSchema",
+        "RuntimeConfigSchemaEntry",
+        "RuntimeConfigSchemaEntrySchema",
+        "SemVerSchema",
+        "TelemetryConfigSchema",
+        "ValidationError",
+        "ValidationResult"
+      ],
+      "rawCount": 70
+    },
+    "./validator": {
+      "exported": [
+        "isValidPlugin",
+        "validateContracts",
+        "validateDatabase",
+        "validatePlugin",
+        "validatePluginOrThrow",
+        "validateRegistry",
+        "validateRegistryOrThrow",
+        "validateService",
+        "validateWorker"
+      ],
+      "rawCount": 9
+    },
+    "./define": {
+      "exported": [
+        "definePlugin",
+        "isPluginFactory",
+        "mergePlugins",
+        "resolvePluginInput",
+        "withPluginMeta"
+      ],
+      "rawCount": 5
+    },
+    "./loader": {
+      "exported": [
+        "DEFAULT_PLUGINS_DIR",
+        "PLUGIN_ENTRY_POINTS",
+        "PLUGIN_MANIFEST",
+        "createPluginContext",
+        "createPluginLogger",
+        "discoverLocalPlugins",
+        "findPluginEntryPoint",
+        "getPluginKey",
+        "getPluginRoot",
+        "isLocalPlugin",
+        "loadPlugin",
+        "loadPlugins",
+        "resolvePlugin",
+        "runPluginHook",
+        "runPluginsHook",
+        "sortPluginsByDependencies"
+      ],
+      "rawCount": 16
+    }
+  },
+  "tests": {
+    "fileCount": 0,
+    "files": []
+  },
+  "gates": [
+    {
+      "gate": "F-JSR-3 readme",
+      "level": "WARN",
+      "message": "README.md is only 35 lines; enterprise bar is ≥150 lines"
+    }
+  ],
+  "slowTypes": {
+    "ok": true,
+    "warnings": [],
+    "rawTail": "skipped"
+  }
+}

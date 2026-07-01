@@ -1,0 +1,23 @@
+{
+  "root": "packages/logger",
+  "pkg": "logger",
+  "totals": {
+    "fail": 0,
+    "warn": 1,
+    "info": 1
+  },
+  "findings": [
+    {
+      "ref": "A9",
+      "level": "INFO",
+      "message": "docs/architecture.md missing — required when public symbols > 25"
+    },
+    {
+      "ref": "AP-23",
+      "level": "WARN",
+      "message": "`any` in exported declaration — use `unknown` or a specific type",
+      "path": "orpc-plugin.ts",
+      "line": 34
+    }
+  ]
+}

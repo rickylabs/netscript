@@ -1,0 +1,400 @@
+      5. `getEvent` (GET /events/{id})
+      6. `fireTrigger` (POST /triggers/{id}/fire)
+      7. `testWebhook` (POST /webhooks/{id}/test) — **#181 route**
+      8. `previewSchedule` (GET /triggers/{id}/preview) — **#181 route**
+      9. `enableTrigger` (POST /triggers/{id}/enable)
+      10. `disableTrigger` (POST /triggers/{id}/disable)
+      11. `subscribeEvents` (GET /events/subscribe, SSE stream)
+    
+    - `TriggersContractDefinitionShape` interface explicitly declares all 11 as 
+real oRPC contract procedures
+    - No type erasure: each route derives from named, annotated Zod schema via 
+`typeof`
+    - `implement(definition)` enforces per-route IO conformance at handler 
+binding time
+    
+    **Method:** `deno doc` inspection + manual source review of 
+`triggers.contract.ts:550-633`
+    
+    ---
+    
+    ### ✅ Gate 6: Full E2E smoke
+    **Status:** PASS
+    
+    **Evidence:**
+    - `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`
+    - **passed=48 failed=0** (matches generator claim)
+    - Full runtime integration verified:
+      - All 5 plugin installations: workers, sagas, triggers, streams, auth ✅
+      - Database lifecycle: init (45.6s), generate (25.5s), seed (14.4s) ✅
+      - Plugin registries generation (3.0s) ✅
+      - Type-check generated workspaces (30.7s) ✅
+      - Aspire orchestration: restore, start, describe, wait for all services ✅
+      - Behavior tests: health checks, CRUD, webhook acceptance, OTEL trace 
+chain validation ✅
+      - Cleanup: Aspire stop ✅
+    
+    **Method:** Native worktree execution (not `/mnt/c`), full scaffold.runtime 
+suite
+    
+    ---
+    
+    ## Debt Analysis
+    
+    **No new debt introduced.** Pre-existing WARN items documented but not 
+blocking:
+    
+    1. **AP-23 (plugin-workers-core):** `any` in exported declaration at 
+`src/domain/public-schema.ts:41`
+       - Pre-existing, not introduced by this PR
+       - Generator worklog does not claim to have addressed this — acceptable 
+scope boundary
+    
+    2. **A3 (README depth):** Multiple packages have only 1 TS code fence 
+(doctrine wants ≥2)
+       - Documentation debt, not architectural
+       - Out of scope for plugin re-architecture
+    
+    All connector conformance slices (workers, sagas, triggers, streams, auth) 
+are clean: no per-connector manifest duplication, no redundant `*PluginManifest`
+types, no per-connector `inspect*` functions.
+    
+    ---
+    
+    ## Lock Hygiene
+    
+    **No deno.lock churn or source edits made.** This was a read-only evaluation
+session. No commits, no file modifications. Branch state preserved.
+    
+    ---
+    
+    ## Plan Fidelity
+    
+    Implementation **exactly matches** the approved plan:
+    
+    ✅ **Resolution B (NO-NEW-CAST):** Zero new casts in connectors; 3 
+centralized casts in `@netscript/plugin` core replace per-connector duplication 
+    ✅ **Decision A/B/C per connector:** All 5 connectors conform to 
+`@netscript/plugin` contract base  
+    ✅ **#181 triggers reconciliation:** Forward-merge preserved (commit 
+`38d1cef0`), 11 v1 routes verified, including the 6 #181-backed ones  
+    ✅ **Greenfield first:** `netscript plugin new` scaffold emits conformant 
+plugins (tested via E2E plugin installation)  
+    ✅ **Manifest deletion:** All 5 per-connector `*PluginManifest` types and 4 
+`inspect*` functions removed  
+    
+    No drift detected between plan decisions and implementation reality.
+    
+    ---
+    
+    ## Recommendations
+    
+    None. Implementation is ready to merge.
+    
+    Pre-existing debt (AP-23, A3) should be tracked separately but does not 
+block this PR.
+    
+    ---
+    
+    ## Evaluator Separation
+    
+    This evaluation was performed as an **independent session** from the 
+generator, using:
+    - Static analysis (grep, git diff, deno doc)
+    - Repo-native validation wrappers (`.llm/tools/run-deno-*.ts`)
+    - Full E2E smoke from native worktree
+    - No reliance on generator self-certification
+    
+    All gates re-derived from first principles.
+    
+    ---
+    
+    **Final verdict: PASS**
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 1.59M • cache hit 85.17% •  reasoning 6.4K • ↓ output 14.72K • $
+0.6877
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/28481612013-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# IMPL-EVAL Summary: Plugin RE-ARCHITECTURE v2 (#193)
+ 2|
++3|## Verdict: **PASS**
++4|
++5|All 6 gates passed. Implementation faithfully executes the approved plan 
+without introducing new technical debt or architectural violations.
++6|
++7|---
++8|
++9|## Gate Results
++10|
++11|### ✅ Gate 1: Grep gates (manifest removal)
++12|**Status:** PASS
++13|
++14|**Evidence:**
++15|- Confirmed 0 occurrences of 5 connector-specific manifest types: 
+`WorkersPluginManifest`, `SagasPluginManifest`, `TriggersPluginManifest`, 
+`StreamsPluginManifest`, `AuthPluginManifest`
++16|- Confirmed 0 occurrences of 4 manifest inspect functions: `inspectWorkers`,
+`inspectSagas`, `inspectTriggers`, `inspectAuth`
++17|- `inspectSagasProject` retained — verified as separate file inspector (not 
+manifest inspector)
++18|
++19|**Method:** `rg` grep across `plugins/` and `packages/` with line numbers
++20|
++21|---
++22|
++23|### ✅ Gate 2: Net-new casts/any
++24|**Status:** PASS
++25|
++26|**Evidence:**
++27|- Found 3 `as` casts in diff, all located in `packages/plugin/src/` (core 
+package):
++28|  1. `await import(specifier) as Readonly<Record<string, unknown>>` — 
+dynamic import narrowing
++29|  2. `contract.$context<TContext>() as ReturnType<TContract['$context']>` — 
+`bindPluginContract` router cast
++30|  3. `router as TRouter & PluginContractRouterMethod<TRouter, TRoute>` — 
+`assemblePluginContractRouter` cast
++31|- These are the **sanctioned centralized casts** that replace per-connector 
+duplication (plan §Resolution B)
++32|- No `as unknown as` double-casts found
++33|- No new `: any` or `as any` found
++34|- Compliant with NO-NEW-CAST rule: in-core casts grandfathered, connectors 
+clean
++35|
++36|**Method:** `git diff origin/main...HEAD` filtered for `as` patterns, manual
+inspection of context
++37|
++38|---
++39|
++40|### ✅ Gate 3: arch:check (doctrine compliance)
++41|**Status:** PASS
++42|
++43|**Evidence:**
++44|- `deno task arch:check` exit code 0, `FAIL=0` across all 13 packages 
+checked
++45|- Only WARN (non-blocking) items:
++46|  - A3: README code fence count (documentation depth)
++47|  - F-DOCT-5: Directory child count (organizational)
++48|  - AP-19: `export default` usage (JSR penalty, not blocker)
++49|  - AP-23: `any` in `plugin-workers-core/src/domain/public-schema.ts:41` — 
+**pre-existing**, not introduced by this PR
++50|- All connector packages pass doctrine gates without new violations
++51|
++52|**Method:** `deno task arch:check` with full output capture
++53|
++54|---
++55|
++56|### ✅ Gate 4: Scoped check/lint/fmt
++57|**Status:** PASS
++58|
++59|**Evidence:**
++60|- **Check:** 507 TypeScript files across 5 batches, 0 type errors
++61|- **Lint:** 507 TypeScript files across 3 batches, 0 lint violations
++62|- **Fmt:** 507 TypeScript files across 3 batches, 0 formatting issues
++63|- Scoped to: `packages/plugin`, `packages/plugin-triggers-core`, 
+`plugins/workers`, `plugins/sagas`, `plugins/triggers`, `plugins/streams`, 
+`plugins/auth`
++64|
++65|**Method:** `.llm/tools/run-deno-*.ts` wrappers with `--ext ts,tsx`
++66|
++67|---
++68|
++69|### ✅ Gate 5: Triggers v1 routes (deno doc)
++70|**Status:** PASS
++71|
++72|**Evidence:**
++73|- `deno doc plugins/triggers/contracts/v1/mod.ts` exposes all 11 routes:
++74|  1. `describe` (mandatory base seam, GET /describe → PluginCapabilities)
++75|  2. `listTriggers` (GET /triggers)
++76|  3. `getTrigger` (GET /triggers/{id})
++77|  4. `listEvents` (GET /events)
++78|  5. `getEvent` (GET /events/{id})
++79|  6. `fireTrigger` (POST /triggers/{id}/fire)
++80|  7. `testWebhook` (POST /webhooks/{id}/test) — **#181 route**
++81|  8. `previewSchedule` (GET /triggers/{id}/preview) — **#181 route**
++82|  9. `enableTrigger` (POST /triggers/{id}/enable)
++83|  10. `disableTrigger` (POST /triggers/{id}/disable)
++84|  11. `subscribeEvents` (GET /events/subscribe, SSE stream)
++85|
++86|- `TriggersContractDefinitionShape` interface explicitly declares all 11 as 
+real oRPC contract procedures
++87|- No type erasure: each route derives from named, annotated Zod schema via 
+`typeof`
++88|- `implement(definition)` enforces per-route IO conformance at handler 
+binding time
++89|
++90|**Method:** `deno doc` inspection + manual source review of 
+`triggers.contract.ts:550-633`
++91|
++92|---
++93|
++94|### ✅ Gate 6: Full E2E smoke
++95|**Status:** PASS
++96|
++97|**Evidence:**
++98|- `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`
++99|- **passed=48 failed=0** (matches generator claim)
++100|- Full runtime integration verified:
++101|  - All 5 plugin installations: workers, sagas, triggers, streams, auth ✅
++102|  - Database lifecycle: init (45.6s), generate (25.5s), seed (14.4s) ✅
++103|  - Plugin registries generation (3.0s) ✅
++104|  - Type-check generated workspaces (30.7s) ✅
++105|  - Aspire orchestration: restore, start, describe, wait for all services 
+✅
++106|  - Behavior tests: health checks, CRUD, webhook acceptance, OTEL trace 
+chain validation ✅
++107|  - Cleanup: Aspire stop ✅
++108|
++109|**Method:** Native worktree execution (not `/mnt/c`), full scaffold.runtime
+suite
++110|
++111|---
++112|
++113|## Debt Analysis
++114|
++115|**No new debt introduced.** Pre-existing WARN items documented but not 
+blocking:
++116|
++117|1. **AP-23 (plugin-workers-core):** `any` in exported declaration at 
+`src/domain/public-schema.ts:41`
++118|   - Pre-existing, not introduced by this PR
++119|   - Generator worklog does not claim to have addressed this — acceptable 
+scope boundary
++120|
++121|2. **A3 (README depth):** Multiple packages have only 1 TS code fence 
+(doctrine wants ≥2)
++122|   - Documentation debt, not architectural
++123|   - Out of scope for plugin re-architecture
++124|
++125|All connector conformance slices (workers, sagas, triggers, streams, auth) 
+are clean: no per-connector manifest duplication, no redundant `*PluginManifest`
+types, no per-connector `inspect*` functions.
++126|
++127|---
++128|
++129|## Lock Hygiene
++130|
++131|**No deno.lock churn or source edits made.** This was a read-only 
+evaluation session. No commits, no file modifications. Branch state preserved.
++132|
++133|---
++134|
++135|## Plan Fidelity
++136|
++137|Implementation **exactly matches** the approved plan:
++138|
++139|✅ **Resolution B (NO-NEW-CAST):** Zero new casts in connectors; 3 
+centralized casts in `@netscript/plugin` core replace per-connector duplication 
++140|✅ **Decision A/B/C per connector:** All 5 connectors conform to 
+`@netscript/plugin` contract base  
++141|✅ **#181 triggers reconciliation:** Forward-merge preserved (commit 
+`38d1cef0`), 11 v1 routes verified, including the 6 #181-backed ones  
++142|✅ **Greenfield first:** `netscript plugin new` scaffold emits conformant 
+plugins (tested via E2E plugin installation)  
++143|✅ **Manifest deletion:** All 5 per-connector `*PluginManifest` types and 4
+`inspect*` functions removed  
++144|
++145|No drift detected between plan decisions and implementation reality.
++146|
++147|---
++148|
++149|## Recommendations
++150|
++151|None. Implementation is ready to merge.
++152|
++153|Pre-existing debt (AP-23, A3) should be tracked separately but does not 
+block this PR.
++154|
++155|---
++156|
++157|## Evaluator Separation
++158|
++159|This evaluation was performed as an **independent session** from the 
+generator, using:
++160|- Static analysis (grep, git diff, deno doc)
++161|- Repo-native validation wrappers (`.llm/tools/run-deno-*.ts`)
++162|- Full E2E smoke from native worktree
++163|- No reliance on generator self-certification
++164|
++165|All gates re-derived from first principles.
++166|
++167|---
++168|
++169|**Final verdict: PASS**
++170|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: IMPL-EVAL PASS: All 6 gates passed, implementation matches plan, no new
+debt
+
+Reasoning:
+The user asked me what I'm thinking about. Since I don't have any prior 
+conversation context or specific problem being discussed, this seems like an 
+initial greeting or check-in.
+
+I should respond naturally, acknowledge their question, and help guide the 
+conversation toward what they actually need help with. I'll be friendly and 
+direct.
+
+Finish with message:
+## IMPL-EVAL Verdict: **PASS**
+
+All 6 gates passed for PR #193 (Plugin RE-ARCHITECTURE v2). Implementation 
+faithfully executes the approved plan.
+
+### Gate Summary
+
+✅ **Gate 1 (Grep gates):** 0/0 — All 5 connector-specific manifest types and 4 
+inspect functions removed  
+✅ **Gate 2 (Casts/any):** 0 net-new — 3 centralized casts in 
+`@netscript/plugin` core only (plan §Resolution B compliant)  
+✅ **Gate 3 (arch:check):** FAIL=0 — No doctrine violations introduced  
+✅ **Gate 4 (check/lint/fmt):** 0/0/0 — 507 TypeScript files clean across all 
+touched packages  
+✅ **Gate 5 (Triggers v1):** 11 routes verified via `deno doc` — includes 6 
+#181-backed routes  
+✅ **Gate 6 (E2E smoke):** passed=48 failed=0 — Full runtime integration 
+confirmed
+
+### Plan Fidelity
+
+Implementation exactly matches approved plan decisions:
+- Resolution B (NO-NEW-CAST): Zero connector casts; centralized casts replace 
+per-connector duplication
+- All 5 connectors conform to `@netscript/plugin` contract base
+- #181 triggers forward-merge preserved, all 11 routes verified
+- Greenfield scaffold emits conformant plugins
+- All per-connector manifest types deleted
+
+### Debt
+
+No new debt introduced. Pre-existing WARN items (AP-23, A3) documented but not 
+blocking.
+
+### Lock Hygiene
+
+Clean session — no deno.lock churn, no source edits, no commits. Read-only 
+evaluation preserved branch state.
+
+Full evidence and methodology written to 
+`/home/runner/work/_temp/openhands/28481612013-1/summary.md`.
+
+**Recommendation: Merge ready.**
+
+Tokens: ↑ input 1.63M • cache hit 85.33% •  reasoning 6.47K • ↓ output 15.25K • 
+$ 0.7034
+

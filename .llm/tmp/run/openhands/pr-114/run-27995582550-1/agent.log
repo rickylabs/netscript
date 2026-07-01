@@ -1,0 +1,400 @@
+
+**6. Arch-Debt Folding** ✅
+- 6 entries appended to `.llm/harness/debt/arch-debt.md`:
+  - RUN-ARTIFACT-ARCHIVAL-POLICY
+  - PAGEBUILDER-LEGACY-COMPAT-TREE
+  - FORMPAGEPROPS-PLAYGROUND-MIGRATION
+  - REDIS-LEGACY-VALUE-FALLBACK
+  - DEBT-1 (version timing)
+  - DEBT-2 (db-init flake)
+
+### Changes Made
+None. This is an evaluation run only; no source code modifications.
+
+### Remaining Risks (Non-Blocking)
+1. **DEBT-2 db-init flake**: Recorded, owned by CLI E2E maintainers. Separate 
+GitHub Actions evidence green.
+2. **DEBT-1 version bump**: Must be issued at JSR-publish prep (one repo-wide 
+breaking bump). Breaking-change note recommended in PR body.
+3. **Wrapper lint/fmt bug**: `failedBatches:1` with 0 occurrences reproduces on 
+main — wrapper bug, not a PR-C regression.
+
+### Recommended Action
+**Merge PR #114** (`chore/alpha1-legacy-purge` → `main`) as-is. Include BREAKING
+CHANGE note in merge body:
+- aspire `DependsOn` alias removed (use canonical `ServiceReferences` in 
+appsettings; `dependsOn` in netscript config)
+- 3 Tier-1 compat exports removed (`updatePluginRegistry`, `safeExtend`, 
+`startWorkersStreamMirror`)
+- Per DEBT-1, no version bump
+
+### Evaluator Metadata
+- Run: `chore-alpha1-legacy-purge--purge`
+- Evaluator: OpenHands IMPL-EVAL (separate session)
+- Plan-eval: minimax-M3 PASS with 3 corrections folded
+- Iteration: 1 of 2 allowed (PASS on first pass)
+EOF
+(2) echo "Summary written to 
+/home/runner/work/_temp/openhands/27995582550-1/summary.md"
+
+⏳ Process still running (soft timeout)
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Create summary.md in one command
+
+Reasoning:
+Let me fix it by running one command at a time.
+
+
+$ mkdir -p /home/runner/work/_temp/openhands/27995582550-1 && cat > 
+/home/runner/work/_temp/openhands/27995582550-1/summary.md << 'EOF'
+# IMPL-EVAL Summary — PR-C alpha-1 legacy/deprecated purge
+
+## Verdict: **PASS**
+
+### Evaluation Scope
+Evaluated PR-C (branch `chore/alpha1-legacy-purge` @ `7d91fbb6`) against 
+approved plan for project-wide alpha-1 legacy/deprecated purge + folded hygiene.
+
+### Verification Results
+
+**1. Scope Fidelity** ✅
+- All planned removals landed (updatePluginRegistry, safeExtend, 
+startWorkersStreamMirror, aspire DependsOn alias)
+- Both exclusions UNTOUCHED:
+  - `packagesAsWorkspaceMembers` (5 live call sites intact)
+  - Workers `schedule?` (deprecated, deferred to CRON-SUBSYSTEM-DUP)
+- Canonical `ServiceConfig.dependsOn` schema REMAINS; only legacy alias removed
+
+**2. Behavior Preservation** ✅
+- S2 (only behavior-affecting slice): canonical `dependsOn` fully covers removed
+legacy `DependsOn` merge cases
+- New regression test asserts `orders.dependsOn === ['users']` 
+(ServiceReferences → dependsOn)
+- 18/18 CLI adapter tests pass; 18/18 aspire tests pass
+
+**3. Static Gates** ✅
+- `deno check`: 784 files, 0 violations
+- `deno lint`: wrapper exit 1 with 0 occurrences (pre-existing wrapper bug on 
+main); raw lint clean
+- `deno fmt`: 8 changed files clean (wrapper anomaly pre-existing on main)
+- `deno doc --lint`: aspire, cli, fresh, workers all pass
+- `deno task arch:check`: exit 0 (only pre-existing WARN/INFO)
+- `deno task publish:dry-run`: Success (all packages resolve exports)
+
+**4. scaffold.runtime E2E** ⚠️ PASS WITH CAVEAT
+- 10/11 tasks pass; single `database.init` failure
+- Failure = recorded **DEBT-2** (pre-existing db-init flake, out-of-scope)
+- Does not touch purge surface; GitHub Actions evidence green independently
+- Not a PR-C blocker
+
+**5. Lock Hygiene** ✅
+- `deno.lock` UNTOUCHED (zero lines in diff)
+- Zero new casts introduced
+
+**6. Arch-Debt Folding** ✅
+- 6 entries appended to `arch-debt.md`: RUN-ARTIFACT-ARCHIVAL-POLICY, 
+PAGEBUILDER-LEGACY-COMPAT-TREE, FORMPAGEPROPS-PLAYGROUND-MIGRATION, 
+REDIS-LEGACY-VALUE-FALLBACK, DEBT-1 (version timing), DEBT-2 (db-init flake)
+
+### Changes Made
+None. This is an evaluation run only; no source code modifications.
+
+### Remaining Risks (Non-Blocking)
+1. **DEBT-2 db-init flake**: Recorded, owned by CLI E2E maintainers. Separate 
+GitHub Actions evidence green.
+2. **DEBT-1 version bump**: Must be issued at JSR-publish prep (one repo-wide 
+breaking bump). Breaking-change note recommended in PR body.
+3. **Wrapper lint/fmt bug**: `failedBatches:1` with 0 occurrences reproduces on 
+main — wrapper bug, not a PR-C regression.
+
+### Recommended Action
+**Merge PR #114** as-is with BREAKING CHANGE note calling out: aspire 
+`DependsOn` alias removed (use canonical `ServiceReferences` / `dependsOn`); 3 
+Tier-1 compat exports removed. Per DEBT-1, no version bump.
+EOF
+echo "Exit: $?"
+
+Tokens: ↑ input 1.51M • cache hit 82.40% •  reasoning 10.05K • ↓ output 26.01K •
+$ 0.7395
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+❌ [An error occurred during execution.]
+Cannot execute multiple commands at once.
+Please run each command separately OR chain them into a single command via && or
+;
+Provided commands:
+(1) mkdir -p /home/runner/work/_temp/openhands/27995582550-1 && cat > 
+/home/runner/work/_temp/openhands/27995582550-1/summary.md << 'EOF'
+# IMPL-EVAL Summary — PR-C alpha-1 legacy/deprecated purge
+
+## Verdict: **PASS**
+
+### Evaluation Scope
+Evaluated PR-C (branch `chore/alpha1-legacy-purge` @ `7d91fbb6`) against 
+approved plan for project-wide alpha-1 legacy/deprecated purge + folded hygiene.
+
+### Verification Results
+
+**1. Scope Fidelity** ✅
+- All planned removals landed (updatePluginRegistry, safeExtend, 
+startWorkersStreamMirror, aspire DependsOn alias)
+- Both exclusions UNTOUCHED:
+  - `packagesAsWorkspaceMembers` (5 live call sites intact)
+  - Workers `schedule?` (deprecated, deferred to CRON-SUBSYSTEM-DUP)
+- Canonical `ServiceConfig.dependsOn` schema REMAINS; only legacy alias removed
+
+**2. Behavior Preservation** ✅
+- S2 (only behavior-affecting slice): canonical `dependsOn` fully covers removed
+legacy `DependsOn` merge cases
+- New regression test asserts `orders.dependsOn === ['users']` 
+(ServiceReferences → dependsOn)
+- 18/18 CLI adapter tests pass; 18/18 aspire tests pass
+
+**3. Static Gates** ✅
+- `deno check`: 784 files, 0 violations
+- `deno lint`: wrapper exit 1 with 0 occurrences (pre-existing wrapper bug on 
+main); raw lint clean
+- `deno fmt`: 8 changed files clean (wrapper anomaly pre-existing on main)
+- `deno doc --lint`: aspire, cli, fresh, workers all pass
+- `deno task arch:check`: exit 0 (only pre-existing WARN/INFO)
+- `deno task publish:dry-run`: Success (all packages resolve exports)
+
+**4. scaffold.runtime E2E** ⚠️ PASS WITH CAVEAT
+- 10/11 tasks pass; single `database.init` failure
+- Failure = recorded **DEBT-2** (pre-existing db-init flake, out-of-scope)
+- Does not touch purge surface; GitHub Actions evidence green independently
+- Not a PR-C blocker
+
+**5. Lock Hygiene** ✅
+- `deno.lock` UNTOUCHED (zero lines in diff)
+- Zero new casts introduced
+
+**6. Arch-Debt Folding** ✅
+- 6 entries appended to `arch-debt.md`: RUN-ARTIFACT-ARCHIVAL-POLICY, 
+PAGEBUILDER-LEGACY-COMPAT-TREE, FORMPAGEPROPS-PLAYGROUND-MIGRATION, 
+REDIS-LEGACY-VALUE-FALLBACK, DEBT-1 (version timing), DEBT-2 (db-init flake)
+
+### Changes Made
+None. This is an evaluation run only; no source code modifications.
+
+### Remaining Risks (Non-Blocking)
+1. **DEBT-2 db-init flake**: Recorded, owned by CLI E2E maintainers. Separate 
+GitHub Actions evidence green.
+2. **DEBT-1 version bump**: Must be issued at JSR-publish prep (one repo-wide 
+breaking bump). Breaking-change note recommended in PR body.
+3. **Wrapper lint/fmt bug**: `failedBatches:1` with 0 occurrences reproduces on 
+main — wrapper bug, not a PR-C regression.
+
+### Recommended Action
+**Merge PR #114** as-is with BREAKING CHANGE note calling out: aspire 
+`DependsOn` alias removed (use canonical `ServiceReferences` / `dependsOn`); 3 
+Tier-1 compat exports removed. Per DEBT-1, no version bump.
+EOF
+(2) echo "Exit: $?"
+
+⏳ Process still running (soft timeout)
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Create output directory
+
+Reasoning:
+It seems the tool is treating the heredoc content as multiple commands when 
+there are newlines. Let me try a different approach—write the file using a 
+single command with `tee` or use `printf`, or perhaps write it using the 
+file_editor create command.
+
+$ mkdir -p /home/runner/work/_temp/openhands/27995582550-1
+
+Tokens: ↑ input 1.53M • cache hit 82.59% •  reasoning 10.1K • ↓ output 26.13K • 
+$ 0.7488
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Create summary.md file
+
+Reasoning:
+I need to split this into multiple commands. First I should create the 
+directory, then write the file with proper quoting to avoid any shell 
+interpretation issues.
+
+
+$ cat > /home/runner/work/_temp/openhands/27995582550-1/summary.md << 'EOF'
+# IMPL-EVAL Summary - PR-C alpha-1 legacy/deprecated purge
+
+## Verdict: PASS
+
+### Evaluation Scope
+Evaluated PR-C (branch chore/alpha1-legacy-purge at 7d91fbb6) against approved 
+plan for project-wide alpha-1 legacy/deprecated purge + folded hygiene.
+
+### Verification Results
+
+1. Scope Fidelity - PASS
+- All planned removals landed (updatePluginRegistry, safeExtend, 
+startWorkersStreamMirror, aspire DependsOn alias)
+- Both exclusions UNTOUCHED: packagesAsWorkspaceMembers (5 live call sites 
+intact), workers schedule? (deprecated, deferred to CRON-SUBSYSTEM-DUP)
+- Canonical ServiceConfig.dependsOn schema REMAINS; only legacy alias removed
+
+2. Behavior Preservation - PASS
+- S2 (only behavior-affecting slice): canonical dependsOn fully covers removed 
+legacy DependsOn merge cases
+- New regression test asserts orders.dependsOn === users (ServiceReferences to 
+dependsOn)
+- 18/18 CLI adapter tests pass; 18/18 aspire tests pass
+
+3. Static Gates - PASS
+- deno check: 784 files, 0 violations
+- deno lint: wrapper exit 1 with 0 occurrences (pre-existing wrapper bug on 
+main); raw lint clean
+- deno fmt: 8 changed files clean (wrapper anomaly pre-existing on main)
+- deno doc --lint: aspire, cli, fresh, workers all pass
+- deno task arch:check: exit 0 (only pre-existing WARN/INFO)
+- deno task publish:dry-run: Success (all packages resolve exports)
+
+4. scaffold.runtime E2E - PASS WITH CAVEAT
+- 10/11 tasks pass; single database.init failure
+- Failure = recorded DEBT-2 (pre-existing db-init flake, out-of-scope)
+- Does not touch purge surface; GitHub Actions evidence green independently
+- Not a PR-C blocker
+
+5. Lock Hygiene - PASS
+- deno.lock UNTOUCHED (zero lines in diff)
+- Zero new casts introduced
+
+6. Arch-Debt Folding - PASS
+- 6 entries appended to arch-debt.md: RUN-ARTIFACT-ARCHIVAL-POLICY, 
+PAGEBUILDER-LEGACY-COMPAT-TREE, FORMPAGEPROPS-PLAYGROUND-MIGRATION, 
+REDIS-LEGACY-VALUE-FALLBACK, DEBT-1 (version timing), DEBT-2 (db-init flake)
+
+### Changes Made
+None. This is an evaluation run only; no source code modifications.
+
+### Remaining Risks (Non-Blocking)
+1. DEBT-2 db-init flake: Recorded, owned by CLI E2E maintainers. Separate GitHub
+Actions evidence green.
+2. DEBT-1 version bump: Must be issued at JSR-publish prep (one repo-wide 
+breaking bump). Breaking-change note recommended in PR body.
+3. Wrapper lint/fmt bug: failedBatches:1 with 0 occurrences reproduces on main. 
+wrapper bug, not a PR-C regression.
+
+### Recommended Action
+Merge PR #114 as-is with BREAKING CHANGE note calling out: aspire DependsOn 
+alias removed (use canonical ServiceReferences / dependsOn); 3 Tier-1 compat 
+exports removed. Per DEBT-1, no version bump.
+EOF
+
+Tokens: ↑ input 1.56M • cache hit 82.76% •  reasoning 10.13K • ↓ output 26.95K •
+$ 0.7608
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+cat > /home/runner/work/_temp/openhands/27995582550-1/summary.md << 'EOF'
+# IMPL-EVAL Summary - PR-C alpha-1 legacy/deprecated purge
+## Verdict: PASS
+### Evaluation Scope
+Evaluated PR-C (branch chore/alpha1-legacy-purge at 7d91fbb6) against approved 
+plan for project-wide alpha-1 legacy/deprecated purge + folded hygiene.
+### Verification Results
+1. Scope Fidelity - PASS
+- All planned removals landed (updatePluginRegistry, safeExtend, 
+startWorkersStreamMirror, aspire DependsOn alias)
+- Both exclusions UNTOUCHED: packagesAsWorkspaceMembers (5 live call sites 
+intact), workers schedule? (deprecated, deferred to CRON-SUBSYSTEM-DUP)
+- Canonical ServiceConfig.dependsOn schema REMAINS; only legacy alias removed
+2. Behavior Preservation - PASS
+- S2 (only behavior-affecting slice): canonical dependsOn fully covers removed 
+legacy DependsOn merge cases
+- New regression test asserts orders.dependsOn === users (ServiceReferences to 
+dependsOn)
+- 18/18 CLI adapter tests pass; 18/18 aspire tests pass
+3. Static Gates - PASS
+- deno check: 784 files, 0 violations
+- deno lint: wrapper exit 1 with 0 occurrences (pre-existing wrapper bug on 
+main); raw lint clean
+- deno fmt: 8 changed files clean (wrapper anomaly pre-existing on main)
+- deno doc --lint: aspire, cli, fresh, workers all pass
+- deno task arch:check: exit 0 (only pre-existing WARN/INFO)
+- deno task publish:dry-run: Success (all packages resolve exports)
+4. scaffold.runtime E2E - PASS WITH CAVEAT
+- 10/11 tasks pass; single database.init failure
+- Failure = recorded DEBT-2 (pre-existing db-init flake, out-of-scope)
+- Does not touch purge surface; GitHub Actions evidence green independently
+- Not a PR-C blocker
+5. Lock Hygiene - PASS
+- deno.lock UNTOUCHED (zero lines in diff)
+- Zero new casts introduced
+6. Arch-Debt Folding - PASS
+- 6 entries appended to arch-debt.md: RUN-ARTIFACT-ARCHIVAL-POLICY, 
+PAGEBUILDER-LEGACY-COMPAT-TREE, FORMPAGEPROPS-PLAYGROUND-MIGRATION, 
+REDIS-LEGACY-VALUE-FALLBACK, DEBT-1 (version timing), DEBT-2 (db-init flake)
+### Changes Made
+None. This is an evaluation run only; no source code modifications.
+### Remaining Risks (Non-Blocking)
+1. DEBT-2 db-init flake: Recorded, owned by CLI E2E maintainers. Separate GitHub
+Actions evidence green.
+2. DEBT-1 version bump: Must be issued at JSR-publish prep (one repo-wide 
+breaking bump). Breaking-change note recommended in PR body.
+3. Wrapper lint/fmt bug: failedBatches:1 with 0 occurrences reproduces on main. 
+wrapper bug, not a PR-C regression.
+### Recommended Action
+Merge PR #114 as-is with BREAKING CHANGE note calling out: aspire DependsOn 
+alias removed (use canonical ServiceReferences / dependsOn); 3 Tier-1 compat 
+exports removed. Per DEBT-1, no version bump.
+EOF
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: IMPL-EVAL PASS for PR-C alpha-1 legacy purge
+
+Reasoning:
+I've completed the IMPL-EVAL evaluation. Let me call finish to signal 
+completion.
+
+Finish with message:
+IMPL-EVAL complete for PR-C (alpha-1 legacy/deprecated purge). **Verdict: PASS**
+
+All gates verified independently:
+- Scope fidelity: 16 source files changed, 2 exclusions UNTOUCHED, canonical 
+dependsOn preserved
+- Behavior: S2 covered by ServiceReferences→dependsOn regression test (18/18 CLI
+tests pass)
+- Static: deno check 784 files clean, doc --lint 4 packages clean, arch:check + 
+publish:dry-run clean
+- E2E: 10/11 tasks pass; database.init failure = recorded DEBT-2 (pre-existing, 
+out-of-scope)
+- Hygiene: deno.lock untouched, zero new casts
+
+Outputs written:
+- `.llm/tmp/run/chore-alpha1-legacy-purge--purge/evaluate.md` (corrected E2E 
+section to reflect actual exit code 1 + DEBT-2 caveat)
+- `/home/runner/work/_temp/openhands/27995582550-1/summary.md`
+
+PR #114 is ready to merge as-is with a BREAKING CHANGE note in the merge body 
+(aspire `DependsOn` alias removed; 3 Tier-1 compat exports removed). Per DEBT-1,
+no version bump.
+
+Tokens: ↑ input 1.59M • cache hit 81.78% •  reasoning 10.15K • ↓ output 27.31K •
+$ 0.7900
+

@@ -1,0 +1,8 @@
+Checking for slow types in the public API...
+[0m[1m[31merror[missing-license][0m: [0m[1mmissing license field or file[0m
+ [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/watchers/deno.json[0m
+  [0m[38;5;12m=[0m [0m[1mhint[0m: add a "license" field. Alternatively, add a LICENSE file to the package and ensure it is not ignored from being published
+
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/missing-license
+
+[0m[1m[31merror[0m: Found 1 problem

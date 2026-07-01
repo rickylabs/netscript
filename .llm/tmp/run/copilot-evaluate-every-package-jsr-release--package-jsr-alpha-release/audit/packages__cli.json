@@ -1,0 +1,175 @@
+{
+  "pkg": {
+    "name": "@netscript/cli",
+    "version": "1.0.0",
+    "root": "packages/cli"
+  },
+  "exports": {
+    ".": "./mod.ts",
+    "./scaffolding": "./scaffolding.ts",
+    "./testing": "./testing.ts"
+  },
+  "files": {
+    "total": 457,
+    "loc": 42364,
+    "entries": [
+      {
+        "path": "mod.ts",
+        "bytes": 381
+      },
+      {
+        "path": "scaffolding.ts",
+        "bytes": 2511
+      },
+      {
+        "path": "testing.ts",
+        "bytes": 8128
+      }
+    ]
+  },
+  "docs": {
+    "hasReadme": true,
+    "readmeLines": 118,
+    "hasDocsFolder": true,
+    "moduleTagOnEntries": {
+      ".": true,
+      "./scaffolding": true,
+      "./testing": true
+    },
+    "descriptionLen": 0
+  },
+  "surface": {
+    ".": {
+      "exported": [],
+      "rawCount": 1
+    },
+    "./scaffolding": {
+      "exported": [
+        "DenoFileSystem",
+        "MemoryFileSystemAdapter",
+        "Scaffolder",
+        "StringTemplateAdapter",
+        "createPluginScaffoldContext",
+        "planPluginScaffoldFiles",
+        "renderTemplate",
+        "writePluginScaffoldFiles"
+      ],
+      "rawCount": 8
+    },
+    "./testing": {
+      "exported": [
+        "InMemoryProcess",
+        "MemoryFileSystemAdapter",
+        "PromptScript",
+        "RecordedProcessCall",
+        "buildEmptyScaffoldResult",
+        "buildMinimalInitResult",
+        "buildMinimalPromptAnswers",
+        "buildMinimalScaffoldPlan",
+        "createInMemoryFileSystem",
+        "createInMemoryProcess",
+        "createInMemoryPrompt",
+        "createSilentLogger"
+      ],
+      "rawCount": 12
+    }
+  },
+  "tests": {
+    "fileCount": 57,
+    "files": [
+      "src/local/features/plugins/add/add-local-plugin_test.ts",
+      "src/local/composition/local-contributor-command-tree_test.ts",
+      "src/public/features/generate/runtime-schemas/generate-runtime-schemas_test.ts",
+      "src/public/features/plugins/add/add-plugin_test.ts",
+      "src/public/features/services/add/add-service_test.ts",
+      "src/public/features/db/add/add-db_test.ts",
+      "src/public/features/deploy/build/deploy_test.ts",
+      "src/public/domain/scaffold-plan_test.ts",
+      "src/public/adapters/jsr-import-resolver_test.ts",
+      "src/kernel/templates/database/generators_test.ts",
+      "src/kernel/templates/workspace/generators_test.ts",
+      "src/kernel/templates/service/generators_test.ts",
+      "src/kernel/templates/aspire/generators_test.ts",
+      "src/kernel/templates/aspire/template-rendering_test.ts",
+      "src/kernel/templates/aspire/helpers/tests/generators-pipeline_test.ts",
+      "src/kernel/templates/aspire/helpers/tests/generators-tools-db-index_test.ts",
+      "src/kernel/templates/aspire/helpers/tests/generators-service-plugin_test.ts",
+      "src/kernel/templates/aspire/helpers/tests/generate-db-cli-mode_test.ts",
+      "src/kernel/templates/aspire/helpers/tests/generators-config-infra_test.ts",
+      "src/kernel/templates/aspire/helpers/tests/generators-background-app_test.ts",
+      "src/kernel/templates/aspire/helpers/tests/generate-register-infrastructure_test.ts",
+      "src/kernel/templates/aspire/generate-aspire-config_test.ts",
+      "src/kernel/templates/plugins/generate-plugin-service_test.ts",
+      "src/kernel/templates/app/route-templates_test.ts",
+      "src/kernel/templates/app/generators-config_test.ts",
+      "src/kernel/application/scaffold/orchestrate-init_test.ts",
+      "src/kernel/application/registries/template-registry_test.ts",
+      "src/kernel/adapters/database/scaffolder_test.ts",
+      "src/kernel/adapters/database/workspace-resolver_test.ts",
+      "src/kernel/adapters/database/operation-runner_test.ts",
+      "src/kernel/adapters/service/scaffolder_test.ts",
+      "src/kernel/adapters/plugin/scaffolder_test.ts",
+      "src/kernel/adapters/plugin/db-integration_test.ts",
+      "src/kernel/adapters/plugin/workspace-mutator_test.ts",
+      "src/kernel/adapters/config/plugin-registry.test.ts",
+      "src/kernel/adapters/scaffold/tests/fresh-adapter_test.ts",
+      "src/kernel/adapters/scaffold/tests/scaffolder_test.ts",
+      "src/kernel/adapters/scaffold/tests/dry-run-fs_test.ts",
+      "src/kernel/adapters/scaffold/tests/template-adapter_test.ts",
+      "src/kernel/adapters/scaffold/tests/import-resolver_test.ts",
+      "src/kernel/adapters/scaffold/tests/workspace-writer_test.ts",
+      "src/kernel/adapters/windows/compile/compile.test.ts",
+      "src/kernel/adapters/windows/compile/compile_test.ts",
+      "src/kernel/adapters/windows/manifest/manifest-resolver_test.ts",
+      "src/maintainer/features/root/maintainer-services_test.ts",
+      "src/maintainer/features/init/init-command_test.ts",
+      "src/maintainer/features/sync/plugin/copy-official-plugin-copy_test.ts",
+      "src/maintainer/features/sync/plugin/copy-official-plugin-samples_test.ts",
+      "src/maintainer/adapters/packages-copier_test.ts",
+      "e2e/tests/application/builders/runtime-gates_test.ts",
+      "e2e/tests/application/builders/workspace-options_test.ts",
+      "e2e/tests/application/builders/suite-builder_test.ts",
+      "e2e/tests/application/runner/suite-runner_test.ts",
+      "e2e/tests/presentation/cli-options_test.ts",
+      "e2e/tests/presentation/suite-registry_test.ts",
+      "scaffolding_test.ts",
+      "testing_test.ts"
+    ]
+  },
+  "gates": [
+    {
+      "gate": "F-JSR-4 description",
+      "level": "FAIL",
+      "message": "deno.json lacks `description` (used by JSR discoverability)"
+    },
+    {
+      "gate": "F-DOCT-4 vocabulary",
+      "level": "WARN",
+      "message": "forbidden folder name 'helpers' (utils/helpers/common/lib/interfaces) — needs migration plan + debt entry",
+      "path": "src/kernel/assets/aspire/helpers"
+    },
+    {
+      "gate": "F-DOCT-4 vocabulary",
+      "level": "WARN",
+      "message": "forbidden folder name 'helpers' (utils/helpers/common/lib/interfaces) — needs migration plan + debt entry",
+      "path": "src/kernel/assets/generated/aspire/helpers"
+    },
+    {
+      "gate": "F-DOCT-4 vocabulary",
+      "level": "WARN",
+      "message": "forbidden folder name 'lib' (utils/helpers/common/lib/interfaces) — needs migration plan + debt entry",
+      "path": "src/kernel/assets/app/lib"
+    },
+    {
+      "gate": "F-DOCT-4 vocabulary",
+      "level": "WARN",
+      "message": "forbidden folder name 'helpers' (utils/helpers/common/lib/interfaces) — needs migration plan + debt entry",
+      "path": "src/kernel/templates/aspire/helpers"
+    }
+  ],
+  "slowTypes": {
+    "ok": true,
+    "warnings": [],
+    "rawTail": "skipped"
+  }
+}

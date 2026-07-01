@@ -1,0 +1,352 @@
+{
+  "root": "packages/cli",
+  "pkg": "cli",
+  "totals": {
+    "fail": 39,
+    "warn": 20,
+    "info": 0
+  },
+  "findings": [
+    {
+      "ref": "A4",
+      "level": "FAIL",
+      "message": "abstract class CliExitError declares no abstract members — bases are stub-only contracts",
+      "path": "src/kernel/domain/errors/cli-exit-error.ts"
+    },
+    {
+      "ref": "A4",
+      "level": "FAIL",
+      "message": "abstract class Pipeline declares no abstract members — bases are stub-only contracts",
+      "path": "src/kernel/application/abstracts/pipeline.ts"
+    },
+    {
+      "ref": "A4",
+      "level": "FAIL",
+      "message": "abstract class ScaffoldCommand declares no abstract members — bases are stub-only contracts",
+      "path": "src/kernel/presentation/abstracts/scaffold-command.ts"
+    },
+    {
+      "ref": "A4",
+      "level": "FAIL",
+      "message": "abstract class DeployStepCommand declares no abstract members — bases are stub-only contracts",
+      "path": "src/kernel/presentation/abstracts/deploy-step-command.ts"
+    },
+    {
+      "ref": "A4",
+      "level": "FAIL",
+      "message": "abstract class ListCommand declares no abstract members — bases are stub-only contracts",
+      "path": "src/kernel/presentation/abstracts/list-command.ts"
+    },
+    {
+      "ref": "A5/AP-1",
+      "level": "WARN",
+      "message": "class ScaffoldError sits 3+ levels deep in inheritance chain — prefer composition"
+    },
+    {
+      "ref": "A5/AP-1",
+      "level": "WARN",
+      "message": "class ScaffoldDirExistsError sits 3+ levels deep in inheritance chain — prefer composition"
+    },
+    {
+      "ref": "A5/AP-1",
+      "level": "WARN",
+      "message": "class ScaffoldValidationError sits 3+ levels deep in inheritance chain — prefer composition"
+    },
+    {
+      "ref": "A5/AP-1",
+      "level": "WARN",
+      "message": "class ScaffoldTemplateError sits 3+ levels deep in inheritance chain — prefer composition"
+    },
+    {
+      "ref": "A5/AP-1",
+      "level": "WARN",
+      "message": "class ScaffoldGitError sits 3+ levels deep in inheritance chain — prefer composition"
+    },
+    {
+      "ref": "A5/AP-1",
+      "level": "WARN",
+      "message": "class ConfigNotFoundError sits 3+ levels deep in inheritance chain — prefer composition"
+    },
+    {
+      "ref": "A5/AP-1",
+      "level": "WARN",
+      "message": "class ConfigInvalidError sits 3+ levels deep in inheritance chain — prefer composition"
+    },
+    {
+      "ref": "A5/AP-1",
+      "level": "WARN",
+      "message": "class CompileError sits 3+ levels deep in inheritance chain — prefer composition"
+    },
+    {
+      "ref": "A5/AP-1",
+      "level": "WARN",
+      "message": "class CompileTimeoutError sits 3+ levels deep in inheritance chain — prefer composition"
+    },
+    {
+      "ref": "A5/AP-1",
+      "level": "WARN",
+      "message": "class ServyNotFoundError sits 3+ levels deep in inheritance chain — prefer composition"
+    },
+    {
+      "ref": "A5/AP-1",
+      "level": "WARN",
+      "message": "class WindowsRequiredError sits 3+ levels deep in inheritance chain — prefer composition"
+    },
+    {
+      "ref": "A5/AP-1",
+      "level": "WARN",
+      "message": "class AdminRequiredError sits 3+ levels deep in inheritance chain — prefer composition"
+    },
+    {
+      "ref": "A5/AP-1",
+      "level": "WARN",
+      "message": "class ServiceExistsError sits 3+ levels deep in inheritance chain — prefer composition"
+    },
+    {
+      "ref": "AP-7/F-DOCT-4",
+      "level": "WARN",
+      "message": "forbidden folder name 'helpers' — split into domain/, application/, or adapters/ aligned to a real concern",
+      "path": "src/kernel/assets/aspire/helpers"
+    },
+    {
+      "ref": "AP-7/F-DOCT-4",
+      "level": "WARN",
+      "message": "forbidden folder name 'helpers' — split into domain/, application/, or adapters/ aligned to a real concern",
+      "path": "src/kernel/assets/generated/aspire/helpers"
+    },
+    {
+      "ref": "AP-7/F-DOCT-4",
+      "level": "WARN",
+      "message": "forbidden folder name 'lib' — split into domain/, application/, or adapters/ aligned to a real concern",
+      "path": "src/kernel/assets/app/lib"
+    },
+    {
+      "ref": "AP-7/F-DOCT-4",
+      "level": "WARN",
+      "message": "forbidden folder name 'helpers' — split into domain/, application/, or adapters/ aligned to a real concern",
+      "path": "src/kernel/templates/aspire/helpers"
+    },
+    {
+      "ref": "A7/AP-12",
+      "level": "WARN",
+      "message": "defines local Result/Either/Option — should re-export from @netscript/shared",
+      "path": "src/kernel/domain/core-types.ts"
+    },
+    {
+      "ref": "A9",
+      "level": "WARN",
+      "message": "docs/architecture.md must declare archetype number (1–6)",
+      "path": "docs/architecture.md"
+    },
+    {
+      "ref": "A13",
+      "level": "WARN",
+      "message": "Deno.exit/process.exit outside bin/ — crash boundaries must be explicit, throw a typed error instead",
+      "path": "e2e/src/application/gates/scaffold/otel-gates.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/local/features/plugins/add/add-local-plugin_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/local/composition/local-contributor-command-tree_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/public/features/generate/runtime-schemas/generate-runtime-schemas_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/public/features/plugins/add/add-plugin_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/public/features/services/add/add-service_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/public/features/db/add/add-db_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/public/features/deploy/build/deploy_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/public/domain/scaffold-plan_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/public/adapters/jsr-import-resolver_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/kernel/templates/database/generators_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/kernel/templates/service/generators_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/kernel/templates/aspire/generators_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/kernel/templates/aspire/template-rendering_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/kernel/templates/aspire/helpers/tests/generators-pipeline_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/kernel/templates/aspire/helpers/tests/generators-tools-db-index_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/kernel/templates/aspire/helpers/tests/generators-service-plugin_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/kernel/templates/aspire/helpers/tests/generate-db-cli-mode_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/kernel/templates/aspire/helpers/tests/generators-config-infra_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/kernel/templates/aspire/helpers/tests/generators-background-app_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/kernel/templates/aspire/helpers/tests/generate-register-infrastructure_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/kernel/templates/aspire/generate-aspire-config_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/kernel/templates/app/route-templates_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/kernel/templates/app/generators-config_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/kernel/adapters/database/scaffolder_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/kernel/adapters/database/workspace-resolver_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/kernel/adapters/database/operation-runner_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/kernel/adapters/scaffold/tests/fresh-adapter_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/kernel/adapters/scaffold/tests/scaffolder_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/kernel/adapters/scaffold/tests/dry-run-fs_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/kernel/adapters/scaffold/tests/template-adapter_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/kernel/adapters/scaffold/tests/import-resolver_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/kernel/adapters/scaffold/tests/workspace-writer_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/maintainer/features/root/maintainer-services_test.ts"
+    },
+    {
+      "ref": "A14",
+      "level": "FAIL",
+      "message": "Jest/Vitest globals (describe/it/expect) — only Deno.test allowed",
+      "path": "src/maintainer/features/init/init-command_test.ts"
+    }
+  ]
+}

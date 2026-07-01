@@ -1,0 +1,27 @@
+{
+  "root": "packages/prisma-adapter-mysql",
+  "pkg": "prisma-adapter-mysql",
+  "totals": {
+    "fail": 1,
+    "warn": 1,
+    "info": 1
+  },
+  "findings": [
+    {
+      "ref": "A1",
+      "level": "FAIL",
+      "message": "mod.ts missing — required canonical entrypoint"
+    },
+    {
+      "ref": "A8/AP-9",
+      "level": "WARN",
+      "message": "file is 517 lines (cap 500) — split into smaller single-reason files",
+      "path": "src/adapter.ts"
+    },
+    {
+      "ref": "A9",
+      "level": "INFO",
+      "message": "docs/architecture.md missing — required when public symbols > 25"
+    }
+  ]
+}

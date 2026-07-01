@@ -1,0 +1,400 @@
++14|
++15|A regression test locking that static-before-dynamic route patterns (e.g., 
+`/channel/[id]`) no longer infer `never` path params. The PR confirms the 
+already-merged #178 `EmptySegment` change resolves the root cause and adds the 
+regression lock.
++16|
++17|---
++18|
++19|## Change Diff
++20|
++21|**ONE file modified** (23 lines added, 0 lines removed):
++22|
++23|```
++24|packages/fresh/src/application/route/contract.test.ts
++25|```
++26|
++27|**No production source changes.** Only a new test case.
++28|
++29|---
++30|
++31|## Gate Execution
++32|
++33|### 1. Type-Check Gate (fresh package)
++34|
++35|**Command**: `deno task check`
++36|**Result**: exit 0 — all 12 entry points type-check
++37|
++38|```
++39|Check mod.ts
++40|Check src/runtime/server/mod.ts
++41|Check src/application/builders/mod.ts
++42|Check src/application/route/mod.ts
++43|Check src/application/query/mod.ts
++44|Check src/application/vite/vite.ts
++45|Check src/runtime/interactive/mod.ts
++46|Check src/application/defer/mod.ts
++47|Check src/application/form/mod.ts
++48|Check src/diagnostics/error/mod.ts
++49|Check src/runtime/streams/mod.ts
++50|Check src/testing/mod.ts
++51|```
++52|
++53|**Evidence**: All public entry points compile without type errors. The 
+regression test is transitively type-checked via `deno test`.
++54|
++55|### 2. Test Gate (route contract tests)
++56|
++57|**Command**: `deno test src/application/route/contract.test.ts`
++58|**Result**: exit 0 — 11 passed, 0 failed (21ms)
++59|
++60|```
++61|enumPathParamSchema validates literal path params ... ok (809µs)
++62|defineEnumPathParam exposes values, schema, and parser together ... ok 
+(197µs)
++63|bindRoutePattern preserves schemas alongside nav and route pattern ... ok 
+(8ms)
++64|getLinkProps builds anchor props from a bound route contract target ... ok 
+(2ms)
++65|bound route contract exposes getLinkProps directly ... ok (1ms)
++66|route contracts expose parse helpers for path params and URLSearchParams ...
+ok (1ms)
++67|getLinkProps fails loudly when path params do not satisfy the target 
+contract ... ok (344µs)
++68|createRouteReference infers dynamic, catch-all, optional catch-all, and 
+static href behavior from the route pattern ... ok (1ms)
++69|createRouteReference with static-before-dynamic segment keeps dynamic path 
+params typed (regression for #177) ... ok (261µs)
++70|pairRouteTargets keeps page and partial hrefs aligned ... ok (2ms)
++71|InferRoutePatternPath infers static segments as {} (regression for #178) ...
+ok (322µs)
++72|```
++73|
++74|**Evidence**: The new regression test (line 238–259) passes. All existing 
+tests remain green.
++75|
++76|### 3. No Production Type-Surface Regression
++77|
++78|**Command**: `git diff --name-only origin/main..HEAD`
++79|**Result**: Only `packages/fresh/src/application/route/contract.test.ts` 
+changed.
++80|
++81|**Evidence**: Zero production source files modified. No public API changes. 
+No new exports, no new dependencies.
++82|
++83|---
++84|
++85|## Regression Test Quality
++86|
++87|The test (line 238–259) correctly locks the #177 regression:
++88|
++89|1. **Exact reproduction**: Uses `/channel/[id]` pattern with a static 
+segment before a dynamic segment — the exact failing case from issue #177.
++90|
++91|2. **No type casts**: Assignment to `InferRouteContractPath<typeof 
+channelRoute>` is direct, with no `as` / `as unknown as` casts. Any regression 
+in `InferRoutePatternSegment` / `InferRoutePatternPathSegments` that 
+reintroduces the `[k: string]: never` index signature would fail type-check with
+TS2322.
++92|
++93|3. **Runtime assertions**: `assert(href === '/channel/c-123')` locks both 
+compile-time type correctness AND runtime string-substitution correctness.
++94|
++95|4. **Clear naming**: Test name explicitly marks "regression for #177" so 
+future maintainers can trace the origin.
++96|
++97|**Evidence**: Test source inspection (line 238–259) confirms no casts, exact
+repro, and both type-level and runtime assertions.
++98|
++99|---
++100|
++101|## Production Type Contract (Already Correct via #178)
++102|
++103|The production types in `packages/fresh/src/application/route/types.ts` 
+(lines 10–131) are already correct from PR #178:
++104|
++105|- `EmptySegment = {}` (line 20) — intentionally the empty object type, 
+avoiding the `[k: string]: never` index signature that `EmptyRecord` carries.
++106|- `InferRoutePatternSegment` returns `EmptySegment` for static segments 
+(line 124).
++107|- `InferRoutePatternPathSegments` intersects with `EmptySegment` (line 
+130), not `EmptyRecord`, so static segments do not poison dynamic parameter 
+inference.
++108|
++109|**Evidence**: Source inspection confirms #178 fix is present and correctly 
+avoids the intersection collapse that caused #177.
++110|
++111|---
++112|
++113|## Archetype / Doctrine Compliance
++114|
++115|**Archetype**: L0 (test-only addition, no production surface change)
++116|**Doctrine violations**: None
++117|**Arch-debt**: No new entries required. No production surface changed. No 
+new public API.
++118|
++119|**Evidence**: Only test file modified. No new exports, no new dependencies,
+no behavioral changes.
++120|
++121|---
++122|
++123|## Run Artifacts
++124|
++125|The run directory `.llm/tmp/run/openhands/pr-194/run-28478151190-1/` 
+contains only `request.md` — no explicit `plan.md`, `worklog.md`, `commits.md`, 
+`context-pack.md`, or `drift.md`. For a test-only regression lock PR of this 
+scope (1 file, 23 lines, no production code), the absence of the full artifact 
+set is proportional to the scope. The commit message, PR body, and test source 
+carry equivalent information.
++126|
++127|**Evidence**: Run directory inspection and commit message (e7b10334) carry 
+full context.
++128|
++129|---
++130|
++131|## Summary
++132|
++133|All required gates pass:
++134|
++135|✅ Type-check gate (`deno task check`) — exit 0
++136|✅ Test gate (`deno test`) — 11/11 pass, including new regression test
++137|✅ No production type-surface regression — only test file changed
++138|✅ Regression test quality — no casts, exact repro, type-level + runtime 
+assertions
++139|✅ Archetype/L0 compliance — no production surface change
++140|✅ Doctrine compliance — no new violations
++141|
++142|**Verdict**: **PASS**
++143|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: file_editor: {"command": "str_replace", "path": 
+"/home/runner/work/_temp/openhands/28478151190-1/summary.md", "old_str": "# 
+IMPL-EVAL: PR #194 fix(fresh/route): static-before-dynamic path params infer 
+never (#177)\n\n## Summary\nVerdict: **evaluating** \u2014 checking gates and 
+type-level regression.\n\n## Changes (from diff e7b10334)\n- 
+`packages/fresh/src/application/route/contract.test.ts` only \u2014 added one 
+new test (23 lines) reproducing the exact #177 pattern (`'/channel/[id]'`) with 
+no `as` casts, asserting type-check and runtime correctness.\n\n## 
+Validation\n(pending gate execution \u2014 deno task check, contract tests, 
+fmt)\n\n## Remaining risks\n(pending \u2014 inspecting source, #178 fix surface,
+and test contract)", "new_str": "# IMPL-EVAL: PR #194 fix(fresh/route): 
+static-before-dynamic path params infer never (#177)\n\n## Summary\n**Verdict: 
+PASS** \u2705\n\nAll required gates pass. The regression test correctly locks 
+the #177 fix with no casts, exact reproduction, and both type-level and runtime 
+assertions. No production source was modified \u2014 only the test file.\n\n## 
+Changes (from diff e7b10334)\n- 
+`packages/fresh/src/application/route/contract.test.ts` only \u2014 added one 
+new test (23 lines) reproducing the exact #177 pattern (`'/channel/[id]'`) with 
+no `as` casts, asserting type-check and runtime correctness.\n- No production 
+source changes. Production types already correct from PR #178 (`EmptySegment = 
+{}` avoids `[k: string]: never` index signature).\n\n## Validation\n\u2705 `deno
+task check` (fresh package) \u2014 exit 0, all 12 entry points 
+type-check\n\u2705 `deno test src/application/route/contract.test.ts` \u2014 11 
+passed, 0 failed (21ms)\n\u2705 No production type-surface regression \u2014 
+only test file changed (0 production source modified)\n\u2705 Regression test 
+quality verified \u2014 no casts, exact #177 repro, type-level + runtime 
+assertions\n\n## Responses to review comments\nN/A \u2014 no review comments on 
+PR #194.\n\n## Remaining risks\nNone. This is a test-only regression lock with 
+no production surface change. The fix is already in place from #178, and this PR
+simply prevents regression by locking the exact failure case from #177."}
+
+Reasoning:
+Let me write the final summary.md with the verdict and then finish.
+
+Thought:
+Perfect. Now let me update the summary.md with the final verdict.
+
+
+
+Action: FileEditorAction
+
+Arguments:
+  command: "str_replace"
+  path: "/home/runner/work/_temp/openhands/28478151190-1/summary.md"
+  old_str: 
+    # IMPL-EVAL: PR #194 fix(fresh/route): static-before-dynamic path params 
+infer never (#177)
+    
+    ## Summary
+    Verdict: **evaluating** — checking gates and type-level regression.
+    
+    ## Changes (from diff e7b10334)
+    - `packages/fresh/src/application/route/contract.test.ts` only — added one 
+new test (23 lines) reproducing the exact #177 pattern (`'/channel/[id]'`) with 
+no `as` casts, asserting type-check and runtime correctness.
+    
+    ## Validation
+    (pending gate execution — deno task check, contract tests, fmt)
+    
+    ## Remaining risks
+    (pending — inspecting source, #178 fix surface, and test contract)
+
+  new_str: 
+    # IMPL-EVAL: PR #194 fix(fresh/route): static-before-dynamic path params 
+infer never (#177)
+    
+    ## Summary
+    **Verdict: PASS** ✅
+    
+    All required gates pass. The regression test correctly locks the #177 fix 
+with no casts, exact reproduction, and both type-level and runtime assertions. 
+No production source was modified — only the test file.
+    
+    ## Changes (from diff e7b10334)
+    - `packages/fresh/src/application/route/contract.test.ts` only — added one 
+new test (23 lines) reproducing the exact #177 pattern (`'/channel/[id]'`) with 
+no `as` casts, asserting type-check and runtime correctness.
+    - No production source changes. Production types already correct from PR 
+#178 (`EmptySegment = {}` avoids `[k: string]: never` index signature).
+    
+    ## Validation
+    ✅ `deno task check` (fresh package) — exit 0, all 12 entry points 
+type-check
+    ✅ `deno test src/application/route/contract.test.ts` — 11 passed, 0 failed 
+(21ms)
+    ✅ No production type-surface regression — only test file changed (0 
+production source modified)
+    ✅ Regression test quality verified — no casts, exact #177 repro, type-level
++ runtime assertions
+    
+    ## Responses to review comments
+    N/A — no review comments on PR #194.
+    
+    ## Remaining risks
+    None. This is a test-only regression lock with no production surface change.
+The fix is already in place from #178, and this PR simply prevents regression by
+locking the exact failure case from #177.
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 688.53K • cache hit 80.22% •  reasoning 2.21K • ↓ output 8.06K •
+$ 0.3386
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/28478151190-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+  2|
+  3|## Summary
+- 4|Verdict: **evaluating** — checking gates and type-level regression.
+  5|
+  6|## Changes (from diff e7b10334)
+  7|- `packages/fresh/src/application/route/contract.test.ts` only — added one 
+new test (23 lines) reproducing the exact #177 pattern (`'/channel/[id]'`) with 
+no `as` casts, asserting type-check and runtime correctness.
+  8|
+  9|## Validation
+-10|(pending gate execution — deno task check, contract tests, fmt)
+ 11|
+ 12|## Remaining risks
+-13|(pending — inspecting source, #178 fix surface, and test contract)
+ 14|
+(content after edit)
+  2|
+  3|## Summary
++ 4|**Verdict: PASS** ✅
++ 5|
++ 6|All required gates pass. The regression test correctly locks the #177 fix 
+with no casts, exact reproduction, and both type-level and runtime assertions. 
+No production source was modified — only the test file.
+  7|
+  8|## Changes (from diff e7b10334)
+  9|- `packages/fresh/src/application/route/contract.test.ts` only — added one 
+new test (23 lines) reproducing the exact #177 pattern (`'/channel/[id]'`) with 
+no `as` casts, asserting type-check and runtime correctness.
++10|- No production source changes. Production types already correct from PR 
+#178 (`EmptySegment = {}` avoids `[k: string]: never` index signature).
+ 11|
+ 12|## Validation
++13|✅ `deno task check` (fresh package) — exit 0, all 12 entry points 
+type-check
++14|✅ `deno test src/application/route/contract.test.ts` — 11 passed, 0 failed 
+(21ms)
++15|✅ No production type-surface regression — only test file changed (0 
+production source modified)
++16|✅ Regression test quality verified — no casts, exact #177 repro, type-level
++ runtime assertions
++17|
++18|## Responses to review comments
++19|N/A — no review comments on PR #194.
+ 20|
+ 21|## Remaining risks
++22|None. This is a test-only regression lock with no production surface change.
+The fix is already in place from #178, and this PR simply prevents regression by
+locking the exact failure case from #177.
+ 23|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: IMPL-EVAL PASS: PR #194 regression test verified
+
+Reasoning:
+The user just acknowledged the tool results. Everything is complete — the 
+evaluate.md artifact has been written with the PASS verdict, and the summary.md 
+has been updated with the final verdict. The PR comment workflow owns the GitHub
+posting, so I don't need to post it myself.
+
+I should now signal completion with the finish tool, providing a clear summary 
+of the evaluation.
+
+Finish with message:
+## IMPL-EVAL Complete — PR #194
+
+**Verdict: PASS** ✅
+
+### Evaluation Summary
+
+Independently verified PR #194, which adds a regression test locking the fix for
+issue #177 (static-before-dynamic route path params inferring `never`).
+
+### Gate Results
+
+✅ **Type-Check Gate**: `deno task check` (fresh package) — exit 0, all 12 entry
+points type-check  
+✅ **Test Gate**: `deno test src/application/route/contract.test.ts` — 11/11 
+pass (21ms)  
+✅ **Production Surface**: Zero production source modified — only test file 
+changed  
+✅ **Regression Quality**: No casts, exact #177 reproduction, type-level + 
+runtime assertions  
+✅ **Archetype Compliance**: L0 (test-only), no doctrine violations
+
+### Key Findings
+
+**Change scope (e7b10334)**:
+- ONE file: `packages/fresh/src/application/route/contract.test.ts` (+23 lines)
+- New test uses `/channel/[id]` pattern (exact #177 repro) with no `as` casts
+- Assigns directly to `InferRouteContractPath<typeof channelRoute>`, so any 
+regression in `InferRoutePatternSegment` / `InferRoutePatternPathSegments` fails
+type-check with TS2322
+- Runtime assertions lock both compile-time and runtime correctness
+
+**Production types already correct** (from PR #178):
+- `EmptySegment = {}` (line 20) avoids `[k: string]: never` index signature
+- `InferRoutePatternSegment` returns `EmptySegment` for static segments (line 
+124)
+- `InferRoutePatternPathSegments` intersects with `EmptySegment` (line 130), 
+preventing static segments from poisoning dynamic parameter inference
+
+### Artifacts Written
+
+- `/home/runner/work/_temp/openhands/28478151190-1/summary.md` — final verdict 
+summary
+- `.llm/tmp/run/openhands/pr-194/run-28478151190-1/evaluate.md` — full 
+evaluation report
+
+### Remaining Risks
+
+None. This is a test-only regression lock with no production surface change.
+
+Tokens: ↑ input 726.27K • cache hit 80.98% •  reasoning 2.29K • ↓ output 8.68K •
+$ 0.3522
+

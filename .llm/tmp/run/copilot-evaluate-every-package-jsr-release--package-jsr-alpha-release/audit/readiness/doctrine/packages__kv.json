@@ -1,0 +1,47 @@
+{
+  "root": "packages/kv",
+  "pkg": "kv",
+  "totals": {
+    "fail": 0,
+    "warn": 5,
+    "info": 1
+  },
+  "findings": [
+    {
+      "ref": "A8/AP-9",
+      "level": "WARN",
+      "message": "file is 536 lines (cap 500) — split into smaller single-reason files",
+      "path": "adapters/memory.adapter.ts"
+    },
+    {
+      "ref": "A8/AP-9",
+      "level": "WARN",
+      "message": "file is 592 lines (cap 500) — split into smaller single-reason files",
+      "path": "adapters/deno-kv.adapter.ts"
+    },
+    {
+      "ref": "A8/AP-9",
+      "level": "WARN",
+      "message": "file is 810 lines (cap 500) — split into smaller single-reason files",
+      "path": "adapters/redis.adapter.ts"
+    },
+    {
+      "ref": "A8/AP-9",
+      "level": "WARN",
+      "message": "file is 666 lines (cap 500) — split into smaller single-reason files",
+      "path": "bridges/denokv-bridge.ts"
+    },
+    {
+      "ref": "A9",
+      "level": "INFO",
+      "message": "docs/architecture.md missing — required when public symbols > 25"
+    },
+    {
+      "ref": "AP-23",
+      "level": "WARN",
+      "message": "`any` in exported declaration — use `unknown` or a specific type",
+      "path": "bridges/kvdex.ts",
+      "line": 32
+    }
+  ]
+}

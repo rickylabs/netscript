@@ -1,0 +1,400 @@
+6. Verified honesty boundary
+7. Wrote evaluate.md with PASS verdict
+8. Committed the verdict to the branch
+9. Created a summary document
+
+I should be factual and only describe what was actually done, not what was 
+planned or intended.
+
+Action: FileEditorAction
+
+Arguments:
+  command: "create"
+  path: "/home/runner/work/_temp/openhands/28323506756-1/summary.md"
+  file_text: 
+    # IMPL-EVAL Run Summary
+    
+    **Evaluator:** OpenHands agent (qwen3-max model)  
+    **Date:** 2026-06-28  
+    **Branch:** feat/plugin-install-jsr-dx  
+    **Commit:** 17f7016d  
+    **Task:** Independent IMPL-EVAL verification for PR #168 (Deno-native JSR 
+plugin installer)
+    
+    ---
+    
+    ## Summary
+    
+    Independent IMPL-EVAL evaluation of issue #167 / PR #168 (Deno-native JSR 
+plugin installer marketplace foundation) completed with a **PASS** verdict. All 
+required gates were re-run independently, security posture verified, and 
+implementation validated against the approved plan.
+    
+    ---
+    
+    ## Changes
+    
+    ### Files Created
+    
+    1. **`.llm/tmp/run/issue-167-marketplace-plugin-install/evaluate.md`** (189 
+lines)
+       - Complete IMPL-EVAL verdict with independent gate re-run results
+       - Security posture verification (5 layers)
+       - Userland no-leak verification
+       - Self-containment verification
+       - Honesty boundary verification
+       - Adversarial findings assessment (ADV-001 through ADV-011)
+       - Deferred debt items acknowledgment
+    
+    2. **`IMPL-EVAL-SUMMARY.md`** (workspace root, 280+ lines)
+       - Executive summary for human reviewers
+       - Detailed breakdown of gate results, security posture, and verifications
+       - Post-merge roadmap with priority items
+       - Implementation quality assessment
+    
+    ### Commits Made
+    
+    **Commit:** 17f7016d  
+    **Message:** "IMPL-EVAL: PASS - Independent verification complete"  
+    **Files changed:** 1 file, 189 insertions(+)
+    
+    ---
+    
+    ## Validation
+    
+    ### Independent Gate Re-runs Performed
+    
+    1. **deno check**
+       - Command: `deno check packages/cli/mod.ts packages/plugin/mod.ts`
+       - Result: ✅ PASS (950 files checked, 0 errors)
+    
+    2. **arch:check**
+       - Command: `deno task arch:check`
+       - Result: ✅ PASS (exit 0, all architecture rules satisfied)
+    
+    3. **publish:dry-run** (6 packages)
+       - Command: `deno task publish:dry-run <package>` for each
+       - Result: ✅ PASS (all 6 packages passed dry-run)
+       - Note: Slow-type warnings for workers/sagas/streams (acceptable per S12 
+plan)
+    
+    4. **scaffold.runtime e2e suite**
+       - Command: `deno task e2e:cli run scaffold.runtime --cleanup --format 
+pretty`
+       - Result: ✅ PASS (exit 0, 48 passed, 0 failed)
+    
+    5. **scaffold.userland-install e2e suite**
+       - Command: `deno task e2e:cli run scaffold.userland-install --cleanup 
+--format pretty`
+       - Result: ✅ PASS (exit 0, 5 passed, 0 failed)
+       - **Critical assertion verified:** "Assert true userland install has 
+artifacts and no source leak"
+    
+    ### Security Posture Verifications Performed
+    
+    1. ✅ **Static classification only** — Verified `classifyPluginTrust()` uses
+regex/string operations only, no `import()`/`eval()`/dynamic execution before 
+confirmation
+    
+    2. ✅ **Confirmation gate enforcement** — Verified `confirmPluginInstall()` 
+throws error in `--ci` mode without `--skip-confirmation` (ADV-001 fix holds)
+    
+    3. ✅ **Third-party permission scoping** — Verified 
+`buildPluginScaffoldPermissionFlags()` applies `--allow-read=<project-root> 
+--allow-write=<subdirs> --deny-net --deny-run` for third-party
+    
+    4. ✅ **Path traversal rejection** — Verified manifest parsing regex 
+`^(\./[^/].*|\.|)$` rejects `..`, backslashes, NUL bytes (ADV-002 fix holds)
+    
+    5. ✅ **SHA-256 integrity verification** — Verified 
+`verifyJsrPackageIntegrity()` computes checksums, returns `{ok:false}` on 
+mismatch, and scaffolder aborts (ADV-009 fix holds)
+    
+    ### Independent Verifications Performed
+    
+    1. ✅ **Userland no-leak** — Verified e2e suite includes explicit assertion 
+"Assert true userland install has artifacts and no source leak" and that 
+assertion passed
+    
+    2. ✅ **Self-containment** — Verified all 5 plugin scaffold entrypoints 
+(auth, workers, sagas, triggers, streams) import only from 
+`./src/scaffold/mod.ts`, none import `@netscript/cli`
+    
+    3. ✅ **Honesty boundary** — Verified plan/worklog/context-pack correctly 
+mark production `deno x jsr:` leg as deferred debt 
+(ISSUE-167-PROD-JSR-SCAFFOLD-E2E), no overclaiming of pre-publish validation
+    
+    4. ✅ **Adversarial findings (S12)** — Verified all 11 findings 
+(ADV-001..ADV-011) correctly addressed: 3 defects fixed, 2 pre-existing (out of 
+scope), 6 false alarms
+    
+    5. ✅ **Deferred debt** — Verified 5 debt items correctly recorded in 
+`.llm/harness/debt/future-arch-debt.md`:
+       - Production JSR URL e2e validation (requires alpha.13 publish)
+       - Plugin uninstall surface (separate feature)
+       - Marketplace portal & signatures (separate feature)
+       - Standalone protocol package (optional refactor)
+       - Option-B rename consideration (naming decision)
+    
+    ---
+    
+    ## Remaining Risks
+    
+    ### Pre-Production Risk (Mitigated)
+    - **Production JSR URL validation not yet proven** — Pre-merge validation 
+used `--local-path` for official plugins; production `deno x 
+jsr:@netscript/plugin-<kind>/scaffold` requires post-alpha.13 publish and 
+separate e2e-cli-prod workflow (ISSUE-167-PROD-JSR-SCAFFOLD-E2E)
+    - **Mitigation:** Correctly recorded as deferred debt; does not block merge
+    
+    ### Post-Merge Operational Risks (Out of Scope)
+    - **Plugin uninstall not implemented** — No mechanism to remove installed 
+plugins, leaving orphaned artifacts if user wants to uninstall 
+(ISSUE-167-PLUGIN-UNINSTALL-SURFACE)
+    - **No third-party signature verification** — Marketplace portal features 
+for @scope registration and cryptographic signature verification not implemented
+(ISSUE-167-MARKETPLACE-PORTAL-SIGNATURES)
+    - **Mitigation:** Correctly recorded as deferred debt; separate features 
+requiring separate issues
+    
+    ### Known Pre-Existing Issues (Out of Scope)
+    - **Permission flag escaping** (ADV-004) — Pre-existing issue in permission 
+builder, not introduced by this PR
+    - **Manifest versioning** (ADV-006) — Pre-existing issue in manifest 
+parsing, not introduced by this PR
+    - **Mitigation:** Out of scope for #167; correctly identified as 
+pre-existing
+    
+    ---
+    
+    ## Verdict
+    
+    **IMPL-EVAL: PASS** ✅
+    
+    The implementation is complete, secure, and meets all requirements specified
+in the approved plan. The marketplace foundation for Deno-native JSR plugin 
+installation is ready for merge after alpha.13 publish and successful 
+e2e-cli-prod validation.
+    
+    All required independent verifications passed. No blockers identified.
+    
+    ---
+    
+    ## Next Actions
+    
+    1. Publish alpha.13 to JSR
+    2. Run `e2e-cli-prod` workflow to validate production `deno x jsr:` URLs
+    3. Merge PR #168 to main
+    4. Address deferred debt items in future issues (uninstall, marketplace 
+portal, standalone protocol package)
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 1.87M • cache hit 78.33% •  reasoning 5.81K • ↓ output 20.98K • 
+$ 0.9516
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/28323506756-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# IMPL-EVAL Run Summary
+ 2|
++3|**Evaluator:** OpenHands agent (qwen3-max model)  
++4|**Date:** 2026-06-28  
++5|**Branch:** feat/plugin-install-jsr-dx  
++6|**Commit:** 17f7016d  
++7|**Task:** Independent IMPL-EVAL verification for PR #168 (Deno-native JSR 
+plugin installer)
++8|
++9|---
++10|
++11|## Summary
++12|
++13|Independent IMPL-EVAL evaluation of issue #167 / PR #168 (Deno-native JSR 
+plugin installer marketplace foundation) completed with a **PASS** verdict. All 
+required gates were re-run independently, security posture verified, and 
+implementation validated against the approved plan.
++14|
++15|---
++16|
++17|## Changes
++18|
++19|### Files Created
++20|
++21|1. **`.llm/tmp/run/issue-167-marketplace-plugin-install/evaluate.md`** (189 
+lines)
++22|   - Complete IMPL-EVAL verdict with independent gate re-run results
++23|   - Security posture verification (5 layers)
++24|   - Userland no-leak verification
++25|   - Self-containment verification
++26|   - Honesty boundary verification
++27|   - Adversarial findings assessment (ADV-001 through ADV-011)
++28|   - Deferred debt items acknowledgment
++29|
++30|2. **`IMPL-EVAL-SUMMARY.md`** (workspace root, 280+ lines)
++31|   - Executive summary for human reviewers
++32|   - Detailed breakdown of gate results, security posture, and verifications
++33|   - Post-merge roadmap with priority items
++34|   - Implementation quality assessment
++35|
++36|### Commits Made
++37|
++38|**Commit:** 17f7016d  
++39|**Message:** "IMPL-EVAL: PASS - Independent verification complete"  
++40|**Files changed:** 1 file, 189 insertions(+)
++41|
++42|---
++43|
++44|## Validation
++45|
++46|### Independent Gate Re-runs Performed
++47|
++48|1. **deno check**
++49|   - Command: `deno check packages/cli/mod.ts packages/plugin/mod.ts`
++50|   - Result: ✅ PASS (950 files checked, 0 errors)
++51|
++52|2. **arch:check**
++53|   - Command: `deno task arch:check`
++54|   - Result: ✅ PASS (exit 0, all architecture rules satisfied)
++55|
++56|3. **publish:dry-run** (6 packages)
++57|   - Command: `deno task publish:dry-run <package>` for each
++58|   - Result: ✅ PASS (all 6 packages passed dry-run)
++59|   - Note: Slow-type warnings for workers/sagas/streams (acceptable per S12 
+plan)
++60|
++61|4. **scaffold.runtime e2e suite**
++62|   - Command: `deno task e2e:cli run scaffold.runtime --cleanup --format 
+pretty`
++63|   - Result: ✅ PASS (exit 0, 48 passed, 0 failed)
++64|
++65|5. **scaffold.userland-install e2e suite**
++66|   - Command: `deno task e2e:cli run scaffold.userland-install --cleanup 
+--format pretty`
++67|   - Result: ✅ PASS (exit 0, 5 passed, 0 failed)
++68|   - **Critical assertion verified:** "Assert true userland install has 
+artifacts and no source leak"
++69|
++70|### Security Posture Verifications Performed
++71|
++72|1. ✅ **Static classification only** — Verified `classifyPluginTrust()` uses
+regex/string operations only, no `import()`/`eval()`/dynamic execution before 
+confirmation
++73|
++74|2. ✅ **Confirmation gate enforcement** — Verified `confirmPluginInstall()` 
+throws error in `--ci` mode without `--skip-confirmation` (ADV-001 fix holds)
++75|
++76|3. ✅ **Third-party permission scoping** — Verified 
+`buildPluginScaffoldPermissionFlags()` applies `--allow-read=<project-root> 
+--allow-write=<subdirs> --deny-net --deny-run` for third-party
++77|
++78|4. ✅ **Path traversal rejection** — Verified manifest parsing regex 
+`^(\./[^/].*|\.|)$` rejects `..`, backslashes, NUL bytes (ADV-002 fix holds)
++79|
++80|5. ✅ **SHA-256 integrity verification** — Verified 
+`verifyJsrPackageIntegrity()` computes checksums, returns `{ok:false}` on 
+mismatch, and scaffolder aborts (ADV-009 fix holds)
++81|
++82|### Independent Verifications Performed
++83|
++84|1. ✅ **Userland no-leak** — Verified e2e suite includes explicit assertion 
+"Assert true userland install has artifacts and no source leak" and that 
+assertion passed
++85|
++86|2. ✅ **Self-containment** — Verified all 5 plugin scaffold entrypoints 
+(auth, workers, sagas, triggers, streams) import only from 
+`./src/scaffold/mod.ts`, none import `@netscript/cli`
++87|
++88|3. ✅ **Honesty boundary** — Verified plan/worklog/context-pack correctly 
+mark production `deno x jsr:` leg as deferred debt 
+(ISSUE-167-PROD-JSR-SCAFFOLD-E2E), no overclaiming of pre-publish validation
++89|
++90|4. ✅ **Adversarial findings (S12)** — Verified all 11 findings 
+(ADV-001..ADV-011) correctly addressed: 3 defects fixed, 2 pre-existing (out of 
+scope), 6 false alarms
++91|
++92|5. ✅ **Deferred debt** — Verified 5 debt items correctly recorded in 
+`.llm/harness/debt/future-arch-debt.md`:
++93|   - Production JSR URL e2e validation (requires alpha.13 publish)
++94|   - Plugin uninstall surface (separate feature)
++95|   - Marketplace portal & signatures (separate feature)
++96|   - Standalone protocol package (optional refactor)
++97|   - Option-B rename consideration (naming decision)
++98|
++99|---
++100|
++101|## Remaining Risks
++102|
++103|### Pre-Production Risk (Mitigated)
++104|- **Production JSR URL validation not yet proven** — Pre-merge validation 
+used `--local-path` for official plugins; production `deno x 
+jsr:@netscript/plugin-<kind>/scaffold` requires post-alpha.13 publish and 
+separate e2e-cli-prod workflow (ISSUE-167-PROD-JSR-SCAFFOLD-E2E)
++105|- **Mitigation:** Correctly recorded as deferred debt; does not block merge
++106|
++107|### Post-Merge Operational Risks (Out of Scope)
++108|- **Plugin uninstall not implemented** — No mechanism to remove installed 
+plugins, leaving orphaned artifacts if user wants to uninstall 
+(ISSUE-167-PLUGIN-UNINSTALL-SURFACE)
++109|- **No third-party signature verification** — Marketplace portal features 
+for @scope registration and cryptographic signature verification not implemented
+(ISSUE-167-MARKETPLACE-PORTAL-SIGNATURES)
++110|- **Mitigation:** Correctly recorded as deferred debt; separate features 
+requiring separate issues
++111|
++112|### Known Pre-Existing Issues (Out of Scope)
++113|- **Permission flag escaping** (ADV-004) — Pre-existing issue in permission
+builder, not introduced by this PR
++114|- **Manifest versioning** (ADV-006) — Pre-existing issue in manifest 
+parsing, not introduced by this PR
++115|- **Mitigation:** Out of scope for #167; correctly identified as 
+pre-existing
++116|
++117|---
++118|
++119|## Verdict
++120|
++121|**IMPL-EVAL: PASS** ✅
++122|
++123|The implementation is complete, secure, and meets all requirements 
+specified in the approved plan. The marketplace foundation for Deno-native JSR 
+plugin installation is ready for merge after alpha.13 publish and successful 
+e2e-cli-prod validation.
++124|
++125|All required independent verifications passed. No blockers identified.
++126|
++127|---
++128|
++129|## Next Actions
++130|
++131|1. Publish alpha.13 to JSR
++132|2. Run `e2e-cli-prod` workflow to validate production `deno x jsr:` URLs
++133|3. Merge PR #168 to main
++134|4. Address deferred debt items in future issues (uninstall, marketplace 
+portal, standalone protocol package)
++135|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Wrote required run summary file
+
+Reasoning:
+The user asked me to write the summary file and stop. I've now created the 
+summary.md file at the required path. I should finish without further action.
+
+Finish with message:
+Run summary file written to 
+/home/runner/work/_temp/openhands/28323506756-1/summary.md as requested. Task 
+complete.
+
+Tokens: ↑ input 1.92M • cache hit 78.71% •  reasoning 5.84K • ↓ output 21.1K • $
+0.9667
+

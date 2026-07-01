@@ -1,0 +1,1387 @@
+{
+  "root": "packages/cli",
+  "pkg": "cli",
+  "totals": {
+    "fail": 1,
+    "warn": 199,
+    "info": 3
+  },
+  "findings": [
+    {
+      "ref": "NS-S-1.description",
+      "level": "FAIL",
+      "message": "deno.json `description` missing"
+    },
+    {
+      "ref": "NS-S-1.version",
+      "level": "WARN",
+      "message": "version is '1.0.0'; alpha cadence requires '0.0.1-alpha.0'"
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'addLocalPlugin' uses non-standard prefix 'add' — consult STANDARDS § 4.1",
+      "path": "src/local/features/plugins/add/add-local-plugin.ts",
+      "line": 81
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateAspire' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/public/features/generate/aspire/generate-aspire.ts",
+      "line": 52
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateConfigSchema' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/public/features/generate/runtime-schemas/generate-runtime-schemas.ts",
+      "line": 98
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'planConfigSchemaWrites' uses non-standard prefix 'plan' — consult STANDARDS § 4.1",
+      "path": "src/public/features/generate/runtime-schemas/generate-runtime-schemas.ts",
+      "line": 136
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'addPlugin' uses non-standard prefix 'add' — consult STANDARDS § 4.1",
+      "path": "src/public/features/plugins/add/add-plugin.ts",
+      "line": 39
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'planPluginAdd' uses non-standard prefix 'plan' — consult STANDARDS § 4.1",
+      "path": "src/public/features/plugins/add/plan-plugin-add.ts",
+      "line": 30
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'planServiceAdd' uses non-standard prefix 'plan' — consult STANDARDS § 4.1",
+      "path": "src/public/features/services/add/plan-service-add.ts",
+      "line": 24
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'addService' uses non-standard prefix 'add' — consult STANDARDS § 4.1",
+      "path": "src/public/features/services/add/add-service.ts",
+      "line": 42
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'exitWithCode' uses non-standard prefix 'exit' — consult STANDARDS § 4.1",
+      "path": "src/public/features/db/operations/db-operation-command.ts",
+      "line": 89
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'planDbAdd' uses non-standard prefix 'plan' — consult STANDARDS § 4.1",
+      "path": "src/public/features/db/add/plan-db-add.ts",
+      "line": 20
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'addDb' uses non-standard prefix 'add' — consult STANDARDS § 4.1",
+      "path": "src/public/features/db/add/add-db.ts",
+      "line": 36
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'copyWindowsTaskFiles' uses non-standard prefix 'copy' — consult STANDARDS § 4.1",
+      "path": "src/public/features/deploy/build/build-windows-tasks.ts",
+      "line": 10
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'compileWindowsCli' uses non-standard prefix 'compile' — consult STANDARDS § 4.1",
+      "path": "src/public/features/deploy/build/build-windows-cli.ts",
+      "line": 9
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'requireProjectRoot' uses non-standard prefix 'require' — consult STANDARDS § 4.1",
+      "path": "src/public/presentation/support.ts",
+      "line": 11
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'requireString' uses non-standard prefix 'require' — consult STANDARDS § 4.1",
+      "path": "src/public/presentation/support.ts",
+      "line": 30
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'planPluginScaffoldFiles' uses non-standard prefix 'plan' — consult STANDARDS § 4.1",
+      "path": "src/public/scaffolding/plugin-scaffolding.ts",
+      "line": 85
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateEngineMod' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/database/generate-engine-mod.ts",
+      "line": 25
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateDatabaseDenoJson' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/database/generate-db-deno-json.ts",
+      "line": 27
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generatePrismaConfig' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/database/generate-prisma-config.ts",
+      "line": 24
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateDatabaseFacadeMod' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/database/generate-db-mod.ts",
+      "line": 13
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateReadme' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/workspace/generate-readme.ts",
+      "line": 45
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateDenoJson' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/workspace/deno-json.ts",
+      "line": 28
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateContractsDenoJson' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/workspace/contracts/deno-json.ts",
+      "line": 25
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generatePluginsDenoJson' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/workspace/plugins/deno-json.ts",
+      "line": 12
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateNetScriptConfig' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/workspace/netscript-config.ts",
+      "line": 18
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateServiceDenoJson' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/service/generate-service-deno-json.ts",
+      "line": 45
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateAppsettings' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/aspire/generate-appsettings.ts",
+      "line": 199
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateGlobalJson' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/aspire/generate-global-json.ts",
+      "line": 24
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateIndex' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/aspire/helpers/generate-index.ts",
+      "line": 39
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateHelpers' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/aspire/helpers/helpers-generator-pipeline.ts",
+      "line": 233
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateDbCliMode' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/aspire/helpers/generate-db-cli-mode.ts",
+      "line": 15
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'fileHeader' uses non-standard prefix 'file' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/aspire/helpers/_utils.ts",
+      "line": 12
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'safeIdentifier' uses non-standard prefix 'safe' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/aspire/helpers/_utils.ts",
+      "line": 26
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'quoteProperty' uses non-standard prefix 'quote' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/aspire/helpers/_utils.ts",
+      "line": 43
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'indent' uses non-standard prefix 'indent' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/aspire/helpers/_utils.ts",
+      "line": 54
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'joinLines' uses non-standard prefix 'join' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/aspire/helpers/_utils.ts",
+      "line": 69
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateConfigSchema' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/aspire/helpers/generate-config-schema.ts",
+      "line": 22
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'ProjectConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "src/kernel/templates/aspire/helpers/generate-config-schema.ts"
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateRegisterTools' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/aspire/helpers/register/generate-register-tools.ts",
+      "line": 30
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateRegisterInfrastructure' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/aspire/helpers/register/generate-register-infrastructure.ts",
+      "line": 38
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateRegisterApps' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/aspire/helpers/register/generate-register-apps.ts",
+      "line": 39
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateRegisterServices' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/aspire/helpers/register/generate-register-services.ts",
+      "line": 38
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateRegisterBackground' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/aspire/helpers/register/generate-register-background.ts",
+      "line": 34
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateRegisterPlugins' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/aspire/helpers/register/generate-register-plugins.ts",
+      "line": 39
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateAspireConfig' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/aspire/generate-aspire-config.ts",
+      "line": 28
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateTsAspireConfig' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/aspire/generate-aspire-config.ts",
+      "line": 74
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generatePluginMod' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/plugins/generate-plugin-mod.ts",
+      "line": 49
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generatePluginContracts' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/plugins/generate-plugin-contracts.ts",
+      "line": 14
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generatePluginDenoJson' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/plugins/generate-plugin-deno-json.ts",
+      "line": 21
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generatePluginService' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/plugins/generate-plugin-service.ts",
+      "line": 23
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generatePluginRouter' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/plugins/generate-plugin-service.ts",
+      "line": 68
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generatePluginProcessorEntrypoint' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/plugins/generate-plugin-service.ts",
+      "line": 93
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generatePluginServiceContext' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/plugins/generate-plugin-service-context.ts",
+      "line": 11
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generatePluginSampleFiles' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/plugins/generate-plugin-samples.ts",
+      "line": 25
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generatePluginSampleManifestBlocks' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/plugins/generate-plugin-samples.ts",
+      "line": 61
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generatePluginDbSchema' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/plugins/generate-plugin-db-schema.ts",
+      "line": 20
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'makeAdapter' uses non-standard prefix 'make' — consult STANDARDS § 4.1",
+      "path": "src/kernel/templates/app/app-template-test-support.ts",
+      "line": 17
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'ResolvedServiceConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "src/kernel/domain/resolved-config.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'ResolvedPluginConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "src/kernel/domain/resolved-config.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'ResolvedAppConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "src/kernel/domain/resolved-config.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'ResolvedBackgroundProcessorEntrypointConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "src/kernel/domain/resolved-config.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'ResolvedBackgroundProcessorConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "src/kernel/domain/resolved-config.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'RegisteredPluginConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "src/kernel/domain/resolved-config.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'ResolvedDefaultsConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "src/kernel/domain/resolved-config.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'ResolvedWindowsDeployConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "src/kernel/domain/resolved-config.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'ResolvedConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "src/kernel/domain/resolved-config.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'JobsRuntimeConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "src/kernel/domain/deploy/runtime-overrides.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'SagasRuntimeConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "src/kernel/domain/deploy/runtime-overrides.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'TasksRuntimeConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "src/kernel/domain/deploy/runtime-overrides.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'FeaturesRuntimeConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "src/kernel/domain/deploy/runtime-overrides.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'TriggersRuntimeConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "src/kernel/domain/deploy/runtime-overrides.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'ServyServiceConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "src/kernel/domain/deploy/servy-config.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'DatabaseConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "src/kernel/domain/infrastructure-config.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'CacheConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "src/kernel/domain/infrastructure-config.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'InfrastructureConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "src/kernel/domain/infrastructure-config.ts"
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'scaffoldApp' uses non-standard prefix 'scaffold' — consult STANDARDS § 4.1",
+      "path": "src/kernel/application/scaffold/writers/write-init.ts",
+      "line": 9
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'scaffoldDatabase' uses non-standard prefix 'scaffold' — consult STANDARDS § 4.1",
+      "path": "src/kernel/application/scaffold/workspace-init.ts",
+      "line": 12
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'scaffoldContracts' uses non-standard prefix 'scaffold' — consult STANDARDS § 4.1",
+      "path": "src/kernel/application/scaffold/workspace-init.ts",
+      "line": 37
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'scaffoldServices' uses non-standard prefix 'scaffold' — consult STANDARDS § 4.1",
+      "path": "src/kernel/application/scaffold/workspace-init.ts",
+      "line": 62
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'scaffoldPlugins' uses non-standard prefix 'scaffold' — consult STANDARDS § 4.1",
+      "path": "src/kernel/application/scaffold/workspace-init.ts",
+      "line": 94
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'scaffoldRoot' uses non-standard prefix 'scaffold' — consult STANDARDS § 4.1",
+      "path": "src/kernel/application/scaffold/plan-init.ts",
+      "line": 21
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'scaffoldPackagesLocal' uses non-standard prefix 'scaffold' — consult STANDARDS § 4.1",
+      "path": "src/kernel/application/scaffold/plan-init.ts",
+      "line": 170
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'emptyScaffoldResult' uses non-standard prefix 'empty' — consult STANDARDS § 4.1",
+      "path": "src/kernel/application/scaffold/helpers.ts",
+      "line": 12
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'adjustLocalBase' uses non-standard prefix 'adjust' — consult STANDARDS § 4.1",
+      "path": "src/kernel/application/scaffold/helpers.ts",
+      "line": 23
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'collectFormattableScaffoldFiles' uses non-standard prefix 'collect' — consult STANDARDS § 4.1",
+      "path": "src/kernel/application/scaffold/helpers.ts",
+      "line": 41
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'scaffoldTsAppHost' uses non-standard prefix 'scaffold' — consult STANDARDS § 4.1",
+      "path": "src/kernel/application/scaffold/render-ts-apphost.ts",
+      "line": 18
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'scaffoldAspire' uses non-standard prefix 'scaffold' — consult STANDARDS § 4.1",
+      "path": "src/kernel/application/scaffold/render-init.ts",
+      "line": 16
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'gitInit' uses non-standard prefix 'git' — consult STANDARDS § 4.1",
+      "path": "src/kernel/application/scaffold/git-init.ts",
+      "line": 4
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'mapEngine' uses non-standard prefix 'map' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/database/workspace-resolver.ts",
+      "line": 97
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'findExecutableStatus' uses non-standard prefix 'find' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/database/operation-runner-helpers.ts",
+      "line": 56
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'osName' uses non-standard prefix 'os' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/runtime/platform/deno-platform.ts",
+      "line": 40
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'arch' uses non-standard prefix 'arch' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/runtime/platform/deno-platform.ts",
+      "line": 56
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'executableExists' uses non-standard prefix 'executable' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/runtime/platform/deno-platform.ts",
+      "line": 124
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'commandExists' uses non-standard prefix 'command' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/runtime/platform/deno-platform.ts",
+      "line": 137
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'executableDir' uses non-standard prefix 'executable' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/runtime/platform/deno-platform.ts",
+      "line": 181
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'localAppData' uses non-standard prefix 'local' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/runtime/platform/deno-platform.ts",
+      "line": 195
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'programFiles' uses non-standard prefix 'program' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/runtime/platform/deno-platform.ts",
+      "line": 204
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateAppStyles' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/templates/app/generate-styles.ts",
+      "line": 16
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateAppDenoJson' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/templates/app/generate-app-deno-json.ts",
+      "line": 44
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateAppViteConfig' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/templates/app/generate-vite-config.ts",
+      "line": 31
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'upsertServiceAppsettingsEntry' uses non-standard prefix 'upsert' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/service/workspace-mutator.ts",
+      "line": 67
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'addServiceWorkspaceMember' uses non-standard prefix 'add' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/service/workspace-mutator.ts",
+      "line": 92
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'regenerateAspireHelpers' uses non-standard prefix 'regenerate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/service/workspace-mutator.ts",
+      "line": 105
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateV1Mod' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/contracts/templates/generate-v1-mod.ts",
+      "line": 30
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateVersionAggregate' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/contracts/version-registry.ts",
+      "line": 15
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'detectPluginDbRequirement' uses non-standard prefix 'detect' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/plugin/db-integration.ts",
+      "line": 61
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'provisionDatabaseIfNeeded' uses non-standard prefix 'provision' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/plugin/db-integration.ts",
+      "line": 110
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'copyPluginSchemaToRootDb' uses non-standard prefix 'copy' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/plugin/db-integration.ts",
+      "line": 156
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'copyPluginSchemasToRootDb' uses non-standard prefix 'copy' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/plugin/db-integration.ts",
+      "line": 176
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'mergeEnvironment' uses non-standard prefix 'merge' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/config/deploy-config-resolvers.ts",
+      "line": 46
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'findWorkspaceMemberPath' uses non-standard prefix 'find' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/config/deploy-config-resolvers.ts",
+      "line": 63
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'detectInfrastructure' uses non-standard prefix 'detect' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/config/infrastructure.ts",
+      "line": 28
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'inferDbProvider' uses non-standard prefix 'infer' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/config/infrastructure-connection-strings.ts",
+      "line": 214
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'inferCacheProvider' uses non-standard prefix 'infer' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/config/infrastructure-connection-strings.ts",
+      "line": 234
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'findAspireContainer' uses non-standard prefix 'find' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/config/infrastructure-docker.ts",
+      "line": 66
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'findProjectRoot' uses non-standard prefix 'find' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/config/deploy-config.ts",
+      "line": 57
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'RawServiceConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "src/kernel/adapters/config/deploy-config-types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'RawPluginConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "src/kernel/adapters/config/deploy-config-types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'RawAppConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "src/kernel/adapters/config/deploy-config-types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'NetScriptAppConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "src/kernel/adapters/config/deploy-config-types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'RawBackgroundProcessorEntrypointConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "src/kernel/adapters/config/deploy-config-types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'RawBackgroundProcessorConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "src/kernel/adapters/config/deploy-config-types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'RawDatabaseConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "src/kernel/adapters/config/deploy-config-types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'RawCacheConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "src/kernel/adapters/config/deploy-config-types.ts"
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'copyDirectoryFiltered' uses non-standard prefix 'copy' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/scaffold/directory-copier.ts",
+      "line": 36
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateEditorConfigFiles' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/scaffold/editor-config.ts",
+      "line": 176
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'addWorkspaceMember' uses non-standard prefix 'add' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/scaffold/workspace-writer.ts",
+      "line": 36
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'allocatePort' uses non-standard prefix 'allocate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/scaffold/workspace-writer.ts",
+      "line": 76
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'clearProgress' uses non-standard prefix 'clear' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/loggers/console-logger.ts",
+      "line": 262
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'maskConnectionString' uses non-standard prefix 'mask' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/loggers/console-logger.ts",
+      "line": 341
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'detectRuntimePaths' uses non-standard prefix 'detect' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/deploy/runtime-detect.ts",
+      "line": 38
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'injectRuntimeEnvVars' uses non-standard prefix 'inject' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/deploy/runtime-detect.ts",
+      "line": 122
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'servyLifecycleArgs' uses non-standard prefix 'servy' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/deploy/commands/servy-command.ts",
+      "line": 50
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'fullServiceName' uses non-standard prefix 'full' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/deploy/commands/servy-command.ts",
+      "line": 58
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'checkAdmin' uses non-standard prefix 'check' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/deploy/commands/admin-command.ts",
+      "line": 13
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'syncDeployToInstallDir' uses non-standard prefix 'sync' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/deploy/commands/install.ts",
+      "line": 25
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'shouldCopyFile' uses non-standard prefix 'should' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/deploy/commands/install.ts",
+      "line": 106
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'syncDir' uses non-standard prefix 'sync' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/deploy/commands/install.ts",
+      "line": 118
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'updateXmlPaths' uses non-standard prefix 'update' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/deploy/commands/install.ts",
+      "line": 156
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'failDeployCommand' uses non-standard prefix 'fail' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/deploy/deploy-exit.ts",
+      "line": 4
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'compareVersions' uses non-standard prefix 'compare' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/windows/runtime/runtime-version-utils.ts",
+      "line": 59
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateRuntimeSchema' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/windows/runtime/runtime-config-schema.ts",
+      "line": 22
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateJobOverrides' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/windows/runtime/runtime-config-overrides.ts",
+      "line": 46
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateSagaOverrides' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/windows/runtime/runtime-config-overrides.ts",
+      "line": 67
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateTriggerOverrides' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/windows/runtime/runtime-config-overrides.ts",
+      "line": 88
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'copyTaskFiles' uses non-standard prefix 'copy' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/windows/tasks-copier.ts",
+      "line": 157
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'compileTarget' uses non-standard prefix 'compile' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/windows/compile/compile-runner.ts",
+      "line": 59
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'compileAll' uses non-standard prefix 'compile' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/windows/compile/compile-runner.ts",
+      "line": 301
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'bundleTarget' uses non-standard prefix 'bundle' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/windows/compile/compile-bundler.ts",
+      "line": 44
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'extractCompileTargets' uses non-standard prefix 'extract' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/windows/compile/compile-targets.ts",
+      "line": 68
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateEnvFileContent' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/windows/environment/env-file-content.ts",
+      "line": 27
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'collectTargetDerivedEnvVars' uses non-standard prefix 'collect' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/windows/environment/env-file-values.ts",
+      "line": 43
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'collectAllEnvVars' uses non-standard prefix 'collect' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/windows/environment/env-file-values.ts",
+      "line": 71
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'extractHost' uses non-standard prefix 'extract' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/windows/environment/env-file-values.ts",
+      "line": 236
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'extractPort' uses non-standard prefix 'extract' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/windows/environment/env-file-values.ts",
+      "line": 257
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'extractUser' uses non-standard prefix 'extract' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/windows/environment/env-file-values.ts",
+      "line": 284
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'extractPassword' uses non-standard prefix 'extract' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/windows/environment/env-file-values.ts",
+      "line": 299
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateServyXml' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/windows/servy/servy-xml.ts",
+      "line": 40
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateServiceManifest' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/windows/manifest/manifest.ts",
+      "line": 31
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'topologicalSort' uses non-standard prefix 'topological' — consult STANDARDS § 4.1",
+      "path": "src/kernel/adapters/windows/manifest/manifest.ts",
+      "line": 108
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'outputText' uses non-standard prefix 'output' — consult STANDARDS § 4.1",
+      "path": "src/kernel/presentation/output/default-output.ts",
+      "line": 12
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'outputWarning' uses non-standard prefix 'output' — consult STANDARDS § 4.1",
+      "path": "src/kernel/presentation/output/default-output.ts",
+      "line": 17
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'outputError' uses non-standard prefix 'output' — consult STANDARDS § 4.1",
+      "path": "src/kernel/presentation/output/default-output.ts",
+      "line": 22
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'outputList' uses non-standard prefix 'output' — consult STANDARDS § 4.1",
+      "path": "src/kernel/presentation/output/default-output.ts",
+      "line": 27
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'outputJson' uses non-standard prefix 'output' — consult STANDARDS § 4.1",
+      "path": "src/kernel/presentation/output/default-output.ts",
+      "line": 32
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'probeMonorepo' uses non-standard prefix 'probe' — consult STANDARDS § 4.1",
+      "path": "src/maintainer/features/probe/probe-monorepo.ts",
+      "line": 38
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'orchestrateMaintainerInit' uses non-standard prefix 'orchestrate' — consult STANDARDS § 4.1",
+      "path": "src/maintainer/features/init/orchestrate-maintainer-init.ts",
+      "line": 77
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'syncTemplates' uses non-standard prefix 'sync' — consult STANDARDS § 4.1",
+      "path": "src/maintainer/features/sync/templates/sync-templates.ts",
+      "line": 38
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'syncPlugin' uses non-standard prefix 'sync' — consult STANDARDS § 4.1",
+      "path": "src/maintainer/features/sync/plugin/sync-plugin.ts",
+      "line": 93
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'copyOfficialPlugin' uses non-standard prefix 'copy' — consult STANDARDS § 4.1",
+      "path": "src/maintainer/features/sync/plugin/copy-official-plugin.ts",
+      "line": 49
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'exists' uses non-standard prefix 'exists' — consult STANDARDS § 4.1",
+      "path": "src/maintainer/features/sync/plugin/copy-official-plugin-test-support.ts",
+      "line": 72
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'syncPackages' uses non-standard prefix 'sync' — consult STANDARDS § 4.1",
+      "path": "src/maintainer/features/sync/packages/sync-packages.ts",
+      "line": 24
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'regenerateCopiedRuntimeRegistries' uses non-standard prefix 'regenerate' — consult STANDARDS § 4.1",
+      "path": "src/maintainer/adapters/plugin-runtime-registry.ts",
+      "line": 83
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'detectMonorepoRoot' uses non-standard prefix 'detect' — consult STANDARDS § 4.1",
+      "path": "src/maintainer/adapters/monorepo-detector.ts",
+      "line": 48
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'computeLocalBase' uses non-standard prefix 'compute' — consult STANDARDS § 4.1",
+      "path": "src/maintainer/adapters/monorepo-detector.ts",
+      "line": 89
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'copyPluginDirectory' uses non-standard prefix 'copy' — consult STANDARDS § 4.1",
+      "path": "src/maintainer/adapters/plugin-file-collector.ts",
+      "line": 42
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'copyWorkspaceDirectory' uses non-standard prefix 'copy' — consult STANDARDS § 4.1",
+      "path": "src/maintainer/adapters/plugin-file-collector.ts",
+      "line": 57
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'pruneNonPortableBackgroundSamples' uses non-standard prefix 'prune' — consult STANDARDS § 4.1",
+      "path": "src/maintainer/adapters/plugin-file-collector.ts",
+      "line": 72
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'removeCopiedFiles' uses non-standard prefix 'remove' — consult STANDARDS § 4.1",
+      "path": "src/maintainer/adapters/plugin-file-collector.ts",
+      "line": 101
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateOfficialSamplesConfig' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/maintainer/adapters/plugin-sample-templates.ts",
+      "line": 16
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateCreateUserSettingsJob' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/maintainer/adapters/plugin-sample-templates.ts",
+      "line": 34
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'rewriteCopiedDenoJsons' uses non-standard prefix 'rewrite' — consult STANDARDS § 4.1",
+      "path": "src/maintainer/adapters/plugin-import-rewriter.ts",
+      "line": 6
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'rewritePackagePathToJsr' uses non-standard prefix 'rewrite' — consult STANDARDS § 4.1",
+      "path": "src/maintainer/adapters/plugin-import-rewriter.ts",
+      "line": 56
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'copyLocalPackages' uses non-standard prefix 'copy' — consult STANDARDS § 4.1",
+      "path": "src/maintainer/adapters/packages-copier.ts",
+      "line": 85
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'canCopyOfficialPlugin' uses non-standard prefix 'can' — consult STANDARDS § 4.1",
+      "path": "src/maintainer/adapters/official-plugin-source.ts",
+      "line": 163
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'findOfficialPluginSourceRoot' uses non-standard prefix 'find' — consult STANDARDS § 4.1",
+      "path": "src/maintainer/adapters/official-plugin-source.ts",
+      "line": 168
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'requireString' uses non-standard prefix 'require' — consult STANDARDS § 4.1",
+      "path": "src/maintainer/presentation/support.ts",
+      "line": 21
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'defaultRunOptions' uses non-standard prefix 'default' — consult STANDARDS § 4.1",
+      "path": "e2e/src/create-default-runner.ts",
+      "line": 48
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'cli' uses non-standard prefix 'cli' — consult STANDARDS § 4.1",
+      "path": "e2e/src/application/gates/scaffold/gate-factory.ts",
+      "line": 12
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'commandGate' uses non-standard prefix 'command' — consult STANDARDS § 4.1",
+      "path": "e2e/src/application/gates/scaffold/gate-factory.ts",
+      "line": 17
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'httpGate' uses non-standard prefix 'http' — consult STANDARDS § 4.1",
+      "path": "e2e/src/application/gates/scaffold/gate-factory.ts",
+      "line": 40
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'defaultRunOptions' uses non-standard prefix 'default' — consult STANDARDS § 4.1",
+      "path": "e2e/src/application/builders/workspace/suite-builder-options.ts",
+      "line": 14
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'defaultCliEntrypoint' uses non-standard prefix 'default' — consult STANDARDS § 4.1",
+      "path": "e2e/src/application/builders/workspace/workspace-options.ts",
+      "line": 5
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'mapRunOptions' uses non-standard prefix 'map' — consult STANDARDS § 4.1",
+      "path": "e2e/src/presentation/cli/options/run-options.ts",
+      "line": 28
+    },
+    {
+      "ref": "NS-S-6.length",
+      "level": "WARN",
+      "message": "README is 118 lines; minimum is 150"
+    },
+    {
+      "ref": "NS-S-6.sections",
+      "level": "WARN",
+      "message": "README missing 12/12 mandated sections (Overview, Quickstart, Mental model, API, Recipes, Configuration, Testing, Observability, Architecture, Stability, Compatibility, License)"
+    },
+    {
+      "ref": "NS-S-7",
+      "level": "WARN",
+      "message": "docs/concepts.md missing — required for /docs structure"
+    },
+    {
+      "ref": "NS-S-7",
+      "level": "INFO",
+      "message": "docs/recipes/ folder missing — recommended for task-oriented docs"
+    },
+    {
+      "ref": "NS-S-7",
+      "level": "INFO",
+      "message": "docs/reference/ folder missing — required for auto-generated API ref"
+    },
+    {
+      "ref": "NS-S-8.location",
+      "level": "WARN",
+      "message": "57 inline *_test.ts files outside tests/ — consolidate under tests/<layer>/"
+    },
+    {
+      "ref": "NS-S-10",
+      "level": "INFO",
+      "message": "mod.ts does not export an `inspect<Noun>()` diagnostic — recommended discoverability axis"
+    }
+  ]
+}

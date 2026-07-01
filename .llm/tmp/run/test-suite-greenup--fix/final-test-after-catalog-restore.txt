@@ -1,0 +1,71 @@
+Task test deno test --allow-all
+Check packages/cli/scaffolding_test.ts
+Check packages/cli/src/kernel/adapters/config/plugin-registry.test.ts
+Check packages/cli/src/kernel/adapters/database/operation-runner_test.ts
+Check packages/cli/src/kernel/adapters/database/scaffolder_test.ts
+Check packages/cli/src/kernel/adapters/database/workspace-resolver_test.ts
+Check packages/cli/src/kernel/adapters/plugin/db-integration_test.ts
+Check packages/cli/src/kernel/adapters/plugin/scaffolder_test.ts
+Check packages/cli/src/kernel/adapters/plugin/workspace-mutator_test.ts
+Check packages/cli/src/kernel/adapters/runtime/file-system/deno-file-system_test.ts
+Check packages/cli/src/kernel/adapters/scaffold/tests/dry-run-fs_test.ts
+Check packages/cli/src/kernel/adapters/scaffold/tests/fresh-adapter_test.ts
+Check packages/cli/src/kernel/adapters/scaffold/tests/import-resolver_test.ts
+Check packages/cli/src/kernel/adapters/scaffold/tests/scaffolder_test.ts
+Check packages/cli/src/kernel/adapters/scaffold/tests/template-adapter_test.ts
+Check packages/cli/src/kernel/adapters/scaffold/tests/workspace-writer_test.ts
+Check packages/cli/src/kernel/adapters/service/scaffolder_test.ts
+Check packages/cli/src/kernel/adapters/windows/compile/compile.test.ts
+Check packages/cli/src/kernel/adapters/windows/compile/compile_test.ts
+Check packages/cli/src/kernel/adapters/windows/manifest/manifest-resolver_test.ts
+Check packages/cli/src/kernel/application/registries/template-registry_test.ts
+Check packages/cli/src/kernel/application/scaffold/orchestrate-init_test.ts
+Check packages/cli/src/kernel/templates/app/generators-config_test.ts
+Check packages/cli/src/kernel/templates/app/route-templates_test.ts
+Check packages/cli/src/kernel/templates/aspire/generate-aspire-config_test.ts
+Check packages/cli/src/kernel/templates/aspire/generators_test.ts
+Check packages/cli/src/kernel/templates/aspire/helpers/tests/generate-db-cli-mode_test.ts
+Check packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-infrastructure_test.ts
+Check packages/cli/src/kernel/templates/aspire/helpers/tests/generators-background-app_test.ts
+Check packages/cli/src/kernel/templates/aspire/helpers/tests/generators-config-infra_test.ts
+Check packages/cli/src/kernel/templates/aspire/helpers/tests/generators-pipeline_test.ts
+Check packages/cli/src/kernel/templates/aspire/helpers/tests/generators-service-plugin_test.ts
+Check packages/cli/src/kernel/templates/aspire/helpers/tests/generators-tools-db-index_test.ts
+Check packages/cli/src/kernel/templates/aspire/template-rendering_test.ts
+Check packages/cli/src/kernel/templates/database/generators_test.ts
+Check packages/cli/src/kernel/templates/plugins/generate-plugin-service_test.ts
+Check packages/cli/src/kernel/templates/service/generators_test.ts
+Check packages/cli/src/kernel/templates/workspace/generators_test.ts
+Check packages/cli/src/local/composition/local-contributor-command-tree_test.ts
+Check packages/cli/src/local/features/plugins/add/add-local-plugin_test.ts
+Check packages/cli/src/maintainer/adapters/packages-copier_test.ts
+Check packages/cli/src/maintainer/features/init/init-command_test.ts
+Check packages/cli/src/maintainer/features/root/maintainer-services_test.ts
+Check packages/cli/src/maintainer/features/sync/plugin/copy-official-plugin-copy_test.ts
+Check packages/cli/src/maintainer/features/sync/plugin/copy-official-plugin-samples_test.ts
+Check packages/cli/src/public/adapters/jsr-import-resolver_test.ts
+Check packages/cli/src/public/domain/scaffold-plan_test.ts
+Check packages/cli/src/public/features/db/add/add-db_test.ts
+Check packages/cli/src/public/features/deploy/build/deploy_test.ts
+Check packages/cli/src/public/features/generate/runtime-schemas/generate-runtime-schemas_test.ts
+Check packages/cli/src/public/features/marketplace/marketplace-group_test.ts
+Check packages/cli/src/public/features/plugins/add/add-plugin_test.ts
+Check packages/cli/src/public/features/plugins/dispatch/dispatch-plugin-verb_test.ts
+Check packages/cli/src/public/features/plugins/host/plugin-loader_test.ts
+Check packages/cli/src/public/features/plugins/scaffold/scaffold-plugin_test.ts
+Check packages/cli/src/public/features/services/add/add-service_test.ts
+Check packages/cli/src/public/features/ui/registry.test.ts
+Check packages/cli/testing_test.ts
+TS2307 [ERROR]: Import "@std/jsonc" not a dependency and not in import map from "file:///home/codex/repos/netscript-test-green-up/packages/config/workspace.ts"
+  hint: If you want to use the JSR package, try running `deno add jsr:@std/jsonc`
+    at file:///home/codex/repos/netscript-test-green-up/packages/config/workspace.ts:8:37
+
+Check packages/config/tests/_fixtures/readme-examples_test.ts
+Check packages/config/tests/merge/merge_test.ts
+Check packages/config/tests/schema/netscript_config_test.ts
+Check packages/config/tests/schema/plugins_test.ts
+Check packages/config/workspace.test.ts
+error: Type checking failed.
+
+  [33minfo:[39m The program failed type-checking, but it still might work correctly.
+  [36mhint:[39m Re-run with [4m--no-check[24m to skip type-checking.

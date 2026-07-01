@@ -1,0 +1,179 @@
+{
+  "pkg": {
+    "name": "@netscript/triggers",
+    "version": "0.1.0",
+    "root": "packages/triggers"
+  },
+  "exports": {
+    ".": "./mod.ts",
+    "./schemas": "./schemas.ts",
+    "./streams/server": "./streams/server.ts",
+    "./streams/schema": "./streams/schema.ts"
+  },
+  "files": {
+    "total": 16,
+    "loc": 3653,
+    "entries": [
+      {
+        "path": "mod.ts",
+        "bytes": 4447
+      },
+      {
+        "path": "schemas.ts",
+        "bytes": 18402
+      },
+      {
+        "path": "streams/server.ts",
+        "bytes": 254
+      },
+      {
+        "path": "streams/schema.ts",
+        "bytes": 1288
+      }
+    ]
+  },
+  "docs": {
+    "hasReadme": false,
+    "readmeLines": 0,
+    "hasDocsFolder": false,
+    "moduleTagOnEntries": {
+      ".": true,
+      "./schemas": true,
+      "./streams/server": true,
+      "./streams/schema": true
+    },
+    "descriptionLen": 0
+  },
+  "surface": {
+    ".": {
+      "exported": [
+        "ActionChainConfigSchema",
+        "CallServiceActionSchema",
+        "CustomActionSchema",
+        "EnqueueMessageActionSchema",
+        "ExecuteBatchActionSchema",
+        "ExecuteTaskActionSchema",
+        "FileEventKindSchema",
+        "FileTriggerOptionsSchema",
+        "PublishSagaActionSchema",
+        "RetryPolicySchema",
+        "RunScriptActionSchema",
+        "TriggerActionSchema",
+        "TriggerBuilder",
+        "TriggerEventStatusSchema",
+        "TriggerEventStore",
+        "TriggerMiddlewareSchema",
+        "TriggerProcessor",
+        "TriggerRegistry",
+        "TriggerTypeSchema",
+        "WebhookTriggerOptionsSchema",
+        "createActionExecutor",
+        "defineTrigger",
+        "dispatchTriggerEvent",
+        "getTriggerEventStore",
+        "getTriggerRegistry",
+        "handleFileLifecycle",
+        "resetTriggerEventStore",
+        "resetTriggerRegistry",
+        "startTriggersCombined"
+      ],
+      "rawCount": 29
+    },
+    "./schemas": {
+      "exported": [
+        "ActionChainConfig",
+        "ActionChainConfigSchema",
+        "ActionResult",
+        "ActionResultSchema",
+        "ActionType",
+        "ActionTypeSchema",
+        "CallServiceActionSchema",
+        "CustomActionSchema",
+        "EnqueueJobActionSchema",
+        "EnqueueMessageActionSchema",
+        "ExecuteBatchActionSchema",
+        "ExecuteTaskActionSchema",
+        "FileEventKind",
+        "FileEventKindSchema",
+        "FileEventPayload",
+        "FileEventPayloadSchema",
+        "FileLifecycleConfig",
+        "FileLifecycleConfigSchema",
+        "FileTriggerOptions",
+        "FileTriggerOptionsSchema",
+        "PublishSagaActionSchema",
+        "RetryPolicy",
+        "RetryPolicySchema",
+        "RunScriptActionSchema",
+        "StabilityThreshold",
+        "StabilityThresholdSchema",
+        "ThrottleConfigSchema",
+        "TriggerAction",
+        "TriggerActionSchema",
+        "TriggerDefinition",
+        "TriggerDefinitionSchema",
+        "TriggerEvent",
+        "TriggerEventSchema",
+        "TriggerEventStatus",
+        "TriggerEventStatusSchema",
+        "TriggerKvKeys",
+        "TriggerMiddleware",
+        "TriggerMiddlewareSchema",
+        "TriggerType",
+        "TriggerTypeSchema",
+        "WebhookTriggerOptions",
+        "WebhookTriggerOptionsSchema"
+      ],
+      "rawCount": 42
+    },
+    "./streams/server": {
+      "exported": [
+        "TriggerEventSchema",
+        "createStreamMutationHook",
+        "getTriggersStreamProducer",
+        "startTriggersStreamMirror",
+        "triggersStreamSchema"
+      ],
+      "rawCount": 5
+    },
+    "./streams/schema": {
+      "exported": [
+        "TriggerEvent",
+        "TriggerEventSchema",
+        "triggersStreamSchema"
+      ],
+      "rawCount": 3
+    }
+  },
+  "tests": {
+    "fileCount": 3,
+    "files": [
+      "registry_test.ts",
+      "builder_test.ts",
+      "processor_test.ts"
+    ]
+  },
+  "gates": [
+    {
+      "gate": "F-JSR-3 readme",
+      "level": "FAIL",
+      "message": "README.md missing"
+    },
+    {
+      "gate": "F-JSR-4 description",
+      "level": "FAIL",
+      "message": "deno.json lacks `description` (used by JSR discoverability)"
+    },
+    {
+      "gate": "F-DOCT-5 cardinality",
+      "level": "WARN",
+      "message": "directory has 14 immediate children; doctrine cap is 12",
+      "path": ""
+    }
+  ],
+  "slowTypes": {
+    "ok": true,
+    "warnings": [],
+    "rawTail": "skipped"
+  }
+}

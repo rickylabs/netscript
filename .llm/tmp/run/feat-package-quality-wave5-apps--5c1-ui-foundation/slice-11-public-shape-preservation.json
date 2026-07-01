@@ -1,0 +1,28 @@
+{
+  "results": [
+    {
+      "label": "interactive",
+      "before": "slice-11-deno-doc-interactive-before.json",
+      "after": "slice-11-deno-doc-interactive-after.json",
+      "beforeSymbolCount": 7,
+      "afterSymbolCount": 7,
+      "publicShapePreserved": true
+    },
+    {
+      "label": "accordion-module",
+      "before": "slice-11-deno-doc-accordion-module-before.json",
+      "after": "slice-11-deno-doc-accordion-module-after.json",
+      "beforeSymbolCount": 1,
+      "afterSymbolCount": 1,
+      "publicShapePreserved": true
+    },
+    {
+      "label": "use-accordion-module",
+      "before": "slice-11-deno-doc-use-accordion-before.json",
+      "after": "slice-11-deno-doc-use-accordion-after.json",
+      "beforeSymbolCount": 2,
+      "afterSymbolCount": 2,
+      "publicShapePreserved": true
+    }
+  ]
+}

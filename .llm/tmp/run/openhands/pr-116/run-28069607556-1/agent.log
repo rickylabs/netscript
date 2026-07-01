@@ -1,0 +1,400 @@
+against the code on this branch.\n\n## What this slice does (ratify or reject — 
+do not implement)\nA release-mechanics slice to make the workspace publishable 
+to JSR under one aligned alpha version and to fix the broken scaffold version 
+pins. Four slices:\n\n1. **Version align** — normalize 
+`packages/fresh-ui/deno.json` `0.1.0` → `0.0.1-alpha.0`, then `deno bump-version
+prerelease -w` → all 32 members uniform at `0.0.1-alpha.1` + root import-map 
+`jsr:` refs rewritten. (The bump tool is increment-only; `prerelease -w 
+--dry-run` was confirmed to map every `0.0.1-alpha.0`→`0.0.1-alpha.1` EXCEPT the
+off-base fresh-ui `0.1.0`→`0.1.1-0`, hence the normalize-first step.)\n2. 
+**Single version source + scaffold pin fix** — 
+`packages/cli/src/kernel/adapters/scaffold/import-resolver.ts` `PACKAGE_TO_JSR` 
+hardcodes 48 `jsr:@netscript/...@^1.0.0` specifiers that will NOT resolve once 
+`0.0.1-alpha.1` publishes (`^1.0.0` ⇒ `>=1.0.0 <2.0.0`). Replace with an 
+**exact** pin `@0.0.1-alpha.1` sourced from ONE release-version constant 
+(preferred: derive from the CLI package's own lockstep `version`, so the next 
+bump keeps scaffolds correct — drift-free). Update 
+`tests/import-resolver_test.ts:21-22`.\n3. **Docs dynamic version** — feed the 
+release version into one docs data constant; remove hardcoded 
+`^1.0.0`/`1.0.0`/\"not installable today\" framing in `docs/site/concepts.vto`, 
+`docs/site/capabilities/auth.md`, `docs/site/explanation/auth-model.md`, 
+`docs/site/how-to/add-authentication.md`.\n4. **OIDC publish workflow + lock 
+regen** — new `.github/workflows/publish.yml`, tag-push trigger, `permissions: 
+id-token: write` + `contents: read`, tokenless `deno publish` at workspace root;
+regenerate `deno.lock` (version-driven only).\n\n## Plan-Gate (evaluate and 
+report each)\n1. **Version mechanism** — is 
+normalize-fresh-ui-then-`bump-version prerelease -w` correct and complete? Does 
+it actually update root import-map `jsr:` self-refs, or are there 
+`jsr:@netscript/*` references elsewhere (package deno.json `imports`, exports) 
+the bump misses and that must be hand-reconciled? Confirm nothing published yet 
+makes the fresh-ui downgrade safe.\n2. **Scaffold single-source** — is deriving 
+the scaffold pin from the CLI package's own `version` the right drift-free 
+mechanism, vs a generated constant? Verify `import-resolver.ts` is the only 
+place the `^1.0.0` pins live (plus the test) and that 
+`generate-app-deno-json.ts` consumes it. Is an EXACT pin (not `^`) correct for a
+prerelease?\n3. **Docs dynamic version** — does a clean single-source mechanism 
+exist for `docs/site` (Lume `_data`), and does removing the 
+\"forward-looking/not installable\" narrative leave the docs accurate once 
+published? (Honesty-framing voice is banned per repo doctrine.)\n4. **OIDC 
+workflow** — is tag-push + `id-token: write` + workspace-root `deno publish` the
+correct shape given the `@netscript` scope posture (\"Restrict publishing to 
+members\" ON, \"Require publishing from CI\" OFF)? Any missing permission, 
+tag-pattern, or member/OIDC linkage concern?\n5. **Gates/scope** — is the gate 
+set right (scoped check/lint/fmt, CLI scaffold unit test, `publish:dry-run`)? Is
+`scaffold.runtime` E2E required for the JSR-pin change, or does scaffold.runtime
+use local-source mode such that the unit test suffices? Any slice mis-scoped or 
+reaching beyond its boundary?\n6. **Debt** — anything deferred that should be 
+explicit debt? Anything proposed for deletion that is load-bearing?\n\n## 
+Constraints (verify the plan honors these)\n- Lock hygiene: only the 
+version-driven re-resolution in `deno.lock`; no unrelated churn.\n- 
+Implementation lane = WSL Codex daemon-attached, slice-by-slice, IMPL-EVAL 
+gated.\n- README revamp + in-package `/docs` removal are a SEPARATE PR (PR2, 
+doc-authoring lane) — do NOT evaluate them here.\n\n## Output\nEmit **PASS** or 
+**FAIL_PLAN** with per-slice notes. On PASS, list any slice-time corrections to 
+fold in. On FAIL_PLAN, give the specific blocking defect. Two FAIL_PLAN cycles →
+escalate. Deliver the full verdict in this PR comment thread.\n",
+    "created_at": "2026-06-24T01:49:59Z",
+    "html_url": 
+"https://github.com/rickylabs/netscript/pull/116#issuecomment-4785181706",
+    "id": 4785181706,
+    "issue_url": "https://api.github.com/repos/rickylabs/netscript/issues/116",
+    "node_id": "IC_kwDOSxcnO88AAAABHTgUCg",
+    "performed_via_github_app": null,
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Check harness conventions
+
+Thought:
+OK. The PR comment is the trigger itself (id `4785181706`). The trigger metadata
+says "output_mode: pr-comment" and "Do not post GitHub issue or PR comments 
+directly. The workflow owns GitHub comments." So my PR-comment.md will be picked
+up by the workflow and posted.
+
+Let me also note: the trigger comment id is 4785181706. The output mode is 
+`pr-comment`, which means the agent's reply goes as a PR issue comment (not a 
+review comment). Let me verify the workflow expects a `pr-comment.md` file:
+
+$ find .agents -name "*.md" 2>/dev/null | head -20; echo "---"; cat 
+.agents/skills/netscript-harness/SKILL.md 2>/dev/null | grep -i 
+"comment\|output_mode\|pr-comment" | head -10
+
+Tokens: ↑ input 8.1M • cache hit 90.41% •  reasoning 3.92K • ↓ output 60.91K • $
+0.7566
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+.agents/docs/README.md
+.agents/skills/jsr-audit/SKILL.md
+.agents/skills/fresh-ui-horizontal/SKILL.md
+.agents/skills/design/SKILL.md
+.agents/skills/README.md
+.agents/skills/netscript-doctrine/SKILL.md
+.agents/skills/claude-manager/SKILL.md
+.agents/skills/skill-creator/SKILL.md
+.agents/skills/openhands-handoff/SKILL.md
+.agents/skills/netscript-pr/SKILL.md
+.agents/skills/netscript-cli/SKILL.md
+.agents/skills/netscript-tools/SKILL.md
+.agents/skills/rtk/SKILL.md
+.agents/skills/codex-wsl-remote/SKILL.md
+.agents/skills/deno-fresh/SKILL.md
+.agents/skills/DEVELOPING.md
+.agents/skills/netscript-deno-toolchain/SKILL.md
+.agents/skills/netscript-harness/SKILL.md
+.agents/skills/aspire/SKILL.md
+---
+  identity, files touched, tests run, commit hash, push status, and PR 
+comment/status.
+- Every slice must commit, push, and comment on the PR before the next slice is 
+considered complete.
+  evaluator verdict explicitly classifies the test as stale/irrelevant and the 
+PR comment records
+3. comment on the PR with slice scope, commit hash, and test evidence,
+- [ ] Each implementation slice was committed, pushed, and commented on the PR.
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Find prior pr-comment.md format
+
+Thought:
+The skill mentions PR commenting but doesn't define the file format. The harness
+has a bootstrap that creates these files. Let me check what existing 
+pr-comment.md files look like in prior runs:
+
+$ find /home/runner/work/_temp -name "pr-comment.md" 2>/dev/null | head -3 | 
+while read f; do echo "=== $f ==="; head -10 "$f"; done
+
+Tokens: ↑ input 8.13M • cache hit 90.45% •  reasoning 3.92K • ↓ output 61.04K • 
+$ 0.7590
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+=== /home/runner/work/_temp/openhands/28069607556-1/pr-comment.md ===
+## PLAN-EVAL — `chore/jsr-alpha1-publish-prep` (PR1)
+
+**Verdict: `PASS`** — all four slice mechanisms (D1–D6) are sound and 
+drift-free. Implementation may begin with the slice-time corrections below 
+folded in.
+
+> Plan evaluator session: `openrouter/minimax/minimax-m3` · run `28069607556` · 
+branch head `87f19290` off `origin/main 1b3c63c2` · full deliverable committed 
+at `.llm/tmp/run/chore-jsr-alpha1-publish-prep/plan-eval.md`.
+
+### Plan-Gate checklist
+
+| Item                              | Result            | Evidence |
+| --------------------------------- | ----------------- | -------- |
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Check bootstrap exit info
+
+Thought:
+OK, my file is the only one. Let me verify the bootstrap script's expectation by
+looking at it briefly:
+
+$ cat /home/runner/work/_temp/openhands/28069607556-1/bootstrap-exit-code.txt 
+2>/dev/null; echo "---"; head -20 
+/home/runner/work/_temp/openhands/28069607556-1/bootstrap.log 2>/dev/null
+
+Tokens: ↑ input 8.17M • cache hit 90.48% •  reasoning 3.92K • ↓ output 61.17K • 
+$ 0.7614
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+0
+---
+Bootstrapping NetScript for OpenHands
+Downloading aspire-cli-linux-x64-13.4.0.tar.gz
+######################################################################## 100.0%
+Downloading aspire-cli-linux-x64-13.4.0.tar.gz.sha512
+######################################################################## 100.0%
+Aspire CLI successfully installed to: /home/runner/.aspire/bin/aspire
+Skipping PATH configuration due to --skip-path flag
+deno 2.8.3 (stable, release, x86_64-unknown-linux-gnu)
+v8 14.9.207.2-rusty
+typescript 6.0.3
+10.0.301
+10.0.109 [/usr/share/dotnet/sdk]
+10.0.204 [/usr/share/dotnet/sdk]
+10.0.301 [/usr/share/dotnet/sdk]
+13.4.0+becb48e2d61099e35ae336d527d3875e928d6594
+Docker version 29.5.3, build d1c06ef
+Docker Compose version v2.38.2
+╭ Warning
+│
+│  Ignored build scripts for packages:
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Verify all deliverables in place
+
+Thought:
+OK, the bootstrap just sets up the environment. The agent.log indicates I'm in 
+the middle of the run. Let me verify my files are in good shape by checking the 
+final state:
+
+$ echo "=== Files in temp dir ==="; ls -la 
+/home/runner/work/_temp/openhands/28069607556-1/; echo "=== Plan-eval 
+deliverable ==="; wc -l /home/runner/work/_temp/openhands/28069607556-1/*.md 
+2>/dev/null; echo "=== Git state ==="; git --no-pager status; echo "=== Git log 
+==="; git --no-pager log --oneline -3
+
+Tokens: ↑ input 8.2M • cache hit 90.52% •  reasoning 3.92K • ↓ output 61.37K • $
+0.7639
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+=== Files in temp dir ===
+total 984
+drwxr-xr-x 2 runner runner   4096 Jun 24 02:19 .
+drwxr-xr-x 3 runner runner   4096 Jun 24 01:50 ..
+-rw-r--r-- 1 runner runner 949393 Jun 24 02:20 agent.log
+-rw-r--r-- 1 runner runner      2 Jun 24 01:50 bootstrap-exit-code.txt
+-rw-r--r-- 1 runner runner   2855 Jun 24 01:50 bootstrap.log
+-rw-r--r-- 1 runner runner   8710 Jun 24 01:50 issue-comments.json
+-rw------- 1 runner runner   9172 Jun 24 02:19 pr-comment.md
+-rw-r--r-- 1 runner runner      3 Jun 24 01:50 pr-review-comments.json
+-rw-r--r-- 1 runner runner   6484 Jun 24 01:50 request.md
+-rw------- 1 runner runner   4010 Jun 24 02:19 summary.md
+=== Plan-eval deliverable ===
+   94 /home/runner/work/_temp/openhands/28069607556-1/pr-comment.md
+   63 /home/runner/work/_temp/openhands/28069607556-1/request.md
+   46 /home/runner/work/_temp/openhands/28069607556-1/summary.md
+  203 total
+=== Git state ===
+On branch chore/jsr-alpha1-publish-prep
+Your branch is ahead of 'origin/chore/jsr-alpha1-publish-prep' by 1 commit.
+  (use "git push" to publish your local commits)
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   .llm/tmp/run/openhands/pr-17/run-27493382997-1/request.md
+        modified:   .llm/tmp/run/openhands/pr-25/run-27305429810-1/request.md
+        modified:   .llm/tmp/run/openhands/pr-32/run-27433712260-1/request.md
+        modified:   .llm/tmp/run/openhands/pr-35/run-27454103300-1/request.md
+        modified:   .llm/tmp/run/openhands/pr-35/run-27454169329-1/request.md
+        modified:   .llm/tmp/run/openhands/pr-37/run-27454273181-1/request.md
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        .llm/tmp/run/openhands/pr-116/
+
+no changes added to commit (use "git add" and/or "git commit -a")
+=== Git log ===
+66a5d0c4 (HEAD -> chore/jsr-alpha1-publish-prep) chore(publish-prep): PR1 
+PLAN-EVAL — PASS with slice-time corrections
+87f19290 (origin/chore/jsr-alpha1-publish-prep) chore(publish-prep): PR1 plan + 
+research — JSR alpha-1 version/scaffold/docs/OIDC
+1b3c63c2 (origin/main) chore(hygiene): relocate leaked AS7 run snapshots out of 
+repo root (#115)
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: PLAN-EVAL PASS verdict submitted
+
+Thought:
+All deliverables in place:
+
+1. **`.llm/tmp/run/chore-jsr-alpha1-publish-prep/plan-eval.md`** (committed in 
+`66a5d0c4`) — the PLAN-EVAL deliverable.
+2. **`/home/runner/work/_temp/openhands/28069607556-1/pr-comment.md`** — the 
+PR-comment body for the workflow to post.
+3. **`/home/runner/work/_temp/openhands/28069607556-1/summary.md`** — the run 
+summary.
+
+The other modified files are from prior openhands runs (pr-17, pr-25, pr-32, 
+pr-35, pr-37) — not mine, and the contract says "Preserve user changes and avoid
+destructive git commands". I'll leave those alone.
+
+Finish with message:
+## PLAN-EVAL verdict: `PASS`
+
+PR1 (`chore/jsr-alpha1-publish-prep`, run `28069607556`) is approved for 
+implementation with slice-time corrections to fold in.
+
+### Deliverables (committed)
+
+- `.llm/tmp/run/chore-jsr-alpha1-publish-prep/plan-eval.md` — full PLAN-EVAL 
+checklist + per-slice notes + slice-time corrections (commit `66a5d0c4`).
+- `/home/runner/work/_temp/openhands/28069607556-1/pr-comment.md` — PR-comment 
+body (for the workflow to post; per operational contract, the agent does not 
+post directly).
+- `/home/runner/work/_temp/openhands/28069607556-1/summary.md` — run summary.
+
+### Plan-Gate checklist (all PASS)
+
+| Item                              | Result            | Evidence |
+| --------------------------------- | ----------------- | -------- |
+| Research present and current      | PASS              | `research.md` 
+baselined against `origin/main 1b3c63c2` |
+| Decisions locked                  | PASS              | D1–D6 stated with 
+rationale |
+| Open-decision sweep               | PASS              | 4 plan-listed + 3 
+evaluator-found (slice-time corrections, not rework) |
+| Commit slices (< 30, gate+files)  | PASS              | 4 slices; each names 
+what it proves, the gate, the files |
+| Risk register                     | PASS              | `plan.md` Debt / 
+deferrals + Gates / merge-readiness |
+| Gate set selected                 | PASS              | 
+`check:scaffold-versions`, scoped check/lint/fmt, CLI scaffold tests, 
+`publish:dry-run` |
+| Deferred scope explicit           | PASS              | README + in-package 
+`/docs` → PR2 (doc-authoring lane) |
+| jsr-audit surface scan (pkg wave) | PASS              | Slow-types 
+whitelisted; `publish:dry-run` is the authoritative readiness gate |
+
+### Slice-time corrections (to fold into IMPL)
+
+1. **Slice 2 (scaffold pin fix)** — wire the single-source release-version 
+constant into **4 source files** (not just `import-resolver.ts`):
+   - `packages/cli/src/kernel/adapters/scaffold/import-resolver.ts` 
+`PACKAGE_TO_JSR` (48 entries)
+   - `packages/cli/src/kernel/constants/jsr-specifiers.ts` `JSR_SPECIFIERS` (20 
+entries — **canonical kernel-side source**)
+   - `packages/cli/src/public/adapters/jsr-import-resolver.ts` 
+`REGISTRY_SPECIFIERS` (29 entries, derived from `JSR_SPECIFIERS`)
+   - `packages/cli/src/maintainer/adapters/plugin-import-rewriter.ts` 
+`rewritePackagePathToJsr` (~12 entries; **load-bearing** for 
+`copy-official-plugin.ts`)
+   And update **5 test files** (not just `import-resolver_test.ts`): 
+`scaffolder_test.ts`, `generators_test.ts`, `copy-official-plugin-copy_test.ts`,
+`jsr-import-resolver_test.ts` (plus the one the plan names).
+
+2. **Slice 3 (docs dynamic version)** — extend the sweep from 4 doc files to 
+**~12 `docs/site` files** (the plan misses `why.vto:106`, 
+`capabilities/index.md:54`, `quickstart.vto:23`, `index.vto:20`, 
+`explanation/plugin-system.md:97`, `how-to/discover-services.md:210`, 
+`how-to/use-a-second-database.md:242`, `reference/plugin-auth/index.md:30`). 
+Adjacent stale `^0.0.1-alpha.0` literals in `packages/config/docs/*` and 
+`packages/config/src/schema/plugins/mod.ts` should be flagged (out-of-band full 
+fix). **Replace the bogus debt ID** `docs-voice-no-honesty-framing` (does not 
+exist) with the actual `alpha-specifiers-forward-looking` at `arch-debt.md:994` 
+— slice 3 should explicitly close that debt with the post-merge 
+`publish:dry-run` evidence requirement.
+
+3. **Slice 4 (OIDC publish workflow)** — resolve tag pattern as `v*` at slice 
+time; add a `deno task publish:dry-run` pre-step before `deno publish` for 
+fail-fast.
+
+4. **Slice 1 (version align)** — clarify plan wording: `bump-version` rewrites 
+**package-level** `jsr:` self-refs, not root (verified root `deno.json` has no 
+`imports` section; verified no `jsr:@netscript/*` refs in any package `imports` 
+map).
+
+### Decisions resolved at IMPL slice time (safe to defer)
+
+- Single-source mechanism: read CLI `deno.json` at module load (preferred over 
+generated constant; drift-free by construction).
+- EXACT pin correctness for prerelease: confirmed (caret on a prerelease narrows
+to the same published version on most resolvers; EXACT removes ambiguity).
+- `scaffold.runtime` E2E NOT required for slice 2: verified 
+`packages/cli/e2e/suites/scaffold.runtime.ts` defaults to `source: local`; unit 
+tests cover the JSR-pin change.
+- `plugin-import-rewriter.ts` is load-bearing (used by 
+`copy-official-plugin.ts`); do not delete; update its pins via the single-source
+constant.
+
+### Loop state
+
+- First cycle, no `FAIL_PLAN` issued. No escalation needed. Implementation may 
+begin in the next harness session with corrections folded in.
+
+---
+
+This evaluation was performed by an AI agent (OpenHands) on behalf of the user, 
+per PLAN-EVAL protocol (`gates/plan-gate.md` + `evaluator/plan-protocol.md`).
+
+Tokens: ↑ input 8.24M • cache hit 90.51% •  reasoning 3.92K • ↓ output 62.8K • $
+0.7689
+

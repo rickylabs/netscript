@@ -1,0 +1,17 @@
+{
+  "run_id": "28483118420",
+  "run_attempt": "1",
+  "run_url": "https://github.com/rickylabs/netscript/actions/runs/28483118420",
+  "bootstrap_outcome": "success",
+  "agent_outcome": "success",
+  "verdict": "completed",
+  "summary_source": "agent",
+  "model": "openrouter/qwen/qwen3.7-max",
+  "provider": "OPENROUTER",
+  "output_mode": "pr-comment",
+  "issue_number": "183",
+  "checkout_repo": "rickylabs/netscript",
+  "checkout_ref": "feature/wi12-page-module-route-binding-codegen",
+  "summary_path": "/home/runner/work/_temp/openhands/28483118420-1/summary.md",
+  "trace_dir": ".llm/tmp/run/openhands/pr-183/run-28483118420-1"
+}

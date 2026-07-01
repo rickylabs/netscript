@@ -1,0 +1,282 @@
+# Worklog
+
+Run id: `feat-e2e-cli-prod-local--prod-suite`
+
+## Design
+
+1. Public surface
+   - Add root task `e2e:cli:prod`.
+   - Add GitHub workflow `.github/workflows/e2e-cli-prod-local.yml`.
+   - Relax the e2e scaffold preflight guard for JSR source mode.
+2. Domain vocabulary
+   - `prod-local`: local public CLI binary plus generated JSR package source.
+   - `public bin`: `packages/cli/bin/netscript.ts`.
+   - `contributor bin`: `packages/cli/bin/netscript-dev.ts`.
+3. Ports
+   - No new ports.
+4. Constants
+   - Reuse existing `PACKAGE_SOURCE.JSR`, `GATE.SCAFFOLD_INIT`, and `SCAFFOLD.RUNTIME`.
+5. Commit slices
+   - Single surgical implementation slice covering guard, task, workflow, docs, tests, and evidence.
+6. Deferred scope
+   - `--package-version` override on public `init`.
+   - Published-CLI workflow changes.
+7. Contributor path
+   - Read `packages/cli/e2e/README.md`, then use `deno task e2e:cli:prod --cleanup --format pretty`
+     to run prod-local mode.
+
+## Evidence
+
+| Gate | Command | Result |
+| --- | --- | --- |
+| TS fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --file packages/cli/e2e/src/application/gates/scaffold/scaffold-gates.ts --file packages/cli/e2e/tests/application/gates/scaffold-gates_test.ts --ext ts --write --pretty` | PASS: filesSelected=2, failedBatches=0, findings=0 |
+| TS check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli/e2e --ext ts,tsx --pretty` | PASS: filesSelected=74, failedBatches=0, totalOccurrences=0 |
+| TS lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --file packages/cli/e2e/src/application/gates/scaffold/scaffold-gates.ts --file packages/cli/e2e/tests/application/gates/scaffold-gates_test.ts --ext ts --pretty` | PASS: filesSelected=2, totalOccurrences=0 |
+| Focused guard test | `deno test --allow-all packages/cli/e2e/tests/application/gates/scaffold-gates_test.ts` | PASS: 2 passed, 0 failed |
+| Maintainer runtime smoke | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS: Summary passed=47 failed=0 |
+| Prod-local runtime smoke | `rtk proxy deno task e2e:cli:prod --cleanup --format pretty` | FAIL: `scaffold.plugin.worker`, exit code 3 |
+| Workflow validation | `actionlint` | NOT RUN: `actionlint` is not installed |
+| Lock hygiene | `git diff --name-only -- deno.lock` | PASS: no output; `deno.lock` unchanged |
+
+## Prod-Local Failure Detail
+
+The prod-local run did not fail with a missing `@netscript/*` package version. It scaffolded the
+project using the local public binary and started resolving published dependencies, then failed when
+the public `plugin add` flow dispatched the plugin CLI with `deno dx ...`.
+
+Raw failure from `.llm/tmp/cli-e2e/plugin-smoke-20260626-115601.log`:
+
+```text
+> scaffold.plugin.worker: Add official worker plugin
+  FAILED 1632ms
+command: deno run -A packages/cli/bin/netscript.ts plugin add worker --name workers --project-root /home/codex/repos/netscript-e2e-prod-local/.llm/tmp/cli-e2e/plugin-smoke-20260626-115601 --samples --force
+error: Module not found "file:///home/codex/repos/netscript-e2e-prod-local/.llm/tmp/cli-e2e/plugin-smoke-20260626-115601/dx".
+```
+
+Manual spot-check:
+
+```text
+deno dx --help
+error: Module not found "file:///home/codex/repos/netscript-e2e-prod-local/dx".
+```
+
+This blocks the required proof that `deno task e2e:cli:prod --cleanup --format pretty` works.
+
+## Dispatch Fix Attempt Evidence
+
+The public dispatch implementation was corrected from `deno dx` to `deno run -A`, with matching
+JSDoc, unit expectation, and reference/prose docs. The first-party plugin `/cli` exports that are
+expected to participate in the published plugin-management path were resolved with `deno info
+--no-lock`:
+
+- `jsr:@netscript/plugin-workers@0.0.1-alpha.4/cli`: resolved
+- `jsr:@netscript/plugin-sagas@0.0.1-alpha.4/cli`: resolved
+- `jsr:@netscript/plugin-triggers@0.0.1-alpha.4/cli`: resolved
+- `jsr:@netscript/plugin-streams@0.0.1-alpha.4/cli`: resolved
+
+`plugins/auth/deno.json` does not expose `./cli`; if prod-local reaches
+`scaffold.plugin.auth`, that remains a separate public plugin-management blocker.
+
+| Gate | Command | Result |
+| --- | --- | --- |
+| Focused dispatch test | `deno test --allow-all packages/cli/src/public/features/plugins/dispatch/dispatch-plugin-verb_test.ts` | PASS: 1 test, 4 steps, 0 failed |
+| TS check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx --pretty` | PASS: filesSelected=519, failedBatches=0, totalOccurrences=0 |
+| TS lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --file packages/cli/src/public/features/plugins/dispatch/dispatch-plugin-verb.ts --file packages/cli/src/public/public-api.ts --file packages/cli/src/public/features/plugins/dispatch/dispatch-plugin-verb_test.ts --file plugins/streams/src/cli/composition/main.ts --ext ts --pretty` | PASS: filesSelected=4, totalOccurrences=0 |
+| TS fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --file packages/cli/src/public/features/plugins/dispatch/dispatch-plugin-verb.ts --file packages/cli/src/public/public-api.ts --file packages/cli/src/public/features/plugins/dispatch/dispatch-plugin-verb_test.ts --file plugins/streams/src/cli/composition/main.ts --ext ts --pretty` | PASS: filesSelected=4, failedBatches=0, findings=0 |
+| Prod-local runtime smoke | `rtk proxy deno task e2e:cli:prod --cleanup --format pretty` | FAIL: `scaffold.plugin.worker`, exit code 3 |
+| Lock hygiene | `git diff -- deno.lock` | PASS: no output; `deno.lock` unchanged |
+
+Raw prod-local failure after the `deno run -A` correction:
+
+```text
+> scaffold.plugin.worker: Add official worker plugin
+  FAILED 314ms
+command: deno run -A packages/cli/bin/netscript.ts plugin add worker --name workers --project-root /home/codex/repos/netscript-e2e-prod-local/.llm/tmp/cli-e2e/plugin-smoke-20260626-121007 --samples --force
+stderr: Error: Plugin command failed: add worker
+  verb: add
+  pkg: worker
+  code: 1
+  stderr: Download https://jsr.io/worker/meta.json
+error: JSR package not found: worker
+```
+
+Manual follow-up showed that resolving the official package alias is not enough. The published
+worker plugin CLI resolves, but it does not implement the framework `add` verb:
+
+```text
+deno run --no-lock -A --minimum-dependency-age=0 jsr:@netscript/plugin-workers@0.0.1-alpha.4/cli add --name workers --project-root . --samples --force
+Unknown command: add
+```
+
+The generated JSR-mode e2e gate passes `--minimum-dependency-age=0` to the top-level CLI runner.
+Nested plugin CLI dispatch would also need that Deno flag once the plugin-owned `add` verb exists;
+otherwise the generated workspace's dependency-age policy can block just-published plugin packages.
+
+## Final Implementation Evidence
+
+| Gate | Command | Result |
+| --- | --- | --- |
+| Focused dispatch test | `deno test --allow-all packages/cli/src/public/features/plugins/dispatch/dispatch-plugin-verb_test.ts` | PASS: 1 test, 4 steps, exit code 0 |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | PASS: filesSelected=520, failedBatches=0, totalOccurrences=0 |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/workers --ext ts,tsx` | PASS: filesSelected=77, failedBatches=0, totalOccurrences=0 |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/streams --ext ts,tsx` | PASS: filesSelected=21, failedBatches=0, totalOccurrences=0 |
+| Scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts $(git diff --name-only -- '*.ts' '*.tsx' | sed 's#^#--file #') --pretty` | PASS: filesSelected=25, totalOccurrences=0 |
+| Scoped fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts $(git diff --name-only -- '*.ts' '*.tsx' | sed 's#^#--file #') --pretty` | PASS after formatting `plugins/workers/bin/combined.ts`: filesSelected=25, failedBatches=0, findings=0 |
+| Prod-local runtime smoke | `rtk proxy deno task e2e:cli:prod --cleanup --format pretty` | PASS: Summary passed=47 failed=0, raw exit code 0 |
+| Prod-local runtime smoke repeat | queued duplicate `rtk proxy deno task e2e:cli:prod --cleanup --format pretty` | PASS: Summary passed=47 failed=0, raw exit code 0 |
+| Maintainer runtime smoke | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS: Summary passed=47 failed=0, raw exit code 0 |
+
+## Final Prod Fix Notes
+
+- Added the missing prod import-map/dependency entries for copied official plugin workspaces,
+  including streams `@durable-streams/server` and worker `@netscript/cron`.
+- Added generated worker runtime loading for `.netscript/generated/plugin-workers/jobs.registry.ts`
+  so prod workers have both static job definitions and in-process handlers.
+- `deno.lock` was updated naturally by Deno resolution. The delta is limited to root workspace
+  dependency membership for `plugins/auth`, `plugins/sagas`, `plugins/streams`, `plugins/triggers`,
+  and `plugins/workers`; no package version re-resolution churn was observed.
+- Drift: `rtk proxy`/tool polling repeatedly left or queued an additional prod smoke process. I
+  waited for active runs to finish and verified the process table before starting the maintainer
+  smoke.
+
+## Final Rerun Evidence After Streams/KV Prod Fix
+
+| Gate | Command | Result |
+| --- | --- | --- |
+| Focused dispatch test | `deno test --allow-all packages/cli/src/public/features/plugins/dispatch/dispatch-plugin-verb_test.ts` | PASS: 1 test, 4 steps, raw exit code 0 |
+| Focused Aspire helper tests | `deno test --allow-all packages/cli/src/kernel/templates/aspire/helpers/tests/generators-service-plugin_test.ts packages/cli/src/kernel/templates/aspire/helpers/tests/generators-background-app_test.ts` | PASS: 4 suites, 51 steps, raw exit code 0 |
+| Focused HTTP/describe tests | `deno test --allow-all packages/cli/e2e/tests/application/gates/http-gate_test.ts packages/cli/src/kernel/adapters/database/operation-runner_test.ts` | PASS: 2 suites, 5 steps, raw exit code 0 |
+| Scoped package check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | PASS: filesSelected=520, failedBatches=0, totalOccurrences=0 |
+| Scoped changed-TS check/lint/fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --file ... --ext ts,tsx && deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --file ... --ext ts,tsx && deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --file ... --ext ts,tsx` | PASS: filesSelected=27, check/lint/fmt raw exit code 0 |
+| Prod-local runtime smoke | `rtk proxy deno task e2e:cli:prod --cleanup --format pretty` | PASS: Summary passed=47 failed=0, raw exit code 0 |
+| Maintainer runtime smoke | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS: Summary passed=47 failed=0, raw exit code 0 |
+
+Notes:
+
+- The last prod-local failure was worker execution polling after a successful trigger. Generated
+  Aspire resources now wire `GARNET_URI` and `REDIS_URI` from the configured cache endpoint for
+  KV-backed plugins/background processors, so the published alpha.4 queue code uses the shared
+  Garnet resource instead of process-local fallback state.
+- The streams production dependency fix uses package-level imports only; no import-map entries were
+  added for sub-exports.
+- Package-wide lint/fmt wrappers returned exit code 1 with zero reported findings after one touched
+  file was formatted. The final green wrapper verdict used explicit changed TS files, which is the
+  scoped source surface for this slice.
+
+## Import-Map Hygiene Slice
+
+Scope:
+
+- Removed redundant same-package registry sub-path import-map entries from checked-in package and
+  plugin `deno.json` files.
+- Added missing root import-map entries before deleting sub-path entries where the audit found no
+  root mapping.
+- Updated scaffold generators so JSR-mode/root registry import maps emit root package mappings only.
+  Local-mode file-path mappings are unchanged.
+
+Removed checked-in package/plugin entries:
+
+- `plugins/auth/deno.json`: `@netscript/plugin/sdk`,
+  `@netscript/plugin-auth-core/config`, `@netscript/plugin-auth-core/contracts/v1`,
+  `@netscript/plugin-auth-core/domain`, `@netscript/plugin-auth-core/ports`,
+  `@netscript/plugin-auth-core/streams`, `@netscript/plugin-auth-core/telemetry`,
+  `@netscript/service/auth`, `@netscript/telemetry/context`, `@durable-streams/state/db`.
+- `plugins/sagas/deno.json`: `@durable-streams/state/db`.
+- `plugins/workers/deno.json`: `@orpc/server/fetch`, `@orpc/server/plugins`,
+  `@orpc/openapi/fetch`, `@orpc/zod/zod4`, `@durable-streams/state/db`.
+- `plugins/triggers/deno.json`: `@durable-streams/state/db`.
+- `packages/sdk/deno.json`: `@orpc/client/fetch`, `@orpc/client/plugins`,
+  `@orpc/client/standard`.
+- `packages/service/deno.json`: `@orpc/openapi/fetch`, `@orpc/server/fetch`,
+  `@orpc/server/plugins`, `@orpc/client/plugins`, `@orpc/zod/zod4`.
+- `packages/logger/deno.json`: `@orpc/server/plugins`.
+- `packages/fresh/deno.json`: `preact/compat`, `preact/hooks`, `preact/jsx-runtime`,
+  `preact-render-to-string/stream`, `@durable-streams/state/db`.
+- `packages/fresh-ui/deno.json`: `preact/hooks`, `preact/jsx-runtime`.
+
+Roots added:
+
+- `plugins/workers/deno.json`: `@orpc/openapi`, `@orpc/zod`, `@durable-streams/state`.
+- `plugins/triggers/deno.json`: `@durable-streams/state`.
+- `packages/sdk/deno.json`: `@orpc/client`.
+- `packages/service/deno.json`: `@orpc/openapi`, `@orpc/client`, `@orpc/zod`.
+- `packages/logger/deno.json`: `@orpc/server`.
+- `packages/fresh/deno.json`: `preact`, `preact-render-to-string`,
+  `@durable-streams/state`.
+- `packages/fresh-ui/deno.json`: `preact`.
+- Scaffold generators now emit/ensure roots for `@netscript/plugin`, `@netscript/database`,
+  same-package NetScript subpaths, `preact`, `vite`, and copied official plugin registry
+  subpaths.
+
+Generator/template hygiene:
+
+- `packages/cli/src/kernel/constants/scaffold/scaffold-app-catalog.ts`: removed generated
+  `preact/hooks` and `vite/client` import-map entries; root `preact` and `vite` remain.
+- `packages/cli/src/kernel/adapters/templates/app/generate-app-deno-json.ts`: JSR mode now emits
+  root `@netscript/fresh`, `@netscript/fresh-ui`, and `@netscript/sdk` mappings only; local mode
+  keeps explicit file-path subpaths.
+- `packages/cli/src/kernel/templates/workspace/deno-json.ts`: root JSR map now emits
+  `@netscript/plugin` instead of `@netscript/plugin/loader` and `@netscript/plugin/sdk`.
+- `packages/cli/src/kernel/templates/database/generate-db-deno-json.ts`: JSR mode now emits
+  `@netscript/database` instead of `@netscript/database/scripts` and
+  `@netscript/database/tracing`; local mode keeps explicit file-path subpaths.
+- `packages/cli/src/kernel/application/ui/registry-deno-json.ts`: UI merge now adds only root
+  `preact`.
+- `packages/cli/src/maintainer/adapters/plugin-import-rewriter.ts`: copied official plugin
+  workspaces normalize same-package `npm:`/`jsr:` sub-path import-map entries to root mappings.
+
+Evidence:
+
+| Gate | Command | Result |
+| --- | --- | --- |
+| Import-map audit | `deno eval <checked-in-deno-json-audit>` | PASS: no same-package registry sub-path import-map entries in checked-in `deno.json` files |
+| Focused generator tests | `deno test --allow-all packages/cli/src/kernel/templates/app/generators-config_test.ts packages/cli/src/kernel/templates/workspace/generators_test.ts packages/cli/src/kernel/templates/database/generators_test.ts packages/cli/src/maintainer/features/sync/plugin/copy-official-plugin-copy_test.ts` | PASS: 20 passed, 22 steps, raw exit code 0 |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/auth --ext ts,tsx` | PASS: filesSelected=29, failedBatches=0, totalOccurrences=0 |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/sagas --ext ts,tsx` | PASS: filesSelected=70, failedBatches=0, totalOccurrences=0 |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/workers --ext ts,tsx` | PASS: filesSelected=77, failedBatches=0, totalOccurrences=0 |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/triggers --ext ts,tsx` | PASS: filesSelected=55, failedBatches=0, totalOccurrences=0 |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/sdk --ext ts,tsx` | PASS: filesSelected=57, failedBatches=0, totalOccurrences=0 |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --ext ts,tsx` | PASS: filesSelected=34, failedBatches=0, totalOccurrences=0 |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/logger --ext ts,tsx` | PASS: filesSelected=12, failedBatches=0, totalOccurrences=0 |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh --ext ts,tsx` | PASS: filesSelected=147, failedBatches=0, totalOccurrences=0 |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh-ui --ext ts,tsx` | PASS: filesSelected=86, failedBatches=0, totalOccurrences=0 |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | PASS: filesSelected=520, failedBatches=0, totalOccurrences=0 |
+| Publish dry-run | `rtk proxy deno task publish:dry-run` | PASS: raw exit code 0; pre-existing slow-type/dynamic-import warnings printed |
+| Prod-local runtime smoke | `rtk proxy deno task e2e:cli:prod --cleanup --format pretty` | PASS: Summary passed=47 failed=0, raw exit code 0 |
+| Maintainer runtime smoke | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS: Summary passed=47 failed=0, raw exit code 0 |
+| Whitespace diff check | `git diff --check -- . ':!.llm/tmp/run/openhands'` | PASS: raw exit code 0 |
+| Formatter wrapper | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --file <touched-ts> --ext ts,tsx` | TOOL ANOMALY: exit code 1 with filesSelected=9, failedBatches=1, findings=0 |
+
+Lock delta:
+
+- `deno.lock`: 655 insertions, 3 deletions.
+- Added one top-level specifier: `npm:style-dictionary@5.4.4`.
+- Added 96 npm package lock entries, all transitive resolution for `style-dictionary` and its
+  dependency graph.
+- No added or removed JSR/remote/workspace lock keys.
+- The three deleted dependency references were unqualified dependency names replaced by qualified
+  package keys: `inherits`, `lru-cache`, and `commander`.
+
+## Check-Test Drift Fix Slice
+
+Scope:
+
+- Updated stale CLI unit-test expectations only.
+- `packages/cli/src/kernel/templates/workspace/generators_test.ts` now derives expected root JSR
+  specifiers with `netscriptJsrSpecifier`.
+- `packages/cli/src/kernel/templates/database/generators_test.ts` now derives the expected database
+  root JSR specifier with `netscriptJsrSpecifier` while keeping the removed sub-path assertions.
+- `packages/cli/src/public/features/db/add/add-db_test.ts` now reads the generated root
+  `@netscript/database` import instead of the removed `@netscript/database/scripts` sub-path key.
+- No generator/source `.ts` files changed; no `as` casts introduced.
+
+Evidence:
+
+| Gate | Command | Result |
+| --- | --- | --- |
+| Targeted workspace generator test | `deno test --allow-all packages/cli/src/kernel/templates/workspace/generators_test.ts` | PASS: `ok \| 13 passed \| 0 failed (10ms)` |
+| Targeted database generator test | `deno test --allow-all packages/cli/src/kernel/templates/database/generators_test.ts` | PASS: `ok \| 1 passed (7 steps) \| 0 failed (15ms)` |
+| Targeted add-db flow test | `deno test --allow-all packages/cli/src/public/features/db/add/add-db_test.ts` | PASS: `ok \| 1 passed (2 steps) \| 0 failed (16ms)` |
+| Version-drift guard | `deno test --allow-all packages/cli/src/kernel/constants/version-drift_test.ts` | PASS: `ok \| 1 passed \| 0 failed (179ms)` |
+| Scoped CLI check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | PASS: `filesSelected=520`, `failedBatches=0`, `totalOccurrences=0` |
+| Repo-wide tests | `rtk proxy deno task test` | PASS: `ok \| 885 passed (370 steps) \| 0 failed \| 12 ignored (37s)` |

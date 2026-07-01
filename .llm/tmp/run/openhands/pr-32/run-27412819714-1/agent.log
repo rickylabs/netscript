@@ -1,0 +1,400 @@
+Archetype 3 expectations (domain vocabulary, ports, constants, contributor path)
+to the fresh-ui package shape. For CLI slices 12-16, the design identifies the 
+public scaffold path (`ui:init`, `ui:add`, generated routes) and ports 
+(file-system/template, browser validation, registry install) without 
+exhaustively populating Arch 6 spine/layer-2 abstract names or the 
+vertical-feature catalog. This is appropriate for the plan scope, which changes 
+scaffold output contracts, not CLI internal architecture. Implementer should 
+surface relevant CLI internal decisions during slices 12-16 and record in 
+worklog/drift as required.
+    - **Research re-baseline head** — `research.md` was captured against 
+`049711f`; current branch head is `b066935`. Findings spot-checked against 
+current head still hold (version `0.0.1-alpha.0` confirmed, `deno.gates.json` 
+still present). The gap between the two heads reflects harness-bootstrap commits
+(artifact recording, zag note), not plan drift. No re-baseline refresh required 
+before implementation.
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 539.94K • cache hit 82.26% •  reasoning 1.52K • ↓ output 9.16K •
+$ 0.2651
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File 
+/home/runner/work/netscript/netscript/.llm/tmp/run/feat-package-quality-wave5-ap
+ps--5c2-design-system--run3-production-hardening-scaffold-revamp/plan-eval.md 
+edited with 1 changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# PLAN-EVAL — Run 3 production hardening + scaffold revamp
+ 2|
++3|- Plan evaluator session: OpenHands 2026-06-12
++4|- Run: 
+`feat-package-quality-wave5-apps--5c2-design-system--run3-production-hardening-s
+caffold-revamp`
++5|- Surface / archetype: `@netscript/fresh-ui` (Archetype 3 — Runtime / 
+Behavior); `@netscript/cli` slices 12-16 (Archetype 6 — CLI / Tooling)
++6|- Scope overlays: frontend, docs
++7|
++8|## Checklist results
++9|
++10|| Plan-Gate item | Result | Evidence / location |
++11||---|---|---|
++12|| Research present and current | PASS | `research.md` exists; re-baselined 
+against worktree head `049711f`; carried-in plan 
+`.llm/plans/2026-06-12-fresh-ui-doctrine-plan.md` differences explicitly 
+documented; spot-verified finding #1 (`deno.json` version `0.0.1-alpha.0` 
+confirmed present at `b066935`) and finding #2 (`deno.gates.json` confirmed 
+present). |
++13|| Decisions locked | PASS | LD-1 through LD-6 in `plan.md` "Locked 
+Decisions" table, each with rationale. LD-5 correctly records Zag as 
+evidence-only with existing proof from prior commit and PR #32. |
++14|| Open-decision sweep | PASS | Three open decisions in `plan.md` table with 
+safe-to-defer or must-resolve-now status. Evaluator sweep independently found no
+additional open decisions that would force rework. |
++15|| Commit slices (< 30, gate + files each) | PASS | 16 ordered slices in 
+`plan.md` "Locked Slice Table" (well under 30); per-slice gate and file list in 
+`worklog.md` Design "Commit Slices" table. Slices combining C-5/C-6 and C-7/C-8 
+are logically related cleanups of appropriate size. |
++16|| Risk register | PASS | Six risks with mitigations in `plan.md` "Risk 
+Register" table. Coverage spans Plan-Gate, lock policy, slice creep, lock 
+mutation, visual failures, and Zag impact. |
++17|| Gate set selected | PASS (minor label gap) | `plan.md` Fitness Gates: 
+F-1..F-15 via `deno task arch:check` + package/static evidence; F-6/F-7 via 
+clean dry-run; F-CLI-* for slices 12-16; DS no-raw-hex and DS color utilities; 
+browser validation for visual slices. F-16 (folder-cardinality), F-17 
+(abstract-derived co-location), F-18 (sub-barrel) not explicitly named but 
+functionally covered via `arch:check` and package/static evidence. Label should 
+read F-1..F-18, not F-1..F-15; does not rise to FAIL. |
++18|| Deferred scope explicit | PASS | `plan.md` "Non-Scope" (4 items) and 
+"Hidden Scope" (4 items); `worklog.md` Design "Deferred Scope" (3 items 
+including Zag migration exclusion and full CLI doctrine debt closure). |
++19|| jsr-audit surface scan (pkg/plugin) | PASS | `research.md` "jsr-audit 
+surface scan" section names 5 slow-type/surface risks (docs scaffold, package 
+tasks, version mismatch, registry support code leakage, JSR dry-run gate) and 
+maps each to the slice that resolves it. |
++20|
++21|## Open-decision sweep (evaluator-run)
++22|
++23|Independent sweep identified no unlisted open decisions that would force 
+rework if deferred:
++24|
++25|1. **Package lock policy** — deferred to Slice 2 with user approval gate; 
+safe.
++26|2. **Zag production dependency** — deferred to Slice 7 ADR/verdict; prior 
+working proof in PR #32 is explicit starting evidence; safe.
++27|3. **Archetype mismatch (doctrine Arch 4, plan Arch 3)** — recorded as drift
+in `plan.md` "Current Doctrine Verdict" and `worklog.md` Drift; plan correctly 
+refuses to edit doctrine mid-run.
++28|4. **C-2 lock file untracked status (research finding #3)** — LD-4 gates 
+user approval before mutation; safe.
++29|
++30|No open decision would force rework when deferred per the plan's own terms.
++31|
++32|## Verdict
++33|
++34|`PASS`
++35|
++36|Implementation may begin under the locked 16-slice table, subject to 
+per-slice gates.
++37|
++38|## Notes
++39|
++40|- **Zag treatment is correct.** The user clarified that Zag has already been
+proved working in a prior commit and is mentioned in PR #32. LD-5 correctly 
+frames Slice 7 as an ADR/evidence citation, not a viability re-litigation. The 
+evaluator did not treat prior Zag proof as an open blocker.
++41|- **Fitness gates label** — `plan.md` "Fitness Gates" says "F-1..F-15" but 
+the archetype-gate-matrix requires F-16 (folder-cardinality), F-17 
+(abstract-derived co-location), F-18 (sub-barrel) for all archetypes including 
+Arch 3. These gates are functionally included via the `deno task arch:check` 
+evidence reference, so the gate set is selected; label should be tightened to 
+"F-1..F-18" before implementation gates run. Implementer should not treat this 
+as a reason to skip F-16..F-18 evidence collection at IMPL-EVAL.
++42|- **Archetype 6 design checkpoint** — `worklog.md` Design section adapts 
+Archetype 3 expectations (domain vocabulary, ports, constants, contributor path)
+to the fresh-ui package shape. For CLI slices 12-16, the design identifies the 
+public scaffold path (`ui:init`, `ui:add`, generated routes) and ports 
+(file-system/template, browser validation, registry install) without 
+exhaustively populating Arch 6 spine/layer-2 abstract names or the 
+vertical-feature catalog. This is appropriate for the plan scope, which changes 
+scaffold output contracts, not CLI internal architecture. Implementer should 
+surface relevant CLI internal decisions during slices 12-16 and record in 
+worklog/drift as required.
++43|- **Research re-baseline head** — `research.md` was captured against 
+`049711f`; current branch head is `b066935`. Findings spot-checked against 
+current head still hold (version `0.0.1-alpha.0` confirmed, `deno.gates.json` 
+still present). The gap between the two heads reflects harness-bootstrap commits
+(artifact recording, zag note), not plan drift. No re-baseline refresh required 
+before implementation.
++44|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Write summary.md for workflow
+
+Reasoning:
+Now I need to post the PR comment and write the summary file. Let me re-read the
+operational contract:
+
+- "Do not post GitHub issue or PR comments directly. The workflow owns GitHub 
+comments."
+- "Write /home/runner/work/_temp/openhands/27412819714-1/summary.md before 
+exit."
+- "Write the verdict to the run's `plan-eval.md` and comment the result on this 
+PR as `PASS` or `FAIL_PLAN` with the unchecked Plan-Gate boxes."
+- output_mode is pr-comment
+
+So I need to write the summary.md file, and since the output mode is pr-comment,
+I should write the PR comment content. The instructions say "Do not post GitHub 
+issue or PR comments directly. The workflow owns GitHub comments." So I should 
+NOT post the comment myself. But I should write the content that the workflow 
+will use.
+
+Let me check if there's a specific path where the workflow reads the PR comment 
+from. Looking at the trigger metadata:
+- output_mode: pr-comment
+
+The contract says to write 
+`/home/runner/work/_temp/openhands/27412819714-1/summary.md`. Let me write that 
+and include the verdict clearly. The workflow should pick up the PR comment 
+content from this summary or from the plan-eval.md.
+
+Actually, let me write the summary.md with all the required fields: Summary, 
+Changes, Validation, Responses to review comments, Remaining risks.
+
+Action: FileEditorAction
+
+Arguments:
+  command: "create"
+  path: "/home/runner/work/_temp/openhands/27412819714-1/summary.md"
+  file_text: 
+    # Summary
+    
+    ## PR Comment
+    
+    **PASS** — Plan-Gate cleared for Run 3: production hardening + scaffold 
+revamp (run 
+`feat-package-quality-wave5-apps--5c2-design-system--run3-production-hardening-s
+caffold-revamp`).
+    
+    All 8 Plan-Gate checklist items satisfied. Verdict written to 
+`.llm/tmp/run/feat-package-quality-wave5-apps--5c2-design-system--run3-productio
+n-hardening-scaffold-revamp/plan-eval.md`. Implementation may begin under the 
+locked 16-slice table.
+    
+    Two non-blocking advisory notes for the implementer:
+    - Fitness gates label in `plan.md` says "F-1..F-15" but the gate matrix 
+requires F-16..F-18 for all archetypes; these are functionally covered via 
+`arch:check` but evidence collection should include them at IMPL-EVAL. Label 
+should read "F-1..F-18."
+    - Archetype 6 spine/layer-2 abstract names are not exhaustively populated 
+for CLI slices 12-16 in the Design section. This is appropriate since scaffold 
+output contracts (not CLI internals) are in scope; relevant CLI internal 
+decisions should surface during slices and record in worklog/drift.
+    
+    Zag treatment is correct: LD-5 properly frames Slice 7 as evidence citation 
+against the prior working proof in PR #32, not a viability re-litigation. No 
+open blocker.
+    
+    Full per-box walkthrough:
+    
+    | Plan-Gate item | Result |
+    |---|---|
+    | Research present and current | PASS — re-baselined against `049711f`; 
+spot-verified findings against current head `b066935` |
+    | Decisions locked | PASS — LD-1..LD-6 with rationale |
+    | Open-decision sweep | PASS — 3 open decisions with defer/resolve-now 
+status; evaluator sweep found no hidden rework risk |
+    | Commit slices (< 30, gate + files each) | PASS — 16 ordered slices, each 
+with gate and files in worklog Design table |
+    | Risk register | PASS — 6 risks with mitigations |
+    | Gate set selected | PASS (minor F-16..F-18 label gap, functionally 
+covered) |
+    | Deferred scope explicit | PASS — Non-Scope + Hidden Scope + Deferred Scope
+sections populated |
+    | jsr-audit surface scan | PASS — 5 slow-type/surface risks mapped to 
+resolving slices |
+    
+    ## Changes
+    
+    - Created 
+`.llm/tmp/run/feat-package-quality-wave5-apps--5c2-design-system--run3-productio
+n-hardening-scaffold-revamp/plan-eval.md` with the PLAN-EVAL verdict.
+    
+    ## Validation
+    
+    - Spot-checked research finding #1: `packages/fresh-ui/deno.json` version 
+`0.0.1-alpha.0` confirmed at head `b066935`.
+    - Spot-checked research finding #2: `packages/fresh-ui/deno.gates.json` 
+still exists at head `b066935`.
+    - Independent open-decision sweep run against the plan — no hidden decisions
+forcing rework identified.
+    
+    ## Responses to Issue Comments
+    
+    User clarification handled: "Zag has already been proved working in a 
+previous commit and is mentioned in PR #32. Slice 7 should cite/validate the 
+existing proof in the ADR rather than re-litigating basic viability." — 
+incorporated into verdict; LD-5 and the open-decision sweep are correct. No 
+blocker treatment applied.
+    
+    ## Remaining Risks
+    
+    - Implementer should tighten "F-1..F-15" label to "F-1..F-18" before running
+IMPL-EVAL gates.
+    - C-2 lock policy still requires explicit user approval before Slice 2 
+mutates it.
+    - Doctrine archetype mismatch (fresh-ui as Arch 4 in handbook vs Arch 3 in 
+this run) is recorded as drift; no doctrine edit in scope.
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 588.33K • cache hit 83.37% •  reasoning 1.83K • ↓ output 10.42K 
+• $ 0.2840
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/27412819714-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# Summary
+ 2|
++3|## PR Comment
++4|
++5|**PASS** — Plan-Gate cleared for Run 3: production hardening + scaffold 
+revamp (run 
+`feat-package-quality-wave5-apps--5c2-design-system--run3-production-hardening-s
+caffold-revamp`).
++6|
++7|All 8 Plan-Gate checklist items satisfied. Verdict written to 
+`.llm/tmp/run/feat-package-quality-wave5-apps--5c2-design-system--run3-productio
+n-hardening-scaffold-revamp/plan-eval.md`. Implementation may begin under the 
+locked 16-slice table.
++8|
++9|Two non-blocking advisory notes for the implementer:
++10|- Fitness gates label in `plan.md` says "F-1..F-15" but the gate matrix 
+requires F-16..F-18 for all archetypes; these are functionally covered via 
+`arch:check` but evidence collection should include them at IMPL-EVAL. Label 
+should read "F-1..F-18."
++11|- Archetype 6 spine/layer-2 abstract names are not exhaustively populated 
+for CLI slices 12-16 in the Design section. This is appropriate since scaffold 
+output contracts (not CLI internals) are in scope; relevant CLI internal 
+decisions should surface during slices and record in worklog/drift.
++12|
++13|Zag treatment is correct: LD-5 properly frames Slice 7 as evidence citation 
+against the prior working proof in PR #32, not a viability re-litigation. No 
+open blocker.
++14|
++15|Full per-box walkthrough:
++16|
++17|| Plan-Gate item | Result |
++18||---|---|
++19|| Research present and current | PASS — re-baselined against `049711f`; 
+spot-verified findings against current head `b066935` |
++20|| Decisions locked | PASS — LD-1..LD-6 with rationale |
++21|| Open-decision sweep | PASS — 3 open decisions with defer/resolve-now 
+status; evaluator sweep found no hidden rework risk |
++22|| Commit slices (< 30, gate + files each) | PASS — 16 ordered slices, each 
+with gate and files in worklog Design table |
++23|| Risk register | PASS — 6 risks with mitigations |
++24|| Gate set selected | PASS (minor F-16..F-18 label gap, functionally 
+covered) |
++25|| Deferred scope explicit | PASS — Non-Scope + Hidden Scope + Deferred Scope
+sections populated |
++26|| jsr-audit surface scan | PASS — 5 slow-type/surface risks mapped to 
+resolving slices |
++27|
++28|## Changes
++29|
++30|- Created 
+`.llm/tmp/run/feat-package-quality-wave5-apps--5c2-design-system--run3-productio
+n-hardening-scaffold-revamp/plan-eval.md` with the PLAN-EVAL verdict.
++31|
++32|## Validation
++33|
++34|- Spot-checked research finding #1: `packages/fresh-ui/deno.json` version 
+`0.0.1-alpha.0` confirmed at head `b066935`.
++35|- Spot-checked research finding #2: `packages/fresh-ui/deno.gates.json` 
+still exists at head `b066935`.
++36|- Independent open-decision sweep run against the plan — no hidden decisions
+forcing rework identified.
++37|
++38|## Responses to Issue Comments
++39|
++40|User clarification handled: "Zag has already been proved working in a 
+previous commit and is mentioned in PR #32. Slice 7 should cite/validate the 
+existing proof in the ADR rather than re-litigating basic viability." — 
+incorporated into verdict; LD-5 and the open-decision sweep are correct. No 
+blocker treatment applied.
++41|
++42|## Remaining Risks
++43|
++44|- Implementer should tighten "F-1..F-15" label to "F-1..F-18" before running
+IMPL-EVAL gates.
++45|- C-2 lock policy still requires explicit user approval before Slice 2 
+mutates it.
++46|- Doctrine archetype mismatch (fresh-ui as Arch 4 in handbook vs Arch 3 in 
+this run) is recorded as drift; no doctrine edit in scope.
++47|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: PLAN-EVAL complete: PASS verdict
+
+Reasoning:
+The summary is complete and the plan evaluation has been finalized. I have 
+successfully:
+
+1. Read all the required harness documents in the correct order
+2. Evaluated the plan-eval.md file against the Plan-Gate criteria
+3. Created a comprehensive summary documenting the evaluation results
+4. Identified key findings: PASS verdict with two advisory notes about fitness 
+gates labeling (F-16..F-18 should be added to the label) and Archetype 6 design 
+checkpoint details
+
+The evaluation is complete. The plan has passed the Plan-Gate, and the summary 
+has been written for the PR comment workflow. The task is now concluded.
+
+Finish with message:
+PLAN-EVAL complete for Run 3: production hardening + scaffold revamp.
+
+**Verdict: PASS** — All 8 Plan-Gate checklist items satisfied. Implementation 
+may proceed under the locked 16-slice table.
+
+**Key findings:**
+- Zag treatment correctly frames Slice 7 as evidence citation against prior 
+proof in PR #32, not viability re-litigation
+- Fitness gates label should be tightened from "F-1..F-15" to "F-1..F-18" before
+IMPL-EVAL (F-16..F-18 functionally covered via arch:check)
+- Archetype 6 design checkpoint appropriately scoped for scaffold output 
+contracts rather than CLI internals
+
+**Deliverables:**
+- Plan-eval verdict written to 
+`.llm/tmp/run/feat-package-quality-wave5-apps--5c2-design-system--run3-productio
+n-hardening-scaffold-revamp/plan-eval.md`
+- Summary written to 
+`/home/runner/work/_temp/openhands/27412819714-1/summary.md` for PR comment 
+workflow
+
+Research findings spot-checked against current head `b066935` remain valid. No 
+open decisions identified that would force rework.
+
+Tokens: ↑ input 637.7K • cache hit 84.18% •  reasoning 1.96K • ↓ output 10.87K •
+$ 0.3010
+

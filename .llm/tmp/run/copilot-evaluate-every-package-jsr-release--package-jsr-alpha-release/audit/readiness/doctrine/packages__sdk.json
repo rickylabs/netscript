@@ -1,0 +1,34 @@
+{
+  "root": "packages/sdk",
+  "pkg": "sdk",
+  "totals": {
+    "fail": 0,
+    "warn": 3,
+    "info": 1
+  },
+  "findings": [
+    {
+      "ref": "AP-7/F-DOCT-4",
+      "level": "WARN",
+      "message": "forbidden folder name 'interfaces' — split into domain/, application/, or adapters/ aligned to a real concern",
+      "path": "interfaces"
+    },
+    {
+      "ref": "A8/AP-9",
+      "level": "WARN",
+      "message": "file is 643 lines (cap 500) — split into smaller single-reason files",
+      "path": "discovery/service-discovery.ts"
+    },
+    {
+      "ref": "F-DOCT-5",
+      "level": "WARN",
+      "message": "directory has 15 immediate children; doctrine cap is 12",
+      "path": ""
+    },
+    {
+      "ref": "A9",
+      "level": "INFO",
+      "message": "docs/architecture.md missing — required when public symbols > 25"
+    }
+  ]
+}

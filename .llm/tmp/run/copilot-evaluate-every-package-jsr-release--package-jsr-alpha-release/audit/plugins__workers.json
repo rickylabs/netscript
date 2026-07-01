@@ -1,0 +1,156 @@
+{
+  "pkg": {
+    "name": "@netscript/plugin-workers",
+    "version": "0.1.0",
+    "description": "NetScript plugin for background job scheduling, task execution, and worker API endpoints.",
+    "root": "plugins/workers"
+  },
+  "exports": {
+    ".": "./mod.ts",
+    "./contracts": "./contracts/v1/mod.ts",
+    "./services": "./services/src/main.ts",
+    "./streams": "./streams/mod.ts",
+    "./streams/server": "./streams/server.ts"
+  },
+  "files": {
+    "total": 21,
+    "loc": 4366,
+    "entries": [
+      {
+        "path": "mod.ts",
+        "bytes": 13041
+      },
+      {
+        "path": "contracts/v1/mod.ts",
+        "bytes": 2768
+      },
+      {
+        "path": "services/src/main.ts",
+        "bytes": 3343
+      },
+      {
+        "path": "streams/mod.ts",
+        "bytes": 334
+      },
+      {
+        "path": "streams/server.ts",
+        "bytes": 332
+      }
+    ]
+  },
+  "docs": {
+    "hasReadme": true,
+    "readmeLines": 25,
+    "hasDocsFolder": false,
+    "moduleTagOnEntries": {
+      ".": true,
+      "./contracts": true,
+      "./services": false,
+      "./streams": true,
+      "./streams/server": true
+    },
+    "descriptionLen": 89
+  },
+  "surface": {
+    ".": {
+      "exported": [
+        "Scheduler",
+        "Worker",
+        "getScheduler",
+        "getWorker",
+        "resetScheduler",
+        "resetWorker"
+      ],
+      "rawCount": 7
+    },
+    "./contracts": {
+      "exported": [
+        "ExecutionRecordSchema",
+        "ExecutionResponseSchema",
+        "ExecutionStatusSchema",
+        "JobCompletionEventSchema",
+        "JobDefinitionResponseSchema",
+        "JobDefinitionSchema",
+        "JobEditableSchema",
+        "JobExecutionTypeSchema",
+        "JobFiltersSchema",
+        "JobKvKeys",
+        "JobMessageSchema",
+        "JobResponseSchema",
+        "JobSourceSchema",
+        "JobSystemSchema",
+        "JobTriggerEventSchema",
+        "JobTriggerInputSchema",
+        "JobUpdateInputSchema",
+        "JobUpdateWithIdSchema",
+        "PluginJobContributionSchema",
+        "RegisterJobInputSchema",
+        "RegisterTaskInputSchema",
+        "SSEEventSchema",
+        "SSEEventTypes",
+        "TaskDefinitionResponseSchema",
+        "TaskDefinitionSchema",
+        "TaskEditableSchema",
+        "TaskExecutionOptionsSchema",
+        "TaskFiltersSchema",
+        "TaskMessageSchema",
+        "TaskPermissionsSchema",
+        "TaskResponseSchema",
+        "TaskResultSchema",
+        "TaskSourceSchema",
+        "TaskStatusSchema",
+        "TaskSystemSchema",
+        "TaskTypeSchema",
+        "TriggerTypeSchema",
+        "workersContractV1"
+      ],
+      "rawCount": 38
+    },
+    "./services": {
+      "exported": [],
+      "rawCount": 0
+    },
+    "./streams": {
+      "exported": [
+        "WorkerExecutionSchema",
+        "WorkerJobSchema",
+        "createWorkersStreamDB",
+        "workersStreamSchema"
+      ],
+      "rawCount": 4
+    },
+    "./streams/server": {
+      "exported": [
+        "WorkerExecutionSchema",
+        "WorkerJobSchema",
+        "getWorkersStreamProducer",
+        "publishJobToStream",
+        "startWorkersStreamMirror",
+        "workersStreamSchema"
+      ],
+      "rawCount": 6
+    }
+  },
+  "tests": {
+    "fileCount": 0,
+    "files": []
+  },
+  "gates": [
+    {
+      "gate": "F-JSR-2 module-tag",
+      "level": "FAIL",
+      "message": "export ./services (./services/src/main.ts) lacks @module JSDoc tag",
+      "path": "./services/src/main.ts"
+    },
+    {
+      "gate": "F-JSR-3 readme",
+      "level": "WARN",
+      "message": "README.md is only 25 lines; enterprise bar is ≥150 lines"
+    }
+  ],
+  "slowTypes": {
+    "ok": true,
+    "warnings": [],
+    "rawTail": "skipped"
+  }
+}
