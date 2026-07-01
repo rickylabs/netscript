@@ -50,8 +50,8 @@ export type ContractSchemaOutput<TSchema> = TSchema extends {
  * contract object without exposing private upstream helper types.
  */
 export interface ContractProcedureMetadata<
-  TInputSchema extends ContractSchema | undefined = ContractSchema | undefined,
-  TOutputSchema extends ContractSchema | undefined = ContractSchema | undefined,
+  TInputSchema = unknown,
+  TOutputSchema = unknown,
 > {
   /** Input validation schema for the procedure. */
   readonly inputSchema?: TInputSchema;
@@ -63,8 +63,8 @@ export interface ContractProcedureMetadata<
  * Minimal structural representation of an oRPC contract procedure.
  */
 export interface ContractProcedureLike<
-  TInputSchema extends ContractSchema | undefined = ContractSchema | undefined,
-  TOutputSchema extends ContractSchema | undefined = ContractSchema | undefined,
+  TInputSchema = unknown,
+  TOutputSchema = unknown,
 > {
   /** Public oRPC metadata container. */
   readonly '~orpc': ContractProcedureMetadata<TInputSchema, TOutputSchema>;
@@ -88,8 +88,8 @@ export type ContractProcedureNames<TContract> =
  * Input payload for a contract procedure node.
  */
 export type ProcedureInputFromNode<TNode> = TNode extends ContractProcedureLike<
-  infer TInputSchema extends ContractSchema | undefined,
-  ContractSchema | undefined
+  infer TInputSchema,
+  unknown
 > ? ContractSchemaInput<TInputSchema>
   : never;
 
@@ -97,8 +97,8 @@ export type ProcedureInputFromNode<TNode> = TNode extends ContractProcedureLike<
  * Output payload for a contract procedure node.
  */
 export type ProcedureOutputFromNode<TNode> = TNode extends ContractProcedureLike<
-  ContractSchema | undefined,
-  infer TOutputSchema extends ContractSchema | undefined
+  unknown,
+  infer TOutputSchema
 > ? ContractSchemaOutput<TOutputSchema>
   : never;
 
