@@ -61,7 +61,7 @@ export default async function createWorkersService(
     context: () => ({ workers: runtime }),
   }).serve();
 
-  queueMicrotask(async () => {
+  queueMicrotask(() => {
     try {
       runtime.executionState.setMutationHook(createStreamMutationHook());
 
