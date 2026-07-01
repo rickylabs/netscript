@@ -34,6 +34,7 @@ export async function writeNormalizedAppFiles(
     appName: options.appName,
     appPort: String(appPort),
     serviceName: plan.service?.name ?? SCAFFOLD_DEFAULTS.SERVICE_NAME,
+    modelName: options.modelName,
   };
   const {
     appAppTemplate,
