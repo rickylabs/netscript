@@ -1,81 +1,79 @@
 /**
- * {{serviceName | pascalCase}} router — seeded example handlers for v1.
- *
- * Step 5 intentionally returns stable in-memory records so the generated
- * frontend can prove the FE → service contract before the database scaffold
- * lands in later rollout steps.
+ * {{serviceName | pascalCase}} router — Prisma-backed CRUD handlers for v1.
  */
 
-import { v1, type {{serviceName | pascalCase}}ListItemV1 } from '@{{projectName}}/contracts';
+import type { PrismaClient } from '@database';
+import { v1 } from '@{{projectName}}/contracts';
 
-const NEXT_STATUS_BY_STATE: Record<
-  {{serviceName | pascalCase}}ListItemV1['status'],
-  {{serviceName | pascalCase}}ListItemV1['status']
-> = {
-  draft: 'active',
-  active: 'archived',
-  archived: 'draft',
-};
+type {{modelName}}Delegate = PrismaClient['{{modelName | camelCase}}'];
+type {{modelName}}FindManyArgs = NonNullable<Parameters<{{modelName}}Delegate['findMany']>[0]>;
 
-let seededRecords: {{serviceName | pascalCase}}ListItemV1[] = [
-  {
-    id: 1,
-    name: 'Launch checklist',
-    summary: 'Tracks the first release milestones for the scaffolded service.',
-    status: 'active',
-    createdAt: '2026-04-21T08:00:00.000Z',
-  },
-  {
-    id: 2,
-    name: 'Integration handshake',
-    summary: 'Verifies the frontend route can hydrate from the generated service.',
-    status: 'draft',
-    createdAt: '2026-04-20T12:30:00.000Z',
-  },
-  {
-    id: 3,
-    name: 'Telemetry follow-up',
-    summary: 'Reserved for the later rollout step that wires end-to-end tracing.',
-    status: 'archived',
-    createdAt: '2026-04-19T15:45:00.000Z',
-  },
-];
+const SORTABLE_FIELDS = new Set(['id', 'name', 'createdAt', 'updatedAt']);
+
+function {{modelName | camelCase}}Delegate(context: { readonly db?: unknown }): {{modelName}}Delegate {
+  const db = context.db as PrismaClient | undefined;
+  if (!db?.{{modelName | camelCase}}) {
+    throw new Error('{{modelName}} database delegate is not available on context.db.');
+  }
+  return db.{{modelName | camelCase}};
+}
+
+function orderBy(input: { readonly sortBy?: string; readonly sortOrder: 'asc' | 'desc' }) {
+  const field = input.sortBy && SORTABLE_FIELDS.has(input.sortBy) ? input.sortBy : 'id';
+  return { [field]: input.sortOrder };
+}
 
 export const {{serviceName | pascalCase}}V1 = {
-  list: v1.{{serviceName | camelCase}}.list.handler(async ({ input }) => {
-    const search = input.search?.trim().toLowerCase();
-    const filtered = search
-      ? seededRecords.filter((record) =>
-        record.name.toLowerCase().includes(search)
-      )
-      : [...seededRecords];
-    const items = filtered.slice(input.offset, input.offset + input.limit);
+  list: v1.{{serviceName | camelCase}}.list!.handler(async ({ input, context }) => {
+    const delegate = {{modelName | camelCase}}Delegate(context);
+    const page = input.page;
+    const limit = input.limit;
+    const skip = (page - 1) * limit;
+    const findManyArgs = {
+      skip,
+      take: limit,
+      orderBy: orderBy(input),
+    } satisfies {{modelName}}FindManyArgs;
+
+    const [data, total] = await Promise.all([
+      delegate.findMany(findManyArgs),
+      delegate.count(),
+    ]);
+    const totalPages = Math.ceil(total / limit);
 
     return {
-      items,
-      total: filtered.length,
-      limit: input.limit,
-      offset: input.offset,
-      hasMore: input.offset + input.limit < filtered.length,
+      data,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+      },
     };
   }),
-  updateStatus: v1.{{serviceName | camelCase}}.updateStatus.handler(async ({ input }) => {
-    const record = seededRecords.find((entry) => entry.id === input.id);
-
+  getById: v1.{{serviceName | camelCase}}.getById!.handler(async ({ input, context }) => {
+    const record = await {{modelName | camelCase}}Delegate(context).findUnique({
+      where: { id: input.id },
+    });
     if (!record) {
-      throw new Error(`{{serviceName}} record ${input.id} not found`);
+      throw new Error(`{{modelName}} ${input.id} not found`);
     }
-
-    const nextStatus = input.status;
-    record.status = nextStatus;
-    record.summary = nextStatus === 'archived'
-      ? 'Archived after the optimistic showcase mutation completed.'
-      : nextStatus === 'active'
-      ? 'Re-activated through the scaffolded optimistic update flow.'
-      : 'Moved back into draft to demonstrate typed mutation rollbacks.';
-
-    return {
-      ...record,
-    };
+    return record;
   }),
+  create: v1.{{serviceName | camelCase}}.create!.handler(async ({ input, context }) =>
+    await {{modelName | camelCase}}Delegate(context).create({ data: input })
+  ),
+  update: v1.{{serviceName | camelCase}}.update!.handler(async ({ input, context }) =>
+    await {{modelName | camelCase}}Delegate(context).update({
+      where: { id: input.id },
+      data: input.data,
+    })
+  ),
+  delete: v1.{{serviceName | camelCase}}.delete!.handler(async ({ input, context }) =>
+    await {{modelName | camelCase}}Delegate(context).delete({
+      where: { id: input.id },
+    })
+  ),
 };

@@ -5,16 +5,12 @@
  */
 
 import { defineService } from '@netscript/service';
-import { db } from '@database';
 import { router } from './router.ts';
-
-const database = await db.getClient();
 
 await defineService(router, {
   name: '{{serviceName}}',
   version: '1.0.0',
   port: parseInt(Deno.env.get('PORT') || '{{servicePort}}'),
-  db: database,
   openapi: {
     title: '{{serviceName | pascalCase}} API',
     description: '{{serviceName}} service',

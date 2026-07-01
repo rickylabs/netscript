@@ -102,6 +102,8 @@ export async function scaffoldServices(
     importMode: options.importMode,
     localBase: options.localBase ? adjustLocalBase(options.localBase, 2) : undefined,
     packagesAsWorkspaceMembers: context.packagesAsWorkspaceMembers(options),
+    modelName: options.modelName,
+    hasDatabase: isDbEngine(options.dbEngine),
     force: options.force,
   });
 

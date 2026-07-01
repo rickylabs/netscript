@@ -21,6 +21,8 @@ export interface ServiceDenoJsonOptions {
   readonly importMode: PackageSourceMode;
   /** Depth-adjusted local base path (when `importMode` is `'local'`). */
   readonly localBase?: string;
+  /** Whether this service imports the scaffolded database facade. */
+  readonly hasDatabase?: boolean;
   /**
    * Retained for backward compatibility with older scaffold callers.
    * Resource deno.json files always declare their direct imports now.
@@ -34,6 +36,7 @@ export interface ServiceDenoJsonOptions {
  * Resolves the service's direct imports:
  * - `@<project>/contracts`
  * - `@netscript/service`
+ * - `@database` when the service is database-backed
  *
  * `@netscript/telemetry` is intentionally omitted here. The scaffolded service
  * imports only `defineService`, and that preset owns telemetry/tracing
@@ -63,6 +66,7 @@ export function generateServiceDenoJson(options: ServiceDenoJsonOptions): string
     },
     imports: {
       [`@${options.projectName}/contracts`]: contractsImport,
+      ...(options.hasDatabase ? { '@database': '../../database/mod.ts' } : {}),
       [SCAFFOLD_PACKAGES.NETSCRIPT_SERVICE]: resolvedImports[SCAFFOLD_PACKAGES.NETSCRIPT_SERVICE],
     },
     compilerOptions: {
