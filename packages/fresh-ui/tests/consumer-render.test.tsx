@@ -11,6 +11,7 @@
 
 import { assert } from '@std/assert';
 import type { VNode } from 'preact';
+import { DataGrid } from '../mod.ts';
 import {
   Accordion,
   Combobox,
@@ -128,9 +129,44 @@ const primitives: VNode = (
   </Show>
 );
 
+type SessionRow = {
+  name: string;
+  tokens: number;
+  status: 'active' | 'idle';
+};
+
+const dataGrid: VNode = (
+  <DataGrid<SessionRow>
+    label='Sessions'
+    columns={[
+      { key: 'name', header: 'Session', cell: 'strong' },
+      { key: 'tokens', header: 'Tokens', width: '8rem', cell: 'num' },
+      { key: 'status', header: 'Status', render: (row) => <span>{row.status}</span> },
+    ]}
+    rows={[
+      {
+        id: 'session-1',
+        data: { name: 'VS3', tokens: 1280, status: 'active' },
+        href: '/sessions/session-1',
+      },
+    ]}
+  />
+);
+
 Deno.test('runtime namespaces construct consumer-shaped JSX trees', () => {
   for (
-    const tree of [accordion, combobox, dialog, drawer, popover, sheet, tabs, tooltip, primitives]
+    const tree of [
+      accordion,
+      combobox,
+      dataGrid,
+      dialog,
+      drawer,
+      popover,
+      sheet,
+      tabs,
+      tooltip,
+      primitives,
+    ]
   ) {
     assert(tree && typeof tree === 'object' && 'type' in tree);
   }
