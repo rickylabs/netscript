@@ -29,8 +29,17 @@ import {
   baseContract,
   type BaseContractProcedure,
 } from '../src/application/contract-primitives.ts';
-import type { ContractObjectSchema, ContractSchema } from '../src/domain/schema-types.ts';
-import { PaginationInputSchema, PaginationOutputSchema } from '../schemas/pagination.ts';
+import type {
+  ContractObjectSchema,
+  ContractSchema,
+  ContractSchemaOutput,
+} from '../src/domain/schema-types.ts';
+import {
+  createPaginatedOutput,
+  type PaginatedResult,
+  type PaginationInput,
+  PaginationInputSchema,
+} from '../schemas/pagination.ts';
 
 // ============================================================================
 // CRUD CONTRACT OPTIONS
@@ -43,6 +52,8 @@ export interface CrudContractOptions<
   TEntity extends ContractSchema<unknown>,
   TCreate extends ContractSchema<unknown>,
   TUpdate extends ContractSchema<unknown>,
+  TId extends ContractSchema<unknown> = ContractSchema<number>,
+  TFilter extends ContractObjectSchema<unknown> | undefined = undefined,
 > {
   /** Resource name (used in route paths, e.g., 'users' → /users) */
   resource: string;
@@ -53,9 +64,9 @@ export interface CrudContractOptions<
   /** Zod schema for updating entities (should be partial) */
   updateSchema: TUpdate;
   /** ID type schema (default: z.coerce.number().int().positive()) */
-  idSchema?: ContractSchema<unknown>;
+  idSchema?: TId;
   /** Additional filters for list endpoint */
-  filterSchema?: ContractObjectSchema<unknown>;
+  filterSchema?: TFilter;
   /** Disable specific operations */
   disable?: {
     list?: boolean;
@@ -69,17 +80,55 @@ export interface CrudContractOptions<
 /**
  * Generated CRUD contract type.
  */
-export type CrudContractOperation = BaseContractProcedure;
+export type CrudContractOperation<
+  TInputSchema extends ContractSchema<unknown> | undefined = ContractSchema<unknown> | undefined,
+  TOutputSchema extends ContractSchema<unknown> | undefined = ContractSchema<unknown> | undefined,
+> =
+  & BaseContractProcedure
+  & Readonly<{
+    /** Public oRPC schema metadata used by downstream client type extraction. */
+    readonly '~orpc': {
+      readonly inputSchema?: TInputSchema;
+      readonly outputSchema?: TOutputSchema;
+    };
+  }>;
+
+type CrudIdInput<TId extends ContractSchema<unknown>> = ContractObjectSchema<
+  Readonly<{ id: ContractSchemaOutput<TId> }>
+>;
+
+type CrudListInput<TFilter extends ContractObjectSchema<unknown> | undefined> = TFilter extends
+  ContractObjectSchema<infer TFilterOutput> ? ContractObjectSchema<
+    PaginationInput & TFilterOutput
+  >
+  : ContractObjectSchema<PaginationInput>;
+
+type CrudListOutput<TEntity extends ContractSchema<unknown>> = ContractObjectSchema<
+  PaginatedResult<ContractSchemaOutput<TEntity>>
+>;
+
+type CrudUpdateInput<
+  TId extends ContractSchema<unknown>,
+  TUpdate extends ContractSchema<unknown>,
+> = ContractObjectSchema<
+  Readonly<{ id: ContractSchemaOutput<TId>; data: ContractSchemaOutput<TUpdate> }>
+>;
 
 /**
  * Generated CRUD contract shape.
  */
-export type CrudContract = Readonly<{
-  list: CrudContractOperation;
-  getById: CrudContractOperation;
-  create: CrudContractOperation;
-  update: CrudContractOperation;
-  delete: CrudContractOperation;
+export type CrudContract<
+  TEntity extends ContractSchema<unknown> = ContractSchema<unknown>,
+  TCreate extends ContractSchema<unknown> = ContractSchema<unknown>,
+  TUpdate extends ContractSchema<unknown> = ContractSchema<unknown>,
+  TId extends ContractSchema<unknown> = ContractSchema<number>,
+  TFilter extends ContractObjectSchema<unknown> | undefined = undefined,
+> = Readonly<{
+  list: CrudContractOperation<CrudListInput<TFilter>, CrudListOutput<TEntity>>;
+  getById: CrudContractOperation<CrudIdInput<TId>, TEntity>;
+  create: CrudContractOperation<TCreate, TEntity>;
+  update: CrudContractOperation<CrudUpdateInput<TId, TUpdate>, TEntity>;
+  delete: CrudContractOperation<CrudIdInput<TId>, TEntity>;
 }>;
 
 /** Generated CRUD contract shape when selected operations are disabled. */
@@ -130,30 +179,40 @@ export function createCrudContract<
   TEntity extends ContractSchema<unknown>,
   TCreate extends ContractSchema<unknown>,
   TUpdate extends ContractSchema<unknown>,
->(options: CrudContractOptions<TEntity, TCreate, TUpdate>): CrudContract {
+  TId extends ContractSchema<unknown> = ContractSchema<number>,
+  TFilter extends ContractObjectSchema<unknown> | undefined = undefined,
+>(
+  options: CrudContractOptions<TEntity, TCreate, TUpdate, TId, TFilter>,
+): CrudContract<TEntity, TCreate, TUpdate, TId, TFilter> {
   const {
     resource,
     entitySchema,
     createSchema,
     updateSchema,
-    idSchema = z.coerce.number().int().positive(),
+    idSchema = z.coerce.number().int().positive() as unknown as TId,
     filterSchema,
     disable = {},
   } = options;
 
   // Build list input schema (pagination + optional filters)
-  const listInputSchema = filterSchema
-    ? PaginationInputSchema.merge(filterSchema as unknown as z.ZodObject)
-    : PaginationInputSchema;
+  const listInputSchema = (
+    filterSchema
+      ? PaginationInputSchema.merge(filterSchema as unknown as z.ZodObject)
+      : PaginationInputSchema
+  ) as CrudListInput<TFilter>;
 
   // Build list output schema
-  const listOutputSchema = z.object({
-    data: z.array(entitySchema as unknown as z.ZodTypeAny),
-    pagination: PaginationOutputSchema as unknown as z.ZodTypeAny,
-  });
+  const listOutputSchema = createPaginatedOutput(
+    entitySchema,
+  ) as CrudListOutput<TEntity>;
 
   // ID input schema
-  const idInputSchema = z.object({ id: idSchema as unknown as z.ZodTypeAny });
+  const idInputSchema = z.object({
+    id: idSchema as unknown as z.ZodTypeAny,
+  }) as unknown as CrudIdInput<TId>;
+  const updateInputSchema = idInputSchema.merge(
+    z.object({ data: updateSchema as unknown as z.ZodTypeAny }),
+  ) as CrudUpdateInput<TId, TUpdate>;
 
   // Build contract object
   const contract: Record<string, CrudContractOperation> = {};
@@ -186,7 +245,7 @@ export function createCrudContract<
   if (!disable.update) {
     contract.update = baseContract
       .route({ method: 'PATCH', path: `/${resource}/{id}` })
-      .input(idInputSchema.merge(z.object({ data: updateSchema as unknown as z.ZodTypeAny })))
+      .input(updateInputSchema)
       .output(entitySchema);
   }
 
@@ -198,7 +257,7 @@ export function createCrudContract<
       .output(entitySchema);
   }
 
-  return contract as CrudContract;
+  return contract as CrudContract<TEntity, TCreate, TUpdate, TId, TFilter>;
 }
 
 // ============================================================================

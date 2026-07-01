@@ -42,6 +42,7 @@ export type ContractSchemaOutput<TSchema> = TSchema extends {
     };
   };
 } ? TOutput
+  : TSchema extends { parse(value: unknown): infer TOutput } ? TOutput
   : unknown;
 
 /**
