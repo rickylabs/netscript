@@ -71,6 +71,12 @@ jobs:
           fi
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
+      - name: Wait for JSR propagation
+        if: github.event_name == 'workflow_run'
+        run: |
+          echo "sleeping 120s so just-published @netscript/cli@${{ steps.version.outputs.version }} and deps become resolvable on JSR before install."
+          sleep 120
+
       - name: Install published CLI from JSR
         run: |
           echo "$HOME/.deno/bin" >> "$GITHUB_PATH"
