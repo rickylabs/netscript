@@ -1,0 +1,17 @@
+{
+  "run_id": "28547342778",
+  "run_attempt": "1",
+  "run_url": "https://github.com/rickylabs/netscript/actions/runs/28547342778",
+  "bootstrap_outcome": "success",
+  "agent_outcome": "failure",
+  "verdict": "agent-failed",
+  "summary_source": "none",
+  "model": "openrouter/qwen/qwen3.7-max",
+  "provider": "OPENROUTER",
+  "output_mode": "pr-comment",
+  "issue_number": "208",
+  "checkout_repo": "rickylabs/netscript",
+  "checkout_ref": "feat/scaffold-crud-surface",
+  "summary_path": "/home/runner/work/_temp/openhands/28547342778-1/summary.md",
+  "trace_dir": ".llm/tmp/run/openhands/pr-208/run-28547342778-1"
+}
