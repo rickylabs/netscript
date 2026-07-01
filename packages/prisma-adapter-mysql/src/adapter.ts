@@ -514,9 +514,9 @@ export interface PrismaMySqlTransactionAdapter {
   /** Prisma transaction options associated with this transaction. */
   readonly options: TransactionOptions;
   /** Execute a raw SQL query. */
-  queryRaw(query: PrismaMySqlQuery): Promise<PrismaMySqlResultSet>;
+  queryRaw(query: SqlQuery): Promise<SqlResultSet>;
   /** Execute a raw SQL statement and return affected rows. */
-  executeRaw(query: PrismaMySqlQuery): Promise<number>;
+  executeRaw(query: SqlQuery): Promise<number>;
   /** Commit the transaction. */
   commit(): Promise<void>;
   /** Roll back the transaction. */
@@ -532,16 +532,16 @@ export interface PrismaMySqlConnectedAdapter {
   /** Adapter package name. */
   readonly adapterName: string;
   /** Execute a raw SQL query. */
-  queryRaw(query: PrismaMySqlQuery): Promise<PrismaMySqlResultSet>;
+  queryRaw(query: SqlQuery): Promise<SqlResultSet>;
   /** Execute a raw SQL statement and return affected rows. */
-  executeRaw(query: PrismaMySqlQuery): Promise<number>;
+  executeRaw(query: SqlQuery): Promise<number>;
   /** Execute a SQL script. */
   executeScript(script: string): Promise<void>;
   /** Return connection details used by Prisma. */
   getConnectionInfo(): PrismaMySqlConnectionInfo;
   /** Start a transaction. */
   startTransaction(
-    isolationLevel?: PrismaMySqlIsolationLevel,
+    isolationLevel?: IsolationLevel,
   ): Promise<PrismaMySqlTransactionAdapter>;
   /** Close the underlying driver resources. */
   dispose(): Promise<void>;
