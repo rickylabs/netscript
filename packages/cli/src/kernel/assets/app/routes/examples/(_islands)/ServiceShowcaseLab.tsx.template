@@ -35,13 +35,18 @@ function ServiceShowcaseLabInner(props: Props) {
     hydratedRef.current = true;
   }
 
+  const listOptions = exampleServiceQueries.list.queryOptions(props.input) as {
+    readonly queryKey: readonly unknown[];
+    readonly queryFn: () => Promise<ServiceListData> | ServiceListData;
+  };
   const {
     data,
     status,
     isLoading,
     refetch,
   } = useQuery<ServiceListData>({
-    ...exampleServiceQueries.list.queryOptions(props.input),
+    queryKey: listOptions.queryKey,
+    queryFn: listOptions.queryFn,
     initialData: props.initialList,
     staleTime: 15_000,
   });
@@ -50,8 +55,13 @@ function ServiceShowcaseLabInner(props: Props) {
     void refetch();
   };
 
+  const createOptions = exampleServiceQueries.create.mutationOptions() as {
+    readonly mutationKey?: readonly unknown[];
+    readonly mutationFn: (input: CreateInput) => Promise<ServiceRecord> | ServiceRecord;
+  };
   const createMutation = useMutation<ServiceRecord, unknown, CreateInput>({
-    ...exampleServiceQueries.create.mutationOptions(),
+    mutationKey: createOptions.mutationKey,
+    mutationFn: createOptions.mutationFn,
     onSuccess: (record) => {
       statusMessage.value = `Server created ${record.name}.`;
       refreshList();
@@ -61,8 +71,13 @@ function ServiceShowcaseLabInner(props: Props) {
     },
   });
 
+  const updateOptions = exampleServiceQueries.update.mutationOptions() as {
+    readonly mutationKey?: readonly unknown[];
+    readonly mutationFn: (input: UpdateInput) => Promise<ServiceRecord> | ServiceRecord;
+  };
   const renameMutation = useMutation<ServiceRecord, unknown, UpdateInput>({
-    ...exampleServiceQueries.update.mutationOptions(),
+    mutationKey: updateOptions.mutationKey,
+    mutationFn: updateOptions.mutationFn,
     onSuccess: (record) => {
       statusMessage.value = `Server confirmed ${record.name}.`;
       refreshList();
@@ -72,8 +87,13 @@ function ServiceShowcaseLabInner(props: Props) {
     },
   });
 
+  const deleteOptions = exampleServiceQueries.delete.mutationOptions() as {
+    readonly mutationKey?: readonly unknown[];
+    readonly mutationFn: (input: DeleteInput) => Promise<ServiceRecord> | ServiceRecord;
+  };
   const deleteMutation = useMutation<ServiceRecord, unknown, DeleteInput>({
-    ...exampleServiceQueries.delete.mutationOptions(),
+    mutationKey: deleteOptions.mutationKey,
+    mutationFn: deleteOptions.mutationFn,
     onSuccess: (record) => {
       statusMessage.value = `Server deleted ${record.name}.`;
       refreshList();
