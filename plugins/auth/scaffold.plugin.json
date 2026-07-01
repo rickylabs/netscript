@@ -25,7 +25,7 @@
     "displayName": "Auth",
     "category": "plugin",
     "portRangeKey": "PLUGIN_API",
-    "defaultPermissions": ["--unstable-kv", "--allow-net", "--allow-env", "--allow-read"],
+    "defaultPermissions": ["--unstable-kv", "--allow-net", "--allow-env", "--allow-read", "--allow-sys"],
     "watchFlag": "--watch",
     "defaultEntrypoint": "services/src/main.ts",
     "defaultServiceEntrypoint": "services/src/main.ts",
@@ -48,6 +48,6 @@
     "backgroundPort": 8094,
     "requiresDb": true,
     "requiresKv": true,
-    "permissions": ["--unstable-kv", "--allow-net", "--allow-env", "--allow-read"]
+    "permissions": ["--unstable-kv", "--allow-net", "--allow-env", "--allow-read", "--allow-sys"]
   }
 }
