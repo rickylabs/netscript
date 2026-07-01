@@ -1791,3 +1791,36 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   exited 0 on 2026-06-30 with `Summary: passed=48 failed=0`. The run used package-launched
   service/background plugin resources, passed every service/background wait gate, accepted the
   generic trigger webhook, listed trigger events, and validated the cross-service OTEL trace.
+
+## packages/cli — DB-GENERATE-ASPIRE-COUPLING
+
+- **ID:** `DB-GENERATE-ASPIRE-COUPLING`
+- **Reason:** `netscript db generate` is pure, DB-less codegen (Prisma client + `@database/zod`
+  schemas + the `schema/.generated/zod/crud.ts` barrel) but is **Aspire-coupled**: the shared
+  `DbOperationRunner.executeDetached`
+  (`packages/cli/src/kernel/adapters/database/operation-runner.ts`) always runs
+  `aspire start --apphost apphost.mts` and polls `aspire describe` before executing any db
+  operation. So `db generate` cannot run where the aspire CLI / .NET is absent (deno-only CI,
+  containerless dev), failing fast (~243ms, `aspire` command-not-found) even though no database,
+  docker, or AppHost is required for codegen.
+- **Evidence:** PR #208 `scaffold-static (deno-only)` CI failed at the `database.generate` e2e gate
+  in 243ms while passing on aspire-equipped boxes and in `scaffold-runtime`. The scaffolded project
+  already ships a standalone Aspire-less path — the db-workspace `deno task db:generate`
+  (`prisma generate --generator client` + `scripts/generate-zod.ts` + `scripts/fix-zod-imports.ts`
+  + `patch-prisma-client.ts`), which C14 wired into the static suites via the new `database.codegen`
+  gate. That harness workaround unblocks CI but does not remove the coupling from the CLI command.
+- **Why deferred:** Decoupling `db generate` from Aspire is a cross-package refactor of the CLI
+  database kernel (`DbOperationRunner` / operation classification): pure-codegen operations must run
+  their prisma/zod pipeline directly (as the scaffolded `db:generate` task already does) without
+  booting the AppHost, while connect-requiring operations (`init`/`migrate`/`seed`) keep the Aspire
+  path. That is a distinct DX slice from the #153 scaffold-surface work and out of scope for PR #208.
+- **Owner:** CLI database kernel maintainers.
+- **Target:** Follow-up DX slice (aspire-less `db generate`).
+- **Linked evidence:** `.llm/tmp/run/feat-scaffold-crud-surface--impl/drift.md` (2026-07-01
+  scaffold-static root-cause), PR #208 C14 (`fee58a6b`).
+- **Created:** 2026-07-01.
+- **Status:** open — worked around in the e2e harness (C14 `database.codegen` gate); the CLI command
+  itself remains Aspire-coupled.
+- **Gate:** Close when `netscript db generate` completes DB-less codegen in a deno-only environment
+  (no aspire CLI / .NET / docker) and the static suites can invoke the CLI command directly instead
+  of the standalone `deno task db:generate` workaround.

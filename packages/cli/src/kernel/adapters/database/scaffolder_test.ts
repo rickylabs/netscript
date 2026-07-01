@@ -28,6 +28,7 @@ describe('DatabaseScaffolder', () => {
       projectName: 'alpha-app',
       targetPath: '/project',
       engine: 'mysql',
+      modelName: 'Product',
       importMode: 'jsr',
     });
 
@@ -46,6 +47,7 @@ describe('DatabaseScaffolder', () => {
     const schemaZodConfig = await fs.readFile(
       '/project/database/mysql/schema/zod-generator.config.json',
     );
+    const schema = await fs.readFile('/project/database/mysql/schema/schema.prisma');
 
     assertStringIncludes(
       generateZod,
@@ -53,7 +55,7 @@ describe('DatabaseScaffolder', () => {
     );
     assertStringIncludes(
       generateZod,
-      'await generateZodSchemasCli({ zodOutputDir: ZOD_OUTPUT_DIR });',
+      'await runWriteCrudZodBarrel(ZOD_OUTPUT_DIR, CRUD_MODEL_NAME);',
     );
 
     assertStringIncludes(
@@ -63,6 +65,10 @@ describe('DatabaseScaffolder', () => {
     assertStringIncludes(
       fixZodImports,
       'await runFixZodImports(ZOD_OUTPUT_DIR, { fixDecimalImports: true });',
+    );
+    assertStringIncludes(
+      fixZodImports,
+      'await runWriteCrudZodBarrel(ZOD_OUTPUT_DIR, CRUD_MODEL_NAME);',
     );
     assertStringIncludes(
       fixZodImports,
@@ -90,6 +96,8 @@ describe('DatabaseScaffolder', () => {
 
     assertStringIncludes(rootZodConfig, '"zodImportTarget": "v4"');
     assertStringIncludes(schemaZodConfig, '"emit": {');
+    assertStringIncludes(schema, 'model Product {');
+    assertStringIncludes(schema, 'id        Int      @id @default(autoincrement())');
   });
 
   it('derives unique container database names for added engines', async () => {

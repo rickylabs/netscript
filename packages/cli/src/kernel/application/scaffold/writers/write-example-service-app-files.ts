@@ -7,6 +7,7 @@ interface ExampleServiceAppFilesInput {
   readonly appTemplateVars: Record<string, string>;
   readonly templates: ExampleServiceAppTemplateAssets;
   readonly write: (targetPath: string, content: string) => Promise<void>;
+  readonly hasDatabase: boolean;
   readonly libDir: string;
   readonly serviceExampleDir: string;
   readonly serviceExampleComponentsDir: string;
@@ -28,9 +29,12 @@ export async function writeExampleServiceAppFiles(
     appExampleServiceLabPanelTemplate,
     appExampleServiceNotesCardTemplate,
     appExampleServicePageLayoutTemplate,
+    appExampleServiceShowcaseMemoryTemplate,
+    appExampleServiceShowcaseSharedMemoryTemplate,
     appExampleServiceShowcaseSharedTemplate,
     appExampleServiceShowcaseTemplate,
     appExampleServiceSummaryCardTemplate,
+    appExampleServiceSummaryPanelMemoryTemplate,
     appExampleServiceSummaryPanelTemplate,
     appExampleServiceTemplate,
     appServiceExampleIndexTemplate,
@@ -40,6 +44,15 @@ export async function writeExampleServiceAppFiles(
     appTelemetryExampleViewTemplate,
     appTelemetryExampleSharedTemplate,
   } = input.templates;
+  const showcaseTemplate = input.hasDatabase
+    ? appExampleServiceShowcaseTemplate
+    : appExampleServiceShowcaseMemoryTemplate;
+  const showcaseSharedTemplate = input.hasDatabase
+    ? appExampleServiceShowcaseSharedTemplate
+    : appExampleServiceShowcaseSharedMemoryTemplate;
+  const summaryPanelTemplate = input.hasDatabase
+    ? appExampleServiceSummaryPanelTemplate
+    : appExampleServiceSummaryPanelMemoryTemplate;
   await write(
     join(input.libDir, 'example-service.ts'),
     await context.templateAdapter.render(appExampleServiceTemplate, appTemplateVars),
@@ -66,15 +79,15 @@ export async function writeExampleServiceAppFiles(
   );
   await write(
     join(input.serviceExampleComponentsDir, 'summary-panel.tsx'),
-    await context.templateAdapter.render(appExampleServiceSummaryPanelTemplate, appTemplateVars),
+    await context.templateAdapter.render(summaryPanelTemplate, appTemplateVars),
   );
   await write(
     join(input.serviceExampleIslandsDir, 'ServiceShowcaseLab.tsx'),
-    await context.templateAdapter.render(appExampleServiceShowcaseTemplate, appTemplateVars),
+    await context.templateAdapter.render(showcaseTemplate, appTemplateVars),
   );
   await write(
     join(input.serviceExampleSharedDir, 'service-showcase.ts'),
-    await context.templateAdapter.render(appExampleServiceShowcaseSharedTemplate, appTemplateVars),
+    await context.templateAdapter.render(showcaseSharedTemplate, appTemplateVars),
   );
   await write(
     join(input.serviceExamplePartialDir, 'summary.tsx'),

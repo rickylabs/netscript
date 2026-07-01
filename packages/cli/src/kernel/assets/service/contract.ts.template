@@ -1,14 +1,18 @@
 /**
  * {{serviceName | pascalCase}} contract — Version 1
  *
- * Shared type surface between the {{serviceName}} service and any caller.
- * Using `@orpc/contract` here means the server-side handler and any
- * generated client will automatically stay in type-lockstep.
+ * Shared CRUD type surface between the {{serviceName}} service and any caller.
  */
 
-import { z } from 'zod';
-import { oc } from '@orpc/contract';
 import { implement } from '@orpc/server';
+import { baseContract } from '@netscript/contracts';
+import { createCrudContract } from '@netscript/contracts/crud';
+import { z } from 'zod';
+import {
+  {{modelName}}CreateInput,
+  {{modelName}}Schema,
+  {{modelName}}UpdateInput,
+} from '@database/zod';
 
 export const {{serviceName | pascalCase}}HealthSchemaV1 = z.object({
   status: z.enum(['healthy', 'unhealthy', 'degraded']).describe('Service health status'),
@@ -18,52 +22,27 @@ export const {{serviceName | pascalCase}}HealthSchemaV1 = z.object({
   uptime: z.number().int().nonnegative().optional().describe('Uptime in seconds'),
 });
 
-export const {{serviceName | pascalCase}}StatusSchemaV1 = z.enum([
-  'active',
-  'draft',
-  'archived',
-]);
-
-export const {{serviceName | pascalCase}}ListItemSchemaV1 = z.object({
-  id: z.number().int().positive().describe('Stable identifier'),
-  name: z.string().min(1).describe('Display name'),
-  summary: z.string().min(1).describe('Short record summary'),
-  status: {{serviceName | pascalCase}}StatusSchemaV1.describe('Record lifecycle status'),
-  createdAt: z.string().datetime().describe('ISO creation timestamp'),
-});
-
-export const {{serviceName | pascalCase}}ListInputSchemaV1 = z.object({
-  limit: z.number().int().positive().describe('Number of records to return'),
-  offset: z.number().int().nonnegative().describe('Starting offset'),
-  search: z.string().min(1).optional().describe('Optional record name search'),
-});
-
-export const {{serviceName | pascalCase}}ListResponseSchemaV1 = z.object({
-  items: z.array({{serviceName | pascalCase}}ListItemSchemaV1).describe('Returned service records'),
-  total: z.number().int().nonnegative().describe('Total matching records'),
-  limit: z.number().int().positive().describe('Requested page size'),
-  offset: z.number().int().nonnegative().describe('Requested offset'),
-  hasMore: z.boolean().describe('Whether more records are available'),
-});
-
-export const {{serviceName | pascalCase}}UpdateStatusInputSchemaV1 = z.object({
-  id: z.number().int().positive().describe('Stable identifier'),
-  status: {{serviceName | pascalCase}}StatusSchemaV1.describe('Next lifecycle status'),
-});
-
-export const {{serviceName | pascalCase}}UpdateStatusResponseSchemaV1 =
-  {{serviceName | pascalCase}}ListItemSchemaV1;
+export const {{serviceName | pascalCase}}{{modelName}}SchemaV1 = {{modelName}}Schema;
+export const {{serviceName | pascalCase}}{{modelName}}CreateInputSchemaV1 = {{modelName}}CreateInput;
+export const {{serviceName | pascalCase}}{{modelName}}UpdateInputSchemaV1 = {{modelName}}UpdateInput;
 
 export type {{serviceName | pascalCase}}HealthV1 = z.infer<typeof {{serviceName | pascalCase}}HealthSchemaV1>;
-export type {{serviceName | pascalCase}}ListItemV1 = z.infer<typeof {{serviceName | pascalCase}}ListItemSchemaV1>;
-export type {{serviceName | pascalCase}}ListInputV1 = z.infer<typeof {{serviceName | pascalCase}}ListInputSchemaV1>;
-export type {{serviceName | pascalCase}}ListResponseV1 = z.infer<typeof {{serviceName | pascalCase}}ListResponseSchemaV1>;
-export type {{serviceName | pascalCase}}UpdateStatusInputV1 = z.infer<
-  typeof {{serviceName | pascalCase}}UpdateStatusInputSchemaV1
+export type {{serviceName | pascalCase}}{{modelName}}V1 = z.infer<
+  typeof {{serviceName | pascalCase}}{{modelName}}SchemaV1
 >;
-export type {{serviceName | pascalCase}}UpdateStatusResponseV1 = z.infer<
-  typeof {{serviceName | pascalCase}}UpdateStatusResponseSchemaV1
+export type {{serviceName | pascalCase}}{{modelName}}CreateInputV1 = z.infer<
+  typeof {{serviceName | pascalCase}}{{modelName}}CreateInputSchemaV1
 >;
+export type {{serviceName | pascalCase}}{{modelName}}UpdateInputV1 = z.infer<
+  typeof {{serviceName | pascalCase}}{{modelName}}UpdateInputSchemaV1
+>;
+
+export const {{serviceName | pascalCase}}CrudContractV1 = createCrudContract({
+  resource: '{{serviceName}}',
+  entitySchema: {{serviceName | pascalCase}}{{modelName}}SchemaV1,
+  createSchema: {{serviceName | pascalCase}}{{modelName}}CreateInputSchemaV1,
+  updateSchema: {{serviceName | pascalCase}}{{modelName}}UpdateInputSchemaV1,
+});
 
 /**
  * {{serviceName | pascalCase}} contract — Version 1.
@@ -72,19 +51,11 @@ export type {{serviceName | pascalCase}}UpdateStatusResponseV1 = z.infer<
  */
 export const {{serviceName | pascalCase}}ContractV1 = {
   health: {
-    check: oc
-      .route({ method: 'GET' })
-      .input(z.object({}).optional())
+    check: baseContract
+      .route({ method: 'GET', path: '/{{serviceName}}/health' })
       .output({{serviceName | pascalCase}}HealthSchemaV1),
   },
-  list: oc
-    .route({ method: 'POST' })
-    .input({{serviceName | pascalCase}}ListInputSchemaV1)
-    .output({{serviceName | pascalCase}}ListResponseSchemaV1),
-  updateStatus: oc
-    .route({ method: 'POST' })
-    .input({{serviceName | pascalCase}}UpdateStatusInputSchemaV1)
-    .output({{serviceName | pascalCase}}UpdateStatusResponseSchemaV1),
+  ...{{serviceName | pascalCase}}CrudContractV1,
 };
 
 /**

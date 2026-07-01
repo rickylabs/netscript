@@ -70,6 +70,9 @@ export interface InitOptions {
   /** Example service name. */
   readonly serviceName?: string;
 
+  /** Prisma domain model name override. */
+  readonly modelName?: string;
+
   /** Example service port. */
   readonly servicePort?: number;
 
@@ -126,6 +129,9 @@ export interface ValidatedInitOptions extends
 
   /** Resolved example service name. */
   readonly serviceName?: string;
+
+  /** Resolved Prisma domain model name. */
+  readonly modelName: string;
 
   /** Resolved example service port. */
   readonly servicePort?: number;

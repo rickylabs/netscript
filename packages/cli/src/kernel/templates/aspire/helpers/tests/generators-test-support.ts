@@ -40,6 +40,15 @@ export const SERVICE_WITH_REFS: ServiceEntry = {
   ServiceReferences: ['users'],
 };
 
+export const SERVICE_WITH_PLUGIN_REFS: ServiceEntry = {
+  Enabled: true,
+  Runtime: 'deno',
+  Port: 3002,
+  Entrypoint: 'src/main.ts',
+  Workdir: 'services/reporting',
+  PluginReferences: ['workers-api'],
+};
+
 // --- Plugin Fixtures ---
 
 export const MINIMAL_PLUGIN: PluginEntry = {

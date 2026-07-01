@@ -1,7 +1,7 @@
 import { assert, assertEquals, assertExists } from '@std/assert';
 import { h } from 'preact';
 import type { ComponentChildren } from 'preact';
-import { cn, getToast, stripToastFromUrl, withToast } from '../../mod.ts';
+import { cn, getToast, Icon, stripToastFromUrl, withToast } from '../../mod.ts';
 import { Dialog } from '../../interactive.ts';
 import { Show, VisuallyHidden } from '../../primitives.tsx';
 
@@ -15,6 +15,7 @@ const redirectTo = withToast('/dashboard/deployments', {
 
 const toast = getToast(new URL(`https://app.example${redirectTo}`));
 const cleanPath = stripToastFromUrl(new URL(`https://app.example${redirectTo}`));
+const checkIcon = h(Icon, { name: 'check', size: 18, title: 'Complete' });
 const cleanPathStatus = Show({
   when: cleanPath === '/dashboard/deployments',
   children: VisuallyHidden({ children: 'Redirect path is clean' }),
@@ -50,6 +51,8 @@ Deno.test('README/getting-started helper flow stays executable', () => {
   assertEquals(toast.title, 'Deployment queued');
   assertEquals(toast.message, 'api-gateway will roll out to three regions.');
   assertEquals(cleanPath, '/dashboard/deployments');
+  assertEquals(checkIcon.type, Icon);
+  assertEquals(checkIcon.props.name, 'check');
 });
 
 Deno.test('README/getting-started runtime component flow stays executable', () => {

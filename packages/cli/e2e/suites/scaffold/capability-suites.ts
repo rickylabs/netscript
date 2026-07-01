@@ -20,6 +20,7 @@ const SERVICE_GATES = [
   GATE.PREFLIGHT_DENO,
   GATE.SCAFFOLD_INIT,
   GATE.SERVICE_LIST,
+  GATE.DATABASE_CODEGEN,
   GATE.GENERATED_SERVICE_CHECK,
 ] as const;
 
@@ -27,6 +28,7 @@ const CONTRACT_GATES = [
   GATE.PREFLIGHT_DENO,
   GATE.SCAFFOLD_INIT,
   GATE.CONTRACT_LIST,
+  GATE.DATABASE_CODEGEN,
   GATE.GENERATED_CONTRACTS_CHECK,
 ] as const;
 
@@ -58,6 +60,7 @@ const RUNTIME_GATES = [
   GATE.RUNTIME_ASPIRE_RESTORE,
   GATE.RUNTIME_ASPIRE_START,
   GATE.RUNTIME_WAIT_POSTGRES,
+  GATE.RUNTIME_WAIT_MYSQL,
   GATE.RUNTIME_WAIT_GARNET,
   GATE.RUNTIME_WAIT_WORKERS_API,
   GATE.RUNTIME_WAIT_WORKERS,
@@ -145,6 +148,7 @@ export function createScaffoldCapabilitySuite(
       if (overrides.cliEntrypoint) next = next.withCliEntrypoint(overrides.cliEntrypoint);
       if (overrides.smokeRoot) next = next.withSmokeRoot(overrides.smokeRoot);
       if (overrides.projectName) next = next.withProjectName(overrides.projectName);
+      if (overrides.database) next = next.withDatabase(overrides.database);
       if (overrides.packageSource) next = next.withPackageSource(overrides.packageSource);
       if (overrides.cleanup !== undefined) next = next.withCleanup(overrides.cleanup);
       return next;
@@ -175,12 +179,23 @@ export function createScaffoldCapabilitySuite(
   const gatesById = new Map(suite.gates.map((gate) => [gate.id, gate]));
   return {
     ...suite,
-    gates: capability.gates.map((id) => {
+    gates: runtimeGateIds(capability.gates, suite.defaultOptions.database).map((id) => {
       const gate = gatesById.get(id);
       if (!gate) throw new Error(`Gate "${id}" is not registered for suite "${capability.id}".`);
       return gate;
     }),
   };
+}
+
+function runtimeGateIds(
+  gates: readonly GateId[],
+  database: RunOptions['database'],
+): readonly GateId[] {
+  return gates.filter((id) => {
+    if (id === GATE.RUNTIME_WAIT_POSTGRES) return database === 'postgres';
+    if (id === GATE.RUNTIME_WAIT_MYSQL) return database === 'mysql';
+    return true;
+  });
 }
 
 /** Build the official plugin scaffold smoke suite. */

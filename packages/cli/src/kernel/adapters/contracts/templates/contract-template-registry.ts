@@ -19,6 +19,11 @@ export class DefaultContractTemplateRegistry implements ContractTemplateRegistry
     return readTemplateAssetSync(TEMPLATE_KEYS.serviceContract);
   }
 
+  /** Get the no-database in-memory service contract template. */
+  getMemoryContractTemplate(): string {
+    return readTemplateAssetSync(TEMPLATE_KEYS.serviceContractMemory);
+  }
+
   /** Get the root contracts/mod.ts template. */
   getRootModTemplate(): string {
     return readTemplateAssetSync(TEMPLATE_KEYS.workspaceContractsMod);

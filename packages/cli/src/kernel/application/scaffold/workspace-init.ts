@@ -9,6 +9,16 @@ import type { ValidatedInitOptions } from '../../domain/scaffold/scaffold-option
 import type { InitPipelineContext } from './context.ts';
 import { adjustLocalBase, emptyScaffoldResult, isDbEngine } from './support/helpers.ts';
 
+function contractDatabaseImports(options: ValidatedInitOptions): Record<string, string> | undefined {
+  if (!isDbEngine(options.dbEngine)) {
+    return undefined;
+  }
+  return {
+    '@database/zod':
+      `../${SCAFFOLD_DIRS.DATABASE}/${options.dbEngine}/schema/.generated/zod/crud.ts`,
+  };
+}
+
 export async function scaffoldDatabase(
   context: InitPipelineContext,
   options: ValidatedInitOptions,
@@ -26,6 +36,7 @@ export async function scaffoldDatabase(
     projectName: options.name,
     targetPath: options.targetPath,
     engine: options.dbEngine,
+    modelName: options.modelName,
     importMode: options.importMode,
     localBase: options.localBase,
     overwrite: options.force,
@@ -50,9 +61,15 @@ export async function scaffoldContracts(
       importMode: options.importMode,
       localBase: options.localBase ? adjustLocalBase(options.localBase, 1) : undefined,
       force: options.force,
+      imports: contractDatabaseImports(options),
     },
     serviceContract: options.includeExampleService && options.serviceName
-      ? { serviceName: options.serviceName, version: SCAFFOLD_DIRS.V1 }
+      ? {
+        serviceName: options.serviceName,
+        modelName: options.modelName,
+        hasDatabase: isDbEngine(options.dbEngine),
+        version: SCAFFOLD_DIRS.V1,
+      }
       : undefined,
   });
 
@@ -85,6 +102,8 @@ export async function scaffoldServices(
     importMode: options.importMode,
     localBase: options.localBase ? adjustLocalBase(options.localBase, 2) : undefined,
     packagesAsWorkspaceMembers: context.packagesAsWorkspaceMembers(options),
+    modelName: options.modelName,
+    hasDatabase: isDbEngine(options.dbEngine),
     force: options.force,
   });
 

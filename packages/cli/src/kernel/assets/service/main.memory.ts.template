@@ -1,0 +1,19 @@
+/**
+ * {{serviceName | pascalCase}} Service
+ *
+ * Type-safe {{serviceName}} API with oRPC.
+ */
+
+import { defineService } from '@netscript/service';
+import { router } from './router.ts';
+
+await defineService(router, {
+  name: '{{serviceName}}',
+  version: '1.0.0',
+  port: parseInt(Deno.env.get('PORT') || '{{servicePort}}'),
+  openapi: {
+    title: '{{serviceName | pascalCase}} API',
+    description: '{{serviceName}} service',
+  },
+  debug: true,
+});

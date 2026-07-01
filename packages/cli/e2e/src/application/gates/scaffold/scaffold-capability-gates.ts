@@ -1,4 +1,5 @@
 import type { PluginSuiteState } from '../../builders/scaffold/plugin-suite-state.ts';
+import { DATABASE, type DatabaseEngine } from '../../../domain/extension-axes.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
 import { createBehaviorPluginHealthGates } from './behavior-plugins-health-gate.ts';
 import { createDatabaseGates, createGeneratedCheckGates } from './database-gates.ts';
@@ -8,14 +9,17 @@ import { createCleanupGates, createRuntimeGates } from './runtime-gates.ts';
 import { createPreflightGates, createScaffoldGates } from './scaffold-gates.ts';
 
 /** Build the scaffold capability gate list. */
-export function createScaffoldCapabilityGates(state: PluginSuiteState): readonly GateDefinition[] {
+export function createScaffoldCapabilityGates(
+  state: PluginSuiteState,
+  database: DatabaseEngine = DATABASE.POSTGRES,
+): readonly GateDefinition[] {
   return [
     ...createPreflightGates(),
     ...createScaffoldGates(state),
     ...createDatabaseGates(),
     ...createGeneratedCheckGates(),
     ...createGeneratedPluginCheckGates(),
-    ...createRuntimeGates(),
+    ...createRuntimeGates(database),
     ...createBehaviorPluginHealthGates(),
     ...createOtelGates(),
     ...createCleanupGates(),

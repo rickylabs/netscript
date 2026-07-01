@@ -40,6 +40,10 @@ export interface ServiceScaffoldOptions {
   readonly localBase?: string;
   /** Whether the scaffold copied NetScript packages into the workspace. */
   readonly packagesAsWorkspaceMembers?: boolean;
+  /** Prisma domain model name associated with the service. */
+  readonly modelName?: string;
+  /** Whether the service should use the database-backed CRUD templates. */
+  readonly hasDatabase?: boolean;
   /** Optional peer services to expose through Aspire service discovery. */
   readonly serviceReferences?: readonly string[];
   /** Whether existing files should be overwritten. */

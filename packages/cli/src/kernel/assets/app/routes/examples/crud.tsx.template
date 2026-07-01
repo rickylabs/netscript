@@ -1,12 +1,12 @@
 import CrudExampleView from './(_components)/crud-view.tsx';
-import { appRoutes } from '@app/router.ts';
+import { routes } from '@app/router.ts';
 import { definePage } from '@app/utils.ts';
 
 export const crudExamplePage = definePage()
-  .withRoute(appRoutes.crudExample)
+  .withRoute(routes.examples.crud)
   .withMeta(() => ({
-    title: '{{name}} — CRUD example',
-    description: 'CRUD scaffold example composed from app-owned fresh-ui registry blocks.',
+    title: '{{name}} — directory pattern demo',
+    description: 'Static registry-block composition demo with app-owned fresh-ui components.',
   }))
   .withLayer('crud', CrudExampleView, () => ({
     records: [

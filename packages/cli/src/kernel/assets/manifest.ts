@@ -41,10 +41,16 @@ export const TEMPLATE_KEYS = {
     'app/routes/examples/(_components)/summary-card.tsx.template',
   appRoutesExamplesComponentsSummaryPanel:
     'app/routes/examples/(_components)/summary-panel.tsx.template',
+  appRoutesExamplesComponentsSummaryPanelMemory:
+    'app/routes/examples/(_components)/summary-panel.memory.tsx.template',
   appRoutesExamplesIslandsServiceshowcaselab:
     'app/routes/examples/(_islands)/ServiceShowcaseLab.tsx.template',
+  appRoutesExamplesIslandsServiceshowcaselabMemory:
+    'app/routes/examples/(_islands)/ServiceShowcaseLab.memory.tsx.template',
   appRoutesExamplesSharedServiceShowcase:
     'app/routes/examples/(_shared)/service-showcase.ts.template',
+  appRoutesExamplesSharedServiceShowcaseMemory:
+    'app/routes/examples/(_shared)/service-showcase.memory.ts.template',
   appRoutesExamplesIndex: 'app/routes/examples/index.tsx.template',
   appRoutesExamplesCrud: 'app/routes/examples/crud.tsx.template',
   appRoutesExamplesServiceIndexLayout: 'app/routes/examples/service/index.layout.tsx.template',
@@ -108,10 +114,13 @@ export const TEMPLATE_KEYS = {
   generatedWorkspaceNetscriptConfig1: 'generated/workspace/netscript-config-1.ts.template',
   pluginsServiceContext: 'plugins/service-context.ts.template',
   serviceContract: 'service/contract.ts.template',
+  serviceContractMemory: 'service/contract.memory.ts.template',
   serviceMain: 'service/main.ts.template',
+  serviceMainMemory: 'service/main.memory.ts.template',
   serviceRouter: 'service/router.ts.template',
   serviceRoutersHealth: 'service/routers/health.ts.template',
   serviceRoutersV1: 'service/routers/v1.ts.template',
+  serviceRoutersV1Memory: 'service/routers/v1.memory.ts.template',
   windowsEnv: 'windows/env.template',
   workspaceContractsMod: 'workspace/contracts/mod.ts.template',
   workspaceContractsV1Aggregate: 'workspace/contracts/v1-aggregate.ts.template',

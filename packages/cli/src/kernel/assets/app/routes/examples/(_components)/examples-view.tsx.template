@@ -61,12 +61,12 @@ export default function ExamplesView({ examples }: ExamplesViewProps) {
           <PageHeader.Intro>
             <h1>Examples</h1>
             <p class='ns-lede'>
-              Reference app workflows built from copied fresh-ui components. Start with CRUD, then
-              replace the data seams with your contracts and services.
+              Reference app workflows built from copied fresh-ui components. Start with the live
+              {{modelName}} service flow, then adapt the patterns for your own routes.
             </p>
           </PageHeader.Intro>
           <PageHeader.Actions>
-            <Button type='link' href='/examples/crud'>Open CRUD example</Button>
+            <Button type='link' href='/examples/{{serviceName}}'>Open {{modelName}} CRUD</Button>
           </PageHeader.Actions>
         </PageHeader.Main>
       </PageHeader>

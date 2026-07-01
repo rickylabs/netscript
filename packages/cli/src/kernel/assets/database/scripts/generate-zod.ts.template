@@ -4,11 +4,16 @@
  * @module
  */
 
-import { generateZodSchemasCli } from '@netscript/database/scripts';
+import { generateZodSchemas, runWriteCrudZodBarrel } from '@netscript/database/scripts';
 
 const ZOD_OUTPUT_DIR = new URL('../schema/.generated/zod', import.meta.url).pathname
   .replace(/^\/([A-Z]:)/, '$1');
+const CRUD_MODEL_NAME = '{{modelName}}';
 
 if (import.meta.main) {
-  await generateZodSchemasCli({ zodOutputDir: ZOD_OUTPUT_DIR });
+  const code = await generateZodSchemas({ zodOutputDir: ZOD_OUTPUT_DIR });
+  if (code === 0) {
+    await runWriteCrudZodBarrel(ZOD_OUTPUT_DIR, CRUD_MODEL_NAME);
+  }
+  Deno.exit(code);
 }

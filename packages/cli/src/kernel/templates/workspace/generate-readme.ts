@@ -126,10 +126,10 @@ export function generateReadme(options: ReadmeOptions): string {
     if (options.legacyAspire) {
       lines.push('| `dotnet run --project dotnet/AppHost` | Start Aspire orchestration (C#) |');
     } else {
+      lines.push('| `cd aspire && aspire restore` | Restore Aspire SDK modules (run once) |');
       lines.push(
         '| `cd aspire && aspire start` | Start Aspire orchestration (TypeScript AppHost) |',
       );
-      lines.push('| `cd aspire && aspire restore` | Restore Aspire SDK modules (run once) |');
     }
   }
   lines.push('| `deno task check` | Type-check all workspace members |');
@@ -178,6 +178,9 @@ export function generateReadme(options: ReadmeOptions): string {
     }
     lines.push('');
     lines.push('Use the local contributor CLI for database commands in this workspace:');
+    if (!options.noAspire) {
+      lines.push('Run these after the Aspire AppHost has restored and started.');
+    }
     lines.push('');
     lines.push('```bash');
     lines.push('deno run -A packages/cli/bin/netscript-dev.ts db init --name init');
