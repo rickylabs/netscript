@@ -62,12 +62,14 @@ Every NetScript plugin is **two packages, not one**: a JSR-publishable **core en
 both trees correct is the greenfield generator:
 
 ```sh
-netscript plugin new notifier --kind proxy
+netscript plugin new notifier
 ```
 
-`netscript plugin new <name>` emits the whole pair in one pass. Its options are `--kind
-feature|proxy` (the connector archetype, default `proxy`) and `--overwrite` (replace existing files
-instead of skipping them). The connector under `plugins/<name>/` is the workspace member
+`netscript plugin new <name>` emits the whole pair in one pass. It scaffolds a **proxy** connector
+by default; pass `--feature` to generate a route-backed feature connector instead. Its other options
+are `--force` (overwrite existing files instead of skipping them) and `--project-root <path>` (target
+a project root other than the current directory). The connector under `plugins/<name>/` is the
+workspace member
 `netscript.config.ts` references; the core package under `packages/plugin-<name>-core/` is where the
 domain, ports, application logic, and contract live and is independently publishable to JSR.
 
