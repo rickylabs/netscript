@@ -20,7 +20,7 @@ Deno.test('capability suites select only their scoped gates', () => {
     GATE.PREFLIGHT_DENO,
     GATE.SCAFFOLD_INIT,
     GATE.SERVICE_LIST,
-    GATE.DATABASE_GENERATE,
+    GATE.DATABASE_CODEGEN,
     GATE.GENERATED_SERVICE_CHECK,
   ]);
 });

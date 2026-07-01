@@ -39,6 +39,7 @@ export const GATE = {
   CONTRACT_LIST: 'contract.list',
   SCAFFOLD_PLUGIN_LIST: 'scaffold.plugin-list',
   DATABASE_INIT: 'database.init',
+  DATABASE_CODEGEN: 'database.codegen',
   DATABASE_GENERATE: 'database.generate',
   DATABASE_SEED: 'database.seed',
   GENERATED_SERVICE_CHECK: 'generated.service-check',
