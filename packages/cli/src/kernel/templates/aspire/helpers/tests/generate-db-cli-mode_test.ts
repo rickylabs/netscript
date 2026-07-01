@@ -62,12 +62,18 @@ describe('generateDbCliMode', () => {
     assertStringIncludes(output, "envKey: 'SQLITE_URI'");
     assertStringIncludes(output, "taskSuffix: 'sqlite'");
     assertStringIncludes(output, 'let resource = await builder.addExecutable(');
+    assertStringIncludes(output, 'const offlineGenerateUrl = operation ===');
+    assertStringIncludes(output, 'buildOfflineGenerateUrl(target)');
+    assertStringIncludes(output, ".withEnvironment('DATABASE_URL', offlineGenerateUrl)");
     assertStringIncludes(output, 'const sqliteUrl = `file:./${target.databaseName}`;');
     assertStringIncludes(output, ".withEnvironment('DATABASE_URL', sqliteUrl)");
     assertStringIncludes(output, '.withEnvironment(target.envKey, sqliteUrl);');
     assertStringIncludes(output, 'resource = await resource');
+    assertStringIncludes(output, 'if (!offlineGenerateUrl && target.resource)');
     assertStringIncludes(output, ".withEnvironment('DATABASE_URL', target.resource)");
     assertStringIncludes(output, '.withReference(target.resource)');
+    assertStringIncludes(output, 'function buildOfflineGenerateUrl(target: DbCliTarget)');
+    assertStringIncludes(output, 'sqlserver://localhost:1433;database=');
   });
 
   it('supports env-based DB CLI activation for detached Aspire runs', () => {
