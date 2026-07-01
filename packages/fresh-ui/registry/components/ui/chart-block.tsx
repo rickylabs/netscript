@@ -67,11 +67,13 @@ export function ChartBlock(
         {sub ? <div class='ns-chart__sub'>{sub}</div> : null}
         <div class='ns-colchart__plot'>
           <div class='ns-colchart__yaxis'>
-            {ticks.map((tick) => <span class='ns-colchart__ytick'>{formatTick(tick)}</span>)}
+            {ticks.map((tick, i) => (
+              <span key={i} class='ns-colchart__ytick'>{formatTick(tick)}</span>
+            ))}
           </div>
           <div class='ns-colchart__grid'>
-            {data.map((datum) => (
-              <div class='ns-colchart__col'>
+            {data.map((datum, i) => (
+              <div key={i} class='ns-colchart__col'>
                 <div
                   class='ns-colchart__bar'
                   data-tone={datum.tone}
@@ -84,7 +86,7 @@ export function ChartBlock(
           </div>
         </div>
         <div class='ns-colchart__xaxis'>
-          {data.map((datum) => <span>{datum.label}</span>)}
+          {data.map((datum, i) => <span key={i}>{datum.label}</span>)}
         </div>
       </div>
     );
