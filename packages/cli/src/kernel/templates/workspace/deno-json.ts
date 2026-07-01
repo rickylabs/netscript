@@ -39,19 +39,25 @@ export function generateDenoJson(options: WorkspaceDenoJsonOptions): string {
     ? [...new Set([...SCAFFOLD_WORKSPACE_PACKAGES, ...enginePackages])]
       .map((p) => `./${SCAFFOLD_DIRS.PACKAGES}/${p}`)
     : [];
+  const dbEngine = options.dbEngines?.[0];
+  const generatedImports = dbEngine
+    ? {
+      '@database/zod': `./${SCAFFOLD_DIRS.DATABASE}/${dbEngine}/schema/.generated/zod/crud.ts`,
+    }
+    : {};
+  const jsrImports = options.importMode === 'jsr'
+    ? {
+      '@netscript/config': netscriptJsrSpecifier('config'),
+      '@netscript/contracts': netscriptJsrSpecifier('contracts'),
+      '@netscript/kv': netscriptJsrSpecifier('kv'),
+      '@netscript/plugin': netscriptJsrSpecifier('plugin'),
+    }
+    : {};
+  const imports = { ...jsrImports, ...generatedImports };
 
   const config: Record<string, unknown> = {
     workspace: [...userMembers, ...packageMembers],
-    ...(options.importMode === 'jsr'
-      ? {
-        imports: {
-          '@netscript/config': netscriptJsrSpecifier('config'),
-          '@netscript/contracts': netscriptJsrSpecifier('contracts'),
-          '@netscript/kv': netscriptJsrSpecifier('kv'),
-          '@netscript/plugin': netscriptJsrSpecifier('plugin'),
-        },
-      }
-      : {}),
+    ...(Object.keys(imports).length > 0 ? { imports } : {}),
     // Single workspace-root node_modules shared across all members.
     nodeModulesDir: 'auto',
     // Deno unstable features used by generated NetScript workspaces:

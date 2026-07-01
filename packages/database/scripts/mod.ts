@@ -11,6 +11,9 @@ export {
   type FixZodImportsOptions,
   type FixZodImportsResult,
   runFixZodImports,
+  runWriteCrudZodBarrel,
+  writeCrudZodBarrel,
+  type WriteCrudZodBarrelOptions,
 } from './fix-zod-imports.ts';
 export {
   patchPrismaClient,

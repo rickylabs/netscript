@@ -43,9 +43,15 @@ const EXAMPLE_SERVICE_APP_TEMPLATE_URLS: TemplateUrlMap = {
   appExampleServiceNotesCardTemplate: TEMPLATE_KEYS.appRoutesExamplesComponentsNotesCard,
   appExampleServicePageLayoutTemplate: TEMPLATE_KEYS.appRoutesExamplesComponentsPageLayout,
   appExampleServiceShowcaseSharedTemplate: TEMPLATE_KEYS.appRoutesExamplesSharedServiceShowcase,
+  appExampleServiceShowcaseSharedMemoryTemplate:
+    TEMPLATE_KEYS.appRoutesExamplesSharedServiceShowcaseMemory,
   appExampleServiceShowcaseTemplate: TEMPLATE_KEYS.appRoutesExamplesIslandsServiceshowcaselab,
+  appExampleServiceShowcaseMemoryTemplate:
+    TEMPLATE_KEYS.appRoutesExamplesIslandsServiceshowcaselabMemory,
   appExampleServiceSummaryCardTemplate: TEMPLATE_KEYS.appRoutesExamplesComponentsSummaryCard,
   appExampleServiceSummaryPanelTemplate: TEMPLATE_KEYS.appRoutesExamplesComponentsSummaryPanel,
+  appExampleServiceSummaryPanelMemoryTemplate:
+    TEMPLATE_KEYS.appRoutesExamplesComponentsSummaryPanelMemory,
   appExampleServiceTemplate: TEMPLATE_KEYS.appLibExampleService,
   appServiceExampleIndexTemplate: TEMPLATE_KEYS.appRoutesExamplesServiceIndex,
   appServiceExampleLayoutTemplate: TEMPLATE_KEYS.appRoutesExamplesServiceIndexLayout,

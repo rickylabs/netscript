@@ -127,6 +127,7 @@ export class DatabaseScaffolder {
       displayName: provider.displayName,
       configKey,
       databaseName,
+      modelName: options.modelName ?? 'ExampleRecord',
     };
 
     await write(

@@ -67,6 +67,7 @@ describe('generateRegisterServices', () => {
       services: { users: fixtures.MINIMAL_SERVICE },
     });
     assertStringIncludes(output, "builder.addExecutable('users', 'deno', workdir,");
+    assertStringIncludes(output, "'--minimum-dependency-age=0'");
     assertStringIncludes(output, '.withHttpEndpoint({ port: 3000');
     assertStringIncludes(output, "services.set('users'");
   });
@@ -109,6 +110,8 @@ describe('generateRegisterServices', () => {
     );
     assertStringIncludes(output, '.withReference(infrastructure.primaryDatabase)');
     assertStringIncludes(output, '.waitFor(infrastructure.primaryDatabase)');
+    assertStringIncludes(output, "sqliteDatabase?.Engine === 'Sqlite'");
+    assertStringIncludes(output, 'file:./database/${config.PrimaryDatabase}/');
   });
 
   it('should wire service references from the services map', () => {
@@ -244,6 +247,8 @@ describe('generateRegisterPlugins', () => {
     assertStringIncludes(output, '// Database dependency');
     assertStringIncludes(output, 'infrastructure.primaryDatabase');
     assertStringIncludes(output, "withEnvironment('DATABASE_URL'");
+    assertStringIncludes(output, "sqliteDatabase?.Engine === 'Sqlite'");
+    assertStringIncludes(output, 'file:./database/${config.PrimaryDatabase}/');
   });
 
   it('should handle RequiresKv dependency', () => {
@@ -255,7 +260,10 @@ describe('generateRegisterPlugins', () => {
     assertStringIncludes(output, '// KV cache dependency');
     assertStringIncludes(output, 'infrastructure.primaryCacheEndpoint');
     assertStringIncludes(output, 'withReference(infrastructure.primaryCacheEndpoint)');
-    assertStringIncludes(output, "import { EndpointProperty } from '../.aspire/modules/aspire.mjs'");
+    assertStringIncludes(
+      output,
+      "import { EndpointProperty } from '../.aspire/modules/aspire.mjs'",
+    );
     assertStringIncludes(
       output,
       'infrastructure.primaryCacheEndpoint.property(EndpointProperty.HostAndPort)',
@@ -275,7 +283,7 @@ describe('generateRegisterPlugins', () => {
     });
     assertStringIncludes(
       output,
-      "resource.withEnvironment('NETSCRIPT_SAGA_STORE', \"prisma\")",
+      'resource.withEnvironment(\'NETSCRIPT_SAGA_STORE\', "prisma")',
     );
   });
 

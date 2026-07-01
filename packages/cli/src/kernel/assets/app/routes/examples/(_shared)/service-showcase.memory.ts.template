@@ -1,39 +1,30 @@
 import { dehydrateQueryClient } from '@netscript/fresh/query';
 import { createNetScriptQueryClient } from '@netscript/sdk/query-client';
 import { exampleServiceQueries } from '@app/lib/example-service.ts';
-import type { {{serviceName | pascalCase}}{{modelName}}V1 } from '@{{name}}/contracts';
 
 export const SERVICE_SHOWCASE_PAGE_SIZE = 3;
 export const SERVICE_SHOWCASE_INPUT = {
   limit: SERVICE_SHOWCASE_PAGE_SIZE,
-  page: 1,
-  sortBy: 'id',
-  sortOrder: 'asc',
+  offset: 0,
 } as const;
 
-export interface ServiceShowcasePagination {
-  readonly page: number;
-  readonly limit: number;
-  readonly total: number;
-  readonly totalPages: number;
-  readonly hasNext: boolean;
-  readonly hasPrev: boolean;
-}
-
-export interface ServiceShowcaseListData {
-  readonly data: readonly {{serviceName | pascalCase}}{{modelName}}V1[];
-  readonly pagination: ServiceShowcasePagination;
-}
+export type ServiceShowcaseListData = Awaited<ReturnType<typeof exampleServiceQueries.list>>;
 
 export interface ServiceSummaryPanelProps {
   readonly total: number;
-  readonly shown: number;
-  readonly page: number;
-  readonly totalPages: number;
+  readonly active: number;
+  readonly draft: number;
+  readonly archived: number;
   readonly updatedAtLabel: string;
 }
 
-export function formatServiceTimestamp(value: string | number | Date): string {
+type ServiceStatusCounts = {
+  active: number;
+  draft: number;
+  archived: number;
+};
+
+export function formatServiceTimestamp(value: string | number): string {
   return new Intl.DateTimeFormat('en', {
     month: 'short',
     day: 'numeric',
@@ -45,19 +36,25 @@ export function buildServiceSummary(
   data: ServiceShowcaseListData,
   snapshotAt: number = Date.now(),
 ): ServiceSummaryPanelProps {
+  const counts = data.items.reduce<ServiceStatusCounts>(
+    (summary, item) => {
+      summary[item.status] += 1;
+      return summary;
+    },
+    { active: 0, draft: 0, archived: 0 },
+  );
+
   return {
-    total: data.pagination.total,
-    shown: data.data.length,
-    page: data.pagination.page,
-    totalPages: data.pagination.totalPages,
+    total: data.total,
+    active: counts.active,
+    draft: counts.draft,
+    archived: counts.archived,
     updatedAtLabel: formatServiceTimestamp(snapshotAt),
   };
 }
 
 export async function loadServiceShowcaseSummary(): Promise<ServiceSummaryPanelProps> {
-  const result: ServiceShowcaseListData = await exampleServiceQueries.list(
-    SERVICE_SHOWCASE_INPUT,
-  );
+  const result = await exampleServiceQueries.list(SERVICE_SHOWCASE_INPUT);
   return buildServiceSummary(result);
 }
 
@@ -65,7 +62,7 @@ export async function loadServiceShowcaseData() {
   const queryClient = createNetScriptQueryClient();
   const queryOptions = exampleServiceQueries.list.queryOptions(SERVICE_SHOWCASE_INPUT);
   const cachedAt = Date.now();
-  const initialList: ServiceShowcaseListData = await queryClient.fetchQuery({
+  const initialList = await queryClient.fetchQuery<ServiceShowcaseListData>({
     queryKey: queryOptions.queryKey,
     queryFn: queryOptions.queryFn,
   });

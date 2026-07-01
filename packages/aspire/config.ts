@@ -197,8 +197,8 @@ export interface BackgroundProcessorEntry extends BaseEntry, ReferenceEntry {
 export interface DatabaseEntry extends BaseEntry {
   /** Database engine. */
   Engine: DatabaseEngine;
-  /** Resource provisioning mode. */
-  Mode: ResourceMode;
+  /** Resource provisioning mode. Defaults to container mode when omitted. */
+  Mode?: ResourceMode;
   /** Optional container image tag. */
   ImageTag?: string;
   /** Database name. */

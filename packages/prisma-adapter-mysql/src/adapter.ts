@@ -45,6 +45,7 @@ interface Mysql2PoolOptions {
   database?: string;
   waitForConnections: boolean;
   connectionLimit: number;
+  multipleStatements: boolean;
   connectTimeout?: number;
   ssl?: {
     ca?: string;
@@ -339,10 +340,10 @@ class PrismaMySqlAdapter extends MySqlQueryable implements SqlDriverAdapter {
   }
 
   /**
-   * Execute a script (not implemented).
+   * Execute a trusted SQL script.
    */
-  executeScript(_script: string): Promise<void> {
-    throw new Error('Not implemented yet');
+  async executeScript(script: string): Promise<void> {
+    await this.client.query(script);
   }
 
   /**
@@ -511,10 +512,12 @@ export interface PrismaMySqlTransactionAdapter {
   readonly provider: 'mysql';
   /** Adapter package name. */
   readonly adapterName: string;
+  /** Prisma transaction options associated with this transaction. */
+  readonly options: TransactionOptions;
   /** Execute a raw SQL query. */
-  queryRaw(query: PrismaMySqlQuery): Promise<PrismaMySqlResultSet>;
+  queryRaw(query: SqlQuery): Promise<SqlResultSet>;
   /** Execute a raw SQL statement and return affected rows. */
-  executeRaw(query: PrismaMySqlQuery): Promise<number>;
+  executeRaw(query: SqlQuery): Promise<number>;
   /** Commit the transaction. */
   commit(): Promise<void>;
   /** Roll back the transaction. */
@@ -530,16 +533,16 @@ export interface PrismaMySqlConnectedAdapter {
   /** Adapter package name. */
   readonly adapterName: string;
   /** Execute a raw SQL query. */
-  queryRaw(query: PrismaMySqlQuery): Promise<PrismaMySqlResultSet>;
+  queryRaw(query: SqlQuery): Promise<SqlResultSet>;
   /** Execute a raw SQL statement and return affected rows. */
-  executeRaw(query: PrismaMySqlQuery): Promise<number>;
-  /** Execute a SQL script. */
+  executeRaw(query: SqlQuery): Promise<number>;
+  /** Execute a trusted SQL script. */
   executeScript(script: string): Promise<void>;
   /** Return connection details used by Prisma. */
   getConnectionInfo(): PrismaMySqlConnectionInfo;
   /** Start a transaction. */
   startTransaction(
-    isolationLevel?: PrismaMySqlIsolationLevel,
+    isolationLevel?: IsolationLevel,
   ): Promise<PrismaMySqlTransactionAdapter>;
   /** Close the underlying driver resources. */
   dispose(): Promise<void>;
@@ -578,7 +581,7 @@ export class PrismaMySqlAdapterFactory {
    * Connect to the database and create an adapter instance.
    */
   async connect(): Promise<PrismaMySqlConnectedAdapter> {
-    const { createPool } = await import('mysql2') as unknown as Mysql2Module;
+    const { createPool } = await import('mysql2/promise') as unknown as Mysql2Module;
 
     let client: AnyClient;
     try {
@@ -669,6 +672,7 @@ function toMysql2PoolOptions(config: MySqlConnectionConfig): Mysql2PoolOptions {
     database: config.db,
     waitForConnections: true,
     connectionLimit: config.poolSize ?? 1,
+    multipleStatements: true,
     connectTimeout: config.timeout,
   };
 

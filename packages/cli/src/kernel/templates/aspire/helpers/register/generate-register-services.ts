@@ -68,7 +68,7 @@ export function generateRegisterServices(options: RegisterServicesOptions): stri
 
     // Register via addExecutable with HTTP endpoint
     lines.push(
-      `    const resource = builder.addExecutable('${name}', 'deno', workdir, ['run', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', ...perms, '${entrypoint}'])`,
+      `    const resource = builder.addExecutable('${name}', 'deno', workdir, ['run', '--minimum-dependency-age=0', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', ...perms, '${entrypoint}'])`,
     );
     lines.push(
       `      .withHttpEndpoint({ port: ${entry.Port}, env: '${RESOURCE_DEFAULTS.PortEnvVar}' });`,
@@ -88,13 +88,30 @@ export function generateRegisterServices(options: RegisterServicesOptions): stri
     lines.push(``);
     lines.push(`    // Database dependency — all services wait for primary DB (C# parity)`);
     lines.push(`    if (infrastructure.primaryDatabase) {`);
-    lines.push(`      let databaseBinding = resource.withEnvironment('DATABASE_URL', infrastructure.primaryDatabase);`);
+    lines.push(
+      `      let databaseBinding = resource.withEnvironment('DATABASE_URL', infrastructure.primaryDatabase);`,
+    );
     lines.push(`      if (databaseEnvKey) {`);
-    lines.push(`        databaseBinding = databaseBinding.withEnvironment(databaseEnvKey, infrastructure.primaryDatabase);`);
+    lines.push(
+      `        databaseBinding = databaseBinding.withEnvironment(databaseEnvKey, infrastructure.primaryDatabase);`,
+    );
     lines.push(`      }`);
     lines.push(`      await databaseBinding`);
     lines.push(`        .withReference(infrastructure.primaryDatabase)`);
     lines.push(`        .waitFor(infrastructure.primaryDatabase);`);
+    lines.push(`    } else {`);
+    lines.push(
+      `      const sqliteDatabase = config.PrimaryDatabase ? config.Databases[config.PrimaryDatabase] : undefined;`,
+    );
+    lines.push(`      if (sqliteDatabase?.Engine === 'Sqlite' && config.PrimaryDatabase) {`);
+    lines.push(
+      `        const sqliteUrl = \`file:./database/\${config.PrimaryDatabase}/\${sqliteDatabase.DatabaseName ?? \`\${config.PrimaryDatabase}.db\`}\`;`,
+    );
+    lines.push(`        await resource.withEnvironment('DATABASE_URL', sqliteUrl);`);
+    lines.push(`        if (databaseEnvKey) {`);
+    lines.push(`          await resource.withEnvironment(databaseEnvKey, sqliteUrl);`);
+    lines.push(`        }`);
+    lines.push(`      }`);
     lines.push(`    }`);
 
     lines.push(``);

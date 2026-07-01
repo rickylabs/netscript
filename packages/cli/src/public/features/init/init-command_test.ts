@@ -40,6 +40,70 @@ Deno.test('init defaults cache on with redis backend in non-interactive mode', a
 
   assertEquals(validated.cache, true);
   assertEquals(validated.cacheBackend, 'redis');
+  assertEquals(validated.modelName, 'User');
+});
+
+Deno.test('init derives Prisma model name from service name', async () => {
+  const validated = await validateOptions(fakeInitContext(), {
+    name: 'crud-defaults',
+    importMode: 'jsr',
+    force: true,
+    ci: true,
+    yes: false,
+    dryRun: true,
+    noGit: true,
+    noAspire: false,
+    legacyAspire: false,
+    dbEngine: 'postgres',
+    includeExampleService: true,
+    serviceName: 'products',
+  });
+
+  assertEquals(validated.serviceName, 'products');
+  assertEquals(validated.modelName, 'Product');
+});
+
+Deno.test('init accepts validated Prisma model name override', async () => {
+  const validated = await validateOptions(fakeInitContext(), {
+    name: 'crud-override',
+    importMode: 'jsr',
+    force: true,
+    ci: true,
+    yes: false,
+    dryRun: true,
+    noGit: true,
+    noAspire: false,
+    legacyAspire: false,
+    dbEngine: 'postgres',
+    includeExampleService: true,
+    serviceName: 'products',
+    modelName: 'InventoryItem',
+  });
+
+  assertEquals(validated.modelName, 'InventoryItem');
+});
+
+Deno.test('init rejects invalid Prisma model name override', async () => {
+  await assertRejects(
+    () =>
+      validateOptions(fakeInitContext(), {
+        name: 'crud-invalid',
+        importMode: 'jsr',
+        force: true,
+        ci: true,
+        yes: false,
+        dryRun: true,
+        noGit: true,
+        noAspire: false,
+        legacyAspire: false,
+        dbEngine: 'postgres',
+        includeExampleService: true,
+        serviceName: 'products',
+        modelName: 'inventory-item',
+      }),
+    Error,
+    'Invalid model name',
+  );
 });
 
 Deno.test('interactive init prompts for all missing scaffold choices', async () => {

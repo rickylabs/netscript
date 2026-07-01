@@ -69,6 +69,28 @@ Deno.test('defineService disconnects a capable database client on stop', async (
   });
 });
 
+Deno.test('defineService exposes a friendly service landing response', async () => {
+  const running = await defineService({}, {
+    name: 'define-service-landing',
+    port: 0,
+  });
+
+  try {
+    const response = await running.app.request('/');
+    const body = await response.json();
+
+    assertEquals(response.status, 200);
+    assertEquals(body.service, 'define-service-landing');
+    assertEquals(
+      body.message,
+      'NetScript service is running. Open /api/docs for the oRPC playground.',
+    );
+    assertEquals(body.endpoints.playground, '/api/docs');
+  } finally {
+    await running.stop();
+  }
+});
+
 Deno.test('defineService skips disconnect hook for non-capable database client', async () => {
   await withReachableDatabaseEndpoint(async () => {
     let queryCount = 0;

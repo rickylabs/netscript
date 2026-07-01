@@ -84,7 +84,9 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
     const sagaStoreBackend = extractSagaStoreBackend(entry);
     if (sagaStoreBackend) {
       lines.push(
-        `    await ${id}.withEnvironment('NETSCRIPT_SAGA_STORE', ${JSON.stringify(sagaStoreBackend)});`,
+        `    await ${id}.withEnvironment('NETSCRIPT_SAGA_STORE', ${
+          JSON.stringify(sagaStoreBackend)
+        });`,
       );
     }
 
@@ -130,6 +132,21 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
       lines.push(`      await ${id}_databaseBinding`);
       lines.push(`        .withReference(infrastructure.primaryDatabase)`);
       lines.push(`        .waitFor(infrastructure.primaryDatabase);`);
+      lines.push(`    } else {`);
+      lines.push(
+        `      const ${id}_sqliteDatabase = config.PrimaryDatabase ? config.Databases[config.PrimaryDatabase] : undefined;`,
+      );
+      lines.push(
+        `      if (${id}_sqliteDatabase?.Engine === 'Sqlite' && config.PrimaryDatabase) {`,
+      );
+      lines.push(
+        `        const ${id}_sqliteUrl = \`file:./database/\${config.PrimaryDatabase}/\${${id}_sqliteDatabase.DatabaseName ?? \`\${config.PrimaryDatabase}.db\`}\`;`,
+      );
+      lines.push(`        await ${id}.withEnvironment('DATABASE_URL', ${id}_sqliteUrl);`);
+      lines.push(`        if (databaseEnvKey) {`);
+      lines.push(`          await ${id}.withEnvironment(databaseEnvKey, ${id}_sqliteUrl);`);
+      lines.push(`        }`);
+      lines.push(`      }`);
       lines.push(`    }`);
     }
 

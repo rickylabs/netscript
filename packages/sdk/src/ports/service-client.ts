@@ -42,6 +42,7 @@ export type ContractSchemaOutput<TSchema> = TSchema extends {
     };
   };
 } ? TOutput
+  : TSchema extends { parse(value: unknown): infer TOutput } ? TOutput
   : unknown;
 
 /**
@@ -49,8 +50,8 @@ export type ContractSchemaOutput<TSchema> = TSchema extends {
  * contract object without exposing private upstream helper types.
  */
 export interface ContractProcedureMetadata<
-  TInputSchema extends ContractSchema | undefined = ContractSchema | undefined,
-  TOutputSchema extends ContractSchema | undefined = ContractSchema | undefined,
+  TInputSchema = unknown,
+  TOutputSchema = unknown,
 > {
   /** Input validation schema for the procedure. */
   readonly inputSchema?: TInputSchema;
@@ -59,12 +60,27 @@ export interface ContractProcedureMetadata<
 }
 
 /**
+ * NetScript-owned procedure schema marker for package-generated contract factories.
+ */
+export interface NetScriptProcedureSchemas<
+  TInputSchema = unknown,
+  TOutputSchema = unknown,
+> {
+  /** Input validation schema for the procedure. */
+  readonly inputSchema: TInputSchema;
+  /** Output validation schema for the procedure. */
+  readonly outputSchema: TOutputSchema;
+}
+
+/**
  * Minimal structural representation of an oRPC contract procedure.
  */
 export interface ContractProcedureLike<
-  TInputSchema extends ContractSchema | undefined = ContractSchema | undefined,
-  TOutputSchema extends ContractSchema | undefined = ContractSchema | undefined,
+  TInputSchema = unknown,
+  TOutputSchema = unknown,
 > {
+  /** NetScript-owned schema marker used when upstream metadata is intentionally opaque. */
+  readonly __netscriptSchemas?: NetScriptProcedureSchemas<TInputSchema, TOutputSchema>;
   /** Public oRPC metadata container. */
   readonly '~orpc': ContractProcedureMetadata<TInputSchema, TOutputSchema>;
 }
@@ -87,18 +103,24 @@ export type ContractProcedureNames<TContract> =
  * Input payload for a contract procedure node.
  */
 export type ProcedureInputFromNode<TNode> = TNode extends ContractProcedureLike<
-  infer TInputSchema extends ContractSchema | undefined,
-  ContractSchema | undefined
-> ? ContractSchemaInput<TInputSchema>
+  infer TInputSchema,
+  unknown
+>
+  ? TNode extends { readonly __netscriptSchemas: { readonly inputSchema: infer TSchema } }
+    ? ContractSchemaInput<TSchema>
+  : ContractSchemaInput<TInputSchema>
   : never;
 
 /**
  * Output payload for a contract procedure node.
  */
 export type ProcedureOutputFromNode<TNode> = TNode extends ContractProcedureLike<
-  ContractSchema | undefined,
-  infer TOutputSchema extends ContractSchema | undefined
-> ? ContractSchemaOutput<TOutputSchema>
+  unknown,
+  infer TOutputSchema
+>
+  ? TNode extends { readonly __netscriptSchemas: { readonly outputSchema: infer TSchema } }
+    ? ContractSchemaOutput<TSchema>
+  : ContractSchemaOutput<TOutputSchema>
   : never;
 
 /**

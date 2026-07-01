@@ -39,6 +39,8 @@ export interface MaintainerInitRequest {
   readonly includeExampleService?: boolean;
   /** Example service name override. */
   readonly serviceName?: string;
+  /** Prisma model name override. */
+  readonly modelName?: string;
   /** Example service port override. */
   readonly servicePort?: number;
 }
