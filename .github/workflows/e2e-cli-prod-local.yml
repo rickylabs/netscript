@@ -7,13 +7,23 @@ name: e2e-cli-prod-local
 # workflow does NOT exercise the `https://` asset-read path and cannot catch the
 # CLI-self-asset class tracked in #124. That remains covered exclusively by the
 # published-CLI smoke in e2e-cli-prod.yml.
+#
+# Trigger: runs after the `publish` workflow completes successfully, NOT on every
+# push to main. On a release cut the merge push lands the bumped `@netscript/*`
+# version before `publish` uploads it to JSR, so a push-triggered run resolved a
+# not-yet-published version and failed (e.g. scaffold.plugin-list). Gating on
+# `workflow_run` after `publish` plus a fixed JSR-propagation delay removes that
+# race. Non-release main pushes do not change the published `@netscript/*` graph,
+# so there is nothing new for this JSR-resolving smoke to validate on them.
 
 on:
-  push:
-    branches: [main]
+  workflow_run:
+    workflows: ["publish"]
+    types: [completed]
   workflow_dispatch:
 
 permissions:
+  actions: read
   contents: read
 
 concurrency:
@@ -23,6 +33,7 @@ concurrency:
 jobs:
   scaffold-runtime-prod-local:
     name: scaffold-runtime (local public CLI + JSR deps)
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 75
     steps:
@@ -54,6 +65,12 @@ jobs:
             13.4.*) ;;
             *) echo "Expected Aspire CLI 13.4.x, got $aspire_version" >&2; exit 1 ;;
           esac
+
+      - name: Wait for JSR propagation
+        if: github.event_name == 'workflow_run'
+        run: |
+          echo "publish completed; sleeping 120s so the just-published @netscript/* versions become resolvable on JSR before the generated workspace pins them."
+          sleep 120
 
       - name: Install workspace dependencies
         run: deno install
