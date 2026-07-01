@@ -21,7 +21,7 @@ import {
   Tabs,
   Tooltip,
 } from '../interactive.ts';
-import { Show, SrOnly, VisuallyHidden } from '../primitives.tsx';
+import { Icon, Show, SrOnly, VisuallyHidden } from '../primitives.tsx';
 
 const accordion: VNode = (
   <Accordion.Root>
@@ -122,6 +122,7 @@ const combobox: VNode = (
 
 const primitives: VNode = (
   <Show when>
+    <Icon name='check' title='Complete' />
     <VisuallyHidden>hidden</VisuallyHidden>
     <SrOnly>screen-reader only</SrOnly>
   </Show>

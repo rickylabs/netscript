@@ -9,6 +9,19 @@
  */
 
 export {
+  Icon,
+  ICON_PATHS,
+  type IconName,
+  type IconProps,
+  type IconSize,
+  type IconSvgAttributes,
+  type IconSvgAttributeValue,
+  type PrimitiveChild,
+  type PrimitiveChildren,
+  type PrimitiveNode,
+  type VisuallyHiddenStyle,
+} from './primitives.tsx';
+export {
   getToast,
   REGISTRY_TOAST_QUERY_KEYS,
   type RegistryToast,
