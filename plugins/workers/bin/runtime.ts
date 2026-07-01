@@ -7,17 +7,20 @@
 // Register Redis/Garnet KV adapter before createWorkersServiceRuntime() calls getKv().
 import '@netscript/kv/redis';
 import { createDefaultTaskExecutor } from '@netscript/plugin-workers-core/executor';
-import type { RegisterJobInput, StaticJobRegistry } from '@netscript/plugin-workers-core/runtime';
+import type { StaticJobRegistry } from '@netscript/plugin-workers-core/runtime';
+export {
+  loadGeneratedJobRegistry,
+  projectFileUrl,
+  registerStaticJobDefinitions,
+  type StaticJobDefinitionRegistry,
+  WORKERS_JOB_REGISTRY_PATH,
+} from '../src/runtime/generated-jobs.ts';
+import {
+  registerStaticJobDefinitions,
+  type StaticJobDefinitionRegistry,
+} from '../src/runtime/generated-jobs.ts';
 import { createWorkersServiceRuntime } from '../services/src/service-runtime.ts';
 import { Scheduler, Worker } from '../worker/mod.ts';
-
-/** Generated static job definitions keyed by job id. */
-export type StaticJobDefinitionRegistry = ReadonlyMap<string, RegisterJobInput>;
-
-type StaticJobDefinitionRegistrar = Readonly<{
-  get(id: string): Promise<unknown>;
-  registerJob(input: RegisterJobInput): Promise<unknown>;
-}>;
 
 /** Options for starting only the workers job execution process. */
 export type StartWorkerProcessOptions = Readonly<{
@@ -108,27 +111,4 @@ export async function startCombinedProcess(
   await scheduler.start();
   await worker.start();
   return Object.freeze({ scheduler, worker });
-}
-
-/** Register generated static job definitions if the project emitted them. */
-export async function registerStaticJobDefinitions(
-  registry: StaticJobDefinitionRegistrar,
-  definitions?: StaticJobDefinitionRegistry,
-): Promise<void> {
-  if (!definitions?.size) return;
-
-  console.log(`[Workers Plugin] Registering ${definitions.size} static job definition(s)...`);
-  for (const [id, definition] of definitions) {
-    const existing = await registry.get(id);
-    if (existing) continue;
-
-    try {
-      await registry.registerJob({ ...definition, id });
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      if (!message.includes(`Job with id '${id}' already exists`)) {
-        throw error;
-      }
-    }
-  }
 }

@@ -34,6 +34,7 @@ export async function writeNormalizedAppFiles(
     appName: options.appName,
     appPort: String(appPort),
     serviceName: plan.service?.name ?? SCAFFOLD_DEFAULTS.SERVICE_NAME,
+    modelName: options.modelName,
   };
   const {
     appAppTemplate,
@@ -270,6 +271,7 @@ export async function writeNormalizedAppFiles(
       appTemplateVars,
       templates: await loadExampleServiceAppTemplateAssets(),
       write,
+      hasDatabase: options.dbEngine !== 'none',
       libDir,
       serviceExampleDir,
       serviceExampleComponentsDir,

@@ -48,7 +48,7 @@ describe('generateRegisterTools', () => {
     });
     assertStringIncludes(
       output,
-      "builder.addExecutable('prisma-studio', 'deno', prisma_studio_workdir, ['task', 'studio'])",
+      "builder.addExecutable('prisma-studio', 'deno', prisma_studio_workdir, ['task', '--minimum-dependency-age=0', 'studio'])",
     );
     assertStringIncludes(
       output,
@@ -63,7 +63,7 @@ describe('generateRegisterTools', () => {
     const output = generateRegisterTools({
       tools: { migrate: toolNoTaskName },
     });
-    assertStringIncludes(output, "['task', 'migrate']");
+    assertStringIncludes(output, "['task', '--minimum-dependency-age=0', 'migrate']");
   });
 
   it('should convert hyphenated names to safe identifiers', () => {
@@ -255,7 +255,7 @@ describe('generateIndex', () => {
     );
     assertStringIncludes(
       output,
-      "import { registerServices } from './register-services.mjs'",
+      "import { registerServices, wireServiceReferences } from './register-services.mjs'",
     );
     assertStringIncludes(
       output,
@@ -281,6 +281,7 @@ describe('generateIndex', () => {
     const infraIdx = output.indexOf('registerInfrastructure(builder');
     const servicesIdx = output.indexOf('registerServices(builder');
     const pluginsIdx = output.indexOf('registerPlugins(builder');
+    const wireServicesIdx = output.indexOf('wireServiceReferences(config, services, plugins)');
     const backgroundIdx = output.indexOf('registerBackgroundProcessors(builder');
     const appsIdx = output.indexOf('registerApps(builder');
     const toolsIdx = output.indexOf('registerTools(builder, config, infrastructure, appHostDir)');
@@ -289,7 +290,8 @@ describe('generateIndex', () => {
     assert(infraIdx > dashboardIdx, 'infrastructure should follow dashboard');
     assert(servicesIdx > infraIdx, 'services should follow infrastructure');
     assert(pluginsIdx > servicesIdx, 'plugins should follow services');
-    assert(backgroundIdx > pluginsIdx, 'background should follow plugins');
+    assert(wireServicesIdx > pluginsIdx, 'service reference wiring should follow plugins');
+    assert(backgroundIdx > wireServicesIdx, 'background should follow service reference wiring');
     assert(appsIdx > backgroundIdx, 'apps should follow background');
     assert(toolsIdx > appsIdx, 'tools should follow apps');
   });

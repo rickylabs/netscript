@@ -233,7 +233,7 @@ export interface Database {
 }
 
 /** Database context injected into service handler context. */
-export type DbContext = Record<string, unknown>;
+export type DbContext = object;
 
 /** Creates per-request service handler context. */
 export type ContextFactory = (

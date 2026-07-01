@@ -73,8 +73,14 @@ describe('database template generators', () => {
       config.imports['@netscript/database'],
       netscriptJsrSpecifier('database'),
     );
-    assertEquals(config.imports['@netscript/database/scripts'], undefined);
-    assertEquals(config.imports['@netscript/database/tracing'], undefined);
+    assertEquals(
+      config.imports['@netscript/database/scripts'],
+      netscriptJsrSpecifier('database') + '/scripts',
+    );
+    assertEquals(
+      config.imports['@netscript/database/tracing'],
+      netscriptJsrSpecifier('database') + '/tracing',
+    );
   });
 
   it('generates zod and patch-client tasks for mysql', () => {
@@ -95,6 +101,14 @@ describe('database template generators', () => {
     assertEquals(
       config.tasks['db:patch-client'],
       'deno run -A --minimum-dependency-age=0 scripts/patch-prisma-client.ts',
+    );
+    assertEquals(
+      config.imports['@netscript/database/scripts'],
+      netscriptJsrSpecifier('database') + '/scripts',
+    );
+    assertEquals(
+      config.imports['@netscript/database/tracing'],
+      netscriptJsrSpecifier('database') + '/tracing',
     );
   });
 

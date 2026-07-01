@@ -20,6 +20,7 @@ function makeOptions(overrides: Partial<ValidatedInitOptions> = {}): ValidatedIn
     cache: true,
     cacheBackend: 'redis',
     includeExampleService: false,
+    modelName: 'User',
     ...overrides,
   };
 }

@@ -71,6 +71,7 @@ export function createInitCommand(
     .option('--db <engine:string>', `Database engine (${DB_ENGINE_CHOICES.join(' | ')})`)
     .option('--service [enabled:boolean]', 'Scaffold an example oRPC service')
     .option('--service-name <name:string>', 'Example service name')
+    .option('--model-name <name:string>', 'Prisma model name for the scaffolded CRUD surface')
     .option('--service-port <port:number>', 'Example service port')
     .option('--cache [enabled:boolean]', 'Scaffold a shared cache resource')
     .option(
@@ -132,6 +133,7 @@ export function createInitCommand(
         cacheBackend: cacheBackend(resolvedOptions.cacheBackend),
         includeExampleService: includeService,
         serviceName: resolvedOptions.serviceName,
+        modelName: resolvedOptions.modelName,
         servicePort: resolvedOptions.servicePort,
       });
     });

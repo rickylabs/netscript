@@ -50,6 +50,7 @@ export class ServiceScaffolder {
 
     const templateVars = {
       serviceName: options.serviceName,
+      modelName: options.modelName ?? '',
       projectName: options.projectName,
       servicePort: String(options.servicePort),
     };
@@ -61,13 +62,14 @@ export class ServiceScaffolder {
         importMode: options.importMode,
         localBase: options.localBase,
         packagesAsWorkspaceMembers: options.packagesAsWorkspaceMembers,
+        hasDatabase: options.hasDatabase,
       }),
       options.force,
       filesCreated,
       filesSkipped,
     );
     await this.writeRendered(
-      TEMPLATE_KEYS.serviceMain,
+      options.hasDatabase ? TEMPLATE_KEYS.serviceMain : TEMPLATE_KEYS.serviceMainMemory,
       join(srcDir, SCAFFOLD_FILES.MAIN),
       templateVars,
       options.force,
@@ -91,7 +93,7 @@ export class ServiceScaffolder {
       filesSkipped,
     );
     await this.writeRendered(
-      TEMPLATE_KEYS.serviceRoutersV1,
+      options.hasDatabase ? TEMPLATE_KEYS.serviceRoutersV1 : TEMPLATE_KEYS.serviceRoutersV1Memory,
       join(routersDir, 'v1.ts'),
       templateVars,
       options.force,

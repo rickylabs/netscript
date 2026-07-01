@@ -83,9 +83,15 @@ export function createContractScaffolder(
     filesCreated: string[],
     filesSkipped: string[],
   ): Promise<string> {
+    const template = serviceContract.hasDatabase
+      ? templateRegistry.getContractTemplate()
+      : templateRegistry.getMemoryContractTemplate();
     const contractContent = await templateAdapter.render(
-      templateRegistry.getContractTemplate(),
-      { serviceName: serviceContract.serviceName },
+      template,
+      {
+        serviceName: serviceContract.serviceName,
+        modelName: serviceContract.modelName ?? '',
+      },
     );
     const contractPath = join(versionDir, `${serviceContract.serviceName}.contract.ts`);
     await writeTracked(contractPath, contractContent, force, filesCreated, filesSkipped);
@@ -133,6 +139,7 @@ export function createContractScaffolder(
           packageName,
           importMode: options.importMode,
           localBase: options.localBase,
+          imports: options.imports,
         }),
         options.force,
         filesCreated,

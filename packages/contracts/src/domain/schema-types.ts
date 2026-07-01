@@ -5,6 +5,10 @@ export type ContractParseResult<TOutput> = Readonly<{
   error?: unknown;
 }>;
 
+/** Infer the output value type from a documented contract schema. */
+export type ContractSchemaOutput<TSchema> = TSchema extends ContractSchema<infer TOutput> ? TOutput
+  : unknown;
+
 /** Minimal documented schema contract exposed by `@netscript/contracts`. */
 export type ContractSchema<TOutput = unknown> = Readonly<{
   parse(value: unknown): TOutput;

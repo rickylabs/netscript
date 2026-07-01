@@ -12,6 +12,7 @@ export const SAMPLE_APP_VARS = {
   appName: 'dashboard',
   appPort: '8010',
   serviceName: 'team-members',
+  modelName: 'TeamMember',
 } as const;
 
 export function makeAdapter(): StringTemplateAdapter {

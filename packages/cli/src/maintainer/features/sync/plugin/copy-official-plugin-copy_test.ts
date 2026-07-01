@@ -146,7 +146,7 @@ Deno.test("copyOfficialPlugin copies plugin and background source workspaces", a
   );
   await writeSourceFile(
     sourceRoot,
-    ".netscript/generated/plugin-workers/jobs.registry.ts",
+    ".netscript/generated/plugin-workers/job-registry.ts",
     "import stale from '../../../plugins/triggers/jobs/file-import.ts';\nexport const registry = new Map([[stale.id, stale]]);\n",
   );
 
@@ -210,7 +210,7 @@ Deno.test("copyOfficialPlugin copies plugin and background source workspaces", a
   );
 
   const registry = await Deno.readTextFile(
-    join(targetPath, ".netscript/generated/plugin-workers/jobs.registry.ts"),
+    join(targetPath, ".netscript/generated/plugin-workers/job-registry.ts"),
   );
   assertEquals(
     registry.includes("../../../plugins/triggers/jobs/file-import.ts"),
@@ -320,7 +320,7 @@ Deno.test("copyOfficialPlugin copies plugin and background source workspaces", a
   );
 
   const integratedRegistry = await Deno.readTextFile(
-    join(targetPath, ".netscript/generated/plugin-workers/jobs.registry.ts"),
+    join(targetPath, ".netscript/generated/plugin-workers/job-registry.ts"),
   );
   assertEquals(integratedRegistry.includes("send-welcome-email.ts"), true);
   assertEquals(integratedRegistry.includes("process-webhook-payload.ts"), true);

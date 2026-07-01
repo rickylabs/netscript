@@ -4,6 +4,7 @@ import {
   GATE,
   GATE_PHASE,
 } from '../../../domain/cli-surface.ts';
+import { DATABASE, type DatabaseEngine } from '../../../domain/extension-axes.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
 import { commandGate, httpGate } from './gate-factory.ts';
 
@@ -25,7 +26,9 @@ function runtimeWaitGate(resource: AspireResource): GateDefinition {
 }
 
 /** Create runtime and health-check gates for the generated application. */
-export function createRuntimeGates(): readonly GateDefinition[] {
+export function createRuntimeGates(
+  database: DatabaseEngine = DATABASE.POSTGRES,
+): readonly GateDefinition[] {
   return [
     commandGate(
       GATE.RUNTIME_ASPIRE_RESTORE,
@@ -60,7 +63,7 @@ export function createRuntimeGates(): readonly GateDefinition[] {
         context.project.projectRoot,
       ],
     ),
-    ...Object.values(ASPIRE_RESOURCE).map(runtimeWaitGate),
+    ...runtimeResources(database).map(runtimeWaitGate),
     commandGate(
       GATE.RUNTIME_ASPIRE_DESCRIBE,
       'Describe generated topology',
@@ -191,6 +194,30 @@ const ASPIRE_START_SCRIPT = [
   '  return trimmed.slice(objectIndex);',
   '}',
 ].join('\n');
+function runtimeResources(database: DatabaseEngine): readonly AspireResource[] {
+  return [
+    ...databaseRuntimeResources(database),
+    ASPIRE_RESOURCE.GARNET,
+    ASPIRE_RESOURCE.WORKERS_API,
+    ASPIRE_RESOURCE.WORKERS,
+    ASPIRE_RESOURCE.SAGAS_API,
+    ASPIRE_RESOURCE.SAGAS,
+    ASPIRE_RESOURCE.TRIGGERS_API,
+    ASPIRE_RESOURCE.TRIGGERS,
+    ASPIRE_RESOURCE.AUTH,
+  ];
+}
+
+function databaseRuntimeResources(database: DatabaseEngine): readonly AspireResource[] {
+  switch (database) {
+    case DATABASE.POSTGRES:
+      return [ASPIRE_RESOURCE.POSTGRES];
+    case DATABASE.MYSQL:
+      return [ASPIRE_RESOURCE.MYSQL];
+    case DATABASE.SQLITE:
+      return [];
+  }
+}
 
 const PROBE_SERVICE_HEALTH_SCRIPT = [
   'const appHost = Deno.args[0];',

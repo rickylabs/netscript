@@ -38,15 +38,7 @@ export function generateV1Mod(options: GenerateV1ModOptions = {}): string {
   });
 
   const typeExports = serviceNames.map((serviceName) => {
-    const pascal = toPascalCase(serviceName);
-    return `export type {
-  ${pascal}HealthV1,
-  ${pascal}ListItemV1,
-  ${pascal}ListInputV1,
-  ${pascal}ListResponseV1,
-  ${pascal}UpdateStatusInputV1,
-  ${pascal}UpdateStatusResponseV1,
-} from './${serviceName}.contract.ts';`;
+    return `export type * from './${serviceName}.contract.ts';`;
   });
 
   const aggregateEntries = serviceNames.map((serviceName) => {

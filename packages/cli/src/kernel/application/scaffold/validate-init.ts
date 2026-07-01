@@ -6,6 +6,26 @@ import { ScaffoldDirExistsError, ScaffoldValidationError } from '../../domain/er
 import type { InitOptions, ValidatedInitOptions } from '../../domain/scaffold/scaffold-options.ts';
 import type { InitPipelineContext } from './context.ts';
 
+const PRISMA_MODEL_NAME_PATTERN = /^[A-Z][A-Za-z0-9]*$/;
+
+function singularize(value: string): string {
+  if (value.endsWith('ies') && value.length > 3) {
+    return `${value.slice(0, -3)}y`;
+  }
+  if (value.endsWith('s') && value.length > 1) {
+    return value.slice(0, -1);
+  }
+  return value;
+}
+
+function toPascalName(value: string): string {
+  return value
+    .split(/[^A-Za-z0-9]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join('');
+}
+
 export async function validateOptions(
   context: InitPipelineContext,
   options: InitOptions,
@@ -97,6 +117,15 @@ export async function validateOptions(
       );
     }
   }
+  const modelName = options.modelName ?? toPascalName(singularize(
+    serviceName ?? options.serviceName ?? SCAFFOLD_DEFAULTS.SERVICE_NAME,
+  ));
+  if (!PRISMA_MODEL_NAME_PATTERN.test(modelName)) {
+    throw new ScaffoldValidationError(
+      `Invalid model name "${modelName}". Model names must be PascalCase identifiers.`,
+      { modelName, pattern: String(PRISMA_MODEL_NAME_PATTERN) },
+    );
+  }
 
   return {
     name: options.name,
@@ -116,6 +145,7 @@ export async function validateOptions(
     cacheBackend: options.cacheBackend ?? SCAFFOLD_DEFAULTS.CACHE_BACKEND,
     includeExampleService,
     serviceName,
+    modelName,
     servicePort,
   };
 }

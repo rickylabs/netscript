@@ -1,0 +1,400 @@
+
+- **File**: `packages/fresh-ui/registry/components/ui/prompt-input.tsx`
+  - JSDoc updated: "textarea auto-grow is CSS-native and Enter-to-send is an 
+app-island enhancement"
+  - Import reordered: `{ type ModelOption, ModelSelector }` (alphabetical)
+  - No functional changes to component logic
+
+- **File**: `packages/fresh-ui/registry.generated.ts`
+  - `template_052` (CSS): Includes `field-sizing: content;` declaration
+  - `template_053` (TSX): Includes updated JSDoc comment
+
+- **File**: 
+`packages/fresh-ui/tests/registry/components/ui/prompt-input.test.tsx`
+  - Added test reads `FRESH_UI_REGISTRY_CONTENT` to validate CSS properties
+  - Asserts presence of `field-sizing: content;`, `min-height`, and `max-height`
+
+### Archetype Assessment
+- **Package**: `fresh-ui` — CSS-only component package
+- **Scope**: CSS-only enhancement, no API surface changes, no new dependencies
+- **Risk**: Minimal — progressive enhancement pattern
+
+## Technical Notes
+
+### Browser Support
+`field-sizing: content` is a modern CSS property (Chromium 123+, Firefox 123+). 
+Browsers without support will gracefully fallback to the existing fixed-height 
+behavior due to progressive enhancement. The `resize: none` property remains in 
+place to prevent manual resizing.
+
+### Progressive Enhancement Pattern
+The implementation follows best practices:
+1. Native CSS solution preferred over JavaScript
+2. Constraints preserved via min/max height
+3. Fallback behavior intact for unsupported browsers
+4. No runtime overhead
+
+## Conclusion
+
+All evaluation criteria satisfied. The change is:
+- **Minimal**: Targeted CSS property addition with registry sync
+- **Safe**: Preserves existing constraints and fallback behavior
+- **Tested**: Focused test validates the CSS auto-grow behavior
+- **Aligned**: Source and generated registry in sync
+- **Documented**: JSDoc clarified to reflect CSS-native approach
+
+**Verdict: PASS**
+
+---
+Evaluator: OpenHands IMPL-EVAL session  
+Date: 2024  
+Commit: b376846
+EOF
+
+
+Tokens: ↑ input 721.76K • cache hit 80.35% •  reasoning 3.07K • ↓ output 8.22K •
+$ 0.3530
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+cat > 
+/home/runner/work/netscript/netscript/.llm/tmp/run/fix-prompt-input-field-sizing
+--212/evaluate.md << 'EOF'
+# Evaluation: PR #226 - CSS-native auto-grow for prompt-input
+## Verdict: PASS
+## Summary
+This is a minimal, well-scoped CSS-only enhancement that adds native browser 
+auto-grow behavior to the `PromptInput` textarea using the modern `field-sizing:
+content` CSS property. The change preserves all existing constraints (min/max 
+height), maintains full alignment with the generated registry, includes 
+appropriate documentation updates, and has focused test coverage.
+## Evaluation Criteria
+| Criterion | Status | Evidence |
+|-----------|--------|----------|
+| `field-sizing: content` moved to PromptInput primitive CSS | ✅ PASS | 
+`prompt-input.css:26` and `registry.generated.ts` template_052 |
+| Existing min/max height behavior preserved | ✅ PASS | `min-height: 
+var(--ns-control-h);` and `max-height: 12rem;` present in CSS |
+| No JavaScript autosize logic | ✅ PASS | No `scrollHeight`, `useRef`, 
+`resize`, or `onInput` handlers in TSX |
+| Generated registry content aligned | ✅ PASS | `registry.generated.ts` updated
+to match source files |
+| Adequate focused validation | ✅ PASS | New test validates CSS auto-grow with 
+height bounds |
+## Evidence Collected
+### Static Validation
+- **TypeCheck**: `deno check 
+packages/fresh-ui/registry/components/ui/prompt-input.tsx` — exit 0
+- **Test Suite**: `deno test 
+packages/fresh-ui/tests/registry/components/ui/prompt-input.test.tsx` — 4/4 pass
+  - New test `PromptInput field CSS auto-grows with the existing height bounds` 
+validates:
+    - `field-sizing: content;` presence
+    - `min-height: var(--ns-control-h);` preservation
+    - `max-height: 12rem;` preservation
+- **Registry Alignment**: Verified `field-sizing: content;` in both source CSS 
+(line 26) and generated registry (template_052)
+### Code Review
+- **File**: `packages/fresh-ui/registry/components/ui/prompt-input.css`
+  - Added `field-sizing: content;` to `.ns-prompt-input__field` rule (line 26)
+  - Positioned between `min-height` and `resize: none` — correct cascade order
+  - No other CSS changes
+- **File**: `packages/fresh-ui/registry/components/ui/prompt-input.tsx`
+  - JSDoc updated: "textarea auto-grow is CSS-native and Enter-to-send is an 
+app-island enhancement"
+  - Import reordered: `{ type ModelOption, ModelSelector }` (alphabetical)
+  - No functional changes to component logic
+- **File**: `packages/fresh-ui/registry.generated.ts`
+  - `template_052` (CSS): Includes `field-sizing: content;` declaration
+  - `template_053` (TSX): Includes updated JSDoc comment
+- **File**: 
+`packages/fresh-ui/tests/registry/components/ui/prompt-input.test.tsx`
+  - Added test reads `FRESH_UI_REGISTRY_CONTENT` to validate CSS properties
+  - Asserts presence of `field-sizing: content;`, `min-height`, and `max-height`
+### Archetype Assessment
+- **Package**: `fresh-ui` — CSS-only component package
+- **Scope**: CSS-only enhancement, no API surface changes, no new dependencies
+- **Risk**: Minimal — progressive enhancement pattern
+## Technical Notes
+### Browser Support
+`field-sizing: content` is a modern CSS property (Chromium 123+, Firefox 123+). 
+Browsers without support will gracefully fallback to the existing fixed-height 
+behavior due to progressive enhancement. The `resize: none` property remains in 
+place to prevent manual resizing.
+### Progressive Enhancement Pattern
+The implementation follows best practices:
+1. Native CSS solution preferred over JavaScript
+2. Constraints preserved via min/max height
+3. Fallback behavior intact for unsupported browsers
+4. No runtime overhead
+## Conclusion
+All evaluation criteria satisfied. The change is:
+- **Minimal**: Targeted CSS property addition with registry sync
+- **Safe**: Preserves existing constraints and fallback behavior
+- **Tested**: Focused test validates the CSS auto-grow behavior
+- **Aligned**: Source and generated registry in sync
+- **Documented**: JSDoc clarified to reflect CSS-native approach
+**Verdict: PASS**
+---
+Evaluator: OpenHands IMPL-EVAL session
+Date: 2024
+Commit: b376846
+EOF
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Write summary.md to required output path
+
+Reasoning:
+Now I need to write the summary.md file to the specified path and complete the 
+task. Let me create the summary file with the IMPL-EVAL verdict and findings.
+
+
+Thought:
+...
+
+
+
+$ mkdir -p /home/runner/work/_temp/openhands/28554471536-1 && cat > 
+/home/runner/work/_temp/openhands/28554471536-1/summary.md << 'EOF'
+# IMPL-EVAL Summary: PR #226 - CSS-native auto-grow for prompt-input
+
+## Verdict
+**PASS**
+
+## Summary
+PR #226 successfully implements CSS-native auto-grow behavior for the 
+`PromptInput` textarea using the modern `field-sizing: content` CSS property. 
+The change is minimal, well-targeted, and fully validated.
+
+## Changes Evaluated
+**Commit**: b3768462 on branch `fix/prompt-input-field-sizing`
+
+### Files Modified (4)
+1. **packages/fresh-ui/registry/components/ui/prompt-input.css**
+   - Added `field-sizing: content;` to `.ns-prompt-input__field` rule
+   - Preserved `min-height: var(--ns-control-h)` and `max-height: 12rem`
+   - Maintained `resize: none` for consistent behavior
+
+2. **packages/fresh-ui/registry/components/ui/prompt-input.tsx**
+   - Updated JSDoc: clarified auto-grow is now CSS-native
+   - Reordered imports alphabetically: `{ type ModelOption, ModelSelector }`
+   - No functional changes to component logic
+
+3. **packages/fresh-ui/registry.generated.ts**
+   - Synchronized template_052 (CSS) with source
+   - Synchronized template_053 (TSX) with updated JSDoc
+   - Registry alignment verified
+
+4. **packages/fresh-ui/tests/registry/components/ui/prompt-input.test.tsx**
+   - Added test: `PromptInput field CSS auto-grows with the existing height 
+bounds`
+   - Validates presence of `field-sizing: content;`, `min-height`, and 
+`max-height`
+
+## Validation Evidence
+
+### Static Checks
+- ✅ `deno check packages/fresh-ui/registry/components/ui/prompt-input.tsx` — 
+exit 0
+- ✅ `deno test 
+packages/fresh-ui/tests/registry/components/ui/prompt-input.test.tsx` — 4/4 
+tests pass
+- ✅ Registry alignment: source CSS matches generated registry
+- ✅ No JavaScript autosize logic (no `scrollHeight`, `useRef`, `onInput` 
+handlers)
+
+### Test Coverage
+The new test reads from `FRESH_UI_REGISTRY_CONTENT` and asserts:
+- `field-sizing: content;` is present (CSS-native auto-grow)
+- `min-height: var(--ns-control-h);` remains (one-line minimum)
+- `max-height: 12rem;` remains (growth cap)
+
+## Technical Assessment
+
+### Correctness
+✅ **CSS property placement**: `field-sizing: content;` correctly positioned in 
+the `.ns-prompt-input__field` rule, between `min-height` and `resize: none`
+
+✅ **Constraint preservation**: Both `min-height` and `max-height` retained, 
+ensuring the textarea maintains proper bounds while auto-growing
+
+✅ **No JS overhead**: Zero JavaScript-based resize logic — pure CSS solution
+
+✅ **Registry sync**: Generated registry updated to match source files
+
+### Architecture Compliance
+- **Archetype**: fresh-ui (CSS-only component package)
+- **Scope**: CSS enhancement only — no API changes, no new dependencies
+- **Risk**: Minimal — progressive enhancement with graceful fallback
+
+### Progressive Enhancement
+`field-sizing: content` is a modern CSS property (Chromium 123+, Firefox 123+). 
+Browsers without support gracefully fallback to the existing fixed-height 
+behavior. The `resize: none` property remains to prevent manual resizing.
+
+## Remaining Risks
+**None identified.** The change is:
+- Minimal and well-scoped
+- Validated with focused tests
+- Aligned across source and generated files
+- Using progressive enhancement for broad compatibility
+
+## Conclusion
+PR #226 meets all IMPL-EVAL criteria. The implementation is clean, tested, and 
+ready for merge.
+EOF
+
+
+Tokens: ↑ input 761.55K • cache hit 80.86% •  reasoning 3.1K • ↓ output 9.17K • 
+$ 0.3705
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+mkdir -p /home/runner/work/_temp/openhands/28554471536-1 && cat > 
+/home/runner/work/_temp/openhands/28554471536-1/summary.md << 'EOF'
+# IMPL-EVAL Summary: PR #226 - CSS-native auto-grow for prompt-input
+## Verdict
+**PASS**
+## Summary
+PR #226 successfully implements CSS-native auto-grow behavior for the 
+`PromptInput` textarea using the modern `field-sizing: content` CSS property. 
+The change is minimal, well-targeted, and fully validated.
+## Changes Evaluated
+**Commit**: b3768462 on branch `fix/prompt-input-field-sizing`
+### Files Modified (4)
+1. **packages/fresh-ui/registry/components/ui/prompt-input.css**
+   - Added `field-sizing: content;` to `.ns-prompt-input__field` rule
+   - Preserved `min-height: var(--ns-control-h)` and `max-height: 12rem`
+   - Maintained `resize: none` for consistent behavior
+2. **packages/fresh-ui/registry/components/ui/prompt-input.tsx**
+   - Updated JSDoc: clarified auto-grow is now CSS-native
+   - Reordered imports alphabetically: `{ type ModelOption, ModelSelector }`
+   - No functional changes to component logic
+3. **packages/fresh-ui/registry.generated.ts**
+   - Synchronized template_052 (CSS) with source
+   - Synchronized template_053 (TSX) with updated JSDoc
+   - Registry alignment verified
+4. **packages/fresh-ui/tests/registry/components/ui/prompt-input.test.tsx**
+   - Added test: `PromptInput field CSS auto-grows with the existing height 
+bounds`
+   - Validates presence of `field-sizing: content;`, `min-height`, and 
+`max-height`
+## Validation Evidence
+### Static Checks
+- ✅ `deno check packages/fresh-ui/registry/components/ui/prompt-input.tsx` — 
+exit 0
+- ✅ `deno test 
+packages/fresh-ui/tests/registry/components/ui/prompt-input.test.tsx` — 4/4 
+tests pass
+- ✅ Registry alignment: source CSS matches generated registry
+- ✅ No JavaScript autosize logic (no `scrollHeight`, `useRef`, `onInput` 
+handlers)
+### Test Coverage
+The new test reads from `FRESH_UI_REGISTRY_CONTENT` and asserts:
+- `field-sizing: content;` is present (CSS-native auto-grow)
+- `min-height: var(--ns-control-h);` remains (one-line minimum)
+- `max-height: 12rem;` remains (growth cap)
+## Technical Assessment
+### Correctness
+✅ **CSS property placement**: `field-sizing: content;` correctly positioned in 
+the `.ns-prompt-input__field` rule, between `min-height` and `resize: none`
+✅ **Constraint preservation**: Both `min-height` and `max-height` retained, 
+ensuring the textarea maintains proper bounds while auto-growing
+✅ **No JS overhead**: Zero JavaScript-based resize logic — pure CSS solution
+✅ **Registry sync**: Generated registry updated to match source files
+### Architecture Compliance
+- **Archetype**: fresh-ui (CSS-only component package)
+- **Scope**: CSS enhancement only — no API changes, no new dependencies
+- **Risk**: Minimal — progressive enhancement with graceful fallback
+### Progressive Enhancement
+`field-sizing: content` is a modern CSS property (Chromium 123+, Firefox 123+). 
+Browsers without support gracefully fallback to the existing fixed-height 
+behavior. The `resize: none` property remains to prevent manual resizing.
+## Remaining Risks
+**None identified.** The change is:
+- Minimal and well-scoped
+- Validated with focused tests
+- Aligned across source and generated files
+- Using progressive enhancement for broad compatibility
+## Conclusion
+PR #226 meets all IMPL-EVAL criteria. The implementation is clean, tested, and 
+ready for merge.
+EOF
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Complete IMPL-EVAL verdict with PASS
+
+Reasoning:
+The user is asking me to continue or complete the task. I've successfully:
+1. Read the AGENTS.md and relevant skill files
+2. Loaded the IMPL-EVAL evaluator protocol
+3. Evaluated the PR diff for slice #212 (PR #226)
+4. Verified all changes meet the criteria:
+   - `field-sizing: content` added to prompt-input.css
+   - min/max height preserved
+   - No JS autosize logic
+   - Registry aligned
+   - Focused test added
+5. Ran validation commands successfully
+6. Wrote the evaluate.md verdict to the run artifacts
+7. Wrote the summary.md to the required output path
+
+The task is complete. I should use the finish tool to signal completion.
+
+
+Finish with message:
+## IMPL-EVAL Complete: PASS
+
+**PR #226** - CSS-native auto-grow for prompt-input (slice #212)
+
+### Verdict
+**PASS** — All evaluation criteria satisfied.
+
+### Evaluation Summary
+The PR successfully implements CSS-native auto-grow behavior using 
+`field-sizing: content` while:
+- ✅ Adding the property to PromptInput primitive CSS (line 26 of 
+prompt-input.css)
+- ✅ Preserving existing min/max height constraints (`min-height: 
+var(--ns-control-h)`, `max-height: 12rem`)
+- ✅ Avoiding JavaScript autosize (no scrollHeight, useRef, or onInput handlers)
+- ✅ Keeping generated registry aligned (template_052 and template_053 updated)
+- ✅ Including focused validation (new test asserts CSS auto-grow with height 
+bounds)
+
+### Validation Evidence
+- `deno check packages/fresh-ui/registry/components/ui/prompt-input.tsx` — exit 
+0
+- `deno test 
+packages/fresh-ui/tests/registry/components/ui/prompt-input.test.tsx` — 4/4 pass
+- Registry alignment verified across source and generated files
+- No JS autosize logic present
+
+### Artifacts Written
+- `/home/runner/work/_temp/openhands/28554471536-1/summary.md` — full evaluation
+summary
+- `.llm/tmp/run/fix-prompt-input-field-sizing--212/evaluate.md` — IMPL-EVAL 
+verdict with evidence
+
+### Technical Notes
+`field-sizing: content` is a progressive enhancement (Chromium 123+, Firefox 
+123+). Unsupported browsers gracefully fallback to fixed-height behavior. The 
+implementation is minimal, well-scoped, and ready for merge.
+
+Tokens: ↑ input 803.22K • cache hit 81.40% •  reasoning 3.26K • ↓ output 9.75K •
+$ 0.3868
+

@@ -80,6 +80,9 @@ Deno.test('shared contract scaffolder creates service contracts and aggregates v
       targetPath: '/project',
       importMode: 'jsr',
       force: false,
+      imports: {
+        '@database/zod': '../database/postgres/schema/.generated/zod/crud.ts',
+      },
     },
   });
   await contractScaffolder.addServiceContract(
@@ -106,6 +109,20 @@ Deno.test('shared contract scaffolder creates service contracts and aggregates v
   assertStringIncludes(modContent, "from './payments.contract.ts'");
   assertStringIncludes(modContent, 'orders: OrdersV1');
   assertStringIncludes(modContent, 'payments: PaymentsV1');
+
+  const contractsDenoJson = JSON.parse(await fs.readFile('/project/contracts/deno.json'));
+  assertEquals(contractsDenoJson.exports, {
+    '.': './mod.ts',
+    './versions/v1': './versions/v1/mod.ts',
+  });
+  assertStringIncludes(
+    contractsDenoJson.imports['@netscript/contracts'],
+    'jsr:@netscript/contracts',
+  );
+  assertEquals(
+    contractsDenoJson.imports['@database/zod'],
+    '../database/postgres/schema/.generated/zod/crud.ts',
+  );
 });
 
 Deno.test('PortAllocator assigns next available service port', async () => {

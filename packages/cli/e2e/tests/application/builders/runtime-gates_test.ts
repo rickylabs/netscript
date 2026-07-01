@@ -2,6 +2,7 @@ import { assertEquals } from '@std/assert';
 
 import { GATE } from '../../../src/domain/cli-surface.ts';
 import type { RunContext } from '../../../src/domain/run-context.ts';
+import { DATABASE } from '../../../src/domain/extension-axes.ts';
 import { createRuntimeGates } from '../../../src/application/gates/scaffold/runtime-gates.ts';
 
 Deno.test('runtime aspire start gate captures detached endpoint metadata', () => {
@@ -27,4 +28,26 @@ Deno.test('runtime aspire start gate captures detached endpoint metadata', () =>
   assertEquals(command.at(-1), '/workspace/app');
   assertEquals(command[2].includes('"--format"'), true);
   assertEquals(command[2].includes('aspire-start.json'), true);
+});
+
+Deno.test('runtime gates wait for postgres resource by default', () => {
+  const gateIds = createRuntimeGates().map((entry) => entry.id);
+
+  assertEquals(gateIds.includes(GATE.RUNTIME_WAIT_POSTGRES), true);
+  assertEquals(gateIds.includes(GATE.RUNTIME_WAIT_MYSQL), false);
+});
+
+Deno.test('runtime gates wait for mysql resource when mysql is selected', () => {
+  const gateIds = createRuntimeGates(DATABASE.MYSQL).map((entry) => entry.id);
+
+  assertEquals(gateIds.includes(GATE.RUNTIME_WAIT_POSTGRES), false);
+  assertEquals(gateIds.includes(GATE.RUNTIME_WAIT_MYSQL), true);
+});
+
+Deno.test('runtime gates skip database resource wait for sqlite', () => {
+  const gateIds = createRuntimeGates(DATABASE.SQLITE).map((entry) => entry.id);
+
+  assertEquals(gateIds.includes(GATE.RUNTIME_WAIT_POSTGRES), false);
+  assertEquals(gateIds.includes(GATE.RUNTIME_WAIT_MYSQL), false);
+  assertEquals(gateIds.includes(GATE.RUNTIME_WAIT_GARNET), true);
 });
