@@ -83,8 +83,11 @@ export function createContractScaffolder(
     filesCreated: string[],
     filesSkipped: string[],
   ): Promise<string> {
+    const template = serviceContract.hasDatabase
+      ? templateRegistry.getContractTemplate()
+      : templateRegistry.getMemoryContractTemplate();
     const contractContent = await templateAdapter.render(
-      templateRegistry.getContractTemplate(),
+      template,
       {
         serviceName: serviceContract.serviceName,
         modelName: serviceContract.modelName ?? '',

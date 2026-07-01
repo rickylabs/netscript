@@ -64,7 +64,12 @@ export async function scaffoldContracts(
       imports: contractDatabaseImports(options),
     },
     serviceContract: options.includeExampleService && options.serviceName
-      ? { serviceName: options.serviceName, modelName: options.modelName, version: SCAFFOLD_DIRS.V1 }
+      ? {
+        serviceName: options.serviceName,
+        modelName: options.modelName,
+        hasDatabase: isDbEngine(options.dbEngine),
+        version: SCAFFOLD_DIRS.V1,
+      }
       : undefined,
   });
 

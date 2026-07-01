@@ -42,6 +42,9 @@ export interface ServiceContractOptions {
   /** Prisma domain model name associated with the service. */
   readonly modelName?: string;
 
+  /** Whether this contract should target the database-backed CRUD surface. */
+  readonly hasDatabase?: boolean;
+
   /** Version directory to target. */
   readonly version: ContractVersion;
 }
@@ -104,6 +107,9 @@ export interface DiscoveredVersion {
 export interface ContractTemplateRegistry {
   /** Get the service contract template. */
   getContractTemplate(): string;
+
+  /** Get the no-database in-memory service contract template. */
+  getMemoryContractTemplate(): string;
 
   /** Get the root contracts/mod.ts template. */
   getRootModTemplate(): string;

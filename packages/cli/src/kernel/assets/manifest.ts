@@ -108,6 +108,7 @@ export const TEMPLATE_KEYS = {
   generatedWorkspaceNetscriptConfig1: 'generated/workspace/netscript-config-1.ts.template',
   pluginsServiceContext: 'plugins/service-context.ts.template',
   serviceContract: 'service/contract.ts.template',
+  serviceContractMemory: 'service/contract.memory.ts.template',
   serviceMain: 'service/main.ts.template',
   serviceRouter: 'service/router.ts.template',
   serviceRoutersHealth: 'service/routers/health.ts.template',
