@@ -1,2 +1,0 @@
-[0m[32mTask[0m [0m[36mcheck[0m deno check ./mod.ts ./interactive.ts ./server.ts ./builders/mod.ts ./route/mod.ts ./defer/mod.ts ./form/mod.ts ./error/mod.ts ./utils/mod.ts ./streams/mod.ts ./config/vite.ts
-[0m[33mWarning[0m No matching files found.

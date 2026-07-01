@@ -1,1 +1,0 @@
-- PLAN-EVAL: PASS (OpenHands minimax-M3, run 28419815466) — all Plan-Gate boxes checked; 4 non-blocking refinements folded into plan.md (Slice0 sagas re-export, Slice2 shim-not-rename, Slice4 glue/ folder, R5 WithEnvironment process-scope).

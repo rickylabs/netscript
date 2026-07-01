@@ -1,7 +1,0 @@
-Check tests/cli/sagas-cli_test.ts
-[0m[38;5;245mrunning 2 tests from ./tests/cli/sagas-cli_test.ts[0m
-SagasCli exposes the sagas command registry ... [0m[32mok[0m [0m[38;5;245m(2ms)[0m
-SagasCli exposes command metadata with categories and flags ... [0m[32mok[0m [0m[38;5;245m(0ms)[0m
-
-[0m[32mok[0m | 2 passed | 0 failed [0m[38;5;245m(12ms)[0m
-

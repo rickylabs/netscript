@@ -1,5 +1,0 @@
-running 1 test from ./packages/config/workspace.test.ts
-discoverWorkspace finds standardized project members ... ok (56ms)
-
-ok | 1 passed | 0 failed (65ms)
-

@@ -1,3 +1,0 @@
-- 0b5f8fce: feat(cli): expose scaffold contract v1 subpath
-- d9ab28af: feat(cli): parameterize scaffold database model
-- 1c2f7e91: feat(cli): wire generated database zod aliases

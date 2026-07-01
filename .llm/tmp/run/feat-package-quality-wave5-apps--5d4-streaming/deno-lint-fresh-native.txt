@@ -1,4 +1,0 @@
-[0m[1m[31merror[0m: equal sign is needed when assigning values to '--ext=<EXT>'
-
-Usage: deno lint [OPTIONS] [files]...
-

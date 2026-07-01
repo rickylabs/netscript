@@ -1,5 +1,0 @@
-Command: deno doc --lint packages/fresh/form/types.ts
-Result: PASS
-
-Output:
-Checked 1 file
