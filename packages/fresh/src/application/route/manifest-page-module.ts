@@ -264,13 +264,94 @@ function ensureImport(
 
   // Place the new import after the final existing top-level import for stable
   // output; fall back to prepending when the module has no imports yet.
-  const lastImportMatch = [...source.matchAll(/^import\b[^\n]*\n/gm)].at(-1);
-  if (lastImportMatch && lastImportMatch.index !== undefined) {
-    const insertAt = lastImportMatch.index + lastImportMatch[0].length;
+  const insertAt = findLastStaticImportEnd(source);
+  if (insertAt !== undefined) {
     return `${source.slice(0, insertAt)}${importLine}\n${source.slice(insertAt)}`;
   }
 
   return `${importLine}\n${source}`;
+}
+
+function findLastStaticImportEnd(source: string): number | undefined {
+  const lineMatches = source.matchAll(/[^\n]*(?:\n|$)/g);
+  let cursor = 0;
+  let importStart: number | undefined;
+  let importBraceDepth = 0;
+  let lastImportEnd: number | undefined;
+
+  for (const match of lineMatches) {
+    const line = match[0];
+    if (line.length === 0) {
+      break;
+    }
+
+    if (importStart === undefined && isStaticImportStart(line)) {
+      importStart = cursor;
+      importBraceDepth = 0;
+    }
+
+    if (importStart !== undefined) {
+      importBraceDepth = applyBraceDelta(line, importBraceDepth);
+      if (importBraceDepth === 0 && endsImportDeclaration(line)) {
+        lastImportEnd = cursor + line.length;
+        importStart = undefined;
+      }
+    }
+
+    cursor += line.length;
+  }
+
+  return lastImportEnd;
+}
+
+function isStaticImportStart(line: string): boolean {
+  return /^\s*import\b(?!\s*[\(.])/.test(line);
+}
+
+function endsImportDeclaration(line: string): boolean {
+  const statement = line.replace(/\/\/.*$/, '').trimEnd();
+  if (statement.endsWith(';')) {
+    return true;
+  }
+  return /^import\s+['"][^'"]+['"]$/.test(statement) ||
+    /\bfrom\s+['"][^'"]+['"]$/.test(statement);
+}
+
+function applyBraceDelta(line: string, initialDepth: number): number {
+  let depth = initialDepth;
+  let inString: string | undefined;
+
+  for (let index = 0; index < line.length; index += 1) {
+    const char = line[index];
+
+    if (inString) {
+      if (char === '\\') {
+        index += 1;
+        continue;
+      }
+      if (char === inString) {
+        inString = undefined;
+      }
+      continue;
+    }
+
+    if (char === '/' && line[index + 1] === '/') {
+      break;
+    }
+
+    if (char === '"' || char === "'" || char === '`') {
+      inString = char;
+      continue;
+    }
+
+    if (char === '{') {
+      depth += 1;
+    } else if (char === '}') {
+      depth -= 1;
+    }
+  }
+
+  return depth;
 }
 
 /**
