@@ -32,6 +32,47 @@ Deno.test('Form renders framework-owned submission and csrf hidden inputs', () =
   assert(html.includes('class="demo-form"'), `Expected forwarded class in ${html}`);
 });
 
+Deno.test('Form forwards formProps attrs to the rendered form without dropping hidden inputs', () => {
+  const runtime = resolveRuntimeFormState(
+    replyFor<{ name?: string }>().initial({
+      values: { name: 'Ada' },
+      initialValues: { name: 'Ada' },
+      submissionId: 'sub-attrs',
+      csrfToken: 'csrf-attrs',
+    }),
+    {
+      id: 'runtime-form',
+      action: '/dashboard/framework/forms',
+    },
+  );
+
+  const html = renderToString(
+    <Form
+      state={runtime}
+      formProps={{
+        id: 'managed-form',
+        class: 'managed-form',
+        target: '_self',
+        'aria-label': 'Profile form',
+        'data-form-kind': 'profile',
+      }}
+    >
+      <input type='text' name='name' defaultValue='Ada' />
+    </Form>,
+  );
+
+  assert(html.includes('<form'), `Expected form element in ${html}`);
+  assert(html.includes('id="managed-form"'), `Expected formProps id in ${html}`);
+  assert(html.includes('class="managed-form"'), `Expected formProps class in ${html}`);
+  assert(html.includes('target="_self"'), `Expected formProps target in ${html}`);
+  assert(html.includes('aria-label="Profile form"'), `Expected formProps aria attr in ${html}`);
+  assert(html.includes('data-form-kind="profile"'), `Expected formProps data attr in ${html}`);
+  assert(html.includes('name="__submission_id__"'), `Expected submission id input in ${html}`);
+  assert(html.includes('value="sub-attrs"'), `Expected submission id value in ${html}`);
+  assert(html.includes('name="__csrf__"'), `Expected csrf input in ${html}`);
+  assert(html.includes('value="csrf-attrs"'), `Expected csrf value in ${html}`);
+});
+
 Deno.test('createFormEnhancementSnapshot strips runtime descriptors to a serializable shape', () => {
   const runtime = resolveRuntimeFormState(
     replyFor<{ name?: string }>().initial({
