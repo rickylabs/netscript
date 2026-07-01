@@ -132,6 +132,8 @@ describe('generateRegisterBackground', () => {
     assertStringIncludes(output, '// Database dependency');
     assertStringIncludes(output, 'infrastructure.primaryDatabase');
     assertStringIncludes(output, "withEnvironment('DATABASE_URL'");
+    assertStringIncludes(output, "workers_sqliteDatabase?.Engine === 'Sqlite'");
+    assertStringIncludes(output, 'file:./database/${config.PrimaryDatabase}/');
   });
 
   it('should include KV cache dependency when RequiresKv is true', () => {
@@ -146,7 +148,10 @@ describe('generateRegisterBackground', () => {
     assertStringIncludes(output, '// KV cache dependency');
     assertStringIncludes(output, 'infrastructure.primaryCacheEndpoint');
     assertStringIncludes(output, 'withReference(infrastructure.primaryCacheEndpoint)');
-    assertStringIncludes(output, "import { EndpointProperty } from '../.aspire/modules/aspire.mjs'");
+    assertStringIncludes(
+      output,
+      "import { EndpointProperty } from '../.aspire/modules/aspire.mjs'",
+    );
     assertStringIncludes(
       output,
       'infrastructure.primaryCacheEndpoint.property(EndpointProperty.HostAndPort)',
@@ -166,7 +171,7 @@ describe('generateRegisterBackground', () => {
     });
     assertStringIncludes(
       output,
-      "sagas.withEnvironment('NETSCRIPT_SAGA_STORE', \"prisma\")",
+      'sagas.withEnvironment(\'NETSCRIPT_SAGA_STORE\', "prisma")',
     );
   });
 
