@@ -19,6 +19,10 @@ function asConfigureServerHook(plugin: ReturnType<typeof createNetScriptVitePlug
   return plugin.configureServer as unknown as (server: ViteDevServer) => void | Promise<void>;
 }
 
+function asBuildStartHook(plugin: ReturnType<typeof createNetScriptVitePlugin>) {
+  return plugin.buildStart as unknown as () => void;
+}
+
 function asResolveIdHook(plugin: ReturnType<typeof createNetScriptVitePlugin>) {
   return plugin.resolveId as unknown as (
     source: string,
@@ -145,6 +149,72 @@ Deno.test('createNetScriptVitePlugin resolves @app aliases via resolveId', async
   assert(
     resolved === 'C:/repo/apps/playground/assets/tokens.css',
     `Unexpected resolved path: ${resolved}`,
+  );
+});
+
+Deno.test('createNetScriptVitePlugin rewrites page modules for route binding by default', () => {
+  const appRoot = Deno.makeTempDirSync();
+  const routeDir = resolve(appRoot, 'routes/orders');
+  Deno.mkdirSync(routeDir, { recursive: true });
+  const pagePath = resolve(routeDir, '[id].tsx');
+  Deno.writeTextFileSync(
+    pagePath,
+    [
+      "import { z } from 'zod';",
+      "import { definePage } from '@app/utils.ts';",
+      'export const ordersDetailPage = definePage()',
+      '  .withRouteContract({ pathSchema: z.object({ id: z.string().min(1) }) })',
+      '  .build();',
+    ].join('\n'),
+  );
+
+  const plugin = createNetScriptVitePlugin({ appRoot, routeManifest: {} });
+  asBuildStartHook(plugin)();
+
+  const rewritten = Deno.readTextFileSync(pagePath);
+  assert(
+    rewritten.includes('$route: routePatterns.orders.$id.$route'),
+    `Expected the inline $route field to be inserted: ${rewritten}`,
+  );
+  assert(
+    rewritten.includes("import { routePatterns } from '@app/.generated/manifest.ts';"),
+    `Expected the routePatterns import to be inserted: ${rewritten}`,
+  );
+
+  // Idempotency: a second build pass produces no further change.
+  asBuildStartHook(plugin)();
+  assert(
+    Deno.readTextFileSync(pagePath) === rewritten,
+    'Expected a second build pass to leave the page module unchanged',
+  );
+});
+
+Deno.test('createNetScriptVitePlugin leaves page modules untouched when pageModuleRouteBinding is false', () => {
+  const appRoot = Deno.makeTempDirSync();
+  const routeDir = resolve(appRoot, 'routes');
+  Deno.mkdirSync(routeDir, { recursive: true });
+  const pagePath = resolve(routeDir, 'about.tsx');
+  const original = [
+    "import { definePage } from '@app/utils.ts';",
+    "export const aboutPage = definePage().withMeta(() => ({ title: 'About' })).build();",
+  ].join('\n');
+  Deno.writeTextFileSync(pagePath, original);
+
+  const plugin = createNetScriptVitePlugin({
+    appRoot,
+    routeManifest: {},
+    pageModuleRouteBinding: false,
+  });
+  asBuildStartHook(plugin)();
+
+  assert(
+    Deno.readTextFileSync(pagePath) === original,
+    'Expected page module to be untouched when pageModuleRouteBinding is false',
+  );
+  // The generated routes module is still written.
+  assert(
+    Deno.readTextFileSync(resolve(appRoot, '.generated/routes.ts')).includes('export const routes'),
+    'Expected the generated routes module to still be written',
   );
 });
 

@@ -78,6 +78,7 @@ handlers, and response shaping. Each returns a `PageBuilder` for continued chain
 | `withPathParams(schema)` | Apply a typed path schema to the page. |
 | `withSearchParams(schema)` | Apply a typed search schema to the page. |
 | `withRoute(route)` | Bind the page to a generated route reference. |
+| `withRouteContract({ $route?, pathSchema?, searchSchema? })` | Bind the page to a route via an inline contract; the Vite plugin inserts `$route` from the page path. |
 | `withPolicy(policy)` | Configure defer policy defaults for the page. |
 | `withTelemetry(telemetry)` | Configure telemetry metadata for the page. |
 | `withLayer(id, component, config?)` | Register a render layer for the page. |
@@ -103,6 +104,27 @@ which exposes a typed `nav`, an `href(...)` builder, a route-bound `Link` compon
 and `parsePath` / `parseSearch` helpers (plus `safeParsePath` / `safeParseSearch`
 returning a `PageSchemaParseResult`). Data loading details are covered in
 [Data loading and the query cache](/web-layer/query/).
+
+#### Codegen-owned route binding
+
+With the NetScript Vite plugin enabled, the binding call itself is generated from
+the page module's path under `routes/`, so you author only the contract body. Three
+forms converge on the same generated `routes.<key>` tree:
+
+- **Form A — inline.** `withRouteContract({ pathSchema?, searchSchema? })` keeps the
+  contract body in the page module. The generator inserts
+  `$route: routePatterns.<key>.$route` as the first field and the `routePatterns`
+  import. The inline schemas drive the same `path` / `search` type-state promotion
+  as `withRoute`.
+- **Form B — sidecar.** A sibling `<page>.route.ts` owns the contract. The generator
+  inserts `.withRoute(routes.<key>.$route)` and the `routes` import.
+- **Form C — no contract.** The generator inserts a default
+  `.withRoute(routes.<key>.$route)` backed by `createRouteReference(routePattern)`.
+
+Both inline and sidecar in the same page is a build warning (inline wins, the
+sidecar is left in place). `.withRoute` and `.withRouteContract` in the same page is
+a build error. Set `pageModuleRouteBinding: false` on the Vite plugin to disable
+page-module rewriting and keep hand-written `.withRoute(...)` lines.
 
 ### Defer policy and streaming
 

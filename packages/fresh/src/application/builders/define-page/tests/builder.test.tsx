@@ -432,3 +432,66 @@ Deno.test('definePage withRoute(route) supports implicit createNav and build()',
     `Expected handler href to use ctx.search.page: ${handlerHref}`,
   );
 });
+Deno.test('definePage withRouteContract({ pathSchema }) promotes path type-state and binds the route', async () => {
+  let capturedHref = '';
+  const routeBuilder = definePage<{ requestId: string }>()
+    .withRouteContract({
+      $route: '/dashboard/orders/[id]',
+      pathSchema: z.object({ id: z.string().min(1) }),
+    })
+    .withLayer('panel', () => <div />)
+    .withLayout((_slots, ctx) => {
+      // Type-state promotion: ctx.path.id is typed as string from the inline schema.
+      capturedHref = ctx.route.nav.makeHref({ path: { id: ctx.path.id } });
+      return <main />;
+    });
+  const route = routeBuilder.build();
+  await route.default(
+    createRequestContext({
+      params: { id: 'order-7' },
+      url: new URL('http://localhost/dashboard/orders/order-7'),
+    }),
+  );
+  const href = route.nav.makeHref({ path: { id: 'order-9' } });
+  assert(
+    href === '/dashboard/orders/order-9',
+    `Expected inline-contract route to bind the $route pattern: ${href}`,
+  );
+  assert(
+    capturedHref === '/dashboard/orders/order-7',
+    `Expected layout ctx.path to carry the promoted inline path: ${capturedHref}`,
+  );
+});
+Deno.test('definePage withRouteContract({ searchSchema }) promotes search type-state', () => {
+  const route = definePage<{ requestId: string }>()
+    .withRouteContract({
+      $route: '/dashboard/orders',
+      searchSchema: z.object({
+        page: z.coerce.number().int().min(1).default(1),
+        preview: fallback(z.enum(['true', 'false']), 'false'),
+      }),
+    })
+    .withLayer('panel', () => <div />)
+    .build();
+  const href = route.nav.makeHref({ search: { page: 4 } });
+  assert(
+    href === '/dashboard/orders?page=4&preview=false',
+    `Expected inline-contract search schema to drive typed hrefs: ${href}`,
+  );
+});
+Deno.test('definePage withRouteContract({}) throws a clear error when $route is missing', () => {
+  let thrown: unknown;
+  try {
+    definePage<{ requestId: string }>()
+      .withRouteContract({ pathSchema: z.object({ id: z.string() }) })
+      .withLayer('panel', () => <div />)
+      .build();
+  } catch (error: unknown) {
+    thrown = error;
+  }
+  assert(thrown instanceof Error, 'Expected a missing $route to throw an Error');
+  assert(
+    thrown.message.includes('$route'),
+    `Expected the error to mention the missing $route field: ${thrown.message}`,
+  );
+});

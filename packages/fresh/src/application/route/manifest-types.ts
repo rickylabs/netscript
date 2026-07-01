@@ -1,5 +1,9 @@
 /** Public types for NetScript route manifest generation. */
 
+import type { PageModuleRouteForm } from './manifest-page-module.ts';
+
+export type { PageModuleRouteForm } from './manifest-page-module.ts';
+
 /** Options controlling the NetScript route manifest generator. */
 export interface NetScriptRouteManifestOptions {
   /** Whether manifest generation is enabled. */
@@ -38,6 +42,20 @@ export interface DiscoveredNetScriptRoute {
   routeKeyPath: string[];
   /** Relative import path to the route contract sidecar, if present. */
   routeContractImportPath?: string;
+  /**
+   * WI-12 page-module authoring form discovered by scanning the page module.
+   *
+   * - `inline`: page module has `.withRouteContract({...})` (Form A).
+   * - `sidecar`: page module has a sibling `<page>.route.ts` (Form B).
+   * - `default`: neither inline contract nor sidecar (Form C).
+   */
+  pageModuleForm?: PageModuleRouteForm;
+  /**
+   * Inline contract object body (schema fields, excluding `$route`) extracted
+   * from the page module's `.withRouteContract({...})` call. Present only for
+   * Form A routes.
+   */
+  inlineContractBody?: string;
 }
 
 /** Result returned after writing the generated route manifest files. */

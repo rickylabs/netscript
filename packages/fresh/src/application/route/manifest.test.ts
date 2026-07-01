@@ -72,6 +72,99 @@ Deno.test('discoverNetScriptRoutes only binds route contracts from sibling sidec
   );
 });
 
+Deno.test('discoverNetScriptRoutes classifies inline .withRouteContract page modules as Form A', () => {
+  const appRoot = Deno.makeTempDirSync();
+  const routeDir = resolve(appRoot, 'routes/orders');
+  Deno.mkdirSync(routeDir, { recursive: true });
+  Deno.writeTextFileSync(
+    resolve(routeDir, '[id].tsx'),
+    [
+      "import { z } from 'zod';",
+      "import { definePage } from '@netscript/fresh';",
+      'export const ordersDetailPage = definePage()',
+      '  .withRouteContract({ pathSchema: z.object({ id: z.string().min(1) }) })',
+      '  .build();',
+    ].join('\n'),
+  );
+
+  const options = resolveNetScriptRouteManifestOptions(appRoot, {});
+  const routes = discoverNetScriptRoutes(options);
+  const ordersRoute = routes.find((route) => route.relativeRouteFilePath.endsWith('[id].tsx'));
+
+  assert(ordersRoute !== undefined, 'Expected orders route to be discovered');
+  assert(
+    ordersRoute.pageModuleForm === 'inline',
+    `Expected inline form, received: ${ordersRoute.pageModuleForm}`,
+  );
+  assert(
+    ordersRoute.inlineContractBody === 'pathSchema: z.object({ id: z.string().min(1) })',
+    `Unexpected extracted inline body: ${ordersRoute.inlineContractBody}`,
+  );
+  assert(
+    ordersRoute.routeContractImportPath === undefined,
+    'Did not expect a sidecar import for an inline (Form A) page',
+  );
+});
+
+Deno.test('discoverNetScriptRoutes ignores .withRouteContract outside page modules (helper files)', () => {
+  const appRoot = Deno.makeTempDirSync();
+  const routeDir = resolve(appRoot, 'routes/orders');
+  const helperDir = resolve(routeDir, '(_shared)');
+  Deno.mkdirSync(helperDir, { recursive: true });
+  // A non-page helper file that mentions .withRouteContract must not become a route.
+  Deno.writeTextFileSync(
+    resolve(helperDir, 'contract-helper.ts'),
+    'export const sample = (b) => b.withRouteContract({ pathSchema: undefined });\n',
+  );
+  Deno.writeTextFileSync(
+    resolve(routeDir, 'index.tsx'),
+    "import { definePage } from '@netscript/fresh';\nexport const ordersPage = definePage().build();\n",
+  );
+
+  const options = resolveNetScriptRouteManifestOptions(appRoot, {});
+  const routes = discoverNetScriptRoutes(options);
+
+  assert(routes.length === 1, `Expected only the orders index page, received ${routes.length}`);
+  assert(
+    routes[0].relativeRouteFilePath.endsWith('orders/index.tsx'),
+    `Unexpected discovered route: ${routes[0].relativeRouteFilePath}`,
+  );
+  assert(
+    routes[0].pageModuleForm === 'default',
+    `Expected the orders index page to be Form C (default): ${routes[0].pageModuleForm}`,
+  );
+});
+
+Deno.test('discoverNetScriptRoutes errors when a page has both .withRoute and .withRouteContract', () => {
+  const appRoot = Deno.makeTempDirSync();
+  const routeDir = resolve(appRoot, 'routes/orders');
+  Deno.mkdirSync(routeDir, { recursive: true });
+  Deno.writeTextFileSync(
+    resolve(routeDir, '[id].tsx'),
+    [
+      "import { routes } from '@app/.generated/routes.ts';",
+      "import { definePage } from '@netscript/fresh';",
+      'export const p = definePage()',
+      '  .withRoute(routes.orders.$id.$route)',
+      '  .withRouteContract({ pathSchema: undefined })',
+      '  .build();',
+    ].join('\n'),
+  );
+
+  const options = resolveNetScriptRouteManifestOptions(appRoot, {});
+  let thrown: unknown;
+  try {
+    discoverNetScriptRoutes(options);
+  } catch (error: unknown) {
+    thrown = error;
+  }
+  assert(thrown instanceof Error, 'Expected a build error for the dual-binding page');
+  assert(
+    thrown.message.includes('.withRoute and .withRouteContract'),
+    `Unexpected error message: ${(thrown as Error).message}`,
+  );
+});
+
 Deno.test('discoverNetScriptRoutes preserves key semantics for grouped, nested, catch-all, and optional catch-all routes', () => {
   const appRoot = Deno.makeTempDirSync();
 

@@ -9,9 +9,13 @@ import {
 import {
   isRouteManifestWatchPath,
   resolveNetScriptRouteManifestOptions,
+  writeNetScriptPageModuleBindingsSync,
   writeNetScriptRouteManifestSync,
 } from '../route/manifest.ts';
-import type { NetScriptRouteManifestOptions } from '../route/manifest.ts';
+import type {
+  NetScriptRouteManifestOptions,
+  ResolvedNetScriptRouteManifestOptions,
+} from '../route/manifest.ts';
 
 export type { NetScriptRouteManifestOptions } from '../route/manifest.ts';
 
@@ -87,6 +91,14 @@ export interface NetScriptVitePluginOptions {
   includeWorkspaceRootInFsAllow?: boolean;
   /** Route manifest generation options. */
   routeManifest?: NetScriptRouteManifestOptions;
+  /**
+   * Whether the generator rewrites page modules to own the route-binding call
+   * (WI-12). When `true` (default), Form A page modules receive the inline
+   * `$route:` field and Form B/C page modules receive `.withRoute(...)`. When
+   * `false`, page modules are left untouched and only the generated manifest
+   * and routes modules are updated.
+   */
+  pageModuleRouteBinding?: boolean;
 }
 
 /** Package-owned Vite plugin type used by NetScript Fresh. */
@@ -156,6 +168,43 @@ function resolveAliasImport(
   return undefined;
 }
 
+function toAliasImportSpecifier(
+  appRoot: string,
+  aliasPrefix: string,
+  absoluteFilePath: string,
+): string {
+  const normalizedRoot = normalizePath(appRoot);
+  const normalizedFile = normalizePath(absoluteFilePath);
+  const relativePath = normalizedFile.startsWith(`${normalizedRoot}/`)
+    ? normalizedFile.slice(normalizedRoot.length + 1)
+    : normalizedFile;
+  return `${aliasPrefix}/${relativePath}`;
+}
+
+function runPageModuleBinding(
+  phase: 'init' | 'build' | 'watch',
+  routeManifest: ResolvedNetScriptRouteManifestOptions,
+  appRoot: string,
+  aliasPrefix: string,
+): void {
+  const result = writeNetScriptPageModuleBindingsSync(routeManifest, {
+    manifestImportSpecifier: toAliasImportSpecifier(
+      appRoot,
+      aliasPrefix,
+      routeManifest.manifestOutputPath,
+    ),
+    routesImportSpecifier: toAliasImportSpecifier(
+      appRoot,
+      aliasPrefix,
+      routeManifest.routesOutputPath,
+    ),
+  });
+
+  for (const warning of result.warnings) {
+    console.warn(`[vite-plugin-netscript] ${phase}: ${warning}`);
+  }
+}
+
 function logRouteManifestResult(
   _phase: 'init' | 'build' | 'watch',
   _result: {
@@ -186,6 +235,7 @@ export function createNetScriptVitePlugin(
   const routeManifest = options.routeManifest && options.routeManifest.enabled !== false
     ? resolveNetScriptRouteManifestOptions(appRoot, options.routeManifest)
     : undefined;
+  const pageModuleRouteBinding = options.pageModuleRouteBinding !== false;
   const allowFsPaths = dedupe([
     ...(options.includeWorkspaceRootInFsAllow === false ? [] : [normalizePath(workspaceRoot)]),
     ...(options.allowFsPaths ?? []).map((value) => normalizePath(value)),
@@ -194,6 +244,9 @@ export function createNetScriptVitePlugin(
   if (routeManifest) {
     const result = writeNetScriptRouteManifestSync(routeManifest);
     logRouteManifestResult('init', result, routeManifest.logLevel);
+    if (pageModuleRouteBinding) {
+      runPageModuleBinding('init', routeManifest, appRoot, aliasPrefix);
+    }
   }
 
   const plugin: Plugin = {
@@ -273,6 +326,9 @@ export function createNetScriptVitePlugin(
       if (routeManifest) {
         const result = writeNetScriptRouteManifestSync(routeManifest);
         logRouteManifestResult('build', result, routeManifest.logLevel);
+        if (pageModuleRouteBinding) {
+          runPageModuleBinding('build', routeManifest, appRoot, aliasPrefix);
+        }
       }
     },
     configureServer(server: ViteDevServer) {
@@ -297,6 +353,9 @@ export function createNetScriptVitePlugin(
           routeManifestTimer = setTimeout(() => {
             const result = writeNetScriptRouteManifestSync(routeManifest);
             logRouteManifestResult('watch', result, routeManifest.logLevel);
+            if (pageModuleRouteBinding) {
+              runPageModuleBinding('watch', routeManifest, appRoot, aliasPrefix);
+            }
             if (result.changed) {
               server.ws.send({ type: 'full-reload' });
             }

@@ -118,6 +118,31 @@ export type PathParamSchema<TOutput = unknown> = SchemaLike<PathParamInput, TOut
 /** @internal */
 export type SearchParamSchema<TOutput = unknown> = SchemaLike<SearchParamInput, TOutput>;
 
+/**
+ * Inline route-contract authoring input accepted by `definePage().withRouteContract({...})`.
+ *
+ * The `$route` field carries the raw Fresh route pattern that binds the inline
+ * contract to a concrete route. It is normally inserted by the NetScript Vite
+ * plugin codegen pass from the page module's path under `routes/`, so authors
+ * write only the schema body.
+ *
+ * @internal
+ */
+export interface DefinePageRouteContractInput<
+  TPathSchema = unknown,
+  TSearchSchema = unknown,
+> {
+  /**
+   * Raw Fresh route pattern (e.g. `"/orders/[id]"`) or a `routePatterns.<key>.$route`
+   * accessor. Inserted by the generator when omitted in source.
+   */
+  $route?: string;
+  /** Path-parameter schema for the route. */
+  pathSchema?: TPathSchema & PathParamSchema;
+  /** Search-parameter schema for the route. */
+  searchSchema?: TSearchSchema & SearchParamSchema;
+}
+
 /** @internal */
 export interface DefinePageTypeState<
   TState = EmptyRecord,
@@ -308,6 +333,19 @@ export type DefinePageWithRoute<
   DefinePageResourcesOf<TTypes>,
   InferRoutePath<TRoute>,
   InferRouteSearch<TRoute>,
+  DefinePageLayerDataOf<TTypes>
+>;
+
+/** @internal */
+export type DefinePageWithRouteContract<
+  TTypes extends AnyDefinePageTypeState,
+  TPathSchema,
+  TSearchSchema,
+> = DefinePageTypeState<
+  DefinePageStateOf<TTypes>,
+  DefinePageResourcesOf<TTypes>,
+  ResolveSchemaOutput<DefinePagePathOf<TTypes>, TPathSchema>,
+  ResolveSchemaOutput<DefinePageSearchOf<TTypes>, TSearchSchema>,
   DefinePageLayerDataOf<TTypes>
 >;
 
