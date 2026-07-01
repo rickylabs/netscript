@@ -106,6 +106,16 @@ Deno.test('shared contract scaffolder creates service contracts and aggregates v
   assertStringIncludes(modContent, "from './payments.contract.ts'");
   assertStringIncludes(modContent, 'orders: OrdersV1');
   assertStringIncludes(modContent, 'payments: PaymentsV1');
+
+  const contractsDenoJson = JSON.parse(await fs.readFile('/project/contracts/deno.json'));
+  assertEquals(contractsDenoJson.exports, {
+    '.': './mod.ts',
+    './versions/v1': './versions/v1/mod.ts',
+  });
+  assertStringIncludes(
+    contractsDenoJson.imports['@netscript/contracts'],
+    'jsr:@netscript/contracts',
+  );
 });
 
 Deno.test('PortAllocator assigns next available service port', async () => {

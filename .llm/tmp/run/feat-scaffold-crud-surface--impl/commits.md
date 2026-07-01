@@ -1,0 +1,1 @@
+- e2b64e76: feat(cli): expose scaffold contract v1 subpath
