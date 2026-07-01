@@ -8,18 +8,24 @@ import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import { generateTsAspireConfig } from './generate-aspire-config.ts';
 
 describe('generateTsAspireConfig', () => {
-  it('configures the Aspire dashboard OTLP HTTP endpoint for Deno exporters', () => {
+  it('lets Aspire choose per-process dashboard and telemetry ports', () => {
     const config = JSON.parse(generateTsAspireConfig()) as {
       profiles: {
         https: {
+          applicationUrl: string;
           environmentVariables: Record<string, string>;
         };
       };
     };
 
+    assertEquals(config.profiles.https.applicationUrl, 'https://localhost:0;http://localhost:0');
     assertEquals(
       config.profiles.https.environmentVariables.ASPIRE_DASHBOARD_OTLP_HTTP_ENDPOINT_URL,
-      'http://localhost:4318',
+      'http://localhost:0',
+    );
+    assertEquals(
+      config.profiles.https.environmentVariables.ASPIRE_RESOURCE_SERVICE_ENDPOINT_URL,
+      'https://localhost:0',
     );
     assertEquals(
       config.profiles.https.environmentVariables.ASPIRE_ALLOW_UNSECURED_TRANSPORT,
@@ -30,6 +36,27 @@ describe('generateTsAspireConfig', () => {
       'true',
     );
     assert(!('ASPIRE_DASHBOARD_OTLP_ENDPOINT_URL' in config.profiles.https.environmentVariables));
+  });
+
+  it('does not pin the profile to the base Aspire infra ports', () => {
+    const config = JSON.parse(generateTsAspireConfig()) as {
+      profiles: {
+        https: {
+          applicationUrl: string;
+          environmentVariables: Record<string, string>;
+        };
+      };
+    };
+    const profile = config.profiles.https;
+    const values = [
+      profile.applicationUrl,
+      profile.environmentVariables.ASPIRE_DASHBOARD_OTLP_HTTP_ENDPOINT_URL,
+      profile.environmentVariables.ASPIRE_RESOURCE_SERVICE_ENDPOINT_URL,
+    ].join(';');
+
+    assert(!values.includes(':18888'));
+    assert(!values.includes(':4318'));
+    assert(!values.includes(':18891'));
   });
 
   it('includes all required DB integration packages for multi-engine projects', () => {
