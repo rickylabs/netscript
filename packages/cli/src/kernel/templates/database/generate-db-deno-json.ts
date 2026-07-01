@@ -92,6 +92,10 @@ export function generateDatabaseDenoJson(
     }
     : {
       [SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE]: imports[SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE],
+      [SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE_SCRIPTS]:
+        `${imports[SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE]}/scripts`,
+      [SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE_TRACING]:
+        `${imports[SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE]}/tracing`,
     };
 
   const config = {

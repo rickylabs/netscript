@@ -26,6 +26,7 @@ export async function scaffoldDatabase(
     projectName: options.name,
     targetPath: options.targetPath,
     engine: options.dbEngine,
+    modelName: options.modelName,
     importMode: options.importMode,
     localBase: options.localBase,
     overwrite: options.force,
@@ -52,7 +53,7 @@ export async function scaffoldContracts(
       force: options.force,
     },
     serviceContract: options.includeExampleService && options.serviceName
-      ? { serviceName: options.serviceName, version: SCAFFOLD_DIRS.V1 }
+      ? { serviceName: options.serviceName, modelName: options.modelName, version: SCAFFOLD_DIRS.V1 }
       : undefined,
   });
 

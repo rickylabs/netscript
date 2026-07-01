@@ -85,7 +85,10 @@ export function createContractScaffolder(
   ): Promise<string> {
     const contractContent = await templateAdapter.render(
       templateRegistry.getContractTemplate(),
-      { serviceName: serviceContract.serviceName },
+      {
+        serviceName: serviceContract.serviceName,
+        modelName: serviceContract.modelName ?? '',
+      },
     );
     const contractPath = join(versionDir, `${serviceContract.serviceName}.contract.ts`);
     await writeTracked(contractPath, contractContent, force, filesCreated, filesSkipped);

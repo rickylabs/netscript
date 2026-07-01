@@ -36,6 +36,9 @@ export interface ServiceContractOptions {
   /** Service name in kebab-case. */
   readonly serviceName: string;
 
+  /** Prisma domain model name associated with the service. */
+  readonly modelName?: string;
+
   /** Version directory to target. */
   readonly version: ContractVersion;
 }

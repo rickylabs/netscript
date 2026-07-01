@@ -8,6 +8,7 @@ export interface InitCommandInput {
   readonly db?: DbEngineChoice | string;
   readonly service?: boolean;
   readonly serviceName?: string;
+  readonly modelName?: string;
   readonly servicePort?: number;
   readonly cache?: boolean;
   readonly cacheBackend?: CacheBackendChoice | string;
