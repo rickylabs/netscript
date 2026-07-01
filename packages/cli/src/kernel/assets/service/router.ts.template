@@ -8,6 +8,8 @@
  * The generated showcase keeps `health` under the service namespace because
  * the validated Step 5 contract baseline already owns that path at
  * `v1.{{serviceName | camelCase}}.health`.
+ * `defineService()` also exposes a friendly GET `/` landing response with
+ * links to `/api/docs`, `/api/openapi.json`, `/api/rpc/*`, and `/health`.
  *
  * @see https://orpc.unnoq.com/docs/router
  */

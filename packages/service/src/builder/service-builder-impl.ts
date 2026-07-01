@@ -400,11 +400,13 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
       c.json({
         service: this.config.name,
         version: this.config.version ?? '1.0.0',
+        message: 'NetScript service is running. Open /api/docs for the oRPC playground.',
         endpoints: {
           rpc: '/api/rpc/*',
           openapi: '/api/*',
           spec: '/api/openapi.json',
           docs: '/api/docs',
+          playground: '/api/docs',
           health: '/health',
         },
       }));
