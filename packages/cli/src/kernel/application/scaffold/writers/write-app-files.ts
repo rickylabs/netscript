@@ -270,6 +270,7 @@ export async function writeNormalizedAppFiles(
       appTemplateVars,
       templates: await loadExampleServiceAppTemplateAssets(),
       write,
+      hasDatabase: options.dbEngine !== 'none',
       libDir,
       serviceExampleDir,
       serviceExampleComponentsDir,

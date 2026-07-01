@@ -5,22 +5,26 @@ import { exampleServiceQueries } from '@app/lib/example-service.ts';
 export const SERVICE_SHOWCASE_PAGE_SIZE = 3;
 export const SERVICE_SHOWCASE_INPUT = {
   limit: SERVICE_SHOWCASE_PAGE_SIZE,
-  page: 1,
-  sortBy: 'id',
-  sortOrder: 'asc',
+  offset: 0,
 } as const;
 
 export type ServiceShowcaseListData = Awaited<ReturnType<typeof exampleServiceQueries.list>>;
 
 export interface ServiceSummaryPanelProps {
   readonly total: number;
-  readonly shown: number;
-  readonly page: number;
-  readonly totalPages: number;
+  readonly active: number;
+  readonly draft: number;
+  readonly archived: number;
   readonly updatedAtLabel: string;
 }
 
-export function formatServiceTimestamp(value: string | number | Date): string {
+type ServiceStatusCounts = {
+  active: number;
+  draft: number;
+  archived: number;
+};
+
+export function formatServiceTimestamp(value: string | number): string {
   return new Intl.DateTimeFormat('en', {
     month: 'short',
     day: 'numeric',
@@ -32,11 +36,19 @@ export function buildServiceSummary(
   data: ServiceShowcaseListData,
   snapshotAt: number = Date.now(),
 ): ServiceSummaryPanelProps {
+  const counts = data.items.reduce<ServiceStatusCounts>(
+    (summary, item) => {
+      summary[item.status] += 1;
+      return summary;
+    },
+    { active: 0, draft: 0, archived: 0 },
+  );
+
   return {
-    total: data.pagination.total,
-    shown: data.data.length,
-    page: data.pagination.page,
-    totalPages: data.pagination.totalPages,
+    total: data.total,
+    active: counts.active,
+    draft: counts.draft,
+    archived: counts.archived,
     updatedAtLabel: formatServiceTimestamp(snapshotAt),
   };
 }

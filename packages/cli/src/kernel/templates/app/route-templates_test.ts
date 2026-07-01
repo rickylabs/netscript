@@ -398,9 +398,11 @@ describe('app route template rendering', () => {
     assertStringIncludes(output, 'useMutation');
     assertStringIncludes(output, 'useQuery');
     assertStringIncludes(output, 'exampleServiceListInvalidation');
-    assertStringIncludes(output, 'exampleServiceQueries.updateStatus.mutationOptions()');
+    assertStringIncludes(output, 'exampleServiceQueries.create.mutationOptions()');
+    assertStringIncludes(output, 'exampleServiceQueries.update.mutationOptions()');
+    assertStringIncludes(output, 'exampleServiceQueries.delete.mutationOptions()');
     assertStringIncludes(output, 'invalidateQueries(exampleServiceListInvalidation)');
-    assertStringIncludes(output, 'Optimistically moved record');
+    assertStringIncludes(output, 'Optimistically renamed record');
   });
 
   it('summary panel and partial route keep defer concerns server-owned', async () => {
@@ -420,28 +422,26 @@ describe('app route template rendering', () => {
     assertStringIncludes(partial, 'query: loadServiceShowcaseSummary');
   });
 
-  it('service contract exposes typed updateStatus for the showcase mutation', async () => {
+  it('service contract exposes typed CRUD schemas for the showcase mutations', async () => {
     const adapter = makeAdapter();
     const output = await adapter.render(serviceContractTemplate, SAMPLE_APP_VARS);
-    assertStringIncludes(output, 'UpdateStatusInputSchemaV1');
-    assertStringIncludes(output, 'UpdateStatusResponseSchemaV1');
-    assertStringIncludes(output, 'updateStatus: oc');
+    assertStringIncludes(output, 'createCrudContract');
+    assertStringIncludes(output, 'TeamMemberSchema');
+    assertStringIncludes(output, 'TeamMemberCreateInput');
+    assertStringIncludes(output, 'TeamMemberUpdateInput');
   });
 
-  it('service router mutates the seeded records for the showcase flow', async () => {
+  it('service router binds Prisma-backed CRUD handlers for the showcase flow', async () => {
     const adapter = makeAdapter();
     const output = await adapter.render(serviceV1RouterTemplate, {
       ...SAMPLE_APP_VARS,
       projectName: SAMPLE_APP_VARS.name,
     });
-    assertStringIncludes(
-      output,
-      'const NEXT_STATUS_BY_STATE: Record<',
-    );
-    assertStringIncludes(output, "type TeamMembersListItemV1 } from '@test-project/contracts';");
-    assertStringIncludes(output, 'let seededRecords: TeamMembersListItemV1[] = [');
-    assertStringIncludes(output, 'updateStatus: v1.teamMembers.updateStatus.handler');
-    assertStringIncludes(output, 'const nextStatus = input.status;');
-    assertStringIncludes(output, 'record.summary = nextStatus ===');
+    assertStringIncludes(output, "import type { PrismaClient } from '@database';");
+    assertStringIncludes(output, "type TeamMemberDelegate = PrismaClient['teamMember'];");
+    assertStringIncludes(output, 'list: v1.teamMembers.list!.handler');
+    assertStringIncludes(output, 'create: v1.teamMembers.create!.handler');
+    assertStringIncludes(output, 'update: v1.teamMembers.update!.handler');
+    assertStringIncludes(output, 'delete: v1.teamMembers.delete!.handler');
   });
 });

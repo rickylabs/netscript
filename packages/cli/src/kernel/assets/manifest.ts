@@ -41,10 +41,16 @@ export const TEMPLATE_KEYS = {
     'app/routes/examples/(_components)/summary-card.tsx.template',
   appRoutesExamplesComponentsSummaryPanel:
     'app/routes/examples/(_components)/summary-panel.tsx.template',
+  appRoutesExamplesComponentsSummaryPanelMemory:
+    'app/routes/examples/(_components)/summary-panel.memory.tsx.template',
   appRoutesExamplesIslandsServiceshowcaselab:
     'app/routes/examples/(_islands)/ServiceShowcaseLab.tsx.template',
+  appRoutesExamplesIslandsServiceshowcaselabMemory:
+    'app/routes/examples/(_islands)/ServiceShowcaseLab.memory.tsx.template',
   appRoutesExamplesSharedServiceShowcase:
     'app/routes/examples/(_shared)/service-showcase.ts.template',
+  appRoutesExamplesSharedServiceShowcaseMemory:
+    'app/routes/examples/(_shared)/service-showcase.memory.ts.template',
   appRoutesExamplesIndex: 'app/routes/examples/index.tsx.template',
   appRoutesExamplesCrud: 'app/routes/examples/crud.tsx.template',
   appRoutesExamplesServiceIndexLayout: 'app/routes/examples/service/index.layout.tsx.template',

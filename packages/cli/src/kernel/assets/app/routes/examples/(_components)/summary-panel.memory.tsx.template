@@ -5,9 +5,9 @@ export function ServiceSummaryPanel(props: ServiceSummaryPanelProps) {
   return (
     <div class='grid gap-3 sm:grid-cols-2'>
       <SummaryStat label='Total records' value={String(props.total)} />
-      <SummaryStat label='Shown' value={String(props.shown)} />
-      <SummaryStat label='Page' value={String(props.page)} />
-      <SummaryStat label='Pages' value={String(props.totalPages)} />
+      <SummaryStat label='Active' value={String(props.active)} />
+      <SummaryStat label='Draft' value={String(props.draft)} />
+      <SummaryStat label='Archived' value={String(props.archived)} />
       <div class='sm:col-span-2 rounded-2xl border border-ns-border bg-ns-surface-raised/20 px-4 py-3'>
         <p class='text-[0.68rem] uppercase tracking-[0.18em] text-ns-muted-fg'>Snapshot</p>
         <p class='mt-2 text-sm font-semibold text-ns-fg'>
