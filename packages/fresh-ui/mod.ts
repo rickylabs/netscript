@@ -9,6 +9,29 @@
  */
 
 export {
+  Icon,
+  ICON_PATHS,
+  type IconName,
+  type IconProps,
+  type IconSize,
+  type IconSvgAttributes,
+  type IconSvgAttributeValue,
+  type PrimitiveChild,
+  type PrimitiveChildren,
+  type PrimitiveNode,
+  type VisuallyHiddenStyle,
+} from './primitives.tsx';
+export {
+  DATA_GRID_CELL_VARIANTS,
+  DataGrid,
+  type DataGridCellVariant,
+  type DataGridColumn,
+  type DataGridNode,
+  type DataGridProps,
+  type DataGridRenderable,
+  type DataGridRow,
+} from './src/presentation/data-grid.tsx';
+export {
   getToast,
   REGISTRY_TOAST_QUERY_KEYS,
   type RegistryToast,

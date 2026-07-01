@@ -303,7 +303,7 @@ The runtime scans <code>workers/jobs</code> (the primary user jobs directory) fo
 default-exported handlers, and also includes plugin-contributed handlers from
 <code>plugins/workers/jobs</code> (and <code>plugins/triggers/jobs</code> when present). The
 generated registry lands at
-<code>.netscript/generated/plugin-workers/jobs.registry.ts</code>, keyed by each handler's
+<code>.netscript/generated/plugin-workers/job-registry.ts</code>, keyed by each handler's
 <code>id</code>. Background execution runs from <code>plugins/workers/bin/combined.ts</code>,
 a <em>separate</em> process from the <code>:8091</code> API service — the API enqueues, the
 runner executes. Set <code>WORKERS_CONCURRENCY</code> on the worker background process when you

@@ -1,5 +1,5 @@
 import { assertStrictEquals } from '@std/assert';
-import { Show, SrOnly, VisuallyHidden } from '../primitives.tsx';
+import { Icon, ICON_PATHS, type IconProps, Show, SrOnly, VisuallyHidden } from '../primitives.tsx';
 
 interface VNodeLike {
   type: unknown;
@@ -39,6 +39,50 @@ Deno.test('VisuallyHidden can be used as a JSX component', () => {
   assertStrictEquals(element.props.id, 'jsx-label');
   assertStrictEquals(element.props.children, 'JSX label');
 });
+
+Deno.test('Icon renders a decorative token-driven stroke SVG', () => {
+  const element = asVNode(Icon({ name: 'check', size: 20, class: 'ns-icon' }));
+
+  assertStrictEquals(element.type, 'svg');
+  assertStrictEquals(element.props.class, 'ns-icon');
+  assertStrictEquals(element.props.width, 20);
+  assertStrictEquals(element.props.height, 20);
+  assertStrictEquals(element.props.fill, 'none');
+  assertStrictEquals(element.props.stroke, 'currentColor');
+  assertStrictEquals(element.props['stroke-width'], 'var(--ns-icon-stroke-width, 2)');
+  assertStrictEquals(element.props['aria-hidden'], true);
+
+  const children = element.props.children as unknown[];
+  const path = asVNode(children[1]);
+  assertStrictEquals(path.type, 'path');
+  assertStrictEquals(path.props.d, ICON_PATHS.check[0]);
+});
+
+Deno.test('Icon renders an accessible title when provided', () => {
+  const element = asVNode(<Icon name='search' size='1.25rem' title='Search' />);
+
+  assertStrictEquals(element.type, Icon);
+  assertStrictEquals(element.props.name, 'search');
+  assertStrictEquals(element.props.size, '1.25rem');
+  assertStrictEquals(element.props.title, 'Search');
+
+  const rendered = asVNode(Icon(element.props as IconProps));
+  assertStrictEquals(rendered.props.role, 'img');
+  assertStrictEquals(rendered.props['aria-hidden'], undefined);
+
+  const children = rendered.props.children as unknown[];
+  const title = asVNode(children[0]);
+  const path = asVNode(children[1]);
+  assertStrictEquals(title.type, 'title');
+  assertStrictEquals(title.props.children, 'Search');
+  assertStrictEquals(path.props.d, ICON_PATHS.search[0]);
+});
+
+// @ts-expect-error fill is package-token driven, not caller-overridable.
+Icon({ name: 'check', fill: 'red' });
+
+// @ts-expect-error stroke is package-token driven, not caller-overridable.
+Icon({ name: 'check', stroke: 'red' });
 
 Deno.test('Show renders children only when the condition is truthy', () => {
   assertStrictEquals(Show({ when: false, fallback: 'empty', children: 'visible' }), 'empty');

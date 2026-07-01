@@ -125,6 +125,8 @@ export interface ServiceConfig {
   entrypoint?: string;
   /** Service dependencies by configured service name. */
   dependsOn?: string[];
+  /** Plugin API dependencies by configured plugin resource name. */
+  pluginReferences?: string[];
 }
 
 /** Frontend application configuration definition. */
