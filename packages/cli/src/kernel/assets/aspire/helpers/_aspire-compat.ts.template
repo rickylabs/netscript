@@ -169,7 +169,7 @@ export function buildOtelEnvVars(
   serviceName: string,
   serviceVersion: string,
   mode: OtelMode,
-  otlpEndpoint: string = OTEL_DEFAULTS.ENDPOINT,
+  otlpEndpoint?: string,
 ): Record<string, string> {
   const coreVars: Record<string, string> = {
     [OTEL_ENV_VARS.OTEL_DENO]: 'true',
@@ -181,10 +181,16 @@ export function buildOtelEnvVars(
     return coreVars;
   }
 
+  const exporterVars: Record<string, string> = otlpEndpoint
+    ? {
+      [OTEL_ENV_VARS.OTEL_EXPORTER_OTLP_ENDPOINT]: otlpEndpoint,
+      [OTEL_ENV_VARS.OTEL_EXPORTER_OTLP_PROTOCOL]: OTEL_DEFAULTS.PROTOCOL,
+    }
+    : {};
+
   return {
     ...coreVars,
-    [OTEL_ENV_VARS.OTEL_EXPORTER_OTLP_ENDPOINT]: otlpEndpoint,
-    [OTEL_ENV_VARS.OTEL_EXPORTER_OTLP_PROTOCOL]: OTEL_DEFAULTS.PROTOCOL,
+    ...exporterVars,
     [OTEL_ENV_VARS.OTEL_TRACES_SAMPLER]: OTEL_DEFAULTS.SAMPLER,
     [OTEL_ENV_VARS.OTEL_BSP_SCHEDULE_DELAY]: OTEL_DEFAULTS.EXPORT_INTERVAL,
     [OTEL_ENV_VARS.OTEL_BLRP_SCHEDULE_DELAY]: OTEL_DEFAULTS.EXPORT_INTERVAL,

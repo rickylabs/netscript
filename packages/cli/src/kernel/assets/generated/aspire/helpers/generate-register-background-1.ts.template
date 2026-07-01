@@ -1,7 +1,7 @@
 {{__slot0__}}
 
 import type { DistributedApplicationBuilder } from '{{__slot1__}}';
-import { EndpointProperty } from '{{__slot1__}}';
+import { EndpointProperty, OtlpProtocol } from '{{__slot1__}}';
 import type { NetScriptConfig } from '{{__slot2__}}';
 import type { InfrastructureContext } from './register-infrastructure.mjs';
 import {
