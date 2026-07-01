@@ -62,9 +62,14 @@ outcome.
   slice-by-slice.
 - Keep OpenHands as the evaluator. Claude workflows may prepare evaluator inputs, but they do not
   replace PLAN-EVAL or IMPL-EVAL.
-- For cost control, launch workflow-oriented Claude sessions with `opusplan` or `high` only when
-  planning complexity justifies it; reserve Ultracode/xhigh for explicit user requests or extreme
-  design uncertainty.
+- For cost control, route Claude dynamic-workflow stages by model: **Sonnet 5 by default**, and
+  **Opus only for genuinely complex, thinking-heavy stages** (hard planning, adversarial
+  verify/judge). **Never use Fable 5 inside a workflow** — it is the most powerful *and* the
+  priciest model, so fanning it out burns plan tokens; reserve Fable 5 for a single
+  deliberately-spawned sub-agent on an extremely complex, single-threaded engineering task. Run
+  supervisor/evaluator sessions on **Opus 4.8 at high effort**. Launch workflow-oriented Claude
+  sessions with `opusplan` or `high` only when planning complexity justifies it; reserve
+  Ultracode/xhigh for explicit user requests or extreme design uncertainty.
 - A workflow output is acceptable only if it produces compact artifacts: updated harness plan,
   slice briefs, agent prompts, or decision records. It should not leave hidden untracked work.
 
