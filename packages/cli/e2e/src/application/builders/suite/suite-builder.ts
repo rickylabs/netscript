@@ -44,7 +44,7 @@ export function createSuiteBuilder(): SuiteBuilder {
       return this;
     },
     withScaffold(configure) {
-      const builder = configure(createScaffoldSuiteBuilder());
+      const builder = configure(createScaffoldSuiteBuilder(state.options.database));
       state.gates.push(...builder.buildGates());
       return this;
     },
