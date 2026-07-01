@@ -63,6 +63,9 @@ const ROOT_GROUPS = [
     'text-2xl',
     'text-3xl',
     'text-4xl',
+    'text-3xs',
+    'text-2xs',
+    'text-chat',
   ],
   ['leading-tight', 'leading-snug', 'leading-normal', 'leading-relaxed'],
   ['tracking-tight', 'tracking-normal', 'tracking-wide'],
@@ -82,7 +85,17 @@ const ROOT_GROUPS = [
     'space-12',
     'space-16',
     'space-20',
+    'space-2-5',
+    'space-3-5',
+    'space-7',
+    'space-9',
+    'space-11',
+    'space-14',
+    'space-24',
   ],
+  ['avatar-sm', 'avatar-md', 'avatar-lg', 'control-h', 'control-h-sm'],
+  ['app-nav', 'app-rail', 'topbar-h', 'shell-content'],
+  ['label-size', 'label-tracking'],
   [
     'radius-sm',
     'radius-md',
@@ -127,6 +140,24 @@ const lightTokens = await loadDictionaryTokens({
   source: ['tokens/themes/light.tokens.json'],
 });
 
+// Default theme is LIGHT (no attribute). semantic.tokens.json carries the base +
+// theme-invariant roles; light.tokens.json overrides the theme-variant roles
+// (LIGHT_GROUPS) to light. So `:root` = semantic with light applied (full light),
+// and `[data-theme='dark']` = the semantic (dark) values for just the variant roles.
+const lightFileTokens = lightTokens.filter(
+  (token) => token.filePath?.endsWith('tokens/themes/light.tokens.json'),
+);
+const lightByVar = new Map(
+  lightFileTokens.map((token) => [tokenSourceCssVar(token), token] as const),
+);
+const lightRootTokens = rootTokens.map(
+  (token) => lightByVar.get(tokenSourceCssVar(token)) ?? token,
+);
+const variantNames = new Set(LIGHT_GROUPS.flat());
+const darkOverrideTokens = rootTokens.filter((token) =>
+  variantNames.has(tokenSourceCssVar(token)?.replace(/^--ns-/, '') ?? '')
+);
+
 const css = [
   '/*',
   ' * Initial token seed for @netscript/fresh-ui.',
@@ -141,15 +172,11 @@ const css = [
   ' */',
   '',
   ':root {',
-  ...renderBlock(rootTokens, themeColorScheme(darkTheme, 'dark'), ROOT_GROUPS),
+  ...renderBlock(lightRootTokens, themeColorScheme(lightTheme, 'light'), ROOT_GROUPS),
   '}',
   '',
-  "[data-theme='light'] {",
-  ...renderBlock(
-    lightTokens.filter((token) => token.filePath?.endsWith('tokens/themes/light.tokens.json')),
-    themeColorScheme(lightTheme, 'light'),
-    LIGHT_GROUPS,
-  ),
+  "[data-theme='dark'] {",
+  ...renderBlock(darkOverrideTokens, themeColorScheme(darkTheme, 'dark'), LIGHT_GROUPS),
   '}',
 ].join('\n');
 
@@ -160,7 +187,7 @@ await Deno.writeTextFile(
 );
 await Deno.writeTextFile(
   'registry/theme/tokens.json',
-  `${JSON.stringify(renderTokensJson(rootTokens, lightTokens), null, 2)}\n`,
+  `${JSON.stringify(renderTokensJson(lightRootTokens, darkOverrideTokens), null, 2)}\n`,
 );
 
 async function loadDictionaryTokens(
@@ -228,7 +255,11 @@ function tokenCssDeclarations(name: string, token: DictionaryToken) {
       `  --ns-${name}: ${oklchCssValue(value.components)};`,
     ];
   }
-  return [`  --ns-${name}: ${tokenCssValue(token)};`];
+  // Easing/duration tokens can't be auto-classified as color/space/radius/
+  // shadow/font; annotate them so the design-system token checker files them
+  // under `other` instead of flagging them as unclassified.
+  const kind = /^ease-/.test(name) ? ' /* @kind other */' : '';
+  return [`  --ns-${name}: ${tokenCssValue(token)};${kind}`];
 }
 
 function tokenCssValue(token: DictionaryToken) {
@@ -292,6 +323,13 @@ function renderThemeBridge(tokens: DictionaryToken[]) {
     '  --spacing-ns-12: var(--ns-space-12);',
     '  --spacing-ns-16: var(--ns-space-16);',
     '  --spacing-ns-20: var(--ns-space-20);',
+    '  --spacing-ns-2-5: var(--ns-space-2-5);',
+    '  --spacing-ns-3-5: var(--ns-space-3-5);',
+    '  --spacing-ns-7: var(--ns-space-7);',
+    '  --spacing-ns-9: var(--ns-space-9);',
+    '  --spacing-ns-11: var(--ns-space-11);',
+    '  --spacing-ns-14: var(--ns-space-14);',
+    '  --spacing-ns-24: var(--ns-space-24);',
     '  --radius-xs: 2px;',
     '  --radius-sm: var(--ns-radius-sm);',
     '  --radius-md: var(--ns-radius-md);',
@@ -322,16 +360,14 @@ function renderThemeBridge(tokens: DictionaryToken[]) {
 
 function renderTokensJson(
   rootTokens: DictionaryToken[],
-  lightTokens: DictionaryToken[],
+  darkTokens: DictionaryToken[],
 ) {
   return {
     version: 1,
     generatedBy: 'packages/fresh-ui/scripts/build-tokens.ts',
     tokens: flatTokenMap(rootTokens),
     themes: {
-      light: flatTokenMap(
-        lightTokens.filter((token) => token.filePath?.endsWith('tokens/themes/light.tokens.json')),
-      ),
+      dark: flatTokenMap(darkTokens),
     },
   };
 }

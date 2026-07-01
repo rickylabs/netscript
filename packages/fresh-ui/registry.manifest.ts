@@ -425,6 +425,277 @@ export const freshUiRegistryManifest: RegistryManifest = {
       css: [{ layer: 'components', content: "@import './ui/badge.css';" }],
     },
     {
+      name: 'avatar',
+      kind: 'component',
+      layer: 2,
+      description:
+        'Identity chip for a person or agent — initials or image with size, presence, and agent variants.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['identity', 'presence', 'primitive'],
+      files: [
+        {
+          source: 'registry/components/ui/avatar.tsx',
+          target: '@ui/avatar.tsx',
+        },
+        {
+          source: 'registry/components/ui/avatar.css',
+          target: '@assets/ui/avatar.css',
+        },
+      ],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/avatar.css';" }],
+    },
+    {
+      name: 'citation-chip',
+      kind: 'component',
+      layer: 2,
+      description:
+        'Inline per-claim source marker [n] that pairs with a sources list — the grounded-agent citation UX.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['citation', 'ai', 'primitive'],
+      files: [
+        {
+          source: 'registry/components/ui/citation-chip.tsx',
+          target: '@ui/citation-chip.tsx',
+        },
+        {
+          source: 'registry/components/ui/citation-chip.css',
+          target: '@assets/ui/citation-chip.css',
+        },
+      ],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/citation-chip.css';" }],
+    },
+    {
+      name: 'code-block',
+      kind: 'component',
+      layer: 2,
+      description:
+        'Fenced code surface with filename/language header and a copy affordance for assistant messages.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['code', 'ai', 'primitive'],
+      files: [
+        {
+          source: 'registry/components/ui/code-block.tsx',
+          target: '@ui/code-block.tsx',
+        },
+        {
+          source: 'registry/components/ui/code-block.css',
+          target: '@assets/ui/code-block.css',
+        },
+      ],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/code-block.css';" }],
+    },
+    {
+      name: 'model-selector',
+      kind: 'component',
+      layer: 2,
+      description:
+        'Disclosure-backed model/provider picker for the prompt composer (native <details>).',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['ai', 'model', 'primitive'],
+      files: [
+        {
+          source: 'registry/components/ui/model-selector.tsx',
+          target: '@ui/model-selector.tsx',
+        },
+        {
+          source: 'registry/components/ui/model-selector.css',
+          target: '@assets/ui/model-selector.css',
+        },
+      ],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/model-selector.css';" }],
+    },
+    {
+      name: 'tool-call-card',
+      kind: 'component',
+      layer: 2,
+      description:
+        'Inline MCP/tool invocation + result as a native <details> disclosure with status badge and IO panel.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['ai', 'tool', 'primitive'],
+      files: [
+        {
+          source: 'registry/components/ui/tool-call-card.tsx',
+          target: '@ui/tool-call-card.tsx',
+        },
+        {
+          source: 'registry/components/ui/tool-call-card.css',
+          target: '@assets/ui/tool-call-card.css',
+        },
+      ],
+      registryDependencies: ['theme-seed', 'badge', 'spinner'],
+      css: [{ layer: 'components', content: "@import './ui/tool-call-card.css';" }],
+    },
+    {
+      name: 'chart-block',
+      kind: 'component',
+      layer: 2,
+      description:
+        'Inline token-driven metric chart — horizontal bars or a vertical column chart with y-axis ticks and data-tone intents.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['chart', 'analytics', 'primitive'],
+      files: [
+        {
+          source: 'registry/components/ui/chart-block.tsx',
+          target: '@ui/chart-block.tsx',
+        },
+        {
+          source: 'registry/components/ui/chart-block.css',
+          target: '@assets/ui/chart-block.css',
+        },
+      ],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/chart-block.css';" }],
+    },
+    {
+      name: 'donut',
+      kind: 'component',
+      layer: 2,
+      description:
+        'Token-driven donut/pie chart — SVG arc segments with a center total and legend; segment colors from data-tone or a semantic-token cycle.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['chart', 'analytics', 'primitive'],
+      files: [
+        {
+          source: 'registry/components/ui/donut.tsx',
+          target: '@ui/donut.tsx',
+        },
+        {
+          source: 'registry/components/ui/donut.css',
+          target: '@assets/ui/donut.css',
+        },
+      ],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/donut.css';" }],
+    },
+    {
+      name: 'prompt-input',
+      kind: 'component',
+      layer: 2,
+      description:
+        'Chat composer: auto-grow textarea with a toolbar of research/grounding pills, model picker, attach/screenshot/voice, and send.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['ai', 'composer', 'primitive'],
+      files: [
+        {
+          source: 'registry/components/ui/prompt-input.tsx',
+          target: '@ui/prompt-input.tsx',
+        },
+        {
+          source: 'registry/components/ui/prompt-input.css',
+          target: '@assets/ui/prompt-input.css',
+        },
+      ],
+      registryDependencies: ['theme-seed', 'model-selector'],
+      css: [{ layer: 'components', content: "@import './ui/prompt-input.css';" }],
+    },
+    {
+      name: 'message',
+      kind: 'component',
+      layer: 2,
+      description:
+        'Chat message: author/time, inline-markup body (bold/code/[n] citations), tool-call + chart/code blocks, follow-up chips, and a typing indicator. Exports renderInline + TypingIndicator.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['ai', 'chat', 'primitive'],
+      files: [
+        {
+          source: 'registry/components/ui/message.tsx',
+          target: '@ui/message.tsx',
+        },
+        {
+          source: 'registry/components/ui/message.css',
+          target: '@assets/ui/message.css',
+        },
+      ],
+      registryDependencies: [
+        'theme-seed',
+        'avatar',
+        'citation-chip',
+        'chart-block',
+        'code-block',
+        'tool-call-card',
+      ],
+      css: [{ layer: 'components', content: "@import './ui/message.css';" }],
+    },
+    {
+      name: 'command-palette',
+      kind: 'component',
+      layer: 2,
+      description:
+        'Modal ⌘K command palette — the L1 Dialog backdrop/overlay wrapping the L1 Combobox: grouped, searchable commands with icon/hash/kind sub-parts.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['ai', 'command', 'palette', 'primitive'],
+      files: [
+        {
+          source: 'registry/components/ui/command-palette.tsx',
+          target: '@ui/command-palette.tsx',
+        },
+        {
+          source: 'registry/components/ui/command-palette.css',
+          target: '@assets/ui/command-palette.css',
+        },
+      ],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/command-palette.css';" }],
+    },
+    {
+      name: 'search',
+      kind: 'component',
+      layer: 2,
+      description:
+        'Compact nav search affordance — a button styled as an input with a ⌘K hint that opens the command palette.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['ai', 'search', 'navigation', 'primitive'],
+      files: [
+        {
+          source: 'registry/components/ui/search.tsx',
+          target: '@ui/search.tsx',
+        },
+        {
+          source: 'registry/components/ui/search.css',
+          target: '@assets/ui/search.css',
+        },
+      ],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/search.css';" }],
+    },
+    {
+      name: 'dropzone',
+      kind: 'component',
+      layer: 2,
+      description:
+        'File-drop affordance — a dashed drop target (label/hint/icon) that wraps a native file input; drag-over via data-active.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['upload', 'forms', 'primitive'],
+      files: [
+        {
+          source: 'registry/components/ui/dropzone.tsx',
+          target: '@ui/dropzone.tsx',
+        },
+        {
+          source: 'registry/components/ui/dropzone.css',
+          target: '@assets/ui/dropzone.css',
+        },
+      ],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/dropzone.css';" }],
+    },
+    {
       name: 'separator',
       kind: 'component',
       layer: 2,
@@ -821,6 +1092,26 @@ export const freshUiRegistryManifest: RegistryManifest = {
         'theme-toggle',
         'toast-support',
         'toast',
+        'avatar',
+        'code-block',
+        'chart-block',
+        'donut',
+        'dropzone',
+      ],
+    },
+    {
+      name: 'ai',
+      description:
+        'AI / chat surface seams: grounded-agent citations, message thread, composer, model picker, and tool-call disclosure.',
+      items: [
+        'theme-seed',
+        'citation-chip',
+        'model-selector',
+        'tool-call-card',
+        'prompt-input',
+        'message',
+        'command-palette',
+        'search',
       ],
     },
     {

@@ -1,0 +1,39 @@
+.ns-citation {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: super;
+  min-width: var(--ns-space-4);
+  height: var(--ns-space-4);
+  padding: 0 var(--ns-space-1);
+  margin-inline: var(--ns-space-px);
+  border: 1px solid var(--ns-primary-border);
+  border-radius: var(--ns-radius-sm);
+  background: var(--ns-primary-subtle);
+  color: var(--ns-primary);
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-3xs);
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background-color var(--ns-ease-fast),
+    border-color var(--ns-ease-fast),
+    color var(--ns-ease-fast);
+}
+
+.ns-citation:hover {
+  background: color-mix(in srgb, var(--ns-primary) 16%, transparent);
+  border-color: var(--ns-primary);
+}
+
+.ns-citation:focus-visible {
+  outline: 2px solid var(--ns-ring);
+  outline-offset: var(--ns-space-px);
+}
+
+.ns-citation.is-active {
+  background: var(--ns-primary);
+  border-color: var(--ns-primary);
+  color: var(--ns-primary-fg);
+}

@@ -76,7 +76,10 @@ async function* walk(dir: string): AsyncGenerator<string> {
       yield* walk(path);
     } else if (
       SCAN_EXTENSIONS.some((ext) => entry.name.endsWith(ext)) &&
-      !/[._]test\.(ts|tsx)$/.test(entry.name)
+      !/[._]test\.(ts|tsx)$/.test(entry.name) &&
+      // Generated asset barrels embed already-gated source verbatim
+      // (incl. registry/theme's legitimate ramp hex) — don't double-scan.
+      !/\.generated\.(ts|tsx)$/.test(entry.name)
     ) {
       yield path;
     }

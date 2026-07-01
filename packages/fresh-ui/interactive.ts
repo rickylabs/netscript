@@ -26,6 +26,17 @@ export type {
   AccordionItemTriggerProps,
   AccordionRootProps,
 } from './src/runtime/accordion/accordion.types.ts';
+export { Combobox } from './src/runtime/combobox/Combobox.tsx';
+export type { ComboboxNamespace } from './src/runtime/combobox/Combobox.tsx';
+export type {
+  ComboboxContentProps,
+  ComboboxEmptyProps,
+  ComboboxInputProps,
+  ComboboxItemProps,
+  ComboboxRootProps,
+  UseComboboxOptions,
+  UseComboboxReturn,
+} from './src/runtime/combobox/combobox.types.ts';
 export { Dialog } from './src/runtime/dialog/Dialog.tsx';
 export type { DialogNamespace } from './src/runtime/dialog/Dialog.tsx';
 export type {

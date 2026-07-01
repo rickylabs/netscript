@@ -11,7 +11,7 @@
  */
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 
   --ns-gray-1: #fcfaf6;
   --ns-gray-1: oklch(98.5% 0.006 85);
@@ -101,29 +101,29 @@
   --ns-amber-6: #bc8519;
   --ns-amber-6: oklch(65.5% 0.13 78);
 
-  --ns-bg: var(--ns-gray-12);
-  --ns-fg: var(--ns-gray-1);
-  --ns-surface: var(--ns-gray-11);
-  --ns-surface-raised: var(--ns-gray-10);
-  --ns-overlay: rgba(17, 17, 16, 0.8);
+  --ns-bg: var(--ns-gray-1);
+  --ns-fg: var(--ns-gray-12);
+  --ns-surface: var(--ns-gray-2);
+  --ns-surface-raised: #ffffff;
+  --ns-overlay: rgba(0, 0, 0, 0.4);
 
-  --ns-card: var(--ns-gray-10);
-  --ns-card-fg: var(--ns-gray-1);
+  --ns-card: #ffffff;
+  --ns-card-fg: var(--ns-gray-12);
 
   --ns-primary: var(--ns-copper-6);
   --ns-primary-fg: var(--ns-gray-12);
   --ns-primary-hover: var(--ns-copper-7);
-  --ns-primary-subtle: rgba(200, 149, 108, 0.08);
-  --ns-primary-border: rgba(200, 149, 108, 0.18);
+  --ns-primary-subtle: rgba(200, 149, 108, 0.1);
+  --ns-primary-border: rgba(200, 149, 108, 0.25);
 
   --ns-secondary: var(--ns-slate-5);
   --ns-secondary-fg: var(--ns-gray-12);
   --ns-secondary-hover: var(--ns-slate-6);
-  --ns-secondary-subtle: rgba(144, 152, 166, 0.07);
-  --ns-secondary-border: rgba(144, 152, 166, 0.14);
+  --ns-secondary-subtle: rgba(144, 152, 166, 0.1);
+  --ns-secondary-border: rgba(144, 152, 166, 0.2);
 
-  --ns-muted: var(--ns-gray-9);
-  --ns-muted-fg: var(--ns-gray-5);
+  --ns-muted: var(--ns-gray-3);
+  --ns-muted-fg: var(--ns-gray-7);
 
   --ns-accent: var(--ns-copper-6);
   --ns-accent-fg: var(--ns-gray-12);
@@ -132,23 +132,23 @@
 
   --ns-success: var(--ns-teal-5);
   --ns-success-fg: var(--ns-gray-12);
-  --ns-success-subtle: rgba(91, 168, 160, 0.07);
-  --ns-success-border: rgba(91, 168, 160, 0.15);
+  --ns-success-subtle: rgba(91, 168, 160, 0.1);
+  --ns-success-border: rgba(91, 168, 160, 0.2);
 
   --ns-warning: var(--ns-amber-5);
   --ns-warning-fg: var(--ns-gray-12);
-  --ns-warning-subtle: rgba(224, 174, 79, 0.08);
-  --ns-warning-border: rgba(224, 174, 79, 0.16);
+  --ns-warning-subtle: rgba(224, 174, 79, 0.1);
+  --ns-warning-border: rgba(224, 174, 79, 0.2);
 
   --ns-destructive: var(--ns-red-5);
   --ns-destructive-fg: #ffffff;
-  --ns-destructive-subtle: rgba(224, 69, 69, 0.08);
-  --ns-destructive-border: rgba(224, 69, 69, 0.16);
+  --ns-destructive-subtle: rgba(224, 69, 69, 0.1);
+  --ns-destructive-border: rgba(224, 69, 69, 0.2);
 
-  --ns-border: rgba(235, 228, 210, 0.06);
-  --ns-border-hover: rgba(235, 228, 210, 0.12);
-  --ns-border-strong: rgba(235, 228, 210, 0.18);
-  --ns-input-border: rgba(235, 228, 210, 0.1);
+  --ns-border: rgba(0, 0, 0, 0.08);
+  --ns-border-hover: rgba(0, 0, 0, 0.14);
+  --ns-border-strong: rgba(0, 0, 0, 0.22);
+  --ns-input-border: var(--ns-gray-4);
   --ns-ring: var(--ns-copper-6);
 
   --ns-font-sans: 'DM Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -162,6 +162,9 @@
   --ns-text-2xl: 1.5rem;
   --ns-text-3xl: 1.875rem;
   --ns-text-4xl: 2.25rem;
+  --ns-text-3xs: 0.625rem;
+  --ns-text-2xs: 0.6875rem;
+  --ns-text-chat: 0.9375rem;
 
   --ns-leading-tight: 1.1;
   --ns-leading-snug: 1.3;
@@ -187,6 +190,27 @@
   --ns-space-12: 3rem;
   --ns-space-16: 4rem;
   --ns-space-20: 5rem;
+  --ns-space-2-5: 0.625rem;
+  --ns-space-3-5: 0.875rem;
+  --ns-space-7: 1.75rem;
+  --ns-space-9: 2.25rem;
+  --ns-space-11: 2.75rem;
+  --ns-space-14: 3.5rem;
+  --ns-space-24: 6rem;
+
+  --ns-avatar-sm: 1.5rem;
+  --ns-avatar-md: 2rem;
+  --ns-avatar-lg: 2.5rem;
+  --ns-control-h: 2.25rem;
+  --ns-control-h-sm: 2rem;
+
+  --ns-app-nav: 17rem;
+  --ns-app-rail: 20rem;
+  --ns-topbar-h: 3.5rem;
+  --ns-shell-content: 67.5rem;
+
+  --ns-label-size: 0.6875rem;
+  --ns-label-tracking: 0.06em;
 
   --ns-radius-sm: 4px;
   --ns-radius-md: 6px;
@@ -195,16 +219,16 @@
   --ns-radius-2xl: 16px;
   --ns-radius-full: 9999px;
 
-  --ns-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.18);
-  --ns-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.1);
-  --ns-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.08);
-  --ns-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.12), 0 4px 6px rgba(0, 0, 0, 0.06);
+  --ns-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --ns-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --ns-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.04);
+  --ns-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.06), 0 4px 6px rgba(0, 0, 0, 0.03);
   --ns-shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15), 0 10px 10px rgba(0, 0, 0, 0.06);
 
-  --ns-ease-fast: 100ms ease;
-  --ns-ease-normal: 150ms ease;
-  --ns-ease-slow: 250ms ease;
-  --ns-ease-spring: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ns-ease-fast: 100ms ease; /* @kind other */
+  --ns-ease-normal: 150ms ease; /* @kind other */
+  --ns-ease-slow: 250ms ease; /* @kind other */
+  --ns-ease-spring: 300ms cubic-bezier(0.34, 1.56, 0.64, 1); /* @kind other */
 
   --ns-z-base: 0;
   --ns-z-dropdown: 10;
@@ -214,40 +238,40 @@
   --ns-z-toast: 50;
 }
 
-[data-theme='light'] {
-  color-scheme: light;
+[data-theme='dark'] {
+  color-scheme: dark;
 
-  --ns-bg: var(--ns-gray-1);
-  --ns-fg: var(--ns-gray-12);
-  --ns-surface: var(--ns-gray-2);
-  --ns-surface-raised: #ffffff;
-  --ns-overlay: rgba(0, 0, 0, 0.4);
+  --ns-bg: var(--ns-gray-12);
+  --ns-fg: var(--ns-gray-1);
+  --ns-surface: var(--ns-gray-11);
+  --ns-surface-raised: var(--ns-gray-10);
+  --ns-overlay: rgba(17, 17, 16, 0.8);
 
-  --ns-card: #ffffff;
-  --ns-card-fg: var(--ns-gray-12);
+  --ns-card: var(--ns-gray-10);
+  --ns-card-fg: var(--ns-gray-1);
 
-  --ns-primary-subtle: rgba(200, 149, 108, 0.1);
-  --ns-primary-border: rgba(200, 149, 108, 0.25);
-  --ns-secondary-subtle: rgba(144, 152, 166, 0.1);
-  --ns-secondary-border: rgba(144, 152, 166, 0.2);
+  --ns-primary-subtle: rgba(200, 149, 108, 0.08);
+  --ns-primary-border: rgba(200, 149, 108, 0.18);
+  --ns-secondary-subtle: rgba(144, 152, 166, 0.07);
+  --ns-secondary-border: rgba(144, 152, 166, 0.14);
 
-  --ns-muted: var(--ns-gray-3);
-  --ns-muted-fg: var(--ns-gray-7);
+  --ns-muted: var(--ns-gray-9);
+  --ns-muted-fg: var(--ns-gray-5);
 
-  --ns-success-subtle: rgba(91, 168, 160, 0.1);
-  --ns-success-border: rgba(91, 168, 160, 0.2);
-  --ns-warning-subtle: rgba(224, 174, 79, 0.1);
-  --ns-warning-border: rgba(224, 174, 79, 0.2);
-  --ns-destructive-subtle: rgba(224, 69, 69, 0.1);
-  --ns-destructive-border: rgba(224, 69, 69, 0.2);
+  --ns-success-subtle: rgba(91, 168, 160, 0.07);
+  --ns-success-border: rgba(91, 168, 160, 0.15);
+  --ns-warning-subtle: rgba(224, 174, 79, 0.08);
+  --ns-warning-border: rgba(224, 174, 79, 0.16);
+  --ns-destructive-subtle: rgba(224, 69, 69, 0.08);
+  --ns-destructive-border: rgba(224, 69, 69, 0.16);
 
-  --ns-border: rgba(0, 0, 0, 0.08);
-  --ns-border-hover: rgba(0, 0, 0, 0.14);
-  --ns-border-strong: rgba(0, 0, 0, 0.22);
-  --ns-input-border: var(--ns-gray-4);
+  --ns-border: rgba(235, 228, 210, 0.06);
+  --ns-border-hover: rgba(235, 228, 210, 0.12);
+  --ns-border-strong: rgba(235, 228, 210, 0.18);
+  --ns-input-border: rgba(235, 228, 210, 0.1);
 
-  --ns-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --ns-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
-  --ns-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.04);
-  --ns-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.06), 0 4px 6px rgba(0, 0, 0, 0.03);
+  --ns-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.18);
+  --ns-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.1);
+  --ns-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.08);
+  --ns-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.12), 0 4px 6px rgba(0, 0, 0, 0.06);
 }
