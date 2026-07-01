@@ -102,6 +102,7 @@ export const xref: Record<string, XrefTarget> = {
   "howto:customize-fresh-ui": { href: "/how-to/customize-fresh-ui/", label: "Customize Fresh UI" },
   "howto:deploy": { href: "/how-to/deploy/", label: "Deploy" },
   "howto:author-a-plugin": { href: "/how-to/author-a-plugin/", label: "Author a plugin" },
+  "howto:deno-lsp-code-intelligence": { href: "/how-to/deno-lsp-code-intelligence/", label: "Deno LSP code intelligence" },
   // v3 NEW how-to recipes
   "howto:run-a-polyglot-task": { href: "/how-to/run-a-polyglot-task/", label: "Run a polyglot task" },
   "howto:choose-a-queue-provider": { href: "/how-to/choose-a-queue-provider/", label: "Choose a queue provider" },
