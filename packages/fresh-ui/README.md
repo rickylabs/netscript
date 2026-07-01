@@ -26,7 +26,7 @@ bunx jsr add @netscript/fresh-ui
 ### Usage
 
 ```typescript
-import { cn, getToast, stripToastFromUrl, withToast } from '@netscript/fresh-ui';
+import { cn, getToast, Icon, stripToastFromUrl, withToast } from '@netscript/fresh-ui';
 
 // Merge class names safely (clsx + tailwind-merge).
 const buttonClass = cn('ns-button', 'ns-button--primary');
@@ -42,6 +42,9 @@ const redirectTo = withToast('/dashboard/deployments', {
 const url = new URL(`https://app.example${redirectTo}`);
 const toast = getToast(url); // RegistryToast | undefined
 const cleanPath = stripToastFromUrl(url);
+
+// Render a package-owned stroke SVG icon.
+const checkIcon = <Icon name='check' size={18} title='Complete' />;
 ```
 
 Stateful interactive components live on the `./interactive` sub-path, and headless layout primitives
@@ -49,7 +52,7 @@ on `./primitives`:
 
 ```typescript
 import { Dialog } from '@netscript/fresh-ui/interactive';
-import { Show, VisuallyHidden } from '@netscript/fresh-ui/primitives';
+import { Icon, Show, VisuallyHidden } from '@netscript/fresh-ui/primitives';
 ```
 
 ---
@@ -64,8 +67,8 @@ import { Show, VisuallyHidden } from '@netscript/fresh-ui/primitives';
 - **Interactive primitives**: `Accordion`, `Dialog`, `Drawer`, `Popover`, `Sheet`, `Tabs`, and
   `Tooltip` compound namespaces emit `data-part`, `data-state`, and ARIA attributes for accessible,
   styleable behavior.
-- **L0 platform primitives**: `Show`, `VisuallyHidden`, and `SrOnly` cover conditional rendering and
-  assistive-technology output without extra DOM wrappers.
+- **L0 platform primitives**: `Icon`, `Show`, `VisuallyHidden`, and `SrOnly` cover token-driven
+  stroke icons, conditional rendering, and assistive-technology output without extra DOM wrappers.
 - **Semantic token vocabulary**: a theme-driven `--ns-*` custom-property surface that registry CSS
   targets, so themes and components stay decoupled.
 
