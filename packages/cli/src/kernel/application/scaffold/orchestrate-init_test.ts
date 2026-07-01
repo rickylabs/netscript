@@ -34,12 +34,11 @@ Deno.test('initNextSteps includes public database preparation steps for JSR init
     'cd smoke-test',
     'cd aspire  # TS AppHost lives here, isolated from the Deno workspace',
     'aspire restore  # download TypeScript AppHost SDK modules (run once)',
+    'aspire start  # start TypeScript AppHost',
     'cd ..',
     'netscript db init --name init',
     'netscript db generate',
     'netscript db seed',
-    'cd aspire',
-    'aspire start  # start TypeScript AppHost',
     '# Postgres provisioned by Aspire (see "Databases" in appsettings.json)',
   ]);
 });
@@ -76,12 +75,11 @@ Deno.test('initNextSteps includes local database preparation steps for maintaine
     'cd smoke-test',
     'cd aspire  # TS AppHost lives here, isolated from the Deno workspace',
     'aspire restore  # download TypeScript AppHost SDK modules (run once)',
+    'aspire start  # start TypeScript AppHost',
     'cd ..',
     'deno run -A packages/cli/bin/netscript-dev.ts db init --name init',
     'deno run -A packages/cli/bin/netscript-dev.ts db generate',
     'deno run -A packages/cli/bin/netscript-dev.ts db seed',
-    'cd aspire',
-    'aspire start  # start TypeScript AppHost',
     '# Postgres provisioned by Aspire (see "Databases" in appsettings.json)',
   ]);
 });

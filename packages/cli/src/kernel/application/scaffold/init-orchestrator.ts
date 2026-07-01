@@ -98,17 +98,16 @@ export function initNextSteps(options: ValidatedInitOptions): string[] {
     : 'netscript db';
 
   if (!options.noAspire && options.legacyAspire) {
-    if (options.dbEngine !== 'none') addDatabaseSteps(steps, dbCommand);
     steps.push('dotnet run --project dotnet/AppHost  # start C# Aspire orchestration');
+    if (options.dbEngine !== 'none') addDatabaseSteps(steps, dbCommand);
   } else if (!options.noAspire) {
     steps.push('cd aspire  # TS AppHost lives here, isolated from the Deno workspace');
     steps.push('aspire restore  # download TypeScript AppHost SDK modules (run once)');
+    steps.push('aspire start  # start TypeScript AppHost');
     if (options.dbEngine !== 'none') {
       steps.push('cd ..');
       addDatabaseSteps(steps, dbCommand);
-      steps.push('cd aspire');
     }
-    steps.push('aspire start  # start TypeScript AppHost');
   } else {
     if (options.dbEngine !== 'none') {
       steps.push(`${dbCommand} generate  # generate database client after configuring DATABASE_URL`);
