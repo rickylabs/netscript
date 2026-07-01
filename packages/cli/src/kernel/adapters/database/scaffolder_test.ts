@@ -55,7 +55,7 @@ describe('DatabaseScaffolder', () => {
     );
     assertStringIncludes(
       generateZod,
-      'await generateZodSchemasCli({ zodOutputDir: ZOD_OUTPUT_DIR });',
+      'await runWriteCrudZodBarrel(ZOD_OUTPUT_DIR, CRUD_MODEL_NAME);',
     );
 
     assertStringIncludes(
@@ -65,6 +65,10 @@ describe('DatabaseScaffolder', () => {
     assertStringIncludes(
       fixZodImports,
       'await runFixZodImports(ZOD_OUTPUT_DIR, { fixDecimalImports: true });',
+    );
+    assertStringIncludes(
+      fixZodImports,
+      'await runWriteCrudZodBarrel(ZOD_OUTPUT_DIR, CRUD_MODEL_NAME);',
     );
     assertStringIncludes(
       fixZodImports,

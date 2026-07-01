@@ -80,6 +80,9 @@ Deno.test('shared contract scaffolder creates service contracts and aggregates v
       targetPath: '/project',
       importMode: 'jsr',
       force: false,
+      imports: {
+        '@database/zod': '../database/postgres/schema/.generated/zod/crud.ts',
+      },
     },
   });
   await contractScaffolder.addServiceContract(
@@ -115,6 +118,10 @@ Deno.test('shared contract scaffolder creates service contracts and aggregates v
   assertStringIncludes(
     contractsDenoJson.imports['@netscript/contracts'],
     'jsr:@netscript/contracts',
+  );
+  assertEquals(
+    contractsDenoJson.imports['@database/zod'],
+    '../database/postgres/schema/.generated/zod/crud.ts',
   );
 });
 

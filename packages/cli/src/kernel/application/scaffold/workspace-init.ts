@@ -9,6 +9,16 @@ import type { ValidatedInitOptions } from '../../domain/scaffold/scaffold-option
 import type { InitPipelineContext } from './context.ts';
 import { adjustLocalBase, emptyScaffoldResult, isDbEngine } from './support/helpers.ts';
 
+function contractDatabaseImports(options: ValidatedInitOptions): Record<string, string> | undefined {
+  if (!isDbEngine(options.dbEngine)) {
+    return undefined;
+  }
+  return {
+    '@database/zod':
+      `../${SCAFFOLD_DIRS.DATABASE}/${options.dbEngine}/schema/.generated/zod/crud.ts`,
+  };
+}
+
 export async function scaffoldDatabase(
   context: InitPipelineContext,
   options: ValidatedInitOptions,
@@ -51,6 +61,7 @@ export async function scaffoldContracts(
       importMode: options.importMode,
       localBase: options.localBase ? adjustLocalBase(options.localBase, 1) : undefined,
       force: options.force,
+      imports: contractDatabaseImports(options),
     },
     serviceContract: options.includeExampleService && options.serviceName
       ? { serviceName: options.serviceName, modelName: options.modelName, version: SCAFFOLD_DIRS.V1 }

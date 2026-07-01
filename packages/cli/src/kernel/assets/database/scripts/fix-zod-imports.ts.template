@@ -4,15 +4,21 @@
  * @module
  */
 
-import { runFixZodImports, runPatchPrismaClient } from '@netscript/database/scripts';
+import {
+  runFixZodImports,
+  runPatchPrismaClient,
+  runWriteCrudZodBarrel,
+} from '@netscript/database/scripts';
 
 const ZOD_OUTPUT_DIR = new URL('../schema/.generated/zod', import.meta.url).pathname
   .replace(/^\/([A-Z]:)/, '$1');
 
 const GENERATED_DIR = new URL('../schema/.generated', import.meta.url).pathname
   .replace(/^\/([A-Z]:)/, '$1');
+const CRUD_MODEL_NAME = '{{modelName}}';
 
 if (import.meta.main) {
   await runFixZodImports(ZOD_OUTPUT_DIR, { fixDecimalImports: true });
+  await runWriteCrudZodBarrel(ZOD_OUTPUT_DIR, CRUD_MODEL_NAME);
   await runPatchPrismaClient(GENERATED_DIR);
 }

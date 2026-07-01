@@ -69,6 +69,36 @@ Deno.test('generateDenoJson emits shared plugin service-context imports in JSR m
   });
 });
 
+Deno.test('generateDenoJson maps @database/zod for the selected database engine', () => {
+  const result = JSON.parse(generateDenoJson({
+    name: 'test-project',
+    appName: 'dashboard',
+    workspaceMembers: ['contracts', 'database/postgres'],
+    importMode: 'jsr',
+    dbEngines: ['postgres'],
+  }));
+
+  assertEquals(
+    result.imports['@database/zod'],
+    './database/postgres/schema/.generated/zod/crud.ts',
+  );
+});
+
+Deno.test('generateDenoJson keeps generated database aliases in local mode', () => {
+  const result = JSON.parse(generateDenoJson({
+    name: 'test-project',
+    appName: 'dashboard',
+    workspaceMembers: ['contracts', 'database/sqlite'],
+    importMode: 'local',
+    localBase: '../..',
+    dbEngines: ['sqlite'],
+  }));
+
+  assertEquals(result.imports, {
+    '@database/zod': './database/sqlite/schema/.generated/zod/crud.ts',
+  });
+});
+
 Deno.test('generateDenoJson keeps the same root-only shape in local mode', () => {
   const result = JSON.parse(generateDenoJson({
     name: 'test-project',

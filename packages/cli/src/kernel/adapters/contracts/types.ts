@@ -29,6 +29,9 @@ export interface ContractScaffoldOptions {
 
   /** Whether existing files may be overwritten. */
   readonly force?: boolean;
+
+  /** Additional import-map entries for generated contracts. */
+  readonly imports?: Readonly<Record<string, string>>;
 }
 
 /** Options for a service-paired contract file. */

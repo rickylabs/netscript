@@ -136,6 +136,7 @@ export function createContractScaffolder(
           packageName,
           importMode: options.importMode,
           localBase: options.localBase,
+          imports: options.imports,
         }),
         options.force,
         filesCreated,
