@@ -48,7 +48,7 @@ describe('generateRegisterTools', () => {
     });
     assertStringIncludes(
       output,
-      "builder.addExecutable('prisma-studio', 'deno', prisma_studio_workdir, ['task', 'studio'])",
+      "builder.addExecutable('prisma-studio', 'deno', prisma_studio_workdir, ['task', '--minimum-dependency-age=0', 'studio'])",
     );
     assertStringIncludes(
       output,
@@ -63,7 +63,7 @@ describe('generateRegisterTools', () => {
     const output = generateRegisterTools({
       tools: { migrate: toolNoTaskName },
     });
-    assertStringIncludes(output, "['task', 'migrate']");
+    assertStringIncludes(output, "['task', '--minimum-dependency-age=0', 'migrate']");
   });
 
   it('should convert hyphenated names to safe identifiers', () => {

@@ -72,8 +72,8 @@ describe('app route template rendering', () => {
     assertStringIncludes(output, 'dashboard: routes.dashboard.$route,');
     assertStringIncludes(output, 'health: routes.health.$route,');
     assertStringIncludes(output, 'examples: routes.examples.$route,');
-    assertStringIncludes(output, 'crudExample: routes.examples.crud,');
     assertStringIncludes(output, 'serviceExample: routes.examples.serviceExample,');
+    assertStringIncludes(output, 'crudExample: routes.examples.serviceExample,');
     assertStringIncludes(output, "designTokens: createRouteReference('/design/tokens'");
     assertStringIncludes(output, "id: 'design.components'");
     assertStringIncludes(output, "id: 'design.composition'");
@@ -246,22 +246,40 @@ describe('app route template rendering', () => {
     assertStringIncludes(route, 'export const examplesPage = definePage()');
     assertStringIncludes(route, '.withRoute(appRoutes.examples)');
     assertStringIncludes(route, 'href: appRoutes.crudExample.href()');
+    assertStringIncludes(route, "title: 'TeamMember CRUD'");
+    assertStringIncludes(
+      route,
+      "description: 'Live TeamMember list, create, update, and delete flow backed by team-members.'",
+    );
     assertStringIncludes(route, '/examples/telemetry');
     assertStringIncludes(route, '.build();');
     assertStringIncludes(route, 'export { page as default };');
     assertStringIncludes(view, 'interface ExamplesViewProps {');
     assertStringIncludes(view, 'ResponsiveTable');
-    assertStringIncludes(view, 'Open CRUD example');
+    assertStringIncludes(view, 'Open TeamMember CRUD');
+    assertStringIncludes(view, '/examples/team-members');
   });
 
-  it('CRUD example route uses registry form, table, and detail blocks', async () => {
+  it('static directory-pattern route uses registry form, table, and detail blocks', async () => {
     const adapter = makeAdapter();
     const route = await adapter.render(appCrudExampleRouteTemplate, SAMPLE_APP_VARS);
     const view = await adapter.render(appCrudExampleViewTemplate, SAMPLE_APP_VARS);
     assertStringIncludes(route, "import CrudExampleView from './(_components)/crud-view.tsx';");
-    assertStringIncludes(route, '.withRoute(appRoutes.crudExample)');
+    assertStringIncludes(route, "import { routes } from '@app/router.ts';");
+    assertStringIncludes(route, '.withRoute(routes.examples.crud)');
+    assertStringIncludes(route, "title: 'test-project — directory pattern demo'");
+    assertStringIncludes(
+      route,
+      "description: 'Static registry-block composition demo with app-owned fresh-ui components.'",
+    );
     assertStringIncludes(route, ".withLayer('crud', CrudExampleView");
     assertStringIncludes(route, "name: 'Acme Robotics'");
+    assertStringIncludes(view, "<Badge variant='primary'>Pattern</Badge>");
+    assertStringIncludes(view, '<h1>Directory pattern</h1>');
+    assertStringIncludes(
+      view,
+      'The live service-backed CRUD route is generated under /examples/team-members.',
+    );
     assertStringIncludes(view, 'FilterForm');
     assertStringIncludes(view, 'ResponsiveTable');
     assertStringIncludes(view, 'DetailLayout');
@@ -439,9 +457,16 @@ describe('app route template rendering', () => {
     });
     assertStringIncludes(output, "import type { PrismaClient } from '@database';");
     assertStringIncludes(output, "type TeamMemberDelegate = PrismaClient['teamMember'];");
-    assertStringIncludes(output, 'list: v1.teamMembers.list!.handler');
-    assertStringIncludes(output, 'create: v1.teamMembers.create!.handler');
-    assertStringIncludes(output, 'update: v1.teamMembers.update!.handler');
-    assertStringIncludes(output, 'delete: v1.teamMembers.delete!.handler');
+    assertStringIncludes(output, 'type TeamMemberHandlerContext = { readonly db: PrismaClient };');
+    assertStringIncludes(
+      output,
+      'const teamMembersV1 = v1.teamMembers.$context<TeamMemberHandlerContext>();',
+    );
+    assertStringIncludes(output, 'list: teamMembersV1.list.handler');
+    assertStringIncludes(output, 'create: teamMembersV1.create.handler');
+    assertStringIncludes(output, 'update: teamMembersV1.update.handler');
+    assertStringIncludes(output, 'delete: teamMembersV1.delete.handler');
+    assert(!output.includes('list!.handler'));
+    assert(!output.includes('context.db as PrismaClient'));
   });
 });
