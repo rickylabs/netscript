@@ -91,7 +91,7 @@ export default function DashboardView({ projectName, appName, services }: Dashbo
               </p>
             </PageHeader.Intro>
             <PageHeader.Actions>
-              <Button type='link' href='/examples/crud'>Review CRUD flow</Button>
+              <Button type='link' href='/examples/{{serviceName}}'>Review {{modelName}} CRUD</Button>
               <Button type='link' href='/design/tokens' variant='outline'>Inspect tokens</Button>
             </PageHeader.Actions>
           </PageHeader.Main>

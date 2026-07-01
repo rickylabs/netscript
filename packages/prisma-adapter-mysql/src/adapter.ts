@@ -45,6 +45,7 @@ interface Mysql2PoolOptions {
   database?: string;
   waitForConnections: boolean;
   connectionLimit: number;
+  multipleStatements: boolean;
   connectTimeout?: number;
   ssl?: {
     ca?: string;
@@ -339,10 +340,10 @@ class PrismaMySqlAdapter extends MySqlQueryable implements SqlDriverAdapter {
   }
 
   /**
-   * Execute a script (not implemented).
+   * Execute a trusted SQL script.
    */
-  executeScript(_script: string): Promise<void> {
-    throw new Error('Not implemented yet');
+  async executeScript(script: string): Promise<void> {
+    await this.client.query(script);
   }
 
   /**
@@ -535,7 +536,7 @@ export interface PrismaMySqlConnectedAdapter {
   queryRaw(query: SqlQuery): Promise<SqlResultSet>;
   /** Execute a raw SQL statement and return affected rows. */
   executeRaw(query: SqlQuery): Promise<number>;
-  /** Execute a SQL script. */
+  /** Execute a trusted SQL script. */
   executeScript(script: string): Promise<void>;
   /** Return connection details used by Prisma. */
   getConnectionInfo(): PrismaMySqlConnectionInfo;
@@ -671,6 +672,7 @@ function toMysql2PoolOptions(config: MySqlConnectionConfig): Mysql2PoolOptions {
     database: config.db,
     waitForConnections: true,
     connectionLimit: config.poolSize ?? 1,
+    multipleStatements: true,
     connectTimeout: config.timeout,
   };
 

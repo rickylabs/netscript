@@ -68,28 +68,36 @@ export interface CrudContractOptions<
   /** Additional filters for list endpoint */
   filterSchema?: TFilter;
   /** Disable specific operations */
-  disable?: {
-    list?: boolean;
-    getById?: boolean;
-    create?: boolean;
-    update?: boolean;
-    delete?: boolean;
-  };
+  disable?: CrudOperationDisable;
 }
+
+/** Operation flags used when intentionally generating a partial CRUD contract. */
+export type CrudOperationDisable = Readonly<{
+  list?: boolean;
+  getById?: boolean;
+  create?: boolean;
+  update?: boolean;
+  delete?: boolean;
+}>;
 
 /**
  * Generated CRUD contract type.
  */
 export type CrudContractOperation<
-  TInputSchema extends ContractSchema<unknown> | undefined = ContractSchema<unknown> | undefined,
-  TOutputSchema extends ContractSchema<unknown> | undefined = ContractSchema<unknown> | undefined,
+  TInputSchema extends ContractSchema<unknown> = ContractSchema<unknown>,
+  TOutputSchema extends ContractSchema<unknown> = ContractSchema<unknown>,
 > =
   & BaseContractProcedure
   & Readonly<{
+    /** NetScript-owned schema marker used by downstream SDK type extraction. */
+    readonly __netscriptSchemas: {
+      readonly inputSchema: TInputSchema;
+      readonly outputSchema: TOutputSchema;
+    };
     /** Public oRPC schema metadata used by downstream client type extraction. */
     readonly '~orpc': {
-      readonly inputSchema?: TInputSchema;
-      readonly outputSchema?: TOutputSchema;
+      readonly inputSchema: TInputSchema;
+      readonly outputSchema: TOutputSchema;
     };
   }>;
 
@@ -132,7 +140,38 @@ export type CrudContract<
 }>;
 
 /** Generated CRUD contract shape when selected operations are disabled. */
-export type PartialCrudContract = Readonly<Partial<CrudContract>>;
+export type PartialCrudContract<
+  TEntity extends ContractSchema<unknown> = ContractSchema<unknown>,
+  TCreate extends ContractSchema<unknown> = ContractSchema<unknown>,
+  TUpdate extends ContractSchema<unknown> = ContractSchema<unknown>,
+  TId extends ContractSchema<unknown> = ContractSchema<number>,
+  TFilter extends ContractObjectSchema<unknown> | undefined = undefined,
+> = Readonly<Partial<CrudContract<TEntity, TCreate, TUpdate, TId, TFilter>>>;
+
+type MutablePartialCrudContract<
+  TEntity extends ContractSchema<unknown>,
+  TCreate extends ContractSchema<unknown>,
+  TUpdate extends ContractSchema<unknown>,
+  TId extends ContractSchema<unknown>,
+  TFilter extends ContractObjectSchema<unknown> | undefined,
+> = {
+  -readonly [K in keyof CrudContract<TEntity, TCreate, TUpdate, TId, TFilter>]?: CrudContract<
+    TEntity,
+    TCreate,
+    TUpdate,
+    TId,
+    TFilter
+  >[K];
+};
+
+function crudOperation<
+  TInputSchema extends ContractSchema<unknown>,
+  TOutputSchema extends ContractSchema<unknown>,
+>(
+  operation: BaseContractProcedure,
+): CrudContractOperation<TInputSchema, TOutputSchema> {
+  return operation as CrudContractOperation<TInputSchema, TOutputSchema>;
+}
 
 // ============================================================================
 // CRUD CONTRACT GENERATOR
@@ -150,7 +189,7 @@ export type PartialCrudContract = Readonly<Partial<CrudContract>>;
  *
  * @example
  * ```typescript
- * import { createCrudContract } from '@netscript/contracts';
+ * import { createCrudContract } from '@netscript/contracts/crud';
  *
  * const usersContract = createCrudContract({
  *   resource: 'users',
@@ -182,8 +221,38 @@ export function createCrudContract<
   TId extends ContractSchema<unknown> = ContractSchema<number>,
   TFilter extends ContractObjectSchema<unknown> | undefined = undefined,
 >(
+  options: CrudContractOptions<TEntity, TCreate, TUpdate, TId, TFilter> & {
+    readonly disable?: undefined;
+  },
+): CrudContract<TEntity, TCreate, TUpdate, TId, TFilter>;
+export function createCrudContract<
+  TEntity extends ContractSchema<unknown>,
+  TCreate extends ContractSchema<unknown>,
+  TUpdate extends ContractSchema<unknown>,
+  TId extends ContractSchema<unknown> = ContractSchema<number>,
+  TFilter extends ContractObjectSchema<unknown> | undefined = undefined,
+>(
+  options: CrudContractOptions<TEntity, TCreate, TUpdate, TId, TFilter> & {
+    readonly disable: CrudOperationDisable;
+  },
+): PartialCrudContract<TEntity, TCreate, TUpdate, TId, TFilter>;
+export function createCrudContract<
+  TEntity extends ContractSchema<unknown>,
+  TCreate extends ContractSchema<unknown>,
+  TUpdate extends ContractSchema<unknown>,
+  TId extends ContractSchema<unknown> = ContractSchema<number>,
+  TFilter extends ContractObjectSchema<unknown> | undefined = undefined,
+>(
   options: CrudContractOptions<TEntity, TCreate, TUpdate, TId, TFilter>,
-): CrudContract<TEntity, TCreate, TUpdate, TId, TFilter> {
+):
+  | CrudContract<TEntity, TCreate, TUpdate, TId, TFilter>
+  | PartialCrudContract<
+    TEntity,
+    TCreate,
+    TUpdate,
+    TId,
+    TFilter
+  > {
   const {
     resource,
     entitySchema,
@@ -191,7 +260,7 @@ export function createCrudContract<
     updateSchema,
     idSchema = z.coerce.number().int().positive() as unknown as TId,
     filterSchema,
-    disable = {},
+    disable,
   } = options;
 
   // Build list input schema (pagination + optional filters)
@@ -214,50 +283,66 @@ export function createCrudContract<
     z.object({ data: updateSchema as unknown as z.ZodTypeAny }),
   ) as CrudUpdateInput<TId, TUpdate>;
 
-  // Build contract object
-  const contract: Record<string, CrudContractOperation> = {};
+  const operations: CrudContract<TEntity, TCreate, TUpdate, TId, TFilter> = {
+    list: crudOperation(
+      baseContract
+        .route({ method: 'GET', path: `/${resource}` })
+        .input(listInputSchema)
+        .output(listOutputSchema),
+    ),
+    getById: crudOperation(
+      baseContract
+        .route({ method: 'GET', path: `/${resource}/{id}` })
+        .input(idInputSchema)
+        .output(entitySchema),
+    ),
+    create: crudOperation(
+      baseContract
+        .route({ method: 'POST', path: `/${resource}` })
+        .input(createSchema)
+        .output(entitySchema),
+    ),
+    update: crudOperation(
+      baseContract
+        .route({ method: 'PATCH', path: `/${resource}/{id}` })
+        .input(updateInputSchema)
+        .output(entitySchema),
+    ),
+    delete: crudOperation(
+      baseContract
+        .route({ method: 'DELETE', path: `/${resource}/{id}` })
+        .input(idInputSchema)
+        .output(entitySchema),
+    ),
+  };
 
-  // List operation
+  if (!disable) {
+    return operations;
+  }
+
+  const contract: MutablePartialCrudContract<TEntity, TCreate, TUpdate, TId, TFilter> = {};
+
   if (!disable.list) {
-    contract.list = baseContract
-      .route({ method: 'GET', path: `/${resource}` })
-      .input(listInputSchema)
-      .output(listOutputSchema);
+    contract.list = operations.list;
   }
 
-  // Get by ID operation
   if (!disable.getById) {
-    contract.getById = baseContract
-      .route({ method: 'GET', path: `/${resource}/{id}` })
-      .input(idInputSchema)
-      .output(entitySchema);
+    contract.getById = operations.getById;
   }
 
-  // Create operation
   if (!disable.create) {
-    contract.create = baseContract
-      .route({ method: 'POST', path: `/${resource}` })
-      .input(createSchema)
-      .output(entitySchema);
+    contract.create = operations.create;
   }
 
-  // Update operation
   if (!disable.update) {
-    contract.update = baseContract
-      .route({ method: 'PATCH', path: `/${resource}/{id}` })
-      .input(updateInputSchema)
-      .output(entitySchema);
+    contract.update = operations.update;
   }
 
-  // Delete operation
   if (!disable.delete) {
-    contract.delete = baseContract
-      .route({ method: 'DELETE', path: `/${resource}/{id}` })
-      .input(idInputSchema)
-      .output(entitySchema);
+    contract.delete = operations.delete;
   }
 
-  return contract as CrudContract<TEntity, TCreate, TUpdate, TId, TFilter>;
+  return contract;
 }
 
 // ============================================================================
@@ -280,8 +365,20 @@ export function createReadOnlyContract<TEntity extends ContractSchema<unknown>>(
   entitySchema: TEntity;
   idSchema?: ContractSchema<unknown>;
   filterSchema?: ContractObjectSchema<unknown>;
-}): PartialCrudContract {
-  return createCrudContract({
+}): PartialCrudContract<
+  TEntity,
+  ContractSchema<never>,
+  ContractSchema<never>,
+  ContractSchema<unknown>,
+  ContractObjectSchema<unknown> | undefined
+> {
+  return createCrudContract<
+    TEntity,
+    ContractSchema<never>,
+    ContractSchema<never>,
+    ContractSchema<unknown>,
+    ContractObjectSchema<unknown> | undefined
+  >({
     resource: options.resource,
     entitySchema: options.entitySchema,
     createSchema: z.never(),
@@ -311,8 +408,20 @@ export function createListOnlyContract<TEntity extends ContractSchema<unknown>>(
   resource: string;
   entitySchema: TEntity;
   filterSchema?: ContractObjectSchema<unknown>;
-}): PartialCrudContract {
-  return createCrudContract({
+}): PartialCrudContract<
+  TEntity,
+  ContractSchema<never>,
+  ContractSchema<never>,
+  ContractSchema<number>,
+  ContractObjectSchema<unknown> | undefined
+> {
+  return createCrudContract<
+    TEntity,
+    ContractSchema<never>,
+    ContractSchema<never>,
+    ContractSchema<number>,
+    ContractObjectSchema<unknown> | undefined
+  >({
     resource: options.resource,
     entitySchema: options.entitySchema,
     createSchema: z.never(),

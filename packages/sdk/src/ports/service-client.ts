@@ -60,12 +60,27 @@ export interface ContractProcedureMetadata<
 }
 
 /**
+ * NetScript-owned procedure schema marker for package-generated contract factories.
+ */
+export interface NetScriptProcedureSchemas<
+  TInputSchema = unknown,
+  TOutputSchema = unknown,
+> {
+  /** Input validation schema for the procedure. */
+  readonly inputSchema: TInputSchema;
+  /** Output validation schema for the procedure. */
+  readonly outputSchema: TOutputSchema;
+}
+
+/**
  * Minimal structural representation of an oRPC contract procedure.
  */
 export interface ContractProcedureLike<
   TInputSchema = unknown,
   TOutputSchema = unknown,
 > {
+  /** NetScript-owned schema marker used when upstream metadata is intentionally opaque. */
+  readonly __netscriptSchemas?: NetScriptProcedureSchemas<TInputSchema, TOutputSchema>;
   /** Public oRPC metadata container. */
   readonly '~orpc': ContractProcedureMetadata<TInputSchema, TOutputSchema>;
 }
@@ -90,7 +105,10 @@ export type ContractProcedureNames<TContract> =
 export type ProcedureInputFromNode<TNode> = TNode extends ContractProcedureLike<
   infer TInputSchema,
   unknown
-> ? ContractSchemaInput<TInputSchema>
+>
+  ? TNode extends { readonly __netscriptSchemas: { readonly inputSchema: infer TSchema } }
+    ? ContractSchemaInput<TSchema>
+  : ContractSchemaInput<TInputSchema>
   : never;
 
 /**
@@ -99,7 +117,10 @@ export type ProcedureInputFromNode<TNode> = TNode extends ContractProcedureLike<
 export type ProcedureOutputFromNode<TNode> = TNode extends ContractProcedureLike<
   unknown,
   infer TOutputSchema
-> ? ContractSchemaOutput<TOutputSchema>
+>
+  ? TNode extends { readonly __netscriptSchemas: { readonly outputSchema: infer TSchema } }
+    ? ContractSchemaOutput<TSchema>
+  : ContractSchemaOutput<TOutputSchema>
   : never;
 
 /**

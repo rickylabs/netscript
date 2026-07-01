@@ -35,10 +35,7 @@ function ServiceShowcaseLabInner(props: Props) {
     hydratedRef.current = true;
   }
 
-  const listOptions = exampleServiceQueries.list.queryOptions(props.input) as {
-    readonly queryKey: readonly unknown[];
-    readonly queryFn: () => Promise<ServiceListData> | ServiceListData;
-  };
+  const listOptions = exampleServiceQueries.list.queryOptions(props.input);
   const {
     data,
     status,
@@ -55,10 +52,7 @@ function ServiceShowcaseLabInner(props: Props) {
     void refetch();
   };
 
-  const createOptions = exampleServiceQueries.create.mutationOptions() as {
-    readonly mutationKey?: readonly unknown[];
-    readonly mutationFn: (input: CreateInput) => Promise<ServiceRecord> | ServiceRecord;
-  };
+  const createOptions = exampleServiceQueries.create.mutationOptions();
   const createMutation = useMutation<ServiceRecord, unknown, CreateInput>({
     mutationFn: createOptions.mutationFn,
     onSuccess: (record) => {
@@ -70,10 +64,7 @@ function ServiceShowcaseLabInner(props: Props) {
     },
   });
 
-  const updateOptions = exampleServiceQueries.update.mutationOptions() as {
-    readonly mutationKey?: readonly unknown[];
-    readonly mutationFn: (input: UpdateInput) => Promise<ServiceRecord> | ServiceRecord;
-  };
+  const updateOptions = exampleServiceQueries.update.mutationOptions();
   const renameMutation = useMutation<ServiceRecord, unknown, UpdateInput>({
     mutationFn: updateOptions.mutationFn,
     onSuccess: (record) => {
@@ -85,10 +76,7 @@ function ServiceShowcaseLabInner(props: Props) {
     },
   });
 
-  const deleteOptions = exampleServiceQueries.delete.mutationOptions() as {
-    readonly mutationKey?: readonly unknown[];
-    readonly mutationFn: (input: DeleteInput) => Promise<ServiceRecord> | ServiceRecord;
-  };
+  const deleteOptions = exampleServiceQueries.delete.mutationOptions();
   const deleteMutation = useMutation<ServiceRecord, unknown, DeleteInput>({
     mutationFn: deleteOptions.mutationFn,
     onSuccess: (record) => {

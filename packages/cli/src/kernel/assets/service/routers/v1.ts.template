@@ -7,15 +7,13 @@ import { v1 } from '@{{projectName}}/contracts';
 
 type {{modelName}}Delegate = PrismaClient['{{modelName | camelCase}}'];
 type {{modelName}}FindManyArgs = NonNullable<Parameters<{{modelName}}Delegate['findMany']>[0]>;
+type {{modelName}}HandlerContext = { readonly db: PrismaClient };
 
 const SORTABLE_FIELDS = new Set(['id', 'name', 'createdAt', 'updatedAt']);
+const {{serviceName | camelCase}}V1 = v1.{{serviceName | camelCase}}.$context<{{modelName}}HandlerContext>();
 
-function {{modelName | camelCase}}Delegate(context: { readonly db?: unknown }): {{modelName}}Delegate {
-  const db = context.db as PrismaClient | undefined;
-  if (!db?.{{modelName | camelCase}}) {
-    throw new Error('{{modelName}} database delegate is not available on context.db.');
-  }
-  return db.{{modelName | camelCase}};
+function {{modelName | camelCase}}Delegate(context: {{modelName}}HandlerContext): {{modelName}}Delegate {
+  return context.db.{{modelName | camelCase}};
 }
 
 function orderBy(input: { readonly sortBy?: string; readonly sortOrder: 'asc' | 'desc' }) {
@@ -24,7 +22,7 @@ function orderBy(input: { readonly sortBy?: string; readonly sortOrder: 'asc' | 
 }
 
 export const {{serviceName | pascalCase}}V1 = {
-  list: v1.{{serviceName | camelCase}}.list!.handler(async ({ input, context }) => {
+  list: {{serviceName | camelCase}}V1.list.handler(async ({ input, context }) => {
     const delegate = {{modelName | camelCase}}Delegate(context);
     const page = input.page;
     const limit = input.limit;
@@ -53,7 +51,7 @@ export const {{serviceName | pascalCase}}V1 = {
       },
     };
   }),
-  getById: v1.{{serviceName | camelCase}}.getById!.handler(async ({ input, context }) => {
+  getById: {{serviceName | camelCase}}V1.getById.handler(async ({ input, context }) => {
     const record = await {{modelName | camelCase}}Delegate(context).findUnique({
       where: { id: input.id },
     });
@@ -62,16 +60,16 @@ export const {{serviceName | pascalCase}}V1 = {
     }
     return record;
   }),
-  create: v1.{{serviceName | camelCase}}.create!.handler(async ({ input, context }) =>
+  create: {{serviceName | camelCase}}V1.create.handler(async ({ input, context }) =>
     await {{modelName | camelCase}}Delegate(context).create({ data: input })
   ),
-  update: v1.{{serviceName | camelCase}}.update!.handler(async ({ input, context }) =>
+  update: {{serviceName | camelCase}}V1.update.handler(async ({ input, context }) =>
     await {{modelName | camelCase}}Delegate(context).update({
       where: { id: input.id },
       data: input.data,
     })
   ),
-  delete: v1.{{serviceName | camelCase}}.delete!.handler(async ({ input, context }) =>
+  delete: {{serviceName | camelCase}}V1.delete.handler(async ({ input, context }) =>
     await {{modelName | camelCase}}Delegate(context).delete({
       where: { id: input.id },
     })

@@ -55,9 +55,9 @@ export function buildServiceSummary(
 }
 
 export async function loadServiceShowcaseSummary(): Promise<ServiceSummaryPanelProps> {
-  const result = await exampleServiceQueries.list(
+  const result: ServiceShowcaseListData = await exampleServiceQueries.list(
     SERVICE_SHOWCASE_INPUT,
-  ) as ServiceShowcaseListData;
+  );
   return buildServiceSummary(result);
 }
 
@@ -65,9 +65,9 @@ export async function loadServiceShowcaseData() {
   const queryClient = createNetScriptQueryClient();
   const queryOptions = exampleServiceQueries.list.queryOptions(SERVICE_SHOWCASE_INPUT);
   const cachedAt = Date.now();
-  const initialList = await queryClient.fetchQuery<ServiceShowcaseListData>({
+  const initialList: ServiceShowcaseListData = await queryClient.fetchQuery({
     queryKey: queryOptions.queryKey,
-    queryFn: async () => await queryOptions.queryFn() as ServiceShowcaseListData,
+    queryFn: queryOptions.queryFn,
   });
 
   return {

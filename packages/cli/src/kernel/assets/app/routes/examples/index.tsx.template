@@ -11,9 +11,9 @@ export const examplesPage = definePage()
   .withLayer('examples', ExamplesView, () => ({
     examples: [
       {
-        title: 'CRUD directory',
+        title: '{{modelName}} CRUD',
         href: appRoutes.crudExample.href(),
-        description: 'Filter form, responsive table, detail rail, and empty-state patterns.',
+        description: 'Live {{modelName}} list, create, update, and delete flow backed by {{serviceName}}.',
         status: 'Ready',
         owner: 'app',
       },
