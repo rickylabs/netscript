@@ -1,0 +1,400 @@
+5. Write the summary to the required path
+
+Let me check the fresh-ui docs more thoroughly and run the verification tasks.
+
+$ cd /home/runner/work/netscript/netscript && head -50 
+packages/fresh-ui/src/runtime/combobox/Combobox.tsx
+
+Tokens: ↑ input 1.52M • cache hit 83.51% •  reasoning 9.16K • ↓ output 16.68K • 
+$ 0.6948
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+import { createContext } from 'preact';
+import type { ComponentChildren, VNode } from 'preact';
+import { useContext } from 'preact/hooks';
+import { useCombobox } from './use-combobox.ts';
+import type {
+  ComboboxContentProps,
+  ComboboxEmptyProps,
+  ComboboxInputProps,
+  ComboboxItemProps,
+  ComboboxRootProps,
+  UseComboboxReturn,
+} from './combobox.types.ts';
+
+const ComboboxContext = createContext<UseComboboxReturn | null>(null);
+
+function useComboboxContext(partName: string): UseComboboxReturn {
+  const context = useContext(ComboboxContext);
+  if (context === null) {
+    throw new Error(`${partName} must be used within <Combobox.Root>`);
+  }
+  return context;
+}
+
+function ComboboxRoot({ children, ...options }: ComboboxRootProps): VNode {
+  const combobox = useCombobox(options);
+  return (
+    <ComboboxContext.Provider value={combobox}>
+      <div {...combobox.getRootProps()}>{children as ComponentChildren}</div>
+    </ComboboxContext.Provider>
+  );
+}
+
+function ComboboxInput(props: ComboboxInputProps): VNode {
+  const combobox = useComboboxContext('Combobox.Input');
+  return <input {...combobox.getInputProps(props)} />;
+}
+
+function ComboboxContent({ children, ...props }: ComboboxContentProps): VNode {
+  const combobox = useComboboxContext('Combobox.Content');
+  return <div {...combobox.getContentProps(props)}>{children as 
+ComponentChildren}</div>;
+}
+
+function ComboboxItem({ children, value, ...props }: ComboboxItemProps): VNode {
+  const combobox = useComboboxContext('Combobox.Item');
+  return <div {...combobox.getItemProps(value, props)}>{children as 
+ComponentChildren}</div>;
+}
+
+function ComboboxEmpty({ children, ...props }: ComboboxEmptyProps): VNode {
+  return <div data-part='empty' {...props}>{children as 
+ComponentChildren}</div>;
+}
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: List fresh-ui reference directory
+
+Reasoning:
+...
+
+$ cd /home/runner/work/netscript/netscript && ls docs/site/reference/fresh-ui/
+
+Tokens: ↑ input 1.55M • cache hit 83.36% •  reasoning 9.16K • ↓ output 16.76K • 
+$ 0.7091
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+index.md
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: View PR review comments
+
+Reasoning:
+Now I have all the information needed to complete the review. Let me also create
+a PR reply since the trigger specified output=pr-comment.
+
+Let me look at the pr-review-comments.json to understand what we're replying to:
+
+
+$ cat /home/runner/work/_temp/openhands/28485224548-1/pr-review-comments.json 
+2>/dev/null | head -50
+
+Tokens: ↑ input 1.58M • cache hit 83.47% •  reasoning 9.21K • ↓ output 16.9K • $
+0.7195
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+[]
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: terminal: {"command": "cat 
+/home/runner/work/_temp/openhands/28485224548-1/issue-comments.json 
+2>/dev/null"}
+
+Reasoning:
+The task says I should not write GitHub issue or PR comments directly. The 
+workflow writes those. I need to write my evaluation in the summary.md which was
+already created, and possibly in replies.json. However, since there's no 
+specific review-thread comment in pr-review-comments.json, and the trigger was 
+`issue_comment`, let me check the issue-comments.json:
+
+
+$ cat /home/runner/work/_temp/openhands/28485224548-1/issue-comments.json 
+2>/dev/null
+
+Tokens: ↑ input 1.61M • cache hit 83.58% •  reasoning 9.28K • ↓ output 17.04K • 
+$ 0.7302
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+[
+  {
+    "author_association": "OWNER",
+    "body": "@openhands-agent model=openrouter/qwen/qwen3.7-max 
+output=pr-comment\n\nIMPL-EVAL this docs-only PR (#199). It reconciles the doc 
+site to three just-merged PRs. Give a **per-domain verdict** (PASS / FAIL_FIX 
+per domain), grounded against the actual merged code on `main` — not against the
+prose alone.\n\nDomains to verify:\n\n1. **Triggers oRPC truth (#193)** — the 
+docs must say triggers serve a **typed v1 oRPC contract** 
+(introspection/management/SSE), and that ONLY the webhook **ingress** endpoint 
+(`POST /api/v1/webhooks/:triggerId`, plus the legacy `GET /api/v1/events`) stays
+a **raw HMAC-verifying route by design** (HMAC-over-raw-bytes is incompatible 
+with oRPC Zod parsing). Ground against `plugins/triggers/services/src/**` (the 
+v1 router + `createPluginService(router, { serveRpc: true })` and the 
+`rawRoutes` webhook ingress). Confirm no remaining \"raw Hono, not oRPC\" claim 
+survives in: `capabilities/triggers.md`, `capabilities/index.md`, 
+`explanation/contracts.md`, `explanation/architecture.md`, `glossary.md`, 
+`how-to/deploy.md`, `tutorials/storefront/05-shipping-webhook.md`. The webhook 
+ingress must NEVER be described as oRPC.\n\n2. **Two-tier plugin shape 
+(#183/#172)** — `netscript plugin new <name>` emits a **core engine package** 
+(`packages/plugin-<name>-core/`) + a **thin connector** (`plugins/<name>/`, 
+contracts re-exported); flags `--kind feature|proxy` (default **proxy**), 
+`--overwrite`. Ground against the CLI `plugin new` command source and the 
+existing converged plugins. Files: `cli-reference.md`, 
+`how-to/author-a-plugin.md`, `explanation/plugin-system.md`.\n\n3. **fresh-ui AI
+catalog (#190)** — the AI/workspace primitive catalog (the L2 primitives + 
+command-palette/search `.ns-cmdk`/`.ns-search`) and the headless **Combobox** 
+interactive namespace (from `@netscript/fresh-ui/interactive`). Ground against 
+`packages/fresh-ui/**` public surface (`deno doc`). Confirm 
+`reference/fresh-ui/index.md` (generated) was NOT hand-edited. Files: 
+`how-to/customize-fresh-ui.md`, `capabilities/fresh-ui.md`.\n\nAlso run the docs
+gates from `docs/site/`:\n\ndeno task build\ndeno task check:links\n\nBoth must 
+be green (expected: 306 files built; ~18456 internal links resolve). Note: 
+`check:caveats` is not required here — it fails only under linked-worktree 
+layout; on your normal checkout it should locate 
+`.llm/harness/debt/arch-debt.md` and pass, but a caveat-ref failure unrelated to
+these 12 pages is not a blocker.\n\nConstraints: docs-only PR — flag ANY change 
+outside `docs/site/`. Do not commit lock churn or source changes. Report 
+per-domain PASS/FAIL_FIX plus the raw build/link exit codes.\n",
+    "created_at": "2026-07-01T00:36:01Z",
+    "html_url": 
+"https://github.com/rickylabs/netscript/pull/199#issuecomment-4849151733",
+    "id": 4849151733,
+    "issue_url": "https://api.github.com/repos/rickylabs/netscript/issues/199",
+    "minimized": null,
+    "node_id": "IC_kwDOSxcnO88AAAABIQgu9Q",
+    "performed_via_github_app": null,
+    "reactions": {
+      "+1": 0,
+      "-1": 0,
+      "confused": 0,
+      "eyes": 1,
+      "heart": 0,
+      "hooray": 0,
+      "laugh": 0,
+      "rocket": 0,
+      "total_count": 1,
+      "url": 
+"https://api.github.com/repos/rickylabs/netscript/issues/comments/4849151733/rea
+ctions"
+    },
+    "updated_at": "2026-07-01T00:36:01Z",
+    "url": 
+"https://api.github.com/repos/rickylabs/netscript/issues/comments/4849151733",
+    "user": {
+      "avatar_url": "https://avatars.githubusercontent.com/u/129366361?v=4",
+      "events_url": "https://api.github.com/users/rickylabs/events{/privacy}",
+      "followers_url": "https://api.github.com/users/rickylabs/followers",
+      "following_url": 
+"https://api.github.com/users/rickylabs/following{/other_user}",
+      "gists_url": "https://api.github.com/users/rickylabs/gists{/gist_id}",
+      "gravatar_id": "",
+      "html_url": "https://github.com/rickylabs",
+      "id": 129366361,
+      "login": "rickylabs",
+      "node_id": "U_kgDOB7X5WQ",
+      "organizations_url": "https://api.github.com/users/rickylabs/orgs",
+      "received_events_url": 
+"https://api.github.com/users/rickylabs/received_events",
+      "repos_url": "https://api.github.com/users/rickylabs/repos",
+      "site_admin": false,
+      "starred_url": 
+"https://api.github.com/users/rickylabs/starred{/owner}{/repo}",
+      "subscriptions_url": 
+"https://api.github.com/users/rickylabs/subscriptions",
+      "type": "User",
+      "url": "https://api.github.com/users/rickylabs",
+      "user_view_type": "public"
+    }
+  },
+  {
+    "author_association": "OWNER",
+    "body": "<!-- openhands-agent-summary -->\n## OpenHands Agent — 
+Running\n\nModel: `openrouter/qwen/qwen3.7-max`\nProvider: `OPENROUTER`\nOutput 
+mode: `pr-comment`\n\nRun: 
+https://github.com/rickylabs/netscript/actions/runs/28485224548",
+    "created_at": "2026-07-01T00:36:10Z",
+    "html_url": 
+"https://github.com/rickylabs/netscript/pull/199#issuecomment-4849152413",
+    "id": 4849152413,
+    "issue_url": "https://api.github.com/repos/rickylabs/netscript/issues/199",
+    "minimized": null,
+    "node_id": "IC_kwDOSxcnO88AAAABIQgxnQ",
+    "performed_via_github_app": null,
+    "reactions": {
+      "+1": 0,
+      "-1": 0,
+      "confused": 0,
+      "eyes": 0,
+      "heart": 0,
+      "hooray": 0,
+      "laugh": 0,
+      "rocket": 0,
+      "total_count": 0,
+      "url": 
+"https://api.github.com/repos/rickylabs/netscript/issues/comments/4849152413/rea
+ctions"
+    },
+    "updated_at": "2026-07-01T00:36:10Z",
+    "url": 
+"https://api.github.com/repos/rickylabs/netscript/issues/comments/4849152413",
+    "user": {
+      "avatar_url": "https://avatars.githubusercontent.com/u/129366361?v=4",
+      "events_url": "https://api.github.com/users/rickylabs/events{/privacy}",
+      "followers_url": "https://api.github.com/users/rickylabs/followers",
+      "following_url": 
+"https://api.github.com/users/rickylabs/following{/other_user}",
+      "gists_url": "https://api.github.com/users/rickylabs/gists{/gist_id}",
+      "gravatar_id": "",
+      "html_url": "https://github.com/rickylabs",
+      "id": 129366361,
+      "login": "rickylabs",
+      "node_id": "U_kgDOB7X5WQ",
+      "organizations_url": "https://api.github.com/users/rickylabs/orgs",
+      "received_events_url": 
+"https://api.github.com/users/rickylabs/received_events",
+      "repos_url": "https://api.github.com/users/rickylabs/repos",
+      "site_admin": false,
+      "starred_url": 
+"https://api.github.com/users/rickylabs/starred{/owner}{/repo}",
+      "subscriptions_url": 
+"https://api.github.com/users/rickylabs/subscriptions",
+      "type": "User",
+      "url": "https://api.github.com/users/rickylabs",
+      "user_view_type": "public"
+    }
+  }
+]
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: IMPL-EVAL complete: 2 PASS, 1 FAIL_FIX (Domain 2 CLI flag names)
+
+Reasoning:
+The user task is to perform an IMPL-EVAL (implementation evaluation) of a 
+docs-only PR #199. The task requires:
+
+1. Verify three domains against the actual merged code:
+   - Domain 1: Triggers oRPC truth (#193) - verify docs describe typed v1 oRPC 
+contract and raw webhook ingress correctly
+   - Domain 2: Two-tier plugin shape (#183/#172) - verify docs describe CLI 
+plugin new command correctly
+   - Domain 3: fresh-ui AI catalog (#190) - verify docs describe fresh-ui 
+primitives correctly
+
+2. Run docs gates (build and link checks)
+
+3. Provide per-domain PASS/FAIL_FIX verdicts
+
+I've completed my analysis:
+
+**Domain 1 (Triggers oRPC truth)**: PASS
+- All docs correctly describe the typed v1 oRPC contract
+- Webhook ingress correctly described as raw route (not oRPC)
+- Grounded against source: `plugins/triggers/services/src/main.ts` matches
+
+**Domain 2 (Two-tier plugin shape)**: FAIL_FIX
+- Found a CRITICAL discrepancy: docs say `--kind feature|proxy` and 
+`--overwrite` flags
+- Actual CLI source uses `--feature` (boolean) and `--force` (boolean)
+- Internal semantics are correct, but flag names are wrong in docs
+- Files affected: cli-reference.md, how-to/author-a-plugin.md
+
+**Domain 3 (fresh-ui AI catalog)**: PASS
+- Docs correctly describe Combobox and useCombobox
+- reference/fresh-ui/index.md was NOT modified by this PR (confirmed no 
+hand-editing)
+- Caveat: reference page has stale generation (missing Combobox), but authored 
+docs are correct
+
+**Build gates**: Both PASS
+- deno task build: exit code 0, 306 files
+- deno task check:links: exit code 0, 18456 links
+
+**Constraints**: PASS
+- All changes are under docs/site/
+- No lock churn or source changes
+
+I've created the summary.md file. Now I need to signal completion.
+
+Finish with message:
+## IMPL-EVAL Complete — PR #199
+
+### Per-Domain Verdicts
+
+**Domain 1: Triggers oRPC truth (#193)** — **PASS**
+- All 7 doc files correctly describe the typed v1 oRPC contract for 
+introspection/management/SSE
+- Webhook ingress correctly described as raw HMAC-verifying route (not oRPC)
+- Grounded against `plugins/triggers/services/src/main.ts`: 
+`createPluginService(router, { serveRpc: true })` + `rawRoutes` matches docs
+- No stale "raw Hono, not oRPC" claims found
+
+**Domain 2: Two-tier plugin shape (#183/#172)** — **FAIL_FIX**
+- Two-tier topology description (core package + thin connector) is correct
+- **Critical issue**: CLI flag names are wrong in docs
+  - Docs say: `--kind feature|proxy` and `--overwrite`
+  - Actual CLI: `--feature` (boolean) and `--force` (boolean)
+  - Files: `cli-reference.md` L134, `how-to/author-a-plugin.md` L65, L68-69
+- Internal semantics correct but flag spellings diverge from source
+
+**Domain 3: fresh-ui AI catalog (#190)** — **PASS**
+- `capabilities/fresh-ui.md` correctly catalogs L2 primitives, Combobox, and 
+.ns-cmdk/.ns-search
+- `how-to/customize-fresh-ui.md` correctly describes headless Combobox seam
+- `reference/fresh-ui/index.md` not modified by this PR (confirmed no 
+hand-editing)
+- Caveat: reference page has stale Combobox omission (deno doc regeneration 
+needed, but not an authored doc issue)
+
+### Docs Gates
+- `deno task build`: **exit code 0** — 306 files generated ✓
+- `deno task check:links`: **exit code 0** — 18456 internal links, all resolve ✓
+
+### Constraints
+- Docs-only scope: All 13 changed files under `docs/site/` ✓
+- No lock churn or source changes ✓
+
+### Required Fix
+Domain 2 requires flag name corrections before merge:
+- Replace `--kind feature|proxy` with `--feature` in cli-reference.md and 
+how-to/author-a-plugin.md
+- Replace `--overwrite` with `--force` in cli-reference.md and 
+how-to/author-a-plugin.md
+
+Full analysis written to 
+`/home/runner/work/_temp/openhands/28485224548-1/summary.md`.
+
+Tokens: ↑ input 1.64M • cache hit 83.68% •  reasoning 9.73K • ↓ output 18.11K • 
+$ 0.7452
+

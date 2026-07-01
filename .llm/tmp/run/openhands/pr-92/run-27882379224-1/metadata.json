@@ -1,0 +1,17 @@
+{
+  "run_id": "27882379224",
+  "run_attempt": "1",
+  "run_url": "https://github.com/rickylabs/netscript/actions/runs/27882379224",
+  "bootstrap_outcome": "success",
+  "agent_outcome": "success",
+  "verdict": "completed",
+  "summary_source": "agent",
+  "model": "openrouter/qwen/qwen3.7-max",
+  "provider": "OPENROUTER",
+  "output_mode": "pr-comment",
+  "issue_number": "92",
+  "checkout_repo": "rickylabs/netscript",
+  "checkout_ref": "feat/prime-time/auth-s1-contract",
+  "summary_path": "/home/runner/work/_temp/openhands/27882379224-1/summary.md",
+  "trace_dir": ".llm/tmp/run/openhands/pr-92/run-27882379224-1"
+}

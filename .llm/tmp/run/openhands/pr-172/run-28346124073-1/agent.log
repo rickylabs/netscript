@@ -1,0 +1,400 @@
+    | --- | --- |
+    | Three overlapping mechanisms exist | 
+`packages/cli/src/public/features/plugins/add/render-plugin.ts:36`; 
+`packages/cli/src/kernel/templates/plugins/generate-plugin-service.ts` + 7 
+sibling factories; v1 thin `packages/plugin/src/scaffold/{mod,types,...}.ts` 
+(commit `832fa9e8`); `plugins/*/src/scaffolding/templates/*.template` |
+    | Three forked item-scaffolder contracts | core 
+`PluginItemScaffolder<TInput>` + `WorkersItemScaffolder<>` in 
+`plugin-workers-core/abstracts/` + inline `SagasItemScaffolder` + bare 
+`TriggerDefinitionScaffolder` interface |
+    | A4 violation: `PluginCli.run()` concrete | 
+`packages/plugin/src/cli/base/plugin-cli.ts:30-37` |
+    | `FRAMEWORK_VERBS = 
+['add','remove','enable','disable','sync','setup','update','doctor','info']` | 
+`packages/cli/src/public/features/plugins/dispatch/dispatch-plugin-verb.ts:13-22
+` |
+    | Host config wiring to KEEP | 
+`packages/cli/src/public/features/plugins/add/add-plugin.ts:144,151,161,165` |
+    | `@netscript/plugin` has no `@netscript/cli` import (live tree) | grep 
+clean |
+    | `deno.lock` untouched since `9d477461` (v0.0.1-alpha.12) | git log clean |
+    | `arch:check`/`plugins:check`/`deno doc --lint`/`deno publish --dry-run` 
+wrappers exist | `.llm/tools/fitness/check-doctrine.ts`, 
+`.llm/tools/run-deno-doc-lint.ts`, `.llm/tools/run-publish-dry-run.ts`, 
+`.llm/tools/scaffold-e2e-test.ts` |
+    | Doctrine 03 cross-package inheritance ban | 
+`docs/architecture/doctrine/03-base-and-derived-classes.md:164` (plan cites 
+L162-175 — within tolerance) |
+    | Branch HEAD = `beb931d6`; v2 plan lock = `3412c469`; tooling DoD = 
+`8554c427` | `git log` confirmed |
+    
+    ## Plan-Gate boxes (`.llm/harness/gates/plan-gate.md`)
+    
+    All 9 boxes PASS: research current + cited; decisions locked with rationale;
+open-decision sweep
+    folded (rename, mandatory set, extension model); S0–S9 slice enumeration 
+with per-slice
+    files/gates/proof; risk register visible inline; gates wired to slices; 
+deferred scope explicit;
+    JSR-audit policy complete; re-baseline verified against branch HEAD.
+    
+    ## PLAN-EVAL scrutiny (9 points)
+    
+    All 9 PASS: one contract (no 4th mechanism); doctrine-legal extension 
+(factory, not extends);
+    layering + JSR clean; no source leak (S5 negative e2e gates it); item 
+generator uses typed
+    substitution over type-checked stubs (no string concat, no `.template`); 
+command taxonomy + rename
+    coherent; S8/S9 tooling wraps native + repo wrappers (no bespoke linters); 
+gates are real
+    (merge-blocking arch:check/plugins:check, no `any`, no lock churn, 
+forward-only); re-baselined.
+    
+    ## Non-blocking observations for IMPL-EVAL
+    
+    1. S1 is large — 10 files in `packages/plugin/src/adapter/`. IMPL-EVAL 
+should verify each sub-file
+       is independently type-checked, doc'd, and unit-tested within the slice.
+    2. `ItemScaffolder<TInput>` typed substitution is contractually specified 
+but mechanically
+       under-specified — IMPL-EVAL should verify type-level token maps so 
+missing tokens are compile
+       errors.
+    3. Mandatory-command logic location implicit in plan — IMPL-EVAL should 
+verify each mandatory verb
+       has exactly one owner module in `@netscript/plugin/adapter/commands/`.
+    4. Root-schema typed-builder deferred to `.llm/plans/` (not blocker).
+    5. `enable`/`disable`/`sync`/`setup` keep current names — IMPL-EVAL verifies
+dispatch surface.
+    
+    ## Responses to review comments or issue comments
+    
+    None — read-only evaluator role. PR #172 has 0 review comments and 0 issue 
+comments at the time
+    of evaluation.
+    
+    ## Remaining risks
+    
+    - Plan acknowledges the `add→install` rename is breaking; acceptable 
+pre-1.0.
+    - S3 (4 remaining plugins: sagas/triggers/streams/auth) is high-risk if any 
+plugin has a
+      non-conforming shape; mitigated by the plan's "shape as a separate commit"
+guidance.
+    - All observed risks are acknowledged in the plan and do not block 
+implementation.
+    
+    ---
+    
+    _This summary was created by an AI agent (OpenHands) on behalf of the user._
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 3.84M • cache hit 95.20% •  reasoning 1.71K • ↓ output 28.17K • 
+$ 0.3086
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/28346124073-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# PLAN-EVAL Run Summary — NetScript PR #172 / issue #167 / task #157
+ 2|
++3|## Summary
++4|
++5|Evaluated Plan v2 (user-locked 2026-06-29 in commit `3412c469`) for the 
+**Plugin Command Surface
++6|Unification** re-architecture on branch `feat/scaffold-surface-167` (PR 
+#172). Plan collapses
++7|three overlapping scaffold mechanisms and three forked item-scaffolder 
+contracts into ONE
++8|core-owned `NetScriptPlugin` interface + `createPluginAdapter` factory + 
+`ItemScaffolder<TInput>`
++9|contract, all under a new `@netscript/plugin/adapter` JSR-publishable export.
+Honors the
++10|user-granted re-architecture license and is doctrine-legal, layered 
+correctly, source-leak-free,
++11|and properly gated.
++12|
++13|**Verdict: `PASS`** — Implementation is unblocked.
++14|
++15|## Verdict artifact
++16|
++17|`.llm/tmp/run/feat-scaffold-surface-167--scaffold-surface/plan-eval.md` (190
+lines).
++18|
++19|## Changes
++20|
++21|Wrote one artifact (no source or plan edits — read-only evaluator role):
++22|
++23|- `.llm/tmp/run/feat-scaffold-surface-167--scaffold-surface/plan-eval.md` — 
+full PLAN-EVAL
++24|  verdict per `.llm/harness/gates/plan-gate.md` and 
+`.llm/harness/evaluator/plan-protocol.md`.
++25|  Records evaluator model (`openrouter/minimax/minimax-m3`), run id, `PASS` 
+verdict, and each of
++26|  the 9 PLAN-EVAL scrutiny points with file/line-anchored evidence.
++27|
++28|No source, no plan, no branch mutations. Working tree dirty only on 
+ephemeral request files
++29|under `.llm/tmp/run/openhands/`.
++30|
++31|## Validation
++32|
++33|Cross-referenced every plan claim against the live branch tree:
++34|
++35|| Plan claim | File:line grounded |
++36|| --- | --- |
++37|| Three overlapping mechanisms exist | 
+`packages/cli/src/public/features/plugins/add/render-plugin.ts:36`; 
+`packages/cli/src/kernel/templates/plugins/generate-plugin-service.ts` + 7 
+sibling factories; v1 thin `packages/plugin/src/scaffold/{mod,types,...}.ts` 
+(commit `832fa9e8`); `plugins/*/src/scaffolding/templates/*.template` |
++38|| Three forked item-scaffolder contracts | core 
+`PluginItemScaffolder<TInput>` + `WorkersItemScaffolder<>` in 
+`plugin-workers-core/abstracts/` + inline `SagasItemScaffolder` + bare 
+`TriggerDefinitionScaffolder` interface |
++39|| A4 violation: `PluginCli.run()` concrete | 
+`packages/plugin/src/cli/base/plugin-cli.ts:30-37` |
++40|| `FRAMEWORK_VERBS = 
+['add','remove','enable','disable','sync','setup','update','doctor','info']` | 
+`packages/cli/src/public/features/plugins/dispatch/dispatch-plugin-verb.ts:13-22
+` |
++41|| Host config wiring to KEEP | 
+`packages/cli/src/public/features/plugins/add/add-plugin.ts:144,151,161,165` |
++42|| `@netscript/plugin` has no `@netscript/cli` import (live tree) | grep 
+clean |
++43|| `deno.lock` untouched since `9d477461` (v0.0.1-alpha.12) | git log clean |
++44|| `arch:check`/`plugins:check`/`deno doc --lint`/`deno publish --dry-run` 
+wrappers exist | `.llm/tools/fitness/check-doctrine.ts`, 
+`.llm/tools/run-deno-doc-lint.ts`, `.llm/tools/run-publish-dry-run.ts`, 
+`.llm/tools/scaffold-e2e-test.ts` |
++45|| Doctrine 03 cross-package inheritance ban | 
+`docs/architecture/doctrine/03-base-and-derived-classes.md:164` (plan cites 
+L162-175 — within tolerance) |
++46|| Branch HEAD = `beb931d6`; v2 plan lock = `3412c469`; tooling DoD = 
+`8554c427` | `git log` confirmed |
++47|
++48|## Plan-Gate boxes (`.llm/harness/gates/plan-gate.md`)
++49|
++50|All 9 boxes PASS: research current + cited; decisions locked with rationale;
+open-decision sweep
++51|folded (rename, mandatory set, extension model); S0–S9 slice enumeration 
+with per-slice
++52|files/gates/proof; risk register visible inline; gates wired to slices; 
+deferred scope explicit;
++53|JSR-audit policy complete; re-baseline verified against branch HEAD.
++54|
++55|## PLAN-EVAL scrutiny (9 points)
++56|
++57|All 9 PASS: one contract (no 4th mechanism); doctrine-legal extension 
+(factory, not extends);
++58|layering + JSR clean; no source leak (S5 negative e2e gates it); item 
+generator uses typed
++59|substitution over type-checked stubs (no string concat, no `.template`); 
+command taxonomy + rename
++60|coherent; S8/S9 tooling wraps native + repo wrappers (no bespoke linters); 
+gates are real
++61|(merge-blocking arch:check/plugins:check, no `any`, no lock churn, 
+forward-only); re-baselined.
++62|
++63|## Non-blocking observations for IMPL-EVAL
++64|
++65|1. S1 is large — 10 files in `packages/plugin/src/adapter/`. IMPL-EVAL 
+should verify each sub-file
++66|   is independently type-checked, doc'd, and unit-tested within the slice.
++67|2. `ItemScaffolder<TInput>` typed substitution is contractually specified 
+but mechanically
++68|   under-specified — IMPL-EVAL should verify type-level token maps so 
+missing tokens are compile
++69|   errors.
++70|3. Mandatory-command logic location implicit in plan — IMPL-EVAL should 
+verify each mandatory verb
++71|   has exactly one owner module in `@netscript/plugin/adapter/commands/`.
++72|4. Root-schema typed-builder deferred to `.llm/plans/` (not blocker).
++73|5. `enable`/`disable`/`sync`/`setup` keep current names — IMPL-EVAL verifies
+dispatch surface.
++74|
++75|## Responses to review comments or issue comments
++76|
++77|None — read-only evaluator role. PR #172 has 0 review comments and 0 issue 
+comments at the time
++78|of evaluation.
++79|
++80|## Remaining risks
++81|
++82|- Plan acknowledges the `add→install` rename is breaking; acceptable 
+pre-1.0.
++83|- S3 (4 remaining plugins: sagas/triggers/streams/auth) is high-risk if any 
+plugin has a
++84|  non-conforming shape; mitigated by the plan's "shape as a separate commit"
+guidance.
++85|- All observed risks are acknowledged in the plan and do not block 
+implementation.
++86|
++87|---
++88|
++89|_This summary was created by an AI agent (OpenHands) on behalf of the user._
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: task_tracker: {"command": "plan", "task_list": [{"title": "PLAN-EVAL 
+verdict for Plan v2 \u2014 emit PASS/FAIL_PLAN", "notes": "PASS recorded in 
+plan-eval.md with 9 scrutiny points and 9 plan-gate boxes grounded", "status": 
+"done"}, {"title": "Plan-Gate enforcement (per gates/plan-gate.md, 
+evaluator/plan-protocol.md)", "notes": "All boxes grounded against live branch 
+tree with file/line evidence", "status": "done"}, {"title": "Write verdict to 
+.llm/tmp/run/feat-scaffold-surface-167--scaffold-surface/plan-eval.md", "notes":
+"190 lines, PASS, all 9 scrutiny points grounded", "status": "done"}, {"title": 
+"Post summary to PR #172 comment", "notes": "Workflow owns GitHub comments per 
+operational contract; PR summary recorded in plan-eval.md for workflow to post",
+"status": "done"}, {"title": "Write 
+/home/runner/work/_temp/openhands/28346124073-1/summary.md", "notes": "Done", 
+"status": "done"}]}
+
+Thought:
+Now I should also post the summary to the PR #172 comment. The operational 
+contract says "Do not post GitHub issue or PR comments directly. The workflow 
+owns GitHub comments." So I will NOT call `gh` to post; the workflow will handle
+that. But I should still emit a `replies.json` file for the workflow to pick up 
+— actually, looking again, the contract specifies replies only for 
+"thread-replies" output mode. This run is `output_mode: pr-comment`. The summary
+says the workflow owns GitHub comments, so my output is the artifact + summary, 
+and the workflow handles posting.
+
+Let me finalize by updating task tracker and finishing:
+
+📋 Update Task List (5 tasks)
+
+Tokens: ↑ input 3.87M • cache hit 95.23% •  reasoning 1.71K • ↓ output 28.67K • 
+$ 0.3107
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: task_tracker
+Result:
+✅ Task list updated: 5 done
+
+✅ 1. PLAN-EVAL verdict for Plan v2 — emit PASS/FAIL_PLAN
+   Notes: PASS recorded in plan-eval.md with 9 scrutiny points and 9 plan-gate 
+boxes grounded
+✅ 2. Plan-Gate enforcement (per gates/plan-gate.md, evaluator/plan-protocol.md)
+   Notes: All boxes grounded against live branch tree with file/line evidence
+✅ 3. Write verdict to 
+.llm/tmp/run/feat-scaffold-surface-167--scaffold-surface/plan-eval.md
+   Notes: 190 lines, PASS, all 9 scrutiny points grounded
+✅ 4. Post summary to PR #172 comment
+   Notes: Workflow owns GitHub comments per operational contract; PR summary 
+recorded in plan-eval.md for workflow to post
+✅ 5. Write /home/runner/work/_temp/openhands/28346124073-1/summary.md
+   Notes: Done
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Confirm no source/plan files were mutated
+
+$ git status --short
+
+Tokens: ↑ input 3.89M • cache hit 95.26% •  reasoning 1.71K • ↓ output 28.73K • 
+$ 0.3123
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+M .llm/tmp/run/openhands/pr-17/run-27493382997-1/request.md
+ M .llm/tmp/run/openhands/pr-25/run-27305429810-1/request.md
+ M .llm/tmp/run/openhands/pr-32/run-27433712260-1/request.md
+ M .llm/tmp/run/openhands/pr-35/run-27454103300-1/request.md
+ M .llm/tmp/run/openhands/pr-35/run-27454169329-1/request.md
+ M .llm/tmp/run/openhands/pr-37/run-27454273181-1/request.md
+?? .llm/tmp/run/feat-scaffold-surface-167--scaffold-surface/plan-eval.md
+?? .llm/tmp/run/openhands/pr-172/
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: PLAN-EVAL verdict: PASS — Plan v2 for plugin scaffold unification
+
+Thought:
+Working tree is clean — only my evaluator artifact (`plan-eval.md`) plus 
+pre-existing ephemeral request files. No source mutations, no plan mutations, no
+lock file churn.
+
+Finish with message:
+## PLAN-EVAL verdict: `PASS`
+
+Plan v2 for **Plugin Command Surface Unification** (#157, PR #172) on branch
+`feat/scaffold-surface-167` is **approved for implementation**. The user-granted
+re-architecture license (commit `beb931d6`, 2026-06-29) is honored; doctrine 03
+cross-package inheritance ban is respected; the THREE overlapping scaffold 
+mechanisms
+and THREE forked item-scaffolder contracts are collapsed into ONE 
+`NetScriptPlugin`
+interface + `createPluginAdapter` factory + `ItemScaffolder<TInput>` contract 
+under
+a new JSR-publishable `@netscript/plugin/adapter` export.
+
+### Plan-Gate boxes (all 9 PASS)
+- Research current + cited; decisions locked 
+(D-UNIFY/D-MANDATORY/D-OPTIONAL/D-ONE-ITEM/D-RENAME/D-OWN/...); open-decision 
+sweep folded; S0–S9 slice enumeration with per-slice gates; risk register 
+visible inline; gates wired to slices; deferred scope explicit; JSR-audit policy
+complete; re-baseline verified.
+
+### PLAN-EVAL nine-point scrutiny (all 9 PASS)
+1. One contract, no duplication (no 4th mechanism).
+2. Doctrine-legal extension (factory composition, no `extends`).
+3. Layering + JSR clean (no `@netscript/cli` import in `@netscript/plugin`).
+4. No source leak (S5 negative e2e via `scaffold-e2e-test.ts`).
+5. Item generator uses typed substitution over type-checked stubs (no string 
+concat, no `.template`).
+6. Command taxonomy + rename (`add→install`, `<kind> add/generate <resource>`) 
+coherent.
+7. S8/S9 tooling wraps native + repo wrappers (no bespoke linters).
+8. Gates-as-actual-gates (merge-blocking `arch:check`/`plugins:check`, no `any`,
+no lock churn, forward-only).
+9. Re-baselined against branch HEAD `beb931d6`.
+
+### Artifacts written
+- `.llm/tmp/run/feat-scaffold-surface-167--scaffold-surface/plan-eval.md` (190 
+lines) — full verdict with file/line-anchored evidence.
+- `/home/runner/work/_temp/openhands/28346124073-1/summary.md` — run summary.
+
+### Non-blocking observations for IMPL-EVAL
+- S1 is large (10 sub-files); verify each is independently type-checked, doc'd, 
+unit-tested.
+- `ItemScaffolder<TInput>` typed substitution is contractually specified but 
+mechanically under-specified — verify type-level token maps so missing tokens 
+are compile errors.
+- Mandatory-command logic location implicit — verify exactly one owner module 
+per mandatory verb in `@netscript/plugin/adapter/commands/`.
+- `enable`/`disable`/`sync`/`setup` keep current names — verify dispatch surface
+after S4.
+
+### Operational notes
+- Read-only evaluator role honored: no source/plan mutations, no force-push, no 
+lock churn.
+- Workflow owns the PR comment (per operational contract); the verdict artifact 
+is ready for posting.
+
+IMPL-EVAL may begin.
+
+---
+
+_This verdict was issued by an AI agent (OpenHands) on behalf of the user._
+
+Tokens: ↑ input 3.92M • cache hit 95.28% •  reasoning 1.71K • ↓ output 29.5K • $
+0.3149
+

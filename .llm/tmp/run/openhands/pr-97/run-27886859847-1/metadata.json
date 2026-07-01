@@ -1,0 +1,17 @@
+{
+  "run_id": "27886859847",
+  "run_attempt": "1",
+  "run_url": "https://github.com/rickylabs/netscript/actions/runs/27886859847",
+  "bootstrap_outcome": "success",
+  "agent_outcome": "success",
+  "verdict": "completed",
+  "summary_source": "agent",
+  "model": "openrouter/qwen/qwen3.7-max",
+  "provider": "OPENROUTER",
+  "output_mode": "pr-comment",
+  "issue_number": "97",
+  "checkout_repo": "rickylabs/netscript",
+  "checkout_ref": "feat/prime-time/auth-e2e-docs",
+  "summary_path": "/home/runner/work/_temp/openhands/27886859847-1/summary.md",
+  "trace_dir": ".llm/tmp/run/openhands/pr-97/run-27886859847-1"
+}

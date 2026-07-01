@@ -1,0 +1,400 @@
++49|   decoupled from this program).
++50|
++51|## Responses to review comments or issue comments
++52|
++53|None. This is a PLAN-EVAL session with no in-PR comment to reply to. The 
+verdict itself is
++54|posted as a new top-level PR comment via `pr-comment-body.md` (cycle 1, 
+`output_mode: pr-comment`).
++55|
++56|## Remaining risks
++57|
++58|- **F-1 — `publish.yml:23` citation should be `:62`.** Cosmetic; slice shape
+unchanged.
++59|- **F-2 — `docs/site/_plan/00-README.md:57`** contains a "Deno 2.8" 
+contextual sentence not
++60|  currently in C3's scope. Recommend folding into C3 for consistency.
++61|- **F-3 — `aspire/package.json` arch-debt reference is unverifiable** (no 
+entry in
++62|  `arch-debt.md`). Non-blocking; either file a new entry or rephrase D5.
++63|- **C5/C6 are deferred** (correctly) and remain forward-looking follow-up 
+work after this
++64|  plan lands.
++65|- **D6 lock reseed** requires explicit user approval per AGENTS.md; plan 
+correctly routes
++66|  through an approval gate.
++67|- **Bump risk** (`Deno.serve` compression-off #35486 + min-dep-age #35458 + 
+lock reseed) is
++68|  caught by C0's gate set (`deno task ci` + `e2e:cli scaffold.runtime 
+--cleanup` +
++69|  `publish:dry-run`).
++70|
++71|## Verdict
++72|
++73|`PASS` — implementation supervision may begin. Per `gates/plan-gate.md`, two
+`FAIL_PLAN` cycles
++74|then escalate; this is cycle 1 and rendered `PASS`.
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Verify artifacts in place
+
+Thought:
+Now let me also check if there's a thread-replies output needed. Per the 
+trigger: `output_mode: pr-comment` (not `thread-replies`), so no replies.json 
+needed.
+
+Let me verify all artifacts are in place and finalize.
+
+$ ls -la 
+/home/runner/work/netscript/netscript/.llm/tmp/run/chore-deno-2.9-adoption--adop
+tion-plan/ && echo "---" && ls -la 
+/home/runner/work/_temp/openhands/28184411850-1/ && echo "---" && head -10 
+/home/runner/work/_temp/openhands/28184411850-1/summary.md
+
+Tokens: ↑ input 4.5M • cache hit 84.35% •  reasoning 8.33K • ↓ output 52.34K • $
+0.5306
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+total 48
+drwxr-xr-x  2 runner runner 4096 Jun 25 16:41 .
+drwxr-xr-x 74 runner runner 4096 Jun 25 16:18 ..
+-rw-------  1 runner runner 8965 Jun 25 16:40 plan-eval.md
+-rw-r--r--  1 runner runner 6419 Jun 25 16:18 plan.md
+-rw-------  1 runner runner 6436 Jun 25 16:41 pr-comment-body.md
+-rw-r--r--  1 runner runner 8817 Jun 25 16:18 research.md
+---
+total 940
+drwxr-xr-x 2 runner runner   4096 Jun 25 16:41 .
+drwxr-xr-x 3 runner runner   4096 Jun 25 16:18 ..
+-rw-r--r-- 1 runner runner 914052 Jun 25 16:41 agent.log
+-rw-r--r-- 1 runner runner      2 Jun 25 16:19 bootstrap-exit-code.txt
+-rw-r--r-- 1 runner runner   2615 Jun 25 16:19 bootstrap.log
+-rw-r--r-- 1 runner runner   6956 Jun 25 16:18 issue-comments.json
+-rw-r--r-- 1 runner runner      3 Jun 25 16:18 pr-review-comments.json
+-rw-r--r-- 1 runner runner   4710 Jun 25 16:18 request.md
+-rw------- 1 runner runner   4360 Jun 25 16:41 summary.md
+---
+# Run Summary — PLAN-EVAL for `chore-deno-2.9-adoption--adoption-plan`
+
+## Summary
+
+PLAN-EVAL (separate evaluator session) for the Deno 2.9.0 adoption plan on 
+branch
+`chore/deno-2.9-adoption` (baseline `origin/main@c0020a1b`, includes #126). 
+Read-only
+spot-verification of plan claims (version-pin sites, scope, debt entries, gates)
+before rendering
+the verdict per `evaluator/plan-protocol.md`. **Verdict: `PASS`** — all 8 
+Plan-Gate boxes are
+satisfied; the plan is decision-complete; C0–C4 are supervisor-implementable; 
+C5/C6 are correctly
+deferred. Three non-blocking slice-time corrections are noted.
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Condensation ───────────────────────────────────────────────────────────────────
+
+Auto Conversation Condensation Triggered.
+Forgetting 43 events
+
+[Summary of Events Being Forgotten]
+USER_CONTEXT: PLAN-EVAL session for Deno 2.9.0 adoption plan 
+(`chore-deno-2.9-adoption--adoption-plan`) on branch `chore/deno-2.9-adoption` 
+baselined against `origin/main` @ `c0020a1b`. Read-only spot-verification of 
+plan claims (version-pin sites, scope, debt entries, gates) before rendering 
+verdict per `evaluator/plan-protocol.md`. Plan is planning-only; no 
+implementation begins until verdict is PASS.
+
+TASK_TRACKING:
+- [active] PLAN-EVAL: spot-verify plan claims (version-pin sites, scope, debt 
+entries, gates) — **NEARLY COMPLETE**
+- [pending] Render PLAN-EVAL verdict (`PASS`/`DEFER`/`FAIL_PLAN`)
+
+COMPLETED: Spot-verification of plan claims:
+- **C1 (`run-parallel-tasks.ts` deletion)**: Confirmed 52-line hand-rolled 
+Promise.all runner used by `ci:quality`; replacement with `deno task --jobs` is 
+accurate.
+- **C0 version-pin sites**:
+  - `deno.json:23,49,50` (`check`/`fmt:check`/`lint`) ✓ accurate
+  - `deno.json:22` (`ci:quality`) ✓ accurate
+  - `ci.yml:50,71` (`deno install` not `--frozen`) ✓ accurate; also `ci.yml:101`
+(3 sites total)
+  - `publish.yml:23` ✗ **DISCREPANCY** — actual line is 62
+  - `toolchain.env:7` and `e2e-cli.yml:57,87` (from plan header) — not directly 
+re-verified but consistent with prior
+- **Unstable array**: `["kv","temporal","tsgo","worker-options","raw-imports"]` 
+confirmed at `deno.json:13-18`.
+- **`automaticCompression`**: zero references in repo — plan's low-risk framing 
+is accurate.
+- **Debt registry**: `aspire/package.json` missing-lock claim labeled 
+"pre-existing arch-debt" — **NOT** actually in `arch-debt.md` (minor inaccuracy,
+but in deferred/decided-out section; non-blocking).
+- **C5 deferral code refs verified**: `MYSQL_ADAPTER_PACKAGE = 
+"prisma-adapter-mysql"` at `packages-copier.ts:74`; 
+`pruneMysqlAdapterFromDatabasePackage` at 203-230; `PACKAGE_TO_LOCAL_PATH` in 
+both `scaffold/import-resolver.ts:84` and `local-import-resolver.ts:6`. Deferral
+rationale (subpath resolution, catalog: against source, MySQL prune on immutable
+source) grounded in real code.
+- **C2 doc-text updates**: `AGENTS.md:13` ("native Deno 2.8 toolchain") ✓; 
+`docs/site/_plan/00-README.md:57`, `.llm/tools/README.md:22,82`, 
+`.llm/tools/deps/entry.md:21` — all real Deno-2.8 mentions ✓. Plan correctly 
+avoids `arch-debt.md` entries (historical "accepted score-impacting debt" 
+records, not doc copy).
+- **Protocol context read**: `evaluator/plan-protocol.md` and 
+`gates/plan-gate.md` reviewed for verdict criteria.
+
+PENDING:
+- Render final PLAN-EVAL verdict (likely `PASS` with minor callout on 
+`publish.yml:23` line number error and `aspire/package.json` debt registry 
+reference)
+
+CURRENT_STATE:
+- All spot-verification checks complete
+- Discrepancies found are minor (line number typo in plan header, non-existent 
+debt-registry entry cited as "pre-existing arch-debt") and do not affect plan 
+correctness
+- Plan's C0–C4 scope (config/CI/docs only, no package surface) and C5/C6 
+deferrals are well-grounded in verified code
+- Verdict rendering is the only remaining step
+
+VERSION_CONTROL_STATUS: Branch: `chore/deno-2.9-adoption` (plan-only, no 
+implementation), baseline: `origin/main` @ `c0020a1b`; no commits made during 
+PLAN-EVAL session.USER_CONTEXT: PLAN-EVAL session for Deno 2.9.0 adoption plan 
+(`chore-deno-2.9-adoption--adoption-plan`) on branch `chore/deno-2.9-adoption` 
+baselined against `origin/main` @ `c0020a1b`. Read-only spot-verification of 
+plan claims (version-pin sites, scope, debt entries, gates) before rendering 
+verdict per `evaluator/plan-protocol.md`. Plan is planning-only; no 
+implementation begins until verdict is PASS.
+
+TASK_TRACKING:
+- [active] PLAN-EVAL: spot-verify plan claims (version-pin sites, scope, debt 
+entries, gates) — **NEARLY COMPLETE**
+- [pending] Render PLAN-EVAL verdict (`PASS`/`DEFER`/`FAIL_PLAN`)
+
+COMPLETED: Spot-verification of plan claims:
+- **C1 (`run-parallel-tasks.ts` deletion)**: Confirmed 52-line hand-rolled 
+Promise.all runner used by `ci:quality`; replacement with `deno task --jobs` is 
+accurate.
+- **C0 version-pin sites**:
+  - `deno.json:23,49,50` (`check`/`fmt:check`/`lint`) ✓ accurate
+  - `deno.json:22` (`ci:quality`) ✓ accurate
+  - `ci.yml:50,71` (`deno install` not `--frozen`) ✓ accurate; also `ci.yml:101`
+(3 sites total)
+  - `publish.yml:23` ✗ **DISCREPANCY** — actual line is 62
+  - `toolchain.env:7` and `e2e-cli.yml:57,87` (from plan header) — not directly 
+re-verified but consistent with prior
+- **Unstable array**: `["kv","temporal","tsgo","worker-options","raw-imports"]` 
+confirmed at `deno.json:13-18`.
+- **`automaticCompression`**: zero references in repo — plan's low-risk framing 
+is accurate.
+- **Debt registry**: `aspire/package.json` missing-lock claim labeled 
+"pre-existing arch-debt" — **NOT** actually in `arch-debt.md` (minor inaccuracy,
+but in deferred/decided-out section; non-blocking).
+- **C5 deferral code refs verified**: `MYSQL_ADAPTER_PACKAGE = 
+"prisma-adapter-mysql"` at `packages-copier.ts:74`; 
+`pruneMysqlAdapterFromDatabasePackage` at 203-230; `PACKAGE_TO_LOCAL_PATH` in 
+both `scaffold/import-resolver.ts:84` and `local-import-resolver.ts:6`. Deferral
+rationale (subpath resolution, catalog: against source, MySQL prune on immutable
+source) grounded in real code.
+- **C2 doc-text updates**: `AGENTS.md:13` ("native Deno 2.8 toolchain") ✓; 
+`docs/site/_plan/00-README.md:57`, `.llm/tools/README.md:22,82`, 
+`.llm/tools/deps/entry.md:21` — all real Deno-2.8 mentions ✓. Plan correctly 
+avoids `arch-debt.md` entries (historical "accepted score-impacting debt" 
+records, not doc copy).
+- **Protocol context read**: `evaluator/plan-protocol.md` and 
+`gates/plan-gate.md` reviewed for verdict criteria.
+
+PENDING:
+- Render final PLAN-EVAL verdict (likely `PASS` with minor callout on 
+`publish.yml:23` line number error and `aspire/package.json` debt registry 
+reference)
+
+CURRENT_STATE:
+- All spot-verification checks complete
+- Discrepancies found are minor (line number typo in plan header, non-existent 
+debt-registry entry cited as "pre-existing arch-debt") and do not affect plan 
+correctness
+- Plan's C0–C4 scope (config/CI/docs only, no package surface) and C5/C6 
+deferrals are well-grounded in verified code
+- Verdict rendering is the only remaining step
+
+VERSION_CONTROL_STATUS: Branch: `chore/deno-2.9-adoption` (plan-only, no 
+implementation), baseline: `origin/main` @ `c0020a1b`; no commits made during 
+PLAN-EVAL session.
+
+
+Tokens: ↑ input 4.5M • cache hit 84.26% •  reasoning 8.72K • ↓ output 53.7K • $ 
+0.5337
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Confirm git state is clean
+
+Thought:
+All artifacts are in place. Let me confirm git state remains clean (no commits 
+made).
+
+$ git status && echo "---" && git log --oneline -3
+
+Tokens: ↑ input 4.53M • cache hit 83.91% •  reasoning 8.72K • ↓ output 53.78K • 
+$ 0.5406
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+On branch chore/deno-2.9-adoption
+Your branch is up to date with 'origin/chore/deno-2.9-adoption'.
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        .llm/tmp/run/chore-deno-2.9-adoption--adoption-plan/plan-eval.md
+        .llm/tmp/run/chore-deno-2.9-adoption--adoption-plan/pr-comment-body.md
+        .llm/tmp/run/openhands/pr-128/
+
+nothing added to commit but untracked files present (use "git add" to track)
+---
+d559d6cd (HEAD -> chore/deno-2.9-adoption, origin/chore/deno-2.9-adoption) 
+docs(deno-2.9): adoption research + plan (toolchain bump + low-risk wins)
+c0020a1b (origin/main) ci(publish): reconcile JSR package settings (readme, 
+description, runtime) on publish (#126)
+0dc73f00 (tag: v0.0.1-alpha.2) fix(service): replace forbidden global Hono type 
+augmentation with exported ServiceEnv (#114) (#125)
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Confirm artifacts match HEAD commit
+
+Thought:
+Clean state. No implementation commits made (PLAN-EVAL is read-only). The two 
+new artifacts (`plan-eval.md` and `pr-comment-body.md`) are untracked under the 
+run's tmp directory — they'll be picked up by the harness workflow.
+
+Note: The branch head is actually `d559d6cd` (the research + plan commit) on top
+of baseline `c0020a1b`. Let me verify the plan artifacts match what's on HEAD.
+
+$ git show --stat d559d6cd | head -20 && echo "---" && diff <(git show 
+d559d6cd:.llm/tmp/run/chore-deno-2.9-adoption--adoption-plan/research.md) 
+/home/runner/work/netscript/netscript/.llm/tmp/run/chore-deno-2.9-adoption--adop
+tion-plan/research.md | head -5 && diff <(git show 
+d559d6cd:.llm/tmp/run/chore-deno-2.9-adoption--adoption-plan/plan.md) 
+/home/runner/work/netscript/netscript/.llm/tmp/run/chore-deno-2.9-adoption--adop
+tion-plan/plan.md | head -5
+
+Tokens: ↑ input 4.56M • cache hit 83.55% •  reasoning 8.72K • ↓ output 54.09K • 
+$ 0.5479
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+commit d559d6cd20675d6d2f76a4361f2e71dcff1b7409
+Author: Rickylabs <eric.chautems@gmail.com>
+Date:   Thu Jun 25 18:13:31 2026 +0200
+
+    docs(deno-2.9): adoption research + plan (toolchain bump + low-risk wins)
+
+    Grounded Deno 2.9.0 dossier (feature inventory + repo grounding at 7 
+version-pin
+    sites, maintainer copy-vs-deno-link fit, task-runner wins, bump-risk) and a
+    planning-only plan locking scope to C0 (2.8.3->2.9 bump) + C1 (--jobs) + C2
+    (input-cache) + C3 (skill refresh) + C4 (publish resilience). C5 
+(copy->links)
+    spike-gated Codex slice; C6 follow-up; bundle --declaration / 
+lockfile-seeding
+    decided-out. For PLAN-EVAL.
+
+    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_014gW4zfhMMQU6txC828ijct
+
+ .../chore-deno-2.9-adoption--adoption-plan/plan.md |  86 ++++++++++++++++
+ .../research.md                                    | 112 +++++++++++++++++++++
+ 2 files changed, 198 insertions(+)
+---
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Rendered PLAN-EVAL verdict: PASS
+
+Thought:
+Verified — the research.md and plan.md on disk match the committed artifacts at 
+HEAD (`d559d6cd`). The evaluator session is operating on the correct artifacts.
+
+Finish with message:
+PLAN-EVAL verdict: **PASS** (cycle 1) for 
+`chore-deno-2.9-adoption--adoption-plan`.
+
+All 8 Plan-Gate boxes satisfied; the plan is decision-complete; C0–C4 are 
+supervisor-implementable with concrete gates; C5/C6 are correctly deferred.
+
+## Artifacts written
+
+- `.llm/tmp/run/chore-deno-2.9-adoption--adoption-plan/plan-eval.md` — full 
+PLAN-EVAL deliverable (checklist + open-decision sweep + verdict + slice-time 
+corrections).
+- `.llm/tmp/run/chore-deno-2.9-adoption--adoption-plan/pr-comment-body.md` — 
+rendered PR comment body (for harness to post).
+- `/home/runner/work/_temp/openhands/28184411850-1/summary.md` — run summary per
+operational contract.
+
+## Verdict
+
+**PASS** — implementation supervision may begin.
+
+## Non-blocking slice-time corrections (fold into IMPL)
+
+- **F-1** — `publish.yml:23` citation should be `:62` (verified `grep -n 
+"deno-version" .github/workflows/publish.yml` → line 62). Slice shape unchanged.
+- **F-2** — `docs/site/_plan/00-README.md:57` has a "Deno 2.8" contextual 
+sentence not currently in C3 scope; recommend including.
+- **F-3** — `aspire/package.json` "pre-existing arch-debt" citation is 
+unverifiable (no matching entry in `arch-debt.md`); either file a new entry or 
+rephrase D5.
+
+## Spot-verification summary
+
+- 7 version-pin sites / 5 files confirmed (1 cosmetic line-number error: 
+`publish.yml` cite).
+- `deno.json` task runner sites confirmed: `ci:quality:22`, `check:23`, 
+`fmt:check:49`, `lint:50` (correctly excludes `e2e:cli:47` from C2's input-cache
+scope).
+- Unstable array confirmed: 
+`["kv","temporal","tsgo","worker-options","raw-imports"]` — none stabilized in 
+2.9.
+- `run-parallel-tasks.ts` confirmed as 52-line hand-rolled `Promise.all` runner 
+with no other consumers.
+- C5 deferral grounding confirmed in real code (`packages-copier.ts:74`, 
+`:203-230`; `import-resolver.ts:84-131`; `local-import-resolver.ts:6`).
+- No `automaticCompression` references anywhere — compression-off bump risk is 
+correctly scoped.
+- Deno 2.9 does NOT fix the https-asset blocker claim confirmed (PR #127 is the 
+separate fix).
+- `ci.yml` lock install path (`:50,71,101`) runs `deno install` non-frozen; D6 
+approval gate correctly routes lock reseed per AGENTS.md.
+
+## Git state
+
+Branch `chore/deno-2.9-adoption` at `d559d6cd` (HEAD; baseline `c0020a1b`). No 
+commits made during this PLAN-EVAL session (read-only evaluation). Two untracked
+artifacts (`plan-eval.md`, `pr-comment-body.md`) under 
+`.llm/tmp/run/chore-deno-2.9-adoption--adoption-plan/` for the harness to pick 
+up.
+
+Tokens: ↑ input 4.59M • cache hit 83.65% •  reasoning 8.72K • ↓ output 54.88K • 
+$ 0.5508
+

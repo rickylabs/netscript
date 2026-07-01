@@ -1,0 +1,17 @@
+{
+  "run_id": "27841604750",
+  "run_attempt": "1",
+  "run_url": "https://github.com/rickylabs/netscript/actions/runs/27841604750",
+  "bootstrap_outcome": "success",
+  "agent_outcome": "success",
+  "verdict": "completed",
+  "summary_source": "agent",
+  "model": "openrouter/qwen/qwen3.7-max",
+  "provider": "OPENROUTER",
+  "output_mode": "pr-comment",
+  "issue_number": "71",
+  "checkout_repo": "rickylabs/netscript",
+  "checkout_ref": "fix/cap-caveat-s5-pg-queue",
+  "summary_path": "/home/runner/work/_temp/openhands/27841604750-1/summary.md",
+  "trace_dir": ".llm/tmp/run/openhands/pr-71/run-27841604750-1"
+}

@@ -1,0 +1,17 @@
+{
+  "run_id": "27522478072",
+  "run_attempt": "1",
+  "run_url": "https://github.com/rickylabs/netscript/actions/runs/27522478072",
+  "bootstrap_outcome": "success",
+  "agent_outcome": "success",
+  "verdict": "completed",
+  "summary_source": "agent",
+  "model": "openrouter/minimax/minimax-m3",
+  "provider": "OPENROUTER",
+  "output_mode": "pr-comment",
+  "issue_number": "44",
+  "checkout_repo": "rickylabs/netscript",
+  "checkout_ref": "chore/deno-2.8-aspire-13.4-upgrade",
+  "summary_path": "/home/runner/work/_temp/openhands/27522478072-1/summary.md",
+  "trace_dir": ".llm/tmp/run/openhands/pr-44/run-27522478072-1"
+}
