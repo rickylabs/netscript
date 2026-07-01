@@ -18,7 +18,7 @@ import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.t
 import { EXIT_CODES } from '../host/plugin-loader.ts';
 
 /** Package version stamped onto generated plugin tiers. */
-export const GENERATED_PLUGIN_VERSION = '0.0.1-alpha.16';
+export const GENERATED_PLUGIN_VERSION = '0.0.1-alpha.17';
 
 /** Options accepted by the greenfield plugin generator. */
 export interface NewPluginOptions {
