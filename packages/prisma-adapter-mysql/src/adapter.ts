@@ -578,7 +578,7 @@ export class PrismaMySqlAdapterFactory {
    * Connect to the database and create an adapter instance.
    */
   async connect(): Promise<PrismaMySqlConnectedAdapter> {
-    const { createPool } = await import('mysql2') as unknown as Mysql2Module;
+    const { createPool } = await import('mysql2/promise') as unknown as Mysql2Module;
 
     let client: AnyClient;
     try {
