@@ -12,6 +12,27 @@
   "imports": {
     "lume/": "https://deno.land/x/lume@v2.5.4/"
   },
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 100,
+    "indentWidth": 2,
+    "semiColons": true,
+    "singleQuote": true,
+    "proseWrap": "preserve",
+    "exclude": [
+      "_site/",
+      "_cache/",
+      "**/*.md",
+      "**/*.mdx",
+      "**/*.vto"
+    ]
+  },
+  "lint": {
+    "exclude": [
+      "_site/",
+      "_cache/"
+    ]
+  },
   "compilerOptions": {
     "types": ["lume/types.ts"],
     "jsx": "react-jsx",

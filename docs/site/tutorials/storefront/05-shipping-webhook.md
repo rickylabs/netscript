@@ -164,16 +164,18 @@ raises an unsupported-operation error and the event lands in the DLQ rather than
 reach for the scheduling features of the [triggers capability](/capabilities/triggers/) (cron and
 file-watch triggers) when you need time-based work, not `defer`.
 
-## Step 4 — Route shape (Hono, not oRPC)
+## Step 4 — Route shape (raw webhook ingress)
 
-The triggers API service is built on **raw [Hono](https://hono.dev/)**, not oRPC — deliberately.
-Webhooks come from third parties posting plain JSON to a fixed path, so a typed contract would buy
-nothing. The webhook router is a `new Hono()` with a `POST /:triggerId` handler: a request to
-`/api/v1/webhooks/shipping/status` resolves `:triggerId` to `shipping/status`, which matches the
-`path` on your webhook — so the handler runs and its effects are applied.
+The triggers service serves a typed v1 oRPC contract for trigger and event introspection plus
+management, but the **webhook ingress endpoint** is deliberately a **raw route**, not an oRPC
+procedure. Webhooks come from third parties posting plain JSON to a fixed path, and the endpoint must
+verify an HMAC signature over the raw request bytes, so a typed contract would buy nothing. The ingress
+handler resolves a `POST /:triggerId` path: a request to `/api/v1/webhooks/shipping/status` resolves
+`:triggerId` to `shipping/status`, which matches the `path` on your webhook — so the handler runs and
+its effects are applied.
 
-{{ comp callout { type: "note", title: "Why triggers are Hono and services are oRPC" } }}
-oRPC gives services a typed contract shared with their clients. Webhooks have no NetScript client — the sender is a third party — so triggers expose ordinary Hono routes you can point any webhook source at. See <a href="/capabilities/triggers/">the triggers capability</a> for verifiers, scheduling, and file-watch triggers.
+{{ comp callout { type: "note", title: "Why the webhook ingress endpoint stays a raw route" } }}
+oRPC gives the rest of the triggers surface a typed contract shared with its clients. Webhooks have no NetScript client — the sender is a third party — so the ingress endpoint stays an ordinary, signature-verifying route you can point any webhook source at. See <a href="/capabilities/triggers/">the triggers capability</a> for verifiers, scheduling, and file-watch triggers.
 {{ /comp }}
 
 ## Step 5 — Set the secret and start the triggers service

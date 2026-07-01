@@ -175,6 +175,19 @@ UI is editing your own files — there is no framework component you cannot open
 `(design)` route group renders a live token, component, and composition gallery so you can see every
 primitive in your project.
 
+What ships falls into four groups, each installable by registry id (`ui:add <name>`) or as a named
+collection:
+
+{{ comp.apiTable({
+  caption: "What the registry ships",
+  rows: [
+    { name: "Interactive namespaces", type: "@netscript/fresh-ui/interactive", desc: "Stateful, accessible compound primitives: Accordion, Dialog, Drawer, Popover, Sheet, Tabs, Tooltip, and the headless Combobox seam (useCombobox) that powers the command palette and autocompletes." },
+    { name: "L0 primitives", type: "@netscript/fresh-ui/primitives", desc: "Small platform-contract helpers: Show (wrapper-free conditional render), VisuallyHidden, and its SrOnly alias." },
+    { name: "AI / workspace primitives", type: "ui:add", desc: "The agent-surface set: avatar, citation-chip, code-block, model-selector, tool-call-card, chart-block, donut, prompt-input, message (renderInline + TypingIndicator), and dropzone — plus the foundation set (button, card, badge, data-table, forms, feedback, dashboard blocks)." },
+    { name: "Command & search utilities", type: "ui:add", desc: "command-palette (.ns-cmdk — the ⌘K modal that wraps the Combobox) and search (.ns-search — a compact nav affordance with a ⌘K hint that opens it)." }
+  ]
+}) }}
+
 You manage that library with two CLI commands (run from the workspace root):
 
 {{ comp.apiTable({

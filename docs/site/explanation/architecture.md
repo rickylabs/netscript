@@ -135,10 +135,12 @@ it is a small constellation of single-purpose services, each owned by a plugin a
 each speaking a contract, brought up together by Aspire. Two kinds of thing
 execute here:
 
-- **Services** answer requests. Most are
+- **Services** answer requests. They are
   [oRPC services]({{ comp.xref({ key: "cap:services" }) }}) mounted at
-  `/api/rpc/*`; trigger ingress is the exception, exposing raw Hono routes because
-  webhooks are webhook-shaped, not contract-shaped.
+  `/api/rpc/*` — including triggers, which serve a typed v1 oRPC contract for
+  trigger and event introspection plus management. The exception is the webhook
+  *ingress* endpoint, a raw signature-verifying route because inbound webhooks are
+  webhook-shaped, not contract-shaped.
 - **Background processors** do work outside the request path: the worker job
   runtime, the durable saga runtime, schedulers, and file watchers. They own
   state and lifecycle, persist through a store, and shut down cleanly through a
@@ -157,11 +159,11 @@ first-party plugin enabled.
             ┌─────────────────────────────────┼─────────────────────────────────┐
             │                                  │                                 │
    ┌────────▼────────┐                ┌────────▼─────────────────────────┐
-   │  example service │                │   PLUGIN SERVICES (oRPC / Hono)  │
+   │  example service │                │      PLUGIN SERVICES (oRPC)      │
    │   users :3001    │                ├──────────────────────────────────┤
    │  /api/rpc/*      │                │  workers  :8091   (jobs/tasks)   │
    │  oRPC contract   │                │  sagas    :8092   (durable flows)│
-   └────────┬─────────┘                │  triggers :8093   (raw Hono in)  │
+   └────────┬─────────┘                │  triggers :8093   (raw ingress)  │
             │                          │  auth     :8094   (oRPC /api/rpc)│
             │ contracts                └────────┬─────────────────────────┘
             │ (@orpc/contract + zod)            │
@@ -197,16 +199,18 @@ control-plane detail.
     ["Example service (users)", ":3001", "oRPC over <code>/api/rpc/*</code>", "your service"],
     ["Workers", ":8091", "oRPC", "<code>@netscript/plugin-workers</code>"],
     ["Sagas", ":8092", "oRPC", "<code>@netscript/plugin-sagas</code>"],
-    ["Triggers", ":8093", "raw Hono routes", "<code>@netscript/plugin-triggers</code>"],
+    ["Triggers", ":8093", "oRPC (raw webhook ingress)", "<code>@netscript/plugin-triggers</code>"],
     ["Auth", ":8094", "oRPC over <code>/api/rpc/v1/auth/*</code>", "<code>@netscript/plugin-auth</code>"],
     ["Streams", ":4437", "durable-stream HTTP / SSE", "<code>@netscript/plugin-streams</code>"]
   ]
 }) }}
 
-A subtlety worth fixing early: **triggers expose raw Hono routes, not oRPC**,
-because trigger ingress is webhook-shaped rather than contract-shaped. Every other
-plugin service is an oRPC service, and service RPC is mounted at `/api/rpc/*` (not
-`/rpc`). Those two facts trip people up more than any other detail here.
+A subtlety worth fixing early: **triggers serve a typed v1 oRPC contract**, like
+every other plugin service — the exception is narrower than it looks. Only the
+webhook *ingress* endpoint (`POST /api/v1/webhooks/:triggerId`) stays a raw,
+signature-verifying route, because it verifies an HMAC over the raw request bytes
+from external senders. Service RPC is mounted at `/api/rpc/*` (not `/rpc`). Those
+two facts trip people up more than any other detail here.
 
 ## The pure-backend seam: a port with interchangeable adapters
 

@@ -46,7 +46,7 @@ so the plugin services and their dependencies exist when you reach for them.
 {{ comp.featureGrid({ items: [
   { title: "Background jobs", icon: "⚙️", body: "Workers run thread-isolated jobs with defineJobHandler and createSuccessResult. Trigger one over HTTP on :8091. Job dispatch, execution, and scheduler spans are real OTel automatically.", href: "/capabilities/background-jobs/" },
   { title: "Durable sagas", icon: "🔁", body: "Message-driven state machines authored with the fluent defineSaga(...).build() builder, correlated and listed on :8092. Durable store is kv or prisma.", href: "/capabilities/durable-sagas/" },
-  { title: "Triggers & ingress", icon: "🪝", body: "defineWebhook turns an inbound POST into an enqueued job (enqueueJob). Raw Hono routes (not oRPC) on :8093.", href: "/capabilities/triggers/" },
+  { title: "Triggers & ingress", icon: "🪝", body: "defineWebhook turns an inbound POST into an enqueued job (enqueueJob). Typed v1 oRPC contract for trigger/event introspection + management on :8093; the webhook ingress endpoint alone stays a raw, HMAC-verifying route.", href: "/capabilities/triggers/" },
   { title: "Durable streams", icon: "🌊", body: "createDurableStream gives you a real producer runtime served on :4437 and wired into workers, auth, and sagas. The plugin-streams manifest helpers stay stubbed and fail loud.", href: "/capabilities/streams/" },
   { title: "Authentication", icon: "🔐", body: "auth-api oRPC service on :8094 with five endpoints. A pure-backend seam composing one active backend — kv-oauth (interactive), WorkOS, or better-auth.", href: "/capabilities/auth/" }
 ] }) }}
@@ -86,7 +86,7 @@ surface — these hubs orient, the reference enumerates.
     { name: "Services & contracts", type: "platform · :3001", desc: "defineService / createService().serve() + oRPC contracts via implement(); RPC at /api/rpc/*. Full API at /reference/service/ and /reference/contracts/." },
     { name: "Background jobs", type: "plugin · :8091", desc: "defineJobHandler + createSuccessResult; trigger via POST /api/v1/workers/jobs/{id}/trigger. Job/scheduler OTel spans are real. Full API at /reference/workers/." },
     { name: "Durable sagas", type: "plugin · :8092", desc: "defineSaga(id).durability('t1')...build(); durable store kv | prisma; list at /api/v1/sagas/sagas. Full API at /reference/sagas/." },
-    { name: "Triggers & ingress", type: "plugin · :8093 (Hono)", desc: "defineWebhook → enqueueJob; POST /api/v1/webhooks/inbound/generic. defer throws + DLQs. Full API at /reference/triggers/." },
+    { name: "Triggers & ingress", type: "plugin · :8093", desc: "defineWebhook → enqueueJob; typed v1 oRPC contract for trigger/event introspection + management; webhook ingress POST /api/v1/webhooks/:triggerId stays a raw HMAC-verifying route. defer throws + DLQs. Full API at /reference/triggers/." },
     { name: "Durable streams", type: "plugin · :4437", desc: "createDurableStream producer runtime is real; plugin-streams manifest helpers throw StreamUnsupportedOperationError. Full API at /reference/streams/." },
     { name: "Authentication", type: "plugin · :8094", desc: "auth-api oRPC; /api/v1/auth/{signin,callback,signout,session,me}; one active backend (kv-oauth | workos | better-auth). Full API at /capabilities/auth/." },
     { name: "Database & Prisma", type: "platform · Postgres", desc: "Prisma runtime=\"deno\", per-plugin schema aggregation; Postgres is the default engine, with mysql / mssql / sqlite selectable via --db. Full API at /reference/database/." },

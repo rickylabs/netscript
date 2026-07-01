@@ -247,7 +247,76 @@ When you need a primitive the scaffold didn't copy in, pull it from the
 ```bash
 # Add one component (or a named collection) to the dashboard app
 netscript ui:add data-table
+
+# Add an AI / workspace primitive — e.g. the chat message renderer
+netscript ui:add message
+
+# Add a whole named collection in one call (theme + all its items)
+netscript ui:add ai
 ```
+
+### Available components
+
+Every item below is something you can `ui:add <name>` by its registry id. They fall
+into four groups. **Interactive namespaces** ship from the
+`@netscript/fresh-ui/interactive` sub-path (stateful, accessible compound
+components); the rest are copy-source registry items.
+
+{{ comp.apiTable({
+  caption: "Interactive namespaces (@netscript/fresh-ui/interactive)",
+  rows: [
+    { name: "Accordion", type: "disclosure", desc: "Compound accordion with root + item subcomponents." },
+    { name: "Dialog", type: "overlay", desc: "Modal dialog with structural subcomponents." },
+    { name: "Drawer", type: "overlay", desc: "Edge-docked drawer with structural subcomponents." },
+    { name: "Popover", type: "floating", desc: "Anchored popover with positioning subcomponents." },
+    { name: "Sheet", type: "overlay", desc: "Side-docked inspection panel." },
+    { name: "Tabs", type: "navigation", desc: "Tabs with list, trigger, and content subcomponents." },
+    { name: "Tooltip", type: "floating", desc: "Anchored tooltip with positioning subcomponents." },
+    { name: "Combobox", type: "headless L1", desc: "Headless combobox seam (useCombobox + getRootProps/getInputProps/getContentProps/getItemProps) — the keyboard/selection engine behind the command palette and autocomplete inputs." }
+  ]
+}) }}
+
+{{ comp.apiTable({
+  caption: "L0 primitives (@netscript/fresh-ui/primitives)",
+  rows: [
+    { name: "Show", type: "control flow", desc: "Conditionally renders children without an extra DOM wrapper." },
+    { name: "VisuallyHidden", type: "a11y", desc: "Renders content for assistive tech while keeping it visually hidden." },
+    { name: "SrOnly", type: "a11y", desc: "Screen-reader-named alias for VisuallyHidden." }
+  ]
+}) }}
+
+{{ comp.apiTable({
+  caption: "AI / workspace primitives (ui:add <name>)",
+  rows: [
+    { name: "avatar", type: "identity", desc: "Identity chip for a person or agent — initials or image with size, presence, and agent variants." },
+    { name: "citation-chip", type: "ai", desc: "Inline per-claim source marker [n] that pairs with a sources list — the grounded-agent citation UX." },
+    { name: "code-block", type: "ai", desc: "Fenced code surface with filename/language header and a copy affordance for assistant messages." },
+    { name: "model-selector", type: "ai", desc: "Disclosure-backed model/provider picker for the prompt composer (native details)." },
+    { name: "tool-call-card", type: "ai", desc: "Inline MCP/tool invocation + result as a native details disclosure with a status badge and IO panel." },
+    { name: "chart-block", type: "analytics", desc: "Inline token-driven metric chart — horizontal bars or a vertical column chart with y-axis ticks and data-tone intents." },
+    { name: "donut", type: "analytics", desc: "Token-driven donut/pie chart — SVG arc segments with a center total and legend." },
+    { name: "prompt-input", type: "ai composer", desc: "Chat composer: auto-grow textarea with a toolbar of research/grounding pills, model picker, attach/screenshot/voice, and send." },
+    { name: "message", type: "ai chat", desc: "Chat message with author/time, inline-markup body (bold/code/[n] citations), tool-call + chart/code blocks, follow-up chips, and a typing indicator. Exports renderInline + TypingIndicator." },
+    { name: "dropzone", type: "upload", desc: "File-drop affordance — a dashed drop target (label/hint/icon) wrapping a native file input; drag-over via data-active." }
+  ]
+}) }}
+
+{{ comp.apiTable({
+  caption: "Command & search utilities (ui:add <name>)",
+  rows: [
+    { name: "command-palette", type: "palette", desc: "Modal ⌘K command palette (.ns-cmdk) — the L1 Dialog backdrop/overlay wrapping the L1 Combobox: grouped, searchable commands with icon/hash/kind sub-parts." },
+    { name: "search", type: "navigation", desc: "Compact nav search affordance (.ns-search) — a button styled as an input with a ⌘K hint that opens the command palette." }
+  ]
+}) }}
+
+{{ comp callout { type: "tip", title: "Collections copy a whole set at once" } }}
+Named <strong>collections</strong> are also valid <code>ui:add</code> targets. For
+example <code>netscript ui:add ai</code> installs the AI surface set (citation-chip,
+model-selector, tool-call-card, prompt-input, message, command-palette, search) with
+their theme seed in one command; <code>foundation</code> installs the full dashboard
+set. See the <a href="/reference/fresh-ui/">reference</a> for the complete item and
+collection catalog.
+{{ /comp }}
 
 Both commands accept the same useful flags (run `--help` for the version-accurate
 list):

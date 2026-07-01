@@ -27,14 +27,17 @@ This closes the continuous-app loop. A webhook lands on the triggers service, it
 [saga](/capabilities/durable-sagas/) advances a workflow — all from one inbound
 POST.
 
-{{ comp callout { type: "important", title: "Triggers speak raw Hono, not oRPC" } }}
-Unlike <a href="/capabilities/services/">services</a>, <a href="/capabilities/background-jobs/">workers</a>,
-and <a href="/capabilities/durable-sagas/">sagas</a> — which all serve oRPC routers — the triggers
-API service mounts <strong>raw <a href="https://hono.dev">Hono</a> routes</strong>. The webhook router is a plain
-<code>new Hono()</code> with <code>app.post('/:triggerId', …)</code>, dispatched to a
-<code>TriggerIngressPort</code>. This is deliberate: webhook senders post arbitrary, often
-non-JSON-RPC shapes, so the ingress edge stays unopinionated HTTP. Do not expect an oRPC client
-or typed RPC contract here.
+{{ comp callout { type: "important", title: "Typed oRPC contract, raw webhook ingress" } }}
+Like <a href="/capabilities/services/">services</a>, <a href="/capabilities/background-jobs/">workers</a>,
+and <a href="/capabilities/durable-sagas/">sagas</a>, the triggers API service serves a
+<strong>typed v1 oRPC contract</strong> for trigger and event introspection plus management —
+describing triggers, listing and fetching triggers and events, firing a trigger, testing a webhook,
+previewing a schedule, enabling/disabling a trigger, and subscribing to an SSE event stream. The one
+deliberate exception is the <strong>webhook ingress endpoint</strong> itself
+(<code>POST /api/v1/webhooks/:triggerId</code>, plus a legacy <code>GET /api/v1/events</code>): it stays
+a <strong>raw, signature-verifying route</strong>, not an oRPC procedure, because it must verify an HMAC
+signature over the raw request bytes — incompatible with oRPC's Zod body parsing. That keeps it open to
+any third-party webhook sender, which has no NetScript typed client and just POSTs to the plain URL.
 {{ /comp }}
 
 ## What it is
