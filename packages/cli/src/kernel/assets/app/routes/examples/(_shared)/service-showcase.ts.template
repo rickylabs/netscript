@@ -1,6 +1,7 @@
 import { dehydrateQueryClient } from '@netscript/fresh/query';
 import { createNetScriptQueryClient } from '@netscript/sdk/query-client';
 import { exampleServiceQueries } from '@app/lib/example-service.ts';
+import type { {{serviceName | pascalCase}}{{modelName}}V1 } from '@{{name}}/contracts';
 
 export const SERVICE_SHOWCASE_PAGE_SIZE = 3;
 export const SERVICE_SHOWCASE_INPUT = {
@@ -10,7 +11,19 @@ export const SERVICE_SHOWCASE_INPUT = {
   sortOrder: 'asc',
 } as const;
 
-export type ServiceShowcaseListData = Awaited<ReturnType<typeof exampleServiceQueries.list>>;
+export interface ServiceShowcasePagination {
+  readonly page: number;
+  readonly limit: number;
+  readonly total: number;
+  readonly totalPages: number;
+  readonly hasNext: boolean;
+  readonly hasPrev: boolean;
+}
+
+export interface ServiceShowcaseListData {
+  readonly data: readonly {{serviceName | pascalCase}}{{modelName}}V1[];
+  readonly pagination: ServiceShowcasePagination;
+}
 
 export interface ServiceSummaryPanelProps {
   readonly total: number;
@@ -42,7 +55,9 @@ export function buildServiceSummary(
 }
 
 export async function loadServiceShowcaseSummary(): Promise<ServiceSummaryPanelProps> {
-  const result = await exampleServiceQueries.list(SERVICE_SHOWCASE_INPUT);
+  const result = await exampleServiceQueries.list(
+    SERVICE_SHOWCASE_INPUT,
+  ) as ServiceShowcaseListData;
   return buildServiceSummary(result);
 }
 
@@ -52,7 +67,7 @@ export async function loadServiceShowcaseData() {
   const cachedAt = Date.now();
   const initialList = await queryClient.fetchQuery<ServiceShowcaseListData>({
     queryKey: queryOptions.queryKey,
-    queryFn: queryOptions.queryFn,
+    queryFn: async () => await queryOptions.queryFn() as ServiceShowcaseListData,
   });
 
   return {

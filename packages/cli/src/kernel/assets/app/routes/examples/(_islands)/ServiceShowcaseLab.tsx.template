@@ -22,6 +22,9 @@ import {
 
 type Props = NonNullable<InferDefinePageLayerLoaderProps<typeof loadServiceShowcaseData>>;
 type ServiceListData = NonNullable<Props['initialList']>;
+type ServiceRecord = ServiceListData['data'][number];
+type UpdateInput = { readonly id: number; readonly data: Partial<Pick<ServiceRecord, 'name'>> };
+type DeleteInput = { readonly id: number };
 type MutationContext = { previous?: ServiceListData };
 
 function ServiceShowcaseLabInner(props: Props) {
@@ -50,7 +53,8 @@ function ServiceShowcaseLabInner(props: Props) {
   const createMutation = useMutation({
     ...exampleServiceQueries.create.mutationOptions(),
     onSuccess: async (item) => {
-      statusMessage.value = `Server created ${item.name}.`;
+      const record = item as ServiceRecord;
+      statusMessage.value = `Server created ${record.name}.`;
       await queryClient.invalidateQueries(exampleServiceListInvalidation);
     },
   });
@@ -58,30 +62,33 @@ function ServiceShowcaseLabInner(props: Props) {
   const renameMutation = useMutation({
     ...exampleServiceQueries.update.mutationOptions(),
     onMutate: async (variables) => {
+      const input = variables as UpdateInput;
       const previous = queryClient.getQueryData<ServiceListData>(currentKey);
 
       if (previous) {
         queryClient.setQueryData<ServiceListData>(currentKey, {
           ...previous,
           data: previous.data.map((item) =>
-            item.id === variables.id ? { ...item, ...variables.data, updatedAt: new Date() } : item
+            item.id === input.id ? { ...item, ...input.data, updatedAt: new Date() } : item
           ),
         });
       }
 
-      statusMessage.value = `Optimistically renamed record #${variables.id}.`;
+      statusMessage.value = `Optimistically renamed record #${input.id}.`;
       return { previous } satisfies MutationContext;
     },
     onError: (_error, variables, context) => {
+      const input = variables as UpdateInput;
       if (context?.previous) {
         queryClient.setQueryData(currentKey, context.previous);
       }
 
       statusMessage.value =
-        `Update for record #${variables.id} failed and the cached list rolled back.`;
+        `Update for record #${input.id} failed and the cached list rolled back.`;
     },
     onSuccess: (item) => {
-      statusMessage.value = `Server confirmed ${item.name}.`;
+      const record = item as ServiceRecord;
+      statusMessage.value = `Server confirmed ${record.name}.`;
     },
     onSettled: async () => {
       await queryClient.invalidateQueries(exampleServiceListInvalidation);
@@ -91,12 +98,13 @@ function ServiceShowcaseLabInner(props: Props) {
   const deleteMutation = useMutation({
     ...exampleServiceQueries.delete.mutationOptions(),
     onMutate: async (variables) => {
+      const input = variables as DeleteInput;
       const previous = queryClient.getQueryData<ServiceListData>(currentKey);
 
       if (previous) {
         queryClient.setQueryData<ServiceListData>(currentKey, {
           ...previous,
-          data: previous.data.filter((item) => item.id !== variables.id),
+          data: previous.data.filter((item) => item.id !== input.id),
           pagination: {
             ...previous.pagination,
             total: Math.max(0, previous.pagination.total - 1),
@@ -104,19 +112,21 @@ function ServiceShowcaseLabInner(props: Props) {
         });
       }
 
-      statusMessage.value = `Optimistically removed record #${variables.id}.`;
+      statusMessage.value = `Optimistically removed record #${input.id}.`;
       return { previous } satisfies MutationContext;
     },
     onError: (_error, variables, context) => {
+      const input = variables as DeleteInput;
       if (context?.previous) {
         queryClient.setQueryData(currentKey, context.previous);
       }
 
       statusMessage.value =
-        `Delete for record #${variables.id} failed and the cached list rolled back.`;
+        `Delete for record #${input.id} failed and the cached list rolled back.`;
     },
     onSuccess: (item) => {
-      statusMessage.value = `Server deleted ${item.name}.`;
+      const record = item as ServiceRecord;
+      statusMessage.value = `Server deleted ${record.name}.`;
     },
     onSettled: async () => {
       await queryClient.invalidateQueries(exampleServiceListInvalidation);
