@@ -51,6 +51,38 @@ producer.upsert('execution', { id: 'exec-1', status: 'running' });
 await producer.flush();
 ```
 
+### Endpoint resolution and diagnostics
+
+Resolve the durable-streams base URL, build a concrete stream URL, and produce a JSON-stable
+inspection report for a schema before wiring a producer:
+
+```typescript
+import {
+  buildStreamUrl,
+  defineStreamSchema,
+  getStreamsUrl,
+  inspectStreamTopic,
+} from '@netscript/plugin-streams-core';
+
+const schema = defineStreamSchema({
+  execution: {
+    schema: {
+      '~standard': { version: 1, vendor: 'workers', validate: (value: unknown) => ({ value }) },
+    },
+    type: 'execution',
+    primaryKey: 'id',
+  },
+});
+
+// Resolve the server base URL, then the concrete path for this stream.
+const streamPath = '/workers/executions';
+const url = buildStreamUrl(streamPath, getStreamsUrl());
+
+// Inspect the schema without opening a socket.
+const report = inspectStreamTopic({ target: url, schema, streamPath });
+console.log(report.summary); // e.g. ".../workers/executions: 1 stream collection(s)"
+```
+
 ---
 
 ## 📦 Key Capabilities

@@ -52,6 +52,34 @@ console.log(streamsPlugin.name); // "@netscript/plugin-streams"
 console.log(Object.keys(streamsPlugin.contributions)); // ["services", "contractVersions", ...]
 ```
 
+### Typed topics, producers, and consumers
+
+The manifest-layer stream API defines typed topics and derives producer/consumer handles from them.
+The handles are wiring stubs — runtime IO throws `StreamUnsupportedOperationError`, so bind
+`@netscript/plugin-streams-core` for actual publishing:
+
+```typescript
+import {
+  defineStreamConsumer,
+  defineStreamProducer,
+  defineStreamTopic,
+} from '@netscript/plugin-streams';
+
+type OrderPlaced = { orderId: string; total: number };
+
+const topic = defineStreamTopic<OrderPlaced>('orders.placed', {
+  '~standard': { version: 1, vendor: 'orders', validate: (value: unknown) => value },
+});
+
+const producer = defineStreamProducer(topic);
+const consumer = defineStreamConsumer(topic);
+
+console.log(topic.name); // "orders.placed"
+// `producer.publish` / `consumer.subscribe` are typed to `OrderPlaced`.
+void producer;
+void consumer;
+```
+
 ---
 
 ## 📦 Key Capabilities

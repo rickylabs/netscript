@@ -55,6 +55,25 @@ console.log(summary.target); // "@netscript/plugin-sagas"
 console.log(summary.details.contributionGroups); // number of declared contribution groups
 ```
 
+### Identity and service constants
+
+The plugin re-exports its stable identity and API-service constants so hosts, scaffolding, and
+Aspire wiring can reference them without hard-coding literals:
+
+```typescript
+import {
+  SAGAS_API_DEFAULT_PORT,
+  SAGAS_API_SERVICE_NAME,
+  SAGAS_PLUGIN_ID,
+  sagasPlugin,
+} from '@netscript/plugin-sagas';
+
+console.log(SAGAS_PLUGIN_ID); // "sagas"
+console.log(SAGAS_API_SERVICE_NAME); // "sagas-api"
+console.log(SAGAS_API_DEFAULT_PORT); // 8092
+console.log(sagasPlugin.name); // "@netscript/plugin-sagas"
+```
+
 ---
 
 ## 📦 Key Capabilities

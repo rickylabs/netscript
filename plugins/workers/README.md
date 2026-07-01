@@ -54,6 +54,20 @@ console.log(summary.target); // "@netscript/plugin-workers"
 console.log(summary.details.contributionGroups); // number of declared contribution groups
 ```
 
+The manifest is plain data, so you can also read its declared contributions directly — for example
+to discover the Workers API service the plugin registers:
+
+```typescript
+import { workersPlugin } from '@netscript/plugin-workers';
+
+console.log(workersPlugin.name); // "@netscript/plugin-workers"
+
+// Declared service contributions (the Workers API runs on port 8091).
+const service = workersPlugin.contributions.services?.[0];
+console.log(service?.name); // "workers-api"
+console.log(service?.port); // 8091
+```
+
 ---
 
 ## 📦 Key Capabilities
