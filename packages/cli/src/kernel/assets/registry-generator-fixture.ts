@@ -30,7 +30,7 @@ for (const file of files) {
   entries.push(\`  [\${name}.id, \${name}],\`);
 }
 await Deno.mkdir(join(projectRoot, '.netscript', 'generated', 'plugin-workers'), { recursive: true });
-await Deno.writeTextFile(join(projectRoot, '.netscript', 'generated', 'plugin-workers', 'jobs.registry.ts'), [
+await Deno.writeTextFile(join(projectRoot, '.netscript', 'generated', 'plugin-workers', 'job-registry.ts'), [
   "import type { JobHandler, RegisterJobInput } from '@netscript/plugin-workers-core/runtime';",
   ...imports,
   '',

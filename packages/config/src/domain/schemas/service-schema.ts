@@ -15,4 +15,6 @@ export const ServiceConfigSchema: z.ZodType<ServiceConfig> = z.object({
   entrypoint: z.string().optional(),
   /** Services this service depends on */
   dependsOn: z.array(z.string()).optional(),
+  /** Plugin APIs this service depends on */
+  pluginReferences: z.array(z.string()).optional(),
 });

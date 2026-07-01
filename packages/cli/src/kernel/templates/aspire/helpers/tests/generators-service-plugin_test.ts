@@ -42,9 +42,11 @@ describe('generateRegisterServices', () => {
     assertStringIncludes(output, 'export async function registerServices(');
   });
 
-  it('should import buildOtelEnvVars, resolvePermissions, resolveWorkspacePath', () => {
+  it('should import register-services dependencies', () => {
     const output = generateRegisterServices(emptyOptions);
     assertStringIncludes(output, 'buildOtelEnvVars,');
+    assertStringIncludes(output, 'extractPluginReferences,');
+    assertStringIncludes(output, 'extractServiceReferences,');
     assertStringIncludes(output, 'resolvePermissions,');
     assertStringIncludes(output, 'resolveWorkspacePath,');
     assertStringIncludes(output, "from './_aspire-compat.mjs'");
@@ -56,7 +58,7 @@ describe('generateRegisterServices', () => {
       services: { users: fixtures.MINIMAL_SERVICE },
     });
     assertStringIncludes(output, '// --- Pass 1: Create all service resources ---');
-    assertStringIncludes(output, '// --- Pass 2: Wire cross-references ---');
+    assertStringIncludes(output, 'export async function wireServiceReferences(');
   });
 
   it('should register services via addExecutable with correct port and entrypoint', () => {
@@ -109,7 +111,7 @@ describe('generateRegisterServices', () => {
     assertStringIncludes(output, '.waitFor(infrastructure.primaryDatabase)');
   });
 
-  it('should wire cross-references in pass 2', () => {
+  it('should wire service references from the services map', () => {
     const output = generateRegisterServices({
       ...emptyOptions,
       services: {
@@ -117,27 +119,27 @@ describe('generateRegisterServices', () => {
         orders: fixtures.SERVICE_WITH_REFS,
       },
     });
-    assertStringIncludes(
-      output,
-      '// --- orders: wire ServiceReferences via endpoint env vars ---',
-    );
-    assertStringIncludes(output, "services.get('users')?.getEndpoint('http')");
-    assertStringIncludes(output, "resource.withEnvironment('services__users__http__0'");
+    assertStringIncludes(output, 'for (const ref of extractServiceReferences(entry))');
+    assertStringIncludes(output, "const endpoint = await services.get(ref)?.getEndpoint('http')");
+    assertStringIncludes(output, 'services__${ref}__http__0');
   });
 
-  it('should not emit pass 2 blocks for services without references', () => {
+  it('should wire plugin references from the plugins map', () => {
     const output = generateRegisterServices({
       ...emptyOptions,
-      services: { users: fixtures.MINIMAL_SERVICE },
+      services: {
+        reporting: fixtures.SERVICE_WITH_PLUGIN_REFS,
+      },
     });
-    // Pass 2 should have no-op comment since users has no ServiceReferences
-    assertStringIncludes(output, '// No cross-references to wire');
+    assertStringIncludes(output, 'for (const ref of extractPluginReferences(entry))');
+    assertStringIncludes(output, "const endpoint = await plugins.get(ref)?.getEndpoint('http')");
+    assertStringIncludes(output, 'services__${ref}__http__0');
   });
 
   it('should handle empty services', () => {
     const output = generateRegisterServices(emptyOptions);
     assertStringIncludes(output, '// No services configured');
-    assertStringIncludes(output, '// No cross-references to wire');
+    assertStringIncludes(output, 'export async function wireServiceReferences(');
   });
 });
 // generateRegisterPlugins
