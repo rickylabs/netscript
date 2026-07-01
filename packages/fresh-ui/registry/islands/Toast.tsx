@@ -36,9 +36,9 @@ const TOAST_LABELS: Record<RegistryToastType, string> = {
 export default function Toast(
   { message, title, type = 'info', duration = 4200, cleanUrl }: ToastIslandProps,
 ): VNode | null {
-  const exitTimeoutRef = useRef<number>();
-  const hideTimeoutRef = useRef<number>();
-  const urlCleanupTimeoutRef = useRef<number>();
+  const exitTimeoutRef = useRef<ReturnType<typeof globalThis.setTimeout>>();
+  const hideTimeoutRef = useRef<ReturnType<typeof globalThis.setTimeout>>();
+  const urlCleanupTimeoutRef = useRef<ReturnType<typeof globalThis.setTimeout>>();
   const countdownStartedAtRef = useRef<number>(0);
   const remainingTimeRef = useRef<number>(duration);
   const [visible, setVisible] = useState(Boolean(message));

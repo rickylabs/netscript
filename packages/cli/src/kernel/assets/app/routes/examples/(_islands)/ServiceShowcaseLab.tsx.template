@@ -7,11 +7,9 @@ import {
   QueryIsland,
   useMutation,
   useQuery,
-  useQueryClient,
 } from '@netscript/fresh/query';
 import { Button } from '@app/components/ui/mod.ts';
 import {
-  exampleServiceListInvalidation,
   exampleServiceName,
   exampleServiceQueries,
 } from '@app/lib/example-service.ts';
@@ -23,9 +21,9 @@ import {
 type Props = NonNullable<InferDefinePageLayerLoaderProps<typeof loadServiceShowcaseData>>;
 type ServiceListData = NonNullable<Props['initialList']>;
 type ServiceRecord = ServiceListData['data'][number];
+type CreateInput = Pick<ServiceRecord, 'name'>;
 type UpdateInput = { readonly id: number; readonly data: Partial<Pick<ServiceRecord, 'name'>> };
 type DeleteInput = { readonly id: number };
-type MutationContext = { previous?: ServiceListData };
 
 function ServiceShowcaseLabInner(props: Props) {
   const islandQueryClient = getIslandQueryClient();
@@ -37,99 +35,51 @@ function ServiceShowcaseLabInner(props: Props) {
     hydratedRef.current = true;
   }
 
-  const queryClient = useQueryClient();
-  const currentKey = exampleServiceQueries.list.clientKey(props.input);
   const {
     data,
     status,
     isLoading,
     refetch,
-  } = useQuery({
+  } = useQuery<ServiceListData>({
     ...exampleServiceQueries.list.queryOptions(props.input),
     initialData: props.initialList,
     staleTime: 15_000,
   });
 
-  const createMutation = useMutation({
+  const refreshList = () => {
+    void refetch();
+  };
+
+  const createMutation = useMutation<ServiceRecord, unknown, CreateInput>({
     ...exampleServiceQueries.create.mutationOptions(),
-    onSuccess: async (item) => {
-      const record = item as ServiceRecord;
+    onSuccess: (record) => {
       statusMessage.value = `Server created ${record.name}.`;
-      await queryClient.invalidateQueries(exampleServiceListInvalidation);
+      refreshList();
+    },
+    onError: (_error, variables) => {
+      statusMessage.value = `Create for ${variables.name} failed.`;
     },
   });
 
-  const renameMutation = useMutation({
+  const renameMutation = useMutation<ServiceRecord, unknown, UpdateInput>({
     ...exampleServiceQueries.update.mutationOptions(),
-    onMutate: async (variables) => {
-      const input = variables as UpdateInput;
-      const previous = queryClient.getQueryData<ServiceListData>(currentKey);
-
-      if (previous) {
-        queryClient.setQueryData<ServiceListData>(currentKey, {
-          ...previous,
-          data: previous.data.map((item) =>
-            item.id === input.id ? { ...item, ...input.data, updatedAt: new Date() } : item
-          ),
-        });
-      }
-
-      statusMessage.value = `Optimistically renamed record #${input.id}.`;
-      return { previous } satisfies MutationContext;
-    },
-    onError: (_error, variables, context) => {
-      const input = variables as UpdateInput;
-      if (context?.previous) {
-        queryClient.setQueryData(currentKey, context.previous);
-      }
-
-      statusMessage.value =
-        `Update for record #${input.id} failed and the cached list rolled back.`;
-    },
-    onSuccess: (item) => {
-      const record = item as ServiceRecord;
+    onSuccess: (record) => {
       statusMessage.value = `Server confirmed ${record.name}.`;
+      refreshList();
     },
-    onSettled: async () => {
-      await queryClient.invalidateQueries(exampleServiceListInvalidation);
+    onError: (_error, variables) => {
+      statusMessage.value = `Update for record #${variables.id} failed.`;
     },
   });
 
-  const deleteMutation = useMutation({
+  const deleteMutation = useMutation<ServiceRecord, unknown, DeleteInput>({
     ...exampleServiceQueries.delete.mutationOptions(),
-    onMutate: async (variables) => {
-      const input = variables as DeleteInput;
-      const previous = queryClient.getQueryData<ServiceListData>(currentKey);
-
-      if (previous) {
-        queryClient.setQueryData<ServiceListData>(currentKey, {
-          ...previous,
-          data: previous.data.filter((item) => item.id !== input.id),
-          pagination: {
-            ...previous.pagination,
-            total: Math.max(0, previous.pagination.total - 1),
-          },
-        });
-      }
-
-      statusMessage.value = `Optimistically removed record #${input.id}.`;
-      return { previous } satisfies MutationContext;
-    },
-    onError: (_error, variables, context) => {
-      const input = variables as DeleteInput;
-      if (context?.previous) {
-        queryClient.setQueryData(currentKey, context.previous);
-      }
-
-      statusMessage.value =
-        `Delete for record #${input.id} failed and the cached list rolled back.`;
-    },
-    onSuccess: (item) => {
-      const record = item as ServiceRecord;
+    onSuccess: (record) => {
       statusMessage.value = `Server deleted ${record.name}.`;
+      refreshList();
     },
-    onSettled: async () => {
-      await queryClient.invalidateQueries(exampleServiceListInvalidation);
+    onError: (_error, variables) => {
+      statusMessage.value = `Delete for record #${variables.id} failed.`;
     },
   });
 

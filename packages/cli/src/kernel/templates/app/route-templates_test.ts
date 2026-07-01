@@ -388,7 +388,7 @@ describe('app route template rendering', () => {
     assert(!output.includes('summary: buildServiceSummary'));
   });
 
-  it('route-local island uses QueryIsland, useQuery, and typed optimistic mutation', async () => {
+  it('route-local island uses QueryIsland, useQuery, and typed CRUD mutations', async () => {
     const adapter = makeAdapter();
     const output = await adapter.render(appServiceShowcaseIslandTemplate, SAMPLE_APP_VARS);
     assertStringIncludes(output, "import { useSignal } from '@preact/signals';");
@@ -397,12 +397,12 @@ describe('app route template rendering', () => {
     assertStringIncludes(output, 'hydrateFromDehydrated');
     assertStringIncludes(output, 'useMutation');
     assertStringIncludes(output, 'useQuery');
-    assertStringIncludes(output, 'exampleServiceListInvalidation');
     assertStringIncludes(output, 'exampleServiceQueries.create.mutationOptions()');
     assertStringIncludes(output, 'exampleServiceQueries.update.mutationOptions()');
     assertStringIncludes(output, 'exampleServiceQueries.delete.mutationOptions()');
-    assertStringIncludes(output, 'invalidateQueries(exampleServiceListInvalidation)');
-    assertStringIncludes(output, 'Optimistically renamed record');
+    assertStringIncludes(output, 'useQuery<ServiceListData>');
+    assertStringIncludes(output, 'useMutation<ServiceRecord, unknown, CreateInput>');
+    assertStringIncludes(output, 'refreshList();');
   });
 
   it('summary panel and partial route keep defer concerns server-owned', async () => {
