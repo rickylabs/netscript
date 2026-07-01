@@ -60,7 +60,6 @@ function ServiceShowcaseLabInner(props: Props) {
     readonly mutationFn: (input: CreateInput) => Promise<ServiceRecord> | ServiceRecord;
   };
   const createMutation = useMutation<ServiceRecord, unknown, CreateInput>({
-    mutationKey: createOptions.mutationKey,
     mutationFn: createOptions.mutationFn,
     onSuccess: (record) => {
       statusMessage.value = `Server created ${record.name}.`;
@@ -76,7 +75,6 @@ function ServiceShowcaseLabInner(props: Props) {
     readonly mutationFn: (input: UpdateInput) => Promise<ServiceRecord> | ServiceRecord;
   };
   const renameMutation = useMutation<ServiceRecord, unknown, UpdateInput>({
-    mutationKey: updateOptions.mutationKey,
     mutationFn: updateOptions.mutationFn,
     onSuccess: (record) => {
       statusMessage.value = `Server confirmed ${record.name}.`;
@@ -92,7 +90,6 @@ function ServiceShowcaseLabInner(props: Props) {
     readonly mutationFn: (input: DeleteInput) => Promise<ServiceRecord> | ServiceRecord;
   };
   const deleteMutation = useMutation<ServiceRecord, unknown, DeleteInput>({
-    mutationKey: deleteOptions.mutationKey,
     mutationFn: deleteOptions.mutationFn,
     onSuccess: (record) => {
       statusMessage.value = `Server deleted ${record.name}.`;
