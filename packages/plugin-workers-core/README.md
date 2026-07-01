@@ -47,6 +47,39 @@ const runtime = await startWorkers();
 await runtime.stop('done');
 ```
 
+### Tasks and an explicit runtime
+
+Define a task with a handler, then compose an explicit runtime instead of the `startWorkers()`
+preset when you need to control startup:
+
+```typescript
+import {
+  createFailureResult,
+  createSuccessResult,
+  createWorkersRuntime,
+  defineTask,
+  inspectTask,
+} from '@netscript/plugin-workers-core';
+
+// The typestate builder only exposes build() after a handler or entrypoint is set.
+const resizeThumbnail = defineTask('resize-thumbnail')
+  .timeout(30_000)
+  .retry(3)
+  .handler<{ path: string }>((context) =>
+    context.payload.path
+      ? createSuccessResult({ resized: context.payload.path })
+      : createFailureResult('missing path')
+  )
+  .build();
+
+console.log(inspectTask(resizeThumbnail)); // { id: "resize-thumbnail", kind: "task" }
+
+// Compose a runtime from defaults, then start and drain it explicitly.
+const runtime = createWorkersRuntime({ id: 'workers' });
+await runtime.start();
+await runtime.stop('deploy');
+```
+
 ---
 
 ## 📦 Key Capabilities

@@ -55,6 +55,37 @@ await runtime.register([registrationSaga]);
 await runtime.start();
 ```
 
+### Signals, queries, and compensation
+
+Reserve a signal and a query with `defineSignal`/`defineQuery`, register a compensation handler, and
+return a `sagaFail` effect when an event cannot be applied:
+
+```typescript
+import { defineQuery, defineSaga, defineSignal, sagaFail } from '@netscript/plugin-sagas-core';
+
+type OrderState = { total: number; cancelled: boolean };
+
+const CancelOrder = defineSignal<{ reason: string }>('CancelOrder');
+const OrderTotal = defineQuery<number>('OrderTotal');
+
+const orderSaga = defineSaga('order')
+  .state<OrderState>({ total: 0, cancelled: false })
+  .on<'ItemAdded', { price: number }>('ItemAdded', (saga, event) => {
+    saga.state.total += event.payload.price;
+    return [];
+  })
+  .compensate<'ItemAdded', { price: number }>('ItemAdded', (saga, event) => {
+    saga.state.total -= event.payload.price;
+    return [];
+  })
+  .onSignal(CancelOrder, (saga, payload) => {
+    saga.state.cancelled = true;
+    return [sagaFail(payload.reason)];
+  })
+  .onQuery(OrderTotal, (saga) => saga.state.total)
+  .build();
+```
+
 ---
 
 ## 📦 Key Capabilities

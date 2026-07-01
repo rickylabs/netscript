@@ -54,6 +54,25 @@ console.log(summary.target); // "@netscript/plugin-triggers"
 console.log(summary.details.contributionGroups); // 5
 ```
 
+### Identity and service constants
+
+The plugin re-exports its stable identity and API-service constants so hosts, scaffolding, and
+Aspire wiring can reference them without hard-coding literals:
+
+```typescript
+import {
+  TRIGGERS_API_DEFAULT_PORT,
+  TRIGGERS_API_SERVICE_NAME,
+  TRIGGERS_PLUGIN_ID,
+  triggersPlugin,
+} from '@netscript/plugin-triggers';
+
+console.log(TRIGGERS_PLUGIN_ID); // "triggers"
+console.log(TRIGGERS_API_SERVICE_NAME); // "triggers-api"
+console.log(TRIGGERS_API_DEFAULT_PORT); // 8093
+console.log(triggersPlugin.name); // "@netscript/plugin-triggers"
+```
+
 ---
 
 ## 📦 Key Capabilities

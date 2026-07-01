@@ -37,8 +37,7 @@ export interface PublicStandardSchema<TOutput> {
 }
 
 /** Structural object-shape map used by public definition schemas. */
-// deno-lint-ignore no-explicit-any -- preserves field-specific schema shape types for consumers.
-export type PublicDefinitionSchemaShape = Readonly<Record<string, any>>;
+export type PublicDefinitionSchemaShape = Readonly<Record<string, z.ZodTypeAny>>;
 
 /** Package-owned structural schema surface for public definition schemas. */
 export interface PublicDefinitionSchema<TOutput> extends PublicStandardSchema<TOutput> {

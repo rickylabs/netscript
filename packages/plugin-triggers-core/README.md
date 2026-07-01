@@ -70,6 +70,34 @@ the handler's actions to the `TriggerProcessorPort` for dispatch. The two phases
 slow handler never blocks the acknowledgement and a crash after `202` is recoverable from the
 persisted event.
 
+### Scheduled triggers and fire-time preview
+
+`defineScheduledTrigger` takes the handler first and a static cron spec second;
+`computeNextFireTimes` previews upcoming fire times for a spec without a running scheduler:
+
+```typescript
+import { computeNextFireTimes, defineScheduledTrigger } from '@netscript/plugin-triggers-core';
+
+const nightlyReindex = defineScheduledTrigger(
+  // Handlers are async and return trigger actions (e.g. `enqueueJob`).
+  async () => [],
+  {
+    id: 'nightly-reindex',
+    cron: '0 2 * * *',
+    timezone: 'UTC',
+  },
+);
+console.log(nightlyReindex.id); // "nightly-reindex"
+
+// Preview the next three fire times from a reference instant.
+const upcoming = computeNextFireTimes(
+  { cron: '0 2 * * *', timezone: 'UTC' },
+  3,
+  new Date('2026-01-01T00:00:00Z'),
+);
+console.log(upcoming);
+```
+
 ---
 
 ## 📦 Key Capabilities
