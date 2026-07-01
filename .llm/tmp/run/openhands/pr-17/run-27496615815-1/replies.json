@@ -1,6 +1,0 @@
-[
-  {
-    "comment_id": 38945627832,
-    "body": "**OpenHands Agent Run Summary (27496615815-1)**\n\nContinuation of the failed previous run (27493382997-1). This run focused on producing the required harness output and validating the sub-waves' work rather than re-running quality gates.\n\n**Status:** INCOMPLETE (analysis complete, no source changes needed)\n\n**Validation Results:**\n- All four Wave 5 packages (sdk, service, fresh-ui, fresh) PASS quality gates\n- deno check: 0 errors across 324 TypeScript files\n- deno lint: 0 warnings\n- deno fmt: all files properly formatted\n\n**Completed:**\n- Documented package structures and doctrine compliance in run artifacts\n- Cataloged remaining debt (page-compat.ts 1,111 LOC, documentation stubs)\n- Created plan.md with prioritized next steps\n\n**Remains for next agent (est. 200 iterations):**\n1. Split `page-compat.ts` (1,111 LOC → ~3 files <500 LOC each)\n2. Populate `docs/recipes/` and `docs/reference/` directories (currently stubs)\n3. Add service subpath exports (`./builders`, `./types`, `./testing`)\n4. Run final E2E scaffold test across all four packages\n\nDetailed breakdown in `.llm/tmp/run/openhands/pr-17/run-27496615815-1/summary.md`"
-  }
-]
