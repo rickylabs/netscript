@@ -10,17 +10,17 @@
  * - **Pass 1:** Create ALL service resources — `addExecutable()` + working dir +
  *   HTTP endpoint + executable-mode OTEL telemetry +
  *   infrastructure dependencies (`waitFor` primary database).
- * - **Pass 2:** Wire `ServiceReferences` via `getEndpoint('http')` +
- *   `withEnvironment()` — all services now exist in the Map, so forward
- *   references resolve cleanly. Uses Aspire service-discovery env var
- *   convention: `services__{name}__http__0`.
+ * - **Pass 2:** Wire `ServiceReferences` and `PluginReferences` via
+ *   `getEndpoint('http')` + `withEnvironment()` after services and plugins
+ *   both exist. Uses Aspire service-discovery env var convention:
+ *   `services__{name}__http__0`.
  *
  * Services use `--watch-hmr` for watch mode (HMR-capable), unlike background
  * processors and apps which use `--watch`.
  */
 
 import type { RegisterServicesOptions } from '../types.ts';
-import { fileHeader, safeIdentifier } from '../_utils.ts';
+import { fileHeader } from '../_utils.ts';
 import { SCAFFOLD_ASPIRE_MODULES } from '../../../../constants/scaffold/scaffold-aspire.ts';
 import { SCAFFOLD_DIRS } from '../../../../constants/scaffold/scaffold-dirs.ts';
 import { RESOURCE_DEFAULTS } from '@netscript/aspire/constants';
@@ -104,45 +104,10 @@ export function generateRegisterServices(options: RegisterServicesOptions): stri
     pass1Blocks.push(lines.join('\n'));
   }
 
-  // --- Pass 2 blocks: wire cross-references ---
-  const pass2Blocks: string[] = [];
-
-  for (const [name, entry] of entries) {
-    const refs = entry.ServiceReferences;
-    if (!refs || refs.length === 0) continue;
-
-    const lines: string[] = [];
-    lines.push(`  // --- ${name}: wire ServiceReferences via endpoint env vars ---`);
-    lines.push(`  {`);
-    lines.push(`    const resource = services.get('${name}');`);
-    lines.push(`    if (resource) {`);
-
-    for (const ref of refs) {
-      const refId = safeIdentifier(ref);
-      lines.push(
-        `      const ${refId}Endpoint = await services.get('${ref}')?.getEndpoint('http');`,
-      );
-      lines.push(`      if (${refId}Endpoint) {`);
-      lines.push(
-        `        await resource.withEnvironment('services__${ref}__http__0', ${refId}Endpoint);`,
-      );
-      lines.push(`      }`);
-    }
-
-    lines.push(`    }`);
-    lines.push(`  }`);
-
-    pass2Blocks.push(lines.join('\n'));
-  }
-
   // --- Compose full output ---
   const pass1Content = pass1Blocks.length > 0
     ? pass1Blocks.join('\n\n')
     : '  // No services configured';
-
-  const pass2Content = pass2Blocks.length > 0
-    ? pass2Blocks.join('\n\n')
-    : '  // No cross-references to wire';
 
   return renderTemplateAssetSync(TEMPLATE_KEYS.generatedAspireHelpersGenerateRegisterServices1, {
     __slot0__: String(fileHeader('register-services.mts')),
@@ -150,6 +115,5 @@ export function generateRegisterServices(options: RegisterServicesOptions): stri
     __slot2__: String(SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT),
     __slot3__: String(SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT),
     __slot4__: String(pass1Content),
-    __slot5__: String(pass2Content),
   });
 }

@@ -10,11 +10,12 @@
  * 1. Dashboard OTLP endpoint configuration
  * 2. Infrastructure (databases + caches)
  * 3. DB CLI short-circuit mode
- * 4. Services (two-pass with cross-reference wiring)
+ * 4. Services (creation pass)
  * 5. Plugins (two-pass with plugin→plugin + plugin→service refs)
- * 6. Background processors (workers, sagas, triggers)
- * 7. Applications (web apps, Tauri desktop, task apps)
- * 8. Development tools (Prisma Studio, etc.)
+ * 6. Service reference wiring (service→service + service→plugin refs)
+ * 7. Background processors (workers, sagas, triggers)
+ * 8. Applications (web apps, Tauri desktop, task apps)
+ * 9. Development tools (Prisma Studio, etc.)
  *
  * Empty sections produce no-op functions in their respective modules —
  * the index file always includes all registration phases.

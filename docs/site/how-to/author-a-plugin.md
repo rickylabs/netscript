@@ -269,7 +269,7 @@ canonical location:
 
 Listing the plugin is not enough — the runtime addresses contributions through a **generated
 registry**. For a worker-archetype plugin, the generator scans `plugins/<name>/jobs/` and writes a
-jobs registry (e.g. `.netscript/generated/plugin-<name>/jobs.registry.ts`) keyed by each handler's
+jobs registry (e.g. `.netscript/generated/plugin-<name>/job-registry.ts`) keyed by each handler's
 `id`. Generate it:
 
 ```sh

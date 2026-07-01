@@ -6,6 +6,8 @@ import type { InfrastructureContext } from './register-infrastructure.mjs';
 import {
   buildDatabaseUriEnvKey,
   buildOtelEnvVars,
+  extractPluginReferences,
+  extractServiceReferences,
   resolvePermissions,
   resolveWorkspacePath,
 } from '{{__slot3__}}';
@@ -18,10 +20,9 @@ type ExecutableResource = ReturnType<DistributedApplicationBuilder['addExecutabl
  * - Pass 1: Create all service resources via `addExecutable()` with resolved
  *   permissions, working directory, HTTP endpoint, OTEL telemetry (3 vars
  *   via `denoApp` mode), and infrastructure dependencies.
- * - Pass 2: Wire `ServiceReferences` via `getEndpoint('http')` +
- *   `withEnvironment()` using the Aspire service-discovery env var
- *   convention (`services__{name}__http__0`) to avoid forward-reference
- *   issues where service A references service B but B hasn't been created yet.
+ * - Reference wiring is completed by `wireServiceReferences(...)` after
+ *   services and plugins have both been created, so service -> plugin API
+ *   discovery uses the same endpoint environment convention as other resources.
  *
  * @param builder - The Aspire distributed application builder
  * @param config - Parsed NetScript configuration
@@ -41,8 +42,42 @@ export async function registerServices(
   // --- Pass 1: Create all service resources ---
 {{__slot4__}}
 
-  // --- Pass 2: Wire cross-references ---
-{{__slot5__}}
-
   return services;
+}
+
+/**
+ * Wires endpoint environment variables for service references.
+ *
+ * Services can reference plain services through `ServiceReferences` and plugin
+ * API resources through `PluginReferences`. Plugin resources are created after
+ * services, so this pass runs from the AppHost orchestrator after
+ * `registerPlugins(...)` returns.
+ *
+ * @param config - Parsed NetScript configuration
+ * @param services - Registered service resources
+ * @param plugins - Registered plugin API resources
+ */
+export async function wireServiceReferences(
+  config: NetScriptConfig,
+  services: Map<string, ExecutableResource>,
+  plugins: Map<string, ExecutableResource>,
+): Promise<void> {
+  for (const [name, entry] of Object.entries(config.Services)) {
+    const resource = services.get(name);
+    if (!resource) continue;
+
+    for (const ref of extractServiceReferences(entry)) {
+      const endpoint = await services.get(ref)?.getEndpoint('http');
+      if (endpoint) {
+        await resource.withEnvironment(`services__${ref}__http__0`, endpoint);
+      }
+    }
+
+    for (const ref of extractPluginReferences(entry)) {
+      const endpoint = await plugins.get(ref)?.getEndpoint('http');
+      if (endpoint) {
+        await resource.withEnvironment(`services__${ref}__http__0`, endpoint);
+      }
+    }
+  }
 }
