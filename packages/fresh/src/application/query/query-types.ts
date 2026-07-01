@@ -78,7 +78,12 @@ export interface IslandInfiniteQueryResult<TData = unknown, TError = unknown>
 }
 
 /** Result of an island mutation hook call. */
-export interface IslandMutationResult<TData = unknown, TError = unknown, TVariables = void> {
+export interface IslandMutationResult<
+  TData = unknown,
+  TError = unknown,
+  TVariables = void,
+  TContext = unknown,
+> {
   /** Current mutation data, when the mutation has completed successfully. */
   readonly data: TData | undefined;
   /** Current mutation error, when the mutation failed. */
@@ -128,13 +133,31 @@ export interface IslandInfiniteQueryOptions<TData = unknown, TError = unknown, T
 }
 
 /** Options accepted by `useIslandMutation`. */
-export interface IslandMutationOptions<TData = unknown, TError = unknown, TVariables = void> {
+export interface IslandMutationOptions<
+  TData = unknown,
+  TError = unknown,
+  TVariables = void,
+  TContext = unknown,
+> {
   /** Function that performs the mutation. */
   mutationFn: (variables: TVariables) => Promise<TData> | TData;
+  /** Optional optimistic update callback that returns rollback context. */
+  onMutate?: (variables: TVariables) => Promise<TContext> | TContext;
   /** Optional success callback. */
-  onSuccess?: (data: TData, variables: TVariables) => void;
+  onSuccess?: (data: TData, variables: TVariables, context: TContext) => Promise<void> | void;
   /** Optional error callback. */
-  onError?: (error: TError, variables: TVariables) => void;
+  onError?: (
+    error: TError,
+    variables: TVariables,
+    context: TContext | undefined,
+  ) => Promise<void> | void;
+  /** Optional settled callback that runs after success or error. */
+  onSettled?: (
+    data: TData | undefined,
+    error: TError | null,
+    variables: TVariables,
+    context: TContext | undefined,
+  ) => Promise<void> | void;
 }
 
 /** Filters accepted by query/mutation activity counters. */
