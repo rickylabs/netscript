@@ -81,7 +81,7 @@ first-party plugins installed, the graph looks like this:
   { name: "streams", type: "plugin · :4437", desc: "durable-streams runtime service. <code>RequiresDb=false</code>, <code>RequiresKv=false</code>. Real producer runtime — see Step 5." },
   { name: "workers-api", type: "plugin · :8091", desc: "Workers API. Requires DB + KV. References <code>streams</code>." },
   { name: "sagas-api", type: "plugin · :8092", desc: "Sagas API. Requires DB + KV. References <code>workers-api</code>, <code>streams</code>." },
-  { name: "triggers-api", type: "plugin · :8093", desc: "Triggers API (raw Hono routes, not oRPC). Requires DB + KV. References <code>workers-api</code>, <code>streams</code>." },
+  { name: "triggers-api", type: "plugin · :8093", desc: "Triggers API. Typed v1 oRPC contract for trigger/event introspection + management; the webhook ingress endpoint <code>POST /api/v1/webhooks/:triggerId</code> stays a raw HMAC-verifying route by design. Requires DB + KV. References <code>workers-api</code>, <code>streams</code>." },
   { name: "workers / sagas", type: "background processor", desc: "Entrypoint <code>bin/combined.ts</code>. Watch mode + telemetry on. Workers runtime pool via <code>WORKERS_CONCURRENCY</code>; sagas via <code>SAGA_CONCURRENCY</code>." },
   { name: "triggers", type: "background processor", desc: "Entrypoint <code>src/runtime/trigger-processor.ts</code>. Concurrency 10 via <code>TRIGGER_CONCURRENCY</code>." },
   { name: "dashboard", type: "app · :8010", desc: "Fresh frontend. References service <code>users</code>." },

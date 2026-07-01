@@ -228,10 +228,14 @@ service's RPC channel also types the plugin boundaries you compose into a NetScr
   `createService(...).serve()` builder, so dispatching a job or driving a saga is a typed client
   call rather than a hand-rolled `fetch`. See [background jobs](/capabilities/background-jobs/) and
   [durable sagas](/capabilities/durable-sagas/).
-- **Triggers** are the deliberate exception: they expose *raw* Hono routes rather than an oRPC
-  contract, because they receive external webhooks whose shapes you do not control. That asymmetry
-  is itself instructive — contracts-first is for boundaries you *own*; an inbound webhook is a
-  boundary someone else owns. See [the plugin model](/explanation/plugin-system/).
+- **Triggers** also serve a typed v1 oRPC contract — for trigger and event introspection plus
+  management (fire, enable/disable, schedule preview, SSE event subscription) — like workers and
+  sagas. Their exception is narrower: the *webhook ingress endpoint* itself
+  (`POST /api/v1/webhooks/:triggerId`) stays a *raw*, signature-verifying route rather than an oRPC
+  procedure, because it verifies an HMAC over the raw request bytes from external senders whose shapes
+  you do not control. That asymmetry is itself instructive — contracts-first is for boundaries you
+  *own*; an inbound webhook is a boundary someone else owns. See
+  [the plugin model](/explanation/plugin-system/).
 
 Holding those together: the contract is how NetScript makes the *internal* surfaces of a system
 type-safe end to end, and the framework is explicit about where that model stops.

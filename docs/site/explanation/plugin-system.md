@@ -82,6 +82,15 @@ the *plugin* only carries the manifest. The boundary is a feature, not an oversi
 framing.
 <!-- caveat: arch-debt:streams-manifest-helpers-unsupported -->
 
+This two-tier shape is not reserved for the official plugins. When you scaffold a custom plugin with
+`netscript plugin new <name>`, the generator emits the same pair: a JSR-publishable core engine
+package under `packages/plugin-<name>-core/` (its domain, ports, application orchestration,
+`contracts/v1`, and testing doubles) and a thin connector under `plugins/<name>/` (its manifest,
+adapter, Aspire contribution, CLI/scaffold entrypoints, and service) whose `contracts` subpath simply
+re-exports the core's `contracts/v1`. So custom plugins inherit the same behavior-versus-integration
+split — thin, composable, and independently publishable — from the moment they are generated. See
+{{ comp.xref({ key: "howto:author-a-plugin", text: "author-a-plugin" }) }} for the walkthrough.
+
 ## What a plugin contributes: the manifest
 
 A plugin describes itself with a typed **manifest**, assembled through the `definePlugin()`

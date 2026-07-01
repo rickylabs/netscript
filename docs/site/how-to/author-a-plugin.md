@@ -15,13 +15,15 @@ advanced companion to [Add a first-party plugin](/how-to/add-a-plugin/), which o
 of the four official plugins (`workers`, `sagas`, `triggers`, `streams`). If you just want a worker
 or a saga, install it there. Come here when you need a capability NetScript does not ship.
 
-A NetScript plugin is a workspace member under **`plugins/<name>/`** whose `mod.ts` exports a plugin
-**manifest** built with `definePlugin`. The framework discovers it because `netscript.config.ts`
-lists `./plugins/<name>/mod.ts`, and it discovers the plugin's *contributions* (jobs, services,
-stream topics, DB schemas, e2e gates) through a generated **registry**. Get those three things right
-— location, manifest, registry — and the kernel wires the rest. The conceptual model behind that
-wiring lives in [The plugin system](/explanation/plugin-system/); the generated manifest and
-contribution types live in the [plugin reference](/reference/plugin/).
+A NetScript plugin is **two packages**: a JSR-publishable **core engine** under
+`packages/plugin-<name>-core/` that owns the behavior (domain, ports, application, contract), and a
+thin **connector** under `plugins/<name>/` whose `mod.ts` exports a plugin **manifest** built with
+`definePlugin`. The framework discovers the connector because `netscript.config.ts` lists
+`./plugins/<name>/mod.ts`, and it discovers the plugin's *contributions* (jobs, services, stream
+topics, DB schemas, e2e gates) through a generated **registry**. Scaffold both tiers with `netscript
+plugin new <name>`, get location, manifest, and registry right, and the kernel wires the rest. The
+conceptual model behind that split lives in [The plugin system](/explanation/plugin-system/); the
+generated manifest and contribution types live in the [plugin reference](/reference/plugin/).
 
 {{ comp callout { type: "important", title: "Aspire is the control plane — start it first" } }}
 If your plugin contributes an API service or a background processor, those run as resources in the
@@ -45,48 +47,79 @@ adapters, and a single oRPC service. Study it when your plugin spans more than o
   rows: [
     { name: "Workspace", type: "netscript init", desc: "An existing project. If you have none, scaffold one first — see the tutorials." },
     { name: "netscript CLI", type: "on PATH", desc: "Installed globally: deno install --global --allow-all --name netscript jsr:@netscript/cli. Confirm with netscript --help." },
-    { name: "A reference plugin", type: "plugins/<name>/", desc: "Install a first-party plugin with --samples and read its mod.ts + scaffold.plugin.json as your template. The auth plugin is the best multi-package exemplar." },
+    { name: "A starting skeleton", type: "netscript plugin new <name>", desc: "Scaffold the two-tier core + connector pair, then adapt it. Read a first-party plugin's mod.ts + scaffold.plugin.json alongside it; the auth plugin is the best multi-package exemplar." },
     { name: "Provider kind", type: "worker | saga | trigger | stream | plugin", desc: "Decide which archetype your plugin is. Utility/infra plugins use kind 'stream' or the generic 'plugin'." }
   ]
 }) }}
 
 Throughout, run commands from your workspace root.
 
-## Step 1 — Create the plugin directory
+## Step 1 — Scaffold the two-tier skeleton
 
-The canonical, config-referenced home for every plugin is **`plugins/<name>/`** — that is where
-`netscript.config.ts` points and where you author. A scaffold may also leave a slimmer top-level
-`<name>/` workspace member that stages a subset of files for a background processor; **`plugins/<name>/`
-is the real source of truth.** Edit there.
-
-The fastest way to get a correct skeleton is to install a first-party plugin whose archetype matches
-yours, then read and adapt it:
+Every NetScript plugin is **two packages, not one**: a JSR-publishable **core engine package** under
+`packages/plugin-<name>-core/` that owns the behavior, and a **thin connector** under
+`plugins/<name>/` that wires that behavior into a host. The fastest — and doctrine-true — way to get
+both trees correct is the greenfield generator:
 
 ```sh
-deno run -A packages/cli/bin/netscript-dev.ts plugin install worker --name workers --samples
+netscript plugin new notifier --kind proxy
 ```
 
-A minimal hand-authored plugin needs only a `mod.ts` manifest (built with `definePlugin`) and a
-`scaffold.plugin.json` manifest descriptor. A capability-bearing plugin installs contribution modules, a
-`deno.json`, and (optionally) a `services/`, `bin/`, `database/`, and `contracts/` tree:
+`netscript plugin new <name>` emits the whole pair in one pass. Its options are `--kind
+feature|proxy` (the connector archetype, default `proxy`) and `--overwrite` (replace existing files
+instead of skipping them). The connector under `plugins/<name>/` is the workspace member
+`netscript.config.ts` references; the core package under `packages/plugin-<name>-core/` is where the
+domain, ports, application logic, and contract live and is independently publishable to JSR.
+
+The **core engine package** owns the capability. Its `deno.json` is strict and exports
+`. ./contracts/v1 ./domain ./ports ./testing`:
+
+```
+packages/plugin-notifier-core/
+├── deno.json                          # strict; exports . ./contracts/v1 ./domain ./ports ./testing
+├── mod.ts                             # curated builders + domain type re-exports
+├── README.md
+├── src/domain/mod.ts                  # domain entities and ids
+├── src/ports/mod.ts                   # the engine's ports (the seam adapters implement)
+├── src/application/mod.ts             # application orchestration (define<Name>)
+├── src/contracts/v1/notifier.contract.ts  # the v1 oRPC contract, extends the base plugin contract
+├── src/contracts/v1/mod.ts            # contract barrel
+├── src/testing/mod.ts                 # in-memory port doubles for tests
+└── tests/contracts/notifier-contract-soundness_test.ts
+```
+
+The **thin connector** carries only integration. Its `deno.json` exports
+`. ./contracts ./services ./aspire ./cli ./scaffold`, and its `contracts/v1.ts` re-exports the core's
+`contracts/v1`:
 
 ```
 plugins/notifier/
-├── mod.ts                 # ← public manifest: exports definePlugin(...).build() + an inspect fn
-├── scaffold.plugin.json   # ← manifest descriptor read by the CLI/kernel (provider.kind, ports…)
-├── deno.json              # workspace member: name, exports, import map
-├── contracts/v1/          # (optional) oRPC contract re-exports, frontend-safe
+├── deno.json                 # exports . ./contracts ./services ./aspire ./cli ./scaffold
+├── package.json
+├── mod.ts                    # ← public manifest: definePlugin(...).build() + an inspect fn
+├── README.md
+├── contracts/v1.ts           # re-exports @netscript/plugin-notifier-core/contracts/v1
+├── adapter.ts                # NetScriptPlugin adapter (install/doctor/info/update/remove)
+├── aspire.ts                 # Aspire contribution
+├── cli.ts                    # CLI adapter entrypoint
+├── scaffold.ts               # scaffold adapter entrypoint
+├── verify-plugin.ts          # manifest self-verification
+├── scaffold.plugin.json      # manifest descriptor read by the CLI/kernel (kind, capabilities…)
+├── scaffold.runtime.json
 ├── database/notifier.prisma  # (optional) plugin's Prisma models, aggregated at db generate
-├── services/src/          # (optional) the plugin's API service (main.ts, router.ts)
-├── jobs/                  # (optional) worker job-handler contributions
-└── bin/combined.ts        # (optional) background-processor entrypoint
+├── scaffolding/              # item scaffolder + stub the connector emits into userland
+├── services/src/             # the plugin's service: context.ts, handlers.ts, main.ts
+└── tests/public/manifest_test.ts
 ```
 
-{{ comp callout { type: "note", title: "Two trees, one canonical home" } }}
-If you see both <code>plugins/notifier/</code> and a top-level <code>notifier/</code> after a
-scaffold, that is expected: the top-level copy is a background-processor staging member.
-<code>netscript.config.ts</code> references <strong><code>./plugins/notifier/mod.ts</code></strong>,
-and that is the directory you author in.
+{{ comp callout { type: "note", title: "Two tiers: behavior in core, integration in the connector" } }}
+The pair the generator emits mirrors the core/connector split every official plugin uses:
+<code>packages/plugin-notifier-core/</code> holds the domain, ports, application logic, and the
+versioned contract — the parts you would publish and reuse — while <code>plugins/notifier/</code>
+holds only the manifest, adapters, and service wiring, re-exporting the core's contract through
+<code>contracts/v1.ts</code>. <code>netscript.config.ts</code> references
+<strong><code>./plugins/notifier/mod.ts</code></strong>, so the connector is the workspace member you
+register; author capability changes in the core package and integration changes in the connector.
 {{ /comp }}
 
 ## Step 2 — Write the manifest descriptor (`scaffold.plugin.json`)
@@ -171,7 +204,7 @@ your `provider.kind`:
   rows: [
     { name: "worker", type: "defineJobHandler", desc: "A job: defineJobHandler(async (ctx) => …) + createSuccessResult/createFailureResult; id via Object.assign(handler, { id }). Lives in jobs/." },
     { name: "saga", type: "defineSaga(id)…build()", desc: "Fluent builder: .durability('t1').state<S>({…}).on<Type,Payload>(type, fn).build(); effects via sagaComplete({…}). Durable store is kv | prisma." },
-    { name: "trigger", type: "defineWebhook", desc: "defineWebhook(handler, { id, path, verifier, tags }); handler returns enqueueJob(jobRef, { payload, priority })[]. Raw Hono routes, NOT oRPC. enqueueJob is live; defer throws + routes to DLQ." },
+    { name: "trigger", type: "defineWebhook", desc: "defineWebhook(handler, { id, path, verifier, tags }); handler returns enqueueJob(jobRef, { payload, priority })[]. The service speaks a typed v1 oRPC contract for trigger/event introspection and management; the webhook ingress endpoint stays a raw signature-verifying route by design. enqueueJob is live; defer throws + routes to DLQ." },
     { name: "stream", type: "createDurableStream / defineStreamSchema", desc: "Real producer runtime via @netscript/plugin-streams-core. The @netscript/plugin-streams manifest helpers (defineStreamProducer/Consumer) fail loud — they throw StreamUnsupportedOperationError." }
   ]
 }) }}
@@ -186,9 +219,9 @@ API the official workers plugin uses — drop the file in `plugins/notifier/jobs
     code: "import {\n  createSuccessResult,\n  defineJobHandler,\n} from '@netscript/plugin-workers-core';\nimport { z } from 'zod';\n\nconst PayloadSchema = z.object({ userId: z.string().min(1) });\n\nconst handler = defineJobHandler(async (ctx) => {\n  const { userId } = PayloadSchema.parse(ctx.payload ?? {});\n  // …deliver the notification here…\n  return createSuccessResult({ userId, delivered: true });\n});\n\nexport default Object.assign(handler, { id: 'send-notification' });"
   },
   {
-    label: "Trigger archetype (Hono, not oRPC)",
+    label: "Trigger archetype (typed contract + raw ingress)",
     lang: "ts",
-    code: "import { defineWebhook, enqueueJob } from '@netscript/plugin-triggers-core/builders';\n\n// A webhook contribution: returns an array of enqueueJob effects that\n// bind inbound HTTP to worker jobs. The triggers service mounts raw Hono\n// routes — there is no oRPC contract layer here. enqueueJob is the only\n// live action; a defer action throws and routes to the DLQ.\nexport const inbound = defineWebhook(\n  () => Promise.resolve([\n    enqueueJob(jobRef, { payload: { verbose: false }, priority: 50 }),\n  ]),\n  { id: 'notifier-inbound', path: 'inbound/notify', verifier: 'memory', tags: ['webhook'] },\n);\nexport default inbound;"
+    code: "import { defineWebhook, enqueueJob } from '@netscript/plugin-triggers-core/builders';\n\n// A webhook contribution: returns an array of enqueueJob effects that\n// bind inbound HTTP to worker jobs. The triggers service serves a typed\n// v1 oRPC contract for trigger/event introspection and management; the\n// webhook ingress route (POST /api/v1/webhooks/:triggerId) stays a raw\n// signature-verifying endpoint by design. enqueueJob is the only live\n// action; a defer action throws and routes to the DLQ.\nexport const inbound = defineWebhook(\n  () => Promise.resolve([\n    enqueueJob(jobRef, { payload: { verbose: false }, priority: 50 }),\n  ]),\n  { id: 'notifier-inbound', path: 'inbound/notify', verifier: 'memory', tags: ['webhook'] },\n);\nexport default inbound;"
   },
   {
     label: "Stream producer (real runtime)",
@@ -197,12 +230,15 @@ API the official workers plugin uses — drop the file in `plugins/notifier/jobs
   }
 ] }) }}
 
-{{ comp callout { type: "warning", title: "Edges: triggers are Hono, stream helpers fail loud" } }}
-Two reality checks the official plugins make explicit. <strong>Triggers</strong> expose
-<strong>raw Hono routes</strong>, not oRPC — the triggers service mounts
-<code>app.route('/api/v1/webhooks', …)</code> and dispatches by trigger id; the supported action is
-<code>enqueueJob</code> (live), while <code>defer</code> is defined-but-unsupported (it
-<strong>throws</strong> and routes to the DLQ — no deferred replay). <strong>Streams</strong> are
+{{ comp callout { type: "warning", title: "Edges: trigger ingress is a raw route, stream helpers fail loud" } }}
+Two reality checks the official plugins make explicit. <strong>Triggers</strong> serve a
+<strong>typed v1 oRPC contract</strong> for trigger/event introspection and management, but the
+<strong>webhook ingress endpoint</strong> (<code>POST /api/v1/webhooks/:triggerId</code>) stays a
+<strong>raw signature-verifying route</strong> by design — it verifies an HMAC signature over the raw
+request bytes, which oRPC's schema parsing cannot do, so third-party senders (with no NetScript
+client) POST to that plain URL; the supported action is <code>enqueueJob</code> (live), while
+<code>defer</code> is defined-but-unsupported (it <strong>throws</strong> and routes to the DLQ — no
+deferred replay). <strong>Streams</strong> are
 split: the <strong>producer runtime is real</strong> via
 <code>@netscript/plugin-streams-core</code>'s <code>createDurableStream</code> (served as an Aspire
 service on <code>:4437</code> and used by the workers, auth, and sagas plugins). Only the
@@ -321,8 +357,9 @@ Set a free <code>servicePort</code> in both <code>scaffold.plugin.json</code> an
 <li><strong>Wrong canonical directory</strong> — author in <code>plugins/&lt;name&gt;/</code>, the
 directory <code>netscript.config.ts</code> references. Edits to a top-level staging copy are not the
 source of truth.</li>
-<li><strong>Mismatched archetype expectations</strong> — a <code>trigger</code> plugin serves raw
-Hono routes (no oRPC) and only the <code>enqueueJob</code> action is live; a <code>stream</code>
+<li><strong>Mismatched archetype expectations</strong> — a <code>trigger</code> plugin serves a typed
+v1 oRPC contract for introspection/management while keeping the webhook ingress endpoint a raw
+signature-verifying route, and only the <code>enqueueJob</code> action is live; a <code>stream</code>
 plugin's real runtime is the <em>producer</em> in <code>@netscript/plugin-streams-core</code>, while
 the <code>@netscript/plugin-streams</code> manifest helpers throw
 <code>StreamUnsupportedOperationError</code>. Match your plugin's behavior to its declared
