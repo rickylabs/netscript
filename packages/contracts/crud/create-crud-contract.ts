@@ -25,10 +25,7 @@
  */
 
 import { z } from 'zod';
-import {
-  baseContract,
-  type BaseContractProcedure,
-} from '../src/application/contract-primitives.ts';
+import { baseContract } from '../src/application/contract-primitives.ts';
 import type {
   ContractObjectSchema,
   ContractSchema,
@@ -83,15 +80,13 @@ export interface CrudContractOptions<
 export type CrudContractOperation<
   TInputSchema extends ContractSchema<unknown> | undefined = ContractSchema<unknown> | undefined,
   TOutputSchema extends ContractSchema<unknown> | undefined = ContractSchema<unknown> | undefined,
-> =
-  & BaseContractProcedure
-  & Readonly<{
-    /** Public oRPC schema metadata used by downstream client type extraction. */
-    readonly '~orpc': {
-      readonly inputSchema?: TInputSchema;
-      readonly outputSchema?: TOutputSchema;
-    };
-  }>;
+> = Readonly<{
+  /** Public oRPC schema metadata used by downstream client type extraction. */
+  readonly '~orpc': {
+    readonly inputSchema?: TInputSchema;
+    readonly outputSchema?: TOutputSchema;
+  };
+}>;
 
 type CrudIdInput<TId extends ContractSchema<unknown>> = ContractObjectSchema<
   Readonly<{ id: ContractSchemaOutput<TId> }>
@@ -293,7 +288,7 @@ export function createReadOnlyContract<TEntity extends ContractSchema<unknown>>(
       update: true,
       delete: true,
     },
-  });
+  }) as PartialCrudContract;
 }
 
 /**
@@ -324,5 +319,5 @@ export function createListOnlyContract<TEntity extends ContractSchema<unknown>>(
       update: true,
       delete: true,
     },
-  });
+  }) as PartialCrudContract;
 }
