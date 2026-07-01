@@ -511,6 +511,8 @@ export interface PrismaMySqlTransactionAdapter {
   readonly provider: 'mysql';
   /** Adapter package name. */
   readonly adapterName: string;
+  /** Prisma transaction options associated with this transaction. */
+  readonly options: TransactionOptions;
   /** Execute a raw SQL query. */
   queryRaw(query: PrismaMySqlQuery): Promise<PrismaMySqlResultSet>;
   /** Execute a raw SQL statement and return affected rows. */
