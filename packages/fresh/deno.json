@@ -1,6 +1,6 @@
 {
   "name": "@netscript/fresh",
-  "version": "0.0.1-alpha.17",
+  "version": "0.0.1-alpha.18",
   "description": "Fresh runtime extensions, builders, forms, defer primitives, and route contracts for NetScript.",
   "license": "MIT",
   "exports": {
