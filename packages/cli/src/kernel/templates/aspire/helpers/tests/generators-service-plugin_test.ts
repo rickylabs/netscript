@@ -65,6 +65,7 @@ describe('generateRegisterServices', () => {
       services: { users: fixtures.MINIMAL_SERVICE },
     });
     assertStringIncludes(output, "builder.addExecutable('users', 'deno', workdir,");
+    assertStringIncludes(output, "'--minimum-dependency-age=0'");
     assertStringIncludes(output, '.withHttpEndpoint({ port: 3000');
     assertStringIncludes(output, "services.set('users'");
   });

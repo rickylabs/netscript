@@ -235,6 +235,7 @@ describe('generateRegisterApps', () => {
       apps: { frontend: fixtures.MINIMAL_APP },
     });
     assertStringIncludes(output, "builder.addExecutable('frontend', 'deno',");
+    assertStringIncludes(output, "'--minimum-dependency-age=0'");
     assertStringIncludes(output, "apps.set('frontend'");
   });
 
@@ -273,7 +274,7 @@ describe('generateRegisterApps', () => {
       ...emptyOptions,
       apps: { frontend: fixtures.MINIMAL_APP },
     });
-    assertStringIncludes(output, "['task', 'dev']");
+    assertStringIncludes(output, "['task', '--minimum-dependency-age=0', 'dev']");
   });
 
   it('should include VITE service-discovery injection for service references', () => {
