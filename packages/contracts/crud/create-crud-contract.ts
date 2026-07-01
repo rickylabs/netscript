@@ -75,12 +75,15 @@ export type CrudContractOperation = BaseContractProcedure;
  * Generated CRUD contract shape.
  */
 export type CrudContract = Readonly<{
-  list?: CrudContractOperation;
-  getById?: CrudContractOperation;
-  create?: CrudContractOperation;
-  update?: CrudContractOperation;
-  delete?: CrudContractOperation;
+  list: CrudContractOperation;
+  getById: CrudContractOperation;
+  create: CrudContractOperation;
+  update: CrudContractOperation;
+  delete: CrudContractOperation;
 }>;
+
+/** Generated CRUD contract shape when selected operations are disabled. */
+export type PartialCrudContract = Readonly<Partial<CrudContract>>;
 
 // ============================================================================
 // CRUD CONTRACT GENERATOR
@@ -218,7 +221,7 @@ export function createReadOnlyContract<TEntity extends ContractSchema<unknown>>(
   entitySchema: TEntity;
   idSchema?: ContractSchema<unknown>;
   filterSchema?: ContractObjectSchema<unknown>;
-}): CrudContract {
+}): PartialCrudContract {
   return createCrudContract({
     resource: options.resource,
     entitySchema: options.entitySchema,
@@ -249,7 +252,7 @@ export function createListOnlyContract<TEntity extends ContractSchema<unknown>>(
   resource: string;
   entitySchema: TEntity;
   filterSchema?: ContractObjectSchema<unknown>;
-}): CrudContract {
+}): PartialCrudContract {
   return createCrudContract({
     resource: options.resource,
     entitySchema: options.entitySchema,
