@@ -44,7 +44,10 @@
     skills: `jsr-audit`, `netscript-doctrine`, `deno-fresh` as applicable) so output respects
     doctrine, the publish surface, and gates.
   - Route model/effort per slice: Opus medium for reference/concept pages, Opus low for mechanical
-    README standardization, **Sonnet 4.6** for trivial link-fix/cleanup.
+    README standardization, **Sonnet 5** for trivial link-fix/cleanup. **Never route workflow stages
+    to Fable 5** — it is the most powerful *and* the priciest model, so fanning it out across a
+    workflow burns plan tokens; reserve Fable 5 for a single deliberately-spawned sub-agent on an
+    extremely complex, single-threaded engineering task.
   - **Validation stays with OpenHands** (qwen 3.7 max, separate session) with a **per-package /
     per-domain verdict** — the Claude workflow is the _generator only_; it does not self-certify.
   - Any change to **framework source** (e.g. the `@netscript/fresh-ui` `*Namespace` type exports)
