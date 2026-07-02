@@ -90,6 +90,7 @@
     "npm:@durable-streams/client@~0.2.6": "0.2.6",
     "npm:@durable-streams/server@~0.3.7": "0.3.7_@tanstack+db@0.6.8__typescript@6.0.3",
     "npm:@durable-streams/state@~0.3.1": "0.3.1_@tanstack+db@0.6.8__typescript@6.0.3_typescript@6.0.3",
+    "npm:@durable-streams/tanstack-ai-transport@^0.0.8": "0.0.8",
     "npm:@multiformats/base-x@^4.0.1": "4.0.1",
     "npm:@opentelemetry/api@^1.9.0": "1.9.1",
     "npm:@opentelemetry/api@^1.9.1": "1.9.1",
@@ -113,6 +114,8 @@
     "npm:@prisma/driver-adapter-utils@^7.8.0": "7.8.0",
     "npm:@prisma/instrumentation-contract@^7.8.0": "7.8.0_@opentelemetry+api@1.9.1",
     "npm:@saga-bus/core@~0.2.2": "0.2.2_typescript@6.0.3",
+    "npm:@tanstack/ai-preact@~0.10.1": "0.10.1_@tanstack+ai@0.39.0__@opentelemetry+api@1.9.1_preact@10.29.2_@opentelemetry+api@1.9.1",
+    "npm:@tanstack/ai@0.39": "0.39.0_@opentelemetry+api@1.9.1",
     "npm:@tanstack/db@~0.6.8": "0.6.8_typescript@6.0.3",
     "npm:@tanstack/preact-query@^5.101.0": "5.101.0_preact@10.29.2",
     "npm:@tanstack/query-core@^5.101.0": "5.101.0",
@@ -531,6 +534,12 @@
     }
   },
   "npm": {
+    "@ag-ui/core@0.0.52": {
+      "integrity": "sha512-Xo0bUaNV56EqylzcrAuhUkQX7et7+SZIrqZZtEByGwEq/I1EHny6ZMkWHLkKR7UNi0FJZwJyhKYmKJS3B2SEgA==",
+      "dependencies": [
+        "zod@3.25.76"
+      ]
+    },
     "@azure-rest/core-client@2.6.1": {
       "integrity": "sha512-KzI10qnkWTsVS2yRBUdc8NLUJ1rOm+292mYs7Pe9wqAj/jv4bRskVm1l8XkKeVTN0OCQtrU5RG0Yhjbz1Wmg7g==",
       "dependencies": [
@@ -818,6 +827,13 @@
       ],
       "optionalPeers": [
         "@tanstack/db"
+      ],
+      "bin": true
+    },
+    "@durable-streams/tanstack-ai-transport@0.0.8": {
+      "integrity": "sha512-fefWoIwTqnLEEkmNqcznDfcm4eY4yxbeP1S2MGu5xTCmpGCccid364iglzPjGdKhHHWfuuyE+3xNt5yT+q/iAw==",
+      "dependencies": [
+        "@durable-streams/client"
       ],
       "bin": true
     },
@@ -1573,6 +1589,45 @@
     "@standard-schema/spec@1.1.0": {
       "integrity": "sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w=="
     },
+    "@tanstack/ai-client@0.19.1_@opentelemetry+api@1.9.1": {
+      "integrity": "sha512-fIIezPYDDzW8BAuvvu9Jbwww3UAwEmyv9WRlrfVKRcIln33iOMRl+jU01+djTKMbP1yQOqVhoIu4VDJJKvgiuQ==",
+      "dependencies": [
+        "@tanstack/ai",
+        "@tanstack/ai-event-client",
+        "@tanstack/ai-utils"
+      ]
+    },
+    "@tanstack/ai-event-client@0.6.8": {
+      "integrity": "sha512-h7/HLz9u2LF9ba6uKFMnSZkFlkzQONJ5u3Hi+4qGxpsHyvcGRtW6v186jaFLoklndhEwyC49ytkC4eafi7Qq8w==",
+      "dependencies": [
+        "@tanstack/devtools-event-client"
+      ]
+    },
+    "@tanstack/ai-preact@0.10.1_@tanstack+ai@0.39.0__@opentelemetry+api@1.9.1_preact@10.29.2_@opentelemetry+api@1.9.1": {
+      "integrity": "sha512-PRVz8k9O3lYpsSg8jg9dpB4yoxPmCQdcoDFO5EZPWFbz6k52tSMs9TlXAN7pxut5IQqdk5nkcGYp0FHOdQ0jbA==",
+      "dependencies": [
+        "@tanstack/ai",
+        "@tanstack/ai-client",
+        "preact"
+      ]
+    },
+    "@tanstack/ai-utils@0.3.1": {
+      "integrity": "sha512-fgbjd5DohL3k5rTWr/KInauLVYMiHVm0cnmTsNrzL3cr4wWhEld5vmFSrjiwUWACAuONjZa+uBXuS+ZSO8fwDQ=="
+    },
+    "@tanstack/ai@0.39.0_@opentelemetry+api@1.9.1": {
+      "integrity": "sha512-UxqvTMwhGeUCafX/4nzFJfi1iT8uNJ4rqtB482Fc3knbmuKBO+C8d0CRxHqnPjZqc9r+lCmrv/AwqpeKfZMkaQ==",
+      "dependencies": [
+        "@ag-ui/core",
+        "@opentelemetry/api",
+        "@standard-schema/spec",
+        "@tanstack/ai-event-client",
+        "@tanstack/ai-utils",
+        "partial-json"
+      ],
+      "optionalPeers": [
+        "@opentelemetry/api"
+      ]
+    },
     "@tanstack/db-ivm@0.1.18_typescript@6.0.3": {
       "integrity": "sha512-+pZJiRKdoKRM5Epq9T7otD9ZJl82pRFauo7LKuJGrarjVKQ7r+QQlPe3kGdN9LEKSnuNGIWjX9OOY4M8kH4eLw==",
       "dependencies": [
@@ -1589,6 +1644,10 @@
         "@tanstack/pacer-lite",
         "typescript"
       ]
+    },
+    "@tanstack/devtools-event-client@0.4.4": {
+      "integrity": "sha512-6T5Yop/793YI+H+5J8Hsyj4kCih9sl4t3ElLgKioW5hk3ocn+ZdSJ94tT7vL7uabxSugWYBZlOTMPzEw2puvQw==",
+      "bin": true
     },
     "@tanstack/pacer-lite@0.2.2": {
       "integrity": "sha512-eQ1MyLKCHyXiH7NbdmB80W77OhiMgGBUb+qDx/8WMGbwg5Lf/NlfD0TfNYAqY77i8V3AxoDoYdICrQE5ADw4Yw=="
@@ -2458,6 +2517,9 @@
     "ordered-binary@1.6.1": {
       "integrity": "sha512-QkCdPooczexPLiXIrbVOPYkR3VO3T6v2OyKRkR1Xbhpy7/LAVXwahnRCgRp78Oe/Ehf0C/HATAxfSr6eA1oX+w=="
     },
+    "partial-json@0.1.7": {
+      "integrity": "sha512-Njv/59hHaokb/hRUjce3Hdv12wd60MtM9Z5Olmn+nehe0QDAsRtRbJPvJ0Z91TusF0SuZRIvnM+S4l6EIP8leA=="
+    },
     "path-scurry@2.0.2": {
       "integrity": "sha512-3O/iVVsJAPsOnpwWIeD+d6z/7PmqApyQePUtCndjatj/9I5LylHvt5qluFaBT3I5h3r1ejfR056c+FCv+NnNXg==",
       "dependencies": [
@@ -3085,6 +3147,9 @@
           "jsr:@std/text@1",
           "jsr:@zod/zod@4.4.3",
           "npm:@durable-streams/state@~0.3.1",
+          "npm:@durable-streams/tanstack-ai-transport@^0.0.8",
+          "npm:@tanstack/ai-preact@~0.10.1",
+          "npm:@tanstack/ai@0.39",
           "npm:preact-render-to-string@^6.7.0",
           "npm:preact@^10.29.2"
         ],
