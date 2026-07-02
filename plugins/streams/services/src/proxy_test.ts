@@ -25,7 +25,9 @@ function assert(cond: boolean, msg: string): void {
 }
 function assertEquals<T>(actual: T, expected: T, msg: string): void {
   if (actual !== expected) {
-    throw new Error(`Assertion failed (${msg}): expected ${String(expected)}, got ${String(actual)}`);
+    throw new Error(
+      `Assertion failed (${msg}): expected ${String(expected)}, got ${String(actual)}`,
+    );
   }
 }
 
@@ -101,7 +103,10 @@ Deno.test('streams live-read race: first live poll of a not-yet-created stream s
     // stays open and delivers the producer's first write.
     assert(res.status !== 404, `live poll must not 404 (got ${res.status})`);
     assertEquals(res.status, 200, 'delivered read is a normal 200');
-    assert(body.includes(expected), `delivered body must contain the produced event (body=${body})`);
+    assert(
+      body.includes(expected),
+      `delivered body must contain the produced event (body=${body})`,
+    );
   } finally {
     await running.stop();
     await upstreamServer.shutdown();
@@ -124,7 +129,11 @@ Deno.test('streams live-read race: live poll of a stream that never appears retu
     assert(res.status !== 404, `missing-stream live poll must not 404 (got ${res.status})`);
     assertEquals(res.status, 204, 'empty live poll is 204 No Content');
     assertEquals(res.headers.get('Stream-Up-To-Date'), 'true', 'response signals up-to-date');
-    assertEquals(res.headers.get('Stream-Next-Offset'), '-1', 'resume offset echoes the request start offset');
+    assertEquals(
+      res.headers.get('Stream-Next-Offset'),
+      '-1',
+      'resume offset echoes the request start offset',
+    );
   } finally {
     await running.stop();
     await upstreamServer.shutdown();
