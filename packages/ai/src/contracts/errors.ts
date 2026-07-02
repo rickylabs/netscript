@@ -79,6 +79,40 @@ export class ToolNotFoundError extends AiError {
 }
 
 /**
+ * A single validation problem reported while checking tool input against its
+ * Standard Schema. Mirrors a Standard Schema issue reduced to a plain path.
+ */
+export interface ToolInputIssue {
+  /** Human-readable validation message. */
+  readonly message: string;
+  /** Property path to the offending value, when the schema reports one. */
+  readonly path?: readonly PropertyKey[];
+}
+
+/**
+ * Raised when a tool's raw input fails Standard Schema validation, before the
+ * tool handler runs. Carries every reported {@linkcode ToolInputIssue}.
+ */
+export class ToolInputValidationError extends AiError {
+  /** Name of the tool whose input failed validation. */
+  readonly toolName: string;
+  /** The validation issues reported by the tool's Standard Schema. */
+  readonly issues: readonly ToolInputIssue[];
+
+  /** Construct the error for `toolName` from its reported `issues`. */
+  constructor(toolName: string, issues: readonly ToolInputIssue[]) {
+    super(
+      `Input for tool "${toolName}" failed validation: ${
+        issues.map((issue) => issue.message).join('; ')
+      }`,
+    );
+    this.name = 'ToolInputValidationError';
+    this.toolName = toolName;
+    this.issues = issues;
+  }
+}
+
+/**
  * Raised when a model reference string cannot be parsed into a provider +
  * model pair.
  */
