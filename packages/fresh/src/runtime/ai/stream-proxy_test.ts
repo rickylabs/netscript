@@ -1,5 +1,5 @@
 import { assert, assertEquals } from '@std/assert';
-import { createChatStreamProxyHandler } from './stream-proxy.ts';
+import { createNetScriptChatStreamProxy } from './stream-proxy.ts';
 
 /** Enqueue `text` as a single chunk into a `ReadableStream<Uint8Array>`. */
 function streamOf(chunks: readonly string[]): ReadableStream<Uint8Array> {
@@ -41,16 +41,26 @@ Deno.test(
     });
 
     let upstreamAuth: string | null = null;
-    const handler = createChatStreamProxyHandler({
-      resolveUpstreamUrl: () => 'http://upstream.test/ai/chat/s1',
+    let upstreamUrl: string | undefined;
+    const handler = createNetScriptChatStreamProxy({
+      target: { sessionId: 's1', baseUrl: 'http://upstream.test' },
       auth: () => ({ Authorization: 'Bearer server-secret' }),
       fetch: (input) => {
-        upstreamAuth = (input as Request).headers.get('authorization');
+        const req = input as Request;
+        upstreamUrl = req.url;
+        upstreamAuth = req.headers.get('authorization');
         return Promise.resolve(upstreamResponse);
       },
     });
 
     const response = await handler(new Request('http://app.test/api/chat/s1', { method: 'POST' }));
+
+    // Target resolved to the durable `/ai/chat/{sessionId}` addressing.
+    assert(upstreamUrl !== undefined);
+    assert(
+      upstreamUrl!.startsWith('http://upstream.test/') && upstreamUrl!.endsWith('/ai/chat/s1'),
+      `unexpected upstream URL: ${upstreamUrl}`,
+    );
 
     // Corrupting headers stripped; benign headers preserved.
     assertEquals(response.headers.get('content-encoding'), null);
@@ -76,8 +86,11 @@ Deno.test('propagates the client AbortSignal into the upstream fetch (F-13 cance
   let upstreamSignal: AbortSignal | undefined;
   let streamCancelled = false;
 
-  const handler = createChatStreamProxyHandler({
-    resolveUpstreamUrl: () => 'http://upstream.test/ai/chat/s1',
+  const handler = createNetScriptChatStreamProxy({
+    target: (req) => ({
+      sessionId: new URL(req.url).pathname.split('/').pop()!,
+      baseUrl: 'http://upstream.test',
+    }),
     auth: () => ({}),
     fetch: (input) => {
       const req = input as Request;

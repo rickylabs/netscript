@@ -2,7 +2,7 @@
  * FA2 — the single, correct durable **chat stream proxy** for NetScript Fresh
  * routes.
  *
- * `createChatStreamProxyHandler` replaces the per-route, hand-rolled chat
+ * `createNetScriptChatStreamProxy` replaces the per-route, hand-rolled chat
  * proxies that each re-forwarded the durable-streams response verbatim. Those
  * hand-rolled proxies re-emitted the upstream `content-encoding`/`content-length`
  * headers on a body that Deno's `fetch` had already transparently decoded and
@@ -37,7 +37,8 @@
  * @module
  */
 
-import { getStreamsAuth } from '@netscript/plugin-streams-core';
+import { buildStreamUrl, getStreamsAuth, getStreamsUrl } from '@netscript/plugin-streams-core';
+import type { NetScriptChatSessionTarget } from './mod.ts';
 
 /**
  * Response headers stripped before a proxied durable-stream response is returned
@@ -62,6 +63,23 @@ const STRIPPED_RESPONSE_HEADERS: readonly string[] = [
   'upgrade',
 ];
 
+/** Durable-stream subpath under which one stream is addressed per chat session. */
+const NETSCRIPT_CHAT_STREAM_SUBPATH = '/ai/chat';
+
+/**
+ * Resolve the absolute upstream durable-stream URL for a chat session target,
+ * using the `/ai/chat/{sessionId}` addressing convention.
+ *
+ * Converges with FA1's `resolveChatSessionUrl` at merge (#250).
+ */
+function resolveChatSessionUrl(target: NetScriptChatSessionTarget): string {
+  const baseUrl = target.baseUrl ?? getStreamsUrl();
+  return buildStreamUrl(
+    `${NETSCRIPT_CHAT_STREAM_SUBPATH}/${encodeURIComponent(target.sessionId)}`,
+    baseUrl,
+  );
+}
+
 /**
  * Re-wrap an upstream durable-stream response so its headers describe the bytes
  * on the wire. The body `ReadableStream` is passed through unbuffered; only the
@@ -85,18 +103,16 @@ function sanitizeUpstreamResponse(upstream: Response): Response {
  * directly as a `Handler`/`Handlers` entry (`{ POST: handler }`) or called with
  * a `Request` in tests.
  */
-export type ChatStreamProxyHandler = (
+export type NetScriptChatStreamProxyHandler = (
   input: Request | { readonly req: Request },
 ) => Promise<Response>;
 
-/** Options for {@link createChatStreamProxyHandler}. */
-export interface ChatStreamProxyHandlerOptions {
-  /**
-   * Resolve the absolute upstream durable-stream URL to proxy the request to.
-   * Receives the incoming `Request` so it can derive the session endpoint from
-   * the route (e.g. a `sessionId` path segment or query param).
-   */
-  readonly resolveUpstreamUrl: (request: Request) => string | URL;
+/** Options for {@link createNetScriptChatStreamProxy}. */
+export interface NetScriptChatStreamProxyOptions {
+  /** The chat session to proxy, or a resolver deriving it from the request. */
+  readonly target:
+    | NetScriptChatSessionTarget
+    | ((request: Request) => NetScriptChatSessionTarget);
   /**
    * Server-side auth header provider. Defaults to `getStreamsAuth` from
    * `@netscript/plugin-streams-core`. Invoked per request; the result is
@@ -118,47 +134,53 @@ function toRequest(input: Request | { readonly req: Request }): Request {
 /**
  * Build the single durable chat-stream proxy handler.
  *
- * The returned handler proxies the incoming request to the resolved upstream
- * durable-stream URL, attaches server-side streams auth, passes the upstream
- * body through unbuffered, strips headers that would misdescribe the re-framed
- * bytes (fencing netscript#239), and propagates the client `AbortSignal` so a
- * disconnect tears the upstream fetch down (F-13).
+ * The returned handler resolves the chat session target (static or per-request),
+ * proxies the incoming request to that session's durable-stream URL, attaches
+ * server-side streams auth, passes the upstream body through unbuffered, strips
+ * headers that would misdescribe the re-framed bytes (fencing netscript#239),
+ * and propagates the client `AbortSignal` so a disconnect tears the upstream
+ * fetch down (F-13).
  *
- * @param options Upstream URL resolver plus optional `auth`/`fetch` overrides.
+ * @param options Chat session `target` plus optional `auth`/`fetch` overrides.
  * @returns A Fresh `Handler`/`Handlers`-compatible chat-stream proxy function.
  *
  * @example
  * ```ts
  * // routes/api/chat/[sessionId].ts
- * import { createChatStreamProxyHandler } from '@netscript/fresh/ai';
- * import { buildStreamUrl } from '@netscript/plugin-streams-core';
+ * import { createNetScriptChatStreamProxy } from '@netscript/fresh/ai';
  *
- * const proxy = createChatStreamProxyHandler({
- *   resolveUpstreamUrl: (req) => {
- *     const sessionId = new URL(req.url).pathname.split('/').pop()!;
- *     return buildStreamUrl(`/ai/chat/${sessionId}`);
- *   },
+ * const proxy = createNetScriptChatStreamProxy({
+ *   target: (req) => ({
+ *     sessionId: new URL(req.url).pathname.split('/').pop()!,
+ *   }),
  * });
  *
  * export const handler = { POST: proxy, GET: proxy };
  * ```
  */
-export function createChatStreamProxyHandler(
-  options: ChatStreamProxyHandlerOptions,
-): ChatStreamProxyHandler {
+export function createNetScriptChatStreamProxy(
+  options: NetScriptChatStreamProxyOptions,
+): NetScriptChatStreamProxyHandler {
   const resolveAuth = options.auth ?? getStreamsAuth;
   const doFetch = options.fetch ?? fetch;
 
   return async (input: Request | { readonly req: Request }): Promise<Response> => {
     const request = toRequest(input);
-    const upstreamUrl = options.resolveUpstreamUrl(request);
+    const target = typeof options.target === 'function' ? options.target(request) : options.target;
+    const upstreamUrl = resolveChatSessionUrl(target);
 
-    // Forward the client request headers, then overlay the server-side streams
-    // auth. `host` is dropped so the inner fetch sets it for the upstream. The
-    // auth header lives only on this server→streams hop; it is never surfaced to
-    // the browser (the sanitized response below carries no request auth).
+    // Forward the client request headers, then overlay the target's session
+    // headers (if any) and the server-side streams auth. `host` is dropped so
+    // the inner fetch sets it for the upstream. The auth header lives only on
+    // this server→streams hop; it is never surfaced to the browser (the
+    // sanitized response below carries no request auth).
     const upstreamHeaders = new Headers(request.headers);
     upstreamHeaders.delete('host');
+    if (target.headers) {
+      for (const [name, value] of Object.entries(target.headers)) {
+        upstreamHeaders.set(name, value);
+      }
+    }
     for (const [name, value] of Object.entries(resolveAuth())) {
       upstreamHeaders.set(name, value);
     }

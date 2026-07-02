@@ -62,7 +62,7 @@
  *   task-list registration. NO handler bodies.
  * - **FA1**: `createNetScriptChatConnection`, `toNetScriptChatResponse`,
  *   `resolveChatSnapshot` (owns the one-projection reducer).
- * - **FA2**: `createChatStreamProxyHandler` (the durable chat stream proxy
+ * - **FA2**: `createNetScriptChatStreamProxy` (the durable chat stream proxy
  *   handler; implemented in `./stream-proxy.ts`, fences netscript#239).
  * - **FA3**: `createNetScriptMcpSandbox` (the MCP tool sandbox).
  *
@@ -238,9 +238,9 @@ export function resolveChatSnapshot(
 // ---------------------------------------------------------------------------
 
 export {
-  type ChatStreamProxyHandler,
-  type ChatStreamProxyHandlerOptions,
-  createChatStreamProxyHandler,
+  createNetScriptChatStreamProxy,
+  type NetScriptChatStreamProxyHandler,
+  type NetScriptChatStreamProxyOptions,
 } from './stream-proxy.ts';
 
 // ---------------------------------------------------------------------------
