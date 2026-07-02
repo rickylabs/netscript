@@ -24,6 +24,28 @@ consume as package runtime dependencies. Two sub-path exports carry the runtime 
 | --- | --- | --- |
 | `cn` | `function cn(...inputs: ClassValue[]): string` | Combines clsx and tailwind-merge for optimal class merging. |
 
+## Icon primitive
+
+`Icon` is a first-class stroke-SVG icon primitive, re-exported at the package root alongside its
+supporting types from `@netscript/fresh-ui/primitives`.
+
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `Icon` | component | Renders a named stroke-SVG icon (`IconName`) at a given `IconSize`, forwarding standard SVG attributes. |
+| `ICON_PATHS` | const | The stroke-path lookup table backing every `IconName`. |
+| `IconName` / `IconSize` / `IconProps` / `IconSvgAttributes` / `IconSvgAttributeValue` | type aliases / interface | Supporting types for the `Icon` primitive. |
+
+## DataGrid
+
+`DataGrid` is a generic, templated data-grid component exported from the package root — the
+successor to the earlier `DataTable` registry component.
+
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `DataGrid` | component | Generic templated data grid; renders `DataGridColumn` definitions over `DataGridRow` data. |
+| `DATA_GRID_CELL_VARIANTS` | const | Supported cell rendering variants for `DataGridColumn`. |
+| `DataGridColumn` / `DataGridProps` / `DataGridRow` / `DataGridNode` / `DataGridRenderable` / `DataGridCellVariant` | types | Supporting types for `DataGrid`. |
+
 ## Redirect-flash (toast) helpers
 
 | Symbol | Signature | Description |
@@ -89,7 +111,7 @@ The following entrypoints are published alongside the root export.
 
 | Export | Entrypoint | Purpose |
 | --- | --- | --- |
-| `@netscript/fresh-ui` | `./mod.ts` | Stable runtime helpers (`cn`, redirect-flash toast helpers — documented above). |
+| `@netscript/fresh-ui` | `./mod.ts` | Stable runtime helpers (`cn`, redirect-flash toast helpers, the `Icon` primitive, and `DataGrid` — documented above). |
 | `@netscript/fresh-ui/interactive` | `./interactive.ts` | Package-owned interactive namespaces (documented above). |
 | `@netscript/fresh-ui/primitives` | `./primitives.tsx` | L0 platform-contract primitives (documented above). |
 

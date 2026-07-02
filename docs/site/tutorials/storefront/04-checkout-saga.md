@@ -53,7 +53,7 @@ Sagas ship as an official NetScript plugin. Add it from the project root, with i
 included so you have a working module to adapt:
 
 ```sh
-deno run -A packages/cli/bin/netscript-dev.ts plugin install saga --name sagas --samples
+netscript plugin install saga --name sagas --samples
 ```
 
 The plugin lands at the canonical location **`plugins/sagas/`**, and `netscript.config.ts` is updated
@@ -298,7 +298,7 @@ A completed checkout shows an instance at `status: 'completed'` carrying its `tr
 failed payment shows one at `status: 'cancelled'` carrying the `cancelReason` your compensation
 branch stamped.
 
-- [ ] `deno run -A packages/cli/bin/netscript-dev.ts plugin install saga --name sagas --samples` landed `plugins/sagas/`.
+- [ ] `netscript plugin install saga --name sagas --samples` landed `plugins/sagas/`.
 - [ ] `checkout-saga.ts` defines state, a correlation key, the forward handlers, and a
       `PaymentFailed` compensation branch.
 - [ ] `workers/jobs/process-payment.ts` publishes `PaymentCompleted` / `PaymentFailed` back to the
@@ -312,7 +312,7 @@ The durability tier persists instance state so a workflow survives a restart, bu
 
 ## What you built
 
-- The `sagas` plugin at `plugins/sagas/`, added with the local `netscript-dev plugin install saga --name sagas --samples` contributor command.
+- The `sagas` plugin at `plugins/sagas/`, added with `netscript plugin install saga --name sagas --samples`.
 - A `CheckoutSaga` built with `defineSaga().state().correlate().on().build()` — a durable state
   machine that walks order → payment → inventory → shipment, with a `PaymentFailed` **compensation
   branch** that cancels the order.

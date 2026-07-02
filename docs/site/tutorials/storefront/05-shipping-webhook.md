@@ -54,10 +54,10 @@ You should see `sagas` (and its `streams` dependency) from the previous chapter.
 From the project root, add the official triggers plugin with its sample modules:
 
 ```sh
-deno run -A packages/cli/bin/netscript-dev.ts plugin install trigger --name triggers --samples
+netscript plugin install trigger --name triggers --samples
 ```
 
-This local-source contributor command lands a new workspace at `plugins/triggers/` and registers it in `netscript.config.ts`
+This command lands a new workspace at `plugins/triggers/` and registers it in `netscript.config.ts`
 (`./plugins/triggers/mod.ts`) and `appsettings.json`. The `--samples` flag also drops in working
 webhook modules and a small `jobs/` folder you can study. Confirm it registered:
 
@@ -230,7 +230,7 @@ You should see the inbound event listed by the triggers events endpoint and a fr
 `process-shipping-update` in the workers executions list. One verified webhook hit, handed off to a
 durable job.
 
-- [ ] `deno run -A packages/cli/bin/netscript-dev.ts plugin install trigger --name triggers --samples` landed `plugins/triggers/`.
+- [ ] `netscript plugin install trigger --name triggers --samples` landed `plugins/triggers/`.
 - [ ] `shipping-status-webhook.ts` uses `verifier: 'hmac-sha256'` with a `secretEnv`.
 - [ ] `WEBHOOK_SHIPPING_SECRET` is set in the environment running the triggers service.
 - [ ] `curl http://localhost:8093/health` answers.

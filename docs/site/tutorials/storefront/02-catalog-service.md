@@ -57,7 +57,7 @@ curl http://localhost:3001/health
 A healthy JSON response means the scaffolded `products` service is up on port **3001** and ready to
 turn into a real catalog.
 
-{{ comp callout { type: "important", title: "db commands need aspire startning first" } }}
+{{ comp callout { type: "important", title: "db commands need aspire starting first" } }}
 <code>netscript db init / generate / seed</code> reach the Postgres container <em>through</em> the running AppHost. If <code>aspire start</code> is not up, there is no database to migrate and these commands fail fast. Bring Aspire up first — always.
 {{ /comp }}
 
@@ -67,71 +67,66 @@ Contracts are the typed seam between your service and every client. They live in
 versioned under `versions/v1/`, and are built from [`@orpc/contract`](/explanation/contracts/) routes
 plus [Zod](https://zod.dev) schemas. The key move for a database-backed service is that you do not
 hand-write the entity schema — it is **generated from your Prisma model** and re-exported from a
-`@database/zod` module, so the contract and the table can never drift.
+`@database/zod` module, so the contract and the table can never drift. And you do not hand-roll the
+CRUD routes either: `createCrudContract` generates them from the schemas.
 
 Open `contracts/versions/v1/products.contract.ts` and define the catalog surface:
 
 ```ts
 // contracts/versions/v1/products.contract.ts
-import { z } from 'zod';
 import { implement } from '@orpc/server';
-import { baseContract } from '../../shared.ts';
-import {
-  IdQuerySchema,
-  nonNegativeInt,
-  OffsetPaginationQuerySchema,
-  paginationLimit,
-  paginationOffset,
-  positiveInt,
-} from '@shared/utils';
-import {
-  ProductCategorySchema,
-  ProductSchema,
-  ProductUncheckedCreateInputObjectZodSchema,
-  ProductUncheckedUpdateInputObjectZodSchema,
-} from '@database/zod';
+import { baseContract } from '@netscript/contracts';
+import { createCrudContract } from '@netscript/contracts/crud';
+import { z } from 'zod';
+import { ProductCreateInput, ProductSchema, ProductUpdateInput } from '@database/zod';
 
-// The entity schema is GENERATED from Prisma — no hand-written shape to drift.
-export const ProductsSchemaV1 = ProductSchema;
+export const ProductsHealthSchemaV1 = z.object({
+  status: z.enum(['healthy', 'unhealthy', 'degraded']).describe('Service health status'),
+  service: z.string().describe('Service name'),
+  version: z.string().describe('Service version'),
+  timestamp: z.string().datetime().describe('ISO timestamp'),
+  uptime: z.number().int().nonnegative().optional().describe('Uptime in seconds'),
+});
 
-// Create/update inputs are derived from the same generated schemas.
-export const CreateProductsSchemaV1 = ProductUncheckedCreateInputObjectZodSchema.omit({ id: true });
-export const UpdateProductsSchemaV1 = ProductUncheckedUpdateInputObjectZodSchema
-  .pick({ id: true, name: true, description: true, price: true, category: true, stock: true })
-  .extend({ id: positiveInt({ description: 'Product ID to update' }) });
+// The entity and input schemas are GENERATED from Prisma — no hand-written shape to drift.
+export const ProductsProductSchemaV1 = ProductSchema;
+export const ProductsProductCreateInputSchemaV1 = ProductCreateInput;
+export const ProductsProductUpdateInputSchemaV1 = ProductUpdateInput;
 
-// Routes declare method + typed input + typed output. No handler body here.
-export const productsContract = {
-  list: baseContract
-    .route({ method: 'GET' })
-    .input(OffsetPaginationQuerySchema.extend({ category: ProductCategorySchema.optional() }))
-    .output(z.object({
-      items: z.array(ProductsSchemaV1),
-      total: nonNegativeInt({ description: 'Total count' }),
-      limit: paginationLimit({ description: 'Results per page' }),
-      offset: paginationOffset({ description: 'Current offset' }),
-      hasMore: z.boolean(),
-    })),
-  getById: baseContract.route({ method: 'GET' }).input(IdQuerySchema).output(ProductsSchemaV1),
-  create: baseContract.route({ method: 'POST' }).input(CreateProductsSchemaV1).output(ProductsSchemaV1),
-  update: baseContract.route({ method: 'PUT' }).input(UpdateProductsSchemaV1).output(ProductsSchemaV1),
+// createCrudContract builds list/getById/create/update/delete routes on baseContract.
+export const ProductsCrudContractV1 = createCrudContract({
+  resource: 'products',
+  entitySchema: ProductsProductSchemaV1,
+  createSchema: ProductsProductCreateInputSchemaV1,
+  updateSchema: ProductsProductUpdateInputSchemaV1,
+});
+
+export const ProductsContract = {
+  health: {
+    check: baseContract
+      .route({ method: 'GET', path: '/products/health' })
+      .output(ProductsHealthSchemaV1),
+  },
+  ...ProductsCrudContractV1,
 };
 
 // implement() turns the contract into a `.handler()`-bindable object.
-export const productsContractV1 = implement(productsContract);
+export const ProductsContractV1 = implement(ProductsContract);
 ```
 
 Three ideas carry the whole pattern:
 
-1. **Schemas come from Prisma.** `ProductSchema` and the `Product*InputObjectZodSchema` shapes are
+1. **Schemas come from Prisma.** `ProductSchema`, `ProductCreateInput`, and `ProductUpdateInput` are
    generated into `@database/zod` from your `schema.prisma`. They double as runtime validation and as
    the TypeScript types that flow everywhere else — change a column, regenerate, and every consumer
    re-type-checks.
-2. **`baseContract` gives you typed errors for free.** It is defined once as `os.errors({ ... })` and
-   carries `NOT_FOUND`, `VALIDATION_ERROR`, `UNAUTHORIZED`, `FORBIDDEN`, `RATE_LIMITED`, and
-   `SERVICE_UNAVAILABLE`. Every route built from it can `throw` those typed errors and the client sees
-   them, typed.
-3. **`implement(productsContract)`** produces `productsContractV1`, whose `.handler(...)` is now bound
+2. **`createCrudContract` generates the standard five.** Given `resource`, `entitySchema`,
+   `createSchema`, and `updateSchema`, it builds `list` (`GET /products`), `getById`
+   (`GET /products/{id}`), `create` (`POST /products`), `update` (`PATCH /products/{id}`), and
+   `delete` (`DELETE /products/{id}`) — every route built on `baseContract`, imported from
+   `@netscript/contracts`, so each one inherits typed `NOT_FOUND`, `VALIDATION_ERROR`,
+   `UNAUTHORIZED`, `FORBIDDEN`, `RATE_LIMITED`, and `SERVICE_UNAVAILABLE` errors for free.
+3. **`implement(ProductsContract)`** produces `ProductsContractV1`, whose `.handler(...)` is now bound
    to the schemas above. Return the wrong shape and `deno task check` fails.
 
 {{ comp callout { type: "tip", title: "Why a separate contracts/ workspace?" } }}
@@ -142,33 +137,43 @@ Because your service <em>and</em> your Fresh app both import from the same <code
 
 A contract describes the shape; a handler supplies the behavior. Database-backed handlers need a
 Prisma client, and NetScript injects it through a **typed context**: `v1.products.$context<{ db }>()`
-declares the context shape, then each `router.<proc>.handler(...)` receives it as `context`.
+declares the context shape, then each `router.<proc>.handler(...)` receives it as `context`. Every
+handler also receives the `errors` object generated from `baseContract` (imported from
+`@netscript/contracts`), so a missing row raises the contract's own typed `NOT_FOUND` — there is no
+hand-rolled not-found helper to import.
 
 Open `services/products/src/routers/v1.ts` and bind the handlers:
 
 ```ts
 // services/products/src/routers/v1.ts
 import { v1 } from '@my-shop/contracts';
-import { notFound } from '@shared/utils';
 import type { DB } from '@database';
 
 // Declare the context the handlers need: a Prisma client.
 const router = v1.products.$context<{ db: DB['client'] }>();
 
 export const productsV1 = {
+  health: {
+    check: router.health.check.handler(() => ({
+      status: 'healthy',
+      service: 'products',
+      version: '1.0.0',
+      timestamp: new Date().toISOString(),
+    })),
+  },
+
   list: router.list.handler(async ({ input, context }) => {
     const { db } = context;
-    const where = input.category ? { category: input.category } : {};
     const [total, items] = await Promise.all([
-      db.product.count({ where }),
-      db.product.findMany({ where, skip: input.offset, take: input.limit }),
+      db.product.count(),
+      db.product.findMany({ skip: input.offset, take: input.limit }),
     ]);
     return { items, total, limit: input.limit, offset: input.offset, hasMore: input.offset + input.limit < total };
   }),
 
-  getById: router.getById.handler(async ({ input, errors, path, context }) => {
+  getById: router.getById.handler(async ({ input, errors, context }) => {
     const item = await context.db.product.findUnique({ where: { id: input.id } });
-    if (!item) notFound({ errors, path, resourceId: input.id });
+    if (!item) throw errors.NOT_FOUND({ message: `Product ${input.id} not found` });
     return item;
   }),
 
@@ -176,10 +181,16 @@ export const productsV1 = {
     return await context.db.product.create({ data: input });
   }),
 
-  update: router.update.handler(async ({ input, errors, path, context }) => {
+  update: router.update.handler(async ({ input, errors, context }) => {
     const existing = await context.db.product.findUnique({ where: { id: input.id } });
-    if (!existing) notFound({ errors, path, resourceId: input.id });
-    return await context.db.product.update({ where: { id: input.id }, data: input });
+    if (!existing) throw errors.NOT_FOUND({ message: `Product ${input.id} not found` });
+    return await context.db.product.update({ where: { id: input.id }, data: input.data });
+  }),
+
+  delete: router.delete.handler(async ({ input, errors, context }) => {
+    const existing = await context.db.product.findUnique({ where: { id: input.id } });
+    if (!existing) throw errors.NOT_FOUND({ message: `Product ${input.id} not found` });
+    return await context.db.product.delete({ where: { id: input.id } });
   }),
 };
 ```
@@ -187,21 +198,23 @@ export const productsV1 = {
 What is type-locked here, for free:
 
 - `input` is already parsed and typed to the contract's input schema — you never re-validate it.
+  For `update`, `createCrudContract` shapes the input as `{ id, data }`, so the handler reads
+  `input.id` and passes `input.data` straight through to Prisma.
 - `context.db` is the Prisma client you injected; `db.product.*` is the generated table API.
-- `notFound({ errors, path, resourceId })` raises the typed `NOT_FOUND` error from `baseContract` —
-  the client receives a 404 with a typed body, not a generic throw.
+- `errors.NOT_FOUND(...)` raises the typed `NOT_FOUND` error every `createCrudContract` route
+  inherits from `baseContract` — the client receives a 404 with a typed body, not a generic throw.
 - Each handler's return value must satisfy the contract's output schema. Drop a field and
   `deno task check` rejects it.
 
-Now aggregate the handlers into the service router. The router namespaces by version so the service
-can host `v1`, `v2`, and so on side by side:
+Now aggregate the handlers into the service router. `productsV1` already carries its own
+`health.check` procedure (defined above, on the `/products/health` route from Step 1), so the router
+nests it under the `products` namespace rather than exposing a second, unrelated top-level `health`:
 
 ```ts
 // services/products/src/router.ts
-import { health } from './routers/health.ts';
 import { productsV1 } from './routers/v1.ts';
 
-export const v1 = { health, products: productsV1 };
+export const v1 = { products: productsV1 };
 export const router = { v1 };
 export type Router = typeof router;
 ```
@@ -280,10 +293,12 @@ NetScript mounts the typed oRPC surface under <code>/api/rpc/*</code>; the <code
 
 ## What you built
 
-- A versioned **oRPC contract** whose entity and input schemas are **generated from Prisma** via
-  `@database/zod`, with typed errors inherited from `baseContract`.
+- A versioned **oRPC contract** built by `createCrudContract` from entity and input schemas
+  **generated from Prisma** via `@database/zod` — `list`/`getById`/`create`/`update`/`delete`, with
+  typed errors inherited from `baseContract` (imported from `@netscript/contracts`).
 - Handlers bound with `v1.products.$context<{ db }>()` → `.handler(...)` that read and write Postgres
-  through the injected Prisma client, fully type-locked to the contract.
+  through the injected Prisma client, fully type-locked to the contract, and raise `errors.NOT_FOUND(...)`
+  for missing rows.
 - A running catalog served by `defineService(router, { name, version, port, db, openapi })` on port
   **3001**, with its OpenAPI projection confirmed by `curl` and `deno task check`.
 
