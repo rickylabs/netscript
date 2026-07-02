@@ -246,6 +246,13 @@ server's HTTP/SSE protocol, which Fresh clients read to materialize the latest v
 read side as an HTTP/SSE consumer of the <code>:4437</code> stream, not as an in-process callback.
 {{ /comp }}
 
+{{ comp callout { type: "warning", title: "Local HTTP can limit concurrent stream consumers" } }}
+The local AppHost serves the generated app over <code>http://</code>. Under HTTP/1.1, browsers
+typically allow about six concurrent connections per origin, so several long-lived HTTP/SSE streams
+from one Fresh page can starve later requests or stream subscriptions. Use HTTPS for HTTP/2 when a
+local dashboard needs many simultaneous stream consumers.
+{{ /comp }}
+
 {{ comp callout { type: "note", title: "Operator visibility is console.warn (alpha)" } }}
 The producer reports skips and connect failures through <code>console.warn</code> today — tracked as
 <strong>AP-13</strong> architecture debt until the telemetry-integration wave supplies a structured

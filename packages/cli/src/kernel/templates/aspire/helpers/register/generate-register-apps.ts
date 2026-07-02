@@ -79,6 +79,9 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
       lines.push(``);
       lines.push(`    // HTTP endpoint`);
       lines.push(`    await ${id}.withHttpEndpoint({ port: ${entry.Port}, env: 'PORT' });`);
+      if (type === 'app') {
+        lines.push(`    await ${id}.withBrowserLogs();`);
+      }
     }
 
     // --- Common: KV cache dependency ---
