@@ -66,7 +66,7 @@ function parsePlugins(raw: string | undefined): readonly PluginKind[] | undefine
 function parseDatabase(raw: string | undefined): RunOptions['database'] | undefined {
   if (raw === undefined) return undefined;
   if (isOneOf(DATABASE, raw)) return raw;
-  throw new Error('--db must be postgres or mysql.');
+  throw new Error('--db must be postgres, mysql, sqlite, or mssql.');
 }
 
 function isOneOf<const T extends Record<string, string>>(

@@ -92,4 +92,30 @@ describe('generateRegisterInfrastructure', () => {
     assert(!output.includes('sqlite_server.addDatabase('));
     assert(!output.includes('const sqlite_server'));
   });
+
+  it('registers SQL Server containers with explicit image and password policy env', () => {
+    const output = generateRegisterInfrastructure({
+      databases: {
+        mssql: {
+          Enabled: true,
+          Engine: 'Mssql',
+          Mode: 'Container',
+          DatabaseName: 'app-mssql-db',
+          Persistent: true,
+          ImageTag: '2022-latest',
+        },
+      },
+      caches: {},
+      primaryDatabase: 'mssql',
+    });
+
+    assertStringIncludes(output, "builder.addSqlServer('mssql')");
+    assertStringIncludes(output, ".withImage('mssql/server')");
+    assertStringIncludes(output, ".withImageTag('2022-latest')");
+    assertStringIncludes(output, ".withEnvironment('ACCEPT_EULA', 'Y')");
+    assertStringIncludes(output, ".withEnvironment('SA_PASSWORD', 'NetscriptE2e!Sql2026')");
+    assertStringIncludes(output, ".withEnvironment('MSSQL_SA_PASSWORD', 'NetscriptE2e!Sql2026')");
+    assertStringIncludes(output, "mssql_server.addDatabase('app-mssql-db')");
+    assertStringIncludes(output, "databases.set('mssql', mssql);");
+  });
 });

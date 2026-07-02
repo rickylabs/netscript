@@ -20,6 +20,10 @@ const DB_ENGINE_METHODS: Record<string, string> = {
   Mssql: 'addSqlServer',
 };
 
+const MSSQL_CONTAINER_IMAGE = 'mssql/server';
+const MSSQL_CONTAINER_TAG = '2022-latest';
+const MSSQL_SA_PASSWORD = 'NetscriptE2e!Sql2026';
+
 /** Default Redis-compatible cache container images. */
 const CACHE_CONTAINER_IMAGES: Record<string, { readonly image: string; readonly tag: string }> = {
   Redis: { image: 'docker.io/library/redis', tag: '7' },
@@ -78,6 +82,13 @@ export function generateRegisterInfrastructure(options: RegisterInfrastructureOp
       lines.push(
         `    .withDataBindMount(resolveDataPath(appHostDir, '${entry.DataPath}', '${name}'))`,
       );
+    }
+    if (entry.Engine === 'Mssql') {
+      lines.push(`    .withImage('${MSSQL_CONTAINER_IMAGE}')`);
+      lines.push(`    .withImageTag('${entry.ImageTag ?? MSSQL_CONTAINER_TAG}')`);
+      lines.push(`    .withEnvironment('ACCEPT_EULA', 'Y')`);
+      lines.push(`    .withEnvironment('SA_PASSWORD', '${MSSQL_SA_PASSWORD}')`);
+      lines.push(`    .withEnvironment('MSSQL_SA_PASSWORD', '${MSSQL_SA_PASSWORD}')`);
     }
 
     // Close the server chain with semicolon

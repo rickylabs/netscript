@@ -1,5 +1,5 @@
 import { assertEquals, assertThrows } from '@std/assert';
-import { REPORT_FORMAT } from '../../src/domain/extension-axes.ts';
+import { DATABASE, REPORT_FORMAT } from '../../src/domain/extension-axes.ts';
 import { mapRunOptions } from '../../src/presentation/cli/options/run-options.ts';
 
 Deno.test('mapRunOptions keeps defaults by omitting undefined values', () => {
@@ -11,5 +11,17 @@ Deno.test('mapRunOptions rejects unsupported plugin values', () => {
     () => mapRunOptions({ plugins: 'worker,unknown' }),
     Error,
     'Unsupported plugin kind',
+  );
+});
+
+Deno.test('mapRunOptions accepts mssql database axis', () => {
+  assertEquals(mapRunOptions({ db: DATABASE.MSSQL }), { database: DATABASE.MSSQL });
+});
+
+Deno.test('mapRunOptions reports all supported database axes', () => {
+  assertThrows(
+    () => mapRunOptions({ db: 'oracle' }),
+    Error,
+    '--db must be postgres, mysql, sqlite, or mssql.',
   );
 });

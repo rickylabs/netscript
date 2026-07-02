@@ -165,7 +165,6 @@ function buildDatabaseBlock(
           Mode: 'Container',
           DatabaseName: kebabDbName,
           Persistent: true,
-          DataPath: '.data/mssql',
         },
       };
     case 'sqlite':

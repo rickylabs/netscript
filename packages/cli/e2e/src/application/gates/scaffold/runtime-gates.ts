@@ -4,8 +4,16 @@ import {
   GATE,
   GATE_PHASE,
 } from '../../../domain/cli-surface.ts';
+import { DATABASE, type DatabaseEngine } from '../../../domain/extension-axes.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
 import { commandGate, httpGate } from './gate-factory.ts';
+
+const DATABASE_WAIT_TIMEOUT_SECONDS = {
+  [DATABASE.POSTGRES]: 120,
+  [DATABASE.MYSQL]: 180,
+  [DATABASE.SQLITE]: 120,
+  [DATABASE.MSSQL]: 600,
+} as const satisfies Record<DatabaseEngine, number>;
 
 function runtimeWaitGate(resource: AspireResource): GateDefinition {
   return commandGate(
@@ -22,6 +30,47 @@ function runtimeWaitGate(resource: AspireResource): GateDefinition {
       '--nologo',
     ],
   );
+}
+
+function databaseRuntimeWaitGate(): GateDefinition {
+  return commandGate(
+    GATE.RUNTIME_WAIT_DATABASE,
+    'Wait for active database',
+    GATE_PHASE.RUNTIME,
+    (context) => {
+      const resource = databaseAspireResource(context.request.options.database);
+      if (!resource) {
+        return ['deno', 'eval', 'console.info("No database Aspire resource for this engine.")'];
+      }
+      const timeoutSeconds = DATABASE_WAIT_TIMEOUT_SECONDS[context.request.options.database] ?? 120;
+      return [
+        'aspire',
+        'wait',
+        resource,
+        '--status',
+        'healthy',
+        '--timeout',
+        String(timeoutSeconds),
+        '--apphost',
+        context.project.appHost,
+        '--non-interactive',
+        '--nologo',
+      ];
+    },
+  );
+}
+
+function databaseAspireResource(database: DatabaseEngine): AspireResource | undefined {
+  switch (database) {
+    case DATABASE.POSTGRES:
+      return ASPIRE_RESOURCE.POSTGRES;
+    case DATABASE.MYSQL:
+      return ASPIRE_RESOURCE.MYSQL;
+    case DATABASE.MSSQL:
+      return ASPIRE_RESOURCE.MSSQL;
+    case DATABASE.SQLITE:
+      return undefined;
+  }
 }
 
 /** Create runtime and health-check gates for the generated application. */
@@ -65,7 +114,17 @@ export function createRuntimeGates(): readonly GateDefinition[] {
       'discard',
       'Aspire start ran with discarded output. Check the detached-child log under ~/.aspire/logs or rerun the command manually for full diagnostics.',
     ),
-    ...Object.values(ASPIRE_RESOURCE).map(runtimeWaitGate),
+    databaseRuntimeWaitGate(),
+    ...[
+      ASPIRE_RESOURCE.GARNET,
+      ASPIRE_RESOURCE.WORKERS_API,
+      ASPIRE_RESOURCE.WORKERS,
+      ASPIRE_RESOURCE.SAGAS_API,
+      ASPIRE_RESOURCE.SAGAS,
+      ASPIRE_RESOURCE.TRIGGERS_API,
+      ASPIRE_RESOURCE.TRIGGERS,
+      ASPIRE_RESOURCE.AUTH,
+    ].map(runtimeWaitGate),
     commandGate(
       GATE.RUNTIME_ASPIRE_DESCRIBE,
       'Describe generated topology',

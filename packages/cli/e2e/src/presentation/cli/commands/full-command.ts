@@ -14,7 +14,9 @@ export function createFullCommand(createRunner: CliRunnerFactory) {
     .option('--cli <path:string>', 'CLI entrypoint')
     .option('--smoke-root <path:string>', 'Generated project parent directory')
     .option('--name <name:string>', 'Generated project name')
-    .option('--db <engine:string>', 'Database engine: postgres or mysql', { default: 'postgres' })
+    .option('--db <engine:string>', 'Database engine: postgres, mysql, sqlite, or mssql', {
+      default: 'postgres',
+    })
     .option('--source <mode:string>', 'Package source: auto, starter, local, or jsr', {
       default: 'local',
     })

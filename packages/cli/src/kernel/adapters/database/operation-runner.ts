@@ -27,7 +27,7 @@ import {
 } from './operation-runner-helpers.ts';
 
 const DEFAULT_POLL_INTERVAL_MS = 1_000;
-const DEFAULT_TIMEOUT_MS = 5 * 60_000;
+const DEFAULT_TIMEOUT_MS = 15 * 60_000;
 
 interface DbOperationRunnerOptions {
   readonly executor?: AspireCommandExecutor;
