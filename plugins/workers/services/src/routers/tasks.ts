@@ -3,7 +3,7 @@ import {
   type ExecutionRecord,
   type TaskMessage,
 } from '@netscript/plugin-workers-core/runtime';
-import { notFound } from '@netscript/contracts';
+import { notFound, validationFailed } from '@netscript/contracts';
 import { getTaskQueue, getWorkersRuntime, router, type WorkersHandlers } from './router-context.ts';
 
 export const taskHandlers: WorkersHandlers<
@@ -43,15 +43,28 @@ export const taskHandlers: WorkersHandlers<
   }),
 
   triggerTask: router.triggerTask.handler(async ({ input, errors, path, context }) => {
+    // The `{id}` path segment is the single source of truth for the target task.
+    // oRPC merges the OpenAPI path param into `input.id`; the RPC transport carries
+    // it in the body. If neither resolves an id, fail loudly with a validation
+    // error rather than persisting an `undefined` KV key.
+    const taskId = input.id;
+    if (!taskId) {
+      validationFailed({
+        errors,
+        message: 'Task id is required in the {id} path segment.',
+        fieldErrors: { id: ['Task id is required in the {id} path segment.'] },
+      });
+    }
+
     const { taskRegistry: registry } = getWorkersRuntime(context);
-    const task = await registry.get(input.id);
+    const task = await registry.get(taskId);
 
     if (!task) {
-      notFound({ errors, path, resourceId: input.id });
+      notFound({ errors, path, resourceId: taskId });
     }
 
     const taskMessage: TaskMessage = {
-      taskId: input.id,
+      taskId,
       topic: task.topic ?? DEFAULT_TOPIC,
       triggeredBy: 'api',
       triggeredAt: new Date().toISOString(),
@@ -67,7 +80,7 @@ export const taskHandlers: WorkersHandlers<
       priority: input.priority,
     });
 
-    return { taskId: input.id, triggered: true };
+    return { taskId, triggered: true };
   }),
 
   listTaskExecutions: router.listTaskExecutions.handler(async ({ input, context }) => {

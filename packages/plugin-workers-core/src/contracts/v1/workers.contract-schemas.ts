@@ -205,7 +205,7 @@ type JobTriggerInputShape =
     'delay' | 'payload' | 'priority' | 'traceparent' | 'tracestate'
   >
   & {
-    id: z.ZodString;
+    id: z.ZodOptional<z.ZodString>;
     correlationId: z.ZodOptional<z.ZodString>;
   };
 
@@ -217,7 +217,11 @@ const JobTriggerInputShape: JobTriggerInputShape = {
     traceparent: true,
     tracestate: true,
   }).shape,
-  id: z.string(),
+  // The `{id}` path segment is the single source of truth for the target job:
+  // oRPC merges the OpenAPI path param into `input.id`, so the body value is only
+  // an optional fallback for RPC transports. The handler fails loudly when no id
+  // resolves rather than persisting an `undefined` KV key.
+  id: z.string().optional().describe('Job id (resolved from the {id} path segment)'),
   correlationId: z.string().optional().describe('Correlation ID for tracing'),
 };
 
@@ -232,7 +236,11 @@ export const JobTriggerInputSchema: ContractSchema<JobTriggerInput> =
   JobTriggerInputZodSchema as unknown as ContractSchema<JobTriggerInput>;
 
 export const TaskTriggerInputZodSchema: z.ZodType<TaskTriggerInput> = z.object({
-  id: z.string(),
+  // The `{id}` path segment is the single source of truth for the target task:
+  // oRPC merges the OpenAPI path param into `input.id`, so the body value is only
+  // an optional fallback for RPC transports. The handler fails loudly when no id
+  // resolves rather than persisting an `undefined` KV key.
+  id: z.string().optional().describe('Task id (resolved from the {id} path segment)'),
   payload: z.record(z.string(), z.unknown()).optional().describe('Task payload'),
   priority: z.number().int().min(0).max(100).default(50).optional(),
   delay: z.number().int().nonnegative().optional().describe('Delay in ms'),
