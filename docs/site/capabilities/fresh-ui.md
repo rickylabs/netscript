@@ -194,7 +194,7 @@ You manage that library with two CLI commands (run from the workspace root):
   caption: "Fresh UI CLI commands",
   rows: [
     { name: "netscript ui:init", type: "install foundation", desc: "Installs the Fresh UI foundation set into an app workspace. The scaffold runs the equivalent for you; run it once when adding UI to an app that lacks it." },
-    { name: "netscript ui:add <name>", type: "add an item", desc: "Copies one registry item or a named collection into components/ui/, wires its CSS, and merges any required deno.json imports. Example: netscript ui:add data-grid." }
+    { name: "netscript ui:add <name>", type: "add an item", desc: "Copies one registry item or a named collection into components/ui/, wires its CSS, and merges any required deno.json imports. Example: netscript ui:add data-table." }
   ]
 }) }}
 
