@@ -98,7 +98,7 @@ service the back end implements.
     { name: "router.ts", type: "routing", desc: "Stable route entrypoint. Re-exports generated routePatterns + routes and builds typed appRoutes via createRouteReference." },
     { name: "routes/", type: "pages", desc: "File-system routes: index.tsx, dashboard.tsx, health.tsx, examples/service/, examples/telemetry/, the (design) system pages, plus _app.tsx / _layout.tsx shells." },
     { name: "islands/", type: "interactivity", desc: "Client-hydrated Preact islands (e.g. ThemeToggle, SidebarToggle, Toast under islands/ui/)." },
-    { name: "components/ui/", type: "design system", desc: "The copy-source component library you own (@netscript/fresh-ui): button, card, data-table, form-field, badge, and more (tsx + matching CSS in assets/ui/)." },
+    { name: "components/ui/", type: "design system", desc: "The copy-source component library you own (@netscript/fresh-ui): button, card, data-grid, form-field, badge, and more (tsx + matching CSS in assets/ui/)." },
     { name: "lib/", type: "service wiring", desc: "example-service.ts builds a typed oRPC client + query factories from your contract; cn.ts, public-types.ts." },
     { name: "assets/", type: "styling", desc: "design.css, tokens.css/json, theme-bridge.css, and per-component CSS — the Tailwind v4 + design-token layer." },
     { name: ".generated/", type: "generated", desc: "manifest.ts + routes.ts produced by the Fresh route generator; consume via router.ts, never directly." }
@@ -182,8 +182,8 @@ collection:
   caption: "What the registry ships",
   rows: [
     { name: "Interactive namespaces", type: "@netscript/fresh-ui/interactive", desc: "Stateful, accessible compound primitives: Accordion, Dialog, Drawer, Popover, Sheet, Tabs, Tooltip, and the headless Combobox seam (useCombobox) that powers the command palette and autocompletes." },
-    { name: "L0 primitives", type: "@netscript/fresh-ui/primitives", desc: "Small platform-contract helpers: Show (wrapper-free conditional render), VisuallyHidden, and its SrOnly alias." },
-    { name: "AI / workspace primitives", type: "ui:add", desc: "The agent-surface set: avatar, citation-chip, code-block, model-selector, tool-call-card, chart-block, donut, prompt-input, message (renderInline + TypingIndicator), and dropzone — plus the foundation set (button, card, badge, data-table, forms, feedback, dashboard blocks)." },
+    { name: "L0 primitives", type: "@netscript/fresh-ui/primitives", desc: "Small platform-contract helpers: Show (wrapper-free conditional render), VisuallyHidden and its SrOnly alias, and Icon — a first-class stroke-SVG icon primitive also re-exported from the package root." },
+    { name: "AI / workspace primitives", type: "ui:add", desc: "The agent-surface set: avatar, citation-chip, code-block, model-selector, tool-call-card, chart-block, donut, prompt-input (auto-grows to fit its content), message (renderInline + TypingIndicator), and dropzone (drag, clipboard-paste, and multi-file ingest) — plus the foundation set (button, card, badge, data-grid, forms, feedback, dashboard blocks)." },
     { name: "Command & search utilities", type: "ui:add", desc: "command-palette (.ns-cmdk — the ⌘K modal that wraps the Combobox) and search (.ns-search — a compact nav affordance with a ⌘K hint that opens it)." }
   ]
 }) }}
@@ -194,7 +194,7 @@ You manage that library with two CLI commands (run from the workspace root):
   caption: "Fresh UI CLI commands",
   rows: [
     { name: "netscript ui:init", type: "install foundation", desc: "Installs the Fresh UI foundation set into an app workspace. The scaffold runs the equivalent for you; run it once when adding UI to an app that lacks it." },
-    { name: "netscript ui:add <name>", type: "add an item", desc: "Copies one registry item or a named collection into components/ui/, wires its CSS, and merges any required deno.json imports. Example: netscript ui:add data-table." }
+    { name: "netscript ui:add <name>", type: "add an item", desc: "Copies one registry item or a named collection into components/ui/, wires its CSS, and merges any required deno.json imports. Example: netscript ui:add data-grid." }
   ]
 }) }}
 

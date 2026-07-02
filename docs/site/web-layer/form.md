@@ -46,7 +46,9 @@ initial values.
 
 The `Form` component renders a managed `<form>` element with the submission and CSRF hidden
 inputs already wired. It accepts a `state` (the resolved `FormState`-compatible value),
-the form `children`, and optional `formProps` overrides.
+the form `children`, and optional `formProps` overrides. `formProps` forwards `class` and
+standard `<form>` attributes (such as `action` and `method`) onto the rendered element, so you
+style and configure the managed form the same way you would a plain one.
 
 ```tsx
 import { Form, resolveFormState } from "@netscript/fresh/form";

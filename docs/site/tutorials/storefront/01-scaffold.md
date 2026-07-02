@@ -27,7 +27,7 @@ the Redis cache, and an example service all running together behind one dashboar
 By the end of this chapter you will have a real NetScript workspace named `my-shop/` on disk — with a
 shared `contracts/` workspace, a `products` service, a Fresh app, and a Postgres database — and you
 will have watched it boot under a single `aspire start`, with the Aspire dashboard live on
-`http://localhost:18888` and Postgres plus Redis reporting healthy.
+`https://localhost:18888` and Postgres plus Redis reporting healthy.
 
 ## Before you begin
 
@@ -112,6 +112,8 @@ Open `my-shop/` and you will find this shape:
     { name: "contracts/", comment: "Shared oRPC contracts, versioned under versions/v1/" },
     { name: "services/products/", comment: "The example oRPC service (src/main.ts, router.ts, routers/)" },
     { name: "plugins/", comment: "Plugin registry + manifests — empty until chapter 4" },
+    { name: "database/", comment: "Postgres workspace (Prisma schema + migrations) — initialized in chapter 2" },
+    { name: "tests/", comment: "Workspace-level test suite scaffolded alongside the project" },
     { name: "aspire/", children: [
       { name: "apphost.mts", comment: "Entry point for aspire start" },
       { name: "aspire.config.json", comment: "AppHost language + SDK pin" }
@@ -136,6 +138,11 @@ What each piece is for:
   backend, so you will not edit it.
 - **`plugins/`** — where background capabilities (workers, sagas, triggers, streams) register. Empty
   until you add the sagas plugin in [chapter 4](/tutorials/storefront/04-checkout-saga/).
+- **`database/`** — the Postgres-backed database workspace: the Prisma schema and migrations that back
+  `context.db` in your handlers. You initialize it in
+  [chapter 2](/tutorials/storefront/02-catalog-service/) with `netscript db init`.
+- **`tests/`** — the workspace-level test suite scaffolded alongside the project. Extend it as you add
+  handlers and contracts.
 - **`aspire/`** — the orchestrator. `aspire start` reads `apphost.mts` and starts every resource your
   app declares — Postgres, the Redis cache, your services — with one command.
 - **`appsettings.json`** — the infrastructure manifest Aspire reads: which services, databases, and
@@ -164,7 +171,7 @@ aspire start       # starts the AppHost and every declared resource
 together, then prints a URL and a one-time login token for the **Aspire dashboard**:
 
 ```
-http://localhost:18888
+https://localhost:18888
 ```
 
 The dashboard lists every resource (`postgres`, `redis`, your service), live console logs, and
@@ -194,8 +201,8 @@ deno task check
 A clean check, plus a healthy `curl`, means the scaffold is sound.
 
 - [ ] `netscript --help` lists the public command groups.
-- [ ] `my-shop/` exists with `contracts/`, `services/products/`, and `aspire/`.
-- [ ] `aspire start` is up; the dashboard at `http://localhost:18888` shows `postgres` and `redis`
+- [ ] `my-shop/` exists with `contracts/`, `services/products/`, `database/`, and `aspire/`.
+- [ ] `aspire start` is up; the dashboard at `https://localhost:18888` shows `postgres` and `redis`
       healthy.
 - [ ] `curl http://localhost:3001/health` returns healthy JSON.
 - [ ] `deno task check` passes with no errors.

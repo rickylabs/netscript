@@ -162,9 +162,13 @@ immediately and only refetches once `staleTime` elapses.
 ### Mutations, infinite queries, and live data
 
 - `useIslandMutation` runs a mutation through the shared client. Its options
-  (`IslandMutationOptions`) take a `mutationFn` plus optional `onSuccess` and
-  `onError` callbacks; the result exposes `mutate`, `mutateAsync`, `status`,
-  `isPending`, `data`, and `error`.
+  (`IslandMutationOptions`) take a `mutationFn` plus optional `onMutate`,
+  `onSuccess`, `onError`, and `onSettled` callbacks; the result exposes
+  `mutate`, `mutateAsync`, `status`, `isPending`, `data`, and `error`.
+  `onMutate` runs before the mutation fires and can return context (for
+  example, a snapshot of prior data) that `onSuccess`, `onError`, and
+  `onSettled` receive back — the seam for optimistic updates with rollback.
+  `onSettled` runs after either a success or an error.
 - `useIslandInfiniteQuery` loads paged data. Its options extend the query
   options with `initialPageParam` and `getNextPageParam`; the result adds
   `hasNextPage`, `isFetchingNextPage`, and `fetchNextPage()`.
