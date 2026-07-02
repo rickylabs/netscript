@@ -126,6 +126,29 @@ export interface ShutdownReport {
 }
 
 /**
+ * TLS material for a service listener.
+ *
+ * When supplied, the listener serves HTTPS and Deno automatically negotiates
+ * HTTP/2 with clients that support it over ALPN (HTTP/1.1 remains available as a
+ * fallback). The fields mirror `Deno.serve`'s `cert`/`key` PEM inputs.
+ *
+ * @example
+ * ```typescript
+ * const tls: ServiceTlsOptions = {
+ *   cert: await Deno.readTextFile('cert.pem'),
+ *   key: await Deno.readTextFile('key.pem'),
+ * };
+ * ```
+ */
+export interface ServiceTlsOptions {
+  /** PEM-encoded certificate chain. */
+  readonly cert: string;
+
+  /** PEM-encoded private key for the certificate. */
+  readonly key: string;
+}
+
+/**
  * Options for starting a service listener.
  *
  * @example
@@ -153,6 +176,14 @@ export interface ServeOptions {
 
   /** Install SIGINT/SIGTERM or SIGBREAK handlers. Defaults to `true`. */
   handleSignals?: boolean;
+
+  /**
+   * Opt-in TLS material. When present, the listener serves HTTPS and negotiates
+   * HTTP/2 via ALPN. When absent, the listener falls back to the
+   * `NETSCRIPT_TLS_CERT_FILE` / `NETSCRIPT_TLS_KEY_FILE` env pair (both must be
+   * set) before defaulting to plain HTTP/1.1.
+   */
+  tls?: ServiceTlsOptions;
 }
 
 /** Result returned by oRPC-compatible fetch handlers. */

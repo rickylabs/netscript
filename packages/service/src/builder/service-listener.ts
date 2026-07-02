@@ -24,6 +24,7 @@ import type {
   RunningServiceAddress,
   ServeOptions,
   ServiceApp,
+  ServiceTlsOptions,
   ShutdownHook,
   ShutdownReport,
 } from '../types.ts';
@@ -31,6 +32,41 @@ import { ServiceShutdownCoordinator } from './service-shutdown.ts';
 
 const POSIX_SHUTDOWN_SIGNALS = ['SIGINT', 'SIGTERM'] as const;
 const WINDOWS_SHUTDOWN_SIGNALS = ['SIGINT', 'SIGBREAK'] as const;
+
+/** Env var naming a PEM certificate file used when `ServeOptions.tls` is absent. */
+const TLS_CERT_FILE_ENV = 'NETSCRIPT_TLS_CERT_FILE';
+
+/** Env var naming a PEM private-key file used when `ServeOptions.tls` is absent. */
+const TLS_KEY_FILE_ENV = 'NETSCRIPT_TLS_KEY_FILE';
+
+/**
+ * Resolves TLS material from the passed serve options, else from the
+ * `NETSCRIPT_TLS_CERT_FILE` / `NETSCRIPT_TLS_KEY_FILE` env pair.
+ *
+ * The env fallback only activates when **both** variables are set, in which case
+ * the referenced PEM files are read synchronously (services already hold
+ * `--allow-read`/`--allow-env`). Returns `undefined` when no TLS is configured,
+ * preserving the plain HTTP/1.1 default.
+ *
+ * @param options - Serve options that may carry inline `tls` material.
+ * @returns Resolved cert/key PEM strings, or `undefined` for plain HTTP.
+ */
+export function resolveTlsConfig(options?: ServeOptions): ServiceTlsOptions | undefined {
+  if (options?.tls) {
+    return { cert: options.tls.cert, key: options.tls.key };
+  }
+
+  const certFile = Deno.env.get(TLS_CERT_FILE_ENV);
+  const keyFile = Deno.env.get(TLS_KEY_FILE_ENV);
+  if (certFile && keyFile) {
+    return {
+      cert: Deno.readTextFileSync(certFile),
+      key: Deno.readTextFileSync(keyFile),
+    };
+  }
+
+  return undefined;
+}
 
 type RegisteredSignal =
   | (typeof POSIX_SHUTDOWN_SIGNALS)[number]
@@ -54,6 +90,8 @@ export function startServiceListener(
 ): RunningService {
   const serviceLogger = createServiceLogger(serviceName);
   const port = options?.port ?? defaultPort;
+  const tls = resolveTlsConfig(options);
+  const scheme = tls ? 'https' : 'http';
   const controller = new AbortController();
   const registeredSignals: Array<{
     readonly signal: RegisteredSignal;
@@ -63,22 +101,19 @@ export function startServiceListener(
   let listenersRemoved = false;
   let shutdownLogged = false;
 
-  const server = Deno.serve(
-    {
-      port,
-      onListen: ({ hostname, port }) => {
-        const origin = `http://${hostname}:${port}`;
-        serviceLogger.info('Service listening', {
-          service: serviceName,
-          origin,
-          docs: `${origin}/api/docs`,
-          openapi: `${origin}/api/openapi.json`,
-          health: `${origin}/health`,
-        });
-      },
-    },
-    (request) => app.fetch(request),
-  );
+  const onListen = ({ hostname, port }: Deno.NetAddr): void => {
+    serviceLogger.info('Service listening', {
+      service: serviceName,
+      ...buildListenerBanner(scheme, { hostname, port }),
+    });
+  };
+  const handler = (request: Request): Response | Promise<Response> => app.fetch(request);
+
+  // Passing `cert`/`key` makes Deno serve HTTPS and auto-negotiate HTTP/2 via
+  // ALPN; the plain-TCP branch keeps the unchanged HTTP/1.1 default.
+  const server = tls
+    ? Deno.serve({ port, onListen, cert: tls.cert, key: tls.key }, handler)
+    : Deno.serve({ port, onListen }, handler);
 
   const removeListeners = (): void => {
     if (listenersRemoved) return;
@@ -159,6 +194,38 @@ export function startServiceListener(
     stop: async () => {
       await stopAndLog('manual');
     },
+  };
+}
+
+/** URL scheme used in the startup banner and endpoint links. */
+export type ListenerScheme = 'http' | 'https';
+
+/**
+ * Builds the startup-banner endpoint URLs for a listening address.
+ *
+ * The scheme is `https` whenever TLS is active (see {@link resolveTlsConfig}) and
+ * `http` otherwise, so the logged docs/openapi/health links always match the
+ * transport the listener actually speaks.
+ *
+ * @param scheme - `https` when the listener serves TLS, else `http`.
+ * @param addr - Listening hostname and port.
+ * @returns Origin plus the docs, openapi, and health endpoint URLs.
+ */
+export function buildListenerBanner(
+  scheme: ListenerScheme,
+  addr: Pick<Deno.NetAddr, 'hostname' | 'port'>,
+): {
+  readonly origin: string;
+  readonly docs: string;
+  readonly openapi: string;
+  readonly health: string;
+} {
+  const origin = `${scheme}://${addr.hostname}:${addr.port}`;
+  return {
+    origin,
+    docs: `${origin}/api/docs`,
+    openapi: `${origin}/api/openapi.json`,
+    health: `${origin}/health`,
   };
 }
 
