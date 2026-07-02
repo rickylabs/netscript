@@ -59,6 +59,79 @@ registerModelProvider('demo', () => ({
 const handle = await getModel('demo:some-model');
 ```
 
+## Providers
+
+Two first-party providers ship as **self-registering subpaths**. Each wraps a
+TanStack AI client and implements the E1 `ModelProviderPort`. Importing a subpath
+runs a one-time side effect that registers its factory into the shared registry —
+no explicit wiring — then re-exports the provider class and its id/config for
+direct construction.
+
+### `@netscript/ai/anthropic`
+
+Wraps [`@tanstack/ai-anthropic`](https://www.npmjs.com/package/@tanstack/ai-anthropic).
+The model catalog is taken verbatim from the wrapped package's `ANTHROPIC_MODELS`,
+so it stays in lockstep with upstream.
+
+```ts
+import '@netscript/ai/anthropic'; // side effect: registers 'anthropic'
+import { getModel, getModelProvider } from '@netscript/ai';
+
+// Resolve a model handle through the registry.
+const handle = await getModel('anthropic:claude-sonnet-4-5');
+
+// Or construct a configured provider (apiKey falls back to ANTHROPIC_API_KEY).
+const provider = getModelProvider('anthropic', { apiKey: Deno.env.get('ANTHROPIC_API_KEY') });
+const client = provider.createChatClient('claude-sonnet-4-5');
+```
+
+### `@netscript/ai/openai-compatible`
+
+Wraps [`@tanstack/ai-openai`](https://www.npmjs.com/package/@tanstack/ai-openai)'s
+OpenAI-compatible client, so any endpoint that speaks the OpenAI Chat Completions
+or Responses API (DeepSeek, Together, vLLM, a local gateway, …) works by pointing
+`baseURL` at it. With no `models` configured the provider is *optimistic* — the
+remote endpoint is the authority on its own catalog.
+
+```ts
+import '@netscript/ai/openai-compatible'; // side effect: registers 'openai-compatible'
+import { getModelProvider } from '@netscript/ai';
+
+const provider = getModelProvider('openai-compatible', {
+  baseURL: 'https://api.deepseek.com/v1',
+  apiKey: Deno.env.get('DEEPSEEK_KEY'),
+  models: ['deepseek-chat', 'deepseek-reasoner'], // optional
+  api: 'chat-completions', // or 'responses'
+});
+const client = provider.createChatClient('deepseek-chat');
+```
+
+### Stopping long-lived streams
+
+`createChatClient` returns the wrapped TanStack text adapter. In-flight
+chat/streams are cancelled by passing an `AbortController` to the TanStack
+`chat()` / `chatStream()` call — the documented stop path (F-13):
+
+```ts
+const abortController = new AbortController();
+setTimeout(() => abortController.abort(), 5_000);
+// chat({ adapter: client, messages, abortController });
+```
+
+### Bundle-isolation guarantee
+
+The base `@netscript/ai` entrypoint **never** imports a provider subpath, and the
+subpaths never import each other. The heavy provider SDKs are scoped to their own
+subpath's module graph, so:
+
+- `import '@netscript/ai'` pulls **zero** TanStack/provider dependencies.
+- `import '@netscript/ai/anthropic'` pulls **only** `@tanstack/ai-anthropic`.
+- `import '@netscript/ai/openai-compatible'` pulls **only** `@tanstack/ai-openai`.
+
+This is enforced by `tests/provider_isolation_test.ts`, which imports a single
+subpath in a fresh subprocess and asserts the registry contains **exactly** that
+one provider.
+
 ## Tool system (`@netscript/ai/tools`)
 
 Define server-executable tools, validate their input with **Standard Schema**, and register/dispatch
@@ -132,6 +205,10 @@ const result = await registry.dispatch('render_ui', {
 - `@netscript/ai/tools` — the tool system: `defineAiTool`, `createToolRegistry`, and the
   `renderUiTool` wire contract (validates input via Standard Schema).
 - `@netscript/ai/testing` — deterministic fake ports for downstream unit tests.
+- `@netscript/ai/anthropic` — self-registering Anthropic provider (wraps
+  `@tanstack/ai-anthropic`); pulls the SDK only when imported.
+- `@netscript/ai/openai-compatible` — self-registering OpenAI-compatible provider
+  (wraps `@tanstack/ai-openai`); pulls the SDK only when imported.
 
 ## See also
 
