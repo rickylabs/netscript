@@ -1,5 +1,5 @@
 import { DEFAULT_TOPIC, type JobMessage } from '@netscript/plugin-workers-core/runtime';
-import { notFound } from '@netscript/contracts';
+import { notFound, validationFailed } from '@netscript/contracts';
 import { getJobQueue, getWorkersRuntime, router, type WorkersHandlers } from './router-context.ts';
 
 export const jobHandlers: WorkersHandlers<
@@ -85,18 +85,31 @@ export const jobHandlers: WorkersHandlers<
   }),
 
   triggerJob: router.triggerJob.handler(async ({ input, errors, path, context }) => {
+    // The `{id}` path segment is the single source of truth for the target job.
+    // oRPC merges the OpenAPI path param into `input.id`; the RPC transport carries
+    // it in the body. If neither resolves an id, fail loudly with a validation
+    // error rather than persisting an `undefined` KV key.
+    const jobId = input.id;
+    if (!jobId) {
+      validationFailed({
+        errors,
+        message: 'Job id is required in the {id} path segment.',
+        fieldErrors: { id: ['Job id is required in the {id} path segment.'] },
+      });
+    }
+
     const { jobRegistry: registry } = getWorkersRuntime(context);
-    const job = await registry.get(input.id);
+    const job = await registry.get(jobId);
 
     if (!job) {
-      notFound({ errors, path, resourceId: input.id });
+      notFound({ errors, path, resourceId: jobId });
     }
 
     const traceHeaders =
       (context as { traceHeaders?: { traceparent?: string; tracestate?: string } })?.traceHeaders;
 
     const jobMessage: JobMessage = {
-      jobId: input.id,
+      jobId,
       topic: job.topic ?? DEFAULT_TOPIC,
       triggeredBy: 'api',
       triggeredAt: new Date().toISOString(),
@@ -119,6 +132,6 @@ export const jobHandlers: WorkersHandlers<
         : undefined,
     });
 
-    return { jobId: input.id, triggered: true };
+    return { jobId, triggered: true };
   }),
 };

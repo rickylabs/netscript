@@ -31,7 +31,8 @@ export type SSEEvent = Readonly<Record<string, unknown>>;
 
 /** Input accepted by the trigger-job procedure. */
 export type JobTriggerInput = Readonly<{
-  id: string;
+  /** Job id, resolved from the `{id}` path segment; optional in the body. */
+  id?: string;
   payload?: Record<string, unknown>;
   priority?: number;
   delay?: number;
@@ -45,7 +46,8 @@ export type JobTriggerOutput = Readonly<{ jobId: string; triggered: boolean }>;
 
 /** Input accepted by the trigger-task procedure. */
 export type TaskTriggerInput = Readonly<{
-  id: string;
+  /** Task id, resolved from the `{id}` path segment; optional in the body. */
+  id?: string;
   payload?: Record<string, unknown>;
   priority?: number;
   delay?: number;

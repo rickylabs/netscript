@@ -28,7 +28,13 @@ export {
   DEFAULT_PAGINATION_LIMIT_MAX,
   DEFAULT_PAGINATION_OFFSET,
 } from '../domain/constants.ts';
-export { getResourceType, notFound, type NotFoundOptions } from '../domain/errors.ts';
+export {
+  getResourceType,
+  notFound,
+  type NotFoundOptions,
+  validationFailed,
+  type ValidationFailedOptions,
+} from '../domain/errors.ts';
 export type { ErrorResult, OkResult, Result } from '../domain/result.ts';
 export type {
   ContractDefaultableSchema,
