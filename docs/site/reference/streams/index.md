@@ -34,12 +34,20 @@ live in the internal `@netscript/plugin-streams-core` package, documented in
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
 | `defineStreamTopic` | function | `function defineStreamTopic(name, schema): StreamTopicDefinition` | Define a typed stream topic. |
-| `defineStreamProducer` | function | `function defineStreamProducer(topic): StreamProducerHandle` | Create a typed producer handle for a topic. |
-| `defineStreamConsumer` | function | `function defineStreamConsumer(topic): StreamConsumerHandle` | Create a typed consumer handle for a topic. |
+| `defineStreamProducer` | function | `function defineStreamProducer(topic): StreamProducerHandle` | Return a manifest-layer producer handle. Not wired to a transport: the returned `publish()` **rejects** with `StreamUnsupportedOperationError`. |
+| `defineStreamConsumer` | function | `function defineStreamConsumer(topic): StreamConsumerHandle` | Return a manifest-layer consumer handle. Not wired to a transport: the returned `subscribe()` **throws** `StreamUnsupportedOperationError` synchronously. |
+| `StreamUnsupportedOperationError` | class | `class StreamUnsupportedOperationError extends Error` | Raised by the manifest topic helpers when asked to perform runtime IO; points callers at `@netscript/plugin-streams-core`. |
 | `StreamTopicDefinition` | interface | `interface StreamTopicDefinition` | Typed stream topic definition. |
 | `StreamPayloadSchema` | interface | `interface StreamPayloadSchema` | Package-owned structural payload schema accepted by stream topic definitions. |
-| `StreamProducerHandle` | interface | `interface StreamProducerHandle` | Stub producer handle for downstream plugin manifests. |
-| `StreamConsumerHandle` | interface | `interface StreamConsumerHandle` | Stub consumer handle for downstream plugin manifests. |
+| `StreamProducerHandle` | interface | `interface StreamProducerHandle` | Stub producer handle for downstream plugin manifests; its `publish()` rejects (see above). |
+| `StreamConsumerHandle` | interface | `interface StreamConsumerHandle` | Stub consumer handle for downstream plugin manifests; its `subscribe()` throws (see above). |
+
+> **Not yet wired.** `defineStreamProducer` and `defineStreamConsumer` are manifest-layer stubs.
+> A producer's `publish()` returns a rejected promise and a consumer's `subscribe()` throws
+> synchronously, both with `StreamUnsupportedOperationError`. For real producer work use
+> `createDurableStream` (or the Service-facing `createServiceStreamProducer`) and `defineStreamSchema`
+> from [`@netscript/plugin-streams-core`](#internals). See the
+> [durable streams capability page](/capabilities/streams/) for the full producer/consumer model.
 
 ### Re-exported plugin framework types
 
@@ -125,8 +133,10 @@ export is `@netscript/plugin-streams-core` with two sub-path exports (`/telemetr
 | --- | --- | --- | --- |
 | `defineStreamSchema` | function | `function defineStreamSchema(collections): StateSchema` | Define a type-safe durable stream schema. |
 | `createDurableStream` | function | `function createDurableStream(options): DurableStreamProducer` | Create or reuse a durable stream producer for a stream path. |
+| `createServiceStreamProducer` | function | `function createServiceStreamProducer(options): DurableStreamProducer` | Blessed Service-facing producer factory. Wraps `createDurableStream` reusing `getStreamsUrl`/`getStreamsAuth`; eagerly resolves the streams URL and auth (`assertResolvable`, default `true`) so a mis-wired Service **throws at construction** instead of silently dropping writes. |
 | `DurableStreamProducer` | class | `class DurableStreamProducer` | Server-side writer for a named durable stream. |
-| `DurableStreamProducerOptions` | interface | `interface DurableStreamProducerOptions` | Options accepted by `DurableStreamProducer`. |
+| `DurableStreamProducerOptions` | interface | `interface DurableStreamProducerOptions` | Options accepted by `createDurableStream` / `DurableStreamProducer`. |
+| `ServiceStreamProducerOptions` | interface | `interface ServiceStreamProducerOptions extends DurableStreamProducerOptions` | Options for `createServiceStreamProducer`: the `DurableStreamProducerOptions` fields plus the optional `assertResolvable` fail-fast gate (default `true`). |
 | `StreamProducerPort` | interface | `interface StreamProducerPort` | Port implemented by stream producers that publish State Protocol changes. |
 | `inspectStreamTopic` | function | `function inspectStreamTopic(input): StreamTopicInspectionReport` | Inspect a stream schema and optional producer metadata. |
 | `StreamTopicInspectionInput` | interface | `interface StreamTopicInspectionInput` | Input accepted by `inspectStreamTopic`. |
