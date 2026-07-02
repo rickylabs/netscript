@@ -1050,6 +1050,21 @@ export const freshUiRegistryManifest: RegistryManifest = {
       registryDependencies: ['theme-seed', 'toast-support'],
       css: [{ layer: 'components', content: "@import './ui/toast.css';" }],
     },
+    {
+      name: 'chat-render',
+      kind: 'lib',
+      layer: 2,
+      description:
+        'Curated generative-UI block parser: projects fenced chart/donut/table/stats/line markdown into a typed RenderPart[] tree with a reload-fidelity inverse projection.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['ai', 'chat', 'generative-ui', 'lib'],
+      files: [{
+        source: 'src/chat/parse-blocks.ts',
+        target: '@lib/chat/parse-blocks.ts',
+      }],
+      registryDependencies: ['chart-block', 'donut', 'data-table', 'stats-grid'],
+    },
   ],
   collections: [
     {
@@ -1115,6 +1130,7 @@ export const freshUiRegistryManifest: RegistryManifest = {
         'message',
         'command-palette',
         'search',
+        'chat-render',
       ],
     },
     {
