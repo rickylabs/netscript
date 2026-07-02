@@ -1,4 +1,0 @@
-exit=0
-command=deno fmt --check
-
-Checked 96 files

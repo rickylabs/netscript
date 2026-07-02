@@ -1,6 +1,0 @@
-Error linting: /home/runner/work/netscript/netscript/packages/fresh/mod.ts
-    Expected ',', got 'ErrorDisplayProps' at file:///home/runner/work/netscript/netscript/packages/fresh/mod.ts:15:8
-
-        type ErrorDisplayProps,
-             ~~~~~~~~~~~~~~~~~
-Checked 1 file

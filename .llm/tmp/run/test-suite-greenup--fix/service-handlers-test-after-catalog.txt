@@ -1,7 +1,0 @@
-Check packages/service/tests/handlers_test.ts
-running 2 tests from ./packages/service/tests/handlers_test.ts
-createNotFoundHandler returns service-scoped not found response ... ok (13ms)
-createErrorHandler returns production-safe error response ... ok (0ms)
-
-ok | 2 passed | 0 failed (19ms)
-

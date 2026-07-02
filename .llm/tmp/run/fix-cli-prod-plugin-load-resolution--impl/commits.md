@@ -1,5 +1,0 @@
-- 6cdfe39c: fix(cli): inject plugin core imports on add
-- dcf4e0dc: fix(cli): list plugins from scaffold metadata
-- 398c1a23: chore(harness): record plugin load evidence
-- fb3b8821: chore(harness): finalize plugin load commit log
-- 1a872a93: fix(cli): derive JSR specifier in workspace-mutator test from release version
