@@ -17,6 +17,7 @@ import type { ModelHandle, ModelRef } from '../contracts/model.ts';
 import { AiNotConfiguredError } from '../contracts/errors.ts';
 import {
   type AgentLoopPort,
+  type AgentMemoryPort,
   createNoopAgentMemory,
   createNoopSkillLoader,
   createNoopTelemetryPort,
@@ -25,7 +26,6 @@ import {
   createUnconfiguredEmbeddingProvider,
   createUnconfiguredMcpTransport,
   createUnconfiguredVisionProvider,
-  type AgentMemoryPort,
   type EmbeddingProviderPort,
   getModel,
   getModelProvider,

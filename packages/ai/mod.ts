@@ -58,4 +58,8 @@ export {
 export type { ModelProviderConfig, ModelProviderPort } from './src/ports/model-provider.ts';
 
 export type { ModelHandle, ModelRef } from './src/contracts/model.ts';
-export { AiError, AiNotConfiguredError, ModelProviderNotFoundError } from './src/contracts/errors.ts';
+export {
+  AiError,
+  AiNotConfiguredError,
+  ModelProviderNotFoundError,
+} from './src/contracts/errors.ts';

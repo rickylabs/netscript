@@ -18,7 +18,13 @@
  * @module
  */
 
-import type { ModelDescriptor, ModelHandle, ModelId, ModelRef, ModelSelector } from '../contracts/model.ts';
+import type {
+  ModelDescriptor,
+  ModelHandle,
+  ModelId,
+  ModelRef,
+  ModelSelector,
+} from '../contracts/model.ts';
 import { InvalidModelRefError, ModelProviderNotFoundError } from '../contracts/errors.ts';
 
 /**

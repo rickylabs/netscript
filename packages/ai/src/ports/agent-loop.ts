@@ -59,7 +59,10 @@ export function createUnconfiguredAgentLoop(): AgentLoopPort {
           return {
             next(): Promise<IteratorResult<AgentChunk>> {
               return Promise.reject(
-                new AiNotConfiguredError('agentLoop', 'Inject an AgentLoopPort via createAiRuntime.'),
+                new AiNotConfiguredError(
+                  'agentLoop',
+                  'Inject an AgentLoopPort via createAiRuntime.',
+                ),
               );
             },
           };

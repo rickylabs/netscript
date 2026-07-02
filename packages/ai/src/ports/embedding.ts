@@ -54,7 +54,10 @@ export function createUnconfiguredEmbeddingProvider(): EmbeddingProviderPort {
   return {
     embed(): Promise<EmbeddingResponse> {
       return Promise.reject(
-        new AiNotConfiguredError('embeddings', 'Inject an EmbeddingProviderPort via createAiRuntime.'),
+        new AiNotConfiguredError(
+          'embeddings',
+          'Inject an EmbeddingProviderPort via createAiRuntime.',
+        ),
       );
     },
   };

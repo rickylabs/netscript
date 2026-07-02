@@ -30,7 +30,9 @@ export class AiNotConfiguredError extends AiError {
   /** Construct the error for a named unconfigured `capability`. */
   constructor(capability: string, detail?: string) {
     super(
-      `AI capability "${capability}" is not configured on this runtime.${detail ? ` ${detail}` : ''}`,
+      `AI capability "${capability}" is not configured on this runtime.${
+        detail ? ` ${detail}` : ''
+      }`,
     );
     this.name = 'AiNotConfiguredError';
     this.capability = capability;
@@ -86,7 +88,9 @@ export class InvalidModelRefError extends AiError {
 
   /** Construct the error for a malformed model reference `ref`. */
   constructor(ref: string) {
-    super(`Invalid model reference "${ref}". Expected "<provider>:<model>" or { provider, model }.`);
+    super(
+      `Invalid model reference "${ref}". Expected "<provider>:<model>" or { provider, model }.`,
+    );
     this.name = 'InvalidModelRefError';
     this.ref = ref;
   }

@@ -11,8 +11,10 @@ import { createFakeModelProvider } from '../src/testing/mod.ts';
 
 Deno.test('model registry: registered provider resolves via getModelProvider', () => {
   resetModelRegistry();
-  registerModelProvider('demo', () =>
-    createFakeModelProvider('demo', [{ id: 'm1', provider: 'demo' }]));
+  registerModelProvider(
+    'demo',
+    () => createFakeModelProvider('demo', [{ id: 'm1', provider: 'demo' }]),
+  );
 
   const provider = getModelProvider('demo');
   assertEquals(provider.id, 'demo');
@@ -22,8 +24,10 @@ Deno.test('model registry: registered provider resolves via getModelProvider', (
 
 Deno.test('model registry: getModel resolves a "<provider>:<model>" ref end-to-end', async () => {
   resetModelRegistry();
-  registerModelProvider('demo', () =>
-    createFakeModelProvider('demo', [{ id: 'm1', provider: 'demo' }]));
+  registerModelProvider(
+    'demo',
+    () => createFakeModelProvider('demo', [{ id: 'm1', provider: 'demo' }]),
+  );
 
   const handle = await getModel('demo:m1');
   assertEquals(handle.providerId, 'demo');

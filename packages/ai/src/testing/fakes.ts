@@ -134,7 +134,9 @@ export function createFakeAgentLoop(chunks: readonly AgentChunk[]): AgentLoopPor
  * to include a trivial (non-semantic) recall implementation for exercising the
  * optional recall seam.
  */
-export function createFakeAgentMemory(options: { readonly recall?: boolean } = {}): AgentMemoryPort {
+export function createFakeAgentMemory(
+  options: { readonly recall?: boolean } = {},
+): AgentMemoryPort {
   const threads = new Map<string, MemoryRecord[]>();
   let sequence = 0;
   const base: AgentMemoryPort = {
@@ -165,7 +167,9 @@ export function createFakeAgentMemory(options: { readonly recall?: boolean } = {
  * Create a fake {@linkcode EmbeddingProviderPort} that returns a fixed vector
  * per input.
  */
-export function createFakeEmbeddingProvider(vector: readonly number[] = [0, 0, 0]): EmbeddingProviderPort {
+export function createFakeEmbeddingProvider(
+  vector: readonly number[] = [0, 0, 0],
+): EmbeddingProviderPort {
   return {
     embed(request): Promise<EmbeddingResponse> {
       const inputs = typeof request.input === 'string' ? [request.input] : request.input;

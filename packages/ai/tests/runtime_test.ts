@@ -1,4 +1,10 @@
-import { assert, assertEquals, assertNotStrictEquals, assertRejects, assertStrictEquals } from '@std/assert';
+import {
+  assert,
+  assertEquals,
+  assertNotStrictEquals,
+  assertRejects,
+  assertStrictEquals,
+} from '@std/assert';
 import {
   AiNotConfiguredError,
   createAiRuntime,
