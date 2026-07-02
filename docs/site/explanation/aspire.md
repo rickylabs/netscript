@@ -126,7 +126,7 @@ Treat the <code>netscript.config.ts</code> value as cosmetic legacy until it is 
 This is the part that makes Aspire feel like *part of the framework* rather than a bolted-on tool:
 **you never enumerate processes by hand.** A NetScript plugin can declare an Aspire
 *contribution*, and the AppHost asks every installed plugin to contribute its own slice of the
-graph. The contract lives in `@netscript/aspire` and is genuinely small.
+graph. The contract lives in `@netscript/aspire` and is deliberately small.
 
 A plugin's contribution extends `AspireNSPluginContribution`. It names itself and, given a builder
 and a context, returns the resources it wants in the graph:
