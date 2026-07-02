@@ -19,9 +19,9 @@ you want to build a durable workflow with your own hands, follow the
 
 {{ comp.diagram({ src: "/assets/diagrams/saga-state-machine.svg", alt: "A saga as a persisted state machine: an inbound message is routed by correlation id to the right instance, the runtime loads its state from the durable store, the matching handler advances the state and returns effects, and the new state is written back.", caption: "A saga is a persisted state machine. Messages drive transitions; the runtime loads state by correlation, applies the matching handler, and writes the new state back to the durable store." }) }}
 
-{{ comp callout { type: "note", title: "What is genuinely live today" } }}
+{{ comp callout { type: "note", title: "What is live today" } }}
 The saga builder, its persisted state model, the message-handler effects, and the
-<strong>durable store</strong> behind them are all <strong>real and they compile</strong> — the
+<strong>durable store</strong> behind them are all <strong>implemented and they compile</strong> — the
 scaffold ships a working <code>defineSaga(...)</code> sample, a registry API at <code>:8092</code>,
 and a durable runtime that persists every transition to either <strong>Deno KV</strong> or
 <strong>Prisma/Postgres</strong>. Two builder methods are reserved: <code>.onSignal(...)</code> and
