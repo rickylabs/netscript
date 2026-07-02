@@ -10,6 +10,7 @@ export {
   createDurableStream,
   DurableStreamProducer,
 } from '../application/create-durable-stream.ts';
+export { createServiceStreamProducer } from '../application/create-service-stream-producer.ts';
 export {
   buildStreamUrl,
   getStreamsAuth,
@@ -21,6 +22,7 @@ export type {
   StreamTopicInspectionReport,
 } from '../diagnostics/inspect-stream-topic.ts';
 export type { DurableStreamProducerOptions } from '../application/create-durable-stream.ts';
+export type { ServiceStreamProducerOptions } from '../application/create-service-stream-producer.ts';
 export type {
   CollectionDefinition,
   CollectionEventHelpers,
