@@ -1,0 +1,93 @@
+/**
+ * @component Markdown
+ * @layer 3
+ * @depends theme-seed, citation-chip
+ * @description Sanitized GFM + math + syntax-highlighted renderer for streamed
+ * assistant / chat output. Wraps `react-markdown` (running under `preact/compat`)
+ * with `remark-gfm` + `remark-math` + the local `remarkCitations` transform, then
+ * `rehype-katex` + `rehype-highlight`, and finally a MANDATORY `rehype-sanitize`
+ * pass. `stripIncompleteSyntax` guards a truncated mid-stream chunk so partial
+ * syntax never renders as raw markers.
+ *
+ * Copy-based item — the npm dependencies (`react-markdown`, `remark-*`,
+ * `rehype-*`, `katex`, `highlight.js`) are declared on the registry item and are
+ * merged into the CONSUMING app's `deno.json`, never into `@netscript/fresh-ui`.
+ *
+ * App wiring: `react-markdown` runs under Preact via a `react` / `react-dom`
+ * -> `preact/compat` alias in the app's `deno.json` (the standard Fresh setup),
+ * and the KaTeX + highlight.js stylesheets are imported by the styles aggregator
+ * this item contributes.
+ */
+
+import type { VNode } from 'preact';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import rehypeHighlight from 'rehype-highlight';
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
+import { CitationChip } from './citation-chip.tsx';
+import { extendSanitizeSchema, remarkCitations, stripIncompleteSyntax } from './markdown-pipeline.ts';
+
+/** Sanitize schema is built once: citation chips + KaTeX + hljs allowed, scripts never. */
+const SANITIZE_SCHEMA = extendSanitizeSchema(defaultSchema);
+
+/** Source parsing plugins: GFM, `$math$`, and the `[n]` citation transform. */
+const REMARK_PLUGINS = [remarkGfm, remarkMath, remarkCitations];
+
+/**
+ * Rehype pipeline. Order is load-bearing: math + highlight transform the tree,
+ * then `rehype-sanitize` runs LAST and unconditionally. It is never exposed as a
+ * caller-toggled option, so model-authored `<script>` / event-handler HTML can
+ * never survive to the DOM.
+ */
+const REHYPE_PLUGINS = [rehypeKatex, rehypeHighlight, [rehypeSanitize, SANITIZE_SCHEMA]];
+
+/** Props for the {@link Markdown} renderer. */
+export interface MarkdownProps {
+  /** Raw model / assistant markdown source. */
+  children: string;
+  /** Pre-process a possibly-truncated mid-stream chunk before rendering. */
+  streaming?: boolean;
+  /** Invoked with the citation index when a rendered chip is activated. */
+  onCite?: (index: number) => void;
+  /** Currently active citation index (highlights its chip). */
+  activeCite?: number;
+  /** Extra class names for the wrapper. */
+  class?: string;
+}
+
+/**
+ * Renders sanitized markdown from streamed assistant output.
+ * @param props - {@link MarkdownProps}.
+ * @returns The rendered prose surface.
+ */
+export function Markdown(
+  { children, streaming = false, onCite, activeCite, class: className }: MarkdownProps,
+): VNode {
+  const source = streaming ? stripIncompleteSyntax(children) : children;
+
+  return (
+    <div class={className ? `ns-markdown ${className}` : 'ns-markdown'}>
+      <ReactMarkdown
+        remarkPlugins={REMARK_PLUGINS}
+        rehypePlugins={REHYPE_PLUGINS}
+        components={{
+          'citation-chip': (props: { index?: string | number; source?: string }) => {
+            const index = Number(props.index);
+            return (
+              <CitationChip
+                index={index}
+                source={props.source}
+                active={activeCite === index}
+                onClick={onCite}
+              />
+            );
+          },
+        }}
+      >
+        {source}
+      </ReactMarkdown>
+    </div>
+  );
+}
