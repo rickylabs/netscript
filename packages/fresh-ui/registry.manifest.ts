@@ -1105,13 +1105,14 @@ export const freshUiRegistryManifest: RegistryManifest = {
         'AI / chat surface seams: grounded-agent citations, message thread, composer, model picker, and tool-call disclosure.',
       items: [
         'theme-seed',
+        'avatar',
         'citation-chip',
+        'code-block',
+        'chart-block',
         'model-selector',
         'tool-call-card',
         'prompt-input',
         'message',
-        'command-palette',
-        'search',
       ],
     },
     {
