@@ -36,6 +36,16 @@ export const SCAFFOLD_ASPIRE_INTEGRATIONS = {
     PACKAGE_ID: 'Aspire.Hosting.Browsers',
     VERSION: '13.4.6-preview.1.26319.6',
   },
+  // Aspire fork's JavaScript hosting integration — supplies `builder.addDenoApp(...)`,
+  // which hosts Deno services/plugins via the fork's first-class Deno runtime
+  // (native OTEL via WithDenoDefaults) instead of a hand-rolled
+  // `addExecutable('deno', ...)`. The package is not on nuget.org yet; the fork
+  // resolves it from source in dev-mode (ASPIRE_REPO_ROOT), so an empty version
+  // string is intentional until the integration is published.
+  JAVASCRIPT: {
+    PACKAGE_ID: 'Aspire.Hosting.JavaScript',
+    VERSION: '',
+  },
   DENO_KV: {
     PACKAGE_ID: 'CommunityToolkit.Aspire.Hosting.Deno',
     VERSION: '13.4.0',

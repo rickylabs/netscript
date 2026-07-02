@@ -47,7 +47,6 @@ describe('generateRegisterServices', () => {
     assertStringIncludes(output, 'buildOtelEnvVars,');
     assertStringIncludes(output, 'extractPluginReferences,');
     assertStringIncludes(output, 'extractServiceReferences,');
-    assertStringIncludes(output, 'resolvePermissions,');
     assertStringIncludes(output, 'resolveWorkspacePath,');
     assertStringIncludes(output, "from './_aspire-compat.mjs'");
   });
@@ -61,36 +60,27 @@ describe('generateRegisterServices', () => {
     assertStringIncludes(output, 'export async function wireServiceReferences(');
   });
 
-  it('should register services via addExecutable with correct port and entrypoint', () => {
+  it('should register services via addDenoApp with correct port and entrypoint', () => {
     const output = generateRegisterServices({
       ...emptyOptions,
       services: { users: fixtures.MINIMAL_SERVICE },
     });
-    assertStringIncludes(output, "builder.addExecutable('users', 'deno', workdir,");
-    assertStringIncludes(output, "'--minimum-dependency-age=0'");
+    assertStringIncludes(output, "builder.addDenoApp('users', workdir, 'src/main.ts')");
     assertStringIncludes(output, '.withHttpEndpoint({ port: 3000');
     assertStringIncludes(output, "services.set('users'");
   });
 
-  it('should include full executable OTEL env vars for each service', () => {
+  it('should include denoApp OTEL env vars for each service', () => {
     const output = generateRegisterServices({
       ...emptyOptions,
       services: { users: fixtures.MINIMAL_SERVICE },
     });
     assertStringIncludes(
       output,
-      "buildOtelEnvVars('users', config.Version, 'executable')",
+      "buildOtelEnvVars('users', config.Version, 'denoApp')",
     );
     assertStringIncludes(output, 'resource.withEnvironment(key, value)');
-    assertStringIncludes(output, '// OTEL telemetry (full executable env set)');
-  });
-
-  it('should use --watch-hmr flag for services (HMR-capable)', () => {
-    const output = generateRegisterServices({
-      ...emptyOptions,
-      services: { users: fixtures.MINIMAL_SERVICE },
-    });
-    assertStringIncludes(output, "'--watch-hmr'");
+    assertStringIncludes(output, '// OTEL telemetry (denoApp mode — native Deno OTEL)');
   });
 
   it('should wire primary database dependency for all services', () => {
@@ -186,28 +176,27 @@ describe('generateRegisterPlugins', () => {
     );
   });
 
-  it('should register plugins via addExecutable with correct port', () => {
+  it('should register plugins via addDenoApp with correct port', () => {
     const output = generateRegisterPlugins({
       ...emptyOptions,
       plugins: { auth: fixtures.MINIMAL_PLUGIN },
     });
-    assertStringIncludes(output, "builder.addExecutable('auth', 'deno', workdir,");
-    assertStringIncludes(output, "'--minimum-dependency-age=0'");
+    assertStringIncludes(output, "builder.addDenoApp('auth', workdir,");
     assertStringIncludes(output, '.withHttpEndpoint({ port: 4400');
     assertStringIncludes(output, "plugins.set('auth'");
   });
 
-  it('should include full executable OTEL env vars for each plugin', () => {
+  it('should include denoApp OTEL env vars for each plugin', () => {
     const output = generateRegisterPlugins({
       ...emptyOptions,
       plugins: { auth: fixtures.MINIMAL_PLUGIN },
     });
     assertStringIncludes(
       output,
-      "buildOtelEnvVars('auth', config.Version, 'executable')",
+      "buildOtelEnvVars('auth', config.Version, 'denoApp')",
     );
     assertStringIncludes(output, 'resource.withEnvironment(key, value)');
-    assertStringIncludes(output, '// OTEL telemetry (full executable env set)');
+    assertStringIncludes(output, '// OTEL telemetry (denoApp mode — native Deno OTEL)');
   });
 
   it('should wire plugin\u2192plugin references in pass 2', () => {
@@ -262,7 +251,7 @@ describe('generateRegisterPlugins', () => {
     assertStringIncludes(output, 'withReference(infrastructure.primaryCacheEndpoint)');
     assertStringIncludes(
       output,
-      "import { EndpointProperty, OtlpProtocol } from '../.aspire/modules/aspire.mjs'",
+      "import { EndpointProperty } from '../.aspire/modules/aspire.mjs'",
     );
     assertStringIncludes(
       output,

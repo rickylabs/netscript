@@ -37,7 +37,7 @@ import { netscriptJsrSpecifier } from '../../../../constants/jsr-specifiers.ts';
  * @returns Generated TypeScript source as a string
  */
 export function generateRegisterPlugins(options: RegisterPluginsOptions): string {
-  const { plugins, version: _version, denoDefaults } = options;
+  const { plugins, version: _version } = options;
   const entries = Object.entries(plugins);
 
   // --- Pass 1 blocks: create all plugin resources ---
@@ -51,27 +51,20 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
     lines.push(`  // --- ${name} ---`);
     lines.push(`  {`);
 
-    // Resolve permissions — plugins use --watch-hmr
-    lines.push(`    const perms = resolvePermissions(`);
-    if (entry.Permissions) {
-      lines.push(`      ${JSON.stringify(entry.Permissions)},`);
-    } else {
-      lines.push(`      undefined,`);
-    }
-    lines.push(`      ${JSON.stringify(denoDefaults.Permissions)},`);
-    lines.push(`      config.Defaults.Deno.WatchMode,`);
-    lines.push(`      '${RESOURCE_DEFAULTS.WatchHmrFlag}',`);
-    lines.push(`    );`);
-
     // Resolve working directory
     lines.push(`    const workdir = resolveWorkspacePath(appHostDir, '${workdir}');`);
     lines.push(
       `    const bootstrapModule = new URL('../../services/_shared/plugin-service-context.ts', import.meta.url).href;`,
     );
 
-    // Register via addExecutable with HTTP endpoint
+    // Register via addDenoApp — the Aspire fork's Deno runtime host. Runs
+    // `deno run -A ${entrypoint}` (a JSR specifier survives verbatim) from the
+    // working directory. Drops --config deno.json / --node-modules-dir=none /
+    // --minimum-dependency-age=0 / granular perms (addDenoApp uses -A and lets
+    // Deno auto-discover the deno.json from the working directory) but adds
+    // native Deno OTEL via WithDenoDefaults.
     lines.push(
-      `    const resource = builder.addExecutable('${name}', 'deno', workdir, ['run', '--config', 'deno.json', '--minimum-dependency-age=0', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', ...perms, '${entrypoint}'])`,
+      `    const resource = builder.addDenoApp('${name}', workdir, '${entrypoint}')`,
     );
     lines.push(
       `      .withHttpEndpoint({ port: ${entry.Port}, env: '${RESOURCE_DEFAULTS.PortEnvVar}' });`,
@@ -97,18 +90,16 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
       );
     }
 
-    // OTEL telemetry (full executable env set)
+    // OTEL telemetry — denoApp mode (3 vars); WithDenoDefaults already wired
+    // OTEL_DENO=true + the OTLP exporter.
     lines.push(``);
-    lines.push(`    // OTEL telemetry (full executable env set)`);
+    lines.push(`    // OTEL telemetry (denoApp mode — native Deno OTEL)`);
     lines.push(
-      `    const otel = buildOtelEnvVars('${name}', config.Version, 'executable');`,
+      `    const otel = buildOtelEnvVars('${name}', config.Version, 'denoApp');`,
     );
     lines.push(`    for (const [key, value] of Object.entries(otel)) {`);
     lines.push(`      await resource.withEnvironment(key, value);`);
     lines.push(`    }`);
-    lines.push(
-      `    await resource.withOtlpExporter({ protocol: OtlpProtocol.HttpProtobuf });`,
-    );
 
     // Database dependency
     if (entry.RequiresDb) {

@@ -1,17 +1,18 @@
 {{__slot0__}}
 
 import type { DistributedApplicationBuilder } from '{{__slot1__}}';
-import { EndpointProperty, OtlpProtocol } from '{{__slot1__}}';
+import { EndpointProperty } from '{{__slot1__}}';
 import type { NetScriptConfig } from '{{__slot2__}}';
 import type { InfrastructureContext } from './register-infrastructure.mjs';
 import {
   buildDatabaseUriEnvKey,
   buildOtelEnvVars,
-  resolvePermissions,
   resolveWorkspacePath,
 } from '{{__slot3__}}';
 
-type ExecutableResource = ReturnType<DistributedApplicationBuilder['addExecutable']>;
+// Plugins are hosted via the Aspire fork's `builder.addDenoApp(...)` (Deno
+// runtime host, native OTEL via WithDenoDefaults), not `addExecutable`.
+type DenoResource = ReturnType<DistributedApplicationBuilder['addDenoApp']>;
 
 /**
  * Registers plugins with the Aspire SDK builder using a two-pass approach.
@@ -35,10 +36,10 @@ export async function registerPlugins(
   builder: DistributedApplicationBuilder,
   config: NetScriptConfig,
   infrastructure: InfrastructureContext,
-  services: Map<string, ExecutableResource>,
+  services: Map<string, DenoResource>,
   appHostDir: string,
-): Promise<Map<string, ExecutableResource>> {
-  const plugins = new Map<string, ExecutableResource>();
+): Promise<Map<string, DenoResource>> {
+  const plugins = new Map<string, DenoResource>();
   const databaseEnvKey = buildDatabaseUriEnvKey(config);
 
   // --- Pass 1: Create all plugin resources ---

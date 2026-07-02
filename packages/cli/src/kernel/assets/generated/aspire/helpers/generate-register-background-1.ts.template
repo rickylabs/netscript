@@ -14,13 +14,19 @@ import {
   resolveWorkspacePath,
 } from '{{__slot3__}}';
 
+// Background processors stay on `addExecutable('deno', ...)`: they require
+// `--unstable-worker-options` BEFORE the script path, which `addDenoApp`
+// (fixed `deno run -A <script>`) cannot express. Services and plugins, by
+// contrast, are hosted via `addDenoApp` and flow in as `DenoResource`.
 type ExecutableResource = ReturnType<DistributedApplicationBuilder['addExecutable']>;
+type DenoResource = ReturnType<DistributedApplicationBuilder['addDenoApp']>;
 
 /**
  * Registers background processors (workers, sagas, triggers, benchmark)
  * with the Aspire SDK builder.
  *
- * Each processor is registered via `addExecutable()` from the Aspire SDK.
+ * Each processor is registered via `addExecutable()` from the Aspire SDK
+ * (see the note above on `--unstable-worker-options`).
  * Telemetry-enabled entries receive the full executable OTEL env set;
  * telemetry-disabled entries receive explicit opt-out vars.
  *
@@ -39,8 +45,8 @@ export async function registerBackgroundProcessors(
   builder: DistributedApplicationBuilder,
   config: NetScriptConfig,
   infrastructure: InfrastructureContext,
-  services: Map<string, ExecutableResource>,
-  plugins: Map<string, ExecutableResource>,
+  services: Map<string, DenoResource>,
+  plugins: Map<string, DenoResource>,
   appHostDir: string,
 ): Promise<Map<string, ExecutableResource>> {
   const backgroundProcessors = new Map<string, ExecutableResource>();

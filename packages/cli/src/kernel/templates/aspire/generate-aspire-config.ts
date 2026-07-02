@@ -42,17 +42,21 @@ export function generateAspireConfig(options?: AspireConfigOptions): string {
  * generated `.helpers/register-*.ts` call (e.g. `builder.addPostgres(...)`)
  * throws at runtime.
  *
- * ### Deno orchestration — intentionally no NuGet
+ * ### Deno orchestration — Aspire.Hosting.JavaScript
  *
- * We deliberately do NOT emit `CommunityToolkit.Aspire.Hosting.Deno`. Its
- * `addDenoApp(...)` extension is `[AspireExport]`-annotated, but in Aspire
- * 13.2 the export decorator is only honoured for types declared inside the
- * AppHost project itself — external NuGet packages are skipped. Shipping
- * the beta NuGet in the scaffold would therefore surface as a dead import.
- * Instead every generated `.helpers/register-*.ts` uses the SDK primitive
- * `builder.addExecutable('deno', ...)`, which works today and needs no
- * integration package. Revisit when Aspire 13.3 lands (GH aspire#15119 /
- * aspire#16220).
+ * We emit `Aspire.Hosting.JavaScript` (the Aspire fork's JavaScript hosting
+ * integration). After `aspire restore` re-emits `.aspire/modules/aspire.mts`,
+ * this exposes `builder.addDenoApp(name, appDir, script)` — the fork's
+ * first-class Deno runtime host. Service and plugin `.helpers/register-*.ts`
+ * use it instead of the hand-rolled `addExecutable('deno', ...)`, which gives
+ * native Deno OpenTelemetry (`WithDenoDefaults()` sets `OTEL_DENO=true` and
+ * wires the OTLP exporter — no app-side SDK). The prior CommunityToolkit
+ * `addDenoApp` was skipped because its `[AspireExport]` was not honoured for
+ * external NuGets in Aspire 13.2; the fork's integration is honoured.
+ *
+ * Background processors still use `addExecutable('deno', ...)` because they
+ * require `--unstable-worker-options` before the script path, which
+ * `addDenoApp` (fixed `deno run -A <script>`) cannot express.
  */
 export interface TsAspireConfigOptions {
   /** Selected database engine (drives Postgres/MySql packages). */
@@ -120,6 +124,12 @@ export function generateTsAspireConfig(options?: TsAspireConfigOptions): string 
 
   packages[SCAFFOLD_ASPIRE_INTEGRATIONS.BROWSERS.PACKAGE_ID] =
     SCAFFOLD_ASPIRE_INTEGRATIONS.BROWSERS.VERSION;
+
+  // JavaScript hosting integration — supplies `builder.addDenoApp(...)` used by
+  // the generated service/plugin register helpers. Empty version = fork
+  // dev-mode source resolution (see SCAFFOLD_ASPIRE_INTEGRATIONS.JAVASCRIPT).
+  packages[SCAFFOLD_ASPIRE_INTEGRATIONS.JAVASCRIPT.PACKAGE_ID] =
+    SCAFFOLD_ASPIRE_INTEGRATIONS.JAVASCRIPT.VERSION;
 
   const config: Record<string, unknown> = {
     appHost: {

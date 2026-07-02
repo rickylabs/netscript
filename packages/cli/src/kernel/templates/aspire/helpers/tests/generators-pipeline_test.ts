@@ -168,14 +168,16 @@ describe('HelpersGeneratorPipeline', () => {
       (f) => f.path === '.helpers/register-services.mts',
     );
     assert(regServices, 'register-services.mjs should exist');
-    assertStringIncludes(regServices!.content, "builder.addExecutable('users'");
+    assertStringIncludes(regServices!.content, "builder.addDenoApp('users'");
     assertStringIncludes(
       regServices!.content,
-      "buildOtelEnvVars('users', config.Version, 'executable')",
+      "buildOtelEnvVars('users', config.Version, 'denoApp')",
     );
-    assertStringIncludes(
-      regServices!.content,
-      'withOtlpExporter({ protocol: OtlpProtocol.HttpProtobuf })',
+    // Services use addDenoApp → WithDenoDefaults already wires the OTLP
+    // exporter, so the generated helper does not call withOtlpExporter.
+    assert(
+      !regServices!.content.includes('withOtlpExporter'),
+      'addDenoApp services should not call withOtlpExporter (WithDenoDefaults handles it)',
     );
     assert(
       !regServices!.content.includes('config.Otel.HttpEndpoint'),
@@ -194,10 +196,10 @@ describe('HelpersGeneratorPipeline', () => {
       (f) => f.path === '.helpers/register-plugins.mts',
     );
     assert(regPlugins, 'register-plugins.mjs should exist');
-    assertStringIncludes(regPlugins!.content, "builder.addExecutable('auth'");
-    assertStringIncludes(
-      regPlugins!.content,
-      'withOtlpExporter({ protocol: OtlpProtocol.HttpProtobuf })',
+    assertStringIncludes(regPlugins!.content, "builder.addDenoApp('auth'");
+    assert(
+      !regPlugins!.content.includes('withOtlpExporter'),
+      'addDenoApp plugins should not call withOtlpExporter (WithDenoDefaults handles it)',
     );
     assert(
       !regPlugins!.content.includes('config.Otel.HttpEndpoint'),

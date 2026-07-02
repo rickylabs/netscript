@@ -36,7 +36,7 @@ import { renderTemplateAssetSync } from '../../../../adapters/templates/template
  * @returns Generated TypeScript source as a string
  */
 export function generateRegisterServices(options: RegisterServicesOptions): string {
-  const { services, version: _version, denoDefaults } = options;
+  const { services, version: _version } = options;
   const entries = Object.entries(services);
 
   // --- Pass 1 blocks: create all service resources ---
@@ -45,47 +45,36 @@ export function generateRegisterServices(options: RegisterServicesOptions): stri
   for (const [name, entry] of entries) {
     const entrypoint = entry.Entrypoint ?? RESOURCE_DEFAULTS.ServiceEntrypoint;
     const workdir = entry.Workdir ?? `${SCAFFOLD_DIRS.SERVICES}/${name}`;
-    const watchMode = denoDefaults.WatchMode;
 
     const lines: string[] = [];
     lines.push(`  // --- ${name} ---`);
     lines.push(`  {`);
 
-    // Resolve permissions — services use HMR watch
-    lines.push(`    const perms = resolvePermissions(`);
-    if (entry.Permissions) {
-      lines.push(`      ${JSON.stringify(entry.Permissions)},`);
-    } else {
-      lines.push(`      undefined,`);
-    }
-    lines.push(`      ${JSON.stringify(denoDefaults.Permissions)},`);
-    lines.push(`      ${watchMode},`);
-    lines.push(`      '${RESOURCE_DEFAULTS.WatchHmrFlag}',`);
-    lines.push(`    );`);
-
     // Resolve working directory
     lines.push(`    const workdir = resolveWorkspacePath(appHostDir, '${workdir}');`);
 
-    // Register via addExecutable with HTTP endpoint
+    // Register via addDenoApp — the Aspire fork's Deno runtime host. This runs
+    // `deno run -A ${entrypoint}` from the resource working directory. Unlike the
+    // prior `addExecutable('deno', ...)` form it does not thread granular
+    // permissions / --node-modules-dir=none / --minimum-dependency-age=0
+    // (addDenoApp uses `-A`), but it wires native Deno OTEL via WithDenoDefaults.
     lines.push(
-      `    const resource = builder.addExecutable('${name}', 'deno', workdir, ['run', '--minimum-dependency-age=0', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', ...perms, '${entrypoint}'])`,
+      `    const resource = builder.addDenoApp('${name}', workdir, '${entrypoint}')`,
     );
     lines.push(
       `      .withHttpEndpoint({ port: ${entry.Port}, env: '${RESOURCE_DEFAULTS.PortEnvVar}' });`,
     );
 
-    // OTEL telemetry (full executable env set)
+    // OTEL telemetry — denoApp mode (3 vars). WithDenoDefaults already set
+    // OTEL_DENO=true and the OTLP exporter, so no explicit withOtlpExporter.
     lines.push(``);
-    lines.push(`    // OTEL telemetry (full executable env set)`);
+    lines.push(`    // OTEL telemetry (denoApp mode — native Deno OTEL)`);
     lines.push(
-      `    const otel = buildOtelEnvVars('${name}', config.Version, 'executable');`,
+      `    const otel = buildOtelEnvVars('${name}', config.Version, 'denoApp');`,
     );
     lines.push(`    for (const [key, value] of Object.entries(otel)) {`);
     lines.push(`      await resource.withEnvironment(key, value);`);
     lines.push(`    }`);
-    lines.push(
-      `    await resource.withOtlpExporter({ protocol: OtlpProtocol.HttpProtobuf });`,
-    );
 
     // Database dependency — all services wait for primary DB (C# parity)
     lines.push(``);
