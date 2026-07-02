@@ -56,7 +56,7 @@
  * Any downstream slice that adds a projection MUST route both seed and live
  * through it.
  *
- * ## FA-slice map (FA1 landed — FA2/FA3 still skeleton)
+ * ## FA-slice map (FA1 + FA2 landed — FA3 still skeleton)
  *
  * - **FA0**: module skeleton, subpath export, transport dep wiring,
  *   task-list registration.
@@ -64,11 +64,12 @@
  *   `resolveChatSnapshot`, and the one-projection reducer `projectChatSnapshot`.
  *   Bodies live in `./create-chat-connection.ts` and are re-exported below so
  *   FA2's concurrent edits to this file stay conflict-free.
- * - **FA2**: `createNetScriptChatStreamProxy` (the durable stream proxy handler).
+ * - **FA2** (landed): `createNetScriptChatStreamProxy` (the durable chat stream
+ *   proxy handler; body in `./stream-proxy.ts`, re-exported below).
  * - **FA3**: `createNetScriptMcpSandbox` (the MCP tool sandbox).
  *
- * The FA2/FA3 functions below remain typed stubs that throw `not implemented
- * (FA0 skeleton)`; each stub names the upstream value its body will wrap.
+ * The FA3 function below remains a typed stub that throws `not implemented
+ * (FA0 skeleton)`; it names the upstream value its body will wrap.
  *
  * @module
  */
@@ -91,14 +92,12 @@ export {
   resolveChatSnapshot,
   toNetScriptChatResponse,
 } from './create-chat-connection.ts';
-import type { NetScriptChatSessionTarget } from './create-chat-connection.ts';
 
-// Upstream wrap targets for the FA2/FA3 stubs. These value imports keep the
-// remaining transport deps in the module graph while each stub declares — via
+// Upstream wrap target for the FA3 stub. This value import keeps the remaining
+// transport dep in the module graph while the stub declares — via
 // `notImplemented(..., <target>)` — exactly which upstream primitive its body
 // will wrap. The public API below stays self-contained (local types only) so
 // the JSR doc gate never sees an external private type reference.
-import { toDurableStreamResponse } from '@durable-streams/tanstack-ai-transport';
 import { createMcpAppBridge } from '@tanstack/ai-preact';
 import { mergeAgentTools } from '@tanstack/ai';
 
@@ -116,34 +115,16 @@ function notImplemented(symbol: string, wrapTarget: unknown): never {
 }
 
 // ---------------------------------------------------------------------------
-// FA2 — durable stream proxy (route handler).
+// FA2 — durable chat stream proxy (route handler). Real implementation lives in
+// `./stream-proxy.ts`; re-exported here so `@netscript/fresh/ai` stays a single
+// barrel. See issue #251 / netscript#239 (gzip-mislabel fence).
 // ---------------------------------------------------------------------------
 
-/** A Fresh-compatible request handler that proxies a durable chat stream. */
-export type NetScriptChatStreamProxyHandler = (request: Request) => Promise<Response>;
-
-/** Options for the FA2 durable stream proxy handler. */
-export interface NetScriptChatStreamProxyOptions {
-  /**
-   * Durable session target, or a resolver deriving it from the request (e.g.
-   * pulling `sessionId` from the route params / auth context).
-   */
-  readonly target:
-    | NetScriptChatSessionTarget
-    | ((request: Request) => NetScriptChatSessionTarget);
-}
-
-/**
- * FA2 — build a route handler that proxies the durable chat session stream
- * (SSE / HTTP stream passthrough with NetScript auth). Wraps
- * `toDurableStreamResponse`. FA0 stub.
- */
-export function createNetScriptChatStreamProxy(
-  options: NetScriptChatStreamProxyOptions,
-): NetScriptChatStreamProxyHandler {
-  void options;
-  return notImplemented('createNetScriptChatStreamProxy', toDurableStreamResponse);
-}
+export {
+  createNetScriptChatStreamProxy,
+  type NetScriptChatStreamProxyHandler,
+  type NetScriptChatStreamProxyOptions,
+} from './stream-proxy.ts';
 
 // ---------------------------------------------------------------------------
 // FA3 — MCP tool sandbox.
