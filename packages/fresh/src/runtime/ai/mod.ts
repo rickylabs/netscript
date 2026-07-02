@@ -56,34 +56,49 @@
  * Any downstream slice that adds a projection MUST route both seed and live
  * through it.
  *
- * ## FA-slice map (this file is FA0 — skeleton only)
+ * ## FA-slice map (FA1 landed — FA2/FA3 still skeleton)
  *
- * - **FA0** (this slice): module skeleton, subpath export, transport dep wiring,
- *   task-list registration. NO handler bodies.
- * - **FA1**: `createNetScriptChatConnection`, `toNetScriptChatResponse`,
- *   `resolveChatSnapshot` (owns the one-projection reducer).
+ * - **FA0**: module skeleton, subpath export, transport dep wiring,
+ *   task-list registration.
+ * - **FA1** (landed): `createNetScriptChatConnection`, `toNetScriptChatResponse`,
+ *   `resolveChatSnapshot`, and the one-projection reducer `projectChatSnapshot`.
+ *   Bodies live in `./create-chat-connection.ts` and are re-exported below so
+ *   FA2's concurrent edits to this file stay conflict-free.
  * - **FA2**: `createNetScriptChatStreamProxy` (the durable stream proxy handler).
  * - **FA3**: `createNetScriptMcpSandbox` (the MCP tool sandbox).
  *
- * Every function below is a typed stub that throws `not implemented (FA0
- * skeleton)`. The signatures are the contract downstream slices implement, and
- * each stub names the upstream value it will wrap.
+ * The FA2/FA3 functions below remain typed stubs that throw `not implemented
+ * (FA0 skeleton)`; each stub names the upstream value its body will wrap.
  *
  * @module
  */
 
-// Upstream wrap targets. These value imports keep the three transport deps in
-// the module graph (so `@netscript/fresh/ai` resolves and locks) while each FA0
-// stub declares — via `notImplemented(..., <target>)` — exactly which upstream
-// primitive its FA1/FA2/FA3 body will wrap. The public API below stays
-// self-contained (local types only) so the JSR doc gate never sees an external
-// private type reference.
-import {
-  durableStreamConnection,
-  materializeSnapshotFromDurableStream,
-  toDurableChatSessionResponse,
-  toDurableStreamResponse,
-} from '@durable-streams/tanstack-ai-transport';
+// FA1 — durable chat connection, response, and the one-projection snapshot.
+// Implemented in `./create-chat-connection.ts`; re-exported here so the `./ai`
+// subpath surface stays in one place.
+export {
+  createNetScriptChatConnection,
+  type NetScriptChatAuthorize,
+  type NetScriptChatConnection,
+  type NetScriptChatConnectionOptions,
+  type NetScriptChatMessage,
+  type NetScriptChatResponseOptions,
+  type NetScriptChatSessionTarget,
+  type NetScriptChatSnapshot,
+  type NetScriptChatSnapshotOptions,
+  projectChatSnapshot,
+  type RenderPart,
+  resolveChatSnapshot,
+  toNetScriptChatResponse,
+} from './create-chat-connection.ts';
+import type { NetScriptChatSessionTarget } from './create-chat-connection.ts';
+
+// Upstream wrap targets for the FA2/FA3 stubs. These value imports keep the
+// remaining transport deps in the module graph while each stub declares — via
+// `notImplemented(..., <target>)` — exactly which upstream primitive its body
+// will wrap. The public API below stays self-contained (local types only) so
+// the JSR doc gate never sees an external private type reference.
+import { toDurableStreamResponse } from '@durable-streams/tanstack-ai-transport';
 import { createMcpAppBridge } from '@tanstack/ai-preact';
 import { mergeAgentTools } from '@tanstack/ai';
 
@@ -98,137 +113,6 @@ const FA0_SKELETON = 'not implemented (FA0 skeleton)';
 function notImplemented(symbol: string, wrapTarget: unknown): never {
   void wrapTarget;
   throw new Error(`${symbol}: ${FA0_SKELETON}`);
-}
-
-// ---------------------------------------------------------------------------
-// Shared local surface types (NetScript-owned; no upstream types leak here).
-// ---------------------------------------------------------------------------
-
-/**
- * Addresses one durable chat session stream. NetScript-owned target that FA1+
- * resolves into an upstream `DurableStreamTarget` with auth applied.
- */
-export interface NetScriptChatSessionTarget {
-  /** Stable id of the chat session; one durable stream per `sessionId`. */
-  readonly sessionId: string;
-  /** Base URL of the NetScript durable-stream endpoint (resolved if omitted). */
-  readonly baseUrl?: string;
-  /** Auth / correlation headers applied to every durable-stream request. */
-  readonly headers?: Readonly<Record<string, string>>;
-}
-
-/**
- * A single chat message projected from the durable session chunk log. Local
- * shape so seed and live projections agree on a NetScript-owned message type.
- */
-export interface NetScriptChatMessage {
-  /** Stable message id within the session. */
-  readonly id: string;
-  /** Author role of the message. */
-  readonly role: 'system' | 'user' | 'assistant' | 'tool';
-  /** Reduced text content of the message. */
-  readonly content: string;
-}
-
-// ---------------------------------------------------------------------------
-// FA1 — durable chat connection, response, and the one-projection snapshot.
-// ---------------------------------------------------------------------------
-
-/** Options for opening a durable chat session connection. */
-export interface NetScriptChatConnectionOptions {
-  /** The durable chat session to connect to. */
-  readonly target: NetScriptChatSessionTarget;
-}
-
-/** A live handle to a durable chat session connection. */
-export interface NetScriptChatConnection {
-  /** Session id this connection is bound to. */
-  readonly sessionId: string;
-  /** Tear down the underlying durable-stream subscription. */
-  readonly close: () => void;
-}
-
-/**
- * FA1 — open a durable chat session connection.
- *
- * Wraps `durableStreamConnection` from the transport with NetScript URL
- * resolution + auth. FA0 stub.
- */
-export function createNetScriptChatConnection(
-  options: NetScriptChatConnectionOptions,
-): NetScriptChatConnection {
-  void options;
-  return notImplemented('createNetScriptChatConnection', durableStreamConnection);
-}
-
-/** Options for turning a server chat activity into a durable session `Response`. */
-export interface NetScriptChatResponseOptions {
-  /** The durable session stream to append the assistant turn into. */
-  readonly target: NetScriptChatSessionTarget;
-  /** The server-side chat stream to sanitize and persist as chunks. */
-  readonly source: AsyncIterable<unknown>;
-}
-
-/**
- * FA1 — produce a durable chat session `Response` from a server chat stream.
- *
- * Wraps `toDurableChatSessionResponse`. FA0 stub.
- */
-export function toNetScriptChatResponse(
-  options: NetScriptChatResponseOptions,
-): Promise<Response> {
-  void options;
-  return notImplemented('toNetScriptChatResponse', toDurableChatSessionResponse);
-}
-
-/**
- * A single tool card as materialized by the one-projection reducer. Both the
- * seed snapshot and the live projection MUST emit these identically.
- */
-export interface NetScriptChatToolCard {
-  /** Upstream tool-call id that ties chunks to this card. */
-  readonly toolCallId: string;
-  /** Name of the invoked tool. */
-  readonly toolName: string;
-  /** Lifecycle state of the card as reduced from the chunk log. */
-  readonly state: 'pending' | 'streaming' | 'complete' | 'error';
-  /** Reduced tool input (may be partial while `streaming`). */
-  readonly input: unknown;
-  /** Reduced tool output, present once `complete`. */
-  readonly output?: unknown;
-}
-
-/**
- * The projected chat state — the SINGLE output type of the one-projection
- * reducer. Returned by `resolveChatSnapshot` (seed) and by the live island
- * projection (FB2): same type, same code path (see ONE-PROJECTION LAW above).
- */
-export interface NetScriptChatSnapshot {
-  /** Ordered chat messages reduced from the durable session chunk log. */
-  readonly messages: ReadonlyArray<NetScriptChatMessage>;
-  /** Tool cards reduced from the same chunk log. */
-  readonly toolCards: ReadonlyArray<NetScriptChatToolCard>;
-  /** Replay cursor: the last chunk offset folded into this snapshot. */
-  readonly cursor: string | null;
-}
-
-/** Options for resolving a seed chat snapshot from a durable session. */
-export interface NetScriptChatSnapshotOptions {
-  /** The durable session stream to project. */
-  readonly target: NetScriptChatSessionTarget;
-}
-
-/**
- * FA1 — resolve the seed chat snapshot for SSR / first paint.
- *
- * MUST delegate to the same projection reducer as the live island path
- * (ONE-PROJECTION LAW). Wraps `materializeSnapshotFromDurableStream`. FA0 stub.
- */
-export function resolveChatSnapshot(
-  options: NetScriptChatSnapshotOptions,
-): Promise<NetScriptChatSnapshot> {
-  void options;
-  return notImplemented('resolveChatSnapshot', materializeSnapshotFromDurableStream);
 }
 
 // ---------------------------------------------------------------------------
