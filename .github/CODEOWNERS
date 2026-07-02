@@ -1,0 +1,41 @@
+# CODEOWNERS — default reviewers per path.
+# Syntax: https://docs.github.com/articles/about-code-owners
+# The last matching pattern takes precedence. Keep this in sync with the `area:*` label map.
+
+# Default owner for everything not matched below.
+*                           @rickylabs
+
+# Governance, process, and community-health surface.
+/.github/                   @rickylabs
+/rfcs/                      @rickylabs
+/CONTRIBUTING.md            @rickylabs
+/CODE_OF_CONDUCT.md         @rickylabs
+/SECURITY.md                @rickylabs
+/SUPPORT.md                 @rickylabs
+/AGENTS.md                  @rickylabs
+/CLAUDE.md                  @rickylabs
+
+# Agent skills, harness, and doctrine.
+/.agents/                   @rickylabs
+/.llm/                      @rickylabs
+/docs/architecture/         @rickylabs
+
+# Framework packages and plugins (area:* map).
+/packages/cli/              @rickylabs
+/packages/fresh/            @rickylabs
+/packages/fresh-ui/         @rickylabs
+/packages/aspire/           @rickylabs
+/packages/database/         @rickylabs
+/packages/kv/               @rickylabs
+/packages/sdk/              @rickylabs
+/packages/service/          @rickylabs
+/packages/config/           @rickylabs
+/packages/runtime-config/   @rickylabs
+/packages/telemetry/        @rickylabs
+/packages/ai/               @rickylabs
+/packages/plugin-ai-core/   @rickylabs
+/packages/auth-better-auth/ @rickylabs
+/plugins/                   @rickylabs
+
+# Docs site.
+/docs/                      @rickylabs

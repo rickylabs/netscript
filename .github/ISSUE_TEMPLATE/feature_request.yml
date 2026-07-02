@@ -1,0 +1,63 @@
+name: Feature request
+description: Propose a new capability or enhancement that does not require a full RFC.
+title: "feat: "
+labels: ["enhancement", "status:triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for scoped, non-breaking enhancements. **Substantial, cross-cutting, or breaking
+        changes need an [RFC](https://github.com/rickylabs/netscript/blob/main/rfcs/README.md)** —
+        open an RFC proposal instead. Not sure? Start a [Discussion → Ideas](https://github.com/rickylabs/netscript/discussions/categories/ideas).
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / motivation
+      description: What problem does this solve? Who is affected and how?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What should the API/behavior look like? Include a rough sketch if you have one.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - cli
+        - fresh
+        - fresh-ui
+        - plugins
+        - auth
+        - aspire
+        - database
+        - kv
+        - sdk
+        - service
+        - config
+        - telemetry
+        - ai-core / plugin-ai
+        - tooling
+        - docs
+        - unsure
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+    validations:
+      required: false
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope check
+      options:
+        - label: This is a scoped enhancement, not a breaking or cross-cutting redesign (those need an RFC).
+          required: true
+        - label: I searched existing issues and Discussions for prior art.
+          required: true

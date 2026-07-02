@@ -1,0 +1,61 @@
+name: RFC proposal (tracking issue)
+description: Open a tracking issue for a substantial or breaking design change. Read rfcs/README.md first.
+title: "rfc: "
+labels: ["rfc", "status:triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        RFCs govern **substantial** changes: new public APIs, breaking changes, cross-package
+        architecture, plugin-contract or doctrine changes, and anything that alters the release
+        surface. The full lifecycle (Draft → Discussion → Accepted/Rejected/Withdrawn → tracking)
+        lives in [`rfcs/README.md`](https://github.com/rickylabs/netscript/blob/main/rfcs/README.md).
+
+        This issue is the **tracking issue** for the RFC. The RFC text itself goes in a PR that adds
+        `rfcs/NNNN-<slug>.md` using [`rfcs/0000-template.md`](https://github.com/rickylabs/netscript/blob/main/rfcs/0000-template.md).
+  - type: input
+    id: title
+    attributes:
+      label: RFC title
+      description: Short, descriptive title of the proposed change.
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: One paragraph. What is being proposed and why now?
+    validations:
+      required: true
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: What problem does this solve? What is the cost of not doing it?
+    validations:
+      required: true
+  - type: checkboxes
+    id: gate
+    attributes:
+      label: Why this needs an RFC (check all that apply)
+      options:
+        - label: Adds or changes a public API / package export surface.
+        - label: Is a breaking change or affects the release/publish surface.
+        - label: Changes plugin contracts, the service seam, or architecture doctrine.
+        - label: Cross-cutting across multiple packages/plugins.
+  - type: input
+    id: rfc_pr
+    attributes:
+      label: RFC PR (if opened)
+      description: Link to the `rfcs/NNNN-<slug>.md` PR, once created.
+    validations:
+      required: false
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I read `rfcs/README.md` and confirmed a plain issue/feature request is insufficient.
+          required: true
+        - label: I opened (or will open) a Discussion in the RFCs category for design debate.
+          required: false
