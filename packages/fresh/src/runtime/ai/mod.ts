@@ -62,7 +62,8 @@
  *   task-list registration. NO handler bodies.
  * - **FA1**: `createNetScriptChatConnection`, `toNetScriptChatResponse`,
  *   `resolveChatSnapshot` (owns the one-projection reducer).
- * - **FA2**: `createNetScriptChatStreamProxy` (the durable stream proxy handler).
+ * - **FA2**: `createChatStreamProxyHandler` (the durable chat stream proxy
+ *   handler; implemented in `./stream-proxy.ts`, fences netscript#239).
  * - **FA3**: `createNetScriptMcpSandbox` (the MCP tool sandbox).
  *
  * Every function below is a typed stub that throws `not implemented (FA0
@@ -82,7 +83,6 @@ import {
   durableStreamConnection,
   materializeSnapshotFromDurableStream,
   toDurableChatSessionResponse,
-  toDurableStreamResponse,
 } from '@durable-streams/tanstack-ai-transport';
 import { createMcpAppBridge } from '@tanstack/ai-preact';
 import { mergeAgentTools } from '@tanstack/ai';
@@ -232,34 +232,16 @@ export function resolveChatSnapshot(
 }
 
 // ---------------------------------------------------------------------------
-// FA2 — durable stream proxy (route handler).
+// FA2 — durable chat stream proxy (route handler). Real implementation lives in
+// `./stream-proxy.ts`; re-exported here so `@netscript/fresh/ai` stays a single
+// barrel. See issue #251 / netscript#239 (gzip-mislabel fence).
 // ---------------------------------------------------------------------------
 
-/** A Fresh-compatible request handler that proxies a durable chat stream. */
-export type NetScriptChatStreamProxyHandler = (request: Request) => Promise<Response>;
-
-/** Options for the FA2 durable stream proxy handler. */
-export interface NetScriptChatStreamProxyOptions {
-  /**
-   * Durable session target, or a resolver deriving it from the request (e.g.
-   * pulling `sessionId` from the route params / auth context).
-   */
-  readonly target:
-    | NetScriptChatSessionTarget
-    | ((request: Request) => NetScriptChatSessionTarget);
-}
-
-/**
- * FA2 — build a route handler that proxies the durable chat session stream
- * (SSE / HTTP stream passthrough with NetScript auth). Wraps
- * `toDurableStreamResponse`. FA0 stub.
- */
-export function createNetScriptChatStreamProxy(
-  options: NetScriptChatStreamProxyOptions,
-): NetScriptChatStreamProxyHandler {
-  void options;
-  return notImplemented('createNetScriptChatStreamProxy', toDurableStreamResponse);
-}
+export {
+  type ChatStreamProxyHandler,
+  type ChatStreamProxyHandlerOptions,
+  createChatStreamProxyHandler,
+} from './stream-proxy.ts';
 
 // ---------------------------------------------------------------------------
 // FA3 — MCP tool sandbox.
