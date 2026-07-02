@@ -101,11 +101,14 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
     lines.push(``);
     lines.push(`    // OTEL telemetry (full executable env set)`);
     lines.push(
-      `    const otel = buildOtelEnvVars('${name}', config.Version, 'executable', config.Otel.HttpEndpoint);`,
+      `    const otel = buildOtelEnvVars('${name}', config.Version, 'executable');`,
     );
     lines.push(`    for (const [key, value] of Object.entries(otel)) {`);
     lines.push(`      await resource.withEnvironment(key, value);`);
     lines.push(`    }`);
+    lines.push(
+      `    await resource.withOtlpExporter({ protocol: OtlpProtocol.HttpProtobuf });`,
+    );
 
     // Database dependency
     if (entry.RequiresDb) {

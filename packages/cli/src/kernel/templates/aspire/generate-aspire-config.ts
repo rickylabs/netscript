@@ -7,12 +7,13 @@
  * project directory.
  */
 
-import { PORT_RANGES } from '../../constants/port-ranges.ts';
 import { SCAFFOLD_ASPIRE_INTEGRATIONS } from '../../constants/scaffold/scaffold-aspire.ts';
 import { SCAFFOLD_DEFAULTS } from '../../constants/scaffold/scaffold-defaults.ts';
 import { SCAFFOLD_VERSIONS } from '../../constants/scaffold/scaffold-versions.ts';
 import type { CacheBackendChoice } from '../../domain/cache-backend.ts';
 import type { DbEngineChoice } from '../../domain/db-engine.ts';
+
+const ASPIRE_EPHEMERAL_PORT = 0;
 
 /** Options for generating `aspire.config.json`. */
 export interface AspireConfigOptions {
@@ -127,16 +128,14 @@ export function generateTsAspireConfig(options?: TsAspireConfigOptions): string 
     },
     profiles: {
       https: {
-        applicationUrl: `https://localhost:${PORT_RANGES.ASPIRE_DASHBOARD};http://localhost:${
-          PORT_RANGES.ASPIRE_DASHBOARD + 1
-        }`,
+        applicationUrl:
+          `https://localhost:${ASPIRE_EPHEMERAL_PORT};http://localhost:${ASPIRE_EPHEMERAL_PORT}`,
         environmentVariables: {
-          ASPIRE_DASHBOARD_OTLP_HTTP_ENDPOINT_URL: `http://localhost:${PORT_RANGES.OTEL_COLLECTOR}`,
+          ASPIRE_DASHBOARD_OTLP_HTTP_ENDPOINT_URL:
+            `http://localhost:${ASPIRE_EPHEMERAL_PORT}`,
           ASPIRE_ALLOW_UNSECURED_TRANSPORT: 'true',
           ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS: 'true',
-          ASPIRE_RESOURCE_SERVICE_ENDPOINT_URL: `https://localhost:${
-            PORT_RANGES.ASPIRE_DASHBOARD + 3
-          }`,
+          ASPIRE_RESOURCE_SERVICE_ENDPOINT_URL: `https://localhost:${ASPIRE_EPHEMERAL_PORT}`,
         },
       },
     },

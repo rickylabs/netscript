@@ -92,7 +92,7 @@ describe('generateRegisterBackground', () => {
     });
     assertStringIncludes(
       output,
-      "buildOtelEnvVars('workers', config.Version, 'executable', config.Otel.HttpEndpoint)",
+      "buildOtelEnvVars('workers', config.Version, 'executable')",
     );
     assertStringIncludes(output, '// OTEL telemetry (full executable env set)');
   });
@@ -150,7 +150,7 @@ describe('generateRegisterBackground', () => {
     assertStringIncludes(output, 'withReference(infrastructure.primaryCacheEndpoint)');
     assertStringIncludes(
       output,
-      "import { EndpointProperty } from '../.aspire/modules/aspire.mjs'",
+      "import { EndpointProperty, OtlpProtocol } from '../.aspire/modules/aspire.mjs'",
     );
     assertStringIncludes(
       output,
@@ -262,7 +262,7 @@ describe('generateRegisterApps', () => {
     });
     assertStringIncludes(
       output,
-      "buildOtelEnvVars('frontend', config.Version, 'executable', config.Otel.HttpEndpoint)",
+      "buildOtelEnvVars('frontend', config.Version, 'executable')",
     );
   });
 

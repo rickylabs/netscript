@@ -95,11 +95,14 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
       lines.push(``);
       lines.push(`    // OTEL telemetry (full executable env set)`);
       lines.push(
-        `    const ${id}_otel = buildOtelEnvVars('${name}', config.Version, 'executable', config.Otel.HttpEndpoint);`,
+        `    const ${id}_otel = buildOtelEnvVars('${name}', config.Version, 'executable');`,
       );
       lines.push(`    for (const [key, value] of Object.entries(${id}_otel)) {`);
       lines.push(`      await ${id}.withEnvironment(key, value);`);
       lines.push(`    }`);
+      lines.push(
+        `    await ${id}.withOtlpExporter({ protocol: OtlpProtocol.HttpProtobuf });`,
+      );
     } else {
       lines.push(``);
       lines.push(`    // Telemetry disabled — opt out explicitly`);
