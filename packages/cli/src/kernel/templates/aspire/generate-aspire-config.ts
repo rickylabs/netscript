@@ -118,6 +118,9 @@ export function generateTsAspireConfig(options?: TsAspireConfigOptions): string 
     packages[integration.PACKAGE_ID] = integration.VERSION;
   }
 
+  packages[SCAFFOLD_ASPIRE_INTEGRATIONS.BROWSERS.PACKAGE_ID] =
+    SCAFFOLD_ASPIRE_INTEGRATIONS.BROWSERS.VERSION;
+
   const config: Record<string, unknown> = {
     appHost: {
       path: 'apphost.mts',

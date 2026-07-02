@@ -72,4 +72,16 @@ describe('generateTsAspireConfig', () => {
     assertEquals(config.packages['Aspire.Hosting.SqlServer'], '13.4.6');
     assert(!('sqlite' in config.packages));
   });
+
+  it('includes the browser logs integration package by default', () => {
+    const config = JSON.parse(generateTsAspireConfig()) as {
+      packages?: Record<string, string>;
+    };
+
+    assert(config.packages);
+    assertEquals(
+      config.packages['Aspire.Hosting.Browsers'],
+      '13.4.6-preview.1.26319.6',
+    );
+  });
 });

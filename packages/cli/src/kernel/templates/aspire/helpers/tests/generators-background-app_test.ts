@@ -274,6 +274,15 @@ describe('generateRegisterApps', () => {
     assertStringIncludes(output, ".withHttpEndpoint({ port: 8000, env: 'PORT' })");
   });
 
+  it('should enable browser logs for app resources with HTTP endpoints', () => {
+    const output = generateRegisterApps({
+      ...emptyOptions,
+      apps: { frontend: fixtures.MINIMAL_APP },
+    });
+
+    assertStringIncludes(output, 'await frontend.withBrowserLogs();');
+  });
+
   it('should use deno task for app registration', () => {
     const output = generateRegisterApps({
       ...emptyOptions,

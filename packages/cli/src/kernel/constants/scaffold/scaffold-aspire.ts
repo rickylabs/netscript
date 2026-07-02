@@ -32,6 +32,10 @@ export const SCAFFOLD_ASPIRE_INTEGRATIONS = {
     PACKAGE_ID: 'Aspire.Hosting.Garnet',
     VERSION: '13.4.6',
   },
+  BROWSERS: {
+    PACKAGE_ID: 'Aspire.Hosting.Browsers',
+    VERSION: '13.4.6-preview.1.26319.6',
+  },
   DENO_KV: {
     PACKAGE_ID: 'CommunityToolkit.Aspire.Hosting.Deno',
     VERSION: '13.4.0',
