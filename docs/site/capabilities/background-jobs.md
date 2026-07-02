@@ -241,6 +241,55 @@ export default handler;
   ]
 }) }}
 
+## Trigger a job from a typed client
+
+The `…/trigger` curl above is the OpenAPI/REST way in. Because the workers API is a **plugin
+service**, the same trigger is reachable with a generated typed client over the RPC route
+`/api/rpc/*` — no OpenAPI-only fallback and no transport `404`. A first-party plugin API mounts
+its router under a named segment, so the client takes a `routerName` alongside `serviceName`;
+Aspire injects the URL under `services__workers-api__http__0`.
+
+```ts
+// Reach the workers plugin API with a generated typed client.
+import { createServiceClient } from '@netscript/sdk/client';
+import { workersContract } from '@netscript/plugin-workers/contracts';
+
+const workers = createServiceClient<typeof workersContract>({
+  contract: workersContract,
+  serviceName: 'workers-api',
+  routerName: 'workers',
+});
+
+// triggerJob is served over /api/rpc/* and returns { jobId, triggered }.
+// The {id} path segment is the single source of truth for the target job;
+// a body id is optional and ignored if sent.
+const { jobId, triggered } = await workers.triggerJob({
+  id: 'process-payment',
+  payload: { orderId: 'o_42', amountCents: 4999 },
+});
+
+// triggerTask is the polyglot-task twin, returning { taskId, triggered }.
+const task = await workers.triggerTask({ id: 'validate-payload', payload: {} });
+```
+
+{{ comp.apiTable({
+  caption: "Trigger procedures — served over /api/rpc/* (typed client) and /api/v1/... (OpenAPI/REST)",
+  rows: [
+    { name: "triggerJob({ id, payload?, priority?, delay?, correlationId? })", type: "{ jobId, triggered }", desc: "POST /jobs/{id}/trigger — enqueue a run of the job named by the {id} path segment; resolves the jobId and a triggered flag." },
+    { name: "triggerTask({ id, payload?, priority?, delay?, correlationId? })", type: "{ taskId, triggered }", desc: "POST /tasks/{id}/trigger — enqueue a run of the polyglot task named by the {id} path segment; resolves the taskId and a triggered flag." }
+  ]
+}) }}
+
+{{ comp callout { type: "caution", title: "The {id} path segment is authoritative" } }}
+<code>triggerJob</code> / <code>triggerTask</code> derive the target id from the
+<code>{id}</code> URL path segment, not the request body. A body <code>id</code> is optional and
+ignored when present, so it can never disagree with the path. If no id resolves, the handler
+short-circuits to a typed <code>VALIDATION_ERROR</code> (HTTP&nbsp;422) through the centralized
+<code>validationFailed</code> contract helper <em>before any KV write</em> — it never persists an
+<code>undefined</code>-keyed run. Handle it as the contract's typed error on the client, not a
+generic <code>500</code>.
+{{ /comp }}
+
 ## Graceful shutdown
 
 Background runners must drain in flight work before they exit, or a redeploy loses jobs
@@ -299,16 +348,19 @@ endpoints the CLI E2E suite validates live.
 }) }}
 
 {{ comp callout { type: "note", title: "Where jobs come from" } }}
-The runtime scans <code>workers/jobs</code> (the primary user jobs directory) for
-default-exported handlers, and also includes plugin-contributed handlers from
-<code>plugins/workers/jobs</code> (and <code>plugins/triggers/jobs</code> when present). The
-generated registry lands at
-<code>.netscript/generated/plugin-workers/job-registry.ts</code>, keyed by each handler's
-<code>id</code>. Background execution runs from <code>plugins/workers/bin/combined.ts</code>,
-a <em>separate</em> process from the <code>:8091</code> API service — the API enqueues, the
-runner executes. Set <code>WORKERS_CONCURRENCY</code> on the worker background process when you
-need a specific process pool size. Current Aspire metadata also emits
-<code>WORKER_CONCURRENCY</code>, but the runtime entrypoint does not consume it; use
+Each handler file under your jobs directory (<code>workers/jobs</code> by default,
+<code>*.ts</code>) is discovered and compiled into one generated registry at
+<code>.netscript/generated/plugin-workers/job-registry.ts</code>, keyed by the source filename —
+so <code>workers/jobs/process-payment.ts</code> registers as <code>process-payment</code>. Both
+the <code>:8091</code> API service <em>and</em> the background runner load that single registry at
+startup: the API service registers the generated user job definitions <em>before it serves</em>,
+so your jobs — not just the built-in <code>workers-plugin-health-check</code> — appear in
+<code>GET /api/v1/workers/jobs</code> and resolve on trigger. Background execution runs from
+<code>plugins/workers/bin/combined.ts</code>, a <em>separate</em> process from the API service —
+the API enqueues, the runner executes. A missing generated registry is tolerated as an empty set,
+so a fresh workspace boots before you author any job. Set <code>WORKERS_CONCURRENCY</code> on the
+worker background process when you need a specific process pool size. Current Aspire metadata also
+emits <code>WORKER_CONCURRENCY</code>, but the runtime entrypoint does not consume it; use
 <a href="/how-to/tune-worker-runtime/">Tune the worker runtime</a> for the mismatch details.
 {{ /comp }}
 
