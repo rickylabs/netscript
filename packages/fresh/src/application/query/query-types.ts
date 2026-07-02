@@ -116,6 +116,16 @@ export interface IslandQueryOptions<TData = unknown, TError = unknown, TSelected
   select?: (data: TData) => TSelected;
   /** Optional error callback. */
   onError?: (error: TError) => void;
+  /**
+   * Polling interval in milliseconds. When set, the query refetches on this
+   * cadence. Set to `false` to disable polling. Defaults to `false`.
+   */
+  refetchInterval?: number | false;
+  /**
+   * Whether polling continues while the tab or window is in the background.
+   * Only relevant when `refetchInterval` is set. Defaults to `false`.
+   */
+  refetchIntervalInBackground?: boolean;
 }
 
 /** Options accepted by `useIslandInfiniteQuery`. */
