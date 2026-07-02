@@ -19,6 +19,19 @@
  *
  * See netscript#219 (root-cause wire proof) and #239 (this runtime-side fix).
  *
+ * ## Cancel lifecycle (netscript#268 / SR1)
+ *
+ * The upstream body is not forwarded to `Deno.serve` as the raw `fetch`
+ * response stream. Handing the raw stream through means a client disconnect
+ * cancels the `fetch` body directly, which tears the upstream connection down
+ * as an *uncaught* `AbortError` (noisy logs / half-open upstream read).
+ * Instead {@link restreamUpstreamBody} wraps the upstream reader in an explicit
+ * {@link ReadableStream} whose `cancel()` runs the upstream reader's own
+ * `cancel()`. On client disconnect the served stream's `cancel()` fires, the
+ * upstream reader is released cleanly, and no `AbortError` propagates. The
+ * re-streamed bytes are enqueued verbatim, so the #239 invariant above is
+ * preserved unchanged.
+ *
  * @module
  */
 
@@ -58,12 +71,72 @@ export function sanitizeProxyResponseHeaders(source: Headers): Headers {
 }
 
 /**
+ * Re-stream an upstream `fetch` response body through an explicit
+ * {@link ReadableStream} that decouples its lifecycle from the upstream `fetch`
+ * connection's `AbortSignal`.
+ *
+ * Bytes are enqueued verbatim as they are read (no buffering, transform, or
+ * re-framing), so the payload is byte-identical to the upstream body and the
+ * #239 "content-encoding describes the bytes sent" invariant is preserved.
+ *
+ * The returned stream's `cancel()` — fired by `Deno.serve` when the client
+ * disconnects mid-stream — cancels the upstream reader, which releases the
+ * upstream `fetch` connection cleanly. This replaces the previous behavior of
+ * handing the raw `fetch` body to `Deno.serve`, where a client disconnect tore
+ * the upstream connection down as an uncaught `AbortError` (netscript#268 SR1).
+ *
+ * @param upstreamBody The non-null body of the upstream `fetch` response.
+ * @returns A fresh readable stream that forwards `upstreamBody`'s chunks and
+ *   propagates downstream cancellation to the upstream reader.
+ */
+export function restreamUpstreamBody(
+  upstreamBody: ReadableStream<Uint8Array>,
+): ReadableStream<Uint8Array> {
+  const reader = upstreamBody.getReader();
+  return new ReadableStream<Uint8Array>({
+    async pull(controller) {
+      try {
+        const { done, value } = await reader.read();
+        if (done) {
+          controller.close();
+          reader.releaseLock();
+          return;
+        }
+        controller.enqueue(value);
+      } catch (error) {
+        // The upstream read failed (e.g. the upstream connection dropped):
+        // surface it as a stream error and release the reader lock.
+        controller.error(error);
+        try {
+          reader.releaseLock();
+        } catch {
+          // The reader may already be released/errored — nothing to do.
+        }
+      }
+    },
+    cancel(reason) {
+      // Downstream (the client) cancelled — typically the browser disconnected
+      // mid-stream and `Deno.serve` cancelled the response body. Cancel the
+      // upstream reader so the upstream `fetch` connection is released cleanly
+      // instead of being abandoned and surfacing as an uncaught `AbortError`.
+      return reader.cancel(reason);
+    },
+  });
+}
+
+/**
  * Re-wrap an upstream proxy response so its headers describe the bytes on the
- * wire. The body stream is passed through unbuffered; only the headers are
- * rewritten (see {@link sanitizeProxyResponseHeaders}).
+ * wire and its body's cancel lifecycle is owned by the proxy.
+ *
+ * Headers are rewritten by {@link sanitizeProxyResponseHeaders} (the #239
+ * content-encoding/content-length/hop-by-hop strip). The body is re-streamed
+ * through {@link restreamUpstreamBody} so a client disconnect cancels the
+ * upstream reader cleanly rather than aborting the upstream `fetch`. A null
+ * upstream body (e.g. a `204`/`304`) is forwarded as `null` unchanged.
  */
 export function sanitizeProxyResponse(upstream: Response): Response {
-  return new Response(upstream.body, {
+  const body = upstream.body === null ? null : restreamUpstreamBody(upstream.body);
+  return new Response(body, {
     status: upstream.status,
     statusText: upstream.statusText,
     headers: sanitizeProxyResponseHeaders(upstream.headers),

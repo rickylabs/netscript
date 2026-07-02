@@ -7,8 +7,11 @@
  *  1. **Header hygiene** — the upstream mislabels a decoded JSON body with
  *     `content-encoding: gzip`; {@link sanitizeProxyResponse} strips that (and
  *     the hop-by-hop headers) so the response describes the bytes actually sent
- *     (netscript#219 / #239). Every response returned from this handler passes
- *     through that sanitizer.
+ *     (netscript#219 / #239). The same sanitizer also re-streams the upstream
+ *     body through an explicit `ReadableStream` so a client disconnect cancels
+ *     the upstream reader cleanly instead of tearing the upstream `fetch` down
+ *     as an uncaught `AbortError` (netscript#268 / SR1). Every response returned
+ *     from this handler passes through that sanitizer.
  *
  *  2. **Fresh-session live-read race** — a brand-new chat session issues its
  *     first live/subscribe poll of a durable stream *before* the producer's
