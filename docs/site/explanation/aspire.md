@@ -79,9 +79,22 @@ and runs the resulting graph.
   {
     label: "aspire/aspire.config.json (generated)",
     lang: "json",
-    code: "{\n  \"appHost\": { \"path\": \"apphost.mts\", \"language\": \"typescript/nodejs\" },\n  \"sdk\": { \"version\": \"13.4.6\" },\n  \"profiles\": {\n    \"https\": {\n      \"applicationUrl\": \"https://localhost:18888;http://localhost:18889\",\n      \"environmentVariables\": {\n        \"ASPIRE_DASHBOARD_OTLP_HTTP_ENDPOINT_URL\": \"http://localhost:4318\",\n        \"ASPIRE_ALLOW_UNSECURED_TRANSPORT\": \"true\",\n        \"ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS\": \"true\"\n      }\n    }\n  },\n  \"packages\": { \"Aspire.Hosting.PostgreSQL\": \"13.4.6\" }\n}"
+    code: "{\n  \"appHost\": { \"path\": \"apphost.mts\", \"language\": \"typescript/nodejs\" },\n  \"sdk\": { \"version\": \"13.4.6\" },\n  \"profiles\": {\n    \"https\": {\n      \"applicationUrl\": \"https://localhost:0;http://localhost:0\",\n      \"environmentVariables\": {\n        \"ASPIRE_DASHBOARD_OTLP_HTTP_ENDPOINT_URL\": \"http://localhost:0\",\n        \"ASPIRE_ALLOW_UNSECURED_TRANSPORT\": \"true\",\n        \"ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS\": \"true\",\n        \"ASPIRE_RESOURCE_SERVICE_ENDPOINT_URL\": \"https://localhost:0\"\n      }\n    }\n  },\n  \"packages\": {\n    \"Aspire.Hosting.PostgreSQL\": \"13.4.6\",\n    \"Aspire.Hosting.Browsers\": \"13.4.6-preview.1.26319.6\"\n  }\n}"
   }
 ] }) }}
+
+{{ comp callout { type: "important", title: "Dashboard and OTLP ports are ephemeral, not pinned" } }}
+The generated <code>https</code> profile asks Kestrel for <strong>ephemeral ports</strong> —
+<code>applicationUrl</code>, the OTLP endpoint, and the resource-service endpoint are all
+<code>localhost:0</code>, so Aspire binds a free port per run instead of hard-pinning the
+dashboard to <code>:18888</code> or the collector to <code>:4318</code>. Two consequences: (1)
+<strong>trust the URL <code>aspire start</code> prints</strong>, not a memorized port — the
+examples in this essay use <code>:18888</code>/<code>:4318</code> as the conventional Aspire
+defaults, but your run may differ; (2) <code>aspire start --isolated</code> gets its own free
+infra ports <em>and</em> isolated secrets under an isolated run folder, so several apphosts can run
+side by side without colliding on the base dashboard. Point telemetry backends at the endpoint the
+run reports, or set <code>ASPIRE_DASHBOARD_OTLP_HTTP_ENDPOINT_URL</code> yourself to fix it.
+{{ /comp }}
 
 Two facts about the AppHost are worth internalizing because they contradict assumptions people
 carry from .NET Aspire:
@@ -206,6 +219,25 @@ dependency from each entry:
   ]
 }) }}
 
+{{ comp callout { type: "note", title: "Services now declare references too" } }}
+Every resource entry — <code>ServiceEntry</code> included — extends the same
+<code>ReferenceEntry</code>, so a <strong>service</strong> is no longer excluded from
+plugin-reference wiring: it can carry <code>PluginReferences</code> and reach a plugin API over the
+injected <code>services__&lt;plugin&gt;__http__0</code> variable, exactly as apps and background
+processors do. You express this in <code>netscript.config.ts</code> on the service's own section,
+where two fields resolve into the generated <code>appsettings.json</code> entry:
+<ul>
+<li><code>pluginReferences: string[]</code> — plugin APIs this service calls (lowers to
+<code>PluginReferences</code>). This is the field that closes the earlier "a Service can't declare
+<code>PluginReferences</code>" gap.</li>
+<li><code>dependsOn: string[]</code> — sibling services this service waits on (lowers to the
+resource's <code>ServiceReferences</code>, driving both discovery wiring and start ordering).</li>
+</ul>
+See {{ comp.xref({ key: "howto:discover-services", text: "Discover services" }) }} for the
+two-pass resolution these fields feed, and {{ comp.xref({ key: "ref:config", text: "the config reference" }) }}
+for the full service-section schema.
+{{ /comp }}
+
 Because endpoints only exist once resources are created, the wiring happens in **two passes**:
 first every resource is created, then a second pass resolves each reference against the now-known
 graph and injects it. In the generated builder that resolution lands as the equivalent of
@@ -265,6 +297,66 @@ Each of these capabilities has its own hub: {{ comp.xref({ key: "cap:services", 
 {{ comp.xref({ key: "cap:database", text: "Database" }) }} are the practical pages behind the
 graph nodes above.
 
+## Customizing the generated AppHost: restart, regenerate, or hand-edit
+
+Once the graph is running, the recurring question is *which change needs which action*. Because the
+`register-*.mts` helper layer is **generated from `netscript.config.ts`/`appsettings.json`**, most
+edits are a config change plus a regenerate, not a hand-edit of the AppHost. The regenerate command
+is `netscript service generate` — it rewrites only the Aspire helper files, never your service code.
+
+{{ comp.apiTable({
+  caption: "Which change needs which action",
+  rows: [
+    { name: "Handler / service / app code", type: "hot or restart resource", desc: "Apps and background processors scaffold with Deno watch mode, so they reload on save. A plain service restarts from the dashboard. No regenerate, no AppHost restart." },
+    { name: "Env / Permissions / Port / Workdir on a resource", type: "generate + restart AppHost", desc: "Edit the resource's section in netscript.config.ts, run `netscript service generate` to rewrite the register-*.mts layer, then restart `aspire start`." },
+    { name: "A reference: ServiceReferences / pluginReferences / dependsOn", type: "generate + restart AppHost", desc: "Same flow. Pass 2 only re-resolves and re-injects services__<name>__http__0 on the next `aspire start` — a declared-but-not-generated reference does nothing." },
+    { name: "Add / remove a plugin, or a new appsettings resource", type: "generate + restart AppHost", desc: "`netscript plugin add`/`remove` (or a hand-added resource) changes the graph; the resource only joins on the next generate + `aspire start`." },
+    { name: "An injected env value Aspire owns (OTEL_*, a connection string)", type: "restart the resource", desc: "Environment is read once at process start, so bounce the affected resource for the new value to take effect." }
+  ]
+}) }}
+
+{{ comp callout { type: "warning", title: "The register-*.mts files are regenerated — express config, don't hand-edit" } }}
+The scaffolded <code>register-infrastructure.mts</code>, <code>register-services.mts</code>,
+<code>register-plugins.mts</code>, <code>register-background.mts</code>, <code>register-apps.mts</code>,
+and <code>register-tools.mts</code> carry a generated header and are <strong>overwritten by the next
+<code>netscript service generate</code></strong>. Anything you can express as config survives regen:
+per resource, <code>Env</code>, <code>Permissions</code>, <code>Port</code>, and <code>Workdir</code>
+are all declarable in <code>netscript.config.ts</code>/<code>appsettings.json</code> — reach for those
+first. When a wire genuinely is not config-expressible yet (an MCP-over-HTTP endpoint, a bespoke
+cross-resource reference), there is <strong>no automatic preserve mechanism today</strong>: tag the
+change <code>// HAND-EDITED (keep on regen)</code> and re-apply it after each generate. Prefer moving
+the need into config so the hand-edit disappears.
+{{ /comp }}
+
+### Native database drivers need launch permissions
+
+A resource's permission flags are set **at launch**, and they are separate from the per-task
+permissions you tighten *inside* a worker (those are covered in
+{{ comp.xref({ key: "howto:restrict-worker-task-permissions", text: "Restrict worker task permissions" }) }}).
+This matters when a plugin loads a **native (FFI) database driver** — for example the native
+libSQL/Turso client the workers runtime can use for per-channel storage. Without FFI access the
+process crashes at import with `NotCapable: Requires ffi access`. The workers **background
+processor** therefore launches with an explicit permission set that includes `--allow-ffi` (and
+`--allow-sys`):
+
+```ts
+// plugins/workers/src/aspire/workers-contribution.ts — the background launch set
+const WORKERS_BACKGROUND_PERMISSIONS = [
+  '--unstable-kv',
+  '--allow-net',
+  '--allow-env',
+  '--allow-read',
+  '--allow-write',
+  '--allow-run',
+  '--allow-sys',
+  '--allow-ffi', // native FFI drivers (e.g. libSQL/Turso) load here
+] as const;
+```
+
+If you author a plugin or service that pulls in a native driver, give its resource the matching
+`--allow-ffi` (and any `--allow-sys`) flag through its contribution's launch permissions — a missing
+flag surfaces only at runtime as an FFI capability crash, not at generate time.
+
 ## The dashboard: the local observability surface
 
 When `aspire start` finishes booting, it prints a URL and a one-time login token for the dashboard
@@ -292,6 +384,38 @@ stubs. For custom <em>handler-level</em> spans, call <code>@netscript/telemetry<
 directly. The framework-level spans above are real; see
 {{ comp.xref({ key: "explain:observability", text: "Observability" }) }} for the precise
 framework-vs-scaffold boundary.
+{{ /comp }}
+
+## HTTP/2 and TLS: opt-in today
+
+NetScript service listeners serve **plaintext HTTP/1.1 by default**, and that default is unchanged.
+HTTP/2 is available but strictly **opt-in via TLS**: `Deno.serve` negotiates h2 over ALPN the moment
+the listener has a certificate and key, so the way to get HTTP/2 is to hand the service TLS material.
+There are two ways to do that, and both flip the listener banner from `http` to `https`:
+
+{{ comp.tabbedCode({ tabs: [
+  {
+    label: "Inline TLS on serve()",
+    lang: "ts",
+    code: "// Pass cert/key PEM material as ServeOptions.tls. Deno then negotiates HTTP/2\n// over ALPN for clients that support it (HTTP/1.1 stays available as fallback).\nimport { createService } from '@netscript/service';\nimport type { ServiceTlsOptions } from '@netscript/service';\n\nconst tls: ServiceTlsOptions = {\n  cert: await Deno.readTextFile('cert.pem'), // PEM certificate chain\n  key: await Deno.readTextFile('key.pem'),   // PEM private key\n};\n\nawait createService(router, { name: 'users' })\n  .withHealth()\n  .serve({ port: 3001, tls }); // banner now reports https://…"
+  },
+  {
+    label: "Env pair (no code change)",
+    lang: "bash",
+    code: "# When ServeOptions.tls is absent, the listener falls back to this env pair.\n# BOTH must be set — one alone is ignored and the service stays plaintext.\nNETSCRIPT_TLS_CERT_FILE=cert.pem \\\nNETSCRIPT_TLS_KEY_FILE=key.pem \\\n  deno run --allow-net --allow-read --allow-env services/users/main.ts\n\n# With both present the service serves HTTPS + HTTP/2 — confirmed with `curl --http2`."
+  }
+] }) }}
+
+{{ comp callout { type: "important", title: "Plaintext HTTP/1.1 is still the default" } }}
+Opting into TLS does not change the default path: with no <code>tls</code> option and no
+<code>NETSCRIPT_TLS_CERT_FILE</code>/<code>NETSCRIPT_TLS_KEY_FILE</code> pair, the listener is
+byte-for-byte the same plain HTTP/1.1 server. That has one consequence worth knowing: browsers cap
+HTTP/1.1 at roughly <strong>six concurrent connections per origin</strong>, which SSE and durable
+streams can exhaust — the fix is to adopt HTTP/2 per service by enabling TLS as above. Automatic
+Aspire dev-certificate provisioning and a default flip to HTTP/2 are still on the roadmap, so today
+this remains a deliberate opt-in. See {{ comp.xref({ key: "cap:streams", text: "Durable streams" }) }}
+for the connection-cap caveat and {{ comp.xref({ key: "ref:service", text: "the service reference" }) }}
+for <code>ServiceTlsOptions</code> and <code>ServeOptions.tls</code>.
 {{ /comp }}
 
 ## The `--no-aspire` escape hatch
