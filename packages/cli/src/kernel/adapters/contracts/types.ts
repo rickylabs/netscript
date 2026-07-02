@@ -29,12 +29,21 @@ export interface ContractScaffoldOptions {
 
   /** Whether existing files may be overwritten. */
   readonly force?: boolean;
+
+  /** Additional import-map entries for generated contracts. */
+  readonly imports?: Readonly<Record<string, string>>;
 }
 
 /** Options for a service-paired contract file. */
 export interface ServiceContractOptions {
   /** Service name in kebab-case. */
   readonly serviceName: string;
+
+  /** Prisma domain model name associated with the service. */
+  readonly modelName?: string;
+
+  /** Whether this contract should target the database-backed CRUD surface. */
+  readonly hasDatabase?: boolean;
 
   /** Version directory to target. */
   readonly version: ContractVersion;
@@ -98,6 +107,9 @@ export interface DiscoveredVersion {
 export interface ContractTemplateRegistry {
   /** Get the service contract template. */
   getContractTemplate(): string;
+
+  /** Get the no-database in-memory service contract template. */
+  getMemoryContractTemplate(): string;
 
   /** Get the root contracts/mod.ts template. */
   getRootModTemplate(): string;

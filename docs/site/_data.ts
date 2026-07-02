@@ -171,6 +171,7 @@ export const navSections: NavSection[] = [
     items: [
       { href: "/orchestration-runtime/", label: "Overview & Concepts", icon: "O" },
       { href: "/quickstart/", label: "Quickstart: run the workspace", icon: "Q" },
+      { href: "/how-to/deno-lsp-code-intelligence/", label: "How-To: Deno LSP intelligence", icon: "H" },
       { href: "/how-to/deploy-local-aspire/", label: "How-To: deploy locally with Aspire", icon: "H" },
       { href: "/how-to/deploy/", label: "How-To: deploy", icon: "H" },
       { href: "/how-to/roll-out-runtime-overrides/", label: "How-To: runtime overrides", icon: "H" },

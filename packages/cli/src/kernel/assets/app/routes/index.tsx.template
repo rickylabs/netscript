@@ -20,10 +20,10 @@ export const homePage = definePage()
         badge: 'app',
       },
       {
-        title: 'CRUD example',
+        title: '{{modelName}} CRUD',
         href: appRoutes.crudExample.href(),
-        description: 'Directory, filters, table, and detail rail composed from copied UI blocks.',
-        cta: 'Open CRUD',
+        description: 'Live {{modelName}} records backed by the {{serviceName}} service contract and Prisma.',
+        cta: 'Open {{modelName}} CRUD',
         badge: 'example',
       },
       {

@@ -14,7 +14,7 @@ describe('createMaintainerInitCommand', () => {
         detectMonorepoRoot: () => Promise.resolve('C:/repo'),
         runInit: (request) => {
           initCalls.push(
-            `${request.name}:${request.appName}:${request.includeExampleService}:${request.serviceName}:${request.dbEngine}:${request.editor}`,
+            `${request.name}:${request.appName}:${request.includeExampleService}:${request.serviceName}:${request.modelName}:${request.dbEngine}:${request.editor}`,
           );
           return Promise.resolve({
             name: request.name,
@@ -43,6 +43,8 @@ describe('createMaintainerInitCommand', () => {
       'true',
       '--service-name',
       'user',
+      '--model-name',
+      'Account',
       '--db',
       'postgres',
       '--editor',
@@ -50,7 +52,7 @@ describe('createMaintainerInitCommand', () => {
       '--dry-run',
     ]);
 
-    assertEquals(initCalls, ['smoke-test:frontend:true:user:postgres:zed']);
+    assertEquals(initCalls, ['smoke-test:frontend:true:user:Account:postgres:zed']);
     assertEquals(printed[0], 'Maintainer scaffold root: C:/repo/smoke-test');
   });
 });

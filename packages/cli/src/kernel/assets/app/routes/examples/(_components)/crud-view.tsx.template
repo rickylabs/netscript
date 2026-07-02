@@ -80,16 +80,16 @@ export default function CrudExampleView({ records }: CrudExampleViewProps) {
   return (
     <main class='ns-shell ns-section ns-stack ns-stack--lg'>
       <PageHeader>
-        <PageHeader.Main>
-          <PageHeader.Badges>
-            <Badge variant='primary'>CRUD</Badge>
-            <Badge variant='muted'>example</Badge>
+          <PageHeader.Main>
+            <PageHeader.Badges>
+            <Badge variant='primary'>Pattern</Badge>
+            <Badge variant='muted'>static</Badge>
           </PageHeader.Badges>
           <PageHeader.Intro>
-            <h1>Account directory</h1>
+            <h1>Directory pattern</h1>
             <p class='ns-lede'>
-              A generated CRUD surface using registry form, table, detail, and empty-state blocks.
-              Replace the static records with loaders and actions when your contracts are ready.
+              Static registry form, table, detail, and empty-state blocks for composing app-owned
+              pages. The live service-backed CRUD route is generated under /examples/{{serviceName}}.
             </p>
           </PageHeader.Intro>
           <PageHeader.Actions>

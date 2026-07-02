@@ -42,9 +42,11 @@ describe('generateRegisterServices', () => {
     assertStringIncludes(output, 'export async function registerServices(');
   });
 
-  it('should import buildOtelEnvVars, resolvePermissions, resolveWorkspacePath', () => {
+  it('should import register-services dependencies', () => {
     const output = generateRegisterServices(emptyOptions);
     assertStringIncludes(output, 'buildOtelEnvVars,');
+    assertStringIncludes(output, 'extractPluginReferences,');
+    assertStringIncludes(output, 'extractServiceReferences,');
     assertStringIncludes(output, 'resolvePermissions,');
     assertStringIncludes(output, 'resolveWorkspacePath,');
     assertStringIncludes(output, "from './_aspire-compat.mjs'");
@@ -56,7 +58,7 @@ describe('generateRegisterServices', () => {
       services: { users: fixtures.MINIMAL_SERVICE },
     });
     assertStringIncludes(output, '// --- Pass 1: Create all service resources ---');
-    assertStringIncludes(output, '// --- Pass 2: Wire cross-references ---');
+    assertStringIncludes(output, 'export async function wireServiceReferences(');
   });
 
   it('should register services via addExecutable with correct port and entrypoint', () => {
@@ -65,6 +67,7 @@ describe('generateRegisterServices', () => {
       services: { users: fixtures.MINIMAL_SERVICE },
     });
     assertStringIncludes(output, "builder.addExecutable('users', 'deno', workdir,");
+    assertStringIncludes(output, "'--minimum-dependency-age=0'");
     assertStringIncludes(output, '.withHttpEndpoint({ port: 3000');
     assertStringIncludes(output, "services.set('users'");
   });
@@ -76,7 +79,7 @@ describe('generateRegisterServices', () => {
     });
     assertStringIncludes(
       output,
-      "buildOtelEnvVars('users', config.Version, 'executable', config.Otel.HttpEndpoint)",
+      "buildOtelEnvVars('users', config.Version, 'executable')",
     );
     assertStringIncludes(output, 'resource.withEnvironment(key, value)');
     assertStringIncludes(output, '// OTEL telemetry (full executable env set)');
@@ -107,9 +110,11 @@ describe('generateRegisterServices', () => {
     );
     assertStringIncludes(output, '.withReference(infrastructure.primaryDatabase)');
     assertStringIncludes(output, '.waitFor(infrastructure.primaryDatabase)');
+    assertStringIncludes(output, "sqliteDatabase?.Engine === 'Sqlite'");
+    assertStringIncludes(output, 'file:./database/${config.PrimaryDatabase}/');
   });
 
-  it('should wire cross-references in pass 2', () => {
+  it('should wire service references from the services map', () => {
     const output = generateRegisterServices({
       ...emptyOptions,
       services: {
@@ -117,27 +122,27 @@ describe('generateRegisterServices', () => {
         orders: fixtures.SERVICE_WITH_REFS,
       },
     });
-    assertStringIncludes(
-      output,
-      '// --- orders: wire ServiceReferences via endpoint env vars ---',
-    );
-    assertStringIncludes(output, "services.get('users')?.getEndpoint('http')");
-    assertStringIncludes(output, "resource.withEnvironment('services__users__http__0'");
+    assertStringIncludes(output, 'for (const ref of extractServiceReferences(entry))');
+    assertStringIncludes(output, "const endpoint = await services.get(ref)?.getEndpoint('http')");
+    assertStringIncludes(output, 'services__${ref}__http__0');
   });
 
-  it('should not emit pass 2 blocks for services without references', () => {
+  it('should wire plugin references from the plugins map', () => {
     const output = generateRegisterServices({
       ...emptyOptions,
-      services: { users: fixtures.MINIMAL_SERVICE },
+      services: {
+        reporting: fixtures.SERVICE_WITH_PLUGIN_REFS,
+      },
     });
-    // Pass 2 should have no-op comment since users has no ServiceReferences
-    assertStringIncludes(output, '// No cross-references to wire');
+    assertStringIncludes(output, 'for (const ref of extractPluginReferences(entry))');
+    assertStringIncludes(output, "const endpoint = await plugins.get(ref)?.getEndpoint('http')");
+    assertStringIncludes(output, 'services__${ref}__http__0');
   });
 
   it('should handle empty services', () => {
     const output = generateRegisterServices(emptyOptions);
     assertStringIncludes(output, '// No services configured');
-    assertStringIncludes(output, '// No cross-references to wire');
+    assertStringIncludes(output, 'export async function wireServiceReferences(');
   });
 });
 // generateRegisterPlugins
@@ -199,7 +204,7 @@ describe('generateRegisterPlugins', () => {
     });
     assertStringIncludes(
       output,
-      "buildOtelEnvVars('auth', config.Version, 'executable', config.Otel.HttpEndpoint)",
+      "buildOtelEnvVars('auth', config.Version, 'executable')",
     );
     assertStringIncludes(output, 'resource.withEnvironment(key, value)');
     assertStringIncludes(output, '// OTEL telemetry (full executable env set)');
@@ -242,6 +247,8 @@ describe('generateRegisterPlugins', () => {
     assertStringIncludes(output, '// Database dependency');
     assertStringIncludes(output, 'infrastructure.primaryDatabase');
     assertStringIncludes(output, "withEnvironment('DATABASE_URL'");
+    assertStringIncludes(output, "sqliteDatabase?.Engine === 'Sqlite'");
+    assertStringIncludes(output, 'file:./database/${config.PrimaryDatabase}/');
   });
 
   it('should handle RequiresKv dependency', () => {
@@ -253,7 +260,10 @@ describe('generateRegisterPlugins', () => {
     assertStringIncludes(output, '// KV cache dependency');
     assertStringIncludes(output, 'infrastructure.primaryCacheEndpoint');
     assertStringIncludes(output, 'withReference(infrastructure.primaryCacheEndpoint)');
-    assertStringIncludes(output, "import { EndpointProperty } from '../.aspire/modules/aspire.mjs'");
+    assertStringIncludes(
+      output,
+      "import { EndpointProperty, OtlpProtocol } from '../.aspire/modules/aspire.mjs'",
+    );
     assertStringIncludes(
       output,
       'infrastructure.primaryCacheEndpoint.property(EndpointProperty.HostAndPort)',
@@ -273,7 +283,7 @@ describe('generateRegisterPlugins', () => {
     });
     assertStringIncludes(
       output,
-      "resource.withEnvironment('NETSCRIPT_SAGA_STORE', \"prisma\")",
+      'resource.withEnvironment(\'NETSCRIPT_SAGA_STORE\', "prisma")',
     );
   });
 

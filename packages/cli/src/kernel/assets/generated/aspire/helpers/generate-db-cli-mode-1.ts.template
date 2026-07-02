@@ -66,14 +66,19 @@ export async function tryHandleDbCliMode(
       ['task', taskName],
     );
 
-    if (target.engine === 'Sqlite') {
+    const offlineGenerateUrl = operation === 'generate' ? buildOfflineGenerateUrl(target) : null;
+    if (offlineGenerateUrl) {
+      resource = await resource
+        .withEnvironment('DATABASE_URL', offlineGenerateUrl)
+        .withEnvironment(target.envKey, offlineGenerateUrl);
+    } else if (target.engine === 'Sqlite') {
       const sqliteUrl = `file:./${target.databaseName}`;
       resource = await resource
         .withEnvironment('DATABASE_URL', sqliteUrl)
         .withEnvironment(target.envKey, sqliteUrl);
     }
 
-    if (target.resource) {
+    if (!offlineGenerateUrl && target.resource) {
       resource = await resource
         .withEnvironment('DATABASE_URL', target.resource)
         .withEnvironment(target.envKey, target.resource)
@@ -87,6 +92,21 @@ export async function tryHandleDbCliMode(
   }
 
   return true;
+}
+
+function buildOfflineGenerateUrl(target: DbCliTarget): string | null {
+  switch (target.engine) {
+    case 'Postgres':
+      return `postgres://postgres:postgres@localhost:5432/${target.databaseName}`;
+    case 'Mysql':
+      return `mysql://root:password@localhost:3306/${target.databaseName}`;
+    case 'Mssql':
+      return `sqlserver://localhost:1433;database=${encodeURIComponent(target.databaseName)};user=sa;password=NetscriptE2e!Sql2026;trustServerCertificate=true`;
+    case 'Sqlite':
+      return `file:./${target.databaseName}`;
+    default:
+      return null;
+  }
 }
 
 function resolveTargets(

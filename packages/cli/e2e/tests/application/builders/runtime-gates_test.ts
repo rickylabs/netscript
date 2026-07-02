@@ -1,17 +1,11 @@
 import { assertEquals } from '@std/assert';
 
-import { createSmokeProject } from '../../../src/application/builders/workspace/smoke-project-factory.ts';
+import { GATE } from '../../../src/domain/cli-surface.ts';
+import type { RunContext } from '../../../src/domain/run-context.ts';
+import { DATABASE } from '../../../src/domain/extension-axes.ts';
 import { createRuntimeGates } from '../../../src/application/gates/scaffold/runtime-gates.ts';
-import { GATE, SCAFFOLD } from '../../../src/domain/cli-surface.ts';
-import {
-  DATABASE,
-  PACKAGE_SOURCE,
-  PLUGIN,
-  REPORT_FORMAT,
-} from '../../../src/domain/extension-axes.ts';
-import type { RunContext, RunOptions } from '../../../src/domain/run-context.ts';
 
-Deno.test('runtime aspire start gate discards detached command output', () => {
+Deno.test('runtime aspire start gate captures detached endpoint metadata', () => {
   const gate = createRuntimeGates().find((entry) => entry.id === GATE.RUNTIME_ASPIRE_START);
 
   assertEquals(gate?.kind, 'command');
@@ -19,54 +13,78 @@ Deno.test('runtime aspire start gate discards detached command output', () => {
     throw new Error('Expected runtime aspire start gate to be a command gate.');
   }
 
-  assertEquals(gate.outputMode, 'discard');
-  assertEquals(
-    gate.failureHint,
-    'Aspire start ran with discarded output. Check the detached-child log under ~/.aspire/logs or rerun the command manually for full diagnostics.',
-  );
+  assertEquals(gate.outputMode, 'capture');
+
+  const command = gate.command({
+    project: {
+      appHost: '/workspace/app/aspire/apphost.mts',
+      projectRoot: '/workspace/app',
+    },
+  } as RunContext);
+
+  assertEquals(command[0], 'deno');
+  assertEquals(command[1], 'eval');
+  assertEquals(command.at(-2), '/workspace/app/aspire/apphost.mts');
+  assertEquals(command.at(-1), '/workspace/app');
+  assertEquals(command[2].includes('"--format"'), true);
+  assertEquals(command[2].includes('aspire-start.json'), true);
 });
 
-Deno.test('runtime database wait gate targets mssql with extended timeout', () => {
-  const gate = createRuntimeGates().find((entry) => entry.id === GATE.RUNTIME_WAIT_DATABASE);
+Deno.test('runtime gates wait for postgres resource by default', () => {
+  const gateIds = createRuntimeGates().map((entry) => entry.id);
+
+  assertEquals(gateIds.includes(GATE.RUNTIME_WAIT_POSTGRES), true);
+  assertEquals(gateIds.includes(GATE.RUNTIME_WAIT_MYSQL), false);
+});
+
+Deno.test('runtime gates wait for mysql resource when mysql is selected', () => {
+  const gateIds = createRuntimeGates(DATABASE.MYSQL).map((entry) => entry.id);
+
+  assertEquals(gateIds.includes(GATE.RUNTIME_WAIT_POSTGRES), false);
+  assertEquals(gateIds.includes(GATE.RUNTIME_WAIT_MYSQL), true);
+});
+
+Deno.test('runtime gates skip database resource wait for sqlite', () => {
+  const gateIds = createRuntimeGates(DATABASE.SQLITE).map((entry) => entry.id);
+
+  assertEquals(gateIds.includes(GATE.RUNTIME_WAIT_POSTGRES), false);
+  assertEquals(gateIds.includes(GATE.RUNTIME_WAIT_MYSQL), false);
+  assertEquals(gateIds.includes(GATE.RUNTIME_WAIT_MSSQL), false);
+  assertEquals(gateIds.includes(GATE.RUNTIME_WAIT_GARNET), true);
+});
+
+Deno.test('runtime gates wait for mssql resource with extended timeout when mssql is selected', () => {
+  const gateIds = createRuntimeGates(DATABASE.MSSQL).map((entry) => entry.id);
+
+  assertEquals(gateIds.includes(GATE.RUNTIME_WAIT_POSTGRES), false);
+  assertEquals(gateIds.includes(GATE.RUNTIME_WAIT_MYSQL), false);
+  assertEquals(gateIds.includes(GATE.RUNTIME_WAIT_MSSQL), true);
+
+  const gate = createRuntimeGates(DATABASE.MSSQL).find((entry) =>
+    entry.id === GATE.RUNTIME_WAIT_MSSQL
+  );
   if (gate?.kind !== 'command') {
-    throw new Error('Expected active database wait gate to be a command gate.');
+    throw new Error('Expected mssql wait gate to be a command gate.');
   }
 
-  assertEquals(gate.command(createContext(DATABASE.MSSQL)), [
-    'aspire',
-    'wait',
-    'mssql',
-    '--status',
-    'healthy',
-    '--timeout',
-    '600',
-    '--apphost',
-    '/repo/.llm/tmp/cli-e2e/runtime-wait-test/aspire/apphost.mts',
-    '--non-interactive',
-    '--nologo',
-  ]);
+  assertEquals(
+    gate.command({
+      project: {
+        appHost: '/workspace/app/aspire/apphost.mts',
+      },
+    } as RunContext),
+    [
+      'aspire',
+      'wait',
+      'mssql',
+      '--status',
+      'healthy',
+      '--timeout',
+      '600',
+      '--apphost',
+      '/workspace/app/aspire/apphost.mts',
+      '--non-interactive',
+      '--nologo',
+    ],
+  );
 });
-
-function createContext(database: RunOptions['database']): RunContext {
-  const options: RunOptions = {
-    repoRoot: '/repo',
-    cliEntrypoint: '/repo/packages/cli/bin/netscript-dev.ts',
-    smokeRoot: '/repo/.llm/tmp/cli-e2e',
-    projectName: 'runtime-wait-test',
-    database,
-    packageSource: PACKAGE_SOURCE.LOCAL,
-    plugins: [PLUGIN.WORKER],
-    samples: true,
-    cleanup: true,
-    format: REPORT_FORMAT.PRETTY,
-    commandTimeoutMs: 1,
-    httpTimeoutMs: 1,
-  };
-  return {
-    request: {
-      suiteId: SCAFFOLD.RUNTIME,
-      options,
-    },
-    project: createSmokeProject(options),
-  };
-}

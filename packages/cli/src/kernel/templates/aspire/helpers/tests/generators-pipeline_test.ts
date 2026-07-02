@@ -169,6 +169,18 @@ describe('HelpersGeneratorPipeline', () => {
     );
     assert(regServices, 'register-services.mjs should exist');
     assertStringIncludes(regServices!.content, "builder.addExecutable('users'");
+    assertStringIncludes(
+      regServices!.content,
+      "buildOtelEnvVars('users', config.Version, 'executable')",
+    );
+    assertStringIncludes(
+      regServices!.content,
+      'withOtlpExporter({ protocol: OtlpProtocol.HttpProtobuf })',
+    );
+    assert(
+      !regServices!.content.includes('config.Otel.HttpEndpoint'),
+      'service OTEL should use Aspire-injected dashboard collector endpoint',
+    );
 
     // Register infrastructure should include our database
     const regInfra = files.find(
@@ -183,6 +195,14 @@ describe('HelpersGeneratorPipeline', () => {
     );
     assert(regPlugins, 'register-plugins.mjs should exist');
     assertStringIncludes(regPlugins!.content, "builder.addExecutable('auth'");
+    assertStringIncludes(
+      regPlugins!.content,
+      'withOtlpExporter({ protocol: OtlpProtocol.HttpProtobuf })',
+    );
+    assert(
+      !regPlugins!.content.includes('config.Otel.HttpEndpoint'),
+      'plugin OTEL should use Aspire-injected dashboard collector endpoint',
+    );
 
     // Register tools should include our tool
     const regTools = files.find(

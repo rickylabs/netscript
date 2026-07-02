@@ -1,5 +1,5 @@
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
-import { PLUGIN } from '../../../domain/extension-axes.ts';
+import { DATABASE, type DatabaseEngine, PLUGIN } from '../../../domain/extension-axes.ts';
 import { createScaffoldCapabilityGates } from '../../gates/scaffold/scaffold-capability-gates.ts';
 import { createPluginSuiteBuilder, type PluginSuiteBuilder } from './plugin-suite-builder.ts';
 
@@ -10,7 +10,9 @@ export interface ScaffoldSuiteBuilder {
 }
 
 /** Create the scaffold suite builder. */
-export function createScaffoldSuiteBuilder(): ScaffoldSuiteBuilder {
+export function createScaffoldSuiteBuilder(
+  database: DatabaseEngine = DATABASE.POSTGRES,
+): ScaffoldSuiteBuilder {
   const gates: GateDefinition[] = [];
   return {
     withOfficialPluginSuite(configure) {
@@ -20,7 +22,7 @@ export function createScaffoldSuiteBuilder(): ScaffoldSuiteBuilder {
       const plugins = state.plugins.length > 0
         ? state.plugins
         : [PLUGIN.WORKER, PLUGIN.SAGA, PLUGIN.TRIGGER, PLUGIN.STREAM, PLUGIN.AUTH] as const;
-      gates.push(...createScaffoldCapabilityGates({ ...state, plugins: [...plugins] }));
+      gates.push(...createScaffoldCapabilityGates({ ...state, plugins: [...plugins] }, database));
       return this;
     },
     buildGates() {

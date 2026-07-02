@@ -26,7 +26,7 @@ bunx jsr add @netscript/fresh-ui
 ### Usage
 
 ```typescript
-import { cn, getToast, stripToastFromUrl, withToast } from '@netscript/fresh-ui';
+import { cn, getToast, Icon, stripToastFromUrl, withToast } from '@netscript/fresh-ui';
 
 // Merge class names safely (clsx + tailwind-merge).
 const buttonClass = cn('ns-button', 'ns-button--primary');
@@ -42,6 +42,30 @@ const redirectTo = withToast('/dashboard/deployments', {
 const url = new URL(`https://app.example${redirectTo}`);
 const toast = getToast(url); // RegistryToast | undefined
 const cleanPath = stripToastFromUrl(url);
+
+// Render a package-owned stroke SVG icon.
+const checkIcon = <Icon name='check' size={18} title='Complete' />;
+```
+
+Typed package components are available from the root entrypoint. `DataGrid` emits semantic
+`ns-data-grid*` classes for the package token CSS.
+
+```tsx
+import { DataGrid } from '@netscript/fresh-ui';
+
+type Session = { name: string; tokens: number; status: string };
+
+<DataGrid<Session>
+  label='Recent sessions'
+  columns={[
+    { key: 'name', header: 'Session', cell: 'strong' },
+    { key: 'tokens', header: 'Tokens', width: '8rem', cell: 'num' },
+    { key: 'status', header: 'Status', render: (row) => <span>{row.status}</span> },
+  ]}
+  rows={[
+    { id: 'vs3', data: { name: 'VS3', tokens: 18420, status: 'active' }, href: '/sessions/vs3' },
+  ]}
+/>;
 ```
 
 Stateful interactive components live on the `./interactive` sub-path, and headless layout primitives
@@ -49,7 +73,7 @@ on `./primitives`:
 
 ```typescript
 import { Dialog } from '@netscript/fresh-ui/interactive';
-import { Show, VisuallyHidden } from '@netscript/fresh-ui/primitives';
+import { Icon, Show, VisuallyHidden } from '@netscript/fresh-ui/primitives';
 ```
 
 ---
@@ -64,8 +88,8 @@ import { Show, VisuallyHidden } from '@netscript/fresh-ui/primitives';
 - **Interactive primitives**: `Accordion`, `Dialog`, `Drawer`, `Popover`, `Sheet`, `Tabs`, and
   `Tooltip` compound namespaces emit `data-part`, `data-state`, and ARIA attributes for accessible,
   styleable behavior.
-- **L0 platform primitives**: `Show`, `VisuallyHidden`, and `SrOnly` cover conditional rendering and
-  assistive-technology output without extra DOM wrappers.
+- **L0 platform primitives**: `Icon`, `Show`, `VisuallyHidden`, and `SrOnly` cover token-driven
+  stroke icons, conditional rendering, and assistive-technology output without extra DOM wrappers.
 - **Semantic token vocabulary**: a theme-driven `--ns-*` custom-property surface that registry CSS
   targets, so themes and components stay decoupled.
 

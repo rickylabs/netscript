@@ -178,7 +178,6 @@ export async function scaffoldTsAppHost(
       databases.sqlite = {
         Enabled: true,
         Engine: 'Sqlite',
-        Mode: 'Container',
         DatabaseName: sqliteDbFile,
         Persistent: false,
       };

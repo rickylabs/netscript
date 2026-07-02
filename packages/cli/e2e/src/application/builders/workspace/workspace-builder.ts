@@ -1,5 +1,5 @@
 import type { RunOptions } from '../../../domain/run-context.ts';
-import type { PackageSource } from '../../../domain/extension-axes.ts';
+import type { DatabaseEngine, PackageSource } from '../../../domain/extension-axes.ts';
 import { withRepoRootOption } from './workspace-options.ts';
 import { resolve } from '@std/path';
 
@@ -9,6 +9,7 @@ export interface WorkspaceBuilder {
   withCliEntrypoint(path: string): WorkspaceBuilder;
   withSmokeRoot(path: string): WorkspaceBuilder;
   withProjectName(name: string): WorkspaceBuilder;
+  withDatabase(database: DatabaseEngine): WorkspaceBuilder;
   withPackageSource(source: PackageSource): WorkspaceBuilder;
   withCleanup(enabled?: boolean): WorkspaceBuilder;
   buildOptions(): RunOptions;
@@ -33,6 +34,10 @@ export function createWorkspaceBuilder(initial: RunOptions): WorkspaceBuilder {
     },
     withProjectName(name) {
       options = { ...options, projectName: name };
+      return this;
+    },
+    withDatabase(database) {
+      options = { ...options, database };
       return this;
     },
     withPackageSource(source) {

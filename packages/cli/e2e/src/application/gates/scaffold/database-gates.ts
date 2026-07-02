@@ -1,7 +1,23 @@
+import { join } from '@std/path';
 import { GATE, GATE_PHASE } from '../../../domain/cli-surface.ts';
 import { PACKAGE_SOURCE } from '../../../domain/extension-axes.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
+import type { RunContext } from '../../../domain/run-context.ts';
 import { cli, commandGate, denoCommand } from './gate-factory.ts';
+
+const STANDALONE_DATABASE_CODEGEN_SCRIPT = `
+const [databaseUrl, providerEnvKey] = Deno.args;
+if (!databaseUrl) throw new Error('database URL argument is required');
+Deno.env.set('DATABASE_URL', databaseUrl);
+if (providerEnvKey) Deno.env.set(providerEnvKey, databaseUrl);
+const child = new Deno.Command('deno', {
+  args: ['task', 'db:generate'],
+  stdout: 'inherit',
+  stderr: 'inherit',
+}).spawn();
+const status = await child.status;
+Deno.exit(status.code);
+`;
 
 /** Create database workflow gates for a generated project. */
 export function createDatabaseGates(): readonly GateDefinition[] {
@@ -39,6 +55,13 @@ export function createDatabaseGates(): readonly GateDefinition[] {
         ),
     ),
     commandGate(
+      GATE.DATABASE_CODEGEN,
+      'Generate database clients (standalone, no Aspire)',
+      GATE_PHASE.DATABASE,
+      standaloneDatabaseCodegenCommand,
+      (context) => join(context.project.projectRoot, 'database', context.request.options.database),
+    ),
+    commandGate(
       GATE.DATABASE_SEED,
       'Seed generated database',
       GATE_PHASE.DATABASE,
@@ -54,6 +77,44 @@ export function createDatabaseGates(): readonly GateDefinition[] {
         ),
     ),
   ];
+}
+
+function standaloneDatabaseCodegenCommand(context: RunContext): readonly string[] {
+  const offline = offlineGenerateDatabaseUrl(context.request.options.database);
+  return [
+    'deno',
+    'eval',
+    STANDALONE_DATABASE_CODEGEN_SCRIPT,
+    offline.url,
+    offline.envKey,
+  ];
+}
+
+function offlineGenerateDatabaseUrl(
+  database: string,
+): { readonly url: string; readonly envKey: string } {
+  switch (database) {
+    case 'postgres':
+      return {
+        url: 'postgres://postgres:postgres@localhost:5432/postgres',
+        envKey: 'POSTGRES_URI',
+      };
+    case 'mysql':
+      return {
+        url: 'mysql://root:password@localhost:3306/mysql',
+        envKey: 'MYSQL_URI',
+      };
+    case 'mssql':
+      return {
+        url:
+          'sqlserver://localhost:1433;database=master;user=sa;password=NetscriptE2e!Sql2026;trustServerCertificate=true',
+        envKey: 'MSSQL_URI',
+      };
+    case 'sqlite':
+      return { url: 'file:./sqlite.db', envKey: 'SQLITE_URI' };
+    default:
+      throw new Error(`Unsupported database for standalone codegen: ${database}`);
+  }
 }
 
 /** Create type-check gates for generated project slices. */

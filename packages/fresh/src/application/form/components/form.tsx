@@ -1,6 +1,6 @@
 import { SUBMISSION_ID_FIELD_NAME } from '../runtime/idempotency.ts';
 import type {
-  FormElementProps,
+  FormElementOverrideProps,
   FormEnhancementSnapshot,
   FormEnhancementState,
   FormValues,
@@ -31,7 +31,7 @@ export interface FormProps<TValues extends FormValues> extends Partial<Record<st
   /** Form controls and content rendered inside the managed form element. */
   readonly children: FormContent;
   /** Optional override for framework-managed form attributes. */
-  readonly formProps?: Partial<FormElementProps>;
+  readonly formProps?: FormElementOverrideProps;
 }
 
 /** Render a managed form element with submission and CSRF hidden inputs. */
@@ -42,10 +42,17 @@ export function Form<TValues extends FormValues>({
   formProps: formPropOverrides,
   ...props
 }: FormProps<TValues>): object {
+  const {
+    onSubmit: _formPropsOnSubmit,
+    onBlurCapture: _formPropsOnBlurCapture,
+    onInputCapture: _formPropsOnInputCapture,
+    ref: _formPropsRef,
+    ...formElementOverrides
+  } = formPropOverrides ?? {};
   const formProps = {
     ...state.formProps,
     ...(enhancement?.formProps ?? {}),
-    ...(formPropOverrides ?? {}),
+    ...formElementOverrides,
     ...props,
   };
 

@@ -41,6 +41,16 @@ command you can run to confirm it works.
   { title: "Database & migration", body: "Initialize, generate, seed, and inspect the Postgres schema: netscript db init --name init → db generate → db seed → db status. Requires aspire start first so Postgres is provisioned.", href: "/how-to/database-migration/" }
 ] }) }}
 
+## Set up the developer environment
+
+Recipes for the toolchain around a NetScript workspace: editor intelligence, orchestration, and
+runtime setup that should behave the same on every device.
+
+{{ comp.featureGrid({ items: [
+  { title: "Deno LSP code intelligence", body: "Install the Claude Code Deno LSP plugin, enable the LSP tool globally, and keep go-to-definition, hover, references, symbols, and diagnostics aligned across CLI, VS Code, and Zed.", href: "/how-to/deno-lsp-code-intelligence/" },
+  { title: "Deploy locally with Aspire", body: "Run the full local resource graph from the generated Aspire AppHost: dashboard, infrastructure, services, plugin APIs, and background processors.", href: "/how-to/deploy-local-aspire/" }
+] }) }}
+
 ## Wire primitives & observability
 
 Recipes for the shared building blocks every plugin leans on — queues, KV, cron,

@@ -5,7 +5,8 @@
  * @description Chat composer: an auto-grow textarea over a toolbar of toggle
  * pills (deep research / grounding), a ModelSelector, attach/screenshot/voice
  * affordances, and a send button. Presentational <form> — onSubmit reads the
- * field; Enter-to-send + textarea auto-grow are app-island enhancements.
+ * field; textarea auto-grow is CSS-native and Enter-to-send is an app-island
+ * enhancement.
  */
 
 import type { JSX, VNode } from 'preact';

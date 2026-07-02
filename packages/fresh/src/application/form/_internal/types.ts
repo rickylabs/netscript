@@ -20,6 +20,7 @@ export type {
   EnhancedFormProps,
   ErrorProps,
   FormCsrfInputProps,
+  FormElementOverrideProps,
   FormElementProps,
   IntentButtonProps,
   LabelProps,

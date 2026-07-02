@@ -72,8 +72,8 @@ describe('app route template rendering', () => {
     assertStringIncludes(output, 'dashboard: routes.dashboard.$route,');
     assertStringIncludes(output, 'health: routes.health.$route,');
     assertStringIncludes(output, 'examples: routes.examples.$route,');
-    assertStringIncludes(output, 'crudExample: routes.examples.crud,');
     assertStringIncludes(output, 'serviceExample: routes.examples.serviceExample,');
+    assertStringIncludes(output, 'crudExample: routes.examples.serviceExample,');
     assertStringIncludes(output, "designTokens: createRouteReference('/design/tokens'");
     assertStringIncludes(output, "id: 'design.components'");
     assertStringIncludes(output, "id: 'design.composition'");
@@ -246,22 +246,40 @@ describe('app route template rendering', () => {
     assertStringIncludes(route, 'export const examplesPage = definePage()');
     assertStringIncludes(route, '.withRoute(appRoutes.examples)');
     assertStringIncludes(route, 'href: appRoutes.crudExample.href()');
+    assertStringIncludes(route, "title: 'TeamMember CRUD'");
+    assertStringIncludes(
+      route,
+      "description: 'Live TeamMember list, create, update, and delete flow backed by team-members.'",
+    );
     assertStringIncludes(route, '/examples/telemetry');
     assertStringIncludes(route, '.build();');
     assertStringIncludes(route, 'export { page as default };');
     assertStringIncludes(view, 'interface ExamplesViewProps {');
     assertStringIncludes(view, 'ResponsiveTable');
-    assertStringIncludes(view, 'Open CRUD example');
+    assertStringIncludes(view, 'Open TeamMember CRUD');
+    assertStringIncludes(view, '/examples/team-members');
   });
 
-  it('CRUD example route uses registry form, table, and detail blocks', async () => {
+  it('static directory-pattern route uses registry form, table, and detail blocks', async () => {
     const adapter = makeAdapter();
     const route = await adapter.render(appCrudExampleRouteTemplate, SAMPLE_APP_VARS);
     const view = await adapter.render(appCrudExampleViewTemplate, SAMPLE_APP_VARS);
     assertStringIncludes(route, "import CrudExampleView from './(_components)/crud-view.tsx';");
-    assertStringIncludes(route, '.withRoute(appRoutes.crudExample)');
+    assertStringIncludes(route, "import { routes } from '@app/router.ts';");
+    assertStringIncludes(route, '.withRoute(routes.examples.crud)');
+    assertStringIncludes(route, "title: 'test-project — directory pattern demo'");
+    assertStringIncludes(
+      route,
+      "description: 'Static registry-block composition demo with app-owned fresh-ui components.'",
+    );
     assertStringIncludes(route, ".withLayer('crud', CrudExampleView");
     assertStringIncludes(route, "name: 'Acme Robotics'");
+    assertStringIncludes(view, "<Badge variant='primary'>Pattern</Badge>");
+    assertStringIncludes(view, '<h1>Directory pattern</h1>');
+    assertStringIncludes(
+      view,
+      'The live service-backed CRUD route is generated under /examples/team-members.',
+    );
     assertStringIncludes(view, 'FilterForm');
     assertStringIncludes(view, 'ResponsiveTable');
     assertStringIncludes(view, 'DetailLayout');
@@ -388,7 +406,7 @@ describe('app route template rendering', () => {
     assert(!output.includes('summary: buildServiceSummary'));
   });
 
-  it('route-local island uses QueryIsland, useQuery, and typed optimistic mutation', async () => {
+  it('route-local island uses QueryIsland, useQuery, and typed CRUD mutations', async () => {
     const adapter = makeAdapter();
     const output = await adapter.render(appServiceShowcaseIslandTemplate, SAMPLE_APP_VARS);
     assertStringIncludes(output, "import { useSignal } from '@preact/signals';");
@@ -397,10 +415,12 @@ describe('app route template rendering', () => {
     assertStringIncludes(output, 'hydrateFromDehydrated');
     assertStringIncludes(output, 'useMutation');
     assertStringIncludes(output, 'useQuery');
-    assertStringIncludes(output, 'exampleServiceListInvalidation');
-    assertStringIncludes(output, 'exampleServiceQueries.updateStatus.mutationOptions()');
-    assertStringIncludes(output, 'invalidateQueries(exampleServiceListInvalidation)');
-    assertStringIncludes(output, 'Optimistically moved record');
+    assertStringIncludes(output, 'exampleServiceQueries.create.mutationOptions()');
+    assertStringIncludes(output, 'exampleServiceQueries.update.mutationOptions()');
+    assertStringIncludes(output, 'exampleServiceQueries.delete.mutationOptions()');
+    assertStringIncludes(output, 'useQuery<ServiceListData>');
+    assertStringIncludes(output, 'useMutation<ServiceRecord, unknown, CreateInput>');
+    assertStringIncludes(output, 'refreshList();');
   });
 
   it('summary panel and partial route keep defer concerns server-owned', async () => {
@@ -420,28 +440,33 @@ describe('app route template rendering', () => {
     assertStringIncludes(partial, 'query: loadServiceShowcaseSummary');
   });
 
-  it('service contract exposes typed updateStatus for the showcase mutation', async () => {
+  it('service contract exposes typed CRUD schemas for the showcase mutations', async () => {
     const adapter = makeAdapter();
     const output = await adapter.render(serviceContractTemplate, SAMPLE_APP_VARS);
-    assertStringIncludes(output, 'UpdateStatusInputSchemaV1');
-    assertStringIncludes(output, 'UpdateStatusResponseSchemaV1');
-    assertStringIncludes(output, 'updateStatus: oc');
+    assertStringIncludes(output, 'createCrudContract');
+    assertStringIncludes(output, 'TeamMemberSchema');
+    assertStringIncludes(output, 'TeamMemberCreateInput');
+    assertStringIncludes(output, 'TeamMemberUpdateInput');
   });
 
-  it('service router mutates the seeded records for the showcase flow', async () => {
+  it('service router binds Prisma-backed CRUD handlers for the showcase flow', async () => {
     const adapter = makeAdapter();
     const output = await adapter.render(serviceV1RouterTemplate, {
       ...SAMPLE_APP_VARS,
       projectName: SAMPLE_APP_VARS.name,
     });
+    assertStringIncludes(output, "import type { PrismaClient } from '@database';");
+    assertStringIncludes(output, "type TeamMemberDelegate = PrismaClient['teamMember'];");
+    assertStringIncludes(output, 'type TeamMemberHandlerContext = { readonly db: PrismaClient };');
     assertStringIncludes(
       output,
-      'const NEXT_STATUS_BY_STATE: Record<',
+      'const teamMembersV1 = v1.teamMembers.$context<TeamMemberHandlerContext>();',
     );
-    assertStringIncludes(output, "type TeamMembersListItemV1 } from '@test-project/contracts';");
-    assertStringIncludes(output, 'let seededRecords: TeamMembersListItemV1[] = [');
-    assertStringIncludes(output, 'updateStatus: v1.teamMembers.updateStatus.handler');
-    assertStringIncludes(output, 'const nextStatus = input.status;');
-    assertStringIncludes(output, 'record.summary = nextStatus ===');
+    assertStringIncludes(output, 'list: teamMembersV1.list.handler');
+    assertStringIncludes(output, 'create: teamMembersV1.create.handler');
+    assertStringIncludes(output, 'update: teamMembersV1.update.handler');
+    assertStringIncludes(output, 'delete: teamMembersV1.delete.handler');
+    assert(!output.includes('list!.handler'));
+    assert(!output.includes('context.db as PrismaClient'));
   });
 });

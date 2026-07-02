@@ -6,6 +6,18 @@ Deno.test('mapRunOptions keeps defaults by omitting undefined values', () => {
   assertEquals(mapRunOptions({ format: REPORT_FORMAT.PRETTY }), { format: REPORT_FORMAT.PRETTY });
 });
 
+Deno.test('mapRunOptions accepts sqlite database axis', () => {
+  assertEquals(mapRunOptions({ db: DATABASE.SQLITE }), { database: DATABASE.SQLITE });
+});
+
+Deno.test('mapRunOptions rejects unsupported database values', () => {
+  assertThrows(
+    () => mapRunOptions({ db: 'oracle' }),
+    Error,
+    '--db must be postgres, mysql, sqlite, or mssql.',
+  );
+});
+
 Deno.test('mapRunOptions rejects unsupported plugin values', () => {
   assertThrows(
     () => mapRunOptions({ plugins: 'worker,unknown' }),

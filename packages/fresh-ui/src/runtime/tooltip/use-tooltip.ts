@@ -40,8 +40,8 @@ export function useTooltip({
   const generatedId = useId();
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
-  const openTimerRef = useRef<number | undefined>(undefined);
-  const closeTimerRef = useRef<number | undefined>(undefined);
+  const openTimerRef = useRef<ReturnType<typeof globalThis.setTimeout> | undefined>(undefined);
+  const closeTimerRef = useRef<ReturnType<typeof globalThis.setTimeout> | undefined>(undefined);
   const uncontrolledOpen = useSignal(defaultOpen);
   const open = controlledOpen === undefined ? uncontrolledOpen.value : controlledOpen;
   const contentId = id ?? `ns-tooltip-${generatedId}`;

@@ -1,0 +1,93 @@
+/**
+ * {{serviceName | pascalCase}} contract — Version 1
+ *
+ * Shared type surface between the {{serviceName}} service and any caller.
+ * Using `@orpc/contract` here means the server-side handler and any
+ * generated client will automatically stay in type-lockstep.
+ */
+
+import { z } from 'zod';
+import { oc } from '@orpc/contract';
+import { implement } from '@orpc/server';
+
+export const {{serviceName | pascalCase}}HealthSchemaV1 = z.object({
+  status: z.enum(['healthy', 'unhealthy', 'degraded']).describe('Service health status'),
+  service: z.string().describe('Service name'),
+  version: z.string().describe('Service version'),
+  timestamp: z.string().datetime().describe('ISO timestamp'),
+  uptime: z.number().int().nonnegative().optional().describe('Uptime in seconds'),
+});
+
+export const {{serviceName | pascalCase}}StatusSchemaV1 = z.enum([
+  'active',
+  'draft',
+  'archived',
+]);
+
+export const {{serviceName | pascalCase}}ListItemSchemaV1 = z.object({
+  id: z.number().int().positive().describe('Stable identifier'),
+  name: z.string().min(1).describe('Display name'),
+  summary: z.string().min(1).describe('Short record summary'),
+  status: {{serviceName | pascalCase}}StatusSchemaV1.describe('Record lifecycle status'),
+  createdAt: z.string().datetime().describe('ISO creation timestamp'),
+});
+
+export const {{serviceName | pascalCase}}ListInputSchemaV1 = z.object({
+  limit: z.number().int().positive().describe('Number of records to return'),
+  offset: z.number().int().nonnegative().describe('Starting offset'),
+  search: z.string().min(1).optional().describe('Optional record name search'),
+});
+
+export const {{serviceName | pascalCase}}ListResponseSchemaV1 = z.object({
+  items: z.array({{serviceName | pascalCase}}ListItemSchemaV1).describe('Returned service records'),
+  total: z.number().int().nonnegative().describe('Total matching records'),
+  limit: z.number().int().positive().describe('Requested page size'),
+  offset: z.number().int().nonnegative().describe('Requested offset'),
+  hasMore: z.boolean().describe('Whether more records are available'),
+});
+
+export const {{serviceName | pascalCase}}UpdateStatusInputSchemaV1 = z.object({
+  id: z.number().int().positive().describe('Stable identifier'),
+  status: {{serviceName | pascalCase}}StatusSchemaV1.describe('Next lifecycle status'),
+});
+
+export const {{serviceName | pascalCase}}UpdateStatusResponseSchemaV1 =
+  {{serviceName | pascalCase}}ListItemSchemaV1;
+
+export type {{serviceName | pascalCase}}HealthV1 = z.infer<typeof {{serviceName | pascalCase}}HealthSchemaV1>;
+export type {{serviceName | pascalCase}}ListItemV1 = z.infer<typeof {{serviceName | pascalCase}}ListItemSchemaV1>;
+export type {{serviceName | pascalCase}}ListInputV1 = z.infer<typeof {{serviceName | pascalCase}}ListInputSchemaV1>;
+export type {{serviceName | pascalCase}}ListResponseV1 = z.infer<typeof {{serviceName | pascalCase}}ListResponseSchemaV1>;
+export type {{serviceName | pascalCase}}UpdateStatusInputV1 = z.infer<
+  typeof {{serviceName | pascalCase}}UpdateStatusInputSchemaV1
+>;
+export type {{serviceName | pascalCase}}UpdateStatusResponseV1 = z.infer<
+  typeof {{serviceName | pascalCase}}UpdateStatusResponseSchemaV1
+>;
+
+/**
+ * {{serviceName | pascalCase}} contract — Version 1.
+ *
+ * Extend this with your own procedures as the service grows.
+ */
+export const {{serviceName | pascalCase}}ContractV1 = {
+  health: {
+    check: oc
+      .route({ method: 'GET' })
+      .input(z.object({}).optional())
+      .output({{serviceName | pascalCase}}HealthSchemaV1),
+  },
+  list: oc
+    .route({ method: 'POST' })
+    .input({{serviceName | pascalCase}}ListInputSchemaV1)
+    .output({{serviceName | pascalCase}}ListResponseSchemaV1),
+  updateStatus: oc
+    .route({ method: 'POST' })
+    .input({{serviceName | pascalCase}}UpdateStatusInputSchemaV1)
+    .output({{serviceName | pascalCase}}UpdateStatusResponseSchemaV1),
+};
+
+/**
+ * Implemented contract ready for `.handler()` binding in the service router.
+ */
+export const {{serviceName | pascalCase}}V1 = implement({{serviceName | pascalCase}}ContractV1);

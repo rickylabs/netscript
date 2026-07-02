@@ -8,73 +8,38 @@ import { DATABASE, type DatabaseEngine } from '../../../domain/extension-axes.ts
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
 import { commandGate, httpGate } from './gate-factory.ts';
 
-const DATABASE_WAIT_TIMEOUT_SECONDS = {
-  [DATABASE.POSTGRES]: 120,
-  [DATABASE.MYSQL]: 180,
-  [DATABASE.SQLITE]: 120,
-  [DATABASE.MSSQL]: 600,
-} as const satisfies Record<DatabaseEngine, number>;
+const ASPIRE_RESOURCE_WAIT_TIMEOUT_SECONDS: Partial<Record<AspireResource, number>> = {
+  [ASPIRE_RESOURCE.MSSQL]: 600,
+};
 
 function runtimeWaitGate(resource: AspireResource): GateDefinition {
   return commandGate(
     `runtime.wait.${resource}`,
     `Wait for ${resource}`,
     GATE_PHASE.RUNTIME,
-    (context) => [
-      'aspire',
-      'wait',
-      resource,
-      '--apphost',
-      context.project.appHost,
-      '--non-interactive',
-      '--nologo',
-    ],
-  );
-}
-
-function databaseRuntimeWaitGate(): GateDefinition {
-  return commandGate(
-    GATE.RUNTIME_WAIT_DATABASE,
-    'Wait for active database',
-    GATE_PHASE.RUNTIME,
     (context) => {
-      const resource = databaseAspireResource(context.request.options.database);
-      if (!resource) {
-        return ['deno', 'eval', 'console.info("No database Aspire resource for this engine.")'];
-      }
-      const timeoutSeconds = DATABASE_WAIT_TIMEOUT_SECONDS[context.request.options.database] ?? 120;
-      return [
+      const command = [
         'aspire',
         'wait',
         resource,
-        '--status',
-        'healthy',
-        '--timeout',
-        String(timeoutSeconds),
         '--apphost',
         context.project.appHost,
         '--non-interactive',
         '--nologo',
       ];
+      const timeoutSeconds = ASPIRE_RESOURCE_WAIT_TIMEOUT_SECONDS[resource];
+      if (timeoutSeconds !== undefined) {
+        command.splice(3, 0, '--status', 'healthy', '--timeout', String(timeoutSeconds));
+      }
+      return command;
     },
   );
 }
 
-function databaseAspireResource(database: DatabaseEngine): AspireResource | undefined {
-  switch (database) {
-    case DATABASE.POSTGRES:
-      return ASPIRE_RESOURCE.POSTGRES;
-    case DATABASE.MYSQL:
-      return ASPIRE_RESOURCE.MYSQL;
-    case DATABASE.MSSQL:
-      return ASPIRE_RESOURCE.MSSQL;
-    case DATABASE.SQLITE:
-      return undefined;
-  }
-}
-
 /** Create runtime and health-check gates for the generated application. */
-export function createRuntimeGates(): readonly GateDefinition[] {
+export function createRuntimeGates(
+  database: DatabaseEngine = DATABASE.POSTGRES,
+): readonly GateDefinition[] {
   return [
     commandGate(
       GATE.RUNTIME_ASPIRE_RESTORE,
@@ -102,29 +67,14 @@ export function createRuntimeGates(): readonly GateDefinition[] {
       (
         context,
       ) => [
-        'aspire',
-        'start',
-        '--apphost',
+        'deno',
+        'eval',
+        ASPIRE_START_SCRIPT,
         context.project.appHost,
-        '--isolated',
-        '--non-interactive',
-        '--nologo',
+        context.project.projectRoot,
       ],
-      undefined,
-      'discard',
-      'Aspire start ran with discarded output. Check the detached-child log under ~/.aspire/logs or rerun the command manually for full diagnostics.',
     ),
-    databaseRuntimeWaitGate(),
-    ...[
-      ASPIRE_RESOURCE.GARNET,
-      ASPIRE_RESOURCE.WORKERS_API,
-      ASPIRE_RESOURCE.WORKERS,
-      ASPIRE_RESOURCE.SAGAS_API,
-      ASPIRE_RESOURCE.SAGAS,
-      ASPIRE_RESOURCE.TRIGGERS_API,
-      ASPIRE_RESOURCE.TRIGGERS,
-      ASPIRE_RESOURCE.AUTH,
-    ].map(runtimeWaitGate),
+    ...runtimeResources(database).map(runtimeWaitGate),
     commandGate(
       GATE.RUNTIME_ASPIRE_DESCRIBE,
       'Describe generated topology',
@@ -213,6 +163,73 @@ export function createRuntimeGates(): readonly GateDefinition[] {
       'http://127.0.0.1:8094/api/v1/auth/session',
     ),
   ];
+}
+
+const ASPIRE_START_SCRIPT = [
+  'const appHost = Deno.args[0];',
+  'const projectRoot = Deno.args[1];',
+  'if (!appHost) throw new Error("apphost argument is required");',
+  'if (!projectRoot) throw new Error("project root argument is required");',
+  'const command = new Deno.Command("aspire", {',
+  '  args: [',
+  '    "start",',
+  '    "--apphost",',
+  '    appHost,',
+  '    "--isolated",',
+  '    "--non-interactive",',
+  '    "--nologo",',
+  '    "--format",',
+  '    "Json",',
+  '  ],',
+  '  stdout: "piped",',
+  '  stderr: "piped",',
+  '});',
+  'const output = await command.output();',
+  'const stdout = new TextDecoder().decode(output.stdout);',
+  'const stderr = new TextDecoder().decode(output.stderr);',
+  'if (!output.success) {',
+  '  throw new Error(`aspire start failed with code ${output.code}: ${stderr || stdout}`);',
+  '}',
+  'const metadata = JSON.parse(extractJson(stdout));',
+  'if (!metadata.dashboardUrl) throw new Error("aspire start did not report dashboardUrl");',
+  'const stateDir = `${projectRoot}/.netscript/e2e`;',
+  'await Deno.mkdir(stateDir, { recursive: true });',
+  'await Deno.writeTextFile(`${stateDir}/aspire-start.json`, JSON.stringify(metadata, null, 2));',
+  'console.info(`Aspire dashboard: ${metadata.dashboardUrl}`);',
+  'if (metadata.logFile) console.info(`Aspire log: ${metadata.logFile}`);',
+  '',
+  'function extractJson(text) {',
+  '  const trimmed = text.trim();',
+  '  const objectIndex = trimmed.indexOf("{");',
+  '  if (objectIndex < 0) throw new Error("aspire start did not emit JSON");',
+  '  return trimmed.slice(objectIndex);',
+  '}',
+].join('\n');
+function runtimeResources(database: DatabaseEngine): readonly AspireResource[] {
+  return [
+    ...databaseRuntimeResources(database),
+    ASPIRE_RESOURCE.GARNET,
+    ASPIRE_RESOURCE.WORKERS_API,
+    ASPIRE_RESOURCE.WORKERS,
+    ASPIRE_RESOURCE.SAGAS_API,
+    ASPIRE_RESOURCE.SAGAS,
+    ASPIRE_RESOURCE.TRIGGERS_API,
+    ASPIRE_RESOURCE.TRIGGERS,
+    ASPIRE_RESOURCE.AUTH,
+  ];
+}
+
+function databaseRuntimeResources(database: DatabaseEngine): readonly AspireResource[] {
+  switch (database) {
+    case DATABASE.POSTGRES:
+      return [ASPIRE_RESOURCE.POSTGRES];
+    case DATABASE.MYSQL:
+      return [ASPIRE_RESOURCE.MYSQL];
+    case DATABASE.MSSQL:
+      return [ASPIRE_RESOURCE.MSSQL];
+    case DATABASE.SQLITE:
+      return [];
+  }
 }
 
 const PROBE_SERVICE_HEALTH_SCRIPT = [

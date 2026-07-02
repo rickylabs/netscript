@@ -24,6 +24,7 @@ export type {
   FormCollectionStrategy,
   FormCollectionStrategyMode,
   FormCsrfInputProps,
+  FormElementOverrideProps,
   FormElementProps,
   FormEnhancementOptions,
   FormEnhancementSnapshot,

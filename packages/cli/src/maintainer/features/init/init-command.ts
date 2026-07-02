@@ -56,6 +56,7 @@ export function createMaintainerInitCommand(
     .option('--db <engine:string>', `Database engine (${DB_ENGINE_CHOICES.join(' | ')})`)
     .option('--service [enabled:boolean]', 'Scaffold an example oRPC service', { default: false })
     .option('--service-name <name:string>', 'Example service name')
+    .option('--model-name <name:string>', 'Prisma model name for the scaffolded CRUD surface')
     .option('--service-port <port:number>', 'Example service port')
     .option('--editor <editor:string>', `Editor config (${EDITOR_CHOICES.join(' | ')})`)
     .option('--no-aspire', 'Skip Aspire orchestration layer')
@@ -98,6 +99,7 @@ export function createMaintainerInitCommand(
         dbEngine: parseDbEngine(options.db),
         includeExampleService: includeService,
         serviceName: options.serviceName,
+        modelName: options.modelName,
         servicePort: options.servicePort,
       }, dependencies.initDependencies);
 

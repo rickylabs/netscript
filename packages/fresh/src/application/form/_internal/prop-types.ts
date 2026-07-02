@@ -1,5 +1,7 @@
 /** Props applied to the root form element. */
 export interface FormElementProps {
+  /** Additional standard, ARIA, data, or framework attributes for the form element. */
+  readonly [attribute: string]: unknown;
   /** DOM id for the form element. */
   readonly id: string;
   /** Submission URL. */
@@ -8,6 +10,40 @@ export interface FormElementProps {
   readonly method: string;
   /** Disable native browser validation when framework validation owns errors. */
   readonly noValidate: boolean;
+  /** CSS class forwarded to the form element. */
+  readonly class?: string;
+  /** Submit handling is owned by the managed form runtime. */
+  readonly onSubmit?: never;
+  /** Blur capture handling is owned by progressive enhancement. */
+  readonly onBlurCapture?: never;
+  /** Input capture handling is owned by progressive enhancement. */
+  readonly onInputCapture?: never;
+  /** Form refs are owned by progressive enhancement. */
+  readonly ref?: never;
+}
+
+/** Caller overrides accepted by the managed form component's `formProps` bag. */
+export interface FormElementOverrideProps {
+  /** Additional standard, ARIA, data, or framework attributes for the form element. */
+  readonly [attribute: string]: unknown;
+  /** DOM id override for the form element. */
+  readonly id?: string;
+  /** Submission URL override. */
+  readonly action?: string;
+  /** HTTP method override. */
+  readonly method?: string;
+  /** Native validation override. */
+  readonly noValidate?: boolean;
+  /** CSS class forwarded to the form element. */
+  readonly class?: string;
+  /** Submit handling is owned by the managed form runtime. */
+  readonly onSubmit?: never;
+  /** Blur capture handling is owned by progressive enhancement. */
+  readonly onBlurCapture?: never;
+  /** Input capture handling is owned by progressive enhancement. */
+  readonly onInputCapture?: never;
+  /** Form refs are owned by progressive enhancement. */
+  readonly ref?: never;
 }
 
 /** Props for the hidden CSRF token input. */
@@ -165,7 +201,19 @@ export interface IntentButtonProps {
 }
 
 /** Form element props after progressive enhancement handlers are attached. */
-export interface EnhancedFormProps extends FormElementProps {
+export interface EnhancedFormProps {
+  /** Additional standard, ARIA, data, or framework attributes for the form element. */
+  readonly [attribute: string]: unknown;
+  /** DOM id for the form element. */
+  readonly id: string;
+  /** Submission URL. */
+  readonly action: string;
+  /** HTTP method used by the form. */
+  readonly method: string;
+  /** Disable native browser validation when framework validation owns errors. */
+  readonly noValidate: boolean;
+  /** CSS class forwarded to the form element. */
+  readonly class?: string;
   /** Fresh client-navigation flag. */
   readonly 'f-client-nav'?: boolean;
   /** Fresh partial route name. */

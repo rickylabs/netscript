@@ -11,6 +11,13 @@
  */
 
 export {
+  Icon,
+  ICON_PATHS,
+  type IconName,
+  type IconProps,
+  type IconSize,
+  type IconSvgAttributes,
+  type IconSvgAttributeValue,
   Show,
   type ShowProps,
   SrOnly,

@@ -1,4 +1,5 @@
 import { assert } from '@std/assert';
+import { FRESH_UI_REGISTRY_CONTENT } from '../../../../registry.generated.ts';
 import { PromptInput } from '../../../../registry/components/ui/prompt-input.tsx';
 
 interface VNodeLike {
@@ -37,4 +38,11 @@ Deno.test('PromptInput omits the model picker when no models given', () => {
   const json = JSON.stringify(PromptInput({}));
   assert(!json.includes('ns-model-selector'), 'no picker without models');
   assert(json.includes('ns-prompt-input__field'), 'field still present');
+});
+
+Deno.test('PromptInput field CSS auto-grows with the existing height bounds', () => {
+  const css = FRESH_UI_REGISTRY_CONTENT['registry/components/ui/prompt-input.css'];
+  assert(css.includes('field-sizing: content;'), 'textarea uses CSS-native auto-grow');
+  assert(css.includes('min-height: var(--ns-control-h);'), 'one-line minimum remains');
+  assert(css.includes('max-height: 12rem;'), 'growth cap remains');
 });

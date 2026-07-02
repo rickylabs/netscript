@@ -78,13 +78,19 @@ export function useIslandSuspenseInfiniteQuery<
 }
 
 /** Run an island mutation through the shared NetScript Fresh QueryClient. */
-export function useIslandMutation<TData = unknown, TError = unknown, TVariables = void>(
-  options: IslandMutationOptions<TData, TError, TVariables>,
-): IslandMutationResult<TData, TError, TVariables> {
+export function useIslandMutation<
+  TData = unknown,
+  TError = unknown,
+  TVariables = void,
+  TContext = unknown,
+>(
+  options: IslandMutationOptions<TData, TError, TVariables, TContext>,
+): IslandMutationResult<TData, TError, TVariables, TContext> {
   return useTanStackMutation(options as never) as unknown as IslandMutationResult<
     TData,
     TError,
-    TVariables
+    TVariables,
+    TContext
   >;
 }
 
@@ -172,8 +178,13 @@ export function useSuspenseInfiniteQuery<
 }
 
 /** Run an island mutation through the canonical NetScript Fresh query surface. */
-export function useMutation<TData = unknown, TError = unknown, TVariables = void>(
-  options: IslandMutationOptions<TData, TError, TVariables>,
-): IslandMutationResult<TData, TError, TVariables> {
+export function useMutation<
+  TData = unknown,
+  TError = unknown,
+  TVariables = void,
+  TContext = unknown,
+>(
+  options: IslandMutationOptions<TData, TError, TVariables, TContext>,
+): IslandMutationResult<TData, TError, TVariables, TContext> {
   return useIslandMutation(options);
 }

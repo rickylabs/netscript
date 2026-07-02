@@ -1,5 +1,6 @@
 import { assertEquals } from '@std/assert';
 import { GATE, SCAFFOLD } from '../../src/domain/cli-surface.ts';
+import { DATABASE } from '../../src/domain/extension-axes.ts';
 import { builtInSuites, resolveSuite } from '../../src/presentation/cli/suites/registry.ts';
 
 Deno.test('registry exposes scaffold capability suites from constants', () => {
@@ -19,6 +20,7 @@ Deno.test('capability suites select only their scoped gates', () => {
     GATE.PREFLIGHT_DENO,
     GATE.SCAFFOLD_INIT,
     GATE.SERVICE_LIST,
+    GATE.DATABASE_CODEGEN,
     GATE.GENERATED_SERVICE_CHECK,
   ]);
 });
@@ -76,4 +78,21 @@ Deno.test('runtime suite includes full scaffold, database, runtime, and behavior
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_PLUGINS_HEALTH), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_WEBHOOK), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_TRACES), true);
+});
+
+Deno.test('runtime suite omits database resource wait for sqlite', () => {
+  const runtime = resolveSuite(SCAFFOLD.RUNTIME, { database: DATABASE.SQLITE });
+  assertEquals(runtime.defaultOptions.database, DATABASE.SQLITE);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_WAIT_POSTGRES), false);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_WAIT_MYSQL), false);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_WAIT_MSSQL), false);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_WAIT_GARNET), true);
+});
+
+Deno.test('runtime suite selects mssql database resource wait for mssql', () => {
+  const runtime = resolveSuite(SCAFFOLD.RUNTIME, { database: DATABASE.MSSQL });
+  assertEquals(runtime.defaultOptions.database, DATABASE.MSSQL);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_WAIT_POSTGRES), false);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_WAIT_MYSQL), false);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_WAIT_MSSQL), true);
 });

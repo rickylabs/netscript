@@ -1,5 +1,10 @@
 import type { StaticJobRegistry } from '@netscript/plugin-workers-core/runtime';
-import { startCombinedProcess, type StaticJobDefinitionRegistry } from './runtime.ts';
+import {
+  loadGeneratedJobRegistry,
+  startCombinedProcess,
+  type StaticJobDefinitionRegistry,
+  WORKERS_JOB_REGISTRY_PATH,
+} from './runtime.ts';
 
 const generated = await loadGeneratedJobs();
 
@@ -11,25 +16,6 @@ async function loadGeneratedJobs(): Promise<
     registry?: StaticJobRegistry;
   }>
 > {
-  const registryUrl = new URL(
-    '../../.netscript/generated/plugin-workers/jobs.registry.ts',
-    import.meta.url,
-  );
-
-  try {
-    await Deno.stat(registryUrl);
-  } catch (error) {
-    if (error instanceof Deno.errors.NotFound) return {};
-    throw error;
-  }
-
-  const module = await import(registryUrl.href);
-  const definitions = module.jobDefinitions instanceof Map
-    ? module.jobDefinitions
-    : module.definitions instanceof Map
-    ? module.definitions
-    : undefined;
-  const registry = module.registry instanceof Map ? module.registry : undefined;
-
-  return { definitions, registry };
+  const registryUrl = new URL(`../../${WORKERS_JOB_REGISTRY_PATH}`, import.meta.url);
+  return await loadGeneratedJobRegistry(registryUrl);
 }
