@@ -156,3 +156,9 @@ jobs:
             --body-file .llm/tmp/release-body.md \
             --out .llm/tmp/release-body-updated.md
           gh release edit "$TAG" --notes-file .llm/tmp/release-body-updated.md
+          # Latest-badge backstop: GitHub never marks a prerelease as "Latest", so a
+          # release cut with the prerelease flag set strands the badge on an older
+          # version (this is exactly how alpha.16 held Latest through alpha.19). Every
+          # published release is the newest visible version, so force it non-prerelease
+          # and Latest here. Idempotent; safe to run when release:publish already set it.
+          gh release edit "$TAG" --prerelease=false --latest

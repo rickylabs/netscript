@@ -18,6 +18,9 @@ semantics and `netscript-pr` for branch, PR, and comment mechanics.
 - Do not delete `deno.lock`, delete caches, or run `deno cache --reload`.
 - Do not publish from a local machine. Publishing stays in GitHub Actions through OIDC.
 - Use `gh ... --body-file` for release PR creation and comments.
+- Never publish to JSR without a GitHub Release created via `deno task release:publish`. The release
+  is the publish trigger; its notes must carry the hand-written intro plus the generated PR and
+  closed-issue lists, and the newest release must be non-prerelease so GitHub shows it as Latest.
 
 ## One Command
 
@@ -57,7 +60,23 @@ Run it in a disposable copy if you do not want the working tree version-bumped a
 
 After the release PR merges:
 
-1. Create and publish GitHub Release `v<version>`.
+1. Create the GitHub Release with the one command:
+
+   ```bash
+   deno task release:publish -- v<version> --notes-file <intro.md>
+   ```
+
+   This creates `v<version>`, which is what triggers `publish.yml`. There is no JSR publish
+   without a GitHub Release, so **never hand-run `gh release create`** — it forgets the intro and
+   leaves the `prerelease` flag set (which stranded the Latest badge on alpha.16 through alpha.19).
+   - **The introduction summary is written by hand** — the prose describing what the release ships.
+     Pass it via `--notes-file <path>` or `--message "<text>"`; the tool refuses to run without one.
+     This is the single deliberately-manual step.
+   - **Everything else is generated:** the "What's Changed" merged-PR list, the "Closed Issues" list
+     since the previous release, and the `prerelease=false` + `make_latest` flags so the newest
+     release shows as **Latest**. The JSR package links are appended later by `publish.yml`.
+   - Rehearse with `--dry-run` to print the composed body before creating. Use `--prerelease`
+     (with `--no-latest`) only for a genuine prerelease that must not become Latest.
 2. `publish.yml` resolves the release version, runs the release preflight, runs publish dry-run, and
    publishes every `@netscript/*` workspace member to JSR through OIDC.
 3. On successful publish, `publish.yml` writes `version.txt` and uploads it as

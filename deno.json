@@ -59,6 +59,7 @@
     "check:scaffold-versions": "deno run .llm/tools/check-scaffold-versions.ts --pretty",
     "release:preflight": "deno run --allow-read .llm/tools/release/preflight-text-imports.ts",
     "release:cut": "deno run --allow-read --allow-write --allow-run --allow-env .llm/tools/release/cut.ts",
+    "release:publish": "deno run --allow-net --allow-env --allow-run --allow-read .llm/tools/release/github-release.ts",
     "publish:dry-run": "deno run --allow-read --allow-write --allow-run .llm/tools/run-publish-dry-run.ts",
     "e2e:cli": "deno run --allow-all packages/cli/e2e/cli.ts",
     "e2e:cli:prod": "deno run --allow-all packages/cli/e2e/cli.ts run scaffold.runtime --source jsr --cli packages/cli/bin/netscript.ts",
