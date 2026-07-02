@@ -124,6 +124,7 @@ export type {
   ServiceRequest,
   ServiceRouteMethod,
   ServiceRouter,
+  ServiceTlsOptions,
   ShutdownContext,
   ShutdownHook,
   ShutdownHookOutcome,

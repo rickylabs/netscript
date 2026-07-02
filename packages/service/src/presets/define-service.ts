@@ -27,7 +27,13 @@
 import { createService, type ServiceConfig } from '../builder/service-builder.ts';
 import type { AuthnOptions, AuthzOptions } from '../auth/options.ts';
 import { createDatabaseConnectivityStartupHook } from '../diagnostics/database-connectivity.ts';
-import type { Database, DbContext, RunningService, ServiceRouter } from '../types.ts';
+import type {
+  Database,
+  DbContext,
+  RunningService,
+  ServiceRouter,
+  ServiceTlsOptions,
+} from '../types.ts';
 
 interface DisconnectCapableDatabase extends Database {
   $disconnect(): Promise<void>;
@@ -79,6 +85,13 @@ export interface DefineServiceOptions extends ServiceConfig {
   };
   /** Enable debug mode for verbose oRPC logging (default: NETSCRIPT_DEBUG env var) */
   debug?: boolean;
+  /**
+   * Opt-in TLS material. When set, the service serves HTTPS and negotiates
+   * HTTP/2 via ALPN. When omitted, the listener still honors the
+   * `NETSCRIPT_TLS_CERT_FILE` / `NETSCRIPT_TLS_KEY_FILE` env pair before
+   * defaulting to plain HTTP/1.1.
+   */
+  tls?: ServiceTlsOptions;
   /** Optional authentication and authorization stages for guarded service paths. */
   auth?: {
     /** Authentication middleware options. */
@@ -202,5 +215,5 @@ export async function defineService<T extends ServiceRouter>(
     }
   }
 
-  return await builder.withHealth().serve();
+  return await builder.withHealth().serve(options.tls ? { tls: options.tls } : undefined);
 }
