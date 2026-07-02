@@ -18,13 +18,12 @@
  * @module
  */
 
-import type { Context } from 'hono';
 import { getAvailablePort } from '@std/net';
 import { healthChecks } from '@netscript/service';
 import { createPluginService } from '@netscript/plugin/service';
 import { DurableStreamTestServer } from '@durable-streams/server';
 import denoJson from '../../deno.json' with { type: 'json' };
-import { sanitizeProxyResponse } from './proxy-headers.ts';
+import { createStreamsProxyHandler } from './proxy.ts';
 
 /** Connector version, single-sourced from the streams package `deno.json`. */
 const VERSION: string = denoJson.version;
@@ -66,29 +65,15 @@ const upstreamCheck = healthChecks.custom('durable-streams-server', async () => 
 });
 
 // ── Transparent proxy to the upstream DurableStreamTestServer ─────────
-// Matches all paths (including nested routes like /v1/stream/...) that are
-// not handled by the health endpoints or the service-info root.
-const proxyHandler = async (c: Context): Promise<Response> => {
-  const url = new URL(c.req.url);
-  const target = `http://127.0.0.1:${internalPort}${url.pathname}${url.search}`;
-  try {
-    const proxyReq = new Request(target, {
-      method: c.req.method,
-      headers: c.req.raw.headers,
-      body: c.req.raw.body,
-      // @ts-ignore Deno supports duplex on Request
-      duplex: c.req.raw.body ? 'half' : undefined,
-    });
-    // Deno's fetch transparently decodes the upstream body, so the bytes we
-    // re-stream are already decoded. Strip content-encoding/content-length and
-    // hop-by-hop headers so the response headers describe the bytes actually
-    // sent — otherwise the upstream's bogus `content-encoding: gzip` on a plain
-    // JSON body breaks every compliant reader (netscript#219 / #239).
-    return sanitizeProxyResponse(await fetch(proxyReq));
-  } catch {
-    return c.json({ error: 'Upstream unavailable' }, 502);
-  }
-};
+// Matches all paths (including nested routes like /v1/stream/...) that are not
+// handled by the health endpoints or the service-info root. The handler:
+//   - strips the upstream's bogus `content-encoding: gzip` and hop-by-hop
+//     headers so the response describes the bytes actually sent
+//     (netscript#219 / #239); and
+//   - reinterprets a live/subscribe poll (`?live=long-poll`) of a
+//     not-yet-created stream as an open, empty, up-to-date subscription instead
+//     of a terminal 404 (netscript#267). See ./proxy.ts.
+const proxyHandler = createStreamsProxyHandler({ internalPort });
 
 // ── Serve via the mandated createPluginService surface ────────────────
 // Empty router + serveRpc:false → no oRPC wiring (streams has no contract).

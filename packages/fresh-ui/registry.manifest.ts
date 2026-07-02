@@ -630,6 +630,48 @@ export const freshUiRegistryManifest: RegistryManifest = {
       css: [{ layer: 'components', content: "@import './ui/message.css';" }],
     },
     {
+      name: 'markdown',
+      kind: 'component',
+      layer: 3,
+      description:
+        'Sanitized GFM + math + syntax-highlighted renderer for streamed assistant output — ' +
+        'react-markdown (preact/compat) with remark-gfm/remark-math/remarkCitations, ' +
+        'rehype-katex/rehype-highlight, and a MANDATORY rehype-sanitize pass applied last.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['ai', 'chat', 'markdown', 'component'],
+      files: [
+        {
+          source: 'registry/components/ui/markdown.tsx.template',
+          target: '@ui/markdown.tsx',
+        },
+        {
+          source: 'registry/components/ui/markdown-pipeline.ts',
+          target: '@ui/markdown-pipeline.ts',
+        },
+        {
+          source: 'registry/components/ui/markdown.css',
+          target: '@assets/ui/markdown.css',
+        },
+      ],
+      registryDependencies: ['theme-seed', 'citation-chip'],
+      dependencies: [
+        'npm:react-markdown@^9',
+        'npm:remark-gfm@^4',
+        'npm:remark-math@^6',
+        'npm:rehype-katex@^7',
+        'npm:rehype-highlight@^7',
+        'npm:rehype-sanitize@^6',
+        'npm:katex@^0.16',
+        'npm:highlight.js@^11',
+      ],
+      css: [
+        { layer: 'components', content: "@import './ui/markdown.css';" },
+        { layer: 'components', content: "@import 'katex/dist/katex.min.css';" },
+        { layer: 'components', content: "@import 'highlight.js/styles/github-dark.css';" },
+      ],
+    },
+    {
       name: 'command-palette',
       kind: 'component',
       layer: 2,
@@ -1115,6 +1157,7 @@ export const freshUiRegistryManifest: RegistryManifest = {
         'message',
         'command-palette',
         'search',
+        'markdown',
       ],
     },
     {
