@@ -49,5 +49,42 @@ Deno.test('runtime gates skip database resource wait for sqlite', () => {
 
   assertEquals(gateIds.includes(GATE.RUNTIME_WAIT_POSTGRES), false);
   assertEquals(gateIds.includes(GATE.RUNTIME_WAIT_MYSQL), false);
+  assertEquals(gateIds.includes(GATE.RUNTIME_WAIT_MSSQL), false);
   assertEquals(gateIds.includes(GATE.RUNTIME_WAIT_GARNET), true);
+});
+
+Deno.test('runtime gates wait for mssql resource with extended timeout when mssql is selected', () => {
+  const gateIds = createRuntimeGates(DATABASE.MSSQL).map((entry) => entry.id);
+
+  assertEquals(gateIds.includes(GATE.RUNTIME_WAIT_POSTGRES), false);
+  assertEquals(gateIds.includes(GATE.RUNTIME_WAIT_MYSQL), false);
+  assertEquals(gateIds.includes(GATE.RUNTIME_WAIT_MSSQL), true);
+
+  const gate = createRuntimeGates(DATABASE.MSSQL).find((entry) =>
+    entry.id === GATE.RUNTIME_WAIT_MSSQL
+  );
+  if (gate?.kind !== 'command') {
+    throw new Error('Expected mssql wait gate to be a command gate.');
+  }
+
+  assertEquals(
+    gate.command({
+      project: {
+        appHost: '/workspace/app/aspire/apphost.mts',
+      },
+    } as RunContext),
+    [
+      'aspire',
+      'wait',
+      'mssql',
+      '--status',
+      'healthy',
+      '--timeout',
+      '600',
+      '--apphost',
+      '/workspace/app/aspire/apphost.mts',
+      '--non-interactive',
+      '--nologo',
+    ],
+  );
 });

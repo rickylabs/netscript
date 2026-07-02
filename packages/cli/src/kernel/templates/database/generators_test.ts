@@ -149,6 +149,19 @@ describe('database template generators', () => {
     assertStringIncludes(output, "schema: 'schema'");
   });
 
+  it('normalizes mssql Aspire loopback endpoints to hostname URLs', () => {
+    const mssql = registry.get('mssql');
+    const output = generatePrismaConfig(mssql, {
+      configKey: 'mssql',
+      databaseName: 'netscript',
+    });
+
+    assertStringIncludes(output, "case 'mssql':");
+    assertStringIncludes(output, 'normalizeSqlServerHost(host.trim())');
+    assertStringIncludes(output, "host === '127.0.0.1'");
+    assertStringIncludes(output, "return 'localhost'");
+  });
+
   it('generates engine modules with adapter setup where required', () => {
     const mssql = registry.get('mssql');
     const output = generateEngineMod(mssql, { configKey: 'sql-server' });

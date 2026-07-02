@@ -123,7 +123,14 @@ function buildSqlServerOptions(parts: Record<string, string>): string {
 function parseSqlServerEndpoint(value: string): { host: string; port: string } {
   const trimmed = value.replace(/^tcp:/i, '');
   const [host = 'localhost', port = '1433'] = trimmed.split(',', 2);
-  return { host: host.trim(), port: port.trim() || '1433' };
+  return { host: normalizeSqlServerHost(host.trim()), port: port.trim() || '1433' };
+}
+
+function normalizeSqlServerHost(host: string): string {
+  if (host === '127.0.0.1' || host === '::1' || host === '[::1]') {
+    return 'localhost';
+  }
+  return host || 'localhost';
 }
 
 function parseConnectionParts(value: string): Record<string, string> {

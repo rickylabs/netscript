@@ -3,6 +3,7 @@ export const DATABASE = {
   POSTGRES: 'postgres',
   MYSQL: 'mysql',
   SQLITE: 'sqlite',
+  MSSQL: 'mssql',
 } as const;
 
 /** Package source modes for generated projects and plugins. */

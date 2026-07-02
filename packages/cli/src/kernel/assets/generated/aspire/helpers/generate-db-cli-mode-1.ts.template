@@ -101,7 +101,7 @@ function buildOfflineGenerateUrl(target: DbCliTarget): string | null {
     case 'Mysql':
       return `mysql://root:password@localhost:3306/${target.databaseName}`;
     case 'Mssql':
-      return `sqlserver://localhost:1433;database=${encodeURIComponent(target.databaseName)};user=sa;password=Password123;trustServerCertificate=true`;
+      return `sqlserver://localhost:1433;database=${encodeURIComponent(target.databaseName)};user=sa;password=NetscriptE2e!Sql2026;trustServerCertificate=true`;
     case 'Sqlite':
       return `file:./${target.databaseName}`;
     default:

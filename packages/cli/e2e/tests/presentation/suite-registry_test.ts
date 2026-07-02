@@ -85,5 +85,14 @@ Deno.test('runtime suite omits database resource wait for sqlite', () => {
   assertEquals(runtime.defaultOptions.database, DATABASE.SQLITE);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_WAIT_POSTGRES), false);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_WAIT_MYSQL), false);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_WAIT_MSSQL), false);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_WAIT_GARNET), true);
+});
+
+Deno.test('runtime suite selects mssql database resource wait for mssql', () => {
+  const runtime = resolveSuite(SCAFFOLD.RUNTIME, { database: DATABASE.MSSQL });
+  assertEquals(runtime.defaultOptions.database, DATABASE.MSSQL);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_WAIT_POSTGRES), false);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_WAIT_MYSQL), false);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_WAIT_MSSQL), true);
 });

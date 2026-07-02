@@ -50,8 +50,10 @@ export const GATE = {
   RUNTIME_AUTH_SMOKE_ENV: 'runtime.auth-smoke-env',
   RUNTIME_ASPIRE_RESTORE: 'runtime.aspire-restore',
   RUNTIME_ASPIRE_START: 'runtime.aspire-start',
+  RUNTIME_WAIT_DATABASE: 'runtime.wait.database',
   RUNTIME_WAIT_POSTGRES: 'runtime.wait.postgres',
   RUNTIME_WAIT_MYSQL: 'runtime.wait.mysql',
+  RUNTIME_WAIT_MSSQL: 'runtime.wait.mssql',
   RUNTIME_WAIT_GARNET: 'runtime.wait.garnet',
   RUNTIME_WAIT_WORKERS_API: 'runtime.wait.workers-api',
   RUNTIME_WAIT_WORKERS: 'runtime.wait.workers',
@@ -90,6 +92,7 @@ export const GATE = {
 export const ASPIRE_RESOURCE = {
   POSTGRES: 'postgres',
   MYSQL: 'mysql',
+  MSSQL: 'mssql',
   GARNET: 'garnet',
   WORKERS_API: 'workers-api',
   WORKERS: 'workers',

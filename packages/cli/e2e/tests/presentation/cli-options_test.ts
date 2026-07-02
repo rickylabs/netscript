@@ -12,9 +12,9 @@ Deno.test('mapRunOptions accepts sqlite database axis', () => {
 
 Deno.test('mapRunOptions rejects unsupported database values', () => {
   assertThrows(
-    () => mapRunOptions({ db: 'mssql' }),
+    () => mapRunOptions({ db: 'oracle' }),
     Error,
-    '--db must be postgres, mysql, or sqlite.',
+    '--db must be postgres, mysql, sqlite, or mssql.',
   );
 });
 
@@ -23,5 +23,17 @@ Deno.test('mapRunOptions rejects unsupported plugin values', () => {
     () => mapRunOptions({ plugins: 'worker,unknown' }),
     Error,
     'Unsupported plugin kind',
+  );
+});
+
+Deno.test('mapRunOptions accepts mssql database axis', () => {
+  assertEquals(mapRunOptions({ db: DATABASE.MSSQL }), { database: DATABASE.MSSQL });
+});
+
+Deno.test('mapRunOptions reports all supported database axes', () => {
+  assertThrows(
+    () => mapRunOptions({ db: 'oracle' }),
+    Error,
+    '--db must be postgres, mysql, sqlite, or mssql.',
   );
 });

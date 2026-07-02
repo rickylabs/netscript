@@ -107,7 +107,7 @@ function offlineGenerateDatabaseUrl(
     case 'mssql':
       return {
         url:
-          'sqlserver://localhost:1433;database=master;user=sa;password=Password123;trustServerCertificate=true',
+          'sqlserver://localhost:1433;database=master;user=sa;password=NetscriptE2e!Sql2026;trustServerCertificate=true',
         envKey: 'MSSQL_URI',
       };
     case 'sqlite':

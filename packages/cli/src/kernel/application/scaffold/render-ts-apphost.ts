@@ -148,6 +148,7 @@ export async function scaffoldTsAppHost(
         Mode: 'Container',
         DatabaseName: containerDbName,
         Persistent: true,
+        DataPath: '.data/postgres',
       };
       primaryDatabase = 'postgres';
       break;
@@ -158,6 +159,7 @@ export async function scaffoldTsAppHost(
         Mode: 'Container',
         DatabaseName: containerDbName,
         Persistent: true,
+        DataPath: '.data/mysql',
       };
       primaryDatabase = 'mysql';
       break;
@@ -168,6 +170,7 @@ export async function scaffoldTsAppHost(
         Mode: 'Container',
         DatabaseName: containerDbName,
         Persistent: true,
+        ImageTag: '2022-latest',
       };
       primaryDatabase = 'mssql';
       break;

@@ -9,63 +9,65 @@
  * options — nothing is hardcoded per engine or per service.
  */
 
-import { PORT_RANGES } from '../../constants/port-ranges.ts';
-import { SCAFFOLD_DEFAULTS } from '../../constants/scaffold/scaffold-defaults.ts';
-import type { CacheBackendChoice } from '../../domain/cache-backend.ts';
-import type { DbEngineChoice } from '../../domain/db-engine.ts';
+import { PORT_RANGES } from '../../constants/port-ranges.ts'
+import { SCAFFOLD_DEFAULTS } from '../../constants/scaffold/scaffold-defaults.ts'
+import type { CacheBackendChoice } from '../../domain/cache-backend.ts'
+import type { DbEngineChoice } from '../../domain/db-engine.ts'
+
+const MSSQL_SA_PASSWORD = 'NetscriptE2e!Sql2026'
 
 /** Example service wiring for `generateAppsettings()`. */
 export interface AppsettingsServiceOption {
   /** Service key in `NetScriptConfig.Services`. */
-  readonly name: string;
+  readonly name: string
   /** HTTP port. Must fall in `PORT_RANGES.SERVICE`. */
-  readonly port: number;
+  readonly port: number
 }
 
 /** Options for generating `appsettings.json`. */
 export interface AppsettingsOptions {
   /** Project name (required by NetScript config schema). */
-  readonly name?: string;
+  readonly name?: string
   /** Application name. Defaults to SCAFFOLD_DEFAULTS.APP_NAME. */
-  readonly appName?: string;
+  readonly appName?: string
   /** Application port. Defaults to PORT_RANGES.APP start. */
-  readonly appPort?: number;
+  readonly appPort?: number
   /** OTEL collector endpoint port. Defaults to PORT_RANGES.OTEL_COLLECTOR. */
-  readonly otelPort?: number;
+  readonly otelPort?: number
   /** Aspire dashboard port. Defaults to PORT_RANGES.ASPIRE_DASHBOARD. */
-  readonly dashboardPort?: number;
+  readonly dashboardPort?: number
   /** Database engine to register. `'none'` omits the Databases block. */
-  readonly dbEngine?: DbEngineChoice;
+  readonly dbEngine?: DbEngineChoice
   /** Whether to register a shared cache resource. */
-  readonly cache?: boolean;
+  readonly cache?: boolean
   /** Shared cache backend to register. */
-  readonly cacheBackend?: CacheBackendChoice;
+  readonly cacheBackend?: CacheBackendChoice
   /** Optional example service to register. */
-  readonly service?: AppsettingsServiceOption;
+  readonly service?: AppsettingsServiceOption
 }
 
 /** JSON shape of a Databases entry. */
 interface DatabaseBlock {
-  readonly Engine: 'Postgres' | 'Mysql' | 'Mssql' | 'Sqlite';
-  readonly Mode?: 'Container' | 'External';
-  readonly DatabaseName?: string;
-  readonly Persistent?: boolean;
-  readonly DataPath?: string;
+  readonly Engine: 'Postgres' | 'Mysql' | 'Mssql' | 'Sqlite'
+  readonly Mode?: 'Container' | 'External'
+  readonly DatabaseName?: string
+  readonly Persistent?: boolean
+  readonly DataPath?: string
 }
 
 interface ToolBlock {
-  readonly Enabled: boolean;
-  readonly TaskName: string;
-  readonly Database: string;
-  readonly Description: string;
+  readonly Enabled: boolean
+  readonly TaskName: string
+  readonly Database: string
+  readonly Description: string
 }
 
 /** JSON shape of a Cache entry. */
 export interface CacheBlock {
-  readonly Engine: 'Redis' | 'Garnet' | 'DenoKv';
-  readonly Mode: 'Container' | 'External';
-  readonly DataPath?: string;
-  readonly Port?: number;
+  readonly Engine: 'Redis' | 'Garnet' | 'DenoKv'
+  readonly Mode: 'Container' | 'External'
+  readonly DataPath?: string
+  readonly Port?: number
 }
 
 /**
@@ -85,16 +87,19 @@ export interface CacheBlock {
  * @returns Kebab-cased resource name, e.g. `aspire_full` → `aspire-full-db` or
  *   `aspire_full` + `mysql` → `aspire-full-mysql-db`.
  */
-export function deriveContainerDbResourceName(projectName: string, suffix?: string): string {
+export function deriveContainerDbResourceName(
+  projectName: string,
+  suffix?: string,
+): string {
   const kebab = projectName
     .toLowerCase()
     .replace(/[^a-z0-9-]+/g, '-')
-    .replace(/^-+|-+$/g, '') || 'app';
+    .replace(/^-+|-+$/g, '') || 'app'
   const safeSuffix = suffix
     ?.toLowerCase()
     .replace(/[^a-z0-9-]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-  return safeSuffix ? `${kebab}-${safeSuffix}-db` : `${kebab}-db`;
+    .replace(/^-+|-+$/g, '')
+  return safeSuffix ? `${kebab}-${safeSuffix}-db` : `${kebab}-db`
 }
 
 /**
@@ -106,8 +111,8 @@ export function deriveContainerDbResourceName(projectName: string, suffix?: stri
  * @returns File name with `.db` suffix, e.g. `my app` → `my_app.db`.
  */
 export function deriveSqliteDbFileName(projectName: string): string {
-  const safe = projectName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-  return `${safe}.db`;
+  const safe = projectName.replace(/[^a-z0-9]/gi, '_').toLowerCase()
+  return `${safe}.db`
 }
 
 /**
@@ -128,12 +133,12 @@ function buildDatabaseBlock(
   engine: DbEngineChoice,
   projectName: string,
 ): { readonly key: string; readonly block: DatabaseBlock } | undefined {
-  if (engine === 'none') return undefined;
+  if (engine === 'none') return undefined
   // Container engines use the kebab-safe name. SQLite is
   // exempt because its DatabaseName is a file path, not an Aspire resource
   // name. See `deriveContainerDbResourceName` for the validator contract.
-  const kebabDbName = deriveContainerDbResourceName(projectName);
-  const sqliteDbFile = deriveSqliteDbFileName(projectName);
+  const kebabDbName = deriveContainerDbResourceName(projectName)
+  const sqliteDbFile = deriveSqliteDbFileName(projectName)
   switch (engine) {
     case 'postgres':
       return {
@@ -145,7 +150,7 @@ function buildDatabaseBlock(
           Persistent: true,
           DataPath: '.data/postgres',
         },
-      };
+      }
     case 'mysql':
       return {
         key: 'mysql',
@@ -156,7 +161,7 @@ function buildDatabaseBlock(
           Persistent: true,
           DataPath: '.data/mysql',
         },
-      };
+      }
     case 'mssql':
       return {
         key: 'mssql',
@@ -165,9 +170,8 @@ function buildDatabaseBlock(
           Mode: 'Container',
           DatabaseName: kebabDbName,
           Persistent: true,
-          DataPath: '.data/mssql',
         },
-      };
+      }
     case 'sqlite':
       return {
         key: 'sqlite',
@@ -175,7 +179,7 @@ function buildDatabaseBlock(
           Engine: 'Sqlite',
           DatabaseName: sqliteDbFile,
         },
-      };
+      }
   }
 }
 
@@ -192,7 +196,7 @@ export function buildDefaultTools(
   primaryDatabase?: string,
 ): Record<string, ToolBlock> {
   if (!primaryDatabase) {
-    return {};
+    return {}
   }
 
   return {
@@ -202,7 +206,7 @@ export function buildDefaultTools(
       Database: primaryDatabase,
       Description: 'Prisma Studio for database management',
     },
-  };
+  }
 }
 
 /**
@@ -227,7 +231,7 @@ export function buildCacheBlock(
           Mode: 'Container',
           DataPath: '.data/redis',
         },
-      };
+      }
     case 'garnet':
       return {
         key: 'garnet',
@@ -236,7 +240,7 @@ export function buildCacheBlock(
           Mode: 'Container',
           DataPath: '.data/garnet',
         },
-      };
+      }
     case 'deno-kv':
       return {
         key: 'deno-kv',
@@ -245,7 +249,7 @@ export function buildCacheBlock(
           Mode: 'External',
           DataPath: 'data/kv',
         },
-      };
+      }
   }
 }
 
@@ -258,24 +262,24 @@ export function buildCacheBlock(
  * @returns Serialized JSON string with trailing newline.
  */
 export function generateAppsettings(options?: AppsettingsOptions): string {
-  const name = options?.name ?? 'my-app';
-  const appName = options?.appName ?? SCAFFOLD_DEFAULTS.APP_NAME;
-  const appPort = options?.appPort ?? PORT_RANGES.APP.start;
-  const otelPort = options?.otelPort ?? PORT_RANGES.OTEL_COLLECTOR;
-  const dbEngine = options?.dbEngine ?? SCAFFOLD_DEFAULTS.DB_ENGINE;
-  const cacheEnabled = options?.cache ?? SCAFFOLD_DEFAULTS.CACHE_ENABLED;
-  const cacheBackend = options?.cacheBackend ?? SCAFFOLD_DEFAULTS.CACHE_BACKEND;
+  const name = options?.name ?? 'my-app'
+  const appName = options?.appName ?? SCAFFOLD_DEFAULTS.APP_NAME
+  const appPort = options?.appPort ?? PORT_RANGES.APP.start
+  const otelPort = options?.otelPort ?? PORT_RANGES.OTEL_COLLECTOR
+  const dbEngine = options?.dbEngine ?? SCAFFOLD_DEFAULTS.DB_ENGINE
+  const cacheEnabled = options?.cache ?? SCAFFOLD_DEFAULTS.CACHE_ENABLED
+  const cacheBackend = options?.cacheBackend ?? SCAFFOLD_DEFAULTS.CACHE_BACKEND
 
-  const db = buildDatabaseBlock(dbEngine, name);
-  const cache = cacheEnabled ? buildCacheBlock(cacheBackend) : undefined;
+  const db = buildDatabaseBlock(dbEngine, name)
+  const cache = cacheEnabled ? buildCacheBlock(cacheBackend) : undefined
 
-  const services: Record<string, unknown> = {};
+  const services: Record<string, unknown> = {}
   if (options?.service) {
     services[options.service.name] = {
       Runtime: 'deno',
       Port: options.service.port,
       Entrypoint: 'src/main.ts',
-    };
+    }
   }
 
   const netScriptConfig: Record<string, unknown> = {
@@ -285,13 +289,13 @@ export function generateAppsettings(options?: AppsettingsOptions): string {
       HttpEndpoint: `http://localhost:${otelPort}`,
       Protocol: 'http/protobuf',
     },
-  };
+  }
 
   if (db) {
-    netScriptConfig.PrimaryDatabase = db.key;
+    netScriptConfig.PrimaryDatabase = db.key
   }
   if (cache) {
-    netScriptConfig.PrimaryCache = cache.key;
+    netScriptConfig.PrimaryCache = cache.key
   }
 
   Object.assign(netScriptConfig, {
@@ -305,12 +309,19 @@ export function generateAppsettings(options?: AppsettingsOptions): string {
         Runtime: 'deno',
         Type: 'app',
         Port: appPort,
-        ...(options?.service ? { ServiceReferences: [options.service.name] } : {}),
+        ...(options?.service
+          ? { ServiceReferences: [options.service.name] }
+          : {}),
       },
     },
     Tools: buildDefaultTools(db?.key),
-  });
+  })
 
-  const config = { NetScript: netScriptConfig };
-  return JSON.stringify(config, null, 2) + '\n';
+  const parameters = db?.block.Engine === 'Mssql'
+    ? { [`${db.key}-password`]: MSSQL_SA_PASSWORD }
+    : undefined
+  const config = parameters
+    ? { Parameters: parameters, NetScript: netScriptConfig }
+    : { NetScript: netScriptConfig }
+  return JSON.stringify(config, null, 2) + '\n'
 }

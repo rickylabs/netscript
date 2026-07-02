@@ -8,20 +8,31 @@ import { DATABASE, type DatabaseEngine } from '../../../domain/extension-axes.ts
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
 import { commandGate, httpGate } from './gate-factory.ts';
 
+const ASPIRE_RESOURCE_WAIT_TIMEOUT_SECONDS: Partial<Record<AspireResource, number>> = {
+  [ASPIRE_RESOURCE.MSSQL]: 600,
+};
+
 function runtimeWaitGate(resource: AspireResource): GateDefinition {
   return commandGate(
     `runtime.wait.${resource}`,
     `Wait for ${resource}`,
     GATE_PHASE.RUNTIME,
-    (context) => [
-      'aspire',
-      'wait',
-      resource,
-      '--apphost',
-      context.project.appHost,
-      '--non-interactive',
-      '--nologo',
-    ],
+    (context) => {
+      const command = [
+        'aspire',
+        'wait',
+        resource,
+        '--apphost',
+        context.project.appHost,
+        '--non-interactive',
+        '--nologo',
+      ];
+      const timeoutSeconds = ASPIRE_RESOURCE_WAIT_TIMEOUT_SECONDS[resource];
+      if (timeoutSeconds !== undefined) {
+        command.splice(3, 0, '--status', 'healthy', '--timeout', String(timeoutSeconds));
+      }
+      return command;
+    },
   );
 }
 
@@ -214,6 +225,8 @@ function databaseRuntimeResources(database: DatabaseEngine): readonly AspireReso
       return [ASPIRE_RESOURCE.POSTGRES];
     case DATABASE.MYSQL:
       return [ASPIRE_RESOURCE.MYSQL];
+    case DATABASE.MSSQL:
+      return [ASPIRE_RESOURCE.MSSQL];
     case DATABASE.SQLITE:
       return [];
   }

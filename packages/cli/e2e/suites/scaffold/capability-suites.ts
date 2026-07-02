@@ -61,6 +61,7 @@ const RUNTIME_GATES = [
   GATE.RUNTIME_ASPIRE_START,
   GATE.RUNTIME_WAIT_POSTGRES,
   GATE.RUNTIME_WAIT_MYSQL,
+  GATE.RUNTIME_WAIT_MSSQL,
   GATE.RUNTIME_WAIT_GARNET,
   GATE.RUNTIME_WAIT_WORKERS_API,
   GATE.RUNTIME_WAIT_WORKERS,
@@ -194,6 +195,7 @@ function runtimeGateIds(
   return gates.filter((id) => {
     if (id === GATE.RUNTIME_WAIT_POSTGRES) return database === 'postgres';
     if (id === GATE.RUNTIME_WAIT_MYSQL) return database === 'mysql';
+    if (id === GATE.RUNTIME_WAIT_MSSQL) return database === 'mssql';
     return true;
   });
 }
