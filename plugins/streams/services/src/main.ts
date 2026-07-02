@@ -24,6 +24,7 @@ import { healthChecks } from '@netscript/service';
 import { createPluginService } from '@netscript/plugin/service';
 import { DurableStreamTestServer } from '@durable-streams/server';
 import denoJson from '../../deno.json' with { type: 'json' };
+import { sanitizeProxyResponse } from './proxy-headers.ts';
 
 /** Connector version, single-sourced from the streams package `deno.json`. */
 const VERSION: string = denoJson.version;
@@ -78,7 +79,12 @@ const proxyHandler = async (c: Context): Promise<Response> => {
       // @ts-ignore Deno supports duplex on Request
       duplex: c.req.raw.body ? 'half' : undefined,
     });
-    return await fetch(proxyReq);
+    // Deno's fetch transparently decodes the upstream body, so the bytes we
+    // re-stream are already decoded. Strip content-encoding/content-length and
+    // hop-by-hop headers so the response headers describe the bytes actually
+    // sent — otherwise the upstream's bogus `content-encoding: gzip` on a plain
+    // JSON body breaks every compliant reader (netscript#219 / #239).
+    return sanitizeProxyResponse(await fetch(proxyReq));
   } catch {
     return c.json({ error: 'Upstream unavailable' }, 502);
   }
