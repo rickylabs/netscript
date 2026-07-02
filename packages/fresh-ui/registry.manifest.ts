@@ -1113,6 +1113,8 @@ export const freshUiRegistryManifest: RegistryManifest = {
         'tool-call-card',
         'prompt-input',
         'message',
+        'command-palette',
+        'search',
       ],
     },
     {
