@@ -3220,6 +3220,15 @@
           "npm:@orpc/server@^1.14.6"
         ]
       },
+      "packages/plugin-ai-core": {
+        "dependencies": [
+          "jsr:@netscript/ai@0.0.1-alpha.0",
+          "jsr:@netscript/plugin@0.0.1-alpha.19",
+          "jsr:@zod/zod@4.4.3",
+          "npm:@orpc/contract@^1.14.6",
+          "npm:@orpc/server@^1.14.6"
+        ]
+      },
       "packages/plugin-auth-core": {
         "dependencies": [
           "jsr:@std/assert@1",
