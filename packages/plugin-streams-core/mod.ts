@@ -15,9 +15,11 @@
 
 export { defineStreamSchema } from './src/public/mod.ts';
 export { createDurableStream, DurableStreamProducer } from './src/public/mod.ts';
+export { createServiceStreamProducer } from './src/public/mod.ts';
 export { buildStreamUrl, getStreamsAuth, getStreamsUrl } from './src/public/mod.ts';
 export { inspectStreamTopic } from './src/public/mod.ts';
 export type { DurableStreamProducerOptions, StreamProducerPort } from './src/public/mod.ts';
+export type { ServiceStreamProducerOptions } from './src/public/mod.ts';
 export type { StreamTopicInspectionInput, StreamTopicInspectionReport } from './src/public/mod.ts';
 export type {
   ChangeEvent,
