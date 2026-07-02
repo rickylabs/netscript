@@ -51,66 +51,40 @@ export async function scaffoldTsAppHost(
     filesSkipped.push(aspireConfigPath);
   }
 
-  // 2. package.json — Node/TypeScript dependencies required by Aspire TS AppHost runtime.
-  //    Lives inside `aspire/` to keep the Node.js package graph isolated
-  //    from the Deno workspace at the project root.
-  const packageJsonContent = JSON.stringify(
+  // 2. deno.json — makes the Aspire fork's TypeScript AppHost toolchain
+  //    resolver select the **Deno** runtime (it runs `deno run -A apphost.mts`
+  //    + a `deno check` pre-flight) instead of the Node/tsx toolchain.
+  //
+  //    Marker precedence in the fork resolver: a bare `package.json` never
+  //    selects npm, and `deno.json` outranks `package-lock.json`, so emitting
+  //    this file (and NOT a Node `package.json`/`tsconfig`) is what pins the
+  //    AppHost to Deno.
+  //
+  //    - `unstable: ["sloppy-imports"]` is REQUIRED: the fork's SDK codegen
+  //      emits `.mjs` import specifiers that point at `.mts` files (e.g.
+  //      `base.mts` imports `./transport.mjs`). Deno rejects that by default;
+  //      the resolver runs a plain `deno check` with no `--sloppy-imports`
+  //      flag, so the workaround has to live in the config.
+  //    - `nodeModulesDir: "auto"` + the `vscode-jsonrpc` import map (bare +
+  //      subpath) resolve the one npm dependency the generated SDK transport
+  //      pulls in (`vscode-jsonrpc/node.js`).
+  const denoJsonContent = JSON.stringify(
     {
-      name: `${options.name}-apphost`,
-      version: '1.0.0',
-      private: true,
-      type: 'module',
-      dependencies: {
-        'vscode-jsonrpc': '8.2.0',
-      },
-      devDependencies: {
-        '@types/node': '^22.0.0',
-        tsx: '4.21.0',
-        typescript: '^5.9.3',
+      nodeModulesDir: 'auto',
+      unstable: ['sloppy-imports'],
+      imports: {
+        'vscode-jsonrpc': 'npm:vscode-jsonrpc@8.2.0',
+        'vscode-jsonrpc/': 'npm:/vscode-jsonrpc@8.2.0/',
       },
     },
     null,
     2,
   ) + '\n';
-  const packageJsonPath = join(aspireDir, 'package.json');
-  if (await context.scaffolder.writeFile(packageJsonPath, packageJsonContent, options.force)) {
-    filesCreated.push(packageJsonPath);
+  const denoJsonPath = join(aspireDir, 'deno.json');
+  if (await context.scaffolder.writeFile(denoJsonPath, denoJsonContent, options.force)) {
+    filesCreated.push(denoJsonPath);
   } else {
-    filesSkipped.push(packageJsonPath);
-  }
-
-  // 3. tsconfig.apphost.json — Aspire 13.4 validates TypeScript AppHosts before startup.
-  const tsconfigApphostContent = JSON.stringify(
-    {
-      compilerOptions: {
-        target: 'ES2022',
-        module: 'NodeNext',
-        moduleResolution: 'NodeNext',
-        esModuleInterop: true,
-        forceConsistentCasingInFileNames: true,
-        strict: true,
-        skipLibCheck: true,
-        outDir: './dist/apphost',
-        rootDir: '.',
-      },
-      include: [
-        SCAFFOLD_FILES.APPHOST_MTS,
-        `${SCAFFOLD_DIRS.ASPIRE_GENERATED}/${SCAFFOLD_DIRS.MODULES}/aspire.mts`,
-        `${SCAFFOLD_DIRS.ASPIRE_GENERATED}/${SCAFFOLD_DIRS.MODULES}/base.mts`,
-        `${SCAFFOLD_DIRS.ASPIRE_GENERATED}/${SCAFFOLD_DIRS.MODULES}/transport.mts`,
-      ],
-      exclude: ['node_modules'],
-    },
-    null,
-    2,
-  ) + '\n';
-  const tsconfigApphostPath = join(aspireDir, SCAFFOLD_FILES.TSCONFIG_APPHOST);
-  if (
-    await context.scaffolder.writeFile(tsconfigApphostPath, tsconfigApphostContent, options.force)
-  ) {
-    filesCreated.push(tsconfigApphostPath);
-  } else {
-    filesSkipped.push(tsconfigApphostPath);
+    filesSkipped.push(denoJsonPath);
   }
 
   // 4. .helpers/ directory (inside aspire/)
