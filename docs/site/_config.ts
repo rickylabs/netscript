@@ -8,6 +8,7 @@ import langJson from "npm:highlight.js@11.11.1/lib/languages/json";
 import langTypescript from "npm:highlight.js@11.11.1/lib/languages/typescript";
 import { resolveXref } from "./_data/xref.ts";
 import { assertDiagramAssetsExist } from "./_diagrams/validate.ts";
+import { aiTooling } from "./_plugins/ai-tooling.ts";
 
 /**
  * NetScript external user documentation site (Diátaxis IA).
@@ -117,5 +118,11 @@ site.use(pagefind({
 
 // MUST run last: rewrite every root-relative href/src to the /netscript/ base (TD-1).
 site.use(basePath());
+
+// AI-affordance tooling (SOTA rec #1): per-page Markdown twins + tiered llms.txt.
+// Registered last so its `afterRender` pass runs after pagefind's indexing but
+// before the `base_path` processor — body hrefs are still root-relative and are
+// absolutised inside the plugin; the emitted `.md`/`.txt` pages skip base_path.
+site.use(aiTooling());
 
 export default site;

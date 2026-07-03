@@ -1677,3 +1677,29 @@ a.ns-cards-grid__card:focus-visible {
   border-color: var(--ns-success-border);
   opacity: 1;
 }
+
+/* AI affordance (PR-A): "View as Markdown" link to the per-page .md twin. */
+.ns-page-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin: calc(-1 * var(--ns-space-2)) 0 var(--ns-space-3);
+}
+
+.ns-md-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8125rem;
+  color: var(--ns-fg-muted, var(--ns-fg));
+  text-decoration: none;
+  padding: 0.125rem var(--ns-space-2);
+  border: 1px solid var(--ns-border);
+  border-radius: var(--ns-radius-sm, 6px);
+  transition: color var(--ns-ease-normal), border-color var(--ns-ease-normal);
+}
+
+.ns-md-link:hover,
+.ns-md-link:focus-visible {
+  color: var(--ns-fg);
+  border-color: var(--ns-border-hover, var(--ns-accent, #5b8def));
+}

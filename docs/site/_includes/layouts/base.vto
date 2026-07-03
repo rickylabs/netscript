@@ -129,6 +129,18 @@
 
         <main class="ns-dashboard__content" id="main-content" tabindex="-1">
           {{ comp.breadcrumb({ url, navSections, title }) }}
+          {{# AI-affordance (PR-A): plain link to this page's Markdown twin
+             (built by _plugins/ai-tooling.ts). CSP-safe, no client JS. #}}
+          <div class="ns-page-actions">
+            <a
+              class="ns-md-link"
+              href="{{ (url + 'index.md') |> url }}"
+              data-pagefind-ignore
+              title="View this page as clean Markdown (for LLMs and agents)"
+            >
+              <span aria-hidden="true">&#9660;</span> View as Markdown
+            </a>
+          </div>
           <div class="ns-content-rail">
             <article class="ns-prose" data-pagefind-body>
               {{ content }}
