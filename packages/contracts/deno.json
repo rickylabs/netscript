@@ -10,6 +10,7 @@
     "./transform": "./transform.ts"
   },
   "imports": {
+    "@orpc/contract": "npm:@orpc/contract@^1.14.6",
     "zod": "jsr:@zod/zod@4.4.3"
   },
   "tasks": {

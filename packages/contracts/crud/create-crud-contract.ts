@@ -26,9 +26,28 @@
 
 import { z } from 'zod';
 import {
-  baseContract,
+  baseContract as soundBaseContract,
   type BaseContractProcedure,
+  type BaseContractRouteBuilder,
+  type BaseContractRouteOptions,
 } from '../src/application/contract-primitives.ts';
+
+/**
+ * Structural view of {@link soundBaseContract} used by this generator.
+ *
+ * The CRUD generator composes routes from the package's minimal
+ * {@link ContractSchema} abstraction rather than oRPC's `StandardSchemaV1`, so
+ * it drives the base contract through the deprecated structural builder surface
+ * (whose `.input(...)`/`.output(...)` accept `ContractSchema`). 172a-2-SOUND
+ * slice 3 migrates this generator onto the sound `BaseContractRoute` types and
+ * removes this view. This single boundary cast replaces the `as BaseContract`
+ * erasure that previously lived on `baseContract` itself (net cast delta 0).
+ */
+type LegacyBaseContractBuilder = Readonly<{
+  route(options: BaseContractRouteOptions): BaseContractRouteBuilder;
+}>;
+
+const baseContract = soundBaseContract as unknown as LegacyBaseContractBuilder;
 import type {
   ContractObjectSchema,
   ContractSchema,
