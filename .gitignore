@@ -10,10 +10,8 @@ dist/
 # Local git worktrees for parallel harness supervisor/wave runs
 .worktrees/
 
-.llm/tmp/claude/
-.llm/tmp/cli-e2e/
-.llm/tmp/init-json-smoke/
-
-# Runtime-only OpenHands Actions scratch space. Durable run evidence belongs under
-# .llm/tmp/run/openhands/<source>/run-<id>-<attempt>/ or GitHub Actions artifacts.
-.llm/tmp/openhands/
+# Transient LLM/harness scratch tree. All of `.llm/tmp/` is git-excluded scratch
+# (see AGENTS.md and root deno.json `exclude`): harness run logs, evidence, and
+# CI output land here and embed machine-local absolute paths. Never commit it.
+# If a specific artifact ever needs to be durable, re-add it with a `!` negation.
+.llm/tmp/

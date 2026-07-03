@@ -1,4 +1,0 @@
-exit=0
-command=deno lint
-
-Checked 89 files

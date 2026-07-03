@@ -1,4 +1,0 @@
-packages/plugin-sagas-core/src/transports/redis-transport.ts	321
-packages/plugin-sagas-core/src/transports/redis-transport-commands.ts	292
-packages/plugin-sagas-core/src/transports/list-transport.ts	318
-packages/plugin-sagas-core/src/transports/list-transport-commands.ts	303

@@ -1,6 +1,0 @@
-Check packages/fresh-ui/tests/consumer-render.test.tsx
-running 1 test from ./packages/fresh-ui/tests/consumer-render.test.tsx
-runtime namespaces construct consumer-shaped JSX trees ... ok (16ms)
-
-ok | 1 passed | 0 failed (25ms)
-

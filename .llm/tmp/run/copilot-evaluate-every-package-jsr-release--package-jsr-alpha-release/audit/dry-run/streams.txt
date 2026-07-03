@@ -1,9 +1,0 @@
-Checking for slow types in the public API...
-[0m[1m[32mSimulating publish[0m of [0m[38;5;245m@netscript/streams@0.1.0[0m with files:
-   file:///home/runner/work/netscript-start/netscript-start/packages/streams/config.ts (2.22KB)
-   file:///home/runner/work/netscript-start/netscript-start/packages/streams/deno.json (869B)
-   file:///home/runner/work/netscript-start/netscript-start/packages/streams/mod.ts (1.18KB)
-   file:///home/runner/work/netscript-start/netscript-start/packages/streams/producer.ts (7.04KB)
-   file:///home/runner/work/netscript-start/netscript-start/packages/streams/schema.ts (1.58KB)
-   file:///home/runner/work/netscript-start/netscript-start/packages/streams/types.ts (391B)
-[0m[32mSuccess[0m Dry run complete

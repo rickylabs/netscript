@@ -1,52 +1,0 @@
-Bootstrapping NetScript for OpenHands
-Downloading aspire-cli-linux-x64-13.4.0.tar.gz
-                                                                           0.0%########                                                                  12.5%###############################                                           43.3%#######################################################                   77.5%#####################################################################     97.0%######################################################################## 100.0%
-Downloading aspire-cli-linux-x64-13.4.0.tar.gz.sha512
-######################################################################## 100.0%
-Aspire CLI successfully installed to: [0;32m/home/runner/.aspire/bin/aspire[0m
-Skipping PATH configuration due to --skip-path flag
-deno 2.8.3 (stable, release, x86_64-unknown-linux-gnu)
-v8 14.9.207.2-rusty
-typescript 6.0.3
-10.0.301
-10.0.109 [/usr/share/dotnet/sdk]
-10.0.204 [/usr/share/dotnet/sdk]
-10.0.301 [/usr/share/dotnet/sdk]
-13.4.0+becb48e2d61099e35ae336d527d3875e928d6594
-Docker version 29.5.3, build d1c06ef
-Docker Compose version v2.38.2
-[0m[32mDownload[0m https://jsr.io/@panva/oauth4webapi/3.8.6_meta.json
-[0m[32mDownload[0m https://jsr.io/@panva/oauth4webapi/meta.json
-[0m[32mDownload[0m https://jsr.io/@panva/oauth4webapi/3.8.6/src/index.ts
-[0m[38;5;245mInstalled[0m 1 [0m[38;5;245mpackage[0m [0m[38;5;245min[0m 617ms
-[0m[38;5;245mReused[0m 297 [0m[38;5;245mpackages from cache[0m
-[0m[1m[33m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[0m
-[0m[38;5;245mDownloaded[0m 1 [0m[38;5;245mpackage from JSR[0m
-[0m[32m+[0m
-[0m[38;5;245mDownloaded[0m 0 [0m[38;5;245mpackages from npm[0m
-
-[0m[36mDependencies:[0m
-[0m[32m+[0m [0m[38;5;245mjsr:[0m@panva/oauth4webapi [0m[38;5;245m3.8.6[0m
-
-[0m[33m╭[0m [0m[1m[33mWarning[0m
-[0m[33m│[0m
-[0m[33m│[0m  Ignored build scripts for packages:
-[0m[33m│[0m  [0m[3mnpm:lmdb@3.5.5[0m
-[0m[33m│[0m  [0m[3mnpm:msgpackr-extract@3.0.4[0m
-[0m[33m│[0m
-[0m[33m│[0m  Lifecycle scripts are only supported when using a `node_modules` directory.
-[0m[33m│[0m  Enable it in your deno config file:
-[0m[33m│[0m  [0m[1m"nodeModulesDir": "auto"[0m
-[0m[33m╰─[0m
-http-cache: /home/runner/.local/share/NuGet/http-cache
-global-packages: /home/runner/.nuget/packages/
-temp: /tmp/NuGetScratchrunner
-plugins-cache: /home/runner/.local/share/NuGet/plugin-cache
-
-Workload version: 10.0.300-manifests.b0c14421
-
-Installed Workload Id      Manifest Version      Installation Source
---------------------------------------------------------------------
-
-Use `dotnet workload search` to find additional workloads to install.
-

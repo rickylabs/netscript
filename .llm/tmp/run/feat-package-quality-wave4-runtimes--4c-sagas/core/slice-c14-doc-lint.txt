@@ -1,4 +1,0 @@
-exit=0
-command=deno run --allow-read --allow-run --allow-write .llm/tools/run-deno-doc-lint.ts --root packages/plugin-sagas-core --output <report> --pretty
-
-Wrote .llm/tmp/run/feat-package-quality-wave4-runtimes--4c-sagas/core/slice-c14-doc-lint-report.json
