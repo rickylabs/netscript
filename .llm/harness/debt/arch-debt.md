@@ -357,7 +357,13 @@ verdicts are not seeded here.
 - **Target:** 2026-Q3 doctrine remediation.
 - **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
 - **Created:** 2026-04-29
-- **Status:** open
+- **Status:** RESOLVED 2026-07-03 (superseded) — the top-level `packages/triggers` package named in
+  this heading no longer exists; it was superseded by `packages/plugin-triggers-core` (plus the
+  `plugins/triggers` connector) during the plugin re-architecture. The successor package carries a
+  doctrine-compliant role-named layout (`domain/`, `ports/`, `runtime/`, `adapters/`, `stores/`,
+  `builders/`, `config/`, `contracts/`, `telemetry/`, `testing/`, `public/`) with no flat
+  root-level source files, so the Restructure concern (lift flat files into role folders) is fully
+  addressed by the successor rather than relocated. Heading retained as the historical record.
 - **Gate:** F-3, F-11, F-13
 
 ## packages/plugin-triggers-core — T4 slow-type publish carve-out
@@ -538,7 +544,10 @@ verdicts are not seeded here.
   and stable public re-exports while list command/key/recovery mechanics live in
   `src/transports/list-transport-commands.ts`; `src/transports/redis-transport.ts` was split the
   same way into `src/transports/redis-transport-commands.ts`. All four files are below the F-1 cap
-  and the transport entrypoint still passes raw `deno check --unstable-kv`.
+  and the transport entrypoint still passes raw `deno check --unstable-kv`. Supersession note
+  (2026-07-03): the top-level `packages/sagas` directory named in this heading no longer exists —
+  the code and this resolved debt live entirely in `packages/plugin-sagas-core`; the heading is
+  retained as the historical record.
 - **Gate:** F-1, F-13
 
 ## packages/fresh — AP-1 / doctrine verdict Restructure (builders/mod.ts 1,110 LOC)
