@@ -78,6 +78,7 @@
     "jsr:@std/semver@1": "1.0.8",
     "jsr:@std/semver@^1.0.6": "1.0.8",
     "jsr:@std/semver@^1.0.8": "1.0.8",
+    "jsr:@std/streams@1": "1.1.1",
     "jsr:@std/streams@^1.1.0": "1.1.1",
     "jsr:@std/streams@^1.1.1": "1.1.1",
     "jsr:@std/testing@1": "1.0.19",
@@ -3155,6 +3156,15 @@
             "npm:jose@^6.2.3"
           ]
         }
+      },
+      "packages/bench": {
+        "dependencies": [
+          "jsr:@cliffy/command@^1.0.0-rc.7",
+          "jsr:@std/assert@1",
+          "jsr:@std/fs@1",
+          "jsr:@std/path@1",
+          "jsr:@std/streams@1"
+        ]
       },
       "packages/cli": {
         "dependencies": [
