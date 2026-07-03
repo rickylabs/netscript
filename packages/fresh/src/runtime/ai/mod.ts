@@ -66,7 +66,9 @@
  *   FA2's concurrent edits to this file stay conflict-free.
  * - **FA2** (landed): `createNetScriptChatStreamProxy` (the durable chat stream
  *   proxy handler; body in `./stream-proxy.ts`, re-exported below).
- * - **FA3**: `createNetScriptMcpSandbox` (the MCP tool sandbox).
+ * - **FA3**: `createMcpSandboxHandler` (the themed `ui://` resource sandbox)
+ *   plus the older `createNetScriptMcpSandbox` skeleton for chat-activity tool
+ *   wiring.
  *
  * The FA3 function below remains a typed stub that throws `not implemented
  * (FA0 skeleton)`; it names the upstream value its body will wrap.
@@ -125,6 +127,8 @@ export {
   type NetScriptChatStreamProxyHandler,
   type NetScriptChatStreamProxyOptions,
 } from './stream-proxy.ts';
+
+export { createMcpSandboxHandler, type McpSandboxHandlerOptions } from './mcp-sandbox-handler.ts';
 
 // ---------------------------------------------------------------------------
 // FA3 — MCP tool sandbox.
