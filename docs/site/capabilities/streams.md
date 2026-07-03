@@ -20,25 +20,25 @@ materialize the latest value per key. {{ comp.badge({ status: "alpha" }) }}
 
 NetScript's streams capability is the typed, change-data backbone the other
 plugins lean on — workers, sagas, and the auth service all publish their live
-state through it. The producer half is **real and shipping today**: you define a
+state through it. The producer half is implemented: you define a
 typed stream schema with [`defineStreamSchema`](/reference/streams/), open a
-producer with `createDurableStream`, and `upsert`/`delete`/`flush` entity state
+producer with `createDurableStream` (or the Service-facing
+`createServiceStreamProducer`), and `upsert`/`delete`/`flush` entity state
 over a durable-stream server that runs as an Aspire resource on port **:4437**.
 
-The scope on this page is narrower than it used to be. The producer
-runtime in `@netscript/plugin-streams-core` is genuine — it writes through
-`@durable-streams/client` with idempotent delivery. What is *not* live is the
-topic-centric **manifest sugar** in `@netscript/plugin-streams`
-(`defineStreamProducer` / `defineStreamConsumer`): a producer's `publish()`
-returns a **rejected** promise and a consumer's `subscribe()` **throws**
-synchronously — both with `StreamUnsupportedOperationError`, pointing you at the
-core package. There is also no in-process consumer `subscribe()` yet —
-consumption is over the durable-stream server's HTTP/SSE protocol, which Fresh
-clients read. This page draws those lines precisely so you build against the
-producer surface that exists, not against the manifest helpers that don't.
+The producer runtime in `@netscript/plugin-streams-core` writes through
+`@durable-streams/client` with idempotent delivery. The topic-centric
+**manifest sugar** in `@netscript/plugin-streams`
+(`defineStreamProducer` / `defineStreamConsumer`) is **not** wired to a
+transport: a producer's `publish()` returns a **rejected** promise and a
+consumer's `subscribe()` **throws** synchronously — both with
+`StreamUnsupportedOperationError`, pointing you at the core package. There is
+also no in-process consumer `subscribe()` yet — consumption is over the
+durable-stream server's HTTP/SSE protocol, which Fresh clients read. Build
+against the core producer package, not the manifest helpers.
 
-{{ comp callout { type: "important", title: "Status — producer runtime real, manifest helpers fail loud" } }}
-The producer is real: <code>createDurableStream(...)</code> from
+{{ comp callout { type: "important", title: "Status — producers write via the core package; manifest helpers fail loud" } }}
+The producer is implemented: <code>createDurableStream(...)</code> from
 <code>@netscript/plugin-streams-core</code> writes <code>upsert</code>/<code>delete</code>/<code>flush</code>
 through <code>@durable-streams/client</code> to the <code>:4437</code> Aspire service, and workers,
 sagas, and auth already mirror their state through it. What is <strong>not</strong> supported: the
@@ -196,6 +196,54 @@ implemented-by interface — the same four members, with `entityType` widened to
   ]
 }) }}
 
+## Service-side producers — `createServiceStreamProducer`
+
+When the writer is a backend **Service** — for example an ingestion worker that
+emits a `doc.ready` completion event from the callback where the work finishes —
+reach for `createServiceStreamProducer` instead of wiring `createDurableStream`
+and the URL/auth resolvers by hand. It is a thin wrapper over `createDurableStream`
+that reuses the exact same singleton producer and Aspire discovery
+(`getStreamsUrl` / `getStreamsAuth`), and it adds one guard: `assertResolvable`
+(default `true`) eagerly resolves the streams URL and auth at construction, so a
+Service that forgot to declare the `streams` reference **throws immediately**
+rather than silently dropping every write.
+
+```ts
+// services/ingestion/emit-completion.ts
+import {
+  createServiceStreamProducer,
+  defineStreamSchema,
+} from "@netscript/plugin-streams-core";
+import { z } from "zod";
+
+const completions = defineStreamSchema({
+  completion: {
+    schema: z.object({ id: z.string().min(1), status: z.string() }),
+    type: "completion",
+    primaryKey: "id",
+  },
+});
+
+// assertResolvable defaults to true: this throws now if neither
+// DURABLE_STREAMS_URL nor services__streams__http__0 is wired.
+const producer = createServiceStreamProducer({
+  streamPath: "/eischat/completions",
+  schema: completions,
+  producerId: "eischat-ingestion",
+});
+
+producer.upsert("completion", { id: "run-1", status: "done" });
+await producer.flush();
+```
+
+A Service that declares `ServiceReferences: ["streams"]` always has the streams
+endpoint wired, so the guard resolves without throwing. Set `assertResolvable:
+false` to keep the tolerant, lazy-connect behavior of `createDurableStream` when
+a Service may legitimately start before the streams service is reachable.
+`ServiceStreamProducerOptions` is `DurableStreamProducerOptions` plus this
+optional `assertResolvable` flag; the returned `DurableStreamProducer` is
+identical, so the write/flush/close surface below applies unchanged.
+
 ## Runtime & transport — URL and auth resolution
 
 The producer never hardcodes a host. `createDurableStream` resolves the
@@ -273,7 +321,7 @@ through it. The port is overridable via `STREAMS_PORT` or `PORT`.
   columns: ["Property", "Value"],
   rows: [
     ["Plugin location", "<code>plugins/streams/</code>"],
-    ["Real producer package", "<code>@netscript/plugin-streams-core</code> (<code>createDurableStream</code>, <code>defineStreamSchema</code>)"],
+    ["Producer package", "<code>@netscript/plugin-streams-core</code> (<code>createDurableStream</code>, <code>createServiceStreamProducer</code>, <code>defineStreamSchema</code>)"],
     ["Manifest import", "<code>@netscript/plugin-streams</code> — topic helpers <strong>throw</strong> <code>StreamUnsupportedOperationError</code>"],
     ["Transport client", "<code>@durable-streams/client</code> (<code>IdempotentProducer</code>)"],
     ["Dev service port", "<code>:4437</code> (durable-stream Aspire service; override with <code>STREAMS_PORT</code>/<code>PORT</code>)"],
@@ -322,7 +370,8 @@ This hub is intentionally thin — the full generated API lives in the reference
 
 {{ comp callout { type: "tip", title: "Where the real surface comes from" } }}
 The producer you build on lives in <code>@netscript/plugin-streams-core</code>:
-<code>createDurableStream</code>, <code>DurableStreamProducer</code>, <code>defineStreamSchema</code>,
+<code>createDurableStream</code>, the Service-facing <code>createServiceStreamProducer</code>,
+<code>DurableStreamProducer</code>, <code>defineStreamSchema</code>,
 the <code>buildStreamUrl</code>/<code>getStreamsUrl</code>/<code>getStreamsAuth</code> resolvers,
 <code>inspectStreamTopic</code>, and the <code>StreamProducerPort</code> /
 <code>DurableStreamProducerOptions</code> types. The <code>@netscript/plugin-streams</code> manifest
