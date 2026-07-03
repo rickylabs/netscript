@@ -176,6 +176,22 @@ No open decision forces rework if deferred; all rework-shaping choices are locke
 | 6 | Merge-readiness | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | exit 0, per PR |
 | 7 | IMPL-EVAL | OpenHands qwen3.7-max, separate session | PASS |
 
+## Commit Slices
+
+Each slice = one commit + push + PR comment. All slices are well under 30 files.
+
+| # | Slice | PR | Files | Proving gate |
+| - | ----- | -- | ----- | ------------ |
+| S1 | Cache contract: `CacheEngine`+`'DenoKv'`, `CacheMode` 5-value union, `ToolVersion?`, engine×mode matrix validation | A | `packages/aspire/config.ts`, `packages/aspire/*_test.ts` | schema tests (`deno test` packages/aspire) + scoped check/lint/fmt |
+| S2 | DenoKv container arm + `CacheWiring` seam + `withCacheReference` helper + consumer call-site swaps | A | `.../register/generate-register-infrastructure.ts`, its template asset, `generate-register-{plugins,background,apps}.ts`, `_aspire-compat` template, `helpers/tests/*` | semantic generator tests + generated-workspace `deno check --unstable-kv` via scaffold smoke |
+| S3 | `Local` mode (no resource), scaffold-defaults verification, docs (engine×mode table, token/env contract) | A | infra generator + tests, `packages/cli` docs/README touchpoints | generator tests + scaffold smoke + docs lint |
+| S4 | Garnet dotnet-tool executable arm (verify `addDotnetTool` live FIRST; D2 fallback if it fails) | B | infra generator + template + tests, `scaffold-versions.ts` (tool pin) | generator tests + live `aspire start` on this Docker-less host (aspire MCP resource checks) |
+| S5 | `Auto` selection: `isDockerAvailable` probe, cross-fallback, `NETSCRIPT_CACHE_MODE` override; `ensureSharedCache` → `Mode:'Auto'` | B | `_aspire-compat` template, infra generator, `kernel/adapters/plugin/workspace-mutator.ts`, tests | generator + mutator tests (incl. no-rewrite of existing entries) + scaffold smoke both host classes |
+| S6 | redis-import audit across generated RequiresKv entrypoints, docs, live two-arm validation | B | entrypoint templates (if gaps found), docs | live aspire MCP validation (kv container w/ Docker; garnet Auto docker-less) + full `e2e:cli scaffold.runtime --cleanup` |
+
+Merge-readiness per PR: `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format
+pretty` + IMPL-EVAL (OpenHands qwen 3.7 max, separate session).
+
 ## Dependencies
 
 - Aspire TS SDK 13.4.4 surface (verified from generated `.aspire/modules/aspire.mts`).
