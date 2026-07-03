@@ -80,6 +80,9 @@ export function createInMemoryToolRegistry(): ToolRegistryPort {
     register(tool: ToolDescriptor, handler?: ToolHandler): void {
       tools.set(tool.name, { descriptor: tool, handler });
     },
+    unregister(name: string): void {
+      tools.delete(name);
+    },
     has(name: string): boolean {
       return tools.has(name);
     },
