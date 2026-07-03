@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type {
+  DenoDeployTarget,
   DeployConfig,
   DeployTargetBase,
   DockerComposeDeployTarget,
@@ -175,11 +176,31 @@ export const LinuxDeployTargetSchema: z.ZodType<LinuxDeployTarget> = z.object({
 });
 
 /**
+ * Deno Deploy cloud deployment target (`deploy.targets['deno-deploy']`).
+ * Extends the shared base with Deno-Deploy-specific push fields. Consumed by
+ * `netscript deploy deno-deploy <verb>` via the native `deno deploy` CLI.
+ */
+export const DenoDeployTargetSchema: z.ZodType<DenoDeployTarget> = z.object({
+  ...deployTargetBaseShape,
+
+  // ── Deno Deploy platform ────────────────────────────────────────────────
+  /** Deno Deploy organization slug (`deno deploy --org`). */
+  org: z.string().optional(),
+  /** Deno Deploy application/project name (`deno deploy --app`). */
+  app: z.string().optional(),
+  /** Entrypoint module passed to `deno deploy`. Default: 'main.ts' */
+  entrypoint: z.string().optional(),
+  /** Whether pushes target production (`deno deploy --prod`) by default. */
+  prod: z.boolean().optional(),
+  /** Path to an env file loaded via `deno deploy env load`. */
+  envFile: z.string().optional(),
+});
+
+/**
  * Top-level deploy configuration section.
  * `targets` is a name-keyed map of deployment targets: `windows` (Servy),
- * `docker` (single-image build/push), `compose` (emit + self-host) and `linux`
- * (systemd bare-metal). Future targets (deno-deploy) are added as sibling keys
- * by #342–#343.
+ * `docker` (single-image build/push), `compose` (emit + self-host), `linux`
+ * (systemd bare-metal) and `deno-deploy` (Deno Deploy cloud).
  */
 export const DeployConfigSchema: z.ZodType<DeployConfig | undefined> = z
   .object({
@@ -194,6 +215,8 @@ export const DeployConfigSchema: z.ZodType<DeployConfig | undefined> = z
         compose: DockerComposeDeployTargetSchema.optional(),
         /** Linux systemd deployment. */
         linux: LinuxDeployTargetSchema.optional(),
+        /** Deno Deploy cloud deployment via the native `deno deploy` CLI. */
+        'deno-deploy': DenoDeployTargetSchema.optional(),
       })
       .optional(),
   })

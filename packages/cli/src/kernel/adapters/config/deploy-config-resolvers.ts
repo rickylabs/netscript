@@ -24,6 +24,7 @@ import type {
   RegisteredPluginConfig,
   ResolvedAppConfig,
   ResolvedDefaultsConfig,
+  ResolvedDenoDeployConfig,
   ResolvedDeployBaseConfig,
   ResolvedLinuxDeployConfig,
   ResolvedPluginConfig,
@@ -348,6 +349,25 @@ export function resolveLinuxDeploy(userDeploy?: DeployConfig): ResolvedLinuxDepl
     user: linux?.user,
     group: linux?.group,
     runtimeDir: linux?.runtimeDir ?? DEFAULT_LINUX_RUNTIME_DIR,
+  };
+}
+
+/**
+ * Resolve the Deno Deploy target config by merging netscript.config.ts
+ * `deploy.targets['deno-deploy']` with CLI flag overrides. Overrides (flags)
+ * take precedence over config; `prod` defaults to `false`.
+ */
+export function resolveDenoDeployTarget(
+  userDeploy?: DeployConfig,
+  overrides?: Partial<ResolvedDenoDeployConfig>,
+): ResolvedDenoDeployConfig {
+  const target = userDeploy?.targets?.['deno-deploy'];
+  return {
+    org: overrides?.org ?? target?.org,
+    app: overrides?.app ?? target?.app,
+    prod: overrides?.prod ?? target?.prod ?? false,
+    entrypoint: overrides?.entrypoint ?? target?.entrypoint,
+    envFile: overrides?.envFile ?? target?.envFile,
   };
 }
 

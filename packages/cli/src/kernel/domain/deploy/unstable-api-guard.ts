@@ -1,0 +1,110 @@
+/**
+ * Unstable-API preflight guard (Archetype 7 deploy, D9 / research Finding 9).
+ *
+ * Deno Deploy rejects `--unstable-*` runtime flags, but NetScript projects that
+ * use KV (and other unstable APIs) require them locally. Before a `deno deploy`
+ * push, this guard scans the project entrypoint sources plus the `deno.json`
+ * `unstable` list for APIs that only work behind an `--unstable-*` flag, so the
+ * marquee one-click `up` can refuse (on `--prod`) or warn (on preview) rather
+ * than silently ship an app that dies on-platform.
+ *
+ * Pure by design: callers supply already-read file contents; filesystem access
+ * lives in an adapter (`kernel/adapters/deno-deploy/**`). The scan is
+ * best-effort — it inspects the declared `unstable` list and direct entrypoint
+ * source, not the full transitive module graph (see arch-debt).
+ */
+
+/** A single detected unstable-API usage that Deno Deploy would reject. */
+export interface UnstableApiViolation {
+  /** Human-readable API or feature name (e.g. `Deno.openKv`). */
+  readonly api: string;
+  /** The `--unstable-*` flag the API would require locally. */
+  readonly requiresFlag: string;
+  /** Where the usage was found (`deno.json#unstable` or a source path). */
+  readonly source: string;
+}
+
+/** Input to {@link scanUnstableApis}: already-read project sources. */
+export interface UnstableApiScanInput {
+  /** Parsed `deno.json` (unknown shape; only the `unstable` array is read). */
+  readonly denoJson?: unknown;
+  /** Entrypoint (and reachable) source files to scan. */
+  readonly sources?: readonly UnstableApiSource[];
+}
+
+/** A single source file provided to the guard. */
+export interface UnstableApiSource {
+  /** Path used for reporting (project-relative is fine). */
+  readonly path: string;
+  /** Full text content of the file. */
+  readonly content: string;
+}
+
+/** Result of an unstable-API scan. */
+export interface UnstableApiScanResult {
+  /** `true` when no unstable-API usage was detected. */
+  readonly ok: boolean;
+  /** All detected violations, deduped by `api` + `source`. */
+  readonly violations: readonly UnstableApiViolation[];
+}
+
+/** Source-token signatures for unstable APIs Deno Deploy rejects. */
+const UNSTABLE_API_SIGNATURES: readonly {
+  readonly pattern: RegExp;
+  readonly api: string;
+  readonly flag: string;
+}[] = [
+  { pattern: /\bDeno\.openKv\b/, api: 'Deno.openKv', flag: '--unstable-kv' },
+  { pattern: /\bDeno\.cron\b/, api: 'Deno.cron', flag: '--unstable-cron' },
+  {
+    pattern: /\bnew\s+BroadcastChannel\b/,
+    api: 'BroadcastChannel',
+    flag: '--unstable-broadcast-channel',
+  },
+  { pattern: /\bTemporal\./, api: 'Temporal', flag: '--unstable-temporal' },
+];
+
+function readUnstableList(denoJson: unknown): readonly string[] {
+  if (denoJson === null || typeof denoJson !== 'object') return [];
+  const value = (denoJson as { readonly unstable?: unknown }).unstable;
+  if (!Array.isArray(value)) return [];
+  return value.filter((entry): entry is string => typeof entry === 'string');
+}
+
+/**
+ * Scan already-read project sources for unstable APIs that Deno Deploy rejects.
+ *
+ * Detects (a) every feature declared in `deno.json`'s `unstable` array and
+ * (b) direct usage of known unstable-API tokens in the supplied source files.
+ * Returns a deduped, ordered violation report; the caller decides whether a
+ * violation is fatal (`refuse` on `--prod`) or a warning (preview push).
+ */
+export function scanUnstableApis(input: UnstableApiScanInput): UnstableApiScanResult {
+  const violations: UnstableApiViolation[] = [];
+  const seen = new Set<string>();
+
+  const push = (violation: UnstableApiViolation): void => {
+    const dedupeKey = `${violation.api} ${violation.source}`;
+    if (seen.has(dedupeKey)) return;
+    seen.add(dedupeKey);
+    violations.push(violation);
+  };
+
+  for (const feature of readUnstableList(input.denoJson)) {
+    push({
+      api: feature,
+      requiresFlag: `--unstable-${feature}`,
+      source: 'deno.json#unstable',
+    });
+  }
+
+  for (const file of input.sources ?? []) {
+    for (const signature of UNSTABLE_API_SIGNATURES) {
+      if (signature.pattern.test(file.content)) {
+        push({ api: signature.api, requiresFlag: signature.flag, source: file.path });
+      }
+    }
+  }
+
+  return { ok: violations.length === 0, violations };
+}

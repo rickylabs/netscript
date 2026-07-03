@@ -2,6 +2,7 @@ import { Command } from '@cliffy/command';
 
 import { buildWindowsDeployment } from './build/build-windows-strategy.ts';
 import { createDeployBuildCommand } from './build/build-deploy-command.ts';
+import { createDenoDeployCommand } from './deno-deploy/deno-deploy-command.ts';
 import { copyCommand } from './copy/copy-deploy-command.ts';
 import { createDeployInstallCommand } from './install/install-deploy-command.ts';
 import { logsCommand } from './logs/logs-deploy-command.ts';
@@ -37,6 +38,13 @@ export function createDeployCommand(
               excludeTasks: options.excludeTasks ? [...options.excludeTasks] : undefined,
             }),
         },
+      }),
+    )
+    .command(
+      'deno-deploy',
+      createDenoDeployCommand({
+        loadConfig: dependencies.loadConfig,
+        resolveProjectRoot: dependencies.resolveProjectRoot,
       }),
     )
     .command('package-cli', packageCliCommand)

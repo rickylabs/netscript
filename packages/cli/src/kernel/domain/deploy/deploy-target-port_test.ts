@@ -96,10 +96,16 @@ Deno.test('a bare-metal service operation resolves a target-scoped descriptor re
   assertEquals(result.message.includes('/srv/app'), true);
 });
 
-Deno.test('the default deploy target registry seeds both bare-metal OS targets', () => {
+Deno.test('the default deploy target registry seeds the bare-metal OS targets plus deno-deploy', () => {
   const registry = new DeployTargetRegistry();
 
-  assertEquals(registry.entries().map(([key]) => key), ['linux-service', 'windows-service']);
+  // entries() sorts keys with localeCompare for deterministic ordering.
+  assertEquals(registry.entries().map(([key]) => key), [
+    'deno-deploy',
+    'linux-service',
+    'windows-service',
+  ]);
   assertEquals(registry.get('linux-service')?.label, 'Linux service');
   assertEquals(registry.get('windows-service')?.label, 'Windows service');
+  assertEquals(registry.get('deno-deploy')?.label, 'Deno Deploy');
 });

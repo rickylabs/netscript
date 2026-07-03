@@ -55,6 +55,44 @@ Deno.test('defineConfig: accepts a deploy.targets.windows target', () => {
   assertEquals(config.deploy?.targets?.windows?.servicePrefix, 'Acme');
 });
 
+Deno.test('defineConfig: accepts a deploy.targets[deno-deploy] target', () => {
+  const config = defineConfig({
+    name: 'orders',
+    databases: { config: [] },
+    deploy: {
+      targets: {
+        'deno-deploy': {
+          org: 'acme',
+          app: 'orders-api',
+          entrypoint: 'main.ts',
+          prod: true,
+          envFile: '.env.production',
+        },
+      },
+    },
+  });
+
+  assertEquals(config.deploy?.targets?.['deno-deploy']?.org, 'acme');
+  assertEquals(config.deploy?.targets?.['deno-deploy']?.app, 'orders-api');
+  assertEquals(config.deploy?.targets?.['deno-deploy']?.prod, true);
+});
+
+Deno.test('defineConfig: accepts windows and deno-deploy targets side by side', () => {
+  const config = defineConfig({
+    name: 'orders',
+    databases: { config: [] },
+    deploy: {
+      targets: {
+        windows: { servicePrefix: 'Acme' },
+        'deno-deploy': { app: 'orders-api' },
+      },
+    },
+  });
+
+  assertEquals(config.deploy?.targets?.windows?.servicePrefix, 'Acme');
+  assertEquals(config.deploy?.targets?.['deno-deploy']?.app, 'orders-api');
+});
+
 Deno.test('defineConfig: does not honor the legacy deploy.windows shape (clean break)', () => {
   const config = defineConfig(
     {
@@ -77,9 +115,11 @@ Deno.test('defineConfig: drops unknown deploy.targets keys', () => {
       deploy: {
         targets: {
           windows: { mode: 'compile' },
-          // `linux` is now a valid member of the target map and is retained.
+          // `linux` is a valid member of the target map and is retained.
           linux: { mode: 'compile' },
-          // `solaris` is not a member of this slice's target map and is dropped.
+          // `deno-deploy` is a valid cloud member of the target map and is retained.
+          'deno-deploy': { org: 'acme', app: 'orders' },
+          // `solaris` is not a member of the target map and is dropped.
           solaris: { mode: 'compile' },
         },
       },
@@ -88,7 +128,9 @@ Deno.test('defineConfig: drops unknown deploy.targets keys', () => {
 
   assertEquals(config.deploy?.targets?.windows?.mode, 'compile');
   assertEquals(config.deploy?.targets?.linux?.mode, 'compile');
-  assertEquals(Object.keys(config.deploy?.targets ?? {}), ['windows', 'linux']);
+  assertEquals(config.deploy?.targets?.['deno-deploy']?.org, 'acme');
+  assertEquals(config.deploy?.targets?.['deno-deploy']?.app, 'orders');
+  assertEquals(Object.keys(config.deploy?.targets ?? {}), ['windows', 'linux', 'deno-deploy']);
 });
 
 Deno.test('defineConfig: rejects unrelated saga and trigger section shapes', () => {

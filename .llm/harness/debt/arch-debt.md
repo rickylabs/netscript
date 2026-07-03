@@ -1313,12 +1313,18 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   command.
 - **Owner:** Deployment tooling follow-up.
 - **Created:** 2026-06-22.
-- **Status:** partially resolved (#339 + #340), narrowed to container/orchestrator artifacts.
+- **Status:** partially resolved (#339 + #340, #342), narrowed to container/orchestrator artifacts.
 - **Update (2026-07-03, #339/#340):** `netscript deploy` now IS a first-class command that emits
   bare-metal deployment artifacts: a self-contained single binary per service (`deno compile`,
   OS-generic triple) managed as an OS service through the OS-agnostic `OsServicePort` (Servy on
   Windows, systemd on Linux). Dockerfiles / Compose / Kubernetes manifests are still not generated —
   the container/orchestrator lane is tracked by the Aspire-compose deploy adapter (#343).
+- **Update (2026-07-03, #342 Deploy-S6):** a first-class cloud deploy target now exists —
+  `netscript deploy deno-deploy` (`plan`/`up`/`down`/`status`/`logs`) via the `DenoDeployTarget`
+  adapter behind the canonical `DeployTargetPort`. `rollback`/`secrets` remain declared-unsupported
+  pending the deploy-core convention seam (#341/#364) — the adapter delegates to the seam by design
+  and omits the ops until it lands, rather than forking. The unstable-API preflight guard is
+  best-effort (`deno.json` + entrypoint, not the full transitive module graph).
 - **Gate:** Close when `netscript deploy` (or scaffold generation) also emits the container /
   orchestrator artifacts, or the deployment docs are rewritten to remove generated-artifact
   expectations for those targets.
