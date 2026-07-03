@@ -51,5 +51,28 @@
 | S5 | cli `deno check` + adapter tests | PASS (6/6 tests) |
 | S6 | cli `deno check` (23 files) + router tests | PASS (3/3 tests) |
 
-_Pending: S4 (apphost-gen snapshots), S7 (docs/debt), S8 (compose-artifact E2E — needs Docker/
-evaluator env)._
+## Slice disposition (final for this session)
+
+- **S1 config** — DONE (`8438b7d6`).
+- **S2 port** — DONE (no-op verification; S0 landed it). Drift D1.
+- **S3 secrets/rollback core** — DEFERRED (blocked on #341/#364 core conventions). Drift D2 +
+  arch-debt `DEPLOY-SECRETS-ROLLBACK-CORE`.
+- **S4 apphost compose-gen** — DEFERRED as a coordinated shared primitive. Aspire TS API names
+  confirmed via docs MCP, but (a) runtime correctness is unvalidatable without the Aspire .NET
+  SDK + Docker (S8/S9 evaluator env) and (b) the per-resource Deno `denoland/deno:2` Dockerfile
+  weave is a SHARED publishing convention that overlaps the live #342 Deno Deploy adapter — must
+  not be forked per-target. Drift D7 + arch-debt `DEPLOY-S7-APPHOST-COMPOSE-GEN`.
+- **S5 adapter** — DONE (`e7dcfa33`).
+- **S6 router** — DONE (`10f4eba9`).
+- **S7 docs + debt** — arch-debt entries added (`DEPLOY-S7-APPHOST-COMPOSE-GEN`,
+  `DEPLOY-SECRETS-ROLLBACK-CORE`). `docs/site/how-to/deploy.md` prose update intentionally held
+  to land WITH the S4 apphost-gen slice, so the docs describe a working `deploy docker|compose`
+  path rather than a command that cannot yet emit compose (avoids documenting a half-wired
+  feature; the Vento page also carries build-breakage landmines that warrant a docs-lane pass).
+- **S8 merge E2E** — HANDED to the evaluator/Docker environment (CI-safe compose-artifact +
+  `docker compose config` + `scaffold.runtime`); not runnable here and gated on S4. Drift D8.
+
+_Delivered this session: the functional deploy-target delegation surface end-to-end at the CLI
+level — config member + Aspire compose/docker adapter + thin router — validated by `deno check`
+(clean) and 13 passing unit tests (4 schema + 6 adapter + 3 router). The two deferred slices are
+cleanly separable and recorded as arch-debt with close gates._

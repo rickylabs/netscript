@@ -91,3 +91,65 @@ a real finding (reproduced against the pre-existing, known-good windows stub). T
 authoritative gate for cli source is `deno check` (type), which passes for all S5
 changes, plus the co-located unit tests. cli code is still hand-kept to the repo
 style (2-space, single quotes, semicolons, width 100).
+
+## D7 — S4 (apphost compose-publishing generation) deferred as a coordinated cross-slice primitive — significant
+
+**Grounding (Aspire docs MCP, `docker-integration`):** the TypeScript AppHost API
+names in the plan are confirmed real — `await builder.addDockerComposeEnvironment("compose")`,
+`resource.publishAsDockerComposeService(async (r, service) => …)`,
+`builder.addParameterFromConfiguration(name, ENV)`, `builder.addDockerfileBuilder(name, ctx, cb, {stage})`.
+Two decisive facts emerged:
+
+1. **Auto-publish:** "When a Docker Compose environment is present, all resources
+   are automatically published as Docker Compose services — no additional opt-in
+   is required." So `publishAsDockerComposeService` is an *optional customization*,
+   and the minimal enabler is (a) adding the official `Aspire.Hosting.Docker` NuGet
+   to `aspire.config.json` `packages` (re-emits correctly, unlike the community Deno
+   one — see `generate-aspire-config.ts` L44-56) and (b) one
+   `builder.addDockerComposeEnvironment("compose")` call.
+2. **Deno-resource blocker:** NetScript registers Deno services/apps/background as
+   `builder.addExecutable('deno', …)` (the deliberate SDK-primitive approach, same
+   file L44-56). Aspire's compose publisher containerizes resources; an *executable*
+   is not a container, so publishing Deno resources to compose requires the
+   `denoland/deno:2` `addDockerfileBuilder` / container-resource weave the plan
+   calls for. That weave is **cross-cutting** across the shared
+   `register-services` / `register-apps` / `register-background` generators.
+
+**Why deferred (guardrail: STOP if risky/unvalidatable or cross-slice):**
+
+- **Unvalidatable here.** Whether `aspire publish` emits a *valid* compose for
+  NetScript's Deno executable resources cannot be proven without the Aspire .NET
+  SDK + Docker daemon (`aspire restore` → `aspire publish` → `docker compose config`).
+  That is exactly the S8/S9 merge-readiness / `scaffold.runtime` gate the guardrails
+  say NOT to run per-slice — it needs the evaluator environment. A green snapshot
+  test would lock the *string* but not prove Aspire accepts it, risking a
+  false-green.
+- **Shared convention, not a per-target fork (R-DEPLOY-3 / centralization law).**
+  The per-resource compose-publishing generation (Deno `denoland/deno:2` Dockerfile +
+  `publishAsDockerComposeService` + config→`Parameters__*`) is a SHARED publishing
+  primitive. The concurrent **#342 Deno Deploy adapter** needs the same
+  apphost-publishing surface; three deployment-epic agents (ace40639 coordinator,
+  a57afc0d #339/#340, a5a1f7ea #342) are live on it now. Landing an isolated fork of
+  this generation on this branch risks a merge collision and a doctrine violation
+  (forked convention).
+
+**Decision:** S4 apphost-gen is deferred to a coordinated slice under the epic
+coordinator, implemented ONCE as a shared primitive (compose env + Docker NuGet +
+Deno `denoland/deno:2` Dockerfile weave + `Parameters__*`) with the full
+`scaffold.runtime` + `docker compose config` E2E as its runtime gate. The S5 adapter
+already delegates `plan`→`aspire publish`, so it works unchanged the moment the
+apphost gains the compose environment — the deferral is cleanly separable and does
+not block the adapter/router/config slices. Recorded as NEEDS-COORDINATION +
+NEEDS-EVALUATOR-ENV. See also arch-debt entry DEPLOY-S7-APPHOST-COMPOSE-GEN.
+
+## D8 — S8 merge-readiness E2E requires the evaluator/Docker environment — significant
+
+The plan's S8 (Slice-9 gate) is the CI-safe compose-artifact emit +
+`docker compose config` validation plus the full `deno task e2e:cli run
+scaffold.runtime` smoke. Both require the Aspire .NET SDK and (for `docker compose
+config`) a Docker daemon, which are not available in this implementation
+environment, and the guardrails explicitly forbid running the expensive
+`scaffold.runtime` smoke per-slice. This gate is therefore handed to the
+evaluator/merge-readiness environment (OpenHands IMPL-EVAL / Docker-capable host).
+It is additionally gated on D7 (there is no compose environment to publish until the
+apphost-gen slice lands).
