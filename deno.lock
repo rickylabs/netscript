@@ -3209,7 +3209,8 @@
       },
       "packages/contracts": {
         "dependencies": [
-          "jsr:@zod/zod@4.4.3"
+          "jsr:@zod/zod@4.4.3",
+          "npm:@orpc/contract@^1.14.6"
         ],
         "packageJson": {
           "dependencies": [
