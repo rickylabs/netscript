@@ -46,6 +46,28 @@ For a binary edge, wrap the tree in `runPublicCli()` for consistent NetScript er
 - **Plugin host loading**: `createPluginHostLoader` and `resolvePluginManifest` resolve configured plugin specs, walk the project, and aggregate runtime contributions from structural ports.
 - **Plugin scaffolding**: `scaffoldPluginPackage` (root) and the `@netscript/cli/scaffolding` engine render `{{var | pipe}}` skeleton templates into a plugin package.
 - **Deterministic testing**: `@netscript/cli/testing` supplies in-memory filesystem, process, prompt, and logger ports plus fixture builders for exercising scaffold and CLI flows.
+- **Bare-metal deployment**: `netscript deploy` compiles each workspace service into a self-contained single binary and manages it as an OS service through one OS-agnostic seam — Servy on Windows, systemd on Linux — configured per OS under `deploy.targets.{windows,linux}`.
+
+---
+
+## 🖥 Bare-metal deployment
+
+NetScript deploys workspace services to bare-metal hosts as OS-managed services behind one OS-agnostic seam, so the CLI verbs stay identical across platforms:
+
+- **OS-agnostic service port** — `OsServicePort` (`install` / `start` / `stop` / `status` / `uninstall`) is satisfied by the Servy adapter on Windows and the systemd adapter on Linux. `createOsServicePort(os, { process })` resolves the right adapter, and the deploy lifecycle verbs (`deploy install | start | stop | status | uninstall`) route through it. Service naming and config paths follow the host OS: `NetScript.<svc>` + `<svc>.xml` on Windows, `netscript-<svc>.service` on Linux.
+- **Single-binary artifacts** — `deploy build` compiles each Deno service into a self-contained binary with `deno compile`, embedding assets via `--include`. The compile target defaults to the host triple (`x86_64-pc-windows-msvc` → `.exe`, `x86_64-unknown-linux-gnu` → ELF) and is overridable per target with `deploy.targets.<os>.compileTarget`.
+- **Per-OS configuration** — `deploy.targets.windows` (servy path, service prefix, install base) and `deploy.targets.linux` (systemctl path, unit prefix, install base, `user`/`group`, runtime dir) share one build/bundle/health/logging base; unset fields fall back to OS-sensible defaults.
+
+### Binary signing
+
+`deno compile` produces **unsigned** binaries. Signing is a deliberate manual hook so you can use your own certificate and timestamp authority — run it after `deploy build` and before `deploy install`:
+
+- **Windows**: `signtool sign /fd SHA256 /tr <timestamp-url> /td SHA256 <binary>.exe`
+- **Linux**: attach a detached signature (`gpg --detach-sign <binary>`) or use your distribution's package-signing flow.
+
+### Operation coverage
+
+The bare-metal targets implement the canonical `plan` / `emit` / `up` / `down` / `status` / `logs` operations (with `build` / `install` / `uninstall` retained as verb aliases). `rollback` and `secrets` are declared-unsupported for now and are tracked for a later deployment-hardening release.
 
 ---
 

@@ -49,7 +49,10 @@ is fmt/lint-gated.
   (b) real `WindowsServicePort`/`ServyCliAdapter`. LD-1 unifies them (target adapter composes port).
 - Two Windows call paths: install/uninstall use the port; start/stop/status call `runServy()`
   directly — must unify behind `OsServicePort`.
-- File-size ceiling tight: `upgrade` 342, `build-windows-strategy` 301, `compile-runner` 292 → extract.
+- File sizes (post-S9 actuals, IMPL-4 corrected): `upgrade-deploy-command` 312, `build-windows-strategy`
+  284 (shrank via the S7 `prepare-deploy-build` extraction), `compile-runner` 292 — all comfortably
+  under the 500-line flag ceiling (F-1). No extraction required; the earlier "342/301 → extract" figures
+  were stale plan residue.
 
 ## Next action — resume at S5
 
@@ -87,19 +90,20 @@ Concrete resume notes discovered while building S0–S4:
   `plan/up/down/status/logs`; leave `rollback?`/`secrets?` unsupported → #341); add
   `LinuxServiceDeployTarget`; **register `linux`** in `deploy-target-registry.ts`. **IMPL-3:** update
   `command-registry_test.ts:69` (the `['build','install','uninstall']` assertion) for the realized ops.
-- **S9** tests + F-DEPLOY-2 evidence. **S10** docs + arch-debt (+ **IMPL-4:** fix stale "342" /
-  "OpenHands/minimax" text in this context-pack's dispatch note below and any plan residue). **S11**
-  validation sweep + the one-time expensive `deno task e2e:cli run scaffold.runtime --cleanup
-  --format pretty` (Windows-only — will NOT exercise the Linux systemd lane; report exit code).
+- **S9** tests + F-DEPLOY-2 evidence — **DONE** (`47519737`: OS-routing e2e-lite + D2 base extraction).
+  **S10** docs + arch-debt — **in progress** (**IMPL-4 applied:** stale "342" figure corrected above,
+  dispatch-lane note tightened below). **S11** validation sweep + the one-time expensive
+  `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` (Windows-only — will NOT exercise
+  the Linux systemd lane; report exit code + note the Linux-integration gap).
 
 ### Merge-order reminder
 
 **#357 (doctrine) → S0 port-expansion (`12d70ff0`, already pushed) → #342/#343 rebase.** #342/#343
 consume the 7-op `DeployTargetPort` and rebase onto S0; they do not use `OsServicePort`.
 
-**Dispatch lane (port-ownership §correction):** implementers = **Opus 4.8 sub-agents** (WSL Codex is
-dropped for the deployment epic); evaluators = separate Opus session. Do **not** follow the generic
-"WSL Codex / OpenHands-minimax" lane.
+**Dispatch lane (port-ownership §correction, IMPL-4):** implementers = **Opus 4.8 sub-agents**;
+evaluators = separate Opus session. The generic WSL-Codex / OpenHands-minimax implementation lane does
+**not** apply to this deployment epic — that stale reference is retained here only as a negative note.
 
 ## PLAN-EVAL history
 
