@@ -32,7 +32,7 @@ it.
 | `docs/architecture/doctrine/06-archetypes.md`                          | Six package archetypes and selection order               |
 | `docs/architecture/doctrine/07-composition-and-extension.md`           | Composition roots, constructor injection, extension axes |
 | `docs/architecture/doctrine/08-runtime-state-failure.md`               | Stateful runtime, supervision, cancellation, failure     |
-| `docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md` | AP-1..AP-20 and F-1..F-15                                |
+| `docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md` | AP-1..AP-25 and F-1..F-19                                |
 | `docs/architecture/doctrine/10-codebase-verdict-and-handoff.md`        | Current verdict per package and debt seed                |
 
 ## Axiom Digest

@@ -9,9 +9,10 @@
   - `docs/architecture/doctrine/07-composition-and-extension.md#plugin-discovery-and-loading`
   - `docs/architecture/doctrine/08-runtime-state-failure.md` when plugin contributes runtime work
   - `docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md`
-- Anti-patterns: AP-1, AP-3, AP-8, AP-9, AP-10, AP-11, AP-13, AP-14, AP-16, AP-19, AP-20.
+- Anti-patterns: AP-1, AP-3, AP-8, AP-9, AP-10, AP-11, AP-13, AP-14, AP-16, AP-19, AP-20, AP-22,
+  AP-23, AP-24, AP-25.
 - Fitness functions: F-1, F-3, F-5, F-6, F-7, F-8, F-9, F-10, F-11, F-12, F-13 when runtime
-  declarations require it, F-14, F-15.
+  declarations require it, F-14, F-15, F-16, F-17, F-18, F-19.
 
 ## When This Archetype Applies
 
@@ -20,9 +21,15 @@ database/schema pieces, jobs, sagas, triggers, streams, or verification to the N
 
 ## Minimum Folder Shape
 
-Use the canonical shape in `docs/architecture/doctrine/06-archetypes.md#archetype-5--plugin-package`. The package
-reuses sibling package contracts instead of redefining them and exposes explicit service/background
+Use the canonical shape in
+`docs/architecture/doctrine/06-archetypes.md#archetype-5--plugin-package`. The package reuses
+sibling package contracts instead of redefining them and exposes explicit service/background
 entrypoints.
+
+Note: real first-party `plugins/*` place their contribution folders (`contracts/`, `services/`,
+`database/`, `jobs/`, `streams/`) at the top level as siblings of `src/`, together with top-level
+`contracts.ts`, `mod.ts`, and `verify-plugin.ts`. Treat that observed layout as authoritative until
+`06-archetypes.md` is reconciled.
 
 ## Skills to Activate
 
@@ -57,6 +64,14 @@ entrypoints.
 - AP-16: generic folders that hide plugin contributions.
 - AP-19: service/database permissions not declared.
 - AP-1: `mod.ts` or `contracts.ts` accumulating every plugin concern.
+- AP-22: sub-directory `mod.ts` barrel re-exporting a contribution folder instead of the
+  package-root surface.
+- AP-23: plugin discovery/registration wiring that inlines service or handler bodies instead of
+  referencing them.
+- AP-24: switch-over-kind dispatch (engine/event/adapter) instead of a typed registry populated at
+  composition.
+- AP-25: `Deno.*` / `console.*` / `fetch` side effects in a non-edge plugin file instead of an
+  injected port.
 
 ## False-Done States
 
