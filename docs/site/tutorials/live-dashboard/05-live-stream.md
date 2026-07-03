@@ -48,6 +48,10 @@ A healthy response means the durable-streams producer runtime is live. If the po
 sagas plugin (which brings the stream) is not installed or Aspire has not finished booting it — check
 the [dashboard](/explanation/aspire/) resource list at `:18888`.
 
+{{ comp callout { type: "note", title: "HTTP/2 is opt-in for live subscriptions" } }}
+The live subscription runs over plaintext <strong>HTTP/1.1</strong> by default, which caps how many concurrent SSE connections a browser opens per origin. HTTP/2 lifts that cap but is opt-in and requires TLS — via <code>ServiceTlsOptions</code> or the <code>NETSCRIPT_TLS_CERT_FILE</code> / <code>NETSCRIPT_TLS_KEY_FILE</code> environment variables. See <a href="/capabilities/streams/">Durable streams</a> for the connection-limit detail.
+{{ /comp }}
+
 ## Step 1 — Open a StreamDB handle
 
 `createSagasStreamDB` from `@plugins/sagas/streams` opens a typed StreamDB client against the streams
