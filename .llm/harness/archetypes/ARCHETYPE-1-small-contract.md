@@ -9,8 +9,8 @@
   - `docs/architecture/doctrine/05-folder-structure.md`
   - `docs/architecture/doctrine/06-archetypes.md#archetype-1--small-contract`
   - `docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md`
-- Anti-patterns: AP-1, AP-2, AP-7, AP-9, AP-13, AP-14, AP-15, AP-16, AP-20.
-- Fitness functions: F-1, F-5, F-6, F-7, F-8, F-10, F-11, F-12, F-14, F-15.
+- Anti-patterns: AP-1, AP-2, AP-7, AP-9, AP-13, AP-14, AP-15, AP-16, AP-20, AP-22, AP-25.
+- Fitness functions: F-1, F-5, F-6, F-7, F-8, F-10, F-11, F-12, F-14, F-15, F-16, F-17, F-18, F-19.
 
 ## When This Archetype Applies
 
@@ -45,7 +45,7 @@ invented layers.
 
 1. Static gates: narrow `deno check`, package slice check, `deno fmt --check`, `deno lint`,
    `deno doc --lint`, `deno publish --dry-run` when package scope.
-2. Fitness gates: F-1, F-5, F-6, F-7, F-8, F-10, F-11, F-12, F-14, F-15.
+2. Fitness gates: F-1, F-5, F-6, F-7, F-8, F-10, F-11, F-12, F-14, F-15, F-16, F-17, F-18, F-19.
 3. Runtime gates: none by default.
 4. Consumer gates: optional unless exports, names, or validation semantics changed.
 
@@ -57,6 +57,8 @@ invented layers.
 - AP-9: premature abstraction across two similar schemas.
 - AP-14: re-exporting upstream libraries as part of the package surface.
 - AP-16: `utils/`, `helpers/`, or `common/` folders.
+- AP-22: a `mod.ts` inside `src/` that only re-exports the sibling type/schema files next to it.
+- AP-25: a load-time side effect in a file that should hold only pure types and parse logic.
 
 ## False-Done States
 

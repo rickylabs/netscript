@@ -10,9 +10,9 @@
   - `docs/architecture/doctrine/08-runtime-state-failure.md`
   - `docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md`
 - Anti-patterns: AP-1, AP-3, AP-4, AP-5, AP-6, AP-8, AP-10, AP-11, AP-12, AP-13, AP-16, AP-17,
-  AP-19, AP-20.
+  AP-19, AP-20, AP-22, AP-23, AP-24, AP-25.
 - Fitness functions: F-1, F-2, F-3, F-4, F-5, F-6, F-7, F-8, F-9, F-10, F-11, F-12, F-13, F-14,
-  F-15.
+  F-15, F-16, F-17, F-18, F-19.
 
 ## When This Archetype Applies
 
@@ -47,7 +47,7 @@ cancellation and failure behavior.
 ## Required Gates in Order
 
 1. Static gates: package/slice checks, fmt, lint, doc lint, publish dry-run.
-2. Fitness gates: all F-1 through F-15.
+2. Fitness gates: all F-1 through F-19.
 3. Runtime gates: required. Validate lifecycle, stop handles, cancellation, backend health where
    applicable, and representative traces/logs.
 4. Consumer gates: required when definitions, builders, runtime contracts, or exported handles
@@ -61,6 +61,11 @@ cancellation and failure behavior.
 - AP-11: hidden globals for stores, clocks, telemetry, or queues.
 - AP-12: direct time and timer use inside handlers.
 - AP-13: `console.*` in published runtime code.
+- AP-22: a sub-folder `mod.ts` re-exporting the runtime files next to it.
+- AP-23: message-handler bodies defined inline in composition instead of registered and referenced.
+- AP-24: a `switch` over event kind or handler type where a dispatch registry belongs.
+- AP-25: a `Deno.*`, `fetch`, `Date.now`, or `setTimeout` side effect outside adapters, `bin/`, or
+  edge files.
 
 ## False-Done States
 
