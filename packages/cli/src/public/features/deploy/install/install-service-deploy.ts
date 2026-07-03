@@ -1,5 +1,10 @@
 import { join } from '@std/path';
-import { DEFAULT_SERVICE_PREFIX } from '../../../../kernel/constants/windows.ts';
+import {
+  detectServiceOs,
+  fullServiceNameForOs,
+  type ServiceOs,
+  serviceConfigPath,
+} from '../../../../kernel/adapters/deploy/runtime-detect.ts';
 import { Pipeline } from '../../../../kernel/application/abstracts/pipeline.ts';
 import {
   PipelineStep,
@@ -31,8 +36,11 @@ export interface InstallServiceDeployDependencies {
   /** Deployment manifest resolver. */
   readonly manifests: ServiceManifestPort;
 
-  /** Windows service lifecycle adapter. */
+  /** OS service lifecycle adapter (servy on Windows, systemd on Linux). */
   readonly services: OsServicePort;
+
+  /** Target service OS. Defaults to the detected host OS. */
+  readonly os?: ServiceOs;
 }
 
 /** Result of installing deployment services. */
@@ -74,13 +82,15 @@ export class InstallServiceDeployStep
       deployDir: request.deployDir,
     });
     const serviceNames = selectServiceNames(resolved.manifest.services, 'start', request.service);
+    const os = this.dependencies.os ?? detectServiceOs();
+    const configDir = join(resolved.installDir, 'config');
     const installed: string[] = [];
     const failed: string[] = [];
 
     for (const serviceName of serviceNames) {
       const result = await this.dependencies.services.install({
-        serviceName: fullServiceName(serviceName),
-        configPath: join(resolved.installDir, 'config', `${serviceName}.xml`),
+        serviceName: fullServiceNameForOs(os, serviceName),
+        configPath: serviceConfigPath(os, configDir, serviceName),
         force: request.force,
       });
       if (result.success) installed.push(serviceName);
@@ -125,8 +135,4 @@ function selectServiceNames(
   }
   const names = Object.keys(services);
   return mode === 'stop' ? [...names].reverse() : names;
-}
-
-function fullServiceName(shortName: string): string {
-  return `${DEFAULT_SERVICE_PREFIX}.${shortName}`;
 }

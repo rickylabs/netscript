@@ -61,6 +61,7 @@ describe('public deploy application flows', () => {
     }, {
       manifests: manifestPort(['users', 'orders']),
       services,
+      os: 'windows',
     });
 
     assertEquals(result.installed, ['users', 'orders']);
@@ -74,6 +75,29 @@ describe('public deploy application flows', () => {
     ]);
   });
 
+  it('routes install naming through the linux (systemd) lane', async () => {
+    const services = new RecordingOsServicePort();
+
+    const result = await installServiceDeploy({
+      deployDir: '/deploy',
+      force: false,
+    }, {
+      manifests: manifestPort(['users', 'orders']),
+      services,
+      os: 'linux',
+    });
+
+    assertEquals(result.installed, ['users', 'orders']);
+    assertEquals(services.installs.map((entry) => entry.serviceName), [
+      'netscript-users.service',
+      'netscript-orders.service',
+    ]);
+    assertEquals(services.installs.map((entry) => entry.configPath.replaceAll('\\', '/')), [
+      '/install/config/users.service',
+      '/install/config/orders.service',
+    ]);
+  });
+
   it('uninstalls manifest services in reverse manifest order', async () => {
     const services = new RecordingOsServicePort();
 
@@ -83,6 +107,7 @@ describe('public deploy application flows', () => {
     }, {
       manifests: manifestPort(['users', 'orders']),
       services,
+      os: 'windows',
     });
 
     assertEquals(result.uninstalled, ['orders', 'users']);

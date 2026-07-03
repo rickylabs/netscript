@@ -46,7 +46,7 @@ export function createDeployCommand(
       createDeployInstallCommand({
         installDeployDependencies: {
           manifests: dependencies.manifestPort,
-          services: dependencies.windowsServices,
+          services: dependencies.osServices,
         },
       }),
     )
@@ -59,7 +59,7 @@ export function createDeployCommand(
       createDeployUninstallCommand({
         uninstallDeployDependencies: {
           manifests: dependencies.manifestPort,
-          services: dependencies.windowsServices,
+          services: dependencies.osServices,
         },
       }),
     )

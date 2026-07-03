@@ -73,3 +73,32 @@ Append-only. Severity: `minor` | `significant` | `architectural`.
   resolver to import from `constants/linux.ts` is deferred to the S5/S7 wiring/base-config
   consolidation (same seam as D2) to keep S4 additive and avoid perturbing S1's tested resolver.
   Values are identical, so no behavioural drift.
+
+## D6 (S5) — start/stop/status keep the Windows guard; verbose servy trace dropped — severity: minor
+
+- **D3 convergence (done):** `start`/`stop`/`status-deploy-command.ts` now execute through
+  `createOsServicePort('windows', { process: new DenoProcess(), servyCliPath })` →
+  `port.run(op, name)` instead of the raw `runServy` free function. `install`/`uninstall` route OS
+  naming/config through `runtime-detect.ts` (`fullServiceNameForOs` + `serviceConfigPath`) and the
+  injected `OsServicePort`. `runServy` + `servyLifecycleArgs` remain exported solely for
+  `kernel/adapters/deploy/upgrade-steps.ts` (upgrade path is out of this epic's scope).
+- **Guard retained:** the three interactive lifecycle commands keep their
+  `WindowsRequiredError` guard and pin the port to `'windows'`. Their success/"already running"/
+  "not installed" branch logic parses **servy** stdout, which is not systemctl-shaped (systemctl
+  emits `active (running)` and non-zero exit for inactive units). Unguarding them would ship an
+  untested, mis-parsing Linux path. The OS-agnostic Linux lifecycle is delivered through S8's
+  `LinuxServiceDeployTarget` (which composes `SystemdOsServiceAdapter` directly), not by loosening
+  these servy-tuned commands. Boundary recorded so the evaluator does not read the retained guard as
+  an S5 gap.
+- **Verbose trace:** the per-command gray `Cmd:`/`Output:` trace that `runServy(..., verbose)`
+  printed is dropped for start/stop/status — the `OsServicePort` adapters intentionally do no
+  presentation logging (single-responsibility). The `-v/--verbose` flag is retained on the commands
+  (still parsed, now inert for the servy call). No behavioural change to exit codes, result
+  classification, or health polling; only the optional debug echo is gone. If verbose command
+  tracing is wanted later it belongs at the port seam, not re-inlined per command.
+
+## D5 update (S5) — Linux const convergence still deferred to S7 — severity: minor
+
+- S5 did not fold `deploy-config-resolvers.ts`'s private Linux consts into `constants/linux.ts`; that
+  resolver was not otherwise touched by S5's wiring. Convergence remains scheduled for the S7
+  base-config/build-strategy consolidation (same seam as D2). No behavioural drift (values identical).

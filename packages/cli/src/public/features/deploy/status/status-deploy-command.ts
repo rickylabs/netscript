@@ -20,9 +20,9 @@ import {
   printBanner,
   resolveManifest,
   resolveServyCli,
-  runServy,
-  servyLifecycleArgs,
 } from '../../../../kernel/adapters/deploy/shared.ts';
+import { DenoProcess } from '../../../../kernel/adapters/runtime/process/deno-process.ts';
+import { createOsServicePort } from '../../../adapters/os-service-factory.ts';
 
 export const statusCommand: Command<any, any, any, any, any, any, any, any> = new Command()
   .name('status')
@@ -53,8 +53,6 @@ export const statusCommand: Command<any, any, any, any, any, any, any, any> = ne
       failDeployCommand('Deploy command failed.');
     });
 
-    const verbose = options.verbose ?? false;
-
     printBanner(`NetScript Status — ${manifest.name} v${manifest.version}`);
 
     outputText(`📁 Install Dir: ${installDir}`);
@@ -64,6 +62,12 @@ export const statusCommand: Command<any, any, any, any, any, any, any, any> = ne
     const servy = await resolveServyCli(options.servyCli).catch((err: unknown) => {
       outputError(red(`✗ ${err instanceof Error ? err.message : String(err)}`));
       failDeployCommand('Deploy command failed.');
+    });
+
+    // ── Windows service lifecycle port (servy adapter) ───────────────────
+    const services = createOsServicePort('windows', {
+      process: new DenoProcess(),
+      servyCliPath: servy.path,
     });
 
     // ── Get service list ─────────────────────────────────────────────────
@@ -97,8 +101,7 @@ export const statusCommand: Command<any, any, any, any, any, any, any, any> = ne
       const urlLabel = svcInfo?.url ?? '';
 
       try {
-        const args = servyLifecycleArgs('status', windowsName);
-        const result = await runServy(servy.path, args, verbose);
+        const result = await services.run('status', windowsName);
 
         let statusLabel: string;
         const output = result.message.toLowerCase();

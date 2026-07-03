@@ -112,3 +112,32 @@
   `public/adapters/systemd-os-service_test.ts` (adapter, RecordingProcessPort, byte-identical
   systemctl matrix + reload fail-fast) → **3 suites / 12 steps green**.
 - Gates: cli `deno check` 0 (545 files). Drift D4 (adapter dir), D5 (Linux const dup → S5/S7).
+
+### S5 — OS routing/wiring: converge lifecycle onto `OsServicePort` (LD-1/LD-3, D3 convergence)
+
+- New `kernel/adapters/deploy/runtime-detect.ts` (pure kernel): `ServiceOs` type,
+  `detectServiceOs(explicit?)` (explicit wins, else host → windows/linux), `fullServiceNameForOs`
+  (windows `NetScript.<svc>` / linux `netscript-<svc>.service`), `serviceConfigFileName` +
+  `serviceConfigPath` (windows `.xml` / linux `.service`). Single OS-naming source of truth shared by
+  the install/uninstall flows.
+- New `public/adapters/os-service-factory.ts`: `createOsServicePort(os, { process, servyCliPath?,
+  systemctlPath? })` → `ServyOsServiceAdapter` (windows) / `SystemdOsServiceAdapter` (linux). Lives in
+  `public/adapters` (constructs public adapters — layer symmetry, D4).
+- `public-command-dependencies.ts`: field `windowsServices: ServyOsServiceAdapter` →
+  `osServices: OsServicePort`, built via `createOsServicePort(detectServiceOs(), { process })`.
+  `deploy-group.ts` install/uninstall wiring updated to `dependencies.osServices`.
+- `install-service-deploy.ts` / `uninstall-service-deploy.ts`: added optional `os?: ServiceOs`
+  (default `detectServiceOs()`); replaced the Windows-hardcoded `NetScript.<svc>` + `.xml` naming with
+  `fullServiceNameForOs` + `serviceConfigPath`. Windows behaviour unchanged when `os` omitted on a
+  Windows host.
+- `start`/`stop`/`status-deploy-command.ts`: execution converged onto the port
+  (`createOsServicePort('windows', { process: new DenoProcess(), servyCliPath: servy.path })` →
+  `port.run(op, name)`), replacing the raw `runServy` free function (D3 resolved for the command
+  layer). Guard + servy-tuned output parsing retained deliberately (drift D6); `runServy` stays only
+  for `upgrade-steps.ts`.
+- Tests: new `runtime-detect_test.ts` (5 steps); `deploy_test.ts` gains a Linux-routing install case
+  and pins the existing Windows cases to `os: 'windows'` (host-deterministic). Targeted run:
+  **5 suites / 22 steps green** (deploy, runtime-detect, systemd renderer/args, systemd adapter).
+- Gates: cli `deno check` 0 (548 files); `deno task arch:check` FAIL=0 for cli (layering intact —
+  kernel `runtime-detect` imports kernel-only; factory in public). cli is fmt/lint-excluded from the
+  root gate by design. Drift D6 (guard/verbose boundary), D3 convergence recorded, D5 still → S7.
