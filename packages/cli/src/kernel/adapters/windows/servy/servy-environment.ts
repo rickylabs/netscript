@@ -8,6 +8,7 @@ import {
 } from '../../../constants/providers.ts';
 import type { CompileTarget } from '../../../domain/deploy/compile-target.ts';
 import type { InfrastructureConfig } from '../../../domain/infrastructure-config.ts';
+import { observabilityEnv } from '../../../domain/deploy/observability-convention.ts';
 import { getManifestEnvVars, type ManifestContext } from '../manifest/manifest-resolver.ts';
 
 // ============================================================================
@@ -203,19 +204,23 @@ export function buildServiceEnvironment(
   }
 
   // OpenTelemetry — full parity with Aspire live resource env vars.
-  // Plugins (workers-api, sagas-api, triggers-api) and worker binaries get
-  // OTEL_SERVICE_VERSION as a standalone var in addition to OTEL_RESOURCE_ATTRIBUTES.
-  // Services and apps only get OTEL_RESOURCE_ATTRIBUTES.
-  env.OTEL_DENO = 'true';
-  env.OTEL_SERVICE_NAME = target.name;
-  if (version) {
-    env.OTEL_RESOURCE_ATTRIBUTES = `service.version=${version}`;
-    if (target.type === 'plugin' || target.type === 'worker') {
-      env.OTEL_SERVICE_VERSION = version;
-    }
-  }
-  env.OTEL_EXPORTER_OTLP_ENDPOINT = infra.otlpEndpoint;
-  env.OTEL_EXPORTER_OTLP_PROTOCOL = 'http/protobuf';
+  // The canonical identity/exporter env (OTEL_DENO, OTEL_SERVICE_NAME,
+  // OTEL_RESOURCE_ATTRIBUTES/OTEL_SERVICE_VERSION, endpoint, protocol) is
+  // derived once by the target-agnostic core convention (R-DEPLOY-3, D6) so
+  // this adapter no longer hand-rolls it. Plugins and worker binaries get
+  // OTEL_SERVICE_VERSION as a standalone var in addition to
+  // OTEL_RESOURCE_ATTRIBUTES; services and apps only get the resource attribute.
+  Object.assign(
+    env,
+    observabilityEnv({
+      serviceName: target.name,
+      endpoint: infra.otlpEndpoint,
+      protocol: 'http/protobuf',
+      serviceVersion: version,
+      emitServiceVersionVar: target.type === 'plugin' || target.type === 'worker',
+    }),
+  );
+  // SERVY/Aspire runtime tuning (not part of the shared identity/exporter seam).
   env.OTEL_TRACES_SAMPLER = 'always_on';
   env.OTEL_BSP_SCHEDULE_DELAY = '1000';
   env.OTEL_BLRP_SCHEDULE_DELAY = '1000';
