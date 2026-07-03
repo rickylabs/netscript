@@ -177,16 +177,17 @@ export interface ResolvedDefaultsConfig {
  * Merges defaults from constants/windows.ts with user overrides from
  * netscript.config.ts `deploy.targets.windows` section.
  */
-export interface ResolvedWindowsDeployConfig {
-  /** Absolute path to servy-cli.exe */
-  servyCliPath: string;
-  /** Windows Service name prefix (e.g., "NetScript") */
-  servicePrefix: string;
-  /** Base install directory (e.g., "C:\NetScript") */
-  installBase: string;
-  /** Deployment mode: compile .exe binaries or run via deno.exe + source */
+/**
+ * Shared resolved deploy base — the build/bundle/compile/health/logging/docker
+ * defaults common to every OS deploy target. {@link ResolvedWindowsDeployConfig}
+ * and {@link ResolvedLinuxDeployConfig} extend this with their OS-specific path
+ * fields, so the shared defaults are declared and resolved once (D2; resolved by
+ * `resolveDeployBase`, the only per-OS input being the default compile triple).
+ */
+export interface ResolvedDeployBaseConfig {
+  /** Deployment mode: compile binaries or run via deno + source */
   mode: 'compile' | 'script';
-  /** Path to deno.exe for script mode */
+  /** Path to deno for script mode */
   denoPath: string;
   /** deno compile target triple */
   compileTarget: string;
@@ -223,6 +224,40 @@ export interface ResolvedWindowsDeployConfig {
     denoBaseImage: string;
     dotnetBaseImage: string;
   };
+}
+
+/**
+ * Resolved Windows (Servy) deployment configuration. Extends the shared
+ * {@link ResolvedDeployBaseConfig} with Windows-specific path fields.
+ */
+export interface ResolvedWindowsDeployConfig extends ResolvedDeployBaseConfig {
+  /** Absolute path to servy-cli.exe */
+  servyCliPath: string;
+  /** Windows Service name prefix (e.g., "NetScript") */
+  servicePrefix: string;
+  /** Base install directory (e.g., "C:\NetScript") */
+  installBase: string;
+}
+
+/**
+ * Resolved Linux (systemd) deployment configuration. Extends the shared
+ * {@link ResolvedDeployBaseConfig} with Linux-specific path/ownership fields.
+ * Merges Linux-sensible defaults with user overrides from netscript.config.ts
+ * `deploy.targets.linux`.
+ */
+export interface ResolvedLinuxDeployConfig extends ResolvedDeployBaseConfig {
+  /** Path to systemctl */
+  systemctlPath: string;
+  /** systemd unit name prefix (e.g., "netscript") */
+  unitPrefix: string;
+  /** Base install directory (e.g., "/opt/netscript") */
+  installBase: string;
+  /** System user that owns the generated units */
+  user?: string;
+  /** System group that owns the generated units */
+  group?: string;
+  /** Runtime directory for sockets and pid files (e.g., "/run/netscript") */
+  runtimeDir: string;
 }
 
 /**

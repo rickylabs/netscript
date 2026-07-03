@@ -30,7 +30,7 @@ import { join, resolve } from '@std/path';
 import { ensureDir } from '@std/fs';
 import { DEFAULT_COMPILE_TARGET } from '../../../../kernel/constants/windows.ts';
 import { DEFAULT_DEPLOY_OUTPUT_DIR, DEPLOY_DIRS } from '../../../../kernel/constants/runtime.ts';
-import { buildCompileConfig } from '../../../../kernel/adapters/windows/compile/compile-config.ts';
+import { buildCompileConfig } from '../../../../kernel/adapters/deploy/compile/compile-config.ts';
 import { formatError } from '../../../../kernel/domain/errors.ts';
 
 // ── V8 flags suited for a short-lived CLI process ───────────────────────────

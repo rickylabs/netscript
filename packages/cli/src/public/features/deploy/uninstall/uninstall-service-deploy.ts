@@ -1,4 +1,8 @@
-import { DEFAULT_SERVICE_PREFIX } from '../../../../kernel/constants/windows.ts';
+import {
+  detectServiceOs,
+  fullServiceNameForOs,
+  type ServiceOs,
+} from '../../../../kernel/adapters/deploy/runtime-detect.ts';
 import { Pipeline } from '../../../../kernel/application/abstracts/pipeline.ts';
 import {
   PipelineStep,
@@ -8,7 +12,7 @@ import type {
   ResolvedServiceManifest,
   ServiceManifestPort,
 } from '../../../ports/service-manifest-port.ts';
-import type { WindowsServicePort } from '../../../ports/windows-service-port.ts';
+import type { OsServicePort } from '../../../ports/os-service-port.ts';
 
 /** Request for uninstalling deployed services. */
 export interface UninstallServiceDeployRequest {
@@ -30,8 +34,11 @@ export interface UninstallServiceDeployDependencies {
   /** Deployment manifest resolver. */
   readonly manifests: ServiceManifestPort;
 
-  /** Windows service lifecycle adapter. */
-  readonly services: WindowsServicePort;
+  /** OS service lifecycle adapter (servy on Windows, systemd on Linux). */
+  readonly services: OsServicePort;
+
+  /** Target service OS. Defaults to the detected host OS. */
+  readonly os?: ServiceOs;
 }
 
 /** Result of uninstalling deployment services. */
@@ -73,13 +80,14 @@ export class UninstallServiceDeployStep
       deployDir: request.deployDir,
     });
     const serviceNames = selectServiceNames(resolved.manifest.services, 'stop', request.service);
+    const os = this.dependencies.os ?? detectServiceOs();
     const uninstalled: string[] = [];
     const failed: string[] = [];
 
     for (const serviceName of serviceNames) {
-      const windowsName = fullServiceName(serviceName);
-      if (request.stopFirst) await this.dependencies.services.run('stop', windowsName);
-      const result = await this.dependencies.services.run('uninstall', windowsName);
+      const osName = fullServiceNameForOs(os, serviceName);
+      if (request.stopFirst) await this.dependencies.services.run('stop', osName);
+      const result = await this.dependencies.services.run('uninstall', osName);
       if (result.success) uninstalled.push(serviceName);
       else failed.push(serviceName);
     }
@@ -122,8 +130,4 @@ function selectServiceNames(
   }
   const names = Object.keys(services);
   return mode === 'stop' ? [...names].reverse() : names;
-}
-
-function fullServiceName(shortName: string): string {
-  return `${DEFAULT_SERVICE_PREFIX}.${shortName}`;
 }

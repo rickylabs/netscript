@@ -1313,9 +1313,43 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   command.
 - **Owner:** Deployment tooling follow-up.
 - **Created:** 2026-06-22.
+- **Status:** partially resolved (#339 + #340), narrowed to container/orchestrator artifacts.
+- **Update (2026-07-03, #339/#340):** `netscript deploy` now IS a first-class command that emits
+  bare-metal deployment artifacts: a self-contained single binary per service (`deno compile`,
+  OS-generic triple) managed as an OS service through the OS-agnostic `OsServicePort` (Servy on
+  Windows, systemd on Linux). Dockerfiles / Compose / Kubernetes manifests are still not generated —
+  the container/orchestrator lane is tracked by the Aspire-compose deploy adapter (#343).
+- **Gate:** Close when `netscript deploy` (or scaffold generation) also emits the container /
+  orchestrator artifacts, or the deployment docs are rewritten to remove generated-artifact
+  expectations for those targets.
+
+## packages/cli — bare-metal deploy targets ship without rollback/secrets bodies (`cli-deploy-target-rollback-secrets-deferred`)
+
+- **Reason:** The canonical `DeployTargetPort` contract declares seven operations; the bare-metal
+  service targets (`WindowsServiceDeployTarget`, `LinuxServiceDeployTarget`) implement six
+  (`plan` / `emit` / `up` / `down` / `status` / `logs`) and leave `rollback?` / `secrets?`
+  declared-unsupported (omitted from the shared `ServiceDeployTarget` base per LD-4). The
+  kernel-domain `DeployTargetRegistry` descriptors are also not yet wired to inject the public
+  `OsServicePort` + compile pipeline (a kernel→public import would violate hexagonal layering — see
+  worklog drift D-S8); the live deploy path runs `deploy-group.ts` → `install-service-deploy` /
+  `buildWindowsDeployment` directly, so the descriptors are scaffolding consumed only by tests today.
+- **Owner:** Deployment-hardening follow-up (#341).
+- **Created:** 2026-07-03 (#339/#340).
+- **Status:** open, DEBT_ACCEPTED — intentional scope split.
+- **Gate:** Close when #341 lands the `rollback` / `secrets` (+ health / OTEL) operation bodies and
+  the injected execution-delegation seam that lets the registry descriptors drive real deploys.
+
+## packages/cli — Linux systemd deploy lane is unit-tested but not integration-exercised (`cli-deploy-linux-integration-untested`)
+
+- **Reason:** The systemd adapter, unit renderer, and OS-routing are covered by unit + OS-routing
+  e2e-lite tests, but the implementation host is Windows-only, so the end-to-end Linux systemd
+  install/start/status path is not exercised against a live `systemctl`/`journalctl`. The
+  merge-readiness `scaffold.runtime` gate likewise runs on Windows and does not touch the Linux lane.
+- **Owner:** Deployment CI follow-up.
+- **Created:** 2026-07-03 (#339/#340).
 - **Status:** open, DEBT_ACCEPTED.
-- **Gate:** Close when `netscript deploy` or scaffold generation emits supported deployment
-  artifacts, or the deployment docs are rewritten to remove generated-artifact expectations.
+- **Gate:** Close when a Linux CI job (or containerized systemd harness) runs the bare-metal deploy
+  lifecycle against a real systemd and asserts unit install/enable/status/logs.
 
 ## packages/fresh — Fresh app telemetry defaults reserved (`fresh-app-telemetry-defaults`)
 

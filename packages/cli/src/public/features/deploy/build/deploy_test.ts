@@ -4,11 +4,11 @@ import { assertEquals } from 'jsr:@std/assert@^1';
 import type { ProcessPort, ProcessResult } from '../../../../kernel/ports/process-port.ts';
 import type { ServiceManifestPort } from '../../../ports/service-manifest-port.ts';
 import type {
-  WindowsServiceCommandResult,
-  WindowsServiceInstallRequest,
-  WindowsServicePort,
-} from '../../../ports/windows-service-port.ts';
-import { ServyCliAdapter } from '../../../adapters/servy-cli.ts';
+  OsServiceCommandResult,
+  OsServiceInstallRequest,
+  OsServicePort,
+} from '../../../ports/os-service-port.ts';
+import { ServyOsServiceAdapter } from '../../../adapters/servy-os-service.ts';
 import { buildDeploy } from './build-deploy.ts';
 import { installServiceDeploy } from '../install/install-service-deploy.ts';
 import { uninstallServiceDeploy } from '../uninstall/uninstall-service-deploy.ts';
@@ -53,7 +53,7 @@ describe('public deploy application flows', () => {
   });
 
   it('installs manifest services in manifest order', async () => {
-    const services = new RecordingWindowsServicePort();
+    const services = new RecordingOsServicePort();
 
     const result = await installServiceDeploy({
       deployDir: '/deploy',
@@ -61,6 +61,7 @@ describe('public deploy application flows', () => {
     }, {
       manifests: manifestPort(['users', 'orders']),
       services,
+      os: 'windows',
     });
 
     assertEquals(result.installed, ['users', 'orders']);
@@ -74,8 +75,31 @@ describe('public deploy application flows', () => {
     ]);
   });
 
+  it('routes install naming through the linux (systemd) lane', async () => {
+    const services = new RecordingOsServicePort();
+
+    const result = await installServiceDeploy({
+      deployDir: '/deploy',
+      force: false,
+    }, {
+      manifests: manifestPort(['users', 'orders']),
+      services,
+      os: 'linux',
+    });
+
+    assertEquals(result.installed, ['users', 'orders']);
+    assertEquals(services.installs.map((entry) => entry.serviceName), [
+      'netscript-users.service',
+      'netscript-orders.service',
+    ]);
+    assertEquals(services.installs.map((entry) => entry.configPath.replaceAll('\\', '/')), [
+      '/install/config/users.service',
+      '/install/config/orders.service',
+    ]);
+  });
+
   it('uninstalls manifest services in reverse manifest order', async () => {
-    const services = new RecordingWindowsServicePort();
+    const services = new RecordingOsServicePort();
 
     const result = await uninstallServiceDeploy({
       deployDir: '/deploy',
@@ -83,6 +107,7 @@ describe('public deploy application flows', () => {
     }, {
       manifests: manifestPort(['users', 'orders']),
       services,
+      os: 'windows',
     });
 
     assertEquals(result.uninstalled, ['orders', 'users']);
@@ -102,7 +127,7 @@ describe('public deploy application flows', () => {
 
   it('maps Windows service operations to servy-cli invocations', async () => {
     const process = new RecordingProcessPort();
-    const adapter = new ServyCliAdapter({
+    const adapter = new ServyOsServiceAdapter({
       servyCliPath: 'C:/tools/servy-cli.exe',
       process,
     });
@@ -112,8 +137,18 @@ describe('public deploy application flows', () => {
       configPath: 'C:/app/config/users.xml',
       force: true,
     });
+    await adapter.install({
+      serviceName: 'NetScript.orders',
+      configPath: 'C:/app/config/orders.xml',
+      force: false,
+    });
     await adapter.run('start', 'NetScript.users');
+    await adapter.run('stop', 'NetScript.users');
+    await adapter.run('status', 'NetScript.users');
+    await adapter.run('uninstall', 'NetScript.users');
 
+    // Byte-identical servy invocations after folding arg construction into the
+    // shared servyInstallArgs / servyLifecycleArgs builders (S3).
     assertEquals(process.calls, [
       {
         command: 'C:/tools/servy-cli.exe',
@@ -129,7 +164,23 @@ describe('public deploy application flows', () => {
       },
       {
         command: 'C:/tools/servy-cli.exe',
+        args: ['install', '-n', 'NetScript.orders', '-c', 'C:/app/config/orders.xml', '-q'],
+      },
+      {
+        command: 'C:/tools/servy-cli.exe',
         args: ['start', '-n', 'NetScript.users', '-q'],
+      },
+      {
+        command: 'C:/tools/servy-cli.exe',
+        args: ['stop', '-n', 'NetScript.users', '-q'],
+      },
+      {
+        command: 'C:/tools/servy-cli.exe',
+        args: ['status', '-n', 'NetScript.users', '-q'],
+      },
+      {
+        command: 'C:/tools/servy-cli.exe',
+        args: ['uninstall', '-n', 'NetScript.users', '-q'],
       },
     ]);
   });
@@ -154,11 +205,11 @@ function manifestPort(serviceNames: readonly string[]): ServiceManifestPort {
   };
 }
 
-class RecordingWindowsServicePort implements WindowsServicePort {
-  readonly installs: WindowsServiceInstallRequest[] = [];
+class RecordingOsServicePort implements OsServicePort {
+  readonly installs: OsServiceInstallRequest[] = [];
   readonly runs: Array<{ operation: string; serviceName: string }> = [];
 
-  install(request: WindowsServiceInstallRequest): Promise<WindowsServiceCommandResult> {
+  install(request: OsServiceInstallRequest): Promise<OsServiceCommandResult> {
     this.installs.push(request);
     return Promise.resolve({ success: true, message: 'OK', code: 0 });
   }

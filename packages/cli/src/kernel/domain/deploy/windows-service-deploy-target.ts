@@ -1,36 +1,12 @@
-import type {
-  DeployTargetOperation,
-  DeployTargetPort,
-  DeployTargetRequest,
-  DeployTargetResult,
-} from './deploy-target-port.ts';
+import { ServiceDeployTarget } from './service-deploy-target.ts';
 
-/** Windows service deploy target descriptor and adapter identity. */
-export class WindowsServiceDeployTarget implements DeployTargetPort {
-  readonly key = 'windows-service';
-  readonly label = 'Windows service';
-  readonly operations: readonly DeployTargetOperation[] = ['build', 'install', 'uninstall'];
-
-  /** Build is currently delegated to the public deploy build command pipeline. */
-  build(request: DeployTargetRequest): Promise<DeployTargetResult> {
-    return Promise.resolve(this.#result('build', request));
-  }
-
-  /** Install is currently delegated to the public deploy install command pipeline. */
-  install(request: DeployTargetRequest): Promise<DeployTargetResult> {
-    return Promise.resolve(this.#result('install', request));
-  }
-
-  /** Uninstall is currently delegated to the public deploy uninstall command pipeline. */
-  uninstall(request: DeployTargetRequest): Promise<DeployTargetResult> {
-    return Promise.resolve(this.#result('uninstall', request));
-  }
-
-  #result(operation: DeployTargetOperation, request: DeployTargetRequest): DeployTargetResult {
-    return {
-      target: this.key,
-      operation,
-      message: `${this.label} ${operation} registered for ${request.projectRoot}`,
-    };
-  }
+/**
+ * Windows (Servy) bare-metal service deploy target. Declares the canonical 6-op
+ * surface (`plan`/`emit`/`up`/`down`/`status`/`logs`) and retains the legacy
+ * `build`/`install`/`uninstall` verb aliases via {@link ServiceDeployTarget};
+ * `rollback`/`secrets` stay declared-unsupported until #341 (LD-4).
+ */
+export class WindowsServiceDeployTarget extends ServiceDeployTarget {
+  override readonly key = 'windows-service';
+  override readonly label = 'Windows service';
 }

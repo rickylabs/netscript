@@ -24,9 +24,9 @@ import {
   printSummary,
   resolveManifest,
   resolveServyCli,
-  runServy,
-  servyLifecycleArgs,
 } from '../../../../kernel/adapters/deploy/shared.ts';
+import { DenoProcess } from '../../../../kernel/adapters/runtime/process/deno-process.ts';
+import { createOsServicePort } from '../../../adapters/os-service-factory.ts';
 
 export const stopCommand: Command<any, any, any, any, any, any, any, any> = new Command()
   .name('stop')
@@ -63,8 +63,6 @@ export const stopCommand: Command<any, any, any, any, any, any, any, any> = new 
       failDeployCommand('Deploy command failed.');
     });
 
-    const verbose = options.verbose ?? false;
-
     outputText(`📦 App:         ${manifest.name} v${manifest.version}`);
     outputText(`📁 Install Dir: ${installDir}`);
     outputText('');
@@ -77,6 +75,12 @@ export const stopCommand: Command<any, any, any, any, any, any, any, any> = new 
 
     outputText(`✓ Servy CLI: ${servy.path}`);
     outputText('');
+
+    // ── Windows service lifecycle port (servy adapter) ───────────────────
+    const services = createOsServicePort('windows', {
+      process: new DenoProcess(),
+      servyCliPath: servy.path,
+    });
 
     // ── Get service list (reverse order for stop) ────────────────────────
     let serviceNames: string[];
@@ -100,8 +104,7 @@ export const stopCommand: Command<any, any, any, any, any, any, any, any> = new 
       outputText(`  ⏹️  ${name}`);
 
       try {
-        const args = servyLifecycleArgs('stop', windowsName);
-        const result = await runServy(servy.path, args, verbose);
+        const result = await services.run('stop', windowsName);
 
         if (result.success) {
           outputText(`     ${green('✓')} Stopped`);

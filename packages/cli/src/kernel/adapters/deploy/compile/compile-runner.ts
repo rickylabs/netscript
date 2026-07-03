@@ -1,9 +1,8 @@
 import { outputText } from '../../../presentation/output/default-output.ts';
-/** Run deno compile for one or more Windows binary targets. */
+/** Run deno compile for one or more single-binary targets (OS-generic). */
 import { join } from '@std/path';
 import {
   DEFAULT_BUNDLE_EXTERNAL_IMPORTS,
-  DEFAULT_COMPILE_TARGET,
   DEFAULT_COMPILE_TIMEOUT_MS,
 } from '../../../constants/windows.ts';
 import type {
@@ -14,7 +13,8 @@ import type {
 import { buildCompileConfig } from './compile-config.ts';
 import { bundleTarget } from './compile-bundler.ts';
 import { formatSize } from './compile-format.ts';
-import { formatV8CompileArg, getV8Profile } from '../runtime/v8-profiles.ts';
+import { binaryExtensionForTarget, defaultCompileTarget } from './compile-platform.ts';
+import { formatV8CompileArg, getV8Profile } from '../../windows/runtime/v8-profiles.ts';
 
 // ============================================================================
 // SINGLE TARGET COMPILATION
@@ -61,9 +61,9 @@ export async function compileTarget(
   options: CompileOptions,
 ): Promise<CompileResult> {
   const startTime = performance.now();
-  const outputPath = join(options.binDir, `${target.name}.exe`);
+  const arch = options.target ?? defaultCompileTarget();
+  const outputPath = join(options.binDir, `${target.name}${binaryExtensionForTarget(arch)}`);
   const entrypointPath = join(options.projectRoot, target.entrypoint);
-  const arch = options.target ?? DEFAULT_COMPILE_TARGET;
   const v8Profile = getV8Profile(target);
   const timeoutMs = options.timeoutMs ?? DEFAULT_COMPILE_TIMEOUT_MS;
 

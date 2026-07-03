@@ -445,6 +445,22 @@ export interface DockerComposeDeployTarget extends DeployTargetBase {
   imageName?: string;
 }
 
+/** Linux systemd deployment target (`deploy.targets.linux`). */
+export interface LinuxDeployTarget extends DeployTargetBase {
+  /** Path to the systemctl executable. */
+  systemctlPath?: string;
+  /** systemd unit name prefix. */
+  unitPrefix?: string;
+  /** Base directory for service installation. */
+  installBase?: string;
+  /** System user that owns the generated units. */
+  user?: string;
+  /** System group that owns the generated units. */
+  group?: string;
+  /** Runtime directory for sockets and pid files. */
+  runtimeDir?: string;
+}
+
 /** Top-level deployment configuration type. */
 export interface DeployConfig {
   /** Deployment targets keyed by name. */
@@ -455,6 +471,8 @@ export interface DeployConfig {
     docker?: DockerComposeDeployTarget;
     /** Docker Compose (emit + self-host) deployment settings. */
     compose?: DockerComposeDeployTarget;
+    /** Linux systemd deployment settings. */
+    linux?: LinuxDeployTarget;
   };
 }
 

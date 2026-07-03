@@ -18,19 +18,17 @@ import { outputError, outputText } from '../../../../kernel/presentation/output/
  * on the deployment target. Servy manages service lifecycle.
  */
 
-import { join } from '@std/path';
 import { bold, cyan, gray, green, red } from '@std/fmt/colors';
-import { DEPLOY_DIRS } from '../../../../kernel/constants/runtime.ts';
 import type { BuildResult } from '../../../../kernel/domain/deploy/compile-target.ts';
 import type { ResolvedConfig } from '../../../../kernel/domain/resolved-config.ts';
-import { buildCompileConfig } from '../../../../kernel/adapters/windows/compile/compile-config.ts';
+import { buildCompileConfig } from '../../../../kernel/adapters/deploy/compile/compile-config.ts';
 import {
   formatDuration,
   formatSize,
   printCompileResults,
-} from '../../../../kernel/adapters/windows/compile/compile-format.ts';
-import { compileAll } from '../../../../kernel/adapters/windows/compile/compile-runner.ts';
-import { extractCompileTargets } from '../../../../kernel/adapters/windows/compile/compile-targets.ts';
+} from '../../../../kernel/adapters/deploy/compile/compile-format.ts';
+import { compileAll } from '../../../../kernel/adapters/deploy/compile/compile-runner.ts';
+import { prepareDeployBuild } from './prepare-deploy-build.ts';
 import {
   writeEnvFile,
   writeEnvTemplate,
@@ -39,7 +37,6 @@ import { writeServyConfigs } from '../../../../kernel/adapters/windows/servy/ser
 import { buildManifestContext } from '../../../../kernel/adapters/windows/manifest/manifest-resolver.ts';
 import {
   generateServiceManifest,
-  topologicalSort,
   writeServiceManifest,
 } from '../../../../kernel/adapters/windows/manifest/manifest.ts';
 import { printV8BudgetSummary } from '../../../../kernel/adapters/windows/runtime/v8-profiles.ts';
@@ -70,37 +67,20 @@ export async function buildWindowsDeployment(
 ): Promise<BuildResult> {
   const startTime = performance.now();
 
-  const binDir = join(options.deployDir, DEPLOY_DIRS.BIN);
-  const configDir = join(options.deployDir, DEPLOY_DIRS.CONFIG);
-  const logsDir = join(options.deployDir, DEPLOY_DIRS.LOGS);
-  const scriptsDir = join(options.deployDir, DEPLOY_DIRS.SCRIPTS);
+  // OS-neutral preparation: create the deploy dir layout and derive the
+  // dependency-ordered, skip-filtered compile targets (shared with the Linux
+  // build path — see prepare-deploy-build.ts / S7).
+  const { binDir, configDir, scriptsDir, sortedTargets, skipped } = await prepareDeployBuild(
+    config,
+    options,
+  );
 
-  // Ensure directory structure
-  await Promise.all([
-    Deno.mkdir(binDir, { recursive: true }),
-    Deno.mkdir(configDir, { recursive: true }),
-    Deno.mkdir(logsDir, { recursive: true }),
-    Deno.mkdir(scriptsDir, { recursive: true }),
-  ]);
+  // `sortedTargets` is already the skip-filtered, topologically-ordered set.
+  const targets = sortedTargets;
 
-  const allExtractedTargets = extractCompileTargets(config);
-
-  // Apply --skip filter: exclude targets whose name matches any skip pattern
-  const skipSet = new Set(options.skipServices ?? []);
-  const targets = skipSet.size > 0
-    ? allExtractedTargets.filter((t) => !skipSet.has(t.name))
-    : allExtractedTargets;
-
-  if (skipSet.size > 0 && options.verbose) {
-    const skipped = allExtractedTargets
-      .filter((t) => skipSet.has(t.name))
-      .map((t) => t.name);
-    if (skipped.length > 0) {
-      outputText(gray(`Skipping: ${skipped.join(', ')}`));
-    }
+  if (skipped.length > 0 && options.verbose) {
+    outputText(gray(`Skipping: ${skipped.join(', ')}`));
   }
-
-  const sortedTargets = topologicalSort(targets);
 
   // ── Build header ─────────────────────────────────────────────────────────
   outputText(bold(cyan('\nNetScript Windows Deployment Build')));

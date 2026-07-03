@@ -1,5 +1,5 @@
 import { outputText } from '../../../presentation/output/default-output.ts';
-/** Console formatting helpers for Windows compile results. */
+/** Console formatting helpers for compile results. */
 import type { CompileResult } from '../../../domain/deploy/compile-target.ts';
 
 // ============================================================================

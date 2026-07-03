@@ -1,4 +1,4 @@
-/** Derive Windows binary compile targets from resolved NetScript config. */
+/** Derive single-binary compile targets from resolved NetScript config. */
 import { join } from '@std/path';
 import {
   getPluginServiceLookupName,

@@ -38,10 +38,11 @@ import {
   DeployTargetRegistry,
 } from '../../../kernel/application/registries/deploy-target-registry.ts';
 import { PluginKindRegistry } from '../../../kernel/application/registries/plugin-kind-registry.ts';
-import { DEFAULT_SERVY_CLI_PATH } from '../../../kernel/constants/windows.ts';
 import { JsrImportResolver } from '../../adapters/jsr-import-resolver.ts';
 import { FetchJsrPluginValidator } from '../../infra/jsr/fetch-jsr-plugin-validator.ts';
-import { ServyCliAdapter } from '../../adapters/servy-cli.ts';
+import { createOsServicePort } from '../../adapters/os-service-factory.ts';
+import { detectServiceOs } from '../../../kernel/adapters/deploy/runtime-detect.ts';
+import type { OsServicePort } from '../../ports/os-service-port.ts';
 import type { ServiceManifest } from '../../ports/service-manifest-port.ts';
 import type { GeneratePluginRegistriesCommandDependencies } from '../generate/plugins/generate-plugin-registries-command.ts';
 import type { GenerateRuntimeSchemasCommandDependencies } from '../generate/runtime-schemas/generate-runtime-schemas-command.ts';
@@ -153,8 +154,8 @@ export interface PublicCommandDependencies {
       options: { installDir?: string; deployDir?: string },
     ) => Promise<{ manifest: ServiceManifest; manifestDir: string; installDir: string }>;
   };
-  /** Windows service adapter for deployment lifecycle commands. */
-  readonly windowsServices: ServyCliAdapter;
+  /** OS service adapter for deployment lifecycle commands (servy/systemd). */
+  readonly osServices: OsServicePort;
   /**
    * Deploy target registry (named extension axis, A11). Ships the seed
    * `windows-service` target plus the Aspire-driven `compose`/`docker` cloud
@@ -316,10 +317,7 @@ export function createPublicCommandDependencies(
         };
       },
     },
-    windowsServices: new ServyCliAdapter({
-      servyCliPath: DEFAULT_SERVY_CLI_PATH,
-      process,
-    }),
+    osServices: createOsServicePort(detectServiceOs(), { process }),
     deployTargets: new DeployTargetRegistry([
       ...DEFAULT_DEPLOY_TARGETS,
       ['compose', new AspireComposeDeployTarget({ key: 'compose', process })],

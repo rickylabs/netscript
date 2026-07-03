@@ -2,8 +2,8 @@ import { outputText } from '../../../../kernel/presentation/output/default-outpu
 import { bold, green, red } from '@std/fmt/colors';
 import { join } from '@std/path';
 import type { ResolvedConfig } from '../../../../kernel/domain/resolved-config.ts';
-import { buildCompileConfig } from '../../../../kernel/adapters/windows/compile/compile-config.ts';
-import { formatSize } from '../../../../kernel/adapters/windows/compile/compile-format.ts';
+import { buildCompileConfig } from '../../../../kernel/adapters/deploy/compile/compile-config.ts';
+import { formatSize } from '../../../../kernel/adapters/deploy/compile/compile-format.ts';
 import type { WindowsBuildOptions } from './build-windows-options.ts';
 
 export async function compileWindowsCli(
