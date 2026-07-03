@@ -178,7 +178,7 @@ aspire start       # starts the AppHost and every declared resource
 app together, then prints a URL and login token for the **Aspire dashboard**:
 
 ```
-http://localhost:18888
+https://localhost:18888
 ```
 
 Leave `aspire start` running in this terminal; it is your control plane for the rest of the track.

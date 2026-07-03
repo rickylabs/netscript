@@ -25,7 +25,7 @@ The <code>auth-api</code> service and its database/KV dependencies run as resour
 graph (the database is Postgres by default; <code>mysql</code> / <code>mssql</code> run as Aspire
 containers too, while <code>sqlite</code> is file-backed — pick one at scaffold with <code>--db</code>). Bring orchestration up <strong>before</strong> you run any <code>netscript db</code> command
 or hit an auth endpoint: from the project root, <code>cd aspire &amp;&amp; aspire start</code>
-(dashboard at <a href="http://localhost:18888">http://localhost:18888</a>). DB commands require
+(dashboard at <a href="https://localhost:18888">https://localhost:18888</a>). DB commands require
 aspire startning first. See <a href="/explanation/aspire/">the Aspire explanation</a> for the resource
 graph.
 {{ /comp }}
@@ -228,7 +228,7 @@ public REST prefix **`/api/v1/auth/*`** (the oRPC surface is mirrored at `/api/r
 
 The service also exposes liveness/readiness probes at `/health/live` and `/health/ready`, plus
 OpenAPI docs, through the standard `@netscript/service` builder. Watch it come up in the Aspire
-dashboard at [http://localhost:18888](http://localhost:18888) under the `auth-api` resource.
+dashboard at [https://localhost:18888](https://localhost:18888) under the `auth-api` resource.
 
 ## Step 7 — Verify a session
 

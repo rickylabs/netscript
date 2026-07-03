@@ -74,7 +74,7 @@ up for this track:
 {{ comp.apiTable({
   caption: "What aspire start brings up for my-dashboard",
   rows: [
-    { name: "aspire (dashboard)", type: "http://localhost:18888", desc: "The Aspire dashboard: live resource list, console logs, structured logs and traces. A login token prints on start." },
+    { name: "aspire (dashboard)", type: "https://localhost:18888", desc: "The Aspire dashboard: live resource list, console logs, structured logs and traces. A login token prints on start." },
     { name: "postgres", type: "Container", desc: "Provisioned via Docker. The database your orders service reads — reachable only once Aspire is up." },
     { name: "redis", type: "Container (cache)", desc: "Redis cache — the default `--cache-backend`; Redis-compatible. Backs the KV-backed query layer from chapter 3." },
     { name: "orders", type: ":3002", desc: "Your oRPC service (defineService). RPC at /api/rpc/*, OpenAPI at /api/v1/orders/*." },

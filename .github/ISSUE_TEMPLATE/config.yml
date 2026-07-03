@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question / Q&A
+    url: https://github.com/rickylabs/netscript/discussions/categories/q-a
+    about: Ask usage questions and get help from maintainers and the community.
+  - name: Ideas & feature brainstorming
+    url: https://github.com/rickylabs/netscript/discussions/categories/ideas
+    about: Float an idea before it is a formal feature request or RFC.
+  - name: RFC discussion
+    url: https://github.com/rickylabs/netscript/discussions/categories/rfcs
+    about: Discuss substantial or breaking design changes. See rfcs/README.md for the process.
+  - name: Report a security vulnerability
+    url: https://github.com/rickylabs/netscript/security/advisories/new
+    about: Report vulnerabilities privately via coordinated disclosure. Do NOT open a public issue.

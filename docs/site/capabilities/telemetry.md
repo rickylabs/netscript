@@ -13,7 +13,7 @@ runtime is wired for **OpenTelemetry** — services serve their RPC handlers wit
 trace-context propagation, the worker runtime wraps job dispatch, execution, scheduling,
 subprocess hand-off, and task execution in real OTel spans, and structured logs flow through
 the framework `logger`. The viewing surface is the **Aspire dashboard at
-`http://localhost:18888`**, which collects OTLP traces, metrics, and structured logs from
+`https://localhost:18888`**, which collects OTLP traces, metrics, and structured logs from
 every resource in the app graph (services, plugin APIs, background processors) the moment you
 run `aspire start`. You do not stand up Jaeger, Grafana, or a log shipper to get started — the
 AppHost provisions the OTLP collector and the dashboard for you.
@@ -35,7 +35,7 @@ The dashboard, the OTLP collector, and the per-resource trace/log views all come
 orchestrator — they are not separate processes you start by hand. Run
 <code>cd aspire &amp;&amp; aspire start</code> <strong>before</strong> any <code>netscript db</code>
 command (Aspire provisions Postgres and Redis first), then open the dashboard URL printed in
-the console (<code>http://localhost:18888</code>, with a one-time auth token). Until Aspire is
+the console (<code>https://localhost:18888</code>, with a one-time auth token). Until Aspire is
 running there is no <code>:18888</code> surface to view traces or logs on. See
 <a href="/how-to/database-migration/">Database &amp; migration</a> for the full startup order.
 {{ /comp }}
@@ -98,8 +98,13 @@ spans *inside* a job handler — and even there the `@netscript/telemetry` helpe
   },
   {
     title: "OTLP → Aspire dashboard",
-    body: "The generated AppHost configures an OTLP endpoint (http://localhost:4318) and the Aspire dashboard (http://localhost:18888) so traces, metrics, and logs from every resource land in one place — no collector to deploy.",
+    body: "The generated AppHost configures an OTLP endpoint (http://localhost:4318) and the Aspire dashboard (https://localhost:18888) so traces, metrics, and logs from every resource land in one place — no collector to deploy.",
     icon: "◎"
+  },
+  {
+    title: "Browser console logs (default)",
+    body: "Generated app resources call withBrowserLogs() automatically (the AppHost pins Aspire.Hosting.Browsers), so a Fresh/Vite app's browser console output — including a client-side error an island throws — is forwarded into the dashboard next to server logs and traces. No opt-in, nothing to wire.",
+    icon: "▷"
   },
   {
     title: "Per-resource health",
@@ -108,6 +113,14 @@ spans *inside* a job handler — and even there the `@netscript/telemetry` helpe
   }
 ] }) }}
 
+{{ comp callout { type: "note", title: "Browser logs land in the dashboard too" } }}
+Because generated app resources emit <code>withBrowserLogs()</code> by default, the class of failure
+that is otherwise invisible from the server — a client-side <code>TypeError</code> a durable-streams
+island throws in the browser, say — shows up in the Aspire dashboard's <strong>Console logs</strong>
+for that app resource, correlated with the server-side spans of the same request. You do not start a
+separate browser-log collector; the AppHost wires it when it scaffolds the app.
+{{ /comp }}
+
 ## Enable tracing & see a span
 
 Tracing turns on from the **environment** — `@netscript/telemetry/config` resolves a
@@ -115,6 +128,18 @@ Tracing turns on from the **environment** — `@netscript/telemetry/config` reso
 them for you. The fastest path is to run `aspire start`, trigger any job, and the
 runtime's automatic spans show up in the dashboard with no code change. The tab below adds a
 **custom** span on top of that automatic trace.
+
+{{ comp callout { type: "note", title: "Local vs deployed: same instrumentation, different collector" } }}
+<strong>Locally</strong>, Aspire provisions the OTLP collector and the dashboard and injects the
+<code>OTEL_*</code> variables into every resource, so telemetry works the moment you run
+<code>aspire start</code> — nothing to configure. Note the dashboard and OTLP endpoints bind to
+<strong>ephemeral ports</strong> (the generated profile uses <code>localhost:0</code>), so use the URL
+<code>aspire start</code> prints rather than assuming <code>:18888</code>/<code>:4318</code>.
+<strong>Deployed</strong>, there is no Aspire and no dashboard: you point
+<code>OTEL_EXPORTER_OTLP_ENDPOINT</code> at your own collector or a hosted backend (Grafana Tempo,
+Honeycomb, Jaeger, …). The instrumentation code is identical — only the endpoint/protocol env and the
+sampler change. That single OTLP seam is the whole porting story; see <em>Production notes</em> below.
+{{ /comp }}
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -307,7 +332,7 @@ by Aspire. These are the real addresses you interact with, validated by the CLI 
 {{ comp.apiTable({
   caption: "Observability surfaces (link to /reference/telemetry/ and /reference/logger/ for the generated APIs)",
   rows: [
-    { name: "http://localhost:18888", type: "dashboard", desc: "Aspire dashboard — traces, structured logs, metrics, and resource state for the whole app graph. Auth token printed by `aspire start`." },
+    { name: "https://localhost:18888", type: "dashboard", desc: "Aspire dashboard — traces, structured logs, metrics, and resource state for the whole app graph. Auth token printed by `aspire start`." },
     { name: "http://localhost:4318", type: "OTLP/HTTP", desc: "OTLP ingest endpoint the AppHost configures (aspire.config.json https profile). Runtimes export spans and logs here; the dashboard reads them back. This is the seam you point at a hosted backend." },
     { name: "GET :8091/health", type: "liveness", desc: "Workers API health probe — reported as resource health in the dashboard." },
     { name: "GET :8092/health/live", type: "liveness", desc: "Sagas API liveness route." },
@@ -318,11 +343,11 @@ by Aspire. These are the real addresses you interact with, validated by the CLI 
 
 ## View it in Aspire
 
-With `aspire start` up, the dashboard at `http://localhost:18888` gives you four views over the
+With `aspire start` up, the dashboard at `https://localhost:18888` gives you four views over the
 same telemetry stream — there is no separate tool to configure.
 
 {{ comp.apiTable({
-  caption: "Aspire dashboard views (http://localhost:18888)",
+  caption: "Aspire dashboard views (https://localhost:18888)",
   rows: [
     { name: "Resources", type: "graph", desc: "Live state of every app-graph resource: postgres, redis, workers-api, workers, sagas-api, sagas, triggers-api, triggers, auth-api. Health probes drive the status colour." },
     { name: "Console logs", type: "stream", desc: "Per-resource stdout/stderr — the framework logger's text/JSON output lands here in real time." },
@@ -344,26 +369,29 @@ hosted backend.
 ## Production notes
 
 {{ comp callout { type: "warning", title: "Footguns before you ship telemetry" } }}
-<ul>
-<li><strong>Sampling is an env decision, not a code one.</strong> The sampler comes from
-<code>OTEL_TRACES_SAMPLER</code> (surfaced as <code>TelemetryConfig.sampler</code>) — set a
-ratio sampler like <code>traceidratio</code> in production rather than tracing 100% of traffic.
-The local Aspire default samples everything, which is fine for dev and ruinous at scale.</li>
-<li><strong>Point the exporter, don't rewrite the runtime.</strong> The OTLP export
-(<code>http://localhost:4318</code>, <code>OTEL_EXPORTER_OTLP_ENDPOINT</code>) is the single
-seam for a hosted backend. Swap the endpoint/protocol via env; the instrumentation code does
-not change.</li>
-<li><strong>Watch span-attribute cardinality.</strong> Putting unbounded values (user ids, raw
-URLs, full payloads) into <code>span.setAttribute</code> explodes index cardinality on the
-backend. Use stable, low-cardinality keys; correlate to a record with <code>getTraceId()</code>
-in a log line instead.</li>
-<li><strong><code>recordJobProgress</code>'s 3rd argument is a UNIT label, not a message.</strong>
-Pass <code>'steps'</code> / <code>'items'</code>, not free text — the value is meant to be a
-stable unit, and a per-call message inflates cardinality.</li>
-<li><strong>The scaffold <code>createJobTools(ctx)</code> trace/progress helpers are no-op
-today.</strong> Don't ship code that relies on them for real spans — call the
-<code>@netscript/telemetry</code> helpers directly (see the callout above).</li>
-</ul>
+<p><strong>❌ Trace 100% of traffic in production.</strong> The local Aspire default samples
+everything — fine for dev, ruinous at scale.<br>
+<strong>✅ Set a ratio sampler via env.</strong> Sampling is an env decision, not a code one: set
+<code>OTEL_TRACES_SAMPLER</code> (surfaced as <code>TelemetryConfig.sampler</code>) to
+<code>traceidratio</code> with a rate. <em>Exception:</em> keep always-on sampling for low-volume
+services or a targeted debugging window.</p>
+<p><strong>❌ Fork the runtime to change telemetry backends.</strong> Editing instrumentation to
+point at Grafana/Honeycomb is churn you will re-do every upgrade.<br>
+<strong>✅ Point the exporter.</strong> The OTLP export (<code>OTEL_EXPORTER_OTLP_ENDPOINT</code>,
+default <code>http://localhost:4318</code>) is the single seam — swap endpoint/protocol via env and
+the instrumentation code does not change.</p>
+<p><strong>❌ Put unbounded values in span attributes.</strong> User ids, raw URLs, or full payloads
+in <code>span.setAttribute</code> explode index cardinality on the backend.<br>
+<strong>✅ Use stable, low-cardinality keys.</strong> Correlate to a specific record with
+<code>getTraceId()</code> in a structured log line instead of widening the span.</p>
+<p><strong>❌ Pass a message as <code>recordJobProgress</code>'s 3rd argument.</strong> Free text
+there inflates cardinality and misreads the API.<br>
+<strong>✅ Pass a stable unit label.</strong> <code>'steps'</code> / <code>'items'</code> — the
+argument is a unit, not a description.</p>
+<p><strong>❌ Ship code that relies on the scaffold <code>createJobTools(ctx)</code> trace/progress
+helpers.</strong> Those are no-op stubs today (debt <code>workers-scaffold-job-tools-noop</code>).<br>
+<strong>✅ Call the <code>@netscript/telemetry</code> helpers directly</strong> for real spans and
+progress, as in the handler tab above.</p>
 {{ /comp }}
 
 ## Reference

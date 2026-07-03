@@ -24,7 +24,7 @@ use <code>netscript</code>.
 The <code>netscript db ...</code> commands provision and talk to your database <strong>through Aspire</strong> — Postgres
 by default, or <code>mysql</code> / <code>mssql</code> / <code>sqlite</code> when you scaffold with <code>--db</code>. Aspire is
 step 2 of the everyday flow: <code>cd aspire &amp;&amp; aspire start</code> brings up Postgres and Redis via Docker and
-opens the dashboard at <a href="http://localhost:18888">:18888</a> — <strong>before</strong> any <code>db init</code>,
+opens the dashboard at <a href="https://localhost:18888">:18888</a> — <strong>before</strong> any <code>db init</code>,
 <code>db generate</code>, <code>db seed</code>, or <code>db status</code>. Run a <code>db</code> command with Aspire down and it fails to
 find the database. See the <a href="/how-to/database-migration/">database &amp; migration how-to</a>.
 {{ /comp }}

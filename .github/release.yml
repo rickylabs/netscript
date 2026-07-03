@@ -1,0 +1,39 @@
+# Configuration for GitHub's auto-generated release notes.
+# Categorizes merged PRs by label. Complements `deno task release:publish`, which
+# writes the hand-authored intro and the generated PR / closed-issue lists.
+# See .agents/skills/netscript-release.
+changelog:
+  exclude:
+    labels:
+      - type:sub-pr
+      - ci:skip-e2e
+      - ci:full
+  categories:
+    - title: ⚠️ Breaking changes
+      labels:
+        - breaking
+    - title: 🚀 Features
+      labels:
+        - type:feat
+        - enhancement
+    - title: 🐛 Fixes
+      labels:
+        - type:fix
+        - bug
+    - title: 📚 Documentation
+      labels:
+        - type:docs
+        - documentation
+    - title: 🏗️ Architecture & RFCs
+      labels:
+        - rfc
+        - type:umbrella
+    - title: 🧰 Maintenance
+      labels:
+        - type:chore
+        - type:refactor
+        - type:perf
+        - type:test
+    - title: Other changes
+      labels:
+        - "*"

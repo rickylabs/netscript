@@ -46,7 +46,7 @@ curl http://localhost:3001/health   # the workspace service from chapter 1
 The <code>auth-api</code> service and its Postgres/KV dependencies are resources in the Aspire graph.
 Bring orchestration up <strong>before</strong> any <code>netscript db</code> command or auth endpoint
 call: from the project root, <code>cd aspire &amp;&amp; aspire start</code> (dashboard at
-<a href="http://localhost:18888">http://localhost:18888</a>). DB commands need aspire startning first.
+<a href="https://localhost:18888">https://localhost:18888</a>). DB commands need aspire startning first.
 {{ /comp }}
 
 ## Step 1 — Add the `auth` plugin

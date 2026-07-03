@@ -114,11 +114,19 @@ when acting as evaluator.
 Exactly one `status:` at a time; `type:`/`area:`/`ci:` as needed. The single-status rule is what lets
 a board column reflect reality.
 
-- `type:` — `umbrella`, `sub-pr`, `chore`, `feat`, `fix`, `docs`
-- `status:` — `research`, `plan`, `plan-eval`, `impl`, `impl-eval`, `augment-review`, `ci-fail`,
-  `ready-merge`
-- `area:` — `cli`, `fresh`, `plugins`, `deps`, `aspire`, `tooling`
-- `ci:` — `skip-e2e`, `full` (manual overrides for the path-filtered CI)
+- `type:` — `umbrella`, `sub-pr`, `chore`, `feat`, `fix`, `docs`, `refactor`, `perf`, `test`
+- `status:` — `triage` (incoming issues), `research`, `plan`, `plan-eval`, `impl`, `impl-eval`,
+  `augment-review`, `ci-fail`, `ready-merge`
+- `area:` — `cli`, `fresh`, `fresh-ui`, `plugins`, `auth`, `deps`, `aspire`, `tooling`, `database`,
+  `kv`, `sdk`, `service`, `config`, `telemetry`, `ai-core`, `plugin-ai`, `docs`
+- `priority:` — `p0` (release blocker), `p1`, `p2`, `p3`
+- `ci:` — `skip-e2e`, `full` (manual overrides for the path-filtered CI); `gate:` — `e2e`, `jsr`
+- flags — `rfc` (an RFC tracking issue/PR; see `rfcs/README.md`), `breaking`, `good first issue`,
+  `help wanted`
+
+The machine-readable label set (names + colors + descriptions) is mirrored in
+[`.github/labels.yml`](../../../.github/labels.yml) for a future label-sync workflow; keep the two in
+sync. Add labels there first — never delete an existing label (it strips the label off live issues).
 
 Source of truth stays the harness run artifacts under `.llm/tmp/run/`. Labels + Projects v2 are a
 **view and a trigger**, not the record. When you advance a phase, move the `status:` label in the

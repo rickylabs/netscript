@@ -229,7 +229,7 @@ curl 'http://localhost:8091/api/v1/workers/executions?limit=10'
 Expected: the events feed lists a `product-import-trigger` event, and the executions feed shows a
 completed `import-products` run whose result is `{ "fileName": "products_2024.csv", "rowCount": 2,
 "headers": ["name","sku","price"] }`. Open the `workers` resource logs in the
-[Aspire dashboard](http://localhost:18888) to read the job's structured log lines.
+[Aspire dashboard](https://localhost:18888) to read the job's structured log lines.
 
 - [ ] `.data/incoming/products/` exists and you dropped a `products_*.csv` into it.
 - [ ] The triggers events feed shows a `product-import-trigger` event.

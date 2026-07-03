@@ -14,6 +14,11 @@ import type { ToolDescriptor } from '../contracts/tool.ts';
 import type {
   AgentLoopPort,
   AgentMemoryPort,
+  ChatClientCallOptions,
+  ChatClientEvent,
+  ChatClientPort,
+  ChatClientRequest,
+  ChatModelProviderPort,
   EmbeddingProviderPort,
   MemoryRecord,
   ModelProviderPort,
@@ -109,6 +114,65 @@ export function createFakeModelProvider(
     },
     supports(modelId: string): boolean {
       return byId.has(modelId);
+    },
+  };
+}
+
+/**
+ * A fake {@linkcode ChatModelProviderPort} that replays scripted turns and
+ * records every request for assertions.
+ */
+export interface FakeChatModelProvider extends ChatModelProviderPort {
+  /** Every {@linkcode ChatClientRequest} seen, in call order across turns. */
+  readonly requests: readonly ChatClientRequest[];
+  /** Model ids passed to {@linkcode ChatModelProviderPort.createChatClient}. */
+  readonly modelIds: readonly string[];
+}
+
+/**
+ * Create a fake {@linkcode ChatModelProviderPort} whose chat client replays one
+ * scripted turn (an array of {@linkcode ChatClientEvent}s) per `stream()` call.
+ *
+ * The agent loop mints a fresh client each turn, so `turns[0]` answers the first
+ * model turn, `turns[1]` the next, and so on; exhausted turns stream nothing.
+ * An already-aborted signal yields nothing (mirrors a real client).
+ *
+ * @param id - Provider id reported by the fake.
+ * @param turns - Scripted events, one array per turn.
+ */
+export function createFakeChatModelProvider(
+  id: string,
+  turns: readonly (readonly ChatClientEvent[])[],
+): FakeChatModelProvider {
+  const queue = [...turns];
+  const requests: ChatClientRequest[] = [];
+  const modelIds: string[] = [];
+  return {
+    id,
+    requests,
+    modelIds,
+    createChatClient(modelId: string): ChatClientPort {
+      modelIds.push(modelId);
+      return {
+        kind: 'text',
+        name: id,
+        async *stream(
+          request: ChatClientRequest,
+          options?: ChatClientCallOptions,
+        ): AsyncIterable<ChatClientEvent> {
+          requests.push(request);
+          if (options?.signal?.aborted) {
+            return;
+          }
+          const events = queue.shift() ?? [];
+          for (const event of events) {
+            if (options?.signal?.aborted) {
+              return;
+            }
+            yield event;
+          }
+        },
+      };
     },
   };
 }

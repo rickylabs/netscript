@@ -212,12 +212,12 @@ plugin is registered, wired, and ready to use.
 
 {{ comp.tabbedCode({ tabs: [
   { label: "Inspect one plugin", lang: "bash", code: "# Detailed info for a single installed plugin\nnetscript plugin info @netscript/plugin-auth" },
-  { label: "Run the service", lang: "bash", code: "# Bring the whole stack up and exercise the plugin's service\ncd aspire && aspire start\n# Aspire dashboard: http://localhost:18888\n# auth-api:         http://localhost:8094" }
+  { label: "Run the service", lang: "bash", code: "# Bring the whole stack up and exercise the plugin's service\ncd aspire && aspire start\n# Aspire dashboard: https://localhost:18888\n# auth-api:         http://localhost:8094" }
 ] }) }}
 
 {{ comp callout { type: "tip", title: "Confirm in the Aspire dashboard" } }}
 Service-bearing plugins appear as resources in the Aspire dashboard at
-<a href="http://localhost:18888"><code>http://localhost:18888</code></a> once
+<a href="https://localhost:18888"><code>https://localhost:18888</code></a> once
 <code>aspire start</code> is up. A green resource on the plugin's port (workers
 <code>:8091</code>, sagas <code>:8092</code>, triggers <code>:8093</code>, auth
 <code>:8094</code>, streams <code>:4437</code>) confirms the plugin is live end to end.
