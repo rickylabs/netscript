@@ -3,6 +3,10 @@ import type { DeployTargetPort } from '../../domain/deploy/deploy-target-port.ts
 import type { DeployTargetRegistryPort } from '../../domain/deploy/deploy-target-registry-port.ts';
 import { WindowsServiceDeployTarget } from '../../domain/deploy/windows-service-deploy-target.ts';
 import { LinuxServiceDeployTarget } from '../../domain/deploy/linux-service-deploy-target.ts';
+import { DenoDeployTarget } from '../../domain/deploy/deno-deploy-target.ts';
+import { DenoDeployCliAdapter } from '../../adapters/deno-deploy/deno-deploy-cli.ts';
+import { DenoDeployPreflightReader } from '../../adapters/deno-deploy/deno-deploy-preflight.ts';
+import { DenoProcess } from '../../adapters/runtime/process/deno-process.ts';
 
 /** Metadata and operations for a deploy target exposed by the CLI. */
 export type DeployTarget = DeployTargetPort;
@@ -13,11 +17,22 @@ export const WINDOWS_SERVICE_DEPLOY_TARGET: DeployTarget = new WindowsServiceDep
 /** Linux (systemd) service deploy target descriptor. */
 export const LINUX_SERVICE_DEPLOY_TARGET: DeployTarget = new LinuxServiceDeployTarget();
 
+/**
+ * Deno Deploy cloud target descriptor. Wired with the concrete `deno deploy`
+ * CLI adapter (ProcessPort-backed) and the FS preflight reader at the
+ * application composition layer; the domain target itself imports neither.
+ */
+export const DENO_DEPLOY_TARGET: DeployTarget = new DenoDeployTarget({
+  cli: new DenoDeployCliAdapter(new DenoProcess()),
+  preflight: new DenoDeployPreflightReader(),
+});
+
 /** Ordered default deployment targets. */
 export const DEFAULT_DEPLOY_TARGETS: readonly (readonly [string, DeployTarget])[] = Object
   .freeze([
     ['windows-service', WINDOWS_SERVICE_DEPLOY_TARGET],
     ['linux-service', LINUX_SERVICE_DEPLOY_TARGET],
+    ['deno-deploy', DENO_DEPLOY_TARGET],
   ]);
 
 /** Registry for supported deployment targets. */
