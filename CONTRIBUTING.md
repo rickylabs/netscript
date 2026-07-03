@@ -68,6 +68,11 @@ Open your PR against `main` using the [PR template](.github/pull_request_templat
 how false-green merges happen. Multi-slice work should open as a **draft** and flip to **ready for
 review** only when the slice checklist is complete.
 
+**Link the issue you resolve.** If your PR fully closes an issue, put a GitHub closing keyword in the
+PR body's `## Scope` section: `Closes #N` (or `Fixes #N` / `Resolves #N`) so the merge auto-closes the
+issue. A bare `#N` or `Refs #N` does **not** auto-close. For partial work, reference `#N` without a
+keyword and note the remaining scope; never put a closing keyword on an epic/umbrella issue.
+
 ## Labels, milestones, and the board
 
 Issues and PRs are organized with a namespaced, colon-delimited label taxonomy. The machine-readable

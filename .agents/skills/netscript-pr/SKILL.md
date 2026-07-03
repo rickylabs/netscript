@@ -73,6 +73,30 @@ Always structure the body like this so reviewers and automation find the same an
 Keep `Validation` honest: paste real results/exit codes; if a gate was skipped, say so. A green
 checkbox with no evidence is how false-green merges happen.
 
+## Linking issues (auto-close on merge) — MANDATORY
+
+A PR that **fully resolves** an issue MUST put a GitHub **closing keyword** in the **PR body** so the
+merge auto-closes the issue. Use one of: `Closes #N`, `Fixes #N`, `Resolves #N` (one per issue; put
+each on its own line in the `## Scope` section).
+
+```markdown
+## Scope
+
+- Archetype / area: packages/service
+- Closes #234
+- Part of #301   <!-- umbrella: reference only, do NOT close -->
+```
+
+- **Bare `#N` and `Refs #N` / `Re #N` do NOT auto-close.** This is the exact defect that left 40+
+  merged NetScript PRs with stale-open issues that had to be triaged by hand. If the work fully
+  lands the issue, a closing keyword is not optional.
+- **Partial work:** reference the issue **without** a closing keyword (`Part of #N` / plain `#N`) and
+  state the remaining scope in the body. Never `Closes` an issue you only partially deliver.
+- **Never** put a closing keyword on an **epic/umbrella** (`type:umbrella`, `epic:*`) — those close
+  by hand once every child is done. Use `Part of #<umbrella>` instead.
+- The keyword must be in the **PR body or a commit message**, not only in a comment, for GitHub to
+  wire the auto-close. The PR template's `## Scope` is the canonical home.
+
 ## Per-phase structured comments
 
 Each harness phase posts ONE comment so the PR timeline reads as a phase log. Lead with a status
@@ -121,12 +145,19 @@ a board column reflect reality.
   `kv`, `sdk`, `service`, `config`, `telemetry`, `ai-core`, `plugin-ai`, `docs`
 - `priority:` — `p0` (release blocker), `p1`, `p2`, `p3`
 - `ci:` — `skip-e2e`, `full` (manual overrides for the path-filtered CI); `gate:` — `e2e`, `jsr`
+- `epic:` — groups every issue/PR belonging to a program epic (e.g. `epic:ai-stack`,
+  `epic:deployment`); the epic's own umbrella issue carries `type:umbrella`.
+- `wave:` — scheduling band that drives the **milestone** (see below): `v1`, `v1-min`, `defer`.
 - flags — `rfc` (an RFC tracking issue/PR; see `rfcs/README.md`), `breaking`, `good first issue`,
   `help wanted`
 
 The machine-readable label set (names + colors + descriptions) is mirrored in
 [`.github/labels.yml`](../../../.github/labels.yml) for a future label-sync workflow; keep the two in
 sync. Add labels there first — never delete an existing label (it strips the label off live issues).
+
+**Every open issue and PR carries at least one `type:` and one `area:` label, and every open issue
+carries a milestone.** New issues land with `status:triage` (the issue forms apply it automatically)
+until triaged.
 
 Source of truth stays the harness run artifacts under `.llm/tmp/run/`. Labels + Projects v2 are a
 **view and a trigger**, not the record. When you advance a phase, move the `status:` label in the
@@ -135,6 +166,43 @@ same action you post the phase comment, so the board never lags the timeline.
 > Phase D (the Action that enforces single-status, syncs label→Project column, and fires the right
 > workflow per status) is deferred to the repo-process-automation umbrella. Until it lands, apply
 > labels manually per this taxonomy so the future automation has clean data.
+
+## Milestones (roadmap mapping)
+
+Three milestones track the release roadmap. Assign one to every open issue:
+
+- **`0.0.1-beta.1`** — the next beta cut. Everything scheduled for the beta.
+- **`0.0.1-stable`** — the stable release. Deferred-but-committed work.
+- **`Backlog / Triage`** — accepted-but-unscheduled work and not-yet-triaged issues.
+
+Map from the `wave:` label:
+
+| Label | Milestone |
+| ----- | --------- |
+| `wave:v1`, `wave:v1-min` | `0.0.1-beta.1` |
+| `wave:defer` | `0.0.1-stable` (or `Backlog / Triage` when the body says "track only / no impl") |
+| epics + umbrellas (`epic:*`, `type:umbrella`) | the milestone of the cut they land in (usually `0.0.1-beta.1`) |
+| upstream / tracking issues with no wave | `0.0.1-beta.1` if the cut depends on them, else `Backlog / Triage` |
+
+Beta/stable acceptance criteria are owned by the Road-to-0.0.1-stable umbrella; keep milestone scope
+in sync with it rather than inventing criteria here.
+
+## Issue and PR templates
+
+Contributors and agents file through the GitHub-native forms — do not hand-author raw issues when a
+form fits:
+
+- Issue forms live in [`.github/ISSUE_TEMPLATE/`](../../../.github/ISSUE_TEMPLATE/): `bug_report`,
+  `feature_request`, `rfc_proposal`, `documentation`, plus `config.yml` (contact links). They
+  auto-apply the incoming labels (`bug`/`enhancement`/`rfc`/`documentation` + `status:triage`).
+- The PR body follows [`.github/pull_request_template.md`](../../../.github/pull_request_template.md),
+  which is the PR body template above plus the closing-keyword `## Scope` convention.
+- Substantial/breaking changes go through the RFC process in
+  [`rfcs/README.md`](../../../rfcs/README.md) before implementation.
+
+This skill is the single canonical reference for NetScript's GitHub process — label taxonomy,
+milestones, closing-keyword rule, templates, and RFC entry point. `CONTRIBUTING.md` is the
+human-facing mirror; `.github/labels.yml` is the machine-readable label set.
 
 ## Path-filter awareness (Phase C)
 

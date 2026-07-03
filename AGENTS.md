@@ -13,7 +13,21 @@ Use `.agents/skills/netscript-deno-toolchain` for any dependency, version, relea
 API-inspection work — it maps the native Deno 2.9 toolchain (`outdated`, `why`, `audit`,
 `ci`/`ci --prod`, `bump-version`, `publish`, `doc`) and the repo's `.llm/tools/deps/` wrappers so
 you stop hand-rolling registry curls and version checks. Use `.agents/skills/netscript-pr` whenever
-creating a branch, opening/updating a PR, posting a phase summary comment, or applying labels.
+creating a branch, opening/updating a PR, filing or triaging an issue, posting a phase summary
+comment, or applying labels/milestones — it is the **single canonical reference** for NetScript's
+GitHub process. Two obligations are non-negotiable for any agent that opens issues or PRs:
+
+1. **Closing keyword.** A PR that fully resolves an issue MUST carry a GitHub closing keyword
+   (`Closes #N` / `Fixes #N` / `Resolves #N`) in its **body** so the merge auto-closes the issue.
+   Bare `#N` and `Refs #N` do **not** auto-close — that omission is what stranded 40+ merged PRs with
+   stale-open issues. Partial work references `#N` without a keyword and states remaining scope; never
+   put a closing keyword on an epic/umbrella.
+2. **Taxonomy + milestones.** Apply the namespaced colon labels (`type:`/`area:`/`priority:`/`wave:`/
+   `epic:`/`gate:`/`status:`, exactly one `status:`) and assign a milestone (`0.0.1-beta.1`,
+   `0.0.1-stable`, or `Backlog / Triage`, mapped from `wave:`). The full taxonomy, milestone mapping,
+   and templates live in the netscript-pr skill; the machine-readable label set is
+   `.github/labels.yml`.
+
 Use `.agents/skills/netscript-release` for release cuts, publish handoffs, race-free production E2E
 verification, and rollback.
 
