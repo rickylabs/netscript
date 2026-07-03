@@ -1,4 +1,4 @@
-/** Build per-target Deno compile config content for Windows binaries. */
+/** Build per-target Deno compile config content for single-binary targets. */
 import { join } from '@std/path';
 import { discoverWorkspace } from '@netscript/config';
 import { COMPILE_CONFIG, DEFAULT_BUNDLE_EXTERNAL_IMPORTS } from '../../../constants/windows.ts';

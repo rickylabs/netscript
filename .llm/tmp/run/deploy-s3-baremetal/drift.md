@@ -102,3 +102,26 @@ Append-only. Severity: `minor` | `significant` | `architectural`.
 - S5 did not fold `deploy-config-resolvers.ts`'s private Linux consts into `constants/linux.ts`; that
   resolver was not otherwise touched by S5's wiring. Convergence remains scheduled for the S7
   base-config/build-strategy consolidation (same seam as D2). No behavioural drift (values identical).
+
+## D7 (S6) — plan's `--include-as-is` compile flag does not exist in Deno 2.9 — severity: minor
+
+- The plan's S6 line lists "`--include`/`--include-as-is`". `deno compile --help` on the pinned
+  toolchain (deno 2.9.0) exposes only `--include <path>` and `--exclude <path>` — there is **no**
+  `--include-as-is` flag. The compile runner already emits `--include` per `target.include`
+  (services embed via `include`, apps embed `_fresh/client` + `static`), which satisfies the plan's
+  underlying "embed assets into the single binary" intent. Wiring a non-existent flag would be dead
+  or crash-on-emit code, so it was deliberately **not** added. If a future Deno adds a verbatim
+  include mode, extend `CompileTarget`/the runner then. `denort` needs no flag — it is the standard
+  `deno compile` runtime and is used automatically.
+
+## D8 (S6) — plan's `deno:2.5` pin and "dead docker/script config" have no target — severity: minor
+
+- The plan's S6 line says "retire `deno:2.5` pin + dead `docker`/`script` config". A repo-wide grep
+  found **no `deno:2.5` pin anywhere** — a stale plan assumption; nothing to retire. The only Deno
+  container reference is `denoBaseImage: 'denoland/deno:2'` in
+  `kernel/adapters/config/deploy-config-resolvers.ts` (windows + linux resolvers). That is **live**
+  container-packaging config consumed by the container/Aspire lane (#343 territory), not dead and not
+  bare-metal's to remove — deleting it would be an out-of-scope config-contract change with
+  cross-slice risk. Both items are recorded as plan inaccuracies and intentionally left as no-ops;
+  S6 delivered its load-bearing intent (OS-generic single-binary compile relocated to a neutral home)
+  without them.

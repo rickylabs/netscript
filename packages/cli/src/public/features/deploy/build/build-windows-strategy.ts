@@ -23,14 +23,14 @@ import { bold, cyan, gray, green, red } from '@std/fmt/colors';
 import { DEPLOY_DIRS } from '../../../../kernel/constants/runtime.ts';
 import type { BuildResult } from '../../../../kernel/domain/deploy/compile-target.ts';
 import type { ResolvedConfig } from '../../../../kernel/domain/resolved-config.ts';
-import { buildCompileConfig } from '../../../../kernel/adapters/windows/compile/compile-config.ts';
+import { buildCompileConfig } from '../../../../kernel/adapters/deploy/compile/compile-config.ts';
 import {
   formatDuration,
   formatSize,
   printCompileResults,
-} from '../../../../kernel/adapters/windows/compile/compile-format.ts';
-import { compileAll } from '../../../../kernel/adapters/windows/compile/compile-runner.ts';
-import { extractCompileTargets } from '../../../../kernel/adapters/windows/compile/compile-targets.ts';
+} from '../../../../kernel/adapters/deploy/compile/compile-format.ts';
+import { compileAll } from '../../../../kernel/adapters/deploy/compile/compile-runner.ts';
+import { extractCompileTargets } from '../../../../kernel/adapters/deploy/compile/compile-targets.ts';
 import {
   writeEnvFile,
   writeEnvTemplate,

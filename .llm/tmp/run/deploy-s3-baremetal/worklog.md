@@ -141,3 +141,34 @@
 - Gates: cli `deno check` 0 (548 files); `deno task arch:check` FAIL=0 for cli (layering intact —
   kernel `runtime-detect` imports kernel-only; factory in public). cli is fmt/lint-excluded from the
   root gate by design. Drift D6 (guard/verbose boundary), D3 convergence recorded, D5 still → S7.
+
+## S6 — compile generalization (#340)
+
+- Relocated the whole compile tree `kernel/adapters/windows/compile/*` →
+  `kernel/adapters/deploy/compile/*` via `git mv` (history preserved): `compile-bundler.ts`,
+  `compile-config.ts`, `compile-format.ts`, `compile-runner.ts`, `compile-targets.ts` +
+  `compile.test.ts` + `compile_test.ts`. Only cross-import that broke was the runner's
+  `../runtime/v8-profiles.ts` → fixed to `../../windows/runtime/v8-profiles.ts` (v8-profiles stays
+  in `windows/runtime`; it is intra-kernel so `arch:check` stays FAIL=0). All other relative imports
+  (`./compile-*`, `../../config/plugin-registry.ts`, `../../../constants/windows.ts`,
+  `../../../domain/deploy/compile-target.ts`, `../../../presentation/...`) keep the same depth after
+  the move and needed no edit.
+- New `kernel/adapters/deploy/compile/compile-platform.ts`: `defaultCompileTarget()` = host triple
+  (`Deno.build.target`) and `binaryExtensionForTarget(triple)` = `.exe` for `*-windows-*` triples,
+  empty otherwise. `compile-runner.ts` now derives `arch = options.target ?? defaultCompileTarget()`
+  (was hardcoded `DEFAULT_COMPILE_TARGET`) and the output path uses
+  `${target.name}${binaryExtensionForTarget(arch)}` (was hardcoded `.exe`). On a Windows host this is
+  **byte-identical** (host triple *is* `x86_64-pc-windows-msvc` → `.exe`); on Linux the same pipeline
+  now emits an extension-less ELF and the Linux triple.
+- Header comments on the moved files de-Windowsed (comment-only). `DEFAULT_COMPILE_TARGET` is still
+  exported from `constants/windows.ts` and still consumed by `package-cli-deploy-command.ts` (the CLI
+  self-packager, a separate Windows-scoped subcommand out of this slice's scope) — no dangling ref.
+- Importers updated in the same commit: `package-cli-deploy-command.ts`,
+  `build-windows-strategy.ts`, `build-windows-cli.ts` (grep for `windows/compile` now returns none).
+- `--include` asset embedding already present in the runner (satisfies the plan's "embed assets"
+  intent); `denort` is automatic in `deno compile` (no flag). See drift D7/D8 for the plan's
+  `--include-as-is` and `deno:2.5` items that have no target in Deno 2.9 / this tree.
+- Tests: new `compile-platform_test.ts` (3 steps). Targeted run of the relocated dir:
+  **5 passed (3 steps) / 0 failed** (compile-platform + extractCompileTargets + loadDeployConfig
+  cases). Gates: cli `deno check` 0 (463 files in cli batch), lint 0 occurrences on the moved dir,
+  `arch:check` FAIL=0.
