@@ -56,3 +56,38 @@ so physically moving it off the base would break the Windows resolver. The new
 inherits the `docker` image block (with the `denoland/deno:2` default) — that is
 its natural home for container targets. The base block is left in place; no
 breaking move. R-DEPLOY-4 (member spreads the base, no base class) is satisfied.
+
+## D4 — F-9 permission manifest: CLI runs under `--allow-all` (no narrower manifest) — minor
+
+The plan's F-9 asks for `--allow-run` declared for `aspire`/`docker` in the CLI
+permission manifest. The NetScript CLI has **no fine-grained permission manifest**:
+`packages/cli/deno.json` `dev`/`build`/`install`/`test` tasks and `bin/netscript.ts`
+all run under `--allow-all`. The adapter shells `aspire`/`docker` via the existing
+`DenoProcess` (`Deno.Command`), whose run authority is already granted ambiently by
+`--allow-all`. No manifest exists to narrow, so S7 documents the external commands
+in the adapter JSDoc instead. Narrowing the CLI to explicit permissions is a
+pre-existing, CLI-wide concern outside this slice.
+
+## D5 — S5 adapter registration lives in the composition root (layering) — minor
+
+The plan's S5 lists `deploy-target-registry.ts` among the files to touch for
+registration. The `AspireComposeDeployTarget` requires a `ProcessPort`, which only
+exists in the composition root. `application/registries/deploy-target-registry.ts`
+would have to import a `kernel/adapters/**` class to register it there, inverting
+the layering (application → adapters). Instead the two adapter instances are
+registered in `public/features/root/public-command-dependencies.ts` (the DI
+composition root, which already constructs `process` and other adapters) via the
+registry's public `register`/constructor API. The registry module is left generic.
+This preserves F-3 layering; R-DEPLOY-2/A11 (registry as the named extension axis)
+is unchanged.
+
+## D6 — packages/cli is excluded from repo lint + fmt gates — minor
+
+`deno.json` `lint.exclude` and `fmt.exclude` both list `packages/cli/`, and the
+`deno task lint` / `deno task fmt:check` commands additionally `--exclude` cli.
+Therefore `deno lint`/`deno fmt` report "No target files found" for cli paths and
+the scoped wrappers exit non-zero with **zero findings** — a scoping artifact, not
+a real finding (reproduced against the pre-existing, known-good windows stub). The
+authoritative gate for cli source is `deno check` (type), which passes for all S5
+changes, plus the co-located unit tests. cli code is still hand-kept to the repo
+style (2-space, single quotes, semicolons, width 100).
