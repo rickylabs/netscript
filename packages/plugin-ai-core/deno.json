@@ -19,19 +19,7 @@
     "test": "deno test --unstable-kv --allow-all",
     "publish:dry-run": "deno publish --dry-run --allow-dirty"
   },
-  "publish": {
-    "include": [
-      "README.md",
-      "deno.json",
-      "mod.ts",
-      "src/**/*.ts"
-    ],
-    "exclude": [
-      "**/*_test.ts",
-      "**/*.test.ts",
-      "**/test_utils/**"
-    ]
-  },
+  "publish": false,
   "compilerOptions": {
     "strict": true,
     "noImplicitAny": true,
