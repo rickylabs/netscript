@@ -43,7 +43,7 @@ export type {
   TriggerScalingConfig,
   TriggersConfig,
   WebhookConfig,
-  WindowsDeployConfig,
+  WindowsDeployTarget,
 } from '../../types.ts';
 
 /** Database config entry accepted in plugin contribution fragments. */

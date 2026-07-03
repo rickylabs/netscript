@@ -43,5 +43,44 @@
 - These corrections supersede the earlier "WSL Codex implements / OpenHands or separate-Opus
   evaluates" note above for THIS epic only.
 
+### 2026-07-03 — PLAN-EVAL #2 → PASS_PLAN (fresh separate Opus session)
+- Verdict `plan-eval-2.md`: PASS_PLAN. All 4 prior blocking findings RESOLVED (commit slices present;
+  four-barrel rename enumerated + both new barrels verified real; F-6 slow-type `z.ZodType<…>` mandate
+  in L-8/F-6/CS-1; stub-scope resolved to base+windows only). Tree anchors verified; no new
+  contradiction. Non-blocking: docker-in-base wording reconcilable; merge test planned (CS-4).
+- **Plan-Gate CLEARED.** Proceeding to Implement phase.
+- Implement lane: Opus 4.8 high-effort sub-agent builds CS-1…CS-5 in this worktree with per-slice
+  commit + push to draft PR #352.
+
+## Drift
+
+### 2026-07-03 — CS-1/CS-2 merged into one commit (type-check coupling)
+- The plan assigned the schema (CS-1) and derived types + four barrels (CS-2) to separate commits.
+  In practice they are inseparable for a green-per-slice discipline: `deploy-schema.ts` imports the
+  new derived types (`DeployTargetBase`/`WindowsDeployTarget`), and renaming the type/schema exports
+  forces every barrel re-export in the same commit or type-check fails. CS-1 cannot type-check
+  without CS-2. Merged into a single atomic commit labeled `CS-1+CS-2`. No scope change; all planned
+  files land. CS-3/CS-4/CS-5 remain separate.
+- `src/domain/mod.ts` uses a wildcard re-export, so the rename is picked up with no edit needed
+  (verified). Only `src/public/mod.ts`, root `mod.ts`, and `src/merge/mod.ts` needed explicit edits.
+- `DeployTargetBase` added to `src/public/mod.ts` + root `mod.ts` type barrels; not added to
+  `src/merge/mod.ts` (per plan L-7 — merge entrypoint only renames the Windows symbol).
+
+### 2026-07-03 — deno-doc-generated reference doc will need regeneration (out of scope / #344)
+- `docs/site/reference/config/index.md:85` lists `WindowsDeployConfig` in a table that is explicitly
+  "generated from the package public surface with `deno doc` (US-2)". The rename makes that entry
+  stale; it regenerates from the new surface. Not hand-edited here (docs rewrite is #344's scope).
+- `docs/architecture/doctrine/06-archetypes.md:227` uses `deploy.windows` as an illustrative config
+  topic in doctrine prose — left as-is (doctrine, not this slice's surface); noted for #344.
+
 ## Gate results
-_(populated during Implement/Gate phases)_
+
+### CS-1+CS-2 — schema split + derived types + four-barrel rename
+- `run-deno-check.ts --cwd <wt> --root packages/config --ext ts` (passes `--unstable-kv`): **PASS**
+  (33 files, 0 errors). NOTE: the wrapper must be given `--cwd <worktree>` or it resolves the main
+  repo's import map and false-fails every `zod`/`@std/*` import with TS2307.
+- `deno publish --dry-run --allow-dirty` on packages/config (F-6 slow-type authority): **PASS**
+  ("Success Dry run complete") — new `z.ZodType<…>`-annotated exports are not slow types.
+- `deno doc --lint mod.ts src/public/mod.ts src/merge/mod.ts`: 1 error — pre-existing missing-JSDoc
+  on `PathsConfigSchema` (`paths-schema.ts`, untouched by this slice); my new exports
+  (`DeployTargetBaseSchema`, `WindowsDeployTargetSchema`) are documented and NOT flagged.

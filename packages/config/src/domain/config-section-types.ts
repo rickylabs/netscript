@@ -353,14 +353,8 @@ export interface TriggersConfig {
   enabled: boolean;
 }
 
-/** Windows-specific deployment configuration type. */
-export interface WindowsDeployConfig {
-  /** Path to the Servy CLI executable. */
-  servyCliPath?: string;
-  /** Base directory for service installation. */
-  installBase?: string;
-  /** Windows Service name prefix. */
-  servicePrefix?: string;
+/** Fields shared by every `deploy.targets.*` deployment target. */
+export interface DeployTargetBase {
   /** Deployment mode. */
   mode?: 'compile' | 'script';
   /** Path to Deno executable for script mode. */
@@ -419,10 +413,23 @@ export interface WindowsDeployConfig {
   };
 }
 
+/** Windows Services deployment target (`deploy.targets.windows`). */
+export interface WindowsDeployTarget extends DeployTargetBase {
+  /** Path to the Servy CLI executable. */
+  servyCliPath?: string;
+  /** Base directory for service installation. */
+  installBase?: string;
+  /** Windows Service name prefix. */
+  servicePrefix?: string;
+}
+
 /** Top-level deployment configuration type. */
 export interface DeployConfig {
-  /** Windows Services deployment settings. */
-  windows?: WindowsDeployConfig;
+  /** Deployment targets keyed by name (currently `windows` only). */
+  targets?: {
+    /** Windows Services deployment settings. */
+    windows?: WindowsDeployTarget;
+  };
 }
 
 /** Runtime schema/config output path entry type. */
