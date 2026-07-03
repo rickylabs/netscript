@@ -32,6 +32,7 @@ Legend:
 | F-16 Folder-cardinality lint      | required | required | required | required | required | required |
 | F-17 Abstract-derived co-location | required | required | required | required | required | required |
 | F-18 Sub-barrel lint              | required | required | required | required | required | required |
+| F-19 Scoped source gate runners   | required | required | required | required | required | required |
 
 ## Archetype-specific Gates
 
@@ -53,7 +54,10 @@ Future archetypes may publish their own gate IDs in the same namespace pattern (
 
 ## Phase A Reporting
 
-Until fitness scripts exist, evaluators report required fitness gates as:
+Fitness scripts now exist: `deno task arch:check` runs `.llm/tools/fitness/check-doctrine.ts` over
+the owned package/plugin roots, and `.llm/tools/fitness/` holds the individual check scripts (e.g.
+`check-folder-cardinality.ts`, `check-abstract-coloc.ts`, and the `check-cli-*.ts` family). Where a
+script does not yet cover a required gate, evaluators report it as:
 
 - `PASS` with manual evidence,
 - `PENDING_SCRIPT` with manual evidence and no detected violation,
