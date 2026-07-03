@@ -23,9 +23,15 @@ export { PresetRegistry } from './application/registries/preset-registry.ts';
 /** Deployment target descriptors supported by deploy commands. */
 export { DeployTargetRegistry } from './application/registries/deploy-target-registry.ts';
 export type {
+  DeployOperation,
   DeployTargetOperation,
+  DeployTargetOperationHandler,
   DeployTargetPort,
   DeployTargetRequest,
   DeployTargetResult,
+  LegacyDeployOperation,
 } from './domain/deploy/deploy-target-port.ts';
-export type { DeployTargetRegistryPort } from './domain/deploy/deploy-target-registry-port.ts';
+export type {
+  DeployTargetRegistryPort,
+  KnownDeployTargetKey,
+} from './domain/deploy/deploy-target-registry-port.ts';
