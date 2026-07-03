@@ -2,6 +2,7 @@ import { Registry } from '../abstracts/registry.ts';
 import type { DeployTargetPort } from '../../domain/deploy/deploy-target-port.ts';
 import type { DeployTargetRegistryPort } from '../../domain/deploy/deploy-target-registry-port.ts';
 import { WindowsServiceDeployTarget } from '../../domain/deploy/windows-service-deploy-target.ts';
+import { LinuxServiceDeployTarget } from '../../domain/deploy/linux-service-deploy-target.ts';
 
 /** Metadata and operations for a deploy target exposed by the CLI. */
 export type DeployTarget = DeployTargetPort;
@@ -9,10 +10,14 @@ export type DeployTarget = DeployTargetPort;
 /** Windows service deploy target descriptor. */
 export const WINDOWS_SERVICE_DEPLOY_TARGET: DeployTarget = new WindowsServiceDeployTarget();
 
+/** Linux (systemd) service deploy target descriptor. */
+export const LINUX_SERVICE_DEPLOY_TARGET: DeployTarget = new LinuxServiceDeployTarget();
+
 /** Ordered default deployment targets. */
 export const DEFAULT_DEPLOY_TARGETS: readonly (readonly [string, DeployTarget])[] = Object
   .freeze([
     ['windows-service', WINDOWS_SERVICE_DEPLOY_TARGET],
+    ['linux-service', LINUX_SERVICE_DEPLOY_TARGET],
   ]);
 
 /** Registry for supported deployment targets. */

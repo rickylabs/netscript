@@ -66,6 +66,13 @@ Deno.test('public command registry exposes deploy targets through a string-keyed
       ['windows-service', new WindowsServiceDeployTarget()],
     ]);
 
-    assertEquals(registry.get('windows-service')?.operations, ['build', 'install', 'uninstall']);
+    assertEquals(registry.get('windows-service')?.operations, [
+      'plan',
+      'emit',
+      'up',
+      'down',
+      'status',
+      'logs',
+    ]);
     assertEquals(registry.entries().map(([key]) => key), ['windows-service']);
 });
