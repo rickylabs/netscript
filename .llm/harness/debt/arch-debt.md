@@ -1833,3 +1833,35 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** Close when `netscript db generate` completes DB-less codegen in a deno-only environment
   (no aspire CLI / .NET / docker) and the static suites can invoke the CLI command directly instead
   of the standalone `deno task db:generate` workaround.
+
+## deployment — Archetype-7 core-centralization + F-DEPLOY seed (`deploy-archetype-7-core-seed`)
+
+- **ID:** `DEPLOY-ARCHETYPE-7-CORE-SEED`
+- **Reason:** Doctrine Archetype 7 (Deployment Target Adapter) names a package-agnostic LAW — the
+  `OsServicePort`/cloud-adapter seam, the uniform 7-op adapter contract, and the thin-router /
+  core-centralization rule — but the deployment **core** that would own the convention-bearing
+  primitives (health gating, OTEL, secrets, rollback) and the target registry does **not exist
+  yet**. Deploy today lives inside `packages/cli` (Archetype 6, `src/public/features/deploy/`). The
+  archetype's archetype-specific gates `F-DEPLOY-1` (uniform 7-op contract) and `F-DEPLOY-2` (no
+  target business logic in the command surface) are therefore seeded **`reviewed`**, not `gated`,
+  across the doctrine (`06-archetypes.md`), the harness archetype file
+  (`ARCHETYPE-7-deploy-target-adapter.md`), and the gate matrix.
+- **Why deferred:** Extracting a deployment core and its adapters is the work of deployment epic
+  #327 slices #339 (systemd) / #340 (deno-deploy) / #342 (docker/compose) / #343 (aca). Promoting
+  the gates to `gated` before those packages exist would red CI against unbuilt code. This entry
+  tracks both the future core-centralization obligation and the `reviewed → gated` promotion.
+- **Cross-link:** The eventual `OsServicePort` extraction out of the CLI deploy feature ties into
+  the existing `packages/cli — AP-1 / doctrine verdict Restructure` entry (Wave 6 "command
+  registry/deploy target seams"); do not duplicate that restructure debt — the deployment core
+  extraction is its downstream continuation.
+- **Owner:** Deployment epic #327.
+- **Target:** Phase 1 of #327 (first landed target adapter, #339+).
+- **Linked plan:** `.llm/tmp/run/deploy-s2-doctrine/plan.md` (Slice 3);
+  `docs/architecture/doctrine/06-archetypes.md#archetype-7--deployment-target-adapter`.
+- **Created:** 2026-07-03
+- **Status:** open, DEBT_ACCEPTED — `F-DEPLOY-1/2` seeded `reviewed` while the deployment packages
+  are unbuilt.
+- **Gate:** Close when the deployment core owns the centralized health/OTEL/secrets/rollback
+  primitives and the target registry, every landed target adapter satisfies the uniform 7-op
+  contract, and `F-DEPLOY-1`/`F-DEPLOY-2` are promoted from `reviewed` to `gated` in all three
+  surfaces (doctrine, harness archetype file, gate matrix).
