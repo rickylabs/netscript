@@ -7,14 +7,16 @@
  *   - `self --fake` — runs the full pipeline with the deterministic fake driver
  *                     and fixture test runner. No key, no service — a pipeline
  *                     proof, never a benchmark result.
- *   - `conformance` — key-free CI gate that replays a golden reference against
- *                     the frozen suite. Pending until Slice 1b lands the golden
- *                     reference; currently prints a documented skipped status.
+ *   - `conformance` — key-free CI gate that boots the committed golden reference
+ *                     and replays each task's frozen suite against it over HTTP
+ *                     (with a real restart that preserves KV data). Exits
+ *                     non-zero on any non-green suite.
  *
  * @module
  */
 
 import { Command } from '@cliffy/command';
+import { join } from '@std/path';
 import {
   ANCHORS,
   CAPS,
@@ -25,10 +27,15 @@ import {
 } from '../../bench.config.ts';
 import type { RunManifest } from '../domain/manifest.ts';
 import type { TaskAttemptResult } from '../domain/report.ts';
+import type { TestRunResult } from '../domain/test-run.ts';
 import { createBenchRunner } from '../application/runner/bench-runner.ts';
 import { buildRunSummary } from '../application/runner/summarize.ts';
 import { FakeAgentDriver, type ScriptedTurn } from '../adapters/agent/fake-driver.ts';
 import { fixtureResult, FixtureTestRunner } from '../adapters/test-runner/fixture-runner.ts';
+import { DenoHttpTestRunner, DynamicImportSuiteLoader } from '../adapters/test-runner/deno-http.ts';
+import { ReferenceServiceHarness } from '../adapters/test-runner/reference-harness.ts';
+import { FetchHttpClient } from '../adapters/http/fetch-http-client.ts';
+import { DenoCommandExecutor } from '../adapters/command/deno-command-executor.ts';
 import { LocalWorkspaceSandbox } from '../adapters/sandbox/local-workspace.ts';
 import { PricingTokenMeter } from '../adapters/token-meter/pricing-token-meter.ts';
 import { SystemClock } from '../adapters/clock/system-clock.ts';
@@ -119,23 +126,71 @@ function runLiveGuard(): never {
       'To exercise the pipeline now without an API key or a live service, run:',
       '    deno task cli self --fake',
       '',
-      'Live runs land in Slice 1b behind an ANTHROPIC_API_KEY gate.',
+      'Live runs are gated behind an ANTHROPIC_API_KEY once OQ2 is settled.',
     ].join('\n'),
   );
   Deno.exit(2);
 }
 
-function runConformance(): void {
-  console.log(
-    [
-      'bench conformance: SKIPPED (pending).',
-      '',
-      'Conformance replays a committed golden NetScript reference against each',
-      "task's frozen suite with no agent — a key-free CI gate. The golden",
-      'reference is authored in Slice 1b; until then this step is intentionally',
-      'a documented no-op and does not fail CI.',
-    ].join('\n'),
-  );
+/** Print a single task's per-probe conformance result. */
+function printConformance(taskId: string, result: TestRunResult): void {
+  console.log(`bench conformance — ${taskId}`);
+  for (const probe of result.probes) {
+    const mark = probe.verdict === 'pass' ? 'PASS' : probe.verdict === 'fail' ? 'FAIL' : 'SKIP';
+    const detail = probe.error !== undefined ? ` — ${probe.error}` : '';
+    console.log(`  [${mark}] ${probe.id} (${probe.durationMs.toFixed(1)}ms)${detail}`);
+  }
+  const pct = (result.passRate * 100).toFixed(0);
+  const verdict = result.green ? 'GREEN' : 'RED';
+  console.log(`  ${verdict}: ${result.passed}/${result.total} probes (${pct}%)`);
+}
+
+/**
+ * Key-free conformance gate: boot the committed golden reference and replay each
+ * task's frozen suite against it over HTTP (including a real process restart
+ * that preserves KV data). Exits non-zero if any suite is not fully green.
+ */
+async function runConformance(): Promise<void> {
+  let allGreen = true;
+
+  for (const task of TASKS) {
+    const entrypoint = join(task.dir, 'reference', 'netscript', 'main.ts');
+    const kvDir = await Deno.makeTempDir({ prefix: 'bench-conformance-' });
+    const kvPath = join(kvDir, 'store.kv');
+
+    const harness = new ReferenceServiceHarness({
+      executor: new DenoCommandExecutor(),
+      http: new FetchHttpClient(),
+      config: { entrypoint, kvPath },
+    });
+    const runner = new DenoHttpTestRunner({
+      loader: new DynamicImportSuiteLoader(),
+      harness,
+      http: new FetchHttpClient(),
+      clock: new SystemClock(),
+    });
+
+    try {
+      const result = await runner.run({
+        taskId: task.id,
+        workdir: task.dir,
+        suitePath: task.testSuitePath,
+        timeoutMs: 30_000,
+      });
+      printConformance(task.id, result);
+      if (!result.green) allGreen = false;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.error(`bench conformance — ${task.id}: ERROR ${message}`);
+      allGreen = false;
+    } finally {
+      await Deno.remove(kvDir, { recursive: true }).catch(() => {});
+    }
+  }
+
+  if (!allGreen) {
+    Deno.exit(1);
+  }
 }
 
 function createSelfCommand() {
@@ -153,8 +208,10 @@ function createSelfCommand() {
 
 function createConformanceCommand() {
   return new Command()
-    .description('Key-free conformance gate against the golden reference (pending Slice 1b).')
-    .action(() => runConformance());
+    .description('Key-free conformance gate: replay the golden reference against the frozen suite.')
+    .action(async () => {
+      await runConformance();
+    });
 }
 
 /** Build the CLI command tree. Bare invocation prints help. */
