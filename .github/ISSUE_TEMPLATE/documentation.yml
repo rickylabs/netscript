@@ -1,0 +1,35 @@
+name: Documentation issue
+description: Report missing, unclear, or incorrect documentation.
+title: "docs: "
+labels: ["documentation", "status:triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For the docs site, reference pages, README content, tutorials, or in-repo guides.
+  - type: textarea
+    id: location
+    attributes:
+      label: Location
+      description: URL or file path of the affected documentation.
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind of issue
+      options:
+        - Incorrect / outdated information
+        - Missing documentation
+        - Unclear / confusing
+        - Broken link or example
+        - Typo / formatting
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: What is wrong and what would make it correct?
+    validations:
+      required: true
