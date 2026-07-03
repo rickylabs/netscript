@@ -1,6 +1,6 @@
 {
   "name": "@netscript/cron",
-  "version": "0.0.1-alpha.19",
+  "version": "0.0.1-beta.1",
   "description": "Runtime-agnostic cron scheduling abstraction for Deno applications.",
   "license": "MIT",
   "exports": {

@@ -3551,10 +3551,10 @@
           "jsr:@cliffy/command@^1.0.0-rc.7",
           "jsr:@cliffy/prompt@1",
           "jsr:@david/dax@0.48",
-          "jsr:@netscript/aspire@0.0.1-alpha.19",
-          "jsr:@netscript/config@^0.0.1-alpha.19",
-          "jsr:@netscript/fresh-ui@^0.0.1-alpha.19",
-          "jsr:@netscript/plugin@0.0.1-alpha.19",
+          "jsr:@netscript/aspire@0.0.1-beta.1",
+          "jsr:@netscript/config@^0.0.1-beta.1",
+          "jsr:@netscript/fresh-ui@^0.0.1-beta.1",
+          "jsr:@netscript/plugin@0.0.1-beta.1",
           "jsr:@std/async@1",
           "jsr:@std/cli@1",
           "jsr:@std/collections@1",
@@ -3681,8 +3681,8 @@
       },
       "packages/plugin": {
         "dependencies": [
-          "jsr:@netscript/contracts@0.0.1-alpha.19",
-          "jsr:@netscript/service@0.0.1-alpha.19",
+          "jsr:@netscript/contracts@0.0.1-beta.1",
+          "jsr:@netscript/service@0.0.1-beta.1",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
           "jsr:@std/path@1",
@@ -3694,7 +3694,7 @@
       "packages/plugin-ai-core": {
         "dependencies": [
           "jsr:@netscript/ai@0.0.1-alpha.0",
-          "jsr:@netscript/plugin@0.0.1-alpha.19",
+          "jsr:@netscript/plugin@0.0.1-beta.1",
           "jsr:@zod/zod@4.4.3",
           "npm:@orpc/contract@^1.14.6",
           "npm:@orpc/server@^1.14.6"
@@ -3711,7 +3711,7 @@
       "packages/plugin-sagas-core": {
         "dependencies": [
           "jsr:@hono/hono@4.12.24",
-          "jsr:@netscript/kv@0.0.1-alpha.19",
+          "jsr:@netscript/kv@0.0.1-beta.1",
           "jsr:@std/assert@1",
           "jsr:@zod/zod@4.4.3"
         ],
@@ -3737,9 +3737,9 @@
       },
       "packages/plugin-triggers-core": {
         "dependencies": [
-          "jsr:@netscript/cron@0.0.1-alpha.19",
-          "jsr:@netscript/kv@0.0.1-alpha.19",
-          "jsr:@netscript/watchers@0.0.1-alpha.19",
+          "jsr:@netscript/cron@0.0.1-beta.1",
+          "jsr:@netscript/kv@0.0.1-beta.1",
+          "jsr:@netscript/watchers@0.0.1-beta.1",
           "jsr:@std/assert@1",
           "jsr:@zod/zod@4.4.3"
         ],
@@ -3753,8 +3753,8 @@
       "packages/plugin-workers-core": {
         "dependencies": [
           "jsr:@david/dax@0.48",
-          "jsr:@netscript/kv@0.0.1-alpha.19",
-          "jsr:@netscript/plugin@0.0.1-alpha.19",
+          "jsr:@netscript/kv@0.0.1-beta.1",
+          "jsr:@netscript/plugin@0.0.1-beta.1",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
           "jsr:@std/path@1",
@@ -3857,16 +3857,16 @@
       },
       "plugins/auth": {
         "dependencies": [
-          "jsr:@netscript/auth-better-auth@0.0.1-alpha.19",
-          "jsr:@netscript/auth-kv-oauth@0.0.1-alpha.19",
-          "jsr:@netscript/auth-workos@0.0.1-alpha.19",
-          "jsr:@netscript/contracts@0.0.1-alpha.19",
-          "jsr:@netscript/kv@0.0.1-alpha.19",
-          "jsr:@netscript/plugin-auth-core@0.0.1-alpha.19",
-          "jsr:@netscript/plugin-streams-core@0.0.1-alpha.19",
-          "jsr:@netscript/plugin@0.0.1-alpha.19",
-          "jsr:@netscript/service@0.0.1-alpha.19",
-          "jsr:@netscript/telemetry@0.0.1-alpha.19",
+          "jsr:@netscript/auth-better-auth@0.0.1-beta.1",
+          "jsr:@netscript/auth-kv-oauth@0.0.1-beta.1",
+          "jsr:@netscript/auth-workos@0.0.1-beta.1",
+          "jsr:@netscript/contracts@0.0.1-beta.1",
+          "jsr:@netscript/kv@0.0.1-beta.1",
+          "jsr:@netscript/plugin-auth-core@0.0.1-beta.1",
+          "jsr:@netscript/plugin-streams-core@0.0.1-beta.1",
+          "jsr:@netscript/plugin@0.0.1-beta.1",
+          "jsr:@netscript/service@0.0.1-beta.1",
+          "jsr:@netscript/telemetry@0.0.1-beta.1",
           "jsr:@zod/zod@4.4.3"
         ],
         "packageJson": {
@@ -3882,13 +3882,13 @@
       "plugins/sagas": {
         "dependencies": [
           "jsr:@hono/hono@4.12.24",
-          "jsr:@netscript/contracts@0.0.1-alpha.19",
-          "jsr:@netscript/kv@0.0.1-alpha.19",
-          "jsr:@netscript/plugin-sagas-core@0.0.1-alpha.19",
-          "jsr:@netscript/plugin-streams-core@0.0.1-alpha.19",
-          "jsr:@netscript/plugin@0.0.1-alpha.19",
-          "jsr:@netscript/service@0.0.1-alpha.19",
-          "jsr:@netscript/telemetry@0.0.1-alpha.19",
+          "jsr:@netscript/contracts@0.0.1-beta.1",
+          "jsr:@netscript/kv@0.0.1-beta.1",
+          "jsr:@netscript/plugin-sagas-core@0.0.1-beta.1",
+          "jsr:@netscript/plugin-streams-core@0.0.1-beta.1",
+          "jsr:@netscript/plugin@0.0.1-beta.1",
+          "jsr:@netscript/service@0.0.1-beta.1",
+          "jsr:@netscript/telemetry@0.0.1-beta.1",
           "jsr:@std/async@1",
           "jsr:@zod/zod@4.4.3"
         ],
@@ -3907,11 +3907,11 @@
       "plugins/streams": {
         "dependencies": [
           "jsr:@hono/hono@4.12.24",
-          "jsr:@netscript/aspire@0.0.1-alpha.19",
-          "jsr:@netscript/contracts@0.0.1-alpha.19",
-          "jsr:@netscript/plugin-streams-core@0.0.1-alpha.19",
-          "jsr:@netscript/plugin@0.0.1-alpha.19",
-          "jsr:@netscript/service@0.0.1-alpha.19",
+          "jsr:@netscript/aspire@0.0.1-beta.1",
+          "jsr:@netscript/contracts@0.0.1-beta.1",
+          "jsr:@netscript/plugin-streams-core@0.0.1-beta.1",
+          "jsr:@netscript/plugin@0.0.1-beta.1",
+          "jsr:@netscript/service@0.0.1-beta.1",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/net@1",
           "jsr:@zod/zod@4.4.3"
@@ -3927,14 +3927,14 @@
       "plugins/triggers": {
         "dependencies": [
           "jsr:@hono/hono@4.12.24",
-          "jsr:@netscript/contracts@0.0.1-alpha.19",
-          "jsr:@netscript/kv@0.0.1-alpha.19",
-          "jsr:@netscript/plugin-triggers-core@0.0.1-alpha.19",
-          "jsr:@netscript/plugin-workers-core@0.0.1-alpha.19",
-          "jsr:@netscript/plugin@0.0.1-alpha.19",
-          "jsr:@netscript/queue@0.0.1-alpha.19",
-          "jsr:@netscript/service@0.0.1-alpha.19",
-          "jsr:@netscript/telemetry@0.0.1-alpha.19",
+          "jsr:@netscript/contracts@0.0.1-beta.1",
+          "jsr:@netscript/kv@0.0.1-beta.1",
+          "jsr:@netscript/plugin-triggers-core@0.0.1-beta.1",
+          "jsr:@netscript/plugin-workers-core@0.0.1-beta.1",
+          "jsr:@netscript/plugin@0.0.1-beta.1",
+          "jsr:@netscript/queue@0.0.1-beta.1",
+          "jsr:@netscript/service@0.0.1-beta.1",
+          "jsr:@netscript/telemetry@0.0.1-beta.1",
           "jsr:@std/assert@1",
           "jsr:@std/path@1",
           "jsr:@zod/zod@4.4.3"
@@ -3950,15 +3950,15 @@
       "plugins/workers": {
         "dependencies": [
           "jsr:@hono/hono@4.12.24",
-          "jsr:@netscript/contracts@0.0.1-alpha.19",
-          "jsr:@netscript/cron@0.0.1-alpha.19",
-          "jsr:@netscript/kv@0.0.1-alpha.19",
-          "jsr:@netscript/plugin-streams-core@0.0.1-alpha.19",
-          "jsr:@netscript/plugin-workers-core@0.0.1-alpha.19",
-          "jsr:@netscript/plugin@0.0.1-alpha.19",
-          "jsr:@netscript/queue@0.0.1-alpha.19",
-          "jsr:@netscript/service@0.0.1-alpha.19",
-          "jsr:@netscript/telemetry@0.0.1-alpha.19",
+          "jsr:@netscript/contracts@0.0.1-beta.1",
+          "jsr:@netscript/cron@0.0.1-beta.1",
+          "jsr:@netscript/kv@0.0.1-beta.1",
+          "jsr:@netscript/plugin-streams-core@0.0.1-beta.1",
+          "jsr:@netscript/plugin-workers-core@0.0.1-beta.1",
+          "jsr:@netscript/plugin@0.0.1-beta.1",
+          "jsr:@netscript/queue@0.0.1-beta.1",
+          "jsr:@netscript/service@0.0.1-beta.1",
+          "jsr:@netscript/telemetry@0.0.1-beta.1",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/async@1",
           "jsr:@std/path@1",
