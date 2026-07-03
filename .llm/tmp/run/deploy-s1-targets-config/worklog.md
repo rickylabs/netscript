@@ -84,3 +84,13 @@
 - `deno doc --lint mod.ts src/public/mod.ts src/merge/mod.ts`: 1 error — pre-existing missing-JSDoc
   on `PathsConfigSchema` (`paths-schema.ts`, untouched by this slice); my new exports
   (`DeployTargetBaseSchema`, `WindowsDeployTargetSchema`) are documented and NOT flagged.
+
+### CS-3 — CLI resolver re-key + comment-prose fixes
+- `resolveWindowsDeploy` now reads `userDeploy?.targets?.windows` (was `userDeploy?.windows`);
+  resolver `denoBaseImage` fallback also re-pinned `2.5`→`2` for consistency with L-3 (schema default
+  moved; leaving the resolver fallback on 2.5 would be a dead pin). `ResolvedWindowsDeployConfig`
+  kept windows-shaped (L-4). Comment-prose accuracy fixes in `deploy-config-background.ts`,
+  `constants/windows.ts` (×2), `adapters/windows/compile/compile-config.ts`, and
+  `kernel/domain/resolved-config.ts` (`deploy.windows` → `deploy.targets.windows`).
+- `run-deno-check.ts --cwd <wt> --root .../features/deploy --root .../kernel/adapters/config`:
+  **PASS** (34 files, 0 errors).

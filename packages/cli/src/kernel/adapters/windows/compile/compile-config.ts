@@ -45,7 +45,7 @@ function stringifyCompileConfig(
  * constant if deno.json cannot be read.
  *
  * @param projectRoot    Absolute path to the project root
- * @param workspaceOverride  Optional explicit workspace array (from config.deploy.workspace)
+ * @param workspaceOverride  Optional explicit workspace array (from config.deploy.targets.windows.workspace)
  * @param bundleExternalImports  npm specifier rewrites for externalized packages
  */
 export async function buildCompileConfig(

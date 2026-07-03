@@ -2,8 +2,9 @@
  * @module windows
  * Windows-specific defaults for the NetScript CLI.
  *
- * All values here are DEFAULTS — they can be overridden via the `deploy.windows`
- * section in netscript.config.ts, which is resolved into ResolvedConfig.deploy.
+ * All values here are DEFAULTS — they can be overridden via the
+ * `deploy.targets.windows` section in netscript.config.ts, which is resolved
+ * into ResolvedConfig.deploy.
  */
 
 /**
@@ -173,7 +174,7 @@ export const DEFAULT_BUNDLE_EXTERNAL_IMPORTS: Record<string, string> = {
  * binaries to balloon from ~97 MB to ~880 MB.
  *
  * Workspace members are injected at build time from the discovered Deno
- * workspace (or an explicit deploy.windows.workspace override).
+ * workspace (or an explicit deploy.targets.windows.workspace override).
  */
 export const COMPILE_CONFIG: { readonly content: string } = {
   /**
