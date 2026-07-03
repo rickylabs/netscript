@@ -94,3 +94,20 @@
   `kernel/domain/resolved-config.ts` (`deploy.windows` → `deploy.targets.windows`).
 - `run-deno-check.ts --cwd <wt> --root .../features/deploy --root .../kernel/adapters/config`:
   **PASS** (34 files, 0 errors).
+
+### CS-4 — schema/merge tests + docs migration note
+- The config schema is intentionally lenient: `NetScriptConfigSchema` is `.passthrough()` at the top
+  and inner `z.object`s STRIP unknown keys (Zod default). So the old `deploy.windows` shape and
+  unknown target keys are **dropped, not parse-rejected**. `.strict()` was deliberately NOT added —
+  it would be a new invariant outside the plan/locked decisions and would complicate #339+ extending
+  the shared base. Tests assert the truthful clean-break drop-semantics instead of `assertThrows`.
+- Added 3 schema tests (`netscript_config_test.ts`): accepts `deploy.targets.windows`; legacy
+  `deploy.windows` shape yields `config.deploy.targets === undefined`; unknown `targets.linux` key is
+  dropped (only `windows` remains). Added 1 merge test (`merge_test.ts`): a deploy fragment replaces
+  the whole `targets` map (coarser one-level spread granularity) without mutating base.
+- `deploy_test.ts` needed no mock re-key: its `loadConfig` mock returns `{ app: { name: 'alpha' } }`
+  with no `deploy.windows` block (verified).
+- One-line docs migration note added to `docs/site/how-to/deploy.md` intro callout
+  (`deploy.windows` → `deploy.targets.windows`); full rewrite remains #344.
+- `deno test tests/schema/netscript_config_test.ts tests/merge/merge_test.ts`: **PASS**
+  (9 passed | 0 failed).

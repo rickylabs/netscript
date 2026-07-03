@@ -27,6 +27,8 @@ the Aspire AppHost (<code>aspire/apphost.mts</code>) for local orchestration.
 compose file, or cloud deploy target. <code>netscript.config.ts</code> ships an empty
 <code>deploy: {}</code> block. You assemble the production target yourself from the primitives
 below — every one of which is a verified fact you can copy verbatim.
+<br><strong>Migration (#337):</strong> Windows deploy settings now live under
+<code>deploy.targets.windows</code> (previously <code>deploy.windows</code>).
 {{ /comp }}
 
 ## Before you start
