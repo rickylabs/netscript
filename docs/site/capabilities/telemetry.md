@@ -13,7 +13,7 @@ runtime is wired for **OpenTelemetry** — services serve their RPC handlers wit
 trace-context propagation, the worker runtime wraps job dispatch, execution, scheduling,
 subprocess hand-off, and task execution in real OTel spans, and structured logs flow through
 the framework `logger`. The viewing surface is the **Aspire dashboard at
-`http://localhost:18888`**, which collects OTLP traces, metrics, and structured logs from
+`https://localhost:18888`**, which collects OTLP traces, metrics, and structured logs from
 every resource in the app graph (services, plugin APIs, background processors) the moment you
 run `aspire start`. You do not stand up Jaeger, Grafana, or a log shipper to get started — the
 AppHost provisions the OTLP collector and the dashboard for you.
@@ -35,7 +35,7 @@ The dashboard, the OTLP collector, and the per-resource trace/log views all come
 orchestrator — they are not separate processes you start by hand. Run
 <code>cd aspire &amp;&amp; aspire start</code> <strong>before</strong> any <code>netscript db</code>
 command (Aspire provisions Postgres and Redis first), then open the dashboard URL printed in
-the console (<code>http://localhost:18888</code>, with a one-time auth token). Until Aspire is
+the console (<code>https://localhost:18888</code>, with a one-time auth token). Until Aspire is
 running there is no <code>:18888</code> surface to view traces or logs on. See
 <a href="/how-to/database-migration/">Database &amp; migration</a> for the full startup order.
 {{ /comp }}
@@ -98,7 +98,7 @@ spans *inside* a job handler — and even there the `@netscript/telemetry` helpe
   },
   {
     title: "OTLP → Aspire dashboard",
-    body: "The generated AppHost configures an OTLP endpoint (http://localhost:4318) and the Aspire dashboard (http://localhost:18888) so traces, metrics, and logs from every resource land in one place — no collector to deploy.",
+    body: "The generated AppHost configures an OTLP endpoint (http://localhost:4318) and the Aspire dashboard (https://localhost:18888) so traces, metrics, and logs from every resource land in one place — no collector to deploy.",
     icon: "◎"
   },
   {
@@ -332,7 +332,7 @@ by Aspire. These are the real addresses you interact with, validated by the CLI 
 {{ comp.apiTable({
   caption: "Observability surfaces (link to /reference/telemetry/ and /reference/logger/ for the generated APIs)",
   rows: [
-    { name: "http://localhost:18888", type: "dashboard", desc: "Aspire dashboard — traces, structured logs, metrics, and resource state for the whole app graph. Auth token printed by `aspire start`." },
+    { name: "https://localhost:18888", type: "dashboard", desc: "Aspire dashboard — traces, structured logs, metrics, and resource state for the whole app graph. Auth token printed by `aspire start`." },
     { name: "http://localhost:4318", type: "OTLP/HTTP", desc: "OTLP ingest endpoint the AppHost configures (aspire.config.json https profile). Runtimes export spans and logs here; the dashboard reads them back. This is the seam you point at a hosted backend." },
     { name: "GET :8091/health", type: "liveness", desc: "Workers API health probe — reported as resource health in the dashboard." },
     { name: "GET :8092/health/live", type: "liveness", desc: "Sagas API liveness route." },
@@ -343,11 +343,11 @@ by Aspire. These are the real addresses you interact with, validated by the CLI 
 
 ## View it in Aspire
 
-With `aspire start` up, the dashboard at `http://localhost:18888` gives you four views over the
+With `aspire start` up, the dashboard at `https://localhost:18888` gives you four views over the
 same telemetry stream — there is no separate tool to configure.
 
 {{ comp.apiTable({
-  caption: "Aspire dashboard views (http://localhost:18888)",
+  caption: "Aspire dashboard views (https://localhost:18888)",
   rows: [
     { name: "Resources", type: "graph", desc: "Live state of every app-graph resource: postgres, redis, workers-api, workers, sagas-api, sagas, triggers-api, triggers, auth-api. Health probes drive the status colour." },
     { name: "Console logs", type: "stream", desc: "Per-resource stdout/stderr — the framework logger's text/JSON output lands here in real time." },

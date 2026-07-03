@@ -22,7 +22,7 @@ and reference that go deeper.
 {{ comp callout { tone: "info", title: "One prerequisite spans almost every recipe" } }}
 Anything that touches Postgres, Redis/Garnet, or a plugin service expects Aspire
 to be running first. From your workspace: <code>cd aspire &amp;&amp; aspire start</code>
-brings up the dependencies and the dashboard on <a href="http://localhost:18888"><code>http://localhost:18888</code></a>
+brings up the dependencies and the dashboard on <a href="https://localhost:18888"><code>https://localhost:18888</code></a>
 <strong>before</strong> any <code>netscript db</code> command or service call. The
 recipes call this out where it matters, but it is the single most common missing
 step.

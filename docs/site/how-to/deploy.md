@@ -196,7 +196,7 @@ This is the real fork in the road. Pick based on whether your target understands
   {
     label: "Keep Aspire",
     lang: "bash",
-    code: "# The AppHost is a TypeScript/Node project under aspire/ (apphost.mts).\n# Locally it provisions Postgres + Redis and wires every process.\ncd aspire\naspire restore   # one-time: restore the TS AppHost SDK\naspire start       # boots the full graph; dashboard at http://localhost:18888\n\n# Aspire 13.x can also publish a deployment manifest from the same AppHost\n# (e.g. `aspire publish`). The scaffold wires the AppHost graph; it does NOT\n# pre-select a cloud target for you — you point publish at your platform."
+    code: "# The AppHost is a TypeScript/Node project under aspire/ (apphost.mts).\n# Locally it provisions Postgres + Redis and wires every process.\ncd aspire\naspire restore   # one-time: restore the TS AppHost SDK\naspire start       # boots the full graph; dashboard at https://localhost:18888\n\n# Aspire 13.x can also publish a deployment manifest from the same AppHost\n# (e.g. `aspire publish`). The scaffold wires the AppHost graph; it does NOT\n# pre-select a cloud target for you — you point publish at your platform."
   },
   {
     label: "Drop Aspire (--no-aspire)",
@@ -274,7 +274,7 @@ production host):
   { name: "POST /api/v1/webhooks/inbound/generic", type: ":8093", desc: "Inbound webhook → enqueues the workers health-check job (end-to-end proof)." },
   { name: "GET /api/v1/events?limit=10", type: ":8093", desc: "Recent trigger events." },
   { name: "GET /api/v1/auth/session", type: ":8094", desc: "Auth session probe (only if the auth plugin is installed)." },
-  { name: "(dashboard)", type: "http://localhost:18888", desc: "Aspire dashboard: every resource, health, logs, distributed traces (Aspire path only)." }
+  { name: "(dashboard)", type: "https://localhost:18888", desc: "Aspire dashboard: every resource, health, logs, distributed traces (Aspire path only)." }
 ] }) }}
 
 ```bash

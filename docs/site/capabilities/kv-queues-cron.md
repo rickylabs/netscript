@@ -120,7 +120,7 @@ transactional database as your domain data.
 Auto-detection upgrades to Redis/Garnet and RabbitMQ only when those resources are
 <strong>running</strong>. Bring orchestration up first:
 <code>cd aspire &amp;&amp; aspire start</code> provisions Postgres, Redis, and any message broker
-(dashboard at <a href="http://localhost:18888">http://localhost:18888</a>)
+(dashboard at <a href="https://localhost:18888">https://localhost:18888</a>)
 <strong>before</strong> any <code>netscript db</code> command or service that expects those
 backends. Without Aspire, KV falls back to local Deno KV, the queue falls back to Deno KV, and
 cron falls back to the in-memory adapter — your code is identical either way. See

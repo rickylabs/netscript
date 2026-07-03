@@ -30,7 +30,7 @@ If your plugin contributes an API service or a background processor, those run a
 Aspire graph alongside Postgres and Redis. Bring orchestration up <strong>before</strong> you run
 any <code>netscript db</code> command or exercise your plugin's endpoints: from the project root,
 <code>cd aspire &amp;&amp; aspire start</code> (dashboard at
-<a href="http://localhost:18888">http://localhost:18888</a>). DB commands require aspire startning
+<a href="https://localhost:18888">https://localhost:18888</a>). DB commands require aspire startning
 first. See <a href="/explanation/aspire/">the Aspire explanation</a> for the resource graph.
 {{ /comp }}
 
@@ -314,7 +314,7 @@ curl -X POST http://localhost:8095/api/v1/notifier/jobs/send-notification/trigge
 
 You should see the contribution registered in the jobs list and an execution recorded after you
 trigger it. Watch it live in the Aspire dashboard at
-[http://localhost:18888](http://localhost:18888) under your plugin's resource.
+[https://localhost:18888](https://localhost:18888) under your plugin's resource.
 
 ## A real multi-package exemplar: the auth plugin
 

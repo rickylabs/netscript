@@ -154,7 +154,7 @@ aspire start       # starts the AppHost and every declared resource
 + processor together, then prints a URL and a one-time login token for the **Aspire dashboard**:
 
 ```
-http://localhost:18888
+https://localhost:18888
 ```
 
 The dashboard's **Resources** tab is the authority for which port each resource bound — the
