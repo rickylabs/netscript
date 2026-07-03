@@ -23,6 +23,8 @@ export type ToolHandler = (call: ToolCall) => Promise<ToolResult> | ToolResult;
 export interface ToolRegistryPort {
   /** Register a tool descriptor and optional handler. */
   register(tool: ToolDescriptor, handler?: ToolHandler): void;
+  /** Remove a registered tool by name, if present. */
+  unregister(name: string): void;
   /** Whether a tool with this name is registered. */
   has(name: string): boolean;
   /** Resolve a tool descriptor by name, if present. */
@@ -41,6 +43,7 @@ export interface ToolRegistryPort {
 export function createNoopToolRegistry(): ToolRegistryPort {
   return {
     register(): void {},
+    unregister(): void {},
     has(): boolean {
       return false;
     },

@@ -68,6 +68,9 @@ export function createToolRegistry(
     register(tool: ToolDescriptor, handler?: ToolHandler): void {
       entries.set(tool.name, { descriptor: tool, ...(handler ? { handler } : {}) });
     },
+    unregister(name: string): void {
+      entries.delete(name);
+    },
     define(definition: AiToolDefinition): void {
       entries.set(definition.descriptor.name, {
         descriptor: definition.descriptor,
