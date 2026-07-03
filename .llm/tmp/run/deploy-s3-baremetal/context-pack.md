@@ -30,5 +30,18 @@ secrets) is out of scope.**
 
 ## Next action
 
-Run PLAN-EVAL (separate session). On PASS, implement via WSL Codex daemon-attached slices in the
-S0→S10 order in `plan.md` §Commit-Slice List.
+Re-run PLAN-EVAL (separate session) on the revised plan. On PASS, implement in the **S0→S11** order
+in `plan.md` §Commit-Slice List, where **S0 = the front-loaded pure port-contract expansion (rebase
+point for #342/#343)**.
+
+**Dispatch lane (port-ownership §correction):** implementers = **Opus 4.8 sub-agents** (WSL Codex is
+dropped for the deployment epic); evaluators = separate Opus session. Do **not** follow the generic
+"WSL Codex / OpenHands-minimax" lane.
+
+## PLAN-EVAL history
+
+- v1 (commit `94c332e3`): **FAIL_PLAN** — B1 (port-contract expansion bundled in old S7, not
+  front-loaded). Non-blocking N1–N4.
+- v2 (this revision): B1 fixed (S0 carved out + front-loaded); N1 (port is internal, no exports
+  diff), N2 (S2 renames all importers in one commit), N3 (F-1 is 500/800 → 312-L `upgrade` fine, no
+  extraction), N4 (dispatch lane = Opus 4.8) all folded in. Awaiting re-eval.

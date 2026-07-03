@@ -38,27 +38,28 @@ consumes this slice.
 | 5  | `deno compile` build machinery already exists but is **Windows-shaped**: `build-windows-strategy.ts` (301 L), `compile-runner.ts` (292 L), `compile-bundler.ts`, `CompileTarget` (`type`, `entrypoint`, `permissions`, `include[]`, `compileTarget` triple), `CompileResult`/`BuildResult`. Config default triple is `x86_64-pc-windows-msvc`; `.exe` output assumed. #340 generalizes triple selection (5 cross-compile triples), `--include`/`--include-as-is` asset embedding, denort, and retires the dead `deno:2.5` pin + unused compile-config fragments. | `public/features/deploy/build/build-windows-strategy.ts`; `kernel/adapters/windows/compile/compile-runner.ts`; `kernel/domain/deploy/compile-target.ts`; `deploy-schema.ts` `compileTarget` default |
 | 6  | Existing `deploy` CLI command surface (thin router candidate): `build`, `package-cli`, `copy`, `install`, `start`, `stop`, `status`, `logs`, `uninstall`, `upgrade` — wired in `deploy-group.ts`; deps constructed in `public-command-dependencies.ts` (`windowsServices`, `manifestPort`). Live commands call `WindowsServicePort`/manifest, **not** the stub `DeployTargetPort`. So the 7-op ops are *already partly implemented* as commands; this slice re-seats them behind the OS-agnostic port. | `public/features/deploy/deploy-group.ts`; `public/features/root/public-command-dependencies.ts`; `public/features/deploy/install/install-service-deploy.ts` |
 | 7  | **7-op coverage for the bare-metal target after this slice** (subset): `plan`/`emit` = deno compile artifact (**#340, in scope**); `up` = OsServicePort install+enable+start (**#339, in scope**); `down` = OsServicePort stop+disable+uninstall (**#339**); `status` = OsServicePort status (**#339**); `logs` = servy logs / `journalctl` (**#339**); `rollback` = **DEFERRED → #341** (declared-unsupported subset this slice); `secrets` = **DEFERRED → #341** (basic env-file secrets are S5). | epic #341 acceptance criteria; ARCHETYPE-7 subset rule |
-| 8  | File-size headroom is tight on the files this slice touches: `upgrade-deploy-command.ts` 312 L, `build-windows-strategy.ts` 301 L, `compile-runner.ts` 292 L. Generalization must **extract**, not grow these past the F-1 ceiling. | `wc -l` over `packages/cli/src/**/*deploy*|*compile*` |
+| 8  | Largest touched files: `upgrade-deploy-command.ts` 312 L, `build-windows-strategy.ts` 301 L, `compile-runner.ts` 292 L. **F-1 flags >500 / fails >800** (`09-anti-patterns…` §F-1) — all are well under, so F-1 is low-risk; the ~300 "two screenfuls" figure is a soft guideline. Extraction is hygiene, not gate-forced; the `upgrade` import-rename needs no extraction. | `wc -l`; `docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md` §F-1 |
 | 9  | Config member for Linux must **spread** `deployTargetBaseShape` (as `WindowsDeployTargetSchema` does) and add only systemd-specific fields (`systemctlPath`, `unitPrefix`, `installBase`, `user`/`group`, `runtimeDir`), plus the matching `LinuxDeployTarget` type in `config-section-types.ts` — no per-target base-class hierarchy (R-DEPLOY-4 / A5). | `deploy-schema.ts` `WindowsDeployTargetSchema` pattern; `config-section-types.ts` `WindowsDeployTarget` |
 | 10 | Deploy today stays **inside `packages/cli`** (Archetype 6 host); the `deploy-core` package extraction is an explicitly *later* wave. So `OsServicePort` + adapters + the bare-metal target adapters are **package-owned within `packages/cli`** for this slice — do not extract a new package. | `06-archetypes.md` L302-308, L353 |
 
 ## jsr-audit surface scan (package wave — `@netscript/cli`)
 
-- **Surface scanned:** `@netscript/cli` public exports (`packages/cli/deno.json` exports map;
-  `public/public-api.ts`, `public/ports/*`, `public/adapters/*`). This slice adds/renames public
-  port + adapter types (`OsServicePort`, `OsServiceCommandResult`, systemd/servy adapters) and a
-  config type (`LinuxDeployTarget`).
-- **Slow-type / surface risks to name before slicing:**
-  - Renaming/generalizing `WindowsServicePort` → `OsServicePort` is a **public-surface change** to
-    `@netscript/cli`. Must keep every exported type explicitly annotated (no inferred slow types),
-    keep `@module` JSDoc, and update the `deno.json` exports + `public-api.ts` barrel. Run
-    `deno doc --lint` / F-6 publishability on the changed surface.
-  - Decide whether `WindowsServicePort` stays as a deprecated re-export or is a **clean break**
-    (D5-consistent: repo is alpha, clean breaks allowed). See Open Decisions.
-  - New `@netscript/config` type `LinuxDeployTarget` extends `DeployTargetBase` — verify it renders
-    in `deno doc` and does not introduce a slow type.
-- Not N/A — this is a package wave touching two package public surfaces (`@netscript/cli`,
-  `@netscript/config`).
+- **Surface scanned:** `@netscript/cli` exports map (`packages/cli/deno.json` = `.` /
+  `./scaffolding` / `./testing` only) + `public/public-api.ts` barrel; `@netscript/config` public
+  exports.
+- **Correction (PLAN-EVAL N1):** `WindowsServicePort`/`OsServicePort` are **NOT on the published
+  `@netscript/cli` surface** — the port lives under the `public/` folder convention but is **absent
+  from the `deno.json` exports and the `public-api.ts` barrel**. The rename is therefore an
+  **internal-consumer update, not a JSR-surface event**; there is **no `deno.json` exports diff** for
+  the port. Do not fabricate one.
+- **Genuine published-surface change:** the `@netscript/config` `LinuxDeployTarget` type (added in
+  S1), which is re-exported via `packages/config/src/public/mod.ts` and must carry an explicit
+  `z.ZodType<LinuxDeployTarget>` annotation (mirroring `WindowsDeployTargetSchema`) so `deno doc`
+  renders it and no slow type is introduced.
+- **Build-green risk (N2):** the `WindowsServicePort → OsServicePort` rename must update all ~4-6
+  in-repo importers in the same commit or the build breaks mid-slice.
+- `deno doc --lint` (F-6) still runs on both packages, scoped to what actually publishes.
+- Not N/A — a package wave; `@netscript/config` publishes a new type.
 
 ## Open questions (carried into the plan's Open-Decision Sweep)
 

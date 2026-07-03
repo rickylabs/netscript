@@ -18,6 +18,25 @@
 - **Base:** `origin/main` @ `bf0113df`. Worktree `.claude/worktrees/deploy-s3`, branch
   `feat/deploy-s3-baremetal`.
 
+## PLAN-EVAL cycle
+
+- **v1** (commit `94c332e3`): **FAIL_PLAN**. Blocking **B1** — the `DeployTargetPort` 3-op→7-op
+  contract expansion was bundled in the last substantive slice (old S7), not front-loaded, which
+  would serialize the sibling cloud adapters #342/#343 behind the whole bare-metal slice. Non-blocking
+  N1–N4 (internal-not-published port; importer-rename-in-one-commit; F-1 headroom; Opus dispatch lane).
+- **v2** (this revision): applied surgically —
+  - **B1:** carved the pure type-level port-contract expansion into a new **S0** (first slice,
+    independently mergeable, the **rebase point for #342/#343**); bare-metal realization stays late
+    (S8). Slices renumbered S0→S11; LD-9 + merge-order added.
+  - **N1:** corrected `WindowsServicePort` framing to internal (not on `@netscript/cli` JSR exports);
+    no fabricated `deno.json` exports diff; genuine published change = `@netscript/config`
+    `LinuxDeployTarget`.
+  - **N2:** S2 renames all in-repo importers in the same commit (listed in the slice).
+  - **N3:** F-1 is flag >500 / fail >800 → `upgrade-deploy-command.ts` (312) is comfortably under;
+    import-rename only, no extraction; fixed the stale "342" figures.
+  - **N4:** dispatch lane corrected to Opus 4.8 sub-agents (WSL Codex dropped for this epic).
+  - Awaiting re-run of PLAN-EVAL.
+
 ## Gate results
 
 - Not run (planning-only). Validation Plan in `plan.md` executes during implementation slices.

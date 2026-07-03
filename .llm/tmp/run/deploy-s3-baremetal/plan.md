@@ -103,11 +103,18 @@ Deliver the first bare-metal deploy-target adapter pair behind one uniform seam:
   uninstall use `WindowsServicePort`. Generalization must route *all five* lifecycle ops through
   `OsServicePort` or the Windows/Linux behaviours will diverge. Keep the health-poll wait in the
   command layer, not the port.
-- **File-size ceiling (F-1).** `upgrade-deploy-command.ts` (342 L), `build-windows-strategy.ts`
-  (301 L), `compile-runner.ts` (292 L) are at/over the lint ceiling *before* edits. Generalization
-  must **extract**, not grow, these files.
-- **Public-surface + barrel churn.** Renaming the exported `WindowsServicePort` touches
-  `public-api.ts`, `deno.json` exports, and every consumer; must re-pass `deno doc --lint` (F-6).
+- **File-size (F-1) — comfortable headroom.** The gate **flags >500 LOC and fails >800**
+  (`09-anti-patterns…` §F-1). The largest files this slice touches — `upgrade-deploy-command.ts`
+  (**312**, import-rename only), `build-windows-strategy.ts` (301), `compile-runner.ts` (292) — are
+  all well under the 500 flag. The ~300-line "two screenfuls" figure is a **soft guideline**, not
+  the gate. Extraction in S6/S7 is hygiene against that guideline, **not** an F-1 requirement, and
+  the `upgrade` import-rename needs **no extraction** (N3).
+- **Internal rename, not a JSR event (N1).** `WindowsServicePort` is **not** on the published
+  `@netscript/cli` surface (exports = `.`/`./scaffolding`/`./testing`; absent from the `public-api.ts`
+  barrel). The rename is an **internal-consumer update** — no `deno.json` exports diff for the port.
+  All ~4-6 in-repo importers must be renamed in the **same commit** (S2) to stay green. The genuine
+  published-surface change is the `@netscript/config` `LinuxDeployTarget` type (S1). `deno doc --lint`
+  (F-6) still runs on both packages, scoped to what actually publishes.
 - **Windows-only constants** in `kernel/constants/windows.ts` (servy path, `NetScript.*` naming,
   startup-type/priority enums, V8 `--single-threaded`/`--no-sparkplug`) need OS-neutral
   counterparts or a Linux constants sibling.
@@ -126,6 +133,7 @@ Deliver the first bare-metal deploy-target adapter pair behind one uniform seam:
 | LD-6 | Bare-metal deploy code stays **inside `packages/cli`**; no `deploy-core` extraction. | Doctrine defers extraction to a later wave; premature extraction would balloon this slice and risk the epic critical path. |
 | LD-7 | `OsServicePort` adapter is resolved by **host OS** (`Deno.build.os`), overridable by explicit config target; Windows resolves to `ServyOsServiceAdapter` with byte-identical servy invocations. | Epic #339 acceptance: "routes by host OS; Windows behaviour unchanged." |
 | LD-8 | Move `kernel/adapters/windows/compile/*` → OS-neutral `kernel/adapters/deploy/compile/*`; keep servy-specific emit under a `windows/` sibling and add `linux/systemd/*`. | Compile is already cross-platform (deno compile); only the *service-config emit* is OS-specific. Keeps one-adapter-per-file + F-3 layering. |
+| LD-9 | **Front-load the port-contract expansion (S0)** as a pure type-level, independently-mergeable commit — the **rebase point for #342/#343**. Bare-metal *realization* (S8) stays late. | Ratifies `port-ownership.md` §3: #339/#340 OWNS the port contract; siblings CONSUME it and must not be serialized behind the bare-metal slice. Merge order: #357 → S0 port-expansion → siblings rebase. |
 
 ## Open-Decision Sweep
 
@@ -133,7 +141,8 @@ Deliver the first bare-metal deploy-target adapter pair behind one uniform seam:
 | -------- | ------ | ----- |
 | Verb-vocabulary lock (port op names) | **resolved now** → LD-3 | Would force rework in #342/#341 if deferred; resolved within supervisor authority (reconciliation §3 delegates it here). Reversible. |
 | `WindowsServicePort` fate (rename vs shim) | **resolved now** → LD-2 | Public-surface-defining; deferring forces a later break. Covered by the standing D5 clean-break grant. |
-| Whether to rewire live commands through the target-adapter layer | **resolved now** → LD-1 | Scope-defining. Chosen: commands keep their names + orchestration but resolve lifecycle via `OsServicePort`; the target adapters wrap the same primitives for registry/router conformance. Avoids touching the 342-L upgrade orchestration. |
+| Whether to rewire live commands through the target-adapter layer | **resolved now** → LD-1 | Scope-defining. Chosen: commands keep their names + orchestration but resolve lifecycle via `OsServicePort`; the target adapters wrap the same primitives for registry/router conformance. Avoids touching the 312-L upgrade orchestration. |
+| Port-contract expansion commit ordering (front-load vs bundled) | **resolved now** → LD-9 | PLAN-EVAL B1: bundling it in S8 would serialize #342/#343 behind the bare-metal slice. Carved out as S0, first + independently mergeable. |
 | systemd `rollback`/health-gate seam | **safe to defer bodies** → LD-4 | Op *surface* declared now (optional); bodies are #341. No rework: #341 fills methods without a contract change. |
 | PR #357 (doctrine + F-DEPLOY gates) not yet on `main` | **resolved now (sequencing)** | See Dependencies: land/coordinate after #357 so gates + Archetype-7 file are on `main`; the contract is already frozen, so design does not block on it. |
 | Cross-triple smoke depth | **safe to defer** | Smoke validates compile command/config for the target triple; live Linux execution is a manual/out-of-CI step (documented). |
@@ -158,9 +167,9 @@ Deliver the first bare-metal deploy-target adapter pair behind one uniform seam:
 
 | Risk | Mitigation |
 | ---- | ---------- |
-| Renaming `WindowsServicePort` breaks the `@netscript/cli` public surface / consumers. | Clean break in one slice (S1); update `public-api.ts` + `deno.json` exports + all consumers; re-run `deno doc --lint` (F-6) and check. |
+| Renaming `WindowsServicePort` breaks in-repo consumers mid-slice (build red). | N2: rename **all** importers in the same S2 commit (`install-service-deploy.ts`, `uninstall-service-deploy.ts`, `public-command-dependencies.ts`, `deploy_test.ts`, + start/stop/status once S3 folds `runServy`); `deno check` must be green at S2 close. It is an **internal** rename (N1) — no JSR exports diff. |
 | Unifying the two Windows call paths (port vs `runServy` helper) subtly changes start/stop/status. | Keep health-poll wait in the command layer; adapter only wraps the *identical* `servy-cli` args; add a servy-path regression test asserting arg strings unchanged. |
-| File-size lint (F-1) trips on already-large files (`upgrade` 342, `build-windows-strategy` 301, `compile-runner` 292). | Dedicated extraction in S5/S6; verify each edited file stays under the ceiling via `run-deno-lint.ts` before committing the slice. |
+| File-size lint (F-1). | Low risk: F-1 flags >500 / fails >800; all touched files ≤ 312. Extraction (S6/S7) is optional hygiene for the ~300 soft guideline; verify via `run-deno-lint.ts` per slice regardless. |
 | systemd/`systemctl` unavailable (or needs root) in CI. | Adapter tests validate **unit rendering + `systemctl` arg construction**, not live activation; live systemd is a documented manual/out-of-CI verification. |
 | Cross-compiling a Linux binary on a Windows host can't be run to prove it works. | Smoke asserts the compile command/config is well-formed for the target triple; artifact execution documented as target-host manual step. |
 | PR #357 not merged → `F-DEPLOY-*` gates + Archetype-7 file absent on `main`; IMPL-EVAL can't cite them. | Sequence this slice to land after/with #357; report F-DEPLOY-1/2 as `reviewed` with manual evidence (the 7-op mapping table) until promoted. |
@@ -181,12 +190,12 @@ Deliver the first bare-metal deploy-target adapter pair behind one uniform seam:
 
 | Gate | Required | Expected evidence |
 | ---- | -------- | ----------------- |
-| F-1 File-size lint | yes | `run-deno-lint.ts` over touched files; extractions keep all under ceiling. |
+| F-1 File-size lint | yes | Flags >500 / fails >800; all touched files ≤ 312 → comfortably passing. `run-deno-lint.ts` over touched files each slice. |
 | F-2 Helper-reinvention | yes | Reuse `ProcessPort`, `@std/path`, existing compile/manifest helpers; no re-rolled service mgmt. |
 | F-3 Layering | yes | ports ← adapters ← application; no domain→adapter leak; compile move preserves layering. |
 | F-4 Inheritance audit | yes | No new abstract/base classes; adapters implement the port directly. |
-| F-5 Public surface audit | yes | `OsServicePort`/results/config types explicitly annotated; `public-api.ts` + exports updated. |
-| F-6 JSR publishability | yes | `deno doc --lint` on `@netscript/cli` + `@netscript/config`; `publish:dry-run`. |
+| F-5 Public surface audit | yes | New types explicitly annotated. **Genuine published-surface change = `@netscript/config` `LinuxDeployTarget`** (S1); `OsServicePort` is internal-to-`@netscript/cli` (N1) — no exports diff, but annotate cleanly. |
+| F-6 JSR publishability | yes | `deno doc --lint` on `@netscript/cli` + `@netscript/config`; `publish:dry-run`. Scope evidence to what actually publishes (N1). |
 | F-9 Permission decl | yes | New systemctl/journalctl `ProcessPort` calls need `--allow-run`; declare in manifests. |
 | F-10 Test-shape | yes | Unit tests colocated; systemd rendering, servy regression, routing, subset-declaration. |
 | F-12 Naming-convention | yes | `os-service-port.ts`, `servy-os-service.ts`, `systemd-os-service.ts`, one adapter per file. |
@@ -210,17 +219,33 @@ Deliver the first bare-metal deploy-target adapter pair behind one uniform seam:
 
 Each slice: proves → gate → files. Ordered; DAG noted. `< 30` slices.
 
-1. **S0 config: `deploy.targets.linux`** — add `LinuxDeployTargetSchema` (spread base) + `LinuxDeployTarget` type + CLI deploy-config resolver + `config-file.v1.json` asset; round-trip test. *Proves:* F-3/F-5, config parse. *Files:* `packages/config/src/domain/schemas/deploy-schema.ts`, `…/config-section-types.ts`, `…/public/mod.ts`; `packages/cli/src/kernel/adapters/config/deploy-config-*.ts`; `packages/cli/assets/schema/config-file.v1.json`; `*_test.ts`.
-2. **S1 port: `OsServicePort`** — generalize `windows-service-port.ts` → `os-service-port.ts` (`OsServicePort`, `OsServiceCommandResult`, `OsServiceInstallRequest`); clean-rename (LD-2); update barrel + exports. *Proves:* F-5, F-6 `deno doc --lint`. *Files:* `public/ports/os-service-port.ts` (+ remove old), `public/public-api.ts`, `packages/cli/deno.json`.
-3. **S2 Windows adapter: `ServyOsServiceAdapter`** — evolve `servy-cli.ts` to implement `OsServicePort`; fold the `runServy` start/stop/status helper so all lifecycle flows through the port; byte-identical servy args. *Proves:* servy-path regression test (args unchanged). *Files:* `public/adapters/servy-os-service.ts`, `kernel/adapters/deploy/commands/servy-command.ts`, `*_test.ts`.
-4. **S3 Linux adapter: `SystemdOsServiceAdapter` + unit renderer** — `systemd-unit.ts` (render `.service`), `systemd-command.ts` (`systemctl`/`journalctl` args), `systemd-os-service.ts` (adapter). *Proves:* F-10 unit-rendering + arg-construction tests. *Files:* `kernel/adapters/linux/systemd/*`, `kernel/constants/linux.ts`, `*_test.ts`.
-5. **S4 OS routing/wiring** — resolve `OsServicePort` by `Deno.build.os` (+ explicit target) in `public-command-dependencies.ts`; start/stop/status/install/uninstall consume the port; Windows unchanged. *Proves:* routing test; Windows regression. *Files:* `public/features/root/public-command-dependencies.ts`, `public/features/deploy/{start,stop,status,install,uninstall}/*`, `kernel/adapters/deploy/runtime-detect.ts`.
-6. **S5 compile generalization (#340)** — move `kernel/adapters/windows/compile/*` → `kernel/adapters/deploy/compile/*`; OS-generic triple + `--include`/`--include-as-is` + denort; retire `deno:2.5` pin + dead `docker`/`script` config; extract to keep F-1. *Proves:* smoke `deno compile` for host triple; F-1. *Files:* `kernel/adapters/deploy/compile/*`, `kernel/domain/deploy/compile-target.ts`, `kernel/constants/*`.
-7. **S6 build-strategy generalization** — split `build-windows-strategy.ts` into an OS-neutral orchestrator + per-OS service-config emit (servy XML vs systemd unit); keep files under F-1. *Proves:* build emits artifacts for both OS shapes; F-1/F-3. *Files:* `public/features/deploy/build/*`, `kernel/adapters/windows/servy/*`, `kernel/adapters/linux/systemd/*`.
-8. **S7 target adapters + registry (Archetype 7)** — expand `DeployTargetOperation` → 7 canonical ops (LD-3); evolve `WindowsServiceDeployTarget` stub → real (delegates to `OsServicePort` + compile); add `LinuxServiceDeployTarget`; declare `rollback?`/`secrets?` optional-unsupported (LD-4); register `linux` in `DeployTargetRegistry`. *Proves:* F-DEPLOY-1 (registry scan + subset-declaration test). *Files:* `kernel/domain/deploy/deploy-target-port.ts`, `…/windows-service-deploy-target.ts`, `…/linux-service-deploy-target.ts`, `kernel/application/registries/deploy-target-registry.ts`, `*_test.ts`.
-9. **S8 tests + F-DEPLOY-2 evidence** — fill gaps: subset-declaration assertion, thin-router import-graph check, OS-routing e2e-lite. *Proves:* F-10, F-DEPLOY-2. *Files:* `*_test.ts` across the above.
-10. **S9 docs + arch-debt** — `@netscript/cli` README/JSDoc for the OS-agnostic port + systemd target + `deno compile` artifact + documented manual-signing hook; update arch-debt entries (see table). *Proves:* F-7 doc-score; debt registry accurate. *Files:* `packages/cli/README.md`, module JSDoc, `.llm/harness/debt/arch-debt.md`.
-11. **S10 validation sweep** — `deno task check` (`--unstable-kv`), scoped lint/fmt, `publish:dry-run`, targeted deploy tests; record in `worklog.md`. *Proves:* all required gates green pre-IMPL-EVAL. *Files:* none (gate pass).
+> **B1 front-load (PLAN-EVAL):** S0 is the **pure type-level port-contract expansion**, carved out
+> of the old S7 and placed **first** as an independently-mergeable unit. It is the **rebase point for
+> #342 (Deno Deploy, p0) and #343 (Aspire)** — they consume the 7-op `DeployTargetPort` and must not
+> be serialized behind the bare-metal realization. It has **no dependency** on config (S1) or the
+> `OsServicePort` rename (S2): it is type-level + registry-shape only, no bare-metal bodies. The
+> bare-metal *realization* stays late (S8).
+
+1. **S0 port-contract expansion (7-op `DeployTargetPort`) — REBASE POINT for #342/#343** — pure
+   type-level: expand `DeployTargetOperation` → the 7 canonical op names (`plan`/`emit`,`up`,`down`,
+   `status`,`logs`,`rollback`,`secrets`); add the optional op method signatures (`plan?`/`up?`/
+   `down?`/`status?`/`logs?`/`rollback?`/`secrets?`) + their request/result types on
+   `DeployTargetPort`; record the `build→plan/emit · install→up · uninstall→down` verb-alias map in
+   JSDoc; reserve the `linux` key in the registry *shape/type* (no `linux` adapter registered yet —
+   that is S8). **No bare-metal bodies, no `OsServicePort`, no config.** Independently mergeable.
+   *Proves:* F-DEPLOY-1 contract shape (AST); `deno check` compiles; registry type accepts the
+   reserved key. *Files:* `kernel/domain/deploy/deploy-target-port.ts`, `…/deploy-target-registry-port.ts`, `*_test.ts`.
+2. **S1 config: `deploy.targets.linux`** — add `LinuxDeployTargetSchema` (spread base) + `LinuxDeployTarget` type + CLI deploy-config resolver + `config-file.v1.json` asset; round-trip test. *Proves:* F-3/F-5, config parse. *Files:* `packages/config/src/domain/schemas/deploy-schema.ts`, `…/config-section-types.ts`, `…/public/mod.ts`; `packages/cli/src/kernel/adapters/config/deploy-config-*.ts`; `packages/cli/assets/schema/config-file.v1.json`; `*_test.ts`.
+3. **S2 port: `OsServicePort`** — generalize `windows-service-port.ts` → `os-service-port.ts` (`OsServicePort`, `OsServiceCommandResult`, `OsServiceInstallRequest`); clean-rename (LD-2). **Update ALL in-repo importers in the SAME commit to stay green (N2):** `public/features/deploy/install/install-service-deploy.ts`, `…/uninstall/uninstall-service-deploy.ts`, `public/features/root/public-command-dependencies.ts`, `public/features/deploy/build/deploy_test.ts`, plus the `public-api.ts` folder-barrel if referenced. *Proves:* `deno check` green; F-6 `deno doc --lint`. *Files:* `public/ports/os-service-port.ts` (+ remove old), the importers above. **N1: `WindowsServicePort` is internal — not on the JSR exports (`.`/`./scaffolding`/`./testing`); no `deno.json` exports diff for the port.**
+4. **S3 Windows adapter: `ServyOsServiceAdapter`** — evolve `servy-cli.ts` to implement `OsServicePort`; fold the `runServy` start/stop/status helper so all lifecycle flows through the port; byte-identical servy args. *Proves:* servy-path regression test (args unchanged). *Files:* `public/adapters/servy-os-service.ts`, `kernel/adapters/deploy/commands/servy-command.ts`, `*_test.ts`.
+5. **S4 Linux adapter: `SystemdOsServiceAdapter` + unit renderer** — `systemd-unit.ts` (render `.service`), `systemd-command.ts` (`systemctl`/`journalctl` args), `systemd-os-service.ts` (adapter). *Proves:* F-10 unit-rendering + arg-construction tests. *Files:* `kernel/adapters/linux/systemd/*`, `kernel/constants/linux.ts`, `*_test.ts`.
+6. **S5 OS routing/wiring** — resolve `OsServicePort` by `Deno.build.os` (+ explicit target) in `public-command-dependencies.ts`; start/stop/status/install/uninstall consume the port; Windows unchanged. *Proves:* routing test; Windows regression. *Files:* `public/features/root/public-command-dependencies.ts`, `public/features/deploy/{start,stop,status,install,uninstall}/*`, `kernel/adapters/deploy/runtime-detect.ts`.
+7. **S6 compile generalization (#340)** — move `kernel/adapters/windows/compile/*` → `kernel/adapters/deploy/compile/*`; OS-generic triple + `--include`/`--include-as-is` + denort; retire `deno:2.5` pin + dead `docker`/`script` config. *Proves:* smoke `deno compile` for host triple. *Files:* `kernel/adapters/deploy/compile/*`, `kernel/domain/deploy/compile-target.ts`, `kernel/constants/*`.
+8. **S7 build-strategy generalization** — split `build-windows-strategy.ts` (301 L) into an OS-neutral orchestrator + per-OS service-config emit (servy XML vs systemd unit). Extraction is hygiene for the ~300 soft guideline; **F-1 flags >500 / fails >800, so no file here is near the gate.** *Proves:* build emits artifacts for both OS shapes; F-3. *Files:* `public/features/deploy/build/*`, `kernel/adapters/windows/servy/*`, `kernel/adapters/linux/systemd/*`.
+9. **S8 bare-metal realization + registry (Archetype 7)** — evolve `WindowsServiceDeployTarget` stub → real (delegates to `OsServicePort` + compile for `plan/up/down/status/logs`); add `LinuxServiceDeployTarget`; leave `rollback?`/`secrets?` declared-unsupported (LD-4, bodies → #341); **register `linux` in `DeployTargetRegistry`** (the S0 shape is now filled with a real adapter). *Proves:* F-DEPLOY-1 (registry scan + subset-declaration test). *Files:* `kernel/domain/deploy/windows-service-deploy-target.ts`, `…/linux-service-deploy-target.ts`, `kernel/application/registries/deploy-target-registry.ts`, `*_test.ts`.
+10. **S9 tests + F-DEPLOY-2 evidence** — fill gaps: subset-declaration assertion, thin-router import-graph check, OS-routing e2e-lite. *Proves:* F-10, F-DEPLOY-2. *Files:* `*_test.ts` across the above.
+11. **S10 docs + arch-debt** — `@netscript/cli` README/JSDoc for the OS-agnostic port + systemd target + `deno compile` artifact + documented manual-signing hook; update arch-debt entries (see table). *Proves:* F-7 doc-score; debt registry accurate. *Files:* `packages/cli/README.md`, module JSDoc, `.llm/harness/debt/arch-debt.md`.
+12. **S11 validation sweep** — `deno task check` (`--unstable-kv`), scoped lint/fmt, `publish:dry-run`, targeted deploy tests; record in `worklog.md`. *Proves:* all required gates green pre-IMPL-EVAL. *Files:* none (gate pass).
 
 ## Validation Plan
 
@@ -246,13 +271,17 @@ Each slice: proves → gate → files. Ordered; DAG noted. `< 30` slices.
   already frozen, so *design* does not block on it. If #357 is still open at implementation time,
   report F-DEPLOY-1/2 as `reviewed` with the mapping-table manual evidence.
 - **#340 (S4)** is co-planned here with #339 (S3) as one bare-metal slice (both feed #341).
+- **Merge order (port-ownership §3):** **#357 (doctrine) → S0 port-expansion commit → #342/#343
+  rebase.** #339/#340 OWNS the port contract; **#342 (Deno Deploy, p0) + #343 (Aspire) CONSUME** the
+  7-op `DeployTargetPort` and rebase onto the S0 commit — they do **not** use `OsServicePort`
+  (bare-metal-only). Front-loading S0 keeps the p0 marquee un-serialized.
 - **Downstream:** **#341 (S5)** rollback/health-gate/OTEL/secrets consumes this slice's declared
   `rollback?`/`secrets?` surface + the `deno compile` + adapter lane — **out of scope here.**
-  #342/#343 (cloud) are independent.
 - **Toolchain:** Deno 2.9; `deno compile` denort cross-compile triples; `servy-cli.exe` (Windows,
   external); `systemctl`/`journalctl` (Linux, external, `--allow-run`).
-- **Process:** implementation is a **WSL Codex daemon-attached slice** (mobile-visible), not this
-  planner. PLAN-EVAL = OpenHands/minimax M3, separate session, before any implementation.
+- **Process (dispatch lane — port-ownership §"Dispatch-lane correction"):** implementers =
+  **Opus 4.8 sub-agents** (WSL Codex is dropped for the deployment epic); evaluators = **separate
+  Opus session** (or Codex GPT-5.5 when reachable). PLAN-EVAL runs before any implementation.
 
 ## Drift Watch
 
