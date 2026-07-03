@@ -54,6 +54,24 @@ export function servyLifecycleArgs(
   return [command, '-n', fullServiceName, '-q'];
 }
 
+/**
+ * Build standard servy-cli args for an install command.
+ *
+ * Single source of truth for the install invocation, shared by the
+ * `ServyOsServiceAdapter` so port-driven and command-layer servy calls are
+ * byte-identical. Structurally typed to avoid a kernel→public import of
+ * `OsServiceInstallRequest`.
+ */
+export function servyInstallArgs(
+  request: { serviceName: string; configPath: string; force: boolean },
+): string[] {
+  const args = ['install', '-n', request.serviceName, '-c', request.configPath, '-q'];
+  if (request.force) {
+    args.push('--force');
+  }
+  return args;
+}
+
 /** Build the full Windows service name from a short service name. */
 export function fullServiceName(
   shortName: string,

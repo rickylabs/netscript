@@ -8,7 +8,7 @@ import type {
   OsServiceInstallRequest,
   OsServicePort,
 } from '../../../ports/os-service-port.ts';
-import { ServyCliAdapter } from '../../../adapters/servy-cli.ts';
+import { ServyOsServiceAdapter } from '../../../adapters/servy-os-service.ts';
 import { buildDeploy } from './build-deploy.ts';
 import { installServiceDeploy } from '../install/install-service-deploy.ts';
 import { uninstallServiceDeploy } from '../uninstall/uninstall-service-deploy.ts';
@@ -102,7 +102,7 @@ describe('public deploy application flows', () => {
 
   it('maps Windows service operations to servy-cli invocations', async () => {
     const process = new RecordingProcessPort();
-    const adapter = new ServyCliAdapter({
+    const adapter = new ServyOsServiceAdapter({
       servyCliPath: 'C:/tools/servy-cli.exe',
       process,
     });
@@ -112,8 +112,18 @@ describe('public deploy application flows', () => {
       configPath: 'C:/app/config/users.xml',
       force: true,
     });
+    await adapter.install({
+      serviceName: 'NetScript.orders',
+      configPath: 'C:/app/config/orders.xml',
+      force: false,
+    });
     await adapter.run('start', 'NetScript.users');
+    await adapter.run('stop', 'NetScript.users');
+    await adapter.run('status', 'NetScript.users');
+    await adapter.run('uninstall', 'NetScript.users');
 
+    // Byte-identical servy invocations after folding arg construction into the
+    // shared servyInstallArgs / servyLifecycleArgs builders (S3).
     assertEquals(process.calls, [
       {
         command: 'C:/tools/servy-cli.exe',
@@ -129,7 +139,23 @@ describe('public deploy application flows', () => {
       },
       {
         command: 'C:/tools/servy-cli.exe',
+        args: ['install', '-n', 'NetScript.orders', '-c', 'C:/app/config/orders.xml', '-q'],
+      },
+      {
+        command: 'C:/tools/servy-cli.exe',
         args: ['start', '-n', 'NetScript.users', '-q'],
+      },
+      {
+        command: 'C:/tools/servy-cli.exe',
+        args: ['stop', '-n', 'NetScript.users', '-q'],
+      },
+      {
+        command: 'C:/tools/servy-cli.exe',
+        args: ['status', '-n', 'NetScript.users', '-q'],
+      },
+      {
+        command: 'C:/tools/servy-cli.exe',
+        args: ['uninstall', '-n', 'NetScript.users', '-q'],
       },
     ]);
   });

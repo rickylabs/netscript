@@ -41,7 +41,7 @@ import { PluginKindRegistry } from '../../../kernel/application/registries/plugi
 import { DEFAULT_SERVY_CLI_PATH } from '../../../kernel/constants/windows.ts';
 import { JsrImportResolver } from '../../adapters/jsr-import-resolver.ts';
 import { FetchJsrPluginValidator } from '../../infra/jsr/fetch-jsr-plugin-validator.ts';
-import { ServyCliAdapter } from '../../adapters/servy-cli.ts';
+import { ServyOsServiceAdapter } from '../../adapters/servy-os-service.ts';
 import type { ServiceManifest } from '../../ports/service-manifest-port.ts';
 import type { GeneratePluginRegistriesCommandDependencies } from '../generate/plugins/generate-plugin-registries-command.ts';
 import type { GenerateRuntimeSchemasCommandDependencies } from '../generate/runtime-schemas/generate-runtime-schemas-command.ts';
@@ -154,7 +154,7 @@ export interface PublicCommandDependencies {
     ) => Promise<{ manifest: ServiceManifest; manifestDir: string; installDir: string }>;
   };
   /** Windows service adapter for deployment lifecycle commands. */
-  readonly windowsServices: ServyCliAdapter;
+  readonly windowsServices: ServyOsServiceAdapter;
   /**
    * Deploy target registry (named extension axis, A11). Ships the seed
    * `windows-service` target plus the Aspire-driven `compose`/`docker` cloud
@@ -316,7 +316,7 @@ export function createPublicCommandDependencies(
         };
       },
     },
-    windowsServices: new ServyCliAdapter({
+    windowsServices: new ServyOsServiceAdapter({
       servyCliPath: DEFAULT_SERVY_CLI_PATH,
       process,
     }),

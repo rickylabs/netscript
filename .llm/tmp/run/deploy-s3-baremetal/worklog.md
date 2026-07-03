@@ -75,3 +75,21 @@
   (name unchanged) so needed no S2 edit.
 - Gates: cli `deno check` 0 (539 files); `deploy_test.ts` 4/4 steps incl. the "maps Windows service
   operations to servy-cli invocations" regression (servy args byte-identical).
+
+### S3 — `ServyOsServiceAdapter` evolution + servy arg-fold (LD-1/LD-7, F-12)
+
+- Renamed `public/adapters/servy-cli.ts` → `servy-os-service.ts`; class `ServyCliAdapter` →
+  `ServyOsServiceAdapter` (+ `ServyOsServiceAdapterOptions`). Clean break, no shim (LD-2). Concrete
+  importers updated in the same commit: `public-command-dependencies.ts` (import + field type +
+  construction), `deploy_test.ts`.
+- Folded servy argument construction into shared builders in `servy-command.ts`: added
+  `servyInstallArgs` (structurally typed, no kernel→public import) alongside the existing
+  `servyLifecycleArgs`. The adapter now composes both — single source of truth for servy args, so
+  port-driven and command-layer invocations are byte-identical.
+- Expanded the servy-path regression test in `deploy_test.ts` to the full lifecycle matrix
+  (install +--force, install w/o force, start/stop/status/uninstall) — locks the byte-identical
+  guarantee after the fold.
+- Drift **D3**: the `runServy` *execution* free function is still consumed by the start/stop/status
+  commands + `upgrade-steps.ts`; routing those through the adapter is S5's command-wiring slice, so
+  S3 unifies the arg source-of-truth only and defers execution convergence to S5. See `drift.md`.
+- Gates: cli `deno check` 0 (539 files); `deploy_test.ts` 4/4 steps green (expanded servy matrix).
