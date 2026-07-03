@@ -226,6 +226,70 @@ export interface ResolvedWindowsDeployConfig {
 }
 
 /**
+ * Resolved Linux (systemd) deployment configuration.
+ * Merges Linux-sensible defaults with user overrides from
+ * netscript.config.ts `deploy.targets.linux` section.
+ *
+ * Mirrors {@link ResolvedWindowsDeployConfig}; the shared build/bundle/health
+ * base fields are intentionally repeated here to keep this slice's port change
+ * isolated. Centralizing the shared base is deferred to the build-strategy
+ * generalization slice (#340, S7).
+ */
+export interface ResolvedLinuxDeployConfig {
+  /** Path to systemctl */
+  systemctlPath: string;
+  /** systemd unit name prefix (e.g., "netscript") */
+  unitPrefix: string;
+  /** Base install directory (e.g., "/opt/netscript") */
+  installBase: string;
+  /** System user that owns the generated units */
+  user?: string;
+  /** System group that owns the generated units */
+  group?: string;
+  /** Runtime directory for sockets and pid files (e.g., "/run/netscript") */
+  runtimeDir: string;
+  /** Deployment mode: compile binaries or run via deno + source */
+  mode: 'compile' | 'script';
+  /** Path to deno for script mode */
+  denoPath: string;
+  /** deno compile target triple */
+  compileTarget: string;
+  /** Max parallel compilations */
+  concurrency: number;
+  /** Per-service compile timeout in ms */
+  compileTimeoutMs: number;
+  /** Per-service bundle timeout in ms */
+  bundleTimeoutMs: number;
+  /** Packages to externalize during deno bundle */
+  bundleExternal: readonly string[];
+  /** npm specifier rewrites for externalized packages */
+  bundleExternalImports: Record<string, string>;
+  /** Workspace globs for temp compile config (undefined = derive from root deno.json) */
+  workspace?: string[];
+  /** V8 max heap per service type in MB */
+  v8HeapMb: { service: number; plugin: number; worker: number; app: number };
+  /** Whether to generate .env files alongside binaries */
+  generateEnvFile: boolean;
+  /** Log rotation settings */
+  logging: {
+    rotationSizeMb: number;
+    maxRotations: number;
+    dateRotation: 'Daily' | 'Weekly' | 'Monthly';
+  };
+  /** Health check settings */
+  health: {
+    intervalSeconds: number;
+    maxFailedChecks: number;
+    maxRestartAttempts: number;
+  };
+  /** Docker base images (for future docker deployment target) */
+  docker: {
+    denoBaseImage: string;
+    dotnetBaseImage: string;
+  };
+}
+
+/**
  * Fully-resolved deployment configuration — the single source of truth
  * passed to all adapters, generators, and command handlers.
  */

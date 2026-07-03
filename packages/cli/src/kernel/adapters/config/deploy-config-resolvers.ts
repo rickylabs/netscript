@@ -17,6 +17,7 @@ import type {
   RegisteredPluginConfig,
   ResolvedAppConfig,
   ResolvedDefaultsConfig,
+  ResolvedLinuxDeployConfig,
   ResolvedPluginConfig,
   ResolvedServiceConfig,
   ResolvedWindowsDeployConfig,
@@ -294,6 +295,66 @@ export function resolveWindowsDeploy(userDeploy?: DeployConfig): ResolvedWindows
     docker: {
       denoBaseImage: win?.docker?.denoBaseImage ?? 'denoland/deno:2',
       dotnetBaseImage: win?.docker?.dotnetBaseImage ?? 'mcr.microsoft.com/dotnet/aspnet:9.0',
+    },
+  };
+}
+
+// ── Linux (systemd) deploy defaults ─────────────────────────────────────────
+const DEFAULT_SYSTEMCTL_PATH = 'systemctl';
+const DEFAULT_LINUX_UNIT_PREFIX = 'netscript';
+const DEFAULT_LINUX_INSTALL_BASE = '/opt/netscript';
+const DEFAULT_LINUX_RUNTIME_DIR = '/run/netscript';
+const DEFAULT_LINUX_COMPILE_TARGET = 'x86_64-unknown-linux-gnu';
+
+/**
+ * Resolve the Linux (systemd) deploy target from `deploy.targets.linux`.
+ * Mirrors {@link resolveWindowsDeploy}; the shared build/bundle/health defaults
+ * are reused, and Linux-specific path defaults are applied. Base-resolution
+ * centralization across OS targets is deferred to the build-strategy
+ * generalization slice (#340, S7).
+ */
+export function resolveLinuxDeploy(userDeploy?: DeployConfig): ResolvedLinuxDeployConfig {
+  const linux = userDeploy?.targets?.linux;
+  return {
+    systemctlPath: linux?.systemctlPath ?? DEFAULT_SYSTEMCTL_PATH,
+    unitPrefix: linux?.unitPrefix ?? DEFAULT_LINUX_UNIT_PREFIX,
+    installBase: linux?.installBase ?? DEFAULT_LINUX_INSTALL_BASE,
+    user: linux?.user,
+    group: linux?.group,
+    runtimeDir: linux?.runtimeDir ?? DEFAULT_LINUX_RUNTIME_DIR,
+    mode: linux?.mode ?? 'compile',
+    denoPath: linux?.denoPath ?? 'deno',
+    compileTarget: linux?.compileTarget ?? DEFAULT_LINUX_COMPILE_TARGET,
+    concurrency: linux?.concurrency ?? 4,
+    compileTimeoutMs: linux?.compileTimeoutMs ?? DEFAULT_COMPILE_TIMEOUT_MS,
+    bundleTimeoutMs: linux?.bundleTimeoutMs ?? DEFAULT_BUNDLE_TIMEOUT_MS,
+    bundleExternal: linux?.bundleExternal
+      ? (linux.bundleExternal as readonly string[])
+      : DEFAULT_BUNDLE_EXTERNAL,
+    bundleExternalImports: linux?.bundleExternalImports ?? DEFAULT_BUNDLE_EXTERNAL_IMPORTS,
+    workspace: linux?.workspace,
+    v8HeapMb: {
+      service: linux?.v8HeapMb?.service ?? DEFAULT_V8_HEAP_MB.service,
+      plugin: linux?.v8HeapMb?.plugin ?? DEFAULT_V8_HEAP_MB.plugin,
+      worker: linux?.v8HeapMb?.worker ?? DEFAULT_V8_HEAP_MB.worker,
+      app: linux?.v8HeapMb?.app ?? DEFAULT_V8_HEAP_MB.app,
+    },
+    generateEnvFile: linux?.generateEnvFile ?? true,
+    logging: {
+      rotationSizeMb: linux?.logging?.rotationSizeMb ?? DEFAULT_LOG_ROTATION.rotationSizeMB,
+      maxRotations: linux?.logging?.maxRotations ?? DEFAULT_LOG_ROTATION.maxRotations,
+      dateRotation: linux?.logging?.dateRotation ?? DEFAULT_LOG_ROTATION.dateRotationType,
+    },
+    health: {
+      intervalSeconds: linux?.health?.intervalSeconds ??
+        DEFAULT_HEALTH_MONITORING.heartbeatIntervalSeconds,
+      maxFailedChecks: linux?.health?.maxFailedChecks ?? DEFAULT_HEALTH_MONITORING.maxFailedChecks,
+      maxRestartAttempts: linux?.health?.maxRestartAttempts ??
+        DEFAULT_HEALTH_MONITORING.maxRestartAttempts,
+    },
+    docker: {
+      denoBaseImage: linux?.docker?.denoBaseImage ?? 'denoland/deno:2',
+      dotnetBaseImage: linux?.docker?.dotnetBaseImage ?? 'mcr.microsoft.com/dotnet/aspnet:9.0',
     },
   };
 }

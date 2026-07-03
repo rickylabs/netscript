@@ -3,6 +3,7 @@ import type {
   DeployConfig,
   DeployTargetBase,
   DockerComposeDeployTarget,
+  LinuxDeployTarget,
   WindowsDeployTarget,
 } from '../config-section-types.ts';
 
@@ -151,10 +152,34 @@ export const DockerComposeDeployTargetSchema: z.ZodType<DockerComposeDeployTarge
 });
 
 /**
+ * Linux systemd deployment target (`deploy.targets.linux`).
+ * Extends the shared base with systemd service-manager fields.
+ * Consumed by the bare-metal Linux deploy target (#339 + #340).
+ */
+export const LinuxDeployTargetSchema: z.ZodType<LinuxDeployTarget> = z.object({
+  ...deployTargetBaseShape,
+
+  // ── Service management (systemd) ────────────────────────────────────────
+  /** Path to systemctl. Default: 'systemctl' */
+  systemctlPath: z.string().optional(),
+  /** systemd unit name prefix. Default: 'netscript' */
+  unitPrefix: z.string().optional(),
+  /** Base directory for service installation. Default: '/opt/netscript' */
+  installBase: z.string().optional(),
+  /** System user that owns the generated units. */
+  user: z.string().optional(),
+  /** System group that owns the generated units. */
+  group: z.string().optional(),
+  /** Runtime directory for sockets and pid files. Default: '/run/netscript' */
+  runtimeDir: z.string().optional(),
+});
+
+/**
  * Top-level deploy configuration section.
  * `targets` is a name-keyed map of deployment targets: `windows` (Servy),
- * `docker` (single-image build/push) and `compose` (emit + self-host). Future
- * targets (linux, deno-deploy) are added as sibling keys by #339–#342.
+ * `docker` (single-image build/push), `compose` (emit + self-host) and `linux`
+ * (systemd bare-metal). Future targets (deno-deploy) are added as sibling keys
+ * by #342–#343.
  */
 export const DeployConfigSchema: z.ZodType<DeployConfig | undefined> = z
   .object({
@@ -167,6 +192,8 @@ export const DeployConfigSchema: z.ZodType<DeployConfig | undefined> = z
         docker: DockerComposeDeployTargetSchema.optional(),
         /** Docker Compose (emit + self-host) deployment via Aspire. */
         compose: DockerComposeDeployTargetSchema.optional(),
+        /** Linux systemd deployment. */
+        linux: LinuxDeployTargetSchema.optional(),
       })
       .optional(),
   })

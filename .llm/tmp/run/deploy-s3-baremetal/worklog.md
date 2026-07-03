@@ -39,4 +39,24 @@
 
 ## Gate results
 
-- Not run (planning-only). Validation Plan in `plan.md` executes during implementation slices.
+- Planning phase: not run (planning-only).
+
+### S0 — DeployTargetPort 7-op contract (commit `12d70ff0`, REBASE POINT, pushed first)
+
+- `deno check` packages/cli: 0 errors (538 files). fmt: clean (scratch config, cli excluded from
+  root fmt/lint by design). tests: 8/8 (4 new `deploy-target-port_test.ts` + 4 untouched
+  `command-registry_test.ts` incl. the legacy `['build','install','uninstall']` assertion — stays
+  green under additive union expansion, IMPL-1 satisfied).
+
+### S1 — config `deploy.targets.linux` (this slice)
+
+- Added `LinuxDeployTarget` type + `LinuxDeployTargetSchema` (spreads `deployTargetBaseShape`,
+  LD-5), wired `linux` sibling into `DeployConfig.targets` / `DeployConfigSchema`, exported both
+  from `@netscript/config` public `mod.ts`. Added `ResolvedLinuxDeployConfig` +
+  `resolveLinuxDeploy` CLI resolver (Linux-sensible defaults; honors overrides).
+- Round-trip tests: `packages/config/tests/schema/deploy_schema_test.ts` (3) +
+  `packages/cli/.../deploy-config-resolvers_test.ts` (2) → **5 passed / 0 failed**.
+- Gates: config `deno check` 0 (34 files); cli `deno check` 0 (539 files); config `deno lint` 0;
+  config `deno fmt --check` 0 findings (config IS lint/fmt-gated, unlike cli).
+- Drift: D1 (config-file.v1.json is vendored Deno schema, no `deploy.targets` — asset entry
+  correctly omitted), D2 (resolved base-config duplication deferred to S7). See `drift.md`.
