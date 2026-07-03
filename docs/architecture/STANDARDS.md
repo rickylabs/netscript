@@ -411,6 +411,8 @@ this fixed sequence — each step is mechanical and reviewable:
 3. Rename I-prefix interfaces, schedule a one-shot codemod (`.llm/tools/`).
 4. Replace `export *` from internals with a curated `src/public/mod.ts`.
 5. Eliminate slow types — explicit return types on every published function.
+   Exception: oRPC-bound packages may keep `--allow-slow-types` (see the
+   sanctioned exception in `docs/architecture/doctrine/02-public-surface.md`).
 6. Write the README to spec § 6.
 7. Write `docs/` to spec § 7 if symbol count > 25.
 8. Write the test suite to spec § 8.
