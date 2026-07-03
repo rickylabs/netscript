@@ -132,3 +132,20 @@
 - CS-1+CS-2 → `07cb41e9`, CS-3 → `217116e5`, CS-4 → `3acd114b`, CS-5 run-docs → this commit. All
   pushed to `feat/deploy-s1-targets-config`. Every gate green. No scaffold-template edits were needed
   (no fixture emits `deploy.windows`); `scaffold.runtime` e2e remains the evaluator's gate.
+
+## Evaluate phase
+
+### 2026-07-03 — Adversarial review (built artifact)
+- Codex GPT-5.5 xhigh attempt FAILED to invoke (companion returned no output — launch landmine /
+  auth-limit). Fell back to a separate Opus session (coordinator-permitted alternative). Both satisfy
+  the mandatory separate-agent rule; neither is the implementer session.
+- Verdict `adversarial-review.md`: **PASS, zero BLOCKING**. Rename complete across `packages/` +
+  `plugins/` (only `ResolvedWindowsDeployConfig` remains — intentional L-4/L-7); both new Zod exports
+  carry matching `z.ZodType<…>` (L-8); **test honesty CLEAN** — "reject old shape" asserts
+  `config.deploy?.targets === undefined` (meaningful, not false confidence), unknown-key drop asserts
+  `keys === ['windows']`; no missed consumers (resolved layer verified windows-shaped, not assumed);
+  re-pin in both schema default + resolver fallback; merge test asserts wholesale replacement; no
+  unsound casts. Lone cosmetic nice-to-have (also assert `deploy?.windows === undefined`) —
+  non-blocking, not actioned.
+- Next: IMPL-EVAL / merge-readiness in a fresh separate session — reproduce CI quality gate
+  (`fmt:check` + lint + `check --unstable-kv`) + run `scaffold.runtime --cleanup` before sign-off.
