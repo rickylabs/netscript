@@ -25,29 +25,28 @@
  */
 
 import { z } from 'zod';
+import type { AnySchema } from '@orpc/contract';
 import {
-  baseContract as soundBaseContract,
+  baseContract,
   type BaseContractProcedure,
-  type BaseContractRouteBuilder,
-  type BaseContractRouteOptions,
 } from '../src/application/contract-primitives.ts';
 
 /**
- * Structural view of {@link soundBaseContract} used by this generator.
+ * Widens a NetScript {@link ContractSchema}-shaped value to oRPC's
+ * {@link AnySchema} so it can drive the sound {@link baseContract} builder.
  *
  * The CRUD generator composes routes from the package's minimal
- * {@link ContractSchema} abstraction rather than oRPC's `StandardSchemaV1`, so
- * it drives the base contract through the deprecated structural builder surface
- * (whose `.input(...)`/`.output(...)` accept `ContractSchema`). 172a-2-SOUND
- * slice 3 migrates this generator onto the sound `BaseContractRoute` types and
- * removes this view. This single boundary cast replaces the `as BaseContract`
- * erasure that previously lived on `baseContract` itself (net cast delta 0).
+ * {@link ContractSchema} abstraction rather than oRPC's `StandardSchemaV1`, yet
+ * every value it passes to `.input(...)`/`.output(...)` is a real Zod schema at
+ * runtime (Zod satisfies `StandardSchemaV1`). This helper is the single
+ * `ContractSchema`→`AnySchema` boundary of the generator: the parameter widens
+ * to `unknown` implicitly, so the assertion is a plain single `as` — it carries
+ * no double-assertion erasure. 172a-2-SOUND slice 3 replaced the deprecated
+ * structural builder shim (and its double-assertion boundary cast) with this
+ * helper plus the real sound {@link baseContract} builder, whose composed routes
+ * are the sound `BaseContractRoute` type exported by this package.
  */
-type LegacyBaseContractBuilder = Readonly<{
-  route(options: BaseContractRouteOptions): BaseContractRouteBuilder;
-}>;
-
-const baseContract = soundBaseContract as unknown as LegacyBaseContractBuilder;
+const asSchema = (schema: unknown): AnySchema => schema as AnySchema;
 import type {
   ContractObjectSchema,
   ContractSchema,
@@ -306,32 +305,32 @@ export function createCrudContract<
     list: crudOperation(
       baseContract
         .route({ method: 'GET', path: `/${resource}` })
-        .input(listInputSchema)
-        .output(listOutputSchema),
+        .input(asSchema(listInputSchema))
+        .output(asSchema(listOutputSchema)),
     ),
     getById: crudOperation(
       baseContract
         .route({ method: 'GET', path: `/${resource}/{id}` })
-        .input(idInputSchema)
-        .output(entitySchema),
+        .input(asSchema(idInputSchema))
+        .output(asSchema(entitySchema)),
     ),
     create: crudOperation(
       baseContract
         .route({ method: 'POST', path: `/${resource}` })
-        .input(createSchema)
-        .output(entitySchema),
+        .input(asSchema(createSchema))
+        .output(asSchema(entitySchema)),
     ),
     update: crudOperation(
       baseContract
         .route({ method: 'PATCH', path: `/${resource}/{id}` })
-        .input(updateInputSchema)
-        .output(entitySchema),
+        .input(asSchema(updateInputSchema))
+        .output(asSchema(entitySchema)),
     ),
     delete: crudOperation(
       baseContract
         .route({ method: 'DELETE', path: `/${resource}/{id}` })
-        .input(idInputSchema)
-        .output(entitySchema),
+        .input(asSchema(idInputSchema))
+        .output(asSchema(entitySchema)),
     ),
   };
 

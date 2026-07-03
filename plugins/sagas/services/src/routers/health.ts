@@ -7,7 +7,7 @@
  */
 
 import { z } from 'zod';
-import { baseContract, type BaseContractProcedure } from '@netscript/contracts';
+import { baseContract, type BaseContractRoute } from '@netscript/contracts';
 import { implement } from '@orpc/server';
 import { getKv } from '@netscript/kv';
 import { listSagaMetadata } from '../saga-registry.ts';
@@ -16,13 +16,46 @@ import { listSagaMetadata } from '../saga-registry.ts';
 // HEALTH CHECK SCHEMAS
 // ============================================================================
 
-const ComponentHealthSchema = z.object({
+const ComponentHealthSchema: z.ZodObject<{
+  status: z.ZodEnum<{ healthy: 'healthy'; unhealthy: 'unhealthy' }>;
+  latency: z.ZodOptional<z.ZodNumber>;
+  message: z.ZodOptional<z.ZodString>;
+}> = z.object({
   status: z.enum(['healthy', 'unhealthy']),
   latency: z.number().optional(),
   message: z.string().optional(),
 });
 
-const HealthCheckResultSchema = z.object({
+// Named input/output schemas so each route can be annotated with the SOUND
+// `BaseContractRoute<TIn, TOut>` alias (172a-2-SOUND slice 3). The precise
+// `typeof <schema>` flows through `implement(...)`, so the handler bodies below
+// are genuinely type-checked against the contract output — under the previous
+// `BaseContractProcedure` (`~orpc: any`) annotation a wrong handler shape
+// compiled silently.
+const HealthInputSchema: z.ZodOptional<z.ZodObject<Record<string, never>>> = z.object({})
+  .optional();
+
+const LiveOutputSchema: z.ZodObject<{ status: z.ZodLiteral<'ok'>; timestamp: z.ZodString }> = z
+  .object({
+    status: z.literal('ok'),
+    timestamp: z.string().datetime(),
+  });
+
+const ReadyOutputSchema: z.ZodObject<{
+  status: z.ZodEnum<{ ready: 'ready'; not_ready: 'not_ready' }>;
+  timestamp: z.ZodString;
+}> = z.object({
+  status: z.enum(['ready', 'not_ready']),
+  timestamp: z.string().datetime(),
+});
+
+const HealthCheckResultSchema: z.ZodObject<{
+  status: z.ZodEnum<{ healthy: 'healthy'; degraded: 'degraded'; unhealthy: 'unhealthy' }>;
+  service: z.ZodString;
+  timestamp: z.ZodString;
+  version: z.ZodString;
+  checks: z.ZodOptional<z.ZodRecord<z.ZodString, typeof ComponentHealthSchema>>;
+}> = z.object({
   status: z.enum(['healthy', 'degraded', 'unhealthy']),
   service: z.string(),
   timestamp: z.string().datetime(),
@@ -35,9 +68,9 @@ const HealthCheckResultSchema = z.object({
 // ============================================================================
 
 const healthContract: {
-  live: BaseContractProcedure;
-  ready: BaseContractProcedure;
-  check: BaseContractProcedure;
+  live: BaseContractRoute<typeof HealthInputSchema, typeof LiveOutputSchema>;
+  ready: BaseContractRoute<typeof HealthInputSchema, typeof ReadyOutputSchema>;
+  check: BaseContractRoute<typeof HealthInputSchema, typeof HealthCheckResultSchema>;
 } = {
   /**
    * Liveness probe - is the process alive?
@@ -45,11 +78,8 @@ const healthContract: {
    */
   live: baseContract
     .route({ method: 'GET', path: '/health/live' })
-    .input(z.object({}).optional())
-    .output(z.object({
-      status: z.literal('ok'),
-      timestamp: z.string().datetime(),
-    })),
+    .input(HealthInputSchema)
+    .output(LiveOutputSchema),
 
   /**
    * Readiness probe - can the service accept traffic?
@@ -57,18 +87,15 @@ const healthContract: {
    */
   ready: baseContract
     .route({ method: 'GET', path: '/health/ready' })
-    .input(z.object({}).optional())
-    .output(z.object({
-      status: z.enum(['ready', 'not_ready']),
-      timestamp: z.string().datetime(),
-    })),
+    .input(HealthInputSchema)
+    .output(ReadyOutputSchema),
 
   /**
    * Detailed health check - comprehensive status of all components.
    */
   check: baseContract
     .route({ method: 'GET', path: '/health' })
-    .input(z.object({}).optional())
+    .input(HealthInputSchema)
     .output(HealthCheckResultSchema),
 };
 
