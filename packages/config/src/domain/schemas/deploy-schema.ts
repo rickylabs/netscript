@@ -2,6 +2,7 @@ import { z } from 'zod';
 import type {
   DeployConfig,
   DeployTargetBase,
+  DockerComposeDeployTarget,
   WindowsDeployTarget,
 } from '../config-section-types.ts';
 
@@ -126,18 +127,46 @@ export const WindowsDeployTargetSchema: z.ZodType<WindowsDeployTarget> = z.objec
 });
 
 /**
+ * Docker / Compose deployment target (`deploy.targets.docker` and
+ * `deploy.targets.compose`).
+ *
+ * Spreads the shared base (which already carries the `docker` image sub-block
+ * defaulting to `denoland/deno:2`) and adds compose/registry-specific fields.
+ * Consumed by the Aspire-driven compose adapter behind `netscript deploy
+ * docker|compose <verb>`; the compose YAML itself is emitted by `aspire
+ * publish`, never hand-authored here.
+ */
+export const DockerComposeDeployTargetSchema: z.ZodType<DockerComposeDeployTarget> = z.object({
+  ...deployTargetBaseShape,
+
+  // ── Compose / image publish ─────────────────────────────────────────────
+  /** Compose project name (`docker compose -p`). Default: the workspace name. */
+  projectName: z.string().optional(),
+  /** Directory for emitted compose artifacts. Default: `.deploy/compose`. */
+  outputPath: z.string().optional(),
+  /** Container image registry for the `docker` push path (e.g. `ghcr.io/acme`). */
+  registry: z.string().optional(),
+  /** Base image name/tag for built service images. Default: the service name. */
+  imageName: z.string().optional(),
+});
+
+/**
  * Top-level deploy configuration section.
- * `targets` is a name-keyed map of deployment targets. This slice ships the
- * `windows` member only; future targets (linux, deno-deploy, docker) are added
- * as sibling keys by #339–#343.
+ * `targets` is a name-keyed map of deployment targets: `windows` (Servy),
+ * `docker` (single-image build/push) and `compose` (emit + self-host). Future
+ * targets (linux, deno-deploy) are added as sibling keys by #339–#342.
  */
 export const DeployConfigSchema: z.ZodType<DeployConfig | undefined> = z
   .object({
-    /** Deployment targets keyed by name (currently `windows` only). */
+    /** Deployment targets keyed by name. */
     targets: z
       .object({
         /** Windows Services deployment via Servy. */
         windows: WindowsDeployTargetSchema.optional(),
+        /** Docker single-image (build/push) deployment via Aspire. */
+        docker: DockerComposeDeployTargetSchema.optional(),
+        /** Docker Compose (emit + self-host) deployment via Aspire. */
+        compose: DockerComposeDeployTargetSchema.optional(),
       })
       .optional(),
   })
