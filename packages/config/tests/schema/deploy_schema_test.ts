@@ -95,3 +95,50 @@ Deno.test('DeployConfigSchema accepts a linux-only target', () => {
   assertEquals(deploy?.targets?.linux, {});
   assertEquals(deploy?.targets?.windows, undefined);
 });
+
+Deno.test('shared base carries the activation/secrets/otel convention blocks (spread, R-DEPLOY-3)', () => {
+  const linux = LinuxDeployTargetSchema.parse({
+    activation: {
+      retain: 5,
+      strategy: 'symlink',
+      healthGate: {
+        path: '/healthz',
+        port: 8080,
+        timeoutMs: 1500,
+        intervalMs: 3000,
+        retries: 4,
+        expectStatus: 204,
+      },
+    },
+    secrets: { envFile: 'config/.secrets.env', mode: 0o600 },
+    otel: {
+      enabled: true,
+      endpoint: 'http://otel:4318',
+      protocol: 'grpc',
+      serviceNamePrefix: 'acme-',
+    },
+  });
+
+  assertEquals(linux.activation?.retain, 5);
+  assertEquals(linux.activation?.strategy, 'symlink');
+  assertEquals(linux.activation?.healthGate?.path, '/healthz');
+  assertEquals(linux.activation?.healthGate?.expectStatus, 204);
+  assertEquals(linux.secrets?.envFile, 'config/.secrets.env');
+  assertEquals(linux.secrets?.mode, 0o600);
+  assertEquals(linux.otel?.endpoint, 'http://otel:4318');
+  assertEquals(linux.otel?.serviceNamePrefix, 'acme-');
+});
+
+Deno.test('activation.strategy rejects an unknown swap strategy', () => {
+  const parsed = LinuxDeployTargetSchema.safeParse({
+    activation: { strategy: 'copy-over' },
+  });
+  assertEquals(parsed.success, false);
+});
+
+Deno.test('the convention blocks are optional on every target member', () => {
+  // Absent blocks parse cleanly across all target members (defaults are applied
+  // downstream by resolveDeployBase, not the schema).
+  assertEquals(DockerComposeDeployTargetSchema.parse({}).activation, undefined);
+  assertEquals(LinuxDeployTargetSchema.parse({}).secrets, undefined);
+});

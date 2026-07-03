@@ -224,6 +224,49 @@ export interface ResolvedDeployBaseConfig {
     denoBaseImage: string;
     dotnetBaseImage: string;
   };
+  /**
+   * Health-gated activation + release-retention convention (R-DEPLOY-3).
+   * Shared by every target; bindings live in the bare-metal activation adapters.
+   */
+  activation: {
+    /** Prior releases retained before pruning (current is always kept). */
+    retain: number;
+    /** Atomic activation strategy for this target's platform family. */
+    strategy: 'symlink' | 'dir-swap';
+    /** Health probe that gates a new release taking traffic. */
+    healthGate: {
+      /** HTTP path probed for health. */
+      path: string;
+      /** Port the health endpoint listens on (undefined → derived per service). */
+      port?: number;
+      /** Per-probe timeout in milliseconds. */
+      timeoutMs: number;
+      /** Delay between probe attempts in milliseconds. */
+      intervalMs: number;
+      /** Number of probe attempts before the gate fails. */
+      retries: number;
+      /** HTTP status that signals healthy. */
+      expectStatus: number;
+    };
+  };
+  /** Secret-material convention (R-DEPLOY-3): restricted-permission env file. */
+  secrets: {
+    /** Relative path of the generated restricted secret env file. */
+    envFile: string;
+    /** POSIX file mode for the secret file (0o600 default). */
+    mode: number;
+  };
+  /** OpenTelemetry convention (R-DEPLOY-3): canonical `OTEL_DENO` runtime env. */
+  otel: {
+    /** Whether OTEL runtime env is emitted. */
+    enabled: boolean;
+    /** OTLP exporter endpoint (`OTEL_EXPORTER_OTLP_ENDPOINT`). */
+    endpoint?: string;
+    /** OTLP exporter protocol (`OTEL_EXPORTER_OTLP_PROTOCOL`). */
+    protocol: string;
+    /** Prefix applied to the derived `OTEL_SERVICE_NAME`. */
+    serviceNamePrefix?: string;
+  };
 }
 
 /**

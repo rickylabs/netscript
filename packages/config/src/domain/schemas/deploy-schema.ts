@@ -103,6 +103,47 @@ const deployTargetBaseShape = {
       dotnetBaseImage: z.string().default('mcr.microsoft.com/dotnet/aspnet:9.0'),
     })
     .optional(),
+
+  // ── Health-gated activation + release retention (R-DEPLOY-3) ─────────────
+  activation: z
+    .object({
+      /** Prior releases retained before pruning. Default: 3. */
+      retain: z.number().int().min(0).optional(),
+      /** Atomic activation strategy. */
+      strategy: z.enum(['symlink', 'dir-swap']).optional(),
+      /** Health probe that gates a new release taking traffic. */
+      healthGate: z
+        .object({
+          path: z.string().optional(),
+          port: z.number().int().optional(),
+          timeoutMs: z.number().int().optional(),
+          intervalMs: z.number().int().optional(),
+          retries: z.number().int().min(1).optional(),
+          expectStatus: z.number().int().optional(),
+        })
+        .optional(),
+    })
+    .optional(),
+
+  // ── Secret material convention (R-DEPLOY-3) ──────────────────────────────
+  secrets: z
+    .object({
+      /** Relative path of the generated restricted secret env file. */
+      envFile: z.string().optional(),
+      /** POSIX file mode for the secret file. Default: 0o600. */
+      mode: z.number().int().optional(),
+    })
+    .optional(),
+
+  // ── OpenTelemetry convention (R-DEPLOY-3) ────────────────────────────────
+  otel: z
+    .object({
+      enabled: z.boolean().optional(),
+      endpoint: z.string().optional(),
+      protocol: z.string().optional(),
+      serviceNamePrefix: z.string().optional(),
+    })
+    .optional(),
 } as const;
 
 /**
