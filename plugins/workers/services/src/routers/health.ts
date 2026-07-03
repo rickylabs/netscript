@@ -14,8 +14,8 @@ const startTime = Date.now();
 // `BaseContractRoute<TIn, TOut>` alias (172a-2-SOUND slice 3). Carrying the
 // precise `typeof <schema>` through the contract is what makes the handler
 // bodies below genuinely type-checked against the contract output — under the
-// previous `BaseContractProcedure` (`~orpc: any`) annotation a wrong handler
-// shape compiled silently.
+// previous erasing procedure annotation (whose `~orpc` marker was `any`) a
+// wrong handler shape compiled silently.
 const CheckInputSchema: z.ZodOptional<z.ZodObject<Record<string, never>>> = z.object({})
   .optional();
 const CheckOutputSchema: z.ZodObject<{

@@ -30,8 +30,8 @@ const ComponentHealthSchema: z.ZodObject<{
 // `BaseContractRoute<TIn, TOut>` alias (172a-2-SOUND slice 3). The precise
 // `typeof <schema>` flows through `implement(...)`, so the handler bodies below
 // are genuinely type-checked against the contract output — under the previous
-// `BaseContractProcedure` (`~orpc: any`) annotation a wrong handler shape
-// compiled silently.
+// erasing procedure annotation (whose `~orpc` marker was `any`) a wrong handler
+// shape compiled silently.
 const HealthInputSchema: z.ZodOptional<z.ZodObject<Record<string, never>>> = z.object({})
   .optional();
 
