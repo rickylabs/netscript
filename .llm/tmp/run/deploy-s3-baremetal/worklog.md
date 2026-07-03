@@ -192,10 +192,45 @@
 - **D2 base-default extraction re-sequenced to S8** (see drift D2 update): the shared-base-default
   helper across both OS resolvers needs a common structural type over two `@netscript/config` schemas
   and `resolveWindowsDeploy` has no direct unit test here, so it cannot be proven green on a
-  Windows-only host without the per-slice-forbidden E2E. Benign (identical literals); lands in S8
-  where the Linux build path exercises both resolvers together.
+  Windows-only host without the per-slice-forbidden E2E. Benign (identical literals); re-sequenced to
+  **S9** (the tests slice) so the extraction lands paired with new direct `resolveWindowsDeploy`
+  coverage as its green backstop — S8 (registry realization) does not itself exercise that resolver.
 - Tests: new `prepare-deploy-build_test.ts` (2 tests on the pure `deployBuildDirs` mapping; the
   composed `prepareDeployBuild` layers already-unit-tested `extractCompileTargets` + `topologicalSort`
   over `Deno.mkdir`). Kept the test cast-free to respect the type-soundness doctrine. Gates: cli
   `deno check` 0 (465 files), deploy feature tests 3 passed/5 steps + config resolver tests 4 passed,
   lint 0 occurrences, `arch:check` no FAIL.
+
+## S8 — bare-metal deploy-target registry realization (#339, commit `c9f23efc`)
+
+- **Stub → real (canonical surface):** `WindowsServiceDeployTarget` migrated off the legacy-3
+  `operations = ['build','install','uninstall']` hardcode onto the canonical 6-op subset
+  (`plan/emit/up/down/status/logs`). Added the `LinuxServiceDeployTarget` sibling
+  (`kernel/domain/deploy/linux-service-deploy-target.ts`). Both are now three-line concrete classes
+  over a new shared `kernel/domain/deploy/service-deploy-target.ts` base (`ServiceDeployTarget` +
+  `SERVICE_DEPLOY_OPERATIONS`) that centralizes the canonical handlers **and** the legacy
+  `build`/`install`/`uninstall` verb aliases (LD-3) — no per-OS duplication; mirrors the endorsed
+  base-plugin-service seam. `rollback`/`secrets` remain **omitted** (declared-unsupported, LD-4;
+  bodies → #341).
+- **Registration:** `linux-service` added to `DEFAULT_DEPLOY_TARGETS` alongside `windows-service`
+  (+ `LINUX_SERVICE_DEPLOY_TARGET` const). The `KnownDeployTargetKey` reservation is now backed by a
+  concrete default descriptor; `DeployTargetRegistry.entries()` returns both in deterministic order.
+- **IMPL-3 (same commit):** `command-registry_test.ts` operations assertion updated from the legacy-3
+  array to the canonical 6-op array in the very commit that migrates the stub — no red interval.
+- **F-DEPLOY-1 evidence:** `deploy-target-port_test.ts` gains (a) a subset-declaration test — each
+  target's `operations` equals the canonical subset, every declared op resolves to a `function`
+  handler, legacy aliases stay callable, and `rollback`/`secrets` are `undefined`; (b) a
+  target-scoped result assertion (`linux.up` → `{target:'linux-service', operation:'up', …projectRoot}`);
+  (c) a default-registry scan (both OS targets seeded, deterministic order, correct labels). The
+  `undefined`-check required typing the loop as `readonly DeployTargetPort[]` (the interface carries
+  the optional `rollback?/secrets?`; the concrete class types do not) — no casts introduced.
+- **Layering boundary (drift D-S8):** these adapters are kernel-domain descriptors exposed via
+  `kernel/extension-points.ts` and are **not** on the live deploy path (CLI verbs run
+  `deploy-group.ts` → `buildWindowsDeployment`/`install-service-deploy` directly). Kernel-domain code
+  may not import the public `OsServicePort`/build pipeline, so the plan's "delegates to OsServicePort
+  + compile" bodies (injecting execution onto the descriptor seam) are a public-layer concern deferred
+  to #341. S8 realizes the registry faithfully at its own layer: full canonical vocabulary + Linux
+  sibling + registration, layering-clean and green.
+- **Gate:** cli `deno check` 0 errors; `deploy-target-port_test.ts` + `command-registry_test.ts`
+  **11 passed / 0 failed**; `arch:check` FAIL=0. packages/cli is check-only (excluded from the root
+  fmt/lint gate → "No target files" is expected, not a failure).

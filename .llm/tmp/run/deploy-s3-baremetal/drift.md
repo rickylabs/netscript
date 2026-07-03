@@ -40,9 +40,11 @@ Append-only. Severity: `minor` | `significant` | `architectural`.
   **not** directly unit-tested in `deploy-config-resolvers_test.ts` (only `resolveLinuxDeploy` is) —
   so a Windows-side merge cannot be proven green on this Windows-only host without the
   per-slice-forbidden `scaffold.runtime` E2E. The duplication is benign (character-identical literal
-  defaults). S8 realizes the Linux build path, which exercises both resolvers together and gives the
-  extraction a green backstop. Deferring (vs. forcing an unvalidatable Windows-config refactor) is the
-  guardrail-preferred choice; recorded so the evaluator reads this as a sequencing decision, not a gap.
+  defaults). The correct green backstop is direct `resolveWindowsDeploy` unit tests (defaults +
+  overrides, mirroring the existing `resolveLinuxDeploy` ones) — those belong with the **S9** tests
+  slice, so the base-default extraction is paired with and lands in **S9**, immediately after adding
+  that Windows resolver coverage. Deferring (vs. forcing an unvalidatable Windows-config refactor) is
+  the guardrail-preferred choice; recorded so the evaluator reads this as a sequencing decision.
 
 ## D3 (S3) — servy execution convergence deferred from S3 to S5 — severity: minor
 
@@ -140,3 +142,28 @@ Append-only. Severity: `minor` | `significant` | `architectural`.
   cross-slice risk. Both items are recorded as plan inaccuracies and intentionally left as no-ops;
   S6 delivered its load-bearing intent (OS-generic single-binary compile relocated to a neutral home)
   without them.
+
+## D-S8 (S8) — deploy-target descriptor delegation is bounded by hexagonal layering — severity: minor
+
+- **Plan said (S8):** evolve `WindowsServiceDeployTarget` stub → real "delegates to `OsServicePort` +
+  compile for `plan/up/down/status/logs`"; add `LinuxServiceDeployTarget`; register `linux`.
+- **Reality:** the `DeployTargetPort` adapters + `DeployTargetRegistry` are the **Archetype-7
+  descriptor / extension-point surface** exposed via `kernel/extension-points.ts`, and they are
+  **kernel-domain** code. `OsServicePort` lives in `public/ports/` (S2) and the real build/install
+  pipeline lives in `public/features/deploy/**`. A kernel-domain adapter importing either would invert
+  the hexagonal layer direction (kernel→public) and fail `arch:check` — the same constraint that moved
+  the systemd adapter to `public/adapters/` in D4. A repo-wide grep confirms nothing consumes the
+  registry on the live deploy execution path today: the CLI deploy verbs run through `deploy-group.ts`
+  → `buildWindowsDeployment` / `install-service-deploy` **directly**; the registry is consumed only by
+  tests + the exported extension-point surface.
+- **Decision:** S8 realizes the registry at the layer it lives in — the adapters now **declare the full
+  canonical operation vocabulary** (6 ops + legacy aliases) and return target-scoped operation
+  descriptors from a shared `ServiceDeployTarget` base, and `linux-service` is registered as a
+  first-class default target. Wiring an **injected** `OsServicePort`/compile delegation onto this seam
+  (so the descriptor registry becomes an execution path) is a public-layer composition concern that
+  belongs with the deployment-hardening slice **#341** (rollback/health/OTEL/secrets bodies), which is
+  explicitly out of this epic's scope. This keeps S8 green, layering-clean, and faithful to the plan's
+  intent (canonical-op adapters + Linux sibling + registration) without a layering violation.
+- **Impact:** none on gates or the live deploy path. F-DEPLOY-1 (registry scan + subset-declaration) is
+  proven by the new tests. Recorded so the evaluator reads the descriptor-level realization as a
+  layering decision, not a missing-delegation gap.
