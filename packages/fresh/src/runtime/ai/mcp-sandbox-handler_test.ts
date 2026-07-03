@@ -1,5 +1,5 @@
 import { assert, assertEquals, assertStringIncludes } from '@std/assert';
-import { createMcpSandboxHandler } from './mcp-sandbox-handler.ts';
+import { createMcpSandboxHandler } from './sandbox.ts';
 
 const sampleUri = 'ui://widgets.example/weather/card.js';
 

@@ -103,10 +103,10 @@ Code lands via #251; the surface is documented here for completeness.
 
 ### FA3 — MCP `ui://` sandbox handler
 
-`createMcpSandboxHandler` builds a Fresh-compatible `GET` handler for sandboxed
-MCP UI resources. Mount it on any route and request a registered resource with
-`?uri=ui://...`; non-`ui://` or missing resource URIs return `400`, and resolver
-misses return `404`.
+`createMcpSandboxHandler` is exported from `@netscript/fresh/ai/sandbox`. It
+builds a Fresh-compatible `GET` handler for sandboxed MCP UI resources. Mount it
+on any route and request a registered resource with `?uri=ui://...`; non-`ui://`
+or missing resource URIs return `400`, and resolver misses return `404`.
 
 The caller owns two ports: `resolveResource(uri, { request, signal })` for the
 registered resource body, and `themes` for design tokens. The handler wraps the
@@ -122,7 +122,7 @@ a record theme source does not contain the fallback name, the first record entry
 is used instead.
 
 ```ts
-import { createMcpSandboxHandler } from '@netscript/fresh/ai';
+import { createMcpSandboxHandler } from '@netscript/fresh/ai/sandbox';
 
 export const handler = {
   GET: createMcpSandboxHandler({
@@ -136,7 +136,8 @@ export const handler = {
 ```
 
 `createNetScriptMcpSandbox` (+ `NetScriptMcpToolSource`, `NetScriptMcpSandbox`,
-`NetScriptMcpSandboxOptions`) remains the chat-activity tool-wiring skeleton
+`NetScriptMcpSandboxOptions`) is also exported from
+`@netscript/fresh/ai/sandbox` and remains the chat-activity tool-wiring skeleton
 (server `mergeAgentTools` + island `createMcpAppBridge`).
 
 ## End-to-end usage sketch

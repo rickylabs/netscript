@@ -66,12 +66,8 @@
  *   FA2's concurrent edits to this file stay conflict-free.
  * - **FA2** (landed): `createNetScriptChatStreamProxy` (the durable chat stream
  *   proxy handler; body in `./stream-proxy.ts`, re-exported below).
- * - **FA3**: `createMcpSandboxHandler` (the themed `ui://` resource sandbox)
- *   plus the older `createNetScriptMcpSandbox` skeleton for chat-activity tool
- *   wiring.
- *
- * The FA3 function below remains a typed stub that throws `not implemented
- * (FA0 skeleton)`; it names the upstream value its body will wrap.
+ * - **FA3**: MCP sandbox helpers live on `@netscript/fresh/ai/sandbox` so the
+ *   chat-session surface stays within the F-5 export cap.
  *
  * @module
  */
@@ -95,27 +91,6 @@ export {
   toNetScriptChatResponse,
 } from './create-chat-connection.ts';
 
-// Upstream wrap target for the FA3 stub. This value import keeps the remaining
-// transport dep in the module graph while the stub declares — via
-// `notImplemented(..., <target>)` — exactly which upstream primitive its body
-// will wrap. The public API below stays self-contained (local types only) so
-// the JSR doc gate never sees an external private type reference.
-import { createMcpAppBridge } from '@tanstack/ai-preact';
-import { mergeAgentTools } from '@tanstack/ai';
-
-/** Human-readable marker every FA0 skeleton stub throws with. */
-const FA0_SKELETON = 'not implemented (FA0 skeleton)';
-
-/**
- * Throw the shared FA0 skeleton error, recording which upstream value the real
- * FA1/FA2/FA3 body will wrap. Returns `never`, so callers can `return` it and
- * still satisfy their declared return type.
- */
-function notImplemented(symbol: string, wrapTarget: unknown): never {
-  void wrapTarget;
-  throw new Error(`${symbol}: ${FA0_SKELETON}`);
-}
-
 // ---------------------------------------------------------------------------
 // FA2 — durable chat stream proxy (route handler). Real implementation lives in
 // `./stream-proxy.ts`; re-exported here so `@netscript/fresh/ai` stays a single
@@ -127,46 +102,3 @@ export {
   type NetScriptChatStreamProxyHandler,
   type NetScriptChatStreamProxyOptions,
 } from './stream-proxy.ts';
-
-export { createMcpSandboxHandler, type McpSandboxHandlerOptions } from './mcp-sandbox-handler.ts';
-
-// ---------------------------------------------------------------------------
-// FA3 — MCP tool sandbox.
-// ---------------------------------------------------------------------------
-
-/** A NetScript-owned reference to an MCP tool source exposed to a chat activity. */
-export interface NetScriptMcpToolSource {
-  /** Stable identifier for the MCP source. */
-  readonly id: string;
-  /** Endpoint URL the MCP source is served from. */
-  readonly url: string;
-  /** Whether the connection is held open between turns. */
-  readonly keepAlive?: boolean;
-}
-
-/** Options for wiring an MCP tool sandbox into a NetScript chat activity. */
-export interface NetScriptMcpSandboxOptions {
-  /** MCP tool sources exposed to the chat activity. */
-  readonly sources: ReadonlyArray<NetScriptMcpToolSource>;
-}
-
-/**
- * A resolved MCP sandbox: the tool surface plus the runtime handle downstream
- * slices connect the island `useChat` bridge to.
- */
-export interface NetScriptMcpSandbox {
-  /** MCP tool sources active in this sandbox. */
-  readonly sources: ReadonlyArray<NetScriptMcpToolSource>;
-}
-
-/**
- * FA3 — construct the MCP tool sandbox for a NetScript chat activity. Wraps
- * `mergeAgentTools` (server) and `createMcpAppBridge` (island). FA0 stub.
- */
-export function createNetScriptMcpSandbox(
-  options: NetScriptMcpSandboxOptions,
-): NetScriptMcpSandbox {
-  void options;
-  void createMcpAppBridge;
-  return notImplemented('createNetScriptMcpSandbox', mergeAgentTools);
-}

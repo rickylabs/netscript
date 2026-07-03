@@ -13,6 +13,7 @@
     "./error": "./src/diagnostics/error/mod.ts",
     "./streams": "./src/runtime/streams/mod.ts",
     "./ai": "./src/runtime/ai/mod.ts",
+    "./ai/sandbox": "./src/runtime/ai/sandbox.ts",
     "./query": "./src/application/query/mod.ts",
     "./interactive": "./src/runtime/interactive/mod.ts",
     "./vite": "./src/application/vite/vite.ts",
@@ -20,8 +21,8 @@
   },
   "tasks": {
     "test": "deno test --allow-all ./src ./tests",
-    "check": "deno check --unstable-kv ./mod.ts ./src/runtime/server/mod.ts ./src/application/builders/mod.ts ./src/application/route/mod.ts ./src/application/query/mod.ts ./src/application/vite/vite.ts ./src/runtime/interactive/mod.ts ./src/application/defer/mod.ts ./src/application/form/mod.ts ./src/diagnostics/error/mod.ts ./src/runtime/streams/mod.ts ./src/runtime/ai/mod.ts ./src/testing/mod.ts",
-    "doc-lint": "deno doc --lint ./mod.ts ./src/runtime/server/mod.ts ./src/application/builders/mod.ts ./src/application/route/mod.ts ./src/application/defer/mod.ts ./src/application/form/mod.ts ./src/diagnostics/error/mod.ts ./src/runtime/streams/mod.ts ./src/runtime/ai/mod.ts ./src/application/query/mod.ts ./src/runtime/interactive/mod.ts ./src/application/vite/vite.ts ./src/testing/mod.ts",
+    "check": "deno check --unstable-kv ./mod.ts ./src/runtime/server/mod.ts ./src/application/builders/mod.ts ./src/application/route/mod.ts ./src/application/query/mod.ts ./src/application/vite/vite.ts ./src/runtime/interactive/mod.ts ./src/application/defer/mod.ts ./src/application/form/mod.ts ./src/diagnostics/error/mod.ts ./src/runtime/streams/mod.ts ./src/runtime/ai/mod.ts ./src/runtime/ai/sandbox.ts ./src/testing/mod.ts",
+    "doc-lint": "deno doc --lint ./mod.ts ./src/runtime/server/mod.ts ./src/application/builders/mod.ts ./src/application/route/mod.ts ./src/application/defer/mod.ts ./src/application/form/mod.ts ./src/diagnostics/error/mod.ts ./src/runtime/streams/mod.ts ./src/runtime/ai/mod.ts ./src/runtime/ai/sandbox.ts ./src/application/query/mod.ts ./src/runtime/interactive/mod.ts ./src/application/vite/vite.ts ./src/testing/mod.ts",
     "fmt": "deno fmt ./mod.ts ./src ./tests/_fixtures",
     "fmt:check": "deno fmt --check ./mod.ts ./src ./tests/_fixtures",
     "lint": "deno lint --rules-exclude=no-slow-types ./mod.ts ./src ./tests/_fixtures",
