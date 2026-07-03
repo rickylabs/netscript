@@ -319,7 +319,7 @@ Aspire resources and the connection-string env vars the workspace resolves.
   rows: [
     { name: "postgres", type: "Aspire resource", desc: "The Postgres container Aspire provisions from appsettings.json NetScript.Databases.postgres. Watch it go green in the dashboard." },
     { name: "redis", type: "Aspire resource", desc: "Redis cache — the default `--cache-backend`; Redis-compatible — backing KV/queues. A separate concern from Postgres; see KV, queues & cron. (`garnet` and `deno-kv` are alternative backends.)" },
-    { name: "http://localhost:18888", type: "dashboard", desc: "Aspire dashboard (token printed by `aspire start`) — confirm the postgres resource is healthy." },
+    { name: "https://localhost:18888", type: "dashboard", desc: "Aspire dashboard (token printed by `aspire start`) — confirm the postgres resource is healthy." },
     { name: "POSTGRES_URI / DATABASE_URL", type: "env", desc: "Connection string resolved by prisma.config.ts and normalized to a URL. Set these yourself under --no-aspire." }
   ]
 }) }}

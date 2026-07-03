@@ -279,7 +279,7 @@ treat that as canonical and this essay as the orientation.
 {{ comp.apiTable({
   caption: "The resource graph a single `aspire start` brings up",
   rows: [
-    { name: "aspire (dashboard)", type: "http://localhost:18888", desc: "The Aspire dashboard. `aspire start` prints a login token. Live resource list, logs, structured traces, and the OTLP collector (:4318) surface here." },
+    { name: "aspire (dashboard)", type: "https://localhost:18888", desc: "The Aspire dashboard. `aspire start` prints a login token. Live resource list, logs, structured traces, and the OTLP collector (:4318) surface here." },
     { name: "postgres", type: "Container", desc: "Provisioned via Docker. Engine Postgres by default (swap to `mysql` / `mssql` — also Containers — or file-backed `sqlite`, which has no container, via `--db`), persistent (DataPath .data/postgres). The database that `netscript db` commands target — reachable only once Aspire is up." },
     { name: "redis", type: "Container (cache)", desc: "Redis cache — the default `--cache-backend`; Redis-compatible. Backs KV/queue workloads for the runtime plugins. Swap to `garnet` (also a Container) or app-level `deno-kv` via `--cache-backend`." },
     { name: "users", type: ":3001", desc: "Example oRPC service (defineService). Routes /api/v1/users/* and the RPC surface at /api/rpc/*." },
@@ -360,7 +360,7 @@ flag surfaces only at runtime as an FFI capability crash, not at generate time.
 ## The dashboard: the local observability surface
 
 When `aspire start` finishes booting, it prints a URL and a one-time login token for the dashboard
-at `http://localhost:18888`. The dashboard is the single pane of glass over the running graph:
+at `https://localhost:18888`. The dashboard is the single pane of glass over the running graph:
 
 - **Resources** — every container and executable above, with status, endpoints, and environment.
 - **Console logs** — stdout/stderr per resource, so a failing background processor is one click
@@ -430,7 +430,7 @@ connection strings.
   {
     label: "Default — with Aspire",
     lang: "bash",
-    code: "netscript init my-app --db postgres --service --service-name users --service-port 3001 --yes\n\n# Step 2: orchestration brings up Postgres + Redis + every process.\ncd aspire && aspire restore   # once\naspire start                    # dashboard at http://localhost:18888\n\n# Step 3: database commands now work (provisioned through Aspire).\nnetscript db init --name init"
+    code: "netscript init my-app --db postgres --service --service-name users --service-port 3001 --yes\n\n# Step 2: orchestration brings up Postgres + Redis + every process.\ncd aspire && aspire restore   # once\naspire start                    # dashboard at https://localhost:18888\n\n# Step 3: database commands now work (provisioned through Aspire).\nnetscript db init --name init"
   },
   {
     label: "Escape hatch — --no-aspire",

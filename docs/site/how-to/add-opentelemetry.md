@@ -15,7 +15,7 @@ and the subprocess task runtime the scaffold generates. Aspire stands up the OTL
 and the trace UI for you. This recipe shows where the instrumentation already lives, how to
 add your own spans and structured logs, how `traceparent` propagates across the oRPC/HTTP
 boundary and into job subprocesses, and how to watch it all land in the Aspire dashboard at
-[http://localhost:18888](http://localhost:18888).
+[https://localhost:18888](https://localhost:18888).
 
 This is a task recipe, not a deep-dive. For the mental model behind spans, structured logs,
 and the per-capability health endpoints, read [Observability](/explanation/observability/).
@@ -39,7 +39,7 @@ directly — shown in Step 3. Structured logging via <code>log.*</code> is real 
 
 {{ comp.apiTable({ caption: "What this recipe assumes", rows: [
   { name: "netscript workspace", type: "netscript init", desc: "An existing workspace. If you have none, scaffold one first — see the tutorials." },
-  { name: "aspire startning", type: "cd aspire && aspire start", desc: "The AppHost provisions Postgres, Redis, the OTLP collector, and the dashboard. Start it BEFORE you expect traces. Dashboard at http://localhost:18888." },
+  { name: "aspire startning", type: "cd aspire && aspire start", desc: "The AppHost provisions Postgres, Redis, the OTLP collector, and the dashboard. Start it BEFORE you expect traces. Dashboard at https://localhost:18888." },
   { name: "@netscript/telemetry", type: "OTel facade", desc: "Wraps @opentelemetry/api and ships the worker/scheduler/queue/SSE instrumentation. Already wired into the generated handlers — no install step." },
   { name: "A service or plugin to trace", type: "services/users or plugins/workers", desc: "The users service (:3001) and the workers/sagas/triggers/auth plugins all emit health + trace data once running." }
 ] }) }}
@@ -82,10 +82,10 @@ the dashboard, then boots Postgres, Redis, and every service/plugin resource.
 ```bash
 cd aspire
 aspire start
-# dashboard: http://localhost:18888  (login token printed in the console)
+# dashboard: https://localhost:18888  (login token printed in the console)
 ```
 
-Open [http://localhost:18888](http://localhost:18888), authenticate with the token Aspire
+Open [https://localhost:18888](https://localhost:18888), authenticate with the token Aspire
 printed, and select the **Traces** tab. With nothing exercised yet it is empty — that is
 expected. Leave it open; it updates live.
 
@@ -206,7 +206,7 @@ Always forward <code>traceparent</code> on service-to-service calls.
 
 ## Step 5 — Read the traces
 
-Back in the dashboard at [http://localhost:18888](http://localhost:18888):
+Back in the dashboard at [https://localhost:18888](https://localhost:18888):
 
 1. **Traces** — every request and job as a waterfall of spans. Click a root span to drill into
    children, durations, and attributes (the ones you set via `span.setAttribute(...)`). Job

@@ -39,7 +39,7 @@ completion and watch a failure compensate, all observable on the Sagas API at `:
 You should have finished [chapter 3](/tutorials/storefront/03-cart-contracts/), so:
 
 - `my-shop/` has the `products` service and the `cart` contract.
-- `aspire start` is up (the dashboard answers at [http://localhost:18888](http://localhost:18888)).
+- `aspire start` is up (the dashboard answers at [https://localhost:18888](https://localhost:18888)).
   The saga registry and durable instance store both depend on Aspire-managed resources — Deno KV for
   the registry, and either KV or Postgres for instance state.
 
