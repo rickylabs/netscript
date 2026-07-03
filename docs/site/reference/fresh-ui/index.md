@@ -37,14 +37,160 @@ supporting types from `@netscript/fresh-ui/primitives`.
 
 ## DataGrid
 
-`DataGrid` is a generic, templated data-grid component exported from the package root — the
-successor to the earlier `DataTable` registry component.
+`DataGrid` is a generic, templated data-grid component exported from the package root
+(`@netscript/fresh-ui`) — the successor to the earlier `DataTable` registry block. Unlike the
+copy-source registry items, `DataGrid` is a runtime export you import directly; you do **not**
+`netscript ui:add` it. It renders a token-styled `role="grid"` region from a `columns` contract and
+a `rows` contract, and supports plain, button, and Fresh client-navigation rows.
+
+### DataGrid props
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `columns` | `readonly DataGridColumn<T>[]` | Ordered column definitions (required). |
+| `rows` | `readonly DataGridRow<T>[]` | Ordered row definitions (required). |
+| `label` | `string` | Accessible label applied as `aria-label` on the grid region. |
+| `class` | `string` | Additional class names appended to the `ns-data-grid` root. |
+| `[attribute: string]` | `unknown` | Any further native attributes are forwarded to the grid root. |
+
+### `DataGridColumn<T>`
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `key` | `string` | Property key used for fallback cell content and stable cell identity. |
+| `header` | `string` | Visible column header text. |
+| `width` | `string` | CSS grid track width, e.g. `2fr` or `minmax(0, 12rem)`. Defaults to `minmax(0, 1fr)`. |
+| `cell` | `DataGridCellVariant` | Optional built-in cell treatment: `"strong"` (bold) or `"num"` (monospace, right-aligned). |
+| `render` | `(row: T) => DataGridRenderable` | Optional per-column template receiving the row payload. |
+
+### `DataGridRow<T>`
+
+Every row carries a stable `id`, a caller-owned `data: T` payload, and an optional `selected` flag.
+A row renders differently based on which navigation field is present — the three shapes are mutually
+exclusive (supply at most one of `onSelect` or `href`):
+
+| Shape | Distinguishing field | Renders as |
+| --- | --- | --- |
+| Plain | neither `onSelect` nor `href` | a `role="row"` `<div>`. |
+| Button | `onSelect: () => void` | a `role="row"` `<button>` that calls `onSelect` on click. |
+| Link | `href: string` | a `role="row"` `<a f-client-nav>` for Fresh client navigation. |
+
+### DataGrid symbols
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
 | `DataGrid` | component | Generic templated data grid; renders `DataGridColumn` definitions over `DataGridRow` data. |
-| `DATA_GRID_CELL_VARIANTS` | const | Supported cell rendering variants for `DataGridColumn`. |
-| `DataGridColumn` / `DataGridProps` / `DataGridRow` / `DataGridNode` / `DataGridRenderable` / `DataGridCellVariant` | types | Supporting types for `DataGrid`. |
+| `DATA_GRID_CELL_VARIANTS` | const | The supported cell-treatment names: `["strong", "num"]`. |
+| `DataGridColumn<T>` / `DataGridProps<T>` / `DataGridRow<T>` | interfaces / types | Column, props, and row contracts. |
+| `DataGridNode` / `DataGridRenderable` / `DataGridCellVariant` | types | Structural node, renderable cell content, and the cell-variant union. |
+
+### DataGrid example
+
+```tsx
+import { DataGrid, type DataGridColumn, type DataGridRow } from "@netscript/fresh-ui";
+
+interface Invoice {
+  id: string;
+  customer: string;
+  total: number;
+}
+
+const columns: DataGridColumn<Invoice>[] = [
+  { key: "customer", header: "Customer", width: "2fr", cell: "strong" },
+  { key: "total", header: "Total", cell: "num", render: (row) => `$${row.total.toFixed(2)}` },
+];
+
+const rows: DataGridRow<Invoice>[] = [
+  { id: "inv-1", data: { id: "inv-1", customer: "Acme", total: 420 }, href: "/invoices/inv-1" },
+  { id: "inv-2", data: { id: "inv-2", customer: "Globex", total: 130 }, selected: true, href: "/invoices/inv-2" },
+];
+
+export function InvoiceGrid() {
+  return <DataGrid label="Invoices" columns={columns} rows={rows} />;
+}
+```
+
+A column with `cell: "num"` renders monospace and right-aligned; `cell: "strong"` renders bold. A
+column without `render` falls back to `row.data[column.key]` when that key holds a string, number,
+bigint, boolean, `null`, or `undefined`.
+
+> **Rows are keyed by `id`.** Supply a stable `id` per row so Preact can reconcile rows across
+> re-renders, and provide at most one of `onSelect` or `href` — the row shapes are mutually
+> exclusive, and a link row navigates through Fresh (`f-client-nav`) rather than a full page load.
+
+## Dropzone (registry component)
+
+`Dropzone` is a copy-source registry component, not a package export — install it with
+`netscript ui:add dropzone`, after which it lives at `components/ui/dropzone.tsx` in your app and is
+yours to edit. It renders a dashed file-drop target (`<label class="ns-dropzone">`) that ingests
+files from three sources — drag-and-drop, focused clipboard paste, and the native file picker — and
+filters each ingest through a shared `accept` / `multiple` policy before calling back.
+
+### Dropzone props
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `label` | `string` | Primary call-to-action text. Defaults to `"Drop files or click to upload"`. |
+| `hint` | `string` | Secondary hint line (accepted types, size limits). |
+| `icon` | `Renderable` | Leading glyph or icon node. Defaults to `↑`. |
+| `active` | `boolean` | Forces the drag-over (`data-active`) visual state. |
+| `accept` | `string` | Native `accept` string applied to drop, paste, **and** picker ingest. |
+| `multiple` | `boolean` | Whether one ingest event may accept more than one file. Defaults to `false`. |
+| `onFile` | `(file: File, details: DropzoneIngestDetails) => void` | Called with the first accepted file — the simple single-file path. |
+| `onFiles` | `(files: readonly File[], details: DropzoneIngestDetails) => void` | Called with every accepted file. |
+| `onReject` | `(files: readonly DropzoneRejectedFile[], details: DropzoneIngestDetails) => void` | Called with every rejected file. |
+| `onDrop` / `onDragOver` / `onPaste` | event handlers | Optional passthrough handlers invoked after the built-in ingest runs. |
+| `children` | `Renderable` | Additional content rendered inside the label. |
+| `class` | `string` | Additional class names appended to the `ns-dropzone` root. |
+
+`DropzoneProps` also extends `JSX.HTMLAttributes<HTMLLabelElement>` (minus `class`, `onDrop`,
+`onDragOver`, and `onPaste`, which the component owns), so standard label attributes pass through.
+
+### Dropzone ingest types
+
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `DROPZONE_INGEST_SOURCES` | const | The ingest source names: `["drop", "paste", "picker"]`. |
+| `DROPZONE_REJECTED_REASONS` | const | The rejection reason names: `["type", "too-many"]`. |
+| `DropzoneIngestSource` | type | `"drop" \| "paste" \| "picker"`. |
+| `DropzoneRejectedReason` | type | `"type" \| "too-many"`. |
+| `DropzoneRejectedFile` | interface | A rejected `file`, its `reason`, and the ingest `source` that supplied it. |
+| `DropzoneIngestDetails` | interface | `acceptedFiles`, `rejectedFiles`, the ingest `source`, and the original `event`. |
+| `DropzoneProps` | interface | The full prop contract documented above. |
+
+### Dropzone example
+
+```tsx
+import { Dropzone, type DropzoneIngestDetails } from "@app/components/ui/dropzone.tsx";
+
+export function AvatarUpload() {
+  function handleFiles(files: readonly File[], details: DropzoneIngestDetails) {
+    console.log(`Accepted ${files.length} file(s) via ${details.source}`);
+    for (const rejected of details.rejectedFiles) {
+      console.warn(`Rejected ${rejected.file.name}: ${rejected.reason}`);
+    }
+  }
+
+  return (
+    <Dropzone
+      label="Drop images or click to upload"
+      hint="PNG or JPG, up to 5 MB"
+      accept="image/png,image/jpeg"
+      multiple
+      onFiles={handleFiles}
+    />
+  );
+}
+```
+
+Rejections are reported, not silent: a file whose type falls outside `accept` is rejected with
+reason `"type"`, and — when `multiple` is `false` — every file after the first is rejected with
+reason `"too-many"`. Each ingest also updates a visually-rendered `aria-live` status node so
+assistive technology hears how many files were accepted or rejected.
+
+> **Paste ingest requires focus.** Clipboard paste only fires while the dropzone (or a child) holds
+> focus, so pair it with a focusable affordance. The picker `<input>` clears its value after each
+> selection, so re-selecting the same file still triggers `onFile` / `onFiles`.
 
 ## Redirect-flash (toast) helpers
 

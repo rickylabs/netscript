@@ -219,6 +219,83 @@ Shorter aliases — `useQuery`, `useMutation`, `useInfiniteQuery`,
 `useSuspenseQuery`, and `useSuspenseInfiniteQuery` — map to their `useIsland*`
 counterparts for backward compatibility.
 
+#### A worked mutation: optimistic toggle with rollback
+
+This island toggles a todo's `done` flag through `useIslandMutation`, applying the
+change optimistically and rolling back if the server rejects it. `onMutate` snapshots
+the cached list and returns it as context, `onError` restores that snapshot, and
+`onSettled` re-syncs with the server:
+
+```tsx
+import {
+  QueryIsland,
+  useIslandMutation,
+  useQueryClient,
+} from "@netscript/fresh/query";
+
+interface Todo {
+  id: string;
+  title: string;
+  done: boolean;
+}
+
+function TodoToggle({ todo }: { todo: Todo }) {
+  const queryClient = useQueryClient();
+
+  const toggle = useIslandMutation<Todo, Error, boolean, { previous?: Todo[] }>({
+    // 1. The round-trip: PATCH the change and return the server's copy.
+    mutationFn: (done) =>
+      fetch(`/api/todos/${todo.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ done }),
+      }).then((res) => res.json() as Promise<Todo>),
+
+    // 2. Optimistic update: snapshot prior state, write the expected next state.
+    onMutate: async (done) => {
+      await queryClient.cancelQueries({ queryKey: ["todos"] });
+      const previous = queryClient.getQueryData<Todo[]>(["todos"]);
+      queryClient.setQueryData<Todo[]>(
+        ["todos"],
+        (list) => (list ?? []).map((item) => item.id === todo.id ? { ...item, done } : item),
+      );
+      return { previous };
+    },
+
+    // 3. Roll back to the snapshot when the server rejects the change.
+    onError: (_error, _done, context) => {
+      if (context?.previous) queryClient.setQueryData(["todos"], context.previous);
+    },
+
+    // 4. Re-sync with the server once the mutation settles, either way.
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["todos"] }),
+  });
+
+  return (
+    <button
+      type="button"
+      disabled={toggle.isPending}
+      onClick={() => toggle.mutate(!todo.done)}
+    >
+      {todo.done ? "Mark undone" : "Mark done"}
+    </button>
+  );
+}
+
+export default function TodoIsland({ todo }: { todo: Todo }) {
+  return (
+    <QueryIsland>
+      <TodoToggle todo={todo} />
+    </QueryIsland>
+  );
+}
+```
+
+The four generic parameters mirror
+`IslandMutationOptions<TData, TError, TVariables, TContext>`: here `TData` is the
+server's `Todo`, `TVariables` is the `boolean` passed to `mutate`, and `TContext` is
+the snapshot threaded from `onMutate` into `onError` and `onSettled`. Call `mutate`
+for fire-and-forget UI updates, or `mutateAsync` when you need to await the result.
+
 ## Server prefetch and hydration
 
 For streaming SSR, prefetch on the server and hand the cache to the island:
