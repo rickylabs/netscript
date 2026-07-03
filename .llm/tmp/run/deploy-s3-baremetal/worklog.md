@@ -60,3 +60,18 @@
   config `deno fmt --check` 0 findings (config IS lint/fmt-gated, unlike cli).
 - Drift: D1 (config-file.v1.json is vendored Deno schema, no `deploy.targets` — asset entry
   correctly omitted), D2 (resolved base-config duplication deferred to S7). See `drift.md`.
+
+### S2 — port `OsServicePort` clean rename (LD-2, N1/N2, IMPL-2)
+
+- Renamed `public/ports/windows-service-port.ts` → `os-service-port.ts`; types
+  `WindowsService{Port,CommandResult,InstallRequest,Operation}` → `OsService*`. Clean break, no
+  deprecated shim (LD-2). Internal surface — not on `@netscript/cli` JSR exports, no `deno.json`
+  exports diff (N1).
+- Updated ALL in-repo importers in this one commit (N2): `adapters/servy-cli.ts` (IMPL-2 — type
+  refs; class stays `ServyCliAdapter`, evolves at S3), `features/deploy/install/
+  install-service-deploy.ts`, `.../uninstall/uninstall-service-deploy.ts`,
+  `features/deploy/build/deploy_test.ts` (incl. `RecordingWindowsServicePort` →
+  `RecordingOsServicePort`). `public-command-dependencies.ts` imports the concrete `ServyCliAdapter`
+  (name unchanged) so needed no S2 edit.
+- Gates: cli `deno check` 0 (539 files); `deploy_test.ts` 4/4 steps incl. the "maps Windows service
+  operations to servy-cli invocations" regression (servy args byte-identical).

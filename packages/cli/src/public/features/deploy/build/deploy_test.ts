@@ -4,10 +4,10 @@ import { assertEquals } from 'jsr:@std/assert@^1';
 import type { ProcessPort, ProcessResult } from '../../../../kernel/ports/process-port.ts';
 import type { ServiceManifestPort } from '../../../ports/service-manifest-port.ts';
 import type {
-  WindowsServiceCommandResult,
-  WindowsServiceInstallRequest,
-  WindowsServicePort,
-} from '../../../ports/windows-service-port.ts';
+  OsServiceCommandResult,
+  OsServiceInstallRequest,
+  OsServicePort,
+} from '../../../ports/os-service-port.ts';
 import { ServyCliAdapter } from '../../../adapters/servy-cli.ts';
 import { buildDeploy } from './build-deploy.ts';
 import { installServiceDeploy } from '../install/install-service-deploy.ts';
@@ -53,7 +53,7 @@ describe('public deploy application flows', () => {
   });
 
   it('installs manifest services in manifest order', async () => {
-    const services = new RecordingWindowsServicePort();
+    const services = new RecordingOsServicePort();
 
     const result = await installServiceDeploy({
       deployDir: '/deploy',
@@ -75,7 +75,7 @@ describe('public deploy application flows', () => {
   });
 
   it('uninstalls manifest services in reverse manifest order', async () => {
-    const services = new RecordingWindowsServicePort();
+    const services = new RecordingOsServicePort();
 
     const result = await uninstallServiceDeploy({
       deployDir: '/deploy',
@@ -154,11 +154,11 @@ function manifestPort(serviceNames: readonly string[]): ServiceManifestPort {
   };
 }
 
-class RecordingWindowsServicePort implements WindowsServicePort {
-  readonly installs: WindowsServiceInstallRequest[] = [];
+class RecordingOsServicePort implements OsServicePort {
+  readonly installs: OsServiceInstallRequest[] = [];
   readonly runs: Array<{ operation: string; serviceName: string }> = [];
 
-  install(request: WindowsServiceInstallRequest): Promise<WindowsServiceCommandResult> {
+  install(request: OsServiceInstallRequest): Promise<OsServiceCommandResult> {
     this.installs.push(request);
     return Promise.resolve({ success: true, message: 'OK', code: 0 });
   }

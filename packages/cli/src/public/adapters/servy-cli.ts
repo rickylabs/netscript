@@ -6,11 +6,11 @@
 
 import type { ProcessPort } from '../../kernel/ports/process-port.ts';
 import type {
-  WindowsServiceCommandResult,
-  WindowsServiceInstallRequest,
-  WindowsServiceOperation,
-  WindowsServicePort,
-} from '../ports/windows-service-port.ts';
+  OsServiceCommandResult,
+  OsServiceInstallRequest,
+  OsServiceOperation,
+  OsServicePort,
+} from '../ports/os-service-port.ts';
 
 /** Options for constructing a Servy CLI adapter. */
 export interface ServyCliAdapterOptions {
@@ -22,14 +22,14 @@ export interface ServyCliAdapterOptions {
 }
 
 /** Windows service adapter backed by servy-cli.exe. */
-export class ServyCliAdapter implements WindowsServicePort {
+export class ServyCliAdapter implements OsServicePort {
   /** Create a Servy CLI adapter. */
   constructor(private readonly options: ServyCliAdapterOptions) {}
 
   /** Install a service from its Servy XML config. */
   async install(
-    request: WindowsServiceInstallRequest,
-  ): Promise<WindowsServiceCommandResult> {
+    request: OsServiceInstallRequest,
+  ): Promise<OsServiceCommandResult> {
     const args = ['install', '-n', request.serviceName, '-c', request.configPath, '-q'];
     if (request.force) {
       args.push('--force');
@@ -39,14 +39,14 @@ export class ServyCliAdapter implements WindowsServicePort {
 
   /** Run a lifecycle operation against a full Windows service name. */
   async run(
-    operation: Exclude<WindowsServiceOperation, 'install'>,
+    operation: Exclude<OsServiceOperation, 'install'>,
     serviceName: string,
-  ): Promise<WindowsServiceCommandResult> {
+  ): Promise<OsServiceCommandResult> {
     return await this.runCommand([operation, '-n', serviceName, '-q']);
   }
 
   /** Execute a Servy CLI invocation and translate its output to a structured result. */
-  private async runCommand(args: readonly string[]): Promise<WindowsServiceCommandResult> {
+  private async runCommand(args: readonly string[]): Promise<OsServiceCommandResult> {
     const result = await this.options.process.exec(this.options.servyCliPath, [...args]);
     const message = result.stdout.trim() ||
       result.stderr.trim() ||

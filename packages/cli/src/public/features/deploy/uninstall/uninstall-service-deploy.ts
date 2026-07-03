@@ -8,7 +8,7 @@ import type {
   ResolvedServiceManifest,
   ServiceManifestPort,
 } from '../../../ports/service-manifest-port.ts';
-import type { WindowsServicePort } from '../../../ports/windows-service-port.ts';
+import type { OsServicePort } from '../../../ports/os-service-port.ts';
 
 /** Request for uninstalling deployed services. */
 export interface UninstallServiceDeployRequest {
@@ -31,7 +31,7 @@ export interface UninstallServiceDeployDependencies {
   readonly manifests: ServiceManifestPort;
 
   /** Windows service lifecycle adapter. */
-  readonly services: WindowsServicePort;
+  readonly services: OsServicePort;
 }
 
 /** Result of uninstalling deployment services. */
