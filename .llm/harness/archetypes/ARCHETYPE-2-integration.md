@@ -10,8 +10,9 @@
   - `docs/architecture/doctrine/07-composition-and-extension.md`
   - `docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md`
 - Anti-patterns: AP-1, AP-2, AP-3, AP-4, AP-5, AP-7, AP-8, AP-9, AP-11, AP-13, AP-14, AP-16, AP-17,
-  AP-19, AP-20.
-- Fitness functions: F-1, F-2, F-3, F-4, F-5, F-6, F-7, F-8, F-9, F-10, F-11, F-12, F-14, F-15.
+  AP-19, AP-20, AP-22, AP-23, AP-24, AP-25.
+- Fitness functions: F-1, F-2, F-3, F-4, F-5, F-6, F-7, F-8, F-9, F-10, F-11, F-12, F-14, F-15,
+  F-16, F-17, F-18, F-19.
 
 ## When This Archetype Applies
 
@@ -44,7 +45,7 @@ unless the doctrine criteria are met.
 
 1. Static gates: package/slice checks, `fmt --check`, lint, doc lint, publish dry-run when package
    scope.
-2. Fitness gates: F-1 through F-12 as listed above, plus F-14 and F-15.
+2. Fitness gates: F-1 through F-12 as listed above, plus F-14, F-15, F-16, F-17, F-18, and F-19.
 3. Runtime gates: optional, required when the adapter is exercised against a real backend or Aspire
    resource.
 4. Consumer gates: required when ports, adapter names, exports, or defaults change.
@@ -57,6 +58,10 @@ unless the doctrine criteria are met.
 - AP-11: module-load-time clients, env reads, or implicit `Deno.openKv()`.
 - AP-17: `interfaces/` folder instead of `ports/`.
 - AP-19: README omits required permissions.
+- AP-22: a sub-folder `mod.ts` that only re-exports the adapters beside it.
+- AP-23: adapter wiring buried as inline bodies in the composition root instead of referenced.
+- AP-24: a `switch (engine)` selecting adapters where a typed registry belongs.
+- AP-25: a filesystem, process, network, or clock side effect in a non-adapter, non-edge file.
 
 ## False-Done States
 

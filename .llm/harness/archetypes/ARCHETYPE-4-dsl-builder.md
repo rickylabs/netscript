@@ -9,8 +9,10 @@
   - `docs/architecture/doctrine/06-archetypes.md#archetype-4--public-dsl--builder`
   - `docs/architecture/doctrine/07-composition-and-extension.md`
   - `docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md`
-- Anti-patterns: AP-1, AP-2, AP-7, AP-8, AP-9, AP-11, AP-13, AP-14, AP-15, AP-16, AP-19, AP-20.
-- Fitness functions: F-1, F-2, F-3, F-4, F-5, F-6, F-7, F-8, F-9, F-10, F-11, F-12, F-14, F-15.
+- Anti-patterns: AP-1, AP-2, AP-7, AP-8, AP-9, AP-11, AP-13, AP-14, AP-15, AP-16, AP-19, AP-20,
+  AP-22, AP-23, AP-24, AP-25.
+- Fitness functions: F-1, F-2, F-3, F-4, F-5, F-6, F-7, F-8, F-9, F-10, F-11, F-12, F-14, F-15,
+  F-16, F-17, F-18, F-19.
 
 ## When This Archetype Applies
 
@@ -42,7 +44,7 @@ runtime only when needed.
 ## Required Gates in Order
 
 1. Static gates: package/slice check, fmt, lint, doc lint, publish dry-run.
-2. Fitness gates: F-1 through F-12 as listed above, plus F-14 and F-15.
+2. Fitness gates: F-1 through F-12 as listed above, plus F-14, F-15, F-16, F-17, F-18, and F-19.
 3. Runtime gates: optional; required when the DSL starts, configures, or materializes runtime
    behavior.
 4. Browser validation: required when the DSL drives Fresh/frontend route output.
@@ -55,6 +57,11 @@ runtime only when needed.
 - AP-9: typestate or generics added before a broken-order problem exists.
 - AP-14: re-exporting Zod or upstream DSL dependencies.
 - AP-15: names that expose implementation roles instead of caller vocabulary.
+- AP-22: a sub-builder `mod.ts` that only re-exports the builder files beside it.
+- AP-23: builder materialization wired as inline bodies in composition instead of referenced
+  factories.
+- AP-24: a `switch` over a builder variant tag where a typed registry belongs.
+- AP-25: a load-time side effect in a builder or definition file that should stay pure.
 
 ## False-Done States
 
