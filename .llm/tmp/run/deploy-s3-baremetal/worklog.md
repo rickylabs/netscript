@@ -234,3 +234,28 @@
 - **Gate:** cli `deno check` 0 errors; `deploy-target-port_test.ts` + `command-registry_test.ts`
   **11 passed / 0 failed**; `arch:check` FAIL=0. packages/cli is check-only (excluded from the root
   fmt/lint gate → "No target files" is expected, not a failure).
+
+## S9 — tests + F-DEPLOY-2 evidence + D2 resolution (#339/#340, commit `47519737`)
+
+- **OS-routing e2e-lite (F-DEPLOY-2):** new `public/adapters/os-service-factory_test.ts` proves the OS
+  seam is coherent end-to-end-lite: `detectServiceOs(explicit)` → `fullServiceNameForOs` naming →
+  `createOsServicePort` adapter selection all agree — `'windows'` routes to `ServyOsServiceAdapter`
+  (naming `NetScript.orders`), `'linux'` to `SystemdOsServiceAdapter` (naming
+  `netscript-orders.service`). Host-independent (explicit OS wins over `Deno.build.os`), so the Linux
+  route is asserted on this Windows host. Cast-free: a one-method `ProcessPort` stub + `assertInstanceOf`.
+- **F-DEPLOY-1/2 status:** the subset-declaration assertion landed in S8 (`c9f23efc`); the thin-router
+  import-graph is a `reviewed` gate (validation-plan row 7) — the router `deploy-group.ts` already wires
+  each CLI verb to an injected-dependency factory (thin) and the legacy verb→canonical-op alias map is
+  the documented contract on `deploy-target-port.ts` (`build`→`plan`/`emit`, `install`→`up`,
+  `uninstall`→`down`). F-10 systemd rendering is covered by the S4 systemd tests.
+- **D2 base-default extraction — LANDED here** (see drift D2 resolution): the shared-base concern that
+  blocked this in S1/S7/S8 (needing a common cross-schema type + an untested `resolveWindowsDeploy`)
+  is resolved by using the **existing sound** `@netscript/config` `DeployTargetBase` type (both OS
+  targets extend it) as the `resolveDeployBase` input, and by adding the Windows resolver tests as the
+  green backstop. `ResolvedDeployBaseConfig` (14 shared fields) is now the extended base of both
+  `Resolved{Windows,Linux}DeployConfig`; both resolvers spread `resolveDeployBase(base, triple)` and add
+  only OS-specific fields. Structurally identical resolved shape (consumers unaffected); two
+  `as readonly string[]` casts folded into one (net −1). D2 **and** D5 duplication seam fully closed.
+- **Gate:** cli `deno check` 0 errors (555 files, 0 failed batches); resolver (4) + os-routing (3) +
+  runtime-detect (1 suite/5 steps) tests **8 passed / 0 failed**; `arch:check` FAIL=0. No
+  `@netscript/config` files touched (config lint/fmt gate N/A); packages/cli is check-only.

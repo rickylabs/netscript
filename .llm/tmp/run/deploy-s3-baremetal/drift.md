@@ -46,6 +46,21 @@ Append-only. Severity: `minor` | `significant` | `architectural`.
   that Windows resolver coverage. Deferring (vs. forcing an unvalidatable Windows-config refactor) is
   the guardrail-preferred choice; recorded so the evaluator reads this as a sequencing decision.
 
+### D2 resolution (S9) — base-default extraction LANDED — severity: minor
+
+- **Done in S9** (commit `47519737`). `resolved-config.ts` gained `ResolvedDeployBaseConfig` (the 14
+  shared build/bundle/compile/health/logging/docker fields); `ResolvedWindowsDeployConfig` +
+  `ResolvedLinuxDeployConfig` now `extend` it with only their OS-specific path fields (structurally
+  identical resolved shape → all consumers unaffected, full cli check green at 555 files).
+  `deploy-config-resolvers.ts` gained the private `resolveDeployBase(base, compileTargetDefault)`
+  helper keyed on the **sound** `@netscript/config` `DeployTargetBase` input — both `WindowsDeployTarget`
+  and `LinuxDeployTarget` `extend DeployTargetBase`, so no fabricated cross-schema structural type was
+  needed (the concern that originally deferred this). Both resolvers now spread the base and add their
+  OS-specific fields; the two `as readonly string[]` bundleExternal casts folded into **one** inside the
+  helper (net −1 cast). Green backstop: new `resolveWindowsDeploy` defaults + overrides tests prove the
+  previously-untested Windows resolver stays byte-stable through the refactor (2 new + 2 existing Linux
+  = 4 resolver tests green). D2/D5 duplication seam fully closed.
+
 ## D3 (S3) — servy execution convergence deferred from S3 to S5 — severity: minor
 
 - **Plan said (S3):** "fold the `runServy` start/stop/status helper so all lifecycle flows through
