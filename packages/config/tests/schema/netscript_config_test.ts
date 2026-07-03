@@ -115,9 +115,11 @@ Deno.test('defineConfig: drops unknown deploy.targets keys', () => {
       deploy: {
         targets: {
           windows: { mode: 'compile' },
-          // `linux` is now a valid member of the target map and is retained.
+          // `linux` is a valid member of the target map and is retained.
           linux: { mode: 'compile' },
-          // `solaris` is not a member of this slice's target map and is dropped.
+          // `deno-deploy` is a valid cloud member of the target map and is retained.
+          'deno-deploy': { org: 'acme', app: 'orders' },
+          // `solaris` is not a member of the target map and is dropped.
           solaris: { mode: 'compile' },
         },
       },
@@ -126,7 +128,9 @@ Deno.test('defineConfig: drops unknown deploy.targets keys', () => {
 
   assertEquals(config.deploy?.targets?.windows?.mode, 'compile');
   assertEquals(config.deploy?.targets?.linux?.mode, 'compile');
-  assertEquals(Object.keys(config.deploy?.targets ?? {}), ['windows', 'linux']);
+  assertEquals(config.deploy?.targets?.['deno-deploy']?.org, 'acme');
+  assertEquals(config.deploy?.targets?.['deno-deploy']?.app, 'orders');
+  assertEquals(Object.keys(config.deploy?.targets ?? {}), ['windows', 'linux', 'deno-deploy']);
 });
 
 Deno.test('defineConfig: rejects unrelated saga and trigger section shapes', () => {
