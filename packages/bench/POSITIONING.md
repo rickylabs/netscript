@@ -1,12 +1,16 @@
 # NetScript positioning thesis & beta/stable acceptance criteria
 
-> **Status: DRAFT for user ratification.** This document is the _synthesis half_ of the S1
-> positioning deliverable (umbrella #301 / bench sub-epic #302). The **thesis** below is falsifiable
-> and grounded in the shipped `@netscript/bench` instrument. The **acceptance criteria** are a
-> _proposed_ lock — they become binding only when the user ratifies them. The **empirical verdict**
-> (an actual measured score on the thesis) is gated on three escalated decisions — **D2**
-> (competitor framework set), **D5** (agent model + build cadence), **OQ2** (live API keys + cost
-> budget) — and is intentionally _not_ asserted here.
+> **Status: §4 framed for the incremental-beta cadence.** This document is the _synthesis half_ of
+> the S1 positioning deliverable (umbrella #301 / bench sub-epic #302). The **thesis** below is
+> falsifiable and grounded in the shipped `@netscript/bench` instrument. Per the user's strategy for
+> the 0.0.1 line — an **incremental beta cadence** (beta.1 → beta.2 → … → stable, mirroring the
+> alpha line) — **beta.1 is a minimal cuttable bar** (the current green state), and the
+> **falsifiable positioning verdict is a stable-line goal pursued incrementally across the betas**,
+> _not_ a beta.1 gate. The **empirical verdict** (an actual measured score on the thesis) remains
+> gated on **D2** (competitor framework set), **D5** (agent model + build cadence), and **OQ2**
+> (live API keys + cost budget) — but those are **positioning-line inputs, not beta-cut blockers**,
+> and no number is asserted here. Milestone/issue structure (beta.1..N descriptions, re-tagging) is
+> owned by the release/GitHub lane; this file owns the §4 prose only.
 
 ## 1. The thesis (falsifiable)
 
@@ -81,28 +85,46 @@ The instrument is ready; the _experiment design inputs_ are product decisions th
 Until these are set, the positioning verdict remains **thesis-only**. This is a feature, not a
 stall: the instrument refuses to fabricate a comparison.
 
-## 4. Proposed beta/stable acceptance criteria (DRAFT — pending user lock)
+## 4. Acceptance criteria across the incremental-beta cadence
 
-These convert the thesis into gates. They are proposed; **bold** items are the falsifiable core.
+These convert the thesis into gates positioned along the 0.0.1 line. **Bold** items are the
+falsifiable core. The 0.0.1 line is an **incremental beta cadence** (beta.1 → beta.2 → … → stable):
+beta.1 is a **minimal cuttable bar**, and the positioning verdict is layered in across later betas.
 
-### 0.0.1-beta acceptance (build-efficiency credible)
+### 0.0.1-beta.1 acceptance (minimal cuttable bar)
+
+beta.1 ships the **current green state** — it requires **no bench measurement**:
 
 1. **Instrument honesty.** Conformance gate green in CI (reference 10/10, real restart); no `fake`
-   summary is ever presented as a result. _(Met today.)_
+   summary is ever presented as a result. _(Met.)_
 2. **Soundness floor.** The plugin-service contract seam is type-sound end-to-end — handler bodies
-   are genuinely output-checked (172a-2-SOUND closed, #332). _(In progress: slices 1+3 merged;
-   finisher slice 4 in flight.)_
-3. **One measured paired run.** At least **one** frozen-manifest paired run (NetScript vs ≥1 D2
-   alternative, same D5 model/caps) exists and is committed, with NetScript **not worse on
-   `test_pass_rate`** and **strictly better on at least one efficiency axis** (`turns_to_green`,
-   `cost`, or `wall_seconds`). _(Blocked on D2/D5/OQ2.)_
-4. **Scaffold trust.** `scaffold.runtime` e2e green — a scaffolded project type-checks, wires DB,
-   and serves plugin endpoints in one pass.
+   are genuinely output-checked. _(Met: 172a-2-SOUND complete, #332 closed; slices 1/3/4 merged.)_
+3. **Scaffold trust.** `scaffold.runtime` e2e green — a scaffolded project type-checks, wires DB,
+   and serves plugin endpoints in one pass. _(Met.)_
+4. **CI + release machinery.** The `check` / `lint` / `fmt:check` trio is green and the release cut
+   is a working one-command path. _(Met.)_
+
+> beta.1 does **not** require self-bench, a competitor-paired run, task breadth, or the full rubric.
+> Those are the positioning verdict, layered in below across later betas.
+
+### The positioning verdict — a stable-line goal, reached incrementally
+
+The falsifiable verdict is pursued **across the beta cadence** and completed for stable. Each step
+is a later-beta bet; **none gates beta.1**:
+
+- **P1 — self-bench green (an early-beta goal).** Self-bench t1+t2 reach **`test_pass_rate` ≥ 0.90**
+  median across N≥3 runs, with the regression detector wired to fire on drops. NetScript-only — no
+  competitor lane — so it needs **D5/OQ2** but **not D2**.
+- **P2 — competitor-paired (a mid-beta goal).** At least **one** frozen-manifest paired run
+  (NetScript vs ≥1 D2 alternative, same D5 model/caps): NetScript **not worse on `test_pass_rate`**
+  and **strictly better on ≥1 efficiency axis** (`turns_to_green`, `cost`, or `wall_seconds`). Needs
+  **D2/D5/OQ2**.
+- **P3 — breadth + full rubric (toward stable).** The lead holds across **≥2 tasks** and **N≥3
+  repeats per lane** (variance reported), and the 0.20 rubric reserve is retired (bench Slice 5).
 
 ### 0.0.1-stable acceptance (build-efficiency defensible)
 
-1. **Multi-task, multi-run.** The build-efficiency lead holds across **≥2 tasks** and **N≥3 repeats
-   per lane** (variance reported), not a single lucky run.
+1. **Positioning verdict complete.** P1–P3 above are all met and their scored summaries committed.
 2. **Reproducible verdict.** Every published score carries its full `RunManifest`; a third party can
    re-run and land within reported variance.
 3. **Positioning copy matches evidence.** Public positioning claims are traceable to a committed
@@ -115,12 +137,12 @@ These convert the thesis into gates. They are proposed; **bold** items are the f
 
 The bench reference README documents that it builds procedures on `os.errors(...)` rather than the
 public `baseContract`, precisely because that export was type-erased (`{ '~orpc': any }`) and could
-not carry a sound `.handler()` without a cast. **172a-2-SOUND removes that erasure.** Once the
-finisher (slice 4) lands, the optional **bench Slice 5** can rebind the reference onto the now-sound
+not carry a sound `.handler()` without a cast. **172a-2-SOUND has removed that erasure (#332 closed,
+slices 1/3/4 merged).** The optional **bench Slice 5** can now rebind the reference onto the sound
 `baseContract`, retiring the last reason the instrument reached under the public surface — closing
 the loop between the S2 soundness lane and the S1 positioning lane.
 
 ---
 
-_Owner: Fable 5 program supervisor (S1 / #302). This is a synthesis artifact; the empirical verdict
-and the binding lock of §4 await user decisions D2 / D5 / OQ2._
+_Owner: Fable 5 program supervisor (S1 / #302). §4 is LOCKED per the user's S1/S2 decisions; the
+empirical verdict still awaits user decisions D2 / D5 / OQ2._
