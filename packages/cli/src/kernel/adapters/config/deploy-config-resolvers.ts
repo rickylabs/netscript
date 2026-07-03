@@ -1,6 +1,6 @@
 import { join } from '@std/path';
 import { discoverWorkspace } from '@netscript/config';
-import type { DeployConfig, PathsConfig } from '@netscript/config';
+import type { DeployConfig, DeployTargetBase, PathsConfig } from '@netscript/config';
 import {
   DEFAULT_BUNDLE_EXTERNAL,
   DEFAULT_BUNDLE_EXTERNAL_IMPORTS,
@@ -24,6 +24,7 @@ import type {
   RegisteredPluginConfig,
   ResolvedAppConfig,
   ResolvedDefaultsConfig,
+  ResolvedDeployBaseConfig,
   ResolvedLinuxDeployConfig,
   ResolvedPluginConfig,
   ResolvedServiceConfig,
@@ -263,102 +264,90 @@ export function resolveApps(
   return apps;
 }
 
-export function resolveWindowsDeploy(userDeploy?: DeployConfig): ResolvedWindowsDeployConfig {
-  const win = userDeploy?.targets?.windows;
-  return {
-    servyCliPath: win?.servyCliPath ?? DEFAULT_SERVY_CLI_PATH,
-    servicePrefix: win?.servicePrefix ?? DEFAULT_SERVICE_PREFIX,
-    installBase: win?.installBase ?? 'C:\\NetScript',
-    mode: win?.mode ?? 'compile',
-    denoPath: win?.denoPath ?? 'deno',
-    compileTarget: win?.compileTarget ?? DEFAULT_COMPILE_TARGET,
-    concurrency: win?.concurrency ?? 4,
-    compileTimeoutMs: win?.compileTimeoutMs ?? DEFAULT_COMPILE_TIMEOUT_MS,
-    bundleTimeoutMs: win?.bundleTimeoutMs ?? DEFAULT_BUNDLE_TIMEOUT_MS,
-    bundleExternal: win?.bundleExternal
-      ? (win.bundleExternal as readonly string[])
-      : DEFAULT_BUNDLE_EXTERNAL,
-    bundleExternalImports: win?.bundleExternalImports ?? DEFAULT_BUNDLE_EXTERNAL_IMPORTS,
-    workspace: win?.workspace,
-    v8HeapMb: {
-      service: win?.v8HeapMb?.service ?? DEFAULT_V8_HEAP_MB.service,
-      plugin: win?.v8HeapMb?.plugin ?? DEFAULT_V8_HEAP_MB.plugin,
-      worker: win?.v8HeapMb?.worker ?? DEFAULT_V8_HEAP_MB.worker,
-      app: win?.v8HeapMb?.app ?? DEFAULT_V8_HEAP_MB.app,
-    },
-    generateEnvFile: win?.generateEnvFile ?? true,
-    logging: {
-      rotationSizeMb: win?.logging?.rotationSizeMb ?? DEFAULT_LOG_ROTATION.rotationSizeMB,
-      maxRotations: win?.logging?.maxRotations ?? DEFAULT_LOG_ROTATION.maxRotations,
-      dateRotation: win?.logging?.dateRotation ?? DEFAULT_LOG_ROTATION.dateRotationType,
-    },
-    health: {
-      intervalSeconds: win?.health?.intervalSeconds ??
-        DEFAULT_HEALTH_MONITORING.heartbeatIntervalSeconds,
-      maxFailedChecks: win?.health?.maxFailedChecks ?? DEFAULT_HEALTH_MONITORING.maxFailedChecks,
-      maxRestartAttempts: win?.health?.maxRestartAttempts ??
-        DEFAULT_HEALTH_MONITORING.maxRestartAttempts,
-    },
-    docker: {
-      denoBaseImage: win?.docker?.denoBaseImage ?? 'denoland/deno:2',
-      dotnetBaseImage: win?.docker?.dotnetBaseImage ?? 'mcr.microsoft.com/dotnet/aspnet:9.0',
-    },
-  };
-}
-
 // Linux (systemd) deploy defaults are the canonical exports in
 // `kernel/constants/linux.ts` (imported above) — no local re-declaration (D5).
 
 /**
+ * Resolve the OS-agnostic deploy base defaults shared by every target
+ * ({@link resolveWindowsDeploy} / {@link resolveLinuxDeploy}). The only per-OS
+ * input is the default compile triple; all other build/bundle/health/log/docker
+ * defaults are identical, so they are declared and resolved once here (D2).
+ * OS-specific path fields (`servyCliPath`, `systemctlPath`, `installBase`, …)
+ * stay on the callers, which spread this base and add them.
+ */
+function resolveDeployBase(
+  base: DeployTargetBase | undefined,
+  compileTargetDefault: string,
+): ResolvedDeployBaseConfig {
+  return {
+    mode: base?.mode ?? 'compile',
+    denoPath: base?.denoPath ?? 'deno',
+    compileTarget: base?.compileTarget ?? compileTargetDefault,
+    concurrency: base?.concurrency ?? 4,
+    compileTimeoutMs: base?.compileTimeoutMs ?? DEFAULT_COMPILE_TIMEOUT_MS,
+    bundleTimeoutMs: base?.bundleTimeoutMs ?? DEFAULT_BUNDLE_TIMEOUT_MS,
+    bundleExternal: base?.bundleExternal
+      ? (base.bundleExternal as readonly string[])
+      : DEFAULT_BUNDLE_EXTERNAL,
+    bundleExternalImports: base?.bundleExternalImports ?? DEFAULT_BUNDLE_EXTERNAL_IMPORTS,
+    workspace: base?.workspace,
+    v8HeapMb: {
+      service: base?.v8HeapMb?.service ?? DEFAULT_V8_HEAP_MB.service,
+      plugin: base?.v8HeapMb?.plugin ?? DEFAULT_V8_HEAP_MB.plugin,
+      worker: base?.v8HeapMb?.worker ?? DEFAULT_V8_HEAP_MB.worker,
+      app: base?.v8HeapMb?.app ?? DEFAULT_V8_HEAP_MB.app,
+    },
+    generateEnvFile: base?.generateEnvFile ?? true,
+    logging: {
+      rotationSizeMb: base?.logging?.rotationSizeMb ?? DEFAULT_LOG_ROTATION.rotationSizeMB,
+      maxRotations: base?.logging?.maxRotations ?? DEFAULT_LOG_ROTATION.maxRotations,
+      dateRotation: base?.logging?.dateRotation ?? DEFAULT_LOG_ROTATION.dateRotationType,
+    },
+    health: {
+      intervalSeconds: base?.health?.intervalSeconds ??
+        DEFAULT_HEALTH_MONITORING.heartbeatIntervalSeconds,
+      maxFailedChecks: base?.health?.maxFailedChecks ?? DEFAULT_HEALTH_MONITORING.maxFailedChecks,
+      maxRestartAttempts: base?.health?.maxRestartAttempts ??
+        DEFAULT_HEALTH_MONITORING.maxRestartAttempts,
+    },
+    docker: {
+      denoBaseImage: base?.docker?.denoBaseImage ?? 'denoland/deno:2',
+      dotnetBaseImage: base?.docker?.dotnetBaseImage ?? 'mcr.microsoft.com/dotnet/aspnet:9.0',
+    },
+  };
+}
+
+/**
+ * Resolve the Windows (Servy) deploy target from `deploy.targets.windows`.
+ * Spreads the shared {@link resolveDeployBase} defaults and adds the
+ * Windows-specific servy path/prefix/install-base fields.
+ */
+export function resolveWindowsDeploy(userDeploy?: DeployConfig): ResolvedWindowsDeployConfig {
+  const win = userDeploy?.targets?.windows;
+  return {
+    ...resolveDeployBase(win, DEFAULT_COMPILE_TARGET),
+    servyCliPath: win?.servyCliPath ?? DEFAULT_SERVY_CLI_PATH,
+    servicePrefix: win?.servicePrefix ?? DEFAULT_SERVICE_PREFIX,
+    installBase: win?.installBase ?? 'C:\\NetScript',
+  };
+}
+
+/**
  * Resolve the Linux (systemd) deploy target from `deploy.targets.linux`.
- * Mirrors {@link resolveWindowsDeploy}; the shared build/bundle/health defaults
- * are reused, and Linux-specific path defaults are applied. Base-default
- * centralization across the two OS resolvers (D2) is deferred to S8, where the
- * Linux build path exercises both resolvers together (see drift.md D2).
+ * Mirrors {@link resolveWindowsDeploy}: spreads the shared
+ * {@link resolveDeployBase} defaults (with the Linux compile triple) and adds
+ * the systemd-specific path/ownership fields.
  */
 export function resolveLinuxDeploy(userDeploy?: DeployConfig): ResolvedLinuxDeployConfig {
   const linux = userDeploy?.targets?.linux;
   return {
+    ...resolveDeployBase(linux, DEFAULT_LINUX_COMPILE_TARGET),
     systemctlPath: linux?.systemctlPath ?? DEFAULT_SYSTEMCTL_PATH,
     unitPrefix: linux?.unitPrefix ?? DEFAULT_LINUX_UNIT_PREFIX,
     installBase: linux?.installBase ?? DEFAULT_LINUX_INSTALL_BASE,
     user: linux?.user,
     group: linux?.group,
     runtimeDir: linux?.runtimeDir ?? DEFAULT_LINUX_RUNTIME_DIR,
-    mode: linux?.mode ?? 'compile',
-    denoPath: linux?.denoPath ?? 'deno',
-    compileTarget: linux?.compileTarget ?? DEFAULT_LINUX_COMPILE_TARGET,
-    concurrency: linux?.concurrency ?? 4,
-    compileTimeoutMs: linux?.compileTimeoutMs ?? DEFAULT_COMPILE_TIMEOUT_MS,
-    bundleTimeoutMs: linux?.bundleTimeoutMs ?? DEFAULT_BUNDLE_TIMEOUT_MS,
-    bundleExternal: linux?.bundleExternal
-      ? (linux.bundleExternal as readonly string[])
-      : DEFAULT_BUNDLE_EXTERNAL,
-    bundleExternalImports: linux?.bundleExternalImports ?? DEFAULT_BUNDLE_EXTERNAL_IMPORTS,
-    workspace: linux?.workspace,
-    v8HeapMb: {
-      service: linux?.v8HeapMb?.service ?? DEFAULT_V8_HEAP_MB.service,
-      plugin: linux?.v8HeapMb?.plugin ?? DEFAULT_V8_HEAP_MB.plugin,
-      worker: linux?.v8HeapMb?.worker ?? DEFAULT_V8_HEAP_MB.worker,
-      app: linux?.v8HeapMb?.app ?? DEFAULT_V8_HEAP_MB.app,
-    },
-    generateEnvFile: linux?.generateEnvFile ?? true,
-    logging: {
-      rotationSizeMb: linux?.logging?.rotationSizeMb ?? DEFAULT_LOG_ROTATION.rotationSizeMB,
-      maxRotations: linux?.logging?.maxRotations ?? DEFAULT_LOG_ROTATION.maxRotations,
-      dateRotation: linux?.logging?.dateRotation ?? DEFAULT_LOG_ROTATION.dateRotationType,
-    },
-    health: {
-      intervalSeconds: linux?.health?.intervalSeconds ??
-        DEFAULT_HEALTH_MONITORING.heartbeatIntervalSeconds,
-      maxFailedChecks: linux?.health?.maxFailedChecks ?? DEFAULT_HEALTH_MONITORING.maxFailedChecks,
-      maxRestartAttempts: linux?.health?.maxRestartAttempts ??
-        DEFAULT_HEALTH_MONITORING.maxRestartAttempts,
-    },
-    docker: {
-      denoBaseImage: linux?.docker?.denoBaseImage ?? 'denoland/deno:2',
-      dotnetBaseImage: linux?.docker?.dotnetBaseImage ?? 'mcr.microsoft.com/dotnet/aspnet:9.0',
-    },
   };
 }
 
