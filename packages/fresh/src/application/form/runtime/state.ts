@@ -6,7 +6,6 @@ import type { FormValues } from './types.ts';
 import type {
   FieldConstraints,
   FormFieldErrors,
-  FormPageProps,
   FormSubmissionResult,
   RuntimeFormState,
 } from './types.ts';
@@ -57,63 +56,6 @@ export function createFormState<TValues extends FormValues>(
     values,
     errors,
   };
-}
-
-/**
- * Create the transitional page-form props consumed by current playground
- * components while `withForm()` lands before field-descriptor work.
- */
-export function createFormPageProps<TValues extends FormValues>(
-  options: {
-    action: string;
-    method?: 'POST' | 'PUT' | 'PATCH';
-    values?: Partial<TValues>;
-    errors?: FormFieldErrors<TValues>;
-    submissionId?: string;
-    csrfToken?: string;
-  },
-): Omit<FormPageProps<TValues>, 'mode'> {
-  return {
-    action: options.action,
-    method: options.method ?? 'POST',
-    values: options.values ?? {},
-    errors: options.errors ?? createEmptyFormErrors<TValues>(),
-    submissionId: options.submissionId ?? generateSubmissionId(),
-    csrfToken: options.csrfToken,
-  };
-}
-
-/**
- * Resolve the current form-page props from a `withForm()` result or from the
- * supplied initial values when no submission result is present yet.
- */
-export function resolveFormPageProps<TValues extends FormValues>(
-  data: unknown,
-  options: {
-    action: string;
-    initialValues?: Partial<TValues>;
-    method?: 'POST' | 'PUT' | 'PATCH';
-    csrfToken?: string;
-  },
-): Omit<FormPageProps<TValues>, 'mode'> {
-  if (isFormSubmissionResult<TValues>(data) && data.status !== 'redirect') {
-    return createFormPageProps({
-      action: options.action,
-      method: options.method,
-      values: data.status === 'success' && data.nextValues ? data.nextValues : data.values,
-      errors: cloneFormSubmissionErrors(data),
-      csrfToken: data.csrfToken || options.csrfToken,
-    });
-  }
-
-  const state = resolveFormState<TValues>(data, options.initialValues);
-  return createFormPageProps({
-    action: options.action,
-    method: options.method,
-    values: state.values,
-    errors: state.errors,
-    csrfToken: options.csrfToken,
-  });
 }
 
 /**
@@ -198,33 +140,6 @@ function isFormState<TValues extends FormValues>(
   }
 
   return 'values' in value && 'errors' in value;
-}
-
-function isFormSubmissionResult<TValues extends FormValues>(
-  value: unknown,
-): value is FormSubmissionResult<TValues> {
-  if (typeof value !== 'object' || value === null) {
-    return false;
-  }
-
-  const candidate = value as { status?: unknown; values?: unknown; submissionId?: unknown };
-  return typeof candidate.status === 'string' &&
-    typeof candidate.submissionId === 'string' &&
-    typeof candidate.values === 'object' &&
-    candidate.values !== null;
-}
-
-function cloneFormSubmissionErrors<TValues extends FormValues>(
-  result: Exclude<FormSubmissionResult<TValues>, { status: 'redirect' }>,
-): FormFieldErrors<TValues> {
-  return cloneFieldErrors({
-    ...result.fieldErrors,
-    _form: result.formErrors.length > 0
-      ? [...result.formErrors]
-      : Array.isArray(result.fieldErrors._form)
-      ? [...result.fieldErrors._form]
-      : [],
-  });
 }
 
 function cloneFieldErrors<TValues extends FormValues>(

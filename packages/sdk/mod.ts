@@ -54,12 +54,8 @@ export type {
   CacheKey,
   CacheStore,
   CacheStoreEntry,
-  HealthCheckResponse,
-  PaginatedResponse,
   QueryClientPort,
   ServiceClientContract,
   ServiceClientShape,
-  ServiceMetadata,
   ServiceQueryUtils,
-  ServiceTransport,
 } from './src/ports/mod.ts';

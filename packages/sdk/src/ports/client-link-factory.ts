@@ -23,8 +23,3 @@ export interface ClientLinkPort<TContext> {
     options: ClientLinkCallOptions<TContext>,
   ): Promise<unknown>;
 }
-
-/** Factory that creates a service-client transport link. */
-export type ClientLinkFactory<TContext, TOptions> = (
-  options: TOptions,
-) => ClientLinkPort<TContext>;

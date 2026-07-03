@@ -17,7 +17,6 @@
 export type { CachedEntry, CacheEntry } from './cache-entry.ts';
 export { isCacheEntryStale, toCachedEntry } from './cache-entry.ts';
 export type { CacheKey, CacheStore, CacheStoreEntry } from './cache-store.ts';
-export type { HealthCheckResponse, PaginatedResponse, ServiceMetadata } from './metadata.ts';
 export type {
   ActionMethod,
   CompositeQuery,
@@ -81,4 +80,3 @@ export type {
   ServiceClientShape,
   ServiceRequestOptions,
 } from './service-client.ts';
-export type { ServiceTransport } from './transport.ts';
