@@ -29,19 +29,7 @@
     "@tanstack/ai-mcp": "npm:@tanstack/ai-mcp@0.2.1",
     "@tanstack/ai-openai": "npm:@tanstack/ai-openai@^0.15.10"
   },
-  "publish": {
-    "include": [
-      "**/*.ts",
-      "deno.json",
-      "README.md",
-      "docs/**/*.md"
-    ],
-    "exclude": [
-      "tests/",
-      "**/*_test.ts",
-      "**/*.test.ts"
-    ]
-  },
+  "publish": false,
   "compilerOptions": {
     "strict": true,
     "noUncheckedIndexedAccess": true

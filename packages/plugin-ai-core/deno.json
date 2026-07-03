@@ -1,6 +1,6 @@
 {
   "name": "@netscript/plugin-ai-core",
-  "version": "0.0.1-alpha.19",
+  "version": "0.0.1-beta.1",
   "description": "AI plugin oRPC v1 contract: the SSE-framed /v1/ai chat, models, tools, embed, and transcribe route surface for NetScript AI plugins.",
   "license": "MIT",
   "exports": {
@@ -12,26 +12,14 @@
     "@orpc/server": "npm:@orpc/server@^1.14.6",
     "zod": "jsr:@zod/zod@4.4.3",
     "@netscript/ai": "jsr:@netscript/ai@0.0.1-alpha.0",
-    "@netscript/plugin": "jsr:@netscript/plugin@0.0.1-alpha.19"
+    "@netscript/plugin": "jsr:@netscript/plugin@0.0.1-beta.1"
   },
   "tasks": {
     "check": "deno check --unstable-kv mod.ts src/contracts/v1/mod.ts",
     "test": "deno test --unstable-kv --allow-all",
     "publish:dry-run": "deno publish --dry-run --allow-dirty"
   },
-  "publish": {
-    "include": [
-      "README.md",
-      "deno.json",
-      "mod.ts",
-      "src/**/*.ts"
-    ],
-    "exclude": [
-      "**/*_test.ts",
-      "**/*.test.ts",
-      "**/test_utils/**"
-    ]
-  },
+  "publish": false,
   "compilerOptions": {
     "strict": true,
     "noImplicitAny": true,
