@@ -29,6 +29,21 @@ Append-only. Severity: `minor` | `significant` | `architectural`.
   windows regression). Noted here as the intended debt seam; not a doctrine violation given it
   matches the shipped precedent and is scheduled for consolidation within this same epic.
 
+### D2 update (S7) — base-default extraction re-sequenced from S7 to S8 — severity: minor
+
+- S7 delivered the **D5** half of "consolidate the config duplication" (the five duplicated
+  `DEFAULT_LINUX_*` constants in `deploy-config-resolvers.ts` now import from the canonical
+  `kernel/constants/linux.ts`; identical values, `resolveLinuxDeploy` tests stay green). The **base
+  *default* extraction** (a shared helper feeding both `resolveWindowsDeploy` and `resolveLinuxDeploy`)
+  is intentionally **not** done in S7 and moves to **S8**. Rationale: it requires introducing a common
+  structural type across the two `@netscript/config` target schemas, and `resolveWindowsDeploy` is
+  **not** directly unit-tested in `deploy-config-resolvers_test.ts` (only `resolveLinuxDeploy` is) —
+  so a Windows-side merge cannot be proven green on this Windows-only host without the
+  per-slice-forbidden `scaffold.runtime` E2E. The duplication is benign (character-identical literal
+  defaults). S8 realizes the Linux build path, which exercises both resolvers together and gives the
+  extraction a green backstop. Deferring (vs. forcing an unvalidatable Windows-config refactor) is the
+  guardrail-preferred choice; recorded so the evaluator reads this as a sequencing decision, not a gap.
+
 ## D3 (S3) — servy execution convergence deferred from S3 to S5 — severity: minor
 
 - **Plan said (S3):** "fold the `runServy` start/stop/status helper so all lifecycle flows through

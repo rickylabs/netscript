@@ -13,6 +13,13 @@ import {
   DEFAULT_SERVY_CLI_PATH,
   DEFAULT_V8_HEAP_MB,
 } from '../../constants/windows.ts';
+import {
+  DEFAULT_LINUX_COMPILE_TARGET,
+  DEFAULT_LINUX_INSTALL_BASE,
+  DEFAULT_LINUX_RUNTIME_DIR,
+  DEFAULT_LINUX_UNIT_PREFIX,
+  DEFAULT_SYSTEMCTL_PATH,
+} from '../../constants/linux.ts';
 import type {
   RegisteredPluginConfig,
   ResolvedAppConfig,
@@ -299,19 +306,15 @@ export function resolveWindowsDeploy(userDeploy?: DeployConfig): ResolvedWindows
   };
 }
 
-// ── Linux (systemd) deploy defaults ─────────────────────────────────────────
-const DEFAULT_SYSTEMCTL_PATH = 'systemctl';
-const DEFAULT_LINUX_UNIT_PREFIX = 'netscript';
-const DEFAULT_LINUX_INSTALL_BASE = '/opt/netscript';
-const DEFAULT_LINUX_RUNTIME_DIR = '/run/netscript';
-const DEFAULT_LINUX_COMPILE_TARGET = 'x86_64-unknown-linux-gnu';
+// Linux (systemd) deploy defaults are the canonical exports in
+// `kernel/constants/linux.ts` (imported above) — no local re-declaration (D5).
 
 /**
  * Resolve the Linux (systemd) deploy target from `deploy.targets.linux`.
  * Mirrors {@link resolveWindowsDeploy}; the shared build/bundle/health defaults
- * are reused, and Linux-specific path defaults are applied. Base-resolution
- * centralization across OS targets is deferred to the build-strategy
- * generalization slice (#340, S7).
+ * are reused, and Linux-specific path defaults are applied. Base-default
+ * centralization across the two OS resolvers (D2) is deferred to S8, where the
+ * Linux build path exercises both resolvers together (see drift.md D2).
  */
 export function resolveLinuxDeploy(userDeploy?: DeployConfig): ResolvedLinuxDeployConfig {
   const linux = userDeploy?.targets?.linux;

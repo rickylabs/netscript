@@ -172,3 +172,30 @@
   **5 passed (3 steps) / 0 failed** (compile-platform + extractCompileTargets + loadDeployConfig
   cases). Gates: cli `deno check` 0 (463 files in cli batch), lint 0 occurrences on the moved dir,
   `arch:check` FAIL=0.
+
+## S7 — build-strategy generalization (#340)
+
+- **D5 dedupe (safe):** `deploy-config-resolvers.ts` re-declared five Linux defaults
+  (`DEFAULT_SYSTEMCTL_PATH`, `DEFAULT_LINUX_UNIT_PREFIX`, `DEFAULT_LINUX_INSTALL_BASE`,
+  `DEFAULT_LINUX_RUNTIME_DIR`, `DEFAULT_LINUX_COMPILE_TARGET`) that already exist as canonical exports
+  in `kernel/constants/linux.ts`. Removed the local block; the resolver now imports them. Values are
+  character-identical, so `resolveLinuxDeploy` tests stay green (4 passed).
+- **OS-neutral orchestrator (the S7 deliverable):** new
+  `public/features/deploy/build/prepare-deploy-build.ts` — `deployBuildDirs(deployDir)` (pure: the
+  four `DEPLOY_DIRS` subpaths) + `prepareDeployBuild(config, options)` (creates the layout, extracts
+  compile targets, applies `--skip`, topo-sorts). This is the OS-agnostic build core the Linux
+  strategy (S8) will reuse. `buildWindowsDeployment` now calls `prepareDeployBuild` instead of
+  inlining the dir-mkdir + `extractCompileTargets` + skip-filter + `topologicalSort` block; the
+  Windows call sequence and stdout are unchanged (`sortedTargets` is the same skip-filtered ordered
+  set; the verbose "Skipping:" line is preserved). Dropped the now-unused `join`, `DEPLOY_DIRS`,
+  `extractCompileTargets`, and `topologicalSort` imports from the strategy.
+- **D2 base-default extraction re-sequenced to S8** (see drift D2 update): the shared-base-default
+  helper across both OS resolvers needs a common structural type over two `@netscript/config` schemas
+  and `resolveWindowsDeploy` has no direct unit test here, so it cannot be proven green on a
+  Windows-only host without the per-slice-forbidden E2E. Benign (identical literals); lands in S8
+  where the Linux build path exercises both resolvers together.
+- Tests: new `prepare-deploy-build_test.ts` (2 tests on the pure `deployBuildDirs` mapping; the
+  composed `prepareDeployBuild` layers already-unit-tested `extractCompileTargets` + `topologicalSort`
+  over `Deno.mkdir`). Kept the test cast-free to respect the type-soundness doctrine. Gates: cli
+  `deno check` 0 (465 files), deploy feature tests 3 passed/5 steps + config resolver tests 4 passed,
+  lint 0 occurrences, `arch:check` no FAIL.
