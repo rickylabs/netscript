@@ -4,7 +4,7 @@ Axioms governed: A9.
 
 One folder layout for every package is wrong. A 200-line schema
 package does not need a `presentation/` layer. A runtime behavior
-package cannot survive without one. This page defines six
+package cannot survive without one. This page defines seven
 archetypes; every `packages/*` and `plugins/*` package picks the
 smallest archetype that fits, and the [folder structure
 doctrine](./05-folder-structure.md) governs how each archetype is
@@ -229,6 +229,84 @@ Doctrine for this archetype:
   packages legitimately call into the CLI's flows
   programmatically.
 
+## Archetype 7 — Deployment Target Adapter
+
+For the deployment feature: a **composite** archetype that ships one
+uniform way to deploy a NetScript app to many *targets* (bare-metal
+Windows/Linux, Docker/Compose, Deno Deploy, Aspire-driven cloud
+runtimes). It is *not* a new package *shape* a single package picks
+over its true archetype; it is a **named cross-package pattern** that
+composes two existing archetypes and folds neither:
+
+- **Archetype 2 (Integration)** supplies the port/adapter core: a
+  package-owned `OsServicePort` (bare-metal — servy + systemd adapters)
+  plus cloud adapters (docker/compose/aca wrapping `aspire publish` /
+  `aspire deploy`; deno-deploy wrapping `deno deploy`). Each *target*
+  is one adapter behind the stable port — the target is the named
+  extension axis (A11), not a new abstraction layer.
+- **Archetype 6 (CLI / Tooling)** supplies the presentation: `netscript
+  deploy <target> <verb>` parses input and routes to an adapter. The
+  command surface is a **thin router** — no target-specific business
+  logic lives in it.
+
+A9's "pick the larger, fold the smaller" applies: Archetype 7 is the
+larger, named pattern that folds A2 and A6 for the deployment domain,
+giving every adapter one conformance target. A deploy flow that is
+*only* a CLI command with no port and a single target stays Archetype
+6; Archetype 7 applies once the port/adapter seam *and* multi-target
+routing exist.
+
+Minimum shape (a package-agnostic seam, not a fixed folder tree — the
+core is Archetype 2, the router is Archetype 6):
+
+```
+<deploy-core>/                         ← Archetype 2 core
+  ports/
+    os-service-port.ts                 ← OsServicePort (bare-metal seam)
+  adapters/                            ← one file per target
+    servy-os-service.ts                ← bare-metal (Windows)
+    systemd-os-service.ts              ← bare-metal (Linux)
+    aspire-<runtime>.ts                ← wraps aspire publish/deploy
+    deno-deploy.ts                     ← wraps deno deploy
+  application/
+    deploy-target-registry.ts          ← target → adapter, closed-on-key
+
+<cli>/…/features/deploy/               ← Archetype 6 thin router
+  deploy-group.ts                      ← routes <target> <verb>; no target logic
+```
+
+Doctrine for this archetype:
+
+- **Uniform adapter contract.** Every target adapter implements the same
+  op set — `plan`/`emit`, `up`, `down`, `status`, `logs`, `rollback`,
+  `secrets`. A target implements the subset it supports; Aspire-driven
+  adapters delegate `up`/`plan` to the Aspire CLI rather than
+  reimplementing it (A7 — wrap upstream, do not reinvent).
+- **Target config extends the shared base.** Each target's config member
+  spreads `DeployTargetBaseSchema` (the `@netscript/config` deployment
+  base contract). A target adds only its own fields. No per-target
+  config base-class hierarchy (A5 — composition over inheritance).
+- **Thin router, core-centralized conventions.** The command surface
+  only parses and routes. Convention-bearing primitives — health
+  gating, OTEL wiring, secrets handling, rollback — live in the **core**,
+  shared across targets, never re-implemented per target (plugin-thinness
+  / core-centralization law).
+- **Crash boundaries are explicit (A13).** Bare-metal activation is
+  health-gated and paired with `rollback`; cloud `rollback` maps to the
+  platform-native mechanism — it is not silently a no-op.
+- **The port is justified, not premature (A11).** A second adapter is
+  foreseeable by construction (servy + systemd + cloud), so the
+  `OsServicePort` seam is warranted; do not add a target-specific base
+  class where an adapter behind the port suffices.
+
+> **#305 cross-reference.** This entry is durable archetype prose so the
+> doctrine revamp (#305) can absorb it verbatim into the revamped
+> archetype chapter and lift its `F-DEPLOY-*` gates into the fitness
+> registry. It names the LAW (the seam + the op contract), not a concrete
+> `deploy-core` package — deploy today lives inside `packages/cli`
+> (Archetype 6) and the core is extracted in a later wave (deployment
+> epic #327, slices #339–#343).
+
 ## How to choose
 
 Decision order:
@@ -240,6 +318,9 @@ Decision order:
 4. Is the package's *primary product* a fluent DSL? → Archetype 4.
 5. Is the package a *first-party plugin*? → Archetype 5.
 6. Does the package ship a *binary* the user runs? → Archetype 6.
+7. Does it deploy an app to *multiple targets* behind a port/adapter
+   seam with a thin CLI router? → Archetype 7 (composite; a single-target
+   CLI deploy flow with no port stays Archetype 6).
 
 If two archetypes apply (e.g. a runtime package that also publishes
 a DSL), pick the *larger* archetype. Layers from the smaller one
@@ -256,6 +337,7 @@ archetypes.
 | `sagas`                      | 3 — Runtime/Behavior with state-machine specialization |
 | `fresh`, `fresh-ui`, `sdk`, `service`, `contracts`, `plugin` | 4 — DSL/Builder |
 | `cli`                        | 6 — CLI/Tooling            |
+| _future_ `deploy-core` (not yet extracted; deploy today folded in `cli` / A6) | 7 — Deployment Target Adapter (composite) |
 | `shared`                     | Special — see below.       |
 | `plugins/*`                  | 5 — Plugin Package         |
 
@@ -281,3 +363,9 @@ identifiers (`CorrelationId`, `RunId`, `EventId`).
       `state/` in a Small Contract package).
 - [ ] If two archetypes seemed to apply, the package picked the
       larger one and folded the smaller in.
+- [ ] A deployment package that composes A2 + A6 is declared
+      Archetype 7, and every target is an adapter behind the shared
+      port (not a target base-class hierarchy).
+- [ ] The deploy command surface is a thin router — no
+      target-specific business logic; health, OTEL, secrets, and
+      rollback live in the core.
