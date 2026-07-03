@@ -461,6 +461,27 @@ export interface LinuxDeployTarget extends DeployTargetBase {
   runtimeDir?: string;
 }
 
+/**
+ * Deno Deploy cloud deployment target (`deploy.targets['deno-deploy']`).
+ *
+ * Pushes a scaffolded NetScript project to the Deno Deploy platform via the
+ * native `deno deploy` CLI (source build, no Dockerfile). The shared compile /
+ * bundle fields of {@link DeployTargetBase} are inherited but generally unused
+ * by the hosted platform; the Deno-Deploy-specific fields below drive the push.
+ */
+export interface DenoDeployTarget extends DeployTargetBase {
+  /** Deno Deploy organization slug (`deno deploy --org`). */
+  org?: string;
+  /** Deno Deploy application/project name (`deno deploy --app`). */
+  app?: string;
+  /** Entrypoint module passed to `deno deploy`. Default: `main.ts`. */
+  entrypoint?: string;
+  /** Whether pushes target production (`deno deploy --prod`) by default. */
+  prod?: boolean;
+  /** Path to an env file loaded via `deno deploy env load`. */
+  envFile?: string;
+}
+
 /** Top-level deployment configuration type. */
 export interface DeployConfig {
   /** Deployment targets keyed by name. */
@@ -473,6 +494,8 @@ export interface DeployConfig {
     compose?: DockerComposeDeployTarget;
     /** Linux systemd deployment settings. */
     linux?: LinuxDeployTarget;
+    /** Deno Deploy cloud deployment settings. */
+    'deno-deploy'?: DenoDeployTarget;
   };
 }
 

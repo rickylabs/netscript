@@ -55,6 +55,44 @@ Deno.test('defineConfig: accepts a deploy.targets.windows target', () => {
   assertEquals(config.deploy?.targets?.windows?.servicePrefix, 'Acme');
 });
 
+Deno.test('defineConfig: accepts a deploy.targets[deno-deploy] target', () => {
+  const config = defineConfig({
+    name: 'orders',
+    databases: { config: [] },
+    deploy: {
+      targets: {
+        'deno-deploy': {
+          org: 'acme',
+          app: 'orders-api',
+          entrypoint: 'main.ts',
+          prod: true,
+          envFile: '.env.production',
+        },
+      },
+    },
+  });
+
+  assertEquals(config.deploy?.targets?.['deno-deploy']?.org, 'acme');
+  assertEquals(config.deploy?.targets?.['deno-deploy']?.app, 'orders-api');
+  assertEquals(config.deploy?.targets?.['deno-deploy']?.prod, true);
+});
+
+Deno.test('defineConfig: accepts windows and deno-deploy targets side by side', () => {
+  const config = defineConfig({
+    name: 'orders',
+    databases: { config: [] },
+    deploy: {
+      targets: {
+        windows: { servicePrefix: 'Acme' },
+        'deno-deploy': { app: 'orders-api' },
+      },
+    },
+  });
+
+  assertEquals(config.deploy?.targets?.windows?.servicePrefix, 'Acme');
+  assertEquals(config.deploy?.targets?.['deno-deploy']?.app, 'orders-api');
+});
+
 Deno.test('defineConfig: does not honor the legacy deploy.windows shape (clean break)', () => {
   const config = defineConfig(
     {

@@ -22,6 +22,7 @@ export {
 export {
   AppConfigSchema,
   DatabaseConfigSchema,
+  DenoDeployTargetSchema,
   DeployConfigSchema,
   DeployTargetBaseSchema,
   DockerComposeDeployTargetSchema,
@@ -45,6 +46,7 @@ export type {
   DatabaseConfig,
   DatabaseProvider,
   DatabasesConfig,
+  DenoDeployTarget,
   DeployConfig,
   DeployTargetBase,
   DockerComposeDeployTarget,
