@@ -40,11 +40,26 @@ interface DenoJson {
 
 interface Finding {
   gate: string;
-  level: 'PASS' | 'WARN' | 'FAIL';
+  level: 'PASS' | 'INFO' | 'WARN' | 'FAIL';
   message: string;
   path?: string;
   line?: number;
 }
+
+/**
+ * Packages sanctioned to carry `--allow-slow-types` per the doctrine
+ * exception in docs/architecture/doctrine/02-public-surface.md. These are
+ * oRPC-bound packages whose contract/service seam binds to `@orpc/contract`'s
+ * `declare`d builder types, which inherently emit `private-type-ref`
+ * slow-types diagnostics. For these, F-JSR-7 slow-types is an expected INFO
+ * note, not a WARN finding. Any OTHER package remains a WARN finding.
+ */
+const ORPC_SLOW_TYPES_ALLOWLIST = new Set<string>([
+  '@netscript/contracts',
+  '@netscript/service',
+  '@netscript/plugin',
+  '@netscript/plugin-triggers-core',
+]);
 
 interface AuditReport {
   pkg: { name: string; version: string; description?: string; root: string };
@@ -290,11 +305,14 @@ async function main() {
         message: `deno publish --dry-run failed`,
       });
     }
+    const slowTypesSanctioned = ORPC_SLOW_TYPES_ALLOWLIST.has(denoJson.name ?? '');
     for (const w of slowTypes.warnings) {
       findings.push({
         gate: 'F-JSR-7 slow-types',
-        level: 'WARN',
-        message: w,
+        level: slowTypesSanctioned ? 'INFO' : 'WARN',
+        message: slowTypesSanctioned
+          ? `${w} — sanctioned --allow-slow-types (oRPC-bound; see docs/architecture/doctrine/02-public-surface.md)`
+          : w,
       });
     }
   }

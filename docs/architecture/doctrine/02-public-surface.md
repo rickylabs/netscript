@@ -197,6 +197,33 @@ A published export is one of:
 The default is **stable**. Experimental status is opt-in and time-
 limited.
 
+## Sanctioned exception: slow-types for oRPC-bound packages
+
+One exception to the "no slow types" bar is sanctioned and
+documented. Packages that bind a NetScript contract or service
+seam to oRPC's real `@orpc/contract` builder types (`oc`,
+`Schema`, `AnySchema`, the `ContractProcedureBuilderWith*`
+family) MAY set `--allow-slow-types` on their publish dry-run.
+
+Rationale: those upstream types are `declare`d internals, so
+`deno doc --lint` inherently emits `private-type-ref` "slow
+types" diagnostics that only `--allow-slow-types` waives.
+Binding to the real builder types is the *sound* implementation
+— it removed a phantom `'~orpc': any` erasure in the base
+contract seam. Demanding zero slow types would force that
+unsound erasing cast back in. Soundness wins; the slow-types
+diagnostic is the accepted cost.
+
+The boundary is strict: this exception applies *only* to
+oRPC-bound packages — `packages/contracts` and any plugin
+`-core`/`services` package that extends the base contract or
+service seam (`BaseContractRoute` / `BaseContractOutputRoute`
+from `@netscript/contracts`). Any other package that sets
+`--allow-slow-types` is a finding and must carry a debt entry.
+The `audit-jsr-package.ts` fitness gate encodes this allow-list:
+sanctioned packages report the slow-types diagnostic as an INFO
+note; every other package still reports it as a WARN finding.
+
 ## Concrete repo examples
 
 ### `packages/fresh/builders/mod.ts` (1,110 LOC)
@@ -235,5 +262,6 @@ Before merging a `packages/*` change that touches `mod.ts`:
 - [ ] Subpath exports are used if the symbol count exceeds 20 or
       the responsibilities exceed three.
 - [ ] `deno doc <package>` reads end-to-end as a manual.
-- [ ] `deno publish --dry-run` is clean — no slow types, no
-      portability warnings.
+- [ ] `deno publish --dry-run` is clean — no portability
+      warnings, and no slow types *unless* the package is
+      oRPC-bound (see "Sanctioned exception" above).
