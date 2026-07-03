@@ -259,3 +259,31 @@
 - **Gate:** cli `deno check` 0 errors (555 files, 0 failed batches); resolver (4) + os-routing (3) +
   runtime-detect (1 suite/5 steps) tests **8 passed / 0 failed**; `arch:check` FAIL=0. No
   `@netscript/config` files touched (config lint/fmt gate N/A); packages/cli is check-only.
+
+## S10 — docs + arch-debt + IMPL-4 (#339/#340, commit `73287a75`)
+
+- **`@netscript/cli` README (F-7 doc-score):** new "Bare-metal deployment" section documents the
+  OS-agnostic `OsServicePort` (Servy on Windows, systemd on Linux; `createOsServicePort` routing;
+  OS-specific naming `NetScript.<svc>.xml` vs `netscript-<svc>.service`), the `deno compile`
+  single-binary artifact + OS-generic default triple + per-target `compileTarget` override, per-OS
+  `deploy.targets.{windows,linux}` config over a shared base, the **manual binary-signing hook**
+  (`signtool` on Windows, `gpg --detach-sign` on Linux — deno compile emits unsigned binaries), and
+  the canonical operation coverage (6 implemented + verb aliases; `rollback`/`secrets`
+  declared-unsupported → #341). Prose follows the docs voice policy (factual callouts, no
+  "honesty" framing).
+- **arch-debt registry accuracy:** `cli-deploy-artifacts-missing` narrowed to the
+  container/orchestrator lane with a #339/#340 update note (bare-metal single-binary + OS service now
+  generated; Docker/Compose/K8s tracked by #343). Two new entries:
+  `cli-deploy-target-rollback-secrets-deferred` (the 6-of-7 op split + kernel-domain descriptor
+  layering boundary D-S8 + injected-delegation deferral → #341) and
+  `cli-deploy-linux-integration-untested` (Windows-only host → systemd lane unit-tested but not
+  live-integration-exercised; the `scaffold.runtime` gate also does not touch the Linux lane).
+- **IMPL-4 applied** in `context-pack.md`: corrected the stale `342` file-size figure (actuals:
+  `upgrade-deploy-command` 312, `build-windows-strategy` 284 post-S7 extraction, `compile-runner`
+  292 — all under the 500-line F-1 ceiling, so no extraction is owed) and tightened the stale
+  "WSL Codex / OpenHands-minimax" dispatch-lane note to a negative reference; marked S9 DONE / S10 in
+  progress in the resume brief.
+- **Gate:** docs + run-artifacts only, no `.ts` touched → per-slice check/lint/fmt trivially green;
+  packages/cli is check-only and `.llm/**` is outside the fmt/lint gate. README Markdown left
+  unformatted-by-tool per policy (root `deno fmt` on Markdown is not a package-quality verdict and
+  reflows prose).
