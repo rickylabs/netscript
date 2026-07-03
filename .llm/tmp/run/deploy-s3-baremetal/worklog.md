@@ -93,3 +93,22 @@
   commands + `upgrade-steps.ts`; routing those through the adapter is S5's command-wiring slice, so
   S3 unifies the arg source-of-truth only and defers execution convergence to S5. See `drift.md`.
 - Gates: cli `deno check` 0 (539 files); `deploy_test.ts` 4/4 steps green (expanded servy matrix).
+
+### S4 — Linux adapter: `SystemdOsServiceAdapter` + unit renderer (F-10)
+
+- New `kernel/constants/linux.ts` — canonical Linux defaults home mirroring `constants/windows.ts`
+  (systemctl/journalctl paths, compile triple, unit prefix, install base, runtime dir, systemd
+  `[Unit]`/`[Service]`/`[Install]` defaults).
+- New `kernel/adapters/linux/systemd/systemd-unit.ts` — `SystemdUnitConfig` + `renderSystemdUnit`
+  producing a well-formed `.service` unit (Linux analogue of `servy-xml.ts`); Environment values
+  escaped for systemd's quote/backslash parser; User/Group/RuntimeDirectory emitted only when set.
+- New `kernel/adapters/linux/systemd/systemd-command.ts` — the single systemctl/journalctl arg
+  source of truth: `fullUnitName`, `systemctlLifecycleArgs`, `systemctlEnableArgs` (+`--force`),
+  `systemctlDisableArgs`, `systemctlDaemonReloadArgs`, `journalctlLogsArgs`.
+- New `public/adapters/systemd-os-service.ts` — `SystemdOsServiceAdapter implements OsServicePort`
+  (placed in `public/adapters` for layer symmetry, see drift D4): `install` = daemon-reload → enable
+  (fail-fast), `run` maps start/stop/status → lifecycle args and uninstall → disable.
+- Tests: `kernel/.../systemd/systemd_test.ts` (renderer + arg builders) and
+  `public/adapters/systemd-os-service_test.ts` (adapter, RecordingProcessPort, byte-identical
+  systemctl matrix + reload fail-fast) → **3 suites / 12 steps green**.
+- Gates: cli `deno check` 0 (545 files). Drift D4 (adapter dir), D5 (Linux const dup → S5/S7).

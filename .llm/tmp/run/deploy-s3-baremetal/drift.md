@@ -49,3 +49,27 @@ Append-only. Severity: `minor` | `significant` | `architectural`.
   upgrade path (out of this epic's declared scope).
 - **Impact:** none on the contract or the byte-identical guarantee; S3 stays green and self-contained.
   Records the S3↔S5 boundary so the evaluator does not read a missing runServy deletion as an S3 gap.
+
+## D4 (S4) — systemd adapter file placed in `public/adapters`, not `kernel/` — severity: minor
+
+- **Plan said (S4 file list):** `systemd-os-service.ts` under `kernel/adapters/linux/systemd/*`.
+- **Reality:** the adapter *implements* `OsServicePort`, which S2 placed in `public/ports/`. A
+  `kernel/`-located class importing a `public/` port inverts the hexagonal layer direction
+  (kernel→public) and would fail `arch:check`. The shipped Windows adapter `ServyOsServiceAdapter`
+  already lives in `public/adapters/` for exactly this reason.
+- **Decision:** placed `SystemdOsServiceAdapter` at `public/adapters/systemd-os-service.ts` for
+  layer symmetry with the servy adapter. The *pure* systemd logic the plan wanted in `kernel/` — the
+  `.service` unit renderer (`systemd-unit.ts`) and the systemctl/journalctl arg builders
+  (`systemd-command.ts`) — DO live under `kernel/adapters/linux/systemd/`, and hold no port
+  dependency. `kernel/constants/linux.ts` added as planned.
+- **Impact:** none on behaviour or gates; the only deviation is the adapter's directory, corrected to
+  respect layering. Registration/wiring of the adapter happens at S5/S8 as planned.
+
+## D5 (S4) — Linux default-const duplication between resolver and `constants/linux.ts` — severity: minor
+
+- `kernel/constants/linux.ts` (new, canonical Linux defaults home mirroring `constants/windows.ts`)
+  re-states a few OS defaults (`systemctl` path, unit prefix, install base, runtime dir, compile
+  triple) that S1 hardcoded as private consts inside `deploy-config-resolvers.ts`. Converging the
+  resolver to import from `constants/linux.ts` is deferred to the S5/S7 wiring/base-config
+  consolidation (same seam as D2) to keep S4 additive and avoid perturbing S1's tested resolver.
+  Values are identical, so no behavioural drift.
