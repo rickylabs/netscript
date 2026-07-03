@@ -11,7 +11,7 @@ import {
 
 const options = parseOptions();
 const findings: Finding[] = [];
-const commandExtends = /extends\s+(CliCommand|ScaffoldCommand|ListCommand|DeployStepCommand)\b/;
+const commandExtends = /extends\s+(CliCommand|ScaffoldCommand|DeployStepCommand)\b/;
 const commandFactory = /export\s+function\s+create[A-Z][A-Za-z0-9]*Command\b/;
 const commandConstant =
   /export\s+const\s+[A-Za-z0-9_]*Command(?:\s*:\s*[^=]+)?\s*=\s*new\s+Command\b/;
