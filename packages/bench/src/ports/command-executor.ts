@@ -15,6 +15,13 @@ export interface CommandRequest {
   readonly env?: Readonly<Record<string, string>>;
   /** Wall-clock budget in milliseconds. */
   readonly timeoutMs: number;
+  /**
+   * Child stdout disposition (default `'piped'`). A long-running `spawn`ed
+   * service should use `'null'` so an unread pipe never fills and blocks it.
+   */
+  readonly stdout?: 'piped' | 'null' | 'inherit';
+  /** Child stderr disposition (default `'piped'`). */
+  readonly stderr?: 'piped' | 'null' | 'inherit';
 }
 
 /** Outcome of a completed subprocess. */

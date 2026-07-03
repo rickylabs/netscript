@@ -3163,7 +3163,9 @@
           "jsr:@std/assert@1",
           "jsr:@std/fs@1",
           "jsr:@std/path@1",
-          "jsr:@std/streams@1"
+          "jsr:@std/streams@1",
+          "jsr:@zod/zod@4.4.3",
+          "npm:@orpc/server@^1.14.6"
         ]
       },
       "packages/cli": {

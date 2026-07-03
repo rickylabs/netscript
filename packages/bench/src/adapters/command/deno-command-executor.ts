@@ -20,8 +20,8 @@ function buildCommand(request: CommandRequest): Deno.Command {
     args: [...request.args],
     cwd: request.cwd,
     env: request.env ? { ...request.env } : undefined,
-    stdout: 'piped',
-    stderr: 'piped',
+    stdout: request.stdout ?? 'piped',
+    stderr: request.stderr ?? 'piped',
   });
 }
 
