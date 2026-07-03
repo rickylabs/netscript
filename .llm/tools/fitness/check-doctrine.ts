@@ -399,7 +399,10 @@ for await (
 ) testFiles.push(entry.path);
 for (const f of testFiles) {
   const text = await readText(f);
-  if (/\b(?:describe|it|expect|jest|vitest)\s*\(/.test(text)) {
+  // Match only *bare* Jest/Vitest globals, never method invocations: a leading
+  // `.` or word char means it is a method call (e.g. the `defineAiTool(...)
+  // .describe(...)` fluent tool builder), not a forbidden test global.
+  if (/(?<![.\w])(?:describe|it|expect|jest|vitest)\s*\(/.test(text)) {
     findings.push({
       ref: 'A14',
       level: 'FAIL',

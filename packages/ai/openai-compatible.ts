@@ -65,5 +65,4 @@ export {
 export type {
   OpenAiCompatibleApi,
   OpenAiCompatibleModelProviderConfig,
-  OpenAiCompatibleTextClient,
 } from './src/adapters/openai-compatible.adapter.ts';

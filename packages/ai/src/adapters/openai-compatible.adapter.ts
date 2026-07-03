@@ -14,14 +14,12 @@
  */
 
 import { openaiCompatible } from '@tanstack/ai-openai/compatible';
-import type {
-  OpenAICompatibleChatAdapter,
-  OpenAICompatibleResponsesAdapter,
-} from '@tanstack/ai-openai/compatible';
 
 import type { ModelDescriptor, ModelHandle, ModelId } from '../contracts/model.ts';
 import { AiError, AiNotConfiguredError } from '../contracts/errors.ts';
 import type { ModelProviderPort } from '../ports/model-provider.ts';
+import type { ChatClientPort } from '../ports/chat-client.ts';
+import { toTanstackChatClient } from './tanstack-chat-client.ts';
 
 /**
  * Registry id under which {@linkcode OpenAiCompatibleModelProvider} self-registers.
@@ -53,14 +51,6 @@ export interface OpenAiCompatibleModelProviderConfig {
   /** Display name for the provider (defaults to `"openai-compatible"`). */
   readonly name?: string;
 }
-
-/**
- * The wrapped TanStack OpenAI-compatible text client, over either the Chat
- * Completions or Responses API.
- */
-export type OpenAiCompatibleTextClient =
-  | OpenAICompatibleChatAdapter<string>
-  | OpenAICompatibleResponsesAdapter<string>;
 
 const DEFAULT_INPUT_MODALITIES = ['text', 'image'] as const;
 
@@ -132,30 +122,34 @@ export class OpenAiCompatibleModelProvider implements ModelProviderPort {
   }
 
   /**
-   * Construct the underlying TanStack OpenAI-compatible text client for `model`.
+   * Construct an owned {@linkcode ChatClientPort} for `model`.
    *
-   * The returned adapter drives chat/streaming. In-flight streams are cancelled
-   * by passing an `AbortController` to the TanStack `chat()` / `chatStream()`
-   * call, e.g. `chat({ adapter, messages, abortController })` — the documented
-   * stop path so no request is left un-cancellable (F-13).
+   * The wrapped TanStack OpenAI-compatible text adapter is translated to the
+   * owned chat vocabulary internally (no provider-SDK type escapes the public
+   * surface). Per-turn cancellation flows through the port's
+   * `stream(_, { signal })` option, which forwards to the TanStack
+   * `AbortController` — the documented stop path so no request is left
+   * un-cancellable (F-13).
    *
    * @param model - A model id the endpoint exposes.
-   * @returns The wrapped TanStack OpenAI-compatible text adapter.
+   * @returns An owned chat client bound to `model`.
    * @throws {AiNotConfiguredError} When `baseURL` or `apiKey` is missing.
    *
-   * @example Cancel a stream after a timeout
+   * @example Stream one turn with cancellation
    * ```ts
    * const provider = new OpenAiCompatibleModelProvider({
    *   baseURL: 'https://api.deepseek.com/v1',
    *   apiKey,
    * });
-   * const adapter = provider.createChatClient('deepseek-chat');
-   * const abortController = new AbortController();
-   * setTimeout(() => abortController.abort(), 5_000);
-   * // chat({ adapter, messages, abortController });
+   * const client = provider.createChatClient('deepseek-chat');
+   * const abort = new AbortController();
+   * setTimeout(() => abort.abort(), 5_000);
+   * for await (const event of client.stream({ messages }, { signal: abort.signal })) {
+   *   if (event.type === 'text') console.log(event.delta);
+   * }
    * ```
    */
-  createChatClient(model: string): OpenAiCompatibleTextClient {
+  createChatClient(model: string): ChatClientPort {
     const { baseURL, apiKey, models, api, name } = this.#config;
     if (baseURL === undefined || apiKey === undefined) {
       throw new AiNotConfiguredError(
@@ -170,7 +164,11 @@ export class OpenAiCompatibleModelProvider implements ModelProviderPort {
       models: models ?? [model],
       api,
     });
-    return factory(model);
+    const adapter = factory(model);
+    return toTanstackChatClient(adapter, {
+      name: name ?? OPENAI_COMPATIBLE_PROVIDER_ID,
+      kind: 'text',
+    });
   }
 
   /** Build the {@linkcode ModelDescriptor} for a model id. */

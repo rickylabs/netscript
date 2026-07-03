@@ -25,6 +25,7 @@ import type {
   ModelRef,
   ModelSelector,
 } from '../contracts/model.ts';
+import type { ChatClientPort } from './chat-client.ts';
 import { InvalidModelRefError, ModelProviderNotFoundError } from '../contracts/errors.ts';
 
 /**
@@ -40,6 +41,15 @@ export interface ModelProviderPort {
   getModel(modelId: ModelId): Promise<ModelHandle>;
   /** Cheap synchronous capability probe. */
   supports(modelId: ModelId): boolean;
+  /**
+   * Construct a single-turn {@linkcode ChatClientPort} bound to `modelId`.
+   *
+   * Optional on the base port so discovery-only providers need not implement
+   * it; the E2 adapters and any provider the E3 agent loop drives do. The loop
+   * injects a provider through the narrower {@linkcode ChatModelProviderPort}
+   * capability, so it never depends on this being present on every provider.
+   */
+  createChatClient?(modelId: ModelId): ChatClientPort;
 }
 
 /**
