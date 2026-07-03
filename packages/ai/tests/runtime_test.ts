@@ -43,7 +43,7 @@ Deno.test('createAiRuntime: injected telemetry port is used verbatim', () => {
 Deno.test('createAiRuntime: unconfigured embedding port rejects with AiNotConfiguredError', async () => {
   const ai = createAiRuntime();
   await assertRejects(
-    () => ai.embeddings.embed({ model: 'x', input: 'hello' }),
+    () => ai.embeddings.embed('hello', { model: 'x' }),
     AiNotConfiguredError,
   );
 });
