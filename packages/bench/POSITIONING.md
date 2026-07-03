@@ -1,12 +1,13 @@
 # NetScript positioning thesis & beta/stable acceptance criteria
 
-> **Status: DRAFT for user ratification.** This document is the _synthesis half_ of the S1
+> **Status: acceptance criteria LOCKED.** This document is the _synthesis half_ of the S1
 > positioning deliverable (umbrella #301 / bench sub-epic #302). The **thesis** below is falsifiable
-> and grounded in the shipped `@netscript/bench` instrument. The **acceptance criteria** are a
-> _proposed_ lock — they become binding only when the user ratifies them. The **empirical verdict**
-> (an actual measured score on the thesis) is gated on three escalated decisions — **D2**
-> (competitor framework set), **D5** (agent model + build cadence), **OQ2** (live API keys + cost
-> budget) — and is intentionally _not_ asserted here.
+> and grounded in the shipped `@netscript/bench` instrument. The **acceptance criteria (§4) are now
+> binding** — ratified via the user's S1 decision (self-bench-only for beta; competitor-paired run
+> moves to stable) and S2 decision (slow-types doctrine exception for oRPC-bound packages, S4/#305).
+> The **empirical verdict** (an actual measured score on the thesis) remains gated on three
+> escalated decisions — **D2** (competitor framework set), **D5** (agent model + build cadence),
+> **OQ2** (live API keys + cost budget) — and is intentionally _not_ asserted here.
 
 ## 1. The thesis (falsifiable)
 
@@ -81,46 +82,51 @@ The instrument is ready; the _experiment design inputs_ are product decisions th
 Until these are set, the positioning verdict remains **thesis-only**. This is a feature, not a
 stall: the instrument refuses to fabricate a comparison.
 
-## 4. Proposed beta/stable acceptance criteria (DRAFT — pending user lock)
+## 4. Beta/stable acceptance criteria (LOCKED)
 
-These convert the thesis into gates. They are proposed; **bold** items are the falsifiable core.
+These convert the thesis into gates. **Bold** items are the falsifiable core. The beta/stable split
+below reflects the user's S1 decision: **beta is self-bench-only** (no competitor lane required),
+and the **competitor-paired verdict is a stable criterion**. This matches #302's sequencing, so no
+#302 rework is needed.
 
 ### 0.0.1-beta acceptance (build-efficiency credible)
 
 1. **Instrument honesty.** Conformance gate green in CI (reference 10/10, real restart); no `fake`
    summary is ever presented as a result. _(Met today.)_
 2. **Soundness floor.** The plugin-service contract seam is type-sound end-to-end — handler bodies
-   are genuinely output-checked (172a-2-SOUND closed, #332). _(In progress: slices 1+3 merged;
-   finisher slice 4 in flight.)_
-3. **One measured paired run.** At least **one** frozen-manifest paired run (NetScript vs ≥1 D2
-   alternative, same D5 model/caps) exists and is committed, with NetScript **not worse on
-   `test_pass_rate`** and **strictly better on at least one efficiency axis** (`turns_to_green`,
-   `cost`, or `wall_seconds`). _(Blocked on D2/D5/OQ2.)_
+   are genuinely output-checked. _(Met: 172a-2-SOUND complete, #332 closed; slices 1/3/4 merged.)_
+3. **Self-bench green.** Self-bench t1+t2 reach **`test_pass_rate` ≥ 0.90** median across N≥3 runs,
+   with the regression detector wired to fire on drops. This is a NetScript-only measurement — **no
+   competitor lane** — so it does **not** depend on D2. _(Blocked only on D5/OQ2 for the live run.)_
 4. **Scaffold trust.** `scaffold.runtime` e2e green — a scaffolded project type-checks, wires DB,
    and serves plugin endpoints in one pass.
 
 ### 0.0.1-stable acceptance (build-efficiency defensible)
 
-1. **Multi-task, multi-run.** The build-efficiency lead holds across **≥2 tasks** and **N≥3 repeats
+1. **Competitor-paired verdict.** At least **one** frozen-manifest paired run (NetScript vs ≥1 D2
+   alternative, same D5 model/caps) is committed, with NetScript **not worse on `test_pass_rate`**
+   and **strictly better on at least one efficiency axis** (`turns_to_green`, `cost`, or
+   `wall_seconds`). _(Moved here from beta per the S1 decision; blocked on D2/D5/OQ2.)_
+2. **Multi-task, multi-run.** The build-efficiency lead holds across **≥2 tasks** and **N≥3 repeats
    per lane** (variance reported), not a single lucky run.
-2. **Reproducible verdict.** Every published score carries its full `RunManifest`; a third party can
+3. **Reproducible verdict.** Every published score carries its full `RunManifest`; a third party can
    re-run and land within reported variance.
-3. **Positioning copy matches evidence.** Public positioning claims are traceable to a committed
+4. **Positioning copy matches evidence.** Public positioning claims are traceable to a committed
    scored summary — no claim exceeds what a pinned run demonstrates (aligns with the docs-site
    positioning lane, #232, without owning it).
-4. **Falsification honored.** If paired runs show NetScript is _not_ more build-efficient, the
+5. **Falsification honored.** If paired runs show NetScript is _not_ more build-efficient, the
    positioning is revised — the criteria commit us to reporting the result either way.
 
 ## 5. Cross-lane note (soundness ↔ instrument)
 
 The bench reference README documents that it builds procedures on `os.errors(...)` rather than the
 public `baseContract`, precisely because that export was type-erased (`{ '~orpc': any }`) and could
-not carry a sound `.handler()` without a cast. **172a-2-SOUND removes that erasure.** Once the
-finisher (slice 4) lands, the optional **bench Slice 5** can rebind the reference onto the now-sound
+not carry a sound `.handler()` without a cast. **172a-2-SOUND has removed that erasure (#332 closed,
+slices 1/3/4 merged).** The optional **bench Slice 5** can now rebind the reference onto the sound
 `baseContract`, retiring the last reason the instrument reached under the public surface — closing
 the loop between the S2 soundness lane and the S1 positioning lane.
 
 ---
 
-_Owner: Fable 5 program supervisor (S1 / #302). This is a synthesis artifact; the empirical verdict
-and the binding lock of §4 await user decisions D2 / D5 / OQ2._
+_Owner: Fable 5 program supervisor (S1 / #302). §4 is LOCKED per the user's S1/S2 decisions; the
+empirical verdict still awaits user decisions D2 / D5 / OQ2._
