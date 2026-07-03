@@ -60,7 +60,7 @@ Deno.test('deploy target registry reserves the linux-service key at the type lev
   assertEquals(registry.entries().map(([key]) => key), ['linux-service']);
 });
 
-Deno.test('bare-metal service targets declare the canonical 6-op subset (F-DEPLOY-1)', () => {
+Deno.test('unwired bare-metal service targets advertise only the canonical 6-op subset (F-DEPLOY-1)', () => {
   const canonical: readonly DeployTargetOperation[] = ['plan', 'emit', 'up', 'down', 'status', 'logs'];
 
   const targets: readonly DeployTargetPort[] = [
@@ -68,23 +68,65 @@ Deno.test('bare-metal service targets declare the canonical 6-op subset (F-DEPLO
     new LinuxServiceDeployTarget(),
   ];
   for (const target of targets) {
-    // Declared operations are exactly the canonical subset (rollback/secrets omitted).
+    // Advertised operations are exactly the canonical subset while no core ports
+    // are wired: rollback/secrets are NOT advertised, so the router never exposes
+    // an op the descriptor cannot really perform (LD-4: omit rather than no-op).
     assertEquals(target.operations, canonical);
-    // Every declared operation resolves to an implemented handler method.
+    assertEquals(target.operations.includes('rollback'), false);
+    assertEquals(target.operations.includes('secrets'), false);
+    // Every advertised operation resolves to an implemented handler method.
     assertEquals(typeof target.plan, 'function');
     assertEquals(typeof target.emit, 'function');
     assertEquals(typeof target.up, 'function');
     assertEquals(typeof target.down, 'function');
     assertEquals(typeof target.status, 'function');
     assertEquals(typeof target.logs, 'function');
-    // Legacy verb aliases stay callable (LD-3) without being declared.
+    // Legacy verb aliases stay callable (LD-3) without being advertised.
     assertEquals(typeof target.build, 'function');
     assertEquals(typeof target.install, 'function');
     assertEquals(typeof target.uninstall, 'function');
-    // Unsupported operations are omitted, not shipped as silent no-ops (LD-4, #341).
-    assertEquals(target.rollback, undefined);
-    assertEquals(target.secrets, undefined);
   }
+});
+
+Deno.test('wiring the core ports promotes a service target to the 7-op surface and delegates', async () => {
+  const activated: string[] = [];
+  const target = new LinuxServiceDeployTarget({
+    activation: {
+      activate: (id) => {
+        activated.push(id);
+        return Promise.resolve();
+      },
+      current: () => Promise.resolve('rel-current'),
+      history: () =>
+        Promise.resolve([
+          { id: 'rel-prev', recordedAt: 1, healthy: true },
+          { id: 'rel-current', recordedAt: 2, healthy: true },
+        ]),
+      record: () => Promise.resolve(),
+    },
+    secretsStore: {
+      put: () => Promise.resolve(),
+      list: () => Promise.resolve(['STALE']),
+      clear: () => Promise.resolve(),
+    },
+    resolveSecrets: () =>
+      ({ target: 'linux-service', secrets: [{ key: 'API_KEY', value: 'v' }] }),
+  });
+
+  // rollback + secrets are now advertised because their core ports are wired.
+  assertEquals(target.operations.includes('rollback'), true);
+  assertEquals(target.operations.includes('secrets'), true);
+
+  // rollback delegates to the core orchestrator (activates the previous healthy release).
+  const rollback = await target.rollback({ projectRoot: '/srv/app' });
+  assertEquals(rollback.operation, 'rollback');
+  assertEquals(activated, ['rel-prev']);
+  assertEquals(rollback.message.includes('rel-prev'), true);
+
+  // secrets delegates to the core reconcile (writes the bundle key, prunes the stale one).
+  const secrets = await target.secrets({ projectRoot: '/srv/app' });
+  assertEquals(secrets.operation, 'secrets');
+  assertEquals(secrets.message, 'Linux service secrets: wrote 1, pruned 1');
 });
 
 Deno.test('a bare-metal service operation resolves a target-scoped descriptor result', async () => {
