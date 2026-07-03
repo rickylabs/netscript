@@ -15,7 +15,6 @@ import {
   unauthorizedErrorSchema,
   validationErrorSchema,
 } from '../domain/schemas.ts';
-import type { ContractSchema } from '../domain/schema-types.ts';
 
 type OrpcErrorMap = Parameters<typeof oc.errors>[0];
 
@@ -105,8 +104,8 @@ type BaseContractErrors = MergedErrorMap<Record<never, never>, ErrorMap>;
  * Parameterized on the input and output schemas so `typeof <inputConst>` and
  * `typeof <outputConst>` (each an explicitly-annotated Zod schema) flow through
  * to `implement`, keeping every handler's input and output precisely typed.
- * This is the sound annotation that replaces the deprecated
- * {@link BaseContractProcedure} for input + output routes.
+ * This is the sound annotation for input + output routes; it superseded the
+ * former erasing procedure alias whose `~orpc` marker was `any`.
  *
  * @example
  * ```typescript
@@ -136,9 +135,9 @@ export type BaseContractRoute<TIn extends AnySchema, TOut extends AnySchema> =
  * `baseContract.route(...).output(TOut)` (no `.input(...)`).
  *
  * The input schema defaults to the open `Schema<unknown, unknown>` the builder
- * carries before `.input(...)` is applied. This is the sound annotation that
- * replaces the deprecated {@link BaseContractProcedure} for routes that declare
- * only an output schema (for example plugin `status` and `health` routes).
+ * carries before `.input(...)` is applied. This is the sound annotation for
+ * routes that declare only an output schema (for example plugin `status` and
+ * `health` routes); it superseded the former erasing procedure alias.
  *
  * @example
  * ```typescript
@@ -158,63 +157,3 @@ export type BaseContractOutputRoute<TOut extends AnySchema> = ContractProcedureB
   BaseContractErrors,
   Record<never, never>
 >;
-
-/**
- * HTTP route options accepted by the NetScript oRPC base contract.
- *
- * @deprecated Transitional alias retained so existing consumers compile without
- * migration. Pass route options directly to `baseContract.route(...)` (typed by
- * oRPC's `Route`) and annotate the composed route with {@link BaseContractRoute}
- * or {@link BaseContractOutputRoute}. Removed in 172a-2-SOUND slice 3.
- */
-export type BaseContractRouteOptions = Readonly<{
-  method: 'HEAD' | 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-  path: string;
-}>;
-
-/**
- * Opaque procedure returned by oRPC after contract composition.
- *
- * @deprecated Type-erasing transitional alias (its `~orpc` marker is `any`, so
- * annotating a route with it discards the input/output schema types). Retained
- * so the CRUD generator and the plugin health routers compile without
- * migration. Prefer the sound {@link BaseContractRoute} /
- * {@link BaseContractOutputRoute} aliases. Removed in 172a-2-SOUND slice 3.
- */
-export type BaseContractProcedure = Readonly<{
-  /** oRPC procedure marker used by implementers and routers. */
-  // deno-lint-ignore no-explicit-any
-  '~orpc': any;
-}>;
-
-/**
- * Builder returned after binding input to the NetScript oRPC base contract.
- *
- * @deprecated Structural transitional alias retained so existing consumers
- * compile without migration. Prefer the sound {@link BaseContractRoute} alias.
- * Removed in 172a-2-SOUND slice 3.
- */
-export type BaseContractOutputBuilder<TInput extends ContractSchema<unknown>> = Readonly<{
-  /** Binds the output schema, yielding the composed procedure. */
-  output<TOutput extends ContractSchema<unknown>>(
-    schema: TOutput,
-  ): BaseContractProcedure;
-}>;
-
-/**
- * Builder returned after binding a route to the NetScript oRPC base contract.
- *
- * @deprecated Structural transitional alias retained so existing consumers
- * compile without migration. Prefer the sound {@link BaseContractRoute} alias.
- * Removed in 172a-2-SOUND slice 3.
- */
-export type BaseContractRouteBuilder = Readonly<{
-  /** Binds the input schema, yielding the output builder. */
-  input<TInput extends ContractSchema<unknown>>(
-    schema: TInput,
-  ): BaseContractOutputBuilder<TInput>;
-  /** Binds the output schema directly (no input), yielding the procedure. */
-  output<TOutput extends ContractSchema<unknown>>(
-    schema: TOutput,
-  ): BaseContractProcedure;
-}>;

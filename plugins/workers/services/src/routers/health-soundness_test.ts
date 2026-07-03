@@ -10,9 +10,9 @@ import { z } from 'zod';
 // the SOUND `BaseContractRoute<TIn, TOut>` alias carries its precise OUTPUT
 // schema through `implement(...)`, so a handler whose return shape does not
 // conform to the contract output is a COMPILE error. Under the pre-172a-2-SOUND
-// `BaseContractProcedure` erasure (`~orpc: any`) — the annotation the workers /
-// sagas health routers used before this slice — the same wrong handlers
-// compiled silently.
+// erasing procedure alias (`~orpc: any`) — the annotation the workers / sagas
+// health routers used before this slice — the same wrong handlers compiled
+// silently.
 //
 // Each `@ts-expect-error` below MUST stay an error. Deleting one (i.e.
 // re-loosening the seam back to `any`) removes the error, fails this file under

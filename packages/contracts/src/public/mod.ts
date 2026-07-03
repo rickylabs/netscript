@@ -4,12 +4,6 @@ export type {
   BaseContractOutputRoute,
   BaseContractRoute,
 } from '../application/contract-primitives.ts';
-export type {
-  BaseContractOutputBuilder,
-  BaseContractProcedure,
-  BaseContractRouteBuilder,
-  BaseContractRouteOptions,
-} from '../application/contract-primitives.ts';
 export {
   boundedString,
   type BoundedStringSchemaOptions,

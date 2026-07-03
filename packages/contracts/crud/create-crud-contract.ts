@@ -26,10 +26,7 @@
 
 import { z } from 'zod';
 import type { AnySchema } from '@orpc/contract';
-import {
-  baseContract,
-  type BaseContractProcedure,
-} from '../src/application/contract-primitives.ts';
+import { baseContract, type BaseContractRoute } from '../src/application/contract-primitives.ts';
 
 /**
  * Widens a NetScript {@link ContractSchema}-shaped value to oRPC's
@@ -99,13 +96,33 @@ export type CrudOperationDisable = Readonly<{
 }>;
 
 /**
+ * Concrete sound route type produced by every CRUD operation builder.
+ *
+ * Each operation is `baseContract.route(...).input(...).output(...)`, where the
+ * input/output schemas are widened to oRPC's {@link AnySchema} at the single
+ * {@link asSchema} boundary. That expression's type is exactly
+ * `BaseContractRoute<AnySchema, AnySchema>` — a real `@orpc/contract` procedure
+ * builder whose `~orpc` marker is a genuine oRPC contract def (not `any`). It
+ * replaces the removed erasing procedure alias as the base of
+ * {@link CrudContractOperation}.
+ */
+type CrudRoute = BaseContractRoute<AnySchema, AnySchema>;
+
+/**
  * Generated CRUD contract type.
+ *
+ * Intersects the sound {@link CrudRoute} (so each operation is a real oRPC
+ * contract procedure that `implement(...)` accepts) with NetScript's precise
+ * schema markers. The markers re-narrow the `~orpc` metadata and the
+ * `__netscriptSchemas` field back to the exact input/output schema types that
+ * the {@link asSchema} `AnySchema` widening erased, so downstream SDK client
+ * typing stays precise.
  */
 export type CrudContractOperation<
   TInputSchema extends ContractSchema<unknown> = ContractSchema<unknown>,
   TOutputSchema extends ContractSchema<unknown> = ContractSchema<unknown>,
 > =
-  & BaseContractProcedure
+  & CrudRoute
   & Readonly<{
     /** NetScript-owned schema marker used by downstream SDK type extraction. */
     readonly __netscriptSchemas: {
@@ -186,8 +203,12 @@ function crudOperation<
   TInputSchema extends ContractSchema<unknown>,
   TOutputSchema extends ContractSchema<unknown>,
 >(
-  operation: BaseContractProcedure,
+  operation: CrudRoute,
 ): CrudContractOperation<TInputSchema, TOutputSchema> {
+  // Single `as`: narrows the sound `CrudRoute` to itself intersected with the
+  // NetScript schema markers (`CrudContractOperation` is assignable back to
+  // `CrudRoute`). The markers are phantom compile-time refinements — not a
+  // double assertion through `unknown`, and no runtime shape change.
   return operation as CrudContractOperation<TInputSchema, TOutputSchema>;
 }
 
