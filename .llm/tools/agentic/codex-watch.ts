@@ -41,7 +41,7 @@
  * (heartbeat) · 1 = bad args / worktree, logs dir, or rollout not found.
  */
 
-import { parseTurnComplete, requireValue, runBin, UUID } from './agentic-lib.ts';
+import { parseTurnComplete, requireValue, runBin, UUID, wslHome } from './agentic-lib.ts';
 
 type Mode = 'git' | 'turn';
 
@@ -56,7 +56,7 @@ interface Options {
 }
 
 function defaultSessionsDir(): string {
-  const home = Deno.env.get('HOME') ?? '/home/codex';
+  const home = Deno.env.get('HOME') ?? wslHome();
   return `${home}/.codex/sessions`;
 }
 

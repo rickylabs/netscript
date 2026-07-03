@@ -180,10 +180,27 @@ exists), requires `mergeable_state == clean` (`--force` to override), refuses ba
 `4` missing token · `6` base-`main` guard · `7` not mergeable · `10` eval FAIL · `11` eval
 pending/not-final · `12` no eval comment found.
 
+## Environment overrides
+
+The suite ships portable: every machine/user-specific default is read through an env override with
+the **historical value as the fallback**, so with none of these set the behavior is byte-identical
+to before. Override them to run the suite on a machine whose WSL user or home differs. Reads are
+permission-guarded — a tool run without `--allow-env` simply falls back to the default rather than
+failing, so overrides only take effect when the process is granted `--allow-env`.
+
+| Env var | Overrides | Default | Consumed by |
+| ------- | --------- | ------- | ----------- |
+| `NETSCRIPT_WSL_USER` | WSL linux user the suite drives Codex under (the `-u <user>` for `wsl.exe`, `--user` flag default). | `codex` | `launch-codex-slice.ts`, `codex-status.ts`, `codex-resume.ts`, `gh-token.ts`, `resolveGithubToken` in `agentic-lib.ts`. |
+| `NETSCRIPT_WSL_HOME` | WSL home dir (default brief dest, `codex-watch.ts` sessions-dir fallback when `$HOME` is unset). | `/home/<NETSCRIPT_WSL_USER>` (i.e. `/home/codex`) | `launch-codex-slice.ts`, `codex-watch.ts`. |
+
+The `wslUser()` / `wslHome()` helpers in `agentic-lib.ts` are the single source of truth; per-tool
+`--user` flags still override at call time. Note `$HOME/.local/bin` PATH prepends stay `$HOME`-relative
+(already portable) and so carry no env var.
+
 ## Tests & validation
 
 ```powershell
-deno test --allow-read .llm/tools/agentic/agentic-lib_test.ts      # 39 unit tests
+deno test --allow-read --allow-env .llm/tools/agentic/agentic-lib_test.ts   # 41 unit tests
 deno check --unstable-kv .llm/tools/agentic/*.ts                   # type-check (clean)
 deno lint  --no-config   .llm/tools/agentic/*.ts                   # lint (repo excludes .llm/)
 ```

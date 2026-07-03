@@ -21,7 +21,7 @@
  * Exit codes: 0 = ok / dry-run clean · 1 = resume failed · 2 = usage error.
  */
 
-import { requireValue, sq, UUID, wsl } from "./agentic-lib.ts";
+import { requireValue, sq, UUID, wsl, wslUser } from "./agentic-lib.ts";
 
 interface Options {
   threadId?: string;
@@ -50,7 +50,7 @@ function printHelp(): void {
 }
 
 function parseArgs(args: string[]): Options | null {
-  const o: Options = { user: "codex", dryRun: false };
+  const o: Options = { user: wslUser(), dryRun: false };
   for (let i = 0; i < args.length; i++) {
     const a = args[i];
     switch (a) {

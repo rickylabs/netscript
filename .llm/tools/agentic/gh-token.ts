@@ -30,7 +30,7 @@
  * 3 = stdin token did not validate.
  */
 
-import { resolveGithubToken, validateGithubToken } from './agentic-lib.ts';
+import { resolveGithubToken, validateGithubToken, wslUser } from './agentic-lib.ts';
 
 type Sub = 'check' | 'store';
 
@@ -61,7 +61,7 @@ function parseArgs(args: string[]): Options {
   if (args.length === 0) usage();
   const sub = args[0];
   if (sub !== 'check' && sub !== 'store') usage();
-  const o: Options = { sub, wslUser: 'codex', skipWsl: false, skipGcm: false };
+  const o: Options = { sub, wslUser: wslUser(), skipWsl: false, skipGcm: false };
   for (let i = 1; i < args.length; i++) {
     const a = args[i];
     switch (a) {
