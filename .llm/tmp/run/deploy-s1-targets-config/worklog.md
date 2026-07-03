@@ -111,3 +111,24 @@
   (`deploy.windows` → `deploy.targets.windows`); full rewrite remains #344.
 - `deno test tests/schema/netscript_config_test.ts tests/merge/merge_test.ts`: **PASS**
   (9 passed | 0 failed).
+
+### CS-5 — root quality reconcile
+- `packages/cli/` is excluded from root `fmt` AND `lint` (deno.json fmt.exclude + lint.exclude +
+  the fmt/lint task `--exclude` regexes). So the CLI-root fmt wrapper's `failedBatches` = deno fmt
+  reporting "No target files found" on an all-excluded set, NOT real findings. CLI files need no
+  fmt/lint; they are covered by `check` only.
+- `run-deno-fmt.ts --root packages/config --ext ts` (check): **PASS** (33 files, 0 findings — includes
+  the two new test files).
+- `run-deno-lint.ts --root packages/config --ext ts`: **PASS** (exit 0, 0 occurrences).
+- `run-deno-check.ts --root packages/config`: **PASS** (33 files). `run-deno-check.ts --root
+  packages/cli/src` (whole CLI package): **PASS** (450 files, 0 errors) — confirms the rename/re-key
+  ripples nowhere else.
+- Grep sweep of `packages/`: no dangling `WindowsDeployConfig`/`WindowsDeployConfigSchema` and no
+  `deploy.windows` code path. Remaining `ResolvedWindowsDeployConfig` (×4) is the CLI resolved-layer
+  type kept windows-shaped per L-4; lone `deploy.windows` is a test-name string.
+- No code changes were needed in CS-5 (diff already green); this slice records the gate evidence only.
+
+## Implementer summary (2026-07-03)
+- CS-1+CS-2 → `07cb41e9`, CS-3 → `217116e5`, CS-4 → `3acd114b`, CS-5 run-docs → this commit. All
+  pushed to `feat/deploy-s1-targets-config`. Every gate green. No scaffold-template edits were needed
+  (no fixture emits `deploy.windows`); `scaffold.runtime` e2e remains the evaluator's gate.
