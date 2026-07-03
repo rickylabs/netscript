@@ -12,6 +12,7 @@
  */
 
 export * from './telemetry.ts';
+export * from './chat-client.ts';
 export * from './model-provider.ts';
 export * from './tool-registry.ts';
 export * from './embedding.ts';

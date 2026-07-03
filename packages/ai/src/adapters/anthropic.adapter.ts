@@ -12,17 +12,13 @@
  * @module
  */
 
-import {
-  ANTHROPIC_MODELS,
-  type AnthropicChatModel,
-  anthropicText,
-  type AnthropicTextAdapter,
-  createAnthropicChat,
-} from '@tanstack/ai-anthropic';
+import { ANTHROPIC_MODELS, anthropicText, createAnthropicChat } from '@tanstack/ai-anthropic';
 
 import type { ModelDescriptor, ModelHandle, ModelId } from '../contracts/model.ts';
 import { AiError } from '../contracts/errors.ts';
 import type { ModelProviderPort } from '../ports/model-provider.ts';
+import type { ChatClientPort } from '../ports/chat-client.ts';
+import { toTanstackChatClient } from './tanstack-chat-client.ts';
 
 /**
  * Registry id under which {@linkcode AnthropicModelProvider} self-registers.
@@ -104,31 +100,45 @@ export class AnthropicModelProvider implements ModelProviderPort {
   }
 
   /**
-   * Construct the underlying TanStack Anthropic text client for `model`.
+   * Construct an owned {@linkcode ChatClientPort} for `model`.
    *
-   * The returned adapter drives chat/streaming. In-flight streams are cancelled
-   * by passing an `AbortController` to the TanStack `chat()` / `chatStream()`
-   * call, e.g. `chat({ adapter, messages, abortController })` — the documented
-   * stop path so no request is left un-cancellable (F-13).
+   * The wrapped TanStack Anthropic text adapter is translated to the owned
+   * chat vocabulary internally (no provider-SDK type escapes the public
+   * surface). Per-turn cancellation flows through the port's
+   * `stream(_, { signal })` option, which forwards to the TanStack
+   * `AbortController` — the documented stop path so no request is left
+   * un-cancellable (F-13).
    *
    * @param model - A model id from the Anthropic catalog.
-   * @returns The wrapped TanStack Anthropic text adapter.
+   * @returns An owned chat client bound to `model`.
+   * @throws {AiError} When `model` is not in the Anthropic catalog.
    *
-   * @example Cancel a stream after a timeout
+   * @example Stream one turn with cancellation
    * ```ts
    * const provider = new AnthropicModelProvider({ apiKey });
-   * const adapter = provider.createChatClient('claude-sonnet-4-5');
-   * const abortController = new AbortController();
-   * setTimeout(() => abortController.abort(), 5_000);
-   * // chat({ adapter, messages, abortController });
+   * const client = provider.createChatClient('claude-sonnet-4-5');
+   * const abort = new AbortController();
+   * setTimeout(() => abort.abort(), 5_000);
+   * for await (const event of client.stream({ messages }, { signal: abort.signal })) {
+   *   if (event.type === 'text') console.log(event.delta);
+   * }
    * ```
    */
-  createChatClient(model: AnthropicChatModel): AnthropicTextAdapter<AnthropicChatModel> {
+  createChatClient(model: ModelId): ChatClientPort {
+    // Narrow the owned string id against the runtime catalog so no
+    // `@tanstack/ai-anthropic` type appears in the public signature (D3).
+    const resolved = ANTHROPIC_MODELS.find((candidate) => candidate === model);
+    if (resolved === undefined) {
+      throw new AiError(
+        `Model "${model}" is not offered by the "${ANTHROPIC_PROVIDER_ID}" provider.`,
+      );
+    }
     const { apiKey, baseURL } = this.#config;
     const clientConfig = baseURL === undefined ? undefined : { baseURL };
-    return apiKey === undefined
-      ? anthropicText(model, clientConfig)
-      : createAnthropicChat(model, apiKey, clientConfig);
+    const adapter = apiKey === undefined
+      ? anthropicText(resolved, clientConfig)
+      : createAnthropicChat(resolved, apiKey, clientConfig);
+    return toTanstackChatClient(adapter, { name: ANTHROPIC_PROVIDER_ID, kind: 'text' });
   }
 }
 

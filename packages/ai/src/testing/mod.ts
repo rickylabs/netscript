@@ -11,11 +11,13 @@
 export {
   createFakeAgentLoop,
   createFakeAgentMemory,
+  createFakeChatModelProvider,
   createFakeEmbeddingProvider,
   createFakeModelProvider,
   createFakeTelemetryPort,
   createFakeVisionProvider,
   createInMemoryToolRegistry,
+  type FakeChatModelProvider,
   type FakeTelemetryPort,
   type RecordedTelemetry,
 } from './fakes.ts';

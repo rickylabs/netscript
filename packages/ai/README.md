@@ -61,17 +61,16 @@ const handle = await getModel('demo:some-model');
 
 ## Providers
 
-Two first-party providers ship as **self-registering subpaths**. Each wraps a
-TanStack AI client and implements the E1 `ModelProviderPort`. Importing a subpath
-runs a one-time side effect that registers its factory into the shared registry —
-no explicit wiring — then re-exports the provider class and its id/config for
-direct construction.
+Two first-party providers ship as **self-registering subpaths**. Each wraps a TanStack AI client and
+implements the E1 `ModelProviderPort`. Importing a subpath runs a one-time side effect that
+registers its factory into the shared registry — no explicit wiring — then re-exports the provider
+class and its id/config for direct construction.
 
 ### `@netscript/ai/anthropic`
 
-Wraps [`@tanstack/ai-anthropic`](https://www.npmjs.com/package/@tanstack/ai-anthropic).
-The model catalog is taken verbatim from the wrapped package's `ANTHROPIC_MODELS`,
-so it stays in lockstep with upstream.
+Wraps [`@tanstack/ai-anthropic`](https://www.npmjs.com/package/@tanstack/ai-anthropic). The model
+catalog is taken verbatim from the wrapped package's `ANTHROPIC_MODELS`, so it stays in lockstep
+with upstream.
 
 ```ts
 import '@netscript/ai/anthropic'; // side effect: registers 'anthropic'
@@ -87,11 +86,10 @@ const client = provider.createChatClient('claude-sonnet-4-5');
 
 ### `@netscript/ai/openai-compatible`
 
-Wraps [`@tanstack/ai-openai`](https://www.npmjs.com/package/@tanstack/ai-openai)'s
-OpenAI-compatible client, so any endpoint that speaks the OpenAI Chat Completions
-or Responses API (DeepSeek, Together, vLLM, a local gateway, …) works by pointing
-`baseURL` at it. With no `models` configured the provider is *optimistic* — the
-remote endpoint is the authority on its own catalog.
+Wraps [`@tanstack/ai-openai`](https://www.npmjs.com/package/@tanstack/ai-openai)'s OpenAI-compatible
+client, so any endpoint that speaks the OpenAI Chat Completions or Responses API (DeepSeek,
+Together, vLLM, a local gateway, …) works by pointing `baseURL` at it. With no `models` configured
+the provider is _optimistic_ — the remote endpoint is the authority on its own catalog.
 
 ```ts
 import '@netscript/ai/openai-compatible'; // side effect: registers 'openai-compatible'
@@ -108,29 +106,92 @@ const client = provider.createChatClient('deepseek-chat');
 
 ### Stopping long-lived streams
 
-`createChatClient` returns the wrapped TanStack text adapter. In-flight
-chat/streams are cancelled by passing an `AbortController` to the TanStack
-`chat()` / `chatStream()` call — the documented stop path (F-13):
+`createChatClient(modelId)` returns an owned `ChatClientPort` — **not** a raw TanStack adapter, so
+no provider-SDK type escapes the public surface. Its `stream(request, { signal })` method yields an
+owned `ChatClientEvent` union (`text` | `tool-call` | `finish` | `error`, where `finish` carries the
+real provider `Usage`). In-flight turns are cancelled by passing an `AbortSignal` — the port
+forwards it to the underlying TanStack `AbortController`, the documented stop path (F-13):
 
 ```ts
-const abortController = new AbortController();
-setTimeout(() => abortController.abort(), 5_000);
-// chat({ adapter: client, messages, abortController });
+const client = provider.createChatClient('claude-sonnet-4-5');
+const abort = new AbortController();
+setTimeout(() => abort.abort(), 5_000);
+
+for await (const event of client.stream({ messages }, { signal: abort.signal })) {
+  if (event.type === 'text') console.log(event.delta);
+  if (event.type === 'finish') console.log(event.usage);
+}
 ```
 
 ### Bundle-isolation guarantee
 
-The base `@netscript/ai` entrypoint **never** imports a provider subpath, and the
-subpaths never import each other. The heavy provider SDKs are scoped to their own
-subpath's module graph, so:
+The base `@netscript/ai` entrypoint **never** imports a provider subpath, and the subpaths never
+import each other. The heavy provider SDKs are scoped to their own subpath's module graph, so:
 
 - `import '@netscript/ai'` pulls **zero** TanStack/provider dependencies.
 - `import '@netscript/ai/anthropic'` pulls **only** `@tanstack/ai-anthropic`.
 - `import '@netscript/ai/openai-compatible'` pulls **only** `@tanstack/ai-openai`.
 
-This is enforced by `tests/provider_isolation_test.ts`, which imports a single
-subpath in a fresh subprocess and asserts the registry contains **exactly** that
-one provider.
+This is enforced by `tests/provider_isolation_test.ts`, which imports a single subpath in a fresh
+subprocess and asserts the registry contains **exactly** that one provider.
+
+## Agent loop (`@netscript/ai/agent`)
+
+`createAgentLoop` drives a bounded, cancellable multi-turn conversation. It is programmed purely
+against the injected `ChatModelProviderPort` and `ToolRegistryPort` seams (A10) — importing this
+subpath pulls **no** provider SDK, so you choose a provider by importing e.g.
+`@netscript/ai/anthropic` separately.
+
+```ts
+import { createAgentLoop, slidingWindowHistory } from '@netscript/ai/agent';
+
+const loop = createAgentLoop({
+  modelProvider, // a ChatModelProviderPort (E2)
+  tools, // a ToolRegistryPort (E4)
+  history: slidingWindowHistory({ maxMessages: 12 }),
+});
+
+const abort = new AbortController();
+for await (
+  const chunk of loop.run(
+    { model: 'anthropic:claude-sonnet-4-5', messages },
+    { signal: abort.signal, maxSteps: 8 },
+  )
+) {
+  switch (chunk.type) {
+    case 'text':
+      Deno.stdout.writeSync(new TextEncoder().encode(chunk.delta));
+      break;
+    case 'tool-result':
+      console.log('tool ->', chunk.result.content);
+      break;
+    case 'done':
+      console.log('usage', chunk.usage); // real, summed provider usage
+      break;
+  }
+}
+
+loop.stop(); // or abort.signal — either unwinds to the `aborted` terminal state
+```
+
+The loop is a **typestate machine**:
+`idle → running → awaiting-tool → running →
+done | aborted | errored`. `loop.state` exposes the
+current state.
+
+- **Bounded.** `maxSteps` (default 8) caps model turns; exceeding it emits an `error` chunk carrying
+  `AgentMaxStepsExceededError` and settles in `errored`.
+- **Cancellable (F-13).** `options.signal` and `loop.stop()` are combined via `AbortSignal.any`; on
+  abort the loop stops streaming, emits a terminal `done` chunk, and settles in `aborted` — the
+  generator always returns, nothing leaks.
+- **Bounded context.** Each turn's history passes through the injected `HistoryStrategy` (default
+  `slidingWindowHistory`, window 20), preserving leading system messages while trimming to the most
+  recent turns.
+- **Real usage.** Per-turn provider `Usage` is summed — there is no `chars/4` estimation anywhere;
+  the terminal `done` chunk carries the aggregate.
+- **Owned tools.** Tool calls surfaced by the model are executed through the injected
+  `ToolRegistryPort`; a missing handler yields an `error`-state `ToolResult` rather than throwing,
+  and the loop resumes with the result appended.
 
 ## Tool system (`@netscript/ai/tools`)
 
@@ -195,6 +256,7 @@ const result = await registry.dispatch('render_ui', {
 | `getAiRuntime()` / `resetAiRuntime()`                     | `getKv()`-shaped process singleton + reset.          |
 | `registerModelProvider` / `getModelProvider` / `getModel` | Model registry: self-register + resolve.             |
 | `defineAiTool` / `createToolRegistry` / `renderUiTool`    | Tool system: define, register, dispatch (`./tools`). |
+| `createAgentLoop` / `slidingWindowHistory`                | Bounded, cancellable agent loop (`./agent`).         |
 
 ### Subpath exports
 
@@ -204,11 +266,14 @@ const result = await registry.dispatch('render_ui', {
 - `@netscript/ai/ports` — capability seams and their no-op/throwing defaults.
 - `@netscript/ai/tools` — the tool system: `defineAiTool`, `createToolRegistry`, and the
   `renderUiTool` wire contract (validates input via Standard Schema).
+- `@netscript/ai/agent` — the bounded, cancellable agent loop: `createAgentLoop`, the
+  `slidingWindowHistory` strategy, the typestate/terminal vocabulary, and the
+  `ChatModelProviderPort` / `ToolRegistryPort` seams it is injected with.
 - `@netscript/ai/testing` — deterministic fake ports for downstream unit tests.
-- `@netscript/ai/anthropic` — self-registering Anthropic provider (wraps
-  `@tanstack/ai-anthropic`); pulls the SDK only when imported.
-- `@netscript/ai/openai-compatible` — self-registering OpenAI-compatible provider
-  (wraps `@tanstack/ai-openai`); pulls the SDK only when imported.
+- `@netscript/ai/anthropic` — self-registering Anthropic provider (wraps `@tanstack/ai-anthropic`);
+  pulls the SDK only when imported.
+- `@netscript/ai/openai-compatible` — self-registering OpenAI-compatible provider (wraps
+  `@tanstack/ai-openai`); pulls the SDK only when imported.
 
 ## See also
 
