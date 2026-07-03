@@ -117,6 +117,8 @@ through the shared client; its options come from `IslandQueryOptions`:
 | `gcTime`      | Cache garbage-collection duration in milliseconds.   |
 | `select`      | Optional projection applied by the query adapter.    |
 | `onError`     | Optional error callback.                             |
+| `refetchInterval` | Polling cadence in milliseconds (`number \| false`). When set, the query refetches on this cadence; `false` disables polling. Defaults to `false`. |
+| `refetchIntervalInBackground` | Whether polling continues while the tab or window is backgrounded (`boolean`). Only relevant when `refetchInterval` is set. Defaults to `false`. |
 
 The hook returns an `IslandQueryResult` with `data`, `error`, `status`,
 `isLoading`, `isSuccess`, `isError`, and a `refetch()` method.
@@ -159,6 +161,39 @@ export default function WidgetIsland() {
 loader's cached payload as `initialData` so the island renders with data
 immediately and only refetches once `staleTime` elapses.
 
+### Polling an island with `refetchInterval`
+
+When an island needs to poll for a changing status — a document moving from
+`pending` to `embedding` to `ready`, say — set `refetchInterval` rather than
+wiring a manual `setInterval`. The hook refetches on that cadence and cleans the
+timer up on unmount. Add `refetchIntervalInBackground: true` when polling must
+continue while the tab is backgrounded (the default stops polling on blur).
+
+```tsx
+import { useIslandQuery } from "@netscript/fresh/query";
+
+interface Doc {
+  id: string;
+  status: "pending" | "embedding" | "ready";
+}
+
+function DocStatus({ id }: { id: string }) {
+  const query = useIslandQuery<Doc>({
+    queryKey: ["doc", id],
+    queryFn: () => fetch(`/api/docs/${id}`).then((res) => res.json()),
+    // Poll every 2s until ready, then stop by returning false.
+    refetchInterval: 2_000,
+    refetchIntervalInBackground: true,
+  });
+
+  return <span>{query.data?.status ?? "loading…"}</span>;
+}
+```
+
+`refetchInterval` is typed `number | false`: pass a millisecond cadence to poll,
+or `false` to disable it (for example, flip it to `false` from state once the
+status reaches `ready` to stop polling).
+
 ### Mutations, infinite queries, and live data
 
 - `useIslandMutation` runs a mutation through the shared client. Its options
@@ -183,6 +218,83 @@ immediately and only refetches once `staleTime` elapses.
 Shorter aliases — `useQuery`, `useMutation`, `useInfiniteQuery`,
 `useSuspenseQuery`, and `useSuspenseInfiniteQuery` — map to their `useIsland*`
 counterparts for backward compatibility.
+
+#### A worked mutation: optimistic toggle with rollback
+
+This island toggles a todo's `done` flag through `useIslandMutation`, applying the
+change optimistically and rolling back if the server rejects it. `onMutate` snapshots
+the cached list and returns it as context, `onError` restores that snapshot, and
+`onSettled` re-syncs with the server:
+
+```tsx
+import {
+  QueryIsland,
+  useIslandMutation,
+  useQueryClient,
+} from "@netscript/fresh/query";
+
+interface Todo {
+  id: string;
+  title: string;
+  done: boolean;
+}
+
+function TodoToggle({ todo }: { todo: Todo }) {
+  const queryClient = useQueryClient();
+
+  const toggle = useIslandMutation<Todo, Error, boolean, { previous?: Todo[] }>({
+    // 1. The round-trip: PATCH the change and return the server's copy.
+    mutationFn: (done) =>
+      fetch(`/api/todos/${todo.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ done }),
+      }).then((res) => res.json() as Promise<Todo>),
+
+    // 2. Optimistic update: snapshot prior state, write the expected next state.
+    onMutate: async (done) => {
+      await queryClient.cancelQueries({ queryKey: ["todos"] });
+      const previous = queryClient.getQueryData<Todo[]>(["todos"]);
+      queryClient.setQueryData<Todo[]>(
+        ["todos"],
+        (list) => (list ?? []).map((item) => item.id === todo.id ? { ...item, done } : item),
+      );
+      return { previous };
+    },
+
+    // 3. Roll back to the snapshot when the server rejects the change.
+    onError: (_error, _done, context) => {
+      if (context?.previous) queryClient.setQueryData(["todos"], context.previous);
+    },
+
+    // 4. Re-sync with the server once the mutation settles, either way.
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["todos"] }),
+  });
+
+  return (
+    <button
+      type="button"
+      disabled={toggle.isPending}
+      onClick={() => toggle.mutate(!todo.done)}
+    >
+      {todo.done ? "Mark undone" : "Mark done"}
+    </button>
+  );
+}
+
+export default function TodoIsland({ todo }: { todo: Todo }) {
+  return (
+    <QueryIsland>
+      <TodoToggle todo={todo} />
+    </QueryIsland>
+  );
+}
+```
+
+The four generic parameters mirror
+`IslandMutationOptions<TData, TError, TVariables, TContext>`: here `TData` is the
+server's `Todo`, `TVariables` is the `boolean` passed to `mutate`, and `TContext` is
+the snapshot threaded from `onMutate` into `onError` and `onSettled`. Call `mutate`
+for fire-and-forget UI updates, or `mutateAsync` when you need to await the result.
 
 ## Server prefetch and hydration
 

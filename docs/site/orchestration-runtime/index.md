@@ -18,3 +18,19 @@ workspace up, change runtime overrides, or understand how plugin contributions b
   { eyebrow: "How-To", title: "Plugins", body: "Add or author a plugin contribution.", href: "/how-to/add-a-plugin/", icon: "H" },
   { eyebrow: "API Reference", title: "aspire and runtime config", body: "Generated symbols for AppHost, config, runtime-config, plugin, and CLI units.", href: "/reference/aspire/", icon: "R" }
 ] }) }}
+
+## Where to go next
+
+New here, start with the concept, then the practical wiring, then the reference:
+
+- **Understand the model:** {{ comp.xref({ key: "explain:aspire", text: "Orchestration with Aspire" }) }}
+  explains why a NetScript app is a resource graph, how plugin contributions become resources, and
+  when to change vs. regenerate vs. hand-edit the generated AppHost.
+- **Wire resources together:** {{ comp.xref({ key: "howto:discover-services", text: "Discover services" }) }}
+  covers the two-pass reference resolution — including how a service now declares
+  `pluginReferences`/`dependsOn` — and {{ comp.xref({ key: "howto:roll-out-runtime-overrides", text: "Roll out runtime overrides" }) }}
+  covers configuration across resources.
+- **See it observed:** {{ comp.xref({ key: "cap:telemetry", text: "Telemetry & logging" }) }} is the
+  dashboard side of the same graph — the spans and logs `aspire start` collects.
+- **Look up exact symbols:** {{ comp.xref({ key: "ref:aspire", text: "the Aspire reference" }) }} and
+  the {{ comp.xref({ key: "cli:reference", text: "CLI reference" }) }}.

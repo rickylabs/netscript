@@ -137,7 +137,7 @@ Leave `aspire start` running in this terminal. It provisions both the Postgres d
 the Redis cache (your KV/queue backend) as Docker containers — no manual `docker run` and
 no local Postgres install required. When it settles you'll have:
 
-- The **Aspire dashboard** at [http://localhost:18888](http://localhost:18888) — the access
+- The **Aspire dashboard** at [https://localhost:18888](https://localhost:18888) — the access
   token is printed in the `aspire start` output. Open it and confirm the `postgres` and
   `redis` resources are green.
 - Resources named `postgres`, `redis`, and the per-capability services/processors
@@ -218,7 +218,7 @@ Confirm the database is migrated and seeded three ways, from most to least autho
    Prisma client and the `zod` schemas — proof `db generate` succeeded and your typed models
    are importable from application code.
 3. **Aspire dashboard.** The `postgres` resource at
-   [http://localhost:18888](http://localhost:18888) is green and shows recent activity from
+   [https://localhost:18888](https://localhost:18888) is green and shows recent activity from
    the migration and seed runs. Use it to eyeball that the container is healthy.
 
 If all three line up, your database is provisioned, migrated, and seeded — you can now

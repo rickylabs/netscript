@@ -42,7 +42,7 @@ netscript db status --db workspace   # the workspace datasource from chapter 3
 
 {{ comp callout { type: "important", title: "Aspire first, then everything else" } }}
 The Workers API on <code>:8091</code> and its background processor are resources in the Aspire graph,
-and so is the <a href="http://localhost:18888">dashboard on <code>:18888</code></a> where you read job
+and so is the <a href="https://localhost:18888">dashboard on <code>:18888</code></a> where you read job
 traces. Start <code>aspire start</code> from <code>aspire/</code> <strong>before</strong> you add the
 plugin or trigger a job, and leave it running.
 {{ /comp }}
@@ -92,7 +92,7 @@ shows the shape and the `createJobTools(ctx)` helper surface:
 Two layers, and they behave differently. <strong>The framework instruments the job for you.</strong>
 When the background processor dispatches your handler it wraps the whole execution in real
 OpenTelemetry spans — dispatch, execution, duration, status — which show up in the
-<a href="http://localhost:18888">Aspire dashboard</a> automatically. What is <em>not</em> yet wired are
+<a href="https://localhost:18888">Aspire dashboard</a> automatically. What is <em>not</em> yet wired are
 the <code>createJobTools(ctx)</code> helpers you call <em>inside</em> the handler:
 <code>trace.addEvent</code>, <code>trace.withChildSpan</code>, and <code>progress(...)</code> are
 currently no-op stubs in the scaffold (tracked debt). They will not throw and your code keeps working;
@@ -199,7 +199,7 @@ curl 'http://localhost:8091/api/v1/workers/executions?limit=10'
 
 You should see an execution record for `provision-member` with a succeeded status and a result payload
 carrying the new `memberId`. Then watch the same run in the Aspire **Traces** view at
-[http://localhost:18888](http://localhost:18888) — the framework emits the dispatch/execution span
+[https://localhost:18888](https://localhost:18888) — the framework emits the dispatch/execution span
 automatically.
 
 {{ comp.apiTable({

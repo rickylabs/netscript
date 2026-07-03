@@ -143,6 +143,24 @@ Versioned oRPC service contracts plus the request/response schemas and types use
 | `WorkersRouteHandler` | type alias | Structural route handler exposed by the implemented worker router. |
 | `WorkersRouter` | type alias | Structural worker router returned after binding a context. |
 
+#### Trigger procedures (RPC routes)
+
+`workersContract` exposes two enqueue procedures. A generated typed client
+(`createServiceClient<typeof workersContract>({ contract: workersContract, serviceName:
+'workers-api', routerName: 'workers' })`) reaches them over `/api/rpc/*`; the same routes answer
+REST callers under `/api/v1/workers/...`. For each, the `{id}` path segment is the single source
+of truth for the target — a request-body `id` is optional and ignored when sent, and a missing id
+short-circuits to a typed `VALIDATION_ERROR` (HTTP 422) via the centralized `validationFailed`
+contract helper before any KV write.
+
+| Procedure | Route | Input (`JobTriggerInput` / `TaskTriggerInput`) | Output |
+| --- | --- | --- | --- |
+| `triggerJob` | `POST /jobs/{id}/trigger` | `{ id, payload?, priority?, delay?, correlationId?, traceparent?, tracestate? }` | `{ jobId, triggered }` |
+| `triggerTask` | `POST /tasks/{id}/trigger` | `{ id, payload?, priority?, delay?, correlationId? }` | `{ taskId, triggered }` |
+
+See the [background-jobs capability page](/capabilities/background-jobs/#trigger-a-job-from-a-typed-client)
+for the typed-client walkthrough.
+
 ### `@netscript/plugin-workers/scaffolding`
 
 | Symbol | Kind | Description |

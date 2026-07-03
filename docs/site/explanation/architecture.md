@@ -152,7 +152,7 @@ first-party plugin enabled.
 ```text
                               ┌───────────────────────────────────┐
                               │            Aspire AppHost          │
-                              │   dashboard  http://localhost:18888│
+                              │   dashboard  https://localhost:18888│
                               │  provisions Postgres + Redis (KV)  │
                               └───────────────┬───────────────────┘
                                               │ wires env, ports, resources
@@ -183,7 +183,7 @@ first-party plugin enabled.
 Read the picture in three bands. **Aspire** sits on top as the local
 orchestrator: `cd aspire && aspire start` brings up Postgres and Redis (the default cache backend; `garnet` or `deno-kv` are selectable via `--cache-backend`) and starts
 every service *before* any `netscript db` command runs, with traces, logs, and
-health landing in the dashboard at `http://localhost:18888`. **Plugin services**
+health landing in the dashboard at `https://localhost:18888`. **Plugin services**
 sit in the middle, each owning exactly one service on a fixed port; your own
 scaffolded `users` service sits alongside them, speaking the same contract
 machinery. **The packages** sit underneath as the shared substrate every plugin

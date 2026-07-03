@@ -37,7 +37,7 @@ You should have finished [chapter 1](/tutorials/storefront/01-scaffold/), so:
 
 - `my-shop/` exists with `services/products/` and `contracts/` directories.
 - `aspire start` is up from the `aspire/` folder, so the dashboard at
-  [http://localhost:18888](http://localhost:18888) is live and Postgres is online.
+  [https://localhost:18888](https://localhost:18888) is live and Postgres is online.
 
 With Aspire up, initialize the database so the catalog has real tables to read and write. Run these
 from the **workspace root** (a second terminal — leave `aspire start` going in the first):

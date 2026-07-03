@@ -168,7 +168,7 @@ with `deno task --cwd services/users dev`.
 {{ comp callout { type: "important", title: "Aspire first, then hit the endpoint" } }}
 Services that touch the database need orchestration up first:
 <code>cd aspire &amp;&amp; aspire start</code> brings up Postgres and Redis (dashboard at
-<a href="http://localhost:18888">http://localhost:18888</a>) <strong>before</strong> any
+<a href="https://localhost:18888">https://localhost:18888</a>) <strong>before</strong> any
 <code>netscript db</code> command. The seeded-records example service runs without the DB,
 but the real workflow expects aspire startning. See <a href="/explanation/aspire/">Aspire</a>.
 {{ /comp }}
