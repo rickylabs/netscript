@@ -61,13 +61,18 @@ The deliverable is **not** bare-metal-private logic. It is:
     writes `.deploy/<target>/.env` via `Deno.writeTextFile` — but with **no restricted permission**
     and Windows-only. #341 lifts this to a target-agnostic, 0600-equivalent convention.
 - **Config base (`packages/config/.../deploy-schema.ts`):** `deployTargetBaseShape` is the spread-composed
-  target-agnostic base (R-DEPLOY-4). It already carries a `health` block, but that is *runtime
-  heartbeat monitoring* (servy `heartbeatIntervalSeconds`/`maxFailedChecks`), **not** deploy-time
+  target-agnostic base (R-DEPLOY-4). It already carries a `health` block
+  (`intervalSeconds`/`maxFailedChecks`/`maxRestartAttempts`), but that is *runtime heartbeat
+  monitoring* (mapped to servy's `heartbeatIntervalSeconds` at render time), **not** deploy-time
   health-*gated activation*. `resolveDeployBase` in
   `kernel/adapters/config/deploy-config-resolvers.ts` defaults every base field. The `linux` member +
   `resolveLinuxDeploy` live in #364's worktree (not yet on `main`).
-- **OTEL:** `env-file-content.ts`/`writeEnvFile` already accept `otlpEndpoint`/`otlpProtocol` options;
-  no `OTEL_DENO` is emitted yet, and it is not wired into the systemd unit / servy XML environment.
+- **OTEL:** `env-file-content.ts`/`writeEnvFile` already accept `otlpEndpoint`/`otlpProtocol` options,
+  and **#364's `kernel/adapters/windows/servy/servy-environment.ts:209` already emits
+  `env.OTEL_DENO = 'true'`** (+ `OTEL_SERVICE_NAME`) — but only on the servy path, hand-rolled and
+  not centralized; the systemd unit has **no** OTEL wiring. So S5 **refactors** the existing servy
+  emission through the core `observabilityEnv` (it does **not** add a duplicate) and adds the missing
+  systemd wiring. The canonical value is **`OTEL_DENO='true'`** (aligned to #364, not `1`).
 
 ## Locked Decisions
 
@@ -78,7 +83,7 @@ The deliverable is **not** bare-metal-private logic. It is:
 | **D3** | **Rollback convention** = `rollback-convention.ts`: types (`ReleaseId`, `ReleaseRecord`, `ReleaseHistory`, `RollbackRequest/Result`), retention constant `DEFAULT_RELEASE_RETENTION = 3`, **pure** math `retainReleases(history, keep)` + `selectRollbackTarget(history)`, an injected **`ActivationPort`** (`activate(releaseId)`/`current()`/`history()`/`record(release)`), and a pure orchestrator `rollbackToPrevious(request, activation)`. **Every adapter's `rollback` op delegates to `rollbackToPrevious`; only the `ActivationPort` binding is per-target.** | Version-retention + previous-good selection is convention, not platform detail; the platform only supplies the atomic swap. |
 | **D4** | **Health-gate convention** = `health-gate.ts`: `HealthProbeSpec` (`url`/`path`, `timeoutMs`, `intervalMs`, `retries`, `expectStatus`), injected **`HealthProbePort`** (`probe(spec)`), and a **pure** orchestrator `runHealthGate(spec, probe, sleep)` returning `{ passed, attempts }`. | "New version only takes traffic after a health probe passes" is a shared convention; the transport (fetch) is the only edge binding. |
 | **D5** | **Health-gated activation** = `activation-convention.ts`: the composite orchestrator `activateWithHealthGate({ candidate, activation, health, spec })` — (1) `activation.activate(candidate)`, (2) `runHealthGate(...)`, (3a) on **pass** `activation.record(candidate)` + `retainReleases`/prune, (3b) on **fail** `activation.activate(previous)` (**automatic rollback**) and return failure. `up` routes through this. | This is the single core primitive that makes "atomic activate/rollback + health-gated activation" true for *any* target; bare-metal is its reference exercise. |
-| **D6** | **OTEL convention** = `observability-convention.ts`: pure `observabilityEnv(opts) → Record<string,string>` emitting `OTEL_DENO=1` (+ `OTEL_SERVICE_NAME`, `OTEL_EXPORTER_OTLP_ENDPOINT/PROTOCOL` when configured). Bare-metal wires this env-map into the **systemd unit** (`Environment=`) and **servy XML** (`environmentVariables`); cloud adapters can inject the same map into their platform env. | `OTEL_DENO` is a Deno-*runtime* feature common to every Deno target, so the env derivation is convention, not bare-metal-private. |
+| **D6** | **OTEL convention** = `observability-convention.ts`: pure `observabilityEnv(opts) → Record<string,string>` emitting **`OTEL_DENO='true'`** (canonical value aligned to #364's existing servy emission; **not** `1`) (+ `OTEL_SERVICE_NAME`, `OTEL_EXPORTER_OTLP_ENDPOINT/PROTOCOL` when configured). Bare-metal **refactors #364's existing `servy-environment.ts` OTEL_DENO emission to source from this helper** (no duplicate) and adds the missing **systemd unit** (`Environment=`) wiring; cloud adapters can inject the same map into their platform env. | `OTEL_DENO` is a Deno-*runtime* feature common to every Deno target, so the env derivation is convention, not bare-metal-private; centralizing removes the hand-rolled per-adapter copy. |
 | **D7** | **Bare-metal reference bindings** (edge adapters): `EnvFileSecretsStore` (`SecretsStorePort`; writes the rendered env file then `Deno.chmod(0o600)` on POSIX / owner-only ACL on Windows), `SymlinkActivationPort` (Linux: `releases/<id>/` + atomic `current` symlink swap + `systemctl restart` via `OsServicePort`) and `DirSwapActivationPort` (Windows: junction/dir swap + servy restart), `FetchHealthProbe` (`HealthProbePort`; `fetch` with `AbortSignal.timeout`). These implement the D2–D5 ports. | First concrete binding = the seam ratifier; proves the port interfaces are sufficient and platform-neutral. |
 | **D8** | **7-op promotion + routing.** Promote `ServiceDeployTarget` to the full **7-op** set (add `rollback`/`secrets` to `operations` + handlers) and make `up` health-gated. Handlers delegate to the D2/D3/D5 orchestrators via **optional injected ports** (constructor deps). When ports are absent (pure registry descriptor) the adapter still constructs; the **public deploy path** injects the concrete bare-metal bindings for real execution. The thin router (`netscript deploy <target> rollback|secrets`) only dispatches — no target logic (R-DEPLOY-2). | Makes bare-metal a genuine 7-op adapter (F-DEPLOY-1) while keeping conventions in core and the router thin (F-DEPLOY-2). Honors S3 D-S8 hand-off. |
 | **D9** | **Config surface is added to `deployTargetBaseShape` (spread, target-agnostic — R-DEPLOY-4), not a per-target base class.** New base blocks: `activation` (`retain?`, `strategy?: 'symlink'|'dir-swap'`, `healthGate?: { path?, port?, timeoutMs?, intervalMs?, retries?, expectStatus? }`), `secrets` (`envFile?`, `mode?`), `otel` (`enabled?`, `endpoint?`, `protocol?`, `serviceNamePrefix?`). `resolveDeployBase` defaults all. | Conventions are shared → their config is on the shared base; every current and future target inherits them for free. |
@@ -109,11 +114,11 @@ Collision Map).
 
 | #  | Slice | Contract-first order | Files (relative to repo root) | Gate / validation |
 | -- | ----- | -------------------- | ----------------------------- | ----------------- |
-| **S1** | **Config contract** — add `activation`/`secrets`/`otel` blocks to `deployTargetBaseShape`; extend `ResolvedDeployBaseConfig` + `resolveDeployBase` defaults. | schema+types → resolver → tests | `packages/config/src/domain/schemas/deploy-schema.ts`, `packages/config/src/domain/config-section-types.ts`, `packages/cli/src/kernel/adapters/config/deploy-config-resolvers.ts`, `packages/cli/src/kernel/domain/resolved-config.ts`, `packages/cli/src/kernel/constants/*.ts`; tests `packages/config/tests/schema/deploy_schema_test.ts` (+ resolver `_test.ts`) | `run-deno-check.ts` (config+cli, `--ext ts`) · schema round-trip/defaults test · `deno publish --dry-run` (config) |
+| **S1** | **Config contract** — add `activation`/`secrets`/`otel` blocks to `deployTargetBaseShape`; extend `ResolvedDeployBaseConfig` + `resolveDeployBase` defaults. **JSR slow-type discipline (S1 mutates the *published* `@netscript/config` surface):** the three new blocks land as explicit interface fields on `DeployTargetBase` in `config-section-types.ts` (`isolatedDeclarations`-clean, no inferred shapes), and the member schema keeps its `z.ZodType<DeployTargetBase>` annotation composing them by **spread** (never `.extend()`, which hides the annotated type). Verify slow-types up front — do **not** rely on `publish --dry-run` alone (dry-run resolves locally and misses server-side slow-type rejection). | schema+types → resolver → tests | `packages/config/src/domain/schemas/deploy-schema.ts`, `packages/config/src/domain/config-section-types.ts`, `packages/cli/src/kernel/adapters/config/deploy-config-resolvers.ts`, `packages/cli/src/kernel/domain/resolved-config.ts`, `packages/cli/src/kernel/constants/*.ts`; tests `packages/config/tests/schema/deploy_schema_test.ts` (+ resolver `_test.ts`) | `run-deno-check.ts` (config+cli, `--ext ts`) · schema round-trip/defaults test · `deno doc`/`jsr-audit` slow-type check on the new fields · `deno publish --dry-run` (config) |
 | **S2** | **Core secrets convention** — `SecretsStorePort`, `renderSecretsEnvFile`, `reconcileSecrets`, `RESTRICTED_SECRET_FILE_MODE`. | types+port → orchestrator → tests | NEW `packages/cli/src/kernel/domain/deploy/secrets-convention.ts` (+ `secrets-convention_test.ts`) | `run-deno-check.ts` (cli) · pure unit tests (fake store; render mode = 0o600; escaping) |
 | **S3** | **Core rollback + health-gate + activation** — `ActivationPort`, retention math, `rollbackToPrevious`, `HealthProbePort`, `runHealthGate`, `activateWithHealthGate`. | types+ports → orchestrators → tests | NEW `packages/cli/src/kernel/domain/deploy/rollback-convention.ts`, `health-gate.ts`, `activation-convention.ts` (+ co-located `_test.ts`) | `run-deno-check.ts` (cli) · unit tests covering **rollback path + health-gate pass/fail/timeout + rollback-on-fail** (fake ports + injected clock) |
 | **S4** | **Core OTEL convention** — `observabilityEnv`. | types → fn → tests | NEW `packages/cli/src/kernel/domain/deploy/observability-convention.ts` (+ `_test.ts`) | `run-deno-check.ts` (cli) · unit test (`OTEL_DENO=1`; endpoint/protocol wiring) |
-| **S5** | **Bare-metal reference bindings** — `EnvFileSecretsStore`, `Symlink`/`DirSwapActivationPort`, `FetchHealthProbe`; wire `observabilityEnv` into the systemd unit renderer + servy XML env. | adapters → tests | NEW `packages/cli/src/kernel/adapters/{linux,windows}/**` (or `public/adapters/**` where `OsServicePort` is needed — see D8 layering); edits to `kernel/adapters/linux/systemd/systemd-unit.ts`, `kernel/adapters/windows/servy/servy-environment.ts`, `kernel/adapters/windows/environment/env-file-writer.ts` (**#364-owned — post-merge, see Collision Map**) | `run-deno-check.ts` (cli) · adapter unit tests (fake `ProcessPort`/`OsServicePort`/fs; assert `chmod 0o600`, atomic swap ordering, argv) |
+| **S5** | **Bare-metal reference bindings** — `EnvFileSecretsStore`, `Symlink`/`DirSwapActivationPort`, `FetchHealthProbe`; **refactor #364's existing `servy-environment.ts` `OTEL_DENO='true'` emission to source from the core `observabilityEnv`** (no duplicate) and **add** the missing systemd unit `Environment=` OTEL wiring. | adapters → tests | NEW `packages/cli/src/kernel/adapters/{linux,windows}/**` (or `public/adapters/**` where `OsServicePort` is needed — see D8 layering); edits to `kernel/adapters/linux/systemd/systemd-unit.ts`, `kernel/adapters/windows/servy/servy-environment.ts`, `kernel/adapters/windows/environment/env-file-writer.ts` (**#364-owned — post-merge, see Collision Map**) | `run-deno-check.ts` (cli) · adapter unit tests (fake `ProcessPort`/`OsServicePort`/fs; assert `chmod 0o600`, atomic swap ordering, argv) |
 | **S6** | **7-op promotion + thin-router reach** — full 7-op `ServiceDeployTarget` (rollback/secrets handlers + health-gated up delegating to core via injected ports); public `deploy <target> rollback|secrets` dispatch; README permissions. | descriptor+wiring → tests → docs | `packages/cli/src/kernel/domain/deploy/service-deploy-target.ts` (**#364-owned — post-merge**), `packages/cli/src/public/features/deploy/**` (thin router reach), `packages/cli/README.md` | `run-deno-check.ts` · descriptor + router tests · F-DEPLOY-1 (7-op) + F-DEPLOY-2 (thin router / conventions in core) manual evidence |
 | **S7** | **Docs / debt / drift** — arch-debt (Archetype-7 core-centralization **advanced**), harness drift + worklog, per-slice PR comments. | docs only | `.llm/harness/debt/arch-debt.md`, `.llm/tmp/run/deploy-s5-hardening/{drift,worklog}.md` | `run-deno-fmt.ts` + `run-deno-lint.ts` |
 
@@ -179,6 +184,16 @@ Implement rebases onto #364 post-merge; I do not edit them before that.**
 | **Shared register/aspire generators** (`generate-register-infrastructure.ts`, `packages/aspire/config.ts`, `helpers-generator-pipeline.ts`, `generate-aspire-config.ts`, `render-ts-apphost.ts`) | **none** | sibling **aspire lane (#343)** owns these | **I do NOT touch them.** No collision from #341. |
 | **Cross-plan seam collision** | S2–S4 | **#343 (aspire)** plan proposes its own "S3 · core conventions — centralize secrets + rollback in the deploy core" | **FLAG FOR COORDINATOR:** that is *this* slice's seam. #341 must land the `kernel/domain/deploy/*-convention.ts` modules; #343 must **consume** them (construct its `SecretsStorePort`/`ActivationPort` bindings), not re-create the core. Sequence #341 core (S2–S4) before #343's adapter, or have #343 rebase onto #341. |
 
+## Type soundness (2-cast policy)
+
+This slice commits to the repo's non-negotiable **2-cast** rule: the only accepted casts are the
+centralized-contract `as unknown as` seam and the top-level router `any`; **zero** other casts are
+introduced or retained as debt. The design is naturally cast-free — the convention modules are pure
+functions over explicit types, side effects flow through **injected typed ports**
+(`SecretsStorePort`/`ActivationPort`/`HealthProbePort`), and the config blocks carry explicit
+`isolatedDeclarations`-clean interface fields. Any cast that surfaces during Implement is a design
+smell to fix at the port boundary, not to defer.
+
 ## Fitness gates (Archetype 7 + composed)
 
 | Gate | Required | Evidence |
@@ -214,3 +229,30 @@ Implement rebases onto #364 post-merge; I do not edit them before that.**
 S2–S4 (new-file core conventions) are safe to author now against `origin/main`; S1/S5/S6 wait for
 #364. #342/#343 rebase onto #341's core-convention commit (or #341 lands first) so their deferred
 `rollback`/`secrets` bind to the shared seam.
+
+## PLAN-EVAL reconciliation
+
+PLAN-EVAL returned **PASS-WITH-REQUIRED-CHANGES**; design/seam/slices/merge-order accepted unchanged.
+Corrections resolved as follows (drift-is-explicit):
+
+- **APPLIED — OTEL provenance/value.** Grounding corrected: #364's `servy-environment.ts:209` already
+  emits `OTEL_DENO='true'`; S5 now **refactors** that emission through the core `observabilityEnv`
+  (no duplicate) + adds systemd wiring; canonical value fixed to `'true'` (was `1`).
+- **APPLIED — JSR slow-type discipline (S1).** Named the `z.ZodType<T>` annotation + spread-compose +
+  `isolatedDeclarations`-clean interface fields + up-front slow-type check requirement; publish
+  dry-run is no longer treated as sufficient.
+- **APPLIED — 2-cast type-soundness policy.** Committed explicitly (new "Type soundness" section).
+- **APPLIED — health field-name nit.** Config `health` block named `intervalSeconds`
+  (`heartbeatIntervalSeconds` clarified as the servy render-time mapping).
+- **NOT APPLIED (factually incorrect) — "main is still 3-op; 7-op arrives via #364".** Verified false
+  by raw git: `git show origin/main:packages/cli/src/kernel/domain/deploy/deploy-target-port.ts` on
+  `origin/main` carries the full 7-op `DeployOperation` union (`plan|emit|up|down|status|logs|rollback|secrets`),
+  optional `rollback?`/`secrets?` methods, the `(bodies → #341)` JSDoc, and the `LegacyDeployOperation`
+  aliases. This also matches the epic-supervisor briefing ("7-op DeployTargetPort landed via S0/PR
+  #370"). The original Grounded-Facts/Collision-Map attribution to `main` is **correct and retained**;
+  applying the correction would have inserted a false baseline. The plan's "I do not redefine the
+  port / read-only" claim is true against `main`.
+- **NOT APPLIED (citation is valid) — "Archetype 7 not in 06-archetypes.md".** Verified false:
+  `docs/architecture/doctrine/06-archetypes.md:232` is `## Archetype 7 — Deployment Target Adapter`,
+  so the `#archetype-7` anchor resolves. The plan already also cites the harness archetype file; both
+  citations retained.
