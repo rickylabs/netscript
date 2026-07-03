@@ -99,6 +99,46 @@ export function wslCd(user: string, cwd: string, script: string): Promise<Comman
 }
 
 // ---------------------------------------------------------------------------
+// Machine/environment configuration (portability seam)
+// ---------------------------------------------------------------------------
+
+/**
+ * Read an env override, falling back to `fallback` when unset OR when this
+ * process lacks `--allow-env` (in which case `Deno.env.get` throws `NotCapable`).
+ * Swallowing the permission error is deliberate: the suite's CLIs are commonly
+ * run with only `--allow-read --allow-run`, so an override read must never harden
+ * into a new permission requirement. With the env var unset the returned value is
+ * byte-identical to the previous hardcoded literal — this is a portability seam,
+ * not a behavior change.
+ */
+function envOr(name: string, fallback: string): string {
+  try {
+    return Deno.env.get(name) ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+/**
+ * WSL linux user the suite drives Codex under. Defaults to `codex` (this repo's
+ * historical hardcoded value); override with `NETSCRIPT_WSL_USER` to run on a
+ * machine whose WSL user differs. Unset ⇒ identical to the prior default.
+ */
+export function wslUser(): string {
+  return envOr('NETSCRIPT_WSL_USER', 'codex');
+}
+
+/**
+ * Home directory of {@link wslUser} inside WSL. Defaults to `/home/<wslUser>`
+ * (i.e. `/home/codex` when the user is unchanged); override with
+ * `NETSCRIPT_WSL_HOME` for a non-standard home. Unset ⇒ identical to the prior
+ * hardcoded `/home/codex`.
+ */
+export function wslHome(): string {
+  return envOr('NETSCRIPT_WSL_HOME', `/home/${wslUser()}`);
+}
+
+// ---------------------------------------------------------------------------
 // Arg parsing helper (pure)
 // ---------------------------------------------------------------------------
 
@@ -670,7 +710,7 @@ export async function resolveGithubToken(
   opts: ResolveTokenOptions = {},
 ): Promise<ResolvedGithubToken> {
   const validate = opts.validate ?? true;
-  const wslUser = opts.wslUser ?? 'codex';
+  const resolvedWslUser = opts.wslUser ?? wslUser();
   const tried: string[] = [];
 
   const accept = async (
@@ -703,7 +743,7 @@ export async function resolveGithubToken(
 
     const ghWsl = await runCapture('wsl.exe', [
       '-u',
-      wslUser,
+      resolvedWslUser,
       '--',
       'bash',
       '-lc',
@@ -720,7 +760,7 @@ export async function resolveGithubToken(
   const summary = tried.length ? tried.join(', ') : 'no candidate produced a token';
   throw new Error(
     `No valid GitHub token resolved (tried: ${summary}). ` +
-      `Authenticate once with \`gh auth login\` (WSL: \`wsl.exe -u ${wslUser} -- gh auth login\`) ` +
+      `Authenticate once with \`gh auth login\` (WSL: \`wsl.exe -u ${resolvedWslUser} -- gh auth login\`) ` +
       `so \`gh auth token\` can supply a self-refreshing credential, or store a PAT via ` +
       `\`git credential approve\`, then retry.`,
   );

@@ -8,7 +8,7 @@
  * evaluation, repo-slug parsing, OpenHands comment building, and status parsing
  * against a real-shaped status comment fixture.
  *
- * Run: deno test --allow-read .llm/tools/agentic/agentic-lib_test.ts
+ * Run: deno test --allow-read --allow-env .llm/tools/agentic/agentic-lib_test.ts
  */
 
 import {
@@ -26,6 +26,8 @@ import {
   sq,
   validateHandoffContract,
   winToWsl,
+  wslHome,
+  wslUser,
 } from './agentic-lib.ts';
 
 function assert(cond: unknown, msg: string): void {
@@ -48,6 +50,38 @@ Deno.test('winToWsl maps a Windows path to /mnt', () => {
 });
 Deno.test('winToWsl passes through a POSIX path', () => {
   assertEquals(winToWsl('/home/codex/repos/wt'), '/home/codex/repos/wt');
+});
+
+// --- machine/env config seam ---------------------------------------------
+Deno.test('wslUser/wslHome default to the historical hardcoded values when env is unset', () => {
+  const prevUser = Deno.env.get('NETSCRIPT_WSL_USER');
+  const prevHome = Deno.env.get('NETSCRIPT_WSL_HOME');
+  Deno.env.delete('NETSCRIPT_WSL_USER');
+  Deno.env.delete('NETSCRIPT_WSL_HOME');
+  try {
+    assertEquals(wslUser(), 'codex');
+    assertEquals(wslHome(), '/home/codex');
+  } finally {
+    if (prevUser !== undefined) Deno.env.set('NETSCRIPT_WSL_USER', prevUser);
+    if (prevHome !== undefined) Deno.env.set('NETSCRIPT_WSL_HOME', prevHome);
+  }
+});
+Deno.test('NETSCRIPT_WSL_USER/HOME override the defaults', () => {
+  const prevUser = Deno.env.get('NETSCRIPT_WSL_USER');
+  const prevHome = Deno.env.get('NETSCRIPT_WSL_HOME');
+  try {
+    Deno.env.set('NETSCRIPT_WSL_USER', 'dev');
+    Deno.env.delete('NETSCRIPT_WSL_HOME');
+    assertEquals(wslUser(), 'dev');
+    assertEquals(wslHome(), '/home/dev'); // derives from user when HOME unset
+    Deno.env.set('NETSCRIPT_WSL_HOME', '/custom/home');
+    assertEquals(wslHome(), '/custom/home');
+  } finally {
+    if (prevUser !== undefined) Deno.env.set('NETSCRIPT_WSL_USER', prevUser);
+    else Deno.env.delete('NETSCRIPT_WSL_USER');
+    if (prevHome !== undefined) Deno.env.set('NETSCRIPT_WSL_HOME', prevHome);
+    else Deno.env.delete('NETSCRIPT_WSL_HOME');
+  }
 });
 
 // --- sq (bash single-quoting) --------------------------------------------

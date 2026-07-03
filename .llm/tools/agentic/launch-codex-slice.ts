@@ -50,6 +50,8 @@ import {
   winToWsl,
   wsl,
   wslGitInfo,
+  wslHome,
+  wslUser,
 } from "./agentic-lib.ts";
 
 interface Options {
@@ -90,7 +92,7 @@ function printHelp(): void {
 }
 
 function parseArgs(args: string[]): Options | null {
-  const o: Options = { mode: "launch", user: "codex", pretty: false };
+  const o: Options = { mode: "launch", user: wslUser(), pretty: false };
   for (let i = 0; i < args.length; i++) {
     const a = args[i];
     switch (a) {
@@ -202,7 +204,7 @@ async function main(): Promise<void> {
     console.error("--brief and --worktree are required to launch. See --help.");
     Deno.exit(2);
   }
-  const dest = o.dest ?? `/home/codex/${o.slug ?? "slice"}-brief.md`;
+  const dest = o.dest ?? `${wslHome()}/${o.slug ?? "slice"}-brief.md`;
 
   // 1) Validate the brief contract (read on Windows; LF-normalize in memory).
   const content = await Deno.readTextFile(o.brief);

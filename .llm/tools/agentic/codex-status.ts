@@ -21,7 +21,7 @@
  * Exit codes: 0 = ok · 2 = usage error · 5 = --worktree given but not found.
  */
 
-import { requireValue, wsl, wslGitInfo, wslGitLogsPath } from "./agentic-lib.ts";
+import { requireValue, wsl, wslGitInfo, wslGitLogsPath, wslUser } from "./agentic-lib.ts";
 
 interface Options {
   worktree?: string;
@@ -45,7 +45,7 @@ function printHelp(): void {
 }
 
 function parseArgs(args: string[]): Options | null {
-  const o: Options = { user: "codex", sessions: 5, pretty: false };
+  const o: Options = { user: wslUser(), sessions: 5, pretty: false };
   for (let i = 0; i < args.length; i++) {
     const a = args[i];
     switch (a) {
