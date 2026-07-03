@@ -57,6 +57,22 @@ Deno.test('switches themes and falls back to the documented default theme', asyn
   assertStringIncludes(fallbackBody, '--ns-color-text: #111111;');
 });
 
+Deno.test('falls back to the first record theme when the default theme is absent', async () => {
+  const handler = createMcpSandboxHandler({
+    resolveResource: () => '<section>Widget</section>',
+    themes: {
+      dark: { '--ns-color-text': '#eeeeee' },
+    },
+  });
+
+  const response = await handler(new Request(sandboxUrl(sampleUri, 'unknown')));
+  const body = await response.text();
+
+  assertEquals(response.headers.get('x-netscript-theme'), 'dark');
+  assertStringIncludes(body, 'data-theme="dark"');
+  assertStringIncludes(body, '--ns-color-text: #eeeeee;');
+});
+
 Deno.test('derives the CSP header and meta tag from a representative ui:// URI', async () => {
   const handler = createMcpSandboxHandler({
     resolveResource: () => '<script src="ui://widgets.example/weather/card.js"></script>',
@@ -75,6 +91,33 @@ Deno.test('derives the CSP header and meta tag from a representative ui:// URI',
     body,
     'http-equiv="Content-Security-Policy" content="default-src \'none\';',
   );
+});
+
+Deno.test('returns 400 for a missing or non-ui resource URI', async () => {
+  const handler = createMcpSandboxHandler({
+    resolveResource: () => '<p>must not resolve</p>',
+    themes: { default: {} },
+  });
+
+  const missing = await handler(new Request('https://app.test/api/mcp/sandbox'));
+  assertEquals(missing.status, 400);
+
+  const nonUi = new URL('https://app.test/api/mcp/sandbox');
+  nonUi.searchParams.set('uri', 'https://widgets.example/weather/card.js');
+  const invalid = await handler(new Request(nonUi.href));
+  assertEquals(invalid.status, 400);
+});
+
+Deno.test('returns 404 when the ui resource resolver misses', async () => {
+  const handler = createMcpSandboxHandler({
+    resolveResource: () => null,
+    themes: { default: {} },
+  });
+
+  const response = await handler(new Request(sandboxUrl(sampleUri)));
+
+  assertEquals(response.status, 404);
+  assertEquals(response.headers.get('content-security-policy'), null);
 });
 
 Deno.test('passes the incoming request AbortSignal to the resource resolver', async () => {

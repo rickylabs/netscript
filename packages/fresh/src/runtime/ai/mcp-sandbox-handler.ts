@@ -86,11 +86,19 @@ async function resolveThemeTokens(
   defaultThemeName: string,
   request: Request,
 ): Promise<{ readonly themeName: string; readonly tokens: McpSandboxThemeTokens }> {
-  const resolve = async (name: string): Promise<McpSandboxThemeTokens | null | undefined> => {
-    if (typeof themes === 'function') {
-      return await themes(name, { request, signal: request.signal });
+  if (typeof themes !== 'function') {
+    if (requested !== null && themes[requested]) {
+      return { themeName: requested, tokens: themes[requested] };
     }
-    return themes[name];
+    if (themes[defaultThemeName]) {
+      return { themeName: defaultThemeName, tokens: themes[defaultThemeName] };
+    }
+    const [firstName, firstTokens] = Object.entries(themes)[0] ?? [defaultThemeName, {}];
+    return { themeName: firstName, tokens: firstTokens };
+  }
+
+  const resolve = async (name: string): Promise<McpSandboxThemeTokens | null | undefined> => {
+    return await themes(name, { request, signal: request.signal });
   };
 
   if (requested !== null) {

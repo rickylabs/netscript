@@ -101,13 +101,43 @@ not in this subpath. It resolves the same `/ai/chat/{sessionId}` addressing
 convention as FA1, so the island connection and the route proxy read one stream.
 Code lands via #251; the surface is documented here for completeness.
 
-### FA3 — MCP tool sandbox (future slice, skeleton stub)
+### FA3 — MCP `ui://` sandbox handler
+
+`createMcpSandboxHandler` builds a Fresh-compatible `GET` handler for sandboxed
+MCP UI resources. Mount it on any route and request a registered resource with
+`?uri=ui://...`; non-`ui://` or missing resource URIs return `400`, and resolver
+misses return `404`.
+
+The caller owns two ports: `resolveResource(uri, { request, signal })` for the
+registered resource body, and `themes` for design tokens. The handler wraps the
+resource body in an isolated HTML document, injects only `--ns-*` custom
+properties before that body, stamps `data-theme`, and applies both a
+`Content-Security-Policy` response header and a matching meta tag derived from
+the `ui://` URI. The incoming request's `AbortSignal` is passed to lookup ports
+so registry/database work can cancel on disconnect.
+
+`?theme=<name>` selects a token set. Unknown or absent themes fall back to
+`defaultThemeName`; if omitted that documented fallback name is `default`. When
+a record theme source does not contain the fallback name, the first record entry
+is used instead.
+
+```ts
+import { createMcpSandboxHandler } from '@netscript/fresh/ai';
+
+export const handler = {
+  GET: createMcpSandboxHandler({
+    resolveResource: (uri, { signal }) => registry.lookup(uri, { signal }),
+    themes: {
+      default: { '--ns-color-surface': '#ffffff' },
+      dark: { '--ns-color-surface': '#111111' },
+    },
+  }),
+};
+```
 
 `createNetScriptMcpSandbox` (+ `NetScriptMcpToolSource`, `NetScriptMcpSandbox`,
-`NetScriptMcpSandboxOptions`) is currently a **typed skeleton stub** that throws
-`not implemented`. It marks the subpath boundary for wiring MCP tool sources into
-a chat activity (server `mergeAgentTools` + island `createMcpAppBridge`) and will
-be implemented in a later slice.
+`NetScriptMcpSandboxOptions`) remains the chat-activity tool-wiring skeleton
+(server `mergeAgentTools` + island `createMcpAppBridge`).
 
 ## End-to-end usage sketch
 
