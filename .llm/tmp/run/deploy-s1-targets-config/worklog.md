@@ -149,3 +149,20 @@
   non-blocking, not actioned.
 - Next: IMPL-EVAL / merge-readiness in a fresh separate session — reproduce CI quality gate
   (`fmt:check` + lint + `check --unstable-kv`) + run `scaffold.runtime --cleanup` before sign-off.
+
+### 2026-07-03 — IMPL-EVAL → PASS (fresh separate Opus session; merge-ready)
+- First IMPL-EVAL attempt died on the session limit mid-run (no verdict). Re-dispatched a fresh
+  separate Opus session after reset. Verdict `evaluate.md` at HEAD `1f60d137`:
+- **`deno task fmt:check` → exit 0 PASS** (no diff-attributable drift; `packages/cli` excluded by design).
+- **`deno task lint` → exit 0 PASS** (`fresh-ui` + `cli` excluded by design).
+- **`deno task check` → exit 0 PASS.** Honest caveat: the task wraps `.llm/tools/run-deno-check.ts`,
+  whose arg parser REJECTS `--unstable-kv` (`Unknown argument`) — that flag is for raw `deno check`,
+  not this task; the bare task is what CI runs and is the authoritative gate. Not a slice defect.
+- **config unit tests** (`netscript_config_test.ts` + `merge_test.ts`) → 9 passed / 0 failed (incl. the
+  3 new `deploy.targets` schema tests + the merge-granularity test).
+- **`scaffold.runtime` e2e → exit 0**, Summary passed=48 failed=0, single clean run (no Prisma
+  schema-engine flake). `generated.deno-check` type-checked the scaffolded workspace against the
+  changed `@netscript/config` surface — PASS.
+- **Verdict: slice #337 merge-ready, no required fixes.** Adversarial review + IMPL-EVAL both ran in
+  separate sessions from the implementer (rule satisfied). → mark draft PR #352 ready-for-review;
+  coordinator holds the merge gate.
