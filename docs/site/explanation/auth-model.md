@@ -72,7 +72,7 @@ redirect flow provides it; a backend that delegates sign-in to a hosted page lea
 
 {{ comp callout { type: "note", title: "Why a port and not a base class" } }}
 A base class would force every backend to inherit a session store, a crypto scheme, and a flow it
-might not have. A <strong>port</strong> lets each backend supply only the sub-ports it genuinely
+might not have. A <strong>port</strong> lets each backend supply only the sub-ports it
 owns — WorkOS brings its AuthKit sealed cookie and skips <code>interactive</code> entirely, while
 kv-oauth brings a full KV-backed session store and a real OAuth redirect. Same seam, different
 fills. This is the doctrine's <em>composition over inheritance</em> applied to identity.
@@ -107,8 +107,8 @@ service handlers, your contract middleware, your authorization checks — sees a
 ## Three backends, three different capability matrices
 
 The framework ships three pure backends. They satisfy the **same** `AuthBackendPort`, but they fill
-the **optional** `interactive` slot differently — and that single difference produces three genuinely
-different capability profiles. Only **kv-oauth** is a full interactive backend; WorkOS and
+the **optional** `interactive` slot differently — and that single difference produces three distinct
+capability profiles. Only **kv-oauth** is a full interactive backend; WorkOS and
 better-auth are **non-interactive by design**.
 
 {{ comp.apiTable({

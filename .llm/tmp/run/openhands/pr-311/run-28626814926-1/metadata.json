@@ -1,0 +1,17 @@
+{
+  "run_id": "28626814926",
+  "run_attempt": "1",
+  "run_url": "https://github.com/rickylabs/netscript/actions/runs/28626814926",
+  "bootstrap_outcome": "success",
+  "agent_outcome": "success",
+  "verdict": "completed",
+  "summary_source": "agent",
+  "model": "openrouter/qwen/qwen3.7-max",
+  "provider": "OPENROUTER",
+  "output_mode": "pr-comment",
+  "issue_number": "311",
+  "checkout_repo": "rickylabs/netscript",
+  "checkout_ref": "docs/pr-f-voice-xref",
+  "summary_path": "/home/runner/work/_temp/openhands/28626814926-1/summary.md",
+  "trace_dir": ".llm/tmp/run/openhands/pr-311/run-28626814926-1"
+}
