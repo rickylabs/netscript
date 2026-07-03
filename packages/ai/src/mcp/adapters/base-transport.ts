@@ -15,7 +15,7 @@ import { abortableDelay, maxReconnectAttempts, retryDelayMs } from '../applicati
 import { combineSignals } from '../application/signal.ts';
 
 /** Shared lifecycle implementation for MCP transports. */
-export abstract class BaseMcpTransport implements McpTransportPort {
+export class BaseMcpTransport implements McpTransportPort {
   readonly serverId: string;
   readonly #config: McpConnectorConfig;
   readonly #connector: McpClientConnector;
