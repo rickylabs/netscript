@@ -7,6 +7,7 @@
     ".": "./mod.ts",
     "./anthropic": "./anthropic.ts",
     "./openai-compatible": "./openai-compatible.ts",
+    "./openai-embeddings": "./openai-embeddings.ts",
     "./mcp": "./mcp.ts",
     "./agent": "./agent.ts",
     "./contracts": "./src/contracts/mod.ts",
@@ -15,7 +16,7 @@
     "./testing": "./src/testing/mod.ts"
   },
   "tasks": {
-    "check": "deno check --unstable-kv ./mod.ts ./anthropic.ts ./openai-compatible.ts ./mcp.ts ./agent.ts ./src/contracts/mod.ts ./src/ports/mod.ts ./tools.ts ./src/testing/mod.ts",
+    "check": "deno check --unstable-kv ./mod.ts ./anthropic.ts ./openai-compatible.ts ./openai-embeddings.ts ./mcp.ts ./agent.ts ./src/contracts/mod.ts ./src/ports/mod.ts ./tools.ts ./src/testing/mod.ts",
     "test": "deno test --allow-all ./tests/",
     "lint": "deno lint",
     "fmt": "deno fmt --check",

@@ -56,6 +56,22 @@ export {
   resetModelRegistry,
 } from './src/ports/model-provider.ts';
 export type { ModelProviderConfig, ModelProviderPort } from './src/ports/model-provider.ts';
+export {
+  getEmbeddingProvider,
+  getVisionProvider,
+  listEmbeddingProviders,
+  listVisionProviders,
+  registerEmbeddingProvider,
+  registerVisionProvider,
+  resetEmbeddingRegistry,
+  resetVisionRegistry,
+} from './src/ports/mod.ts';
+export type {
+  EmbeddingProviderConfig,
+  EmbeddingProviderPort,
+  VisionProviderConfig,
+  VisionProviderPort,
+} from './src/ports/mod.ts';
 
 export type { ModelHandle, ModelRef } from './src/contracts/model.ts';
 export {

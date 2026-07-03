@@ -238,11 +238,11 @@ export function createFakeEmbeddingProvider(
   vector: readonly number[] = [0, 0, 0],
 ): EmbeddingProviderPort {
   return {
-    embed(request): Promise<EmbeddingResponse> {
-      const inputs = typeof request.input === 'string' ? [request.input] : request.input;
+    embed(input, options): Promise<EmbeddingResponse> {
+      const inputs = typeof input === 'string' ? [input] : input;
       return Promise.resolve({
-        model: request.model,
-        vectors: inputs.map((_, index) => ({ index, embedding: vector })),
+        embeddings: inputs.map(() => vector),
+        model: options?.model ?? 'fake-embedding-model',
       });
     },
   };
