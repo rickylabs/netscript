@@ -1661,6 +1661,71 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Status:** closed 2026-06-30 by #181 Slices 1-6. The connector now backs the six deferred routes
   through triggers-core seams: enabled/name fields + enabled-state store, manual dispatcher, webhook
   test delivery, cron preview engine, and in-process event subscription.
+
+## packages/cli deploy — DEPLOY-S7-APPHOST-COMPOSE-GEN (#343)
+
+- **ID:** `DEPLOY-S7-APPHOST-COMPOSE-GEN`
+- **Title:** Aspire AppHost compose-publishing generation (compose environment + Deno
+  `denoland/deno:2` Dockerfile weave + config→`Parameters__*`) is deferred as a shared,
+  cross-slice primitive.
+- **Context:** Deploy-S7 (#343) shipped the config member (S1), the Aspire compose/docker
+  adapter (S5, `aspire-compose-deploy-target.ts`), and the thin `deploy docker|compose` router
+  (S6). The adapter delegates `plan`→`aspire publish`. For `aspire publish` to actually emit a
+  docker-compose artifact, the generated `aspire/apphost.mts` must (a) declare the official
+  `Aspire.Hosting.Docker` NuGet in `aspire.config.json` and (b) call
+  `await builder.addDockerComposeEnvironment("compose")`. Aspire then auto-publishes all
+  resources as compose services. **But** NetScript registers Deno resources as
+  `builder.addExecutable('deno', …)` (see `generate-aspire-config.ts` L44-56); executables are
+  not containers, so publishing them to compose requires a `denoland/deno:2`
+  `addDockerfileBuilder` / container-resource weave across the shared `register-services` /
+  `register-apps` / `register-background` generators, plus config→`Parameters__*` mapping.
+- **Why deferred:** (1) Runtime correctness — whether `aspire publish` emits a valid compose for
+  NetScript's Deno executable resources — cannot be validated without the Aspire .NET SDK + a
+  Docker daemon (`aspire restore`→`aspire publish`→`docker compose config`), i.e. the S8/S9
+  merge-readiness environment; a snapshot test would lock the string but not prove Aspire
+  accepts it. (2) The per-resource compose-publishing generation is a SHARED publishing
+  convention (R-DEPLOY-3 / core-centralization law), and the concurrent #342 Deno Deploy adapter
+  needs the same apphost-publishing surface — forking it per-target on one branch would violate
+  the centralization law and risk a merge collision with the live deployment-epic agents.
+- **Owner:** NetScript deployment epic (#327) coordinator; implement once as a shared
+  apphost-publishing primitive in coordination with #342.
+- **Target:** Deployment-epic merge-readiness pass, before the Docker/Compose target is declared
+  end-to-end.
+- **Linked plan:** `.llm/tmp/run/deploy-s7-aspire/plan.md` (S4); drift `D7`.
+- **Aspire API grounding:** aspire.dev `docker-integration` (TS AppHost:
+  `addDockerComposeEnvironment`, `publishAsDockerComposeService`, `addParameterFromConfiguration`,
+  `addDockerfileBuilder`).
+- **Created:** 2026-07-03.
+- **Status:** open — S5 adapter + S6 router shipped and work unchanged the moment the apphost
+  gains the compose environment; the generation is cleanly separable.
+- **Gate:** Close when scaffolded `apphost.mts` emits the compose environment + Deno
+  `denoland/deno:2` service, `deno task e2e:cli run scaffold.runtime` stays green, and
+  `netscript deploy compose plan` produces a `docker-compose.yaml` that passes
+  `docker compose config`.
+
+## packages/cli deploy — DEPLOY-SECRETS-ROLLBACK-CORE (#341 / #343)
+
+- **ID:** `DEPLOY-SECRETS-ROLLBACK-CORE`
+- **Title:** Centralized `secrets` + `rollback` deploy-convention primitives are not yet on main;
+  adapters declare them unsupported until the core lands.
+- **Context:** The 7-op `DeployTargetPort` (landed by S0/#370) includes `rollback` and `secrets`
+  as optional ops. Doctrine R-DEPLOY-3 requires both to be centralized in the deploy core
+  (shared, restricted-perm secret env-file backed by Aspire `Parameters__*`; rollback = redeploy
+  the last-good emitted artifact/image), never re-implemented per adapter. Those core primitives
+  do not exist on main yet — they are the #341 deployment-hardening work (PR #364). Per the port
+  doc comment, adapters may omit the two methods (declare unsupported) rather than provide silent
+  no-ops.
+- **Why deferred:** Cross-slice dependency — forking secrets/rollback inside the Aspire adapter
+  would violate R-DEPLOY-3. The Deploy-S7 adapter therefore ships the supported subset
+  (`plan`/`emit`/`up`/`down`/`status`/`logs`) and omits `rollback`/`secrets`.
+- **Owner:** #341 deployment-hardening core (deploy core in `packages/cli/src/kernel/domain/deploy`).
+- **Target:** When #341/#364 lands the shared primitives; adapters then advertise the ops and call
+  the core.
+- **Linked plan:** `.llm/tmp/run/deploy-s7-aspire/plan.md` (S3); drift `D2`.
+- **Created:** 2026-07-03.
+- **Status:** open — blocked on #341/#364 core conventions.
+- **Gate:** Close when the deploy core exposes shared `secrets`/`rollback` primitives and the
+  Aspire compose/docker adapter advertises both ops by delegating to them.
 - **Gate:** Close each route as its triggers-core seam lands (manual/test-fire helper -> `fireTrigger`
   + `testWebhook`; enabled-state store + `enabled`/`name` fields -> `enableTrigger`/`disableTrigger`
   + un-synthesized `listTriggers`/`getTrigger`; cron preview engine -> `previewSchedule`; event SSE

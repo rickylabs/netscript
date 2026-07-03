@@ -31,7 +31,12 @@ import { PortAllocator } from '../../../kernel/adapters/service/port-allocator.t
 import { ServiceScaffolder } from '../../../kernel/adapters/service/scaffolder.ts';
 import { ServiceWorkspaceResolver } from '../../../kernel/adapters/service/workspace-resolver.ts';
 import { emptyScaffoldResult } from '../../../kernel/application/scaffold/support/helpers.ts';
+import { AspireComposeDeployTarget } from '../../../kernel/adapters/aspire/aspire-compose-deploy-target.ts';
 import { DbEngineRegistry } from '../../../kernel/application/registries/db-engine-registry.ts';
+import {
+  DEFAULT_DEPLOY_TARGETS,
+  DeployTargetRegistry,
+} from '../../../kernel/application/registries/deploy-target-registry.ts';
 import { PluginKindRegistry } from '../../../kernel/application/registries/plugin-kind-registry.ts';
 import { DEFAULT_SERVY_CLI_PATH } from '../../../kernel/constants/windows.ts';
 import { JsrImportResolver } from '../../adapters/jsr-import-resolver.ts';
@@ -150,6 +155,12 @@ export interface PublicCommandDependencies {
   };
   /** Windows service adapter for deployment lifecycle commands. */
   readonly windowsServices: ServyCliAdapter;
+  /**
+   * Deploy target registry (named extension axis, A11). Ships the seed
+   * `windows-service` target plus the Aspire-driven `compose`/`docker` cloud
+   * adapters; resolved by the thin `deploy <target>` router (R-DEPLOY-2).
+   */
+  readonly deployTargets: DeployTargetRegistry;
 }
 
 /** Build the public command dependency graph for one CLI invocation. */
@@ -309,5 +320,10 @@ export function createPublicCommandDependencies(
       servyCliPath: DEFAULT_SERVY_CLI_PATH,
       process,
     }),
+    deployTargets: new DeployTargetRegistry([
+      ...DEFAULT_DEPLOY_TARGETS,
+      ['compose', new AspireComposeDeployTarget({ key: 'compose', process })],
+      ['docker', new AspireComposeDeployTarget({ key: 'docker', process })],
+    ]),
   };
 }

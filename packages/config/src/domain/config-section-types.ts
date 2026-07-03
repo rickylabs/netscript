@@ -423,12 +423,38 @@ export interface WindowsDeployTarget extends DeployTargetBase {
   servicePrefix?: string;
 }
 
+/**
+ * Docker / Compose deployment target (`deploy.targets.docker` and
+ * `deploy.targets.compose`).
+ *
+ * Both keys map to the Aspire-driven compose adapter: `compose` emits a
+ * docker-compose project and self-hosts it via `docker compose up`, while
+ * `docker` follows the single-image build/push path. Extends the shared base —
+ * which already carries the container `docker` image sub-block defaulting to
+ * `denoland/deno:2` — with compose/registry-specific settings. The manifest and
+ * compose YAML are authored by `aspire publish`, never by NetScript.
+ */
+export interface DockerComposeDeployTarget extends DeployTargetBase {
+  /** Compose project name (`docker compose -p`). Default: the workspace name. */
+  projectName?: string;
+  /** Directory for emitted compose artifacts. Default: `.deploy/compose`. */
+  outputPath?: string;
+  /** Container image registry for the `docker` push path (e.g. `ghcr.io/acme`). */
+  registry?: string;
+  /** Base image name/tag for built service images. Default: the service name. */
+  imageName?: string;
+}
+
 /** Top-level deployment configuration type. */
 export interface DeployConfig {
-  /** Deployment targets keyed by name (currently `windows` only). */
+  /** Deployment targets keyed by name. */
   targets?: {
     /** Windows Services deployment settings. */
     windows?: WindowsDeployTarget;
+    /** Docker single-image (build/push) deployment settings. */
+    docker?: DockerComposeDeployTarget;
+    /** Docker Compose (emit + self-host) deployment settings. */
+    compose?: DockerComposeDeployTarget;
   };
 }
 

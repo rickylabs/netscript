@@ -11,6 +11,7 @@ import { statusCommand } from './status/status-deploy-command.ts';
 import { stopCommand } from './stop/stop-deploy-command.ts';
 import { createDeployUninstallCommand } from './uninstall/uninstall-deploy-command.ts';
 import { upgradeCommand } from './upgrade/upgrade-deploy-command.ts';
+import { createTargetDeployCommand } from './target/target-deploy-command.ts';
 import type { PublicCommandDependencies } from '../root/public-command-dependencies.ts';
 
 /** Create the public deploy command group. */
@@ -62,5 +63,9 @@ export function createDeployCommand(
         },
       }),
     )
-    .command('upgrade', upgradeCommand);
+    .command('upgrade', upgradeCommand)
+    // Cloud deploy targets (thin router → registry-resolved adapter, R-DEPLOY-2).
+    // Added alongside the legacy flat Windows verbs; full convergence is S12/#348.
+    .command('docker', createTargetDeployCommand('docker', dependencies))
+    .command('compose', createTargetDeployCommand('compose', dependencies));
 }
