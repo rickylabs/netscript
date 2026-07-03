@@ -33,3 +33,26 @@ Append-only. Records divergence from plan/doctrine discovered during implementat
   `deno fmt --check --no-config --line-width=100 --indent-width=2 --options-single-quote` and
   `deno lint --no-config` on the new files to prove default-style conformance. `packages/config` IS
   fmt/lint-gated and uses the wrappers normally.
+- **S4 addendum (`no-explicit-any`):** `deno lint --no-config` on the new `deno-deploy-command.ts`
+  reports `no-explicit-any` for the cliffy `Command<any, …>` generics. These are the repo-standard,
+  explicitly-accepted "top-level router any" (see MEMORY: only 2 accepted casts + the router `any`);
+  every command in `packages/cli/src/public/features/**` uses the identical signature. cli is
+  lint-excluded, so this is not a new soundness debt and not a gate failure. Business logic uses no
+  `any` (flag marshalling narrows from `unknown`).
+
+## D-IMPL-3 — unstable-API preflight guard is best-effort (not full graph walk)
+
+- **Severity:** minor (documented bound, recorded in arch-debt).
+- The `DenoDeployPreflightReader` feeds the pure guard with `deno.json` + the entrypoint (and
+  `src/<entrypoint>`), not the full transitive module graph. A violation reached only through a deep
+  import is not detected. This is an intentional cost/scope bound for S6; recorded under
+  `cli-deploy-artifacts-missing` in arch-debt as remaining work. The guard is advisory on preview
+  pushes and blocking only on `up --prod`.
+
+## D-IMPL-4 — `deno deploy delete/show` subcommand surface assumption
+
+- **Severity:** minor (upstream-CLI-shape assumption, isolated).
+- The argv builders map `down`→`deno deploy delete` and `status`→`deno deploy show`. The non-`deploy`
+  subcommand surface of the native `deno deploy` CLI is still stabilizing; the builders are isolated
+  (`buildDeleteArgs`/`buildStatusArgs`) so a rename is a one-file edit. Verified argv shape by unit
+  test, not against a live platform account (no credentials in this environment — D5 NEEDS-USER).
