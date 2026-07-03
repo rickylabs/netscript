@@ -287,7 +287,7 @@ function resolveDeployBase(
     compileTimeoutMs: base?.compileTimeoutMs ?? DEFAULT_COMPILE_TIMEOUT_MS,
     bundleTimeoutMs: base?.bundleTimeoutMs ?? DEFAULT_BUNDLE_TIMEOUT_MS,
     bundleExternal: base?.bundleExternal
-      ? (base.bundleExternal as readonly string[])
+      ? base.bundleExternal
       : DEFAULT_BUNDLE_EXTERNAL,
     bundleExternalImports: base?.bundleExternalImports ?? DEFAULT_BUNDLE_EXTERNAL_IMPORTS,
     workspace: base?.workspace,
