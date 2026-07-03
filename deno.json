@@ -63,6 +63,9 @@
     "publish:dry-run": "deno run --allow-read --allow-write --allow-run .llm/tools/run-publish-dry-run.ts",
     "e2e:cli": "deno run --allow-all packages/cli/e2e/cli.ts",
     "e2e:cli:prod": "deno run --allow-all packages/cli/e2e/cli.ts run scaffold.runtime --source jsr --cli packages/cli/bin/netscript.ts",
+    "bench:self": "deno run --allow-all packages/bench/cli.ts self",
+    "bench:self:fake": "deno run --allow-all packages/bench/cli.ts self --fake",
+    "bench:conformance": "deno run --allow-all packages/bench/cli.ts conformance",
     "fmt": "deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" --write",
     "fmt:check": {
       "command": "deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" --ignore-line-endings",
