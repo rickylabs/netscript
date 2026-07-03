@@ -1854,6 +1854,18 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   the existing `packages/cli — AP-1 / doctrine verdict Restructure` entry (Wave 6 "command
   registry/deploy target seams"); do not duplicate that restructure debt — the deployment core
   extraction is its downstream continuation.
+- **Seed expansion (3-op → 7-op):** A placeholder port already ships on main — the 3-op
+  `DeployTargetPort` (`build`/`install`/`uninstall`, all optional) plus its stub adapter
+  `WindowsServiceDeployTarget` (key `windows-service`) in `packages/cli`, landed by commit
+  `3137e455` (an unrelated command-registry slice, not this epic). It maps to the canonical
+  lifecycle as `build → plan`/`emit`, `install → up`, `uninstall → down`, and lacks
+  `status`/`logs`/`rollback`/`secrets`. The epic must expand this seed to the full 7-op
+  `OsServicePort`/cloud-adapter contract across #339–#343 and migrate/retire the `windows-service`
+  stub — never entrench the 3-op surface. Verb-vocabulary lock (keep `build`/`install`/`uninstall`,
+  adopt `up`/`down`, or a hybrid) is deferred to the first real adapter (#339/#340); closing gate
+  for this obligation = `F-DEPLOY-1` promoted `gated`. Authoritative reconciliation:
+  `.llm/tmp/run/deploy-s2-doctrine/contract-reconciliation.md` (epic #327 supervisor decision,
+  surfaced by the #342 PLAN-EVAL).
 - **Owner:** Deployment epic #327.
 - **Target:** Phase 1 of #327 (first landed target adapter, #339+).
 - **Linked plan:** `.llm/tmp/run/deploy-s2-doctrine/plan.md` (Slice 3);

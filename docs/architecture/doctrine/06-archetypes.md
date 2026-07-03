@@ -307,6 +307,19 @@ Doctrine for this archetype:
 > (Archetype 6) and the core is extracted in a later wave (deployment
 > epic #327, slices #339–#343).
 
+> **Shipped seed.** A placeholder port already ships on main: the 3-op
+> `DeployTargetPort` (`build` / `install` / `uninstall`, all optional)
+> and its stub reference adapter `WindowsServiceDeployTarget` (key
+> `windows-service`) under `packages/cli` (landed by commit `3137e455`,
+> an unrelated command-registry slice — not this epic). It maps into the
+> canonical lifecycle above as `build → plan`/`emit`, `install → up`,
+> `uninstall → down`; `status`, `logs`, `rollback`, and `secrets` are
+> net-new ops the seed does not yet have. The 7-op contract is canonical
+> and the seed is a stub the epic expands to the full
+> `OsServicePort`/cloud-adapter surface; the final verb vocabulary
+> (keep `build`/`install`/`uninstall`, adopt `up`/`down`, or a hybrid)
+> locks at the first real adapter (#339/#340).
+
 ## How to choose
 
 Decision order:
