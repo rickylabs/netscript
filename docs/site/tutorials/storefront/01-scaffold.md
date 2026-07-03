@@ -191,6 +191,10 @@ The example `products` service exposes a plain health endpoint. In a second term
 curl http://localhost:3001/health
 ```
 
+{{ comp callout { type: "note", title: "Endpoints are HTTP/1.1 — HTTP/2 is opt-in" } }}
+You reach services over plaintext <strong>HTTP/1.1</strong> at <code>http://localhost:3001</code> — that is the default. HTTP/2 is opt-in and requires TLS: configure it with <code>ServiceTlsOptions</code> (or the <code>NETSCRIPT_TLS_CERT_FILE</code> / <code>NETSCRIPT_TLS_KEY_FILE</code> environment variables). See <a href="/explanation/aspire/">Aspire &amp; the AppHost</a> for the local-versus-deployed runtime model.
+{{ /comp }}
+
 You should get a healthy JSON response. Then type-check the whole workspace from the project root to
 confirm the scaffold, contracts, and service all line up:
 
