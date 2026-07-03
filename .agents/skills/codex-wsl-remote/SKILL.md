@@ -11,8 +11,41 @@ Use this skill when a NetScript task needs Codex Desktop or mobile to steer loca
 The verified path is:
 
 ```text
-Codex Desktop/mobile -> SSH target codex-wsl -> WSL Ubuntu codex user -> codex app-server remote-control
+Codex Desktop/mobile -> SSH target <CODEX_SSH_HOST> -> WSL <WSL_DISTRO> <WSL_USER> user -> codex app-server remote-control
 ```
+
+## Local machine profile (example — replace with your own)
+
+This skill teaches the **pattern**. Everything below references placeholders; the values are
+per-operator and per-machine. Fill in your own — put them in a git-ignored local profile
+(`.llm/tmp/codex-wsl.env`) or export them in your shell — then read the rest verbatim, substituting
+your values for the placeholders. **Nothing in this table is baked into the shipped prose.** The
+right-hand column is one operator's working example, not a required value.
+
+| Placeholder | What it is | How to obtain it | Example value |
+| ----------- | ---------- | ---------------- | ------------- |
+| `<WSL_DISTRO>` | WSL distro name | `wsl.exe -l -v` | `Ubuntu-24.04` |
+| `<WSL_USER>` | Linux username that runs Codex | your WSL login | `codex` |
+| `<WSL_HOME>` | that user's home dir | `echo $HOME` inside WSL | `/home/codex` |
+| `<CODEX_SSH_HOST>` | SSH host alias in `~/.ssh/config` | your `Host` block | `codex-wsl` |
+| `<SSH_PORT>` | port sshd listens on in WSL | your sshd config | `2222` |
+| `<SSH_IDENTITY>` | Windows path to the SSH key | your key location | `C:\Users\<you>\.ssh\codex_wsl_ed25519` |
+| `<HOST>` | device/server name remote-control reports | `serverName` in `remote-control start --json` | `YogaBook9i` |
+| `<ENV_ID>` | remote-control environment id | `environmentId` in `remote-control start --json` | `env_e_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx` |
+| `<REPO_WSL>` | native ext4 worktree root for the branch family | `git worktree list` inside WSL | `/home/codex/repos/netscript-wave5-apps` |
+| `<THREAD_ID>` | a session thread uuid | printed by `send-message-v2` / `codex-status.ts` | `019ec234-4e7f-70c0-91a0-97de455702f8` |
+| `<CODEX_BIN_DIR>` | dir holding the `codex` binary | `command -v codex` inside a login shell (then take its dirname) | `$HOME/.local/bin` |
+
+Notes:
+
+- **PATH in non-login shells.** `ssh.exe <CODEX_SSH_HOST> '<cmd>'` runs a non-login shell that may
+  not have `codex` on `PATH`. The examples below prepend `export PATH="<CODEX_BIN_DIR>:$PATH"`.
+  Resolve `<CODEX_BIN_DIR>` once with `command -v codex` in a login shell and reuse it; on many
+  setups it is `$HOME/.local/bin`, which is already `$HOME`-relative and safe to keep verbatim.
+- **`$HOME` inside single-quoted `ssh.exe '…'` strings** is passed literally to the remote shell,
+  which expands it to `<WSL_HOME>` for `<WSL_USER>`. Prefer `$HOME` over a hardcoded path where a
+  command runs remotely; use the literal `<WSL_HOME>` placeholder only where a value must be spelled
+  out (e.g. an anchored `pgrep` pattern).
 
 ### Launch model (the one rule that matters)
 
@@ -71,9 +104,9 @@ Run **both** in parallel when supervising: git-mode to narrate commits, turn-mod
 Both exit `0` on their event, `2` on the `--timeout-seconds` heartbeat (re-arm; a hung agent still
 re-wakes you), `1` on bad args / unresolved worktree|rollout. Determine a thread's live state any
 time with `codex-status.ts` (daemon proc count + newest rollouts) — and remember its non-login shell
-may not resolve `~`/PATH; a one-off `wsl.exe --cd /home/codex -u codex -- bash -lc '…'` with a literal
-absolute sessions path is the fallback (avoid `$`/`@{}`/`~` inside a PowerShell-wrapped bash string —
-PowerShell expands them before WSL sees them).
+may not resolve `~`/PATH; a one-off `wsl.exe --cd <WSL_HOME> -u <WSL_USER> -- bash -lc '…'` with a
+literal absolute sessions path is the fallback (avoid `$`/`@{}`/`~` inside a PowerShell-wrapped bash
+string — PowerShell expands them before WSL sees them).
 
 The suite enforces the one-active-send-per-worktree and explicit-refspec-push rules described in
 this skill; `codex-resume.ts` is the supported steering path (it issues exactly one
@@ -96,20 +129,24 @@ Every prompt/brief file passed to `send-message-v2` MUST:
 
 ## Verified Baseline
 
-- WSL distro: `Ubuntu-24.04`
-- WSL user: `codex`
-- SSH alias: `codex-wsl`
-- SSH endpoint: `127.0.0.1:2222`
-- SSH identity: `C:\Users\chaut\.ssh\codex_wsl_ed25519`
-- WSL Codex home: `/home/codex/.codex`
+The tool/config snapshot below is one verified machine's baseline (recorded on Codex `0.140.0`,
+2026-06-16). Re-verify per branch with the [Verification Commands](#verification-commands); treat the
+identifiers as your local-profile placeholders, not fixed values.
+
+- WSL distro: `<WSL_DISTRO>`
+- WSL user: `<WSL_USER>`
+- SSH alias: `<CODEX_SSH_HOST>`
+- SSH endpoint: `127.0.0.1:<SSH_PORT>`
+- SSH identity: `<SSH_IDENTITY>`
+- WSL Codex home: `<WSL_HOME>/.codex`
 - Codex CLI/app-server: `0.140.0` (managed daemon verified 2026-06-16)
 - App-server config: `approval_policy = "never"`, `sandbox_mode = "danger-full-access"`,
   `model_reasoning_effort = "medium"`, `plan_mode_reasoning_effort = "medium"`,
   `model_reasoning_summary = "auto"`, and `model_verbosity = "medium"`.
-- Native WSL wave5 worktree root: `/home/codex/repos/netscript-wave5-apps`
-- Deno toolchain: `2.8.x` (PR #44 upgrade). Other tool versions below are the wave5 snapshot —
+- Native WSL worktree root: `<REPO_WSL>`
+- Deno toolchain: `2.8.x` (PR #44 upgrade). Other tool versions below are a captured snapshot —
   re-verify per branch with the toolchain command in [Verification Commands](#verification-commands).
-- Wave5 snapshot toolchain: Deno `2.7.11`, .NET SDK `10.0.109`, Aspire CLI `13.3.0`, Docker `29.1.3`, Node `18.19.1`, npm `9.2.0`
+- Snapshot toolchain: Deno `2.7.11`, .NET SDK `10.0.109`, Aspire CLI `13.3.0`, Docker `29.1.3`, Node `18.19.1`, npm `9.2.0`
 
 Default reasoning remains `medium`. Override per launch only when the task calls for it:
 
@@ -132,25 +169,25 @@ Run it from Windows PowerShell when transport needs restoration:
 powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.codex\skills\codex-wsl-remote\scripts\start-codex-wsl-remote.ps1"
 ```
 
-The helper starts a hidden WSL keepalive, restarts WSL `ssh.service`, verifies `ssh codex-wsl`,
+The helper starts a hidden WSL keepalive, restarts WSL `ssh.service`, verifies `ssh <CODEX_SSH_HOST>`,
 writes the full-access Codex app-server config with medium reasoning defaults, restarts the managed
 daemon, starts `codex remote-control`, and checks the toolchain.
 
 ## Native Worktree Rule
 
-Run full NetScript Deno/npm/Aspire gates from native WSL ext4 paths under `/home/codex/repos/`.
+Run full NetScript Deno/npm/Aspire gates from native WSL ext4 paths under `<WSL_HOME>/repos/`.
 Do not run full CLI E2E from `/mnt/c`: Deno's internal npm materialization can hit DrvFS
 `Operation not permitted (os error 1)` even when ordinary shell copy/write commands work.
 
 Known good full E2E smoke:
 
 ```text
-Cwd: /home/codex/repos/netscript-wave5-apps
+Cwd: <REPO_WSL>
 Command: deno task e2e:cli run scaffold.runtime --cleanup --format pretty
 Raw exit code: 0
 Summary: passed=41 failed=0
 Elapsed: 224s
-Thread: 019ec234-4e7f-70c0-91a0-97de455702f8
+Thread: <THREAD_ID>
 Marker: CODEX_WSL_NATIVE_WORKTREE_E2E_SMOKE_PASS
 ```
 
@@ -159,29 +196,30 @@ Marker: CODEX_WSL_NATIVE_WORKTREE_E2E_SMOKE_PASS
 From Windows PowerShell, verify transport:
 
 ```powershell
-Test-NetConnection -ComputerName 127.0.0.1 -Port 2222
-ssh.exe codex-wsl 'echo SSH_OK; export PATH="$HOME/.local/bin:$PATH"; codex --version'
+Test-NetConnection -ComputerName 127.0.0.1 -Port <SSH_PORT>
+ssh.exe <CODEX_SSH_HOST> 'echo SSH_OK; export PATH="<CODEX_BIN_DIR>:$PATH"; codex --version'
 ```
 
 Verify app-server remote-control:
 
 ```powershell
-ssh.exe codex-wsl 'export PATH="$HOME/.local/bin:$PATH"; codex remote-control start --json; codex app-server daemon version'
+ssh.exe <CODEX_SSH_HOST> 'export PATH="<CODEX_BIN_DIR>:$PATH"; codex remote-control start --json; codex app-server daemon version'
 ```
 
-Expected remote-control output includes:
+Expected remote-control output includes (`serverName`/`environmentId` are your machine's — they will
+differ from the example placeholders):
 
 ```text
 "status":"connected"
 "remoteControlEnabled":true
-"serverName":"YogaBook9i"
-"environmentId":"env_e_6a2d7485c5a0832a82505a12442cd3ec"
+"serverName":"<HOST>"
+"environmentId":"<ENV_ID>"
 ```
 
 For passive health checks, prefer daemon status and process inspection:
 
 ```powershell
-ssh.exe codex-wsl 'export PATH="$HOME/.local/bin:$PATH"; codex app-server daemon version; ps -eo user,pid,ppid,etime,cmd | grep -E "[c]odex app-server|[a]pp-server daemon" || true'
+ssh.exe <CODEX_SSH_HOST> 'export PATH="<CODEX_BIN_DIR>:$PATH"; codex app-server daemon version; ps -eo user,pid,ppid,etime,cmd | grep -E "[c]odex app-server|[a]pp-server daemon" || true'
 ```
 
 A single `codex debug app-server send-message-v2` against a managed daemon is **safe** and leaves
@@ -205,7 +243,7 @@ remote-control is connected.
 Verify the native NetScript toolchain:
 
 ```powershell
-ssh.exe codex-wsl 'cd /home/codex/repos/netscript-wave5-apps; deno --version; dotnet --version; aspire --version; docker version --format "{{.Client.Version}} / {{.Server.Version}}"; node --version; npm --version; git status --short --branch'
+ssh.exe <CODEX_SSH_HOST> 'cd <REPO_WSL>; deno --version; dotnet --version; aspire --version; docker version --format "{{.Client.Version}} / {{.Server.Version}}"; node --version; npm --version; git status --short --branch'
 ```
 
 A `send-message-v2` turn against a managed daemon is both the **launch path** for a mobile-visible
@@ -214,7 +252,7 @@ session and, with a no-edit prompt, a connectivity smoke. The `thread/start` res
 `turn/completed` / `[codex app-server exited: exit status: 0]`:
 
 ```powershell
-ssh.exe codex-wsl 'cd /home/codex/repos/netscript-wave5-apps; codex debug app-server send-message-v2 "Remote smoke only. Do not edit files. Do not run validation. Reply with exactly CODEX_WSL_REMOTE_SMOKE_OK and no other prose."'
+ssh.exe <CODEX_SSH_HOST> 'cd <REPO_WSL>; codex debug app-server send-message-v2 "Remote smoke only. Do not edit files. Do not run validation. Reply with exactly CODEX_WSL_REMOTE_SMOKE_OK and no other prose."'
 ```
 
 Capture the `threadId` from the output — that is the handle for `codex exec resume <thread-id>` if
@@ -223,29 +261,22 @@ you later need to steer the session. Confirm the thread on your phone to prove m
 ## Launching Supervisor Or Implementation Sessions
 
 Start Desktop/mobile-visible Codex sessions from the native WSL worktree path for the relevant
-branch. The wave5 family uses these native worktrees:
+branch. A branch family keeps one native worktree per slice under `<WSL_HOME>/repos/`; list them with
+`git worktree list` inside WSL. For example, a multi-slice family looks like:
 
 ```text
-/home/codex/repos/netscript-wave5-apps
-/home/codex/repos/netscript-wave5-apps-5a-service
-/home/codex/repos/netscript-wave5-apps-5b-sdk
-/home/codex/repos/netscript-wave5-apps-5c-fresh-ui
-/home/codex/repos/netscript-wave5-apps-5c1-ui-foundation
-/home/codex/repos/netscript-wave5-apps-5c2-design-system
-/home/codex/repos/netscript-wave5-apps-5d-fresh
-/home/codex/repos/netscript-wave5-apps-5d1-support
-/home/codex/repos/netscript-wave5-apps-5d2-builders
-/home/codex/repos/netscript-wave5-apps-5d3-route
-/home/codex/repos/netscript-wave5-apps-5d4-streaming
-/home/codex/repos/netscript-wave5-apps-5d5-form
-/home/codex/repos/netscript-wave5-apps-5d6-query
+<REPO_WSL>
+<REPO_WSL>-5a-service
+<REPO_WSL>-5b-sdk
+<REPO_WSL>-5c-fresh-ui
+<REPO_WSL>-5d-fresh
 ```
 
 Launch one with a single `send-message-v2` carrying the full brief, run as a background SSH job so
 the supervisor turn is not blocked. Pattern (one per worktree, sequential):
 
 ```powershell
-ssh.exe codex-wsl 'export PATH="$HOME/.local/bin:$PATH"; cd <native-worktree>; codex debug app-server send-message-v2 "<full self-contained brief: use harness, activate skills, pre-flight git fetch+reset, task, constraints, reporting>"' 2>&1 | Tee-Object <log>
+ssh.exe <CODEX_SSH_HOST> 'export PATH="<CODEX_BIN_DIR>:$PATH"; cd <native-worktree>; codex debug app-server send-message-v2 "<full self-contained brief: use harness, activate skills, pre-flight git fetch+reset, task, constraints, reporting>"' 2>&1 | Tee-Object <log>
 ```
 
 Prefer the agentic suite: `launch-codex-slice.ts` validates the brief, runs the push-safety gate,
@@ -272,29 +303,30 @@ lock files or caches, and do not run `deno cache --reload` without approval.
 If mobile says connection is impossible or Desktop shows a failed SSH connection:
 
 1. Run the Windows helper above.
-2. Confirm `ssh codex-wsl` reaches the `codex` user, not root.
-3. Confirm `/home/codex/.codex/config.toml` contains the quoted full-access TOML values.
-4. Restart only the `codex` user's app-server if remote-control reports an unmanaged daemon:
+2. Confirm `ssh <CODEX_SSH_HOST>` reaches the `<WSL_USER>` user, not root.
+3. Confirm `<WSL_HOME>/.codex/config.toml` contains the quoted full-access TOML values.
+4. Restart only the `<WSL_USER>` user's app-server if remote-control reports an unmanaged daemon:
 
    ```powershell
-   wsl.exe -d Ubuntu-24.04 -- sh -lc 'pkill -u codex -f "codex.*app-server" || true; pkill -u codex -f "app-server" || true'
-   ssh.exe codex-wsl 'export PATH="$HOME/.local/bin:$PATH"; codex remote-control start --json; codex app-server daemon version'
+   wsl.exe -d <WSL_DISTRO> -- sh -lc 'pkill -u <WSL_USER> -f "codex.*app-server" || true; pkill -u <WSL_USER> -f "app-server" || true'
+   ssh.exe <CODEX_SSH_HOST> 'export PATH="<CODEX_BIN_DIR>:$PATH"; codex remote-control start --json; codex app-server daemon version'
    ```
 
 Before restarting app-server while implementation agents are running, check whether active work would
 be interrupted:
 
 ```powershell
-ssh.exe codex-wsl 'ps -eo user,pid,ppid,stat,etime,cmd | grep -E "[d]eno|[d]otnet|[a]spire|[d]ocker compose|[n]pm|[n]ode|[g]it |[c]odex" | sed -n "1,200p"'
-ssh.exe codex-wsl 'find ~/.codex/sessions -type f -name "*.jsonl" -printf "%T@ %TY-%Tm-%Td %TH:%TM:%TS %p\n" 2>/dev/null | sort -nr | head -20'
+ssh.exe <CODEX_SSH_HOST> 'ps -eo user,pid,ppid,stat,etime,cmd | grep -E "[d]eno|[d]otnet|[a]spire|[d]ocker compose|[n]pm|[n]ode|[g]it |[c]odex" | sed -n "1,200p"'
+ssh.exe <CODEX_SSH_HOST> 'find ~/.codex/sessions -type f -name "*.jsonl" -printf "%T@ %TY-%Tm-%Td %TH:%TM:%TS %p\n" 2>/dev/null | sort -nr | head -20'
 ```
 
 If there are no active child jobs and the latest relevant session has completed, repair an unmanaged
-remote-control daemon by killing only the `codex` user's app-server processes by anchored PID match
-and then starting remote-control fresh:
+remote-control daemon by killing only the `<WSL_USER>` user's app-server processes by anchored PID
+match and then starting remote-control fresh (the anchored pattern is `^$HOME/.codex/…` so it matches
+only the real app-server binary; `$HOME` expands to `<WSL_HOME>` in the remote shell):
 
 ```powershell
-ssh.exe codex-wsl 'set -e; export PATH="$HOME/.local/bin:$PATH"; pids=$(pgrep -u codex -f "^/home/codex/.codex/packages/standalone/current/codex app-server" || true); if [ -n "$pids" ]; then echo "killing app-server pids: $pids"; kill $pids; sleep 2; fi; rm -f ~/.codex/app-server-control/app-server-control.sock; codex remote-control start --json; codex app-server daemon version'
+ssh.exe <CODEX_SSH_HOST> 'set -e; export PATH="<CODEX_BIN_DIR>:$PATH"; pids=$(pgrep -u <WSL_USER> -f "^$HOME/.codex/packages/standalone/current/codex app-server" || true); if [ -n "$pids" ]; then echo "killing app-server pids: $pids"; kill $pids; sleep 2; fi; rm -f ~/.codex/app-server-control/app-server-control.sock; codex remote-control start --json; codex app-server daemon version'
 ```
 
 Do not use a broad `pkill -f "codex app-server"` inside an SSH one-liner. The pattern can match the
@@ -309,9 +341,9 @@ and stale mobile entries.
 
 Symptoms:
 
-- Mobile lost connection to the green `YogaBook9i` host.
-- `Test-NetConnection 127.0.0.1 -Port 2222` passed.
-- `ssh codex-wsl` passed.
+- Mobile lost connection to the green `<HOST>` host.
+- `Test-NetConnection 127.0.0.1 -Port <SSH_PORT>` passed.
+- `ssh <CODEX_SSH_HOST>` passed.
 - `ssh.service` was active.
 - `codex app-server daemon version` reported a running app-server.
 - `codex remote-control start --json` failed with:
@@ -322,10 +354,10 @@ Symptoms:
 
 Safe recovery used:
 
-1. Confirmed the latest 5d2 session had completed and no `deno`, `dotnet`, `aspire`, `node`, or
+1. Confirmed the latest session had completed and no `deno`, `dotnet`, `aspire`, `node`, or
    child worker commands were running.
-2. Killed only the `codex` user's app-server PIDs matched by
-   `^/home/codex/.codex/packages/standalone/current/codex app-server`.
+2. Killed only the `<WSL_USER>` user's app-server PIDs matched by
+   `^<WSL_HOME>/.codex/packages/standalone/current/codex app-server`.
 3. Removed the stale app-server control socket.
 4. Ran `codex remote-control start --json`.
 5. Confirmed remote-control output returned `"status":"connected"` and
