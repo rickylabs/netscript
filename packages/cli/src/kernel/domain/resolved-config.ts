@@ -261,6 +261,25 @@ export interface ResolvedLinuxDeployConfig extends ResolvedDeployBaseConfig {
 }
 
 /**
+ * Resolved Deno Deploy target configuration.
+ * Merges `deploy.targets['deno-deploy']` from netscript.config.ts with CLI flag
+ * overrides (flags win). Consumed by the composition layer to construct a
+ * defaults-baked `DenoDeployTarget`.
+ */
+export interface ResolvedDenoDeployConfig {
+  /** Deno Deploy organization slug (`--org`). */
+  org?: string;
+  /** Deno Deploy application/project name (`--app`). */
+  app?: string;
+  /** Whether pushes target production by default (`--prod`). */
+  prod: boolean;
+  /** Entrypoint module passed to `deno deploy`. */
+  entrypoint?: string;
+  /** Path to an env file loaded via `--env-file`. */
+  envFile?: string;
+}
+
+/**
  * Fully-resolved deployment configuration — the single source of truth
  * passed to all adapters, generators, and command handlers.
  */

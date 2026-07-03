@@ -3,10 +3,7 @@ import type { DeployTargetPort } from '../../domain/deploy/deploy-target-port.ts
 import type { DeployTargetRegistryPort } from '../../domain/deploy/deploy-target-registry-port.ts';
 import { WindowsServiceDeployTarget } from '../../domain/deploy/windows-service-deploy-target.ts';
 import { LinuxServiceDeployTarget } from '../../domain/deploy/linux-service-deploy-target.ts';
-import { DenoDeployTarget } from '../../domain/deploy/deno-deploy-target.ts';
-import { DenoDeployCliAdapter } from '../../adapters/deno-deploy/deno-deploy-cli.ts';
-import { DenoDeployPreflightReader } from '../../adapters/deno-deploy/deno-deploy-preflight.ts';
-import { DenoProcess } from '../../adapters/runtime/process/deno-process.ts';
+import { createDenoDeployTarget } from '../../adapters/deno-deploy/create-deno-deploy-target.ts';
 
 /** Metadata and operations for a deploy target exposed by the CLI. */
 export type DeployTarget = DeployTargetPort;
@@ -18,14 +15,12 @@ export const WINDOWS_SERVICE_DEPLOY_TARGET: DeployTarget = new WindowsServiceDep
 export const LINUX_SERVICE_DEPLOY_TARGET: DeployTarget = new LinuxServiceDeployTarget();
 
 /**
- * Deno Deploy cloud target descriptor. Wired with the concrete `deno deploy`
- * CLI adapter (ProcessPort-backed) and the FS preflight reader at the
- * application composition layer; the domain target itself imports neither.
+ * Deno Deploy cloud target descriptor. Composed with the concrete `deno deploy`
+ * CLI adapter (ProcessPort-backed) and the FS preflight reader; the registry
+ * instance carries no baked defaults (the CLI surface builds a config-resolved
+ * instance per invocation).
  */
-export const DENO_DEPLOY_TARGET: DeployTarget = new DenoDeployTarget({
-  cli: new DenoDeployCliAdapter(new DenoProcess()),
-  preflight: new DenoDeployPreflightReader(),
-});
+export const DENO_DEPLOY_TARGET: DeployTarget = createDenoDeployTarget();
 
 /** Ordered default deployment targets. */
 export const DEFAULT_DEPLOY_TARGETS: readonly (readonly [string, DeployTarget])[] = Object

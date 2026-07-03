@@ -71,6 +71,38 @@ The bare-metal targets implement the canonical `plan` / `emit` / `up` / `down` /
 
 ---
 
+## ☁️ Deno Deploy target
+
+`netscript deploy deno-deploy <op>` deploys a workspace to
+[Deno Deploy](https://deno.com/deploy). Supported operations: `plan` (preflight
+only), `up` (`deno deploy [--prod]`), `down`, `status`, `logs`. Configure defaults
+under `deploy.targets['deno-deploy']` in `netscript.config.ts`
+(`org`/`app`/`prod`/`entrypoint`/`envFile`) or pass
+`--org`/`--app`/`--prod`/`--entrypoint`/`--env-file`; flags override config. `up
+--dry-run` runs `plan` without pushing.
+
+`plan`/`up` first run an unstable-API guard: `up --prod` **refuses** to push when
+the project uses APIs that require `--unstable-*` flags (e.g. `Deno.openKv`,
+`Deno.cron`, `BroadcastChannel`, `Temporal`), which Deno Deploy rejects; preview
+pushes warn but proceed.
+
+### Permissions
+
+The deploy subcommands shell out to the `deno deploy` CLI and read project files,
+so a host binary embedding this surface must grant:
+
+| Permission     | Why                                                            |
+| -------------- | ------------------------------------------------------------- |
+| `--allow-run`  | Spawn the `deno deploy` CLI (`plan`/`up`/`down`/`status`/`logs`). |
+| `--allow-read` | Read `deno.json` + the entrypoint for the unstable-API guard. |
+| `--allow-net`  | The `deno deploy` CLI uploads to and queries the platform.    |
+| `--allow-env`  | The `deno deploy` CLI reads auth/token environment variables. |
+
+Authentication is delegated to the `deno deploy` CLI (its token/login flow); this
+surface issues no credentials of its own.
+
+---
+
 ## 📖 Documentation
 
 - **Reference**: [rickylabs.github.io/netscript/reference/cli/](https://rickylabs.github.io/netscript/reference/cli/)
