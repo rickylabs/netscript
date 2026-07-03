@@ -1,4 +1,33 @@
 {
   "schemaVersion": 1,
-  "runtimeRegistries": []
+  "runtimeRegistryGenerator": {
+    "command": "src/cli/generate-runtime-registries.ts",
+    "args": ["--profile", "scaffold"]
+  },
+  "runtimeRegistries": [
+    {
+      "kind": "ai-tools",
+      "dir": "ai/tools",
+      "registryPath": ".netscript/generated/plugin-ai/tools.registry.ts",
+      "fileSuffixes": [".ts"],
+      "exclude": ["_registry.ts", "mod.ts", "types.ts"],
+      "varPrefix": "tool",
+      "typeImport": {
+        "name": "AiToolDefinition",
+        "from": "@netscript/ai/tools"
+      }
+    },
+    {
+      "kind": "ai-agents",
+      "dir": "ai/agents",
+      "registryPath": ".netscript/generated/plugin-ai/agents.registry.ts",
+      "fileSuffixes": [".ts"],
+      "exclude": ["_registry.ts", "mod.ts", "types.ts"],
+      "varPrefix": "agent",
+      "typeImport": {
+        "name": "AgentLoop",
+        "from": "@netscript/ai/agent"
+      }
+    }
+  ]
 }
