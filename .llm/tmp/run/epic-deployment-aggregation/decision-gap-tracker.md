@@ -205,7 +205,14 @@ working v1 line); k8s/Azure (feasible but user-owned cluster ops — stable, not
 
 ---
 
-## 5. Proposed epic sub-issue breakdown (v1 vs deferred)
+## 5. Epic sub-issue breakdown (v1 vs deferred) — FILED 2026-07-03
+
+Slices filed as `[Deploy-Sx]` under epic #327 (Projects-board add pending — token lacks
+`read:project` scope; #327 itself not yet on a board): S1 #337 · S2 #338 · S3 #339 · S4 #340 ·
+S5 #341 · S6 #342 (marquee, p0) · S7 #343 · S8 #344 · S9 #345 · S10 #346 · S11 #347 · S12 #348 ·
+S13 #349 (watch) · S14 #350 (watch). Beta.1 = #337-#344; stable = #345-#348; Backlog/Triage =
+#349-#350. Full phased plan + DAG = #327 PLAN comment (issuecomment-4872648426).
+
 
 Each sub-issue tagged **[BETA]** (0.0.1-beta, tier-1), **[STABLE]** (0.0.1-stable, tier-2),
 **[SPLIT]** (part beta / part stable), **[WATCH]** (deferred/tracked), or **[DONE]**.

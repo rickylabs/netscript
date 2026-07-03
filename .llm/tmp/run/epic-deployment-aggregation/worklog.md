@@ -66,3 +66,10 @@ See detailed per-group in the four agent final reports. Key locked facts:
 - Dropped the "alias through beta, remove at stable" plan everywhere.
 - Updated: decision-gap-tracker.md §4 (D5 row), §4b (beta Phase 0), §5 (sub-issue #2); deployment-architecture-spec.md §3.3 (clean-break stance), §7 item 2, §8 Phase 0; #327 body (D5 row + priority + sub-issue) + correction comment (#issuecomment-4872309717).
 - No other decisions reopened. Research/spec only.
+
+## 2026-07-03 — GREENLIGHT: phased plan + 14 slices filed (planning only)
+- Posted detailed phased execution plan (Phases 0-5, per-phase goal/deliverables/deps/gates + DAG) as #327 PLAN comment (issuecomment-4872648426).
+- Filed 14 slice issues [Deploy-S1..S14] = #337-#350; labels (type/area:deploy+/priority/epic:deployment/wave) + milestones (beta.1 #337-#344, stable #345-#348, Backlog/Triage #349-#350) applied + spot-verified.
+- Updated #327 body: sub-issue checklist now links #337-#350 grouped by phase.
+- BLOCKED: Projects board add — #327 not on any board + gh token missing read:project scope; flagged to coordinator in PLAN comment.
+- Still planning/spec only; no code, no PRs. Impl gate held by coordinator pending user review.
