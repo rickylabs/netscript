@@ -23,6 +23,7 @@ export {
   AppConfigSchema,
   DatabaseConfigSchema,
   DeployConfigSchema,
+  DeployTargetBaseSchema,
   GatewayConfigSchema,
   LoggingConfigSchema,
   NetScriptConfigSchema,
@@ -31,7 +32,7 @@ export {
   RuntimeConfigSectionSchema,
   SdkConfigSchema,
   ServiceConfigSchema,
-  WindowsDeployConfigSchema,
+  WindowsDeployTargetSchema,
 } from '../domain/mod.ts';
 export { inspectConfig } from '../diagnostics/inspect-config.ts';
 export type { InspectionReport } from '../diagnostics/inspect-config.ts';
@@ -43,6 +44,7 @@ export type {
   DatabaseProvider,
   DatabasesConfig,
   DeployConfig,
+  DeployTargetBase,
   EnvDef,
   GatewayConfig,
   LoadConfigOptions,
@@ -75,6 +77,6 @@ export type {
   TriggersConfig,
   TriggersConfigInput,
   WebhookConfig,
-  WindowsDeployConfig,
+  WindowsDeployTarget,
 } from '../../types.ts';
 export type { WorkspaceMap, WorkspaceMember, WorkspaceMemberType } from '../../workspace.ts';

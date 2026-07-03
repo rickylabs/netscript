@@ -175,7 +175,7 @@ export interface ResolvedDefaultsConfig {
 /**
  * Resolved Windows deployment configuration.
  * Merges defaults from constants/windows.ts with user overrides from
- * netscript.config.ts `deploy.windows` section.
+ * netscript.config.ts `deploy.targets.windows` section.
  */
 export interface ResolvedWindowsDeployConfig {
   /** Absolute path to servy-cli.exe */

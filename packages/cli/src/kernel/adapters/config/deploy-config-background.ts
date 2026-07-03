@@ -153,6 +153,6 @@ export function resolveBackgroundProcessors(
 // ============================================================================
 
 /**
- * Merge user deploy.windows overrides with compiled-in defaults.
+ * Merge user deploy.targets.windows overrides with compiled-in defaults.
  * All fields are required on the returned object — callers never deal with optionals.
  */

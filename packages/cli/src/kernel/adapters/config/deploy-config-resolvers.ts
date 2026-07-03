@@ -256,7 +256,7 @@ export function resolveApps(
 }
 
 export function resolveWindowsDeploy(userDeploy?: DeployConfig): ResolvedWindowsDeployConfig {
-  const win = userDeploy?.windows;
+  const win = userDeploy?.targets?.windows;
   return {
     servyCliPath: win?.servyCliPath ?? DEFAULT_SERVY_CLI_PATH,
     servicePrefix: win?.servicePrefix ?? DEFAULT_SERVICE_PREFIX,
@@ -292,7 +292,7 @@ export function resolveWindowsDeploy(userDeploy?: DeployConfig): ResolvedWindows
         DEFAULT_HEALTH_MONITORING.maxRestartAttempts,
     },
     docker: {
-      denoBaseImage: win?.docker?.denoBaseImage ?? 'denoland/deno:2.5',
+      denoBaseImage: win?.docker?.denoBaseImage ?? 'denoland/deno:2',
       dotnetBaseImage: win?.docker?.dotnetBaseImage ?? 'mcr.microsoft.com/dotnet/aspnet:9.0',
     },
   };
