@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "name": "@netscript/plugin-ai",
+  "version": "0.0.1-beta.1",
+  "displayName": "AI Chat",
+  "description": "Thin connector and scaffolder wiring an app-owned, in-process AI chat, tool, and agent surface onto @netscript/ai.",
+  "peerDependencies": {
+    "@netscript/plugin": "0.0.1-beta.1"
+  },
+  "capabilities": {
+    "hasDatabaseMigrations": false,
+    "hasRoutes": true,
+    "hasBackgroundWorkers": false
+  },
+  "scaffolder": {
+    "export": "./scaffold",
+    "requiredPermissions": {
+      "net": [],
+      "read": ["<workspaceRoot>"],
+      "write": ["<workspaceRoot>"]
+    },
+    "flags": {
+      "persist-threads": {
+        "type": "boolean",
+        "default": false,
+        "description": "Also scaffold an app-owned Deno.Kv thread store for durable chat persistence."
+      }
+    }
+  },
+  "provider": {
+    "kind": "ai",
+    "displayName": "AI Chat",
+    "category": "plugin",
+    "portRangeKey": "PLUGIN_API",
+    "defaultPermissions": ["--allow-net", "--allow-env", "--allow-read"],
+    "watchFlag": "--watch",
+    "defaultEntrypoint": "ai/ai.ts",
+    "defaultServiceEntrypoint": null,
+    "defaultRequiresDb": false,
+    "defaultRequiresKv": false,
+    "pluginType": "utility",
+    "supportsConcurrency": false,
+    "concurrencyEnvVar": null,
+    "defaultConcurrency": null,
+    "defaultTelemetry": false,
+    "infrastructureRequires": [],
+    "infrastructureOptionalDeps": []
+  },
+  "officialSource": {
+    "canonicalName": "ai",
+    "pluginDir": "ai",
+    "requiresDb": false,
+    "requiresKv": false,
+    "permissions": ["--allow-net", "--allow-env", "--allow-read"]
+  }
+}

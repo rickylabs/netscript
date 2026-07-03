@@ -3855,6 +3855,13 @@
           "jsr:@std/path@1"
         ]
       },
+      "plugins/ai": {
+        "dependencies": [
+          "jsr:@netscript/plugin-ai-core@0.0.1-beta.1",
+          "jsr:@netscript/plugin@0.0.1-beta.1",
+          "jsr:@std/assert@1"
+        ]
+      },
       "plugins/auth": {
         "dependencies": [
           "jsr:@netscript/auth-better-auth@0.0.1-beta.1",
