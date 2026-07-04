@@ -1,7 +1,8 @@
 # Plan — roadmap re-forecast (seed)
 
-Status: SEED — locked plan (the roadmap artifact `roadmap-0.0.1.md`) lands after G1/G2 evidence;
-PLAN-EVAL (OpenHands, separate session) gates it before the PR leaves `status:plan-eval`.
+Status: LOCKED — `roadmap-0.0.1.md` is the plan artifact. PLAN-EVAL APPROVED (OpenHands
+minimax-M2, 2026-07-04); owner ratifications R1–R4 folded post-eval (see roadmap §5 + `drift.md`);
+Q5 assumed deferred. Awaiting final validation + owner un-draft/merge.
 
 - Surface: `.llm/runs/<run-id>/**` + `.github/labels.yml` (new epic label) + GitHub
   milestones/labels/issues. No `packages/`/`plugins/` source.

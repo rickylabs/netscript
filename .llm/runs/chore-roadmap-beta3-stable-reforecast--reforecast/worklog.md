@@ -23,3 +23,21 @@
   - Reconcile of pre-applied moves: agreed with #388/#387/#219→beta.3, #262/#290/#247→beta.4;
     OVERRODE #389→stable to #389→beta.5 (harness V3 is repo-maturity, not a stable-release gate);
     ADDED #269/#270→beta.4 and the Aspire-tracking→Backlog set.
+- 2026-07-04 — G4 PLAN-EVAL + ratification fold:
+  - PLAN-EVAL **APPROVED** (OpenHands minimax-M2, separate session; verdict comment on PR #392 —
+    5/5 code claims confirmed against `v0.0.1-beta.2`, C1–C16 all clean).
+  - Owner ratified R1–R4 post-PLAN-EVAL (PR #392 comment 2026-07-04): R1 bench #302 = post-stable
+    fast-follow (not a hard gate) · R2 beta.5 stays distinct · R3 beta.3 = the eis-chat dogfood
+    bar · R4 stable deploy gate = bare-metal systemd + `deno compile` (#394 bare-metal-first).
+    Q5 (Prisma-Next #313) unanswered → assumed deferred, kept out of the critical path.
+  - Folded into `roadmap-0.0.1.md`: status header, §1 maturity para, §2 themes + stable rescope
+    (#302 out of gate set; deployability gate = bare-metal), beta.3 acceptance-bar block, #394
+    bullet, beta.5 distinct-cut note, §3 stable ETA 3-4wk→2-3wk (end-to-end 10-13→9-12wk), §4
+    reconcile table + distribution (stable=8/Backlog=15), §5 rewritten as ratification record,
+    new §6 harness-V3 operating-model conformance (merged `eeaff336`; tiers, A1, stage labels,
+    #387 close-gate, epic/closing-keyword conventions).
+  - GitHub: #302 milestone stable → Backlog / Triage (reversible, comment posted); #394 comment
+    (bare-metal-first per R4); PR #392 phase comment + `status:plan-eval` → `status:impl-eval`.
+  - Reconcile note: harness V3 merged to main (`eeaff336`) after the forecast was written — beta.5
+    scope line for #389 updated to "epic close-out + adoption remain"; #313 verified already at
+    Backlog (Q5 assumption holds); no other issue drift found since G3.
