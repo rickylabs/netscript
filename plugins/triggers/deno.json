@@ -1,6 +1,6 @@
 {
   "name": "@netscript/plugin-triggers",
-  "version": "0.0.1-beta.1",
+  "version": "0.0.1-beta.2",
   "description": "NetScript plugin for trigger ingress, scheduling, file watching, and trigger runtime APIs.",
   "license": "MIT",
   "exports": {
@@ -17,14 +17,14 @@
     "./streams/server": "./streams/server.ts"
   },
   "imports": {
-    "@netscript/contracts": "jsr:@netscript/contracts@0.0.1-beta.1",
-    "@netscript/kv": "jsr:@netscript/kv@0.0.1-beta.1",
-    "@netscript/plugin": "jsr:@netscript/plugin@0.0.1-beta.1",
-    "@netscript/plugin-triggers-core": "jsr:@netscript/plugin-triggers-core@0.0.1-beta.1",
-    "@netscript/plugin-workers-core": "jsr:@netscript/plugin-workers-core@0.0.1-beta.1",
-    "@netscript/queue": "jsr:@netscript/queue@0.0.1-beta.1",
-    "@netscript/service": "jsr:@netscript/service@0.0.1-beta.1",
-    "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.1-beta.1",
+    "@netscript/contracts": "jsr:@netscript/contracts@0.0.1-beta.2",
+    "@netscript/kv": "jsr:@netscript/kv@0.0.1-beta.2",
+    "@netscript/plugin": "jsr:@netscript/plugin@0.0.1-beta.2",
+    "@netscript/plugin-triggers-core": "jsr:@netscript/plugin-triggers-core@0.0.1-beta.2",
+    "@netscript/plugin-workers-core": "jsr:@netscript/plugin-workers-core@0.0.1-beta.2",
+    "@netscript/queue": "jsr:@netscript/queue@0.0.1-beta.2",
+    "@netscript/service": "jsr:@netscript/service@0.0.1-beta.2",
+    "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.1-beta.2",
     "@std/assert": "jsr:@std/assert@^1",
     "@std/path": "jsr:@std/path@^1",
     "hono": "jsr:@hono/hono@4.12.24",
