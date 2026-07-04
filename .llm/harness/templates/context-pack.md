@@ -58,4 +58,4 @@
 
 ## Commits
 
-- `<sha>: <message>`
+- See the draft PR's commit list + per-slice PR comments (V3 retired `commits.md`).

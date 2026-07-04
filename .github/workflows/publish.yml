@@ -64,13 +64,13 @@ jobs:
       - name: Ensure JSR packages exist
         env:
           JSR_API_TOKEN: ${{ secrets.JSR_API_TOKEN }}
-        run: deno run --allow-net --allow-read --allow-env .llm/tools/jsr-provision-packages.ts
+        run: deno run --allow-net --allow-read --allow-env .llm/tools/release/jsr-provision-packages.ts
 
       - name: Release preflight
         run: deno task release:preflight
 
       - name: Publish dry-run
-        run: deno run --allow-read --allow-write --allow-run .llm/tools/run-publish.ts --dry-run
+        run: deno run --allow-read --allow-write --allow-run .llm/tools/release/run-publish.ts --dry-run
 
       # Real-publish-equivalent preflight. `deno publish --dry-run` is a blind
       # spot: it can pass while the REAL publish module-graph build rejects a
@@ -81,10 +81,10 @@ jobs:
       # error here fails the job before the Publish step below, so a release can
       # never half-publish. It never uploads (the token is invalid by design).
       - name: Publish preflight (real graph build, no upload)
-        run: deno run --allow-read --allow-write --allow-run .llm/tools/run-publish.ts --preflight
+        run: deno run --allow-read --allow-write --allow-run .llm/tools/release/run-publish.ts --preflight
 
       # Deno 2.9 publish resilience (relied on by the atomic whole-workspace
-      # publish in .llm/tools/publish-workspace.ts):
+      # publish in .llm/tools/release/publish-workspace.ts):
       #   - skip-already-published (denoland/deno#35134): members already on the
       #     registry at this version are skipped, so re-running after a partial
       #     publish is idempotent (this is why the dry-run step above and a retry
@@ -96,7 +96,7 @@ jobs:
       #     carried in the published tarball.
       - name: Publish
         if: steps.release.outputs.dry_run != 'true'
-        run: deno run --allow-read --allow-write --allow-run .llm/tools/run-publish.ts
+        run: deno run --allow-read --allow-write --allow-run .llm/tools/release/run-publish.ts
 
       - name: Write published version
         if: steps.release.outputs.dry_run != 'true'
@@ -134,7 +134,7 @@ jobs:
         if: steps.release.outputs.dry_run != 'true' && steps.jsr_settings.outputs.apply == 'true'
         env:
           JSR_API_TOKEN: ${{ secrets.JSR_API_TOKEN }}
-        run: deno run --allow-net --allow-read --allow-env .llm/tools/jsr-set-package-settings.ts
+        run: deno run --allow-net --allow-read --allow-env .llm/tools/release/jsr-set-package-settings.ts
 
       - name: Update GitHub Release with JSR links
         if: steps.release.outputs.dry_run != 'true'
@@ -150,7 +150,7 @@ jobs:
           fi
           mkdir -p .llm/tmp
           gh release view "$TAG" --json body --jq '.body // ""' > .llm/tmp/release-body.md
-          deno run --allow-read --allow-write .llm/tools/run-publish.ts \
+          deno run --allow-read --allow-write .llm/tools/release/run-publish.ts \
             --update-release-body \
             --version "$VERSION" \
             --body-file .llm/tmp/release-body.md \

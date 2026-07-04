@@ -12,7 +12,7 @@ that govern *when* to reach for these tools. For those, see:
 - [`AGENTS.md` -> Validation](../../AGENTS.md#validation) -- which validation proves which change,
   plus the scoped check/lint/fmt wrapper policy.
 - [`.llm/harness/README.md`](../harness/README.md) -- harness run mechanics that orchestrate these
-  tools (commit/worklog tracking, gates, evaluator protocol).
+  tools (worklog tracking, the draft-PR commit trail, gates, evaluator protocol).
 
 ## Subtree map
 
@@ -26,14 +26,14 @@ that govern *when* to reach for these tools. For those, see:
 ## Start Here
 
 - Use `deno task e2e:cli` for the full CLI merge-readiness gate.
-- Use `.llm/tools/scaffold-e2e-test.ts` only as a legacy comparison smoke when debugging parity with
+- Use `.llm/tools/e2e/scaffold-e2e-test.ts` only as a legacy comparison smoke when debugging parity with
   the previous repo checkout.
 - Use `.llm/tools/run-deno-check.ts` to run scoped type-checks or summarize noisy deno-check logs.
 - Use `.llm/tools/run-deno-lint.ts` to run scoped lint checks and summarize findings as JSON.
 - Use `.llm/tools/run-deno-fmt.ts` to run scoped, non-mutating fmt checks by root and extension. Add
   `--ignore-line-endings` for known baseline line-ending drift; add `--show-ignored` only when the
   ignored file list is needed.
-- Use `.llm/tools/watch-run.ts <run-dir>` as a **background** process to wake the supervisor when a
+- Use `.llm/tools/harness/watch-run.ts <run-dir>` as a **background** process to wake the supervisor when a
   sub-agent writes -- never poll. See [Supervisor watch](#supervisor-watch-watch-runts).
 - Use the `deps:*` tasks for any dependency-version or dead-import decision. See the
   [Dependency toolbelt](#dependency-toolbelt-llmtoolsdeps).
@@ -122,32 +122,32 @@ hooks, or agent-orchestration docs (see `CLAUDE.md`).
 `watch-run.ts <run-dir>` blocks until a harness run directory changes, then exits -- so the
 supervisor re-wakes without polling (which burns tokens). Run it as a **background** process: it
 `Deno.watchFs`-es the run dir and exits **0** on the first relevant change (a sub-agent appending
-`commits.md` / `worklog.md`), or exits **2** on the `--timeout-seconds` heartbeat if a sub-agent
-hangs without writing. Bad args exit **1**.
+`worklog.md`), or exits **2** on the `--timeout-seconds` heartbeat if a sub-agent hangs without
+writing. Bad args exit **1**.
 
 ```powershell
-deno run --allow-read .llm/tools/watch-run.ts <run-dir> --files commits.md,worklog.md --timeout-seconds 1800 --quiet
+deno run --allow-read .llm/tools/harness/watch-run.ts <run-dir> --files worklog.md --timeout-seconds 1800 --quiet
 ```
 
-Defaults: `--files commits.md,worklog.md`, `--timeout-seconds 1800`. See
+Defaults: `--files worklog.md`, `--timeout-seconds 1800`. See
 [`AGENTS.md` -> Tooling (Supervisor wake)](../../AGENTS.md#tooling) for the surrounding convention.
 
 ## Tool Index
 
 | Tool                        | Use                                                                                |
 | --------------------------- | ---------------------------------------------------------------------------------- |
-| `find-lines.ts`             | Substring or regex scans across one or more roots.                                 |
-| `find-import-patterns.ts`   | Import alias and relative-path debt scans.                                         |
-| `find-symbol-usages.ts`     | Symbol-boundary usage scans for refactors.                                         |
-| `list-exports.ts`           | Export and re-export inventory for package surfaces.                               |
-| `compare-export-surface.ts` | Compare actual exports against an expected symbol list.                            |
+| `search/find-lines.ts`             | Substring or regex scans across one or more roots.                          |
+| `search/find-import-patterns.ts`   | Import alias and relative-path debt scans.                                  |
+| `search/find-symbol-usages.ts`     | Symbol-boundary usage scans for refactors.                                 |
+| `search/list-exports.ts`           | Export and re-export inventory for package surfaces.                       |
+| `search/compare-export-surface.ts` | Compare actual exports against an expected symbol list.                    |
 | `run-deno-doc-lint.ts`      | Structured `deno doc --lint` runner with per-entrypoint + per-file attribution.    |
 | `run-deno-check.ts`         | Scoped `deno check` runner and parser for saved, stdin, or wrapped command output. |
 | `run-deno-lint.ts`          | Scoped lint runner with grouped JSON findings.                                     |
 | `run-deno-fmt.ts`           | Scoped fmt runner with non-mutating `--check` default.                             |
-| `watch-run.ts`              | Background supervisor wake: exit on run-dir change, heartbeat on timeout.          |
-| `git-commit-paths.ts`       | Commit/push selected paths without Windows shell quoting issues.                   |
-| `scaffold-e2e-test.ts`      | Legacy full scaffold smoke for CLI/plugin/DB/Aspire parity debugging.              |
+| `harness/watch-run.ts`      | Background supervisor wake: exit on run-dir change, heartbeat on timeout.          |
+| `git/git-commit-paths.ts`   | Commit/push selected paths without Windows shell quoting issues.                   |
+| `e2e/scaffold-e2e-test.ts`  | Legacy full scaffold smoke for CLI/plugin/DB/Aspire parity debugging.              |
 | `deps/*.ts`                 | Dependency-version, dead-import, audit, and prod-install decisions (see above).    |
 | `agentic/sync-claude-skills.ts` | Generate or check `.claude/skills` from `.agents/skills`.                      |
 | `agentic/validate-claude-surface.ts` | Validate `CLAUDE.md`, Claude settings, gitignore, and skill mirror.     |

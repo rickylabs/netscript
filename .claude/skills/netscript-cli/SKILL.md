@@ -1,6 +1,6 @@
 ---
 name: netscript-cli
-description: NetScript CLI, scaffold, maintainer, plugin, and E2E command guide. Use whenever a task mentions netscript init, netscript-dev, maintainer CLI, scaffold output, generated projects, plugin install/sync/list/doctor, generate plugins/runtime-schemas, DB/service commands, Aspire scaffold validation, full CLI E2E, or OpenHands/Copilot requests to run CLI scaffold suites.
+description: NetScript CLI, scaffold, maintainer, plugin, and E2E command guide. Use whenever a task mentions netscript init, netscript-dev, maintainer CLI, scaffold output, generated projects, plugin install/sync/list/doctor, generate plugins/runtime-schemas, DB/service commands, Aspire scaffold validation, full CLI E2E, or OpenHands requests to run CLI scaffold suites.
 ---
 
 # NetScript CLI

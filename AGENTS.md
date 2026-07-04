@@ -56,7 +56,7 @@ Read only what the task needs.
 2. relevant `.agents/skills/*/SKILL.md`
 3. relevant doctrine files under `docs/architecture/doctrine/`
 4. relevant harness workflow/archetype/gate files under `.llm/harness/`
-5. relevant run artifacts under `.llm/tmp/run/`
+5. relevant run artifacts under `.llm/runs/`
 6. relevant package/plugin docs and README files
 7. focused code
 
@@ -99,8 +99,8 @@ the canonical home; do not restate its gotchas elsewhere.
 
 ### Supervisor wake (token-free)
 
-When supervising sub-agents, do not poll. Run `.llm/tools/watch-run.ts <run-dir>` as a
-**background** process: it `Deno.watchFs`-es `commits.md`/`worklog.md` and exits 0 on the next
+When supervising sub-agents, do not poll. Run `.llm/tools/harness/watch-run.ts <run-dir>` as a
+**background** process: it `Deno.watchFs`-es `worklog.md` and exits 0 on the next
 change (re-waking the supervisor turn), or exits 2 on a `--timeout-seconds` heartbeat if a sub-agent
 hangs without writing.
 

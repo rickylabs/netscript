@@ -24,7 +24,7 @@
  * Launch it as a background process via:
  *
  *   wsl.exe --cd /home/codex/repos/<wt> -u codex -- bash -lc 'export PATH="$HOME/.local/bin:$PATH"; \
- *     deno run --no-config --allow-read --allow-run \
+ *     deno run --no-config --allow-env --allow-read --allow-run \
  *     /mnt/c/.../.llm/tools/agentic/codex-watch.ts \
  *     --mode turn --thread-id <uuid> --timeout-seconds 1800'
  *
@@ -32,13 +32,14 @@
  *
  * Usage (inside WSL):
  *   # progress (git refs):
- *   deno run --allow-read --allow-run codex-watch.ts --worktree <path> [--timeout-seconds 1800]
+ *   deno run --allow-env --allow-read --allow-run codex-watch.ts --worktree <path> [--timeout-seconds 1800]
  *   # turn finish (rollout):
- *   deno run --allow-read --allow-run codex-watch.ts --mode turn --thread-id <uuid> \
+ *   deno run --allow-env --allow-read --allow-run codex-watch.ts --mode turn --thread-id <uuid> \
  *     [--sessions-dir <dir>] [--rollout <path>] [--timeout-seconds 1800]
  *
- * Exit codes: 0 = awaited event seen (git event | turn complete) · 2 = timed out
- * (heartbeat) · 1 = bad args / worktree, logs dir, or rollout not found.
+ * Perms: --allow-env (reads HOME to locate ~/.codex/sessions) · --allow-read ·
+ * --allow-run (git). Exit codes: 0 = awaited event seen (git event | turn complete) ·
+ * 2 = timed out (heartbeat) · 1 = bad args / worktree, logs dir, or rollout not found.
  */
 
 import { parseTurnComplete, requireValue, runBin, UUID, wslHome } from './agentic-lib.ts';

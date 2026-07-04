@@ -1,3 +1,16 @@
+/**
+ * generate-cli-assets-barrel.ts — regenerate the embedded-asset barrels for CLI,
+ * plugin, fresh-ui, and service packages (inlined string literals, fmt-canonical).
+ *
+ * Run via `deno task gen:assets-barrel`. Perms: --allow-read (asset sources),
+ * --allow-write (generated barrels), --allow-run (`deno fmt`). Reads/writes only
+ * under packages/**.
+ *
+ * Usage:
+ *   deno run --allow-read --allow-write --allow-run \
+ *     .llm/tools/generate-cli-assets-barrel.ts
+ */
+
 import { TEMPLATE_MANIFEST } from '../../packages/cli/src/kernel/assets/manifest.ts';
 import { freshUiRegistryManifest } from '../../packages/fresh-ui/registry.manifest.ts';
 import { PLUGIN_SKELETON_TEMPLATES } from '../../packages/plugin/src/kernel/assets/template-registry.ts';
@@ -163,16 +176,34 @@ export const SCALAR_MIN_JS: string = ${literal};
 `;
 }
 
-await Deno.writeTextFile(CLI_OUTPUT_URL, await formatTypeScript(await renderCliEmbeddedContent()));
-await Deno.writeTextFile(
-  PLUGIN_OUTPUT_URL,
-  await formatTypeScript(await renderPluginEmbeddedContent()),
-);
-await Deno.writeTextFile(
-  FRESH_UI_OUTPUT_URL,
-  await formatTypeScript(await renderFreshUiRegistryContent()),
-);
-await Deno.writeTextFile(
-  SERVICE_OUTPUT_URL,
-  await formatTypeScript(await renderServiceEmbeddedContent()),
-);
+if (import.meta.main) {
+  if (Deno.args.includes('--help') || Deno.args.includes('-h')) {
+    console.log(
+      [
+        'generate-cli-assets-barrel.ts — regenerate embedded-asset barrels',
+        '(CLI, plugin, fresh-ui, service).',
+        '',
+        'Usage:',
+        '  deno run --allow-read --allow-write --allow-run \\',
+        '    .llm/tools/generate-cli-assets-barrel.ts',
+        '',
+        'Takes no flags (other than --help). Rewrites the *.generated.ts barrels in place.',
+      ].join('\n'),
+    );
+    Deno.exit(0);
+  }
+
+  await Deno.writeTextFile(CLI_OUTPUT_URL, await formatTypeScript(await renderCliEmbeddedContent()));
+  await Deno.writeTextFile(
+    PLUGIN_OUTPUT_URL,
+    await formatTypeScript(await renderPluginEmbeddedContent()),
+  );
+  await Deno.writeTextFile(
+    FRESH_UI_OUTPUT_URL,
+    await formatTypeScript(await renderFreshUiRegistryContent()),
+  );
+  await Deno.writeTextFile(
+    SERVICE_OUTPUT_URL,
+    await formatTypeScript(await renderServiceEmbeddedContent()),
+  );
+}

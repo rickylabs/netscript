@@ -1,47 +1,91 @@
+/**
+ * check-caveat-refs.ts — verify every `<!-- caveat: … -->` marker in docs Markdown
+ * references a resolvable target: a GitHub issue (`gh:#N`) or an existing
+ * `arch-debt:<ID>` in `.llm/harness/debt/arch-debt.md`. Exits 1 and lists offenders
+ * when any marker is unresolved.
+ *
+ * Perms: --allow-read (docs Markdown + arch-debt.md).
+ *
+ * Usage:
+ *   deno run --allow-read .llm/tools/docs/check-caveat-refs.ts [docs-root]
+ *   deno run --allow-read .llm/tools/docs/check-caveat-refs.ts --help
+ *
+ * docs-root defaults to the current directory.
+ */
+
 const markerPattern = /<!--\s*caveat\s*:\s*([\s\S]*?)-->/g;
 const archDebtIdPattern = /`([^`]+)`/g;
 
-const rootArg = Deno.args[0] ?? '.';
-const docsRoot = await absolutePath(rootArg);
-const docsRootPrefix = docsRoot.endsWith('/') ? docsRoot : `${docsRoot}/`;
-const archDebtPath = await findArchDebtPath(Deno.cwd());
-const archDebtIds = await readArchDebtIds(archDebtPath);
-const markdownFiles = await walkMarkdownFiles(docsRoot);
-
-const unresolved = new Map<string, string[]>();
-let markerCount = 0;
-const pagesWithMarkers = new Set<string>();
-
-for (const file of markdownFiles) {
-  const markdown = await Deno.readTextFile(file);
-  const refs = caveatRefsIn(markdown);
-
-  if (refs.length > 0) {
-    pagesWithMarkers.add(toDisplayPath(file));
-  }
-
-  for (const ref of refs) {
-    markerCount++;
-    if (!resolves(ref, archDebtIds)) {
-      addUnresolved(unresolved, toDisplayPath(file), ref);
-    }
-  }
+function printHelp(): void {
+  console.log(
+    [
+      'check-caveat-refs.ts — verify docs caveat markers reference resolvable targets',
+      '',
+      'Usage:',
+      '  deno run --allow-read .llm/tools/docs/check-caveat-refs.ts [docs-root]',
+      '',
+      'Arguments:',
+      '  docs-root   Markdown root to scan (default: current directory)',
+      '  --help, -h  show this help',
+      '',
+      'Exit codes: 0 = all caveat markers resolve · 1 = one or more unresolved.',
+    ].join('\n'),
+  );
 }
 
-if (unresolved.size > 0) {
-  console.error('Unresolved caveat references:');
-  for (const [file, refs] of [...unresolved.entries()].sort(([a], [b]) => a.localeCompare(b))) {
-    console.error(`  ${file}`);
-    for (const ref of refs.toSorted()) {
-      console.error(`    - ${ref}`);
+if (import.meta.main) {
+  if (Deno.args.includes('--help') || Deno.args.includes('-h')) {
+    printHelp();
+    Deno.exit(0);
+  }
+
+  const rootArg = Deno.args[0] ?? '.';
+  const docsRoot = await absolutePath(rootArg);
+  const docsRootPrefix = docsRoot.endsWith('/') ? docsRoot : `${docsRoot}/`;
+  const archDebtPath = await findArchDebtPath(Deno.cwd());
+  const archDebtIds = await readArchDebtIds(archDebtPath);
+  const markdownFiles = await walkMarkdownFiles(docsRoot);
+
+  const toDisplayPath = (file: string): string => {
+    const relative = file.startsWith(docsRootPrefix) ? file.slice(docsRootPrefix.length) : file;
+    return relative.replaceAll('\\', '/');
+  };
+
+  const unresolved = new Map<string, string[]>();
+  let markerCount = 0;
+  const pagesWithMarkers = new Set<string>();
+
+  for (const file of markdownFiles) {
+    const markdown = await Deno.readTextFile(file);
+    const refs = caveatRefsIn(markdown);
+
+    if (refs.length > 0) {
+      pagesWithMarkers.add(toDisplayPath(file));
+    }
+
+    for (const ref of refs) {
+      markerCount++;
+      if (!resolves(ref, archDebtIds)) {
+        addUnresolved(unresolved, toDisplayPath(file), ref);
+      }
     }
   }
-  Deno.exit(1);
-}
 
-console.log(
-  `${markerCount} caveat markers across ${pagesWithMarkers.size} pages — all references resolve`,
-);
+  if (unresolved.size > 0) {
+    console.error('Unresolved caveat references:');
+    for (const [file, refs] of [...unresolved.entries()].sort(([a], [b]) => a.localeCompare(b))) {
+      console.error(`  ${file}`);
+      for (const ref of refs.toSorted()) {
+        console.error(`    - ${ref}`);
+      }
+    }
+    Deno.exit(1);
+  }
+
+  console.log(
+    `${markerCount} caveat markers across ${pagesWithMarkers.size} pages — all references resolve`,
+  );
+}
 
 async function absolutePath(path: string): Promise<string> {
   try {
@@ -148,11 +192,6 @@ function addUnresolved(unresolved: Map<string, string[]>, file: string, ref: str
   const refs = unresolved.get(file) ?? [];
   refs.push(ref);
   unresolved.set(file, refs);
-}
-
-function toDisplayPath(file: string): string {
-  const relative = file.startsWith(docsRootPrefix) ? file.slice(docsRootPrefix.length) : file;
-  return relative.replaceAll('\\', '/');
 }
 
 function dirname(path: string): string {

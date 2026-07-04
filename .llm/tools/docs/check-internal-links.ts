@@ -1,3 +1,17 @@
+/**
+ * check-internal-links.ts — verify every internal `href` in a built docs site
+ * resolves to an emitted page (or index directory), accounting for the site's
+ * base path. Exits 1 and lists the offenders when any internal link is unresolved.
+ *
+ * Perms: --allow-read (the built-site directory + `_config.ts`).
+ *
+ * Usage:
+ *   deno run --allow-read .llm/tools/docs/check-internal-links.ts [site-root]
+ *   deno run --allow-read .llm/tools/docs/check-internal-links.ts --help
+ *
+ * site-root defaults to `docs/site/_site`.
+ */
+
 const htmlHrefPattern = /\bhref\s*=\s*["']([^"']+)["']/gi;
 const skippedSchemes = [
   'http://',
@@ -7,67 +21,101 @@ const skippedSchemes = [
   'javascript:',
 ];
 
-const rootArg = Deno.args[0] ?? 'docs/site/_site';
-const siteRoot = await absolutePath(rootArg);
-const siteRootPrefix = siteRoot.endsWith('/') ? siteRoot : `${siteRoot}/`;
-
-const files = await walkFiles(siteRoot);
-const emittedFiles = new Set<string>();
-const indexDirectories = new Set<string>();
-const htmlFiles: string[] = [];
-
-for (const file of files) {
-  const sitePath = toSitePath(file);
-  emittedFiles.add(sitePath);
-
-  if (sitePath.endsWith('/index.html')) {
-    indexDirectories.add(sitePath.slice(0, -'index.html'.length));
-  }
-
-  if (sitePath.endsWith('.html')) {
-    htmlFiles.push(file);
-  }
+function printHelp(): void {
+  console.log(
+    [
+      'check-internal-links.ts — verify internal links in a built docs site resolve',
+      '',
+      'Usage:',
+      '  deno run --allow-read .llm/tools/docs/check-internal-links.ts [site-root]',
+      '',
+      'Arguments:',
+      '  site-root   built-site directory to scan (default: docs/site/_site)',
+      '  --help, -h  show this help',
+      '',
+      'Exit codes: 0 = all internal links resolve · 1 = one or more unresolved.',
+    ].join('\n'),
+  );
 }
 
-const basePath = await detectBasePath(siteRoot, htmlFiles);
-const unresolved = new Map<string, Set<string>>();
-let internalLinkCount = 0;
+if (import.meta.main) {
+  if (Deno.args.includes('--help') || Deno.args.includes('-h')) {
+    printHelp();
+    Deno.exit(0);
+  }
 
-for (const htmlFile of htmlFiles) {
-  const html = await Deno.readTextFile(htmlFile);
-  const source = toSitePath(htmlFile);
+  const rootArg = Deno.args[0] ?? 'docs/site/_site';
+  const siteRoot = await absolutePath(rootArg);
+  const siteRootPrefix = siteRoot.endsWith('/') ? siteRoot : `${siteRoot}/`;
 
-  for (const href of hrefsIn(html)) {
-    if (!isInternalLink(href)) {
-      continue;
+  const files = await walkFiles(siteRoot);
+  const emittedFiles = new Set<string>();
+  const indexDirectories = new Set<string>();
+  const htmlFiles: string[] = [];
+
+  const toSitePath = (file: string): string => {
+    if (file === siteRoot) {
+      return '/';
+    }
+    const relative = file.startsWith(siteRootPrefix) ? file.slice(siteRootPrefix.length) : file;
+    return `/${relative.replaceAll('\\', '/')}`;
+  };
+
+  for (const file of files) {
+    const sitePath = toSitePath(file);
+    emittedFiles.add(sitePath);
+
+    if (sitePath.endsWith('/index.html')) {
+      indexDirectories.add(sitePath.slice(0, -'index.html'.length));
     }
 
-    internalLinkCount++;
-
-    const resolved = resolveInternalHref(href, basePath);
-    if (!resolved) {
-      addUnresolved(unresolved, source, href);
-      continue;
-    }
-
-    if (!emittedFiles.has(resolved.filePath) && !indexDirectories.has(resolved.directoryPath)) {
-      addUnresolved(unresolved, source, href);
+    if (sitePath.endsWith('.html')) {
+      htmlFiles.push(file);
     }
   }
-}
 
-if (unresolved.size > 0) {
-  console.error('Unresolved internal links:');
-  for (const [source, hrefs] of [...unresolved.entries()].sort(([a], [b]) => a.localeCompare(b))) {
-    console.error(`  ${source}`);
-    for (const href of [...hrefs].sort()) {
-      console.error(`    - ${href}`);
+  const basePath = await detectBasePath(siteRoot, htmlFiles, emittedFiles, indexDirectories);
+  const unresolved = new Map<string, Set<string>>();
+  let internalLinkCount = 0;
+
+  for (const htmlFile of htmlFiles) {
+    const html = await Deno.readTextFile(htmlFile);
+    const source = toSitePath(htmlFile);
+
+    for (const href of hrefsIn(html)) {
+      if (!isInternalLink(href)) {
+        continue;
+      }
+
+      internalLinkCount++;
+
+      const resolved = resolveInternalHref(href, basePath);
+      if (!resolved) {
+        addUnresolved(unresolved, source, href);
+        continue;
+      }
+
+      if (!emittedFiles.has(resolved.filePath) && !indexDirectories.has(resolved.directoryPath)) {
+        addUnresolved(unresolved, source, href);
+      }
     }
   }
-  Deno.exit(1);
-}
 
-console.log(`${internalLinkCount} internal links across ${htmlFiles.length} pages — all resolve`);
+  if (unresolved.size > 0) {
+    console.error('Unresolved internal links:');
+    for (
+      const [source, hrefs] of [...unresolved.entries()].sort(([a], [b]) => a.localeCompare(b))
+    ) {
+      console.error(`  ${source}`);
+      for (const href of [...hrefs].sort()) {
+        console.error(`    - ${href}`);
+      }
+    }
+    Deno.exit(1);
+  }
+
+  console.log(`${internalLinkCount} internal links across ${htmlFiles.length} pages — all resolve`);
+}
 
 async function absolutePath(path: string): Promise<string> {
   try {
@@ -93,15 +141,6 @@ async function walkFiles(dir: string): Promise<string[]> {
   }
 
   return found;
-}
-
-function toSitePath(file: string): string {
-  if (file === siteRoot) {
-    return '/';
-  }
-
-  const relative = file.startsWith(siteRootPrefix) ? file.slice(siteRootPrefix.length) : file;
-  return `/${relative.replaceAll('\\', '/')}`;
 }
 
 function hrefsIn(html: string): string[] {
@@ -164,7 +203,12 @@ function addUnresolved(unresolved: Map<string, Set<string>>, source: string, hre
   unresolved.set(source, hrefs);
 }
 
-async function detectBasePath(root: string, htmlFiles: string[]): Promise<string> {
+async function detectBasePath(
+  root: string,
+  htmlFiles: string[],
+  emittedFiles: Set<string>,
+  indexDirectories: Set<string>,
+): Promise<string> {
   const configBasePath = await basePathFromConfig(root);
   if (configBasePath) {
     return configBasePath;

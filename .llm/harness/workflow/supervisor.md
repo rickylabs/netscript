@@ -19,8 +19,8 @@ pass_ — never a single command or file. Single-surface changes use the normal 
 ## Run layout
 
 - **Integration branch**: `feat/<supervisor>` (off the base branch).
-- **Supervisor run dir** `.llm/tmp/run/<supervisor-run-id>/`:
-  - base templates — `plan.md`, `worklog.md`, `context-pack.md`, `drift.md`, `commits.md`;
+- **Supervisor run dir** `.llm/runs/<supervisor-run-id>/`:
+  - base templates — `plan.md`, `worklog.md`, `context-pack.md`, `drift.md`;
   - **`phase-registry.md`** from `templates/phase-registry.md` — the group map, ordering, and live
     status;
   - `final-pr-handoff.md` + `escalations/` — produced as groups merge.
@@ -53,7 +53,7 @@ git checkout -b feat/<supervisor>-<group>
 git worktree add .worktrees/<group> feat/<supervisor>-<group>
 
 # 3. Scaffold the group's nested harness run dir from templates/
-#    .llm/tmp/run/<supervisor>-<group>--<suffix>/
+#    .llm/runs/<supervisor>-<group>--<suffix>/
 
 # 4. Push the group branch and open a DRAFT sub-PR against the integration branch
 git push -u origin feat/<supervisor>-<group>
@@ -94,7 +94,8 @@ After a group's evaluator returns `PASS`:
 3. **Post-merge verification** — `deno check` (with project unstable flags) on affected surfaces;
    forbidden-import check; affected tests.
 4. **Update supervisor state** — `phase-registry.md` group → `merged` (record merge commit);
-   `context-pack.md` group → Completed; `worklog.md` progress; append `commits.md`.
+   `context-pack.md` group → Completed; `worklog.md` progress; the merge commit is captured in the
+   integration PR / sub-PR commit trail.
 
 ## 4. Escalation review
 

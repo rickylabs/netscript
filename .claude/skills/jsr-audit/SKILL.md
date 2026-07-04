@@ -546,6 +546,35 @@ framework debt.
 
 ---
 
+## JSR publish gotchas (NetScript, grounded)
+
+These are publish-surface traps established across NetScript release cuts. They are consolidated
+here as the canonical home; the `deno doc --lint` full-export-surface bar is covered above under
+[`deno doc --lint`](#deno-doc---lint-the-publish-quality-bar) — do not restate it.
+
+- **Embed assets via import attributes, never `readTextFile`/`fromFileUrl`.** A published module runs
+  over an `https:`/`jsr:` graph where there is no filesystem, so `Deno.readTextFile(...)` /
+  `fromFileUrl(new URL(..., import.meta.url))` crash at runtime. Bundle text/JSON assets with import
+  attributes instead (`import data from "./x.json" with { type: "json" }`, `with { type: "text" }`).
+  Guard: `deno lint` + the production CLI e2e (`e2e-cli-prod`) exercise the real remote graph.
+- **Top-level `import.meta`/`fromFileUrl` crashes over https.** Same root cause as above but even for
+  path resolution: a top-level `fromFileUrl(new URL("...", import.meta.url))` throws when the module
+  is imported over `https:`/`jsr:`. Make it lazy (resolve inside the function that needs it) and
+  guard on `import.meta.url`'s protocol before touching the filesystem.
+- **Self-referential subpath import trap (#188).** A package that imports its OWN bare specifier
+  (e.g. `@netscript/x/sub` from inside `@netscript/x`) resolves at publish time against the LATEST
+  PUBLISHED version on JSR, not the in-repo source — so the publish graph fails or silently binds an
+  old version. Fix: use relative imports (`./sub.ts`) within a package; reserve bare specifiers for
+  true cross-package edges.
+- **JSR renders `@module` JSDoc, not README, by default (`readmeSource=jsdoc`).** The package page
+  shows the entrypoint `@module` JSDoc rather than `README.md` when `readmeSource` is `jsdoc` (the
+  default). If the README should be the page, toggle `readmeSource` to `readme` in the JSR UI or via
+  a PATCH to the package config; otherwise ensure the `@module` doc carries the intended landing
+  content.
+- **Prerelease-only packages show `latest=null`.** A package with only prerelease versions has JSR
+  `latest = null`, which renders a blank version badge/README on the package page. This self-heals at
+  the first non-prerelease (stable) publish; no config fix is needed.
+
 ## Known Limitations (2024-2025)
 
 - **Private packages**: Not yet available (most requested feature)

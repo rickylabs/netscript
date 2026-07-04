@@ -74,4 +74,28 @@ async function main() {
   Deno.exit(output.code);
 }
 
-await main();
+function printHelp(): void {
+  console.log(
+    [
+      'deps/outdated.ts — structured JSON wrapper over `deno outdated --recursive`',
+      '',
+      'Usage:',
+      '  deno run --allow-read --allow-run .llm/tools/deps/outdated.ts [flags]',
+      '',
+      'Flags:',
+      '  --latest    include the --latest view (flags prerelease "Latest" rows)',
+      '  --pretty    human-readable list instead of JSON',
+      '  --help, -h  show this help',
+      '',
+      'Output (default): JSON { generatedAt, mode, count, prereleaseLatest, rows }.',
+    ].join('\n'),
+  );
+}
+
+if (import.meta.main) {
+  if (Deno.args.includes('--help') || Deno.args.includes('-h')) {
+    printHelp();
+    Deno.exit(0);
+  }
+  await main();
+}

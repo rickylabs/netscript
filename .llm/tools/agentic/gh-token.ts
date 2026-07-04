@@ -188,4 +188,4 @@ async function main(): Promise<void> {
   Deno.exit(code);
 }
 
-await main();
+if (import.meta.main) await main();

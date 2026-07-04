@@ -93,4 +93,25 @@ async function main(): Promise<void> {
   }
 }
 
-await main();
+function printHelp(): void {
+  console.log(
+    [
+      'deps/census.ts — report the workspace dependency + task baseline for shape scanners',
+      '',
+      'Usage:',
+      '  deno run --allow-read .llm/tools/deps/census.ts [--json]',
+      '',
+      'Flags:',
+      '  --json      full JSON report instead of the one-line + per-dep summary',
+      '  --help, -h  show this help',
+    ].join('\n'),
+  );
+}
+
+if (import.meta.main) {
+  if (Deno.args.includes('--help') || Deno.args.includes('-h')) {
+    printHelp();
+    Deno.exit(0);
+  }
+  await main();
+}

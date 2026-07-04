@@ -59,6 +59,29 @@ async function main() {
   Deno.exit(output.code);
 }
 
+function printHelp(): void {
+  console.log(
+    [
+      'deps/prod-install.ts — structured wrapper over `deno ci --prod`',
+      '',
+      'Usage:',
+      '  deno run --allow-read --allow-write --allow-net --allow-run --allow-env \\',
+      '    .llm/tools/deps/prod-install.ts [flags]',
+      '',
+      'Flags:',
+      '  --skip-types   pass --skip-types to `deno ci --prod`',
+      '  --pretty       human-readable summary instead of JSON',
+      '  --help, -h     show this help',
+      '',
+      'Output (default): JSON { generatedAt, command, exitCode, ok, durationMs, stderr }.',
+    ].join('\n'),
+  );
+}
+
 if (import.meta.main) {
+  if (Deno.args.includes('--help') || Deno.args.includes('-h')) {
+    printHelp();
+    Deno.exit(0);
+  }
   await main();
 }

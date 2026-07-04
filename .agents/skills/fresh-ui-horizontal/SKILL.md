@@ -65,9 +65,10 @@ skipped:
 - One slice = one impl commit per repo + bookkeeping commit. NEVER amend;
   follow-ups are new commits, hash-recorded.
 - Trailer on every commit: `Co-Authored-By: <model attribution line>`.
-- Append (never rewrite) `worklog.md`, `commits.md`, `drift.md` in
-  `.llm/tmp/run/<run-id>/`.
-- Per-slice PR comment with a Gate(s) / Changed / Drift / Commits table.
+- Append (never rewrite) `worklog.md`, `drift.md` in `.llm/runs/<run-id>/`.
+- Per-slice PR comment with a Gate(s) / Changed / Drift / Commits table — the
+  draft-PR commit list + per-slice PR comments are the commit trail (no
+  `commits.md`).
 - Push both repos after every slice.
 
 ## Environment gotchas (verified, will bite you)

@@ -1,7 +1,7 @@
 name: Feature request
 description: Propose a new capability or enhancement that does not require a full RFC.
 title: "feat: "
-labels: ["enhancement", "status:triage"]
+labels: ["type:feat", "status:triage"]
 body:
   - type: markdown
     attributes:
@@ -9,6 +9,11 @@ body:
         Use this for scoped, non-breaking enhancements. **Substantial, cross-cutting, or breaking
         changes need an [RFC](https://github.com/rickylabs/netscript/blob/main/rfcs/README.md)** —
         open an RFC proposal instead. Not sure? Start a [Discussion → Ideas](https://github.com/rickylabs/netscript/discussions/categories/ideas).
+
+        **Multi-slice / epic work:** file a program epic as `Epic: <name>` (`type:umbrella` +
+        `epic:<slug>`) with a sub-issue checklist, and file each slice as its own `[<epic-slug> S<n>]
+        <slice>` issue linked by `Part of #<epic>`. See the epic / sub-issue standard in the
+        `netscript-pr` skill.
   - type: textarea
     id: problem
     attributes:

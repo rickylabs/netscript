@@ -281,4 +281,31 @@ async function main() {
   if (args.failBehind && behindCount > 0) Deno.exit(1);
 }
 
-await main();
+function printHelp(): void {
+  console.log(
+    [
+      'deps/latest.ts — report each workspace dep against its registry stable channel',
+      '',
+      'Usage:',
+      '  deno run --allow-read --allow-net .llm/tools/deps/latest.ts [flags]',
+      '',
+      'Flags:',
+      '  --pretty              human-readable table instead of JSON',
+      '  --behind-only         only list deps that are behind',
+      '  --allow-prerelease    treat a prerelease latest as comparable',
+      '  --fail-behind         exit 1 if any dep is behind (CI report lane)',
+      '  --filter <glob>       limit to matching package names, e.g. "@fedify/*"',
+      '  --help, -h            show this help',
+      '',
+      'Output (default): JSON { generatedAt, behind, entries }. Exit 0 unless --fail-behind.',
+    ].join('\n'),
+  );
+}
+
+if (import.meta.main) {
+  if (Deno.args.includes('--help') || Deno.args.includes('-h')) {
+    printHelp();
+    Deno.exit(0);
+  }
+  await main();
+}

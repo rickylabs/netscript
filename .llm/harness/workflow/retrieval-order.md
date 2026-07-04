@@ -5,13 +5,15 @@ sources before broad scans or web searches.
 
 ## Existing Run
 
-1. `.llm/tmp/run/<run-id>/context-pack.md`
-2. `.llm/tmp/run/<run-id>/plan.md`
-3. `.llm/tmp/run/<run-id>/worklog.md`
-4. `.llm/tmp/run/<run-id>/drift.md`
-5. `.llm/tmp/run/<run-id>/commits.md`
+1. `.llm/runs/<run-id>/context-pack.md`
+2. `.llm/runs/<run-id>/plan.md`
+3. `.llm/runs/<run-id>/worklog.md`
+4. `.llm/runs/<run-id>/drift.md`
 
-For `.llm/tmp/` paths, verify with direct filesystem listing if an index/search tool misses the
+For the commit trail, read the draft PR's commit list + per-slice PR comments (there is no
+`commits.md`).
+
+For `.llm/runs/` paths, verify with direct filesystem listing if an index/search tool misses the
 directory.
 
 ## Doctrine and Harness

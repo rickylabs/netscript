@@ -19,7 +19,7 @@
   AP-16, AP-18, AP-19, AP-20, AP-21, AP-22, AP-23, AP-24, AP-25.
 - Universal fitness functions: F-1, F-2, F-3, F-4, F-5, F-6, F-7, F-8, F-9, F-10, F-11, F-12, F-15,
   F-16, F-17, F-18. F-14 excludes allowed CLI presentation output.
-- Archetype-specific fitness functions: F-CLI-1 … F-CLI-30 (see §"Fitness Gates").
+- Archetype-specific fitness functions: F-CLI-1 … F-CLI-31 (see §"Fitness Gates").
 
 ## When This Archetype Applies
 
@@ -219,17 +219,19 @@ Archetype-specific gates F-CLI-1 … F-CLI-31:
 | F-CLI-30 | abstract + derived co-location (R-A6-N3) under `src/kernel/**`                                                                                                                                                    | AST + path                 |
 | F-CLI-31 | `kernel/extension-points.ts` exports every `Registry` subclass declared under `src/**` (or the registry is explicitly marked internal)                                                                            | AST                        |
 
-Implementation lives in `.llm/tools/fitness/check-cli-*.ts`. Phase A runs may report
-`PENDING_SCRIPT` with manual evidence; Phase B+ requires the script.
+The F-CLI-* fitness functions have **no dedicated script** — the `check-cli-*.ts` family was deleted
+in S9 (see `gates/fitness-gates.md`). In every phase they are recorded as `PENDING_SCRIPT` with
+manual/structural evidence, backed by the mechanical `check-doctrine.ts`
+(`deno task arch:check`, per-root).
 
 ## Required Gates in Order
 
-1. Static gates: package check slice (`deno task check:packages`), `deno task lint`,
-   `deno task fmt --check`.
+1. Static gates: `deno task check`, `deno task lint`, `deno task fmt:check`.
 2. Universal fitness gates: F-1, F-3, F-5 (CLI-aware), F-6, F-7, F-8, F-9, F-10, F-11, F-12, F-15,
    F-16, F-17, F-18.
-3. Archetype-6 fitness gates: F-CLI-1 … F-CLI-31. Phase A reports `PENDING_SCRIPT` with manual
-   evidence; Phase B requires `arch:check` green.
+3. Archetype-6 fitness gates: F-CLI-1 … F-CLI-31. These have no dedicated script; report
+   `PENDING_SCRIPT` with manual/structural evidence, backed by `check-doctrine.ts`
+   (`deno task arch:check`, per-root).
 4. Runtime gates: required when a slice changes a command that starts services, scaffolds projects,
    or shells out to Aspire, Docker, or process adapters.
 5. Consumer gates: scaffolded-project compile and import smoke tests required when the slice changes

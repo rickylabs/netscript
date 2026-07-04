@@ -18,7 +18,7 @@ against the changed state, not to continue implementation.
 | run `worklog.md`           | yes                         | design checkpoint and generator evidence               |
 | run `context-pack.md`      | yes when present            | resumable state                                        |
 | run `drift.md`             | yes when present            | plan/doctrine drift                                    |
-| run `commits.md`           | yes when commits exist      | implementation history                                 |
+| draft-PR commit list + per-slice PR comments | yes when commits exist | implementation history (the commit trail)   |
 | `debt/arch-debt.md`        | yes                         | debt delta                                             |
 
 ## Operating Rules
@@ -36,10 +36,16 @@ against the changed state, not to continue implementation.
 9. Use `FAIL_DEBT` when the only blocking issue is unrecorded or malformed architecture debt.
 10. Use `FAIL_RESCOPE` when the plan is materially wrong, not merely incomplete.
 11. Do not fix implementation except for minimal read-only validation commands.
+12. Verify the **close-gate** (`netscript-pr` → "Merge close-gate (#387)") is honored before any
+    `status:ready-merge` / `Closes #N` merge: for every referenced issue, its acceptance criteria and
+    every `gate:` checkbox are checked with linked evidence, and the PR's Definition-of-Done checklist
+    is complete. An unchecked `gate:` box on a referenced issue (the #260 failure) blocks the pass.
+13. Verify every brief and the PR body carry a `## SKILL` chapter naming the relevant skills (harness
+    rule; missing SKILL chapter is a finding).
 
 ## Output
 
-Write `.llm/tmp/run/<run-id>/evaluate.md` using `templates/evaluate.md`.
+Write `.llm/runs/<run-id>/evaluate.md` using `templates/evaluate.md`.
 
 ## Evidence Standard
 

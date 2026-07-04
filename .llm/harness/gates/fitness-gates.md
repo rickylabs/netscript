@@ -3,28 +3,35 @@
 Fitness gates are the executable form of the doctrine. Doctrine source:
 `docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md`.
 
-Phase A does not implement scripts. This file defines the run contract, expected script names, and
-evaluator reporting shape.
+The fitness surface is real and lives under `.llm/tools/fitness/*.ts`. This file names the actual
+scripts and the evaluator reporting shape. It does **not** invent script names: every path below
+exists in the tree. The surface is deliberately small — a mechanical doctrine evaluator plus a
+per-package JSR/doctrine auditor plus the design-system token gates. There is **no** per-domain
+`check-cli-*` / `check-*-edges` / `check-*-shape` family and **no** `release-readiness` /
+`audit-all-packages` / `check-netscript-standards` aggregator; those were dead code and were
+removed. For any domain that has no dedicated script, evaluators use manual evidence plus
+`check-doctrine.ts` coverage (see `PENDING_SCRIPT` below).
 
-## Gates
+## Gate scripts (entrypoints)
 
-| Gate | Name                         | Script target                            | Primary AP coverage      |
-| ---- | ---------------------------- | ---------------------------------------- | ------------------------ |
-| F-1  | File-size lint               | `.llm/tools/check-file-sizes.ts`         | AP-1                     |
-| F-2  | Helper-reinvention scan      | `.llm/tools/check-helper-reinvention.ts` | AP-2, AP-9               |
-| F-3  | Layering check               | `.llm/tools/check-layering.ts`           | AP-16, AP-17             |
-| F-4  | Inheritance audit            | `.llm/tools/check-inheritance.ts`        | AP-4, AP-5, AP-6         |
-| F-5  | Public surface audit         | `.llm/tools/check-doc-coverage.ts`       | AP-14, AP-15             |
-| F-6  | JSR publishability           | built-in `deno publish --dry-run`        | public package readiness |
-| F-7  | Doc-score gate               | JSR score/manual until automated         | public docs readiness    |
-| F-8  | Workspace lib check          | `.llm/tools/check-workspace-lib.ts`      | AP-20                    |
-| F-9  | Permission declaration check | `.llm/tools/check-permission-decl.ts`    | AP-19                    |
-| F-10 | Test-shape audit             | `.llm/tools/check-test-shape.ts`         | AP-1, AP-18              |
-| F-11 | Forbidden-folder lint        | `.llm/tools/check-forbidden-folders.ts`  | AP-16, AP-17             |
-| F-12 | Naming-convention lint       | `.llm/tools/check-naming.ts`             | AP-15                    |
-| F-13 | Saga/runtime invariants      | `.llm/tools/check-saga-invariants.ts`    | AP-10, AP-11, AP-12      |
-| F-14 | Console-log lint             | `.llm/tools/check-console-usage.ts`      | AP-13                    |
-| F-15 | Re-export-upstream lint      | `.llm/tools/check-upstream-reexport.ts`  | AP-14                    |
+All paths are under `.llm/tools/fitness/`.
+
+| Script                     | What it does                                                                                                                                                                                                                            | Use for                                          |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------ |
+| `check-doctrine.ts`        | Mechanical doctrine evaluator — axioms A1..A14 + anti-patterns AP-1..AP-30 at the granularity that can be checked mechanically; findings tagged `A##`/`AP-##`/`F-DOCT-##`. Takes `--root <pkg>` (defaults to repo-wide with no root).      | per-root anti-pattern coverage (`--root <pkg>`); this is the script `deno task arch:check` runs |
+| `audit-jsr-package.ts`     | Single-package JSR + doctrine audit; internal gates F-1 (folder vocabulary), F-2 (file-count caps), F-3 (no `I`-prefix), F-4 (no helpers/utils dumping ground), F-5 (`mod.ts` present), F-6 (`deno.json` JSR-valid), F-7 (publish dry-run clean); also docs/surface/slow-types/tests sections. | per-package JSR + doctrine readiness (`--root <pkg>`) |
+| `check-ds-no-raw-hex.ts`   | Design-system gate: no raw hex color literals; tokens only.                                                                                                                                                                              | design-token discipline (design-system packages) |
+| `check-ds-color-utilities.ts` | Design-system gate: color utilities go through the token layer, not ad-hoc.                                                                                                                                                           | design-token discipline (design-system packages) |
+
+Support file (not a gate entrypoint): `check-ds-gates_test.ts` — the unit test for the two
+design-system gates.
+
+## `deno task arch:check`
+
+`deno task arch:check` runs `check-doctrine.ts --root <pkg>` over each owned package/plugin root in
+turn (the exact root list lives in the `arch:check` task in `deno.json`), after `deps:check`.
+`deno task arch:check:repo` runs `check-doctrine.ts` once repo-wide (no `--root`). `check-doctrine.ts`
+is the mechanical AP-1..AP-30 authority; there is no separate architecture-gates aggregator.
 
 ## Reporting States
 
@@ -32,22 +39,37 @@ evaluator reporting shape.
 | ---------------- | --------------------------------------------------------------------- |
 | `PASS`           | Script or manual equivalent found no violation.                       |
 | `FAIL`           | Violation found and not accepted as debt.                             |
-| `PENDING_SCRIPT` | Phase A or later script does not exist yet; manual evidence required. |
+| `PENDING_SCRIPT` | No dedicated script exists for this domain; manual evidence required. |
 | `N/A`            | Gate does not apply to the archetype or scope.                        |
 | `DEBT_ACCEPTED`  | Violation exists and has a valid `arch-debt.md` entry.                |
 
-## Manual Evidence Before Scripts Exist
+`PENDING_SCRIPT` is the common case, not the exception. The gate scripts above cover doctrine
+anti-patterns (`check-doctrine.ts`), per-package JSR readiness (`audit-jsr-package.ts`), and
+design-system tokens (the two `check-ds-*` gates). Every other domain — CLI archetype shape, folder
+cardinality beyond `audit-jsr-package.ts` F-1/F-2, layering/edges, naming, composition — has **no**
+dedicated script and is evaluated with manual evidence backed by `check-doctrine.ts` coverage. Report
+those as `PENDING_SCRIPT` (with manual evidence and no detected violation) or `PASS` (with manual
+evidence), not as a missing gate.
 
-When a script is not implemented, the generator/evaluator performs the narrowest manual check that
-matches the gate. Examples:
+## Manual Evidence When No Dedicated Script Exists
 
-- F-1: inspect line counts for changed package files.
-- F-3: inspect imports across touched role folders.
-- F-5: run `deno doc --lint` and read exported symbols.
-- F-9: compare README permissions to touched `Deno.*`, network, KV, and process calls.
-- F-15: inspect changed exports.
+When a domain has no dedicated script, the generator/evaluator performs the narrowest manual check
+that matches the gate. Examples:
 
-Manual evidence is temporary. Later phases replace it with scripts.
+- Anti-pattern coverage generally: run `check-doctrine.ts --root <pkg>` before hand-auditing — it is
+  the mechanical AP-1..AP-30 authority and should be the first evidence for any structural,
+  layering, naming, or edges gate.
+- File size / folder cardinality / folder vocabulary: run `audit-jsr-package.ts --root <pkg>`
+  (F-1/F-2/F-4) for the package, or inspect line counts and folder shape for the changed files.
+- Public surface / doc coverage: run `deno doc --lint` and read exported symbols (or read the
+  docs/surface/slow-types sections of `audit-jsr-package.ts`).
+- Permission declaration: compare README permissions to the touched `Deno.*`, network, KV, and
+  process calls by reading the changed files.
+- Design tokens: run `check-ds-no-raw-hex.ts` / `check-ds-color-utilities.ts` for design-system
+  packages.
+
+Manual evidence is temporary. If a domain later gains a dedicated script, that script replaces the
+manual check and this file is updated to name it.
 
 ## Debt Rule
 
