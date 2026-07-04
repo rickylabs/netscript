@@ -25,6 +25,25 @@ const ALLOW_MARKER = 'ds-allow-raw-color';
 const RAW_HEX = /#[0-9a-fA-F]{3,8}(?![0-9a-zA-Z-])/g;
 const RAW_COLOR_FN = /(?<![a-zA-Z.-])(?:rgba?|hsla?|oklch|oklab|hwb)\(/g;
 
+if (Deno.args.includes('--help') || Deno.args.includes('-h')) {
+  console.log(
+    [
+      'check-ds-no-raw-hex.ts — DS gate: no raw color literals in @netscript/fresh-ui components',
+      '',
+      'Usage:',
+      '  deno run --allow-read .llm/tools/fitness/check-ds-no-raw-hex.ts [--root <dir>]',
+      '',
+      'Flags:',
+      `  --root <dir>   package root to scan (default: ${DEFAULT_PACKAGE_ROOT})`,
+      '  --help, -h     show this help',
+      '',
+      'Opt out a documented fallback with a `ds-allow-raw-color` comment on the same line.',
+      'Exit codes: 0 = clean · 1 = at least one raw color literal.',
+    ].join('\n'),
+  );
+  Deno.exit(0);
+}
+
 const violations: string[] = [];
 let scanned = 0;
 

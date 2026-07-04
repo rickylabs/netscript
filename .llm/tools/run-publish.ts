@@ -1,3 +1,19 @@
+/**
+ * run-publish.ts — workspace publish entrypoint used by the release/publish flow
+ * (`.github/workflows/publish.yml`) and the `publish`/`publish:dry-run` tasks.
+ *
+ * Modes: default publish, `--dry-run`, `--preflight`, `--print-jsr-links`, and
+ * `--update-release-body`. Perms: matches the publish-workspace surface
+ * (--allow-read --allow-run --allow-env, --allow-write for --update-release-body,
+ * plus network for the underlying `deno publish`).
+ *
+ * Usage:
+ *   deno run -A .llm/tools/run-publish.ts [--dry-run | --preflight]
+ *   deno run -A .llm/tools/run-publish.ts --print-jsr-links --version <v>
+ *   deno run -A .llm/tools/run-publish.ts --update-release-body --version <v> \
+ *     --body-file <in> --out <out>
+ */
+
 import {
   discoverWorkspaceMembers,
   formatJsrLinks,
@@ -15,25 +31,54 @@ interface Options {
   readonly outFile?: string;
 }
 
-const options = parseArgs(Deno.args);
+function printHelp(): void {
+  console.log(
+    [
+      'run-publish.ts — workspace publish entrypoint (release/publish flow)',
+      '',
+      'Usage:',
+      '  deno run -A .llm/tools/run-publish.ts [flags]',
+      '',
+      'Flags:',
+      '  --dry-run                run publish in dry-run mode',
+      '  --preflight              run publish preflight checks',
+      '  --print-jsr-links        print JSR links (requires --version)',
+      '  --update-release-body    rewrite a release body with JSR links',
+      '                           (requires --version, --body-file, --out)',
+      '  --version <v>            release version for link generation',
+      '  --body-file <path>      input release body for --update-release-body',
+      '  --out <path>            output path for --update-release-body',
+      '  --help, -h              show this help',
+    ].join('\n'),
+  );
+}
 
-if (options.printJsrLinks) {
-  const version = requireVersion(options);
-  const members = await discoverWorkspaceMembers();
-  await Deno.stdout.write(new TextEncoder().encode(formatJsrLinks(members, version)));
-} else if (options.updateReleaseBody) {
-  const version = requireVersion(options);
-  if (!options.bodyFile || !options.outFile) {
-    throw new Error('--update-release-body requires --body-file and --out.');
+if (import.meta.main) {
+  if (Deno.args.includes('--help') || Deno.args.includes('-h')) {
+    printHelp();
+    Deno.exit(0);
   }
-  const body = await Deno.readTextFile(options.bodyFile);
-  const members = await discoverWorkspaceMembers();
-  const updated = updateReleaseBodyWithJsrLinks(body, members, version);
-  await Deno.writeTextFile(options.outFile, updated);
-} else if (options.preflight) {
-  await publishWorkspace({ mode: 'preflight' });
-} else {
-  await publishWorkspace({ mode: options.dryRun ? 'dry-run' : 'publish' });
+
+  const options = parseArgs(Deno.args);
+
+  if (options.printJsrLinks) {
+    const version = requireVersion(options);
+    const members = await discoverWorkspaceMembers();
+    await Deno.stdout.write(new TextEncoder().encode(formatJsrLinks(members, version)));
+  } else if (options.updateReleaseBody) {
+    const version = requireVersion(options);
+    if (!options.bodyFile || !options.outFile) {
+      throw new Error('--update-release-body requires --body-file and --out.');
+    }
+    const body = await Deno.readTextFile(options.bodyFile);
+    const members = await discoverWorkspaceMembers();
+    const updated = updateReleaseBodyWithJsrLinks(body, members, version);
+    await Deno.writeTextFile(options.outFile, updated);
+  } else if (options.preflight) {
+    await publishWorkspace({ mode: 'preflight' });
+  } else {
+    await publishWorkspace({ mode: options.dryRun ? 'dry-run' : 'publish' });
+  }
 }
 
 function parseArgs(args: readonly string[]): Options {

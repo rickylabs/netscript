@@ -32,61 +32,63 @@ interface PackageReport {
   >;
 }
 
-const options = parseArgs(Deno.args);
-const lcovPath = `${options.coverageDir.replace(/\/$/, '')}/lcov.info`;
-const coverageByName = await loadFunctionCoverage(options.coverageDir, lcovPath);
-const packages: PackageReport[] = [];
+if (import.meta.main) {
+  const options = parseArgs(Deno.args);
+  const lcovPath = `${options.coverageDir.replace(/\/$/, '')}/lcov.info`;
+  const coverageByName = await loadFunctionCoverage(options.coverageDir, lcovPath);
+  const packages: PackageReport[] = [];
 
-for (const packagePath of options.packages) {
-  const symbols = await getExportedSymbols(packagePath);
-  packages.push({
-    packagePath,
-    exportedSymbols: symbols.map((symbol) => {
-      const coverage = coverageByName.get(symbol.name);
-      return {
-        ...symbol,
-        coverage: coverage
-          ? {
-            kind: 'function' as const,
-            hits: coverage.hits,
-            file: coverage.file,
-            line: coverage.line,
-          }
-          : {
-            kind: 'not_found' as const,
-            hits: 0,
-          },
-      };
-    }),
-  });
+  for (const packagePath of options.packages) {
+    const symbols = await getExportedSymbols(packagePath);
+    packages.push({
+      packagePath,
+      exportedSymbols: symbols.map((symbol) => {
+        const coverage = coverageByName.get(symbol.name);
+        return {
+          ...symbol,
+          coverage: coverage
+            ? {
+              kind: 'function' as const,
+              hits: coverage.hits,
+              file: coverage.file,
+              line: coverage.line,
+            }
+            : {
+              kind: 'not_found' as const,
+              hits: 0,
+            },
+        };
+      }),
+    });
+  }
+
+  const report = {
+    generatedAt: new Date().toISOString(),
+    source: {
+      coverageDir: options.coverageDir,
+      lcov: await exists(lcovPath) ? lcovPath : undefined,
+    },
+    summary: {
+      packages: packages.length,
+      exportedSymbols: packages.reduce((sum, pkg) => sum + pkg.exportedSymbols.length, 0),
+      coveredFunctionExports: packages.reduce(
+        (sum, pkg) =>
+          sum +
+          pkg.exportedSymbols.filter((symbol) =>
+            symbol.coverage.kind === 'function' && symbol.coverage.hits > 0
+          ).length,
+        0,
+      ),
+    },
+    packages,
+  };
+
+  await Deno.mkdir(dirname(options.out), { recursive: true });
+  await Deno.writeTextFile(options.out, `${JSON.stringify(report, null, 2)}\n`);
+  console.log(
+    `Wrote ${options.out} with ${report.summary.exportedSymbols} exported symbols across ${packages.length} packages.`,
+  );
 }
-
-const report = {
-  generatedAt: new Date().toISOString(),
-  source: {
-    coverageDir: options.coverageDir,
-    lcov: await exists(lcovPath) ? lcovPath : undefined,
-  },
-  summary: {
-    packages: packages.length,
-    exportedSymbols: packages.reduce((sum, pkg) => sum + pkg.exportedSymbols.length, 0),
-    coveredFunctionExports: packages.reduce(
-      (sum, pkg) =>
-        sum +
-        pkg.exportedSymbols.filter((symbol) =>
-          symbol.coverage.kind === 'function' && symbol.coverage.hits > 0
-        ).length,
-      0,
-    ),
-  },
-  packages,
-};
-
-await Deno.mkdir(dirname(options.out), { recursive: true });
-await Deno.writeTextFile(options.out, `${JSON.stringify(report, null, 2)}\n`);
-console.log(
-  `Wrote ${options.out} with ${report.summary.exportedSymbols} exported symbols across ${packages.length} packages.`,
-);
 
 function parseArgs(args: string[]): Options {
   let coverageDir = '';

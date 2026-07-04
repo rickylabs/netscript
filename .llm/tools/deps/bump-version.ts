@@ -56,4 +56,30 @@ async function main(): Promise<void> {
   Deno.exit(output.code);
 }
 
-await main();
+function printHelp(): void {
+  console.log(
+    [
+      'deps/bump-version.ts — structured wrapper over native `deno bump-version`',
+      '',
+      'Usage:',
+      '  deno run --allow-read --allow-run --allow-env \\',
+      '    .llm/tools/deps/bump-version.ts [--json|--pretty] [--cwd <dir>] [native args...]',
+      '',
+      'Flags:',
+      '  --json         JSON result (default output)',
+      '  --pretty       human-readable summary instead of JSON',
+      '  --cwd <dir>    working directory for `deno bump-version`',
+      '  --help, -h     show this help',
+      '',
+      'Any other args (e.g. `patch --dry-run`) are forwarded to `deno bump-version`.',
+    ].join('\n'),
+  );
+}
+
+if (import.meta.main) {
+  if (Deno.args.includes('--help') || Deno.args.includes('-h')) {
+    printHelp();
+    Deno.exit(0);
+  }
+  await main();
+}

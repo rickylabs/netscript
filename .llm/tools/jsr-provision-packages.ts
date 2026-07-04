@@ -43,47 +43,78 @@ const DEFAULT_SCOPE = 'netscript';
 const DEFAULT_REPO = 'rickylabs/netscript';
 const JSR_PACKAGE_PREFIX = '@netscript/';
 
-const options = parseArgs(Deno.args);
-const members = await discoverWorkspaceMembers(options.root);
-const packageNames = members.map((member) => packageSegment(member.name));
-
-console.log(`discovered ${packageNames.length} workspace members: ${packageNames.join(', ')}`);
-
-const token = Deno.env.get('JSR_API_TOKEN')?.trim();
-if (!token && !options.dryRun) {
-  console.log('JSR_API_TOKEN not set — running public checks before deciding if writes are needed');
+function printHelp(): void {
+  console.log(
+    [
+      'jsr-provision-packages.ts — idempotently create + repo-link every @netscript/*',
+      'workspace member as a JSR package.',
+      '',
+      'Usage:',
+      '  deno run --allow-net --allow-env --allow-read \\',
+      '    .llm/tools/jsr-provision-packages.ts [flags]',
+      '',
+      'Flags:',
+      '  --scope <name>     JSR scope (default: netscript)',
+      '  --repo <owner/name> GitHub repo to link (default: rickylabs/netscript)',
+      '  --root <dir>       workspace root to discover members from',
+      '  --dry-run          report actions without writing (no token needed)',
+      '  --help, -h         show this help',
+      '',
+      'Writes require JSR_API_TOKEN with package-edit scope.',
+    ].join('\n'),
+  );
 }
 
-const results: PackageResult[] = [];
-const failures: PackageFailure[] = [];
-
-for (const packageName of packageNames) {
-  const result = await provisionPackage(packageName, options, token);
-  if ('failure' in result) {
-    failures.push(result.failure);
-    continue;
+if (import.meta.main) {
+  if (Deno.args.includes('--help') || Deno.args.includes('-h')) {
+    printHelp();
+    Deno.exit(0);
   }
-  results.push(result.result);
-  console.log(`${packageName}: ${result.result.state} + ${result.result.linkState}`);
-}
 
-const created = results.filter((result) => result.state === 'created').length;
-const linked =
-  results.filter((result) => result.linkState === 'linked' || result.linkState === 'already-linked')
-    .length;
-console.log(
-  `provisioned ${results.length}/${packageNames.length} (created ${created}, linked ${linked}), failures ${failures.length}`,
-);
+  const options = parseArgs(Deno.args);
+  const members = await discoverWorkspaceMembers(options.root);
+  const packageNames = members.map((member) => packageSegment(member.name));
 
-if (failures.length > 0) {
-  for (const failure of failures) {
-    console.error(`${failure.packageName}: ${failure.action} failed: ${failure.reason}`);
+  console.log(`discovered ${packageNames.length} workspace members: ${packageNames.join(', ')}`);
+
+  const token = Deno.env.get('JSR_API_TOKEN')?.trim();
+  if (!token && !options.dryRun) {
+    console.log(
+      'JSR_API_TOKEN not set — running public checks before deciding if writes are needed',
+    );
   }
-  Deno.exit(1);
-}
 
-if (!token && !options.dryRun) {
-  console.log('JSR_API_TOKEN not set — no writes needed (packages already provisioned)');
+  const results: PackageResult[] = [];
+  const failures: PackageFailure[] = [];
+
+  for (const packageName of packageNames) {
+    const result = await provisionPackage(packageName, options, token);
+    if ('failure' in result) {
+      failures.push(result.failure);
+      continue;
+    }
+    results.push(result.result);
+    console.log(`${packageName}: ${result.result.state} + ${result.result.linkState}`);
+  }
+
+  const created = results.filter((result) => result.state === 'created').length;
+  const linked = results.filter((result) =>
+    result.linkState === 'linked' || result.linkState === 'already-linked'
+  ).length;
+  console.log(
+    `provisioned ${results.length}/${packageNames.length} (created ${created}, linked ${linked}), failures ${failures.length}`,
+  );
+
+  if (failures.length > 0) {
+    for (const failure of failures) {
+      console.error(`${failure.packageName}: ${failure.action} failed: ${failure.reason}`);
+    }
+    Deno.exit(1);
+  }
+
+  if (!token && !options.dryRun) {
+    console.log('JSR_API_TOKEN not set — no writes needed (packages already provisioned)');
+  }
 }
 
 async function provisionPackage(

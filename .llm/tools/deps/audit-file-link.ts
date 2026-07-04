@@ -123,4 +123,26 @@ async function main(): Promise<void> {
   Deno.exit(hasFail(findings) ? 1 : 0);
 }
 
-await main();
+function printHelp(): void {
+  console.log(
+    [
+      'deps/audit-file-link.ts — report file:/link: dependency specifiers in publishable members',
+      '',
+      'Usage:',
+      '  deno run --allow-read .llm/tools/deps/audit-file-link.ts [flags]',
+      '',
+      'Flags:',
+      '  --json                full JSON findings instead of the text report',
+      '  --fail-on-violation   emit findings at FAIL level (exit 1 on any finding)',
+      '  --help, -h            show this help',
+    ].join('\n'),
+  );
+}
+
+if (import.meta.main) {
+  if (Deno.args.includes('--help') || Deno.args.includes('-h')) {
+    printHelp();
+    Deno.exit(0);
+  }
+  await main();
+}

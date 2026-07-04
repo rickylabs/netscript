@@ -110,4 +110,27 @@ async function main() {
   }
 }
 
-await main();
+function printHelp(): void {
+  console.log(
+    [
+      'deps/why.ts — structured wrapper over `deno why <package>` + source-usage grep',
+      '',
+      'Usage:',
+      '  deno run --allow-read --allow-run .llm/tools/deps/why.ts <package> [--pretty]',
+      '',
+      'Flags:',
+      '  --pretty    human-readable summary instead of JSON',
+      '  --help, -h  show this help',
+      '',
+      'Output (default): JSON { package, sourceUsed, transitivelyPresent, likelyDeadImport, ... }.',
+    ].join('\n'),
+  );
+}
+
+if (import.meta.main) {
+  if (Deno.args.includes('--help') || Deno.args.includes('-h')) {
+    printHelp();
+    Deno.exit(0);
+  }
+  await main();
+}

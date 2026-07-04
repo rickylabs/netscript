@@ -61,4 +61,29 @@ async function main() {
   if (args.failOnFind && advisoriesFound) Deno.exit(1);
 }
 
-await main();
+function printHelp(): void {
+  console.log(
+    [
+      'deps/audit.ts — structured JSON wrapper over `deno audit`',
+      '',
+      'Usage:',
+      '  deno run --allow-read --allow-net --allow-run .llm/tools/deps/audit.ts [flags]',
+      '',
+      'Flags:',
+      '  --level <critical|high|moderate|low>   severity floor (default: low)',
+      '  --pretty                               human-readable output instead of JSON',
+      '  --fail-on-find                         exit 1 if advisories are found',
+      '  --help, -h                             show this help',
+      '',
+      'Output (default): JSON { generatedAt, level, exitCode, advisoriesFound, ... }.',
+    ].join('\n'),
+  );
+}
+
+if (import.meta.main) {
+  if (Deno.args.includes('--help') || Deno.args.includes('-h')) {
+    printHelp();
+    Deno.exit(0);
+  }
+  await main();
+}

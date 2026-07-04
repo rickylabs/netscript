@@ -13,11 +13,11 @@
  * pins from the root catalog (see `generate-app-deno-json.ts`), not here.
  *
  * Usage:
- *   deno run .llm/tools/check-scaffold-versions.ts [--aspire-only] [--pretty] [--quiet]
+ *   deno run .llm/tools/check-scaffold-versions.ts [--aspire-only] [--pretty] [--quiet] [--help]
  *
  * Exit codes: 0 = all pins stable · 1 = at least one prerelease pin (E-12 FAIL).
  *
- * Static import = no runtime permissions required (safe as a CI gate).
+ * Perms: none — static import only, no runtime `--allow-*` required (safe as a CI gate).
  */
 import { SCAFFOLD_VERSIONS } from '../../packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts';
 
@@ -91,4 +91,29 @@ function main(): void {
   Deno.exit(ok ? 0 : 1);
 }
 
-main();
+function printHelp(): void {
+  console.log(
+    [
+      'check-scaffold-versions.ts — E-12 / LD-7 guard: scaffold version pins must be stable',
+      '',
+      'Usage:',
+      '  deno run .llm/tools/check-scaffold-versions.ts [flags]',
+      '',
+      'Flags:',
+      '  --aspire-only   only check the Aspire/.NET scaffold pins (LD-7 scope)',
+      '  --pretty        human-readable output instead of JSON',
+      '  --quiet         suppress the report (exit code only)',
+      '  --help, -h      show this help',
+      '',
+      'Exit codes: 0 = all pins stable · 1 = at least one prerelease pin (E-12 FAIL).',
+    ].join('\n'),
+  );
+}
+
+if (import.meta.main) {
+  if (Deno.args.includes('--help') || Deno.args.includes('-h')) {
+    printHelp();
+    Deno.exit(0);
+  }
+  main();
+}

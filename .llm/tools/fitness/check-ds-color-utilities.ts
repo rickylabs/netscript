@@ -40,6 +40,25 @@ const ARBITRARY_COLOR_UTILITY = new RegExp(
   'g',
 );
 
+if (Deno.args.includes('--help') || Deno.args.includes('-h')) {
+  console.log(
+    [
+      'check-ds-color-utilities.ts — DS gate: no off-vocabulary color utilities in fresh-ui',
+      '',
+      'Usage:',
+      '  deno run --allow-read .llm/tools/fitness/check-ds-color-utilities.ts [--root <dir>]',
+      '',
+      'Flags:',
+      `  --root <dir>   package root to scan (default: ${DEFAULT_PACKAGE_ROOT})`,
+      '  --help, -h     show this help',
+      '',
+      'Opt out a documented exception with a `ds-allow-color-utility` comment on the same line.',
+      'Exit codes: 0 = clean · 1 = at least one off-vocabulary color utility.',
+    ].join('\n'),
+  );
+  Deno.exit(0);
+}
+
 const violations: string[] = [];
 let scanned = 0;
 

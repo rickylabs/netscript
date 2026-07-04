@@ -71,4 +71,26 @@ async function main(): Promise<void> {
   Deno.exit(hasFail(findings) ? 1 : 0);
 }
 
-await main();
+function printHelp(): void {
+  console.log(
+    [
+      'deps/scan-jsr-centralization.ts — report shared JSR deps with divergent version ranges',
+      '',
+      'Usage:',
+      '  deno run --allow-read .llm/tools/deps/scan-jsr-centralization.ts [flags]',
+      '',
+      'Flags:',
+      '  --json                JSON findings instead of the text report',
+      '  --fail-on-violation   emit findings at FAIL level (exit 1 on any finding)',
+      '  --help, -h            show this help',
+    ].join('\n'),
+  );
+}
+
+if (import.meta.main) {
+  if (Deno.args.includes('--help') || Deno.args.includes('-h')) {
+    printHelp();
+    Deno.exit(0);
+  }
+  await main();
+}

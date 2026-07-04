@@ -112,108 +112,138 @@ const FALLBACK_DEFAULTS: PackageSettings = {
   runtimeCompat: { deno: true },
 };
 
-const options = parseArgs(Deno.args);
-const members = await discoverWorkspaceMembers(options.root);
-const config = await loadConfig(options.configPath ?? `${options.root}/${CONFIG_BASENAME}`);
-assertConfigPackagesExist(config, members);
-
-console.log(`discovered ${members.length} workspace members`);
-
-const token = Deno.env.get('JSR_API_TOKEN')?.trim();
-if (!token && !options.dryRun) {
-  console.log('JSR_API_TOKEN not set — running read-only diff (no settings will be written)');
+function printHelp(): void {
+  console.log(
+    [
+      'jsr-set-package-settings.ts — idempotently reconcile JSR per-package settings',
+      '(readmeSource, description, runtimeCompat) for every publishable member.',
+      '',
+      'Usage:',
+      '  deno run --allow-net --allow-read --allow-env \\',
+      '    .llm/tools/jsr-set-package-settings.ts [flags]',
+      '',
+      'Flags:',
+      '  --scope <name>    JSR scope (default: netscript)',
+      '  --root <dir>      workspace root to discover members from',
+      '  --config <path>   settings config (default: <root>/jsr-package-settings.json)',
+      '  --dry-run         report the diff without writing (no token needed)',
+      '  --help, -h        show this help',
+      '',
+      'Writes require JSR_API_TOKEN with package-edit scope; without it the tool',
+      'runs read-only and reports the diff it would apply.',
+    ].join('\n'),
+  );
 }
 
-const failures: SettingsFailure[] = [];
-let changed = 0;
-let unchanged = 0;
-let wouldChange = 0;
-
-for (const member of members) {
-  const packageName = packageSegment(member.name);
-  const desired = await resolveDesiredSettings(packageName, member, options.root, config);
-
-  const existing = await requestApi(
-    'GET',
-    `/scopes/${options.scope}/packages/${packageName}`,
-  );
-  if (existing.kind !== 'ok') {
-    failures.push({
-      packageName,
-      action: 'read',
-      reason: formatApiError(existing),
-    });
-    continue;
+if (import.meta.main) {
+  if (Deno.args.includes('--help') || Deno.args.includes('-h')) {
+    printHelp();
+    Deno.exit(0);
   }
 
-  const patch = diffSettings(existing.body, desired);
-  const fields = Object.keys(patch);
-  if (fields.length === 0) {
-    unchanged += 1;
-    console.log(`${packageName}: up to date`);
-    continue;
+  const options = parseArgs(Deno.args);
+  const members = await discoverWorkspaceMembers(options.root);
+  const config = await loadConfig(options.configPath ?? `${options.root}/${CONFIG_BASENAME}`);
+  assertConfigPackagesExist(config, members);
+
+  console.log(`discovered ${members.length} workspace members`);
+
+  const token = Deno.env.get('JSR_API_TOKEN')?.trim();
+  if (!token && !options.dryRun) {
+    console.log('JSR_API_TOKEN not set — running read-only diff (no settings will be written)');
   }
 
-  if (options.dryRun) {
-    wouldChange += 1;
-    console.log(`${packageName}: would update ${fields.join(', ')}`);
-    continue;
-  }
+  const failures: SettingsFailure[] = [];
+  let changed = 0;
+  let unchanged = 0;
+  let wouldChange = 0;
 
-  if (!token) {
-    wouldChange += 1;
-    console.log(`${packageName}: needs update (${fields.join(', ')}) but no token`);
-    continue;
-  }
+  for (const member of members) {
+    const packageName = packageSegment(member.name);
+    const desired = await resolveDesiredSettings(packageName, member, options.root, config);
 
-  // The JSR update endpoint deserializes the body into an externally-tagged
-  // enum (`ApiUpdatePackageRequest`) that accepts EXACTLY ONE field per
-  // request. A merged multi-field body fails to parse server-side with
-  // HTTP 400 `malformedRequest` ("expected value ..."). Send one PATCH per
-  // changed field.
-  const applied: string[] = [];
-  let packageFailed = false;
-  for (const field of fields) {
-    const singleFieldBody = { [field]: patch[field] };
-    const updated = await requestApi(
-      'PATCH',
+    const existing = await requestApi(
+      'GET',
       `/scopes/${options.scope}/packages/${packageName}`,
-      token,
-      singleFieldBody,
     );
-    if (updated.kind === 'ok') {
-      applied.push(field);
-    } else {
-      packageFailed = true;
+    if (existing.kind !== 'ok') {
       failures.push({
         packageName,
-        action: `update ${field}`,
-        reason: formatApiError(updated),
+        action: 'read',
+        reason: formatApiError(existing),
       });
+      continue;
+    }
+
+    const patch = diffSettings(existing.body, desired);
+    const fields = Object.keys(patch);
+    if (fields.length === 0) {
+      unchanged += 1;
+      console.log(`${packageName}: up to date`);
+      continue;
+    }
+
+    if (options.dryRun) {
+      wouldChange += 1;
+      console.log(`${packageName}: would update ${fields.join(', ')}`);
+      continue;
+    }
+
+    if (!token) {
+      wouldChange += 1;
+      console.log(`${packageName}: needs update (${fields.join(', ')}) but no token`);
+      continue;
+    }
+
+    // The JSR update endpoint deserializes the body into an externally-tagged
+    // enum (`ApiUpdatePackageRequest`) that accepts EXACTLY ONE field per
+    // request. A merged multi-field body fails to parse server-side with
+    // HTTP 400 `malformedRequest` ("expected value ..."). Send one PATCH per
+    // changed field.
+    const applied: string[] = [];
+    let packageFailed = false;
+    for (const field of fields) {
+      const singleFieldBody = { [field]: patch[field] };
+      const updated = await requestApi(
+        'PATCH',
+        `/scopes/${options.scope}/packages/${packageName}`,
+        token,
+        singleFieldBody,
+      );
+      if (updated.kind === 'ok') {
+        applied.push(field);
+      } else {
+        packageFailed = true;
+        failures.push({
+          packageName,
+          action: `update ${field}`,
+          reason: formatApiError(updated),
+        });
+      }
+    }
+    if (applied.length > 0) {
+      changed += 1;
+      console.log(`${packageName}: updated ${applied.join(', ')}`);
+    } else if (!packageFailed) {
+      unchanged += 1;
     }
   }
-  if (applied.length > 0) {
-    changed += 1;
-    console.log(`${packageName}: updated ${applied.join(', ')}`);
-  } else if (!packageFailed) {
-    unchanged += 1;
+
+  console.log(
+    `settings reconciled: ${changed} updated, ${unchanged} unchanged, ${wouldChange} pending, failures ${failures.length}`,
+  );
+
+  if (failures.length > 0) {
+    for (const failure of failures) {
+      console.error(`${failure.packageName}: ${failure.action} failed: ${failure.reason}`);
+    }
+    Deno.exit(1);
   }
-}
 
-console.log(
-  `settings reconciled: ${changed} updated, ${unchanged} unchanged, ${wouldChange} pending, failures ${failures.length}`,
-);
-
-if (failures.length > 0) {
-  for (const failure of failures) {
-    console.error(`${failure.packageName}: ${failure.action} failed: ${failure.reason}`);
+  if (!token && !options.dryRun && wouldChange > 0) {
+    console.error('JSR_API_TOKEN not set but settings changes are needed.');
+    Deno.exit(1);
   }
-  Deno.exit(1);
-}
-
-if (!token && !options.dryRun && wouldChange > 0) {
-  console.error('JSR_API_TOKEN not set but settings changes are needed.');
-  Deno.exit(1);
 }
 
 async function resolveDesiredSettings(
