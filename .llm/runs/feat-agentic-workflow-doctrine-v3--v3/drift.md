@@ -19,3 +19,21 @@ Append-only. Severity: minor | significant | architectural.
   written lane-policy doctrine (S2 still documents the general Tier A–E model per §2); it is a
   run-scoped execution choice, recorded here per "drift is explicit". IMPL-EVAL remains OpenHands,
   separate session.
+- **D4 (minor, 2026-07-04)**: The PLAN-EVAL evaluator's OpenHands job errored after producing its
+  verdict — the PASS was posted to PR #390 (issuecomment-4881028564) but the mandatory
+  `plan-eval.md` artifact never landed on the branch. The supervisor transcribed the posted verdict
+  into `plan-eval.md` with a provenance note (transcription, not supervisor certification). The
+  evaluator session separation is intact; only the artifact delivery failed.
+- **D5-slice-review-gate (significant, 2026-07-04)**: Owner-directed scope amendment AFTER
+  PLAN-EVAL PASS. The substantive per-slice supervisor review is not run-local behavior — it becomes
+  **permanent, lane-agnostic harness doctrine** ("Slice review gate"): after an implementation
+  sub-agent lands a slice and automated gates pass, the **Tier-A supervisor performs a substantive
+  intelligence review of the slice content (correctness, coherence with already-landed slices,
+  doctrine-fit, gaps/overreach) BEFORE the sign-off commit** — the commit is the supervisor's
+  sign-off, not the implementer's. This holds for **every implementation lane without exception**
+  (Tier B Opus sub-agents, Tier C Workflow-generated slices, Tier D WSL Codex); no lane
+  self-certifies. Codified in V3 as: invariant wording in `workflow/lane-policy.md` (S2) +
+  discoverable reference in the `netscript-harness` SKILL (S2) + concrete run-loop step between
+  automated gates and sign-off commit in `workflow/run-loop.md` (S5). Recorded as design-v3.md
+  Amendment A1; applied immediately to in-flight slices (each slice's worklog entry notes the
+  review + any findings).

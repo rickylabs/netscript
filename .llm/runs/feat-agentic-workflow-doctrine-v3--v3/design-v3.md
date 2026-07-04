@@ -1,8 +1,20 @@
 # V3 DESIGN — Agentic Workflow Doctrine (harness V3)
 
-Status: READY FOR PLAN-EVAL (R1 + R2 folded; open decisions swept + resolved). This document is the
-PLAN-EVAL subject.
+Status: PLAN-EVAL PASSED (see `plan-eval.md`); implementation in flight under the D3 lane override.
+Amendment A1 (below) added post-PLAN-EVAL by owner directive — recorded in `drift.md`
+D5-slice-review-gate.
 Epic #389 · Draft PR #390 · Adopts #306 · Enforces #387 direction · Coordinates with #305.
+
+> **Amendment A1 — Slice review gate (owner-directed, 2026-07-04, post-PLAN-EVAL).** New permanent,
+> **lane-agnostic** harness doctrine: after an implementation sub-agent lands a slice and its
+> automated gates pass, the **Tier-A supervisor performs a substantive intelligence review of the
+> slice content — correctness, coherence with already-landed slices, doctrine-fit, gaps/overreach —
+> BEFORE the commit that signs it off**; the sign-off commit is the supervisor's, not the
+> implementer's. This applies to every implementation tier (B Opus sub-agents, C Workflow-generated
+> slices, D WSL Codex) — **no lane self-certifies**. Codified in S2 (`workflow/lane-policy.md`
+> invariant + `netscript-harness` SKILL reference) and S5 (`workflow/run-loop.md` step between
+> automated gates and sign-off commit). Scope impact: minor additions to S2/S5; slice count
+> unchanged.
 
 ## 1. Problem
 
@@ -134,8 +146,11 @@ S1 = this design doc → PLAN-EVAL (hard stop). On PASS, sub-issues `[harness-v3
 #389, then:
 
 - **S2 — lane policy + tiered model** (Tier D Codex; doc-heavy parts Tier B). New
-  `workflow/lane-policy.md` (§2 tiering + model bindings; invariant generator≠evaluator-session);
-  add tiered-agent model + supervisor-identity requirement to `netscript-harness` SKILL, re-baseline
+  `workflow/lane-policy.md` (§2 tiering + model bindings; invariant generator≠evaluator-session;
+  **+A1: lane-agnostic Slice review gate invariant — no implementation lane B/C/D self-certifies;
+  Tier-A supervisor reviews substantively before the sign-off commit**);
+  add tiered-agent model + supervisor-identity requirement + **A1 Slice-review-gate reference** to
+  `netscript-harness` SKILL, re-baseline
   its "v2"/profile framing. Gate: `agentic:check-claude` + `agentic:sync-claude:check`.
 - **S3 — run-dir relocation** (Tier C Workflow; workflow.js committed first). Repath
   `.llm/tmp/run/` → `.llm/runs/` across the ~30 migration-relevant files (harness workflow/templates/
@@ -150,8 +165,9 @@ S1 = this design doc → PLAN-EVAL (hard stop). On PASS, sub-issues `[harness-v3
   table. Gate: check wrapper on watch-run.ts + sync check.
 - **S5 — GitHub-surface codification** (Tier B/D). Draft-PR-on-start + stage-label lifecycle +
   #387 close-gate + epic/sub-issue standard (`Epic:` + `[<epic-slug> S#]`, OD2) into `netscript-pr`;
-  add reconcile-loop + Release-phase to `run-loop.md`/`evaluator/protocol.md`; PR/issue template
-  close-gate checkbox. NO new labels (OD1). Gate: sync check.
+  add reconcile-loop + Release-phase + **A1 Slice-review-gate step (between automated gates and the
+  sign-off commit, all implementation tiers)** to `run-loop.md`/`evaluator/protocol.md`; PR/issue
+  template close-gate checkbox. NO new labels (OD1). Gate: sync check.
 - **S6 — tooling mandates + aliases** (Tier D Codex). Make `run-deno-check|lint|fmt` + `deps/*`
   mandatory in `netscript-tools` + `netscript-deno-toolchain` + harness gate docs; add `agentic:*`
   task aliases for the 10 unwired supervisor tools; wire/cite `run-deno-doc-lint.ts`; document
