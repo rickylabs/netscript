@@ -43,3 +43,21 @@ for a final adversarial validation pass before IMPL-EVAL**, to close gaps ahead 
 Tier E (OpenHands, separate session) still owns IMPL-EVAL. The Fable 5 supervisor orchestrates:
 briefs, sequencing, run-dir upkeep, GitHub surface, and per-slice review. Recorded in `drift.md`
 (D3-lane-override).
+
+## Run status — CLOSED / MERGED (2026-07-04)
+
+| Field | Value |
+| --- | --- |
+| Stage | **merged / done** |
+| PLAN-EVAL | PASS (OpenHands minimax-M3, separate session; `plan-eval.md`) |
+| IMPL-EVAL | PASS (OpenHands qwen-3.7-max, separate session; `impl-eval.md`) |
+| Delivered slices | S1–S10 + Amendments A1 (lane-agnostic slice-review gate) + A2 (`.llm/tools` refactor + `.llm/*` sweep) + WSL Codex adversarial pass |
+| PR | #390 **MERGED** (squash `eeaff336` on `main`); run branch deleted |
+| Main-drift reconciled | merge `266c0f74` (main @ `78eda7f0` / #395) |
+| Epic | #389 left **OPEN** (umbrella — no closing keyword) |
+| main-push `ci` (`eeaff336`) | GREEN (`quality` / `check-test` / `deps-report`) |
+| Out-of-surface follow-ups | #305 (doctrine fitness-inventory / AP-25-vs-AP-30 / `docs/**` refs — drift D7/D8), #307 (tools audit) |
+| Closeout | run-dir-only bookkeeping on `chore/harness-v3-run-closeout` off updated `main` (run branch was deleted at merge) |
+
+Supervisor stood down after the merge trigger (owned by the coordinator per channel discipline) and
+this closeout. No open V3 action items in-surface.

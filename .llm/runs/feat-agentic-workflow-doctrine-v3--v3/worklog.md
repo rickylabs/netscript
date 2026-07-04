@@ -550,3 +550,42 @@ Opus 4.8 sub-agent, then A1-reviewed + re-gated.
 - **Stage**: `status:impl-eval → status:ready-merge`; PR DoD item 7 checked with the verdict link.
 - **HARD HOLD**: no merge, no issue close — owner's call. Ready-merge evidence bundle handed to the
   coordinator.
+
+## 2026-07-04 — Pre-merge main-drift reconcile (merge `266c0f74`)
+
+- PR #390 went `mergeable: CONFLICTING` / `DIRTY` after main advanced one commit (`78eda7f0`, #395 —
+  the `JSR_API_TOKEN` CI fix, `.github/workflows/publish.yml` only). Merged `origin/main` **into** the
+  branch (merge, not rebase, per coordinator) → single conflict in `publish.yml`.
+- **Conflict resolved "keep both"** (complementary, no semantic contradiction): main's
+  `JSR_API_TOKEN: ${{ secrets.JSR_API_TOKEN }}` on the two `env:` lines + our S9 restructure
+  `run:` tool paths (`.llm/tools/release/jsr-provision-packages.ts`,
+  `.llm/tools/release/jsr-set-package-settings.ts`). All 4 referenced `release/` tools verified present.
+- **Authoritative `.llm` gates re-run on the merge (all green)**: `.llm/tools` type-check 69 files /
+  0 errors; `docs:links` 92 docs / 0 broken; `agentic:sync-claude:check` OK (17 skills / 21 files);
+  `agentic:check-claude` OK (lock unchanged). `deno.lock` transient `@std/*` churn `git restore`d —
+  not committed.
+- **PR CI on the merge**: required `quality` / `check-test` / `deps-report` all green;
+  `scaffold-runtime` (aspire+docker+postgres) **success** (merge-readiness authority, no db-init flake);
+  `scaffold-static` success. Un-drafted the PR (residual `blocked` was draft state, not a conflict) →
+  `mergeable: MERGEABLE` / `clean`. Commit `266c0f74`. Handed the merge trigger to the coordinator
+  (channel discipline: no self-merge on a relay).
+
+## 2026-07-04 — Run CLOSED — MERGED
+
+- **PR #390 MERGED** by the coordinator (owner-authorized) via squash — squash commit **`eeaff336`**
+  on `main` (`feat(harness): Agentic Workflow Doctrine V3 — tiered agents, tracked runs, stage-labeled
+  PRs (#390)`); branch `feat/agentic-workflow-doctrine-v3` deleted. Main-drift brought in by merge
+  `266c0f74` (main @ `78eda7f0` / #395). IMPL-EVAL verdict: **PASS** (OpenHands qwen-3.7-max, separate
+  session; `impl-eval.md`).
+- **Epic #389 left OPEN** (correct — umbrella carries no closing keyword; V3 is one delivered slice of
+  the road-to-stable program, cumulative work continues under it).
+- **main-push `ci` on `eeaff336`: GREEN** — `quality` success, `check-test` success, `deps-report`
+  success (`agent` skipped). Lighter main-push scope; V3 touched zero `packages/`/`plugins/`.
+- **Run stage → `merged` / done.** All slices S1–S10 + Amendments A1/A2 + WSL Codex adversarial pass +
+  IMPL-EVAL PASS delivered. Out-of-surface follow-ups remain tracked on **#305** (doctrine-prose
+  fitness-inventory reconcile, AP-25-vs-AP-30 ceiling, `docs/**` stale tool-name refs — drift D7/D8) and
+  **#307** (tools audit / ~28 unwired-fitness verdict already actioned in S9). No new debt opened by
+  the closeout.
+- Closeout bookkeeping (this entry + `supervisor.md` status + `drift.md` D10 + `context-pack.md`)
+  landed run-dir-only on a short-lived branch off updated `main` (`chore/harness-v3-run-closeout`),
+  since the run branch was deleted at merge.

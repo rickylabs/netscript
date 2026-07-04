@@ -135,3 +135,14 @@ Append-only. Severity: minor | significant | architectural.
   supervisor faithfully **transcribed** the evaluator's verbatim verdict into `impl-eval.md` (same
   mechanism as D4/plan-eval.md), attributed to the evaluator with the run + comment links. Verdict
   content is the evaluator's, not the supervisor's. No self-certification.
+- **D10-closeout-branch (minor, 2026-07-04)**: PR #390 was squash-merged (`eeaff336`) and its branch
+  `feat/agentic-workflow-doctrine-v3` deleted at merge. The Close-phase run-dir bookkeeping (final
+  `worklog.md` merge entry + `supervisor.md` run-status + `context-pack.md` MERGED currency + this
+  entry) therefore could **not** land on the run branch. Per the coordinator's judgment call and the
+  standing "branch first / never push to `main` directly" rule, closeout landed run-dir-only on a
+  fresh short-lived branch off updated `main` (`chore/harness-v3-run-closeout`) via a tiny PR — not a
+  direct-to-main commit. No divergence from plan or doctrine; recorded for provenance completeness.
+- **Closeout note (no open in-surface drift)**: all V3 divergences above are either resolved
+  (D1–D5, D9) or captured as out-of-surface #305/#307 follow-ups (D6-A2 actioned; D7/D7b/D7c/D7d, D8).
+  The pre-merge conflict (`publish.yml`, #395 vs S9 paths) resolved keep-both with no semantic
+  contradiction. IMPL-EVAL PASS; nothing deferred as new arch-debt. Run CLOSED / MERGED.
