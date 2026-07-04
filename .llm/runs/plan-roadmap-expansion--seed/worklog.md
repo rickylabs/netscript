@@ -1,13 +1,14 @@
-# Worklog: <target>
+# Worklog: roadmap-expansion planning run
 
 ## Run Metadata
 
-| Field          | Value                          |
-| -------------- | ------------------------------ |
-| Run ID         | `<run-id>`                     |
-| Branch         | `<branch>`                     |
-| Archetype      | `<N - name or N/A>`            |
-| Scope overlays | `<frontend/service/docs/none>` |
+| Field          | Value                                                        |
+| -------------- | ------------------------------------------------------------ |
+| Run ID         | `plan-roadmap-expansion--seed`                               |
+| Branch         | `plan/roadmap-expansion` (draft PR #397)                     |
+| Archetype      | N/A — planning-only supervisor run (no framework code)       |
+| Scope overlays | docs (planning artifacts only)                               |
+| Supervisor     | Fable 5 (this session); B=Sonnet 5, D=Opus 4.8, F1=WSL Codex, G=OpenHands minimax M3 |
 
 ## Design
 
@@ -46,9 +47,11 @@ full requirement.
 
 ## Progress Log
 
-| Time     | Slice       | Step     | Notes     |
-| -------- | ----------- | -------- | --------- |
-| `<time>` | `<slice #>` | `<step>` | `<notes>` |
+| Time             | Slice | Step | Notes |
+| ---------------- | ----- | ---- | ----- |
+| 2026-07-04 (n1) | Stage A | Supervisor online | Charter + specs 00/01/02 + topics A–E read in full; harness skill activated; run dir + worktree + WSL gh auth verified; opening comment posted on PR #397 (4883200883). |
+| 2026-07-04 (n1) | Stage B | eis-chat reference staged | Private repo cloned in WSL home (9p chmod blocks direct clone), working tree exported via `git archive` to `.llm/tmp/eis-chat-ref` (1220 files; conventions.md / PRODUCT.md / DESKTOP-SHELL.md verified present). tar utime warnings on 9p are benign. |
+| 2026-07-04 (n1) | Stage B | Deep-search workflow launched | Realized as 5 concurrent Sonnet-5 agents (one per topic), each under the B1–B4 output contract writing `matrix|analysis|research|context/<topic>/`. Skill-first mandated in every brief; facts-over-verdicts on delegated decisions (D-NSONE, grouped-trace flow, E sequencing). |
 
 ## Decisions
 

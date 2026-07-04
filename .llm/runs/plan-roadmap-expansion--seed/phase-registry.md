@@ -1,73 +1,49 @@
-# Phase Group Registry: <supervisor>
+# Phase Registry: plan-roadmap-expansion (A→G delegation flow)
 
-The group map for a supervisor run. One row/section per **phase group** (a capability-scoped
-deliverable = one branch + worktree + nested run + sub-PR + evaluator passes: PLAN-EVAL before
-implementation, IMPL-EVAL after). See `workflow/supervisor.md`.
+Planning-only supervisor run. The "groups" here are the owner-specified delegation stages from
+`specs/00-mission-and-flow.md`, not implementation phase groups — no framework code is produced in
+this run. One branch (`plan/roadmap-expansion`), one draft PR (#397), all artifacts under this run
+dir.
 
 ## Run Metadata
 
-| Field              | Value                 |
-| ------------------ | --------------------- |
-| Supervisor run ID  | `<supervisor-run-id>` |
-| Integration branch | `feat/<supervisor>`   |
-| Base branch        | `<base>`              |
+| Field              | Value                          |
+| ------------------ | ------------------------------ |
+| Supervisor run ID  | `plan-roadmap-expansion--seed` |
+| Integration branch | `plan/roadmap-expansion`       |
+| Base branch        | `main`                         |
+| Draft PR           | #397 (stays draft; owner ratifies + cuts) |
 
-## Status Legend
+## Stage map (model/lane law: B=Sonnet 5, D=Opus 4.8, F1=WSL Codex, G=OpenHands minimax M3; Fable never fans out)
 
-| Status            | Meaning                                                      |
-| ----------------- | ------------------------------------------------------------ |
-| `planned`         | In the map, not started                                      |
-| `active`          | Group branch/worktree launched; implementation in progress   |
-| `plan-evaluating` | Handed to a separate PLAN-EVAL session                       |
-| `evaluating`      | Handed to a separate IMPL-EVAL session                       |
-| `merged`          | Evaluator `PASS` (or accepted `FAIL_DEBT`); merged `--no-ff` |
-| `blocked`         | Waiting on a dependency or a user decision                   |
-| `rescope`         | Under rescope (see `escalations/`)                           |
+| Stage | What                                                                 | Lane                         | Status  | Evidence |
+| ----- | -------------------------------------------------------------------- | ---------------------------- | ------- | -------- |
+| A     | Supervisor bootstrap: charter + specs read, run/PR verified          | Fable 5 (this session)       | done    | PR #397 comment 4883200883 |
+| B     | Deep-search corpus: B1 matrix / B2 analysis / B3 research / B4 context, one sub-folder per topic | 5 concurrent Sonnet 5 agents | active  | agents launched 2026-07-04; eis-chat export staged at `.llm/tmp/eis-chat-ref` |
+| C     | Fable analysis of the B corpus                                        | Fable 5                      | planned | — |
+| D     | Per-topic deep-dive design proposals (real designs, not surveys)      | Opus 4.8 agents (one per topic/hard sub-topic) | planned | — |
+| E     | Decide + lock design; write `research.md`, `plan.md`, `## Design`; resolve D-NSONE + grouped-trace flow; epics/sub-issues/DAG/briefs drafted | Fable 5 | planned | — |
+| F1    | Adversarial validation of the locked design                          | WSL Codex (daemon-attached)  | planned | — |
+| F2    | Fix/adjust from adversarial findings                                  | Fable 5                      | planned | — |
+| G     | PLAN-EVAL (hard stop — nothing is "ready" before PASS)                | OpenHands, minimax M3, separate session | planned | — |
 
-## Group <X> — <name>
+## Deliverables checklist (from specs/00 §Deliverables)
 
-| Field         | Value                            |
-| ------------- | -------------------------------- |
-| Group branch  | `feat/<supervisor>-<group>`      |
-| Nested run ID | `<supervisor>-<group>--<suffix>` |
-| Archetype(s)  | `<N - name>` + overlays          |
-| Status        | `<planned/active/…>`             |
-| Merge commit  | `<sha or —>`                     |
+- [ ] `research.md` + `plan.md` (locked decisions, archetypes, gates, debt) + `## Design`
+- [ ] Epic drafts: NEW `telemetry-revamp`, NEW `dev-dashboard`, rescope `#232` (C+D), rescope `#327` (E) — sub-issues, acceptance criteria, milestones, netscript-pr labels, dependency DAG (draft text only; NO GitHub mutations until owner ratifies)
+- [ ] Per-slice agent briefs (lane/model routing + `## SKILL` chapter each)
+- [ ] Open-decision register (D-NSONE + telemetry grouped-trace flow resolutions + any new forks → owner)
+- [ ] `plan-eval.md` = PASS
 
-### Pre-conditions
+## Hard boundaries (standing)
 
-- <what must be true / which prior group must be `merged` first>
-
-### Inherited debt
-
-- <open entries from prior groups this group must respect or close>
-
-### Phase 0 reading
-
-- <specific plan/research/decision files the group agent must read>
-
-### Surfaces touched
-
-- <packages / plugins / apps / services this group changes>
-
-### Success criteria
-
-- <the gate(s) that prove this group is done>
-
-### Notes
-
-- <parallel decision, risks, sequencing notes>
-
----
-
-## Summary Table
-
-| Group | Status     | Depends on     | Surfaces     | Merge commit |
-| ----- | ---------- | -------------- | ------------ | ------------ |
-| `<X>` | `<status>` | `<group/none>` | `<surfaces>` | `<sha/—>`    |
+- No issue/PR/label/milestone mutation until owner ratifies.
+- No framework/plugin code in this run.
+- Decisions beyond the delegated set, or touching locked positioning/invariants → back to the owner.
+- PR #397 stays draft; push after every stage with explicit refspec; PR comment + body checklist updated per stage.
 
 ## Base-Sync Log
 
-| Date           | Base sha merged | Result              | Notes     |
-| -------------- | --------------- | ------------------- | --------- |
-| `<YYYY-MM-DD>` | `<sha>`         | `<clean/conflicts>` | `<notes>` |
+| Date       | Base sha merged | Result | Notes                          |
+| ---------- | --------------- | ------ | ------------------------------ |
+| 2026-07-04 | eeaff336 (main) | clean  | seed branch cut from main + 2 seed commits |
