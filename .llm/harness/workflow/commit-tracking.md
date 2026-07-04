@@ -24,7 +24,7 @@ Good: `Add domain types, ports, and runner engine with passing tests` Bad:
 Path:
 
 ```text
-.llm/tmp/run/<run-id>/commits.md
+.llm/runs/<run-id>/commits.md
 ```
 
 The log is append-only for the run. Do not rewrite earlier entries unless the user explicitly asks

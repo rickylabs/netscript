@@ -11,7 +11,7 @@ alwaysApply: true
 # Harness Workflow
 
 - Start substantial work from `.llm/harness/workflow/activation.md`; keep run artifacts under
-  `.llm/tmp/run/<run-id>/`.
+  `.llm/runs/<run-id>/`.
 - Use `.llm/harness/workflow/run-loop.md` for the design checkpoint, implementation loop,
   validation notes, and handoff.
 - For multi-branch work, follow `.llm/harness/workflow/supervisor.md`: each group gets its own

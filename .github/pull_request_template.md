@@ -30,7 +30,7 @@ NetScript PR conventions (see .agents/skills/netscript-pr and CONTRIBUTING.md):
 
 ## Harness
 
-- Run dir: `.llm/tmp/run/<run-id>/` <!-- omit for non-harnessed PRs -->
+- Run dir: `.llm/runs/<run-id>/` <!-- omit for non-harnessed PRs -->
 - Phase: <research|plan|plan-eval|impl|impl-eval|review> — see phase comments below.
 
 ## Drift / Debt

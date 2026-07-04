@@ -30,7 +30,7 @@ The canonical details live in `AGENTS-handoff.md` and `.agents/skills/openhands-
 - The phrase `use harness` still activates the normal harness run loop.
 - PLAN-EVAL and IMPL-EVAL remain separate sessions. A cloud OpenHands run can perform one of those
   roles, but it must not self-certify work it generated in the same session.
-- Cloud agents must update the normal run artifacts under `.llm/tmp/run/<run-id>/` when the task is
+- Cloud agents must update the normal run artifacts under `.llm/runs/<run-id>/` when the task is
   a harness run.
 - The OpenHands workflow summary artifact is additional handoff evidence, not a replacement for
   `worklog.md`, `evaluate.md`, `drift.md`, or `commits.md`.

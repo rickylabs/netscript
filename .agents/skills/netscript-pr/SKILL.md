@@ -62,7 +62,7 @@ Always structure the body like this so reviewers and automation find the same an
 
 ## Harness
 
-- Run dir: `.llm/tmp/run/<run-id>/`
+- Run dir: `.llm/runs/<run-id>/`
 - Phase: <research|plan|plan-eval|impl|impl-eval|review> — see phase comments below.
 
 ## Drift / Debt
@@ -159,7 +159,7 @@ sync. Add labels there first — never delete an existing label (it strips the l
 carries a milestone.** New issues land with `status:triage` (the issue forms apply it automatically)
 until triaged.
 
-Source of truth stays the harness run artifacts under `.llm/tmp/run/`. Labels + Projects v2 are a
+Source of truth stays the harness run artifacts under `.llm/runs/`. Labels + Projects v2 are a
 **view and a trigger**, not the record. When you advance a phase, move the `status:` label in the
 same action you post the phase comment, so the board never lags the timeline.
 

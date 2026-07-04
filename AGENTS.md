@@ -56,7 +56,7 @@ Read only what the task needs.
 2. relevant `.agents/skills/*/SKILL.md`
 3. relevant doctrine files under `docs/architecture/doctrine/`
 4. relevant harness workflow/archetype/gate files under `.llm/harness/`
-5. relevant run artifacts under `.llm/tmp/run/`
+5. relevant run artifacts under `.llm/runs/`
 6. relevant package/plugin docs and README files
 7. focused code
 

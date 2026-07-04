@@ -45,7 +45,7 @@ self-certifies). Everything else is a per-run lane assignment recorded in the ru
 | **Plan-Gate**     | Checklist (`gates/plan-gate.md`) that PLAN-EVAL enforces.                               |
 | **Archetype**     | Package/plugin shape profile from `archetypes/ARCHETYPE-*.md`.                          |
 | **Scope overlay** | `SCOPE-frontend.md`, `SCOPE-service.md`, `SCOPE-docs.md`.                               |
-| **Run artifact**  | File in `.llm/tmp/run/<run-id>/` that preserves state across sessions.                  |
+| **Run artifact**  | File in `.llm/runs/<run-id>/` that preserves state across sessions.                     |
 | **Debt**          | Recorded in `.llm/harness/debt/arch-debt.md`.                                           |
 
 For a **supervisor run** (two or more capability-scoped phase groups), also read
@@ -69,7 +69,7 @@ intent hint, not the final profile.
 | `docs` or `knowledge-base` | `SCOPE-docs.md` plus any described archetypes               |
 
 1. Read `workflow/activation.md` and `workflow/run-loop.md`.
-2. If resuming, read `.llm/tmp/run/<run-id>/context-pack.md`.
+2. If resuming, read `.llm/runs/<run-id>/context-pack.md`.
 3. Identify the target surface and select archetype + overlays.
 4. Read `gates/archetype-gate-matrix.md` and `gates/plan-gate.md`.
 5. Scaffold run artifacts from `templates/`.
@@ -148,7 +148,7 @@ routing here — defer to that file. The items below are the parts of the contra
 
 ## Run Artifacts
 
-Run artifacts live under `.llm/tmp/run/<run-id>/` and use templates from `.llm/harness/templates/`.
+Run artifacts live under `.llm/runs/<run-id>/` and use templates from `.llm/harness/templates/`.
 
 `<run-id>` is the current branch name with `/` replaced by `-`, followed by `--<suffix>`.
 
@@ -170,13 +170,14 @@ Append `commits.md` immediately after every commit. Supervisor runs additionally
 `phase-registry.md`, `final-pr-handoff.md`, and an `escalations/` folder; brief each group agent
 with `templates/agent-briefing.md`.
 
-## `.llm/tmp` Path Caveat
+## `.llm/runs` Path Caveat
 
-Some search/index tools may skip or lag on `.llm/tmp/`. Verify run paths with a direct filesystem
-listing when needed:
+Some search/index tools may skip or lag on freshly written `.llm/runs/` run dirs (the same caveat
+that applied to the old `.llm/tmp/run/` location). Verify run paths with a direct filesystem listing
+when needed:
 
 ```powershell
-dir /s /b ".llm\tmp\run\<id>" 2>&1
+dir /s /b ".llm\runs\<id>" 2>&1
 ```
 
 ## Resource Aggregation
@@ -218,7 +219,7 @@ When a run requires commits:
 1. commit by implementation slice,
 2. push the branch,
 3. comment on the PR with slice scope, commit hash, and test evidence,
-4. append `.llm/tmp/run/<run-id>/commits.md`,
+4. append `.llm/runs/<run-id>/commits.md`,
 5. update `context-pack.md`,
 6. continue to the next slice.
 

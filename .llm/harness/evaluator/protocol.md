@@ -39,7 +39,7 @@ against the changed state, not to continue implementation.
 
 ## Output
 
-Write `.llm/tmp/run/<run-id>/evaluate.md` using `templates/evaluate.md`.
+Write `.llm/runs/<run-id>/evaluate.md` using `templates/evaluate.md`.
 
 ## Evidence Standard
 

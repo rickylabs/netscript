@@ -39,7 +39,7 @@ how an agent uses it during a run.
 
 ## Core Contract
 
-- Important state lives in `.llm/tmp/run/<run-id>/`, not chat memory.
+- Important state lives in `.llm/runs/<run-id>/`, not chat memory.
 - The generator fills a Design checkpoint before creating implementation files.
 - The generator commits by slice, not by monolith.
 - The generator does not self-certify completion.
@@ -52,7 +52,7 @@ how an agent uses it during a run.
 
 ## Run Artifacts
 
-Run artifacts live under `.llm/tmp/run/<run-id>/` and use the templates in `templates/`:
+Run artifacts live under `.llm/runs/<run-id>/` and use the templates in `templates/`:
 
 - `research.md`
 - `plan.md`

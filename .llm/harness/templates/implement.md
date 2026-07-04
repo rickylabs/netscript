@@ -9,8 +9,8 @@ Use this prompt for the generator session.
 3. Selected archetype profile (read its **Design Checkpoint Expectations** and **Concept of Done**
    sections).
 4. `.llm/harness/gates/archetype-gate-matrix.md`
-5. `.llm/tmp/run/<run-id>/plan.md`
-6. `.llm/tmp/run/<run-id>/context-pack.md` if present
+5. `.llm/runs/<run-id>/plan.md`
+6. `.llm/runs/<run-id>/context-pack.md` if present
 
 ## First Act: Design Checkpoint
 
@@ -27,6 +27,10 @@ mandatory. The evaluator will verify the design section exists and that commit s
 - Append `drift.md` when facts differ from the plan or doctrine.
 - Append `commits.md` immediately after every commit.
 - Update `context-pack.md` after each slice.
+- The run dir starts with `supervisor.md` (agent identity + lane table); a run dir without it is not
+  activated (see `workflow/lane-policy.md` § Supervisor identity).
+- If a slice runs a Tier C Workflow, commit its generated `workflow.js` to
+  `<run-dir>/workflows/<slice>-workflow.js` before executing it.
 
 ## Handoff Requirements
 

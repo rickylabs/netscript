@@ -6,7 +6,7 @@ Harness mode activates when the user says `use harness` or explicitly asks for a
 
 1. Read this file.
 2. Read `workflow/run-loop.md`.
-3. Read `.llm/tmp/run/<run-id>/context-pack.md` when resuming an existing run.
+3. Read `.llm/runs/<run-id>/context-pack.md` when resuming an existing run.
 4. Identify the target surface:
    - package or plugin: select a doctrine archetype.
    - app, service, docs, or infrastructure: select any affected package/plugin archetypes, then

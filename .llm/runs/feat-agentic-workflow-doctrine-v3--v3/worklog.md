@@ -101,4 +101,31 @@ concept named in `design-v3.md` §5/§8. Ready for PLAN-EVAL (OpenHands, separat
   OK → `agentic:check-claude` OK (all surface checks green, lock unchanged). File set matches §8-S2
   scope exactly (source SKILL + mirror + new lane-policy.md; no framework source).
 - **Reconcile**: no related-issue state change needed (S2 touches no issue acceptance boxes; #306
-  remains open, resolved cumulatively by this PR). No new labels. Commit sha recorded below.
+  remains open, resolved cumulatively by this PR). No new labels. Commit sha `f33141fd` (+ currency
+  `dca28ee9`).
+
+## 2026-07-04 — S3 landed (run-dir relocation)
+
+- **Author**: Opus 4.8 sub-agent (Tier B, D3 lane override), worktree `.llm/tmp/wt-harness-v3`.
+- **What**: relocated the harness run-dir convention `.llm/tmp/run/<run-id>/` (git-ignored) →
+  `.llm/runs/<run-id>/` (tracked) — drift D1's root-cause fix. 15 source files repathed: harness
+  `workflow/{activation,agent-handoff,commit-tracking,supervisor,retrieval-order}.md`,
+  `evaluator/protocol.md`, `README.md`, `templates/{agent-briefing,implement}.md`, `AGENTS.md`,
+  `.agents/rules/harness-workflow.mdc`, `.github/pull_request_template.md`, and 3 skills
+  (`netscript-harness`, `netscript-pr`, `fresh-ui-horizontal`). 3 mirrors regenerated. Templates
+  also gained the §3 supervisor.md-first + `workflows/<slice>-workflow.js`-before-run notes (pointing
+  to `lane-policy.md`). The SKILL `.llm/tmp` Path Caveat renamed to `.llm/runs` with a legacy note.
+- **Supervisor review (A1 gate)**: read the full classified grep hit list + all 15 diffs. Template
+  additions correct (point to lane-policy, do not restate). Boundary respected: `commits.md` tokens
+  left intact for S4 (only the co-located path repathed); Copilot/Augment residue left for S7;
+  OpenHands trace-output paths (`.github/workflows/openhands-agent.yml`, `openhands-handoff` L103)
+  left as a distinct live convention for the S7 agent-handoff contract; 6 `fitness/*.ts` output
+  defaults left under `.llm/tmp/` (ephemeral audit scratch, source-behavior change out of S3 scope).
+- **Gate**: `agentic:sync-claude` (SYNCED, 3 stale mirrors refreshed) → `agentic:sync-claude:check`
+  OK. **grep-zero of stale non-legacy convention refs holds** — all residual `.llm/tmp/run` hits are
+  OD4 concrete historical run-ids (`supervisor.md` L9, `lessons/*`, `debt/arch-debt.md` — evidence
+  links, not the convention placeholder), the OpenHands trace convention, or the one intentional
+  legacy note. `watch-run.ts`/`CONTRIBUTING.md`/`tools/README.md` were no-ops (no hardcoded base
+  path).
+- **Reconcile**: no related-issue state change. `commits.md` drop remains S4; watch-run.ts `--files`
+  default remains S4. Commit sha recorded below.

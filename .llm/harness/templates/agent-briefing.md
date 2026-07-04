@@ -19,8 +19,8 @@ You are implementing Phase Group <X> (<name>) of the <supervisor> supervisor run
 - Surfaces: <packages/plugins/apps/services>
 
 ### Required reading (in order)
-1. .llm/tmp/run/<supervisor-run-id>/plan.md
-2. .llm/tmp/run/<supervisor-run-id>/phase-registry.md  (§ Group <X> row)
+1. .llm/runs/<supervisor-run-id>/plan.md
+2. .llm/runs/<supervisor-run-id>/phase-registry.md  (§ Group <X> row)
 3. <supervisor-specific plan/research/decision files for this group>
 4. .agents/skills/netscript-harness/SKILL.md
 
@@ -31,11 +31,17 @@ select your archetype from archetypes/README.md; apply scope overlays; read
 gates/archetype-gate-matrix.md and debt/arch-debt.md.
 
 Create your run dir at:
-  .llm/tmp/run/<supervisor>-<group>--<suffix>/
+  .llm/runs/<supervisor>-<group>--<suffix>/
+Start it with `supervisor.md` (agent identity: model, session, host, worktree,
+branch, baseline SHA, lane table) — a run dir without it is not activated. See
+`workflow/lane-policy.md` § Supervisor identity.
 
 ### What you must produce
-- research.md, plan.md, worklog.md (Design checkpoint first), context-pack.md,
-  drift.md, commits.md
+- supervisor.md, research.md, plan.md, worklog.md (Design checkpoint first),
+  context-pack.md, drift.md, commits.md
+- If a slice runs a Tier C Workflow, commit its generated `workflow.js` to
+  `<run-dir>/workflows/<slice>-workflow.js` BEFORE executing it (see
+  `workflow/lane-policy.md` selection rule 2)
 - Sliced implementation commits per the Design checkpoint
 - Gate results recorded in worklog.md
 - A clean state ready for a SEPARATE PLAN-EVAL session (before implementation)

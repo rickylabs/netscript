@@ -19,7 +19,7 @@ pass_ — never a single command or file. Single-surface changes use the normal 
 ## Run layout
 
 - **Integration branch**: `feat/<supervisor>` (off the base branch).
-- **Supervisor run dir** `.llm/tmp/run/<supervisor-run-id>/`:
+- **Supervisor run dir** `.llm/runs/<supervisor-run-id>/`:
   - base templates — `plan.md`, `worklog.md`, `context-pack.md`, `drift.md`, `commits.md`;
   - **`phase-registry.md`** from `templates/phase-registry.md` — the group map, ordering, and live
     status;
@@ -53,7 +53,7 @@ git checkout -b feat/<supervisor>-<group>
 git worktree add .worktrees/<group> feat/<supervisor>-<group>
 
 # 3. Scaffold the group's nested harness run dir from templates/
-#    .llm/tmp/run/<supervisor>-<group>--<suffix>/
+#    .llm/runs/<supervisor>-<group>--<suffix>/
 
 # 4. Push the group branch and open a DRAFT sub-PR against the integration branch
 git push -u origin feat/<supervisor>-<group>

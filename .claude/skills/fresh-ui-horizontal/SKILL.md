@@ -66,7 +66,7 @@ skipped:
   follow-ups are new commits, hash-recorded.
 - Trailer on every commit: `Co-Authored-By: <model attribution line>`.
 - Append (never rewrite) `worklog.md`, `commits.md`, `drift.md` in
-  `.llm/tmp/run/<run-id>/`.
+  `.llm/runs/<run-id>/`.
 - Per-slice PR comment with a Gate(s) / Changed / Drift / Commits table.
 - Push both repos after every slice.
 
