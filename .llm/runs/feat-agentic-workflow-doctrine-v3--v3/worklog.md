@@ -494,3 +494,38 @@ the 2 dated singletons.
   already-gone run-ids (not these 108) — left as historical provenance, not rewritten (per owner).
 - **Next**: full-surface gates → WSL Codex adversarial (whole V3 surface, owner's pre-eval
   close-all-gaps pass) → OpenHands IMPL-EVAL (separate session). No merge/close.
+
+## Adversarial remediation — WSL Codex pre-eval pass (commit `1d50c6c3`)
+
+Ran the owner-directed WSL Codex adversarial review over the whole V3 surface (gpt-5.5, native
+worktree `netscript-harness-v3` at `bfb6185a`, thread `019f2d44`, READ-ONLY brief). Verdict:
+**1 blocker / 4 major / 3 minor / 0 nit — all in-surface, zero out-of-surface**. Supervisor
+independently re-verified every finding against the tree before acting; all valid. Fixed by an
+Opus 4.8 sub-agent, then A1-reviewed + re-gated.
+
+- **BLOCKER `.llm/tools/validation/check-internal-doc-links.ts`**: S9 moved this tool one level
+  deeper but `REPO_ROOT` still climbed 2 levels → resolved to `.llm/`, so `docs:links`
+  **false-passed with docs=0**. A type-check cannot catch a wrong-but-typed path constant — this is
+  precisely why the adversarial pass exists. Fixed with `findRepoRoot()` walk to the nearest
+  `deno.json` ancestor. **Proof**: `docs:links --root .llm/harness` now scans **54** docs (was 0),
+  0 broken links; `.llm/tools` type-check stays **69 files / 0 errors**.
+- **MAJOR ARCHETYPE-6**: static gates named undefined `deno task check:packages` + wrong-form
+  `fmt --check` → real `deno task check|lint|fmt:check`; F-CLI range header `…30` → `…31` (matched
+  the rest of the file; the two individual `F-CLI-30` gate refs correctly left unchanged).
+- **MAJOR 8→9 phase**: `netscript-harness/SKILL.md` + `.agents/skills/README.md` still advertised
+  the retired 8-phase model (omitting Release); aligned to run-loop.md's 9 phases and **regenerated
+  the `.claude/skills` mirror** via `agentic:sync-claude` (sync:check OK, 17 skills / 21 files). S10
+  fixed the harness docs but had missed the skill — the review caught the gap the mirror couldn't.
+- **MAJOR `feature_request.yml`**: `["enhancement","status:triage"]` → `["type:feat",
+  "status:triage"]` (namespaced `type:` per netscript-pr; both labels confirmed in `.github/labels.yml`).
+- **MINOR verbatim titles**: `anti-pattern-catalog.md` (AP-9/15/17/18/20) + `archetype-gate-matrix.md`
+  and `templates/evaluate.md` (F-6/8/9/13/15/17) aligned **verbatim** to doctrine 09 headings
+  (supervisor cross-checked each against `09-*.md`).
+- **MINOR `.llm/tools/entry.md`**: "Deno 2.8" → "Deno 2.9".
+- **Lock hygiene**: running deno gates re-added the transient `jsr:@std/fs@*` + `jsr:@std/path@*`
+  lines to `deno.lock`; `git restore`d before staging — **not committed** (docs/tooling slice).
+- **Reviewer clean confirmations** (corroborate the earlier gates): no dangling `.llm/tools/*.ts`
+  refs; `coverage:functions` → `reporting/`; no calls to deleted `check-cli-*`/aggregators; mirror
+  sync OK; gitignore `coverage/` trap present but unused.
+- **Next**: report remediation-landed to coordinator → hold for OpenHands IMPL-EVAL dispatch
+  (separate session). No merge/close.
