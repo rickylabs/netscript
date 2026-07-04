@@ -1,5 +1,5 @@
 ---
-description: Use Harness v2 for substantial NetScript work.
+description: Use Harness v3 for substantial NetScript work.
 globs:
   - ".llm/**"
   - "packages/**"
