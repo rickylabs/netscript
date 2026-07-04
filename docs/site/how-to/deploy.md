@@ -2,8 +2,8 @@
 layout: layouts/base.vto
 title: Deploy
 templateEngine: [vento, md]
-prev: { label: "Customize Fresh UI", href: "/how-to/customize-fresh-ui/" }
-next: { label: "Author a plugin", href: "/how-to/author-a-plugin/" }
+prev: { label: "Build a durable chat", href: "/how-to/build-a-durable-chat/" }
+next: { label: "Deploy to Deno Deploy", href: "/how-to/deploy-deno-deploy/" }
 ---
 
 # Deploy a NetScript workspace
@@ -16,8 +16,9 @@ This is a task recipe, not a one-click button. NetScript is in alpha, and the sc
 deliberately minimal about deployment: it gives you a single declarative description of every
 process (`appsettings.json`), runnable Deno entrypoints with explicit permissions, and the
 Aspire AppHost that orchestrates them locally. It does **not** generate a `Dockerfile`, a
-`docker-compose.yml`, or a cloud target for you. Those are yours to add, and this page shows
-you exactly which verified facts to build them from.
+`docker-compose.yml`, or a cloud target *artifact* for you — those are yours to assemble, and this
+page shows you exactly which verified facts to build them from. The one runnable managed-platform
+*command* is [Deno Deploy](/how-to/deploy-deno-deploy/) (see the callout below).
 
 {{ comp callout { type: "important", title: "What is wired vs. what is manual" } }}
 <strong>Wired:</strong> a declarative resource graph in <code>appsettings.json</code> (ports,
@@ -29,6 +30,18 @@ compose file, or cloud deploy target. <code>netscript.config.ts</code> ships an 
 below — every one of which is a verified fact you can copy verbatim.
 <br><strong>Migration (#337):</strong> Windows deploy settings now live under
 <code>deploy.targets.windows</code> (previously <code>deploy.windows</code>).
+{{ /comp }}
+
+{{ comp callout { type: "tip", title: "One managed platform IS wired: Deno Deploy" } }}
+There is now a first-class, runnable managed-platform path:
+<strong><code>netscript deploy deno-deploy &lt;op&gt;</code></strong> (<code>plan</code>/<code>up</code>/
+<code>status</code>/<code>logs</code>/<code>down</code>) pushes a workspace to
+<a href="https://deno.com/deploy">Deno Deploy</a> over the native <code>deno deploy</code> CLI, with a
+preflight guard and <code>deploy.targets['deno-deploy']</code> config. It is the exception to the
+"manual" framing on this page. The <strong>Docker, Compose, and Linux/systemd</strong> targets remain
+config-schema only — there is <em>no</em> runnable <code>netscript deploy docker|compose|linux</code>
+verb — so those you still assemble by hand from the facts below. See
+<a href="/how-to/deploy-deno-deploy/">Deploy to Deno Deploy</a> for the full command reference.
 {{ /comp }}
 
 ## Before you start
@@ -56,7 +69,7 @@ production:
 {{ comp.featureGrid({ items: [
   {
     title: "1. Backing services",
-    body: "Postgres (the recommended default database; `mysql`, `mssql`, or `sqlite` are first-class alternatives via `--db`) and Redis (KV/cache — the default `--cache-backend`; `garnet` and `deno-kv` are alternatives). In dev, Aspire provisions Postgres/MySQL/SQL Server as containers (`sqlite` is file-backed, no container) and Redis as a container. In production you bring your own — managed database, managed Redis-compatible cache.",
+    body: "Postgres (the recommended database; `mysql`, `mssql`, or `sqlite` are first-class alternatives via `--db`) and Redis (KV/cache — the default `--cache-backend`; `garnet` and `deno-kv` are alternatives). In dev, Aspire provisions Postgres/MySQL/SQL Server as containers (`sqlite` is file-backed, no container) and Redis as a container. In production you bring your own — managed database, managed Redis-compatible cache.",
     icon: "▣"
   },
   {
@@ -251,7 +264,7 @@ deployment. To containerize, each process becomes one image whose `CMD` is the m
 {{ comp callout { type: "warning", title: "Limits of the alpha scaffold" } }}
 <ul>
 <li>No <code>Dockerfile</code>, <code>docker-compose.yml</code>, or Kubernetes manifest is generated. You write these from the <code>appsettings.json</code> facts above.</li>
-<li><code>netscript.config.ts</code> ships an empty <code>deploy: {}</code> block — there is no first-class deploy command yet.</li>
+<li><code>netscript.config.ts</code> ships an empty <code>deploy: {}</code> block, and the scaffold generates no container/compose/cloud <em>artifacts</em>. The one runnable deploy <em>command</em> is <code>netscript deploy deno-deploy</code> (<a href="/how-to/deploy-deno-deploy/">Deploy to Deno Deploy</a>); Docker/Compose/Linux targets are config-schema only, with no runnable verb.</li>
 <li>The <code>streams</code> service runs a <strong>real producer runtime</strong> (durable-streams over <code>@netscript/plugin-streams-core</code>, served on :4437) — deploy it as a first-class service. What is <em>not</em> production-ready is the manifest-helper layer: <code>@netscript/plugin-streams</code>'s <code>defineStreamProducer</code>/<code>defineStreamConsumer</code> <strong>throw <code>StreamUnsupportedOperationError</code></strong> by design (use <code>@netscript/plugin-streams-core</code> directly), and there is no in-process consumer <code>subscribe()</code> — consumption is HTTP/SSE.</li>
 <li>The scaffold worker <code>createJobTools(ctx)</code> handler helpers (<code>trace.addEvent</code>, <code>withChildSpan</code>, <code>progress</code>) are still no-op stubs (tracked debt, fix planned). Job dispatch/execution traces still appear in Aspire automatically; for custom handler spans call <code>@netscript/telemetry</code> helpers directly.</li>
 <li>DB commands assume a reachable Postgres — in CI/containers without Aspire, inject <code>POSTGRES_URI</code> yourself or the command fails fast.</li>
@@ -294,6 +307,12 @@ deployment is live.
 ## Where to go next
 
 {{ comp.featureGrid({ items: [
+  {
+    title: "Deploy to Deno Deploy",
+    body: "The one runnable managed-platform path: netscript deploy deno-deploy plan/up/status/logs/down, the unstable-API guard, and deploy.targets['deno-deploy'] config.",
+    href: "/how-to/deploy-deno-deploy/",
+    icon: "◆"
+  },
   {
     title: "How Aspire orchestrates it",
     body: "The AppHost graph, two-pass resource wiring, and why orchestration is a layer you can keep or drop.",

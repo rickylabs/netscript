@@ -32,7 +32,7 @@ records — fully independent from the primary database and the auth tables.
 
 ## Before you begin
 
-You need the auth layer from [chapter 2](/tutorials/workspace/02-auth/) and **aspire startning**. The
+You need the auth layer from [chapter 2](/tutorials/workspace/02-auth/) and **Aspire running**. The
 second database is provisioned as its own container in the Aspire graph, so Docker must be up too.
 Confirm the primary is migrated and Aspire is live:
 

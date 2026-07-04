@@ -2,7 +2,7 @@
 layout: layouts/base.vto
 title: Author a plugin
 templateEngine: [vento, md]
-prev: { label: "Deploy", href: "/how-to/deploy/" }
+prev: { label: "Deploy to Deno Deploy", href: "/how-to/deploy-deno-deploy/" }
 next: { label: "Add authentication", href: "/how-to/add-authentication/" }
 ---
 
@@ -30,7 +30,7 @@ If your plugin contributes an API service or a background processor, those run a
 Aspire graph alongside Postgres and Redis. Bring orchestration up <strong>before</strong> you run
 any <code>netscript db</code> command or exercise your plugin's endpoints: from the project root,
 <code>cd aspire &amp;&amp; aspire start</code> (dashboard at
-<a href="https://localhost:18888">https://localhost:18888</a>). DB commands require aspire startning
+<a href="https://localhost:18888">https://localhost:18888</a>). DB commands require Aspire running
 first. See <a href="/explanation/aspire/">the Aspire explanation</a> for the resource graph.
 {{ /comp }}
 
@@ -300,7 +300,7 @@ netscript plugin list      # your plugin should appear in the registry
 netscript plugin doctor    # checks plugin health and reports wiring problems
 ```
 
-With aspire startning, your plugin's service is live on the port you chose. Confirm it and exercise a
+With Aspire running, your plugin's service is live on the port you chose. Confirm it and exercise a
 contribution — for the `notifier` worker example on `:8095`:
 
 ```sh

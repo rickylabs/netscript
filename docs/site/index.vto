@@ -13,18 +13,18 @@ title: NetScript — type-safe services and durable workflows in one workspace
   ]
 }) }}
 
-{{ comp callout { type: "note", title: "Alpha — API subject to change" } }}
+{{ comp callout { type: "note", title: "Beta — API subject to change" } }}
 NetScript is a backend framework and workspace generator, not a hosted service — you run it on
-Deno and own all the generated code. We are on the path to beta, targeting late 2026, and the API
-is still moving. Every <code>@netscript/*</code> package shares one aligned version
+Deno and own all the generated code. NetScript is in <code>0.0.1</code> beta, shipping
+incrementally, and the API is still moving. Every <code>@netscript/*</code> package shares one aligned version
 (<code>{{ releaseVersion }}</code>) and releases move in lockstep. Scaffolded JSR imports use exact
-<code>{{ releaseSpecifier }}</code> pins for the alpha train, so keep package versions aligned when
+<code>{{ releaseSpecifier }}</code> pins for the beta train, so keep package versions aligned when
 you upgrade.
 {{ /comp }}
 
 {{ comp.tabbedCode({ tabs: [
   { label: "Define a service", lang: "ts", code: "// One preset wires CORS, request logging, OpenAPI JSON, Scalar docs,\n// RPC (served at /api/rpc/*), service info, and health endpoints —\n// instead of ~40 lines of Hono setup.\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\nconst service = await defineService(router, {\n  name: 'users',\n  port: 3000,\n});\n\nawait service.stop();" },
-  { label: "Install & scaffold", lang: "sh", code: "# Install the netscript command from JSR\ndeno install --global --allow-all --name netscript jsr:@netscript/cli" + releaseSpecifier + "\n\n# Scaffold a complete, type-checked workspace.\n# Postgres is the default engine; swap --db postgres for mysql, mssql, or sqlite.\nnetscript init my-app --db postgres\n\n# Prefer to keep .NET Aspire out of the loop? Opt out:\nnetscript init my-app --db postgres --no-aspire" },
+  { label: "Install & scaffold", lang: "sh", code: "# Install the netscript command from JSR\ndeno install --global --allow-all --name netscript jsr:@netscript/cli" + releaseSpecifier + "\n\n# Scaffold a complete, type-checked workspace.\n# Postgres is the recommended engine; pass --db postgres (mysql, mssql, sqlite also supported).\nnetscript init my-app --db postgres\n\n# Prefer to keep .NET Aspire out of the loop? Opt out:\nnetscript init my-app --db postgres --no-aspire" },
   { label: "Bring it up", lang: "sh", code: "# Aspire is step 2: it brings up Postgres and Redis first\ncd my-app/aspire && aspire start\n\n# Then, in the workspace root, initialize the database\nnetscript db init\n\n# Open the Aspire dashboard at https://localhost:18888 to see\n# every resource, service, trace, and log in one place." }
 ] }) }}
 
@@ -60,6 +60,6 @@ you upgrade.
 
 {{ comp.featureGrid({ items: [
   { title: "API reference", body: "Generated from source via deno doc — every package, every public symbol.", href: "/reference/" },
-  { title: "Source on GitHub", body: "Read the framework, file issues, follow the road to beta.", href: "https://github.com/rickylabs/netscript" },
+  { title: "Source on GitHub", body: "Read the framework, file issues, follow the road to stable.", href: "https://github.com/rickylabs/netscript" },
   { title: "Packages on JSR", body: "The @netscript/* family, installable with deno add.", href: "https://jsr.io/@netscript" }
 ] }) }}

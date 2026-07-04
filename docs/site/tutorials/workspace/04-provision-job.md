@@ -32,7 +32,7 @@ Aspire dashboard.
 ## Before you begin
 
 You need the workspace database from [chapter 3](/tutorials/workspace/03-workspace-data/) with
-**aspire startning**. The workers plugin ships an API service and a background processor that Aspire
+**Aspire running**. The workers plugin ships an API service and a background processor that Aspire
 orchestrates. Confirm the workspace datasource is ready:
 
 ```sh

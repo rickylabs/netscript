@@ -68,7 +68,9 @@ the Aspire-free portability path.
 
 {{ comp.featureGrid({ items: [
   { title: "Customize the Fresh UI", body: "Bring in and own the dashboard UI with the ui:init / ui:add tasks. The scaffold uses copy-source ownership — the components land in your workspace, so you edit them directly rather than depending on a hidden package.", href: "/how-to/customize-fresh-ui/" },
-  { title: "Deploy", body: "Take a workspace to production: Docker and bare-metal targets, the raw deno task entry points behind each service, and the --no-aspire portability escape hatch when you provision Postgres and Redis (or Garnet) yourself.", href: "/how-to/deploy/" },
+  { title: "Build a durable chat", body: "Wire an AI chat onto a Fresh route whose transcript survives reload and reconnect via a durable session stream; hydrate the fresh-ui chat components; and add one server-side tool.", href: "/how-to/build-a-durable-chat/" },
+  { title: "Deploy", body: "The portability and config story: the raw deno task entry points behind each service, plus the --no-aspire escape hatch when you provision Postgres and Redis (or Garnet) yourself. Docker, Compose, and Linux targets are config-only scaffolding today, not runnable deploy verbs — for a first-class hosted path, see Deploy to Deno Deploy.", href: "/how-to/deploy/" },
+  { title: "Deploy to Deno Deploy", body: "Push a workspace to Deno Deploy with the first-class netscript deploy deno-deploy plan | up | down | status | logs command: preflight the unstable-API guard, push a preview, promote to prod, and read status and logs.", href: "/how-to/deploy-deno-deploy/" },
   { title: "Author a plugin", body: "Advanced: build a custom plugin from scratch. Defines the scaffold.plugin.json provider kind, the manifest exports, and the mod.ts contract the host discovers — the same shape the first-party plugins use.", href: "/how-to/author-a-plugin/" }
 ] }) }}
 

@@ -290,7 +290,7 @@ without one.
   Aspire). Zero extra schema; the natural default for a single-service app and for
   local development.
 - **`prisma`** — durable saga state in your scaffolded relational database via Prisma
-  (Postgres by default; equally `mysql` / `mssql` / `sqlite`, since the store writes through
+  (Postgres in the recommended setup; equally `mysql` / `mssql` / `sqlite`, since the store writes through
   your project's Prisma client — it is not Postgres-specific). The `PrismaSagaStore`
   writes the dedicated runtime tables `saga_runtime_state`, `saga_runtime_transition`,
   and `saga_runtime_correlation`. Reach for this when you want the saga's own write
@@ -303,7 +303,7 @@ You select the backend with the `NETSCRIPT_SAGA_STORE` environment variable (`kv
   caption: "Durable saga store backends — trait matrix",
   rows: [
     { name: "kv", type: "Deno KV", desc: "Default for local/single-service. No extra schema. Provisioned by Aspire (Redis/KV). Resolved via NETSCRIPT_SAGA_STORE=kv or sagas.store.backend=kv." },
-    { name: "prisma", type: "Relational / Prisma", desc: "Writes saga_runtime_state, saga_runtime_transition, saga_runtime_correlation. Requires a Prisma client passed to createDurableSagaRuntime — so it follows whatever engine you scaffolded (Postgres by default; mysql / mssql / sqlite all work). SQL-inspectable in-flight state. Resolved via NETSCRIPT_SAGA_STORE=prisma or sagas.store.backend=prisma." },
+    { name: "prisma", type: "Relational / Prisma", desc: "Writes saga_runtime_state, saga_runtime_transition, saga_runtime_correlation. Requires a Prisma client passed to createDurableSagaRuntime — so it follows whatever engine you scaffolded (Postgres in the recommended setup; mysql / mssql / sqlite all work). SQL-inspectable in-flight state. Resolved via NETSCRIPT_SAGA_STORE=prisma or sagas.store.backend=prisma." },
     { name: "selection", type: "mandatory", desc: "No implicit default. resolveSagaStoreBackend(...) throws when neither NETSCRIPT_SAGA_STORE nor sagas.store.backend is set." },
     { name: "client requirement", type: "prisma only", desc: "backend: 'prisma' (or passing prisma) without a Prisma client throws 'Prisma saga store backend requires a Prisma client.'" }
   ]
@@ -458,7 +458,7 @@ instances. Bring orchestration up first — <code>cd aspire &amp;&amp; aspire st
 <em>before</em> any <code>netscript db</code> command or before you expect
 <code>/api/v1/sagas/instances</code> to return durable state. This holds for both
 backends: <code>kv</code> needs Redis/KV up, and <code>prisma</code> needs Postgres up
-with the <code>saga_runtime_*</code> tables migrated. DB commands require aspire startning
+with the <code>saga_runtime_*</code> tables migrated. DB commands require Aspire running
 first.
 {{ /comp }}
 

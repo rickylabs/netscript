@@ -140,6 +140,17 @@ export const navSections: NavSection[] = [
     ],
   },
   {
+    label: "AI & Agents",
+    items: [
+      { href: "/ai/", label: "Overview & Concepts", icon: "O" },
+      { href: "/tutorials/chat/", label: "Quickstart: AI chat", icon: "Q" },
+      { href: "/how-to/build-a-durable-chat/", label: "How-To: build a durable chat", icon: "H" },
+      { href: "/ai/durable-chat/", label: "Guide: durable chat", icon: "G" },
+      { href: "/ai/chat-ui/", label: "Guide: chat UI", icon: "G" },
+      { href: "/ai/engine/", label: "Reference: AI engine", icon: "R" },
+    ],
+  },
+  {
     label: "Data & Persistence",
     items: [
       { href: "/data-persistence/", label: "Overview & Concepts", icon: "O" },
@@ -174,6 +185,7 @@ export const navSections: NavSection[] = [
       { href: "/how-to/deno-lsp-code-intelligence/", label: "How-To: Deno LSP intelligence", icon: "H" },
       { href: "/how-to/deploy-local-aspire/", label: "How-To: deploy locally with Aspire", icon: "H" },
       { href: "/how-to/deploy/", label: "How-To: deploy", icon: "H" },
+      { href: "/how-to/deploy-deno-deploy/", label: "How-To: deploy to Deno Deploy", icon: "H" },
       { href: "/how-to/roll-out-runtime-overrides/", label: "How-To: runtime overrides", icon: "H" },
       { href: "/how-to/graceful-shutdown/", label: "How-To: graceful shutdown", icon: "H" },
       { href: "/how-to/add-a-plugin/", label: "How-To: add a plugin", icon: "H" },
@@ -200,6 +212,7 @@ export const navSections: NavSection[] = [
     items: [
       { href: "/tutorials/", label: "Tutorials index", icon: "T" },
       { href: "/tutorials/live-dashboard/", label: "Live dashboard", icon: "T" },
+      { href: "/tutorials/chat/", label: "AI Chat", icon: "T" },
       { href: "/tutorials/workspace/", label: "Workspace", icon: "T" },
       { href: "/tutorials/storefront/", label: "Storefront", icon: "T" },
       { href: "/tutorials/erp-sync/", label: "ERP sync", icon: "T" },

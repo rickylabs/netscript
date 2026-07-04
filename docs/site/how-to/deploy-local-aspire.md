@@ -97,7 +97,7 @@ graph a single run stands up:
   rows: [
     { name: "aspire (dashboard)", type: "https://localhost:18888 / http://localhost:18889", desc: "The Aspire dashboard. Live resource list, console logs, structured logs and traces. A login token is printed on start." },
     { name: "OTLP collector", type: "http://localhost:4318", desc: "OpenTelemetry endpoint (http/protobuf) the dashboard runs; framework spans and structured logs land here automatically." },
-    { name: "postgres", type: "Container", desc: "Provisioned via Docker. The database `netscript db` commands target — reachable only once Aspire is up. Postgres is the default; pass `--db mysql` or `--db mssql` at init for those engines (each also an Aspire container), or `--db sqlite` for a file-backed database with no container." },
+    { name: "postgres", type: "Container", desc: "Provisioned via Docker. The database `netscript db` commands target — reachable only once Aspire is up. Postgres is the recommended engine — pass `--db postgres` at init; `--db mysql` or `--db mssql` select those engines (each also an Aspire container), or `--db sqlite` for a file-backed database with no container." },
     { name: "redis", type: "Container (cache)", desc: "Redis cache — the default `--cache-backend`; Redis-compatible. Backs KV/queue workloads for the runtime plugins. Swap it for `garnet` (also a container) or app-level `deno-kv` via `--cache-backend`." },
     { name: "users (example service)", type: ":3000+ (SERVICE range, OS-allocated from 3000)", desc: "The scaffolded oRPC service, when you init with --service. OpenAPI at /api/v1/users/* and RPC at /api/rpc/*." },
     { name: "plugin APIs", type: ":8091–8099 (PLUGIN_API range)", desc: "Each installed runtime plugin's HTTP API (workers, sagas, triggers, auth). Ports are allocated from the plugin range, not hardcoded." },
@@ -118,7 +118,7 @@ port each resource bound, not a memorized number. Read it from there.
 ## Step 4 — Initialize the database (through the running AppHost)
 
 With Aspire up, your database engine is live and the `netscript db` commands can reach it. The
-resource graph above shows Postgres — the default and the engine these recipes use; if you
+resource graph above shows Postgres — the recommended engine and the one these recipes use; if you
 scaffolded with `--db mysql` / `--db mssql` you get that container instead, and `--db sqlite`
 gives a file-backed database with no Aspire container. Run the commands from the
 **workspace root** (a second terminal — leave `aspire start` running in the first):

@@ -20,9 +20,9 @@ contributor-only shape — a normal install has no <code>packages/</code> tree. 
 use <code>netscript</code>.
 {{ /comp }}
 
-{{ comp callout { type: "important", title: "Database commands need aspire startning first" } }}
-The <code>netscript db ...</code> commands provision and talk to your database <strong>through Aspire</strong> — Postgres
-by default, or <code>mysql</code> / <code>mssql</code> / <code>sqlite</code> when you scaffold with <code>--db</code>. Aspire is
+{{ comp callout { type: "important", title: "Database commands need Aspire running first" } }}
+The <code>netscript db ...</code> commands provision and talk to your database <strong>through Aspire</strong> — Postgres is the recommended
+engine, or <code>mysql</code> / <code>mssql</code> / <code>sqlite</code> when you scaffold with <code>--db</code>. Aspire is
 step 2 of the everyday flow: <code>cd aspire &amp;&amp; aspire start</code> brings up Postgres and Redis via Docker and
 opens the dashboard at <a href="https://localhost:18888">:18888</a> — <strong>before</strong> any <code>db init</code>,
 <code>db generate</code>, <code>db seed</code>, or <code>db status</code>. Run a <code>db</code> command with Aspire down and it fails to
@@ -71,7 +71,7 @@ and the order matters: **Aspire (step 2) must be up before any `db` command (ste
   },
   {
     title: "2 · Orchestrate",
-    body: "cd aspire && aspire start brings up your database (Postgres by default; or mysql/mssql/sqlite via --db) and Redis, and opens the dashboard at :18888. Do this before any db command.",
+    body: "cd aspire && aspire start brings up your database (Postgres is the recommended engine; or mysql/mssql/sqlite via --db) and Redis, and opens the dashboard at :18888. Do this before any db command.",
     icon: "▶"
   },
   {
@@ -96,7 +96,8 @@ Aspire orchestration files. The flags below match the verified scaffold run.
   caption: "Scaffold a workspace",
   rows: [
     { name: "netscript init", type: "netscript init my-app", desc: "Create a NetScript workspace in <code>my-app/</code> — contracts, plugin registry, Fresh app, a default Redis cache, and the Aspire layer. On a terminal it prompts for anything you omit (name, database, service, cache); add <code>--dry-run</code> to preview every file without writing." },
-    { name: "init (full happy path)", type: "netscript init my-app --db postgres --service --service-name users --service-port 3001 --yes", desc: "The fully-specified, non-interactive form (<code>--yes</code>): Postgres database support (swap <code>--db postgres</code> for <code>mysql</code>, <code>mssql</code>, or <code>sqlite</code>), an example oRPC <code>users</code> service on port 3001, and the default Redis cache resource." },
+    { name: "init (full happy path)", type: "netscript init my-app --db postgres --service --service-name users --service-port 3001 --yes", desc: "The fully-specified, non-interactive form (<code>--yes</code>): Postgres database support (swap <code>--db postgres</code> for <code>mysql</code>, <code>mssql</code>, <code>sqlite</code>, or <code>none</code>), an example oRPC <code>users</code> service on port 3001, and the default Redis cache resource." },
+    { name: "init --model-name", type: "netscript init my-app --db postgres --service --model-name Product", desc: "Name the Prisma model for the scaffolded CRUD surface. With a database engine and an example service, <code>netscript init</code> now generates a real Prisma-backed CRUD contract + handlers (authored under <code>contracts/versions/v1/</code>) and an oRPC playground landing page at <code>GET /</code>. Omit the flag and the model name is derived from the singularized service name — service <code>users</code> → model <code>User</code>; it must be a PascalCase identifier." },
     { name: "init --cache / --cache-backend", type: "netscript init my-app --cache-backend garnet", desc: "The shared cache is on by default with the <code>redis</code> backend. Pick another with <code>--cache-backend</code>: <code>redis</code> (default) or <code>garnet</code> are provisioned as Aspire container resources; <code>deno-kv</code> is app-level and needs no container. Pass <code>--cache=false</code> to scaffold without a cache." },
     { name: "init --no-aspire", type: "netscript init my-app --no-aspire", desc: "Scaffold without the .NET Aspire footprint. You start the Fresh app directly with <code>deno task --cwd apps/dashboard dev</code> and lose the dashboard + multi-resource wiring." },
     { name: "init --path / --editor", type: "netscript init my-app --path ./apps --editor zed", desc: "Place the project under a different directory and emit editor settings (<code>none</code> | <code>zed</code> | <code>vscode</code>)." }
@@ -227,6 +228,16 @@ are picked up by the same `generate` / `migrate` pass. The full task walkthrough
   ]
 }) }}
 
+{{ comp callout { type: "note", title: "Two ways to run the DB workflow: with Aspire and without" } }}
+Every <code>netscript db &lt;op&gt;</code> command is <strong>Aspire-coupled</strong> — it shells out to the
+Aspire AppHost, so <code>aspire</code> must be on your PATH and the apphost running. The scaffolded
+workspace <em>also</em> defines <strong>aspire-less</strong> <code>deno task db:*</code> tasks
+(<code>db:generate</code>, <code>db:migrate</code>, <code>db:seed</code>, <code>db:studio</code>, …) inside
+<code>database/&lt;engine&gt;/</code> that run Prisma directly with no Aspire. Use the <code>deno task db:*</code>
+form in deno-only or CI jobs that have no Aspire; use <code>netscript db *</code> for the orchestrated
+local flow.
+{{ /comp }}
+
 {{ comp callout { type: "warning", title: "“aspire start failed: project file does not exist”" } }}
 This almost always means a <code>db</code> command was run with Aspire down (or from the wrong directory).
 The fix is the dev flow order: <code>cd aspire &amp;&amp; aspire start</code> first, leave it running, then run
@@ -242,7 +253,8 @@ registry and runtime schemas stay in sync.
   caption: "Generate registries & schemas",
   rows: [
     { name: "netscript generate plugins", type: "netscript generate plugins", desc: "Generate the plugin registries from project source. Run this after every <code>plugin install</code> so the workspace picks up new contributions." },
-    { name: "netscript generate runtime-schemas", type: "netscript generate runtime-schemas", desc: "Generate runtime configuration schemas from registered plugin metadata." }
+    { name: "netscript generate runtime-schemas", type: "netscript generate runtime-schemas", desc: "Generate runtime configuration schemas from registered plugin metadata." },
+    { name: "netscript generate ai", type: "netscript generate ai", desc: "Available from <code>0.0.1-beta.2</code>: generate the AI runtime registries from the workspace's AI-stack configuration. Emits two targets: <code>ai-tools</code> (a registry keyed by <code>descriptor.name</code>, values are <code>AiToolDefinition</code> from <code>@netscript/ai/tools</code>) and <code>ai-agents</code> (a stem-keyed map of <code>() =&gt; AgentLoop</code> factories)." }
   ]
 }) }}
 
@@ -279,12 +291,53 @@ the scaffold exists. Use `--cwd <member>` to target a specific workspace member.
 
 ## Deploy
 
-Deployment commands build and manage Windows Service artifacts from a deployment
-manifest. See [deploy](/how-to/deploy/) for the portability story, including the
-`--no-aspire` escape hatch and bare-`deno task` targets.
+Two deploy paths are wired today: the **Deno Deploy** cloud target and the pre-existing
+**Windows Service** (Servy) path. See [deploy](/how-to/deploy/) for the portability story,
+including the `--no-aspire` escape hatch and bare-`deno task` targets.
+
+### Deno Deploy (cloud target)
+
+`netscript deploy deno-deploy <op>` is a thin router over the native `deno deploy` CLI — it
+shells `deno deploy …`, so that CLI must be on your PATH and authentication is delegated to it
+(NetScript issues no credentials of its own).
 
 {{ comp.apiTable({
-  caption: "Deployment lifecycle",
+  caption: "netscript deploy deno-deploy <op>",
+  rows: [
+    { name: "deno-deploy plan", type: "netscript deploy deno-deploy plan", desc: "Preflight the project for Deno Deploy (runs the unstable-API guard only; never pushes)." },
+    { name: "deno-deploy up", type: "netscript deploy deno-deploy up [--prod] [--dry-run]", desc: "Push a deployment (<code>deno deploy [--prod]</code>). <code>--dry-run</code> is equivalent to <code>plan</code> and does not push." },
+    { name: "deno-deploy down", type: "netscript deploy deno-deploy down", desc: "Delete the deployment." },
+    { name: "deno-deploy status", type: "netscript deploy deno-deploy status", desc: "Show deployment status." },
+    { name: "deno-deploy logs", type: "netscript deploy deno-deploy logs", desc: "Show deployment logs." }
+  ]
+}) }}
+
+Every op shares five flags: `--org <slug>`, `--app <name>`, `--entrypoint <path>`,
+`--env-file <path>`, and `--project-root <dir>`. CLI flags override the optional
+`deploy.targets['deno-deploy']` config block, and flags alone are sufficient (config is optional).
+
+{{ comp callout { type: "warning", title: "The unstable-API guard blocks `up --prod`" } }}
+<code>plan</code> and <code>up</code> run a best-effort <strong>unstable-API guard</strong> that scans
+<code>deno.json#unstable</code> and your entrypoint for <code>Deno.openKv</code>, <code>Deno.cron</code>,
+<code>new BroadcastChannel</code>, and <code>Temporal.</code>. Deno Deploy rejects <code>--unstable-*</code>
+flags, so <code>up --prod</code> <strong>refuses to push</strong> when the guard finds a violation; a preview
+(non-prod) push warns but proceeds.
+{{ /comp }}
+
+{{ comp callout { type: "note", title: "docker / compose / linux are not wired yet" } }}
+<code>netscript deploy docker</code> and <code>netscript deploy compose</code> command groups exist but
+are <strong>not wired</strong> — they expose no runnable verbs and only print help. Bare-metal
+<code>linux</code> deploy is likewise planning-only. Only the Windows Service path and
+<code>deno-deploy</code> run today.
+{{ /comp }}
+
+### Windows Service (Servy)
+
+The pre-existing Windows path builds and manages Windows Service artifacts from a deployment
+manifest via Servy.
+
+{{ comp.apiTable({
+  caption: "Windows Service deployment lifecycle",
   rows: [
     { name: "netscript deploy build", type: "netscript deploy build", desc: "Build the Windows Service deployment artifacts." },
     { name: "netscript deploy package-cli", type: "netscript deploy package-cli", desc: "Compile a standalone deployment CLI artifact." },

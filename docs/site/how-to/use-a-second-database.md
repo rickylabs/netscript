@@ -42,7 +42,7 @@ There are two ways to add one, and they answer different needs:
 ## Before you start
 
 {{ comp.apiTable({ caption: "Prerequisites", rows: [
-  { name: "A scaffolded workspace", type: "with a primary db", desc: "An existing NetScript project whose primary datasource is already wired (Postgres by default, or whichever engine you passed to netscript init via --db) — ideally migrated once via the Database & migration recipe so you know the single-datasource loop." },
+  { name: "A scaffolded workspace", type: "with a primary db", desc: "An existing NetScript project whose primary datasource is already wired (Postgres, the recommended engine, or whichever engine you passed to netscript init via --db) — ideally migrated once via the Database & migration recipe so you know the single-datasource loop." },
   { name: "netscript CLI", type: "on PATH", desc: "deno install --global --allow-all --name netscript jsr:@netscript/cli. netscript db add --help should print." },
   { name: "Aspire CLI + Docker", type: "for container mode", desc: "The scaffolded second database is provisioned as a container by Aspire (addMySql / addPostgres / addSqlServer). Docker or Podman must be running. Skip only for an external/hand-wired database." },
   { name: "Deno", type: "2.x", desc: "Prisma client generation runs under the Deno runtime (the generated schema sets runtime=\"deno\")." }

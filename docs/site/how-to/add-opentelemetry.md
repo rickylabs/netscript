@@ -39,7 +39,7 @@ directly — shown in Step 3. Structured logging via <code>log.*</code> is real 
 
 {{ comp.apiTable({ caption: "What this recipe assumes", rows: [
   { name: "netscript workspace", type: "netscript init", desc: "An existing workspace. If you have none, scaffold one first — see the tutorials." },
-  { name: "aspire startning", type: "cd aspire && aspire start", desc: "The AppHost provisions Postgres, Redis, the OTLP collector, and the dashboard. Start it BEFORE you expect traces. Dashboard at https://localhost:18888." },
+  { name: "Start Aspire", type: "cd aspire && aspire start", desc: "The AppHost provisions Postgres, Redis, the OTLP collector, and the dashboard. Start it BEFORE you expect traces. Dashboard at https://localhost:18888." },
   { name: "@netscript/telemetry", type: "OTel facade", desc: "Wraps @opentelemetry/api and ships the worker/scheduler/queue/SSE instrumentation. Already wired into the generated handlers — no install step." },
   { name: "A service or plugin to trace", type: "services/users or plugins/workers", desc: "The users service (:3001) and the workers/sagas/triggers/auth plugins all emit health + trace data once running." }
 ] }) }}
