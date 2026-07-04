@@ -6,23 +6,23 @@ stage labels, tracked run dirs, epic/sub-issue standard, drop commits.md, prune 
 skills/tools/harness docs, make `.llm/tools` wrappers mandatory. Everything reviewable from
 GitHub + mobile without cloning.
 
-**State**: PLAN-EVAL PASS (OpenHands minimax-M3; `plan-eval.md`). Implementation IN FLIGHT under the
-D3 lane override (all slices S2–S8 = Opus 4.8 sub-agents; Fable 5 supervises). **S2 LANDED**
-(`f33141fd`): new `.llm/harness/workflow/lane-policy.md` + `netscript-harness` SKILL re-baselined to V3.
+**State**: **CLOSED / MERGED (2026-07-04).** PLAN-EVAL PASS + IMPL-EVAL PASS (both OpenHands, separate
+sessions; `plan-eval.md` / `impl-eval.md`). All slices S1–S10 + Amendments A1/A2 + WSL Codex
+adversarial pass delivered under the D3 lane override (implementation = Opus 4.8 sub-agents; Fable 5
+supervised) with the A1 lane-agnostic slice-review gate on every slice.
 
-- Branch: `feat/agentic-workflow-doctrine-v3` @ base `1b42ba88` · worktree `.llm/tmp/wt-harness-v3`
-- Doctrine issue: #306 (adopt) · related: #305 (boundary, framework doctrine), #387 (closure guardrail)
-- Epic: #389 · Draft PR: #390 · stage label `status:impl`
-- Phase: research + plan + PLAN-EVAL PASS [done] → **slices S2–S8 in flight** (design §8)
-- Slice map: **S2 lane-policy [DONE]** · **S3 run-dir move [DONE]** · **S4 drop commits.md [DONE]** ·
-  **S5 GitHub-surface/#387 [DONE]** · **S6 tooling mandates+aliases [DONE]** ·
-  **S7 scrub+frontmatter+fitness-gates [DONE]** · **S8 residue+folds+ARCHETYPE-5 [DONE]** ·
-  **S9 .llm/tools prod-grade refactor (audit-first) [IN FLIGHT]** · **S10 .llm/* prod-grade sweep [PENDING]**
-- S2–S8 DONE. **Amendment A2 (owner, drift D6): IMPL-EVAL HELD** — §8 under-scoped `.llm/tools` (deep
-  refactor never done). Fold S9 (tools refactor, audit-first: audit→post PR comment→delete→harden→
-  restructure→test→update-registry) + S10 (`.llm/*` sweep, `.llm/runs/` KEPT). Sequencing: S9 → S10 →
-  full-surface gates → WSL Codex adversarial (whole surface) → OpenHands IMPL-EVAL. No merge/close.
-- Drift: D1 (tracked run dirs `.llm/runs/`) · D2 (no commits.md) · D3 (Opus-sub-agent impl lane) ·
-  D4 (plan-eval.md transcribed) · D5-slice-review-gate (A1 permanent lane-agnostic review gate)
+- PR #390 **MERGED** — squash `eeaff336` on `main`; run branch `feat/agentic-workflow-doctrine-v3`
+  (base `1b42ba88`) deleted at merge. Main-drift reconciled by merge `266c0f74` (main @ `78eda7f0` /
+  #395). main-push `ci` on `eeaff336` GREEN (quality / check-test / deps-report).
+- Doctrine issue: #306 (adopted) · related: #305 (boundary, framework doctrine), #387 (closure
+  guardrail, folded into V3 close-gate)
+- Epic: **#389 left OPEN** (umbrella — no closing keyword; V3 = one delivered slice of road-to-stable)
+- Slice map (all DONE): S1 research+design · S2 lane-policy · S3 run-dir move · S4 drop commits.md ·
+  S5 GitHub-surface/#387 · S6 tooling mandates+aliases · S7 scrub+frontmatter+fitness-gates ·
+  S8 residue+folds+ARCHETYPE-5 · **S9 `.llm/tools` prod-grade refactor** (audit→harden→delete-28→
+  restructure into topic subfolders) · **S10 `.llm/*` prod-grade sweep** (`.llm/runs/` KEPT).
+- Drift resolved/captured: D1 tracked run dirs · D2 no commits.md · D3 Opus-impl lane · D4/D9
+  eval-transcribe · D5 A1 review gate · D6-A2 tools+`.llm/*` scope · D7/D7b/D7c/D7d + D8 out-of-surface
+  #305/#307 follow-ups · D10 closeout branch. **No open in-surface action items.**
 
-**Resume**: read `supervisor.md`, `worklog.md`, `drift.md`, then latest phase artifact.
+**Status**: run complete — no resume needed. Historical corpus only (kept under `.llm/runs/`).
