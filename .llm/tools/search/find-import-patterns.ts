@@ -6,9 +6,9 @@
  * quoting problems around paths like `(dashboard)` or `[id]`.
  *
  * Examples:
- * - deno run --allow-read .llm/tools/find-import-patterns.ts --root packages/cli/src
- * - deno run --allow-read .llm/tools/find-import-patterns.ts --root packages/cli/src --legacy-alias @old/
- * - deno run --allow-read .llm/tools/find-import-patterns.ts --root packages/cli/src --include-sibling
+ * - deno run --allow-read .llm/tools/search/find-import-patterns.ts --root packages/cli/src
+ * - deno run --allow-read .llm/tools/search/find-import-patterns.ts --root packages/cli/src --legacy-alias @old/
+ * - deno run --allow-read .llm/tools/search/find-import-patterns.ts --root packages/cli/src --include-sibling
  */
 
 interface Options {
@@ -33,7 +33,7 @@ const DEFAULT_LEGACY_ALIASES = ['@/'];
 function printHelp(): void {
   console.log([
     'Usage:',
-    '  deno run --allow-read .llm/tools/find-import-patterns.ts [options]',
+    '  deno run --allow-read .llm/tools/search/find-import-patterns.ts [options]',
     '',
     'Options:',
     '  --root <path>          Root path to scan. Repeatable. Default: .',

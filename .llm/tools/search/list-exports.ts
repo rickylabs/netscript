@@ -6,9 +6,9 @@
  * public APIs and migration surfaces.
  *
  * Examples:
- * - deno run --allow-read .llm/tools/list-exports.ts --root packages/fresh
- * - deno run --allow-read .llm/tools/list-exports.ts --root packages/fresh --name define
- * - deno run --allow-read .llm/tools/list-exports.ts --root packages/cli/src --name handler
+ * - deno run --allow-read .llm/tools/search/list-exports.ts --root packages/fresh
+ * - deno run --allow-read .llm/tools/search/list-exports.ts --root packages/fresh --name define
+ * - deno run --allow-read .llm/tools/search/list-exports.ts --root packages/cli/src --name handler
  */
 
 interface Options {
@@ -36,7 +36,7 @@ const DEFAULT_IGNORE_DIRS = ['.git', '_fresh', 'node_modules', 'dist', 'coverage
 function printHelp(): void {
   console.log([
     'Usage:',
-    '  deno run --allow-read .llm/tools/list-exports.ts [options]',
+    '  deno run --allow-read .llm/tools/search/list-exports.ts [options]',
     '',
     'Options:',
     '  --root <path>     Root path to scan. Repeatable. Default: .',

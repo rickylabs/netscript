@@ -5,9 +5,9 @@
  * WI doc, or migration note. Scan a package tree, then compare against explicit expected names.
  *
  * Examples:
- * - deno run --allow-read .llm/tools/compare-export-surface.ts --root packages/fresh --expect definePage --expect definePartial
- * - deno run --allow-read .llm/tools/compare-export-surface.ts --root packages/fresh --expect-file .llm/temp/fresh-contract.txt
- * - deno run --allow-read .llm/tools/compare-export-surface.ts --root packages/fresh --expect definePage --fail-on-missing
+ * - deno run --allow-read .llm/tools/search/compare-export-surface.ts --root packages/fresh --expect definePage --expect definePartial
+ * - deno run --allow-read .llm/tools/search/compare-export-surface.ts --root packages/fresh --expect-file .llm/temp/fresh-contract.txt
+ * - deno run --allow-read .llm/tools/search/compare-export-surface.ts --root packages/fresh --expect definePage --fail-on-missing
  */
 
 interface Options {
@@ -25,7 +25,7 @@ const EXPORT_EXTS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.mts', '.cts
 function printHelp(): void {
   console.log([
     'Usage:',
-    '  deno run --allow-read .llm/tools/compare-export-surface.ts [options]',
+    '  deno run --allow-read .llm/tools/search/compare-export-surface.ts [options]',
     '',
     'Options:',
     '  --root <path>         Root path to scan. Repeatable. Default: .',

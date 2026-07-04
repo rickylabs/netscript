@@ -28,10 +28,10 @@
  * flagged as a broken link rather than silently skipped.
  *
  * Usage:
- *   deno run --allow-read .llm/tools/check-internal-doc-links.ts --pretty
- *   deno run --allow-read .llm/tools/check-internal-doc-links.ts --check-orphans --pretty
- *   deno run --allow-read .llm/tools/check-internal-doc-links.ts --json
- *   deno run --allow-read .llm/tools/check-internal-doc-links.ts --root .llm/harness --pretty
+ *   deno run --allow-read .llm/tools/validation/check-internal-doc-links.ts --pretty
+ *   deno run --allow-read .llm/tools/validation/check-internal-doc-links.ts --check-orphans --pretty
+ *   deno run --allow-read .llm/tools/validation/check-internal-doc-links.ts --json
+ *   deno run --allow-read .llm/tools/validation/check-internal-doc-links.ts --root .llm/harness --pretty
  *
  * Exit code: 0 when no enforced violation is found, 1 otherwise. Broken links and
  * broken anchors are always enforced; orphans are enforced only with --check-orphans.
@@ -56,7 +56,7 @@ if (args.help) {
       'Internal-doc link / anchor / orphan checker',
       '',
       'Usage:',
-      '  deno run --allow-read .llm/tools/check-internal-doc-links.ts [options]',
+      '  deno run --allow-read .llm/tools/validation/check-internal-doc-links.ts [options]',
       '',
       'Options:',
       '  --root <path>     Doc root to scan (repeatable). Defaults to the internal',

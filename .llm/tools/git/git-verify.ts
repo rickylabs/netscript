@@ -17,10 +17,10 @@
  *   --help         Show this help.
  *
  * Examples:
- *   deno run --allow-run .llm/tools/git-verify.ts exists \
+ *   deno run --allow-run .llm/tools/git/git-verify.ts exists \
  *     --ref origin/main --path .github/workflows/copilot-setup-steps.yml
- *   deno run --allow-run .llm/tools/git-verify.ts sync --branch feat/package-quality
- *   deno run --allow-run .llm/tools/git-verify.ts ancestor --of e951083 --in HEAD
+ *   deno run --allow-run .llm/tools/git/git-verify.ts sync --branch feat/package-quality
+ *   deno run --allow-run .llm/tools/git/git-verify.ts ancestor --of e951083 --in HEAD
  *
  * Exit codes: 0 = check passed / true; 1 = check failed / false; 2 = usage error.
  */
@@ -40,7 +40,7 @@ interface Options {
 function printHelp(): void {
   console.log([
     'Usage:',
-    '  deno run --allow-run .llm/tools/git-verify.ts <command> [options]',
+    '  deno run --allow-run .llm/tools/git/git-verify.ts <command> [options]',
     '',
     'Commands:',
     "  exists   --ref <ref> --path <path>   Does <path> exist in <ref>'s tree?",

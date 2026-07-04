@@ -51,7 +51,7 @@ function printHelp(): void {
       '',
       'Usage:',
       '  deno run --allow-net --allow-env --allow-read \\',
-      '    .llm/tools/jsr-provision-packages.ts [flags]',
+      '    .llm/tools/release/jsr-provision-packages.ts [flags]',
       '',
       'Flags:',
       '  --scope <name>     JSR scope (default: netscript)',

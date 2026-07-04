@@ -12,7 +12,7 @@
  * never writes still eventually wakes the supervisor instead of blocking forever.
  *
  * Usage:
- *   deno run --allow-read .llm/tools/watch-run.ts <run-dir> \
+ *   deno run --allow-read .llm/tools/harness/watch-run.ts <run-dir> \
  *     [--files worklog.md] [--timeout-seconds 1800] [--quiet]
  *
  * Exit codes: 0 = relevant change seen · 2 = timed out (heartbeat) · 1 = bad args.

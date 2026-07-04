@@ -8,9 +8,9 @@
  * plus network for the underlying `deno publish`).
  *
  * Usage:
- *   deno run -A .llm/tools/run-publish.ts [--dry-run | --preflight]
- *   deno run -A .llm/tools/run-publish.ts --print-jsr-links --version <v>
- *   deno run -A .llm/tools/run-publish.ts --update-release-body --version <v> \
+ *   deno run -A .llm/tools/release/run-publish.ts [--dry-run | --preflight]
+ *   deno run -A .llm/tools/release/run-publish.ts --print-jsr-links --version <v>
+ *   deno run -A .llm/tools/release/run-publish.ts --update-release-body --version <v> \
  *     --body-file <in> --out <out>
  */
 
@@ -37,7 +37,7 @@ function printHelp(): void {
       'run-publish.ts — workspace publish entrypoint (release/publish flow)',
       '',
       'Usage:',
-      '  deno run -A .llm/tools/run-publish.ts [flags]',
+      '  deno run -A .llm/tools/release/run-publish.ts [flags]',
       '',
       'Flags:',
       '  --dry-run                run publish in dry-run mode',

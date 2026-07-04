@@ -282,7 +282,7 @@ ssh.exe <CODEX_SSH_HOST> 'export PATH="<CODEX_BIN_DIR>:$PATH"; cd <native-worktr
 Prefer the agentic suite: `launch-codex-slice.ts` validates the brief, runs the push-safety gate,
 stages with CRLF stripped, launches, and records the thread id for you (see the table above).
 
-Supervise without polling: run `.llm/tools/watch-run.ts <run-dir>` (run-artifact watcher), or
+Supervise without polling: run `.llm/tools/harness/watch-run.ts <run-dir>` (run-artifact watcher), or
 `.llm/tools/agentic/codex-watch.ts` from inside WSL — `--worktree <wsl path>` to wake on git
 activity (progress), and `--mode turn --thread-id <uuid>` to wake when the turn finishes (idle). The
 git event alone does not mean the agent stopped; pair the two. Steer only with

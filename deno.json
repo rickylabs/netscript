@@ -34,7 +34,7 @@
       ]
     },
     "test": "deno test --allow-all",
-    "coverage:functions": "rm -rf .llm/tmp/coverage/functions && deno test --allow-all --coverage=.llm/tmp/coverage/functions --coverage-raw-data-only packages/contracts/tests/errors_test.ts packages/service/tests/_fixtures/readme-examples_test.ts && deno run --allow-read --allow-write .llm/tools/report-function-coverage.ts --coverage .llm/tmp/coverage/functions --out .llm/tmp/coverage/function-report.json --package packages/contracts --package packages/plugin-triggers-core --package packages/service --package packages/plugin",
+    "coverage:functions": "rm -rf .llm/tmp/coverage/functions && deno test --allow-all --coverage=.llm/tmp/coverage/functions --coverage-raw-data-only packages/contracts/tests/errors_test.ts packages/service/tests/_fixtures/readme-examples_test.ts && deno run --allow-read --allow-write .llm/tools/reporting/report-function-coverage.ts --coverage .llm/tmp/coverage/functions --out .llm/tmp/coverage/function-report.json --package packages/contracts --package packages/plugin-triggers-core --package packages/service --package packages/plugin",
     "audit:critical": "deno audit --level critical",
     "deps:latest": "deno run --allow-read --allow-net .llm/tools/deps/latest.ts --pretty --behind-only",
     "deps:outdated": "deno run --allow-read --allow-run .llm/tools/deps/outdated.ts --latest --pretty",
@@ -51,7 +51,7 @@
     "agentic:sync-claude": "deno run --no-lock --allow-read --allow-write .llm/tools/agentic/sync-claude-skills.ts --pretty",
     "agentic:sync-claude:check": "deno run --no-lock --allow-read .llm/tools/agentic/sync-claude-skills.ts --check --pretty",
     "agentic:check-claude": "deno run --no-lock --allow-read --allow-run .llm/tools/agentic/validate-claude-surface.ts --pretty",
-    "docs:links": "deno run --no-lock --allow-read .llm/tools/check-internal-doc-links.ts --pretty",
+    "docs:links": "deno run --no-lock --allow-read .llm/tools/validation/check-internal-doc-links.ts --pretty",
     "docs:maintenance": "deno task docs:links && deno task agentic:sync-claude:check && deno task agentic:check-claude",
     "agentic:smoke-claude-remote": "deno run --no-lock --allow-read --allow-run .llm/tools/agentic/claude-remote-smoke.ts --env-aware --pretty",
     "agentic:codex-resume": "deno run --no-lock --allow-read --allow-run .llm/tools/agentic/codex-resume.ts",
@@ -66,11 +66,11 @@
     "agentic:claude-hook-log": "deno run --no-lock --allow-env --allow-write .llm/tools/agentic/claude-hook-log.ts",
     "gen:assets-barrel": "deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-cli-assets-barrel.ts",
     "check:assets-barrel": "deno task gen:assets-barrel && git diff --exit-code -- packages/cli/src/kernel/assets/embedded.generated.ts packages/plugin/src/kernel/assets/embedded.generated.ts packages/fresh-ui/registry.generated.ts packages/service/src/primitives/scalar.generated.ts",
-    "check:scaffold-versions": "deno run .llm/tools/check-scaffold-versions.ts --pretty",
+    "check:scaffold-versions": "deno run .llm/tools/validation/check-scaffold-versions.ts --pretty",
     "release:preflight": "deno run --allow-read .llm/tools/release/preflight-text-imports.ts",
     "release:cut": "deno run --allow-read --allow-write --allow-run --allow-env .llm/tools/release/cut.ts",
     "release:publish": "deno run --allow-net --allow-env --allow-run --allow-read .llm/tools/release/github-release.ts",
-    "publish:dry-run": "deno run --allow-read --allow-write --allow-run .llm/tools/run-publish-dry-run.ts",
+    "publish:dry-run": "deno run --allow-read --allow-write --allow-run .llm/tools/release/run-publish-dry-run.ts",
     "doc:lint": "deno run --allow-read --allow-run .llm/tools/run-deno-doc-lint.ts",
     "e2e:cli": "deno run --allow-all packages/cli/e2e/cli.ts",
     "e2e:cli:prod": "deno run --allow-all packages/cli/e2e/cli.ts run scaffold.runtime --source jsr --cli packages/cli/bin/netscript.ts",
@@ -100,7 +100,7 @@
         ".llm/tools/run-deno-lint.ts"
       ]
     },
-    "docs:readme:check": "deno run --no-lock --allow-read .llm/tools/check-readme-standard.ts --pretty",
+    "docs:readme:check": "deno run --no-lock --allow-read .llm/tools/validation/check-readme-standard.ts --pretty",
     "arch:check": "deno task deps:check && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/plugin-auth-core && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/auth-workos && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/auth-better-auth && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/auth-kv-oauth && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root plugins/auth && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/plugin && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root plugins/workers && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root plugins/sagas && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root plugins/triggers && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root plugins/streams && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/plugin-sagas-core && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/plugin-triggers-core && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/plugin-workers-core && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/plugin-ai-core && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/ai && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root plugins/ai",
     "arch:check:repo": "deno run --allow-read .llm/tools/fitness/check-doctrine.ts"
   },

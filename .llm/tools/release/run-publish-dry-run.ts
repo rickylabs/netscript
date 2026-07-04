@@ -7,7 +7,7 @@
  * as the underlying `deno publish --dry-run` requires).
  *
  * Usage:
- *   deno run -A .llm/tools/run-publish-dry-run.ts
+ *   deno run -A .llm/tools/release/run-publish-dry-run.ts
  */
 
 import { publishWorkspace } from './publish-workspace.ts';
@@ -19,7 +19,7 @@ if (import.meta.main) {
         'run-publish-dry-run.ts — run the workspace publish in dry-run mode',
         '',
         'Usage:',
-        '  deno run -A .llm/tools/run-publish-dry-run.ts',
+        '  deno run -A .llm/tools/release/run-publish-dry-run.ts',
         '',
         'Takes no flags (other than --help). Runs publishWorkspace in dry-run mode.',
       ].join('\n'),

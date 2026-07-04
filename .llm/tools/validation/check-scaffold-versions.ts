@@ -13,13 +13,13 @@
  * pins from the root catalog (see `generate-app-deno-json.ts`), not here.
  *
  * Usage:
- *   deno run .llm/tools/check-scaffold-versions.ts [--aspire-only] [--pretty] [--quiet] [--help]
+ *   deno run .llm/tools/validation/check-scaffold-versions.ts [--aspire-only] [--pretty] [--quiet] [--help]
  *
  * Exit codes: 0 = all pins stable · 1 = at least one prerelease pin (E-12 FAIL).
  *
  * Perms: none — static import only, no runtime `--allow-*` required (safe as a CI gate).
  */
-import { SCAFFOLD_VERSIONS } from '../../packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts';
+import { SCAFFOLD_VERSIONS } from '../../../packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts';
 
 /** Keys whose pins feed the Aspire/.NET scaffold surface (LD-7 scope). */
 const ASPIRE_KEYS = new Set<string>([
@@ -97,7 +97,7 @@ function printHelp(): void {
       'check-scaffold-versions.ts — E-12 / LD-7 guard: scaffold version pins must be stable',
       '',
       'Usage:',
-      '  deno run .llm/tools/check-scaffold-versions.ts [flags]',
+      '  deno run .llm/tools/validation/check-scaffold-versions.ts [flags]',
       '',
       'Flags:',
       '  --aspire-only   only check the Aspire/.NET scaffold pins (LD-7 scope)',

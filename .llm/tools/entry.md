@@ -82,14 +82,14 @@ command map.
 - Notes: `scaffold.plugins` is not the full suite. It is a narrower plugin scaffold and diagnostic
   smoke. Use `scaffold.runtime` for merge readiness.
 
-### `scaffold-e2e-test.ts`
+### `e2e/scaffold-e2e-test.ts`
 
 - Purpose: legacy generated-project scaffold smoke kept as a comparison harness while the maintained
   `packages/cli/e2e` runner covers the merge gate.
 - Why MCP-friendly: emits step-level output and a streaming log under `.llm/tmp/scaffold-e2e-test/`.
 - Example commands:
-  - `deno run --allow-read --allow-write --allow-run --allow-net --allow-env .llm/tools/scaffold-e2e-test.ts --format pretty --cleanup`
-  - `deno run --allow-read --allow-write --allow-run --allow-net --allow-env .llm/tools/scaffold-e2e-test.ts --dry-run --format pretty`
+  - `deno run --allow-read --allow-write --allow-run --allow-net --allow-env .llm/tools/e2e/scaffold-e2e-test.ts --format pretty --cleanup`
+  - `deno run --allow-read --allow-write --allow-run --allow-net --allow-env .llm/tools/e2e/scaffold-e2e-test.ts --dry-run --format pretty`
 - Notes: use this only for parity debugging with the previous repo checkout. For PR readiness, use
   `deno task e2e:cli`.
 
@@ -114,42 +114,42 @@ command map.
 - Notes: `--ignore-line-endings` counts known baseline line-ending drift without listing every
   ignored file. Add `--show-ignored` only when the ignored file list is needed.
 
-### `find-lines.ts`
+### `search/find-lines.ts`
 
 - Purpose: scan roots for substring or regex matches and print `path:line: text`.
 - Example command:
-  - `deno run --allow-read .llm/tools/find-lines.ts --root packages/cli --regex "scaffold\\.(runtime|plugins)"`
+  - `deno run --allow-read .llm/tools/search/find-lines.ts --root packages/cli --regex "scaffold\\.(runtime|plugins)"`
 
-### `find-import-patterns.ts`
+### `search/find-import-patterns.ts`
 
 - Purpose: scan imports and CSS `@import` lines for legacy aliases and relative-path debt.
 - Example command:
-  - `deno run --allow-read .llm/tools/find-import-patterns.ts --root packages/cli`
+  - `deno run --allow-read .llm/tools/search/find-import-patterns.ts --root packages/cli`
 
-### `find-symbol-usages.ts`
+### `search/find-symbol-usages.ts`
 
 - Purpose: scan for symbol usages with symbol-boundary matching for refactor prep.
 - Example command:
-  - `deno run --allow-read .llm/tools/find-symbol-usages.ts --root packages/cli --symbol copyOfficialPlugin`
+  - `deno run --allow-read .llm/tools/search/find-symbol-usages.ts --root packages/cli --symbol copyOfficialPlugin`
 
-### `list-exports.ts`
+### `search/list-exports.ts`
 
 - Purpose: inventory exported symbols and re-exports across a package or app surface.
 - Example command:
-  - `deno run --allow-read .llm/tools/list-exports.ts --root packages/contracts`
+  - `deno run --allow-read .llm/tools/search/list-exports.ts --root packages/contracts`
 
-### `compare-export-surface.ts`
+### `search/compare-export-surface.ts`
 
 - Purpose: compare actual exported symbols against an expected contract list.
 - Example command:
-  - `deno run --allow-read .llm/tools/compare-export-surface.ts --root packages/contracts --expect contract`
+  - `deno run --allow-read .llm/tools/search/compare-export-surface.ts --root packages/contracts --expect contract`
 
-### `git-commit-paths.ts`
+### `git/git-commit-paths.ts`
 
 - Purpose: run `git commit` with explicit message/path inputs without Windows shell quoting issues.
 - Example commands:
-  - `deno run --allow-run .llm/tools/git-commit-paths.ts --message chore-sync --all-staged --dry-run`
-  - `deno run --allow-read --allow-run .llm/tools/git-commit-paths.ts --message-file .llm/tmp/commit-message.txt --path-file .llm/tmp/commit-paths.txt --push`
+  - `deno run --allow-run .llm/tools/git/git-commit-paths.ts --message chore-sync --all-staged --dry-run`
+  - `deno run --allow-read --allow-run .llm/tools/git/git-commit-paths.ts --message-file .llm/tmp/commit-message.txt --path-file .llm/tmp/commit-paths.txt --push`
 
 ## Non-ported Old Tools
 

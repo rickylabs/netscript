@@ -17,7 +17,7 @@
  * lint prose or verify link targets resolve (link-checking is a separate gate).
  *
  * Usage:
- *   deno run --no-lock --allow-read .llm/tools/check-readme-standard.ts [paths...] [--pretty] [--json] [--help]
+ *   deno run --no-lock --allow-read .llm/tools/validation/check-readme-standard.ts [paths...] [--pretty] [--json] [--help]
  *
  * With no path arguments it scans the default glob set:
  *   packages/<star>/README.md and plugins/<star>/README.md
@@ -57,7 +57,7 @@ const HELP = [
   'check-readme-standard.ts - A2 / US-9 README conformance gate.',
   '',
   'Usage:',
-  '  deno run --no-lock --allow-read .llm/tools/check-readme-standard.ts [paths...] [flags]',
+  '  deno run --no-lock --allow-read .llm/tools/validation/check-readme-standard.ts [paths...] [flags]',
   '',
   'Arguments:',
   '  paths     One or more README.md paths. Default: packages/*/README.md + plugins/*/README.md.',

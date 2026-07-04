@@ -6,9 +6,9 @@
  * endpoints, triggers a worker job, and emits machine-readable step results.
  *
  * Examples:
- * - deno run --allow-read --allow-write --allow-run --allow-net --allow-env .llm/tools/scaffold-e2e-test.ts
- * - deno run --allow-read --allow-write --allow-run --allow-net --allow-env .llm/tools/scaffold-e2e-test.ts --format pretty --cleanup
- * - deno run --allow-read --allow-write --allow-run --allow-net --allow-env .llm/tools/scaffold-e2e-test.ts --repo . --name plugin-smoke-manual --strict-telemetry
+ * - deno run --allow-read --allow-write --allow-run --allow-net --allow-env .llm/tools/e2e/scaffold-e2e-test.ts
+ * - deno run --allow-read --allow-write --allow-run --allow-net --allow-env .llm/tools/e2e/scaffold-e2e-test.ts --format pretty --cleanup
+ * - deno run --allow-read --allow-write --allow-run --allow-net --allow-env .llm/tools/e2e/scaffold-e2e-test.ts --repo . --name plugin-smoke-manual --strict-telemetry
  */
 
 import { delay } from 'jsr:@std/async@1/delay';
@@ -351,11 +351,11 @@ async function parseCliOptions(args: string[]): Promise<Options | null> {
     })
     .example(
       'Default NDJSON run',
-      'deno run --allow-read --allow-write --allow-run --allow-net --allow-env .llm/tools/scaffold-e2e-test.ts',
+      'deno run --allow-read --allow-write --allow-run --allow-net --allow-env .llm/tools/e2e/scaffold-e2e-test.ts',
     )
     .example(
       'Pretty dry-run plan',
-      'deno run --allow-read --allow-write --allow-run --allow-net --allow-env .llm/tools/scaffold-e2e-test.ts --dry-run --format pretty',
+      'deno run --allow-read --allow-write --allow-run --allow-net --allow-env .llm/tools/e2e/scaffold-e2e-test.ts --dry-run --format pretty',
     )
     .action((options: CommandOptionValues) => {
       parsed = normalizeCommandOptions(options);

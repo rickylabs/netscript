@@ -37,7 +37,7 @@
  *
  * Usage:
  *   deno run --allow-net --allow-read --allow-env \
- *     .llm/tools/jsr-set-package-settings.ts \
+ *     .llm/tools/release/jsr-set-package-settings.ts \
  *     [--scope netscript] [--root .] [--config jsr-package-settings.json] [--dry-run]
  */
 
@@ -120,7 +120,7 @@ function printHelp(): void {
       '',
       'Usage:',
       '  deno run --allow-net --allow-read --allow-env \\',
-      '    .llm/tools/jsr-set-package-settings.ts [flags]',
+      '    .llm/tools/release/jsr-set-package-settings.ts [flags]',
       '',
       'Flags:',
       '  --scope <name>    JSR scope (default: netscript)',

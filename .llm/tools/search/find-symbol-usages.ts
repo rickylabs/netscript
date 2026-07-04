@@ -5,9 +5,9 @@
  * for symbols during refactors, API audits, or migration work.
  *
  * Examples:
- * - deno run --allow-read .llm/tools/find-symbol-usages.ts --root packages/fresh --symbol definePage
- * - deno run --allow-read .llm/tools/find-symbol-usages.ts --root packages/cli/src --symbol defineCommand
- * - deno run --allow-read .llm/tools/find-symbol-usages.ts --root packages/fresh --symbol createListPage --substring
+ * - deno run --allow-read .llm/tools/search/find-symbol-usages.ts --root packages/fresh --symbol definePage
+ * - deno run --allow-read .llm/tools/search/find-symbol-usages.ts --root packages/cli/src --symbol defineCommand
+ * - deno run --allow-read .llm/tools/search/find-symbol-usages.ts --root packages/fresh --symbol createListPage --substring
  */
 
 interface Options {
@@ -32,7 +32,7 @@ const DEFAULT_IGNORE_DIRS = ['.git', '_fresh', 'node_modules', 'dist', 'coverage
 function printHelp(): void {
   console.log([
     'Usage:',
-    '  deno run --allow-read .llm/tools/find-symbol-usages.ts [options]',
+    '  deno run --allow-read .llm/tools/search/find-symbol-usages.ts [options]',
     '',
     'Options:',
     '  --root <path>       Root path to scan. Repeatable. Default: .',

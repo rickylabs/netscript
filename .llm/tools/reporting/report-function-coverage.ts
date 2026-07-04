@@ -130,7 +130,7 @@ function requireValue(args: string[], index: number, flag: string): string {
 function printHelp(): void {
   console.log([
     'Usage:',
-    '  deno run --allow-read --allow-write --allow-run .llm/tools/report-function-coverage.ts \\',
+    '  deno run --allow-read --allow-write --allow-run .llm/tools/reporting/report-function-coverage.ts \\',
     '    --coverage .llm/tmp/coverage/functions \\',
     '    --out .llm/tmp/coverage/function-report.json \\',
     '    --package packages/contracts',

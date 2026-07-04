@@ -6,8 +6,8 @@
  * shell does not get a chance to mangle them.
  *
  * Examples:
- * - deno run --allow-run .llm/tools/git-commit-paths.ts --message chore-sync --all-staged --push --dry-run
- * - deno run --allow-read --allow-run .llm/tools/git-commit-paths.ts --message-file .llm/temp/commit-message.txt --path-file .llm/temp/commit-paths.txt
+ * - deno run --allow-run .llm/tools/git/git-commit-paths.ts --message chore-sync --all-staged --push --dry-run
+ * - deno run --allow-read --allow-run .llm/tools/git/git-commit-paths.ts --message-file .llm/temp/commit-message.txt --path-file .llm/temp/commit-paths.txt
  */
 
 interface Options {
@@ -25,7 +25,7 @@ interface Options {
 function printHelp(): void {
   console.log([
     'Usage:',
-    '  deno run --allow-run .llm/tools/git-commit-paths.ts --message <msg> [options]',
+    '  deno run --allow-run .llm/tools/git/git-commit-paths.ts --message <msg> [options]',
     '',
     'Options:',
     '  --message <msg>        Commit message.',

@@ -6,9 +6,9 @@
  * because one Deno process can walk the tree once and handle all matching in-process.
  *
  * Examples:
- * - deno run --allow-read .llm/tools/find-lines.ts --root packages/cli/src --contains @netscript/
- * - deno run --allow-read .llm/tools/find-lines.ts --root packages/fresh --regex define(ListPage|DetailPage|FormPage)
- * - deno run --allow-read .llm/tools/find-lines.ts --root packages/cli/src --contains ../ --ext .ts,.tsx
+ * - deno run --allow-read .llm/tools/search/find-lines.ts --root packages/cli/src --contains @netscript/
+ * - deno run --allow-read .llm/tools/search/find-lines.ts --root packages/fresh --regex define(ListPage|DetailPage|FormPage)
+ * - deno run --allow-read .llm/tools/search/find-lines.ts --root packages/cli/src --contains ../ --ext .ts,.tsx
  */
 
 interface Options {
@@ -32,7 +32,7 @@ const DEFAULT_IGNORE_DIRS = ['.git', '_fresh', 'node_modules', 'dist', 'coverage
 function printHelp(): void {
   console.log([
     'Usage:',
-    '  deno run --allow-read .llm/tools/find-lines.ts [options]',
+    '  deno run --allow-read .llm/tools/search/find-lines.ts [options]',
     '',
     'Options:',
     '  --root <path>       Root path to scan. Repeatable. Default: .',

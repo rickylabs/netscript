@@ -17,7 +17,7 @@ Bypass for ground truth:
 
 - `rtk proxy git <args>` — runs the raw command, no cache.
 - **Preferred for scripts:** spawn git directly with no shell, e.g.
-  `deno eval 'new Deno.Command("git",{args:[...]})'`, or use `.llm/tools/git-verify.ts`. No shell =
+  `deno eval 'new Deno.Command("git",{args:[...]})'`, or use `.llm/tools/git/git-verify.ts`. No shell =
   no rewrite = no cache.
 
 (Also captured in auto-memory `rtk-stale-git-cache`.)
