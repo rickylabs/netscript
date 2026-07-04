@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "name": "@netscript/plugin-sagas",
-  "version": "0.0.1-beta.1",
+  "version": "0.0.1-beta.2",
   "displayName": "Saga Orchestrator",
   "description": "NetScript plugin for durable saga orchestration, workflow APIs, and saga runtime metadata.",
   "peerDependencies": {
-    "@netscript/plugin": "0.0.1-beta.1"
+    "@netscript/plugin": "0.0.1-beta.2"
   },
   "capabilities": {
     "hasDatabaseMigrations": true,
