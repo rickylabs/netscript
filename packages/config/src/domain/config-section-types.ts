@@ -411,6 +411,58 @@ export interface DeployTargetBase {
     /** .NET base image used for container output. */
     dotnetBaseImage: string;
   };
+  /**
+   * Health-gated activation + release-retention convention (shared across every
+   * deploy target — R-DEPLOY-3). Bare-metal swaps the active release atomically
+   * only after a health probe passes, and prunes old releases beyond `retain`.
+   */
+  activation?: {
+    /** Number of prior releases to retain before pruning. Default: 3. */
+    retain?: number;
+    /** Atomic activation strategy. Default: `symlink` (Linux) / `dir-swap` (Windows). */
+    strategy?: 'symlink' | 'dir-swap';
+    /** Health probe that gates a new release taking traffic. */
+    healthGate?: {
+      /** HTTP path probed for health. Default: `/health`. */
+      path?: string;
+      /** Port the health endpoint listens on. */
+      port?: number;
+      /** Per-probe timeout in milliseconds. Default: 2000. */
+      timeoutMs?: number;
+      /** Delay between probe attempts in milliseconds. Default: 2000. */
+      intervalMs?: number;
+      /** Number of probe attempts before the gate fails. Default: 5. */
+      retries?: number;
+      /** HTTP status that signals healthy. Default: 200. */
+      expectStatus?: number;
+    };
+  };
+  /**
+   * Secret-material convention (shared across every deploy target — R-DEPLOY-3).
+   * Beta baseline writes a restricted-permission env file; the external secret
+   * store is the deferred stable slice.
+   */
+  secrets?: {
+    /** Relative path of the generated restricted secret env file. */
+    envFile?: string;
+    /** POSIX file mode for the secret file. Default: 0o600. */
+    mode?: number;
+  };
+  /**
+   * OpenTelemetry convention (shared across every deploy target — R-DEPLOY-3).
+   * Derives the canonical `OTEL_DENO='true'` runtime env plus optional endpoint /
+   * protocol / service-name-prefix wiring.
+   */
+  otel?: {
+    /** Whether OTEL runtime env is emitted. Default: true. */
+    enabled?: boolean;
+    /** OTLP exporter endpoint (`OTEL_EXPORTER_OTLP_ENDPOINT`). */
+    endpoint?: string;
+    /** OTLP exporter protocol (`OTEL_EXPORTER_OTLP_PROTOCOL`). */
+    protocol?: string;
+    /** Prefix applied to the derived `OTEL_SERVICE_NAME`. */
+    serviceNamePrefix?: string;
+  };
 }
 
 /** Windows Services deployment target (`deploy.targets.windows`). */

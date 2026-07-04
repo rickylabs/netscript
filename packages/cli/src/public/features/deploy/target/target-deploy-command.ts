@@ -18,6 +18,8 @@ const ROUTED_OPERATIONS: readonly DeployOperation[] = [
   'down',
   'status',
   'logs',
+  'rollback',
+  'secrets',
 ];
 
 /** Human-readable descriptions for the routed lifecycle verbs. */

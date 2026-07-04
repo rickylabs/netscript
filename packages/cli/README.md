@@ -67,7 +67,20 @@ NetScript deploys workspace services to bare-metal hosts as OS-managed services 
 
 ### Operation coverage
 
-The bare-metal targets implement the canonical `plan` / `emit` / `up` / `down` / `status` / `logs` operations (with `build` / `install` / `uninstall` retained as verb aliases). `rollback` and `secrets` are declared-unsupported for now and are tracked for a later deployment-hardening release.
+The bare-metal targets implement the canonical `plan` / `emit` / `up` / `down` / `status` / `logs` operations (with `build` / `install` / `uninstall` retained as verb aliases). The full 7-op contract — adding `rollback` and `secrets` — is available once a target is wired with the shared deploy-core conventions: `up` runs a health-gated activation (atomic cutover + probe + automatic rollback on failure), `rollback` returns to the previous healthy release, and `secrets` reconciles a restricted env file (`0o600` on Linux, owner+SYSTEM ACL on Windows). An unwired descriptor advertises only the 6-op subset, so the router never exposes a verb the target cannot perform.
+
+### Permissions
+
+The bare-metal deploy lifecycle compiles binaries, manages OS services, writes release/secret material, and health-probes the running service, so a host binary embedding this surface must grant:
+
+| Permission     | Why                                                                              |
+| -------------- | -------------------------------------------------------------------------------- |
+| `--allow-run`  | `deno compile` the service binaries and invoke `servy` / `systemctl` / `icacls`. |
+| `--allow-read` | Read the workspace config, entrypoints, and release/secret files.                |
+| `--allow-write`| Emit compiled binaries, release directories, the `current` link, and env files.  |
+| `--allow-net`  | Health-probe the activated service (`FetchHealthProbe`).                          |
+| `--allow-sys`  | Resolve the host OS/triple to pick the Servy vs. systemd adapter and target.      |
+| `--allow-env`  | Read the deploy owner principal for the Windows secret-file ACL.                 |
 
 ---
 

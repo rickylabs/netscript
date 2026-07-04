@@ -85,3 +85,62 @@ Deno.test('resolveWindowsDeploy honors user overrides from deploy.targets.window
   assertEquals(resolved.compileTarget, 'aarch64-pc-windows-msvc');
   assertEquals(resolved.concurrency, 8);
 });
+
+// ── Shared convention-block defaults (activation / secrets / otel, R-DEPLOY-3) ──
+
+Deno.test('resolveDeployBase defaults the activation/secrets/otel convention blocks (U1–U3)', () => {
+  const resolved = resolveLinuxDeploy(undefined);
+
+  // Activation + health-gate defaults (U1, U3).
+  assertEquals(resolved.activation.retain, 3);
+  assertEquals(resolved.activation.strategy, 'symlink');
+  assertEquals(resolved.activation.healthGate.path, '/health');
+  assertEquals(resolved.activation.healthGate.expectStatus, 200);
+  assertEquals(resolved.activation.healthGate.retries, 5);
+  assertEquals(resolved.activation.healthGate.intervalMs, 2000);
+  assertEquals(resolved.activation.healthGate.timeoutMs, 2000);
+  assertEquals(resolved.activation.healthGate.port, undefined);
+  // Secret env-file convention defaults (U2).
+  assertEquals(resolved.secrets.envFile, '.env');
+  assertEquals(resolved.secrets.mode, 0o600);
+  // OTEL convention defaults.
+  assertEquals(resolved.otel.enabled, true);
+  assertEquals(resolved.otel.protocol, 'http/protobuf');
+  assertEquals(resolved.otel.endpoint, undefined);
+});
+
+Deno.test('activation.strategy defaults per-OS (symlink on Linux, dir-swap on Windows)', () => {
+  assertEquals(resolveLinuxDeploy(undefined).activation.strategy, 'symlink');
+  assertEquals(resolveWindowsDeploy(undefined).activation.strategy, 'dir-swap');
+});
+
+Deno.test('resolveDeployBase honors activation/secrets/otel overrides', () => {
+  const userDeploy: DeployConfig = {
+    targets: {
+      linux: {
+        activation: {
+          retain: 7,
+          strategy: 'dir-swap',
+          healthGate: { path: '/ready', retries: 2, expectStatus: 204 },
+        },
+        secrets: { envFile: 'config/.secrets.env', mode: 0o640 },
+        otel: { enabled: false, endpoint: 'http://otel:4318', protocol: 'grpc' },
+      },
+    },
+  };
+
+  const resolved = resolveLinuxDeploy(userDeploy);
+
+  assertEquals(resolved.activation.retain, 7);
+  assertEquals(resolved.activation.strategy, 'dir-swap');
+  assertEquals(resolved.activation.healthGate.path, '/ready');
+  assertEquals(resolved.activation.healthGate.retries, 2);
+  assertEquals(resolved.activation.healthGate.expectStatus, 204);
+  // Unset health-gate fields still fall back to the shared defaults.
+  assertEquals(resolved.activation.healthGate.intervalMs, 2000);
+  assertEquals(resolved.secrets.envFile, 'config/.secrets.env');
+  assertEquals(resolved.secrets.mode, 0o640);
+  assertEquals(resolved.otel.enabled, false);
+  assertEquals(resolved.otel.endpoint, 'http://otel:4318');
+  assertEquals(resolved.otel.protocol, 'grpc');
+});

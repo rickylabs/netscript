@@ -1763,9 +1763,20 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   the core.
 - **Linked plan:** `.llm/tmp/run/deploy-s7-aspire/plan.md` (S3); drift `D2`.
 - **Created:** 2026-07-03.
-- **Status:** open — blocked on #341/#364 core conventions.
-- **Gate:** Close when the deploy core exposes shared `secrets`/`rollback` primitives and the
-  Aspire compose/docker adapter advertises both ops by delegating to them.
+- **Update (2026-07-04, #341 / PR #374):** the blocking core conventions now exist. Deploy-S5 landed
+  the target-agnostic core primitives in `packages/cli/src/kernel/domain/deploy/`:
+  `secrets-convention.ts` (`reconcileSecrets` + `SecretsStorePort`), `rollback-convention.ts`
+  (`retainReleases`/`selectRollbackTarget`/`rollbackToPrevious` + `ActivationPort`),
+  `health-gate.ts` (`runHealthGate` + `HealthProbePort`), `activation-convention.ts`
+  (`activateWithHealthGate`), and `observability-convention.ts` (`observabilityEnv`). The bare-metal
+  reference binding is complete: `EnvFileSecretsStore`, `Fetch­HealthProbe`,
+  `Symlink`/`DirSwapActivationPort`, and a 7-op `ServiceDeployTarget` that advertises + delegates
+  `rollback`/`secrets` (and health-gates `up`) when the core ports are injected. The Aspire
+  compose/docker adapter delegation (this entry's own gate) remains open and is now unblocked.
+- **Status:** open — core primitives landed (#341/#374); remaining scope is the Aspire adapter
+  delegating to them.
+- **Gate:** Close when the Aspire compose/docker adapter advertises both ops by delegating to the
+  now-shipped deploy-core `secrets`/`rollback` primitives.
 - **Gate:** Close each route as its triggers-core seam lands (manual/test-fire helper -> `fireTrigger`
   + `testWebhook`; enabled-state store + `enabled`/`name` fields -> `enableTrigger`/`disableTrigger`
   + un-synthesized `listTriggers`/`getTrigger`; cron preview engine -> `previewSchedule`; event SSE
@@ -1976,9 +1987,50 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Linked plan:** `.llm/tmp/run/deploy-s2-doctrine/plan.md` (Slice 3);
   `docs/architecture/doctrine/06-archetypes.md#archetype-7--deployment-target-adapter`.
 - **Created:** 2026-07-03
-- **Status:** open, DEBT_ACCEPTED — `F-DEPLOY-1/2` seeded `reviewed` while the deployment packages
-  are unbuilt.
+- **Update (2026-07-04, #341 / PR #374):** the core-centralization obligation is materially advanced.
+  The convention-bearing primitives (health gating, OTEL, secrets, rollback) now live in the deploy
+  core `packages/cli/src/kernel/domain/deploy/` as pure, target-agnostic modules with injected ports
+  (`secrets-convention.ts`, `rollback-convention.ts`, `health-gate.ts`, `activation-convention.ts`,
+  `observability-convention.ts`), and the bare-metal reference binding proves them against systemd +
+  SERVY (see `DEPLOY-SECRETS-ROLLBACK-CORE`). The `windows-service`/`linux-service`
+  `ServiceDeployTarget` is now a genuine 7-op adapter (rollback/secrets advertised + delegated when
+  the core ports are injected). Still open for full closure: the primitives live in `packages/cli`
+  (not a standalone deployment core package), the target registry is CLI-local, and
+  `F-DEPLOY-1`/`F-DEPLOY-2` remain `reviewed` (not `gated`).
+- **Status:** open, DEBT_ACCEPTED — convention primitives centralized (#341/#374); `F-DEPLOY-1/2`
+  remain `reviewed` pending a standalone deployment core package + full adapter matrix.
 - **Gate:** Close when the deployment core owns the centralized health/OTEL/secrets/rollback
   primitives and the target registry, every landed target adapter satisfies the uniform 7-op
   contract, and `F-DEPLOY-1`/`F-DEPLOY-2` are promoted from `reviewed` to `gated` in all three
   surfaces (doctrine, harness archetype file, gate matrix).
+
+## packages/cli deploy — DEPLOY-BAREMETAL-PUBLIC-WIRING (#341 / PR #374)
+
+- **ID:** `DEPLOY-BAREMETAL-PUBLIC-WIRING`
+- **Title:** The bare-metal 7-op adapter is proven via injected ports but not yet composed onto the
+  public deploy execution path.
+- **Context:** Deploy-S5 (#341) landed the target-agnostic core conventions, the bare-metal
+  reference bindings (`EnvFileSecretsStore`, `FetchHealthProbe`, `Symlink`/`DirSwapActivationPort`),
+  and a `ServiceDeployTarget` that delegates `rollback`/`secrets` and health-gates `up` **when the
+  core ports are injected**. The registry-seeded descriptors (`WindowsServiceDeployTarget`/
+  `LinuxServiceDeployTarget`) are still constructed with **no** ports, so at runtime they advertise
+  only the 6-op subset. The production composition that constructs a fully-wired target — resolving
+  the release candidate + probe spec + secret bundle and injecting the real `OsServicePort`-backed
+  activation store on the public deploy path — is intentionally not built here.
+- **Why deferred:** The activation adapters depend on the public `OsServicePort` seam, so the
+  wiring is a public-layer composition concern (`public/adapters/**` + the deploy command
+  dependencies), out of the kernel-domain S5/S6 scope (hexagonal boundary; see run drift `D-S8`).
+  Wiring it also needs a release-id/candidate resolution + secret-source pipeline that has no
+  first-party caller yet. The delegation seam is fully unit-proven with fake ports; only the
+  composition root is missing.
+- **Owner:** Deployment epic #327 — public deploy composition slice (systemd/#339, servy).
+- **Target:** When the public deploy path constructs `ServiceDeployTarget` with the real bare-metal
+  ports so `deploy <target> up|rollback|secrets` executes end-to-end.
+- **Linked plan:** `.llm/tmp/run/deploy-s5-hardening/plan.md`;
+  `.llm/tmp/run/deploy-s5-hardening/drift.md` (`D-S8`).
+- **Created:** 2026-07-04
+- **Status:** open, DEBT_ACCEPTED — delegation seam proven via injected ports; production
+  composition deferred.
+- **Gate:** Close when the registry seeds a port-wired `ServiceDeployTarget` (or the deploy command
+  injects the bare-metal ports) and an e2e/runtime smoke exercises health-gated `up`, `rollback`,
+  and `secrets` against a real systemd/SERVY service.

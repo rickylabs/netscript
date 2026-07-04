@@ -20,6 +20,13 @@ import {
   DEFAULT_LINUX_UNIT_PREFIX,
   DEFAULT_SYSTEMCTL_PATH,
 } from '../../constants/linux.ts';
+import {
+  DEFAULT_HEALTH_GATE,
+  DEFAULT_OTLP_PROTOCOL,
+  DEFAULT_RELEASE_RETENTION,
+  DEFAULT_SECRET_ENV_FILE,
+  RESTRICTED_SECRET_FILE_MODE,
+} from '../../constants/deploy.ts';
 import type {
   RegisteredPluginConfig,
   ResolvedAppConfig,
@@ -279,6 +286,7 @@ export function resolveApps(
 function resolveDeployBase(
   base: DeployTargetBase | undefined,
   compileTargetDefault: string,
+  activationStrategyDefault: 'symlink' | 'dir-swap',
 ): ResolvedDeployBaseConfig {
   return {
     mode: base?.mode ?? 'compile',
@@ -315,6 +323,28 @@ function resolveDeployBase(
       denoBaseImage: base?.docker?.denoBaseImage ?? 'denoland/deno:2',
       dotnetBaseImage: base?.docker?.dotnetBaseImage ?? 'mcr.microsoft.com/dotnet/aspnet:9.0',
     },
+    activation: {
+      retain: base?.activation?.retain ?? DEFAULT_RELEASE_RETENTION,
+      strategy: base?.activation?.strategy ?? activationStrategyDefault,
+      healthGate: {
+        path: base?.activation?.healthGate?.path ?? DEFAULT_HEALTH_GATE.path,
+        port: base?.activation?.healthGate?.port,
+        timeoutMs: base?.activation?.healthGate?.timeoutMs ?? DEFAULT_HEALTH_GATE.timeoutMs,
+        intervalMs: base?.activation?.healthGate?.intervalMs ?? DEFAULT_HEALTH_GATE.intervalMs,
+        retries: base?.activation?.healthGate?.retries ?? DEFAULT_HEALTH_GATE.retries,
+        expectStatus: base?.activation?.healthGate?.expectStatus ?? DEFAULT_HEALTH_GATE.expectStatus,
+      },
+    },
+    secrets: {
+      envFile: base?.secrets?.envFile ?? DEFAULT_SECRET_ENV_FILE,
+      mode: base?.secrets?.mode ?? RESTRICTED_SECRET_FILE_MODE,
+    },
+    otel: {
+      enabled: base?.otel?.enabled ?? true,
+      endpoint: base?.otel?.endpoint,
+      protocol: base?.otel?.protocol ?? DEFAULT_OTLP_PROTOCOL,
+      serviceNamePrefix: base?.otel?.serviceNamePrefix,
+    },
   };
 }
 
@@ -326,7 +356,7 @@ function resolveDeployBase(
 export function resolveWindowsDeploy(userDeploy?: DeployConfig): ResolvedWindowsDeployConfig {
   const win = userDeploy?.targets?.windows;
   return {
-    ...resolveDeployBase(win, DEFAULT_COMPILE_TARGET),
+    ...resolveDeployBase(win, DEFAULT_COMPILE_TARGET, 'dir-swap'),
     servyCliPath: win?.servyCliPath ?? DEFAULT_SERVY_CLI_PATH,
     servicePrefix: win?.servicePrefix ?? DEFAULT_SERVICE_PREFIX,
     installBase: win?.installBase ?? 'C:\\NetScript',
@@ -342,7 +372,7 @@ export function resolveWindowsDeploy(userDeploy?: DeployConfig): ResolvedWindows
 export function resolveLinuxDeploy(userDeploy?: DeployConfig): ResolvedLinuxDeployConfig {
   const linux = userDeploy?.targets?.linux;
   return {
-    ...resolveDeployBase(linux, DEFAULT_LINUX_COMPILE_TARGET),
+    ...resolveDeployBase(linux, DEFAULT_LINUX_COMPILE_TARGET, 'symlink'),
     systemctlPath: linux?.systemctlPath ?? DEFAULT_SYSTEMCTL_PATH,
     unitPrefix: linux?.unitPrefix ?? DEFAULT_LINUX_UNIT_PREFIX,
     installBase: linux?.installBase ?? DEFAULT_LINUX_INSTALL_BASE,
