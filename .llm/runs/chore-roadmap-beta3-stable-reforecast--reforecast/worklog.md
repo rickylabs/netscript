@@ -36,8 +36,11 @@
     reconcile table + distribution (stable=8/Backlog=15), §5 rewritten as ratification record,
     new §6 harness-V3 operating-model conformance (merged `eeaff336`; tiers, A1, stage labels,
     #387 close-gate, epic/closing-keyword conventions).
-  - GitHub: #302 milestone stable → Backlog / Triage (reversible, comment posted); #394 comment
-    (bare-metal-first per R4); PR #392 phase comment + `status:plan-eval` → `status:impl-eval`.
+  - GitHub: PR #392 phase comment posted; #302 milestone move (stable → Backlog / Triage) and the
+    #302/#394 ratification comments were DENIED by the fold session's permission classifier
+    (grant covered the PR surface only) — recorded as directed/pending-apply for the owner or a
+    granted session. Stage label `status:plan-eval` → `status:impl-eval` attempted with the phase
+    comment.
   - Reconcile note: harness V3 merged to main (`eeaff336`) after the forecast was written — beta.5
     scope line for #389 updated to "epic close-out + adoption remain"; #313 verified already at
     Backlog (Q5 assumption holds); no other issue drift found since G3.

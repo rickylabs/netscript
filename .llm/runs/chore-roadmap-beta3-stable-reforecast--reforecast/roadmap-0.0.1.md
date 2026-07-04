@@ -119,8 +119,10 @@ Scope (the release — #301's stable criteria as amended by R1):
 - **#302** S1 positioning + `netscript-bench` — **post-stable FAST-FOLLOW (R1 ratified), not a
   stable gate.** Run-1 leadership numbers + the cross-framework batch publish after the stable cut
   (work may proceed in parallel, but it must not block the cut). #301's "hard gate" framing is
-  loosened accordingly (epic-body amendment tracked as an owner follow-up). Milestone moved
-  stable → Backlog / Triage (reversible) to keep the stable milestone = the cut's true gate set.
+  loosened accordingly (epic-body amendment tracked as an owner follow-up). Milestone move
+  stable → Backlog / Triage directed (reversible; **pending apply** — the fold session's
+  permission grant covered the PR surface only) to keep the stable milestone = the cut's true
+  gate set.
 - **#313** Prisma-Next (**Q5: assumed deferred** — see §5) + #314-318 gaps + #349/#350 deploy-WATCH
   — remain **Backlog** (deferred; not stable blockers)
 
@@ -164,12 +166,12 @@ Applied moves (all reversible; see worklog for exact `gh` calls):
 | #295 Aspire dogfood proof | beta.3 | Backlog | evidence-only, never merges to main; external-dep |
 | #319/#320 Aspire Layer A/B | beta.3 | Backlog | gated on external microsoft/aspire#16218 — can't gate a beta |
 | #309 release-eng | beta.3 | stable | API-stability/surface-diff gate is a stable criterion |
-| #302 bench | stable | Backlog / Triage | **R1 ratified (2026-07-04): post-stable fast-follow, not a stable gate** — keeps the stable milestone = the cut's true gate set; reversible |
+| #302 bench | stable | Backlog / Triage | **R1 ratified (2026-07-04): post-stable fast-follow, not a stable gate** — reversible; **pending apply** (fold session's grant covered the PR surface only) |
 
-Ratification-driven reconcile (applied 2026-07-04, after PLAN-EVAL): the #302 move above; #394
-stays beta.3 but its scope is re-pointed **bare-metal-first** (R4 — comment posted on #394); #313
-confirmed already at Backlog (Q5 assumption); no other moves needed — R2 (distinct beta.5) and R3
-(beta.3 dogfood bar) match the forecast as applied.
+Ratification-driven reconcile (2026-07-04, after PLAN-EVAL): the #302 move above (directed,
+pending apply); #394 stays beta.3 but its scope is re-pointed **bare-metal-first** (R4 — issue
+comment pending under the same grant); #313 confirmed already at Backlog (Q5 assumption); no other
+moves needed — R2 (distinct beta.5) and R3 (beta.3 dogfood bar) match the forecast as applied.
 
 New milestone created: **`0.0.1-beta.5`** (staging boundary between AI depth and stable).
 
@@ -178,10 +180,10 @@ New issues filed (code defects found by the sweep — NOT fixed here):
 - **#394** test: no deploy target has a scaffold.runtime/e2e gate (beta.3, `type:test`, `area:cli`, `gate:e2e`, p1).
 - Taxonomy fixes: #375 (`type:feat`/`area:aspire`/p3), #376 (`type:fix`/`area:plugins`/p2).
 
-Resulting distribution (open, post-reconcile + post-ratification): **beta.3=9**
-(219,238,376,379,380,387,388,393,394) · **beta.4=9** · **beta.5=10** · **stable=8** ·
-**Backlog=15** (#302 moved per R1). Each milestone now reads as a coherent theme rather than a
-leftover bucket.
+Resulting distribution (open, post-reconcile): **beta.3=9** (219,238,376,379,380,387,388,393,394)
+· **beta.4=9** · **beta.5=10** · **stable=9** · **Backlog=14** — becomes **stable=8 · Backlog=15**
+once the R1-directed #302 move is applied. Each milestone now reads as a coherent theme rather
+than a leftover bucket.
 
 ## 5. Owner ratification record (2026-07-04, post-PLAN-EVAL)
 
@@ -191,7 +193,8 @@ R1–R4 on PR #392 after the PLAN-EVAL APPROVED verdict. Folded into §§1–4 a
 1. **Stable definition — RATIFIED: bench = FAST-FOLLOW.** Bench leadership (#302) is a post-stable
    fast-follow, **not** a hard stable gate; stable cuts on production-readiness. Any "hard gate"
    framing on #301 is loosened accordingly (epic-body amendment tracked as an owner follow-up).
-   Applied: stable theme/scope + ETA reworked; #302 milestone stable → Backlog / Triage.
+   Applied: stable theme/scope + ETA reworked; #302 milestone move stable → Backlog / Triage
+   directed (pending apply — see §4).
 2. **Cut sequence / beta.5 — RATIFIED: KEEP DISTINCT.** beta.5 stays its own milestone with its own
    scope (deployment hardening + repo/process maturity); not folded into beta.4 or stable.
 3. **eis-chat dogfood bar — RATIFIED: beta.3 IS THE BAR.** eis-chat dogfood readiness is the beta.3

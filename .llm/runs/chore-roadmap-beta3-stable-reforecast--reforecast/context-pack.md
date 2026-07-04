@@ -13,8 +13,9 @@ evidence-derived release design, not leftover-bucketing. Evidence over labels (#
 - Forecast (post-ratification): beta.3=AI-plugin-parity+acceptance, **eis-chat dogfood bar (R3)**
   (#388/#387/#380/#379/#219/#376/#393/#394) · beta.4=AI-depth · beta.5=deploy+maturity, **distinct
   (R2)** · stable=prod-gates+release-readiness with **bare-metal systemd deploy gate (R4)**; bench
-  #302 = **post-stable fast-follow (R1)**, milestone moved to Backlog. Single load-bearing dogfood
-  gap = #388. #389 overridden stable→beta.5. beta.5 milestone (#7) created.
+  #302 = **post-stable fast-follow (R1)**, milestone move to Backlog directed (pending apply —
+  fold session grant covered the PR surface only). Single load-bearing dogfood gap = #388. #389
+  overridden stable→beta.5. beta.5 milestone (#7) created.
 - Milestone snapshot at start (2026-07-04): beta.1 closed(19) · beta.2 0 open/10 closed ·
   beta.3 16 open/13 closed · beta.4 3 open · stable 16 open/3 closed · Backlog 12 open. No beta.5 yet.
 - Moves already applied pre-run (to reconcile): #388/#387→beta.3, #262/#290/#247→beta.4,

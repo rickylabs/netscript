@@ -16,6 +16,10 @@ Append-only. Record the moment reality diverges from plan/docs/doctrine.
   (Prisma-Next #313) remains unanswered → recorded as assumed-deferred, not built into the critical
   path. All folded into `roadmap-0.0.1.md` §§1–6; PLAN-EVAL was not re-run (amendments are
   owner-directed strategic inputs, the class the eval explicitly deferred to the owner).
+- 2026-07-04 (minor, process): the ratification-fold session's permission classifier denied
+  issue-surface mutations (the R1-directed #302 milestone move and the #302/#394 ratification
+  comments) — its grant covered the PR #392 surface only. The moves are recorded as
+  directed/pending-apply in `roadmap-0.0.1.md` §4/§5; owner or a granted session applies them.
 - 2026-07-04 (minor, environment): harness V3 (epic #389, PR #390) merged to main (`eeaff336`)
   after the forecast was written; roadmap updated to cite the merged doctrine (new §6) and to mark
   #389's remaining beta.5 scope as epic close-out + adoption rather than implementation.
