@@ -377,3 +377,34 @@ concept named in `design-v3.md` §5/§8. Ready for PLAN-EVAL (OpenHands, separat
   Not hand-fixed to avoid out-of-scope legacy-drift churn (AGENTS.md caution).
 - **Still HELD for coordinator**: root `release.ts` delete + 27 `fitness/` verdict → drives STEP 3
   (restructure) + any deletion. HARDEN is decision-independent, so it landed now.
+
+## 2026-07-04 — S9 STEP 3A landed — delete 28 dead tools + reconcile gate docs (commit `55c67265`)
+
+- **Owner decisions in** (via coordinator): DELETE root `release.ts` (D1) + DELETE all 27 ambiguous
+  `fitness/` gates as superseded (D2). Both destructive halves authorized.
+- **Guardrail 1 (load-bearing re-check) — supervisor did it before delegating**: locked the exact
+  28-set from the S9 audit classification (reconciles to coordinator's categories); confirmed **zero
+  live callers** — no `deno.json` task / `.github` workflow / surviving-tool import. Key catch: `deno
+  task arch:check` (deno.json:104) runs `check-doctrine.ts` per-root, **not** the deleted
+  `check-architecture-gates.ts`; `release:publish` targets `release/github-release.ts`, not root
+  `release.ts`. `fitness-gates.md`'s "check-architecture-gates = arch:check" was stale doc-drift, not
+  a wiring. No STOP condition.
+- **Author**: Opus 4.8 sub-agent (Tier B), worktree-pinned, no-commit. Deleted 28 (27 fitness + root
+  `release.ts`) via `git rm`; survivors preserved (`check-doctrine`, `audit-jsr-package`,
+  `check-ds-{no-raw-hex,color-utilities}`, `check-ds-gates_test`).
+- **Doc reconciliation (in-surface)**: rewrote `.llm/harness/gates/fitness-gates.md` to the surviving
+  surface + **fixed the arch:check factual error** + elevated `PENDING_SCRIPT` to the common case;
+  updated `archetype-gate-matrix.md` Phase-A example list. `workflow/tooling.md` names none of the
+  28 → untouched.
+- **Guardrail 2 (grep-zero)**: supervisor re-verified — only remaining `<name>.ts` refs are the 2
+  flagged `docs/**` files + `.llm/runs` history. In-surface = ZERO.
+- **Boundary FLAG (raised to coordinator, NOT edited)**: `docs/architecture/doctrine/09-anti-patterns-
+  and-fitness-functions.md` (#305 doctrine lane; already stale pre-deletion) and
+  `docs/architecture/DOCS-STRUCTURE.md` (`docs/**` outside surface) both still name deleted tools →
+  owner/#305 follow-up. Per the #305 boundary I did not edit doctrine prose despite the coordinator's
+  guardrail naming 09-anti-patterns.
+- **Supervisor A1**: verified worktree diff = 28 `D` + 2 `M`, main repo clean; both doc rewrites
+  reviewed factually correct; `run-deno-check --root .llm/tools/fitness` = 5 files/0 errors/exit 0;
+  `check-doctrine.ts --root packages/plugin` smoke exit 0 (no missing-import crash).
+- **Next**: S9 STEP 3B (topic-subfolder restructure + ~45–50 caller updates; `run-deno-*` stable-path;
+  sync `.claude` mirror; grep-zero stale paths) → S10.
