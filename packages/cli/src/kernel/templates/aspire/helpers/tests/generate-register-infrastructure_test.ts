@@ -137,6 +137,63 @@ describe('generateRegisterInfrastructure', () => {
     assertStringIncludes(output, "CACHE_PROVIDER: 'denokv'")
   })
 
+  it('emits garnet Executable cache as a self-provisioned dotnet tool (Docker-less)', () => {
+    const output = generateRegisterInfrastructure({
+      databases: {},
+      caches: {
+        garnet: {
+          Enabled: true,
+          Engine: 'Garnet',
+          Mode: 'Executable',
+        },
+      },
+      primaryCache: 'garnet',
+    })
+
+    // No container in the executable arm — bare-metal dotnet tool.
+    assert(!output.includes("builder.addContainer('garnet'"))
+    // Self-provisions the garnet-server tool manifest, then runs it via dotnet.
+    assertStringIncludes(
+      output,
+      "garnet_workdir = ensureGarnetToolManifest(appHostDir, '1.1.10');",
+    )
+    assertStringIncludes(
+      output,
+      "builder.addExecutable('garnet', 'dotnet', garnet_workdir, ['tool', 'run', 'garnet-server', '--port', '6379'])",
+    )
+    assertStringIncludes(
+      output,
+      "withEndpoint({ name: 'tcp', targetPort: 6379, scheme: 'tcp' })",
+    )
+    assertStringIncludes(
+      output,
+      'garnet_hostPort = garnet_tcpEndpoint.property(EndpointProperty.HostAndPort)',
+    )
+    assertStringIncludes(output, "cacheWiring.set('garnet', {")
+    assertStringIncludes(output, 'GARNET_URI: garnet_hostPort')
+    assertStringIncludes(output, "CACHE_PROVIDER: 'garnet'")
+  })
+
+  it('honors an explicit ToolVersion pin for the garnet Executable arm', () => {
+    const output = generateRegisterInfrastructure({
+      databases: {},
+      caches: {
+        garnet: {
+          Enabled: true,
+          Engine: 'Garnet',
+          Mode: 'Executable',
+          ToolVersion: '1.0.61',
+        },
+      },
+      primaryCache: 'garnet',
+    })
+
+    assertStringIncludes(
+      output,
+      "ensureGarnetToolManifest(appHostDir, '1.0.61');",
+    )
+  })
+
   it('skips sqlite Aspire resource registration entirely', () => {
     const output = generateRegisterInfrastructure({
       databases: {
