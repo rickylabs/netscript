@@ -150,6 +150,20 @@
   color: "d4c5f9"
   description: "Run the JSR publish/audit gate"
 
+# ── epic: program epics ──────────────────────────────────────────────────────
+- name: "epic:deployment"
+  color: "5319e7"
+  description: "Enterprise deployment framework epic"
+- name: "epic:ai-stack"
+  color: "5319e7"
+  description: "AI plugin stack epic"
+- name: "epic:harness-v3"
+  color: "3e4b9e"
+  description: "Agentic Workflow Doctrine V3 program"
+- name: "epic:roadmap-reforecast"
+  color: "5319e7"
+  description: "beta.3-to-stable roadmap re-forecast program"
+
 # ── cross-cutting flags ──────────────────────────────────────────────────────
 - name: "rfc"
   color: "5319e7"
