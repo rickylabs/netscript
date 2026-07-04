@@ -1,0 +1,253 @@
+# Topic A — `dev-dashboard` epic + sub-issues (draft text only — NO GitHub mutations)
+
+> Decomposed per **panel / layer / CLI surface** per the owner's "one Fable/agent per feature/layer/
+> CLI option" build model (`specs/topic-A §1`). Labels per netscript-pr taxonomy. Milestone
+> `0.0.1-beta.6` (core) / `0.0.1-stable` (depth) — **note: `0.0.1-beta.6` milestone does not exist
+> yet; owner must create it at ratification** (Stage-C owner fork 1; drift C1). All issues carry
+> exactly one `status:` (= `status:plan` in this planning run) and land under `epic:dev-dashboard`.
+
+## Epic issue — `dev-dashboard`
+
+- **Title:** `epic: NetScript Dev Dashboard — Aspire-extension dev console (ships as a plugin, beta.6)`
+- **Labels:** `type:umbrella`, `epic:dev-dashboard`, `area:plugins`, `area:aspire`, `area:fresh-ui`,
+  `area:telemetry`, `priority:p1`, `status:plan`, `wave:v1`
+- **Milestone:** `0.0.1-beta.6`
+- **Body gist:** The killer feature — an Encore-dev-equivalent local dev console for NetScript,
+  delivered as an installable official plugin (`plugin add dashboard`) that dogfoods the plugin
+  system. Thin `plugins/dashboard` + `packages/plugin-dashboard-core`; UI on `@netscript/fresh-ui`;
+  live data from Aspire `/api/telemetry/*` converging on the telemetry-revamp query/export surface
+  (co-land beta.6). **No closing keyword** (epic closes by hand when children land). Cross-epic dep:
+  `epic:telemetry-revamp` (query/export + streams fan-in span-links + triggers W3C bugfix).
+
+## DAG (dependency edges)
+
+```
+FOUNDATION (framework, WSL Codex) ──────────────────────────────────────────────
+  DDX-0  fresh-ui L3 blocks promotion (precursor)   ─┐
+  DDX-1  @netscript/aspire seam ext (command|app)   ─┤
+  DDX-2  plugin-dashboard-core scaffold + contract  ─┤
+                                                      │
+CORE LAYER ───────────────────────────────────────────┼──────────────────────────
+  DDX-3  TelemetryQueryPort + aspire-otlp-http adapter (needs DDX-2; soft dep: TELE query/export)
+  DDX-4  plugins/dashboard thin manifest + scaffold + E2E   (needs DDX-2)
+  DDX-13 Introspection endpoint /_netscript/*               (needs DDX-2, DDX-4)
+  DDX-15 Claude design-sync artifact + panel prototype (Claude) (needs DDX-0)
+                                                      │
+UI SHELL ─────────────────────────────────────────────┼──────────────────────────
+  DDX-5  Fresh build-console shell + app-registration + IA  (needs DDX-0, DDX-4, DDX-15)
+                                                      │
+PANELS (one agent each) ──────────────────────────────┼──────────────────────────
+  DDX-6  Stack Map            (needs DDX-5, DDX-3?/graph-port, DDX-13)
+  DDX-7  Service Catalog+API Explorer (needs DDX-5, DDX-13)
+  DDX-8  Flow / Trace Waterfall  ★flagship (needs DDX-5, DDX-3, TELE fan-in links + triggers bugfix)
+  DDX-9  Run Inspector       (needs DDX-5, DDX-3; rerun-from-step needs DDX-1)
+  DDX-10 Plugin Control      (needs DDX-5, DDX-1)
+  DDX-11 Logs                (needs DDX-5, DDX-3, DDX-1 app/browser-logs)
+  DDX-12 Resource Control    (needs DDX-5, DDX-1)
+  DDX-14 CLI surface + auto-launch (needs DDX-4)
+                                                      │
+MERGE-READINESS ──────────────────────────────────────┴──────────────────────────
+  DDX-16 E2E: scaffold.runtime dashboard join + panel smoke (needs all beta.6 core)
+```
+
+Critical path to a shippable beta.6 flagship: **DDX-0 + DDX-2 → DDX-3/DDX-4 → DDX-5 → DDX-8** with
+the **telemetry-revamp** fan-in-links/triggers-bugfix co-land. DDX-1 gates the "control" panels
+(10/12) and rerun-from-step (9).
+
+---
+
+## Foundation slices (framework — WSL Codex)
+
+### DDX-0 — fresh-ui L3 `blocks/` promotion (D-NSONE precursor)
+- **Labels:** `type:feat`, `area:fresh-ui`, `epic:dev-dashboard`, `priority:p1`, `status:plan`, `wave:v1`
+- **Milestone:** `0.0.1-beta.6`
+- **Acceptance:**
+  - Scripted full-tree byte-diff of the 32 unsampled fresh-ui⇄eis-chat shared-name pairs; divergences
+    (if any) recorded, none silently promoted.
+  - `markdown` build-path split reconciled to one approach (template+codegen **or** compiled).
+  - `registry/blocks/` added with copy-source model (`copyOwnership: app-owned-after-copy`,
+    `registryDependencies`), per-block CSS, and **real** `*.d.ts` + `*.prompt.md` per block.
+  - Promoted set: `breadcrumbs`, `context-rail`, `plugin-gated-view`, `activity-feed`, `connector`,
+    `entity-rail` (generalized from `member-rail`), `tree-nav` (generalized from `channel-tree`).
+    `data-grid` NOT added (collides with existing `DataGrid<T>` export). MCP components NOT added.
+  - `netscript ui:add <block>` copies a block + its L2 `registryDependencies`; fresh-ui gates green.
+- **Dep:** none. **Blocks:** DDX-5 and all panels; DDX-15.
+
+### DDX-1 — `@netscript/aspire` seam extension (`command` + `app` kinds)
+- **Labels:** `type:feat`, `area:aspire`, `epic:dev-dashboard`, `priority:p1`, `status:plan`, `wave:v1`
+- **Milestone:** `0.0.1-beta.6`
+- **Acceptance:**
+  - `AspireResourceKind` gains `'command'` (hard) and `'app'` (preferred); `AspireBuilder` port gains
+    matching methods; `composeAppHost()` lowers them to raw-SDK `withCommand`/`addExecutable`
+    +`withHttpEndpoint`+`withBrowserLogs`.
+  - `contribute()` can register a command whose `commandOptions.arguments` (`InteractionInput[]`) +
+    `confirmationMessage` render the dashboard prompt dialog AND work from `aspire resource <name>
+    <cmd>` (visibility default UI+API). **No `IInteractionService` reference anywhere** (A2).
+  - `app`-kind path registers a Fresh app with HTTP endpoint + browser-logs via `contribute()`.
+  - `ContributionRegistry` duplicate/collision behavior preserved; arch:check green.
+  - **Fallback documented:** if `app` kind slips, dashboard UI registers via Seam B `apps.dashboard`.
+- **Dep:** none. **Blocks:** DDX-10, DDX-12, DDX-9 (rerun), DDX-11 (browser-logs), DDX-5 (app kind).
+
+### DDX-2 — `packages/plugin-dashboard-core` scaffold + contract seam
+- **Labels:** `type:feat`, `area:plugins`, `epic:dev-dashboard`, `priority:p1`, `status:plan`, `wave:v1`
+- **Milestone:** `0.0.1-beta.6`
+- **Acceptance:**
+  - Package created with doctrine layering (`domain/ports/application/adapters/public/telemetry/
+    testing`); no forbidden imports (arch:check).
+  - Domain models: `ResourceGraph`, `PanelDescriptor`, `RunRecord`, `TraceTree`, `TraceSpan`,
+    `LogRecord`, `ContractCatalogEntry`.
+  - Ports: `TelemetryQueryPort`, `AspireResourcePort`, `IntrospectionPort`, `CommandInvokePort`.
+  - `contracts/v1/mod.ts` defines `DashboardContract` **extending `BasePluginContract`** (base
+    `describe` + the §1.3 routes) as oRPC `ContractProcedure`s with Standard-Schema outputs.
+  - `tests/contracts/dashboard-contract-base-seam_test.ts` soundness test green (only the 2 accepted
+    casts; MEMORY e2e-type-soundness).
+- **Dep:** none. **Blocks:** DDX-3, DDX-4, DDX-13, and every panel (via ports/contract).
+
+---
+
+## Core layer
+
+### DDX-3 — `TelemetryQueryPort` + `aspire-otlp-http` adapter
+- **Labels:** `type:feat`, `area:telemetry`, `area:plugins`, `epic:dev-dashboard`, `priority:p1`, `status:plan`, `wave:v1`
+- **Milestone:** `0.0.1-beta.6`
+- **Acceptance:**
+  - Adapter consumes `/api/telemetry/{traces,traces/{id},logs,spans,resources}` (OTLP-JSON), auth via
+    `DASHBOARD_ENV_VARS` + `.netscript/e2e/aspire-start.json` base-URL resolution.
+  - Generalizes `telemetry-trace.ts.template`'s `fetchDashboardTraces()` (currently hardcoded to a
+    `triggers-api`→`workers` demo) — filters by service/time/status; reconstructs `TraceTree` by
+    `parentSpanId`; `streamLogs` maps to `?follow=true` NDJSON.
+  - Port is the source-swap seam: a second adapter can target Topic-B's query/export surface with **no
+    panel change**. Contract co-designed with Opus-B (see `open-questions.md` OQ-1).
+- **Dep:** DDX-2. **Soft dep:** `epic:telemetry-revamp` query/export. **Blocks:** DDX-8, DDX-9, DDX-11, DDX-6.
+
+### DDX-4 — `plugins/dashboard` thin plugin (manifest + scaffold + E2E join)
+- **Labels:** `type:feat`, `area:plugins`, `area:cli`, `epic:dev-dashboard`, `priority:p1`, `status:plan`, `wave:v1`
+- **Milestone:** `0.0.1-beta.6`
+- **Acceptance:**
+  - `scaffold.plugin.json` with `provider.kind: 'dashboard'`, `category: 'plugin'`,
+    `portRangeKey: 'PLUGIN_API'`, `pluginType: 'utility'`, `defaultRequiresDb/Kv: false`, +
+    `officialSource` block (canonicalName `dashboard`, serviceEntrypoint, servicePort).
+  - `src/public/mod.ts` `definePlugin('@netscript/plugin-dashboard', VERSION).withType('utility')
+    .withService(...).withAspire('./src/aspire/mod.ts').withContractVersions([...]).build()`;
+    `mod.ts` one-line re-export.
+  - `scaffold.ts` = `createPluginAdapter(dashboardAdapterPlugin).toScaffold()`; `adapter/plugin.ts`
+    implements install/doctor/info/update/remove; `adapter/resources/` emits **typesafe codegen**
+    glue (#157 mandate — no string templates).
+  - `contracts/v1/mod.ts` re-exports from core (no redefinition). `verify-plugin.ts` present.
+  - **`netscript plugin install @netscript/plugin-dashboard` works with no CLI core change** (confirm
+    dynamic-kind registration path); joins `scaffold.runtime`/`scaffold.plugins` E2E.
+- **Dep:** DDX-2. **Blocks:** DDX-5, DDX-13, DDX-14.
+
+### DDX-13 — Introspection endpoint (`/_netscript/*`)
+- **Labels:** `type:feat`, `area:cli`, `area:plugins`, `epic:dev-dashboard`, `priority:p2`, `status:plan`, `wave:v1`
+- **Milestone:** `0.0.1-beta.6`
+- **Acceptance:** a machine-readable JSON dev endpoint (Nitro `/_nitro/tasks` pattern, `A/03 §6`)
+  listing scaffolded plugins, routes, background jobs, stream topics, contract versions — consumed by
+  the Fresh dashboard for Stack Map + Catalog. Derived from scaffold/registry, not hand-authored.
+- **Dep:** DDX-2, DDX-4. **Blocks:** DDX-6, DDX-7.
+
+### DDX-15 — MANDATORY Claude design-sync artifact + panel prototype (Claude lane)
+- **Labels:** `type:feat`, `area:fresh-ui`, `area:docs`, `epic:dev-dashboard`, `priority:p1`, `status:plan`, `wave:v1`
+- **Milestone:** `0.0.1-beta.6`
+- **Acceptance:** `plugins/dashboard/.design-sync/` (config.json, conventions.md reusing NS One/
+  fresh-ui L0–L4, previews per panel + promoted block with **real** content, NOTES.md with the
+  compiled-closure re-sync recipe) + a Fresh prototype of the panel shell leveraging fresh-ui seams.
+  Truth chain points at the real component tree, never `previews/` (`A/02` trap).
+- **Dep:** DDX-0. **Blocks:** DDX-5 and panels (component/token contract). **Lane:** Claude (design/
+  prototype); framework wiring is WSL Codex (DDX-5).
+
+---
+
+## UI shell + panels (one agent per surface)
+
+### DDX-5 — Fresh build-console shell + app-registration + IA
+- **Labels:** `type:feat`, `area:fresh`, `area:fresh-ui`, `epic:dev-dashboard`, `priority:p1`, `status:plan`, `wave:v1`
+- **Milestone:** `0.0.1-beta.6`
+- **Acceptance:** SidebarShell-based 7-panel IA on `@netscript/fresh-ui` + promoted L3 blocks;
+  dashboard registered as an Aspire resource (DDX-1 `app` kind, or Seam-B fallback) with
+  `withHttpEndpoint` + `withBrowserLogs`; auto-launch on `aspire start`, fixed local port, live
+  updates; routing/islands wired to core ports. Consumes DDX-15 design-sync contract.
+- **Dep:** DDX-0, DDX-4, DDX-15 (soft: DDX-1 app kind). **Blocks:** DDX-6…12.
+
+### DDX-6 — Stack Map panel
+- **Labels:** `type:feat`, `area:fresh`, `area:aspire`, `epic:dev-dashboard`, `priority:p1`, `status:plan`, `wave:v1` · **beta.6**
+- **Acceptance:** live code-derived resource/plugin-contribution graph (Encore-Flow analog);
+  `AspireResourcePort` (NS compose graph + `/api/telemetry/resources`, + MCP `list_resources` for
+  non-NS resources); node→detail; health color; node click cross-filters panels.
+- **Dep:** DDX-5, DDX-13, `AspireResourcePort`.
+
+### DDX-7 — Service Catalog + API Explorer panel
+- **Labels:** `type:feat`, `area:fresh`, `area:plugins`, `epic:dev-dashboard`, `priority:p1`, `status:plan`, `wave:v1` · **beta.6**
+- **Acceptance:** auto-generated oRPC-contract catalog from each plugin's `describe`→
+  `PluginCapabilities` + introspection; **live API Explorer** — call an endpoint, params pre-filled
+  from the Standard Schema (Encore's highest-value interaction, `A/03 §1`).
+- **Dep:** DDX-5, DDX-13.
+
+### DDX-8 — Flow / Trace Waterfall panel ★flagship
+- **Labels:** `type:feat`, `area:fresh`, `area:telemetry`, `epic:dev-dashboard`, `priority:p1`, `status:plan`, `wave:v1` · **beta.6**
+- **Acceptance:** trace list → two-panel waterfall (timeline-left / details-right) + inline logs, via
+  `TelemetryQueryPort`; renders the **Flow B** flagship grouped trace (eischat enqueue → workers-api
+  → workers → oRPC callback → streams fan-out) as ONE trace. **Co-land gate:** telemetry-revamp
+  streams fan-in span-links + triggers W3C-parenting bugfix, else the trace renders severed.
+- **Dep:** DDX-5, DDX-3, **`epic:telemetry-revamp`** (fan-in links + triggers bugfix).
+
+### DDX-9 — Run Inspector panel
+- **Labels:** `type:feat`, `area:fresh`, `area:telemetry`, `epic:dev-dashboard`, `priority:p1`, `status:plan`, `wave:v1`
+- **Milestone:** list+detail **beta.6**; rerun-from-step + rich All/Compact/JSON event-history **0.0.1-stable**
+- **Acceptance (beta.6):** run-list (filter status/type/time, live) → run-detail (inputs/results) →
+  step-timeline waterfall; Attempt badges. **(stable):** rerun-from-step via DDX-1 command; multi-
+  altitude history toggle (Temporal pattern, `A/03 §2`).
+- **Dep:** DDX-5, DDX-3; rerun → DDX-1.
+
+### DDX-10 — Plugin Control panel (the dogfood)
+- **Labels:** `type:feat`, `area:fresh`, `area:plugins`, `area:aspire`, `epic:dev-dashboard`, `priority:p1`, `status:plan`, `wave:v1` · **beta.6**
+- **Acceptance:** installed-plugin list + health/doctor + `withCommand` actions (restart worker,
+  clear cache, run migration, seed) via `CommandInvokePort`; `plugin-gated-view` block gates panels
+  by installed plugin. Interactive params via command `arguments` (A2).
+- **Dep:** DDX-5, DDX-1.
+
+### DDX-11 — Logs panel
+- **Labels:** `type:feat`, `area:fresh`, `area:telemetry`, `epic:dev-dashboard`, `priority:p2`, `status:plan`, `wave:v1` · **beta.6**
+- **Acceptance:** live structured logs (`/api/telemetry/logs?follow=true` NDJSON) + Aspire browser-log
+  capture (`withBrowserLogs`, #218); filter by resource/severity. Prefer single multiplexed stream
+  (HTTP/1.1 6-conn ceiling, `A/05`).
+- **Dep:** DDX-5, DDX-3; browser-logs → DDX-1.
+
+### DDX-12 — Resource Control panel
+- **Labels:** `type:feat`, `area:fresh`, `area:aspire`, `epic:dev-dashboard`, `priority:p2`, `status:plan`, `wave:v1`
+- **Milestone:** basic start/stop/restart **beta.6**; composite/orchestration **0.0.1-stable**
+- **Acceptance:** resource start/stop/restart via `CommandInvokePort` → `ResourceCommandService` /
+  MCP `execute_resource_command`; composite "reset stack" command (stable).
+- **Dep:** DDX-5, DDX-1.
+
+### DDX-14 — CLI surface + auto-launch
+- **Labels:** `type:feat`, `area:cli`, `epic:dev-dashboard`, `priority:p2`, `status:plan`, `wave:v1` · **beta.6**
+- **Acceptance:** dashboard auto-launches on the dev run at a fixed port (competitor convention,
+  `A/03`); optional `netscript dashboard` command + optional `--kind dashboard` /
+  `BARE_PLUGIN_PACKAGE_ALIASES` shortcut (low-cost, non-blocking, `A/04 §4`).
+- **Dep:** DDX-4.
+
+### DDX-16 — E2E: dashboard join + panel smoke (merge-readiness)
+- **Labels:** `type:test`, `gate:e2e`, `area:plugins`, `epic:dev-dashboard`, `priority:p1`, `status:plan`, `wave:v1` · **beta.6**
+- **Acceptance:** `scaffold.runtime` adds `dashboard` alongside workers/sagas/triggers/streams;
+  install→generate→type-check→Aspire start→panel-endpoint smoke green; cleanup on `--cleanup`.
+- **Dep:** all beta.6 core (DDX-3…13, DDX-5…12).
+
+---
+
+## Milestone summary
+
+| Milestone | Slices |
+|---|---|
+| **0.0.1-beta.6 (core)** | DDX-0, DDX-1, DDX-2, DDX-3, DDX-4, DDX-5, DDX-6, DDX-7, DDX-8, DDX-9(list+detail), DDX-10, DDX-11, DDX-12(basic), DDX-13, DDX-14, DDX-15, DDX-16 |
+| **0.0.1-stable (depth)** | DDX-9 rerun-from-step + rich history; DDX-12 composite orchestration; MCP-content panel (if adopted); data-browser tab; saved views/prefs |
+
+## Owner-facing forks (carry to ratification)
+
+1. **`0.0.1-beta.6` milestone must be created** before issue-filing (AGENTS milestone obligation;
+   Stage-C fork 1). Same for beta.7 (Topic C/D).
+2. **`epic:dev-dashboard` label** must be added to `.github/labels.yml` (netscript-pr: add-first,
+   never delete-live).
+3. **Cross-epic co-land contract with `telemetry-revamp`** — DDX-8's flagship trace depends on
+   telemetry's streams fan-in span-links + triggers W3C-parenting bugfix landing at beta.6. Confirm
+   the two epics are scheduled to co-land, not sequenced.
