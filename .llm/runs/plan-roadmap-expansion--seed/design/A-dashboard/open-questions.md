@@ -78,3 +78,37 @@ them separately against `@netscript/fresh-ui` (flag to netscript-doctrine).
 beta.6 keeps the dashboard stateless (`defaultRequiresDb/Kv:false`; prefs client-side). Saved views /
 server-side prefs are a stable-tier item (would flip `defaultRequiresKv:true`). Confirm client-side
 is acceptable for beta.6.
+
+## Owner-facing — BaaS/admin-console corpus decisions (Opus-A resolved; confirm)
+
+**OQ-11 — per-capability sections vs flat list for beta.6 (HIGH, IA shape).**
+Proposal §9.1 reframes the IA: cross-cutting panels + **per-capability plugin sections** (create→
+configure(tabs)→monitor), shipping first-party sections for workers/sagas/triggers/streams at beta.6
+(thin), auth/db/kv/storage at stable. This is a bigger beta.6 surface than the first-draft flat
+"Plugin Control list" — it adds DDX-17 (contribution seam) + DDX-18a-d (4 section slices) to the
+beta.6 critical path. Confirm the owner wants the fuller per-capability IA at beta.6 vs. a flat list
+at beta.6 with per-capability as the stable evolution. **Recommendation: adopt per-capability at
+beta.6** — it is the literal thesis ("the dashboard is how you drive the framework") and the seam is
+what makes the dashboard dogfood its own extension API.
+
+**OQ-12 — `.withDashboardPanel` realization: contribution-contract seam vs. core `definePlugin`
+axis (MEDIUM).**
+Proposal §9.2 recommends a **`DashboardPanelContribution` contract owned by `plugin-dashboard-core`**
++ Aspire-style discovery, keeping `@netscript/plugin` dashboard-agnostic (thinness/layering), with
+optional `.withDashboardPanel()` **sugar** over it. The owner's phrasing ("a first-class `definePlugin`
+axis like `.withService`") leans toward a core axis. Confirm the thinness-correct contract-seam
+realization is acceptable (core must not know about one specific plugin's surface — the dashboard is
+itself a plugin), or explicitly accept the coupling of a first-class core axis.
+
+**OQ-13 — codegen-from-UI + AI-on-codegen milestone + #238 handshake (MEDIUM, cross-epic).**
+Proposal §9.3/§9.4: the dashboard "Add resource" action (DDX-19, calling the same
+`createPluginAdapter().toScaffold()`, #157-safe) is **stable** (beta.6 stretch only if DDX-4's
+resource scaffolders are cheap to expose). AI-on-codegen is a **cross-epic edge to the flagship AI
+plugin #238** (the AI plugin drives the same scaffolder — chat/Figma-import/code-analysis inputs),
+NOT net-new dashboard scope. Confirm the stable milestone and that the #238 owner co-owns the
+convergence (so it is not built twice).
+
+**OQ-14 — schema-driven `db` tab is Prisma-Next-gated (LOW, track).**
+Proposal §9.5: a Directus-style `db` tab rendered off the Prisma-Next schema is **stable/deferred**,
+gated on the Prisma-Next DB-layer migration (MEMORY prisma-next-db-migration). Track as a stable edge;
+do not scope into beta.6.

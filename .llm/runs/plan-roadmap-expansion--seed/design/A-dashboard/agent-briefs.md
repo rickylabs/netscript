@@ -125,6 +125,42 @@ Validation = panel island type-check + a data-source fixture test + panel smoke 
   render target is the Flow-B grouped trace. Do not start until DDX-3 + telemetry fan-in links land.
 - **DDX-10 (Plugin Control)** exercises DDX-1 command `arguments` — the A2 interaction path.
 
+## DDX-17 — DashboardPanelContribution seam (.withDashboardPanel)  · WSL Codex · high
+**Objective:** the extensibility seam (proposal §9.2).
+**Deliverables:** `DashboardPanelContribution` contract in `plugin-dashboard-core/contracts/v1`
+(id/title/icon/capability/component/slots/setup/commands, Standard-Schema); discovery mirroring
+`AspireNSPluginContribution` (registry-generation collects contributions); dashboard shell renders
+contributed sections at the DDX-10 host; optional `.withDashboardPanel()` sugar at the plugin layer.
+**## SKILL:** baseline + `netscript-doctrine` (contribution/registry patterns, layering — core stays
+dashboard-agnostic) + `netscript-cli` (registry-generation) + `deno-fresh`.
+**Validation:** contribution soundness test; a fixture plugin contributes a section + it renders;
+arch:check confirms `@netscript/plugin` gained NO dashboard axis.
+**Gotchas:** do NOT add a dashboard-coupled axis to the core `definePlugin` builder — the dashboard
+owns its own extension contract (thinness/layering; the dashboard is itself a plugin). Sugar is a
+thin helper over the contract, never core coupling.
+
+## DDX-18 — First-party per-capability sections (18a-d)  · WSL Codex · medium · one agent each
+**Objective:** workers/sagas/triggers/streams sections via the DDX-17 seam (proposal §9.1).
+**Deliverables (per section, thin):** a contributed section following create→configure(tabs)→monitor
+— monitor view deep-linking into cross-cutting Run Inspector/Flow filtered to the capability, basic
+config tab, `withCommand` actions (A2 arguments). Dogfoods DDX-17 for first-party plugins.
+**## SKILL:** baseline + `deno-fresh` + `fresh-ui-horizontal` (L3 blocks as the section palette) +
+`aspire` (commands).
+**Validation:** section renders through the contribution seam (not a hardcoded panel); data-source
+fixture test; smoke in DDX-16.
+**Gotchas:** sections MUST render via DDX-17, not as hardcoded shell panels (the dogfood point). Do
+NOT duplicate trace rendering — deep-link into the cross-cutting panels. Depth is stable, keep thin.
+
+## DDX-19 — Codegen-from-UI "Add resource" action  · WSL Codex · medium · STABLE (beta.6 stretch)
+**Objective:** dashboard action calling the same CLI scaffolder (proposal §9.3).
+**Deliverables:** an "Add resource" action per plugin/resource type calling
+`createPluginAdapter(...).toScaffold()` — identical CLI-reproducible artifacts.
+**## SKILL:** baseline + `netscript-cli` (scaffolder mechanics, #157 typesafe-codegen mandate).
+**Validation:** action output byte-matches the CLI generator output for the same inputs.
+**Gotchas:** **#157 — typesafe factory/AST codegen ONLY, never string templates** (MEMORY scaffold-
+surface-typesafe-codegen). One generator, two callers — do not fork a second codegen path. Coordinate
+the AI-on-codegen convergence with the `#238` AI-plugin owner (cross-epic, stable) — not this slice.
+
 ## DDX-14 — CLI surface + auto-launch  · WSL Codex · low-medium
 **## SKILL:** baseline + `netscript-cli`. Optional `--kind dashboard`/`BARE_PLUGIN_PACKAGE_ALIASES`
 shortcut; auto-launch on dev run. Validation: CLI unit + E2E smoke.
@@ -140,10 +176,13 @@ evaluator/merge pass, not per intermediate loop (expensive).
 
 1. **Wave 1 (parallel, unblocked):** DDX-0, DDX-1, DDX-2.
 2. **Wave 2:** DDX-3, DDX-4 (need DDX-2); DDX-15 (needs DDX-0). DDX-13 after DDX-4.
-3. **Wave 3:** DDX-5 (needs DDX-0+DDX-4+DDX-15, soft DDX-1).
-4. **Wave 4 (panels, parallel):** DDX-6, DDX-7, DDX-9, DDX-10, DDX-11, DDX-12, DDX-14. **DDX-8 gated
-   on telemetry-revamp fan-in links + triggers bugfix.**
-5. **Wave 5:** DDX-16 merge-readiness gate.
+3. **Wave 3:** DDX-5 (needs DDX-0+DDX-4+DDX-15, soft DDX-1); then **DDX-17** (needs DDX-2+DDX-5) —
+   gates the per-capability sections and the DDX-10 host.
+4. **Wave 4 (cross-cutting panels, parallel):** DDX-6, DDX-7, DDX-9, DDX-10(host, needs DDX-17),
+   DDX-11, DDX-12, DDX-14. **DDX-8 gated on telemetry-revamp fan-in links + triggers bugfix.**
+5. **Wave 5 (per-capability sections, parallel, one agent each):** DDX-18a/b/c/d (need DDX-17).
+6. **Wave 6:** DDX-16 merge-readiness gate. **DDX-19 is stable** (post-beta.6; beta.6 stretch only if
+   DDX-4 scaffolders are cheap to expose).
 
 Each slice: branch `feat/dev-dashboard-<slice>`, commit-per-slice, push, PR comment, append
 `commits.md`; IMPL-EVAL (OpenHands qwen 3.7 max) before the next dependent wave.

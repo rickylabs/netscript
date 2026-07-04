@@ -36,18 +36,25 @@ CORE LAYER ───────────────────────
 UI SHELL ─────────────────────────────────────────────┼──────────────────────────
   DDX-5  Fresh build-console shell + app-registration + IA  (needs DDX-0, DDX-4, DDX-15)
                                                       │
-PANELS (one agent each) ──────────────────────────────┼──────────────────────────
+EXTENSIBILITY SEAM (proposal §9) ─────────────────────┼──────────────────────────
+  DDX-17 DashboardPanelContribution seam (.withDashboardPanel) (needs DDX-2, DDX-5)
+                                                      │
+CROSS-CUTTING PANELS (one agent each) ────────────────┼──────────────────────────
   DDX-6  Stack Map            (needs DDX-5, DDX-3?/graph-port, DDX-13)
   DDX-7  Service Catalog+API Explorer (needs DDX-5, DDX-13)
   DDX-8  Flow / Trace Waterfall  ★flagship (needs DDX-5, DDX-3, TELE fan-in links + triggers bugfix)
-  DDX-9  Run Inspector       (needs DDX-5, DDX-3; rerun-from-step needs DDX-1)
-  DDX-10 Plugin Control      (needs DDX-5, DDX-1)
+  DDX-9  Run Inspector (all plugins) (needs DDX-5, DDX-3; rerun-from-step needs DDX-1)
+  DDX-10 Plugin Control HOST/registry (needs DDX-5, DDX-1, DDX-17)
   DDX-11 Logs                (needs DDX-5, DDX-3, DDX-1 app/browser-logs)
   DDX-12 Resource Control    (needs DDX-5, DDX-1)
   DDX-14 CLI surface + auto-launch (needs DDX-4)
                                                       │
+PER-CAPABILITY SECTIONS (contributed; one agent each) ─┼──────────────────────────
+  DDX-18 workers/sagas/triggers/streams sections (18a-d) (needs DDX-17, DDX-5, DDX-3, DDX-1)
+  DDX-19 Codegen-from-UI "Add resource" [STABLE] (needs DDX-4, DDX-17; ⇄ #238)
+                                                      │
 MERGE-READINESS ──────────────────────────────────────┴──────────────────────────
-  DDX-16 E2E: scaffold.runtime dashboard join + panel smoke (needs all beta.6 core)
+  DDX-16 E2E: scaffold.runtime dashboard join + panel + section smoke (needs all beta.6 core)
 ```
 
 Critical path to a shippable beta.6 flagship: **DDX-0 + DDX-2 → DDX-3/DDX-4 → DDX-5 → DDX-8** with
@@ -199,12 +206,17 @@ the **telemetry-revamp** fan-in-links/triggers-bugfix co-land. DDX-1 gates the "
   altitude history toggle (Temporal pattern, `A/03 §2`).
 - **Dep:** DDX-5, DDX-3; rerun → DDX-1.
 
-### DDX-10 — Plugin Control panel (the dogfood)
+### DDX-10 — Plugin Control HOST + registry/overview (revised per proposal §9.1)
 - **Labels:** `type:feat`, `area:fresh`, `area:plugins`, `area:aspire`, `epic:dev-dashboard`, `priority:p1`, `status:plan`, `wave:v1` · **beta.6**
-- **Acceptance:** installed-plugin list + health/doctor + `withCommand` actions (restart worker,
-  clear cache, run migration, seed) via `CommandInvokePort`; `plugin-gated-view` block gates panels
-  by installed plugin. Interactive params via command `arguments` (A2).
-- **Dep:** DDX-5, DDX-1.
+- **Revised scope (was "flat action list"):** now the **host/registry/overview** — installed-vs-
+  available plugin list + health/doctor + the **mount point that renders contributed per-capability
+  sections** (DDX-17/DDX-18). `plugin-gated-view` block gates sections by installed plugin. The
+  per-capability *actions* move into each section (DDX-18); this issue owns the host + overview +
+  doctor + global commands.
+- **Acceptance:** overview lists installed/available plugins with health; doctor surfaced; contributed
+  sections mount here via the DDX-17 seam; global `withCommand` actions via `CommandInvokePort`;
+  interactive params via command `arguments` (A2).
+- **Dep:** DDX-5, DDX-1, DDX-17.
 
 ### DDX-11 — Logs panel
 - **Labels:** `type:feat`, `area:fresh`, `area:telemetry`, `epic:dev-dashboard`, `priority:p2`, `status:plan`, `wave:v1` · **beta.6**
@@ -235,12 +247,52 @@ the **telemetry-revamp** fan-in-links/triggers-bugfix co-land. DDX-1 gates the "
 
 ---
 
+## Extensibility + manage-through-UI slices (proposal §9)
+
+### DDX-17 — `DashboardPanelContribution` seam (`.withDashboardPanel`)
+- **Labels:** `type:feat`, `area:plugins`, `epic:dev-dashboard`, `priority:p1`, `status:plan`, `wave:v1` · **beta.6**
+- **Acceptance:**
+  - `DashboardPanelContribution` contract in `plugin-dashboard-core/contracts/v1` (Standard-Schema:
+    `id/title/icon/capability/component/slots{options,sidebar,actions}/setup()/commands`) — shaped
+    like Directus's Layout/Panel export.
+  - **Discovery mirrors `AspireNSPluginContribution`**: a plugin depending on
+    `@netscript/plugin-dashboard-core` exports a contribution the registry-generation step collects.
+    **`@netscript/plugin` gains NO dashboard-coupled axis** (thinness/layering).
+  - The dashboard shell (DDX-5) renders contributed sections at the DDX-10 host mount point.
+  - Optional `.withDashboardPanel()` sugar = thin helper producing the same contract, at the
+    plugin's layer, NOT core coupling. arch:check green; contribution soundness test.
+- **Dep:** DDX-2 (contract seam), DDX-5 (mount). **Blocks:** DDX-18, DDX-10, DDX-19.
+- **Note:** third-party ecosystem + in-dashboard marketplace are **stable** follow-ons, not this issue.
+
+### DDX-18 — First-party per-capability sections (workers/sagas/triggers/streams)
+- **Labels:** `type:feat`, `area:fresh`, `area:plugins`, `epic:dev-dashboard`, `priority:p1`, `status:plan`, `wave:v1` · **beta.6**
+- **Model:** one agent per capability (owner's one-agent-per-feature model) → 4 parallel sub-slices
+  (18a workers, 18b sagas, 18c triggers, 18d streams).
+- **Acceptance (per section, thin at beta.6):** each installed core plugin renders a section via the
+  DDX-17 contribution seam following **create → configure(tabs) → monitor**: a monitor view (deep-
+  links into cross-cutting Run Inspector/Flow filtered to that capability), basic config tab, and
+  `withCommand` actions (A2 arguments). Dogfoods DDX-17 for first-party plugins. Depth (rich config
+  tabs, dual histories, capability-specific composed blocks) is **stable**.
+- **Dep:** DDX-17, DDX-5, DDX-3, DDX-1. auth/db/kv/storage sections = **stable** (separate issues).
+
+### DDX-19 — Codegen-from-UI "Add resource" action (Strapi precedent)
+- **Labels:** `type:feat`, `area:cli`, `area:plugins`, `epic:dev-dashboard`, `priority:p2`, `status:plan`, `wave:v2`
+- **Milestone:** `0.0.1-stable` (beta.6 stretch if DDX-4 resource scaffolders are cheap to expose)
+- **Acceptance:** a dashboard "Add resource" action calls the **same**
+  `createPluginAdapter(...).toScaffold()` machinery the CLI installer uses, landing **identical**
+  CLI-reproducible artifacts — **#157-safe (typesafe factory/AST codegen, NEVER string templates)**.
+  One generator, two callers. No new codegen engine.
+- **Dep:** DDX-4 (`adapter/resources/` scaffolders), DDX-17.
+- **Cross-epic edge:** AI-on-codegen convergence with **`epic:@netscript/plugin-ai (#238)`** (stable)
+  — the AI plugin drives the same scaffolder (chat / Figma-import / code-analysis inputs). Not
+  net-new dashboard scope; cross-ref only. See open-questions OQ-11.
+
 ## Milestone summary
 
 | Milestone | Slices |
 |---|---|
-| **0.0.1-beta.6 (core)** | DDX-0, DDX-1, DDX-2, DDX-3, DDX-4, DDX-5, DDX-6, DDX-7, DDX-8, DDX-9(list+detail), DDX-10, DDX-11, DDX-12(basic), DDX-13, DDX-14, DDX-15, DDX-16 |
-| **0.0.1-stable (depth)** | DDX-9 rerun-from-step + rich history; DDX-12 composite orchestration; MCP-content panel (if adopted); data-browser tab; saved views/prefs |
+| **0.0.1-beta.6 (core)** | DDX-0, DDX-1, DDX-2, DDX-3, DDX-4, DDX-5, DDX-6, DDX-7, DDX-8, DDX-9(list+detail), DDX-10(host), DDX-11, DDX-12(basic), DDX-13, DDX-14, DDX-15, DDX-16, **DDX-17 (contribution seam), DDX-18a-d (workers/sagas/triggers/streams sections — thin)** |
+| **0.0.1-stable (depth)** | DDX-9 rerun-from-step + rich history; DDX-12 composite orchestration; **DDX-18 auth/db/kv/storage sections + per-capability depth (rich config tabs, dual histories, capability-specific composed blocks); DDX-19 codegen-from-UI (⇄ #238 AI-on-codegen); third-party panel ecosystem + in-dashboard marketplace; schema-driven db tab (Prisma-Next-gated); tokens/API-keys + Dev Keys panel;** MCP-content panel (if adopted); saved views/prefs |
 
 ## Owner-facing forks (carry to ratification)
 

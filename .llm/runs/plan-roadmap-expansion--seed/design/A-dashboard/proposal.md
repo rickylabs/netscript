@@ -19,9 +19,23 @@
   actions through `contribute()` — making "the tool that controls your plugins is itself a plugin"
   true for its Aspire presence, not just its CLI. **No `IInteractionService`** (A2): all interactive
   prompts route through command `arguments` (`InteractionInput[]`) + `confirmationMessage`.
-- **Panel IA (7 panels):** Stack Map · Service Catalog + API Explorer · Flow/Trace Waterfall ·
-  Run Inspector · Plugin Control · Logs · Resource Control. Encore-Flow-grade, all code/scaffold-
-  derived, auto-launched, live-updating.
+- **Panel IA — reframed (see §9):** NOT 7 fixed panels but **cross-cutting panels** (Stack Map ·
+  Service Catalog + API Explorer · Flow/Trace Waterfall · Run Inspector · Logs · Resource Control)
+  **+ per-capability plugin sections** (one per installed plugin category — workers/sagas/triggers/
+  streams/auth/…), each following Appwrite's **create → configure(tabs) → monitor** loop, rendered
+  through a contribution seam. Plugin Control becomes the host/registry/overview, not a flat list.
+- **`.withDashboardPanel` verdict:** ADOPT as a **contribution-contract seam** in
+  `plugin-dashboard-core` (Directus Panel/Module precedent) so the dashboard is a **panel/L3-block
+  registry consumer** other plugins contribute to, not just an author. Realized as a
+  `DashboardPanelContribution` contract discovered like `AspireNSPluginContribution` (thinness-
+  correct — keeps `@netscript/plugin` dashboard-agnostic), with optional `.withDashboardPanel()`
+  sugar over it. **beta.6 = the seam + first-party sections (dogfooded); stable = third-party
+  ecosystem + marketplace.**
+- **Codegen-from-UI / AI edges:** a dashboard "Add resource" action calls the SAME
+  `createPluginAdapter(...).toScaffold()` the CLI drives (Strapi precedent; #157-safe) — stable
+  (beta.6 stretch if cheap); AI-on-codegen converges with flagship AI plugin **#238** (cross-epic
+  edge, stable), not net-new dashboard scope. Schema-driven `db` tab off Prisma-Next = stable/
+  deferred.
 - **Telemetry data contract:** beta.6 consumes Aspire `/api/telemetry/*` HTTP (OTLP-JSON) behind a
   `TelemetryQueryPort` in core; the port is the swap seam onto Topic-B's query/export surface.
 - **D-NSONE verdict:** **promote the missing L3 `blocks/` layer into `@netscript/fresh-ui`**;
@@ -203,8 +217,14 @@ path may assume `PromptInputAsync` et al.
 
 ## 3. Panel IA (the Encore-dev equivalent)
 
-Grounded in the competitor teardown (`A/03`) and the candidate-panel matrix
-(`matrix/A/_draft-competitor-rows.md`). Data sources ranked by reachability today (`ctx/01`):
+> **Read with §9.** The BaaS/admin-console corpus (`A/04`) reframes this from "7 fixed panels" into
+> **cross-cutting panels (this table) + per-capability plugin sections (§9)**. The table below is
+> the cross-cutting set + the Plugin Control host; the per-capability create→configure→monitor
+> sections are contributed (§9.1) and specified there. Panel 5 (Plugin Control) is revised in §9.1.
+
+Grounded in the competitor teardown (`A/03`) + BaaS/admin corpus (`A/04`) and the candidate-panel
+matrices (`matrix/A/_draft-competitor-rows{,-baas}.md`). Data sources ranked by reachability today
+(`ctx/01`):
 `OTLP/HTTP /api/telemetry/*` (open) → NetScript's own `AspireResource[]` compose graph (cheapest for
 NS-native resources) → `aspire` MCP tools (structured, dev-only) → resource-service gRPC (internal,
 avoid). Every panel: auto-launched, fixed port, live-updating, code/scaffold-derived (`A/03`
@@ -316,6 +336,21 @@ I **confirm and detail** the Stage-C provisional lock, with the evidence re-veri
   L3; its absence is pre-existing internal debt (flag to `netscript-doctrine` independent of
   D-NSONE). **Promote the missing L3 layer** = the correct read of the owner's promotion lean, and
   it aligns with the core-centralization law for a flagship surface.
+- **Directus sharpening (`A/04 §2`) — the L3 layer is now the CONTRIBUTION TARGET, not just an
+  author palette.** Directus builds its own Insights dashboard on the same `Panel` primitive it
+  exposes to third parties, over a closed extension taxonomy (Interface/Display/Layout/Panel/Module,
+  each an SDK-contract'd `id/name/icon/component/slots/setup` shape). That is the concrete precedent
+  the D-NSONE extensibility call was missing: the promoted L3 blocks are the palette that
+  **contributed** dashboard panels (§9.1) compose from. This raises the bar on two DDX-0 conventions
+  — the per-block `*.d.ts` (real prop types) and `*.prompt.md` are now **contribution-author-facing
+  contracts**, not just internal docs, so they must be genuinely typed and complete. It also adds a
+  vocabulary refinement: adopt Directus's **edit-shape vs. show-shape** split (Interface vs.
+  Display) as a named distinction in the block taxonomy (form-field blocks vs. read-only/badge
+  display blocks) — fresh-ui/NS One currently has no such named split (`A/04` secondary convention).
+  Per-capability composed block *shapes* (a "collection/attributes/indexes" block, a "provider-
+  config" block, a "compose" block) are mostly **stable-tier** — beta.6 ships the 7 generic blocks
+  (§5.1) as the contribution substrate; the capability-specific block shapes follow with the
+  per-capability sections.
 
 **Block shortlist (Opus-A decides — here is the decision).** Promote the generically-dashboard
 blocks as canonical L3; generalize the one product-specific one; leave chat/MCP out:
@@ -428,3 +463,110 @@ real component tree, never at `previews/`.
    Topic-B's streams fan-in span-links + triggers W3C-parenting bugfix land late, the Flow panel
    renders the flagship trace **severed** — this is a co-land gate, not a soft convergence. (§4.2
    ask 4.)
+6. **IA reframe (owner-expanded corpus `A/04`): "manage-through-UI" is the actual thesis, so the IA
+   is a shell + per-capability sections, not 7 fixed panels.** §9 restructures. This supersedes the
+   flat-list framing of DDX-10 in the first draft.
+
+---
+
+## 9. Manage-through-UI thesis + extensibility (BaaS/admin-console corpus `A/04`)
+
+The dev/run-console corpus (`A/03`) sharpened *observability*. The BaaS/admin-console corpus (`A/04`)
+hits Topic-A's **actual** thesis — "the dashboard IS how you drive the framework" — head-on. Three
+patterns change the design; two are noted as deferred edges.
+
+### 9.1 Per-capability manage loop + the reframed IA (Appwrite north-star)
+
+**Decision: reframe the IA. Adopt per-capability sections; keep a flat overview only as the host.**
+Appwrite proves the differentiator is **per-capability first-class sections** (Databases, Auth,
+Storage, Functions, Messaging) each with (1) its own nav entry named after the primitive, (2) a
+fastest-path create action (form or template gallery), (3) a **tabbed settings area** distinct from
+the create form (permissions/security/config as separate tabs, not inlined), and (4) — where the
+primitive produces activity — a **dedicated monitor view with its own status vocabulary** (Appwrite
+splits Executions vs. Deployments; message `draft→scheduled→processing→success/failed`). A single
+generic "Plugin Control" list (first-draft DDX-10) is the *weaker* read of the thesis.
+
+So the IA becomes:
+
+- **Cross-cutting panels** (framework-wide, dashboard-authored — the §3 table): Stack Map ·
+  Service Catalog + API Explorer · Flow/Trace Waterfall · Run Inspector (all runs, all plugins) ·
+  Logs · Resource Control.
+- **Per-capability plugin sections** (one per **installed** plugin category, following the
+  create→configure(tabs)→monitor loop): **workers · sagas · triggers · streams** at beta.6;
+  **auth · db · kv · storage-shaped** at stable. Each section's monitor view **deep-links into the
+  cross-cutting Run Inspector / Flow panel** filtered to that capability (no duplicated trace
+  rendering — the cross-cutting panels stay the single render surface, §3 note on the HTTP/1.1
+  ceiling).
+- **Plugin Control (revised DDX-10)** = the **host + registry/overview + doctor** — installed-vs-
+  available plugins, health, and the mount point that renders the contributed per-capability
+  sections. It is no longer "the panel that lists actions"; the actions live in each capability
+  section.
+
+**beta.6 scope discipline:** ship the cross-cutting panels + **first-party per-capability sections
+for the 4 core plugins** (workers/sagas/triggers/streams), each thin (monitor + basic config +
+`withCommand` actions), rendered **through the contribution seam** (§9.2) so the dashboard dogfoods
+its own extension API even for first-party sections. Depth per capability (rich config tabs,
+Executions-vs-Deployments-style dual histories, per-capability composed block shapes) is stable.
+auth/db/kv/storage sections are stable (auth is the strongest stable candidate; db gated on
+Prisma-Next). Secondary Appwrite conventions worth carrying but **not beta.6 issues**: scopes-mirror-
+nav for a tokens/API-keys panel + **Dev Keys** (short-lived, rotate-in-place, local-dev-only tokens
+for the Aspire loop) — both stable candidates, noted not scoped.
+
+### 9.2 `.withDashboardPanel` — the contribution seam (Directus precedent)
+
+**Verdict: ADOPT, as a contribution-CONTRACT seam owned by `plugin-dashboard-core`, not a new core
+`definePlugin` axis.** Directus's extension taxonomy (Interface/Display/Layout/Panel/Module, each a
+documented SDK-contract'd `id/name/icon/component/slots/setup` shape) and — critically — the fact
+that Directus's **own** Insights dashboard is built on the same `Panel` primitive it exposes to third
+parties, is the exact precedent for making the NetScript dashboard a **panel/L3-block registry
+consumer**, not just an author.
+
+Realization (thinness-correct):
+
+- Define a **`DashboardPanelContribution` contract** in `plugin-dashboard-core/contracts/v1`
+  (Standard-Schema-shaped: `id`, `title`, `icon`, `capability` (which plugin category), `component`
+  (the island entrypoint), `slots` (options/sidebar/actions), `setup()` (data-source wiring to the
+  core ports), `commands` (withCommand refs)). This mirrors Directus's Layout/Panel export contract.
+- **Discover contributions the way Aspire contributions are discovered** — a plugin that wants a
+  dashboard section depends on `@netscript/plugin-dashboard-core` and exports a contribution the
+  registry-generation step collects (parallel to `AspireNSPluginContribution.contribute()`). **This
+  deliberately keeps `@netscript/plugin` dashboard-agnostic** — the core builder does NOT gain a
+  dashboard-coupled axis; the dashboard owns its own extension contract. (Layering: core must not
+  know about one specific plugin's surface — the same reason the dashboard is itself a plugin.)
+- **Optional `.withDashboardPanel()` sugar** — if the owner wants the ergonomic symmetry with
+  `.withService`/`.withStreamTopics`, ship it as a thin helper that *produces* the same contribution
+  contract, NOT as coupling in the core builder. Sugar over the contract, at the plugin's own layer.
+
+**Milestone split:** the **seam** (contract + discovery + the dashboard renders contributed sections
++ the 4 first-party sections dogfooding it) is **beta.6** — it is load-bearing for §9.1's reframed
+IA. The **third-party ecosystem** (external plugins contributing panels) + an **in-dashboard
+marketplace** (Directus reachable-from-Settings install, a stretch on `plugin add`) are **stable**.
+
+### 9.3 Codegen-from-UI (Strapi) — a second caller of the CLI scaffolder
+
+**Decision: adopt as a stable feature (beta.6 stretch if the resource scaffolders are cheap).**
+Strapi's Content-Type Builder writes the **identical** on-disk artifacts as its `strapi generate`
+CLI — dashboard and CLI are two callers of one generator. This is an almost-literal precedent for a
+dashboard **"Add resource"** action that calls the exact same `createPluginAdapter(...).toScaffold()`
+machinery the CLI installer already uses (`A/04 §3`, `A/04-plugin-archetype-grounding §4`). **No new
+codegen engine — a second caller of the existing one**, and it must respect #157 (typesafe codegen
+via factory/AST, **never string templates**; MEMORY scaffold-surface-typesafe-codegen). Scoped as
+DDX-19; stable because it depends on DDX-4's `adapter/resources/` scaffolders being wired for the
+resource types the dashboard would emit.
+
+### 9.4 AI-on-codegen (Strapi AI) — cross-epic edge to #238, not dashboard scope
+
+Strapi AI's chat / design-import / code-analysis triad all terminate in the same generated artifacts.
+This is a precedent for the **flagship AI plugin (#238)** converging with §9.3's scaffold-from-UI
+action (the AI plugin drives the same typesafe scaffolder), NOT net-new dashboard scope. Recorded as
+a **cross-epic edge**: `epic:dev-dashboard` DDX-19 ⇄ `epic:@netscript/plugin-ai (#238)`, stable.
+Reusable input taxonomy for a future dashboard-AI panel: chat-driven contract authoring, Figma/
+screenshot-driven L3-block scaffolding, existing-code (Prisma schema / oRPC contract) reverse-
+inference. See `open-questions.md` OQ-11.
+
+### 9.5 Schema-driven `db` tab (Directus data-model) — stable/deferred
+
+Directus generates Content-module CRUD screens live from the data model (model → auto CRUD, field
+type → default interface, explicit override seam). Strongest precedent for a NetScript `db` tab
+rendered directly off the **Prisma-Next** schema — but it is **stable/deferred**, gated on the
+Prisma-Next DB-layer migration (MEMORY prisma-next-db-migration). Noted, not scoped into beta.6.

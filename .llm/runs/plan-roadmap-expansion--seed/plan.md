@@ -24,7 +24,8 @@ everything beyond the delegated set is surfaced as an owner fork, not self-decid
 
 - **NEW epic `telemetry-revamp`** (enabler half of Spine-1) — `design/B-telemetry/`, sub-issues T1–T9.
 - **NEW epic `dev-dashboard`** (headline half of Spine-1, ships as a plugin) — `design/A-dashboard/`,
-  sub-issues DDX-0…16 (+ BaaS-pattern refinements from the owner-expanded source set).
+  sub-issues DDX-0…19 (DDX-0…16 core + DDX-17 `DashboardPanelContribution` seam + DDX-18a-d
+  per-capability sections + DDX-19 codegen-from-UI, from the owner-expanded BaaS source set).
 - **Docs-cut** for C (tutorial rewrites) + D (positioning) — `design/CD-docs/`, S0 + C1–C6 + D1–D9 +
   V; delivered as a docs-only PR wave.
 - **`#327` rescope** for E (desktop/single-process) — `design/E-desktop/`, #E1–#E8.
@@ -75,7 +76,7 @@ everything beyond the delegated set is surfaced as an owner fork, not self-decid
 | Epic | Archetype | Milestones | Slices | Merge-gate |
 | ---- | --------- | ---------- | ------ | ---------- |
 | `telemetry-revamp` (NEW) | package refactor + plugin instrumentation | beta.5 (T1–T2), beta.6 (T3–T8), stable (T9) | T1–T9 (9) | T8 real Flow-B e2e |
-| `dev-dashboard` (NEW) | thin plugin + core (ARCH-5+2) | beta.6 core, stable depth | DDX-0…16 (17, + BaaS refinements) | DDX-16 scaffold.runtime join |
+| `dev-dashboard` (NEW) | thin plugin + core (ARCH-5+2) | beta.6 core, stable depth | DDX-0…19 (20: 17 core + panel-contribution seam + 4 per-capability sections + codegen-from-UI) | DDX-16 scaffold.runtime join |
 | docs-cut (C+D) | docs (authoring exception) | beta.7 | S0 + C1–C6 + D1–D9 + V-C/V-D (~18) | V-C/V-D OpenHands per-domain |
 | `#327` rescope (E) | sdk/service/cli/db | beta.8 core (E1–E6), stable (E7–E8) | #E1–#E8 (8) | #E7 desktop deploy-e2e |
 
@@ -89,8 +90,10 @@ beta.6 ── SPINE-1 CO-LAND:
                      T2 → T6 (oRPC span + AI-invoke) ─────────┤
                      T2 → T7 (@netscript/telemetry/query) ────┘
           dashboard: DDX-0 (fresh-ui L3) ┐
-                     DDX-1 (Aspire seam)  ├→ DDX-2 (core) → DDX-3/4 → DDX-5 (shell) → DDX-6…12 panels → DDX-16
-                     DDX-15 (design-sync)─┘         DDX-8 (flagship) ⇐ REQUIRES telemetry T4+T5(+T6)+T7
+                     DDX-1 (Aspire seam)  ├→ DDX-2 (core) → DDX-3/4 → DDX-5 (shell) → DDX-6…12 cross-cutting panels ┐
+                     DDX-15 (design-sync)─┘         DDX-8 (flagship) ⇐ REQUIRES telemetry T4+T5(+T6)+T7          ├→ DDX-16
+                     DDX-2 → DDX-17 (panel-contribution seam) → DDX-18a-d (per-capability sections: workers/sagas/triggers/streams) ─┘
+                                                    [IA shift: flat "Plugin Control list" → cross-cutting panels + per-capability create→configure→monitor sections (Appwrite/Directus precedent)]
 beta.7 ── docs: [owner creates beta.7] → S0 (IA-reconcile, HARD precursor) → {C1–C6 ∥ D1–D9} → V-C/V-D → docs-only PR wave
 beta.8 ── desktop: #E1 (sdk link) ∥ #E2 (#375 gen) ∥ #E3 (tursodb) → #E4 (single-process) → #E5 (offline), #E6 (packaging)
 stable ── telemetry T9 (AI adapter + Flow-A duckdb); desktop #E7 (deploy-e2e, deps #393/#394) + #E8 (signing);
@@ -114,10 +117,16 @@ stable ── telemetry T9 (AI adapter + Flow-A duckdb); desktop #E7 (deploy-e2e
 | OF-7 **Positioning density** (~13 one-per-major-feature competitor comparisons vs 2 today) | safe to defer to authoring | No plan rework; a density knob per D slice. | Opus-CD; brushes "sparse by design" — owner sets the ceiling. |
 | OF-8 **Two net-new docs pages** (CLI/scaffold, MCP) in scope | safe to defer (recommend in) | No rework; S0 adds two nav stubs regardless. | Opus-CD. |
 | OF-9 **Desktop-mode telemetry export** (no Aspire collector in a shipped binary) | safe to defer to stable | No beta.6 rework; desktop ships beta.8+. | Resolve as env-configured external OTLP via the SDK adapter (LD-4 makes this free). |
+| OF-10 (=OQ-11) **Per-capability sections vs flat "Plugin Control list" at beta.6** — the IA shape | should resolve at ratification | Deferring = ship a flat list at beta.6, per-capability as stable evolution — a *smaller* beta.6 surface, not plan rework. | Opus-A **recommends adopt per-capability at beta.6** (it is the literal "the dashboard is how you drive the framework" thesis + it dogfoods the DDX-17 contribution seam). Adds DDX-17 + DDX-18a-d to the beta.6 surface. |
+| OF-11 (=OQ-12) **`.withDashboardPanel` realization** — `DashboardPanelContribution` contract owned by `plugin-dashboard-core` (thinness-correct) vs a first-class core `definePlugin` axis | should resolve before DDX-17 filing | No plan rework — both realize the same panel-contribution capability; only the seam location differs. | Opus-A **recommends the contract-seam** (core must not know one plugin's surface — the dashboard is itself a plugin), with optional `.withDashboardPanel()` sugar. Owner's phrasing leaned toward a core axis; confirm. |
+| OF-12 (=OQ-13) **Codegen-from-UI (DDX-19) milestone + AI-on-codegen #238 handshake** | safe to defer (recommend stable) | No rework; DDX-19 is a stable-tier "Add resource" action (beta.6 stretch only if DDX-4 scaffolders are cheap to expose). | Opus-A: DDX-19 calls the same `createPluginAdapter().toScaffold()` (#157-safe); AI-on-codegen is a cross-epic edge to flagship AI plugin **#238**, NOT net-new dashboard scope. #238 owner must co-own so it is not built twice. |
+| OF-13 (=OQ-14) **Schema-driven `db` tab (Directus precedent)** — Prisma-Next-gated | safe to defer to stable (track only) | No beta.6 rework; explicitly out of beta.6. | Opus-A: gated on the Prisma-Next DB-layer migration; track as a stable edge. |
 
 > Only OF-5 is "must resolve now" in the rework sense; it is resolved technically (LD-4) and needs
-> only the owner's dependency-posture ratification. All others are ratification-gates that do not
-> force plan rework when deferred → **no `FAIL_PLAN` open decision.**
+> only the owner's dependency-posture ratification. OF-10/OF-11 are HIGH/MEDIUM but deferring them
+> *reduces* the beta.6 dashboard surface rather than forcing rework (a flat-list fallback + a
+> sugar-vs-seam choice), so neither is `FAIL_PLAN`. All other forks are ratification-gates that do
+> not force plan rework when deferred → **no `FAIL_PLAN` open decision.**
 
 ## Risk Register
 
@@ -171,8 +180,8 @@ Two levels, both satisfying the bound:
   B corpus → drift → stage-C synthesis → research.md → 4 Opus proposals → BaaS addendum → plan.md +
   ## Design → F1 fixes → PLAN-EVAL. Well under 30.
 - **Each ratified epic's implementation slices** are enumerated, ordered, and sized in its
-  `epic-and-issues.md`, each < 30: telemetry 9, dashboard 17 (+ BaaS refinements), docs ~18,
-  desktop 8. No single epic exceeds the bound; each slice names its proving gate + files.
+  `epic-and-issues.md`, each < 30: telemetry 9, dashboard 20 (DDX-0…19), docs ~18, desktop 8. No
+  single epic exceeds the bound; each slice names its proving gate + files.
 
 ## Deferred Scope (explicit)
 
