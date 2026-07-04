@@ -529,3 +529,24 @@ Opus 4.8 sub-agent, then A1-reviewed + re-gated.
   sync OK; gitignore `coverage/` trap present but unused.
 - **Next**: report remediation-landed to coordinator → hold for OpenHands IMPL-EVAL dispatch
   (separate session). No merge/close.
+
+## IMPL-EVAL — PASS (2026-07-04)
+
+- **Dispatch**: OpenHands, separate evaluator session, `openrouter/qwen/qwen3.7-max`,
+  `output=pr-comment`, iterations=600, via `dispatch-openhands.ts` (dry-run contract check first).
+  Trigger comment: PR #390 issuecomment-4882250106. Prompt began `use harness` + `## SKILL` chapter;
+  pointed at the whole V3 surface (`origin/main..HEAD`, HEAD `7e053757`), the run-dir artifacts, and
+  the PR DoD; required independent gate re-runs + the #387 close-gate on every referenced issue.
+- **Verdict**: **PASS** — zero blocking findings; close-gate #387 clean; 3 non-blocking advisories
+  (all correctly routed out of V3's surface to #305 / owner follow-ups). Evaluator run
+  <https://github.com/rickylabs/netscript/actions/runs/28708279015>; verdict comment
+  issuecomment-4882250744 (complete/untruncated, verified).
+- **Reconcile (per coordinator, [[openhands-eval-commits-lock-churn-and-junk]])**: verified the eval
+  session pushed **nothing** to the branch (PR head still `7e053757`). The trace it claimed to commit
+  under `.llm/tmp/run/openhands/pr-390/` **never landed** (job errored at push — the "Job status:
+  failure" wrapper quirk) → no `git rm` needed; the drift-D1 violation did not materialize. `deno.lock`
+  clean. `impl-eval.md` also did not land → **transcribed verbatim** from the evaluator's comment into
+  the run dir (same as PLAN-EVAL/D4), recorded as `drift.md` D9. No self-certification.
+- **Stage**: `status:impl-eval → status:ready-merge`; PR DoD item 7 checked with the verdict link.
+- **HARD HOLD**: no merge, no issue close — owner's call. Ready-merge evidence bundle handed to the
+  coordinator.

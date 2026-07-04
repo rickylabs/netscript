@@ -123,3 +123,15 @@ Append-only. Severity: minor | significant | architectural.
   the tool's advertised range. `DOCTRINE-REF.md` now notes the AP-30 tool range as forward headroom.
   Owner/#305 follow-up. No AP-30 references in `fitness-gates.md`/matrix/tool were changed (S9 surface,
   graded correct).
+- **D9-impl-eval-push-did-not-land (minor, 2026-07-04)**: The IMPL-EVAL evaluator (OpenHands,
+  `openrouter/qwen/qwen3.7-max`, run 28708279015) returned **PASS** and posted the full verdict to
+  PR #390 (issuecomment 4882250744), but — identically to the PLAN-EVAL case in D4 — its job errored
+  at the push step ("Job status: failure" wrapper quirk), so **neither `impl-eval.md` NOR the trace
+  it claimed to commit (`.llm/tmp/run/openhands/pr-390/run-28708279015-1`) actually landed on the
+  branch**. Verified: PR head unchanged at `7e053757`; no `.llm/tmp/run/` path tracked on origin or
+  present on disk; `deno.lock` clean; no `openhands/*` refs. Consequence: (a) the feared drift-D1
+  violation (tracked content under the just-cleaned `.llm/tmp/run/`) **did NOT materialize** — there
+  was nothing to `git rm`; (b) the legitimate evaluator artifact was missing from the run dir, so the
+  supervisor faithfully **transcribed** the evaluator's verbatim verdict into `impl-eval.md` (same
+  mechanism as D4/plan-eval.md), attributed to the evaluator with the run + comment links. Verdict
+  content is the evaluator's, not the supervisor's. No self-certification.
