@@ -20,8 +20,8 @@ dir.
 | ----- | -------------------------------------------------------------------- | ---------------------------- | ------- | -------- |
 | A     | Supervisor bootstrap: charter + specs read, run/PR verified          | Fable 5 (this session)       | done    | PR #397 comment 4883200883 |
 | B     | Deep-search corpus: B1 matrix / B2 analysis / B3 research / B4 context, one sub-folder per topic | 5 concurrent Sonnet 5 agents | done    | 75 files committed 3d70ff5a; 9 drift candidates in drift.md |
-| C     | Fable analysis of the B corpus                                        | Fable 5                      | active  | drift.md written; reading decision-critical B2 files before Opus briefs |
-| D     | Per-topic deep-dive design proposals (real designs, not surveys)      | Opus 4.8 agents (one per topic/hard sub-topic) | planned | — |
+| C     | Fable analysis of the B corpus                                        | Fable 5                      | done    | drift.md + FABLE-STAGE-C-SYNTHESIS.md (both delegated decisions provisionally resolved); commit b7964509 |
+| D     | Per-topic deep-dive design proposals (real designs, not surveys)      | Opus 4.8 agents (A / B / E / CD — C+D combined) | active | 4 agents launched, writing to design/&lt;topic&gt;/ |
 | E     | Decide + lock design; write `research.md`, `plan.md`, `## Design`; resolve D-NSONE + grouped-trace flow; epics/sub-issues/DAG/briefs drafted | Fable 5 | planned | — |
 | F1    | Adversarial validation of the locked design                          | WSL Codex (daemon-attached)  | planned | — |
 | F2    | Fix/adjust from adversarial findings                                  | Fable 5                      | planned | — |
