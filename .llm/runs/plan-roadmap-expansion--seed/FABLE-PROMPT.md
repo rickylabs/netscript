@@ -36,8 +36,8 @@ agent briefs; the open-decision register (D-NSONE + telemetry flow resolutions).
 mutations and no framework code until the owner ratifies.** Decisions beyond the delegated set → back
 to the owner.
 
-**PR discipline (mandatory — the owner steers from the PR).** This run has a **draft PR** on branch
-`plan/roadmap-expansion`. You MUST:
+**PR discipline (mandatory — the owner steers from the PR).** This run has **draft PR #397** on
+branch `plan/roadmap-expansion`. You MUST:
 - Commit each artifact/stage as you go (explicit paths, never `git add -A`); **push after every
   stage** (B corpus, Fable analysis, each Opus design proposal, locked design docs, adversarial
   fixes, PLAN-EVAL). Push explicit refspec `HEAD:refs/heads/plan/roadmap-expansion`.
@@ -48,3 +48,23 @@ to the owner.
   — the owner ratifies and cuts.
 - End every commit message with the Co-Authored-By + Claude-Session trailers; end the PR body with
   the Claude Code generated-with footer.
+
+**Execution environment (env-split — this is not optional, Windows cannot push/gh directly).**
+- **Worktree:** `C:/Dev/repos/netscript-framework/.llm/tmp/wt-roadmap-expansion` (branch
+  `plan/roadmap-expansion`). Do all Edit/Write + `git add`/`git commit` on **Windows** (file tools +
+  PowerShell), staging **explicit paths** under `.llm/runs/plan-roadmap-expansion--seed/`. Before any
+  git network op set `$env:GIT_TERMINAL_PROMPT="0"; $env:GCM_INTERACTIVE="Never"`.
+- **Push** (Windows git has no creds; the linked worktree `.git` is a Windows path WSL can't resolve
+  — push the shared ref from the MAIN repo path as the `codex` user):
+  ```
+  wsl.exe -u codex -e bash -lc 'export PATH=$HOME/.local/bin:$PATH; git -C /mnt/c/Dev/repos/netscript-framework -c credential.helper="!$HOME/.local/bin/gh auth git-credential" push origin refs/heads/plan/roadmap-expansion:refs/heads/plan/roadmap-expansion 2>&1'
+  ```
+- **gh** (PRs/comments/labels): run as `codex` from a neutral dir, always `--repo rickylabs/netscript`,
+  markdown bodies via `--body-file` on a `/mnt/c/...` path:
+  ```
+  wsl.exe -u codex -e bash -lc 'export PATH=$HOME/.local/bin:$PATH; cd /tmp && gh pr comment 397 --repo rickylabs/netscript --body-file /mnt/c/.../update.md'
+  ```
+  `gh` lives at `/home/codex/.local/bin/gh` (root has no gh). Verify auth with `gh api user -q .login`
+  (expect `rickylabs`) before relying on it.
+- **Supervisor wake:** run `.llm/tools/harness/watch-run.ts <run-dir>` in the background instead of
+  polling sub-agents.
