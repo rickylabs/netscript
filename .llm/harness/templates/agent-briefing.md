@@ -13,7 +13,7 @@ You are implementing Phase Group <X> (<name>) of the <supervisor> supervisor run
 - Worktree: <integration worktree path>
 
 ### Your group
-- Branch: feat/<supervisor>/<group>
+- Branch: feat/<supervisor>-<group>
 - Worktree: <group worktree path>
 - Archetype(s): <N - name + overlays>
 - Surfaces: <packages/plugins/apps/services>

@@ -9,7 +9,7 @@ it.
 | File                                               | Use                                                                                                       |
 | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
 | `.llm/harness/workflow/activation.md`              | Bootstrap reading list and mandatory artifacts                                                            |
-| `.llm/harness/workflow/run-loop.md`                | 8-phase run loop (Bootstrap → Research → Plan & Design → Plan-Gate → Implement → Gate → Evaluate → Close) |
+| `.llm/harness/workflow/run-loop.md`                | 9-phase run loop (Bootstrap → Research → Plan & Design → Plan-Gate → Implement → Gate → Evaluate → Release → Close) |
 | `.llm/harness/workflow/supervisor.md`              | Multi-group supervisor runs                                                                               |
 | `.llm/harness/gates/archetype-gate-matrix.md`      | Required gates per archetype                                                                              |
 | `.llm/harness/gates/plan-gate.md`                  | Plan-Gate checklist (PLAN-EVAL)                                                                           |
@@ -32,7 +32,7 @@ it.
 | `docs/architecture/doctrine/06-archetypes.md`                          | Six package archetypes and selection order               |
 | `docs/architecture/doctrine/07-composition-and-extension.md`           | Composition roots, constructor injection, extension axes |
 | `docs/architecture/doctrine/08-runtime-state-failure.md`               | Stateful runtime, supervision, cancellation, failure     |
-| `docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md` | AP-1..AP-25 and F-1..F-19                                |
+| `docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md` | AP-1..AP-25 and F-1..F-19 (the `check-doctrine.ts` tool advertises coverage up to AP-30 as forward headroom; doctrine currently defines through AP-25) |
 | `docs/architecture/doctrine/10-codebase-verdict-and-handoff.md`        | Current verdict per package and debt seed                |
 
 ## Axiom Digest

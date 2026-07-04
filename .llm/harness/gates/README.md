@@ -8,7 +8,7 @@ archetype matrix decides which gates apply.
 | Family   | File                       | Purpose                                         |
 | -------- | -------------------------- | ----------------------------------------------- |
 | Static   | `static-gates.md`          | Typecheck, lint, format, docs, publishability   |
-| Fitness  | `fitness-gates.md`         | Doctrine F-1 through F-15                       |
+| Fitness  | `fitness-gates.md`         | Doctrine F-1 through F-19                       |
 | Runtime  | `runtime-gates.md`         | Aspire, browser, services, traces, lifecycle    |
 | Consumer | `consumer-gates.md`        | Downstream imports, generated clients, examples |
 | Matrix   | `archetype-gate-matrix.md` | Required gate set per archetype                 |
@@ -25,6 +25,9 @@ matrix or scope overlay requires them.
 
 ## Phase A Caveat
 
-Phase A is documentation-only. Fitness functions are documented as required doctrine gates, but
-their scripts are implemented in later phases. Until a script exists, the generator and evaluator
-record the gate as `PENDING_SCRIPT` with manual evidence or debt references.
+Phase A is documentation-only. The surviving fitness scripts already exist (see `fitness-gates.md`
+for the small real surface: `check-doctrine.ts`, `audit-jsr-package.ts`, and the `check-ds-*`
+gates); the previously-referenced `check-cli-*` and aggregator scripts were **deleted dead code**,
+not "coming later". When an F-gate has **no dedicated script**, the generator and evaluator record it
+as `PENDING_SCRIPT` — meaning the gate is evidenced manually and/or via `check-doctrine.ts` coverage
+(with a debt reference where applicable), not that a script will be added in a later phase.

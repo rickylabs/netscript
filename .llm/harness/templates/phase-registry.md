@@ -28,7 +28,7 @@ implementation, IMPL-EVAL after). See `workflow/supervisor.md`.
 
 | Field         | Value                            |
 | ------------- | -------------------------------- |
-| Group branch  | `feat/<supervisor>/<group>`      |
+| Group branch  | `feat/<supervisor>-<group>`      |
 | Nested run ID | `<supervisor>-<group>--<suffix>` |
 | Archetype(s)  | `<N - name>` + overlays          |
 | Status        | `<planned/active/…>`             |

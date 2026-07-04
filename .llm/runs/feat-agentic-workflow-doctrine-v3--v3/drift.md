@@ -109,3 +109,17 @@ Append-only. Severity: minor | significant | architectural.
   `.llm/tools/scaffold-e2e-test.ts`, now `.llm/tools/e2e/`). Both are prose mentions, not executable
   wiring — no gate breaks. `docs/**` is the #305 lane and `packages/**` is framework source; both are
   owner/#305 follow-ups, captured here so the grep-zero record is complete.
+- **D8-S10-AP-ceiling-doctrine-vs-tool (significant, 2026-07-04)**: S10 harness sweep surfaced a
+  three-way ceiling split for anti-patterns/fitness-functions. Doctrine source
+  `docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md` **defines** AP-1..AP-25 and
+  F-1..F-19 (verified by heading grep). The `check-doctrine.ts` tool + `gates/fitness-gates.md` +
+  `archetype-gate-matrix.md` describe the tool's coverage range as AP-1..**AP-30**. Several harness
+  evaluator surfaces were additionally **stale at AP-20 / F-15** (a pre-expansion count). RESOLUTION
+  (in-surface): the harness evaluator tables (`evaluator/anti-pattern-catalog.md`,
+  `templates/evaluate.md`, `gates/README.md`, `DOCTRINE-REF.md`) were brought up to the
+  **doctrine-defined ceiling AP-25 / F-19** — an evaluator must enumerate what doctrine actually
+  defines. The AP-25(doctrine)-vs-AP-30(tool) gap is **NOT resolved here**: reconciling it requires a
+  doctrine-prose edit (the #305 lane, out of V3's surface) to either define AP-26..AP-30 or correct
+  the tool's advertised range. `DOCTRINE-REF.md` now notes the AP-30 tool range as forward headroom.
+  Owner/#305 follow-up. No AP-30 references in `fitness-gates.md`/matrix/tool were changed (S9 surface,
+  graded correct).

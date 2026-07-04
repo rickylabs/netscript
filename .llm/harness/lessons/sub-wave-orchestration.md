@@ -55,7 +55,7 @@ surfaced 3 pre-existing CLI errors the generator had not seen.
 ## Supervisor bookkeeping that paid off
 
 - One commit per slice, **paired with a `docs(NN): record …` commit** that writes
-  the worklog/commits/drift row. The history reads as a ledger.
+  the worklog/drift row. The history reads as a ledger.
 - The supervisor seeds each sub-wave's `context-pack.md` front-loading carried-in
   decisions (locked OQ-* answers, structural baseline, MEASURE-FIRST instructions,
   deferred scope) so the generator never re-litigates settled questions.

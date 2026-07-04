@@ -25,6 +25,11 @@ Quick evaluator reference. Doctrine source:
 | AP-18 | Giant generated-string snapshots                     | brittle snapshots where semantic assertions are needed                      |
 | AP-19 | Permissions assumed silently                         | README omits actual Deno/network/KV/process permissions                     |
 | AP-20 | Workspace lib override missing `deno.unstable`       | member config overrides lib without unstable Deno types                     |
+| AP-21 | Flat command-surface folder                          | `presentation/`/`routes/`/`handlers/` folder with >12 immediate children instead of vertical slicing |
+| AP-22 | Useless re-export barrel                              | sub-`src/` `mod.ts`/`index.ts` that only `export *` without aggregation logic |
+| AP-23 | Inline command body in composition                   | composition root containing `.command()`/`.option()`/`.action()`/route/handler bodies instead of wiring-only |
+| AP-24 | Switch-over-tagged-union instead of registry         | `switch` over a variant union returning implementations instead of a typed registry |
+| AP-25 | Side effect in non-edge file                         | `Deno.*`/`console.*`/`fetch`/`Date.now`/`setTimeout` in a non-edge file instead of injected port |
 
 ## Evaluator Use
 

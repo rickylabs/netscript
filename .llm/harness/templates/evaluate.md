@@ -56,6 +56,10 @@ Fill this template during evaluation. Allowed result values: `PASS`, `FAIL`, `N/
 | F-13 | Saga/runtime invariants      |        |          |            |
 | F-14 | Console-log lint             |        |          |            |
 | F-15 | Re-export-upstream lint      |        |          |            |
+| F-16 | Folder-cardinality lint      |        |          |            |
+| F-17 | Abstract-derived co-location lint |   |          |            |
+| F-18 | Sub-barrel lint              |        |          |            |
+| F-19 | Scoped source gate runners   |        |          |            |
 
 ## Runtime Gates
 
@@ -96,6 +100,11 @@ outside scope. Use `DEBT_ACCEPTED` only with a matching `debt/arch-debt.md` entr
 | AP-18 |        |          |       |
 | AP-19 |        |          |       |
 | AP-20 |        |          |       |
+| AP-21 |        |          |       |
+| AP-22 |        |          |       |
+| AP-23 |        |          |       |
+| AP-24 |        |          |       |
+| AP-25 |        |          |       |
 
 ## Arch-Debt Delta
 
