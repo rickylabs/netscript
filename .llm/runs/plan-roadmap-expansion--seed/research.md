@@ -23,7 +23,7 @@ locked decisions live in `plan.md` and the `## Design` section of `worklog.md`.
 
 | #  | Finding (fact the plan depends on) | How to verify |
 | -- | ---------------------------------- | ------------- |
-| 1  | fresh-ui & eis-chat "NS One" share a byte-identical L0–L2 layer (copy-source, `copyOwnership: app-owned-after-copy`); NS One is fresh-ui's own copy output. | `analysis/A-dashboard/03-fresh-ui-vs-nsone-gap-inventory.md`; diff `packages/fresh-ui/**/button.tsx` vs `eis-chat-ref/apps/dashboard/components/ui/button.tsx` |
+| 1  | fresh-ui & eis-chat "NS One" share a byte-identical L0–L2 layer **in the sampled pairs** (copy-source, `copyOwnership: app-owned-after-copy`); NS One is fresh-ui's own copy output. **Scope: 5 of 37 shared-name pairs were byte-diffed identical; the remaining 32 are unsampled — DDX-0's acceptance carries a scripted full-tree L0–L2 diff as the proving gate**, and any non-identical pair it surfaces is recorded as DDX-0 drift. | `analysis/A-dashboard/03-fresh-ui-vs-nsone-gap-inventory.md` (L85-89,117-123,145-149); diff `packages/fresh-ui/**/button.tsx` vs `eis-chat-ref/apps/dashboard/components/ui/button.tsx` |
 | 2  | fresh-ui has NO `blocks/` (L3) layer; eis-chat has 9 L3 blocks incl. `plugin-gated-view.tsx`. | `ls packages/fresh-ui/src` (no blocks dir) vs `eis-chat-ref/apps/dashboard/components/blocks/` |
 | 3  | Aspire pinned 13.4.6 (clears ≥9.4 `WithCommand`); `IInteractionService` NOT in the TS AppHost SDK → route prompts via command `arguments`. | `context/A-dashboard/*`; drift A2; Aspire pin in repo aspire config |
 | 4  | `plugin add dashboard` needs no CLI change; archetype analog = `plugins/streams` + `packages/plugin-streams-core`. | `analysis/A-dashboard/*`; `plugins/streams/scaffold.plugin.json` |
@@ -36,7 +36,7 @@ locked decisions live in `plan.md` and the `## Design` section of `worklog.md`.
 | 11 | Two unreconciled docs IAs (`capabilities/` ~15pp vs 9 pillar folders) block per-feature authoring; only 2 competitor mentions site-wide. | `analysis/D-positioning/*`; drift D1; `docs/**` |
 | 12 | 172a-2 dep is a misattribution (PR #172 merged, CLI type-soundness); server `.fetch()` `ServiceApp` seam ships; only client `ClientLinkPort` in-process adapter missing from sdk. | `analysis/E-desktop/sdk-link-mode-and-service-seam.md`; `packages/sdk/src/ports/client-link-factory.ts`, `packages/service` |
 | 13 | #327 lists desktop WATCH/unscheduled; #375 p3/Backlog; tursodb exclusive OS file-lock (os error 33) shapes single-process; eis-chat validated option (b) in prod. | `analysis/E-desktop/*`; drift E2; `eis-chat-ref/DESKTOP-SHELL.md` |
-| 14 | No `0.0.1-beta.6` / `0.0.1-beta.7` GitHub milestones exist yet (owner must create before issue-filing). | `gh api repos/:owner/:repo/milestones` (read-only); drift C1 |
+| 14 | The plan's milestone train spans `0.0.1-beta.5`→`beta.6`→`beta.7`→`beta.8`→`stable`; **any of these `beta.5/6/7/8` milestones that do not already exist must be created by the owner before issue-filing** (OF-1). Do not assume beta.5 or beta.8 pre-exist. | `gh api repos/:owner/:repo/milestones` (read-only); drift C1; OF-1 |
 
 ## Delegated decisions (resolved — rationale in FABLE-STAGE-C-SYNTHESIS.md)
 

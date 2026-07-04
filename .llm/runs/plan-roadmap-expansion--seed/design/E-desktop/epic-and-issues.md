@@ -66,7 +66,8 @@ Convention: each resolving PR carries a closing keyword (`Closes #En`) in its **
 ### #E1 — feat(sdk): in-process link-mode adapter for single-process service mounting
 
 - **Milestone:** `0.0.1-beta.8` (precursor — land early in the window). **Labels:** `type:feat`,
-  `area:sdk`, `priority:p2`, `epic:deployment`, `status:research`. Parent: #327.
+  `area:sdk`, `gate:jsr`, `priority:p2`, `epic:deployment`, `status:research`. Parent: #327.
+  (`gate:jsr` — acceptance criterion 6 + `deno publish --dry-run` on the new `@netscript/sdk` surface.)
 - **Scope:** add `createInProcessClientLink` (`packages/sdk/src/client/in-process-client-link.ts`),
   the in-process registry (`packages/sdk/src/client/in-process-registry.ts`:
   `registerInProcessService`/`resolveInProcessService`/`clearInProcessServices`), the
@@ -93,7 +94,9 @@ Convention: each resolving PR carries a closing keyword (`Closes #En`) in its **
 ### #E2 — feat(aspire): first-party `deno desktop` app type in the generator (folds #375)
 
 - **Milestone:** `0.0.1-beta.8`. **Labels:** `type:feat`, `area:aspire`, `area:cli`, `priority:p2`,
-  `epic:deployment`, `status:research`. Parent: #327. **Body:** `Closes #375`.
+  `epic:deployment`, `status:research`. Parent: #327. **Issue body:** "Part of #327; folds #375."
+  (No closing keyword on the issue.) **The resolving PR body carries `Closes #375`** so the merge
+  auto-closes the folded issue — closing keywords live in PR bodies, never issue bodies (AGENTS.md).
 - **Scope:** 4th branch (`desktop`) in
   `packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-apps.ts` beside
   `app`/`tauri`/`task`; extend the `AppEntry` type (`@netscript/aspire/types`) with `Type:"desktop"`.

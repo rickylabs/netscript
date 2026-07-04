@@ -87,8 +87,9 @@ packages/plugin-dashboard-core/            # FAT — ARCHETYPE-2 (integration co
                      netscript-graph/    (AspireResourcePort via AspireResource[] compose graph)
                      command-invoke/     (CommandInvokePort → Aspire ResourceCommandService)
     contracts/v1/    mod.ts  — DashboardContract (extends BasePluginContract), oRPC ContractProcedures
-    telemetry/       self-instrumentation of the dashboard (flagship bar)
-    public/mod.ts    package public surface
+    middleware/      self-instrumentation of the dashboard (doctrine-05 lists telemetry as a
+                     middleware/ example; flagship bar) — tech-specific exporter, if any, → adapters/
+    public/mod.ts    package public surface (harness-observed CLI-scaffolder layout; see note below)
     testing/
   tests/contracts/dashboard-contract-base-seam_test.ts   # soundness test (mirrors workers-core)
 
@@ -109,10 +110,15 @@ plugins/dashboard/                          # THIN — ARCHETYPE-5
   .design-sync/         # MANDATORY Claude design-sync artifact (§7)
 ```
 
-Folder vocabulary is doctrine-clean (`domain/ports/application/adapters/public/testing`); the
-harness-authoritative top-level-sibling layout for `contracts/`, `services/` matches `streams`
-on disk (`A/04 §3`; ARCHETYPE-5 vs doctrine-text nesting divergence tracked under #305/#306 — the
-dashboard follows the **harness-observed** layout, which is what the CLI scaffolder emits).
+Folder vocabulary uses canonical doctrine-05 roles (`domain/ports/application/adapters/middleware/
+testing`) with **two documented divergences, not a clean claim**: (1) self-instrumentation lives
+under `middleware/` (doctrine-05's telemetry example), **not** a `telemetry/` role folder — the
+earlier `telemetry/` naming was drift and is corrected here; (2) `public/mod.ts` is the
+**harness-observed CLI-scaffolder** public-surface layout rather than doctrine-05's `mod.ts`-only
+surface — this ARCHETYPE-5-vs-doctrine-text divergence (also covering the top-level-sibling
+`contracts/`, `services/` layout that matches `streams` on disk, `A/04 §3`) is already tracked under
+**#305/#306**; the dashboard follows the harness-observed layout because that is what the CLI
+scaffolder emits and what merges green. arch:check is the enforcing gate.
 
 ### 1.3 The base oRPC `ContractProcedure` contract seam
 
