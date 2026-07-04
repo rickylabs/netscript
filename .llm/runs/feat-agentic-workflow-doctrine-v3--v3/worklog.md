@@ -312,3 +312,44 @@ concept named in `design-v3.md` §5/§8. Ready for PLAN-EVAL (OpenHands, separat
 - **Reconcile**: no related-issue state change. Commit sha recorded below. **All slices S2–S8 DONE** →
   next = WSL Codex final adversarial validation → full-surface gates → IMPL-EVAL (OpenHands, separate
   session).
+
+## 2026-07-04 — post-S8: full-surface gate + Amendment A2 (IMPL-EVAL HELD)
+
+- **Full-surface gate** (`docs:maintenance` = docs:links + sync:check + check-claude) caught a real
+  S8 defect: the jsr-audit doc-lint cross-ref used GitHub's double-dash slug where the link-checker
+  collapses `\s+` around the removed em-dash to a single dash. Fixed `6ff46c82`; gate green.
+- **WSL Codex daemon repair**: remote-control was in the unmanaged state (mobile visibility broken
+  system-wide). No active agent turn (latest rollout >1 day; lingering deno procs = orphaned plugin
+  services from old E2E). Ran the codex-wsl-remote anchored-PID repair → connected/managed
+  (YogaBook9i). Native WSL worktree `~/repos/netscript-harness-v3` @ 6ff46c82 staged for the eventual
+  full-surface adversarial pass.
+- **Amendment A2 (owner-directed)** recorded `62db7abe` (design §8 A2 + drift D6-A2 + context-pack):
+  §8 under-scoped `.llm/tools`; IMPL-EVAL HELD; fold S9 (tools prod-grade refactor, audit-first) +
+  S10 (`.llm/*` sweep, `.llm/runs/` kept). Adversarial pass deferred to the whole surface.
+
+## 2026-07-04 — S9 STEP 1 (AUDIT ONLY) landed — classification posted
+
+- **Author**: Opus 4.8 sub-agent (Tier B), read-only. No file edited/moved/deleted, no git ops,
+  `e2e:cli` not run.
+- **Result — 85 tool files**: KEEP 33, HARDEN 24, DEPRECATE-DELETE 1, AMBIGUOUS 27. Caller map from
+  `deno.json`, `publish.yml`, `docs/site/deno.json`, all skills + mirrors, `.llm/harness/**`,
+  AGENTS/CLAUDE, cross-imports.
+- **Key findings**: (a) only 1 clean delete — root `release.ts` (superseded by
+  `release/github-release.ts`, stale rickylabs default, no callers) — flagged for owner confirm.
+  (b) 27 AMBIGUOUS, all `fitness/` — the unwired #157 CLI-doctrine gate suite (19 `check-cli-*`
+  + shared lib) + 4 readiness orchestrators + 2 fresh-ui drift gates + `check-architecture-gates`;
+  no live caller but real doctrine → **owner must decide wire-vs-delete**. (c) all 3 #307 debt items
+  CONFIRMED (`codex-watch` missing `--allow-env` doc; `gh-token` no main-guard; `claude-hook-log`
+  top-level stdin block). (d) global: only 13/85 files have a main-guard (near-universal harmonization
+  target). (e) duplication: root `check-internal-doc-links` (markdown) vs `docs/check-internal-links`
+  (site HTML) — co-named, both live; doc-drift in `09-anti-patterns` + `fitness-gates.md` naming ~13
+  phantom root `check-*.ts` (S10/#305).
+- **Restructure map**: keep `agentic/ deps/ docs/ fitness/ release/`; new `validation/ search/ git/
+  codegen/ coverage/ e2e/ harness/` for loose root scripts; move publish/jsr wrappers into `release/`.
+  Blast radius ≈45–50 refs; `run-deno-{check,lint,fmt}` trio = stable-path (deepest-wired via
+  `deno.json` command strings + 2 `files:` arrays). 7 `_test.ts` + 5 fixtures move with subjects.
+- **Supervisor A1**: reviewed the audit reasoning; independently confirmed root `release.ts` has the
+  stale `DEFAULT_REPO = 'rickylabs/netscript'` + top-level exec + no callers.
+- **Posted**: PR #390 classification comment (issuecomment-4881590662). **Escalated 2 decisions to
+  coordinator** (confirm `release.ts` delete; verdict on the 27 `fitness/` gates). HARDEN + low-risk
+  moves ready on go-ahead; ambiguous set untouched until decided. No destructive action taken.
