@@ -45,3 +45,16 @@ The V3 Design checkpoint is the dedicated artifact **`design-v3.md`** (public su
 constants = the fixed stage set + lane/model bindings; commit slices = §8 S2–S8; deferred scope =
 §8 notes + ~28 unwired fitness scripts audit → #307). Every file a slice will touch traces to a
 concept named in `design-v3.md` §5/§8. Ready for PLAN-EVAL (OpenHands, separate session).
+
+## 2026-07-04 — S1 pushed + PLAN-EVAL dispatched
+
+- S1 committed `1b025afa` (research + design), pushed to origin via bundle→WSL(206-registry)→origin.
+- PR #390: RESEARCH+PLAN phase comment posted (issuecomment-4881023435); stage label advanced
+  `status:research` → `status:plan-eval`.
+- **PLAN-EVAL dispatched** to a SEPARATE OpenHands session (minimax-M3 requested) via
+  `@openhands-agent` PR-comment trigger (issuecomment-4881027719). Evaluator will read
+  plan-protocol + plan-gate + research.md + design-v3.md, write `plan-eval.md`, and comment
+  `[PHASE: PLAN-EVAL] [VERDICT: …]`. **HARD STOP: no implementation slice (S2–S8) until PASS.**
+- Watch-and-act: await PLAN-EVAL verdict → on PASS, file `[harness-v3 S2..S8]` sub-issues under
+  #389, advance label to `status:impl`, launch S2 (Tier D Codex daemon slice) + S3/S7 (Tier C
+  Workflows, workflow.js committed first). On FAIL_PLAN, revise design and re-dispatch (2 cycles).
