@@ -353,3 +353,27 @@ concept named in `design-v3.md` §5/§8. Ready for PLAN-EVAL (OpenHands, separat
 - **Posted**: PR #390 classification comment (issuecomment-4881590662). **Escalated 2 decisions to
   coordinator** (confirm `release.ts` delete; verdict on the 27 `fitness/` gates). HARDEN + low-risk
   moves ready on go-ahead; ambiguous set untouched until decided. No destructive action taken.
+
+## 2026-07-04 — S9 STEP 2 (HARDEN) landed — 24 live tools, non-destructive
+
+- **Author**: Opus 4.8 sub-agent (Tier B). Additive hardening only; no file moved/renamed/deleted;
+  27 ambiguous `fitness/` tools untouched; `deno.json`/skills/mirrors/docs unchanged.
+- **Worktree-pin landmine + reconcile**: the sub-agent's Edits first landed in the MAIN repo tree
+  (on branch `ci/fix-jsr-provision-token`) instead of the worktree (known "Workflow subagent worktree
+  pin" landmine). It self-reconciled: 24-file patch → `git apply --check` clean → applied to worktree
+  → `git checkout --` reverted main repo. **Supervisor verified**: worktree = exactly 24 ` M` under
+  `.llm/tools` (0 add/del/rename), main repo `.llm/tools` clean.
+- **What** (commit `1457d2d1`): uniform CLI contract (`--help`/`-h` → usage+exit0; `if
+  (import.meta.main)` guard so import ≠ run/exit; accurate `--allow-*` banners). #307 fixes:
+  codex-watch `--allow-env` doc; gh-token main-guard; claude-hook-log stdin moved into guarded main()
+  with help-before-read. deps/* JSON path byte-identical. docs/check-{internal-links,caveat-refs}
+  executable moved into guard, closured helpers rescoped/parameterized (logic + output identical).
+- **Supervisor A1**: reviewed all 24 diffs — #307 fixes correct; closure refactors sound (clean
+  `deno check` proves no dangling module-scope refs); output preserved. **Confirmed** in-env: `deno
+  check --unstable-kv` (24) exit 0; `--help` smokes print+exit0; **gh-token imports without running
+  main (IMPORT_OK_NO_EXIT)**; tests bump-version/prod-install/check-ds-gates 5/5.
+- **Deliberately left** (pre-existing, CI-excluded `.llm/`, non-gating): `no-fallthrough` in
+  `report-function-coverage.ts` parseArgs `--help` case; fmt drift in `check-scaffold-versions.ts`.
+  Not hand-fixed to avoid out-of-scope legacy-drift churn (AGENTS.md caution).
+- **Still HELD for coordinator**: root `release.ts` delete + 27 `fitness/` verdict → drives STEP 3
+  (restructure) + any deletion. HARDEN is decision-independent, so it landed now.
