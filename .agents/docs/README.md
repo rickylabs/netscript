@@ -82,7 +82,7 @@ docs/
   rules/           # .mdc rule files
   docs/            # This directory — agent-facing docs
 .llm/
-  harness/         # Harness v2 (workflows, gates, evaluator protocols)
+  harness/         # Harness v3 (workflows, gates, evaluator protocols)
 ```
 
 ### Subsystems Index

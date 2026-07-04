@@ -1,12 +1,12 @@
 ---
 name: fresh-ui-horizontal
-description: Execute @netscript/fresh-ui design-system slices (registry → scaffolded UI page) under Harness v2 — follow the L0/theme/README authority chain and the run's LOCKED slice table; record divergence in drift.md, never improvise.
+description: Execute @netscript/fresh-ui design-system slices (registry → scaffolded UI page) under Harness v3 — follow the L0/theme/README authority chain and the run's LOCKED slice table; record divergence in drift.md, never improvise.
 ---
 
 # SKILL: fresh-ui horizontal implementation (registry → scaffolded UI page)
 
 Audience: a follower model (e.g. GPT 5.5) executing design-system slices
-for `@netscript/fresh-ui` under Harness v2. Follow these rules literally;
+for `@netscript/fresh-ui` under Harness v3. Follow these rules literally;
 when reality diverges, append to the run's `drift.md` — never improvise
 silently.
 
@@ -60,7 +60,7 @@ skipped:
    surface changed, extend `consumer-render.test.tsx` with a
    consumer-shaped JSX tree.
 
-## Commit & evidence discipline (Harness v2)
+## Commit & evidence discipline (Harness v3)
 
 - One slice = one impl commit per repo + bookkeeping commit. NEVER amend;
   follow-ups are new commits, hash-recorded.

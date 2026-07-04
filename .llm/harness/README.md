@@ -1,8 +1,9 @@
-# NetScript Harness v2
+# NetScript Harness v3
 
-Harness v2 is the agent operating system for doctrine-aware work in this repo. It keeps the v1
-separation of planner, generator, and evaluator, but the run shape is now derived from the NetScript
-Architecture Doctrine.
+Harness v3 is the agent operating system for doctrine-aware work in this repo. It keeps the v1
+separation of planner, generator, and evaluator and the v2 doctrine-derived run shape, and adds
+tiered agent lanes, git-tracked run dirs under `.llm/runs/`, and stage-labeled draft PRs as the
+commit trail (no `commits.md`).
 
 Authoritative doctrine:
 

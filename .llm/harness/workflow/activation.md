@@ -33,8 +33,8 @@ doc/harness-doctrine-refactor -> doc-harness-doctrine-refactor--harness-v2-plan
 
 ## Profile Field
 
-Old harness prompts used `profile: package`, `profile: frontend`, and similar task categories. In
-v2, treat that field as an intent hint. The effective run profile is:
+Old harness prompts used `profile: package`, `profile: frontend`, and similar task categories.
+Treat that field as an intent hint. The effective run profile is:
 
 - the selected `ARCHETYPE-*` file for package/plugin subjects, plus
 - zero or more `SCOPE-*` overlays.

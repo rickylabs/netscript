@@ -1,6 +1,6 @@
 # Doctrine Reference
 
-Harness v2 is derived from the NetScript Architecture Doctrine. The doctrine is the source of truth
+Harness v3 is derived from the NetScript Architecture Doctrine. The doctrine is the source of truth
 for `packages/` and `plugins/`; the harness is the run-time operating model that makes agents apply
 it.
 
