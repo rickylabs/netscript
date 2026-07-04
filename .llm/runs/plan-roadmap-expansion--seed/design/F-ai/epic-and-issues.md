@@ -18,6 +18,15 @@
   (road-to-stable umbrella).
 - **Do NOT** create a parallel `epic:f-ai` label — every AI issue already carries `epic:ai-stack`
   and the negative sweep (`F/04 §4`) confirms no orphan AI issue exists outside it.
+- **Taxonomy/label-file sync (owner action, before Phase-2 filing — F1AI-04).** `.github/labels.yml`
+  currently declares only `type:`/`status:`/`priority:`/`area:`/`ci:`/`gate:` blocks — it has **no**
+  `epic:` or `wave:` label definitions (`.github/labels.yml:14-151`), yet the canonical taxonomy
+  (`.agents/skills/netscript-pr/SKILL.md:190-210`) requires `wave:v1`/`wave:v1-min`/`wave:defer` and
+  the F-ai drafts use `epic:ai-stack` + `epic:telemetry-revamp`. Before any F-ai issue is filed, the
+  owner must add `epic:ai-stack`, `epic:telemetry-revamp`, and the `wave:*` block to `.github/labels.yml`
+  (this folds into the shared A–E owner action OF-1 and F-ai OQ-4). **Wave→milestone rule:** beta.5/6/7
+  slices carry `wave:v1` (they are the v1 train); only the stable-tier adapter FAI-17 carries
+  `wave:defer` — the F-ai drafts were corrected to honor this (no `wave:defer` on a beta milestone).
 
 ## DAG (dependency edges)
 
@@ -47,7 +56,7 @@ DEPTH SEAMS (beta.7, WSL Codex) ────────────────
   FAI-16 RetrieverPort hybrid retrieval + citation provenance                      (#270 E11) [needs FAI-15]
 TELEMETRY SEAM — CO-OWNED WITH TOPIC-B (stable) ──────────────────────────────────
   FAI-17 @netscript/ai/otel GenAI-span adapter (wraps chatOtelMiddleware)          (#248 E9 == Topic-B T9)
-         [HARD dep: Topic-B T1 (attrs) + T6 (live seam, beta.6)]
+         [HARD dep: Topic-B T3 (adapters/SDK posture) + T6 (live seam, beta.6); T1 attrs transitive]
 ```
 
 Critical path to a shippable beta.5 parity floor: **FAI-0 → FAI-1 → FAI-2**, with FAI-3 (publish) and
@@ -61,9 +70,11 @@ Beta.7 depth: FAI-12 gates the skills/memory injection (FAI-13/15).
 ### FAI-0 — in-repo `/v1/ai` impl + bind scaffolder to `aiContractV1` + soundness test
 - **Labels:** `type:feat`, `area:plugin-ai`, `area:ai-core`, `gate:jsr`, `epic:ai-stack`, `priority:p1`, `status:plan`, `wave:v1`
 - **Milestone:** `0.0.1-beta.5`
-- **Justification:** `stream-proxy.stub.ts:16-64` emits a raw `Request→Response` POST to
-  `@netscript/ai/agent`, never binding `aiContractV1` (`ai.contract.ts:377`); the published contract
-  is unexercised (`F/01 §4.2`, verified). This is the correctness heart of #388.
+- **Justification:** `plugins/ai/src/adapter/resources/stream-proxy/stream-proxy.stub.ts:16-64` emits
+  a raw `Request→Response` POST to `@netscript/ai/agent`, never binding `aiContractV1`
+  (`packages/plugin-ai-core/src/contracts/v1/ai.contract.ts:377-379`; the `chat` route uses
+  `eventIterator(chatChunkZodSchema)` at `:332`); the published contract is unexercised
+  (`F/01 §4.2`, verified). This is the correctness heart of #388.
 - **Acceptance:**
   - An in-repo router *implements* `aiContractV1`/`AiRouter` (SSE `chat` async-generator handler +
     `models`/`invokeTool`/`embed`/`transcribe`).
@@ -150,8 +161,9 @@ Beta.7 depth: FAI-12 gates the skills/memory injection (FAI-13/15).
 ### FAI-6 — `@netscript/fresh/ai` FA3 recursive renderer + sandboxed-HTML fallback
 - **Labels:** `type:feat`, `area:fresh`, `gate:jsr`, `epic:ai-stack`, `priority:p1`, `status:plan`, `wave:v1`
 - **Milestone:** `0.0.1-beta.6`
-- **Justification:** `sandbox.ts` is a literal FA0/FA3 skeleton — `createNetScriptMcpSandbox` returns
-  `notImplemented(...)` (verified); `packages/fresh/deno.json:16` already exports `./ai/sandbox`.
+- **Justification:** `packages/fresh/src/runtime/ai/sandbox.ts:71-77` is a literal FA0/FA3 skeleton —
+  `createNetScriptMcpSandbox` throws `notImplemented(...)` (verified); `packages/fresh/deno.json:15-16`
+  already exports `./ai/sandbox`.
 - **Acceptance:**
   - `createNetScriptMcpSandbox` (and the render entrypoint) implement a **recursive
     JSON→component-tree renderer** over the FAI-5 catalog + a **zero-network sandboxed-HTML escape
@@ -195,9 +207,13 @@ Beta.7 depth: FAI-12 gates the skills/memory injection (FAI-13/15).
 - **Dep:** FAI-7, FAI-6. **Issue:** **fold #257 into #379's landing**; #272 (FB6 bidirectional bridge)
   stays a stable follow-on, dependency-superseded by this.
 
-### FAI-9 — beta.6 capability e2e (merge-readiness)
+### FAI-9 — beta.6 capability merge gate
 - **Labels:** `type:test`, `gate:e2e`, `area:plugin-ai`, `area:cli`, `epic:ai-stack`, `priority:p1`, `status:plan`, `wave:v1`
 - **Milestone:** `0.0.1-beta.6`
+- **Scope note:** FAI-9 is the **beta.6** capability merge gate only — it proves the generative-UI +
+  MCP-widget capabilities land, not the beta.7 depth seams or the stable OTel adapter. The beta.7 and
+  stable tiers carry their own gates (see the per-milestone gate row in the Milestone summary); do not
+  read FAI-9 as gating FAI-10…17.
 - **Acceptance:** extend the FAI-2 `ai` e2e (`--mcp` variant) with a generative-UI render assertion
   (a `render_ui` tree renders through FAI-6) + an MCP widget round-trip smoke (FAI-8). Fails if
   FAI-5…8 did not land. Cleanup on `--cleanup`.
@@ -208,7 +224,7 @@ Beta.7 depth: FAI-12 gates the skills/memory injection (FAI-13/15).
 ## Depth seams (beta.7, WSL Codex)
 
 ### FAI-10 — reasoning-effort/token-cap per-call `modelOptions` passthrough  · **NEW ISSUE**
-- **Labels:** `type:feat`, `area:ai-core`, `gate:jsr`, `epic:ai-stack`, `priority:p2`, `status:plan`, `wave:defer`
+- **Labels:** `type:feat`, `area:ai-core`, `gate:jsr`, `epic:ai-stack`, `priority:p2`, `status:plan`, `wave:v1`
 - **Milestone:** `0.0.1-beta.7`
 - **Justification:** adapters take static construction-time config only, no per-call options bag
   (verified §12); but `openRouterReasoningModelOptions` + `ReasoningEffort` already exist (`F/01 §2.3`)
@@ -220,7 +236,7 @@ Beta.7 depth: FAI-12 gates the skills/memory injection (FAI-13/15).
 - **Dep:** none. **Blocks:** FAI-11. **Issue:** file new under `epic:ai-stack`.
 
 ### FAI-11 — BYOK per-request key/baseURL resolution seam  · **NEW ISSUE**
-- **Labels:** `type:feat`, `area:ai-core`, `gate:jsr`, `epic:ai-stack`, `priority:p2`, `status:plan`, `wave:defer`
+- **Labels:** `type:feat`, `area:ai-core`, `gate:jsr`, `epic:ai-stack`, `priority:p2`, `status:plan`, `wave:v1`
 - **Milestone:** `0.0.1-beta.7`
 - **Justification:** provider factories take static `apiKey`/`baseURL` at construction (verified §12);
   multi-tenant/user-supplied keys need a per-request override the current config cannot express
@@ -250,7 +266,7 @@ Beta.7 depth: FAI-12 gates the skills/memory injection (FAI-13/15).
 - **Dep:** FAI-12. **Blocks:** FAI-14. **Issue:** #246 (E7; re-sequence beta.4→beta.7).
 
 ### FAI-14 — `plugins/ai` `--mcp`/skill scaffolder + e2e variant
-- **Labels:** `type:feat`, `area:plugin-ai`, `gate:e2e`, `epic:ai-stack`, `priority:p2`, `status:plan`, `wave:defer`
+- **Labels:** `type:feat`, `area:plugin-ai`, `gate:e2e`, `epic:ai-stack`, `priority:p2`, `status:plan`, `wave:v1`
 - **Milestone:** `0.0.1-beta.7`
 - **Justification:** `--mcp`/skill scaffold flags deferred pending E7 (`F/01 §4.4`, README).
 - **Acceptance:** the `--mcp`/skill scaffolder flags emit typesafe glue (#157 — codegen not string
@@ -289,10 +305,15 @@ Beta.7 depth: FAI-12 gates the skills/memory injection (FAI-13/15).
     GenAI-semconv attributes from Topic-B **T1**'s `SpanNames`/`createGenAiAttributes`; gated behind
     `gen_ai_latest_experimental`.
   - **`gate:jsr`:** new `./otel` export `deno doc --lint` clean; `deno publish --dry-run` green.
-- **Dep (HARD, cross-topic):** Topic-B **T1** (attribute builders + namespacing) + Topic-B **T6**
-  (the beta.6 live-seam invocation in `packages/ai/src/runtime/mod.ts` must exist first).
+- **Dep (HARD, cross-topic):** Topic-B **T3** (thin-vs-SDK provider adapters + flush-on-exit — the
+  OTel adapter shape and runtime-dep boundary FAI-17 builds on) + Topic-B **T6** (the beta.6 live-seam
+  invocation in `packages/ai/src/runtime/mod.ts` must exist first). This matches Topic-B T9's own
+  declared deps (`design/B-telemetry/epic-and-issues.md:156` + DAG `:168` = `T3, T6 → T9`). Topic-B
+  **T1** is a *transitive* prerequisite (it supplies the `SpanNames`/`createGenAiAttributes` attribute
+  conventions consumed through T3), not the direct hard-dep.
 - **Ownership:** F-ai = implementation lane (it is `@netscript/ai` source); Topic-B = semconv-attribute
-  correctness + dashboard views. **OQ-1 — owner ratifies the co-own so it is not built twice.**
+  correctness (T1) + adapter/SDK posture (T3) + dashboard views. **OQ-1 — owner ratifies the co-own so
+  it is not built twice.**
 - **Issue:** #248 (E9); re-sequence beta.4→stable; add `epic:telemetry-revamp` cross-label.
 
 ---
@@ -313,7 +334,7 @@ Beta.7 depth: FAI-12 gates the skills/memory injection (FAI-13/15).
 | #252 | FA3 MCP `ui://` sandbox | **KEEP** | FAI-6 | beta.3 → beta.6 |
 | #379 | FA4 createMcpAppCallHandler | **KEEP** (+ backfill `status:`) | FAI-8 | **beta.3 → beta.6** |
 | #257 | FB4 mcp-ui-widget | **FOLD** into #379's landing | FAI-8 | beta.4 → beta.6 |
-| #272 | FB6 interactive MCP-App bridge | **KEEP stable** (dependency-superseded by #379) | — (stable follow-on) | stable (unchanged) |
+| #272 | FB6 interactive MCP-App bridge | **KEEP stable** (dependency-superseded by FAI-8/#379; NOT counted as a fold) | — (stable follow-on) | stable (unchanged) |
 | #380 | E15 system-prompt assembly | **KEEP** (+ backfill `status:`) | FAI-12 | **beta.3 → beta.7** |
 | #246 | E7 SkillLoaderPort | **KEEP** | FAI-13 | beta.4 → beta.7 |
 | #290 | P2-follow --mcp/skill scaffolder | **KEEP** | FAI-14 | beta.4 → beta.7 |
@@ -330,8 +351,10 @@ Beta.7 depth: FAI-12 gates the skills/memory injection (FAI-13/15).
 | — | BYOK per-request keys | **NEW ISSUE** (gap 4, un-issued) | FAI-11 | beta.7 |
 | — | doctrine backstop | **NEW ISSUE** (extends closed #263) | FAI-4 | beta.5 |
 
-**Headline: 15 KEEP (12 re-sequenced) · 2 FOLD (#257, #272-by-dependency) · 0 supersede/close · 3 NEW
-issues (FAI-4, FAI-10, FAI-11).**
+**Headline: 15 KEEP (12 re-sequenced) · 1 FOLD (#257 into #379) · 0 supersede/close · 3 NEW
+issues (FAI-4, FAI-10, FAI-11).** #272 is **KEEP stable, dependency-superseded by FAI-8** — it is not
+counted as a fold (it retains its own stable issue). This is the single authoritative headline;
+`plan.md` mirrors it verbatim.
 
 ## Milestone summary
 
@@ -345,6 +368,15 @@ issues (FAI-4, FAI-10, FAI-11).**
 | **0.0.1-beta.6** | FAI-5, FAI-6 (generative-UI) · FAI-7, FAI-8 (MCP pooling + widgets) · FAI-9 (capability e2e) |
 | **0.0.1-beta.7** | FAI-10, FAI-11 (reasoning/BYOK) · FAI-12 (system-prompt) · FAI-13 (skills) · FAI-14 (scaffolder) · FAI-15 (memory) · FAI-16 (retriever) |
 | **0.0.1-stable** | FAI-17 (`@netscript/ai/otel`, co-own Topic-B T9) · FAI-16 citation-provenance half · deferred: #262, #247, #271, #256, #272 |
+
+**Per-milestone merge gates (F1AI-07 — FAI-9 is not the whole-epic gate):**
+
+| Milestone | Merge gate |
+|---|---|
+| beta.5 | FAI-2 `ai` scaffold.runtime e2e green + FAI-3 `gate:jsr` (`plugins/ai` first publish dry-run) |
+| beta.6 | **FAI-9** (generative-UI render + MCP widget round-trip) |
+| beta.7 | FAI-14 `--mcp`/skill e2e variant green (exercises FAI-10…13/15) + per-slice `gate:jsr` on the changed `@netscript/ai` surfaces |
+| stable | FAI-17 `gate:jsr` (`./otel` publish dry-run) + co-land under Topic-B **T8** real-e2e assertion |
 
 ## Owner-facing forks (carry to ratification)
 

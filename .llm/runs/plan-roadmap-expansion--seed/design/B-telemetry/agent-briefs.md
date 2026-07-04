@@ -9,7 +9,8 @@ greenfield (map to the existing modules named in `proposal.md`); read the packag
 before broad source reads; validate with the scoped wrappers (`.llm/tools/run-deno-check.ts --root
 packages/telemetry --ext ts,tsx` etc.) never raw root CLI as verdict; targeted `deno check` includes
 `--unstable-kv`; do not touch `deno.lock` beyond what the change requires; commit-push-comment per
-slice then append `commits.md`. IMPL-EVAL is OpenHands qwen-3.7-max, separate session.
+slice (V3: the draft-PR commit list + per-slice PR comments are the commit trail — no `commits.md`).
+IMPL-EVAL is OpenHands qwen-3.7-max, separate session.
 
 ---
 
@@ -187,4 +188,5 @@ slice then append `commits.md`. IMPL-EVAL is OpenHands qwen-3.7-max, separate se
 Launch T1+T2 first (beta.5). After T2 lands the ports/adapters skeleton, fan out T3, T4, T6, T7 in
 parallel (T4/T6/T7 depend only on T1+T2; T5 waits on T3's SDK adapter). T8 launches last (gates on
 T4/T5/T6/T7) and is the epic merge-gate. T9 is post-beta.6, stable-tier, single Fable-5 sub-agent.
-Each slice: WSL Codex daemon-attached, commit-push-comment, append `commits.md`, then next.
+Each slice: WSL Codex daemon-attached, commit-push-comment, then next (V3: the draft-PR commit
+list + per-slice PR comments are the commit trail — no `commits.md`).

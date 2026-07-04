@@ -184,5 +184,6 @@ evaluator/merge pass, not per intermediate loop (expensive).
 6. **Wave 6:** DDX-16 merge-readiness gate. **DDX-19 is stable** (post-beta.6; beta.6 stretch only if
    DDX-4 scaffolders are cheap to expose).
 
-Each slice: branch `feat/dev-dashboard-<slice>`, commit-per-slice, push, PR comment, append
-`commits.md`; IMPL-EVAL (OpenHands qwen 3.7 max) before the next dependent wave.
+Each slice: branch `feat/dev-dashboard-<slice>`, commit-per-slice, push, PR comment (V3: the
+draft-PR commit list + per-slice PR comments are the commit trail — no `commits.md`); IMPL-EVAL
+(OpenHands qwen 3.7 max) before the next dependent wave.

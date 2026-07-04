@@ -193,5 +193,7 @@ closing-keywords), `netscript-tools` (scoped check/lint/fmt wrappers, validation
   `./otel`. File ONCE, cross-labelled `epic:ai-stack` + `epic:telemetry-revamp`.
 - **## SKILL:** `netscript-doctrine`, `netscript-deno-toolchain` (exact-pin `@tanstack/ai`), `jsr-audit`,
   `netscript-pr` (cross-epic labels), + shared baseline.
-- **Dep (HARD, cross-topic):** Topic-B T1 + T6. **Milestone stable.** Do NOT build if Topic-B T9 is
-  already staged — reconcile ownership first (OQ-1).
+- **Dep (HARD, cross-topic):** Topic-B **T3** (adapters/SDK posture) **+ T6** (live seam) — matches
+  Topic-B T9's declared deps (`design/B-telemetry/epic-and-issues.md:156`); T1 attributes are
+  transitive through T3 (corrected from "T1 + T6", F1AI-02). **Milestone stable.** Do NOT build if
+  Topic-B T9 is already staged — reconcile ownership first (OQ-1).

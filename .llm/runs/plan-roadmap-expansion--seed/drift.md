@@ -162,3 +162,43 @@ delegated decision, surfaced to the owner in the PR.
 - eis-chat `PRODUCT.md`/`ARCHITECTURE.md` narrate a SigNoz join + component map ahead of current code
   (aspirational docs). Accept; use code-verified reality for any telemetry showcase.
 - Severity: minor. Action: accept (recorded so Stage D/E agents don't chase dead paths).
+
+## 2026-07-05 — FAI-1: F-ai design invented a beta.6 Topic-A "dashboard AI panel" not in the ratified graph
+
+- **What:** the Opus-F F-ai design (proposal §1/§7, plan.md DAG + OF-F3, open-questions OQ-3) framed a
+  beta.6 Topic-A "dashboard AI panel" and made it hard-depend on FAI-0…3 (and FAI-6 if gen-UI).
+- **Source:** F1-ai adversarial review finding **F1AI-01** (BLOCKER), cross-checked against ratified
+  Topic-A artifacts.
+- **Expected:** a ratified beta.6 Topic-A AI panel to hang F-ai cross-topic deps on.
+- **Actual:** the ratified Topic-A graph has **no** beta.6 AI panel. Its only AI edges are the **stable
+  DDX-19** "codegen-from-UI" handshake `⇄ #238` (`design/A-dashboard/epic-and-issues.md:52-55`,
+  `:307-316`) and the integrated A–E owner fork **OF-6 "AI-invocation-at-beta.6"**, a *telemetry-seam*
+  choice (`plan.md:195`) — not a dashboard panel issue.
+- **Severity:** significant (invents a cross-topic hard-dep that the ratified A–E DAG does not carry).
+- **Action:** fixed in F2 — reframed FAI-0…3 as a parity **floor** for any future AI consumer (and for
+  the OF-6 telemetry seam / DDX-19 handshake), **not** a hard-dep injected into Topic-A's beta.6 DAG;
+  OQ-3/OF-F3 reclassified as a safe deferral (rework-forcing only if the owner reopens Topic-A to add a
+  panel). No Topic-A artifact was edited (F-ai does not mutate a ratified topic).
+- **Evidence:** `F1-ai-adversarial-review.md#F1AI-01`; `design/A-dashboard/epic-and-issues.md:52-55,307-316`.
+
+## 2026-07-05 — FAI-2: FAI-17 cross-topic dep stated as Topic-B T1+T6; T9's real deps are T3+T6
+
+- **What:** F-ai stated FAI-17 (== Topic-B T9) hard-deps Topic-B **T1 + T6**.
+- **Source:** F1-ai review finding **F1AI-02** (BLOCKER).
+- **Expected:** the F-ai dep list matches Topic-B T9's own declared deps.
+- **Actual:** Topic-B T9 declares **T3, T6** (`design/B-telemetry/epic-and-issues.md:156`; DAG `:168`
+  `T3, T6 → T9`). T3 (thin-vs-SDK provider adapters + flush-on-exit) is the adapter/SDK posture the
+  GenAI adapter is built on; T1 supplies attribute conventions transitively through T3.
+- **Severity:** significant (a false cross-topic dependency graph → likely rework if filed as-is).
+- **Action:** fixed in F2 — every FAI-17 dep statement changed to **T3 + T6** (T1 transitive) across
+  proposal, epic-and-issues, agent-briefs, open-questions, and plan.md.
+- **Evidence:** `F1-ai-adversarial-review.md#F1AI-02`; `design/B-telemetry/epic-and-issues.md:156,168`.
+
+## 2026-07-05 — V3 harness: run-root `commits.md` retired
+
+- **What:** the run carried a run-root `commits.md` and several agent-briefs instructed "append
+  `commits.md`" per slice.
+- **Source:** V3 harness change (commit trail = draft-PR commit list + per-slice PR comments).
+- **Actual/Action:** deleted the run-root `commits.md`; corrected the "append commits.md" wording in
+  `design/{A-dashboard,B-telemetry,E-desktop}/agent-briefs.md` to the V3 trail; grep confirms all
+  remaining `commits.md` mentions are V3-correct ("no commits.md"). Severity: minor (bookkeeping).

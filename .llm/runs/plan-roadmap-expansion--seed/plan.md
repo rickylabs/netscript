@@ -119,17 +119,25 @@ stable ── telemetry T9 (AI adapter + Flow-A duckdb); desktop #E7 (deploy-e2e
 | ID | Decision | Rationale |
 | -- | -------- | --------- |
 | LD-F1 | **Evaluate-and-harden, not rebuild.** Reaffirm the TanStack-AI wrap (`@netscript/ai` engine + `ChatClientPort` seam); do NOT switch to Vercel AI SDK (Node-22-only, Deno/`npm:` friction). Keep `@tanstack/ai-mcp` behind `McpTransportPort`; `@modelcontextprotocol/sdk` only if NetScript must be an MCP *server*. | Corpus + source re-verified: the stack is correctly shaped; eis-chat is the proof-of-pattern reference (consumes TanStack directly). |
-| LD-F2 | **Flagship parity #388 is the load-bearing near-term spine (beta.5).** `plugins/ai` has no e2e/`verify-plugin.ts`/golden/doctor and its scaffolded `stream-proxy.stub.ts` **bypasses the `/v1/ai` contract** (raw POST, never binds `aiContractV1`). Parity includes `publish:false`→publishable. | `stream-proxy.stub.ts:16-64` confirmed; #388 (priority:p1) names exactly this. Precedes the dashboard AI panel. |
+| LD-F2 | **Flagship parity #388 is the load-bearing near-term spine (beta.5).** `plugins/ai` has no e2e/`verify-plugin.ts`/golden/doctor and its scaffolded `stream-proxy.stub.ts` **bypasses the `/v1/ai` contract** (raw POST, never binds `aiContractV1`). Parity includes `publish:false`→publishable. | `stream-proxy.stub.ts:16-64` confirmed; #388 (priority:p1) names exactly this. Parity floor for the OF-6 telemetry seam + stable DDX-19 handshake (no ratified beta.6 Topic-A AI panel — F1AI-01). |
 | LD-F3 | **Promote the flagship-quality-parity law into doctrine (beta.5).** New dedicated section in `docs/architecture/doctrine/11-plugin-thinness-and-base-seams.md` ("thinness is a layering choice, not a quality-bar exemption") + fix `plugins/ai/README.md` "thin" framing. Lane: Opus docs-workflow; validation OpenHands. | The law lives only as #238-c10/#388 today — no doctrine backstop; if #388 closes it has no durable home (biggest structural risk). |
 | LD-F4 | **Generative-UI at beta.6 = recursive renderer + MINIMAL catalog + sandboxed-HTML fallback; full 30+ vocabulary → stable.** | The renderer (FA3 sandbox skeleton, `sandbox.ts`) is the load-bearing gap; vocabulary breadth is purely additive and reworks nothing (OQ-5). |
-| LD-F5 | **The AI `TelemetryPort` GenAI-span adapter (FAI-17) == Topic-B T9; co-own, F-ai implements, milestone stable.** `@netscript/ai/otel` wraps `@tanstack/ai/middlewares/otel` (already spec-correct in eis-chat). File **once**, cross-labelled `epic:ai-stack`+`epic:telemetry-revamp`; hard-deps Topic-B T1 (attributes) + T6 (live seam). | Same work scoped twice would double-build; the adapter is `@netscript/ai` source so F-ai owns the lane. beta.6 dashboard is served by T6's live minimal span, not the full adapter (OQ-1). |
+| LD-F5 | **The AI `TelemetryPort` GenAI-span adapter (FAI-17) == Topic-B T9; co-own, F-ai implements, milestone stable.** `@netscript/ai/otel` wraps `@tanstack/ai/middlewares/otel` (already spec-correct in eis-chat). File **once**, cross-labelled `epic:ai-stack`+`epic:telemetry-revamp`; **hard-deps Topic-B T3 (adapters/SDK posture) + T6 (live seam)** — matching T9's own declared deps (`design/B-telemetry/epic-and-issues.md:156`); T1 attribute conventions are transitive through T3 (corrected from "T1 + T6", F1AI-02). | Same work scoped twice would double-build; the adapter is `@netscript/ai` source so F-ai owns the lane. The beta.6 AI telemetry seam (OF-6) is served by T6's live minimal span, not the full adapter (OQ-1). |
 | LD-F6 | **F-ai is 18 slices FAI-0…17 (<30).** beta.5 parity+doctrine (FAI-0…4); beta.6 gen-UI + MCP pooling + capability e2e (FAI-5…9); beta.7 reasoning/BYOK/system-prompt/skills/memory/retriever (FAI-10…16); stable OTel adapter (FAI-17). #262 gateway/#247 orchestration/#271 write-gate/#256 paced-reveal/#272 MCP-bridge deferred explicitly. | Opus-F DAG, each slice cites a `file:line`/issue. #238's children currently at beta.3/beta.4 re-sequence into the beta.5–stable train (OF-F1/OF-F8). |
 
 ### F-ai epic entry
 
 | Epic | Archetype | Milestones | Slices | Merge-gate |
 | ---- | --------- | ---------- | ------ | ---------- |
-| `ai-stack` hardening (#238 existing epic, re-sequenced) | package + plugin + docs | beta.5 (FAI-0…4), beta.6 (FAI-5…9), beta.7 (FAI-10…16), stable (FAI-17) | FAI-0…17 (**18**) | FAI-9 beta.6 capability e2e (gen-UI render + MCP widget round-trip) |
+| `ai-stack` hardening (#238 existing epic, re-sequenced) | package + plugin + docs | beta.5 (FAI-0…4), beta.6 (FAI-5…9), beta.7 (FAI-10…16), stable (FAI-17) | FAI-0…17 (**18**) | **per-milestone** (see below): beta.6 = FAI-9 (gen-UI render + MCP widget round-trip) |
+
+> **Gate set (F1AI-05):** `gate:jsr`/`gate:e2e` are labels; the required gate set per slice is selected
+> from the archetype gate matrix — see the **Archetype gate matrix (§8.1)** in `design/F-ai/proposal.md`
+> (Archetype 1 contract → soundness+`arch:check`; Archetype 2/3 package/runtime → full-export
+> `deno doc --lint` + publish dry-run + `deps:prod-install` on new subpaths; Archetype 5 plugin →
+> `verify-plugin.ts`+doctor+`scaffold.runtime` e2e; docs → `arch:check`+`check:links`). **Merge gates
+> are per-milestone (F1AI-07):** FAI-9 gates **beta.6 only** — beta.5/beta.7/stable carry their own
+> gates (per-milestone gate table in `design/F-ai/epic-and-issues.md`).
 
 ### F-ai DAG lane (into the train)
 
@@ -137,34 +145,42 @@ stable ── telemetry T9 (AI adapter + Flow-A duckdb); desktop #E7 (deploy-e2e
 beta.5 ── ai: FAI-0 (/v1/ai impl + bind scaffolder) → FAI-1 (verify/golden/doctor) → FAI-2 (ai e2e) → FAI-3 (publish:false→publishable, gate:jsr)
           FAI-4 (doctrine backstop, Opus docs-workflow) ∥
 beta.6 ── ai: FAI-5 (gen-UI catalog, fresh-ui) → FAI-6 (FA3 recursive renderer + HTML fallback) ┐
-              FAI-7 (MCP pooling + ui://) → FAI-8 (mcp-app-call + widget, folds #257→#379)       ├→ FAI-9 (capability e2e)
-          [dashboard AI panel OF-6 hard-deps FAI-0…3 parity floor; renders-gen-UI ⇒ hard-dep FAI-6 (OQ-3)]
+              FAI-7 (MCP pooling + ui://) → FAI-8 (mcp-app-call + widget, folds #257→#379)       ├→ FAI-9 (beta.6 capability merge gate)
+          [no ratified beta.6 Topic-A "AI panel": FAI-0…3 is a parity FLOOR for OF-6 telemetry seam + stable DDX-19 handshake, NOT a Topic-A beta.6 hard-dep (F1AI-01/OQ-3)]
 beta.7 ── ai: FAI-12 (system-prompt assembly) → {FAI-13 (SkillLoader L1/L2/L3) → FAI-14 (--mcp scaffolder)}, FAI-15 (MemoryPort.recall)
               FAI-10 (reasoning/token-cap, extend openRouterReasoningModelOptions) ∥ FAI-11 (BYOK) ∥ FAI-16 (RetrieverPort → citation half trails to stable)
-stable ── ai: FAI-17 (@netscript/ai/otel GenAI-span adapter) == Topic-B T9 ⇐ hard-deps Topic-B T1 + T6
+stable ── ai: FAI-17 (@netscript/ai/otel GenAI-span adapter) == Topic-B T9 ⇐ hard-deps Topic-B T3 + T6 (T1 attrs transitive)
 ```
 
 ### F-ai owner forks (OF-F1…OF-F8 = design/F-ai/open-questions.md OQ-1…8)
 
 | Decision | Status | Rework if deferred? | Notes |
 | -------- | ------ | ------------------- | ----- |
-| OF-F1 (=OQ-1) **E9/#248 GenAI-span adapter ownership** — F-ai FAI-17 vs Topic-B T9 | **should resolve before filing FAI-17/T9** | Yes if both filed as independent build slices (double-build). | Recommend **co-own, F-ai implements**, single cross-labelled issue at stable; hard-dep Topic-B T1+T6. Do not file twice. |
+| OF-F1 (=OQ-1) **E9/#248 GenAI-span adapter ownership** — F-ai FAI-17 vs Topic-B T9 | **should resolve before filing FAI-17/T9** | Yes if both filed as independent build slices (double-build). | Recommend **co-own, F-ai implements**, single cross-labelled issue at stable; hard-dep Topic-B **T3+T6** (matches T9's declared deps; T1 attrs transitive). Do not file twice. |
 | OF-F2 (=OQ-2) **Reasoning + BYOK are un-issued** — file two NEW issues | should resolve before beta.7 filing | No plan rework; changes issue count only. | Recommend file **two** (`epic:ai-stack`, beta.7, p2); FAI-10 is extend-not-greenfield (`openRouterReasoningModelOptions` exists). |
-| OF-F3 (=OQ-3) **Dashboard beta.6 AI panel: invoke vs observe** (cross-topic w/ Opus-A) | should resolve before DDX AI-panel filing | Changes FAI-6 dep shape, not the slice set. | Parity floor FAI-0…3 is a hard-dep either way; renders-gen-UI ⇒ FAI-6 hard-dep. Confirm panel's exact AI surface with Opus-A/owner. |
-| OF-F4 (=OQ-4) **beta.5/6/7 milestones do not exist** (shared with A–E OF-1) | **must resolve at ratification** | Blocks issue-filing, not design. | Owner creates milestones. `plugins/ai` first prerelease JSR publish → cosmetic `latest:null`, self-heals (not a blocker). |
+| OF-F3 (=OQ-3) **Topic-A AI surface at beta.6 — is there any AI panel at all?** (cross-topic w/ Opus-A) | safe to defer (default: no net-new beta.6 panel) | **No** — with the invented panel removed, no F-ai slice set or milestone changes. Rework-forcing ONLY if the owner reopens Topic-A to add a beta.6 panel (a Topic-A decision). | **Corrected (F1AI-01/F1AI-06):** the ratified Topic-A graph has **no** beta.6 AI panel — its AI edges are stable DDX-19 (`⇄ #238`) + OF-6's beta.6 telemetry seam. FAI-0…3 is a parity **floor** for future AI consumers, NOT a hard-dep injected into Topic-A's beta.6 DAG. Default: confirm no net-new panel. |
+| OF-F4 (=OQ-4) **beta.5/6/7 milestones do not exist + `.github/labels.yml` lacks `epic:`/`wave:` blocks** (shared with A–E OF-1) | **must resolve at ratification** | Blocks issue-filing, not design. | Owner creates the milestones **and** adds `epic:ai-stack`, `epic:telemetry-revamp`, and the `wave:v1`/`wave:v1-min`/`wave:defer` block to `.github/labels.yml` before filing (F1AI-04 — the file currently has none). `plugins/ai` first prerelease JSR publish → cosmetic `latest:null`, self-heals (not a blocker). |
 | OF-F5 (=OQ-5) **Gen-UI vocabulary density at beta.6** | should resolve before FAI-5 filing | No rework — vocabulary is additive over the renderer. | Recommend **minimal at beta.6, full at stable** (LD-F4). |
 | OF-F6 (=OQ-6) **#388 emitter count 6 vs 7** | safe to defer (FAI-1 reconciles) | No — in-slice reconciliation. | Source shows 6 emitters; treat source as authority, update #388 in-slice. |
 | OF-F7 (=OQ-7) **TanStack pre-1.0 pin-as-gate** | safe to defer (accept-with-pin) | No — pin discipline is additive. | Recommend accept-with-exact-pin + upgrade-watch (eis-chat runs it in prod); add exact-pin lint to TanStack-touching slices. |
 | OF-F8 (=OQ-8) **#262 gateway + #247 orchestration milestone** | safe to defer | No — both leave the near-term train. | Recommend re-sequence **back to stable** (neither parity-critical nor a dashboard dep). |
 
-> **F-ai "must resolve now" forks:** only **OF-F4** (milestones — shared with A–E OF-1, a pure owner
-> action). OF-F1 (adapter co-ownership) is "resolve before filing FAI-17" and is technically
-> resolved by LD-F5 with a documented single-issue path — no design rework. No `FAIL_PLAN` open
-> decision in the F-ai set.
+> **F-ai "must resolve now" forks:** only **OF-F4** (milestones + `.github/labels.yml` `epic:`/`wave:`
+> sync — shared with A–E OF-1, a pure owner action). OF-F1 (adapter co-ownership) is "resolve before
+> filing FAI-17" and is technically resolved by LD-F5 with a documented single-issue path — no design
+> rework. **OF-F3 is no longer rework-forcing:** the F1-ai review removed the invented beta.6 Topic-A
+> AI panel, so deferring OF-F3 changes no F-ai slice or milestone (it becomes rework-forcing only if the
+> owner *reopens Topic-A* to add a beta.6 panel, a Topic-A decision). **No `FAIL_PLAN` open decision in
+> the F-ai set.**
 
 ### F-ai supersession map (DRAFT — owner-approved before any close; NEVER a keyword on #238)
 
-Opus-F headline: **15 keep (12 re-sequenced into beta.5–stable) · 2 fold (#257→#379 render+act halves; #272 dependency-superseded by FAI-8) · 0 close/supersede · 3 new (FAI-10 reasoning, FAI-11 BYOK, + reconcile #388 emitter count in-slice).** Full mapping in `design/F-ai/epic-and-issues.md`.
+Authoritative headline (F1AI-03 — single source, mirrors `design/F-ai/epic-and-issues.md` verbatim):
+**15 KEEP (12 re-sequenced into beta.5–stable) · 1 FOLD (#257 into #379) · 0 close/supersede · 3 NEW
+issues (FAI-4 doctrine backstop, FAI-10 reasoning, FAI-11 BYOK).** #272 is **KEEP stable,
+dependency-superseded by FAI-8** — it retains its own stable issue and is **not** counted as a fold.
+The #388 emitter-count reconcile (6 vs 7) is an in-slice fix in FAI-1 (OF-F6), not a new issue. Full
+mapping in `design/F-ai/epic-and-issues.md`.
 
 ### F-ai risk additions
 

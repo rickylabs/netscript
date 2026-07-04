@@ -2,7 +2,8 @@
 
 Lane law (mission §Delegation): framework/plugin implementation = **WSL Codex** daemon-attached
 slices; **separate-session OpenHands IMPL-EVAL** (qwen 3.7 max) per slice; Claude supervises only.
-Each slice: own branch/worktree, commit → push → PR comment → append `commits.md` before the next.
+Each slice: own branch/worktree, commit → push → PR comment before the next (V3: the draft-PR
+commit list + per-slice PR comments are the commit trail — no `commits.md`).
 None of these run until the owner ratifies the roadmap.
 
 **Global validation reminders (all slices):** `--unstable-kv` on targeted `deno check`; use the

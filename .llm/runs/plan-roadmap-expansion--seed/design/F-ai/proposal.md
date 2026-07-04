@@ -93,9 +93,15 @@ Per #388's own scope (`F/04 §2`), decomposed for one-agent-per-surface:
    yields `latest: null` on JSR (MEMORY jsr-prerelease-latest-null) — cosmetic, self-heals; not a
    blocker (OQ-4).
 
-**Milestone: beta.5.** #388 currently sits at beta.3 (`F/04 §2`) — i.e. *behind* the A–E train and
-its own consumer (the dashboard AI panel targets beta.6). It must move up to precede the dashboard
-(§5, owner-fork 1).
+**Milestone: beta.5.** #388 currently sits at beta.3 (`F/04 §2`) — i.e. *behind* the A–E train. It
+must move up so the parity floor exists before any consumer leans on it. **Correction (F1AI-01):** the
+ratified Topic-A design does **not** contain a beta.6 dashboard "AI panel." Topic-A's only AI edges are
+(a) the **stable** DDX-19 "codegen-from-UI" handshake, cross-labelled `⇄ #238`
+(`design/A-dashboard/epic-and-issues.md:52-55`, `:307-316`), and (b) the integrated A–E owner fork
+**OF-6 "AI-invocation-at-beta.6"**, which is a *telemetry seam* choice (pull the minimal AI
+`TelemetryPort` invocation forward), not a dashboard panel issue (`plan.md:195`). So beta.5 parity is
+the honest floor for the OF-6 telemetry seam and the stable DDX-19 handshake — not a hard-dep of a
+Topic-A beta.6 panel that the ratified graph does not carry.
 
 ---
 
@@ -246,9 +252,13 @@ is the same work as FAI-17.** To avoid a double-build, I resolve:
   source change, so F-ai is the **implementation lane owner**; Topic-B contributes the semconv
   *attribute correctness* (`SpanNames`/`createGenAiAttributes` from Topic-B **T1**) and the dashboard
   *views*. File it **once**, cross-labelled `epic:ai-stack` + `epic:telemetry-revamp`.
-- **Hard-deps:** FAI-17 → Topic-B **T1** (GenAI attribute builders + namespacing) and Topic-B **T6**
-  (the live-seam invocation must exist first). Milestone **stable** (matching T9), because the beta.6
-  dashboard AI panel is served by T6's live minimal span, not the full adapter.
+- **Hard-deps:** FAI-17 → Topic-B **T3** (thin-vs-SDK provider adapters + flush-on-exit; the OTel
+  adapter shape and runtime-dep boundary the GenAI adapter is built on) and Topic-B **T6** (the
+  live-seam invocation must exist first). This matches Topic-B T9's own declared deps
+  (`design/B-telemetry/epic-and-issues.md:156`; DAG `:168` reads `T3, T6 → T9`). Topic-B **T1** is a
+  *transitive* prerequisite — it supplies the `SpanNames`/`createGenAiAttributes` attribute conventions
+  consumed through T3, not a direct hard-dep. Milestone **stable** (matching T9); the beta.6 AI
+  telemetry seam (OF-6) is served by T6's live minimal span, not the full adapter.
 
 Raised as **OQ-1** for owner ratification (do not let it be built twice).
 
@@ -256,17 +266,23 @@ Raised as **OQ-1** for owner ratification (do not let it be built twice).
 
 ## 7. Cross-topic gates (hard-deps, by intent)
 
-1. **Topic-A dashboard AI panel (OF-6, AI-invocation-at-beta.6) → hard-dep on the parity floor
-   FAI-0…3 (beta.5).** The dashboard cannot honestly show/drive AI invocations without a
-   contract-bound, e2e-covered, publishable `plugins/ai` under it. If the panel *invokes* AI it binds
-   the `/v1/ai` contract (FAI-0); if it only *observes* AI it depends on the live `TelemetryPort` seam
-   (Topic-B T6, beta.6) + soft-dep FAI-17 for rich views (stable). Exact invoke-vs-observe scope →
-   OQ-3 with Opus-A.
+1. **Topic-A AI edges are the stable DDX-19 handshake + the OF-6 beta.6 telemetry seam — NOT a
+   ratified beta.6 dashboard "AI panel" (F1AI-01).** The ratified Topic-A graph contains no beta.6 AI
+   panel issue; its AI edges are (a) **stable DDX-19** "codegen-from-UI" `⇄ #238`
+   (`design/A-dashboard/epic-and-issues.md:52-55`, `:307-316`) and (b) **OF-6 "AI-invocation-at-beta.6"**,
+   a *telemetry-seam* choice to make the AI `TelemetryPort` invocation live at beta.6 (`plan.md:195`).
+   The parity floor **FAI-0…3 (beta.5)** is the honest prerequisite for either to be real — any AI
+   consumer needs a contract-bound, e2e-covered, publishable `plugins/ai` first — but FAI-0…3 is a
+   *parity floor*, **not** a hard-dep injected into Topic-A's beta.6 DAG. If the owner later reopens
+   Topic-A with a genuinely new beta.6 AI panel, that is a Topic-A scope change with its own DAG edits;
+   F-ai does not assume it (OQ-3).
 2. **AI `TelemetryPort` adapter co-lands with Topic-B GenAI-span work.** FAI-17 == Topic-B T9; hard
-   dep on Topic-B **T1** (convention/attributes) + **T6** (live seam). §6 / OQ-1.
-3. **Generative-UI + MCP (FAI-5…8, beta.6) are the substance of the dashboard AI panel** if OF-6 is a
-   generative-UI surface — confirm with Opus-A whether the beta.6 AI panel renders generative-UI (then
-   FAI-6 is a hard-dep) or is telemetry-only (then it is not). OQ-3.
+   dep on Topic-B **T3** (adapters/SDK posture) + **T6** (live seam); T1 attribute conventions are
+   transitive through T3. §6 / OQ-1.
+3. **Generative-UI + MCP (FAI-5…8, beta.6) stand on their own #238 issues** (#258/#252/#379/#257), not
+   on a Topic-A panel. Should the owner later add a Topic-A beta.6 AI surface that *renders*
+   generative-UI, FAI-6 would become its hard-dep; absent that ratified surface, FAI-5…8 are gated only
+   by their own DAG. OQ-3.
 
 ---
 
@@ -286,6 +302,27 @@ acceptance bullet:
 
 `plugins/ai` moving off `publish:false` (FAI-3) is the highest-risk jsr delta — it is the first
 publish and must pass the full doc:lint + dry-run + JSR-safe-asset checks before the beta.5 cut.
+
+### 8.1 Archetype gate matrix (F1AI-05)
+
+`gate:jsr`/`gate:e2e` are the *labels*; the **required gate set** for each slice is selected from the
+archetype gate matrix (`.llm/harness/gates/archetype-gate-matrix.md:18-80`) per the surface it touches,
+so the Plan-Gate "gate set selected" box (`.llm/harness/gates/plan-gate.md:29-30`) is checkable. Every
+slice additionally runs the scoped static gates (`.llm/tools/run-deno-{check,lint,fmt}.ts --root <pkg>
+--ext ts,tsx`; targeted `deno check` with `--unstable-kv`).
+
+| Surface (archetype) | Slices | Required gates beyond scoped check/lint/fmt |
+|---|---|---|
+| `plugin-ai-core` `/v1/ai` **contract** (Archetype 1) | FAI-0 | contract-soundness test (2 accepted casts only); `arch:check`; full-export `deno doc --lint`; `deno publish --dry-run` |
+| `@netscript/ai` **package** public surface (Archetype 2) | FAI-7, FAI-10, FAI-11, FAI-13, FAI-15, FAI-16, FAI-17 | full-export `deno doc --lint`; `deno publish --dry-run`; `deps:prod-install` consumer-import where a new subpath ships (`./otel`, `./mcp`, `./ports`) |
+| `@netscript/fresh/ai` **runtime** behavior (Archetype 3) | FAI-6, FAI-8 | `./ai/sandbox` / `createMcpAppCallHandler` export `deno doc --lint`; runtime render/round-trip unit + `deno publish --dry-run` |
+| `@netscript/fresh-ui` `ai` **registry** (Archetype 2) | FAI-5, FAI-8 | registry-subpath `deno doc --lint`; `deno publish --dry-run` |
+| `plugins/ai` **plugin** (Archetype 5) | FAI-1, FAI-2, FAI-3, FAI-9, FAI-14 | `verify-plugin.ts` + plugin `doctor`; `scaffold.runtime` `ai` e2e; FAI-3 first-publish `deno doc --lint` full map + `deno publish --dry-run` + JSR-safe-asset check |
+| **doctrine/README** prose (docs) | FAI-4 | `arch:check` doctrine fitness; `check:links`; no `packages/`/`plugins/` source change |
+
+The doctrine fitness gates (F-1…F-19 in the matrix) apply where a slice changes a doctrine-governed
+package/plugin surface; `arch:check` is the runnable proxy. This matrix is the authority for the
+per-slice `gate:*` labels above.
 
 ---
 

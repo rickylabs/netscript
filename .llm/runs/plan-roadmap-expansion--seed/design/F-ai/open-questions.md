@@ -12,7 +12,10 @@ F-ai FAI-17 name the **same** `@netscript/ai/otel` adapter. Building it twice is
 - **Recommended:** **co-own, F-ai implements.** The adapter is `@netscript/ai` *source*, so F-ai is the
   implementation lane; Topic-B contributes the semconv attribute builders (T1 `SpanNames`/
   `createGenAiAttributes`) and the dashboard views. File **once**, cross-labelled `epic:ai-stack` +
-  `epic:telemetry-revamp`, milestone **stable**. FAI-17 hard-deps Topic-B T1 + T6.
+  `epic:telemetry-revamp`, milestone **stable**. **FAI-17 hard-deps Topic-B T3 + T6** — matching
+  Topic-B T9's own declared deps (`design/B-telemetry/epic-and-issues.md:156`, DAG `:168`); T3 is the
+  adapters/SDK posture the GenAI adapter is built on, T6 is the live seam, and T1's attributes arrive
+  transitively through T3 (corrected from the earlier "T1 + T6", F1AI-02).
 - **Decision needed:** owner confirms the single-issue co-own and which epic is primary. Until then
   FAI-17 and B-T9 must not both be filed as independent build slices.
 
@@ -28,17 +31,27 @@ would be **newly filed** under `epic:ai-stack`.
 - **Decision needed:** owner approves filing two new issues (vs folding both into a single
   "provider-options" issue). Recommend two — BYOK is a distinct multi-tenant seam from reasoning caps.
 
-## OQ-3 — dashboard beta.6 AI panel: invoke vs observe (HIGH, cross-topic with Opus-A)
+## OQ-3 — Topic-A AI surface at beta.6: is there any AI panel at all? (HIGH, cross-topic with Opus-A)
 
-The Topic-A dashboard AI panel (OF-6, AI-invocation-at-beta.6) can either **invoke** AI (binds the
-`/v1/ai` contract, hard-dep FAI-0 parity floor + FAI-6 generative-UI renderer) or only **observe** AI
-telemetry (depends on Topic-B T6 live seam + soft-dep FAI-17 rich views). The dependency shape differs.
+**Corrected (F1AI-01/F1AI-06).** The ratified Topic-A design does **not** contain a beta.6 dashboard
+"AI panel." Its only AI edges are the **stable DDX-19** "codegen-from-UI" handshake `⇄ #238`
+(`design/A-dashboard/epic-and-issues.md:52-55`, `:307-316`) and the integrated A–E owner fork **OF-6
+"AI-invocation-at-beta.6"**, which is a *telemetry-seam* choice (make the AI `TelemetryPort` invocation
+live at beta.6), not a dashboard panel issue (`plan.md:195`). The earlier framing invented a beta.6 AI
+panel and made Topic-A hard-depend on FAI-0…3/FAI-6 — that dependency does not exist in the ratified
+graph.
 
-- **Recommended:** treat the parity floor **FAI-0…3 (beta.5)** as a hard-dep either way (the dashboard
-  cannot honestly show AI without a contract-bound, e2e-covered, publishable `plugins/ai`); confirm
-  with Opus-A whether the panel *renders generative-UI* (then FAI-6 becomes a hard-dep) or is
-  telemetry-only.
-- **Decision needed:** Opus-A / owner clarifies the panel's exact AI surface at beta.6.
+- **Recommended:** treat **FAI-0…3 (beta.5)** as a *parity floor* for any future AI consumer (the
+  dashboard cannot honestly show/drive AI without a contract-bound, e2e-covered, publishable
+  `plugins/ai`), but do **not** inject it as a hard-dep into Topic-A's beta.6 DAG. F-ai carries no
+  beta.6 dashboard-panel dependency. If the owner wants a genuinely new beta.6 Topic-A AI panel, that is
+  a **Topic-A scope reopen** with its own DAG edits (and only *then* would a generative-UI panel make
+  FAI-6 a hard-dep).
+- **Rework classification:** with the invented panel removed, deferring OQ-3 is **safe** — no F-ai slice
+  set or milestone changes. It becomes rework-forcing **only** if the owner reopens Topic-A to add a
+  beta.6 AI panel, which is a Topic-A decision, not a silent F-ai deferral.
+- **Decision needed:** Opus-A / owner confirms there is **no** net-new beta.6 Topic-A AI panel (default),
+  or explicitly reopens Topic-A to add one.
 
 ## OQ-4 — beta.5/beta.6/beta.7 milestones do not exist yet (MEDIUM, shared A–E)
 
