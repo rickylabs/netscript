@@ -72,3 +72,33 @@ concept named in `design-v3.md` §5/§8. Ready for PLAN-EVAL (OpenHands, separat
   run-dir currency (`worklog.md` + `context-pack.md`) touched every slice, reconcile note per slice.
 - `#390` stage label advanced `status:plan-eval` → `status:impl`.
 - Next: S2 (lane-policy + tiered model) → Opus 4.8 sub-agent, worktree `.llm/tmp/wt-harness-v3`.
+
+## 2026-07-04 — Pre-S2 currency (commit `f220e0c2`)
+
+- **plan-eval.md transcribed** (drift D4): the PLAN-EVAL OpenHands job errored before its artifact
+  landed, but posted a PASS verdict (issuecomment-4881028564). Supervisor transcribed it faithfully
+  with a provenance note (transcription, not self-certification). Session separation intact.
+- **Amendment A1 recorded** (drift D5-slice-review-gate, design-v3.md top + §8 S2/S5): owner-directed
+  post-PLAN-EVAL scope addition — permanent, **lane-agnostic Slice review gate** (no implementation
+  lane B/C/D self-certifies; Tier-A supervisor substantively reviews before the sign-off commit).
+  Codified in S2 (lane-policy invariant + SKILL ref) and S5 (run-loop step). Slice count unchanged.
+
+## 2026-07-04 — S2 landed (lane policy + tiered model)
+
+- **Author**: Opus 4.8 sub-agent (Tier B, D3 lane override), worktree `.llm/tmp/wt-harness-v3`.
+- **Files**: NEW `.llm/harness/workflow/lane-policy.md` (single source: Tier A–E table + OD3 model
+  bindings + exactly-two-invariants section incl. A1 with explicit B/C/D enumeration + selection
+  rules + supervisor-identity requirement); EDITED `.agents/skills/netscript-harness/SKILL.md`
+  (retire hardcoded lane dogma → defer to lane-policy; add Slice-review-gate + supervisor-identity
+  rows/checklist items; re-baseline v2→V3, incl. frontmatter `v2 runs`→`runs`); regenerated mirror
+  `.claude/skills/netscript-harness/SKILL.md`.
+- **Supervisor review (A1 gate)**: read full diff + lane-policy.md. Two hard invariants stated
+  exactly; A1 enumerates B/C/D; dogma retired everywhere except the pitfall that explicitly retires
+  it. Boundary respected — `.llm/tmp/run` paths + `commits.md` refs in untouched sections left for
+  S3/S4; Copilot/Augment residue left for S7/S8. One supervisor edit: frontmatter description
+  `harness v2 runs` → `harness runs` (S2 re-baseline scope; left "commit tracking" for S4).
+- **Gate**: `agentic:sync-claude` (SYNCED, 1 stale mirror refreshed) → `agentic:sync-claude:check`
+  OK → `agentic:check-claude` OK (all surface checks green, lock unchanged). File set matches §8-S2
+  scope exactly (source SKILL + mirror + new lane-policy.md; no framework source).
+- **Reconcile**: no related-issue state change needed (S2 touches no issue acceptance boxes; #306
+  remains open, resolved cumulatively by this PR). No new labels. Commit sha recorded below.

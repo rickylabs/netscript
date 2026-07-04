@@ -1,16 +1,22 @@
 ---
 name: netscript-harness
 description: >
-  Operating model for NetScript harness v2 runs. Use whenever the user says
+  Operating model for NetScript harness runs. Use whenever the user says
   "use harness", references a harness run, asks about archetype/profile
   selection, run artifacts, resource aggregation, commit tracking, evaluator
   protocol, rescoping, or where a lesson/doctrine update should live.
 ---
 
-# NetScript Harness v2 — Orchestration Skill
+# NetScript Harness (V3) — Orchestration Skill
 
 This skill coordinates harness-mode runs. The authoritative harness docs live under `.llm/harness/`;
 this skill tells you what to load and in what order.
+
+Agent lanes and their model bindings are configuration, not dogma — the single source of truth is
+[`workflow/lane-policy.md`](../../../.llm/harness/workflow/lane-policy.md). Only two rules are hard:
+**generator-session ≠ evaluator-session**, and the **slice review gate** (no implementation lane
+self-certifies). Everything else is a per-run lane assignment recorded in the run dir's
+`supervisor.md`/`drift.md`.
 
 ## When to Use
 
@@ -33,7 +39,9 @@ this skill tells you what to load and in what order.
 | **8-phase model** | Bootstrap → Research → Plan & Design → Plan-Gate → Implement → Gate → Evaluate → Close. |
 | **PLAN-EVAL**     | First evaluator pass, before implementation. Hard stop.                                 |
 | **IMPL-EVAL**     | Final evaluator pass, after implementation.                                             |
-| **Supervisor**    | Claude coordinates only; OpenHands evaluates; Codex implements.                         |
+| **Tiered lanes**  | Agent lanes A–E with named model bindings; single source `workflow/lane-policy.md`.     |
+| **Slice review gate** | Tier-A supervisor substantively reviews each landed slice before the sign-off commit; no lane self-certifies (A1). |
+| **Supervisor identity** | Every run dir carries `supervisor.md` (model, session, host, paths, branch, baseline, lanes). |
 | **Plan-Gate**     | Checklist (`gates/plan-gate.md`) that PLAN-EVAL enforces.                               |
 | **Archetype**     | Package/plugin shape profile from `archetypes/ARCHETYPE-*.md`.                          |
 | **Scope overlay** | `SCOPE-frontend.md`, `SCOPE-service.md`, `SCOPE-docs.md`.                               |
@@ -49,10 +57,10 @@ For OpenHands, Copilot, Augment, or local-agent handoffs during a run, also read
 
 ## Workflow
 
-The user may still write `profile: package`, `profile: docs`, or similar. In v2 that field is an
+The user may still write `profile: package`, `profile: docs`, or similar. In V3 that field is an
 intent hint, not the final profile.
 
-| User hint                  | v2 selection                                                |
+| User hint                  | V3 selection                                                |
 | -------------------------- | ----------------------------------------------------------- |
 | `package`                  | identify `ARCHETYPE-1` through `ARCHETYPE-6`                |
 | `plugin`                   | normally `ARCHETYPE-5`, unless sibling packages also change |
@@ -75,34 +83,42 @@ intent hint, not the final profile.
 
 ## Agent Delegation Contract
 
-For supervised NetScript work:
+Lane assignments and model bindings are configuration. The tiered A–E model, the selection rules
+(source slices → Tier D, batch/parallel → Tier C with committed `workflow.js`, research/doc prose →
+Tier B), and the named model bindings are defined once in
+[`workflow/lane-policy.md`](../../../.llm/harness/workflow/lane-policy.md). Do not restate lane
+routing here — defer to that file. The items below are the parts of the contract that hold as
+**invariants** regardless of which lane implements:
 
-- Claude is the supervisor/coordinator only. It may gather state, write prompts, launch/check
-  agents, and update handoff artifacts, but it must not perform the heavy implementation or certify
-  its own work.
-- PLAN-EVAL must run in OpenHands with minimax M3 unless the run artifact explicitly records why
-  that launch path is unavailable.
-- IMPL-EVAL must run in OpenHands with qwen 3.7 max unless the run artifact explicitly records why
-  that launch path is unavailable.
-- Implementation/fix work must run in WSL Codex subagents attached to the Codex daemon so the user
-  can monitor and steer the work from Desktop/mobile.
-- Claude plugin helpers such as `codex:rescue`, `codex:codex-rescue`, `codex-companion.mjs`, and
-  Claude internal `general-purpose` agents are not valid implementation subagents for supervised
-  runs. They are local Claude tool surfaces unless WSL daemon status proves a mobile-visible Codex
-  thread.
-- A Codex implementation slice is launched only when the run artifacts include the WSL worktree
-  path, concrete Codex thread id, daemon-managed `remote-control` proof, and the follow-up command
-  for steering that same thread. Without those, record the launch as failed/not attached.
-- Every implementation slice must be independently trackable: branch/worktree identity, agent/thread
-  identity, files touched, tests run, commit hash, push status, and PR comment/status.
-- Every slice must commit, push, and comment on the PR before the next slice is considered complete.
-- Merge, publish, or release gates require all relevant tests to be green with required features
-  intact. For catalog-related work, do not delete, skip, de-catalog, or bypass tests unless the
-  evaluator verdict explicitly classifies the test as stale/irrelevant and the PR comment records
-  the rationale.
-- If an OpenHands launch is blocked, record the missing launch mechanism in `worklog.md`/`drift.md`,
-  then proceed only with the appropriate daemon-attached Codex implementation slice if the user has
-  authorized that fallback.
+- **Generator ≠ evaluator (hard invariant).** The session that generates a plan or an
+  implementation is never the session that evaluates it. Which model implements is configurable per
+  run and recorded in `supervisor.md`/`drift.md`; the session separation is not.
+- **Slice review gate (A1, hard invariant).** After any implementation lane lands a slice and its
+  automated gates pass, the Tier-A supervisor substantively reviews the slice content before the
+  sign-off commit — and the sign-off commit is the supervisor's, not the implementer's. This holds
+  for every implementation tier (B Opus sub-agents, C Workflow-generated slices, D WSL Codex); no
+  lane self-certifies. See `workflow/lane-policy.md` for the rule and `workflow/run-loop.md` for the
+  step placement.
+- **Evaluator model bindings.** PLAN-EVAL runs OpenHands minimax-M3; IMPL-EVAL runs OpenHands
+  qwen-3.7-max — each unless the run artifact explicitly records why that launch path is
+  unavailable. The two-failure eval loop is unchanged.
+- **Tier-D mobile-visibility proof.** A Tier-D (WSL Codex) implementation slice is launched only via
+  skills + `.llm/tools/agentic/` (never ad-hoc `wsl.exe`), and only when the run artifacts include
+  the WSL worktree path, concrete Codex thread id, daemon-managed `remote-control` proof, and the
+  follow-up steering command for that same thread. Without those, record the launch as
+  failed/not-attached. Claude helpers (`codex:rescue`, `codex:codex-rescue`, `codex-companion.mjs`,
+  internal `general-purpose` agents) are local tool surfaces, not daemon-attached Codex threads.
+- **Per-slice trackability.** Every implementation slice is independently trackable: branch/worktree
+  identity, agent/thread identity, files touched, tests run, commit hash, push status, and PR
+  comment/status. Each slice commits, pushes, and comments on the draft PR before the next slice is
+  considered complete (the draft-PR commit list + per-slice PR comments are the commit trail).
+- **Green-gate merge bar.** Merge, publish, or release gates require all relevant tests green with
+  required features intact. For catalog-related work, do not delete, skip, de-catalog, or bypass
+  tests unless the evaluator verdict explicitly classifies the test as stale/irrelevant and the PR
+  comment records the rationale.
+- **Blocked-lane handling.** If an evaluator or implementation launch path is blocked, record the
+  missing launch mechanism in `worklog.md`/`drift.md`, then proceed only with an owner-authorized
+  fallback lane recorded in `supervisor.md`/`drift.md`.
 
 ## Common Pitfalls
 
@@ -111,12 +127,17 @@ For supervised NetScript work:
 - **Self-evaluation** — The evaluator must be a separate session. The generator does not
   self-certify.
 - **Wrong evaluator surface** — Claude internal subagents are not PLAN-EVAL or IMPL-EVAL. Use
-  OpenHands with the required model, or record a blocked launch.
-- **Wrong implementation surface** — Claude should not do heavy implementation during supervisor
-  runs. Use WSL Codex daemon-attached subagents so the work is mobile-visible and steerable.
-- **False attached-agent claims** — A Claude `codex:*` skill/helper is not a WSL Codex daemon
-  thread. Require daemon status plus thread id before claiming the user can see or steer the
-  subagent from phone/Desktop.
+  OpenHands with the required model, or record a blocked launch. The generator session may never
+  evaluate its own output.
+- **Self-certifying a slice** — a green automated gate is not a sign-off. The Tier-A supervisor must
+  substantively review the slice before the sign-off commit, for every implementation lane
+  (`workflow/lane-policy.md` invariant 2). No lane self-certifies.
+- **Treating lanes as dogma** — the "Claude coordinates / OpenHands evaluates / Codex implements"
+  fixed-lane assertion is retired. Lanes are configuration; consult `workflow/lane-policy.md` and
+  honor the run's recorded lane assignments/overrides in `supervisor.md`/`drift.md`.
+- **False attached-agent claims** — for Tier-D slices, a Claude `codex:*` skill/helper is not a WSL
+  Codex daemon thread. Require daemon status plus thread id before claiming the user can see or steer
+  the subagent from phone/Desktop.
 - **Carried-in plans as ground truth** — Re-baseline against current `main` before locking the plan.
 - **Monolithic commits** — Commit by slice, not by monolith. Each slice has its own gate.
 - **Raw root CLI noise as a verdict** — Package-quality check/lint/fmt evidence must come from the
@@ -133,6 +154,7 @@ Run artifacts live under `.llm/tmp/run/<run-id>/` and use templates from `.llm/h
 
 | File                | Purpose                                                     |
 | ------------------- | ----------------------------------------------------------- |
+| `supervisor.md`     | supervisor identity (model, session, host, paths, branch, baseline, lanes) — written at run start |
 | `research.md`       | deep findings, re-baseline of carried-in plans              |
 | `plan.md`           | approved scope, archetype, gates, debt implications         |
 | `implement.md`      | generator prompt when needed                                |
@@ -235,7 +257,8 @@ User says "use harness"
   -> two or more phase groups? read workflow/supervisor.md + escalation.md, keep phase-registry.md
   -> read gate matrix + plan-gate.md
   -> plan committed? run PLAN-EVAL (separate session); no slice before PASS
-  -> supervised? Claude coordinates, OpenHands evaluates, WSL Codex implements
+  -> supervised? assign lanes per workflow/lane-policy.md (generator != evaluator session)
+  -> slice landed + gates green? Tier-A supervisor reviews before the sign-off commit
   -> OpenHands/local/cloud handoff? read workflow/agent-handoff.md
   -> update run artifacts while working
   -> commit tracking required? append commits.md after every commit
@@ -249,6 +272,7 @@ User says "use harness"
 | ----------------------------------------------- | --------------------------- |
 | `.llm/harness/workflow/activation.md`           | Every harness run           |
 | `.llm/harness/workflow/run-loop.md`             | Every harness run           |
+| `.llm/harness/workflow/lane-policy.md`          | Lane assignment + model bindings |
 | `.llm/harness/workflow/supervisor.md`           | Multi-group supervisor runs |
 | `.llm/harness/gates/plan-gate.md`               | Plan-Gate checklist         |
 | `.llm/harness/evaluator/plan-protocol.md`       | PLAN-EVAL instructions      |
@@ -262,13 +286,17 @@ User says "use harness"
 ## Checklist
 
 - [ ] `workflow/activation.md` and `workflow/run-loop.md` were read.
+- [ ] Run dir has `supervisor.md` (supervisor identity + lane table) written at run start.
 - [ ] Archetype and overlays are selected and justified.
+- [ ] Lane assignments follow `workflow/lane-policy.md`, or the override is recorded in
+      `supervisor.md`/`drift.md`.
 - [ ] Plan-Gate checklist (`gates/plan-gate.md`) was reviewed.
 - [ ] PLAN-EVAL returned `PASS` before any implementation slice.
 - [ ] PLAN-EVAL used OpenHands/minimax M3, or the blocked launch was recorded.
-- [ ] Implementation slices used WSL Codex daemon-attached subagents.
-- [ ] Each Codex slice recorded WSL daemon-managed proof, thread id, worktree, and steering command.
-- [ ] Commits are appended to `commits.md` immediately after creation.
-- [ ] Each implementation slice was committed, pushed, and commented on the PR.
+- [ ] Tier-D (WSL Codex) slices recorded daemon-managed proof, thread id, worktree, and steering
+      command.
+- [ ] The slice review gate was performed (Tier-A substantive review) before each sign-off commit;
+      no lane self-certified.
+- [ ] Each implementation slice was committed, pushed, and commented on the draft PR.
 - [ ] IMPL-EVAL is a separate session from the generator.
 - [ ] IMPL-EVAL used OpenHands/qwen 3.7 max, or the blocked launch was recorded.
