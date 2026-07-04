@@ -13,18 +13,18 @@ Quick evaluator reference. Doctrine source:
 | AP-6  | Base class with concrete methods                     | orchestration, logging, state, or utilities in a base class                 |
 | AP-7  | Telescoping factory                                  | many positional arguments instead of typed options or builder               |
 | AP-8  | Premature DI container                               | container introduced without doctrine escalation conditions                 |
-| AP-9  | Premature abstraction                                | flags/generic helper hiding divergent callers                               |
+| AP-9  | Premature abstraction (the Wet Codebase failure)                                | flags/generic helper hiding divergent callers                               |
 | AP-10 | Defensive `try/catch` inside handlers                | handler swallows/remaps errors instead of supervisor boundary               |
 | AP-11 | Hidden globals                                       | module-load clients, env reads, loggers, stores, or implicit resources      |
 | AP-12 | `Date.now()` and `setTimeout` in handlers            | time/scheduling bypasses a clock/scheduler port                             |
 | AP-13 | `console.log` in published code                      | direct console use outside CLI presentation/examples                        |
 | AP-14 | Re-exporting upstream packages                       | exported upstream npm/jsr symbols as package surface                        |
-| AP-15 | `interface IFoo` or `type FooT` naming               | Hungarian or suffix naming forbidden by doctrine                            |
+| AP-15 | `interface IFoo` / `type FooT`               | Hungarian or suffix naming forbidden by doctrine                            |
 | AP-16 | `utils/`, `helpers/`, `common/`, `lib/` folders      | generic folder names under package source                                   |
-| AP-17 | `interfaces/` folder for package interfaces          | ports/types not named by consumed role                                      |
-| AP-18 | Giant generated-string snapshots                     | brittle snapshots where semantic assertions are needed                      |
+| AP-17 | `interfaces/` folder for the package's own interfaces          | ports/types not named by consumed role                                      |
+| AP-18 | Test snapshots of giant generated strings                     | brittle snapshots where semantic assertions are needed                      |
 | AP-19 | Permissions assumed silently                         | README omits actual Deno/network/KV/process permissions                     |
-| AP-20 | Workspace lib override missing `deno.unstable`       | member config overrides lib without unstable Deno types                     |
+| AP-20 | Workspace `compilerOptions.lib` override missing `deno.unstable`       | member config overrides lib without unstable Deno types                     |
 | AP-21 | Flat command-surface folder                          | `presentation/`/`routes/`/`handlers/` folder with >12 immediate children instead of vertical slicing |
 | AP-22 | Useless re-export barrel                              | sub-`src/` `mod.ts`/`index.ts` that only `export *` without aggregation logic |
 | AP-23 | Inline command body in composition                   | composition root containing `.command()`/`.option()`/`.action()`/route/handler bodies instead of wiring-only |

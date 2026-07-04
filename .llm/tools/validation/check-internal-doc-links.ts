@@ -75,8 +75,29 @@ function norm(p: string): string {
   return normalize(p).replaceAll('\\', '/');
 }
 
-// Repo root = two levels up from this file (.llm/tools/<file>).
-const REPO_ROOT = resolve(dirname(fromFileUrl(import.meta.url)), '..', '..');
+// Repo root = nearest ancestor directory containing deno.json. This tool lives
+// at .llm/tools/validation/<file> (three levels under the repo root), but a fixed
+// count of `..` hops is brittle across file moves, so walk upward until the
+// workspace root (the directory with deno.json) is found.
+function findRepoRoot(start: string): string {
+  let dir = resolve(start);
+  while (true) {
+    try {
+      Deno.statSync(join(dir, 'deno.json'));
+      return dir;
+    } catch {
+      // deno.json not here; continue upward.
+    }
+    const parent = dirname(dir);
+    if (parent === dir) {
+      throw new Error(
+        'check-internal-doc-links: could not locate repo root (no deno.json ancestor).',
+      );
+    }
+    dir = parent;
+  }
+}
+const REPO_ROOT = findRepoRoot(dirname(fromFileUrl(import.meta.url)));
 
 // Default internal doc roots (scanned recursively) plus the explicit root-level
 // agent-surface files. The generated .claude/skills/ mirror is excluded.

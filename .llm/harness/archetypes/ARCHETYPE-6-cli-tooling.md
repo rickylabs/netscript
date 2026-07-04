@@ -19,7 +19,7 @@
   AP-16, AP-18, AP-19, AP-20, AP-21, AP-22, AP-23, AP-24, AP-25.
 - Universal fitness functions: F-1, F-2, F-3, F-4, F-5, F-6, F-7, F-8, F-9, F-10, F-11, F-12, F-15,
   F-16, F-17, F-18. F-14 excludes allowed CLI presentation output.
-- Archetype-specific fitness functions: F-CLI-1 … F-CLI-30 (see §"Fitness Gates").
+- Archetype-specific fitness functions: F-CLI-1 … F-CLI-31 (see §"Fitness Gates").
 
 ## When This Archetype Applies
 
@@ -226,8 +226,7 @@ manual/structural evidence, backed by the mechanical `check-doctrine.ts`
 
 ## Required Gates in Order
 
-1. Static gates: package check slice (`deno task check:packages`), `deno task lint`,
-   `deno task fmt --check`.
+1. Static gates: `deno task check`, `deno task lint`, `deno task fmt:check`.
 2. Universal fitness gates: F-1, F-3, F-5 (CLI-aware), F-6, F-7, F-8, F-9, F-10, F-11, F-12, F-15,
    F-16, F-17, F-18.
 3. Archetype-6 fitness gates: F-CLI-1 … F-CLI-31. These have no dedicated script; report

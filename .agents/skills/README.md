@@ -13,7 +13,7 @@ operate this codebase end-to-end without re-deriving the API from documentation 
 | Skill                | Scope                                                                                                             | Status |
 | -------------------- | ----------------------------------------------------------------------------------------------------------------- | ------ |
 | `netscript-doctrine` | **CORE** — Navigate the architecture doctrine for `packages/` and `plugins/`.                                     | active |
-| `netscript-harness`  | **CORE** — Orchestrate harness-mode runs (8-phase model, Plan-Gate, dual evaluators).                             | active |
+| `netscript-harness`  | **CORE** — Orchestrate harness-mode runs (9-phase model, Plan-Gate, dual evaluators).                             | active |
 | `jsr-audit`          | **CORE** — Audit packages for JSR readiness. Required Plan-Gate input for package/plugin waves.                   | active |
 | `deno-fresh`         | Frontend development with Fresh 2.x, Preact, and Tailwind CSS in Deno.                                            | active |
 | `aspire`             | Aspire/.NET integration, AppHost shape, and Deno hosting package expectations.                                    | active |

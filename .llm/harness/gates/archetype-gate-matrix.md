@@ -24,18 +24,18 @@ gates. Its own archetype-specific gates are `F-DEPLOY-*` (see below).
 | F-3 Layering check                | n/a      | required | required | required | required | required | required |
 | F-4 Inheritance audit             | n/a      | required | required | required | n/a      | required | required |
 | F-5 Public surface audit          | required | required | required | required | required | required | required |
-| F-6 JSR publishability            | required | required | required | required | required | required | required |
+| F-6 JSR publishability gate          | required | required | required | required | required | required | required |
 | F-7 Doc-score gate                | required | required | required | required | required | required | required |
-| F-8 Workspace lib check           | required | required | required | required | required | required | required |
-| F-9 Permission decl check         | n/a      | required | required | required | required | required | required |
+| F-8 Workspace `lib` override check | required | required | required | required | required | required | required |
+| F-9 Permission declaration check  | n/a      | required | required | required | required | required | required |
 | F-10 Test-shape audit             | required | required | required | required | required | required | required |
 | F-11 Forbidden-folder lint        | required | required | required | required | required | required | required |
 | F-12 Naming-convention lint       | required | required | required | required | required | required | required |
-| F-13 Saga/runtime invariants      | n/a      | n/a      | required | n/a      | subtype  | n/a      | n/a      |
+| F-13 Saga and runtime invariants  | n/a      | n/a      | required | n/a      | subtype  | n/a      | n/a      |
 | F-14 Console-log lint             | required | required | required | required | required | n/a      | required |
-| F-15 Re-export-upstream lint      | required | required | required | required | required | required | required |
+| F-15 Re-export-of-upstream lint   | required | required | required | required | required | required | required |
 | F-16 Folder-cardinality lint      | required | required | required | required | required | required | required |
-| F-17 Abstract-derived co-location | required | required | required | required | required | required | required |
+| F-17 Abstract-derived co-location lint | required | required | required | required | required | required | required |
 | F-18 Sub-barrel lint              | required | required | required | required | required | required | required |
 | F-19 Scoped source gate runners   | required | required | required | required | required | required | required |
 

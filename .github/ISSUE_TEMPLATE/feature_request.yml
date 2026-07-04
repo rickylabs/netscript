@@ -1,7 +1,7 @@
 name: Feature request
 description: Propose a new capability or enhancement that does not require a full RFC.
 title: "feat: "
-labels: ["enhancement", "status:triage"]
+labels: ["type:feat", "status:triage"]
 body:
   - type: markdown
     attributes:

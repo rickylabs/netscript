@@ -46,16 +46,16 @@ Fill this template during evaluation. Allowed result values: `PASS`, `FAIL`, `N/
 | F-3  | Layering check               |        |          |            |
 | F-4  | Inheritance audit            |        |          |            |
 | F-5  | Public surface audit         |        |          |            |
-| F-6  | JSR publishability           |        |          |            |
+| F-6  | JSR publishability gate      |        |          |            |
 | F-7  | Doc-score gate               |        |          |            |
-| F-8  | Workspace lib check          |        |          |            |
+| F-8  | Workspace `lib` override check |        |          |            |
 | F-9  | Permission declaration check |        |          |            |
 | F-10 | Test-shape audit             |        |          |            |
 | F-11 | Forbidden-folder lint        |        |          |            |
 | F-12 | Naming-convention lint       |        |          |            |
-| F-13 | Saga/runtime invariants      |        |          |            |
+| F-13 | Saga and runtime invariants  |        |          |            |
 | F-14 | Console-log lint             |        |          |            |
-| F-15 | Re-export-upstream lint      |        |          |            |
+| F-15 | Re-export-of-upstream lint   |        |          |            |
 | F-16 | Folder-cardinality lint      |        |          |            |
 | F-17 | Abstract-derived co-location lint |   |          |            |
 | F-18 | Sub-barrel lint              |        |          |            |

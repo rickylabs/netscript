@@ -36,7 +36,7 @@ self-certifies). Everything else is a per-run lane assignment recorded in the ru
 
 | Concept           | Meaning                                                                                 |
 | ----------------- | --------------------------------------------------------------------------------------- |
-| **8-phase model** | Bootstrap → Research → Plan & Design → Plan-Gate → Implement → Gate → Evaluate → Close. |
+| **9-phase model** | Bootstrap → Research → Plan & Design → Plan-Gate → Implement → Gate → Evaluate → Release → Close. |
 | **PLAN-EVAL**     | First evaluator pass, before implementation. Hard stop.                                 |
 | **IMPL-EVAL**     | Final evaluator pass, after implementation.                                             |
 | **Tiered lanes**  | Agent lanes A–E with named model bindings; single source `workflow/lane-policy.md`.     |

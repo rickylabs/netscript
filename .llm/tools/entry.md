@@ -18,7 +18,7 @@ across sessions; temporary investigation scripts belong under `.llm/tmp/`.
 
 ## Dependency toolbelt (`deps/`)
 
-Thin, structured wrappers over the Deno 2.8 dependency commands. They emit JSON by default
+Thin, structured wrappers over the Deno 2.9 dependency commands. They emit JSON by default
 (`--pretty` for human output) so agents read versions/advisories without scraping human tables and
 without re-querying registries by hand. See the `netscript-deno-toolchain` skill for the full
 command map.
