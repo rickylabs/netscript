@@ -88,10 +88,7 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
     if (entry.RequiresKv) {
       lines.push(``);
       lines.push(`    // KV cache dependency`);
-      lines.push(`    if (infrastructure.primaryCache) {`);
-      lines.push(`      await ${id}.withReference(infrastructure.primaryCache);`);
-      lines.push(`      await ${id}.waitFor(infrastructure.primaryCache);`);
-      lines.push(`    }`);
+      lines.push(`    await withCacheReference(${id}, infrastructure.primaryCacheWiring);`);
     }
 
     // --- app type: VITE injection ---

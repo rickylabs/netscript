@@ -36,6 +36,15 @@ const CACHE_CONTAINER_IMAGES: Record<
 /** Default Redis-compatible TCP port. */
 const CACHE_DEFAULT_PORT = 6379
 
+/** Deno KV Connect container image (shared KV over HTTP). */
+const DENOKV_CONTAINER = {
+  image: 'ghcr.io/denoland/denokv',
+  tag: '0.11.0',
+} as const
+
+/** Deno KV Connect HTTP port inside the container. */
+const DENOKV_HTTP_PORT = 4512
+
 /**
  * Generates the register-infrastructure.mts file content.
  *
@@ -137,24 +146,66 @@ export function generateRegisterInfrastructure(
     const id = safeIdentifier(name)
     const mode = entry.Mode ?? 'Container'
 
-    if (entry.Engine === 'DenoKv') {
+    // DenoKv Local — in-process Deno.openKv(), no Aspire resource.
+    if (entry.Engine === 'DenoKv' && mode === 'Local') {
       cacheBlocks.push(
-        `  // ${name} (DenoKv, file-backed — no Aspire cache resource needed)`,
+        `  // ${name} (DenoKv, Local — in-process Deno.openKv(), no Aspire resource)\n` +
+          `  cacheWiring.set('${name}', { resource: null, reference: null, env: {}, local: true });`,
       )
       continue
     }
 
+    // External — connection-string resource; consumer wires by reference only.
     if (mode === 'External') {
       cacheBlocks.push(`  // ${name} (${entry.Engine}, External)
   const ${id} = await builder.addConnectionString('${name}');
-  caches.set('${name}', ${id});`)
+  caches.set('${name}', ${id});
+  cacheWiring.set('${name}', { resource: ${id}, reference: ${id}, env: {}, local: false });`)
       continue
     }
 
+    // DenoKv Container — Deno KV Connect over HTTP with an access token.
+    if (entry.Engine === 'DenoKv') {
+      const tag = entry.ImageTag ?? DENOKV_CONTAINER.tag
+      const imageRef = `${DENOKV_CONTAINER.image}:${tag}`
+      const lines: string[] = []
+
+      lines.push(`  // ${name} (DenoKv, Container — Deno KV Connect)`)
+      lines.push(`  const ${id}_token = generateAccessToken();`)
+      lines.push(
+        `  const ${id} = await builder.addContainer('${name}', '${imageRef}')`,
+      )
+      lines.push(
+        `    .withEndpoint({ name: 'http', targetPort: ${DENOKV_HTTP_PORT}, scheme: 'http' })`,
+      )
+      lines.push(`    .withContainerRuntimeArgs(['--init'])`)
+      lines.push(`    .withArgs(['--sqlite-path', '/data/denokv.sqlite', 'serve'])`)
+      lines.push(`    .withEnvironment('DENO_KV_ACCESS_TOKEN', ${id}_token)`)
+      if (entry.DataPath) {
+        lines.push(
+          `    .withBindMount(resolveDataPath(appHostDir, '${entry.DataPath}', '${name}'), '/data')`,
+        )
+      }
+
+      const lastIdx = lines.length - 1
+      lines[lastIdx] = lines[lastIdx] + ';'
+
+      lines.push(`  const ${id}_httpEndpoint = await ${id}.getEndpoint('http');`)
+      lines.push(`  caches.set('${name}', ${id});`)
+      lines.push(`  cacheEndpoints.set('${name}', ${id}_httpEndpoint);`)
+      lines.push(
+        `  cacheWiring.set('${name}', { resource: ${id}, reference: ${id}_httpEndpoint, env: { DENO_KV_ACCESS_TOKEN: ${id}_token, CACHE_PROVIDER: 'denokv' }, local: false });`,
+      )
+      cacheBlocks.push(lines.join('\n'))
+      continue
+    }
+
+    // Redis / Garnet Container — Redis-compatible TCP endpoint.
     const image = CACHE_CONTAINER_IMAGES[entry.Engine] ??
       CACHE_CONTAINER_IMAGES.Redis
     const tag = entry.ImageTag ?? image.tag
     const imageRef = `${image.image}:${tag}`
+    const provider = entry.Engine === 'Garnet' ? 'garnet' : 'redis'
     const lines: string[] = []
 
     lines.push(`  // ${name} (${entry.Engine}, Container)`)
@@ -173,8 +224,14 @@ export function generateRegisterInfrastructure(
     lines[lastIdx] = lines[lastIdx] + ';'
 
     lines.push(`  const ${id}_tcpEndpoint = await ${id}.getEndpoint('tcp');`)
+    lines.push(
+      `  const ${id}_hostPort = ${id}_tcpEndpoint.property(EndpointProperty.HostAndPort);`,
+    )
     lines.push(`  caches.set('${name}', ${id});`)
     lines.push(`  cacheEndpoints.set('${name}', ${id}_tcpEndpoint);`)
+    lines.push(
+      `  cacheWiring.set('${name}', { resource: ${id}, reference: ${id}_tcpEndpoint, env: { GARNET_URI: ${id}_hostPort, REDIS_URI: ${id}_hostPort, CACHE_PROVIDER: '${provider}' }, local: false });`,
+    )
     cacheBlocks.push(lines.join('\n'))
   }
 
@@ -188,6 +245,9 @@ export function generateRegisterInfrastructure(
   const primaryCacheEndpointLine = primaryCache
     ? `  const primaryCacheEndpoint = cacheEndpoints.get('${primaryCache}') ?? null;`
     : `  const primaryCacheEndpoint = null;`
+  const primaryCacheWiringLine = primaryCache
+    ? `  const primaryCacheWiring = cacheWiring.get('${primaryCache}') ?? null;`
+    : `  const primaryCacheWiring = null;`
 
   return renderTemplateAssetSync(
     TEMPLATE_KEYS.generatedAspireHelpersGenerateRegisterInfrastructure1,
@@ -210,6 +270,7 @@ export function generateRegisterInfrastructure(
       __slot7__: String(primaryDbLine),
       __slot8__: String(primaryCacheLine),
       __slot9__: String(primaryCacheEndpointLine),
+      __slot10__: String(primaryCacheWiringLine),
     },
   )
 }

@@ -231,6 +231,65 @@ export function extractDependencies(
 }
 
 // ============================================================================
+// Cache wiring (shared-cache consumer injection seam)
+// ============================================================================
+
+/**
+ * Describes how a consumer resource attaches to the primary shared cache.
+ * Built once in register-infrastructure and reused by every consumer so a
+ * future apphost-compose weave layers over one call site.
+ */
+export interface CacheWiring {
+  /** Cache resource to await readiness on (null for Local/in-process). */
+  readonly resource: any;
+  /** Passed to withReference — an endpoint reference or the resource (null for Local). */
+  readonly reference: any;
+  /** Explicit env pairs consumers receive (access token, provider, host:port refs). */
+  readonly env: Record<string, any>;
+  /** Local mode (DenoKv in-process): consumers inject nothing. */
+  readonly local: boolean;
+}
+
+/**
+ * Generates a crypto-random base64 access token for the DenoKv Connect
+ * container (15 random bytes → base64), matching the historical AddDenoKv port.
+ */
+export function generateAccessToken(): string {
+  const bytes = new Uint8Array(15);
+  crypto.getRandomValues(bytes);
+  let binary = '';
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+/**
+ * Wires a shared-cache dependency into a consumer builder through a single
+ * seam: withReference (endpoint or resource), explicit env vars, then waitFor.
+ * Local mode (DenoKv in-process) is a no-op.
+ */
+export async function withCacheReference<T>(
+  builder: T,
+  wiring: CacheWiring | undefined | null,
+): Promise<T> {
+  if (!wiring || wiring.local) {
+    return builder;
+  }
+  const target = builder as any;
+  if (wiring.reference) {
+    await target.withReference(wiring.reference);
+  }
+  for (const key of Object.keys(wiring.env)) {
+    await target.withEnvironment(key, wiring.env[key]);
+  }
+  if (wiring.resource) {
+    await target.waitFor(wiring.resource);
+  }
+  return builder;
+}
+
+// ============================================================================
 // Config parsing (Node.js-compatible replacement for parseAppSettings)
 // ============================================================================
 

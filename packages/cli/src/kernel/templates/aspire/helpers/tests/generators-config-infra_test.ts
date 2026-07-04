@@ -145,8 +145,14 @@ describe('generateRegisterInfrastructure', () => {
 
   it('should import ContainerLifetime and resolveDataPath', () => {
     const output = generateRegisterInfrastructure(emptyOptions);
-    assertStringIncludes(output, "import { ContainerLifetime } from '../.aspire/modules/aspire.mjs'");
-    assertStringIncludes(output, "import { resolveDataPath } from './_aspire-compat.mjs'");
+    assertStringIncludes(
+      output,
+      "import { ContainerLifetime, EndpointProperty } from '../.aspire/modules/aspire.mjs'",
+    );
+    assertStringIncludes(
+      output,
+      "import { type CacheWiring, generateAccessToken, resolveDataPath } from './_aspire-compat.mjs'",
+    );
   });
 
   it('should use addPostgres for Postgres Container mode', () => {

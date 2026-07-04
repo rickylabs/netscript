@@ -251,25 +251,23 @@ describe('generateRegisterPlugins', () => {
     assertStringIncludes(output, 'file:./database/${config.PrimaryDatabase}/');
   });
 
-  it('should handle RequiresKv dependency', () => {
+  it('should handle RequiresKv dependency via the withCacheReference seam', () => {
     const kvPlugin: PluginEntry = { ...fixtures.MINIMAL_PLUGIN, RequiresKv: true };
     const output = generateRegisterPlugins({
       ...emptyOptions,
       plugins: { cache: kvPlugin },
     });
     assertStringIncludes(output, '// KV cache dependency');
-    assertStringIncludes(output, 'infrastructure.primaryCacheEndpoint');
-    assertStringIncludes(output, 'withReference(infrastructure.primaryCacheEndpoint)');
+    // The cache seam is a single helper call over pre-built wiring — no inline
+    // endpoint/env handling leaks into the consumer.
     assertStringIncludes(
       output,
-      "import { EndpointProperty, OtlpProtocol } from '../.aspire/modules/aspire.mjs'",
+      'await withCacheReference(resource, infrastructure.primaryCacheWiring)',
     );
-    assertStringIncludes(
-      output,
-      'infrastructure.primaryCacheEndpoint.property(EndpointProperty.HostAndPort)',
-    );
-    assertStringIncludes(output, "withEnvironment('GARNET_URI', cacheEndpoint)");
-    assertStringIncludes(output, "withEnvironment('REDIS_URI', cacheEndpoint)");
+    assertStringIncludes(output, 'withCacheReference,');
+    // EndpointProperty is no longer imported — endpoint resolution moved to the
+    // infrastructure wiring layer.
+    assertStringIncludes(output, "import { OtlpProtocol } from '../.aspire/modules/aspire.mjs'");
   });
 
   it('should pass saga store backend appsettings to plugin env', () => {
