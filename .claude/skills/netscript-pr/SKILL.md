@@ -97,6 +97,43 @@ each on its own line in the `## Scope` section).
 - The keyword must be in the **PR body or a commit message**, not only in a comment, for GitHub to
   wire the auto-close. The PR template's `## Scope` is the canonical home.
 
+## Merge close-gate (#387)
+
+The closing-keyword rule above wires the auto-close; this gate governs **when a PR carrying one may
+merge**. They are separate concerns: a keyword makes the merge *close* the issue, the close-gate
+makes sure the issue is *actually done* before that happens.
+
+A PR whose `status:` is `research`, `plan`, or `plan-eval` **MUST NOT be merged** — a plan-only
+artifact set can never satisfy an implementation Definition-of-Done. Merge requires
+`status:ready-merge`, and moving to `status:ready-merge` requires all three:
+
+1. **IMPL-EVAL PASS evidence** — the `[PHASE: IMPL-EVAL] [VERDICT: PASS]` phase comment from the
+   evaluator (a separate session).
+2. **DoD checklist complete** — every `- [ ]` in the PR body's Definition-of-Done is checked.
+3. **Referenced-issue acceptance** — for **every** issue the PR references, its acceptance criteria
+   **and** every `gate:` checkbox are checked with linked evidence (command, run URL, or PR comment).
+
+The exemplar failure is **#260**, closed with its `gate:e2e` box unchecked — the false-done this gate
+exists to stop. Enforcement lives at three points today: this section, the evaluator protocol's
+IMPL-EVAL checklist line, and the PR-template close-gate checkbox. The future Phase-D label
+automation will block the `status:ready-merge` transition (and any `Closes #N` auto-close) while any
+referenced `- [ ]` remains unchecked; until it lands, honor this gate by hand.
+
+## Epic / sub-issue standard
+
+Program epics use one convention so the board and the run dir agree:
+
+- **Epic issue** — title `Epic: <name>`; labels `type:umbrella` + `epic:<slug>` + the relevant
+  `area:`/`priority:` + a milestone; body = the epic's pillars, a sub-issue checklist, and links.
+  **Never put a closing keyword on an epic** (see the close-gate above) — it closes **by hand** once
+  every child is done.
+- **Sub-issues** — real issues titled `[<epic-slug> S<n>] <slice>`, each carrying `epic:<slug>` (plus
+  its own `area:`/`priority:`/milestone), linked to the epic by `Part of #<epic>` in the body.
+  Exactly **one** PR resolves each sub-issue, and that PR's body carries `Closes #<child>`.
+- GitHub-native sub-issue linkage is **unused repo-wide** today, so it is adopted **opportunistically**
+  as a nice-to-have on top of the `Part of #<epic>` body text — it is not required and carries no
+  migration burden.
+
 ## Per-phase structured comments
 
 Each harness phase posts ONE comment so the PR timeline reads as a phase log. Lead with a status
@@ -125,6 +162,23 @@ Phases & their verdict vocabulary:
 
 The evaluator must be a **separate session** from the generator (harness rule). Comment, don't edit,
 when acting as evaluator.
+
+## Draft-PR-on-start (harness)
+
+For harnessed work, **opening the feature is opening a DRAFT PR** — in the **same session as the
+first commit**, where the run-dir bootstrap commit (`.llm/runs/<run-id>/`) is the natural first
+commit. There is no "work now, PR later": the draft PR is the reviewable surface from the first
+commit onward, so the whole run reads from mobile without cloning or diffing.
+
+The draft PR body carries these, live from the start (they are the anchors the close-gate and the
+evaluator read):
+
+- an explicit, **checkable Definition-of-Done** (the close-gate reads these boxes);
+- the run-dir path `.llm/runs/<run-id>/`;
+- the slice checklist (`## Slices`);
+- the **live commit list** — the draft PR's own commit list plus per-slice comments are the commit
+  trail (there is no `commits.md`);
+- drift / debt (`## Drift / Debt`).
 
 ## Draft ↔ ready
 
@@ -162,6 +216,20 @@ until triaged.
 Source of truth stays the harness run artifacts under `.llm/runs/`. Labels + Projects v2 are a
 **view and a trigger**, not the record. When you advance a phase, move the `status:` label in the
 same action you post the phase comment, so the board never lags the timeline.
+
+### Stage-label lifecycle
+
+The `status:` labels are a **lifecycle**, not free-form tags — a harness PR walks exactly one path,
+moving the label in the **same action** as each phase comment:
+
+`status:research → status:plan → status:plan-eval → status:impl → status:impl-eval →
+status:augment-review` (optional advisory) `→ status:ready-merge`
+
+Exactly one `status:` at any moment. These are the existing `labels.yml` tokens — **no new stage
+names**. Enforcement exists because a practice audit found ~50% non-compliance: recent merged PRs
+shipped with **zero** labels or with `status:` frozen mid-lifecycle (merged still at `status:plan`).
+The close-gate keys off `status:ready-merge`, so a missing or frozen `status:` is a merge hazard, not
+a cosmetic lapse.
 
 > Phase D (the Action that enforces single-status, syncs label→Project column, and fires the right
 > workflow per status) is deferred to the repo-process-automation umbrella. Until it lands, apply

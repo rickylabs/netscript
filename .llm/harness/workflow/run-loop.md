@@ -1,7 +1,7 @@
 # Run Loop
 
-Harness v2 runs in eight phases: Bootstrap, Research, Plan & Design, Plan-Gate, Implement, Gate,
-Evaluate, Close.
+Harness runs in nine phases: Bootstrap, Research, Plan & Design, Plan-Gate, Implement, Gate,
+Evaluate, Release, Close.
 
 The loop has **two evaluator passes**: a cheap **PLAN-EVAL** at the Plan-Gate, before any
 implementation slice, and the full **IMPL-EVAL** at Evaluate. The Plan-Gate is a hard stop — see
@@ -98,11 +98,18 @@ before escalation to the user.
 1. Implement one commit slice at a time in the Design order.
 2. After each slice:
    - run the slice's named gate,
-   - commit with a message that names what the slice proves, not what it contains,
+   - **Slice review gate (Amendment A1)** — before the sign-off commit, the Tier-A supervisor
+     substantively reviews the landed slice (correctness, coherence with already-landed slices,
+     doctrine-fit, gaps/overreach). No implementation lane (Tier B/C/D) self-certifies; passing
+     automated gates is not a sign-off. See `workflow/lane-policy.md` §"Slice review gate (Amendment
+     A1)" for the lane-agnostic invariant this step enforces.
+   - commit (the **sign-off commit**, the supervisor's) with a message that names what the slice
+     proves, not what it contains,
    - push, then comment on the draft PR with the slice scope, commit hash, and gate evidence — the
      draft-PR commit list + per-slice PR comments are the commit trail (there is no `commits.md`),
    - update `worklog.md` + `context-pack.md` as part of the same slice (a slice whose commit does not
-     touch the run dir is incomplete).
+     touch the run dir is incomplete),
+   - run the **post-slice reconcile loop** (below) and write one reconcile note in `worklog.md`.
 3. Append `drift.md` when facts diverge from the plan, RFC, or doctrine.
 
 Before committing, inspect `git status --short` and do not fold in unrelated user changes. If an
@@ -118,6 +125,21 @@ A slice is done when:
 - public functions have a JSDoc one-liner (what it does, not how),
 - a contributor can extend the slice by reading one file and copying a pattern,
 - the slice's gate passes.
+
+### Post-slice reconcile loop
+
+After each slice completes (and before starting the next), reconcile the GitHub surface with the
+run:
+
+1. **Sweep related issues** — check their state, any needed `status:`/`area:`/milestone moves, and
+   that the resolving PR carries the right closing keyword (`Closes #N` for full resolution, a bare
+   reference for partial work — see `netscript-pr`).
+2. **Read new issue/PR comments** since the last sweep (evaluator verdicts, reviewer notes,
+   OpenHands output).
+3. **Record readjustments** — fold plan changes into `plan.md`; append `drift.md` when reality
+   diverged from the plan or doctrine.
+
+Write **one reconcile note per slice** in `worklog.md`.
 
 ## 6. Gate
 
@@ -150,7 +172,15 @@ The final evaluation is a separate session, distinct from PLAN-EVAL. Operating i
 
 Two `FAIL_FIX` cycles are allowed. After the second, escalate to the user.
 
-## 8. Close
+## 8. Release (release-cutting runs only)
+
+Runs that cut or gate a release call the hard release gates here — **`e2e-cli-prod`,
+`scaffold.runtime`, and the release-gate class**. This phase does **not** define those gates: their
+definitions, sequencing, and race-free production verification are owned by **#309's release
+engineering** (see the `netscript-release` skill). Reference and call them here; do not redefine
+them. For a run that does not cut a release, this phase is a no-op.
+
+## 9. Close
 
 1. Update `context-pack.md`.
 2. Update `debt/arch-debt.md` for any created or closed debt entries.

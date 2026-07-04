@@ -40,6 +40,7 @@ NetScript PR conventions (see .agents/skills/netscript-pr and CONTRIBUTING.md):
 ## Checklist
 
 - [ ] Branch name and labels follow the taxonomy (exactly one `status:` label).
+- [ ] Every referenced issue's acceptance + `gate:` boxes are checked with linked evidence (required before `status:ready-merge`).
 - [ ] Docs/reference updated if public surface changed.
 - [ ] Breaking changes are labelled `breaking` and, if substantial, backed by an RFC.
 - [ ] No lock-file or unrelated churn committed (`deno.lock` only when a reviewed fix requires it).

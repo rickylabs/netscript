@@ -155,4 +155,35 @@ concept named in `design-v3.md` §5/§8. Ready for PLAN-EVAL (OpenHands, separat
   `agentic:sync-claude:check` OK (2 mirrors refreshed). `commits.md` grep over source scope = zero
   non-intentional hits (residual = deliberate "no commits.md" drop-notes + the historical
   `__fixtures__/codex-launch-s1.head.log`).
-- **Reconcile**: no related-issue state change. Commit sha recorded below.
+- **Reconcile**: no related-issue state change. Commit sha `d80e0bd8`.
+
+## 2026-07-04 — S5 landed (GitHub-surface codification)
+
+- **Author**: Opus 4.8 sub-agent (Tier B, D3 lane override), worktree `.llm/tmp/wt-harness-v3`.
+- **What**: codified the V3 GitHub surface (design §4). `netscript-pr` SKILL gained four sections
+  using existing structure/voice: **Merge close-gate (#387)** (placed right after the existing
+  "Linking issues" keyword law — references it, does not rewrite: no merge below
+  `status:ready-merge`, which requires IMPL-EVAL PASS + complete DoD + every referenced issue's
+  acceptance & `gate:` box checked+evidenced; #260 cited), **Epic / sub-issue standard** (OD2:
+  `Epic: <name>` + `type:umbrella`+`epic:<slug>`, sub-issues `[<epic-slug> S<n>]` linked by
+  `Part of #<epic>`, resolved by one `Closes #<child>` PR, epics never carry a closing keyword,
+  native sub-issues opportunistic), **Draft-PR-on-start** (draft PR in the same session as the first
+  commit; body carries checkable DoD + run-dir path + slice checklist + live commit list +
+  drift/debt), **Stage-label lifecycle** (exactly one `status:` walking the existing 7-token path,
+  cite ~50% practice-audit non-compliance; no new labels). `run-loop.md`: A1 slice-review step placed
+  **between the named-gate bullet and the sign-off commit** in §5.2, plus a **Post-slice reconcile
+  loop** subsection and a new **Release phase (§8, stub)** that names `e2e-cli-prod`/
+  `scaffold.runtime`/release-gate class but REFERENCES #309/`netscript-release` (does not redefine);
+  Close renumbered §8→§9, phase count 8→9. `evaluator/protocol.md`: rules 12 (close-gate honored) +
+  13 (briefs/PR carry `## SKILL` chapter). `.github/pull_request_template.md`: close-gate checkbox.
+  `.github/ISSUE_TEMPLATE/feature_request.yml`: epic/sub-issue convention note (templates exist — no
+  new template invented).
+- **Supervisor review (A1 gate)**: read all 5 diffs. Close-gate correctly ADJACENT to the keyword
+  law (not a rewrite); A1 step correctly placed between automated gate and sign-off commit; Release
+  phase is a call-out stub (#309 boundary honored, no gate redefinition); zero new labels/stages
+  (verified tokens all pre-exist in labels.yml). Boundary respected — no commits.md/`.llm/tmp/run`
+  re-churn, no Copilot/Augment scrub, no doctrine prose, no labels.yml edit.
+- **Gate**: `agentic:sync-claude` (1 mirror refreshed) → `agentic:sync-claude:check` OK;
+  `agentic:check-claude` OK (all surface checks green, lock unchanged).
+- **Reconcile**: no related-issue state change (S5 codifies process; touches no issue acceptance
+  boxes). No new labels. Commit sha recorded below.
