@@ -15,7 +15,7 @@ Every V3 run dir records its supervisor here so other supervisors can cross-peek
 | Run dir (tracked) | `.llm/runs/chore-roadmap-beta3-stable-reforecast--reforecast/` |
 | Baseline | `1b42ba88` (origin/main, post 0.0.1-beta.2 cut) |
 | Epic | #391 (child of #301; cross-links #389) |
-| Draft PR | #TBD (set at bootstrap commit) |
+| Draft PR | #392 (draft, `status:research`) |
 | Started | 2026-07-04 |
 
 ## Sub-agent lanes (V3 tiering in force for this run)
