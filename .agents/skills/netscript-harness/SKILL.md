@@ -52,7 +52,7 @@ For a **supervisor run** (two or more capability-scoped phase groups), also read
 `.llm/harness/workflow/supervisor.md` and `.llm/harness/workflow/escalation.md`, and track the
 groups in `phase-registry.md`.
 
-For OpenHands, Copilot, Augment, or local-agent handoffs during a run, also read
+For OpenHands or local-agent handoffs during a run, also read
 `.llm/harness/workflow/agent-handoff.md` and `.agents/skills/openhands-handoff/SKILL.md`.
 
 ## Workflow

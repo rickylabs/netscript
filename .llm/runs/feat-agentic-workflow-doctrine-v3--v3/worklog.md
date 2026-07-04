@@ -221,4 +221,46 @@ concept named in `design-v3.md` §5/§8. Ready for PLAN-EVAL (OpenHands, separat
   (2) `gh-token.ts` lacks an `import.meta.main` guard + `--help`; (3) `claude-hook-log.ts` is
   stdin-blocking (hook consumer, not an interactive supervisor command). Carry to S6-reconcile note /
   #307 tooling audit; none block the mandated wrappers.
+- **Reconcile**: no related-issue state change. Commit sha `f5b77425`.
+
+## 2026-07-04 — S7 landed (residue scrub + frontmatter + fitness-gates rewrite)
+
+- **Author**: Opus 4.8 sub-agent (Tier B, D3 lane override), worktree `.llm/tmp/wt-harness-v3`.
+- **What** (design §8-S7, four items):
+  1. **Copilot/Augment residue scrub** — the retired agent lanes removed from 5 files:
+     `.llm/harness/workflow/agent-handoff.md` (header lane list + review-loop line),
+     `openhands-handoff` SKILL (when-to-use + example), `netscript-tools` + `netscript-cli` SKILL
+     descriptions ("OpenHands/Copilot"→"OpenHands"), `netscript-harness` SKILL handoff line.
+     **KEPT** (correctly): `netscript-pr` (L161/197/226) + `CONTRIBUTING.md` (L84) — those are the
+     **live `status:augment-review` label/stage** (verified `.github/labels.yml` L62-64, in design §4
+     stage lifecycle), NOT the retired Augment agent. `docs/site/_plan` "augment with components"
+     (English verb, docs lane) + `AGENTS-handoff.md` (S8) + `.llm/runs/**` left.
+  2. **OpenHands output contract** — `agent-handoff.md` `## Output Contract` rewritten + reconciled in
+     `openhands-handoff` SKILL: evaluator writes to **`OPENHANDS_RUN_DIR`** = tracked
+     `.llm/runs/<run-id>/` (verdict `plan-eval.md`/`evaluate.md` committed there; no commits.md) and
+     **`TRACE_DIR`** = `trace/` beneath it (`OPENHANDS_TRACE_DIR`); explicitly REPLACES the legacy
+     `.llm/tmp/run/openhands/…` / `.llm/tmp/openhands/summary.md` scratch. Fixed the stale
+     `openhands-status.ts --source local` committed-trace path + `thread-replies`→`OPENHANDS_REPLIES_PATH`.
+     Doc-only; references existing `dispatch-openhands.ts`/`openhands-status.ts` (no new tooling).
+  3. **Frontmatter name=dir** — `deno-fresh` `name: deno-frontend`→`deno-fresh`; `design`
+     `name: frontend-design`→`design` (`name:` line only; upstream `description`/`license`/`metadata`/
+     body untouched). Swept all `.agents/skills/*`: no other frontmatter dir-mismatch
+     (`jsr-audit` `name: Publish to JSR` hit is a body heading, frontmatter `name: jsr-audit` correct).
+  4. **fitness-gates.md rewrite** — replaced the F-1..F-15 table of **13 non-existent `check-*.ts`**
+     with the REAL surface: an **Aggregators** table (`check-architecture-gates.ts`=`arch:check`,
+     `audit-jsr-package.ts` w/ its real internal F-1..F-7, `audit-all-packages.ts`,
+     `release-readiness.ts`, `check-doctrine.ts` AP-1..AP-30 authority, `check-netscript-standards.ts`
+     NS-S-##) + a **per-domain `check-*` family** table (structure/layering, naming/edges, CLI, DS)
+     — all 32 names glob-verified. Reporting/Manual/Debt sections preserved (paths updated). Honest
+     **#307 follow-up** note instead of a fabricated per-AP 1:1 map.
+- **Supervisor review (A1 gate)**: read all 8 diffs + full fitness-gates.md + verified the KEEP
+  decision (labels.yml L62-64 confirms `status:augment-review` live). Scrubs surgical + meaning-
+  preserving; output contract V3-consistent (tracked dir, no commits.md); frontmatter minimal;
+  fitness-gates names only real scripts + honest #307 deferral. Boundary respected — no
+  AGENTS-handoff/doctrine-prose/labels.yml/packages/tools-source edits.
+- **Gate**: `agentic:sync-claude` (6 mirrors refreshed) → `agentic:sync-claude:check` OK →
+  `agentic:check-claude` OK (surface green incl. name=dir now consistent, lock unchanged). Author-side
+  self-gate: grep `(?i)copilot|augment` over scrubbed files = 0; all fitness script paths exist.
+- **Drift/debt candidate**: exhaustive fitness AP-1..AP-30 → script map deferred to #307
+  (interim authority = `check-doctrine.ts`). Recorded in fitness-gates.md follow-up note.
 - **Reconcile**: no related-issue state change. Commit sha recorded below.

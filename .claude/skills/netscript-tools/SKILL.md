@@ -1,6 +1,6 @@
 ---
 name: netscript-tools
-description: NetScript repository tooling and validation guide. Use whenever a task involves repo-native Deno wrappers, rtk, raw git verification, gate evidence, PR comments, OpenHands/Copilot automation, lock hygiene, root check/lint/fmt wrappers, doc-lint, publish dry-run, JSR audits, worktree synchronization, or deciding which command is a trustworthy verdict source.
+description: NetScript repository tooling and validation guide. Use whenever a task involves repo-native Deno wrappers, rtk, raw git verification, gate evidence, PR comments, OpenHands automation, lock hygiene, root check/lint/fmt wrappers, doc-lint, publish dry-run, JSR audits, worktree synchronization, or deciding which command is a trustworthy verdict source.
 ---
 
 # NetScript Tools

@@ -14,7 +14,7 @@ required summary artifacts keep local and cloud agents synchronized.
 - A task mentions `@openhands-agent`, `agent:<model>`, `fix-me`, `[openhands ...]`, or OpenHands
   output modes.
 - A local agent needs to hand work to cloud Actions or a VPS Web UI session.
-- A cloud agent must respond to PR, issue, Copilot, or Augment review comments.
+- A cloud agent must respond to PR or issue review comments.
 
 ## When Not to Use
 
@@ -53,7 +53,7 @@ Model selection is per run:
 
 ```text
 @openhands-agent model=anthropic/claude-sonnet-4 use harness proceed to IMPL-EVAL
-@openhands-agent agent=gemini output=respond-comments fix the legitimate Augment comments
+@openhands-agent agent=gemini output=respond-comments fix the legitimate review comments
 [openhands model=openai/gpt-5.1 output=pr-comment] run a focused evaluator pass
 @openhands-agent provider=openrouter model=openai/gpt-5.1 run through OpenRouter
 ```
@@ -71,9 +71,12 @@ Provider-specific secrets follow the `LLM_API_KEY_<PROVIDER>` pattern and fall b
 | `thread-replies`   | Post the summary and any review-thread replies from `OPENHANDS_REPLIES_PATH`.           |
 | `summary-only`     | Upload artifacts only; do not comment.                                                  |
 
-The agent must write `OPENHANDS_SUMMARY_PATH` before exit. The workflow gives each run a fresh
-`OPENHANDS_RUN_DIR` outside the repository checkout and mirrors compact trace metadata to
-`OPENHANDS_TRACE_DIR`; do not reuse legacy `.llm/tmp/openhands/summary.md`.
+The agent must write `OPENHANDS_SUMMARY_PATH` before exit. For a harness run, the verdict of record
+and its trace live in the **tracked** run dir: `OPENHANDS_RUN_DIR` is the run's `.llm/runs/<run-id>/`
+dir (where the evaluator's `plan-eval.md`/`evaluate.md` is committed), and `TRACE_DIR` is `trace/`
+beneath it (env `OPENHANDS_TRACE_DIR`) for compact trace metadata. Do not reuse legacy
+`.llm/tmp/openhands/summary.md` or `.llm/tmp/run/openhands/…` scratch as the verdict — see
+`.llm/harness/workflow/agent-handoff.md` for the full output contract.
 
 ## Token Rule
 
@@ -99,8 +102,8 @@ and carry a `## SKILL` chapter — see step 2 below) and reads the GitHub token 
 in-process env var (`--token-env`, default `GH_TOKEN`), never from a file or argv. It posts exactly
 one trigger comment, respecting the per-PR concurrency-cancel rule.
 `openhands-status.ts --source
-local` needs no token and reads the newest committed trace under
-`.llm/tmp/run/openhands/pr-<n>/`.
+local` needs no token and reads the newest committed trace under the run's `TRACE_DIR`
+(`.llm/runs/<run-id>/trace/`).
 
 ## Workflow
 

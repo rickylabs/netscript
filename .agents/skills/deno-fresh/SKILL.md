@@ -1,5 +1,5 @@
 ---
-name: deno-frontend
+name: deno-fresh
 description: Use when working with Fresh framework, creating routes or handlers in Fresh, building web UIs with Preact, or adding Tailwind CSS in Deno. Covers Fresh 2.x project structure, route handlers, islands, createDefine, PageProps, context patterns, and Fresh 1.x to 2.x migration. Essential for any Fresh-related question.
 license: MIT
 metadata:
