@@ -9,7 +9,9 @@ sources before broad scans or web searches.
 2. `.llm/runs/<run-id>/plan.md`
 3. `.llm/runs/<run-id>/worklog.md`
 4. `.llm/runs/<run-id>/drift.md`
-5. `.llm/runs/<run-id>/commits.md`
+
+For the commit trail, read the draft PR's commit list + per-slice PR comments (there is no
+`commits.md`).
 
 For `.llm/runs/` paths, verify with direct filesystem listing if an index/search tool misses the
 directory.

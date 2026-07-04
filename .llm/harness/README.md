@@ -29,7 +29,7 @@ how an agent uses it during a run.
 
 | Folder        | Concern                                                               |
 | ------------- | --------------------------------------------------------------------- |
-| `workflow/`   | Run mechanics: activation, loop, retrieval, commits, circuit breakers |
+| `workflow/`   | Run mechanics: activation, loop, retrieval, commit trail, circuit breakers |
 | `archetypes/` | Doctrine archetype profiles plus scope overlays                       |
 | `gates/`      | Static, fitness, runtime, and consumer gate definitions               |
 | `evaluator/`  | Separate evaluator-session protocol and verdict definitions           |
@@ -62,6 +62,6 @@ Run artifacts live under `.llm/runs/<run-id>/` and use the templates in `templat
 - `evaluate.md` (IMPL-EVAL verdict)
 - `context-pack.md`
 - `drift.md`
-- `commits.md`
 
-Append `commits.md` immediately after every commit.
+The draft-PR commit list + per-slice PR comments are the commit trail; there is no `commits.md`. Keep
+`worklog.md` + `context-pack.md` current as part of every slice.

@@ -18,7 +18,7 @@ against the changed state, not to continue implementation.
 | run `worklog.md`           | yes                         | design checkpoint and generator evidence               |
 | run `context-pack.md`      | yes when present            | resumable state                                        |
 | run `drift.md`             | yes when present            | plan/doctrine drift                                    |
-| run `commits.md`           | yes when commits exist      | implementation history                                 |
+| draft-PR commit list + per-slice PR comments | yes when commits exist | implementation history (the commit trail)   |
 | `debt/arch-debt.md`        | yes                         | debt delta                                             |
 
 ## Operating Rules

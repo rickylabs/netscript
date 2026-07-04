@@ -128,4 +128,31 @@ concept named in `design-v3.md` §5/§8. Ready for PLAN-EVAL (OpenHands, separat
   legacy note. `watch-run.ts`/`CONTRIBUTING.md`/`tools/README.md` were no-ops (no hardcoded base
   path).
 - **Reconcile**: no related-issue state change. `commits.md` drop remains S4; watch-run.ts `--files`
-  default remains S4. Commit sha recorded below.
+  default remains S4. Commit sha `57ce8d75`.
+
+## 2026-07-04 — S4 landed (drop commits.md)
+
+- **Author**: Opus 4.8 sub-agent (Tier B, D3 lane override), worktree `.llm/tmp/wt-harness-v3`.
+- **What**: dropped the `commits.md` run-artifact mechanism entirely (design §3, drift D2) — in V3
+  the draft-PR commit list + per-slice PR comments are the commit trail. DELETED
+  `templates/commits.md` + `workflow/commit-tracking.md` (1 live inbound link, de-linked; its two
+  still-valid non-commits.md crumbs — "message names what the slice proves" + the dirty-worktree
+  `git status --short` rule — folded into `run-loop.md` §5). Scrubbed the 13-file blast radius
+  (AGENTS.md, tools/README, harness `workflow/{run-loop,activation,supervisor,retrieval-order,
+  agent-handoff}.md`, `templates/{implement,agent-briefing}.md`, `evaluator/protocol.md`, harness
+  README, `netscript-harness` + `fresh-ui-horizontal` SKILLs) replacing "append commits.md" with the
+  PR-comment trail. Repointed `evaluator/protocol.md` IMPL-EVAL reading from `commits.md` → draft-PR
+  commit list + per-slice PR comments.
+- **The one TS edit**: `.llm/tools/watch-run.ts` default watched-file set `['commits.md',
+  'worklog.md']` → `['worklog.md']`; doc-comment/usage/README references updated. CLI contract,
+  `Deno.watchFs` behavior, exit codes (0 change / 2 heartbeat / 1 bad-args), `--timeout-seconds`,
+  and `--files` override all unchanged.
+- **Supervisor review (A1 gate)**: read watch-run.ts + run-loop + protocol + implement diffs and the
+  full post-edit grep. Doctrine crumbs preserved via the run-loop fold (no doctrine loss from the
+  delete). Boundary respected — Copilot/Augment (S7), tooling wiring (S6) untouched; only commits.md
+  concern + the single watch-run default edit.
+- **Gate**: `.llm/tools/run-deno-check.ts` on watch-run.ts → 0 occurrences (EXIT 0);
+  `agentic:sync-claude:check` OK (2 mirrors refreshed). `commits.md` grep over source scope = zero
+  non-intentional hits (residual = deliberate "no commits.md" drop-notes + the historical
+  `__fixtures__/codex-launch-s1.head.log`).
+- **Reconcile**: no related-issue state change. Commit sha recorded below.

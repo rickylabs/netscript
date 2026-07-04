@@ -76,7 +76,8 @@ intent hint, not the final profile.
 6. Produce `research.md`, then `plan.md` with locked decisions.
 7. Record Design checkpoint in `worklog.md`.
 8. **Run PLAN-EVAL (separate session). No implementation before PASS.**
-9. Implement one commit slice at a time; append `commits.md` after each.
+9. Implement one commit slice at a time; push + comment on the draft PR (the commit trail) and keep
+   `worklog.md`/`context-pack.md` current after each.
 10. Run gates; record results in `worklog.md`.
 11. **Run IMPL-EVAL (separate session).**
 12. Close: update `context-pack.md`, `arch-debt.md`, and promote lessons if warranted.
@@ -163,11 +164,11 @@ Run artifacts live under `.llm/runs/<run-id>/` and use templates from `.llm/harn
 | `evaluate.md`       | IMPL-EVAL verdict (separate session, after implementation)  |
 | `context-pack.md`   | resumable summary                                           |
 | `drift.md`          | append-only drift log                                       |
-| `commits.md`        | append-only commit list                                     |
 | `phase-registry.md` | supervisor runs only: phase-group map + live status         |
 
-Append `commits.md` immediately after every commit. Supervisor runs additionally keep
-`phase-registry.md`, `final-pr-handoff.md`, and an `escalations/` folder; brief each group agent
+There is no `commits.md` — the draft-PR commit list + per-slice PR comments are the commit trail.
+Keep `worklog.md` + `context-pack.md` current as part of every slice. Supervisor runs additionally
+keep `phase-registry.md`, `final-pr-handoff.md`, and an `escalations/` folder; brief each group agent
 with `templates/agent-briefing.md`.
 
 ## `.llm/runs` Path Caveat
@@ -206,28 +207,27 @@ There are **two** separate-session evaluator passes.
 **IMPL-EVAL** (final pass, after implementation):
 
 - Runs in OpenHands with qwen 3.7 max unless blocked and recorded.
-- Generator writes `worklog.md`, `context-pack.md`, `drift.md`, and `commits.md`.
-- Evaluator reads `.llm/harness/evaluator/protocol.md`, the plan, worklog, context pack, drift,
-  commits, selected archetype, overlays, and gate docs.
+- Generator writes `worklog.md`, `context-pack.md`, and `drift.md`.
+- Evaluator reads `.llm/harness/evaluator/protocol.md`, the plan, worklog, context pack, drift, the
+  draft-PR commit list + per-slice PR comments (the commit trail), selected archetype, overlays, and
+  gate docs.
 - Evaluator writes `evaluate.md` with `PASS`, `FAIL_FIX`, `FAIL_RESCOPE`, or `FAIL_DEBT`.
 - Eval loop limit is two failures before escalation.
 
-## Commit Tracking
+## Commit Trail
 
-When a run requires commits:
+When a run requires commits, the draft PR's commit list + per-slice PR comments **are** the commit
+trail — there is no `commits.md`. Per slice:
 
-1. commit by implementation slice,
+1. commit by implementation slice (message names what the slice proves, not what it contains),
 2. push the branch,
-3. comment on the PR with slice scope, commit hash, and test evidence,
-4. append `.llm/runs/<run-id>/commits.md`,
-5. update `context-pack.md`,
-6. continue to the next slice.
+3. comment on the draft PR with slice scope, commit hash, and gate/test evidence,
+4. update `worklog.md` + `context-pack.md` as part of the same slice (a slice whose commit does not
+   touch the run dir is incomplete),
+5. continue to the next slice.
 
-Commit log format:
-
-```md
-- <commit-sha>: <commit message>
-```
+The draft PR is opened in the same session as the first commit, so its commit list is live and
+reviewable from mobile without cloning or diffing.
 
 ## Rescoping
 
@@ -262,7 +262,7 @@ User says "use harness"
   -> slice landed + gates green? Tier-A supervisor reviews before the sign-off commit
   -> OpenHands/local/cloud handoff? read workflow/agent-handoff.md
   -> update run artifacts while working
-  -> commit tracking required? append commits.md after every commit
+  -> commit slice? push + comment on the draft PR (the commit trail); keep worklog/context-pack current
   -> discovered violation not fixed? update arch-debt.md
   -> evaluator is separate session
 ```

@@ -12,7 +12,7 @@ that govern *when* to reach for these tools. For those, see:
 - [`AGENTS.md` -> Validation](../../AGENTS.md#validation) -- which validation proves which change,
   plus the scoped check/lint/fmt wrapper policy.
 - [`.llm/harness/README.md`](../harness/README.md) -- harness run mechanics that orchestrate these
-  tools (commit/worklog tracking, gates, evaluator protocol).
+  tools (worklog tracking, the draft-PR commit trail, gates, evaluator protocol).
 
 ## Subtree map
 
@@ -122,14 +122,14 @@ hooks, or agent-orchestration docs (see `CLAUDE.md`).
 `watch-run.ts <run-dir>` blocks until a harness run directory changes, then exits -- so the
 supervisor re-wakes without polling (which burns tokens). Run it as a **background** process: it
 `Deno.watchFs`-es the run dir and exits **0** on the first relevant change (a sub-agent appending
-`commits.md` / `worklog.md`), or exits **2** on the `--timeout-seconds` heartbeat if a sub-agent
-hangs without writing. Bad args exit **1**.
+`worklog.md`), or exits **2** on the `--timeout-seconds` heartbeat if a sub-agent hangs without
+writing. Bad args exit **1**.
 
 ```powershell
-deno run --allow-read .llm/tools/watch-run.ts <run-dir> --files commits.md,worklog.md --timeout-seconds 1800 --quiet
+deno run --allow-read .llm/tools/watch-run.ts <run-dir> --files worklog.md --timeout-seconds 1800 --quiet
 ```
 
-Defaults: `--files commits.md,worklog.md`, `--timeout-seconds 1800`. See
+Defaults: `--files worklog.md`, `--timeout-seconds 1800`. See
 [`AGENTS.md` -> Tooling (Supervisor wake)](../../AGENTS.md#tooling) for the surrounding convention.
 
 ## Tool Index

@@ -38,7 +38,8 @@ branch, baseline SHA, lane table) — a run dir without it is not activated. See
 
 ### What you must produce
 - supervisor.md, research.md, plan.md, worklog.md (Design checkpoint first),
-  context-pack.md, drift.md, commits.md
+  context-pack.md, drift.md (the draft-PR commit list + per-slice PR comments
+  are the commit trail — no commits.md)
 - If a slice runs a Tier C Workflow, commit its generated `workflow.js` to
   `<run-dir>/workflows/<slice>-workflow.js` BEFORE executing it (see
   `workflow/lane-policy.md` selection rule 2)

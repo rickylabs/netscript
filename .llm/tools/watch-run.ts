@@ -5,15 +5,15 @@
  * lands — without polling (which burns tokens) and without depending on
  * `ScheduleWakeup` (unreliable here). Run this as a **background** process: it
  * `Deno.watchFs`-es a run dir and exits 0 on the first relevant change (a
- * sub-agent appending `commits.md` / `worklog.md`), which re-invokes the
- * supervisor turn. The supervisor then inspects the new commit and continues.
+ * sub-agent appending `worklog.md`), which re-invokes the supervisor turn.
+ * The supervisor then inspects the new commit and continues.
  *
  * A `--timeout-seconds` fallback exits 2 (heartbeat) so a hung sub-agent that
  * never writes still eventually wakes the supervisor instead of blocking forever.
  *
  * Usage:
  *   deno run --allow-read .llm/tools/watch-run.ts <run-dir> \
- *     [--files commits.md,worklog.md] [--timeout-seconds 1800] [--quiet]
+ *     [--files worklog.md] [--timeout-seconds 1800] [--quiet]
  *
  * Exit codes: 0 = relevant change seen · 2 = timed out (heartbeat) · 1 = bad args.
  */
@@ -27,7 +27,7 @@ interface Args {
 
 function parseArgs(argv: string[]): Args | null {
   const positional: string[] = [];
-  let files = ['commits.md', 'worklog.md'];
+  let files = ['worklog.md'];
   let timeoutSeconds = 1800;
   let quiet = false;
   for (let i = 0; i < argv.length; i++) {

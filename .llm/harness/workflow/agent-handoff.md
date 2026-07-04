@@ -33,7 +33,7 @@ The canonical details live in `AGENTS-handoff.md` and `.agents/skills/openhands-
 - Cloud agents must update the normal run artifacts under `.llm/runs/<run-id>/` when the task is
   a harness run.
 - The OpenHands workflow summary artifact is additional handoff evidence, not a replacement for
-  `worklog.md`, `evaluate.md`, `drift.md`, or `commits.md`.
+  `worklog.md`, `evaluate.md`, or `drift.md`.
 - If a cloud run discovers plan drift, it records drift in the harness artifact first, then reports
   the drift in the PR comment.
 

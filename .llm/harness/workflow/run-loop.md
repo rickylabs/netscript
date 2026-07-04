@@ -98,11 +98,15 @@ before escalation to the user.
 1. Implement one commit slice at a time in the Design order.
 2. After each slice:
    - run the slice's named gate,
-   - commit with a message that names what the slice proves,
-   - append `commits.md`,
-   - update `context-pack.md`.
-3. Update `worklog.md` after significant steps.
-4. Append `drift.md` when facts diverge from the plan, RFC, or doctrine.
+   - commit with a message that names what the slice proves, not what it contains,
+   - push, then comment on the draft PR with the slice scope, commit hash, and gate evidence — the
+     draft-PR commit list + per-slice PR comments are the commit trail (there is no `commits.md`),
+   - update `worklog.md` + `context-pack.md` as part of the same slice (a slice whose commit does not
+     touch the run dir is incomplete).
+3. Append `drift.md` when facts diverge from the plan, RFC, or doctrine.
+
+Before committing, inspect `git status --short` and do not fold in unrelated user changes. If an
+unrelated change shares a file you must edit, work with the current content instead of reverting it.
 
 ### Concept of Done (per slice)
 
@@ -135,7 +139,7 @@ The final evaluation is a separate session, distinct from PLAN-EVAL. Operating i
 
 1. Read `evaluator/protocol.md` and `evaluator/verdict-definitions.md`.
 2. Read the archetype profile, overlays, research, plan, plan-eval, worklog, context pack, drift,
-   and commits.
+   and the draft-PR commit list + per-slice PR comments (the commit trail).
 3. Verify the Design checkpoint exists and was followed.
 4. Verify commit slices match the Design checkpoint.
 5. Verify the Plan-Gate passed (`plan-eval.md` = `PASS`) before implementation began. Implementation

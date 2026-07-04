@@ -50,8 +50,8 @@ Every run directory contains:
 - `worklog.md` (must include a `## Design` section before implementation)
 - `context-pack.md`
 - `drift.md`
-- `commits.md`
 
+There is no `commits.md` — the draft-PR commit list + per-slice PR comments are the commit trail.
 `implement.md` is used when the run phase needs it. `plan-eval.md` (PLAN-EVAL) and `evaluate.md`
 (IMPL-EVAL) are the two evaluator verdicts; each is written in a separate session.
 

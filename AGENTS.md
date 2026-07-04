@@ -100,7 +100,7 @@ the canonical home; do not restate its gotchas elsewhere.
 ### Supervisor wake (token-free)
 
 When supervising sub-agents, do not poll. Run `.llm/tools/watch-run.ts <run-dir>` as a
-**background** process: it `Deno.watchFs`-es `commits.md`/`worklog.md` and exits 0 on the next
+**background** process: it `Deno.watchFs`-es `worklog.md` and exits 0 on the next
 change (re-waking the supervisor turn), or exits 2 on a `--timeout-seconds` heartbeat if a sub-agent
 hangs without writing.
 
