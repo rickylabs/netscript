@@ -6,12 +6,15 @@ stage labels, tracked run dirs, epic/sub-issue standard, drop commits.md, prune 
 skills/tools/harness docs, make `.llm/tools` wrappers mandatory. Everything reviewable from
 GitHub + mobile without cloning.
 
-**State**: Bootstrap done (2026-07-04). Research phase next.
+**State**: Research + Plan & Design COMPLETE (2026-07-04). Design = `design-v3.md` (READY FOR
+PLAN-EVAL). Next: PLAN-EVAL (OpenHands, separate session) — hard stop before any slice.
 
 - Branch: `feat/agentic-workflow-doctrine-v3` @ base `1b42ba88` · worktree `.llm/tmp/wt-harness-v3`
 - Doctrine issue: #306 (adopt) · related: #305 (adjacent, framework doctrine), #387 (closure guardrail)
 - Epic: TBD · Draft PR: TBD
-- Phase: research → plan → PLAN-EVAL (OpenHands, separate session) → slices
+- Phase: [done] research + plan → **PLAN-EVAL next** → slices S2–S8 (design §8)
+- Slice map: S2 lane-policy · S3 run-dir move · S4 drop commits.md · S5 GitHub-surface/#387 ·
+  S6 tooling mandates+aliases · S7 scrub+frontmatter+fitness-gates · S8 residue+ARCHETYPE-5+eval
 - Drift: D1 (tracked run dirs `.llm/runs/`), D2 (no commits.md — PR is the commit trail)
 
 **Resume**: read `supervisor.md`, `worklog.md`, `drift.md`, then latest phase artifact.
