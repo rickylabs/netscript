@@ -5,6 +5,7 @@
 import { join, resolve } from "node:path";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
+import process from "node:process";
 
 // ============================================================================
 // Types
@@ -263,6 +264,35 @@ export function generateAccessToken(): string {
     binary += String.fromCharCode(bytes[i]);
   }
   return btoa(binary);
+}
+
+/**
+ * Probes whether a live container runtime is reachable (Docker/Podman daemon
+ * up), used by the `Auto` cache arm to pick the container backend. Runs
+ * `docker info` with a short timeout; any failure (missing binary, daemon down)
+ * reports unavailable so the apphost falls back to the Docker-less Garnet
+ * executable. IO stays in the runtime edge (A7/A11).
+ */
+export function isDockerAvailable(): boolean {
+  try {
+    execFileSync("docker", ["info"], { stdio: "ignore", timeout: 3000 });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Resolves the environment-aware cache backend for the `Auto` mode: honors the
+ * explicit `NETSCRIPT_CACHE_MODE` escape hatch (`Container` | `Executable`),
+ * otherwise probes the container runtime. Returns true for the container
+ * (DenoKv Connect) backend, false for the Docker-less Garnet executable.
+ */
+export function shouldUseContainerCache(): boolean {
+  const override = process.env.NETSCRIPT_CACHE_MODE;
+  if (override === "Container") return true;
+  if (override === "Executable") return false;
+  return isDockerAvailable();
 }
 
 /**

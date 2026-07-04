@@ -2,7 +2,7 @@
 
 import type { DistributedApplicationBuilder, EndpointReference } from '{{__slot1__}}';
 import { ContainerLifetime, EndpointProperty } from '{{__slot2__}}';
-import { type CacheWiring, ensureGarnetToolManifest, generateAccessToken, resolveDataPath } from '{{__slot3__}}';
+import { type CacheWiring, ensureGarnetToolManifest, generateAccessToken, resolveDataPath, shouldUseContainerCache } from '{{__slot3__}}';
 import type { NetScriptConfig } from '{{__slot4__}}';
 
 type AspireResource =

@@ -493,10 +493,14 @@ export class PluginWorkspaceMutator {
     raw.NetScript.Cache ??= {};
 
     const hadCache = raw.NetScript.Cache[cacheKey] !== undefined;
+    // Environment-aware default (#372): `Auto` resolves at apphost runtime to a
+    // Garnet container when Docker is available, or the Docker-less Garnet
+    // dotnet-tool executable otherwise — both Redis-compatible, so KV consumers
+    // are unaffected either way. Append-only (`??=`) leaves existing entries.
     raw.NetScript.Cache[cacheKey] ??= {
       Enabled: true,
       Engine: 'Garnet',
-      Mode: 'Container',
+      Mode: 'Auto',
     };
 
     raw.NetScript.PrimaryCache ??= cacheKey;

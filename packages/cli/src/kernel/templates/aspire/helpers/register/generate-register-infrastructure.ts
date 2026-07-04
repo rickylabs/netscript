@@ -166,6 +166,38 @@ export function generateRegisterInfrastructure(
       continue
     }
 
+    // Auto — environment-aware at apphost runtime (D5/D6). Docker present →
+    // the configured container backend (DenoKv Connect for DenoKv, else the
+    // Redis-compatible Garnet/Redis container). Docker absent → the Garnet
+    // dotnet-tool executable (cross-fallback for the Docker-less bare-metal
+    // host, #372). Both branches emit inline so the generated apphost decides
+    // at `aspire start` without regeneration.
+    if (mode === 'Auto') {
+      const container = entry.Engine === 'DenoKv'
+        ? denokvContainerSetup(id, name, entry)
+        : redisGarnetContainerSetup(id, name, entry)
+      const executable = garnetExecutableSetup(id, name, entry)
+      const containerLabel = entry.Engine === 'DenoKv'
+        ? 'DenoKv container'
+        : `${entry.Engine} container`
+      const lines: string[] = []
+
+      lines.push(
+        `  // ${name} (${entry.Engine}, Auto — Docker → ${containerLabel}; Docker-less → Garnet executable)`,
+      )
+      lines.push(`  let ${id}_wiring: CacheWiring;`)
+      lines.push(`  if (shouldUseContainerCache()) {`)
+      for (const line of container.lines) lines.push(`  ${line}`)
+      lines.push(`    ${id}_wiring = ${container.wiring};`)
+      lines.push(`  } else {`)
+      for (const line of executable.lines) lines.push(`  ${line}`)
+      lines.push(`    ${id}_wiring = ${executable.wiring};`)
+      lines.push(`  }`)
+      lines.push(`  cacheWiring.set('${name}', ${id}_wiring);`)
+      cacheBlocks.push(lines.join('\n'))
+      continue
+    }
+
     // DenoKv Container — Deno KV Connect over HTTP with an access token.
     if (entry.Engine === 'DenoKv') {
       const setup = denokvContainerSetup(id, name, entry)
@@ -191,37 +223,12 @@ export function generateRegisterInfrastructure(
     }
 
     // Redis / Garnet Container — Redis-compatible TCP endpoint.
-    const image = CACHE_CONTAINER_IMAGES[entry.Engine] ??
-      CACHE_CONTAINER_IMAGES.Redis
-    const tag = entry.ImageTag ?? image.tag
-    const imageRef = `${image.image}:${tag}`
-    const provider = entry.Engine === 'Garnet' ? 'garnet' : 'redis'
-    const lines: string[] = []
-
-    lines.push(`  // ${name} (${entry.Engine}, Container)`)
-    lines.push(
-      `  const ${id} = await builder.addContainer('${name}', '${imageRef}')`,
-    )
-    lines.push(`    .withEndpoint(${cacheEndpointOptions(entry.Port)})`)
-
-    if (entry.DataPath) {
-      lines.push(
-        `    .withBindMount(resolveDataPath(appHostDir, '${entry.DataPath}', '${name}'), '/data')`,
-      )
-    }
-
-    const lastIdx = lines.length - 1
-    lines[lastIdx] = lines[lastIdx] + ';'
-
-    lines.push(`  const ${id}_tcpEndpoint = await ${id}.getEndpoint('tcp');`)
-    lines.push(
-      `  const ${id}_hostPort = ${id}_tcpEndpoint.property(EndpointProperty.HostAndPort);`,
-    )
-    lines.push(`  caches.set('${name}', ${id});`)
-    lines.push(`  cacheEndpoints.set('${name}', ${id}_tcpEndpoint);`)
-    lines.push(
-      `  cacheWiring.set('${name}', { resource: ${id}, reference: ${id}_tcpEndpoint, env: { GARNET_URI: ${id}_hostPort, REDIS_URI: ${id}_hostPort, CACHE_PROVIDER: '${provider}' }, local: false });`,
-    )
+    const setup = redisGarnetContainerSetup(id, name, entry)
+    const lines = [
+      `  // ${name} (${entry.Engine}, Container)`,
+      ...setup.lines,
+      `  cacheWiring.set('${name}', ${setup.wiring});`,
+    ]
     cacheBlocks.push(lines.join('\n'))
   }
 
@@ -338,6 +345,46 @@ function garnetExecutableSetup(
 
   const wiring =
     `{ resource: ${id}, reference: ${id}_tcpEndpoint, env: { GARNET_URI: ${id}_hostPort, REDIS_URI: ${id}_hostPort, CACHE_PROVIDER: 'garnet' }, local: false }`
+  return { lines, wiring }
+}
+
+/**
+ * Emits the Redis-compatible container setup lines for Redis/Garnet (shared by
+ * the Container arm and the Docker branch of a Redis/Garnet Auto arm). Wires a
+ * `GARNET_URI`/`REDIS_URI` host:port pair plus the provider tag.
+ */
+function redisGarnetContainerSetup(
+  id: string,
+  name: string,
+  entry: CacheEntry,
+): { lines: string[]; wiring: string } {
+  const image = CACHE_CONTAINER_IMAGES[entry.Engine] ??
+    CACHE_CONTAINER_IMAGES.Redis
+  const tag = entry.ImageTag ?? image.tag
+  const imageRef = `${image.image}:${tag}`
+  const provider = entry.Engine === 'Garnet' ? 'garnet' : 'redis'
+  const lines: string[] = []
+
+  lines.push(`  const ${id} = await builder.addContainer('${name}', '${imageRef}')`)
+  lines.push(`    .withEndpoint(${cacheEndpointOptions(entry.Port)})`)
+  if (entry.DataPath) {
+    lines.push(
+      `    .withBindMount(resolveDataPath(appHostDir, '${entry.DataPath}', '${name}'), '/data')`,
+    )
+  }
+
+  const lastIdx = lines.length - 1
+  lines[lastIdx] = lines[lastIdx] + ';'
+
+  lines.push(`  const ${id}_tcpEndpoint = await ${id}.getEndpoint('tcp');`)
+  lines.push(
+    `  const ${id}_hostPort = ${id}_tcpEndpoint.property(EndpointProperty.HostAndPort);`,
+  )
+  lines.push(`  caches.set('${name}', ${id});`)
+  lines.push(`  cacheEndpoints.set('${name}', ${id}_tcpEndpoint);`)
+
+  const wiring =
+    `{ resource: ${id}, reference: ${id}_tcpEndpoint, env: { GARNET_URI: ${id}_hostPort, REDIS_URI: ${id}_hostPort, CACHE_PROVIDER: '${provider}' }, local: false }`
   return { lines, wiring }
 }
 
