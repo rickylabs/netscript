@@ -446,3 +446,33 @@ concept named in `design-v3.md` §5/§8. Ready for PLAN-EVAL (OpenHands, separat
   before staging). Staged explicit paths only (never `git add -A`). Pushed `b85944a6..c44a1fd3`.
 - **Next**: S10 (`.llm/*` production-grade sweep; `.llm/runs/` KEPT) → full-surface gates → WSL Codex
   adversarial over the whole V3 surface → OpenHands IMPL-EVAL (separate session). No merge/close.
+
+## 2026-07-04 — S10 part 1: `.llm/harness/**` bring-to-grade (commit `5e5e036b`)
+
+- **Scope**: `.llm/*` production-grade sweep. Surface enumerated (tracked, `.llm/runs/` KEPT +
+  gitignored-untracked excluded): `.llm/harness/**` (54), `.llm/tmp/` (108 tracked!), `.llm/frontend`
+  (1), `.llm/plans` (1).
+- **Read-only audit** (Opus 4.8 Tier-B, all 54 harness files): **zero stale-remove** — every harness
+  doc is live; drift = a tight cluster of 8 defects. Audit distinguished historical-provenance
+  `.llm/tmp/run/` refs (correct, left) from canonical-path drift (none found), and confirmed the
+  "there is no commits.md" notes are correct V3 (not drift). No moved-tool old-flat-paths remain.
+- **Fix slice** (Opus 4.8 Tier-B, in-surface `.llm/harness` only, no-commit): 8 fixes across 9 files
+  — ARCHETYPE-6 deleted-`check-cli-*` claim → PENDING_SCRIPT/manual backed by `check-doctrine.ts`;
+  slash→hyphen group-branch in agent-briefing + phase-registry (slash form is Git-impossible per
+  supervisor.md); evaluate.md tables extended F-15→F-19 + AP-20→AP-25; anti-pattern-catalog AP-21..25
+  added; gates/README F-15→F-19 + Phase-A caveat reframed to match fitness-gates.md; DOCTRINE-REF
+  8→9-phase (incl. Release) + AP-30-headroom note; context-pack retired-commits ledger repointed;
+  sub-wave-orchestration "commits"→dropped.
+- **Supervisor A1**: reviewed every diff; **verified AP-21..25 / F-16..19 titles verbatim against
+  `docs/architecture/doctrine/09-…md` headings** (exact match); phase list matches run-loop.md (9
+  incl. Release); branch form matches supervisor.md (hyphen). Confirmed no edit outside `.llm/harness`
+  and that `fitness-gates.md`/matrix/`run-loop.md`/`supervisor.md`/doctrine/tool/mirrors were NOT
+  touched. `.llm/harness` is docs — outside CI fmt/lint surface; no type-check applies.
+- **AP-ceiling judgment (drift D8)**: aligned harness evaluator tables to the **doctrine-defined
+  AP-25 / F-19**; the AP-25(doctrine)-vs-AP-30(`check-doctrine.ts`) gap is left as an out-of-surface
+  #305 follow-up (reconciling needs a doctrine-prose edit V3 must not make). AP-30 tool refs unchanged.
+- **STILL PENDING owner decision (part B, destructive)**: `git rm` the 108 stale tracked
+  `.llm/tmp/run/` v2 artifacts (contradict `.gitignore:17`) + verdict on `.llm/frontend/wi/WI-12-*.md`
+  and `.llm/plans/2026-06-12-fresh-ui-doctrine-plan.md`. Flagged to coordinator; not acted on.
+- **Next**: await part-B decision → then full-surface gates → WSL Codex adversarial (whole V3 surface)
+  → OpenHands IMPL-EVAL (separate session). No merge/close.
