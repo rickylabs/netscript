@@ -40,48 +40,21 @@ exploratory reads; it is **not** a verdict source for gates. When a consumer che
 
 ## The OpenHands eval automation can commit `deno.lock` churn (silent drift)
 
-Wave 4 4b was the first sub-wave to run both evaluator passes on the OpenHands
-GitHub-Actions automation (`@openhands-agent model=… use harness proceed to
-PLAN-EVAL/IMPL-EVAL`). The **PLAN-EVAL** run, while executing `deno check` /
-`deno publish --dry-run` to verify the plan, re-resolved the workspace and committed
-the result into `deno.lock` (`chore(openhands): apply agent changes`): a
-**`@opentelemetry/semantic-conventions` 1.40.0→1.28.0 downgrade** plus unrelated
-`esbuild`/`esbuild-wasm`/`@deno/loader`/`preact`/`zod` additions (+179/−63 vs the
-sub-wave base). It rode through implementation and **into the merged umbrella** —
-nobody reviewed it, and the implementer's per-slice "`deno.lock` unchanged" check was
-true only relative to its own already-churned baseline, not the pre-sub-wave base.
-
-Rules:
-
-- **A PLAN-EVAL must never mutate `deno.lock`.** It is read-only over the plan. If the
-  automation's checks re-resolve the lock, that churn is an artifact, not a result —
-  the run prompt should instruct the agent to `git checkout -- deno.lock` before
-  committing, the same lock-hygiene rule given to generators.
-- **Diff the lock against the true sub-wave base, not the working baseline.** When
-  closing a sub-wave, the supervisor should `git diff --stat <base> <head> -- deno.lock`
-  (base = the commit the sub-wave forked/synced from, e.g. `2c24662`), because an
-  in-branch "unchanged" claim hides churn that predates the first slice.
-- **Reconcile, don't revert mid-wave.** Once churn has merged into the umbrella and
-  later work validated against it, reverting just re-churns. Carry it forward, log it
-  (registry + drift), and do one deliberate, reviewed lock pass at the umbrella→track
-  closeout. (Golden Rule 6: never delete the lock or `--reload` without approval.)
+Wave 4 4b: an OpenHands **PLAN-EVAL** run's `deno check` / `deno publish --dry-run`
+re-resolved the workspace and committed `deno.lock` churn (a
+`@opentelemetry/semantic-conventions` downgrade) that rode unreviewed into the merged
+umbrella. Rule (now canonical in the `openhands-handoff` SKILL): an evaluator must never
+mutate the lock (`git checkout -- deno.lock` before commit), diff the lock against the
+TRUE base not the working baseline, and reconcile-don't-revert mid-wave. See
+`.agents/skills/openhands-handoff/SKILL.md` → Common Pitfalls.
 
 ## The OpenHands `<!-- openhands-agent-summary -->` PR comment can be stale
 
-The automation maintains **one persistent summary comment** per PR (marker
-`<!-- openhands-agent-summary -->`) and updates it each run from `.llm/tmp/openhands/summary.md`.
-That file is **not always regenerated** for the new run: Wave 4 4d's PLAN-EVAL run
-(`bb985d0`, qwen3.7-max) bumped the comment's `updated_at` to the run instant but left
-the **previous 4c sagas IMPL-EVAL `FAIL_FIX`** body in place — so the visible PR summary
-on the 4d PLAN-EVAL PR read "Wave 4 · 4c sagas IMPL-EVAL (PR #20) … FAIL_FIX". A reviewer
-trusting the PR comment would have read the wrong package, wrong phase, and wrong verdict.
-
-Rule: **the verdict source is the committed run artifact, never the PR comment.** Read
-`<run>/plan-eval.md` (PLAN-EVAL) or `<run>/evaluate.md` (IMPL-EVAL) from the bot commit
-and confirm it names the **right run id, the right slices, and the right surface** before
-accepting the verdict. The `<!-- openhands-agent-summary -->` comment is a convenience
-mirror that can lag a run behind. (Same shape as the `rtk proxy` false-evidence trap: the
-convenient summary is not the gate.)
+Wave 4 4d: the persistent per-PR summary comment (`<!-- openhands-agent-summary -->`) bumped
+its `updated_at` but kept a **prior run's** package/phase/verdict body, showing a stale
+`FAIL_FIX` on a different PR. Rule (now canonical in the `openhands-handoff` SKILL): the
+verdict source is the committed run artifact (`plan-eval.md`/`evaluate.md`), never the PR
+comment. See `.agents/skills/openhands-handoff/SKILL.md` → Common Pitfalls.
 
 ## MSYS mangles `ref:path` colons
 

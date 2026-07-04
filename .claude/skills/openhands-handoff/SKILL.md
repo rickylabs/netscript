@@ -58,9 +58,27 @@ Model selection is per run:
 @openhands-agent provider=openrouter model=openai/gpt-5.1 run through OpenRouter
 ```
 
-The workflow infers the provider from the selected model prefix unless `provider=...` is present.
-Provider-specific secrets follow the `LLM_API_KEY_<PROVIDER>` pattern and fall back to
-`LLM_API_KEY`.
+The model precedence is:
+
+1. manual workflow `model` input,
+2. `model=...` in a comment or commit message,
+3. `agent=<profile>` in a comment or commit message,
+4. `agent:<profile-or-literal>` label,
+5. repository variable `OPENHANDS_DEFAULT_MODEL`,
+6. `anthropic/claude-sonnet-4`.
+
+The workflow infers the provider from the selected model prefix unless `provider=...` is present:
+
+| Model prefix           | Provider     | Preferred secret         |
+| ---------------------- | ------------ | ------------------------ |
+| `anthropic/`           | `ANTHROPIC`  | `LLM_API_KEY_ANTHROPIC`  |
+| `openai/`              | `OPENAI`     | `LLM_API_KEY_OPENAI`     |
+| `gemini/` or `google/` | `GEMINI`     | `LLM_API_KEY_GEMINI`     |
+| `openrouter/`          | `OPENROUTER` | `LLM_API_KEY_OPENROUTER` |
+
+Provider-specific secrets fall back to `LLM_API_KEY` when the specific key is absent; optional
+provider-specific base URLs use the same suffix pattern (`LLM_BASE_URL_<PROVIDER>`, `LLM_BASE_URL`
+fallback).
 
 ## Output Modes
 
@@ -151,6 +169,23 @@ local` needs no token and reads the newest committed trace under the run's `TRAC
   budget during exploration, leaving zero artifacts. Split the task into sequential triggers and/or
   raise `iterations=`, and require the agent to create deliverable files early and grow them
   incrementally.
+- **Eval run mutating `deno.lock`**: a PLAN-EVAL/IMPL-EVAL run's `deno check` / `deno publish
+  --dry-run` can silently re-resolve and commit `deno.lock` churn (observed: a
+  `@opentelemetry/semantic-conventions` downgrade riding into a merged umbrella). Rule: **an
+  evaluator must never mutate the lock** — instruct the run prompt to `git checkout -- deno.lock`
+  before committing. Diff the lock against the **true base** (the commit the wave forked/synced
+  from), not the working baseline — an in-branch "unchanged" claim hides churn that predates the
+  first slice. Reconcile-don't-revert mid-wave (Golden Rule 6: never delete the lock or `--reload`
+  without approval).
+- **Trusting the persistent PR summary comment**: the `<!-- openhands-agent-summary -->` comment is
+  one per PR and is **not always regenerated** for a new run — it can show a prior run's package,
+  phase, and verdict while only its `updated_at` bumps. **The verdict source is the committed run
+  artifact** (`plan-eval.md` for PLAN-EVAL, `evaluate.md` for IMPL-EVAL), never the PR comment;
+  confirm it names the right run id, slices, and surface before accepting it.
+- **Stacking `@openhands` comments on one PR**: multiple `@openhands` triggers on the same PR
+  cancel all-but-one under the per-PR concurrency group. Post exactly one trigger per intended run.
+  Trigger placement also chooses the checkout: a **PR comment** runs against the PR branch, an
+  **issue comment** runs against `main`.
 
 ## Reference Files
 

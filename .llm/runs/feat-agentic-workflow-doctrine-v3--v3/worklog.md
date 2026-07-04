@@ -263,4 +263,52 @@ concept named in `design-v3.md` §5/§8. Ready for PLAN-EVAL (OpenHands, separat
   self-gate: grep `(?i)copilot|augment` over scrubbed files = 0; all fitness script paths exist.
 - **Drift/debt candidate**: exhaustive fitness AP-1..AP-30 → script map deferred to #307
   (interim authority = `check-doctrine.ts`). Recorded in fitness-gates.md follow-up note.
-- **Reconcile**: no related-issue state change. Commit sha recorded below.
+- **Reconcile**: no related-issue state change. Commit sha `39dde76a`.
+
+## 2026-07-04 — S8 landed (residue prune + folds + ARCHETYPE-5) — FINAL SLICE
+
+- **Author**: Opus 4.8 sub-agent (Tier B, D3 lane override), worktree `.llm/tmp/wt-harness-v3`.
+- **What** (design §8-S8, five items):
+  1. **Prune (5 deletions)** — `.llm/temp/{measure-5a-service,measure-5b-sdk,ui-init-smoke}.ts` +
+     `.llm/{2026-06-11-5c1-ui-foundation,2026-06-11-wave5b-sdk-implementation}.md` (stale scratch +
+     dated one-offs; basename grep = 0 live refs). `.llm/temp/` now EMPTY (dir removed on commit).
+     `.llm/tmp/` (live scratch) untouched.
+  2. **AGENTS-handoff.md consolidated** — rewritten from a 118-line duplicate of the handoff spec to a
+     **thin pointer** naming the two canonical homes (`openhands-handoff` SKILL = triggers/precedence/
+     output-modes/token-rule/gotchas/agentic-suite; `agent-handoff.md` = OPENHANDS_RUN_DIR/TRACE_DIR
+     output contract). Kept only the unique Actions-vs-VPS long-running split +
+     `ops/openhands/docker-compose.yml`. Copilot/Augment residue scrubbed (grep=0); stale
+     `.llm/tmp/run/openhands` path replaced with the S7 contract.
+  3. **OpenHands gotchas → `openhands-handoff` SKILL** — folded 3 rules into Common Pitfalls (eval
+     lock-churn: evaluator never mutates lock/`git checkout -- deno.lock`/diff vs TRUE base/
+     reconcile-not-revert; stale summary comment: verdict = committed `plan-eval.md`/`evaluate.md`
+     never the PR comment; per-PR concurrency-cancel: one trigger/run, PR-comment→PR-branch,
+     issue-comment→main) + folded the model-precedence 6-step list + provider→secret table.
+     `platform.md` trimmed: the 2 OpenHands sections → 1-line rule + SKILL pointer, provenance headers
+     + all non-OpenHands lessons (rtk-stale-git, gate-evidence trap, MSYS, Bash-tool, gh-PATH,
+     lock-sync, root-quality-gates) preserved.
+  4. **JSR gotchas → `jsr-audit` SKILL** — new "JSR publish gotchas (grounded)" section: import-attr
+     asset embedding (never readTextFile/fromFileUrl), top-level import.meta/fromFileUrl https crash,
+     self-referential subpath trap (cited #188), readmeSource=jsdoc default, prerelease latest=null.
+     Cross-referenced (not duplicated) the existing doc-lint full-export-surface bar. Only #188
+     carried a groundable issue number (cited); no fabricated issue numbers.
+  5. **ARCHETYPE-5 thin-plugin rewrite** — reframed the harness profile around the plugin-thinness /
+     core-centralization law (convention-bearing primitives in `@netscript/*` core; plugin = thin
+     wiring that composes + re-exports, never redefines; auth-core+adapters = reference). Two new
+     anti-patterns (fat plugin owning core's concerns; plugin re-implements a core convention) +
+     fat-plugin False-Done + rescope trigger; reframed When-Applies/Folder-Shape/Read-First/Design-
+     Checkpoint/Concept-of-Done/Historical-Notes. Structure preserved. **#305 boundary honored**: only
+     `.llm/harness/archetypes/ARCHETYPE-5-plugin.md` edited; doctrine references left intact; added a
+     "folder-shape reconciliation tracked under #305/#306" note. NO `docs/architecture/doctrine/**` edit.
+- **Supervisor review (A1 gate)**: read all 5 diffs + the consolidated AGENTS-handoff.md + full
+  ARCHETYPE-5. Thinness law threaded correctly + doctrine untouched + #305 note present; folds are
+  grounded (only #188 cited, no fabricated issues) and de-dup correctly (doc-lint cross-ref not
+  restated); platform.md provenance + non-OpenHands lessons preserved; AGENTS-handoff is a genuine
+  pointer with no contradictory duplicate. Boundary respected — no doctrine/packages/plugins/labels/
+  lock/tools-source/fitness-script deletions; the ~28 unwired fitness scripts left for #307.
+- **Gate**: `agentic:sync-claude` (2 mirrors refreshed) → `agentic:sync-claude:check` OK →
+  `agentic:check-claude` OK (surface green, lock unchanged). Author self-gate: grep copilot|augment
+  over AGENTS-handoff = 0; 5 prune basenames = 0 tree refs; no doctrine/mirror edits.
+- **Reconcile**: no related-issue state change. Commit sha recorded below. **All slices S2–S8 DONE** →
+  next = WSL Codex final adversarial validation → full-surface gates → IMPL-EVAL (OpenHands, separate
+  session).

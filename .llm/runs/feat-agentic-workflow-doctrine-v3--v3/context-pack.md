@@ -16,7 +16,9 @@ D3 lane override (all slices S2–S8 = Opus 4.8 sub-agents; Fable 5 supervises).
 - Phase: research + plan + PLAN-EVAL PASS [done] → **slices S2–S8 in flight** (design §8)
 - Slice map: **S2 lane-policy [DONE]** · **S3 run-dir move [DONE]** · **S4 drop commits.md [DONE]** ·
   **S5 GitHub-surface/#387 [DONE]** · **S6 tooling mandates+aliases [DONE]** ·
-  **S7 scrub+frontmatter+fitness-gates [DONE]** · S8 residue+ARCHETYPE-5+eval
+  **S7 scrub+frontmatter+fitness-gates [DONE]** · **S8 residue+folds+ARCHETYPE-5 [DONE]**
+- **All impl slices S2–S8 DONE.** Next: WSL Codex final adversarial validation → full-surface gates →
+  IMPL-EVAL (OpenHands, separate session). No merge/close — owner's call.
 - Drift: D1 (tracked run dirs `.llm/runs/`) · D2 (no commits.md) · D3 (Opus-sub-agent impl lane) ·
   D4 (plan-eval.md transcribed) · D5-slice-review-gate (A1 permanent lane-agnostic review gate)
 
