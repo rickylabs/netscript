@@ -305,11 +305,20 @@ function denokvContainerSetup(
   lines[lastIdx] = lines[lastIdx] + ';'
 
   lines.push(`  const ${id}_httpEndpoint = await ${id}.getEndpoint('http');`)
+  lines.push(
+    `  const ${id}_httpUrl = ${id}_httpEndpoint.property(EndpointProperty.Url);`,
+  )
   lines.push(`  caches.set('${name}', ${id});`)
   lines.push(`  cacheEndpoints.set('${name}', ${id}_httpEndpoint);`)
 
+  // DENO_KV_URL is injected explicitly (scheme-complete, via EndpointProperty.Url)
+  // so the consumer's autoDetectProvider() resolves the KV Connect URL from an env
+  // key regardless of the resource name — mirroring how the Redis/Garnet arms inject
+  // GARNET_URI/REDIS_URI. Without it, auto-detect only finds a DenoKv URL when the
+  // resource is literally named 'kv' (services__kv__http__0), silently falling back
+  // to in-process Deno.openKv() otherwise.
   const wiring =
-    `{ resource: ${id}, reference: ${id}_httpEndpoint, env: { DENO_KV_ACCESS_TOKEN: ${id}_token, CACHE_PROVIDER: 'denokv' }, local: false }`
+    `{ resource: ${id}, reference: ${id}_httpEndpoint, env: { DENO_KV_URL: ${id}_httpUrl, DENO_KV_ACCESS_TOKEN: ${id}_token, CACHE_PROVIDER: 'denokv' }, local: false }`
   return { lines, wiring }
 }
 

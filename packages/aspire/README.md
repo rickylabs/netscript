@@ -66,6 +66,48 @@ for (const warning of warnings) console.warn(warning);
 
 ---
 
+## 🗄️ Shared cache provisioning
+
+A NetScript workspace provisions **one shared cache** for KV-backed queues, session stores, and rate
+limiters. The `CacheEntry` config picks a backend with two axes — **`Engine`** (what speaks the
+protocol) and **`Mode`** (how it is hosted). The generated AppHost turns that entry into an Aspire
+resource and injects the connection env into every consumer that declares `RequiresKv`.
+
+### Engine × Mode matrix
+
+| Engine × Mode                    | Provisioned as                                                                | Wire protocol       | Injected env                                                             |
+| -------------------------------- | ----------------------------------------------------------------------------- | ------------------- | ------------------------------------------------------------------------ |
+| `Garnet` / `Redis` + `Container` | `addContainer` (Garnet `ghcr.io/microsoft/garnet`, Redis `redis:7`), tcp:6379 | Redis               | `GARNET_URI` / `REDIS_URI` (host:port), `CACHE_PROVIDER=garnet`\|`redis` |
+| `Garnet` + `Executable`          | `addExecutable('dotnet', ['tool','run','garnet-server',…])` — no Docker       | Redis               | `GARNET_URI` (host:port), `CACHE_PROVIDER=garnet`                        |
+| `DenoKv` + `Container`           | `addContainer` (`ghcr.io/denoland/denokv`), http:4512                         | Deno KV Connect     | `DENO_KV_URL`, `DENO_KV_ACCESS_TOKEN`, `CACHE_PROVIDER=denokv`           |
+| `DenoKv` + `Local`               | in-process `Deno.openKv()` — no resource                                      | Deno KV (embedded)  | _(none — in-process)_                                                    |
+| any + `External`                 | `addConnectionString` to a URL you supply                                     | as configured       | connection string                                                        |
+| `Garnet` / `DenoKv` + `Auto`     | **decided at `aspire start`** (see below)                                     | Redis or KV Connect | matches the resolved arm                                                 |
+
+### `Auto` — environment-aware selection (default)
+
+The scaffold default is `Engine: 'Garnet', Mode: 'Auto'`. `Auto` defers the hosting choice to
+**AppHost start time** so the same generated project runs on a Docker host and on Docker-less bare
+metal without regeneration:
+
+- **Docker present** → the configured container backend (`Garnet` → Garnet container, `DenoKv` →
+  Deno KV Connect container).
+- **Docker absent** → the **Garnet dotnet-tool executable** (`garnet-server`, self-provisioned into
+  `.config/dotnet-tools.json` and `dotnet tool restore`d), so bare metal needs only the .NET SDK.
+
+Because both Garnet arms speak the Redis wire protocol, KV consumers connect identically either way
+— selection is transparent to userland.
+
+Override the probe with **`NETSCRIPT_CACHE_MODE`** in the AppHost environment: `Container` forces
+the container arm, `Executable` forces the dotnet-tool arm. Unset (or any other value) uses the
+runtime `docker info` probe.
+
+The Garnet tool version is pinned (via `CacheEntry.ToolVersion`, defaulting to the CLI's
+`SCAFFOLD_VERSIONS.GARNET_TOOL`); the executable arm additionally needs the .NET SDK and, for the
+Deno KV path, the `--unstable-kv` flag on the consuming Deno process.
+
+---
+
 ## 📖 Documentation
 
 - **Reference**:

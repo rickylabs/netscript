@@ -135,6 +135,13 @@ describe('generateRegisterInfrastructure', () => {
     assertStringIncludes(output, "cacheWiring.set('deno-kv', {")
     assertStringIncludes(output, 'DENO_KV_ACCESS_TOKEN: deno_kv_token')
     assertStringIncludes(output, "CACHE_PROVIDER: 'denokv'")
+    // Explicit scheme-complete URL so auto-detect resolves KV Connect by env key,
+    // not only via the name-bound services__kv__http__0 discovery key.
+    assertStringIncludes(
+      output,
+      'deno_kv_httpEndpoint.property(EndpointProperty.Url)',
+    )
+    assertStringIncludes(output, 'DENO_KV_URL: deno_kv_httpUrl')
   })
 
   it('emits garnet Executable cache as a self-provisioned dotnet tool (Docker-less)', () => {
