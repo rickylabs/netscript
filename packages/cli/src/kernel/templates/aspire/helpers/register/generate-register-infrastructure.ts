@@ -7,9 +7,11 @@
  * resource resolution.
  */
 
+import type { CacheEntry } from '@netscript/aspire/types'
 import type { RegisterInfrastructureOptions } from '../types.ts'
 import { fileHeader, safeIdentifier } from '../_utils.ts'
 import { SCAFFOLD_ASPIRE_MODULES } from '../../../../constants/scaffold/scaffold-aspire.ts'
+import { SCAFFOLD_VERSIONS } from '../../../../constants/scaffold/scaffold-versions.ts'
 import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts'
 import { renderTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts'
 
@@ -35,6 +37,15 @@ const CACHE_CONTAINER_IMAGES: Record<
 
 /** Default Redis-compatible TCP port. */
 const CACHE_DEFAULT_PORT = 6379
+
+/** Deno KV Connect container image (shared KV over HTTP). */
+const DENOKV_CONTAINER = {
+  image: 'ghcr.io/denoland/denokv',
+  tag: '0.11.0',
+} as const
+
+/** Deno KV Connect HTTP port inside the container. */
+const DENOKV_HTTP_PORT = 4512
 
 /**
  * Generates the register-infrastructure.mts file content.
@@ -137,44 +148,87 @@ export function generateRegisterInfrastructure(
     const id = safeIdentifier(name)
     const mode = entry.Mode ?? 'Container'
 
-    if (entry.Engine === 'DenoKv') {
+    // DenoKv Local — in-process Deno.openKv(), no Aspire resource.
+    if (entry.Engine === 'DenoKv' && mode === 'Local') {
       cacheBlocks.push(
-        `  // ${name} (DenoKv, file-backed — no Aspire cache resource needed)`,
+        `  // ${name} (DenoKv, Local — in-process Deno.openKv(), no Aspire resource)\n` +
+          `  cacheWiring.set('${name}', { resource: null, reference: null, env: {}, local: true });`,
       )
       continue
     }
 
+    // External — connection-string resource; consumer wires by reference only.
     if (mode === 'External') {
       cacheBlocks.push(`  // ${name} (${entry.Engine}, External)
   const ${id} = await builder.addConnectionString('${name}');
-  caches.set('${name}', ${id});`)
+  caches.set('${name}', ${id});
+  cacheWiring.set('${name}', { resource: ${id}, reference: ${id}, env: {}, local: false });`)
       continue
     }
 
-    const image = CACHE_CONTAINER_IMAGES[entry.Engine] ??
-      CACHE_CONTAINER_IMAGES.Redis
-    const tag = entry.ImageTag ?? image.tag
-    const imageRef = `${image.image}:${tag}`
-    const lines: string[] = []
+    // Auto — environment-aware at apphost runtime (D5/D6). Docker present →
+    // the configured container backend (DenoKv Connect for DenoKv, else the
+    // Redis-compatible Garnet/Redis container). Docker absent → the Garnet
+    // dotnet-tool executable (cross-fallback for the Docker-less bare-metal
+    // host, #372). Both branches emit inline so the generated apphost decides
+    // at `aspire start` without regeneration.
+    if (mode === 'Auto') {
+      const container = entry.Engine === 'DenoKv'
+        ? denokvContainerSetup(id, name, entry)
+        : redisGarnetContainerSetup(id, name, entry)
+      const executable = garnetExecutableSetup(id, name, entry)
+      const containerLabel = entry.Engine === 'DenoKv'
+        ? 'DenoKv container'
+        : `${entry.Engine} container`
+      const lines: string[] = []
 
-    lines.push(`  // ${name} (${entry.Engine}, Container)`)
-    lines.push(
-      `  const ${id} = await builder.addContainer('${name}', '${imageRef}')`,
-    )
-    lines.push(`    .withEndpoint(${cacheEndpointOptions(entry.Port)})`)
-
-    if (entry.DataPath) {
       lines.push(
-        `    .withBindMount(resolveDataPath(appHostDir, '${entry.DataPath}', '${name}'), '/data')`,
+        `  // ${name} (${entry.Engine}, Auto — Docker → ${containerLabel}; Docker-less → Garnet executable)`,
       )
+      lines.push(`  let ${id}_wiring: CacheWiring;`)
+      lines.push(`  if (shouldUseContainerCache()) {`)
+      for (const line of container.lines) lines.push(`  ${line}`)
+      lines.push(`    ${id}_wiring = ${container.wiring};`)
+      lines.push(`  } else {`)
+      for (const line of executable.lines) lines.push(`  ${line}`)
+      lines.push(`    ${id}_wiring = ${executable.wiring};`)
+      lines.push(`  }`)
+      lines.push(`  cacheWiring.set('${name}', ${id}_wiring);`)
+      cacheBlocks.push(lines.join('\n'))
+      continue
     }
 
-    const lastIdx = lines.length - 1
-    lines[lastIdx] = lines[lastIdx] + ';'
+    // DenoKv Container — Deno KV Connect over HTTP with an access token.
+    if (entry.Engine === 'DenoKv') {
+      const setup = denokvContainerSetup(id, name, entry)
+      const lines = [
+        `  // ${name} (DenoKv, Container — Deno KV Connect)`,
+        ...setup.lines,
+        `  cacheWiring.set('${name}', ${setup.wiring});`,
+      ]
+      cacheBlocks.push(lines.join('\n'))
+      continue
+    }
 
-    lines.push(`  const ${id}_tcpEndpoint = await ${id}.getEndpoint('tcp');`)
-    lines.push(`  caches.set('${name}', ${id});`)
-    lines.push(`  cacheEndpoints.set('${name}', ${id}_tcpEndpoint);`)
+    // Garnet Executable — Docker-less self-provisioned dotnet tool (#372).
+    if (entry.Engine === 'Garnet' && mode === 'Executable') {
+      const setup = garnetExecutableSetup(id, name, entry)
+      const lines = [
+        `  // ${name} (Garnet, Executable — Docker-less dotnet tool)`,
+        ...setup.lines,
+        `  cacheWiring.set('${name}', ${setup.wiring});`,
+      ]
+      cacheBlocks.push(lines.join('\n'))
+      continue
+    }
+
+    // Redis / Garnet Container — Redis-compatible TCP endpoint.
+    const setup = redisGarnetContainerSetup(id, name, entry)
+    const lines = [
+      `  // ${name} (${entry.Engine}, Container)`,
+      ...setup.lines,
+      `  cacheWiring.set('${name}', ${setup.wiring});`,
+    ]
     cacheBlocks.push(lines.join('\n'))
   }
 
@@ -188,6 +242,9 @@ export function generateRegisterInfrastructure(
   const primaryCacheEndpointLine = primaryCache
     ? `  const primaryCacheEndpoint = cacheEndpoints.get('${primaryCache}') ?? null;`
     : `  const primaryCacheEndpoint = null;`
+  const primaryCacheWiringLine = primaryCache
+    ? `  const primaryCacheWiring = cacheWiring.get('${primaryCache}') ?? null;`
+    : `  const primaryCacheWiring = null;`
 
   return renderTemplateAssetSync(
     TEMPLATE_KEYS.generatedAspireHelpersGenerateRegisterInfrastructure1,
@@ -210,8 +267,134 @@ export function generateRegisterInfrastructure(
       __slot7__: String(primaryDbLine),
       __slot8__: String(primaryCacheLine),
       __slot9__: String(primaryCacheEndpointLine),
+      __slot10__: String(primaryCacheWiringLine),
     },
   )
+}
+
+/**
+ * Emits the DenoKv Connect container setup lines (shared by the Container arm
+ * and the Docker branch of the Auto arm). Returns the setup lines plus the
+ * `CacheWiring` object-literal expression so callers control where it is stored
+ * (direct `cacheWiring.set` vs. an Auto `let`-binding).
+ */
+function denokvContainerSetup(
+  id: string,
+  name: string,
+  entry: CacheEntry,
+): { lines: string[]; wiring: string } {
+  const tag = entry.ImageTag ?? DENOKV_CONTAINER.tag
+  const imageRef = `${DENOKV_CONTAINER.image}:${tag}`
+  const lines: string[] = []
+
+  lines.push(`  const ${id}_token = generateAccessToken();`)
+  lines.push(`  const ${id} = await builder.addContainer('${name}', '${imageRef}')`)
+  lines.push(
+    `    .withEndpoint({ name: 'http', targetPort: ${DENOKV_HTTP_PORT}, scheme: 'http' })`,
+  )
+  lines.push(`    .withContainerRuntimeArgs(['--init'])`)
+  lines.push(`    .withArgs(['--sqlite-path', '/data/denokv.sqlite', 'serve'])`)
+  lines.push(`    .withEnvironment('DENO_KV_ACCESS_TOKEN', ${id}_token)`)
+  if (entry.DataPath) {
+    lines.push(
+      `    .withBindMount(resolveDataPath(appHostDir, '${entry.DataPath}', '${name}'), '/data')`,
+    )
+  }
+
+  const lastIdx = lines.length - 1
+  lines[lastIdx] = lines[lastIdx] + ';'
+
+  lines.push(`  const ${id}_httpEndpoint = await ${id}.getEndpoint('http');`)
+  lines.push(
+    `  const ${id}_httpUrl = ${id}_httpEndpoint.property(EndpointProperty.Url);`,
+  )
+  lines.push(`  caches.set('${name}', ${id});`)
+  lines.push(`  cacheEndpoints.set('${name}', ${id}_httpEndpoint);`)
+
+  // DENO_KV_URL is injected explicitly (scheme-complete, via EndpointProperty.Url)
+  // so the consumer's autoDetectProvider() resolves the KV Connect URL from an env
+  // key regardless of the resource name — mirroring how the Redis/Garnet arms inject
+  // GARNET_URI/REDIS_URI. Without it, auto-detect only finds a DenoKv URL when the
+  // resource is literally named 'kv' (services__kv__http__0), silently falling back
+  // to in-process Deno.openKv() otherwise.
+  const wiring =
+    `{ resource: ${id}, reference: ${id}_httpEndpoint, env: { DENO_KV_URL: ${id}_httpUrl, DENO_KV_ACCESS_TOKEN: ${id}_token, CACHE_PROVIDER: 'denokv' }, local: false }`
+  return { lines, wiring }
+}
+
+/**
+ * Emits the Garnet executable setup lines (shared by the Executable arm and the
+ * Docker-less branch of the Auto arm). Runs `garnet-server` as a self-provisioned
+ * dotnet tool (no Docker) over a Redis-compatible TCP endpoint (#372). The tool
+ * version pins from `CacheEntry.ToolVersion`, falling back to the scaffold pin.
+ */
+function garnetExecutableSetup(
+  id: string,
+  name: string,
+  entry: CacheEntry,
+): { lines: string[]; wiring: string } {
+  const version = entry.ToolVersion ?? SCAFFOLD_VERSIONS.GARNET_TOOL
+  const lines: string[] = []
+
+  lines.push(
+    `  const ${id}_workdir = ensureGarnetToolManifest(appHostDir, '${version}');`,
+  )
+  lines.push(
+    `  const ${id} = await builder.addExecutable('${name}', 'dotnet', ${id}_workdir, ['tool', 'run', 'garnet-server', '--port', '${CACHE_DEFAULT_PORT}'])`,
+  )
+  lines.push(
+    `    .withEndpoint({ name: 'tcp', targetPort: ${CACHE_DEFAULT_PORT}, scheme: 'tcp' });`,
+  )
+  lines.push(`  const ${id}_tcpEndpoint = await ${id}.getEndpoint('tcp');`)
+  lines.push(
+    `  const ${id}_hostPort = ${id}_tcpEndpoint.property(EndpointProperty.HostAndPort);`,
+  )
+  lines.push(`  caches.set('${name}', ${id});`)
+  lines.push(`  cacheEndpoints.set('${name}', ${id}_tcpEndpoint);`)
+
+  const wiring =
+    `{ resource: ${id}, reference: ${id}_tcpEndpoint, env: { GARNET_URI: ${id}_hostPort, REDIS_URI: ${id}_hostPort, CACHE_PROVIDER: 'garnet' }, local: false }`
+  return { lines, wiring }
+}
+
+/**
+ * Emits the Redis-compatible container setup lines for Redis/Garnet (shared by
+ * the Container arm and the Docker branch of a Redis/Garnet Auto arm). Wires a
+ * `GARNET_URI`/`REDIS_URI` host:port pair plus the provider tag.
+ */
+function redisGarnetContainerSetup(
+  id: string,
+  name: string,
+  entry: CacheEntry,
+): { lines: string[]; wiring: string } {
+  const image = CACHE_CONTAINER_IMAGES[entry.Engine] ??
+    CACHE_CONTAINER_IMAGES.Redis
+  const tag = entry.ImageTag ?? image.tag
+  const imageRef = `${image.image}:${tag}`
+  const provider = entry.Engine === 'Garnet' ? 'garnet' : 'redis'
+  const lines: string[] = []
+
+  lines.push(`  const ${id} = await builder.addContainer('${name}', '${imageRef}')`)
+  lines.push(`    .withEndpoint(${cacheEndpointOptions(entry.Port)})`)
+  if (entry.DataPath) {
+    lines.push(
+      `    .withBindMount(resolveDataPath(appHostDir, '${entry.DataPath}', '${name}'), '/data')`,
+    )
+  }
+
+  const lastIdx = lines.length - 1
+  lines[lastIdx] = lines[lastIdx] + ';'
+
+  lines.push(`  const ${id}_tcpEndpoint = await ${id}.getEndpoint('tcp');`)
+  lines.push(
+    `  const ${id}_hostPort = ${id}_tcpEndpoint.property(EndpointProperty.HostAndPort);`,
+  )
+  lines.push(`  caches.set('${name}', ${id});`)
+  lines.push(`  cacheEndpoints.set('${name}', ${id}_tcpEndpoint);`)
+
+  const wiring =
+    `{ resource: ${id}, reference: ${id}_tcpEndpoint, env: { GARNET_URI: ${id}_hostPort, REDIS_URI: ${id}_hostPort, CACHE_PROVIDER: '${provider}' }, local: false }`
+  return { lines, wiring }
 }
 
 function cacheEndpointOptions(port: number | undefined): string {

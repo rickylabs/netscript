@@ -68,28 +68,198 @@ describe('generateRegisterInfrastructure', () => {
       output,
       "const primaryCacheEndpoint = cacheEndpoints.get('garnet') ?? null;",
     )
+    // Garnet container builds Redis-compatible wiring (host:port + provider tag)
+    // consumed once via withCacheReference.
+    assertStringIncludes(
+      output,
+      'garnet_hostPort = garnet_tcpEndpoint.property(EndpointProperty.HostAndPort)',
+    )
+    assertStringIncludes(output, "cacheWiring.set('garnet', {")
+    assertStringIncludes(output, 'GARNET_URI: garnet_hostPort')
+    assertStringIncludes(output, 'REDIS_URI: garnet_hostPort')
+    assertStringIncludes(output, "CACHE_PROVIDER: 'garnet'")
+    assertStringIncludes(
+      output,
+      "const primaryCacheWiring = cacheWiring.get('garnet') ?? null;",
+    )
   })
 
-  it('emits deno-kv cache as file-backed infrastructure debt without container wiring', () => {
+  it('emits deno-kv Local cache as in-process wiring without an Aspire resource', () => {
     const output = generateRegisterInfrastructure({
       databases: {},
       caches: {
         'deno-kv': {
           Enabled: true,
           Engine: 'DenoKv',
-          Mode: 'External',
+          Mode: 'Local',
           DataPath: 'data/kv',
         },
       },
       primaryCache: 'deno-kv',
     })
 
-    assertStringIncludes(
-      output,
-      'deno-kv (DenoKv, file-backed — no Aspire cache resource needed)',
-    )
+    // Local mode: no container, no endpoint — consumers use in-process Deno.openKv().
     assert(!output.includes(`builder.addContainer('deno-kv'`))
     assert(!output.includes(`cacheEndpoints.set('deno-kv'`))
+    assertStringIncludes(
+      output,
+      "cacheWiring.set('deno-kv', { resource: null, reference: null, env: {}, local: true });",
+    )
+  })
+
+  it('emits deno-kv Container cache as a Deno KV Connect container with an access token', () => {
+    const output = generateRegisterInfrastructure({
+      databases: {},
+      caches: {
+        'deno-kv': {
+          Enabled: true,
+          Engine: 'DenoKv',
+          Mode: 'Container',
+          DataPath: 'data/kv',
+        },
+      },
+      primaryCache: 'deno-kv',
+    })
+
+    assertStringIncludes(output, 'deno_kv_token = generateAccessToken();')
+    assertStringIncludes(
+      output,
+      "builder.addContainer('deno-kv', 'ghcr.io/denoland/denokv:0.11.0')",
+    )
+    assertStringIncludes(
+      output,
+      "withEndpoint({ name: 'http', targetPort: 4512, scheme: 'http' })",
+    )
+    assertStringIncludes(output, "withArgs(['--sqlite-path', '/data/denokv.sqlite', 'serve'])")
+    assertStringIncludes(output, "withEnvironment('DENO_KV_ACCESS_TOKEN', deno_kv_token)")
+    assertStringIncludes(output, "cacheWiring.set('deno-kv', {")
+    assertStringIncludes(output, 'DENO_KV_ACCESS_TOKEN: deno_kv_token')
+    assertStringIncludes(output, "CACHE_PROVIDER: 'denokv'")
+    // Explicit scheme-complete URL so auto-detect resolves KV Connect by env key,
+    // not only via the name-bound services__kv__http__0 discovery key.
+    assertStringIncludes(
+      output,
+      'deno_kv_httpEndpoint.property(EndpointProperty.Url)',
+    )
+    assertStringIncludes(output, 'DENO_KV_URL: deno_kv_httpUrl')
+  })
+
+  it('emits garnet Executable cache as a self-provisioned dotnet tool (Docker-less)', () => {
+    const output = generateRegisterInfrastructure({
+      databases: {},
+      caches: {
+        garnet: {
+          Enabled: true,
+          Engine: 'Garnet',
+          Mode: 'Executable',
+        },
+      },
+      primaryCache: 'garnet',
+    })
+
+    // No container in the executable arm — bare-metal dotnet tool.
+    assert(!output.includes("builder.addContainer('garnet'"))
+    // Self-provisions the garnet-server tool manifest, then runs it via dotnet.
+    assertStringIncludes(
+      output,
+      "garnet_workdir = ensureGarnetToolManifest(appHostDir, '1.1.10');",
+    )
+    assertStringIncludes(
+      output,
+      "builder.addExecutable('garnet', 'dotnet', garnet_workdir, ['tool', 'run', 'garnet-server', '--port', '6379'])",
+    )
+    assertStringIncludes(
+      output,
+      "withEndpoint({ name: 'tcp', targetPort: 6379, scheme: 'tcp' })",
+    )
+    assertStringIncludes(
+      output,
+      'garnet_hostPort = garnet_tcpEndpoint.property(EndpointProperty.HostAndPort)',
+    )
+    assertStringIncludes(output, "cacheWiring.set('garnet', {")
+    assertStringIncludes(output, 'GARNET_URI: garnet_hostPort')
+    assertStringIncludes(output, "CACHE_PROVIDER: 'garnet'")
+  })
+
+  it('honors an explicit ToolVersion pin for the garnet Executable arm', () => {
+    const output = generateRegisterInfrastructure({
+      databases: {},
+      caches: {
+        garnet: {
+          Enabled: true,
+          Engine: 'Garnet',
+          Mode: 'Executable',
+          ToolVersion: '1.0.61',
+        },
+      },
+      primaryCache: 'garnet',
+    })
+
+    assertStringIncludes(
+      output,
+      "ensureGarnetToolManifest(appHostDir, '1.0.61');",
+    )
+  })
+
+  it('emits garnet Auto as a runtime Docker probe: Garnet container vs Garnet executable', () => {
+    const output = generateRegisterInfrastructure({
+      databases: {},
+      caches: {
+        garnet: {
+          Enabled: true,
+          Engine: 'Garnet',
+          Mode: 'Auto',
+        },
+      },
+      primaryCache: 'garnet',
+    })
+
+    // Runtime branch on the container-runtime probe, resolved at apphost start.
+    assertStringIncludes(output, 'let garnet_wiring: CacheWiring;')
+    assertStringIncludes(output, 'if (shouldUseContainerCache()) {')
+    // Docker present → Redis-compatible Garnet container (default engine kept).
+    assertStringIncludes(
+      output,
+      "builder.addContainer('garnet', 'ghcr.io/microsoft/garnet:1.1.1')",
+    )
+    // Docker absent → self-provisioned Garnet dotnet-tool executable.
+    assertStringIncludes(
+      output,
+      "builder.addExecutable('garnet', 'dotnet', garnet_workdir, ['tool', 'run', 'garnet-server', '--port', '6379'])",
+    )
+    assertStringIncludes(output, 'ensureGarnetToolManifest(appHostDir')
+    assertStringIncludes(output, "cacheWiring.set('garnet', garnet_wiring);")
+    // Both branches speak Redis, so consumer wiring is provider-stable.
+    assertStringIncludes(output, "CACHE_PROVIDER: 'garnet'")
+  })
+
+  it('emits deno-kv Auto with the DenoKv Connect container as the Docker branch', () => {
+    const output = generateRegisterInfrastructure({
+      databases: {},
+      caches: {
+        'deno-kv': {
+          Enabled: true,
+          Engine: 'DenoKv',
+          Mode: 'Auto',
+        },
+      },
+      primaryCache: 'deno-kv',
+    })
+
+    assertStringIncludes(output, 'let deno_kv_wiring: CacheWiring;')
+    assertStringIncludes(output, 'if (shouldUseContainerCache()) {')
+    // Docker present → DenoKv Connect container (engine-aware container branch).
+    assertStringIncludes(
+      output,
+      "builder.addContainer('deno-kv', 'ghcr.io/denoland/denokv:0.11.0')",
+    )
+    assertStringIncludes(output, 'deno_kv_token = generateAccessToken();')
+    // Docker absent → Garnet executable cross-fallback (D6).
+    assertStringIncludes(
+      output,
+      "builder.addExecutable('deno-kv', 'dotnet', deno_kv_workdir,",
+    )
+    assertStringIncludes(output, "cacheWiring.set('deno-kv', deno_kv_wiring);")
   })
 
   it('skips sqlite Aspire resource registration entirely', () => {

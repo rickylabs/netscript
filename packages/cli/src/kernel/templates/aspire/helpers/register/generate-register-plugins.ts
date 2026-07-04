@@ -142,23 +142,11 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
       lines.push(`    }`);
     }
 
-    // KV cache dependency
+    // KV cache dependency — single seam over the primary shared cache.
     if (entry.RequiresKv) {
       lines.push(``);
       lines.push(`    // KV cache dependency`);
-      lines.push(`    if (infrastructure.primaryCache) {`);
-      lines.push(`      if (infrastructure.primaryCacheEndpoint) {`);
-      lines.push(`        await resource.withReference(infrastructure.primaryCacheEndpoint);`);
-      lines.push(
-        `        const cacheEndpoint = infrastructure.primaryCacheEndpoint.property(EndpointProperty.HostAndPort);`,
-      );
-      lines.push(`        await resource.withEnvironment('GARNET_URI', cacheEndpoint);`);
-      lines.push(`        await resource.withEnvironment('REDIS_URI', cacheEndpoint);`);
-      lines.push(`      } else {`);
-      lines.push(`        await resource.withReference(infrastructure.primaryCache);`);
-      lines.push(`      }`);
-      lines.push(`      await resource.waitFor(infrastructure.primaryCache);`);
-      lines.push(`    }`);
+      lines.push(`    await withCacheReference(resource, infrastructure.primaryCacheWiring);`);
     }
 
     // Service references — wired via endpoint env vars in Pass 1 (services already exist)

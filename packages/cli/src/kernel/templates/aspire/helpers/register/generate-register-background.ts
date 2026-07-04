@@ -156,19 +156,7 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
     if (entry.RequiresKv) {
       lines.push(``);
       lines.push(`    // KV cache dependency`);
-      lines.push(`    if (infrastructure.primaryCache) {`);
-      lines.push(`      if (infrastructure.primaryCacheEndpoint) {`);
-      lines.push(`        await ${id}.withReference(infrastructure.primaryCacheEndpoint);`);
-      lines.push(
-        `        const ${id}_cacheEndpoint = infrastructure.primaryCacheEndpoint.property(EndpointProperty.HostAndPort);`,
-      );
-      lines.push(`        await ${id}.withEnvironment('GARNET_URI', ${id}_cacheEndpoint);`);
-      lines.push(`        await ${id}.withEnvironment('REDIS_URI', ${id}_cacheEndpoint);`);
-      lines.push(`      } else {`);
-      lines.push(`        await ${id}.withReference(infrastructure.primaryCache);`);
-      lines.push(`      }`);
-      lines.push(`      await ${id}.waitFor(infrastructure.primaryCache);`);
-      lines.push(`    }`);
+      lines.push(`    await withCacheReference(${id}, infrastructure.primaryCacheWiring);`);
     }
 
     // Service references — wired via endpoint env vars (executable→executable)

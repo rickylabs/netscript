@@ -3,7 +3,9 @@
 // Remove when Aspire 13.3 adds Deno runtime support (aspire#15812).
 
 import { join, resolve } from "node:path";
-import { readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import process from "node:process";
 
 // ============================================================================
 // Types
@@ -228,6 +230,152 @@ export function extractDependencies(
     requiresDb: entry.RequiresDb ?? false,
     requiresKv: entry.RequiresKv ?? false,
   };
+}
+
+// ============================================================================
+// Cache wiring (shared-cache consumer injection seam)
+// ============================================================================
+
+/**
+ * Describes how a consumer resource attaches to the primary shared cache.
+ * Built once in register-infrastructure and reused by every consumer so a
+ * future apphost-compose weave layers over one call site.
+ */
+export interface CacheWiring {
+  /** Cache resource to await readiness on (null for Local/in-process). */
+  readonly resource: any;
+  /** Passed to withReference — an endpoint reference or the resource (null for Local). */
+  readonly reference: any;
+  /** Explicit env pairs consumers receive (access token, provider, host:port refs). */
+  readonly env: Record<string, any>;
+  /** Local mode (DenoKv in-process): consumers inject nothing. */
+  readonly local: boolean;
+}
+
+/**
+ * Generates a crypto-random base64 access token for the DenoKv Connect
+ * container (15 random bytes → base64), matching the historical AddDenoKv port.
+ */
+export function generateAccessToken(): string {
+  const bytes = new Uint8Array(15);
+  crypto.getRandomValues(bytes);
+  let binary = '';
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+/**
+ * Probes whether a live container runtime is reachable (Docker/Podman daemon
+ * up), used by the `Auto` cache arm to pick the container backend. Runs
+ * `docker info` with a short timeout; any failure (missing binary, daemon down)
+ * reports unavailable so the apphost falls back to the Docker-less Garnet
+ * executable. IO stays in the runtime edge (A7/A11).
+ */
+export function isDockerAvailable(): boolean {
+  try {
+    execFileSync("docker", ["info"], { stdio: "ignore", timeout: 3000 });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Resolves the environment-aware cache backend for the `Auto` mode: honors the
+ * explicit `NETSCRIPT_CACHE_MODE` escape hatch (`Container` | `Executable`),
+ * otherwise probes the container runtime. Returns true for the container
+ * (DenoKv Connect) backend, false for the Docker-less Garnet executable.
+ */
+export function shouldUseContainerCache(): boolean {
+  const override = process.env.NETSCRIPT_CACHE_MODE;
+  if (override === "Container") return true;
+  if (override === "Executable") return false;
+  return isDockerAvailable();
+}
+
+/**
+ * Ensures the apphost carries a local `garnet-server` dotnet tool manifest and
+ * that the tool is restored, then returns the working directory to run it from.
+ *
+ * This backs the Docker-less Garnet executable arm (#372): the generated
+ * apphost runs `dotnet tool run garnet-server` as an Aspire executable resource,
+ * which requires a `.config/dotnet-tools.json` manifest listing the pinned tool.
+ * The manifest is created (or merged) idempotently and `dotnet tool restore` is
+ * invoked best-effort so a fresh clone self-provisions Garnet with no Docker.
+ *
+ * IO lives here (runtime edge), never in the generator (A7/A11).
+ */
+export function ensureGarnetToolManifest(
+  appHostDir: string,
+  version: string,
+): string {
+  const configDir = join(appHostDir, ".config");
+  const manifestPath = join(configDir, "dotnet-tools.json");
+
+  let manifest: {
+    version: number;
+    isRoot: boolean;
+    tools: Record<string, { version: string; commands: string[] }>;
+  };
+  if (existsSync(manifestPath)) {
+    try {
+      manifest = JSON.parse(readFileSync(manifestPath, "utf-8"));
+      if (!manifest.tools) manifest.tools = {};
+    } catch {
+      manifest = { version: 1, isRoot: true, tools: {} };
+    }
+  } else {
+    manifest = { version: 1, isRoot: true, tools: {} };
+  }
+
+  if (!manifest.tools["garnet-server"]) {
+    manifest.tools["garnet-server"] = {
+      version,
+      commands: ["garnet-server"],
+    };
+    mkdirSync(configDir, { recursive: true });
+    writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + "\n", "utf-8");
+  }
+
+  // Best-effort restore so `dotnet tool run` resolves offline after first run.
+  try {
+    execFileSync("dotnet", ["tool", "restore"], {
+      cwd: appHostDir,
+      stdio: "ignore",
+    });
+  } catch {
+    // Restore failures surface when the executable resource starts; the
+    // apphost log makes the missing tool actionable rather than silent.
+  }
+
+  return appHostDir;
+}
+
+/**
+ * Wires a shared-cache dependency into a consumer builder through a single
+ * seam: withReference (endpoint or resource), explicit env vars, then waitFor.
+ * Local mode (DenoKv in-process) is a no-op.
+ */
+export async function withCacheReference<T>(
+  builder: T,
+  wiring: CacheWiring | undefined | null,
+): Promise<T> {
+  if (!wiring || wiring.local) {
+    return builder;
+  }
+  const target = builder as any;
+  if (wiring.reference) {
+    await target.withReference(wiring.reference);
+  }
+  for (const key of Object.keys(wiring.env)) {
+    await target.withEnvironment(key, wiring.env[key]);
+  }
+  if (wiring.resource) {
+    await target.waitFor(wiring.resource);
+  }
+  return builder;
 }
 
 // ============================================================================

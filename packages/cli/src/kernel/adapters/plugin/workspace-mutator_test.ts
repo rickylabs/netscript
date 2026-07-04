@@ -334,7 +334,7 @@ Deno.test('PluginWorkspaceMutator provisions shared Garnet cache when missing', 
   assertEquals(config.NetScript.Cache.garnet, {
     Enabled: true,
     Engine: 'Garnet',
-    Mode: 'Container',
+    Mode: 'Auto',
   });
 });
 

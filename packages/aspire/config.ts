@@ -60,6 +60,15 @@ export type DatabaseEngine = 'Postgres' | 'Mssql' | 'Mysql' | 'Sqlite';
 export type CacheEngine = 'Redis' | 'Garnet' | 'DenoKv';
 /** Resource provisioning mode for managed resources. */
 export type ResourceMode = 'Container' | 'External';
+/**
+ * Cache-specific provisioning mode. Wider than {@link ResourceMode}:
+ * - `Local`: no Aspire resource; consumers use in-process `Deno.openKv()` (DenoKv only).
+ * - `Container`: managed container resource.
+ * - `Executable`: managed dotnet-tool executable (Garnet only, Docker-less bare metal).
+ * - `External`: pre-existing resource referenced by connection string.
+ * - `Auto`: backend selected at AppHost runtime by Docker availability.
+ */
+export type CacheMode = 'Local' | 'Container' | 'Executable' | 'External' | 'Auto';
 /** Application entry variants supported by the AppHost config. */
 export type AppType = 'app' | 'tauri' | 'task';
 
@@ -215,14 +224,16 @@ export interface DatabaseEntry extends BaseEntry {
 export interface CacheEntry extends BaseEntry {
   /** Cache engine. */
   Engine: CacheEngine;
-  /** Resource provisioning mode. */
-  Mode: ResourceMode;
+  /** Cache provisioning mode (wider than database {@link ResourceMode}). */
+  Mode: CacheMode;
   /** Optional container image tag. */
   ImageTag?: string;
   /** TCP port exposed by the cache. */
   Port?: number;
   /** Persistent data path. */
   DataPath?: string;
+  /** dotnet-tool version pin for `Executable` mode (e.g. `garnet-server`). */
+  ToolVersion?: string;
 }
 
 /** Development tool entry. */
@@ -306,6 +317,15 @@ const ResourceModeZod = z.enum(['Container', 'External']).meta({
 });
 /** Resource provisioning mode schema. */
 export const ResourceModeSchema: AspireSchema<ResourceMode> = ResourceModeZod;
+
+/** Cache-specific provisioning mode. */
+const CacheModeZod = z.enum(['Local', 'Container', 'Executable', 'External', 'Auto']).meta({
+  title: 'CacheMode',
+  description:
+    'Cache provisioning mode: Local (in-process), Container, Executable (dotnet-tool), External, or Auto (runtime Docker probe)',
+});
+/** Cache provisioning mode schema. */
+export const CacheModeSchema: AspireSchema<CacheMode> = CacheModeZod;
 
 /** Application type variants for the Apps section. */
 const AppTypeZod = z.enum(['app', 'tauri', 'task']).meta({
@@ -463,10 +483,11 @@ export const DatabaseEntrySchema: AspireSchema<DatabaseEntry> = DatabaseEntryZod
 const CacheEntryZod = z.object({
   ...BaseEntryFields,
   Engine: CacheEngineZod.default('Garnet'),
-  Mode: ResourceModeZod.default('Container'),
+  Mode: CacheModeZod.default('Container'),
   ImageTag: z.string().optional(),
   Port: z.number().int().positive().optional(),
   DataPath: z.string().optional(),
+  ToolVersion: z.string().optional(),
 }).meta({ title: 'CacheEntry', description: 'Configuration for a cache resource' });
 /** Cache entry schema. */
 export const CacheEntrySchema: AspireSchema<CacheEntry> = CacheEntryZod;
@@ -591,12 +612,35 @@ function resolveDefaults<T extends NetScriptConfig>(config: T): T {
  * @param config - The parsed and defaults-resolved configuration
  * @returns Array of validation issues (empty if valid)
  */
+/**
+ * Valid cache provisioning modes per engine. `Auto` resolves at AppHost runtime
+ * (Docker probe): Redis/Garnet → Container else Executable/error; DenoKv →
+ * Container else Garnet Executable cross-fallback.
+ */
+const CACHE_ENGINE_MODE_MATRIX: Record<CacheEngine, readonly CacheMode[]> = {
+  Redis: ['Container', 'External', 'Auto'],
+  Garnet: ['Container', 'Executable', 'External', 'Auto'],
+  DenoKv: ['Local', 'Container', 'Auto'],
+};
+
 function validateCrossReferences(config: NetScriptConfig): string[] {
   const issues: string[] = [];
   const serviceNames = new Set(Object.keys(config.Services));
   const pluginNames = new Set(Object.keys(config.Plugins));
   const dbNames = new Set(Object.keys(config.Databases));
   const cacheNames = new Set(Object.keys(config.Cache));
+
+  // Cache engine×mode validity matrix
+  for (const [name, entry] of Object.entries(config.Cache)) {
+    const validModes = CACHE_ENGINE_MODE_MATRIX[entry.Engine];
+    if (validModes && !validModes.includes(entry.Mode)) {
+      issues.push(
+        `Cache."${name}": Mode "${entry.Mode}" is not valid for Engine "${entry.Engine}" (valid: ${
+          validModes.join(', ')
+        })`,
+      );
+    }
+  }
 
   // Primary references
   if (config.PrimaryDatabase && !dbNames.has(config.PrimaryDatabase)) {

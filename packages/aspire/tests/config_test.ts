@@ -1,6 +1,8 @@
 import { assertEquals, assertExists, assertRejects } from '@std/assert';
 import {
   AppSettingsSchema,
+  CacheEntrySchema,
+  CacheModeSchema,
   NetScriptConfigSchema,
   parseAppSettings,
   ServiceEntrySchema,
@@ -124,7 +126,7 @@ Deno.test('config', async (t) => {
         Cache: {
           'deno-kv': {
             Engine: 'DenoKv',
-            Mode: 'External',
+            Mode: 'Local',
             DataPath: 'data/kv',
           },
         },
@@ -133,6 +135,60 @@ Deno.test('config', async (t) => {
 
     assertEquals(result.NetScript.PrimaryCache, 'deno-kv');
     assertEquals(result.NetScript.Cache['deno-kv']?.Engine, 'DenoKv');
+    assertEquals(result.NetScript.Cache['deno-kv']?.Mode, 'Local');
+  });
+
+  await t.step('CacheModeSchema: accepts all five modes', () => {
+    for (const mode of ['Local', 'Container', 'Executable', 'External', 'Auto']) {
+      assertEquals(CacheModeSchema.safeParse(mode).success, true);
+    }
+  });
+
+  await t.step('CacheModeSchema: rejects unknown mode', () => {
+    assertEquals(CacheModeSchema.safeParse('Managed').success, false);
+  });
+
+  await t.step('CacheEntrySchema: accepts Executable mode with ToolVersion', () => {
+    const result = CacheEntrySchema.parse({
+      Engine: 'Garnet',
+      Mode: 'Executable',
+      ToolVersion: '1.1.10',
+    });
+    assertEquals(result.Engine, 'Garnet');
+    assertEquals(result.Mode, 'Executable');
+    assertEquals(result.ToolVersion, '1.1.10');
+  });
+
+  await t.step('CacheEntrySchema: defaults Engine=Garnet, Mode=Container', () => {
+    const result = CacheEntrySchema.parse({});
+    assertEquals(result.Engine, 'Garnet');
+    assertEquals(result.Mode, 'Container');
+  });
+
+  await t.step('parseAppSettings: warns on invalid engine×mode combos', async () => {
+    // Redis has no Executable mode; DenoKv has no External mode.
+    const warnings = await cacheMatrixWarnings({
+      'bad-redis': { Engine: 'Redis', Mode: 'Executable' },
+      'bad-kv': { Engine: 'DenoKv', Mode: 'External' },
+    });
+    assertEquals(
+      warnings.some((w) => w.includes('bad-redis') && w.includes('Executable')),
+      true,
+    );
+    assertEquals(
+      warnings.some((w) => w.includes('bad-kv') && w.includes('External')),
+      true,
+    );
+  });
+
+  await t.step('parseAppSettings: no matrix warning for valid combos', async () => {
+    const warnings = await cacheMatrixWarnings({
+      'redis': { Engine: 'Redis', Mode: 'Container' },
+      'garnet': { Engine: 'Garnet', Mode: 'Executable' },
+      'kv': { Engine: 'DenoKv', Mode: 'Local' },
+      'auto': { Engine: 'Garnet', Mode: 'Auto' },
+    });
+    assertEquals(warnings.filter((w) => w.includes('is not valid for Engine')).length, 0);
   });
 
   await t.step('parseAppSettings: parses tools', async () => {
@@ -259,3 +315,20 @@ Deno.test('config', async (t) => {
     }
   });
 });
+
+/** Parses a temp appsettings with the given Cache section and returns warnings. */
+async function cacheMatrixWarnings(
+  cache: Record<string, { Engine: string; Mode: string }>,
+): Promise<readonly string[]> {
+  const tmpPath = await Deno.makeTempFile({ suffix: '.json' });
+  await Deno.writeTextFile(
+    tmpPath,
+    JSON.stringify({ NetScript: { Name: 'matrix-test', Cache: cache } }),
+  );
+  try {
+    const { warnings } = await parseAppSettings(tmpPath);
+    return warnings;
+  } finally {
+    await Deno.remove(tmpPath);
+  }
+}

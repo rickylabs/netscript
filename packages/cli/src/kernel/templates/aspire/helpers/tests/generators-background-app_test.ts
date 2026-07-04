@@ -146,18 +146,14 @@ describe('generateRegisterBackground', () => {
       processors: { triggers: kvProcessor },
     });
     assertStringIncludes(output, '// KV cache dependency');
-    assertStringIncludes(output, 'infrastructure.primaryCacheEndpoint');
-    assertStringIncludes(output, 'withReference(infrastructure.primaryCacheEndpoint)');
+    // Single seam over the pre-built primary-cache wiring.
     assertStringIncludes(
       output,
-      "import { EndpointProperty, OtlpProtocol } from '../.aspire/modules/aspire.mjs'",
+      'await withCacheReference(triggers, infrastructure.primaryCacheWiring)',
     );
-    assertStringIncludes(
-      output,
-      'infrastructure.primaryCacheEndpoint.property(EndpointProperty.HostAndPort)',
-    );
-    assertStringIncludes(output, "withEnvironment('GARNET_URI', triggers_cacheEndpoint)");
-    assertStringIncludes(output, "withEnvironment('REDIS_URI', triggers_cacheEndpoint)");
+    assertStringIncludes(output, 'withCacheReference,');
+    // EndpointProperty no longer imported — endpoint resolution moved to wiring.
+    assertStringIncludes(output, "import { OtlpProtocol } from '../.aspire/modules/aspire.mjs'");
   });
 
   it('should pass saga store backend appsettings to background env', () => {

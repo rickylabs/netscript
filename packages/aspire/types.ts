@@ -24,6 +24,7 @@ import type {
   BackgroundProcessorEntry as BackgroundProcessorEntryConfig,
   CacheEngine as CacheEngineConfig,
   CacheEntry as CacheEntryConfig,
+  CacheMode as CacheModeConfig,
   DatabaseEngine as DatabaseEngineConfig,
   DatabaseEntry as DatabaseEntryConfig,
   DenoDefaults as DenoDefaultsConfig,
@@ -80,6 +81,9 @@ export type CacheEngine = CacheEngineConfig;
 
 /** Resource provisioning mode. */
 export type ResourceMode = ResourceModeConfig;
+
+/** Cache-specific provisioning mode. */
+export type CacheMode = CacheModeConfig;
 
 /** Application type variant. */
 export type AppType = AppTypeConfig;

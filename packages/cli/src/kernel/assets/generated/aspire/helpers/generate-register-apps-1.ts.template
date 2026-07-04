@@ -11,6 +11,7 @@ import {
   extractPluginReferences,
   extractServiceReferences,
   resolveWorkspacePath,
+  withCacheReference,
 } from '{{__slot3__}}';
 
 interface EndpointProvider {
