@@ -120,3 +120,36 @@ belt-and-braces alongside explicit env).
 ## Evidence
 
 (appended per slice)
+
+### Implementation status (2026-07-04)
+
+- **S1** (97db8bf9) DONE — CacheMode union + engine×mode matrix validation + schema exports.
+- **S2** (48d08fd0) DONE — DenoKv Connect container arm + `withCacheReference` seam + consumer swaps.
+- **S3** (PR-A) docs DONE — engine×mode matrix + env contract + Auto/NETSCRIPT_CACHE_MODE section
+  added to `packages/aspire/README.md`. (Local-mode arm itself shipped in S2.)
+- **S4** (ce244d60) DONE — Garnet executable arm via D2 fallback (`ensureGarnetToolManifest` +
+  `addExecutable('dotnet',['tool','run','garnet-server',…])`), tcp:6379, `GARNET_URI`/`REDIS_URI` +
+  `CACHE_PROVIDER='garnet'`, `ToolVersion` pin (default `SCAFFOLD_VERSIONS.GARNET_TOOL='1.1.10'`).
+- **S5** (08e70e64) DONE — `isDockerAvailable()` + `shouldUseContainerCache()` probe (+
+  `NETSCRIPT_CACHE_MODE` override), engine-aware Auto arm (Docker→configured container,
+  Docker-less→Garnet executable cross-fallback), `ensureSharedCache` default flipped to `Mode:'Auto'`.
+- **S6** (a2f56409) DONE — redis-import audit complete (consumers self-register `@netscript/kv/redis`
+  and resolve via `getKv()`→`autoDetectProvider()` on `CACHE_PROVIDER`+URI env). Audit found +
+  fixed the DenoKv container env-contract gap (explicit `DENO_KV_URL` via `EndpointProperty.Url`; see
+  drift). Docs added to `packages/aspire/README.md`.
+
+### Validation coverage
+
+- Unit/generator tests GREEN: `generate-register-infrastructure_test.ts` (10 steps incl. new S4/S5
+  cases), `generators-config-infra_test.ts` (updated import assertion), `workspace-mutator_test.ts`
+  (9 steps), `config_test.ts` (26 steps).
+- Scoped `deno check --unstable-kv` on aspire helper templates + plugin adapters: clean.
+- **PR-A E2E** `scaffold.runtime --cleanup`: **exit 0, 48 passed / 0 failed** (job bltjyeyl9).
+  Validated the Garnet **Container** arm + `withCacheReference` seam on this Docker host.
+- **PR-B E2E** (Auto default → Garnet **container** on this Docker host, `NETSCRIPT_CACHE_MODE`
+  unset): **exit 0, 48 passed / 0 failed** (job b8dqt4cm9). Ran on S5-tip code; validates the Auto
+  code path resolving to the Garnet container + live Aspire plugin/background endpoints. The S6
+  DenoKv-URL fix is orthogonal to this Garnet path (DenoKv arm not exercised by the default scaffold).
+- **NOT live-E2E'd on this Docker host** (flagged for separate-session eval): the Garnet
+  **Executable** arm (needs Docker-less env or `NETSCRIPT_CACHE_MODE=Executable`) and the **DenoKv
+  Container** arm (needs a `DenoKv`-engine scaffold). Both are unit-tested + type-checked-as-generator.
