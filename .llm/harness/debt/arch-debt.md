@@ -1325,6 +1325,15 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   pending the deploy-core convention seam (#341/#364) — the adapter delegates to the seam by design
   and omits the ops until it lands, rather than forking. The unstable-API preflight guard is
   best-effort (`deno.json` + entrypoint, not the full transitive module graph).
+- **Update (2026-07-04, #341 / PR #374):** the deploy-core convention seam the #342 note was
+  "pending" has now landed. Deploy-S5 centralized `secrets`/`rollback`/health-gate/OTEL as pure,
+  target-agnostic primitives in `packages/cli/src/kernel/domain/deploy/`, and the bare-metal
+  `ServiceDeployTarget` now advertises + delegates `rollback`/`secrets` (with health-gated `up`)
+  when the core ports are injected — so the marquee `deno-deploy` target's declared-unsupported
+  `rollback`/`secrets` are unblocked to delegate to the shipped core rather than fork (tracked by
+  `DEPLOY-SECRETS-ROLLBACK-CORE`). This entry stays open narrowed strictly to the
+  container/orchestrator artifact-generation gate below (Dockerfile / Compose / Kubernetes via the
+  Aspire-compose adapter, #343).
 - **Gate:** Close when `netscript deploy` (or scaffold generation) also emits the container /
   orchestrator artifacts, or the deployment docs are rewritten to remove generated-artifact
   expectations for those targets.
@@ -1341,9 +1350,20 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   `buildWindowsDeployment` directly, so the descriptors are scaffolding consumed only by tests today.
 - **Owner:** Deployment-hardening follow-up (#341).
 - **Created:** 2026-07-03 (#339/#340).
-- **Status:** open, DEBT_ACCEPTED — intentional scope split.
-- **Gate:** Close when #341 lands the `rollback` / `secrets` (+ health / OTEL) operation bodies and
-  the injected execution-delegation seam that lets the registry descriptors drive real deploys.
+- **Update (2026-07-04, #341 / PR #374):** the operation bodies + delegation seam landed. Deploy-S5
+  promoted `ServiceDeployTarget` to a genuine 7-op adapter — `WindowsServiceDeployTarget` and
+  `LinuxServiceDeployTarget` now advertise `rollback`/`secrets` and delegate to the shipped
+  deploy-core primitives (`secrets-convention`/`rollback-convention`/`health-gate`/
+  `activation-convention`), with `up` health-gated, when the core ports are injected. The one
+  residual — composing the registry descriptors onto the public `OsServicePort` + compile pipeline so
+  `deploy <target> up|rollback|secrets` executes end-to-end off the descriptor path — is a
+  kernel→public layering boundary and is now tracked distinctly by `DEPLOY-BAREMETAL-PUBLIC-WIRING`.
+- **Status:** RESOLVED 2026-07-04 (superseded) — the `rollback`/`secrets` (+ health/OTEL) bodies and
+  the injected execution-delegation seam landed in #341/#374; superseded by
+  `DEPLOY-SECRETS-ROLLBACK-CORE` (bodies + seam) and `DEPLOY-BAREMETAL-PUBLIC-WIRING` (residual
+  public-path wiring).
+- **Gate:** Closed — bodies + delegation seam landed in #341/#374; residual public-path wiring
+  tracked by `DEPLOY-BAREMETAL-PUBLIC-WIRING`.
 
 ## packages/cli — Linux systemd deploy lane is unit-tested but not integration-exercised (`cli-deploy-linux-integration-untested`)
 
