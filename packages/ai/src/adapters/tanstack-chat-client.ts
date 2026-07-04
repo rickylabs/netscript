@@ -50,13 +50,23 @@ export interface ChatClientMeta {
   readonly name: string;
   /** Adapter kind (e.g. `"text"`). */
   readonly kind: string;
+  /**
+   * Static provider-specific request options forwarded to the TanStack
+   * `chat()` call on every turn (its `modelOptions` passthrough). Providers
+   * that carry a fixed wire override — e.g. OpenRouter's top-level
+   * `{ reasoning: { effort } }` — normalize it once and pass it here. The
+   * OpenAI-compatible provider options type is an open `Record`, so the value
+   * is threaded into the request body without a provider SDK type escaping the
+   * owned surface. Omit for providers with no override (Anthropic, Ollama).
+   */
+  readonly modelOptions?: Readonly<Record<string, unknown>>;
 }
 
 /**
  * Wrap a TanStack text adapter as an owned {@linkcode ChatClientPort}.
  *
  * @param adapter - A TanStack text adapter (from a provider factory).
- * @param meta - Owned `name`/`kind` to expose on the port.
+ * @param meta - Owned `name`/`kind` (+ optional `modelOptions`) to expose.
  * @returns A provider-neutral chat client that translates to/from TanStack.
  */
 export function toTanstackChatClient(
@@ -91,6 +101,9 @@ export function toTanstackChatClient(
           systemPrompts,
           tools,
           abortController: controller,
+          // `AnyTextAdapter` erases the provider-options type to `any`, so this
+          // owned `Record` threads into `modelOptions` without a cast (D3-safe).
+          modelOptions: meta.modelOptions,
         });
         for await (const chunk of streamed) {
           if (external?.aborted) {

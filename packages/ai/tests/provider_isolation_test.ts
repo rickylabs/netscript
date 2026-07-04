@@ -37,3 +37,13 @@ Deno.test('bundle isolation: importing @netscript/ai/openai-compatible registers
   const providers = await registeredProvidersFrom('registered_openai_compatible.ts');
   assertEquals(providers, ['openai-compatible']);
 });
+
+Deno.test('bundle isolation: importing @netscript/ai/openrouter registers exactly one provider', async () => {
+  const providers = await registeredProvidersFrom('registered_openrouter.ts');
+  assertEquals(providers, ['openrouter']);
+});
+
+Deno.test('bundle isolation: importing @netscript/ai/ollama registers exactly one provider', async () => {
+  const providers = await registeredProvidersFrom('registered_ollama.ts');
+  assertEquals(providers, ['ollama']);
+});

@@ -17,6 +17,7 @@ export * from './model-provider.ts';
 export * from './tool-registry.ts';
 export * from './embedding.ts';
 export * from './vision.ts';
+export * from './reachability.ts';
 export * from './mcp-transport.ts';
 export * from './skill-loader.ts';
 export * from './agent-loop.ts';
