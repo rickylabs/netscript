@@ -12,9 +12,9 @@ This track builds one thing end to end: a **durable AI chat app**. By the last c
 will have a chat whose transcript — messages, streaming markdown, and tool-call cards —
 survives reload, reconnect, and a second tab, because it is backed by a durable session
 stream rather than component state. It runs on shipped NetScript seams: the
-[`@netscript/fresh/ai`](/reference/fresh/) durable-chat plane (available from
-`0.0.1-beta.2`) and the [`@netscript/fresh-ui`](/reference/fresh-ui/) copy-registry chat
-components.
+[`@netscript/fresh/ai`](/reference/fresh/) durable-chat plane (published on JSR in
+`@netscript/fresh` and usable now) and the [`@netscript/fresh-ui`](/reference/fresh-ui/)
+copy-registry chat components.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/chat/01-scaffold/" },

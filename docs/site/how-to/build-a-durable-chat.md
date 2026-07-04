@@ -11,8 +11,9 @@ next: { label: "Deploy", href: "/how-to/deploy/" }
 **Goal:** wire an AI chat onto a Fresh route whose message history and in-flight tool
 calls survive reload, reconnect, and a second tab — because the transcript is backed by a
 **durable session stream**, not component state. This recipe uses the
-[`@netscript/fresh/ai`](/reference/fresh/) durable-chat plane (available from
-`0.0.1-beta.2`): one session route, one stream proxy, one SSR seed, and one client island.
+[`@netscript/fresh/ai`](/reference/fresh/) durable-chat plane (published on JSR in
+`@netscript/fresh`, usable now): one session route, one stream proxy, one SSR seed, and one
+client island.
 
 The chat surface is built from four seams, each a single function:
 
