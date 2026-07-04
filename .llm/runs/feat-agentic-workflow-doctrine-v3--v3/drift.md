@@ -37,3 +37,32 @@ Append-only. Severity: minor | significant | architectural.
   automated gates and sign-off commit in `workflow/run-loop.md` (S5). Recorded as design-v3.md
   Amendment A1; applied immediately to in-flight slices (each slice's worklog entry notes the
   review + any findings).
+- **D6-A2-tools-and-llm-grade (architectural, 2026-07-04)**: Owner-directed scope amendment AFTER
+  S2–S8 landed and BEFORE IMPL-EVAL dispatch. Owner identified that design §8 **under-scoped the
+  `.llm/tools` work**: S6 wired mandates/aliases + `workflow/tooling.md`, and S8 pruned scratch, but
+  the **deep tools refactor was never performed**. IMPL-EVAL is HELD. Two new workstreams fold in
+  (recorded as design-v3.md **Amendment A2**):
+  - **S9 — `.llm/tools` production-grade refactor (audit-first).** (1) AUDIT every tool under
+    `.llm/tools/**` → classify keep / harden / deprecate-delete; post the classification as a PR #390
+    comment (reviewable) and SendMessage the supervisor-coordinator BEFORE any destructive action;
+    flag load-bearing/ambiguous delete candidates rather than guessing. (2) DELETE stale/deprecated
+    tools, never deleting anything still referenced without repointing callers first. (3) HARDEN +
+    HARMONIZE survivors (uniform CLI contract: flags/`--help`/exit codes, least-privilege
+    `--allow-*`, structured/compact output, uniform errors); fix the three #307 debt items if in
+    scope (codex-watch `--allow-env` doc, gh-token main-guard, claude-hook-log stdin-block).
+    (4) RESTRUCTURE the folder into topic/domain subfolders — an S3-scale reference sweep updating
+    EVERY caller (`deno.json` `agentic:*` + other aliases, all skills + `.claude` mirrors via sync
+    (never hand-edit mirrors), AGENTS.md/CLAUDE.md, `.llm/harness/**`, `.github/workflows/**`);
+    grep-zero stale tool paths. (5) TEST each surviving tool runs (smoke/`--help`/dry-run); existing
+    tool tests pass; agentic suite resolves end-to-end. (6) UPDATE the tools registry +
+    `workflow/tooling.md` + `netscript-tools` and `netscript-deno-toolchain` SKILLs to the new
+    structure (map, not manual). May split into audit→execute sub-slices.
+  - **S10 — `.llm/*` production-grade sweep.** Everything under `.llm/*` must be production-grade: no
+    stale, no drafts, no dead/dated one-offs, no contradictions. **EXCEPTION: `.llm/runs/` is KEPT**
+    as the agent-learning corpus (pruned on demand, not swept). Sweep `.llm/harness/**` and any other
+    `.llm/*` for staleness/drafts/duplication and bring to grade.
+  - **Sequencing:** S9 (audit→execute) → S10 → full-surface gates → **WSL Codex adversarial pass over
+    the WHOLE V3 surface** (the pre-staged adversarial brief is deferred to cover S9+S10 too) →
+    OpenHands IMPL-EVAL (separate session). Slices stay reviewable; material run growth noted in
+    worklog. Still docs/tooling only — no `packages/`/`plugins/` source. No merge/close (owner's
+    call). Authored by Opus 4.8 sub-agents under the A1 lane-agnostic review gate, same as S2–S8.

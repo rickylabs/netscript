@@ -188,6 +188,34 @@ S1 = this design doc → PLAN-EVAL (hard stop). On PASS, sub-issues `[harness-v3
 Slice count 8 (< 30). Each slice: own PR comment + run-dir currency + reconcile note; source slices
 = Tier D Codex daemon-attached; batch/parallel = Tier C Workflow with committed workflow.js.
 
+### Amendment A2 (owner-directed, post-PLAN-EVAL, post-S2–S8; recorded 2026-07-04)
+
+Owner identified that §8 **under-scoped `.llm/tools`**: S6 wired mandates/aliases + `tooling.md`, S8
+pruned scratch, but the **deep tools refactor was never done**. IMPL-EVAL is **HELD**. Two workstreams
+fold in (full rationale + sub-steps in `drift.md` **D6-A2**). Authored by Opus 4.8 sub-agents under
+the A1 lane-agnostic review gate, same as S2–S8; still docs/tooling only.
+
+- **S9 — `.llm/tools` production-grade refactor (audit-first).** (1) AUDIT every `.llm/tools/**`
+  tool → keep / harden / deprecate-delete; **post classification as a PR #390 comment + SendMessage
+  the coordinator BEFORE any destructive action**; flag load-bearing/ambiguous deletes rather than
+  guessing. (2) DELETE stale tools (repoint callers first, never orphan a live reference).
+  (3) HARDEN + HARMONIZE survivors (uniform CLI contract: flags/`--help`/exit codes, least-privilege
+  `--allow-*`, structured output, uniform errors; fold the three #307 debt items if in scope).
+  (4) RESTRUCTURE into topic/domain subfolders — S3-scale reference sweep updating EVERY caller
+  (`deno.json` aliases, all skills + `.claude` mirrors via sync, AGENTS.md/CLAUDE.md,
+  `.llm/harness/**`, `.github/workflows/**`); grep-zero stale tool paths. (5) TEST each survivor runs
+  (smoke/`--help`/dry-run; existing tests pass; agentic suite resolves end-to-end). (6) UPDATE tools
+  registry + `workflow/tooling.md` + `netscript-tools`/`netscript-deno-toolchain` SKILLs (map, not
+  manual). May split audit→execute.
+- **S10 — `.llm/*` production-grade sweep.** All `.llm/*` production-grade: no stale/drafts/dated
+  one-offs/contradictions. **EXCEPTION: `.llm/runs/` KEPT** as the agent-learning corpus (pruned on
+  demand, not swept). Sweep `.llm/harness/**` + any other `.llm/*`.
+
+**Sequencing:** S9 (audit→execute) → S10 → full-surface gates → **WSL Codex adversarial pass over the
+WHOLE V3 surface** (the pre-staged adversarial brief is deferred to also cover S9+S10) → OpenHands
+IMPL-EVAL (separate session). Slice count grows 8 → 10 (+ possible S9 audit/execute split); still
+< 30. No merge/close — owner's call.
+
 ## 9. Risk register
 
 | Risk | Mitigation |
