@@ -24,3 +24,22 @@ Every V3 run dir records its supervisor here so other supervisors can cross-peek
 - **D — WSL Codex GPT-5.5-high**: long/deterministic refactors + housekeeping; daemon-attached
   (`codex-wsl-remote` skill), thread id + steering command recorded per slice in worklog.md.
 - **Eval**: OpenHands, separate session (PLAN-EVAL / IMPL-EVAL per `.llm/harness/evaluator/`).
+
+## Phase 2 — Implementation (lane override, owner directive 2026-07-04)
+
+**Supervisor is UNCHANGED — stays Fable 5** (`claude-fable-5`, Tier A, the originating supervisor
+above). Only the implementation lane changes.
+
+| Field | Value |
+| --- | --- |
+| Supervisor | Claude Code — **Fable 5** (`claude-fable-5`) — unchanged |
+| PLAN-EVAL | PASS (OpenHands minimax-M3, separate session; `plan-eval.md`) — impl unblocked |
+| Worktree | `C:\Dev\repos\netscript-framework\.llm\tmp\wt-harness-v3` (unchanged) |
+
+**Lane override (owner directive):** given V3's high importance, the implementation of **all slices
+S2–S8 is executed by Opus 4.8 sub-agents** (Tier B elevated to the implementation lane), replacing
+the design's original Tier-D Codex / Tier-C Workflow assignments. **WSL Codex (Tier D) is used ONLY
+for a final adversarial validation pass before IMPL-EVAL**, to close gaps ahead of the evaluator.
+Tier E (OpenHands, separate session) still owns IMPL-EVAL. The Fable 5 supervisor orchestrates:
+briefs, sequencing, run-dir upkeep, GitHub surface, and per-slice review. Recorded in `drift.md`
+(D3-lane-override).

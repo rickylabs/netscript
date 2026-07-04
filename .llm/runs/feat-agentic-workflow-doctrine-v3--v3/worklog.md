@@ -58,3 +58,17 @@ concept named in `design-v3.md` §5/§8. Ready for PLAN-EVAL (OpenHands, separat
 - Watch-and-act: await PLAN-EVAL verdict → on PASS, file `[harness-v3 S2..S8]` sub-issues under
   #389, advance label to `status:impl`, launch S2 (Tier D Codex daemon slice) + S3/S7 (Tier C
   Workflows, workflow.js committed first). On FAIL_PLAN, revise design and re-dispatch (2 cycles).
+
+## 2026-07-04 — PLAN-EVAL PASS → Implementation phase (lane override)
+
+- **PLAN-EVAL verdict: PASS** (OpenHands minimax-M3, separate session; `plan-eval.md`). Zero of two
+  FAIL_PLAN cycles used. Checklist all-green (research current, 5 decisions locked, 6 ODs resolved,
+  slices <30, risk register, gate set, deferred scope explicit). Adversarial V3 checks all ✅.
+- **Owner directive (lane override):** the **supervisor stays Fable 5** (unchanged); implementation
+  of ALL slices S2–S8 runs on **Opus 4.8 sub-agents** (not the design's Tier-D Codex / Tier-C
+  Workflow lanes), given V3's high importance. **WSL Codex = final adversarial validation before
+  IMPL-EVAL** only. IMPL-EVAL stays OpenHands (separate session). See `supervisor.md` Phase 2.
+- Delivery model: single PR **#390** carries S2–S8 as sequential commits, one PR comment per slice,
+  run-dir currency (`worklog.md` + `context-pack.md`) touched every slice, reconcile note per slice.
+- `#390` stage label advanced `status:plan-eval` → `status:impl`.
+- Next: S2 (lane-policy + tiered model) → Opus 4.8 sub-agent, worktree `.llm/tmp/wt-harness-v3`.
