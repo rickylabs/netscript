@@ -311,7 +311,7 @@ trail for operational and security review, not a tamper-evident, write-once comp
 {{ comp.xref({ key: "explain:observability" }) }}.</li>
 <li><strong>Run the <code>auth.prisma</code> migration after Aspire is up.</strong> The
 better-auth backend's tables (and any DB-backed flow) need your database provisioned first
-(Postgres by default; or <code>mysql</code> / <code>mssql</code> / <code>sqlite</code> via
+(Postgres is the recommended engine; or <code>mysql</code> / <code>mssql</code> / <code>sqlite</code> via
 <code>--db</code> — better-auth persists through Prisma, so it is not Postgres-specific) — the same
 Aspire-first ordering every plugin schema follows.</li>
 </ul>

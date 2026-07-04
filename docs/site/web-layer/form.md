@@ -46,9 +46,14 @@ initial values.
 
 The `Form` component renders a managed `<form>` element with the submission and CSRF hidden
 inputs already wired. It accepts a `state` (the resolved `FormState`-compatible value),
-the form `children`, and optional `formProps` overrides. `formProps` forwards `class` and
-standard `<form>` attributes (such as `action` and `method`) onto the rendered element, so you
-style and configure the managed form the same way you would a plain one.
+the form `children`, and optional `formProps` overrides. `formProps` is a
+`FormElementOverrideProps` bag: an open attribute set (every field optional, plus an
+`[attribute: string]: unknown` index signature) so you can forward `class`, standard `<form>`
+attributes (`action`, `method`, `noValidate`, `id`), and any additional ARIA, `data-*`, or
+framework attribute onto the rendered element — you style and configure the managed form the same
+way you would a plain one. The four handler slots the managed runtime owns —
+`onSubmit`, `onBlurCapture`, `onInputCapture`, and `ref` — are typed `never`, so passing one is a
+compile-time error rather than a silent override of the progressive-enhancement wiring.
 
 ```tsx
 import { Form, resolveFormState } from "@netscript/fresh/form";
@@ -212,6 +217,7 @@ import { FormRegion } from "@netscript/fresh/form";
 | `Form` | Render a managed form element with submission and CSRF hidden inputs. |
 | `FormRegion` | Render a Fresh partial boundary for form-driven updates. |
 | `FormProps<TValues>` | Props accepted by the managed form component (`state`, `children`, `formProps`, `enhancement`). |
+| `FormElementOverrideProps` | The open `formProps` override bag — optional `class` / `id` / `action` / `method` / `noValidate`, an arbitrary-attribute index signature, and `never`-typed `onSubmit` / `onBlurCapture` / `onInputCapture` / `ref` slots the runtime owns. |
 | `FormRegionProps` | Props for the partial-region helper (`name`, `mode`, `children`). |
 
 ### Parsing and state

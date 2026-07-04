@@ -49,7 +49,7 @@ You need:
 
 - **Aspire up if you plan to run the plugin.** Adding and registering a plugin is offline,
   but several plugins (workers, sagas, auth) need a database and Redis to actually run. The
-  database is Postgres by default (or `mysql` / `mssql` / `sqlite`, chosen at scaffold time
+  database is Postgres, the recommended engine (or `mysql` / `mssql` / `sqlite`, chosen at scaffold time
   with `--db`). Bring
   the local stack up first — `cd aspire && aspire start` — exactly as in
   [Run the stack with Aspire](/explanation/aspire/). You do **not** need it up just to

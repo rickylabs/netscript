@@ -3,7 +3,7 @@ layout: layouts/base.vto
 title: Customize Fresh UI
 templateEngine: [vento, md]
 prev: { "label": "Add OpenTelemetry", "href": "/how-to/add-opentelemetry/" }
-next: { "label": "Deploy", "href": "/how-to/deploy/" }
+next: { "label": "Build a durable chat", "href": "/how-to/build-a-durable-chat/" }
 ---
 
 # Customize Fresh UI
@@ -41,7 +41,7 @@ You need:
   `deno install --global --allow-all --name netscript jsr:@netscript/cli{{ releaseSpecifier }}`.
 
 Run the app while you work so you can see each change live. Aspire is step 2 of the
-normal startup flow — it brings up your database (Postgres by default; or `mysql` /
+normal startup flow — it brings up your database (Postgres is the recommended engine; or `mysql` /
 `mssql` / `sqlite` chosen at scaffold time via `--db`) and Redis before any
 `netscript db` command and orchestrates the dashboard for you. You can also run the Fresh app on
 its own when you only need the UI loop:
@@ -246,7 +246,7 @@ When you need a primitive the scaffold didn't copy in, pull it from the
 
 ```bash
 # Add one component (or a named collection) to the dashboard app
-netscript ui:add data-table
+netscript ui:add dropzone
 
 # Add an AI / workspace primitive — e.g. the chat message renderer
 netscript ui:add message
@@ -295,9 +295,9 @@ components); the rest are copy-source registry items.
     { name: "tool-call-card", type: "ai", desc: "Inline MCP/tool invocation + result as a native details disclosure with a status badge and IO panel." },
     { name: "chart-block", type: "analytics", desc: "Inline token-driven metric chart — horizontal bars or a vertical column chart with y-axis ticks and data-tone intents." },
     { name: "donut", type: "analytics", desc: "Token-driven donut/pie chart — SVG arc segments with a center total and legend." },
-    { name: "prompt-input", type: "ai composer", desc: "Chat composer: auto-grow textarea with a toolbar of research/grounding pills, model picker, attach/screenshot/voice, and send." },
+    { name: "prompt-input", type: "ai composer", desc: "Chat composer: a CSS auto-grow textarea (native field-sizing: content, no JS handler) with a toolbar of research/grounding pills, model picker, attach/screenshot/voice, and send." },
     { name: "message", type: "ai chat", desc: "Chat message with author/time, inline-markup body (bold/code/[n] citations), tool-call + chart/code blocks, follow-up chips, and a typing indicator. Exports renderInline + TypingIndicator." },
-    { name: "dropzone", type: "upload", desc: "File-drop affordance — a dashed drop target (label/hint/icon) wrapping a native file input; drag-over via data-active." }
+    { name: "dropzone", type: "upload", desc: "File-ingest affordance — a dashed drop target with built-in drag-drop, clipboard-paste, and file-picker ingest; filters by accept / multiple and reports results through onFile / onFiles / onReject." }
   ]
 }) }}
 
@@ -381,4 +381,4 @@ type.
 - Concepts: the [contracts](/explanation/contracts/) explanation shows how a typed
   contract flows from service to client to island.
 
-{{ comp.nextPrev({ prev: { label: "Add OpenTelemetry", href: "/how-to/add-opentelemetry/" }, next: { label: "Deploy", href: "/how-to/deploy/" } }) }}
+{{ comp.nextPrev({ prev: { label: "Add OpenTelemetry", href: "/how-to/add-opentelemetry/" }, next: { label: "Build a durable chat", href: "/how-to/build-a-durable-chat/" } }) }}

@@ -278,7 +278,7 @@ Wire persistence with the database recipe before you depend on durability.
   { title: "Tutorial: Build a service", body: "The guided, learning-oriented version — contract to typed client to a Fresh island, explained step by step.", href: "/tutorials/storefront/02-catalog-service/", icon: "→" },
   { title: "Service API reference", body: "The full generated surface of defineService and createService — every option, builder method, and return type.", href: "/reference/service/", icon: "◆" },
   { title: "Contracts, explained", body: "How an oRPC contract flows from service to typed client to UI without a codegen step.", href: "/explanation/contracts/", icon: "◎" },
-  { title: "Database & migration", body: "Replace the seeded in-memory records with real Prisma-backed persistence — Postgres by default, or mysql / mssql / sqlite via --db — init, generate, seed (Aspire up first).", href: "/how-to/database-migration/", icon: "▣" }
+  { title: "Database & migration", body: "Replace the seeded in-memory records with real Prisma-backed persistence — Postgres is the recommended engine, or mysql / mssql / sqlite via --db — init, generate, seed (Aspire up first).", href: "/how-to/database-migration/", icon: "▣" }
 ] }) }}
 
 Manage the service over its lifetime by editing its contract under `contracts/versions/`

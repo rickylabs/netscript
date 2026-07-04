@@ -26,9 +26,9 @@ reasoning behind durability, contracts, and plugins, read the
 <a href="/explanation/">explanation</a> pages.
 {{ /comp }}
 
-## Four tracks, four applications
+## Five tracks, five applications
 
-There are four independent tracks. **Each builds one complete application** from a
+There are five independent tracks. **Each builds one complete application** from a
 fresh `netscript init`, and each ends by running that application **locally
 under .NET Aspire** — so whichever you pick, you finish with something that boots,
 serves, and survives a restart. The tracks don't depend on each other; start with
@@ -54,6 +54,11 @@ the one closest to what you're building.
     title: "Live Dashboard",
     body: "Build a real-time UI: go from a typed contract to an SDK client, a cache-first query, a Fresh <code>definePage</code> with a hydrated <code>QueryIsland</code>, and finally a durable StreamDB feed that updates the table live. The track for <strong>the Fresh + SDK stack</strong>. 6 chapters.",
     href: "/tutorials/live-dashboard/"
+  },
+  {
+    title: "AI Chat",
+    body: "Build a durable AI chat app whose transcript, streaming markdown, and tool-call cards survive reload and reconnect: wire a durable chat route on <code>@netscript/fresh/ai</code>, hydrate the <code>fresh-ui</code> chat components, and add one server-side tool. The track for <strong>durable chat UI</strong>. 4 chapters.",
+    href: "/tutorials/chat/"
   }
 ] }) }}
 
@@ -65,7 +70,8 @@ the one closest to what you're building.
     { name: "An API with multi-step business logic", type: "Storefront", desc: "You need typed services and a workflow that can't half-complete — orders, payments, fulfillment. Teaches contracts, defineService, sagas, and webhooks." },
     { name: "An app behind a login", type: "Team Workspace", desc: "You need authentication, sessions, and route-level access control before anything else. Teaches the auth backend, session crypto, and the .withAuthz() seam." },
     { name: "Data pipelines and scheduled work", type: "ERP Sync", desc: "Your work happens off the request path — file ingestion, batch jobs, scheduled syncs, and tasks in other languages. Teaches triggers, jobs, queues, cron, and the task runtime." },
-    { name: "A live, reactive frontend", type: "Live Dashboard", desc: "You're rendering server data in a Fresh UI that stays current without a refresh. Teaches the SDK client, cache-first queries, the page builder, islands, and durable streams." }
+    { name: "A live, reactive frontend", type: "Live Dashboard", desc: "You're rendering server data in a Fresh UI that stays current without a refresh. Teaches the SDK client, cache-first queries, the page builder, islands, and durable streams." },
+    { name: "A durable AI chat app", type: "AI Chat", desc: "You're building a chat UI whose transcript, streaming markdown, and tool-call cards survive reload and reconnect. Teaches the durable chat route on @netscript/fresh/ai, the fresh-ui chat components, and one server-side tool." }
   ]
 }) }}
 

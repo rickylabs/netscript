@@ -261,8 +261,9 @@ const workers = createServiceClient<typeof workersContract>({
 });
 
 // triggerJob is served over /api/rpc/* and returns { jobId, triggered }.
-// The {id} path segment is the single source of truth for the target job;
-// a body id is optional and ignored if sent.
+// Over REST the {id} path segment carries the target job; over RPC (no path
+// segment) it travels in this input object. Either way it resolves to
+// input.id — with no id at all the call fails with a 422 VALIDATION_ERROR.
 const { jobId, triggered } = await workers.triggerJob({
   id: 'process-payment',
   payload: { orderId: 'o_42', amountCents: 4999 },
@@ -280,14 +281,26 @@ const task = await workers.triggerTask({ id: 'validate-payload', payload: {} });
   ]
 }) }}
 
+{{ comp callout { type: "note", title: "Declare the plugin dependency with pluginReferences" } }}
+When a Service depends on a plugin API — the workers plugin, say — declare it in that Service's
+config section with <code>pluginReferences?: string[]</code>, a list of the plugin resource names it
+consumes (alongside the existing <code>dependsOn</code>). The Aspire helper generation wires those
+references so the Service can discover and load the user jobs the plugin API exposes at runtime, and
+so the typed client above resolves the plugin's injected URL
+(<code>services__workers-api__http__0</code>). It is the config seam behind Service→plugin-API job
+discovery.
+{{ /comp }}
+
 {{ comp callout { type: "caution", title: "The {id} path segment is authoritative" } }}
-<code>triggerJob</code> / <code>triggerTask</code> derive the target id from the
-<code>{id}</code> URL path segment, not the request body. A body <code>id</code> is optional and
-ignored when present, so it can never disagree with the path. If no id resolves, the handler
-short-circuits to a typed <code>VALIDATION_ERROR</code> (HTTP&nbsp;422) through the centralized
-<code>validationFailed</code> contract helper <em>before any KV write</em> — it never persists an
-<code>undefined</code>-keyed run. Handle it as the contract's typed error on the client, not a
-generic <code>500</code>.
+<code>triggerJob</code> / <code>triggerTask</code> resolve the target id from
+<code>input.id</code>. On the REST route (<code>POST /jobs/{id}/trigger</code>) oRPC merges the
+<code>{id}</code> URL path segment into <code>input.id</code>, so the path is authoritative and a
+body <code>id</code> is a redundant fallback that can never disagree with it; on the RPC transport
+there is no path segment, so the <code>id</code> you pass in the input object is used directly. If
+neither resolves an id, the handler short-circuits to a typed <code>VALIDATION_ERROR</code>
+(HTTP&nbsp;422) through the centralized <code>validationFailed</code> contract helper <em>before any
+KV write</em> — it never persists an <code>undefined</code>-keyed run. Handle it as the contract's
+typed error on the client, not a generic <code>500</code>.
 {{ /comp }}
 
 ## Graceful shutdown

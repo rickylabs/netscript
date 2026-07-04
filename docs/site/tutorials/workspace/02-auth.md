@@ -33,7 +33,7 @@ endpoints are wired.
 
 ## Before you begin
 
-You need the workspace from [chapter 1](/tutorials/workspace/01-scaffold/) with **aspire startning** —
+You need the workspace from [chapter 1](/tutorials/workspace/01-scaffold/) with **Aspire running** —
 the auth plugin contributes a service and a Prisma schema that Aspire and `netscript db` reach through
 the running graph. Confirm the base is up:
 
@@ -46,7 +46,7 @@ curl http://localhost:3001/health   # the workspace service from chapter 1
 The <code>auth-api</code> service and its Postgres/KV dependencies are resources in the Aspire graph.
 Bring orchestration up <strong>before</strong> any <code>netscript db</code> command or auth endpoint
 call: from the project root, <code>cd aspire &amp;&amp; aspire start</code> (dashboard at
-<a href="https://localhost:18888">https://localhost:18888</a>). DB commands need aspire startning first.
+<a href="https://localhost:18888">https://localhost:18888</a>). DB commands need Aspire running first.
 {{ /comp }}
 
 ## Step 1 — Add the `auth` plugin
@@ -117,7 +117,7 @@ NetScript, stay on <code>kv-oauth</code>.
 ## Step 3 — Run the auth database migration
 
 The `auth` plugin contributes a package-provided **`auth.prisma`** schema that
-aggregates into your primary Postgres at `db generate`. With aspire startning, run the standard database
+aggregates into your primary Postgres at `db generate`. With Aspire running, run the standard database
 loop from the workspace root:
 
 ```sh
@@ -203,7 +203,7 @@ the auth plugin composes against, confirmed on the package's public surface:
 
 ## Step 6 — Verify a session
 
-With aspire startning, the `auth-api` service binds **port 8094** and mounts the five auth endpoints
+With Aspire running, the `auth-api` service binds **port 8094** and mounts the five auth endpoints
 under `/api/v1/auth/*`. On a fresh, unauthenticated request, `session` reports no active session —
 which proves the endpoint is wired even before you complete a login:
 

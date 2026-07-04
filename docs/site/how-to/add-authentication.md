@@ -22,11 +22,11 @@ the *how*, stay here.
 
 {{ comp callout { type: "important", title: "Aspire is the control plane — start it first" } }}
 The <code>auth-api</code> service and its database/KV dependencies run as resources in the Aspire
-graph (the database is Postgres by default; <code>mysql</code> / <code>mssql</code> run as Aspire
+graph (the database is Postgres, the recommended engine; <code>mysql</code> / <code>mssql</code> run as Aspire
 containers too, while <code>sqlite</code> is file-backed — pick one at scaffold with <code>--db</code>). Bring orchestration up <strong>before</strong> you run any <code>netscript db</code> command
 or hit an auth endpoint: from the project root, <code>cd aspire &amp;&amp; aspire start</code>
 (dashboard at <a href="https://localhost:18888">https://localhost:18888</a>). DB commands require
-aspire startning first. See <a href="/explanation/aspire/">the Aspire explanation</a> for the resource
+Aspire running first. See <a href="/explanation/aspire/">the Aspire explanation</a> for the resource
 graph.
 {{ /comp }}
 
@@ -117,7 +117,7 @@ export NETSCRIPT_AUTH_BACKEND=kv-oauth
 ## Step 3 — Run the auth database migration
 
 The `auth` plugin contributes a package-provided **`auth.prisma`** schema, which is
-aggregated into your project's database schema at `db generate` (Postgres by default; or `mysql` /
+aggregated into your project's database schema at `db generate` (Postgres is the recommended engine; or `mysql` /
 `mssql` / `sqlite` — the auth models persist through Prisma, so they follow whichever engine you
 scaffolded with `--db`). It defines four better-auth-shaped models mapped to these tables:
 
@@ -140,7 +140,7 @@ through Prisma. The migration runs regardless; it is the persistence path for th
 backend.
 {{ /comp }}
 
-With aspire startning (Step 0), generate and apply the migration the same way you do for any plugin
+With Aspire running (Step 0), generate and apply the migration the same way you do for any plugin
 schema:
 
 ```sh
@@ -212,7 +212,7 @@ architecture behind this, read [the authentication model](/explanation/auth-mode
 
 ## Step 6 — Start the service and the auth endpoints
 
-With aspire startning, the `auth-api` service binds **port 8094** and mounts five endpoints under the
+With Aspire running, the `auth-api` service binds **port 8094** and mounts five endpoints under the
 public REST prefix **`/api/v1/auth/*`** (the oRPC surface is mirrored at `/api/rpc/v1/auth/*`):
 
 {{ comp.apiTable({

@@ -8,7 +8,7 @@ next: { label: "KV, queues & cron", href: "/capabilities/kv-queues-cron/" }
 
 # Database & Prisma
 
-NetScript's persistence layer is **Prisma 7 over a driver adapter** (Postgres by default,
+NetScript's persistence layer is **Prisma 7 over a driver adapter** (Postgres is the recommended engine,
 with MSSQL and MySQL adapters shipped alongside), generated for the Deno runtime and
 provisioned for you by **Aspire**. Every plugin contributes its own `.prisma` models, which
 are aggregated into a single generated client over one primary datasource.
@@ -33,7 +33,7 @@ workspace root. See <a href="/explanation/aspire/">Orchestration with Aspire</a>
 Reach for the database layer when you need <strong>durable, relational state</strong> —
 records that survive restarts, are queried with a typed client, and are shared across your
 service and its plugins. The engine is polyglot: pick it at scaffold time with
-<code>--db</code> — Postgres (the default; or <code>mysql</code> / <code>mssql</code> /
+<code>--db</code> — Postgres (the recommended engine; or <code>mysql</code> / <code>mssql</code> /
 <code>sqlite</code>). For <em>ephemeral or high-throughput</em> state (counters, locks,
 work queues, scheduled triggers) reach for <a href="/capabilities/kv-queues-cron/">KV,
 queues &amp; cron</a> instead; the scaffold uses both — Postgres for records, Redis/KV for
@@ -52,9 +52,9 @@ href="/capabilities/kv-queues-cron/">the Postgres queue backend</a> below.
 
 The scaffold engine is chosen with the `--db` flag —
 `netscript init my-app --db postgres|mysql|mssql|sqlite`. Postgres is the recommended
-default (and what every tutorial uses); `mysql`, `mssql`, and `sqlite` are first-class
+engine (and what every tutorial uses); `mysql`, `mssql`, and `sqlite` are first-class
 alternatives. `postgres` / `mysql` / `mssql` provision an Aspire container; `sqlite` is
-file-backed with **no** Aspire container resource. The default `--db postgres` scaffold
+file-backed with **no** Aspire container resource. The `--db postgres` scaffold
 lays down a `database/postgres/` workspace (a different engine lays down
 `database/<engine>/`). A few facts are worth internalizing before you run anything, because
 they differ from a typical single-file Prisma setup.
@@ -198,7 +198,7 @@ already provision. It is selectable only via an <strong>explicit</strong>
 Prisma 7 talks to the database through a **driver adapter**. NetScript wraps each driver in
 a small `DatabaseAdapter` that gives every backend the same lifecycle surface
 (`getDriverAdapter` → `setClient` → `connect`/`disconnect`/`healthCheck`/`getStatus`). The
-default scaffold is Postgres, but MSSQL and MySQL ship as sub-exports so you can target — or
+recommended scaffold is Postgres, but MSSQL and MySQL ship as sub-exports so you can target — or
 add — a second engine without changing how your code consumes the client.
 
 The shared options shape comes from `DatabaseConnectionOptions`
@@ -336,7 +336,7 @@ Aspire resources and the connection-string env vars the workspace resolves.
 {{ /comp }}
 
 {{ comp callout { type: "note", title: "MSSQL & MySQL are sub-exports" } }}
-Postgres is the default and lives in the <code>@netscript/database/adapters</code> barrel.
+Postgres is the recommended engine and lives in the <code>@netscript/database/adapters</code> barrel.
 The <strong>SQL Server</strong> and <strong>MySQL</strong> adapters are imported from their
 own sub-paths — <code>@netscript/database/adapters/mssql</code> and
 <code>@netscript/database/adapters/mysql</code> — so a Postgres-only app never pulls in the

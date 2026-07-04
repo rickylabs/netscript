@@ -14,7 +14,7 @@ templateEngine: [vento, md]
 }) }}
 
 {{ comp callout { type: "note", title: "Where we are" } }}
-NetScript is in <strong>alpha</strong>. The API is subject to change. We're on the path to beta by the end of 2026 — so build with us, but pin your versions. The published package surface is the contract: what you import from <code>jsr:@netscript/*</code> is what's documented and type-checked.
+NetScript is in <strong>beta</strong> (<code>0.0.1</code>), shipping incrementally. The API is subject to change — so build with us, but pin your versions. The published package surface is the contract: what you import from <code>jsr:@netscript/*</code> is what's documented and type-checked.
 {{ /comp }}
 
 ## The problem
@@ -84,7 +84,7 @@ Tracing isn't a follow-up ticket. Spans wrap the work itself: `withSpan` runs yo
 
 ### 4. Orchestrated with Aspire
 
-Your database, services, workers, and a real dashboard come up together — locally and on the way to deploy — through NetScript's .NET Aspire integration. The flow is two commands: `cd aspire && aspire start` brings up your database container (Postgres by default — or `mysql` / `mssql` via `--db`; `sqlite` is file-backed and needs no container) and Redis and the dashboard *before* any `netscript db` command touches the database. One workspace wires the resources; you get the Aspire dashboard (`:18888`) for traces and logs without standing up your own. Don't want the .NET footprint? `netscript init --no-aspire` and it's gone.
+Your database, services, workers, and a real dashboard come up together — locally and on the way to deploy — through NetScript's .NET Aspire integration. The flow is two commands: `cd aspire && aspire start` brings up your database container (Postgres is the recommended engine — or `mysql` / `mssql` via `--db`; `sqlite` is file-backed and needs no container) and Redis and the dashboard *before* any `netscript db` command touches the database. One workspace wires the resources; you get the Aspire dashboard (`:18888`) for traces and logs without standing up your own. Don't want the .NET footprint? `netscript init --no-aspire` and it's gone.
 
 ### 5. Composable plugins
 
@@ -102,8 +102,8 @@ Authentication is a plugin like any other, and its defining opinion is that the 
   { label: "Pick a backend", lang: "ts", code: "// The interactive backend: a full OAuth/OIDC redirect flow with KV sessions.\nimport { createKvOAuthBackend, providers } from '@netscript/auth-kv-oauth';\n\nconst backend = await createKvOAuthBackend({\n  provider: providers.google({ clientId, clientSecret, redirectUri }),\n});\n\n// One active backend at a time; selected by NETSCRIPT_AUTH_BACKEND.\n// Swap to 'workos' or 'better-auth' without touching your service." }
 ] }) }}
 
-{{ comp callout { type: "note", title: "Framework alpha" } }}
-NetScript packages share the aligned <code>{{ releaseVersion }}</code> version, and scaffolded JSR imports pin that exact alpha train. Only <strong>kv-oauth</strong> is fully interactive — on WorkOS and better-auth the <code>signin</code>/<code>callback</code> endpoints return a typed unsupported-operation error by design. It's one active backend at a time: no multi-active routing, cross-backend linking, or global logout yet. See <a href="/capabilities/auth/">the auth capability hub</a> for the full surface.
+{{ comp callout { type: "note", title: "Framework beta" } }}
+NetScript packages share the aligned <code>{{ releaseVersion }}</code> version, and scaffolded JSR imports pin that exact beta train. Only <strong>kv-oauth</strong> is fully interactive — on WorkOS and better-auth the <code>signin</code>/<code>callback</code> endpoints return a typed unsupported-operation error by design. It's one active backend at a time: no multi-active routing, cross-backend linking, or global logout yet. See <a href="/capabilities/auth/">the auth capability hub</a> for the full surface.
 {{ /comp }}
 
 ## Compared to assembling it yourself
@@ -126,7 +126,7 @@ NetScript is the opinion that these pieces should arrive already fitted — and 
 
 {{ comp callout { type: "tip", title: "When NetScript is NOT the right tool" } }}
 <ul>
-<li><strong>You need a stable, frozen API today.</strong> We're alpha; surfaces still move. If churn is unacceptable, wait for beta or pin hard.</li>
+<li><strong>You need a stable, frozen API today.</strong> We're in beta; surfaces still move. If churn is unacceptable, wait for a later beta or pin hard.</li>
 <li><strong>You can't take a .NET dependency.</strong> The default scaffold integrates .NET Aspire for orchestration. You can <a href="/explanation/aspire/"><code>--no-aspire</code></a>, but if even the option offends your platform constraints, weigh that first.</li>
 <li><strong>You want a frontend framework or a hosted PaaS.</strong> NetScript is backend-scoped: services, workflows, jobs, streams, auth, and a generated workspace you run yourself. It ships a Fresh UI, but it is not a React-style frontend framework, and it does not host anything for you.</li>
 </ul>

@@ -19,9 +19,9 @@ to orchestrate Postgres, Redis, and your services — install the <code>aspire</
 or skip orchestration entirely with <code>--no-aspire</code> (see the aside in step 3).
 {{ /comp }}
 
-{{ comp callout { type: "important", title: "Alpha" } }}
-NetScript is in alpha. Public package versions are <code>{{ releaseVersion }}</code> and the API is subject to
-change as we move toward beta. Pin versions in real projects.
+{{ comp callout { type: "important", title: "Beta" } }}
+NetScript is in beta. Public package versions are <code>{{ releaseVersion }}</code> and the API is subject to
+change as it ships incrementally. Pin versions in real projects.
 {{ /comp }}
 
 {{ comp.learningPath({
@@ -192,7 +192,7 @@ A complete, type-checked workspace — not a starter you have to assemble:
   },
   {
     title: "A database + Redis, provisioned",
-    body: "Aspire stands up the database (Postgres by default; or mysql / mssql / sqlite via --db) and cache for you — no docker-compose to babysit, no connection strings to copy.",
+    body: "Aspire stands up the database (Postgres is the recommended engine; or mysql / mssql / sqlite via --db) and cache for you — no docker-compose to babysit, no connection strings to copy.",
     icon: "▦"
   },
   {

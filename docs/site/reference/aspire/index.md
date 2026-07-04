@@ -10,6 +10,13 @@ generation for NetScript plugin packages. This page is generated from the packag
 surface with `deno doc` (US-2). For the full index of packages and plugins return to the
 [reference overview](/reference/).
 
+> **Generated AppHost runtime behavior.** The TypeScript AppHost this package generates emits
+> **ephemeral ports** (`0`) for the dashboard, OTLP, and resource-service endpoints, so
+> `aspire start --isolated` (an upstream Aspire CLI flag) yields non-colliding, parallel-safe ports
+> and isolated secrets. Generated frontend **app** resources also call `withBrowserLogs()` by default
+> (the AppHost pins `Aspire.Hosting.Browsers`), forwarding browser console output into the Aspire
+> dashboard with no opt-in.
+
 The root entrypoint (`@netscript/aspire`) exposes the diagnostic contract only. Composition,
 config, schema, type, adapter, and testing APIs live on typed sub-path exports:
 

@@ -26,7 +26,7 @@ single server. It is a small fleet:
   `triggers-api` (`:8093`), `auth-api` (`:8094`), the durable-`streams` runtime (`:4437`).
 - Each plugin's **isolated background processors** — the workers and sagas runners, the triggers
   processor — running as separate executables, not threads inside the API.
-- The **infrastructure** all of those depend on: a database — Postgres (the default; or `mysql` /
+- The **infrastructure** all of those depend on: a database — Postgres (the recommended engine; or `mysql` /
   `mssql` / `sqlite` via `--db`) — and a shared cache —
   `redis` by default, or `garnet` / `deno-kv` via `--cache-backend`.
 
@@ -54,7 +54,7 @@ runtime.
 {{ comp callout { type: "important", title: "Aspire is step 2 — before any database command" } }}
 The canonical workflow is <strong>scaffold → orchestrate → database</strong>. After
 <code>netscript init</code>, you run <code>cd aspire &amp;&amp; aspire restore</code> once, then
-<code>aspire start</code>. That command provisions your database (Postgres by default, or
+<code>aspire start</code>. That command provisions your database (Postgres is the recommended engine, or
 <code>mysql</code> / <code>mssql</code> / <code>sqlite</code> via <code>--db</code> at <code>init</code>) and Redis through Docker and brings up
 every service. <strong>Only then</strong> do <code>netscript db init</code>,
 <code>db generate</code>, and <code>db seed</code> work — because those commands provision and
@@ -280,7 +280,7 @@ treat that as canonical and this essay as the orientation.
   caption: "The resource graph a single `aspire start` brings up",
   rows: [
     { name: "aspire (dashboard)", type: "https://localhost:18888", desc: "The Aspire dashboard. `aspire start` prints a login token. Live resource list, logs, structured traces, and the OTLP collector (:4318) surface here." },
-    { name: "postgres", type: "Container", desc: "Provisioned via Docker. Engine Postgres by default (swap to `mysql` / `mssql` — also Containers — or file-backed `sqlite`, which has no container, via `--db`), persistent (DataPath .data/postgres). The database that `netscript db` commands target — reachable only once Aspire is up." },
+    { name: "postgres", type: "Container", desc: "Provisioned via Docker. The recommended engine is Postgres (swap to `mysql` / `mssql` — also Containers — or file-backed `sqlite`, which has no container, via `--db`), persistent (DataPath .data/postgres). The database that `netscript db` commands target — reachable only once Aspire is up." },
     { name: "redis", type: "Container (cache)", desc: "Redis cache — the default `--cache-backend`; Redis-compatible. Backs KV/queue workloads for the runtime plugins. Swap to `garnet` (also a Container) or app-level `deno-kv` via `--cache-backend`." },
     { name: "users", type: ":3001", desc: "Example oRPC service (defineService). Routes /api/v1/users/* and the RPC surface at /api/rpc/*." },
     { name: "workers-api", type: ":8091", desc: "Workers plugin API. /api/v1/workers/{jobs,executions,tasks,seed}; trigger via POST /api/v1/workers/jobs/{id}/trigger." },

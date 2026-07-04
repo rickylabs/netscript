@@ -135,7 +135,8 @@ package surface — nothing is omitted.
     { name: "db", type: "DbContext?", desc: "Database context injected as context.db. Accepts a single Prisma client (with $queryRaw) or a multi-db record like { netscript, mdb, prosco, prev }; the first value exposing $queryRaw is auto-wired as the /health and /health/ready probe client." },
     { name: "openapi", type: "{ title?; description? }?", desc: "Turns on the generated OpenAPI spec endpoint and the Scalar docs UI with this title/description." },
     { name: "debug", type: "boolean?", desc: "Enables verbose oRPC logging. Defaults to the NETSCRIPT_DEBUG env var." },
-    { name: "auth", type: "{ authn: AuthnOptions; authz?: AuthzOptions }?", desc: "Installs the authentication (and optional authorization) gate on guarded paths — the preset form of .withAuthn()/.withAuthz()." }
+    { name: "auth", type: "{ authn: AuthnOptions; authz?: AuthzOptions }?", desc: "Installs the authentication (and optional authorization) gate on guarded paths — the preset form of .withAuthn()/.withAuthz()." },
+    { name: "tls", type: "ServiceTlsOptions?", desc: "Opt-in TLS: { cert, key } as PEM strings. When set, the listener serves HTTPS and negotiates HTTP/2 via ALPN automatically. Forwarded to serve() as .serve({ tls }). See TLS & HTTP/2 below." }
   ]
 }) }}
 
@@ -170,7 +171,7 @@ Services that touch the database need orchestration up first:
 <code>cd aspire &amp;&amp; aspire start</code> brings up Postgres and Redis (dashboard at
 <a href="https://localhost:18888">https://localhost:18888</a>) <strong>before</strong> any
 <code>netscript db</code> command. The seeded-records example service runs without the DB,
-but the real workflow expects aspire startning. See <a href="/explanation/aspire/">Aspire</a>.
+but the real workflow expects Aspire running. See <a href="/explanation/aspire/">Aspire</a>.
 {{ /comp }}
 
 ## OpenAPI spec & Scalar docs
@@ -293,7 +294,8 @@ the same drain manually (reason `'manual'`).
     { name: "port", type: "number?", desc: "Preferred listener port; use 0 for an ephemeral port." },
     { name: "signal", type: "AbortSignal?", desc: "External signal that stops the listener when aborted (drives the drain)." },
     { name: "drainTimeoutMs", type: "number?", desc: "Max time to wait for in-flight requests and shutdown hooks before forcing exit. Defaults to 30_000." },
-    { name: "handleSignals", type: "boolean?", desc: "Install SIGINT/SIGTERM (or SIGBREAK) handlers. Defaults to true." }
+    { name: "handleSignals", type: "boolean?", desc: "Install SIGINT/SIGTERM (or SIGBREAK) handlers. Defaults to true." },
+    { name: "tls", type: "ServiceTlsOptions?", desc: "Opt-in TLS ({ cert, key } PEM strings). Present → HTTPS + HTTP/2 via ALPN; absent → plain HTTP/1.1. See TLS & HTTP/2 below." }
   ]
 }) }}
 
@@ -304,6 +306,47 @@ the same drain manually (reason `'manual'`).
     code: "// services/users/src/main.ts — drain + teardown on signal or manual stop\nimport { createService } from '@netscript/service';\nimport { router } from './router.ts';\nimport { db } from '@database';\n\nconst running = await createService(router, { name: 'users', version: '1.0.0' })\n  .withRPC()\n  .withHealth()\n  .onShutdown(async ({ reason, signal }) => {\n    // reason: 'signal' | 'manual' | 'startup-failure'\n    audit.record({ event: 'shutdown', reason, signal });\n    await db.$disconnect();\n  })\n  .serve({\n    port: 3001,\n    drainTimeoutMs: 10_000, // wait up to 10s for in-flight work\n    handleSignals: true,    // SIGINT/SIGTERM/SIGBREAK\n  });\n\n// Later, in tests or a supervisor: trigger the same drain manually.\nawait running.stop();"
   }
 ] }) }}
+
+## TLS & HTTP/2 (opt-in)
+
+By default a service listens over plain HTTP. Pass a `tls` option and the *same* listener serves
+HTTPS and negotiates **HTTP/2 automatically via ALPN** — HTTP/1.1 stays available as a fallback, and
+there is no separate `http2` flag. TLS is purely additive: a service that omits `tls` is unchanged.
+
+`tls` is a `ServiceTlsOptions` object whose `cert` and `key` are **PEM-encoded strings** — the
+certificate chain and the private key as *contents*, not file paths. It is accepted by both
+`defineService(router, { …, tls })` and the fluent builder's `.serve({ tls })`.
+
+```ts
+// services/users/src/main.ts — serve HTTPS + HTTP/2 with an inline cert/key
+import { defineService } from '@netscript/service';
+import { router } from './router.ts';
+
+await defineService(router, {
+  name: 'users',
+  port: 3000,
+  tls: {
+    cert: await Deno.readTextFile('cert.pem'), // PEM contents
+    key: await Deno.readTextFile('key.pem'),   // PEM contents
+  },
+});
+// Fluent equivalent: createService(router, { name }).withHealth().serve({ tls: { cert, key } })
+```
+
+If you omit `tls`, the listener falls back to environment configuration: set **both**
+`NETSCRIPT_TLS_CERT_FILE` and `NETSCRIPT_TLS_KEY_FILE` and the service serves HTTPS from those files.
+Unlike the inline `cert`/`key` (PEM contents), these env vars are **file paths** — and both are
+required; one alone is ignored.
+
+{{ comp.apiTable({
+  caption: "ServiceTlsOptions (@netscript/service) + env fallback",
+  rows: [
+    { name: "cert", type: "string (required)", desc: "PEM-encoded certificate chain — the contents, not a path." },
+    { name: "key", type: "string (required)", desc: "PEM-encoded private key — the contents, not a path." },
+    { name: "NETSCRIPT_TLS_CERT_FILE", type: "env (path)", desc: "Fallback when tls is omitted: file path to the PEM certificate chain. Both env vars must be set together." },
+    { name: "NETSCRIPT_TLS_KEY_FILE", type: "env (path)", desc: "Fallback when tls is omitted: file path to the PEM private key. Both env vars must be set together." }
+  ]
+}) }}
 
 ## Service-layer authn / authz middleware
 

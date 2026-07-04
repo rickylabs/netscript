@@ -134,7 +134,10 @@ runtime's automatic spans show up in the dashboard with no code change. The tab 
 <code>OTEL_*</code> variables into every resource, so telemetry works the moment you run
 <code>aspire start</code> — nothing to configure. Note the dashboard and OTLP endpoints bind to
 <strong>ephemeral ports</strong> (the generated profile uses <code>localhost:0</code>), so use the URL
-<code>aspire start</code> prints rather than assuming <code>:18888</code>/<code>:4318</code>.
+<code>aspire start</code> prints rather than assuming <code>:18888</code>/<code>:4318</code>. Running
+<code>aspire start --isolated</code> (an upstream Aspire CLI flag) also randomizes the dashboard, OTLP,
+and resource-service ports and isolates secrets, so several apphosts can boot in parallel without
+colliding.
 <strong>Deployed</strong>, there is no Aspire and no dashboard: you point
 <code>OTEL_EXPORTER_OTLP_ENDPOINT</code> at your own collector or a hosted backend (Grafana Tempo,
 Honeycomb, Jaeger, …). The instrumentation code is identical — only the endpoint/protocol env and the
