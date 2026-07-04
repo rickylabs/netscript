@@ -550,7 +550,7 @@ framework debt.
 
 These are publish-surface traps established across NetScript release cuts. They are consolidated
 here as the canonical home; the `deno doc --lint` full-export-surface bar is covered above under
-[`deno doc --lint`](#deno-doc---lint--the-publish-quality-bar) — do not restate it.
+[`deno doc --lint`](#deno-doc---lint-the-publish-quality-bar) — do not restate it.
 
 - **Embed assets via import attributes, never `readTextFile`/`fromFileUrl`.** A published module runs
   over an `https:`/`jsr:` graph where there is no filesystem, so `Deno.readTextFile(...)` /
