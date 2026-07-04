@@ -186,4 +186,39 @@ concept named in `design-v3.md` §5/§8. Ready for PLAN-EVAL (OpenHands, separat
 - **Gate**: `agentic:sync-claude` (1 mirror refreshed) → `agentic:sync-claude:check` OK;
   `agentic:check-claude` OK (all surface checks green, lock unchanged).
 - **Reconcile**: no related-issue state change (S5 codifies process; touches no issue acceptance
-  boxes). No new labels. Commit sha recorded below.
+  boxes). No new labels. Commit sha `aa3e2fed`.
+
+## 2026-07-04 — S6 landed (tooling mandates + agentic aliases)
+
+- **Author**: Opus 4.8 sub-agent (Tier B, D3 lane override), worktree `.llm/tmp/wt-harness-v3`.
+- **What**: made the scoped tool surface **mandatory** (design §8-S6). `netscript-tools` SKILL:
+  Validation Wrappers rewritten as a MANDATE (check/lint/fmt evidence MUST come from
+  `run-deno-{check,lint,fmt}.ts`; raw root `deno check .`/`deno fmt --check` = non-verdict), new
+  **Dependency Evidence** MANDATE (deps/* wrappers; never `deno outdated --latest` for latest) that
+  cross-references `netscript-deno-toolchain` as the canonical gotcha home, `doc:lint` wrapper cited
+  in Publish-And-Docs, new **Supervisor Automation** section documenting `gh-watch.ts` (token-free
+  CI/verdict watch + exit-code table) and `gh-token.ts` (durable token check/store).
+  `netscript-deno-toolchain` SKILL: deps/* MANDATE line (keeps canonical role); `doc:lint` wrapper
+  in the inspection table. Harness gate docs: `gates/static-gates.md` "Parser Preference" → "Required
+  Evidence Source (mandatory)"; `run-loop.md` §6 gate para "evidence is wrapper-sourced". NEW
+  `.llm/harness/workflow/tooling.md` — pure INDEX (map not manual) of the mandatory tool surface,
+  cross-linking the two skills; linked from harness `README.md`. `deno.json`: **11 new task aliases**
+  — the 10 unwired `agentic:*` supervisor tools (`codex-resume|status|watch`, `launch-codex-slice`,
+  `dispatch-openhands`, `openhands-status`, `gh-pr|watch|token`, `claude-hook-log`) each with
+  per-script permission scoping + `--no-lock`, plus `doc:lint` wrapping `run-deno-doc-lint.ts`.
+- **Supervisor review (A1 gate)**: read all 6 diffs + new tooling.md. Mandates correctly DEFER to
+  the canonical gotcha homes (no restated `--latest`/catalog gotchas — cross-ref only, per AGENTS.md
+  law); tooling.md is an index not a manual; alias permission strings verified sane (e.g. `codex-watch`
+  gets `--allow-env` for its unguarded `HOME` read). Boundary respected — no `.claude/skills` hand-edit,
+  no `packages/`/`plugins/`, no `deno.lock`, no `.llm/tools/**` script-body edits (aliases in
+  `deno.json` only); S7 (Copilot/Augment, frontmatter, fitness-gates) + S8 (residue/ARCHETYPE-5)
+  untouched.
+- **Gate**: `agentic:sync-claude` (2 mirrors refreshed) → `agentic:sync-claude:check` OK →
+  `agentic:check-claude` OK. Alias-resolve independently verified: `agentic:gh-watch --help` and
+  `agentic:dispatch-openhands --help` print usage (resolve, not missing-file); `deno.json` parses.
+- **Drift/debt candidates** (sub-agent flagged, NOT fixed — source-behavior out of S6 scope):
+  (1) `codex-watch.ts` header doc-comment omits `--allow-env` it actually needs (`HOME` read);
+  (2) `gh-token.ts` lacks an `import.meta.main` guard + `--help`; (3) `claude-hook-log.ts` is
+  stdin-blocking (hook consumer, not an interactive supervisor command). Carry to S6-reconcile note /
+  #307 tooling audit; none block the mandated wrappers.
+- **Reconcile**: no related-issue state change. Commit sha recorded below.

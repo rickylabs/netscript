@@ -9,6 +9,13 @@ Deno 2.9.x ships a full first-class dependency + release toolchain. **Prefer it 
 This skill is the command map; the repo wraps the noisy ones in `.llm/tools/deps/` (structured
 JSON). Use the wrappers for agent decisions, the raw commands for one-off interactive work.
 
+**MANDATE (harness runs).** Dependency/version/"is-latest"/"is-this-import-dead"/publish-install
+evidence MUST come from the `.llm/tools/deps/*` wrappers, exposed as
+`deno task deps:latest|outdated|why|audit|prod-install` — never a hand-rolled registry `curl`, and
+never `deno outdated --latest` for "latest" (see the trap below). This skill is the **canonical home**
+for the command map and the gotchas; other skills (e.g. `netscript-tools`) cross-reference here
+rather than restate them.
+
 Repo is on **Deno 2.9.0** (Windows + WSL). Targeted `deno check` must pass `--unstable-kv`.
 
 ## The one trap that matters
@@ -73,7 +80,7 @@ plugin); everything else must satisfy `isolatedDeclarations`. Prefer fixing slow
 | ------- | --- |
 | `deno doc <module>` | **your friend** — read a package's public API without opening source. Use before implementation reads for `@netscript/*` packages. |
 | `deno doc --filter <symbol> <module>` | jump straight to one symbol's signature/docs |
-| `deno doc --lint <module>` | enforce documented public surface (publishability gate) |
+| `deno doc --lint <module>` | enforce documented public surface (publishability gate). For noisy multi-entrypoint output, use the structured wrapper `deno task doc:lint --root packages/<pkg> --pretty` (`.llm/tools/run-deno-doc-lint.ts`) — it lints the **full export map** from `deno.json` (not `mod.ts` alone) and attributes errors per entrypoint/file |
 
 `deno doc` / `deno doc --filter` are the cheapest way to learn an internal package API — far cheaper
 than reading the whole module. Reach for them first.

@@ -152,6 +152,13 @@ overlays:
 - consumer gates when exports or downstream contracts change,
 - **jsr-audit** as a required gate for package/plugin waves.
 
+Gate **evidence is wrapper-sourced and mandatory**: type-check / lint / format from the scoped
+wrappers (`.llm/tools/run-deno-check|lint|fmt.ts`), doc-lint from `deno task doc:lint`, and
+dependency / publishability from the `deno task deps:*` wrappers — raw root `deno check .` /
+`deno fmt --check` and hand-rolled registry curls are non-verdicts. The full tool surface is indexed
+in `workflow/tooling.md`; the command map and gotchas live in the **netscript-tools** and
+**netscript-deno-toolchain** skills (do not restate them here).
+
 Record results as tables in `worklog.md`.
 
 ## 7. Evaluate (IMPL-EVAL)

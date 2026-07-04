@@ -29,7 +29,7 @@ how an agent uses it during a run.
 
 | Folder        | Concern                                                               |
 | ------------- | --------------------------------------------------------------------- |
-| `workflow/`   | Run mechanics: activation, loop, retrieval, commit trail, circuit breakers |
+| `workflow/`   | Run mechanics: activation, loop, retrieval, lane policy, tooling index, circuit breakers |
 | `archetypes/` | Doctrine archetype profiles plus scope overlays                       |
 | `gates/`      | Static, fitness, runtime, and consumer gate definitions               |
 | `evaluator/`  | Separate evaluator-session protocol and verdict definitions           |
@@ -49,6 +49,10 @@ how an agent uses it during a run.
 - Every deferred doctrine violation is recorded in `debt/arch-debt.md`.
 - Cross-agent handoffs use `workflow/agent-handoff.md`; GitHub comments remain evidence, not a
   replacement for harness artifacts.
+- Gate evidence is wrapper-sourced: [`workflow/tooling.md`](./workflow/tooling.md) indexes the
+  mandatory tool surface (scoped check/lint/fmt + `deps/*` wrappers, the `agentic:*` task family,
+  and the event-driven wake tools), cross-referencing the `netscript-tools` and
+  `netscript-deno-toolchain` skills.
 
 ## Run Artifacts
 
