@@ -67,9 +67,10 @@ logic in the command surface; conventions live in the core), documented in
 ## Phase A Reporting
 
 Fitness scripts now exist: `deno task arch:check` runs `.llm/tools/fitness/check-doctrine.ts` over
-the owned package/plugin roots, and `.llm/tools/fitness/` holds the individual check scripts (e.g.
-`check-folder-cardinality.ts`, `check-abstract-coloc.ts`, and the `check-cli-*.ts` family). Where a
-script does not yet cover a required gate, evaluators report it as:
+the owned package/plugin roots, and `.llm/tools/fitness/` holds the remaining gate scripts —
+`check-doctrine.ts` for anti-pattern coverage (AP-1..AP-30), `audit-jsr-package.ts` for per-package
+JSR readiness, and `check-ds-no-raw-hex.ts` / `check-ds-color-utilities.ts` for the design-system
+token gates. Where a script does not cover a required gate, evaluators report it as:
 
 - `PASS` with manual evidence,
 - `PENDING_SCRIPT` with manual evidence and no detected violation,

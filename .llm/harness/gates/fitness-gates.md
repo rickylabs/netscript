@@ -4,44 +4,34 @@ Fitness gates are the executable form of the doctrine. Doctrine source:
 `docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md`.
 
 The fitness surface is real and lives under `.llm/tools/fitness/*.ts`. This file names the actual
-scripts, the aggregators that run them, and the evaluator reporting shape. It does **not** invent
-script names: every path below exists in the tree. Run the aggregators for a verdict; reach for the
-per-domain `check-*.ts` family when a single anti-pattern class needs an isolated check.
+scripts and the evaluator reporting shape. It does **not** invent script names: every path below
+exists in the tree. The surface is deliberately small — a mechanical doctrine evaluator plus a
+per-package JSR/doctrine auditor plus the design-system token gates. There is **no** per-domain
+`check-cli-*` / `check-*-edges` / `check-*-shape` family and **no** `release-readiness` /
+`audit-all-packages` / `check-netscript-standards` aggregator; those were dead code and were
+removed. For any domain that has no dedicated script, evaluators use manual evidence plus
+`check-doctrine.ts` coverage (see `PENDING_SCRIPT` below).
 
-## Aggregators (entrypoints)
+## Gate scripts (entrypoints)
 
-Prefer these for merge-readiness and package/JSR verdicts — each fans out to the per-domain scripts.
+All paths are under `.llm/tools/fitness/`.
 
-| Aggregator                                       | Runs                                                                                             | Use for                                    |
-| ------------------------------------------------ | ------------------------------------------------------------------------------------------------ | ------------------------------------------ |
-| `.llm/tools/fitness/check-architecture-gates.ts` | doctrine (`check-doctrine.ts`) + design-system gates (`check-ds-no-raw-hex.ts`, `check-ds-color-utilities.ts`); this is `deno task arch:check` | single merge-readiness architecture verdict |
-| `.llm/tools/fitness/audit-jsr-package.ts`        | single-package JSR + doctrine audit; internal gates F-1 (folder vocabulary), F-2 (file-count caps), F-3 (no `I`-prefix), F-4 (no helpers/utils dumping ground), F-5 (`mod.ts` present), F-6 (`deno.json` JSR-valid), F-7 (publish dry-run clean); also docs/surface/slow-types/tests sections | per-package JSR + doctrine readiness (`--root <pkg>`) |
-| `.llm/tools/fitness/audit-all-packages.ts`       | `audit-jsr-package.ts` across every `packages/*` (and `plugins/*` with `--include-plugins`)       | repo-wide package readiness roll-up        |
-| `.llm/tools/fitness/release-readiness.ts`        | JSR (`audit-jsr-package.ts`) + doctrine (`check-doctrine.ts`) + standards (`check-netscript-standards.ts`) + CLI fitness (`check-cli-*.ts`) per package | release-gate roll-up (`_summary.md`)       |
-| `.llm/tools/fitness/check-doctrine.ts`           | mechanical doctrine evaluator — axioms A1..A14 + anti-patterns AP-1..AP-30 at the granularity that can be checked mechanically; findings tagged `A##`/`AP-##`/`F-DOCT-##` | per-root anti-pattern coverage (`--root <pkg>`) |
-| `.llm/tools/fitness/check-netscript-standards.ts`| cross-package public-surface uniformity (findings tagged `NS-S-##`); stricter than doctrine       | per-root standards readiness (`--root <pkg>`) |
+| Script                     | What it does                                                                                                                                                                                                                            | Use for                                          |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------ |
+| `check-doctrine.ts`        | Mechanical doctrine evaluator — axioms A1..A14 + anti-patterns AP-1..AP-30 at the granularity that can be checked mechanically; findings tagged `A##`/`AP-##`/`F-DOCT-##`. Takes `--root <pkg>` (defaults to repo-wide with no root).      | per-root anti-pattern coverage (`--root <pkg>`); this is the script `deno task arch:check` runs |
+| `audit-jsr-package.ts`     | Single-package JSR + doctrine audit; internal gates F-1 (folder vocabulary), F-2 (file-count caps), F-3 (no `I`-prefix), F-4 (no helpers/utils dumping ground), F-5 (`mod.ts` present), F-6 (`deno.json` JSR-valid), F-7 (publish dry-run clean); also docs/surface/slow-types/tests sections. | per-package JSR + doctrine readiness (`--root <pkg>`) |
+| `check-ds-no-raw-hex.ts`   | Design-system gate: no raw hex color literals; tokens only.                                                                                                                                                                              | design-token discipline (design-system packages) |
+| `check-ds-color-utilities.ts` | Design-system gate: color utilities go through the token layer, not ad-hoc.                                                                                                                                                           | design-token discipline (design-system packages) |
 
-## Per-domain `check-*` family
+Support file (not a gate entrypoint): `check-ds-gates_test.ts` — the unit test for the two
+design-system gates.
 
-When a single anti-pattern class needs an isolated check (or an aggregator flags one domain), run the
-matching script. All paths are under `.llm/tools/fitness/`.
+## `deno task arch:check`
 
-| Domain                             | Scripts                                                                                                                                                                                             | Primary AP focus            |
-| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
-| Structure / layering / composition | `check-abstract-coloc.ts`, `check-composition-shape.ts`, `check-extension-points.ts`, `check-instantiation-edges.ts`, `check-folder-cardinality.ts`, `check-manifest-integrity.ts`, `check-template-location.ts`, `check-template-registry.ts` | AP-4/5/6, AP-16/17          |
-| Naming / edges                     | `check-no-i-prefix.ts`, `check-console-edges.ts`, `check-process-edges.ts`                                                                                                                          | AP-13, AP-15, AP-19         |
-| CLI archetype                      | `check-cli-structure.ts`, `check-cli-barrels.ts`, `check-cli-file-size.ts`, `check-cli-isolation.ts`, `check-cli-naming.ts`, `check-cli-no-leak-markers.ts`, `check-cli-presentation.ts`, `check-cliffy-containment.ts`, `check-command-shape.ts` | AP-1, AP-14/15/16/17         |
-| Design system                      | `check-ds-no-raw-hex.ts`, `check-ds-color-utilities.ts`, `check-token-drift.ts`                                                                                                                     | design-token discipline     |
-
-Support files (not gate entrypoints): `cli-fitness-shared.ts` (shared lib), `check-ds-gates_test.ts`
-(unit test), `generate-package-plans.ts` (plan generator).
-
-> **Follow-up (#307-coordinated):** a faithful, exhaustive per-anti-pattern (AP-1..AP-30) → script
-> map is intentionally not enumerated here — the real surface is 32 domain scripts against 30
-> anti-patterns and the correspondence is many-to-one and partly aggregator-mediated. The canonical
-> per-AP mapping belongs with the fitness-tool audit tracked under #307; until then,
-> `check-doctrine.ts` is the mechanical AP-1..AP-30 authority and the family table above is the
-> pointer.
+`deno task arch:check` runs `check-doctrine.ts --root <pkg>` over each owned package/plugin root in
+turn (the exact root list lives in the `arch:check` task in `deno.json`), after `deps:check`.
+`deno task arch:check:repo` runs `check-doctrine.ts` once repo-wide (no `--root`). `check-doctrine.ts`
+is the mechanical AP-1..AP-30 authority; there is no separate architecture-gates aggregator.
 
 ## Reporting States
 
@@ -49,26 +39,37 @@ Support files (not gate entrypoints): `cli-fitness-shared.ts` (shared lib), `che
 | ---------------- | --------------------------------------------------------------------- |
 | `PASS`           | Script or manual equivalent found no violation.                       |
 | `FAIL`           | Violation found and not accepted as debt.                             |
-| `PENDING_SCRIPT` | No dedicated script exists for this domain yet; manual evidence required. |
+| `PENDING_SCRIPT` | No dedicated script exists for this domain; manual evidence required. |
 | `N/A`            | Gate does not apply to the archetype or scope.                        |
 | `DEBT_ACCEPTED`  | Violation exists and has a valid `arch-debt.md` entry.                |
+
+`PENDING_SCRIPT` is the common case, not the exception. The gate scripts above cover doctrine
+anti-patterns (`check-doctrine.ts`), per-package JSR readiness (`audit-jsr-package.ts`), and
+design-system tokens (the two `check-ds-*` gates). Every other domain — CLI archetype shape, folder
+cardinality beyond `audit-jsr-package.ts` F-1/F-2, layering/edges, naming, composition — has **no**
+dedicated script and is evaluated with manual evidence backed by `check-doctrine.ts` coverage. Report
+those as `PENDING_SCRIPT` (with manual evidence and no detected violation) or `PASS` (with manual
+evidence), not as a missing gate.
 
 ## Manual Evidence When No Dedicated Script Exists
 
 When a domain has no dedicated script, the generator/evaluator performs the narrowest manual check
 that matches the gate. Examples:
 
-- File size / folder cardinality: inspect line counts and folder shape for changed package files
-  (or run `audit-jsr-package.ts` F-1/F-2 for the package).
-- Layering: inspect imports across touched role folders (or run `check-instantiation-edges.ts` /
-  `check-composition-shape.ts`).
-- Public surface / doc coverage: run `deno doc --lint` and read exported symbols (or the docs/surface
-  sections of `audit-jsr-package.ts`).
-- Permission declaration: compare README permissions to touched `Deno.*`, network, KV, and process
-  calls (or run `check-process-edges.ts`).
-- Anti-pattern coverage generally: run `check-doctrine.ts --root <pkg>` before hand-auditing.
+- Anti-pattern coverage generally: run `check-doctrine.ts --root <pkg>` before hand-auditing — it is
+  the mechanical AP-1..AP-30 authority and should be the first evidence for any structural,
+  layering, naming, or edges gate.
+- File size / folder cardinality / folder vocabulary: run `audit-jsr-package.ts --root <pkg>`
+  (F-1/F-2/F-4) for the package, or inspect line counts and folder shape for the changed files.
+- Public surface / doc coverage: run `deno doc --lint` and read exported symbols (or read the
+  docs/surface/slow-types sections of `audit-jsr-package.ts`).
+- Permission declaration: compare README permissions to the touched `Deno.*`, network, KV, and
+  process calls by reading the changed files.
+- Design tokens: run `check-ds-no-raw-hex.ts` / `check-ds-color-utilities.ts` for design-system
+  packages.
 
-Manual evidence is temporary. When a domain gains a dedicated script it replaces the manual check.
+Manual evidence is temporary. If a domain later gains a dedicated script, that script replaces the
+manual check and this file is updated to name it.
 
 ## Debt Rule
 
