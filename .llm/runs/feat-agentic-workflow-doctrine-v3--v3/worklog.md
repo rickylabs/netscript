@@ -471,8 +471,26 @@ concept named in `design-v3.md` §5/§8. Ready for PLAN-EVAL (OpenHands, separat
 - **AP-ceiling judgment (drift D8)**: aligned harness evaluator tables to the **doctrine-defined
   AP-25 / F-19**; the AP-25(doctrine)-vs-AP-30(`check-doctrine.ts`) gap is left as an out-of-surface
   #305 follow-up (reconciling needs a doctrine-prose edit V3 must not make). AP-30 tool refs unchanged.
-- **STILL PENDING owner decision (part B, destructive)**: `git rm` the 108 stale tracked
-  `.llm/tmp/run/` v2 artifacts (contradict `.gitignore:17`) + verdict on `.llm/frontend/wi/WI-12-*.md`
-  and `.llm/plans/2026-06-12-fresh-ui-doctrine-plan.md`. Flagged to coordinator; not acted on.
-- **Next**: await part-B decision → then full-surface gates → WSL Codex adversarial (whole V3 surface)
-  → OpenHands IMPL-EVAL (separate session). No merge/close.
+## S10 part B — untrack stale tmp/run + delete dated singletons (commit `707b21cd`)
+
+Owner authorized (via coordinator): untrack (keep on disk) the stale `.llm/tmp/run/` set; delete
+the 2 dated singletons.
+
+- **Locked the exact set first**: `git ls-files .llm/tmp/run/` → **108** tracked paths; verified
+  **zero overlap** with `.llm/runs/` (the kept run home, 9 tracked). Only then staged.
+- **(a) Untrack, keep on disk**: `git rm -r --cached .llm/tmp/run/` — 108 paths removed from the
+  index, all still present on disk. `.llm/tmp/` is `.gitignore:17`, so they stay ignored and do
+  **not** reappear as untracked. Post-op `git status` clean of them.
+- **(b) Delete both dated singletons** (repo + disk) via `git rm`:
+  `.llm/frontend/wi/WI-12-definePage-route-binding-codegen.md` and
+  `.llm/plans/2026-06-12-fresh-ui-doctrine-plan.md`.
+- **Staged set audit**: exactly **110** entries, all `D` (108 untrack + 2 delete); nothing outside
+  the intended paths; `deno.lock` untouched.
+- **grep-zero (both singleton filenames, repo-wide)**: no in-surface, framework (`packages/**`), or
+  `docs/**` referrer remains. The **only** hit is this run's own historical worklog note (part A
+  "STILL PENDING" line) — append-only provenance, superseded by this entry; not rewritten. Reported
+  the grep result to the coordinator.
+- **arch-debt.md historical `.llm/tmp/run/<id>` provenance links** point to **different**
+  already-gone run-ids (not these 108) — left as historical provenance, not rewritten (per owner).
+- **Next**: full-surface gates → WSL Codex adversarial (whole V3 surface, owner's pre-eval
+  close-all-gaps pass) → OpenHands IMPL-EVAL (separate session). No merge/close.
