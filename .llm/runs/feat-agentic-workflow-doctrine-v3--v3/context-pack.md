@@ -8,7 +8,7 @@ GitHub + mobile without cloning.
 
 **State**: PLAN-EVAL PASS (OpenHands minimax-M3; `plan-eval.md`). Implementation IN FLIGHT under the
 D3 lane override (all slices S2–S8 = Opus 4.8 sub-agents; Fable 5 supervises). **S2 LANDED**
-(`<sha>`): new `.llm/harness/workflow/lane-policy.md` + `netscript-harness` SKILL re-baselined to V3.
+(`f33141fd`): new `.llm/harness/workflow/lane-policy.md` + `netscript-harness` SKILL re-baselined to V3.
 
 - Branch: `feat/agentic-workflow-doctrine-v3` @ base `1b42ba88` · worktree `.llm/tmp/wt-harness-v3`
 - Doctrine issue: #306 (adopt) · related: #305 (boundary, framework doctrine), #387 (closure guardrail)
