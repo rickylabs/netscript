@@ -63,7 +63,7 @@ jobs:
 
       - name: Ensure JSR packages exist
         env:
-          JSR_API_TOKEN: ${{ secrets.JSR_TOKEN }}
+          JSR_API_TOKEN: ${{ secrets.JSR_API_TOKEN }}
         run: deno run --allow-net --allow-read --allow-env .llm/tools/jsr-provision-packages.ts
 
       - name: Release preflight
@@ -133,7 +133,7 @@ jobs:
       - name: Apply JSR package settings
         if: steps.release.outputs.dry_run != 'true' && steps.jsr_settings.outputs.apply == 'true'
         env:
-          JSR_API_TOKEN: ${{ secrets.JSR_TOKEN }}
+          JSR_API_TOKEN: ${{ secrets.JSR_API_TOKEN }}
         run: deno run --allow-net --allow-read --allow-env .llm/tools/jsr-set-package-settings.ts
 
       - name: Update GitHub Release with JSR links
