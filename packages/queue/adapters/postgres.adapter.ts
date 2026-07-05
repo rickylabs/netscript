@@ -30,7 +30,9 @@ const DEFAULT_TABLE_NAME = 'message_queue';
 const DEFAULT_POLL_INTERVAL_MS = 1_000;
 const DEFAULT_VISIBILITY_TIMEOUT_MS = 30_000;
 
-interface PostgresQueryResult<Row = Record<string, unknown>> {
+/** Result rows returned by the PostgreSQL queue client. */
+export interface PostgresQueryResult<Row = Record<string, unknown>> {
+  /** Rows returned by the query. */
   readonly rows: Row[];
 }
 
@@ -283,6 +285,7 @@ export class PostgresAdapter<T = unknown> implements MessageQueue<T> {
     return Promise.resolve();
   }
 
+  /** Resolves or creates the PostgreSQL client and prepares the queue schema. */
   private async ensureClient(): Promise<PostgresQueueClient> {
     if (this.client) {
       return this.client;
@@ -312,6 +315,7 @@ export class PostgresAdapter<T = unknown> implements MessageQueue<T> {
     }
   }
 
+  /** Ensures schema creation runs once per adapter instance. */
   private async ensureSchema(client: PostgresQueueClient): Promise<void> {
     if (!this.schemaReady) {
       this.schemaReady = this.createSchema(client);
@@ -319,6 +323,7 @@ export class PostgresAdapter<T = unknown> implements MessageQueue<T> {
     await this.schemaReady;
   }
 
+  /** Resolves the dead-letter store used for exhausted queue messages. */
   private async ensureDeadLetterStore(): Promise<DeadLetterStorePort<T>> {
     if (this.deadLetterStore) {
       return this.deadLetterStore;
@@ -337,6 +342,7 @@ export class PostgresAdapter<T = unknown> implements MessageQueue<T> {
     return this.deadLetterStore;
   }
 
+  /** Creates the queue table and indexes when they do not already exist. */
   private async createSchema(client: PostgresQueueClient): Promise<void> {
     await client.query(
       `CREATE TABLE IF NOT EXISTS ${this.tableIdentifier} (
@@ -363,6 +369,7 @@ export class PostgresAdapter<T = unknown> implements MessageQueue<T> {
     );
   }
 
+  /** Claims the next visible queue row for this consumer. */
   private async claimNextMessage(
     visibilityTimeout = this.visibilityTimeout,
   ): Promise<PostgresMessageRow | null> {
@@ -391,6 +398,7 @@ export class PostgresAdapter<T = unknown> implements MessageQueue<T> {
     return result.rows[0] ?? null;
   }
 
+  /** Dispatches one claimed row to the message handler. */
   private async processRow(
     row: PostgresMessageRow,
     handler: (message: T, context: MessageContext) => Promise<void>,
@@ -436,6 +444,7 @@ export class PostgresAdapter<T = unknown> implements MessageQueue<T> {
     }
   }
 
+  /** Creates the public message context for a claimed storage row. */
   private createContext(
     storageMessageId: string,
     messageId: string,
@@ -475,6 +484,7 @@ export class PostgresAdapter<T = unknown> implements MessageQueue<T> {
     );
   }
 
+  /** Deletes a message row after successful processing. */
   private async ack(messageId: string): Promise<void> {
     const client = await this.ensureClient();
     await client.query(
@@ -484,6 +494,7 @@ export class PostgresAdapter<T = unknown> implements MessageQueue<T> {
     );
   }
 
+  /** Releases a message row so another listener can claim it again. */
   private async release(messageId: string): Promise<void> {
     const client = await this.ensureClient();
     await client.query(
@@ -496,6 +507,7 @@ export class PostgresAdapter<T = unknown> implements MessageQueue<T> {
     );
   }
 
+  /** Records an exhausted or explicitly rejected message in the dead-letter store. */
   private async deadLetter(
     _storageMessageId: string,
     messageId: string,
