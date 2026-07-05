@@ -65,6 +65,8 @@ slice commit.
 | 2026-07-06 | 1 | bootstrap | Read required skills, doctrine, harness workflow, and commit `86eca907`; created run artifacts. |
 | 2026-07-06 | 1 | draft PR | Opened draft PR #483 and pushed bootstrap commit `1178e727`. |
 | 2026-07-06 | 1 | plan-eval | OpenHands PLAN-EVAL PASS, commit `324d85d3`; corrected plan wording slips before implementation. |
+| 2026-07-06 | 2 | inventory | Full-export-map doc-lint inventory: 346 diagnostics before fixes across 34 publishable roots. |
+| 2026-07-06 | 2 | aspire | Fixed missing JSDoc in `packages/aspire` public error/interface members; raw full-export doc-lint clean. |
 
 ## Decisions
 
@@ -88,6 +90,9 @@ slice commit.
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
 | Git branch/baseline | `git branch --show-current`; `git rev-parse HEAD` | PASS | Branch and baseline match user brief. |
+| Aspire check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/aspire --ext ts,tsx` | PASS | 45 files selected, 0 occurrences. |
+| Aspire lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/aspire --ext ts,tsx` | PASS | 45 files selected, 0 findings. |
+| Aspire fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/aspire --ext ts,tsx` | PASS | 45 files selected, 0 findings. |
 
 ### Fitness Gates
 
@@ -96,6 +101,7 @@ slice commit.
 | F-5/F-7 | NOT_RUN | Pending after PLAN-EVAL | Full doc-lint sweep is implementation slice work. |
 | F-6 | NOT_RUN | Pending after fixes | Publish dry-run is final validation. |
 | F-19 | NOT_RUN | Pending after fixes | Scoped wrappers are final validation. |
+| F-5/F-7 `@netscript/aspire` | PASS | `deno doc --lint` over 9 export-map entrypoints: `Checked 9 files`. | Wrapper summary also reports 0 combined errors; raw command used to confirm clean verdict. |
 
 ### Runtime Gates
 
