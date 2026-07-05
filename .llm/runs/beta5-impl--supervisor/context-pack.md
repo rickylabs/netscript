@@ -6,7 +6,7 @@
 | ----- | ----- |
 | Run ID | `beta5-impl--supervisor` |
 | Branch | `chore/305-doctrine-quickwin` |
-| Current phase | `plan-eval` |
+| Current phase | `implement` |
 | Archetype | Archetype 6 for checker tooling; N/A for docs-only files |
 | Scope overlays | `SCOPE-docs.md` |
 
@@ -23,14 +23,13 @@ The quick-win findings reproduce: stale `@netscript/shared` Result guidance, dea
 
 ## In Progress
 
-- PLAN-EVAL handoff, then slice 0 commit/push/draft PR.
+- Implementation slices may begin after PLAN-EVAL `PASS`.
 
 ## Next Steps
 
-1. Complete PLAN-EVAL in a separate session.
-2. Commit/push run bootstrap and open draft PR.
-3. Run baseline `deno task arch:check`.
-4. Implement slices 1-3 and final validation.
+1. Commit/push PLAN-EVAL artifact.
+2. Run baseline `deno task arch:check`.
+3. Implement slices 1-3 and final validation.
 
 ## Key Decisions
 
@@ -45,6 +44,7 @@ The quick-win findings reproduce: stale `@netscript/shared` Result guidance, dea
 | Path | Status | Notes |
 | ---- | ------ | ----- |
 | `.llm/runs/beta5-impl--supervisor/` | new | Harness run artifacts. |
+| `.llm/runs/beta5-impl--supervisor/plan-eval.md` | new | Separate evaluator verdict `PASS`. |
 
 ## Gates
 

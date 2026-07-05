@@ -60,6 +60,7 @@ Start at `docs/architecture/doctrine/ref-migration-map.md` to translate old refs
 | Time | Slice | Step | Notes |
 | ---- | ----- | ---- | ----- |
 | 2026-07-06 | 0 | Bootstrap | Created run artifacts from current-tree research. |
+| 2026-07-06 | Plan-Gate | PASS | Separate PLAN-EVAL wrote `plan-eval.md`; implementation may begin. |
 
 ## Decisions
 
