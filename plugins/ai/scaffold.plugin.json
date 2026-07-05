@@ -18,13 +18,6 @@
       "net": [],
       "read": ["<workspaceRoot>"],
       "write": ["<workspaceRoot>"]
-    },
-    "flags": {
-      "persist-threads": {
-        "type": "boolean",
-        "default": false,
-        "description": "Also scaffold an app-owned Deno.Kv thread store for durable chat persistence."
-      }
     }
   },
   "provider": {
@@ -35,7 +28,7 @@
     "defaultPermissions": ["--allow-net", "--allow-env", "--allow-read"],
     "watchFlag": "--watch",
     "defaultEntrypoint": "ai/ai.ts",
-    "defaultServiceEntrypoint": null,
+    "defaultServiceEntrypoint": "ai/routes/chat-stream.ts",
     "defaultRequiresDb": false,
     "defaultRequiresKv": false,
     "pluginType": "utility",
@@ -49,6 +42,10 @@
   "officialSource": {
     "canonicalName": "ai",
     "pluginDir": "ai",
+    "serviceEntrypoint": "ai/routes/chat-stream.ts",
+    "serviceConfigKey": "ai",
+    "servicePort": 0,
+    "backgroundPort": 0,
     "requiresDb": false,
     "requiresKv": false,
     "permissions": ["--allow-net", "--allow-env", "--allow-read"]

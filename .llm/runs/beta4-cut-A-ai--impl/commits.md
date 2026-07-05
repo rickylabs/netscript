@@ -10,3 +10,4 @@ This file is maintained because the owner prompt explicitly requires it for this
 | 3 | `4bfa47a5` | Added `verify-plugin.ts`, doctor coverage for `ANTHROPIC_API_KEY`, six-emitter golden coverage, and parity review. |
 | 4 | `1aaff3a5` | Added AI to scaffold runtime/plugin E2E suite wiring and registered `behavior.ai-chat-route` smoke gate. |
 | 5 | `41e6f02e` | Flipped `plugins/ai` to an explicit JSR publish map, preserved package publish dry-runs, and recorded install-variant drift. |
+| 6 | `310aa9b4` | Fixed the AI scaffold.runtime install gate to run from the generated project root after the first full e2e run exposed repo-root plugin-kind resolution. |

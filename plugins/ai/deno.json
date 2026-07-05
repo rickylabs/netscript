@@ -26,6 +26,8 @@
     "include": [
       "README.md",
       "deno.json",
+      "scaffold.plugin.json",
+      "scaffold.runtime.json",
       "mod.ts",
       "cli.ts",
       "scaffold.ts",
