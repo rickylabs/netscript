@@ -1,5 +1,9 @@
 # Topic A — per-slice agent briefs (dev-dashboard)
 
+> **ROUTING OVERRIDE (2026-07-06):** model/effort lines below are superseded where they conflict —
+> see `../ROUTING-ADJUSTMENTS.md` (UI + complex-thinking slices → Opus 4.8 high; Codex always high
+> unless trivially easy; docs prose = Claude only, Codex = adversarial validator only).
+
 > One brief per slice, per the owner's "one Fable/agent per feature/layer/CLI option" model. Lane =
 > **WSL Codex daemon-attached** for all framework/plugin source (mobile-visible, steerable);
 > **Claude** for the design-sync/prototype (design artifacts, not `packages/`/`plugins/` source).

@@ -1,5 +1,9 @@
 # Topic F-ai — Per-slice agent briefs
 
+> **ROUTING OVERRIDE (2026-07-06):** model/effort lines below are superseded where they conflict —
+> see `../ROUTING-ADJUSTMENTS.md` (UI + complex-thinking slices → Opus 4.8 high; Codex always high
+> unless trivially easy; docs prose = Claude only, Codex = adversarial validator only).
+
 > One brief per slice for Phase-2 implementation hand-off. **Lane law:** framework/plugin/sdk source =
 > **WSL Codex** daemon-attached (mobile-visible, steerable); doctrine/README prose = **Opus workflow**
 > (docs exception, CLAUDE.md); validation = **OpenHands** (qwen 3.7 max IMPL-EVAL). Each brief carries
