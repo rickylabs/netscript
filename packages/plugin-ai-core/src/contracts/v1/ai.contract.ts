@@ -73,6 +73,7 @@ export type {
   DoneChunk,
   ErrorChunk,
   ImageContentPart,
+  JsonSchema,
   Message,
   MessageChunk,
   MessageContent,
@@ -340,12 +341,18 @@ type ChatRoute = ContractProcedureBuilderWithInputOutput<
  * from a named, annotated schema via `typeof`, the contract type can never
  * silently drift from the schemas.
  */
-export interface AiContractDefinitionShape extends BasePluginContract {
+interface AiContractDefinitionShape extends BasePluginContract {
+  /** Mandatory plugin capability-document route shared by all feature plugins. */
   readonly describe: BasePluginDescribeRoute;
+  /** Streaming chat-completion route. */
   readonly chat: ChatRoute;
+  /** Model-listing route. */
   readonly models: Route<typeof modelsInputZodSchema, typeof modelsResponseZodSchema>;
+  /** Tool invocation route keyed by tool name. */
   readonly invokeTool: Route<typeof toolInvokeInputZodSchema, typeof toolInvokeResponseZodSchema>;
+  /** Embedding generation route. */
   readonly embed: Route<typeof embedInputZodSchema, typeof embedResponseZodSchema>;
+  /** Audio transcription route. */
   readonly transcribe: Route<typeof transcribeInputZodSchema, typeof transcribeResponseZodSchema>;
 }
 
@@ -389,19 +396,19 @@ const aiContractDefinition: AiContractDefinitionShape = {
 };
 
 /**
- * The fully-typed AI v1 contract definition type.
- *
- * Re-exported so {@link AiContract} and {@link AiContractV1} derive from it
- * instead of hand-authoring a parallel structural shape.
- */
-export type AiContractDefinition = AiContractDefinitionShape;
-
-/**
  * AI service contract definition for client generation.
  *
  * Carries the real, precise oRPC contract router type — no erasure cast.
  */
-export const aiContract: AiContractDefinition = aiContractDefinition;
+export const aiContract: AiContractDefinitionShape = aiContractDefinition;
+
+/**
+ * The fully-typed AI v1 contract definition type.
+ *
+ * Derived from the exported {@link aiContract} value so consumers see the same
+ * contract shape used for client generation.
+ */
+export type AiContractDefinition = typeof aiContract;
 
 /**
  * The implemented (context-bindable) AI v1 contract.

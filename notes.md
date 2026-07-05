@@ -17,6 +17,12 @@
   `AnySchema`, `ContractProcedureBuilderWith*`, `Schema`, and aliases over those types). This is the
   sanctioned `86eca907` carve-out class; changing it would require redesigning the sound oRPC
   builder surface.
+- `packages/plugin-ai-core` is reduced from 23 diagnostics to 2 after JSDoc and public vocabulary
+  re-export cleanup. The remaining refs are the exported `aiContract` value naming the internal
+  precise contract definition shape and `aiContractV1` naming oRPC's `Implementer` type. Removing
+  those annotations breaks `--isolatedDeclarations`; replacing them with a package-owned structural
+  type would change the public contract API, so this needs a design decision rather than a local
+  doc-lint edit.
 
 ## Process Notes
 
@@ -32,3 +38,5 @@
 - No committed `deno.lock` changes.
 - 2026-07-06: `deno info npm:better-auth --json` added a transient `npm:better-auth@*`
   resolution to `deno.lock`; reverted immediately per the zero-lock-churn rule.
+
+- 2026-07-06: `deno info npm:@orpc/server@1.14.6` / `npm:@orpc/contract@1.14.6` touched `deno.lock` during read-only declaration inspection; reverted immediately per zero-lock-churn rule.
