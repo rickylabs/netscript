@@ -5,7 +5,8 @@ run calls in the Release phase (`workflow/run-loop.md` § 8) — distinct from t
 fitness, runtime, and consumer gates that prove ordinary implementation work.
 
 This file is the **single source** for the release-gate class inside the harness. The run-loop,
-evaluator protocol, and archetype gate matrix reference it rather than restating the gate list.
+evaluator protocol, and archetype gate matrix may name the gates, but they reference it rather than
+redefining sequencing, requiredness, or the evidence bar.
 
 ## Ownership boundary (do not redefine here)
 
@@ -19,7 +20,7 @@ run, in what order, or how the JSR publish race is avoided — read `netscript-r
 | Gate               | Proves                                                                                  | Canonical command / owner                                      |
 | ------------------ | --------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
 | `scaffold.runtime` | Local-source merge-readiness: scaffold → first-party plugins → DB → registries → typecheck → Aspire → endpoints | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` |
-| `e2e-cli-prod`     | The **published** `jsr:@netscript/cli` user path: install + official plugin scaffold + runtime over the real remote graph | `e2e-cli-prod` Action (release:published); see netscript-release |
+| `e2e-cli-prod`     | The **published** `jsr:@netscript/cli` user path: install + official plugin scaffold + runtime over the real remote graph | `e2e-cli-prod.yml` (`workflow_run` after `publish`, or manual `workflow_dispatch` with `published-version`); see netscript-release |
 | release-gate class | A release cut is complete: `publish.yml` all-green **and** `e2e-cli-prod` green         | `netscript-release` skill (`release:cut` + the release skill)  |
 
 `scaffold.runtime` is a merge-readiness gate that also runs pre-release; `e2e-cli-prod` is
