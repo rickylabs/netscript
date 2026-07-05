@@ -63,6 +63,7 @@ Start at `docs/architecture/doctrine/ref-migration-map.md` to translate old refs
 | 2026-07-06 | Plan-Gate | PASS | Separate PLAN-EVAL wrote `plan-eval.md`; implementation may begin. |
 | 2026-07-06 | 1 | Checker refs | Retired the stale Result/shared guidance and reconciled checker refs to doctrine 09 AP/F numbering. |
 | 2026-07-06 | 2 | Doctrine links | Replaced dead `phase-0-research/*` references in doctrine chapters 01 and 04 with live doctrine links or prose. |
+| 2026-07-06 | 3 | Ref map | Added the AP/F migration map and linked it from evaluator and debt reference entry points. |
 
 ## Decisions
 
@@ -93,6 +94,7 @@ Start at `docs/architecture/doctrine/ref-migration-map.md` to translate old refs
 | `arch:check` after | NOT_RUN | `deno task arch:check` | Run after implementation. |
 | stale checker refs | PASS | `rg "@netscript/shared|F-DOCT|AP-30|AP-12|A8/AP-9|A10/AP-22|AP-19|AP-23" .llm/tools/fitness/check-doctrine.ts` exited 1 | Removed from checker. |
 | doctrine dead links | PASS | `rg "phase-0-research" docs/architecture/doctrine` exited 1 | Zero hits remain. |
+| harness ref trust | PASS | `rg "F-DOCT|AP-30|AP-29|AP-28|AP-27|AP-26|A8/AP-9|A10/AP-22|AP-7/F|A7/AP-12" ...` | Hits are limited to the new migration map and evaluator trust note. |
 
 ### Runtime Gates
 

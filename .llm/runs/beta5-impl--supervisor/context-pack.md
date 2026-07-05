@@ -23,6 +23,7 @@ The quick-win findings reproduce: stale `@netscript/shared` Result guidance, dea
 - PLAN-EVAL passed in a separate session.
 - S1 checker reconciliation implemented; `.llm/tools` Deno check passed.
 - S2 dead doctrine research links removed; doctrine grep has zero `phase-0-research` hits.
+- S3 ref migration map added and linked from evaluator/debt docs.
 
 ## In Progress
 
@@ -30,9 +31,9 @@ The quick-win findings reproduce: stale `@netscript/shared` Result guidance, dea
 
 ## Next Steps
 
-1. Commit/push S2 and comment evidence.
-2. Implement S3 ref migration map and harness ref reconciliation.
-3. Run final validation.
+1. Commit/push S3 and comment evidence.
+2. Run final validation.
+3. Update PR body/checklist and post `SLICE-COMPLETE`.
 
 ## Key Decisions
 
@@ -51,6 +52,9 @@ The quick-win findings reproduce: stale `@netscript/shared` Result guidance, dea
 | `.llm/tools/fitness/check-doctrine.ts` | changed | Stale `@netscript/shared` Result rule retired; AP/F refs reconciled. |
 | `docs/architecture/doctrine/01-thesis-and-axioms.md` | changed | Removed dead phase-0 citation references. |
 | `docs/architecture/doctrine/04-modules-and-helpers.md` | changed | Removed dead phase-0 citation references. |
+| `docs/architecture/doctrine/ref-migration-map.md` | new | Old-to-current AP/F map. |
+| `.llm/harness/evaluator/anti-pattern-catalog.md` | changed | Reference trust note links to migration map. |
+| `.llm/harness/debt/arch-debt.md` | changed | Reference trust note links to migration map. |
 
 ## Gates
 

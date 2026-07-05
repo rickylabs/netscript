@@ -4,6 +4,11 @@ Seeded from `docs/architecture/doctrine/10-codebase-verdict-and-handoff.md` on 2
 track packages with `Refactor`, `Restructure`, or `Rewrite` doctrine verdicts. `Keep` and `Defer`
 verdicts are not seeded here.
 
+Reference trust note: AP/F refs in this registry use the current doctrine catalog (`AP-1` through
+`AP-25`, `F-1` through `F-19`). Historical checker-only refs are translated in
+`docs/architecture/doctrine/ref-migration-map.md`; do that translation before carrying an old run
+finding into a debt entry.
+
 ## plugins/auth — AUTH-BACKEND-ENV-CENTRALIZATION
 
 - **ID:** `AUTH-BACKEND-ENV-CENTRALIZATION`
