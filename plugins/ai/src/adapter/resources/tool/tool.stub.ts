@@ -20,17 +20,22 @@ import { defineAiTool } from '@netscript/ai/tools';
 import { z } from 'zod';
 
 /** The "%%TOOL_ID%%" tool, callable by the agent loop. */
-export const %%TOOL_EXPORT%% = defineAiTool({
-  name: '%%TOOL_ID%%',
-  description: 'Describe what %%TOOL_ID%% does so the model knows when to call it.',
-  input: z.object({
+export const %%TOOL_EXPORT%% = defineAiTool('%%TOOL_ID%%')
+  .describe('Describe what %%TOOL_ID%% does so the model knows when to call it.')
+  .parameters({
+    type: 'object',
+    properties: {
+      query: { type: 'string', description: 'The primary input for %%TOOL_ID%%.' },
+    },
+    required: ['query'],
+  })
+  .input(z.object({
     query: z.string().describe('The primary input for %%TOOL_ID%%.'),
-  }),
-  async execute({ query }) {
+  }))
+  .server(({ query }) => {
     // TODO: implement %%TOOL_ID%%. App-owned — this is your business logic.
     return { ok: true, echo: query };
-  },
-});
+  });
 `,
   tokens: ['TOOL_EXPORT', 'TOOL_ID'],
 });

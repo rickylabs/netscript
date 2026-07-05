@@ -70,6 +70,7 @@ the presentation tests.
 | 2026-07-05 | 1 | Bootstrap | Read requested skills, doctrine, archetype gates, and FAI-0..3 design source. |
 | 2026-07-05 | 1 | Research/plan | Re-baselined current branch and wrote run artifacts. |
 | 2026-07-05 | 1 | Plan fix | PLAN-EVAL failed on incomplete gate mapping; expanded full Archetype 5 plus service/docs overlay gates. |
+| 2026-07-05 | 2 | Contract binding | Added `createAiRouter` in `plugin-ai-core`, AI contract soundness test, and generated stream-route binding to `aiContractV1`. |
 
 ## Decisions
 
@@ -94,12 +95,15 @@ the presentation tests.
 | --- | --- | --- | --- |
 | PLAN-EVAL | separate evaluator over research/plan/design | NOT_RUN | Pending after artifact creation. |
 | PLAN-EVAL cycle 1 | separate evaluator over research/plan/design | FAIL | Gate set mapping was incomplete. |
+| PLAN-EVAL cycle 2 | separate evaluator over research/plan/design | PASS | `plan-eval.md` records PASS. |
+| Slice 2 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin-ai-core --root plugins/ai --ext ts,tsx` | PASS | 35 files selected, 0 diagnostics. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | F-5/F-6/F-19 | NOT_RUN | pending | Run after implementation slices. |
+| F-10 contract/resource tests | PASS | `deno test --unstable-kv packages/plugin-ai-core/tests/contracts/ai-contract-soundness_test.ts`; `deno test --unstable-kv plugins/ai/src/adapter/resources/resources.test.ts` | Contract soundness and generator resource assertions pass. |
 
 ### Runtime Gates
 

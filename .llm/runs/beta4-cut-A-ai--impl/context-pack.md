@@ -9,8 +9,10 @@ the F-ai design source.
 
 - Branch started clean.
 - Run artifacts have been scaffolded and filled.
-- PLAN-EVAL cycle 1 returned `FAIL_PLAN` because gate mapping was incomplete. The plan has been
-  updated with full Archetype 5 and service/docs overlay gate mappings; cycle 2 is pending.
+- PLAN-EVAL cycle 1 returned `FAIL_PLAN` because gate mapping was incomplete. Cycle 2 returned
+  `PASS`.
+- Slice 2 added `createAiRouter` in `packages/plugin-ai-core`, a contract soundness test, and
+  generated AI stream-route output that imports `aiContractV1` and binds `createAiRouter`.
 
 ## Decisions
 

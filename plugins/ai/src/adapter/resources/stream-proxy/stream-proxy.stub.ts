@@ -16,14 +16,91 @@ import { defineStub, type StubSource } from '@netscript/plugin/adapter';
 export const streamProxyStub: StubSource<never> = defineStub({
   source: `/** In-process AI stream route (POST). Runs the agent loop directly; no gateway hop. */
 
-import { createAgentLoop, slidingWindowHistory } from '@netscript/ai/agent';
+import { createAiRouter, aiContractV1, type AiRouterImplementation } from '@netscript/plugin-ai-core';
 import { toNetScriptChatResponse } from '@netscript/fresh/ai';
-import { ai, chatModel } from '../ai.ts';
+import { createAssistantAgent } from '../agents/assistant.ts';
+import { ai, chatModelId, DEFAULT_CHAT_MODEL } from '../ai.ts';
 
 interface ChatRequestBody {
   readonly sessionId: string;
   readonly message: { readonly role: 'user'; readonly text: string };
 }
+
+interface AiRequestContext {
+  readonly request: Request;
+}
+
+const capabilities = {
+  pluginName: '@netscript/plugin-ai',
+  contractVersions: ['v1'],
+  routeGroups: ['ai'],
+  capabilities: ['chat', 'models', 'tools', 'embeddings', 'transcription'],
+} as const;
+
+async function* streamChat(input: {
+  readonly message: string;
+  readonly signal?: AbortSignal;
+}) {
+  const loop = createAssistantAgent();
+  const generation = loop.run({
+    model: chatModelId(DEFAULT_CHAT_MODEL),
+    messages: [{ role: 'user', content: input.message }],
+    system: 'You are the assistant. Be concise and precise.',
+  }, { signal: input.signal });
+
+  try {
+    for await (const chunk of generation) {
+      yield chunk;
+    }
+  } finally {
+    if (input.signal?.aborted) {
+      loop.stop();
+    }
+  }
+}
+
+const aiRouteImplementation: AiRouterImplementation<AiRequestContext> = {
+  describe: () => capabilities,
+  chat: async function* ({ input, signal }) {
+    const latestUserText = [...input.messages]
+      .reverse()
+      .find((message) => message.role === 'user')?.content;
+    const message = typeof latestUserText === 'string' ? latestUserText : '';
+    yield* streamChat({ message, signal });
+  },
+  models: async ({ input }) => {
+    const providerId = input?.provider ?? ai().defaultModelProvider ?? 'anthropic';
+    const models = await ai().getModelProvider(providerId).listModels();
+    return { models };
+  },
+  invokeTool: async ({ input }) => {
+    const handler = ai().tools.resolveHandler(input.name);
+    if (!handler) {
+      return { content: \`Tool "\${input.name}" is not registered.\`, state: 'error' };
+    }
+    return await handler({
+      id: crypto.randomUUID(),
+      name: input.name,
+      arguments: JSON.stringify(input.arguments ?? {}),
+      state: 'input-complete',
+    });
+  },
+  embed: async ({ input }) => {
+    const values = Array.isArray(input.input) ? input.input : [input.input];
+    const model = typeof input.model === 'string' ? input.model : input.model.model;
+    const response = await ai().embeddings.embed(values, { model });
+    return { embeddings: response.embeddings, model: response.model, usage: response.usage };
+  },
+  transcribe: async () => ({
+    text: 'Transcription is not configured in this scaffold. Wire a transcription provider here.',
+  }),
+};
+
+/** Contract handle imported explicitly so this route stays tied to /v1/ai. */
+export const aiRouteContract = aiContractV1;
+
+/** Contract-bound /v1/ai router handlers for host integrations and tests. */
+export const aiRouter = createAiRouter(aiRouteImplementation);
 
 /**
  * POST handler. Directly invokes the in-process agent loop and streams tokens
@@ -35,27 +112,12 @@ export async function handler(request: Request): Promise<Response> {
   const body = (await request.json()) as ChatRequestBody;
   const { sessionId, message } = body;
 
-  const loop = createAgentLoop({
-    model: chatModel(),
-    runtime: ai(),
-    history: slidingWindowHistory({ maxMessages: 32 }),
-  });
-
-  const generation = loop.run({
-    input: message.text,
-    // Propagate the inbound AbortSignal so aborting the request cancels the model call.
-    signal: request.signal,
-  });
-
   const response = toNetScriptChatResponse({
     target: { sessionId },
-    source: generation.stream,
+    source: streamChat({ message: message.text, signal: request.signal }),
     newMessages: [{ role: 'user', text: message.text }],
     request,
   });
-
-  // Cancel in-flight generation when the durable session is closed/stopped.
-  request.signal.addEventListener('abort', () => generation.stop(), { once: true });
 
   return response;
 }

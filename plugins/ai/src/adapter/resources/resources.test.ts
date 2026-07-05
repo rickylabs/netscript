@@ -55,7 +55,10 @@ Deno.test('ai stream route threads AbortSignal and exposes stop() (F-13)', () =>
   const source = streamRoute ? artifactText(streamRoute) : '';
 
   assertStringIncludes(source, 'request.signal');
-  assertStringIncludes(source, 'generation.stop()');
+  assertStringIncludes(source, 'loop.stop()');
+  assertStringIncludes(source, "from '@netscript/plugin-ai-core'");
+  assertStringIncludes(source, 'aiContractV1');
+  assertStringIncludes(source, 'createAiRouter(aiRouteImplementation)');
 });
 
 Deno.test('ai install starter tool is byte-identical to add tool default emission', () => {
@@ -72,7 +75,7 @@ Deno.test('ai add tool/agent emit the same shape at the user-named path', () => 
   const [tool] = toolScaffolder.emit({ id: 'summarize-text' });
   assertEquals(tool.path, 'ai/tools/summarize-text.ts');
   assertStringIncludes(artifactText(tool), 'summarizeTextTool');
-  assertStringIncludes(artifactText(tool), "name: 'summarize-text'");
+  assertStringIncludes(artifactText(tool), "defineAiTool('summarize-text')");
 
   const [agent] = agentScaffolder.emit({ id: 'researcher' });
   assertEquals(agent.path, 'ai/agents/researcher.ts');
