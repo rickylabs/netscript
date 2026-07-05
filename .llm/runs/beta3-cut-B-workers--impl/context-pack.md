@@ -12,7 +12,7 @@
 
 ## Current State
 
-The branch started clean at `eab02889`. The implementation now registers the built-in workers health job with `sourceUrl: "jsr:@netscript/plugin-workers/jobs/health-check.ts"` while retaining `entrypoint: "./jobs/health-check.ts"` as the package-local fallback/display path. Tests prove registry repair and core dynamic import source selection.
+The branch started clean at `eab02889`. The implementation now registers the built-in workers health job with `sourceUrl: "jsr:@netscript/plugin-workers/jobs/health-check.ts"` while retaining `entrypoint: "./jobs/health-check.ts"` as the package-local fallback/display path. The FAIL_FIX response adds the required `./jobs/health-check.ts` export map entry, documents the job subpath, and tests that the sourceUrl-derived subpath remains exported.
 
 ## Completed
 
@@ -20,16 +20,17 @@ The branch started clean at `eab02889`. The implementation now registers the bui
 - Research, plan, design, and drift initialized.
 - Fix option selected: published JSR package module via `sourceUrl`.
 - Source changes and targeted gates completed.
+- FAIL_FIX export-map defect fixed and gates rerun.
 
 ## In Progress
 
-- Commit, push, PR creation, and PR implementation comment.
+- Commit FAIL_FIX response, push, and post PR comment.
 
 ## Next Steps
 
-1. Commit the slice and update `commits.md`.
+1. Commit FAIL_FIX response and update `commits.md`.
 2. Push with `git push origin HEAD:refs/heads/fix/workers-health-entrypoint-376`.
-3. Open the PR against `main`, apply labels/milestone, and post implementation evidence.
+3. Post `[PHASE: IMPL] [VERDICT: FAIL_FIX-RESPONSE]` PR comment.
 
 ## Key Decisions
 
@@ -44,6 +45,8 @@ The branch started clean at `eab02889`. The implementation now registers the bui
 | `.llm/runs/beta3-cut-B-workers--impl/*` | new | Harness artifacts. |
 | `plugins/workers/services/src/init.ts` | changed | Built-in job constants, package `sourceUrl`, stale-row repair. |
 | `plugins/workers/services/src/init_test.ts` | new | Registration and stale repair tests. |
+| `plugins/workers/deno.json` | changed | Adds explicit `./jobs/health-check.ts` export. |
+| `plugins/workers/jobs/health-check.ts` | changed | Documents the new public job subpath and exports local structural types. |
 | `packages/plugin-workers-core/tests/runtime/job-dispatcher_test.ts` | new | Dynamic import uses `sourceUrl` before `entrypoint`. |
 | `packages/cli/e2e/src/application/gates/scaffold/runtime-gates.ts` | changed | Runtime E2E gate now requires completed health-check execution. |
 
@@ -52,7 +55,7 @@ The branch started clean at `eab02889`. The implementation now registers the bui
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
 | Static | pass | scoped check/lint/fmt wrappers on touched roots |
-| Fitness | pass | targeted Deno tests and workers publish dry-run |
+| Fitness | pass | targeted Deno tests, raw job entry doc-lint, full export doc-lint wrapper, workers publish dry-run |
 | Runtime | partial pass | unit execution source coverage; full scaffold runtime not run |
 | Consumer | partial pass | E2E gate source strengthened; full smoke deferred |
 
@@ -62,7 +65,7 @@ The branch started clean at `eab02889`. The implementation now registers the bui
 
 ## Drift and Debt
 
-- Drift: implementation-lane prompt bypassed separate PLAN-EVAL; recorded in `drift.md`.
+- Drift: implementation-lane prompt bypassed separate PLAN-EVAL; export-map miss found by IMPL-EVAL; both recorded in `drift.md`.
 - Debt: no new architecture debt expected.
 
 ## Commits

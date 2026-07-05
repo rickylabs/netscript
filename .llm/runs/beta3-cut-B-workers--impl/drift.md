@@ -11,3 +11,13 @@ Drift is append-only. Record facts that diverge from the plan, RFC, doctrine, or
 - **Severity:** significant
 - **Action:** accept
 - **Evidence:** `supervisor.md`, `research.md`, `plan.md`, and `worklog.md` created before source edits; IMPL-EVAL remains required before merge-readiness.
+
+## 2026-07-05 — Health job sourceUrl file was published but not exported
+
+- **What:** IMPL-EVAL found the package `sourceUrl` target was included in the publish file list but missing from the `deno.json` exports map, so `jsr:@netscript/plugin-workers/jobs/health-check.ts` would not resolve in prod/JSR mode.
+- **Source:** Binding evaluator finding on PR #469.
+- **Expected:** A package subpath used in `sourceUrl` must have an identical explicit JSR export-map key.
+- **Actual:** `plugins/workers/deno.json` had `jobs/**/*.ts` in `publish.include` but no `./jobs/health-check.ts` export.
+- **Severity:** significant
+- **Action:** fix
+- **Evidence:** Added `./jobs/health-check.ts` export, export-map regression test in `plugins/workers/services/src/init_test.ts`, and clean raw `deno doc --lint plugins/workers/jobs/health-check.ts`.

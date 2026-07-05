@@ -13,7 +13,7 @@
 
 ### Public Surface
 
-- `@netscript/plugin-workers` package contents: no new export key; uses existing published `jobs/**/*.ts` include.
+- `@netscript/plugin-workers` package contents: explicit `./jobs/health-check.ts` export key maps to `./jobs/health-check.ts`.
 - Worker runtime dynamic import path: existing `sourceUrl` field on `JobDefinition`.
 - CLI E2E runtime gate: `BEHAVIOR_WORKERS_EXECUTIONS` validator.
 
@@ -57,18 +57,21 @@ To add another built-in workers plugin job, place its handler under `plugins/wor
 | 2026-07-05 | 1 | design | Locked option 1 and scoped tests/gates. |
 | 2026-07-05 | 1 | implementation | Registered built-in health job with package `sourceUrl`, added registration/dynamic-dispatch tests, and strengthened runtime E2E execution polling. |
 | 2026-07-05 | 1 | reconcile | Related issue #376 fully addressed by this branch; PR must carry `Closes #376` and `Refs #172, #191, #372`. No full scaffold runtime smoke run in this implementation lane. |
+| 2026-07-05 | 2 | FAIL_FIX response | Added explicit `./jobs/health-check.ts` export map entry, documented the new job subpath, and added an export-map drift regression test. |
 
 ## Decisions
 
 | Decision | Reason | Source |
 | -------- | ------ | ------ |
 | Use JSR package `sourceUrl` | Restores no-copy thin plugin invariant in prod and maintainer modes. | `plan.md` D1 |
+| Export the exact health job subpath | JSR/Deno only resolve package subpaths declared in `deno.json` exports; publish include alone is insufficient. | IMPL-EVAL FAIL_FIX finding |
 
 ## Drift
 
 | Drift | Severity | Logged in drift.md |
 | ----- | -------- | ------------------ |
 | PLAN-EVAL artifact unavailable in implementation lane | significant | yes |
+| Package file included but not exported | significant | yes |
 
 ## Gate Results
 
@@ -86,12 +89,19 @@ To add another built-in workers plugin job, place its handler under `plugins/wor
 | scoped fmt: workers | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/workers --ext ts,tsx` | PASS | 90 files selected, 0 findings. |
 | scoped fmt: workers core | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin-workers-core --ext ts,tsx` | PASS | 111 files selected, 0 findings. |
 | scoped fmt: CLI E2E | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cli/e2e --ext ts,tsx` | PASS | 76 files selected, 0 findings. |
+| targeted tests after FAIL_FIX | `deno test --unstable-kv --allow-all plugins/workers/services/src/init_test.ts packages/plugin-workers-core/tests/runtime/job-dispatcher_test.ts` | PASS | 4 passed, 0 failed. |
+| raw doc-lint: health job export | `deno doc --lint plugins/workers/jobs/health-check.ts` | PASS | New `./jobs/health-check.ts` entrypoint checked cleanly. |
+| full export doc-lint wrapper | `deno task doc:lint --root plugins/workers --pretty` | PASS_WITH_EXISTING_FINDINGS | Exit 0; full export set includes `./jobs/health-check.ts` with 0 diagnostics. Wrapper still reports 17 pre-existing private-type refs on other entrypoints. |
+| publish dry-run after FAIL_FIX | `deno publish --dry-run --allow-dirty` in `plugins/workers` | PASS | Checks `jobs/health-check.ts`; published file list includes it. Existing unanalyzable dynamic-import warnings remain. |
+| scoped check after FAIL_FIX | check wrappers on `plugins/workers`, `packages/plugin-workers-core`, `packages/cli/e2e` | PASS | 90/111/76 files selected, 0 diagnostics. |
+| scoped lint after FAIL_FIX | lint wrappers on `plugins/workers`, `packages/plugin-workers-core`, `packages/cli/e2e` | PASS | 0 findings. |
+| scoped fmt after FAIL_FIX | fmt wrappers on `plugins/workers`, `packages/plugin-workers-core`, `packages/cli/e2e` | PASS | 0 findings. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
-| F-5/F-6 | PASS | `deno publish --dry-run --allow-dirty` in `plugins/workers` | Dry run succeeded; output includes `jobs/health-check.ts`. Existing unanalyzable dynamic-import warnings are unrelated and pre-existing. |
+| F-5/F-6 | PASS | `deno publish --dry-run --allow-dirty` in `plugins/workers`; `deno doc --lint plugins/workers/jobs/health-check.ts`; `deno task doc:lint --root plugins/workers --pretty` | Dry run succeeded; output checks/includes `jobs/health-check.ts`. New entrypoint doc-lint is clean; full wrapper has existing non-new private-type findings elsewhere. |
 | F-10/F-19 | PASS | Targeted tests and scoped wrappers | Test and wrapper gates passed. |
 
 ### Runtime Gates

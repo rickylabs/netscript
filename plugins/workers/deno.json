@@ -9,6 +9,7 @@
     "./aspire": "./src/aspire/mod.ts",
     "./cli": "./src/cli/composition/main.ts",
     "./contracts": "./contracts/v1/mod.ts",
+    "./jobs/health-check.ts": "./jobs/health-check.ts",
     "./runtime": "./bin/runtime.ts",
     "./scaffold": "./scaffold.ts",
     "./services": "./services/src/main.ts",
