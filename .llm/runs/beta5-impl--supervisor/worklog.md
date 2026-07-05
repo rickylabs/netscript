@@ -63,6 +63,7 @@ slice commit.
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-07-06 | 1 | bootstrap | Read required skills, doctrine, harness workflow, and commit `86eca907`; created run artifacts. |
+| 2026-07-06 | 1 | draft PR | Opened draft PR #483 and pushed bootstrap commit `1178e727`. |
 
 ## Decisions
 
@@ -77,6 +78,7 @@ slice commit.
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
 | No existing run dir was present; this session bootstrapped it. | minor | yes |
+| Requested PR labels partially absent from repo taxonomy. | minor | yes |
 
 ## Gate Results
 
