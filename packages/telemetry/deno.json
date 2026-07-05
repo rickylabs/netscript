@@ -1,6 +1,6 @@
 {
   "name": "@netscript/telemetry",
-  "version": "0.0.1-beta.3",
+  "version": "0.0.1-beta.4",
   "description": "OpenTelemetry tracing primitives and NetScript instrumentation for jobs, queues, RPC, and SSE.",
   "license": "MIT",
   "exports": {
