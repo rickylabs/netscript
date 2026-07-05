@@ -1,5 +1,5 @@
 import { assertEquals } from '@std/assert';
-import { GATE, SCAFFOLD } from '../../src/domain/cli-surface.ts';
+import { DEPLOY, GATE, SCAFFOLD } from '../../src/domain/cli-surface.ts';
 import { DATABASE } from '../../src/domain/extension-axes.ts';
 import { builtInSuites, resolveSuite } from '../../src/presentation/cli/suites/registry.ts';
 
@@ -11,6 +11,7 @@ Deno.test('registry exposes scaffold capability suites from constants', () => {
     SCAFFOLD.PLUGIN,
     SCAFFOLD.RUNTIME,
     SCAFFOLD.USERLAND_INSTALL,
+    DEPLOY.TARGETS,
   ]);
 });
 
