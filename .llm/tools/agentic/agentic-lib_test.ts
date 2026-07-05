@@ -497,3 +497,35 @@ Deno.test('extractVerdict takes the newest comment within the same layer', () =>
 Deno.test('extractVerdict returns null when there are no comments', () => {
   assertEquals(extractVerdict([]), null);
 });
+Deno.test('extractVerdict matches a bolded machine marker with Verdict: prefix (PR #475 prod form)', () => {
+  const v = extractVerdict([
+    triggerComment,
+    c(
+      '# IMPL-EVAL Summary — PR #475\n\n**Verdict: OPENHANDS_VERDICT: PASS**\n\ndetail',
+      '2026-07-05T01:00:00Z',
+    ),
+  ]);
+  assertEquals(v?.verdict, 'PASS');
+  assertEquals(v?.confidence, 'exact');
+});
+Deno.test('extractVerdict matches a decorated full-line verdict in an agent comment (PR #476 prod form)', () => {
+  const v = extractVerdict([
+    triggerComment,
+    c(
+      '## [PHASE: IMPL-EVAL] Evaluation: PR #476\n\n**Verdict**: `FAIL_FIX`\n\n**Evaluator**: OpenHands agent',
+      '2026-07-05T01:00:00Z',
+    ),
+  ]);
+  assertEquals(v?.verdict, 'FAIL_FIX');
+  assertEquals(v?.confidence, 'heuristic');
+});
+Deno.test('extractVerdict never maps GitHub review vocabulary to a verdict', () => {
+  const v = extractVerdict([
+    triggerComment,
+    c(
+      '## [PHASE: IMPL-EVAL] Evaluation\n\n**Verdict**: `CHANGES_REQUESTED`\n\ndetail',
+      '2026-07-05T01:00:00Z',
+    ),
+  ]);
+  assertEquals(v, null, 'CHANGES_REQUESTED is not harness vocabulary');
+});

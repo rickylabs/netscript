@@ -656,9 +656,22 @@ export interface ExtractedVerdict {
   url: string;
 }
 
-/** Machine-readable contract line: `OPENHANDS_VERDICT: <token>` at line start. */
+/**
+ * Machine-readable contract line: `OPENHANDS_VERDICT: <token>` at line start.
+ * Tolerates markdown decoration and an evaluator-habit `Verdict:` prefix —
+ * observed in prod (PR #475): `**Verdict: OPENHANDS_VERDICT: PASS**`.
+ */
 const MACHINE_VERDICT_RE =
-  /^[\s>*`_]*OPENHANDS_VERDICT:\s*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN|NONE)\b/m;
+  /^[\s>*`_]*(?:Verdict[*`_]*\s*:?\s*[*`_]*)?OPENHANDS_VERDICT:\s*[*`_]*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN|NONE)\b/m;
+
+/**
+ * Decorated verdict line without the machine marker: `**Verdict**: \`FAIL_FIX\``
+ * — the whole line is the verdict statement (observed in prod, PR #476). Only
+ * exact harness tokens match; GitHub review vocabulary (CHANGES_REQUESTED,
+ * APPROVED) never does, by design — that drift must surface as NONE.
+ */
+const DECORATED_VERDICT_RE =
+  /^[\s>]*[*_`]*Verdict[*_`]*\s*:\s*[*_`\s]*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN)[*_`.\s]*$/im;
 
 /** Formal evaluator header: `**[PHASE: IMPL-EVAL] [VERDICT: PASS]**`. */
 const FORMAL_HEADER_RE =
@@ -697,9 +710,9 @@ function heuristicVerdict(body: string): string | null {
       if (m) return m[1];
     }
   }
-  // b. inline `**Verdict: PASS.**` / `Verdict: FAIL_FIX` phrase.
+  // b. inline `**Verdict: PASS.**` / `Verdict: FAIL_FIX` / `**Verdict**: \`FAIL_FIX\`` phrase.
   const inline = body.match(
-    /\*{0,2}[Vv]erdict\*{0,2}\s*:?\s*\*{0,2}\s*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN|FAIL)\b(?!\s*\|)/,
+    /[*_`]{0,3}[Vv]erdict[*_`]{0,3}\s*:?\s*[*_`\s]{0,4}(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN|FAIL)\b(?!\s*\|)/,
   );
   if (inline) return inline[1];
   // c. token near the word "verdict" (buried in a context dump).
@@ -716,7 +729,10 @@ function heuristicVerdict(body: string): string | null {
  * `createdAt` internally, matched newest-first). Priority:
  *   1. the machine-readable `OPENHANDS_VERDICT: <token>` contract line (exact);
  *   2. the formal `**[PHASE: …-EVAL] [VERDICT: X]**` header (exact);
- *   3. {@link heuristicVerdict} fallbacks, restricted to comments carrying
+ *   3. a full-line decorated verdict (`**Verdict**: \`FAIL_FIX\``) in ANY
+ *      non-trigger comment — evaluator-authored verdict comments observed in
+ *      prod carry no machine marker (heuristic);
+ *   4. {@link heuristicVerdict} fallbacks, restricted to comments carrying
  *      {@link OPENHANDS_MARKER} (the runner's synthesized summary).
  * A higher layer in ANY comment beats a lower layer in a newer one. Trigger and
  * template comments are excluded up front ({@link isTriggerOrTemplateComment}).
@@ -732,6 +748,10 @@ export function extractVerdict(comments: VerdictSourceComment[]): ExtractedVerdi
   for (const c of newestFirst) {
     const m = c.body.match(FORMAL_HEADER_RE);
     if (m) return { verdict: m[1], confidence: 'exact', url: c.url };
+  }
+  for (const c of newestFirst) {
+    const m = c.body.match(DECORATED_VERDICT_RE);
+    if (m) return { verdict: m[1].toUpperCase(), confidence: 'heuristic', url: c.url };
   }
   for (const c of newestFirst) {
     if (!c.body.includes(OPENHANDS_MARKER)) continue;

@@ -40,8 +40,10 @@ against the changed state, not to continue implementation.
     `status:ready-merge` / `Closes #N` merge: for every referenced issue, its acceptance criteria and
     every `gate:` checkbox are checked with linked evidence, and the PR's Definition-of-Done checklist
     is complete. An unchecked `gate:` box on a referenced issue (the #260 failure) blocks the pass.
-13. Verify every brief and the PR body carry a `## SKILL` chapter naming the relevant skills (harness
-    rule; missing SKILL chapter is a finding).
+13. Verify every agent brief/prompt (implementation, evaluation, side-fix) carries a `## SKILL`
+    chapter naming the relevant skills (harness rule; a missing SKILL chapter in a brief is a
+    finding). PR bodies are governed by the `netscript-pr` templates and do NOT require a `## SKILL`
+    chapter — never raise its absence from a PR body as a finding.
 
 ## Output
 
