@@ -88,6 +88,7 @@ const PLUGIN_KIND_ROOT_IMPORTS: Readonly<Record<string, readonly string[]>> = {
   ],
   worker: [
     SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_WORKERS_RUNTIME,
+    SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_WORKERS_HEALTH_CHECK,
     SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS,
     SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS_RUNTIME,
     SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS_SCHEMAS,
@@ -223,6 +224,12 @@ const OFFICIAL_PLUGIN_RUNTIME_LOCAL_PATHS: Readonly<Record<string, string>> = {
     'workers',
     'bin',
     'runtime.ts',
+  ),
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_WORKERS_HEALTH_CHECK]: join(
+    'plugins',
+    'workers',
+    'jobs',
+    'health-check.ts',
   ),
   [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_SAGAS_RUNTIME]: join(
     'plugins',

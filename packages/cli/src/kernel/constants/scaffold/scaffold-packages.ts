@@ -25,6 +25,8 @@ export const SCAFFOLD_PACKAGES = {
   NETSCRIPT_AUTH_BETTER_AUTH: '@netscript/auth-better-auth',
   NETSCRIPT_AUTH_KV_OAUTH: '@netscript/auth-kv-oauth',
   NETSCRIPT_PLUGIN_WORKERS_RUNTIME: '@netscript/plugin-workers/runtime',
+  NETSCRIPT_PLUGIN_WORKERS_HEALTH_CHECK:
+    'jsr:@netscript/plugin-workers/jobs/health-check.ts',
   NETSCRIPT_WORKERS: '@netscript/plugin-workers-core',
   NETSCRIPT_WORKERS_RUNTIME: '@netscript/plugin-workers-core/runtime',
   NETSCRIPT_WORKERS_SCHEMAS: '@netscript/plugin-workers-core/schemas',

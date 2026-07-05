@@ -11,8 +11,6 @@ import {
   createFailureResult,
   createSuccessResult,
   defineJobHandler,
-  type JobHandlerContext,
-  type JobResult,
 } from '@netscript/plugin-workers-core';
 import { createJobTools } from './job-tools.ts';
 import { z } from 'zod';
@@ -40,9 +38,26 @@ interface HealthCheck {
 // JOB HANDLER
 // ============================================================================
 
-type HealthCheckJobHandler = (
-  context: JobHandlerContext,
-) => JobResult<unknown> | Promise<JobResult<unknown>>;
+/** Context passed to the built-in workers plugin health check job. */
+export type HealthCheckJobContext = Readonly<{
+  id: string;
+  job?: Readonly<{ id: string }>;
+  payload: unknown;
+  correlationId?: string;
+  traceparent?: string;
+  tracestate?: string;
+  reportProgress?: (percent: number, message?: string) => void | Promise<void>;
+}>;
+
+/** Result returned by the built-in workers plugin health check job. */
+export type HealthCheckJobResult =
+  | Readonly<{ success: true; data?: unknown }>
+  | Readonly<{ success: false; error: string; data?: unknown }>;
+
+/** Handler signature for the built-in workers plugin health check job. */
+export type HealthCheckJobHandler = (
+  context: HealthCheckJobContext,
+) => HealthCheckJobResult | Promise<HealthCheckJobResult>;
 
 const handler: HealthCheckJobHandler = defineJobHandler(async (ctx) => {
   const payload = HealthCheckPayloadSchema.parse(ctx.payload ?? {});
@@ -221,7 +236,11 @@ const handler: HealthCheckJobHandler = defineJobHandler(async (ctx) => {
   }
 });
 
-const healthCheckJob: HealthCheckJobHandler & Readonly<{ id: 'workers-plugin-health-check' }> =
-  Object.assign(handler, { id: 'workers-plugin-health-check' as const });
+/** Runs the built-in workers plugin health check job. */
+export const healthCheckJob:
+  & HealthCheckJobHandler
+  & Readonly<{ id: 'workers-plugin-health-check' }> = Object.assign(handler, {
+    id: 'workers-plugin-health-check' as const,
+  });
 
 export default healthCheckJob;
