@@ -1,5 +1,9 @@
 # Topic E — per-slice WSL Codex agent briefs (DRAFT — for post-ratification implementation)
 
+> **ROUTING OVERRIDE (2026-07-06):** model/effort lines below are superseded where they conflict —
+> see `../ROUTING-ADJUSTMENTS.md` (UI + complex-thinking slices → Opus 4.8 high; Codex always high
+> unless trivially easy; docs prose = Claude only, Codex = adversarial validator only).
+
 Lane law (mission §Delegation): framework/plugin implementation = **WSL Codex** daemon-attached
 slices; **separate-session OpenHands IMPL-EVAL** (qwen 3.7 max) per slice; Claude supervises only.
 Each slice: own branch/worktree, commit → push → PR comment before the next (V3: the draft-PR

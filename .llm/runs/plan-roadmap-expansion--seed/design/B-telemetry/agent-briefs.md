@@ -1,5 +1,9 @@
 # `telemetry-revamp` — per-slice WSL Codex implementation briefs (Opus-B)
 
+> **ROUTING OVERRIDE (2026-07-06):** model/effort lines below are superseded where they conflict —
+> see `../ROUTING-ADJUSTMENTS.md` (UI + complex-thinking slices → Opus 4.8 high; Codex always high
+> unless trivially easy; docs prose = Claude only, Codex = adversarial validator only).
+
 One brief per sub-issue (T1..T9). Implementation lane = **WSL Codex daemon-attached subagent**
 (mobile-visible, per `netscript-harness`). Each brief has a `## SKILL` chapter, model/effort, files,
 validation, and an IMPL-EVAL note. Draft text — the supervisor launches these after PLAN-EVAL PASS.

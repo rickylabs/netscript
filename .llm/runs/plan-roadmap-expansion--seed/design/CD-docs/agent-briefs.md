@@ -1,5 +1,9 @@
 # Opus-CD — Per-slice authoring briefs
 
+> **ROUTING OVERRIDE (2026-07-06):** model/effort lines below are superseded where they conflict —
+> see `../ROUTING-ADJUSTMENTS.md` (UI + complex-thinking slices → Opus 4.8 high; Codex always high
+> unless trivially easy; docs prose = Claude only, Codex = adversarial validator only).
+
 Lane law (CLAUDE.md documentation-authoring exception + proposal §5):
 - **S0 (IA-reconciliation) = WSL Codex** daemon-attached (structural nav/redirect plumbing).
 - **All C + D prose = Claude dynamic workflows** — Opus medium (concept/story/reference), Opus low
