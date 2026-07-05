@@ -529,7 +529,12 @@ verdicts are not seeded here.
 - **Target:** 2026-Q3 doctrine remediation.
 - **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
 - **Created:** 2026-04-29
-- **Status:** open
+- **Status:** RESOLVED 2026-07-06 (superseded) — the top-level `packages/workers` package named in
+  this heading no longer exists; it was superseded by `packages/plugin-workers-core` (plus the
+  `plugins/workers` connector) during the plugin re-architecture. The 1,287 LOC monolith is gone: the
+  successor `packages/plugin-workers-core/src/abstracts/task-executor.ts` is a 26 LOC abstract, so the
+  supervisor/executor/dispatcher split concern is fully addressed by the successor rather than
+  relocated. Heading retained as the historical record.
 - **Gate:** F-1, F-3, F-13
 
 ## packages/sagas — AP-1 / doctrine verdict Refactor (list-transport.ts 847 LOC)
@@ -798,12 +803,14 @@ verdicts are not seeded here.
 - **Target:** 2026-Q3 doctrine remediation.
 - **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
 - **Created:** 2026-04-29
-- **Status:** partially closed 2026-06-05 — `utils/datetime.ts` was deleted in Wave 0 and the
-  published surface remains free of generic datetime helpers. Residual unpublished `utils/`
-  compatibility for `@shared/utils` consumers is tracked in the Wave 0 drift registry until later
-  plugin waves migrate those imports.
-- **Gate:** F-1 and F-2 closed for datetime; F-11 remains deferred for residual unpublished `utils/`
-  compatibility
+- **Status:** RESOLVED 2026-07-06 (superseded) — the `packages/shared` package named in this heading
+  no longer exists; the whole package was removed during the re-architecture. `utils/datetime.ts` was
+  already deleted in Wave 0, and with the package itself gone the "shrink `shared` to cross-package
+  identifiers" concern and the residual `@shared/utils` compatibility tracking are both moot. Heading
+  retained as the historical record. (Prior note, retained: partially closed 2026-06-05 — datetime
+  helper deleted; published surface free of generic datetime helpers.)
+- **Gate:** F-1 and F-2 closed for datetime; residual F-11 concern moot now that `packages/shared`
+  is deleted
 
 ## plugins/triggers — doctrine verdict Refactor
 
@@ -1387,18 +1394,21 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** Close when Fresh app bootstrap telemetry is implemented and the Web Layer server docs
   describe emitted spans rather than reserved options.
 
-## packages/workers — non-Deno task runtimes are not permission-sandboxed (`workers-non-deno-task-sandbox-boundary`)
+## packages/plugin-workers-core — non-Deno task runtimes are not permission-sandboxed (`workers-non-deno-task-sandbox-boundary`)
 
 - **Reason:** `.permissions(...)` compiles into Deno `--allow-*` flags only for `runtime("deno")`.
   Python, .NET, shell, PowerShell, cmd, executable, and custom subprocess runtimes inherit the
   worker host's OS privileges unless the caller adds an external sandbox.
+- **Path note (2026-07-06):** the concern was recorded against the former `packages/workers`, which
+  no longer exists; the public task-runtime API now lives in `packages/plugin-workers-core`. Debt
+  remains **open** — relocated, not resolved.
 - **Owner:** Workers runtime hardening follow-up.
 - **Created:** 2026-06-22.
 - **Status:** open, DEBT_ACCEPTED.
 - **Gate:** Close when non-Deno task runtimes have a documented, enforced per-task sandbox or the
   public task runtime API explicitly models this as a permanent trust boundary.
 
-## packages/workers — scaffold createJobTools handler helpers are no-op stubs (`workers-scaffold-job-tools-noop`)
+## packages/plugin-workers-core — scaffold createJobTools handler helpers are no-op stubs (`workers-scaffold-job-tools-noop`)
 
 - **Reason:** The scaffold-generated worker handler toolkit `createJobTools(ctx)` exposes
   `trace.addEvent`, `withChildSpan`, and `progress` helpers that are currently no-op stubs.
@@ -2054,3 +2064,28 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** Close when the registry seeds a port-wired `ServiceDeployTarget` (or the deploy command
   injects the bare-metal ports) and an e2e/runtime smoke exercises health-gated `up`, `rollback`,
   and `secrets` against a real systemd/SERVY service.
+
+## docs/architecture/doctrine/06-archetypes.md — Archetype 5 folder-shape reconciliation deferred (`doctrine-06-archetype-5-folder-shape`)
+
+- **Reason:** The doctrine-06 "Archetype 5 — Plugin Package" Minimum shape nests contribution
+  folders (`services/`, `database/`, `jobs/`, `streams/`, `verify-plugin.ts`) under `src/` and names
+  sibling contract packages `@netscript/sagas` / `@netscript/workers`. Neither matches reality: real
+  first-party `plugins/*` place those contribution folders at the **top level** as siblings of `src/`
+  (with top-level `contracts.ts`/`mod.ts`/`verify-plugin.ts`), and the sibling contract packages were
+  renamed to `@netscript/plugin-*-core` during the plugin re-architecture. The harness archetype-5
+  profile already treats the observed `plugins/*` layout as authoritative until this chapter is
+  reconciled.
+- **Why deferred:** Reconciling the doctrine chapter is a rewrite that must land coherently with the
+  plugin-v2 folder conventions (AI-stack #238 / plugin re-architecture sequencing), not a drive-by
+  edit inside a chore run. The #306 harness/skills revamp is doc-and-spec scope; a doctrine
+  folder-shape rewrite is the #305/#306 doctrine-revamp lane's own slice.
+- **Owner:** Doctrine-revamp lane (#305/#306) — plugin-v2 folder-convention slice.
+- **Target:** When plugin-v2 folder conventions are frozen; reconcile the doctrine-06 Minimum shape
+  (top-level contribution folders + `@netscript/plugin-*-core` sibling names) and drop the
+  "authoritative until reconciled" note from `ARCHETYPE-5-plugin.md`.
+- **Linked plan:** `.llm/harness/archetypes/ARCHETYPE-5-plugin.md` § Minimum Folder Shape; issue #306.
+- **Created:** 2026-07-06
+- **Status:** open, DEBT_ACCEPTED (assessed and deferred during the #306 remainder run).
+- **Gate:** Close when doctrine-06 Archetype 5 Minimum shape matches the observed authoritative
+  `plugins/*` layout and sibling package names, and the archetype-5 profile no longer defers to the
+  observed layout.

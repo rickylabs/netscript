@@ -6,8 +6,9 @@ frontend package work.
 ## Doctrine Boundary
 
 Application code is a consumer of the package/plugin doctrine unless it modifies `packages/` or
-`plugins/`. When frontend work touches `@netscript/fresh`, `@netscript/fresh-ui`, plugin UI
-contracts, or public builders, apply the matching archetype profile first.
+`plugins/`. When frontend work touches `@netscript/fresh`, `@netscript/fresh/ai` (the plugin-AI
+stack's frontend surface), `@netscript/fresh-ui`, plugin UI contracts, or public builders, apply the
+matching archetype profile first.
 
 ## Additional Read First
 
