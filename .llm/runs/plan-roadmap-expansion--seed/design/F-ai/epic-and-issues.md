@@ -1,5 +1,31 @@
 # Topic F-ai — AI-suite epic + sub-issues (draft text only — NO GitHub mutations)
 
+> ## ⚠️ MILESTONE AUTHORITY — reconciled 2026-07-05 (post-ratification)
+>
+> **GitHub milestones are the single source of truth for this roadmap.** This doc was authored with
+> topic-local milestone estimates *before* the owner-ratified **beta.3 / beta.4 re-forecast**
+> (recorded in [`BETA34-FORECAST.md`](../../BETA34-FORECAST.md)). Since then:
+>
+> 1. **Every milestone now exists.** `0.0.1-beta.1`…`0.0.1-beta.8` + `0.0.1-stable` are all live.
+>    beta.1 (2026-07-03) and beta.2 (2026-07-04) have **shipped**; **beta.3 is the next cut**, then
+>    beta.4. Any "milestone does not exist yet / owner must create it" note below is **obsolete**.
+> 2. **Live train (authoritative):** **beta.3** = deploy compose + deploy-e2e gate + issue-closure
+>    guardrail + workers health-check fix (#393 / #394 / #387 / #376) · **beta.4** = AI flagship
+>    parity + doctrine backstop (#388 / #459) · **beta.5** = telemetry T1/T2 + road-to-stable
+>    S2/S4/S5/S6 + deploy S9–S12 + AI anchor #219 · **beta.6** = dashboard DDX + telemetry T3–T8 +
+>    AI generative-UI/MCP (incl. FAI-7 #463 / FAI-9 #464) · **beta.7** = AI depth seams + docs cut ·
+>    **beta.8** = desktop · **stable** = deferred tail.
+> 3. **F-ai front-train corrections vs the body below:** #388 (FAI-0…3) and #459 (FAI-4) are
+>    **beta.4**, not beta.5 — pulled forward as telemetry-independent. The #219 anchor is **beta.5**
+>    (it slid from the proposed beta.4 under the ratified slide rule), not beta.3. FAI-6's basis
+>    **#252 is CLOSED** (superseded) — treat FAI-6 as needing a fresh issue if renderer scope is
+>    still open. **FAI-7 = #463**, **FAI-9 = #464** (both beta.6). The supersession table's
+>    "milestone move" column below reflects the *pre*-re-forecast proposal; the live train above
+>    supersedes it.
+>
+> **Where a milestone tag in the body below differs from the issue's current GitHub milestone,
+> GitHub wins.** Do not re-file or re-milestone from this doc without checking the live issue first.
+
 > **F-ai is additive/organizing over the existing Epic #238, not a replacement.** The corpus verdict
 > (`F/04 §5`) is unanimous: no open #238 child warrants outright supersession/close; the roadmap
 > re-sequences milestones, folds two pairs, and files a few new slices. **NEVER put a closing keyword
