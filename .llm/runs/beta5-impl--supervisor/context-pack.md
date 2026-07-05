@@ -22,6 +22,7 @@ The quick-win findings reproduce: stale `@netscript/shared` Result guidance, dea
 - Current-tree research and plan/design artifacts created.
 - PLAN-EVAL passed in a separate session.
 - S1 checker reconciliation implemented; `.llm/tools` Deno check passed.
+- S2 dead doctrine research links removed; doctrine grep has zero `phase-0-research` hits.
 
 ## In Progress
 
@@ -29,10 +30,9 @@ The quick-win findings reproduce: stale `@netscript/shared` Result guidance, dea
 
 ## Next Steps
 
-1. Commit/push S1 and comment evidence.
-2. Implement S2 dead doctrine link purge.
-3. Implement S3 ref migration map and harness ref reconciliation.
-4. Run final validation.
+1. Commit/push S2 and comment evidence.
+2. Implement S3 ref migration map and harness ref reconciliation.
+3. Run final validation.
 
 ## Key Decisions
 
@@ -49,6 +49,8 @@ The quick-win findings reproduce: stale `@netscript/shared` Result guidance, dea
 | `.llm/runs/beta5-impl--supervisor/` | new | Harness run artifacts. |
 | `.llm/runs/beta5-impl--supervisor/plan-eval.md` | new | Separate evaluator verdict `PASS`. |
 | `.llm/tools/fitness/check-doctrine.ts` | changed | Stale `@netscript/shared` Result rule retired; AP/F refs reconciled. |
+| `docs/architecture/doctrine/01-thesis-and-axioms.md` | changed | Removed dead phase-0 citation references. |
+| `docs/architecture/doctrine/04-modules-and-helpers.md` | changed | Removed dead phase-0 citation references. |
 
 ## Gates
 

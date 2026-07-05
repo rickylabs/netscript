@@ -62,6 +62,7 @@ Start at `docs/architecture/doctrine/ref-migration-map.md` to translate old refs
 | 2026-07-06 | 0 | Bootstrap | Created run artifacts from current-tree research. |
 | 2026-07-06 | Plan-Gate | PASS | Separate PLAN-EVAL wrote `plan-eval.md`; implementation may begin. |
 | 2026-07-06 | 1 | Checker refs | Retired the stale Result/shared guidance and reconciled checker refs to doctrine 09 AP/F numbering. |
+| 2026-07-06 | 2 | Doctrine links | Replaced dead `phase-0-research/*` references in doctrine chapters 01 and 04 with live doctrine links or prose. |
 
 ## Decisions
 
@@ -91,6 +92,7 @@ Start at `docs/architecture/doctrine/ref-migration-map.md` to translate old refs
 | `arch:check` baseline | PASS | `rtk proxy deno task arch:check` | Exit 0 before implementation; warnings only. Baseline includes stale refs such as `A8/AP-9`, `F-DOCT-5`, and `AP-19` plus dependency catalog warnings. |
 | `arch:check` after | NOT_RUN | `deno task arch:check` | Run after implementation. |
 | stale checker refs | PASS | `rg "@netscript/shared|F-DOCT|AP-30|AP-12|A8/AP-9|A10/AP-22|AP-19|AP-23" .llm/tools/fitness/check-doctrine.ts` exited 1 | Removed from checker. |
+| doctrine dead links | PASS | `rg "phase-0-research" docs/architecture/doctrine` exited 1 | Zero hits remain. |
 
 ### Runtime Gates
 
