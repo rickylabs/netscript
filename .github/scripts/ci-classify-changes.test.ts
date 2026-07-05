@@ -5,7 +5,88 @@ import {
   isImpacting,
   parseFiles,
   parseLabels,
+  parseNameStatus,
+  sanitizeReason,
 } from './ci-classify-changes.ts';
+
+// ── rename-hole regression (adversarial review, defect 1) ────────────────────
+
+Deno.test('regression: packages/cli/a.ts -> docs/a.md rename is NOT docs-only', () => {
+  // `git diff --name-status -M` reports `R087\tpackages/cli/a.ts\tdocs/a.md`.
+  const files = parseNameStatus('R087\tpackages/cli/a.ts\tdocs/a.md');
+  assertEquals(files, ['packages/cli/a.ts', 'docs/a.md']);
+  const d = decide({ eventName: 'pull_request', files, labels: [] });
+  assertEquals(d.docsOnly, false);
+  assertEquals(d.runStatic, true);
+  assertEquals(d.runRuntime, true);
+});
+
+Deno.test('parseNameStatus: statuses A/M/D keep their single path', () => {
+  const files = parseNameStatus(
+    'A\tdocs/new.md\nM\tpackages/cli/mod.ts\nD\tplugins/sagas/gone.ts',
+  );
+  assertEquals(files, [
+    'docs/new.md',
+    'packages/cli/mod.ts',
+    'plugins/sagas/gone.ts',
+  ]);
+});
+
+Deno.test('parseNameStatus: copies include both sides; deletes stay impacting', () => {
+  const files = parseNameStatus('C90\tpackages/kv/mod.ts\tdocs/copy.md\nD\tpackages/sdk/x.ts');
+  assertEquals(files, ['packages/kv/mod.ts', 'docs/copy.md', 'packages/sdk/x.ts']);
+  const d = decide({ eventName: 'pull_request', files, labels: [] });
+  assertEquals(d.docsOnly, false);
+});
+
+Deno.test('parseNameStatus: docs-to-docs rename stays docs-only', () => {
+  const files = parseNameStatus('R100\tdocs/old.md\tdocs/new.md');
+  const d = decide({ eventName: 'pull_request', files, labels: [] });
+  assertEquals(d.docsOnly, true);
+  assertEquals(d.runStatic, false);
+  assertEquals(d.runRuntime, false);
+});
+
+Deno.test('parseNameStatus: unrecognisable line degrades to a bare path (forces run)', () => {
+  const files = parseNameStatus('something-weird-without-tab');
+  assertEquals(files, ['something-weird-without-tab']);
+  const d = decide({ eventName: 'pull_request', files, labels: [] });
+  assertEquals(d.docsOnly, false);
+});
+
+Deno.test('parseNameStatus: empty/undefined input', () => {
+  assertEquals(parseNameStatus(''), []);
+  assertEquals(parseNameStatus(undefined), []);
+});
+
+// ── reason sanitization (adversarial review, defect 3) ───────────────────────
+
+Deno.test('sanitizeReason: strips control chars and newlines', () => {
+  assertEquals(
+    sanitizeReason('a\nb\r\nc\x00d'),
+    'a b c d',
+  );
+});
+
+Deno.test('sanitizeReason: caps length at 500', () => {
+  const long = 'x'.repeat(600);
+  const out = sanitizeReason(long);
+  assertEquals(out.length, 500);
+  assertEquals(out.endsWith('...'), true);
+});
+
+Deno.test('reason with a GITHUB_OUTPUT-injection filename stays one line', () => {
+  const evil = 'packages/cli/$(touch pwned)\nrun_static=false.ts';
+  const d = decide({
+    eventName: 'pull_request',
+    files: [evil],
+    labels: ['ci:skip-e2e'],
+  });
+  const safe = sanitizeReason(d.reason);
+  assertEquals(safe.includes('\n'), false);
+  // The evil path is impacting (packages/) so the gate still runs static.
+  assertEquals(d.runStatic, true);
+});
 
 Deno.test('docs surfaces are docs-only', () => {
   for (

@@ -222,18 +222,69 @@ export function parseFiles(raw: string | undefined): string[] {
     .filter((v) => v.length > 0);
 }
 
+/**
+ * Parse `git diff --name-status -M` output into the full set of touched paths.
+ *
+ * Renames/copies (`R<score>` / `C<score>`) report `STATUS\told\tnew` — BOTH
+ * sides are returned, so a `packages/cli/a.ts -> docs/a.md` rename still
+ * surfaces the impacting source path (the rename hole found in adversarial
+ * review: `--name-only` emits only the destination). Deletions (`D`) keep the
+ * deleted path. All other statuses (`A`/`M`/`T`/...) contribute their path.
+ * Lines without a recognisable status column are treated as bare paths, so an
+ * unclassifiable input can only ever FORCE the gate, never skip it.
+ */
+export function parseNameStatus(raw: string | undefined): string[] {
+  if (!raw) return [];
+  const paths: string[] = [];
+  for (const line of raw.split(/\r?\n/)) {
+    if (line.trim().length === 0) continue;
+    const parts = line.split('\t').map((v) => v.trim()).filter((v) => v.length > 0);
+    if (parts.length === 0) continue;
+    const status = parts[0];
+    if (/^[RC]\d*$/.test(status) && parts.length >= 3) {
+      // Rename/copy: include BOTH the old and the new path.
+      paths.push(parts[1], parts[2]);
+    } else if (/^[A-Z]\d*$/.test(status) && parts.length >= 2) {
+      // Single-path statuses (A/M/D/T/U/...): everything after the status.
+      paths.push(...parts.slice(1));
+    } else {
+      // No status column recognised — treat the fields as paths (conservative).
+      paths.push(...parts);
+    }
+  }
+  return paths;
+}
+
+/**
+ * Make the reason safe to transport through `$GITHUB_OUTPUT` and job outputs:
+ * strip control characters (incl. newlines, which a crafted filename could use
+ * to inject extra output assignments) and cap the length. Consumers must still
+ * only print it via `printf '%s\n' "$REASON"` from an env var — never
+ * interpolate it into shell source.
+ */
+export function sanitizeReason(reason: string): string {
+  // deno-lint-ignore no-control-regex
+  const flat = reason.replace(/[\x00-\x1f\x7f]+/g, ' ').trim();
+  return flat.length > 500 ? `${flat.slice(0, 497)}...` : flat;
+}
+
 async function main(): Promise<void> {
   const eventName = Deno.env.get('EVENT_NAME') ?? 'pull_request';
-  const files = parseFiles(Deno.env.get('CHANGED_FILES'));
+  // Prefer the rename-aware name-status form; fall back to a plain file list.
+  const nameStatus = Deno.env.get('CHANGED_NAME_STATUS');
+  const files = nameStatus !== undefined && nameStatus.trim().length > 0
+    ? parseNameStatus(nameStatus)
+    : parseFiles(Deno.env.get('CHANGED_FILES'));
   const labels = parseLabels(Deno.env.get('PR_LABELS'));
 
   const decision = decide({ eventName, files, labels });
+  const reason = sanitizeReason(decision.reason);
 
   const lines = [
     `run_static=${decision.runStatic}`,
     `run_runtime=${decision.runRuntime}`,
     `docs_only=${decision.docsOnly}`,
-    `reason=${decision.reason}`,
+    `reason=${reason}`,
   ];
 
   // Human-readable log.
@@ -244,7 +295,7 @@ async function main(): Promise<void> {
   console.log(`  run_static:   ${decision.runStatic}`);
   console.log(`  run_runtime:  ${decision.runRuntime}`);
   console.log(`  docs_only:    ${decision.docsOnly}`);
-  console.log(`  reason:       ${decision.reason}`);
+  console.log(`  reason:       ${reason}`);
 
   const outPath = Deno.env.get('GITHUB_OUTPUT');
   if (outPath) {
