@@ -11,6 +11,7 @@ archetype matrix decides which gates apply.
 | Fitness  | `fitness-gates.md`         | Doctrine F-1 through F-19                       |
 | Runtime  | `runtime-gates.md`         | Aspire, browser, services, traces, lifecycle    |
 | Consumer | `consumer-gates.md`        | Downstream imports, generated clients, examples |
+| Release  | `release-gates.md`         | `scaffold.runtime`, `e2e-cli-prod`, release-gate class (cut/release-gating runs only) |
 | Matrix   | `archetype-gate-matrix.md` | Required gate set per archetype                 |
 
 ## Ordering

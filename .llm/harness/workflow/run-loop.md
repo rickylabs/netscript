@@ -182,10 +182,12 @@ Two `FAIL_FIX` cycles are allowed. After the second, escalate to the user.
 ## 8. Release (release-cutting runs only)
 
 Runs that cut or gate a release call the hard release gates here — **`e2e-cli-prod`,
-`scaffold.runtime`, and the release-gate class**. This phase does **not** define those gates: their
-definitions, sequencing, and race-free production verification are owned by **#309's release
-engineering** (see the `netscript-release` skill). Reference and call them here; do not redefine
-them. For a run that does not cut a release, this phase is a no-op.
+`scaffold.runtime`, and the release-gate class**. The harness-side single source for this class —
+which gate is required when, and the evidence bar — is `gates/release-gates.md`. This phase does
+**not** define the gates themselves: their definitions, sequencing, and race-free production
+verification are owned by **#309's release engineering** (see the `netscript-release` skill).
+Reference and call them here; do not redefine them. For a run that does not cut a release, this phase
+is a no-op.
 
 ## 9. Close
 

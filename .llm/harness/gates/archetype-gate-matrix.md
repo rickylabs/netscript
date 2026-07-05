@@ -64,6 +64,17 @@ logic in the command surface; conventions live in the core), documented in
 | Browser validation         | n/a      | n/a      | n/a      | subtype  | n/a      | n/a      | n/a      |
 | Consumer import validation | optional | required | required | required | required | required | required |
 
+## Release Gates (cut / release-gating runs)
+
+The **release-gate class** (`scaffold.runtime`, `e2e-cli-prod`, and the composite release gate) is
+orthogonal to the per-archetype matrix above: it is keyed on **what the run does**, not the
+archetype it touches. Any run that cuts a release, or that changes scaffold output / plugin
+scaffolding / DB wiring / Aspire helper generation / the published CLI or plugin publish shape, must
+call it. The single source for which gate is required when — and the evidence bar — is
+`gates/release-gates.md`; the gate definitions themselves are owned by #309 release engineering (the
+`netscript-release` skill). For a run that is neither a release cut nor a touch of those surfaces,
+the release-gate class is `n/a`.
+
 ## Phase A Reporting
 
 Fitness scripts now exist: `deno task arch:check` runs `.llm/tools/fitness/check-doctrine.ts` over

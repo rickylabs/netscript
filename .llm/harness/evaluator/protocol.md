@@ -44,6 +44,12 @@ against the changed state, not to continue implementation.
     chapter naming the relevant skills (harness rule; a missing SKILL chapter in a brief is a
     finding). PR bodies are governed by the `netscript-pr` templates and do NOT require a `## SKILL`
     chapter — never raise its absence from a PR body as a finding.
+14. For a **cut or release-gating run**, verify the **release-gate class** (`gates/release-gates.md`
+    — `scaffold.runtime`, `e2e-cli-prod`, and the composite release gate) is green with raw-exit-code
+    evidence before any `status:ready-merge` / release. A red or unrun release gate on a release cut
+    blocks the pass. The gate definitions are owned by #309 release engineering (the
+    `netscript-release` skill); the evaluator confirms they ran, it does not redefine them. Non-release
+    runs treat this rule as `n/a`.
 
 ## Output
 
