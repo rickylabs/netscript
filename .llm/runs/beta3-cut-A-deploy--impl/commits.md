@@ -4,3 +4,4 @@ Per user instruction for this beta.3 cut, append each slice commit here even tho
 
 | Slice | Commit | Branch | Notes |
 | ----- | ------ | ------ | ----- |
+| #393 | `6e7e13cf` | `fix/deploy-compose-target-393` | Registers `compose`/`docker` default deploy targets and adds resolution smoke tests. |
