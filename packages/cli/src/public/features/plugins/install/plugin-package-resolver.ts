@@ -1,5 +1,6 @@
 /** Known bare plugin aliases that resolve only to verified NetScript JSR packages. */
 export const BARE_PLUGIN_PACKAGE_ALIASES: Readonly<Record<string, string>> = Object.freeze({
+  ai: '@netscript/plugin-ai',
   auth: '@netscript/plugin-auth',
   saga: '@netscript/plugin-sagas',
   sagas: '@netscript/plugin-sagas',
