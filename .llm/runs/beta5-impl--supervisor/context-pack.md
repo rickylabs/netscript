@@ -20,6 +20,8 @@ The quick-win findings reproduce: stale `@netscript/shared` Result guidance, dea
 
 - Required skills and harness workflow docs read.
 - Current-tree research and plan/design artifacts created.
+- PLAN-EVAL passed in a separate session.
+- S1 checker reconciliation implemented; `.llm/tools` Deno check passed.
 
 ## In Progress
 
@@ -27,9 +29,10 @@ The quick-win findings reproduce: stale `@netscript/shared` Result guidance, dea
 
 ## Next Steps
 
-1. Commit/push PLAN-EVAL artifact.
-2. Run baseline `deno task arch:check`.
-3. Implement slices 1-3 and final validation.
+1. Commit/push S1 and comment evidence.
+2. Implement S2 dead doctrine link purge.
+3. Implement S3 ref migration map and harness ref reconciliation.
+4. Run final validation.
 
 ## Key Decisions
 
@@ -45,12 +48,13 @@ The quick-win findings reproduce: stale `@netscript/shared` Result guidance, dea
 | ---- | ------ | ----- |
 | `.llm/runs/beta5-impl--supervisor/` | new | Harness run artifacts. |
 | `.llm/runs/beta5-impl--supervisor/plan-eval.md` | new | Separate evaluator verdict `PASS`. |
+| `.llm/tools/fitness/check-doctrine.ts` | changed | Stale `@netscript/shared` Result rule retired; AP/F refs reconciled. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Static | pending | Planned `.llm/tools` wrapper check. |
+| Static | PASS for `.llm/tools` | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .llm/tools --ext ts` |
 | Fitness | pending | Planned before/after `deno task arch:check`. |
 | Runtime | N/A | No runtime changes. |
 | Consumer | N/A | No package public exports changed. |
