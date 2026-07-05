@@ -8,6 +8,10 @@
   `betterAuthOptions` -> `Omit<BetterAuthOptions, 'database' | 'plugins'>`. A trivial re-export or
   `BetterAuthPlugin[]` replacement did not satisfy `deno doc --lint`; resolving this cleanly needs
   a public API redesign for the passthrough surface, so it is deferred per the issue #303 brief.
+- `packages/fresh/src/application/vite/vite.ts` exposes `NetScriptVitePlugin = Plugin` from Vite.
+  `deno doc --lint` reports Vite's `Plugin` declaration as private. Replacing this with a
+  package-owned structural hook interface would change the public plugin type contract, so it is
+  deferred per the issue #303 brief.
 
 ## Process Notes
 

@@ -73,6 +73,7 @@ slice commit.
 | 2026-07-06 | 2 | lock hygiene | Reverted transient `deno.lock` change from `deno info npm:better-auth --json` (`npm:better-auth@*` resolution). |
 | 2026-07-06 | 2 | cli | Re-exported `CacheBackendChoice` from `@netscript/cli/testing`; raw full-export doc-lint clean. |
 | 2026-07-06 | 2 | sdk | Re-exported `NetScriptProcedureSchemas` from SDK client and ports subpaths; raw full-export doc-lint clean. |
+| 2026-07-06 | 3 | fresh | Exported `EmptySegment` to clear route type leaks; Vite `Plugin` alias requires public API redesign and is recorded in `notes.md`. |
 
 ## Decisions
 
@@ -110,6 +111,9 @@ slice commit.
 | SDK check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/sdk --ext ts,tsx` | PASS | 56 files selected, 0 occurrences. |
 | SDK lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/sdk --ext ts,tsx` | PASS | 56 files selected, 0 findings. |
 | SDK fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/sdk --ext ts,tsx` | PASS | 56 files selected, 0 findings. |
+| Fresh check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh --ext ts,tsx` | PASS | 159 files selected, 0 occurrences. |
+| Fresh lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/fresh --ext ts,tsx` | PASS | 159 files selected, 0 findings. |
+| Fresh fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/fresh --ext ts,tsx` | PASS | 159 files selected, 0 findings. |
 
 ### Fitness Gates
 
@@ -124,6 +128,7 @@ slice commit.
 | F-5/F-7 `@netscript/auth-better-auth` | DEFERRED | `deno doc --lint ./mod.ts` reports Better Auth private aliases in passthrough option fields. | Requires public API redesign; recorded in `notes.md` per brief. |
 | F-5/F-7 `@netscript/cli` | PASS | `deno doc --lint` over 3 export-map entrypoints: `Checked 3 files`. | `CacheBackendChoice` is now public on the testing subpath that exports `InitPromptAnswers`. |
 | F-5/F-7 `@netscript/sdk` | PASS | `deno doc --lint` over 10 export-map entrypoints: `Checked 10 files`. | `NetScriptProcedureSchemas` is now public on subpaths that expose `ContractProcedureLike`. |
+| F-5/F-7 `@netscript/fresh` | DEFERRED | Wrapper now reports only 1 private-type ref in `src/application/vite/vite.ts`. | Route leaks fixed; Vite `Plugin` alias needs public API redesign and is recorded in `notes.md`. |
 
 ### Runtime Gates
 
