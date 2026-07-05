@@ -26,6 +26,10 @@ Deno.test('mapRunOptions rejects unsupported plugin values', () => {
   );
 });
 
+Deno.test('mapRunOptions accepts ai plugin axis', () => {
+  assertEquals(mapRunOptions({ plugins: 'worker,ai' }), { plugins: ['worker', 'ai'] });
+});
+
 Deno.test('mapRunOptions accepts mssql database axis', () => {
   assertEquals(mapRunOptions({ db: DATABASE.MSSQL }), { database: DATABASE.MSSQL });
 });

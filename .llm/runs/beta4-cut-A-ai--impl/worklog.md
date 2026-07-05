@@ -72,6 +72,7 @@ the presentation tests.
 | 2026-07-05 | 1 | Plan fix | PLAN-EVAL failed on incomplete gate mapping; expanded full Archetype 5 plus service/docs overlay gates. |
 | 2026-07-05 | 2 | Contract binding | Added `createAiRouter` in `plugin-ai-core`, AI contract soundness test, and generated stream-route binding to `aiContractV1`. |
 | 2026-07-05 | 3 | Plugin parity | Added `verify-plugin.ts`, doctor coverage for `ANTHROPIC_API_KEY`, six-emitter golden assertions, and parity review. |
+| 2026-07-05 | 4 | E2E wiring | Added AI plugin kind to scaffold suites and a generated chat-route import smoke gate. |
 
 ## Decisions
 
@@ -99,6 +100,7 @@ the presentation tests.
 | PLAN-EVAL cycle 2 | separate evaluator over research/plan/design | PASS | `plan-eval.md` records PASS. |
 | Slice 2 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin-ai-core --root plugins/ai --ext ts,tsx` | PASS | 35 files selected, 0 diagnostics. |
 | Slice 3 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/ai --ext ts,tsx` | PASS | 30 files selected, 0 diagnostics. |
+| Slice 4 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli/e2e --ext ts,tsx` | PASS | 77 files selected, 0 diagnostics. |
 
 ### Fitness Gates
 
@@ -113,6 +115,7 @@ the presentation tests.
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | scaffold.runtime ai | NOT_RUN | pending | Full suite once at end. |
+| scaffold.runtime registry | PASS | `deno test --unstable-kv --allow-write packages/cli/e2e/tests/presentation/suite-registry_test.ts`; `deno test --unstable-kv packages/cli/e2e/tests/presentation/cli-options_test.ts`; `deno test --unstable-kv packages/cli/e2e/tests/application/builders/runtime-gates_test.ts` | AI plugin/gate is registered in runtime/plugin suite expectations. |
 
 ### Consumer Gates
 

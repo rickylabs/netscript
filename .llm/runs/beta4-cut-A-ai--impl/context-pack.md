@@ -15,6 +15,9 @@ the F-ai design source.
   generated AI stream-route output that imports `aiContractV1` and binds `createAiRouter`.
 - Slice 3 added `plugins/ai/verify-plugin.ts`, doctor tests for `ANTHROPIC_API_KEY`, six-emitter
   golden coverage, and `.llm/runs/beta4-cut-A-ai--impl/parity-review.md`.
+- Slice 4 added AI as a first-party CLI E2E plugin kind and a `behavior.ai-chat-route` smoke gate
+  that imports the generated `ai/routes/chat-stream.ts` module and checks `handler`, `aiRouter`, and
+  `aiRouteContract`.
 
 ## Decisions
 

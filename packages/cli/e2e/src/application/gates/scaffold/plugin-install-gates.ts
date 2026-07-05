@@ -11,6 +11,7 @@ import { cli, commandGate } from './gate-factory.ts';
 
 function pluginName(kind: PluginKind): string {
   if (kind === PLUGIN.AUTH) return 'auth';
+  if (kind === PLUGIN.AI) return 'ai';
   return `${kind}s`;
 }
 
@@ -19,6 +20,7 @@ function localPluginDir(kind: PluginKind): string {
   if (kind === PLUGIN.SAGA) return 'sagas';
   if (kind === PLUGIN.TRIGGER) return 'triggers';
   if (kind === PLUGIN.STREAM) return 'streams';
+  if (kind === PLUGIN.AI) return 'ai';
   return 'auth';
 }
 

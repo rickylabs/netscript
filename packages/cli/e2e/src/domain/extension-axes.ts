@@ -33,6 +33,7 @@ export const PLUGIN = {
   TRIGGER: 'trigger',
   STREAM: 'stream',
   AUTH: 'auth',
+  AI: 'ai',
 } as const;
 
 /** Reporter formats emitted by the CLI. */

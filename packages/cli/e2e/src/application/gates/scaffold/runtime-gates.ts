@@ -162,6 +162,12 @@ export function createRuntimeGates(
       'Read auth session route',
       'http://127.0.0.1:8094/api/v1/auth/session',
     ),
+    commandGate(
+      GATE.BEHAVIOR_AI_CHAT_ROUTE,
+      'Import generated AI chat route',
+      GATE_PHASE.BEHAVIOR,
+      (context) => ['deno', 'eval', VALIDATE_AI_CHAT_ROUTE_SCRIPT, context.project.projectRoot],
+    ),
   ];
 }
 
@@ -218,6 +224,20 @@ function runtimeResources(database: DatabaseEngine): readonly AspireResource[] {
     ASPIRE_RESOURCE.AUTH,
   ];
 }
+
+const VALIDATE_AI_CHAT_ROUTE_SCRIPT = [
+  'const projectRoot = Deno.args[0];',
+  'if (!projectRoot) throw new Error("project root argument is required");',
+  'const route = await import(`file://${projectRoot}/ai/routes/chat-stream.ts`);',
+  'if (typeof route.handler !== "function") throw new Error("AI chat-stream handler is not exported");',
+  'if (typeof route.aiRouter !== "object" || route.aiRouter === null) {',
+  '  throw new Error("AI chat-stream route did not export a contract-bound aiRouter");',
+  '}',
+  'if (typeof route.aiRouteContract !== "object" || route.aiRouteContract === null) {',
+  '  throw new Error("AI chat-stream route did not export aiContractV1 handle");',
+  '}',
+  'console.info("AI chat route contract import smoke passed");',
+].join('\n');
 
 function databaseRuntimeResources(database: DatabaseEngine): readonly AspireResource[] {
   switch (database) {
