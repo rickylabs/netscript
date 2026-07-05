@@ -2,7 +2,12 @@
 
 ## Stops / Deferrals
 
-- None yet.
+- `packages/auth-better-auth/src/better-auth.ts` exposes Better Auth passthrough options whose
+  public fields reference upstream private declaration aliases:
+  `NetscriptBetterAuthOptions.plugins` -> `BetterAuthOptions['plugins']` and
+  `betterAuthOptions` -> `Omit<BetterAuthOptions, 'database' | 'plugins'>`. A trivial re-export or
+  `BetterAuthPlugin[]` replacement did not satisfy `deno doc --lint`; resolving this cleanly needs
+  a public API redesign for the passthrough surface, so it is deferred per the issue #303 brief.
 
 ## Process Notes
 

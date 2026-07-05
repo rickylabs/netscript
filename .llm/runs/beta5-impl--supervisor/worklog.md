@@ -69,6 +69,7 @@ slice commit.
 | 2026-07-06 | 2 | aspire | Fixed missing JSDoc in `packages/aspire` public error/interface members; raw full-export doc-lint clean. |
 | 2026-07-06 | 2 | queue | Exported/documented `PostgresQueryResult` and documented Postgres adapter private methods; raw full-export doc-lint clean. |
 | 2026-07-06 | 2 | config | Re-exported deploy target types from root `mod.ts`; raw full-export doc-lint clean. |
+| 2026-07-06 | 2 | auth-better-auth | Stopped on Better Auth passthrough private-type leak; trivial re-export/element-type replacement failed, so deferral recorded in `notes.md`. |
 
 ## Decisions
 
@@ -112,6 +113,7 @@ slice commit.
 | F-5/F-7 `@netscript/aspire` | PASS | `deno doc --lint` over 9 export-map entrypoints: `Checked 9 files`. | Wrapper summary also reports 0 combined errors; raw command used to confirm clean verdict. |
 | F-5/F-7 `@netscript/queue` | PASS | `deno doc --lint` over 13 export-map entrypoints: `Checked 13 files`. | Warnings from transitive npm Node typings did not produce doc-lint errors. |
 | F-5/F-7 `@netscript/config` | PASS | `deno doc --lint` over 4 export-map entrypoints: `Checked 4 files`. | Root re-export now exposes deploy target types referenced by `DeployConfig`. |
+| F-5/F-7 `@netscript/auth-better-auth` | DEFERRED | `deno doc --lint ./mod.ts` reports Better Auth private aliases in passthrough option fields. | Requires public API redesign; recorded in `notes.md` per brief. |
 
 ### Runtime Gates
 
