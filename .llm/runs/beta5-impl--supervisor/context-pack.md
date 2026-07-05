@@ -6,7 +6,7 @@
 | ----- | ----- |
 | Run ID | `beta5-impl--supervisor` |
 | Branch | `chore/305-doctrine-quickwin` |
-| Current phase | `implement` |
+| Current phase | `impl-eval` |
 | Archetype | Archetype 6 for checker tooling; N/A for docs-only files |
 | Scope overlays | `SCOPE-docs.md` |
 
@@ -24,6 +24,7 @@ The quick-win findings reproduce: stale `@netscript/shared` Result guidance, dea
 - S1 checker reconciliation implemented; `.llm/tools` Deno check passed.
 - S2 dead doctrine research links removed; doctrine grep has zero `phase-0-research` hits.
 - S3 ref migration map added and linked from evaluator/debt docs.
+- S4 final validation passed; branch is ready for separate IMPL-EVAL.
 
 ## In Progress
 
@@ -31,9 +32,9 @@ The quick-win findings reproduce: stale `@netscript/shared` Result guidance, dea
 
 ## Next Steps
 
-1. Commit/push S3 and comment evidence.
-2. Run final validation.
-3. Update PR body/checklist and post `SLICE-COMPLETE`.
+1. Commit/push S4 validation artifacts and update PR body.
+2. Run separate IMPL-EVAL.
+3. Post `SLICE-COMPLETE`.
 
 ## Key Decisions
 
@@ -61,7 +62,7 @@ The quick-win findings reproduce: stale `@netscript/shared` Result guidance, dea
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
 | Static | PASS for `.llm/tools` | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .llm/tools --ext ts` |
-| Fitness | pending | Planned before/after `deno task arch:check`. |
+| Fitness | PASS with existing warnings | Before and after `rtk proxy deno task arch:check` exited 0; after-run has reconciled refs and no stale shared Result rule. |
 | Runtime | N/A | No runtime changes. |
 | Consumer | N/A | No package public exports changed. |
 

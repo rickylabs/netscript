@@ -27,7 +27,7 @@
 | Group branch | `chore/305-doctrine-quickwin` |
 | Nested run ID | `beta5-impl--supervisor` |
 | Archetype(s) | Archetype 6 for checker tooling + `SCOPE-docs.md` |
-| Status | `active` |
+| Status | `evaluating` |
 | Merge commit | `—` |
 
 ### Pre-conditions
@@ -73,7 +73,7 @@
 
 | Group | Status | Depends on | Surfaces | Merge commit |
 | ----- | ------ | ---------- | -------- | ------------ |
-| `QW` | `active` | none | doctrine docs, checker, harness refs | `—` |
+| `QW` | `evaluating` | none | doctrine docs, checker, harness refs | `—` |
 
 ## Base-Sync Log
 

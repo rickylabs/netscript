@@ -64,6 +64,7 @@ Start at `docs/architecture/doctrine/ref-migration-map.md` to translate old refs
 | 2026-07-06 | 1 | Checker refs | Retired the stale Result/shared guidance and reconciled checker refs to doctrine 09 AP/F numbering. |
 | 2026-07-06 | 2 | Doctrine links | Replaced dead `phase-0-research/*` references in doctrine chapters 01 and 04 with live doctrine links or prose. |
 | 2026-07-06 | 3 | Ref map | Added the AP/F migration map and linked it from evaluator and debt reference entry points. |
+| 2026-07-06 | 4 | Final validation | Re-ran requested gates; after `arch:check` exits 0 and reports reconciled refs, with no `@netscript/shared` finding. |
 
 ## Decisions
 
@@ -91,7 +92,7 @@ Start at `docs/architecture/doctrine/ref-migration-map.md` to translate old refs
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
 | `arch:check` baseline | PASS | `rtk proxy deno task arch:check` | Exit 0 before implementation; warnings only. Baseline includes stale refs such as `A8/AP-9`, `F-DOCT-5`, and `AP-19` plus dependency catalog warnings. |
-| `arch:check` after | NOT_RUN | `deno task arch:check` | Run after implementation. |
+| `arch:check` after | PASS | `rtk proxy deno task arch:check` | Exit 0 after implementation; existing warnings remain but use reconciled refs such as `A8/AP-1/F-1`, `F-16`, and `F-5/F-6`. No `@netscript/shared` Result finding appears. |
 | stale checker refs | PASS | `rg "@netscript/shared|F-DOCT|AP-30|AP-12|A8/AP-9|A10/AP-22|AP-19|AP-23" .llm/tools/fitness/check-doctrine.ts` exited 1 | Removed from checker. |
 | doctrine dead links | PASS | `rg "phase-0-research" docs/architecture/doctrine` exited 1 | Zero hits remain. |
 | harness ref trust | PASS | `rg "F-DOCT|AP-30|AP-29|AP-28|AP-27|AP-26|A8/AP-9|A10/AP-22|AP-7/F|A7/AP-12" ...` | Hits are limited to the new migration map and evaluator trust note. |
@@ -112,3 +113,5 @@ Start at `docs/architecture/doctrine/ref-migration-map.md` to translate old refs
 
 - Evaluator should inspect `check-doctrine.ts` for stale `@netscript/shared`, doctrine files for
   dead `phase-0-research`, and `ref-migration-map.md` for AP/F trust.
+- Lock hygiene: validation twice added resolver-only `deno.lock` entries for `jsr:@std/fs@*` and
+  `jsr:@std/path@*`; both were restored before commit. No `deno.lock` churn is part of this branch.
