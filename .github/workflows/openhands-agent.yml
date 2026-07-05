@@ -465,9 +465,11 @@ jobs:
           - If your task defines a verdict, emit exactly one line of the form
             OPENHANDS_VERDICT: PASS
             (one token from PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN, alone on its
-            own line, outside code fences) in BOTH your summary file and your verdict
-            comment. The workflow parses only that exact form; anything else reports
-            OPENHANDS_VERDICT: NONE to the supervisor.
+            own line, outside code fences, with NO bold/backtick/prefix decoration) in
+            BOTH your summary file and your verdict comment — as the FIRST line of the
+            verdict comment. Use ONLY that harness vocabulary: GitHub review terms
+            (CHANGES_REQUESTED, APPROVED, REQUEST_CHANGES) are NOT verdicts and report
+            OPENHANDS_VERDICT: NONE to the supervisor, as does any other form.
           - You may post the PR/issue comments your task instructions require (for
             example an early verdict comment). Do NOT imitate the workflow's own status
             comment: never write an '<!-- openhands-' marker or a '## OpenHands Agent —'
@@ -649,17 +651,27 @@ jobs:
             verdict="summary-missing"
           fi
 
-          # Strict agent-verdict extraction. KEEP IN SYNC with verdictOf() in the
-          # "Publish final status comment" step: literal OPENHANDS_VERDICT: line,
-          # one exact token, alone on its own line, outside code fences. Template
-          # text (e.g. "OPENHANDS_VERDICT: <PASS|FAIL_FIX|...>") cannot match.
+          # Layered agent-verdict extraction. KEEP IN SYNC with verdictOf() in the
+          # "Publish final status comment" step. Tier 1 (strict): literal
+          # OPENHANDS_VERDICT: line, one exact token, alone on its own line, outside
+          # code fences. Template text (e.g. "OPENHANDS_VERDICT: <PASS|FAIL_FIX|...>")
+          # cannot match. Tier 2 (decorated): the same marker line after stripping
+          # markdown decoration and an optional "Verdict:" prefix — models bold the
+          # marker in practice (observed: "**Verdict: OPENHANDS_VERDICT: PASS**",
+          # PR #475); lines containing '<' (placeholders) never match.
           agent_verdict="NONE"
           if [ -s "$OPENHANDS_SUMMARY_PATH" ]; then
-            line="$(awk '/^[[:space:]]*(```|~~~)/{fence=!fence; next} !fence' "$OPENHANDS_SUMMARY_PATH" \
+            unfenced="$(awk '/^[[:space:]]*(```|~~~)/{fence=!fence; next} !fence' "$OPENHANDS_SUMMARY_PATH")"
+            line="$(printf '%s\n' "$unfenced" \
               | grep -E '^OPENHANDS_VERDICT:[[:space:]]*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN)[[:space:]]*$' \
               | head -n 1 || true)"
+            if [ -z "$line" ]; then
+              line="$(printf '%s\n' "$unfenced" | grep -v '<' | sed -E 's/[*`]+//g' \
+                | grep -E '^[[:space:]]*(Verdict:?[[:space:]]*)?OPENHANDS_VERDICT:[[:space:]]*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN)[[:space:]]*$' \
+                | head -n 1 || true)"
+            fi
             if [ -n "$line" ]; then
-              agent_verdict="$(printf '%s' "$line" | sed -E 's/^OPENHANDS_VERDICT:[[:space:]]*//; s/[[:space:]]*$//')"
+              agent_verdict="$(printf '%s' "$line" | sed -E 's/^.*OPENHANDS_VERDICT:[[:space:]]*//; s/[[:space:]]*$//')"
             fi
           fi
 
@@ -932,13 +944,18 @@ jobs:
             const env = process.env;
             const outcome = (v) => v || 'skipped';
 
-            // Strict agent-verdict matcher. KEEP IN SYNC with the awk/grep in
-            // the "Materialize OpenHands trace" step: literal line, one exact
-            // token, own line, outside code fences. Placeholder/template text
-            // ("OPENHANDS_VERDICT: <PASS|...>", "[VERDICT: <verdict>]") cannot
-            // match, which is the point (observed failure mode 5).
+            // Layered agent-verdict matcher. KEEP IN SYNC with the awk/grep in
+            // the "Materialize OpenHands trace" step. Tier 1 (strict): literal
+            // line, one exact token, own line, outside code fences. Placeholder/
+            // template text ("OPENHANDS_VERDICT: <PASS|...>", "[VERDICT:
+            // <verdict>]") cannot match, which is the point (observed failure
+            // mode 5). Tier 2 (decorated): same marker line after stripping
+            // markdown decoration and an optional "Verdict:" prefix — models
+            // bold the marker in practice ("**Verdict: OPENHANDS_VERDICT:
+            // PASS**", PR #475); lines containing '<' never match.
             function verdictOf(text) {
               let inFence = false;
+              let decorated = null;
               for (const line of String(text ?? '').split(/\r?\n/)) {
                 if (/^\s*(```|~~~)/.test(line)) { inFence = !inFence; continue; }
                 if (inFence) continue;
@@ -946,8 +963,14 @@ jobs:
                   /^OPENHANDS_VERDICT:[ \t]*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN)[ \t]*$/,
                 );
                 if (m) return m[1];
+                if (!decorated && !line.includes('<')) {
+                  const d = line.replace(/[*`]+/g, '').match(
+                    /^[ \t]*(?:Verdict:?[ \t]*)?OPENHANDS_VERDICT:[ \t]*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN)[ \t]*$/,
+                  );
+                  if (d) decorated = d[1];
+                }
               }
-              return null;
+              return decorated;
             }
 
             // 1) Summary file (terminal artifact — authoritative when present).
