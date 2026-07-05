@@ -95,7 +95,7 @@ export type BaseContract = typeof baseContract;
  * vocabulary merged onto an empty map. Mirrors the `BaseErrors` alias used by
  * the first-party `@netscript/plugin-*-core` contract definitions.
  */
-type BaseContractErrors = MergedErrorMap<Record<never, never>, ErrorMap>;
+export type BaseContractErrors = MergedErrorMap<Record<never, never>, ErrorMap>;
 
 /**
  * Sound type of a route built via

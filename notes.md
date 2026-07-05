@@ -12,6 +12,11 @@
   `deno doc --lint` reports Vite's `Plugin` declaration as private. Replacing this with a
   package-owned structural hook interface would change the public plugin type contract, so it is
   deferred per the issue #303 brief.
+- `packages/contracts` still reports 12 `private-type-ref` diagnostics after local alias/JSDoc
+  cleanup. The remaining refs are tied to the oRPC-bound base contract/CRUD route seam (`oc`,
+  `AnySchema`, `ContractProcedureBuilderWith*`, `Schema`, and aliases over those types). This is the
+  sanctioned `86eca907` carve-out class; changing it would require redesigning the sound oRPC
+  builder surface.
 
 ## Process Notes
 

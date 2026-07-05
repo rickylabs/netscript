@@ -74,6 +74,7 @@ slice commit.
 | 2026-07-06 | 2 | cli | Re-exported `CacheBackendChoice` from `@netscript/cli/testing`; raw full-export doc-lint clean. |
 | 2026-07-06 | 2 | sdk | Re-exported `NetScriptProcedureSchemas` from SDK client and ports subpaths; raw full-export doc-lint clean. |
 | 2026-07-06 | 3 | fresh | Exported `EmptySegment` to clear route type leaks; Vite `Plugin` alias requires public API redesign and is recorded in `notes.md`. |
+| 2026-07-06 | 3 | contracts | Cleared contracts missing-JSDoc and local helper alias leaks; remaining oRPC-bound private refs recorded under the `86eca907` carve-out. |
 
 ## Decisions
 
@@ -114,6 +115,9 @@ slice commit.
 | Fresh check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh --ext ts,tsx` | PASS | 159 files selected, 0 occurrences. |
 | Fresh lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/fresh --ext ts,tsx` | PASS | 159 files selected, 0 findings. |
 | Fresh fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/fresh --ext ts,tsx` | PASS | 159 files selected, 0 findings. |
+| Contracts check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/contracts --ext ts,tsx` | PASS | 20 files selected, 0 occurrences. |
+| Contracts lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/contracts --ext ts,tsx` | PASS | 20 files selected, 0 findings. |
+| Contracts fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/contracts --ext ts,tsx` | PASS | 20 files selected, 0 findings. |
 
 ### Fitness Gates
 
@@ -129,6 +133,7 @@ slice commit.
 | F-5/F-7 `@netscript/cli` | PASS | `deno doc --lint` over 3 export-map entrypoints: `Checked 3 files`. | `CacheBackendChoice` is now public on the testing subpath that exports `InitPromptAnswers`. |
 | F-5/F-7 `@netscript/sdk` | PASS | `deno doc --lint` over 10 export-map entrypoints: `Checked 10 files`. | `NetScriptProcedureSchemas` is now public on subpaths that expose `ContractProcedureLike`. |
 | F-5/F-7 `@netscript/fresh` | DEFERRED | Wrapper now reports only 1 private-type ref in `src/application/vite/vite.ts`. | Route leaks fixed; Vite `Plugin` alias needs public API redesign and is recorded in `notes.md`. |
+| F-5/F-7 `@netscript/contracts` | DEFERRED | Wrapper reports 12 private-type refs, 0 missing-JSDoc. | Remaining refs are oRPC-bound builder/schema types covered by the sanctioned `86eca907` policy; recorded in `notes.md`. |
 
 ### Runtime Gates
 

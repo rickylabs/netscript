@@ -106,7 +106,7 @@ export type CrudOperationDisable = Readonly<{
  * replaces the removed erasing procedure alias as the base of
  * {@link CrudContractOperation}.
  */
-type CrudRoute = BaseContractRoute<AnySchema, AnySchema>;
+export type CrudRoute = BaseContractRoute<AnySchema, AnySchema>;
 
 /**
  * Generated CRUD contract type.
@@ -136,21 +136,25 @@ export type CrudContractOperation<
     };
   }>;
 
-type CrudIdInput<TId extends ContractSchema<unknown>> = ContractObjectSchema<
+/** Input schema shape for CRUD operations addressed by identifier. */
+export type CrudIdInput<TId extends ContractSchema<unknown>> = ContractObjectSchema<
   Readonly<{ id: ContractSchemaOutput<TId> }>
 >;
 
-type CrudListInput<TFilter extends ContractObjectSchema<unknown> | undefined> = TFilter extends
-  ContractObjectSchema<infer TFilterOutput> ? ContractObjectSchema<
-    PaginationInput & TFilterOutput
-  >
-  : ContractObjectSchema<PaginationInput>;
+/** Input schema shape for list operations with pagination and optional filters. */
+export type CrudListInput<TFilter extends ContractObjectSchema<unknown> | undefined> =
+  TFilter extends ContractObjectSchema<infer TFilterOutput> ? ContractObjectSchema<
+      PaginationInput & TFilterOutput
+    >
+    : ContractObjectSchema<PaginationInput>;
 
-type CrudListOutput<TEntity extends ContractSchema<unknown>> = ContractObjectSchema<
+/** Output schema shape for list operations with paginated entities. */
+export type CrudListOutput<TEntity extends ContractSchema<unknown>> = ContractObjectSchema<
   PaginatedResult<ContractSchemaOutput<TEntity>>
 >;
 
-type CrudUpdateInput<
+/** Input schema shape for update operations addressed by identifier. */
+export type CrudUpdateInput<
   TId extends ContractSchema<unknown>,
   TUpdate extends ContractSchema<unknown>,
 > = ContractObjectSchema<
@@ -253,6 +257,9 @@ function crudOperation<
  * });
  * ```
  */
+/**
+ * Create a full CRUD contract with every operation enabled.
+ */
 export function createCrudContract<
   TEntity extends ContractSchema<unknown>,
   TCreate extends ContractSchema<unknown>,
@@ -264,6 +271,9 @@ export function createCrudContract<
     readonly disable?: undefined;
   },
 ): CrudContract<TEntity, TCreate, TUpdate, TId, TFilter>;
+/**
+ * Create a CRUD contract with selected operations disabled.
+ */
 export function createCrudContract<
   TEntity extends ContractSchema<unknown>,
   TCreate extends ContractSchema<unknown>,
