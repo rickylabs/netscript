@@ -61,7 +61,7 @@ function pluginInstallCommand(
 
 function pluginInstallCwd(kind: PluginKind): WorkingDirectoryFactory {
   return (context) =>
-    kind === PLUGIN.SAGA || kind === PLUGIN.TRIGGER || kind === PLUGIN.AUTH
+    kind === PLUGIN.SAGA || kind === PLUGIN.TRIGGER || kind === PLUGIN.AUTH || kind === PLUGIN.AI
       ? context.project.projectRoot
       : context.project.repoRoot;
 }

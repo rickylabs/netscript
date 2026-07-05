@@ -73,6 +73,9 @@ the presentation tests.
 | 2026-07-05 | 2 | Contract binding | Added `createAiRouter` in `plugin-ai-core`, AI contract soundness test, and generated stream-route binding to `aiContractV1`. |
 | 2026-07-05 | 3 | Plugin parity | Added `verify-plugin.ts`, doctor coverage for `ANTHROPIC_API_KEY`, six-emitter golden assertions, and parity review. |
 | 2026-07-05 | 4 | E2E wiring | Added AI plugin kind to scaffold suites and a generated chat-route import smoke gate. |
+| 2026-07-05 | 5 | Publishability | Flipped `plugins/ai` to an explicit JSR publish include/exclude map; package dry-runs pass for `plugin-ai-core` and `plugin-ai`. |
+| 2026-07-05 | 5 | Variant audit | Confirmed public plugin install does not yet carry plugin-specific flags; recorded `persist-threads` CLI-variant drift and MCP beta.6 stub. |
+| 2026-07-05 | 6 | Full E2E fix | First `scaffold.runtime` run failed at `scaffold.plugin.ai` because AI install used repo-root cwd with `--project-root .`; fixed gate cwd to generated project. |
 
 ## Decisions
 
@@ -121,6 +124,7 @@ the presentation tests.
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | scaffold.runtime ai | NOT_RUN | pending | Full suite once at end. |
+| scaffold.runtime run 1 | FAIL | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | Failed at `scaffold.plugin.ai` with exit 246: unsupported plugin kind `ai`; root cause was incorrect gate cwd/project-root pairing. |
 | scaffold.runtime registry | PASS | `deno test --unstable-kv --allow-write packages/cli/e2e/tests/presentation/suite-registry_test.ts`; `deno test --unstable-kv packages/cli/e2e/tests/presentation/cli-options_test.ts`; `deno test --unstable-kv packages/cli/e2e/tests/application/builders/runtime-gates_test.ts` | AI plugin/gate is registered in runtime/plugin suite expectations. |
 
 ### Consumer Gates
@@ -133,5 +137,3 @@ the presentation tests.
 
 - Inspect the `stream-proxy.stub.ts` generated output first: it is the central false-done defect.
 - Then verify `plugins/ai/deno.json` export map and publish dry-run.
-| 2026-07-05 | 5 | Publishability | Flipped `plugins/ai` to an explicit JSR publish include/exclude map; package dry-runs pass for `plugin-ai-core` and `plugin-ai`. |
-| 2026-07-05 | 5 | Variant audit | Confirmed public plugin install does not yet carry plugin-specific flags; recorded `persist-threads` CLI-variant drift and MCP beta.6 stub. |
