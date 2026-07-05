@@ -70,6 +70,7 @@ slice commit.
 | 2026-07-06 | 2 | queue | Exported/documented `PostgresQueryResult` and documented Postgres adapter private methods; raw full-export doc-lint clean. |
 | 2026-07-06 | 2 | config | Re-exported deploy target types from root `mod.ts`; raw full-export doc-lint clean. |
 | 2026-07-06 | 2 | auth-better-auth | Stopped on Better Auth passthrough private-type leak; trivial re-export/element-type replacement failed, so deferral recorded in `notes.md`. |
+| 2026-07-06 | 2 | lock hygiene | Reverted transient `deno.lock` change from `deno info npm:better-auth --json` (`npm:better-auth@*` resolution). |
 
 ## Decisions
 

@@ -20,4 +20,6 @@
 
 ## Lock Hygiene
 
-- No `deno.lock` changes observed at bootstrap.
+- No committed `deno.lock` changes.
+- 2026-07-06: `deno info npm:better-auth --json` added a transient `npm:better-auth@*`
+  resolution to `deno.lock`; reverted immediately per the zero-lock-churn rule.
