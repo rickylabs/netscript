@@ -1,6 +1,8 @@
 import { assertEquals } from 'jsr:@std/assert@^1';
 
-import { DeployTargetRegistry } from '../../../../kernel/application/registries/deploy-target-registry.ts';
+import {
+  DeployTargetRegistry,
+} from '../../../../kernel/application/registries/deploy-target-registry.ts';
 import type {
   DeployTargetOperation,
   DeployTargetPort,
@@ -90,4 +92,18 @@ Deno.test('router omits verbs the adapter does not advertise', () => {
   const verbs = command.getCommands().map((c) => c.getName());
 
   assertEquals(verbs, ['plan']);
+});
+
+Deno.test('deploy docker/compose routers resolve their default registry targets', () => {
+  const dependencies = {
+    deployTargets: new DeployTargetRegistry(),
+    resolveProjectRoot: () => Promise.resolve('/resolved-root'),
+  } as unknown as PublicCommandDependencies;
+
+  for (const key of ['docker', 'compose']) {
+    const command = createTargetDeployCommand(key, dependencies);
+    const verbs = command.getCommands().map((c) => c.getName()).sort();
+
+    assertEquals(verbs, ['down', 'logs', 'plan', 'status', 'up']);
+  }
 });
