@@ -36,6 +36,7 @@ Deno.test('plugin suite includes all official plugin and generated-check gates',
     'scaffold.plugin.trigger',
     'scaffold.plugin.stream',
     'scaffold.plugin.auth',
+    'scaffold.plugin.ai',
     GATE.SCAFFOLD_PLUGIN_LIST,
     GATE.GENERATED_PLUGINS_CHECK,
     GATE.BEHAVIOR_PLUGINS_HEALTH,
@@ -76,6 +77,7 @@ Deno.test('runtime suite includes full scaffold, database, runtime, and behavior
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_AUTH_LIVE), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_AUTH_READY), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_AUTH_SESSION), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_AI_CHAT_ROUTE), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_PLUGINS_HEALTH), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_WEBHOOK), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_TRACES), true);

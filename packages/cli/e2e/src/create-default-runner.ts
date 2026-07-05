@@ -55,7 +55,7 @@ export function defaultRunOptions(overrides: Partial<RunOptions> = {}): RunOptio
     projectName,
     database: DATABASE.POSTGRES,
     packageSource: overrides.packageSource ?? PACKAGE_SOURCE.LOCAL,
-    plugins: [PLUGIN.WORKER, PLUGIN.SAGA, PLUGIN.TRIGGER, PLUGIN.STREAM, PLUGIN.AUTH],
+    plugins: [PLUGIN.WORKER, PLUGIN.SAGA, PLUGIN.TRIGGER, PLUGIN.STREAM, PLUGIN.AUTH, PLUGIN.AI],
     samples: true,
     cleanup: false,
     format: REPORT_FORMAT.NDJSON,

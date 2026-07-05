@@ -21,6 +21,8 @@
 import { definePlugin, type PluginManifest } from '@netscript/plugin';
 import { AI_PLUGIN_ID, AI_PLUGIN_VERSION, AI_WORKSPACE_NAME } from '../constants.ts';
 
+export type { PluginManifest } from '@netscript/plugin';
+
 /**
  * Host permissions the scaffolded in-process AI chat route needs at runtime:
  * `--allow-net` to reach the model provider, `--allow-env` to read provider API

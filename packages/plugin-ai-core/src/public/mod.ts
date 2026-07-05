@@ -11,6 +11,15 @@
  */
 
 export { aiContract, aiContractV1 } from '../contracts/v1/mod.ts';
+export { createAiRouter } from '../router/ai-router.ts';
+export type {
+  AiRouteHandler,
+  AiRouterContext,
+  AiRouterImplementation,
+  BoundAiRoute,
+  BoundAiRouter,
+  ContextualAiRouter,
+} from '../router/ai-router.ts';
 export type {
   AiCapabilities,
   AiContract,

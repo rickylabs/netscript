@@ -1,0 +1,17 @@
+# Commits — beta4-cut-A-ai--impl
+
+The current harness docs treat the draft PR commit list and per-slice PR comments as canonical.
+This file is maintained because the owner prompt explicitly requires it for this run.
+
+| Slice | Commit | Evidence |
+| --- | --- | --- |
+| 1 | `8bb0cd85` | PLAN-EVAL cycle 2 `PASS`; harness artifacts created. |
+| 2 | `bbd60980` | `createAiRouter` binder, AI contract soundness test, generated stream route imports `aiContractV1`; targeted contract/resource tests and scoped check passed. |
+| 3 | `4bfa47a5` | Added `verify-plugin.ts`, doctor coverage for `ANTHROPIC_API_KEY`, six-emitter golden coverage, and parity review. |
+| 4 | `1aaff3a5` | Added AI to scaffold runtime/plugin E2E suite wiring and registered `behavior.ai-chat-route` smoke gate. |
+| 5 | `41e6f02e` | Flipped `plugins/ai` to an explicit JSR publish map, preserved package publish dry-runs, and recorded install-variant drift. |
+| 6 | `310aa9b4` | Fixed the AI scaffold.runtime install gate to run from the generated project root after the first full e2e run exposed repo-root plugin-kind resolution. |
+| 7 | `02ab8cf2` | Fixed `plugins/ai/scaffold.plugin.json` to satisfy the current installer schema and included scaffold manifests in the publish files. |
+| 8 | `e4c4763f` | Assigned positive AI manifest port metadata so generated config validation accepts the service-less utility plugin entry. |
+| 9 | `6f47ff4a` | Fixed generated AI chat-route smoke by resolving imports from the generated project root and removing the starter tool's undeclared `zod` dependency; full `scaffold.runtime` passed with `passed=50 failed=0`. |
+| 10 | `8080ca2c` | Recorded implementation evaluation with final gate evidence, Aspire cleanup state, and explicit drift. |

@@ -16,18 +16,17 @@ export type AgentToken = 'AGENT_EXPORT' | 'AGENT_ID';
 export const agentStub: StubSource<AgentToken> = defineStub({
   source: `/** App-owned AI agent "%%AGENT_ID%%". Thin factory over @netscript/ai/agent. */
 
-import { createAgentLoop, createToolRegistry, slidingWindowHistory } from '@netscript/ai/agent';
+import { createAgentLoop, slidingWindowHistory } from '@netscript/ai/agent';
 import type { AgentLoop } from '@netscript/ai/agent';
-import { ai, chatModel } from '../ai.ts';
+import { ai, chatModelId } from '../ai.ts';
 
 /** Build the "%%AGENT_ID%%" agent loop bound to this app's AI runtime. */
 export function %%AGENT_EXPORT%%(): AgentLoop {
+  const runtime = ai();
   return createAgentLoop({
-    runtime: ai(),
-    model: chatModel(),
+    modelProvider: runtime.getModelProvider(),
     history: slidingWindowHistory({ maxMessages: 32 }),
-    tools: createToolRegistry([]),
-    systemPrompt: 'You are the %%AGENT_ID%% assistant. Be concise and precise.',
+    tools: runtime.tools,
   });
 }
 `,

@@ -28,7 +28,7 @@ const connection = createNetScriptChatConnection({
 });
 
 function renderPart(part: RenderPart): preact.JSX.Element {
-  if (part.kind === 'markdown' || part.kind === 'text') {
+  if (part.kind === 'text') {
     return <Markdown>{part.text}</Markdown>;
   }
   return <pre class="ai-part">{JSON.stringify(part, null, 2)}</pre>;

@@ -22,7 +22,24 @@
     "test": "deno test --allow-all",
     "publish:dry-run": "deno publish --dry-run --allow-dirty"
   },
-  "publish": false,
+  "publish": {
+    "include": [
+      "README.md",
+      "deno.json",
+      "scaffold.plugin.json",
+      "scaffold.runtime.json",
+      "mod.ts",
+      "cli.ts",
+      "scaffold.ts",
+      "contracts/**/*.ts",
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "tests/",
+      "**/*_test.ts",
+      "**/*.test.ts"
+    ]
+  },
   "compilerOptions": {
     "strict": true,
     "noImplicitAny": true,
