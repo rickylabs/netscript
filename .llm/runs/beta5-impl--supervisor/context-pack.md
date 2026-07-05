@@ -6,7 +6,7 @@
 | ----- | ----- |
 | Run ID | `beta5-impl--supervisor` |
 | Branch | `chore/305-doctrine-quickwin` |
-| Current phase | `impl-eval` |
+| Current phase | `close` |
 | Archetype | Archetype 6 for checker tooling; N/A for docs-only files |
 | Scope overlays | `SCOPE-docs.md` |
 
@@ -25,6 +25,7 @@ The quick-win findings reproduce: stale `@netscript/shared` Result guidance, dea
 - S2 dead doctrine research links removed; doctrine grep has zero `phase-0-research` hits.
 - S3 ref migration map added and linked from evaluator/debt docs.
 - S4 final validation passed; branch is ready for separate IMPL-EVAL.
+- IMPL-EVAL passed with no blocking findings.
 
 ## In Progress
 
@@ -32,9 +33,8 @@ The quick-win findings reproduce: stale `@netscript/shared` Result guidance, dea
 
 ## Next Steps
 
-1. Commit/push S4 validation artifacts and update PR body.
-2. Run separate IMPL-EVAL.
-3. Post `SLICE-COMPLETE`.
+1. Commit/push IMPL-EVAL artifact.
+2. Post `SLICE-COMPLETE`.
 
 ## Key Decisions
 
@@ -56,6 +56,7 @@ The quick-win findings reproduce: stale `@netscript/shared` Result guidance, dea
 | `docs/architecture/doctrine/ref-migration-map.md` | new | Old-to-current AP/F map. |
 | `.llm/harness/evaluator/anti-pattern-catalog.md` | changed | Reference trust note links to migration map. |
 | `.llm/harness/debt/arch-debt.md` | changed | Reference trust note links to migration map. |
+| `.llm/runs/beta5-impl--supervisor/evaluate.md` | new | Separate IMPL-EVAL `PASS`. |
 
 ## Gates
 

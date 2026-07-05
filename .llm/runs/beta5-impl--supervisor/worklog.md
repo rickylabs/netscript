@@ -65,6 +65,7 @@ Start at `docs/architecture/doctrine/ref-migration-map.md` to translate old refs
 | 2026-07-06 | 2 | Doctrine links | Replaced dead `phase-0-research/*` references in doctrine chapters 01 and 04 with live doctrine links or prose. |
 | 2026-07-06 | 3 | Ref map | Added the AP/F migration map and linked it from evaluator and debt reference entry points. |
 | 2026-07-06 | 4 | Final validation | Re-ran requested gates; after `arch:check` exits 0 and reports reconciled refs, with no `@netscript/shared` finding. |
+| 2026-07-06 | IMPL-EVAL | PASS | Separate evaluator wrote `evaluate.md` with verdict `PASS`. |
 
 ## Decisions
 
@@ -115,3 +116,4 @@ Start at `docs/architecture/doctrine/ref-migration-map.md` to translate old refs
   dead `phase-0-research`, and `ref-migration-map.md` for AP/F trust.
 - Lock hygiene: validation twice added resolver-only `deno.lock` entries for `jsr:@std/fs@*` and
   `jsr:@std/path@*`; both were restored before commit. No `deno.lock` churn is part of this branch.
+- IMPL-EVAL: PASS. No blocking findings.
