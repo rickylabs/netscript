@@ -109,6 +109,10 @@ Deno.test('PluginWorkspaceMutator injects first-party plugin core imports into r
     netscriptJsrSpecifier('plugin-workers', '/runtime'),
   );
   assertEquals(
+    config.imports['jsr:@netscript/plugin-workers/jobs/health-check.ts'],
+    netscriptJsrSpecifier('plugin-workers', '/jobs/health-check.ts'),
+  );
+  assertEquals(
     config.imports['@netscript/plugin-workers-core/schemas'],
     netscriptJsrSpecifier('plugin-workers-core', '/schemas'),
   );

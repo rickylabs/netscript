@@ -62,6 +62,9 @@ const PACKAGE_TO_JSR: Record<string, string> = {
   [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_WORKERS_RUNTIME]: `${
     JSR_SPECIFIERS['plugin-workers']
   }/runtime`,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_WORKERS_HEALTH_CHECK]: `${
+    JSR_SPECIFIERS['plugin-workers']
+  }/jobs/health-check.ts`,
   [SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS]: JSR_SPECIFIERS.workers,
   [SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS_RUNTIME]: `${JSR_SPECIFIERS.workers}/runtime`,
   [SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS_SCHEMAS]: `${JSR_SPECIFIERS.workers}/schemas`,
@@ -147,6 +150,8 @@ const PACKAGE_TO_LOCAL_PATH: Readonly<Record<string, string>> = {
   [SCAFFOLD_PACKAGES.NETSCRIPT_AUTH_BETTER_AUTH]: 'packages/auth-better-auth/mod.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_AUTH_KV_OAUTH]: 'packages/auth-kv-oauth/mod.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_WORKERS_RUNTIME]: 'plugins/workers/bin/runtime.ts',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_WORKERS_HEALTH_CHECK]:
+    'plugins/workers/jobs/health-check.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS]: 'packages/plugin-workers-core/mod.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS_RUNTIME]: 'packages/plugin-workers-core/src/runtime/mod.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS_SCHEMAS]:

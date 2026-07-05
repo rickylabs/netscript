@@ -35,7 +35,7 @@ Make `workers-plugin-health-check` resolvable and executable in consuming apps w
 
 ## Scope
 
-- Register the built-in health-check job with a published JSR module `sourceUrl`.
+- Register the built-in health-check job with a URL-shaped package `sourceUrl` that consuming app import maps resolve through an exact `jsr:` key.
 - Preserve compatibility with existing registry records by re-registering stale jobs when `sourceUrl` differs.
 - Add tests for registration metadata and dynamic import source selection.
 - Strengthen scaffold runtime E2E behavior so it verifies a completed built-in health-check execution.
@@ -45,7 +45,7 @@ Make `workers-plugin-health-check` resolvable and executable in consuming apps w
 - No plugin source vendoring at scaffold/generate time.
 - No inline/embedded handler registration.
 - No broad worker folder restructuring or public export expansion.
-- No full `scaffold.runtime` run in this implementation session; supervisor owns merge-readiness E2E.
+- No repeated full `scaffold.runtime` runs beyond the single FAIL_FIX response smoke requested by the supervisor.
 
 ## Hidden Scope
 
@@ -56,22 +56,24 @@ Make `workers-plugin-health-check` resolvable and executable in consuming apps w
 
 | ID | Decision | Rationale |
 | -- | -------- | --------- |
-| D1 | Use option 1: store `sourceUrl: "jsr:@netscript/plugin-workers/jobs/health-check.ts"` for the built-in job. | Works in prod/JSR mode because the job module is published, and in maintainer/local mode because Deno resolves the workspace package through the import map during local checks. It keeps the plugin thin and avoids vendoring or embedded handler duplication. |
+| D1 | Use option 1 with an exact import-map override: store `sourceUrl: "jsr:@netscript/plugin-workers/jobs/health-check.ts"` for the built-in job and generate an exact root import-map key for that specifier. | `sourceUrl` is schema-validated as URL-shaped, so a bare package key would broaden the core registry contract. An exact `jsr:` import-map key lets local scaffolds map the job to `plugins/workers/jobs/health-check.ts`, while prod scaffolds map the unpinned self-reference to the pinned JSR package subpath. This keeps the plugin thin and avoids vendoring or embedded handler duplication. |
 | D2 | Retain `entrypoint: "./jobs/health-check.ts"` as a plugin-package relative fallback/display value. | The core dispatcher prefers `sourceUrl`, while keeping `entrypoint` avoids a no-entrypoint dynamic import error and preserves a human-readable package-local path. |
 | D3 | Extend the runtime E2E execution validator instead of adding another trigger-only HTTP gate. | The defect class occurs when the worker actually imports the module, after enqueue/trigger succeeds. |
+| D4 | Add an exact root import-map entry for `jsr:@netscript/plugin-workers/jobs/health-check.ts` when the workers plugin is installed. | Deno import-map bare package mappings do not cover the `jsr:` scheme and do not guarantee subpath drift detection. An exact key ties the registry row, scaffold import map, and JSR export key together. |
 
 ## Open-Decision Sweep
 
 | Decision | Status | Notes |
 | -------- | ------ | ----- |
-| Fix option | resolved | D1 selects package `sourceUrl`; options 2 and 3 are rejected as fat-plugin duplication and scaffold-source coupling. |
-| Full runtime smoke | safe to defer | Explicitly deferred to supervisor merge-readiness per prompt. |
+| Fix option | resolved | D1 selects package `sourceUrl` plus exact scaffold import-map override; options 2 and 3 are rejected as fat-plugin duplication and scaffold-source coupling. |
+| Full runtime smoke | required after FAIL_FIX | Supervisor merge-readiness found local-source dynamic import failure; this implementation lane must run `scaffold.runtime` once after the fix. |
 
 ## Risk Register
 
 | Risk | Mitigation |
 | ---- | ---------- |
-| Published package module path is not included in JSR package | `plugins/workers/deno.json` already includes `jobs/**/*.ts`; validation includes `deno doc --lint`/check as scoped evidence. |
+| Published package module path is not included in JSR package | `plugins/workers/deno.json` includes explicit `./jobs/health-check.ts` export; validation includes export-map regression, `deno doc --lint`, and publish dry-run evidence. |
+| Local-source scaffold resolves to previous registry publish | Use an exact generated `jsr:` import-map key so local mode resolves to the workspace file. |
 | Existing stale registry rows are not corrected | Include `sourceUrl` in changed-field detection and re-registration. |
 | Gate only observes enqueue | Poll executions for the specific health-check job and require a completed status. |
 
@@ -104,12 +106,13 @@ Make `workers-plugin-health-check` resolvable and executable in consuming apps w
 
 | Order | Gate | Command or check | Expected result |
 | ----- | ---- | ---------------- | --------------- |
-| 1 | targeted tests | `deno test --unstable-kv --allow-all plugins/workers/services/src/init_test.ts plugins/workers/worker/job-execution_test.ts packages/plugin-workers-core/tests/runtime/job-dispatcher_test.ts` | pass |
+| 1 | targeted tests | `deno test --unstable-kv --allow-all plugins/workers/services/src/init_test.ts packages/plugin-workers-core/tests/runtime/job-dispatcher_test.ts packages/cli/src/kernel/adapters/scaffold/tests/import-resolver_test.ts packages/cli/src/kernel/adapters/plugin/workspace-mutator_test.ts` | pass |
 | 2 | workers check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/workers --ext ts,tsx` | pass |
 | 3 | core check if touched | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin-workers-core --ext ts,tsx` | pass if core test/source touched |
-| 4 | e2e check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli/e2e --ext ts,tsx` | pass |
+| 4 | CLI check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | pass |
 | 5 | lint | scoped lint wrappers on touched roots | pass |
 | 6 | fmt | scoped fmt wrapper on touched roots | pass |
+| 7 | runtime smoke | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | pass |
 
 ## Drift Watch
 

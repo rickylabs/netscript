@@ -39,15 +39,16 @@
 | # | Slice | Gate | Files |
 | - | ----- | ---- | ----- |
 | 1 | Built-in health job package source URL + execution coverage | targeted tests, scoped check/lint/fmt | `plugins/workers/services/src/init.ts`, new tests, `packages/cli/e2e/src/application/gates/scaffold/runtime-gates.ts`, run artifacts |
+| 3 | FAIL_FIX local-source import-map response | targeted tests, scoped check/lint/fmt, scaffold.runtime | `plugins/workers/services/src/init.ts`, CLI scaffold import-map resolvers/mutator tests, run artifacts |
 
 ### Deferred Scope
 
-- Full `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` — supervisor merge-readiness gate.
+- Additional full `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` runs after the required FAIL_FIX response smoke.
 - Plugin folder refactor — existing doctrine debt, unrelated to #376.
 
 ### Contributor Path
 
-To add another built-in workers plugin job, place its handler under `plugins/workers/jobs/`, include a package-local entrypoint plus `jsr:@netscript/plugin-workers/jobs/<name>.ts` `sourceUrl` in `services/src/init.ts`, and add a runtime assertion that the job has completed after trigger.
+To add another built-in workers plugin job, place its handler under `plugins/workers/jobs/`, include a package-local entrypoint plus a `jsr:@netscript/plugin-workers/jobs/<name>.ts` `sourceUrl` in `services/src/init.ts`, add the exact package subpath to the plugin export map and the exact `jsr:` key to CLI scaffold imports, and add a runtime assertion that the job has completed after trigger.
 
 ## Progress Log
 
@@ -58,13 +59,15 @@ To add another built-in workers plugin job, place its handler under `plugins/wor
 | 2026-07-05 | 1 | implementation | Registered built-in health job with package `sourceUrl`, added registration/dynamic-dispatch tests, and strengthened runtime E2E execution polling. |
 | 2026-07-05 | 1 | reconcile | Related issue #376 fully addressed by this branch; PR must carry `Closes #376` and `Refs #172, #191, #372`. No full scaffold runtime smoke run in this implementation lane. |
 | 2026-07-05 | 2 | FAIL_FIX response | Added explicit `./jobs/health-check.ts` export map entry, documented the new job subpath, and added an export-map drift regression test. |
+| 2026-07-05 | 3 | FAIL_FIX response | Added exact scaffold import-map entries for the stored `jsr:` sourceUrl so local-source mode resolves the workspace file while JSR mode resolves the pinned package export. |
 
 ## Decisions
 
 | Decision | Reason | Source |
 | -------- | ------ | ------ |
-| Use JSR package `sourceUrl` | Restores no-copy thin plugin invariant in prod and maintainer modes. | `plan.md` D1 |
+| Use exact import-map override for the `jsr:` sourceUrl | Restores no-copy thin plugin invariant without local-source scaffolds resolving to the previous registry publish, while preserving the registry sourceUrl schema. | `plan.md` D1/D4 |
 | Export the exact health job subpath | JSR/Deno only resolve package subpaths declared in `deno.json` exports; publish include alone is insufficient. | IMPL-EVAL FAIL_FIX finding |
+| Generate an exact root import-map key for the health job subpath | The worker dispatch process imports the stored sourceUrl from the consuming app; exact keys keep local and JSR modes deterministic. | Merge-readiness E2E failure |
 
 ## Drift
 
@@ -72,6 +75,7 @@ To add another built-in workers plugin job, place its handler under `plugins/wor
 | ----- | -------- | ------------------ |
 | PLAN-EVAL artifact unavailable in implementation lane | significant | yes |
 | Package file included but not exported | significant | yes |
+| Self-referential `jsr:` sourceUrl bypassed local-source import maps | critical | yes |
 
 ## Gate Results
 
@@ -90,12 +94,17 @@ To add another built-in workers plugin job, place its handler under `plugins/wor
 | scoped fmt: workers core | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin-workers-core --ext ts,tsx` | PASS | 111 files selected, 0 findings. |
 | scoped fmt: CLI E2E | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cli/e2e --ext ts,tsx` | PASS | 76 files selected, 0 findings. |
 | targeted tests after FAIL_FIX | `deno test --unstable-kv --allow-all plugins/workers/services/src/init_test.ts packages/plugin-workers-core/tests/runtime/job-dispatcher_test.ts` | PASS | 4 passed, 0 failed. |
+| targeted tests after local-source FAIL_FIX | `deno test --unstable-kv --allow-all plugins/workers/services/src/init_test.ts packages/plugin-workers-core/tests/runtime/job-dispatcher_test.ts packages/cli/src/kernel/adapters/scaffold/tests/import-resolver_test.ts packages/cli/src/kernel/adapters/plugin/workspace-mutator_test.ts` | PASS | 15 passed, 0 failed. |
 | raw doc-lint: health job export | `deno doc --lint plugins/workers/jobs/health-check.ts` | PASS | New `./jobs/health-check.ts` entrypoint checked cleanly. |
 | full export doc-lint wrapper | `deno task doc:lint --root plugins/workers --pretty` | PASS_WITH_EXISTING_FINDINGS | Exit 0; full export set includes `./jobs/health-check.ts` with 0 diagnostics. Wrapper still reports 17 pre-existing private-type refs on other entrypoints. |
 | publish dry-run after FAIL_FIX | `deno publish --dry-run --allow-dirty` in `plugins/workers` | PASS | Checks `jobs/health-check.ts`; published file list includes it. Existing unanalyzable dynamic-import warnings remain. |
+| export-map read | `deno eval "const cfg=JSON.parse(await Deno.readTextFile('plugins/workers/deno.json')); console.log(cfg.exports['./jobs/health-check.ts']);"` | PASS | Prints `./jobs/health-check.ts`. |
 | scoped check after FAIL_FIX | check wrappers on `plugins/workers`, `packages/plugin-workers-core`, `packages/cli/e2e` | PASS | 90/111/76 files selected, 0 diagnostics. |
+| scoped check after local-source FAIL_FIX | check wrappers on `plugins/workers`, `packages/plugin-workers-core`, `packages/cli` | PASS | 90/111/589 files selected, 0 diagnostics. |
 | scoped lint after FAIL_FIX | lint wrappers on `plugins/workers`, `packages/plugin-workers-core`, `packages/cli/e2e` | PASS | 0 findings. |
+| scoped lint after local-source FAIL_FIX | lint wrappers on `plugins/workers`, `packages/plugin-workers-core`, `packages/cli` | PASS_WITH_CLI_TOOLING_BOUNDARY | workers/core PASS with 0 findings. CLI wrapper selected 589 files but exited 1 with 0 findings because root lint config excludes `packages/cli/`; no lint occurrence was reported. |
 | scoped fmt after FAIL_FIX | fmt wrappers on `plugins/workers`, `packages/plugin-workers-core`, `packages/cli/e2e` | PASS | 0 findings. |
+| scoped fmt after local-source FAIL_FIX | fmt wrappers on `plugins/workers`, `packages/plugin-workers-core`, `packages/cli` | PASS_WITH_CLI_TOOLING_BOUNDARY | workers/core PASS with 0 findings. CLI wrapper selected 589 files but exited 1 with 0 findings because root fmt config excludes `packages/cli/`; no format finding was reported. |
 
 ### Fitness Gates
 
@@ -108,13 +117,13 @@ To add another built-in workers plugin job, place its handler under `plugins/wor
 
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
-| health job execution | PASS | Unit coverage verifies `sourceUrl` registration and dynamic import source selection. | Full scaffold runtime execution deferred to supervisor; E2E gate source now requires completed `workers-plugin-health-check` execution. |
+| health job execution | PASS | Unit coverage verifies `sourceUrl` registration and dynamic import source selection. Full scaffold runtime smoke exited 0 with `Summary: passed=48 failed=0`; `behavior.workers-trigger-health-job` and `behavior.workers-executions` both passed. | E2E gate source now requires completed `workers-plugin-health-check` execution. |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | -------- | ------ | -------- | ----- |
-| generated scaffold runtime | NOT_RUN | `runtime-gates.ts` updated | Full `scaffold.runtime` smoke deferred to supervisor per prompt. |
+| generated scaffold runtime | PASS | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | Exit 0; `Summary: passed=48 failed=0`. |
 
 ## Handoff Notes
 

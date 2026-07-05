@@ -20,6 +20,8 @@ describe('resolveNetScriptImports', () => {
           '@netscript/service': 'jsr:@netscript/service',
           '@netscript/plugin-auth-core/contracts/v1':
             netscriptJsrSpecifier('plugin-auth-core', '/contracts/v1'),
+          'jsr:@netscript/plugin-workers/jobs/health-check.ts':
+            netscriptJsrSpecifier('plugin-workers', '/jobs/health-check.ts'),
           '@netscript/auth-kv-oauth': netscriptJsrSpecifier('auth-kv-oauth'),
           '@std/path': 'jsr:@std/path',
           zod: 'npm:zod',
@@ -33,6 +35,8 @@ describe('resolveNetScriptImports', () => {
           '@netscript/service': '../../../monorepo/packages/service/mod.ts',
           '@netscript/plugin-auth-core/contracts/v1':
             '../../../monorepo/packages/plugin-auth-core/src/contracts/v1/mod.ts',
+          'jsr:@netscript/plugin-workers/jobs/health-check.ts':
+            '../../../monorepo/plugins/workers/jobs/health-check.ts',
           '@netscript/auth-kv-oauth': '../../../monorepo/packages/auth-kv-oauth/mod.ts',
           '@std/path': 'jsr:@std/path',
           zod: 'npm:zod',
@@ -63,6 +67,10 @@ describe('resolveNetScriptImports', () => {
     assertEquals(
       imports['@netscript/plugin-auth-core/contracts/v1'],
       '../../packages/plugin-auth-core/src/contracts/v1/mod.ts',
+    );
+    assertEquals(
+      imports['jsr:@netscript/plugin-workers/jobs/health-check.ts'],
+      '../../plugins/workers/jobs/health-check.ts',
     );
     assertEquals(imports['@netscript/auth-kv-oauth'], '../../packages/auth-kv-oauth/mod.ts');
     // External deps still use registry

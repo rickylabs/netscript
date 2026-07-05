@@ -11,7 +11,7 @@ import {
   WORKERS_PLUGIN_HEALTH_CHECK_SOURCE_URL,
 } from './init.ts';
 
-Deno.test('registerPluginJobs stores the built-in health job with the published package source URL', async () => {
+Deno.test('registerPluginJobs stores the built-in health job with the package source URL', async () => {
   await using kv = new MemoryKvAdapter();
   const runtime = createTestRuntime(kv);
 
@@ -20,6 +20,7 @@ Deno.test('registerPluginJobs stores the built-in health job with the published 
   const job = await runtime.jobRegistry.get(WORKERS_PLUGIN_HEALTH_CHECK_JOB_ID);
   assertEquals(job?.entrypoint, WORKERS_PLUGIN_HEALTH_CHECK_ENTRYPOINT);
   assertEquals(job?.sourceUrl, WORKERS_PLUGIN_HEALTH_CHECK_SOURCE_URL);
+  assertEquals(job?.sourceUrl, 'jsr:@netscript/plugin-workers/jobs/health-check.ts');
   assertEquals(job?.source, 'plugin');
   assertEquals(job?.pluginId, 'workers');
 });
