@@ -1,6 +1,11 @@
 import { emitJobToStream } from '../../streams/server.ts';
 import type { WorkersServiceRuntime } from './routers/router-context.ts';
 
+export const WORKERS_PLUGIN_HEALTH_CHECK_JOB_ID = 'workers-plugin-health-check';
+export const WORKERS_PLUGIN_HEALTH_CHECK_ENTRYPOINT = './jobs/health-check.ts';
+export const WORKERS_PLUGIN_HEALTH_CHECK_SOURCE_URL =
+  'jsr:@netscript/plugin-workers/jobs/health-check.ts';
+
 /**
  * Register jobs defined in the workers plugin.
  * This runs once on service startup.
@@ -8,15 +13,15 @@ import type { WorkersServiceRuntime } from './routers/router-context.ts';
 export async function registerPluginJobs(runtime: WorkersServiceRuntime): Promise<void> {
   const registry = runtime.jobRegistry;
   // Jobs defined in the workers plugin
-  // Note: For jobs with source: 'plugin', entrypoints are resolved relative to project root.
-  // This allows plugin jobs to be located anywhere in the project (not just in jobsDir).
-  // For remote/JSR plugin jobs, use sourceUrl to specify the package URL directly.
+  // Built-in plugin jobs use sourceUrl so thin consuming apps can execute the
+  // published plugin module without copying plugin source into ./plugins.
   const pluginJobs = [
     {
-      id: 'workers-plugin-health-check',
+      id: WORKERS_PLUGIN_HEALTH_CHECK_JOB_ID,
       name: 'Workers Health Check',
       description: 'Periodic health check of the workers system',
-      entrypoint: './plugins/workers/jobs/health-check.ts',
+      entrypoint: WORKERS_PLUGIN_HEALTH_CHECK_ENTRYPOINT,
+      sourceUrl: WORKERS_PLUGIN_HEALTH_CHECK_SOURCE_URL,
       schedule: '*/5 * * * *',
       timezone: 'UTC',
       timeout: 30000,
@@ -49,18 +54,21 @@ export async function registerPluginJobs(runtime: WorkersServiceRuntime): Promis
       // Check if job already exists
       const existing = await registry.get(job.id);
       if (existing) {
-        // Check if entrypoint, source, or permissions need to be fixed
+        // Check if entrypoint, source URL, source, or permissions need to be fixed.
         const entrypointChanged = existing.entrypoint !== job.entrypoint;
+        const sourceUrlChanged = existing.sourceUrl !== job.sourceUrl;
         const sourceChanged = existing.source !== job.source;
         const permissionsChanged =
           JSON.stringify(existing.permissions) !== JSON.stringify(job.permissions);
 
-        if (entrypointChanged || sourceChanged || permissionsChanged) {
+        if (entrypointChanged || sourceUrlChanged || sourceChanged || permissionsChanged) {
           console.log(
-            `[Workers Plugin] Updating job '${job.id}' (entrypoint: ${entrypointChanged}, source: ${sourceChanged}, permissions: ${permissionsChanged})...`,
+            `[Workers Plugin] Updating job '${job.id}' (entrypoint: ${entrypointChanged}, sourceUrl: ${sourceUrlChanged}, source: ${sourceChanged}, permissions: ${permissionsChanged})...`,
           );
           console.log(`[Workers Plugin]   Old entrypoint: ${existing.entrypoint}`);
           console.log(`[Workers Plugin]   New entrypoint: ${job.entrypoint}`);
+          console.log(`[Workers Plugin]   Old sourceUrl: ${existing.sourceUrl}`);
+          console.log(`[Workers Plugin]   New sourceUrl: ${job.sourceUrl}`);
           console.log(`[Workers Plugin]   Old source: ${existing.source}`);
           console.log(`[Workers Plugin]   New source: ${job.source}`);
           await registry.unregister(job.id);
