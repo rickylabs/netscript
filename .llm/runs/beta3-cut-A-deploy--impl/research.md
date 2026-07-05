@@ -27,3 +27,13 @@
 ## Open questions
 
 - None for #393. The target registry should be the single first-party target source, and public command dependencies should consume it directly.
+
+## Slice #394 Findings
+
+| # | Finding | How to verify |
+| - | ------- | ------------- |
+| 1 | No deploy suite is registered in the CLI e2e suite registry before #394. | `packages/cli/e2e/src/presentation/cli/suites/registry.ts` |
+| 2 | The e2e domain already has a deploy target axis with `windows-service` and `docker`, but no suite consumes it. | `packages/cli/e2e/src/domain/extension-axes.ts` |
+| 3 | Existing scaffold gates can generate a local project through `scaffold.init` without starting Aspire. | `packages/cli/e2e/src/application/gates/scaffold/scaffold-gates.ts` |
+| 4 | `deploy deno-deploy plan` is credential-free: it runs the Deno Deploy preflight path and does not push to Deno Deploy. | `packages/cli/src/public/features/deploy/deno-deploy/deno-deploy-command.ts` |
+| 5 | Compose/Docker target resolution can be checked without invoking Aspire or Docker by asserting their CLI help exposes adapter-derived verbs. | `packages/cli/src/public/features/deploy/target/target-deploy-command.ts` |

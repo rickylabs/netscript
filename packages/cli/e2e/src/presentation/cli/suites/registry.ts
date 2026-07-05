@@ -1,4 +1,4 @@
-import { SCAFFOLD, SCAFFOLD_TITLE } from '../../../domain/cli-surface.ts';
+import { DEPLOY, DEPLOY_TITLE, SCAFFOLD, SCAFFOLD_TITLE } from '../../../domain/cli-surface.ts';
 import type { GateId, SuiteId } from '../../../domain/cli-surface.ts';
 import type { RunOptions } from '../../../domain/run-context.ts';
 import type { SuiteDefinition } from '../../../domain/suite-definition.ts';
@@ -6,6 +6,7 @@ import {
   createScaffoldCapabilitySuite,
   scaffoldCapabilitySuites,
 } from '../../../../suites/scaffold/capability-suites.ts';
+import { createDeployTargetsSuite } from '../../../../suites/deploy/deploy-targets-suite.ts';
 import { createTrueUserlandInstallSuite } from '../../../../suites/scaffold/true-userland-install-suite.ts';
 
 /** Built-in suite descriptor. */
@@ -30,6 +31,11 @@ export const builtInSuites: readonly BuiltInSuite[] = [
     id: SCAFFOLD.USERLAND_INSTALL,
     title: SCAFFOLD_TITLE.USERLAND_INSTALL,
     create: createTrueUserlandInstallSuite,
+  },
+  {
+    id: DEPLOY.TARGETS,
+    title: DEPLOY_TITLE.TARGETS,
+    create: createDeployTargetsSuite,
   },
 ];
 
