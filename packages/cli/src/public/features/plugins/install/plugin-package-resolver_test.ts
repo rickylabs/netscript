@@ -13,6 +13,15 @@ describe('resolvePluginPackageSpec', () => {
     assertEquals(resolved.jsrSpecifier, 'jsr:@netscript/plugin-workers');
   });
 
+  it('resolves the AI bare alias to the published NetScript AI plugin package', () => {
+    const resolved = resolvePluginPackageSpec('ai');
+
+    assertEquals(resolved.source, 'bare-alias');
+    assertEquals(resolved.alias, 'ai');
+    assertEquals(resolved.packageSpecifier, '@netscript/plugin-ai');
+    assertEquals(resolved.jsrSpecifier, 'jsr:@netscript/plugin-ai');
+  });
+
   it('passes scoped package names through unchanged', () => {
     const resolved = resolvePluginPackageSpec('@acme/plugin-billing');
 
