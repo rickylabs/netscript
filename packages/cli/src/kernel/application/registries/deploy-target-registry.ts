@@ -3,7 +3,9 @@ import type { DeployTargetPort } from '../../domain/deploy/deploy-target-port.ts
 import type { DeployTargetRegistryPort } from '../../domain/deploy/deploy-target-registry-port.ts';
 import { WindowsServiceDeployTarget } from '../../domain/deploy/windows-service-deploy-target.ts';
 import { LinuxServiceDeployTarget } from '../../domain/deploy/linux-service-deploy-target.ts';
+import { AspireComposeDeployTarget } from '../../adapters/aspire/aspire-compose-deploy-target.ts';
 import { createDenoDeployTarget } from '../../adapters/deno-deploy/create-deno-deploy-target.ts';
+import { DenoProcess } from '../../adapters/runtime/process/deno-process.ts';
 
 /** Metadata and operations for a deploy target exposed by the CLI. */
 export type DeployTarget = DeployTargetPort;
@@ -22,12 +24,26 @@ export const LINUX_SERVICE_DEPLOY_TARGET: DeployTarget = new LinuxServiceDeployT
  */
 export const DENO_DEPLOY_TARGET: DeployTarget = createDenoDeployTarget();
 
+/** Aspire-backed Docker Compose target descriptor. */
+export const COMPOSE_DEPLOY_TARGET: DeployTarget = new AspireComposeDeployTarget({
+  key: 'compose',
+  process: new DenoProcess(),
+});
+
+/** Aspire-backed Docker target descriptor. */
+export const DOCKER_DEPLOY_TARGET: DeployTarget = new AspireComposeDeployTarget({
+  key: 'docker',
+  process: new DenoProcess(),
+});
+
 /** Ordered default deployment targets. */
 export const DEFAULT_DEPLOY_TARGETS: readonly (readonly [string, DeployTarget])[] = Object
   .freeze([
     ['windows-service', WINDOWS_SERVICE_DEPLOY_TARGET],
     ['linux-service', LINUX_SERVICE_DEPLOY_TARGET],
     ['deno-deploy', DENO_DEPLOY_TARGET],
+    ['compose', COMPOSE_DEPLOY_TARGET],
+    ['docker', DOCKER_DEPLOY_TARGET],
   ]);
 
 /** Registry for supported deployment targets. */

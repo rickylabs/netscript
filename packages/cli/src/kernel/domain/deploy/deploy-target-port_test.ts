@@ -6,6 +6,14 @@ import { DeployTargetRegistry } from '../../application/registries/deploy-target
 import { WindowsServiceDeployTarget } from './windows-service-deploy-target.ts';
 import { LinuxServiceDeployTarget } from './linux-service-deploy-target.ts';
 
+const DEFAULT_TARGET_KEYS = [
+  'compose',
+  'deno-deploy',
+  'docker',
+  'linux-service',
+  'windows-service',
+] as const satisfies readonly KnownDeployTargetKey[];
+
 Deno.test('deploy target contract exposes the canonical 7-op names', () => {
   const canonical: readonly DeployTargetOperation[] = [
     'plan',
@@ -45,23 +53,28 @@ Deno.test('deploy target port accepts an adapter that implements only the canoni
   assertEquals(target.rollback, undefined);
 });
 
-Deno.test('deploy target registry reserves the linux-service key at the type level', () => {
-  const reserved: KnownDeployTargetKey = 'linux-service';
+Deno.test('deploy target registry reserves all first-party target keys at the type level', () => {
   const registry = new DeployTargetRegistry([]);
-  const linuxTarget: DeployTargetPort = {
-    key: reserved,
-    label: 'Linux service',
-    operations: ['up', 'down'],
-  };
+  for (const key of DEFAULT_TARGET_KEYS) {
+    registry.register(key, {
+      key,
+      label: key,
+      operations: [],
+    });
+  }
 
-  registry.register(reserved, linuxTarget);
-
-  assertEquals(registry.get(reserved)?.key, 'linux-service');
-  assertEquals(registry.entries().map(([key]) => key), ['linux-service']);
+  assertEquals(registry.entries().map(([key]) => key), [...DEFAULT_TARGET_KEYS].sort());
 });
 
 Deno.test('unwired bare-metal service targets advertise only the canonical 6-op subset (F-DEPLOY-1)', () => {
-  const canonical: readonly DeployTargetOperation[] = ['plan', 'emit', 'up', 'down', 'status', 'logs'];
+  const canonical: readonly DeployTargetOperation[] = [
+    'plan',
+    'emit',
+    'up',
+    'down',
+    'status',
+    'logs',
+  ];
 
   const targets: readonly DeployTargetPort[] = [
     new WindowsServiceDeployTarget(),
@@ -109,8 +122,7 @@ Deno.test('wiring the core ports promotes a service target to the 7-op surface a
       list: () => Promise.resolve(['STALE']),
       clear: () => Promise.resolve(),
     },
-    resolveSecrets: () =>
-      ({ target: 'linux-service', secrets: [{ key: 'API_KEY', value: 'v' }] }),
+    resolveSecrets: () => ({ target: 'linux-service', secrets: [{ key: 'API_KEY', value: 'v' }] }),
   });
 
   // rollback + secrets are now advertised because their core ports are wired.
@@ -138,16 +150,43 @@ Deno.test('a bare-metal service operation resolves a target-scoped descriptor re
   assertEquals(result.message.includes('/srv/app'), true);
 });
 
-Deno.test('the default deploy target registry seeds the bare-metal OS targets plus deno-deploy', () => {
+Deno.test('the default deploy target registry resolves every first-party target', () => {
   const registry = new DeployTargetRegistry();
 
   // entries() sorts keys with localeCompare for deterministic ordering.
-  assertEquals(registry.entries().map(([key]) => key), [
-    'deno-deploy',
-    'linux-service',
-    'windows-service',
-  ]);
+  assertEquals(registry.entries().map(([key]) => key), [...DEFAULT_TARGET_KEYS].sort());
+  for (const key of DEFAULT_TARGET_KEYS) {
+    assertEquals(registry.get(key)?.key, key);
+  }
+
   assertEquals(registry.get('linux-service')?.label, 'Linux service');
   assertEquals(registry.get('windows-service')?.label, 'Windows service');
   assertEquals(registry.get('deno-deploy')?.label, 'Deno Deploy');
+  assertEquals(registry.get('compose')?.label, 'Docker Compose');
+  assertEquals(registry.get('docker')?.label, 'Docker image');
+});
+
+Deno.test('the default deploy target registry exposes only operations with implemented handlers', () => {
+  const registry = new DeployTargetRegistry();
+
+  for (const [key, target] of registry.entries()) {
+    for (const operation of target.operations) {
+      assertEquals(
+        typeof target[operation as keyof DeployTargetPort],
+        'function',
+        `${key}.${operation} should resolve to a handler`,
+      );
+    }
+  }
+});
+
+Deno.test('compose and docker targets resolve the Aspire adapter operation subsets', () => {
+  const registry = new DeployTargetRegistry();
+  const compose = registry.get('compose');
+  const docker = registry.get('docker');
+
+  assertEquals(compose?.operations, ['plan', 'emit', 'up', 'down', 'status', 'logs']);
+  assertEquals(docker?.operations, ['plan', 'emit', 'up', 'down', 'status', 'logs']);
+  assertEquals(typeof compose?.plan, 'function');
+  assertEquals(typeof docker?.up, 'function');
 });
