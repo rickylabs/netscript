@@ -180,6 +180,12 @@ This reveals:
 - **File list**: Everything that would be published
 - **Metadata errors**: Invalid name, version, etc.
 
+**The dry-run is a static gate, not proof of a working publish.** It never loads the module over the
+real `https:`/`jsr:` graph, so it cannot catch the runtime-only publish failures listed in
+[JSR publish gotchas](#jsr-publish-gotchas-netscript-grounded) — a green `--dry-run` is necessary but
+not sufficient. The authoritative post-publish check is the production CLI e2e (`e2e-cli-prod`), which
+installs and runs the published package over the remote graph.
+
 ### Step 5: Audit the File List
 
 Review dry-run output for files that should NOT be published:
@@ -551,6 +557,12 @@ framework debt.
 These are publish-surface traps established across NetScript release cuts. They are consolidated
 here as the canonical home; the `deno doc --lint` full-export-surface bar is covered above under
 [`deno doc --lint`](#deno-doc---lint-the-publish-quality-bar) — do not restate it.
+
+**`deno publish --dry-run` is NOT publish-equivalent.** Every trap below passes a clean dry-run and
+only fails at real publish/install time, because the dry-run analyzes the local source graph rather
+than loading the module over the remote `https:`/`jsr:` graph a consumer resolves. Treat a green
+dry-run as a static pre-check, never as the release verdict — the verdict is a real-publish preflight
+plus `e2e-cli-prod` against the published package.
 
 - **Embed assets via import attributes, never `readTextFile`/`fromFileUrl`.** A published module runs
   over an `https:`/`jsr:` graph where there is no filesystem, so `Deno.readTextFile(...)` /
