@@ -20,6 +20,16 @@ export const SCAFFOLD_TITLE = {
   USERLAND_INSTALL: 'True userland plugin install smoke',
 } as const;
 
+/** Built-in deploy suites. */
+export const DEPLOY = {
+  TARGETS: 'deploy.targets',
+} as const;
+
+/** Stable titles for deploy suites. */
+export const DEPLOY_TITLE = {
+  TARGETS: 'Deploy target acceptance smoke',
+} as const;
+
 /** Gate phases in suite execution order. */
 export const GATE_PHASE = {
   PREFLIGHT: 'preflight',
@@ -80,6 +90,8 @@ export const GATE = {
   BEHAVIOR_AUTH_READY: 'behavior.auth-ready',
   BEHAVIOR_AUTH_SESSION: 'behavior.auth-session',
   BEHAVIOR_PLUGINS_HEALTH: 'behavior.plugins-health',
+  DEPLOY_DENO_DEPLOY_PLAN: 'deploy.deno-deploy.plan',
+  DEPLOY_COMPOSE_RESOLUTION: 'deploy.compose-resolution',
   USERLAND_INSTALL_ASSERTIONS: 'userland-install.assertions',
   BEHAVIOR_OTEL_WEBHOOK: 'behavior.otel.webhook',
   BEHAVIOR_OTEL_TRACES: 'behavior.otel.traces',
@@ -103,7 +115,9 @@ export const ASPIRE_RESOURCE = {
   AUTH: 'auth',
 } as const;
 
-export type SuiteId = typeof SCAFFOLD[keyof typeof SCAFFOLD];
+export type ScaffoldSuiteId = typeof SCAFFOLD[keyof typeof SCAFFOLD];
+export type DeploySuiteId = typeof DEPLOY[keyof typeof DEPLOY];
+export type SuiteId = ScaffoldSuiteId | DeploySuiteId;
 export type GatePhase = typeof GATE_PHASE[keyof typeof GATE_PHASE];
 export type StaticGateId = typeof GATE[keyof typeof GATE];
 export type AspireResource = typeof ASPIRE_RESOURCE[keyof typeof ASPIRE_RESOURCE];

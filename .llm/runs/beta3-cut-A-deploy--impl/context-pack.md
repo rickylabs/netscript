@@ -12,7 +12,7 @@
 
 ## Current State
 
-#393 implementation is complete locally on `fix/deploy-compose-target-393`. `DEFAULT_DEPLOY_TARGETS` now includes `compose` and `docker`, the public dependency graph consumes the default registry without duplicate target appends, and tests cover all default target resolution plus `deploy docker/compose` router resolution.
+#393 implementation is complete and PR #468 is open/commented. #394 implementation is complete locally on stacked branch `test/deploy-e2e-gate-394`: a new `deploy.targets` e2e suite scaffolds a project, runs Deno Deploy preflight, asserts compose/docker target resolution, and cleans up the scratch project.
 
 ## Completed
 
@@ -21,17 +21,19 @@
 - Created run artifacts for `beta3-cut-A-deploy--impl`.
 - Implemented #393 code and test changes.
 - Ran targeted deploy tests and static diagnostics.
+- Opened PR #468 for #393 and posted the implementation comment.
+- Created #394 stacked branch and implemented `deploy.targets`.
+- Ran #394 acceptance gate green.
 
 ## In Progress
 
-- Commit, push, open PR #393, and post implementation comment.
+- Commit, push, open PR #394, and post implementation comment.
 
 ## Next Steps
 
-1. Commit #393.
+1. Commit #394.
 2. Push with explicit refspec.
-3. Open PR #393 against `main`, label/milestone it, and post implementation comment.
-4. Start #394 only after PR #393 is opened and commented.
+3. Open PR #394 against `fix/deploy-compose-target-393`, label/milestone it, and post implementation comment.
 
 ## Key Decisions
 
@@ -50,15 +52,18 @@
 | `packages/cli/src/public/features/root/public-command-dependencies.ts` | changed | Removes duplicate `compose`/`docker` appends. |
 | `packages/cli/src/kernel/domain/deploy/deploy-target-port_test.ts` | changed | Adds all-default-target resolution and handler consistency coverage. |
 | `packages/cli/src/public/features/deploy/target/target-deploy-command_test.ts` | changed | Adds `deploy docker/compose` router resolution smoke. |
+| `packages/cli/e2e/src/domain/cli-surface.ts` | changed | Adds deploy suite and gate identifiers. |
+| `packages/cli/e2e/src/presentation/cli/suites/registry.ts` | changed | Registers `deploy.targets`. |
+| `packages/cli/e2e/suites/deploy/deploy-targets-suite.ts` | new | Credential-free deploy e2e suite. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Static | mixed | Check wrapper PASS; lint/fmt wrappers selected files but fail due root CLI exclusion with zero findings; changed-file `deno lint --no-config` and `deno fmt --check --no-config` PASS. |
+| Static | PASS for #394 | `packages/cli/e2e` check/lint/fmt wrappers all PASS. #393 check wrapper PASS; #393 lint/fmt changed-file diagnostics PASS with root-exclusion drift recorded. |
 | Fitness | PASS | F-DEPLOY-1/F-DEPLOY-2 covered by targeted tests. |
-| Runtime | PASS | Targeted deploy tests: 23 passed, 0 failed. |
-| Consumer | PASS | Target router smoke test covers `docker` and `compose`. |
+| Runtime | PASS | Targeted deploy tests: 23 passed, 0 failed; `deploy.targets` e2e: passed=5 failed=0. |
+| Consumer | PASS | Target router smoke test covers `docker` and `compose`; e2e suite registration verified. |
 
 ## Open Questions
 

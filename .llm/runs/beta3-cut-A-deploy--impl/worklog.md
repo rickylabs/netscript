@@ -32,18 +32,21 @@
 
 - First-party deploy target keys: `windows-service`, `linux-service`, `deno-deploy`, `compose`, `docker`.
 - Routed deploy operations: `plan`, `up`, `down`, `status`, `logs`, `rollback`, `secrets`.
+- E2E deploy suite id: `deploy.targets`.
+- E2E deploy gate ids: `deploy.deno-deploy.plan`, `deploy.compose-resolution`.
 
 ### Commit Slices
 
 | # | Slice | Gate | Files |
 | - | ----- | ---- | ----- |
 | 1 | Register Docker/Compose in the default target registry and add resolution smoke coverage. | Scoped check/lint/fmt + targeted deploy target tests. | `deploy-target-registry.ts`, `deploy-target-registry-port.ts`, `public-command-dependencies.ts`, deploy target tests, run artifacts |
+| 2 | Add credential-free deploy e2e gate coverage. | `deno task e2e:cli run deploy.targets --cleanup --format pretty` | `packages/cli/e2e/src/domain/cli-surface.ts`, `packages/cli/e2e/src/presentation/cli/suites/registry.ts`, `packages/cli/e2e/suites/deploy/deploy-targets-suite.ts`, run artifacts |
 
 ### Deferred Scope
 
-- #394 deploy e2e suite — starts only after the #393 PR is opened and commented.
 - Full scaffold runtime smoke — supervisor merge-readiness gate.
 - Deploy core extraction — future deployment epic work, not needed for #393.
+- Credentialed Deno Deploy push/delete/status/logs — future credentialed gate, not the #394 credential-free core.
 
 ### Contributor Path
 
@@ -57,6 +60,9 @@ To add a first-party deploy target, implement `DeployTargetPort`, register it in
 | 2026-07-05 | #393 | baseline | Verified `DEFAULT_DEPLOY_TARGETS` omits `compose`/`docker` while public dependencies append them manually. |
 | 2026-07-05 | #393 | implementation | Added `compose` and `docker` Aspire targets to `DEFAULT_DEPLOY_TARGETS`, removed duplicate public dependency registration, and expanded target resolution tests. |
 | 2026-07-05 | #393 | reconcile | #393/#394 are both open on GitHub milestone `0.0.1-beta.3`; #327 remains an open epic and is referenced only. |
+| 2026-07-05 | #394 | branch | Created stacked branch `test/deploy-e2e-gate-394` from #393 branch after PR #468 was opened and commented. |
+| 2026-07-05 | #394 | implementation | Added `deploy.targets` e2e suite with Deno Deploy plan, compose/docker resolution, and cleanup gates. |
+| 2026-07-05 | #394 | acceptance | `deno task e2e:cli run deploy.targets --cleanup --format pretty` passed all 5 gates. |
 
 ## Decisions
 
@@ -64,6 +70,8 @@ To add a first-party deploy target, implement `DeployTargetPort`, register it in
 | -------- | ------ | ------ |
 | Register `compose` and `docker` in defaults. | The registry is the target extension axis and must be the recurrence guard. | #393, Arch 7 |
 | Remove public-dependency duplicate target entries. | Keeps default registry authoritative. | Code baseline |
+| Add `deploy.targets` as a standalone suite. | Gives deploy its own acceptance lane instead of hiding it in scaffold runtime. | #394 |
+| Use Deno Deploy `plan` as credential-free production-path coverage. | Runs locally/CI without paid cloud credentials while exercising a real deploy target. | #394 |
 
 ## Drift
 
@@ -83,6 +91,9 @@ To add a first-party deploy target, implement `DeployTargetPort`, register it in
 | lint changed files | `deno lint --no-config <6 changed ts files>` | PASS | `Checked 6 files`. |
 | fmt wrapper | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cli --ext ts,tsx` | FAIL | Wrapper selected 589 files but Deno exited 1 with 0 findings because root `deno.json` excludes `packages/cli/`; recorded as drift. |
 | fmt changed files | `deno fmt --check --no-config --line-width 100 --indent-width 2 --single-quote <6 changed ts files>` | PASS | `Checked 6 files`. |
+| e2e check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli/e2e --ext ts,tsx` | PASS | 77 files selected; 1 batch; 0 diagnostics. |
+| e2e lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/cli/e2e --ext ts,tsx` | PASS | 77 files selected; 1 batch; 0 findings. |
+| e2e fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cli/e2e --ext ts,tsx` | PASS | 77 files selected; 1 batch; 0 findings. |
 
 ### Fitness Gates
 
@@ -96,12 +107,14 @@ To add a first-party deploy target, implement `DeployTargetPort`, register it in
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
 | targeted deploy tests | PASS | `deno test --unstable-kv packages/cli/src/kernel/domain/deploy/deploy-target-port_test.ts packages/cli/src/kernel/domain/deploy/deno-deploy-target_test.ts packages/cli/src/public/features/deploy/target/target-deploy-command_test.ts` — 23 passed, 0 failed. | No external Aspire/Docker shelling. |
+| deploy e2e suite | PASS | `deno task e2e:cli run deploy.targets --cleanup --format pretty` — passed=5 failed=0. | Acceptance gate for #394. |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | -------- | ------ | -------- | ----- |
 | public deploy command router | PASS | `deploy docker/compose routers resolve their default registry targets` test. | Proves regression target. |
+| CLI e2e deploy suite | PASS | `deno task e2e:cli suites` lists `deploy.targets`; `deno task e2e:cli gates deploy.targets` lists preflight, scaffold, deploy plan, compose resolution, cleanup. | Proves suite registration. |
 
 ## Handoff Notes
 
