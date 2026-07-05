@@ -11,11 +11,12 @@
   `README.md`, `netscript-harness` SKILL (+ regenerated `.claude/skills/` mirror).
 - Run artifacts: `supervisor.md`, `research.md`, `plan.md` (LD-1..LD-8), `worklog.md`, `drift.md`.
 
-**Next**: OpenHands separate-session eval on draft PR #471 → transcribe verdict to `evaluate.md`
-→ surface to owner for ratification (incl. drift #3 PLAN-EVAL exception). The run does NOT
-self-certify or merge. DONE already: S1–S3 committed+pushed, PR #471 open with slice trail, Codex
-adversarial complete (0 blockers / 6 major / 2 minor — all accepted+fixed in S5, see
-`adversarial-triage.md`).
+**Next**: OWNER RATIFICATION of PR #471 — the only remaining step. Ratify = un-draft + merge +
+accept drift #3 (PLAN-EVAL skipped, owner-directed). Run is otherwise COMPLETE: S1–S5 pushed,
+Codex adversarial 0-blockers/8-fixed (`adversarial-triage.md`), OpenHands separate-session eval
+**PASS** with "Recommend merge" (`evaluate.md`; verdict transcribed from summary comment —
+commit-back step failed, branch verified churn-free). Two non-blocking evaluator observations
+deferred to OD-1. The run does NOT self-certify or merge.
 
 **Key decisions**: name = "seed run" (`--seed` suffix); home = `workflow/` (run shape, not
 archetype); stage contracts over frozen template (n=1); lane bindings by reference to
