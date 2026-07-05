@@ -30,14 +30,14 @@ are implemented locally. Validation has run except for pre-merge execution of th
 
 ## In Progress
 
-- Commit, push, PR creation, PR fixture run, and implementation phase comment.
+- Final run-artifact evidence commit, push, and implementation phase comment.
 
 ## Next Steps
 
-1. Commit the slice.
+1. Commit final run-artifact evidence update.
 2. Push `HEAD:refs/heads/chore/close-gate-387`.
-3. Open/update PR with required body, labels, and milestone.
-4. Run close-gate against the PR and post implementation evidence.
+3. Update PR body with live PR fixture evidence if needed.
+4. Post implementation evidence comment.
 
 ## Key Decisions
 
@@ -62,7 +62,7 @@ are implemented locally. Validation has run except for pre-merge execution of th
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Static | pass/partial | `deno check`, `deno lint --no-config`, fmt wrapper, Claude validation passed; actionlint unavailable. |
+| Static | pass/partial | `deno check`, `deno lint --no-config`, fmt wrapper, Claude validation, #260 fixture, and PR #467 fixture passed; actionlint unavailable. |
 | Fitness | pass | Source alignment/scope separation reviewed. |
 | Runtime | N/A | No runtime behavior. |
 | Consumer | reviewed | CI workflow cannot be executed before merge. |

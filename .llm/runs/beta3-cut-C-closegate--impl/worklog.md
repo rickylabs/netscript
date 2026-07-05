@@ -65,6 +65,7 @@ Claude skill mirror.
 | 2026-07-05 | 1 | research | Confirmed #260 has unchecked acceptance/gate boxes and CI lacks close-gate automation. |
 | 2026-07-05 | 1 | implementation | Added close-gate script, CI job, override label, canonical skill text, AGENTS pointer, and regenerated `.claude/skills`. |
 | 2026-07-05 | 1 | validation | Type-check, no-config lint, fmt, Claude surface, and #260 fixture completed; actionlint unavailable. |
+| 2026-07-05 | 1 | PR fixture | Opened draft PR #467 and ran close-gate against it successfully. |
 
 ## Decisions
 
@@ -91,6 +92,7 @@ Claude skill mirror.
 | Claude mirror sync | `deno task agentic:sync-claude` | PASS | Synced 17 skills, 21 mirrored files; stale mirror was `.claude/skills/netscript-pr/SKILL.md`. |
 | Claude mirror validation | `deno task agentic:sync-claude:check && deno task agentic:check-claude` | PASS | Sync check OK; validate-claude-surface OK; `deno.lock` unchanged. |
 | False-closed fixture | `GH_TOKEN=$(gh auth token) deno run --allow-env --allow-net .llm/tools/validation/check-close-gate.ts --repo rickylabs/netscript --issue 260 --pretty` | PASS (expected fail detected) | Script exited 1 and reported unchecked #260 acceptance/gate boxes, including `gate:e2e`. |
+| Live PR fixture | `GH_TOKEN=$(gh auth token) deno run --allow-env --allow-net .llm/tools/validation/check-close-gate.ts --repo rickylabs/netscript --pr 467 --pretty` | PASS | `close-gate PASS rickylabs/netscript#467`; closing issues: `#387`; exit 0. |
 | Workflow YAML | `actionlint .github/workflows/ci.yml` | NOT_RUN | `actionlint` is not installed. Manual review only; workflow cannot be executed pre-merge. |
 
 ### Fitness Gates
@@ -121,3 +123,6 @@ Claude skill mirror.
   - `close-gate FAIL rickylabs/netscript`
   - `closing issues: #260`
   - `unchecked: #260 line 69 [Acceptance & fitness gates] gate:e2e — a scaffold.runtime case ...`
+- The PR #467 fixture output:
+  - `close-gate PASS rickylabs/netscript#467`
+  - `closing issues: #387`
