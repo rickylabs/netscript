@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "name": "@netscript/plugin-workers",
-  "version": "0.0.1-beta.3",
+  "version": "0.0.1-beta.4",
   "displayName": "Background Worker",
   "description": "NetScript plugin for background job scheduling, task execution, and worker API endpoints.",
   "peerDependencies": {
-    "@netscript/plugin": "0.0.1-beta.3"
+    "@netscript/plugin": "0.0.1-beta.4"
   },
   "capabilities": {
     "hasDatabaseMigrations": true,
