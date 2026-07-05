@@ -44,8 +44,8 @@
     "pluginDir": "ai",
     "serviceEntrypoint": "ai/routes/chat-stream.ts",
     "serviceConfigKey": "ai",
-    "servicePort": 0,
-    "backgroundPort": 0,
+    "servicePort": 8095,
+    "backgroundPort": 8095,
     "requiresDb": false,
     "requiresKv": false,
     "permissions": ["--allow-net", "--allow-env", "--allow-read"]

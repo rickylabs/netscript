@@ -77,6 +77,7 @@ the presentation tests.
 | 2026-07-05 | 5 | Variant audit | Confirmed public plugin install does not yet carry plugin-specific flags; recorded `persist-threads` CLI-variant drift and MCP beta.6 stub. |
 | 2026-07-05 | 6 | Full E2E fix | First `scaffold.runtime` run failed at `scaffold.plugin.ai` because AI install used repo-root cwd with `--project-root .`; fixed gate cwd to generated project. |
 | 2026-07-05 | 7 | Manifest fix | Second `scaffold.runtime` run failed static AI plugin manifest validation; removed unsupported manifest flags, supplied required utility metadata, and included scaffold manifests in JSR publish files. |
+| 2026-07-05 | 8 | Manifest port fix | Third `scaffold.runtime` run failed generated config validation because AI metadata port was `0`; assigned positive port metadata while keeping AI service-less. |
 
 ## Decisions
 
@@ -127,6 +128,7 @@ the presentation tests.
 | scaffold.runtime ai | NOT_RUN | pending | Full suite once at end. |
 | scaffold.runtime run 1 | FAIL | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | Failed at `scaffold.plugin.ai` with exit 246: unsupported plugin kind `ai`; root cause was incorrect gate cwd/project-root pairing. |
 | scaffold.runtime run 2 | FAIL | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | Failed at `scaffold.plugin.ai` with exit 246: `scaffold.plugin.json` failed current installer schema validation. |
+| scaffold.runtime run 3 | FAIL | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | Failed at `scaffold.plugin.ai`: generated config rejected `NetScript.Plugins.ai.Port = 0`. |
 | scaffold.runtime registry | PASS | `deno test --unstable-kv --allow-write packages/cli/e2e/tests/presentation/suite-registry_test.ts`; `deno test --unstable-kv packages/cli/e2e/tests/presentation/cli-options_test.ts`; `deno test --unstable-kv packages/cli/e2e/tests/application/builders/runtime-gates_test.ts` | AI plugin/gate is registered in runtime/plugin suite expectations. |
 
 ### Consumer Gates
