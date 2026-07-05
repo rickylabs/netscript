@@ -14,7 +14,7 @@
 
 | # | Finding | How to verify |
 | - | --- | --- |
-| 1 | There are 35 publishable `@netscript/*` package/plugin roots with a JSR export map under `packages/` and `plugins/`. | `deno eval --ext=ts '<inventory script>'` from repo root. |
+| 1 | There are 35 direct-child `@netscript/*` roots with export maps under `packages/` and `plugins/`; 34 are publishable because `@netscript/bench` sets `publish: false`. | `deno eval --ext=ts '<inventory script>'` from repo root; PLAN-EVAL spot-check. |
 | 2 | Full-export-map doc lint is already wrapped by `.llm/tools/run-deno-doc-lint.ts`, exposed as `deno task doc:lint`. | `deno.json` task `doc:lint`; `.llm/tools/run-deno-doc-lint.ts` header. |
 | 3 | Root quality wrappers already scope check/lint/fmt over `packages` and `plugins`, with exclusions documented in `deno.json`. | `deno task check`, `deno task lint`, `deno task fmt:check` entries in `deno.json`. |
 | 4 | The sanctioned slow-types exception is narrow: oRPC-bound packages only, from commit `86eca907`. | `git show --stat --oneline --name-status 86eca907`; doctrine file 02. |
@@ -23,9 +23,11 @@
 ## jsr-audit surface scan (package/plugin waves)
 
 - Surface scanned: planned full export map for every publishable `@netscript/*` package/plugin root:
-  35 roots, not just `mod.ts`.
+  34 publishable roots, not just `mod.ts`; `@netscript/bench` is non-publishable and out of scope.
 - Slow-type / surface risks:
-  - Existing oRPC-bound slow-types allowance from `86eca907` is sanctioned and must remain.
+  - Existing oRPC-bound slow-types allowance from `86eca907` is sanctioned and must remain for the
+    four allow-listed packages: `@netscript/contracts`, `@netscript/service`, `@netscript/plugin`,
+    and `@netscript/plugin-triggers-core`.
   - New slow-types allowances are prohibited. Any slow-type diagnostic requiring public API redesign
     is a stop/deferral item for `notes.md`, not a public API rewrite in this slice.
   - Multi-subpath packages may false-flag if only `mod.ts` is linted; use the full export map wrapper.

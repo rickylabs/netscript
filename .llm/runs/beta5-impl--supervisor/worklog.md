@@ -13,8 +13,8 @@
 
 ### Public Surface
 
-- All `deno.json` export-map entrypoints in 35 publishable `@netscript/*` roots under `packages/`
-  and `plugins/`.
+- All `deno.json` export-map entrypoints in 34 publishable `@netscript/*` roots under `packages/`
+  and `plugins/`; `@netscript/bench` is non-publishable and out of scope.
 - Root validation commands and PR comments are evidence surfaces, not public runtime APIs.
 
 ### Domain Vocabulary
@@ -64,6 +64,7 @@ slice commit.
 | --- | --- | --- | --- |
 | 2026-07-06 | 1 | bootstrap | Read required skills, doctrine, harness workflow, and commit `86eca907`; created run artifacts. |
 | 2026-07-06 | 1 | draft PR | Opened draft PR #483 and pushed bootstrap commit `1178e727`. |
+| 2026-07-06 | 1 | plan-eval | OpenHands PLAN-EVAL PASS, commit `324d85d3`; corrected plan wording slips before implementation. |
 
 ## Decisions
 

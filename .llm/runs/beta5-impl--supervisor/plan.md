@@ -39,7 +39,7 @@ Make the full export map of every publishable `@netscript/*` package/plugin doc-
 
 ## Scope
 
-- Run full-export-map doc lint for all 35 publishable roots.
+- Run full-export-map doc lint for all 34 publishable roots.
 - Fix missing JSDoc, missing explicit export return/types, and trivial private-type leaks.
 - Run publish dry-run and preserve the single sanctioned oRPC-bound slow-types allowance from
   commit `86eca907`.
@@ -107,7 +107,7 @@ Make the full export map of every publishable `@netscript/*` package/plugin doc-
 
 | Entry | Action | Notes |
 | --- | --- | --- |
-| Existing oRPC slow-types carve-out | preserve | Do not remove commit `86eca907` allowance. |
+| Existing oRPC slow-types carve-out | preserve | Do not remove commit `86eca907` allowance for `@netscript/contracts`, `@netscript/service`, `@netscript/plugin`, and `@netscript/plugin-triggers-core`. |
 | New API redesign needed for slow types | defer in `notes.md` | Do not create broad doctrine debt unless supervisor directs. |
 
 ## Validation Plan
