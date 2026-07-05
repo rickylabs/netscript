@@ -19,16 +19,14 @@ export function createScaffoldSuiteBuilder(
       const pluginBuilder = createPluginSuiteBuilder();
       configure?.(pluginBuilder);
       const state = pluginBuilder.buildState();
-      const plugins = state.plugins.length > 0
-        ? state.plugins
-        : [
-          PLUGIN.WORKER,
-          PLUGIN.SAGA,
-          PLUGIN.TRIGGER,
-          PLUGIN.STREAM,
-          PLUGIN.AUTH,
-          PLUGIN.AI,
-        ] as const;
+      const plugins = state.plugins.length > 0 ? state.plugins : [
+        PLUGIN.WORKER,
+        PLUGIN.SAGA,
+        PLUGIN.TRIGGER,
+        PLUGIN.STREAM,
+        PLUGIN.AUTH,
+        PLUGIN.AI,
+      ] as const;
       gates.push(...createScaffoldCapabilityGates({ ...state, plugins: [...plugins] }, database));
       return this;
     },

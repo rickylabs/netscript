@@ -101,6 +101,11 @@ the presentation tests.
 | Slice 2 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin-ai-core --root plugins/ai --ext ts,tsx` | PASS | 35 files selected, 0 diagnostics. |
 | Slice 3 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/ai --ext ts,tsx` | PASS | 30 files selected, 0 diagnostics. |
 | Slice 4 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli/e2e --ext ts,tsx` | PASS | 77 files selected, 0 diagnostics. |
+| Slice 5 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin-ai-core --root plugins/ai --root packages/cli/e2e --ext ts,tsx` | PASS | 114 files selected, 0 diagnostics. |
+| Slice 5 lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin-ai-core --root plugins/ai --root packages/cli/e2e --ext ts,tsx` | PASS | 114 files selected, 0 diagnostics. |
+| Slice 5 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin-ai-core --root plugins/ai --root packages/cli/e2e --ext ts,tsx --write --pretty` | PASS | 114 TypeScript files formatted/verified. |
+| JSR doc lint | `deno task doc:lint --root packages/plugin-ai-core --pretty`; `deno task doc:lint --root plugins/ai --pretty` | WARN | Wrapper exits 0 but reports transitive private-type references from documented dependency internals; package publish dry-runs pass slow-types checks. |
+| Publish dry-run | `deno publish --dry-run --allow-dirty` in `packages/plugin-ai-core` and `plugins/ai` | PASS | Both package-level dry-runs complete successfully. |
 
 ### Fitness Gates
 
@@ -109,6 +114,7 @@ the presentation tests.
 | F-5/F-6/F-19 | NOT_RUN | pending | Run after implementation slices. |
 | F-10 contract/resource tests | PASS | `deno test --unstable-kv packages/plugin-ai-core/tests/contracts/ai-contract-soundness_test.ts`; `deno test --unstable-kv plugins/ai/src/adapter/resources/resources.test.ts` | Contract soundness and generator resource assertions pass. |
 | Plugin verify/doctor | PASS | `deno run --allow-all plugins/ai/verify-plugin.ts`; `deno test --unstable-kv plugins/ai/tests/adapter/doctor_test.ts` | Verify script reports `ok: true`; doctor covers missing and configured Anthropic key. |
+| Slice 5 targeted tests | PASS | `deno test --unstable-kv packages/plugin-ai-core/tests/contracts/ai-contract-soundness_test.ts`; `deno test --unstable-kv plugins/ai/src/adapter/resources/resources.test.ts plugins/ai/tests/adapter/doctor_test.ts`; `deno test --unstable-kv --allow-write packages/cli/e2e/tests/presentation/suite-registry_test.ts packages/cli/e2e/tests/presentation/cli-options_test.ts packages/cli/e2e/tests/application/builders/runtime-gates_test.ts` | 1 + 11 + 19 tests passed. |
 
 ### Runtime Gates
 
@@ -127,3 +133,5 @@ the presentation tests.
 
 - Inspect the `stream-proxy.stub.ts` generated output first: it is the central false-done defect.
 - Then verify `plugins/ai/deno.json` export map and publish dry-run.
+| 2026-07-05 | 5 | Publishability | Flipped `plugins/ai` to an explicit JSR publish include/exclude map; package dry-runs pass for `plugin-ai-core` and `plugin-ai`. |
+| 2026-07-05 | 5 | Variant audit | Confirmed public plugin install does not yet carry plugin-specific flags; recorded `persist-threads` CLI-variant drift and MCP beta.6 stub. |

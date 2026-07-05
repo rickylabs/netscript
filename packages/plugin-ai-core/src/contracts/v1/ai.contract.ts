@@ -21,14 +21,13 @@ import type {
   ErrorMap,
   MergedErrorMap,
 } from '@orpc/contract';
-import { eventIterator, implement } from '@orpc/server';
+import { eventIterator, implement, type Implementer } from '@orpc/server';
 import { z } from 'zod';
 import {
   BASE_PLUGIN_CONTRACT_ROUTES,
   BASE_PLUGIN_ERRORS,
   type BasePluginContract,
   type BasePluginDescribeRoute,
-  type PluginCapabilities,
 } from '@netscript/plugin/contract-base';
 import type {
   AgentChunk,
@@ -57,21 +56,49 @@ import {
 // Plugin IO derives from the engine vocabulary rather than redeclaring it.
 
 export type {
+  BasePluginContract,
+  BasePluginDescribeRoute,
+  PluginCapabilities,
+} from '@netscript/plugin/contract-base';
+
+export type {
   AgentChunk,
+  AudioContentPart,
+  CompletionTokensDetails,
+  ContentModality,
   ContentPart,
   ContentSource,
+  DataContentSource,
+  DocumentContentPart,
+  DoneChunk,
+  ErrorChunk,
+  ImageContentPart,
   Message,
+  MessageChunk,
   MessageContent,
   MessageRole,
   ModelCapabilities,
   ModelDescriptor,
+  ModelId,
   ModelRef,
   ModelSelector,
+  PromptTokensDetails,
+  ProviderUsageDetails,
+  TextChunk,
+  TextContentPart,
   ToolCall,
+  ToolCallChunk,
+  ToolCallState,
   ToolDescriptor,
+  ToolParameters,
   ToolResult,
+  ToolResultChunk,
   ToolResultState,
+  UrlContentSource,
   Usage,
+  UsageChunk,
+  UsageCostBreakdown,
+  VideoContentPart,
 } from '@netscript/ai/contracts';
 
 /**
@@ -80,7 +107,16 @@ export type {
  * Named public alias of {@link PluginCapabilities} so consumers can reference
  * the AI describe-output type without reaching into `@netscript/plugin`.
  */
-export type AiCapabilities = PluginCapabilities;
+export interface AiCapabilities {
+  /** Canonical plugin package name, for example `@netscript/plugin-ai`. */
+  readonly pluginName: string;
+  /** Contract version identifiers served by the plugin. */
+  readonly contractVersions: readonly string[];
+  /** Route group names exposed by the plugin. */
+  readonly routeGroups: readonly string[];
+  /** Capability tags advertised by the plugin. */
+  readonly capabilities: readonly string[];
+}
 
 // --- Base contract vocabulary ------------------------------------------------
 // Converge onto the shared plugin error vocabulary (NOT_FOUND, VALIDATION_ERROR,
@@ -304,7 +340,7 @@ type ChatRoute = ContractProcedureBuilderWithInputOutput<
  * from a named, annotated schema via `typeof`, the contract type can never
  * silently drift from the schemas.
  */
-interface AiContractDefinitionShape extends BasePluginContract {
+export interface AiContractDefinitionShape extends BasePluginContract {
   readonly describe: BasePluginDescribeRoute;
   readonly chat: ChatRoute;
   readonly models: Route<typeof modelsInputZodSchema, typeof modelsResponseZodSchema>;
@@ -374,9 +410,11 @@ export const aiContract: AiContractDefinition = aiContractDefinition;
  * so every `router.<route>.handler(...)` is checked for input/output/error
  * conformance. The type is the real `implement` return type — no erasure cast.
  */
-export const aiContractV1: ReturnType<typeof implement<AiContractDefinition>> = implement(
-  aiContractDefinition,
-);
+export const aiContractV1: Implementer<
+  AiContractDefinition,
+  Record<never, never>,
+  Record<never, never>
+> = implement(aiContractDefinition);
 
 /**
  * Public contract shape for AI service clients.

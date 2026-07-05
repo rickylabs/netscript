@@ -5,19 +5,25 @@
  */
 
 import { aiContractV1 } from '../contracts/v1/mod.ts';
-import type { Context } from '@orpc/server';
 
-type ContextualAiRouter<TContext extends Context> = ReturnType<typeof aiContractV1.$context<TContext>>;
+/**
+ * Request context accepted by the generated AI router.
+ */
+export type AiRouterContext = Record<PropertyKey, unknown>;
 
-type AiRouteHandler<
-  TContext extends Context,
+export type ContextualAiRouter<TContext extends AiRouterContext> = ReturnType<
+  typeof aiContractV1.$context<TContext>
+>;
+
+export type AiRouteHandler<
+  TContext extends AiRouterContext,
   TRoute extends keyof ContextualAiRouter<TContext>,
 > = ContextualAiRouter<TContext>[TRoute] extends { handler: (handler: infer THandler) => unknown }
   ? THandler
   : never;
 
-type BoundAiRoute<
-  TContext extends Context,
+export type BoundAiRoute<
+  TContext extends AiRouterContext,
   TRoute extends keyof ContextualAiRouter<TContext>,
 > = ContextualAiRouter<TContext>[TRoute] extends { handler: (...args: never[]) => infer TBound }
   ? TBound
@@ -26,7 +32,7 @@ type BoundAiRoute<
 /**
  * Handler functions that implement every route in {@linkcode aiContractV1}.
  */
-export interface AiRouterImplementation<TContext extends Context = Record<string, never>> {
+export interface AiRouterImplementation<TContext extends AiRouterContext = Record<string, never>> {
   /** Describe the AI plugin capabilities. */
   readonly describe: AiRouteHandler<TContext, 'describe'>;
   /** Stream chat chunks from the in-process agent loop. */
@@ -44,7 +50,7 @@ export interface AiRouterImplementation<TContext extends Context = Record<string
 /**
  * Contract-bound route handlers returned by {@linkcode createAiRouter}.
  */
-export interface BoundAiRouter<TContext extends Context = Record<string, never>> {
+export interface BoundAiRouter<TContext extends AiRouterContext = Record<string, never>> {
   /** Bound `describe` route handler. */
   readonly describe: BoundAiRoute<TContext, 'describe'>;
   /** Bound streaming `chat` route handler. */
@@ -79,7 +85,7 @@ export interface BoundAiRouter<TContext extends Context = Record<string, never>>
  * });
  * ```
  */
-export function createAiRouter<TContext extends Context = Record<string, never>>(
+export function createAiRouter<TContext extends AiRouterContext = Record<string, never>>(
   implementation: AiRouterImplementation<TContext>,
 ): BoundAiRouter<TContext> {
   const router = aiContractV1.$context<TContext>();

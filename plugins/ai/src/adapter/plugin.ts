@@ -20,6 +20,8 @@ import {
   toolResource,
 } from './resources/mod.ts';
 
+export type { InstallStarterResource, NetScriptPlugin } from '@netscript/plugin/adapter';
+
 /**
  * Starter resources emitted by the AI install command. Default topology is
  * fully in-process: the barrel wires `@netscript/ai`, the stream route calls it
