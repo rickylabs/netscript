@@ -1,3 +1,5 @@
+Generator self-review only — NOT an evaluator verdict; official IMPL-EVAL is a separate OpenHands session.
+
 # PLAN-EVAL — beta5-impl--supervisor
 
 - Plan evaluator session: Codex PLAN-EVAL / 2026-07-06

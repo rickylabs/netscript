@@ -1,3 +1,5 @@
+Generator self-review only — NOT an evaluator verdict; official IMPL-EVAL is a separate OpenHands session.
+
 # Evaluation: issue #305 doctrine quick-win
 
 ## Metadata
