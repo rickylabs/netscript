@@ -25,6 +25,7 @@ thin CLI over it.
 | `codex-resume.ts` | Steer an existing thread via `codex exec resume` (never forks a rival). |
 | `dispatch-openhands.ts` | Validate prompt contract → build & POST an `@openhands-agent` trigger comment. |
 | `openhands-status.ts` | Read-only run status from the committed trace (default) or the PR status comment. |
+| `watch-openhands-verdict.ts` | Poll a PR for the eval verdict with layered extraction (contract line → formal header → summary heuristics). |
 | `gh-pr.ts` | Leaf-PR lifecycle: `create` / `verdict` / `merge` over the GitHub REST API (eval-gated merge). |
 | `agentic-lib_test.ts` | `deno test` unit suite over the pure primitives + real fixtures. |
 | `__fixtures__/` | Real Codex launch log + a real-shaped OpenHands status comment. |
@@ -141,6 +142,13 @@ Output modes: `pr-comment` · `respond-comments` · `thread-replies` · `summary
 trigger checks out the PR branch; `--issue` checks out the default branch. Exit: `0` ok / dry-run ·
 `1` post failed · `2` usage error · `3` prompt contract violation · `4` missing token (non-dry-run).
 
+By default every dispatched prompt gets a **verdict output-contract epilogue**
+(`appendVerdictContractEpilogue`): post the formal `**[PHASE: …] [VERDICT: …]**` PR comment EARLY
+(before optional deep-dives — iteration budgets exhaust and late verdicts get lost), and always end
+both the PR comment and the summary file with a machine-readable
+`OPENHANDS_VERDICT: <PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN|NONE>` line. Pass
+`--no-verdict-contract` for non-eval dispatches (implementation asks) that should not carry it.
+
 ### `openhands-status.ts`
 Read the verdict without hand-writing PowerShell.
 
@@ -153,6 +161,24 @@ deno run --allow-read --allow-env --allow-net .llm/tools/agentic/openhands-statu
   --source remote --repo rickylabs/netscript --pr 86 --pretty
 ```
 Exit: `0` status found · `1` no status found · `2` usage error · `4` missing token (remote).
+
+### `watch-openhands-verdict.ts`
+Poll a PR for the OpenHands eval **verdict** — the layered answer to runs that exhaust their
+iteration budget and never post the formal comment. Extraction priority (per poll, newest comment
+first): (1) the machine-readable `OPENHANDS_VERDICT: <token>` contract line (`confidence: exact`),
+(2) the formal `**[PHASE: …-EVAL] [VERDICT: X]**` header (`exact`), (3) heuristics on the runner's
+synthesized `<!-- openhands-agent-summary -->` comment — `## Verdict` section, `**Verdict: PASS.**`
+phrase, or a token near the word "verdict" in a context dump (`confidence: heuristic`). The
+dispatch/trigger comment (which quotes the `[VERDICT: <verdict>]` template) is never matched.
+
+```powershell
+$env:GH_TOKEN = (read from your secret store)   # never commit / echo this
+deno run --allow-env --allow-net .llm/tools/agentic/watch-openhands-verdict.ts \
+  --repo rickylabs/netscript --pr 86 --since 2026-07-05T10:00:00Z \
+  --timeout-seconds 1800 --interval-seconds 30
+```
+Prints one JSON line `{ok, verdict, confidence, commentUrl, elapsedSeconds}`. Exit: `0` verdict
+found · `2` timeout heartbeat (re-arm to keep waiting) · `1` bad args / auth.
 
 ### `gh-pr.ts`  (`create` | `verdict` | `merge`)
 Leaf-PR lifecycle over the GitHub REST API — replaces the hand-rolled `Invoke-RestMethod` PowerShell
@@ -200,7 +226,7 @@ The `wslUser()` / `wslHome()` helpers in `agentic-lib.ts` are the single source 
 ## Tests & validation
 
 ```powershell
-deno test --allow-read --allow-env .llm/tools/agentic/agentic-lib_test.ts   # 41 unit tests
+deno test --allow-read --allow-env .llm/tools/agentic/agentic-lib_test.ts   # 54 unit tests
 deno check --unstable-kv .llm/tools/agentic/*.ts                   # type-check (clean)
 deno lint  --no-config   .llm/tools/agentic/*.ts                   # lint (repo excludes .llm/)
 ```

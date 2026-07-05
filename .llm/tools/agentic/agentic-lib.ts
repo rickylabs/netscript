@@ -417,6 +417,59 @@ export function buildOpenHandsComment(o: DispatchOptions): string {
 }
 
 // ---------------------------------------------------------------------------
+// OpenHands verdict output contract (pure)
+// ---------------------------------------------------------------------------
+
+/** HTML marker that tags a prompt as already carrying the verdict output contract. */
+export const VERDICT_CONTRACT_MARKER = '<!-- openhands-verdict-contract -->';
+
+/** The machine-readable verdict tokens the output contract allows. */
+export const OPENHANDS_VERDICT_TOKENS = [
+  'PASS',
+  'FAIL_FIX',
+  'FAIL_RESCOPE',
+  'FAIL_DEBT',
+  'FAIL_PLAN',
+  'NONE',
+] as const;
+
+const VERDICT_CONTRACT_EPILOGUE = [
+  '---',
+  '',
+  VERDICT_CONTRACT_MARKER,
+  '',
+  '## OUTPUT CONTRACT (mandatory — verdict first)',
+  '',
+  '1. Post the verdict PR comment IMMEDIATELY after you form the verdict — BEFORE any',
+  '   optional deep-dive, extra verification, or long context dump. Iteration budgets',
+  '   exhaust; a verdict comment deferred to the end of the run is frequently lost.',
+  '2. That PR comment MUST start with the formal header line, exactly:',
+  '   **[PHASE: <phase>] [VERDICT: <verdict>]**',
+  '   where <phase> is your eval phase (e.g. IMPL-EVAL, PLAN-EVAL) and <verdict> is one',
+  '   of PASS, FAIL_FIX, FAIL_RESCOPE, FAIL_DEBT, FAIL_PLAN.',
+  '3. ALWAYS end BOTH the verdict PR comment AND your summary file with one final',
+  '   machine-readable line of the exact form:',
+  '   OPENHANDS_VERDICT: <verdict>',
+  '   using a literal token from: PASS, FAIL_FIX, FAIL_RESCOPE, FAIL_DEBT, FAIL_PLAN,',
+  '   NONE. Use NONE only when no verdict could be reached.',
+].join('\n');
+
+/**
+ * Append the deterministic verdict output contract to a dispatch prompt: post the
+ * formal verdict comment EARLY (before optional deep-dives, which historically eat
+ * the iteration budget and leave only a synthesized summary) and always end both
+ * the PR comment and the summary file with a machine-readable
+ * `OPENHANDS_VERDICT: <token>` line that watchers can grep deterministically.
+ * Idempotent: a prompt already carrying {@link VERDICT_CONTRACT_MARKER} is
+ * returned unchanged. The epilogue uses only `<placeholder>` forms, so the
+ * trigger comment itself can never satisfy a watcher's verdict regexes.
+ */
+export function appendVerdictContractEpilogue(prompt: string): string {
+  if (prompt.includes(VERDICT_CONTRACT_MARKER)) return prompt;
+  return `${prompt.replace(/\s+$/, '')}\n\n${VERDICT_CONTRACT_EPILOGUE}\n`;
+}
+
+// ---------------------------------------------------------------------------
 // OpenHands status parsing (pure)
 // ---------------------------------------------------------------------------
 
@@ -579,6 +632,113 @@ export interface CommentLike {
 export function selectLatestOpenHandsComment<T extends CommentLike>(comments: T[]): T | null {
   const tagged = comments.filter((c) => (c.body ?? '').includes(OPENHANDS_MARKER));
   return tagged.length ? tagged[tagged.length - 1] : null;
+}
+
+// ---------------------------------------------------------------------------
+// Layered verdict extraction (pure)
+// ---------------------------------------------------------------------------
+
+/** A PR issue comment reduced to the fields verdict extraction needs. */
+export interface VerdictSourceComment {
+  body: string;
+  url: string;
+  /** ISO timestamp (`created_at`); used to order comments newest-first. */
+  createdAt: string;
+}
+
+export type VerdictConfidence = 'exact' | 'heuristic';
+
+export interface ExtractedVerdict {
+  /** PASS | FAIL_FIX | FAIL_RESCOPE | FAIL_DEBT | FAIL_PLAN | NONE (or bare FAIL, heuristic only). */
+  verdict: string;
+  confidence: VerdictConfidence;
+  /** html_url of the comment the verdict was extracted from. */
+  url: string;
+}
+
+/** Machine-readable contract line: `OPENHANDS_VERDICT: <token>` at line start. */
+const MACHINE_VERDICT_RE =
+  /^[\s>*`_]*OPENHANDS_VERDICT:\s*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN|NONE)\b/m;
+
+/** Formal evaluator header: `**[PHASE: IMPL-EVAL] [VERDICT: PASS]**`. */
+const FORMAL_HEADER_RE =
+  /\*\*\s*\[PHASE:\s*[A-Z][A-Z _-]*EVAL\]\s*\[VERDICT:\s*(PASS|FAIL_[A-Z_]+|NONE)\s*\]\s*\*\*/;
+
+/** Verdict token used by the fallback heuristics (bare FAIL accepted; menu echoes rejected). */
+const HEURISTIC_TOKEN_RE = /\b(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN|FAIL)\b(?!\s*\|)/;
+
+/**
+ * A dispatch/trigger comment must never be read as a verdict: it quotes the
+ * output-contract template (`[VERDICT: <verdict>]`, `OPENHANDS_VERDICT: <verdict>`)
+ * and would otherwise false-positive every watcher poll.
+ */
+function isTriggerOrTemplateComment(body: string): boolean {
+  return body.includes('@openhands-agent') ||
+    body.includes('<verdict>') ||
+    /\[VERDICT:\s*</i.test(body) ||
+    /OPENHANDS_VERDICT:\s*</.test(body);
+}
+
+/**
+ * Fallback heuristics for a synthesized `<!-- openhands-agent-summary -->` body
+ * whose verdict is present but not in the formal form. Tried in order:
+ *   a. a `## Verdict` section — token within the heading's next few lines;
+ *   b. an inline `**Verdict: PASS.**` / `Verdict: PASS` phrase;
+ *   c. a standalone uppercase token within a short window of the word "verdict"
+ *      (a context-dump mention). Plain PASS/FAIL prose away from "verdict" never
+ *      matches.
+ */
+function heuristicVerdict(body: string): string | null {
+  // a. `## Verdict` section: token in the heading line + next 4 lines.
+  const lines = body.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    if (/^#{1,6}\s*Verdict\b/i.test(lines[i].trim())) {
+      const m = lines.slice(i, i + 5).join('\n').match(HEURISTIC_TOKEN_RE);
+      if (m) return m[1];
+    }
+  }
+  // b. inline `**Verdict: PASS.**` / `Verdict: FAIL_FIX` phrase.
+  const inline = body.match(
+    /\*{0,2}[Vv]erdict\*{0,2}\s*:?\s*\*{0,2}\s*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN|FAIL)\b(?!\s*\|)/,
+  );
+  if (inline) return inline[1];
+  // c. token near the word "verdict" (buried in a context dump).
+  const lower = body.toLowerCase();
+  for (let idx = lower.indexOf('verdict'); idx !== -1; idx = lower.indexOf('verdict', idx + 7)) {
+    const m = body.slice(Math.max(0, idx - 80), idx + 120).match(HEURISTIC_TOKEN_RE);
+    if (m) return m[1];
+  }
+  return null;
+}
+
+/**
+ * Layered verdict extraction over a PR's issue comments (any order; sorted by
+ * `createdAt` internally, matched newest-first). Priority:
+ *   1. the machine-readable `OPENHANDS_VERDICT: <token>` contract line (exact);
+ *   2. the formal `**[PHASE: …-EVAL] [VERDICT: X]**` header (exact);
+ *   3. {@link heuristicVerdict} fallbacks, restricted to comments carrying
+ *      {@link OPENHANDS_MARKER} (the runner's synthesized summary).
+ * A higher layer in ANY comment beats a lower layer in a newer one. Trigger and
+ * template comments are excluded up front ({@link isTriggerOrTemplateComment}).
+ */
+export function extractVerdict(comments: VerdictSourceComment[]): ExtractedVerdict | null {
+  const newestFirst = comments
+    .filter((c) => !isTriggerOrTemplateComment(c.body))
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  for (const c of newestFirst) {
+    const m = c.body.match(MACHINE_VERDICT_RE);
+    if (m) return { verdict: m[1], confidence: 'exact', url: c.url };
+  }
+  for (const c of newestFirst) {
+    const m = c.body.match(FORMAL_HEADER_RE);
+    if (m) return { verdict: m[1], confidence: 'exact', url: c.url };
+  }
+  for (const c of newestFirst) {
+    if (!c.body.includes(OPENHANDS_MARKER)) continue;
+    const v = heuristicVerdict(c.body);
+    if (v) return { verdict: v, confidence: 'heuristic', url: c.url };
+  }
+  return null;
 }
 
 // ---------------------------------------------------------------------------

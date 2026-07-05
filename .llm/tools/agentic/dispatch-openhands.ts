@@ -18,6 +18,13 @@
  * trigger checks out the PR branch; an issue-comment trigger checks out the
  * default branch. Cloud-chained events need PAT_TOKEN, not GITHUB_TOKEN.
  *
+ * Verdict output contract: by default the dispatched prompt gets a standard
+ * epilogue (appendVerdictContractEpilogue) instructing the agent to post the
+ * formal verdict PR comment EARLY and to end both the PR comment and its summary
+ * file with a machine-readable `OPENHANDS_VERDICT: <token>` line — the line
+ * watch-openhands-verdict.ts greps for. Pass --no-verdict-contract for
+ * non-eval dispatches (implementation asks) that should not carry it.
+ *
  * Modes:
  *   (default)    Validate prompt -> build comment -> POST it.
  *   --dry-run    Validate + print the target, trigger line, and full comment body
@@ -36,6 +43,7 @@
  */
 
 import {
+  appendVerdictContractEpilogue,
   buildOpenHandsComment,
   githubRequest,
   parseRepoSlug,
@@ -54,6 +62,7 @@ interface Options {
   iterations?: string;
   provider?: string;
   tokenEnv: string;
+  verdictContract: boolean;
   dryRun: boolean;
   pretty: boolean;
 }
@@ -75,6 +84,8 @@ function printHelp(): void {
     '  --iterations <n>      Max agent iterations (50-3000).',
     '  --provider <name>     Provider gateway override (e.g. openrouter).',
     '  --token-env <name>    Env var holding the GitHub token. Default: GH_TOKEN.',
+    '  --no-verdict-contract Skip the verdict output-contract epilogue (for non-eval',
+    '                        dispatches, e.g. implementation asks). Default: appended.',
     '  --dry-run             Validate + print comment without posting (no token needed).',
     '  --pretty              Human-readable output instead of JSON.',
     '  --help                Show this help.',
@@ -85,6 +96,7 @@ function parseArgs(args: string[]): Options | null {
   const o: Options = {
     repo: 'rickylabs/netscript',
     tokenEnv: 'GH_TOKEN',
+    verdictContract: true,
     dryRun: false,
     pretty: false,
   };
@@ -126,6 +138,9 @@ function parseArgs(args: string[]): Options | null {
       case '--token-env':
         o.tokenEnv = requireValue(args, i, a);
         i++;
+        break;
+      case '--no-verdict-contract':
+        o.verdictContract = false;
         break;
       case '--dry-run':
         o.dryRun = true;
@@ -184,13 +199,14 @@ async function main(): Promise<void> {
     Deno.exit(3);
   }
 
-  // 2) Build the trigger comment.
+  // 2) Build the trigger comment (verdict output contract appended by default).
+  const prompt = o.verdictContract ? appendVerdictContractEpilogue(content) : content;
   const comment = buildOpenHandsComment({
     model: o.model,
     outputMode: o.output,
     iterations: o.iterations,
     provider: o.provider,
-    prompt: content,
+    prompt,
   });
   const triggerLine = comment.split('\n')[0];
   const endpoint = `/repos/${slug.owner}/${slug.repo}/issues/${number}/comments`;
@@ -202,6 +218,7 @@ async function main(): Promise<void> {
       console.log(`  target   : ${slug.owner}/${slug.repo} #${number} (${o.pr ? 'pr' : 'issue'})`);
       console.log(`  trigger  : ${triggerLine}`);
       console.log(`  endpoint : POST ${endpoint}`);
+      console.log(`  contract : verdict epilogue ${o.verdictContract ? 'appended' : 'skipped'}`);
       console.log(`  bytes    : ${new TextEncoder().encode(comment).length}`);
       console.log('  --- comment body ---');
       console.log(comment);
@@ -213,6 +230,7 @@ async function main(): Promise<void> {
         number,
         kind: o.pr ? 'pr' : 'issue',
         triggerLine,
+        verdictContract: o.verdictContract,
         endpoint,
         commentBytes: new TextEncoder().encode(comment).length,
         comment,
