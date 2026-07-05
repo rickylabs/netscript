@@ -40,6 +40,13 @@ name: e2e-cli
 # so they never strand a required status check if promoted to one later. The
 # cheap required trio (quality / check-test / deps-report) lives in ci.yml and is
 # NOT touched by this policy. Release gates (publish, e2e-cli-prod*) have no skip.
+#
+# FAIL-CLOSED RULE: a skip requires `classify` to SUCCEED with an explicit
+# `run_*=false`. If classify fails for any reason, the expensive jobs run in
+# full (`needs.classify.result != 'success'` forces RUN=true); only a `skipped`
+# classify (the pre-existing applicability gate) skips them, as before.
+# Rename-aware diff: `--name-status -M` feeds BOTH sides of renames/copies so a
+# source->docs rename can never classify docs-only.
 
 on:
   pull_request:
@@ -85,22 +92,27 @@ jobs:
           deno test --allow-read --allow-write --allow-env
           .github/scripts/ci-classify-changes.test.ts
 
-      - name: Compute changed files (merge-base diff)
+      - name: Compute changed files (merge-base diff, rename-aware)
         id: diff
         if: github.event_name == 'pull_request'
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        # `--name-status -M` (NOT `--name-only`) so renames/copies report BOTH
+        # sides: a `packages/cli/a.ts -> docs/a.md` rename must surface the
+        # impacting source path, not just the docs destination (rename hole
+        # found in adversarial review). The classifier parses this format and
+        # feeds old+new for R*/C* and the deleted path for D.
         run: |
           echo "changed<<__EOF__" >> "$GITHUB_OUTPUT"
-          git diff --name-only "$BASE_SHA...$HEAD_SHA" >> "$GITHUB_OUTPUT"
+          git diff --name-status -M "$BASE_SHA...$HEAD_SHA" >> "$GITHUB_OUTPUT"
           echo "__EOF__" >> "$GITHUB_OUTPUT"
 
       - name: Decide run/skip
         id: decide
         env:
           EVENT_NAME: ${{ github.event_name }}
-          CHANGED_FILES: ${{ steps.diff.outputs.changed }}
+          CHANGED_NAME_STATUS: ${{ steps.diff.outputs.changed }}
           PR_LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
         run: deno run --allow-read --allow-write --allow-env .github/scripts/ci-classify-changes.ts
 
@@ -109,15 +121,23 @@ jobs:
     needs: classify
     # Job always starts (so its status reports); real work is guarded by the
     # classifier so docs-only / `ci:skip-scaffold` short-circuit to SUCCESS.
+    # FAIL-CLOSED: if `classify` FAILED (setup/diff/output error), this job still
+    # runs and RUN defaults to true — a skip requires classify to have SUCCEEDED
+    # with an explicit `run_static=false`. `skipped` classify (applicability gate:
+    # not a PR to main / no `e2e-cli-gate` label) keeps the old skip behavior.
+    if: ${{ !cancelled() && needs.classify.result != 'skipped' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      RUN: ${{ needs.classify.outputs.run_static }}
+      RUN: ${{ needs.classify.result != 'success' || needs.classify.outputs.run_static == 'true' }}
+      SKIP_REASON: ${{ needs.classify.outputs.reason }}
     steps:
       - name: Skipped by policy
         if: env.RUN != 'true'
+        # REASON contains raw changed-file names — never interpolate it into
+        # shell source; pass via env and print with printf.
         run: |
-          echo "::notice::scaffold-static skipped by policy. ${{ needs.classify.outputs.reason }}"
+          printf '::notice::scaffold-static skipped by policy. %s\n' "$SKIP_REASON"
 
       - name: Checkout
         if: env.RUN == 'true'
@@ -151,15 +171,23 @@ jobs:
     # Job always starts (so its status reports); real work is guarded by the
     # classifier so docs-only / `ci:skip-e2e` short-circuit to SUCCESS. Heavy;
     # additive until observed green.
+    # FAIL-CLOSED: if `classify` FAILED, this job still runs and RUN defaults to
+    # true — a skip requires classify to have SUCCEEDED with an explicit
+    # `run_runtime=false`. `skipped` classify (applicability gate) keeps the old
+    # skip behavior.
+    if: ${{ !cancelled() && needs.classify.result != 'skipped' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
-      RUN: ${{ needs.classify.outputs.run_runtime }}
+      RUN: ${{ needs.classify.result != 'success' || needs.classify.outputs.run_runtime == 'true' }}
+      SKIP_REASON: ${{ needs.classify.outputs.reason }}
     steps:
       - name: Skipped by policy
         if: env.RUN != 'true'
+        # REASON contains raw changed-file names — never interpolate it into
+        # shell source; pass via env and print with printf.
         run: |
-          echo "::notice::scaffold-runtime skipped by policy. ${{ needs.classify.outputs.reason }}"
+          printf '::notice::scaffold-runtime skipped by policy. %s\n' "$SKIP_REASON"
 
       - name: Checkout
         if: env.RUN == 'true'
