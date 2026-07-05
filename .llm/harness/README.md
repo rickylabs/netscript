@@ -26,6 +26,10 @@ how an agent uses it during a run.
 6. Read `gates/archetype-gate-matrix.md`.
 7. Use the matching artifact template from `templates/`.
 
+For planning-only work whose deliverable is a GitHub board (epics + milestones + issues) rather
+than code — a major feature, cross-cutting refactor, replan, or big triage — use the **seed run**
+shape: `workflow/seed-run.md`.
+
 ## Folder Contract
 
 | Folder        | Concern                                                               |
@@ -59,6 +63,7 @@ how an agent uses it during a run.
 
 Run artifacts live under `.llm/runs/<run-id>/` and use the templates in `templates/`:
 
+- `supervisor.md` (supervisor identity + lane table — written at run start)
 - `research.md`
 - `plan.md`
 - `implement.md` (when the run phase needs it)
