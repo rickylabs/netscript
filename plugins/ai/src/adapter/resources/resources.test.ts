@@ -1,6 +1,6 @@
 import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { artifactText, collectInstallArtifacts, substituteTokens } from '@netscript/plugin/adapter';
-import { aiAdapterPlugin } from '../plugin.ts';
+import { aiAdapterPlugin, aiStarterResources } from '../plugin.ts';
 import { agentScaffolder, threadStoreScaffolder, toolScaffolder } from './mod.ts';
 import { DEFAULT_TOOL_INPUT } from './tool/tool.ts';
 import { toolStub } from './tool/tool.stub.ts';
@@ -37,6 +37,32 @@ Deno.test('ai install emits only userland glue under ai/', () => {
       );
     }
   }
+});
+
+Deno.test('ai starter resources cover the six current emitters', () => {
+  assertEquals(aiStarterResources.map((resource) => resource.scaffolder.name), [
+    'models',
+    'barrel',
+    'tool',
+    'agent',
+    'stream-proxy',
+    'chat-route',
+  ]);
+});
+
+Deno.test('ai scaffold emitters have focused golden content', () => {
+  const artifacts = collectInstallArtifacts(aiAdapterPlugin);
+  const byPath = new Map(artifacts.map((artifact) => [artifact.path, artifactText(artifact)]));
+
+  assertStringIncludes(byPath.get('ai/models.ts') ?? '', 'DEFAULT_CHAT_MODEL');
+  assertStringIncludes(byPath.get('ai/ai.ts') ?? '', 'createAiRuntime');
+  assertStringIncludes(byPath.get('ai/ai.ts') ?? '', 'createToolRegistry([echoTool])');
+  assertStringIncludes(byPath.get('ai/tools/echo.ts') ?? '', "defineAiTool('echo')");
+  assertStringIncludes(byPath.get('ai/agents/assistant.ts') ?? '', 'createAgentLoop');
+  assertStringIncludes(byPath.get('ai/agents/assistant.ts') ?? '', 'modelProvider');
+  assertStringIncludes(byPath.get('ai/routes/chat-stream.ts') ?? '', 'aiContractV1');
+  assertStringIncludes(byPath.get('ai/routes/chat-stream.ts') ?? '', 'createAiRouter');
+  assertStringIncludes(byPath.get('ai/routes/chat.tsx') ?? '', 'createNetScriptChatConnection');
 });
 
 Deno.test('ai default topology is in-process (no gateway config emitted)', () => {

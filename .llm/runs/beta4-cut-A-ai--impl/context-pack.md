@@ -13,6 +13,8 @@ the F-ai design source.
   `PASS`.
 - Slice 2 added `createAiRouter` in `packages/plugin-ai-core`, a contract soundness test, and
   generated AI stream-route output that imports `aiContractV1` and binds `createAiRouter`.
+- Slice 3 added `plugins/ai/verify-plugin.ts`, doctor tests for `ANTHROPIC_API_KEY`, six-emitter
+  golden coverage, and `.llm/runs/beta4-cut-A-ai--impl/parity-review.md`.
 
 ## Decisions
 

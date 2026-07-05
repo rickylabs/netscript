@@ -6,3 +6,4 @@ This file is maintained because the owner prompt explicitly requires it for this
 | Slice | Commit | Evidence |
 | --- | --- | --- |
 | 1 | `8bb0cd85` | PLAN-EVAL cycle 2 `PASS`; harness artifacts created. |
+| 2 | `bbd60980` | `createAiRouter` binder, AI contract soundness test, generated stream route imports `aiContractV1`; targeted contract/resource tests and scoped check passed. |
