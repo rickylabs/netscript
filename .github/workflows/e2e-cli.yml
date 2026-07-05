@@ -24,10 +24,26 @@ name: e2e-cli
 # Triggers: every PR to main, PLUS any PR carrying the `e2e-cli-gate` label (so the
 # durable-store / CLI-touching slices into the feat/framework-prime-time umbrella
 # can opt in before they reach main), PLUS manual dispatch.
+#
+# Skip policy (see `.github/scripts/ci-classify-changes.ts`): the `classify` job
+# derives `run_static` / `run_runtime` from the PR diff and labels. Both expensive
+# jobs still START and report SUCCESS, but short-circuit to a "skipped-by-policy"
+# step when their work is not needed:
+#
+#   - docs-only diff (only `**/*.md(x)`, `docs/`, `.llm/`, `.agents/`, `.claude/`,
+#     and never `packages/`/`plugins/`/`apps/`/`deno.json*`/`deno.lock`/
+#     `.github/workflows/`) -> skip both.
+#   - `ci:skip-scaffold` -> skip scaffold-static; `ci:skip-e2e` -> skip
+#     scaffold-runtime; `ci:full` -> force both regardless.
+#
+# The jobs run + report SUCCESS rather than using `paths-ignore`/job-level `if`,
+# so they never strand a required status check if promoted to one later. The
+# cheap required trio (quality / check-test / deps-report) lives in ci.yml and is
+# NOT touched by this policy. Release gates (publish, e2e-cli-prod*) have no skip.
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, labeled]
+    types: [opened, synchronize, reopened, labeled, unlabeled]
   workflow_dispatch:
 
 permissions:
@@ -38,60 +54,131 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  scaffold-static:
-    name: scaffold-static (deno-only)
-    # Run on every PR to main, on any PR labeled `e2e-cli-gate`, or manual dispatch.
+  classify:
+    name: classify changes
+    # Applicability gate (unchanged): only PRs to main, `e2e-cli-gate`-labeled
+    # PRs, or manual dispatch exercise this workflow at all.
     if: >-
       github.event_name == 'workflow_dispatch' ||
       github.event.pull_request.base.ref == 'main' ||
       contains(github.event.pull_request.labels.*.name, 'e2e-cli-gate')
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 10
+    outputs:
+      run_static: ${{ steps.decide.outputs.run_static }}
+      run_runtime: ${{ steps.decide.outputs.run_runtime }}
+      docs_only: ${{ steps.decide.outputs.docs_only }}
+      reason: ${{ steps.decide.outputs.reason }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: "2.9.0"
+
+      - name: Self-check the classifier
+        run: >-
+          deno test --allow-read --allow-write --allow-env
+          .github/scripts/ci-classify-changes.test.ts
+
+      - name: Compute changed files (merge-base diff)
+        id: diff
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          echo "changed<<__EOF__" >> "$GITHUB_OUTPUT"
+          git diff --name-only "$BASE_SHA...$HEAD_SHA" >> "$GITHUB_OUTPUT"
+          echo "__EOF__" >> "$GITHUB_OUTPUT"
+
+      - name: Decide run/skip
+        id: decide
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          CHANGED_FILES: ${{ steps.diff.outputs.changed }}
+          PR_LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+        run: deno run --allow-read --allow-write --allow-env .github/scripts/ci-classify-changes.ts
+
+  scaffold-static:
+    name: scaffold-static (deno-only)
+    needs: classify
+    # Job always starts (so its status reports); real work is guarded by the
+    # classifier so docs-only / `ci:skip-scaffold` short-circuit to SUCCESS.
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      RUN: ${{ needs.classify.outputs.run_static }}
+    steps:
+      - name: Skipped by policy
+        if: env.RUN != 'true'
+        run: |
+          echo "::notice::scaffold-static skipped by policy. ${{ needs.classify.outputs.reason }}"
+
+      - name: Checkout
+        if: env.RUN == 'true'
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        if: env.RUN == 'true'
         uses: denoland/setup-deno@v2
         with:
           deno-version: "2.9.0"
 
       - name: Install workspace dependencies
+        if: env.RUN == 'true'
         run: deno install
 
       - name: scaffold.service (init + generated discovery + typecheck)
+        if: env.RUN == 'true'
         run: deno task e2e:cli run scaffold.service --format pretty
 
       - name: scaffold.contracts (init + contract discovery + typecheck)
+        if: env.RUN == 'true'
         run: deno task e2e:cli run scaffold.contracts --format pretty
 
       - name: scaffold.plugins (official plugins + registry gen + plugin doctor)
+        if: env.RUN == 'true'
         run: deno task e2e:cli run scaffold.plugins --format pretty
 
   scaffold-runtime:
     name: scaffold-runtime (aspire + docker + postgres)
-    # Same gate condition as scaffold-static. Heavy; additive until observed green.
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      github.event.pull_request.base.ref == 'main' ||
-      contains(github.event.pull_request.labels.*.name, 'e2e-cli-gate')
+    needs: classify
+    # Job always starts (so its status reports); real work is guarded by the
+    # classifier so docs-only / `ci:skip-e2e` short-circuit to SUCCESS. Heavy;
+    # additive until observed green.
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    env:
+      RUN: ${{ needs.classify.outputs.run_runtime }}
     steps:
+      - name: Skipped by policy
+        if: env.RUN != 'true'
+        run: |
+          echo "::notice::scaffold-runtime skipped by policy. ${{ needs.classify.outputs.reason }}"
+
       - name: Checkout
+        if: env.RUN == 'true'
         uses: actions/checkout@v4
 
       - name: Setup Deno
+        if: env.RUN == 'true'
         uses: denoland/setup-deno@v2
         with:
           deno-version: "2.9.0"
 
       - name: Setup .NET
+        if: env.RUN == 'true'
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "10.0.x"
 
       - name: Install Aspire CLI
+        if: env.RUN == 'true'
         env:
           ASPIRE_CLI_VERSION: "13.4.6"
         run: |
@@ -99,6 +186,7 @@ jobs:
           echo "$HOME/.aspire/bin" >> "$GITHUB_PATH"
 
       - name: Aspire CLI preflight
+        if: env.RUN == 'true'
         run: |
           aspire_version="$(aspire --version)"
           echo "$aspire_version"
@@ -108,13 +196,15 @@ jobs:
           esac
 
       - name: Install workspace dependencies
+        if: env.RUN == 'true'
         run: deno install
 
       - name: Full scaffold runtime E2E (one pass, with cleanup)
+        if: env.RUN == 'true'
         run: deno task e2e:cli run scaffold.runtime --cleanup --format pretty
 
       - name: Upload E2E report artifact
-        if: always()
+        if: always() && env.RUN == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: e2e-cli-scaffold-runtime-report
