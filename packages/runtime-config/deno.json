@@ -1,6 +1,6 @@
 {
   "name": "@netscript/runtime-config",
-  "version": "0.0.1-beta.2",
+  "version": "0.0.1-beta.3",
   "license": "MIT",
   "description": "Hot-reloadable NetScript runtime override types, loaders, watchers, and diagnostics.",
   "exports": {
