@@ -12,10 +12,12 @@
  */
 
 import {
+  appendVerdictContractEpilogue,
   buildMergeBody,
   buildOpenHandsComment,
   buildPullRequestBody,
   evaluateGitSafety,
+  extractVerdict,
   type GitInfo,
   parseEvalVerdict,
   parseOpenHandsStatusComment,
@@ -25,6 +27,8 @@ import {
   selectLatestOpenHandsComment,
   sq,
   validateHandoffContract,
+  VERDICT_CONTRACT_MARKER,
+  type VerdictSourceComment,
   winToWsl,
   wslHome,
   wslUser,
@@ -365,4 +369,131 @@ Deno.test('selectLatestOpenHandsComment picks the last tagged comment', () => {
 });
 Deno.test('selectLatestOpenHandsComment returns null when none tagged', () => {
   assertEquals(selectLatestOpenHandsComment([{ body: 'a' }, { body: 'b' }]), null);
+});
+
+// --- appendVerdictContractEpilogue -----------------------------------------
+Deno.test('appendVerdictContractEpilogue appends the contract once (idempotent)', () => {
+  const once = appendVerdictContractEpilogue('use harness\n\n## SKILL\n- x\n\nbody\n');
+  assert(once.includes(VERDICT_CONTRACT_MARKER), 'carries the contract marker');
+  assert(once.startsWith('use harness'), 'prompt body preserved');
+  const twice = appendVerdictContractEpilogue(once);
+  assertEquals(twice, once, 'second append is a no-op');
+});
+Deno.test('appendVerdictContractEpilogue instructs early verdict + machine-readable line', () => {
+  const p = appendVerdictContractEpilogue('use harness\n## SKILL\n- x');
+  assert(p.includes('IMMEDIATELY after you form the verdict'), 'verdict-first instruction');
+  assert(p.includes('**[PHASE: <phase>] [VERDICT: <verdict>]**'), 'formal header form');
+  assert(p.includes('OPENHANDS_VERDICT: <verdict>'), 'machine-readable line form');
+  assert(p.includes('summary file'), 'summary file also carries the line');
+});
+Deno.test('the contract epilogue itself can never satisfy the verdict extractor', () => {
+  const comment = buildOpenHandsComment({
+    model: 'x/y',
+    outputMode: 'pr-comment',
+    prompt: appendVerdictContractEpilogue('use harness\n## SKILL\n- x'),
+  });
+  const v = extractVerdict([
+    { body: comment, url: 'https://x/trigger', createdAt: '2026-07-05T00:00:00Z' },
+  ]);
+  assertEquals(v, null, 'dispatched trigger comment must not read as a verdict');
+});
+
+// --- extractVerdict (layered) ----------------------------------------------
+function c(
+  body: string,
+  createdAt: string,
+  url = `https://x/c-${createdAt}`,
+): VerdictSourceComment {
+  return { body, url, createdAt };
+}
+const OH = '<!-- openhands-agent-summary -->';
+// A real-shaped trigger comment: quotes both template forms.
+const triggerComment = c(
+  '@openhands-agent model=openrouter/qwen/qwen3.7-max output=pr-comment iterations=800\n\n' +
+    'use harness\n## SKILL\n- jsr-audit\n\nPost `**[PHASE: IMPL-EVAL] ' +
+    '[VERDICT: <PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT>]**` and end with ' +
+    'OPENHANDS_VERDICT: <verdict>.',
+  '2026-07-05T00:00:00Z',
+  'https://x/trigger',
+);
+
+Deno.test('extractVerdict reads the machine-readable OPENHANDS_VERDICT line (exact)', () => {
+  const v = extractVerdict([
+    triggerComment,
+    c('Gates green.\n\nOPENHANDS_VERDICT: PASS\n', '2026-07-05T01:00:00Z', 'https://x/m'),
+  ]);
+  assertEquals(v?.verdict, 'PASS');
+  assertEquals(v?.confidence, 'exact');
+  assertEquals(v?.url, 'https://x/m');
+});
+Deno.test('extractVerdict reads the formal PHASE/VERDICT header (exact)', () => {
+  const v = extractVerdict([
+    triggerComment,
+    c('**[PHASE: IMPL-EVAL] [VERDICT: FAIL_FIX]**\n\nOne cast remains.', '2026-07-05T01:00:00Z'),
+  ]);
+  assertEquals(v?.verdict, 'FAIL_FIX');
+  assertEquals(v?.confidence, 'exact');
+});
+Deno.test('extractVerdict prefers an exact layer over a newer heuristic comment', () => {
+  const v = extractVerdict([
+    c('**[PHASE: PLAN-EVAL] [VERDICT: FAIL_PLAN]**', '2026-07-05T01:00:00Z', 'https://x/formal'),
+    c(`${OH}\n## OpenHands Agent — Completed\n\n**Verdict: PASS.**`, '2026-07-05T02:00:00Z'),
+  ]);
+  assertEquals(v?.verdict, 'FAIL_PLAN', 'formal header outranks a newer heuristic form');
+  assertEquals(v?.url, 'https://x/formal');
+});
+Deno.test('extractVerdict falls back to a ## Verdict section in a synthesized summary', () => {
+  const v = extractVerdict([
+    triggerComment,
+    c(
+      `${OH}\n## OpenHands Agent — Agent failed\n\n## Verdict\n**PASS**\n\ndetail`,
+      '2026-07-05T01:00:00Z',
+    ),
+  ]);
+  assertEquals(v?.verdict, 'PASS');
+  assertEquals(v?.confidence, 'heuristic');
+});
+Deno.test('extractVerdict falls back to an inline **Verdict: PASS.** phrase', () => {
+  const v = extractVerdict([
+    c(
+      `${OH}\n## OpenHands Agent — Completed\n\nchecks…\n\n**Verdict: PASS.** All gates green.`,
+      '2026-07-05T01:00:00Z',
+    ),
+  ]);
+  assertEquals(v?.verdict, 'PASS');
+  assertEquals(v?.confidence, 'heuristic');
+});
+Deno.test('extractVerdict finds a verdict token buried in a context dump', () => {
+  const v = extractVerdict([
+    c(
+      `${OH}\n## OpenHands Agent — Agent failed\n\n…iteration budget exhausted. The final verdict reached before exhaustion was FAIL_DEBT (two debt entries).`,
+      '2026-07-05T01:00:00Z',
+    ),
+  ]);
+  assertEquals(v?.verdict, 'FAIL_DEBT');
+  assertEquals(v?.confidence, 'heuristic');
+});
+Deno.test('extractVerdict never matches the trigger/template comment', () => {
+  assertEquals(extractVerdict([triggerComment]), null);
+});
+Deno.test('extractVerdict ignores plain PASS/FAIL prose away from a verdict context', () => {
+  const v = extractVerdict([
+    c(
+      `${OH}\n## OpenHands Agent — Completed\n\nAll 41 tests PASS on CI; one FAIL was retried.`,
+      '2026-07-05T01:00:00Z',
+    ),
+    c('Nice, tests PASS locally too.', '2026-07-05T02:00:00Z'),
+  ]);
+  assertEquals(v, null, 'a bare PASS/FAIL word is not a verdict');
+});
+Deno.test('extractVerdict takes the newest comment within the same layer', () => {
+  const v = extractVerdict([
+    c('OPENHANDS_VERDICT: FAIL_FIX', '2026-07-05T01:00:00Z'),
+    c('re-eval after fix\n\nOPENHANDS_VERDICT: PASS', '2026-07-05T03:00:00Z', 'https://x/new'),
+  ]);
+  assertEquals(v?.verdict, 'PASS');
+  assertEquals(v?.url, 'https://x/new');
+});
+Deno.test('extractVerdict returns null when there are no comments', () => {
+  assertEquals(extractVerdict([]), null);
 });
