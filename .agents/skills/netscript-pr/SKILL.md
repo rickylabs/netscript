@@ -22,6 +22,8 @@ serve stale reads) — see the **netscript-tools** skill.
 `<type>/<slug>` — lowercase, kebab, no trailing dates. Types match the commit/PR taxonomy:
 
 - `feat/`, `fix/`, `chore/`, `docs/`, `refactor/`, `perf/`, `test/`.
+- `plan/` — harness **seed runs** only (planning-only runs whose draft PR carries a board plan,
+  never shippable code); see `.llm/harness/workflow/seed-run.md`.
 - Sub-branches of an umbrella append a scope: `chore/deno-2.8-aspire-13.4-upgrade` (umbrella) →
   `chore/deno-2.8-aspire-13.4-upgrade-fresh` (sub). Keep the umbrella prefix so the relationship is
   visible in `git branch` and the PR list.

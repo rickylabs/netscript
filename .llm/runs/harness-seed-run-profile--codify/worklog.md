@@ -5,7 +5,7 @@
 | Field | Value |
 | --- | --- |
 | Run ID | `harness-seed-run-profile--codify` |
-| Branch | `harness/seed-run-profile` (draft PR: TBD) |
+| Branch | `harness/seed-run-profile` (draft PR: [#471](https://github.com/rickylabs/netscript/pull/471)) |
 | Archetype | N/A — harness-surface docs |
 | Scope overlays | `SCOPE-docs.md` |
 | Supervisor | see `supervisor.md` (Fable 5, session `1bd79985…`) |
@@ -36,4 +36,6 @@
 | 2026-07-05 | S1 | Run dir scaffolded; `supervisor.md` written first (dogfooding the gate the exemplar missed). |
 | 2026-07-05 | S2 | Authored `workflow/seed-run.md` (stage contracts A–I, hard invariants, ratification boundary, scale-to-fit, landmine pointers, dogfood acceptance) + `templates/supervisor.md` (fixes the missing-template gap behind drift #2). |
 | 2026-07-05 | S3 | Wiring: `workflow/activation.md` (bootstrap step 10 + `supervisor.md` added to Mandatory Artifacts), harness `README.md` (Start Here pointer + artifact list), `.agents/skills/netscript-harness/SKILL.md` (Key Concepts row, decision-tree branch, Reference Files row); `.claude/skills/` mirror regenerated via `sync-claude-skills.ts` (SYNCED, 17 skills). |
+| 2026-07-05 | S4 | Draft PR #471 opened (type:docs, area:tooling, p2, status:impl, Backlog/Triage) with slice-trail comment. WSL Codex adversarial launched via `launch-codex-slice.ts` (fresh clone `/home/codex/repos/netscript-seed-profile`, HEAD 7c5fd0d8, upstream unset for push safety, brief 3481B verified post-9p-lag). Verdict: 0 blockers, 6 major, 2 minor, mirror byte-identical → `adversarial-findings.md`. |
+| 2026-07-05 | S5 | All 8 findings ACCEPTED and fixed (see `adversarial-triage.md`): PR-vs-board mutation boundary, `plan/` registered in netscript-pr taxonomy, Tier-C workflow.js rule surfaced in Stage B, Stage F de-hardcoded to distinct-model invariants, phase-registry scoped, drift #3 precision on the eval exception, stale artifacts refreshed, FILING-LOG.md spelling. |
 | 2026-07-05 | S3 gates | `validate-claude-surface.ts` → all 5 checks ok. Internal references in `seed-run.md` verified to resolve (lane-policy, resource-aggregation, tooling, templates/supervisor.md, labels.yml). fmt note: `.llm/harness/**/*.md` is OUTSIDE the repo fmt surface (`deno.json` fmt.include = packages/plugins ts,tsx); forcing the wrapper over it flags 29 pre-existing files incl. untouched ones — recorded as non-verdict per AGENTS.md, no mutating fmt run. |

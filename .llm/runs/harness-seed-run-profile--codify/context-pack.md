@@ -11,9 +11,11 @@
   `README.md`, `netscript-harness` SKILL (+ regenerated `.claude/skills/` mirror).
 - Run artifacts: `supervisor.md`, `research.md`, `plan.md` (LD-1..LD-8), `worklog.md`, `drift.md`.
 
-**Next**: S4 — commit slices + draft PR, WSL Codex adversarial pass, OpenHands separate-session
-eval, transcribe verdict, surface to owner for ratification. The run does NOT self-certify or
-merge.
+**Next**: OpenHands separate-session eval on draft PR #471 → transcribe verdict to `evaluate.md`
+→ surface to owner for ratification (incl. drift #3 PLAN-EVAL exception). The run does NOT
+self-certify or merge. DONE already: S1–S3 committed+pushed, PR #471 open with slice trail, Codex
+adversarial complete (0 blockers / 6 major / 2 minor — all accepted+fixed in S5, see
+`adversarial-triage.md`).
 
 **Key decisions**: name = "seed run" (`--seed` suffix); home = `workflow/` (run shape, not
 archetype); stage contracts over frozen template (n=1); lane bindings by reference to

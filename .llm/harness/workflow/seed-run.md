@@ -27,14 +27,18 @@ seed; if the deliverable is *code*, run-loop.
 
 ## Run layout
 
-- **Branch** `plan/<subject>`, worktree under `.llm/tmp/`, **draft PR** opened at stage A — the
-  commit trail. The PR stays draft for the whole run; a seed run never merges itself.
+- **Branch** `plan/<subject>` (the seed-run branch type in the `netscript-pr` taxonomy), worktree
+  under `.llm/tmp/`, **draft PR** opened at stage A — the commit trail. The PR stays draft for the
+  whole run; a seed run never merges itself.
 - **Run dir** `.llm/runs/plan-<subject>--seed/` with the standard mandatory artifacts
   (`supervisor.md` **first**, then `research.md`, `plan.md`, `worklog.md`, `context-pack.md`,
-  `drift.md`, `phase-registry.md`) plus the seed-specific artifact classes below. Discovery corpus
-  layout (`research/`, `matrix/`, `analysis/`, `context/` per topic in the exemplar) is
-  free-form — what is fixed is each stage's contract, not its folder names.
-- **Planning-only**: no framework code, no GitHub issue/label/milestone mutation before stage H.
+  `drift.md`; plus `phase-registry.md` only when the run spans multiple phase groups —
+  `activation.md` step 9) plus the seed-specific artifact classes below. Discovery corpus layout
+  (`research/`, `matrix/`, `analysis/`, `context/` per topic in the exemplar) is free-form — what
+  is fixed is each stage's contract, not its folder names.
+- **Planning-only, two mutation surfaces**: no framework code, ever. On GitHub, the run's **own
+  draft PR** (body, comments, PR labels/milestone) is the commit trail and is always writable;
+  the **board** — issues, epics, milestones, repo label set — is untouchable before stage H.
 
 ## Stage contracts
 
@@ -48,9 +52,9 @@ model bindings live only in [`lane-policy.md`](./lane-policy.md).
 | **C — Synthesis** | supervisor reads the **full** corpus; synthesis doc naming the deep-dive topics + resolutions of supervisor-delegated decisions → committed synthesis | A |
 | **D — Deep-dive packs** | one focused sub-agent per topic; each returns a design pack: `proposal` + `epic-and-issues` (draft text only) + `agent-briefs` + `open-questions` → committed `design/<topic>/` | B |
 | **E — Plan lock** | integrated `plan.md`: locked decisions, **owner-fork sweep** (every owner decision numbered, none silently taken), cross-epic DAG, milestone train, risk register, gate matrix → PR body refreshed + stage comment | A |
-| **F — Adversarial** | unoriented review of the locked plan on a native worktree; severity-tagged findings → findings file + per-finding triage disposition + fix commits | D, then A |
+| **F — Adversarial** | unoriented review of the locked plan on a native worktree; severity-tagged findings → findings file + per-finding triage disposition + fix commits | distinct-model reviewer (see Stage F), then A |
 | **G — PLAN-EVAL** | separate-session evaluator verdict of record → `plan-eval.md` = `PASS`. **Hard stop**: no stage H before PASS | E |
-| **H — Ratify + file** | owner decision brief (the numbered forks) → owner picks → **one-shot filing** from a manifest → `FILING-LOG` + supersession map | owner, then A/B |
+| **H — Ratify + file** | owner decision brief (the numbered forks) → owner picks → **one-shot filing** from a manifest → `FILING-LOG.md` + supersession map | owner, then A/B |
 | **I — Handoff** | implementation lanes launched from **GitHub + the design packs**, not this run's chat history; per-epic briefs carry `use harness` + a `## SKILL` chapter | A |
 
 ### Stage B — evidence-citation gate
@@ -62,6 +66,11 @@ finding; the evaluator at G is entitled to fail the plan on uncited load-bearing
 outward-looking leg (market/competitor teardown) is what distinguishes a seed run from
 navel-gazing — do not skip it, and hold it to the same citation bar.
 
+Stage-B workflows obey the Tier-C hard rule in `lane-policy.md`: the generated `workflow.js` is
+copied to `<run-dir>/workflows/<slice>-workflow.js` and **committed before the workflow
+executes** — an uncommitted workflow does not run, and a corpus produced by one does not count as
+Stage-B proof.
+
 ### Stage D — packs are drafts
 
 `epic-and-issues.md` files are **draft text only — no GitHub mutations**, and say so in their H1.
@@ -69,11 +78,21 @@ Issue drafts follow `netscript-pr` (colon taxonomy, milestone mapping, `Part of 
 bodies — **never a closing keyword in an issue body or on an epic**). Sub-agents RETURN content;
 the supervisor commits (workflow sub-agents cannot redirect writes to another worktree).
 
+### Stage F — the adversarial lane
+
+What is fixed about Stage F: the reviewer is **unoriented** (gets the artifacts, not the
+supervisor's framing), runs in a **separate session on a model distinct from every lane that
+authored the plan**, and produces **findings only** — the supervisor triages and commits fixes.
+Which tier supplies the reviewer is per-run configuration recorded in `supervisor.md` per
+`lane-policy.md` (the exemplar used Tier D; a plan is not a source-edit slice, so this is a
+diversity choice, not a source-lane requirement).
+
 ### Stage H — the ratification boundary and filing discipline
 
-The boundary between G and H is the profile's crown jewel: **zero GitHub mutation until the owner
-ratifies the decision brief in-turn** (a stale or relayed approval does not count; approval does
-not survive compaction — re-surface, never route around).
+The boundary between G and H is the profile's crown jewel: **zero board mutation — issues, epics,
+milestones, repo labels — until the owner ratifies the decision brief in-turn** (a stale or
+relayed approval does not count; approval does not survive compaction — re-surface, never route
+around). The run's own draft PR stays writable throughout; the board does not.
 
 Filing then happens **once, from a committed manifest**, in dependency order:
 
@@ -96,7 +115,8 @@ planning record stays honest; the live board stays authoritative.
 - `supervisor.md` written at stage A from `templates/supervisor.md`. A run dir without it is not
   activated (lane-policy § Supervisor identity) — enforced here because the exemplar itself
   skipped it and its identity had to be recovered by transcript search.
-- Drafts-only before H; one-shot manifest filing; GitHub authority after H.
+- Drafts-only before H (board untouchable; the run's own draft PR writable); one-shot manifest
+  filing; GitHub authority after H.
 - Evidence citation at B (and anywhere a claim is load-bearing).
 - G is a hard stop with a verdict of record. If the evaluator's commit-back push fails, transcribe
   the verdict from the immutable PR comment — do not re-run a passed eval.
@@ -129,7 +149,8 @@ dogfood run passes, treat this doc as provisionally promoted.
 
 - [ ] Subject is board-shaped (epics + issues), not a single slice.
 - [ ] `supervisor.md` written at stage A; draft PR open; charter read back.
-- [ ] Stage-B corpus committed with citations; external/market leg present.
+- [ ] Stage-B corpus committed with citations; external/market leg present; every Tier-C
+      `workflow.js` committed under `<run-dir>/workflows/` before it ran.
 - [ ] Synthesis names deep-dive topics; delegated decisions resolved with evidence.
 - [ ] Design packs committed as drafts (no-mutation H1; `netscript-pr`-conformant issue drafts).
 - [ ] `plan.md` locked with a numbered owner-fork sweep; PR body current.
