@@ -68,6 +68,9 @@
 - name: "status:ready-merge"
   color: "0e8a16"
   description: "Green and cleared to merge"
+- name: "status:close-gate-override"
+  color: "b60205"
+  description: "Audited exception to the closing-keyword acceptance gate"
 
 # ── priority: ────────────────────────────────────────────────────────────────
 - name: "priority:p0"

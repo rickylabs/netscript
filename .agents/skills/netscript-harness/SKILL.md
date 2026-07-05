@@ -45,6 +45,7 @@ self-certifies). Everything else is a per-run lane assignment recorded in the ru
 | **Plan-Gate**     | Checklist (`gates/plan-gate.md`) that PLAN-EVAL enforces.                               |
 | **Archetype**     | Package/plugin shape profile from `archetypes/ARCHETYPE-*.md`.                          |
 | **Scope overlay** | `SCOPE-frontend.md`, `SCOPE-service.md`, `SCOPE-docs.md`.                               |
+| **Seed run**      | Planning-only run shape (`workflow/seed-run.md`): discovery → roadmap → owner-ratified one-shot GitHub filing. Use when the deliverable is a board (epics + issues), not code. |
 | **Run artifact**  | File in `.llm/runs/<run-id>/` that preserves state across sessions.                     |
 | **Debt**          | Recorded in `.llm/harness/debt/arch-debt.md`.                                           |
 
@@ -253,6 +254,10 @@ Record rescope evidence in `drift.md` with severity `significant` or `architectu
 User says "use harness"
   -> read workflow/activation.md and workflow/run-loop.md
   -> resuming? read context-pack.md
+  -> deliverable is a board (epics/issues/milestones from a major feature, refactor, replan,
+     or triage)? read workflow/seed-run.md — drafts only until owner ratification
+  -> deliverable is code for a single scoped change? stay on run-loop.md (a seed run here is
+     ceremony)
   -> package/plugin? select ARCHETYPE-* and load netscript-doctrine
   -> frontend/service/docs? apply SCOPE-* overlay
   -> two or more phase groups? read workflow/supervisor.md + escalation.md, keep phase-registry.md
@@ -275,6 +280,7 @@ User says "use harness"
 | `.llm/harness/workflow/run-loop.md`             | Every harness run           |
 | `.llm/harness/workflow/lane-policy.md`          | Lane assignment + model bindings |
 | `.llm/harness/workflow/supervisor.md`           | Multi-group supervisor runs |
+| `.llm/harness/workflow/seed-run.md`             | Planning-only board-seeding runs (discovery → roadmap → owner-ratified filing) |
 | `.llm/harness/gates/plan-gate.md`               | Plan-Gate checklist         |
 | `.llm/harness/evaluator/plan-protocol.md`       | PLAN-EVAL instructions      |
 | `.llm/harness/evaluator/protocol.md`            | IMPL-EVAL instructions      |
