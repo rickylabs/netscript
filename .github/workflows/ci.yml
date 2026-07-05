@@ -28,12 +28,37 @@ on:
 
 permissions:
   contents: read
+  issues: read
+  pull-requests: read
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  close-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: "2.9.0"
+
+      - name: Referenced issue acceptance gate
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >
+          deno run --allow-env --allow-net
+          .llm/tools/validation/check-close-gate.ts
+          --repo "${{ github.repository }}"
+          --pr "${{ github.event.pull_request.number }}"
+          --pretty
+
   check-test:
     runs-on: ubuntu-latest
     timeout-minutes: 30

@@ -103,6 +103,21 @@ The closing-keyword rule above wires the auto-close; this gate governs **when a 
 merge**. They are separate concerns: a keyword makes the merge *close* the issue, the close-gate
 makes sure the issue is *actually done* before that happens.
 
+The machine convention is intentionally narrow:
+
+- A **close-gated PR** is any PR whose body contains a GitHub closing keyword for an issue:
+  `Closes #N`, `Fixes #N`, or `Resolves #N` (including `closed`/`fixed`/`resolved` variants and full
+  GitHub issue URLs).
+- A **close-gated issue checkbox** is either:
+  - any markdown checkbox inside an issue section whose heading contains `acceptance`, `definition
+    of done`, `gate`, or `fitness gate`; or
+  - any markdown checkbox anywhere in the issue body whose checkbox text starts with `gate:`.
+- Ordinary planning, dependency, sub-issue, or rollout checklists outside those sections are **not**
+  close-gated. If a checklist is acceptance, put it under an acceptance/gate heading.
+- A checked acceptance/gate box must carry linked evidence in the issue, PR body, or PR phase comment
+  (command output, run URL, CI job, or reviewer/evaluator comment). The automation catches unchecked
+  boxes; the coordinator/evaluator verifies the evidence link quality before closing.
+
 A PR whose `status:` is `research`, `plan`, or `plan-eval` **MUST NOT be merged** — a plan-only
 artifact set can never satisfy an implementation Definition-of-Done. Merge requires
 `status:ready-merge`, and moving to `status:ready-merge` requires all three:
@@ -110,14 +125,27 @@ artifact set can never satisfy an implementation Definition-of-Done. Merge requi
 1. **IMPL-EVAL PASS evidence** — the `[PHASE: IMPL-EVAL] [VERDICT: PASS]` phase comment from the
    evaluator (a separate session).
 2. **DoD checklist complete** — every `- [ ]` in the PR body's Definition-of-Done is checked.
-3. **Referenced-issue acceptance** — for **every** issue the PR references, its acceptance criteria
-   **and** every `gate:` checkbox are checked with linked evidence (command, run URL, or PR comment).
+3. **Referenced-issue acceptance** — for **every** issue closed by the PR body, every close-gated
+   issue checkbox is checked with linked evidence (command, run URL, CI job, or PR comment).
 
 The exemplar failure is **#260**, closed with its `gate:e2e` box unchecked — the false-done this gate
-exists to stop. Enforcement lives at three points today: this section, the evaluator protocol's
-IMPL-EVAL checklist line, and the PR-template close-gate checkbox. The future Phase-D label
-automation will block the `status:ready-merge` transition (and any `Closes #N` auto-close) while any
-referenced `- [ ]` remains unchecked; until it lands, honor this gate by hand.
+exists to stop.
+
+Enforcement lives at three points:
+
+1. **Coordinator/evaluator review** — before closing an issue by hand, or before merging a PR whose
+   body carries `Closes #N` / `Fixes #N` / `Resolves #N`, verify every close-gated issue checkbox is
+   checked and has linked evidence.
+2. **CI close-gate** — `.github/workflows/ci.yml` runs
+   `.llm/tools/validation/check-close-gate.ts` on pull requests. It fetches each issue closed by the
+   PR body and fails if any close-gated issue checkbox remains unchecked.
+3. **PR-template/evaluator checklist** — the PR close-gate checkbox and IMPL-EVAL pass both confirm
+   the same evidence before `status:ready-merge`.
+
+Legitimate exceptions require the explicit `status:close-gate-override` label. This label is an
+auditable escape hatch, not a normal lifecycle stage: the coordinator must leave a PR comment naming
+the unchecked checkbox, the reason it is safe to close anyway, and the follow-up issue if work
+remains. Do not use the override to hide missing implementation or missing evidence.
 
 ## Epic / sub-issue standard
 
@@ -194,7 +222,7 @@ a board column reflect reality.
 
 - `type:` — `umbrella`, `sub-pr`, `chore`, `feat`, `fix`, `docs`, `refactor`, `perf`, `test`
 - `status:` — `triage` (incoming issues), `research`, `plan`, `plan-eval`, `impl`, `impl-eval`,
-  `augment-review`, `ci-fail`, `ready-merge`
+  `augment-review`, `ci-fail`, `ready-merge`, `close-gate-override`
 - `area:` — `cli`, `fresh`, `fresh-ui`, `plugins`, `auth`, `deps`, `aspire`, `tooling`, `database`,
   `kv`, `sdk`, `service`, `config`, `telemetry`, `ai-core`, `plugin-ai`, `docs`
 - `priority:` — `p0` (release blocker), `p1`, `p2`, `p3`
@@ -230,6 +258,9 @@ names**. Enforcement exists because a practice audit found ~50% non-compliance: 
 shipped with **zero** labels or with `status:` frozen mid-lifecycle (merged still at `status:plan`).
 The close-gate keys off `status:ready-merge`, so a missing or frozen `status:` is a merge hazard, not
 a cosmetic lapse.
+
+`status:close-gate-override` is outside the normal lifecycle and must be used only for the audited
+exception path described in the close-gate section.
 
 > Phase D (the Action that enforces single-status, syncs label→Project column, and fires the right
 > workflow per status) is deferred to the repo-process-automation umbrella. Until it lands, apply

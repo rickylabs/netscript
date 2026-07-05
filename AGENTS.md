@@ -22,6 +22,7 @@ GitHub process. Two obligations are non-negotiable for any agent that opens issu
    Bare `#N` and `Refs #N` do **not** auto-close — that omission is what stranded 40+ merged PRs with
    stale-open issues. Partial work references `#N` without a keyword and states remaining scope; never
    put a closing keyword on an epic/umbrella.
+   Close-gate rules for verified acceptance before issue closure live in `.agents/skills/netscript-pr`.
 2. **Taxonomy + milestones.** Apply the namespaced colon labels (`type:`/`area:`/`priority:`/`wave:`/
    `epic:`/`gate:`/`status:`, exactly one `status:`) and assign a milestone (`0.0.1-beta.1`,
    `0.0.1-stable`, or `Backlog / Triage`, mapped from `wave:`). The full taxonomy, milestone mapping,
