@@ -31,6 +31,7 @@ import type { ScaffoldPlan, ScaffoldServicePlan } from './src/public/domain/scaf
 export { MemoryFileSystemAdapter };
 export type { ScaffoldResult } from './src/kernel/domain/core-types.ts';
 export type { DirEntry, FileInfo, WalkEntry } from './src/kernel/domain/core-types.ts';
+export type { CacheBackendChoice } from './src/kernel/domain/cache-backend.ts';
 export type { DbEngine, DbEngineChoice } from './src/kernel/domain/db-engine.ts';
 export type {
   EditorChoice,

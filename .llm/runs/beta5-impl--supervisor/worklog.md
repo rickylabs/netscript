@@ -71,6 +71,7 @@ slice commit.
 | 2026-07-06 | 2 | config | Re-exported deploy target types from root `mod.ts`; raw full-export doc-lint clean. |
 | 2026-07-06 | 2 | auth-better-auth | Stopped on Better Auth passthrough private-type leak; trivial re-export/element-type replacement failed, so deferral recorded in `notes.md`. |
 | 2026-07-06 | 2 | lock hygiene | Reverted transient `deno.lock` change from `deno info npm:better-auth --json` (`npm:better-auth@*` resolution). |
+| 2026-07-06 | 2 | cli | Re-exported `CacheBackendChoice` from `@netscript/cli/testing`; raw full-export doc-lint clean. |
 
 ## Decisions
 
@@ -103,6 +104,8 @@ slice commit.
 | Config check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/config --ext ts,tsx` | PASS | 34 files selected, 0 occurrences. |
 | Config lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/config --ext ts,tsx` | PASS | 34 files selected, 0 findings. |
 | Config fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/config --ext ts,tsx` | PASS | 34 files selected, 0 findings. |
+| CLI check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | PASS | 590 files selected, 0 occurrences. |
+| CLI lint/fmt | package-root wrapper / raw target attempts | NOT_RUN | Root config excludes `packages/cli`; wrapper returned exit 1 with zero findings. Final repo-prescribed lint/fmt gates will cover owned package/plugin roots per their configured excludes. |
 
 ### Fitness Gates
 
@@ -115,6 +118,7 @@ slice commit.
 | F-5/F-7 `@netscript/queue` | PASS | `deno doc --lint` over 13 export-map entrypoints: `Checked 13 files`. | Warnings from transitive npm Node typings did not produce doc-lint errors. |
 | F-5/F-7 `@netscript/config` | PASS | `deno doc --lint` over 4 export-map entrypoints: `Checked 4 files`. | Root re-export now exposes deploy target types referenced by `DeployConfig`. |
 | F-5/F-7 `@netscript/auth-better-auth` | DEFERRED | `deno doc --lint ./mod.ts` reports Better Auth private aliases in passthrough option fields. | Requires public API redesign; recorded in `notes.md` per brief. |
+| F-5/F-7 `@netscript/cli` | PASS | `deno doc --lint` over 3 export-map entrypoints: `Checked 3 files`. | `CacheBackendChoice` is now public on the testing subpath that exports `InitPromptAnswers`. |
 
 ### Runtime Gates
 
