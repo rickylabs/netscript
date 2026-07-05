@@ -4,4 +4,4 @@ Coordinator prompt requires this file after every commit.
 
 | Commit | Slice | Notes |
 | ------ | ----- | ----- |
-| pending | S1 built-in health job source URL + execution coverage | Gates passed; replace with commit SHA after commit. |
+| `e0392951` | S1 built-in health job source URL + execution coverage | Registers package `sourceUrl`, adds registration/dynamic-dispatch tests, strengthens scaffold runtime execution gate. |
