@@ -78,6 +78,7 @@ the presentation tests.
 | 2026-07-05 | 6 | Full E2E fix | First `scaffold.runtime` run failed at `scaffold.plugin.ai` because AI install used repo-root cwd with `--project-root .`; fixed gate cwd to generated project. |
 | 2026-07-05 | 7 | Manifest fix | Second `scaffold.runtime` run failed static AI plugin manifest validation; removed unsupported manifest flags, supplied required utility metadata, and included scaffold manifests in JSR publish files. |
 | 2026-07-05 | 8 | Manifest port fix | Third `scaffold.runtime` run failed generated config validation because AI metadata port was `0`; assigned positive port metadata while keeping AI service-less. |
+| 2026-07-05 | 9 | AI chat-route smoke fix | Fourth `scaffold.runtime` run reached `behavior.ai-chat-route` but failed because the smoke gate ran from repo root and resolved generated `zod` imports against the wrong import map. Fixed the gate cwd to the generated project root and removed the starter tool's undeclared `zod` import by using a local Standard Schema input. |
 
 ## Decisions
 
@@ -120,6 +121,8 @@ the presentation tests.
 | F-10 contract/resource tests | PASS | `deno test --unstable-kv packages/plugin-ai-core/tests/contracts/ai-contract-soundness_test.ts`; `deno test --unstable-kv plugins/ai/src/adapter/resources/resources.test.ts` | Contract soundness and generator resource assertions pass. |
 | Plugin verify/doctor | PASS | `deno run --allow-all plugins/ai/verify-plugin.ts`; `deno test --unstable-kv plugins/ai/tests/adapter/doctor_test.ts` | Verify script reports `ok: true`; doctor covers missing and configured Anthropic key. |
 | Slice 5 targeted tests | PASS | `deno test --unstable-kv packages/plugin-ai-core/tests/contracts/ai-contract-soundness_test.ts`; `deno test --unstable-kv plugins/ai/src/adapter/resources/resources.test.ts plugins/ai/tests/adapter/doctor_test.ts`; `deno test --unstable-kv --allow-write packages/cli/e2e/tests/presentation/suite-registry_test.ts packages/cli/e2e/tests/presentation/cli-options_test.ts packages/cli/e2e/tests/application/builders/runtime-gates_test.ts` | 1 + 11 + 19 tests passed. |
+| Slice 9 check/lint/fmt | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/ai --root packages/cli/e2e --ext ts,tsx`; `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root plugins/ai --root packages/cli/e2e --ext ts,tsx`; `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/ai --root packages/cli/e2e --ext ts,tsx --pretty` | 107 files selected; 0 check/lint/fmt findings. |
+| Slice 9 targeted tests | PASS | `deno test --unstable-kv plugins/ai/src/adapter/resources/resources.test.ts`; `deno test --unstable-kv --allow-write packages/cli/e2e/tests/presentation/suite-registry_test.ts packages/cli/e2e/tests/presentation/cli-options_test.ts packages/cli/e2e/tests/application/builders/runtime-gates_test.ts` | 9 AI resource tests and 19 CLI e2e registry/runtime tests passed. |
 
 ### Runtime Gates
 
@@ -129,13 +132,15 @@ the presentation tests.
 | scaffold.runtime run 1 | FAIL | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | Failed at `scaffold.plugin.ai` with exit 246: unsupported plugin kind `ai`; root cause was incorrect gate cwd/project-root pairing. |
 | scaffold.runtime run 2 | FAIL | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | Failed at `scaffold.plugin.ai` with exit 246: `scaffold.plugin.json` failed current installer schema validation. |
 | scaffold.runtime run 3 | FAIL | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | Failed at `scaffold.plugin.ai`: generated config rejected `NetScript.Plugins.ai.Port = 0`. |
+| scaffold.runtime run 4 | FAIL | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | Failed only at `behavior.ai-chat-route`: `deno eval` ran from repo root, so generated `ai/tools/echo.ts` could not resolve bare `zod`. Summary: `passed=46 failed=1`; Aspire start/wait/describe/stop all passed. |
+| scaffold.runtime run 5 | PASS | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | Full native WSL run green, including Aspire restore/start/wait/describe/stop and AI chat-route smoke. Summary: `passed=50 failed=0`. |
 | scaffold.runtime registry | PASS | `deno test --unstable-kv --allow-write packages/cli/e2e/tests/presentation/suite-registry_test.ts`; `deno test --unstable-kv packages/cli/e2e/tests/presentation/cli-options_test.ts`; `deno test --unstable-kv packages/cli/e2e/tests/application/builders/runtime-gates_test.ts` | AI plugin/gate is registered in runtime/plugin suite expectations. |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Generated app scaffold | NOT_RUN | pending | Covered by scaffold.runtime. |
+| Generated app scaffold | PASS | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | Generated workspace type-check and `behavior.ai-chat-route` import smoke passed in the full suite. |
 
 ## Handoff Notes
 

@@ -18,6 +18,9 @@ the F-ai design source.
 - Slice 4 added AI as a first-party CLI E2E plugin kind and a `behavior.ai-chat-route` smoke gate
   that imports the generated `ai/routes/chat-stream.ts` module and checks `handler`, `aiRouter`, and
   `aiRouteContract`.
+- Slice 9 fixed the final full-suite failure by running `behavior.ai-chat-route` from the generated
+  project root and by replacing the starter tool's generated `zod` import with a local Standard
+  Schema input. The full `scaffold.runtime` suite is green: `passed=50 failed=0`.
 
 ## Decisions
 
@@ -32,7 +35,8 @@ the F-ai design source.
 - Scoped check/lint/fmt wrappers over touched roots.
 - Full export-map doc lint for `plugin-ai-core` and `plugins/ai`.
 - `deno publish --dry-run --allow-dirty` for `plugins/ai` and root `deno task publish:dry-run`.
-- One full `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` run.
+- One full `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` run: PASS,
+  `Summary: passed=50 failed=0`.
 - PR URL, labels, milestone, body with `Closes #388` and `Refs #238, #260`.
 
 ## Resume Notes

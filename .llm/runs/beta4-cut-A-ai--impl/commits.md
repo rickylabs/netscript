@@ -12,3 +12,4 @@ This file is maintained because the owner prompt explicitly requires it for this
 | 5 | `41e6f02e` | Flipped `plugins/ai` to an explicit JSR publish map, preserved package publish dry-runs, and recorded install-variant drift. |
 | 6 | `310aa9b4` | Fixed the AI scaffold.runtime install gate to run from the generated project root after the first full e2e run exposed repo-root plugin-kind resolution. |
 | 7 | `02ab8cf2` | Fixed `plugins/ai/scaffold.plugin.json` to satisfy the current installer schema and included scaffold manifests in the publish files. |
+| 8 | `e4c4763f` | Assigned positive AI manifest port metadata so generated config validation accepts the service-less utility plugin entry. |

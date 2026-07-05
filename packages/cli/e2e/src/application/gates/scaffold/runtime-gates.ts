@@ -167,6 +167,7 @@ export function createRuntimeGates(
       'Import generated AI chat route',
       GATE_PHASE.BEHAVIOR,
       (context) => ['deno', 'eval', VALIDATE_AI_CHAT_ROUTE_SCRIPT, context.project.projectRoot],
+      (context) => context.project.projectRoot,
     ),
   ];
 }
