@@ -156,6 +156,7 @@ Deno.test('extractCompileTargets emits metadata-driven background processor targ
 
   const workersCombined = byName.get('workers-combined');
   const workersApi = byName.get('workers-api');
+  const sagasCombined = byName.get('sagas-combined');
   assert(
     workersCombined?.concurrencyEnvVar === 'WORKER_CONCURRENCY',
     'workers-combined should carry concurrency env var',
@@ -167,6 +168,18 @@ Deno.test('extractCompileTargets emits metadata-driven background processor targ
   assert(
     workersApi?.workdir === 'plugins/workers',
     'workers-api should resolve from the plugin service appsettings entry',
+  );
+  assert(
+    sagasCombined?.concurrencyEnvVar === 'SAGA_CONCURRENCY',
+    'sagas-combined should carry saga concurrency env var',
+  );
+  assert(
+    sagasCombined?.workdir === 'sagas',
+    'sagas-combined should resolve from the sagas background workdir',
+  );
+  assert(
+    sagasCombined?.entrypoint === 'sagas/bin/combined.ts',
+    'sagas-combined should resolve the sagas combined runtime entrypoint',
   );
 
   assert(
@@ -186,6 +199,18 @@ Deno.test('extractCompileTargets emits metadata-driven background processor targ
   assert(
     triggerProcessor?.defaultConcurrency === 10,
     'trigger target should preserve plugin default concurrency',
+  );
+  assert(
+    triggerProcessor?.concurrencyEnvVar === 'TRIGGER_CONCURRENCY',
+    'trigger target should carry trigger concurrency env var',
+  );
+  assert(
+    triggerProcessor?.workdir === 'plugins/triggers',
+    'trigger target should resolve from the triggers plugin workdir',
+  );
+  assert(
+    triggerProcessor?.entrypoint === 'plugins/triggers/src/runtime/trigger-processor.ts',
+    'trigger target should resolve the trigger processor entrypoint',
   );
 });
 
