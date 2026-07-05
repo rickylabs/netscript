@@ -1,7 +1,11 @@
 # @netscript/plugin-ai
 
 A **thin** NetScript plugin that scaffolds an app-owned, **in-process** AI chat, tool, and agent
-surface. The plugin ships no runtime AI logic: the engine lives in
+surface. Here _thin_ names a layering choice — the convention-bearing AI logic lives in the core
+packages, not a reduced quality bar. This plugin is held to the same reference-plugin parity
+checklist as `workers` and `sagas` (verify harness, scaffolder golden tests, `plugin doctor`
+coverage, a `scaffold.runtime` e2e case, and an in-repo-exercised contract). The plugin ships no
+runtime AI logic: the engine lives in
 [`@netscript/ai`](jsr:@netscript/ai) and the durable-chat runtime in
 [`@netscript/fresh/ai`](jsr:@netscript/fresh). This package is a manifest, a connector, and a set of
 scaffolders that emit typesafe userland glue importing those installed dependencies directly.

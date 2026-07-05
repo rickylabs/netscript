@@ -94,6 +94,62 @@ Law 1 is enforced by a composite of existing fitness functions plus a dedicated 
   duplicated across two plugins as a promotion candidate (see §_Consequences for new packages_).
   Acknowledged exceptions are recorded in `arch-debt.md`, per chapter 09.
 
+### The corollary — thinness is a layering choice, not a quality-bar exemption (R-PLUGIN-PARITY)
+
+> Thinness fixes _where_ a plugin's convention-bearing logic lives (in its `-core`), not _how much_
+> the plugin is tested, hardened, or finished. Every first-party plugin — flagship or not — clears
+> the same reference-plugin quality bar as `workers` and `sagas`. "Thin by design" is never a
+> license for a thin test surface, an unexercised contract, or a degraded developer experience.
+
+Law 1 moves capability into a core so the plugin stays small. That is a statement about layering and
+ownership, and it is easy to misread as a statement about effort — as if a thin plugin were also
+entitled to a thin quality budget. It is not. The line the framework draws is between _convention_
+(which belongs in `-core`) and _delivery_ (which belongs in the plugin); it is not a line between
+"fully finished" plugins and "acceptably incomplete" ones. A thin plugin is a small delivery shell,
+held to the full quality bar of every other delivery shell.
+
+Concretely, a plugin being thin does not lower the bar on:
+
+- **Tests and contract soundness.** The plugin's contract — authored in its `-core` under the base
+  seam (Law 2) — must be _exercised in-repo_ by a real implementation plus a contract-soundness test
+  in the mould of `packages/plugin-workers-core/tests/contracts/*`, carrying only the two accepted
+  casts (the contract `as unknown as` bridge and the top-router `any`). A published-but-unexercised
+  contract is a parity gap, not a thinness dividend.
+- **End-to-end coverage.** The plugin joins the `scaffold.runtime` e2e suite alongside
+  `workers` / `sagas` / `triggers` / `streams`: install → generate → type-check → Aspire start →
+  smoke the scaffolded surface, with cleanup. A capability that ships without an e2e gate has not
+  reached parity, regardless of how little code it carries.
+- **Developer experience.** The scaffolders emit typesafe userland glue (never string templates or
+  source copies), every emitter is pinned by a golden test, and `plugin doctor` covers the plugin's
+  required-config and health paths. Thin delivery still means a first-class DX.
+
+The reference-plugin quality checklist is therefore identical for every `plugins/*` package,
+independent of how thin the plugin is internally:
+
+- a `verify-plugin.ts` that runs green (the sibling parity harness, not a lone `manifest_test.ts`);
+- a golden test for every scaffold emitter;
+- `plugin doctor` coverage for the plugin's required-config and health paths;
+- a `scaffold.runtime` e2e case registered in `runtime-gates.ts`;
+- the plugin's contract implemented and exercised in-repo, with a contract-soundness test.
+
+A plugin that satisfies Law 1 and Law 2 but misses this checklist is _thin and unfinished_, not
+_thin and done_. Flagship status raises the ambition — a flagship plugin is a differentiator and
+should meet-or-exceed the reference plugins — but it does not raise the _floor_: the floor is this
+same checklist for all of them.
+
+> **#238 / #388 motivation.** This corollary is ratified because the AI capability (`plugins/ai`,
+> epic #238, parity slice #388) had been framed as "deliberately thin by design, so the missing
+> `verify-plugin.ts`, the absent `scaffold.runtime` case, and the unexercised `aiContractV1` are
+> acceptable gaps." Under this law they are not acceptable — they are parity debt on a flagship
+> plugin, tracked to closure by #388, and the `plugins/ai` README framing that implied otherwise is
+> corrected in step. The law names the standard, not the one plugin that motivated it: it binds
+> `plugins/ai` and every future first-party plugin equally.
+
+Process consequence: because this checklist _is_ the plugin's acceptance gate, **closing an issue
+whose acceptance criteria still carry unchecked gate items is a process violation** — the same
+issue-closure discipline the repo enforces through its close-gate guardrail (#387 / #467). A parity
+issue closes when its checklist is green, not when the code merely compiles thin.
+
 ## Law 2 — Base-Contract / Base-Service Seam (R-PLUGIN-SEAM)
 
 > A plugin's contract lives in its `-core` package and conforms to a base contract defined in
