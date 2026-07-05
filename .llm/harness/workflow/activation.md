@@ -20,6 +20,9 @@ Harness mode activates when the user says `use harness` or explicitly asks for a
 9. For a **supervisor / multi-group run** (two or more phase groups), also read
    `workflow/supervisor.md` and `workflow/escalation.md`, and instantiate `phase-registry.md` from
    `templates/`.
+10. For a **seed run** (planning-only: the deliverable is a GitHub board — epics, milestones,
+    issues, design packs — not code), read `workflow/seed-run.md` and follow its stage contracts
+    A–I. Seed runs are drafts-only until owner ratification.
 
 ## Run ID
 
@@ -45,6 +48,9 @@ For docs-only harness work, use `SCOPE-docs.md` and any archetype profiles the d
 
 Every run directory contains:
 
+- `supervisor.md` (supervisor identity + lane table, from `templates/supervisor.md`) — written at
+  run start; a run dir without it is not activated (`workflow/lane-policy.md` § Supervisor
+  identity)
 - `research.md`
 - `plan.md`
 - `worklog.md` (must include a `## Design` section before implementation)
