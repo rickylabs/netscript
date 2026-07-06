@@ -151,4 +151,7 @@
 .ns-btn--icon {
   padding: var(--ns-space-2);
   aspect-ratio: 1;
+  /* The visually-hidden label span is still a flex item; without this the
+     inherited gap pushes the glyph ~4px off center. */
+  gap: 0;
 }

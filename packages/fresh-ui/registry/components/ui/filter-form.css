@@ -7,8 +7,11 @@
 
 .ns-filter-form__actions {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: var(--ns-space-2);
+  /* Actions sit outside .ns-card__body, so they carry their own card inset;
+     without it shadowed buttons collide with the card border. */
+  padding: 0 var(--ns-space-6) var(--ns-space-5);
 }
 
 @media (min-width: 80rem) {

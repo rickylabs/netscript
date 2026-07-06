@@ -22,6 +22,31 @@ export interface PromptSubmitMeta {
   model: string;
 }
 
+const ICON_ATTACH = 'M12 5v14 M5 12h14';
+const ICON_SCREENSHOT =
+  'M4 9V6a2 2 0 0 1 2-2h3 M15 4h3a2 2 0 0 1 2 2v3 M20 15v3a2 2 0 0 1-2 2h-3 M9 20H6a2 2 0 0 1-2-2v-3';
+const ICON_MIC =
+  'M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3Z M5 11a7 7 0 0 0 14 0 M12 18v3';
+const ICON_SEND = 'M12 19V5 M5 12l7-7 7 7';
+
+function IconGlyph({ d }: { d: string }): VNode {
+  return (
+    <svg
+      viewBox='0 0 24 24'
+      width='16'
+      height='16'
+      fill='none'
+      stroke='currentColor'
+      stroke-width='2'
+      stroke-linecap='round'
+      stroke-linejoin='round'
+      aria-hidden='true'
+    >
+      <path d={d} />
+    </svg>
+  );
+}
+
 interface PromptInputProps extends Omit<JSX.HTMLAttributes<HTMLFormElement>, 'class' | 'onSubmit'> {
   placeholder?: string;
   onSubmit?: (text: string, meta: PromptSubmitMeta) => void;
@@ -78,30 +103,41 @@ export function PromptInput(
         placeholder={placeholder}
       />
       <div class='ns-prompt-input__bar'>
-        <button
-          type='button'
-          class='ns-pill'
-          aria-pressed={research ? 'true' : 'false'}
-          onClick={() => onResearchChange?.(!research)}
-        >
-          Deep research
-        </button>
-        <button
-          type='button'
-          class='ns-pill'
-          aria-pressed={grounding ? 'true' : 'false'}
-          onClick={() => onGroundingChange?.(!grounding)}
-        >
-          Grounding
-        </button>
-        {models && models.length
-          ? <ModelSelector value={model} models={models} onChange={onModelChange} align='left' />
-          : null}
-        <span class='ns-prompt-input__spacer' />
-        <button type='button' class='ns-iconbtn' aria-label='Attach file'>+</button>
-        <button type='button' class='ns-iconbtn' aria-label='Capture screenshot'>▢</button>
-        <button type='button' class='ns-iconbtn' aria-label='Voice input'>◎</button>
-        <button type='submit' class='ns-prompt-input__send' aria-label='Send'>↑</button>
+        <div class='ns-prompt-input__tools'>
+          <button type='button' class='ns-iconbtn' aria-label='Attach file'>
+            <IconGlyph d={ICON_ATTACH} />
+          </button>
+          <button
+            type='button'
+            class='ns-pill'
+            aria-pressed={research ? 'true' : 'false'}
+            onClick={() => onResearchChange?.(!research)}
+          >
+            Deep research
+          </button>
+          <button
+            type='button'
+            class='ns-pill'
+            aria-pressed={grounding ? 'true' : 'false'}
+            onClick={() => onGroundingChange?.(!grounding)}
+          >
+            Grounding
+          </button>
+          {models && models.length
+            ? <ModelSelector value={model} models={models} onChange={onModelChange} align='left' />
+            : null}
+        </div>
+        <div class='ns-prompt-input__actions'>
+          <button type='button' class='ns-iconbtn' aria-label='Capture screenshot'>
+            <IconGlyph d={ICON_SCREENSHOT} />
+          </button>
+          <button type='button' class='ns-iconbtn' aria-label='Voice input'>
+            <IconGlyph d={ICON_MIC} />
+          </button>
+          <button type='submit' class='ns-prompt-input__send' aria-label='Send'>
+            <IconGlyph d={ICON_SEND} />
+          </button>
+        </div>
       </div>
       {hint ? <div class='ns-prompt-input__hint'>{hint}</div> : null}
     </form>

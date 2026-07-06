@@ -266,7 +266,16 @@
 }
 
 .ns-page-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ns-space-5);
   padding-block: var(--ns-space-6) var(--ns-space-8);
+}
+
+/* The status/meta line reads as a footnote to the header: extra breathing
+   room above it so it never hugs the action buttons (and their shadows). */
+.ns-page-header > .ns-status-bar {
+  margin-block-start: var(--ns-space-1);
 }
 
 .ns-page-header h1 {
