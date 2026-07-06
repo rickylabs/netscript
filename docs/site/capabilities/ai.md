@@ -74,3 +74,8 @@ copy-registry chat UI. The [durable chat page](/ai/durable-chat/) walks the full
 The section pages orient; the generated reference enumerates every symbol. The shipping
 layers live under [`@netscript/fresh`](/reference/fresh/) (the `/ai` and `/ai/sandbox`
 subpaths) and [`@netscript/fresh-ui`](/reference/fresh-ui/) (the copy-registry manifest).
+The engine and the AI plugin have their own generated reference pages:
+
+{{ comp.xref({ key: "ref:ai" }) }}
+{{ comp.xref({ key: "ref:plugin-ai" }) }}
+{{ comp.xref({ key: "ref:plugin-ai-core" }) }}

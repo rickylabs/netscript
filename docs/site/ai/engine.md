@@ -230,6 +230,12 @@ of the beta.2 cut.
 
 {{ comp.featureGrid({ items: [
   {
+    title: "Look up — @netscript/ai",
+    body: "The generated reference for the engine package: runtime, contracts, ports, tools, agent loop, MCP transports, and provider adapters.",
+    href: "/reference/ai/",
+    icon: "≡"
+  },
+  {
     title: "Back — the AI overview",
     body: "The stack story, the two planes, and the plugin thinness laws the engine anchors.",
     href: "/ai/",
