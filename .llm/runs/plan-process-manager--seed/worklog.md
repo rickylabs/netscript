@@ -54,3 +54,82 @@ Seed run (planning-only). Stage contracts per `.llm/harness/workflow/seed-run.md
   surfaces, D5 config contract + scaffold + docs.
 - Scope guards recorded (§C7): not a prod restart-mechanics reimplementation, not a deploy system,
   not a monitoring product, not a prod LB, not a milestone-1 cluster orchestrator.
+
+## Stage D — Deep-dive design packs (2026-07-06)
+
+- Tier B: 5 Opus 4.8 general-purpose sub-agents launched in parallel, one per §C6 pack, each with a
+  binding brief (S1–S13/C7 verbatim, OF recommendations, read order, single-output-file constraint,
+  no git/gh/board mutation). All 5 returned (~520k sub-agent tokens). Packs landed in
+  `research/design/`: d1 (653 lines), d2 (599), d3 (534), d4 (483), d5 (604) — Σ2873 lines, every
+  non-obvious claim cited to file:line / corpus § / URL.
+- **Slice review gate (A1): Tier-A supervisor read all five packs in full.** Verdict: high quality,
+  evidence-backed, S/C7-compliant across the board. Highlights per pack:
+  - **D1** — lean `Deno.Command`-native runner (rejects dax shell-templating as re-importing pup#33)
+    while reusing `RuntimeCommandSpec`/argv builders/`buildEnvironment()` trace injection/
+    `ShutdownManager`; cron via standalone `@netscript/cron` `createScheduler()` (workers
+    `SchedulerPort` is a job-enqueue contract, not a cron evaluator — triggers-core precedent);
+    capability category verdict: reuse `background-processor` (CLI enum has no `infrastructure`
+    category) + `infrastructureRequires: ['kv']`; Process/Instance split reserved for OF-5; pure
+    `nextDelay()` restart-controller; OS-compile-vs-engine-enforce table. 11 slices.
+  - **D2** — contract modeled on the workers seam (spread `BASE_PLUGIN_CONTRACT_ROUTES`,
+    `satisfies`, no erasure cast); async `accepted`-style lifecycle actions; KV-watch =
+    server-internal optimization, client contract invariant (`eventIterator` streams);
+    opaque zero-dep bearer tokens (lean) over JWT; secrets via 0o600 secrets-convention;
+    pm2-OTEL re-check verdict SAFE with citations (only proprietary paid @pm2/io; Prometheus =
+    third-party) — differentiator claim may be asserted unhedged; control-plane OWN RSS as
+    anti-god-daemon NFR gauge; refines S5: do NOT mint `netscript.service.instance` (TC-5 reuses
+    OTEL semconv verbatim). 7 slices.
+  - **D3** — no new target key: pm = the wired implementation behind reserved
+    `linux-service`/`windows-service`; independently shippable OF-4 precursor slice (D3-S1) fully
+    specified with acceptance/tests; NEW finding: `resolveTargetConfig` registry-key vs
+    config-member mismatch → **drift entry 5**; renderer differentiator = typed opt-in knobs on the
+    existing `renderSystemdUnit` (Type=notify/WatchdogSec/HARDENING_BASELINE/DynamicUser/cgroups);
+    pure-Deno sd_notify with '@' abstract-namespace as explicit spike (D3-S3a); `OsServicePort`
+    stays 2-method + optional capability-descriptor sibling; `--user`+linger deferred; F-DEPLOY
+    promotion conditional on real core-package extraction; #345 re-scope draft for Stage H. 7 slices.
+  - **D4** — `netscript pm` = cliffy Archetype-6 router mirroring deploy-group; 19-verb parity map
+    with CP-down degraded execution per verb; dropped pm2-isms recorded (deploy/link/save/scale;
+    startup→enable-service); `pm dev` = plain foreground multiplexer (rich view = `pm monitor`);
+    console = ONE Fresh app, browser-served ships FIRST, desktop CEF-forced via #E6 soft dep,
+    embedded panel third; DDX-17 host-agnosticism verdict UNVERIFIED → spec'd CR-DDX-HOSTAGNOSTIC
+    change request to #400 (standalone path never blocks on it); CommandInvokePort = bidirectional
+    first-definer edge, default dashboard-defines-first; landscape tails verified (deno-desktop
+    comparison page CITE; dokku DROP; pmc/oxmgr CITE-with-caveat — Deno-native niche uncontested).
+    8 slices.
+  - **D5** — two-layer schema (portable ProcessGraphShape/ProcessSpecShape + deploy-facing schema
+    spreading `deployTargetBaseShape`); `instances` placeholder hard-errors >1 (no fake cluster);
+    four-tier `--no-aspire` resolver precedence with concrete field map (workers
+    `dependencies:["streams"]` proves the ordered graph resolves from shipped metadata);
+    `plugin add` emits typesafe `pm.config.ts` glue only, pre-seeded by running resolvers once
+    (#157 law); 7-page docs wave incl. cli-reference staleness fix same-wave; RFC epic skeleton +
+    normalized ISSUE-DRAFT template (netscript-pr conformant). 6 slices.
+- **Cross-pack reconciliation items for Stage E** (recorded here so plan lock owns them):
+  1. **Target-key conflict (REAL, must resolve):** D3 §D3.1.1 = no new key, implement behind
+     `linux-service`/`windows-service`; D5 §1.4 assumes a NEW `process-manager` key. D3 owns the
+     target-key taxonomy per §C5 routing → Stage E resolves per D3; D5-2 acceptance updates
+     accordingly (D5 itself flags this in its residual q2).
+  2. **State-vocabulary divergence:** D1's instance FSM
+     (idle/starting/running/crashed/backoff-wait/blocked/unhealthy/stopped) vs D2's `ProcessState`
+     (pending/starting/running/degraded/restarting/blocked/stopped/exited/crash-looped). One
+     vocabulary must be locked at Stage E; D1 owns the FSM, D2's wire enum maps onto it.
+  3. **Restart-policy default numbers:** S7 binding = pm2 floor (double-to-cap-**15000**,
+     reset-after-**30s** stable); D1 encodes that; D5's sketch says maxMs 30000 /
+     resetAfterStableMs 10000 / initialMs 1000. Stage E locks the S7 numbers; D5 schema defaults
+     follow D1.
+  4. **Route naming:** D4's verb map references a generic `invokeCommand{...}` route; D2's contract
+     has explicit `start`/`stop`/`restart`/… routes. Stage E unifies: D2's explicit routes are the
+     contract; the shared `CommandInvokePort` (D4 §5.3) is the port-level adapter both epics bind.
+  5. **Renderer-extension boundary:** D1-S11 (thin systemd/servy compile adapters in the core) vs
+     D3-S2 (renderer knob extension in `packages/cli` kernel). Complementary, but Stage E draws the
+     package boundary explicitly (who imports whom) alongside D3's residual q2
+     (core-package extraction scope).
+  6. **Telemetry refinement accepted:** D2's "no `netscript.service.instance` domain" refines S5's
+     parenthetical — accepted at review; carried as D2 residual q7 (confirm with telemetry T2 owner).
+  7. **Cross-epic items to carry into plan.md:** CR-DDX-HOSTAGNOSTIC (change request to #400);
+     CommandInvokePort bidirectional first-definer edge; #E6/#E1 soft deps; fresh-ui L3-blocks
+     sequencing; #327 body absent from `context/adjacent-issues.jsonl` → Stage E fetches the live
+     epic body/milestone before the train is locked.
+- Residual open questions carried to Stage E: D1×6, D2×8, D3×7, D4×7, D5×6 (34 total; several
+  overlap and will collapse in plan.md).
+- Slice inventory available to Stage E: 11 (D1) + 7 (D2) + 7 (D3) + 8 (D4) + 6 (D5) = **39
+  candidate slices** to consolidate into the plan DAG.
