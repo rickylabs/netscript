@@ -438,6 +438,91 @@ Deno.test('PluginWorkspaceMutator registers generated plugin glue entrypoints', 
   assertEquals(config.includes("'./workers/mod.ts'"), true);
 });
 
+/**
+ * Recursively collect `*.stub.ts` file URLs under a resources root. Each AI
+ * scaffold stub wraps the emitted userland source in a `defineStub({ source })`
+ * template literal, so scanning the stub text yields the exact `@netscript/*`
+ * specifiers the generated project will contain.
+ */
+async function collectStubFiles(root: URL): Promise<URL[]> {
+  const files: URL[] = [];
+  for await (const entry of Deno.readDir(root)) {
+    const child = new URL(`${root.href}/${entry.name}`);
+    if (entry.isDirectory) {
+      files.push(...await collectStubFiles(child));
+    } else if (entry.isFile && entry.name.endsWith('.stub.ts')) {
+      files.push(child);
+    }
+  }
+  return files;
+}
+
+/** Split `@netscript/<pkg>[/<subpath...>]` into its `netscriptJsrSpecifier` args. */
+function splitNetscriptSpecifier(specifier: string): { pkg: string; subpath: string } {
+  const withoutScope = specifier.slice('@netscript/'.length);
+  const slash = withoutScope.indexOf('/');
+  if (slash === -1) {
+    return { pkg: withoutScope, subpath: '' };
+  }
+  return { pkg: withoutScope.slice(0, slash), subpath: withoutScope.slice(slash) };
+}
+
+Deno.test('PluginWorkspaceMutator wires every @netscript/* specifier emitted by the AI scaffold', async () => {
+  // Read the real AI scaffold stubs relative to the worktree repo root so this
+  // guard fails whenever the scaffold emits a bare `@netscript/*` specifier that
+  // the prod/JSR import-map wiring does not cover (regression guard for #505).
+  const resourcesRoot = new URL(
+    '../../../../../../plugins/ai/src/adapter/resources',
+    import.meta.url,
+  );
+  const stubFiles = await collectStubFiles(resourcesRoot);
+  assert(stubFiles.length > 0, 'expected to find AI scaffold *.stub.ts sources');
+
+  // `@netscript/plugin/adapter` is the stub-authoring wrapper (imported by the
+  // .stub.ts module itself), never part of the emitted userland source.
+  const STUB_AUTHORING_IMPORT = '@netscript/plugin/adapter';
+  // Match only module specifiers in real `import`/`export` statements — either
+  // `from '<spec>'` or a side-effect `import '<spec>'`. This deliberately ignores
+  // `@netscript/*` mentions in prose/JSDoc and quoted data literals (e.g. a
+  // `pluginName: '@netscript/plugin-ai'` capability string), which are not imports.
+  const specifierPattern = /(?:from|import)\s+['"](@netscript\/[^'"]+)['"]/g;
+  const emitted = new Set<string>();
+  for (const file of stubFiles) {
+    const source = await Deno.readTextFile(file);
+    for (const match of source.matchAll(specifierPattern)) {
+      if (match[1] !== STUB_AUTHORING_IMPORT) {
+        emitted.add(match[1]);
+      }
+    }
+  }
+  assert(
+    emitted.has('@netscript/fresh/ai'),
+    'AI scaffold is expected to emit @netscript/fresh/ai (defect #505 anchor)',
+  );
+
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile(
+    '/project/deno.json',
+    JSON.stringify({ workspace: ['./plugins/*'], imports: {} }, null, 2) + '\n',
+  );
+
+  await new PluginWorkspaceMutator(fs).ensureRootImportsForPluginKind('/project', 'ai');
+
+  const config = JSON.parse(await fs.readFile('/project/deno.json')) as {
+    imports: Record<string, string>;
+  };
+
+  for (const specifier of [...emitted].sort()) {
+    const { pkg, subpath } = splitNetscriptSpecifier(specifier);
+    assertEquals(
+      config.imports[specifier],
+      netscriptJsrSpecifier(pkg, subpath),
+      `AI scaffold emits "${specifier}" but the prod import-map wiring is missing ` +
+        `a matching entry. Add it to PLUGIN_KIND_SOURCE_IMPORTS.ai in workspace-mutator.ts.`,
+    );
+  }
+});
+
 Deno.test('PluginWorkspaceMutator rewrite map covers every @netscript/telemetry export subpath', async () => {
   // Resolve the real telemetry manifest relative to the worktree repo root so
   // this guard fails when either the export map or the rewrite map drifts.

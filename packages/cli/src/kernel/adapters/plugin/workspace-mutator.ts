@@ -101,6 +101,35 @@ const PLUGIN_SERVICE_BOOTSTRAP_IMPORTS: readonly string[] = [
   SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN,
 ];
 
+/**
+ * Kind-scoped root import-map entries for plugins whose scaffolded userland glue
+ * imports first-party `@netscript/*` packages that are NOT covered by the shared
+ * {@link PLUGIN_SERVICE_SOURCE_IMPORTS} superset.
+ *
+ * Unlike the local-source workspace-member path (where every `@netscript/*`
+ * package resolves through workspace membership and its own `exports` map), the
+ * published/JSR consumer path resolves bare specifiers *only* through the root
+ * `deno.json` import map. Each bare specifier — including every subpath — the
+ * scaffold emits therefore needs an explicit entry here or the generated route
+ * fails with "not a dependency and not in import map".
+ *
+ * The `ai` kind emits an app-owned, in-process chat/tool/agent surface wired
+ * onto `@netscript/ai`, `@netscript/plugin-ai-core`, and the durable-chat
+ * runtime in `@netscript/fresh/ai`. Keep this list in lockstep with the bare
+ * `@netscript/*` specifiers emitted by `plugins/ai/src/adapter/resources/**`
+ * (guarded by the AI scaffold import-map completeness test).
+ */
+const PLUGIN_KIND_SOURCE_IMPORTS: Readonly<Record<string, Readonly<Record<string, string>>>> = {
+  ai: {
+    '@netscript/ai': netscriptJsrSpecifier('ai'),
+    '@netscript/ai/agent': netscriptJsrSpecifier('ai', '/agent'),
+    '@netscript/ai/anthropic': netscriptJsrSpecifier('ai', '/anthropic'),
+    '@netscript/ai/tools': netscriptJsrSpecifier('ai', '/tools'),
+    '@netscript/plugin-ai-core': netscriptJsrSpecifier('plugin-ai-core'),
+    '@netscript/fresh/ai': netscriptJsrSpecifier('fresh', '/ai'),
+  },
+};
+
 const PLUGIN_SERVICE_SOURCE_IMPORTS: Readonly<Record<string, string>> = {
   '@durable-streams/client': 'npm:@durable-streams/client@^0.2.6',
   '@durable-streams/server': 'npm:@durable-streams/server@^0.3.7',
@@ -344,11 +373,12 @@ export class PluginWorkspaceMutator {
       );
     }
 
+    const kindSourceImports = PLUGIN_KIND_SOURCE_IMPORTS[pluginKind] ?? {};
     const requiredSpecifiers = [
       ...PLUGIN_SERVICE_BOOTSTRAP_IMPORTS,
       ...(PLUGIN_KIND_ROOT_IMPORTS[pluginKind] ?? []),
     ];
-    if (requiredSpecifiers.length === 0) {
+    if (requiredSpecifiers.length === 0 && Object.keys(kindSourceImports).length === 0) {
       return;
     }
 
@@ -356,7 +386,10 @@ export class PluginWorkspaceMutator {
     raw.imports ??= {};
     const resolvedImports = resolveNetScriptImports('jsr');
     const localRuntimeImports = await this.resolveLocalOfficialRuntimeImports(projectRoot);
-    const requiredImports: Record<string, string> = { ...PLUGIN_SERVICE_SOURCE_IMPORTS };
+    const requiredImports: Record<string, string> = {
+      ...PLUGIN_SERVICE_SOURCE_IMPORTS,
+      ...kindSourceImports,
+    };
     for (const specifier of requiredSpecifiers) {
       const target = localRuntimeImports[specifier] ?? resolvedImports[specifier];
       if (target !== undefined) {
