@@ -38,7 +38,7 @@ merged | blocked | closed-n/a | owner-batch
 | PROG-389 | #389 | A (Fable) | owner-batch | — | verified 2026-07-06: #390 (squash eeaff336, IMPL-EVAL PASS) + #396 + #398 merged; last live child = #306 (this run). Recommend: owner closes by hand once #306 lands |
 | PROG-303-audit | #303 | B (Opus high) | pending | — | scope audit of 172a-2-SOUND remainder |
 | PROG-303-impl | #303 | D (Codex high) | blocked | — | after TEL W1–W2 merge (D-5) + audit |
-| PROG-306 | #306 | B (Opus high) | active | — | 5 remaining harness/skills bullets |
+| PROG-306 | #306 | B (Opus high) | impl-done | #549 | A1 PASS 2026-07-06; bullets 2/3/5 were already merged (52cf7ec7/#486) — slice = doctrine-06 reconciliation + README rows + file-set-reconcile gotcha; surface gates green; awaiting adversarial Codex (post-reset) + IMPL-EVAL |
 | PROG-307 | #307 | — | owner-batch | — | p2 deprioritized; audit-then-decide if capacity |
 
 ## Run gates

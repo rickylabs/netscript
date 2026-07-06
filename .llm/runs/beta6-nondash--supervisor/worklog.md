@@ -49,3 +49,23 @@ before PLAN-EVAL PASS.**
   owns push + draft-PR (Windows agents have no git credentials). #463/#511/wave-2 Tier-D held for
   quota reset.
 - PROG-389 bookkeeping done → `owner-batch.md` §1 (recommend close after #306).
+
+## 2026-07-06 — PROG-306 slice landed (first wave-1 completion)
+
+- Opus sub-agent returned `chore/306-harness-skills-revamp` (3 commits: d6a4b0db, 5b2cd93c,
+  68353c59 on base a1669f60). Key finding: #306 bullets 2 (release-gates wiring), 3 (gotcha folds,
+  minus one clause), 4 (arch-debt reconcile) and 5 (SCOPE-frontend fresh/ai) were ALREADY merged on
+  main via 52cf7ec7 (#486) — agent verified per-bullet against current text and implemented only
+  the true remainder: doctrine-06 archetype-5 folder-shape reconciliation (+05 note, ARCHETYPE-5
+  deferral flip), gh-watch/gh-token rows in the agentic README, IMPL-EVAL file-set-reconcile clause
+  in openhands-handoff (mirror regenerated via sync tool).
+- A1 review (Tier-A, substantive): PASS. Diff read in full; doctrine shape cross-checked against
+  live `plugins/workers` + `plugins/triggers` listings; thinness-law text matches the recorded
+  owner law (auth-core reference); sibling names corrected to `@netscript/plugin-<kind>-core`;
+  already-folded claims spot-checked on main (release-gates.md exists, SCOPE-frontend line 9).
+- Gates: `sync-claude-skills --check` OK, `validate-claude-surface` ok (5/5). No lock churn.
+- Pushed via WSL (explicit refspec) + draft **PR #549** (`Closes #306`, milestone 0.0.1-beta.6,
+  labels copied from issue + status:impl). Landmine note: `gh pr create` aborts the whole create on
+  an unresolvable label — correct status label is `status:impl`, not `status:in-progress`.
+- Next for this slice: adversarial WSL Codex review post-quota-reset, then one IMPL-EVAL
+  (qwen-3.7-max), then merge on green (re-read charter.md first) → owner closes epic #389.
