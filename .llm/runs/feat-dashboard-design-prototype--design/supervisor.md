@@ -32,10 +32,10 @@ eis-chat two-pass loop (prototype pass 1 validates the DDX-0 promote-set before 
 
 | Tier | Binding | Role in this run |
 | --- | --- | --- |
-| A | Claude Fable 5 (this session) | Supervisor; slice review gate; canvas orchestration via Claude Design MCP; board comments |
-| B | Claude Opus sub-agents (internal) | Design-brief prose synthesis from the seed-run corpus; research condensation |
-| C | — | Not used |
-| D | WSL Codex | **Not used in this run** — fresh-ui implementation of prototyped components is a downstream handoff fed by the sync-back spec |
+| A | Claude Fable 5 (this session) | Supervisor; **all design/creativity work** (canvas orchestration via Claude Design MCP, brief authoring, design decisions, shot review); slice review gate; board comments. Owner directive 2026-07-06: Fable 5 is THE design lane — "it outsmarts by far all others in creativity and design consistency" |
+| B | Claude Opus 4.8 sub-agents (internal) | Everything that is neither design nor a chore: research condensation, mechanical doc assembly, code scaffolding support |
+| C | Claude Workflow (Sonnet 5 stages) | Only if a batch fan-out is ever justified; **never Fable 5 in a workflow** |
+| D | WSL Codex | **Chores and easy well-scoped tasks only — never design-related work** (owner directive 2026-07-06). In this run: gh board filing chores. fresh-ui implementation of prototyped components is a downstream handoff fed by the sync-back spec |
 | E | OpenHands minimax-M3 (PLAN-EVAL) / qwen-3.7-max (IMPL-EVAL) | Separate-session evaluator verdicts |
 
 ## Recorded lane/eval overrides
