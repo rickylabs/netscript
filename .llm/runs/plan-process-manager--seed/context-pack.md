@@ -37,10 +37,16 @@ deployment target of epic #327.
   CLI re-exports; F-DEPLOY promotion in PM-20). Also: E4 enumerates the 18-route table (F-2),
   PM-1 gains the workers-core `WorkerTaskPermissions` re-export precursor (F-4), OF-9 is a hard
   fork (F-17), counts corrected 32+4/21 (F-7).
-- G PLAN-EVAL: pending (hard stop) — OpenHands minimax-M3, separate session, grades the amended
-  plan.md.
-- H Ratify + file: pending (owner).
-- I Handoff: pending.
+- G PLAN-EVAL: ✅ **PASS, first cycle** — OpenHands minimax-M3 (comment #issuecomment-4892134973;
+  `plan-eval.md` committed by the evaluator, `2062a536`, verified clean: 1 file, no lock churn).
+  All 8 Plan-Gate boxes checked; evaluator's independent open-decision sweep clean; citation
+  spot-checks confirmed; Stage-F fix landings verified.
+- H Ratify + file: **pending (owner) — the run is parked here.** Owner decision brief = OF-1..9
+  (plan.md §3; posted on #504). Zero board mutation until in-turn ratification (approval does NOT
+  survive compaction — re-surface, never route around). Then one-shot filing per plan.md §10
+  (labels→milestones→epic→36 children→#345 re-scope + 2×#400 comments→FILING-LOG.md).
+- I Handoff: pending (after H) — per-epic briefs from GitHub + design packs, `use harness` +
+  `## SKILL` chapter.
 
 ## Resume notes
 

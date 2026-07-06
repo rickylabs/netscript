@@ -201,3 +201,26 @@ Seed run (planning-only). Stage contracts per `.llm/harness/workflow/seed-run.md
 - Stage F closed: verdict PASS + all majors resolved at triage → proceed to Stage G PLAN-EVAL
   (OpenHands minimax-M3, separate session) against the amended plan.md. Optional: owner may re-run
   Tier-D Codex adversarial after credit reset (2026-07-07 03:52) — not gating.
+- Stage-F proof comment: #issuecomment-4891964722. Commit `0836d821` pushed (bundle→WSL route).
+
+## Stage G — PLAN-EVAL (2026-07-06)
+
+- Dispatched OpenHands **minimax-M3** (separate session, Tier E per lane policy), PR-comment
+  trigger on #504 @ `0836d821` (post-Stage-F amended plan.md). Trigger comment:
+  #issuecomment-4891984663. Brief: PLAN-EVAL protocol + plan-gate walk + open-decision sweep +
+  citation spot-check; seed-run adaptation stated (slices = issue candidates; owner forks OF-1..9
+  are profile design, not open decisions). Verdict contract: PASS | FAIL_PLAN.
+- Verdict watcher armed (1h re-armable heartbeat). **Hard stop: no Stage H before PASS.**
+- **Verdict landed** (elapsed ~18 min): PR comment #issuecomment-4892134973 —
+  **`OPENHANDS_VERDICT: PASS`**. All 8 Plan-Gate boxes checked with evidence; evaluator's own
+  open-decision sweep found **no unflagged open decisions** (OF-1..9 correctly classed as profile
+  design; 4 residuals bounded); both citation spot-checks confirmed against the checkout (drift-5
+  registry/config mismatch; ARCHETYPE-7 "extracted in a later wave" clause under E5/PM-20); all 8
+  accepted Stage-F fixes verified landed, and the F-1 rejection was independently confirmed as a
+  stale-read correction.
+- Evaluator commit-back **verified clean** before accepting: `2062a536` = exactly 1 file
+  (`plan-eval.md`, +143), no `deno.lock` churn, no source drift. Local branch fast-forwarded.
+- One evaluator note (no action required): PM-1's workers-core `mod.ts` re-export precursor
+  bundles a 1-line cross-package change into the pm contract PR — bounded, self-evident.
+- Stage G closed: **PASS on first cycle** (0 FAIL_PLAN loops). Run proceeds to Stage H — owner
+  ratification of the decision brief (OF-1..9), zero board mutation until in-turn approval.
