@@ -22,3 +22,4 @@ export type {
   PluginScaffolderRequiredPermissions,
 } from './manifest.ts';
 export type { PluginScaffoldEntrypoint, ScaffolderContext, ScaffoldResult } from './scaffolder.ts';
+export type { PluginLogger } from '../domain/mod.ts';

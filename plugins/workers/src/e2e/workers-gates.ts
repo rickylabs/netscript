@@ -1,5 +1,7 @@
 import type { PluginE2eGate } from '@netscript/plugin';
 
+export type { PluginE2eGate } from '@netscript/plugin';
+
 /** E2E gate definition for the workers plugin. */
 export type WorkersE2eGate = PluginE2eGate;
 

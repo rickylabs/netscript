@@ -10,7 +10,12 @@ import {
 } from '@netscript/plugin/adapter';
 import { aiAdapterPlugin } from './src/adapter/plugin.ts';
 
-export type { PluginScaffoldEntrypoint } from '@netscript/plugin/adapter';
+export type {
+  PluginLogger,
+  PluginScaffoldEntrypoint,
+  ScaffolderContext,
+  ScaffoldResult,
+} from '@netscript/plugin/adapter';
 
 /** AI adapter scaffold entrypoint. */
 const scaffold: PluginScaffoldEntrypoint = createPluginAdapter(aiAdapterPlugin).toScaffold();

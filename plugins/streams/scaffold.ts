@@ -10,6 +10,13 @@ import {
 } from '@netscript/plugin/adapter';
 import { streamsAdapterPlugin } from './src/adapter/plugin.ts';
 
+export type {
+  PluginLogger,
+  PluginScaffoldEntrypoint,
+  ScaffolderContext,
+  ScaffoldResult,
+} from '@netscript/plugin/adapter';
+
 /** Streams adapter scaffold entrypoint. */
 const scaffold: PluginScaffoldEntrypoint = createPluginAdapter(streamsAdapterPlugin).toScaffold();
 

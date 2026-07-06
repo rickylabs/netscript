@@ -5,4 +5,4 @@
  */
 
 export { getStreamsE2eGates } from './streams-gates.ts';
-export type { StreamsE2eGate } from './streams-gates.ts';
+export type { PluginE2eGate, StreamsE2eGate } from './streams-gates.ts';

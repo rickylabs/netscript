@@ -1,5 +1,7 @@
 import type { PluginE2eGate } from '@netscript/plugin';
 
+export type { PluginE2eGate } from '@netscript/plugin';
+
 /** E2E gate definition for the streams plugin. */
 export type StreamsE2eGate = PluginE2eGate;
 
