@@ -7,11 +7,13 @@ canvas build only swaps the JSX runtime. Treat this document plus each card's `*
 
 ## Runtime contract on the canvas
 
-- `_ds_bundle.js` exposes `window.React`, `window.ReactDOM`, and `window.{{GLOBAL_NAME}}` — every
-  component is a property of `{{GLOBAL_NAME}}` (e.g. `{{GLOBAL_NAME}}.Badge`).
+- `_ns_runtime.js` exposes `window.React`, `window.ReactDOM`, and `window.{{GLOBAL_NAME}}` — every
+  component is a property of `{{GLOBAL_NAME}}` (e.g. `{{GLOBAL_NAME}}.Badge`). Do NOT load
+  `_ds_bundle.js` — that path is platform-generated (compiled from the .tsx sources; it has no
+  ReactDOM and sets no window globals) and is not the prototype runtime.
 - Components accept `class` (not `className`) — they are Preact-authored; React passes `class`
   through to the DOM. Keep using `class` in prototypes so markup round-trips to Fresh unchanged.
-- `_ds_bundle.css` is the full style closure: design tokens, base rules, layout objects, and every
+- `_ns_styles.css` is the full style closure: design tokens, base rules, layout objects, and every
   component's CSS. `styles.css` loads the DM Sans / DM Mono fonts.
 - Preview stories live in `window.__dsPreview` per card; `?story=<Export>` renders one story.
 

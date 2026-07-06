@@ -112,7 +112,7 @@ export function runTraps(input: TrapInput): TrapCheck[] {
       if (/--ns-[\w-]+\s*:/.test(line)) continue;
       const hit = `${path}:${n + 1}`;
       // card copies and the concatenated closure carry source-inherited CSS
-      const fromSource = path.startsWith('components/') || path === '_ds_bundle.css';
+      const fromSource = path.startsWith('components/') || path === '_ns_styles.css';
       (fromSource ? inherited : generated).push(hit);
     }
   }

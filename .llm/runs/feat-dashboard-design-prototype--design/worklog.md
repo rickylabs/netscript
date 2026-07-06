@@ -84,6 +84,7 @@ unit of the same kind.
 | 2026-07-06 | 2 | Design brief + proposed components | `resources/design/dashboard/{CLAUDE-DESIGN-BRIEF.md,PROPOSED-COMPONENTS.md}`. Lanes per owner directive: supervisor drafted brief, **Fable-5 medium sub-agent** authored PROPOSED-COMPONENTS + tightened brief (2 factual fixes: flagship-trace composition per Flow B; A2 command-arguments dialog constraint). Supervisor slice review **PASS** vs proposal §3/§5.1/§9.1 + voice rules (0 banned framings). Net-new verdicts: 4 compose · 2 new-block (step-timeline, log-stream) · 2 new-component (trace-waterfall `ns-waterfall`, stack-map `ns-stackmap`); data-grid + MCP negative verdicts recorded. 6/7 promote-set blocks absent from sync = the recorded DDX-0↔DDX-15 inversion (canvas authors them → sync-back feeds DDX-0) |
 | 2026-07-06 | 1.1 | 26 authored preview stories | **Opus 4.8 sub-agent** (delegated lane) authored `tools/design-sync/previews/*.preview.js` for all 26 predicted-blank floor cards — dashboard-flavored data, tokens/`ns-*` only, `class` not `className`, status→Badge mapping matches PROPOSED-COMPONENTS §3.5. Supervisor slice review **PASS** (independent `design:sync check` re-run: render-blank **PASS** 26 authored/0 blank, idempotence PASS `98be0c4a39b7`, parity 44/44, no FAIL traps). weak-dts stays WARN by verdict: theme-toggle is a true zero-prop component — benign true positive, no src change |
 | 2026-07-06 | 3 | Canvas project seeded | Project `NetScript — NS One` (`ec262e10-…`) seeded via native DesignSync: `finalize_plan` (planId `plan_ec262e10d4ad451f_52521883d287`, localDir `.ds-sync/bundle`, deletes none) → single `write_files` call, **180/180 written via `localPath`** (contents never entered supervisor context). Verify: remote `list_files` == local bundle tree exactly (44 units ×3 + 44 previews + `_ds_bundle.js/.css` + README + styles.css). Canvas-side fitness gate now green; prototype pass 1 (slice 4) unblocked |
+| 2026-07-06 | 3.1 | Reserved-path hotfix (`_ds_bundle.js` → `_ns_runtime.js`) | Owner reported all cards failing (`no PascalCase exports` / `ReactDOM is not defined`). Root cause: the platform compiles uploaded `.tsx` into ITS OWN `_ds_bundle.js` (format-4 namespace bundle, no ReactDOM, no window globals), clobbering our runtime — that path is reserved (drift **D4**). Fix: runtime → `_ns_runtime.js`, CSS closure → `_ns_styles.css` across mod.ts/bundle.ts/traps.ts/card+conventions templates; rebuild `design:sync check` **PASS** (idempotence `9998ab57ac70`, parity 44/44, traps unchanged); re-upload 47 files (planId `plan_ec262e10d4ad451f_4091c6c11b1a`) + remote `_ds_bundle.css` deleted; remote tree verified (`_ns_*` live, platform artifacts `_ds_bundle.js`/`_ds_manifest.json` left alone). Slice-4 agent re-briefed mid-flight to load `../_ns_runtime.js` + `../_ns_styles.css` |
 
 ## Decisions
 
@@ -101,6 +102,7 @@ unit of the same kind.
 | ----- | -------- | ------------------ |
 | DDX-0↔DDX-15 dependency inversion | significant | yes |
 | #425 superseded-in-execution | significant | yes |
+| D4 `_ds_bundle.js` platform-reserved path (canvas render failure, fixed in slice 3.1) | significant | yes |
 
 ## Gate Results
 

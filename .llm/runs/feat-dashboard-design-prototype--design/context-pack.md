@@ -61,6 +61,12 @@ the beta.6 implementation supervisor.
   `finalize_plan` (`plan_ec262e10d4ad451f_52521883d287`, localDir `.ds-sync/bundle`) → one
   `write_files`, 180/180 via `localPath`; remote `list_files` verified == local tree. Canvas-side
   fitness green; pass 1 unblocked.
+- **Slice 3.1 COMPLETE (hotfix)**: `_ds_bundle.js` is a **platform-reserved path** — the canvas
+  compiles uploaded `.tsx` into its own bundle there (no ReactDOM, no window globals), which broke
+  every card (drift D4). Runtime renamed `_ns_runtime.js`, closure `_ns_styles.css`
+  (mod.ts/bundle.ts/traps.ts/templates); `design:sync check` PASS, idempotence `9998ab57ac70`;
+  47 files re-uploaded (`plan_ec262e10d4ad451f_4091c6c11b1a`), remote `_ds_bundle.css` deleted,
+  tree verified. NEVER emit `_ds_*` asset names. Slice-4 agent re-briefed mid-flight.
 
 ## Board state (filed)
 

@@ -52,7 +52,7 @@ img, svg, video { max-width: 100%; height: auto; }
 `;
 
 export interface ClosureResult {
-  /** the full `_ds_bundle.css` content */
+  /** the full `_ns_styles.css` content */
   css: string;
   /** ordered registry paths folded into the closure */
   parts: string[];

@@ -60,3 +60,24 @@ documentation.
 - Added beyond plan wording: `subpaths` module-graph fold-in for `@netscript/fresh-ui/interactive`
   (command-palette dependency; also surfaces the 8 interactive primitives on the canvas global).
 - Severity: minor — same contract names/ports as the locked Design; mechanisms simplified.
+
+## D4 — 2026-07-06 — `_ds_bundle.js` is a platform-reserved path (significant, fixed in-slice)
+
+- **What:** After the slice-3 seed, the owner reported every canvas card failing with
+  `⚠ no PascalCase exports in _preview/<X>.js` / `⚠ ReactDOM is not defined`.
+- **Root cause:** claude.ai/design treats `_ds_bundle.js` as *its own* artifact name: it compiles
+  the uploaded `.tsx` sources into a format-4 namespace bundle at that exact path
+  (`window.NetScriptNSOne_ec262e` only; `React` expected as a host global; **no ReactDOM; no
+  window.React/ReactDOM/NSOne assignments**), silently clobbering our 1.1MB self-contained runtime.
+  Preview/`.html`/`.md` uploads are preserved verbatim (verified byte-equal via `get_file`) — only
+  the reserved bundle path is rewritten. `_ds_manifest.json` + `_adherence.oxlintrc.json` are
+  sibling platform artifacts.
+- **Fix (slice 3.1):** runtime renamed to non-reserved `_ns_runtime.js` and CSS closure to
+  `_ns_styles.css` across `tools/design-sync/` (mod.ts, bundle.ts, traps.ts, card + conventions
+  templates); rebuilt (`design:sync check` PASS, idempotence `9998ab57ac70`); re-uploaded 47 files
+  (runtime + closure + README + 44 cards) under `plan_ec262e10d4ad451f_4091c6c11b1a`; stale remote
+  `_ds_bundle.css` deleted; remote `_ds_bundle.js`/`_ds_manifest.json` left as platform-owned.
+- **Severity:** significant (canvas fully non-functional until fixed), resolved same-day.
+- **Lesson for the reusable tool:** never emit runtime assets under `_ds_*` names; that prefix
+  belongs to the platform. Encoded as a comment at the `bundleFiles.set` site in `mod.ts` and in
+  the seeded README conventions.

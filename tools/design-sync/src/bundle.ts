@@ -1,6 +1,6 @@
 /**
  * Bundle step: write the synthetic package to scratch, compile the single
- * `_ds_bundle.js` with native `deno bundle` (esbuild-backed, zero extra
+ * `_ns_runtime.js` with native `deno bundle` (esbuild-backed, zero extra
  * deps), and assemble the canvas-ready upload tree.
  *
  * The scratch package carries its own `deno.jsonc` (classic React JSX
@@ -100,7 +100,7 @@ export async function buildBundleJs(
   tree.set('__ds/bundle-entry.ts', bundleEntry(cfg, conversions));
   await writeTree(pkgRoot, tree);
 
-  const outPath = `${pkgRoot}/__ds/_ds_bundle.js`;
+  const outPath = `${pkgRoot}/__ds/_ns_runtime.js`;
   const cmd = new Deno.Command(Deno.execPath(), {
     args: [
       'bundle',
