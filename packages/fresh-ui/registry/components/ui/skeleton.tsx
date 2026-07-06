@@ -38,13 +38,24 @@ export function Skeleton(
 
   if (variant === 'stats') {
     return (
-      <div {...props} aria-hidden='true' class={cn('ns-skeleton ns-grid', className)}>
+      <div
+        {...props}
+        aria-hidden='true'
+        class={cn('ns-skeleton ns-skeleton--stats ns-grid', className)}
+      >
         {Array.from(
           { length: resolvedCards },
           (_, index) => (
-            <div key={`stats-${index}`} class='ns-stack ns-stack--sm'>
-              <SkeletonBlock class='ns-skeleton__box ns-skeleton__box--card' />
-              <SkeletonBlock class='ns-skeleton__line--sm' style={{ width: '55%' }} />
+            <div key={`stats-${index}`} class='ns-skeleton__card'>
+              <SkeletonBlock
+                class='ns-skeleton__line--xs'
+                style={{ width: `${38 + ((index % 3) * 8)}%` }}
+              />
+              <SkeletonBlock
+                class='ns-skeleton__line--lg'
+                style={{ width: `${58 + ((index % 2) * 14)}%` }}
+              />
+              <SkeletonBlock class='ns-skeleton__line--xs' style={{ width: '30%' }} />
             </div>
           ),
         )}
@@ -57,7 +68,7 @@ export function Skeleton(
       <div
         {...props}
         aria-hidden='true'
-        class={cn('ns-skeleton ns-stack ns-stack--lg', className)}
+        class={cn('ns-skeleton ns-skeleton--detail ns-stack ns-stack--lg', className)}
       >
         {Array.from(
           { length: resolvedRows },
@@ -82,7 +93,7 @@ export function Skeleton(
       <div
         {...props}
         aria-hidden='true'
-        class={cn('ns-skeleton ns-stack ns-stack--md', className)}
+        class={cn('ns-skeleton ns-skeleton--form ns-stack ns-stack--md', className)}
       >
         {Array.from(
           { length: resolvedRows },
@@ -110,15 +121,17 @@ export function Skeleton(
     );
   }
 
+  const tableColumns = `repeat(${resolvedColumns}, minmax(0, 1fr))`;
+
   return (
     <div
       {...props}
       aria-hidden='true'
-      class={cn('ns-skeleton ns-stack ns-stack--sm', className)}
+      class={cn('ns-skeleton ns-skeleton--table', className)}
     >
       <div
-        class='ns-skeleton__table-row'
-        style={{ gridTemplateColumns: `repeat(${resolvedColumns}, minmax(0, 1fr))` }}
+        class='ns-skeleton__table-row ns-skeleton__table-row--head'
+        style={{ gridTemplateColumns: tableColumns }}
       >
         {Array.from(
           { length: resolvedColumns },
@@ -126,7 +139,7 @@ export function Skeleton(
             <SkeletonBlock
               key={`table-head-${index}`}
               class='ns-skeleton__line--xs'
-              style={{ width: `${60 + ((index % 2) * 15)}%` }}
+              style={{ width: `${44 + ((index % 3) * 12)}%` }}
             />
           ),
         )}
@@ -135,13 +148,13 @@ export function Skeleton(
         <div
           key={`table-row-${rowIndex}`}
           class='ns-skeleton__table-row'
-          style={{ gridTemplateColumns: `repeat(${resolvedColumns}, minmax(0, 1fr))` }}
+          style={{ gridTemplateColumns: tableColumns }}
         >
           {Array.from({ length: resolvedColumns }, (_, columnIndex) => (
             <SkeletonBlock
               key={`table-cell-${rowIndex}-${columnIndex}`}
               class='ns-skeleton__line--sm'
-              style={{ width: `${70 + (((rowIndex + columnIndex) % 3) * 10)}%` }}
+              style={{ width: `${58 + (((rowIndex * 2 + columnIndex) % 4) * 9)}%` }}
             />
           ))}
         </div>
