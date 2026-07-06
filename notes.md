@@ -64,6 +64,10 @@
 - PLAN-EVAL passed via OpenHands run `28758467765`; evaluator noted the strict count is 34
   publishable roots plus non-publishable `@netscript/bench`, and the sanctioned slow-types policy
   covers four packages.
+- Type-soundness residue grep was narrowed to plugin service/router seams plus Fresh/Aspire
+  touchpoints. No unexpected `any` handler erasure was found in router contexts; remaining hits are
+  accepted contract error-map casts, KV/schema/runtime adapter casts, tests, or Fresh/Fresh UI
+  framework touchpoints already covered by the deferrals above.
 
 ## Lock Hygiene
 
