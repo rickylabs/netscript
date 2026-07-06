@@ -108,8 +108,7 @@ export class OtelDenoMeter implements MeterPort {
       createHistogram: (histogramName, options) => {
         const histogram = meter.createHistogram(histogramName, options);
         return {
-          record: (value: number, attributes?: Attributes) =>
-            histogram.record(value, attributes),
+          record: (value: number, attributes?: Attributes) => histogram.record(value, attributes),
         };
       },
       createObservableGauge: (gaugeName, options) => {

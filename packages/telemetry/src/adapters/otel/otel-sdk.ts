@@ -89,7 +89,7 @@ function buildResourceAttributes(
  * `@opentelemetry/sdk-*` and `@opentelemetry/exporter-*-otlp-http` packages to
  * their own dependencies.
  */
-export const defaultSdkLoader: SdkLoader = async (options) => {
+export const defaultSdkLoader: SdkLoader = async (options): Promise<SdkBinding> => {
   const endpoint = normalizeEndpoint(options.endpoint);
   const resourceAttributes = buildResourceAttributes(options);
 
