@@ -31,11 +31,19 @@ the beta.6 implementation supervisor.
 
 - **Slice 5**: re-sync checkpoint + owner review of pass-1 screens, then pass 2 (Plugin Control,
   Logs, Resource Control + 4 capability sections).
-- **Side lane (issue #509, own worktree/branch)**: fresh-ui registry-wide pixel-perfect revamp —
-  Fable-5 sub-agent in `.llm/tmp/fresh-ui-polish-wt` (branch `feat/fresh-ui-pixel-polish`), owner
-  mandated 2026-07-06 ("now or never" Fable window; responsive/mobile first-class; extend registry;
-  render/iterate on scaffolded /design page). Commits locally; supervisor reviews + lands. D5
-  Tailwind-utility fix routed there.
+- **Side lane (issue #509) pass 1 LANDED as PR #547** (2026-07-06): 4 agent commits
+  (`f0d21fe1`/`dde68f32`/`5a1d0c54`/`15d41f96`, 44 files) supervisor-reviewed slice by slice and
+  gates independently reproduced (scoped check/lint/fmt 124 files clean; markdown tests 13/13;
+  raw-hex 0; all new `--ns-*` tokens defined; sanitize-before-style-reshape ordering verified).
+  Highlights: 7 L3 blocks → semantic `ns-*` (kills drift D5 at the source), scoped
+  `[class*='ns-']` box-sizing ownership, StatsGrid `auto-fit` container-adaptive, ThemeToggle
+  light-default + host-stamp authority, `rehypeInlineStyles` fixes the CJS `style-to-js`
+  KaTeX style-drop, token-driven hljs palette. IMPL-EVAL (OpenHands qwen-3.7-max) dispatched
+  (comment 4893731617); no self-merge post-compaction — owner merges on green.
+  **Reconciliation after #547 merges**: rebase this branch on main, re-run `design:sync build`,
+  delete `HOST_ENV_RULES` from `closure.ts`, re-shoot sentinels, re-upload closure. Remaining
+  #509 scope + react-markdown→preact-jsx-runtime follow-up recorded on the issue
+  (comment 4893735680).
 
 ## Done gates
 

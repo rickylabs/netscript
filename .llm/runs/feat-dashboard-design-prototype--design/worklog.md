@@ -193,3 +193,30 @@ re-run `design:sync build` and delete the host-env layer once blocks are semanti
 
 **Still open (islands):** ThemeToggle default-dark on empty localStorage reproduces headless;
 scripted interaction checks (toggle/drawer/toast timers) remain for slice 5.
+
+## Side lane #509 — pass 1 review + landing (2026-07-06)
+
+Fable-5 agent delivered 4 commits on `feat/fresh-ui-pixel-polish` (44 files, +1096/−408, all in
+`packages/fresh-ui` + regenerated embedded mirrors). Supervisor slice review (A1 gate) PASS:
+
+- `5a1d0c54` verified: DataTable/StatsGrid TSX carry zero Tailwind utilities; every `ns-*` class
+  has paired CSS; StatsGrid uses `repeat(auto-fit, minmax(min(13rem,100%),1fr))` — container-
+  adaptive, strictly better than the container-query cap suggested in the findings message.
+- `layouts.css` box-sizing scoped to `[class*='ns-']` (+::before/::after) — host-safe, no global
+  rewrite; documented rationale in-file.
+- ThemeToggle: host-stamped `data-theme` > stored pref > OS pref > light; persists only explicit
+  toggles. Matches finding 5 exactly.
+- `rehypeInlineStyles` runs AFTER unconditional `rehype-sanitize`, adds no attribute surface;
+  root cause (CJS `style-to-js` default-import interop under Deno+Vite silently dropping every
+  inline style via `ignoreInvalidStyle`) is a real framework bug, unit-tested.
+
+Evidence reproduced (not agent-claimed): scoped check/lint/fmt `--root packages/fresh-ui` 124
+files clean; `markdown-pipeline.test.ts` 13/13; raw-hex scan over changed registry CSS = 0;
+new token refs (`--ns-text-2xs`, `--ns-tracking-tight`, `--ns-leading-relaxed`) defined.
+
+Landed: branch pushed, **PR #547** opened (Part of #509, no closing keyword — deferrals remain),
+labels type:feat/area:fresh-ui/priority:p1/epic:dev-dashboard, milestone Backlog / Triage.
+IMPL-EVAL trigger posted (comment 4893731617). Issue #509 updated with remaining scope + the
+react-markdown→preact-jsx-runtime follow-up (comment 4893735680). Merge = owner (post-compaction
+grant rule). Reconciliation plan (post-merge): rebase → `design:sync build` → delete
+`HOST_ENV_RULES` → re-shoot sentinels → re-upload closure.
