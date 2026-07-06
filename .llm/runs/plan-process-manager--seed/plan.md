@@ -1,5 +1,10 @@
 # Plan — plan-process-manager--seed (Stage E lock)
 
+> **⚠️ AUTHORITY (Stage H, 2026-07-06): FILED — GitHub is now the single source of truth.**
+> Epic **#510**, children **#511–#546** (PM-0..PM-35 → see `FILING-LOG.md` for the map and the
+> ratified OF picks, incl. OF-9 = beta.8 and OF-5 → Backlog for PM-35). This document is frozen
+> design rationale; scope changes happen on the issues, not here.
+
 Seed run, planning-only. This document locks the plan that Stage F (adversarial) attacks, Stage G
 (PLAN-EVAL) grades, and Stage H (owner) ratifies before the one-shot filing. Drafts only — zero
 board mutation until Stage H in-turn ratification.

@@ -224,3 +224,24 @@ Seed run (planning-only). Stage contracts per `.llm/harness/workflow/seed-run.md
   bundles a 1-line cross-package change into the pm contract PR — bounded, self-evident.
 - Stage G closed: **PASS on first cycle** (0 FAIL_PLAN loops). Run proceeds to Stage H — owner
   ratification of the decision brief (OF-1..9), zero board mutation until in-turn approval.
+
+## Stage H — Owner ratification + one-shot filing (2026-07-06)
+
+- **Ratified in-session** (owner, verbatim): "OF - 1 YES / OF - 2 yes / OF - 3 YES / OF - 4 YES /
+  OF - 5 Yes ship that later (backlog) / OF - 6 YES / OF - 7 yes / OF - 8 yes / OF - 9 yes".
+  Interpretation (stated, unobjected): OF-1..8 = recommendation (a); **OF-5 → PM-35 to
+  `Backlog / Triage`** (delta vs plan §5's stable sketch); **OF-9 → M1 = `0.0.1-beta.8`**.
+- **One-shot filing executed** (manifest + WSL bash, 37 records, zero failures, one pass):
+  - Label `epic:process-manager` created (5319e7) + mirrored in `.github/labels.yml`.
+  - **Epic #510** (D5 §8 body, ratified-forks section, real sub-issue checklist) — sub-issue of
+    #327.
+  - **36 children #511–#546** (PM-0..PM-35): D5 §9 template, full taxonomy + `status:plan`,
+    milestones per ratified train (PM-0→beta.6; PM-1..33→beta.8; PM-34→stable; PM-35→Backlog),
+    deps as live links (sequential `{{PM-k}}` substitution), all sub-issue-linked under #510.
+  - **#345 re-scoped** per D3 §D3.7 (cross-host HA/secrets/signing; per-host → #546; dep edge).
+  - **2 comments on #400**: CR-DDX-HOSTAGNOSTIC (#issuecomment-4892799802) + `CommandInvokePort`
+    first-definer ack (#issuecomment-4892800265).
+  - **PR #504 body** rewritten with the filed map + completed stage trail.
+- `FILING-LOG.md` written (map, ratified picks, 3 deltas, mechanics); **authority banner** added
+  to plan.md — **GitHub is now the single source of truth**.
+- Stage H closed. Run proceeds to Stage I (implementation handoff briefs).

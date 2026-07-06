@@ -41,11 +41,14 @@ deployment target of epic #327.
   `plan-eval.md` committed by the evaluator, `2062a536`, verified clean: 1 file, no lock churn).
   All 8 Plan-Gate boxes checked; evaluator's independent open-decision sweep clean; citation
   spot-checks confirmed; Stage-F fix landings verified.
-- H Ratify + file: **pending (owner) — the run is parked here.** Owner decision brief = OF-1..9
-  (plan.md §3; posted on #504). Zero board mutation until in-turn ratification (approval does NOT
-  survive compaction — re-surface, never route around). Then one-shot filing per plan.md §10
-  (labels→milestones→epic→36 children→#345 re-scope + 2×#400 comments→FILING-LOG.md).
-- I Handoff: pending (after H) — per-epic briefs from GitHub + design packs, `use harness` +
+- H Ratify + file: ✅ **FILED 2026-07-06** — owner ratified all nine forks in-session (OF-1..8 =
+  (a); OF-5 → PM-35 to Backlog; OF-9 → M1 = beta.8). One-shot filing complete: label
+  `epic:process-manager` + **epic #510** + **36 children #511–#546**, all sub-issue-linked
+  (#510 under #327; children under #510); #345 re-scoped (cross-host only, edge on #546);
+  2 comments on #400 (CR-DDX-HOSTAGNOSTIC #issuecomment-4892799802 + CommandInvokePort
+  first-definer ack #issuecomment-4892800265); PR #504 body updated. Map + deltas:
+  `FILING-LOG.md`. **GitHub is now the single source of truth** (authority banner on plan.md).
+- I Handoff: **in progress** — per-epic briefs from GitHub + design packs, `use harness` +
   `## SKILL` chapter.
 
 ## Resume notes
