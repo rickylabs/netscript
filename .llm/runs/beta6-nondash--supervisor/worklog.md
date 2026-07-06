@@ -132,3 +132,31 @@ before PLAN-EVAL PASS.**
   fmt 0; telemetry 27/27, triggers-core telemetry 5/5, triggers runtime 4/4; no lock churn.
 - Pushed via WSL + draft **PR #559** (`Closes #405`, milestone 0.0.1-beta.6, labels + status:impl).
 - Merge-order note (D-2): T3 #404 and T4 #405 are parallel; whoever merges second rebases.
+
+## 2026-07-06 — TEL-T3 slice landed (wave-1 #5) → WAVE 1 COMPLETE
+
+- Opus sub-agent returned `feat/404-telemetry-t3-provider-adapters` (4 commits d6c04507/078aaf26/
+  68b1be04/16a5866f on base a1669f60; 20 files, +1161/-52).
+- A1 review (Tier-A, substantive): PASS. Verified the linchpin claims directly:
+  (1) ZERO-DEP proven at source — otel-sdk.ts top imports only `@opentelemetry/api`; all four
+  sdk-*/exporter-* packages come via dynamic import() only (lines 98-102), absent from static
+  resolved graph; agent confirmed via `deno info` + `publish --dry-run` success without declaring
+  them; deno.lock unchanged. (2) enabled decoupled = resolveEnabled() three-signal OR
+  (OTEL_DENO ‖ NETSCRIPT_TELEMETRY_ENABLED ‖ isProviderRegistered()), used in both
+  getTelemetryConfig + isTelemetryEnabled; enabled_matrix_test covers all 4 paths + provider
+  selection. (3) NO new casts (cast-scan empty; structural api-boundary delegation). (4) TEL-T4
+  boundary CLEAN (no w3c/extractContext/triggers files).
+- Deferred to merge-readiness (agent recommendation, not A1 block): `deps:prod-install`
+  (workspace-wide `deno ci --prod`) as the formal zero-dep cross-check — heavy/network gate; the
+  deno info + dry-run proof stands for A1.
+- Gates: scoped check 81 / lint 83 / fmt 83 all 0; doc-lint 11-entry export map 0 (1 slow-type
+  fixed); `deno test` 35 pass incl. SDK link-attrs + flush-order + layering fitness scan.
+- Pushed via WSL + draft **PR #560** (`Closes #404`, milestone 0.0.1-beta.6, labels + status:impl).
+
+### Wave 1 complete — all five slices impl-done on draft PRs (A1 PASS each):
+- PROG-306 #306 → PR #549   | AI-257 #257 → PR #550   | AI-494 #494 → PR #558
+- TEL-T4 #405 → PR #559     | TEL-T3 #404 → PR #560
+All five: base a1669f60, no lock churn, scoped gates green, boundaries respected. Next: adversarial
+WSL Codex review per PR + one IMPL-EVAL (qwen-3.7-max) each, after Codex quota reset (07-07 03:52).
+Merge-order dependencies: T3#404 before T5#406/T6-ai; #257 before #258; T3/T4 parallel (D-2 second
+rebases). Merge on green — RE-READ charter.md first (grant lost on compaction).
