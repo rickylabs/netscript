@@ -14,6 +14,15 @@ import {
   type WorkerResolvedIdempotencyKey,
 } from '../runtime/mod.ts';
 
+export type {
+  AtomicCheck,
+  AtomicMutation,
+  AtomicResult,
+  KvEntry,
+  KvKey,
+  KvSetOptions,
+} from '@netscript/kv';
+
 const DEFAULT_ACTIVE_TTL_MS = 15 * 60_000;
 const DEFAULT_APPLIED_TTL_MS = 24 * 60 * 60_000;
 const ACTIVE_TTL_ENV = 'NETSCRIPT_WORKERS_IDEMPOTENCY_ACTIVE_TTL_MS';

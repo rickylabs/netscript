@@ -31,6 +31,10 @@
   client/delegate/KV aliases public on the store subpath and replacing the `PluginCapabilities`
   alias with a package-owned `SagasCapabilities` interface. The remaining refs are the same precise
   oRPC contract-definition/implementer seam as the other feature-plugin contract packages.
+- `packages/plugin-workers-core` is reduced from 16 combined diagnostics to 4 after making KV,
+  registry, runtime enum-schema, and idempotency support aliases public on the relevant subpaths and
+  replacing the `PluginCapabilities` alias with a package-owned `WorkersCapabilities` interface. The
+  remaining refs are the same precise oRPC contract-definition/implementer seam.
 - `packages/fresh-ui` remains a design-heavy interactive surface cluster. A local conversion from
   exported Preact `JSX.*` prop aliases to the package-owned `FreshUiElementProps` vocabulary reduced
   doc-lint counts but broke hook/component type-checking across runtime call sites. The package needs

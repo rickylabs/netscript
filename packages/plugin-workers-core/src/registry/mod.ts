@@ -20,6 +20,7 @@ export type {
   RuntimePermissions,
   RuntimePermissionValue,
   TaskDefinition,
+  TaskExecutionType,
   TaskSource,
 } from './registry-types.ts';
 export type {
