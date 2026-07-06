@@ -26,3 +26,18 @@ Profile: seed-run (planning-only, board-producing; drafts only, owner ratifies).
 - Co-requisite API gaps discovered (not in any pass-1 issue): `TriggerDlqPort` has no contract route; `packages/queue` `DeadLetterStore` is port-only. Drafted as new wave:defer slices.
 - Taxonomy gaps flagged, not invented: no `area:queue` / per-capability area labels exist.
 - No GitHub mutations executed; no `packages/`/`plugins/` source touched; the 42-file fresh-ui overlay in this worktree was not staged.
+
+## 2026-07-06 — v2 amendment (owner feedback)
+
+Owner reviewed the v1 rescope and ruled it over-corrected: the seed research's Appwrite-style manage-through-UI pillar and the Encore-model seam-flow telemetry pillar were mandated, not duplication. Directive: keep S1–S12 ("genuinely good"), augment.
+
+Changes applied across all deliverables:
+
+- **plan.md** — rewritten around three pillars (Observe / Manage / Follow); §3b management-loop grid added; S3 → "Runtime-Config Monitor & Control" (gated write-back); S13 Live Flow added (⚑ flagship #2); `/_netscript/flows` SSE data-plane; beta.7 management wave (#432 + DDX-23); laws extended (one-generator-two-callers, create→configure→monitor, nav=capability taxonomy).
+- **epic-rewrite.md** — v2 body: retitle ("…that drives the framework"), three MANDATORY acceptance lines (non-duplication broadened to state/action/seam-semantics answers; one generator two callers; flow ≠ waterfall), S13 in the screen set, #432 elevation in the slice map.
+- **issues-rescope.md** — #418 CLOSE → **REWRITE (S13 Live Flow)** with full replacement body; #432 KEEP-defer → **REWRITE-elevate** (beta.7 keystone, p3→p2); NEW DDX-23 (seam-event envelope + HTTP boundary events, WSL Codex slice); DDX-20 gains gated write-back; management addenda on #420, #428–#431; DDX-21 + seed action; #413/#419/#423/#426 v2 notes; tally now 3 CLOSE / 18 REWRITE / 5 KEEP / 6 NEW; dispositions table updated.
+- **claude-design-prompts.md** — header → S1–S13 + management-verb & flow-gate usage rules; S3 prompt gains the confirm-dialog + CLI-equivalent write-control pattern; full S13 prompt appended (causal chain via `ns-step-timeline`, payload-at-seam CodeBlocks, hard no-span-bars/no-gantt constraint).
+- **ratification-summary.md** — rewritten: Step 1 closes only #421/#422/#425; Step 2 adds #418 (S13) and #432 rewrites; Step 4 files 6 issues (+DDX-23); owner decisions D5–D7 added (#432 promotion target, S3 write-back scope check, S13 join-fidelity commitment).
+- **research.md** — Appendix H gold-conclusions extract (04-baas-admin-console-teardown, 03-competitor-dev-console-teardown) with the non-duplication reconciliation.
+
+Fidelity honesty preserved: S13 ships beta.6 as a correlation-join over the four already-shipped streams (workers SSE, trigger events SSE, saga history, stream deliveries) keyed on stamped `traceparent` — no new instrumentation; DDX-23 is the beta.7 upgrade. Still drafts-only; owner ratifies every GitHub mutation.

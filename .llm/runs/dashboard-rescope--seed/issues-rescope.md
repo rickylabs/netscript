@@ -3,7 +3,8 @@
 Run: `dashboard-rescope--seed` · 2026-07-06. Companion to `plan.md`; mutation batch in `ratification-summary.md`.
 
 Supervisor notes on the drafts below:
-- Verdict tally: **5 CLOSE** (#418, #421, #422, #425 + none others), **16 REWRITE** (#400 epic + #411 #412 #413 #415 #416 #417 #419 #420 #423 #424 #426 #428 #429 #430 #431 #507), **6 KEEP** (#408, #410, #414, #427, #432, #509 — three with tightening addenda), **5 NEW** (DDX-20 S3 flagship, DDX-21 S11, DDX-22 S12, and two co-requisite API slices).
+- **V2 AMENDMENT (owner feedback, 2026-07-06):** v1 over-corrected. The original seed research mandates two more pillars the verdicts below now restore: (P2) the **Appwrite-style manage-through-UI console** — the dashboard mirrors the CLI's management verbs per capability (create → configure(tabs) → monitor loop; one generator, two callers) — and (P3) **Encore-model seam-flow telemetry** — a live request journey across framework seams, never re-rendered OTLP. Verdict changes: **#418 CLOSE → REWRITE** (becomes S13 Live Flow), **#432 KEEP-defer → REWRITE (elevate to beta.7 management keystone)**, one new co-req (**DDX-23** seam-event flow plane), and management-loop addenda appended to #420, #428–#431, DDX-20, DDX-21. No v1 screen is deleted.
+- Verdict tally (v2): **3 CLOSE** (#421, #422, #425), **18 REWRITE** (#400 epic + #411 #412 #413 #415 #416 #417 **#418** #419 #420 #423 #424 #426 #428 #429 #430 #431 **#432** #507), **5 KEEP** (#408, #410, #414, #427, #509 — two with tightening addenda), **6 NEW** (DDX-20 S3 flagship, DDX-21 S11, DDX-22 S12, DDX-23 flow plane, and two co-requisite DLQ API slices).
 - Closures use **supersession comments, never closing keywords** — nothing here is resolved by a PR.
 - The epic #400 replacement body is maintained separately in `epic-rewrite.md` (the copy embedded below is the same text at draft time; `epic-rewrite.md` wins on divergence).
 - Taxonomy: all labels below come from `.github/labels.yml`; exactly one `status:` per issue; `wave:v1` → milestone `0.0.1-beta.6`, `wave:defer` → `Backlog / Triage`. Noted gaps (`area:queue`, per-capability areas) are flagged, not invented.
@@ -12,7 +13,7 @@ Supervisor notes on the drafts below:
 
 # Dev Dashboard Board Rescope — Per-Issue Disposition (beta.6, OWNER MANDATE 2026-07-06)
 
-**Governing thesis applied to every verdict:** the dashboard renders only runtime/config/codegen state Aspire and Scalar *structurally cannot* — NetScript-primitive run-state, the override/config layer, plugin-registry wiring, contract provenance, codegen/scaffold state — and hands off (deep-links) to Aspire for telemetry/process control and to Scalar for API reference/try-it.
+**Governing thesis applied to every verdict (v2, three pillars):** the dashboard (P1) renders only runtime/config/codegen state Aspire and Scalar *structurally cannot* — NetScript-primitive run-state, the override/config layer, plugin-registry wiring, contract provenance, codegen/scaffold state; (P2) **mirrors the CLI's management verbs through the UI** per capability (Appwrite loop: create → configure(tabs) → monitor; every mutation = the same contract route/scaffolder the CLI calls + CLI-equivalent CodeBlock); (P3) **follows a request live across framework seams** (Encore model — causal chain with payloads at seams, never re-rendered OTLP) — and hands off (deep-links) to Aspire for raw telemetry/process control and to Scalar for API reference/try-it.
 
 **Label conventions used below** (from `.github/labels.yml`): epic label is `epic:dev-dashboard`; exactly one `status:`; `wave:v1` → milestone `0.0.1-beta.6`, `wave:defer` → milestone `Backlog / Triage` (or `0.0.1-stable`). There is no `area:dashboard`/`area:workers`/etc., so dashboard slices use the closest existing area labels (`area:plugins`, `area:fresh-ui`, `area:aspire`, `area:cli`, `area:config`, `area:telemetry`, `area:database`).
 
@@ -22,7 +23,9 @@ Supervisor notes on the drafts below:
 
 ## #400 — epic: NetScript Dev Dashboard — **REWRITE**
 
-**One-line rationale:** Intent is complementary but the body bakes in duplication (flagship trace-waterfall over Aspire's own OTLP); needs an explicit non-duplication acceptance line and the rescoped screen set (S1–S12) as the authoritative slice map. **No closing keyword** (epic).
+**One-line rationale:** Intent is complementary but the body bakes in duplication (flagship trace-waterfall over Aspire's own OTLP); needs the three-pillar thesis, the acceptance lines, and the rescoped screen set (S1–S13) as the authoritative slice map. **No closing keyword** (epic).
+
+**⚠ V2:** the embedded copy below is the **v1 draft** kept for the record — `epic-rewrite.md` carries the ratified **v2** body (three pillars, S13, acceptance lines 1–3, #432 elevation) and wins on divergence. Apply from `epic-rewrite.md`.
 
 **Replacement body:**
 
@@ -182,6 +185,8 @@ Supervisor notes on the drafts below:
 
 **Labels:** `type:feat`, `area:telemetry`, `area:plugins`, `epic:dev-dashboard`, `priority:p1`, `wave:v1`, `status:plan`. Milestone `0.0.1-beta.6`.
 
+**V2 note (add one line to the body's non-goals):** the S13 Live Flow view (#418) does **not** widen this port — the flow plane is owned seam events on #423/DDX-23; this port remains the correlation-only bridge from any flow/run node to Aspire's raw trace detail.
+
 ---
 
 ## #414 — DDX-4: `plugins/dashboard` thin plugin + E2E join — **KEEP-AS-IS**
@@ -296,14 +301,40 @@ Supervisor notes on the drafts below:
 
 ---
 
-## #418 — DDX-8: Flow / Trace Waterfall panel — **CLOSE (fold into #419)**
+## #418 — DDX-8: Flow / Trace Waterfall panel — **REWRITE → S13 Live Flow** *(v2: was CLOSE in v1)*
 
-**Rationale:** Killed as an owned renderer — a two-panel waterfall is Aspire's Traces tab UI, unmodified. The legitimate value (NetScript causal grouping of worker→saga→trigger→stream as one run) is folded into S6 Run Inspector as a NetScript-domain run timeline that deep-links to Aspire's `/traces/detail/{id}`. Close as superseded; transfer the causal-grouping acceptance to #419.
+**Rationale (v2):** The pass-1 *waterfall* stays dead — a two-panel span gantt is Aspire's Traces tab, unmodified. But the owner amendment + the seed research's Encore teardown confirm the underlying telemetry-integration idea was right and v1 threw it out with the rendering: Encore's per-request journey (request → response payload → DB queries → pub/sub publishes) is the single most-loved surface in the closest-analog console. Rescope #418 into **S13 Live Flow** — the same causal value, expressed as NetScript's **own seam events**, primitive-grouped, with payloads at the seams — structurally different from an OTLP waterfall and impossible for Aspire to render (it has no vocabulary for "this handler enqueued this job which advanced this saga").
 
-**Closure comment to post (no closing keyword — it's superseded, not resolved by a PR):**
-> Superseded by the beta.6 rescope. There is no owned trace-waterfall renderer (Aspire's Traces tab owns the span waterfall). The NetScript causal-grouping value (worker→saga→trigger→stream as one logical run, enabled by T4–T7) moves into #419 (S6) as a compact NetScript-domain run timeline annotated with primitive semantics, deep-linking to Aspire `/traces/detail/{traceId}`. Tracking continues on #419. Closing as `wave:defer`-not-applicable / rescoped.
+**Replacement body:**
 
-**Labels before close:** add `status:triage`→ remove; set final single status, add note label if a `superseded`/`wontfix` GitHub-standard label exists. Milestone cleared.
+> ## DDX-8 / S13: Live Flow — request journey across framework seams (flagship #2)
+>
+> ### Summary
+> Follow one request live through the stack: HTTP call → contract procedure (with returned payload) → job it enqueued → saga steps it advanced → stream fan-out it caused — one causal chain, grouped by primitive, streaming as it happens. Rescoped from the pass-1 trace-waterfall: the *causality* survives; the *span-bar rendering* does not.
+>
+> ### DX thesis
+> Aspire renders spans but has no vocabulary for NetScript seams — it cannot say "this API call triggered job `reserve-inventory`, which advanced saga `order.fulfillment` to step 3, which published to `payment-events` (3 subscribers)." Only the framework knows its own seams. (Encore's dev-dash proves this is the killer surface; NetScript's version is seam-semantic, not span-cosmetic.)
+>
+> ### Scope
+> - **Live flow list** (`activity-feed`): recent requests/flows, newest first, filterable by route/primitive/status; select one to pin its journey.
+> - **Journey chain** (`ns-step-timeline`, causal not time-proportional): seam nodes — `HTTP POST /api/orders` → `contract orders.create → 201 {orderId}` → `job reserve-inventory queued → completed (attempt 1)` → `saga order.fulfillment step 2→3` → `stream payment-events → 3/3 delivered`. Each node: primitive badge, status via `STATUS_VARIANT`, expandable payload-at-seam CodeBlock (request/response/job input/step I/O), mono ids.
+> - **Data (beta.6, correlation-join fidelity):** assembled by joining already-shipped streams — workers SSE (`GET /subscribe`), trigger events SSE, saga `/history`, stream deliveries — on the stamped `traceparent` (#408 T4–T7), exposed as `/_netscript/flows` SSE (#423). **No new instrumentation required to ship.**
+> - **Fidelity upgrade (co-req DDX-23, beta.7):** unified seam-event envelope + HTTP request ingress/egress boundary events, so flows start at the route boundary instead of the first primitive event.
+> - Per-node **"View raw trace"** out-link → Aspire `/traces/detail/{traceId}` via #413.
+>
+> ### Non-goals (acceptance line 3 of the epic)
+> - **No span bars, no time-proportional gantt, no duration-scaled bars, no log tails.** The chain is causal/semantic; the moment raw timing or span detail matters, out-link to Aspire. This is what keeps S13 distinct from the killed waterfall.
+> - No OTLP ingestion; the flow plane is owned seam events (#423/DDX-23), never `/api/telemetry/*` (#413 stays correlation-only).
+>
+> ### Acceptance criteria
+> - One scaffold-app HTTP request produces a live flow chain with ≥3 primitive-labeled seam nodes and payloads at each seam.
+> - Every node carries an Aspire out-link; no in-dashboard span render exists (E2E #426 asserts the URL, not a waterfall).
+> - Flow list streams live (SSE); selecting a flow pins it while the list keeps updating.
+>
+> ### Dependencies
+> #408/#413 (traceparent + correlation), #423 (`/_netscript/flows` join), #412 (`FlowRecord` domain model), #419 (S6 cross-links: run-centric ↔ flow-centric). DDX-23 #TBD for boundary-event fidelity.
+
+**Labels:** `type:feat`, `area:fresh-ui`, `area:telemetry`, `area:plugins`, `epic:dev-dashboard`, `priority:p1`, `wave:v1`, `status:plan`. Milestone `0.0.1-beta.6`. **Retitle to:** `DDX-8 / S13: Live Flow — request journey across framework seams`. Cross-ref comment: the pass-1 waterfall scope is dead per the epic's acceptance line 3; S6 (#419) keeps the run-centric view, S13 is the flow-centric view.
 
 ---
 
@@ -338,7 +369,9 @@ Supervisor notes on the drafts below:
 > ### Dependencies
 > #413 (correlation), #412 (`RunRecord`), telemetry T4–T7 (#408) for cross-service grouping fidelity.
 
-**Labels:** `type:feat`, `area:fresh-ui`, `area:plugins`, `epic:dev-dashboard`, `priority:p1`, `wave:v1`, `status:plan`. Milestone `0.0.1-beta.6`. **Label change:** add a cross-ref note that #418 folds here.
+**Labels:** `type:feat`, `area:fresh-ui`, `area:plugins`, `epic:dev-dashboard`, `priority:p1`, `wave:v1`, `status:plan`. Milestone `0.0.1-beta.6`.
+
+**V2 note:** #418 no longer folds here — it is rescoped to S13 Live Flow (flow-centric: one request's causal journey). S6 stays the **run-centric** view (one logical run's lifecycle). Cross-link both ways: a run's originating request → S13 flow; a flow's job/saga node → S6 run detail. Drop the "absorbs #418" line from the body when applying.
 
 ---
 
@@ -375,9 +408,8 @@ Supervisor notes on the drafts below:
 
 **Labels:** `type:feat`, `area:fresh-ui`, `area:plugins`, `epic:dev-dashboard`, `priority:p1`, `wave:v1`, `status:plan`. Milestone `0.0.1-beta.6`.
 
----
-
-## #421 — DDX-11: Logs panel — **CLOSE**
+**V2 management-loop addendum (append to body scope):**
+> **Manage (P2, Appwrite loop):** S5 is also the management entry for the plugin capability — (a) a **marketplace-lite "Add plugin" entry**: browse first-party plugins with install state, absent ones teach + can run `netscript plugin add <id>` from the UI (same JSR installer, one generator two callers, confirm + CLI-equivalent); (b) per-plugin **"Scaffold resource" entry point** (template gallery) appearing once #432 lands (beta.7) — hidden/`plugin-gated` until then. Directus's in-app marketplace is the long-term precedent; beta.6 ships only the teach + gated-install affordance.
 
 **Rationale:** DUPLICATE-LEANING (strong). `?follow` NDJSON, level filters, browser-log capture are line-for-line Aspire Structured/Console Logs; no NetScript-specific angle stated. Killed as an owned screen.
 
@@ -416,6 +448,7 @@ Milestone cleared.
 > - `/_netscript/plugins`, `/plugins/doctor`, `/plugins/contributions` — manifests/capabilities, `PluginDoctorReport`, 8–10 contribution axes.
 > - `/_netscript/workers/*` (21-route oRPC shipped), `/sagas/*` (instances + `/history`), `/triggers/*` (events + `/events/subscribe` + enable/disable + `/preview`).
 > - `/_netscript/routes` (`DiscoveredNetScriptRoute` bound/unbound), `/db/status` (Prisma migration/introspect/drift), `/scheduler` (`scheduler.list()` vs declared defs), `/telemetry/coverage` (wired-vs-unwired).
+> - **`/_netscript/flows` + `/flows/subscribe` (SSE) — v2, feeds S13 Live Flow:** the seam-flow read model. Beta.6 fidelity = a join over the already-listed per-primitive streams keyed on the stamped `traceparent` (no new instrumentation); DDX-23 (co-req, #TBD) upgrades to a unified seam-event envelope + HTTP boundary events.
 >
 > ### Non-goals
 > - **Not** an OTLP/log/metric surface — those are the borrowed telemetry plane (#413) and Aspire. `/_netscript/*` never proxies `/api/telemetry/*`.
@@ -552,6 +585,9 @@ Milestone cleared.
 
 **Labels:** `type:feat`, `area:fresh-ui`, `area:plugins`, `epic:dev-dashboard`, `priority:p1`, `wave:v1`, `status:plan`. Milestone `0.0.1-beta.6`.
 
+**V2 management-loop addendum (append to body scope):**
+> **Manage (P2, Appwrite loop):** complete the workers loop — *act:* trigger-now ✅ (in scope above), **rerun a failed execution** and **cancel a running one** where the 21-route contract exposes it (verify route coverage; missing verbs are explicit gaps, not new backend), enable/disable a job via the S3 override topic (cross-link, same write route); *configure:* a per-job settings tab (schedule + active overrides, read from S3 topics — configuration in tabs, never inline in the list); *create:* "New job from template" entry appears once #432 lands (beta.7), hidden until then. All mutations: confirm + CLI-equivalent CodeBlock.
+
 ---
 
 ## #429 — DDX-18b: Sagas Console — **REWRITE**
@@ -585,6 +621,9 @@ Milestone cleared.
 > #419, #423 (`/_netscript/sagas`), #413 (trace out-link).
 
 **Labels:** `type:feat`, `area:fresh-ui`, `area:plugins`, `epic:dev-dashboard`, `priority:p1`, `wave:v1`, `status:plan`. Milestone `0.0.1-beta.6`.
+
+**V2 management-loop addendum (append to body scope):**
+> **Manage (P2):** *act:* gated **replay / compensate-now** actions on a stuck instance — only if the saga contract already exposes the mutation (verify; if port-only, flag as a thin co-req like the DLQ routes, do not invent a write path); Inngest's rerun-from-step is the precedent, deferred to stable as noted. *Configure:* store-backend + durability view stays read-only. *Create:* "New saga from template" via #432 (beta.7). All mutations: confirm + CLI-equivalent.
 
 ---
 
@@ -622,6 +661,9 @@ Milestone cleared.
 
 **Labels:** `type:feat`, `area:fresh-ui`, `area:plugins`, `epic:dev-dashboard`, `priority:p1`, `wave:v1`, `status:plan`. Milestone `0.0.1-beta.6`.
 
+**V2 management-loop addendum (append to body scope):**
+> **Manage (P2):** S9 was already the most manage-shaped v1 screen (enable/disable + webhook-test + preview all shipped) — it is the reference for the loop on the other consoles. v2 adds only: *create:* "New trigger from template" via #432 (beta.7); *configure:* schedule/webhook settings as a per-trigger tab rather than inline rows.
+
 ---
 
 ## #431 — DDX-18d: Streams Console — **REWRITE**
@@ -651,16 +693,19 @@ Milestone cleared.
 
 **Labels:** `type:feat`, `area:fresh-ui`, `area:plugins`, `epic:dev-dashboard`, `priority:p2`, `wave:v1`, `status:plan`. Milestone `0.0.1-beta.6` (downgrade to fast-follow if contract missing). **Label change:** flag `priority:p2` (contract-state risk).
 
+**V2 management-loop addendum (append to body scope):**
+> **Manage (P2):** *act:* gated **redeliver-to-subscriber** where the delivery read-model + a redeliver route exist (same verification gate as the read-model itself; port-only = co-req flag, no invented write path); *create:* "New stream topic from template" via #432 (beta.7). Confirm + CLI-equivalent on every mutation.
+
 ---
 
-## #432 — DDX-19: Codegen-from-UI "Add resource" action — **KEEP-AS-IS (confirm defer)**
+## #432 — DDX-19: Codegen-from-UI "Add resource" action — **REWRITE (elevate to beta.7 management keystone)** *(v2: was KEEP-defer in v1)*
 
-**Rationale:** Complementary and unambiguously NetScript-specific (Strapi-precedent scaffold-from-UI, not an Aspire/Scalar concern). Correctly deferred. Keep; confirm `wave:defer` and add the non-goal that it reuses the CLI scaffolder (one generator, two callers).
+**Rationale (v2):** The owner amendment + the Strapi gold conclusion make this the **keystone of the management pillar**, not a nice-to-have: Strapi's Content-Type Builder proves dashboard-and-CLI-as-two-callers-of-one-generator is the pattern that makes a framework console feel like Appwrite. Every capability console's "create" cell (S5/S7–S10 template-gallery entries) lands here. Recommend promoting `wave:defer`/stable → **beta.7** (owner decision D5 in `ratification-summary.md`); scope stays exactly the one-generator law.
 
-**Tightening addendum:**
-> **Non-goal.** Does not fork the scaffolder — invokes the same `createPluginAdapter(...).toScaffold()` machinery the CLI installer uses (one generator, two callers), per the #157 typesafe-codegen mandate. Deferred to stable given the DDX-4 scaffolder-exposure dependency.
+**Body addendum (replaces the v1 tightening addendum):**
+> **V2 elevation (management keystone).** This issue is the single "create" seam for every capability console: S5 "Add plugin/Scaffold resource", S7 "New job", S8 "New saga", S9 "New trigger", S10 "New topic" — all template-gallery entries (Appwrite Functions precedent) that invoke the same `createPluginAdapter(...).toScaffold()` machinery the CLI installer uses (**one generator, two callers**, per the #157 typesafe-codegen mandate). Non-goals: does not fork the scaffolder; no string templates; generated files identical whether triggered from `netscript plugin add`/`generate` or the dashboard button (Strapi parity bar). Acceptance: a dashboard-scaffolded resource is byte-identical to the CLI-scaffolded one and the action renders its CLI-equivalent line. Future convergence (separate, stays defer): in-dashboard AI driving this same seam (`@netscript/plugin-ai` #238 — Strapi AI's chat/design-import/code-analysis triad).
 
-**Labels:** `type:feat`, `area:plugins`, `area:cli`, `epic:dev-dashboard`, `priority:p3`, `wave:defer`, one `status:`. Milestone `0.0.1-stable`.
+**Labels:** `type:feat`, `area:plugins`, `area:cli`, `epic:dev-dashboard`, `priority:p2` (raised from p3), **wave: owner decision** — recommended `wave:v1`-next cut (beta.7; milestone to match) instead of `0.0.1-stable`.
 
 ---
 
@@ -701,9 +746,9 @@ Milestone cleared.
 
 # NEW ISSUES TO FILE
 
-## NEW #TBD — DDX-20 / S3: Runtime-Config Monitor ⚑ flagship
+## NEW #TBD — DDX-20 / S3: Runtime-Config Monitor & Control ⚑ flagship *(v2: + gated write-back)*
 
-**Rationale:** Highest-value, cheapest, most-differentiated surface (pain 5); the live override layer Aspire (infra) and Scalar (spec) can never know exists; the watcher already exists.
+**Rationale:** Highest-value, cheapest, most-differentiated surface (pain 5); the live override layer Aspire (infra) and Scalar (spec) can never know exists; the watcher already exists. **v2:** the management pillar makes this read-*write* — flipping a flag / disabling a job from the UI is the purest Appwrite-loop expression of "the dashboard drives the framework," and it uses the same override store the CLI/config sources feed.
 
 **Body:**
 
@@ -719,18 +764,20 @@ Milestone cleared.
 > - Live `activity-feed` (generalized, non-chat) of override changes with `data-tone` by kind.
 > - Current-state `stats-grid` per topic (active flags, disabled jobs/sagas/triggers, task overrides).
 > - `ns-step-timeline`-shaped version history of the `current` pointer (diff between versions: All/Compact/JSON).
-> - Follow switch on the SSE tail; **read-only in beta.6** (write-back later).
-> - Data: existing watcher over 5 topics + versioned `current` pointer, piped to `/_netscript/config/runtime/subscribe` (SSE) — no new backend.
+> - Follow switch on the SSE tail.
+> - **Write-back (v2, gated):** flip a feature flag, disable/enable a job/saga/trigger, clear a task override — from the UI, behind `confirmationMessage` + CLI-equivalent CodeBlock. **Scope condition:** ships in beta.6 only if the runtime-config store already exposes set/unset use-cases the watcher reads (verify first); if the write path is port-only, file it as a thin co-req mutation route (same pattern as the DLQ co-reqs) and ship the read surface without waiting.
+> - Data: existing watcher over 5 topics + versioned `current` pointer, piped to `/_netscript/config/runtime/subscribe` (SSE) — no new backend for the read path.
 >
 > ### Non-goals
-> - Not Aspire config/env display (that's infra config); this is NetScript runtime *overrides*. No write-back in beta.6.
+> - Not Aspire config/env display (that's infra config); this is NetScript runtime *overrides*. Writes never bypass the store the watcher observes — a dashboard write must round-trip as a watcher change event (one write path, observed like any other).
 >
 > ### Acceptance criteria
 > - Flipping an override emits a live SSE event that renders in the feed; per-topic current state accurate; version diff renders.
+> - If write-back ships: a UI flag-flip lands in the store, hot-reloads via the watcher, and appears in the feed as a normal change event with its CLI-equivalent recorded.
 > - Deep-link: disabled entity → its capability console (S7–S10); in ← S1 stat card.
 >
 > ### Dependencies
-> #423 (`/_netscript/config/runtime` + SSE). Watcher already exists.
+> #423 (`/_netscript/config/runtime` + SSE). Watcher already exists. Write-back: runtime-config mutation route (in-scope if store use-cases exist; else co-req).
 
 **Labels:** `type:feat`, `area:config`, `area:fresh-ui`, `area:plugins`, `epic:dev-dashboard`, `priority:p1`, `wave:v1`, `status:triage`. Milestone `0.0.1-beta.6`.
 
@@ -752,7 +799,7 @@ Milestone cleared.
 >
 > ### Scope
 > - Migration `data-table` (applied/pending); drift `alert`; introspect diff as CodeBlock.
-> - "Run migrate" action with CLI-equivalent (`netscript db ...`).
+> - "Run migrate" and **"Run seed" (v2)** actions with CLI-equivalent (`netscript db ...`), confirm-gated — the db cells of the P2 management loop.
 > - Data: Prisma migration status/introspect/drift (CLI `db status` today).
 >
 > ### Non-goals
@@ -852,6 +899,36 @@ Milestone cleared.
 
 ---
 
+## NEW #TBD — DDX-23: co-req — seam-event flow plane (unified envelope + HTTP boundary events) *(v2)*
+
+**Rationale:** S13 Live Flow ships at beta.6 in correlation-join fidelity (existing per-primitive streams joined on `traceparent` — no new instrumentation). This co-req is the beta.7 fidelity upgrade: a unified seam-event envelope so flows are first-class instead of reconstructed, and HTTP request ingress/egress boundary events so a flow starts at the route boundary rather than the first primitive event. Framework-source work → **WSL Codex slice**, never the docs/design lane.
+
+**Body:**
+
+> ## feat(telemetry): seam-event flow plane — unified envelope + HTTP boundary events
+>
+> ### Summary
+> Emit a uniform seam event at each framework boundary a request crosses — HTTP ingress/egress, contract procedure invoke/return, job enqueue/complete, saga transition, stream publish/delivery — onto an owned in-process bus exposed at `/_netscript/flows/subscribe` (SSE), keyed by the stamped `traceparent`.
+>
+> ### Scope
+> - Envelope (contract-first): `{ flowId (traceparent), seam, primitive, name, phase: start|end|error, payloadRef, attempt?, ts }` — reuses the #402 TC-1..14 attribute vocabulary; no parallel naming.
+> - Emitters piggyback on the existing lifecycle event points (execution events, saga history, trigger events, stream deliveries) + new HTTP boundary hooks at the router seam.
+> - Replaces the beta.6 join-layer in `/_netscript/flows` (#423) transparently — same SSE shape, higher fidelity.
+>
+> ### Non-goals
+> - Not OTLP; not an exporter; never proxied from `/api/telemetry/*` (#413 stays correlation-only). No UI (that's S13/#418). No durable storage beyond a bounded ring buffer (dev-time surface).
+>
+> ### Acceptance criteria
+> - One scaffold-app HTTP request yields a complete ordered seam-event chain incl. the HTTP boundary; S13 renders it with zero join heuristics.
+> - `deno check --unstable-kv` green; TC vocabulary lint clean.
+>
+> ### Dependencies
+> #408 (traceparent stamping), #423 (mount), feeds #418/S13. Co-lands sensibly with `epic:telemetry-revamp`.
+
+**Labels:** `type:feat`, `area:telemetry`, `area:service`, `epic:dev-dashboard`, `priority:p2`, `wave:defer` (recommend pulling to beta.7 with #432), `status:triage`. Milestone `Backlog / Triage` (or beta.7 milestone if pulled).
+
+---
+
 # Summary of dispositions
 
 | # | Handle | Verdict |
@@ -866,9 +943,9 @@ Milestone cleared.
 | 415 | DDX-5 shell | **REWRITE** (S1) |
 | 416 | DDX-6 stack map | **REWRITE** (S2 wiring graph) |
 | 417 | DDX-7 catalog | **REWRITE** (S4, kill try-it) |
-| 418 | DDX-8 waterfall | **CLOSE** (fold → #419) |
-| 419 | DDX-9 run inspector | **REWRITE** (S6, absorb 418) |
-| 420 | DDX-10 plugin control | **REWRITE** (S5 elevate) |
+| 418 | DDX-8 waterfall → Live Flow | **REWRITE** (v2: S13 seam-flow journey; waterfall scope stays dead) |
+| 419 | DDX-9 run inspector | **REWRITE** (S6 run-centric; cross-links S13) |
+| 420 | DDX-10 plugin control | **REWRITE** (S5 elevate + v2 manage loop) |
 | 421 | DDX-11 logs | **CLOSE** (Aspire deep-link) |
 | 422 | DDX-12 resource control | **CLOSE** (→ withCommand/#411) |
 | 423 | DDX-13 introspection | **REWRITE** (owned `/_netscript/*` plane) |
@@ -876,17 +953,18 @@ Milestone cleared.
 | 425 | DDX-15 design-sync | **CLOSE** (superseded by #507) |
 | 426 | DDX-16 E2E smoke | **REWRITE** (no-waterfall assertions) |
 | 427 | DDX-17 panel seam | KEEP (tighten) |
-| 428 | DDX-18a workers | **REWRITE** (S7 + scheduler drift) |
-| 429 | DDX-18b sagas | **REWRITE** (S8) |
-| 430 | DDX-18c triggers | **REWRITE** (S9, DLQ gated) |
-| 431 | DDX-18d streams | **REWRITE** (S10, verify contract) |
-| 432 | DDX-19 codegen-from-UI | KEEP (confirm defer) |
-| 507 | design prototype | **REWRITE** (rescoped screens + dup gate) |
+| 428 | DDX-18a workers | **REWRITE** (S7 + scheduler drift + v2 manage loop) |
+| 429 | DDX-18b sagas | **REWRITE** (S8 + v2 gated replay) |
+| 430 | DDX-18c triggers | **REWRITE** (S9, DLQ gated; v2 loop reference) |
+| 431 | DDX-18d streams | **REWRITE** (S10, verify contract; v2 gated redeliver) |
+| 432 | DDX-19 codegen-from-UI | **REWRITE** (v2: elevate — beta.7 management keystone, owner decision D5) |
+| 507 | design prototype | **REWRITE** (rescoped screens S1–S13 + dup gate) |
 | 509 | fresh-ui revamp | KEEP |
-| NEW | DDX-20 Runtime-Config Monitor (S3) ⚑ | FILE (beta.6 flagship) |
+| NEW | DDX-20 Runtime-Config Monitor & Control (S3) ⚑ | FILE (beta.6 flagship; v2 + gated write-back) |
 | NEW | DDX-21 DB Migrations & Drift (S11) | FILE (beta.6-if-cheap) |
 | NEW | DDX-22 DLQ (S12) | FILE (wave:defer) |
+| NEW | DDX-23 seam-event flow plane | FILE (v2 co-req; recommend beta.7) |
 | NEW | co-req `TriggerDlqPort` route | FILE (wave:defer) |
 | NEW | co-req queue `DeadLetterStore` CLI/API | FILE (wave:defer) |
 
-**Kills documented so they don't creep back:** owned trace-waterfall (Aspire Traces), logs tail (Aspire Structured/Console Logs), metrics charts (Aspire Metrics), resource start/stop panel (Aspire Actions), Scalar-style try-it/operation list (Scalar `/api/docs`), service `/health` panel (→ Aspire State column via `withHealthCheck()`). **Taxonomy gaps noted for `labels.yml` before use:** `area:queue`, `area:workers`/`area:sagas`/`area:triggers`/`area:streams`, and a specific dashboard area label do not exist — dashboard slices reuse `area:plugins`/`area:fresh-ui`/`area:aspire`/`area:cli`/`area:config`/`area:service`/`area:database` + `epic:dev-dashboard`. Every open issue carries exactly one `status:`.
+**Kills documented so they don't creep back:** raw OTLP trace-waterfall / span-bar gantt (Aspire Traces — note v2: #418 survives only as the S13 seam-flow journey, which must never grow span bars), logs tail (Aspire Structured/Console Logs), metrics charts (Aspire Metrics), resource start/stop panel (Aspire Actions), Scalar-style try-it/operation list (Scalar `/api/docs`), service `/health` panel (→ Aspire State column via `withHealthCheck()`). **Taxonomy gaps noted for `labels.yml` before use:** `area:queue`, `area:workers`/`area:sagas`/`area:triggers`/`area:streams`, and a specific dashboard area label do not exist — dashboard slices reuse `area:plugins`/`area:fresh-ui`/`area:aspire`/`area:cli`/`area:config`/`area:service`/`area:database` + `epic:dev-dashboard`. Every open issue carries exactly one `status:`.

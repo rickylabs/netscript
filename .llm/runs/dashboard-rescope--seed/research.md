@@ -839,3 +839,27 @@ These do **not** yet exist in `registry.manifest.ts`; they are candidates proven
 - **Layout density objects**: `ns-content-rail` (right detail rail) and its newer mirror `ns-rail-grid`/`--sm` (left list rail: 18rem/15rem fixed + `minmax(0,1fr)` fluid main, breakpoint ≥1024px, single-column stack below 860px for stack-map specifically) are the two console-page grid shapes everything composes from — a prompt author reaching for a "three-zone console layout" should compose these two rather than inventing a new grid.
 
 **Key files referenced**: `C:/Dev/repos/netscript-framework/.llm/tmp/design-proto-wt/resources/design/dashboard/{CLAUDE-DESIGN-BRIEF.md,DECISIONS.md,PROPOSED-COMPONENTS.md}`, `.../screens/{01-stack-map,02-flow-trace,03-service-catalog,04-run-inspector}.html`, `.../screens/proto.css`, `C:/Dev/repos/netscript-framework/.llm/tmp/design-proto-wt/packages/fresh-ui/registry.manifest.ts`, `.../packages/fresh-ui/registry/theme/tokens.css`, `.../packages/fresh-ui/registry/components/ui/button.css`.
+
+---
+
+## Appendix H — v2 gold-conclusions extract (owner amendment, 2026-07-06)
+
+Source: `plan-roadmap-expansion--seed/research/A-dashboard/04-baas-admin-console-teardown.md` + `03-competitor-dev-console-teardown.md`. These are the conclusions the v1 rescope under-weighted; the v2 amendment binds the plan to them.
+
+**From the BaaS admin-console teardown (04):**
+1. **Per-capability manage-through-UI loop** (Appwrite): every primitive gets its own nav entry, a create entry, tabbed settings, and a monitor view with its own status vocabulary — create → configure(tabs) → monitor. → plan §3b management-loop grid; S5/S7–S11 addenda.
+2. **Plugin-contributes-a-panel** as a typed extension axis (Directus' 8 extension types) → validates #427 `DashboardPanelContribution`.
+3. **Schema-driven UI generation** (Directus renders admin UI from the data schema) → deferred db-tab idea; noted, not scoped.
+4. **Codegen-from-UI mirrors the CLI** (Strapi Content-Type Builder writes the identical files `strapi generate` writes) → #432 elevation; the one-generator-two-callers acceptance line.
+5. **In-dashboard AI-on-codegen** (Strapi AI chat / design-import / code-analysis) → converges with `@netscript/plugin-ai` #238; explicitly deferred.
+
+Secondary: scopes taxonomy mirrors nav taxonomy; dev keys; in-app marketplace (→ S5 marketplace-lite only); edit-shape vs show-shape distinction.
+
+**From the competitor dev-console teardown (03):**
+
+- **Encore Flow + per-request tracing** — the "legendary" signature: a live code-derived architecture map and a per-request view showing request/response payloads, DB queries, pub/sub publishes. NetScript translation: the framework knows its own seams; render the causal journey (API call → contract → job → saga → stream), not spans. → S13 + acceptance line 3 (flow ≠ waterfall) + S2 live-traffic overlay.
+- **Temporal** run-list → detail → event history (All/Compact/JSON) → S6 shape.
+- **Inngest** rerun-from-step + attempt badges → S7/S8 gated actions.
+- **Nitro** `/_nitro/tasks` owned dev endpoints → `/_netscript/*` pattern (#423).
+
+**Why v2 does not violate the non-duplication law:** management acts only on NetScript-domain resources through existing routes/the CLI scaffolder (Aspire keeps process lifecycle); flow renders framework-seam causality OTLP has no vocabulary for, from owned seam events — raw spans stay Aspire out-links (#413 unchanged, correlation-only).

@@ -1,12 +1,13 @@
-# Dev Dashboard Rescope — Claude Design Prompts (S1–S12)
+# Dev Dashboard Rescope — Claude Design Prompts (S1–S13) · v2
 
 Run: `dashboard-rescope--seed` · 2026-07-06. One self-contained, paste-ready prompt per rescoped screen, written for claude.ai/design against the **published NS One design system** (the `packages/fresh-ui` ns-* registry, which on main now includes the merged #547 pixel-polish pass).
 
 Usage:
 - Create/reuse a Claude Design project with the NS One design system attached; paste ONE prompt block per design conversation. Each prompt is fully self-contained — the design agent needs no other context.
-- Design-review gate (from the epic's non-duplication acceptance line): reject any produced screen that renders an owned trace waterfall, log tail, metrics chart, resource start/stop panel, or operation list/try-it — those must appear only as out-link affordances, and every prompt says so explicitly.
+- Design-review gate (from the epic's non-duplication acceptance line): reject any produced screen that renders an owned trace waterfall / span-bar gantt, log tail, metrics chart, resource start/stop panel, or operation list/try-it — those must appear only as out-link affordances, and every prompt says so explicitly. (S13's causal chain is NOT a waterfall — see its prompt's hard constraints.)
+- **v2 management verbs:** the capability consoles (S5, S7–S10, S11) are management surfaces, not read-only monitors — each prompt's action affordances (trigger/rerun/enable/disable/migrate/seed/install) follow the Appwrite loop create → configure(tabs) → monitor. Every mutating control is confirm-gated and shows its exact CLI-equivalent line in a `code-block` — design that pattern once and reuse it. "Create from template" entries appear as visible-but-gated affordances (beta.7 / #432).
 - Design-sync caution: when round-tripping artifacts, emit `_ns_runtime.js`/`_ns_styles.css` — never `_ds_*` names (the canvas clobbers uploaded `_ds_*` files).
-- Waves: S1–S10 are beta.6 core (S10 pending a delivery read-model check), S11 beta.6-if-cheap, S12 later-wave — prototype S11/S12 as shells if time-boxed.
+- Waves: S1–S10 + S13 are beta.6 core (S10 pending a delivery read-model check), S11 beta.6-if-cheap, S12 later-wave — prototype S11/S12 as shells if time-boxed.
 
 ---
 
@@ -65,11 +66,11 @@ Usage:
 ```
 
 ```markdown
-# S3 — Runtime-Config Monitor  ⚑ flagship
+# S3 — Runtime-Config Monitor & Control  ⚑ flagship
 
-**Design a Claude Design screen using the published "NS One" design system.** Part of the NetScript Dev Dashboard. This is the flagship, cheapest-to-ship, most-differentiated surface: the live override layer that Aspire (infra) and Scalar (spec) can never know exists.
+**Design a Claude Design screen using the published "NS One" design system.** Part of the NetScript Dev Dashboard. This is the flagship, cheapest-to-ship, most-differentiated surface: the live override layer that Aspire (infra) and Scalar (spec) can never know exists — and the place you *act on it* without leaving the browser.
 
-**DX thesis:** "someone just flipped feature flag `checkout-v2` to 30% rollout / disabled job `nightly-reconcile`" — the live runtime-config override layer, streamed as it changes.
+**DX thesis:** "someone just flipped feature flag `checkout-v2` to 30% rollout / disabled job `nightly-reconcile`" — the live runtime-config override layer, streamed as it changes, with gated controls to flip it back.
 
 **User + moment:** a dev's local behavior suddenly changed — a job stopped firing, a code path went dark. They open this screen to see what override moved. Question: "what changed in runtime config, when, and by which version?"
 
@@ -80,11 +81,13 @@ Usage:
 
 **Reach for:** `activity-feed`, `stats-grid`, `ns-step-timeline`, `switch`, `code-block`, `ns-content-rail`, `badge`, `connector`.
 
-**States:** loading (`skeleton`); empty (no overrides ever set → `empty-state` "Runtime config is at defaults"); live-updating (SSE tail — new feed items slide in; when Follow off, show a "3 new changes" pill to click); error (`inline-notice` "SSE feed dropped, reconnecting"). Read-only: no write-back controls in beta.6 — do not design edit forms.
+**Write-back controls (v2 — design these):** each current-state row carries a gated control: a `switch` on feature flags (flipping opens a confirm `dialog` showing the change + its exact CLI-equivalent in a `code-block`, e.g. `netscript config override set flags.checkout-v2 --rollout 30`), an "Enable" button on each disabled job/saga/trigger row (same confirm-with-CLI pattern), and a "Clear override" tertiary action on task overrides. After confirm, the change appears in the live feed like any other event (one write path — the UI writes to the same store the watcher observes). Design the confirm-dialog pattern once; it is reused by every mutating action across the dashboard.
+
+**States:** loading (`skeleton`); empty (no overrides ever set → `empty-state` "Runtime config is at defaults"); live-updating (SSE tail — new feed items slide in; when Follow off, show a "3 new changes" pill to click); error (`inline-notice` "SSE feed dropped, reconnecting"); pending-write (control disabled + spinner until the round-trip change event lands).
 
 **Hand-off:** a disabled entity links to its capability console — disabled `job nightly-reconcile` → "Open in Workers" (S7); disabled trigger → S9. In-links from the S1 stat card.
 
-**Non-goals:** do NOT design metrics charts or logs. This is override-change state, not telemetry. No write-back UI.
+**Non-goals:** do NOT design metrics charts or logs. This is override-change state, not telemetry. Writes are only the gated per-row controls described above — no free-form config editor, no raw JSON editing.
 
 **Theme:** `--ns-*` only, light default + dark. Tones via `data-tone`; status via `STATUS_VARIANT`. Job ids as mono `job_...`, never `#`. Reduced-motion: feed items appear without motion when reduce is set.
 ```
@@ -319,4 +322,33 @@ Usage:
 **Non-goals:** do NOT build this as if the API exists — the gated/placeholder state is required. No logs/metrics. Bulk replay must always surface the CLI-equivalent and a confirm.
 
 **Theme:** `--ns-*` only, light + dark; `STATUS_VARIANT`; mono message ids/error codes. Reduced-motion respected. Destructive actions in destructive-token styling.
+```
+
+```markdown
+# S13 — Live Flow: request journey across framework seams  ⚑ flagship #2
+
+**Design a Claude Design screen using the published "NS One" design system (the ns-* component library).** Part of the NetScript Dev Dashboard, a DX satellite to the .NET Aspire dashboard. This screen is the Encore-style differentiator: **follow one request live through the whole stack** — API call → contract procedure (with its returned payload) → the job it enqueued → the saga steps it advanced → the stream fan-out it caused — as one causal chain grouped by framework primitive.
+
+**DX thesis:** Aspire renders raw spans but has no vocabulary for NetScript's seams — it cannot say "this API call triggered job `reserve-inventory`, which advanced saga `order.fulfillment` to step 3, which published to `payment-events` (3 subscribers)." Only the framework knows its own seams; this screen shows them, live, with the actual payloads.
+
+**HARD CONSTRAINT — this is NOT a trace waterfall:** no span bars, no time-proportional/gantt layout, no duration-scaled widths, no log tails. The chain is **causal and semantic** (what caused what, through which seam, carrying what payload), rendered as connected steps — the moment raw timing/span detail matters, the affordance is an out-link to Aspire. If the design starts looking like a tracing tool, it has failed review.
+
+**User + moment:** a dev hits an endpoint from their app (or Scalar try-it) and wants to see what it actually did end-to-end — did the job fire, did the saga advance, did subscribers get the event, what came back at each seam. Question: "what did this request cause, and where did it stop?"
+
+**Layout:** two-zone console under `sidebar-shell` + `ns-envbar` + `ns-page-header--console`. Left list rail via `ns-rail-grid`, main journey column, right context via `ns-content-rail`. Below 860px collapse to single column.
+- **Left — live flow list** (`activity-feed`, dense): recent flows, newest first, each item: method+route (mono, e.g. `POST /api/orders`), primitive-count chips (⚙2 ⛓1 ⇶1), status dot via `STATUS_VARIANT`, relative time. A "Follow" `switch` (pause list updates); filter `select`s (route, primitive, status). Selecting a flow pins it in the main column while the list keeps streaming.
+- **Center — journey chain** (`ns-step-timeline` as a *causal* chain): seam nodes top-to-bottom with connector lines, each node showing a **primitive badge** (HTTP / contract / worker / saga / stream), name (mono), status, and an expandable **payload-at-seam** `code-block`. Concrete pinned flow: `HTTP POST /api/orders` (ingress, 201) → `contract orders.create → { orderId: "ord_7f3k" }` → `job reserve-inventory · queued → completed · attempt 1` → `saga order.fulfillment · step 2 → 3 (reserve)` → `stream payment-events · 3/3 delivered`. A failed variant should also be designed: job node `failed · attempt 2 of 3, retrying` (warning) with the chain visibly stopping there — the "where did it stop" answer at a glance.
+- **Right — context rail:** selected node detail via `connector` rows (primitive, plugin owner, queue/topic name, attempt, correlation id mono `traceparent`), plus the hand-off block.
+
+**Live behavior:** nodes append to the pinned chain as seam events stream in (SSE) — design the "in-progress" tail state (last node pulsing subtly, `prefers-reduced-motion` fallback = static badge).
+
+**Reach for:** `ns-step-timeline`, `activity-feed`, `ns-rail-grid`, `ns-content-rail`, `connector`, `badge`, `code-block`, `switch`, `select`, `ns-page-header--console`, `empty-state`, `skeleton`.
+
+**States:** loading (`skeleton` chain); empty (no traffic yet → `empty-state` "Hit an endpoint to see its journey" with a mono `curl` example); live/in-progress (pulsing tail node); completed (calm, all-success chain); failed (chain stops at destructive node, retry badge); degraded fidelity (`inline-notice` "flow assembled by correlation join — boundary events land in beta.7" — subtle, not alarming).
+
+**Hand-off affordances:** every node: "View raw trace in Aspire" out-link (`/traces/detail/{traceId}`); job/saga nodes: "Open run in Run Inspector" (S6); stream node: "Open Streams console" (S10); contract node: "Open in Scalar" anchor. In-links: S6 run detail → "View originating flow"; S1 quick actions.
+
+**Non-goals:** no span bars / gantt / waterfall (hard constraint above), no log tail, no metrics, no OTLP jargon in the UI copy — the vocabulary is NetScript's (job, saga step, delivery, seam), not spans/scopes.
+
+**Theme:** light default (warm cream) + `[data-theme='dark']`; every color a `--ns-*` token; status via `STATUS_VARIANT` (`completed→success, running→primary, failed→destructive, retrying→warning, queued→muted`); ids mono (`ord_…`, `traceparent`); hard-offset press shadows on buttons; respect `prefers-reduced-motion`.
 ```
