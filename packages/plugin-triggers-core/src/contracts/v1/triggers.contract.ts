@@ -12,7 +12,6 @@ import {
   BASE_PLUGIN_ERRORS,
   type BasePluginContract,
   type BasePluginDescribeRoute,
-  type PluginCapabilities,
 } from '@netscript/plugin/contract-base';
 import {
   TRIGGER_DURABILITY_TIERS,
@@ -219,10 +218,18 @@ export type EventFilters = Readonly<{
 /**
  * Public, capability-document shape returned by the mandatory `describe` route.
  *
- * Named public alias of {@link PluginCapabilities} so consumers can reference
- * the triggers describe-output type without reaching into `@netscript/plugin`.
+ * Package-owned shape returned by the triggers describe route.
  */
-export type TriggersCapabilities = PluginCapabilities;
+export interface TriggersCapabilities {
+  /** Canonical plugin package name, for example `@netscript/plugin-triggers`. */
+  readonly pluginName: string;
+  /** Contract version identifiers the plugin serves, for example `["v1"]`. */
+  readonly contractVersions: readonly string[];
+  /** Route group names exposed by the plugin, for example `["triggers"]`. */
+  readonly routeGroups: readonly string[];
+  /** Free-form capability tags advertised by the plugin. */
+  readonly capabilities: readonly string[];
+}
 
 // --- Route output / shared schemas -------------------------------------------
 // Every inline `z.object(...)` / `z.enum(...)` is named and explicitly annotated

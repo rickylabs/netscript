@@ -35,6 +35,11 @@
   registry, runtime enum-schema, and idempotency support aliases public on the relevant subpaths and
   replacing the `PluginCapabilities` alias with a package-owned `WorkersCapabilities` interface. The
   remaining refs are the same precise oRPC contract-definition/implementer seam.
+- `packages/plugin-triggers-core` is reduced from 8 combined diagnostics to 2 after making KV and
+  trigger-domain support aliases public on the store subpath and replacing the `PluginCapabilities`
+  alias with a package-owned `TriggersCapabilities` interface. The remaining refs are the same
+  precise oRPC contract-definition/implementer seam; exporting that internal shape widens the public
+  surface to oRPC helper types and increases doc-lint noise, so it is deferred for design review.
 - `packages/fresh-ui` remains a design-heavy interactive surface cluster. A local conversion from
   exported Preact `JSX.*` prop aliases to the package-owned `FreshUiElementProps` vocabulary reduced
   doc-lint counts but broke hook/component type-checking across runtime call sites. The package needs
