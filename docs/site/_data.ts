@@ -31,10 +31,11 @@ export interface NavSection {
 }
 
 /**
- * Reference units (28). The href is the section-root URL; `url` Lume filter
+ * Reference units (31). The href is the section-root URL; `url` Lume filter
  * applies the /netscript/ base path at render time.
  */
 const referenceUnits: NavItem[] = [
+  { href: "/reference/ai/", label: "ai", icon: "A" },
   { href: "/reference/auth/", label: "auth", icon: "A" },
   { href: "/reference/auth-better-auth/", label: "auth-better-auth", icon: "A" },
   { href: "/reference/auth-kv-oauth/", label: "auth-kv-oauth", icon: "A" },
@@ -50,6 +51,8 @@ const referenceUnits: NavItem[] = [
   { href: "/reference/kv/", label: "kv", icon: "K" },
   { href: "/reference/logger/", label: "logger", icon: "L" },
   { href: "/reference/plugin/", label: "plugin", icon: "P" },
+  { href: "/reference/plugin-ai/", label: "plugin-ai", icon: "P" },
+  { href: "/reference/plugin-ai-core/", label: "plugin-ai-core", icon: "P" },
   { href: "/reference/plugin-auth/", label: "plugin-auth", icon: "P" },
   { href: "/reference/plugin-auth-core/", label: "plugin-auth-core", icon: "P" },
   { href: "/reference/prisma-adapter-mysql/", label: "prisma-adapter-mysql", icon: "P" },
@@ -148,6 +151,9 @@ export const navSections: NavSection[] = [
       { href: "/ai/durable-chat/", label: "Guide: durable chat", icon: "G" },
       { href: "/ai/chat-ui/", label: "Guide: chat UI", icon: "G" },
       { href: "/ai/engine/", label: "Reference: AI engine", icon: "R" },
+      { href: "/reference/ai/", label: "Reference: ai", icon: "R" },
+      { href: "/reference/plugin-ai/", label: "Reference: plugin-ai", icon: "R" },
+      { href: "/reference/plugin-ai-core/", label: "Reference: plugin-ai-core", icon: "R" },
     ],
   },
   {

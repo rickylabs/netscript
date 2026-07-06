@@ -93,5 +93,8 @@ independently of the deferred engine.
   { eyebrow: "Beta.2", title: "AI engine", body: "@netscript/ai: the provider-agnostic runtime, contracts vocabulary, ports, tools, agent loop, MCP transports, and provider adapters.", href: "/ai/engine/", icon: "E" },
   { eyebrow: "Capability hub", title: "AI capability", body: "The one-screen orientation for the AI capability and how it composes with the rest of the framework.", href: "/capabilities/ai/", icon: "◎" },
   { eyebrow: "Related", title: "Durable streams", body: "The other real-time plane — live list/board/table data over the durable-stream server.", href: "/capabilities/streams/", icon: "🌊" },
-  { eyebrow: "Related", title: "Web Layer", body: "The Fresh page and island model the durable-chat runtime plugs into.", href: "/web-layer/", icon: "O" }
+  { eyebrow: "Related", title: "Web Layer", body: "The Fresh page and island model the durable-chat runtime plugs into.", href: "/web-layer/", icon: "O" },
+  { eyebrow: "API Reference", title: "@netscript/ai", body: "Generated symbols for the AI engine package.", href: "/reference/ai/", icon: "R" },
+  { eyebrow: "API Reference", title: "@netscript/plugin-ai", body: "Generated symbols for the thin AI plugin delivery shell.", href: "/reference/plugin-ai/", icon: "R" },
+  { eyebrow: "API Reference", title: "@netscript/plugin-ai-core", body: "Generated symbols for the AI plugin's reusable contract and composition core.", href: "/reference/plugin-ai-core/", icon: "R" }
 ] }) }}
