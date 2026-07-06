@@ -232,3 +232,23 @@ glyphs). Scoped check/lint/fmt 124 files clean; gen:assets-barrel regenerated. O
 file copy; design:sync build PASS; canvas upload plan_ec262e10d4ad451f_5cfa4226a0cd
 (_ns_runtime.js, _ns_styles.css, PromptInput.tsx/prompt.md). Owner cancelled #509 pass 2 — design
 accepted as solid.
+
+## Closure reconciliation: HOST_ENV_RULES deleted (2026-07-06)
+
+The #547 registry conversion (7 L3 blocks → semantic `ns-*` classes, scoped box-sizing in
+`layouts.css`) made the host-env equivalence layer dead weight. Deleted the `HOST_ENV_RULES`
+const + its `chunks.push` from `tools/design-sync/src/closure.ts` (−4,265 chars; closure
+100.8K → 97.6K).
+
+Evidence:
+- scoped fmt/check on `tools/design-sync` (11 files): 0 findings.
+- `design:sync build`: PASS, parity green.
+- Render gate re-shoot without the layer: DataTable, StatsGrid, FormField, EmptyState,
+  Pagination, DetailLayout cards + screen 03 (Catalog, 1440px). Visually verified DataTable
+  (grid/dividers), StatsGrid (auto-fit), FormField (insets/borders), screen 03 — no
+  regression from losing the preflight border-reset or the utility set. Screens' markup is
+  pure `ns-*` (grep: zero non-ns classes).
+- Canvas: `_ns_styles.css` re-uploaded (plan plan_ec262e10d4ad451f_4002122b338d).
+
+Remaining reconciliation (after #547 merges): rebase this branch on main, drop the 42-file
+working-tree overlay, rebuild + spot-check.
