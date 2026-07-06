@@ -30,8 +30,7 @@ export const TEMPLATE_KEYS = {
   appRoutesDesignTokensView: 'app/routes/(design)/design/(_components)/tokens-view.tsx.template',
   appRoutesExamplesComponentsExamplesView:
     'app/routes/examples/(_components)/examples-view.tsx.template',
-  appRoutesExamplesComponentsCrudView:
-    'app/routes/examples/(_components)/crud-view.tsx.template',
+  appRoutesExamplesComponentsCrudView: 'app/routes/examples/(_components)/crud-view.tsx.template',
   appRoutesExamplesComponentsHero: 'app/routes/examples/(_components)/hero.tsx.template',
   appRoutesExamplesComponentsLabPanel: 'app/routes/examples/(_components)/lab-panel.tsx.template',
   appRoutesExamplesComponentsNotesCard: 'app/routes/examples/(_components)/notes-card.tsx.template',
@@ -125,6 +124,12 @@ export const TEMPLATE_KEYS = {
   workspaceContractsMod: 'workspace/contracts/mod.ts.template',
   workspaceContractsV1Aggregate: 'workspace/contracts/v1-aggregate.ts.template',
   workspaceContractsV1Empty: 'workspace/contracts/v1-empty.ts.template',
+  workspaceGithubWorkflowsDeployBareMetal:
+    'workspace/github/workflows/deploy-bare-metal.yml.template',
+  workspaceGithubWorkflowsDeployComposeGhcr:
+    'workspace/github/workflows/deploy-compose-ghcr.yml.template',
+  workspaceGithubWorkflowsDeployDenoDeploy:
+    'workspace/github/workflows/deploy-deno-deploy.yml.template',
   workspaceGitignore: 'workspace/gitignore.template',
   workspacePluginsMod: 'workspace/plugins/mod.ts.template',
 } as const;
@@ -141,7 +146,9 @@ export const TEMPLATE_MANIFEST = Object.values(TEMPLATE_KEYS).map((path) => ({
   path,
 })) as readonly TemplateManifestItem[];
 
-const TEMPLATE_KEY_SET: ReadonlySet<string> = new Set(TEMPLATE_MANIFEST.map((item) => item.key));
+const TEMPLATE_KEY_SET: ReadonlySet<string> = new Set(
+  TEMPLATE_MANIFEST.map((item) => item.key),
+);
 
 export function isTemplateKey(value: string): value is TemplateKey {
   return TEMPLATE_KEY_SET.has(value);

@@ -39,7 +39,10 @@ function fakeTarget(calls: RecordedOp[]): DeployTargetPort {
 }
 
 function fakeDependencies(calls: RecordedOp[]): PublicCommandDependencies {
-  const deployTargets = new DeployTargetRegistry([['compose', fakeTarget(calls)]]);
+  const deployTargets = new DeployTargetRegistry([[
+    'compose',
+    fakeTarget(calls),
+  ]]);
   return {
     deployTargets,
     resolveProjectRoot: (projectRoot?: string) => Promise.resolve(projectRoot ?? '/resolved-root'),
@@ -57,12 +60,35 @@ Deno.test('router routes a verb straight to the registry-resolved adapter', asyn
   const calls: RecordedOp[] = [];
   const command = createTargetDeployCommand('compose', fakeDependencies(calls));
 
-  await command.parse(['plan', '--project-root', '/proj', '--output-dir', '.deploy/compose']);
+  await command.parse([
+    'plan',
+    '--project-root',
+    '/proj',
+    '--output-dir',
+    '.deploy/compose',
+    '--environment',
+    'staging',
+    '--non-interactive',
+  ]);
 
   assertEquals(calls.length, 1);
   assertEquals(calls[0].operation, 'plan');
   assertEquals(calls[0].request.projectRoot, '/proj');
   assertEquals(calls[0].request.outputDir, '.deploy/compose');
+  assertEquals(calls[0].request.environment, 'staging');
+  assertEquals(calls[0].request.nonInteractive, true);
+});
+
+Deno.test('router forwards cache clearing without target-specific branching', async () => {
+  const calls: RecordedOp[] = [];
+  const command = createTargetDeployCommand('compose', fakeDependencies(calls));
+
+  await command.parse(['up', '--clear-cache']);
+
+  assertEquals(calls.length, 1);
+  assertEquals(calls[0].operation, 'up');
+  assertEquals(calls[0].request.projectRoot, '/resolved-root');
+  assertEquals(calls[0].request.clearCache, true);
 });
 
 Deno.test('router omits verbs the adapter does not advertise', () => {

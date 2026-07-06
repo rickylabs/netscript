@@ -32,10 +32,20 @@ const request = { projectRoot: '/proj', outputDir: '.deploy/compose' } as const;
 
 Deno.test('compose adapter declares the supported subset and omits rollback/secrets', () => {
   const process = new FakeProcess();
-  const adapter: DeployTargetPort = new AspireComposeDeployTarget({ key: 'compose', process });
+  const adapter: DeployTargetPort = new AspireComposeDeployTarget({
+    key: 'compose',
+    process,
+  });
 
   assertEquals(adapter.key, 'compose');
-  assertEquals(adapter.operations, ['plan', 'emit', 'up', 'down', 'status', 'logs']);
+  assertEquals(adapter.operations, [
+    'plan',
+    'emit',
+    'up',
+    'down',
+    'status',
+    'logs',
+  ]);
   assertEquals(adapter.rollback, undefined);
   assertEquals(adapter.secrets, undefined);
 });
@@ -48,9 +58,37 @@ Deno.test('plan/emit delegate to `aspire publish --output-path` (authors no YAML
   await adapter.emit(request);
 
   assertEquals(process.calls[0].command, 'aspire');
-  assertEquals(process.calls[0].args, ['publish', '--output-path', '.deploy/compose']);
+  assertEquals(process.calls[0].args, [
+    'publish',
+    '--output-path',
+    '.deploy/compose',
+  ]);
   assertEquals(process.calls[0].cwd, '/proj');
-  assertEquals(process.calls[1].args, ['publish', '--output-path', '.deploy/compose']);
+  assertEquals(process.calls[1].args, [
+    'publish',
+    '--output-path',
+    '.deploy/compose',
+  ]);
+});
+
+Deno.test('plan forwards Aspire environment and non-interactive flags', async () => {
+  const process = new FakeProcess();
+  const adapter = new AspireComposeDeployTarget({ key: 'compose', process });
+
+  await adapter.plan({
+    ...request,
+    environment: 'staging',
+    nonInteractive: true,
+  });
+
+  assertEquals(process.calls[0].args, [
+    'publish',
+    '--output-path',
+    '.deploy/compose',
+    '--environment',
+    'staging',
+    '--non-interactive',
+  ]);
 });
 
 Deno.test('compose `up` self-hosts via `docker compose up -d` on the emitted file', async () => {
@@ -79,6 +117,26 @@ Deno.test('docker `up` delegates the apply to `aspire deploy`', async () => {
   assertEquals(process.calls[0].args, ['deploy']);
 });
 
+Deno.test('docker `up` can clear Aspire deployment cache for CI', async () => {
+  const process = new FakeProcess();
+  const adapter = new AspireComposeDeployTarget({ key: 'docker', process });
+
+  await adapter.up({
+    ...request,
+    environment: 'production',
+    clearCache: true,
+    nonInteractive: true,
+  });
+
+  assertEquals(process.calls[0].args, [
+    'deploy',
+    '--environment',
+    'production',
+    '--non-interactive',
+    '--clear-cache',
+  ]);
+});
+
 Deno.test('down/status/logs shell `docker compose` against the emitted project', async () => {
   const process = new FakeProcess();
   const adapter = new AspireComposeDeployTarget({ key: 'compose', process });
@@ -87,8 +145,18 @@ Deno.test('down/status/logs shell `docker compose` against the emitted project',
   await adapter.status(request);
   await adapter.logs(request);
 
-  assertEquals(process.calls[0].args, ['compose', '-f', '.deploy/compose/docker-compose.yaml', 'down']);
-  assertEquals(process.calls[1].args, ['compose', '-f', '.deploy/compose/docker-compose.yaml', 'ps']);
+  assertEquals(process.calls[0].args, [
+    'compose',
+    '-f',
+    '.deploy/compose/docker-compose.yaml',
+    'down',
+  ]);
+  assertEquals(process.calls[1].args, [
+    'compose',
+    '-f',
+    '.deploy/compose/docker-compose.yaml',
+    'ps',
+  ]);
   assertEquals(process.calls[2].args, [
     'compose',
     '-f',

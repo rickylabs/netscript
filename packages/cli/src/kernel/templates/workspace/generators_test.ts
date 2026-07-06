@@ -43,8 +43,17 @@ Deno.test('generateDenoJson emits the expected root workspace shape in JSR mode'
     '**/.generated',
   ]);
   assertEquals(result.tasks.dev, 'deno run --allow-all apps/dashboard/main.ts');
-  assertEquals(result.tasks.check, 'deno check apps/**/*.ts services/**/*.ts contracts/**/*.ts');
-  assertEquals(Object.keys(result.tasks), ['dev', 'check', 'lint', 'fmt', 'test']);
+  assertEquals(
+    result.tasks.check,
+    'deno check apps/**/*.ts services/**/*.ts contracts/**/*.ts',
+  );
+  assertEquals(Object.keys(result.tasks), [
+    'dev',
+    'check',
+    'lint',
+    'fmt',
+    'test',
+  ]);
   assertEquals(Object.keys(result.fmt), [
     'useTabs',
     'lineWidth',
@@ -143,7 +152,10 @@ Deno.test('generateDenoJson expands copied workspace packages in stable order', 
     './packages/cron',
     './packages/database',
   ]);
-  assertEquals(result.workspace[result.workspace.length - 1], './packages/prisma-adapter-mysql');
+  assertEquals(
+    result.workspace[result.workspace.length - 1],
+    './packages/prisma-adapter-mysql',
+  );
 });
 
 Deno.test('generateNetScriptConfig emits the JSR import and stable section order', () => {
@@ -152,8 +164,13 @@ Deno.test('generateNetScriptConfig emits the JSR import and stable section order
     importMode: 'jsr',
   });
 
-  assert(!result.includes('// TODO: When @netscript packages are published to JSR'));
-  assertStringIncludes(result, "import { defineConfig } from '@netscript/config';");
+  assert(
+    !result.includes('// TODO: When @netscript packages are published to JSR'),
+  );
+  assertStringIncludes(
+    result,
+    "import { defineConfig } from '@netscript/config';",
+  );
   assert(
     result.indexOf("import { defineConfig } from '@netscript/config';") <
       result.indexOf('export default defineConfig({'),
@@ -176,8 +193,13 @@ Deno.test('generateNetScriptConfig switches to local imports without the JSR TOD
     localBase: '../..',
   });
 
-  assertStringIncludes(result, "import { defineConfig } from '@netscript/config';");
-  assert(!result.includes('// TODO: When @netscript packages are published to JSR'));
+  assertStringIncludes(
+    result,
+    "import { defineConfig } from '@netscript/config';",
+  );
+  assert(
+    !result.includes('// TODO: When @netscript packages are published to JSR'),
+  );
   assert(
     result.indexOf("import { defineConfig } from '@netscript/config';") <
       result.indexOf('export default defineConfig({'),
@@ -200,19 +222,49 @@ Deno.test('generateReadme — TS AppHost with service + postgres', () => {
   assertStringIncludes(md, 'services/users');
   assertStringIncludes(md, 'PostgreSQL');
   assertStringIncludes(md, 'appsettings.json');
-  assertStringIncludes(md, 'deno run -A packages/cli/bin/netscript-dev.ts --help');
+  assertStringIncludes(
+    md,
+    'deno run -A packages/cli/bin/netscript-dev.ts --help',
+  );
   assertStringIncludes(md, 'deno run -A packages/cli/bin/netscript.ts --help');
   assertStringIncludes(
     md,
     'Use `packages/cli/bin/netscript-dev.ts` for local contributor workflows',
   );
-  assertStringIncludes(md, 'deno run -A packages/cli/bin/netscript-dev.ts db init --name init');
-  assertStringIncludes(md, 'deno run -A packages/cli/bin/netscript-dev.ts db generate');
-  assertStringIncludes(md, 'deno run -A packages/cli/bin/netscript-dev.ts db seed');
-  assertStringIncludes(md, 'deno run -A packages/cli/bin/netscript-dev.ts db status');
+  assertStringIncludes(
+    md,
+    'deno run -A packages/cli/bin/netscript-dev.ts db init --name init',
+  );
+  assertStringIncludes(
+    md,
+    'deno run -A packages/cli/bin/netscript-dev.ts db generate',
+  );
+  assertStringIncludes(
+    md,
+    'deno run -A packages/cli/bin/netscript-dev.ts db seed',
+  );
+  assertStringIncludes(
+    md,
+    'deno run -A packages/cli/bin/netscript-dev.ts db status',
+  );
+  assertStringIncludes(md, 'deploy-compose-ghcr.yml');
+  assertStringIncludes(md, 'deploy-deno-deploy.yml');
+  assertStringIncludes(md, 'deploy-bare-metal.yml');
+  assertStringIncludes(
+    md,
+    '`development` first, then `staging`, then `production`',
+  );
+  assertStringIncludes(md, '--clear-cache');
+  assertStringIncludes(md, '~/.aspire/deployments');
   assertStringIncludes(md, '`users.health.check` via `/api/rpc`');
-  assert(!md.includes('dotnet run'), 'TS AppHost README should not mention dotnet run');
-  assert(!md.includes('aspire run'), 'TS AppHost README should not mention aspire run');
+  assert(
+    !md.includes('dotnet run'),
+    'TS AppHost README should not mention dotnet run',
+  );
+  assert(
+    !md.includes('aspire run'),
+    'TS AppHost README should not mention aspire run',
+  );
 });
 
 Deno.test('generateReadme — legacy C# AppHost', () => {
@@ -225,9 +277,18 @@ Deno.test('generateReadme — legacy C# AppHost', () => {
   });
   assertStringIncludes(md, 'dotnet run --project dotnet/AppHost');
   assertStringIncludes(md, 'dotnet/');
-  assert(!md.includes('aspire run'), 'legacy README should not mention aspire run');
-  assert(!md.includes('services/'), 'README should omit services section when no service');
-  assert(!md.includes('## Database'), 'README should omit database section when dbEngine=none');
+  assert(
+    !md.includes('aspire run'),
+    'legacy README should not mention aspire run',
+  );
+  assert(
+    !md.includes('services/'),
+    'README should omit services section when no service',
+  );
+  assert(
+    !md.includes('## Database'),
+    'README should omit database section when dbEngine=none',
+  );
 });
 
 Deno.test('generateReadme — no aspire points at app dev task', () => {
@@ -239,9 +300,22 @@ Deno.test('generateReadme — no aspire points at app dev task', () => {
     dbEngine: 'none',
   });
   assertStringIncludes(md, 'deno task --cwd apps/dashboard dev');
-  assert(!md.includes('aspire run'), 'no-aspire README must not mention aspire run');
-  assert(!md.includes('dotnet run'), 'no-aspire README must not mention dotnet run');
-  assert(!md.includes('appsettings.json'), 'no-aspire README must not list appsettings.json');
+  assert(
+    !md.includes('aspire run'),
+    'no-aspire README must not mention aspire run',
+  );
+  assert(
+    !md.includes('dotnet run'),
+    'no-aspire README must not mention dotnet run',
+  );
+  assert(
+    !md.includes('appsettings.json'),
+    'no-aspire README must not list appsettings.json',
+  );
+  assert(
+    !md.includes('## Deployment CI'),
+    'no-aspire README should not describe Aspire CI',
+  );
 });
 
 Deno.test('generateReadme — no aspire postgres asks for self-provisioning', () => {
@@ -256,7 +330,10 @@ Deno.test('generateReadme — no aspire postgres asks for self-provisioning', ()
   assertStringIncludes(md, 'Self-provision the database');
   assertStringIncludes(md, '`POSTGRES_URI` or `DATABASE_URL`');
   assert(!md.includes('Aspire orchestration layer provisions it'));
-  assert(!md.includes('appsettings.json'), 'no-aspire README must not mention appsettings.json');
+  assert(
+    !md.includes('appsettings.json'),
+    'no-aspire README must not mention appsettings.json',
+  );
 });
 
 Deno.test('generateReadme — sqlite gets non-persistent note', () => {

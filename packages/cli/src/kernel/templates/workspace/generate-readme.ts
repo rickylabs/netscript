@@ -63,7 +63,9 @@ export function generateReadme(options: ReadmeOptions): string {
       lines.push('# Start the full Aspire orchestration (C# AppHost)');
       lines.push('dotnet run --project dotnet/AppHost');
     } else {
-      lines.push('# Restore Aspire SDK modules (once), then start orchestration');
+      lines.push(
+        '# Restore Aspire SDK modules (once), then start orchestration',
+      );
       lines.push(
         '# (run from the aspire/ subfolder so `aspire` sees apphost.mts + aspire.config.json)',
       );
@@ -81,25 +83,35 @@ export function generateReadme(options: ReadmeOptions): string {
   lines.push('');
   lines.push('```');
   lines.push(`${options.name}/`);
-  lines.push(`├── apps/${options.appName}/   # Fresh frontend (defineFreshApp)`);
+  lines.push(
+    `├── apps/${options.appName}/   # Fresh frontend (defineFreshApp)`,
+  );
   lines.push('├── contracts/        # Shared oRPC contracts (versioned)');
   if (options.serviceName) {
     lines.push(`├── services/${options.serviceName}/ # Example oRPC service`);
   }
   lines.push('├── plugins/          # Plugin registry and implementations');
   if (!options.noAspire && options.legacyAspire) {
-    lines.push('├── dotnet/           # Aspire C# orchestration (AppHost + ServiceDefaults)');
+    lines.push(
+      '├── dotnet/           # Aspire C# orchestration (AppHost + ServiceDefaults)',
+    );
   } else if (!options.noAspire) {
     lines.push(
       '├── aspire/           # Aspire TypeScript orchestration (isolated Node.js runtime)',
     );
     lines.push('│   ├── apphost.mts   # Entry point for `aspire start`');
     lines.push('│   ├── .helpers/     # Generated register-*.mts helpers');
-    lines.push('│   ├── .aspire/      # Aspire SDK modules (aspire restore output)');
-    lines.push('│   └── package.json  # tsx + vscode-jsonrpc (isolated from the Deno workspace)');
+    lines.push(
+      '│   ├── .aspire/      # Aspire SDK modules (aspire restore output)',
+    );
+    lines.push(
+      '│   └── package.json  # tsx + vscode-jsonrpc (isolated from the Deno workspace)',
+    );
   }
   if (!options.noAspire) {
-    lines.push('├── appsettings.json  # NetScript infrastructure config (Services/Databases/…)');
+    lines.push(
+      '├── appsettings.json  # NetScript infrastructure config (Services/Databases/…)',
+    );
   }
   lines.push('├── deno.json         # Workspace root configuration');
   lines.push('└── netscript.config.ts  # NetScript framework configuration');
@@ -124,9 +136,13 @@ export function generateReadme(options: ReadmeOptions): string {
   }
   if (!options.noAspire) {
     if (options.legacyAspire) {
-      lines.push('| `dotnet run --project dotnet/AppHost` | Start Aspire orchestration (C#) |');
+      lines.push(
+        '| `dotnet run --project dotnet/AppHost` | Start Aspire orchestration (C#) |',
+      );
     } else {
-      lines.push('| `cd aspire && aspire restore` | Restore Aspire SDK modules (run once) |');
+      lines.push(
+        '| `cd aspire && aspire restore` | Restore Aspire SDK modules (run once) |',
+      );
       lines.push(
         '| `cd aspire && aspire start` | Start Aspire orchestration (TypeScript AppHost) |',
       );
@@ -139,8 +155,38 @@ export function generateReadme(options: ReadmeOptions): string {
   lines.push(
     '| `deno run -A packages/cli/bin/netscript-dev.ts --help` | Show local contributor CLI commands |',
   );
-  lines.push('| `deno run -A packages/cli/bin/netscript.ts --help` | Show public CLI commands |');
+  lines.push(
+    '| `deno run -A packages/cli/bin/netscript.ts --help` | Show public CLI commands |',
+  );
   lines.push('');
+
+  if (!options.noAspire) {
+    lines.push('## Deployment CI');
+    lines.push('');
+    lines.push(
+      'The scaffold includes GitHub Actions starter workflows under `.github/workflows`:',
+    );
+    lines.push('');
+    lines.push('| Workflow | Purpose |');
+    lines.push('| --- | --- |');
+    lines.push(
+      '| `deploy-compose-ghcr.yml` | Build and push Compose-backed container images to GHCR, then run `netscript deploy docker up` with `--clear-cache`. |',
+    );
+    lines.push(
+      '| `deploy-deno-deploy.yml` | Run checks and promote a Deno Deploy target with `netscript deploy deno-deploy up`. |',
+    );
+    lines.push(
+      '| `deploy-bare-metal.yml` | Compile bare-metal service artifacts with `netscript deploy build` and upload them as workflow artifacts. |',
+    );
+    lines.push('');
+    lines.push(
+      'Use each workflow environment input as the promotion path: `development` first, then `staging`, then `production` after the same artifact and configuration have passed review.',
+    );
+    lines.push(
+      'The Compose/GHCR workflow intentionally passes `--clear-cache` and does not persist `~/.aspire/deployments`, so Aspire deployment state that may include prompted secrets is not saved in CI caches.',
+    );
+    lines.push('');
+  }
 
   if (options.serviceName) {
     lines.push(`## Example Service — \`${options.serviceName}\``);
@@ -177,13 +223,19 @@ export function generateReadme(options: ReadmeOptions): string {
       );
     }
     lines.push('');
-    lines.push('Use the local contributor CLI for database commands in this workspace:');
+    lines.push(
+      'Use the local contributor CLI for database commands in this workspace:',
+    );
     if (!options.noAspire) {
-      lines.push('Run these after the Aspire AppHost has restored and started.');
+      lines.push(
+        'Run these after the Aspire AppHost has restored and started.',
+      );
     }
     lines.push('');
     lines.push('```bash');
-    lines.push('deno run -A packages/cli/bin/netscript-dev.ts db init --name init');
+    lines.push(
+      'deno run -A packages/cli/bin/netscript-dev.ts db init --name init',
+    );
     lines.push('deno run -A packages/cli/bin/netscript-dev.ts db generate');
     lines.push('deno run -A packages/cli/bin/netscript-dev.ts db seed');
     lines.push('deno run -A packages/cli/bin/netscript-dev.ts db status');
@@ -208,7 +260,9 @@ export function generateReadme(options: ReadmeOptions): string {
 
   lines.push('## Learn More');
   lines.push('');
-  lines.push('- [NetScript Documentation](https://github.com/rickylabs/netscript)');
+  lines.push(
+    '- [NetScript Documentation](https://github.com/rickylabs/netscript)',
+  );
   lines.push('- [Deno Manual](https://docs.deno.com)');
   lines.push('- [Fresh](https://fresh.deno.dev)');
   lines.push('- [oRPC](https://orpc.unnoq.com)');

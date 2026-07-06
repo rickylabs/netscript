@@ -37,6 +37,12 @@ export interface DeployTargetRequest {
   readonly projectRoot: string;
   /** Optional deployment output directory. */
   readonly outputDir?: string;
+  /** Optional Aspire deployment environment (for example, `staging`). */
+  readonly environment?: string;
+  /** Whether Aspire deploy should clear and avoid saving deployment state. */
+  readonly clearCache?: boolean;
+  /** Whether the underlying deploy tool should run without prompts. */
+  readonly nonInteractive?: boolean;
 }
 
 /** Result returned by deploy target operations. */

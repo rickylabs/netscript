@@ -14,34 +14,36 @@ expectations about what the scaffold wires for you and what you still own.
 
 This is a task recipe, not a one-click button. NetScript is in alpha, and the scaffold is
 deliberately minimal about deployment: it gives you a single declarative description of every
-process (`appsettings.json`), runnable Deno entrypoints with explicit permissions, and the
-Aspire AppHost that orchestrates them locally. It does **not** generate a `Dockerfile`, a
-`docker-compose.yml`, or a cloud target *artifact* for you — those are yours to assemble, and this
-page shows you exactly which verified facts to build them from. The one runnable managed-platform
-*command* is [Deno Deploy](/how-to/deploy-deno-deploy/) (see the callout below).
+process (`appsettings.json`), runnable Deno entrypoints with explicit permissions, the Aspire
+AppHost that orchestrates them locally, and starter GitHub Actions workflows for the shipped
+deployment targets. It does **not** generate a `Dockerfile`, a `docker-compose.yml`, or a finished
+cloud infrastructure stack for you — those are yours to assemble from the verified facts below.
 
 {{ comp callout { type: "important", title: "What is wired vs. what is manual" } }}
 <strong>Wired:</strong> a declarative resource graph in <code>appsettings.json</code> (ports,
 entrypoints, permissions, env vars, dependencies), runnable per-process Deno entrypoints, and
 the Aspire AppHost (<code>aspire/apphost.mts</code>) for local orchestration.
-<strong>Manual / aspirational:</strong> there is <em>no</em> generated container image,
-compose file, or cloud deploy target. <code>netscript.config.ts</code> ships an empty
-<code>deploy: {}</code> block. You assemble the production target yourself from the primitives
+<strong>Generated CI starters:</strong> <code>.github/workflows/deploy-compose-ghcr.yml</code>,
+<code>.github/workflows/deploy-deno-deploy.yml</code>, and
+<code>.github/workflows/deploy-bare-metal.yml</code>.
+<strong>Manual:</strong> there is <em>no</em> generated container image, compose file, or finished
+cloud infrastructure stack. <code>netscript.config.ts</code> ships an empty <code>deploy: {}</code>
+block unless you configure a target. You assemble the production target yourself from the primitives
 below — every one of which is a verified fact you can copy verbatim.
 <br><strong>Migration (#337):</strong> Windows deploy settings now live under
 <code>deploy.targets.windows</code> (previously <code>deploy.windows</code>).
 {{ /comp }}
 
-{{ comp callout { type: "tip", title: "One managed platform IS wired: Deno Deploy" } }}
-There is now a first-class, runnable managed-platform path:
-<strong><code>netscript deploy deno-deploy &lt;op&gt;</code></strong> (<code>plan</code>/<code>up</code>/
-<code>status</code>/<code>logs</code>/<code>down</code>) pushes a workspace to
-<a href="https://deno.com/deploy">Deno Deploy</a> over the native <code>deno deploy</code> CLI, with a
-preflight guard and <code>deploy.targets['deno-deploy']</code> config. It is the exception to the
-"manual" framing on this page. The <strong>Docker, Compose, and Linux/systemd</strong> targets remain
-config-schema only — there is <em>no</em> runnable <code>netscript deploy docker|compose|linux</code>
-verb — so those you still assemble by hand from the facts below. See
-<a href="/how-to/deploy-deno-deploy/">Deploy to Deno Deploy</a> for the full command reference.
+{{ comp callout { type: "tip", title: "Generated CI follows the shipped targets" } }}
+The scaffolded workflows cover the deploy surfaces that ship today:
+<strong>Deno Deploy</strong> (<code>netscript deploy deno-deploy up</code>),
+<strong>Compose/GHCR</strong> (<code>netscript deploy compose emit</code> +
+<code>netscript deploy docker up</code>), and <strong>bare metal</strong>
+(<code>netscript deploy build</code>). They are intentionally starter pipelines: fill in repository
+secrets, GitHub environment protection, host credentials, and target-specific configuration before
+you treat them as production release jobs. See
+<a href="/how-to/deploy-deno-deploy/">Deploy to Deno Deploy</a> for the managed-platform command
+reference.
 {{ /comp }}
 
 ## Before you start
@@ -93,7 +95,7 @@ first-party plugins installed, the graph looks like this:
 
 {{ comp.apiTable({ caption: "Resources declared in appsettings.json (verified from a scaffolded workspace)", rows: [
   { name: "users", type: "service · :3000 (the scaffold default; the exact port is OS-allocated from the SERVICE range starting at 3000)", desc: "Example oRPC service. Entrypoint <code>src/main.ts</code>, runtime <code>deno</code>. RPC mounts under <code>/api/rpc/*</code>." },
-  { name: "streams", type: "plugin · :4437", desc: "durable-streams runtime service. <code>RequiresDb=false</code>, <code>RequiresKv=false</code>. Real producer runtime — see Step 5." },
+  { name: "streams", type: "plugin · :4437", desc: "durable-streams runtime service. <code>RequiresDb=false</code>, <code>RequiresKv=false</code>. Real producer runtime — see Step 6." },
   { name: "workers-api", type: "plugin · :8091", desc: "Workers API. Requires DB + KV. References <code>streams</code>." },
   { name: "sagas-api", type: "plugin · :8092", desc: "Sagas API. Requires DB + KV. References <code>workers-api</code>, <code>streams</code>." },
   { name: "triggers-api", type: "plugin · :8093", desc: "Triggers API. Typed v1 oRPC contract for trigger/event introspection + management; the webhook ingress endpoint <code>POST /api/v1/webhooks/:triggerId</code> stays a raw HMAC-verifying route by design. Requires DB + KV. References <code>workers-api</code>, <code>streams</code>." },
@@ -230,7 +232,33 @@ config metadata and the artifact you actually run agree. The
 dashboard binds <code>:18888</code> and the OTLP collector listens on <code>:4318</code>.
 {{ /comp }}
 
-## Step 5 — Run a process by hand (the bare-metal primitive)
+## Step 5 — Wire generated CI and promotion
+
+New Aspire-backed workspaces include three GitHub Actions starter workflows under
+`.github/workflows/`:
+
+{{ comp.apiTable({ caption: "Generated deployment workflows", rows: [
+  { name: "deploy-compose-ghcr.yml", type: "Compose + GHCR", desc: "Restores the Aspire AppHost, emits Compose output with <code>netscript deploy compose emit</code>, builds/pushes images to GHCR, then runs <code>netscript deploy docker up</code> with <code>--clear-cache</code>." },
+  { name: "deploy-deno-deploy.yml", type: "Deno Deploy", desc: "Runs workspace checks, then calls <code>netscript deploy deno-deploy up</code> using GitHub secrets and variables for the Deno Deploy token, organization, and app." },
+  { name: "deploy-bare-metal.yml", type: "Bare metal", desc: "Compiles service artifacts with <code>netscript deploy build</code> on Linux and Windows runners, then uploads the output as workflow artifacts for host-specific installation." }
+] }) }}
+
+Treat the workflow `environment` input as the promotion ladder:
+`development` first, then `staging`, then `production`. In GitHub, map those names to protected
+environments and keep secrets environment-scoped so a staging run cannot accidentally read
+production credentials. Promote the same reviewed commit through each environment; do not rebuild
+from a different branch between staging and production.
+
+{{ comp callout { type: "warning", title: "Do not persist Aspire deployment state in CI" } }}
+Aspire deployment state is cached under <code>~/.aspire/deployments/{AppHostSha}/{environment}.json</code>
+and may contain plaintext values entered during deployment prompts. The generated Compose/GHCR
+workflow does not cache <code>~/.aspire/deployments</code> and passes <code>--clear-cache</code>
+to <code>netscript deploy docker up</code>, which forwards it to <code>aspire deploy --clear-cache</code>.
+Keep that behavior in CI. If you need durable values, store them in GitHub environment secrets or
+your platform's secret manager, not in the Aspire deployment cache.
+{{ /comp }}
+
+## Step 6 — Run a process by hand (the bare-metal primitive)
 
 Under every option above, the atomic unit is the same: one Deno process started from an
 entrypoint with the exact permission set from `appsettings.json`. This is what a container
@@ -264,7 +292,7 @@ deployment. To containerize, each process becomes one image whose `CMD` is the m
 {{ comp callout { type: "warning", title: "Limits of the alpha scaffold" } }}
 <ul>
 <li>No <code>Dockerfile</code>, <code>docker-compose.yml</code>, or Kubernetes manifest is generated. You write these from the <code>appsettings.json</code> facts above.</li>
-<li><code>netscript.config.ts</code> ships an empty <code>deploy: {}</code> block, and the scaffold generates no container/compose/cloud <em>artifacts</em>. The one runnable deploy <em>command</em> is <code>netscript deploy deno-deploy</code> (<a href="/how-to/deploy-deno-deploy/">Deploy to Deno Deploy</a>); Docker/Compose/Linux targets are config-schema only, with no runnable verb.</li>
+<li><code>netscript.config.ts</code> ships an empty <code>deploy: {}</code> block unless you configure a target. Generated workflows are starter CI definitions; you still provide registry, host, cloud, and secret-manager configuration before they are production release jobs.</li>
 <li>The <code>streams</code> service runs a <strong>real producer runtime</strong> (durable-streams over <code>@netscript/plugin-streams-core</code>, served on :4437) — deploy it as a first-class service. What is <em>not</em> production-ready is the manifest-helper layer: <code>@netscript/plugin-streams</code>'s <code>defineStreamProducer</code>/<code>defineStreamConsumer</code> <strong>throw <code>StreamUnsupportedOperationError</code></strong> by design (use <code>@netscript/plugin-streams-core</code> directly), and there is no in-process consumer <code>subscribe()</code> — consumption is HTTP/SSE.</li>
 <li>The scaffold worker <code>createJobTools(ctx)</code> handler helpers (<code>trace.addEvent</code>, <code>withChildSpan</code>, <code>progress</code>) are still no-op stubs (tracked debt, fix planned). Job dispatch/execution traces still appear in Aspire automatically; for custom handler spans call <code>@netscript/telemetry</code> helpers directly.</li>
 <li>DB commands assume a reachable Postgres — in CI/containers without Aspire, inject <code>POSTGRES_URI</code> yourself or the command fails fast.</li>
@@ -274,7 +302,7 @@ deployment. To containerize, each process becomes one image whose `CMD` is the m
 <!-- caveat: arch-debt:workers-scaffold-job-tools-noop -->
 {{ /comp }}
 
-## Step 6 — Verify the deployment
+## Step 7 — Verify the deployment
 
 Once your processes are up against real backing services, hit the health endpoints to confirm
 the graph is wired. These are the exact routes the local runtime exposes (substitute your

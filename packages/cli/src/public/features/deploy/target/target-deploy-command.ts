@@ -62,9 +62,32 @@ export function createTargetDeployCommand(
       operation,
       new Command()
         .description(OPERATION_DESCRIPTIONS[operation])
-        .option('--project-root <dir:string>', 'Project root for the deployment operation')
-        .option('--output-dir <dir:string>', 'Directory for emitted deployment artifacts')
-        .action(async (options: { projectRoot?: string; outputDir?: string }) => {
+        .option(
+          '--project-root <dir:string>',
+          'Project root for the deployment operation',
+        )
+        .option(
+          '--output-dir <dir:string>',
+          'Directory for emitted deployment artifacts',
+        )
+        .option(
+          '--environment <name:string>',
+          'Deployment environment passed to the target',
+        )
+        .option(
+          '--clear-cache',
+          'Clear target deployment state and do not persist new values',
+        )
+        .option('--non-interactive', 'Run the target in non-interactive mode')
+        .action(async (
+          options: {
+            projectRoot?: string;
+            outputDir?: string;
+            environment?: string;
+            clearCache?: boolean;
+            nonInteractive?: boolean;
+          },
+        ) => {
           await runTargetOperation(dependencies, key, operation, options);
         }),
     );
@@ -77,25 +100,45 @@ async function runTargetOperation(
   dependencies: PublicCommandDependencies,
   key: string,
   operation: DeployOperation,
-  options: { projectRoot?: string; outputDir?: string },
+  options: {
+    projectRoot?: string;
+    outputDir?: string;
+    environment?: string;
+    clearCache?: boolean;
+    nonInteractive?: boolean;
+  },
 ): Promise<void> {
   const target = dependencies.deployTargets.get(key);
   if (!target || typeof target[operation] !== 'function') {
-    outputError(red(`✗ Deploy target '${key}' does not support '${operation}'.`));
+    outputError(
+      red(`✗ Deploy target '${key}' does not support '${operation}'.`),
+    );
     failDeployCommand(`Unsupported deploy operation: ${key} ${operation}`);
   }
 
-  const projectRoot = await dependencies.resolveProjectRoot(options.projectRoot);
+  const projectRoot = await dependencies.resolveProjectRoot(
+    options.projectRoot,
+  );
   if (!projectRoot) {
-    outputError(red('✗ Could not resolve a project root. Pass --project-root.'));
+    outputError(
+      red('✗ Could not resolve a project root. Pass --project-root.'),
+    );
     failDeployCommand('Deploy command failed: project root not found.');
   }
 
   try {
-    const result = await target[operation]!({ projectRoot, outputDir: options.outputDir });
+    const result = await target[operation]!({
+      projectRoot,
+      outputDir: options.outputDir,
+      environment: options.environment,
+      clearCache: options.clearCache,
+      nonInteractive: options.nonInteractive,
+    });
     outputText(green(`✓ ${result.message}`));
   } catch (error: unknown) {
-    outputError(red(`✗ ${error instanceof Error ? error.message : String(error)}`));
+    outputError(
+      red(`✗ ${error instanceof Error ? error.message : String(error)}`),
+    );
     failDeployCommand('Deploy command failed.', { cause: error });
   }
 }

@@ -66,7 +66,17 @@ To add a future workflow template, add a `.template` file under `packages/cli/sr
 | 2026-07-06 | Separate PLAN-EVAL returned `FAIL_PLAN`. | Gate set omitted full A7/A6 evidence and scaffold runtime merge-readiness gate. |
 | 2026-07-06 | Updated plan gate set. | Added universal fitness, F-CLI, F-DEPLOY, consumer validation, and supervisor-owned `scaffold.runtime` merge-readiness gate while preserving the implementation-slice instruction not to run `e2e:cli`. |
 | 2026-07-06 | Separate PLAN-EVAL second pass returned `PASS`. | `plan-eval.md` updated from evaluator-provided PASS content. |
+| 2026-07-06 | Implemented workflow template assets and scaffold emission. | Default Aspire-backed init emits Compose/GHCR, Deno Deploy, and bare-metal GitHub Actions templates; `--no-aspire` omits the Aspire-backed Compose/GHCR workflow. |
+| 2026-07-06 | Implemented deploy target CI flags. | `deploy <compose|docker> <op>` accepts `--environment`, `--non-interactive`, and `--clear-cache`; Aspire adapter forwards environment/non-interactive to publish/deploy and clear-cache to `aspire deploy`. |
+| 2026-07-06 | Updated docs/readme generation. | Generated README and `docs/site/how-to/deploy.md` document generated workflows, `development -> staging -> production` promotion, and non-persistence of `~/.aspire/deployments` in CI. |
+| 2026-07-06 | Ran focused tests. | `deno test --allow-all packages/cli/src/kernel/adapters/aspire/aspire-compose-deploy-target_test.ts packages/cli/src/public/features/deploy/target/target-deploy-command_test.ts packages/cli/src/kernel/application/scaffold/plan-init_test.ts packages/cli/src/kernel/templates/workspace/generators_test.ts` passed: 30 passed. |
+| 2026-07-06 | Ran scoped check/lint/fmt evidence. | 12 touched CLI TS files clean via scoped `run-deno-check`, direct `deno lint --no-config --rules-exclude=no-import-prefix`, and direct `deno fmt --check --no-config --single-quote=true --line-width 100 --indent-width 2`. |
+| 2026-07-06 | Ran affected package tests. | `rtk proxy deno task --cwd packages/cli test` passed: 311 passed, 0 failed. |
+| 2026-07-06 | Ran public surface gates. | `run-deno-doc-lint --root packages/cli` passed with 0 errors after re-exporting `CacheBackendChoice`; `rtk proxy deno task publish:dry-run` passed. |
+| 2026-07-06 | Ran final repo validation. | `rtk proxy deno task check` passed: 2102 files, 18 batches, 0 occurrences. `rtk proxy deno task test` passed: 1527 passed, 0 failed, 12 ignored. |
+| 2026-07-06 | Ran architecture gate. | `rtk proxy deno task arch:check` exited 0 with existing WARN/INFO items outside this slice. |
 
 ## Reconcile Notes
 
 - Pre-implementation reconcile: no product code changed; issue #347 scope is unblocked by closed #342/#343 per issue body.
+- Implementation reconcile: no file-level sibling collision observed; no `deno.lock` churn; `deno task e2e:cli` intentionally not run per slice instructions.
