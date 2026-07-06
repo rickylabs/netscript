@@ -185,6 +185,9 @@
 - name: "epic:harness-v3"
   color: "5319e7"
   description: "Agentic Workflow Doctrine V3 epic (#389)"
+- name: "epic:process-manager"
+  color: "5319e7"
+  description: "Process manager plugin epic (bare-metal supervisor + admin console, child of #327)"
 
 # ── wave: release-train bucket (maps to milestone) ───────────────────────────
 - name: "wave:v1"
