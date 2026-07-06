@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>NetScript Dev Dashboard — Stack Map</title>
+    <script>
+      (function () {
+        var dark = false;
+        try { dark = new URLSearchParams(location.search).get('theme') === 'dark'; } catch (e) {}
+        if (dark) document.documentElement.dataset.theme = 'dark';
+        else delete document.documentElement.dataset.theme;
+        try { localStorage.setItem('ns-theme', dark ? 'dark' : 'light'); } catch (e) {}
+      })();
+    </script>
+    <link rel="stylesheet" href="../_ns_styles.css">
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="proto.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="../_ns_runtime.js"></script>
+    <script>
+      (function () {
+        var R = window.React;
+        var NS = window.NSOne;
+        var h = R.createElement;
+
+        /* ---------- shared shell data ---------- */
+
+        var NAV = [
+          {
+            label: 'Console',
+            items: [
+              { href: '/stack', label: 'Stack Map', icon: '◈' },
+              { href: '/catalog', label: 'Catalog', icon: '▤' },
+              { href: '/traces', label: 'Traces', icon: '⌁' },
+              { href: '/runs', label: 'Runs', icon: '◎' },
+              { href: '/logs', label: 'Logs', icon: '≡' },
+              { href: '/resources', label: 'Resources', icon: '⏻' },
+            ],
+          },
+          {
+            label: 'Capabilities',
+            items: [
+              { href: '/cap/workers', label: 'workers', icon: '⚙' },
+              { href: '/cap/sagas', label: 'sagas', icon: '⤿' },
+              { href: '/cap/triggers', label: 'triggers', icon: '⚡' },
+              { href: '/cap/streams', label: 'streams', icon: '≋' },
+            ],
+          },
+          {
+            label: 'Host',
+            items: [
+              { href: '/plugins', label: 'Plugin Control', icon: '❖' },
+            ],
+          },
+        ];
+
+        function EnvBar() {
+          return h('span', { class: 'ns-envbar', 'data-state': 'running' }, [
+            h('span', { key: 'dot', class: 'ns-envbar__dot', 'aria-hidden': 'true' }),
+            h('span', { key: 'env', class: 'ns-envbar__seg' }, 'local'),
+            h('span', { key: 'app', class: 'ns-envbar__seg', 'data-part': 'app' }, 'my-app'),
+            h('span', { key: 'orch', class: 'ns-envbar__seg' }, 'aspire'),
+          ]);
+        }
+
+        var STATUS_VARIANT = {
+          running: 'primary',
+          completed: 'success',
+          failed: 'destructive',
+          retrying: 'warning',
+          degraded: 'warning',
+          queued: 'muted',
+          starting: 'primary',
+          stopped: 'muted',
+        };
+
+        function StatusBadge(status) {
+          return h(NS.Badge, { variant: STATUS_VARIANT[status] || 'muted' }, status);
+        }
+
+        function Shell(props) {
+          return h(NS.SidebarShell, {
+            pathname: '/stack',
+            navigation: NAV,
+            brand: 'NetScript',
+            brandBadge: h(NS.Badge, { variant: 'muted' }, 'dev'),
+            footer: h('span', { class: 'ns-text-2xs ns-muted-fg' }, 'netscript 0.0.1-beta.5'),
+            topbarStart: h(NS.Breadcrumb, {
+              items: [{ label: 'Console', href: '/' }, { label: 'Stack Map' }],
+            }),
+            topbarEnd: h(R.Fragment, null, [
+              h(EnvBar, { key: 'env' }),
+              h(NS.Search, { key: 'search', placeholder: 'Jump to…', shortcut: '⌘K' }),
+              h(NS.ThemeToggle, { key: 'theme' }),
+            ]),
+          }, props.children);
+        }
+
+        /* ---------- stack data ---------- */
+
+        var NODES = [
+          {
+            id: 'web', name: 'web', kind: 'service', state: 'running', icon: '◈',
+            col: 1, row: 1, meta: ['fresh', ':8000', 'up 2h 14m'],
+            endpoints: ['http://localhost:8000'],
+            probes: [
+              { probe: 'GET /healthz', result: '200 · 9 ms', state: 'ok' },
+              { probe: 'api tcp :8001', result: 'ok · 1 ms', state: 'ok' },
+            ],
+            stats: [['cpu', '1.8%'], ['mem', '96 MiB'], ['restarts', '0']],
+          },
+          {
+            id: 'api', name: 'api', kind: 'service', state: 'running', icon: '◈',
+            col: 2, row: 1, meta: ['orpc', ':8001', '34 procedures'],
+            endpoints: ['http://localhost:8001', 'http://localhost:8001/rpc'],
+            probes: [
+              { probe: 'GET /healthz', result: '200 · 11 ms', state: 'ok' },
+              { probe: 'postgres tcp :5432', result: 'ok · 2 ms', state: 'ok' },
+              { probe: 'redis PING', result: '480 ms', state: 'degraded' },
+            ],
+            stats: [['cpu', '3.1%'], ['mem', '212 MiB'], ['restarts', '0']],
+          },
+          {
+            id: 'workers', name: 'workers', kind: 'worker', state: 'running', icon: '⚙',
+            col: 2, row: 2, meta: ['queue imports', 'depth 24', '4 inflight'],
+            endpoints: ['http://localhost:8002/healthz'],
+            probes: [
+              { probe: 'GET /healthz', result: '200 · 6 ms', state: 'ok' },
+              { probe: 'redis PING', result: '480 ms', state: 'degraded' },
+              { probe: 'postgres tcp :5432', result: 'ok · 2 ms', state: 'ok' },
+            ],
+            stats: [['depth', '24'], ['inflight', '4'], ['p95', '168 ms']],
+          },
+          {
+            id: 'eis-chat', name: 'eis-chat', kind: 'service', state: 'running', icon: '◈',
+            col: 1, row: 2, meta: ['fresh', ':8004', 'up 2h 14m'],
+            endpoints: ['http://localhost:8004'],
+            probes: [
+              { probe: 'GET /healthz', result: '200 · 14 ms', state: 'ok' },
+              { probe: 'api tcp :8001', result: 'ok · 1 ms', state: 'ok' },
+            ],
+            stats: [['cpu', '2.2%'], ['mem', '154 MiB'], ['restarts', '0']],
+          },
+          {
+            id: 'postgres', name: 'postgres', kind: 'database', state: 'running', icon: '⛁',
+            col: 3, row: 1, meta: ['postgres:17', ':5432'],
+            endpoints: ['postgres://localhost:5432/my_app'],
+            probes: [
+              { probe: 'tcp accept :5432', result: 'ok · 1 ms', state: 'ok' },
+            ],
+            stats: [['conns', '12 / 100'], ['size', '412 MiB'], ['restarts', '0']],
+          },
+          {
+            id: 'redis', name: 'redis', kind: 'cache', state: 'degraded', icon: '▣',
+            col: 3, row: 2, meta: ['redis:8', ':6379', 'mem 92%'],
+            endpoints: ['redis://localhost:6379'],
+            probes: [
+              { probe: 'PING', result: '480 ms', state: 'degraded' },
+              { probe: 'memory 236 / 256 MiB', result: '92%', state: 'degraded' },
+            ],
+            stats: [['ops', '1.4k/s'], ['hit rate', '96.2%'], ['evictions', '318']],
+          },
+          {
+            id: 'mailpit', name: 'mailpit', kind: 'container', state: 'running', icon: '▢',
+            col: 3, row: 3, meta: ['mailpit:1.24', ':8025 / :1025'],
+            endpoints: ['http://localhost:8025'],
+            probes: [
+              { probe: 'GET /readyz', result: '200 · 8 ms', state: 'ok' },
+            ],
+            stats: [['messages', '32'], ['mem', '38 MiB'], ['restarts', '0']],
+          },
+          {
+            id: 'otel-collector', name: 'otel-collector', kind: 'container', state: 'running', icon: '▢',
+            col: 1, row: 3, meta: ['otlp', ':4317', '240 spans/s'],
+            endpoints: ['grpc://localhost:4317'],
+            probes: [
+              { probe: 'grpc health', result: 'serving', state: 'ok' },
+            ],
+            stats: [['spans', '240/s'], ['mem', '74 MiB'], ['dropped', '0']],
+          },
+        ];
+
+        var EDGES = [
+          { from: 'web', to: 'api' },
+          { from: 'eis-chat', to: 'api' },
+          { from: 'api', to: 'workers' },
+          { from: 'api', to: 'postgres' },
+          { from: 'api', to: 'redis' },
+          { from: 'workers', to: 'postgres' },
+          { from: 'workers', to: 'redis' },
+          { from: 'workers', to: 'mailpit' },
+        ];
+
+        /* ---------- stack map ---------- */
+
+        function StackMapEdges(props) {
+          var st = R.useState(null);
+          var paths = st[0], setPaths = st[1];
+          var selected = props.selected;
+          var canvasRef = props.canvasRef;
+
+          var compute = R.useCallback(function () {
+            var canvas = canvasRef.current;
+            if (!canvas) return;
+            var crect = canvas.getBoundingClientRect();
+            var items = [];
+            EDGES.forEach(function (edge) {
+              var a = canvas.querySelector('[data-node-id="' + edge.from + '"]');
+              var b = canvas.querySelector('[data-node-id="' + edge.to + '"]');
+              if (!a || !b) return;
+              var ra = a.getBoundingClientRect();
+              var rb = b.getBoundingClientRect();
+              var d;
+              if (Math.abs(ra.left - rb.left) < 12) {
+                var x = ra.left + ra.width / 2 - crect.left;
+                d = 'M' + x + ',' + (ra.bottom - crect.top) + ' L' + x + ',' + (rb.top - crect.top);
+              } else {
+                var x1 = ra.right - crect.left;
+                var y1 = ra.top + ra.height / 2 - crect.top;
+                var x2 = rb.left - crect.left;
+                var y2 = rb.top + rb.height / 2 - crect.top;
+                var mx = (x1 + x2) / 2;
+                d = 'M' + x1 + ',' + y1 + ' C' + mx + ',' + y1 + ' ' + mx + ',' + y2 + ' ' + x2 + ',' + y2;
+              }
+              items.push({
+                key: edge.from + '→' + edge.to,
+                d: d,
+                active: selected === edge.from || selected === edge.to,
+              });
+            });
+            setPaths({ w: crect.width, h: crect.height, items: items });
+          }, [selected]);
+
+          R.useLayoutEffect(function () { compute(); }, [compute]);
+          R.useEffect(function () {
+            var onResize = function () { compute(); };
+            window.addEventListener('resize', onResize);
+            return function () { window.removeEventListener('resize', onResize); };
+          }, [compute]);
+
+          if (!paths) return null;
+          return h(
+            'svg',
+            {
+              class: 'ns-stackmap__edge-layer',
+              width: paths.w,
+              height: paths.h,
+              'aria-hidden': 'true',
+            },
+            paths.items.map(function (p) {
+              return h('path', {
+                key: p.key,
+                class: 'ns-stackmap__edge',
+                d: p.d,
+                'data-state': p.active ? 'active' : undefined,
+              });
+            }),
+          );
+        }
+
+        function StackMapNode(props) {
+          var node = props.node;
+          return h(
+            'button',
+            {
+              type: 'button',
+              class: 'ns-stackmap__node',
+              'data-node-id': node.id,
+              'data-state': node.state,
+              'data-kind': node.kind,
+              'aria-pressed': props.selected ? 'true' : 'false',
+              style: { gridColumn: String(node.col), gridRow: String(node.row) },
+              onClick: props.onSelect,
+            },
+            [
+              h('span', { key: 't', class: 'ns-stackmap__node-title' }, [
+                h('span', { key: 'i', class: 'ns-stackmap__node-icon', 'aria-hidden': 'true' }, node.icon),
+                h('span', { key: 'n' }, node.name),
+                h('span', { key: 's', class: 'ns-stackmap__node-state', 'aria-hidden': 'true' }),
+              ]),
+              h('span', { key: 'm', class: 'ns-stackmap__node-meta' }, node.meta.map(function (m, i) {
+                return h('span', { key: i }, m);
+              })),
+              h('span', { key: 'c', class: 'ns-connector' }, node.probes.slice(0, 1).map(function (p, i) {
+                return h('span', { key: i, class: 'ns-connector__row', 'data-state': p.state }, [
+                  h('span', { key: 'd', class: 'ns-connector__dot', 'aria-hidden': 'true' }),
+                  h('span', { key: 'p', class: 'ns-connector__probe' }, p.probe),
+                  h('span', { key: 'r', class: 'ns-connector__result' }, p.result),
+                ]);
+              })),
+            ],
+          );
+        }
+
+        /* ---------- context rail ---------- */
+
+        function NodeDetail(props) {
+          var node = props.node;
+          if (!node) {
+            return h(NS.EmptyState, { heading: 'No resource selected' },
+              'Select a node to inspect health, endpoints, and actions.');
+          }
+          return h(NS.Panel, { tone: 'raised' }, [
+            h(NS.Panel.Header, { key: 'head' }, [
+              h(NS.Panel.Title, { key: 't' }, node.name),
+              h('div', { key: 'b', class: 'ns-cluster ns-cluster--sm' }, [
+                h(NS.Badge, { key: 'kind', variant: 'muted' }, node.kind),
+                h(R.Fragment, { key: 'state' }, StatusBadge(node.state)),
+              ]),
+            ]),
+            h(NS.Panel.Body, { key: 'body', class: 'ns-stack ns-stack--md' }, [
+              h('div', { key: 'endpoints', class: 'ns-stack ns-stack--xs' }, [
+                h('p', { key: 'l', class: 'ns-label' }, 'Endpoints'),
+                h('div', { key: 'v', class: 'ns-stack ns-stack--xs' }, node.endpoints.map(function (ep, i) {
+                  return h('code', { key: i, class: 'ns-inline-code' }, ep);
+                })),
+              ]),
+              h('div', { key: 'health', class: 'ns-stack ns-stack--xs' }, [
+                h('p', { key: 'l', class: 'ns-label' }, 'Health'),
+                h('div', { key: 'v', class: 'ns-connector' }, node.probes.map(function (p, i) {
+                  return h('span', { key: i, class: 'ns-connector__row', 'data-state': p.state }, [
+                    h('span', { key: 'd', class: 'ns-connector__dot', 'aria-hidden': 'true' }),
+                    h('span', { key: 'p', class: 'ns-connector__probe' }, p.probe),
+                    h('span', { key: 'r', class: 'ns-connector__result' }, p.result),
+                  ]);
+                })),
+              ]),
+              h('div', { key: 'metrics', class: 'ns-stack ns-stack--xs' }, [
+                h('p', { key: 'l', class: 'ns-label' }, 'Last 5 min'),
+                h('div', { key: 'v', class: 'ns-connector' }, node.stats.map(function (s, i) {
+                  return h('span', { key: i, class: 'ns-connector__row' }, [
+                    h('span', { key: 'p', class: 'ns-connector__probe' }, s[0]),
+                    h('span', { key: 'r', class: 'ns-connector__result' }, s[1]),
+                  ]);
+                })),
+              ]),
+              h('div', { key: 'actions', class: 'ns-stack ns-stack--xs' }, [
+                h('p', { key: 'l', class: 'ns-label' }, 'Actions'),
+                h('div', { key: 'btns', class: 'ns-toolbar' }, [
+                  h(NS.Button, { key: 'restart', variant: 'outline', size: 'sm' }, 'Restart'),
+                  h(NS.Button, { key: 'stop', variant: 'ghost', size: 'sm' }, 'Stop'),
+                  h(NS.Button, { key: 'logs', variant: 'ghost', size: 'sm' }, 'Logs'),
+                ]),
+                h(NS.CodeBlock, {
+                  key: 'cli',
+                  code: 'aspire resource restart ' + node.id,
+                  lang: 'sh',
+                }),
+              ]),
+            ]),
+            h(NS.Panel.Footer, { key: 'foot', class: 'ns-cluster ns-cluster--sm' }, [
+              h(NS.Button, { key: 'traces', variant: 'ghost', size: 'sm' }, 'View traces'),
+              h(NS.Button, { key: 'runs', variant: 'ghost', size: 'sm' }, 'View runs'),
+            ]),
+          ]);
+        }
+
+        /* ---------- page ---------- */
+
+        function Page() {
+          var st = R.useState('api');
+          var selected = st[0], setSelected = st[1];
+          var canvasRef = R.useRef(null);
+          var selectedNode = null;
+          NODES.forEach(function (n) { if (n.id === selected) selectedNode = n; });
+
+          return h(Shell, null, h('div', { class: 'ns-stack ns-stack--lg' }, [
+            h(NS.PageHeader, { key: 'header', class: 'ns-page-header--console' },
+              h(NS.PageHeader.Main, null, [
+                h(NS.PageHeader.Intro, { key: 'intro' }, [
+                  h('h1', { key: 'h' }, 'Stack Map'),
+                  h('p', { key: 'p', class: 'ns-lede' },
+                    'Every Aspire resource in my-app, live. Select a node to inspect it; traces and runs filter to the selection.'),
+                ]),
+                h(NS.PageHeader.Status, { key: 'status' }, [
+                  h('span', { key: '1' }, '8 resources'),
+                  h('span', { key: 's1', class: 'ns-status-bar__sep' }, '·'),
+                  h('span', { key: '2' }, '7 running'),
+                  h('span', { key: 's2', class: 'ns-status-bar__sep' }, '·'),
+                  h('span', { key: '3' }, '1 degraded'),
+                ]),
+              ]),
+            ),
+            h('div', { key: 'body', class: 'ns-content-rail' }, [
+              h(NS.Card, { key: 'map' },
+                h(NS.Card.Body, null,
+                  h('div', { class: 'ns-stackmap' },
+                    h('div', { class: 'ns-stackmap__canvas', ref: canvasRef }, [
+                      h(StackMapEdges, { key: 'edges', canvasRef: canvasRef, selected: selected }),
+                    ].concat(NODES.map(function (node) {
+                      return h(StackMapNode, {
+                        key: node.id,
+                        node: node,
+                        selected: selected === node.id,
+                        onSelect: function () {
+                          setSelected(selected === node.id ? null : node.id);
+                        },
+                      });
+                    }))),
+                  ),
+                ),
+              ),
+              h('div', { key: 'rail' }, h(NodeDetail, { node: selectedNode })),
+            ]),
+          ]));
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(h(Page));
+      })();
+    </script>
+  </body>
+</html>
