@@ -1,0 +1,3213 @@
+Fixed and pushed.
+
+Commit: `ac9e06ba test(cli): preserve compile target assertions`
+
+What changed:
+- Added the missing saga and trigger compile-target assertions to [compile_test.ts](/home/codex/repos/netscript-307-stale24/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts).
+- Did not restore deleted `compile.test.ts`.
+- Touched no other files.
+
+Validation:
+- `cd packages/cli && deno task test` passed: `306 passed (407 steps), 0 failed`.
+
+Pushed with the explicit refspec to `origin/chore/307-stale-wave2-wave4`. I also posted the PR evidence comment here: https://github.com/rickylabs/netscript/pull/485#issuecomment-4888014858
+
+Final git check is clean: branch `chore/307-stale-wave2-wave4`, no unstaged or staged changes.
+OpenAI Codex v0.142.5
+--------
+workdir: /home/codex/repos/netscript-307-stale24
+model: gpt-5.5
+provider: openai
+approval: never
+sandbox: danger-full-access
+reasoning effort: medium
+reasoning summaries: auto
+session id: 019f3492-97ee-7903-88ef-c5d1f8f23851
+--------
+user
+Adversarial review caveat on PR 485 (fix before eval): deleted compile.test.ts contained unique assertions the surviving compile_test.ts lacks. In packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts, extend the existing test (extractCompileTargets emits metadata-driven background processor targets) with the missing assertions: sagasCombined.concurrencyEnvVar === SAGA_CONCURRENCY, sagasCombined.workdir === sagas, sagasCombined.entrypoint === sagas/bin/combined.ts, triggerProcessor.concurrencyEnvVar === TRIGGER_CONCURRENCY, triggerProcessor.workdir === plugins/triggers, triggerProcessor.entrypoint === plugins/triggers/src/runtime/trigger-processor.ts. Do NOT restore the deleted file. Run cd packages/cli && deno task test (must pass). One commit, push explicit refspec HEAD:refs/heads/chore/307-stale-wave2-wave4, reply to the adversarial review comment on PR 485 with the fix commit + test evidence. Touch nothing else.
+**Planning code modifications**
+
+I want to edit the `compile_test`, check the file, and then apply a patch. After running my tests, I need to commit and push the changes. Now, regarding the adversarial review comment, I'm not sure if there’s a specific comment ID to reply to. I should find comments using GitHub; maybe fetching the top-level comments will help. If I can't identify which one to address, I might need to add to the top-level comments. But let’s focus on making those edits first.
+codex
+I’ll make only the requested test coverage fix in `compile_test.ts`, keep the deleted file deleted, run `cd packages/cli && deno task test`, then commit, push with the explicit refspec, and reply on PR #485 with the commit and test evidence.
+exec
+/bin/bash -lc "sed -n '1,190p' packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts" in /home/codex/repos/netscript-307-stale24
+ succeeded in 0ms:
+import { join, resolve } from '@std/path';
+import { loadDeployConfig } from '../../config/deploy-config.ts';
+import { extractCompileTargets } from './compile-targets.ts';
+
+function assert(condition: unknown, message: string): asserts condition {
+  if (!condition) {
+    throw new Error(message);
+  }
+}
+
+let configPromise: ReturnType<typeof loadDeployConfig> | undefined;
+let projectRootPromise: Promise<string> | undefined;
+
+function getProjectRoot(): Promise<string> {
+  projectRootPromise ??= createCompileProject();
+  return projectRootPromise;
+}
+
+async function getConfig() {
+  configPromise ??= loadDeployConfig({ projectRoot: await getProjectRoot(), quiet: true });
+  return configPromise;
+}
+
+async function getConfiguredTriggerWatchDirs(): Promise<string[]> {
+  const projectRoot = await getProjectRoot();
+  const appsettings = JSON.parse(
+    await Deno.readTextFile(join(projectRoot, 'dotnet', 'AppHost', 'appsettings.json')),
+  ) as {
+    NetScript?: {
+      BackgroundProcessors?: {
+        triggers?: {
+          WatchDirs?: string[];
+        };
+      };
+    };
+  };
+
+  return appsettings.NetScript?.BackgroundProcessors?.triggers?.WatchDirs ?? [];
+}
+
+Deno.test('loadDeployConfig resolves unified background processors from appsettings and registry', async () => {
+  const config = await getConfig();
+  const configuredTriggerWatchDirs = await getConfiguredTriggerWatchDirs();
+  const legacyKeys = config as unknown as Record<string, unknown>;
+
+  assert(!('workers' in legacyKeys), 'legacy workers config should not exist on ResolvedConfig');
+  assert(!('sagas' in legacyKeys), 'legacy sagas config should not exist on ResolvedConfig');
+  assert(!('triggers' in legacyKeys), 'legacy triggers config should not exist on ResolvedConfig');
+
+  const workers = config.backgroundProcessors.workers;
+  const sagas = config.backgroundProcessors.sagas;
+  const triggers = config.backgroundProcessors.triggers;
+
+  assert(workers?.enabled, 'workers background processor should be enabled');
+  assert(sagas?.enabled, 'sagas background processor should be enabled');
+  assert(triggers?.enabled, 'triggers background processor should be enabled');
+
+  const workerEntrypoints = Object.keys(workers.entrypoints).sort().join(',');
+  assert(
+    workerEntrypoints === 'combined',
+    `unexpected worker entrypoints: ${workerEntrypoints}`,
+  );
+  assert(
+    JSON.stringify(triggers.watchDirs ?? []) === JSON.stringify(configuredTriggerWatchDirs),
+    'triggers watchDirs should match BackgroundProcessors.triggers.WatchDirs from appsettings',
+  );
+});
+
+async function createCompileProject(): Promise<string> {
+  const projectRoot = await Deno.makeTempDir();
+  await Deno.mkdir(resolve(projectRoot, 'dotnet', 'AppHost'), { recursive: true });
+  await Deno.writeTextFile(
+    resolve(projectRoot, 'netscript.config.ts'),
+    `export default {
+  name: 'fixture-app',
+  databases: { config: [] },
+  plugins: [
+    '@netscript/plugin-workers',
+    '@netscript/plugin-sagas',
+    '@netscript/plugin-triggers',
+  ],
+};
+`,
+  );
+  await Deno.writeTextFile(
+    resolve(projectRoot, 'dotnet', 'AppHost', 'appsettings.json'),
+    JSON.stringify({
+      NetScript: {
+        Services: {
+          users: {
+            Runtime: 'deno',
+            Port: 3001,
+            Entrypoint: 'src/main.ts',
+            Workdir: 'services/users',
+          },
+          orders: {
+            Runtime: 'deno',
+            Port: 3002,
+            Entrypoint: 'src/main.ts',
+            Workdir: 'services/orders',
+            ServiceReferences: ['users'],
+          },
+        },
+        Plugins: {
+          'workers-api': {
+            Enabled: true,
+            Workdir: 'plugins/workers',
+            Entrypoint: 'services/src/main.ts',
+          },
+        },
+        BackgroundProcessors: {
+          workers: {
+            Enabled: true,
+            Workdir: 'workers',
+            Entrypoint: 'bin/combined.ts',
+            Concurrency: 2,
+            ConcurrencyEnvVar: 'WORKER_CONCURRENCY',
+          },
+          sagas: {
+            Enabled: true,
+            Workdir: 'sagas',
+            Entrypoint: 'bin/combined.ts',
+            ConcurrencyEnvVar: 'SAGA_CONCURRENCY',
+          },
+          triggers: {
+            Enabled: true,
+            Workdir: 'plugins/triggers',
+            Entrypoint: 'src/runtime/trigger-processor.ts',
+            Concurrency: 10,
+            ConcurrencyEnvVar: 'TRIGGER_CONCURRENCY',
+            WatchDirs: ['plugins/triggers/events'],
+          },
+        },
+      },
+    }, null, 2),
+  );
+  return projectRoot;
+}
+
+Deno.test('extractCompileTargets emits metadata-driven background processor targets', async () => {
+  const config = await getConfig();
+  config.backgroundProcessors.workers.concurrency = 7;
+
+  const targets = extractCompileTargets(config);
+  const byName = new Map(targets.map((target) => [target.name, target]));
+
+  for (
+    const targetName of [
+      'workers-combined',
+      'sagas-combined',
+      'trigger-processor',
+    ]
+  ) {
+    assert(byName.has(targetName), `missing compile target: ${targetName}`);
+  }
+
+  const workersCombined = byName.get('workers-combined');
+  const workersApi = byName.get('workers-api');
+  assert(
+    workersCombined?.concurrencyEnvVar === 'WORKER_CONCURRENCY',
+    'workers-combined should carry concurrency env var',
+  );
+  assert(
+    workersCombined?.defaultConcurrency === 7,
+    'workers-combined should use resolved background processor concurrency',
+  );
+  assert(
+    workersApi?.workdir === 'plugins/workers',
+    'workers-api should resolve from the plugin service appsettings entry',
+  );
+
+  assert(
+    !byName.has('workers-worker'),
+    'workers-worker should not be emitted when appsettings only enables the combined runtime',
+  );
+  assert(
+    !byName.has('workers-scheduler'),
+    'workers-scheduler should not be emitted when appsettings only enables the combined runtime',
+  );
+
+  const triggerProcessor = byName.get('trigger-processor');
+  assert(
+    triggerProcessor?.pluginName === 'triggers',
+    'trigger target should retain source plugin metadata',
+  );
+  assert(
+    triggerProcessor?.defaultConcurrency === 10,
+    'trigger target should preserve plugin default concurrency',
+  );
+});
+
+exec
+/bin/bash -lc "deno eval 'const p = new Deno.Command(\"git\", { args: [\"status\", \"--short\", \"--branch\"] }).outputSync(); await Deno.stdout.write(p.stdout); await Deno.stderr.write(p.stderr); Deno.exit(p.code);'" in /home/codex/repos/netscript-307-stale24
+ succeeded in 0ms:
+## chore/307-stale-wave2-wave4
+
+**Applying a patch**
+
+I need to apply a patch and consider if I should import the normalize function. Right now, I'm working with join and resolve. Should I compare the normalized entry point? If the user wants an exact match, I might want to use join or normalize. I deleted the previously used normalize, but maybe I should use strict strings since the entry points could be OS-dependent. They likely normalize from the config while testing on Linux. I need to ensure the assertion meets the user's request and add the sagas constant.
+codex
+`compile_test.ts` already has the target map and trigger target assertions; I’m adding the missing sagas assertions and the trigger concurrency/workdir/entrypoint assertions into that existing test.
+apply patch
+patch: completed
+/home/codex/repos/netscript-307-stale24/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+diff --git a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+index 4eef5bb4a6c5855ae1e46f155ab79a006d6eae0a..1033852a416abf036b144e50cba1742f3516ee4e
+--- a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
++++ b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+@@ -156,6 +156,7 @@
+ 
+   const workersCombined = byName.get('workers-combined');
+   const workersApi = byName.get('workers-api');
++  const sagasCombined = byName.get('sagas-combined');
+   assert(
+     workersCombined?.concurrencyEnvVar === 'WORKER_CONCURRENCY',
+     'workers-combined should carry concurrency env var',
+@@ -168,6 +169,18 @@
+     workersApi?.workdir === 'plugins/workers',
+     'workers-api should resolve from the plugin service appsettings entry',
+   );
++  assert(
++    sagasCombined?.concurrencyEnvVar === 'SAGA_CONCURRENCY',
++    'sagas-combined should carry saga concurrency env var',
++  );
++  assert(
++    sagasCombined?.workdir === 'sagas',
++    'sagas-combined should resolve from the sagas background workdir',
++  );
++  assert(
++    sagasCombined?.entrypoint === 'sagas/bin/combined.ts',
++    'sagas-combined should resolve the sagas combined runtime entrypoint',
++  );
+ 
+   assert(
+     !byName.has('workers-worker'),
+@@ -187,6 +200,18 @@
+     triggerProcessor?.defaultConcurrency === 10,
+     'trigger target should preserve plugin default concurrency',
+   );
++  assert(
++    triggerProcessor?.concurrencyEnvVar === 'TRIGGER_CONCURRENCY',
++    'trigger target should carry trigger concurrency env var',
++  );
++  assert(
++    triggerProcessor?.workdir === 'plugins/triggers',
++    'trigger target should resolve from the triggers plugin workdir',
++  );
++  assert(
++    triggerProcessor?.entrypoint === 'plugins/triggers/src/runtime/trigger-processor.ts',
++    'trigger target should resolve the trigger processor entrypoint',
++  );
+ });
+ 
+ Deno.test('loadDeployConfig maps service references to compile target dependencies', async () => {
+
+diff --git a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+index 4eef5bb4a6c5855ae1e46f155ab79a006d6eae0a..1033852a416abf036b144e50cba1742f3516ee4e
+--- a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
++++ b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+@@ -156,6 +156,7 @@
+ 
+   const workersCombined = byName.get('workers-combined');
+   const workersApi = byName.get('workers-api');
++  const sagasCombined = byName.get('sagas-combined');
+   assert(
+     workersCombined?.concurrencyEnvVar === 'WORKER_CONCURRENCY',
+     'workers-combined should carry concurrency env var',
+@@ -168,6 +169,18 @@
+     workersApi?.workdir === 'plugins/workers',
+     'workers-api should resolve from the plugin service appsettings entry',
+   );
++  assert(
++    sagasCombined?.concurrencyEnvVar === 'SAGA_CONCURRENCY',
++    'sagas-combined should carry saga concurrency env var',
++  );
++  assert(
++    sagasCombined?.workdir === 'sagas',
++    'sagas-combined should resolve from the sagas background workdir',
++  );
++  assert(
++    sagasCombined?.entrypoint === 'sagas/bin/combined.ts',
++    'sagas-combined should resolve the sagas combined runtime entrypoint',
++  );
+ 
+   assert(
+     !byName.has('workers-worker'),
+@@ -187,6 +200,18 @@
+     triggerProcessor?.defaultConcurrency === 10,
+     'trigger target should preserve plugin default concurrency',
+   );
++  assert(
++    triggerProcessor?.concurrencyEnvVar === 'TRIGGER_CONCURRENCY',
++    'trigger target should carry trigger concurrency env var',
++  );
++  assert(
++    triggerProcessor?.workdir === 'plugins/triggers',
++    'trigger target should resolve from the triggers plugin workdir',
++  );
++  assert(
++    triggerProcessor?.entrypoint === 'plugins/triggers/src/runtime/trigger-processor.ts',
++    'trigger target should resolve the trigger processor entrypoint',
++  );
+ });
+ 
+ Deno.test('loadDeployConfig maps service references to compile target dependencies', async () => {
+
+codex
+The test is updated. I’m formatting that one file and running the required `packages/cli` test task.
+exec
+/bin/bash -lc 'deno fmt packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts' in /home/codex/repos/netscript-307-stale24
+ exited 1 in 0ms:
+error: No target files found.
+
+exec
+/bin/bash -lc 'cd packages/cli && deno task test' in /home/codex/repos/netscript-307-stale24
+diff --git a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+index 4eef5bb4a6c5855ae1e46f155ab79a006d6eae0a..1033852a416abf036b144e50cba1742f3516ee4e
+--- a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
++++ b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+@@ -156,6 +156,7 @@
+ 
+   const workersCombined = byName.get('workers-combined');
+   const workersApi = byName.get('workers-api');
++  const sagasCombined = byName.get('sagas-combined');
+   assert(
+     workersCombined?.concurrencyEnvVar === 'WORKER_CONCURRENCY',
+     'workers-combined should carry concurrency env var',
+@@ -168,6 +169,18 @@
+     workersApi?.workdir === 'plugins/workers',
+     'workers-api should resolve from the plugin service appsettings entry',
+   );
++  assert(
++    sagasCombined?.concurrencyEnvVar === 'SAGA_CONCURRENCY',
++    'sagas-combined should carry saga concurrency env var',
++  );
++  assert(
++    sagasCombined?.workdir === 'sagas',
++    'sagas-combined should resolve from the sagas background workdir',
++  );
++  assert(
++    sagasCombined?.entrypoint === 'sagas/bin/combined.ts',
++    'sagas-combined should resolve the sagas combined runtime entrypoint',
++  );
+ 
+   assert(
+     !byName.has('workers-worker'),
+@@ -187,6 +200,18 @@
+     triggerProcessor?.defaultConcurrency === 10,
+     'trigger target should preserve plugin default concurrency',
+   );
++  assert(
++    triggerProcessor?.concurrencyEnvVar === 'TRIGGER_CONCURRENCY',
++    'trigger target should carry trigger concurrency env var',
++  );
++  assert(
++    triggerProcessor?.workdir === 'plugins/triggers',
++    'trigger target should resolve from the triggers plugin workdir',
++  );
++  assert(
++    triggerProcessor?.entrypoint === 'plugins/triggers/src/runtime/trigger-processor.ts',
++    'trigger target should resolve the trigger processor entrypoint',
++  );
+ });
+ 
+ Deno.test('loadDeployConfig maps service references to compile target dependencies', async () => {
+
+ succeeded in 15246ms:
+running 1 test from ./module_import_side_effect_test.ts
+public module imports do not execute the CLI runner ... ok (131ms)
+running 2 tests from ./scaffolding_test.ts
+plugin scaffolding plans and writes plugin-owned templates ... ok (2ms)
+plugin scaffolding skips existing files unless overwrite is enabled ... ok (460µs)
+running 6 tests from ./src/kernel/adapters/aspire/aspire-compose-deploy-target_test.ts
+compose adapter declares the supported subset and omits rollback/secrets ... ok (1ms)
+plan/emit delegate to `aspire publish --output-path` (authors no YAML) ... ok (361µs)
+compose `up` self-hosts via `docker compose up -d` on the emitted file ... ok (240µs)
+docker `up` delegates the apply to `aspire deploy` ... ok (81µs)
+down/status/logs shell `docker compose` against the emitted project ... ok (264µs)
+a non-zero exit surfaces as a thrown error with stderr detail ... ok (559µs)
+running 4 tests from ./src/kernel/adapters/config/deploy-config-resolvers.test.ts
+resolveDenoDeployTarget: empty config defaults prod to false with no fields ... ok (638µs)
+resolveDenoDeployTarget: reads deploy.targets[deno-deploy] from config ... ok (102µs)
+resolveDenoDeployTarget: CLI flag overrides win over config ... ok (69µs)
+resolveDenoDeployTarget: flags alone work with no config section ... ok (92µs)
+running 7 tests from ./src/kernel/adapters/config/deploy-config-resolvers_test.ts
+resolveLinuxDeploy applies Linux-sensible defaults ... ok (878µs)
+resolveLinuxDeploy honors user overrides from deploy.targets.linux ... ok (276µs)
+resolveWindowsDeploy applies Windows-sensible defaults ... ok (786µs)
+resolveWindowsDeploy honors user overrides from deploy.targets.windows ... ok (193µs)
+resolveDeployBase defaults the activation/secrets/otel convention blocks (U1–U3) ... ok (248µs)
+activation.strategy defaults per-OS (symlink on Linux, dir-swap on Windows) ... ok (306µs)
+resolveDeployBase honors activation/secrets/otel overrides ... ok (163µs)
+running 5 tests from ./src/kernel/adapters/config/plugin-registry.test.ts
+loadRegisteredPlugins returns normalized background processor metadata ... ok (32ms)
+loadRegisteredPlugins loads plugin specs from netscript config when omitted ... ok (91ms)
+loadRegisteredPlugins preserves registry output shape from explicit config specs ... ok (5ms)
+loadRegisteredPluginMetadata reads scaffold manifests without importing plugin modules ... ok (5ms)
+loadRegisteredPluginMetadata falls back when userland scaffold manifest is absent ... ok (4ms)
+running 4 tests from ./src/kernel/adapters/config/project-config-loader_test.ts
+loadProjectConfig runs the child loader under the project deno.json ... ok (88ms)
+loadProjectConfig preserves JavaScript config file resolution ... ok (85ms)
+loadProjectConfig reports a missing config from the child process ... ok (78ms)
+loadProjectConfig parses stdout without reading stderr noise ... ok (807µs)
+running 1 test from ./src/kernel/adapters/database/operation-runner_test.ts
+DbOperationRunner ...
+  runs one-shot operations through detached Aspire start and resource polling ...
+------- post-test output -------
+Starting db migrate for postgres...
+Migration applied.
+db migrate completed successfully.
+----- post-test output end -----
+  runs one-shot operations through detached Aspire start and resource polling ... ok (1ms)
+  preserves an operator-provided Aspire CLI start timeout ...
+------- post-test output -------
+Starting db migrate for postgres...
+Migration applied.
+db migrate completed successfully.
+----- post-test output end -----
+  preserves an operator-provided Aspire CLI start timeout ... ok (0ms)
+  keeps polling when Aspire describe returns empty output during startup ...
+------- post-test output -------
+Starting db migrate for postgres...
+Migration applied.
+db migrate completed successfully.
+----- post-test output end -----
+  keeps polling when Aspire describe returns empty output during startup ... ok (1ms)
+  uses the default Aspire CLI start timeout when the operator value is empty ...
+------- post-test output -------
+Starting db migrate for postgres...
+Migration applied.
+db migrate completed successfully.
+----- post-test output end -----
+  uses the default Aspire CLI start timeout when the operator value is empty ... ok (0ms)
+  keeps studio interactive and passes db cli mode through environment variables ... ok (0ms)
+DbOperationRunner ... ok (4ms)
+running 1 test from ./src/kernel/adapters/database/scaffolder_test.ts
+DatabaseScaffolder ...
+  renders database script wrappers with concrete schema and generated paths ... ok (3ms)
+  derives unique container database names for added engines ... ok (1ms)
+DatabaseScaffolder ... ok (6ms)
+running 1 test from ./src/kernel/adapters/database/workspace-resolver_test.ts
+DbWorkspaceResolver ...
+  discovers configured databases from appsettings.json ... ok (1ms)
+  resolves all enabled databases and skips disabled entries ... ok (0ms)
+  maps config engine labels to CLI engine identifiers ... ok (0ms)
+  rejects unknown database targets ... ok (0ms)
+DbWorkspaceResolver ... ok (4ms)
+running 5 tests from ./src/kernel/adapters/deno-deploy/deno-deploy-cli_test.ts
+buildDeployArgs: preview push maps only provided flags ... ok (561µs)
+buildDeployArgs: production push maps --prod/--org/--app/--env-file/entrypoint in order ... ok (90µs)
+buildLogsArgs/buildDeleteArgs/buildStatusArgs: map subcommand + target flags ... ok (160µs)
+DenoDeployCliAdapter: shells `deno` with deploy argv from the project root ... ok (154µs)
+DenoDeployCliAdapter: propagates a non-zero exit code ... ok (89µs)
+running 1 test from ./src/kernel/adapters/deploy/compile/compile-platform_test.ts
+compile-platform ...
+  defaultCompileTarget returns the host triple ... ok (1ms)
+  binaryExtensionForTarget appends .exe for windows triples ... ok (0ms)
+  binaryExtensionForTarget yields no extension for non-windows triples ... ok (0ms)
+compile-platform ... ok (1ms)
+running 3 tests from ./src/kernel/adapters/deploy/compile/compile_test.ts
+loadDeployConfig resolves unified background processors from appsettings and registry ... ok (439ms)
+extractCompileTargets emits metadata-driven background processor targets ... ok (431µs)
+loadDeployConfig maps service references to compile target dependencies ... ok (224µs)
+running 1 test from ./src/kernel/adapters/deploy/runtime-detect_test.ts
+deploy runtime-detect ...
+  honors an explicit OS over the host ... ok (0ms)
+  falls back to the host OS when none is given ... ok (0ms)
+  builds OS-appropriate full service names ... ok (0ms)
+  builds OS-appropriate config file names ... ok (0ms)
+  joins config paths per OS ... ok (0ms)
+deploy runtime-detect ... ok (3ms)
+running 5 tests from ./src/kernel/adapters/health/fetch-health-probe_test.ts
+resolveProbeUrl derives http://host:port/path when no url is given ... ok (600µs)
+resolveProbeUrl prefers an explicit url over derived host/port/path ... ok (42µs)
+probe is healthy when the observed status equals expectStatus ... ok (5ms)
+probe is unhealthy when the status differs from expectStatus ... ok (174µs)
+a thrown fetch (timeout/refused) is a non-healthy outcome, not an error ... ok (445µs)
+running 2 tests from ./src/kernel/adapters/linux/systemd/systemd-environment_test.ts
+withObservabilityEnvironment merges the core OTEL env over a base record ... ok (565µs)
+renderSystemdUnit emits the merged OTEL vars as Environment= directives ... ok (275µs)
+running 2 tests from ./src/kernel/adapters/linux/systemd/systemd_test.ts
+renderSystemdUnit ...
+  renders a well-formed .service unit with defaults ... ok (1ms)
+  emits User/Group/RuntimeDirectory only when provided ... ok (0ms)
+  escapes quotes and backslashes in Environment values ... ok (0ms)
+  honors overrides for service type, restart, and wantedBy ... ok (0ms)
+renderSystemdUnit ... ok (3ms)
+systemd command builders ...
+  builds the full unit name with the default prefix ... ok (0ms)
+  builds lifecycle args ... ok (0ms)
+  builds enable args with and without --force ... ok (0ms)
+  builds disable and daemon-reload args ... ok (0ms)
+  builds journalctl args ... ok (0ms)
+systemd command builders ... ok (2ms)
+running 3 tests from ./src/kernel/adapters/plugin/db-integration_test.ts
+copyPluginSchemaToRootDb copies plugin schema into active root DB schema tree ... ok (1ms)
+copyPluginSchemaToRootDb skips non-DB plugins ... ok (199µs)
+copyPluginSchemasToRootDb copies production plugin schema filenames ... ok (440µs)
+running 2 tests from ./src/kernel/adapters/plugin/scaffolder_test.ts
+PluginScaffolder includes sample jobs and tasks by default ... ok (3ms)
+PluginScaffolder skips sample files and manifest contributions when disabled ... ok (451µs)
+running 9 tests from ./src/kernel/adapters/plugin/workspace-mutator_test.ts
+PluginWorkspaceMutator ensures plugins root and plugin packages are workspace members ... ok (850µs)
+PluginWorkspaceMutator injects first-party plugin core imports into root deno config ... ok (1ms)
+PluginWorkspaceMutator registers background plugins with companion API service ... ok (529µs)
+PluginWorkspaceMutator honors absolute local source service entrypoints ... ok (145µs)
+PluginWorkspaceMutator writes saga store backend appsettings for saga plugins ... ok (233µs)
+PluginWorkspaceMutator provisions shared Garnet cache when missing ... ok (234µs)
+PluginWorkspaceMutator reuses existing shared cache entry ... ok (163µs)
+PluginWorkspaceMutator appends project-local plugin config specs ... ok (491µs)
+PluginWorkspaceMutator registers generated plugin glue entrypoints ... ok (259µs)
+running 2 tests from ./src/kernel/adapters/runtime/file-system/deno-file-system_test.ts
+copyFilePortable falls back to read/write when native copy is denied ... ok (724µs)
+copyFilePortable rethrows non-permission copy failures ... ok (364µs)
+running 1 test from ./src/kernel/adapters/scaffold/tests/dry-run-fs_test.ts
+DryRunFileSystemAdapter ...
+  should record writeFile as write operation ... ok (0ms)
+  should record createDir as mkdir operation ... ok (0ms)
+  should record remove as remove operation ... ok (1ms)
+  should record copy with src in content field ... ok (0ms)
+  should record multiple operations in order ... ok (1ms)
+  should NOT write files to the inner adapter ... ok (0ms)
+  should NOT create directories in the inner adapter ... ok (1ms)
+  exists() returns true for recorded write paths ... ok (0ms)
+  exists() returns true for recorded mkdir paths ... ok (0ms)
+  exists() delegates to inner for unknown paths ... ok (0ms)
+  exists() returns false for truly absent paths ... ok (0ms)
+  stat() returns isFile:true for recorded write paths ... ok (1ms)
+  stat() returns isDirectory:true for recorded mkdir paths ... ok (0ms)
+  stat() delegates to inner for real paths ... ok (0ms)
+  readFile() returns content from recorded writes before inner adapter ... ok (0ms)
+  readFile() delegates to inner adapter ... ok (0ms)
+  readFile() throws if file not in inner ... ok (0ms)
+  getOperations() returns copy not reference ... ok (1ms)
+DryRunFileSystemAdapter ... ok (10ms)
+running 1 test from ./src/kernel/adapters/scaffold/tests/fresh-adapter_test.ts
+normalizeFreshOutput ...
+  should remove known demo files that exist ... ok (1ms)
+  should skip demo files that do not exist ... ok (0ms)
+  should update deno.json with scoped name and exports ... ok (0ms)
+  should handle missing deno.json gracefully ... ok (0ms)
+normalizeFreshOutput ... ok (4ms)
+running 2 tests from ./src/kernel/adapters/scaffold/tests/import-resolver_test.ts
+resolveNetScriptImports ...
+  should keep direct scaffold package families aligned across modes ... ok (1ms)
+  should resolve JSR mode imports ... ok (0ms)
+  should resolve local mode imports with default base ... ok (0ms)
+  should resolve local mode with custom base ... ok (0ms)
+resolveNetScriptImports ... ok (4ms)
+resolveNuGetReference ...
+  should resolve JSR mode as package reference ... ok (0ms)
+  should resolve local mode as project reference ... ok (0ms)
+  should use custom path for local mode ... ok (1ms)
+resolveNuGetReference ... ok (1ms)
+running 1 test from ./src/kernel/adapters/scaffold/tests/scaffolder_test.ts
+Scaffolder integration ...
+  should scaffold a single file from template content ... ok (1ms)
+  should write pre-rendered content directly ... ok (1ms)
+  should skip existing files without overwrite ... ok (0ms)
+  should overwrite existing files with overwrite flag ... ok (0ms)
+  should scaffold directory tree from templates ... ok (2ms)
+  should report skipped files in result ... ok (1ms)
+  should create directories and report them ... ok (0ms)
+  should check existence via the scaffolder ... ok (0ms)
+Scaffolder integration ... ok (10ms)
+running 2 tests from ./src/kernel/adapters/scaffold/tests/template-adapter_test.ts
+renderTemplate ...
+  should replace simple variables ... ok (0ms)
+  should replace multiple variables ... ok (0ms)
+  should apply camelCase pipe ... ok (1ms)
+  should apply pascalCase pipe ... ok (0ms)
+  should apply kebabCase pipe ... ok (0ms)
+  should apply snakeCase pipe ... ok (0ms)
+  should apply upperCase pipe ... ok (0ms)
+  should apply lowerCase pipe ... ok (0ms)
+  should handle whitespace in placeholders ... ok (0ms)
+  should handle whitespace around pipe ... ok (0ms)
+  should throw on undefined variable ... ok (1ms)
+  should throw on unknown pipe ... ok (0ms)
+  should leave non-template content unchanged ... ok (1ms)
+renderTemplate ... ok (8ms)
+StringTemplateAdapter ...
+  should have engine name ... ok (1ms)
+  should render template string ... ok (0ms)
+  should render file from filesystem ... ok (1ms)
+StringTemplateAdapter ... ok (2ms)
+running 3 tests from ./src/kernel/adapters/scaffold/tests/workspace-writer_test.ts
+addWorkspaceMember ...
+  adds member and sorts alphabetically ... ok (2ms)
+  throws if member already exists ... ok (1ms)
+  normalizes backslashes in member path ... ok (0ms)
+  normalizes member path without leading ./ ... ok (0ms)
+addWorkspaceMember ... ok (7ms)
+validateUniqueName ...
+  accepts valid kebab-case names ... ok (0ms)
+  validates resource names without workspace uniqueness checks ... ok (0ms)
+  rejects invalid pattern — uppercase ... ok (0ms)
+  rejects invalid pattern — starts with digit ... ok (0ms)
+  rejects invalid pattern — special chars ... ok (0ms)
+  rejects name exceeding max length ... ok (0ms)
+  rejects reserved names ... ok (0ms)
+  rejects names already in workspace ... ok (0ms)
+validateUniqueName ... ok (5ms)
+allocatePort ...
+  returns preferred port when available ... ok (0ms)
+  skips already used ports ... ok (1ms)
+  throws when range is exhausted ... ok (0ms)
+allocatePort ... ok (1ms)
+running 6 tests from ./src/kernel/adapters/secrets/env-file-secrets-store_test.ts
+put on POSIX writes content then chmod 0o600, no process invocation ... ok (849µs)
+put on Windows writes content then applies owner+SYSTEM icacls ACL, no chmod ... ok (201µs)
+Windows put without a ProcessPort rejects ... ok (395µs)
+list parses persisted keys and ignores blanks and comments ... ok (188µs)
+list returns empty when the secret file is absent ... ok (91µs)
+clear removes the secret file ... ok (104µs)
+running 7 tests from ./src/kernel/adapters/service/scaffolder_test.ts
+ServiceScaffolder creates a contract-bound service workspace ... ok (2ms)
+shared contract scaffolder creates service contracts and aggregates v1 mod exports ... ok (1ms)
+PortAllocator assigns next available service port ... ok (300µs)
+PortAllocator rejects out-of-range and duplicate requested ports ... ok (429µs)
+ServiceWorkspaceResolver discovers configured services ... ok (314µs)
+shared generateV1Mod supports multiple service names ... ok (116µs)
+shared generateV1Mod supports one service name ... ok (49µs)
+running 3 tests from ./src/kernel/adapters/templates/template-asset_test.ts
+package asset adapters do not perform direct Deno.read template reads ... ok (2ms)
+template asset adapter reads embedded content without hydration ... ok (445µs)
+template asset adapter renders existing template pipes ... ok (773µs)
+running 1 test from ./src/kernel/adapters/windows/manifest/manifest-resolver_test.ts
+buildManifestContext resolves executable bindings via manifest resource aliases ... ok (6ms)
+running 2 tests from ./src/kernel/application/registries/template-registry_test.ts
+TemplateRegistry manifest matches checked-in template assets ... ok (8ms)
+TemplateRegistry reads registered template content ... ok (138µs)
+running 5 tests from ./src/kernel/application/scaffold/orchestrate-init_test.ts
+initNextSteps includes public database preparation steps for JSR init ... ok (779µs)
+InMemoryScaffolder writes rendered files without a temp directory ... ok (601µs)
+initNextSteps includes local database preparation steps for maintainer init ... ok (98µs)
+initNextSteps tells no-Aspire Postgres users to self-provision ... ok (82µs)
+initNextSteps reports the generated service oRPC endpoint under /api/rpc ... ok (113µs)
+running 2 tests from ./src/kernel/application/ui/registry-styles.test.ts
+writeStylesAggregator registers a collection install's per-item CSS imports ... ok (1ms)
+writeStylesAggregator appends a collection install onto an existing aggregator ... ok (510µs)
+running 1 test from ./src/kernel/constants/version-drift_test.ts
+no hardcoded pinned NetScript JSR specifiers in CLI src ... ok (48ms)
+running 4 tests from ./src/kernel/domain/deploy/activation-convention_test.ts
+activateWithHealthGate records the candidate and prunes on a passing gate ... ok (828µs)
+activateWithHealthGate activates the candidate BEFORE probing it ... ok (223µs)
+activateWithHealthGate auto-rolls-back to the prior current on a failing gate ... ok (110µs)
+activateWithHealthGate on a failing gate with no prior current does not rollback-activate ... ok (81µs)
+running 9 tests from ./src/kernel/domain/deploy/deno-deploy-target_test.ts
+DenoDeployTarget: declares the supported canonical op subset (no rollback/secrets) ... ok (660µs)
+DenoDeployTarget: plan reports guard violations without shelling ... ok (328µs)
+DenoDeployTarget: plan on a clean project reports Deploy-ready ... ok (64µs)
+DenoDeployTarget: up refuses a production push with unstable-API violations ... ok (684µs)
+DenoDeployTarget: up proceeds on a preview push despite violations (warns) ... ok (184µs)
+DenoDeployTarget: up pushes cleanly and forwards resolved defaults ... ok (132µs)
+DenoDeployTarget: down/status/logs delegate to the CLI port ... ok (147µs)
+DenoDeployTarget: a non-zero CLI exit code throws ... ok (131µs)
+DEFAULT_DEPLOY_TARGETS: registers the deno-deploy target ... ok (84µs)
+running 10 tests from ./src/kernel/domain/deploy/deploy-target-port_test.ts
+deploy target contract exposes the canonical 7-op names ... ok (527µs)
+deploy target contract retains the legacy build/install/uninstall verb aliases ... ok (55µs)
+deploy target port accepts an adapter that implements only the canonical subset ... ok (92µs)
+deploy target registry reserves all first-party target keys at the type level ... ok (209µs)
+unwired bare-metal service targets advertise only the canonical 6-op subset (F-DEPLOY-1) ... ok (114µs)
+wiring the core ports promotes a service target to the 7-op surface and delegates ... ok (349µs)
+a bare-metal service operation resolves a target-scoped descriptor result ... ok (87µs)
+the default deploy target registry resolves every first-party target ... ok (109µs)
+the default deploy target registry exposes only operations with implemented handlers ... ok (100µs)
+compose and docker targets resolve the Aspire adapter operation subsets ... ok (61µs)
+running 4 tests from ./src/kernel/domain/deploy/health-gate_test.ts
+runHealthGate passes once a probe reports healthy, honoring earlier retries ... ok (663µs)
+runHealthGate fails after exhausting retries ... ok (240µs)
+runHealthGate counts a thrown probe (timeout/transport) as a failed attempt ... ok (308µs)
+runHealthGate makes at least one attempt even when retries < 1 ... ok (78µs)
+running 5 tests from ./src/kernel/domain/deploy/observability-convention_test.ts
+observabilityEnv emits OTEL_DENO=true with the derived service name and default protocol ... ok (627µs)
+observabilityEnv wires the exporter endpoint and protocol when configured ... ok (54µs)
+observabilityEnv applies the service-name prefix ... ok (35µs)
+observabilityEnv emits the service-version resource attribute and optional standalone var ... ok (92µs)
+observabilityEnv returns an empty map when disabled ... ok (142µs)
+running 9 tests from ./src/kernel/domain/deploy/rollback-convention_test.ts
+DEFAULT_RELEASE_RETENTION is 3 ... ok (506µs)
+retainReleases prunes prior releases older than the retention window ... ok (232µs)
+retainReleases never prunes the current release even when keep is 0 ... ok (126µs)
+retainReleases is a no-op when keep >= prior count ... ok (77µs)
+selectRollbackTarget picks the most-recent healthy release before current ... ok (85µs)
+selectRollbackTarget skips unhealthy prior releases ... ok (127µs)
+selectRollbackTarget returns undefined for single/empty history ... ok (59µs)
+rollbackToPrevious activates the previous healthy release ... ok (120µs)
+rollbackToPrevious is a structured no-op when there is nothing to roll back to ... ok (49µs)
+running 6 tests from ./src/kernel/domain/deploy/secrets-convention_test.ts
+RESTRICTED_SECRET_FILE_MODE is owner read/write only (0o600) ... ok (676µs)
+renderSecretsEnvFile emits KEY=VALUE lines with the restricted mode ... ok (269µs)
+renderSecretsEnvFile quotes + escapes values that would break a dotenv parse ... ok (67µs)
+renderSecretsEnvFile renders an empty body for a bundle with no secrets ... ok (35µs)
+reconcileSecrets writes the rendered bundle through the store port ... ok (289µs)
+reconcileSecrets reports keys held by the store but dropped from the bundle as pruned ... ok (108µs)
+running 6 tests from ./src/kernel/domain/deploy/unstable-api-guard_test.ts
+scanUnstableApis: clean project reports ok with no violations ... ok (660µs)
+scanUnstableApis: flags Deno.openKv usage in an entrypoint ... ok (194µs)
+scanUnstableApis: flags features declared in deno.json unstable list ... ok (153µs)
+scanUnstableApis: dedupes the same API across the declared list and sources ... ok (122µs)
+scanUnstableApis: detects Temporal, cron, and BroadcastChannel tokens ... ok (121µs)
+scanUnstableApis: tolerates missing/invalid deno.json and sources ... ok (74µs)
+running 2 tests from ./src/kernel/templates/app/generators-config_test.ts
+generateAppDenoJson ...
+  should produce valid JSON with scoped name ... ok (0ms)
+  should have exports pointing to main.ts ... ok (0ms)
+  should include Fresh and Preact imports ... ok (0ms)
+  should include JSX compiler options ... ok (0ms)
+  should NOT include workspace field (only valid on root deno.json) ... ok (0ms)
+  should have Vite-based tasks ... ok (0ms)
+  should include Vite and Fresh plugin imports ... ok (0ms)
+  should end with trailing newline ... ok (0ms)
+  emits the expected app manifest shape for JSR mode ... ok (1ms)
+  should resolve @netscript/fresh/vite in local mode ... ok (1ms)
+  should match the validated copied-workspace app contract in local mode ... ok (1ms)
+  sources external app dependency pins from the scaffold catalog ... ok (0ms)
+generateAppDenoJson ... ok (8ms)
+generateAppViteConfig ...
+  should include the NetScript Vite plugin and workspace watch paths ... ok (0ms)
+  should include all @app aliases mirrored from the playground ... ok (0ms)
+  keeps alias and plugin ordering stable in the vite config ... ok (0ms)
+generateAppViteConfig ... ok (1ms)
+running 1 test from ./src/kernel/templates/app/route-templates_test.ts
+app route template rendering ...
+  router.ts mirrors the playground route entrypoint and adds the scaffold service ref ... ok (1ms)
+  utils.ts re-exports a typed definePage helper ... ok (1ms)
+  app shell imports design CSS and avoids favicon console noise ... ok (0ms)
+  index route keeps the builder in index.tsx and the view in a child component ... ok (0ms)
+  dashboard route keeps operations data in a registry-only child view ... ok (0ms)
+  health route keeps the builder in health.tsx and the probe payload in shared helpers ... ok (0ms)
+  layout template keeps define.layout and exposes the examples nav ... ok (0ms)
+  design route templates use NetScript page builders and scoped route files ... ok (0ms)
+  examples landing route keeps the builder in index.tsx and the cards in a child view ... ok (0ms)
+  static directory-pattern route uses registry form, table, and detail blocks ... ok (0ms)
+  example service template wires the selected service client and query helpers ... ok (0ms)
+  service example route is folder-owned with the builder in index.tsx and layout in index.layout.tsx ... ok (0ms)
+  service example child components separate page structure from layer UIs ... ok (0ms)
+  route-local shared loader prefetches and dehydrates the showcase query ... ok (0ms)
+  route-local island uses QueryIsland, useQuery, and typed CRUD mutations ... ok (0ms)
+  summary panel and partial route keep defer concerns server-owned ... ok (0ms)
+  service contract exposes typed CRUD schemas for the showcase mutations ... ok (0ms)
+  service router binds Prisma-backed CRUD handlers for the showcase flow ... ok (0ms)
+app route template rendering ... ok (10ms)
+running 1 test from ./src/kernel/templates/aspire/generate-aspire-config_test.ts
+generateTsAspireConfig ...
+  lets Aspire choose per-process dashboard and telemetry ports ... ok (1ms)
+  does not pin the profile to the base Aspire infra ports ... ok (1ms)
+  includes all required DB integration packages for multi-engine projects ... ok (0ms)
+  includes the browser logs integration package by default ... ok (0ms)
+generateTsAspireConfig ... ok (3ms)
+running 3 tests from ./src/kernel/templates/aspire/generators_test.ts
+generateGlobalJson ...
+  should produce valid JSON with SDK version ... ok (0ms)
+  should set rollForward to latestMinor ... ok (0ms)
+  should allow prereleases ... ok (0ms)
+  should accept custom SDK version ... ok (0ms)
+  should end with trailing newline ... ok (0ms)
+  keeps the root and sdk key ordering stable ... ok (0ms)
+generateGlobalJson ... ok (3ms)
+generateAspireConfig ...
+  should produce valid JSON with appHostPath ... ok (0ms)
+  should accept custom appHostPath ... ok (0ms)
+  should end with trailing newline ... ok (0ms)
+  keeps the minimal config shape stable ... ok (0ms)
+generateAspireConfig ... ok (1ms)
+generateAppsettings ...
+  should produce valid JSON with NetScript config root ... ok (0ms)
+  should include OTEL endpoint under NetScript.Otel ... ok (0ms)
+  should accept custom appPort and otelPort ... ok (0ms)
+  should omit Databases/PrimaryDatabase when dbEngine is none ... ok (0ms)
+  defaults shared cache to redis ... ok (0ms)
+  can omit shared cache emission ... ok (0ms)
+  emits garnet cache appsettings when selected ... ok (0ms)
+  emits deno-kv cache appsettings when selected ... ok (0ms)
+  should register Postgres engine when dbEngine is postgres ... ok (0ms)
+  should register Sqlite engine without Mode ... ok (0ms)
+  should register MSSQL engine with matching Aspire password parameter ... ok (0ms)
+  should include example service when provided ... ok (0ms)
+  should produce an empty Services block when no service provided ... ok (0ms)
+  should omit Prisma Studio when no database is configured ... ok (0ms)
+  should end with trailing newline ... ok (0ms)
+  keeps the default NetScript key ordering stable ... ok (1ms)
+  keeps service + postgres sections structurally stable ... ok (0ms)
+generateAppsettings ... ok (6ms)
+running 1 test from ./src/kernel/templates/aspire/helpers/tests/generate-db-cli-mode_test.ts
+generateDbCliMode ...
+  generates targets for all configured database engines ... ok (2ms)
+  supports env-based DB CLI activation for detached Aspire runs ... ok (0ms)
+generateDbCliMode ... ok (3ms)
+running 1 test from ./src/kernel/templates/aspire/helpers/tests/generate-register-infrastructure_test.ts
+generateRegisterInfrastructure ...
+  registers redis cache containers with endpoint wiring ... ok (2ms)
+  registers garnet cache containers with endpoint wiring ... ok (1ms)
+  emits deno-kv Local cache as in-process wiring without an Aspire resource ... ok (0ms)
+  emits deno-kv Container cache as a Deno KV Connect container with an access token ... ok (0ms)
+  emits garnet Executable cache as a self-provisioned dotnet tool (Docker-less) ... ok (1ms)
+  honors an explicit ToolVersion pin for the garnet Executable arm ... ok (0ms)
+  emits garnet Auto as a runtime Docker probe: Garnet container vs Garnet executable ... ok (0ms)
+  emits deno-kv Auto with the DenoKv Connect container as the Docker branch ... ok (0ms)
+  skips sqlite Aspire resource registration entirely ... ok (0ms)
+  registers SQL Server containers with explicit image and password policy env ... ok (0ms)
+generateRegisterInfrastructure ... ok (16ms)
+running 2 tests from ./src/kernel/templates/aspire/helpers/tests/generators-background-app_test.ts
+generateRegisterBackground ...
+  should return a non-empty string ... ok (2ms)
+  should include the standard file header ... ok (0ms)
+  should export registerBackgroundProcessors async function ... ok (0ms)
+  should import buildOtelEnvVars and resolvePermissions ... ok (0ms)
+  should register processors via addExecutable ... ok (0ms)
+  should use --watch flag (not --watch-hmr) for background processors ... ok (0ms)
+  should enable Deno worker options for background processors ... ok (0ms)
+  should include enabled gate for each processor ... ok (0ms)
+  should include OTEL env vars when telemetry is enabled ... ok (0ms)
+  should opt out of telemetry when disabled ... ok (1ms)
+  should include concurrency env var when configured ... ok (0ms)
+  should include database dependency when RequiresDb is true ... ok (0ms)
+  should include KV cache dependency when RequiresKv is true ... ok (0ms)
+  should pass saga store backend appsettings to background env ... ok (1ms)
+  should point triggers background at the generated trigger registry module ... ok (1ms)
+  should handle empty processors ... ok (0ms)
+generateRegisterBackground ... ok (20ms)
+generateRegisterApps ...
+  should return a non-empty string ... ok (1ms)
+  should include the standard file header ... ok (0ms)
+  should export registerApps async function ... ok (1ms)
+  should import buildViteEnvVarName from _aspire-compat ... ok (0ms)
+  should register app type via addExecutable with default entrypoint ... ok (0ms)
+  should include enabled gate for each app ... ok (1ms)
+  should include OTEL telemetry for all app types ... ok (0ms)
+  should include HTTP endpoint when port is configured ... ok (0ms)
+  should enable browser logs for app resources with HTTP endpoints ... ok (0ms)
+  should use deno task for app registration ... ok (1ms)
+  should include VITE service-discovery injection for service references ... ok (0ms)
+  should annotate app type in comment ... ok (0ms)
+  should handle empty apps ... ok (0ms)
+generateRegisterApps ... ok (12ms)
+running 2 tests from ./src/kernel/templates/aspire/helpers/tests/generators-config-infra_test.ts
+generateConfigSchema ...
+  should return a non-empty string ... ok (0ms)
+  should include the standard file header ... ok (0ms)
+  should import zod and NetScriptConfigSchema from _aspire-compat ... ok (0ms)
+  should export ProjectConfigSchema and ProjectConfig type ... ok (0ms)
+  should include section entries as literal keys ... ok (0ms)
+  should import entry schemas only for populated sections ... ok (0ms)
+  should quote property keys with special characters ... ok (0ms)
+  should handle all empty sections with no z.object blocks ... ok (0ms)
+generateConfigSchema ... ok (7ms)
+generateRegisterInfrastructure ...
+  should return a non-empty string ... ok (1ms)
+  should include the standard file header ... ok (0ms)
+  should export registerInfrastructure async function ... ok (0ms)
+  should export InfrastructureContext interface ... ok (1ms)
+  should import ContainerLifetime and resolveDataPath ... ok (0ms)
+  should use addPostgres for Postgres Container mode ... ok (0ms)
+  should use addConnectionString for External mode ... ok (0ms)
+  should include withLifetime for persistent databases ... ok (0ms)
+  should include withDataBindMount for databases with DataPath ... ok (0ms)
+  should include addDatabase when DatabaseName is specified ... ok (0ms)
+  should assign server directly when no DatabaseName ... ok (1ms)
+  should use a Redis-compatible Garnet container for Garnet cache engine ... ok (0ms)
+  should resolve primary database from config ... ok (0ms)
+  should resolve primary cache from config ... ok (0ms)
+  should set null primaries when not configured ... ok (0ms)
+  should handle empty databases and caches ... ok (0ms)
+generateRegisterInfrastructure ... ok (9ms)
+running 2 tests from ./src/kernel/templates/aspire/helpers/tests/generators-pipeline_test.ts
+HelpersGeneratorPipeline ...
+  should generate all 12 files with apphost enabled (default) ... ok (3ms)
+  should generate 11 files without apphost ... ok (0ms)
+  should produce files with non-empty paths and content ... ok (0ms)
+  should use correct .helpers/ output paths for all helpers files ... ok (1ms)
+  should include apphost.mts at root level (not in .helpers/) ... ok (1ms)
+  should not include apphost.mts when generateAppHost is false ... ok (0ms)
+  should render apphost.mts with correct template variables ... ok (0ms)
+  should include configure-dashboard.mts from Tier 2 template ... ok (1ms)
+  should mirror dashboard env constants in the Aspire compat helper ... ok (0ms)
+  should include the Aspire compat helper with VITE env-var export ... ok (1ms)
+  should pass populated config through to Tier 1 generator content ... ok (1ms)
+  should handle empty config producing valid no-op output ... ok (0ms)
+HelpersGeneratorPipeline ... ok (14ms)
+generateHelpers ...
+  should return the same file count as pipeline.execute() ... ok (0ms)
+  should support generateAppHost: false ... ok (1ms)
+  should produce valid generated files with non-empty content ... ok (0ms)
+generateHelpers ... ok (1ms)
+running 2 tests from ./src/kernel/templates/aspire/helpers/tests/generators-service-plugin_test.ts
+generateRegisterServices ...
+  should return a non-empty string ... ok (1ms)
+  should include the standard file header ... ok (0ms)
+  should export registerServices async function ... ok (0ms)
+  should import register-services dependencies ... ok (0ms)
+  should generate two-pass registration structure ... ok (0ms)
+  should register services via addExecutable with correct port and entrypoint ... ok (0ms)
+  should include full executable OTEL env vars for each service ... ok (1ms)
+  should use --watch-hmr flag for services (HMR-capable) ... ok (0ms)
+  should wire primary database dependency for all services ... ok (0ms)
+  should wire service references from the services map ... ok (1ms)
+  should wire plugin references from the plugins map ... ok (0ms)
+  should handle empty services ... ok (0ms)
+generateRegisterServices ... ok (8ms)
+generateRegisterPlugins ...
+  should return a non-empty string ... ok (1ms)
+  should include the standard file header ... ok (0ms)
+  should export registerPlugins async function ... ok (0ms)
+  should generate two-pass registration structure ... ok (0ms)
+  should register plugins via addExecutable with correct port ... ok (0ms)
+  should include full executable OTEL env vars for each plugin ... ok (0ms)
+  should wire plugin→plugin references in pass 2 ... ok (0ms)
+  should wire service references in pass 1 (services already exist) ... ok (0ms)
+  should handle RequiresDb dependency ... ok (0ms)
+  should handle RequiresKv dependency via the withCacheReference seam ... ok (0ms)
+  should pass saga store backend appsettings to plugin env ... ok (0ms)
+  should point triggers API at the generated trigger registry module ... ok (0ms)
+  should handle empty plugins ... ok (0ms)
+generateRegisterPlugins ... ok (5ms)
+running 3 tests from ./src/kernel/templates/aspire/helpers/tests/generators-tools-db-index_test.ts
+generateRegisterTools ...
+  should return a non-empty string ... ok (1ms)
+  should include the standard file header ... ok (0ms)
+  should export registerTools async function ... ok (0ms)
+  should import resolveWorkspacePath from _aspire-compat ... ok (0ms)
+  should register tools via addExecutable with deno task ... ok (0ms)
+  should use resource name as TaskName fallback ... ok (0ms)
+  should convert hyphenated names to safe identifiers ... ok (0ms)
+  should include enabled gate for each tool ... ok (0ms)
+  should use named database dependency when configured ... ok (0ms)
+  should fall back to primary database when no named database ... ok (0ms)
+  should inject database URL for database-backed tools ... ok (0ms)
+  should resolve Prisma Studio to the database workspace ... ok (0ms)
+  should handle empty tools ... ok (0ms)
+generateRegisterTools ... ok (6ms)
+generateDbCliMode ...
+  should generate targets for all configured database engines ... ok (0ms)
+  should short-circuit AppHost startup when a Prisma operation is present ... ok (0ms)
+generateDbCliMode ... ok (1ms)
+generateIndex ...
+  should return a non-empty string ... ok (0ms)
+  should include the standard file header ... ok (1ms)
+  should export createNetScriptAppHost async function with correct params ... ok (0ms)
+  should import parseAppSettings from _aspire-compat ... ok (0ms)
+  should import DistributedApplicationBuilder from SDK module ... ok (0ms)
+  should include all registration phase imports ... ok (0ms)
+  should follow correct registration order in function body ... ok (0ms)
+  should parse config via parseAppSettings in function body ... ok (0ms)
+generateIndex ... ok (3ms)
+running 1 test from ./src/kernel/templates/aspire/template-rendering_test.ts
+Aspire template rendering ...
+  AppHost.csproj renders with valid XML structure ... ok (0ms)
+  Program.cs renders with app name and port ... ok (0ms)
+  ServiceDefaults.csproj renders with version variables ... ok (0ms)
+  Extensions.cs renders with namespace substitution ... ok (0ms)
+  NetScriptTelemetryDefaults.cs renders with namespace ... ok (0ms)
+  launchSettings.json renders as valid JSON ... ok (0ms)
+Aspire template rendering ... ok (4ms)
+running 1 test from ./src/kernel/templates/database/generators_test.ts
+database template generators ...
+  generates engine-specific Deno tasks and imports ... ok (2ms)
+  includes patch-client and fix-zod tasks for sqlite ... ok (1ms)
+  generates zod and patch-client tasks for mysql ... ok (0ms)
+  generates zod and patch-client tasks for mssql ... ok (0ms)
+  generates Prisma config with Aspire env key and sqlite fallback URL ... ok (0ms)
+  normalizes mssql Aspire loopback endpoints to hostname URLs ... ok (0ms)
+  generates engine modules with adapter setup where required ... ok (0ms)
+  constructs the sqlite engine module with the libsql driver adapter ... ok (0ms)
+  includes the libsql adapter import for the sqlite database deno.json ... ok (0ms)
+  generates the root database facade for the selected engine ... ok (0ms)
+database template generators ... ok (9ms)
+running 3 tests from ./src/kernel/templates/plugins/generate-plugin-service_test.ts
+generatePluginService opts KV-backed plugin services into Redis adapter ... ok (1ms)
+generatePluginService does not add Redis adapter import for API-only services ... ok (142µs)
+generatePluginServiceContext emits package-resident safe imports ... ok (64µs)
+running 2 tests from ./src/kernel/templates/service/generators_test.ts
+generateServiceDenoJson ...
+  should produce valid JSON with scoped name and direct imports only ... ok (1ms)
+  should resolve service imports against local packages when using copied workspace members ... ok (1ms)
+  should run the server with --unstable-no-legacy-abort (Deno 2.9, #176) ... ok (0ms)
+  should end with a trailing newline ... ok (0ms)
+generateServiceDenoJson ... ok (5ms)
+service template rendering ...
+  main.ts uses defineService as the only boot primitive ... ok (1ms)
+  router.ts preserves the validated service-local health contract shape ... ok (1ms)
+service template rendering ... ok (2ms)
+running 15 tests from ./src/kernel/templates/workspace/generators_test.ts
+generateDenoJson emits the expected root workspace shape in JSR mode ... ok (718µs)
+generateDenoJson emits shared plugin service-context imports in JSR mode ... ok (134µs)
+generateDenoJson maps @database/zod for the selected database engine ... ok (109µs)
+generateDenoJson keeps generated database aliases in local mode ... ok (64µs)
+generateDenoJson keeps the same root-only shape in local mode ... ok (125µs)
+generateDenoJson omits imports in local mode ... ok (53µs)
+generateDenoJson expands copied workspace packages in stable order ... ok (280µs)
+generateNetScriptConfig emits the JSR import and stable section order ... ok (291µs)
+generateNetScriptConfig switches to local imports without the JSR TODO banner ... ok (52µs)
+generateReadme — TS AppHost with service + postgres ... ok (680µs)
+generateReadme — legacy C# AppHost ... ok (60µs)
+generateReadme — no aspire points at app dev task ... ok (41µs)
+generateReadme — no aspire postgres asks for self-provisioning ... ok (42µs)
+generateReadme — sqlite gets non-persistent note ... ok (49µs)
+generateReadme — mysql gets persistent-container note ... ok (32µs)
+running 1 test from ./src/local/composition/local-contributor-command-tree_test.ts
+local contributor CLI composition ...
+  exposes public project commands plus maintainer commands ... ok (4ms)
+local contributor CLI composition ... ok (5ms)
+running 1 test from ./src/local/features/plugins/install/install-local-plugin_test.ts
+local contributor install plugin flow ...
+  writes starter plugin files with local imports for non-canonical plugin names ... ok (5ms)
+  renders canonical plugins without copying source when no local path is supplied ... ok (2ms)
+  writes thin local-import stubs for canonical plugins when source copy is disabled ... ok (1ms)
+  skips the target generated project when discovering the official plugin source root ... ok (1ms)
+local contributor install plugin flow ... ok (10ms)
+running 1 test from ./src/maintainer/adapters/official-plugin-source_test.ts
+findOfficialPluginSourceRoot follows copied workspace source marker ... ok (7ms)
+running 2 tests from ./src/maintainer/adapters/packages-copier_test.ts
+copyLocalPackages keeps mysql adapter engine-specific while resolving database imports ... ok (44ms)
+copyLocalPackages copies mysql adapter only for mysql engine ... ok (35ms)
+running 1 test from ./src/maintainer/features/init/init-command_test.ts
+createMaintainerInitCommand ...
+  accepts an explicit boolean value for --service without consuming the project name ... ok (3ms)
+createMaintainerInitCommand ... ok (4ms)
+running 1 test from ./src/maintainer/features/root/maintainer-services_test.ts
+maintainer application services ...
+  syncPackages delegates to the package copier port ... ok (1ms)
+  syncPlugin discovers the source root and defaults to canonical names ... ok (0ms)
+  syncTemplates runs all registered steps in order ... ok (0ms)
+  probeMonorepo reports local sync capabilities and localBase ... ok (0ms)
+  runScaffoldTest launches the repo e2e task with scaffold suite ids ... ok (1ms)
+  orchestrateMaintainerInit runs local-mode init and package sync ... ok (0ms)
+  orchestrateMaintainerInit fails when no monorepo root is available ... ok (0ms)
+maintainer application services ... ok (6ms)
+running 4 tests from ./src/maintainer/features/sync/plugin/copy-official-plugin-copy_test.ts
+canCopyOfficialPlugin recognizes canonical first-party plugin names ... ok (6ms)
+copyOfficialPlugin copies plugin and background source workspaces ... ok (153ms)
+copyOfficialPlugin rewrites fallback plugin source imports for top-level background workspaces ... ok (80ms)
+official plugin import rewrite converts local package paths to JSR specifiers ... ok (174µs)
+running 2 tests from ./src/maintainer/features/sync/plugin/copy-official-plugin-samples_test.ts
+copyOfficialPlugin wires sample config and runtime files for scaffold projects ... ok (221ms)
+copyOfficialPlugin honors includeSamples false ... ok (80ms)
+running 1 test from ./src/public/adapters/jsr-import-resolver_test.ts
+JsrImportResolver ...
+  resolves NetScript package specifiers to JSR imports ... ok (0ms)
+  resolves external dependencies to registry imports ... ok (0ms)
+  resolves selected imports as an import-map fragment ... ok (0ms)
+  rejects unknown import keys ... ok (1ms)
+JsrImportResolver ... ok (5ms)
+running 3 tests from ./src/public/adapters/os-service-factory_test.ts
+createOsServicePort routes windows to the servy adapter ... ok (521µs)
+createOsServicePort routes linux to the systemd adapter ... ok (132µs)
+OS routing is coherent from explicit OS → naming → adapter ... ok (1ms)
+running 6 tests from ./src/public/adapters/service-activation-port_test.ts
+SymlinkActivationPort activates via atomic symlink+rename before restart ... ok (1ms)
+DirSwapActivationPort removes the old junction then recreates before restart ... ok (398µs)
+current resolves the active release id from the current link basename ... ok (209µs)
+current is undefined when no current link exists ... ok (87µs)
+record appends to persisted history and history reads it back ... ok (332µs)
+prune removes each pruned release directory recursively ... ok (133µs)
+running 1 test from ./src/public/adapters/systemd-os-service_test.ts
+SystemdOsServiceAdapter ...
+  maps Linux service operations to byte-identical systemctl invocations ... ok (1ms)
+  fails fast when daemon-reload fails and does not enable ... ok (0ms)
+  surfaces a structured result on success ... ok (0ms)
+SystemdOsServiceAdapter ... ok (4ms)
+running 1 test from ./src/public/domain/scaffold-plan_test.ts
+createScaffoldPlan ...
+  builds the base workspace member list ... ok (1ms)
+  includes service and database members when selected ... ok (0ms)
+createScaffoldPlan ... ok (5ms)
+running 1 test from ./src/public/features/db/add/add-db_test.ts
+public add database flow ...
+  plans a database add request from project metadata ... ok (1ms)
+  writes the database workspace and root project metadata ... ok (4ms)
+public add database flow ... ok (8ms)
+running 1 test from ./src/public/features/deploy/build/deploy_test.ts
+public deploy application flows ...
+  builds deployment artifacts from a resolved config ... ok (1ms)
+  installs manifest services in manifest order ... ok (1ms)
+  routes install naming through the linux (systemd) lane ... ok (0ms)
+  uninstalls manifest services in reverse manifest order ... ok (0ms)
+  maps Windows service operations to servy-cli invocations ... ok (0ms)
+public deploy application flows ... ok (8ms)
+running 2 tests from ./src/public/features/deploy/build/prepare-deploy-build_test.ts
+deployBuildDirs maps a Windows deploy root to the four standard subdirs ... ok (995µs)
+deployBuildDirs derives every subdir under the given deploy root ... ok (323µs)
+running 4 tests from ./src/public/features/deploy/target/target-deploy-command_test.ts
+router derives verb subcommands from the adapter operations (no business logic) ... ok (2ms)
+router routes a verb straight to the registry-resolved adapter ...
+------- post-test output -------
+✓ plan ok
+----- post-test output end -----
+router routes a verb straight to the registry-resolved adapter ... ok (4ms)
+router omits verbs the adapter does not advertise ... ok (313µs)
+deploy docker/compose routers resolve their default registry targets ... ok (540µs)
+running 1 test from ./src/public/features/generate/runtime-schemas/generate-runtime-schemas_test.ts
+public generate application flows ...
+  regenerates Aspire helpers through an injected helper generator ... ok (1ms)
+  plans runtime config schema writes with configured paths ... ok (1ms)
+  writes changed schemas and skips unchanged files ... ok (1ms)
+  rejects duplicate runtime config schema topics ... ok (1ms)
+public generate application flows ... ok (8ms)
+running 6 tests from ./src/public/features/init/init-command_test.ts
+init --from reports the empty Wave 6 preset registry ... ok (4ms)
+init defaults cache on with redis backend in non-interactive mode ... ok (817µs)
+init derives Prisma model name from service name ... ok (238µs)
+init accepts validated Prisma model name override ... ok (146µs)
+init rejects invalid Prisma model name override ... ok (656µs)
+interactive init prompts for all missing scaffold choices ... ok (456µs)
+running 2 tests from ./src/public/features/marketplace/marketplace-group_test.ts
+marketplace search prints JSR discovery guidance ... ok (3ms)
+marketplace publish prints temporary publishing guidance ... ok (351µs)
+running 2 tests from ./src/public/features/plugins/dispatch/dispatch-plugin-verb_test.ts
+plugin verb dispatch ...
+  routes framework verbs through deno x and the plugin cli subpath ... ok (1ms)
+  maps non-zero plugin cli exits to remote errors ... ok (1ms)
+  returns captured process output through the dispatch port ... ok (0ms)
+  identifies framework verbs and resolves jsr cli specifiers ... ok (0ms)
+plugin verb dispatch ... ok (5ms)
+plugin scaffold dispatch ...
+  invokes a local fixture scaffolder and runs declared post-scripts ... ok (86ms)
+  passes dry-run context to the fixture without writing project files ... ok (38ms)
+  builds deno run argv with confined flags for third-party JSR scaffolders ... ok (1ms)
+  verifies JSR file integrity and reports sha mismatches ... ok (1ms)
+plugin scaffold dispatch ... ok (126ms)
+running 1 test from ./src/public/features/plugins/host/plugin-loader_test.ts
+plugin host loader ...
+  resolves config plugins, merges contributions, and triggers the walker ... ok (1ms)
+  resolves project root flags before creating the sync loader ... ok (3ms)
+plugin host loader ... ok (4ms)
+running 1 test from ./src/public/features/plugins/install/confirm-plugin-install_test.ts
+confirmPluginInstall ...
+  prompts for third-party packages and includes JSR metadata ... ok (1ms)
+  skips prompts for first-party packages ... ok (0ms)
+  skips third-party prompts with --skip-confirmation ... ok (0ms)
+  rejects third-party packages in --ci mode without an explicit bypass ... ok (1ms)
+  rejects third-party packages when no prompt is available ... ok (0ms)
+  allows --ci only when --skip-confirmation is explicit ... ok (0ms)
+  rejects when a third-party prompt is declined ... ok (0ms)
+confirmPluginInstall ... ok (5ms)
+running 1 test from ./src/public/features/plugins/install/install-plugin_test.ts
+public install plugin flow ...
+  plans a starter plugin request from project metadata ... ok (1ms)
+  rejects an unresolvable plugin (no JSR/local descriptor) instead of CLI-side rendering ... ok (1ms)
+  rejects a resolvable plugin when no process runner can dispatch its scaffolder ... ok (0ms)
+  previews a local-path plugin-owned scaffolder without writing files ... ok (39ms)
+  adds workers from the real local-path plugin-owned scaffolder ... ok (65ms)
+  previews the real workers local-path scaffolder without writing files ... ok (57ms)
+  reruns the real workers scaffolder idempotently ... ok (109ms)
+  runs the real sagas local-path scaffolder through plugin install ... ok (59ms)
+  previews the real sagas local-path scaffolder without writing files ... ok (53ms)
+  reruns the real sagas scaffolder idempotently ... ok (107ms)
+  runs the real triggers local-path scaffolder through plugin install ... ok (64ms)
+  previews the real triggers local-path scaffolder without writing files ... ok (55ms)
+  reruns the real triggers scaffolder idempotently ... ok (116ms)
+  runs the real streams local-path scaffolder through plugin install ... ok (60ms)
+  previews the real streams local-path scaffolder without writing files ... ok (53ms)
+  reruns the real streams scaffolder idempotently ... ok (115ms)
+  runs the real auth local-path scaffolder through plugin install ... ok (82ms)
+  previews the real auth local-path scaffolder without writing files ... ok (54ms)
+  reruns the real auth scaffolder idempotently ... ok (107ms)
+public install plugin flow ... ok (1s)
+running 1 test from ./src/public/features/plugins/install/plugin-package-resolver_test.ts
+resolvePluginPackageSpec ...
+  resolves bare aliases to verified NetScript plugin packages ... ok (1ms)
+  resolves the AI bare alias to the published NetScript AI plugin package ... ok (0ms)
+  passes scoped package names through unchanged ... ok (0ms)
+  passes explicit JSR package specs through unchanged ... ok (0ms)
+  rejects malformed package specs ... ok (0ms)
+resolvePluginPackageSpec ... ok (4ms)
+running 1 test from ./src/public/features/plugins/install/plugin-trust-tier_test.ts
+classifyPluginTrust ...
+  classifies @netscript packages as trusted first-party plugins ... ok (2ms)
+  classifies non-NetScript packages as third-party plugins requiring confirmation ... ok (0ms)
+classifyPluginTrust ... ok (4ms)
+running 1 test from ./src/public/features/plugins/list/list-plugins-command_test.ts
+plugin list succeeds for config-registered plugin without userland scaffold manifest ...
+------- post-test output -------
+Name	DisplayName	Type	Enabled	Workdir	Service	Port	Axis	Contributions
+workers	Workers	-	true	workers	-	-	jobs	0
+----- post-test output end -----
+plugin list succeeds for config-registered plugin without userland scaffold manifest ... ok (8ms)
+running 1 test from ./src/public/features/plugins/new/new-plugin_test.ts
+plugin new use case ...
+  writes a dual-tier proxy plugin without template files ... ok (3ms)
+  normalizes package names into deterministic tier paths ... ok (0ms)
+  skips existing files unless overwrite is enabled ... ok (0ms)
+plugin new use case ... ok (5ms)
+running 1 test from ./src/public/features/plugins/scaffold/scaffold-plugin_test.ts
+plugin scaffold use case ...
+  writes registered plugin skeleton templates with semantic substitutions ... ok (1ms)
+  skips existing files unless overwrite is enabled ... ok (0ms)
+  resolves default target and variables from scoped package names ... ok (0ms)
+  rejects templates with missing variables ... ok (0ms)
+plugin scaffold use case ... ok (5ms)
+running 4 tests from ./src/public/features/root/command-registry_test.ts
+public command registry keeps top-level public command order stable ... ok (1ms)
+public command registry passes in-memory context to command factories ... ok (168µs)
+public command registry rejects duplicate top-level command names ... ok (488µs)
+public command registry exposes deploy targets through a string-keyed port registry ... ok (199µs)
+running 2 tests from ./src/public/features/root/public-command-tree_test.ts
+public root command reports the package version ... ok (3ms)
+public init --dry-run leaves the target directory absent ...
+------- post-test output -------
+╔═════════════════════════════════════════════════════════════╗
+║              NetScript — Scaffold New Project               ║
+╚═════════════════════════════════════════════════════════════╝
+
+📁 Creating project "dry-run-zero"...
+   ✓ Project root (deno.json, netscript.config.ts, .gitignore, README.md)
+   ✓ Frontend app "dashboard" (Fresh framework)
+   ✓ Contracts (v1 stub)
+   ✓ Plugins (empty registry)
+  [dry-run] Would create 120 files, 23 directories
+
+  No files were written. Remove --dry-run to execute.
+----- post-test output end -----
+public init --dry-run leaves the target directory absent ... ok (15ms)
+running 1 test from ./src/public/features/services/add/add-service_test.ts
+public add service flow ...
+  plans a service add request from project metadata ... ok (1ms)
+  writes service and contract files with JSR imports ... ok (2ms)
+public add service flow ... ok (5ms)
+running 8 tests from ./src/public/features/ui/registry.test.ts
+resolveRegistryItems installs the official theme by default ... ok (424µs)
+resolveRegistryItems substitutes a theme override for theme dependencies ... ok (69µs)
+resolveRegistryItems applies theme overrides through collections ... ok (74µs)
+resolveRegistryItems rejects a theme override that is not a theme item ... ok (325µs)
+resolveRegistryItems rejects an unknown theme override ... ok (96µs)
+registryManifestModuleUrl resolves manifest outside the copy payload ... ok (442µs)
+DEFAULT_UI_INIT_ITEMS installs the scaffold foundation and floating styles ... ok (33µs)
+installUiRegistryItems uses embedded content by default ... ok (1ms)
+running 1 test from ./src/public/infra/jsr/fetch-jsr-plugin-validator_test.ts
+FetchJsrPluginValidator ...
+  returns a validated plugin descriptor for a published NetScript manifest ... ok (4ms)
+  resolves the semver-greatest prerelease when JSR latest is null ... ok (1ms)
+  skips yanked versions when falling back from null latest ... ok (1ms)
+  reports invalid metadata when no non-yanked version is installable ... ok (0ms)
+  reports missing JSR packages as not found ... ok (1ms)
+  reports yanked latest versions ... ok (0ms)
+  reports packages that do not publish scaffold.plugin.json ... ok (0ms)
+  reports invalid plugin manifests without executing package code ... ok (0ms)
+FetchJsrPluginValidator ... ok (9ms)
+running 1 test from ./src/public/infra/permissions/plugin-scaffold-permissions_test.ts
+buildPluginScaffoldPermissionFlags ...
+  uses the trusted deno x permission level for first-party plugins ... ok (1ms)
+  allows the fresh alpha dependency-age exception only for first-party opt-in ... ok (1ms)
+  confines third-party plugins to project reads, scoped writes, and denied net/run ... ok (0ms)
+  does not inject the minimum dependency age bypass for third-party plugins ... ok (1ms)
+buildPluginScaffoldPermissionFlags ... ok (3ms)
+running 3 tests from ./testing_test.ts
+createInMemoryProcess records calls and returns queued results ... ok (843µs)
+createInMemoryPrompt replays scripted answers ... ok (142µs)
+buildMinimalScaffoldPlan applies overrides ... ok (267µs)
+running 5 tests from ./e2e/tests/application/builders/runtime-gates_test.ts
+runtime aspire start gate captures detached endpoint metadata ... ok (835µs)
+runtime gates wait for postgres resource by default ... ok (243µs)
+runtime gates wait for mysql resource when mysql is selected ... ok (155µs)
+runtime gates skip database resource wait for sqlite ... ok (159µs)
+runtime gates wait for mssql resource with extended timeout when mssql is selected ... ok (365µs)
+running 3 tests from ./e2e/tests/application/builders/suite-builder_test.ts
+defineCliE2eSuite materializes scaffold.plugins with gates ... ok (2ms)
+defineCliE2eSuite rejects suites without gates ... ok (763µs)
+defineCliE2eSuite rejects an empty suite id ... ok (373µs)
+running 2 tests from ./e2e/tests/application/builders/workspace-options_test.ts
+defaultRunOptions targets the maintainer binary entrypoint ... ok (1ms)
+withRepoRootOption derives the maintainer binary entrypoint from the repo root ... ok (413µs)
+running 1 test from ./e2e/tests/application/gates/http-gate_test.ts
+HTTP gate retries transient request failures within the gate deadline ... ok (261ms)
+running 3 tests from ./e2e/tests/application/gates/scaffold-gates_test.ts
+--source jsr accepts the local public CLI binary ... ok (3ms)
+--source jsr rejects the local contributor CLI binary ... ok (1ms)
+--source jsr generated check targets prod workspace members ... ok (690µs)
+running 4 tests from ./e2e/tests/application/runner/suite-runner_test.ts
+suite runner emits a failed report and prunes only created Docker resources ... ok (7ms)
+suite runner skips cleanup phase when cleanup is disabled ... ok (2ms)
+suite runner cleans up after a targeted non-cleanup gate when cleanup is enabled ... ok (922µs)
+suite runner can target cleanup gate without suite cleanup enabled ... ok (411µs)
+running 7 tests from ./e2e/tests/presentation/cli-options_test.ts
+mapRunOptions keeps defaults by omitting undefined values ... ok (891µs)
+mapRunOptions accepts sqlite database axis ... ok (195µs)
+mapRunOptions rejects unsupported database values ... ok (1ms)
+mapRunOptions rejects unsupported plugin values ... ok (238µs)
+mapRunOptions accepts ai plugin axis ... ok (176µs)
+mapRunOptions accepts mssql database axis ... ok (110µs)
+mapRunOptions reports all supported database axes ... ok (137µs)
+running 2 tests from ./e2e/tests/presentation/cli-program_test.ts
+bare CLI command runs the full scaffold runtime suite with cleanup ... ok (8ms)
+full CLI command accepts run options and runs runtime suite ... ok (3ms)
+running 1 test from ./e2e/tests/presentation/init-json_test.ts
+netscript init --json emits a single structured object ... ok (448ms)
+running 7 tests from ./e2e/tests/presentation/suite-registry_test.ts
+registry exposes scaffold capability suites from constants ... ok (849µs)
+capability suites select only their scoped gates ... ok (3ms)
+plugin suite includes all official plugin and generated-check gates ... ok (577µs)
+true userland suite runs init, one local-path plugin install, assertion, and cleanup ... ok (1ms)
+runtime suite includes full scaffold, database, runtime, and behavior gates ... ok (567µs)
+runtime suite omits database resource wait for sqlite ... ok (417µs)
+runtime suite selects mssql database resource wait for mssql ... ok (540µs)
+
+ok | 306 passed (407 steps) | 0 failed (13s)
+
+
+codex
+`cd packages/cli && deno task test` passed: 306 tests, 407 steps, 0 failed. The root-level `deno fmt <file>` did not select the file due the root formatter include rules, so I’m doing a targeted CLI-package fmt check from `packages/cli` before committing.
+exec
+/bin/bash -lc "cd packages/cli && deno fmt --check src/kernel/adapters/deploy/compile/compile_test.ts && deno eval 'const p = new Deno.Command(\"git\", { args: [\"status\", \"--short\"] }).outputSync(); await Deno.stdout.write(p.stdout); await Deno.stderr.write(p.stderr); Deno.exit(p.code);'" in /home/codex/repos/netscript-307-stale24
+ exited 1 in 0ms:
+error: No target files found.
+
+diff --git a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+index 4eef5bb4a6c5855ae1e46f155ab79a006d6eae0a..1033852a416abf036b144e50cba1742f3516ee4e
+--- a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
++++ b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+@@ -156,6 +156,7 @@
+ 
+   const workersCombined = byName.get('workers-combined');
+   const workersApi = byName.get('workers-api');
++  const sagasCombined = byName.get('sagas-combined');
+   assert(
+     workersCombined?.concurrencyEnvVar === 'WORKER_CONCURRENCY',
+     'workers-combined should carry concurrency env var',
+@@ -168,6 +169,18 @@
+     workersApi?.workdir === 'plugins/workers',
+     'workers-api should resolve from the plugin service appsettings entry',
+   );
++  assert(
++    sagasCombined?.concurrencyEnvVar === 'SAGA_CONCURRENCY',
++    'sagas-combined should carry saga concurrency env var',
++  );
++  assert(
++    sagasCombined?.workdir === 'sagas',
++    'sagas-combined should resolve from the sagas background workdir',
++  );
++  assert(
++    sagasCombined?.entrypoint === 'sagas/bin/combined.ts',
++    'sagas-combined should resolve the sagas combined runtime entrypoint',
++  );
+ 
+   assert(
+     !byName.has('workers-worker'),
+@@ -187,6 +200,18 @@
+     triggerProcessor?.defaultConcurrency === 10,
+     'trigger target should preserve plugin default concurrency',
+   );
++  assert(
++    triggerProcessor?.concurrencyEnvVar === 'TRIGGER_CONCURRENCY',
++    'trigger target should carry trigger concurrency env var',
++  );
++  assert(
++    triggerProcessor?.workdir === 'plugins/triggers',
++    'trigger target should resolve from the triggers plugin workdir',
++  );
++  assert(
++    triggerProcessor?.entrypoint === 'plugins/triggers/src/runtime/trigger-processor.ts',
++    'trigger target should resolve the trigger processor entrypoint',
++  );
+ });
+ 
+ Deno.test('loadDeployConfig maps service references to compile target dependencies', async () => {
+
+exec
+/bin/bash -lc "deno fmt --help | sed -n '1,120p'" in /home/codex/repos/netscript-307-stale24
+ succeeded in 0ms:
+Auto-format various file types.
+  deno fmt myfile1.ts myfile2.ts
+
+Supported file types are:
+  JavaScript, TypeScript, Markdown, JSON(C) and Jupyter Notebooks
+
+Supported file types which are behind corresponding unstable flags (see formatting options):
+  HTML, CSS, SCSS, LESS, YAML, Svelte, Vue, Astro and Angular
+
+Format stdin and write to stdout:
+  cat file.ts | deno fmt -
+
+Check if the files are formatted:
+  deno fmt --check
+
+Ignore formatting code by preceding it with an ignore comment:
+  // deno-fmt-ignore
+
+Ignore formatting a file by adding an ignore comment at the top of the file:
+  // deno-fmt-ignore-file
+
+Read more: https://docs.deno.com/go/fmt
+
+Usage: deno fmt [OPTIONS] [files]...
+
+Arguments:
+  [files]...  
+
+Options:
+  -c, --config <FILE>     Configure different aspects of deno including TypeScript, linting, and code formatting.
+                            Typically the configuration file will be called `deno.json` or `deno.jsonc` and
+                            automatically detected; in that case this flag is not necessary.
+                            Docs: https://docs.deno.com/go/config
+  -h, --help[=<CONTEXT>]  [possible values: unstable, full]
+      --no-config         Disable automatic loading of the configuration file
+      --permit-no-files   Don't return an error code if no files were found
+  -q, --quiet             Suppress diagnostic output
+
+Formatting options:
+      --check                            Check if the source files are formatted
+      --ext <ext>                        Set content type of the supplied file [possible values: ts, tsx, js, jsx, mts, mjs, cts, cjs, md, json, jsonc, css, scss, less, html, svelte, vue, astro, yml, yaml, ipynb, sql, vto, njk]
+      --fail-fast                        Stop checking files on first format error
+      --ignore=<ignore>...               Ignore formatting particular source files
+      --indent-width <indent-width>      Define indentation width [default: 2]
+      --line-width <line-width>          Define maximum line width [default: 80]
+      --no-editorconfig                  Don't read .editorconfig files to infer formatting options [default: false]
+      --no-semicolons[=<no-semicolons>]  Don't use semicolons except where necessary [default: false] [possible values: true, false]
+      --prose-wrap <prose-wrap>          Define how prose should be wrapped [default: always] [possible values: always, never, preserve]
+      --single-quote[=<single-quote>]    Use single quotes [default: false] [possible values: true, false]
+      --unstable-component               Enable formatting Svelte, Vue, Astro and Angular files
+      --unstable-sql                     Enable formatting SQL files.
+      --use-tabs[=<use-tabs>]            Use tabs instead of spaces for indentation [default: false] [possible values: true, false]
+
+File watching options:
+      --no-clear-screen             Do not clear terminal screen when under watch mode
+      --watch                       Watch for file changes and restart process automatically.
+                                      Only local files from entry point module graph are watched.
+      --watch-exclude[=<FILES>...]  Exclude provided files/patterns from watch mode
+
+diff --git a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+index 4eef5bb4a6c5855ae1e46f155ab79a006d6eae0a..1033852a416abf036b144e50cba1742f3516ee4e
+--- a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
++++ b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+@@ -156,6 +156,7 @@
+ 
+   const workersCombined = byName.get('workers-combined');
+   const workersApi = byName.get('workers-api');
++  const sagasCombined = byName.get('sagas-combined');
+   assert(
+     workersCombined?.concurrencyEnvVar === 'WORKER_CONCURRENCY',
+     'workers-combined should carry concurrency env var',
+@@ -168,6 +169,18 @@
+     workersApi?.workdir === 'plugins/workers',
+     'workers-api should resolve from the plugin service appsettings entry',
+   );
++  assert(
++    sagasCombined?.concurrencyEnvVar === 'SAGA_CONCURRENCY',
++    'sagas-combined should carry saga concurrency env var',
++  );
++  assert(
++    sagasCombined?.workdir === 'sagas',
++    'sagas-combined should resolve from the sagas background workdir',
++  );
++  assert(
++    sagasCombined?.entrypoint === 'sagas/bin/combined.ts',
++    'sagas-combined should resolve the sagas combined runtime entrypoint',
++  );
+ 
+   assert(
+     !byName.has('workers-worker'),
+@@ -187,6 +200,18 @@
+     triggerProcessor?.defaultConcurrency === 10,
+     'trigger target should preserve plugin default concurrency',
+   );
++  assert(
++    triggerProcessor?.concurrencyEnvVar === 'TRIGGER_CONCURRENCY',
++    'trigger target should carry trigger concurrency env var',
++  );
++  assert(
++    triggerProcessor?.workdir === 'plugins/triggers',
++    'trigger target should resolve from the triggers plugin workdir',
++  );
++  assert(
++    triggerProcessor?.entrypoint === 'plugins/triggers/src/runtime/trigger-processor.ts',
++    'trigger target should resolve the trigger processor entrypoint',
++  );
+ });
+ 
+ Deno.test('loadDeployConfig maps service references to compile target dependencies', async () => {
+
+codex
+The CLI package formatter configuration does not include this path for direct `deno fmt` selection, so I’m using `--no-config` for a file-local formatting check. After that I’ll commit just this test file.
+exec
+/bin/bash -lc "deno fmt --check --no-config packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts && deno eval 'const p = new Deno.Command(\"git\", { args: [\"status\", \"--short\"] }).outputSync(); await Deno.stdout.write(p.stdout); await Deno.stderr.write(p.stderr); Deno.exit(p.code);'" in /home/codex/repos/netscript-307-stale24
+ exited 1 in 0ms:
+
+from /home/codex/repos/netscript-307-stale24/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts:
+  1 | -import { join, resolve } from '@std/path';
+  1 | +import { join, resolve } from "@std/path";
+  2 | -import { loadDeployConfig } from '../../config/deploy-config.ts';
+  2 | +import { loadDeployConfig } from "../../config/deploy-config.ts";
+  3 | -import { extractCompileTargets } from './compile-targets.ts';
+  3 | +import { extractCompileTargets } from "./compile-targets.ts";
+    | ...
+ 20 | -  configPromise ??= loadDeployConfig({ projectRoot: await getProjectRoot(), quiet: true });
+ 20 | +  configPromise ??= loadDeployConfig({
+ 21 | +    projectRoot: await getProjectRoot(),
+ 22 | +    quiet: true,
+ 23 | +  });
+    | ...
+ 27 | -    await Deno.readTextFile(join(projectRoot, 'dotnet', 'AppHost', 'appsettings.json')),
+ 30 | +    await Deno.readTextFile(
+ 31 | +      join(projectRoot, "dotnet", "AppHost", "appsettings.json"),
+ 32 | +    ),
+    | ...
+ 41 | -Deno.test('loadDeployConfig resolves unified background processors from appsettings and registry', async () => {
+ 46 | +Deno.test("loadDeployConfig resolves unified background processors from appsettings and registry", async () => {
+    | ...
+ 46 | -  assert(!('workers' in legacyKeys), 'legacy workers config should not exist on ResolvedConfig');
+ 51 | +  assert(
+ 47 | -  assert(!('sagas' in legacyKeys), 'legacy sagas config should not exist on ResolvedConfig');
+ 52 | +    !("workers" in legacyKeys),
+ 48 | -  assert(!('triggers' in legacyKeys), 'legacy triggers config should not exist on ResolvedConfig');
+ 53 | +    "legacy workers config should not exist on ResolvedConfig",
+ 54 | +  );
+ 55 | +  assert(
+ 56 | +    !("sagas" in legacyKeys),
+ 57 | +    "legacy sagas config should not exist on ResolvedConfig",
+ 58 | +  );
+ 59 | +  assert(
+ 60 | +    !("triggers" in legacyKeys),
+ 61 | +    "legacy triggers config should not exist on ResolvedConfig",
+ 62 | +  );
+    | ...
+ 54 | -  assert(workers?.enabled, 'workers background processor should be enabled');
+ 68 | +  assert(workers?.enabled, "workers background processor should be enabled");
+ 55 | -  assert(sagas?.enabled, 'sagas background processor should be enabled');
+ 69 | +  assert(sagas?.enabled, "sagas background processor should be enabled");
+ 56 | -  assert(triggers?.enabled, 'triggers background processor should be enabled');
+ 70 | +  assert(triggers?.enabled, "triggers background processor should be enabled");
+    | ...
+ 58 | -  const workerEntrypoints = Object.keys(workers.entrypoints).sort().join(',');
+ 72 | +  const workerEntrypoints = Object.keys(workers.entrypoints).sort().join(",");
+    | ...
+ 60 | -    workerEntrypoints === 'combined',
+ 74 | +    workerEntrypoints === "combined",
+    | ...
+ 64 | -    JSON.stringify(triggers.watchDirs ?? []) === JSON.stringify(configuredTriggerWatchDirs),
+ 78 | +    JSON.stringify(triggers.watchDirs ?? []) ===
+ 65 | -    'triggers watchDirs should match BackgroundProcessors.triggers.WatchDirs from appsettings',
+ 79 | +      JSON.stringify(configuredTriggerWatchDirs),
+ 80 | +    "triggers watchDirs should match BackgroundProcessors.triggers.WatchDirs from appsettings",
+    | ...
+ 71 | -  await Deno.mkdir(resolve(projectRoot, 'dotnet', 'AppHost'), { recursive: true });
+ 86 | +  await Deno.mkdir(resolve(projectRoot, "dotnet", "AppHost"), {
+ 87 | +    recursive: true,
+ 88 | +  });
+    | ...
+ 73 | -    resolve(projectRoot, 'netscript.config.ts'),
+ 90 | +    resolve(projectRoot, "netscript.config.ts"),
+    | ...
+ 86 | -    resolve(projectRoot, 'dotnet', 'AppHost', 'appsettings.json'),
+103 | +    resolve(projectRoot, "dotnet", "AppHost", "appsettings.json"),
+ 87 | -    JSON.stringify({
+104 | +    JSON.stringify(
+ 88 | -      NetScript: {
+105 | +      {
+ 89 | -        Services: {
+106 | +        NetScript: {
+ 90 | -          users: {
+107 | +          Services: {
+ 91 | -            Runtime: 'deno',
+108 | +            users: {
+ 92 | -            Port: 3001,
+109 | +              Runtime: "deno",
+ 93 | -            Entrypoint: 'src/main.ts',
+110 | +              Port: 3001,
+ 94 | -            Workdir: 'services/users',
+111 | +              Entrypoint: "src/main.ts",
+112 | +              Workdir: "services/users",
+113 | +            },
+114 | +            orders: {
+115 | +              Runtime: "deno",
+116 | +              Port: 3002,
+117 | +              Entrypoint: "src/main.ts",
+118 | +              Workdir: "services/orders",
+119 | +              ServiceReferences: ["users"],
+120 | +            },
+    | ...
+ 96 | -          orders: {
+122 | +          Plugins: {
+ 97 | -            Runtime: 'deno',
+123 | +            "workers-api": {
+ 98 | -            Port: 3002,
+124 | +              Enabled: true,
+ 99 | -            Entrypoint: 'src/main.ts',
+125 | +              Workdir: "plugins/workers",
+100 | -            Workdir: 'services/orders',
+126 | +              Entrypoint: "services/src/main.ts",
+101 | -            ServiceReferences: ['users'],
+127 | +            },
+    | ...
+103 | -        },
+129 | +          BackgroundProcessors: {
+104 | -        Plugins: {
+130 | +            workers: {
+105 | -          'workers-api': {
+131 | +              Enabled: true,
+106 | -            Enabled: true,
+132 | +              Workdir: "workers",
+107 | -            Workdir: 'plugins/workers',
+133 | +              Entrypoint: "bin/combined.ts",
+108 | -            Entrypoint: 'services/src/main.ts',
+134 | +              Concurrency: 2,
+109 | -          },
+135 | +              ConcurrencyEnvVar: "WORKER_CONCURRENCY",
+110 | -        },
+136 | +            },
+111 | -        BackgroundProcessors: {
+137 | +            sagas: {
+112 | -          workers: {
+138 | +              Enabled: true,
+113 | -            Enabled: true,
+139 | +              Workdir: "sagas",
+114 | -            Workdir: 'workers',
+140 | +              Entrypoint: "bin/combined.ts",
+115 | -            Entrypoint: 'bin/combined.ts',
+141 | +              ConcurrencyEnvVar: "SAGA_CONCURRENCY",
+116 | -            Concurrency: 2,
+142 | +            },
+117 | -            ConcurrencyEnvVar: 'WORKER_CONCURRENCY',
+143 | +            triggers: {
+118 | -          },
+144 | +              Enabled: true,
+119 | -          sagas: {
+145 | +              Workdir: "plugins/triggers",
+120 | -            Enabled: true,
+146 | +              Entrypoint: "src/runtime/trigger-processor.ts",
+121 | -            Workdir: 'sagas',
+147 | +              Concurrency: 10,
+122 | -            Entrypoint: 'bin/combined.ts',
+148 | +              ConcurrencyEnvVar: "TRIGGER_CONCURRENCY",
+123 | -            ConcurrencyEnvVar: 'SAGA_CONCURRENCY',
+149 | +              WatchDirs: ["plugins/triggers/events"],
+124 | -          },
+150 | +            },
+125 | -          triggers: {
+126 | -            Enabled: true,
+127 | -            Workdir: 'plugins/triggers',
+128 | -            Entrypoint: 'src/runtime/trigger-processor.ts',
+129 | -            Concurrency: 10,
+130 | -            ConcurrencyEnvVar: 'TRIGGER_CONCURRENCY',
+131 | -            WatchDirs: ['plugins/triggers/events'],
+    | ...
+135 | -    }, null, 2),
+154 | +      null,
+155 | +      2,
+156 | +    ),
+    | ...
+140 | -Deno.test('extractCompileTargets emits metadata-driven background processor targets', async () => {
+161 | +Deno.test("extractCompileTargets emits metadata-driven background processor targets", async () => {
+    | ...
+149 | -      'workers-combined',
+170 | +      "workers-combined",
+150 | -      'sagas-combined',
+171 | +      "sagas-combined",
+151 | -      'trigger-processor',
+172 | +      "trigger-processor",
+    | ...
+157 | -  const workersCombined = byName.get('workers-combined');
+178 | +  const workersCombined = byName.get("workers-combined");
+158 | -  const workersApi = byName.get('workers-api');
+179 | +  const workersApi = byName.get("workers-api");
+159 | -  const sagasCombined = byName.get('sagas-combined');
+180 | +  const sagasCombined = byName.get("sagas-combined");
+    | ...
+161 | -    workersCombined?.concurrencyEnvVar === 'WORKER_CONCURRENCY',
+182 | +    workersCombined?.concurrencyEnvVar === "WORKER_CONCURRENCY",
+162 | -    'workers-combined should carry concurrency env var',
+183 | +    "workers-combined should carry concurrency env var",
+    | ...
+166 | -    'workers-combined should use resolved background processor concurrency',
+187 | +    "workers-combined should use resolved background processor concurrency",
+    | ...
+169 | -    workersApi?.workdir === 'plugins/workers',
+190 | +    workersApi?.workdir === "plugins/workers",
+170 | -    'workers-api should resolve from the plugin service appsettings entry',
+191 | +    "workers-api should resolve from the plugin service appsettings entry",
+    | ...
+173 | -    sagasCombined?.concurrencyEnvVar === 'SAGA_CONCURRENCY',
+194 | +    sagasCombined?.concurrencyEnvVar === "SAGA_CONCURRENCY",
+174 | -    'sagas-combined should carry saga concurrency env var',
+195 | +    "sagas-combined should carry saga concurrency env var",
+    | ...
+177 | -    sagasCombined?.workdir === 'sagas',
+198 | +    sagasCombined?.workdir === "sagas",
+178 | -    'sagas-combined should resolve from the sagas background workdir',
+199 | +    "sagas-combined should resolve from the sagas background workdir",
+    | ...
+181 | -    sagasCombined?.entrypoint === 'sagas/bin/combined.ts',
+202 | +    sagasCombined?.entrypoint === "sagas/bin/combined.ts",
+182 | -    'sagas-combined should resolve the sagas combined runtime entrypoint',
+203 | +    "sagas-combined should resolve the sagas combined runtime entrypoint",
+183 | -  );
+184 | -
+185 | -  assert(
+186 | -    !byName.has('workers-worker'),
+187 | -    'workers-worker should not be emitted when appsettings only enables the combined runtime',
+188 | -  );
+189 | -  assert(
+190 | -    !byName.has('workers-scheduler'),
+191 | -    'workers-scheduler should not be emitted when appsettings only enables the combined runtime',
+    | ...
+194 | -  const triggerProcessor = byName.get('trigger-processor');
+    | ...
+196 | -    triggerProcessor?.pluginName === 'triggers',
+207 | +    !byName.has("workers-worker"),
+197 | -    'trigger target should retain source plugin metadata',
+208 | +    "workers-worker should not be emitted when appsettings only enables the combined runtime",
+209 | +  );
+210 | +  assert(
+211 | +    !byName.has("workers-scheduler"),
+212 | +    "workers-scheduler should not be emitted when appsettings only enables the combined runtime",
+213 | +  );
+214 | +
+215 | +  const triggerProcessor = byName.get("trigger-processor");
+216 | +  assert(
+217 | +    triggerProcessor?.pluginName === "triggers",
+218 | +    "trigger target should retain source plugin metadata",
+    | ...
+201 | -    'trigger target should preserve plugin default concurrency',
+222 | +    "trigger target should preserve plugin default concurrency",
+    | ...
+204 | -    triggerProcessor?.concurrencyEnvVar === 'TRIGGER_CONCURRENCY',
+225 | +    triggerProcessor?.concurrencyEnvVar === "TRIGGER_CONCURRENCY",
+205 | -    'trigger target should carry trigger concurrency env var',
+226 | +    "trigger target should carry trigger concurrency env var",
+    | ...
+208 | -    triggerProcessor?.workdir === 'plugins/triggers',
+229 | +    triggerProcessor?.workdir === "plugins/triggers",
+209 | -    'trigger target should resolve from the triggers plugin workdir',
+230 | +    "trigger target should resolve from the triggers plugin workdir",
+    | ...
+212 | -    triggerProcessor?.entrypoint === 'plugins/triggers/src/runtime/trigger-processor.ts',
+233 | +    triggerProcessor?.entrypoint ===
+213 | -    'trigger target should resolve the trigger processor entrypoint',
+234 | +      "plugins/triggers/src/runtime/trigger-processor.ts",
+235 | +    "trigger target should resolve the trigger processor entrypoint",
+    | ...
+217 | -Deno.test('loadDeployConfig maps service references to compile target dependencies', async () => {
+239 | +Deno.test("loadDeployConfig maps service references to compile target dependencies", async () => {
+    | ...
+222 | -  const orders = byName.get('orders');
+244 | +  const orders = byName.get("orders");
+223 | -  assert(orders, 'orders service compile target should exist');
+245 | +  assert(orders, "orders service compile target should exist");
+    | ...
+225 | -    JSON.stringify(orders.dependsOn) === JSON.stringify(['users']),
+247 | +    JSON.stringify(orders.dependsOn) === JSON.stringify(["users"]),
+226 | -    'orders service should carry canonical ServiceReferences as dependsOn',
+248 | +    "orders service should carry canonical ServiceReferences as dependsOn",
+
+error: Found 1 not formatted file in 1 file
+
+diff --git a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+index 4eef5bb4a6c5855ae1e46f155ab79a006d6eae0a..1033852a416abf036b144e50cba1742f3516ee4e
+--- a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
++++ b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+@@ -156,6 +156,7 @@
+ 
+   const workersCombined = byName.get('workers-combined');
+   const workersApi = byName.get('workers-api');
++  const sagasCombined = byName.get('sagas-combined');
+   assert(
+     workersCombined?.concurrencyEnvVar === 'WORKER_CONCURRENCY',
+     'workers-combined should carry concurrency env var',
+@@ -168,6 +169,18 @@
+     workersApi?.workdir === 'plugins/workers',
+     'workers-api should resolve from the plugin service appsettings entry',
+   );
++  assert(
++    sagasCombined?.concurrencyEnvVar === 'SAGA_CONCURRENCY',
++    'sagas-combined should carry saga concurrency env var',
++  );
++  assert(
++    sagasCombined?.workdir === 'sagas',
++    'sagas-combined should resolve from the sagas background workdir',
++  );
++  assert(
++    sagasCombined?.entrypoint === 'sagas/bin/combined.ts',
++    'sagas-combined should resolve the sagas combined runtime entrypoint',
++  );
+ 
+   assert(
+     !byName.has('workers-worker'),
+@@ -187,6 +200,18 @@
+     triggerProcessor?.defaultConcurrency === 10,
+     'trigger target should preserve plugin default concurrency',
+   );
++  assert(
++    triggerProcessor?.concurrencyEnvVar === 'TRIGGER_CONCURRENCY',
++    'trigger target should carry trigger concurrency env var',
++  );
++  assert(
++    triggerProcessor?.workdir === 'plugins/triggers',
++    'trigger target should resolve from the triggers plugin workdir',
++  );
++  assert(
++    triggerProcessor?.entrypoint === 'plugins/triggers/src/runtime/trigger-processor.ts',
++    'trigger target should resolve the trigger processor entrypoint',
++  );
+ });
+ 
+ Deno.test('loadDeployConfig maps service references to compile target dependencies', async () => {
+
+**Evaluating repo style**
+
+I realize that the no-config option isn't following the repo style, so I should ignore that for now. Instead, I think I need to use the existing style that's already in place. I'm considering checking the differences between the two styles for clarity. Let's also look into the current status — it'll help confirm if my approach aligns with the project standards. I'm just trying to get this right!
+**Ensuring proper commit**
+
+I need to commit my changes, but I'm wondering if the file is properly formatted. It seems to use single quote style, which might cause issues. I think I’ll just make sure everything is in order and consider whether I've missed anything essential. It might be a good idea to stage everything explicitly to avoid surprises. Let's take a careful look before I proceed.
+codex
+The no-config formatter expects default double quotes, which is not this package’s style; the package test passed and I’m leaving existing formatting conventions intact. I’m staging only `compile_test.ts` now.
+exec
+/bin/bash -lc 'git diff -- packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts' in /home/codex/repos/netscript-307-stale24
+ succeeded in 0ms:
+diff --git a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+index 4eef5bb4..1033852a 100644
+--- a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
++++ b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+@@ -156,6 +156,7 @@ Deno.test('extractCompileTargets emits metadata-driven background processor targ
+ 
+   const workersCombined = byName.get('workers-combined');
+   const workersApi = byName.get('workers-api');
++  const sagasCombined = byName.get('sagas-combined');
+   assert(
+     workersCombined?.concurrencyEnvVar === 'WORKER_CONCURRENCY',
+     'workers-combined should carry concurrency env var',
+@@ -168,6 +169,18 @@ Deno.test('extractCompileTargets emits metadata-driven background processor targ
+     workersApi?.workdir === 'plugins/workers',
+     'workers-api should resolve from the plugin service appsettings entry',
+   );
++  assert(
++    sagasCombined?.concurrencyEnvVar === 'SAGA_CONCURRENCY',
++    'sagas-combined should carry saga concurrency env var',
++  );
++  assert(
++    sagasCombined?.workdir === 'sagas',
++    'sagas-combined should resolve from the sagas background workdir',
++  );
++  assert(
++    sagasCombined?.entrypoint === 'sagas/bin/combined.ts',
++    'sagas-combined should resolve the sagas combined runtime entrypoint',
++  );
+ 
+   assert(
+     !byName.has('workers-worker'),
+@@ -187,6 +200,18 @@ Deno.test('extractCompileTargets emits metadata-driven background processor targ
+     triggerProcessor?.defaultConcurrency === 10,
+     'trigger target should preserve plugin default concurrency',
+   );
++  assert(
++    triggerProcessor?.concurrencyEnvVar === 'TRIGGER_CONCURRENCY',
++    'trigger target should carry trigger concurrency env var',
++  );
++  assert(
++    triggerProcessor?.workdir === 'plugins/triggers',
++    'trigger target should resolve from the triggers plugin workdir',
++  );
++  assert(
++    triggerProcessor?.entrypoint === 'plugins/triggers/src/runtime/trigger-processor.ts',
++    'trigger target should resolve the trigger processor entrypoint',
++  );
+ });
+ 
+ Deno.test('loadDeployConfig maps service references to compile target dependencies', async () => {
+
+exec
+/bin/bash -lc "deno eval 'const p = new Deno.Command(\"git\", { args: [\"status\", \"--short\"] }).outputSync(); await Deno.stdout.write(p.stdout); await Deno.stderr.write(p.stderr); Deno.exit(p.code);'" in /home/codex/repos/netscript-307-stale24
+ succeeded in 0ms:
+ M packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+
+diff --git a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+index 4eef5bb4a6c5855ae1e46f155ab79a006d6eae0a..1033852a416abf036b144e50cba1742f3516ee4e
+--- a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
++++ b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+@@ -156,6 +156,7 @@
+ 
+   const workersCombined = byName.get('workers-combined');
+   const workersApi = byName.get('workers-api');
++  const sagasCombined = byName.get('sagas-combined');
+   assert(
+     workersCombined?.concurrencyEnvVar === 'WORKER_CONCURRENCY',
+     'workers-combined should carry concurrency env var',
+@@ -168,6 +169,18 @@
+     workersApi?.workdir === 'plugins/workers',
+     'workers-api should resolve from the plugin service appsettings entry',
+   );
++  assert(
++    sagasCombined?.concurrencyEnvVar === 'SAGA_CONCURRENCY',
++    'sagas-combined should carry saga concurrency env var',
++  );
++  assert(
++    sagasCombined?.workdir === 'sagas',
++    'sagas-combined should resolve from the sagas background workdir',
++  );
++  assert(
++    sagasCombined?.entrypoint === 'sagas/bin/combined.ts',
++    'sagas-combined should resolve the sagas combined runtime entrypoint',
++  );
+ 
+   assert(
+     !byName.has('workers-worker'),
+@@ -187,6 +200,18 @@
+     triggerProcessor?.defaultConcurrency === 10,
+     'trigger target should preserve plugin default concurrency',
+   );
++  assert(
++    triggerProcessor?.concurrencyEnvVar === 'TRIGGER_CONCURRENCY',
++    'trigger target should carry trigger concurrency env var',
++  );
++  assert(
++    triggerProcessor?.workdir === 'plugins/triggers',
++    'trigger target should resolve from the triggers plugin workdir',
++  );
++  assert(
++    triggerProcessor?.entrypoint === 'plugins/triggers/src/runtime/trigger-processor.ts',
++    'trigger target should resolve the trigger processor entrypoint',
++  );
+ });
+ 
+ Deno.test('loadDeployConfig maps service references to compile target dependencies', async () => {
+
+codex
+The diff is limited to the requested assertions. I’m committing it as a separate fix commit.
+exec
+/bin/bash -lc 'git add packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts && git commit -m "test(cli): preserve compile target assertions"' in /home/codex/repos/netscript-307-stale24
+ succeeded in 0ms:
+[chore/307-stale-wave2-wave4 ac9e06ba] test(cli): preserve compile target assertions
+ 1 file changed, 25 insertions(+)
+
+diff --git a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+index 4eef5bb4a6c5855ae1e46f155ab79a006d6eae0a..1033852a416abf036b144e50cba1742f3516ee4e
+--- a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
++++ b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+@@ -156,6 +156,7 @@
+ 
+   const workersCombined = byName.get('workers-combined');
+   const workersApi = byName.get('workers-api');
++  const sagasCombined = byName.get('sagas-combined');
+   assert(
+     workersCombined?.concurrencyEnvVar === 'WORKER_CONCURRENCY',
+     'workers-combined should carry concurrency env var',
+@@ -168,6 +169,18 @@
+     workersApi?.workdir === 'plugins/workers',
+     'workers-api should resolve from the plugin service appsettings entry',
+   );
++  assert(
++    sagasCombined?.concurrencyEnvVar === 'SAGA_CONCURRENCY',
++    'sagas-combined should carry saga concurrency env var',
++  );
++  assert(
++    sagasCombined?.workdir === 'sagas',
++    'sagas-combined should resolve from the sagas background workdir',
++  );
++  assert(
++    sagasCombined?.entrypoint === 'sagas/bin/combined.ts',
++    'sagas-combined should resolve the sagas combined runtime entrypoint',
++  );
+ 
+   assert(
+     !byName.has('workers-worker'),
+@@ -187,6 +200,18 @@
+     triggerProcessor?.defaultConcurrency === 10,
+     'trigger target should preserve plugin default concurrency',
+   );
++  assert(
++    triggerProcessor?.concurrencyEnvVar === 'TRIGGER_CONCURRENCY',
++    'trigger target should carry trigger concurrency env var',
++  );
++  assert(
++    triggerProcessor?.workdir === 'plugins/triggers',
++    'trigger target should resolve from the triggers plugin workdir',
++  );
++  assert(
++    triggerProcessor?.entrypoint === 'plugins/triggers/src/runtime/trigger-processor.ts',
++    'trigger target should resolve the trigger processor entrypoint',
++  );
+ });
+ 
+ Deno.test('loadDeployConfig maps service references to compile target dependencies', async () => {
+
+**Finding comments for review**
+
+I need to push the explicit changes and then reply to someone's review comment. First, I have to locate that comment I'm supposed to respond to. I think I’ll use the fetch function to gather all the comments so I can find the one I need. After identifying it, I can craft a thoughtful reply to ensure I address their feedback properly. Alright, let’s get started on this!
+codex
+Fix commit `ac9e06ba` is created. I’m pushing with the explicit refspec, then I’ll locate the adversarial review comment on PR #485 and reply with the commit and `deno task test` evidence.
+exec
+/bin/bash -lc 'git push origin HEAD:refs/heads/chore/307-stale-wave2-wave4' in /home/codex/repos/netscript-307-stale24
+diff --git a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+index 4eef5bb4a6c5855ae1e46f155ab79a006d6eae0a..1033852a416abf036b144e50cba1742f3516ee4e
+--- a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
++++ b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+@@ -156,6 +156,7 @@
+ 
+   const workersCombined = byName.get('workers-combined');
+   const workersApi = byName.get('workers-api');
++  const sagasCombined = byName.get('sagas-combined');
+   assert(
+     workersCombined?.concurrencyEnvVar === 'WORKER_CONCURRENCY',
+     'workers-combined should carry concurrency env var',
+@@ -168,6 +169,18 @@
+     workersApi?.workdir === 'plugins/workers',
+     'workers-api should resolve from the plugin service appsettings entry',
+   );
++  assert(
++    sagasCombined?.concurrencyEnvVar === 'SAGA_CONCURRENCY',
++    'sagas-combined should carry saga concurrency env var',
++  );
++  assert(
++    sagasCombined?.workdir === 'sagas',
++    'sagas-combined should resolve from the sagas background workdir',
++  );
++  assert(
++    sagasCombined?.entrypoint === 'sagas/bin/combined.ts',
++    'sagas-combined should resolve the sagas combined runtime entrypoint',
++  );
+ 
+   assert(
+     !byName.has('workers-worker'),
+@@ -187,6 +200,18 @@
+     triggerProcessor?.defaultConcurrency === 10,
+     'trigger target should preserve plugin default concurrency',
+   );
++  assert(
++    triggerProcessor?.concurrencyEnvVar === 'TRIGGER_CONCURRENCY',
++    'trigger target should carry trigger concurrency env var',
++  );
++  assert(
++    triggerProcessor?.workdir === 'plugins/triggers',
++    'trigger target should resolve from the triggers plugin workdir',
++  );
++  assert(
++    triggerProcessor?.entrypoint === 'plugins/triggers/src/runtime/trigger-processor.ts',
++    'trigger target should resolve the trigger processor entrypoint',
++  );
+ });
+ 
+ Deno.test('loadDeployConfig maps service references to compile target dependencies', async () => {
+
+ succeeded in 1882ms:
+To https://github.com/rickylabs/netscript.git
+   c3ed4936..ac9e06ba  HEAD -> chore/307-stale-wave2-wave4
+
+codex
+Push succeeded. I’m reading the PR discussion to find the review comment to reply to.
+mcp: codex_apps/github.fetch_pr_comments started
+mcp: codex_apps/github.fetch_pr_comments (completed)
+diff --git a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+index 4eef5bb4a6c5855ae1e46f155ab79a006d6eae0a..1033852a416abf036b144e50cba1742f3516ee4e
+--- a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
++++ b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+@@ -156,6 +156,7 @@
+ 
+   const workersCombined = byName.get('workers-combined');
+   const workersApi = byName.get('workers-api');
++  const sagasCombined = byName.get('sagas-combined');
+   assert(
+     workersCombined?.concurrencyEnvVar === 'WORKER_CONCURRENCY',
+     'workers-combined should carry concurrency env var',
+@@ -168,6 +169,18 @@
+     workersApi?.workdir === 'plugins/workers',
+     'workers-api should resolve from the plugin service appsettings entry',
+   );
++  assert(
++    sagasCombined?.concurrencyEnvVar === 'SAGA_CONCURRENCY',
++    'sagas-combined should carry saga concurrency env var',
++  );
++  assert(
++    sagasCombined?.workdir === 'sagas',
++    'sagas-combined should resolve from the sagas background workdir',
++  );
++  assert(
++    sagasCombined?.entrypoint === 'sagas/bin/combined.ts',
++    'sagas-combined should resolve the sagas combined runtime entrypoint',
++  );
+ 
+   assert(
+     !byName.has('workers-worker'),
+@@ -187,6 +200,18 @@
+     triggerProcessor?.defaultConcurrency === 10,
+     'trigger target should preserve plugin default concurrency',
+   );
++  assert(
++    triggerProcessor?.concurrencyEnvVar === 'TRIGGER_CONCURRENCY',
++    'trigger target should carry trigger concurrency env var',
++  );
++  assert(
++    triggerProcessor?.workdir === 'plugins/triggers',
++    'trigger target should resolve from the triggers plugin workdir',
++  );
++  assert(
++    triggerProcessor?.entrypoint === 'plugins/triggers/src/runtime/trigger-processor.ts',
++    'trigger target should resolve the trigger processor entrypoint',
++  );
+ });
+ 
+ Deno.test('loadDeployConfig maps service references to compile target dependencies', async () => {
+
+context compacted
+codex
+I’ll finish the PR comment step now. I’m using the GitHub/PR process skill path for this because the remaining work is a PR review reply, and I’ll keep the scope to the one pushed test commit.
+exec
+/bin/bash -lc "sed -n '1,220p' .agents/skills/rtk/SKILL.md" in /home/codex/repos/netscript-307-stale24
+ succeeded in 0ms:
+---
+name: rtk
+description: "Token-saving CLI proxy for NetScript development. USE FOR: any git, gh, grep/rg, ls/tree, or docker command where you want 60-90% token reduction — PREFIX the command with `rtk` (e.g. `rtk git status`, `rtk git diff`, `rtk grep <pattern>`). USE `rtk proxy <cmd>` for commands RTK does not filter natively (e.g. `deno task` runs). DO NOT USE FOR: interactive commands, MCP tool calls, file read/write (use Read/Edit/Write), or when full unfiltered output is explicitly required."
+---
+
+# rtk — token-saving CLI proxy
+
+**Mental model:** `rtk` is a transparent output filter — prefix a read-heavy
+shell command with `rtk` and it compresses the output before it reaches the model
+context, without changing the command's semantics or exit code.
+
+`rtk` is a single machine-level binary (v0.38.0) already on PATH
+(`~/.local/bin/rtk`, Windows `C:\Users\<user>\.local\bin\rtk.exe`). It is
+environment-level, so it is available in this repo and every worktree.
+
+## When to Use
+
+- Any **read-heavy, non-interactive** shell command whose raw output would burn
+  context: `git status`/`log`/`diff`/`show`, `grep`/`rg`, `ls`/`tree`,
+  `docker ps`/`logs`, `gh pr view`/`pr list`/`issue list`.
+- Long harness runs where you repeatedly inspect git state between slices.
+- `deno task` runs whose logs you want tracked/compressed → `rtk proxy deno task …`.
+
+## When Not to Use
+
+- Interactive commands (they hang behind the filter).
+- MCP tool calls — those are not shell commands; call the tool directly.
+- File operations — use the Read/Edit/Write tools, not `cat`/`echo` through rtk.
+- When you genuinely need the full, unfiltered output — run raw, or use
+  `rtk proxy <cmd>` to stay tracked while keeping full output.
+
+## Key Concepts
+
+| Term | Meaning |
+|------|---------|
+| **Prefix mode** | `rtk <cmd>` — rtk recognizes and compresses the command's output. The reliable mode on Windows bare-metal. |
+| **Proxy mode** | `rtk proxy <cmd>` — runs any command unfiltered but tracked in gain stats (use for `deno task …`). |
+| **Gain** | `rtk gain` reports token savings for the session; `rtk gain --history` is per-command. |
+
+## Workflow
+
+1. Reach for `rtk` whenever step 4 of the AGENTS.md Tooling order (shell
+   commands) applies to a read-heavy git/gh/grep/ls/docker command.
+2. Prefix it: `rtk git diff`, `rtk git status`, `rtk grep "<pattern>"`,
+   `rtk ls <dir>`.
+3. For Deno tasks, wrap with proxy: `rtk proxy deno task check:packages`,
+   `rtk proxy deno task lint`, `rtk proxy deno task test`.
+4. Keep git commands non-paging as usual (rtk preserves semantics; `--no-pager`
+   still applies to raw git).
+5. Optionally check `rtk gain` to confirm savings during long runs.
+
+## Supported commands
+
+| Category | Examples |
+|----------|----------|
+| Git | `rtk git log`, `rtk git diff`, `rtk git status`, `rtk git show`, `rtk git add`, `rtk git commit`, `rtk git push` |
+| GitHub CLI | `rtk gh pr view`, `rtk gh pr list`, `rtk gh issue list` |
+| Search | `rtk grep`, `rtk rg` |
+| Listing | `rtk ls`, `rtk tree` |
+| Docker | `rtk docker ps`, `rtk docker logs` |
+| Anything else | `rtk proxy <cmd>` (full output, tracked) |
+
+## Common Pitfalls
+
+- Prefixing an **interactive** command → it hangs. Only proxy non-interactive output.
+- Expecting `rtk deno …` to filter — it does not; use `rtk proxy deno task …`.
+- Using `rtk cat`/`rtk echo` to read/write files — use the editor's file tools instead.
+- Assuming output changed — rtk only compresses presentation; exit codes and
+  side effects are identical to the raw command.
+
+## Reference Files
+
+- This skill is the canonical reference; `rtk --help` and `rtk gain` are the
+  in-tool references.
+- `AGENTS.md` → Tooling / Validation sections cite rtk as the token-efficient
+  shell path.
+
+## Checklist
+
+- [ ] Command is non-interactive and read-heavy → prefix with `rtk`.
+- [ ] It's a `deno task` → use `rtk proxy deno task …`.
+- [ ] Not a file op or MCP call (those bypass rtk).
+- [ ] Full output truly needed → run raw or `rtk proxy`.
+
+exec
+/bin/bash -lc "sed -n '1,220p' .agents/skills/netscript-pr/SKILL.md" in /home/codex/repos/netscript-307-stale24
+ succeeded in 0ms:
+---
+name: netscript-pr
+description: Author NetScript branches, pull requests, and the per-phase structured PR comments used by the harness (research / plan / plan-eval / impl / impl-eval / review summaries), plus umbrella↔sub-PR linking and the namespaced label taxonomy. Use this whenever you are about to create a branch, open or update a PR, post a phase summary comment, split an umbrella into sub-PRs, or apply status/type/area labels in this repo — even if the user just says "open a PR", "push this", "comment the results", or "mark it ready for review". Getting the branch name, PR body, and labels right the first time is what keeps the harness board from rotting.
+---
+
+# NetScript PR Authoring
+
+Consistent branches, PR bodies, phase comments, and labels are what let the harness run as a
+machine: humans and agents read the same structured surface, and automation (Phase D labels +
+Projects v2) keys off it. Sloppy PR hygiene is how a board becomes a graveyard. This skill is the
+house format.
+
+## Tooling note
+
+`gh` is **not** on PATH in this environment. Use the **GitHub MCP** tools for all PR/issue/label
+operations (`create_pull_request`, `update_pull_request`, `add_issue_comment`, `issue_write`,
+`pull_request_read`, label tools). For ground-truth branch/remote state, spawn git directly (RTK can
+serve stale reads) — see the **netscript-tools** skill.
+
+## Branch naming
+
+`<type>/<slug>` — lowercase, kebab, no trailing dates. Types match the commit/PR taxonomy:
+
+- `feat/`, `fix/`, `chore/`, `docs/`, `refactor/`, `perf/`, `test/`.
+- `plan/` — harness **seed runs** only (planning-only runs whose draft PR carries a board plan,
+  never shippable code); see `.llm/harness/workflow/seed-run.md`.
+- Sub-branches of an umbrella append a scope: `chore/deno-2.8-aspire-13.4-upgrade` (umbrella) →
+  `chore/deno-2.8-aspire-13.4-upgrade-fresh` (sub). Keep the umbrella prefix so the relationship is
+  visible in `git branch` and the PR list.
+
+## Umbrella vs sub-PR (wave-4/5 pattern)
+
+- **Umbrella PR**: the coordinating PR for a multi-slice effort. Body carries the slice checklist and
+  links every sub-PR. Labelled `type:umbrella`.
+- **Sub-PR**: one parallelizable slice on its own sub-branch, targeting the **umbrella branch** (not
+  `main`). Labelled `type:sub-pr` and links back to the umbrella with `Part of #<umbrella>`.
+- **Sequential vs parallel**: only split into sub-PRs when slices are genuinely independent. Slices
+  that all edit `deno.json`/catalog are conflict-prone → keep them **sequential on one branch**, one
+  commit per slice. (This is why PR #44's remediation is sequential, not fanned out.)
+
+## PR body template
+
+Always structure the body like this so reviewers and automation find the same anchors:
+
+```markdown
+## Summary
+
+<1–3 sentences: what this PR changes and why.>
+
+## Scope
+
+- Archetype / area: <e.g. tooling, packages/fresh, plugins/workers>
+- Part of #<umbrella> · Sub-PRs: #<n>, #<n>   <!-- omit the side that doesn't apply -->
+
+## Slices
+
+- [x] S1 <slice> — <commit>
+- [ ] S2 <slice>
+
+## Validation
+
+- `deno task check:<slice>` — <result>
+- `deno task ci` / `e2e:cli scaffold.runtime` — <result + native-WSL note if applicable>
+
+## Harness
+
+- Run dir: `.llm/runs/<run-id>/`
+- Phase: <research|plan|plan-eval|impl|impl-eval|review> — see phase comments below.
+
+## Drift / Debt
+
+- <DEBT_ACCEPTED rows or "none">
+```
+
+Keep `Validation` honest: paste real results/exit codes; if a gate was skipped, say so. A green
+checkbox with no evidence is how false-green merges happen.
+
+## Linking issues (auto-close on merge) — MANDATORY
+
+A PR that **fully resolves** an issue MUST put a GitHub **closing keyword** in the **PR body** so the
+merge auto-closes the issue. Use one of: `Closes #N`, `Fixes #N`, `Resolves #N` (one per issue; put
+each on its own line in the `## Scope` section).
+
+```markdown
+## Scope
+
+- Archetype / area: packages/service
+- Closes #234
+- Part of #301   <!-- umbrella: reference only, do NOT close -->
+```
+
+- **Bare `#N` and `Refs #N` / `Re #N` do NOT auto-close.** This is the exact defect that left 40+
+  merged NetScript PRs with stale-open issues that had to be triaged by hand. If the work fully
+  lands the issue, a closing keyword is not optional.
+- **Partial work:** reference the issue **without** a closing keyword (`Part of #N` / plain `#N`) and
+  state the remaining scope in the body. Never `Closes` an issue you only partially deliver.
+- **Never** put a closing keyword on an **epic/umbrella** (`type:umbrella`, `epic:*`) — those close
+  by hand once every child is done. Use `Part of #<umbrella>` instead.
+- The keyword must be in the **PR body or a commit message**, not only in a comment, for GitHub to
+  wire the auto-close. The PR template's `## Scope` is the canonical home.
+
+## Merge close-gate (#387)
+
+The closing-keyword rule above wires the auto-close; this gate governs **when a PR carrying one may
+merge**. They are separate concerns: a keyword makes the merge *close* the issue, the close-gate
+makes sure the issue is *actually done* before that happens.
+
+The machine convention is intentionally narrow:
+
+- A **close-gated PR** is any PR whose body contains a GitHub closing keyword for an issue:
+  `Closes #N`, `Fixes #N`, or `Resolves #N` (including `closed`/`fixed`/`resolved` variants and full
+  GitHub issue URLs).
+- A **close-gated issue checkbox** is either:
+  - any markdown checkbox inside an issue section whose heading contains `acceptance`, `definition
+    of done`, `gate`, or `fitness gate`; or
+  - any markdown checkbox anywhere in the issue body whose checkbox text starts with `gate:`.
+- Ordinary planning, dependency, sub-issue, or rollout checklists outside those sections are **not**
+  close-gated. If a checklist is acceptance, put it under an acceptance/gate heading.
+- A checked acceptance/gate box must carry linked evidence in the issue, PR body, or PR phase comment
+  (command output, run URL, CI job, or reviewer/evaluator comment). The automation catches unchecked
+  boxes; the coordinator/evaluator verifies the evidence link quality before closing.
+
+A PR whose `status:` is `research`, `plan`, or `plan-eval` **MUST NOT be merged** — a plan-only
+artifact set can never satisfy an implementation Definition-of-Done. Merge requires
+`status:ready-merge`, and moving to `status:ready-merge` requires all three:
+
+1. **IMPL-EVAL PASS evidence** — the `[PHASE: IMPL-EVAL] [VERDICT: PASS]` phase comment from the
+   evaluator (a separate session).
+2. **DoD checklist complete** — every `- [ ]` in the PR body's Definition-of-Done is checked.
+3. **Referenced-issue acceptance** — for **every** issue closed by the PR body, every close-gated
+   issue checkbox is checked with linked evidence (command, run URL, CI job, or PR comment).
+
+The exemplar failure is **#260**, closed with its `gate:e2e` box unchecked — the false-done this gate
+exists to stop.
+
+Enforcement lives at three points:
+
+1. **Coordinator/evaluator review** — before closing an issue by hand, or before merging a PR whose
+   body carries `Closes #N` / `Fixes #N` / `Resolves #N`, verify every close-gated issue checkbox is
+   checked and has linked evidence.
+2. **CI close-gate** — `.github/workflows/ci.yml` runs
+   `.llm/tools/validation/check-close-gate.ts` on pull requests. It fetches each issue closed by the
+   PR body and fails if any close-gated issue checkbox remains unchecked.
+3. **PR-template/evaluator checklist** — the PR close-gate checkbox and IMPL-EVAL pass both confirm
+   the same evidence before `status:ready-merge`.
+
+Legitimate exceptions require the explicit `status:close-gate-override` label. This label is an
+auditable escape hatch, not a normal lifecycle stage: the coordinator must leave a PR comment naming
+the unchecked checkbox, the reason it is safe to close anyway, and the follow-up issue if work
+remains. Do not use the override to hide missing implementation or missing evidence.
+
+## Epic / sub-issue standard
+
+Program epics use one convention so the board and the run dir agree:
+
+- **Epic issue** — title `Epic: <name>`; labels `type:umbrella` + `epic:<slug>` + the relevant
+  `area:`/`priority:` + a milestone; body = the epic's pillars, a sub-issue checklist, and links.
+  **Never put a closing keyword on an epic** (see the close-gate above) — it closes **by hand** once
+  every child is done.
+- **Sub-issues** — real issues titled `[<epic-slug> S<n>] <slice>`, each carrying `epic:<slug>` (plus
+  its own `area:`/`priority:`/milestone), linked to the epic by `Part of #<epic>` in the body.
+  Exactly **one** PR resolves each sub-issue, and that PR's body carries `Closes #<child>`.
+- GitHub-native sub-issue linkage is **unused repo-wide** today, so it is adopted **opportunistically**
+  as a nice-to-have on top of the `Part of #<epic>` body text — it is not required and carries no
+  migration burden.
+
+## Per-phase structured comments
+
+Each harness phase posts ONE comment so the PR timeline reads as a phase log. Lead with a status
+token line so the (future) label automation can parse it:
+
+```markdown
+**[PHASE: IMPL-EVAL] [VERDICT: CHANGES_REQUESTED]**
+
+<one-line headline>
+
+### Findings
+1. **C1 …** — <what + where + fix>
+...
+
+### Next
+- <action + owner>
+```
+
+Phases & their verdict vocabulary:
+
+- `RESEARCH` → (no verdict; summary only)
+- `PLAN` → summary; gate is a separate `PLAN-EVAL` comment with `APPROVED` / `CHANGES_REQUESTED`.
+- `IMPL` → summary of slices landed.
+- `IMPL-EVAL` → `PASS` / `CHANGES_REQUESTED` (the gate that clears merge).
+- `REVIEW` (augment/Fable) → advisory.
+
+The evaluator must be a **separate session** from the generator (harness rule). Comment, don't edit,
+when acting as evaluator.
+
+## Draft-PR-on-start (harness)
+
+For harnessed work, **opening the feature is opening a DRAFT PR** — in the **same session as the
+first commit**, where the run-dir bootstrap commit (`.llm/runs/<run-id>/`) is the natural first
+commit. There is no "work now, PR later": the draft PR is the reviewable surface from the first
+commit onward, so the whole run reads from mobile without cloning or diffing.
+
+The draft PR body carries these, live from the start (they are the anchors the close-gate and the
+evaluator read):
+
+- an explicit, **checkable Definition-of-Done** (the close-gate reads these boxes);
+- the run-dir path `.llm/runs/<run-id>/`;
+- the slice checklist (`## Slices`);
+- the **live commit list** — the draft PR's own commit list plus per-slice comments are the commit
+  trail (there is no `commits.md`);
+- drift / debt (`## Drift / Debt`).
+
+## Draft ↔ ready
+
+- Open multi-slice work as a **draft** PR; per-commit CI (Phase C tier 1) runs on drafts but is
+  non-blocking.
+- Flip to **ready for review** only when the slice checklist is complete and IMPL-EVAL is expected to
+  pass — that transition is what triggers the blocking e2e tier and `status:impl-eval`.
+
+## Label taxonomy (namespaced — Phase D)
+
+exec
+/bin/bash -lc "sed -n '1,220p' .agents/skills/netscript-tools/SKILL.md" in /home/codex/repos/netscript-307-stale24
+ succeeded in 0ms:
+---
+name: netscript-tools
+description: NetScript repository tooling and validation guide. Use whenever a task involves repo-native Deno wrappers, rtk, raw git verification, gate evidence, PR comments, OpenHands automation, lock hygiene, root check/lint/fmt wrappers, doc-lint, publish dry-run, JSR audits, worktree synchronization, or deciding which command is a trustworthy verdict source.
+---
+
+# NetScript Tools
+
+Use this skill when choosing commands or recording validation evidence in the NetScript repo. The
+goal is to avoid false green gates, stale git reads, and stale automation comments.
+
+## Tool Locations
+
+Use `.llm/tools/` for harness, evaluator, agent, and package-quality helper scripts. Fitness gates
+live under `.llm/tools/fitness/`; keep new doctrine, standards, JSR, and release-readiness helpers
+there unless they are product-facing CLI features.
+
+Use `tools/` only for reusable product/repository tooling that should ship as part of the public
+developer surface. Do not create a parallel fitness tree outside `.llm/tools/`.
+
+## Git And Status
+
+RTK can cache read-heavy git output. For ground-truth branch state, spawn git directly:
+
+```powershell
+deno eval 'const p = new Deno.Command("git", { args: ["status", "--short"] }).outputSync(); await Deno.stdout.write(p.stdout); await Deno.stderr.write(p.stderr); Deno.exit(p.code);'
+deno eval 'const p = new Deno.Command("git", { args: ["ls-remote", "origin", "refs/heads/<branch>"] }).outputSync(); await Deno.stdout.write(p.stdout); await Deno.stderr.write(p.stderr); Deno.exit(p.code);'
+```
+
+Use `rtk` for exploratory read-heavy commands when token reduction matters. Do not use filtered RTK
+output as the sole PASS/FAIL source for gates.
+
+## Validation Wrappers
+
+**MANDATE (harness runs).** TS type-check / lint / format gate **evidence MUST come from the scoped
+wrappers** — `.llm/tools/run-deno-check.ts`, `.llm/tools/run-deno-lint.ts`, and
+`.llm/tools/run-deno-fmt.ts` (invoked directly with `--root … --ext ts,tsx`, or through the
+`deno task check|lint|fmt:check` aliases that already wrap them). Raw root `deno check .` /
+`deno fmt --check` / `deno lint` over the repo is **not a verdict source**: it walks Markdown,
+generated output, scratch workspaces, and future-wave packages, producing false reds/greens. Use
+these wrappers for package/plugin quality checks:
+
+```powershell
+deno task check
+deno task lint
+deno task fmt:check
+deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root <path> --ext ts,tsx
+deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root <path> --ext ts,tsx
+deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root <path> --ext ts,tsx
+```
+
+The wrappers accept roots, extensions, include/exclude filters, and batching, and emit structured
+compact output. Package-quality formatting gates target source TypeScript only (`--ext ts,tsx`) and
+exclude generated output, scratch workspaces, and future-wave packages.
+
+## Dependency Evidence
+
+**MANDATE (harness runs).** Any "is this the latest / is this outdated / is this import dead / does
+the published surface install / any advisories" question MUST be answered through the
+`.llm/tools/deps/*` wrappers, exposed as `deno task deps:latest|outdated|why|audit|prod-install` —
+never a hand-rolled registry `curl`, and never `deno outdated --latest` for "latest" (it ignores
+semver and surfaces pre-release tags as latest). The canonical command map, the `deno outdated
+--latest` trap rationale, and the `catalog:` npm-only law live once in the **netscript-deno-toolchain**
+skill — read it there; this skill does not restate those gotchas.
+
+For targeted `deno check` commands that touch workspace code, include `--unstable-kv`:
+
+```powershell
+deno check --unstable-kv packages/<pkg>/mod.ts
+```
+
+Do not run mutating root `deno task fmt` unless the user explicitly asks for repo-wide formatting
+changes. Use scoped formatting for owned files only.
+
+## Publish And Docs
+
+Package publishability gates commonly use:
+
+```powershell
+deno doc --lint packages/<pkg>/mod.ts
+deno task doc:lint --root packages/<pkg> --pretty
+deno publish --dry-run --allow-dirty
+deno run --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root packages/<pkg> --text
+```
+
+`deno task doc:lint` wraps `.llm/tools/run-deno-doc-lint.ts` — the structured runner for the
+`deno doc --lint` publish bar. Prefer it when the raw `deno doc --lint` output is too noisy to
+attribute per-entrypoint/per-file: it auto-discovers entrypoints from `deno.json` exports (lint the
+**full export map**, not `mod.ts` alone, or sibling re-exports false-flag) and emits grouped JSON
+with per-file attribution.
+
+Run `deno publish --dry-run --allow-dirty` from the package directory unless the checked-in task or
+plan says otherwise. Treat raw dry-run output as authoritative for slow types; helper scripts may
+overcount banner text.
+
+## OpenHands And PR Comments
+
+The `gh` CLI is not reliably available. Use GitHub MCP tools for PR comments. For OpenHands, comment
+on the PR with the exact trigger text needed for the run. The persistent
+`<!-- openhands-agent-summary -->` comment can be stale; trust committed artifacts like
+`plan-eval.md`, `evaluate.md`, and run logs over the summary comment.
+
+When posting automation requests, specify:
+
+- exact one-pass command
+- repository root as working directory
+- raw exit code requirement
+- lock hygiene: do not commit `deno.lock` or source churn unless a reviewed fix requires it
+
+## Supervisor Automation (agentic tools)
+
+The supervisor drives Tier-D Codex and Tier-E OpenHands through `.llm/tools/agentic/*`, each exposed
+as an `agentic:*` `deno task` (see `deno.json` and the index in `.llm/harness/workflow/tooling.md`).
+Two are durable GitHub infra utilities worth calling out:
+
+- **`gh-watch.ts`** (`deno task agentic:gh-watch --pr <n>`) — token-free CI/verdict watch. Run it as a
+  **background** process: it polls a PR's OpenHands IMPL/PLAN-EVAL summary comment (and, with
+  `--run-id`, the triggered Actions run) until the state is terminal, then exits — re-waking the
+  supervisor turn without a polling loop kept in context. Exit codes: `0` PASS · `10` FAIL · `12`
+  final-no-verdict · `13` action-run-failed · `2` timeout · `4` no-token. Use it whenever you have
+  dispatched an evaluator and must wait for the verdict.
+- **`gh-token.ts`** (`deno task agentic:gh-token check|store`) — durable GitHub-token resolver/store.
+  `check` resolves a token from any healthy source (env candidates → `gh auth token` Windows/WSL →
+  bounded GCM `git credential fill`), validates it against `GET /user`, and reports only the source +
+  login (never the token). `store` reads ONE PAT from stdin and persists it to every durable place
+  (Windows GCM + WSL `gh`) so later sessions auto-resolve. Use `check` at the start of any GitHub
+  session; use `store` once when the supervisor's token is missing/rotated.
+
+The rest of the family (`launch-codex-slice`, `codex-resume`, `codex-status`, `codex-watch`,
+`dispatch-openhands`, `openhands-status`, `gh-pr`) is indexed in
+`.llm/harness/workflow/tooling.md`. `.llm/tools/agentic/` is the **only** interface for driving Codex
+— never ad-hoc `wsl.exe`.
+
+## Lock Hygiene
+
+Do not delete lock files or caches. Do not run `deno cache --reload` without approval. If automation
+or validation mutates `deno.lock`, inspect the diff against the true branch base before accepting
+it. PLAN-EVAL should not commit lock churn.
+
+## Worktree Sync
+
+If push rejects due to a remote-only evaluator/bot commit, inspect the remote commit before
+integrating:
+
+```powershell
+deno eval 'const p = new Deno.Command("git", { args: ["show", "--stat", "--oneline", "--name-status", "origin/<branch>"] }).outputSync(); await Deno.stdout.write(p.stdout); await Deno.stderr.write(p.stderr); Deno.exit(p.code);'
+```
+
+If the remote commit is unrelated and the local commit should sit on top, use a normal rebase onto
+`origin/<branch>` and push. Do not discard user or bot commits.
+
+## Common Gotchas
+
+- `deno task check:packages` and `deno task check:plugins` may not exist; inspect root `deno.json`
+  and use the available wrapper plus focused checks.
+- Raw root `deno fmt --check` can include generated/scratch/future-wave files. Prefer scoped wrapper
+  verdicts.
+- `deno check .` can walk generated caches and deferred package surfaces. Prefer explicit roots and
+  entrypoints.
+- OpenHands may commit `deno.lock` churn; inspect before merging.
+- The final full scaffold/plugins E2E command lives in the `netscript-cli` skill.
+
+exec
+/bin/bash -lc "sed -n '1,220p' .agents/skills/netscript-harness/SKILL.md" in /home/codex/repos/netscript-307-stale24
+ succeeded in 0ms:
+---
+name: netscript-harness
+description: >
+  Operating model for NetScript harness runs. Use whenever the user says
+  "use harness", references a harness run, asks about archetype/profile
+  selection, run artifacts, resource aggregation, commit tracking, evaluator
+  protocol, rescoping, or where a lesson/doctrine update should live.
+---
+
+# NetScript Harness (V3) — Orchestration Skill
+
+This skill coordinates harness-mode runs. The authoritative harness docs live under `.llm/harness/`;
+this skill tells you what to load and in what order.
+
+Agent lanes and their model bindings are configuration, not dogma — the single source of truth is
+[`workflow/lane-policy.md`](../../../.llm/harness/workflow/lane-policy.md). Only two rules are hard:
+**generator-session ≠ evaluator-session**, and the **slice review gate** (no implementation lane
+self-certifies). Everything else is a per-run lane assignment recorded in the run dir's
+`supervisor.md`/`drift.md`.
+
+## When to Use
+
+- The user says `use harness` or asks for a harnessed run.
+- Selecting archetypes, scope overlays, or gate sets.
+- Tracking run artifacts, commits, or drift.
+- Understanding evaluator protocol (PLAN-EVAL or IMPL-EVAL).
+- Deciding where a lesson or doctrine update should live.
+
+## When Not to Use
+
+- For package/plugin architecture decisions — use `netscript-doctrine`.
+- For JSR readiness audits — use `jsr-audit`.
+- For frontend/framework-specific questions — use `deno-fresh` or the relevant domain skill.
+
+## Key Concepts
+
+| Concept           | Meaning                                                                                 |
+| ----------------- | --------------------------------------------------------------------------------------- |
+| **9-phase model** | Bootstrap → Research → Plan & Design → Plan-Gate → Implement → Gate → Evaluate → Release → Close. |
+| **PLAN-EVAL**     | First evaluator pass, before implementation. Hard stop.                                 |
+| **IMPL-EVAL**     | Final evaluator pass, after implementation.                                             |
+| **Tiered lanes**  | Agent lanes A–E with named model bindings; single source `workflow/lane-policy.md`.     |
+| **Slice review gate** | Tier-A supervisor substantively reviews each landed slice before the sign-off commit; no lane self-certifies (A1). |
+| **Supervisor identity** | Every run dir carries `supervisor.md` (model, session, host, paths, branch, baseline, lanes). |
+| **Plan-Gate**     | Checklist (`gates/plan-gate.md`) that PLAN-EVAL enforces.                               |
+| **Archetype**     | Package/plugin shape profile from `archetypes/ARCHETYPE-*.md`.                          |
+| **Scope overlay** | `SCOPE-frontend.md`, `SCOPE-service.md`, `SCOPE-docs.md`.                               |
+| **Seed run**      | Planning-only run shape (`workflow/seed-run.md`): discovery → roadmap → owner-ratified one-shot GitHub filing. Use when the deliverable is a board (epics + issues), not code. |
+| **Run artifact**  | File in `.llm/runs/<run-id>/` that preserves state across sessions.                     |
+| **Debt**          | Recorded in `.llm/harness/debt/arch-debt.md`.                                           |
+
+For a **supervisor run** (two or more capability-scoped phase groups), also read
+`.llm/harness/workflow/supervisor.md` and `.llm/harness/workflow/escalation.md`, and track the
+groups in `phase-registry.md`.
+
+For OpenHands or local-agent handoffs during a run, also read
+`.llm/harness/workflow/agent-handoff.md` and `.agents/skills/openhands-handoff/SKILL.md`.
+
+## Workflow
+
+The user may still write `profile: package`, `profile: docs`, or similar. In V3 that field is an
+intent hint, not the final profile.
+
+| User hint                  | V3 selection                                                |
+| -------------------------- | ----------------------------------------------------------- |
+| `package`                  | identify `ARCHETYPE-1` through `ARCHETYPE-6`                |
+| `plugin`                   | normally `ARCHETYPE-5`, unless sibling packages also change |
+| `frontend`                 | affected archetype(s) plus `SCOPE-frontend.md`              |
+| `service`                  | affected archetype(s) plus `SCOPE-service.md`               |
+| `docs` or `knowledge-base` | `SCOPE-docs.md` plus any described archetypes               |
+
+1. Read `workflow/activation.md` and `workflow/run-loop.md`.
+2. If resuming, read `.llm/runs/<run-id>/context-pack.md`.
+3. Identify the target surface and select archetype + overlays.
+4. Read `gates/archetype-gate-matrix.md` and `gates/plan-gate.md`.
+5. Scaffold run artifacts from `templates/`.
+6. Produce `research.md`, then `plan.md` with locked decisions.
+7. Record Design checkpoint in `worklog.md`.
+8. **Run PLAN-EVAL (separate session). No implementation before PASS.**
+9. Implement one commit slice at a time; push + comment on the draft PR (the commit trail) and keep
+   `worklog.md`/`context-pack.md` current after each.
+10. Run gates; record results in `worklog.md`.
+11. **Run IMPL-EVAL (separate session).**
+12. Close: update `context-pack.md`, `arch-debt.md`, and promote lessons if warranted.
+
+## Agent Delegation Contract
+
+Lane assignments and model bindings are configuration. The tiered A–E model, the selection rules
+(source slices → Tier D, batch/parallel → Tier C with committed `workflow.js`, research/doc prose →
+Tier B), and the named model bindings are defined once in
+[`workflow/lane-policy.md`](../../../.llm/harness/workflow/lane-policy.md). Do not restate lane
+routing here — defer to that file. The items below are the parts of the contract that hold as
+**invariants** regardless of which lane implements:
+
+- **Generator ≠ evaluator (hard invariant).** The session that generates a plan or an
+  implementation is never the session that evaluates it. Which model implements is configurable per
+  run and recorded in `supervisor.md`/`drift.md`; the session separation is not.
+- **Slice review gate (A1, hard invariant).** After any implementation lane lands a slice and its
+  automated gates pass, the Tier-A supervisor substantively reviews the slice content before the
+  sign-off commit — and the sign-off commit is the supervisor's, not the implementer's. This holds
+  for every implementation tier (B Opus sub-agents, C Workflow-generated slices, D WSL Codex); no
+  lane self-certifies. See `workflow/lane-policy.md` for the rule and `workflow/run-loop.md` for the
+  step placement.
+- **Evaluator model bindings.** PLAN-EVAL runs OpenHands minimax-M3; IMPL-EVAL runs OpenHands
+  qwen-3.7-max — each unless the run artifact explicitly records why that launch path is
+  unavailable. The two-failure eval loop is unchanged.
+- **Tier-D mobile-visibility proof.** A Tier-D (WSL Codex) implementation slice is launched only via
+  skills + `.llm/tools/agentic/` (never ad-hoc `wsl.exe`), and only when the run artifacts include
+  the WSL worktree path, concrete Codex thread id, daemon-managed `remote-control` proof, and the
+  follow-up steering command for that same thread. Without those, record the launch as
+  failed/not-attached. Claude helpers (`codex:rescue`, `codex:codex-rescue`, `codex-companion.mjs`,
+  internal `general-purpose` agents) are local tool surfaces, not daemon-attached Codex threads.
+- **Per-slice trackability.** Every implementation slice is independently trackable: branch/worktree
+  identity, agent/thread identity, files touched, tests run, commit hash, push status, and PR
+  comment/status. Each slice commits, pushes, and comments on the draft PR before the next slice is
+  considered complete (the draft-PR commit list + per-slice PR comments are the commit trail).
+- **Green-gate merge bar.** Merge, publish, or release gates require all relevant tests green with
+  required features intact. For catalog-related work, do not delete, skip, de-catalog, or bypass
+  tests unless the evaluator verdict explicitly classifies the test as stale/irrelevant and the PR
+  comment records the rationale.
+- **Blocked-lane handling.** If an evaluator or implementation launch path is blocked, record the
+  missing launch mechanism in `worklog.md`/`drift.md`, then proceed only with an owner-authorized
+  fallback lane recorded in `supervisor.md`/`drift.md`.
+
+## Common Pitfalls
+
+- **Skipping Plan & Design** — The Plan-Gate is a hard stop. Implementation before PLAN-EVAL `PASS`
+  is a process failure.
+- **Self-evaluation** — The evaluator must be a separate session. The generator does not
+  self-certify.
+- **Wrong evaluator surface** — Claude internal subagents are not PLAN-EVAL or IMPL-EVAL. Use
+  OpenHands with the required model, or record a blocked launch. The generator session may never
+  evaluate its own output.
+- **Self-certifying a slice** — a green automated gate is not a sign-off. The Tier-A supervisor must
+  substantively review the slice before the sign-off commit, for every implementation lane
+  (`workflow/lane-policy.md` invariant 2). No lane self-certifies.
+- **Treating lanes as dogma** — the "Claude coordinates / OpenHands evaluates / Codex implements"
+  fixed-lane assertion is retired. Lanes are configuration; consult `workflow/lane-policy.md` and
+  honor the run's recorded lane assignments/overrides in `supervisor.md`/`drift.md`.
+- **False attached-agent claims** — for Tier-D slices, a Claude `codex:*` skill/helper is not a WSL
+  Codex daemon thread. Require daemon status plus thread id before claiming the user can see or steer
+  the subagent from phone/Desktop.
+- **Carried-in plans as ground truth** — Re-baseline against current `main` before locking the plan.
+- **Monolithic commits** — Commit by slice, not by monolith. Each slice has its own gate.
+- **Raw root CLI noise as a verdict** — Package-quality check/lint/fmt evidence must come from the
+  scoped wrappers, not raw root `deno fmt --check` over Markdown, generated targets, or legacy
+  line-ending drift (which is not a package-quality verdict source unless the plan explicitly owns
+  repo-wide formatting). The wrapper invocations and verdict rules live in
+  `.agents/skills/netscript-tools`.
+
+## Run Artifacts
+
+Run artifacts live under `.llm/runs/<run-id>/` and use templates from `.llm/harness/templates/`.
+
+`<run-id>` is the current branch name with `/` replaced by `-`, followed by `--<suffix>`.
+
+| File                | Purpose                                                     |
+| ------------------- | ----------------------------------------------------------- |
+| `supervisor.md`     | supervisor identity (model, session, host, paths, branch, baseline, lanes) — written at run start |
+| `research.md`       | deep findings, re-baseline of carried-in plans              |
+| `plan.md`           | approved scope, archetype, gates, debt implications         |
+| `implement.md`      | generator prompt when needed                                |
+| `worklog.md`        | implementation evidence and gate results                    |
+| `plan-eval.md`      | PLAN-EVAL verdict (separate session, before implementation) |
+| `evaluate.md`       | IMPL-EVAL verdict (separate session, after implementation)  |
+| `context-pack.md`   | resumable summary                                           |
+| `drift.md`          | append-only drift log                                       |
+| `phase-registry.md` | supervisor runs only: phase-group map + live status         |
+
+There is no `commits.md` — the draft-PR commit list + per-slice PR comments are the commit trail.
+Keep `worklog.md` + `context-pack.md` current as part of every slice. Supervisor runs additionally
+keep `phase-registry.md`, `final-pr-handoff.md`, and an `escalations/` folder; brief each group agent
+with `templates/agent-briefing.md`.
+
+## `.llm/runs` Path Caveat
+
+Some search/index tools may skip or lag on freshly written `.llm/runs/` run dirs (the same caveat
+that applied to the old `.llm/tmp/run/` location). Verify run paths with a direct filesystem listing
+when needed:
+
+```powershell
+dir /s /b ".llm\runs\<id>" 2>&1
+```
+
+## Resource Aggregation
+
+When external docs or examples matter:
+
+1. check `.resources/deps-docs/`,
+2. check `.llm/tmp/docs/`,
+3. fetch official/primary docs with available docs tooling,
+4. save useful extracts to `.llm/tmp/docs/<source>-<topic>.md`,
+5. cite the extract in the run artifact.
+
+## Evaluator Separation
+
+There are **two** separate-session evaluator passes.
+
+**PLAN-EVAL** (before implementation):
+
+- Runs in OpenHands with minimax M3 unless blocked and recorded.
+- Reads `evaluator/plan-protocol.md` + `gates/plan-gate.md`.
+- Reads `research.md`, `plan.md`, and the `## Design` section.
+- Writes `plan-eval.md`.
+- Emits `PASS` or `FAIL_PLAN`.
+- Two `FAIL_PLAN` cycles, then escalate.
+
+**IMPL-EVAL** (final pass, after implementation):
+
+- Runs in OpenHands with qwen 3.7 max unless blocked and recorded.
+- Generator writes `worklog.md`, `context-pack.md`, and `drift.md`.
+- Evaluator reads `.llm/harness/evaluator/protocol.md`, the plan, worklog, context pack, drift, the
+  draft-PR commit list + per-slice PR comments (the commit trail), selected archetype, overlays, and
+  gate docs.
+- Evaluator writes `evaluate.md` with `PASS`, `FAIL_FIX`, `FAIL_RESCOPE`, or `FAIL_DEBT`.
+- Eval loop limit is two failures before escalation.
+
+## Commit Trail
+
+When a run requires commits, the draft PR's commit list + per-slice PR comments **are** the commit
+
+diff --git a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+index 4eef5bb4a6c5855ae1e46f155ab79a006d6eae0a..1033852a416abf036b144e50cba1742f3516ee4e
+--- a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
++++ b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+@@ -156,6 +156,7 @@
+ 
+   const workersCombined = byName.get('workers-combined');
+   const workersApi = byName.get('workers-api');
++  const sagasCombined = byName.get('sagas-combined');
+   assert(
+     workersCombined?.concurrencyEnvVar === 'WORKER_CONCURRENCY',
+     'workers-combined should carry concurrency env var',
+@@ -168,6 +169,18 @@
+     workersApi?.workdir === 'plugins/workers',
+     'workers-api should resolve from the plugin service appsettings entry',
+   );
++  assert(
++    sagasCombined?.concurrencyEnvVar === 'SAGA_CONCURRENCY',
++    'sagas-combined should carry saga concurrency env var',
++  );
++  assert(
++    sagasCombined?.workdir === 'sagas',
++    'sagas-combined should resolve from the sagas background workdir',
++  );
++  assert(
++    sagasCombined?.entrypoint === 'sagas/bin/combined.ts',
++    'sagas-combined should resolve the sagas combined runtime entrypoint',
++  );
+ 
+   assert(
+     !byName.has('workers-worker'),
+@@ -187,6 +200,18 @@
+     triggerProcessor?.defaultConcurrency === 10,
+     'trigger target should preserve plugin default concurrency',
+   );
++  assert(
++    triggerProcessor?.concurrencyEnvVar === 'TRIGGER_CONCURRENCY',
++    'trigger target should carry trigger concurrency env var',
++  );
++  assert(
++    triggerProcessor?.workdir === 'plugins/triggers',
++    'trigger target should resolve from the triggers plugin workdir',
++  );
++  assert(
++    triggerProcessor?.entrypoint === 'plugins/triggers/src/runtime/trigger-processor.ts',
++    'trigger target should resolve the trigger processor entrypoint',
++  );
+ });
+ 
+ Deno.test('loadDeployConfig maps service references to compile target dependencies', async () => {
+
+**Exploring tool options**
+
+I need to continue my search. Let's see if I can find comments related to my task. Should I use the search tool for GitHub? It’s already available, but maybe there are tools that aren’t active right now. I only have the search tool at my disposal and lack the specific definitions I might need. I definitely need to discover more to proceed effectively!
+codex
+The code and push are already done; I’m just locating the review-thread target so the evidence lands in the right place instead of as an unrelated top-level note.
+exec
+/bin/bash -lc "deno eval 'const p = new Deno.Command(\"git\", { args: [\"status\", \"--short\", \"--branch\"] }).outputSync(); await Deno.stdout.write(p.stdout); await Deno.stderr.write(p.stderr); Deno.exit(p.code);'" in /home/codex/repos/netscript-307-stale24
+ succeeded in 0ms:
+## chore/307-stale-wave2-wave4
+
+exec
+/bin/bash -lc "rtk gh api repos/rickylabs/netscript/pulls/485/comments --paginate --jq '.[] | select((.body|test(\"compile|assert|sagas|trigger|adversarial|unique\"; \"i\")) or (.path|test(\"compile\"; \"i\"))) | {id, in_reply_to_id, user:.user.login, path, line, created_at, body}'" in /home/codex/repos/netscript-307-stale24
+exec
+/bin/bash -lc "rtk gh api repos/rickylabs/netscript/issues/485/comments --paginate --jq '.[] | select(.body|test(\"compile|assert|sagas|trigger|adversarial|unique\"; \"i\")) | {id, user:.user.login, created_at, body}'" in /home/codex/repos/netscript-307-stale24
+diff --git a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+index 4eef5bb4a6c5855ae1e46f155ab79a006d6eae0a..1033852a416abf036b144e50cba1742f3516ee4e
+--- a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
++++ b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+@@ -156,6 +156,7 @@
+ 
+   const workersCombined = byName.get('workers-combined');
+   const workersApi = byName.get('workers-api');
++  const sagasCombined = byName.get('sagas-combined');
+   assert(
+     workersCombined?.concurrencyEnvVar === 'WORKER_CONCURRENCY',
+     'workers-combined should carry concurrency env var',
+@@ -168,6 +169,18 @@
+     workersApi?.workdir === 'plugins/workers',
+     'workers-api should resolve from the plugin service appsettings entry',
+   );
++  assert(
++    sagasCombined?.concurrencyEnvVar === 'SAGA_CONCURRENCY',
++    'sagas-combined should carry saga concurrency env var',
++  );
++  assert(
++    sagasCombined?.workdir === 'sagas',
++    'sagas-combined should resolve from the sagas background workdir',
++  );
++  assert(
++    sagasCombined?.entrypoint === 'sagas/bin/combined.ts',
++    'sagas-combined should resolve the sagas combined runtime entrypoint',
++  );
+ 
+   assert(
+     !byName.has('workers-worker'),
+@@ -187,6 +200,18 @@
+     triggerProcessor?.defaultConcurrency === 10,
+     'trigger target should preserve plugin default concurrency',
+   );
++  assert(
++    triggerProcessor?.concurrencyEnvVar === 'TRIGGER_CONCURRENCY',
++    'trigger target should carry trigger concurrency env var',
++  );
++  assert(
++    triggerProcessor?.workdir === 'plugins/triggers',
++    'trigger target should resolve from the triggers plugin workdir',
++  );
++  assert(
++    triggerProcessor?.entrypoint === 'plugins/triggers/src/runtime/trigger-processor.ts',
++    'trigger target should resolve the trigger processor entrypoint',
++  );
+ });
+ 
+ Deno.test('loadDeployConfig maps service references to compile target dependencies', async () => {
+
+ succeeded in 449ms:
+ succeeded in 522ms:
+{"body":"**[PHASE: IMPL] [VERDICT: SLICE_PUSHED]**\n\nWave 2 / Wave 4 implementation slice pushed.\n\n### Commit\n- `79433c90` — `chore(stale): verify wave 2 orphan deletes`\n\n### Scope\n- Deleted verified orphan files only:\n  - `packages/cli/src/kernel/adapters/deploy/compile/compile.test.ts`\n  - `packages/plugin-streams-core/src/domain/errors.ts`\n  - `packages/plugin/src/public/mod.ts`\n  - `packages/plugin-workers-core/src/public/mod.ts`\n  - `packages/telemetry/src/public/mod.ts`\n- Recorded every Wave 2 DELETE/KEEP verdict in `.llm/runs/beta5-impl--supervisor/slices/307-stale24/wave2-manifest.md`.\n- Wave 4 is a no-op on this checkout: `git ls-files .llm/tmp | wc -l` is `0`.\n\n### Evidence\n- Affected check: PASS, 927 files, 0 diagnostics.\n- Affected package tests: PASS (`cli` 306, `plugin` 74, `plugin-workers-core` 25, `plugin-streams-core` 8, `telemetry` 12).\n- Root check: PASS, 2101 files, 18 batches, 0 diagnostics.\n- Root test: PASS, 1497 passed, 0 failed, 12 ignored.\n- `.llm/tmp` spot-check: `claude-hook-log.ts` wrote ignored scratch successfully; tracked count remained `0`.\n\n### Notes\n- Kept `DataGrid` because it is root-exported, tested, documented, and coupled to `ns-data-grid*` CSS classes.\n- Kept SDK and workers candidates that are export-map, test, manifest, Aspire, template, or docs coupled.","created_at":"2026-07-05T23:31:17Z","id":4887974498,"user":"rickylabs"}
+{"body":"**[PHASE: ADVERSARIAL-REVIEW] [Codex]**\n\nVerdict: `CAVEATS`\n\n1. `packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts:140` does not preserve all assertions from deleted `packages/cli/src/kernel/adapters/deploy/compile/compile.test.ts` (origin/main lines 41-68). The surviving test checks that `sagas-combined` and `trigger-processor` exist, and checks `triggerProcessor.pluginName` / `defaultConcurrency`, but it no longer asserts `sagasCombined.concurrencyEnvVar === 'SAGA_CONCURRENCY'`, `sagasCombined.workdir === 'sagas'`, `sagasCombined.entrypoint === 'sagas/bin/combined.ts'`, `triggerProcessor.concurrencyEnvVar === 'TRIGGER_CONCURRENCY'`, `triggerProcessor.workdir === 'plugins/triggers'`, or `triggerProcessor.entrypoint === 'plugins/triggers/src/runtime/trigger-processor.ts'`. Suggested fix: add those path/env assertions to the existing `extractCompileTargets emits metadata-driven background processor targets` test instead of restoring the stale duplicate file.\n\nAttack-surface results:\n\n1. Deleted-file import/export/template/doc/test-runner sweep: no findings beyond caveat 1. I independently searched relative paths, deleted basenames, dynamic import strings, package bare/subpath specifiers, CLI templates under `packages/cli/src/**/templates`, docs, and package test/check tasks. The deleted barrels are absent from export maps: `packages/plugin/deno.json:6`, `packages/plugin-workers-core/deno.json:6`, `packages/telemetry/deno.json:6`, and `packages/plugin-streams-core/deno.json:6`; package check tasks likewise target live entrypoints rather than the deleted files.\n2. `compile.test.ts` vs `compile_test.ts`: finding recorded in caveat 1. The deleted file was a duplicate/stale Deno test naming variant, but it did contain unique path/env assertions.\n3. `plugin-workers-core/src/public/mod.ts` public reachability: no finding. The deleted 115-line barrel was not an export-map entry (`packages/plugin-workers-core/deno.json:6-24`); current root `packages/plugin-workers-core/mod.ts:17-25` re-exports from `src/public/root.ts`, including `inspectTask` and `inspectWorkflow`. `deno doc --filter inspectTask packages/plugin-workers-core/mod.ts` and `deno doc --filter inspectWorkflow packages/plugin-workers-core/mod.ts` both resolve to `packages/plugin-workers-core/src/public/root.ts`.\n4. `plugin-streams-core/src/domain/errors.ts`: no finding. `StreamError` / `StreamSchemaError` have no live repo importers or docs references; current code uses durable-stream client errors in `packages/plugin-streams-core/src/application/create-durable-stream.ts`.\n5. KEEP manifest sample: no wrong-keep findings in four samples. SDK collections remain exported/tested/docs-referenced (`packages/sdk/deno.json:10`, `packages/sdk/tests/type-fixtures/query-collection_type.ts:1`, `docs/site/reference/sdk/index.md:147`); workers bin entrypoints are manifest/Aspire/test/docs-coupled (`plugins/workers/src/public/mod.ts:69`, `plugins/workers/src/aspire/workers-contribution.ts:52`, `plugins/workers/tests/aspire/workers-contribution_test.ts:50`); service health remains template/runtime/doc coupled; Fresh UI `DataGrid` remains root-exported/tested/docs/CSS-coupled (`packages/fresh-ui/mod.ts:26`, `packages/fresh-ui/tests/data-grid.test.tsx:3`, `packages/fresh-ui/src/presentation/data-grid.css:1`).\n\nIndependent verification run:\n\n- `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages --ext ts,tsx` — PASS, 1,905 files, 16 batches, 0 diagnostics.\n- `cd packages/cli \u0026\u0026 deno task test` — PASS, 306 passed, 0 failed.\n- `cd packages/plugin \u0026\u0026 deno task test` — PASS, 74 passed, 0 failed.\n- `cd packages/plugin-workers-core \u0026\u0026 deno task test` — PASS, 25 passed, 0 failed.\n- `cd packages/plugin-streams-core \u0026\u0026 deno task test` — PASS, 8 passed, 0 failed.\n- `cd packages/telemetry \u0026\u0026 deno task test` — PASS, 12 passed, 0 failed.\n\nCAVEATS\n","created_at":"2026-07-05T23:42:49Z","id":4888004883,"user":"rickylabs"}
+
+codex
+The adversarial note is a top-level PR conversation comment, not an inline review thread, so I’m posting the fix evidence as a PR reply/comment against #485 with the exact commit and package test result.
+exec
+/bin/bash -lc 'gh pr comment 485 --body $'"'Fixed in "'`ac9e06ba` (`test(cli): preserve compile target assertions`).
+
+I added the missing assertions to `packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts` inside the existing `extractCompileTargets emits metadata-driven background processor targets` test:
+
+- `sagasCombined.concurrencyEnvVar === "SAGA_CONCURRENCY"`
+- `sagasCombined.workdir === "sagas"`
+- `sagasCombined.entrypoint === "sagas/bin/combined.ts"`
+- `triggerProcessor.concurrencyEnvVar === "TRIGGER_CONCURRENCY"`
+- `triggerProcessor.workdir === "plugins/triggers"`
+- `triggerProcessor.entrypoint === "plugins/triggers/src/runtime/trigger-processor.ts"`
+
+I did not restore the deleted `compile.test.ts` file.
+
+Validation: `cd packages/cli && deno task test` -> PASS, 306 passed (407 steps), 0 failed.'"'" in /home/codex/repos/netscript-307-stale24
+diff --git a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+index 4eef5bb4a6c5855ae1e46f155ab79a006d6eae0a..1033852a416abf036b144e50cba1742f3516ee4e
+--- a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
++++ b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+@@ -156,6 +156,7 @@
+ 
+   const workersCombined = byName.get('workers-combined');
+   const workersApi = byName.get('workers-api');
++  const sagasCombined = byName.get('sagas-combined');
+   assert(
+     workersCombined?.concurrencyEnvVar === 'WORKER_CONCURRENCY',
+     'workers-combined should carry concurrency env var',
+@@ -168,6 +169,18 @@
+     workersApi?.workdir === 'plugins/workers',
+     'workers-api should resolve from the plugin service appsettings entry',
+   );
++  assert(
++    sagasCombined?.concurrencyEnvVar === 'SAGA_CONCURRENCY',
++    'sagas-combined should carry saga concurrency env var',
++  );
++  assert(
++    sagasCombined?.workdir === 'sagas',
++    'sagas-combined should resolve from the sagas background workdir',
++  );
++  assert(
++    sagasCombined?.entrypoint === 'sagas/bin/combined.ts',
++    'sagas-combined should resolve the sagas combined runtime entrypoint',
++  );
+ 
+   assert(
+     !byName.has('workers-worker'),
+@@ -187,6 +200,18 @@
+     triggerProcessor?.defaultConcurrency === 10,
+     'trigger target should preserve plugin default concurrency',
+   );
++  assert(
++    triggerProcessor?.concurrencyEnvVar === 'TRIGGER_CONCURRENCY',
++    'trigger target should carry trigger concurrency env var',
++  );
++  assert(
++    triggerProcessor?.workdir === 'plugins/triggers',
++    'trigger target should resolve from the triggers plugin workdir',
++  );
++  assert(
++    triggerProcessor?.entrypoint === 'plugins/triggers/src/runtime/trigger-processor.ts',
++    'trigger target should resolve the trigger processor entrypoint',
++  );
+ });
+ 
+ Deno.test('loadDeployConfig maps service references to compile target dependencies', async () => {
+
+ succeeded in 1312ms:
+https://github.com/rickylabs/netscript/pull/485#issuecomment-4888014858
+
+diff --git a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+index 4eef5bb4a6c5855ae1e46f155ab79a006d6eae0a..1033852a416abf036b144e50cba1742f3516ee4e
+--- a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
++++ b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+@@ -156,6 +156,7 @@
+ 
+   const workersCombined = byName.get('workers-combined');
+   const workersApi = byName.get('workers-api');
++  const sagasCombined = byName.get('sagas-combined');
+   assert(
+     workersCombined?.concurrencyEnvVar === 'WORKER_CONCURRENCY',
+     'workers-combined should carry concurrency env var',
+@@ -168,6 +169,18 @@
+     workersApi?.workdir === 'plugins/workers',
+     'workers-api should resolve from the plugin service appsettings entry',
+   );
++  assert(
++    sagasCombined?.concurrencyEnvVar === 'SAGA_CONCURRENCY',
++    'sagas-combined should carry saga concurrency env var',
++  );
++  assert(
++    sagasCombined?.workdir === 'sagas',
++    'sagas-combined should resolve from the sagas background workdir',
++  );
++  assert(
++    sagasCombined?.entrypoint === 'sagas/bin/combined.ts',
++    'sagas-combined should resolve the sagas combined runtime entrypoint',
++  );
+ 
+   assert(
+     !byName.has('workers-worker'),
+@@ -187,6 +200,18 @@
+     triggerProcessor?.defaultConcurrency === 10,
+     'trigger target should preserve plugin default concurrency',
+   );
++  assert(
++    triggerProcessor?.concurrencyEnvVar === 'TRIGGER_CONCURRENCY',
++    'trigger target should carry trigger concurrency env var',
++  );
++  assert(
++    triggerProcessor?.workdir === 'plugins/triggers',
++    'trigger target should resolve from the triggers plugin workdir',
++  );
++  assert(
++    triggerProcessor?.entrypoint === 'plugins/triggers/src/runtime/trigger-processor.ts',
++    'trigger target should resolve the trigger processor entrypoint',
++  );
+ });
+ 
+ Deno.test('loadDeployConfig maps service references to compile target dependencies', async () => {
+
+**Verifying push and status**
+
+I need to verify my git push and check the status. I'll start by using the `git status` command to see if there are any changes that need to be committed or pushed. Then, I'll look into the log to gather information about my recent commits. It seems straightforward, but I want to ensure everything is in order before proceeding! Let’s check those commands and make sure my repository is up to date.
+codex
+The PR evidence comment is posted. I’m doing the final ground-truth git check now so the close-out can state branch and worktree state accurately.
+exec
+/bin/bash -lc "deno eval 'const p = new Deno.Command(\"git\", { args: [\"log\", \"--oneline\", \"--max-count=3\"] }).outputSync(); await Deno.stdout.write(p.stdout); await Deno.stderr.write(p.stderr); Deno.exit(p.code);'" in /home/codex/repos/netscript-307-stale24
+ succeeded in 0ms:
+ac9e06ba test(cli): preserve compile target assertions
+c3ed4936 chore(harness): relocate stale slice artifacts
+79433c90 chore(stale): verify wave 2 orphan deletes
+
+exec
+/bin/bash -lc "deno eval 'const p = new Deno.Command(\"git\", { args: [\"status\", \"--short\", \"--branch\"] }).outputSync(); await Deno.stdout.write(p.stdout); await Deno.stderr.write(p.stderr); Deno.exit(p.code);'" in /home/codex/repos/netscript-307-stale24
+ succeeded in 0ms:
+## chore/307-stale-wave2-wave4
+
+exec
+/bin/bash -lc "deno eval 'const p = new Deno.Command(\"git\", { args: [\"ls-remote\", \"origin\", \"refs/heads/chore/307-stale-wave2-wave4\"] }).outputSync(); await Deno.stdout.write(p.stdout); await Deno.stderr.write(p.stderr); Deno.exit(p.code);'" in /home/codex/repos/netscript-307-stale24
+diff --git a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+index 4eef5bb4a6c5855ae1e46f155ab79a006d6eae0a..1033852a416abf036b144e50cba1742f3516ee4e
+--- a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
++++ b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+@@ -156,6 +156,7 @@
+ 
+   const workersCombined = byName.get('workers-combined');
+   const workersApi = byName.get('workers-api');
++  const sagasCombined = byName.get('sagas-combined');
+   assert(
+     workersCombined?.concurrencyEnvVar === 'WORKER_CONCURRENCY',
+     'workers-combined should carry concurrency env var',
+@@ -168,6 +169,18 @@
+     workersApi?.workdir === 'plugins/workers',
+     'workers-api should resolve from the plugin service appsettings entry',
+   );
++  assert(
++    sagasCombined?.concurrencyEnvVar === 'SAGA_CONCURRENCY',
++    'sagas-combined should carry saga concurrency env var',
++  );
++  assert(
++    sagasCombined?.workdir === 'sagas',
++    'sagas-combined should resolve from the sagas background workdir',
++  );
++  assert(
++    sagasCombined?.entrypoint === 'sagas/bin/combined.ts',
++    'sagas-combined should resolve the sagas combined runtime entrypoint',
++  );
+ 
+   assert(
+     !byName.has('workers-worker'),
+@@ -187,6 +200,18 @@
+     triggerProcessor?.defaultConcurrency === 10,
+     'trigger target should preserve plugin default concurrency',
+   );
++  assert(
++    triggerProcessor?.concurrencyEnvVar === 'TRIGGER_CONCURRENCY',
++    'trigger target should carry trigger concurrency env var',
++  );
++  assert(
++    triggerProcessor?.workdir === 'plugins/triggers',
++    'trigger target should resolve from the triggers plugin workdir',
++  );
++  assert(
++    triggerProcessor?.entrypoint === 'plugins/triggers/src/runtime/trigger-processor.ts',
++    'trigger target should resolve the trigger processor entrypoint',
++  );
+ });
+ 
+ Deno.test('loadDeployConfig maps service references to compile target dependencies', async () => {
+
+ succeeded in 377ms:
+ac9e06bab675deabd6f463590e884cd3be76c149	refs/heads/chore/307-stale-wave2-wave4
+
+codex
+Fixed and pushed.
+
+Commit: `ac9e06ba test(cli): preserve compile target assertions`
+
+What changed:
+- Added the missing saga and trigger compile-target assertions to [compile_test.ts](/home/codex/repos/netscript-307-stale24/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts).
+- Did not restore deleted `compile.test.ts`.
+- Touched no other files.
+
+Validation:
+- `cd packages/cli && deno task test` passed: `306 passed (407 steps), 0 failed`.
+
+Pushed with the explicit refspec to `origin/chore/307-stale-wave2-wave4`. I also posted the PR evidence comment here: https://github.com/rickylabs/netscript/pull/485#issuecomment-4888014858
+
+Final git check is clean: branch `chore/307-stale-wave2-wave4`, no unstaged or staged changes.
+diff --git a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+index 4eef5bb4a6c5855ae1e46f155ab79a006d6eae0a..1033852a416abf036b144e50cba1742f3516ee4e
+--- a/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
++++ b/packages/cli/src/kernel/adapters/deploy/compile/compile_test.ts
+@@ -156,6 +156,7 @@
+ 
+   const workersCombined = byName.get('workers-combined');
+   const workersApi = byName.get('workers-api');
++  const sagasCombined = byName.get('sagas-combined');
+   assert(
+     workersCombined?.concurrencyEnvVar === 'WORKER_CONCURRENCY',
+     'workers-combined should carry concurrency env var',
+@@ -168,6 +169,18 @@
+     workersApi?.workdir === 'plugins/workers',
+     'workers-api should resolve from the plugin service appsettings entry',
+   );
++  assert(
++    sagasCombined?.concurrencyEnvVar === 'SAGA_CONCURRENCY',
++    'sagas-combined should carry saga concurrency env var',
++  );
++  assert(
++    sagasCombined?.workdir === 'sagas',
++    'sagas-combined should resolve from the sagas background workdir',
++  );
++  assert(
++    sagasCombined?.entrypoint === 'sagas/bin/combined.ts',
++    'sagas-combined should resolve the sagas combined runtime entrypoint',
++  );
+ 
+   assert(
+     !byName.has('workers-worker'),
+@@ -187,6 +200,18 @@
+     triggerProcessor?.defaultConcurrency === 10,
+     'trigger target should preserve plugin default concurrency',
+   );
++  assert(
++    triggerProcessor?.concurrencyEnvVar === 'TRIGGER_CONCURRENCY',
++    'trigger target should carry trigger concurrency env var',
++  );
++  assert(
++    triggerProcessor?.workdir === 'plugins/triggers',
++    'trigger target should resolve from the triggers plugin workdir',
++  );
++  assert(
++    triggerProcessor?.entrypoint === 'plugins/triggers/src/runtime/trigger-processor.ts',
++    'trigger target should resolve the trigger processor entrypoint',
++  );
+ });
+ 
+ Deno.test('loadDeployConfig maps service references to compile target dependencies', async () => {
+
+tokens used
+311,099
