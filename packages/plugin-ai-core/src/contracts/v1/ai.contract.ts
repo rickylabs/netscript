@@ -331,7 +331,7 @@ type ChatRoute = ContractProcedureBuilderWithInputOutput<
 >;
 
 /**
- * Explicit, precise type of the AI v1 contract definition.
+ * Concrete, precise interface for the AI v1 contract definition.
  *
  * Every member is a real oRPC contract procedure typed against its input and
  * output Zod schemas. The interface `extends BasePluginContract`, so the
@@ -340,8 +340,14 @@ type ChatRoute = ContractProcedureBuilderWithInputOutput<
  * `--isolatedDeclarations` (the JSR slow-types bar); because each member derives
  * from a named, annotated schema via `typeof`, the contract type can never
  * silently drift from the schemas.
+ *
+ * Kept module-private: its members reference internal oRPC builder and Zod
+ * schema types, so exporting the interface directly would drag those private
+ * types into the documented surface (a `deno doc --lint` `private-type-ref`
+ * cascade). The public, documented name is re-exposed as the thin type alias
+ * {@link AiContractDefinitionShape} below.
  */
-interface AiContractDefinitionShape extends BasePluginContract {
+interface AiContractDefinitionShapeInternal extends BasePluginContract {
   /** Mandatory plugin capability-document route shared by all feature plugins. */
   readonly describe: BasePluginDescribeRoute;
   /** Streaming chat-completion route. */
@@ -366,7 +372,7 @@ interface AiContractDefinitionShape extends BasePluginContract {
  * this object is handed to `implement()` WITHOUT any erasure cast and every
  * `router.<route>.handler(...)` is checked against the contract's IO.
  */
-const aiContractDefinition: AiContractDefinitionShape = {
+const aiContractDefinition: AiContractDefinitionShapeInternal = {
   ...BASE_PLUGIN_CONTRACT_ROUTES,
 
   chat: oc
@@ -394,6 +400,18 @@ const aiContractDefinition: AiContractDefinitionShape = {
     .input(transcribeInputZodSchema)
     .output(transcribeResponseZodSchema),
 };
+
+/**
+ * Explicit, precise structural type of the AI v1 contract definition.
+ *
+ * Public, documented surface of the `/contracts/v1` subpath (restored after the
+ * enterprise surface sweep). A thin alias over the module-private
+ * {@link AiContractDefinitionShapeInternal} interface, so consumers keep the
+ * exact same structural type — every member a real oRPC contract procedure
+ * typed against its Zod schemas — while the interface's internal builder/schema
+ * member types stay out of the documented surface.
+ */
+export type AiContractDefinitionShape = AiContractDefinitionShapeInternal;
 
 /**
  * AI service contract definition for client generation.
