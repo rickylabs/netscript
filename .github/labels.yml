@@ -142,13 +142,20 @@
   color: "bfdadc"
   description: "Documentation and docs site"
 
-# ── ci: manual overrides for path-filtered CI ────────────────────────────────
+# ── ci: manual overrides for docs-only / label-gated skip of expensive CI ─────
+# Consumed by the `classify` job in .github/workflows/e2e-cli.yml. Precedence:
+# ci:full > ci:skip-* > docs-only auto-detection. Skip labels NEVER affect the
+# cheap required trio (quality / check-test / deps-report) in ci.yml, nor the
+# release gates (publish / e2e-cli-prod*).
 - name: "ci:full"
   color: "d4c5f9"
-  description: "Force the full CI/e2e run"
+  description: "Force both expensive e2e-cli jobs to run (overrides docs-only + skip labels)"
 - name: "ci:skip-e2e"
   color: "d4c5f9"
-  description: "Suppress the e2e tier"
+  description: "Skip the scaffold-runtime (aspire/docker/postgres) e2e job"
+- name: "ci:skip-scaffold"
+  color: "d4c5f9"
+  description: "Skip the scaffold-static (deno-only) scaffold gate"
 - name: "gate:e2e"
   color: "d4c5f9"
   description: "Run the toolchain-heavy e2e-cli gate"
