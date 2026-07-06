@@ -70,8 +70,10 @@ the beta.6 implementation supervisor.
 
 ## Open Questions
 
-- OQ-1 MCP viability (slice 0 gate) · OQ-2 synthetic pkg name · OQ-3 shots in-repo · OQ-4 closure
-  build source — see research.md.
+- **OQ-1 RESOLVED GREEN 2026-07-06:** canvas lane runs on the native `DesignSync` tool
+  (claude.ai-login authorized; read smoke PASS; stale project `ea3fa1b9-…` visible and left
+  untouched per LD-2). See drift.md latest entry.
+- OQ-2 synthetic pkg name · OQ-3 shots in-repo · OQ-4 closure build source — see research.md.
 
 ## Drift and Debt
 

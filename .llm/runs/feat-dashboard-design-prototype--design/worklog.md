@@ -114,7 +114,7 @@ unit of the same kind.
 
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
-| Canvas MCP smoke | NOT_RUN | — | slice 0; blocked on owner `/design-login` |
+| Canvas connectivity smoke (read half) | **PASS** 2026-07-06 | `DesignSync list_projects` returned the writable set: 1 project, the stale `eis-chat — NS One` (`ea3fa1b9-906c-4b8a-8ef7-421b460e5c15`), after owner ran `claude mcp add claude-design …` + `/design-login` | OQ-1 resolved GREEN — via a better mechanism than planned: Claude Code's **native `DesignSync` tool** (localPath disk uploads that bypass model context, plan-boundary enforcement, claude.ai-login auth) rather than the raw MCP. Write half (`create_project` + round-trip) runs in slice 0 proper, after PLAN-EVAL PASS |
 
 ### Consumer Gates
 

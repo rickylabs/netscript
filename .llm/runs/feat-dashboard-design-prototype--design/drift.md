@@ -30,3 +30,20 @@ documentation.
 - **Severity:** minor
 - **Action:** accept (recorded).
 - **Evidence:** supervisor.md lane table; AGENTS.md tooling tiers.
+
+## 2026-07-06 — Canvas sync mechanism: native DesignSync tool, not raw MCP
+
+- **What:** The sync lane runs on Claude Code's native `DesignSync` tool (+ `/design-sync` skill)
+  instead of the raw `claude-design` MCP endpoint the plan assumed.
+- **Expected:** plan/research OQ-1 assumed MCP tools (`mcp__claude-design__*`) with known 404/401
+  flakiness and an owner-relay fallback.
+- **Actual:** `DesignSync` is first-class in the harness: claude.ai-login auth (owner ran
+  `/design-login`), read smoke PASS (`list_projects` → stale `eis-chat — NS One` visible,
+  `ea3fa1b9-…`), `localPath` disk uploads that keep the 290KB registry / ~80KB CSS closure out of
+  model context, and a finalize_plan write boundary. Strictly better; the MCP server stays
+  registered as a secondary surface for canvas-driving if needed.
+- **Severity:** minor (favorable; de-risks the top risk-register entry)
+- **Action:** accept; slice 0 write half (`create_project` + round-trip) still gates after
+  PLAN-EVAL PASS. Slice 1 targets the DesignSync bundle shape (`@dsCard` preview markers,
+  256-file batches).
+- **Evidence:** worklog.md § Runtime Gates.
