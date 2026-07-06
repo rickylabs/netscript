@@ -12,9 +12,12 @@ deployment target of epic #327.
 - A Bootstrap: ✅ (commit `37bcffdc`, draft PR #504).
 - B Discovery corpus: ✅ — workflow `wf_8ef59eb5-cd6`, 8/8 topics, corpus in `research/`, index in
   `research.md`, 25 drift candidates + 36 open questions in `research/stage-b-ledger.md`.
-- C Synthesis: in progress — supervisor reads FULL corpus, triages ledger, names Stage-D deep-dive
-  topics, resolves supervisor-delegated decisions, poses owner-forks.
-- D Design packs: pending.
+- C Synthesis: ✅ — full-corpus read + synthesis appended to `research.md` §C1–C7: mode-split
+  hybrid architecture (library engine / OS supervisor of record / control-plane service as sibling
+  unit), 13 resolved decisions S1–S13, 7 owner-forks OF-1..7, 25/25 ledger drift candidates
+  triaged (drift.md entry 4), 36/36 open questions routed, 5 Stage-D packs named (D1–D5).
+- D Design packs: in progress — Tier B (Opus 4.8) sub-agents author D1–D5 per §C6; drafts only,
+  zero board mutation; packs land in `research/design/`, issue-draft skeletons in `drafts/`.
 - E Plan lock: pending.
 - F Adversarial: pending.
 - G PLAN-EVAL: pending (hard stop).
