@@ -37,21 +37,6 @@ export const NETSCRIPT_RELEASE_VERSION: string = cliPackageJson.version;
 /** Exact JSR version suffix for NetScript prerelease package pins. */
 export const NETSCRIPT_RELEASE_TAG = `@${NETSCRIPT_RELEASE_VERSION}`;
 
-/**
- * Published JSR version of the `@netscript/ai` engine package.
- *
- * `@netscript/ai` is deliberately version-decoupled from the release train
- * (the defer-AI-publish decision): the train sits at
- * {@link NETSCRIPT_RELEASE_VERSION} while `@netscript/ai` is published
- * independently and referenced at its own version — exactly the version
- * `packages/plugin-ai-core/deno.json` pins in its manifest. Pinning it with
- * {@link netscriptJsrSpecifier} would reference an unpublished version and
- * hard-fail prod installs. Drift is guarded by the workspace-mutator test
- * that cross-checks this constant against the `@netscript/ai` pin declared
- * by `packages/plugin-ai-core/deno.json`.
- */
-export const NETSCRIPT_AI_ENGINE_VERSION = '0.0.1-alpha.0';
-
 /** Build an exact JSR specifier for a NetScript package and optional export subpath. */
 export function netscriptJsrSpecifier(
   packageName: string,

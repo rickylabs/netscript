@@ -536,20 +536,19 @@ Deno.test('PluginWorkspaceMutator wires every @netscript/* specifier emitted by 
     );
   }
 
-  // Exact targets: train packages pin the release version; @netscript/ai is
-  // version-decoupled and must pin its actually-published version (see below).
+  // Exact targets: all three kind-source packages ride the release train.
+  assertEquals(config.imports['@netscript/ai'], netscriptJsrSpecifier('ai'));
   assertEquals(
     config.imports['@netscript/plugin-ai-core'],
     netscriptJsrSpecifier('plugin-ai-core'),
   );
   assertEquals(config.imports['@netscript/fresh'], netscriptJsrSpecifier('fresh'));
 
-  // Drift-guard: `@netscript/ai` is deliberately off the release train, so a
-  // `netscriptJsrSpecifier('ai')` pin would point at an unpublished version
-  // and hard-fail prod installs. The in-repo source of truth for what the
-  // published stack references is the `@netscript/ai` pin declared by
-  // packages/plugin-ai-core/deno.json — cross-check the constant against it
-  // so joining the release train forces the constant update in the same PR.
+  // Drift-guard: the map's @netscript/ai entry must match the pin declared by
+  // packages/plugin-ai-core/deno.json — the in-repo source of truth for what
+  // the published stack references. This keeps the map honest across release
+  // cuts: if the engine ever leaves the train again (or the cut misses one of
+  // the two files), this assertion fails in the same PR.
   const pluginAiCoreDenoJson = JSON.parse(
     await Deno.readTextFile(
       new URL('../../../../../../packages/plugin-ai-core/deno.json', import.meta.url),
@@ -558,9 +557,9 @@ Deno.test('PluginWorkspaceMutator wires every @netscript/* specifier emitted by 
   assertEquals(
     config.imports['@netscript/ai'],
     pluginAiCoreDenoJson.imports['@netscript/ai'],
-    'NETSCRIPT_AI_ENGINE_VERSION in jsr-specifiers.ts drifted from the @netscript/ai ' +
-      'pin in packages/plugin-ai-core/deno.json. Update the constant to the version ' +
-      'the published stack references.',
+    'The @netscript/ai entry in PLUGIN_KIND_SOURCE_IMPORTS drifted from the ' +
+      '@netscript/ai pin in packages/plugin-ai-core/deno.json. Both must reference ' +
+      'the same published engine version.',
   );
 
   // Local-source coverage: every emitted @netscript/* package must be copied

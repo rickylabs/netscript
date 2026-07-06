@@ -4,7 +4,7 @@ import { addWorkspaceMember } from '../scaffold/workspace-writer.ts';
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
 import { SCAFFOLD_PACKAGES } from '../../constants/scaffold/scaffold-packages.ts';
-import { NETSCRIPT_AI_ENGINE_VERSION, netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
+import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
 import { ScaffoldValidationError } from '../../domain/errors.ts';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import type {
@@ -124,9 +124,7 @@ const PLUGIN_SERVICE_BOOTSTRAP_IMPORTS: readonly string[] = [
  */
 const PLUGIN_KIND_SOURCE_IMPORTS: Readonly<Record<string, Readonly<Record<string, string>>>> = {
   ai: {
-    // @netscript/ai is version-decoupled from the release train — see
-    // NETSCRIPT_AI_ENGINE_VERSION in jsr-specifiers.ts.
-    '@netscript/ai': `jsr:@netscript/ai@${NETSCRIPT_AI_ENGINE_VERSION}`,
+    '@netscript/ai': netscriptJsrSpecifier('ai'),
     '@netscript/plugin-ai-core': netscriptJsrSpecifier('plugin-ai-core'),
     '@netscript/fresh': netscriptJsrSpecifier('fresh'),
   },
