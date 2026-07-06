@@ -146,11 +146,11 @@ Deno.test('generateDenoJson expands copied workspace packages in stable order', 
 
   assertEquals(result.workspace.slice(0, 2), ['./contracts', './plugins']);
   assertEquals(result.workspace.slice(2, 7), [
+    './packages/ai',
     './packages/aspire',
     './packages/cli',
     './packages/config',
     './packages/cron',
-    './packages/database',
   ]);
   assertEquals(
     result.workspace[result.workspace.length - 1],

@@ -1,4 +1,5 @@
 export const SCAFFOLD_WORKSPACE_PACKAGES = [
+  'ai',
   'aspire',
   'cli',
   'config',
@@ -9,6 +10,7 @@ export const SCAFFOLD_WORKSPACE_PACKAGES = [
   'kv',
   'logger',
   'plugin',
+  'plugin-ai-core',
   'plugin-auth-core',
   'auth-workos',
   'auth-better-auth',

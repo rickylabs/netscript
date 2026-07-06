@@ -5,10 +5,12 @@
  */
 
 import { assert, assertEquals } from 'jsr:@std/assert@^1';
+import { join } from '@std/path';
 import { MemoryFileSystemAdapter } from '../scaffold/memory-fs.ts';
 import { PluginWorkspaceMutator } from './workspace-mutator.ts';
 import type { PluginKindProvider } from '../../domain/plugin-kind.ts';
 import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
+import { SCAFFOLD_WORKSPACE_PACKAGES } from '../../constants/scaffold/scaffold-workspace-packages.ts';
 
 const backgroundProvider: PluginKindProvider = {
   kind: 'background',
@@ -512,15 +514,104 @@ Deno.test('PluginWorkspaceMutator wires every @netscript/* specifier emitted by 
     imports: Record<string, string>;
   };
 
+  // Prod/JSR coverage: kind-source wiring uses bare package aliases only —
+  // Deno expands export subpaths through a root `jsr:` package alias (deno-add
+  // semantics), so every emitted specifier is covered when its root package
+  // alias maps to an exact `jsr:@netscript/<pkg>@<version>` (no subpath).
+  const bareJsrAliasPattern = /^jsr:@netscript\/[a-z0-9-]+@\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/;
   for (const specifier of [...emitted].sort()) {
-    const { pkg, subpath } = splitNetscriptSpecifier(specifier);
-    assertEquals(
-      config.imports[specifier],
-      netscriptJsrSpecifier(pkg, subpath),
-      `AI scaffold emits "${specifier}" but the prod import-map wiring is missing ` +
-        `a matching entry. Add it to PLUGIN_KIND_SOURCE_IMPORTS.ai in workspace-mutator.ts.`,
+    const { pkg } = splitNetscriptSpecifier(specifier);
+    const rootAlias = `@netscript/${pkg}`;
+    const target = config.imports[rootAlias];
+    assert(
+      target !== undefined,
+      `AI scaffold emits "${specifier}" but the prod import-map wiring has no ` +
+        `root alias for "${rootAlias}". Add it to PLUGIN_KIND_SOURCE_IMPORTS.ai ` +
+        `in workspace-mutator.ts.`,
+    );
+    assert(
+      bareJsrAliasPattern.test(target),
+      `Root alias "${rootAlias}" must be a bare exact-version jsr package alias ` +
+        `(subpath expansion only works through bare aliases), got "${target}".`,
     );
   }
+
+  // Exact targets: train packages pin the release version; @netscript/ai is
+  // version-decoupled and must pin its actually-published version (see below).
+  assertEquals(
+    config.imports['@netscript/plugin-ai-core'],
+    netscriptJsrSpecifier('plugin-ai-core'),
+  );
+  assertEquals(config.imports['@netscript/fresh'], netscriptJsrSpecifier('fresh'));
+
+  // Drift-guard: `@netscript/ai` is deliberately off the release train, so a
+  // `netscriptJsrSpecifier('ai')` pin would point at an unpublished version
+  // and hard-fail prod installs. The in-repo source of truth for what the
+  // published stack references is the `@netscript/ai` pin declared by
+  // packages/plugin-ai-core/deno.json — cross-check the constant against it
+  // so joining the release train forces the constant update in the same PR.
+  const pluginAiCoreDenoJson = JSON.parse(
+    await Deno.readTextFile(
+      new URL('../../../../../../packages/plugin-ai-core/deno.json', import.meta.url),
+    ),
+  ) as { imports: Record<string, string> };
+  assertEquals(
+    config.imports['@netscript/ai'],
+    pluginAiCoreDenoJson.imports['@netscript/ai'],
+    'NETSCRIPT_AI_ENGINE_VERSION in jsr-specifiers.ts drifted from the @netscript/ai ' +
+      'pin in packages/plugin-ai-core/deno.json. Update the constant to the version ' +
+      'the published stack references.',
+  );
+
+  // Local-source coverage: every emitted @netscript/* package must be copied
+  // into local scaffolds as a workspace member, because the local path gets NO
+  // kind-source import-map entries (see the local-marker test below) and
+  // resolves these specifiers purely through workspace membership + exports.
+  const memberSet = new Set<string>(SCAFFOLD_WORKSPACE_PACKAGES);
+  for (const specifier of [...emitted].sort()) {
+    const { pkg } = splitNetscriptSpecifier(specifier);
+    assert(
+      memberSet.has(pkg),
+      `AI scaffold emits "${specifier}" but "${pkg}" is not in ` +
+        `SCAFFOLD_WORKSPACE_PACKAGES, so local-source projects cannot resolve it.`,
+    );
+  }
+});
+
+Deno.test('PluginWorkspaceMutator writes no ai kind-source jsr pins into local-source projects', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile(
+    '/project/deno.json',
+    JSON.stringify({ workspace: ['./packages/*', './plugins/*'], imports: {} }, null, 2) + '\n',
+  );
+  // LOCAL_SOURCE_MARKER: presence of the copied CLI package manifest marks a
+  // local-source (maintainer) scaffold whose packages resolve as members.
+  await fs.writeFile(
+    join('/project', 'packages', 'cli', 'deno.json'),
+    JSON.stringify({ name: '@netscript/cli' }, null, 2) + '\n',
+  );
+
+  await new PluginWorkspaceMutator(fs).ensureRootImportsForPluginKind('/project', 'ai');
+
+  const config = JSON.parse(await fs.readFile('/project/deno.json')) as {
+    imports: Record<string, string>;
+  };
+
+  // Exact jsr pins for the ai kind sources must NOT be written into
+  // local-source projects: they would shadow the copied workspace members on
+  // any version mismatch and wedge release-cut CI on not-yet-published
+  // versions. Resolution is provided by the copied members instead.
+  for (const specifier of ['@netscript/ai', '@netscript/plugin-ai-core', '@netscript/fresh']) {
+    assertEquals(
+      config.imports[specifier],
+      undefined,
+      `Local-source project must not receive a jsr pin for "${specifier}".`,
+    );
+  }
+  const aiSubpathKeys = Object.keys(config.imports).filter((key) =>
+    key.startsWith('@netscript/ai/') || key.startsWith('@netscript/fresh/ai')
+  );
+  assertEquals(aiSubpathKeys, [], 'Local-source project must not receive ai subpath pins.');
 });
 
 Deno.test('PluginWorkspaceMutator rewrite map covers every @netscript/telemetry export subpath', async () => {

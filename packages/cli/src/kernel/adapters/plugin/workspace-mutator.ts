@@ -4,7 +4,7 @@ import { addWorkspaceMember } from '../scaffold/workspace-writer.ts';
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
 import { SCAFFOLD_PACKAGES } from '../../constants/scaffold/scaffold-packages.ts';
-import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
+import { NETSCRIPT_AI_ENGINE_VERSION, netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
 import { ScaffoldValidationError } from '../../domain/errors.ts';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import type {
@@ -106,27 +106,29 @@ const PLUGIN_SERVICE_BOOTSTRAP_IMPORTS: readonly string[] = [
  * imports first-party `@netscript/*` packages that are NOT covered by the shared
  * {@link PLUGIN_SERVICE_SOURCE_IMPORTS} superset.
  *
- * Unlike the local-source workspace-member path (where every `@netscript/*`
- * package resolves through workspace membership and its own `exports` map), the
- * published/JSR consumer path resolves bare specifiers *only* through the root
- * `deno.json` import map. Each bare specifier — including every subpath — the
- * scaffold emits therefore needs an explicit entry here or the generated route
- * fails with "not a dependency and not in import map".
+ * These entries are applied ONLY to published/JSR consumer projects (no
+ * {@link LOCAL_SOURCE_MARKER}). Local-source scaffolds copy the packages as
+ * workspace members (see `SCAFFOLD_WORKSPACE_PACKAGES`), and Deno resolves a
+ * member's bare name and export subpaths from any workspace file — writing
+ * exact jsr pins into a local-source project would risk shadowing local source
+ * with published packages and would wedge release-cut CI on not-yet-published
+ * versions.
  *
- * The `ai` kind emits an app-owned, in-process chat/tool/agent surface wired
- * onto `@netscript/ai`, `@netscript/plugin-ai-core`, and the durable-chat
- * runtime in `@netscript/fresh/ai`. Keep this list in lockstep with the bare
- * `@netscript/*` specifiers emitted by `plugins/ai/src/adapter/resources/**`
- * (guarded by the AI scaffold import-map completeness test).
+ * Only bare package aliases are listed: Deno auto-expands export subpaths
+ * (`@netscript/ai/agent`, `@netscript/fresh/ai`, ...) through a root
+ * `jsr:` package alias, exactly like `deno add` semantics — verified
+ * empirically against exact-version pins. Keep this list covering every
+ * `@netscript/*` package whose specifiers are emitted by
+ * `plugins/ai/src/adapter/resources/**` (guarded by the AI scaffold
+ * import-map completeness test).
  */
 const PLUGIN_KIND_SOURCE_IMPORTS: Readonly<Record<string, Readonly<Record<string, string>>>> = {
   ai: {
-    '@netscript/ai': netscriptJsrSpecifier('ai'),
-    '@netscript/ai/agent': netscriptJsrSpecifier('ai', '/agent'),
-    '@netscript/ai/anthropic': netscriptJsrSpecifier('ai', '/anthropic'),
-    '@netscript/ai/tools': netscriptJsrSpecifier('ai', '/tools'),
+    // @netscript/ai is version-decoupled from the release train — see
+    // NETSCRIPT_AI_ENGINE_VERSION in jsr-specifiers.ts.
+    '@netscript/ai': `jsr:@netscript/ai@${NETSCRIPT_AI_ENGINE_VERSION}`,
     '@netscript/plugin-ai-core': netscriptJsrSpecifier('plugin-ai-core'),
-    '@netscript/fresh/ai': netscriptJsrSpecifier('fresh', '/ai'),
+    '@netscript/fresh': netscriptJsrSpecifier('fresh'),
   },
 };
 
@@ -373,7 +375,12 @@ export class PluginWorkspaceMutator {
       );
     }
 
-    const kindSourceImports = PLUGIN_KIND_SOURCE_IMPORTS[pluginKind] ?? {};
+    // Kind-source jsr pins are prod/JSR-only: local-source projects resolve
+    // these packages as copied workspace members (name + export subpaths).
+    const isLocalSourceProject = await this.fs.exists(join(projectRoot, LOCAL_SOURCE_MARKER));
+    const kindSourceImports = isLocalSourceProject
+      ? {}
+      : PLUGIN_KIND_SOURCE_IMPORTS[pluginKind] ?? {};
     const requiredSpecifiers = [
       ...PLUGIN_SERVICE_BOOTSTRAP_IMPORTS,
       ...(PLUGIN_KIND_ROOT_IMPORTS[pluginKind] ?? []),
