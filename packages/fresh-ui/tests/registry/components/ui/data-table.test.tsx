@@ -20,8 +20,8 @@ Deno.test('DataTable.Row applies cols as grid-template-columns', () => {
   assert(style && typeof style === 'object', 'cols must produce a style object');
   assertEquals(style.gridTemplateColumns, '2fr 1fr 1fr');
   assert(
-    String(vnodeProps(row).class).split(' ').includes('grid'),
-    'row keeps its grid display class',
+    String(vnodeProps(row).class).split(' ').includes('ns-data-table__row'),
+    'row carries its semantic block class',
   );
 });
 
