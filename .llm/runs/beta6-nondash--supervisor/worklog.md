@@ -90,3 +90,23 @@ before PLAN-EVAL PASS.**
   issue labels + status:impl). Next: adversarial Codex post-reset → one IMPL-EVAL → merge on green.
 - Note for #258 (wave 2): rebase its manifest edit on PR #550 — append after the `mcp-ui-widget`
   entries, do not conflict with the `ai` collection list.
+
+## 2026-07-06 — AI-494 slice landed (wave-1 #3)
+
+- Opus sub-agent returned `feat/494-ai-perturn-options` (4 commits 18dd9732/f6c94965/9e0042c2/
+  82874ee8 on base a1669f60; 16 files, +520). Survived one transient API drop (resumed in place).
+- A1 review (Tier-A, substantive): PASS. Verified the three load-bearing points directly:
+  (1) zod lockstep is REAL and symmetric — ai-core `ReasoningChunk {type:'reasoning',delta}` +
+  plugin-ai-core `reasoningChunkZodSchema` with matching shape, both unions gain the member in the
+  same position (after text); runtime lockstep test asserts `chatChunkZodSchema` validates the
+  reasoning frame. (2) NO new casts — diff cast-scan empty; `AnyTextAdapter` erasure keeps the 2
+  accepted casts untouched. (3) Anthropic mapper uses `output_config:{effort}` + `thinking:
+  {type:'disabled'}` for off, deliberately NOT deprecated `budget_tokens`. Owned GenerationOptions
+  is provider-neutral, all-optional/additive, with a `providerOptions` escape hatch (layered merge:
+  static < per-turn < raw). eis-chat per-message effort probe passes.
+- Flagged for adversarial/IMPL-EVAL (not an A1 block): the Anthropic `output_config.effort` wire
+  shape is an external-API assertion — reversible via providerOptions, but confirm vs live docs.
+- Gates: scoped check/lint/fmt 0 findings both roots; `deno test` ai 84 / plugin-ai-core 2;
+  doc-lint 7 entrypoints 0 attributable; publish dry-run both pkgs Success; no lock churn;
+  runtime/mod.ts + packages/fresh untouched (later telemetry slice owns runtime).
+- Pushed via WSL + draft **PR #558** (`Closes #494`, milestone 0.0.1-beta.6, labels + status:impl).
