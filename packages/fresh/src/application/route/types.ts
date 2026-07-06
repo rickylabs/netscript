@@ -17,7 +17,7 @@ export type EmptyRecord = Record<string, never>;
  * `never`).
  */
 // deno-lint-ignore ban-types
-type EmptySegment = {};
+export type EmptySegment = {};
 
 /** Primitive search-param value accepted by route helpers. */
 export type SearchParamValue = string | string[] | undefined;

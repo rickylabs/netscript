@@ -534,6 +534,38 @@ export interface DenoDeployTarget extends DeployTargetBase {
   envFile?: string;
 }
 
+/**
+ * Aspire AppHost cloud deployment target (`deploy.targets.kubernetes`,
+ * `deploy.targets['azure-aca']`, `deploy.targets['azure-app-service']`, and
+ * `deploy.targets['azure-aks']`).
+ *
+ * These targets delegate publish/deploy to the generated TypeScript AppHost and
+ * Aspire CLI. Target-specific cluster/cloud auth, RBAC, and provider resources
+ * remain operator-owned unless the AppHost's Aspire integration provisions them.
+ */
+export interface AspireAppHostDeployTarget extends DeployTargetBase {
+  /** Directory for emitted publish/deploy artifacts. */
+  outputPath?: string;
+  /** AppHost path used when Aspire default discovery is insufficient. */
+  appHost?: string;
+}
+
+/**
+ * Google Cloud Run Docker-image provider target (`deploy.targets['cloud-run']`).
+ *
+ * The CLI builds and pushes the configured image, then applies that image with
+ * `gcloud run deploy`.
+ */
+export interface CloudRunDeployTarget extends DeployTargetBase {
+  /** Container registry for the pushed image (for example `us-docker.pkg.dev/acme`). */
+  registry?: string;
+  /** Image name and optional tag (for example `orders-api:latest`). */
+  imageName?: string;
+}
+
+/** Back-compat alias for the AppHost-backed S10 cloud targets. */
+export type AspireCloudDeployTarget = AspireAppHostDeployTarget;
+
 /** Top-level deployment configuration type. */
 export interface DeployConfig {
   /** Deployment targets keyed by name. */
@@ -548,6 +580,16 @@ export interface DeployConfig {
     linux?: LinuxDeployTarget;
     /** Deno Deploy cloud deployment settings. */
     'deno-deploy'?: DenoDeployTarget;
+    /** Kubernetes deployment settings. */
+    kubernetes?: AspireAppHostDeployTarget;
+    /** Azure Container Apps deployment settings. */
+    'azure-aca'?: AspireAppHostDeployTarget;
+    /** Azure App Service deployment settings. */
+    'azure-app-service'?: AspireAppHostDeployTarget;
+    /** Azure Kubernetes Service deployment settings. */
+    'azure-aks'?: AspireAppHostDeployTarget;
+    /** Google Cloud Run deployment settings. */
+    'cloud-run'?: CloudRunDeployTarget;
   };
 }
 

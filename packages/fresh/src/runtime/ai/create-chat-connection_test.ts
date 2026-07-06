@@ -67,6 +67,154 @@ Deno.test('resolveChatSnapshot wires session URL + auth and reduces via projectC
   assertEquals(toolPart?.toolState, 'complete');
 });
 
+Deno.test('streamPath override supports per-session durable paths', async () => {
+  const target = { sessionId: 'session/a b', baseUrl: 'https://streams.example.test' } as const;
+  let connectionReadUrl: string | undefined;
+  let responseWriteUrl: string | undefined;
+  let snapshotReadUrl: string | undefined;
+
+  const streamPath = ({ sessionId }: { readonly sessionId: string }) =>
+    `/eischat/sessions/${encodeURIComponent(sessionId)}/messages`;
+
+  const connection = createNetScriptChatConnection({
+    target,
+    streamPath,
+    createConnection(input) {
+      connectionReadUrl = input.readUrl;
+      return {
+        subscribe: () => (async function* () {})(),
+        send: () => Promise.resolve(),
+      };
+    },
+  });
+  connection.dispose();
+
+  await toNetScriptChatResponse({
+    target,
+    streamPath,
+    source: (async function* () {})(),
+    toResponse(input) {
+      responseWriteUrl = input.writeUrl;
+      return Promise.resolve(new Response(null, { status: 204 }));
+    },
+  });
+
+  await resolveChatSnapshot({
+    target,
+    streamPath,
+    materialize(input) {
+      snapshotReadUrl = input.readUrl;
+      return Promise.resolve({ messages: [] });
+    },
+  });
+
+  const expected =
+    'https://streams.example.test/v1/stream/netscript/eischat/sessions/session%2Fa%20b/messages';
+  assertEquals(connectionReadUrl, expected);
+  assertEquals(responseWriteUrl, expected);
+  assertEquals(snapshotReadUrl, expected);
+});
+
+Deno.test('resolveChatSnapshot requests identity encoding for gzip-mislabeled seed reads', async () => {
+  const controller = new AbortController();
+  let acceptEncoding: string | null = null;
+  const server = Deno.serve(
+    { port: 0, signal: controller.signal, onListen() {} },
+    (request) => {
+      acceptEncoding = request.headers.get('accept-encoding');
+      return new Response(
+        '[{"id":"seed-1","role":"assistant","parts":[{"type":"text","text":"seed ok"}]}]',
+        {
+          headers: {
+            'content-type': 'application/json',
+            'content-encoding': 'gzip',
+          },
+        },
+      );
+    },
+  );
+
+  try {
+    const { port } = server.addr as Deno.NetAddr;
+    const snapshot = await resolveChatSnapshot({
+      target: {
+        sessionId: 'eis-ssr',
+        baseUrl: `http://127.0.0.1:${port}`,
+        headers: { 'Accept-Encoding': 'gzip, br' },
+      },
+      streamPath: ({ sessionId }) => `/eischat/sessions/${sessionId}/messages`,
+      materialize: async (input) => {
+        const response = await fetch(new Request(input.readUrl, { headers: input.headers }));
+        return {
+          messages: await response.json() as readonly unknown[],
+          offset: 'seed-offset',
+        };
+      },
+    });
+
+    assertEquals(acceptEncoding, 'identity');
+    assertEquals(snapshot.messages[0].content, 'seed ok');
+    assertEquals(snapshot.offset, 'seed-offset');
+  } finally {
+    controller.abort();
+    await server.finished.catch(() => undefined);
+  }
+});
+
+Deno.test('createNetScriptChatConnection requests identity encoding for live gzip-mislabeled reads', async () => {
+  const controller = new AbortController();
+  let acceptEncoding: string | null = null;
+  const server = Deno.serve(
+    { port: 0, signal: controller.signal, onListen() {} },
+    (request) => {
+      acceptEncoding = request.headers.get('accept-encoding');
+      return new Response('[{"type":"text","delta":"live ok"}]', {
+        headers: {
+          'content-type': 'application/json',
+          'content-encoding': 'gzip',
+        },
+      });
+    },
+  );
+
+  try {
+    const { port } = server.addr as Deno.NetAddr;
+    const connection = createNetScriptChatConnection({
+      target: {
+        sessionId: 'eis-live',
+        baseUrl: `http://127.0.0.1:${port}`,
+        headers: { 'accept-encoding': 'gzip, br' },
+      },
+      initialOffset: 'seed-offset',
+      streamPath: ({ sessionId }) => `/eischat/sessions/${sessionId}/messages`,
+      createConnection(input) {
+        assertEquals(input.initialOffset, 'seed-offset');
+        return {
+          subscribe() {
+            return (async function* () {
+              const response = await fetch(new Request(input.readUrl, { headers: input.headers }));
+              const chunks = await response.json() as readonly unknown[];
+              for (const chunk of chunks) yield chunk;
+            })();
+          },
+          send() {
+            return Promise.resolve();
+          },
+        };
+      },
+    });
+
+    const chunks = await collect(connection.subscribe());
+    connection.dispose();
+
+    assertEquals(acceptEncoding, 'identity');
+    assertEquals(chunks, [{ type: 'text', delta: 'live ok' }]);
+  } finally {
+    controller.abort();
+    await server.finished.catch(() => undefined);
+  }
+});
+
 Deno.test('projectChatSnapshot is the shared reducer (deterministic seed == live)', () => {
   const messages = [
     { id: 'm1', role: 'assistant', parts: [{ type: 'text', text: 'a' }] },

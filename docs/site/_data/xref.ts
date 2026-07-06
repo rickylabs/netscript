@@ -32,8 +32,9 @@ export interface XrefTarget {
   label: string;
 }
 
-/** The 28 generated reference units (mirrors `referenceUnits` in `_data.ts`). */
+/** The 31 generated reference units (mirrors `referenceUnits` in `_data.ts`). */
 const REFERENCE_UNITS = [
+  "ai",
   "auth",
   "auth-better-auth",
   "auth-kv-oauth",
@@ -49,6 +50,8 @@ const REFERENCE_UNITS = [
   "kv",
   "logger",
   "plugin",
+  "plugin-ai",
+  "plugin-ai-core",
   "plugin-auth",
   "plugin-auth-core",
   "prisma-adapter-mysql",

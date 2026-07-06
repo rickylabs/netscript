@@ -3,6 +3,11 @@
 Quick evaluator reference. Doctrine source:
 `docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md#anti-pattern-catalog`.
 
+Reference trust note: this catalog follows the current doctrine range `AP-1` through `AP-25`.
+Historical checker refs such as `F-DOCT-*`, `A8/AP-9` for file size, or `AP-19` for default exports
+must be translated through
+`docs/architecture/doctrine/ref-migration-map.md` before an evaluator treats them as trusted refs.
+
 | AP    | Summary                                              | Typical evidence                                                            |
 | ----- | ---------------------------------------------------- | --------------------------------------------------------------------------- |
 | AP-1  | Monolithic file                                      | `.ts` or `_test.ts` file beyond doctrine threshold without accepted debt    |

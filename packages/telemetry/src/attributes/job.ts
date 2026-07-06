@@ -1,5 +1,5 @@
 /**
- * Semantic job attribute names used by scheduler and worker instrumentation.
+ * Deprecated job attribute aliases used by existing scheduler and worker instrumentation.
  */
 export const JobAttributes = {
   JOB_ID: 'job.id',
@@ -16,6 +16,30 @@ export const JobAttributes = {
   JOB_TAGS: 'job.tags',
   JOB_TIMEZONE: 'job.timezone',
 } as const;
+
+/**
+ * Canonical NetScript job attribute names.
+ */
+export const NetScriptJobAttributes = {
+  JOB_ID: 'netscript.job.id',
+  JOB_NAME: 'netscript.job.name',
+  JOB_ENTRYPOINT: 'netscript.job.entrypoint',
+  JOB_TRIGGER: 'netscript.job.trigger',
+  JOB_ATTEMPT: 'netscript.job.attempt',
+  JOB_MAX_RETRIES: 'netscript.job.max_retries',
+  JOB_TIMEOUT_MS: 'netscript.job.timeout_ms',
+  JOB_STATUS: 'netscript.job.status',
+  JOB_EXIT_CODE: 'netscript.job.exit_code',
+  JOB_DURATION_MS: 'netscript.job.duration_ms',
+  JOB_PRIORITY: 'netscript.job.priority',
+  JOB_TAGS: 'netscript.job.tags',
+  JOB_TIMEZONE: 'netscript.job.timezone',
+} as const;
+
+/**
+ * Deprecated job aliases emitted during the beta.5 duplicate-key window.
+ */
+export const DeprecatedJobAttributeAliases: typeof JobAttributes = JobAttributes;
 
 /**
  * Standard job trigger names.

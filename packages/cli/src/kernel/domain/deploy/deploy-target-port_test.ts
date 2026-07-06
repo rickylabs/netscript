@@ -7,9 +7,14 @@ import { WindowsServiceDeployTarget } from './windows-service-deploy-target.ts';
 import { LinuxServiceDeployTarget } from './linux-service-deploy-target.ts';
 
 const DEFAULT_TARGET_KEYS = [
+  'azure-aca',
+  'azure-aks',
+  'azure-app-service',
+  'cloud-run',
   'compose',
   'deno-deploy',
   'docker',
+  'kubernetes',
   'linux-service',
   'windows-service',
 ] as const satisfies readonly KnownDeployTargetKey[];
@@ -164,6 +169,11 @@ Deno.test('the default deploy target registry resolves every first-party target'
   assertEquals(registry.get('deno-deploy')?.label, 'Deno Deploy');
   assertEquals(registry.get('compose')?.label, 'Docker Compose');
   assertEquals(registry.get('docker')?.label, 'Docker image');
+  assertEquals(registry.get('kubernetes')?.label, 'Kubernetes');
+  assertEquals(registry.get('azure-aca')?.label, 'Azure Container Apps');
+  assertEquals(registry.get('azure-app-service')?.label, 'Azure App Service');
+  assertEquals(registry.get('azure-aks')?.label, 'Azure Kubernetes Service');
+  assertEquals(registry.get('cloud-run')?.label, 'Google Cloud Run');
 });
 
 Deno.test('the default deploy target registry exposes only operations with implemented handlers', () => {
@@ -189,4 +199,18 @@ Deno.test('compose and docker targets resolve the Aspire adapter operation subse
   assertEquals(docker?.operations, ['plan', 'emit', 'up', 'down', 'status', 'logs']);
   assertEquals(typeof compose?.plan, 'function');
   assertEquals(typeof docker?.up, 'function');
+});
+
+Deno.test('kubernetes, azure, and cloud-run targets resolve the Aspire cloud operation subset', () => {
+  const registry = new DeployTargetRegistry();
+
+  for (const key of ['kubernetes', 'azure-aca', 'azure-app-service', 'azure-aks', 'cloud-run']) {
+    const target = registry.get(key);
+
+    assertEquals(target?.operations, ['plan', 'emit', 'up', 'down']);
+    assertEquals(typeof target?.plan, 'function');
+    assertEquals(typeof target?.emit, 'function');
+    assertEquals(typeof target?.up, 'function');
+    assertEquals(typeof target?.down, 'function');
+  }
 });

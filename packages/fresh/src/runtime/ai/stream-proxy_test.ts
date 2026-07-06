@@ -41,6 +41,7 @@ Deno.test(
     });
 
     let upstreamAuth: string | null = null;
+    let upstreamAcceptEncoding: string | null = null;
     let upstreamUrl: string | undefined;
     const handler = createNetScriptChatStreamProxy({
       target: { sessionId: 's1', baseUrl: 'http://upstream.test' },
@@ -49,6 +50,7 @@ Deno.test(
         const req = input as Request;
         upstreamUrl = req.url;
         upstreamAuth = req.headers.get('authorization');
+        upstreamAcceptEncoding = req.headers.get('accept-encoding');
         return Promise.resolve(upstreamResponse);
       },
     });
@@ -77,7 +79,70 @@ Deno.test(
 
     // Auth was attached to the server→streams hop, never to the client response.
     assertEquals(upstreamAuth, 'Bearer server-secret');
+    assertEquals(upstreamAcceptEncoding, 'identity');
     assertEquals(response.headers.get('authorization'), null);
+  },
+);
+
+Deno.test(
+  'supports eis-chat per-session stream paths and survives identity-negotiated gzip mislabel (#219)',
+  async () => {
+    const controller = new AbortController();
+    const server = Deno.serve(
+      { port: 0, signal: controller.signal, onListen() {} },
+      (request) => {
+        // Mirror durable-streams' bad flavor: plain JSON bytes with a gzip
+        // label. With `identity`, Deno fetch leaves the bytes readable so FA2
+        // can strip the bad header before returning the response to the app.
+        if (request.headers.get('accept-encoding') !== 'identity') {
+          return new Response('[{"unreachable":true}]', {
+            headers: {
+              'content-type': 'application/json',
+              'content-encoding': 'gzip',
+            },
+          });
+        }
+        return new Response('[{"ok":true}]', {
+          headers: {
+            'content-type': 'application/json',
+            'content-encoding': 'gzip',
+          },
+        });
+      },
+    );
+
+    try {
+      const { port } = server.addr as Deno.NetAddr;
+      let upstreamUrl: string | undefined;
+      const handler = createNetScriptChatStreamProxy({
+        target: (request) => {
+          const sessionId = new URL(request.url).searchParams.get('session') ?? 'missing';
+          return { sessionId, baseUrl: `http://127.0.0.1:${port}` };
+        },
+        streamPath: ({ target }) => `/eischat/sessions/${target.sessionId}/messages`,
+        auth: () => ({}),
+        fetch: async (input) => {
+          const request = input as Request;
+          upstreamUrl = request.url;
+          return await fetch(request);
+        },
+      });
+
+      const response = await handler(
+        new Request('http://app.test/api/streams/chat?session=eis-123', { method: 'GET' }),
+      );
+
+      assertEquals(
+        upstreamUrl,
+        `http://127.0.0.1:${port}/v1/stream/netscript/eischat/sessions/eis-123/messages`,
+      );
+      assertEquals(response.headers.get('content-encoding'), null);
+      assertEquals(response.headers.get('content-type'), 'application/json');
+      assertEquals(await response.text(), '[{"ok":true}]');
+    } finally {
+      controller.abort();
+      await server.finished.catch(() => undefined);
+    }
   },
 );
 

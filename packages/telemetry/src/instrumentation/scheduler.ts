@@ -29,6 +29,8 @@ import { injectContext, type PropagationHeaders } from '../context/mod.ts';
 import {
   createJobAttributes,
   JobAttributes,
+  MessagingAttributes,
+  MessagingOperations,
   SchedulerAttributes,
   SpanNames,
 } from '../attributes/mod.ts';
@@ -162,14 +164,14 @@ export function startSchedulerTickSpan(context: SchedulerTickContext): Span {
     kind: SpanKind.INTERNAL,
     attributes: {
       [SchedulerAttributes.SCHEDULER_JOB_COUNT]: context.totalJobs,
-      'scheduler.due_jobs': context.dueJobs.length,
-      'scheduler.due_job_ids': context.dueJobs.join(','),
-      'scheduler.tick_time': context.tickTime.toISOString(),
+      [SchedulerAttributes.SCHEDULER_DUE_JOBS]: context.dueJobs.length,
+      [SchedulerAttributes.SCHEDULER_DUE_JOB_IDS]: context.dueJobs.join(','),
+      [SchedulerAttributes.SCHEDULER_TICK_TIME]: context.tickTime.toISOString(),
     },
   });
 
   if (context.schedulerId) {
-    span.setAttribute('scheduler.id', context.schedulerId);
+    span.setAttribute(SchedulerAttributes.SCHEDULER_ID, context.schedulerId);
   }
 
   addSpanEvent(span, 'scheduler.tick', {
@@ -198,12 +200,12 @@ export async function traceSchedulerTick<T>(
     async (span) => {
       span.setAttributes({
         [SchedulerAttributes.SCHEDULER_JOB_COUNT]: context.totalJobs,
-        'scheduler.due_jobs': context.dueJobs.length,
-        'scheduler.tick_time': context.tickTime.toISOString(),
+        [SchedulerAttributes.SCHEDULER_DUE_JOBS]: context.dueJobs.length,
+        [SchedulerAttributes.SCHEDULER_TICK_TIME]: context.tickTime.toISOString(),
       });
 
       if (context.schedulerId) {
-        span.setAttribute('scheduler.id', context.schedulerId);
+        span.setAttribute(SchedulerAttributes.SCHEDULER_ID, context.schedulerId);
       }
 
       addSpanEvent(span, 'tick.started', {
@@ -258,8 +260,9 @@ export function startJobDispatchSpan(
   const attributes: Attributes = {
     ...createJobAttributes(context.job),
     [JobAttributes.JOB_TRIGGER]: context.triggeredBy,
-    'messaging.destination.name': context.queueName,
-    'messaging.operation': 'publish',
+    [MessagingAttributes.DESTINATION_NAME]: context.queueName,
+    [MessagingAttributes.OPERATION_NAME]: MessagingOperations.PUBLISH,
+    [MessagingAttributes.OPERATION_TYPE]: MessagingOperations.SEND,
   };
 
   if (context.job.schedule) {
@@ -272,7 +275,7 @@ export function startJobDispatchSpan(
     attributes[SchedulerAttributes.SCHEDULER_ENABLED] = context.job.enabled;
   }
   if (context.delay) {
-    attributes['messaging.message.delay_ms'] = context.delay;
+    attributes[MessagingAttributes.DELAY_MS] = context.delay;
   }
   if (context.priority) {
     attributes[JobAttributes.JOB_PRIORITY] = context.priority;
@@ -393,7 +396,7 @@ export function createSchedulerStartSpan(
   const span = createSpan(tracer, 'scheduler.start', {
     kind: SpanKind.INTERNAL,
     attributes: {
-      'scheduler.id': schedulerId,
+      [SchedulerAttributes.SCHEDULER_ID]: schedulerId,
       [SchedulerAttributes.SCHEDULER_JOB_COUNT]: jobCount,
     },
     parentContext: ROOT_CONTEXT,
@@ -421,7 +424,7 @@ export function createSchedulerStopSpan(schedulerId: string): Span {
   const span = createSpan(tracer, 'scheduler.stop', {
     kind: SpanKind.INTERNAL,
     attributes: {
-      'scheduler.id': schedulerId,
+      [SchedulerAttributes.SCHEDULER_ID]: schedulerId,
     },
     parentContext: ROOT_CONTEXT,
   });
@@ -529,7 +532,7 @@ export function recordSchedulerReload(
   newCount: number,
 ): void {
   addSpanEvent(span, 'scheduler.reloaded', {
-    'scheduler.previous_job_count': previousCount,
-    'scheduler.new_job_count': newCount,
+    [SchedulerAttributes.SCHEDULER_PREVIOUS_JOB_COUNT]: previousCount,
+    [SchedulerAttributes.SCHEDULER_NEW_JOB_COUNT]: newCount,
   });
 }

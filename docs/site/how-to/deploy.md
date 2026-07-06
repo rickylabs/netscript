@@ -15,9 +15,12 @@ expectations about what the scaffold wires for you and what you still own.
 This is a task recipe, not a one-click button. NetScript is in alpha, and the scaffold is
 deliberately minimal about deployment: it gives you a single declarative description of every
 process (`appsettings.json`), runnable Deno entrypoints with explicit permissions, the Aspire
-AppHost that orchestrates them locally, and starter GitHub Actions workflows for the shipped
-deployment targets. It does **not** generate a `Dockerfile`, a `docker-compose.yml`, or a finished
-cloud infrastructure stack for you — those are yours to assemble from the verified facts below.
+AppHost that orchestrates them locally and can publish deployment artifacts for targets you
+configure in it, and starter GitHub Actions workflows for the shipped deployment targets. The CLI
+has thin deploy routers for Deno Deploy, Docker/Compose, Kubernetes, Azure, and Cloud Run, but it
+does **not** generate a `Dockerfile`, a `docker-compose.yml`, or a finished cloud infrastructure
+stack for you — target-specific infrastructure still lives in Aspire and your cloud account,
+assembled from the verified facts below.
 
 {{ comp callout { type: "important", title: "What is wired vs. what is manual" } }}
 <strong>Wired:</strong> a declarative resource graph in <code>appsettings.json</code> (ports,
@@ -26,6 +29,12 @@ the Aspire AppHost (<code>aspire/apphost.mts</code>) for local orchestration.
 <strong>Generated CI starters:</strong> <code>.github/workflows/deploy-compose-ghcr.yml</code>,
 <code>.github/workflows/deploy-deno-deploy.yml</code>, and
 <code>.github/workflows/deploy-bare-metal.yml</code>.
+<strong>Delegated:</strong> Docker/Compose, Kubernetes, and Azure target commands call
+<code>aspire publish</code>, <code>aspire deploy</code>, and <code>aspire destroy</code> against the
+generated AppHost code. Aspire emits the manifests and provisions supported resources; your
+cloud account, cluster credentials, registry access, and RBAC remain yours. Cloud Run follows the
+Docker-image provider lane: Docker builds and pushes the image, then <code>gcloud run deploy</code>
+applies it.
 <strong>Manual:</strong> there is <em>no</em> generated container image, compose file, or finished
 cloud infrastructure stack. <code>netscript.config.ts</code> ships an empty <code>deploy: {}</code>
 block unless you configure a target. You assemble the production target yourself from the primitives
@@ -44,6 +53,17 @@ secrets, GitHub environment protection, host credentials, and target-specific co
 you treat them as production release jobs. See
 <a href="/how-to/deploy-deno-deploy/">Deploy to Deno Deploy</a> for the managed-platform command
 reference.
+{{ /comp }}
+
+{{ comp callout { type: "tip", title: "Managed deployment commands" } }}
+There is now a first-class, runnable managed-platform path:
+<strong><code>netscript deploy deno-deploy &lt;op&gt;</code></strong> (<code>plan</code>/<code>up</code>/
+<code>status</code>/<code>logs</code>/<code>down</code>) pushes a workspace to
+<a href="https://deno.com/deploy">Deno Deploy</a> over the native <code>deno deploy</code> CLI, with a
+preflight guard and <code>deploy.targets['deno-deploy']</code> config. Aspire-backed targets are
+also routed: <code>netscript deploy docker|compose|kubernetes|azure-aca|azure-app-service|azure-aks|cloud-run &lt;op&gt;</code>
+delegates to the target adapter. See
+<a href="/how-to/deploy-deno-deploy/">Deploy to Deno Deploy</a> for Deno Deploy details.
 {{ /comp }}
 
 ## Before you start
@@ -213,7 +233,7 @@ This is the real fork in the road. Pick based on whether your target understands
   {
     label: "Keep Aspire",
     lang: "bash",
-    code: "# The AppHost is a TypeScript/Node project under aspire/ (apphost.mts).\n# Locally it provisions Postgres + Redis and wires every process.\ncd aspire\naspire restore   # one-time: restore the TS AppHost SDK\naspire start       # boots the full graph; dashboard at https://localhost:18888\n\n# Aspire 13.x can also publish a deployment manifest from the same AppHost\n# (e.g. `aspire publish`). The scaffold wires the AppHost graph; it does NOT\n# pre-select a cloud target for you — you point publish at your platform."
+    code: "# The AppHost is a TypeScript/Node project under aspire/ (apphost.mts).\n# Locally it provisions Postgres + Redis and wires every process.\ncd aspire\naspire restore   # one-time: restore the TS AppHost SDK\naspire start       # boots the full graph; dashboard at https://localhost:18888\n\n# Aspire 13.x can publish/deploy target artifacts from the same AppHost.\nnetscript deploy kubernetes plan --project-root .\nnetscript deploy kubernetes up --project-root ."
   },
   {
     label: "Drop Aspire (--no-aspire)",
@@ -231,6 +251,65 @@ this same path under <code>aspire.appHost</code> (<code>'aspire/apphost.mts'</co
 config metadata and the artifact you actually run agree. The
 dashboard binds <code>:18888</code> and the OTLP collector listens on <code>:4318</code>.
 {{ /comp }}
+
+### Aspire cloud targets
+
+The Aspire-backed target routers all share the same shape:
+
+```bash
+# Generate artifacts without applying them.
+netscript deploy kubernetes plan --project-root . --output-dir .deploy/kubernetes
+
+# Apply/provision through the validated AppHost platform integration.
+netscript deploy azure-aks up --project-root . --output-dir .deploy/azure-aks
+
+# Tear down the previously deployed target.
+netscript deploy azure-aks down --project-root . --output-dir .deploy/azure-aks
+```
+
+For Kubernetes, add the Aspire Kubernetes integration to the TypeScript AppHost
+(`aspire add kubernetes`, then `builder.addKubernetesEnvironment('k8s')`). Use
+`publishAsKubernetesService(...)` in `aspire/apphost.mts` for per-service manifest
+customization such as replicas, labels, annotations, or extra manifests. `plan`
+runs `aspire publish --apphost <path> --output-path .deploy/kubernetes`; Aspire
+emits a Helm chart with `Chart.yaml`, `values.yaml`, and `templates/`.
+
+Apply the published chart with your normal cluster workflow:
+
+```bash
+kubectl config current-context
+helm upgrade --install my-netscript-app .deploy/kubernetes
+
+# Or inspect/apply rendered manifests if your release process requires kubectl.
+helm template my-netscript-app .deploy/kubernetes > .deploy/kubernetes/rendered.yaml
+kubectl apply -f .deploy/kubernetes/rendered.yaml
+```
+
+For Azure, configure the matching AppHost hosting integration before using the
+router. The CLI validates the AppHost source contains an Azure Container Apps,
+Azure App Service, or Azure Kubernetes marker before it shells
+`aspire publish|deploy --apphost <path>`. Azure CLI login, subscription/location
+parameters, provider feature registration, and RBAC are operator prerequisites.
+
+For Cloud Run, configure the Docker-image provider fields:
+
+```ts
+export default defineConfig({
+  // ...
+  deploy: {
+    targets: {
+      'cloud-run': {
+        registry: 'us-docker.pkg.dev/acme/prod',
+        imageName: 'orders-api:latest',
+      },
+    },
+  },
+});
+```
+
+`netscript deploy cloud-run up` runs `docker build -t
+<registry>/<imageName> .`, `docker push <registry>/<imageName>`, then `gcloud
+run deploy <service> --image <registry>/<imageName> --quiet`.
 
 ## Step 5 — Wire generated CI and promotion
 
@@ -291,8 +370,10 @@ deployment. To containerize, each process becomes one image whose `CMD` is the m
 
 {{ comp callout { type: "warning", title: "Limits of the alpha scaffold" } }}
 <ul>
-<li>No <code>Dockerfile</code>, <code>docker-compose.yml</code>, or Kubernetes manifest is generated. You write these from the <code>appsettings.json</code> facts above.</li>
+<li>The CLI scaffold does not hand-author a <code>Dockerfile</code>, <code>docker-compose.yml</code>, or Kubernetes manifest. Docker/Compose, Kubernetes, and Azure artifacts are generated by Aspire from the AppHost code you configure; you write anything Aspire does not emit from the <code>appsettings.json</code> facts above.</li>
+<li>Cloud Run uses the Docker-image provider lane (<code>docker build</code>, <code>docker push</code>, <code>gcloud run deploy</code>) and requires <code>registry</code> plus <code>imageName</code> in config.</li>
 <li><code>netscript.config.ts</code> ships an empty <code>deploy: {}</code> block unless you configure a target. Generated workflows are starter CI definitions; you still provide registry, host, cloud, and secret-manager configuration before they are production release jobs.</li>
+<li>Cluster/cloud auth, registry access, RBAC, subscriptions, regions, and provider quotas are operator prerequisites. The CLI shells to Aspire, Docker, or gcloud; it does not create credentials.</li>
 <li>The <code>streams</code> service runs a <strong>real producer runtime</strong> (durable-streams over <code>@netscript/plugin-streams-core</code>, served on :4437) — deploy it as a first-class service. What is <em>not</em> production-ready is the manifest-helper layer: <code>@netscript/plugin-streams</code>'s <code>defineStreamProducer</code>/<code>defineStreamConsumer</code> <strong>throw <code>StreamUnsupportedOperationError</code></strong> by design (use <code>@netscript/plugin-streams-core</code> directly), and there is no in-process consumer <code>subscribe()</code> — consumption is HTTP/SSE.</li>
 <li>The scaffold worker <code>createJobTools(ctx)</code> handler helpers (<code>trace.addEvent</code>, <code>withChildSpan</code>, <code>progress</code>) are still no-op stubs (tracked debt, fix planned). Job dispatch/execution traces still appear in Aspire automatically; for custom handler spans call <code>@netscript/telemetry</code> helpers directly.</li>
 <li>DB commands assume a reachable Postgres — in CI/containers without Aspire, inject <code>POSTGRES_URI</code> yourself or the command fails fast.</li>

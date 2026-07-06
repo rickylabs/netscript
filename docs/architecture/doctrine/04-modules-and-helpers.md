@@ -18,8 +18,8 @@ A helper exists only if it does at least one of:
    traversal — things where the correctness criterion is non-obvious and the implementation is
    tested.
 4. **Reduces a frequent, identical multi-line pattern.** _And_ the pattern is identical, not
-   "similar" (cf. the Wet Codebase doctrine — see phase-0 research
-   `phase-0-research/03-frameworks-and-progressive-tradeoffs.md`).
+   "similar" (cf. the Wet Codebase doctrine in
+   [`09-anti-patterns-and-fitness-functions.md`](./09-anti-patterns-and-fitness-functions.md)).
 
 A helper that merely renames a Web Platform or `@std/*` primitive is a regression and must be
 deleted.
@@ -224,7 +224,7 @@ with `@std/*`, and future upgrades come for free.
 
 ## Sources
 
-- Wet Codebase, Sandi Metz / Dan Abramov — see phase-0 research
-  `phase-0-research/03-frameworks-and-progressive-tradeoffs.md`.
-- `@std/*` enumeration — see phase-0 research `phase-0-research/08-deno-and-jsr-as-target.md`.
-- Cockburn's port/adapter — see phase-0 research `phase-0-research/04-enterprise-pattern-canon.md`.
+- Wet Codebase, Sandi Metz / Dan Abramov — see the anti-pattern treatment in
+  [`09-anti-patterns-and-fitness-functions.md`](./09-anti-patterns-and-fitness-functions.md).
+- `@std/*` enumeration — see the lookup table in this chapter.
+- Cockburn's port/adapter — see the port and adapter shape sections in this chapter.

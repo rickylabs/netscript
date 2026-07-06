@@ -77,5 +77,10 @@ export function createDeployCommand(
     // Cloud deploy targets (thin router → registry-resolved adapter, R-DEPLOY-2).
     // Added alongside the legacy flat Windows verbs; full convergence is S12/#348.
     .command('docker', createTargetDeployCommand('docker', dependencies))
-    .command('compose', createTargetDeployCommand('compose', dependencies));
+    .command('compose', createTargetDeployCommand('compose', dependencies))
+    .command('kubernetes', createTargetDeployCommand('kubernetes', dependencies))
+    .command('azure-aca', createTargetDeployCommand('azure-aca', dependencies))
+    .command('azure-app-service', createTargetDeployCommand('azure-app-service', dependencies))
+    .command('azure-aks', createTargetDeployCommand('azure-aks', dependencies))
+    .command('cloud-run', createTargetDeployCommand('cloud-run', dependencies));
 }

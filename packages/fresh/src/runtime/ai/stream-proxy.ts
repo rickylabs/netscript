@@ -37,8 +37,11 @@
  * @module
  */
 
-import { buildStreamUrl, getStreamsAuth, getStreamsUrl } from '@netscript/plugin-streams-core';
-import type { NetScriptChatSessionTarget } from './mod.ts';
+import { getStreamsAuth } from '@netscript/plugin-streams-core';
+import {
+  type NetScriptChatSessionTarget,
+  resolveChatSessionUrl,
+} from './create-chat-connection.ts';
 
 /**
  * Response headers stripped before a proxied durable-stream response is returned
@@ -62,23 +65,6 @@ const STRIPPED_RESPONSE_HEADERS: readonly string[] = [
   'transfer-encoding',
   'upgrade',
 ];
-
-/** Durable-stream subpath under which one stream is addressed per chat session. */
-const NETSCRIPT_CHAT_STREAM_SUBPATH = '/ai/chat';
-
-/**
- * Resolve the absolute upstream durable-stream URL for a chat session target,
- * using the `/ai/chat/{sessionId}` addressing convention.
- *
- * Converges with FA1's `resolveChatSessionUrl` at merge (#250).
- */
-function resolveChatSessionUrl(target: NetScriptChatSessionTarget): string {
-  const baseUrl = target.baseUrl ?? getStreamsUrl();
-  return buildStreamUrl(
-    `${NETSCRIPT_CHAT_STREAM_SUBPATH}/${encodeURIComponent(target.sessionId)}`,
-    baseUrl,
-  );
-}
 
 /**
  * Re-wrap an upstream durable-stream response so its headers describe the bytes
@@ -113,6 +99,17 @@ export interface NetScriptChatStreamProxyOptions {
   readonly target:
     | NetScriptChatSessionTarget
     | ((request: Request) => NetScriptChatSessionTarget);
+  /**
+   * Durable-stream subpath override for the upstream stream. A string is used as
+   * the prefix before the encoded `sessionId`; a function returns the full
+   * per-request subpath, e.g. `/eischat/sessions/{id}/messages`.
+   */
+  readonly streamPath?:
+    | string
+    | ((input: {
+      readonly request: Request;
+      readonly target: NetScriptChatSessionTarget;
+    }) => string);
   /**
    * Server-side auth header provider. Defaults to `getStreamsAuth` from
    * `@netscript/plugin-streams-core`. Invoked per request; the result is
@@ -153,6 +150,7 @@ function toRequest(input: Request | { readonly req: Request }): Request {
  *   target: (req) => ({
  *     sessionId: new URL(req.url).pathname.split('/').pop()!,
  *   }),
+ *   streamPath: ({ target }) => `/eischat/sessions/${target.sessionId}/messages`,
  * });
  *
  * export const handler = { POST: proxy, GET: proxy };
@@ -167,7 +165,11 @@ export function createNetScriptChatStreamProxy(
   return async (input: Request | { readonly req: Request }): Promise<Response> => {
     const request = toRequest(input);
     const target = typeof options.target === 'function' ? options.target(request) : options.target;
-    const upstreamUrl = resolveChatSessionUrl(target);
+    const configuredStreamPath = options.streamPath;
+    const streamPath = typeof configuredStreamPath === 'function'
+      ? () => configuredStreamPath({ request, target })
+      : configuredStreamPath;
+    const upstreamUrl = resolveChatSessionUrl(target, { streamPath });
 
     // Forward the client request headers, then overlay the target's session
     // headers (if any) and the server-side streams auth. `host` is dropped so
@@ -184,6 +186,9 @@ export function createNetScriptChatStreamProxy(
     for (const [name, value] of Object.entries(resolveAuth())) {
       upstreamHeaders.set(name, value);
     }
+    // Prevent Deno's fetch decoder from failing before FA2 can sanitize a
+    // mislabeled durable-stream response (netscript#219 gzip flavor).
+    upstreamHeaders.set('accept-encoding', 'identity');
 
     const hasBody = request.body !== null;
     const upstreamRequest = new Request(upstreamUrl, {
