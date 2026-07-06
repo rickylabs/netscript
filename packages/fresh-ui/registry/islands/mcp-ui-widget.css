@@ -1,0 +1,20 @@
+/* McpUiWidget island styles. */
+
+.ns-mcp-ui-widget {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  border: 1px solid var(--ns-border);
+  border-radius: var(--ns-radius-lg);
+  background: var(--ns-surface-raised);
+  overflow: hidden;
+}
+
+.ns-mcp-ui-widget__frame {
+  display: block;
+  width: 100%;
+  min-height: 16rem;
+  border: 0;
+  background: transparent;
+  color-scheme: light dark;
+}
