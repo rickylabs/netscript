@@ -162,5 +162,42 @@ Seed run (planning-only). Stage contracts per `.llm/harness/workflow/seed-run.md
 - Risk register R1–R10 (ledger constraints 21–25 + sd_notify spike + milestone load + cross-epic
   slips + E5 extraction risk + memory-poll latency), gate matrix (7 gates × archetype overlays),
   Stage-H one-shot filing plan recorded in plan.md §6/§7/§10.
-- Next: Stage F adversarial review (WSL Codex, unoriented, distinct model) attacks plan.md +
-  packs; then Stage G PLAN-EVAL (OpenHands minimax-M3, separate session) — hard stop.
+- Next: Stage F adversarial review (unoriented, distinct model) attacks plan.md + packs; then
+  Stage G PLAN-EVAL (OpenHands minimax-M3, separate session) — hard stop.
+
+## Stage F — Adversarial review (2026-07-06)
+
+- **Tier-D launch attempt (recorded, blocked):** brief validated (`use harness` + `## SKILL`),
+  worktree `/home/codex/worktrees/pm-stage-f` @ `59b8e93d` (branch `review/pm-stage-f`, NO
+  upstream), managed daemon 0.142.5, thread `019f36de-ef6d-7f33-80dc-bc3823cfe1af` — turn failed
+  in 3.5s: **`usageLimitExceeded`** (ChatGPT credits; resets 2026-07-07 03:52; unblock needs
+  USER). Drift entry 6; lane override recorded in `supervisor.md`.
+- **Fallback reviewer dispatched:** OpenHands **qwen-3.7-max** (separate session, distinct from
+  authoring lanes A/B/C and from Stage-G minimax-M3), PR-comment trigger on #504 (checks out the
+  PR branch @ `59b8e93d`), iterations=600, verdict contract PASS / FAIL_FIX / FAIL_RESCOPE.
+  Trigger comment: #issuecomment-4891518785. Unoriented brief = artifacts + attack surfaces, no
+  supervisor framing; findings-only deliverable in the PR summary comment.
+- Verdict watcher armed (`watch-openhands-verdict.ts`, 1h re-armable heartbeat).
+- **Verdict landed** (Action run 28783668102 success; concurrency-cancelled sibling 28783678449
+  expected): PR comment #issuecomment-4891678877, 2026-07-06T10:21:43Z —
+  **`OPENHANDS_VERDICT: PASS`, 18 findings: 0 blockers, 4 major, 14 minor.**
+- **Supervisor triage complete** — full per-finding disposition table in
+  `stage-f-adversarial.md`. Score: 13 accepted (fixes applied to plan.md), 2 rejected-with-
+  rationale (F-1 stale read — PM-0 already carried the drift-5 fix; F-13 no-change), 3 notes.
+  Substantive outcomes:
+  - **F-3 (major, accepted):** E5 extraction re-homed from `plugin-process-manager-core` to
+    **`packages/deploy-core`** — the ARCHETYPE-7-anticipated package — killing the ownership
+    inversion (future deploy wave inherits, never imports from, pm). PM-20 + R9 + §1 amended;
+    F-DEPLOY `reviewed`→`gated` promotion explicitly in PM-20 acceptance (folds F-14).
+  - **F-2 (major, accepted):** E4 now enumerates the normative 18-route D2 §1.3 table and the
+    CLI-verb→route/OS-op mapping (the reviewer's own 10-route list had conflated the two).
+  - **F-4 (major, accepted):** PM-1 gains the workers-core `mod.ts` re-export precursor for
+    `WorkerTaskPermissions` (doctrine 02/09 compliant).
+  - **F-7 (minor, accepted — real arithmetic error):** milestone-1 = **32** slices (not 31),
+    `v1-min` floor = **21** (not 19), total 36; §4/§5/§10 corrected.
+  - F-5/F-8/F-9/F-10/F-11/F-12/F-15/F-16/F-17 minor clarifications applied (PM-11 loopback
+    reachability, PM-31 JSR-only dry-run, PM-25 degraded reads defined, PM-4 pollIntervalMs=5000,
+    R1 Job-Objects note, R9 split escape hatch, PM-0 hard beta.6, E1 "superseded", OF-9 hard fork).
+- Stage F closed: verdict PASS + all majors resolved at triage → proceed to Stage G PLAN-EVAL
+  (OpenHands minimax-M3, separate session) against the amended plan.md. Optional: owner may re-run
+  Tier-D Codex adversarial after credit reset (2026-07-07 03:52) — not gating.

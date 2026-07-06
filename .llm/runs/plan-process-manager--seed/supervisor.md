@@ -27,5 +27,18 @@ operating identity is discoverable without chat memory.
 
 ## Recorded lane/eval overrides
 
-None at run start — defaults per `lane-policy.md`. Seed run is planning-only: no implementation
+- **2026-07-06 — Stage-F reviewer: Tier D → OpenHands qwen-3.7-max (blocked-lane fallback).**
+  The Tier-D launch executed correctly (managed daemon, thread
+  `019f36de-ef6d-7f33-80dc-bc3823cfe1af`, worktree `/home/codex/worktrees/pm-stage-f`,
+  push-safety green) but the turn failed in 3.5s: ChatGPT usage limit exhausted, resets
+  2026-07-07 03:52 (`usageLimitExceeded`, `will_retry: false`). Unblocking Codex credits needs the
+  USER. Stage F's hard requirements are unoriented + separate session + distinct-from-authors
+  model — the tier is per-run configuration (seed-run.md § Stage F). Fallback reviewer:
+  **OpenHands qwen-3.7-max** (separate session via the GitHub Action on PR #504; distinct from
+  authoring lanes A Fable 5 / B Opus 4.8 / C Sonnet 5 AND from the Stage-G evaluator minimax-M3,
+  preserving generator ≠ evaluator across all stages). Authorized under the standing autonomous
+  mandate (a blocked lane must not park the run); the owner may additionally re-run Tier-D Codex
+  after credit reset if a second adversarial pass is wanted.
+
+Otherwise defaults per `lane-policy.md`. Seed run is planning-only: no implementation
 lanes are dispatched by this run (Stage I hands off briefs only).

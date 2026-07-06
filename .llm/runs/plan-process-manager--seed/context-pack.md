@@ -24,14 +24,21 @@ deployment target of epic #327.
   drift entry 5 (`resolveTargetConfig` key/member mismatch). 39 candidate slices total
   (11+7+7+8+6); 34 residual questions carried.
 - E Plan lock: ✅ — supervisor-authored `plan.md`: E1–E16 resolved decisions (headline E1: no new
-  target key, per D3; E5: OS-service-layer extraction into the core w/ CLI re-exports — Stage F
-  attack target), OF-1..9 owner-fork sweep, 39 candidates → **PM-0..PM-35** (31 milestone-1 + 4
-  deferred; `v1-min` floor = 19), milestone train re-derived from the LIVE board (#327 =
-  0.0.1-stable confirmed via WSL gh; #400 beta.6; #E1/#E6 beta.8; beta.7 = 28 open → OF-9), risk
-  register R1–R10, gate matrix, Stage-H one-shot filing plan. 4 residual questions remain (plan §9).
-- F Adversarial: pending — WSL Codex, unoriented, distinct model; attacks plan.md + packs; directed
-  at E5 extraction, the DAG deps, and milestone realism.
-- G PLAN-EVAL: pending (hard stop).
+  target key, per D3), OF-1..9 owner-fork sweep, 39 candidates → **PM-0..PM-35** (32 milestone-1 +
+  4 deferred after Stage-F count fix; `v1-min` floor = 21), milestone train re-derived from the
+  LIVE board (#327 = 0.0.1-stable confirmed via WSL gh; #400 beta.6; #E1/#E6 beta.8; beta.7 = 28
+  open → OF-9), risk register R1–R10, gate matrix, Stage-H one-shot filing plan. 4 residual
+  questions remain (plan §9).
+- F Adversarial: ✅ — Tier-D Codex blocked (`usageLimitExceeded`, drift 6) → recorded fallback
+  OpenHands **qwen-3.7-max** on PR #504. **Verdict PASS** (comment #issuecomment-4891678877): 18
+  findings, 0 blockers / 4 major / 14 minor. Triage in `stage-f-adversarial.md`: 13 accepted +
+  fixed in plan.md, 2 rejected w/ rationale, 3 notes. Headline fix (F-3): **E5 extraction
+  re-homed to `packages/deploy-core`** (ARCHETYPE-7's anticipated package; pm-core depends on it;
+  CLI re-exports; F-DEPLOY promotion in PM-20). Also: E4 enumerates the 18-route table (F-2),
+  PM-1 gains the workers-core `WorkerTaskPermissions` re-export precursor (F-4), OF-9 is a hard
+  fork (F-17), counts corrected 32+4/21 (F-7).
+- G PLAN-EVAL: pending (hard stop) — OpenHands minimax-M3, separate session, grades the amended
+  plan.md.
 - H Ratify + file: pending (owner).
 - I Handoff: pending.
 
