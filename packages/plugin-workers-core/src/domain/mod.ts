@@ -25,13 +25,21 @@ export {
 } from './constants.ts';
 export type {
   ExecutionStatus,
+  ExecutionStatusSchemaValues,
   JobExecutionType,
+  JobExecutionTypeSchemaValues,
   JobSource,
+  JobSourceSchemaValues,
   TaskSource,
+  TaskSourceSchemaValues,
   TaskStatus,
+  TaskStatusSchemaValues,
   TaskType,
+  TaskTypeSchemaValues,
   TriggerType,
+  TriggerTypeSchemaValues,
   WorkerRuntime,
+  WorkerRuntimeSchemaValues,
 } from './constants.ts';
 export { cron, DAY_OF_WEEK, isCronExpression } from './cron.ts';
 export type { CronExpression, DayOfWeek } from './cron.ts';

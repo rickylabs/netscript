@@ -75,6 +75,7 @@ const SKIP_DIRS = new Set([
 const ANSI_PATTERN = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, 'g');
 const RULE_HEADER = /^(?:error\[([^\]]+)\]:\s*(.+)|\(([^)]+)\)\s+(.+))$/;
 const LOCATION_LINE = /^\s*(?:-->|at)\s+(?:file:\/\/)?(.+?):(\d+):(\d+)/;
+const NO_TARGET_FILES_MESSAGE = 'No target files found.';
 
 function printHelp(): void {
   console.log([
@@ -292,8 +293,12 @@ async function runLint(
       stderr: 'piped',
     }).output();
 
-    text += new TextDecoder().decode(result.stdout) + new TextDecoder().decode(result.stderr);
-    if (result.code !== 0) exitCode = result.code;
+    const output = new TextDecoder().decode(result.stdout) +
+      new TextDecoder().decode(result.stderr);
+    text += output;
+    if (result.code !== 0 && !output.includes(NO_TARGET_FILES_MESSAGE)) {
+      exitCode = result.code;
+    }
   }
 
   return { text, exitCode };

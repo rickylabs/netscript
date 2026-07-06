@@ -1,0 +1,153 @@
+# Worklog: issue #303 public-surface doc-lint remainder
+
+## Run Metadata
+
+| Field | Value |
+| --- | --- |
+| Run ID | `beta5-impl--supervisor` |
+| Branch | `chore/303-enterprise-surface-sweep` |
+| Archetype | Mixed package/plugin archetypes |
+| Scope overlays | frontend/service where existing package surfaces require them |
+
+## Design
+
+### Public Surface
+
+- All `deno.json` export-map entrypoints in 34 publishable `@netscript/*` roots under `packages/`
+  and `plugins/`; `@netscript/bench` is non-publishable and out of scope.
+- Root validation commands and PR comments are evidence surfaces, not public runtime APIs.
+
+### Domain Vocabulary
+
+- Publishable root - a `packages/*` or `plugins/*` directory with `deno.json` `name:
+  @netscript/*` and `exports`.
+- Entrypoint - one subpath in a package's JSR export map.
+- Sanctioned slow-types allowance - the oRPC-bound carve-out introduced by commit `86eca907`.
+- Trivial residue - missing JSDoc, explicit type annotation, or local private-type leak fix that
+  does not change public API semantics.
+
+### Ports
+
+- None. This slice consumes existing tooling only and adds no runtime ports.
+
+### Constants
+
+- Validation roots: `packages`, `plugins`.
+- Prohibited commands: `deno task e2e:cli`, `deno cache --reload`, lock/cache deletion.
+- Required PR branch refspec: `HEAD:refs/heads/chore/303-enterprise-surface-sweep`.
+
+### Commit Slices
+
+| # | Slice | Gate | Files |
+| - | --- | --- | --- |
+| 1 | Harness bootstrap + draft PR surface | PLAN-EVAL PASS before implementation | `.llm/runs/beta5-impl--supervisor/*`, `notes.md` |
+| 2 | Low-risk docs/type fixes for small contract/integration roots | Doc-lint roots touched; scoped check where needed | Selected `packages/*` files |
+| 3 | Runtime/DSL/service roots doc-lint fixes | Doc-lint roots touched; scoped check where needed | Selected `packages/*` files |
+| 4 | Plugin/core roots doc-lint and residue fixes | Doc-lint roots touched; cast/any grep evidence | Selected `packages/*`, `plugins/*` files |
+| 5 | Final publish dry-run and workspace gates | Full validation plan green | Run artifacts and PR final comment |
+
+### Deferred Scope
+
+- Public API redesign for slow/private-type diagnostics - record in `notes.md`.
+- Stale file deletion - #307.
+- Runtime E2E - supervisor merge-readiness pass.
+
+### Contributor Path
+
+Start with `research.md` for the package inventory, run `deno task doc:lint --root <root> --pretty`
+for a package, fix only local docs/types, then record the package result in this worklog before the
+slice commit.
+
+## Progress Log
+
+| Time | Slice | Step | Notes |
+| --- | --- | --- | --- |
+| 2026-07-06 | 1 | bootstrap | Read required skills, doctrine, harness workflow, and commit `86eca907`; created run artifacts. |
+| 2026-07-06 | 1 | draft PR | Opened draft PR #483 and pushed bootstrap commit `1178e727`. |
+| 2026-07-06 | 1 | plan-eval | OpenHands PLAN-EVAL PASS, commit `324d85d3`; corrected plan wording slips before implementation. |
+| 2026-07-06 | 2 | inventory | Full-export-map doc-lint inventory: 346 diagnostics before fixes across 34 publishable roots. |
+| 2026-07-06 | 2 | aspire | Fixed missing JSDoc in `packages/aspire` public error/interface members; raw full-export doc-lint clean. |
+| 2026-07-06 | 2 | queue | Exported/documented `PostgresQueryResult` and documented Postgres adapter private methods; raw full-export doc-lint clean. |
+| 2026-07-06 | 2 | config | Re-exported deploy target types from root `mod.ts`; raw full-export doc-lint clean. |
+| 2026-07-06 | 2 | auth-better-auth | Stopped on Better Auth passthrough private-type leak; trivial re-export/element-type replacement failed, so deferral recorded in `notes.md`. |
+| 2026-07-06 | 2 | lock hygiene | Reverted transient `deno.lock` change from `deno info npm:better-auth --json` (`npm:better-auth@*` resolution). |
+| 2026-07-06 | 2 | cli | Re-exported `CacheBackendChoice` from `@netscript/cli/testing`; raw full-export doc-lint clean. |
+| 2026-07-06 | 2 | sdk | Re-exported `NetScriptProcedureSchemas` from SDK client and ports subpaths; raw full-export doc-lint clean. |
+| 2026-07-06 | 3 | fresh | Exported `EmptySegment` to clear route type leaks; Vite `Plugin` alias requires public API redesign and is recorded in `notes.md`. |
+| 2026-07-06 | 3 | contracts | Cleared contracts missing-JSDoc and local helper alias leaks; remaining oRPC-bound private refs recorded under the `86eca907` carve-out. |
+
+## Decisions
+
+| Decision | Reason | Source |
+| --- | --- | --- |
+| Use full-export-map wrapper | Avoid `mod.ts`-only false positives. | `netscript-deno-toolchain`, `netscript-tools` |
+| Preserve oRPC slow-types allowance only | Explicit user and doctrine constraint. | User brief, commit `86eca907` |
+| Defer API redesigns | Slice scope is cleanliness, not public shape redesign. | User brief |
+
+## Drift
+
+| Drift | Severity | Logged in drift.md |
+| --- | --- | --- |
+| No existing run dir was present; this session bootstrapped it. | minor | yes |
+| Requested PR labels partially absent from repo taxonomy. | minor | yes |
+
+## Gate Results
+
+### Static Gates
+
+| Gate | Command or check | Result | Notes |
+| --- | --- | --- | --- |
+| Git branch/baseline | `git branch --show-current`; `git rev-parse HEAD` | PASS | Branch and baseline match user brief. |
+| Aspire check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/aspire --ext ts,tsx` | PASS | 45 files selected, 0 occurrences. |
+| Aspire lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/aspire --ext ts,tsx` | PASS | 45 files selected, 0 findings. |
+| Aspire fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/aspire --ext ts,tsx` | PASS | 45 files selected, 0 findings. |
+| Queue check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/queue --ext ts,tsx` | PASS | 39 files selected, 0 occurrences. |
+| Queue lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/queue --ext ts,tsx` | PASS | 39 files selected, 0 findings. |
+| Queue fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/queue --ext ts,tsx` | PASS | 39 files selected, 0 findings. |
+| Config check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/config --ext ts,tsx` | PASS | 34 files selected, 0 occurrences. |
+| Config lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/config --ext ts,tsx` | PASS | 34 files selected, 0 findings. |
+| Config fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/config --ext ts,tsx` | PASS | 34 files selected, 0 findings. |
+| CLI check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | PASS | 590 files selected, 0 occurrences. |
+| CLI lint/fmt | package-root wrapper / raw target attempts | NOT_RUN | Root config excludes `packages/cli`; wrapper returned exit 1 with zero findings. Final repo-prescribed lint/fmt gates will cover owned package/plugin roots per their configured excludes. |
+| SDK check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/sdk --ext ts,tsx` | PASS | 56 files selected, 0 occurrences. |
+| SDK lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/sdk --ext ts,tsx` | PASS | 56 files selected, 0 findings. |
+| SDK fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/sdk --ext ts,tsx` | PASS | 56 files selected, 0 findings. |
+| Fresh check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh --ext ts,tsx` | PASS | 159 files selected, 0 occurrences. |
+| Fresh lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/fresh --ext ts,tsx` | PASS | 159 files selected, 0 findings. |
+| Fresh fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/fresh --ext ts,tsx` | PASS | 159 files selected, 0 findings. |
+| Contracts check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/contracts --ext ts,tsx` | PASS | 20 files selected, 0 occurrences. |
+| Contracts lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/contracts --ext ts,tsx` | PASS | 20 files selected, 0 findings. |
+| Contracts fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/contracts --ext ts,tsx` | PASS | 20 files selected, 0 findings. |
+
+### Fitness Gates
+
+| Gate | Result | Evidence | Notes |
+| --- | --- | --- | --- |
+| F-5/F-7 | NOT_RUN | Pending after PLAN-EVAL | Full doc-lint sweep is implementation slice work. |
+| F-6 | NOT_RUN | Pending after fixes | Publish dry-run is final validation. |
+| F-19 | NOT_RUN | Pending after fixes | Scoped wrappers are final validation. |
+| F-5/F-7 `@netscript/aspire` | PASS | `deno doc --lint` over 9 export-map entrypoints: `Checked 9 files`. | Wrapper summary also reports 0 combined errors; raw command used to confirm clean verdict. |
+| F-5/F-7 `@netscript/queue` | PASS | `deno doc --lint` over 13 export-map entrypoints: `Checked 13 files`. | Warnings from transitive npm Node typings did not produce doc-lint errors. |
+| F-5/F-7 `@netscript/config` | PASS | `deno doc --lint` over 4 export-map entrypoints: `Checked 4 files`. | Root re-export now exposes deploy target types referenced by `DeployConfig`. |
+| F-5/F-7 `@netscript/auth-better-auth` | DEFERRED | `deno doc --lint ./mod.ts` reports Better Auth private aliases in passthrough option fields. | Requires public API redesign; recorded in `notes.md` per brief. |
+| F-5/F-7 `@netscript/cli` | PASS | `deno doc --lint` over 3 export-map entrypoints: `Checked 3 files`. | `CacheBackendChoice` is now public on the testing subpath that exports `InitPromptAnswers`. |
+| F-5/F-7 `@netscript/sdk` | PASS | `deno doc --lint` over 10 export-map entrypoints: `Checked 10 files`. | `NetScriptProcedureSchemas` is now public on subpaths that expose `ContractProcedureLike`. |
+| F-5/F-7 `@netscript/fresh` | DEFERRED | Wrapper now reports only 1 private-type ref in `src/application/vite/vite.ts`. | Route leaks fixed; Vite `Plugin` alias needs public API redesign and is recorded in `notes.md`. |
+| F-5/F-7 `@netscript/contracts` | DEFERRED | Wrapper reports 12 private-type refs, 0 missing-JSDoc. | Remaining refs are oRPC-bound builder/schema types covered by the sanctioned `86eca907` policy; recorded in `notes.md`. |
+
+### Runtime Gates
+
+| Gate | Result | Evidence | Notes |
+| --- | --- | --- | --- |
+| `deno task e2e:cli` | N/A | User prohibited | Supervisor owns runtime smoke. |
+
+### Consumer Gates
+
+| Consumer | Result | Evidence | Notes |
+| --- | --- | --- | --- |
+| Publish consumers | NOT_RUN | Pending `publish:dry-run` | No API shape changes planned. |
+
+## Handoff Notes
+
+- Evaluator should inspect `plan.md` decision LD-2 and verify implementation has not begun before
+  PLAN-EVAL PASS.

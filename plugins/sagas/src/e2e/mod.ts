@@ -5,7 +5,7 @@
  */
 
 export { getSagasE2eGates } from './sagas-gates.ts';
-export type { SagasE2eGate } from './sagas-gates.ts';
+export type { PluginE2eGate, SagasE2eGate } from './sagas-gates.ts';
 export { assertSuccessfulProbe, joinProbeUrl, summarizeResponse } from '@netscript/plugin';
 export type { ProbeHttpResult } from '@netscript/plugin';
 export {

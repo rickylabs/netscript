@@ -10,6 +10,13 @@ import {
 } from '@netscript/plugin/adapter';
 import { authAdapterPlugin } from './src/adapter/plugin.ts';
 
+export type {
+  PluginLogger,
+  PluginScaffoldEntrypoint,
+  ScaffolderContext,
+  ScaffoldResult,
+} from '@netscript/plugin/adapter';
+
 /** Auth adapter scaffold entrypoint. */
 const scaffold: PluginScaffoldEntrypoint = createPluginAdapter(authAdapterPlugin).toScaffold();
 

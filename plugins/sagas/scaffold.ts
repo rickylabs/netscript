@@ -10,6 +10,13 @@ import {
 } from '@netscript/plugin/adapter';
 import { sagasAdapterPlugin } from './src/adapter/plugin.ts';
 
+export type {
+  PluginLogger,
+  PluginScaffoldEntrypoint,
+  ScaffolderContext,
+  ScaffoldResult,
+} from '@netscript/plugin/adapter';
+
 /** Sagas adapter scaffold entrypoint. */
 const scaffold: PluginScaffoldEntrypoint = createPluginAdapter(sagasAdapterPlugin).toScaffold();
 

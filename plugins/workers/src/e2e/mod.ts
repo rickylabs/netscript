@@ -5,4 +5,4 @@
  */
 
 export { getWorkersE2eGates } from './workers-gates.ts';
-export type { WorkersE2eGate } from './workers-gates.ts';
+export type { PluginE2eGate, WorkersE2eGate } from './workers-gates.ts';

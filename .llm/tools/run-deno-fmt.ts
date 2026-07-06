@@ -60,6 +60,7 @@ const SKIP_DIRS = new Set([
   'vendor',
 ]);
 const ANSI_PATTERN = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, 'g');
+const NO_TARGET_FILES_MESSAGE = 'No target files found.';
 
 function printHelp(): void {
   console.log([
@@ -327,6 +328,10 @@ function parseFindings(results: BatchResult[]): FormatFinding[] {
   return findings.sort((left, right) => left.path.localeCompare(right.path));
 }
 
+function isNoTargetFilesResult(result: BatchResult): boolean {
+  return result.exitCode !== 0 && result.output.includes(NO_TARGET_FILES_MESSAGE);
+}
+
 async function main(): Promise<void> {
   const options = parseArgs(Deno.args);
   if (!options) return;
@@ -348,7 +353,8 @@ async function main(): Promise<void> {
   const findings = options.ignoreLineEndings
     ? allFindings.filter((finding) => !isLineEndingFinding(finding))
     : allFindings;
-  const failedBatches = results.filter((result) => result.exitCode !== 0).length;
+  const failedBatches =
+    results.filter((result) => result.exitCode !== 0 && !isNoTargetFilesResult(result)).length;
   const failedWithoutParsedFindings = failedBatches > 0 && allFindings.length === 0;
   const effectiveFailedBatches = findings.length > 0 || failedWithoutParsedFindings
     ? failedBatches

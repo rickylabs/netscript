@@ -11,10 +11,16 @@ import { aiContractV1 } from '../contracts/v1/mod.ts';
  */
 export type AiRouterContext = Record<PropertyKey, unknown>;
 
+/**
+ * Context-bound implementer returned by the AI v1 contract.
+ */
 export type ContextualAiRouter<TContext extends AiRouterContext> = ReturnType<
   typeof aiContractV1.$context<TContext>
 >;
 
+/**
+ * Handler function type accepted by one named AI route.
+ */
 export type AiRouteHandler<
   TContext extends AiRouterContext,
   TRoute extends keyof ContextualAiRouter<TContext>,
@@ -22,6 +28,9 @@ export type AiRouteHandler<
   ? THandler
   : never;
 
+/**
+ * Bound route value returned after registering one AI route handler.
+ */
 export type BoundAiRoute<
   TContext extends AiRouterContext,
   TRoute extends keyof ContextualAiRouter<TContext>,

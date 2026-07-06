@@ -69,6 +69,7 @@ export class LocalSagasRuntimeBackend implements SagasCliBackend {
     }
   }
 
+  /** Write scaffold artifacts and return the created file list. */
   private async writeArtifacts(
     message: string,
     artifacts: readonly ScaffoldArtifact[],

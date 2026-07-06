@@ -73,6 +73,7 @@ export type {
   DoneChunk,
   ErrorChunk,
   ImageContentPart,
+  JsonSchema,
   Message,
   MessageChunk,
   MessageContent,
@@ -330,7 +331,7 @@ type ChatRoute = ContractProcedureBuilderWithInputOutput<
 >;
 
 /**
- * Explicit, precise type of the AI v1 contract definition.
+ * Concrete, precise interface for the AI v1 contract definition.
  *
  * Every member is a real oRPC contract procedure typed against its input and
  * output Zod schemas. The interface `extends BasePluginContract`, so the
@@ -339,13 +340,25 @@ type ChatRoute = ContractProcedureBuilderWithInputOutput<
  * `--isolatedDeclarations` (the JSR slow-types bar); because each member derives
  * from a named, annotated schema via `typeof`, the contract type can never
  * silently drift from the schemas.
+ *
+ * Kept module-private: its members reference internal oRPC builder and Zod
+ * schema types, so exporting the interface directly would drag those private
+ * types into the documented surface (a `deno doc --lint` `private-type-ref`
+ * cascade). The public, documented name is re-exposed as the thin type alias
+ * {@link AiContractDefinitionShape} below.
  */
-export interface AiContractDefinitionShape extends BasePluginContract {
+interface AiContractDefinitionShapeInternal extends BasePluginContract {
+  /** Mandatory plugin capability-document route shared by all feature plugins. */
   readonly describe: BasePluginDescribeRoute;
+  /** Streaming chat-completion route. */
   readonly chat: ChatRoute;
+  /** Model-listing route. */
   readonly models: Route<typeof modelsInputZodSchema, typeof modelsResponseZodSchema>;
+  /** Tool invocation route keyed by tool name. */
   readonly invokeTool: Route<typeof toolInvokeInputZodSchema, typeof toolInvokeResponseZodSchema>;
+  /** Embedding generation route. */
   readonly embed: Route<typeof embedInputZodSchema, typeof embedResponseZodSchema>;
+  /** Audio transcription route. */
   readonly transcribe: Route<typeof transcribeInputZodSchema, typeof transcribeResponseZodSchema>;
 }
 
@@ -359,7 +372,7 @@ export interface AiContractDefinitionShape extends BasePluginContract {
  * this object is handed to `implement()` WITHOUT any erasure cast and every
  * `router.<route>.handler(...)` is checked against the contract's IO.
  */
-const aiContractDefinition: AiContractDefinitionShape = {
+const aiContractDefinition: AiContractDefinitionShapeInternal = {
   ...BASE_PLUGIN_CONTRACT_ROUTES,
 
   chat: oc
@@ -389,19 +402,31 @@ const aiContractDefinition: AiContractDefinitionShape = {
 };
 
 /**
- * The fully-typed AI v1 contract definition type.
+ * Explicit, precise structural type of the AI v1 contract definition.
  *
- * Re-exported so {@link AiContract} and {@link AiContractV1} derive from it
- * instead of hand-authoring a parallel structural shape.
+ * Public, documented surface of the `/contracts/v1` subpath (restored after the
+ * enterprise surface sweep). A thin alias over the module-private
+ * {@link AiContractDefinitionShapeInternal} interface, so consumers keep the
+ * exact same structural type — every member a real oRPC contract procedure
+ * typed against its Zod schemas — while the interface's internal builder/schema
+ * member types stay out of the documented surface.
  */
-export type AiContractDefinition = AiContractDefinitionShape;
+export type AiContractDefinitionShape = AiContractDefinitionShapeInternal;
 
 /**
  * AI service contract definition for client generation.
  *
  * Carries the real, precise oRPC contract router type — no erasure cast.
  */
-export const aiContract: AiContractDefinition = aiContractDefinition;
+export const aiContract: AiContractDefinitionShape = aiContractDefinition;
+
+/**
+ * The fully-typed AI v1 contract definition type.
+ *
+ * Derived from the exported {@link aiContract} value so consumers see the same
+ * contract shape used for client generation.
+ */
+export type AiContractDefinition = typeof aiContract;
 
 /**
  * The implemented (context-bindable) AI v1 contract.

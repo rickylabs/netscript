@@ -24,6 +24,7 @@ export type {
   ContractSchemaInput,
   ContractSchemaOutput,
   CreateServiceClientOptions,
+  NetScriptProcedureSchemas,
   ProcedureInputFromNode,
   ProcedureOutputFromNode,
   ServiceClient,
