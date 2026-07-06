@@ -1,7 +1,19 @@
 import type { StandardSchemaV1 } from '@standard-schema/spec';
-import type { TelemetryConfig } from './constants.ts';
+import type { TelemetryConfig, TelemetryProviderId } from './constants.ts';
 
 type Issue = StandardSchemaV1.Issue;
+
+function readProviderId(source: object, key: string, issues: Issue[]): TelemetryProviderId {
+  const raw = Reflect.get(source, key);
+  if (raw !== 'otel-deno' && raw !== 'otel-sdk') {
+    issues.push({
+      message: `${key} must be 'otel-deno' or 'otel-sdk'`,
+      path: [key],
+    });
+    return 'otel-deno';
+  }
+  return raw;
+}
 
 function readBoolean(source: object, key: string, issues: Issue[]): boolean {
   const raw = Reflect.get(source, key);
@@ -61,6 +73,7 @@ function validateTelemetryConfigValue(
   const issues: Issue[] = [];
   const parsed: TelemetryConfig = {
     enabled: readBoolean(value, 'enabled', issues),
+    provider: readProviderId(value, 'provider', issues),
     endpoint: readOptionalUrl(value, 'endpoint', issues),
     protocol: readNonEmptyString(value, 'protocol', issues),
     semconvStabilityOptIn: readNonEmptyString(value, 'semconvStabilityOptIn', issues),
