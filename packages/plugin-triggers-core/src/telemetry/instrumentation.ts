@@ -214,35 +214,47 @@ export class TriggerInstrumentation {
 
   /** Record an ingress metric. */
   recordIngress(input: TriggerIngressMetricInput): void {
-    this.meter?.ingressTotal?.add(1, withDeprecatedAliases({
-      ...triggerAttributes(input),
-      [TriggerAttributes.OUTCOME]: input.outcome,
-    }));
+    this.meter?.ingressTotal?.add(
+      1,
+      withDeprecatedAliases({
+        ...triggerAttributes(input),
+        [TriggerAttributes.OUTCOME]: input.outcome,
+      }),
+    );
   }
 
   /** Record an action dispatch duration metric. */
   recordDispatchDuration(input: TriggerDispatchMetricInput): void {
-    this.meter?.dispatchDurationMs?.record(input.durationMs, withDeprecatedAliases({
-      ...triggerAttributes(input),
-      [TriggerAttributes.ACTION_KIND]: input.actionKind,
-      [TriggerAttributes.OUTCOME]: input.outcome,
-    }));
+    this.meter?.dispatchDurationMs?.record(
+      input.durationMs,
+      withDeprecatedAliases({
+        ...triggerAttributes(input),
+        [TriggerAttributes.ACTION_KIND]: input.actionKind,
+        [TriggerAttributes.OUTCOME]: input.outcome,
+      }),
+    );
   }
 
   /** Record a DLQ enqueue metric. */
   recordDlq(input: TriggerDlqInput): void {
-    this.meter?.dlqTotal?.add(1, withDeprecatedAliases({
-      ...triggerAttributes(input),
-      [TriggerAttributes.DLQ_REASON]: input.reason,
-    }));
+    this.meter?.dlqTotal?.add(
+      1,
+      withDeprecatedAliases({
+        ...triggerAttributes(input),
+        [TriggerAttributes.DLQ_REASON]: input.reason,
+      }),
+    );
   }
 
   /** Record an idempotency hit metric. */
   recordIdempotencyHit(input: TriggerSpanInput, source: string): void {
-    this.meter?.idempotencyHitsTotal?.add(1, withDeprecatedAliases({
-      ...triggerAttributes(input),
-      [TriggerAttributes.IDEMPOTENCY_SOURCE]: source,
-    }));
+    this.meter?.idempotencyHitsTotal?.add(
+      1,
+      withDeprecatedAliases({
+        ...triggerAttributes(input),
+        [TriggerAttributes.IDEMPOTENCY_SOURCE]: source,
+      }),
+    );
   }
 }
 
