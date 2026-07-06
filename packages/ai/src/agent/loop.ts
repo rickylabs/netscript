@@ -135,7 +135,7 @@ export function createAgentLoop(deps: AgentLoopDeps): AgentLoop {
 
         for await (
           const event of client.stream(
-            { messages, system: input.system, tools: input.tools },
+            { messages, system: input.system, tools: input.tools, options: input.options },
             { signal },
           )
         ) {
@@ -146,6 +146,12 @@ export function createAgentLoop(deps: AgentLoopDeps): AgentLoop {
             case 'text': {
               assistantText += event.delta;
               yield { type: 'text', delta: event.delta };
+              break;
+            }
+            case 'reasoning': {
+              // Reasoning deltas are surfaced verbatim but not folded into the
+              // committed assistant transcript text (they are a separate trace).
+              yield { type: 'reasoning', delta: event.delta };
               break;
             }
             case 'tool-call': {
