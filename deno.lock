@@ -3693,7 +3693,7 @@
       },
       "packages/plugin-ai-core": {
         "dependencies": [
-          "jsr:@netscript/ai@0.0.1-alpha.0",
+          "jsr:@netscript/ai@0.0.1-beta.5",
           "jsr:@netscript/plugin@0.0.1-beta.5",
           "jsr:@std/assert@1",
           "jsr:@zod/zod@4.4.3",

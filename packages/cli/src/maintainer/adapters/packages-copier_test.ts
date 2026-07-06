@@ -3,6 +3,7 @@ import { join } from "@std/path";
 import { copyLocalPackages } from "./packages-copier.ts";
 
 const LOCAL_PACKAGES = [
+  "ai",
   "aspire",
   "cli",
   "config",
@@ -13,6 +14,7 @@ const LOCAL_PACKAGES = [
   "kv",
   "logger",
   "plugin",
+  "plugin-ai-core",
   "plugin-auth-core",
   "auth-workos",
   "auth-better-auth",

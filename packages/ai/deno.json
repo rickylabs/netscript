@@ -1,6 +1,6 @@
 {
   "name": "@netscript/ai",
-  "version": "0.0.1-alpha.0",
+  "version": "0.0.1-beta.5",
   "description": "Zero-dependency AI engine core: domain contracts, capability ports, model registry, and composition root for NetScript's AI stack.",
   "license": "MIT",
   "exports": {

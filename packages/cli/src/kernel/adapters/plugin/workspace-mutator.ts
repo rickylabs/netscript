@@ -101,6 +101,35 @@ const PLUGIN_SERVICE_BOOTSTRAP_IMPORTS: readonly string[] = [
   SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN,
 ];
 
+/**
+ * Kind-scoped root import-map entries for plugins whose scaffolded userland glue
+ * imports first-party `@netscript/*` packages that are NOT covered by the shared
+ * {@link PLUGIN_SERVICE_SOURCE_IMPORTS} superset.
+ *
+ * These entries are applied ONLY to published/JSR consumer projects (no
+ * {@link LOCAL_SOURCE_MARKER}). Local-source scaffolds copy the packages as
+ * workspace members (see `SCAFFOLD_WORKSPACE_PACKAGES`), and Deno resolves a
+ * member's bare name and export subpaths from any workspace file — writing
+ * exact jsr pins into a local-source project would risk shadowing local source
+ * with published packages and would wedge release-cut CI on not-yet-published
+ * versions.
+ *
+ * Only bare package aliases are listed: Deno auto-expands export subpaths
+ * (`@netscript/ai/agent`, `@netscript/fresh/ai`, ...) through a root
+ * `jsr:` package alias, exactly like `deno add` semantics — verified
+ * empirically against exact-version pins. Keep this list covering every
+ * `@netscript/*` package whose specifiers are emitted by
+ * `plugins/ai/src/adapter/resources/**` (guarded by the AI scaffold
+ * import-map completeness test).
+ */
+const PLUGIN_KIND_SOURCE_IMPORTS: Readonly<Record<string, Readonly<Record<string, string>>>> = {
+  ai: {
+    '@netscript/ai': netscriptJsrSpecifier('ai'),
+    '@netscript/plugin-ai-core': netscriptJsrSpecifier('plugin-ai-core'),
+    '@netscript/fresh': netscriptJsrSpecifier('fresh'),
+  },
+};
+
 const PLUGIN_SERVICE_SOURCE_IMPORTS: Readonly<Record<string, string>> = {
   '@durable-streams/client': 'npm:@durable-streams/client@^0.2.6',
   '@durable-streams/server': 'npm:@durable-streams/server@^0.3.7',
@@ -344,11 +373,17 @@ export class PluginWorkspaceMutator {
       );
     }
 
+    // Kind-source jsr pins are prod/JSR-only: local-source projects resolve
+    // these packages as copied workspace members (name + export subpaths).
+    const isLocalSourceProject = await this.fs.exists(join(projectRoot, LOCAL_SOURCE_MARKER));
+    const kindSourceImports = isLocalSourceProject
+      ? {}
+      : PLUGIN_KIND_SOURCE_IMPORTS[pluginKind] ?? {};
     const requiredSpecifiers = [
       ...PLUGIN_SERVICE_BOOTSTRAP_IMPORTS,
       ...(PLUGIN_KIND_ROOT_IMPORTS[pluginKind] ?? []),
     ];
-    if (requiredSpecifiers.length === 0) {
+    if (requiredSpecifiers.length === 0 && Object.keys(kindSourceImports).length === 0) {
       return;
     }
 
@@ -356,7 +391,10 @@ export class PluginWorkspaceMutator {
     raw.imports ??= {};
     const resolvedImports = resolveNetScriptImports('jsr');
     const localRuntimeImports = await this.resolveLocalOfficialRuntimeImports(projectRoot);
-    const requiredImports: Record<string, string> = { ...PLUGIN_SERVICE_SOURCE_IMPORTS };
+    const requiredImports: Record<string, string> = {
+      ...PLUGIN_SERVICE_SOURCE_IMPORTS,
+      ...kindSourceImports,
+    };
     for (const specifier of requiredSpecifiers) {
       const target = localRuntimeImports[specifier] ?? resolvedImports[specifier];
       if (target !== undefined) {
