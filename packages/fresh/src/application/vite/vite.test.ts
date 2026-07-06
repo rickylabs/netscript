@@ -1,6 +1,22 @@
 import { resolve } from '@std/path';
-import { type ConfigEnv, normalizePath, type UserConfig, type ViteDevServer } from 'vite';
+import {
+  type ConfigEnv,
+  defineConfig,
+  normalizePath,
+  type Plugin,
+  type PluginOption,
+  type UserConfig,
+  type ViteDevServer,
+} from 'vite';
 import { createNetScriptVitePlugin } from './vite.ts';
+
+const assignablePlugin = createNetScriptVitePlugin();
+const pluginContract: Plugin = assignablePlugin;
+const pluginOptionContract: PluginOption = assignablePlugin;
+const defineConfigContract = defineConfig({ plugins: [createNetScriptVitePlugin()] });
+void pluginContract;
+void pluginOptionContract;
+void defineConfigContract;
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) {

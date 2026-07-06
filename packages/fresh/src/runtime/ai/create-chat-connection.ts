@@ -67,7 +67,7 @@ export function resolveChatSessionUrl(
 
 /** Merge NetScript streams auth headers with any per-target correlation headers. */
 export function resolveChatHeaders(target: NetScriptChatSessionTarget): Record<string, string> {
-  return { ...getStreamsAuth(), ...(target.headers ?? {}) };
+  return withIdentityEncoding({ ...getStreamsAuth(), ...(target.headers ?? {}) });
 }
 
 // ---------------------------------------------------------------------------
@@ -573,6 +573,17 @@ function resolveChatStreamSubpath(
 
 function normalizeStreamPath(path: string): string {
   return path.startsWith('/') ? path : `/${path}`;
+}
+
+function withIdentityEncoding(headers: Record<string, string>): Record<string, string> {
+  const normalized = { ...headers };
+  for (const key of Object.keys(normalized)) {
+    if (key.toLowerCase() === 'accept-encoding') {
+      delete normalized[key];
+    }
+  }
+  normalized['accept-encoding'] = 'identity';
+  return normalized;
 }
 
 /**

@@ -101,6 +101,33 @@ export interface NetScriptVitePluginOptions {
   pageModuleRouteBinding?: boolean;
 }
 
+/** Vite config hook shape exposed without leaking Vite's private hook types. */
+export type NetScriptViteConfigHook = (
+  this: unknown,
+  config: unknown,
+  env: unknown,
+) => object | null | void | Promise<object | null | void>;
+
+/** Vite resolve hook shape exposed without leaking Vite's private hook types. */
+export type NetScriptViteResolveIdHook = (
+  this: unknown,
+  source: string,
+  importer?: string,
+  options?: unknown,
+) => string | null | false | void | Promise<string | null | false | void>;
+
+/** Vite build-start hook shape exposed without leaking Vite's private hook types. */
+export type NetScriptViteBuildStartHook = (
+  this: unknown,
+  options?: unknown,
+) => void | Promise<void>;
+
+/** Vite dev-server hook shape exposed without leaking Vite's private hook types. */
+export type NetScriptViteConfigureServerHook = (
+  this: unknown,
+  server: unknown,
+) => void | (() => void) | Promise<void | (() => void)>;
+
 /** Package-owned Vite plugin shape returned by NetScript Fresh. */
 export interface NetScriptVitePlugin {
   /** Vite plugin name. */
@@ -108,13 +135,13 @@ export interface NetScriptVitePlugin {
   /** Vite plugin ordering hint. */
   readonly enforce?: 'pre' | 'post';
   /** Vite config hook used to emit aliases, env values, and SSR/build externalization. */
-  readonly config?: unknown;
+  readonly config?: NetScriptViteConfigHook;
   /** Vite resolve hook used for generated app aliases. */
-  readonly resolveId?: unknown;
+  readonly resolveId?: NetScriptViteResolveIdHook;
   /** Vite build hook used to refresh route manifests. */
-  readonly buildStart?: unknown;
+  readonly buildStart?: NetScriptViteBuildStartHook;
   /** Vite dev-server hook used for route manifest watches. */
-  readonly configureServer?: unknown;
+  readonly configureServer?: NetScriptViteConfigureServerHook;
 }
 
 function dedupe(values: string[]): string[] {
@@ -378,5 +405,5 @@ export function createNetScriptVitePlugin(
     },
   };
 
-  return plugin;
+  return plugin as NetScriptVitePlugin;
 }
