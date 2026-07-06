@@ -411,6 +411,10 @@ Supervisor notes on the drafts below:
 **V2 management-loop addendum (append to body scope):**
 > **Manage (P2, Appwrite loop):** S5 is also the management entry for the plugin capability — (a) a **marketplace-lite "Add plugin" entry**: browse first-party plugins with install state, absent ones teach + can run `netscript plugin add <id>` from the UI (same JSR installer, one generator two callers, confirm + CLI-equivalent); (b) per-plugin **"Scaffold resource" entry point** (template gallery) appearing once #432 lands (beta.7) — hidden/`plugin-gated` until then. Directus's in-app marketplace is the long-term precedent; beta.6 ships only the teach + gated-install affordance.
 
+---
+
+## #421 — DDX-11: Logs panel — **CLOSE**
+
 **Rationale:** DUPLICATE-LEANING (strong). `?follow` NDJSON, level filters, browser-log capture are line-for-line Aspire Structured/Console Logs; no NetScript-specific angle stated. Killed as an owned screen.
 
 **Closure comment (superseded, no PR keyword):**

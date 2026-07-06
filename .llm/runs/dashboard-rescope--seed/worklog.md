@@ -41,3 +41,38 @@ Changes applied across all deliverables:
 - **research.md** — Appendix H gold-conclusions extract (04-baas-admin-console-teardown, 03-competitor-dev-console-teardown) with the non-duplication reconciliation.
 
 Fidelity honesty preserved: S13 ships beta.6 as a correlation-join over the four already-shipped streams (workers SSE, trigger events SSE, saga history, stream deliveries) keyed on stamped `traceparent` — no new instrumentation; DDX-23 is the beta.7 upgrade. Still drafts-only; owner ratifies every GitHub mutation.
+
+## 2026-07-06 — BATCH EXECUTED (owner ratified: "yes to all, proceed")
+
+Owner ratified all decisions D1–D7. The v2 mutation batch was executed in one pass (gh from WSL as
+user `codex`). Decision resolutions folded in: D5 corrected (the `0.0.1-beta.7` milestone already
+existed — #432 + DDX-23 + the mutation co-req assigned to it directly, not created/parked); D6
+resolved by surface check (`@netscript/runtime-config` is read+watch only → S3/DDX-20 ships
+read-only in beta.6, and a 7th co-req issue was filed for the mutation use-cases).
+
+**Batch mechanics:** the ephemeral staged files were re-authored to disk under `batch/` (script +
+26 bodies + 6 comments + MANIFEST), then streamed into the codex native fs via `tar` (the `codex`
+WSL user could not traverse the `bodies/`/`comments/` subdirs over `/mnt/c` — a mount-permission
+issue, not 9p lag; a plain `cp -r` from `/mnt/c` also came back empty). `execute_batch.sh` renders
+bodies into a temp dir, creates the 7 new issues, back-fills their real numbers, aborts on any
+surviving `NUM_*` placeholder, then points every edit at the rendered copy.
+
+**Mutations (32, all verified live):**
+
+- **Closed not-planned (superseded):** #421, #422, #425 — all `CLOSED / NOT_PLANNED`, `wave:v1`
+  removed, milestone cleared, supersession comment posted first, no closing keyword.
+- **New issues (7):** DDX-20 = **#551** (S3 Runtime-Config, beta.6, p1, `area:config`, read-only),
+  DDX-21 = **#552** (S11 Migrations, beta.6, p2), DDX-22 = **#553** (S12 DLQ, Backlog, p2),
+  TriggerDlqPort co-req = **#554** (Backlog), DeadLetterStore co-req = **#555** (Backlog),
+  runtime-config mutation co-req = **#556** (beta.7, p2, `area:config` — the D6 7th issue),
+  DDX-23 seam-event flow plane = **#557** (beta.7, p2).
+- **Rewritten (18 + #432 addendum):** #400 (retitle "…the Aspire/Scalar satellite that drives the
+  framework"), #411, #412, #413, #415, #416, #417, **#418 → "S13: Live Flow — request journey across
+  framework seams" (beta.6, p1)**, #419, #420, #423 (p2→p1), #424 (p2→p1, +area:aspire), #426, #428,
+  #429, #430, #431 (p1→p2), #507 (type:feat→chore, milestone beta.6); #432 addendum + milestone
+  0.0.1-beta.7.
+- **Comments:** #408, #427 (tightening non-goals), #418 (S13 rewrite notice).
+- **Label:** `area:queue` created (D2). **Follow-up NOT done:** one-line `.github/labels.yml` sync
+  commit (kept off the design branch).
+
+**Not run:** Step 5 Claude Design lane — the supervisor session runs it next.

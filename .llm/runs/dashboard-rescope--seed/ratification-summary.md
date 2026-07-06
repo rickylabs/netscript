@@ -1,6 +1,16 @@
 # Dev Dashboard Rescope — Owner Ratification Batch (v2)
 
-Run: `dashboard-rescope--seed` · 2026-07-06, **amended same day (v2)** per owner feedback: restore the two seed-research pillars v1 dropped — Appwrite-style manage-through-UI and Encore-model seam-flow telemetry. **Nothing below has been executed.** This is the complete, ordered GitHub mutation batch; on owner approval it runs in one pass (gh from WSL, all bodies via `--body-file /mnt/c/...`, bodies extracted from `issues-rescope.md` / `epic-rewrite.md`).
+> **✅ EXECUTED 2026-07-06** — owner ratified "yes to all, proceed" (D1–D7). All 32 mutations landed
+> and were verified live. New issues: DDX-20 **#551**, DDX-21 **#552**, DDX-22 **#553**,
+> TriggerDlqPort **#554**, DeadLetterStore **#555**, runtime-config mutation co-req **#556** (D6 7th
+> issue), DDX-23 **#557**. Closed: #421/#422/#425 (not planned / superseded). `area:queue` label
+> created. Decision corrections applied: **D5** — the `0.0.1-beta.7` milestone already existed, so
+> #432/#556/#557 were assigned to it directly (not created/parked); **D6** — runtime-config is
+> read+watch only, so S3/DDX-20 ships read-only in beta.6 with write-back gated behind #556. See
+> `worklog.md` "BATCH EXECUTED" for the full mutation list. Follow-up NOT in this batch: `.github/labels.yml`
+> `area:queue` sync commit; the Claude Design lane (Step 5).
+
+Run: `dashboard-rescope--seed` · 2026-07-06, **amended same day (v2)** per owner feedback: restore the two seed-research pillars v1 dropped — Appwrite-style manage-through-UI and Encore-model seam-flow telemetry. This is the complete, ordered GitHub mutation batch; it ran in one pass (gh from WSL, bodies extracted from `issues-rescope.md` / `epic-rewrite.md`).
 
 ## Decision summary (what you are ratifying)
 
