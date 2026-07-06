@@ -23,3 +23,10 @@ Baseline before work: scoped check clean (61 files), `deno doc --lint` full expo
 - `deno.json`: added `./otel`/`./query`/`./testing`, repointed `./registry`→`registry.ts`, expanded `check` task.
 - `packages/cli/.../workspace-mutator.ts` rewrite-map: added root `@netscript/telemetry` + `/orpc`,`/otel`,`/query`,`/registry`,`/testing`.
 - Evidence: scoped check clean (70 files); `deno doc --lint` full 11-entrypoint export set clean; `deno publish --dry-run` Success; telemetry 20/20 tests + cli mutator 9/9 pass; fmt clean. No new `as`/`any` casts.
+
+## Slice 3 — env config Standard-Schema validation + diagnostics enrichment
+- `src/config/schema.ts`: `telemetryConfigSchema` (StandardSchemaV1-conformant, hand-rolled, cast-free via `Reflect.get` narrowing + reconstruction) validating endpoint-is-URL-when-present and non-empty required strings; `validateTelemetryConfig(config)` throwing `TelemetryConfigError` on issues.
+- Wired `getTelemetryConfig()` to run validation (fails fast on malformed `OTEL_EXPORTER_OTLP_ENDPOINT`); exact prior behavior preserved for valid env (existing config_test still green). Added reject-path test.
+- Enriched the previously-stubbed `inspectTelemetry` string branch to classify path vs label and surface value/empty details.
+- `deno.json` imports: added `@standard-schema/spec@1.1.0` (1-line, minimal `deno.lock` addition — the dep is already used repo-wide; not re-resolution churn).
+- Evidence: scoped check clean (72 files); doc-lint full export set clean (fixed a private-type-ref by typing the public `issues` field as `StandardSchemaV1.Issue`); telemetry 21/21 tests pass; publish dry-run Success; fmt clean. No new `as`/`any` casts.

@@ -4,4 +4,5 @@
 
 export * from './constants.ts';
 export * from './environment.ts';
+export * from './schema.ts';
 export * from './singleton.ts';

@@ -1,5 +1,10 @@
-import { assertEquals } from '@std/assert';
-import { describeTelemetryConfig, getTelemetryConfig, resetConfig } from '../../config.ts';
+import { assertEquals, assertThrows } from '@std/assert';
+import {
+  describeTelemetryConfig,
+  getTelemetryConfig,
+  resetConfig,
+  TelemetryConfigError,
+} from '../../config.ts';
 
 Deno.test('getTelemetryConfig reads OTEL environment values', () => {
   Deno.env.set('OTEL_DENO', 'true');
@@ -37,6 +42,22 @@ Deno.test('getTelemetryConfig reads OTEL environment values', () => {
     Deno.env.delete('OTEL_RESOURCE_ATTRIBUTES');
     Deno.env.delete('OTEL_TRACES_SAMPLER');
     Deno.env.delete('OTEL_LOG_LEVEL');
+    resetConfig();
+  }
+});
+
+Deno.test('getTelemetryConfig rejects a malformed OTLP endpoint', () => {
+  Deno.env.set('OTEL_EXPORTER_OTLP_ENDPOINT', 'not a url');
+
+  try {
+    resetConfig();
+    assertThrows(
+      () => getTelemetryConfig(),
+      TelemetryConfigError,
+      'endpoint must be a valid URL',
+    );
+  } finally {
+    Deno.env.delete('OTEL_EXPORTER_OTLP_ENDPOINT');
     resetConfig();
   }
 });

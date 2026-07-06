@@ -22,11 +22,19 @@ export function inspectTelemetry(
   target: string | InstrumentationRegistry | Record<string, unknown>,
 ): InspectionReport {
   if (typeof target === 'string') {
+    const looksLikePath = target.includes('/') || target.includes('\\');
+    const kind = looksLikePath ? 'path' : 'label';
     return {
       package: '@netscript/telemetry',
       target,
-      summary: 'Telemetry path inspection target',
-      details: { kind: 'path' },
+      summary: looksLikePath
+        ? 'Telemetry path inspection target'
+        : 'Telemetry label inspection target',
+      details: {
+        kind,
+        value: target,
+        empty: target.length === 0,
+      },
     };
   }
 
