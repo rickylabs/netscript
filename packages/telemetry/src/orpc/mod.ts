@@ -3,7 +3,7 @@
  */
 
 export * from './_types.ts';
-export type { Span } from '../core/mod.ts';
+export type { Span } from '../application/mod.ts';
 export { createTracingPlugin, TracingPlugin, type TracingPluginOptions } from './tracing-plugin.ts';
 export {
   createErrorHandlingPlugin,

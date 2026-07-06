@@ -6,7 +6,7 @@ import {
   type SpanOptions,
   SpanStatusCode,
   type Tracer,
-} from './types.ts';
+} from '../domain/types.ts';
 
 /**
  * Create a span from the supplied tracer and parent context options.

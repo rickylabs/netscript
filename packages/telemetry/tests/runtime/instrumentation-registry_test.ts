@@ -1,5 +1,8 @@
 import { assertEquals, assertInstanceOf } from '@std/assert';
-import { DuplicateInstrumentationError, InstrumentationRegistry } from '../../src/runtime/mod.ts';
+import {
+  DuplicateInstrumentationError,
+  InstrumentationRegistry,
+} from '../../src/application/registry/mod.ts';
 
 Deno.test('InstrumentationRegistry resolves registrations in insertion order', () => {
   const registry = new InstrumentationRegistry();

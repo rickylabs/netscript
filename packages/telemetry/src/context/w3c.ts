@@ -5,7 +5,7 @@ import {
   type TextMapSetter,
   trace,
 } from '@opentelemetry/api';
-import type { Context, Span, SpanContext } from '../core/mod.ts';
+import type { Context, Span, SpanContext } from '../application/mod.ts';
 import type { ParsedTraceparent, PropagationHeaders, SerializedTraceContext } from './types.ts';
 
 const TRACEPARENT_HEADER = 'traceparent';

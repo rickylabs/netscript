@@ -77,9 +77,35 @@ await withSpan(
 - **oRPC tracing**: `createTracingPlugin` and `createErrorHandlingPlugin` (via
   `@netscript/telemetry/orpc`) instrument the NetScript oRPC handler with handler-scoped trace
   context.
+- **Provider adapters**: `@netscript/telemetry/otel` exposes the `TracerProviderPort` plus the
+  Deno-native `OtelDenoTracerProvider` (default) and the opt-in `OtelSdkTracerProvider` scaffold.
+- **Query read-model**: `@netscript/telemetry/query` publishes the `TelemetryQuery` contract and
+  read-side `TelemetrySpan`/`TelemetryTrace`/`TelemetryLog`/`TelemetryResource` types
+  (`createTelemetryQuery` reader lands in a later slice).
+- **Test double**: `@netscript/telemetry/testing` provides `InMemorySpanRecorder`, a `Tracer`
+  implementation that records spans in memory for unit assertions.
+- **Config validation**: `getTelemetryConfig` validates the resolved configuration with a Standard
+  Schema (`telemetryConfigSchema`), failing fast with `TelemetryConfigError` on a malformed OTLP
+  endpoint.
 - **Telemetry convention**: TC-1..TC-14 defines span naming, SpanKind, status, W3C propagation,
   `netscript.*` attribute namespacing, the beta.5 deprecated-alias `dup` window, and the required
   `OTEL_SEMCONV_STABILITY_OPT_IN=messaging,rpc,gen_ai_latest_experimental` value.
+
+### Subpaths
+
+| Subpath                              | Purpose                                            |
+| ------------------------------------ | -------------------------------------------------- |
+| `@netscript/telemetry`               | Primary tracing surface + registry + diagnostics   |
+| `@netscript/telemetry/tracer`        | Domain tracers and span helpers                    |
+| `@netscript/telemetry/config`        | Env-driven configuration + Standard Schema          |
+| `@netscript/telemetry/context`       | W3C context propagation                            |
+| `@netscript/telemetry/attributes`    | `netscript.*` attribute builders                   |
+| `@netscript/telemetry/instrumentation` | Queue/worker/scheduler instrumentation            |
+| `@netscript/telemetry/registry`      | Instrumentation registry facade                    |
+| `@netscript/telemetry/orpc`          | oRPC tracing/error plugins                         |
+| `@netscript/telemetry/otel`          | Provider ports + OpenTelemetry adapters            |
+| `@netscript/telemetry/query`         | Read-model contracts for querying telemetry        |
+| `@netscript/telemetry/testing`       | In-memory span recorder for tests                  |
 
 ### Attribute Convention
 

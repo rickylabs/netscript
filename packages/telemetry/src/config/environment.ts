@@ -4,6 +4,7 @@ import {
   type TelemetryConfig,
   type TelemetryConfigDescription,
 } from './constants.ts';
+import { validateTelemetryConfig } from './schema.ts';
 
 function parseResourceAttributes(value: string | undefined): Record<string, string> {
   if (!value) {
@@ -31,6 +32,13 @@ function getEnv(name: string): string | undefined {
 
 /**
  * Resolve telemetry configuration from OpenTelemetry environment variables.
+ *
+ * The resolved configuration is validated with {@linkcode telemetryConfigSchema}
+ * via {@linkcode validateTelemetryConfig}, so a malformed `OTEL_EXPORTER_OTLP_ENDPOINT`
+ * fails fast with a {@linkcode TelemetryConfigError} rather than propagating a
+ * bad endpoint into exporters.
+ *
+ * @throws {TelemetryConfigError} When the resolved configuration is invalid.
  */
 export function getTelemetryConfig(): TelemetryConfig {
   const enabled = getEnv(OTEL_ENV_VARS.OTEL_DENO) === 'true';
@@ -46,7 +54,7 @@ export function getTelemetryConfig(): TelemetryConfig {
   const sampler = getEnv(OTEL_ENV_VARS.OTEL_TRACES_SAMPLER) ?? 'parentbased_always_on';
   const debug = getEnv(OTEL_ENV_VARS.OTEL_LOG_LEVEL) === 'debug';
 
-  return {
+  return validateTelemetryConfig({
     enabled,
     endpoint,
     protocol,
@@ -56,7 +64,7 @@ export function getTelemetryConfig(): TelemetryConfig {
     resourceAttributes,
     sampler,
     debug,
-  };
+  });
 }
 
 /**

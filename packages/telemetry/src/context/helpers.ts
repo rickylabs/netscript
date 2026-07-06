@@ -1,5 +1,5 @@
 import { context, type Span as OtelSpan, trace } from '@opentelemetry/api';
-import type { Context, Span } from '../core/mod.ts';
+import type { Context, Span } from '../application/mod.ts';
 
 function assertOtelSpan(span: Span): asserts span is Span & OtelSpan {
   if (span === null || typeof span !== 'object') {

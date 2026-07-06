@@ -1,4 +1,4 @@
-import type { Context } from '../core/mod.ts';
+import type { Context } from '../application/mod.ts';
 import { extractContext, extractFromTraceContext, resolveTraceContext } from './w3c.ts';
 import type { JobTraceEnv, PropagationHeaders, SerializedTraceContext } from './types.ts';
 
