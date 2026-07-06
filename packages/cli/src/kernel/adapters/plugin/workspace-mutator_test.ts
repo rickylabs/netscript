@@ -4,7 +4,7 @@
  * Focused regression tests for plugin workspace mutations.
  */
 
-import { assertEquals } from 'jsr:@std/assert@^1';
+import { assert, assertEquals } from 'jsr:@std/assert@^1';
 import { MemoryFileSystemAdapter } from '../scaffold/memory-fs.ts';
 import { PluginWorkspaceMutator } from './workspace-mutator.ts';
 import type { PluginKindProvider } from '../../domain/plugin-kind.ts';
@@ -436,4 +436,50 @@ Deno.test('PluginWorkspaceMutator registers generated plugin glue entrypoints', 
 
   const config = await fs.readFile('/project/netscript.config.ts');
   assertEquals(config.includes("'./workers/mod.ts'"), true);
+});
+
+Deno.test('PluginWorkspaceMutator rewrite map covers every @netscript/telemetry export subpath', async () => {
+  // Resolve the real telemetry manifest relative to the worktree repo root so
+  // this guard fails when either the export map or the rewrite map drifts.
+  const telemetryDenoJsonUrl = new URL(
+    '../../../../../../packages/telemetry/deno.json',
+    import.meta.url,
+  );
+  const telemetryDenoJson = JSON.parse(
+    await Deno.readTextFile(telemetryDenoJsonUrl),
+  ) as { exports: Record<string, string> };
+  const exportKeys = Object.keys(telemetryDenoJson.exports ?? {});
+  assert(
+    exportKeys.length > 0,
+    'telemetry deno.json must declare an exports map',
+  );
+
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile(
+    '/project/deno.json',
+    JSON.stringify({ workspace: ['./plugins/*'], imports: {} }, null, 2) + '\n',
+  );
+
+  await new PluginWorkspaceMutator(fs).ensureRootImportsForPluginKind(
+    '/project',
+    'worker',
+  );
+
+  const config = JSON.parse(await fs.readFile('/project/deno.json')) as {
+    imports: Record<string, string>;
+  };
+
+  for (const exportKey of exportKeys) {
+    const subpath = exportKey === '.' ? '' : exportKey.slice(1);
+    const specifier = `@netscript/telemetry${subpath}`;
+    const expected = subpath === ''
+      ? netscriptJsrSpecifier('telemetry')
+      : netscriptJsrSpecifier('telemetry', subpath);
+    assertEquals(
+      config.imports[specifier],
+      expected,
+      `workspace-mutator rewrite map is missing an entry for "${specifier}" ` +
+        `(telemetry export "${exportKey}").`,
+    );
+  }
 });
