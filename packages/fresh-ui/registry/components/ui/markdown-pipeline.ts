@@ -226,6 +226,76 @@ export function stripIncompleteSyntax(chunk: string): string {
   return text;
 }
 
+/** Minimal hast node shape touched by {@link rehypeInlineStyles}. */
+export interface HastNode {
+  /** Node type (e.g. `element`, `text`, `root`). */
+  type: string;
+  /** Element tag name, present on `element` nodes. */
+  tagName?: string;
+  /** Element properties, present on `element` nodes. */
+  properties?: Record<string, unknown>;
+  /** Child nodes, present on parent nodes. */
+  children?: HastNode[];
+}
+
+/** A unified transformer over a hast tree. */
+export type HastTransformer = (tree: HastNode) => void;
+
+/**
+ * Parses an inline `style` attribute string into a camelCased declaration
+ * object (`react`/Preact style-prop shape). Custom properties (`--x`) keep
+ * their literal name. Malformed declarations are skipped, never thrown.
+ * @param style - The raw inline CSS declaration list.
+ * @returns The camelCased property/value map.
+ * @example
+ * ```ts
+ * parseStyleDeclarations('height:0.81em;margin-left:-0.05em');
+ * // -> { height: '0.81em', marginLeft: '-0.05em' }
+ * ```
+ */
+export function parseStyleDeclarations(style: string): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const declaration of style.split(';')) {
+    const colon = declaration.indexOf(':');
+    if (colon === -1) continue;
+    const property = declaration.slice(0, colon).trim();
+    const value = declaration.slice(colon + 1).trim();
+    if (!property || !value) continue;
+    const key = property.startsWith('--')
+      ? property
+      : property.replace(/-+([a-z])/g, (_, ch: string) => ch.toUpperCase());
+    out[key] = value;
+  }
+  return out;
+}
+
+/**
+ * A rehype plugin that replaces string `style` properties with parsed style
+ * OBJECTS. `hast-util-to-jsx-runtime` (inside `react-markdown`) parses string
+ * styles through the CJS-only `style-to-js` package; under ESM-first graphs
+ * (Deno + Vite) that default-import interop can fail, and react-markdown's
+ * `ignoreInvalidStyle` then silently DROPS every inline style — which
+ * visibly breaks KaTeX vertical layout (struts/vlists collapse). Object
+ * values are passed through untouched by the runtime, so pre-parsing here
+ * makes rendering bundler-independent. Run this AFTER `rehype-sanitize`
+ * (sanitize expects string attribute values).
+ * @returns The hast transformer.
+ * @example
+ * ```ts
+ * const transform = rehypeInlineStyles();
+ * transform({ type: 'root', children: [] });
+ * ```
+ */
+export function rehypeInlineStyles(): HastTransformer {
+  const walk = (node: HastNode): void => {
+    if (node.properties && typeof node.properties.style === 'string') {
+      node.properties.style = parseStyleDeclarations(node.properties.style);
+    }
+    if (node.children) { for (const child of node.children) walk(child); }
+  };
+  return walk;
+}
+
 /**
  * Extends a base `rehype-sanitize` schema so the MANDATORY final sanitize pass
  * keeps citation chips, KaTeX math markup, and highlight.js class output while
@@ -255,6 +325,9 @@ export function extendSanitizeSchema(base: SanitizeSchema): SanitizeSchema {
       'className',
       'class',
       'style',
+      // hast property name is camelCase; keep the attribute form too so the
+      // schema works regardless of how the tree was produced.
+      'ariaHidden',
       'aria-hidden',
     ]),
   ];

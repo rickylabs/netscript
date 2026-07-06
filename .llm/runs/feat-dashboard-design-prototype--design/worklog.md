@@ -220,3 +220,15 @@ IMPL-EVAL trigger posted (comment 4893731617). Issue #509 updated with remaining
 react-markdown→preact-jsx-runtime follow-up (comment 4893735680). Merge = owner (post-compaction
 grant rule). Reconciliation plan (post-merge): rebase → `design:sync build` → delete
 `HOST_ENV_RULES` → re-shoot sentinels → re-upload closure.
+
+## Owner-review pixel fixups (2026-07-06, supervisor-inline by owner grant)
+
+Owner flagged 4 defects on the rendered canvas; fixed inline on `feat/fresh-ui-pixel-polish`
+(`36d5dac9`, PR #547 comment 4894117635), verified via the render gate (re-shoot of all 4 cards):
+FilterForm.Actions card inset (button/border collision), ns-page-header column stack + status-bar
+margin (meta rhythm), ns-btn--icon gap:0 (sr-only span inherited flex gap → glyph ~4px off center),
+PromptInput toolbar recomposed into tools/actions groups + stroke-SVG icons (was wrap-stranded text
+glyphs). Scoped check/lint/fmt 124 files clean; gen:assets-barrel regenerated. Overlay refreshed by
+file copy; design:sync build PASS; canvas upload plan_ec262e10d4ad451f_5cfa4226a0cd
+(_ns_runtime.js, _ns_styles.css, PromptInput.tsx/prompt.md). Owner cancelled #509 pass 2 — design
+accepted as solid.

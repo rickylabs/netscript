@@ -27,7 +27,12 @@ import rehypeKatex from 'rehype-katex';
 import rehypeHighlight from 'rehype-highlight';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import { CitationChip } from './citation-chip.tsx';
-import { extendSanitizeSchema, remarkCitations, stripIncompleteSyntax } from './markdown-pipeline.ts';
+import {
+  extendSanitizeSchema,
+  rehypeInlineStyles,
+  remarkCitations,
+  stripIncompleteSyntax,
+} from './markdown-pipeline.ts';
 
 /** Sanitize schema is built once: citation chips + KaTeX + hljs allowed, scripts never. */
 const SANITIZE_SCHEMA = extendSanitizeSchema(defaultSchema);
@@ -37,11 +42,18 @@ const REMARK_PLUGINS = [remarkGfm, remarkMath, remarkCitations];
 
 /**
  * Rehype pipeline. Order is load-bearing: math + highlight transform the tree,
- * then `rehype-sanitize` runs LAST and unconditionally. It is never exposed as a
- * caller-toggled option, so model-authored `<script>` / event-handler HTML can
- * never survive to the DOM.
+ * then `rehype-sanitize` runs LAST among content transforms and unconditionally.
+ * It is never exposed as a caller-toggled option, so model-authored `<script>` /
+ * event-handler HTML can never survive to the DOM. `rehypeInlineStyles` follows
+ * only to re-shape already-sanitized `style` strings into objects (it adds no
+ * new content), keeping KaTeX layout intact under ESM-first bundler graphs.
  */
-const REHYPE_PLUGINS = [rehypeKatex, rehypeHighlight, [rehypeSanitize, SANITIZE_SCHEMA]];
+const REHYPE_PLUGINS = [
+  rehypeKatex,
+  rehypeHighlight,
+  [rehypeSanitize, SANITIZE_SCHEMA],
+  rehypeInlineStyles,
+];
 
 /** Props for the {@link Markdown} renderer. */
 export interface MarkdownProps {

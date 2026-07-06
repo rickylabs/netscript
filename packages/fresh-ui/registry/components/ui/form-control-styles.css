@@ -5,7 +5,7 @@
   font-family: var(--ns-font-sans);
   font-size: var(--ns-text-sm);
   color: var(--ns-fg);
-  background: var(--ns-surface);
+  background: var(--ns-card);
   border: 1px solid var(--ns-input-border);
   border-radius: var(--ns-radius-md);
   padding: var(--ns-space-2) var(--ns-space-3);
@@ -29,6 +29,18 @@
   outline: none;
   border-color: var(--ns-ring);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--ns-ring) 15%, transparent);
+}
+
+/* Disabled: sunken muted fill, quiet text, no hover/focus affordances.
+   Declared after :hover so the specificity tie resolves to disabled. */
+.ns-input:disabled,
+.ns-select:disabled,
+.ns-textarea:disabled {
+  color: var(--ns-muted-fg);
+  background: var(--ns-muted);
+  border-color: var(--ns-border);
+  box-shadow: none;
+  cursor: not-allowed;
 }
 
 .ns-input--error,

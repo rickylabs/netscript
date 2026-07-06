@@ -18,12 +18,12 @@ export function EmptyState(
     <div
       {...props}
       class={cn(
-        'rounded-md border border-dashed border-ns-border px-4 py-4 text-sm text-ns-muted-fg',
+        'ns-empty-state',
         heading ? 'ns-stack ns-stack--xs' : undefined,
         className,
       )}
     >
-      {heading && <p class='font-semibold text-ns-fg'>{heading}</p>}
+      {heading && <p class='ns-empty-state__heading'>{heading}</p>}
       <div>{children}</div>
     </div>
   );

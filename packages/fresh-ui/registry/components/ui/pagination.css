@@ -1,0 +1,14 @@
+/* Pagination block styles. */
+
+.ns-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ns-space-3);
+}
+
+.ns-pagination__meta {
+  font-size: var(--ns-text-sm);
+  color: var(--ns-muted-fg);
+}

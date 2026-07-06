@@ -1,0 +1,14 @@
+/* EmptyState block styles. */
+
+.ns-empty-state {
+  border: 1px dashed var(--ns-border);
+  border-radius: var(--ns-radius-md);
+  padding: var(--ns-space-4);
+  font-size: var(--ns-text-sm);
+  color: var(--ns-muted-fg);
+}
+
+.ns-empty-state__heading {
+  font-weight: 600;
+  color: var(--ns-fg);
+}
