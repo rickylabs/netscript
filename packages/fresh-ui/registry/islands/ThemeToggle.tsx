@@ -13,9 +13,21 @@ type ThemeMode = 'dark' | 'light';
 
 const STORAGE_KEY = 'ns-theme';
 
+/**
+ * Resolves the initial theme without side effects. Order of authority:
+ * an explicit `data-theme` already stamped by the host document, a stored
+ * user preference, then the OS preference. Tokens are light-by-default,
+ * so light is the fallback.
+ */
 function getInitialTheme(): ThemeMode {
   if (typeof document === 'undefined') {
-    return 'dark';
+    return 'light';
+  }
+
+  const stamped = document.documentElement.getAttribute('data-theme');
+
+  if (stamped === 'light' || stamped === 'dark') {
+    return stamped;
   }
 
   const stored = localStorage.getItem(STORAGE_KEY);
@@ -24,36 +36,34 @@ function getInitialTheme(): ThemeMode {
     return stored;
   }
 
-  return globalThis.matchMedia?.('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-}
-
-function applyTheme(theme: ThemeMode) {
-  document.documentElement.setAttribute('data-theme', theme);
-  localStorage.setItem(STORAGE_KEY, theme);
+  return globalThis.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
 /**
- * Switches the active document theme and persists the selection locally.
+ * Switches the active document theme and persists explicit selections.
  * @returns A hydrated button that flips the `data-theme` attribute.
  */
 export default function ThemeToggle(): VNode {
   const theme = useSignal<ThemeMode>(getInitialTheme());
 
   useEffect(() => {
-    applyTheme(theme.value);
+    // Reflect the resolved theme on the document, but never persist it:
+    // only an explicit user toggle writes to storage.
+    document.documentElement.setAttribute('data-theme', theme.value);
   }, []);
 
   const toggle = () => {
     const next = theme.value === 'dark' ? 'light' : 'dark';
     theme.value = next;
-    applyTheme(next);
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem(STORAGE_KEY, next);
   };
 
   return (
     <button
       type='button'
       onClick={toggle}
-      class='inline-flex h-9 w-9 items-center justify-center rounded-md border border-ns-border bg-transparent text-ns-muted-fg transition-colors duration-150 hover:border-ns-border-hover hover:bg-ns-surface-raised hover:text-ns-fg'
+      class='ns-theme-toggle'
       aria-label={`Switch to ${theme.value === 'dark' ? 'light' : 'dark'} mode`}
       title={`Switch to ${theme.value === 'dark' ? 'light' : 'dark'} mode`}
     >

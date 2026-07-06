@@ -110,7 +110,7 @@ export function SidebarShell(
 
       <aside class='ns-dashboard__sidebar' data-sidebar>
         <div class='ns-dashboard__sidebar-header'>
-          <div class='flex min-w-0 items-center gap-3'>
+          <div class='ns-dashboard__brand-group'>
             {brand}
           </div>
           {brandBadge}
@@ -134,10 +134,10 @@ export function SidebarShell(
 
       <div class='ns-dashboard__main'>
         <header class='ns-dashboard__topbar'>
-          <div class='flex min-w-0 items-center gap-3'>
+          <div class='ns-dashboard__topbar-start'>
             {topbarStart}
           </div>
-          <div class='flex items-center gap-2'>
+          <div class='ns-dashboard__topbar-end'>
             {topbarEnd}
           </div>
         </header>

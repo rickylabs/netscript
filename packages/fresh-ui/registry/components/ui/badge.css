@@ -11,6 +11,9 @@
   padding: var(--ns-space-0-5) var(--ns-space-2);
   border-radius: var(--ns-radius-sm);
   white-space: nowrap;
+  /* Keep the pill hugging its content when it lands in a stretching flex
+     column or grid cell instead of growing into a full-width bar. */
+  width: fit-content;
 }
 
 .ns-badge--primary {

@@ -1,0 +1,18 @@
+/* FilterForm block styles. Combines with .ns-card / .ns-card__body. */
+
+.ns-filter-form__body {
+  display: grid;
+  gap: var(--ns-space-4);
+}
+
+.ns-filter-form__actions {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--ns-space-2);
+}
+
+@media (min-width: 80rem) {
+  .ns-filter-form__actions {
+    justify-content: flex-end;
+  }
+}

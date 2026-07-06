@@ -30,25 +30,19 @@ type DataTableComponent = ((props: DataTableProps) => VNode) & {
 };
 
 function DataTableRoot({ children, class: className, ...props }: DataTableProps): VNode {
-  return <Card {...props} class={cn('overflow-hidden', className)}>{children}</Card>;
+  return <Card {...props} class={cn('ns-data-table', className)}>{children}</Card>;
 }
 
 function DataTableHeader({ children, class: className, ...props }: DataTableSectionProps): VNode {
   return (
-    <Card.Header
-      {...props}
-      class={cn(
-        'flex-col items-start gap-3 sm:flex-row sm:items-end sm:justify-between',
-        className,
-      )}
-    >
+    <Card.Header {...props} class={cn('ns-data-table__header', className)}>
       {children}
     </Card.Header>
   );
 }
 
 function DataTableBody({ children, class: className, ...props }: DataTableSectionProps): VNode {
-  return <div {...props} class={cn('divide-y divide-ns-border', className)}>{children}</div>;
+  return <div {...props} class={cn('ns-data-table__body', className)}>{children}</div>;
 }
 
 function DataTableRow(
@@ -58,7 +52,7 @@ function DataTableRow(
     ? { ...(style && typeof style === 'object' ? style : null), gridTemplateColumns: cols }
     : style;
   return (
-    <div {...props} style={gridStyle} class={cn('grid gap-4 px-5 py-4', className)}>
+    <div {...props} style={gridStyle} class={cn('ns-data-table__row', className)}>
       {children}
     </div>
   );
@@ -66,10 +60,7 @@ function DataTableRow(
 
 function DataTableFooter({ children, class: className, ...props }: DataTableSectionProps): VNode {
   return (
-    <div
-      {...props}
-      class={cn('border-t border-ns-border px-5 py-4', className)}
-    >
+    <div {...props} class={cn('ns-data-table__footer', className)}>
       {children}
     </div>
   );

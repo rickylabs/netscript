@@ -24,20 +24,18 @@ function PageHeaderRoot({ children, class: className, ...props }: PageHeaderSect
 
 function PageHeaderLayout({ children, class: className, ...props }: PageHeaderSectionProps): VNode {
   return (
-    <div
-      {...props}
-      class={cn(
-        'grid gap-6 xl:grid-cols-[minmax(0,1.4fr)_360px] xl:items-start',
-        className,
-      )}
-    >
+    <div {...props} class={cn('ns-page-header__layout', className)}>
       {children}
     </div>
   );
 }
 
 function PageHeaderMain({ children, class: className, ...props }: PageHeaderSectionProps): VNode {
-  return <div {...props} class={cn('ns-stack ns-stack--md min-w-0', className)}>{children}</div>;
+  return (
+    <div {...props} class={cn('ns-stack ns-stack--md ns-page-header__main', className)}>
+      {children}
+    </div>
+  );
 }
 
 function PageHeaderAside({ children, class: className, ...props }: PageHeaderSectionProps): VNode {
@@ -49,7 +47,11 @@ function PageHeaderBadges({ children, class: className, ...props }: PageHeaderSe
 }
 
 function PageHeaderIntro({ children, class: className, ...props }: PageHeaderSectionProps): VNode {
-  return <div {...props} class={cn('ns-stack ns-stack--sm min-w-0', className)}>{children}</div>;
+  return (
+    <div {...props} class={cn('ns-stack ns-stack--sm ns-page-header__intro', className)}>
+      {children}
+    </div>
+  );
 }
 
 function PageHeaderActions(
@@ -59,7 +61,7 @@ function PageHeaderActions(
 }
 
 function PageHeaderStatus({ children, class: className, ...props }: PageHeaderSectionProps): VNode {
-  return <div {...props} class={cn('ns-status-bar flex-wrap', className)}>{children}</div>;
+  return <div {...props} class={cn('ns-status-bar', className)}>{children}</div>;
 }
 
 /**

@@ -1,0 +1,19 @@
+/* PageHeader block styles (structure for the seams; the shell rhythm of
+   .ns-page-header itself lives in layouts.css). */
+
+.ns-page-header__layout {
+  display: grid;
+  gap: var(--ns-space-6);
+}
+
+@media (min-width: 80rem) {
+  .ns-page-header__layout {
+    grid-template-columns: minmax(0, 1.4fr) 360px;
+    align-items: start;
+  }
+}
+
+.ns-page-header__main,
+.ns-page-header__intro {
+  min-width: 0;
+}

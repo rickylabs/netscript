@@ -30,7 +30,7 @@ type StatsGridComponent = ((props: StatsGridProps) => VNode) & {
 
 function StatsGridRoot({ children, class: className, ...props }: StatsGridProps): VNode {
   return (
-    <div {...props} class={cn('grid gap-4 md:grid-cols-2 xl:grid-cols-4', className)}>
+    <div {...props} class={cn('ns-stats-grid', className)}>
       {children}
     </div>
   );
@@ -40,16 +40,14 @@ function StatsGridCard(
   { label, value, detail, badge, class: className, ...props }: StatsCardProps,
 ): VNode {
   return (
-    <Card {...props} class={cn('overflow-hidden', className)}>
-      <Card.Body class='ns-stack ns-stack--sm min-w-0'>
-        <div class='ns-cluster ns-cluster--between gap-3'>
-          <span class='text-[0.7rem] font-mono uppercase tracking-[0.18em] text-ns-muted-fg'>
-            {label}
-          </span>
+    <Card {...props} class={cn('ns-stats-grid__card', className)}>
+      <Card.Body class='ns-stack ns-stack--sm ns-stats-grid__body'>
+        <div class='ns-stats-grid__header'>
+          <span class='ns-stats-grid__label'>{label}</span>
           {badge}
         </div>
-        <p class='text-3xl font-semibold tracking-tight tabular-nums text-ns-fg'>{value}</p>
-        {detail && <p class='text-sm leading-relaxed text-ns-muted-fg'>{detail}</p>}
+        <p class='ns-stats-grid__value'>{value}</p>
+        {detail && <p class='ns-stats-grid__detail'>{detail}</p>}
       </Card.Body>
     </Card>
   );

@@ -904,11 +904,18 @@ export const freshUiRegistryManifest: RegistryManifest = {
       copyOwnership: 'app-owned-after-copy',
       author: 'NetScript',
       tags: ['layout', 'header', 'block'],
-      files: [{
-        source: 'registry/components/ui/page-header.tsx',
-        target: '@ui/page-header.tsx',
-      }],
+      files: [
+        {
+          source: 'registry/components/ui/page-header.tsx',
+          target: '@ui/page-header.tsx',
+        },
+        {
+          source: 'registry/components/ui/page-header.css',
+          target: '@assets/ui/page-header.css',
+        },
+      ],
       registryDependencies: ['theme-seed', 'layout-objects'],
+      css: [{ layer: 'components', content: "@import './ui/page-header.css';" }],
     },
     {
       name: 'filter-form',
@@ -919,11 +926,18 @@ export const freshUiRegistryManifest: RegistryManifest = {
       copyOwnership: 'app-owned-after-copy',
       author: 'NetScript',
       tags: ['forms', 'filters', 'block'],
-      files: [{
-        source: 'registry/components/ui/filter-form.tsx',
-        target: '@ui/filter-form.tsx',
-      }],
+      files: [
+        {
+          source: 'registry/components/ui/filter-form.tsx',
+          target: '@ui/filter-form.tsx',
+        },
+        {
+          source: 'registry/components/ui/filter-form.css',
+          target: '@assets/ui/filter-form.css',
+        },
+      ],
       registryDependencies: ['theme-seed', 'card'],
+      css: [{ layer: 'components', content: "@import './ui/filter-form.css';" }],
     },
     {
       name: 'stats-grid',
@@ -934,11 +948,18 @@ export const freshUiRegistryManifest: RegistryManifest = {
       copyOwnership: 'app-owned-after-copy',
       author: 'NetScript',
       tags: ['stats', 'dashboard', 'block'],
-      files: [{
-        source: 'registry/components/ui/stats-grid.tsx',
-        target: '@ui/stats-grid.tsx',
-      }],
+      files: [
+        {
+          source: 'registry/components/ui/stats-grid.tsx',
+          target: '@ui/stats-grid.tsx',
+        },
+        {
+          source: 'registry/components/ui/stats-grid.css',
+          target: '@assets/ui/stats-grid.css',
+        },
+      ],
       registryDependencies: ['theme-seed', 'layout-objects', 'card'],
+      css: [{ layer: 'components', content: "@import './ui/stats-grid.css';" }],
     },
     {
       name: 'detail-layout',
@@ -949,11 +970,18 @@ export const freshUiRegistryManifest: RegistryManifest = {
       copyOwnership: 'app-owned-after-copy',
       author: 'NetScript',
       tags: ['detail', 'layout', 'block'],
-      files: [{
-        source: 'registry/components/ui/detail-layout.tsx',
-        target: '@ui/detail-layout.tsx',
-      }],
+      files: [
+        {
+          source: 'registry/components/ui/detail-layout.tsx',
+          target: '@ui/detail-layout.tsx',
+        },
+        {
+          source: 'registry/components/ui/detail-layout.css',
+          target: '@assets/ui/detail-layout.css',
+        },
+      ],
       registryDependencies: ['theme-seed', 'layout-objects'],
+      css: [{ layer: 'components', content: "@import './ui/detail-layout.css';" }],
     },
     {
       name: 'data-table',
@@ -963,11 +991,18 @@ export const freshUiRegistryManifest: RegistryManifest = {
       copyOwnership: 'app-owned-after-copy',
       author: 'NetScript',
       tags: ['table', 'list', 'block'],
-      files: [{
-        source: 'registry/components/ui/data-table.tsx',
-        target: '@ui/data-table.tsx',
-      }],
+      files: [
+        {
+          source: 'registry/components/ui/data-table.tsx',
+          target: '@ui/data-table.tsx',
+        },
+        {
+          source: 'registry/components/ui/data-table.css',
+          target: '@assets/ui/data-table.css',
+        },
+      ],
       registryDependencies: ['theme-seed', 'card'],
+      css: [{ layer: 'components', content: "@import './ui/data-table.css';" }],
     },
     {
       name: 'responsive-table',
@@ -999,11 +1034,18 @@ export const freshUiRegistryManifest: RegistryManifest = {
       copyOwnership: 'app-owned-after-copy',
       author: 'NetScript',
       tags: ['pagination', 'navigation', 'block'],
-      files: [{
-        source: 'registry/components/ui/pagination.tsx',
-        target: '@ui/pagination.tsx',
-      }],
+      files: [
+        {
+          source: 'registry/components/ui/pagination.tsx',
+          target: '@ui/pagination.tsx',
+        },
+        {
+          source: 'registry/components/ui/pagination.css',
+          target: '@assets/ui/pagination.css',
+        },
+      ],
       registryDependencies: ['theme-seed', 'layout-objects'],
+      css: [{ layer: 'components', content: "@import './ui/pagination.css';" }],
     },
     {
       name: 'empty-state',
@@ -1014,11 +1056,18 @@ export const freshUiRegistryManifest: RegistryManifest = {
       copyOwnership: 'app-owned-after-copy',
       author: 'NetScript',
       tags: ['empty-state', 'feedback', 'block'],
-      files: [{
-        source: 'registry/components/ui/empty-state.tsx',
-        target: '@ui/empty-state.tsx',
-      }],
+      files: [
+        {
+          source: 'registry/components/ui/empty-state.tsx',
+          target: '@ui/empty-state.tsx',
+        },
+        {
+          source: 'registry/components/ui/empty-state.css',
+          target: '@assets/ui/empty-state.css',
+        },
+      ],
       registryDependencies: ['theme-seed', 'layout-objects'],
+      css: [{ layer: 'components', content: "@import './ui/empty-state.css';" }],
     },
     {
       name: 'section-divider',
@@ -1028,11 +1077,18 @@ export const freshUiRegistryManifest: RegistryManifest = {
       copyOwnership: 'app-owned-after-copy',
       author: 'NetScript',
       tags: ['section', 'editorial', 'block'],
-      files: [{
-        source: 'registry/components/ui/section-divider.tsx',
-        target: '@ui/section-divider.tsx',
-      }],
+      files: [
+        {
+          source: 'registry/components/ui/section-divider.tsx',
+          target: '@ui/section-divider.tsx',
+        },
+        {
+          source: 'registry/components/ui/section-divider.css',
+          target: '@assets/ui/section-divider.css',
+        },
+      ],
       registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/section-divider.css';" }],
     },
     {
       name: 'theme-toggle',
@@ -1042,11 +1098,18 @@ export const freshUiRegistryManifest: RegistryManifest = {
       copyOwnership: 'app-owned-after-copy',
       author: 'NetScript',
       tags: ['theme', 'island'],
-      files: [{
-        source: 'registry/islands/ThemeToggle.tsx',
-        target: '@islands/ThemeToggle.tsx',
-      }],
+      files: [
+        {
+          source: 'registry/islands/ThemeToggle.tsx',
+          target: '@islands/ThemeToggle.tsx',
+        },
+        {
+          source: 'registry/islands/theme-toggle.css',
+          target: '@assets/ui/theme-toggle.css',
+        },
+      ],
       registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/theme-toggle.css';" }],
     },
     {
       name: 'sidebar-toggle',
