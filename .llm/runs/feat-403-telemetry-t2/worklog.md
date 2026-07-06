@@ -12,3 +12,14 @@ Baseline before work: scoped check clean (61 files), `deno doc --lint` full expo
 - Deleted dead `src/instrumentation/sse.ts` (447 ln, zero consumers repo-wide; open-question #8 default=delete).
 - Rewired every `../core/mod.ts`, `../runtime/mod.ts`, `./src/core/types.ts` import; `./tracer` facade → application barrel.
 - Evidence: scoped check clean (60 files); `deno test` 17/17 pass incl. T1 TC-1..14 convention tests.
+
+## Slice 2 — subpath surface (`./otel`, `./query`, `./testing`, real `./registry`, barrel, rewrite-map)
+- `src/ports/tracer-provider-port.ts` (+mod): `TracerProviderPort` + `TelemetryProviderDescriptor` (narrow: descriptor + register; tracer access stays on the global provider, so no cast-bearing getTracer on the port).
+- `src/adapters/otel/`: `otel-deno.ts` (real `OtelDenoTracerProvider` binding to Deno's global provider via `@opentelemetry/api`, `isActive()`), `otel-sdk.ts` (documented scaffold; `register()` throws `TelemetryProviderNotImplementedError`), `mod.ts` re-exports ports+both adapters → backs `./otel`.
+- `src/application/query/`: read-model `types.ts` (`TelemetrySpan`/`TelemetryTrace`/`TelemetryLog`/`TelemetryResource`/filters) + `mod.ts` (`TelemetryQuery` contract + `createTelemetryQuery` scaffold rejecting with `TelemetryQueryNotConfiguredError`) → backs `./query`.
+- `src/testing/`: `InMemorySpanRecorder` (implements domain `Tracer`, captures `RecordedSpanSnapshot`s; cast-free overload resolution) + `createInMemorySpanRecorder` → backs `./testing`. + 3 recorder tests.
+- `./registry` given a real root facade `registry.ts` (matches tracer/config/context facade pattern) instead of pointing straight at the internal mod.
+- Root `mod.ts` barrel completed: primary tracing surface (`getTracer`/`withSpan`/`withSpanSync`/`createSpan`/`getActiveSpan`/`getActiveContext`/`isTracingEnabled`/`TracerNames`) + W3C (`getParentContextFromHeaders`/`injectContext`). Attributes stay on `./attributes` (F-5 surface discipline).
+- `deno.json`: added `./otel`/`./query`/`./testing`, repointed `./registry`→`registry.ts`, expanded `check` task.
+- `packages/cli/.../workspace-mutator.ts` rewrite-map: added root `@netscript/telemetry` + `/orpc`,`/otel`,`/query`,`/registry`,`/testing`.
+- Evidence: scoped check clean (70 files); `deno doc --lint` full 11-entrypoint export set clean; `deno publish --dry-run` Success; telemetry 20/20 tests + cli mutator 9/9 pass; fmt clean. No new `as`/`any` casts.

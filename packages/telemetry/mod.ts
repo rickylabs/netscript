@@ -13,7 +13,14 @@
  * - `@netscript/telemetry/context`
  * - `@netscript/telemetry/attributes`
  * - `@netscript/telemetry/instrumentation`
+ * - `@netscript/telemetry/registry`
  * - `@netscript/telemetry/orpc`
+ * - `@netscript/telemetry/otel`
+ * - `@netscript/telemetry/query`
+ * - `@netscript/telemetry/testing`
+ *
+ * The most common tracing primitives (`getTracer`, `withSpan`, W3C context
+ * propagation) are also re-exported here for convenience.
  *
  * @example Inspect an instrumentation registry
  * ```ts
@@ -27,7 +34,10 @@
  * ```
  */
 
-export { DuplicateInstrumentationError, InstrumentationRegistry } from './src/application/registry/mod.ts';
+export {
+  DuplicateInstrumentationError,
+  InstrumentationRegistry,
+} from './src/application/registry/mod.ts';
 export type {
   InstrumentationContext,
   InstrumentationEntry,
@@ -49,3 +59,15 @@ export type {
 } from './src/domain/types.ts';
 export { inspectTelemetry } from './src/diagnostics/inspect-telemetry.ts';
 export type { InspectionReport } from './src/diagnostics/inspect-telemetry.ts';
+
+export {
+  createSpan,
+  getActiveContext,
+  getActiveSpan,
+  getTracer,
+  isTracingEnabled,
+  TracerNames,
+  withSpan,
+  withSpanSync,
+} from './src/application/mod.ts';
+export { getParentContextFromHeaders, injectContext } from './src/context/mod.ts';
