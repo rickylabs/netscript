@@ -9,6 +9,7 @@ import {
   findProjectRoot as findDeployProjectRoot,
   loadDeployConfig,
 } from '../../../kernel/adapters/config/deploy-config.ts';
+import type { buildWindowsDeployment } from '../deploy/build/build-windows-strategy.ts';
 import { loadRegisteredPlugins } from '../../../kernel/adapters/config/plugin-registry.ts';
 import { createProjectConfigLoader } from '../../../kernel/adapters/config/project-config-loader.ts';
 import { createContractScaffolder } from '../../../kernel/adapters/contracts/contract-scaffolder.ts';
@@ -45,6 +46,8 @@ import type { GenerateRuntimeSchemasCommandDependencies } from '../generate/runt
 import type { InitPipelineContext } from '../../../kernel/application/scaffold/context.ts';
 import type { FileSystemPort } from '../../../kernel/ports/file-system-port.ts';
 import type { ProcessPort } from '../../../kernel/ports/process-port.ts';
+import type { DenoDeployTargetDefaults } from '../../../kernel/domain/deploy/deno-deploy-target.ts';
+import type { DeployTargetPort } from '../../../kernel/domain/deploy/deploy-target-port.ts';
 import { createPluginDispatchPort } from '../plugins/dispatch/dispatch-plugin-verb.ts';
 import type { PluginDispatchPort } from '../plugins/dispatch/plugin-dispatch-port.ts';
 import type { DoctorPluginCommandDependencies } from '../plugins/doctor/doctor-plugin-command.ts';
@@ -143,7 +146,10 @@ export interface PublicCommandDependencies {
   /** Dependencies for deploy build. */
   readonly deployBuildDependencies: {
     readonly loadConfig: typeof loadDeployConfig;
+    readonly buildWindowsDeployment?: typeof buildWindowsDeployment;
   };
+  /** Optional Deno Deploy target factory override, used by parser-level tests. */
+  readonly denoDeployTargetFactory?: (defaults: DenoDeployTargetDefaults) => DeployTargetPort;
   /** Resolve deployment manifests for install/uninstall. */
   readonly manifestPort: {
     readonly resolve: (

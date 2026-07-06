@@ -47,7 +47,7 @@ jobs:
       - name: Compile deployment artifacts
         run: >
           deno x -A jsr:@netscript/cli deploy build
-          --deploy-dir "${{ matrix.deploy_dir }}"
+          --output-dir "${{ matrix.deploy_dir }}"
 
       - uses: actions/upload-artifact@v4
         with:

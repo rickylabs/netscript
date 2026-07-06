@@ -37,7 +37,7 @@ below — every one of which is a verified fact you can copy verbatim.
 {{ comp callout { type: "tip", title: "Generated CI follows the shipped targets" } }}
 The scaffolded workflows cover the deploy surfaces that ship today:
 <strong>Deno Deploy</strong> (<code>netscript deploy deno-deploy up</code>),
-<strong>Compose/GHCR</strong> (<code>netscript deploy compose emit</code> +
+<strong>Compose/GHCR</strong> (<code>netscript deploy compose plan</code> +
 <code>netscript deploy docker up</code>), and <strong>bare metal</strong>
 (<code>netscript deploy build</code>). They are intentionally starter pipelines: fill in repository
 secrets, GitHub environment protection, host credentials, and target-specific configuration before
@@ -238,7 +238,7 @@ New Aspire-backed workspaces include three GitHub Actions starter workflows unde
 `.github/workflows/`:
 
 {{ comp.apiTable({ caption: "Generated deployment workflows", rows: [
-  { name: "deploy-compose-ghcr.yml", type: "Compose + GHCR", desc: "Restores the Aspire AppHost, emits Compose output with <code>netscript deploy compose emit</code>, builds/pushes images to GHCR, then runs <code>netscript deploy docker up</code> with <code>--clear-cache</code>." },
+  { name: "deploy-compose-ghcr.yml", type: "Compose + GHCR", desc: "Restores the Aspire AppHost, emits Compose output with <code>netscript deploy compose plan</code>, builds/pushes images to GHCR, then runs <code>netscript deploy docker up</code> with <code>--clear-cache</code>." },
   { name: "deploy-deno-deploy.yml", type: "Deno Deploy", desc: "Runs workspace checks, then calls <code>netscript deploy deno-deploy up</code> using GitHub secrets and variables for the Deno Deploy token, organization, and app." },
   { name: "deploy-bare-metal.yml", type: "Bare metal", desc: "Compiles service artifacts with <code>netscript deploy build</code> on Linux and Windows runners, then uploads the output as workflow artifacts for host-specific installation." }
 ] }) }}

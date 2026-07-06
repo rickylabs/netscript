@@ -52,7 +52,7 @@ jobs:
 
       - name: Emit compose artifacts
         run: >
-          deno x -A jsr:@netscript/cli deploy compose emit
+          deno x -A jsr:@netscript/cli deploy compose plan
           --project-root .
           --output-dir .deploy/compose
           --environment "$DEPLOY_ENVIRONMENT"

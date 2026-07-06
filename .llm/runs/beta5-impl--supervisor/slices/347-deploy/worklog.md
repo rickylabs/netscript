@@ -75,6 +75,11 @@ To add a future workflow template, add a `.template` file under `packages/cli/sr
 | 2026-07-06 | Ran public surface gates. | `run-deno-doc-lint --root packages/cli` passed with 0 errors after re-exporting `CacheBackendChoice`; `rtk proxy deno task publish:dry-run` passed. |
 | 2026-07-06 | Ran final repo validation. | `rtk proxy deno task check` passed: 2102 files, 18 batches, 0 occurrences. `rtk proxy deno task test` passed: 1527 passed, 0 failed, 12 ignored. |
 | 2026-07-06 | Ran architecture gate. | `rtk proxy deno task arch:check` exited 0 with existing WARN/INFO items outside this slice. |
+| 2026-07-06 | Fixed adversarial review caveat 1. | Replaced generated/docs `deploy compose emit` with the routed `deploy compose plan` verb in the source templates, embedded asset mirror, and deploy how-to. |
+| 2026-07-06 | Fixed adversarial review caveat 2. | Replaced generated bare-metal `deploy build --deploy-dir` with the real `--output-dir` flag in the source template and embedded asset mirror. |
+| 2026-07-06 | Closed scaffold test-honesty gap. | Added a parser-backed scaffold test that extracts every emitted `netscript deploy ...` workflow invocation and parses it through `createDeployCommand()` with no-op deploy adapters. |
+| 2026-07-06 | Ran caveat-fix focused validation. | Focused scaffold test passed: 3 passed. Affected CLI test set passed: 39 passed. Scoped check on 4 changed TS files passed. Stale-string grep for `deploy compose emit` and `--deploy-dir` returned no matches. |
+| 2026-07-06 | Ran caveat-fix package/root/public validation. | `rtk proxy deno task --cwd packages/cli check` passed. `rtk proxy deno task --cwd packages/cli test` passed: 312 passed, 0 failed. `rtk proxy deno task check` passed: 2102 files, 18 batches, 0 occurrences. `rtk proxy deno task test` passed: 1528 passed, 0 failed, 12 ignored. `deno doc --lint mod.ts scaffolding.ts testing.ts` from `packages/cli` passed. `rtk proxy deno task publish:dry-run` passed with existing dynamic-import warnings. |
 
 ## Reconcile Notes
 

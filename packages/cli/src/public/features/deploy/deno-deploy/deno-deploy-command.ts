@@ -23,13 +23,19 @@ import type {
   DeployTargetOperation,
   DeployTargetPort,
 } from '../../../../kernel/domain/deploy/deploy-target-port.ts';
+import type { DenoDeployTargetDefaults } from '../../../../kernel/domain/deploy/deno-deploy-target.ts';
 import type { PublicCommandDependencies } from '../../root/public-command-dependencies.ts';
 
 /** Dependencies the Deno Deploy command surface needs. */
-type DenoDeployCommandDependencies = Pick<
-  PublicCommandDependencies,
-  'loadConfig' | 'resolveProjectRoot'
->;
+type DenoDeployCommandDependencies =
+  & Pick<
+    PublicCommandDependencies,
+    'loadConfig' | 'resolveProjectRoot'
+  >
+  & {
+    /** Compose the target implementation. Defaults to the concrete Deno Deploy adapter. */
+    readonly createTarget?: (defaults: DenoDeployTargetDefaults) => DeployTargetPort;
+  };
 
 /** Flag overrides shared by every Deno Deploy operation. */
 interface DenoDeployFlags {
@@ -67,7 +73,8 @@ async function dispatch(
     envFile: flags.envFile,
   });
 
-  const target: DeployTargetPort = createDenoDeployTarget(resolved);
+  const target: DeployTargetPort = dependencies.createTarget?.(resolved) ??
+    createDenoDeployTarget(resolved);
   const handler = target[operation];
   if (!handler) {
     outputError(red(`✗ Deno Deploy does not support \`${operation}\`.`));
