@@ -1,8 +1,7 @@
 # Thesis and Axioms
 
 The doctrine is governed by one thesis and fourteen axioms. The remaining doctrine pages translate
-these into operating rules for each architectural concern. Every axiom is sourced in the phase-0
-research quote armory (`phase-0-research/09-quote-armory.md`).
+these into operating rules for each architectural concern.
 
 ## Thesis
 
@@ -61,8 +60,7 @@ NetScript-specific policy, (c) hides a stable non-trivial computation. Renaming 
 `fetch`, `URL`, `Headers`, `ReadableStream`, `AbortSignal`, `structuredClone`, `crypto.subtle`,
 `Temporal/Date`, `Intl.*`, and the entire `@std/*` set are the baseline. The question "what does the
 platform already give me?" is mandatory before any helper is written. (See
-[`04-modules-and-helpers.md`](./04-modules-and-helpers.md); phase-0 research
-`phase-0-research/08-deno-and-jsr-as-target.md`.)
+[`04-modules-and-helpers.md`](./04-modules-and-helpers.md), especially the `@std/*` lookup table.)
 
 ### A8. One concern per folder; one reason per file
 
@@ -81,8 +79,7 @@ package stays tiny; a runtime package layers. (See [`06-archetypes.md`](./06-arc
 
 A `createX()` factory wires the package. A typed container is allowed only when many modules
 contribute providers, runtime composition is ordered, or services are optional. Decorator-driven DI
-is not used. (See [`07-composition-and-extension.md`](./07-composition-and-extension.md); phase-0
-research `phase-0-research/05-dotnet-as-source.md`.)
+is not used. (See [`07-composition-and-extension.md`](./07-composition-and-extension.md).)
 
 ### A11. Extension axes are named before they are abstracted
 

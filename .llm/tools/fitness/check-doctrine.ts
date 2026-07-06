@@ -3,11 +3,11 @@
  * Doctrine readiness evaluator.
  *
  * Evaluates a package against the Architecture Doctrine
- * (docs/architecture/doctrine/) — axioms A1..A14
- * and anti-patterns AP-1..AP-30 — at the granularity that can be checked
+ * (docs/architecture/doctrine/) — axioms A1..A14,
+ * anti-patterns AP-1..AP-25, and fitness gates F-1..F-19 — at the granularity that can be checked
  * mechanically.
  *
- * Findings are tagged with the doctrine reference (A##/AP##/F-DOCT-##) so an
+ * Findings are tagged with the doctrine reference (A##/AP-##/F-##) so an
  * evaluator can cross-reference doctrine docs without re-reading them.
  *
  * Mechanically checkable items only — semantic axioms (A1, A2, A11) emit
@@ -31,7 +31,7 @@ const args = parseArgs(Deno.args, {
 const ROOT = args.root as string;
 
 interface Finding {
-  ref: string; // doctrine reference, e.g. A4, AP-15, F-DOCT-5
+  ref: string; // doctrine reference, e.g. A4, AP-15, F-16
   level: 'PASS' | 'WARN' | 'FAIL' | 'INFO';
   message: string;
   path?: string;
@@ -199,7 +199,7 @@ for (const f of tsFiles) {
 
 // ─────────────────────────────────────────────────────────────────────────
 // A5 — Composition over inheritance.
-// AP-1: deep inheritance.
+// AP-5 / F-4: deep inheritance.
 // Heuristic: any class chain ≥ 3 deep (extends Foo extends Bar) flagged.
 // ─────────────────────────────────────────────────────────────────────────
 // Approximated: count chains that say `extends X` where X also extends Y in same package.
@@ -220,7 +220,7 @@ for (const [cls, parent] of extendsMap) {
     depth++;
     if (depth >= 3) {
       findings.push({
-        ref: 'A5/AP-1',
+        ref: 'A5/AP-5/F-4',
         level: 'WARN',
         message:
           `class ${cls} sits ${depth}+ levels deep in inheritance chain — prefer composition`,
@@ -232,7 +232,7 @@ for (const [cls, parent] of extendsMap) {
 
 // ─────────────────────────────────────────────────────────────────────────
 // A6 / A7 — Helpers must be justified; std/web first.
-// AP-7 forbidden generic folder names.
+// AP-16 / F-11 forbidden generic folder names.
 // ─────────────────────────────────────────────────────────────────────────
 const FORBIDDEN_DIRS = new Set(['utils', 'helpers', 'common', 'lib', 'interfaces']);
 for await (
@@ -245,7 +245,7 @@ for await (
   const seg = entry.path.split('/').pop()!;
   if (FORBIDDEN_DIRS.has(seg) && entry.path !== ROOT) {
     findings.push({
-      ref: 'AP-7/F-DOCT-4',
+      ref: 'AP-16/F-11',
       level: 'WARN',
       message:
         `forbidden folder name '${seg}' — split into domain/, application/, or adapters/ aligned to a real concern`,
@@ -253,17 +253,19 @@ for await (
     });
   }
 }
-// AP-12 reinventing the wheel: detect handwritten Result/Option types when @netscript/shared exports them
+// Inline result contracts: local Result/Option-style types are allowed when
+// they are package-specific boundary contracts. They should stay intentional
+// and documented instead of being forced through a removed shared package.
 for (const f of tsFiles) {
   const text = await readText(f);
   if (
-    /export\s+type\s+(Result|Either|Option|Maybe)\b/.test(text) &&
-    !/from\s+['"]@netscript\/shared['"]/.test(text)
+    /export\s+type\s+(Result|Either|Option|Maybe)\b/.test(text)
   ) {
     findings.push({
-      ref: 'A7/AP-12',
+      ref: 'A1/A2/A7',
       level: 'WARN',
-      message: `defines local Result/Either/Option — should re-export from @netscript/shared`,
+      message:
+        `exports Result/Either/Option-style contract — keep it package-specific, documented, and inline unless multiple real consumers justify a shared contract`,
       path: relative(ROOT, f),
     });
   }
@@ -271,8 +273,8 @@ for (const f of tsFiles) {
 
 // ─────────────────────────────────────────────────────────────────────────
 // A8 — One concern per folder, one reason per file.
-// F-DOCT-5 cardinality (>12 children).
-// AP-9 mega files (>500 lines for application/runtime; >200 for domain).
+// F-16 cardinality (>12 children).
+// AP-1 / F-1 mega files (>500 lines for application/runtime; >300 for domain).
 // ─────────────────────────────────────────────────────────────────────────
 for (const f of tsFiles) {
   const text = await readText(f);
@@ -283,7 +285,7 @@ for (const f of tsFiles) {
   if (rel.includes('/runtime/') || rel.includes('/application/')) cap = 500;
   if (lines > cap) {
     findings.push({
-      ref: 'A8/AP-9',
+      ref: 'A8/AP-1/F-1',
       level: 'WARN',
       message: `file is ${lines} lines (cap ${cap}) — split into smaller single-reason files`,
       path: rel,
@@ -306,7 +308,7 @@ for await (
 for (const [path, count] of childCounts) {
   if (count > 12) {
     findings.push({
-      ref: 'F-DOCT-5',
+      ref: 'F-16',
       level: 'WARN',
       message: `directory has ${count} immediate children; doctrine cap is 12`,
       path: relative(ROOT, path),
@@ -340,13 +342,13 @@ if (await exists(archDocPath)) {
 
 // ─────────────────────────────────────────────────────────────────────────
 // A10 — Composition root over container. Detect global mutable singletons.
-// AP-22: module-level `let` exporting mutable state.
+// AP-11: module-level `let` exporting mutable state.
 // ─────────────────────────────────────────────────────────────────────────
 for (const f of tsFiles) {
   const text = await readText(f);
   for (const m of text.matchAll(/^export\s+let\s+(\w+)/gm)) {
     findings.push({
-      ref: 'A10/AP-22',
+      ref: 'A10/AP-11',
       level: 'FAIL',
       message: `module-level \`export let ${
         m[1]
@@ -424,14 +426,14 @@ for (const f of testFiles) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// AP-15 — `IFoo` Hungarian prefix
+// AP-15 / F-12 — `IFoo` Hungarian prefix
 // ─────────────────────────────────────────────────────────────────────────
 for (const f of tsFiles) {
   const text = await readText(f);
   text.split(/\r?\n/).forEach((line, i) => {
     for (const m of line.matchAll(/\b(?:interface|type)\s+(I[A-Z][A-Za-z0-9_]*)\b/g)) {
       findings.push({
-        ref: 'AP-15/F-DOCT-7',
+        ref: 'AP-15/F-12',
         level: 'FAIL',
         message: `forbidden I-prefix declaration ${m[1]}`,
         path: relative(ROOT, f),
@@ -442,14 +444,14 @@ for (const f of tsFiles) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// AP-19 — `default` export
+// F-5 / F-6 — `default` export hurts public-surface docs and JSR publishability
 // ─────────────────────────────────────────────────────────────────────────
 for (const f of tsFiles) {
   const text = await readText(f);
   text.split(/\r?\n/).forEach((line, i) => {
     if (/^export\s+default\b/.test(line)) {
       findings.push({
-        ref: 'AP-19',
+        ref: 'F-5/F-6',
         level: 'WARN',
         message: '`export default` — JSR penalises (no auto-doc); use named exports',
         path: relative(ROOT, f),
@@ -460,7 +462,7 @@ for (const f of tsFiles) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// AP-23 — `any` in published surface
+// A1 / F-5 — `any` in published surface
 // ─────────────────────────────────────────────────────────────────────────
 for (const f of tsFiles) {
   if (relative(ROOT, f).startsWith('src/internal/')) continue;
@@ -472,7 +474,7 @@ for (const f of tsFiles) {
       /^export\s+(?:type|interface)\s+\w+[^=]*=[^=]*\bany\b/.test(line)
     ) {
       findings.push({
-        ref: 'AP-23',
+      ref: 'A1/F-5',
         level: 'WARN',
         message: '`any` in exported declaration — use `unknown` or a specific type',
         path: relative(ROOT, f),
