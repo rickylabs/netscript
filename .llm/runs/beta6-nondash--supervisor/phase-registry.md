@@ -45,7 +45,7 @@ merged | blocked | closed-n/a | owner-batch
 
 | Item | Status | Notes |
 | --- | --- | --- |
-| PLAN-EVAL (OpenHands minimax-M3, separate session) | pending | HARD STOP before any implementation slice |
+| PLAN-EVAL (OpenHands minimax-M3, separate session) | eval (dispatched) | PR #548 comment 4895235162, 2026-07-06; trigger `model=openrouter/minimax/minimax-m3 output=pr-comment iterations=600`; HARD STOP before any implementation slice |
 | T8 Flow-B suite green | pending | telemetry epic DoD |
 | #464 capability e2e green | pending | AI lane DoD |
 | Owner batch summary | pending | #389 close, #307 verdict, release readiness |

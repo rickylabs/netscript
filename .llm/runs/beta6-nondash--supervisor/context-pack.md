@@ -22,5 +22,8 @@ stop before any implementation slice.
 
 ## Status
 
-Bootstrap + plan done. Next action: draft PR for run dir + PLAN-EVAL dispatch (see worklog tail /
-phase-registry run-gates table).
+Bootstrap + plan done. Draft PR **#548** open (`chore/beta6-nondash-supervisor-run`, c9ba36a5).
+PLAN-EVAL **dispatched** (minimax-M3, PR #548 comment 4895235162) — HARD STOP: no implementation
+slice before PASS. On PASS: launch wave 1 (TEL-T3, TEL-T4, AI-494 on Codex; AI-257, PROG-306 on
+Opus; PM-0 next slot; PROG-389 Tier-A bookkeeping). On FAIL_PLAN: fix plan, single re-dispatch,
+two failures → escalate to owner.
