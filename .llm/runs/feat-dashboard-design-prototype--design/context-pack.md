@@ -6,7 +6,7 @@
 | -------------- | ----------------------------------------- |
 | Run ID         | `feat-dashboard-design-prototype--design` |
 | Branch         | `feat/dashboard-design-prototype`         |
-| Current phase  | `plan-eval` (dispatched, awaiting verdict) |
+| Current phase  | `implement` (PLAN-EVAL **PASS** 2026-07-06, `plan-eval.md` @ dfd9d8ca; slice 0 complete) |
 | Archetype      | N/A (repo tooling + design artifacts)     |
 | Scope overlays | none                                      |
 
@@ -29,9 +29,15 @@ the beta.6 implementation supervisor.
 
 ## In Progress
 
-- PLAN-EVAL (OpenHands minimax-M3, PR-comment lane) dispatched 2026-07-06 on draft PR **#506**
-  (comment 4891516954). Supervisor watching via `gh-watch.ts --pr 506` background. **Hard stop
-  before slice 1 until PASS.**
+- **Slice 1**: `tools/design-sync/` v1 (converter + closure + conventions + previews + trap
+  checks + idempotence). Canvas target locked: project **`NetScript — NS One`**
+  (`ec262e10-d4ad-451f-9aeb-e51955db3634`) — goes into `.design-sync/config.json`.
+
+## Done gates
+
+- PLAN-EVAL **PASS** (minimax-M3, `plan-eval.md` committed dfd9d8ca; version-label note fixed in
+  plan.md/pr-body.md). Slice 0 canvas round-trip **PASS** (create/finalize/write/read/delete via
+  native `DesignSync` tool).
 
 ## Board state (filed)
 

@@ -9,7 +9,7 @@
 The beta.6 Dev Dashboard's missing design pre-step, fully decoupled from the beta.6 implementation supervisor:
 
 1. **`tools/design-sync/`** — production-grade, reusable converter: fresh-ui copy-source registry → Claude Design-consumable design system (synthetic React package via the type-only-Preact trick + compiled Tailwind CSS closure + conventions header + preview cards). Idempotent re-sync; the six eis-chat parity traps encoded as checks. Future promotion path: `netscript ui:design-sync` for NetScript devs (separate framework issue).
-2. **New Claude Design project** seeded at 100% component parity from today's fresh-ui (`0.0.1-beta.4`) — the stale eis-chat-era design system is abandoned (near-total divergence, not drift).
+2. **New Claude Design project** seeded at 100% component parity from today's fresh-ui at baseline `317e4b50` — the stale eis-chat-era design system is abandoned (near-total divergence, not drift).
 3. **Full E2E prototype** — shell + 7 panels + 4 per-capability sections, light/dark, driven agentically via the Claude Design MCP with owner steering from the canvas.
 4. **Sync-back spec** (`NS-ONE-ADDITIONS` idiom) making every new/changed component implementation-ready for downstream fresh-ui lanes.
 

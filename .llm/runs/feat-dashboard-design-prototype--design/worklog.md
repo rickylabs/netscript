@@ -115,6 +115,7 @@ unit of the same kind.
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
 | Canvas connectivity smoke (read half) | **PASS** 2026-07-06 | `DesignSync list_projects` returned the writable set: 1 project, the stale `eis-chat — NS One` (`ea3fa1b9-906c-4b8a-8ef7-421b460e5c15`), after owner ran `claude mcp add claude-design …` + `/design-login` | OQ-1 resolved GREEN — via a better mechanism than planned: Claude Code's **native `DesignSync` tool** (localPath disk uploads that bypass model context, plan-boundary enforcement, claude.ai-login auth) rather than the raw MCP. Write half (`create_project` + round-trip) runs in slice 0 proper, after PLAN-EVAL PASS |
+| Canvas round-trip smoke (write half, slice 0) | **PASS** 2026-07-06 (post PLAN-EVAL PASS) | `create_project` → **`NetScript — NS One`**, projectId `ec262e10-d4ad-451f-9aeb-e51955db3634` · `finalize_plan` (`_smoke/roundtrip.html`, localDir = worktree) → `write_files` (inline, `@dsCard` marker) → `get_file` read back **byte-identical** → `delete_files` cleanup. Full CRUD cycle green | Slice 0 complete. New project is empty by design until slice 3 seeding. Stale eis-chat project untouched (LD-2). `projectId` is the slice-3 target and belongs in `.design-sync/config.json` at slice 1 |
 
 ### Consumer Gates
 

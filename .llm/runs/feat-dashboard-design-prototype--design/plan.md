@@ -143,7 +143,7 @@ implementation-ready for fresh-ui.
 ## Dependencies
 
 - Claude Design MCP availability (`https://api.anthropic.com/v1/design/mcp`) + owner `/design-login`.
-- fresh-ui `0.0.1-beta.4` registry surface (in-repo, baseline `317e4b50`).
+- fresh-ui registry surface at baseline `317e4b50` (in-repo; `packages/fresh-ui/deno.json` reads `0.0.1-beta.5` — parity claim is content parity, not version-string parity; PLAN-EVAL note).
 - eis-chat `.design-sync/` recipe (extracted in seed run `analysis/A-dashboard/02`).
 - Seed-run corpus for the brief (proposal, teardowns, voice rules).
 
