@@ -5,7 +5,9 @@
 - Branch: `feat/402-telemetry-t1`.
 - Base observed in `git log --oneline -5`: `1c175990`.
 - No upstream configured.
-- Draft PR not yet opened at the time this context pack was written.
+- Draft PR: #489, `feat(telemetry): #402 T1 telemetry convention`.
+- Latest implementation commit: `bf25aee9`.
+- Slice evidence comment posted on PR #489 with `SLICE-COMPLETE`.
 
 ## Implemented
 
@@ -27,8 +29,10 @@
 - Focused telemetry checks/tests, full export-map doc lint, package publish dry-run, full package
   check, `deno task check`, and `deno task test` all passed.
 
-## Remaining Process
+## Process Completed
 
-- Update downstream telemetry issue acceptance bodies where TC convention references are missing.
-- Commit, push to `origin HEAD:refs/heads/feat/402-telemetry-t1`, open draft PR, apply labels and
-  milestone, post slice evidence, and finish with `SLICE-COMPLETE`.
+- Downstream telemetry issue acceptance bodies #403 through #409 reference the #402 TC convention.
+- Branch was pushed with `git push origin HEAD:refs/heads/feat/402-telemetry-t1`.
+- PR #489 is open as a draft against `main`.
+- PR #489 has milestone `0.0.1-beta.5` and `status:impl`.
+- No remaining T1 code scope is known in this checkout.
