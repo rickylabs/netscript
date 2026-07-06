@@ -4,6 +4,7 @@ import type { DeployTargetRegistryPort } from '../../domain/deploy/deploy-target
 import { WindowsServiceDeployTarget } from '../../domain/deploy/windows-service-deploy-target.ts';
 import { LinuxServiceDeployTarget } from '../../domain/deploy/linux-service-deploy-target.ts';
 import { AspireComposeDeployTarget } from '../../adapters/aspire/aspire-compose-deploy-target.ts';
+import { AspireCloudDeployTarget } from '../../adapters/aspire/aspire-cloud-deploy-target.ts';
 import { createDenoDeployTarget } from '../../adapters/deno-deploy/create-deno-deploy-target.ts';
 import { DenoProcess } from '../../adapters/runtime/process/deno-process.ts';
 
@@ -36,9 +37,44 @@ export const DOCKER_DEPLOY_TARGET: DeployTarget = new AspireComposeDeployTarget(
   process: new DenoProcess(),
 });
 
+/** Aspire-backed Kubernetes target descriptor. */
+export const KUBERNETES_DEPLOY_TARGET: DeployTarget = new AspireCloudDeployTarget({
+  key: 'kubernetes',
+  process: new DenoProcess(),
+});
+
+/** Aspire-backed Azure Container Apps target descriptor. */
+export const AZURE_ACA_DEPLOY_TARGET: DeployTarget = new AspireCloudDeployTarget({
+  key: 'azure-aca',
+  process: new DenoProcess(),
+});
+
+/** Aspire-backed Azure App Service target descriptor. */
+export const AZURE_APP_SERVICE_DEPLOY_TARGET: DeployTarget = new AspireCloudDeployTarget({
+  key: 'azure-app-service',
+  process: new DenoProcess(),
+});
+
+/** Aspire-backed Azure Kubernetes Service target descriptor. */
+export const AZURE_AKS_DEPLOY_TARGET: DeployTarget = new AspireCloudDeployTarget({
+  key: 'azure-aks',
+  process: new DenoProcess(),
+});
+
+/** Aspire-backed Cloud Run Docker-image target descriptor. */
+export const CLOUD_RUN_DEPLOY_TARGET: DeployTarget = new AspireCloudDeployTarget({
+  key: 'cloud-run',
+  process: new DenoProcess(),
+});
+
 /** Ordered default deployment targets. */
 export const DEFAULT_DEPLOY_TARGETS: readonly (readonly [string, DeployTarget])[] = Object
   .freeze([
+    ['azure-aca', AZURE_ACA_DEPLOY_TARGET],
+    ['azure-aks', AZURE_AKS_DEPLOY_TARGET],
+    ['azure-app-service', AZURE_APP_SERVICE_DEPLOY_TARGET],
+    ['cloud-run', CLOUD_RUN_DEPLOY_TARGET],
+    ['kubernetes', KUBERNETES_DEPLOY_TARGET],
     ['windows-service', WINDOWS_SERVICE_DEPLOY_TARGET],
     ['linux-service', LINUX_SERVICE_DEPLOY_TARGET],
     ['deno-deploy', DENO_DEPLOY_TARGET],

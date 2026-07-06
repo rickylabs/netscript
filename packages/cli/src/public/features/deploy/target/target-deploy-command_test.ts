@@ -43,6 +43,7 @@ function fakeDependencies(calls: RecordedOp[]): PublicCommandDependencies {
   return {
     deployTargets,
     resolveProjectRoot: (projectRoot?: string) => Promise.resolve(projectRoot ?? '/resolved-root'),
+    loadConfig: () => Promise.resolve({}),
   } as unknown as PublicCommandDependencies;
 }
 
@@ -63,6 +64,34 @@ Deno.test('router routes a verb straight to the registry-resolved adapter', asyn
   assertEquals(calls[0].operation, 'plan');
   assertEquals(calls[0].request.projectRoot, '/proj');
   assertEquals(calls[0].request.outputDir, '.deploy/compose');
+});
+
+Deno.test('router merges target config into the deploy request', async () => {
+  const calls: RecordedOp[] = [];
+  const deployTargets = new DeployTargetRegistry([['compose', fakeTarget(calls)]]);
+  const dependencies = {
+    deployTargets,
+    resolveProjectRoot: () => Promise.resolve('/resolved-root'),
+    loadConfig: () =>
+      Promise.resolve({
+        aspire: { appHost: 'aspire/apphost.mts' },
+        deploy: {
+          targets: {
+            compose: { outputPath: '.deploy/config-compose' },
+          },
+        },
+      }),
+  } as unknown as PublicCommandDependencies;
+  const command = createTargetDeployCommand('compose', dependencies);
+
+  await command.parse(['plan']);
+
+  assertEquals(calls[0].request.projectRoot, '/resolved-root');
+  assertEquals(calls[0].request.outputDir, '.deploy/config-compose');
+  assertEquals(calls[0].request.targetConfig, {
+    outputPath: '.deploy/config-compose',
+    appHost: 'aspire/apphost.mts',
+  });
 });
 
 Deno.test('router omits verbs the adapter does not advertise', () => {
@@ -86,6 +115,7 @@ Deno.test('router omits verbs the adapter does not advertise', () => {
   const dependencies = {
     deployTargets: registry,
     resolveProjectRoot: () => Promise.resolve('/resolved-root'),
+    loadConfig: () => Promise.resolve({}),
   } as unknown as PublicCommandDependencies;
 
   const command = createTargetDeployCommand('compose', dependencies);
@@ -94,10 +124,11 @@ Deno.test('router omits verbs the adapter does not advertise', () => {
   assertEquals(verbs, ['plan']);
 });
 
-Deno.test('deploy docker/compose routers resolve their default registry targets', () => {
+Deno.test('deploy target routers resolve their default registry targets', () => {
   const dependencies = {
     deployTargets: new DeployTargetRegistry(),
     resolveProjectRoot: () => Promise.resolve('/resolved-root'),
+    loadConfig: () => Promise.resolve({}),
   } as unknown as PublicCommandDependencies;
 
   for (const key of ['docker', 'compose']) {
@@ -105,5 +136,12 @@ Deno.test('deploy docker/compose routers resolve their default registry targets'
     const verbs = command.getCommands().map((c) => c.getName()).sort();
 
     assertEquals(verbs, ['down', 'logs', 'plan', 'status', 'up']);
+  }
+
+  for (const key of ['kubernetes', 'azure-aca', 'azure-app-service', 'azure-aks', 'cloud-run']) {
+    const command = createTargetDeployCommand(key, dependencies);
+    const verbs = command.getCommands().map((c) => c.getName()).sort();
+
+    assertEquals(verbs, ['down', 'plan', 'up']);
   }
 });
