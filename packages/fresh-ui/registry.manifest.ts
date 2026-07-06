@@ -1171,6 +1171,28 @@ export const freshUiRegistryManifest: RegistryManifest = {
       }],
       registryDependencies: ['chart-block', 'donut', 'data-table', 'stats-grid'],
     },
+    {
+      name: 'mcp-ui-widget',
+      kind: 'island',
+      layer: 3,
+      description:
+        'Themed sandboxed MCP ui:// widget frame — an allow-scripts-only iframe keyed on the active theme so theme changes force a full remount.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['ai', 'mcp-ui', 'iframe'],
+      files: [
+        {
+          source: 'registry/islands/McpUiWidget.tsx',
+          target: '@islands/McpUiWidget.tsx',
+        },
+        {
+          source: 'registry/islands/mcp-ui-widget.css',
+          target: '@assets/ui/mcp-ui-widget.css',
+        },
+      ],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/mcp-ui-widget.css';" }],
+    },
   ],
   collections: [
     {
@@ -1238,6 +1260,7 @@ export const freshUiRegistryManifest: RegistryManifest = {
         'search',
         'markdown',
         'chat-render',
+        'mcp-ui-widget',
       ],
     },
     {
