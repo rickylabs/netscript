@@ -88,6 +88,11 @@ NetScript-owned attributes live under the single `netscript.*` root. Attribute b
 During beta.5 those builders emit canonical `netscript.*` keys plus deprecated bare aliases where an
 old key already shipped.
 
+Messaging uses upstream OpenTelemetry keys only where they exist, including
+`messaging.operation.name`, `messaging.operation.type`, and `messaging.message.conversation_id`.
+Queue-only concepts such as delivery count, priority, delay, DLQ, and requeue live under
+`netscript.messaging.*`. Correlated spans use the shared floor `netscript.correlation.id`.
+
 ---
 
 ## 📖 Documentation

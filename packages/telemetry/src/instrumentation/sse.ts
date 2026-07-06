@@ -21,7 +21,12 @@ import {
   withSpan,
 } from '../core/mod.ts';
 import type { SerializedTraceContext } from '../context/mod.ts';
-import { SpanNames, SSEAttributes } from '../attributes/mod.ts';
+import {
+  NetScriptExecutionAttributes,
+  NetScriptJobAttributes,
+  SpanNames,
+  SSEAttributes,
+} from '../attributes/mod.ts';
 
 // ============================================================================
 // TYPES
@@ -187,18 +192,18 @@ export function startSSEConnection(
       };
 
       if (event.dataSize !== undefined) {
-        eventAttrs['sse.event.data_size'] = event.dataSize;
+        eventAttrs[SSEAttributes.SSE_EVENT_DATA_SIZE] = event.dataSize;
       }
       if (event.jobId) {
-        eventAttrs['job.id'] = event.jobId;
+        eventAttrs[NetScriptJobAttributes.JOB_ID] = event.jobId;
       }
       if (event.executionId) {
-        eventAttrs['execution.id'] = event.executionId;
+        eventAttrs[NetScriptExecutionAttributes.EXECUTION_ID] = event.executionId;
       }
 
       // If we have related trace context, add it as a link or attribute
       if (event.relatedTraceContext) {
-        eventAttrs['sse.event.related_trace'] = event.relatedTraceContext.traceparent;
+        eventAttrs[SSEAttributes.SSE_EVENT_RELATED_TRACE] = event.relatedTraceContext.traceparent;
       }
 
       addSpanEvent(span, `sse.event.${event.eventType}`, eventAttrs);
@@ -271,13 +276,13 @@ export function createSSEEventSpan(
     attributes[SSEAttributes.SSE_CLIENT_ID] = options.clientId;
   }
   if (options.jobId) {
-    attributes['job.id'] = options.jobId;
+    attributes[NetScriptJobAttributes.JOB_ID] = options.jobId;
   }
   if (options.executionId) {
-    attributes['execution.id'] = options.executionId;
+    attributes[NetScriptExecutionAttributes.EXECUTION_ID] = options.executionId;
   }
   if (options.dataSize !== undefined) {
-    attributes['sse.event.data_size'] = options.dataSize;
+    attributes[SSEAttributes.SSE_EVENT_DATA_SIZE] = options.dataSize;
   }
 
   return createSpan(tracer, SpanNames.SSE_EVENT, {
@@ -317,16 +322,16 @@ export async function traceSSEEvent<T>(
         span.setAttribute(SSEAttributes.SSE_CLIENT_ID, options.clientId);
       }
       if (options.jobId) {
-        span.setAttribute('job.id', options.jobId);
+        span.setAttribute(NetScriptJobAttributes.JOB_ID, options.jobId);
       }
       if (options.executionId) {
-        span.setAttribute('execution.id', options.executionId);
+        span.setAttribute(NetScriptExecutionAttributes.EXECUTION_ID, options.executionId);
       }
 
       const result = await fn(span);
 
       if (options.dataSize !== undefined) {
-        span.setAttribute('sse.event.data_size', options.dataSize);
+        span.setAttribute(SSEAttributes.SSE_EVENT_DATA_SIZE, options.dataSize);
       }
 
       return result;
@@ -353,7 +358,7 @@ export function createSSESubscribeSpan(channel: string, clientId?: string): Span
   const tracer = getSSETracer();
 
   const attributes: Attributes = {
-    'sse.subscription.channel': channel,
+    [SSEAttributes.SSE_SUBSCRIPTION_CHANNEL]: channel,
   };
 
   if (clientId) {
@@ -436,12 +441,15 @@ export function recordSSEMetrics(metrics: {
   if (!span) return;
 
   if (metrics.activeConnections !== undefined) {
-    span.setAttribute('sse.metrics.active_connections', metrics.activeConnections);
+    span.setAttribute(SSEAttributes.SSE_METRICS_ACTIVE_CONNECTIONS, metrics.activeConnections);
   }
   if (metrics.totalEventsSent !== undefined) {
-    span.setAttribute('sse.metrics.total_events_sent', metrics.totalEventsSent);
+    span.setAttribute(SSEAttributes.SSE_METRICS_TOTAL_EVENTS_SENT, metrics.totalEventsSent);
   }
   if (metrics.avgEventsPerConnection !== undefined) {
-    span.setAttribute('sse.metrics.avg_events_per_connection', metrics.avgEventsPerConnection);
+    span.setAttribute(
+      SSEAttributes.SSE_METRICS_AVG_EVENTS_PER_CONNECTION,
+      metrics.avgEventsPerConnection,
+    );
   }
 }

@@ -4,15 +4,21 @@
 export const MessagingAttributes = {
   SYSTEM: 'messaging.system',
   DESTINATION_NAME: 'messaging.destination.name',
-  DESTINATION_KIND: 'messaging.destination.kind',
   OPERATION: 'messaging.operation',
+  OPERATION_NAME: 'messaging.operation.name',
   OPERATION_TYPE: 'messaging.operation.type',
   MESSAGE_ID: 'messaging.message.id',
-  CORRELATION_ID: 'messaging.message.correlation_id',
-  DELIVERY_COUNT: 'messaging.message.delivery_count',
-  PRIORITY: 'messaging.message.priority',
-  PAYLOAD_SIZE: 'messaging.message.payload_size_bytes',
-  DLQ: 'messaging.destination.dlq',
+  MESSAGE_CONVERSATION_ID: 'messaging.message.conversation_id',
+  MESSAGE_BODY_SIZE: 'messaging.message.body.size',
+  MESSAGE_ENVELOPE_SIZE: 'messaging.message.envelope.size',
+  DESTINATION_KIND: 'netscript.messaging.destination.kind',
+  CORRELATION_ID: 'netscript.correlation.id',
+  DELIVERY_COUNT: 'netscript.messaging.message.delivery_count',
+  PRIORITY: 'netscript.messaging.message.priority',
+  PAYLOAD_SIZE: 'messaging.message.body.size',
+  DELAY_MS: 'netscript.messaging.message.delay_ms',
+  DLQ: 'netscript.messaging.destination.dlq',
+  REQUEUE: 'netscript.messaging.requeue',
 } as const;
 
 /**

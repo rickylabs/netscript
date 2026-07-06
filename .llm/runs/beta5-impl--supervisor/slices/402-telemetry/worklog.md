@@ -86,3 +86,37 @@
 - Related issues #403 through #409 were inspected and updated so their acceptance sections reference
   the published #402 TC-1..14 convention, including semconv, `netscript.*`, and span/link vocabulary
   where relevant.
+
+## Adversarial Review Caveat Fix
+
+PR #489 received `[PHASE: ADVERSARIAL-REVIEW]` CAVEATS on July 6, 2026. The follow-up slice fixed
+all three reviewed defects:
+
+| Caveat                          | Fix                                                                                                                                                                                                                                                                                                   |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TC-5 messaging semconv mismatch | Replaced near-miss generic messaging keys with current OpenTelemetry messaging semconv keys where they exist: `messaging.operation.name`, `messaging.operation.type`, and `messaging.message.conversation_id`. Moved NetScript-only queue concepts under `netscript.messaging.*`.                     |
+| TC-7 correlation floor missing  | Added `NetScriptCorrelationAttributes.CORRELATION_ID = "netscript.correlation.id"` and threaded optional correlation input through job, messaging, execution, saga, trigger, and GenAI builders.                                                                                                      |
+| Domain root set incomplete      | Extended `NetScriptAttributeDomains` for every canonical `netscript.*` attribute root emitted by the telemetry package, including messaging, scheduler, retry, concurrency, outcome, SSE, and KV. Added tests proving canonical attribute keys derive from the domain list or are exact semconv keys. |
+
+## Caveat Fix Evidence
+
+| Gate                                                                                                                       | Result                                                    |
+| -------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| `deno test --allow-env packages/telemetry/tests/attributes/helpers_test.ts`                                                | pass, 6 tests                                             |
+| `deno test --allow-env packages/telemetry/tests/attributes/helpers_test.ts packages/telemetry/tests/config/config_test.ts` | pass, 7 tests                                             |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/telemetry --ext ts,tsx`                    | pass, 62 files                                            |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/telemetry --ext ts,tsx`                     | pass, 62 files                                            |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/telemetry --ext ts,tsx`                      | pass, 62 files                                            |
+| `deno task doc:lint --root packages/telemetry --pretty`                                                                    | pass, full export map, 0 combined errors                  |
+| `cd docs/site && deno task verify`                                                                                         | pass, Lume build + 21,730 links + 30 caveat markers       |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages --ext ts,tsx`                              | pass, 1,914 files                                         |
+| `deno task publish:dry-run`                                                                                                | pass, workspace dry-run completed; existing warnings only |
+| `deno task check`                                                                                                          | pass, 2,110 files                                         |
+| `deno task test`                                                                                                           | pass, 1,503 passed, 12 ignored                            |
+
+## Caveat Reconcile Note
+
+- Read the PR #489 adversarial review comment before acting.
+- Rechecked local branch state before fixes: clean worktree at `65de8dca`.
+- Confirmed no `deno.lock` churn after validation.
+- Did not run `deno task e2e:cli`, per supervisor instruction.

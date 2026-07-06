@@ -33,9 +33,23 @@ export const NetScriptAttributeDomains = {
   SAGA: 'netscript.saga',
   TRIGGER: 'netscript.trigger',
   WORKER: 'netscript.worker',
+  SCHEDULER: 'netscript.scheduler',
+  MESSAGING: 'netscript.messaging',
   CORRELATION: 'netscript.correlation',
   DURABILITY: 'netscript.durability',
   IDEMPOTENCY: 'netscript.idempotency',
+  RETRY: 'netscript.retry',
+  CONCURRENCY: 'netscript.concurrency',
+  OUTCOME: 'netscript.outcome',
+  SSE: 'netscript.sse',
+  KV: 'netscript.kv',
+} as const;
+
+/**
+ * Cross-domain correlation floor required on correlated spans.
+ */
+export const NetScriptCorrelationAttributes = {
+  CORRELATION_ID: 'netscript.correlation.id',
 } as const;
 
 /**

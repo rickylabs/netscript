@@ -2,11 +2,11 @@
  * Semantic key-value store attribute names.
  */
 export const KVAttributes = {
-  KV_OPERATION: 'kv.operation',
-  KV_KEY: 'kv.key',
-  KV_KEY_COUNT: 'kv.key_count',
-  KV_ATOMIC: 'kv.atomic',
-  KV_VALUE_SIZE: 'kv.value_size_bytes',
+  KV_OPERATION: 'netscript.kv.operation',
+  KV_KEY: 'netscript.kv.key',
+  KV_KEY_COUNT: 'netscript.kv.key_count',
+  KV_ATOMIC: 'netscript.kv.atomic',
+  KV_VALUE_SIZE: 'netscript.kv.value_size_bytes',
 } as const;
 
 /**

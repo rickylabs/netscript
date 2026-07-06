@@ -16,6 +16,19 @@ Use OpenTelemetry semantic-convention attribute keys verbatim when a domain exis
 attributes use the single proprietary root `netscript.*`. The beta.5 migration emits duplicate
 deprecated aliases for one beta under the `dup` window, then the bare aliases are removed.
 
+Messaging spans use the current OpenTelemetry messaging registry for upstream concepts:
+`messaging.system`, `messaging.destination.name`, `messaging.operation.name`,
+`messaging.operation.type`, `messaging.message.id`, `messaging.message.conversation_id`,
+`messaging.message.body.size`, and `messaging.message.envelope.size`. NetScript queue concepts that
+do not exist in the upstream registry live under `netscript.messaging.*`, including
+`netscript.messaging.destination.kind`, `netscript.messaging.message.delivery_count`,
+`netscript.messaging.message.priority`, `netscript.messaging.message.delay_ms`,
+`netscript.messaging.destination.dlq`, and `netscript.messaging.requeue`.
+
+The cross-domain correlation floor is `netscript.correlation.id`. Builders that receive a
+correlation input emit that key, and messaging builders also map the same value to the upstream
+conversation key `messaging.message.conversation_id`.
+
 ## Checklist
 
 - **TC-1:** Span names use `<domain>.<operation>` from the central `SpanNames` map. RPC and GenAI

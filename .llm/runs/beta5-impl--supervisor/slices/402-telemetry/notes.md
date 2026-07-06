@@ -18,3 +18,14 @@
   independent scope expansion.
 - No supervisor root run artifacts were present in this checkout at start. Per the brief, this slice
   wrote artifacts only under `.llm/runs/beta5-impl--supervisor/slices/402-telemetry/`.
+
+## Adversarial Review Follow-up
+
+- PR #489 adversarial review found three false-done risks against `Closes #402`: near-miss messaging
+  semconv keys, missing `netscript.correlation.id`, and an incomplete domain root list.
+- Current OpenTelemetry messaging registry checked: semantic conventions 1.43.0 lists
+  `messaging.operation.name`, `messaging.operation.type`, and
+  `messaging.message.conversation_id`; it does not list the prior generic delivery/priority/destination
+  kind keys.
+- The fix preserves TC-5 as a strict rule instead of weakening it with undocumented NetScript
+  extensions.

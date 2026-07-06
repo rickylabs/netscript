@@ -1,3 +1,5 @@
+import { NetScriptCorrelationAttributes } from '../domain/telemetry-convention.ts';
+
 /**
  * Semantic trigger attribute names used by trigger instrumentation.
  */
@@ -32,6 +34,7 @@ export function createTriggerAttributes(trigger: {
   name?: string;
   type?: string;
   topic?: string;
+  correlationId?: string;
 }): Record<string, string> {
   const attrs: Record<string, string> = {
     [TriggerAttributes.TRIGGER_ID]: trigger.id,
@@ -39,6 +42,9 @@ export function createTriggerAttributes(trigger: {
   if (trigger.name) attrs[TriggerAttributes.TRIGGER_NAME] = trigger.name;
   if (trigger.type) attrs[TriggerAttributes.TRIGGER_TYPE] = trigger.type;
   if (trigger.topic) attrs[TriggerAttributes.TRIGGER_TOPIC] = trigger.topic;
+  if (trigger.correlationId) {
+    attrs[NetScriptCorrelationAttributes.CORRELATION_ID] = trigger.correlationId;
+  }
   return attrs;
 }
 

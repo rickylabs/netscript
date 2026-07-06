@@ -3,6 +3,7 @@ import { DeprecatedExecutionAttributeAliases, NetScriptExecutionAttributes } fro
 import { DeprecatedJobAttributeAliases, NetScriptJobAttributes } from './job.ts';
 import { DeprecatedSagaAttributeAliases, SagaAttributes } from './saga.ts';
 import { GenAiAttributes } from './genai.ts';
+import { NetScriptCorrelationAttributes } from '../domain/telemetry-convention.ts';
 
 /**
  * Primitive value accepted by telemetry attribute builders.
@@ -36,6 +37,7 @@ export function createMessagingAttributes(options: {
   system: string;
   destination: string;
   operation: string;
+  operationName?: string;
   messageId?: string;
   correlationId?: string;
   deliveryCount?: number;
@@ -45,11 +47,13 @@ export function createMessagingAttributes(options: {
     [MessagingAttributes.SYSTEM]: options.system,
     [MessagingAttributes.DESTINATION_NAME]: options.destination,
     [MessagingAttributes.DESTINATION_KIND]: 'queue',
+    [MessagingAttributes.OPERATION_NAME]: options.operationName ?? options.operation,
     [MessagingAttributes.OPERATION_TYPE]: options.operation,
     [DeprecatedMessagingAttributeAliases.OPERATION]: options.operation,
   };
   setAttribute(attrs, MessagingAttributes.MESSAGE_ID, options.messageId);
-  setAttribute(attrs, MessagingAttributes.CORRELATION_ID, options.correlationId);
+  setAttribute(attrs, MessagingAttributes.MESSAGE_CONVERSATION_ID, options.correlationId);
+  setAttribute(attrs, NetScriptCorrelationAttributes.CORRELATION_ID, options.correlationId);
   setAttribute(attrs, MessagingAttributes.DELIVERY_COUNT, options.deliveryCount);
   setAttribute(attrs, MessagingAttributes.PRIORITY, options.priority);
   return attrs;
@@ -67,6 +71,7 @@ export function createJobAttributes(job: {
   priority?: number;
   tags?: string[];
   timezone?: string;
+  correlationId?: string;
 }): TelemetryAttributeBuilderMap {
   const attrs: TelemetryAttributeBuilderMap = {};
   setAttribute(attrs, NetScriptJobAttributes.JOB_ID, job.id, DeprecatedJobAttributeAliases.JOB_ID);
@@ -112,6 +117,7 @@ export function createJobAttributes(job: {
     job.timezone,
     DeprecatedJobAttributeAliases.JOB_TIMEZONE,
   );
+  setAttribute(attrs, NetScriptCorrelationAttributes.CORRELATION_ID, job.correlationId);
   return attrs;
 }
 
@@ -123,6 +129,7 @@ export function createExecutionAttributes(execution: {
   startedAt?: string;
   completedAt?: string;
   durationMs?: number;
+  correlationId?: string;
 }): TelemetryAttributeBuilderMap {
   const attrs: TelemetryAttributeBuilderMap = {};
   setAttribute(
@@ -149,6 +156,7 @@ export function createExecutionAttributes(execution: {
     execution.durationMs,
     DeprecatedExecutionAttributeAliases.EXECUTION_DURATION_MS,
   );
+  setAttribute(attrs, NetScriptCorrelationAttributes.CORRELATION_ID, execution.correlationId);
   return attrs;
 }
 
@@ -161,6 +169,7 @@ export function createSagaAttributes(saga: {
   eventType?: string;
   attempt?: number;
   durabilityTier?: string;
+  correlationId?: string;
   correlationKey?: string;
   targetJobId?: string;
   idempotencyKey?: string;
@@ -201,6 +210,11 @@ export function createSagaAttributes(saga: {
   );
   setAttribute(
     attrs,
+    NetScriptCorrelationAttributes.CORRELATION_ID,
+    saga.correlationId ?? saga.correlationKey,
+  );
+  setAttribute(
+    attrs,
     SagaAttributes.TARGET_JOB_ID,
     saga.targetJobId,
     DeprecatedSagaAttributeAliases.TARGET_JOB_ID,
@@ -232,6 +246,7 @@ export function createGenAiAttributes(genai: {
   inputTokens?: number;
   outputTokens?: number;
   toolName?: string;
+  correlationId?: string;
 }): TelemetryAttributeBuilderMap {
   const attrs: TelemetryAttributeBuilderMap = {
     [GenAiAttributes.PROVIDER_NAME]: genai.providerName,
@@ -242,5 +257,6 @@ export function createGenAiAttributes(genai: {
   setAttribute(attrs, GenAiAttributes.USAGE_INPUT_TOKENS, genai.inputTokens);
   setAttribute(attrs, GenAiAttributes.USAGE_OUTPUT_TOKENS, genai.outputTokens);
   setAttribute(attrs, GenAiAttributes.TOOL_NAME, genai.toolName);
+  setAttribute(attrs, NetScriptCorrelationAttributes.CORRELATION_ID, genai.correlationId);
   return attrs;
 }
