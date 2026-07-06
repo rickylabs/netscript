@@ -136,7 +136,7 @@ export class TracedQueue<T = unknown> implements MessageQueue<T> {
 
         // Add delay info if present
         if (options?.delay) {
-          span.setAttribute('messaging.message.delay_ms', options.delay);
+          span.setAttribute(MessagingAttributes.DELAY_MS, options.delay);
         }
 
         // Enqueue with updated headers
@@ -293,7 +293,8 @@ export class TracedQueue<T = unknown> implements MessageQueue<T> {
               kind: SpanKind.INTERNAL,
               attributes: {
                 [MessagingAttributes.MESSAGE_ID]: ctx.messageId,
-                [MessagingAttributes.OPERATION]: MessagingOperations.ACK,
+                [MessagingAttributes.OPERATION_NAME]: MessagingOperations.ACK,
+                [MessagingAttributes.OPERATION_TYPE]: MessagingOperations.SETTLE,
               },
             },
           );
@@ -322,8 +323,9 @@ export class TracedQueue<T = unknown> implements MessageQueue<T> {
               kind: SpanKind.INTERNAL,
               attributes: {
                 [MessagingAttributes.MESSAGE_ID]: ctx.messageId,
-                [MessagingAttributes.OPERATION]: MessagingOperations.NACK,
-                'messaging.requeue': options?.requeue ?? true,
+                [MessagingAttributes.OPERATION_NAME]: MessagingOperations.NACK,
+                [MessagingAttributes.OPERATION_TYPE]: MessagingOperations.SETTLE,
+                [MessagingAttributes.REQUEUE]: options?.requeue ?? true,
               },
             },
           );

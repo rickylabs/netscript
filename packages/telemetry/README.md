@@ -77,6 +77,21 @@ await withSpan(
 - **oRPC tracing**: `createTracingPlugin` and `createErrorHandlingPlugin` (via
   `@netscript/telemetry/orpc`) instrument the NetScript oRPC handler with handler-scoped trace
   context.
+- **Telemetry convention**: TC-1..TC-14 defines span naming, SpanKind, status, W3C propagation,
+  `netscript.*` attribute namespacing, the beta.5 deprecated-alias `dup` window, and the required
+  `OTEL_SEMCONV_STABILITY_OPT_IN=messaging,rpc,gen_ai_latest_experimental` value.
+
+### Attribute Convention
+
+NetScript-owned attributes live under the single `netscript.*` root. Attribute builders under
+`@netscript/telemetry/attributes` cover job, messaging, saga, trigger, execution, and GenAI spans.
+During beta.5 those builders emit canonical `netscript.*` keys plus deprecated bare aliases where an
+old key already shipped.
+
+Messaging uses upstream OpenTelemetry keys only where they exist, including
+`messaging.operation.name`, `messaging.operation.type`, and `messaging.message.conversation_id`.
+Queue-only concepts such as delivery count, priority, delay, DLQ, and requeue live under
+`netscript.messaging.*`. Correlated spans use the shared floor `netscript.correlation.id`.
 
 ---
 
@@ -84,6 +99,8 @@ await withSpan(
 
 - **Reference**:
   [rickylabs.github.io/netscript/reference/telemetry/](https://rickylabs.github.io/netscript/reference/telemetry/)
+- **Convention**:
+  [docs/site/reference/telemetry/convention.md](../../docs/site/reference/telemetry/convention.md)
 - **Observability**:
   [rickylabs.github.io/netscript/observability/](https://rickylabs.github.io/netscript/observability/)
 

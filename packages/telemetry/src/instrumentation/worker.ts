@@ -30,6 +30,7 @@ import {
   ExecutionAttributes,
   JobAttributes,
   JobStatuses,
+  NetScriptCorrelationAttributes,
   SpanNames,
   WorkerAttributes,
 } from '../attributes/mod.ts';
@@ -220,7 +221,7 @@ export async function traceJobExecution<T extends TracedJobResult>(
     spanAttributes[JobAttributes.JOB_TRIGGER] = execution.triggeredBy;
   }
   if (execution.correlationId) {
-    spanAttributes['correlation.id'] = execution.correlationId;
+    spanAttributes[NetScriptCorrelationAttributes.CORRELATION_ID] = execution.correlationId;
   }
   if (attributes) {
     Object.assign(spanAttributes, attributes);
