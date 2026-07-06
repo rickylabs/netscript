@@ -110,3 +110,25 @@ before PLAN-EVAL PASS.**
   doc-lint 7 entrypoints 0 attributable; publish dry-run both pkgs Success; no lock churn;
   runtime/mod.ts + packages/fresh untouched (later telemetry slice owns runtime).
 - Pushed via WSL + draft **PR #558** (`Closes #494`, milestone 0.0.1-beta.6, labels + status:impl).
+
+## 2026-07-06 — TEL-T4 slice landed (wave-1 #4)
+
+- Opus sub-agent returned `fix/405-telemetry-t4-w3c-parenting` (4 commits d5ea65d9/134676de/
+  d8d46d3a/087d01c0 on base a1669f60; 9 files, +749/-74).
+- A1 review (Tier-A, substantive): PASS. Verified: (1) W3C fallback fix real — parseTraceState
+  preserves tracestate (immutable TraceState, W3C move-to-front + 32-cap), parseTraceparent
+  validates exact-width lowercase hex + rejects reserved `ff` + all-zero ids; (2) regression test
+  `trigger-runtime-parenting_test.ts` is genuinely load-bearing — ParentAwareRecorder derives each
+  span's traceId from parent context, so broken threading yields fresh random ids and fails;
+  asserts ingress(SERVER)/detect/process all share inbound traceId aaaa…; agent verified FAIL
+  pre-fix; (3) TEL-T3 boundary CLEAN — diff touches no provider-adapter/enabled/registry files.
+- Plan-divergence (recorded for IMPL-EVAL, not an A1 block): SERVER ingress span placed in the
+  plugin PROCESSOR, not core `create-trigger-ingress.ts` as the brief anticipated — processing runs
+  in a detached microtask after the 202 ack so the request span's async context is gone; durable
+  link is the captured traceparent re-established via extractFromTraceContext. plugin-triggers-core
+  stays telemetry-dep-free (matches plugin-workers-core reference); only namespacing constants
+  changed there. Sound rationale.
+- Gates: `deno task check` full plugins/triggers + scoped runtime/tests; lint 0 all three roots;
+  fmt 0; telemetry 27/27, triggers-core telemetry 5/5, triggers runtime 4/4; no lock churn.
+- Pushed via WSL + draft **PR #559** (`Closes #405`, milestone 0.0.1-beta.6, labels + status:impl).
+- Merge-order note (D-2): T3 #404 and T4 #405 are parallel; whoever merges second rebases.

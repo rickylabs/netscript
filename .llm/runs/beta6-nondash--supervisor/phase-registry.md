@@ -8,7 +8,7 @@ merged | blocked | closed-n/a | owner-batch
 | Slice | Issue | Lane | Status | PR | Notes |
 | --- | --- | --- | --- | --- | --- |
 | TEL-T3 | #404 | B (Opus high; rerouted from D, drift D5) | active | — | wave 1; load-bearing for T5/T6 |
-| TEL-T4 | #405 | B (Opus high; rerouted from D, drift D5) | active | — | wave 1; ∥ T3, rebase risk accepted (D-2) |
+| TEL-T4 | #405 | B (Opus high; rerouted from D, drift D5) | impl-done | #559 | A1 PASS 2026-07-06; W3C tracestate+version fix, triggers re-parented under inbound trace (SERVER ingress span), shared facade (TC-13), netscript.* namespacing+alias window. Regression test verified FAIL pre-fix. Plan-divergence: ingress span in processor not core create-trigger-ingress.ts (detached microtask, documented). No T3 territory. ∥ T3 rebase risk (D-2). Awaiting adversarial + IMPL-EVAL |
 | TEL-T5 | #406 | D (Codex high) | pending | — | wave 2; hard-dep T3 merged |
 | TEL-T6 | #407 | D (Codex high) | pending | — | wave 2; ai-half after #494 (D-2) |
 | TEL-T7 | #408 | D (Codex high) | pending | — | wave 2; contract-only, dashboard coupling → drift (D-6) |
