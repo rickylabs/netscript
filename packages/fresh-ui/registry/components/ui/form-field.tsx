@@ -40,7 +40,7 @@ export function FormField({
       {error
         ? (
           <div class='ns-field__error-row'>
-            <span aria-hidden='true' class='font-mono text-xs leading-none text-ns-destructive'>
+            <span aria-hidden='true' class='ns-field__error-icon'>
               ≠
             </span>
             <p class='ns-error-text'>{error}</p>

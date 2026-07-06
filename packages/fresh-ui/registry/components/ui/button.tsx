@@ -92,7 +92,13 @@ export function Button(props: ButtonProps): VNode {
     icon,
     iconPosition = 'left',
   } = props;
-  const classes = cn('ns-btn', VARIANT_CLASSES[variant], SIZE_CLASSES[size], className);
+  const classes = cn(
+    'ns-btn',
+    VARIANT_CLASSES[variant],
+    SIZE_CLASSES[size],
+    loading && 'ns-btn--loading',
+    className,
+  );
   const leadingIcon = loading
     ? <span aria-hidden='true' class='ns-spinner ns-spinner--sm' />
     : iconPosition === 'left'
@@ -133,6 +139,7 @@ export function Button(props: ButtonProps): VNode {
         href={disabled || loading ? undefined : href}
         class={classes}
         aria-disabled={disabled || loading ? 'true' : undefined}
+        aria-busy={loading ? 'true' : undefined}
       >
         {content}
       </a>
@@ -159,6 +166,7 @@ export function Button(props: ButtonProps): VNode {
       {...buttonProps}
       type={type}
       disabled={disabled || loading}
+      aria-busy={loading ? 'true' : undefined}
       class={classes}
     >
       {content}
