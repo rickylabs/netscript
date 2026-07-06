@@ -101,8 +101,21 @@ export interface NetScriptVitePluginOptions {
   pageModuleRouteBinding?: boolean;
 }
 
-/** Package-owned Vite plugin type used by NetScript Fresh. */
-export type NetScriptVitePlugin = Plugin;
+/** Package-owned Vite plugin shape returned by NetScript Fresh. */
+export interface NetScriptVitePlugin {
+  /** Vite plugin name. */
+  readonly name: string;
+  /** Vite plugin ordering hint. */
+  readonly enforce?: 'pre' | 'post';
+  /** Vite config hook used to emit aliases, env values, and SSR/build externalization. */
+  readonly config?: unknown;
+  /** Vite resolve hook used for generated app aliases. */
+  readonly resolveId?: unknown;
+  /** Vite build hook used to refresh route manifests. */
+  readonly buildStart?: unknown;
+  /** Vite dev-server hook used for route manifest watches. */
+  readonly configureServer?: unknown;
+}
 
 function dedupe(values: string[]): string[] {
   return Array.from(new Set(values));

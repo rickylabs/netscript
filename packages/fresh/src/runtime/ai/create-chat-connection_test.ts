@@ -67,6 +67,54 @@ Deno.test('resolveChatSnapshot wires session URL + auth and reduces via projectC
   assertEquals(toolPart?.toolState, 'complete');
 });
 
+Deno.test('streamPath override supports per-session durable paths', async () => {
+  const target = { sessionId: 'session/a b', baseUrl: 'https://streams.example.test' } as const;
+  let connectionReadUrl: string | undefined;
+  let responseWriteUrl: string | undefined;
+  let snapshotReadUrl: string | undefined;
+
+  const streamPath = ({ sessionId }: { readonly sessionId: string }) =>
+    `/eischat/sessions/${encodeURIComponent(sessionId)}/messages`;
+
+  const connection = createNetScriptChatConnection({
+    target,
+    streamPath,
+    createConnection(input) {
+      connectionReadUrl = input.readUrl;
+      return {
+        subscribe: () => (async function* () {})(),
+        send: () => Promise.resolve(),
+      };
+    },
+  });
+  connection.dispose();
+
+  await toNetScriptChatResponse({
+    target,
+    streamPath,
+    source: (async function* () {})(),
+    toResponse(input) {
+      responseWriteUrl = input.writeUrl;
+      return Promise.resolve(new Response(null, { status: 204 }));
+    },
+  });
+
+  await resolveChatSnapshot({
+    target,
+    streamPath,
+    materialize(input) {
+      snapshotReadUrl = input.readUrl;
+      return Promise.resolve({ messages: [] });
+    },
+  });
+
+  const expected =
+    'https://streams.example.test/v1/stream/netscript/eischat/sessions/session%2Fa%20b/messages';
+  assertEquals(connectionReadUrl, expected);
+  assertEquals(responseWriteUrl, expected);
+  assertEquals(snapshotReadUrl, expected);
+});
+
 Deno.test('projectChatSnapshot is the shared reducer (deterministic seed == live)', () => {
   const messages = [
     { id: 'm1', role: 'assistant', parts: [{ type: 'text', text: 'a' }] },

@@ -41,17 +41,28 @@ import { buildStreamUrl, getStreamsAuth, getStreamsUrl } from '@netscript/plugin
 export const NETSCRIPT_CHAT_STREAM_SUBPATH = '/ai/chat';
 
 /**
+ * Resolves the durable-stream subpath for one chat session.
+ *
+ * A string value is treated as the static prefix before `/{sessionId}`; a
+ * function value returns the full per-session subpath. Use the function form for
+ * app conventions such as `/eischat/sessions/{id}/messages`.
+ */
+export type NetScriptChatStreamPath =
+  | string
+  | ((target: NetScriptChatSessionTarget) => string);
+
+/**
  * Resolve the fully-qualified durable-stream URL for a chat session, applying
  * NetScript URL resolution (`getStreamsUrl` + `buildStreamUrl`). Not re-exported
  * from `./mod.ts`; FA2 imports it directly to keep the two slices on one
  * addressing convention.
  */
-export function resolveChatSessionUrl(target: NetScriptChatSessionTarget): string {
+export function resolveChatSessionUrl(
+  target: NetScriptChatSessionTarget,
+  options: { readonly streamPath?: NetScriptChatStreamPath } = {},
+): string {
   const baseUrl = target.baseUrl ?? getStreamsUrl();
-  return buildStreamUrl(
-    `${NETSCRIPT_CHAT_STREAM_SUBPATH}/${encodeURIComponent(target.sessionId)}`,
-    baseUrl,
-  );
+  return buildStreamUrl(resolveChatStreamSubpath(target, options.streamPath), baseUrl);
 }
 
 /** Merge NetScript streams auth headers with any per-target correlation headers. */
@@ -137,6 +148,11 @@ export interface NetScriptChatConnectionOptions {
   /** The durable chat session to connect to. */
   readonly target: NetScriptChatSessionTarget;
   /**
+   * Durable-stream subpath override. A string is used as the prefix before the
+   * encoded `sessionId`; a function returns the full per-session subpath.
+   */
+  readonly streamPath?: NetScriptChatStreamPath;
+  /**
    * REQUIRED for production — see {@link NetScriptChatAuthorize}. Threaded onto
    * the returned connection so the server route that owns it can enforce access
    * on the response path. The factory applies NO default; leaving it unset means
@@ -213,6 +229,11 @@ export interface NetScriptChatConnection {
 export interface NetScriptChatResponseOptions {
   /** The durable session stream to append the assistant turn into. */
   readonly target: NetScriptChatSessionTarget;
+  /**
+   * Durable-stream subpath override. A string is used as the prefix before the
+   * encoded `sessionId`; a function returns the full per-session subpath.
+   */
+  readonly streamPath?: NetScriptChatStreamPath;
   /** The server-side chat stream to sanitize and persist as chunks. */
   readonly source: AsyncIterable<unknown>;
   /** New client messages to persist before the assistant turn (optional). */
@@ -256,6 +277,11 @@ export interface NetScriptChatSnapshot {
 export interface NetScriptChatSnapshotOptions {
   /** The durable session stream to project. */
   readonly target: NetScriptChatSessionTarget;
+  /**
+   * Durable-stream subpath override. A string is used as the prefix before the
+   * encoded `sessionId`; a function returns the full per-session subpath.
+   */
+  readonly streamPath?: NetScriptChatStreamPath;
   /** Replay offset to materialize up to (default: full log). */
   readonly offset?: string;
   /**
@@ -339,6 +365,7 @@ export function projectChatSnapshot(
  * ```ts
  * const chat = createNetScriptChatConnection({
  *   target: { sessionId },
+ *   streamPath: ({ sessionId }) => `/eischat/sessions/${sessionId}/messages`,
  *   authorize: (req, id) => sessionBelongsToUser(req, id), // REQUIRED in prod
  * });
  * try {
@@ -352,7 +379,7 @@ export function createNetScriptChatConnection(
   options: NetScriptChatConnectionOptions,
 ): NetScriptChatConnection {
   const { target } = options;
-  const sessionUrl = resolveChatSessionUrl(target);
+  const sessionUrl = resolveChatSessionUrl(target, { streamPath: options.streamPath });
   const headers = resolveChatHeaders(target);
   const retry = resolveRetryConfig(options.subscribeRetry);
   const controller = new AbortController();
@@ -424,7 +451,7 @@ export async function toNetScriptChatResponse(
 
   const toResponse = options.toResponse ?? defaultToResponse;
   return toResponse({
-    writeUrl: resolveChatSessionUrl(target),
+    writeUrl: resolveChatSessionUrl(target, { streamPath: options.streamPath }),
     headers: resolveChatHeaders(target),
     newMessages: (newMessages ?? []).map(toDurableMessage),
     source,
@@ -445,7 +472,7 @@ export async function resolveChatSnapshot(
 ): Promise<NetScriptChatSnapshot> {
   const materialize = options.materialize ?? defaultMaterialize;
   const raw = await materialize({
-    readUrl: resolveChatSessionUrl(options.target),
+    readUrl: resolveChatSessionUrl(options.target, { streamPath: options.streamPath }),
     headers: resolveChatHeaders(options.target),
     offset: options.offset,
   });
@@ -531,6 +558,21 @@ function resolveRetryConfig(
     initialDelayMs: overrides?.initialDelayMs ?? 250,
     maxDelayMs: overrides?.maxDelayMs ?? 5000,
   };
+}
+
+function resolveChatStreamSubpath(
+  target: NetScriptChatSessionTarget,
+  streamPath: NetScriptChatStreamPath | undefined,
+): string {
+  if (typeof streamPath === 'function') {
+    return normalizeStreamPath(streamPath(target));
+  }
+  const prefix = normalizeStreamPath(streamPath ?? NETSCRIPT_CHAT_STREAM_SUBPATH);
+  return `${prefix.replace(/\/+$/, '')}/${encodeURIComponent(target.sessionId)}`;
+}
+
+function normalizeStreamPath(path: string): string {
+  return path.startsWith('/') ? path : `/${path}`;
 }
 
 /**

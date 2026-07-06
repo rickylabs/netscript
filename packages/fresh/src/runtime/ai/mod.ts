@@ -85,6 +85,7 @@ export {
   type NetScriptChatSessionTarget,
   type NetScriptChatSnapshot,
   type NetScriptChatSnapshotOptions,
+  type NetScriptChatStreamPath,
   projectChatSnapshot,
   type RenderPart,
   resolveChatSnapshot,

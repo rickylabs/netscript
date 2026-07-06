@@ -18,6 +18,17 @@ URL/auth resolution is **not** reimplemented here: it reuses the exact
 `buildStreamUrl`) that `@netscript/fresh/streams` uses. Every chat session is one
 durable stream under `/ai/chat/{sessionId}`.
 
+Apps with their own durable stream convention can override that subpath without
+forking the runtime. Pass `streamPath` as either a static prefix (the `sessionId`
+is appended) or as a per-session function that returns the full subpath:
+
+```ts
+const chat = createNetScriptChatConnection({
+  target: { sessionId },
+  streamPath: ({ sessionId }) => `/eischat/sessions/${sessionId}/messages`,
+});
+```
+
 ## StreamDB _shapes_ vs Durable _Sessions_
 
 `@netscript/fresh/streams` and `@netscript/fresh/ai` look adjacent but model two
@@ -68,6 +79,7 @@ same `projectChatSnapshot` applied to the same session log.
 | `RenderPart`                    | type     | Minimal renderable unit (`text` \| `tool` card) emitted by the reducer. FB2 widens it.         |
 | `NetScriptChatSnapshot`         | type     | `{ messages, renderParts, offset }` — the reducer's output plus the replay cursor.             |
 | `NetScriptChatAuthorize`        | type     | `(request, sessionId) => boolean \| Promise<boolean>`.                                         |
+| `NetScriptChatStreamPath`       | type     | Static prefix or per-session subpath resolver for durable chat streams.                        |
 | `NetScriptChatConnectionOptions`, `NetScriptChatResponseOptions`, `NetScriptChatSnapshotOptions` | type | Option bags for the three functions. |
 
 **SR2 tolerance.** `createNetScriptChatConnection(...).subscribe()` complements
@@ -100,6 +112,17 @@ content-encoding transport and the plugins/streams HTTP proxy are owned there,
 not in this subpath. It resolves the same `/ai/chat/{sessionId}` addressing
 convention as FA1, so the island connection and the route proxy read one stream.
 Code lands via #251; the surface is documented here for completeness.
+
+The proxy always sends `Accept-Encoding: identity` to durable-streams before
+sanitizing response headers. That prevents Deno's auto-decoder from failing
+before the proxy can strip a mislabeled `content-encoding: gzip` header.
+
+```ts
+export const streamHandler = createNetScriptChatStreamProxy({
+  target: (req) => ({ sessionId: sessionIdFrom(req) }),
+  streamPath: ({ target }) => `/eischat/sessions/${target.sessionId}/messages`,
+});
+```
 
 ### FA3 — MCP `ui://` sandbox handler
 
@@ -196,6 +219,7 @@ import { createNetScriptChatStreamProxy } from '@netscript/fresh/ai';
 
 export const streamHandler = createNetScriptChatStreamProxy({
   target: (req) => ({ sessionId: sessionIdFrom(req) }),
+  streamPath: ({ target }) => `/eischat/sessions/${target.sessionId}/messages`,
 });
 ```
 
