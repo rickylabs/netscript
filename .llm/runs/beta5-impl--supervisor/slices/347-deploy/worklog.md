@@ -63,6 +63,9 @@ To add a future workflow template, add a `.template` file under `packages/cli/sr
 | 2026-07-06 | Fetched issue #347 with `gh issue view 347 --repo rickylabs/netscript --json title,body`. | Scope confirmed. |
 | 2026-07-06 | Checked branch/status. | On `feat/347-deploy-s11`, clean worktree before planning. |
 | 2026-07-06 | Ran `aspire deploy --help`, `aspire publish --help`, and `aspire docs get deployment-state-caching`. | Confirmed `--clear-cache` and plaintext cache docs. |
+| 2026-07-06 | Separate PLAN-EVAL returned `FAIL_PLAN`. | Gate set omitted full A7/A6 evidence and scaffold runtime merge-readiness gate. |
+| 2026-07-06 | Updated plan gate set. | Added universal fitness, F-CLI, F-DEPLOY, consumer validation, and supervisor-owned `scaffold.runtime` merge-readiness gate while preserving the implementation-slice instruction not to run `e2e:cli`. |
+| 2026-07-06 | Separate PLAN-EVAL second pass returned `PASS`. | `plan-eval.md` updated from evaluator-provided PASS content. |
 
 ## Reconcile Notes
 

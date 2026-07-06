@@ -14,6 +14,6 @@ Planned implementation:
 1. Add three `.github/workflows/*.yml` templates as CLI assets and emit them during init.
 2. Adjust Aspire compose/docker deploy behavior so generated CI can use `--clear-cache`, `--non-interactive`, and explicit `--environment`.
 3. Update generated README/site docs with CI workflow usage and dev -> staging -> prod promotion.
-4. Run focused tests, scoped wrappers, full `deno task check`, and full `deno task test`. Do not run `deno task e2e:cli`.
+4. Run focused tests, scoped wrappers, `deno task arch:check`, full `deno task check`, and full `deno task test`. Do not run `deno task e2e:cli` in this implementation slice; supervisor merge-readiness owns `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`.
 
-Plan-Gate status: pending separate-session PLAN-EVAL.
+Plan-Gate status: first PLAN-EVAL returned `FAIL_PLAN`; plan gate set updated; second PLAN-EVAL returned `PASS`. Implementation may proceed.

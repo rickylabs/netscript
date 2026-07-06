@@ -30,10 +30,10 @@
 
 | Slice | Proves | Files | Gates |
 | --- | --- | --- | --- |
-| S11-A | Workflow templates are registered and emitted by scaffold root generation. | `packages/cli/src/kernel/assets/manifest.ts`, new `packages/cli/src/kernel/assets/workspace/github/workflows/*.yml.template`, `packages/cli/src/kernel/assets/embedded.generated.ts`, `packages/cli/src/kernel/adapters/templates/scaffold-template-assets.ts`, `packages/cli/src/kernel/application/scaffold/plan-init.ts`, focused scaffold/template tests. | Focused Deno tests; scoped check/lint/fmt for `packages/cli/src/kernel/{assets,adapters/templates,application/scaffold,templates/workspace}`. |
-| S11-B | Aspire deploy CI path avoids plaintext cache persistence and records environment promotion behavior. | `packages/cli/src/kernel/adapters/aspire/aspire-compose-deploy-target.ts`, `packages/cli/src/kernel/adapters/aspire/aspire-compose-deploy-target_test.ts`, docs. | Focused adapter test; scoped check/lint/fmt on adapter root. |
-| S11-C | Generated and site docs describe workflow usage, cache hardening, and dev -> staging -> prod promotion. | `packages/cli/src/kernel/templates/workspace/generate-readme.ts`, `packages/cli/src/kernel/templates/workspace/generators_test.ts`, `docs/site/how-to/deploy.md` or focused deployment doc. | Focused generator tests; docs compile not required unless existing docs task is cheap and available. |
-| S11-D | Final validation and PR trail. | Run artifacts under this slice dir. | Touched-root wrappers, focused tests, full `deno task check`, full `deno task test`. No `deno task e2e:cli`. |
+| S11-A | Workflow templates are registered and emitted by scaffold root generation. | `packages/cli/src/kernel/assets/manifest.ts`, new `packages/cli/src/kernel/assets/workspace/github/workflows/*.yml.template`, `packages/cli/src/kernel/assets/embedded.generated.ts`, `packages/cli/src/kernel/adapters/templates/scaffold-template-assets.ts`, `packages/cli/src/kernel/application/scaffold/plan-init.ts`, focused scaffold/template tests. | Focused Deno tests; scoped check/lint/fmt for `packages/cli/src/kernel/{assets,adapters/templates,application/scaffold,templates/workspace}`; consumer check that scaffold root output contains all three workflow files. |
+| S11-B | Aspire deploy CI path avoids plaintext cache persistence and records environment promotion behavior. | `packages/cli/src/kernel/adapters/aspire/aspire-compose-deploy-target.ts`, `packages/cli/src/kernel/adapters/aspire/aspire-compose-deploy-target_test.ts`, docs. | Focused adapter test; scoped check/lint/fmt on adapter root; F-DEPLOY-2 reviewed evidence that router remains thin and cache policy stays in adapter/template docs. |
+| S11-C | Generated and site docs describe workflow usage, cache hardening, and dev -> staging -> prod promotion. | `packages/cli/src/kernel/templates/workspace/generate-readme.ts`, `packages/cli/src/kernel/templates/workspace/generators_test.ts`, `docs/site/how-to/deploy.md` or focused deployment doc. | Focused generator tests; docs validation when available; reviewed evidence that docs do not overclaim live cloud deployment. |
+| S11-D | Final validation and PR trail. | Run artifacts under this slice dir. | Touched-root wrappers, focused tests, full `deno task check`, full `deno task test`, `deno task arch:check` for universal/F-CLI/F-DEPLOY reviewed evidence, consumer scaffold/import validation. Supervisor merge-readiness triggers `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`; this implementation slice does not run it per briefing. |
 
 ## Risk Register
 
@@ -46,12 +46,28 @@
 
 ## Gate Set
 
-- Scoped wrappers for touched TypeScript roots with `--ext ts,tsx`.
-- Focused Deno tests for template generation and Aspire adapter argv.
-- Full `deno task check`.
-- Full `deno task test`.
+- Static gates:
+  - scoped check/lint/fmt wrappers on touched TypeScript roots with `--ext ts,tsx`;
+  - focused Deno tests for template generation, scaffold emission, generated README text, and Aspire adapter argv;
+  - full `deno task check`;
+  - full `deno task test`.
+- Universal fitness evidence:
+  - `deno task arch:check` as the mechanical doctrine gate backing F-1, F-3, F-5, F-10, F-11, F-12, F-15, F-16, F-17, F-18, and related CLI package checks;
+  - manual reviewed evidence for F-2/F-4/F-8/F-9/F-14/F-19 where scripts do not directly cover this slice or the gate is not touched.
+- Archetype 6 evidence:
+  - F-CLI-1 through F-CLI-31 recorded as `PENDING_SCRIPT` with manual/structural evidence, backed by `deno task arch:check`;
+  - explicit F-CLI-21/F-CLI-22/F-CLI-24 evidence for workflow templates under `kernel/assets/**` and manifest/embedded asset consistency;
+  - explicit F-CLI-27/F-DEPLOY-2 evidence that no target-specific business logic is added to the deploy command router.
+- Archetype 7 evidence:
+  - F-DEPLOY-1 reviewed evidence that first-party target registrations still advertise the supported uniform-operation subset;
+  - F-DEPLOY-2 reviewed evidence that CI/cache/secrets conventions live in assets/adapters/docs, not in router logic.
+- Consumer validation:
+  - generated scaffold root emits `.github/workflows/deploy-compose-ghcr.yml`, `.github/workflows/deploy-deno-deploy.yml`, and `.github/workflows/deploy-bare-metal.yml`;
+  - generated workflow command lines reference existing public CLI/deploy commands and avoid caching `~/.aspire/deployments`.
+- Release/merge-readiness gate:
+  - because this slice changes scaffold output, the supervisor merge-readiness pass must trigger the one-pass `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`;
+  - this implementation slice must not run `deno task e2e:cli` during implementation, per briefing.
 - Public surface doc-lint/publish dry-run only if implementation changes package exports or public symbols.
-- Do not run `deno task e2e:cli`.
 
 ## Deferred Scope
 
