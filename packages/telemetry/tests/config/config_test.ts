@@ -16,12 +16,20 @@ Deno.test('getTelemetryConfig reads OTEL environment values', () => {
 
     assertEquals(config.enabled, true);
     assertEquals(config.endpoint, 'http://localhost:4318');
+    assertEquals(
+      config.semconvStabilityOptIn,
+      'messaging,rpc,gen_ai_latest_experimental',
+    );
     assertEquals(config.serviceName, 'telemetry-test');
     assertEquals(config.serviceVersion, '2.0.0');
     assertEquals(config.resourceAttributes['deployment.environment'], 'dev');
     assertEquals(config.sampler, 'always_on');
     assertEquals(config.debug, true);
     assertEquals(description.endpoint, 'http://localhost:4318');
+    assertEquals(
+      description.semconvStabilityOptIn,
+      'messaging,rpc,gen_ai_latest_experimental',
+    );
   } finally {
     Deno.env.delete('OTEL_DENO');
     Deno.env.delete('OTEL_EXPORTER_OTLP_ENDPOINT');

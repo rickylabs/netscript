@@ -6,6 +6,7 @@ export const MessagingAttributes = {
   DESTINATION_NAME: 'messaging.destination.name',
   DESTINATION_KIND: 'messaging.destination.kind',
   OPERATION: 'messaging.operation',
+  OPERATION_TYPE: 'messaging.operation.type',
   MESSAGE_ID: 'messaging.message.id',
   CORRELATION_ID: 'messaging.message.correlation_id',
   DELIVERY_COUNT: 'messaging.message.delivery_count',
@@ -15,11 +16,21 @@ export const MessagingAttributes = {
 } as const;
 
 /**
+ * Deprecated messaging aliases emitted during the beta.5 duplicate-key window.
+ */
+export const DeprecatedMessagingAttributeAliases = {
+  OPERATION: 'messaging.operation',
+} as const;
+
+/**
  * Messaging operation names used on queue spans.
  */
 export const MessagingOperations = {
-  PUBLISH: 'publish',
+  CREATE: 'create',
+  SEND: 'send',
   RECEIVE: 'receive',
+  PROCESS: 'process',
+  PUBLISH: 'publish',
   ACK: 'ack',
   NACK: 'nack',
   CLAIM: 'claim',

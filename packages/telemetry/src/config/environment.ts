@@ -1,5 +1,6 @@
 import {
   OTEL_ENV_VARS,
+  OTEL_SEMCONV_STABILITY_OPT_IN_VALUE,
   type TelemetryConfig,
   type TelemetryConfigDescription,
 } from './constants.ts';
@@ -35,6 +36,8 @@ export function getTelemetryConfig(): TelemetryConfig {
   const enabled = getEnv(OTEL_ENV_VARS.OTEL_DENO) === 'true';
   const endpoint = getEnv(OTEL_ENV_VARS.OTEL_EXPORTER_OTLP_ENDPOINT);
   const protocol = getEnv(OTEL_ENV_VARS.OTEL_EXPORTER_OTLP_PROTOCOL) ?? 'http/protobuf';
+  const semconvStabilityOptIn = getEnv(OTEL_ENV_VARS.OTEL_SEMCONV_STABILITY_OPT_IN) ??
+    OTEL_SEMCONV_STABILITY_OPT_IN_VALUE;
   const serviceName = getEnv(OTEL_ENV_VARS.OTEL_SERVICE_NAME) ?? 'unknown-service';
   const resourceAttributes = parseResourceAttributes(
     getEnv(OTEL_ENV_VARS.OTEL_RESOURCE_ATTRIBUTES),
@@ -47,6 +50,7 @@ export function getTelemetryConfig(): TelemetryConfig {
     enabled,
     endpoint,
     protocol,
+    semconvStabilityOptIn,
     serviceName,
     serviceVersion,
     resourceAttributes,
@@ -99,6 +103,7 @@ export function describeTelemetryConfig(): TelemetryConfigDescription {
     enabled: config.enabled,
     endpoint: config.endpoint ?? 'not configured',
     protocol: config.protocol,
+    semconvStabilityOptIn: config.semconvStabilityOptIn,
     serviceName: config.serviceName,
     serviceVersion: config.serviceVersion,
     sampler: config.sampler,
