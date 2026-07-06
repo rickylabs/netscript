@@ -1,6 +1,6 @@
 import { context, trace, type Tracer as OtelTracer } from '@opentelemetry/api';
 import { isTelemetryEnabled } from '../config/mod.ts';
-import type { Context, Span, Tracer } from './types.ts';
+import type { Context, Span, Tracer } from '../domain/types.ts';
 
 /**
  * Standard tracer names for NetScript telemetry domains.

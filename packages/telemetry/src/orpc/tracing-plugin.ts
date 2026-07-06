@@ -10,7 +10,7 @@
  */
 
 import { trace } from '@opentelemetry/api';
-import { SpanStatusCode } from '../core/mod.ts';
+import { SpanStatusCode } from '../application/mod.ts';
 import type { GenericHandlerOptions } from './_types.ts';
 import { extractInputKeys } from './_utils.ts';
 

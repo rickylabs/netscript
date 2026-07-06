@@ -27,12 +27,12 @@
  * ```
  */
 
-export { DuplicateInstrumentationError, InstrumentationRegistry } from './src/runtime/mod.ts';
+export { DuplicateInstrumentationError, InstrumentationRegistry } from './src/application/registry/mod.ts';
 export type {
   InstrumentationContext,
   InstrumentationEntry,
   InstrumentationRegistration,
-} from './src/runtime/mod.ts';
+} from './src/application/registry/mod.ts';
 export { initJobTracing, runTracedJob } from './src/instrumentation/worker.ts';
 export type {
   Attributes,
@@ -46,6 +46,6 @@ export type {
   SpanStatusCode,
   TimeInput,
   TraceState,
-} from './src/core/types.ts';
+} from './src/domain/types.ts';
 export { inspectTelemetry } from './src/diagnostics/inspect-telemetry.ts';
 export type { InspectionReport } from './src/diagnostics/inspect-telemetry.ts';

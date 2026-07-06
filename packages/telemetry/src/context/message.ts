@@ -1,5 +1,5 @@
 import { context } from '@opentelemetry/api';
-import type { Context } from '../core/mod.ts';
+import type { Context } from '../application/mod.ts';
 import { extractContext, injectContext } from './w3c.ts';
 import type { PropagationHeaders } from './types.ts';
 

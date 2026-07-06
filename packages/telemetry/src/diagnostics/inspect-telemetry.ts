@@ -1,4 +1,4 @@
-import type { InstrumentationEntry, InstrumentationRegistry } from '../runtime/mod.ts';
+import type { InstrumentationEntry, InstrumentationRegistry } from '../application/registry/mod.ts';
 
 /** JSON-stable diagnostic report returned by telemetry inspectors. */
 export interface InspectionReport {

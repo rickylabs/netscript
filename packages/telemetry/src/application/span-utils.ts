@@ -1,4 +1,4 @@
-import { type Attributes, type Span, SpanStatusCode } from './types.ts';
+import { type Attributes, type Span, SpanStatusCode } from '../domain/types.ts';
 
 /**
  * Set several attributes on a span.

@@ -8,7 +8,7 @@
  */
 
 import { type Attributes, trace } from '@opentelemetry/api';
-import type { Span } from '../core/mod.ts';
+import type { Span } from '../application/mod.ts';
 
 // ============================================================================
 // TYPES

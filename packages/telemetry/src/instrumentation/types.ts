@@ -1,4 +1,4 @@
-import type { Context, Span } from '../core/mod.ts';
+import type { Context, Span } from '../application/mod.ts';
 
 /**
  * Message context provided to queue handlers during message processing.

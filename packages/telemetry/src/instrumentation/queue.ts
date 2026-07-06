@@ -18,7 +18,7 @@ import {
   type Span,
   SpanKind,
   withSpan,
-} from '../core/mod.ts';
+} from '../application/mod.ts';
 import {
   contextWithSpan,
   createMessageHeaders,
