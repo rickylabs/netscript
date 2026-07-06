@@ -48,8 +48,10 @@ deployment target of epic #327.
   2 comments on #400 (CR-DDX-HOSTAGNOSTIC #issuecomment-4892799802 + CommandInvokePort
   first-definer ack #issuecomment-4892800265); PR #504 body updated. Map + deltas:
   `FILING-LOG.md`. **GitHub is now the single source of truth** (authority banner on plan.md).
-- I Handoff: **in progress** — per-epic briefs from GitHub + design packs, `use harness` +
-  `## SKILL` chapter.
+- I Handoff: ✅ — `stage-i-handoff.md` (preamble, lane routing, wave order, pack map, laws, first
+  batch = #511/#512/#513). **Seed run A–I complete; run dir frozen; board is live.** Post-filing
+  owner note: cron lineage + denoland/deno#33965 watch recorded on #517
+  (#issuecomment-4892882327).
 
 ## Resume notes
 

@@ -245,3 +245,16 @@ Seed run (planning-only). Stage contracts per `.llm/harness/workflow/seed-run.md
 - `FILING-LOG.md` written (map, ratified picks, 3 deltas, mechanics); **authority banner** added
   to plan.md — **GitHub is now the single source of truth**.
 - Stage H closed. Run proceeds to Stage I (implementation handoff briefs).
+
+## Stage I — Implementation handoff briefs (2026-07-06)
+
+- `stage-i-handoff.md` written: paste-ready `use harness` + `## SKILL` preamble, lane routing
+  (framework source → WSL Codex Tier D; docs #541 → Claude workflow exception; per-PR IMPL-EVAL =
+  qwen-3.7-max single loop), wave order W0–W5 with parallelism notes, design-pack→issue map,
+  standing laws, first actionable batch (#511 → #512 + #513).
+- Owner note landed post-filing: cron-primitive lineage + upstream watch comment on **#517**
+  (#issuecomment-4892882327) — `@netscript/cron` behind a port (lineage: netscript-start#93
+  TriggerSchedulerPort anti-fragmentation law); track denoland/deno#33965 `Deno.cron.persistent`
+  (OS-scheduler-backed cron) as a future adapter, not a re-architecture.
+- Stage I closed. **Seed run A–I complete.** The run dir is frozen; the board (#510 + #511–#546)
+  is live.
