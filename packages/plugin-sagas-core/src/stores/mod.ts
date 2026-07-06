@@ -33,6 +33,16 @@ export type {
   SagaStorePort,
   SagaStoreWriteOptions,
 } from '../ports/mod.ts';
+export type {
+  AtomicCheck,
+  AtomicMutation,
+  AtomicResult,
+  KvEntry,
+  KvKey,
+  KvListOptions,
+  KvSetOptions,
+  KvStore,
+} from '@netscript/kv';
 export { MemorySagaAppliedKeyStore } from '../runtime/mod.ts';
 export { KvSagaAppliedKeyStore, KvSagaIdempotencyStore } from './kv-saga-runtime-stores.ts';
 export { KvSagaStore, openSagaRuntimeKv } from './kv-saga-store.ts';
@@ -48,7 +58,21 @@ export type {
   SagaRuntimeKvStoreOptions,
 } from './kv-saga-runtime-stores.ts';
 export type { KvSagaStoreOptions } from './kv-saga-store.ts';
-export type { PrismaSagaStoreClient, PrismaSagaStoreOptions } from './prisma-saga-store.ts';
+export type {
+  PrismaSagaStoreClient,
+  PrismaSagaStoreOptions,
+  SagaRuntimeCorrelationDelegate,
+  SagaRuntimeCorrelationRow,
+  SagaRuntimeCorrelationWrite,
+  SagaRuntimeStateDelegate,
+  SagaRuntimeStateRow,
+  SagaRuntimeStateUpdate,
+  SagaRuntimeStateWrite,
+  SagaRuntimeTransitionDelegate,
+  SagaRuntimeTransitionRow,
+  SagaRuntimeTransitionWrite,
+  WriteResult,
+} from './prisma-saga-store.ts';
 export type {
   DurableSagaStoreBackend,
   SagaStoreBackendResolutionInput,

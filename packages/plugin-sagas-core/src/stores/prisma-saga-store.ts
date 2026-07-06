@@ -11,28 +11,33 @@ import type {
   SagaTransitionRecord,
 } from '../runtime/mod.ts';
 
-type WriteResult = Readonly<{ count: number }>;
+/** Result returned by Prisma write operations that report affected row count. */
+export type WriteResult = Readonly<{ count: number }>;
 
-type SagaRuntimeStateRow = Readonly<{
+/** Prisma row shape for persisted saga runtime state. */
+export type SagaRuntimeStateRow = Readonly<{
   instanceId: string;
   sagaId: string;
   version: number;
   envelope: unknown;
 }>;
 
-type SagaRuntimeTransitionRow = Readonly<{
+/** Prisma row shape for persisted saga transition history. */
+export type SagaRuntimeTransitionRow = Readonly<{
   instanceId: string;
   version: number;
   record: unknown;
 }>;
 
-type SagaRuntimeCorrelationRow = Readonly<{
+/** Prisma row shape for the saga correlation index. */
+export type SagaRuntimeCorrelationRow = Readonly<{
   sagaId: string;
   correlationKey: string;
   instanceId: string;
 }>;
 
-type SagaRuntimeStateDelegate = Readonly<{
+/** Prisma delegate surface required for saga runtime state rows. */
+export type SagaRuntimeStateDelegate = Readonly<{
   findUnique(args: { where: { instanceId: string } }): Promise<SagaRuntimeStateRow | null>;
   findMany(args?: {
     orderBy?: { instanceId?: 'asc' | 'desc' };
@@ -50,7 +55,8 @@ type SagaRuntimeStateDelegate = Readonly<{
   deleteMany(args: { where: { instanceId: string } }): Promise<WriteResult>;
 }>;
 
-type SagaRuntimeTransitionDelegate = Readonly<{
+/** Prisma delegate surface required for saga transition history rows. */
+export type SagaRuntimeTransitionDelegate = Readonly<{
   findMany(args: {
     where: { instanceId: string };
     orderBy: { version: 'asc' | 'desc' };
@@ -59,7 +65,8 @@ type SagaRuntimeTransitionDelegate = Readonly<{
   deleteMany(args: { where: { instanceId: string } }): Promise<WriteResult>;
 }>;
 
-type SagaRuntimeCorrelationDelegate = Readonly<{
+/** Prisma delegate surface required for saga correlation rows. */
+export type SagaRuntimeCorrelationDelegate = Readonly<{
   findUnique(args: {
     where: { sagaId_correlationKey: { sagaId: string; correlationKey: string } };
   }): Promise<SagaRuntimeCorrelationRow | null>;
@@ -71,26 +78,30 @@ type SagaRuntimeCorrelationDelegate = Readonly<{
   deleteMany(args: { where: { instanceId: string } }): Promise<WriteResult>;
 }>;
 
-type SagaRuntimeStateWrite = Readonly<{
+/** Prisma create payload for saga runtime state rows. */
+export type SagaRuntimeStateWrite = Readonly<{
   instanceId: string;
   sagaId: string;
   version: number;
   envelope: unknown;
 }>;
 
-type SagaRuntimeStateUpdate = Readonly<{
+/** Prisma update payload for saga runtime state rows. */
+export type SagaRuntimeStateUpdate = Readonly<{
   sagaId: string;
   version: number;
   envelope: unknown;
 }>;
 
-type SagaRuntimeTransitionWrite = Readonly<{
+/** Prisma create payload for saga transition history rows. */
+export type SagaRuntimeTransitionWrite = Readonly<{
   instanceId: string;
   version: number;
   record: unknown;
 }>;
 
-type SagaRuntimeCorrelationWrite = Readonly<{
+/** Prisma create payload for saga correlation rows. */
+export type SagaRuntimeCorrelationWrite = Readonly<{
   sagaId: string;
   correlationKey: string;
   instanceId: string;

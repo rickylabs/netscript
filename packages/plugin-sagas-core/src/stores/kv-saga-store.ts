@@ -13,6 +13,17 @@ import type {
   SagaTransitionRecord,
 } from '../runtime/mod.ts';
 
+export type {
+  AtomicCheck,
+  AtomicMutation,
+  AtomicResult,
+  KvEntry,
+  KvKey,
+  KvListOptions,
+  KvSetOptions,
+  KvStore,
+} from '@netscript/kv';
+
 const DEFAULT_SAGA_KV_PREFIX = ['sagas'] as const satisfies KvKey;
 const SAGA_KV_PATH_ENV = 'NETSCRIPT_SAGA_KV_PATH';
 

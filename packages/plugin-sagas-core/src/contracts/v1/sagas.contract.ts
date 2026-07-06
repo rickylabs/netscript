@@ -12,7 +12,6 @@ import {
   BASE_PLUGIN_ERRORS,
   type BasePluginContract,
   type BasePluginDescribeRoute,
-  type PluginCapabilities,
 } from '@netscript/plugin/contract-base';
 import { SAGA_DURABILITY_TIERS, SAGA_INSTANCE_STATUSES } from '../../domain/mod.ts';
 
@@ -215,11 +214,17 @@ export type SagaHistoryEntry = Readonly<{
 
 /**
  * Public, capability-document shape returned by the mandatory `describe` route.
- *
- * Named public alias of {@link PluginCapabilities} so consumers can reference
- * the sagas describe-output type without reaching into `@netscript/plugin`.
  */
-export type SagasCapabilities = PluginCapabilities;
+export interface SagasCapabilities {
+  /** Canonical plugin package name, for example `@netscript/plugin-sagas`. */
+  readonly pluginName: string;
+  /** Contract version identifiers served by the plugin. */
+  readonly contractVersions: readonly string[];
+  /** Route group names exposed by the plugin. */
+  readonly routeGroups: readonly string[];
+  /** Capability tags advertised by the plugin. */
+  readonly capabilities: readonly string[];
+}
 
 // --- Route output / shared schemas -------------------------------------------
 // Every inline `z.object(...)` is named and explicitly annotated with concrete

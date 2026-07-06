@@ -27,6 +27,10 @@
   `PluginCapabilities` alias with a package-owned `AuthCapabilities` interface. The remaining refs
   are the same precise oRPC contract-definition/implementer seam as the other feature-plugin
   contract packages.
+- `packages/plugin-sagas-core` is reduced from 11 combined diagnostics to 2 after making store
+  client/delegate/KV aliases public on the store subpath and replacing the `PluginCapabilities`
+  alias with a package-owned `SagasCapabilities` interface. The remaining refs are the same precise
+  oRPC contract-definition/implementer seam as the other feature-plugin contract packages.
 - `packages/fresh-ui` remains a design-heavy interactive surface cluster. A local conversion from
   exported Preact `JSX.*` prop aliases to the package-owned `FreshUiElementProps` vocabulary reduced
   doc-lint counts but broke hook/component type-checking across runtime call sites. The package needs

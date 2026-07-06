@@ -9,6 +9,17 @@ import type {
 } from '../runtime/mod.ts';
 import { sagaIdempotencyKey } from '../runtime/mod.ts';
 
+export type {
+  AtomicCheck,
+  AtomicMutation,
+  AtomicResult,
+  KvEntry,
+  KvKey,
+  KvListOptions,
+  KvSetOptions,
+  KvStore,
+} from '@netscript/kv';
+
 const DEFAULT_SAGA_IDEMPOTENCY_TTL_MS = 24 * 60 * 60 * 1000;
 const DEFAULT_SAGA_KV_PREFIX = ['sagas'] as const satisfies KvKey;
 
