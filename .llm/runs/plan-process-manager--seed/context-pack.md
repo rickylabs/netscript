@@ -23,12 +23,14 @@ deployment target of epic #327.
   behind `linux-service`/`windows-service`), state-vocabulary + restart-default unification, and
   drift entry 5 (`resolveTargetConfig` key/member mismatch). 39 candidate slices total
   (11+7+7+8+6); 34 residual questions carried.
-- E Plan lock: in progress — supervisor authors `plan.md`: consolidated slice DAG from the 39
-  candidates, numbered owner-fork sweep (OF-1..7 + key residual questions), milestone train
-  re-derived vs live board (MUST fetch #327 live body/milestone — absent from
-  `context/adjacent-issues.jsonl`), risk register (constraints 21–25 + deno-desktop experimental +
-  cgroups asymmetry), gate matrix, PR #504 body refresh.
-- F Adversarial: pending.
+- E Plan lock: ✅ — supervisor-authored `plan.md`: E1–E16 resolved decisions (headline E1: no new
+  target key, per D3; E5: OS-service-layer extraction into the core w/ CLI re-exports — Stage F
+  attack target), OF-1..9 owner-fork sweep, 39 candidates → **PM-0..PM-35** (31 milestone-1 + 4
+  deferred; `v1-min` floor = 19), milestone train re-derived from the LIVE board (#327 =
+  0.0.1-stable confirmed via WSL gh; #400 beta.6; #E1/#E6 beta.8; beta.7 = 28 open → OF-9), risk
+  register R1–R10, gate matrix, Stage-H one-shot filing plan. 4 residual questions remain (plan §9).
+- F Adversarial: pending — WSL Codex, unoriented, distinct model; attacks plan.md + packs; directed
+  at E5 extraction, the DAG deps, and milestone realism.
 - G PLAN-EVAL: pending (hard stop).
 - H Ratify + file: pending (owner).
 - I Handoff: pending.

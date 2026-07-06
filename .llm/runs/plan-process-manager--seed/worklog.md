@@ -133,3 +133,34 @@ Seed run (planning-only). Stage contracts per `.llm/harness/workflow/seed-run.md
   overlap and will collapse in plan.md).
 - Slice inventory available to Stage E: 11 (D1) + 7 (D2) + 7 (D3) + 8 (D4) + 6 (D5) = **39
   candidate slices** to consolidate into the plan DAG.
+
+## Stage E — Plan lock (2026-07-06)
+
+- Tier A supervisor authored `plan.md` directly (no delegation — plan lock is a supervisor
+  deliverable per seed-run).
+- **Live-board fetch (WSL gh, this session)** — the §C6 caveat (#327 body absent from
+  `context/adjacent-issues.jsonl`) is resolved: #327 = OPEN, milestone **0.0.1-stable** (not
+  beta.5; drift entry 1 confirmed and closed), full body captured incl. the TIER-4 desktop section
+  and D1–D6 product decisions. Adjacents: #400 = beta.6 (41 open) · #451/#456 = beta.8 ·
+  #345/#346/#348/#458 = stable · #349/#350 = Backlog/Triage · beta.7 currently 28 open.
+  Consequences: dashboard-defines-first `CommandInvokePort` default HOLDS (beta.6 < M1 beta.7);
+  #E6/#E1 soft-dep timing works for a beta.8 M2; #345 re-scope timing is safe (stable).
+- **All 7 cross-pack reconciliation items resolved** as plan.md §2 decisions E1–E16:
+  target-key per D3 (E1), state vocabulary (E2), restart defaults S7-locked (E3), route naming +
+  `CommandInvokePort` (E4), renderer/package boundary = core extraction with CLI re-exports (E5,
+  the largest structural call — Stage F directed to attack it), telemetry refinement (E15),
+  cross-epic carries (plan.md §8).
+- **34 residual questions → 4 remain open** (plan.md §9); the rest resolved by E1–E16 or absorbed
+  into slice acceptance criteria.
+- **39 candidate slices → 31 milestone-1 slices + 4 deferred** (PM-0..PM-35, plan.md §4) after 4
+  merges (D1-S1+D5-1; D1-S10+D2-S1; D1-S4+D1-S5; D5-6+PMS-8) and extraction of the 3 board drafts
+  to Stage-H items. `v1-min` wave marks the cuttable floor (19 slices).
+- Milestone train (plan.md §5): PM-0 → beta.6-eligible; M1 → beta.7 (owner fork OF-9 may slide —
+  beta.7 already carries 28 open); M2 (desktop + panel) → beta.8; M3 → stable converging with
+  re-scoped #345.
+- Owner-fork sweep now OF-1..9 (OF-8 CR-DDX-HOSTAGNOSTIC submission, OF-9 milestone loading added).
+- Risk register R1–R10 (ledger constraints 21–25 + sd_notify spike + milestone load + cross-epic
+  slips + E5 extraction risk + memory-poll latency), gate matrix (7 gates × archetype overlays),
+  Stage-H one-shot filing plan recorded in plan.md §6/§7/§10.
+- Next: Stage F adversarial review (WSL Codex, unoriented, distinct model) attacks plan.md +
+  packs; then Stage G PLAN-EVAL (OpenHands minimax-M3, separate session) — hard stop.
