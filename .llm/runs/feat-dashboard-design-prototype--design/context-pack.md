@@ -6,7 +6,7 @@
 | -------------- | ----------------------------------------- |
 | Run ID         | `feat-dashboard-design-prototype--design` |
 | Branch         | `feat/dashboard-design-prototype`         |
-| Current phase  | `plan` (awaiting PLAN-EVAL)               |
+| Current phase  | `plan-eval` (dispatched, awaiting verdict) |
 | Archetype      | N/A (repo tooling + design artifacts)     |
 | Scope overlays | none                                      |
 
@@ -29,15 +29,23 @@ the beta.6 implementation supervisor.
 
 ## In Progress
 
-- Bootstrap tail: commit + push branch, open draft PR, file new issue + board comments, dispatch
-  PLAN-EVAL.
+- PLAN-EVAL (OpenHands minimax-M3, PR-comment lane) dispatched 2026-07-06 on draft PR **#506**
+  (comment 4891516954). Supervisor watching via `gh-watch.ts --pr 506` background. **Hard stop
+  before slice 1 until PASS.**
+
+## Board state (filed)
+
+- Draft PR **#506** (`Closes #425`, Part of #400) — the commit trail.
+- New tracking issue **#507** (Backlog / Triage; type:feat, epic:dev-dashboard, area:fresh-ui,
+  area:tooling, priority:p1, status:plan).
+- Supersession comments posted on #425 (4891488892) and #400 (4891489240).
 
 ## Next Steps
 
-1. Commit run dir; push `feat/dashboard-design-prototype` (explicit refspec); open draft PR (WSL gh).
-2. File new issue (Backlog / Triage, `Part of #400`); supersession comments on #425/#400.
-3. Dispatch PLAN-EVAL (OpenHands minimax-M3, separate session). **Hard stop before slice 1.**
-4. Owner: `claude mcp add … claude-design …` + `/design-login`; then slice 0 canvas smoke.
+1. PLAN-EVAL verdict → PASS: proceed to slice 0; FAIL_PLAN: fix plan boxes (max 2 cycles).
+2. Owner: `claude mcp add … claude-design …` + `/design-login`; then slice 0 canvas smoke.
+3. Owner lane directive 2026-07-06 (in force, also in memory): Fable 5 = all design/creativity
+   work; WSL Codex = chores only, never design; Opus 4.8 = the rest; Sonnet 5 = workflow stages.
 
 ## Key Decisions
 
