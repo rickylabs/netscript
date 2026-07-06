@@ -31,12 +31,13 @@ export function createDeployCommand(
         buildDeployDependencies: {
           loadConfig: dependencies.deployBuildDependencies.loadConfig,
           buildWindowsDeployment: (config, options) =>
-            buildWindowsDeployment(config, {
-              ...options,
-              skipServices: options.skipServices ? [...options.skipServices] : undefined,
-              includeTasks: options.includeTasks ? [...options.includeTasks] : undefined,
-              excludeTasks: options.excludeTasks ? [...options.excludeTasks] : undefined,
-            }),
+            (dependencies.deployBuildDependencies.buildWindowsDeployment ??
+              buildWindowsDeployment)(config, {
+                ...options,
+                skipServices: options.skipServices ? [...options.skipServices] : undefined,
+                includeTasks: options.includeTasks ? [...options.includeTasks] : undefined,
+                excludeTasks: options.excludeTasks ? [...options.excludeTasks] : undefined,
+              }),
         },
       }),
     )
@@ -45,6 +46,7 @@ export function createDeployCommand(
       createDenoDeployCommand({
         loadConfig: dependencies.loadConfig,
         resolveProjectRoot: dependencies.resolveProjectRoot,
+        createTarget: dependencies.denoDeployTargetFactory,
       }),
     )
     .command('package-cli', packageCliCommand)

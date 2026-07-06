@@ -1,0 +1,56 @@
+name: Build Bare-Metal Deploy Artifacts
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Deployment environment represented by the artifact.
+        required: true
+        default: staging
+        type: choice
+        options:
+          - development
+          - staging
+          - production
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-bare-metal-${{ github.event.inputs.environment || 'staging' }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: linux
+            deploy_dir: .deploy/linux
+          - os: windows-latest
+            target: windows
+            deploy_dir: .deploy/windows
+    runs-on: ${{ matrix.os }}
+    environment: ${{ github.event.inputs.environment || 'staging' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Type-check workspace
+        run: deno task check
+
+      - name: Compile deployment artifacts
+        run: >
+          deno x -A jsr:@netscript/cli deploy build
+          --output-dir "${{ matrix.deploy_dir }}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: netscript-${{ matrix.target }}-${{ github.event.inputs.environment || 'staging' }}
+          path: ${{ matrix.deploy_dir }}
+          if-no-files-found: error

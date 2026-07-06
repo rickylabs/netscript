@@ -1,0 +1,56 @@
+name: Deploy to Deno Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: GitHub environment to deploy.
+        required: true
+        default: staging
+        type: choice
+        options:
+          - development
+          - staging
+          - production
+      production:
+        description: Promote this deployment to production.
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-deno-deploy-${{ github.event.inputs.environment || 'staging' }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'staging' }}
+    env:
+      DENO_DEPLOY_TOKEN: ${{ secrets.DENO_DEPLOY_TOKEN }}
+      DENO_DEPLOY_ORG: ${{ vars.DENO_DEPLOY_ORG }}
+      DENO_DEPLOY_APP: ${{ vars.DENO_DEPLOY_APP }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Type-check workspace
+        run: deno task check
+
+      - name: Push deployment
+        run: |
+          args=(
+            deploy deno-deploy up
+            --org "$DENO_DEPLOY_ORG"
+            --app "$DENO_DEPLOY_APP"
+          )
+          if [ "${{ github.event.inputs.production }}" = "true" ]; then
+            args+=(--prod)
+          fi
+          deno x -A jsr:@netscript/cli "${args[@]}"

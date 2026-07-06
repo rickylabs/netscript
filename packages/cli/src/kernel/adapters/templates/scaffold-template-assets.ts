@@ -71,6 +71,9 @@ const LEGACY_ASPIRE_TEMPLATE_URLS: TemplateUrlMap = {
 } as const;
 
 const ROOT_TEMPLATE_URLS: TemplateUrlMap = {
+  bareMetalDeployWorkflowTemplate: TEMPLATE_KEYS.workspaceGithubWorkflowsDeployBareMetal,
+  composeGhcrDeployWorkflowTemplate: TEMPLATE_KEYS.workspaceGithubWorkflowsDeployComposeGhcr,
+  denoDeployWorkflowTemplate: TEMPLATE_KEYS.workspaceGithubWorkflowsDeployDenoDeploy,
   gitignoreTemplate: TEMPLATE_KEYS.workspaceGitignore,
 } as const;
 
@@ -88,20 +91,28 @@ export type AppScaffoldTemplateAssets = TemplateMap<typeof APP_TEMPLATE_URLS>;
 export type ExampleServiceAppTemplateAssets = TemplateMap<
   typeof EXAMPLE_SERVICE_APP_TEMPLATE_URLS
 >;
-export type LegacyAspireTemplateAssets = TemplateMap<typeof LEGACY_ASPIRE_TEMPLATE_URLS>;
+export type LegacyAspireTemplateAssets = TemplateMap<
+  typeof LEGACY_ASPIRE_TEMPLATE_URLS
+>;
 export type RootScaffoldTemplateAssets = TemplateMap<typeof ROOT_TEMPLATE_URLS>;
-export type AspireHelperTemplateAssets = TemplateMap<typeof ASPIRE_HELPER_TEMPLATE_URLS>;
+export type AspireHelperTemplateAssets = TemplateMap<
+  typeof ASPIRE_HELPER_TEMPLATE_URLS
+>;
 
 async function loadTemplateMap<T extends Record<string, TemplateKey>>(
   urls: T,
 ): Promise<TemplateMap<T>> {
   const entries = await Promise.all(
-    Object.entries(urls).map(async ([name, url]) => [name, await readTemplateAsset(url)]),
+    Object.entries(urls).map(async (
+      [name, url],
+    ) => [name, await readTemplateAsset(url)]),
   );
   return Object.fromEntries(entries) as TemplateMap<T>;
 }
 
-export async function loadAppScaffoldTemplateAssets(): Promise<AppScaffoldTemplateAssets> {
+export async function loadAppScaffoldTemplateAssets(): Promise<
+  AppScaffoldTemplateAssets
+> {
   return await loadTemplateMap(APP_TEMPLATE_URLS);
 }
 
@@ -111,14 +122,20 @@ export async function loadExampleServiceAppTemplateAssets(): Promise<
   return await loadTemplateMap(EXAMPLE_SERVICE_APP_TEMPLATE_URLS);
 }
 
-export async function loadLegacyAspireTemplateAssets(): Promise<LegacyAspireTemplateAssets> {
+export async function loadLegacyAspireTemplateAssets(): Promise<
+  LegacyAspireTemplateAssets
+> {
   return await loadTemplateMap(LEGACY_ASPIRE_TEMPLATE_URLS);
 }
 
-export async function loadRootScaffoldTemplateAssets(): Promise<RootScaffoldTemplateAssets> {
+export async function loadRootScaffoldTemplateAssets(): Promise<
+  RootScaffoldTemplateAssets
+> {
   return await loadTemplateMap(ROOT_TEMPLATE_URLS);
 }
 
-export async function loadAspireHelperTemplateAssets(): Promise<AspireHelperTemplateAssets> {
+export async function loadAspireHelperTemplateAssets(): Promise<
+  AspireHelperTemplateAssets
+> {
   return await loadTemplateMap(ASPIRE_HELPER_TEMPLATE_URLS);
 }

@@ -14,7 +14,11 @@ import type { InitPipelineContext } from './context.ts';
 import { createScaffoldPlan } from '../../domain/scaffold/scaffold-plan.ts';
 
 function generateAppStubDenoJson(name: string, appName: string): string {
-  const config = { name: `@${name}/${appName}`, version: '0.0.0', exports: './main.ts' };
+  const config = {
+    name: `@${name}/${appName}`,
+    version: '0.0.0',
+    exports: './main.ts',
+  };
   return JSON.stringify(config, null, 2) + '\n';
 }
 
@@ -35,7 +39,12 @@ export async function scaffoldRoot(
   const plan = createScaffoldPlan(options, {
     useWorkspacePackages: context.packagesAsWorkspaceMembers(options),
   });
-  const { gitignoreTemplate } = await loadRootScaffoldTemplateAssets();
+  const {
+    bareMetalDeployWorkflowTemplate,
+    composeGhcrDeployWorkflowTemplate,
+    denoDeployWorkflowTemplate,
+    gitignoreTemplate,
+  } = await loadRootScaffoldTemplateAssets();
 
   // Create root directory
   await context.scaffolder.createDir(targetPath);
@@ -78,7 +87,13 @@ export async function scaffoldRoot(
     dbEngines: [...plan.dbEngines],
   });
   const denoJsonPath = join(targetPath, SCAFFOLD_FILES.DENO_JSON);
-  if (await context.scaffolder.writeFile(denoJsonPath, denoJsonContent, options.force)) {
+  if (
+    await context.scaffolder.writeFile(
+      denoJsonPath,
+      denoJsonContent,
+      options.force,
+    )
+  ) {
     filesCreated.push(denoJsonPath);
   } else {
     filesSkipped.push(denoJsonPath);
@@ -91,7 +106,9 @@ export async function scaffoldRoot(
     localBase: options.localBase,
   });
   const configPath = join(targetPath, SCAFFOLD_FILES.NETSCRIPT_CONFIG);
-  if (await context.scaffolder.writeFile(configPath, configContent, options.force)) {
+  if (
+    await context.scaffolder.writeFile(configPath, configContent, options.force)
+  ) {
     filesCreated.push(configPath);
   } else {
     filesSkipped.push(configPath);
@@ -99,13 +116,39 @@ export async function scaffoldRoot(
 
   // 3. .gitignore (Tier 2 — static, no variables)
   const gitignorePath = join(targetPath, SCAFFOLD_FILES.GITIGNORE);
-  if (await context.scaffolder.writeFile(gitignorePath, gitignoreTemplate, options.force)) {
+  if (
+    await context.scaffolder.writeFile(
+      gitignorePath,
+      gitignoreTemplate,
+      options.force,
+    )
+  ) {
     filesCreated.push(gitignorePath);
   } else {
     filesSkipped.push(gitignorePath);
   }
 
-  // 4. Optional editor config files (Tier 1 — programmatic, answer-driven)
+  // 4. CI/CD workflow templates (Tier 2 — static, target-specific)
+  const workflowFiles = [
+    ['deploy-deno-deploy.yml', denoDeployWorkflowTemplate],
+    ['deploy-bare-metal.yml', bareMetalDeployWorkflowTemplate],
+  ] as const;
+  const aspireWorkflowFiles = options.noAspire ? workflowFiles : [
+    ['deploy-compose-ghcr.yml', composeGhcrDeployWorkflowTemplate],
+    ...workflowFiles,
+  ] as const;
+  for (const [filename, content] of aspireWorkflowFiles) {
+    const workflowPath = join(targetPath, '.github', 'workflows', filename);
+    if (
+      await context.scaffolder.writeFile(workflowPath, content, options.force)
+    ) {
+      filesCreated.push(workflowPath);
+    } else {
+      filesSkipped.push(workflowPath);
+    }
+  }
+
+  // 5. Optional editor config files (Tier 1 — programmatic, answer-driven)
   for (const file of generateEditorConfigFiles(options.editor)) {
     const filePath = join(targetPath, file.path);
     const directory = dirname(filePath);
@@ -113,14 +156,16 @@ export async function scaffoldRoot(
       await context.scaffolder.createDir(directory);
       directoriesCreated.push(directory);
     }
-    if (await context.scaffolder.writeFile(filePath, file.content, options.force)) {
+    if (
+      await context.scaffolder.writeFile(filePath, file.content, options.force)
+    ) {
       filesCreated.push(filePath);
     } else {
       filesSkipped.push(filePath);
     }
   }
 
-  // 5. README.md (Tier 1 — programmatic, answer-driven)
+  // 6. README.md (Tier 1 — programmatic, answer-driven)
   //    Shows TS vs legacy AppHost commands, includes services/<name>
   //    and database sections when applicable.
   const readmeContent = generateReadme({
@@ -132,13 +177,15 @@ export async function scaffoldRoot(
     dbEngine: options.dbEngine,
   });
   const readmePath = join(targetPath, SCAFFOLD_FILES.README);
-  if (await context.scaffolder.writeFile(readmePath, readmeContent, options.force)) {
+  if (
+    await context.scaffolder.writeFile(readmePath, readmeContent, options.force)
+  ) {
     filesCreated.push(readmePath);
   } else {
     filesSkipped.push(readmePath);
   }
 
-  // 6. appsettings.json (Tier 1 — NetScript infrastructure config)
+  // 7. appsettings.json (Tier 1 — NetScript infrastructure config)
   //    Always generated at project root — consumed by helpers generator
   //    regardless of C# vs TS AppHost mode.
   //    TS AppHost uses port 8010 so the Aspire proxy port (8010) does not
@@ -157,7 +204,13 @@ export async function scaffoldRoot(
       service: plan.service,
     });
     const appsettingsPath = join(targetPath, SCAFFOLD_FILES.APPSETTINGS);
-    if (await context.scaffolder.writeFile(appsettingsPath, appsettingsContent, options.force)) {
+    if (
+      await context.scaffolder.writeFile(
+        appsettingsPath,
+        appsettingsContent,
+        options.force,
+      )
+    ) {
       filesCreated.push(appsettingsPath);
     } else {
       filesSkipped.push(appsettingsPath);
@@ -171,7 +224,11 @@ export async function scaffoldRoot(
   }
   const smokeTestPath = join(testsDir, 'scaffold_test.ts');
   if (
-    await context.scaffolder.writeFile(smokeTestPath, generateScaffoldSmokeTest(), options.force)
+    await context.scaffolder.writeFile(
+      smokeTestPath,
+      generateScaffoldSmokeTest(),
+      options.force,
+    )
   ) {
     filesCreated.push(smokeTestPath);
   } else {

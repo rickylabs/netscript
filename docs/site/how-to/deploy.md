@@ -12,24 +12,47 @@ next: { label: "Deploy to Deno Deploy", href: "/how-to/deploy-deno-deploy/" }
 other than your laptop — a container host, a VM, or a managed platform — with clear
 expectations about what the scaffold wires for you and what you still own.
 
-This is a task recipe, not a one-click button. NetScript gives you a single declarative description
-of every process (`appsettings.json`), runnable Deno entrypoints with explicit permissions, and the
-Aspire AppHost that can publish deployment artifacts for targets you configure in that AppHost. The
-CLI has thin deploy routers for Deno Deploy, Docker/Compose, Kubernetes, Azure, and Cloud Run, but
-target-specific infrastructure still lives in Aspire and your cloud account.
+This is a task recipe, not a one-click button. NetScript is in alpha, and the scaffold is
+deliberately minimal about deployment: it gives you a single declarative description of every
+process (`appsettings.json`), runnable Deno entrypoints with explicit permissions, the Aspire
+AppHost that orchestrates them locally and can publish deployment artifacts for targets you
+configure in it, and starter GitHub Actions workflows for the shipped deployment targets. The CLI
+has thin deploy routers for Deno Deploy, Docker/Compose, Kubernetes, Azure, and Cloud Run, but it
+does **not** generate a `Dockerfile`, a `docker-compose.yml`, or a finished cloud infrastructure
+stack for you — target-specific infrastructure still lives in Aspire and your cloud account,
+assembled from the verified facts below.
 
 {{ comp callout { type: "important", title: "What is wired vs. what is manual" } }}
 <strong>Wired:</strong> a declarative resource graph in <code>appsettings.json</code> (ports,
 entrypoints, permissions, env vars, dependencies), runnable per-process Deno entrypoints, and
 the Aspire AppHost (<code>aspire/apphost.mts</code>) for local orchestration.
+<strong>Generated CI starters:</strong> <code>.github/workflows/deploy-compose-ghcr.yml</code>,
+<code>.github/workflows/deploy-deno-deploy.yml</code>, and
+<code>.github/workflows/deploy-bare-metal.yml</code>.
 <strong>Delegated:</strong> Docker/Compose, Kubernetes, and Azure target commands call
 <code>aspire publish</code>, <code>aspire deploy</code>, and <code>aspire destroy</code> against the
 generated AppHost code. Aspire emits the manifests and provisions supported resources; your
 cloud account, cluster credentials, registry access, and RBAC remain yours. Cloud Run follows the
 Docker-image provider lane: Docker builds and pushes the image, then <code>gcloud run deploy</code>
 applies it.
+<strong>Manual:</strong> there is <em>no</em> generated container image, compose file, or finished
+cloud infrastructure stack. <code>netscript.config.ts</code> ships an empty <code>deploy: {}</code>
+block unless you configure a target. You assemble the production target yourself from the primitives
+below — every one of which is a verified fact you can copy verbatim.
 <br><strong>Migration (#337):</strong> Windows deploy settings now live under
 <code>deploy.targets.windows</code> (previously <code>deploy.windows</code>).
+{{ /comp }}
+
+{{ comp callout { type: "tip", title: "Generated CI follows the shipped targets" } }}
+The scaffolded workflows cover the deploy surfaces that ship today:
+<strong>Deno Deploy</strong> (<code>netscript deploy deno-deploy up</code>),
+<strong>Compose/GHCR</strong> (<code>netscript deploy compose plan</code> +
+<code>netscript deploy docker up</code>), and <strong>bare metal</strong>
+(<code>netscript deploy build</code>). They are intentionally starter pipelines: fill in repository
+secrets, GitHub environment protection, host credentials, and target-specific configuration before
+you treat them as production release jobs. See
+<a href="/how-to/deploy-deno-deploy/">Deploy to Deno Deploy</a> for the managed-platform command
+reference.
 {{ /comp }}
 
 {{ comp callout { type: "tip", title: "Managed deployment commands" } }}
@@ -92,7 +115,7 @@ first-party plugins installed, the graph looks like this:
 
 {{ comp.apiTable({ caption: "Resources declared in appsettings.json (verified from a scaffolded workspace)", rows: [
   { name: "users", type: "service · :3000 (the scaffold default; the exact port is OS-allocated from the SERVICE range starting at 3000)", desc: "Example oRPC service. Entrypoint <code>src/main.ts</code>, runtime <code>deno</code>. RPC mounts under <code>/api/rpc/*</code>." },
-  { name: "streams", type: "plugin · :4437", desc: "durable-streams runtime service. <code>RequiresDb=false</code>, <code>RequiresKv=false</code>. Real producer runtime — see Step 5." },
+  { name: "streams", type: "plugin · :4437", desc: "durable-streams runtime service. <code>RequiresDb=false</code>, <code>RequiresKv=false</code>. Real producer runtime — see Step 6." },
   { name: "workers-api", type: "plugin · :8091", desc: "Workers API. Requires DB + KV. References <code>streams</code>." },
   { name: "sagas-api", type: "plugin · :8092", desc: "Sagas API. Requires DB + KV. References <code>workers-api</code>, <code>streams</code>." },
   { name: "triggers-api", type: "plugin · :8093", desc: "Triggers API. Typed v1 oRPC contract for trigger/event introspection + management; the webhook ingress endpoint <code>POST /api/v1/webhooks/:triggerId</code> stays a raw HMAC-verifying route by design. Requires DB + KV. References <code>workers-api</code>, <code>streams</code>." },
@@ -288,7 +311,33 @@ export default defineConfig({
 <registry>/<imageName> .`, `docker push <registry>/<imageName>`, then `gcloud
 run deploy <service> --image <registry>/<imageName> --quiet`.
 
-## Step 5 — Run a process by hand (the bare-metal primitive)
+## Step 5 — Wire generated CI and promotion
+
+New Aspire-backed workspaces include three GitHub Actions starter workflows under
+`.github/workflows/`:
+
+{{ comp.apiTable({ caption: "Generated deployment workflows", rows: [
+  { name: "deploy-compose-ghcr.yml", type: "Compose + GHCR", desc: "Restores the Aspire AppHost, emits Compose output with <code>netscript deploy compose plan</code>, builds/pushes images to GHCR, then runs <code>netscript deploy docker up</code> with <code>--clear-cache</code>." },
+  { name: "deploy-deno-deploy.yml", type: "Deno Deploy", desc: "Runs workspace checks, then calls <code>netscript deploy deno-deploy up</code> using GitHub secrets and variables for the Deno Deploy token, organization, and app." },
+  { name: "deploy-bare-metal.yml", type: "Bare metal", desc: "Compiles service artifacts with <code>netscript deploy build</code> on Linux and Windows runners, then uploads the output as workflow artifacts for host-specific installation." }
+] }) }}
+
+Treat the workflow `environment` input as the promotion ladder:
+`development` first, then `staging`, then `production`. In GitHub, map those names to protected
+environments and keep secrets environment-scoped so a staging run cannot accidentally read
+production credentials. Promote the same reviewed commit through each environment; do not rebuild
+from a different branch between staging and production.
+
+{{ comp callout { type: "warning", title: "Do not persist Aspire deployment state in CI" } }}
+Aspire deployment state is cached under <code>~/.aspire/deployments/{AppHostSha}/{environment}.json</code>
+and may contain plaintext values entered during deployment prompts. The generated Compose/GHCR
+workflow does not cache <code>~/.aspire/deployments</code> and passes <code>--clear-cache</code>
+to <code>netscript deploy docker up</code>, which forwards it to <code>aspire deploy --clear-cache</code>.
+Keep that behavior in CI. If you need durable values, store them in GitHub environment secrets or
+your platform's secret manager, not in the Aspire deployment cache.
+{{ /comp }}
+
+## Step 6 — Run a process by hand (the bare-metal primitive)
 
 Under every option above, the atomic unit is the same: one Deno process started from an
 entrypoint with the exact permission set from `appsettings.json`. This is what a container
@@ -321,8 +370,9 @@ deployment. To containerize, each process becomes one image whose `CMD` is the m
 
 {{ comp callout { type: "warning", title: "Limits of the alpha scaffold" } }}
 <ul>
-<li>Docker/Compose, Kubernetes, and Azure artifacts are generated by Aspire from the AppHost code you configure; NetScript does not hand-author those manifests in the CLI.</li>
+<li>The CLI scaffold does not hand-author a <code>Dockerfile</code>, <code>docker-compose.yml</code>, or Kubernetes manifest. Docker/Compose, Kubernetes, and Azure artifacts are generated by Aspire from the AppHost code you configure; you write anything Aspire does not emit from the <code>appsettings.json</code> facts above.</li>
 <li>Cloud Run uses the Docker-image provider lane (<code>docker build</code>, <code>docker push</code>, <code>gcloud run deploy</code>) and requires <code>registry</code> plus <code>imageName</code> in config.</li>
+<li><code>netscript.config.ts</code> ships an empty <code>deploy: {}</code> block unless you configure a target. Generated workflows are starter CI definitions; you still provide registry, host, cloud, and secret-manager configuration before they are production release jobs.</li>
 <li>Cluster/cloud auth, registry access, RBAC, subscriptions, regions, and provider quotas are operator prerequisites. The CLI shells to Aspire, Docker, or gcloud; it does not create credentials.</li>
 <li>The <code>streams</code> service runs a <strong>real producer runtime</strong> (durable-streams over <code>@netscript/plugin-streams-core</code>, served on :4437) — deploy it as a first-class service. What is <em>not</em> production-ready is the manifest-helper layer: <code>@netscript/plugin-streams</code>'s <code>defineStreamProducer</code>/<code>defineStreamConsumer</code> <strong>throw <code>StreamUnsupportedOperationError</code></strong> by design (use <code>@netscript/plugin-streams-core</code> directly), and there is no in-process consumer <code>subscribe()</code> — consumption is HTTP/SSE.</li>
 <li>The scaffold worker <code>createJobTools(ctx)</code> handler helpers (<code>trace.addEvent</code>, <code>withChildSpan</code>, <code>progress</code>) are still no-op stubs (tracked debt, fix planned). Job dispatch/execution traces still appear in Aspire automatically; for custom handler spans call <code>@netscript/telemetry</code> helpers directly.</li>
@@ -333,7 +383,7 @@ deployment. To containerize, each process becomes one image whose `CMD` is the m
 <!-- caveat: arch-debt:workers-scaffold-job-tools-noop -->
 {{ /comp }}
 
-## Step 6 — Verify the deployment
+## Step 7 — Verify the deployment
 
 Once your processes are up against real backing services, hit the health endpoints to confirm
 the graph is wired. These are the exact routes the local runtime exposes (substitute your

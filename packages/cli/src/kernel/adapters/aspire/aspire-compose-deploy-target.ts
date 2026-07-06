@@ -82,7 +82,8 @@ export class AspireComposeDeployTarget implements DeployTargetPort {
     this.#process = options.process;
     this.#aspireBin = options.aspireBin ?? 'aspire';
     this.#dockerBin = options.dockerBin ?? 'docker';
-    this.#defaultOutputDir = options.defaultOutputDir ?? join('.deploy', 'compose');
+    this.#defaultOutputDir = options.defaultOutputDir ??
+      join('.deploy', 'compose');
     this.#composeFileName = options.composeFileName ?? 'docker-compose.yaml';
   }
 
@@ -103,8 +104,10 @@ export class AspireComposeDeployTarget implements DeployTargetPort {
    */
   async up(request: DeployTargetRequest): Promise<DeployTargetResult> {
     if (this.key === 'docker') {
-      const result = await this.#exec('up', request, this.#aspireBin, ['deploy']);
-      return this.#result('up', 'aspire deploy', result);
+      const args = ['deploy', ...this.#aspireCommonArgs(request)];
+      if (request.clearCache) args.push('--clear-cache');
+      const result = await this.#exec('up', request, this.#aspireBin, args);
+      return this.#result('up', args.join(' '), result);
     }
     const outputDir = this.#outputDir(request);
     const result = await this.#exec('up', request, this.#dockerBin, [
@@ -138,7 +141,11 @@ export class AspireComposeDeployTarget implements DeployTargetPort {
       this.#composeFile(outputDir),
       'ps',
     ]);
-    return this.#result('status', result.stdout.trim() || 'docker compose ps', result);
+    return this.#result(
+      'status',
+      result.stdout.trim() || 'docker compose ps',
+      result,
+    );
   }
 
   /** Tail deployment logs via `docker compose logs` on the emitted project. */
@@ -151,7 +158,11 @@ export class AspireComposeDeployTarget implements DeployTargetPort {
       'logs',
       '--no-color',
     ]);
-    return this.#result('logs', result.stdout.trim() || 'docker compose logs', result);
+    return this.#result(
+      'logs',
+      result.stdout.trim() || 'docker compose logs',
+      result,
+    );
   }
 
   async #publish(
@@ -159,12 +170,21 @@ export class AspireComposeDeployTarget implements DeployTargetPort {
     request: DeployTargetRequest,
   ): Promise<DeployTargetResult> {
     const outputDir = this.#outputDir(request);
-    const result = await this.#exec(operation, request, this.#aspireBin, [
+    const args = [
       'publish',
       '--output-path',
       outputDir,
-    ]);
-    return this.#result(operation, `aspire publish --output-path ${outputDir}`, result);
+      ...this.#aspireCommonArgs(request),
+    ];
+    const result = await this.#exec(operation, request, this.#aspireBin, args);
+    return this.#result(operation, args.join(' '), result);
+  }
+
+  #aspireCommonArgs(request: DeployTargetRequest): string[] {
+    const args: string[] = [];
+    if (request.environment) args.push('--environment', request.environment);
+    if (request.nonInteractive) args.push('--non-interactive');
+    return args;
   }
 
   #outputDir(request: DeployTargetRequest): string {
@@ -181,7 +201,9 @@ export class AspireComposeDeployTarget implements DeployTargetPort {
     command: string,
     args: readonly string[],
   ): Promise<ProcessResult> {
-    const result = await this.#process.exec(command, args, { cwd: request.projectRoot });
+    const result = await this.#process.exec(command, args, {
+      cwd: request.projectRoot,
+    });
     if (result.code !== 0) {
       const detail = (result.stderr || result.stdout).trim();
       throw new Error(
