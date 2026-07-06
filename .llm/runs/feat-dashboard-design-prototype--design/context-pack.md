@@ -29,10 +29,11 @@ the beta.6 implementation supervisor.
 
 ## In Progress
 
-- **Slice 2**: dashboard design brief + proposed components (`resources/design/dashboard/`).
-  Delegation split per owner directive: Fable 5 keeps the tricky design/creativity core; Opus 4.8
-  sub-agent authors the 26 pending preview stories (`tools/design-sync/previews/<unit>.preview.js`,
-  read by `emitCards`) + mechanical doc polish; WSL Codex = chores only.
+- **Slice 4**: prototype pass 1 on the seeded canvas — shell + Stack Map + Flow/Trace Waterfall +
+  Service Catalog/API Explorer + Run Inspector, each ×light/dark; DDX-0 promote-set verdicts per
+  PROPOSED-COMPONENTS §2. Design/creativity lane ⇒ **Fable-5 medium sub-agent** (supervisor
+  orchestration-only per owner directive). Inputs: CLAUDE-DESIGN-BRIEF.md + PROPOSED-COMPONENTS.md
+  + seeded README.md conventions.
 
 ## Done gates
 
@@ -45,7 +46,21 @@ the beta.6 implementation supervisor.
   check/lint/fmt clean. Key mechanics: zero-Tailwind registry ⇒ concat closure (no Fresh build);
   cn shim drops clsx/tailwind-merge (React = only npm dep); `subpaths` graph fold-in gives the
   canvas the 8 interactive primitives; `markdown` excluded (template-sourced chat stack). See
-  drift.md D3.
+  drift.md D3. Commit `4b31f44b`, PR comment 4892015865.
+- **Slice 2 COMPLETE**: `resources/design/dashboard/{CLAUDE-DESIGN-BRIEF.md,PROPOSED-COMPONENTS.md}`
+  — Fable-5 medium sub-agent authored per owner delegation refinement (supervisor is
+  orchestration-only even on the design lane; locked into `claude-model-routing-cost-policy`
+  memory). Supervisor review PASS vs proposal §3/§5.1/§9.1 + voice rules. Net-new verdicts:
+  4 compose · 2 new-block (step-timeline, log-stream) · 2 new-component (trace-waterfall,
+  stack-map). Commit `73bb9422`, PR comment 4892106915.
+- **Slice 1.1 COMPLETE**: 26 authored preview stories (`tools/design-sync/previews/`, Opus 4.8
+  delegated lane) → render-blank **PASS** (0 predicted blank), idempotence `98be0c4a39b7`,
+  parity 44/44. weak-dts stays WARN by verdict (theme-toggle = true zero-prop component).
+  Bundle fully authored, ready to seed. Commit + PR comment 4892143011.
+- **Slice 3 COMPLETE**: canvas `NetScript — NS One` (`ec262e10-…`) seeded — DesignSync
+  `finalize_plan` (`plan_ec262e10d4ad451f_52521883d287`, localDir `.ds-sync/bundle`) → one
+  `write_files`, 180/180 via `localPath`; remote `list_files` verified == local tree. Canvas-side
+  fitness green; pass 1 unblocked.
 
 ## Board state (filed)
 
@@ -56,12 +71,13 @@ the beta.6 implementation supervisor.
 
 ## Next Steps
 
-1. Slice 2: design brief + proposed components (Fable 5); in parallel delegate the 26 preview
-   stories (`tools/design-sync/previews/*.preview.js`) + doc polish to an Opus 4.8 sub-agent.
-2. Slice 3: re-run `design:sync`, seed project `ec262e10-d4ad-451f-9aeb-e51955db3634` via
-   DesignSync `finalize_plan` + `write_files` (localPath from `.ds-sync/bundle/`).
+1. Slice 4: prototype pass 1 ×light/dark (shell + Stack Map + Flow/Trace + Catalog/API
+   Explorer + Run Inspector) + DDX-0 promote-set verdicts — Fable-5 medium sub-agent.
+2. Slice 5: re-sync checkpoint, then pass 2 (Plugin Control, Logs, Resource Control + 4
+   capability sections).
 3. Owner lane directive 2026-07-06 (in force, also in memory): Fable 5 = all design/creativity
-   work; WSL Codex = chores only, never design; Opus 4.8 = the rest; Sonnet 5 = workflow stages.
+   work but ALWAYS via a Fable-5 medium sub-agent (supervisor orchestration-only); WSL Codex =
+   chores only, never design; Opus 4.8 = the rest; Sonnet 5 = workflow stages.
 4. OQ-2 RESOLVED: pkg `@netscript/ns-one` / global `NSOne`. OQ-4 RESOLVED-MOOT: concat closure,
    no Fresh build (drift.md D3).
 
