@@ -20,11 +20,14 @@
 
 import { openaiCompatible } from '@tanstack/ai-openai/compatible';
 
+import type { GenerationOptions, ReasoningEffort } from '../contracts/generation.ts';
 import type { ModelDescriptor, ModelHandle, ModelId } from '../contracts/model.ts';
 import { AiError, AiNotConfiguredError } from '../contracts/errors.ts';
 import type { ModelProviderPort } from '../ports/model-provider.ts';
 import type { ChatClientPort } from '../ports/chat-client.ts';
 import { toTanstackChatClient } from './tanstack-chat-client.ts';
+
+export type { ReasoningEffort } from '../contracts/generation.ts';
 
 /**
  * Registry id under which {@linkcode OpenRouterModelProvider} self-registers.
@@ -41,13 +44,6 @@ export const DEFAULT_OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1' as con
  * (per-provider BYOK resolution).
  */
 export const OPENROUTER_API_KEY_ENV = 'OPENROUTER_API_KEY' as const;
-
-/**
- * Reasoning effort level, normalized across providers. OpenRouter maps this to
- * `reasoning: { effort }`; providers without a reasoning wire (e.g. Ollama) emit
- * nothing.
- */
-export type ReasoningEffort = 'low' | 'medium' | 'high';
 
 const DEFAULT_INPUT_MODALITIES = ['text', 'image'] as const;
 
@@ -75,23 +71,50 @@ export interface OpenRouterModelProviderConfig {
  * Normalize an owned {@linkcode ReasoningEffort} to OpenRouter's request-body
  * reasoning shape, or `undefined` when no effort is set.
  *
- * OpenRouter expects a **top-level** `reasoning: { effort }` object — distinct
- * from OpenAI's flat `reasoning_effort` and Anthropic's `thinking`/`output_config`.
- * This is a pure function so the exact wire shape is unit-testable.
+ * OpenRouter expects a **top-level** `reasoning` object — distinct from OpenAI's
+ * flat `reasoning_effort` and Anthropic's `thinking`/`output_config`. A tier maps
+ * to `{ reasoning: { effort } }`; `'off'` explicitly disables reasoning via
+ * `{ reasoning: { enabled: false } }`. This is a pure function so the exact wire
+ * shape is unit-testable.
  *
  * @example
  * ```ts
  * openRouterReasoningModelOptions('high'); // { reasoning: { effort: 'high' } }
+ * openRouterReasoningModelOptions('off'); // { reasoning: { enabled: false } }
  * openRouterReasoningModelOptions(undefined); // undefined
  * ```
  */
 export function openRouterReasoningModelOptions(
   effort: ReasoningEffort | undefined,
-): { readonly reasoning: { readonly effort: ReasoningEffort } } | undefined {
+): { readonly reasoning: Readonly<Record<string, unknown>> } | undefined {
   if (effort === undefined) {
     return undefined;
   }
+  if (effort === 'off') {
+    return { reasoning: { enabled: false } };
+  }
   return { reasoning: { effort } };
+}
+
+/**
+ * Map per-turn {@linkcode GenerationOptions} to OpenRouter's native request-body
+ * keys: reasoning via {@linkcode openRouterReasoningModelOptions} (top-level
+ * `reasoning`) and `maxOutputTokens` via `max_tokens`. Returns `undefined` when
+ * the options carry nothing OpenRouter models. Pure and unit-testable; the
+ * caller's `providerOptions` escape hatch is merged separately by the bridge.
+ */
+export function openRouterGenerationModelOptions(
+  options: GenerationOptions,
+): Readonly<Record<string, unknown>> | undefined {
+  const modelOptions: Record<string, unknown> = {};
+  const reasoning = openRouterReasoningModelOptions(options.reasoningEffort);
+  if (reasoning !== undefined) {
+    Object.assign(modelOptions, reasoning);
+  }
+  if (options.maxOutputTokens !== undefined) {
+    modelOptions.max_tokens = options.maxOutputTokens;
+  }
+  return Object.keys(modelOptions).length > 0 ? modelOptions : undefined;
 }
 
 /**
@@ -187,6 +210,7 @@ export class OpenRouterModelProvider implements ModelProviderPort {
       name: OPENROUTER_PROVIDER_ID,
       kind: 'text',
       modelOptions: openRouterReasoningModelOptions(reasoningEffort),
+      mapModelOptions: openRouterGenerationModelOptions,
     });
   }
 
