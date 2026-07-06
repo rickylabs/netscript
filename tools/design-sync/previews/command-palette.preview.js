@@ -23,13 +23,26 @@
       ],
     },
   ];
+  // The palette renders in a fixed/dialog overlay (ns-cmdk__backdrop); the card
+  // cell collapses around it and clips. A sized, transform'd block becomes the
+  // containing block and gives the ⌘K surface room to render in-card.
+  function stage(node) {
+    return h(
+      'div',
+      {
+        style:
+          'position:relative;transform:translateZ(0);height:420px;overflow:hidden;border-radius:8px',
+      },
+      node,
+    );
+  }
   window.__dsPreview = {
     Open: function () {
-      return h(NS.CommandPalette, {
+      return stage(h(NS.CommandPalette, {
         open: true,
         groups: groups,
         placeholder: 'Type a command or search…',
-      });
+      }));
     },
   };
 })();

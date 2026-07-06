@@ -81,3 +81,25 @@ documentation.
 - **Lesson for the reusable tool:** never emit runtime assets under `_ds_*` names; that prefix
   belongs to the platform. Encoded as a comment at the `bundleFiles.set` site in `mod.ts` and in
   the seeded README conventions.
+
+## D5 — 2026-07-06 — 7 L3 blocks emit Tailwind utility classes that no stylesheet defines (significant, mitigated per-story; framework sync-back candidate)
+
+- **What:** While authoring the 18 missing preview stories (slice 3.2), the Opus lane verified that
+  `DataTable`, `StatsGrid`, `PageHeader`, `Pagination`, `DetailLayout`, `FilterForm`, and
+  `EmptyState` style their layout with raw Tailwind utilities (`grid`, `gap-*`, `divide-y`, `flex`,
+  `md:/xl:grid-cols-*`, `overflow-hidden`, `rounded-md`, `border-dashed`, `text-3xl`,
+  `tabular-nums`, …) in their TSX `class` attributes. Those selectors are **0-match** in
+  `_ns_styles.css` — the closure ships only `ns-*` classes + layout objects.
+- **Why slice 1 missed it:** the "registry has ZERO Tailwind utility classes (verified)" decision
+  checked the registry **CSS parts** (true: no utility definitions exist anywhere), not the TSX
+  `class` attributes. The utilities are referenced but never defined — so the blocks are
+  under-styled in *every* consumer that doesn't bring its own Tailwind, including scaffolded apps
+  unless their app CSS generates utilities.
+- **Mitigation (slice 3.2, canvas-side):** per-story inline structural styles / layout-object
+  substitutions (`ns-grid--4`, `ns-cluster--between`, inline `display:grid` etc.) so the cards
+  render faithfully.
+- **Real fix (framework, routed to #509):** the 7 blocks should emit semantic `ns-*` classes per
+  doctrine ("L2/L3 emit semantic `ns-*` classes"); also reconcile the divergent `DataTable`
+  (Tailwind compound) vs `ResponsiveTable` (`ns-responsive-table`, declarative) table surfaces.
+  Routed to the #509 fresh-ui pixel-polish lane + the slice-7 sync-back spec.
+- **Severity:** significant (doctrine contradiction + real under-styling), canvas mitigated same-day.

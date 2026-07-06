@@ -29,11 +29,13 @@ the beta.6 implementation supervisor.
 
 ## In Progress
 
-- **Slice 4**: prototype pass 1 on the seeded canvas — shell + Stack Map + Flow/Trace Waterfall +
-  Service Catalog/API Explorer + Run Inspector, each ×light/dark; DDX-0 promote-set verdicts per
-  PROPOSED-COMPONENTS §2. Design/creativity lane ⇒ **Fable-5 medium sub-agent** (supervisor
-  orchestration-only per owner directive). Inputs: CLAUDE-DESIGN-BRIEF.md + PROPOSED-COMPONENTS.md
-  + seeded README.md conventions.
+- **Slice 5**: re-sync checkpoint + owner review of pass-1 screens, then pass 2 (Plugin Control,
+  Logs, Resource Control + 4 capability sections).
+- **Side lane (issue #509, own worktree/branch)**: fresh-ui registry-wide pixel-perfect revamp —
+  Fable-5 sub-agent in `.llm/tmp/fresh-ui-polish-wt` (branch `feat/fresh-ui-pixel-polish`), owner
+  mandated 2026-07-06 ("now or never" Fable window; responsive/mobile first-class; extend registry;
+  render/iterate on scaffolded /design page). Commits locally; supervisor reviews + lands. D5
+  Tailwind-utility fix routed there.
 
 ## Done gates
 
@@ -61,6 +63,20 @@ the beta.6 implementation supervisor.
   `finalize_plan` (`plan_ec262e10d4ad451f_52521883d287`, localDir `.ds-sync/bundle`) → one
   `write_files`, 180/180 via `localPath`; remote `list_files` verified == local tree. Canvas-side
   fitness green; pass 1 unblocked.
+- **Slice 3.2 COMPLETE**: full authored-story coverage — Opus 4.8 lane authored the 18 missing
+  stories (owner-reported name-only floor cards) + wrapped the 3 clipped overlay stories
+  (CommandPalette/Toast/SidebarToggle) in `translateZ(0)` stages. `design:sync check` PASS:
+  **44 authored / 0 floor**, idempotence `760154a732e6`; 44 `_preview/*.js` re-uploaded
+  (`plan_…_41e3d1bcfd4d`). Surfaced drift **D5**: 7 L3 blocks (DataTable, StatsGrid, PageHeader,
+  Pagination, DetailLayout, FilterForm, EmptyState) emit Tailwind utilities defined NOWHERE —
+  canvas mitigated per-story; framework fix + DataTable↔ResponsiveTable reconciliation routed to
+  **#509**. CodeBlock highlighting = fresh-ui L4-by-design → sync-back candidate (slice 7).
+- **Slice 4 COMPLETE**: prototype pass 1 — Fable-5 lane authored 4 composed screens
+  (`screens/01…04` + `proto.css` ~1090 lines + `DECISIONS.md`) narrating one coherent incident;
+  DDX-0: all 7 promote-set blocks validated (+contract deltas for ns-waterfall/ns-stackmap/
+  ns-step-timeline/ns-log-stream; Tabs skin, `ns-page-header--console`, `ns-envbar`, `ns-rail-grid`
+  promoted for consideration). Supervisor review PASS (runtime refs, hex/className/voice 0,
+  55/55 tokens defined, parse-clean). Uploaded `screens/*` (`plan_…_703d39e2ee7c`), tree verified.
 - **Slice 3.1 COMPLETE (hotfix)**: `_ds_bundle.js` is a **platform-reserved path** — the canvas
   compiles uploaded `.tsx` into its own bundle there (no ReactDOM, no window globals), which broke
   every card (drift D4). Runtime renamed `_ns_runtime.js`, closure `_ns_styles.css`
@@ -74,6 +90,10 @@ the beta.6 implementation supervisor.
 - New tracking issue **#507** (Backlog / Triage; type:feat, epic:dev-dashboard, area:fresh-ui,
   area:tooling, priority:p1, status:plan).
 - Supersession comments posted on #425 (4891488892) and #400 (4891489240).
+- Issue **#509** (fresh-ui registry-wide pixel-perfect revamp: defaults/states/responsive/mobile/
+  dark + registry extensions; Backlog / Triage; type:feat, area:fresh-ui, priority:p1,
+  epic:dev-dashboard, status:plan) — owner-mandated side lane, Fable-5 agent running in
+  `.llm/tmp/fresh-ui-polish-wt`.
 
 ## Next Steps
 
