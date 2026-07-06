@@ -194,7 +194,9 @@
   0%,
   60%,
   100% {
-    opacity: 0.3;
+    /* Resting dots must stay clearly visible on both themes; 0.3 reads as
+       almost-invisible against subtle surfaces. */
+    opacity: 0.55;
     transform: translateY(0);
   }
   30% {

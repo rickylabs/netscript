@@ -17,10 +17,7 @@ function DetailLayoutRoot(
   { children, class: className, ...props }: DetailLayoutSectionProps,
 ): VNode {
   return (
-    <div
-      {...props}
-      class={cn('grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_360px]', className)}
-    >
+    <div {...props} class={cn('ns-detail-layout', className)}>
       {children}
     </div>
   );
@@ -29,13 +26,21 @@ function DetailLayoutRoot(
 function DetailLayoutMain(
   { children, class: className, ...props }: DetailLayoutSectionProps,
 ): VNode {
-  return <div {...props} class={cn('ns-stack ns-stack--md', className)}>{children}</div>;
+  return (
+    <div {...props} class={cn('ns-stack ns-stack--md ns-detail-layout__main', className)}>
+      {children}
+    </div>
+  );
 }
 
 function DetailLayoutAside(
   { children, class: className, ...props }: DetailLayoutSectionProps,
 ): VNode {
-  return <div {...props} class={cn('ns-stack ns-stack--md', className)}>{children}</div>;
+  return (
+    <div {...props} class={cn('ns-stack ns-stack--md ns-detail-layout__aside', className)}>
+      {children}
+    </div>
+  );
 }
 
 /**

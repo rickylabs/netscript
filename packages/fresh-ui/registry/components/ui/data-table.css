@@ -1,0 +1,33 @@
+/* DataTable block styles. Host-agnostic: every layout rule the block needs
+   lives here so it renders identically with or without a utility framework. */
+
+.ns-data-table {
+  overflow: hidden;
+}
+
+/* Combines with .ns-card__header, which is a flex column for stacked
+   title/description; reset the axis explicitly for the table header rail. */
+.ns-data-table__header {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--ns-space-3) var(--ns-space-4);
+}
+
+.ns-data-table__body > * + * {
+  border-top: 1px solid var(--ns-border);
+}
+
+.ns-data-table__row {
+  display: grid;
+  align-items: center;
+  gap: var(--ns-space-4);
+  padding: var(--ns-space-4) var(--ns-space-5);
+}
+
+.ns-data-table__footer {
+  border-top: 1px solid var(--ns-border);
+  padding: var(--ns-space-4) var(--ns-space-5);
+}

@@ -45,11 +45,29 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--ns-space-1-5);
+  justify-content: space-between;
+  gap: var(--ns-space-2);
 }
 
-.ns-prompt-input__spacer {
-  flex: 1;
+/* Two coherent groups: wrapping never strands a lone control on its own row. */
+.ns-prompt-input__tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ns-space-1-5);
+  min-width: 0;
+}
+
+.ns-prompt-input__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--ns-space-1);
+  margin-inline-start: auto;
+}
+
+.ns-iconbtn svg,
+.ns-prompt-input__send svg {
+  display: block;
 }
 
 .ns-pill {

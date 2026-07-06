@@ -2,11 +2,15 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  vertical-align: super;
+  /* Sit like a superscript but stay inside the line box: `super` pushes the
+     chip into the previous line's descenders and collides with tight prose.
+     A small em-relative raise + a real inline gap reads like Perplexity-style
+     citations without breaking line rhythm. */
+  vertical-align: 0.25em;
   min-width: var(--ns-space-4);
   height: var(--ns-space-4);
   padding: 0 var(--ns-space-1);
-  margin-inline: var(--ns-space-px);
+  margin-inline: var(--ns-space-1);
   border: 1px solid var(--ns-primary-border);
   border-radius: var(--ns-radius-sm);
   background: var(--ns-primary-subtle);

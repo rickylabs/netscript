@@ -169,7 +169,7 @@ export default function Toast(
           <div class='ns-toast__header'>
             <div class='ns-toast__title-row'>
               <div class='ns-toast__symbol'>{TOAST_SYMBOLS[type]}</div>
-              <div class='min-w-0'>
+              <div class='ns-toast__title-group'>
                 <p class='ns-toast__eyebrow'>{TOAST_LABELS[type]}</p>
                 <p class='ns-toast__title'>{title ?? TOAST_LABELS[type]}</p>
               </div>

@@ -1,0 +1,23 @@
+/* SectionDivider block styles. The rule line is drawn here so the divider
+   renders without any host utility framework. */
+
+.ns-section-divider {
+  display: flex;
+  align-items: baseline;
+  gap: var(--ns-space-4);
+}
+
+.ns-section-divider__label {
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-3xs);
+  text-transform: uppercase;
+  letter-spacing: var(--ns-tracking-wide);
+  color: var(--ns-muted-fg);
+}
+
+.ns-section-divider__line {
+  flex: 1;
+  height: 1px;
+  align-self: center;
+  background: var(--ns-border);
+}

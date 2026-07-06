@@ -1,0 +1,46 @@
+/* StatsGrid block styles. Container-adaptive: the column count derives from
+   available width (auto-fit), not viewport breakpoints, so the grid behaves
+   in narrow rails, split panes, and embedded canvases alike. */
+
+.ns-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(13rem, 100%), 1fr));
+  gap: var(--ns-space-4);
+}
+
+.ns-stats-grid__card {
+  overflow: hidden;
+}
+
+.ns-stats-grid__body {
+  min-width: 0;
+}
+
+.ns-stats-grid__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ns-space-3);
+}
+
+.ns-stats-grid__label {
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-2xs);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ns-muted-fg);
+}
+
+.ns-stats-grid__value {
+  font-size: var(--ns-text-3xl);
+  font-weight: 600;
+  letter-spacing: var(--ns-tracking-tight);
+  font-variant-numeric: tabular-nums;
+  color: var(--ns-fg);
+}
+
+.ns-stats-grid__detail {
+  font-size: var(--ns-text-sm);
+  line-height: var(--ns-leading-relaxed);
+  color: var(--ns-muted-fg);
+}

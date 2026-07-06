@@ -1,5 +1,15 @@
 /* Layout primitives sourced from the playground design-system seed. */
 
+/* Host-environment independence: registry components are designed against
+   border-box sizing. Hosts with a Tailwind/modern-normalize preflight already
+   provide it globally; this scoped rule guarantees it for ns-* elements in
+   hosts without any reset, without rewriting host globals. */
+[class*='ns-'],
+[class*='ns-']::before,
+[class*='ns-']::after {
+  box-sizing: border-box;
+}
+
 .ns-shell {
   width: min(var(--ns-shell-max, 1060px), calc(100% - var(--ns-space-8)));
   margin-inline: auto;
@@ -256,7 +266,16 @@
 }
 
 .ns-page-header {
-  padding-block: var(--ns-space-12) var(--ns-space-10);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ns-space-5);
+  padding-block: var(--ns-space-6) var(--ns-space-8);
+}
+
+/* The status/meta line reads as a footnote to the header: extra breathing
+   room above it so it never hugs the action buttons (and their shadows). */
+.ns-page-header > .ns-status-bar {
+  margin-block-start: var(--ns-space-1);
 }
 
 .ns-page-header h1 {
@@ -276,6 +295,7 @@
 
 .ns-status-bar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--ns-space-2);
   font-size: var(--ns-text-sm);
@@ -360,6 +380,13 @@
   padding-inline: var(--ns-space-5);
   border-bottom: 1px solid var(--ns-border);
   flex-shrink: 0;
+}
+
+.ns-dashboard__brand-group {
+  display: flex;
+  align-items: center;
+  gap: var(--ns-space-3);
+  min-width: 0;
 }
 
 .ns-dashboard__sidebar-body {
@@ -483,6 +510,19 @@
   padding-inline: var(--ns-space-6);
   border-bottom: 1px solid var(--ns-border);
   flex-shrink: 0;
+}
+
+.ns-dashboard__topbar-start {
+  display: flex;
+  align-items: center;
+  gap: var(--ns-space-3);
+  min-width: 0;
+}
+
+.ns-dashboard__topbar-end {
+  display: flex;
+  align-items: center;
+  gap: var(--ns-space-2);
 }
 
 .ns-dashboard__content {

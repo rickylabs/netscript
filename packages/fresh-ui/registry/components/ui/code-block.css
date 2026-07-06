@@ -70,4 +70,11 @@
 
 .ns-code code {
   font-family: inherit;
+  /* Preserve trailing breathing room when long lines scroll horizontally:
+     an overflow container's right padding collapses visually, so carry it
+     on the inline-level code box instead. */
+  display: inline-block;
+  min-width: 100%;
+  padding-right: var(--ns-space-3);
+  box-sizing: border-box;
 }

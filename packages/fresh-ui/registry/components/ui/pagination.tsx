@@ -15,14 +15,14 @@ type PaginationComponent = ((props: PaginationSectionProps) => VNode) & {
 
 function PaginationRoot({ children, class: className, ...props }: PaginationSectionProps): VNode {
   return (
-    <div {...props} class={cn('flex items-center justify-between gap-3', className)}>
+    <div {...props} class={cn('ns-pagination', className)}>
       {children}
     </div>
   );
 }
 
 function PaginationMeta({ children, class: className, ...props }: PaginationSectionProps): VNode {
-  return <div {...props} class={cn('text-sm text-ns-muted-fg', className)}>{children}</div>;
+  return <div {...props} class={cn('ns-pagination__meta', className)}>{children}</div>;
 }
 
 function PaginationActions(

@@ -18,6 +18,17 @@
 
 .ns-field__error-row {
   display: flex;
-  align-items: flex-start;
+  align-items: baseline;
   gap: var(--ns-space-1-5);
+  margin-top: var(--ns-space-1);
+}
+
+.ns-field__error-row .ns-error-text {
+  margin-top: 0;
+}
+
+.ns-field__error-icon {
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-xs);
+  color: var(--ns-destructive);
 }

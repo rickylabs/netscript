@@ -107,6 +107,10 @@
   min-width: 0;
 }
 
+.ns-toast__title-group {
+  min-width: 0;
+}
+
 .ns-toast__eyebrow {
   font-family: var(--ns-font-mono);
   font-size: 0.62rem;

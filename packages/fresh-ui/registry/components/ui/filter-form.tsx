@@ -27,14 +27,16 @@ function FilterFormRoot({ children, class: className, ...props }: FilterFormProp
 }
 
 function FilterFormBody({ children, class: className, ...props }: FilterFormSectionProps): VNode {
-  return <div {...props} class={cn('ns-card__body grid gap-4', className)}>{children}</div>;
+  return (
+    <div {...props} class={cn('ns-card__body ns-filter-form__body', className)}>{children}</div>
+  );
 }
 
 function FilterFormActions(
   { children, class: className, ...props }: FilterFormSectionProps,
 ): VNode {
   return (
-    <div {...props} class={cn('flex items-end gap-2 xl:justify-end', className)}>
+    <div {...props} class={cn('ns-filter-form__actions', className)}>
       {children}
     </div>
   );

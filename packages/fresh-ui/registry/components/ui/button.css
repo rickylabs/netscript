@@ -31,6 +31,19 @@
   opacity: 0.5;
   cursor: not-allowed;
   pointer-events: none;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Loading: the button is inert but visibly working, not half-dead. */
+.ns-btn--loading:disabled,
+.ns-btn--loading[aria-disabled='true'] {
+  opacity: 0.85;
+}
+
+/* Inside a button the spinner arc follows the label color. */
+.ns-btn .ns-spinner {
+  color: inherit;
 }
 
 /* Primary — copper action with 3D shadow depth */
@@ -55,7 +68,7 @@
 /* Secondary — slate action with subtle depth */
 .ns-btn--secondary {
   background: var(--ns-secondary-subtle);
-  color: var(--ns-secondary);
+  color: var(--ns-fg);
   border-color: var(--ns-secondary-border);
   box-shadow: 3px 3px 0 color-mix(in srgb, var(--ns-secondary-border) 40%, transparent);
 }
@@ -138,4 +151,7 @@
 .ns-btn--icon {
   padding: var(--ns-space-2);
   aspect-ratio: 1;
+  /* The visually-hidden label span is still a flex item; without this the
+     inherited gap pushes the glyph ~4px off center. */
+  gap: 0;
 }
