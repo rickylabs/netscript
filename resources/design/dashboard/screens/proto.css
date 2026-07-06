@@ -122,6 +122,14 @@
   min-width: 0;
 }
 
+/* Screen glue: StatsGrid uses viewport breakpoints (md:/xl:), which overshoot
+ * inside the rail's ~28rem content column — four columns of clipped labels.
+ * Cap it at two columns here; the component-level container-query fix is
+ * routed to issue 509. */
+.ns-rail-grid [class~='xl:grid-cols-4'] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 @media (min-width: 1024px) {
   .ns-rail-grid {
     grid-template-columns: 18rem minmax(0, 1fr);
@@ -468,6 +476,7 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
+  container: ns-waterfall / inline-size;
 }
 
 .ns-waterfall__axis {
@@ -511,6 +520,22 @@
 
 .ns-waterfall__tick:first-child::after {
   left: 0;
+}
+
+/* A narrow waterfall leaves the axis track too tight for five labels — the
+ * quarter ticks collide into a garble. The constraint is the component's own
+ * width (it sits in a three-column shell), so gate on the container: keep
+ * only the 0 / total endpoints and shrink the label column so the track
+ * keeps proportional room. */
+@container ns-waterfall (max-width: 46rem) {
+  .ns-waterfall__axis,
+  .ns-waterfall__row {
+    grid-template-columns: 11rem minmax(0, 1fr);
+  }
+
+  .ns-waterfall__tick:not(:first-child):not(:last-child) {
+    display: none;
+  }
 }
 
 .ns-waterfall__row {

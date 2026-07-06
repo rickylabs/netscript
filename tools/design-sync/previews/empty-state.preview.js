@@ -3,9 +3,14 @@
   var R = window.React;
   var NS = window.NSOne || {};
   var h = R.createElement;
-  // The block styles its dashed frame with `rounded-md border-dashed` utilities
-  // absent from the canvas closure; an inline border keeps the framed look.
-  var frame = 'border:1px dashed var(--ns-border);border-radius:8px;padding:1.25rem';
+  // React (unlike Preact) rejects string `style` props — object form only.
+  // The dashed-frame utilities now come from the closure's host-env layer;
+  // the inline frame stays as a padding floor.
+  var frame = {
+    border: '1px dashed var(--ns-border)',
+    borderRadius: '8px',
+    padding: '1.25rem',
+  };
   window.__dsPreview = {
     NoRuns: function () {
       return h(

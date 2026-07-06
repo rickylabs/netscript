@@ -19,3 +19,8 @@ dist/
 # design-sync scratch output (synthetic React package + canvas bundle);
 # rebuild with `deno task design:sync`, never commit.
 .ds-sync/
+# local-preview copies of the generated bundle so `screens/*.html` resolve
+# `../_ns_*` when served from resources/design/dashboard; copy from
+# .ds-sync/bundle after each build, never commit.
+resources/design/dashboard/_ns_runtime.js
+resources/design/dashboard/_ns_styles.css

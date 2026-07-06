@@ -23,12 +23,29 @@
       desc: 'Distributed-trace expert',
     },
   ];
+  // The open dropdown floats below the trigger; the card cell clips it. A
+  // sized stage gives the popover room to render in-card (object style —
+  // React rejects string style props).
+  function stage(node) {
+    return h(
+      'div',
+      {
+        style: {
+          position: 'relative',
+          transform: 'translateZ(0)',
+          height: '280px',
+          overflow: 'hidden',
+        },
+      },
+      node,
+    );
+  }
   window.__dsPreview = {
     Default: function () {
       return h(NS.ModelSelector, { value: 'ops-copilot-l', models: models });
     },
     Open: function () {
-      return h(NS.ModelSelector, { value: 'ops-copilot-s', models: models, open: true });
+      return stage(h(NS.ModelSelector, { value: 'ops-copilot-s', models: models, open: true }));
     },
   };
 })();

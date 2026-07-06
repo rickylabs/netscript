@@ -140,3 +140,56 @@ unit of the same kind.
 
 - Evaluator: start with plan.md § Locked Decisions + research.md findings F4–F11, then the
   ParityReport/TrapCheck evidence, then DECISIONS.md vs the ratified proposal IA.
+
+## Slice 3.3 — Local render gate + host-env equivalence layer (2026-07-06)
+
+**Trigger:** owner: "most still looks ugly … you really need to find a way to preview the output
+otherwise you work in the dark" (defect classes: overflow, missing props/styles, padding, layout/
+responsiveness, islands).
+
+**Preview loop (new, the render gate from now on):** `python -m http.server 8321` on
+`.ds-sync/bundle` + `8322` on `resources/design/dashboard`; Edge headless
+`--headless --screenshot --window-size=920,720|1440,900 --virtual-time-budget=4000..5000`;
+diagnostics via `--dump-dom` + `--enable-logging=stderr`. All 48 surfaces triaged.
+
+**Root causes found (full triage in the PR comment):**
+
+1. React string-`style` throw → EmptyState/Toast/CommandPalette stories unmounted **blank**
+   (slice 3.2's stages never actually rendered — see drift D6).
+2. Missing box-sizing preflight → Input/FormField/Textarea right-edge bleed (registry silently
+   depends on host Tailwind preflight; framework half → #509).
+3. D5 utility gap is a **closed set**: ~60 non-`ns-*` classes extracted from `_ns_runtime.js`.
+
+**Fixes landed:**
+
+- `tools/design-sync/src/closure.ts`: `HOST_ENV_RULES` — Tailwind preflight subset + all ~60
+  utilities (tokens-mapped, `sm:/md:/xl:` media variants, `divide-y` sibling selector, escaped
+  arbitrary-value classes, hover/sr-only) appended after `BASE_RULES`. Marked "remove once #509
+  converts the blocks to semantic ns-* classes".
+- Previews: `empty-state`/`toast`/`command-palette` string→object styles; `model-selector` OPEN
+  story staged (280px).
+- `screens/proto.css`: waterfall = `container: ns-waterfall / inline-size` + `@container ≤46rem`
+  (endpoint-only ticks, 11rem label col — fixes garbled axis at any panel width);
+  `.ns-rail-grid [class~='xl:grid-cols-4']` capped to 2 columns (StatsGrid viewport-breakpoint
+  overshoot inside the inspector rail).
+
+**Gate:** `design:sync build` + `check` **PASS** — idempotence `628396f31065`, parity 44/44,
+raw-hex 0/0, render-blank 44 authored/0 floor.
+
+**Render verification (24 cards + 3 screens × 2 widths re-shot):** EmptyState/Toast(4 intents)/
+CommandPalette/ModelSelector all render fully; DataTable = real table (dividers, badges, footer);
+StatsGrid = proper grid; Input/FormField/Textarea bleed gone; screen-02 axis clean (`0 ms … 1.12 s`);
+screen-03 endpoint table columnar; screen-04 stats 2×2 readable. No preflight regressions in
+sentinels (Button/Checkbox/Select/Message/ResponsiveTable/Alert/SidebarShell/FilterForm).
+
+**Canvas:** 6 files uploaded — `_ns_styles.css` + 4 `_preview/*.js`
+(`plan_ec262e10d4ad451f_cedc9c41c89e`) + `screens/proto.css` (`plan_…_1186fca9a929`).
+
+**#509 handoff:** findings 1–7 (box-sizing, D5 ns-* conversion, StatsGrid container queries,
+Skeleton rebuild, ThemeToggle default theme, SectionDivider rule, CodeBlock clip) messaged to the
+running fresh-ui agent with an explicit no-overlap reconciliation contract (it owns
+`packages/fresh-ui`; this run owns `tools/design-sync` + `resources/design/dashboard`; on its land,
+re-run `design:sync build` and delete the host-env layer once blocks are semantic).
+
+**Still open (islands):** ThemeToggle default-dark on empty localStorage reproduces headless;
+scripted interaction checks (toggle/drawer/toast timers) remain for slice 5.

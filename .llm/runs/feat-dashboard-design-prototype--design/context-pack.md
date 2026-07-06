@@ -77,6 +77,17 @@ the beta.6 implementation supervisor.
   ns-step-timeline/ns-log-stream; Tabs skin, `ns-page-header--console`, `ns-envbar`, `ns-rail-grid`
   promoted for consideration). Supervisor review PASS (runtime refs, hex/className/voice 0,
   55/55 tokens defined, parse-clean). Uploaded `screens/*` (`plan_…_703d39e2ee7c`), tree verified.
+- **Slice 3.3 COMPLETE (render gate)**: owner-driven ("you work in the dark") — local headless
+  preview loop (http.server 8321/8322 + Edge `--headless --screenshot`) is now the **render gate**
+  for every canvas-facing slice; all 48 surfaces triaged. Root causes: React string-`style` throw
+  (3.2's overlay stages **never rendered** — drift D6), missing box-sizing preflight, D5 = closed
+  ~60-utility set. Fixes: `HOST_ENV_RULES` host-env equivalence layer in `closure.ts`
+  (preflight + utilities, tokens-mapped; supersedes per-story D5 mitigations; delete after #509
+  ns-* conversion); 3 previews → object styles; ModelSelector OPEN staged; proto.css waterfall
+  container-query tick fix + rail StatsGrid 2-col cap. Gate PASS idempotence `628396f31065`;
+  re-shot + verified; 6 files re-uploaded (`plan_…_cedc9c41c89e`, `plan_…_1186fca9a929`).
+  #509 agent messaged with findings 1–7 + reconciliation contract (no file overlap: it owns
+  `packages/fresh-ui`, this run owns `tools/design-sync` + `resources/design/dashboard`).
 - **Slice 3.1 COMPLETE (hotfix)**: `_ds_bundle.js` is a **platform-reserved path** — the canvas
   compiles uploaded `.tsx` into its own bundle there (no ReactDOM, no window globals), which broke
   every card (drift D4). Runtime renamed `_ns_runtime.js`, closure `_ns_styles.css`

@@ -103,3 +103,25 @@ documentation.
   (Tailwind compound) vs `ResponsiveTable` (`ns-responsive-table`, declarative) table surfaces.
   Routed to the #509 fresh-ui pixel-polish lane + the slice-7 sync-back spec.
 - **Severity:** significant (doctrine contradiction + real under-styling), canvas mitigated same-day.
+
+## D6 — slice-3.2 overlay stages never rendered + missing preflight (2026-07-06, significant)
+
+- **Symptom:** owner reported "most still looks ugly … you work in the dark". A local headless
+  render loop (python http.server + Edge `--headless --screenshot`, byte-identical bundle) was
+  built and all 48 canvas surfaces (44 cards + 4 screens) were screenshotted and triaged.
+- **Finding 1 — the 3.2 stage fix never rendered:** the overlay stages (Toast, CommandPalette)
+  and EmptyState's frame passed **string** `style` props. fresh-ui is Preact (strings fine); the
+  canvas runtime is **React 19**, which throws `The 'style' prop expects a mapping…` and unmounts
+  the whole story → blank cards. The 3.2 supervisor review was static-only (traps + code read);
+  no render check existed, so the regression shipped as "fixed". Lesson: **screenshot loop is now
+  the render gate** for every canvas-facing slice.
+- **Finding 2 — missing box-sizing preflight:** zero `box-sizing` rules exist in the closure or in
+  any `registry/**/*.css` — the registry silently depends on the host app's Tailwind preflight.
+  On the canvas, `width:100%`+padding controls (Input/FormField/Textarea) bled past card padding.
+  Framework-side: routed to #509 (declare or ship the dependency).
+- **Fix (slice 3.3):** host-env equivalence layer in `closure.ts` (preflight subset + the closed
+  ~60-utility set extracted from `_ns_runtime.js`, tokens-mapped, media variants included) —
+  supersedes the per-story D5 mitigations at the closure level; 3 previews converted to object
+  styles; ModelSelector OPEN staged; `proto.css` waterfall tick container-query + rail StatsGrid
+  column cap. All re-shot locally and verified before upload.
+- **Severity:** significant (false "fixed" state shipped in 3.2; render-gate process gap now closed).

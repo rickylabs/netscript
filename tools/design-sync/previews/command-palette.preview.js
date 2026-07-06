@@ -30,8 +30,14 @@
     return h(
       'div',
       {
-        style:
-          'position:relative;transform:translateZ(0);height:420px;overflow:hidden;border-radius:8px',
+        // React rejects string style props — object form only.
+        style: {
+          position: 'relative',
+          transform: 'translateZ(0)',
+          height: '420px',
+          overflow: 'hidden',
+          borderRadius: '8px',
+        },
       },
       node,
     );
