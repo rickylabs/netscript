@@ -20,8 +20,8 @@ merged | blocked | closed-n/a | owner-batch
 | --- | --- | --- | --- | --- | --- |
 | AI-494 | #494 | B (Opus high; rerouted from D, drift D5) | active | — | wave 1; plugin-ai-core zod lockstep |
 | AI-463 | #463 | D (Codex high) | blocked | — | Codex quota until 07-07 03:52 (D5); first post-reset slot |
-| AI-257 | #257 | B (Opus 4.8 high) | active | — | wave 1; owns first manifest edit (D-3) |
-| AI-258 | #258 | B (Opus 4.8 high) | pending | — | wave 2; rebases manifest after #257 |
+| AI-257 | #257 | B (Opus 4.8 high) | impl-done | #550 | A1 PASS 2026-07-06; McpUiWidget island (opaque-origin, allow-scripts-only, keyed remount via h()), manifest append-only into `ai` collection; 129 tests pass, F-6 dry-run exit 0; #258 rebases on this manifest. Awaiting adversarial Codex (post-reset) + IMPL-EVAL |
+| AI-258 | #258 | B (Opus 4.8 high) | pending | — | wave 2; rebases manifest after #257 (PR #550 append-only: item after `chat-render` in islands + `ai` collection L1263) |
 | AI-379 | #379 | D (Codex high) | pending | — | wave 2; deps #257 + #463 merged |
 | AI-464 | #464 | D (Codex high) | pending | — | wave 3; MERGE GATE — last; effective deps re-derived (D-4) |
 

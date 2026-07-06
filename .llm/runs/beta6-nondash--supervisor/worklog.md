@@ -69,3 +69,24 @@ before PLAN-EVAL PASS.**
   an unresolvable label — correct status label is `status:impl`, not `status:in-progress`.
 - Next for this slice: adversarial WSL Codex review post-quota-reset, then one IMPL-EVAL
   (qwen-3.7-max), then merge on green (re-read charter.md first) → owner closes epic #389.
+
+## 2026-07-06 — AI-257 slice landed (wave-1 #2)
+
+- Opus sub-agent returned `feat/257-fresh-ui-mcp-ui-widget` (3 commits: 48e5c2f5 island,
+  10381695 manifest wiring, 64fa5364 tests, on base a1669f60). Survived two transient API drops
+  (resumed in place both times; refs intact, no state loss).
+- A1 review (Tier-A, substantive): PASS. Read island source, manifest diff, and all 7 test names
+  in full. Confirmed: (a) sandbox is `allow-scripts` only via `sanitizeSandbox` which strips
+  `allow-same-origin` case-insensitively on EVERY render path incl. hostile override (test-covered);
+  opaque origin + `no-referrer`; (b) keyed remount uses `h('iframe',{key})` deliberately because
+  precompile-JSX drops `key` on intrinsic literals (correct, documented, test asserts distinct key
+  light vs dark); (c) manifest is APPEND-ONLY (+23, no deletions), item lands in the `ai` collection
+  (verified collection.name==='ai' at L1260; test also asserts it) — clean rebase surface for #258;
+  (d) F-6 `deno publish --dry-run` WITHOUT `--allow-slow-types` exit 0.
+- Gates: scoped check/lint/fmt 126 files 0 findings; `deno test -A packages/fresh-ui` 129 pass;
+  assets barrel regenerated LF-clean (avoided PR #547 CRLF trap); no lock churn. Shared checkout
+  verified uncontaminated.
+- Pushed via WSL (explicit refspec) + draft **PR #550** (`Closes #257`, milestone 0.0.1-beta.6,
+  issue labels + status:impl). Next: adversarial Codex post-reset → one IMPL-EVAL → merge on green.
+- Note for #258 (wave 2): rebase its manifest edit on PR #550 — append after the `mcp-ui-widget`
+  entries, do not conflict with the `ai` collection list.
