@@ -82,6 +82,7 @@ unit of the same kind.
 | 2026-07-06 | — | Bootstrap | Worktree `.llm/tmp/design-proto-wt` @ `317e4b50`; run dir scaffolded; four-lane research complete (see research.md) |
 | 2026-07-06 | 1 | `tools/design-sync/` v1 | 11 TS modules + 2 templates + `.design-sync/config.json` + root `design:sync` task + `.ds-sync/` gitignore. Gate `design:sync check` **PASS**: parity green (44/44 cards = 30 components + 11 blocks + 3 islands), idempotence PASS (`dfac420b48f8`), 180-file bundle, traps 4×PASS + 2 by-design WARN (weak-dts: theme-toggle; render-blank: 26 floor cards pending authored stories → slice 2/3). Scoped check/lint/fmt clean. Commit `4b31f44b`, PR comment 4892015865 |
 | 2026-07-06 | 2 | Design brief + proposed components | `resources/design/dashboard/{CLAUDE-DESIGN-BRIEF.md,PROPOSED-COMPONENTS.md}`. Lanes per owner directive: supervisor drafted brief, **Fable-5 medium sub-agent** authored PROPOSED-COMPONENTS + tightened brief (2 factual fixes: flagship-trace composition per Flow B; A2 command-arguments dialog constraint). Supervisor slice review **PASS** vs proposal §3/§5.1/§9.1 + voice rules (0 banned framings). Net-new verdicts: 4 compose · 2 new-block (step-timeline, log-stream) · 2 new-component (trace-waterfall `ns-waterfall`, stack-map `ns-stackmap`); data-grid + MCP negative verdicts recorded. 6/7 promote-set blocks absent from sync = the recorded DDX-0↔DDX-15 inversion (canvas authors them → sync-back feeds DDX-0) |
+| 2026-07-06 | 1.1 | 26 authored preview stories | **Opus 4.8 sub-agent** (delegated lane) authored `tools/design-sync/previews/*.preview.js` for all 26 predicted-blank floor cards — dashboard-flavored data, tokens/`ns-*` only, `class` not `className`, status→Badge mapping matches PROPOSED-COMPONENTS §3.5. Supervisor slice review **PASS** (independent `design:sync check` re-run: render-blank **PASS** 26 authored/0 blank, idempotence PASS `98be0c4a39b7`, parity 44/44, no FAIL traps). weak-dts stays WARN by verdict: theme-toggle is a true zero-prop component — benign true positive, no src change |
 
 ## Decisions
 
@@ -112,9 +113,9 @@ unit of the same kind.
 
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
-| Sync idempotence | **PASS** 2026-07-06 | `design:sync check` double-build tree hash `dfac420b48f8` stable | slice 1 (re-run at slice 5) |
+| Sync idempotence | **PASS** 2026-07-06 | `design:sync check` double-build tree hash `dfac420b48f8` (slice 1) → `98be0c4a39b7` (slice 1.1, authored stories folded) | re-run at slice 5 |
 | Parity checklist | **PASS** (build-side) 2026-07-06 | ParityReport green: 44/44 card-bearing units emitted (30 component + 11 block + 3 island); 2 recorded exclusions (markdown, chat-render); style/theme/support/lib all consumed | canvas-side re-verify at slice 3 |
-| Trap checks a–f | **PASS** 2026-07-06 | theme-default PASS (`:root` light + `[data-theme='dark']` in closure) · token-closure PASS (160 defined; fallback-less refs all resolved incl. runtime inline-style tokens) · compiled-css PASS (37 parts, 88 KiB) · weak-dts WARN (theme-toggle only) · render-blank WARN (26 floor cards, by design pre-authoring) · raw-hex PASS (0 hex anywhere) | WARNs feed slice 2/3 story authoring |
+| Trap checks a–f | **PASS** 2026-07-06 | theme-default PASS (`:root` light + `[data-theme='dark']` in closure) · token-closure PASS (162 defined; fallback-less refs all resolved incl. runtime inline-style tokens) · compiled-css PASS (37 parts, 88 KiB) · weak-dts WARN (theme-toggle — verified zero-prop component, benign true positive) · render-blank **PASS** after slice 1.1 (26 authored stories, 0 predicted blank) · raw-hex PASS (0 hex anywhere) | authored stories landed slice 1.1 |
 
 ### Runtime Gates
 
