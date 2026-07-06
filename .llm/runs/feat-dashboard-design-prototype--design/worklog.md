@@ -80,12 +80,17 @@ unit of the same kind.
 | Time | Slice | Step | Notes |
 | ---- | ----- | ---- | ----- |
 | 2026-07-06 | — | Bootstrap | Worktree `.llm/tmp/design-proto-wt` @ `317e4b50`; run dir scaffolded; four-lane research complete (see research.md) |
+| 2026-07-06 | 1 | `tools/design-sync/` v1 | 11 TS modules + 2 templates + `.design-sync/config.json` + root `design:sync` task + `.ds-sync/` gitignore. Gate `design:sync check` **PASS**: parity green (44/44 cards = 30 components + 11 blocks + 3 islands), idempotence PASS (`dfac420b48f8`), 180-file bundle, traps 4×PASS + 2 by-design WARN (weak-dts: theme-toggle; render-blank: 26 floor cards pending authored stories → slice 2/3). Scoped check/lint/fmt clean |
 
 ## Decisions
 
 | Decision | Reason | Source |
 | -------- | ------ | ------ |
 | LD-1…LD-7 | see plan.md § Locked Decisions | owner (session 2026-07-06) + research |
+| Closure = deterministic registry concat, no Fresh build | registry has ZERO Tailwind utility classes (verified) — closure is fonts→tokens→base→layouts→per-unit CSS; kills OQ-4 dependency on building apps/dashboard | slice-1 verification |
+| `cn` shim drops clsx + tailwind-merge | no Tailwind utils ⇒ merge is a no-op; React becomes the ONLY npm dep of the synthetic package | slice-1 |
+| `subpaths` module-graph fold-in | `command-palette` imports `@netscript/fresh-ui/interactive`; loader walks the 35-file `src/runtime` graph into the pkg and exposes Dialog/Tabs/Popover/Drawer/Sheet/Combobox/Accordion/Tooltip on the canvas global — interactive primitives now first-class on canvas | slice-1 |
+| `markdown` unit excluded | template-sourced (`.tsx.template`) chat renderer on the npm remark/rehype stack — belongs to the deferred AI/chat collection | slice-1 |
 
 ## Drift
 
@@ -100,15 +105,15 @@ unit of the same kind.
 
 | Gate | Command or check | Result | Notes |
 | ---- | ---------------- | ------ | ----- |
-| check/lint/fmt (tools) | scoped wrappers | NOT_RUN | after slice 1 |
+| check/lint/fmt (tools) | scoped wrappers `--root tools/design-sync --ext ts` | **PASS** 2026-07-06 | 11 files, 0 findings each |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
-| Sync idempotence | NOT_RUN | — | slice 1/5 |
-| Parity checklist | NOT_RUN | — | slice 3 |
-| Trap checks a–f | NOT_RUN | — | slice 1/5 |
+| Sync idempotence | **PASS** 2026-07-06 | `design:sync check` double-build tree hash `dfac420b48f8` stable | slice 1 (re-run at slice 5) |
+| Parity checklist | **PASS** (build-side) 2026-07-06 | ParityReport green: 44/44 card-bearing units emitted (30 component + 11 block + 3 island); 2 recorded exclusions (markdown, chat-render); style/theme/support/lib all consumed | canvas-side re-verify at slice 3 |
+| Trap checks a–f | **PASS** 2026-07-06 | theme-default PASS (`:root` light + `[data-theme='dark']` in closure) · token-closure PASS (160 defined; fallback-less refs all resolved incl. runtime inline-style tokens) · compiled-css PASS (37 parts, 88 KiB) · weak-dts WARN (theme-toggle only) · render-blank WARN (26 floor cards, by design pre-authoring) · raw-hex PASS (0 hex anywhere) | WARNs feed slice 2/3 story authoring |
 
 ### Runtime Gates
 

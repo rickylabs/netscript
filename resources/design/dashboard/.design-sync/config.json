@@ -1,0 +1,35 @@
+{
+  "projectId": "ec262e10-d4ad-451f-9aeb-e51955db3634",
+  "projectName": "NetScript — NS One",
+  "pkg": "@netscript/ns-one",
+  "globalName": "NSOne",
+  "shape": "package",
+  "registry": {
+    "root": "packages/fresh-ui",
+    "manifest": "registry.manifest.ts"
+  },
+  "scratchDir": ".ds-sync",
+  "fontImport": "@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap');",
+  "exclude": [
+    {
+      "pattern": "^src/",
+      "reason": "AI/chat collection deferred — not needed for dashboard surfaces (plan § Deferred Scope)"
+    },
+    {
+      "pattern": "\\.template$",
+      "reason": "template-sourced chat markdown renderer (react-markdown/remark/rehype npm stack) — deferred with the AI/chat collection"
+    }
+  ],
+  "subpaths": {
+    "@netscript/fresh-ui/interactive": "interactive.ts"
+  },
+  "groups": {
+    "component": "general",
+    "block": "blocks",
+    "island": "islands"
+  },
+  "react": {
+    "version": "19.2.0",
+    "domVersion": "19.2.0"
+  }
+}

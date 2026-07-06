@@ -29,15 +29,23 @@ the beta.6 implementation supervisor.
 
 ## In Progress
 
-- **Slice 1**: `tools/design-sync/` v1 (converter + closure + conventions + previews + trap
-  checks + idempotence). Canvas target locked: project **`NetScript — NS One`**
-  (`ec262e10-d4ad-451f-9aeb-e51955db3634`) — goes into `.design-sync/config.json`.
+- **Slice 2**: dashboard design brief + proposed components (`resources/design/dashboard/`).
+  Delegation split per owner directive: Fable 5 keeps the tricky design/creativity core; Opus 4.8
+  sub-agent authors the 26 pending preview stories (`tools/design-sync/previews/<unit>.preview.js`,
+  read by `emitCards`) + mechanical doc polish; WSL Codex = chores only.
 
 ## Done gates
 
 - PLAN-EVAL **PASS** (minimax-M3, `plan-eval.md` committed dfd9d8ca; version-label note fixed in
   plan.md/pr-body.md). Slice 0 canvas round-trip **PASS** (create/finalize/write/read/delete via
   native `DesignSync` tool).
+- **Slice 1 COMPLETE**: `tools/design-sync/` v1 (11 modules + card/conventions templates +
+  config.json + `design:sync` task + `.ds-sync/` gitignore). `design:sync check` **PASS** —
+  parity 44/44 cards, idempotence `dfac420b48f8`, traps 4×PASS/2 by-design WARN; scoped
+  check/lint/fmt clean. Key mechanics: zero-Tailwind registry ⇒ concat closure (no Fresh build);
+  cn shim drops clsx/tailwind-merge (React = only npm dep); `subpaths` graph fold-in gives the
+  canvas the 8 interactive primitives; `markdown` excluded (template-sourced chat stack). See
+  drift.md D3.
 
 ## Board state (filed)
 
@@ -48,10 +56,14 @@ the beta.6 implementation supervisor.
 
 ## Next Steps
 
-1. PLAN-EVAL verdict → PASS: proceed to slice 0; FAIL_PLAN: fix plan boxes (max 2 cycles).
-2. Owner: `claude mcp add … claude-design …` + `/design-login`; then slice 0 canvas smoke.
+1. Slice 2: design brief + proposed components (Fable 5); in parallel delegate the 26 preview
+   stories (`tools/design-sync/previews/*.preview.js`) + doc polish to an Opus 4.8 sub-agent.
+2. Slice 3: re-run `design:sync`, seed project `ec262e10-d4ad-451f-9aeb-e51955db3634` via
+   DesignSync `finalize_plan` + `write_files` (localPath from `.ds-sync/bundle/`).
 3. Owner lane directive 2026-07-06 (in force, also in memory): Fable 5 = all design/creativity
    work; WSL Codex = chores only, never design; Opus 4.8 = the rest; Sonnet 5 = workflow stages.
+4. OQ-2 RESOLVED: pkg `@netscript/ns-one` / global `NSOne`. OQ-4 RESOLVED-MOOT: concat closure,
+   no Fresh build (drift.md D3).
 
 ## Key Decisions
 
@@ -63,15 +75,18 @@ the beta.6 implementation supervisor.
 
 | Path | Status | Notes |
 | ---- | ------ | ----- |
-| `.llm/runs/feat-dashboard-design-prototype--design/*` | new | run artifacts (6 files) |
+| `.llm/runs/feat-dashboard-design-prototype--design/*` | new | run artifacts |
+| `tools/design-sync/**` (11 src + 2 templates) | new | slice 1 |
+| `resources/design/dashboard/.design-sync/config.json` | new | projectId + subpaths + exclusions |
+| `deno.json` (`design:sync` task), `.gitignore` (`.ds-sync/`) | modified | slice 1 |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Static      | NOT_RUN        | after slice 1 |
-| Fitness     | NOT_RUN        | idempotence/parity/traps defined in plan.md |
-| Runtime     | NOT_RUN        | slice 0 MCP smoke blocked on owner login |
+| Static      | **PASS** (slice-1 scope) | scoped wrappers, 11 files clean |
+| Fitness     | **PASS** (build-side) | idempotence + parity + traps green; canvas-side at slice 3 |
+| Runtime     | **PASS** (slice 0) | canvas round-trip CRUD green |
 | Consumer    | N/A            | no package surface |
 
 ## Open Questions

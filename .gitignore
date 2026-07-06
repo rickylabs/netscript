@@ -15,3 +15,7 @@ dist/
 # CI output land here and embed machine-local absolute paths. Never commit it.
 # If a specific artifact ever needs to be durable, re-add it with a `!` negation.
 .llm/tmp/
+
+# design-sync scratch output (synthetic React package + canvas bundle);
+# rebuild with `deno task design:sync`, never commit.
+.ds-sync/

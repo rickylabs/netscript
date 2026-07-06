@@ -47,3 +47,16 @@ documentation.
   PLAN-EVAL PASS. Slice 1 targets the DesignSync bundle shape (`@dsCard` preview markers,
   256-file batches).
 - **Evidence:** worklog.md § Runtime Gates.
+
+## D3 — 2026-07-06 — slice 1 implementation vs Design-section wording (minor)
+
+- Plan Design § said `RegistryUnit` joins manifest items with source embedded in
+  `registry.generated.ts`; implementation reads `files[].source` from disk via
+  `registry.manifest.ts` (cheaper, identical content, keeps the RegistrySource port).
+- Plan Design § said `ClosureBuilder` compiles the Tailwind closure from a Fresh build
+  (`apps/dashboard`, OQ-4). Verified the registry carries ZERO Tailwind utility classes, so the
+  shipped builder is `RegistryConcatClosureBuilder` (deterministic concat: fonts → tokens → base →
+  layouts → per-unit CSS). OQ-4 is moot; no Fresh build in the loop.
+- Added beyond plan wording: `subpaths` module-graph fold-in for `@netscript/fresh-ui/interactive`
+  (command-palette dependency; also surfaces the 8 interactive primitives on the canvas global).
+- Severity: minor — same contract names/ports as the locked Design; mechanisms simplified.

@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../../../styles.css">
+    <link rel="stylesheet" href="../../../_ds_bundle.css">
+    <style>
+    body {
+      margin: 0;
+      padding: 24px;
+    }
+    /* auto-fit (not auto-fill): empty tracks collapse, so a 1-2 story card
+       fills the width instead of stranding stories beside phantom columns */
+    .ds-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(320px,1fr));
+      gap: 20px;
+      align-items: start;
+    }
+    .ds-cell {
+      border: 1px solid var(--ns-border,#e5e7eb);
+      border-radius: 8px;
+      padding: 12px;
+      min-width: 0;
+      overflow: hidden;
+      transform: translateZ(0);
+    }
+    .ds-cell > h4 {
+      margin: 0 0 8px;
+      font: 600 12px var(--ns-font-mono,monospace);
+      color: var(--ns-muted-fg,#6b7280);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    </style>
+  </head>
+  <body>
+    <div class="ds-grid" id="g"></div>
+    <script src="../../../_ds_bundle.js"></script>
+    <script src="../../../_preview/{{NAME}}.js"></script>
+    <script>
+    var g = document.getElementById('g');
+    var E = [];
+    for (var k in (window.__dsPreview || {})) {
+      if (typeof window.__dsPreview[k] === 'function' && /^[A-Z]/.test(k)) E.push(k);
+    }
+    window.__dsCells = E.slice();
+    var q = null;
+    try {
+      q = new URLSearchParams(location.search).get('story');
+    } catch (e) {}
+    function mount(id, key) {
+      try {
+        ReactDOM.createRoot(document.getElementById(id)).render(
+          window.React.createElement(window.__dsPreview[key]),
+        );
+      } catch (e) {
+        document.getElementById(id).textContent = '⚠ ' + (e && e.message || e);
+      }
+    }
+    var pick = null;
+    if (q) {
+      for (var j = 0; j < E.length; j++) {
+        if (E[j] === q || E[j].toLowerCase() === q.toLowerCase()) {
+          pick = E[j];
+          break;
+        }
+      }
+    }
+    if (q && !pick) g.textContent = '⚠ no export named ' + q;
+    else if (pick) {
+      var s = document.createElement('div');
+      s.id = 'r0';
+      g.parentNode.replaceChild(s, g);
+      mount('r0', pick);
+    } else {
+      for (var i = 0; i < E.length; i++) {
+        var cell = document.createElement('section');
+        cell.className = 'ds-cell';
+        cell.innerHTML = '<h4>' + E[i] + '</h4><div id="r' + i + '"></div>';
+        g.appendChild(cell);
+        mount('r' + i, E[i]);
+      }
+      if (E.length === 0) g.textContent = '⚠ no PascalCase exports in _preview/{{NAME}}.js';
+    }
+    </script>
+  </body>
+</html>
