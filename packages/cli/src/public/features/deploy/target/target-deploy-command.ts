@@ -9,6 +9,7 @@ import { green, red } from '@std/fmt/colors';
 import { failDeployCommand } from '../../../../kernel/adapters/deploy/deploy-exit.ts';
 import { outputError, outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import type { DeployOperation } from '../../../../kernel/domain/deploy/deploy-target-port.ts';
+import type { DeployTargetRequestConfig } from '../../../../kernel/domain/deploy/deploy-target-port.ts';
 import type { PublicCommandDependencies } from '../../root/public-command-dependencies.ts';
 
 /** Lifecycle verbs the target router exposes; each is routed to the adapter as-is. */
@@ -91,11 +92,32 @@ async function runTargetOperation(
     failDeployCommand('Deploy command failed: project root not found.');
   }
 
+  const targetConfig = await resolveTargetConfig(dependencies, key, projectRoot);
+  const outputDir = options.outputDir ?? targetConfig?.outputPath;
+
   try {
-    const result = await target[operation]!({ projectRoot, outputDir: options.outputDir });
+    const result = await target[operation]!({ projectRoot, outputDir, targetConfig });
     outputText(green(`✓ ${result.message}`));
   } catch (error: unknown) {
     outputError(red(`✗ ${error instanceof Error ? error.message : String(error)}`));
     failDeployCommand('Deploy command failed.', { cause: error });
+  }
+}
+
+async function resolveTargetConfig(
+  dependencies: PublicCommandDependencies,
+  key: string,
+  projectRoot: string,
+): Promise<DeployTargetRequestConfig | undefined> {
+  try {
+    const config = await dependencies.loadConfig({ cwd: projectRoot });
+    const targets = config.deploy?.targets as
+      | Record<string, DeployTargetRequestConfig | undefined>
+      | undefined;
+    const targetConfig = targets?.[key];
+    const appHost = targetConfig?.appHost ?? config.aspire?.appHost;
+    return targetConfig || appHost ? { ...targetConfig, appHost } : undefined;
+  } catch {
+    return undefined;
   }
 }

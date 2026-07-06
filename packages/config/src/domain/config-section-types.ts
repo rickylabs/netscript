@@ -535,26 +535,36 @@ export interface DenoDeployTarget extends DeployTargetBase {
 }
 
 /**
- * Aspire cloud deployment target (`deploy.targets.kubernetes`,
- * `deploy.targets['azure-aca']`, `deploy.targets['azure-app-service']`,
- * `deploy.targets['azure-aks']`, and `deploy.targets['cloud-run']`).
+ * Aspire AppHost cloud deployment target (`deploy.targets.kubernetes`,
+ * `deploy.targets['azure-aca']`, `deploy.targets['azure-app-service']`, and
+ * `deploy.targets['azure-aks']`).
  *
  * These targets delegate publish/deploy to the generated TypeScript AppHost and
  * Aspire CLI. Target-specific cluster/cloud auth, RBAC, and provider resources
  * remain operator-owned unless the AppHost's Aspire integration provisions them.
  */
-export interface AspireCloudDeployTarget extends DeployTargetBase {
-  /** Aspire AppHost environment name passed to `aspire --environment`. */
-  environment?: string;
+export interface AspireAppHostDeployTarget extends DeployTargetBase {
   /** Directory for emitted publish/deploy artifacts. */
   outputPath?: string;
   /** AppHost path used when Aspire default discovery is insufficient. */
   appHost?: string;
-  /** Container registry for targets that publish Docker images. */
+}
+
+/**
+ * Google Cloud Run Docker-image provider target (`deploy.targets['cloud-run']`).
+ *
+ * The CLI builds and pushes the configured image, then applies that image with
+ * `gcloud run deploy`.
+ */
+export interface CloudRunDeployTarget extends DeployTargetBase {
+  /** Container registry for the pushed image (for example `us-docker.pkg.dev/acme`). */
   registry?: string;
-  /** Base image name/tag for built service images. */
+  /** Image name and optional tag (for example `orders-api:latest`). */
   imageName?: string;
 }
+
+/** Back-compat alias for the AppHost-backed S10 cloud targets. */
+export type AspireCloudDeployTarget = AspireAppHostDeployTarget;
 
 /** Top-level deployment configuration type. */
 export interface DeployConfig {
@@ -571,15 +581,15 @@ export interface DeployConfig {
     /** Deno Deploy cloud deployment settings. */
     'deno-deploy'?: DenoDeployTarget;
     /** Kubernetes deployment settings. */
-    kubernetes?: AspireCloudDeployTarget;
+    kubernetes?: AspireAppHostDeployTarget;
     /** Azure Container Apps deployment settings. */
-    'azure-aca'?: AspireCloudDeployTarget;
+    'azure-aca'?: AspireAppHostDeployTarget;
     /** Azure App Service deployment settings. */
-    'azure-app-service'?: AspireCloudDeployTarget;
+    'azure-app-service'?: AspireAppHostDeployTarget;
     /** Azure Kubernetes Service deployment settings. */
-    'azure-aks'?: AspireCloudDeployTarget;
+    'azure-aks'?: AspireAppHostDeployTarget;
     /** Google Cloud Run deployment settings. */
-    'cloud-run'?: AspireCloudDeployTarget;
+    'cloud-run'?: CloudRunDeployTarget;
   };
 }
 

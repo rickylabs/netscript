@@ -22,10 +22,12 @@ target-specific infrastructure still lives in Aspire and your cloud account.
 <strong>Wired:</strong> a declarative resource graph in <code>appsettings.json</code> (ports,
 entrypoints, permissions, env vars, dependencies), runnable per-process Deno entrypoints, and
 the Aspire AppHost (<code>aspire/apphost.mts</code>) for local orchestration.
-<strong>Delegated:</strong> Docker/Compose, Kubernetes, Azure, and Cloud Run target commands call
+<strong>Delegated:</strong> Docker/Compose, Kubernetes, and Azure target commands call
 <code>aspire publish</code>, <code>aspire deploy</code>, and <code>aspire destroy</code> against the
-generated AppHost environment. Aspire emits the manifests and provisions supported resources; your
-cloud account, cluster credentials, registry access, and RBAC remain yours.
+generated AppHost code. Aspire emits the manifests and provisions supported resources; your
+cloud account, cluster credentials, registry access, and RBAC remain yours. Cloud Run follows the
+Docker-image provider lane: Docker builds and pushes the image, then <code>gcloud run deploy</code>
+applies it.
 <br><strong>Migration (#337):</strong> Windows deploy settings now live under
 <code>deploy.targets.windows</code> (previously <code>deploy.windows</code>).
 {{ /comp }}
@@ -37,7 +39,7 @@ There is now a first-class, runnable managed-platform path:
 <a href="https://deno.com/deploy">Deno Deploy</a> over the native <code>deno deploy</code> CLI, with a
 preflight guard and <code>deploy.targets['deno-deploy']</code> config. Aspire-backed targets are
 also routed: <code>netscript deploy docker|compose|kubernetes|azure-aca|azure-app-service|azure-aks|cloud-run &lt;op&gt;</code>
-delegates to the AppHost's publish/deploy environment. See
+delegates to the target adapter. See
 <a href="/how-to/deploy-deno-deploy/">Deploy to Deno Deploy</a> for Deno Deploy details.
 {{ /comp }}
 
@@ -235,10 +237,10 @@ The Aspire-backed target routers all share the same shape:
 # Generate artifacts without applying them.
 netscript deploy kubernetes plan --project-root . --output-dir .deploy/kubernetes
 
-# Apply/provision through the AppHost environment.
+# Apply/provision through the validated AppHost platform integration.
 netscript deploy azure-aks up --project-root . --output-dir .deploy/azure-aks
 
-# Tear down the previously deployed environment.
+# Tear down the previously deployed target.
 netscript deploy azure-aks down --project-root . --output-dir .deploy/azure-aks
 ```
 
@@ -246,7 +248,7 @@ For Kubernetes, add the Aspire Kubernetes integration to the TypeScript AppHost
 (`aspire add kubernetes`, then `builder.addKubernetesEnvironment('k8s')`). Use
 `publishAsKubernetesService(...)` in `aspire/apphost.mts` for per-service manifest
 customization such as replicas, labels, annotations, or extra manifests. `plan`
-runs `aspire publish --environment k8s --output-path .deploy/kubernetes`; Aspire
+runs `aspire publish --apphost <path> --output-path .deploy/kubernetes`; Aspire
 emits a Helm chart with `Chart.yaml`, `values.yaml`, and `templates/`.
 
 Apply the published chart with your normal cluster workflow:
@@ -260,13 +262,31 @@ helm template my-netscript-app .deploy/kubernetes > .deploy/kubernetes/rendered.
 kubectl apply -f .deploy/kubernetes/rendered.yaml
 ```
 
-For Azure, configure the matching AppHost environment before using the router:
-`azure-aca`, `azure-app-service`, and `azure-aks` pass `aca`, `app-service`, and
-`aks` respectively to `aspire publish|deploy --environment`. Azure CLI login,
-subscription/location parameters, provider feature registration, and RBAC are
-operator prerequisites. For `cloud-run`, configure the AppHost's Docker-image
-provider lane and cloud CLI/auth so Aspire can push the image and update the
-service.
+For Azure, configure the matching AppHost hosting integration before using the
+router. The CLI validates the AppHost source contains an Azure Container Apps,
+Azure App Service, or Azure Kubernetes marker before it shells
+`aspire publish|deploy --apphost <path>`. Azure CLI login, subscription/location
+parameters, provider feature registration, and RBAC are operator prerequisites.
+
+For Cloud Run, configure the Docker-image provider fields:
+
+```ts
+export default defineConfig({
+  // ...
+  deploy: {
+    targets: {
+      'cloud-run': {
+        registry: 'us-docker.pkg.dev/acme/prod',
+        imageName: 'orders-api:latest',
+      },
+    },
+  },
+});
+```
+
+`netscript deploy cloud-run up` runs `docker build -t
+<registry>/<imageName> .`, `docker push <registry>/<imageName>`, then `gcloud
+run deploy <service> --image <registry>/<imageName> --quiet`.
 
 ## Step 5 — Run a process by hand (the bare-metal primitive)
 
@@ -301,8 +321,9 @@ deployment. To containerize, each process becomes one image whose `CMD` is the m
 
 {{ comp callout { type: "warning", title: "Limits of the alpha scaffold" } }}
 <ul>
-<li>Docker/Compose, Kubernetes, Azure, and Cloud Run artifacts are generated by Aspire from the AppHost environment you configure; NetScript does not hand-author those manifests in the CLI.</li>
-<li>Cluster/cloud auth, registry access, RBAC, subscriptions, regions, and provider quotas are operator prerequisites. The CLI shells to Aspire; it does not create credentials.</li>
+<li>Docker/Compose, Kubernetes, and Azure artifacts are generated by Aspire from the AppHost code you configure; NetScript does not hand-author those manifests in the CLI.</li>
+<li>Cloud Run uses the Docker-image provider lane (<code>docker build</code>, <code>docker push</code>, <code>gcloud run deploy</code>) and requires <code>registry</code> plus <code>imageName</code> in config.</li>
+<li>Cluster/cloud auth, registry access, RBAC, subscriptions, regions, and provider quotas are operator prerequisites. The CLI shells to Aspire, Docker, or gcloud; it does not create credentials.</li>
 <li>The <code>streams</code> service runs a <strong>real producer runtime</strong> (durable-streams over <code>@netscript/plugin-streams-core</code>, served on :4437) — deploy it as a first-class service. What is <em>not</em> production-ready is the manifest-helper layer: <code>@netscript/plugin-streams</code>'s <code>defineStreamProducer</code>/<code>defineStreamConsumer</code> <strong>throw <code>StreamUnsupportedOperationError</code></strong> by design (use <code>@netscript/plugin-streams-core</code> directly), and there is no in-process consumer <code>subscribe()</code> — consumption is HTTP/SSE.</li>
 <li>The scaffold worker <code>createJobTools(ctx)</code> handler helpers (<code>trace.addEvent</code>, <code>withChildSpan</code>, <code>progress</code>) are still no-op stubs (tracked debt, fix planned). Job dispatch/execution traces still appear in Aspire automatically; for custom handler spans call <code>@netscript/telemetry</code> helpers directly.</li>
 <li>DB commands assume a reachable Postgres — in CI/containers without Aspire, inject <code>POSTGRES_URI</code> yourself or the command fails fast.</li>

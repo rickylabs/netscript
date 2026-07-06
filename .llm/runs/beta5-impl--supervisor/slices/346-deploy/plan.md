@@ -56,23 +56,23 @@ Implement the S10 deploy target slice: Kubernetes, Azure ACA/App Service/AKS, an
 
 | ID | Decision | Rationale |
 | -- | -------- | --------- |
-| D1 | S10 cloud targets are Aspire environment adapters. | Aspire CLI/docs own publish/deploy; avoids manifest reinvention. |
-| D2 | `cloud-run` is the required Docker-image provider adapter for this slice. | The issue acceptance needs at least one Docker-image provider; Cloud Run is named in the issue. |
+| D1 | Kubernetes/Azure targets are AppHost-validated Aspire adapters. | Aspire CLI `--environment` is a deploy profile, not a platform selector; AppHost code selects the platform. |
+| D2 | `cloud-run` is the required Docker-image provider adapter for this slice and uses Docker + `gcloud`. | The issue acceptance needs at least one Docker-image provider wired to registry/imageName, not another Aspire profile delegation. |
 | D3 | Support `plan`/`emit`/`up`/`down`; omit `status`/`logs`/`rollback`/`secrets`. | Aspire provides publish/deploy/destroy generically; target-specific live status/logs/rollback/secrets need provider contracts not present in the current seam. |
-| D4 | Default environment names are `k8s`, `aca`, `app-service`, `aks`, `cloud-run`. | They are explicit, stable keys callers can override later through config resolution. |
+| D4 | S10 config is target-specific: AppHost targets get `appHost`/`outputPath`, Cloud Run gets `registry`/`imageName`. | No documented-but-dead knobs; each schema field is plumbed into the adapter request. |
 
 ## Open-Decision Sweep
 
 | Decision | Status | Notes |
 | -------- | ------ | ----- |
 | Milestone conflict (beta.5 prompt vs stable issue body) | safe to defer | Recorded in `notes.md`; implementation scope still follows issue acceptance. |
-| Provider-specific Cloud Run/ACA/App Service config | safe to defer | Generic Aspire environment delegation is enough for thin adapter acceptance. |
+| Provider-specific ACA/App Service scaffolding | safe to defer | This slice validates AppHost markers and delegates to the user-owned AppHost integration; scaffolding those integrations is separate template work. |
 
 ## Risk Register
 
 | Risk | Mitigation |
 | ---- | ---------- |
-| AppHost lacks the named environment | Adapter delegates to Aspire and surfaces stderr; docs state integration prerequisites. |
+| AppHost lacks the target platform integration | Adapter validates AppHost source markers before invoking Aspire and emits an actionable error. |
 | Provider auth/RBAC missing | Docs state auth/RBAC are user-owned prerequisites. |
 | CLI router grows target logic | Reuse existing target router; target behavior stays in adapters. |
 
@@ -113,9 +113,10 @@ Implement the S10 deploy target slice: Kubernetes, Azure ACA/App Service/AKS, an
 ## Dependencies
 
 - S7 Docker/Compose/Aspire target lane already present in checkout.
-- Aspire CLI and AppHost environment integrations are external prerequisites.
+- Aspire CLI and AppHost hosting integrations are external prerequisites for Kubernetes/Azure.
+- Docker, registry access, and `gcloud` are external prerequisites for Cloud Run.
 
 ## Drift Watch
 
-- If Aspire lacks target-specific ACA/App Service docs, keep the adapter generic and record the limitation.
-- If config resolution is required by tests, add it as a separate small slice rather than embedding config logic in the router.
+- If Aspire lacks target-specific ACA/App Service docs, keep validation marker-based and record the limitation.
+- If additional Cloud Run flags are required (region/project/service name), add them as explicit config fields rather than overloading `imageName`.

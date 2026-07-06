@@ -31,12 +31,32 @@ export type LegacyDeployOperation = 'build' | 'install' | 'uninstall';
 /** Public deploy operation exposed by a deploy target adapter. */
 export type DeployTargetOperation = DeployOperation | LegacyDeployOperation;
 
+/**
+ * Target-specific config values resolved by the CLI command surface.
+ *
+ * The router passes only fields that are valid for the configured target. The
+ * adapter decides which subset it consumes; unknown target config is not a
+ * published extension bag.
+ */
+export interface DeployTargetRequestConfig {
+  /** Directory for emitted deployment artifacts. */
+  readonly outputPath?: string;
+  /** AppHost entrypoint/project path used for Aspire-backed targets. */
+  readonly appHost?: string;
+  /** Container registry used by Docker-image provider targets. */
+  readonly registry?: string;
+  /** Container image name/tag used by Docker-image provider targets. */
+  readonly imageName?: string;
+}
+
 /** Request passed to deploy target operations. */
 export interface DeployTargetRequest {
   /** Project root for the deployment operation. */
   readonly projectRoot: string;
   /** Optional deployment output directory. */
   readonly outputDir?: string;
+  /** Target-specific config resolved from `deploy.targets.<key>`. */
+  readonly targetConfig?: DeployTargetRequestConfig;
 }
 
 /** Result returned by deploy target operations. */

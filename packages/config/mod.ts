@@ -76,8 +76,10 @@ export {
 // Types
 export type {
   AppConfig,
+  AspireAppHostDeployTarget,
   AspireCloudDeployTarget,
   AspireConfig,
+  CloudRunDeployTarget,
   ConfigEnv,
   DatabaseConfig,
   DatabaseProvider,

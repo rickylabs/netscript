@@ -120,11 +120,14 @@ Deno.test('defineConfig: drops unknown deploy.targets keys', () => {
           // `deno-deploy` is a valid cloud member of the target map and is retained.
           'deno-deploy': { org: 'acme', app: 'orders' },
           // S10 Aspire cloud targets are valid members of the target map and retained.
-          kubernetes: { environment: 'k8s' },
-          'azure-aca': { environment: 'aca' },
-          'azure-app-service': { environment: 'app-service' },
-          'azure-aks': { environment: 'aks' },
-          'cloud-run': { environment: 'cloud-run' },
+          kubernetes: { outputPath: '.deploy/kubernetes' },
+          'azure-aca': { appHost: 'aspire/apphost.mts' },
+          'azure-app-service': { appHost: 'aspire/apphost.mts' },
+          'azure-aks': { outputPath: '.deploy/azure-aks' },
+          'cloud-run': {
+            registry: 'us-docker.pkg.dev/acme',
+            imageName: 'orders-api:latest',
+          },
           // `solaris` is not a member of the target map and is dropped.
           solaris: { mode: 'compile' },
         },
@@ -136,11 +139,12 @@ Deno.test('defineConfig: drops unknown deploy.targets keys', () => {
   assertEquals(config.deploy?.targets?.linux?.mode, 'compile');
   assertEquals(config.deploy?.targets?.['deno-deploy']?.org, 'acme');
   assertEquals(config.deploy?.targets?.['deno-deploy']?.app, 'orders');
-  assertEquals(config.deploy?.targets?.kubernetes?.environment, 'k8s');
-  assertEquals(config.deploy?.targets?.['azure-aca']?.environment, 'aca');
-  assertEquals(config.deploy?.targets?.['azure-app-service']?.environment, 'app-service');
-  assertEquals(config.deploy?.targets?.['azure-aks']?.environment, 'aks');
-  assertEquals(config.deploy?.targets?.['cloud-run']?.environment, 'cloud-run');
+  assertEquals(config.deploy?.targets?.kubernetes?.outputPath, '.deploy/kubernetes');
+  assertEquals(config.deploy?.targets?.['azure-aca']?.appHost, 'aspire/apphost.mts');
+  assertEquals(config.deploy?.targets?.['azure-app-service']?.appHost, 'aspire/apphost.mts');
+  assertEquals(config.deploy?.targets?.['azure-aks']?.outputPath, '.deploy/azure-aks');
+  assertEquals(config.deploy?.targets?.['cloud-run']?.registry, 'us-docker.pkg.dev/acme');
+  assertEquals(config.deploy?.targets?.['cloud-run']?.imageName, 'orders-api:latest');
   assertEquals(Object.keys(config.deploy?.targets ?? {}), [
     'windows',
     'linux',

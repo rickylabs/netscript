@@ -11,10 +11,10 @@
 | # | Finding | How to verify |
 | - | ------- | ------------- |
 | 1 | The deploy feature already has an Archetype-7 target adapter seam: `DeployTargetPort`, `DeployTargetRegistry`, Docker/Compose Aspire adapter, Deno Deploy adapter, and a thin `deploy <target>` router. | `packages/cli/src/kernel/domain/deploy/deploy-target-port.ts`; `packages/cli/src/kernel/application/registries/deploy-target-registry.ts`; `packages/cli/src/public/features/deploy/target/target-deploy-command.ts` |
-| 2 | `aspire publish`, `aspire deploy`, and `aspire destroy` exist locally and support `--environment` plus `--output-path`. | `aspire publish --help`; `aspire deploy --help`; `aspire destroy --help` |
+| 2 | `aspire publish`, `aspire deploy`, and `aspire destroy` exist locally and support `--apphost` plus `--output-path`; PR #491 adversarial review clarified that `--environment` is a deployment profile, not a platform selector. | `aspire publish --help`; `aspire deploy --help`; `aspire destroy --help`; PR #491 adversarial review |
 | 3 | Aspire docs confirm TypeScript AppHost Kubernetes support: `builder.addKubernetesEnvironment('k8s')`, `publishAsKubernetesService(...)`, Helm chart publishing, and `helm`/`kubectl` apply flows. | `aspire docs get deploy-to-kubernetes-clusters`; `aspire docs get kubernetes-integration` |
 | 4 | Aspire docs confirm AKS deployment through `builder.addAzureKubernetesEnvironment('aks')`, Azure CLI auth, subscription/location configuration, and Helm/Kubernetes apply behavior. | `aspire docs get deploy-to-azure-kubernetes-service-aks` |
-| 5 | Aspire docs search did not return a target-specific ACA or App Service integration page in this environment; the safe implementation is a generic Aspire environment adapter that delegates to AppHost-owned integration code. | `aspire docs search "Azure Container Apps deploy Aspire ACA"`; `aspire docs search "Azure App Service deploy Aspire"` |
+| 5 | Aspire docs search did not return a target-specific ACA or App Service integration page in this environment; the safe implementation is an AppHost-validation adapter that refuses a mismatched AppHost before delegating to Aspire. | `aspire docs search "Azure Container Apps deploy Aspire ACA"`; `aspire docs search "Azure App Service deploy Aspire"` |
 | 6 | Config currently recognizes windows/linux/docker/compose/deno-deploy only, so S10 target keys need schema/type additions. | `packages/config/src/domain/schemas/deploy-schema.ts`; `packages/config/src/domain/config-section-types.ts` |
 
 ## jsr-audit surface scan
@@ -25,4 +25,4 @@
 ## Open questions
 
 - Whether the issue should remain in beta.5 or stable: issue body and prompt disagree.
-- Whether Cloud Run should later get a provider-specific config resolver once the AppHost integration is selected; this slice only wires the thin Docker-image-provider lane.
+- Whether Cloud Run later needs explicit `region`, `project`, or service-name config beyond `registry`/`imageName`.

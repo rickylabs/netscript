@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import type {
+  AspireAppHostDeployTarget,
   AspireCloudDeployTarget,
+  CloudRunDeployTarget,
   DenoDeployTarget,
   DeployConfig,
   DeployTargetBase,
@@ -239,26 +241,40 @@ export const DenoDeployTargetSchema: z.ZodType<DenoDeployTarget> = z.object({
 });
 
 /**
- * Aspire cloud deployment target (`deploy.targets.kubernetes`,
- * `deploy.targets['azure-aca']`, `deploy.targets['azure-app-service']`,
- * `deploy.targets['azure-aks']`, and `deploy.targets['cloud-run']`).
+ * Aspire AppHost cloud deployment target (`deploy.targets.kubernetes`,
+ * `deploy.targets['azure-aca']`, `deploy.targets['azure-app-service']`, and
+ * `deploy.targets['azure-aks']`).
  *
- * Extends the shared base with Aspire publish/deploy fields. The AppHost owns
+ * Extends the shared base with AppHost publish/deploy fields. The AppHost owns
  * target-specific manifests and provisioning through its configured hosting
- * integration/environment.
+ * integration/environment, and the CLI validates that AppHost source before
+ * invoking Aspire.
  */
-export const AspireCloudDeployTargetSchema: z.ZodType<AspireCloudDeployTarget> = z.object({
+export const AspireAppHostDeployTargetSchema: z.ZodType<AspireAppHostDeployTarget> = z.object({
   ...deployTargetBaseShape,
 
-  /** Aspire AppHost environment name passed to `--environment`. */
-  environment: z.string().optional(),
   /** Directory for emitted publish/deploy artifacts. */
   outputPath: z.string().optional(),
   /** AppHost path passed to Aspire when the default discovery is insufficient. */
   appHost: z.string().optional(),
-  /** Container image registry for targets that publish Docker images. */
+});
+
+/** Back-compat export for the AppHost-backed S10 cloud target schema. */
+export const AspireCloudDeployTargetSchema: z.ZodType<AspireCloudDeployTarget> =
+  AspireAppHostDeployTargetSchema;
+
+/**
+ * Google Cloud Run Docker-image provider target (`deploy.targets['cloud-run']`).
+ *
+ * This is the S10 Docker-image provider lane: build/push an image, then apply
+ * it to Cloud Run with `gcloud run deploy`.
+ */
+export const CloudRunDeployTargetSchema: z.ZodType<CloudRunDeployTarget> = z.object({
+  ...deployTargetBaseShape,
+
+  /** Container image registry for the pushed image. */
   registry: z.string().optional(),
-  /** Base image name/tag for built service images. */
+  /** Image name and optional tag. */
   imageName: z.string().optional(),
 });
 
@@ -285,15 +301,15 @@ export const DeployConfigSchema: z.ZodType<DeployConfig | undefined> = z
         /** Deno Deploy cloud deployment via the native `deno deploy` CLI. */
         'deno-deploy': DenoDeployTargetSchema.optional(),
         /** Kubernetes deployment via Aspire Kubernetes publish/deploy. */
-        kubernetes: AspireCloudDeployTargetSchema.optional(),
+        kubernetes: AspireAppHostDeployTargetSchema.optional(),
         /** Azure Container Apps deployment via an Aspire Azure environment. */
-        'azure-aca': AspireCloudDeployTargetSchema.optional(),
+        'azure-aca': AspireAppHostDeployTargetSchema.optional(),
         /** Azure App Service deployment via an Aspire Azure environment. */
-        'azure-app-service': AspireCloudDeployTargetSchema.optional(),
+        'azure-app-service': AspireAppHostDeployTargetSchema.optional(),
         /** Azure Kubernetes Service deployment via Aspire AKS publish/deploy. */
-        'azure-aks': AspireCloudDeployTargetSchema.optional(),
+        'azure-aks': AspireAppHostDeployTargetSchema.optional(),
         /** Cloud Run deployment via the Docker-image provider lane. */
-        'cloud-run': AspireCloudDeployTargetSchema.optional(),
+        'cloud-run': CloudRunDeployTargetSchema.optional(),
       })
       .optional(),
   })

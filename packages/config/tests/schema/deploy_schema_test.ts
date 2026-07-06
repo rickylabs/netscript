@@ -1,6 +1,8 @@
 import { assertEquals } from 'jsr:@std/assert@^1';
 import {
+  AspireAppHostDeployTargetSchema,
   AspireCloudDeployTargetSchema,
+  CloudRunDeployTargetSchema,
   DeployConfigSchema,
   DockerComposeDeployTargetSchema,
   LinuxDeployTargetSchema,
@@ -52,40 +54,60 @@ Deno.test('DeployConfigSchema exposes windows, docker and compose target keys', 
   assertEquals(config?.targets?.compose?.projectName, 'acme');
 });
 
-Deno.test('AspireCloudDeployTargetSchema inherits the shared base and target fields', () => {
-  const target = AspireCloudDeployTargetSchema.parse({
+Deno.test('AspireAppHostDeployTargetSchema inherits the shared base and AppHost fields', () => {
+  const target = AspireAppHostDeployTargetSchema.parse({
     mode: 'script',
-    environment: 'aks',
     outputPath: '.deploy/azure-aks',
     appHost: 'aspire/apphost.mts',
-    registry: 'acme.azurecr.io',
-    imageName: 'orders-api',
   });
 
   assertEquals(target.mode, 'script');
-  assertEquals(target.environment, 'aks');
   assertEquals(target.outputPath, '.deploy/azure-aks');
   assertEquals(target.appHost, 'aspire/apphost.mts');
+});
+
+Deno.test('AspireCloudDeployTargetSchema remains an AppHost-target alias', () => {
+  const target = AspireCloudDeployTargetSchema.parse({
+    outputPath: '.deploy/kubernetes',
+    appHost: 'aspire/apphost.mts',
+  });
+
+  assertEquals(target.outputPath, '.deploy/kubernetes');
+  assertEquals(target.appHost, 'aspire/apphost.mts');
+});
+
+Deno.test('CloudRunDeployTargetSchema owns the Docker-image provider fields', () => {
+  const target = CloudRunDeployTargetSchema.parse({
+    mode: 'script',
+    registry: 'acme.azurecr.io',
+    imageName: 'orders-api:latest',
+  });
+
+  assertEquals(target.mode, 'script');
   assertEquals(target.registry, 'acme.azurecr.io');
-  assertEquals(target.imageName, 'orders-api');
+  assertEquals(target.imageName, 'orders-api:latest');
 });
 
 Deno.test('DeployConfigSchema exposes kubernetes, azure, and cloud-run target keys', () => {
   const config = DeployConfigSchema.parse({
     targets: {
-      kubernetes: { environment: 'k8s', outputPath: '.deploy/kubernetes' },
-      'azure-aca': { environment: 'aca' },
-      'azure-app-service': { environment: 'app-service' },
-      'azure-aks': { environment: 'aks' },
-      'cloud-run': { environment: 'cloud-run', registry: 'us-docker.pkg.dev/acme' },
+      kubernetes: { outputPath: '.deploy/kubernetes' },
+      'azure-aca': { appHost: 'aspire/apphost.mts' },
+      'azure-app-service': { appHost: 'aspire/apphost.mts' },
+      'azure-aks': { outputPath: '.deploy/azure-aks' },
+      'cloud-run': {
+        registry: 'us-docker.pkg.dev/acme',
+        imageName: 'orders-api:latest',
+      },
     },
   });
 
   assertEquals(config?.targets?.kubernetes?.outputPath, '.deploy/kubernetes');
-  assertEquals(config?.targets?.['azure-aca']?.environment, 'aca');
-  assertEquals(config?.targets?.['azure-app-service']?.environment, 'app-service');
-  assertEquals(config?.targets?.['azure-aks']?.environment, 'aks');
+  assertEquals(config?.targets?.['azure-aca']?.appHost, 'aspire/apphost.mts');
+  assertEquals(config?.targets?.['azure-app-service']?.appHost, 'aspire/apphost.mts');
+  assertEquals(config?.targets?.['azure-aks']?.outputPath, '.deploy/azure-aks');
   assertEquals(config?.targets?.['cloud-run']?.registry, 'us-docker.pkg.dev/acme');
+  assertEquals(config?.targets?.['cloud-run']?.imageName, 'orders-api:latest');
 });
 
 Deno.test('LinuxDeployTargetSchema round-trips systemd fields', () => {
