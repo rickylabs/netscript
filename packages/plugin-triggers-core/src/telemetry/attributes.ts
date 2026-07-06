@@ -20,41 +20,74 @@ export const TriggerSpanNames: TriggerSpanNamesMap = Object.freeze(
   } as const,
 );
 
-/** Trigger attribute keys emitted on spans and metrics. */
+/**
+ * Trigger attribute keys emitted on spans and metrics.
+ *
+ * Namespaced under `netscript.trigger.*` per the #402 two-tier namespacing law.
+ * `http.status_code` intentionally retains the standard OpenTelemetry semantic
+ * convention key. Pre-#402 bare `trigger.*` keys shipped in `0.0.1-beta.5` and
+ * remain available through {@link DeprecatedTriggerAttributes} during the
+ * deprecation window.
+ */
 export type TriggerAttributesMap = Readonly<{
-  TRIGGER_ID: 'trigger.id';
-  TRIGGER_EVENT_ID: 'trigger.event.id';
-  TRIGGER_KIND: 'trigger.kind';
-  TRIGGER_STATUS: 'trigger.status';
-  TRIGGER_ATTEMPT: 'trigger.attempt';
-  TRIGGER_DURABILITY_TIER: 'trigger.durability_tier';
-  ACTION_KIND: 'trigger.action.kind';
-  IDEMPOTENCY_KEY: 'trigger.idempotency_key';
-  IDEMPOTENCY_SOURCE: 'trigger.idempotency_source';
-  DLQ_REASON: 'trigger.dlq.reason';
+  TRIGGER_ID: 'netscript.trigger.id';
+  TRIGGER_EVENT_ID: 'netscript.trigger.event.id';
+  TRIGGER_KIND: 'netscript.trigger.kind';
+  TRIGGER_STATUS: 'netscript.trigger.status';
+  TRIGGER_ATTEMPT: 'netscript.trigger.attempt';
+  TRIGGER_DURABILITY_TIER: 'netscript.trigger.durability_tier';
+  ACTION_KIND: 'netscript.trigger.action.kind';
+  IDEMPOTENCY_KEY: 'netscript.trigger.idempotency_key';
+  IDEMPOTENCY_SOURCE: 'netscript.trigger.idempotency_source';
+  DLQ_REASON: 'netscript.trigger.dlq.reason';
   HTTP_STATUS_CODE: 'http.status_code';
-  OUTCOME: 'outcome';
-  ERROR_CLASS: 'error_class';
+  OUTCOME: 'netscript.trigger.outcome';
+  ERROR_CLASS: 'netscript.trigger.error_class';
 }>;
 
 /** Trigger attribute keys keyed by semantic name. */
 export const TriggerAttributes: TriggerAttributesMap = Object.freeze(
   {
-    TRIGGER_ID: 'trigger.id',
-    TRIGGER_EVENT_ID: 'trigger.event.id',
-    TRIGGER_KIND: 'trigger.kind',
-    TRIGGER_STATUS: 'trigger.status',
-    TRIGGER_ATTEMPT: 'trigger.attempt',
-    TRIGGER_DURABILITY_TIER: 'trigger.durability_tier',
-    ACTION_KIND: 'trigger.action.kind',
-    IDEMPOTENCY_KEY: 'trigger.idempotency_key',
-    IDEMPOTENCY_SOURCE: 'trigger.idempotency_source',
-    DLQ_REASON: 'trigger.dlq.reason',
+    TRIGGER_ID: 'netscript.trigger.id',
+    TRIGGER_EVENT_ID: 'netscript.trigger.event.id',
+    TRIGGER_KIND: 'netscript.trigger.kind',
+    TRIGGER_STATUS: 'netscript.trigger.status',
+    TRIGGER_ATTEMPT: 'netscript.trigger.attempt',
+    TRIGGER_DURABILITY_TIER: 'netscript.trigger.durability_tier',
+    ACTION_KIND: 'netscript.trigger.action.kind',
+    IDEMPOTENCY_KEY: 'netscript.trigger.idempotency_key',
+    IDEMPOTENCY_SOURCE: 'netscript.trigger.idempotency_source',
+    DLQ_REASON: 'netscript.trigger.dlq.reason',
     HTTP_STATUS_CODE: 'http.status_code',
-    OUTCOME: 'outcome',
-    ERROR_CLASS: 'error_class',
+    OUTCOME: 'netscript.trigger.outcome',
+    ERROR_CLASS: 'netscript.trigger.error_class',
   } as const,
 );
+
+/**
+ * Deprecated pre-#402 bare `trigger.*` attribute keys, keyed by canonical
+ * {@link TriggerAttributes} value.
+ *
+ * These shipped in `0.0.1-beta.5`. Trigger instrumentation emits them alongside
+ * the canonical `netscript.trigger.*` keys during the deprecation window so
+ * dashboards and alerts keyed on the old names keep working. Remove this map
+ * (and its emission) once the window closes.
+ */
+export const DeprecatedTriggerAttributes: Readonly<Record<string, string>> = Object.freeze({
+  [TriggerAttributes.TRIGGER_ID]: 'trigger.id',
+  [TriggerAttributes.TRIGGER_EVENT_ID]: 'trigger.event.id',
+  [TriggerAttributes.TRIGGER_KIND]: 'trigger.kind',
+  [TriggerAttributes.TRIGGER_STATUS]: 'trigger.status',
+  [TriggerAttributes.TRIGGER_ATTEMPT]: 'trigger.attempt',
+  [TriggerAttributes.TRIGGER_DURABILITY_TIER]: 'trigger.durability_tier',
+  [TriggerAttributes.ACTION_KIND]: 'trigger.action.kind',
+  [TriggerAttributes.IDEMPOTENCY_KEY]: 'trigger.idempotency_key',
+  [TriggerAttributes.IDEMPOTENCY_SOURCE]: 'trigger.idempotency_source',
+  [TriggerAttributes.DLQ_REASON]: 'trigger.dlq.reason',
+  [TriggerAttributes.OUTCOME]: 'outcome',
+  [TriggerAttributes.ERROR_CLASS]: 'error_class',
+  // HTTP_STATUS_CODE keeps the standard `http.status_code` key (no alias).
+});
 
 /** Metric names required by the trigger observability spec. */
 export type TriggerMetricNamesMap = Readonly<{
