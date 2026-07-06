@@ -184,27 +184,30 @@ the shared plugin error vocabulary from `BASE_PLUGIN_ERRORS`:
 A connector binds its host request context and implements each route handler. The precise per-route
 IO types check every handler; there is no erasure cast on the contract or the implementer.
 
+`aiContractV1.$context<TContext>()` returns the contract-bound **implementer** — `AiRouter` is the
+type alias naming its default (empty-context) shape, and `ContextualAiRouter<TContext>` the
+context-parameterized one. The implementer is not an assembled handler map: each route on it
+exposes a `.handler()` call that binds one implementation function.
+
 ```typescript
 import { aiContractV1 } from '@netscript/plugin-ai-core';
-import type { AiRouter, ChatChunk } from '@netscript/plugin-ai-core';
 
-// Bind the host request context, then implement each route.
+// Bind the host request context; each route is then implemented individually.
 const router = aiContractV1.$context<{ requestId: string }>();
 
-const impl: AiRouter = router.router({
-  // The `chat` output is an event-iterator, so the handler MUST stream frames.
-  chat: router.chat.handler(async function* ({ input }): AsyncGenerator<ChatChunk> {
-    for (const message of input.messages) {
-      yield { type: 'text', delta: `echo: ${JSON.stringify(message.content)}` };
-    }
-    yield { type: 'done' };
-  }),
-  // models / invokeTool / embed / transcribe / describe handlers follow.
+// The `chat` output is an event-iterator, so the handler MUST stream frames.
+const chat = router.chat.handler(async function* ({ input }) {
+  for (const message of input.messages) {
+    yield { type: 'text' as const, delta: `echo: ${JSON.stringify(message.content)}` };
+  }
+  yield { type: 'done' as const };
 });
+// models / invokeTool / embed / transcribe / describe bind the same way.
 ```
 
-`createAiRouter` is a convenience over `aiContractV1.$context()` that binds a complete per-route
-implementation in one call and returns the bound handlers (`BoundAiRouter`):
+Assembling all six bound routes by hand is what `createAiRouter` exists to avoid: it wraps
+`aiContractV1.$context()`, binds a complete per-route implementation (`AiRouterImplementation`)
+in one call, and returns the bound handler map (`BoundAiRouter`):
 
 ```typescript
 import { createAiRouter } from '@netscript/plugin-ai-core';
