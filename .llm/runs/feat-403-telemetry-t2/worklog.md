@@ -30,3 +30,10 @@ Baseline before work: scoped check clean (61 files), `deno doc --lint` full expo
 - Enriched the previously-stubbed `inspectTelemetry` string branch to classify path vs label and surface value/empty details.
 - `deno.json` imports: added `@standard-schema/spec@1.1.0` (1-line, minimal `deno.lock` addition — the dep is already used repo-wide; not re-resolution churn).
 - Evidence: scoped check clean (72 files); doc-lint full export set clean (fixed a private-type-ref by typing the public `issues` field as `StandardSchemaV1.Issue`); telemetry 21/21 tests pass; publish dry-run Success; fmt clean. No new `as`/`any` casts.
+
+## Slice 4 — consumer compat, README, arch-debt closure
+- Confirmed orphan `src/public/mod.ts` absent; no external consumer imports the new subpaths or the old `src/core`/`src/runtime` internals (all consumers use public subpaths).
+- Repo-wide consumer check across `packages/` + `plugins/` (result recorded below).
+- README: added a Subpaths table + capability bullets for provider adapters, query read-model, testing recorder, and Standard-Schema config validation.
+- Closed the `packages/telemetry` Refactor arch-debt entry with F-3/F-5/F-6 resolution evidence.
+- Evidence: repo-wide `deno check` over `packages/` + `plugins/` = **2242 files, 19 batches, 0 failed, 0 occurrences** (all consumers compile). No external consumer imports `/registry` or the old `src/core`/`src/runtime` internals.

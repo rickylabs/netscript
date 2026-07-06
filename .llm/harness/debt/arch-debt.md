@@ -352,8 +352,24 @@ finding into a debt entry.
 - **Target:** 2026-Q3 doctrine remediation.
 - **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
 - **Created:** 2026-04-29
-- **Status:** open
+- **Status:** closed (2026-07-06, #403 T2 — branch `feat/403-telemetry-t2`)
 - **Gate:** F-3, F-5, F-6
+- **Resolution:**
+  - **F-3 (layering):** Forbidden `core/` removed — types moved to `src/domain/`, span/tracer
+    lifecycle to `src/application/`, registry lifecycle to `src/application/registry/`. Provider
+    ports live in `src/ports/`; OTEL provider adapters in `src/adapters/otel/`. Adapters import
+    `ports` + the external `@opentelemetry/api` client only; `application` never imports `adapters`.
+    Dead `src/instrumentation/sse.ts` (zero consumers) deleted; orphan `src/public/mod.ts` confirmed
+    absent.
+  - **F-5 (public surface):** OTEL adapter exposed as the dedicated `@netscript/telemetry/otel`
+    subpath; added `@netscript/telemetry/query` (read-model) and `@netscript/telemetry/testing`
+    (in-memory recorder); `@netscript/telemetry/registry` given a real facade; root `mod.ts` barrel
+    completed with the primary tracing surface. `deno doc --lint` clean across the full
+    11-entrypoint export set.
+  - **F-6 (JSR publishability):** `deno publish --dry-run` green; `workspace-mutator` JSR
+    rewrite-map covers every telemetry subpath (root, `/orpc`, `/otel`, `/query`, `/registry`,
+    `/testing`). Env config validated with Standard Schema. All consumers in `packages/` + `plugins/`
+    still compile; T1 TC-1..14 convention contract preserved.
 
 ## packages/triggers — doctrine verdict Restructure
 
