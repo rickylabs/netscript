@@ -1,0 +1,24 @@
+# Research — plan-process-manager--seed
+
+Stage-B discovery corpus index. Full corpus lives in `research/` (one doc per topic, every claim
+cited: file:line, saved artifact, or URL). Drift candidates + open questions aggregated in
+`research/stage-b-ledger.md`. Stage-C synthesis appends below the corpus index.
+
+## Corpus index (workflow `wf_8ef59eb5-cd6`, 8/8 topics, 0 errors, 2026-07-06)
+
+| Doc | Bytes | Headline |
+| --- | ---: | --- |
+| `research/r1-plugin-architecture-seams.md` | 37,988 | Process-manager = Archetype 5 (thin plugin) wrapping an Archetype 7 (deploy-target-adapter) core; Archetype 7's status note says the deploy core "is not built yet, lives in packages/cli" — this plugin is literally the missing bare-metal adapter that archetype anticipated. Existing contribution axes cover everything (zero new axes). Dev-dashboard pack (DDX-0..19) already solved admin-UI-as-plugin-panel; two shared dependency edges (AspireResourceKind extension, CommandInvokePort-shaped lifecycle port) must be reconciled, not duplicated. "Deno Desktop app" vs Aspire-hosted Fresh dashboard = explicit owner-fork. |
+| `research/r2-deploy-baremetal-seams.md` | 22,416 | Reusable trunk: OsServicePort (servy+systemd), DeployTargetPort, 4 pure conventions (rollback, health-gate, secrets, OTEL env). Three hard gaps: zero NetScript-owned supervision/restart logic (100% delegated to systemd/servy); generalized windows-service/linux-service targets registered but never wired into any CLI command (reachable bare-metal verbs are hard Windows-only); services.json is a static build-time list (no live add/remove, no PID/CPU/mem, no cluster). #345 = supersession candidate. |
+| `research/r3-runtime-process-seams.md` | 28,722 | Workers stack = one-shot job execution only (terminal TaskResult, never keep-alive-restart) — pm slots beside workers without duplication. Deploy-compile path already generates static restart/health/log-rotation config. Genuinely missing: live daemon, mutable process registry, runtime-tunable restart/backoff, aggregate status/logs, N-instance clustering, admin UI, netscript.process telemetry domain. WatchableKv (Deno.Kv.watch) = unused-but-ready IPC primitive. --no-aspire = one foreground task, zero supervision. |
+| `research/r4-docs-scaffold-desktop-surface.md` | 33,445 | --no-aspire fallback today = zero automation (no appsettings.json at all). Desktop Tier-4 (#451–458) = app-shipping mechanism, not a supervisor. Dev-dashboard (#400) is Aspire-dependent/dev-only → pm bare-metal console must be a standalone deno-desktop-packaged app sharing the panel/contract shape. Genuine docs drift: cli-reference.md claims Linux bare-metal "planning-only" vs shipped SystemdOsServiceAdapter. |
+| `research/m1-pup-teardown.md` | 25,336 | pup (MIT, dormant ~19.5 mo, not archived): excellent concept — declarative pup.json, 3 start policies (autostart/cron/watch), single REST control plane consumed identically by CLI/plugins/UI, cluster+LB, service installers. Real smells: dax-sh instead of Deno.Command, deprecated @std/io readLines, god-object Pup class, bespoke slow-polling IPC telemetry. "No third-party deps" framing unverified (real dep graph exists). |
+| `research/m2-pm2-teardown.md` | 28,526 | pm2's top lesson is architectural: the shared always-on god-daemon (private axon RPC) caused repeated unbounded-RSS (150GB+) and daemon-duplication incidents — a structural cost of the pattern pup/pm2 framing implicitly proposes. Feature surface (restart strategies, graceful shutdown, startup generation, pm2-runtime, monit) worth matching; anti-features to reject: SaaS-only monitoring (@pm2/io), git+SSH deploy baked into the PM, AGPL, untyped config. Differentiator: typed oRPC lifecycle surface. |
+| `research/m3-servy-windows-systemd-native.md` | 25,334 | NetScript already ships production-quality Servy+systemd adapters behind OsServicePort — extend, not replace. Biggest gap: shipped systemd unit renderer has no WatchdogSec/Type=notify, no hardening directives, no cgroups resource control. sd_notify/watchdog buildable in pure Deno via Deno.listenDatagram unixpacket (no FFI). Servy remains correct Windows choice vs NSSM/WinSW. launchd/Quadlet = later-tier. |
+| `research/m4-2026-landscape-deno-desktop.md` | 29,048 | Deno-native PM niche still uncontested in 2026 (only Rust pm2-alikes pmc/oxmgr + the process-compose/s6/overmind/supervisord/quadlet field, all lacking Windows parity or OTEL-native subprocess telemetry). Deno 2.9 ships `deno desktop` (experimental) + hardened `deno compile`. Load-bearing platform gaps: OTEL_DENO has zero subprocess coverage (#32752); no unix-socket transport on Windows (#10244); restricted Windows signal set (#28081). |
+
+## Ledger
+
+- 25 drift candidates + 36 open questions: `research/stage-b-ledger.md` (triage at Stage C).
+- Prior-run context extracts: `context/prior-deployment-architecture-spec.md`,
+  `context/prior-decision-gap-tracker.md`, `context/adjacent-issues.jsonl`.

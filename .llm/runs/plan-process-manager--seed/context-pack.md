@@ -9,9 +9,11 @@ deployment target of epic #327.
 
 ## Stage status
 
-- A Bootstrap: in progress (this commit).
-- B Discovery corpus: pending.
-- C Synthesis: pending.
+- A Bootstrap: ✅ (commit `37bcffdc`, draft PR #504).
+- B Discovery corpus: ✅ — workflow `wf_8ef59eb5-cd6`, 8/8 topics, corpus in `research/`, index in
+  `research.md`, 25 drift candidates + 36 open questions in `research/stage-b-ledger.md`.
+- C Synthesis: in progress — supervisor reads FULL corpus, triages ledger, names Stage-D deep-dive
+  topics, resolves supervisor-delegated decisions, poses owner-forks.
 - D Design packs: pending.
 - E Plan lock: pending.
 - F Adversarial: pending.
@@ -25,5 +27,8 @@ deployment target of epic #327.
   origin/main — landmine).
 - `gh` only via WSL (`wsl -u codex bash -lc "cd /tmp && gh ... --repo rickylabs/netscript"`),
   bodies via `--body-file` on `/mnt/c/...` paths.
-- Prior deployment research: branch `research/deployment-aggregation`,
-  `.llm/tmp/run/epic-deployment-aggregation/{deployment-architecture-spec,servy-assessment,decision-gap-tracker}.md`.
+- Prior deployment research: extracted to `context/prior-deployment-architecture-spec.md` +
+  `context/prior-decision-gap-tracker.md` (from branch `research/deployment-aggregation`);
+  `servy-assessment.md` was never committed there — MODERNIZE verdict survives in #327's body.
+- Full workflow result JSON (if needed):
+  `C:\Users\chaut\AppData\Local\Temp\claude\C--Dev-repos-netscript-framework\1e66850d-1c97-4549-b3fb-16e8a34fbc77\tasks\wr28svbvy.output`.
