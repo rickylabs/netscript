@@ -23,6 +23,14 @@
   those annotations breaks `--isolatedDeclarations`; replacing them with a package-owned structural
   type would change the public contract API, so this needs a design decision rather than a local
   doc-lint edit.
+- `packages/plugin-auth-core` is reduced from 3 combined diagnostics to 2 after replacing the
+  `PluginCapabilities` alias with a package-owned `AuthCapabilities` interface. The remaining refs
+  are the same precise oRPC contract-definition/implementer seam as the other feature-plugin
+  contract packages.
+- `packages/fresh-ui` remains a design-heavy interactive surface cluster. A local conversion from
+  exported Preact `JSX.*` prop aliases to the package-owned `FreshUiElementProps` vocabulary reduced
+  doc-lint counts but broke hook/component type-checking across runtime call sites. The package needs
+  a planned public-props/internal-props split rather than an opportunistic doc-lint rewrite.
 
 ## Process Notes
 

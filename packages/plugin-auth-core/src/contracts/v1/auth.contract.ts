@@ -12,7 +12,6 @@ import {
   BASE_PLUGIN_ERRORS,
   type BasePluginContract,
   type BasePluginDescribeRoute,
-  type PluginCapabilities,
 } from '@netscript/plugin/contract-base';
 import { AUTH_SESSION_STATES } from '../../domain/mod.ts';
 
@@ -119,11 +118,17 @@ export type ValidationErrorData = Readonly<{
 
 /**
  * Public, capability-document shape returned by the mandatory `describe` route.
- *
- * Named public alias of {@link PluginCapabilities} so consumers can reference
- * the auth describe-output type without reaching into `@netscript/plugin`.
  */
-export type AuthCapabilities = PluginCapabilities;
+export interface AuthCapabilities {
+  /** Canonical plugin package name, for example `@netscript/plugin-auth`. */
+  readonly pluginName: string;
+  /** Contract version identifiers served by the plugin. */
+  readonly contractVersions: readonly string[];
+  /** Route group names exposed by the plugin. */
+  readonly routeGroups: readonly string[];
+  /** Capability tags advertised by the plugin. */
+  readonly capabilities: readonly string[];
+}
 
 // --- Auth-specific error vocabulary ------------------------------------------
 // Auth converges onto the shared plugin error vocabulary (NOT_FOUND,
