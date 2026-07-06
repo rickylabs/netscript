@@ -1,6 +1,6 @@
 {
   "name": "@netscript/plugin-workers",
-  "version": "0.0.1-beta.4",
+  "version": "0.0.1-beta.5",
   "description": "NetScript plugin for background job scheduling, task execution, and worker API endpoints.",
   "license": "MIT",
   "exports": {
@@ -18,15 +18,15 @@
     "./worker": "./worker/mod.ts"
   },
   "imports": {
-    "@netscript/contracts": "jsr:@netscript/contracts@0.0.1-beta.4",
-    "@netscript/cron": "jsr:@netscript/cron@0.0.1-beta.4",
-    "@netscript/kv": "jsr:@netscript/kv@0.0.1-beta.4",
-    "@netscript/plugin": "jsr:@netscript/plugin@0.0.1-beta.4",
-    "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.1-beta.4",
-    "@netscript/plugin-workers-core": "jsr:@netscript/plugin-workers-core@0.0.1-beta.4",
-    "@netscript/queue": "jsr:@netscript/queue@0.0.1-beta.4",
-    "@netscript/service": "jsr:@netscript/service@0.0.1-beta.4",
-    "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.1-beta.4",
+    "@netscript/contracts": "jsr:@netscript/contracts@0.0.1-beta.5",
+    "@netscript/cron": "jsr:@netscript/cron@0.0.1-beta.5",
+    "@netscript/kv": "jsr:@netscript/kv@0.0.1-beta.5",
+    "@netscript/plugin": "jsr:@netscript/plugin@0.0.1-beta.5",
+    "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.1-beta.5",
+    "@netscript/plugin-workers-core": "jsr:@netscript/plugin-workers-core@0.0.1-beta.5",
+    "@netscript/queue": "jsr:@netscript/queue@0.0.1-beta.5",
+    "@netscript/service": "jsr:@netscript/service@0.0.1-beta.5",
+    "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.1-beta.5",
     "@std/async": "jsr:@std/async@^1",
     "@std/path": "jsr:@std/path@^1",
     "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",

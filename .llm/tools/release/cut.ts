@@ -61,6 +61,12 @@ export async function findVersionResidue(root: string, oldVersion: string): Prom
         // are not readdir-able by this user, which would otherwise crash the
         // residue walk (a release-determinism hazard, #147).
         /(?:^|[/\\])\.llm[/\\]tmp(?:[/\\]|$)/,
+        // Run artifacts are historical records: they quote old release
+        // versions by design and are never part of the publish surface.
+        /(?:^|[/\\])\.llm[/\\]runs(?:[/\\]|$)/,
+        // Agent worktrees are independent checkouts, not release surface;
+        // descending into them false-fails the residue check.
+        /(?:^|[/\\])\.claude[/\\]worktrees(?:[/\\]|$)/,
         /(?:^|[/\\])\.data(?:[/\\]|$)/,
       ],
     })

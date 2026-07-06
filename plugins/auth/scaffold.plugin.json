@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "name": "@netscript/plugin-auth",
-  "version": "0.0.1-beta.4",
+  "version": "0.0.1-beta.5",
   "displayName": "Auth",
   "description": "NetScript plugin for a unified auth API, auth database schema, and auth session streams.",
   "peerDependencies": {
-    "@netscript/plugin": "0.0.1-beta.4"
+    "@netscript/plugin": "0.0.1-beta.5"
   },
   "capabilities": {
     "hasDatabaseMigrations": true,
