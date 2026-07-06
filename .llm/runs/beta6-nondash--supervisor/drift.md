@@ -47,3 +47,30 @@ AFTER `thread/start`, killing the stream and aborting the daemon turn (pipe-kill
 on this run branch (mkdir-recursive before the record write). MSYS pathconv mangling of
 `/home/codex/...` argv re-confirmed — all agentic CLI calls from Git Bash need
 `MSYS_NO_PATHCONV=1 MSYS2_ARG_CONV_EXCL="*"`.
+
+## D6 — #257 implemented in wave 1 ahead of #463; MERGE order must stay #463-first (watch)
+
+Charter line 67: "within AI-stack, #463 before #379/#257 (pooling primitive is upstream)." Wave-1
+parallelization implemented **#257 (FB4 mcp-ui-widget, PR #550) before #463 (FAI-7 pooling +
+ui:// extraction)** because #463 is the Codex-blocked lane and #257 is Tier-B eligible. This is a
+safe reordering of *implementation*, NOT of *merge*: A1 verified #257's `McpUiWidget` island is
+contract-independent of the pooling primitive — it renders a plain `src` string prop with no import
+coupling to `@netscript/plugin-ai-core` MCP surfaces; #463 later *produces* the ui:// resources the
+widget renders (upstream/downstream is data-flow, not compile-dep). **Merge sequencing obligation:
+#463 still merges before #257** (and before #379) to honor the charter's upstream-first intent;
+#257's PR #550 stays draft until #463 lands or the owner explicitly clears it. Recorded so the
+merge-order isn't lost when finalizing.
+
+## D7 — Wave 1 complete (5/5 draft PRs); finalization gated on Codex reset (significant)
+
+2026-07-06 19:43. All five wave-1 slices are impl-done, A1 PASS, on draft PRs against main from base
+`a1669f60`: PROG-306 #306→#549 · AI-257 #257→#550 · AI-494 #494→#558 · TEL-T4 #405→#559 ·
+TEL-T3 #404→#560. No lock churn on any; scoped gates green; parallel-slice boundaries (T3∥T4,
+257∥494) verified clean at A1. **Two gates remain before any merge and both are effectively
+Codex-reset-gated**: (1) per-PR adversarial WSL Codex review (charter pipeline: adversarial →
+IMPL-EVAL) needs Codex, blocked until 07-07 03:52; (2) IMPL-EVAL is OpenHands qwen-3.7-max
+(available now) but is deliberately held until after the adversarial pass so the single per-PR eval
+round isn't spent on un-adversarially-reviewed code. Post-compaction posture (per
+merge-grant-lost-on-compaction): PREP to green + SURFACE to owner-batch; do not autonomously merge
+even on green until the owner re-confirms the charter's merge grant. Non-Codex forward work
+dispatched meanwhile: PROG-303 172a-2-SOUND scope audit (Tier-B Opus, read-only).
