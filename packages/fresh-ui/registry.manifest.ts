@@ -666,9 +666,10 @@ export const freshUiRegistryManifest: RegistryManifest = {
         'npm:highlight.js@^11',
       ],
       css: [
+        // markdown.css carries a token-driven highlight.js palette; a stock
+        // hljs stylesheet would be theme-fixed and break the opposite theme.
         { layer: 'components', content: "@import './ui/markdown.css';" },
         { layer: 'components', content: "@import 'katex/dist/katex.min.css';" },
-        { layer: 'components', content: "@import 'highlight.js/styles/github-dark.css';" },
       ],
     },
     {

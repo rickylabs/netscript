@@ -52,9 +52,24 @@
   color: color-mix(in srgb, var(--ns-primary) 80%, var(--ns-fg));
 }
 
+/* Own the list markers: host resets (Tailwind preflight, Fresh scaffolds)
+   zero out list-style, which silently drops bullets from rendered prose. */
 .ns-markdown ul,
 .ns-markdown ol {
-  padding-inline-start: var(--ns-space-4);
+  list-style-position: outside;
+  padding-inline-start: var(--ns-space-5);
+}
+
+.ns-markdown ul {
+  list-style-type: disc;
+}
+
+.ns-markdown ol {
+  list-style-type: decimal;
+}
+
+.ns-markdown li::marker {
+  color: var(--ns-muted-fg);
 }
 
 .ns-markdown li {
@@ -121,4 +136,65 @@
   margin-block: var(--ns-space-3);
   overflow-x: auto;
   overflow-y: hidden;
+}
+
+/* Syntax highlighting palette for rehype-highlight output. Registry-owned and
+   token-driven so code colors follow the active theme — a stock highlight.js
+   stylesheet is theme-fixed and breaks contrast on the opposite theme. */
+.ns-markdown .hljs-comment,
+.ns-markdown .hljs-quote,
+.ns-markdown .hljs-meta {
+  color: var(--ns-muted-fg);
+  font-style: italic;
+}
+
+.ns-markdown .hljs-keyword,
+.ns-markdown .hljs-selector-tag,
+.ns-markdown .hljs-doctag,
+.ns-markdown .hljs-tag,
+.ns-markdown .hljs-name {
+  color: var(--ns-primary);
+}
+
+.ns-markdown .hljs-string,
+.ns-markdown .hljs-regexp,
+.ns-markdown .hljs-addition {
+  color: var(--ns-success);
+}
+
+.ns-markdown .hljs-number,
+.ns-markdown .hljs-literal,
+.ns-markdown .hljs-symbol,
+.ns-markdown .hljs-bullet,
+.ns-markdown .hljs-link {
+  color: var(--ns-warning);
+}
+
+.ns-markdown .hljs-title,
+.ns-markdown .hljs-section,
+.ns-markdown .hljs-attr,
+.ns-markdown .hljs-attribute,
+.ns-markdown .hljs-selector-id,
+.ns-markdown .hljs-selector-class,
+.ns-markdown .hljs-template-variable,
+.ns-markdown .hljs-variable {
+  color: var(--ns-secondary);
+}
+
+.ns-markdown .hljs-built_in,
+.ns-markdown .hljs-type,
+.ns-markdown .hljs-class {
+  color: color-mix(in srgb, var(--ns-secondary) 60%, var(--ns-fg));
+}
+
+.ns-markdown .hljs-deletion {
+  color: var(--ns-destructive);
+}
+
+.ns-markdown .hljs-emphasis {
+  font-style: italic;
+}
+
+.ns-markdown .hljs-strong {
+  font-weight: 600;
 }

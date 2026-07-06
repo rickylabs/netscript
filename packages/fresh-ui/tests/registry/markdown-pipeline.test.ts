@@ -2,8 +2,11 @@ import { assert, assertEquals, assertFalse } from '@std/assert';
 import {
   CITATION_ELEMENT,
   extendSanitizeSchema,
+  type HastNode,
   KATEX_TAG_NAMES,
   type MdastRoot,
+  parseStyleDeclarations,
+  rehypeInlineStyles,
   remarkCitations,
   type SanitizeSchema,
   stripIncompleteSyntax,
@@ -75,6 +78,67 @@ Deno.test('remarkCitations leaves citation-free text intact', () => {
   remarkCitations()(tree);
   assertEquals(tree.children[0].children?.length, 1);
   assertEquals(tree.children[0].children?.[0].type, 'text');
+});
+
+Deno.test('parseStyleDeclarations camelCases properties and keeps custom properties', () => {
+  assertEquals(
+    parseStyleDeclarations('height:0.8141em;margin-left:-0.0714em;'),
+    { height: '0.8141em', marginLeft: '-0.0714em' },
+  );
+  assertEquals(parseStyleDeclarations('--ns-x: 1px; top: 0'), { '--ns-x': '1px', top: '0' });
+});
+
+Deno.test('parseStyleDeclarations skips malformed declarations without throwing', () => {
+  assertEquals(parseStyleDeclarations(';;;'), {});
+  assertEquals(parseStyleDeclarations('no-colon-here'), {});
+  assertEquals(parseStyleDeclarations('color:'), {});
+  assertEquals(parseStyleDeclarations(''), {});
+});
+
+Deno.test('rehypeInlineStyles objectifies string styles recursively', () => {
+  // KaTeX-shaped tree: struts and vlists carry inline height/positioning styles
+  // that MUST survive as objects (string styles are dropped by the jsx-runtime
+  // when the CJS style parser fails under ESM-first bundler graphs).
+  const tree: HastNode = {
+    type: 'root',
+    children: [
+      {
+        type: 'element',
+        tagName: 'span',
+        properties: { className: ['strut'], style: 'height:0.8141em;' },
+        children: [
+          {
+            type: 'element',
+            tagName: 'span',
+            properties: { style: 'top:-3.063em;margin-right:0.05em;' },
+            children: [{ type: 'text' }],
+          },
+        ],
+      },
+    ],
+  };
+
+  rehypeInlineStyles()(tree);
+
+  const outer = tree.children![0];
+  assertEquals(outer.properties?.style, { height: '0.8141em' });
+  const inner = outer.children![0];
+  assertEquals(inner.properties?.style, { top: '-3.063em', marginRight: '0.05em' });
+});
+
+Deno.test('rehypeInlineStyles leaves object styles and style-free nodes alone', () => {
+  const styleObject = { height: '1em' };
+  const tree: HastNode = {
+    type: 'root',
+    children: [
+      { type: 'element', tagName: 'span', properties: { style: styleObject } },
+      { type: 'element', tagName: 'span', properties: { className: ['x'] } },
+      { type: 'text' },
+    ],
+  };
+  rehypeInlineStyles()(tree);
+  assertEquals(tree.children![0].properties?.style, styleObject);
+  assertEquals(tree.children![1].properties?.style, undefined);
 });
 
 Deno.test('extendSanitizeSchema never allows script or event handlers', () => {
