@@ -7,8 +7,8 @@ merged | blocked | closed-n/a | owner-batch
 
 | Slice | Issue | Lane | Status | PR | Notes |
 | --- | --- | --- | --- | --- | --- |
-| TEL-T3 | #404 | D (Codex high) | pending | — | wave 1; load-bearing for T5/T6 |
-| TEL-T4 | #405 | D (Codex high) | pending | — | wave 1; ∥ T3, rebase risk accepted (D-2) |
+| TEL-T3 | #404 | B (Opus high; rerouted from D, drift D5) | active | — | wave 1; load-bearing for T5/T6 |
+| TEL-T4 | #405 | B (Opus high; rerouted from D, drift D5) | active | — | wave 1; ∥ T3, rebase risk accepted (D-2) |
 | TEL-T5 | #406 | D (Codex high) | pending | — | wave 2; hard-dep T3 merged |
 | TEL-T6 | #407 | D (Codex high) | pending | — | wave 2; ai-half after #494 (D-2) |
 | TEL-T7 | #408 | D (Codex high) | pending | — | wave 2; contract-only, dashboard coupling → drift (D-6) |
@@ -18,9 +18,9 @@ merged | blocked | closed-n/a | owner-batch
 
 | Slice | Issue | Lane | Status | PR | Notes |
 | --- | --- | --- | --- | --- | --- |
-| AI-494 | #494 | D (Codex high) | pending | — | wave 1; plugin-ai-core zod lockstep |
-| AI-463 | #463 | D (Codex high) | pending | — | wave 1 (next free slot); upstream of #379 |
-| AI-257 | #257 | B (Opus 4.8 high) | pending | — | wave 1; owns first manifest edit (D-3) |
+| AI-494 | #494 | B (Opus high; rerouted from D, drift D5) | active | — | wave 1; plugin-ai-core zod lockstep |
+| AI-463 | #463 | D (Codex high) | blocked | — | Codex quota until 07-07 03:52 (D5); first post-reset slot |
+| AI-257 | #257 | B (Opus 4.8 high) | active | — | wave 1; owns first manifest edit (D-3) |
 | AI-258 | #258 | B (Opus 4.8 high) | pending | — | wave 2; rebases manifest after #257 |
 | AI-379 | #379 | D (Codex high) | pending | — | wave 2; deps #257 + #463 merged |
 | AI-464 | #464 | D (Codex high) | pending | — | wave 3; MERGE GATE — last; effective deps re-derived (D-4) |
@@ -29,23 +29,23 @@ merged | blocked | closed-n/a | owner-batch
 
 | Slice | Issue | Lane | Status | PR | Notes |
 | --- | --- | --- | --- | --- | --- |
-| PM-0 | #511 | D (Codex high) | pending | — | independent; queued wave-1 slot |
+| PM-0 | #511 | D (Codex high) | blocked | — | Codex quota until 07-07 03:52 (D5); queued post-reset |
 
 ## Lane PROG — program/track
 
 | Slice | Issue | Lane | Status | PR | Notes |
 | --- | --- | --- | --- | --- | --- |
-| PROG-389 | #389 | A (Fable) | pending | — | bookkeeping: verify V3 acceptance; owner-batch close/keep decision |
+| PROG-389 | #389 | A (Fable) | owner-batch | — | verified 2026-07-06: #390 (squash eeaff336, IMPL-EVAL PASS) + #396 + #398 merged; last live child = #306 (this run). Recommend: owner closes by hand once #306 lands |
 | PROG-303-audit | #303 | B (Opus high) | pending | — | scope audit of 172a-2-SOUND remainder |
 | PROG-303-impl | #303 | D (Codex high) | blocked | — | after TEL W1–W2 merge (D-5) + audit |
-| PROG-306 | #306 | B (Opus high) | pending | — | 5 remaining harness/skills bullets |
+| PROG-306 | #306 | B (Opus high) | active | — | 5 remaining harness/skills bullets |
 | PROG-307 | #307 | — | owner-batch | — | p2 deprioritized; audit-then-decide if capacity |
 
 ## Run gates
 
 | Item | Status | Notes |
 | --- | --- | --- |
-| PLAN-EVAL (OpenHands minimax-M3, separate session) | eval (dispatched) | PR #548 comment 4895235162, 2026-07-06; trigger `model=openrouter/minimax/minimax-m3 output=pr-comment iterations=600`; HARD STOP before any implementation slice |
+| PLAN-EVAL (OpenHands minimax-M3, separate session) | **PASS** | Verdict comment on PR #548, 2026-07-06 (`OPENHANDS_VERDICT: PASS`); all 8 plan-gate boxes + 3 spot-checks; `plan-eval.md` committed 91304fcb. Implementation unlocked |
 | T8 Flow-B suite green | pending | telemetry epic DoD |
 | #464 capability e2e green | pending | AI lane DoD |
 | Owner batch summary | pending | #389 close, #307 verdict, release readiness |

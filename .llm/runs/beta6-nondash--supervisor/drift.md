@@ -26,3 +26,24 @@ from the rescope gets logged here, not silently absorbed.
 
 `@netscript/fresh/ai/sandbox` ships a throwing FA0 stub on the published surface (#495, stable
 milestone). #257/#379 e2e must validate against local-source scaffold, not the published stub.
+
+## D5 — Codex usage quota exhausted; wave-1 Tier-D rerouted to Tier B (significant)
+
+2026-07-06 ~18:52. All three wave-1 Codex launches (TEL-T3, TEL-T4, AI-494) failed at turn start:
+`You've hit your usage limit ... try again at Jul 7th, 2026 3:52 AM`. Daemon healthy; threads
+created but turns refused. Empty threads `019f3858-36b8…`, `019f3858-3efd…`, `019f3858-47ab…`
+(plus 3 earlier zero-turn orphans from the slice-dir crash) are abandoned — no rival-send risk.
+
+Blocked-lane handling applied (lane-policy invariant): Tier-D launch mechanism recorded as blocked
+until 2026-07-07 03:52; wave-1 implementation rerouted to **Tier B (Opus 4.8 high, worktree
+sub-agents)** — precedent: V3 impl run #390 topology (Opus impl sub-agents, Codex
+adversarial-only) — supervisor pushes branches + opens PRs (Windows-side agents have no git
+credentials; push via WSL). Adversarial WSL Codex review per PR still required and is expected to
+run after quota reset; if the reset slips, record a follow-up drift. PM-0 (#511) and wave-2 Tier-D
+slices stay queued for Codex post-reset.
+
+Also hit and fixed en route: `launch-codex-slice.ts` crashed on a missing `--slice-dir` directory
+AFTER `thread/start`, killing the stream and aborting the daemon turn (pipe-kill landmine). Fixed
+on this run branch (mkdir-recursive before the record write). MSYS pathconv mangling of
+`/home/codex/...` argv re-confirmed — all agentic CLI calls from Git Bash need
+`MSYS_NO_PATHCONV=1 MSYS2_ARG_CONV_EXCL="*"`.

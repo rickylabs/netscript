@@ -305,7 +305,11 @@ async function main(): Promise<void> {
       if (info2.threadId) {
         recorded = true;
         if (o.sliceDir) {
-          const recPath = `${o.sliceDir.replace(/[\\/]$/, "")}/codex-thread-ids.md`;
+          const dir = o.sliceDir.replace(/[\\/]$/, "");
+          // A missing slice dir must not kill this stream: the spawned WSL turn
+          // dies with the broken pipe (send-message pipe-kill landmine).
+          await Deno.mkdir(dir, { recursive: true });
+          const recPath = `${dir}/codex-thread-ids.md`;
           await Deno.writeTextFile(recPath, threadRecord(o, info2, dest));
           console.log(`\n[launch-codex-slice] recorded thread ${info2.threadId} -> ${recPath}`);
         } else {

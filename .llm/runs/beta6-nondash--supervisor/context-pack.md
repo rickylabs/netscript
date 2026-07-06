@@ -22,8 +22,10 @@ stop before any implementation slice.
 
 ## Status
 
-Bootstrap + plan done. Draft PR **#548** open (`chore/beta6-nondash-supervisor-run`, c9ba36a5).
-PLAN-EVAL **dispatched** (minimax-M3, PR #548 comment 4895235162) — HARD STOP: no implementation
-slice before PASS. On PASS: launch wave 1 (TEL-T3, TEL-T4, AI-494 on Codex; AI-257, PROG-306 on
-Opus; PM-0 next slot; PROG-389 Tier-A bookkeeping). On FAIL_PLAN: fix plan, single re-dispatch,
-two failures → escalate to owner.
+PLAN-EVAL **PASS** (PR #548, plan-eval.md @ 91304fcb). Wave 1 LIVE on **Tier B Opus** (Codex quota
+blocked until 2026-07-07 03:52 — drift D5): TEL-T3 #404, TEL-T4 #405, AI-494 #494 (rerouted),
+AI-257 #257, PROG-306 #306 — five Opus worktree sub-agents; agents commit locally, SUPERVISOR
+pushes via WSL + opens draft PRs (`Closes #N`, milestone 0.0.1-beta.6) + does A1 review before
+sign-off. Held for Codex reset: #463, #511, wave-2 Tier-D. PROG-389 verified → owner-batch.md §1.
+After each slice returns: A1 review → push → draft PR → adversarial Codex review (post-reset) →
+one IMPL-EVAL (qwen-3.7-max) → merge on green (grant lost on compaction — re-read charter.md).
