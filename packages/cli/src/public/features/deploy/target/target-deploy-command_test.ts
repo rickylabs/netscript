@@ -94,7 +94,7 @@ Deno.test('router omits verbs the adapter does not advertise', () => {
   assertEquals(verbs, ['plan']);
 });
 
-Deno.test('deploy docker/compose routers resolve their default registry targets', () => {
+Deno.test('deploy target routers resolve their default registry targets', () => {
   const dependencies = {
     deployTargets: new DeployTargetRegistry(),
     resolveProjectRoot: () => Promise.resolve('/resolved-root'),
@@ -105,5 +105,12 @@ Deno.test('deploy docker/compose routers resolve their default registry targets'
     const verbs = command.getCommands().map((c) => c.getName()).sort();
 
     assertEquals(verbs, ['down', 'logs', 'plan', 'status', 'up']);
+  }
+
+  for (const key of ['kubernetes', 'azure-aca', 'azure-app-service', 'azure-aks', 'cloud-run']) {
+    const command = createTargetDeployCommand(key, dependencies);
+    const verbs = command.getCommands().map((c) => c.getName()).sort();
+
+    assertEquals(verbs, ['down', 'plan', 'up']);
   }
 });

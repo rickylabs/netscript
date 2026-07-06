@@ -47,6 +47,7 @@ For a binary edge, wrap the tree in `runPublicCli()` for consistent NetScript er
 - **Plugin scaffolding**: `scaffoldPluginPackage` (root) and the `@netscript/cli/scaffolding` engine render `{{var | pipe}}` skeleton templates into a plugin package.
 - **Deterministic testing**: `@netscript/cli/testing` supplies in-memory filesystem, process, prompt, and logger ports plus fixture builders for exercising scaffold and CLI flows.
 - **Bare-metal deployment**: `netscript deploy` compiles each workspace service into a self-contained single binary and manages it as an OS service through one OS-agnostic seam — Servy on Windows, systemd on Linux — configured per OS under `deploy.targets.{windows,linux}`.
+- **Aspire cloud deployment**: `netscript deploy kubernetes|azure-aca|azure-app-service|azure-aks|cloud-run <op>` delegates publish/deploy/destroy to the generated TypeScript AppHost through `aspire publish|deploy|destroy --environment`, so Kubernetes Helm charts, Azure provisioning, and Docker-image provider paths stay owned by Aspire and the operator's cloud tooling.
 
 ---
 
@@ -113,6 +114,43 @@ so a host binary embedding this surface must grant:
 
 Authentication is delegated to the `deno deploy` CLI (its token/login flow); this
 surface issues no credentials of its own.
+
+---
+
+## ☸️ Aspire Kubernetes, Azure, and Docker-image cloud targets
+
+`netscript deploy kubernetes <op>` and
+`netscript deploy azure-aca|azure-app-service|azure-aks|cloud-run <op>` are thin
+routers over Aspire deployment environments. Supported operations are:
+
+- `plan` / `emit`: run `aspire publish --environment <env> --output-path <dir>`
+  to generate deployment artifacts.
+- `up`: run `aspire deploy --environment <env> --output-path <dir>` to provision
+  and apply through the AppHost.
+- `down`: run `aspire destroy --environment <env> --output-path <dir> --yes` to
+  tear down the previously deployed environment.
+
+Default environment names are `k8s`, `aca`, `app-service`, `aks`, and
+`cloud-run`; default artifact directories are `.deploy/<target>`. Configure the
+matching AppHost hosting integration first. For Kubernetes, the TypeScript
+AppHost uses `builder.addKubernetesEnvironment('k8s')`; per-resource manifest
+customization belongs in the AppHost with `publishAsKubernetesService(...)`.
+Aspire emits a Helm chart that can be applied with `helm install|upgrade` or
+applied directly with `aspire deploy`.
+
+### Cloud prerequisites
+
+Cluster and cloud authentication are intentionally operator-owned:
+
+| Target | Prerequisites |
+| ------ | ------------- |
+| `kubernetes` | `aspire add kubernetes`, a configured `kubectl` context, Helm 4.2+, and a registry reachable by the cluster. |
+| `azure-aca` / `azure-app-service` / `azure-aks` | Azure CLI login, subscription/location parameters, and the matching Aspire Azure environment in the AppHost. AKS also needs `kubectl`, Helm, and RBAC that can manage the cluster. |
+| `cloud-run` | A Docker-image provider environment in the AppHost plus cloud CLI/auth/RBAC that can push the image and update the service. |
+
+NetScript does not mint cloud credentials, assign RBAC, or hand-author Helm,
+Bicep, Kubernetes, or provider manifests in the CLI. The adapter only delegates
+to Aspire so the generated AppHost remains the single deployment model.
 
 ---
 

@@ -1,5 +1,6 @@
 import { assertEquals } from 'jsr:@std/assert@^1';
 import {
+  AspireCloudDeployTargetSchema,
   DeployConfigSchema,
   DockerComposeDeployTargetSchema,
   LinuxDeployTargetSchema,
@@ -49,6 +50,42 @@ Deno.test('DeployConfigSchema exposes windows, docker and compose target keys', 
   assertEquals(config?.targets?.windows?.servicePrefix, 'NetScript');
   assertEquals(config?.targets?.docker?.registry, 'ghcr.io/acme');
   assertEquals(config?.targets?.compose?.projectName, 'acme');
+});
+
+Deno.test('AspireCloudDeployTargetSchema inherits the shared base and target fields', () => {
+  const target = AspireCloudDeployTargetSchema.parse({
+    mode: 'script',
+    environment: 'aks',
+    outputPath: '.deploy/azure-aks',
+    appHost: 'aspire/apphost.mts',
+    registry: 'acme.azurecr.io',
+    imageName: 'orders-api',
+  });
+
+  assertEquals(target.mode, 'script');
+  assertEquals(target.environment, 'aks');
+  assertEquals(target.outputPath, '.deploy/azure-aks');
+  assertEquals(target.appHost, 'aspire/apphost.mts');
+  assertEquals(target.registry, 'acme.azurecr.io');
+  assertEquals(target.imageName, 'orders-api');
+});
+
+Deno.test('DeployConfigSchema exposes kubernetes, azure, and cloud-run target keys', () => {
+  const config = DeployConfigSchema.parse({
+    targets: {
+      kubernetes: { environment: 'k8s', outputPath: '.deploy/kubernetes' },
+      'azure-aca': { environment: 'aca' },
+      'azure-app-service': { environment: 'app-service' },
+      'azure-aks': { environment: 'aks' },
+      'cloud-run': { environment: 'cloud-run', registry: 'us-docker.pkg.dev/acme' },
+    },
+  });
+
+  assertEquals(config?.targets?.kubernetes?.outputPath, '.deploy/kubernetes');
+  assertEquals(config?.targets?.['azure-aca']?.environment, 'aca');
+  assertEquals(config?.targets?.['azure-app-service']?.environment, 'app-service');
+  assertEquals(config?.targets?.['azure-aks']?.environment, 'aks');
+  assertEquals(config?.targets?.['cloud-run']?.registry, 'us-docker.pkg.dev/acme');
 });
 
 Deno.test('LinuxDeployTargetSchema round-trips systemd fields', () => {

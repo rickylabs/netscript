@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type {
+  AspireCloudDeployTarget,
   DenoDeployTarget,
   DeployConfig,
   DeployTargetBase,
@@ -238,10 +239,35 @@ export const DenoDeployTargetSchema: z.ZodType<DenoDeployTarget> = z.object({
 });
 
 /**
+ * Aspire cloud deployment target (`deploy.targets.kubernetes`,
+ * `deploy.targets['azure-aca']`, `deploy.targets['azure-app-service']`,
+ * `deploy.targets['azure-aks']`, and `deploy.targets['cloud-run']`).
+ *
+ * Extends the shared base with Aspire publish/deploy fields. The AppHost owns
+ * target-specific manifests and provisioning through its configured hosting
+ * integration/environment.
+ */
+export const AspireCloudDeployTargetSchema: z.ZodType<AspireCloudDeployTarget> = z.object({
+  ...deployTargetBaseShape,
+
+  /** Aspire AppHost environment name passed to `--environment`. */
+  environment: z.string().optional(),
+  /** Directory for emitted publish/deploy artifacts. */
+  outputPath: z.string().optional(),
+  /** AppHost path passed to Aspire when the default discovery is insufficient. */
+  appHost: z.string().optional(),
+  /** Container image registry for targets that publish Docker images. */
+  registry: z.string().optional(),
+  /** Base image name/tag for built service images. */
+  imageName: z.string().optional(),
+});
+
+/**
  * Top-level deploy configuration section.
  * `targets` is a name-keyed map of deployment targets: `windows` (Servy),
  * `docker` (single-image build/push), `compose` (emit + self-host), `linux`
- * (systemd bare-metal) and `deno-deploy` (Deno Deploy cloud).
+ * (systemd bare-metal), `deno-deploy` (Deno Deploy cloud), Kubernetes, Azure,
+ * and Docker-image cloud providers.
  */
 export const DeployConfigSchema: z.ZodType<DeployConfig | undefined> = z
   .object({
@@ -258,6 +284,16 @@ export const DeployConfigSchema: z.ZodType<DeployConfig | undefined> = z
         linux: LinuxDeployTargetSchema.optional(),
         /** Deno Deploy cloud deployment via the native `deno deploy` CLI. */
         'deno-deploy': DenoDeployTargetSchema.optional(),
+        /** Kubernetes deployment via Aspire Kubernetes publish/deploy. */
+        kubernetes: AspireCloudDeployTargetSchema.optional(),
+        /** Azure Container Apps deployment via an Aspire Azure environment. */
+        'azure-aca': AspireCloudDeployTargetSchema.optional(),
+        /** Azure App Service deployment via an Aspire Azure environment. */
+        'azure-app-service': AspireCloudDeployTargetSchema.optional(),
+        /** Azure Kubernetes Service deployment via Aspire AKS publish/deploy. */
+        'azure-aks': AspireCloudDeployTargetSchema.optional(),
+        /** Cloud Run deployment via the Docker-image provider lane. */
+        'cloud-run': AspireCloudDeployTargetSchema.optional(),
       })
       .optional(),
   })

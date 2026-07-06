@@ -534,6 +534,28 @@ export interface DenoDeployTarget extends DeployTargetBase {
   envFile?: string;
 }
 
+/**
+ * Aspire cloud deployment target (`deploy.targets.kubernetes`,
+ * `deploy.targets['azure-aca']`, `deploy.targets['azure-app-service']`,
+ * `deploy.targets['azure-aks']`, and `deploy.targets['cloud-run']`).
+ *
+ * These targets delegate publish/deploy to the generated TypeScript AppHost and
+ * Aspire CLI. Target-specific cluster/cloud auth, RBAC, and provider resources
+ * remain operator-owned unless the AppHost's Aspire integration provisions them.
+ */
+export interface AspireCloudDeployTarget extends DeployTargetBase {
+  /** Aspire AppHost environment name passed to `aspire --environment`. */
+  environment?: string;
+  /** Directory for emitted publish/deploy artifacts. */
+  outputPath?: string;
+  /** AppHost path used when Aspire default discovery is insufficient. */
+  appHost?: string;
+  /** Container registry for targets that publish Docker images. */
+  registry?: string;
+  /** Base image name/tag for built service images. */
+  imageName?: string;
+}
+
 /** Top-level deployment configuration type. */
 export interface DeployConfig {
   /** Deployment targets keyed by name. */
@@ -548,6 +570,16 @@ export interface DeployConfig {
     linux?: LinuxDeployTarget;
     /** Deno Deploy cloud deployment settings. */
     'deno-deploy'?: DenoDeployTarget;
+    /** Kubernetes deployment settings. */
+    kubernetes?: AspireCloudDeployTarget;
+    /** Azure Container Apps deployment settings. */
+    'azure-aca'?: AspireCloudDeployTarget;
+    /** Azure App Service deployment settings. */
+    'azure-app-service'?: AspireCloudDeployTarget;
+    /** Azure Kubernetes Service deployment settings. */
+    'azure-aks'?: AspireCloudDeployTarget;
+    /** Google Cloud Run deployment settings. */
+    'cloud-run'?: AspireCloudDeployTarget;
   };
 }
 

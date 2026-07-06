@@ -24,8 +24,8 @@ const ROUTED_OPERATIONS: readonly DeployOperation[] = [
 
 /** Human-readable descriptions for the routed lifecycle verbs. */
 const OPERATION_DESCRIPTIONS: Readonly<Record<DeployOperation, string>> = {
-  plan: 'Emit deployment artifacts (delegates to `aspire publish`)',
-  emit: 'Emit deployment artifacts (delegates to `aspire publish`)',
+  plan: 'Emit or preflight deployment artifacts',
+  emit: 'Emit deployment artifacts',
   up: 'Bring the deployment up',
   down: 'Bring the deployment down',
   status: 'Show deployment status',
@@ -51,7 +51,7 @@ export function createTargetDeployCommand(
   const label = target?.label ?? key;
   const group = new Command()
     .name(key)
-    .description(`Manage the ${label} deployment target via Aspire`)
+    .description(`Manage the ${label} deployment target`)
     .action(function () {
       this.showHelp();
     });

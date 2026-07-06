@@ -12,7 +12,12 @@ export type KnownDeployTargetKey =
   | 'linux-service'
   | 'deno-deploy'
   | 'compose'
-  | 'docker';
+  | 'docker'
+  | 'kubernetes'
+  | 'azure-aca'
+  | 'azure-app-service'
+  | 'azure-aks'
+  | 'cloud-run';
 
 /** Registry surface for deploy target adapters. */
 export interface DeployTargetRegistryPort {

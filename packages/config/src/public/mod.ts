@@ -21,6 +21,7 @@ export {
 } from '../../workspace.ts';
 export {
   AppConfigSchema,
+  AspireCloudDeployTargetSchema,
   DatabaseConfigSchema,
   DenoDeployTargetSchema,
   DeployConfigSchema,
@@ -41,6 +42,7 @@ export { inspectConfig } from '../diagnostics/inspect-config.ts';
 export type { InspectionReport } from '../diagnostics/inspect-config.ts';
 export type {
   AppConfig,
+  AspireCloudDeployTarget,
   AspireConfig,
   ConfigEnv,
   DatabaseConfig,
