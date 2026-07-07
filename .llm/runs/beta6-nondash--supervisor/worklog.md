@@ -221,3 +221,25 @@ PR. Dispatch comments: #560→4896031663 · #559→4896033675 · #558→48960342
   pool keyed by id over existing StdioMcp/StreamableHttp transports (pool, not rewrite), keep-alive
   across turns, tool-name prefixing, `ui://` extraction to the render-ui seam, `@netscript/ai/mcp`
   export, `gate:jsr` (doc-lint + publish dry-run). IMPL-EVAL is a separate OpenHands session after.
+
+### #463 (FAI-7 MCP pooling) — Codex slice landed, A1 PASS, IMPL-EVAL dispatched (2026-07-07)
+- Codex thread `019f3b96` completed its turn (688s, idle). Commit **39f50c2b** pushed; **draft PR
+  #562** open ("feat(ai): add MCP transport pool", `Closes #463`, `Part of #238` no-keyword-on-epic).
+- Files: `packages/ai/mcp.ts` (barrel +25/-9), `packages/ai/src/mcp/application/pool.ts` (+341, the
+  `McpTransportPool`), `packages/ai/tests/mcp_test.ts` (+169). Codex gate evidence (wrapper-backed):
+  check / scoped check+lint+fmt / doc-lint (`./mcp.ts` total=0) / `publish --dry-run` (no
+  `--allow-slow-types`) all PASS; 78 + 11 tests; no `deno.lock` diff; no new casts. Verdict
+  `READY_FOR_IMPL_EVAL` (did NOT self-certify).
+- **A1 slice review (Tier-A supervisor) = PASS** — substantive read of `pool.ts` + barrel confirmed a
+  real impl: keyed `Map<serverId,transport>` (dup id throws), pool `implements McpTransportPort`
+  (drop-in), keep-alive proven by `connectCount===1` test, `${serverId}__${remote}` prefixing with
+  collision guard, data-only `ui://` `{uri,src,…}` extraction + standalone `extractMcpUiResources`,
+  pools OVER existing transports (not a rewrite), no casts. Sign-off comment posted PR #562
+  (issuecomment-4901591066).
+- **A1 carry-forward (non-blocking) → folded into IMPL-EVAL prompt:** `withUiResources` parses
+  `McpToolResult.content` as a JSON string; IMPL-EVAL check 5 must confirm the real stdio/HTTP
+  transports actually put a JSON string in `.content` (else `ui://` extraction is a prod no-op =
+  FAIL_FIX).
+- **IMPL-EVAL dispatched** (OpenHands qwen-3.7-max, verdict-first, iterations 1500) →
+  issuecomment-4901593055. Verdict target file `evaluate-463.md`. Merge held until PASS; #463 is
+  upstream of #257(#550)/#379.
