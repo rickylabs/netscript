@@ -160,7 +160,7 @@ function renderNode(node: unknown, depth: number, context: RenderContext): Compo
   if (Array.isArray(node)) {
     return node.map((child, index) => (
       <span class='ns-render-ui__fragment' data-index={index}>
-        {renderNode(child, depth, context)}
+        {renderNode(child, depth + 1, context)}
       </span>
     ));
   }

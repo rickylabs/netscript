@@ -83,3 +83,32 @@ Security guard regressions:
 - Issue #258 should be closed by this PR once Tier-A review, adversarial review, and IMPL-EVAL pass.
 - Epic #238 is referenced only as `Part of #238`; no closing keyword.
 - `gate:e2e` remains deferred to #564 and must not be checked on #258 in this slice.
+
+## A1 FAIL_FIX — Nested Array Depth Bypass
+
+Finding:
+
+- A1 found that `renderNode()` rendered arrays at the same depth, so nested arrays inside the
+  unvalidated `props` interior could bypass `RENDER_UI_MAX_DEPTH` and overflow the JS call stack.
+
+Fix:
+
+- Array children now recurse with `depth + 1`.
+- The first guard in `renderNode()` still short-circuits to `renderFallback('max-depth')` once the
+  bound is crossed.
+- Added a non-deferrable regression that feeds a 50-deep nested array through `props.children` and
+  asserts the serialized tree contains `data-render-ui-fallback="max-depth"`.
+
+### A1 FAIL_FIX Gate Evidence
+
+| Gate | Command | Raw result |
+| --- | --- | --- |
+| Focused check | `deno check --unstable-kv packages/fresh-ui/src/ai/render-ui.tsx packages/fresh-ui/tests/ai/render-ui.test.tsx` | exit 0 |
+| Guard tests | `deno test --allow-read --unstable-kv packages/fresh-ui/tests/ai/render-ui.test.tsx` | exit 0; 4 passed / 0 failed |
+| Wrapper check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh-ui --ext ts,tsx` | exit 0; filesSelected=128; failedBatches=0; totalOccurrences=0 |
+| Wrapper lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/fresh-ui --ext ts,tsx` | exit 0; filesSelected=128; totalOccurrences=0 |
+| Wrapper fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/fresh-ui --ext ts,tsx --ignore-line-endings` | exit 0; filesSelected=128; failedBatches=0 |
+| Touched doc-lint | `deno run --allow-read --allow-run .llm/tools/run-deno-doc-lint.ts --root packages/fresh-ui --entrypoints ./src/ai/render-ui.tsx --pretty` | exit 0; totalErrors=0 |
+| Publish dry-run | `deno publish --dry-run --allow-dirty` from `packages/fresh-ui` | exit 0; no `--allow-slow-types`; dry run complete |
+| F-3 | `rtk proxy deno task arch:check` | exit 0; warnings only, no FAIL rows |
+| Fresh UI tests | `deno test --allow-all packages/fresh-ui/tests/` | exit 0; 133 passed / 0 failed |

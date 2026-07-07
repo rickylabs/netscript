@@ -13,6 +13,14 @@ function nestedStack(depth: number): ComponentChildren {
   return { type: 'stack', props: { children: [nestedStack(depth - 1)] } };
 }
 
+function nestedArray(depth: number): unknown {
+  let value: unknown = { type: 'metric', props: { label: 'Leaf', value: 'ok' } };
+  for (let index = 0; index < depth; index++) {
+    value = [value];
+  }
+  return value;
+}
+
 function serialize(value: unknown): string {
   return JSON.stringify(value, (_key, entry) => {
     if (typeof entry === 'function') return `[function ${entry.name}]`;
@@ -69,6 +77,17 @@ Deno.test('renderUiPayload truncates payloads beyond the configured max depth', 
   const tree: unknown = renderUiPayload({
     component: 'stack',
     props: { children: [nestedStack(RENDER_UI_MAX_DEPTH + 2)] },
+  });
+  const fallbackAttribute =
+    `data-render-ui-fallback=\\"${'max-depth' satisfies RenderUiFallbackReason}\\"`;
+
+  assertStringIncludes(serialize(tree), fallbackAttribute);
+});
+
+Deno.test('renderUiPayload bounds nested arrays by the max depth guard', () => {
+  const tree: unknown = renderUiPayload({
+    component: 'stack',
+    props: { children: nestedArray(50) },
   });
   const fallbackAttribute =
     `data-render-ui-fallback=\\"${'max-depth' satisfies RenderUiFallbackReason}\\"`;
