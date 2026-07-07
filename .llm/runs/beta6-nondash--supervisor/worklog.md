@@ -243,3 +243,17 @@ PR. Dispatch comments: #560→4896031663 · #559→4896033675 · #558→48960342
 - **IMPL-EVAL dispatched** (OpenHands qwen-3.7-max, verdict-first, iterations 1500) →
   issuecomment-4901593055. Verdict target file `evaluate-463.md`. Merge held until PASS; #463 is
   upstream of #257(#550)/#379.
+
+### Merges — #463 + #558 landed; #550 unblocked (2026-07-07, owner re-granted merge-on-green)
+- Owner re-confirmed merge-on-green for this session (post-compaction grant re-issued).
+- **#463 (PR #562) MERGED** — squash + delete-branch; issue #463 auto-CLOSED. Upstream MCP pooling
+  primitive is now on `main`. IMPL-EVAL PASS (issuecomment 08:17Z) + all CI green (close-gate,
+  scaffold-runtime, quality, check-test).
+- **#558 (PR #558 / #494) MERGED** at 08:33:26Z — squash + delete-branch; issue #494 auto-CLOSED.
+- **#550 (#257 McpUiWidget) unblocked + branch-updated to main.** Its `close-gate` check was a stale
+  FAIL from run 28813223785 (pre-dating the #257 box edits + `gate:e2e`→#561 defer). Ran
+  `gh pr update-branch 550` → rebases in the #463 pool + triggers fresh CI (close-gate should now
+  PASS). Awaiting green, then merge (grant active).
+- **Next unblocks:** #379 (FA4 createMcpAppCallHandler) deps = #257 + #463 — #463 done, #379 becomes
+  dispatchable once #550 merges. PM-0 #511 independent (queued). #561 = backlog follow-up (ui:add e2e).
+- Housekeeping TODO: remove merged WSL worktree `netscript-463-mcp` (branch deleted).
