@@ -16,6 +16,7 @@
  * @module
  */
 
+import type { GenerationOptions } from '../contracts/generation.ts';
 import type { Message } from '../contracts/message.ts';
 import type { ModelId } from '../contracts/model.ts';
 import type { ToolCall, ToolDescriptor } from '../contracts/tool.ts';
@@ -45,6 +46,13 @@ export interface ChatClientRequest {
    * emits {@linkcode ToolCall}s; the agent loop resolves and executes them.
    */
   readonly tools?: readonly ToolDescriptor[];
+  /**
+   * Provider-neutral per-turn generation options (reasoning effort, output-token
+   * cap, open provider-options escape hatch). Each provider adapter maps this to
+   * its native request shape; omitting it leaves the provider defaults. Additive
+   * and optional — existing call sites compile unchanged.
+   */
+  readonly options?: GenerationOptions;
 }
 
 /**
@@ -60,6 +68,21 @@ export interface ChatTextEvent {
   /** Discriminant. */
   readonly type: 'text';
   /** The text fragment produced this tick. */
+  readonly delta: string;
+}
+
+/**
+ * Incremental model reasoning / extended-thinking output produced this turn.
+ *
+ * Emitted when a reasoning-capable provider streams chain-of-thought deltas
+ * (surfaced via {@linkcode GenerationOptions.reasoningEffort}); the wrapped
+ * adapter translates the provider's reasoning stream event to this owned shape.
+ * Providers without a reasoning wire never emit it.
+ */
+export interface ChatReasoningEvent {
+  /** Discriminant. */
+  readonly type: 'reasoning';
+  /** The reasoning fragment produced this tick. */
   readonly delta: string;
 }
 
@@ -97,6 +120,7 @@ export interface ChatErrorEvent {
  */
 export type ChatClientEvent =
   | ChatTextEvent
+  | ChatReasoningEvent
   | ChatToolCallEvent
   | ChatFinishEvent
   | ChatErrorEvent;

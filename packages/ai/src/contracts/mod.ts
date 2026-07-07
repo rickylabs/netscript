@@ -9,6 +9,7 @@
  */
 
 export * from './content.ts';
+export * from './generation.ts';
 export * from './message.ts';
 export * from './tool.ts';
 export * from './usage.ts';

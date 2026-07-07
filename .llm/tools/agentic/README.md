@@ -27,6 +27,8 @@ thin CLI over it.
 | `openhands-status.ts` | Read-only run status from the committed trace (default) or the PR status comment. |
 | `watch-openhands-verdict.ts` | Poll a PR for the eval verdict with layered extraction (contract line → formal header → summary heuristics). |
 | `gh-pr.ts` | Leaf-PR lifecycle: `create` / `verdict` / `merge` over the GitHub REST API (eval-gated merge). |
+| `gh-watch.ts` | Background CI/verdict watch — polls a PR's OpenHands summary until the IMPL/PLAN-EVAL verdict is terminal, then exits to re-wake the supervisor (token-free re-wake, no polling loop in agent context). |
+| `gh-token.ts` | Durable GitHub-token resolver/store — `check` validates a token from any healthy source (env → `gh auth token` → GCM) printing source+login only; `store` persists one stdin PAT to Windows GCM + WSL `gh` so future sessions resolve it automatically. |
 | `agentic-lib_test.ts` | `deno test` unit suite over the pure primitives + real fixtures. |
 | `__fixtures__/` | Real Codex launch log + a real-shaped OpenHands status comment. |
 

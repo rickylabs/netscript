@@ -11,6 +11,7 @@ export const TracerNames = {
   SCHEDULER: '@netscript/scheduler',
   JOB: '@netscript/job',
   SAGA: '@netscript/saga',
+  TRIGGER: '@netscript/trigger',
   SSE: '@netscript/sse',
   KV: '@netscript/kv',
   DEFAULT: '@netscript/telemetry',
@@ -101,4 +102,11 @@ export function getKVTracer(): Tracer {
  */
 export function getSagaTracer(): Tracer {
   return getTracer(TracerNames.SAGA);
+}
+
+/**
+ * Return the trigger-domain tracer.
+ */
+export function getTriggerTracer(): Tracer {
+  return getTracer(TracerNames.TRIGGER);
 }

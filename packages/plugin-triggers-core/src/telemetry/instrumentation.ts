@@ -1,5 +1,6 @@
 import type { TriggerDurabilityTier, TriggerEventStatus, TriggerKind } from '../domain/mod.ts';
 import {
+  DeprecatedTriggerAttributes,
   TriggerAttributes,
   TriggerSpanNames,
   type TriggerTelemetryOutcome,
@@ -141,7 +142,7 @@ export class TriggerInstrumentation {
   startIngressSpan(input: TriggerSpanInput): TriggerTelemetrySpan {
     return this.tracer.startSpan(TriggerSpanNames.INGRESS, {
       kind: 'server',
-      attributes: triggerAttributes(input),
+      attributes: withDeprecatedAliases(triggerAttributes(input)),
     });
   }
 
@@ -149,7 +150,7 @@ export class TriggerInstrumentation {
   startDetectSpan(input: TriggerSpanInput): TriggerTelemetrySpan {
     return this.tracer.startSpan(TriggerSpanNames.DETECT, {
       kind: 'internal',
-      attributes: triggerAttributes(input),
+      attributes: withDeprecatedAliases(triggerAttributes(input)),
     });
   }
 
@@ -157,7 +158,7 @@ export class TriggerInstrumentation {
   startProcessSpan(input: TriggerSpanInput): TriggerTelemetrySpan {
     return this.tracer.startSpan(TriggerSpanNames.PROCESS, {
       kind: 'internal',
-      attributes: triggerAttributes(input),
+      attributes: withDeprecatedAliases(triggerAttributes(input)),
     });
   }
 
@@ -165,10 +166,10 @@ export class TriggerInstrumentation {
   startActionDispatchSpan(input: TriggerActionDispatchInput): TriggerTelemetrySpan {
     return this.tracer.startSpan(TriggerSpanNames.ACTION_DISPATCH, {
       kind: 'producer',
-      attributes: {
+      attributes: withDeprecatedAliases({
         ...triggerAttributes(input),
         [TriggerAttributes.ACTION_KIND]: input.actionKind,
-      },
+      }),
     });
   }
 
@@ -176,10 +177,10 @@ export class TriggerInstrumentation {
   startDlqEnqueueSpan(input: TriggerDlqInput): TriggerTelemetrySpan {
     return this.tracer.startSpan(TriggerSpanNames.DLQ_ENQUEUE, {
       kind: 'producer',
-      attributes: {
+      attributes: withDeprecatedAliases({
         ...triggerAttributes(input),
         [TriggerAttributes.DLQ_REASON]: input.reason,
-      },
+      }),
     });
   }
 
@@ -187,10 +188,10 @@ export class TriggerInstrumentation {
   startIngressResponseSpan(input: TriggerSpanInput, statusCode: number): TriggerTelemetrySpan {
     return this.tracer.startSpan(TriggerSpanNames.INGRESS_RESPONSE, {
       kind: 'server',
-      attributes: {
+      attributes: withDeprecatedAliases({
         ...triggerAttributes(input),
         [TriggerAttributes.HTTP_STATUS_CODE]: statusCode,
-      },
+      }),
     });
   }
 
@@ -200,10 +201,10 @@ export class TriggerInstrumentation {
     outcome: TriggerTelemetryOutcome = TriggerTelemetryOutcomes.SUCCESS,
     error?: unknown,
   ): void {
-    span.setAttribute(TriggerAttributes.OUTCOME, outcome);
+    setSpanAttribute(span, TriggerAttributes.OUTCOME, outcome);
     if (error !== undefined) {
       span.recordException(error);
-      span.setAttribute(TriggerAttributes.ERROR_CLASS, errorClass(error));
+      setSpanAttribute(span, TriggerAttributes.ERROR_CLASS, errorClass(error));
       span.setStatus('error', error instanceof Error ? error.message : String(error));
     } else {
       span.setStatus('ok');
@@ -213,35 +214,47 @@ export class TriggerInstrumentation {
 
   /** Record an ingress metric. */
   recordIngress(input: TriggerIngressMetricInput): void {
-    this.meter?.ingressTotal?.add(1, {
-      ...triggerAttributes(input),
-      [TriggerAttributes.OUTCOME]: input.outcome,
-    });
+    this.meter?.ingressTotal?.add(
+      1,
+      withDeprecatedAliases({
+        ...triggerAttributes(input),
+        [TriggerAttributes.OUTCOME]: input.outcome,
+      }),
+    );
   }
 
   /** Record an action dispatch duration metric. */
   recordDispatchDuration(input: TriggerDispatchMetricInput): void {
-    this.meter?.dispatchDurationMs?.record(input.durationMs, {
-      ...triggerAttributes(input),
-      [TriggerAttributes.ACTION_KIND]: input.actionKind,
-      [TriggerAttributes.OUTCOME]: input.outcome,
-    });
+    this.meter?.dispatchDurationMs?.record(
+      input.durationMs,
+      withDeprecatedAliases({
+        ...triggerAttributes(input),
+        [TriggerAttributes.ACTION_KIND]: input.actionKind,
+        [TriggerAttributes.OUTCOME]: input.outcome,
+      }),
+    );
   }
 
   /** Record a DLQ enqueue metric. */
   recordDlq(input: TriggerDlqInput): void {
-    this.meter?.dlqTotal?.add(1, {
-      ...triggerAttributes(input),
-      [TriggerAttributes.DLQ_REASON]: input.reason,
-    });
+    this.meter?.dlqTotal?.add(
+      1,
+      withDeprecatedAliases({
+        ...triggerAttributes(input),
+        [TriggerAttributes.DLQ_REASON]: input.reason,
+      }),
+    );
   }
 
   /** Record an idempotency hit metric. */
   recordIdempotencyHit(input: TriggerSpanInput, source: string): void {
-    this.meter?.idempotencyHitsTotal?.add(1, {
-      ...triggerAttributes(input),
-      [TriggerAttributes.IDEMPOTENCY_SOURCE]: source,
-    });
+    this.meter?.idempotencyHitsTotal?.add(
+      1,
+      withDeprecatedAliases({
+        ...triggerAttributes(input),
+        [TriggerAttributes.IDEMPOTENCY_SOURCE]: source,
+      }),
+    );
   }
 }
 
@@ -261,6 +274,43 @@ function triggerAttributes(input: TriggerSpanInput): TriggerTelemetryAttributes 
     [TriggerAttributes.TRIGGER_ATTEMPT]: input.attempt,
     [TriggerAttributes.TRIGGER_DURABILITY_TIER]: input.durabilityTier,
   };
+}
+
+/**
+ * Return the attribute bag with deprecated pre-#402 bare `trigger.*` aliases
+ * mirrored from their canonical `netscript.trigger.*` keys.
+ *
+ * Emitted during the deprecation window so consumers keyed on the old names
+ * keep working. Only defined values are mirrored, so absent attributes stay
+ * absent under both keys.
+ */
+function withDeprecatedAliases(
+  attributes: TriggerTelemetryAttributes,
+): TriggerTelemetryAttributes {
+  const result: Record<string, TriggerTelemetryAttributeValue> = { ...attributes };
+  for (const [canonicalKey, deprecatedKey] of Object.entries(DeprecatedTriggerAttributes)) {
+    const value = result[canonicalKey];
+    if (value !== undefined) {
+      result[deprecatedKey] = value;
+    }
+  }
+  return result;
+}
+
+/**
+ * Set a span attribute under both its canonical key and, when one exists, the
+ * deprecated pre-#402 alias.
+ */
+function setSpanAttribute(
+  span: TriggerTelemetrySpan,
+  key: string,
+  value: Exclude<TriggerTelemetryAttributeValue, undefined>,
+): void {
+  span.setAttribute(key, value);
+  const deprecatedKey = DeprecatedTriggerAttributes[key];
+  if (deprecatedKey !== undefined) {
+    span.setAttribute(deprecatedKey, value);
+  }
 }
 
 function errorClass(error: unknown): string {

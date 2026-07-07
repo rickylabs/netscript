@@ -1,8 +1,15 @@
 import { assert, assertEquals, assertRejects } from '@std/assert';
 import {
   createMcpTransport,
+  createMcpTransportPool,
+  createMcpTransportPoolFromTransports,
   type McpClientConnection,
+  type McpConnectionState,
+  type McpConnectOptions,
+  type McpStateChangeHandler,
   type McpToolDescriptor,
+  type McpToolResult,
+  type McpTransportPort,
   registerMcpTools,
   StdioMcpTransport,
   StreamableHttpMcpTransport,
@@ -37,6 +44,75 @@ function connection(tools: readonly McpToolDescriptor[] = [searchTool]): McpClie
       return Promise.resolve();
     },
   };
+}
+
+class RecordingTransport implements McpTransportPort {
+  readonly serverId: string;
+  readonly #tools: readonly McpToolDescriptor[];
+  readonly #content: string;
+  readonly #handlers = new Set<McpStateChangeHandler>();
+  state: McpConnectionState = 'disconnected';
+  connectCount = 0;
+  calls: Array<{ readonly name: string; readonly args: Readonly<Record<string, unknown>> }> = [];
+
+  constructor(serverId: string, tools: readonly McpToolDescriptor[], content = '{}') {
+    this.serverId = serverId;
+    this.#tools = tools;
+    this.#content = content;
+  }
+
+  connect(): Promise<readonly McpToolDescriptor[]> {
+    this.connectCount += 1;
+    this.#setState('connected');
+    return Promise.resolve(this.#tools);
+  }
+
+  reconnect(): Promise<readonly McpToolDescriptor[]> {
+    this.#setState('reconnecting');
+    this.#setState('connected');
+    return Promise.resolve(this.#tools);
+  }
+
+  listTools(): Promise<readonly McpToolDescriptor[]> {
+    if (this.state !== 'connected') {
+      return this.connect();
+    }
+    return Promise.resolve(this.#tools);
+  }
+
+  callTool(
+    name: string,
+    args: Readonly<Record<string, unknown>>,
+    _options?: McpConnectOptions,
+  ): Promise<McpToolResult> {
+    this.calls.push({ name, args });
+    return Promise.resolve({
+      toolCallId: `${this.serverId}:${name}`,
+      content: this.#content,
+      state: 'complete',
+    });
+  }
+
+  onStateChange(handler: McpStateChangeHandler): () => void {
+    this.#handlers.add(handler);
+    return () => this.#handlers.delete(handler);
+  }
+
+  stop(): Promise<void> {
+    this.#setState('closed');
+    return Promise.resolve();
+  }
+
+  #setState(next: McpConnectionState): void {
+    const previous = this.state;
+    if (previous === next) {
+      return;
+    }
+    this.state = next;
+    for (const handler of this.#handlers) {
+      handler(next, previous);
+    }
+  }
 }
 
 function headersOf(value: unknown): Readonly<Record<string, string>> | undefined {
@@ -130,6 +206,99 @@ Deno.test('registerMcpTools adds tools on connect and removes them on stop', asy
   await registration.stop();
   assertEquals(registry.has('demo_search'), false);
   assertEquals(transport.state, 'closed');
+});
+
+Deno.test('McpTransportPool keys servers and prefixes remote tool names', async () => {
+  const first = new RecordingTransport('alpha', [{
+    ...searchTool,
+    name: 'search',
+    remoteName: 'search',
+    serverId: 'alpha',
+  }]);
+  const second = new RecordingTransport('beta', [{
+    ...searchTool,
+    name: 'search',
+    remoteName: 'search',
+    serverId: 'beta',
+  }]);
+  const pool = createMcpTransportPoolFromTransports({ transports: [first, second] });
+
+  const tools = await pool.listTools();
+
+  assertEquals(pool.serverIds, ['alpha', 'beta']);
+  assertEquals(tools.map((tool) => tool.name), ['alpha__search', 'beta__search']);
+  assertEquals(tools.map((tool) => tool.remoteName), ['search', 'search']);
+});
+
+Deno.test('McpTransportPool keeps transports warm across turns', async () => {
+  const transport = new RecordingTransport('alpha', [searchTool]);
+  const pool = createMcpTransportPoolFromTransports({ transports: [transport] });
+
+  await pool.listTools();
+  await pool.callTool('alpha__search', { q: 'one' });
+  await pool.listTools();
+  await pool.callTool('alpha__search', { q: 'two' });
+
+  assertEquals(transport.connectCount, 1);
+  assertEquals(transport.calls.map((call) => call.name), ['search', 'search']);
+  assertEquals(transport.calls.map((call) => call.args), [{ q: 'one' }, { q: 'two' }]);
+});
+
+Deno.test('McpTransportPool extracts ui resources as plain resource and src data', async () => {
+  const content = JSON.stringify({
+    content: [{
+      type: 'resource',
+      resource: {
+        uri: 'ui://widgets.example/weather/card.js',
+        mimeType: 'text/javascript',
+        text: 'customElements.define("weather-card", class extends HTMLElement {})',
+      },
+    }],
+  });
+  const transport = new RecordingTransport('widgets', [{
+    ...searchTool,
+    name: 'weather',
+    remoteName: 'weather',
+    serverId: 'widgets',
+  }], content);
+  const pool = createMcpTransportPoolFromTransports({ transports: [transport] });
+  await pool.listTools();
+
+  const result = await pool.callTool('widgets__weather', { city: 'Zurich' });
+
+  assertEquals(result.uiResources, [{
+    uri: 'ui://widgets.example/weather/card.js',
+    src: 'ui://widgets.example/weather/card.js',
+    mimeType: 'text/javascript',
+    text: 'customElements.define("weather-card", class extends HTMLElement {})',
+    serverId: 'widgets',
+    toolName: 'weather',
+    toolCallId: 'widgets:weather',
+  }]);
+});
+
+Deno.test('createMcpTransportPool builds pooled transports from config', async () => {
+  let connects = 0;
+  const pool = createMcpTransportPool({
+    servers: [{
+      kind: 'streamable-http',
+      serverId: 'http',
+      url: 'https://mcp.example.test',
+      connector: () => {
+        connects += 1;
+        return Promise.resolve(connection([{
+          ...searchTool,
+          name: 'search',
+          remoteName: 'search',
+          serverId: 'http',
+        }]));
+      },
+    }],
+  });
+
+  assertEquals((await pool.listTools()).map((tool) => tool.name), ['http__search']);
+  assertEquals((await pool.listTools()).map((tool) => tool.name), ['http__search']);
+  assertEquals(connects, 1);
 });
 
 Deno.test('Streamable-HTTP reconnect backs off and resurfaces tools without duplicates', async () => {

@@ -44,9 +44,9 @@ contracts that belong in core.
 
 Note: real first-party `plugins/*` place their contribution folders (`contracts/`, `services/`,
 `database/`, `jobs/`, `streams/`) at the top level as siblings of `src/`, together with top-level
-`contracts.ts`, `mod.ts`, and `verify-plugin.ts`. Treat that observed layout as authoritative until
-`06-archetypes.md` is reconciled. **The authoritative folder-shape reconciliation is tracked under
-#305/#306 (doctrine-revamp lane); do not settle it here** — this profile follows doctrine, it does
+`mod.ts` and `verify-plugin.ts`. As of #306 (doctrine-revamp lane) this layout is **reconciled into
+doctrine**: `06-archetypes.md#archetype-5--plugin-package` now states the same top-level-siblings
+shape as authoritative, so doctrine and this profile agree. This profile follows doctrine; it does
 not rewrite it.
 
 ## Skills to Activate

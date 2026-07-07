@@ -14,6 +14,7 @@
 
 import { ANTHROPIC_MODELS, anthropicText, createAnthropicChat } from '@tanstack/ai-anthropic';
 
+import type { GenerationOptions } from '../contracts/generation.ts';
 import type { ModelDescriptor, ModelHandle, ModelId } from '../contracts/model.ts';
 import { AiError } from '../contracts/errors.ts';
 import type { ModelProviderPort } from '../ports/model-provider.ts';
@@ -24,6 +25,34 @@ import { toTanstackChatClient } from './tanstack-chat-client.ts';
  * Registry id under which {@linkcode AnthropicModelProvider} self-registers.
  */
 export const ANTHROPIC_PROVIDER_ID = 'anthropic' as const;
+
+/**
+ * Map per-turn {@linkcode GenerationOptions} to Anthropic's native request-body
+ * keys. A reasoning tier maps to the modern `output_config: { effort }` control;
+ * `'off'` disables extended thinking via `thinking: { type: 'disabled' }`.
+ * `maxOutputTokens` maps to `max_tokens`. Returns `undefined` when nothing is
+ * set.
+ *
+ * The deprecated `thinking: { type: 'enabled', budget_tokens }` shape is
+ * deliberately **never** emitted — recent Anthropic models reject it — so effort
+ * always flows through `output_config`. Pure and unit-testable; the caller's
+ * `providerOptions` escape hatch is merged separately by the bridge.
+ */
+export function anthropicGenerationModelOptions(
+  options: GenerationOptions,
+): Readonly<Record<string, unknown>> | undefined {
+  const modelOptions: Record<string, unknown> = {};
+  const effort = options.reasoningEffort;
+  if (effort === 'off') {
+    modelOptions.thinking = { type: 'disabled' };
+  } else if (effort !== undefined) {
+    modelOptions.output_config = { effort };
+  }
+  if (options.maxOutputTokens !== undefined) {
+    modelOptions.max_tokens = options.maxOutputTokens;
+  }
+  return Object.keys(modelOptions).length > 0 ? modelOptions : undefined;
+}
 
 /**
  * Configuration for {@linkcode AnthropicModelProvider}.
@@ -138,7 +167,11 @@ export class AnthropicModelProvider implements ModelProviderPort {
     const adapter = apiKey === undefined
       ? anthropicText(resolved, clientConfig)
       : createAnthropicChat(resolved, apiKey, clientConfig);
-    return toTanstackChatClient(adapter, { name: ANTHROPIC_PROVIDER_ID, kind: 'text' });
+    return toTanstackChatClient(adapter, {
+      name: ANTHROPIC_PROVIDER_ID,
+      kind: 'text',
+      mapModelOptions: anthropicGenerationModelOptions,
+    });
   }
 }
 

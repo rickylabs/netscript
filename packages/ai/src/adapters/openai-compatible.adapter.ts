@@ -15,6 +15,7 @@
 
 import { openaiCompatible } from '@tanstack/ai-openai/compatible';
 
+import type { GenerationOptions } from '../contracts/generation.ts';
 import type { ModelDescriptor, ModelHandle, ModelId } from '../contracts/model.ts';
 import { AiError, AiNotConfiguredError } from '../contracts/errors.ts';
 import type { ModelProviderPort } from '../ports/model-provider.ts';
@@ -25,6 +26,29 @@ import { toTanstackChatClient } from './tanstack-chat-client.ts';
  * Registry id under which {@linkcode OpenAiCompatibleModelProvider} self-registers.
  */
 export const OPENAI_COMPATIBLE_PROVIDER_ID = 'openai-compatible' as const;
+
+/**
+ * Map per-turn {@linkcode GenerationOptions} to the OpenAI Chat Completions
+ * request-body keys: a reasoning tier maps to the flat `reasoning_effort` field,
+ * and `maxOutputTokens` maps to `max_tokens`. `'off'` is treated as "no explicit
+ * reasoning request" (the OpenAI wire has no disable value, so `reasoning_effort`
+ * is simply omitted and the model default applies). Returns `undefined` when the
+ * options carry nothing OpenAI models. Pure and unit-testable; the caller's
+ * `providerOptions` escape hatch is merged separately by the bridge.
+ */
+export function openAiCompatibleGenerationModelOptions(
+  options: GenerationOptions,
+): Readonly<Record<string, unknown>> | undefined {
+  const modelOptions: Record<string, unknown> = {};
+  const effort = options.reasoningEffort;
+  if (effort !== undefined && effort !== 'off') {
+    modelOptions.reasoning_effort = effort;
+  }
+  if (options.maxOutputTokens !== undefined) {
+    modelOptions.max_tokens = options.maxOutputTokens;
+  }
+  return Object.keys(modelOptions).length > 0 ? modelOptions : undefined;
+}
 
 /**
  * Which underlying OpenAI API surface the endpoint speaks.
@@ -168,6 +192,7 @@ export class OpenAiCompatibleModelProvider implements ModelProviderPort {
     return toTanstackChatClient(adapter, {
       name: name ?? OPENAI_COMPATIBLE_PROVIDER_ID,
       kind: 'text',
+      mapModelOptions: openAiCompatibleGenerationModelOptions,
     });
   }
 

@@ -34,6 +34,7 @@ import type {
 } from '@tanstack/ai';
 
 import type { ContentPart, MessageContent } from '../contracts/content.ts';
+import type { GenerationOptions } from '../contracts/generation.ts';
 import type { ToolCall, ToolDescriptor, ToolParameters } from '../contracts/tool.ts';
 import type { Usage } from '../contracts/usage.ts';
 import type {
@@ -60,6 +61,40 @@ export interface ChatClientMeta {
    * owned surface. Omit for providers with no override (Anthropic, Ollama).
    */
   readonly modelOptions?: Readonly<Record<string, unknown>>;
+  /**
+   * Provider-native mapper for per-turn {@linkcode GenerationOptions}. Each E2
+   * adapter supplies the pure function that maps the owned neutral options
+   * (reasoning effort, output-token cap) to that provider's request-body keys
+   * (Anthropic `output_config.effort`/`thinking`, OpenAI `reasoning_effort`,
+   * OpenRouter `reasoning:{effort}`; Ollama maps only `max_tokens`). The result
+   * is merged over the static {@linkcode ChatClientMeta.modelOptions}, then the
+   * caller's `providerOptions` escape hatch is merged last (highest priority).
+   * Omit for providers that ignore per-turn options entirely.
+   */
+  readonly mapModelOptions?: (
+    options: GenerationOptions,
+  ) => Readonly<Record<string, unknown>> | undefined;
+}
+
+/**
+ * Merge model-option layers left-to-right (later wins), returning `undefined`
+ * when every layer is empty so no `modelOptions` key is sent for a default turn.
+ */
+export function mergeModelOptions(
+  ...layers: readonly (Readonly<Record<string, unknown>> | undefined)[]
+): Readonly<Record<string, unknown>> | undefined {
+  const merged: Record<string, unknown> = {};
+  let seen = false;
+  for (const layer of layers) {
+    if (layer === undefined) {
+      continue;
+    }
+    for (const [key, value] of Object.entries(layer)) {
+      merged[key] = value;
+      seen = true;
+    }
+  }
+  return seen ? merged : undefined;
 }
 
 /**
@@ -91,6 +126,18 @@ export function toTanstackChatClient(
       const { systemPrompts, messages } = toTanstackMessages(request);
       const tools = toTanstackTools(request.tools);
 
+      // Layer the per-turn options over the provider's static override: static
+      // `meta.modelOptions`, then the provider-native mapping of the neutral
+      // options, then the caller's raw `providerOptions` escape hatch (wins).
+      const perTurn = request.options !== undefined
+        ? meta.mapModelOptions?.(request.options)
+        : undefined;
+      const modelOptions = mergeModelOptions(
+        meta.modelOptions,
+        perTurn,
+        request.options?.providerOptions,
+      );
+
       // Accumulate streamed tool-call fragments keyed by call id.
       const pending = new Map<string, { name: string; args: string }>();
 
@@ -103,7 +150,7 @@ export function toTanstackChatClient(
           abortController: controller,
           // `AnyTextAdapter` erases the provider-options type to `any`, so this
           // owned `Record` threads into `modelOptions` without a cast (D3-safe).
-          modelOptions: meta.modelOptions,
+          modelOptions,
         });
         for await (const chunk of streamed) {
           if (external?.aborted) {
@@ -134,6 +181,11 @@ function translateChunk(
   switch (chunk.type) {
     case EventType.TEXT_MESSAGE_CONTENT: {
       return { type: 'text', delta: chunk.delta };
+    }
+    case EventType.REASONING_MESSAGE_CONTENT: {
+      // The ag-ui reasoning-content event (the current, non-deprecated
+      // chain-of-thought delta) becomes the owned reasoning event.
+      return { type: 'reasoning', delta: chunk.delta };
     }
     case EventType.TOOL_CALL_START: {
       pending.set(chunk.toolCallId, {

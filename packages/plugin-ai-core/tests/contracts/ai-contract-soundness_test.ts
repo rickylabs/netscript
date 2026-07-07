@@ -1,12 +1,15 @@
-import { assertEquals } from '@std/assert';
+import { assert, assertEquals } from '@std/assert';
 import type {
+  ChatChunk,
   ChatInput,
   EmbedInput,
   EmbedResponse,
   ModelsResponse,
+  ReasoningChunk,
   ToolInvokeResponse,
   TranscribeResponse,
 } from '../../src/contracts/v1/mod.ts';
+import { ChatChunkSchema } from '../../src/contracts/v1/mod.ts';
 import { aiContractV1, createAiRouter } from '../../mod.ts';
 
 // Type-level soundness assertions for the precise AI contract.
@@ -72,6 +75,20 @@ const _router = createAiRouter({
   invokeTool: () => ({ content: 'No tools registered.', state: 'error' as const }),
   embed: () => ({ embeddings: [] }),
   transcribe: () => ({ text: '' }),
+});
+
+const _validReasoningChunk = {
+  type: 'reasoning',
+  delta: 'thinking...',
+} satisfies ReasoningChunk;
+
+const _reasoningIsChatChunk: ChatChunk = _validReasoningChunk;
+
+Deno.test('chat chunk schema validates the reasoning-delta frame (lockstep with @netscript/ai)', () => {
+  const parsed = ChatChunkSchema.parse(_validReasoningChunk);
+  assertEquals(parsed, { type: 'reasoning', delta: 'thinking...' });
+  assert(!ChatChunkSchema.safeParse({ type: 'reasoning' }).success);
+  assertEquals(_reasoningIsChatChunk.type, 'reasoning');
 });
 
 Deno.test('ai contract exposes a precise, non-loosened type surface', () => {
