@@ -6,6 +6,7 @@
   "exclude": [],
   "exports": {
     ".": "./mod.ts",
+    "./ai/render-ui": "./src/ai/render-ui.tsx",
     "./interactive": "./interactive.ts",
     "./primitives": "./primitives.tsx",
     "./registry": "./registry.ts"
