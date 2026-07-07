@@ -21,6 +21,7 @@
 
 import { openaiCompatible } from '@tanstack/ai-openai/compatible';
 
+import type { GenerationOptions } from '../contracts/generation.ts';
 import type { ModelDescriptor, ModelHandle, ModelId } from '../contracts/model.ts';
 import { AiError } from '../contracts/errors.ts';
 import type { ModelProviderPort } from '../ports/model-provider.ts';
@@ -50,6 +51,27 @@ export const DEFAULT_OLLAMA_HOST = 'http://localhost:11434' as const;
 const OLLAMA_PLACEHOLDER_KEY = 'ollama' as const;
 
 const DEFAULT_INPUT_MODALITIES = ['text', 'image'] as const;
+
+/**
+ * Map per-turn {@linkcode GenerationOptions} to Ollama's request-body keys.
+ *
+ * Ollama's OpenAI-compatible endpoint has **no reasoning-effort wire**, so
+ * `reasoningEffort` is a documented **no-op** here (any tier, including `'off'`,
+ * is ignored). Only `maxOutputTokens` is mapped, to `max_tokens`. Returns
+ * `undefined` when the options carry nothing Ollama models. Pure and
+ * unit-testable; the caller's `providerOptions` escape hatch is merged
+ * separately by the bridge, so a caller can still force raw Ollama options.
+ */
+export function ollamaGenerationModelOptions(
+  options: GenerationOptions,
+): Readonly<Record<string, unknown>> | undefined {
+  const modelOptions: Record<string, unknown> = {};
+  // reasoningEffort intentionally ignored: Ollama has no reasoning-effort wire.
+  if (options.maxOutputTokens !== undefined) {
+    modelOptions.max_tokens = options.maxOutputTokens;
+  }
+  return Object.keys(modelOptions).length > 0 ? modelOptions : undefined;
+}
 
 /**
  * Configuration for {@linkcode OllamaModelProvider}.
@@ -161,7 +183,11 @@ export class OllamaModelProvider implements ModelProviderPort {
       models: this.#config.models ?? [model],
     });
     const adapter = factory(model);
-    return toTanstackChatClient(adapter, { name: OLLAMA_PROVIDER_ID, kind: 'text' });
+    return toTanstackChatClient(adapter, {
+      name: OLLAMA_PROVIDER_ID,
+      kind: 'text',
+      mapModelOptions: ollamaGenerationModelOptions,
+    });
   }
 
   /** Build the {@linkcode ModelDescriptor} for a model id. */

@@ -59,6 +59,7 @@ export type {
   ModelsResponse,
   PromptTokensDetails,
   ProviderUsageDetails,
+  ReasoningChunk,
   TextChunk,
   TextContentPart,
   ToolCall,

@@ -85,6 +85,7 @@ export type {
   ModelSelector,
   PromptTokensDetails,
   ProviderUsageDetails,
+  ReasoningChunk,
   TextChunk,
   TextContentPart,
   ToolCall,

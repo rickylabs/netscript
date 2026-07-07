@@ -228,6 +228,13 @@ const textChunkZodSchema: z.ZodObject<{ type: z.ZodLiteral<'text'>; delta: z.Zod
     { type: z.literal('text'), delta: z.string() },
   );
 
+const reasoningChunkZodSchema: z.ZodObject<
+  { type: z.ZodLiteral<'reasoning'>; delta: z.ZodString }
+> = z
+  .object(
+    { type: z.literal('reasoning'), delta: z.string() },
+  );
+
 const toolCallChunkZodSchema: z.ZodObject<{
   type: z.ZodLiteral<'tool-call'>;
   toolCall: typeof toolCallZodSchema;
@@ -262,13 +269,15 @@ const doneChunkZodSchema: z.ZodObject<{
 /**
  * Concrete schema for a single streamed chat chunk.
  *
- * A `z.ZodUnion` of the seven discriminated frame shapes. Feeds
- * `eventIterator(...)` in the contract so the `chat` route's output type is an
- * async event-iterator of these frames — never a bare response object (F-13).
+ * A `z.ZodUnion` of the eight discriminated frame shapes (including the
+ * reasoning-delta frame). Feeds `eventIterator(...)` in the contract so the
+ * `chat` route's output type is an async event-iterator of these frames — never
+ * a bare response object (F-13).
  */
 export const chatChunkZodSchema: z.ZodUnion<
   readonly [
     typeof textChunkZodSchema,
+    typeof reasoningChunkZodSchema,
     typeof toolCallChunkZodSchema,
     typeof toolResultChunkZodSchema,
     typeof messageChunkZodSchema,
@@ -278,6 +287,7 @@ export const chatChunkZodSchema: z.ZodUnion<
   ]
 > = z.union([
   textChunkZodSchema,
+  reasoningChunkZodSchema,
   toolCallChunkZodSchema,
   toolResultChunkZodSchema,
   messageChunkZodSchema,

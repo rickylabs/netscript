@@ -10,6 +10,7 @@
  */
 
 import type { AgentChunk } from '../contracts/chunk.ts';
+import type { GenerationOptions } from '../contracts/generation.ts';
 import type { Message } from '../contracts/message.ts';
 import type { ModelRef } from '../contracts/model.ts';
 import type { ToolDescriptor } from '../contracts/tool.ts';
@@ -27,6 +28,13 @@ export interface AgentLoopInput {
   readonly tools?: readonly ToolDescriptor[];
   /** System instruction prepended to the run. */
   readonly system?: string;
+  /**
+   * Provider-neutral per-turn generation options (reasoning effort, output-token
+   * cap, open provider-options escape hatch). The loop threads it into every
+   * {@linkcode import('./chat-client.ts').ChatClientRequest} it issues, where the
+   * bound provider adapter maps it natively. Optional and additive.
+   */
+  readonly options?: GenerationOptions;
 }
 
 /**

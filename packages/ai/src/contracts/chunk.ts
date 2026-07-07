@@ -16,6 +16,7 @@ import type { Usage } from './usage.ts';
 /** Discriminant tags for {@linkcode AgentChunk}. */
 export type AgentChunkType =
   | 'text'
+  | 'reasoning'
   | 'tool-call'
   | 'tool-result'
   | 'message'
@@ -28,6 +29,22 @@ export interface TextChunk {
   /** Discriminant. */
   readonly type: 'text';
   /** The text fragment appended this tick. */
+  readonly delta: string;
+}
+
+/**
+ * Incremental model reasoning / extended-thinking output.
+ *
+ * Emitted when a reasoning-capable provider streams its chain-of-thought deltas
+ * (surfaced via {@linkcode import('./generation.ts').GenerationOptions}'s
+ * `reasoningEffort`). Distinct from
+ * {@linkcode TextChunk} so a UI can render the thinking trace separately from the
+ * final answer; providers without a reasoning wire never emit it.
+ */
+export interface ReasoningChunk {
+  /** Discriminant. */
+  readonly type: 'reasoning';
+  /** The reasoning fragment appended this tick. */
   readonly delta: string;
 }
 
@@ -89,6 +106,7 @@ export interface DoneChunk {
  */
 export type AgentChunk =
   | TextChunk
+  | ReasoningChunk
   | ToolCallChunk
   | ToolResultChunk
   | MessageChunk

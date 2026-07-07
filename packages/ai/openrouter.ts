@@ -30,7 +30,7 @@ import {
   type ReasoningEffort,
 } from './src/adapters/openrouter.adapter.ts';
 
-const REASONING_EFFORTS: readonly string[] = ['low', 'medium', 'high'];
+const REASONING_EFFORTS: readonly string[] = ['off', 'low', 'medium', 'high'];
 
 /** Narrow an opaque registry config bag to the OpenRouter provider config. */
 function readOpenRouterConfig(config?: ModelProviderConfig): OpenRouterModelProviderConfig {
