@@ -176,7 +176,10 @@ local` needs no token and reads the newest committed trace under the run's `TRAC
   before committing. Diff the lock against the **true base** (the commit the wave forked/synced
   from), not the working baseline — an in-branch "unchanged" claim hides churn that predates the
   first slice. Reconcile-don't-revert mid-wave (Golden Rule 6: never delete the lock or `--reload`
-  without approval).
+  without approval). The lock is not the only churn: an IMPL-EVAL commit-back can also push
+  scratch/junk files alongside the verdict artifact. **Verify the committed file set before merge** —
+  the intended change is the run's `evaluate.md`/`plan-eval.md` plus any authorized fix, not a
+  re-resolved `deno.lock` or stray workspace files; drop anything outside that set.
 - **Trusting the persistent PR summary comment**: the `<!-- openhands-agent-summary -->` comment is
   one per PR and is **not always regenerated** for a new run — it can show a prior run's package,
   phase, and verdict while only its `updated_at` bumps. **The verdict source is the committed run

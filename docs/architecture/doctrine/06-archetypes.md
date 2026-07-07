@@ -158,35 +158,60 @@ Doctrine for this archetype:
 
 For first-party plugin packages under `plugins/*`. Examples:
 `plugins/workers`, `plugins/sagas`, `plugins/triggers`,
-`plugins/hello-world`.
+`plugins/streams`.
 
-Minimum shape:
+**Thinness law.** Convention-bearing primitives — contracts, base
+services, schema/runtime conventions, and event/kind vocabularies —
+live in the sibling `@netscript/plugin-<kind>-core` package. A
+first-party `plugins/*` package is **thin userland glue**: it wires
+and composes those core-owned primitives into a concrete integration
+and re-exports sibling contracts; it does not redefine contracts or
+re-implement a core convention. The reference shape is
+`@netscript/plugin-auth-core` + its thin adapters — the core package
+carries the convention, the plugin is the minimal wiring that binds it
+to a provider. The harness archetype profile
+`.llm/harness/archetypes/ARCHETYPE-5-plugin.md` states the same law for
+harness runs.
+
+Minimum shape — the contribution folders sit at the package root as
+siblings of `src/`, not nested under it. This is the observed
+first-party layout (`plugins/workers`, `plugins/sagas`,
+`plugins/triggers`, `plugins/streams`) and it is authoritative:
 
 ```
-mod.ts
+mod.ts                              ← small package-root surface
 README.md
 deno.json
-contracts.ts                        ← public schemas used by plugin loader
-src/
-  services/                         ← service entrypoints
-  database/                         ← Prisma schema contributions
-  jobs/ | sagas/ | triggers/        ← per-runtime declarations
-  streams/                          ← event-bus declarations
-  verify-plugin.ts                  ← package-owned validation
+verify-plugin.ts                    ← package-owned validation gate
+contracts/                          ← public schemas re-exported from the sibling -core package
+services/                           ← service entrypoints
+database/                           ← Prisma schema contributions (optional)
+jobs/ | sagas/ | triggers/          ← per-runtime declarations (optional)
+streams/                            ← event-bus declarations (optional)
+src/                                ← internal wiring / composition
 tests/
 ```
 
+A scaffolded plugin also carries integration/tooling edge files at the
+root (`cli.ts`, `scaffold.ts`, `scaffold.plugin.json`,
+`scaffold.runtime.json`, `package.json`). These are edges, not doctrine
+contribution axes, and do not change the archetype's shape.
+
 Doctrine for this archetype:
 
-- The plugin package re-exports the contract types from a sibling
-  package (`@netscript/sagas`, `@netscript/workers`) — it does not
-  redefine them.
+- The plugin re-exports the contract types from its sibling
+  `@netscript/plugin-<kind>-core` package
+  (`@netscript/plugin-workers-core`, `@netscript/plugin-sagas-core`) —
+  it does not redefine them.
+- Convention-bearing logic — loading/registration/schema/runtime
+  conventions and event/kind vocabularies — is imported from the
+  sibling `-core` package, never re-implemented in the plugin.
 - Schema contributions are plain `*.prisma` files referenced from
   `database/`. They do not contain a private workspace.
 - Service/background entrypoints are explicit named exports.
 - A `verify-plugin.ts` runs the plugin-owned validation gate.
 - The plugin's `mod.ts` is small. Most code lives in services and
-  runtime declarations.
+  runtime declarations that wire core primitives.
 
 ## Archetype 6 — CLI / Tooling Package
 

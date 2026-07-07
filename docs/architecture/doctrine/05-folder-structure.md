@@ -159,8 +159,10 @@ The inventory revealed the following structural states:
 | `packages/workers`  | Refactor — `executor/task-executor.ts` (1,287) splits per concern.                    |
 | `packages/cli`      | Major refactor — `pipeline.ts` (1,869), `official-plugin-copier.ts` (1,203) split.    |
 
-`plugins/*` largely follow the plugin archetype (`contracts.ts`, `services/`, `database/`,
-`streams/`, `jobs/`). The convergence is the desired outcome.
+`plugins/*` largely follow the plugin archetype: the contribution folders (`contracts/`,
+`services/`, `database/`, `streams/`, `jobs/`) sit at the package root as siblings of `src/`, not
+nested under it (see `06-archetypes.md#archetype-5--plugin-package`). The convergence is the desired
+outcome.
 
 ## Folder cardinality (R-FOLD-CARD)
 
