@@ -289,3 +289,19 @@ Codex dispatch and extreme token caution. Quality mitigation: the security-criti
 guards are specified as HARD non-deferrable unit regressions in the brief, and this slice gets a
 mandatory adversarial Codex review before IMPL-EVAL (per the adversarial-impl-review rule). Severity:
 moderate (lane reassignment, scope unchanged).
+
+### #379 (FA4 createMcpAppCallHandler) — landed, A1 PASS, IMPL-EVAL dispatched (2026-07-07)
+- Codex thread `019f3bca` completed (turn 831s, no error). Commit **167c5f26** pushed; **draft PR
+  #563** open ("feat(fresh): add MCP app call handler", `Closes #379`, `Part of #238`).
+- Files: `packages/fresh/src/runtime/ai/mcp-app-call-handler.ts` (+381), `..._test.ts` (+179),
+  `sandbox.ts` (+15 re-export), `packages/fresh/deno.json` (+2 export map), slice note. No `deno.lock`
+  diff; no new casts.
+- **A1 PASS (Tier-A).** Server id authoritative from route URL, body `serverId` distrusted (403 before
+  any transport access — cross-server test asserts `listCount===0` both servers); tool exposure
+  re-verified via `listTools`; consumes the #463 `McpTransportPool` (assignability type-probe passed:
+  `createMcpAppCallHandler({ clients: createMcpTransportPool({servers:[]}) })` type-checks clean);
+  stdio warm reuse (`connectCount===0`); `mcp.tool.call` CLIENT span continues browser trace. 4/4
+  tests green locally. Sign-off comment posted PR #563.
+- **IMPL-EVAL dispatched** (OpenHands qwen-3.7-max, verdict-first) — check 3 independently re-verifies
+  the pool assignability; check 2 the reject-before-access allowlist. Verdict file `evaluate-379.md`.
+  Merge held until PASS + close-gate.
