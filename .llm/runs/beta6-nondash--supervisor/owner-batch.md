@@ -83,3 +83,18 @@ The 172a-2-SOUND seam is already fixed on main (#332); AC1 effectively met; all 
 carve-outs are stale. Real remaining work = AC2 doc-lint (fresh-ui `./interactive` = the tentpole) +
 mechanical cleanup. Rescoped to 3 slices (A/B/C). Full audit in the run dir. No action unless you
 want to re-prioritize #303 into this wave.
+
+## Batch #7 — wave-1 close-out + AI-stack unblock (2026-07-07)
+
+- **#558 (#494) IMPL-EVAL PASS** — independently merge-ready; plan row 42 says it is disjoint (∥) from
+  #463, so it is NOT gated behind the pooling primitive. Ready to merge on your go.
+- **#550 (#257) close-gate PASS** — resolved via follow-up split: `gate:e2e` `ui:add` coverage was
+  genuinely unbuilt, so I filed **#561** and deferred it as a non-merge-gate for the island rather than
+  falsify the box. IMPL-EVAL PASS. Merge gated behind #463 (upstream-first per charter).
+- **#463 (FAI-7 MCP pooling) dispatched to WSL Codex** — thread `019f3b96`, worktree
+  `netscript-463-mcp`, implementing now. Its completion unblocks #257 (#550) and #379.
+- **#561 filed** — new beta.6 issue: test(cli-e2e) scaffold.runtime coverage for `ui:add ai`
+  (McpUiWidget), split out of #257.
+- **Merge posture:** this is a post-compaction session, so I'm holding at **prep-green + surface** — I
+  am not auto-merging. If you want #558 (and #550 once #463 lands) merged autonomously on green,
+  re-confirm the merge-on-green grant and I'll proceed.

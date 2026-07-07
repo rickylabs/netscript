@@ -180,3 +180,44 @@ PR. Dispatch comments: #560→4896031663 · #559→4896033675 · #558→48960342
   that `Closes #257` is present in the PR body, whereas `check-close-gate.ts` enforces that issue
   #257's acceptance/`gate:` checkboxes are checked with evidence. CI correctly failed on 6 unchecked
   boxes. See drift D8.
+
+## Wave-1 close-out + AI-stack #463 dispatch (2026-07-07)
+
+### #558 (AI-494 per-turn options) — IMPL-EVAL re-run PASS
+- First run returned NONE (enumerated a check plan without executing it). Re-dispatched verdict-first
+  prompt (`impl-eval-494-v2.md`, iterations 1500): cheapest-decisive-checks-first, post verdict after
+  check 4, deep adapter-vs-live-API cross-check moved to optional tail.
+- Verdict: **OPENHANDS_VERDICT: PASS** (Actions run 28849529272). Checks 1–4 green — owned
+  `GenerationOptions` (reasoningEffort/maxOutputTokens/providerOptions, readonly+optional) re-exported
+  via `contracts/mod.ts` and threaded loop→chat-client→adapter; `ReasoningChunk` union symmetric
+  TS↔zod with `_chunkMembersMatches` drift-guard + test; 84 (@netscript/ai) + 2 (plugin-ai-core)
+  tests; `publish --dry-run` exit 0 both, `deno.lock` clean (a1669f60..HEAD empty), zero casts.
+  Check 5 (adapter native maps vs live API) skipped for budget = non-blocking caveat.
+- Plan row 42: #494 is **DISJOINT (∥) from #463** — NOT gated behind pooling. Independently
+  merge-ready. → owner batch.
+
+### #550 (AI-257 McpUiWidget) — close-gate resolved via follow-up split
+- IMPL-EVAL PASS on code; `close-gate` CI failed on 6 unchecked #257 acceptance boxes (evaluator §9
+  had misread the close-gate as "PR body has a closing keyword"; corrected in the re-dispatched #558
+  prompt and to fold into the standing template).
+- 5 boxes carry real A1+eval evidence → checked (F-5, F-6, keyed remount, sandbox provably
+  un-bypassable, check/lint). `gate:e2e` is genuinely **UNBUILT** (packages/cli/e2e has zero `ui:add`
+  coverage) → NOT falsified (avoids the #260 antipattern). Split to follow-up issue **#561**
+  (test(cli-e2e) scaffold.runtime `ui:add` coverage), deferred from #257 as a non-merge-gate for the
+  island.
+- `check-close-gate.ts` → **close-gate PASS rickylabs/netscript#550**. Merge gated behind #463
+  (charter upstream-first).
+
+### #463 (AI FAI-7 MCP pooling primitive) — dispatched to WSL Codex (Tier-D)
+- Upstream AI-stack primitive (charter line 67: #463 before #257/#379). In the PLAN-EVAL-approved plan
+  (row AI-463, Lane D/Codex-high) — implementation dispatch authorized, no separate PLAN-EVAL needed.
+- Launched via `.llm/tools/agentic/launch-codex-slice.ts` (brief validated `use harness`+`## SKILL`;
+  push-safety gate; CRLF-stripped stage). Daemon healthy (0.142.5, managed, 0 active procs at launch).
+- Worktree `/home/codex/repos/netscript-463-mcp`, branch `feat/463-ai-mcp-pool` @ base **c9a703bf**
+  (origin/main post-wave-1), NO upstream by design (explicit-refspec push mandated in brief).
+- Thread **`019f3b96-0f41-7a30-9759-f0d84d3878d6`** — daemon-managed, mobile-visible (newest rollout
+  matches). Steer same thread only: `codex exec resume 019f3b96-0f41-7a30-9759-f0d84d3878d6 -- "…"`.
+- Brief `slices/463/implement.md` (5635B staged, all 7 sections incl. `## SKILL`). Scope: multi-server
+  pool keyed by id over existing StdioMcp/StreamableHttp transports (pool, not rewrite), keep-alive
+  across turns, tool-name prefixing, `ui://` extraction to the render-ui seam, `@netscript/ai/mcp`
+  export, `gate:jsr` (doc-lint + publish dry-run). IMPL-EVAL is a separate OpenHands session after.
