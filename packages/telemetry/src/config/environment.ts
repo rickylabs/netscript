@@ -1,9 +1,13 @@
 import {
+  DEFAULT_TELEMETRY_PROVIDER_ID,
+  NETSCRIPT_TELEMETRY_ENV_VARS,
   OTEL_ENV_VARS,
   OTEL_SEMCONV_STABILITY_OPT_IN_VALUE,
   type TelemetryConfig,
   type TelemetryConfigDescription,
+  type TelemetryProviderId,
 } from './constants.ts';
+import { isProviderRegistered } from './provider-registration.ts';
 import { validateTelemetryConfig } from './schema.ts';
 
 function parseResourceAttributes(value: string | undefined): Record<string, string> {
@@ -31,6 +35,23 @@ function getEnv(name: string): string | undefined {
 }
 
 /**
+ * Resolve whether telemetry is enabled, decoupled from `OTEL_DENO`.
+ *
+ * Enabled when the Deno runtime turns telemetry on (`OTEL_DENO=true`), when a
+ * caller opts in explicitly (`NETSCRIPT_TELEMETRY_ENABLED=true`), or once a
+ * provider adapter has registered through the composition seam.
+ */
+function resolveEnabled(): boolean {
+  return getEnv(OTEL_ENV_VARS.OTEL_DENO) === 'true' ||
+    getEnv(NETSCRIPT_TELEMETRY_ENV_VARS.NETSCRIPT_TELEMETRY_ENABLED) === 'true' ||
+    isProviderRegistered();
+}
+
+function resolveProviderId(value: string | undefined): TelemetryProviderId {
+  return value === 'otel-sdk' ? 'otel-sdk' : DEFAULT_TELEMETRY_PROVIDER_ID;
+}
+
+/**
  * Resolve telemetry configuration from OpenTelemetry environment variables.
  *
  * The resolved configuration is validated with {@linkcode telemetryConfigSchema}
@@ -41,7 +62,10 @@ function getEnv(name: string): string | undefined {
  * @throws {TelemetryConfigError} When the resolved configuration is invalid.
  */
 export function getTelemetryConfig(): TelemetryConfig {
-  const enabled = getEnv(OTEL_ENV_VARS.OTEL_DENO) === 'true';
+  const enabled = resolveEnabled();
+  const provider = resolveProviderId(
+    getEnv(NETSCRIPT_TELEMETRY_ENV_VARS.NETSCRIPT_TELEMETRY_PROVIDER),
+  );
   const endpoint = getEnv(OTEL_ENV_VARS.OTEL_EXPORTER_OTLP_ENDPOINT);
   const protocol = getEnv(OTEL_ENV_VARS.OTEL_EXPORTER_OTLP_PROTOCOL) ?? 'http/protobuf';
   const semconvStabilityOptIn = getEnv(OTEL_ENV_VARS.OTEL_SEMCONV_STABILITY_OPT_IN) ??
@@ -56,6 +80,7 @@ export function getTelemetryConfig(): TelemetryConfig {
 
   return validateTelemetryConfig({
     enabled,
+    provider,
     endpoint,
     protocol,
     semconvStabilityOptIn,
@@ -71,7 +96,7 @@ export function getTelemetryConfig(): TelemetryConfig {
  * Return whether OpenTelemetry instrumentation is enabled.
  */
 export function isTelemetryEnabled(): boolean {
-  return getEnv(OTEL_ENV_VARS.OTEL_DENO) === 'true';
+  return resolveEnabled();
 }
 
 /**
@@ -109,6 +134,7 @@ export function describeTelemetryConfig(): TelemetryConfigDescription {
   const config = getTelemetryConfig();
   return {
     enabled: config.enabled,
+    provider: config.provider,
     endpoint: config.endpoint ?? 'not configured',
     protocol: config.protocol,
     semconvStabilityOptIn: config.semconvStabilityOptIn,

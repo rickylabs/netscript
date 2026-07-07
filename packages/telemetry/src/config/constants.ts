@@ -33,6 +33,33 @@ export const OTEL_ENV_VARS: {
 } as const;
 
 /**
+ * NetScript-specific telemetry environment variable names.
+ *
+ * These decouple NetScript telemetry from the Deno-runtime `OTEL_DENO` switch:
+ * `NETSCRIPT_TELEMETRY_ENABLED` turns telemetry on independently, and
+ * `NETSCRIPT_TELEMETRY_PROVIDER` selects which provider adapter the composition
+ * root binds.
+ */
+export const NETSCRIPT_TELEMETRY_ENV_VARS: {
+  readonly NETSCRIPT_TELEMETRY_ENABLED: 'NETSCRIPT_TELEMETRY_ENABLED';
+  readonly NETSCRIPT_TELEMETRY_PROVIDER: 'NETSCRIPT_TELEMETRY_PROVIDER';
+} = {
+  NETSCRIPT_TELEMETRY_ENABLED: 'NETSCRIPT_TELEMETRY_ENABLED',
+  NETSCRIPT_TELEMETRY_PROVIDER: 'NETSCRIPT_TELEMETRY_PROVIDER',
+} as const;
+
+/**
+ * Identifier of a selectable telemetry provider adapter.
+ *
+ * `otel-deno` binds the Deno runtime's global provider (the zero-dependency
+ * default); `otel-sdk` binds the opt-in `@opentelemetry/sdk-*` provider.
+ */
+export type TelemetryProviderId = 'otel-deno' | 'otel-sdk';
+
+/** Provider selected when `NETSCRIPT_TELEMETRY_PROVIDER` is unset. */
+export const DEFAULT_TELEMETRY_PROVIDER_ID: TelemetryProviderId = 'otel-deno';
+
+/**
  * NetScript's required semantic-convention stability opt-in value.
  */
 export const OTEL_SEMCONV_STABILITY_OPT_IN_VALUE: typeof NETSCRIPT_SEMCONV_STABILITY_OPT_IN =
@@ -44,6 +71,8 @@ export const OTEL_SEMCONV_STABILITY_OPT_IN_VALUE: typeof NETSCRIPT_SEMCONV_STABI
 export interface TelemetryConfig {
   /** Whether OpenTelemetry instrumentation is enabled. */
   enabled: boolean;
+  /** Provider adapter the composition root should bind. */
+  provider: TelemetryProviderId;
   /** Optional OTLP endpoint URL. */
   endpoint: string | undefined;
   /** OTLP exporter protocol. */
@@ -68,6 +97,8 @@ export interface TelemetryConfig {
 export interface TelemetryConfigDescription {
   /** Whether OpenTelemetry instrumentation is enabled. */
   enabled: boolean;
+  /** Provider adapter the composition root should bind. */
+  provider: TelemetryProviderId;
   /** Configured OTLP endpoint or a placeholder. */
   endpoint: string;
   /** OTLP exporter protocol. */
