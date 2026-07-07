@@ -16,11 +16,16 @@ import {
   type AnyContractRouter as ORPCAnyContractRouter,
   inferRPCMethodFromContractRouter,
 } from '@orpc/contract';
+import { SpanNames } from '@netscript/telemetry/attributes';
+import { contextWithSpan, injectContext } from '@netscript/telemetry/context';
+import { getTracer, SpanKind, withSpan } from '@netscript/telemetry/tracer';
 import { getServiceUrl } from '../discovery/service-discovery.ts';
 import type { ClientLinkPort } from '../ports/client-link-factory.ts';
 import type { ContractLike, ServiceClientContext } from '../ports/service-client.ts';
 
 type HttpRuntimeClientContext = ServiceClientContext & ClientRetryPluginContext;
+
+const RPC_CLIENT_TRACER = '@netscript/sdk';
 
 /** Options for the HTTP service-client link adapter. */
 export interface HttpClientLinkOptions<TContract extends ContractLike> {
@@ -105,12 +110,35 @@ export function createHttpClientLink({
         ],
       }),
     ],
-    fetch: (request, init, { context }) =>
-      globalThis.fetch(request, {
-        ...init,
-        cache: context?.cache as RequestCache,
-        signal: context?.signal,
-      }),
+    fetch: async (request, init, { context }) => {
+      const requestUrl = typeof request === 'string' ? request : request.url;
+      return await withSpan(
+        getTracer(RPC_CLIENT_TRACER),
+        SpanNames.RPC_CLIENT,
+        async (span) => {
+          const headers = new Headers(request instanceof Request ? request.headers : undefined);
+          const injected = injectContext({}, contextWithSpan(span));
+          for (const [key, value] of Object.entries(injected)) {
+            headers.set(key, value);
+          }
+          return await globalThis.fetch(request, {
+            ...init,
+            headers,
+            cache: context?.cache as RequestCache,
+            signal: context?.signal,
+          });
+        },
+        {
+          kind: SpanKind.CLIENT,
+          attributes: {
+            'rpc.system': 'orpc',
+            'rpc.service': serviceName,
+            'netscript.rpc.transport': 'orpc',
+            'server.address': new URL(requestUrl).hostname,
+          },
+        },
+      );
+    },
   });
   return link as ClientLinkPort<ServiceClientContext>;
 }

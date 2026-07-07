@@ -9,10 +9,21 @@
  * @module
  */
 
-import { trace } from '@opentelemetry/api';
-import { SpanStatusCode } from '../application/mod.ts';
+import {
+  getActiveSpan,
+  getTracer,
+  SpanKind,
+  SpanStatusCode,
+  withSpan,
+} from '../application/mod.ts';
+import type { Attributes, AttributeValue, Tracer } from '../application/mod.ts';
+import { SpanNames } from '../attributes/mod.ts';
+import { contextWithSpan, getParentContextFromHeaders, withContextAsync } from '../context/mod.ts';
+import type { PropagationHeaders } from '../context/mod.ts';
 import type { GenericHandlerOptions } from './_types.ts';
 import { extractInputKeys } from './_utils.ts';
+
+const TRACER_NAME = '@netscript/orpc';
 
 // ============================================================================
 // TYPES
@@ -47,6 +58,106 @@ export interface TracingPluginOptions {
    * @default '' (no prefix)
    */
   attributePrefix?: string;
+
+  /**
+   * Optional tracer override for tests. Production callers use the shared tracer.
+   */
+  tracer?: Tracer;
+}
+
+interface ErrorLike {
+  readonly message?: string;
+  readonly code?: string;
+  readonly status?: number;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object';
+}
+
+function readProperty(source: unknown, key: string): unknown {
+  return isRecord(source) ? source[key] : undefined;
+}
+
+function readHeaders(source: unknown): PropagationHeaders {
+  const context = readProperty(source, 'context');
+  const contextTraceHeaders = readProperty(context, 'traceHeaders');
+  const request = readProperty(source, 'request');
+  const requestHeaders = readProperty(request, 'headers');
+
+  const traceparent = readHeaderValue(contextTraceHeaders, 'traceparent') ??
+    readHeaderValue(requestHeaders, 'traceparent');
+  const tracestate = readHeaderValue(contextTraceHeaders, 'tracestate') ??
+    readHeaderValue(requestHeaders, 'tracestate');
+
+  const headers: PropagationHeaders = {};
+  if (traceparent) {
+    headers.traceparent = traceparent;
+  }
+  if (tracestate) {
+    headers.tracestate = tracestate;
+  }
+  return headers;
+}
+
+function readHeaderValue(source: unknown, key: string): string | undefined {
+  if (!source) {
+    return undefined;
+  }
+  if (source instanceof Headers) {
+    return source.get(key) ?? undefined;
+  }
+  if (isRecord(source)) {
+    const value = source[key] ?? source[key.toLowerCase()];
+    return typeof value === 'string' ? value : undefined;
+  }
+  return undefined;
+}
+
+function readPath(source: unknown): string {
+  const path = readProperty(source, 'path');
+  if (Array.isArray(path)) {
+    return path.map((part) => String(part)).join('.');
+  }
+  return typeof path === 'string' ? path : 'unknown';
+}
+
+function toErrorLike(error: unknown): ErrorLike {
+  if (error instanceof Error) {
+    const code = readProperty(error, 'code');
+    const status = readProperty(error, 'status');
+    return {
+      message: error.message,
+      ...(typeof code === 'string' ? { code } : {}),
+      ...(typeof status === 'number' ? { status } : {}),
+    };
+  }
+  if (isRecord(error)) {
+    const message = readProperty(error, 'message');
+    const code = readProperty(error, 'code');
+    const status = readProperty(error, 'status');
+    return {
+      ...(typeof message === 'string' ? { message } : {}),
+      ...(typeof code === 'string' ? { code } : {}),
+      ...(typeof status === 'number' ? { status } : {}),
+    };
+  }
+  return { message: String(error) };
+}
+
+function recordException(span: { recordException(error: Error): void }, error: unknown): void {
+  span.recordException(error instanceof Error ? error : new Error(String(error)));
+}
+
+function prefixedAttributes(
+  prefix: string,
+  attributes: Readonly<Record<string, AttributeValue>>,
+): Attributes {
+  const result: Attributes = {};
+  for (const [key, value] of Object.entries(attributes)) {
+    result[`${prefix}${key}`] = value;
+  }
+  return result;
 }
 
 // ============================================================================
@@ -76,7 +187,8 @@ export interface TracingPluginOptions {
  * ```
  */
 export class TracingPlugin {
-  private readonly options: Required<TracingPluginOptions>;
+  private readonly options: Required<Omit<TracingPluginOptions, 'tracer'>>;
+  private readonly tracer?: Tracer;
 
   /**
    * Plugin order - run early to set attributes before other processing
@@ -87,6 +199,7 @@ export class TracingPlugin {
    * Create an oRPC tracing plugin.
    */
   constructor(options: TracingPluginOptions = {}) {
+    this.tracer = options.tracer;
     this.options = {
       serviceName: options.serviceName ?? 'unknown',
       recordInputKeys: options.recordInputKeys ?? true,
@@ -109,60 +222,66 @@ export class TracingPlugin {
     handlerOptions.rootInterceptors ??= [];
     // deno-lint-ignore no-explicit-any
     handlerOptions.rootInterceptors.push(async (options: any) => {
-      const span = trace.getActiveSpan();
+      const headers = readHeaders(options);
+      const parentContext = getParentContextFromHeaders(headers);
+      const tracer = this.tracer ?? getTracer(TRACER_NAME);
 
-      if (span) {
-        // Set base RPC attributes at request start
-        span.setAttributes({
-          [`${attributePrefix}rpc.system`]: 'orpc',
-          [`${attributePrefix}rpc.service`]: serviceName,
-        });
-      }
-
-      try {
-        const result = await options.next();
-
-        // Set success status if we have a matched response
-        if (span && result?.matched) {
-          span.setStatus({ code: SpanStatusCode.OK });
-        }
-
-        return result;
-      } catch (error) {
-        // Handle errors at root level
-        if (span) {
-          const err = error as Error & { code?: string; status?: number };
-          span.setStatus({
-            code: SpanStatusCode.ERROR,
-            message: err.message,
-          });
-          span.setAttributes({
-            [`${attributePrefix}rpc.error.code`]: err.code ?? 'UNKNOWN',
-          });
-          span.recordException(err);
-        }
-        throw error;
-      }
+      return await withSpan(
+        tracer,
+        SpanNames.RPC_SERVER,
+        async (span) =>
+          await withContextAsync(contextWithSpan(span, parentContext), async () => {
+            span.setAttributes(prefixedAttributes(attributePrefix, {
+              'rpc.system': 'orpc',
+              'rpc.service': serviceName,
+              'netscript.rpc.transport': 'orpc',
+            }));
+            try {
+              const result = await options.next();
+              span.setStatus({ code: SpanStatusCode.OK });
+              return result;
+            } catch (error) {
+              const err = toErrorLike(error);
+              span.setStatus({
+                code: SpanStatusCode.ERROR,
+                message: err.message,
+              });
+              span.setAttributes(prefixedAttributes(attributePrefix, {
+                'rpc.error.code': err.code ?? 'UNKNOWN',
+              }));
+              recordException(span, error);
+              throw error;
+            }
+          }),
+        {
+          kind: SpanKind.SERVER,
+          parentContext,
+          attributes: prefixedAttributes(attributePrefix, {
+            'rpc.system': 'orpc',
+            'rpc.service': serviceName,
+            'netscript.rpc.transport': 'orpc',
+          }),
+        },
+      );
     });
 
-    // Add client interceptor for procedure-level tracing
+    // Add client interceptor for procedure-level metadata on the active SERVER span.
     handlerOptions.clientInterceptors ??= [];
     // deno-lint-ignore no-explicit-any
     handlerOptions.clientInterceptors.push(async (options: any) => {
-      const span = trace.getActiveSpan();
+      const span = getActiveSpan();
+      const procedurePath = readPath(options);
 
       if (span) {
-        // Set procedure path
-        const procedurePath = Array.isArray(options.path)
-          ? options.path.join('.')
-          : String(options.path);
-        span.setAttributes({
-          [`${attributePrefix}rpc.method`]: procedurePath,
-        });
+        span.setAttributes(prefixedAttributes(attributePrefix, {
+          'rpc.method': procedurePath,
+          'netscript.rpc.procedure': procedurePath,
+        }));
 
         // Record input keys if enabled
-        if (recordInputKeys && options.input) {
-          const inputKeys = extractInputKeys(options.input, maxInputKeys);
+        const input = readProperty(options, 'input');
+        if (recordInputKeys && input) {
+          const inputKeys = extractInputKeys(input, maxInputKeys);
           if (inputKeys.length > 0) {
             span.setAttribute(`${attributePrefix}rpc.input_keys`, inputKeys.join(','));
           }
@@ -184,26 +303,26 @@ export class TracingPlugin {
         return result;
       } catch (error) {
         if (span) {
-          const err = error as Error & { code?: string; status?: number };
+          const err = toErrorLike(error);
 
           span.setStatus({
             code: SpanStatusCode.ERROR,
-            message: err.message,
+            message: err.message ?? 'Unknown oRPC error',
           });
 
-          span.setAttributes({
-            [`${attributePrefix}rpc.error.code`]: err.code ?? 'UNKNOWN',
-            [`${attributePrefix}rpc.error.message`]: err.message,
-          });
+          span.setAttributes(prefixedAttributes(attributePrefix, {
+            'rpc.error.code': err.code ?? 'UNKNOWN',
+            'rpc.error.message': err.message ?? 'Unknown oRPC error',
+          }));
 
           if (err.status) {
             span.setAttribute(`${attributePrefix}rpc.error.status`, err.status);
           }
 
-          span.recordException(err);
+          recordException(span, error);
           span.addEvent('rpc.procedure.error', {
             'error.code': err.code ?? 'UNKNOWN',
-            'error.message': err.message,
+            'error.message': err.message ?? 'Unknown oRPC error',
           });
         }
 

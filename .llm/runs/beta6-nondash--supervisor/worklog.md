@@ -6,59 +6,55 @@ Public surface:
 
 - T5 / #406 keeps shared span-link fan-in exports on `@netscript/telemetry`: `SpanLinkPort`,
   provider public types, and `createFanInLinks`.
+- T6 / #407 keeps `@netscript/telemetry/orpc` as the oRPC telemetry subpath while replacing the
+  bespoke tracing plugin internals with upstream `@orpc/otel` instrumentation.
 - T7 / #408 adds `@netscript/telemetry/query` exported from `packages/telemetry/query.ts`.
-- T7 query contract exports: `TelemetryQueryPort`, `TelemetryQueryOptions`,
-  trace/span/log/resource/metric read-model types, and `TelemetryOtlpJson`.
-- T7 Standard Schema validators: `traceQueryFilterSchema`, `resourceQueryFilterSchema`,
-  `metricQueryFilterSchema`, plus `validate*QueryFilter` helpers.
-- T7 adapter exports: `AspireTelemetryQuery`, `createAspireTelemetryQuery`, and
-  `createTelemetryQuery`.
 
 Domain vocabulary:
 
 - T5 span links describe fan-in relationships across stream and saga execution.
+- T6 oRPC telemetry uses upstream oRPC SERVER/CLIENT instrumentation spans and NetScript-owned
+  `netscript.*` attributes on the active span.
 - T7 query-side read models are separate from write-side span contracts:
   `TelemetryTrace`, `TelemetrySpan`, `TelemetryLog`, `TelemetryResource`, `TelemetryMetric`,
   `TelemetrySpanEvent`, and `TelemetrySpanLink`.
-- Attribute values preserve TC-1..14 vocabulary by carrying canonical attribute names verbatim,
-  including `netscript.*` and upstream semconv keys.
 
 Ports:
 
 - T5 exposes span-link construction through the shared telemetry application layer.
+- T6 wires first-party oRPC instrumentation behind the existing telemetry tracer/provider seam.
 - T7 `TelemetryQueryPort` is the single read-side seam under
   `src/ports/telemetry-query-port.ts`.
-- `AspireTelemetryQuery` implements the T7 port against Aspire dashboard `/api/telemetry/*`
-  endpoints.
 
 Constants:
 
-- No new finite telemetry convention constants in T7. Existing TC-1..14 and attribute vocabulary
-  remain authoritative.
+- Existing TC-1..14 and `netscript.*` attribute vocabulary remain authoritative.
+- T6 must not introduce a second copy of upstream oRPC span lifecycle policy.
 
 Commit slices:
 
-- T5: span-link fan-in exports and plugin stream/saga wiring, landed on `main` before this merge.
-- T7: query contract, Aspire query adapter, `./query` export, tests, and harness evidence.
-- Merge slice: additive conflict resolution after T5 landed; preserve both T5 span-link and T7 query
-  surfaces.
+- T5: span-link fan-in exports and plugin stream/saga wiring, landed on `main`.
+- T6: rework bespoke oRPC tracing to `@orpc/otel`, preserve SDK/AI/worker acceptance, and record
+  gate evidence for PR #568.
+- T7: query contract, Aspire query adapter, `./query` export, tests, and harness evidence, landed
+  on `main`.
 
 Deferred scope:
 
-- Dashboard panels, UI integration, and dashboard data-layer switching are out of scope for T7.
-- Full `scaffold.runtime` E2E is out of scope per T8 (#409).
+- Dashboard panels, UI integration, and dashboard data-layer switching are out of scope.
+- Full `scaffold.runtime` E2E is out of scope per T8 (#409) unless explicitly requested.
 
 Contributor path:
 
-- Add a new query backend by implementing `TelemetryQueryPort` under `src/adapters/<backend>/`,
-  re-exporting it from `packages/telemetry/query.ts`, and adding adapter tests under
-  `tests/query/`.
+- Add new telemetry adapters behind `src/adapters/<backend>/` or existing provider seams.
+- Add new query backends by implementing `TelemetryQueryPort` under `src/adapters/<backend>/`,
+  re-exporting from `packages/telemetry/query.ts`, and adding adapter tests under `tests/query/`.
 
-## T5 / #406 — SpanLinkPort fan-in links
+## T5 / #406 - SpanLinkPort fan-in links
 
 Date: 2026-07-08
 
-T5 landed on `main` before this merge.
+T5 landed on `main` before this rework.
 
 ### Scope
 
@@ -68,10 +64,6 @@ T5 landed on `main` before this merge.
   with SDK-preserved fan-in link attributes.
 - Moved saga OTEL tracer/facade implementation into `@netscript/plugin-sagas-core/telemetry`,
   leaving the plugin-local tracer file as a thin compatibility re-export.
-- Updated saga telemetry attributes and metric names to the `netscript.*` convention and added the
-  seven shared saga metric instruments.
-- Added tests for SDK link attributes, Deno-native dropped-link attributes, streams
-  producer/consumer spans, saga fan-in links, and shared saga meters.
 
 ### Gate Evidence
 
@@ -84,23 +76,25 @@ T5 landed on `main` before this merge.
 | telemetry doc lint | `deno doc --lint packages/telemetry/mod.ts` | 0 | Checked 1 file |
 | telemetry publish dry-run | `deno publish --dry-run --allow-dirty` from `packages/telemetry` | 0 | Success; no `--allow-slow-types` |
 
-### Reconcile
-
-- `deno.lock` churn appeared during T5 validation after package import-map additions and publish
-  dry-run. It was reverted per #406 constraints.
-- No plan or doctrine divergence recorded for T5.
-
-## T7 / #408 — Query Contract and Aspire Adapter
-
-See `worklog-408.md` for per-slice implementation notes and original gate results.
-
-## Merge Resolution — PR #567 after T5 landed
+## T6 / #407 - oRPC telemetry rework
 
 Date: 2026-07-08
 
-- Merged `origin/main` into `feat/408-telemetry-t7-query`.
-- Conflict markers appeared only in shared harness artifacts:
-  `context-pack.md`, `drift.md`, and `worklog.md`.
-- Resolution was additive: retained T5 span-link/fan-in run evidence from `main` and T7 query
-  contract/Aspire adapter evidence from this branch.
-- Source files merged without conflict; no tests were skipped or disabled.
+- Owner-directed rework is in progress for PR #568.
+- Original slice artifact: `.llm/runs/beta6-nondash--supervisor/worklog-407.md`.
+- Drift entry records the major wrap-do-not-reinvent finding and the `@orpc/otel` resolution.
+
+## T7 / #408 - Query Contract and Aspire Adapter
+
+T7 landed on `main` before this rework. See `worklog-408.md` in the T7 branch history for original
+per-slice implementation notes and gate results.
+
+## Rebase Resolution - PR #568 after T5/T7 landed
+
+Date: 2026-07-08
+
+- Rebasing `feat/407-telemetry-t6-orpc-spans` onto `origin/main` produced conflict markers only in
+  shared harness artifacts: `context-pack.md`, `drift.md`, and `worklog.md`.
+- Resolution was additive: retained T5 span-link/fan-in evidence, T6 oRPC scope, and T7 query
+  contract/Aspire adapter evidence.
+- Source files continue rebasing after artifact resolution; no tests were skipped or disabled.
