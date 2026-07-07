@@ -305,3 +305,25 @@ moderate (lane reassignment, scope unchanged).
 - **IMPL-EVAL dispatched** (OpenHands qwen-3.7-max, verdict-first) — check 3 independently re-verifies
   the pool assignability; check 2 the reject-before-access allowlist. Verdict file `evaluate-379.md`.
   Merge held until PASS + close-gate.
+
+### #379 (FA4) IMPL-EVAL PASS + #258 (FB5) A1 FAIL_FIX→fixed→PASS + IMPL-EVAL dispatched (2026-07-07)
+- **#379 (PR #563):** IMPL-EVAL (OpenHands qwen-3.7-max) posted **OPENHANDS_VERDICT: PASS**. With the
+  Tier-A A1 PASS, #379 is green (A1 + IMPL-EVAL). Merge posture: prep + surface to owner (merge grant
+  not assumed post-compaction; owner merged #550 themselves).
+- **#258 (PR #565):** landed `92465bfa`. **A1 caught a reachable security defect** — `renderNode`'s
+  array branch recursed at constant depth, and the core `render_ui` validator does not validate the
+  `props` interior, so `props.children:[[[[…]]]]` bypassed the depth guard → stack-overflow DoS.
+  Verdict **FAIL_FIX**; fix routed to the generator thread (`019f3bce-…`) via Windows-side
+  `codex-resume.ts`.
+  - Generator fix `fe05c814`: array branch → `depth + 1`; new non-deferrable regression test
+    `bounds nested arrays by the max depth guard` (nestedArray(50) → `max-depth` fallback, fails-before
+    /passes-after). 4/4 tests green; no lock churn; whitelist/no-raw-HTML intact; `gate:e2e` correctly
+    deferred to #564 (unchecked).
+  - **A1 PASS** on re-review. **IMPL-EVAL dispatched** (qwen-3.7-max, security-hardened re-attack of the
+    depth+whitelist guards). Verdict file `evaluate-258.md`.
+- **Drift note:** the B→D lane-override adversarial mitigation was satisfied at A1 — Tier-A caught and
+  had fixed the bypass before spending any eval cycle; no separate Codex adversarial round was run.
+- **Tooling lesson:** `codex-resume.ts`/`dispatch-openhands.ts` are Windows-side tools (they shell
+  into WSL via `wsl.exe`); running them *inside* WSL recursively invokes `wsl.exe` and corrupts the
+  command ("MZ" PE-header error). Run from Windows deno; `--message-file`/`--prompt-file` take Windows
+  paths. Backgrounded `wsl.exe bash -lc '…'` from the Bash tool also mangles multi-line strings.
