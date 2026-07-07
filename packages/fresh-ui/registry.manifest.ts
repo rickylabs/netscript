@@ -1193,6 +1193,29 @@ export const freshUiRegistryManifest: RegistryManifest = {
       registryDependencies: ['theme-seed'],
       css: [{ layer: 'components', content: "@import './ui/mcp-ui-widget.css';" }],
     },
+    {
+      name: 'render-ui',
+      kind: 'lib',
+      layer: 2,
+      description:
+        'Safe recursive render_ui payload renderer with depth and block-vocabulary guards for Fresh UI generative surfaces.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['ai', 'generative-ui', 'renderer', 'security'],
+      files: [{
+        source: 'src/ai/render-ui.tsx',
+        target: '@lib/ai/render-ui.tsx',
+      }],
+      registryDependencies: [
+        'theme-seed',
+        'layout-objects',
+        'chart-block',
+        'stats-grid',
+        'data-table',
+        'card',
+      ],
+      dependencies: ['jsr:@netscript/ai@^0.0.1-beta.5', 'npm:preact@^10.29.2'],
+    },
   ],
   collections: [
     {
@@ -1261,6 +1284,7 @@ export const freshUiRegistryManifest: RegistryManifest = {
         'markdown',
         'chat-render',
         'mcp-ui-widget',
+        'render-ui',
       ],
     },
     {
