@@ -20,6 +20,13 @@ export type SagaTelemetryStatus = 'ok' | 'error';
 /** W3C parent trace context optionally carried into a saga span. */
 export type SagaTraceParent = Readonly<{ traceparent?: string; tracestate?: string }>;
 
+/** Upstream message represented as a span link on a saga fan-in span. */
+export type SagaTraceLink = Readonly<{
+  traceparent?: string;
+  tracestate?: string;
+  attributes?: SagaTelemetryAttributes;
+}>;
+
 /** Structural span boundary compatible with OpenTelemetry adapters. */
 export interface SagaTelemetrySpan {
   /** Attach a single defined attribute to the span. */
@@ -43,6 +50,7 @@ export interface SagaTelemetryTracer {
       kind: SagaTelemetrySpanKind;
       attributes?: SagaTelemetryAttributes;
       parent?: SagaTraceParent;
+      links?: readonly SagaTraceLink[];
     }>,
   ): SagaTelemetrySpan;
 }
@@ -91,6 +99,7 @@ export type SagaHandleSpanInput = Readonly<{
   durabilityTier: SagaDurabilityTier;
   correlationKey?: string;
   parent?: SagaTraceParent;
+  links?: readonly SagaTraceLink[];
 }>;
 
 /** Input attributes for a send cascade span. */
@@ -149,6 +158,7 @@ const NOOP_TRACER: SagaTelemetryTracer = Object.freeze({
       kind: SagaTelemetrySpanKind;
       attributes?: SagaTelemetryAttributes;
       parent?: SagaTraceParent;
+      links?: readonly SagaTraceLink[];
     }>,
   ): SagaTelemetrySpan {
     return NOOP_SPAN;
@@ -174,6 +184,7 @@ export class SagaInstrumentation {
       kind: 'internal',
       attributes: handleAttributes(input),
       parent: input.parent,
+      links: input.links,
     });
   }
 

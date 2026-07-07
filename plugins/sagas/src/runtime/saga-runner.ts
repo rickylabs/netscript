@@ -10,7 +10,7 @@ import {
   type SagaRuntimeSupervisorOptions,
   type SagaRuntimeSupervisorSnapshot,
 } from './saga-supervisor.ts';
-import { createSagaTelemetry } from '../telemetry/otel-saga-tracer.ts';
+import { createSagaTelemetry } from '@netscript/plugin-sagas-core/telemetry';
 
 /** Module importer boundary used by the runtime registry loader. */
 export type SagaRuntimeModuleImporter = (specifier: string) => Promise<unknown>;

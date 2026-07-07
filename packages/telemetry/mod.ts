@@ -48,19 +48,40 @@ export type {
   Attributes,
   AttributeValue,
   Context,
+  CreateSpanOptions,
   Exception,
   Link,
   Span,
   SpanContext,
+  SpanOptions,
   SpanStatus,
-  SpanStatusCode,
   TimeInput,
+  Tracer,
   TraceState,
 } from './src/domain/types.ts';
+export { SpanKind, SpanStatusCode } from './src/domain/types.ts';
+export type {
+  Counter,
+  Histogram,
+  Meter,
+  MeterPort,
+  MetricInstrumentOptions,
+  ObservableCallback,
+  ObservableGauge,
+  ObservableResult,
+  PropagationExtractCarrier,
+  PropagationInjectCarrier,
+  PropagatorPort,
+  SpanLinkPort,
+  TelemetryProviderDescriptor,
+  TelemetryProviderOptions,
+  TracerProviderPort,
+} from './src/ports/mod.ts';
 export { inspectTelemetry } from './src/diagnostics/inspect-telemetry.ts';
 export type { InspectionReport } from './src/diagnostics/inspect-telemetry.ts';
 
 export {
+  createFanInLinks,
   createSpan,
   getActiveContext,
   getActiveSpan,
@@ -70,4 +91,6 @@ export {
   withSpan,
   withSpanSync,
 } from './src/application/mod.ts';
+export type { FanInLinkMessage } from './src/application/mod.ts';
 export { getParentContextFromHeaders, injectContext } from './src/context/mod.ts';
+export type { PropagationHeaders, SerializedTraceContext } from './src/context/mod.ts';

@@ -28,6 +28,7 @@ import type {
 } from '../../services/src/routers/v1-types.ts';
 import { publishSagaMessage } from '../../services/src/routers/v1-handlers.ts';
 import { createSagaTelemetry } from '../../src/telemetry/otel-saga-tracer.ts';
+import { SagaAttributes } from '@netscript/plugin-sagas-core/telemetry';
 
 Deno.test('publishSagaMessage propagates API trace headers as saga.handle parent context', async () => {
   const tracer = new RecordingTracer();
@@ -66,7 +67,7 @@ Deno.test('publishSagaMessage propagates API trace headers as saga.handle parent
     assertEquals(span.parentTraceId, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
     assertEquals(span.parentSpanId, 'bbbbbbbbbbbbbbbb');
     assertEquals(span.spanContext().traceId, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
-    assertEquals(span.attributes.outcome, 'success');
+    assertEquals(span.attributes[SagaAttributes.OUTCOME], 'success');
   } finally {
     await runtime.stop('publish trace linkage test complete');
   }
@@ -107,7 +108,7 @@ Deno.test('publishSagaMessage records ERROR saga.handle span when handler throws
     assertEquals(tracer.started[0].parentTraceparent, serverTraceparent);
     assertEquals(span.status, { code: 2, message: 'service handler failed' });
     assertEquals(span.exceptions, [failure]);
-    assertEquals(span.attributes.outcome, 'error');
+    assertEquals(span.attributes[SagaAttributes.OUTCOME], 'error');
     assertEquals(span.ended, true);
   } finally {
     await runtime.stop('publish trace failure test complete');

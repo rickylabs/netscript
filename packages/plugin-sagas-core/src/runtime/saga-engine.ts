@@ -22,7 +22,7 @@ import type {
   SagaStorePort,
 } from '../ports/mod.ts';
 import { MemorySagaAppliedKeyStore } from './saga-applied-keys.ts';
-import { SagaInstrumentation } from '../telemetry/mod.ts';
+import { SagaAttributes, SagaInstrumentation } from '../telemetry/mod.ts';
 import { type SagaTelemetryOutcome, SagaTelemetryOutcomes } from '../telemetry/mod.ts';
 
 /** Registered handler target stored in the O(1) message dispatch index. */
@@ -258,11 +258,22 @@ export class SagaEngine implements SagaBusPort {
           traceparent: message.traceparent,
           tracestate: message.tracestate,
         },
+        links: [{
+          traceparent: message.traceparent,
+          tracestate: message.tracestate,
+          attributes: {
+            [SagaAttributes.SAGA_ID]: entry.sagaId,
+            [SagaAttributes.SAGA_INSTANCE_ID]: instanceId,
+            [SagaAttributes.SAGA_EVENT_TYPE]: message.type,
+            [SagaAttributes.SAGA_ATTEMPT]: attempt,
+            [SagaAttributes.SAGA_CORRELATION_KEY]: correlationKey,
+          },
+        }],
       });
       const startedAt = performance.now();
       const span = this.#instrumentation.startHandleSpan(handleSpanInput);
       this.#instrumentation.recordStateBefore(span, {
-        'saga.status': loaded?.metadata.status,
+        [SagaAttributes.STATUS]: loaded?.metadata.status,
       });
 
       try {
@@ -286,7 +297,7 @@ export class SagaEngine implements SagaBusPort {
 
         const outcome = telemetryOutcomeFromStatus(status);
         this.#instrumentation.recordStateAfter(span, {
-          'saga.status': status,
+          [SagaAttributes.STATUS]: status,
         });
         this.#instrumentation.finishSpan(span, outcome);
         this.#instrumentation.recordHandleDuration({
