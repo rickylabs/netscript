@@ -5,14 +5,86 @@ import {
   type TextMapSetter,
   trace,
 } from '@opentelemetry/api';
-import type { Context, Span, SpanContext } from '../application/mod.ts';
+import type { Context, Span, SpanContext, TraceState } from '../application/mod.ts';
 import type { ParsedTraceparent, PropagationHeaders, SerializedTraceContext } from './types.ts';
 
 const TRACEPARENT_HEADER = 'traceparent';
 const TRACESTATE_HEADER = 'tracestate';
 const TRACE_CONTEXT_VERSION = '00';
+/** W3C reserves version `ff`; a traceparent carrying it is invalid. */
+const INVALID_VERSION = 'ff';
 const INVALID_TRACE_ID = '00000000000000000000000000000000';
 const INVALID_SPAN_ID = '0000000000000000';
+const HEX_VERSION = /^[0-9a-f]{2}$/;
+const HEX_TRACE_ID = /^[0-9a-f]{32}$/;
+const HEX_SPAN_ID = /^[0-9a-f]{16}$/;
+const HEX_FLAGS = /^[0-9a-f]{2}$/;
+/** W3C `tracestate` allows at most 32 list members. */
+const TRACESTATE_MAX_MEMBERS = 32;
+
+/**
+ * Minimal immutable {@link TraceState} implementation used to preserve
+ * `tracestate` across the manual traceparent fallback in {@link extractContext}.
+ *
+ * A registered W3C propagator handles `tracestate` when a provider is active;
+ * this parser backs the fallback path so `tracestate` is never silently dropped
+ * when the propagator yields no remote span.
+ */
+class ParsedTraceState implements TraceState {
+  readonly #entries: ReadonlyArray<readonly [string, string]>;
+
+  constructor(entries: ReadonlyArray<readonly [string, string]>) {
+    this.#entries = entries;
+  }
+
+  get(key: string): string | undefined {
+    return this.#entries.find(([entryKey]) => entryKey === key)?.[1];
+  }
+
+  set(key: string, value: string): TraceState {
+    // W3C: an updated/added key moves to the front of the list.
+    const rest = this.#entries.filter(([entryKey]) => entryKey !== key);
+    const head: readonly [string, string] = [key, value];
+    return new ParsedTraceState([head, ...rest].slice(0, TRACESTATE_MAX_MEMBERS));
+  }
+
+  unset(key: string): TraceState {
+    return new ParsedTraceState(this.#entries.filter(([entryKey]) => entryKey !== key));
+  }
+
+  serialize(): string {
+    return this.#entries.map(([key, value]) => `${key}=${value}`).join(',');
+  }
+}
+
+/**
+ * Parse a W3C `tracestate` header into a {@link TraceState}.
+ *
+ * Malformed members are dropped and the list is truncated to the W3C limit of
+ * 32 members. Returns `undefined` when the header is absent or carries no valid
+ * members so an empty trace-state is never attached to a span context.
+ */
+export function parseTraceState(header: string | undefined): TraceState | undefined {
+  if (!header) {
+    return undefined;
+  }
+  const entries: Array<readonly [string, string]> = [];
+  for (const rawMember of header.split(',')) {
+    const member = rawMember.trim();
+    if (member.length === 0) {
+      continue;
+    }
+    const separator = member.indexOf('=');
+    if (separator <= 0 || separator === member.length - 1) {
+      continue;
+    }
+    entries.push([member.slice(0, separator), member.slice(separator + 1)]);
+    if (entries.length >= TRACESTATE_MAX_MEMBERS) {
+      break;
+    }
+  }
+  return entries.length === 0 ? undefined : new ParsedTraceState(entries);
+}
 
 const headersGetter: TextMapGetter<PropagationHeaders> = {
   keys(carrier: PropagationHeaders) {
@@ -54,8 +126,14 @@ export function parseTraceparent(traceparent: string): ParsedTraceparent | null 
   const traceId = parts[1]!;
   const parentId = parts[2]!;
   const flags = parts[3]!;
+  // Validate every field as W3C-shaped lowercase hex of the exact width, and
+  // reject the reserved `ff` version and the all-zero (invalid) identifiers so
+  // the fallback in `extractContext` cannot build a bogus remote span context.
   if (
-    version.length !== 2 || traceId.length !== 32 || parentId.length !== 16 || flags.length !== 2
+    !HEX_VERSION.test(version) || version === INVALID_VERSION ||
+    !HEX_TRACE_ID.test(traceId) || traceId === INVALID_TRACE_ID ||
+    !HEX_SPAN_ID.test(parentId) || parentId === INVALID_SPAN_ID ||
+    !HEX_FLAGS.test(flags)
   ) {
     return null;
   }
@@ -138,11 +216,16 @@ export function extractContext(headers: PropagationHeaders): Context {
     return context.active();
   }
 
+  // Preserve `tracestate` when reconstructing the remote span context. The
+  // propagator handles this when a provider is registered; without one the
+  // fallback previously dropped `tracestate`, severing vendor trace continuation.
+  const traceState = parseTraceState(headers[TRACESTATE_HEADER] ?? headers['tracestate']);
   const remoteSpanContext: SpanContext = {
     traceId: parsed.traceId,
     spanId: parsed.parentId,
     traceFlags: parsed.traceFlags,
     isRemote: true,
+    ...(traceState ? { traceState } : {}),
   };
 
   return trace.setSpan(context.active(), trace.wrapSpanContext(remoteSpanContext));

@@ -1,6 +1,7 @@
 /** @module @netscript/plugin-triggers-core/telemetry */
 
 export {
+  DeprecatedTriggerAttributes,
   TriggerAttributes,
   TriggerMetricNames,
   TriggerSpanNames,
