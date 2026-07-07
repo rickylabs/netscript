@@ -2,27 +2,39 @@
  * @module @netscript/ai/mcp
  *
  * MCP transport adapters for `@netscript/ai`: stdio, reconnectable
- * Streamable-HTTP, injected auth modes, lifecycle state, and tool-registry
- * registration.
+ * Streamable-HTTP, injected auth modes, lifecycle state, multi-server pooling,
+ * `ui://` resource extraction, and tool-registry registration.
  *
  * @example Create a Streamable-HTTP MCP transport
  * ```ts
- * import { createMcpTransport, registerMcpTools } from "@netscript/ai/mcp";
+ * import { createMcpTransportPool, registerMcpTools } from "@netscript/ai/mcp";
  * import { createToolRegistry } from "@netscript/ai/tools";
  *
- * const transport = createMcpTransport({
- *   kind: "streamable-http",
- *   serverId: "search",
- *   url: "https://mcp.example.com",
- *   auth: { mode: "api-token", token: "injected-at-runtime", scheme: "Bearer" },
+ * const pool = createMcpTransportPool({
+ *   servers: [{
+ *     kind: "streamable-http",
+ *     serverId: "search",
+ *     url: "https://mcp.example.com",
+ *     auth: { mode: "api-token", token: "injected-at-runtime", scheme: "Bearer" },
+ *   }],
  * });
  *
  * const registry = createToolRegistry();
- * await registerMcpTools(registry, transport);
+ * await registerMcpTools(registry, pool);
  * ```
  */
 
 export { createMcpTransport, type McpTransportConfig } from './src/mcp/application/factory.ts';
+export {
+  createMcpTransportPool,
+  createMcpTransportPoolFromTransports,
+  extractMcpUiResources,
+  type McpPooledToolResult,
+  McpTransportPool,
+  type McpTransportPoolConfig,
+  type McpTransportPoolOptions,
+  type McpUiResource,
+} from './src/mcp/application/pool.ts';
 export {
   type McpToolRegistration,
   registerMcpTools,
@@ -36,6 +48,9 @@ export {
   type StreamableHttpMcpTransportConfig,
 } from './src/mcp/adapters/streamable-http-transport.ts';
 export {
+  MCP_AUTH_MODES,
+  MCP_CONNECTION_STATES,
+  MCP_TRANSPORT_KINDS,
   type McpAuthConfig,
   type McpAuthMode,
   type McpBackoffConfig,
@@ -43,6 +58,7 @@ export {
   type McpConnectionState,
   type McpConnectOptions,
   type McpConnectorConfig,
+  type McpStateChangeHandler,
   type McpToolDescriptor,
   type McpToolParameters,
   type McpToolRegistry,
