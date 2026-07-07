@@ -49,3 +49,37 @@ All five wave-1 slices are impl-done, Tier-A A1 PASS, on draft PRs from base `a1
 
 Finalization (adversarial WSL Codex review → one IMPL-EVAL each) is gated on the Codex quota reset
 (07-07 03:52); nothing is merge-ready before then regardless.
+
+---
+
+## #5 — Wave-1 IMPL-EVAL outcome + two live blockers (2026-07-07)
+
+Per your "skip adversarial, launch IMPL eval": all 5 wave-1 IMPL-EVALs ran. **3 PASS → you merged:
+#560 (#404), #559 (#405), #549 (#306).** Two remain:
+
+**#558 (#494 AI-494) — re-dispatched, no action needed.** First IMPL-EVAL returned no verdict
+(exhausted its budget writing a check-plan without running it, `OPENHANDS_VERDICT: NONE`).
+Re-dispatched with a tightened verdict-first prompt (comment 4901284973). Watching for the verdict.
+
+**#550 (#257 AI-257) — DECISION NEEDED.** Code is IMPL-EVAL PASS (island is sound, security-rigorous,
+129/129 tests). But the `close-gate` CI (correctly) fails: issue #257 has 6 unchecked acceptance
+boxes. 5 of them are backed by real A1+IMPL-EVAL evidence and I can check them honestly. The 6th —
+`gate:e2e` (scaffold.runtime must cover `ui:add ai` copying `McpUiWidget` into a Fresh app) — is a
+**genuinely unbuilt acceptance criterion**: the e2e suite has zero `ui:add` coverage; #257's slice
+was island+manifest only. I won't falsify that box.
+  - **Ask (a):** Build the `ui:add ai` scaffold.runtime e2e coverage as a small CLI/e2e-suite slice
+    (WSL Codex) under #257 — **or** amend #257 to move `gate:e2e` to a follow-up issue so #257's bar
+    is the 5 verified boxes. *Recommend the follow-up split* — the island is proven; ui:add scaffold
+    coverage is orthogonal CLI-suite work.
+  - **Note:** #550 cannot merge today regardless — charter line 67 keeps #463 (MCP pooling, not yet
+    implemented) upstream of #257. So the `gate:e2e` call isn't blocking today; #550 waits on #463.
+
+**Process fix applied:** the #550 evaluator misread the close-gate as "PR body has a closing keyword"
+rather than "issue acceptance boxes checked." I hardened the re-dispatched #494 prompt with the
+correct close-gate definition; folding it into the standing IMPL-EVAL template.
+
+## #6 — #303 (S2) is materially smaller than planned (FYI, `303-audit.md` committed)
+The 172a-2-SOUND seam is already fixed on main (#332); AC1 effectively met; all 4 slow-types
+carve-outs are stale. Real remaining work = AC2 doc-lint (fresh-ui `./interactive` = the tentpole) +
+mechanical cleanup. Rescoped to 3 slices (A/B/C). Full audit in the run dir. No action unless you
+want to re-prioritize #303 into this wave.

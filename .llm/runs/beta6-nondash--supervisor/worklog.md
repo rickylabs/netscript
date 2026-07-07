@@ -160,3 +160,23 @@ All five: base a1669f60, no lock churn, scoped gates green, boundaries respected
 WSL Codex review per PR + one IMPL-EVAL (qwen-3.7-max) each, after Codex quota reset (07-07 03:52).
 Merge-order dependencies: T3#404 before T5#406/T6-ai; #257 before #258; T3/T4 parallel (D-2 second
 rebases). Merge on green — RE-READ charter.md first (grant lost on compaction).
+
+### Wave 1 IMPL-EVAL — dispatched + outcome (owner override: "skip adversarial, launch IMPL eval")
+2026-07-07. Per explicit owner instruction, skipped the per-PR adversarial WSL Codex pass and went
+straight to IMPL-EVAL (OpenHands qwen-3.7-max, `--iterations 1000`, `--output pr-comment`), one per
+PR. Dispatch comments: #560→4896031663 · #559→4896033675 · #558→4896034205 · #550→4896034823 ·
+#549→4896035342. Outcomes:
+- **PASS → MERGED by owner:** #560 (#404 TEL-T3), #559 (#405 TEL-T4), #549 (#306 PROG-306). Three
+  slices landed on main.
+- **#558 (#494 AI-494) → NONE (incomplete, not a verdict).** The eval exhausted its iteration budget
+  enumerating a 9-step verification plan without executing any of it (`OPENHANDS_VERDICT: NONE`, no
+  `evaluate-494.md`, no code touched). Re-dispatched 2026-07-07 with a tightened verdict-first prompt
+  (`impl-eval-494-v2.md`: cheapest-decisive-checks-first ordering, post verdict after checks 1–4,
+  deep adapter-vs-live-API check moved to optional tail, `--iterations 1500`) → comment 4901284973.
+  Re-dispatch is consistent with the single-eval-round rule: NONE is a failed run, not a verdict.
+- **#550 (#257 AI-257) → IMPL-EVAL PASS on code, but `close-gate` CI FAILED.** `evaluate-257.md`
+  verdict PASS (sandbox rigorous/un-bypassable, keyed remount, manifest append-only, no casts, F-6
+  dry-run exit 0, 129/129 tests). BUT the evaluator misread the merge close-gate: its §9 checked only
+  that `Closes #257` is present in the PR body, whereas `check-close-gate.ts` enforces that issue
+  #257's acceptance/`gate:` checkboxes are checked with evidence. CI correctly failed on 6 unchecked
+  boxes. See drift D8.
