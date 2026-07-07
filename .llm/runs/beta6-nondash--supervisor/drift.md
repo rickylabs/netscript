@@ -111,3 +111,11 @@ STALE — each publishes clean WITHOUT the flag. Genuine remaining #303 work = *
 doc-lint** (fresh-ui `./interactive` 123 errors is the tentpole) + mechanical carve-out/stale-debt
 cleanup. Rescoped to 3 slices (A carve-out+debt cleanup, B plugin-layer doc-lint, C fresh-ui
 doc-lint); exclude `plugin-ai-core` (#238-coordinated). Full evidence in `303-audit.md`.
+### DRIFT — #258 lane override B→D (2026-07-07)
+plan.md row 44 assigns #258 to Lane B (Opus 4.8 high) as a design-sensitive fresh-ui UI slice.
+Overridden to **Lane D (WSL Codex)**. Rationale: (1) Lane B (Opus) is weekly-limited until Jul 11 and
+the Anthropic budget is on life-support until Saturday; (2) the owner explicitly directed resuming WSL
+Codex dispatch and extreme token caution. Quality mitigation: the security-critical depth/whitelist
+guards are specified as HARD non-deferrable unit regressions in the brief, and this slice gets a
+mandatory adversarial Codex review before IMPL-EVAL (per the adversarial-impl-review rule). Severity:
+moderate (lane reassignment, scope unchanged).

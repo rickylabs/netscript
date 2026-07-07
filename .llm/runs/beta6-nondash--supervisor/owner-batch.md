@@ -98,3 +98,18 @@ want to re-prioritize #303 into this wave.
 - **Merge posture:** this is a post-compaction session, so I'm holding at **prep-green + surface** — I
   am not auto-merging. If you want #558 (and #550 once #463 lands) merged autonomously on green,
   re-confirm the merge-on-green grant and I'll proceed.
+
+## Batch #8 — AI-stack W1 merged, W2 dispatched (2026-07-07)
+- **W1 fully landed on main:** #494 (per-turn), #463 (MCP pool primitive), #257 (McpUiWidget island)
+  all merged. You merged #550 (#257).
+- **W2 dispatched to WSL Codex (both deps-clear):**
+  - **#379** FA4 call-route handler (Lane D) — thread `019f3bca`, consumes the #463 pool, server-side
+    allowlist + stdio fallback + OTel.
+  - **#258** FB5 fresh-ui generative-ui renderer — **lane override B→D** (Opus lane budget-constrained;
+    recorded in drift). Security-critical depth + whitelist guards specified as hard unit regressions;
+    adversarial review before IMPL-EVAL.
+- **Flow per slice:** land → A1 supervisor review → IMPL-EVAL (separate OpenHands session) → merge on
+  green (grant active). I'll surface each verdict.
+- **Last AI-stack gate:** #464 (e2e --mcp) dispatches once #379 + #258 merge.
+- Token posture: implementation is on the WSL Codex lane (cheap); my Opus calls stay lean per your
+  life-support constraint.

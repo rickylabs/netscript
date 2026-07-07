@@ -257,3 +257,35 @@ PR. Dispatch comments: #560→4896031663 · #559→4896033675 · #558→48960342
 - **Next unblocks:** #379 (FA4 createMcpAppCallHandler) deps = #257 + #463 — #463 done, #379 becomes
   dispatchable once #550 merges. PM-0 #511 independent (queued). #561 = backlog follow-up (ui:add e2e).
 - Housekeeping TODO: remove merged WSL worktree `netscript-463-mcp` (branch deleted).
+
+### AI-stack W2 dispatched — #379 + #258 (2026-07-07, owner "proceed with remaining items")
+W1 fully landed (#494, #463, #257 all merged). W2 = the two slices whose deps are now all on main.
+
+- **#379 (FA4 `createMcpAppCallHandler`)** — deps FA3 #252 + E5 #244 + FB4 #257 all MERGED. Lane D
+  (Codex, its planned lane). Worktree `/home/codex/repos/netscript-379-callroute`, branch
+  `feat/379-mcp-app-call-handler` @ b5d09693, upstream NONE (push-safety gate passed after unset).
+  Thread `019f3bca-26fc-7ff2-b857-35ad2af07159` (started 10:55Z). Brief: sibling route factory to the
+  merged FA3 `createMcpSandboxHandler`; consumes the #463 `McpTransportPool` (not re-hand-rolled);
+  same-server allowlist re-enforced server-side; stdio warm-client fallback; OTel `mcp.tool.call`
+  span continuing the browser trace; gate:jsr (no --allow-slow-types) + arch:check.
+- **#258 (FB5 fresh-ui generative-ui-renderer)** — deps FB0 #253 + E4 #243 both MERGED/`[x]` in the
+  #238 DAG. Worktree `/home/codex/repos/netscript-258-genui`, branch
+  `feat/258-fresh-ui-genui-renderer` @ b5d09693, upstream NONE. Brief: recursive JSON-tree renderer
+  consuming E4's `render_ui` schema; curated 3-category vocabulary (layout/viz/data) mapped 1:1 to
+  fresh-ui primitives; **security-critical depth guard + tag whitelist guard** with NON-deferrable
+  unit regressions; extends the existing `ai` collection; gate:e2e (scaffold.runtime) deferrable via
+  follow-up if a separate lift (guard unit tests are not).
+- **Both:** draft PR, `Closes #N`, `Part of #238` (no keyword on epic), milestone `0.0.1-beta.6`,
+  explicit-refspec push, no deno.lock mutation, no new casts, READY_FOR_A1_REVIEW marker (no
+  self-certify).
+- **Next unblock:** #464 (FAI-2 e2e --mcp, the LAST AI-stack merge gate) becomes dispatchable once
+  #379 + #258 merge.
+
+### DRIFT — #258 lane override B→D (2026-07-07)
+plan.md row 44 assigns #258 to Lane B (Opus 4.8 high) as a design-sensitive fresh-ui UI slice.
+Overridden to **Lane D (WSL Codex)**. Rationale: (1) Lane B (Opus) is weekly-limited until Jul 11 and
+the Anthropic budget is on life-support until Saturday; (2) the owner explicitly directed resuming WSL
+Codex dispatch and extreme token caution. Quality mitigation: the security-critical depth/whitelist
+guards are specified as HARD non-deferrable unit regressions in the brief, and this slice gets a
+mandatory adversarial Codex review before IMPL-EVAL (per the adversarial-impl-review rule). Severity:
+moderate (lane reassignment, scope unchanged).
