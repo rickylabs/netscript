@@ -9,7 +9,7 @@
  */
 
 import { httpInstrumentationMiddleware } from '@hono/otel';
-import { trace, type AttributeValue } from '@opentelemetry/api';
+import { type AttributeValue, trace } from '@opentelemetry/api';
 
 type UpstreamHonoOtelConfig = NonNullable<Parameters<typeof httpInstrumentationMiddleware>[0]>;
 
@@ -56,8 +56,6 @@ export function createHonoTracingMiddleware(
   return async (context, next) => {
     return await middleware(context, async () => {
       setActiveHonoAttributes({
-        attributePrefix,
-        serviceName,
         attributes: {
           [`${attributePrefix}netscript.http.service`]: serviceName,
           [`${attributePrefix}netscript.http.method`]: context.req.method,
@@ -69,8 +67,6 @@ export function createHonoTracingMiddleware(
         await next();
       } finally {
         setActiveHonoAttributes({
-          attributePrefix,
-          serviceName,
           attributes: {
             [`${attributePrefix}netscript.http.status_code`]: context.res.status,
           },
@@ -82,8 +78,6 @@ export function createHonoTracingMiddleware(
 
 function setActiveHonoAttributes(
   options: {
-    readonly attributePrefix: string;
-    readonly serviceName: string;
     readonly attributes: Readonly<Record<string, AttributeValue | undefined>>;
   },
 ): void {

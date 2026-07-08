@@ -60,6 +60,8 @@ pass upstream `@hono/otel` config through unchanged.
 | 2026-07-08 | 1 | gate | `deno check --unstable-kv packages/telemetry/hono.ts` exited 0. |
 | 2026-07-08 | 2 | gate | `deno task deps:latest --filter @hono/otel` reported `0 behind / 1 total`; telemetry facade check still exits 0. |
 | 2026-07-08 | 3 | gate | `deno check --unstable-kv packages/service/mod.ts` exited 0 after constructor-first Hono tracing wiring. |
+| 2026-07-08 | 4 | tests | New telemetry Hono test and service builder tracing test pass; package suites pass (`telemetry`: 48, `service`: 77). |
+| 2026-07-08 | 4 | final gates | Scoped check/lint/fmt wrappers pass for telemetry and service; raw publish dry-runs pass for both packages without `--allow-slow-types`. |
 
 ## Decisions
 
@@ -86,6 +88,20 @@ pass upstream `@hono/otel` config through unchanged.
 | Slice 2 stable dependency | `deno task deps:latest --filter @hono/otel` | PASS | `0 behind / 1 total` |
 | Slice 2 check | `deno check --unstable-kv packages/telemetry/hono.ts` | PASS | Exit 0 |
 | Slice 3 service check | `deno check --unstable-kv packages/service/mod.ts` | PASS | Exit 0 |
+| Telemetry tests | `deno test --allow-env --allow-read ./tests/` from `packages/telemetry` | PASS | 48 passed, 0 failed |
+| Service tests | `deno test --allow-all ./tests/` from `packages/service` | PASS | 77 passed, 0 failed |
+| Telemetry scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/telemetry --ext ts,tsx` | PASS | Wrapper reports `deno check --quiet --unstable-kv <files>`, 97 files, 0 occurrences |
+| Service scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --ext ts,tsx` | PASS | Wrapper reports `deno check --quiet --unstable-kv <files>`, 40 files, 0 occurrences |
+| Telemetry scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/telemetry --ext ts,tsx` | PASS | 97 files, 0 occurrences |
+| Service scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/service --ext ts,tsx` | PASS | 40 files, 0 occurrences |
+| Telemetry scoped fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/telemetry --ext ts,tsx` | PASS | 97 files, 0 findings |
+| Service scoped fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/service --ext ts,tsx` | PASS | 40 files, 0 findings |
+| Telemetry publish dry-run | `deno publish --dry-run --allow-dirty` from `packages/telemetry` | PASS | `Success Dry run complete`; no `--allow-slow-types` |
+| Service publish dry-run | `deno publish --dry-run --allow-dirty` from `packages/service` | PASS | `Success Dry run complete`; no `--allow-slow-types` |
+
+> Note: `.llm/tools/run-deno-check.ts` in this checkout defaults to `--unstable-kv` and rejects an
+> explicit `--unstable-kv` option. The supported invocation above is therefore the wrapper-sourced
+> equivalent of the requested check gate.
 
 ### Fitness Gates
 
@@ -95,4 +111,7 @@ pass upstream `@hono/otel` config through unchanged.
 
 ### Runtime Gates
 
-Pending tests.
+| Gate | Validation | Result | Evidence |
+| --- | --- | --- | --- |
+| Hono route span | `packages/telemetry/tests/hono/otel_middleware_test.ts` | PASS | Parameterized `GET /users/:id`, `http.route`, remote `traceparent`, NetScript attrs, downstream child parent |
+| Service wiring | `packages/service/tests/hono-tracing_test.ts` | PASS | Builder-installed Hono span parents downstream route span |

@@ -17,7 +17,8 @@ Implementation started from issue #569 PLAN-EVAL PASS. `@hono/otel@^1.1.2` was a
 thin active-span enrichment wrapper around upstream `httpInstrumentationMiddleware`; its narrow
 `deno check` passed. Slice 2 stages only the `@hono/otel` resolver-owned lock changes, leaving
 pre-existing unrelated lock churn unstaged. Slice 3 wires the middleware into `ServiceBuilderImpl`
-immediately after `new Hono()` and before caller middleware registration.
+immediately after `new Hono()` and before caller middleware registration. Slice 4 adds telemetry and
+service tests and all requested gates now pass.
 
 ## Completed
 
@@ -27,7 +28,7 @@ immediately after `new Hono()` and before caller middleware registration.
 
 ## In Progress
 
-- Slice 3 service builder wiring is ready to commit and push.
+- Slice 4 tests/final gates are ready to commit and push.
 
 ## Next Steps
 
@@ -53,14 +54,18 @@ immediately after `new Hono()` and before caller middleware registration.
 | `packages/telemetry/deno.json` | changed | Adds `./hono`, check target, and `@hono/otel` import. |
 | `deno.lock` | changed | Staged Hono/OTel resolver entries; unrelated prior lock edits remain unstaged. |
 | `packages/service/src/builder/service-builder-impl.ts` | changed | Registers Hono tracing first in the builder-owned middleware chain. |
+| `packages/telemetry/tests/hono/otel_middleware_test.ts` | new | Verifies Hono parameterized span name, W3C parent, NetScript attrs, downstream parenting, and disabled no-op guard. |
+| `packages/service/tests/hono-tracing_test.ts` | new | Verifies service builder tracing middleware parents downstream route work. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | partial PASS | `deno check --unstable-kv packages/telemetry/hono.ts` exit 0; `git diff --check` exit 0. |
+| Static | PASS | Scoped check/lint/fmt wrappers pass for telemetry and service. |
 | Dependency | PASS | `deno task deps:latest --filter @hono/otel` reported `0 behind / 1 total`. |
-| Consumer | partial PASS | `deno check --unstable-kv packages/service/mod.ts` exit 0. |
+| Runtime | PASS | Telemetry suite 48 passed; service suite 77 passed; new focused tests pass. |
+| Consumer | PASS | Service check/test/publish gates pass. |
+| Publish | PASS | Raw `deno publish --dry-run --allow-dirty` passes for telemetry and service without `--allow-slow-types`. |
 | Fitness | pending | Final wrapper gates not run yet. |
 | Runtime | pending | Tests not added yet. |
 | Consumer | pending | Service wiring not complete yet. |
