@@ -59,6 +59,7 @@ pass upstream `@hono/otel` config through unchanged.
 | 2026-07-08 | 1 | started | Added facade and adapter after `deno doc jsr:@hono/otel` confirmed upstream API. |
 | 2026-07-08 | 1 | gate | `deno check --unstable-kv packages/telemetry/hono.ts` exited 0. |
 | 2026-07-08 | 2 | gate | `deno task deps:latest --filter @hono/otel` reported `0 behind / 1 total`; telemetry facade check still exits 0. |
+| 2026-07-08 | 3 | gate | `deno check --unstable-kv packages/service/mod.ts` exited 0 after constructor-first Hono tracing wiring. |
 
 ## Decisions
 
@@ -84,6 +85,7 @@ pass upstream `@hono/otel` config through unchanged.
 | Whitespace | `git diff --check` | PASS | Exit 0 |
 | Slice 2 stable dependency | `deno task deps:latest --filter @hono/otel` | PASS | `0 behind / 1 total` |
 | Slice 2 check | `deno check --unstable-kv packages/telemetry/hono.ts` | PASS | Exit 0 |
+| Slice 3 service check | `deno check --unstable-kv packages/service/mod.ts` | PASS | Exit 0 |
 
 ### Fitness Gates
 

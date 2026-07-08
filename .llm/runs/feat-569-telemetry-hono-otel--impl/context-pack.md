@@ -16,7 +16,8 @@ Implementation started from issue #569 PLAN-EVAL PASS. `@hono/otel@^1.1.2` was a
 `deno add` in `packages/telemetry`. The first source slice adds `@netscript/telemetry/hono` and a
 thin active-span enrichment wrapper around upstream `httpInstrumentationMiddleware`; its narrow
 `deno check` passed. Slice 2 stages only the `@hono/otel` resolver-owned lock changes, leaving
-pre-existing unrelated lock churn unstaged.
+pre-existing unrelated lock churn unstaged. Slice 3 wires the middleware into `ServiceBuilderImpl`
+immediately after `new Hono()` and before caller middleware registration.
 
 ## Completed
 
@@ -26,7 +27,7 @@ pre-existing unrelated lock churn unstaged.
 
 ## In Progress
 
-- Slice 2 dependency lock pin is ready to commit and push.
+- Slice 3 service builder wiring is ready to commit and push.
 
 ## Next Steps
 
@@ -51,6 +52,7 @@ pre-existing unrelated lock churn unstaged.
 | `packages/telemetry/src/hono/otel-middleware.ts` | new | Thin adapter. |
 | `packages/telemetry/deno.json` | changed | Adds `./hono`, check target, and `@hono/otel` import. |
 | `deno.lock` | changed | Staged Hono/OTel resolver entries; unrelated prior lock edits remain unstaged. |
+| `packages/service/src/builder/service-builder-impl.ts` | changed | Registers Hono tracing first in the builder-owned middleware chain. |
 
 ## Gates
 
@@ -58,6 +60,7 @@ pre-existing unrelated lock churn unstaged.
 | --- | --- | --- |
 | Static | partial PASS | `deno check --unstable-kv packages/telemetry/hono.ts` exit 0; `git diff --check` exit 0. |
 | Dependency | PASS | `deno task deps:latest --filter @hono/otel` reported `0 behind / 1 total`. |
+| Consumer | partial PASS | `deno check --unstable-kv packages/service/mod.ts` exit 0. |
 | Fitness | pending | Final wrapper gates not run yet. |
 | Runtime | pending | Tests not added yet. |
 | Consumer | pending | Service wiring not complete yet. |
