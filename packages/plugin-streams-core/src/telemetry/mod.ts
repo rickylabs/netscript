@@ -5,13 +5,17 @@
  */
 
 export {
-  STREAMS_SPAN_NAMES,
-  STREAMS_TELEMETRY_ATTRIBUTES,
+  StreamAttributes,
+  StreamSpanNames,
   type StreamsSpanName,
   type StreamsTelemetryAttributeKey,
   type StreamsTelemetryAttributes,
 } from './attributes.ts';
 export {
+  createStreamsInstrumentation,
+  type StreamFanInMessage,
+  StreamsInstrumentation,
   streamsInstrumentation,
+  type StreamsInstrumentationOptions,
   type StreamsInstrumentationRegistration,
 } from './instrumentation.ts';

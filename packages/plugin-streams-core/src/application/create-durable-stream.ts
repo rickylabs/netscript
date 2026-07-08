@@ -1,6 +1,10 @@
 import { DurableStream, DurableStreamError, IdempotentProducer } from '@durable-streams/client';
 import type { StateSchema, StreamStateDefinition } from '../domain/stream-schema.ts';
 import type { StreamProducerPort } from '../ports/stream-producer-port.ts';
+import {
+  createStreamsInstrumentation,
+  type StreamsInstrumentation,
+} from '../telemetry/instrumentation.ts';
 import { buildStreamUrl, getStreamsAuth } from './stream-url-resolver.ts';
 
 export type { StateSchema, StreamStateDefinition } from '../domain/stream-schema.ts';
@@ -14,6 +18,8 @@ export interface DurableStreamProducerOptions<TDef extends StreamStateDefinition
   readonly schema: StateSchema<TDef>;
   /** Stable producer identity for idempotent delivery. */
   readonly producerId: string;
+  /** Optional stream instrumentation; defaults to real NetScript telemetry. */
+  readonly instrumentation?: StreamsInstrumentation;
   /** Optional abort signal used while opening the stream. */
   readonly signal?: AbortSignal;
 }
@@ -40,6 +46,7 @@ export class DurableStreamProducer<TDef extends StreamStateDefinition>
 
   readonly #schema: StateSchema<TDef>;
   readonly #producerId: string;
+  readonly #instrumentation: StreamsInstrumentation;
   #idempotent: IdempotentProducer | null = null;
   readonly #pendingEvents: string[] = [];
   readonly #initPromise: Promise<void>;
@@ -51,6 +58,7 @@ export class DurableStreamProducer<TDef extends StreamStateDefinition>
     this.streamPath = options.streamPath;
     this.#schema = options.schema;
     this.#producerId = options.producerId;
+    this.#instrumentation = options.instrumentation ?? createStreamsInstrumentation();
     this.#initPromise = this.#connect(options.signal);
   }
 
@@ -179,7 +187,7 @@ export class DurableStreamProducer<TDef extends StreamStateDefinition>
       type: definition.type ?? entityType,
       key,
       value,
-      headers: { operation: 'upsert' },
+      headers: this.#publishHeaders(entityType, 'upsert', key),
     });
     if (event) {
       this.#appendEvent(event);
@@ -212,7 +220,7 @@ export class DurableStreamProducer<TDef extends StreamStateDefinition>
     const event = this.#serializeEvent(entityType, 'delete', {
       type: definition.type ?? entityType,
       key,
-      headers: { operation: 'delete' },
+      headers: this.#publishHeaders(entityType, 'delete', key),
     });
     if (event) {
       this.#appendEvent(event);
@@ -234,6 +242,25 @@ export class DurableStreamProducer<TDef extends StreamStateDefinition>
     await this.#initPromise;
     await this.#idempotent?.close();
     removeProducer(this.streamPath, this);
+  }
+
+  #publishHeaders(
+    entityType: string,
+    operation: 'upsert' | 'delete',
+    key: string,
+  ): Record<string, string> {
+    let headers: Record<string, string> = { operation };
+    this.#instrumentation.publish({
+      streamPath: this.streamPath,
+      collection: entityType,
+      operation,
+      producerId: this.#producerId,
+      messageId: key,
+      emit: (injected) => {
+        headers = { ...headers, ...injected };
+      },
+    });
+    return headers;
   }
 }
 

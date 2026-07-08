@@ -56,8 +56,8 @@ Deno.test('SagaEngine emits one successful saga.handle span for a handled messag
     assertEquals(span.attributes[SagaAttributes.SAGA_CORRELATION_KEY], 'counter-1');
     assertEquals(span.attributes[SagaAttributes.OUTCOME], SagaTelemetryOutcomes.SUCCESS);
     assertEquals(span.events, [
-      { name: SagaSpanEvents.STATE_BEFORE, attributes: { 'saga.status': undefined } },
-      { name: SagaSpanEvents.STATE_AFTER, attributes: { 'saga.status': 'completed' } },
+      { name: SagaSpanEvents.STATE_BEFORE, attributes: { [SagaAttributes.STATUS]: undefined } },
+      { name: SagaSpanEvents.STATE_AFTER, attributes: { [SagaAttributes.STATUS]: 'completed' } },
     ]);
     assertEquals(span.status, { status: 'ok', description: undefined });
     assertEquals(span.exceptions.length, 0);
@@ -109,7 +109,7 @@ Deno.test('SagaEngine records an ERROR span and rethrows when a handler throws',
     assertEquals(span.attributes[SagaAttributes.SAGA_INSTANCE_ID], 'telemetry-failure:work-1');
     assertEquals(span.attributes[SagaAttributes.OUTCOME], SagaTelemetryOutcomes.ERROR);
     assertEquals(span.events, [
-      { name: SagaSpanEvents.STATE_BEFORE, attributes: { 'saga.status': undefined } },
+      { name: SagaSpanEvents.STATE_BEFORE, attributes: { [SagaAttributes.STATUS]: undefined } },
     ]);
     assertEquals(span.status, { status: 'error', description: 'handler failed' });
     assertEquals(span.exceptions, [failure]);
