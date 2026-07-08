@@ -1,8 +1,8 @@
 # IMPL-EVAL: #406 span-link fan-in for streams and sagas
 
-**Branch**: `feat/406-telemetry-t5-span-links`  
-**Base**: `c8f68721` (main)  
-**Slice commit**: `52299e2e`  
+**Branch**: `feat/406-telemetry-t5-span-links`
+**Base**: `c8f68721` (main)
+**Slice commit**: `52299e2e`
 **Evaluator**: IMPL-EVAL (separate session from Tier-D generator)
 
 ## Checks

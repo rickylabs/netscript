@@ -115,3 +115,27 @@ Deno.test('adapters/otel imports only from the ports boundary + @opentelemetry/a
 
   assert(filesScanned > 0, 'expected to scan telemetry adapters/otel source files');
 });
+
+Deno.test('adapters/aspire-query imports only from ports, domain, and sibling modules', async () => {
+  const adapterDir = new URL('../src/adapters/aspire-query/', import.meta.url);
+
+  const isAllowed = (specifier: string): boolean =>
+    specifier.startsWith('../../ports/') ||
+    specifier.startsWith('../../domain/') ||
+    specifier.startsWith('./');
+
+  let filesScanned = 0;
+  for await (const fileUrl of walkTsFiles(adapterDir)) {
+    filesScanned++;
+    const source = await Deno.readTextFile(fileUrl);
+    for (const specifier of importSpecifiers(source)) {
+      assert(
+        isAllowed(specifier),
+        `${shortPath(fileUrl)} imports "${specifier}" — adapters/aspire-query may ` +
+          'import only from ../../ports/, ../../domain/, or sibling adapter modules.',
+      );
+    }
+  }
+
+  assert(filesScanned > 0, 'expected to scan telemetry adapters/aspire-query source files');
+});

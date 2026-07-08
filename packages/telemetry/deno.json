@@ -13,12 +13,12 @@
     "./registry": "./registry.ts",
     "./orpc": "./orpc.ts",
     "./otel": "./src/adapters/otel/mod.ts",
-    "./query": "./src/application/query/mod.ts",
+    "./query": "./query.ts",
     "./testing": "./src/testing/mod.ts"
   },
   "tasks": {
-    "check": "deno check ./mod.ts ./config.ts ./tracer.ts ./context.ts ./attributes.ts ./instrumentation.ts ./registry.ts ./orpc.ts ./src/adapters/otel/mod.ts ./src/application/query/mod.ts ./src/testing/mod.ts",
-    "test": "deno test --allow-env ./tests/",
+    "check": "deno check ./mod.ts ./config.ts ./tracer.ts ./context.ts ./attributes.ts ./instrumentation.ts ./registry.ts ./orpc.ts ./src/adapters/otel/mod.ts ./query.ts ./src/testing/mod.ts",
+    "test": "deno test --allow-env --allow-read ./tests/",
     "publish:dry-run": "deno publish --dry-run --allow-dirty"
   },
   "imports": {

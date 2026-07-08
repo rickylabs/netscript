@@ -1,29 +1,53 @@
-# beta6-nondash context pack
+# beta6-nondash supervisor context pack
 
-## Current Slice
+Status: TEL-T7 implementation complete on `feat/408-telemetry-t7-query` and rebased by merge onto
+`origin/main` after T5 / #406 landed. Awaiting PR #567 review and IMPL-EVAL.
 
-T5 / #406 (`feat/406-telemetry-t5-span-links`) implements span-link fan-in for streams and sagas.
+## Baseline
 
-## Current State
+- Branch: `feat/408-telemetry-t7-query`
+- Original T7 base confirmed at `c8f68721`; T3 commit present in history.
+- Merge base updated on 2026-07-08 to include `origin/main` after T5 / #406.
 
-- Shared telemetry now exports `SpanLinkPort`, meter/propagator provider public types, and
+## T5 / #406 now present from main
+
+- Shared telemetry exports `SpanLinkPort`, meter/propagator provider public types, and
   `createFanInLinks`.
-- Streams-core has real tracing on publish and subscribe fan-in.
+- Streams-core has publish and subscribe fan-in tracing.
 - Sagas-core owns the shared OTEL saga tracer/facade and seven saga metric instruments.
-- Plugin sagas consumes the shared core facade; the old plugin-local tracer path is a re-export for
-  compatibility.
-- `deno.lock` must remain unmodified; any validation churn should be reverted.
+- Plugin sagas consumes the shared core facade; the old plugin-local tracer path remains a
+  compatibility re-export.
 
-## Validation Snapshot
+## T7 / #408 implemented on this branch
 
-- check wrapper: exit 0, `filesSelected=277`, `failedBatches=0`, `totalOccurrences=0`.
-- fmt wrapper: exit 0, `filesSelected=277`, `failedBatches=0`, `findings=0`.
-- lint wrapper: exit 0, `filesSelected=277`, `totalOccurrences=0`.
-- focused telemetry tests: exit 0, 13 passed.
-- telemetry `deno doc --lint`: exit 0.
-- telemetry `deno publish --dry-run --allow-dirty`: exit 0, no `--allow-slow-types`.
+- `@netscript/telemetry/query` exports the query read-side contract and Aspire-backed adapter.
+- Query read models cover traces, spans, logs, resources, metrics, span events, span links, and OTLP
+  JSON export.
+- Standard Schema validators cover trace/resource/metric query filters.
+- `AspireTelemetryQuery` wraps Aspire dashboard `/api/telemetry/*` HTTP endpoints, supports
+  resource/service filters, limits, `follow`, metric name filtering, API key header injection, and
+  absent-Aspire empty-result degradation.
+- Tests cover adapter grouping, logs/resources/metrics, validation failure, public default factory,
+  graceful absent Aspire behavior, and layering.
+
+## Validation snapshot
+
+- T5 pre-merge evidence from main: check/fmt/lint wrappers green for 277 files; focused telemetry
+  tests 13 passed; telemetry doc-lint and publish dry-run green.
+- T7 pre-merge evidence: scoped telemetry check/lint/fmt green; focused query/layering tests 8
+  passed; telemetry package tests 45 passed; full export doc-lint green; publish dry-run green; no
+  new doctrine failures.
+- Post-merge T7 evidence is recorded in `worklog-408.md` and the PR #567 merge-resolution comment.
+
+## Constraints
+
+- T5 span-link exports and T7 query exports must both remain present.
+- No dashboard/UI/panel code is part of T7.
+- No `deno.lock` changes should be kept unless Deno legitimately re-resolves the graph.
+- No new `as` casts in this merge slice.
 
 ## Next
 
-Open a draft PR for #406 with `Closes #406`, acceptance/gate checkboxes checked with the evidence
-above, labels/milestone applied, and a slice implementation comment containing commit hash and gates.
+- Push PR #567 with an explicit refspec.
+- Confirm GitHub reports PR #567 mergeability against `main`.
+- Leave a PR comment with conflict resolution and green gate evidence.
