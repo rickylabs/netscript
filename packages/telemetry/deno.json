@@ -12,16 +12,18 @@
     "./instrumentation": "./instrumentation.ts",
     "./registry": "./registry.ts",
     "./orpc": "./orpc.ts",
+    "./hono": "./hono.ts",
     "./otel": "./src/adapters/otel/mod.ts",
     "./query": "./query.ts",
     "./testing": "./src/testing/mod.ts"
   },
   "tasks": {
-    "check": "deno check ./mod.ts ./config.ts ./tracer.ts ./context.ts ./attributes.ts ./instrumentation.ts ./registry.ts ./orpc.ts ./src/adapters/otel/mod.ts ./query.ts ./src/testing/mod.ts",
+    "check": "deno check ./mod.ts ./config.ts ./tracer.ts ./context.ts ./attributes.ts ./instrumentation.ts ./registry.ts ./orpc.ts ./hono.ts ./src/adapters/otel/mod.ts ./query.ts ./src/testing/mod.ts",
     "test": "deno test --allow-env --allow-read ./tests/",
     "publish:dry-run": "deno publish --dry-run --allow-dirty"
   },
   "imports": {
+    "@hono/otel": "jsr:@hono/otel@^1.1.2",
     "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
     "@std/assert": "jsr:@std/assert@^1"
   },
