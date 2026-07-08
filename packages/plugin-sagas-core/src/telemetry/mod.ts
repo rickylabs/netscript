@@ -13,6 +13,11 @@ export {
 } from './attributes.ts';
 export { SAGA_DURABILITY_TIERS } from '../domain/mod.ts';
 export { createSagaInstrumentation, SagaInstrumentation } from './instrumentation.ts';
+export {
+  createOtelSagaTracer,
+  createSagaTelemetry,
+  createSagaTelemetryMeter,
+} from './otel-saga-telemetry.ts';
 export type { SagaDurabilityTier } from '../domain/mod.ts';
 export type {
   SagaAttributeName,
@@ -45,5 +50,7 @@ export type {
   SagaTelemetrySpanKind,
   SagaTelemetryStatus,
   SagaTelemetryTracer,
+  SagaTraceLink,
   SagaTraceParent,
 } from './instrumentation.ts';
+export type { OtelSagaTelemetryOptions } from './otel-saga-telemetry.ts';
