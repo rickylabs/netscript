@@ -80,9 +80,14 @@ T5 landed on `main` before this rework.
 
 Date: 2026-07-08
 
-- Owner-directed rework is in progress for PR #568.
+- Owner-directed rework is implemented for PR #568.
 - Original slice artifact: `.llm/runs/beta6-nondash--supervisor/worklog-407.md`.
 - Drift entry records the major wrap-do-not-reinvent finding and the `@orpc/otel` resolution.
+- `@orpc/otel` is pinned at `^1.14.7` in the root npm catalog and consumed by
+  `packages/telemetry/package.json` as `catalog:`.
+- Focused rework gates passed: scoped check/lint/fmt for telemetry/AI/SDK/service, telemetry oRPC
+  tests, AI TelemetryPort tests, SDK service-client tests, workers dispatcher tests, and telemetry
+  `deno publish --dry-run --allow-dirty`.
 
 ## T7 / #408 - Query Contract and Aspire Adapter
 

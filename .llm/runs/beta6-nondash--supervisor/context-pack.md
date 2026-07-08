@@ -1,7 +1,8 @@
 # beta6-nondash supervisor context pack
 
-Status: TEL-T6 rework is active on `feat/407-telemetry-t6-orpc-spans`, rebased onto
-`origin/main` after T5 / #406 and T7 / #408 telemetry sibling work landed.
+Status: TEL-T6 rework is implemented on `feat/407-telemetry-t6-orpc-spans`, rebased onto
+`origin/main` after T5 / #406 and T7 / #408 telemetry sibling work landed. Final re-fetch/rebase,
+push, and PR #568 comment remain.
 
 ## Baseline
 
@@ -29,6 +30,7 @@ Status: TEL-T6 rework is active on `feat/407-telemetry-t6-orpc-spans`, rebased o
   `netscript.*` attributes to active-span customization via `trace.getActiveSpan()`.
 - Preserve prior acceptance: real SERVER spans, CLIENT spans where applicable, W3C context
   propagation, `netscript.*` attributes, AI `TelemetryPort` invocation, and worker instrumentation.
+- Pinned upstream version: `@orpc/otel` `^1.14.7` via the root npm catalog.
 
 ## T7 / #408 present from main
 
@@ -45,7 +47,7 @@ Status: TEL-T6 rework is active on `feat/407-telemetry-t6-orpc-spans`, rebased o
 - T7 pre-merge evidence from main: scoped telemetry check/lint/fmt green; focused query/layering
   tests 8 passed; telemetry package tests 45 passed; full export doc-lint green; publish dry-run
   green; no new doctrine failures.
-- T6 rework evidence will be recorded in `worklog-407.md` and the PR #568 implementation comment.
+- T6 rework evidence is recorded in `worklog-407.md`; PR #568 implementation comment remains.
 
 ## Constraints
 
@@ -58,7 +60,6 @@ Status: TEL-T6 rework is active on `feat/407-telemetry-t6-orpc-spans`, rebased o
 
 ## Next
 
-- Finish the `@orpc/otel` rework and focused gates.
 - Re-fetch and rebase on latest `main`.
 - Push PR #568 with an explicit refspec.
 - Leave a PR comment with rework summary, pinned `@orpc/otel` version, commit hash, and gate
