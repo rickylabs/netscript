@@ -2,7 +2,7 @@
   "name": "@netscript/plugin-ai-core",
   "version": "0.0.1-beta.5",
   "description": "AI plugin oRPC v1 contract: the SSE-framed /v1/ai chat, models, tools, embed, and transcribe route surface for NetScript AI plugins.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "exports": {
     ".": "./mod.ts",
     "./contracts/v1": "./src/contracts/v1/mod.ts"

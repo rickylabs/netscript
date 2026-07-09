@@ -172,5 +172,5 @@ Docker image build/push/apply seam.
 
 ## 📝 License
 
-MIT — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE).
+Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE).
 Published to JSR with cryptographically verified provenance.

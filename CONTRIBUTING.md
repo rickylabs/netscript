@@ -99,6 +99,28 @@ machine. A GitHub Release is the only publish trigger, and release notes are cat
 (see [`.github/release.yml`](.github/release.yml)). The full release-cut flow is documented in the
 `netscript-release` agent skill. Contributors do not publish; maintainers cut releases.
 
+## Developer Certificate of Origin (DCO)
+
+NetScript is licensed under [Apache-2.0](LICENSE). Every contribution must be signed off under the
+[Developer Certificate of Origin (DCO) 1.1](https://developercertificate.org/) to certify that you
+wrote the contribution or otherwise have the right to submit it under the project's license.
+
+Sign off every commit by adding a `Signed-off-by` trailer, most easily done with the `-s` flag:
+
+```bash
+git commit -s -m "fix: correct saga retry backoff"
+```
+
+This appends a line to your commit message:
+
+```
+Signed-off-by: Your Name <your.email@example.com>
+```
+
+Use your real name and a reachable email address — anonymous or pseudonymous sign-offs are not
+accepted. PRs with unsigned commits will be asked to amend history (`git commit --amend -s` or
+`git rebase --signoff HEAD~N`) before merge.
+
 ## Reporting security issues
 
 Never open a public issue for a vulnerability. Follow the [Security policy](SECURITY.md) and use

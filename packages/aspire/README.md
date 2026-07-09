@@ -121,5 +121,5 @@ Deno KV path, the `--unstable-kv` flag on the consuming Deno process.
 
 ## 📝 License
 
-MIT — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
+Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
 cryptographically verified provenance.

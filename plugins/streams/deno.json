@@ -2,7 +2,7 @@
   "name": "@netscript/plugin-streams",
   "version": "0.0.1-beta.5",
   "description": "Durable Streams service, CLI, Aspire, E2E, and scaffolding plugin for NetScript.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "exports": {
     ".": "./mod.ts",
     "./scaffold": "./scaffold.ts",

@@ -36,7 +36,7 @@ const sagasManifest: PluginManifest = definePlugin(
   .withType('background-processor')
   .withDescription('Durable saga orchestration and workflow state for NetScript applications.')
   .withAuthor('NetScript Team')
-  .withLicense('MIT')
+  .withLicense('Apache-2.0')
   .withTags(['sagas', 'workflows', 'orchestration', 'distributed', 'compensation'])
   .withPermissions(SAGAS_SERVICE_PERMISSIONS)
   .withDependencies(sagasPluginDependencies)

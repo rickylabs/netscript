@@ -37,7 +37,7 @@ const aiManifest: PluginManifest = definePlugin(AI_PLUGIN_ID, AI_PLUGIN_VERSION)
     'Thin connector and scaffolder wiring an app-owned, in-process AI chat, tool, and agent surface onto @netscript/ai.',
   )
   .withAuthor('NetScript Team')
-  .withLicense('MIT')
+  .withLicense('Apache-2.0')
   .withTags(['ai', 'chat', 'agent', 'tools', 'llm', 'streaming'])
   .withPermissions(AI_RUNTIME_PERMISSIONS)
   .withContractVersions([{ version: 'v1', loader: './contracts/v1/mod.ts' }])
