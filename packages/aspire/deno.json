@@ -2,7 +2,7 @@
   "name": "@netscript/aspire",
   "version": "0.0.1-beta.5",
   "description": "Config parsing, contribution ports, and SDK-agnostic helpers for Aspire TypeScript AppHost.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "exports": {
     ".": "./mod.ts",
     "./config": "./config.ts",

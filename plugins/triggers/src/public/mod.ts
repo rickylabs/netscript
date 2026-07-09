@@ -33,7 +33,7 @@ const triggersManifest: PluginManifest = definePlugin(
   .withType('background-processor')
   .withDescription('Trigger ingress, scheduling, file watching, and trigger runtime APIs.')
   .withAuthor('NetScript Team')
-  .withLicense('MIT')
+  .withLicense('Apache-2.0')
   .withTags(['triggers', 'webhooks', 'schedules', 'file-watchers'])
   .withPermissions(TRIGGERS_SERVICE_PERMISSIONS)
   .withDependencies(triggersPluginDependencies)

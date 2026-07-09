@@ -2,7 +2,7 @@
   "name": "@netscript/ai",
   "version": "0.0.1-beta.5",
   "description": "Zero-dependency AI engine core: domain contracts, capability ports, model registry, and composition root for NetScript's AI stack.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "exports": {
     ".": "./mod.ts",
     "./anthropic": "./anthropic.ts",

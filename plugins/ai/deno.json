@@ -2,7 +2,7 @@
   "name": "@netscript/plugin-ai",
   "version": "0.0.1-beta.5",
   "description": "NetScript AI plugin: a thin manifest, connector, and scaffolder that wires an app-owned, in-process AI chat, tool, and agent surface onto @netscript/ai and @netscript/fresh/ai.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "exports": {
     ".": "./mod.ts",
     "./adapter-cli": "./cli.ts",

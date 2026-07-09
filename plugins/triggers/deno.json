@@ -2,7 +2,7 @@
   "name": "@netscript/plugin-triggers",
   "version": "0.0.1-beta.5",
   "description": "NetScript plugin for trigger ingress, scheduling, file watching, and trigger runtime APIs.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "exports": {
     ".": "./mod.ts",
     "./adapter-cli": "./cli.ts",

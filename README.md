@@ -235,5 +235,5 @@ feature proposals belong on the [issue tracker](https://github.com/rickylabs/net
 
 ## 📝 License
 
-MIT — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Every `@netscript/*`
+Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Every `@netscript/*`
 package is published to JSR with cryptographically verified provenance.
