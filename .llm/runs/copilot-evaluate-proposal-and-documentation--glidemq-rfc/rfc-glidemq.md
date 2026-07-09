@@ -61,7 +61,7 @@ for Track A acceptance: no adapter merges without before/after numbers on NetScr
 - Capability degradation is explicit: priorities/rate-limits/dedup surface as optional
   `EnqueueOptions` capabilities the adapter advertises; other adapters no-op or degrade, mirroring
   how KV watch degrades to polling on Deno KV Connect.
-- npm dependency enters via the catalog (`catalog:` — npm-only law) and stays **internal to the
+- npm dependency enters via the catalog (`catalog:` is npm-only per the netscript-deno-toolchain skill) and stays **internal to the
   adapter module**; the adapter is lazily imported so non-users never load the NAPI binary.
 
 ### 4.2 Track B — AI-execution ports (plugin-workers-core / plugin-ai-core)

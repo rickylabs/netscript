@@ -6,7 +6,7 @@
 
 ---
 
-**Title:** `feat(bench): reintroduce the seam performance benchmark suite (queue/KV transports, pre-GlideMQ baseline)`
+**Title:** `feat(bench): reintroduce the seam performance benchmark suite (queue/KV transports)`
 
 **Labels:** `type:feature` · `area:queue` (or nearest area label for the queue/KV seams) ·
 `priority:p2` · `status:plan` · `wave:v1`

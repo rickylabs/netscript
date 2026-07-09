@@ -818,7 +818,7 @@ The dashboard is an Express middleware — **embeddable in any Express 4/5 appli
 
 ---
 
-## Gaps & Uncertainties
+## Research Limitations & Workarounds
 
 1. **`glidemq.dev` docs unreachable** — DNS resolution failed for `glidemq.dev` in this environment. All guide-page content was sourced from the GitHub docs/ directory which mirrors the website content. Assessed as complete.
 

@@ -103,7 +103,7 @@ the RFC as the plan under review, then owner ratification, then seed-run or run-
 
 ## Invariants
 
-- **Drafts-only.** The run files no issues, opens no non-run PRs, adds no dependencies. Ratification
+- **Drafts-only.** The run does not file issues, opens no non-run PRs, adds no dependencies. Ratification
   gates everything downstream.
 - **Generator ≠ evaluator.** The run that authored the RFC never certifies it; the RFC header names
   its pending-PLAN-EVAL status, and blocked evaluator launches are recorded per `lane-policy.md`.
