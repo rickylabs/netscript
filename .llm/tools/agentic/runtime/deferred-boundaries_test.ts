@@ -36,8 +36,8 @@ function plan(command: RuntimeCommand) {
   return planReconciliation({ command, desired: null, observed });
 }
 
-Deno.test('deferred child-issue registry retains issues 579 through 582 after evidence enablement', () => {
-  assertEquals(DEFERRED_ISSUES.filter((issue) => issue >= 579), [579, 580, 581, 582]);
+Deno.test('deferred child-issue registry removes only landed 579 and retains 580 through 582', () => {
+  assertEquals(DEFERRED_ISSUES.filter((issue) => issue >= 579), [580, 581, 582]);
 });
 
 Deno.test('Antigravity live evidence plans while apply remains issue 580 blocked', () => {
@@ -123,13 +123,13 @@ Deno.test('all provider lifecycle apply paths remain issue 580 blocked', () => {
   ]);
 });
 
-Deno.test('issues 579, 581, and 582 remain absent capabilities rather than hidden implementations', () => {
+Deno.test('issues 581 and 582 remain absent capabilities rather than hidden implementations', () => {
   const serialized = JSON.stringify(plan({
     kind: 'doctor',
     commandId: 'deferred-no-hidden-policy',
     mode: 'inspect',
   }));
-  for (const forbidden of ['quota_fallback', 'routing_policy_migration', 'rollout_promotion']) {
+  for (const forbidden of ['routing_policy_migration', 'rollout_promotion']) {
     assert(!serialized.includes(forbidden), `hidden deferred capability appeared: ${forbidden}`);
   }
 });

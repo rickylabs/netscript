@@ -205,6 +205,30 @@ environment/read-only-process permissions only; it does not receive filesystem w
 
 ### Compatibility-cycle boundary
 
+#### Quota fallback state and restoration
+
+Inspect the machine-local routing state and concise transition history without contacting a
+provider or changing a route:
+
+```bash
+deno task agentic:routing-state
+deno task agentic:routing-state --json
+```
+
+The #579 state machine keeps the configured desired route separate from the active fallback route.
+It records a finite reason category, affected session, detection/reset/probe times, fallback depth,
+restoration/canary status, mobile-visibility notification requirement, and at most 32 concise
+transitions. Controller-owned JSON remains under `~/.config/netscript-agentic/runtime` at mode
+`0600`; it contains no credential values, raw provider output, prompts, or account identity.
+
+Fallback and restoration are data decisions only at an idle/new turn or session boundary. An
+active/critical slice blocks. After restart, the adapter reloads the same active route and history;
+the desired route is restored only after the provider reset time, a minimal successful canary, and
+a fresh boundary. Failed canaries record a five-minute backoff. The command above is read-only: it
+does not log in, probe a provider, start/repair a sender, mutate global defaults/environment, or
+invoke paid/on-demand models. #580 owns sender/daemon execution, #581 owns global policy migration,
+and #582 owns rollout.
+
 The existing `agentic:wsl-foundation`, `agentic:launch-codex-slice`, `agentic:codex-resume`,
 `agentic:codex-status`, and `agentic:smoke-claude-remote` tasks remain supported thin compatibility
 edges for one deprecation cycle. They retain their documented flags, output, and exit contracts and

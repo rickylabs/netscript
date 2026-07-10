@@ -50,8 +50,8 @@ Deno.test('classification fails closed for auth, timeout, quota, and rate limiti
   ]);
   assertEquals(result.diagnostics.map((entry) => [entry.code, entry.ownerIssue]), [
     ['auth_required', undefined],
-    ['quota_exhausted', 579],
-    ['rate_limited', 579],
+    ['quota_exhausted', undefined],
+    ['rate_limited', undefined],
     ['timeout', undefined],
   ]);
   assert(!JSON.stringify(result).includes('authentication service timeout'));
