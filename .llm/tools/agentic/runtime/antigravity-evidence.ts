@@ -153,12 +153,12 @@ export function classifyAntigravityEvidence(
   }
   if (failureSignals.includes('quota')) {
     diagnostics.push(
-      diagnostic('quota_exhausted', 'provider', 'Antigravity reported quota exhaustion', 579),
+      diagnostic('quota_exhausted', 'provider', 'Antigravity reported quota exhaustion'),
     );
   }
   if (failureSignals.includes('rate_limited')) {
     diagnostics.push(
-      diagnostic('rate_limited', 'provider', 'Antigravity reported rate limiting', 579),
+      diagnostic('rate_limited', 'provider', 'Antigravity reported rate limiting'),
     );
   }
   if (failureSignals.includes('timeout')) {

@@ -4,7 +4,7 @@
 
 - Branch: `feat/epic-574-quota-fallback`; worktree native ext4 at the requested path.
 - HEAD before plan commit: `783e505e`; locked base `c90bc938`; ancestry verified.
-- Phase: implementation; coordinator Plan-Gate APPROVED. S1-S2 are implemented and gated.
+- Phase: implementation; coordinator Plan-Gate APPROVED. S1-S3 are implemented and gated.
 - Coordinator: Claude Opus 4.8; Codex thread `019f4d6c-bed7-7d62-a61f-3dccd822fcc2`.
 
 ## Locked Scope
@@ -27,6 +27,13 @@ route, never mutate defaults/global environment, and block same-family evaluatio
 - Added pure routing policy data/guards and structured-first, version-pinned signal classification.
 - Focused tests: 7 passed, 0 failed.
 - Scoped check/lint/fmt: exit 0, zero findings.
+
+## S3 Result
+
+- Added `deno task agentic:routing-state [--json]`, a read-only machine-local status surface, and
+  human README restart/restoration semantics.
+- Removed only the landed #579 deferral tag; #580-#582 regressions remain explicit.
+- Focused tests: 13 passed, 0 failed; CLI exit 0; scoped check/lint/fmt zero findings.
 - No persistence, execution, global mutation, or paid behavior was introduced.
 
 ## S2 Result
@@ -39,5 +46,5 @@ route, never mutate defaults/global environment, and block same-family evaluatio
 
 ## Next Action
 
-Commit/push/comment S2, then integrate the consumer surface/README and remove only the now-landed
-#579 deferred marker while preserving #580-#582 blocks.
+Commit/push/comment S3, then run the final complete agentic/runtime and scoped gate set, reconcile
+DoD, and hand off without self-certification.
