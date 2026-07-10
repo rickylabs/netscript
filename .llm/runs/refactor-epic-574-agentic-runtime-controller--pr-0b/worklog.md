@@ -2,9 +2,8 @@
 
 ## Status
 
-Research and Design are complete and ready for coordinator Plan-Gate review. This generator does
-not approve the plan. No implementation source has been edited and no implementation gate has been
-run in this planning turn.
+Research and Design are complete. Tier-A coordinator Plan-Gate review returned `PASS` under the
+owner-authorized external-evaluator waiver. No implementation source was edited before approval.
 
 ## Design
 
@@ -352,11 +351,10 @@ named contract/port/adapter/test here.
 | 2026-07-10 | research | COMPLETE | Live #576/#585/#577-#582 reconciliation, current-main/base comparison, PR 0A baseline artifacts, Deno docs, and focused source inventory |
 | 2026-07-10 | design | READY_FOR_REVIEW | Typed contract, state, ports/adapters, effects, failures, rollback, slices, budgets, gates, and deferrals locked |
 | 2026-07-10 | planning check | PASS | `git diff --check` exit 0; diff contains only the five required run artifacts and no implementation source |
-| 2026-07-10 | plan-gate | PENDING_COORDINATOR | External dispatch waived; generator does not self-certify |
+| 2026-07-10 | plan-gate | PASS | `plan-eval.md`; external dispatch waived by owner; coordinator substantive review |
 
 ## Reconcile Note — Planning Slice
 
 Issue #576 and draft PR #585 remain open at exactly one `status:plan`; labels and issue milestone are
 correct. PR #585 retains `Closes #576`, `Part of #574`, and its PR #584 stack. Acceptance/DoD boxes
-remain unchecked, the PR remains draft, no new comment changes scope, and implementation remains
-blocked on coordinator Plan-Gate approval.
+remain unchecked and the PR remains draft. Implementation is authorized on the same thread.

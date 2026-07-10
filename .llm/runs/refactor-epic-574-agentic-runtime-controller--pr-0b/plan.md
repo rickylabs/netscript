@@ -8,15 +8,14 @@
 | Issue / PR | #576 / draft #585 |
 | Branch | `refactor/epic-574-agentic-runtime-controller` |
 | Base | PR #584 sign-off `9b75470` |
-| Phase | Plan & Design — ready for coordinator review |
+| Phase | Plan-Gate passed; implementation authorized |
 | Archetype | 6 — CLI / Tooling, scoped internal-tool variant |
 | Scope overlays | none |
 
 ## Plan-Gate Status
 
-The owner waived external evaluator dispatch but did not authorize this generator to approve its own
-plan. No `plan-eval.md` is created in this turn. The coordinator must perform the substantive
-Plan-Gate checklist review and record approval before any implementation source is edited.
+The owner waived external evaluator dispatch. Tier-A coordinator review passed every Plan-Gate item
+and is recorded in `plan-eval.md`; implementation may proceed on the existing thread.
 
 ## Goal
 
@@ -228,7 +227,7 @@ host sleep/network mutation, or child-issue rollout canary belongs to PR 0B.
 | Automatic fallback/reset policy and durable history | safe to defer | #579; PR 0B supports explicit turn-boundary commands only. |
 | Live Codex repair implementation | safe to defer | #580; preflight/dry-run only, live blocked. |
 | Universal rollout/promotion | safe to defer | #582. |
-| Whether this plan is approved | must resolve now | Coordinator substantive Plan-Gate review; implementation cannot start first. |
+| Whether this plan is approved | resolved | Coordinator substantive Plan-Gate `PASS`; `plan-eval.md`. |
 
 ## Debt Implications and Rescope Triggers
 

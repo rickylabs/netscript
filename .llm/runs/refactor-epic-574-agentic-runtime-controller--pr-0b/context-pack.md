@@ -8,7 +8,7 @@
 | Branch | `refactor/epic-574-agentic-runtime-controller` |
 | Worktree | `/home/codex/repos/netscript-epic-574-pr0b-controller` |
 | Base | PR #584 sign-off `9b75470` |
-| Phase | Plan & Design complete; Plan-Gate pending coordinator |
+| Phase | Plan-Gate passed; implementation authorized |
 | Thread | `019f4b72-2ea4-7050-917e-6d6918371265` (resume only) |
 
 ## Current State
@@ -18,9 +18,8 @@ plan models, read and mutation ports, Claude/Codex/Gemini/provider/mobile adapte
 read-only inspection/dry-run, value-free local state, stable failure taxonomy, transactional apply
 and ownership-scoped rollback, five implementation slices, exact gates, and file/scope budgets.
 
-No implementation source was edited in the planning turn. The owner waived external evaluator
-dispatch but explicitly left substantive Plan-Gate approval to the coordinator; this worker has not
-self-certified and no `plan-eval.md` exists.
+No implementation source was edited before approval. The owner waived external evaluator dispatch;
+Tier-A coordinator review passed every Plan-Gate item and recorded approval in `plan-eval.md`.
 
 ## Locked Boundaries
 
@@ -43,10 +42,8 @@ self-certified and no `plan-eval.md` exists.
 
 ## Next Action
 
-The coordinator substantively reviews `research.md`, `plan.md`, and the `## Design` section of
-`worklog.md` against the Plan-Gate. If approved, the coordinator records the waiver-aware approval
-without claiming an external evaluator, then resumes this exact thread for S1. Do not launch another
-sender and do not implement before that approval.
+Resume this exact thread for S1 contract/state/ports/pure-planner implementation. Commit, explicitly
+push, comment, and Tier-A review each slice before proceeding. Do not launch another sender.
 
 ## Safety
 
