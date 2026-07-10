@@ -15,9 +15,9 @@
  *       header, never logged.
  *
  * Usage:
- *   deno run --allow-read .llm/tools/agentic/openhands-status.ts --pr 86 [--pretty]
+ *   deno run --allow-read .llm/tools/agentic/openhands/openhands-status.ts --pr 86 [--pretty]
  *   deno run --allow-read --allow-env --allow-net \
- *     .llm/tools/agentic/openhands-status.ts --source remote --repo rickylabs/netscript --pr 86
+ *     .llm/tools/agentic/openhands/openhands-status.ts --source remote --repo rickylabs/netscript --pr 86
  *
  * Exit codes: 0 = status found · 1 = no status found · 2 = usage error ·
  * 4 = missing token (remote).
@@ -31,7 +31,7 @@ import {
   parseRepoSlug,
   readTokenFromEnv,
   requireValue,
-} from './agentic-lib.ts';
+} from '../lib/agentic-lib.ts';
 
 interface Options {
   source: 'local' | 'remote';
@@ -47,7 +47,7 @@ interface Options {
 function printHelp(): void {
   console.log([
     'Usage:',
-    '  deno run --allow-read .llm/tools/agentic/openhands-status.ts (--pr N | --issue N) [options]',
+    '  deno run --allow-read .llm/tools/agentic/openhands/openhands-status.ts (--pr N | --issue N) [options]',
     '',
     'Options:',
     '  --source <local|remote>  local reads the committed trace (default, no token);',

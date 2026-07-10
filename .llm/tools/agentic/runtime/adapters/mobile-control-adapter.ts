@@ -1,6 +1,6 @@
 /** Read-only translation of the PR 0A Codex mobile-control probe. */
 
-import type { MobileControlProbe } from '../../wsl-foundation-lib.ts';
+import type { MobileControlProbe } from '../../wsl/wsl-foundation-lib.ts';
 import type { CapabilityState, RuntimeDiagnostic } from '../contract.ts';
 
 /** Converts managed app-server health into the controller capability vocabulary. */

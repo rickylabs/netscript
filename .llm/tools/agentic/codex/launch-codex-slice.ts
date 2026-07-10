@@ -27,7 +27,7 @@
  *
  * Usage:
  *   deno run --allow-read --allow-write --allow-run \
- *     .llm/tools/agentic/launch-codex-slice.ts \
+ *     .llm/tools/agentic/codex/launch-codex-slice.ts \
  *     --brief <win-path-to-implement.md> \
  *     --worktree /home/codex/repos/<wt> \
  *     --branch feat/prime-time/auth-s1-contract \
@@ -53,18 +53,18 @@ import {
   wslGitInfo,
   wslHome,
   wslUser,
-} from './agentic-lib.ts';
+} from '../lib/agentic-lib.ts';
 import {
   compareLaunchIdentity,
   type RequestedLaunchIdentity,
   requestedLaunchIdentity,
-} from './runtime/launch-route-identity.ts';
-import { LocalSenderOwnershipAdapter } from './runtime/adapters/local-sender-ownership-adapter.ts';
+} from '../runtime/launch-route-identity.ts';
+import { LocalSenderOwnershipAdapter } from '../runtime/adapters/local-sender-ownership-adapter.ts';
 import {
   activateSenderOwnership,
   decideSenderOwnership,
   newSenderOwnershipRecord,
-} from './runtime/sender-ownership.ts';
+} from '../runtime/sender-ownership.ts';
 
 interface Options {
   mode: 'launch' | 'dry-run' | 'parse-log';
@@ -89,7 +89,7 @@ function printHelp(): void {
   console.log([
     'Usage:',
     '  deno run --allow-read --allow-write --allow-run \\',
-    '    .llm/tools/agentic/launch-codex-slice.ts --brief <win path> \\',
+    '    .llm/tools/agentic/codex/launch-codex-slice.ts --brief <win path> \\',
     '    --worktree <wsl path> --branch <branch> --slug <slug> --slice-dir <win path> [options]',
     '',
     'Options:',
@@ -227,7 +227,7 @@ function threadRecord(
     `codex exec resume ${info.threadId ?? '<thread-id>'} -- "<follow-up>"`,
     '```',
     '',
-    '_Written by `.llm/tools/agentic/launch-codex-slice.ts`._',
+    '_Written by `.llm/tools/agentic/codex/launch-codex-slice.ts`._',
     '',
   ].filter((l) => l !== '').join('\n');
 }

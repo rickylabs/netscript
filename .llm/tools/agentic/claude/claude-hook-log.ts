@@ -9,8 +9,8 @@
  *
  * Usage:
  *   <hook-json> | deno run --allow-env --allow-read --allow-write \
- *     .llm/tools/agentic/claude-hook-log.ts
- *   deno run .llm/tools/agentic/claude-hook-log.ts --help
+ *     .llm/tools/agentic/claude/claude-hook-log.ts
+ *   deno run .llm/tools/agentic/claude/claude-hook-log.ts --help
  *
  * Perms: --allow-env (NETSCRIPT_RUN_ID, CLAUDE_SESSION_ID) · --allow-read /
  * --allow-write (.llm/tmp/claude/hooks/**). Exit 0 on success.
@@ -73,7 +73,7 @@ if (import.meta.main) {
         '',
         'Usage:',
         '  <hook-json> | deno run --allow-env --allow-read --allow-write \\',
-        '    .llm/tools/agentic/claude-hook-log.ts',
+        '    .llm/tools/agentic/claude/claude-hook-log.ts',
         '',
         'Perms: --allow-env --allow-read --allow-write',
       ].join('\n'),

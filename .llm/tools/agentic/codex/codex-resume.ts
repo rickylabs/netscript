@@ -15,14 +15,14 @@
  *   --dry-run    Validate inputs and print the exact command; send nothing.
  *
  * Usage:
- *   deno run --allow-read --allow-run .llm/tools/agentic/codex-resume.ts \
+ *   deno run --allow-read --allow-run .llm/tools/agentic/codex/codex-resume.ts \
  *     --thread-id <uuid> --message "<follow-up>" \
  *     [--message-file <win-path>] [--worktree <wsl path>] [--user codex] [--dry-run]
  *
  * Exit codes: 0 = ok / dry-run clean · 1 = resume failed · 2 = usage error.
  */
 
-import { requireValue, sq, UUID, wsl, wslUser } from './agentic-lib.ts';
+import { requireValue, sq, UUID, wsl, wslUser } from '../lib/agentic-lib.ts';
 
 interface Options {
   threadId?: string;
@@ -38,7 +38,7 @@ interface Options {
 function printHelp(): void {
   console.log([
     'Usage:',
-    '  deno run --allow-read --allow-run .llm/tools/agentic/codex-resume.ts \\',
+    '  deno run --allow-read --allow-run .llm/tools/agentic/codex/codex-resume.ts \\',
     '    --thread-id <uuid> --message "<follow-up>" [options]',
     '',
     'Options:',

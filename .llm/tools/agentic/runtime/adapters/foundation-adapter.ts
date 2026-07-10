@@ -1,7 +1,7 @@
 /** PR 0A doctor adapter for the schema 1.0 runtime controller. */
 
-import type { RuntimeDoctorReport } from '../../wsl-foundation-lib.ts';
-import { FOUNDATION_SCHEMA_VERSION } from '../../wsl-foundation-lib.ts';
+import type { RuntimeDoctorReport } from '../../wsl/wsl-foundation-lib.ts';
+import { FOUNDATION_SCHEMA_VERSION } from '../../wsl/wsl-foundation-lib.ts';
 import { INSTALLABLE_FOUNDATION_COMPONENTS, RUNTIME_SCHEMA_VERSION } from '../contract.ts';
 import type {
   AgentKind,
@@ -14,7 +14,7 @@ import { fingerprintRuntimeValue, type ObservedRuntimeState } from '../state.ts'
 import { translateMobileControl } from './mobile-control-adapter.ts';
 
 const MAX_REPORT_BYTES = 256 * 1024;
-const FOUNDATION_DOCTOR_SCRIPT = new URL('../../wsl-foundation.ts', import.meta.url);
+const FOUNDATION_DOCTOR_SCRIPT = new URL('../../wsl/wsl-foundation.ts', import.meta.url);
 const STATE_DIRECTORY_COMPONENTS: Readonly<
   Partial<Record<RuntimeDoctorReport['components'][number]['component'], StateDirectoryId>>
 > = {

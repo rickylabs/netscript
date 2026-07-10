@@ -37,7 +37,7 @@ import {
   requireValue,
   resolveGithubToken,
   selectLatestOpenHandsComment,
-} from './agentic-lib.ts';
+} from '../lib/agentic-lib.ts';
 
 interface WatchOptions {
   repo: string;

@@ -1,4 +1,4 @@
-import type { GitInfo } from '../agentic-lib.ts';
+import type { GitInfo } from '../lib/agentic-lib.ts';
 import type { RouteIdentity, RuntimeCommand, RuntimeDiagnostic } from './contract.ts';
 import {
   CODEX_LAUNCH_WRAPPER,
@@ -21,7 +21,7 @@ import {
   classifyAuth,
   classifyComponent,
   classifyMobileControl,
-} from '../wsl-foundation-lib.ts';
+} from '../wsl/wsl-foundation-lib.ts';
 import { fingerprintRuntimeValue } from './state.ts';
 import { RUNTIME_TEST_COMPONENT_VERSIONS } from './test-fixtures.ts';
 

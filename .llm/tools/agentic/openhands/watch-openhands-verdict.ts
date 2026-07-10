@@ -19,7 +19,7 @@
  * fallback) and used ONLY as the Authorization header; never logged.
  *
  * Usage:
- *   deno run --allow-env --allow-net .llm/tools/agentic/watch-openhands-verdict.ts \
+ *   deno run --allow-env --allow-net .llm/tools/agentic/openhands/watch-openhands-verdict.ts \
  *     --repo rickylabs/netscript --pr 86 [--since 2026-07-05T10:00:00Z] \
  *     [--timeout-seconds 1800] [--interval-seconds 30] [--token-env GH_TOKEN] [--pretty]
  *
@@ -36,7 +36,7 @@ import {
   type RepoSlug,
   requireValue,
   type VerdictSourceComment,
-} from './agentic-lib.ts';
+} from '../lib/agentic-lib.ts';
 
 interface Options {
   repo: string;
@@ -51,7 +51,7 @@ interface Options {
 function printHelp(): void {
   console.log([
     'Usage:',
-    '  deno run --allow-env --allow-net .llm/tools/agentic/watch-openhands-verdict.ts \\',
+    '  deno run --allow-env --allow-net .llm/tools/agentic/openhands/watch-openhands-verdict.ts \\',
     '    --repo owner/name --pr N [options]',
     '',
     'Options:',

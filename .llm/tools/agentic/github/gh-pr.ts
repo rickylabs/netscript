@@ -22,14 +22,14 @@
  * passed on argv, or echoed. `--dry-run` needs no token and makes no network call.
  *
  * Usage:
- *   deno run --allow-read --allow-env --allow-net .llm/tools/agentic/gh-pr.ts \
+ *   deno run --allow-read --allow-env --allow-net .llm/tools/agentic/github/gh-pr.ts \
  *     create --head feat/prime-time/auth-s3-kv-oauth --base feat/prime-time/auth \
  *     --title "S3 — …" --body-file <win-path> [--draft] [--allow-base-main]
  *
- *   deno run --allow-read --allow-env --allow-net .llm/tools/agentic/gh-pr.ts \
+ *   deno run --allow-read --allow-env --allow-net .llm/tools/agentic/github/gh-pr.ts \
  *     verdict --pr 93
  *
- *   deno run --allow-read --allow-env --allow-net .llm/tools/agentic/gh-pr.ts \
+ *   deno run --allow-read --allow-env --allow-net .llm/tools/agentic/github/gh-pr.ts \
  *     merge --pr 93 [--method merge|squash|rebase] [--title …] [--message …] \
  *     [--no-eval-gate] [--force] [--allow-base-main]
  *
@@ -51,7 +51,7 @@ import {
   requireValue,
   resolveGithubToken,
   selectLatestOpenHandsComment,
-} from './agentic-lib.ts';
+} from '../lib/agentic-lib.ts';
 
 type Sub = 'create' | 'verdict' | 'merge';
 

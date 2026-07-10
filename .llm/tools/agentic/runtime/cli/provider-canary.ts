@@ -1,12 +1,12 @@
 /** Read-only CLI edge for structured provider compatibility canaries. */
 
-import { ProviderCanaryAdapter } from './runtime/adapters/provider-canary-adapter.ts';
+import { ProviderCanaryAdapter } from '../adapters/provider-canary-adapter.ts';
 import {
   CODEX_OPENROUTER_PROFILE_FILE,
   CODEX_OPENROUTER_PROFILE_NAME,
-} from './runtime/adapters/codex-profile-adapter.ts';
-import { AGENT_KINDS, EFFORTS, PROVIDER_KINDS, type RouteIdentity } from './runtime/contract.ts';
-import { PROVIDER_PROFILE_IDS } from './runtime/provider-profiles.ts';
+} from '../adapters/codex-profile-adapter.ts';
+import { AGENT_KINDS, EFFORTS, PROVIDER_KINDS, type RouteIdentity } from '../contract.ts';
+import { PROVIDER_PROFILE_IDS } from '../provider-profiles.ts';
 
 function usage(): string {
   return [

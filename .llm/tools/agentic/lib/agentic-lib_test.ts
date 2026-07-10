@@ -8,7 +8,7 @@
  * evaluation, repo-slug parsing, OpenHands comment building, and status parsing
  * against a real-shaped status comment fixture.
  *
- * Run: deno test --allow-read --allow-env .llm/tools/agentic/agentic-lib_test.ts
+ * Run: deno test --allow-read --allow-env .llm/tools/agentic/lib/agentic-lib_test.ts
  */
 
 import {

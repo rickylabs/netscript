@@ -32,7 +32,7 @@
  *
  * Usage:
  *   deno run --allow-read --allow-env --allow-net \
- *     .llm/tools/agentic/dispatch-openhands.ts \
+ *     .llm/tools/agentic/openhands/dispatch-openhands.ts \
  *     --repo rickylabs/netscript --pr 86 \
  *     --prompt-file <win-path> --model openrouter/qwen/qwen3.7-max \
  *     --output pr-comment --iterations 800 [--provider openrouter] \
@@ -50,8 +50,8 @@ import {
   requireValue,
   resolveGithubToken,
   validateHandoffContract,
-} from './agentic-lib.ts';
-import { requestedLaunchIdentity } from './runtime/launch-route-identity.ts';
+} from '../lib/agentic-lib.ts';
+import { requestedLaunchIdentity } from '../runtime/launch-route-identity.ts';
 
 interface Options {
   repo: string;
@@ -73,7 +73,7 @@ function printHelp(): void {
   console.log([
     'Usage:',
     '  deno run --allow-read --allow-env --allow-net \\',
-    '    .llm/tools/agentic/dispatch-openhands.ts --repo owner/name (--pr N | --issue N) \\',
+    '    .llm/tools/agentic/openhands/dispatch-openhands.ts --repo owner/name (--pr N | --issue N) \\',
     '    --prompt-file <win path> [options]',
     '',
     'Options:',

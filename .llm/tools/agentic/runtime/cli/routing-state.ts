@@ -1,7 +1,7 @@
 /** Read-only human edge for persisted quota fallback state. */
 
-import { LocalRuntimeStateAdapter } from './runtime/adapters/local-state-adapter.ts';
-import type { RoutingState } from './runtime/routing-state-machine.ts';
+import { LocalRuntimeStateAdapter } from '../adapters/local-state-adapter.ts';
+import type { RoutingState } from '../routing-state-machine.ts';
 
 export function renderRoutingStateHuman(states: readonly RoutingState[]): string {
   if (states.length === 0) return 'No persisted routing transitions.';

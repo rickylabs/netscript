@@ -6,11 +6,11 @@ const denoConfig = JSON.parse(await Deno.readTextFile(new URL('deno.json', root)
   tasks: Record<string, string>;
 };
 const wrappers = {
-  'agentic:wsl-foundation': 'wsl-foundation.ts',
-  'agentic:launch-codex-slice': 'launch-codex-slice.ts',
-  'agentic:codex-resume': 'codex-resume.ts',
-  'agentic:codex-status': 'codex-status.ts',
-  'agentic:smoke-claude-remote': 'claude-remote-smoke.ts',
+  'agentic:wsl-foundation': 'wsl/wsl-foundation.ts',
+  'agentic:launch-codex-slice': 'codex/launch-codex-slice.ts',
+  'agentic:codex-resume': 'codex/codex-resume.ts',
+  'agentic:codex-status': 'codex/codex-status.ts',
+  'agentic:smoke-claude-remote': 'claude/claude-remote-smoke.ts',
 } as const;
 
 Deno.test('S5 retains every legacy task as a thin compatibility entry point', async () => {
@@ -21,7 +21,7 @@ Deno.test('S5 retains every legacy task as a thin compatibility entry point', as
     );
     const source = await Deno.readTextFile(new URL(file, import.meta.url));
     assert(source.length > 0, `${file} missing`);
-    if (file !== 'wsl-foundation.ts') {
+    if (file !== 'wsl/wsl-foundation.ts') {
       assert(
         source.includes('@deprecated Retained through one compatibility cycle'),
         `${file} retirement boundary missing`,
@@ -31,11 +31,11 @@ Deno.test('S5 retains every legacy task as a thin compatibility entry point', as
 });
 
 Deno.test('compatibility wrappers retain stable flag and delegation contracts', async () => {
-  const launch = await Deno.readTextFile(new URL('launch-codex-slice.ts', import.meta.url));
-  const resume = await Deno.readTextFile(new URL('codex-resume.ts', import.meta.url));
-  const status = await Deno.readTextFile(new URL('codex-status.ts', import.meta.url));
-  const smoke = await Deno.readTextFile(new URL('claude-remote-smoke.ts', import.meta.url));
-  const foundation = await Deno.readTextFile(new URL('wsl-foundation.ts', import.meta.url));
+  const launch = await Deno.readTextFile(new URL('codex/launch-codex-slice.ts', import.meta.url));
+  const resume = await Deno.readTextFile(new URL('codex/codex-resume.ts', import.meta.url));
+  const status = await Deno.readTextFile(new URL('codex/codex-status.ts', import.meta.url));
+  const smoke = await Deno.readTextFile(new URL('claude/claude-remote-smoke.ts', import.meta.url));
+  const foundation = await Deno.readTextFile(new URL('wsl/wsl-foundation.ts', import.meta.url));
   for (
     const flag of [
       '--brief',

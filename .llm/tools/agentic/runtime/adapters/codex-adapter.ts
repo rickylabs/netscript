@@ -6,7 +6,7 @@ import {
   parseThreadInfo,
   parseTurnComplete,
   validateHandoffContract,
-} from '../../agentic-lib.ts';
+} from '../../lib/agentic-lib.ts';
 import type { RouteIdentity, RuntimeCommand, RuntimeDiagnostic } from '../contract.ts';
 import type { AgentCommandPlan, AgentProcessRequest } from '../ports.ts';
 import { decideSenderOwnership, type SenderOwnershipObservation } from '../sender-ownership.ts';
@@ -14,8 +14,8 @@ import { childEnvironmentPolicyForProfile, resolveProviderProfile } from '../pro
 import type { CodexProfileReference } from './codex-profile-adapter.ts';
 import { validateProviderRoute } from './provider-adapter.ts';
 
-export const CODEX_LAUNCH_WRAPPER = '.llm/tools/agentic/launch-codex-slice.ts';
-export const CODEX_RESUME_WRAPPER = '.llm/tools/agentic/codex-resume.ts';
+export const CODEX_LAUNCH_WRAPPER = '.llm/tools/agentic/codex/launch-codex-slice.ts';
+export const CODEX_RESUME_WRAPPER = '.llm/tools/agentic/codex/codex-resume.ts';
 export const AGENT_COMMAND_TIMEOUT_MS = 30_000;
 export const MAX_AGENT_CAPTURE_BYTES: number = 64 * 1024;
 

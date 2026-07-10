@@ -1,15 +1,15 @@
 // deno-fmt-ignore-file
-import { AGENT_KINDS, type AgentKind, type RuntimeCommand } from './runtime/contract.ts';
-import { runRuntimeCommand } from './runtime/controller.ts';
+import { AGENT_KINDS, type AgentKind, type RuntimeCommand } from '../contract.ts';
+import { runRuntimeCommand } from '../controller.ts';
 import {
   CommandFoundationReportReader,
   FoundationRuntimeInspector,
-} from './runtime/adapters/foundation-adapter.ts';
-import { LocalRuntimeStateAdapter } from './runtime/adapters/local-state-adapter.ts';
-import { LocalCodexRemoteAdapter } from './runtime/adapters/local-codex-remote-adapter.ts';
-import { runCodexRemoteRepair } from './runtime/codex-remote-repair.ts';
-import { renderRuntimeHuman, renderRuntimeJson, runtimeExitCode } from './runtime/output.ts';
-import type { RuntimeReadPorts } from './runtime/ports.ts';
+} from '../adapters/foundation-adapter.ts';
+import { LocalRuntimeStateAdapter } from '../adapters/local-state-adapter.ts';
+import { LocalCodexRemoteAdapter } from '../adapters/local-codex-remote-adapter.ts';
+import { runCodexRemoteRepair } from '../codex-remote-repair.ts';
+import { renderRuntimeHuman, renderRuntimeJson, runtimeExitCode } from '../output.ts';
+import type { RuntimeReadPorts } from '../ports.ts';
 interface ParsedRuntimeArgs { readonly command: RuntimeCommand; readonly json: boolean; }
 interface CliOptions { readonly positional: readonly string[]; readonly json: boolean; readonly dryRun: boolean; readonly values: ReadonlyMap<string, string>; }
 function usage(): string {

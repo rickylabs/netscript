@@ -1,11 +1,11 @@
-import { aggregateAntigravityEvidence } from './runtime/antigravity-evidence-aggregation.ts';
-import type { AntigravityCapability } from './runtime/antigravity-evidence.ts';
+import { aggregateAntigravityEvidence } from '../antigravity-evidence-aggregation.ts';
+import type { AntigravityCapability } from '../antigravity-evidence.ts';
 import {
   ANTIGRAVITY_EVIDENCE_PROBES,
   AntigravityEvidenceAdapter,
   type AntigravityEvidenceProbe,
-} from './runtime/adapters/antigravity-adapter.ts';
-import { LocalRunResourceAggregationAdapter } from './runtime/adapters/run-resource-aggregation-adapter.ts';
+} from '../adapters/antigravity-adapter.ts';
+import { LocalRunResourceAggregationAdapter } from '../adapters/run-resource-aggregation-adapter.ts';
 
 const OWNER_ACCEPTED: readonly AntigravityCapability[] = [
   'headless',

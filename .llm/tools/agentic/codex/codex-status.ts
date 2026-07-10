@@ -16,13 +16,13 @@
  *   - sessions : most recent session rollout jsonl files (newest first).
  *
  * Usage:
- *   deno run --allow-run .llm/tools/agentic/codex-status.ts \
+ *   deno run --allow-run .llm/tools/agentic/codex/codex-status.ts \
  *     [--worktree /home/codex/repos/<wt>] [--user codex] [--sessions 10] [--pretty]
  *
  * Exit codes: 0 = ok · 2 = usage error · 5 = --worktree given but not found.
  */
 
-import { requireValue, wsl, wslGitInfo, wslGitLogsPath, wslUser } from './agentic-lib.ts';
+import { requireValue, wsl, wslGitInfo, wslGitLogsPath, wslUser } from '../lib/agentic-lib.ts';
 
 interface Options {
   worktree?: string;
@@ -34,7 +34,7 @@ interface Options {
 function printHelp(): void {
   console.log([
     'Usage:',
-    '  deno run --allow-run .llm/tools/agentic/codex-status.ts [options]',
+    '  deno run --allow-run .llm/tools/agentic/codex/codex-status.ts [options]',
     '',
     'Options:',
     '  --worktree <path>  WSL worktree to report branch/HEAD/upstream/dirty + logs path.',

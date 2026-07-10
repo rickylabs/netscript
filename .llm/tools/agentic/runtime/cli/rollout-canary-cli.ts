@@ -1,7 +1,7 @@
 /** CLI edge that writes the validated, secret-safe rollout canary matrix. */
 
 import { runRolloutCanaries } from './rollout-canary-runner.ts';
-import { renderRolloutReport } from './runtime/rollout-report.ts';
+import { renderRolloutReport } from '../rollout-report.ts';
 
 interface Args {
   readonly worktree: string;

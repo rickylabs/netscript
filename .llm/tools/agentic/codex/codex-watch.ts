@@ -25,7 +25,7 @@
  *
  *   wsl.exe --cd /home/codex/repos/<wt> -u codex -- bash -lc 'export PATH="$HOME/.local/bin:$PATH"; \
  *     deno run --no-config --allow-env --allow-read --allow-run \
- *     /mnt/c/.../.llm/tools/agentic/codex-watch.ts \
+ *     /mnt/c/.../.llm/tools/agentic/codex/codex-watch.ts \
  *     --mode turn --thread-id <uuid> --timeout-seconds 1800'
  *
  * In git mode it uses plain `git` (cwd = worktree); it does NOT call wsl.exe itself.
@@ -42,7 +42,7 @@
  * 2 = timed out (heartbeat) · 1 = bad args / worktree, logs dir, or rollout not found.
  */
 
-import { parseTurnComplete, requireValue, runBin, UUID, wslHome } from './agentic-lib.ts';
+import { parseTurnComplete, requireValue, runBin, UUID, wslHome } from '../lib/agentic-lib.ts';
 
 type Mode = 'git' | 'turn';
 

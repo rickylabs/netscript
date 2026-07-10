@@ -1,4 +1,4 @@
-import type { GitInfo } from '../agentic-lib.ts';
+import type { GitInfo } from '../lib/agentic-lib.ts';
 import { planClaudeCommand } from './adapters/claude-adapter.ts';
 import {
   CODEX_OPENROUTER_PROFILE_FILE,

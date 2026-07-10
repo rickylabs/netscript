@@ -10,7 +10,7 @@
   work when a mobile-visible implementation agent is required.
 - Before invoking a repo skill by name, check whether it exists in `.claude/skills/`. If it does
   not, read the matching `.agents/skills/<name>/SKILL.md` directly.
-- Use `.llm/tools/agentic/validate-claude-surface.ts` when Claude configuration, skills, hooks, or
+- Use `.llm/tools/agentic/claude/validate-claude-surface.ts` when Claude configuration, skills, hooks, or
   agent orchestration docs change.
 - Keep `.claude/skills/` generated from `.agents/skills/`; do not hand-edit mirrored files.
 

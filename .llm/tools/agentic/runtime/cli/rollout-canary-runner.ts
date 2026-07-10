@@ -5,7 +5,7 @@ import {
   type CanaryResult,
   type FailureClassification,
   type RolloutOutcome,
-} from './runtime/rollout-canary.ts';
+} from '../rollout-canary.ts';
 
 export interface CommandRequest {
   readonly display: string;

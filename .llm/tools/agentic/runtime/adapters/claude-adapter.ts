@@ -6,7 +6,7 @@ import { childEnvironmentPolicyForProfile, resolveProviderProfile } from '../pro
 import { AGENT_COMMAND_TIMEOUT_MS, MAX_AGENT_CAPTURE_BYTES } from './codex-adapter.ts';
 import { validateProviderRoute } from './provider-adapter.ts';
 
-export const CLAUDE_SMOKE_WRAPPER = '.llm/tools/agentic/claude-remote-smoke.ts';
+export const CLAUDE_SMOKE_WRAPPER = '.llm/tools/agentic/claude/claude-remote-smoke.ts';
 
 type ClaudeCommand = Extract<RuntimeCommand, { kind: 'launch' | 'resume' | 'smoke' }>;
 
