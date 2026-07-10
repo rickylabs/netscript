@@ -130,6 +130,20 @@ automated gates pass and coordinator review is pending. S5 has not started.
   dependency, lock, S4 transaction, or S5 wrapper action occurred. Existing format-scope drift
   remains unchanged; no new architecture debt.
 
+## 2026-07-10 Reconciliation Pause
+
+- Desired future component/research lane is Antigravity CLI (`agy`), replacing Gemini CLI.
+- S1-S3 Gemini implementation remains historical and requires an explicit compatibility migration.
+- S4 final remediation is paused; S5 and #578 have not started.
+- Future refactor surfaces: runtime contract/state/planner, foundation/local-state/provider/Gemini
+  adapters, focused tests, and README. Replace the adapter with an Antigravity adapter while
+  explicitly reading/refusing legacy persisted `gemini` state; do not create an executable alias.
+- Canonical acceptance requires `/home/codex/.local/bin/agy` under user `codex`. Preserve
+  `~/.gemini`; never touch `/root/.local/bin/agy`.
+- Auth, subscription/quota, JSON/output, full exit codes, web research/citations, and instruction
+  compatibility remain unpassed canaries.
+- Resume only thread `019f4b72-2ea4-7050-917e-6d6918371265` after revised-scope review.
+
 ## S3 Remediation Evidence
 
 - Codex launch exact argv now ends with `--expect-base <inspected git.head>`; an empty inspected

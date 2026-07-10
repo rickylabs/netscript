@@ -129,6 +129,24 @@ noted above. This boundary prevents #576 from becoming a rewrite of the entire s
   and umbrella relationship are correct.
 - Acceptance/Definition-of-Done boxes remain unchecked. Planning does not satisfy them and the PR
   remains draft.
+
+## 2026-07-10 Antigravity Official-Source Findings
+
+The official Antigravity README, installer, and changelog establish `$HOME/.local/bin/agy`,
+keyring/Google Sign-In with browser or SSH authorization URL, `/logout`, and headless
+`--print`/`-p`. The installer has no documented uninstall command and accepts only `--dir` and
+`--help`. Antigravity stores shared/private configuration below `~/.gemini`, so that directory must
+survive Gemini CLI package removal.
+
+The official surface does not establish JSON/JSONL output, a complete exit-code taxonomy, an
+`agy login` command, deterministic search/citation output, subscription/quota semantics,
+`AGENTS.md`/`GEMINI.md` ingestion, or Gemini state/alias migration. The controller must model these
+as deferred/unknown canaries rather than map Gemini assumptions onto Antigravity.
+
+Exact future migration surfaces are `runtime/contract.ts`, `state.ts`, `planner.ts`,
+`adapters/{foundation,local-state,provider,gemini}-adapter.ts`, their tests, and the agentic README.
+Historical persisted `gemini` values require explicit compatibility parsing or refusal; no silent
+reinterpretation is permitted.
 - Existing PLAN comments correctly identify the sole attached thread. Completion comments are due
   only after the planning commit is pushed.
 

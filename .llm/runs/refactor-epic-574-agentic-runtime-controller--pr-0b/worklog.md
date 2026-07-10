@@ -838,3 +838,17 @@ same locked S4 scope. S5 and #577-#582 remain explicitly unstarted.
 No new plan or architecture drift was introduced. The existing broad-format S5-wrapper drift is
 unchanged. Next action is coordinator Tier-A re-review; this worker does not self-certify or start
 S5.
+
+## 2026-07-10 Planning-Only Antigravity Reconciliation
+
+The owner replaced the future Gemini CLI component/research lane with Google Antigravity CLI
+(`agy`). Historical S1-S4 Gemini observations and tests remain truthful evidence. No runtime
+implementation changed in this pass.
+
+The planned compatibility migration covers runtime contracts/state/planner,
+foundation/local-state/provider/Gemini adapters, focused tests, and README. It must preserve
+`~/.gemini`, normalize or explicitly reject persisted legacy `gemini` state, and avoid a `gemini`
+executable alias. Official sources verify Google Sign-In and headless `-p`, but canonical-user auth,
+structured output, complete exits, quota/subscription, search/fetch/citations, and instruction-file
+behavior remain acceptance canaries owned by revised #578. S4 remediation, S5, and #578 stay paused
+pending scope review.

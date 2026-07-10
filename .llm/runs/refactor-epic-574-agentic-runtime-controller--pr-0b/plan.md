@@ -237,3 +237,21 @@ claim that package gates passed. Stop and request rescope if implementation requ
 credential-bearing CLI option, global provider defaults, live daemon repair, automatic fallback
 policy, provider login, more than 25 touched implementation files, any file above 500 LOC, or any
 edit outside the owned roots.
+
+## 2026-07-10 Owner Rescope Addendum: Antigravity Runtime Boundary
+
+The owner's mobile directive replaces the future Gemini CLI desired component and #578 research lane
+with Google Antigravity CLI (`agy`). Completed S1-S3 Gemini contracts remain historical implementation
+facts until a reviewed compatibility migration; they are not silently renamed.
+
+The future controller refactor replaces desired agent/component/state/capability vocabulary and
+`gemini-adapter.ts` with Antigravity equivalents across `contract.ts`, `state.ts`, `planner.ts`,
+`foundation-adapter.ts`, `local-state-adapter.ts`, `provider-adapter.ts`, focused tests, and the
+agentic README. A bounded parser may accept persisted legacy `gemini` state and normalize it to an
+explicit migration diagnostic; no `gemini` executable alias or inferred auth policy is allowed.
+
+Issue #578 owns live Antigravity evidence acquisition only after official canaries prove canonical
+`codex`-user installation/authentication, headless `-p`, output/exit behavior, web fetch/search and
+citations, subscription/quota semantics, and instruction-file behavior. Official sources do not
+document JSON/JSONL, complete exit codes, `agy login`, or a stable research contract. S4 remediation
+and S5 remain paused until this addendum and the corresponding GitHub scope are reviewed.

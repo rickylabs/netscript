@@ -60,3 +60,13 @@
 - **Severity:** minor gate-scope drift; no implementation or architecture drift.
 - **Action:** preserve the raw exit-1 evidence, use the owned-surface exit-0 wrapper as the S2
   formatting verdict, and do not edit compatibility wrappers before locked slice S5.
+
+## 2026-07-10 - Owner replaced Gemini CLI with Antigravity CLI
+
+- **Expected:** Locked plan and implemented S1-S3 model Gemini CLI as the Google runtime/research
+  component.
+- **Actual:** The owner directed migration to Google Antigravity CLI (`agy`) after those slices.
+- **Severity:** significant owner-authorized scope change.
+- **Action:** preserve historical Gemini evidence, pause S4/S5/#578, revise GitHub and harness plans,
+  and implement a reviewed compatibility migration later. Do not infer Gemini auth, quota, output,
+  or research contracts for `agy`.
