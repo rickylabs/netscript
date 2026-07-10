@@ -74,8 +74,13 @@ const UI_LOCAL_SOURCE_SCRIPT = [
   '  throw new Error("ui:add ai did not merge the expected @netscript/ai dependency");',
   '}',
   'config.imports["@netscript/ai"] = "./packages/ai/mod.ts";',
+  'config.compilerOptions = {',
+  '  ...config.compilerOptions,',
+  '  jsx: "precompile",',
+  '  jsxImportSource: "preact",',
+  '};',
   'await Deno.writeTextFile(path, `${JSON.stringify(config, null, 2)}\n`);',
-  'console.info(`verified ${requiredPaths.length} AI/theme artifacts and mapped @netscript/ai to local source`);',
+  'console.info(`verified ${requiredPaths.length} AI/theme artifacts and configured local-source TSX`);',
 ].join('\n');
 
 const UI_RENDER_ASSERTION_SCRIPT = [

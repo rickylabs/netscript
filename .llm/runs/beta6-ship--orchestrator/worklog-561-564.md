@@ -54,3 +54,12 @@ the resolving PR and its `Closes #561` / `Closes #564` body keywords.
 - Published-JSR availability is intentionally not treated as green. The generated fixture first
   asserts the exact JSR dependency was emitted, then explicitly records and applies the local-source
   mapping used by other maintainer scaffold paths.
+
+## Slice 1 follow-up
+
+The first canonical run reached `generated.ui-ai-check` after 19 earlier gates passed, then exposed
+that the generated root config had no JSX transform for app-owned root-level TSX files. The copied
+files were therefore parsed with the classic React transform despite the dashboard member's Fresh
+config. The local-source preparation gate now adds the same Preact precompile settings used by the
+generated Fresh app before checking the copied files. This is fixture configuration, not a source
+or dependency bypass; the type-check remains mandatory.
