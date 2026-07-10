@@ -94,3 +94,11 @@
 - **Severity:** narrow attribution defect; no mutation escaped and plan paths remained read-only.
 - **Action:** apply mode now wins first; exact provider × launch/resume/smoke status/owner/exit tests
   prevent recurrence. Non-apply provider deferrals remain unchanged.
+
+## 2026-07-10 - Owner fixture review stayed test-only
+
+- **Expected:** Deduplicate runtime-test component versions without creating controller policy.
+- **Actual:** One frozen typed test fixture now supplies the owned runtime tests that shared those
+  exact values; historical foundation tests were intentionally not refactored.
+- **Severity:** no implementation drift.
+- **Action:** retain explicit node/Claude/Gemini typing and order in the test fixture only.

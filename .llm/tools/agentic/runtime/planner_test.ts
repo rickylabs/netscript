@@ -8,6 +8,7 @@ import {
 import { planReconciliation } from './planner.ts';
 import { runtimeExitCode } from './output.ts';
 import type { DesiredRuntimeState, ObservedRuntimeState } from './state.ts';
+import { RUNTIME_TEST_COMPONENT_VERSIONS } from './test-fixtures.ts';
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -34,7 +35,7 @@ const desired: DesiredRuntimeState = {
   stateId: 'desired-1',
   foundation: {
     nativeExt4: true,
-    versions: { node: '26.5.0', claude: '2.1.206', gemini: '0.50.0' },
+    versions: RUNTIME_TEST_COMPONENT_VERSIONS,
     stateDirectories: ['claude', 'codex', 'gemini', 'netscript-agentic'],
   },
   agents: {
@@ -50,9 +51,9 @@ function observed(overrides: Partial<ObservedRuntimeState> = {}): ObservedRuntim
     stateId: 'observed-1',
     nativeExt4: true,
     components: [
-      { component: 'node', version: '26.5.0', status: 'ready' },
-      { component: 'claude', version: '2.1.206', status: 'ready' },
-      { component: 'gemini', version: '0.50.0', status: 'ready' },
+      { component: 'node', version: RUNTIME_TEST_COMPONENT_VERSIONS.node, status: 'ready' },
+      { component: 'claude', version: RUNTIME_TEST_COMPONENT_VERSIONS.claude, status: 'ready' },
+      { component: 'gemini', version: RUNTIME_TEST_COMPONENT_VERSIONS.gemini, status: 'ready' },
     ],
     auth: [],
     stateDirectories: ['claude', 'codex', 'gemini', 'netscript-agentic'],
@@ -75,6 +76,14 @@ function observed(overrides: Partial<ObservedRuntimeState> = {}): ObservedRuntim
 function plan(command: RuntimeCommand, state = observed(), wanted = desired) {
   return planReconciliation({ command, desired: wanted, observed: state });
 }
+
+Deno.test('runtime component version fixture is immutable and explicitly ordered', () => {
+  assertEquals(Object.keys(RUNTIME_TEST_COMPONENT_VERSIONS), ['node', 'claude', 'gemini']);
+  assert(
+    Object.isFrozen(RUNTIME_TEST_COMPONENT_VERSIONS),
+    'component version fixture must be frozen',
+  );
+});
 
 Deno.test('equal configured state plans no actions', () => {
   const result = plan({

@@ -229,6 +229,13 @@ Apply-mode lifecycle ownership now wins before provider-route deferral: Gemini/O
 launch/resume/static smoke are #580 blocks with exit 4. Provider-specific plan/read-only behavior
 remains #577/#578. Await coordinator Tier-A re-review.
 
+### Owner inline fixture review
+
+Runtime component versions are centralized in the frozen test-only
+`RUNTIME_TEST_COMPONENT_VERSIONS` fixture and reused by planner, contract, and matching adapter
+tests. Literal scan is clean outside that fixture; focused `14/0`, complete `110/0`, wrappers
+`38/26/19` green. No production or child-issue scope changed.
+
 ## Safety
 
 - Native ext4 only; explicit push refspec only.

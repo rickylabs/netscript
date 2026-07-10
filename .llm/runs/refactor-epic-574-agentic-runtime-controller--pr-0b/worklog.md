@@ -893,3 +893,12 @@ the remediation commit comment; coordinator re-review remains required. Complete
 suite: `109 passed | 0 failed`; scoped check/lint/fmt: `37/25/18`, zero findings; doctor repeat:
 deterministic `5/5` `state_corrupt` with tree equality (previously recorded deferred owner-state
 vocabulary); planner/test budgets `350/350` and `384/450`; `deno.lock` unchanged; secret scan clean.
+
+## 2026-07-10 Owner Inline Review — Runtime Test Versions
+
+The pending owner thread on `planner_test.ts` is addressed with one frozen, explicitly typed and
+ordered test-only fixture, `RUNTIME_TEST_COMPONENT_VERSIONS`. Desired and observed planner state,
+the matching contract fixture, and owned runtime adapter probes now derive from it. A scoped search
+finds the three literal versions only in that fixture; historical foundation tests remain untouched.
+An assertion locks key order and runtime immutability. Focused planner: `14/0`; complete suite:
+`110/0`; scoped check/lint/fmt: `38/26/19`, zero findings. Production policy and behavior unchanged.

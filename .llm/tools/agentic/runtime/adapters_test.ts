@@ -20,6 +20,7 @@ import {
   classifyMobileControl,
 } from '../wsl-foundation-lib.ts';
 import { fingerprintRuntimeValue } from './state.ts';
+import { RUNTIME_TEST_COMPONENT_VERSIONS } from './test-fixtures.ts';
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -283,7 +284,7 @@ Deno.test('Claude static smoke uses fixed bounded argv and blocks owner-only liv
 
 Deno.test('Gemini observations are finite and live evidence is issue 578 blocked', () => {
   const observation = normalizeGeminiObservation({
-    version: '0.50.0',
+    version: RUNTIME_TEST_COMPONENT_VERSIONS.gemini,
     authStatus: 'ready',
     credentialKeyNames: ['IGNORED_KEY'],
   });
@@ -403,7 +404,12 @@ Deno.test('foundation owned readers match checkpoint canonical component shapes'
     generatedAt: '2026-07-10T00:00:00.000Z',
     nativePath: { cwd: worktree, nativeExt4: true },
     components: [
-      classifyComponent({ component: 'node', output: 'v26.5.0', exitCode: 0, expected: '26.5.0' }),
+      classifyComponent({
+        component: 'node',
+        output: `v${RUNTIME_TEST_COMPONENT_VERSIONS.node}`,
+        exitCode: 0,
+        expected: RUNTIME_TEST_COMPONENT_VERSIONS.node,
+      }),
     ],
     auth: classifyAuth(new Set(), false, false),
     mobileControl: classifyMobileControl(true, '0.144.1', '0.144.1'),
@@ -411,6 +417,9 @@ Deno.test('foundation owned readers match checkpoint canonical component shapes'
   const inspector = new FoundationRuntimeInspector({ readReport: () => Promise.resolve(report) });
   assertEquals(
     await inspector.readOwnedResourceFingerprint('component:node'),
-    await fingerprintRuntimeValue({ kind: 'component', version: '26.5.0' }),
+    await fingerprintRuntimeValue({
+      kind: 'component',
+      version: RUNTIME_TEST_COMPONENT_VERSIONS.node,
+    }),
   );
 });
