@@ -77,6 +77,8 @@ its rollback action; do not put provider credentials or values into reports.
 | 2026-07-10 | plan | baseline | Native WSL toolchain, managed Codex daemon, and Windows rollback versions captured. |
 | 2026-07-10 | plan | worktree | Native ext4 worktree created at `/home/codex/repos/netscript-epic-574-pr0a-foundation` with no upstream. |
 | 2026-07-10 | plan-eval | owner waiver | Owner personally reviewed the plan, declared it passed, and directed immediate WSL Codex delegation. |
+| 2026-07-10 | launch | thread created | Checked-in launcher created thread `019f4b48-abaf-77d2-9cca-5cdec9f2446d`; UNC artifact write failed before the initial turn persisted. |
+| 2026-07-10 | launch | managed repair | Active-work/rollout checks found no active implementation. Anchored PID repair restored managed remote control on environment `env_e_6a2d7485c5a0832a82505a12442cd3ec`, with CLI/app-server `0.144.1`. |
 
 ## Decisions
 
@@ -91,6 +93,7 @@ its rollback action; do not put provider credentials or values into reports.
 | ----- | -------- | ------------------ |
 | Checked lane policy names GPT-5.5-high, not owner-selected GPT-5.6 Sol high. | significant | yes |
 | Codex CLI/app-server versions differ. | minor | yes |
+| Launcher lacked UNC write permission; unmanaged daemon surfaced before first turn. | significant | yes |
 
 ## Gate Results
 

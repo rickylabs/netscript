@@ -20,3 +20,16 @@
 - **Action:** report in PR 0A doctor; durable repair remains #580.
 - **Evidence:** `research.md`.
 
+## 2026-07-10 — Launcher record write and unmanaged daemon recovery
+
+- **What:** `launch-codex-slice.ts` created the thread but its Windows process lacked permission to
+  write `codex-thread-ids.md` through the UNC path. The client closed before a rollout persisted,
+  and passive verification exposed an unmanaged app-server state.
+- **Source:** launcher output, `codex-status.ts`, `codex remote-control start --json`.
+- **Expected:** The launcher records the thread immediately and the daemon remains managed.
+- **Actual:** Thread identity was captured from stdout; no implementation turn or rollout started.
+- **Severity:** significant
+- **Action:** active-work/rollout checks confirmed no live turn; the skill's anchored PID and known
+  socket repair restored managed remote control. The same thread is retained for resume.
+- **Evidence:** `codex-thread-ids.md`; managed environment
+  `env_e_6a2d7485c5a0832a82505a12442cd3ec`; versions all `0.144.1`.
