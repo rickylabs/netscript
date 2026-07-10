@@ -12,25 +12,30 @@
 
 ## Current State
 
-The native WSL child worktree exists at the integration baseline with no upstream. The owner
-personally reviewed the plan and waived the separate PLAN-EVAL. The single daemon-attached WSL
-Codex worker is authorized to implement S1-S3.
+S1 is ready to commit: the native WSL child worktree now contains a typed, stable, read-only doctor
+with pure classifiers and secret-safe auth boundaries. The owner personally reviewed the plan and
+waived the separate PLAN-EVAL. The sole persisted worker is thread
+`019f4b4b-6375-7373-aab5-6750c3fdaf04`; its actual effort is `medium`, recorded as drift.
 
 ## Completed
 
 - Captured WSL and Windows rollback toolchain versions.
 - Confirmed managed Codex remote-control process/control socket and no active worker for this run.
 - Locked the #575/#576 boundary and three implementation slices.
+- Implemented and validated S1's read-only doctor contract (7 unit tests; scoped check/lint/fmt
+  wrappers all exit 0).
+- Captured the pre-mutation doctor baseline: native ext4 ready; Node outdated; Claude/Gemini absent
+  and auth-required; Codex managed at `0.144.1`; raw doctor exit 2 as designed.
 
 ## In Progress
 
-- Record the waiver commit, launch the one mobile-visible Codex thread, and hand it S1-S3.
+- Commit, explicitly push, and comment S1; then implement S2's reversible bootstrap/rollback plan.
 
 ## Next Steps
 
-1. Launch one GPT-5.6 Sol high Codex turn through `launch-codex-slice.ts`.
-2. Post exact thread/worktree/daemon/resume identity.
-3. Let that thread implement and push S1-S3.
+1. Land S1 with explicit-refspec push and per-slice GitHub evidence.
+2. Implement S2's checksum-verified Node install and user-local Claude/Gemini install.
+3. Run S2 twice to prove idempotency without changing `deno.lock`.
 
 ## Key Decisions
 
@@ -45,12 +50,14 @@ Codex worker is authorized to implement S1-S3.
 | Path | Status | Notes |
 | ---- | ------ | ----- |
 | `.llm/runs/chore-epic-574-wsl-agentic-runtime-foundation--pr-0a/` | new | Child harness plan artifacts. |
+| `.llm/tools/agentic/wsl-foundation*.ts` | new | S1 contract, CLI edge, and semantic tests. |
+| `.llm/tools/agentic/README.md`, `deno.json` | modified | Doctor usage and task entry. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Static | planned | `plan.md` |
+| Static | S1 PASS | scoped wrapper exits 0; `worklog.md` |
 | Fitness | planned | `plan.md` |
 | Runtime | planned | `plan.md` |
 | Consumer | planned | `plan.md` |
@@ -62,7 +69,7 @@ Codex worker is authorized to implement S1-S3.
 
 ## Drift and Debt
 
-- Drift: model override and component version skew recorded.
+- Drift: model override, launcher recovery, and ignored requested-effort override recorded.
 - Debt: none.
 
 ## Commits

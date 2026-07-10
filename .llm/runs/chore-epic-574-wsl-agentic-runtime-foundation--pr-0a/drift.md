@@ -33,3 +33,27 @@
   socket repair restored managed remote control. The same thread is retained for resume.
 - **Evidence:** `codex-thread-ids.md`; managed environment
   `env_e_6a2d7485c5a0832a82505a12442cd3ec`; versions all `0.144.1`.
+
+## 2026-07-10 — Requested Codex effort was not applied
+
+- **What:** The sole persisted worker thread reports `model_reasoning_effort=medium` although the
+  launcher requested `high` for the temporary GPT-5.6 Sol route.
+- **Source:** thread-start metadata for `019f4b4b-6375-7373-aab5-6750c3fdaf04`.
+- **Expected:** Per-launch effort `high`.
+- **Actual:** Model `gpt-5.6-sol` is correct; effort remained the daemon default `medium`.
+- **Severity:** significant
+- **Action:** do not overstate the route; continue under the owner's sole-worker authorization.
+  Durable route enforcement remains #581 and is outside #575.
+- **Evidence:** PR/issue worker-attached comments and `codex-thread-ids.md`.
+
+## 2026-07-10 — Coordinator-created run artifacts were root-owned
+
+- **What:** The child run directory and tracked Markdown artifacts were owned by `root:root` and
+  could not be updated by the `codex` implementation worker.
+- **Source:** filesystem ownership and the first failed `apply_patch`.
+- **Expected:** run artifacts are writable by the sole WSL worker on every slice.
+- **Actual:** source files were writable, but mandatory harness evidence was not.
+- **Severity:** minor
+- **Action:** changed ownership only for this run directory to the existing `codex:codex` owner via
+  a one-shot local Docker bind-mount command; file contents and modes were preserved.
+- **Evidence:** post-repair `stat` reports `codex:codex` and mode `0644` for all run Markdown files.

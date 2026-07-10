@@ -19,6 +19,8 @@ thin CLI over it.
 | File | Role |
 | ---- | ---- |
 | `agentic-lib.ts` | Shared pure + impure primitives (the heart; all landmine logic). |
+| `wsl-foundation-lib.ts` | Pure runtime probe, auth-boundary, and doctor-report contracts. |
+| `wsl-foundation.ts` | Read-only native WSL doctor; S2 adds reversible bootstrap/rollback planning. |
 | `launch-codex-slice.ts` | Validate brief → push-safety check → stage → launch a Codex slice; record thread id. |
 | `codex-status.ts` | Read-only: daemon health, worktree git state, recent sessions. |
 | `codex-watch.ts` | Event-driven wait on a worktree's git activity (**runs inside WSL**). |
@@ -58,6 +60,21 @@ thin CLI over it.
   `--allow-base-main`. The head sha is pinned in the merge body so a race can't merge a moved tip.
 
 ## Tools
+
+### `wsl-foundation.ts`
+
+Inspect the native WSL agentic runtime without printing environment values or provider credentials:
+
+```bash
+deno task agentic:wsl-foundation doctor
+deno task agentic:wsl-foundation doctor --json
+```
+
+The doctor reports a stable schema, native-ext4 proof, bounded tool versions, required Linux-local
+state directories, Codex managed/version-skew state, and Claude/Gemini authentication boundaries.
+Gemini is restricted to Google subscription sign-in; API-key and Vertex environment key *names* are
+reported as conflicts without reading or printing their values. Exit: `0` ready · `2` degraded or
+browser auth required · `3` forbidden auth route · `4` usage/execution failure.
 
 ### `launch-codex-slice.ts`
 Stage and launch a Codex slice from a Windows-authored brief, with a push-safety gate, and record

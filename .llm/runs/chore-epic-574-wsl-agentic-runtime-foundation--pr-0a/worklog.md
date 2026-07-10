@@ -79,6 +79,10 @@ its rollback action; do not put provider credentials or values into reports.
 | 2026-07-10 | plan-eval | owner waiver | Owner personally reviewed the plan, declared it passed, and directed immediate WSL Codex delegation. |
 | 2026-07-10 | launch | thread created | Checked-in launcher created thread `019f4b48-abaf-77d2-9cca-5cdec9f2446d`; UNC artifact write failed before the initial turn persisted. |
 | 2026-07-10 | launch | managed repair | Active-work/rollout checks found no active implementation. Anchored PID repair restored managed remote control on environment `env_e_6a2d7485c5a0832a82505a12442cd3ec`, with CLI/app-server `0.144.1`. |
+| 2026-07-10 | S1 | implementation | Added the stable doctor schema, pure version/auth/mobile classifiers, read-only CLI edge, focused tests, task, and permissions/auth documentation. |
+| 2026-07-10 | S1 | doctor baseline | Native ext4 PASS; Node `18.19.1` outdated; Claude/Gemini and their local state missing; both provider sessions `AUTH_REQUIRED`; Codex managed with CLI/app-server `0.144.1`. Raw exit `2` (expected degraded baseline). |
+| 2026-07-10 | S1 | reconcile | #575 and draft PR #584 remain open at `status:impl`; PR carries `Closes #575` and `Part of #574`; no new reviewer/evaluator comments changed scope. |
+| 2026-07-10 | S1 | artifact ownership | Root-owned run artifacts blocked mandatory updates; ownership was narrowed to `codex:codex` for this run directory only, with contents/modes preserved. |
 
 ## Decisions
 
@@ -94,6 +98,8 @@ its rollback action; do not put provider credentials or values into reports.
 | Checked lane policy names GPT-5.5-high, not owner-selected GPT-5.6 Sol high. | significant | yes |
 | Codex CLI/app-server versions differ. | minor | yes |
 | Launcher lacked UNC write permission; unmanaged daemon surfaced before first turn. | significant | yes |
+| Persisted worker used daemon-default `medium` effort instead of requested `high`. | significant | yes |
+| Coordinator-created run artifacts were root-owned. | minor | yes |
 
 ## Gate Results
 
@@ -104,6 +110,22 @@ its rollback action; do not put provider credentials or values into reports.
 | Research current | PASS | `research.md` | Re-baselined at `b58b4c2a`. |
 | Design checkpoint | PASS | This section | Contract, ports, constants, slices, deferred scope, and contributor path recorded. |
 | PLAN-EVAL | PASS | `plan-eval.md` | Owner-reviewed explicit waiver. |
+
+### S1 — Foundation contract and read-only doctor
+
+| Gate | Result | Raw exit | Evidence |
+| ---- | ------ | -------- | -------- |
+| Focused unit tests | PASS | 0 | `7 passed`, `0 failed` in `wsl-foundation_test.ts` |
+| Scoped check wrapper | PASS | 0 | 3 files, 1 batch, 0 findings; command used `--unstable-kv` |
+| Scoped lint wrapper | PASS | 0 | 3 files, 1 batch, 0 findings |
+| Scoped format wrapper | PASS | 0 | 3 files, 1 batch, 0 findings |
+| Doctor JSON baseline | EXPECTED_DEGRADED | 2 | Stable schema `1.0`; native ext4 true; explicit missing/outdated/auth-required states; no secret values |
+| Lock hygiene | PASS | 0 | `deno.lock` unchanged |
+
+Substantive slice review: the pure module contains no `Deno.*`, filesystem, process, or output side
+effects; the CLI edge uses fixed command/argument specs and bounds retained command output. Gemini
+forbidden routes expose key names only. File sizes are 242/167/89 LOC, below the internal-tool hard
+cap, and no generic desired-state routing from #576 was introduced.
 
 ## Handoff Notes
 
