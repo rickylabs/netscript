@@ -75,3 +75,23 @@ mirrors, and run the documented gates. Do not add model tables to individual ski
 PR #590 remains draft at implementation phase. The approved plan is unchanged. The distinct Gemini
 model lane remains an owner open question; Antigravity `agy` is implemented as directed. No #582
 rollout/promotion capability was added.
+
+## Slice 3 — launch identity enforcement and evidence
+
+- Added a pure route-identity boundary that rejects absent/unsupported provider, model, or effort
+  and compares requested versus observed identity without retaining raw provider output.
+- Codex launch now requires all three identity fields, passes model/effort to the child command,
+  parses observed provider/model/effort from daemon output, records both identities, and fails closed
+  on pending or mismatched observation.
+- OpenHands dispatch now requires provider/model/effort, emits all three trigger fields, and records
+  requested identity plus an honest `observed=pending` marker for asynchronous status reconciliation.
+- Parser/launcher/provider tests: 73 passed, 0 failed.
+- Scoped wrapper check/lint/fmt: 7 files, 0 findings each.
+- No live provider launch occurred; this slice cannot spend or alter provider authentication.
+
+### Reconcile note
+
+The launch edges now treat route identity as enforced data rather than prompt prose. Codex provides
+synchronous observed identity and fails closed; OpenHands records pending observation because its
+GitHub Action is asynchronous. #577 provider validation, #579 fallback rules, #580 sender ownership,
+and #582 deferred rollout remain intact.

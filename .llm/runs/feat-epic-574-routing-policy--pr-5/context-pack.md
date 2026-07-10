@@ -24,5 +24,6 @@ Codex/OpenHands launch edges enforce and record provider/model/effort using exis
 
 ## Resume point
 
-Complete slice 2 hygiene, commit/push/comment it, then implement slice 3 launcher enforcement and
-requested-versus-observed evidence. Continue one explicitly pushed and PR-commented slice at a time.
+Slice 2 is commit `c41a790e`. Slice 3 adds required provider/model/effort at Codex and OpenHands
+launch edges plus requested-versus-observed evidence and fail-closed Codex mismatch handling. Finish
+slice 3 hygiene/commit/push/comment, then update skills/docs/templates and generated Claude mirrors.

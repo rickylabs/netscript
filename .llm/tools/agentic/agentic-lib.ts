@@ -192,6 +192,8 @@ export interface ThreadInfo {
   threadId: string | null;
   rollout: string | null;
   model: string | null;
+  provider: string | null;
+  effort: string | null;
   cwd: string | null;
   exited: number | null;
 }
@@ -212,6 +214,10 @@ export function parseThreadInfo(log: string): ThreadInfo {
       new RegExp(`"thread"\\s*:\\s*\\{[^}]*?"id"\\s*:\\s*"(${UUID})"`),
     )?.[1] ?? null;
   const model = log.match(/"model"\s*:\s*"([^"]+)"/)?.[1] ?? null;
+  const provider = log.match(/"model_provider"\s*:\s*"([^"]+)"/)?.[1] ??
+    log.match(/model_provider:\s*"([^"]+)"/)?.[1] ?? null;
+  const effort = log.match(/"reasoning_effort"\s*:\s*"?([A-Za-z]+)"?/)?.[1] ??
+    log.match(/reasoning_effort:\s*Some\(([A-Za-z]+)\)/)?.[1] ?? null;
   const cwd = log.match(/(?:^|\W)CWD=([^\s"]+)/)?.[1] ??
     log.match(/"cwd"\s*:\s*"([^"]+)"/)?.[1] ?? null;
   const exited = Number(
@@ -221,6 +227,8 @@ export function parseThreadInfo(log: string): ThreadInfo {
     threadId,
     rollout,
     model,
+    provider,
+    effort,
     cwd,
     exited: Number.isFinite(exited) ? exited : null,
   };
@@ -397,6 +405,7 @@ export interface DispatchOptions {
   outputMode?: string;
   iterations?: number | string;
   provider?: string;
+  effort?: string;
   prompt: string;
 }
 
@@ -409,6 +418,7 @@ export function buildOpenHandsComment(o: DispatchOptions): string {
   const tokens = ['@openhands-agent'];
   if (o.model) tokens.push(`model=${o.model}`);
   if (o.provider) tokens.push(`provider=${o.provider}`);
+  if (o.effort) tokens.push(`effort=${o.effort}`);
   if (o.outputMode) tokens.push(`output=${o.outputMode}`);
   if (o.iterations !== undefined && String(o.iterations) !== '') {
     tokens.push(`iterations=${o.iterations}`);

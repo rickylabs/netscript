@@ -36,7 +36,18 @@ Deno.test('compatibility wrappers retain stable flag and delegation contracts', 
   const status = await Deno.readTextFile(new URL('codex-status.ts', import.meta.url));
   const smoke = await Deno.readTextFile(new URL('claude-remote-smoke.ts', import.meta.url));
   const foundation = await Deno.readTextFile(new URL('wsl-foundation.ts', import.meta.url));
-  for (const flag of ['--brief', '--worktree', '--branch', '--dry-run', '--parse-log']) {
+  for (
+    const flag of [
+      '--brief',
+      '--worktree',
+      '--branch',
+      '--provider',
+      '--model',
+      '--effort',
+      '--dry-run',
+      '--parse-log',
+    ]
+  ) {
     assert(launch.includes(flag), `launch lost ${flag}`);
   }
   for (const flag of ['--thread-id', '--message', '--message-file', '--dry-run']) {

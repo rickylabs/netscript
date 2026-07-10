@@ -54,6 +54,11 @@ import {
   wslHome,
   wslUser,
 } from './agentic-lib.ts';
+import {
+  compareLaunchIdentity,
+  type RequestedLaunchIdentity,
+  requestedLaunchIdentity,
+} from './runtime/launch-route-identity.ts';
 import { LocalSenderOwnershipAdapter } from './runtime/adapters/local-sender-ownership-adapter.ts';
 import {
   activateSenderOwnership,
@@ -75,6 +80,9 @@ interface Options {
   pretty: boolean;
   profile?: string;
   profileHome?: string;
+  provider?: string;
+  model?: string;
+  effort?: string;
 }
 
 function printHelp(): void {
@@ -94,6 +102,9 @@ function printHelp(): void {
     '  --expect-base <sha>  If set, worktree HEAD short sha must equal this before launch.',
     '  --profile <name>     Named Codex profile layer for this child only.',
     '  --profile-home <dir> Isolated CODEX_HOME containing the named profile.',
+    '  --provider <name>    Required provider identity (normally openai).',
+    '  --model <name>       Required explicit Codex model.',
+    '  --effort <level>     Required low|medium|high|xhigh|max reasoning effort.',
     '  --user <name>        WSL user. Default: codex.',
     '  --dry-run            Validate + safety-check + stage + print launch command; do not send.',
     '  --parse-log <file>   Parse a saved launch log for thread id and exit.',
@@ -143,6 +154,18 @@ function parseArgs(args: string[]): Options | null {
         o.profileHome = requireValue(args, i, a);
         i++;
         break;
+      case '--provider':
+        o.provider = requireValue(args, i, a);
+        i++;
+        break;
+      case '--model':
+        o.model = requireValue(args, i, a);
+        i++;
+        break;
+      case '--effort':
+        o.effort = requireValue(args, i, a);
+        i++;
+        break;
       case '--user':
         o.user = requireValue(args, i, a);
         i++;
@@ -168,7 +191,17 @@ function parseArgs(args: string[]): Options | null {
   return o;
 }
 
-function threadRecord(o: Options, info: ThreadInfo, dest: string): string {
+function threadRecord(
+  o: Options,
+  info: ThreadInfo,
+  dest: string,
+  requested: RequestedLaunchIdentity,
+): string {
+  const evidence = compareLaunchIdentity(requested, {
+    provider: info.provider,
+    model: info.model,
+    effort: info.effort,
+  });
   return [
     `# ${o.slug ?? 'slice'} — Codex implementation thread`,
     '',
@@ -179,7 +212,14 @@ function threadRecord(o: Options, info: ThreadInfo, dest: string): string {
       o.expectBase ? ` @ \`${o.expectBase}\`` : ''
     } (NO upstream by design).`,
     `- **Push rule:** explicit refspec only — \`git push origin HEAD:refs/heads/${o.branch}\`.`,
-    `- **Model:** ${info.model ?? '?'} · approval=never · sandbox=dangerFullAccess`,
+    `- **Requested route:** provider=${requested.provider} · model=${requested.model} · effort=${requested.effort}`,
+    `- **Observed route:** provider=${info.provider ?? 'pending'} · model=${
+      info.model ?? 'pending'
+    } · effort=${info.effort?.toLowerCase() ?? 'pending'}`,
+    `- **Route verdict:** ${evidence.status}${
+      evidence.mismatches.length ? ` (${evidence.mismatches.join(', ')})` : ''
+    }`,
+    `- **Runtime:** approval=never · sandbox=dangerFullAccess`,
     `- **Brief (staged):** \`${dest}\``,
     '',
     '## Steering (same thread — never a second send-message-v2 at this worktree)',
@@ -211,6 +251,8 @@ async function main(): Promise<void> {
       console.log(`threadId: ${info.threadId ?? '(none)'}`);
       console.log(`rollout:  ${info.rollout ?? '(none)'}`);
       console.log(`model:    ${info.model ?? '(none)'}`);
+      console.log(`provider: ${info.provider ?? '(none)'}`);
+      console.log(`effort:   ${info.effort ?? '(none)'}`);
       console.log(`cwd:      ${info.cwd ?? '(none)'}`);
     } else {
       console.log(JSON.stringify({ mode: 'parse-log', ...info }));
@@ -225,6 +267,18 @@ async function main(): Promise<void> {
   }
   if (Boolean(o.profile) !== Boolean(o.profileHome)) {
     console.error('--profile and --profile-home must be supplied together.');
+    Deno.exit(2);
+  }
+  let requested: RequestedLaunchIdentity;
+  try {
+    requested = requestedLaunchIdentity(o);
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : String(error));
+    Deno.exit(2);
+    return;
+  }
+  if (requested.provider !== 'openai' && !o.profile) {
+    console.error('non-OpenAI Codex routes require an explicit --profile and --profile-home');
     Deno.exit(2);
   }
   const dest = o.dest ?? `${wslHome()}/${o.slug ?? 'slice'}-brief.md`;
@@ -278,11 +332,14 @@ async function main(): Promise<void> {
   // spawned from a Windows cwd, leaving the launch (and `send-message-v2`,
   // which derives the agent's worktree from the ambient cwd) in the wrong
   // directory. See wslCd in agentic-lib.ts.
-  const profileScript = o.profile && o.profileHome
-    ? `export PATH="$HOME/.local/bin:$PATH" CODEX_HOME=${sq(o.profileHome)}; msg="$(cat ${
-      sq(dest)
-    })"; codex --profile ${sq(o.profile)} debug app-server send-message-v2 "$msg"`
-    : `~/launch_slice.sh ${sq(dest)}`;
+  const routeFlags = `--model ${sq(requested.model)} -c model_reasoning_effort=${
+    sq(requested.effort)
+  }`;
+  const profileFlags = o.profile && o.profileHome ? `--profile ${sq(o.profile)}` : '';
+  const home = o.profileHome ? ` CODEX_HOME=${sq(o.profileHome)}` : '';
+  const profileScript = `export PATH="$HOME/.local/bin:$PATH"${home}; msg="$(cat ${
+    sq(dest)
+  })"; codex ${profileFlags} ${routeFlags} debug app-server send-message-v2 "$msg"`;
   const launchCommand = `wsl.exe -u ${o.user} --cd ${o.worktree} -- bash -lc ${
     JSON.stringify(profileScript)
   }`;
@@ -296,6 +353,7 @@ async function main(): Promise<void> {
     useHarness: check.useHarness,
     gitSafety: { branch: info.branch, head: info.head, upstream: info.upstream, dirty: info.dirty },
     launchCommand,
+    requestedRoute: requested,
   };
 
   // 4a) Dry-run: stop here.
@@ -389,7 +447,7 @@ async function main(): Promise<void> {
         );
         if (o.sliceDir) {
           const recPath = `${o.sliceDir.replace(/[\\/]$/, '')}/codex-thread-ids.md`;
-          await Deno.writeTextFile(recPath, threadRecord(o, info2, dest));
+          await Deno.writeTextFile(recPath, threadRecord(o, info2, dest, requested));
           console.log(`\n[launch-codex-slice] recorded thread ${info2.threadId} -> ${recPath}`);
         } else {
           console.log(
@@ -402,6 +460,27 @@ async function main(): Promise<void> {
   const status = await child.status;
   if (!recorded) {
     console.log(`\n[launch-codex-slice] WARN: no thread id captured (exit ${status.code})`);
+    Deno.exit(1);
+  }
+  const observed = parseThreadInfo(buf);
+  const evidence = compareLaunchIdentity(requested, {
+    provider: observed.provider,
+    model: observed.model,
+    effort: observed.effort,
+  });
+  if (o.sliceDir) {
+    const recPath = `${o.sliceDir.replace(/[\\/]$/, '')}/codex-thread-ids.md`;
+    await Deno.writeTextFile(recPath, threadRecord(o, observed, dest, requested));
+  }
+  if (evidence.status !== 'matched') {
+    console.log(JSON.stringify({
+      stage: 'route-identity',
+      ok: false,
+      status: evidence.status,
+      mismatches: evidence.mismatches,
+      requested: evidence.requested,
+      observed: evidence.observed,
+    }));
     Deno.exit(1);
   }
   Deno.exit(status.code === 0 ? 0 : 1);

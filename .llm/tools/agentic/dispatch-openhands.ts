@@ -51,6 +51,7 @@ import {
   resolveGithubToken,
   validateHandoffContract,
 } from './agentic-lib.ts';
+import { requestedLaunchIdentity } from './runtime/launch-route-identity.ts';
 
 interface Options {
   repo: string;
@@ -61,6 +62,7 @@ interface Options {
   output?: string;
   iterations?: string;
   provider?: string;
+  effort?: string;
   tokenEnv: string;
   verdictContract: boolean;
   dryRun: boolean;
@@ -83,6 +85,7 @@ function printHelp(): void {
     '  --output <mode>       pr-comment | respond-comments | thread-replies | summary-only.',
     '  --iterations <n>      Max agent iterations (50-3000).',
     '  --provider <name>     Provider gateway override (e.g. openrouter).',
+    '  --effort <level>      Required low|medium|high|xhigh|max effort identity.',
     '  --token-env <name>    Env var holding the GitHub token. Default: GH_TOKEN.',
     '  --no-verdict-contract Skip the verdict output-contract epilogue (for non-eval',
     '                        dispatches, e.g. implementation asks). Default: appended.',
@@ -135,6 +138,10 @@ function parseArgs(args: string[]): Options | null {
         o.provider = requireValue(args, i, a);
         i++;
         break;
+      case '--effort':
+        o.effort = requireValue(args, i, a);
+        i++;
+        break;
       case '--token-env':
         o.tokenEnv = requireValue(args, i, a);
         i++;
@@ -173,6 +180,14 @@ async function main(): Promise<void> {
     console.error('--prompt-file is required. See --help.');
     Deno.exit(2);
   }
+  let requested;
+  try {
+    requested = requestedLaunchIdentity(o);
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : String(error));
+    Deno.exit(2);
+    return;
+  }
   const number = o.pr ?? o.issue;
   if (!number || !Number.isFinite(number)) {
     console.error('one of --pr or --issue (a number) is required. See --help.');
@@ -201,13 +216,16 @@ async function main(): Promise<void> {
 
   // 2) Build the trigger comment (verdict output contract appended by default).
   const prompt = o.verdictContract ? appendVerdictContractEpilogue(content) : content;
-  const comment = buildOpenHandsComment({
+  const triggerComment = buildOpenHandsComment({
     model: o.model,
     outputMode: o.output,
     iterations: o.iterations,
     provider: o.provider,
+    effort: o.effort,
     prompt,
   });
+  const comment =
+    `${triggerComment}\n\n<!-- route-identity requested provider=${requested.provider} model=${requested.model} effort=${requested.effort}; observed provider=pending model=pending effort=pending -->`;
   const triggerLine = comment.split('\n')[0];
   const endpoint = `/repos/${slug.owner}/${slug.repo}/issues/${number}/comments`;
 
