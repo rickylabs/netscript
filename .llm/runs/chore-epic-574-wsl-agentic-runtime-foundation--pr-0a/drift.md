@@ -86,6 +86,19 @@
   Windows files or Claude installation were changed by this run.
 - **Evidence:** absent `/proc/sys/fs/binfmt_misc/WSLInterop`; raw PowerShell exit `126`.
 
+## 2026-07-10 — Owner-authorized external evaluator waiver
+
+- **What:** The owner personally reviewed the run and explicitly instructed the coordinator not to
+  dispatch PLAN-EVAL or IMPL-EVAL agents.
+- **Source:** owner direction in the creator conversation.
+- **Expected:** Harness evaluator passes use separate OpenHands sessions.
+- **Actual:** `plan-eval.md` and `evaluate.md` record owner-review `PASS` waivers; no evaluator was
+  dispatched.
+- **Severity:** significant
+- **Action:** preserve the waiver as explicit process drift. Do not treat it as waiving the four
+  remaining interactive #575 acceptance checks or the merge close-gate.
+- **Evidence:** owner conversation; PR #584 phase comments; `evaluate.md`.
+
 ## 2026-07-10 — Coordinator post-idle evidence resolves reconnect ambiguity
 
 - **What:** After this worker became idle, the coordinator performed the skill-authorized anchored

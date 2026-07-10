@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `chore-epic-574-wsl-agentic-runtime-foundation--pr-0a` |
 | Branch | `chore/epic-574-wsl-agentic-runtime-foundation` |
-| Current phase | `implement` |
+| Current phase | `impl-eval` |
 | Archetype | 6 — CLI / Tooling, scoped internal-tool variant |
 | Scope overlays | none |
 
@@ -17,9 +17,10 @@ confirms managed remote control `status=connected` on `YogaBook9i` environment
 `env_e_6a2d7485c5a0832a82505a12442cd3ec`, matching CLI/app-server `0.144.1`, and same-thread resume
 returned exactly `CODEX_PR0A_RECONNECT_OK` without edits. Native Windows Claude path/version/help
 also passed at `2.1.205`. Owner-only provider login/mobile steering, sleep/network reconnect, and a
-Windows no-edit interactive session remain pending. Coordinator substantive review then found one
-doctor false-green: exit-0 version output with no parseable version was marked ready. The surgical
-classifier/test remediation is validated and ready to commit.
+Windows no-edit interactive session remain pending. Coordinator substantive review found one doctor
+false-green; the surgical classifier/test remediation is pushed as `6ea5224`. The owner's explicit
+no-evaluator instruction is recorded as an IMPL-EVAL `PASS` waiver in `evaluate.md` without waiving
+the remaining interactive acceptance checks.
 
 ## Completed
 
@@ -45,13 +46,13 @@ classifier/test remediation is validated and ready to commit.
 
 ## In Progress
 
-- Commit and explicitly push the coordinator-reviewed version-classification remediation.
+- Owner completes the four interactive provider/mobile/host canaries in `worklog.md`.
 
 ## Next Steps
 
 1. Owner completes the four exact canaries remaining in `worklog.md`.
-2. Coordinator performs slice sign-off after the owner evidence is recorded.
-3. Separate-session IMPL-EVAL remains undispatched until explicitly authorized after acceptance.
+2. Record the raw outcomes, complete the PR Definition of Done, and move to merge readiness.
+3. Keep the owner-authorized evaluator waiver explicit; do not dispatch OpenHands.
 
 ## Key Decisions
 
@@ -77,7 +78,7 @@ classifier/test remediation is validated and ready to commit.
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
 | Static | S1-S3 + review fix PASS | prior 68-test gate plus focused 12-test remediation; scoped wrappers exit 0 |
-| Fitness | planned | `plan.md` |
+| Fitness | PASS | internal-tool size/scope boundary and review remediation recorded in `worklog.md` |
 | Runtime | PARTIAL / OWNER CANARIES | Codex post-idle reconnect passes; provider mobile and sleep/network checks pending |
 | Consumer | PASS | clean non-login WSL shell resolves all installed tools |
 

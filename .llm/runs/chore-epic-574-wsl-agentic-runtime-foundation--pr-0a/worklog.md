@@ -214,6 +214,15 @@ Implementation detail: successful probes without a parsed semantic version now r
 space and retains at most 80 characters of probe output. This closes the coordinator-identified
 false-green without changing missing, nonzero-exit, outdated, or ready semantics.
 
+### Tier-A sign-off and owner evaluation waiver
+
+The coordinator substantively reviewed the foundation contract, bootstrap boundary, provider policy,
+rollback behavior, and S3 evidence. The only correctness finding was the unparseable-version
+false-green above; `6ea5224` fixes it and all focused/scoped gates pass. The owner explicitly waived
+a separate evaluator run and directed that personal review be treated as passed. `evaluate.md`
+records that `PASS` waiver. It does not waive the interactive acceptance checks below, which still
+block merge readiness.
+
 ### Exact owner canaries still required
 
 1. In native WSL, run `claude`, enter `/login`, and complete the claude.ai subscription browser
