@@ -144,8 +144,17 @@ Deno.test('OpenRouter plan mode is enabled but apply remains issue 580 blocked',
   assertEquals(apply.diagnostics[0]?.code, 'capability_deferred');
 });
 
-Deno.test('Antigravity live evidence remains issue 578 deferred', () => {
-  const observed = observedState();
+Deno.test('Antigravity live evidence plans without changing provider profiles', () => {
+  const observed = observedState({
+    worktrees: [{
+      path: worktree,
+      branch: 'feature',
+      upstream: null,
+      dirty: false,
+      nativeExt4: true,
+      found: true,
+    }],
+  });
   const result = planReconciliation({
     command: {
       kind: 'smoke',
@@ -161,7 +170,6 @@ Deno.test('Antigravity live evidence remains issue 578 deferred', () => {
     desired: null,
     observed,
   });
-  assertEquals(result.status, 'blocked');
-  assertEquals(result.diagnostics[0]?.ownerIssue, 578);
-  assertEquals(result.diagnostics[0]?.code, 'capability_deferred');
+  assertEquals(result.status, 'planned');
+  assertEquals(result.actions[0]?.kind, 'smoke_session');
 });

@@ -212,7 +212,7 @@ Deno.test('OpenRouter route planning is available after issue 577 profile select
   assertEquals(result.actions[0]?.kind, 'launch_session');
 });
 
-Deno.test('Antigravity live smoke planning blocks explicitly on issue 578', () => {
+Deno.test('Antigravity live smoke planning is enabled after owner acceptance', () => {
   const result = plan({
     kind: 'smoke',
     commandId: 'smoke-antigravity',
@@ -220,8 +220,8 @@ Deno.test('Antigravity live smoke planning blocks explicitly on issue 578', () =
     route: { ...route, agent: 'antigravity', provider: 'google' },
     level: 'live',
   });
-  assertEquals(result.status, 'blocked');
-  assertEquals(result.diagnostics[0]?.ownerIssue, 578);
+  assertEquals(result.status, 'planned');
+  assertEquals(result.actions[0]?.kind, 'smoke_session');
 });
 
 Deno.test('fallback never changes route inside an active turn', () => {

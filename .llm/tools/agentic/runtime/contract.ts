@@ -78,7 +78,7 @@ export type AdapterKind = typeof ADAPTER_KINDS[number];
 
 export const CAPABILITY_STATES = ['available', 'degraded', 'blocked', 'deferred'] as const;
 export type CapabilityState = typeof CAPABILITY_STATES[number];
-export const DEFERRED_ISSUES = [577, 578, 579, 580, 581, 582] as const;
+export const DEFERRED_ISSUES = [577, 579, 580, 581, 582] as const;
 export type DeferredIssue = typeof DEFERRED_ISSUES[number];
 export interface RouteIdentity {
   readonly agent: AgentKind;

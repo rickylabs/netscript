@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "1.0",
+  "observedAt": "2026-07-10",
+  "redaction": "classified-only-no-raw-output-no-account-identifiers",
+  "environment": {
+    "executable": "/home/codex/.local/bin/agy",
+    "version": "1.1.1",
+    "nativeExt4": true,
+    "legacyStateDirectoryPresent": true
+  },
+  "staticCapabilities": {
+    "headlessPrint": "advertised",
+    "printTimeout": "advertised",
+    "modelFlag": "advertised",
+    "agentFlag": "advertised",
+    "projectFlag": "advertised",
+    "conversationFlag": "advertised",
+    "continueFlag": "advertised",
+    "sandboxFlag": "advertised",
+    "jsonOutput": "unsupported_by_help",
+    "jsonlOutput": "unsupported_by_help"
+  },
+  "liveCanaries": [
+    {
+      "id": "headless-success-initial",
+      "timeoutSeconds": 45,
+      "exitCode": null,
+      "classification": "probe_capture_failed",
+      "stdoutRetained": false,
+      "stderrRetained": false
+    },
+    {
+      "id": "headless-success-retry",
+      "timeoutSeconds": 25,
+      "durationMs": 30660,
+      "exitCode": 1,
+      "stdoutPresent": false,
+      "stderrPresent": true,
+      "classification": "authentication_or_service_timeout",
+      "authenticationIndicator": true,
+      "serviceFailureIndicator": true,
+      "timeoutIndicator": true,
+      "stdoutRetained": false,
+      "stderrRetained": false
+    }
+  ],
+  "capabilities": {
+    "headlessSuccess": "owner_accepted_working",
+    "serverFailureExit": "observed_exit_1_with_timeout_classification",
+    "structuredOutput": "unsupported_by_advertised_cli_surface",
+    "sandboxBehavior": "owner_accepted_working",
+    "webSearchFetch": "owner_accepted_working",
+    "citationPersistence": "owner_accepted_working",
+    "quotaClassification": "deferred_to_issue_579_no_quota_signal_observed",
+    "boundedFallback": "deferred_to_issue_579",
+    "agentsInstructionBehavior": "owner_accepted_working",
+    "geminiInstructionBehavior": "owner_accepted_working",
+    "legacyGeminiStateCompatibility": "state_directory_present_runtime_parser_already_normalizes_legacy_state"
+  },
+  "ownerAcceptanceNote": "The empirical automation canary remains authentication_or_service_timeout. The owner directed treating live capabilities as working for merge and close purposes; this is not a fabricated observed pass and runtime remains fail-closed.",
+  "operatorAction": "If runtime reports authentication or service failure, the owner should verify documented Google Sign-In outside automation without sharing account identifiers.",
+  "fanOutEligible": false
+}

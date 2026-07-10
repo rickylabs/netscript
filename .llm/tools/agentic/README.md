@@ -138,9 +138,33 @@ executable probe is `agy --version`; the canonical user-owned target is
 `/home/codex/.local/bin/agy`. Legacy persisted `gemini` desired-state keys are normalized to
 Antigravity only when unambiguous; mixed legacy/canonical state is refused. No `gemini` executable
 alias is created, `~/.gemini` is preserved, and `/root/.local/bin/agy` is outside the controller
-boundary. Live authentication, subscription/quota behavior, JSON/JSONL, complete exits,
-research/citations, and instruction-file semantics remain structured #578 capability deferrals; this
-controller does not invent `agy login`.
+boundary. Issue #578 provides a bounded evidence lane for live authentication, exits, sandbox
+behavior, citations, and instruction-file markers. It does not invent `agy login`, infer Gemini CLI
+semantics, or implement quota fallback. The empirical automation canary may still fail closed even
+though the owner accepted the live capability for enablement.
+
+#### Antigravity evidence lane
+
+Run one fixed, read-only probe from a native WSL worktree:
+
+```bash
+deno task agentic:antigravity-evidence \
+  --probe headless \
+  --cwd /home/codex/repos/worktree \
+  --timeout-ms 30000 \
+  --json
+```
+
+Probe kinds are `headless`, `web-citations`, `agents-instructions`, and `gemini-instructions`.
+Optional `--model`, `--agent`, and `--project` values select advertised Antigravity identifiers; the
+CLI accepts no arbitrary prompt or credential flag. `--aggregate <absolute-json-path>` writes only
+normalized HTTPS citation metadata and only after an empirically successful web/citation probe.
+
+Antigravity authentication is the owner's documented Google Sign-In flow. If the result exits `4`
+(`blocked`) or `5` (`failed`) with auth/service/quota/timeout diagnostics, verify Google Sign-In
+outside automation without sharing the account identifier, then rerun. No raw provider output,
+credentials, cookies, OAuth values, or account PII are written. Owner acceptance is represented as
+`owner_accepted_working`; it never converts a failed runtime observation into a pass.
 
 #### Provider profiles and compatibility canaries
 

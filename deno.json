@@ -53,6 +53,7 @@
     "agentic:check-claude": "deno run --no-lock --allow-read --allow-run .llm/tools/agentic/validate-claude-surface.ts --pretty",
     "agentic:wsl-foundation": "deno run --no-lock --allow-read --allow-write --allow-run --allow-env --allow-net=nodejs.org,registry.npmjs.org,antigravity.google .llm/tools/agentic/wsl-foundation.ts",
     "agentic:runtime": "deno run --no-lock --allow-read --allow-write --allow-run --allow-env .llm/tools/agentic/agentic-runtime.ts",
+    "agentic:antigravity-evidence": "deno run --no-lock --allow-read --allow-write --allow-run --allow-env .llm/tools/agentic/antigravity-evidence-cli.ts",
     "agentic:provider-canary": "deno run --no-lock --allow-run --allow-env .llm/tools/agentic/provider-canary.ts",
     "docs:links": "deno run --no-lock --allow-read .llm/tools/validation/check-internal-doc-links.ts --pretty",
     "docs:maintenance": "deno task docs:links && deno task agentic:sync-claude:check && deno task agentic:check-claude",

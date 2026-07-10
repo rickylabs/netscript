@@ -83,7 +83,7 @@ Deno.test('legacy foundation manifest migrates without a Gemini executable alias
   }
 });
 
-Deno.test('Antigravity static probe uses agy while live behavior stays issue 578 deferred', () => {
+Deno.test('Antigravity static and bounded live probes use agy without a Gemini alias', () => {
   const staticCommand: Extract<RuntimeCommand, { kind: 'smoke' }> = {
     kind: 'smoke',
     commandId: 'agy-static',
@@ -97,11 +97,14 @@ Deno.test('Antigravity static probe uses agy while live behavior stays issue 578
     command: { ...staticCommand, commandId: 'agy-live', level: 'live' },
     nativeExt4: true,
   });
-  equal([live.request, live.diagnostics[0]?.code, live.diagnostics[0]?.ownerIssue], [
-    null,
-    'capability_deferred',
-    578,
+  equal(live.request?.executable, 'agy');
+  equal(live.request?.arguments.slice(0, 4), [
+    '--print',
+    '--print-timeout',
+    '30000ms',
+    '--sandbox',
   ]);
+  equal(live.diagnostics, []);
   equal(JSON.stringify([staticPlan, live]).includes('agy login'), false);
   equal(JSON.stringify([staticPlan, live]).includes('executable":"gemini'), false);
 });
