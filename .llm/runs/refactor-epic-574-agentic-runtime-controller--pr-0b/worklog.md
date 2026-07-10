@@ -655,3 +655,49 @@ legacy wrappers were intentionally unchanged in S3.
 PR #585 and issue #576 are open at `status:impl`; both record S2 coordinator sign-off `6756a54`.
 The draft PR retains `Closes #576`, `Part of #574`, and the PR #584 stack. S3 matches the locked
 plan and child boundaries #577/#578; no newer comment or label authorizes S4.
+
+## S3 Tier-A Remediation
+
+Tier-A review of `a0baef2` requested two fail-closed Codex corrections: pin launch construction to
+the inspected Git HEAD and reject incomplete, mismatched, or failed launch observations.
+
+### Corrections
+
+- `planCodexCommand` now requires a non-empty inspected `git.head` and includes the exact value as
+  `--expect-base <head>` in the checked-in launch-wrapper request. Missing HEAD returns
+  `missing_identity` and constructs no request, closing the branch-movement TOCTOU gap.
+- `observeCodexLaunch` now accepts the complete expected `RouteIdentity` and validates thread,
+  worktree, model, and process result after the existing bounded parser. Missing identities return
+  `missing_identity`; worktree/model mismatches return `route_conflict`; a nonzero parsed exit
+  returns `process_failed`. An absent exit remains valid under the checked-in parser contract.
+- Focused tests assert exact pinned argv, missing-HEAD rejection, missing worktree/model,
+  mismatched worktree/model, and nonzero process exit. Resume/no-rival and content-sentinel coverage
+  remain green.
+
+### Replacement Evidence
+
+| Gate | Exact command / proof | Raw outcome |
+| --- | --- | --- |
+| Focused adapter tests | `rtk proxy deno test --no-lock .llm/tools/agentic/runtime/adapters_test.ts` | exit 0; `9 passed | 0 failed`; no permissions |
+| Complete agentic/runtime unit set | `rtk proxy deno test --no-lock --allow-read --allow-write --allow-env .llm/tools/agentic/agentic-lib_test.ts .llm/tools/agentic/wsl-foundation_test.ts .llm/tools/agentic/runtime/contract_test.ts .llm/tools/agentic/runtime/planner_test.ts .llm/tools/agentic/runtime/controller_test.ts .llm/tools/agentic/runtime/adapters_test.ts` | exit 0; `105 passed | 0 failed` |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .llm/tools/agentic --ext ts --pretty` | exit 0; 37 files, 1 batch, 0 findings |
+| Scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root .llm/tools/agentic --ext ts --include '(^|/)(runtime/|agentic-runtime|wsl-foundation|launch-codex-slice|codex-resume|codex-status|claude-remote-smoke)' --pretty` | exit 0; 25 files, 0 findings |
+| Owned format | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root .llm/tools/agentic --ext ts --include '(^|/)(runtime/|agentic-runtime)' --pretty` | exit 0; 18 files, 0 findings |
+| Route/identity/process | Focused exact-argv and observation matrix over missing/mismatched identities and nonzero exit | PASS; finite expected diagnostic codes and no request on missing HEAD |
+| Launcher contract | `rg -n -- '--expect-base\|expectBase'` over launcher, adapter, and focused test | launcher already consumes `--expect-base`; adapter and exact-argv test now supply it |
+| No-rival/effects | `rg -n 'send-message-v2\|Deno\\.Command\|Deno\\.env\|Deno\\.write\|fetch\\(' runtime/adapters/codex-adapter.ts` plus resume focused test | no matches; resume still excludes launch wrapper and rival sender |
+| Sentinel/content | Existing real planning sentinel test plus implementation/run-artifact exact scan | PASS; sentinel absent; content remains file-reference only and raw prompt/config values remain unrepresented |
+| File budgets | `wc -l` over Codex adapter and focused test | PASS: adapter `219/350`; test `391/450`; all touched TypeScript remains below 500 LOC |
+| Lock hygiene | `git rev-parse a0baef2:deno.lock`; `git hash-object deno.lock`; `git diff --exit-code a0baef2 -- deno.lock` | both blobs `8694862878e6f9a430bf56497a4d5bf3f8eb1f3d`; diff exit 0 |
+| Scope/patch | raw `git diff --name-only a0baef2`; raw `git status --short`; `git diff --check` | only Codex adapter, focused test, and mandatory run artifacts; patch check exit 0 |
+
+No real send, provider login, dependency/lock/cache change, root format, S4 transaction, S5 wrapper,
+or child-issue implementation occurred. Existing broad-format drift remains unchanged; no new
+architecture debt was introduced. Next action is coordinator substantive Tier-A S3 re-review; this
+worker does not self-certify or start S4.
+
+## Reconcile Note — S3 Remediation
+
+Issue #576 and draft PR #585 remain the authoritative S3 scope. The remediation is limited to the
+two Tier-A findings against `a0baef2`, retains explicit child boundaries #577/#578, and leaves S4
+unstarted. The sole thread and native worktree identities are unchanged.

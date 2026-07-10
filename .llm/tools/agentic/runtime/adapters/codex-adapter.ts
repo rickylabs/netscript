@@ -7,7 +7,7 @@ import {
   parseTurnComplete,
   validateHandoffContract,
 } from '../../agentic-lib.ts';
-import type { RuntimeCommand, RuntimeDiagnostic } from '../contract.ts';
+import type { RouteIdentity, RuntimeCommand, RuntimeDiagnostic } from '../contract.ts';
 import type { AgentCommandPlan, AgentProcessRequest } from '../ports.ts';
 import { validateProviderRoute } from './provider-adapter.ts';
 
@@ -108,6 +108,11 @@ export function planCodexCommand(input: CodexPlanningInput): AgentCommandPlan {
       diagnostic('missing_identity', 'input', 'expected worktree branch is missing'),
     );
   }
+  if (!input.git.head.trim()) {
+    diagnostics.push(
+      diagnostic('missing_identity', 'input', 'inspected git HEAD is missing'),
+    );
+  }
   const safety = evaluateGitSafety(input.git, { branch: input.expectedBranch });
   if (!safety.ok || input.git.dirty !== 0) {
     diagnostics.push(diagnostic(
@@ -142,6 +147,8 @@ export function planCodexCommand(input: CodexPlanningInput): AgentCommandPlan {
         command.route.worktree,
         '--branch',
         input.expectedBranch,
+        '--expect-base',
+        input.git.head,
       ], command.route.worktree);
     }
   } else {
@@ -176,17 +183,31 @@ export function planCodexCommand(input: CodexPlanningInput): AgentCommandPlan {
   };
 }
 
-/** Parses bounded launch output and verifies the returned worktree/thread identity. */
-export function observeCodexLaunch(log: string, worktree: string): CodexLaunchObservation {
+/** Parses bounded launch output and verifies the complete returned route identity. */
+export function observeCodexLaunch(log: string, expected: RouteIdentity): CodexLaunchObservation {
   const thread = parseThreadInfo(log.slice(-MAX_AGENT_CAPTURE_BYTES));
   const diagnostics: RuntimeDiagnostic[] = [];
   if (!thread.threadId) {
     diagnostics.push(diagnostic('missing_identity', 'input', 'launch returned no thread identity'));
   }
-  if (thread.cwd && thread.cwd !== worktree) {
+  if (!thread.cwd) {
+    diagnostics.push(
+      diagnostic('missing_identity', 'input', 'launch returned no worktree identity'),
+    );
+  } else if (thread.cwd !== expected.worktree) {
     diagnostics.push(
       diagnostic('route_conflict', 'policy', 'launch returned a different worktree identity'),
     );
+  }
+  if (!thread.model) {
+    diagnostics.push(diagnostic('missing_identity', 'input', 'launch returned no model identity'));
+  } else if (thread.model !== expected.model) {
+    diagnostics.push(
+      diagnostic('route_conflict', 'policy', 'launch returned a different model identity'),
+    );
+  }
+  if (thread.exited !== null && thread.exited !== 0) {
+    diagnostics.push(diagnostic('process_failed', 'execution', 'Codex launch process failed'));
   }
   return {
     sessionId: thread.threadId,

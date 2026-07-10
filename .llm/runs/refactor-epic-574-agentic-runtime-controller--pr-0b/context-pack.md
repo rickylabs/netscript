@@ -8,7 +8,7 @@
 | Branch | `refactor/epic-574-agentic-runtime-controller` |
 | Worktree | `/home/codex/repos/netscript-epic-574-pr0b-controller` |
 | Base | PR #584 sign-off `9b75470` |
-| Phase | S3 implementation/gates complete; coordinator Tier-A review pending |
+| Phase | S3 Tier-A remediation/gates complete; coordinator re-review pending |
 | Thread | `019f4b72-2ea4-7050-917e-6d6918371265` (resume only) |
 
 ## Current State
@@ -34,8 +34,9 @@ capability translation. Tier-A found four gaps in `2ad1d9c`; remediation restore
 observed summaries with real status filters, makes untyped desired/persisted/checkpoint reads strict,
 connects the mutation guard to the actual ports object, and runs the sentinel through real input,
 failure, renderer, and writer paths. Coordinator substantive review approved S2 in supervisor
-sign-off `6756a54`. S3 now provides data-only Codex/Claude/Gemini/provider lifecycle adapters and
-focused evidence; S4 has not started.
+sign-off `6756a54`. S3 now provides data-only Codex/Claude/Gemini/provider lifecycle adapters.
+Tier-A remediation pins Codex launches to the inspected Git HEAD and makes launch observation fail
+closed on complete route identity and process result. Replacement gates pass; S4 has not started.
 
 ## Locked Boundaries
 
@@ -53,8 +54,8 @@ focused evidence; S4 has not started.
 1. S1 contract/state/ports/pure planner: coordinator-approved at `ac71896`.
 2. S2 controller/renderers/foundation/local-state/mobile adapters and read-only canonical CLI:
    coordinator-approved at `6756a54`.
-3. S3 Claude/Codex/Gemini/provider lifecycle adapters: implementation/gates complete; coordinator
-   Tier-A review pending.
+3. S3 Claude/Codex/Gemini/provider lifecycle adapters: Tier-A remediation/gates complete;
+   coordinator re-review pending.
 4. S4 transactional apply, explicit fallback/restore, rollback, and failure behavior: not started.
 5. S5 compatibility wrappers, documentation, and full scoped gates: not started.
 
@@ -126,10 +127,27 @@ focused evidence; S4 has not started.
   dependency, lock, S4 transaction, or S5 wrapper action occurred. Existing format-scope drift
   remains unchanged; no new architecture debt.
 
+## S3 Remediation Evidence
+
+- Codex launch exact argv now ends with `--expect-base <inspected git.head>`; an empty inspected
+  HEAD returns `missing_identity` and no request.
+- Launch observation validates the expected route's thread/worktree/model identity and the parsed
+  process result after bounded capture. Missing identity, route mismatch, and nonzero exit map to
+  `missing_identity`, `route_conflict`, and `process_failed` respectively; absent exit remains valid
+  under the parser contract.
+- Focused adapter tests remain `9 passed | 0 failed`; the complete current set remains
+  `105 passed | 0 failed`. Scoped check/lint/owned-format select 37/25/18 files and report zero
+  findings.
+- Exact launcher-contract, no-rival/effect, sentinel/content, LOC, scope, patch, and unchanged-lock
+  gates pass. Adapter/test LOC are `219/350` and `391/450`; `deno.lock` remains blob
+  `8694862878e6f9a430bf56497a4d5bf3f8eb1f3d`.
+- Only the Codex adapter, focused adapter test, and mandatory run artifacts changed. No new drift or
+  architecture debt; no S4/S5 or child-issue work.
+
 ## Next Action
 
-Coordinator substantively reviews the pushed S3 commit. Do not start S4 or launch another sender;
-resume this exact thread only after an approved S4 brief.
+Coordinator substantively re-reviews the pushed S3 remediation commit. Do not start S4 or launch
+another sender; resume this exact thread only after an approved S4 brief.
 
 ## Safety
 

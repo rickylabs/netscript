@@ -88,6 +88,8 @@ Deno.test('Codex launch uses a content file and preserves exact worktree identit
     worktree,
     '--branch',
     'feature',
+    '--expect-base',
+    git.head,
   ]);
 });
 
@@ -131,13 +133,24 @@ Deno.test('Codex reuses bounded launch-log and turn parsing primitives', () => {
   const rollout = `/home/codex/.codex/sessions/rollout-2026-07-10T00-00-00-${threadId}.jsonl`;
   const observed = observeCodexLaunch(
     `${rollout}\n{"cwd":"${worktree}","model":"caller-model"}`,
-    worktree,
+    codexRoute,
   );
   assertEquals(observed.sessionId, threadId);
   assertEquals(observed.worktree, worktree);
   assertEquals(observed.diagnostics, []);
-  const wrong = observeCodexLaunch(`${rollout}\n{"cwd":"/home/codex/repos/other"}`, worktree);
-  assertEquals(codes(wrong.diagnostics), ['route_conflict']);
+  const missing = observeCodexLaunch(rollout, codexRoute);
+  assertEquals(codes(missing.diagnostics), ['missing_identity', 'missing_identity']);
+  const wrong = observeCodexLaunch(
+    `${rollout}\n{"cwd":"/home/codex/repos/other","model":"other-model"}`,
+    codexRoute,
+  );
+  assertEquals(codes(wrong.diagnostics), ['route_conflict', 'route_conflict']);
+  const failed = observeCodexLaunch(
+    `${rollout}\n{"cwd":"${worktree}","model":"caller-model"}\n` +
+      'codex app-server exited: exit status: 1',
+    codexRoute,
+  );
+  assertEquals(codes(failed.diagnostics), ['process_failed']);
 });
 
 Deno.test('route matrix rejects incomplete and conflicting identity before construction', () => {
@@ -197,6 +210,15 @@ Deno.test('dirty wrong-branch and active-turn Codex plans reject before executio
   });
   assertEquals(unsafe.request, null);
   assert(codes(unsafe.diagnostics).includes('unsafe_worktree'), 'unsafe worktree passed');
+  const missingHead = planCodexCommand({
+    command: launch,
+    git: { ...git, head: '' },
+    expectedBranch: 'feature',
+    nativeExt4: true,
+    handoff: inspectCodexHandoff(handoff),
+  });
+  assertEquals(missingHead.request, null);
+  assert(codes(missingHead.diagnostics).includes('missing_identity'), 'missing HEAD passed');
   const resume: Extract<RuntimeCommand, { kind: 'resume' }> = {
     kind: 'resume',
     commandId: 'active',
