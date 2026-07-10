@@ -1,8 +1,10 @@
 /** Strict read and mutation port contracts for controller composition. */
 
 import type {
+  AgentKind,
   ContentReference,
   ReconcilePlan,
+  RouteIdentity,
   RuntimeAction,
   RuntimeCommand,
   RuntimeDiagnostic,
@@ -49,6 +51,26 @@ export interface ProcessProbeOutcome {
   readonly exitCode: number;
   readonly timedOut: boolean;
   readonly diagnostic?: RuntimeDiagnostic;
+}
+
+export const AGENT_LIFECYCLE_OPERATIONS = ['launch', 'resume', 'smoke'] as const;
+export type AgentLifecycleOperation = typeof AGENT_LIFECYCLE_OPERATIONS[number];
+
+export interface AgentProcessRequest {
+  readonly executable: string;
+  readonly arguments: readonly string[];
+  readonly cwd: string;
+  readonly timeoutMs: number;
+  readonly maxCaptureBytes: number;
+}
+
+export interface AgentCommandPlan {
+  readonly agent: AgentKind;
+  readonly operation: AgentLifecycleOperation;
+  readonly route: RouteIdentity;
+  readonly content?: ContentReference;
+  readonly request: AgentProcessRequest | null;
+  readonly diagnostics: readonly RuntimeDiagnostic[];
 }
 
 export interface RuntimeInspectorPort {

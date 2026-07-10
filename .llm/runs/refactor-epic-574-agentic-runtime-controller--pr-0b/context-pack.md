@@ -8,7 +8,7 @@
 | Branch | `refactor/epic-574-agentic-runtime-controller` |
 | Worktree | `/home/codex/repos/netscript-epic-574-pr0b-controller` |
 | Base | PR #584 sign-off `9b75470` |
-| Phase | S2 Tier-A remediation complete; coordinator re-review pending |
+| Phase | S3 implementation/gates complete; coordinator Tier-A review pending |
 | Thread | `019f4b72-2ea4-7050-917e-6d6918371265` (resume only) |
 
 ## Current State
@@ -33,7 +33,9 @@ foundation translation, strict value-free local-state migration/storage, and rea
 capability translation. Tier-A found four gaps in `2ad1d9c`; remediation restores safe desired and
 observed summaries with real status filters, makes untyped desired/persisted/checkpoint reads strict,
 connects the mutation guard to the actual ports object, and runs the sentinel through real input,
-failure, renderer, and writer paths. Coordinator re-review remains pending; S3 has not started.
+failure, renderer, and writer paths. Coordinator substantive review approved S2 in supervisor
+sign-off `6756a54`. S3 now provides data-only Codex/Claude/Gemini/provider lifecycle adapters and
+focused evidence; S4 has not started.
 
 ## Locked Boundaries
 
@@ -50,8 +52,9 @@ failure, renderer, and writer paths. Coordinator re-review remains pending; S3 h
 
 1. S1 contract/state/ports/pure planner: coordinator-approved at `ac71896`.
 2. S2 controller/renderers/foundation/local-state/mobile adapters and read-only canonical CLI:
-   Tier-A remediation/gates complete; coordinator re-review pending.
-3. S3 Claude/Codex/Gemini/provider lifecycle adapters: not started.
+   coordinator-approved at `6756a54`.
+3. S3 Claude/Codex/Gemini/provider lifecycle adapters: implementation/gates complete; coordinator
+   Tier-A review pending.
 4. S4 transactional apply, explicit fallback/restore, rollback, and failure behavior: not started.
 5. S5 compatibility wrappers, documentation, and full scoped gates: not started.
 
@@ -101,11 +104,32 @@ failure, renderer, and writer paths. Coordinator re-review remains pending; S3 h
 - Locked LOC budgets, `git diff --check`, scope/secret scans, and lock hygiene pass. Existing broad
   format-scope drift remains; no new architecture debt.
 
+## S3 Files and Evidence
+
+- New: `runtime/adapters/{codex,claude,gemini,provider}-adapter.ts` and
+  `runtime/adapters_test.ts`; updated only the value-free agent command-plan types in `ports.ts`.
+- Codex launch/resume command plans preserve file/worktree/thread identities, reuse handoff,
+  git-safety, launch-log, and turn parsing primitives, and select distinct launch/resume wrappers.
+  Resume argv cannot contain the launch wrapper or `send-message-v2`.
+- Claude exposes bounded static-smoke planning only; live login/mobile canaries return an explicit
+  unsupported diagnostic and remain owner work.
+- Gemini normalizes installed/auth observations; live evidence is an explicit issue #578 block.
+  OpenRouter/custom routes are explicit issue #577 blocks.
+- Provider validation accepts only complete finite route/session identity plus allowlisted conflict
+  key names. It never accepts or acquires credential values, selects profiles, or mutates defaults.
+- Focused tests: `9 passed | 0 failed`; complete current set: `105 passed | 0 failed`.
+- Scoped check/lint/owned format: exit 0, zero findings (`37`/`25`/`18` selected files).
+- Route, command-construction, no-rival, unsupported-capability, sentinel, effect, scope, LOC,
+  `git diff --check`, and unchanged-lock gates pass. Each new adapter is <=198 LOC; focused test is
+  369 LOC; CLI remains untouched at 150 LOC.
+- No real sender, provider login, live Gemini/Claude/mobile canary, network/write mutation,
+  dependency, lock, S4 transaction, or S5 wrapper action occurred. Existing format-scope drift
+  remains unchanged; no new architecture debt.
+
 ## Next Action
 
-Coordinator reviews the pushed S2 remediation commit and records the Tier-A result. Do not start S3
-or launch another sender. Resume this exact thread only after coordinator approval and a concrete
-S3 brief.
+Coordinator substantively reviews the pushed S3 commit. Do not start S4 or launch another sender;
+resume this exact thread only after an approved S4 brief.
 
 ## Safety
 

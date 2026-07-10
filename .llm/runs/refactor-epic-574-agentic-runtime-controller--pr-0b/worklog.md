@@ -6,7 +6,9 @@ Research and Design are complete. Tier-A coordinator Plan-Gate review returned `
 owner-authorized external-evaluator waiver. Tier-A requested three S1 contract remediations, then
 substantively approved them at supervisor sign-off `ac71896` over implementation head `197bc51`.
 S2 implementation received four Tier-A changes requested. The remediation and replacement evidence
-are complete on the same daemon-managed thread. Tier-A S2 re-review is pending; S3 has not started.
+were substantively approved in supervisor sign-off `6756a54`. S3 implementation and automated
+gates are complete on the same daemon-managed thread; coordinator review is pending and S4 has not
+started.
 
 ## Design
 
@@ -583,3 +585,73 @@ and both record the same four Tier-A findings against `2ad1d9c`. The implementat
 aligned with #576, the draft PR still carries `Closes #576` and `Part of #574`, and no comment or
 label authorizes S3. Next action is coordinator substantive Tier-A re-review of the remediation
 commit; this worker does not self-certify.
+
+## S3 Activation
+
+- Coordinator S2 sign-off: `6756a547101a4adf4d2d76157c574edf765ccf5a` over remediation
+  `a314289bbd30908a4f5dcc132f3cf4e4498fc5bb`.
+- Worktree/branch: native ext4 `/home/codex/repos/netscript-epic-574-pr0b-controller` on
+  `refactor/epic-574-agentic-runtime-controller`; raw local and remote heads matched at activation.
+- Sole thread: `019f4b72-2ea4-7050-917e-6d6918371265`; same-thread continuation only, no sender
+  launch.
+- Locked scope: four agent/provider lifecycle adapters, `runtime/adapters_test.ts`, necessary typed
+  S1/S2 composition changes, and mandatory run artifacts. S4 transactions/rollback and S5 wrappers
+  remain blocked.
+
+## S3 Implementation
+
+### Scope Delivered
+
+- `runtime/ports.ts`: value-free `AgentProcessRequest` and `AgentCommandPlan` seam; no executor or
+  mutation method.
+- `runtime/adapters/codex-adapter.ts`: pure launch/resume construction using content file paths,
+  exact worktree/branch/thread identity, existing handoff/git-safety/launch-log/turn primitives,
+  bounded capture metadata, and separate launch/resume wrapper paths.
+- `runtime/adapters/claude-adapter.ts`: fixed bounded static-smoke argv using a content reference;
+  launch/resume and interactive live/mobile work return finite unsupported diagnostics.
+- `runtime/adapters/gemini-adapter.ts`: installed/auth normalization, bounded static probe planning,
+  explicit #578 live-evidence block, and unsupported launch/resume diagnostics.
+- `runtime/adapters/provider-adapter.ts`: complete route/session/native-path validation, fixed
+  agent/provider pairs, allowlisted credential conflict **names** only, and #577 blocks for
+  OpenRouter/custom. It does not accept credential values or select profiles/defaults.
+- `runtime/adapters_test.ts`: command construction, route/worktree/session matrix, bounded parsing,
+  no-rival resume, provider sentinel, child-issue, and unsupported-capability coverage.
+
+The adapter plans are data only and are reached by focused tests. S4 remains responsible for
+controller execution, checkpoints, compensation, and transactional apply; the canonical CLI and
+legacy wrappers were intentionally unchanged in S3.
+
+### S3 Evidence
+
+| Gate | Exact command / proof | Raw outcome |
+| --- | --- | --- |
+| Focused adapter tests | `rtk proxy deno test --no-lock .llm/tools/agentic/runtime/adapters_test.ts` | exit 0; `9 passed | 0 failed`; no permissions required |
+| Complete agentic/runtime unit set | `rtk proxy deno test --no-lock --allow-read --allow-write --allow-env .llm/tools/agentic/agentic-lib_test.ts .llm/tools/agentic/wsl-foundation_test.ts .llm/tools/agentic/runtime/contract_test.ts .llm/tools/agentic/runtime/planner_test.ts .llm/tools/agentic/runtime/controller_test.ts .llm/tools/agentic/runtime/adapters_test.ts` | exit 0; `105 passed | 0 failed` |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .llm/tools/agentic --ext ts --pretty` | exit 0; 37 files, 1 batch, 0 findings |
+| Scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root .llm/tools/agentic --ext ts --include '(^|/)(runtime/|agentic-runtime|wsl-foundation|launch-codex-slice|codex-resume|codex-status|claude-remote-smoke)' --pretty` | exit 0; 25 files, 0 findings |
+| Owned format | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root .llm/tools/agentic --ext ts --include '(^|/)(runtime/|agentic-runtime)' --pretty` | final exit 0; 18 files, 0 findings |
+| Codex construction | Focused launch/resume tests inspect exact argv arrays, content path, cwd, worktree, branch, thread ID, timeout, and capture cap | PASS; launch and resume use their checked-in wrappers; raw content/rollout paths absent from plans/observations |
+| Route/worktree matrix | Missing provider/model/effort/worktree/mobile/session; agent/provider/session conflicts; non-native, dirty, wrong-branch, and active-turn inputs | all reject with finite diagnostics before request construction |
+| Claude/Gemini/provider | Static Claude fixed argv; Gemini observation/live block; OpenRouter/custom/provider-key-name matrix | PASS; #578/#577 ownership explicit; owner-only/unsupported paths return `request: null` |
+| No rival/effects | Resume argv scan plus source effect scan over all four adapters | no launch wrapper or `send-message-v2` in resume; no `Deno.Command`, env/write/fetch, or sender execution in adapters |
+| Secret sentinel | Sentinel enters value-free handoff inspection and credential-key-name input, then real Codex/provider planning | absent from argv, diagnostics, results, implementation, and run artifacts; state contracts remain value-free |
+| Native API inspection | `deno doc` over each new adapter | exit 0; public signatures resolve and raw content/provider-session paths are not result fields |
+| File budgets | `wc -l` over CLI/runtime/adapters/tests | PASS: new provider/codex/claude/gemini adapters 110/198/95/119; new test 369; ports 145/220; CLI unchanged 150/150; all touched TS <500 |
+| Lock hygiene | `git rev-parse 6756a54:deno.lock`; `git hash-object deno.lock`; `git diff --exit-code 6756a54 -- deno.lock` | both blobs `8694862878e6f9a430bf56497a4d5bf3f8eb1f3d`; diff exit 0 |
+| Patch/scope | `git diff --check`; raw `git status --short` and scope/effect/secret scans | exit 0; only five planned S3 files, `ports.ts`, and two mandatory run artifacts |
+
+### S3 Safety and Handoff
+
+- No real second sender, process execution, provider login, live Gemini prompt, Claude/mobile
+  canary, network/write mutation, dependency/lock/cache change, S4 transaction, or S5 wrapper edit.
+- Existing broad-format scope drift remains unchanged; final S3-owned format verdict is green.
+- No new architecture debt. Functional internal-tool layering remains: contracts/ports -> pure
+  adapters -> future S4 execution edge.
+- Next action: coordinator substantive Tier-A S3 review. This worker does not self-certify and does
+  not start S4.
+
+## Reconcile Note — S3
+
+PR #585 and issue #576 are open at `status:impl`; both record S2 coordinator sign-off `6756a54`.
+The draft PR retains `Closes #576`, `Part of #574`, and the PR #584 stack. S3 matches the locked
+plan and child boundaries #577/#578; no newer comment or label authorizes S4.
