@@ -240,17 +240,11 @@ export function planReconciliation(input: ReconciliationInput): ReconcilePlan {
       break;
     }
     case 'repair-codex-remote':
-      addBlockedIntent(
-        builder,
-        command,
-        diagnostic(
-          'capability_deferred',
-          'capability',
-          'live Codex repair is deferred to issue #580',
-          580,
-        ),
-        [`worktree:${command.worktree}`],
-      );
+      addAction(builder, command, 'repair_codex_remote', 'mobile-control', {
+        effect: command.mode === 'apply' ? 'process' : 'none',
+        reversible: false,
+        resourceIds: [`worktree:${command.worktree}`],
+      });
       break;
     case 'rollback': {
       const checkpoint = observed.checkpoints.find((entry) =>

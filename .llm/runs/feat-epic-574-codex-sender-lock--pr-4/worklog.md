@@ -63,6 +63,8 @@ Start at `runtime/contract.ts` for canonical vocabulary, follow the action into 
 | 2026-07-10 | 1 | Plan-Gate | External Claude coordinator approved the locked plan; slice 2 implementation authorized. |
 | 2026-07-10 | 2 | implementation | Added strict sender ownership domain/atomic store and pre-spawn duplicate refusal with resume guidance. |
 | 2026-07-10 | 2 | reconcile | #580 remains the only owned issue; #581/#582 surfaces are unchanged. PR #589 remains draft pending coordinator review. |
+| 2026-07-10 | 3 | implementation | Added six-state Codex remote diagnosis, active-work/unanchored refusal, injected anchored repair, verification/evidence, CLI apply/dry-run, launcher-edge atomic ownership, and operator README. |
+| 2026-07-10 | 3 | reconcile | #581 routing/global defaults and #582 rollout/model promotion remain absent; interactive reconnect canaries remain owner-accepted rather than executed evidence. |
 
 ## Gate Results
 
@@ -74,8 +76,15 @@ Start at `runtime/contract.ts` for canonical vocabulary, follow the action into 
 | Slice 2 scoped lint | PASS | 45 files, 0 findings; exit 0. |
 | Slice 2 scoped fmt | PASS | 45 files, 0 findings; exit 0. |
 | Slice 2 diff/lock | PASS | `git diff --check` exit 0; `deno.lock` unchanged. |
+| Slice 3 focused tests | PASS | 33 remote/planner/controller/boundary tests + 2 compatibility + 4 ownership passed; 0 failed; exits 0. |
+| Slice 3 launcher check | PASS | `deno check --no-lock launch-codex-slice.ts`; exit 0. |
+| Slice 3 scoped check | PASS | 48 files, 0 findings; exit 0. |
+| Slice 3 scoped lint | PASS | 48 files, 0 findings; exit 0. |
+| Slice 3 scoped fmt | PASS | 48 files, 0 findings; exit 0. |
+| Slice 3 diff/lock | PASS | `git diff --check` exit 0; `deno.lock` unchanged. |
 
 ## Handoff Notes
 
 - Review L2–L9 first: lock schema/liveness and repair anchoring/refusal are the decisions that would force rework.
 - Interactive reconnect canaries are owner-accepted only and must not be reported as raw executions.
+- Tier-A should inspect `isAnchoredCodexAppServer`, the repeated PID allowlist in `terminateAnchored`, the exact socket comparison, and active-session/child-command refusal first.

@@ -12,7 +12,7 @@
 
 ## Current State
 
-Plan slice landed as `1d165762`, descended from integration baseline `fe3c63fb`. The external Claude coordinator approved the Plan-Gate and continues to own Tier-A review/sign-off and merge. Slice 2 now implements the ownership domain/store and pre-spawn Codex duplicate refusal.
+Plan slice `1d165762` and ownership slice `65900e52` are landed. Slice 3 implements guarded remote repair and launcher-edge ownership and is ready to commit after integrity scans. The external Claude coordinator owns Tier-A review/sign-off and merge.
 
 ## Completed
 
@@ -23,12 +23,12 @@ Plan slice landed as `1d165762`, descended from integration baseline `fe3c63fb`.
 
 ## In Progress
 
-- Slice 2 commit, explicit-refspec push, and PR evidence.
+- Slice 3 integrity scan, commit, explicit-refspec push, and PR evidence.
 
 ## Next Steps
 
-1. Land slice 2 with required PR evidence.
-2. Implement slice 3, run full gates, and hand off for coordinator Tier-A/IMPL-EVAL workflow.
+1. Land slice 3 with required PR evidence.
+2. Run the final full agentic/runtime suite and hand off for coordinator Tier-A review.
 
 ## Key Decisions
 
@@ -40,7 +40,7 @@ Plan slice landed as `1d165762`, descended from integration baseline `fe3c63fb`.
 
 ## Files Changed
 
-- Slice 2: sender ownership domain/store/tests, Codex adapter duplicate refusal, and run artifacts.
+- Slice 3: Codex remote domain/local adapter/tests, CLI/planner/contract/boundary updates, launcher-edge ownership, README, and run artifacts.
 
 ## Gates
 
@@ -49,6 +49,8 @@ Plan slice landed as `1d165762`, descended from integration baseline `fe3c63fb`.
 | Plan | PASS | coordinator approval recorded in `plan-eval.md` |
 | Slice 2 static | PASS | check/lint/fmt: 45 files, 0 findings each |
 | Slice 2 runtime | PASS | 15 focused tests passed, 0 failed |
+| Slice 3 static | PASS | check/lint/fmt: 48 files, 0 findings each; launcher check exit 0 |
+| Slice 3 runtime | PASS | 39 focused/compatibility/ownership tests passed, 0 failed |
 
 ## Open Questions
 

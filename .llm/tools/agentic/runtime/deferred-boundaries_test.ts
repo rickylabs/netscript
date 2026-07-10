@@ -114,13 +114,12 @@ Deno.test('all provider lifecycle apply paths remain issue 580 blocked', () => {
   }
   const repair = plan({
     kind: 'repair-codex-remote',
-    commandId: 'deferred-repair-580',
+    commandId: 'repair-580',
     mode: 'apply',
     worktree,
   });
-  assertEquals(repair.diagnostics.map((entry) => [entry.code, entry.ownerIssue]), [
-    ['capability_deferred', 580],
-  ]);
+  assertEquals(repair.actions.map((entry) => entry.kind), ['repair_codex_remote']);
+  assertEquals(repair.diagnostics, []);
 });
 
 Deno.test('issues 581 and 582 remain absent capabilities rather than hidden implementations', () => {

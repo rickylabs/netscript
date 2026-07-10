@@ -366,7 +366,7 @@ Deno.test('explicit rollback rejects external drift without mutation and is idem
   equal((await applyRuntimeCommand(command, s.reads, s.writes)).status, 'no_change');
 });
 
-Deno.test('blocked apply observes once and preserves the exact owner diagnostic', async () => {
+Deno.test('generic repair apply cannot bypass the dedicated guarded adapter', async () => {
   const s = scenario();
   const result = await applyRuntimeCommand(
     { kind: 'repair-codex-remote', commandId: 'repair', mode: 'apply', worktree },
@@ -374,10 +374,7 @@ Deno.test('blocked apply observes once and preserves the exact owner diagnostic'
     s.writes,
   );
   equal(result.status, 'blocked');
-  equal(result.diagnostics.map((entry) => [entry.code, entry.ownerIssue]), [[
-    'capability_deferred',
-    580,
-  ]]);
+  equal(result.diagnostics.map((entry) => entry.code), ['ownership_conflict']);
   equal(s.observations(), 1);
   equal(s.events, []);
 });

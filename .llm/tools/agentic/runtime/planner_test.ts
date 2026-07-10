@@ -185,18 +185,16 @@ Deno.test('bootstrap drift yields deterministic data-only actions in finite orde
   assert(!JSON.stringify(first).includes('function'), 'plan contains executable data');
 });
 
-Deno.test('deferred Codex repair is an explicit blocked intent owned by issue 580', () => {
+Deno.test('Codex repair plans one explicit mobile-control action', () => {
   const result = plan({
     kind: 'repair-codex-remote',
     commandId: 'repair-1',
     mode: 'plan',
     worktree,
   });
-  assertEquals(result.status, 'blocked');
-  assertEquals(result.actions.map((action) => action.kind), ['blocked_intent']);
-  assertEquals(result.diagnostics.map((entry) => [entry.code, entry.ownerIssue]), [
-    ['capability_deferred', 580],
-  ]);
+  assertEquals(result.status, 'planned');
+  assertEquals(result.actions.map((action) => action.kind), ['repair_codex_remote']);
+  assertEquals(result.diagnostics, []);
   assertEquals(result.changed, false);
 });
 

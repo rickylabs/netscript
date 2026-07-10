@@ -60,6 +60,16 @@ export class LocalSenderOwnershipAdapter {
     if (!current || current.leaseToken !== leaseToken) throw new Error('sender lease mismatch');
     await Deno.remove(await this.pathFor(worktree));
   }
+
+  isProcessAlive(pid: number): boolean {
+    try {
+      Deno.kill(pid, 0);
+      return true;
+    } catch (error) {
+      if (error instanceof Deno.errors.NotFound) return false;
+      throw error;
+    }
+  }
 }
 
 /** Strictly parses sender records and rejects payload creep that could leak prompt data. */

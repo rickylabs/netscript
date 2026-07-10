@@ -67,7 +67,7 @@ export type ActionEffect = typeof ACTION_EFFECTS[number];
 export const ACTION_KINDS = [
   'install_component', 'create_state_directory', 'configure_auth_route', 'persist_desired_state',
   'launch_session', 'resume_session', 'smoke_session', 'switch_route', 'restore_route',
-  'rollback_checkpoint', 'blocked_intent',
+  'repair_codex_remote', 'rollback_checkpoint', 'blocked_intent',
 ] as const;
 export type RuntimeActionKind = typeof ACTION_KINDS[number];
 // deno-fmt-ignore
