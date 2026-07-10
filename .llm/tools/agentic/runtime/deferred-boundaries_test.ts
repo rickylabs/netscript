@@ -36,11 +36,11 @@ function plan(command: RuntimeCommand) {
   return planReconciliation({ command, desired: null, observed });
 }
 
-Deno.test('deferred child-issue registry removes only landed 579 and retains 580 through 582', () => {
-  assertEquals(DEFERRED_ISSUES.filter((issue) => issue >= 579), [580, 581, 582]);
+Deno.test('deferred registry contains only future issues 581 and 582', () => {
+  assertEquals(DEFERRED_ISSUES, [581, 582]);
 });
 
-Deno.test('Antigravity live evidence plans while apply remains issue 580 blocked', () => {
+Deno.test('Antigravity live evidence plans while controller apply remains unsupported', () => {
   const result = plan({
     kind: 'smoke',
     commandId: 'deferred-578',
@@ -72,11 +72,11 @@ Deno.test('Antigravity live evidence plans while apply remains issue 580 blocked
     level: 'live',
   });
   assertEquals(apply.diagnostics.map((entry) => [entry.code, entry.ownerIssue]), [
-    ['capability_deferred', 580],
+    ['capability_unsupported', undefined],
   ]);
 });
 
-Deno.test('all provider lifecycle apply paths remain issue 580 blocked', () => {
+Deno.test('all controller lifecycle apply paths point to the ownership-enforced launcher', () => {
   const routes = [
     {
       agent: 'claude',
@@ -103,14 +103,15 @@ Deno.test('all provider lifecycle apply paths remain issue 580 blocked', () => {
   for (const [index, route] of routes.entries()) {
     const result = plan({
       kind: 'smoke',
-      commandId: `deferred-580-${index}`,
+      commandId: `unsupported-apply-${index}`,
       mode: 'apply',
       route: { ...route, worktree, mobileRequired: false },
       level: 'static',
     });
     assertEquals(result.diagnostics.map((entry) => [entry.code, entry.ownerIssue]), [
-      ['capability_deferred', 580],
+      ['capability_unsupported', undefined],
     ]);
+    assert(result.diagnostics[0]?.message.includes('ownership-enforced agent launcher'));
   }
   const repair = plan({
     kind: 'repair-codex-remote',

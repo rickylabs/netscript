@@ -12,7 +12,7 @@
 
 ## Current State
 
-Plan `1d165762`, ownership `65900e52`, and guarded recovery `d5430c5a` are landed. Final full tests pass 185/0 and scoped runtime check/lint/fmt report 0 findings. The external Claude coordinator owns Tier-A review/sign-off and merge.
+Plan `1d165762`, ownership `65900e52`, guarded recovery `d5430c5a`, and final evidence `3e20fc39` are landed. Tier-A's stale deferral finding is fixed with option (b): controller lifecycle apply is permanently plan-only, live execution uses the ownership-enforced launcher/resume path, and only #581/#582 remain deferred. Reconciliation tests pass 32/0 focused and 185/0 full.
 
 ## Completed
 
@@ -23,12 +23,12 @@ Plan `1d165762`, ownership `65900e52`, and guarded recovery `d5430c5a` are lande
 
 ## In Progress
 
-- Final evidence commit and coordinator Tier-A handoff.
+- Tier-A reconciliation integrity checks, commit, push, and PR comment.
 
 ## Next Steps
 
-1. Commit/push final evidence and post “implementation complete — awaiting coordinator Tier-A review.”
-2. Coordinator performs substantive Tier-A review and any evaluator/merge workflow.
+1. Commit/push the Tier-A reconciliation and post gate evidence.
+2. Coordinator resumes substantive Tier-A sign-off and evaluator/merge workflow.
 
 ## Key Decisions
 
@@ -53,6 +53,7 @@ Plan `1d165762`, ownership `65900e52`, and guarded recovery `d5430c5a` are lande
 | Slice 3 runtime | PASS | 39 focused/compatibility/ownership tests passed, 0 failed |
 | Final full runtime | PASS | 185 passed, 0 failed; exit 0 |
 | Final static | PASS | check/lint/fmt: 48 files, 0 findings each |
+| Tier-A reconciliation | PASS | 32 focused and 185 full tests; scoped check/lint/fmt 0 findings |
 
 ## Open Questions
 

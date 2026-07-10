@@ -31,3 +31,13 @@ Drift is append-only.
 - **Severity:** significant
 - **Action:** accept as recorded lane override; stop before implementation until coordinator Plan-Gate passes.
 - **Evidence:** `supervisor.md`; `context-pack.md`.
+
+## 2026-07-10 — lifecycle apply is a permanent plan-only boundary
+
+- **What:** Tier-A found that the deferred-issue registry and lifecycle apply diagnostic still named landed #577/#580.
+- **Source:** coordinator Tier-A review of `runtime/contract.ts`, `runtime/planner.ts`, and boundary tests.
+- **Expected:** Only genuinely future issues appear in `DEFERRED_ISSUES`; landed work is not described as deferred.
+- **Actual:** Option (b) matches the built design: controller lifecycle commands produce plans only, while live sends use the durable ownership-enforced `launch-codex-slice.ts` and same-thread resume path. The controller boundary is now `capability_unsupported` with no issue number and explicit launcher guidance; future issues are only #581/#582.
+- **Severity:** significant
+- **Action:** fix; preserve repair apply through its dedicated guarded adapter.
+- **Evidence:** focused boundary suite 32/0; full agentic/runtime suite 185/0.

@@ -74,10 +74,9 @@ function planLifecycleAction(builder: PlanBuilder, command: RuntimeCommand, kind
     builder,
     command,
     diagnostic(
-      'capability_deferred',
+      'capability_unsupported',
       'capability',
-      'live lifecycle apply requires durable sender ownership from issue #580',
-      580,
+      'controller lifecycle apply is plan-only; use the ownership-enforced agent launcher and same-thread resume tools',
     ),
     [`session:${route.agent}:${sessionId ?? 'new'}`],
   );
