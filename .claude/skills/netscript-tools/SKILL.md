@@ -125,10 +125,24 @@ Two are durable GitHub infra utilities worth calling out:
   (Windows GCM + WSL `gh`) so later sessions auto-resolve. Use `check` at the start of any GitHub
   session; use `store` once when the supervisor's token is missing/rotated.
 
+The desired-state runtime controller is the default health/repair entry point:
+`deno task agentic:runtime doctor|status` for inspect-only environment/session snapshots, and
+`deno task agentic:runtime repair codex-remote --worktree <path> [--dry-run]` for planned,
+session-safe Codex daemon repair. `deno task agentic:routing-state` reads the persisted
+quota-fallback routing state.
+
 The rest of the family (`launch-codex-slice`, `codex-resume`, `codex-status`, `codex-watch`,
 `dispatch-openhands`, `openhands-status`, `gh-pr`) is indexed in
 `.llm/harness/workflow/tooling.md`. `.llm/tools/agentic/` is the **only** interface for driving Codex
-— never ad-hoc `wsl.exe`.
+— never ad-hoc `wsl.exe`. The suite is concern-grouped (`codex/`, `openhands/`, `github/`, `wsl/`,
+`claude/`, `runtime/` + `runtime/cli/`, `lib/`); its `README.md` is the canonical map.
+
+**Monthly maintenance (single source):** everything volatile lives in `.llm/tools/agentic/config/` —
+model ids in `config/models.ts`, tool versions in `config/versions.ts`, endpoints in
+`config/endpoints.ts`; routing lane→model bindings stay in `runtime/routing-policy.ts` (referencing
+the config ids). The "Maintenance map" table in the suite README says exactly where to change a
+model, version, policy, agent, or dep. A guard test (`config/no-hardcoded-volatile_test.ts`) fails
+the suite if any of these values is hardcoded outside `config/`.
 
 ## Lock Hygiene
 

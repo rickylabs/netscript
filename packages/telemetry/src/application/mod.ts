@@ -10,3 +10,4 @@ export * from '../domain/types.ts';
 export * from './tracer.ts';
 export * from './span.ts';
 export * from './span-utils.ts';
+export * from './fan-in-links.ts';

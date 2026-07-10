@@ -3489,6 +3489,10 @@
     "https://deno.land/std@0.224.0/jsonc/parse.ts": "06fbe10f0bb0cba684f7902bf7de5126b16eb0e5a82220c98a4b86675c7f9cff"
   },
   "workspace": {
+    "dependencies": [
+      "jsr:@std/assert@1",
+      "jsr:@std/path@1"
+    ],
     "members": {
       "packages/ai": {
         "dependencies": [
@@ -3617,6 +3621,8 @@
       "packages/fresh": {
         "dependencies": [
           "jsr:@fresh/core@^2.3.3",
+          "jsr:@netscript/ai@0.0.1-beta.5",
+          "jsr:@netscript/telemetry@0.0.1-beta.5",
           "jsr:@std/assert@1",
           "jsr:@std/http@1",
           "jsr:@std/path@1",
@@ -3713,6 +3719,7 @@
         "dependencies": [
           "jsr:@hono/hono@4.12.24",
           "jsr:@netscript/kv@0.0.1-beta.5",
+          "jsr:@netscript/telemetry@0.0.1-beta.5",
           "jsr:@std/assert@1",
           "jsr:@zod/zod@4.4.3"
         ],
@@ -3727,6 +3734,7 @@
       },
       "packages/plugin-streams-core": {
         "dependencies": [
+          "jsr:@netscript/telemetry@0.0.1-beta.5",
           "jsr:@std/assert@1"
         ],
         "packageJson": {

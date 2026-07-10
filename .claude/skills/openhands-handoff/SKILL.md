@@ -49,13 +49,13 @@ Use one of these from GitHub mobile, a local agent, or another cloud agent:
 - Push a commit whose message contains `[openhands ...]`.
 - Run `OpenHands Agent` manually from Actions.
 
-Model selection is per run:
+Provider/model/effort selection is per run and must come from
+`.llm/harness/workflow/lane-policy.md`. Use the enforced dispatcher rather than hand-authoring a
+model trigger:
 
-```text
-@openhands-agent model=anthropic/claude-sonnet-4 use harness proceed to IMPL-EVAL
-@openhands-agent agent=gemini output=respond-comments fix the legitimate review comments
-[openhands model=openai/gpt-5.1 output=pr-comment] run a focused evaluator pass
-@openhands-agent provider=openrouter model=openai/gpt-5.1 run through OpenRouter
+```bash
+deno task agentic:dispatch-openhands --pr <n> --prompt-file <path> \
+  --provider <provider> --model <model> --effort <effort> --output pr-comment
 ```
 
 The model precedence is:
@@ -133,12 +133,9 @@ local` needs no token and reads the newest committed trace under the run's `TRAC
    `netscript-deno-toolchain`, etc.), each with a one-line note of why it applies. **Be generous:**
    the more relevant skills you pass, the more efficient the agent. Skills are thin and the agents
    use them appropriately, so under-listing is the failure mode, not over-listing.
-3. Choose the smallest trigger:
-   - add `fix-me` or `openhands` for default model work,
-   - add `agent:<profile>` for a model-label run,
-   - comment `@openhands-agent model=<provider/model> ...` for a per-run literal model,
-   - add `provider=<provider>` when routing a model through a provider gateway such as OpenRouter,
-   - use `[openhands model=... output=...]` in a commit message for local-to-cloud handoff.
+3. Select the canonical route and invoke `dispatch-openhands.ts` with explicit `--provider`,
+   `--model`, and `--effort`. Treat legacy labels/comments as compatibility triggers, not routing
+   authority.
 4. Choose an output mode:
    - `pr-comment` for ordinary summaries,
    - `respond-comments` when review comments must be addressed in one summary,

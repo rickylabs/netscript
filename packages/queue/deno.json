@@ -2,7 +2,7 @@
   "name": "@netscript/queue",
   "version": "0.0.1-beta.5",
   "description": "Provider-agnostic message queue abstraction wrapping Fedify adapters for Deno KV, Redis, and RabbitMQ.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "exports": {
     ".": "./mod.ts",
     "./adapters/deno-kv": "./adapters/deno-kv.adapter.ts",

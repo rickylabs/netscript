@@ -28,7 +28,7 @@ const authManifest: PluginManifest = definePlugin(
   .withType('api')
   .withDescription('Unified auth API surface for NetScript applications.')
   .withAuthor('NetScript Team')
-  .withLicense('MIT')
+  .withLicense('Apache-2.0')
   .withTags(['auth', 'oauth', 'oidc', 'sessions'])
   .withPermissions(AUTH_SERVICE_PERMISSIONS)
   .withDependencies({})

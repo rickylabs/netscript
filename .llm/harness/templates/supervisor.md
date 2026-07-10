@@ -15,12 +15,13 @@ operating identity is discoverable without chat memory.
 | Baseline | <SHA + branch the run is based on, with date> |
 | Run ID | `<run-id>` |
 
-## Lane table in force
+## Routes in force
 
-| Tier | Binding | Role in this run |
+| Task lane | Provider / model / effort | Role in this run |
 | --- | --- | --- |
-| A | <supervisor binding> | <role> |
-| B/C/D/E | <bindings used by this run> | <roles> |
+| <canonical lane id> | <explicit requested identity> | <role> |
+
+Reference `.llm/harness/workflow/lane-policy.md`; do not copy its complete route table here.
 
 ## Recorded lane/eval overrides
 

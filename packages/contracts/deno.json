@@ -2,7 +2,7 @@
   "name": "@netscript/contracts",
   "version": "0.0.1-beta.5",
   "description": "NetScript contract primitives, common schemas, CRUD generators, query helpers, and transform helpers.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "exports": {
     ".": "./mod.ts",
     "./crud": "./crud.ts",

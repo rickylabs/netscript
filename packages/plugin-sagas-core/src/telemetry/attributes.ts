@@ -9,64 +9,62 @@ export type SagaSpanNamesMap = Readonly<{
 }>;
 
 /** Canonical span names emitted by saga runtime operations. */
-export const SagaSpanNames: SagaSpanNamesMap = Object.freeze(
-  {
-    HANDLE: 'saga.handle',
-    CASCADE_SEND: 'saga.cascade.send',
-    CASCADE_SCHEDULE: 'saga.cascade.schedule',
-    CASCADE_SPAWN: 'saga.cascade.spawn',
-    CASCADE_COMPENSATE: 'saga.cascade.compensate',
-    CASCADE_COMPLETE: 'saga.cascade.complete',
-  } as const,
-);
+export const SagaSpanNames: SagaSpanNamesMap = Object.freeze({
+  HANDLE: 'saga.handle',
+  CASCADE_SEND: 'saga.cascade.send',
+  CASCADE_SCHEDULE: 'saga.cascade.schedule',
+  CASCADE_SPAWN: 'saga.cascade.spawn',
+  CASCADE_COMPENSATE: 'saga.cascade.compensate',
+  CASCADE_COMPLETE: 'saga.cascade.complete',
+});
 
 /** Saga attribute keys emitted on spans and metrics. */
 export type SagaAttributesMap = Readonly<{
-  SAGA_ID: 'saga.id';
-  SAGA_INSTANCE_ID: 'saga.instance.id';
-  SAGA_EVENT_TYPE: 'saga.event.type';
-  SAGA_ATTEMPT: 'saga.attempt';
-  SAGA_DURABILITY_TIER: 'saga.durability_tier';
-  SAGA_CORRELATION_KEY: 'saga.correlation_key';
-  TARGET_JOB_ID: 'target.job.id';
-  IDEMPOTENCY_KEY: 'idempotency.key';
-  RETRY_MAX_ATTEMPTS: 'retry.max_attempts';
-  CONCURRENCY_KEY: 'concurrency.key';
-  QUEUE_NAME: 'queue.name';
-  SCHEDULED_FOR: 'scheduled.for';
-  DELAY_MS: 'delay.ms';
-  CHILD_SAGA_ID: 'child.saga.id';
-  CHILD_INSTANCE_ID: 'child.instance.id';
-  COMPENSATION_REASON: 'compensation.reason';
-  COMPENSATION_CASCADE_SIZE: 'compensation.cascade_size';
-  ERROR_CLASS: 'error_class';
-  OUTCOME: 'outcome';
+  SAGA_ID: 'netscript.saga.id';
+  SAGA_INSTANCE_ID: 'netscript.saga.instance.id';
+  SAGA_EVENT_TYPE: 'netscript.saga.event.type';
+  SAGA_ATTEMPT: 'netscript.saga.attempt';
+  SAGA_DURABILITY_TIER: 'netscript.saga.durability_tier';
+  SAGA_CORRELATION_KEY: 'netscript.saga.correlation_key';
+  TARGET_JOB_ID: 'netscript.job.target.id';
+  IDEMPOTENCY_KEY: 'netscript.idempotency.key';
+  RETRY_MAX_ATTEMPTS: 'netscript.retry.max_attempts';
+  CONCURRENCY_KEY: 'netscript.concurrency.key';
+  QUEUE_NAME: 'messaging.destination.name';
+  SCHEDULED_FOR: 'netscript.saga.scheduled_for';
+  DELAY_MS: 'netscript.saga.delay_ms';
+  CHILD_SAGA_ID: 'netscript.saga.child.id';
+  CHILD_INSTANCE_ID: 'netscript.saga.child.instance.id';
+  COMPENSATION_REASON: 'netscript.saga.compensation.reason';
+  COMPENSATION_CASCADE_SIZE: 'netscript.saga.compensation.cascade_size';
+  ERROR_CLASS: 'error.type';
+  OUTCOME: 'netscript.outcome';
+  STATUS: 'netscript.saga.status';
 }>;
 
 /** Canonical attribute keys emitted by saga spans and metrics. */
-export const SagaAttributes: SagaAttributesMap = Object.freeze(
-  {
-    SAGA_ID: 'saga.id',
-    SAGA_INSTANCE_ID: 'saga.instance.id',
-    SAGA_EVENT_TYPE: 'saga.event.type',
-    SAGA_ATTEMPT: 'saga.attempt',
-    SAGA_DURABILITY_TIER: 'saga.durability_tier',
-    SAGA_CORRELATION_KEY: 'saga.correlation_key',
-    TARGET_JOB_ID: 'target.job.id',
-    IDEMPOTENCY_KEY: 'idempotency.key',
-    RETRY_MAX_ATTEMPTS: 'retry.max_attempts',
-    CONCURRENCY_KEY: 'concurrency.key',
-    QUEUE_NAME: 'queue.name',
-    SCHEDULED_FOR: 'scheduled.for',
-    DELAY_MS: 'delay.ms',
-    CHILD_SAGA_ID: 'child.saga.id',
-    CHILD_INSTANCE_ID: 'child.instance.id',
-    COMPENSATION_REASON: 'compensation.reason',
-    COMPENSATION_CASCADE_SIZE: 'compensation.cascade_size',
-    ERROR_CLASS: 'error_class',
-    OUTCOME: 'outcome',
-  } as const,
-);
+export const SagaAttributes: SagaAttributesMap = Object.freeze({
+  SAGA_ID: 'netscript.saga.id',
+  SAGA_INSTANCE_ID: 'netscript.saga.instance.id',
+  SAGA_EVENT_TYPE: 'netscript.saga.event.type',
+  SAGA_ATTEMPT: 'netscript.saga.attempt',
+  SAGA_DURABILITY_TIER: 'netscript.saga.durability_tier',
+  SAGA_CORRELATION_KEY: 'netscript.saga.correlation_key',
+  TARGET_JOB_ID: 'netscript.job.target.id',
+  IDEMPOTENCY_KEY: 'netscript.idempotency.key',
+  RETRY_MAX_ATTEMPTS: 'netscript.retry.max_attempts',
+  CONCURRENCY_KEY: 'netscript.concurrency.key',
+  QUEUE_NAME: 'messaging.destination.name',
+  SCHEDULED_FOR: 'netscript.saga.scheduled_for',
+  DELAY_MS: 'netscript.saga.delay_ms',
+  CHILD_SAGA_ID: 'netscript.saga.child.id',
+  CHILD_INSTANCE_ID: 'netscript.saga.child.instance.id',
+  COMPENSATION_REASON: 'netscript.saga.compensation.reason',
+  COMPENSATION_CASCADE_SIZE: 'netscript.saga.compensation.cascade_size',
+  ERROR_CLASS: 'error.type',
+  OUTCOME: 'netscript.outcome',
+  STATUS: 'netscript.saga.status',
+});
 
 /** Saga span event names used for state-transition breadcrumbs. */
 export type SagaSpanEventsMap = Readonly<{
@@ -75,36 +73,32 @@ export type SagaSpanEventsMap = Readonly<{
 }>;
 
 /** Canonical span events used to annotate state snapshots. */
-export const SagaSpanEvents: SagaSpanEventsMap = Object.freeze(
-  {
-    STATE_BEFORE: 'state.before',
-    STATE_AFTER: 'state.after',
-  } as const,
-);
+export const SagaSpanEvents: SagaSpanEventsMap = Object.freeze({
+  STATE_BEFORE: 'state.before',
+  STATE_AFTER: 'state.after',
+});
 
 /** Metric names required by architecture-v2 section 6. */
 export type SagaMetricNamesMap = Readonly<{
-  HANDLE_DURATION_MS: 'netscript_saga_handle_duration_ms';
-  INSTANCES_ACTIVE: 'netscript_saga_instances_active';
-  COMPENSATIONS_TOTAL: 'netscript_saga_compensations_total';
-  DLQ_TOTAL: 'netscript_saga_dlq_total';
-  IDEMPOTENCY_HITS_TOTAL: 'netscript_saga_idempotency_hits_total';
-  CONCURRENCY_THROTTLED_TOTAL: 'netscript_saga_concurrency_throttled_total';
-  REPLAY_DURATION_MS: 'netscript_saga_replay_duration_ms';
+  HANDLE_DURATION_MS: 'netscript.saga.handle.duration_ms';
+  INSTANCES_ACTIVE: 'netscript.saga.instances.active';
+  COMPENSATIONS_TOTAL: 'netscript.saga.compensations.total';
+  DLQ_TOTAL: 'netscript.saga.dlq.total';
+  IDEMPOTENCY_HITS_TOTAL: 'netscript.saga.idempotency_hits.total';
+  CONCURRENCY_THROTTLED_TOTAL: 'netscript.saga.concurrency_throttled.total';
+  REPLAY_DURATION_MS: 'netscript.saga.replay.duration_ms';
 }>;
 
 /** Canonical metric names emitted by saga instrumentation. */
-export const SagaMetricNames: SagaMetricNamesMap = Object.freeze(
-  {
-    HANDLE_DURATION_MS: 'netscript_saga_handle_duration_ms',
-    INSTANCES_ACTIVE: 'netscript_saga_instances_active',
-    COMPENSATIONS_TOTAL: 'netscript_saga_compensations_total',
-    DLQ_TOTAL: 'netscript_saga_dlq_total',
-    IDEMPOTENCY_HITS_TOTAL: 'netscript_saga_idempotency_hits_total',
-    CONCURRENCY_THROTTLED_TOTAL: 'netscript_saga_concurrency_throttled_total',
-    REPLAY_DURATION_MS: 'netscript_saga_replay_duration_ms',
-  } as const,
-);
+export const SagaMetricNames: SagaMetricNamesMap = Object.freeze({
+  HANDLE_DURATION_MS: 'netscript.saga.handle.duration_ms',
+  INSTANCES_ACTIVE: 'netscript.saga.instances.active',
+  COMPENSATIONS_TOTAL: 'netscript.saga.compensations.total',
+  DLQ_TOTAL: 'netscript.saga.dlq.total',
+  IDEMPOTENCY_HITS_TOTAL: 'netscript.saga.idempotency_hits.total',
+  CONCURRENCY_THROTTLED_TOTAL: 'netscript.saga.concurrency_throttled.total',
+  REPLAY_DURATION_MS: 'netscript.saga.replay.duration_ms',
+});
 
 /** Canonical saga telemetry outcomes. */
 export type SagaTelemetryOutcomesMap = Readonly<{
@@ -115,14 +109,12 @@ export type SagaTelemetryOutcomesMap = Readonly<{
 }>;
 
 /** Canonical outcome values attached to saga spans and metrics. */
-export const SagaTelemetryOutcomes: SagaTelemetryOutcomesMap = Object.freeze(
-  {
-    SUCCESS: 'success',
-    ERROR: 'error',
-    COMPENSATED: 'compensated',
-    SKIPPED: 'skipped',
-  } as const,
-);
+export const SagaTelemetryOutcomes: SagaTelemetryOutcomesMap = Object.freeze({
+  SUCCESS: 'success',
+  ERROR: 'error',
+  COMPENSATED: 'compensated',
+  SKIPPED: 'skipped',
+});
 
 /** Literal union of supported saga span names. */
 export type SagaSpanName = (typeof SagaSpanNames)[keyof typeof SagaSpanNames];

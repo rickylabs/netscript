@@ -93,4 +93,4 @@ a `stop()` on the chat connection, so a client can cancel an in-flight generatio
 
 ## License
 
-MIT
+Apache-2.0

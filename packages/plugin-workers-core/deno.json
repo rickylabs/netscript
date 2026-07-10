@@ -2,7 +2,7 @@
   "name": "@netscript/plugin-workers-core",
   "version": "0.0.1-beta.5",
   "description": "Job, task, workflow, runtime, config, and testing primitives for NetScript workers plugins.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "exports": {
     ".": "./mod.ts",
     "./builders": "./src/builders/mod.ts",

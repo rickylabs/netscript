@@ -40,7 +40,7 @@ export const streamsPlugin: PluginManifest = definePlugin('@netscript/plugin-str
   .withType('utility')
   .withDescription('Durable Streams service and tooling for NetScript applications.')
   .withAuthor('NetScript Team')
-  .withLicense('MIT')
+  .withLicense('Apache-2.0')
   .withTags(['streams', 'sse', 'realtime', 'durable', 'tanstack-db'])
   .withPermissions(STREAMS_SERVICE_PERMISSIONS)
   .withService({

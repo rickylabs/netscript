@@ -12,6 +12,21 @@
 import { createMcpAppBridge } from '@tanstack/ai-preact';
 import { mergeAgentTools } from '@tanstack/ai';
 
+export {
+  createMcpAppCallHandler,
+  type McpAppCallAttributes,
+  type McpAppCallAttributeValue,
+  type McpAppCallClientPool,
+  type McpAppCallHandlerOptions,
+  type McpAppCallServerClient,
+  type McpAppCallSpan,
+  type McpAppCallSpanKind,
+  type McpAppCallSpanOptions,
+  type McpAppCallToolDescriptor,
+  type McpAppCallToolResult,
+  type McpAppCallTraceContext,
+  type McpAppCallTracer,
+} from './mcp-app-call-handler.ts';
 export { createMcpSandboxHandler, type McpSandboxHandlerOptions } from './mcp-sandbox-handler.ts';
 
 /** Human-readable marker every FA0 skeleton stub throws with. */

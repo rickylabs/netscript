@@ -89,5 +89,5 @@ wires discovery, clients, and queries together. Drop to a focused subpath (`@net
 
 ## 📝 License
 
-MIT — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
+Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
 cryptographically verified provenance.
