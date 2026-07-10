@@ -10,9 +10,12 @@ Deno.test('rollout CLI accepts only worktree and output paths', () => {
     '/home/codex/repos/worktree',
     '--output',
     '.llm/tmp/rollout.json',
+    '--report',
+    'ROLLOUT.md',
   ]);
   assert(parsed.worktree === '/home/codex/repos/worktree');
   assert(parsed.output === '.llm/tmp/rollout.json');
+  assert(parsed.report === 'ROLLOUT.md');
   for (
     const args of [
       ['--worktree', '/home/codex/repos/worktree'],

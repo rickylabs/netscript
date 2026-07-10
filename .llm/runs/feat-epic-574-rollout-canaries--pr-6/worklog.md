@@ -148,3 +148,44 @@ recommendation only and requires owner approval plus coordinator action.
 | `deno.lock` | unchanged |
 
 S2 files: runner/CLI and tests, `deno.json`, checked-in matrix, and run artifacts.
+
+## S3 — human outcome + Definition of Done
+
+- Added a pure Markdown renderer and consistency test; the rollout CLI now optionally writes
+  `ROLLOUT.md` from the same validated outcome used for JSON.
+- Final live rerun wrote both checked-in artifacts. Aggregate remains `conditional_pass` with
+  recommendation `promote_with_conditions`; no promotion action exists or ran.
+- Report includes every reproducible command, expected result, actual bounded evidence, failure
+  classification, evidence mode, residual risk, rollback status, privacy boundary, and promotion
+  boundary.
+
+### Final gate evidence
+
+| Gate | Result |
+| --- | --- |
+| Complete agentic tree | `deno test --no-lock --allow-read --allow-write --allow-env --allow-run .llm/tools/agentic` — 201 passed, 0 failed |
+| Scoped check | 84 files, 0 findings |
+| Scoped lint | 84 files, 0 findings |
+| Scoped format check | 84 files, 0 findings |
+| Report/matrix consistency | Included in complete suite; renderer equality test passed |
+| Artifact integrity | 9 rows; report 8697 bytes; aggregate `conditional_pass`; sensitive-value scan clean |
+| `git diff --check` | exit 0 |
+| `deno.lock` | unchanged |
+| Doctrine scanner | Non-verdict exit 1: scanner assumes a publishable package and requires `mod.ts`; also reports pre-existing agentic directory/file warnings. No new owned file exceeds 500 LOC. |
+| Manual Archetype-6 review | PASS for owned files: CLI is 59 LOC and parse/write only; runner is 382 LOC and injected; pure contract 165 LOC; report renderer 72 LOC; no sub-barrels, provider logic, live repair, promotion operation, dependencies, or raw output persistence. |
+
+### Definition-of-Done reconciliation
+
+- [x] Exactly nine stable canary IDs appear once in machine and human outputs.
+- [x] Every canary has a reproducible command, expected result, actual evidence, evidence mode, and
+      failure classification.
+- [x] Live native health, provider compatibility, Antigravity evidence, dry-run Codex inspection,
+      quota state-machine, and routing-state commands were executed and recorded honestly.
+- [x] Owner-interactive evidence is `owner_accepted_working`; no raw mobile proof is fabricated.
+- [x] `auth_blocked` and `credential_absent` remain conditional, never unconditional passes.
+- [x] PRs #585–#590 and rollback PR #584 are cited.
+- [x] Report covers outcome, residual risks, rollback, privacy, and promotion recommendation.
+- [x] No daemon restart, rollback, merge, promotion, dependency change, or #576–#581 behavior change.
+- [x] Full owned tests and scoped static gates pass; lock and sensitive-data gates pass.
+
+Implementation complete — awaiting coordinator Tier-A review. This worker does not self-certify.

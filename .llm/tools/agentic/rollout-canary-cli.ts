@@ -1,13 +1,15 @@
 /** CLI edge that writes the validated, secret-safe rollout canary matrix. */
 
 import { runRolloutCanaries } from './rollout-canary-runner.ts';
+import { renderRolloutReport } from './runtime/rollout-report.ts';
 
 interface Args {
   readonly worktree: string;
   readonly output: string;
+  readonly report?: string;
 }
 function usage(): string {
-  return 'Usage: deno task agentic:rollout-canary --worktree <native-ext4-path> --output <json-path>';
+  return 'Usage: deno task agentic:rollout-canary --worktree <native-ext4-path> --output <json-path> [--report <markdown-path>]';
 }
 export function parseRolloutArgs(args: readonly string[]): Args {
   const values = new Map<string, string>();
@@ -15,7 +17,7 @@ export function parseRolloutArgs(args: readonly string[]): Args {
     const key = args[index];
     const value = args[index + 1];
     if (
-      !['--worktree', '--output'].includes(key) || !value || value.startsWith('--') ||
+      !['--worktree', '--output', '--report'].includes(key) || !value || value.startsWith('--') ||
       values.has(key)
     ) {
       throw new Error(usage());
@@ -25,7 +27,7 @@ export function parseRolloutArgs(args: readonly string[]): Args {
   const worktree = values.get('--worktree');
   const output = values.get('--output');
   if (!worktree?.startsWith('/') || !output) throw new Error(usage());
-  return { worktree, output };
+  return { worktree, output, report: values.get('--report') };
 }
 
 async function main(): Promise<number> {
@@ -33,12 +35,14 @@ async function main(): Promise<number> {
     const args = parseRolloutArgs(Deno.args);
     const outcome = await runRolloutCanaries(args.worktree, new Date().toISOString());
     await Deno.writeTextFile(args.output, `${JSON.stringify(outcome, null, 2)}\n`);
+    if (args.report) await Deno.writeTextFile(args.report, renderRolloutReport(outcome));
     console.log(JSON.stringify({
       schemaVersion: outcome.schemaVersion,
       overallStatus: outcome.overallStatus,
       promotionRecommendation: outcome.promotionRecommendation,
       canaryCount: outcome.canaries.length,
       output: args.output,
+      report: args.report,
     }));
     return outcome.overallStatus === 'fail'
       ? 5

@@ -38,3 +38,13 @@
   them behind dynamic configuration or duplicating upstream logic. Splitting the five small live
   row builders would add navigation seams without reducing behavior. All TypeScript remains below
   the Archetype-6 hard cap of 500 LOC.
+
+## 2026-07-10 — final doctrine evidence
+
+- **Severity:** gate-classification note.
+- **What:** running `check-doctrine.ts --root .llm/tools/agentic` exits 1 because the generic scanner
+  treats the repo-internal tool directory as a publishable package and requires `mod.ts`. It also
+  reports pre-existing large files, directory cardinality, and CLI exit edges outside this issue.
+- **Resolution:** recorded it as a non-verdict and performed the planned manual Archetype-6 review
+  over owned files. All new TypeScript is below 500 LOC, injected/pure roles remain separated, and
+  no new package/public surface or architecture debt was introduced.

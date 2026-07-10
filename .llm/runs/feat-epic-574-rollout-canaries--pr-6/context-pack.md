@@ -2,7 +2,7 @@
 
 ## Current state
 
-- Phase: S1 landed as `00fa6429`; S2 live matrix and gates green, pending commit/push/comment.
+- Phase: S1 `00fa6429` and S2 `2b788296` landed; S3/final gates green, pending final commit/push/comment and coordinator Tier-A review.
 - Branch/worktree: `feat/epic-574-rollout-canaries` at
   `/home/codex/repos/netscript-epic-574-pr6-rollout`.
 - Baseline: `b438f16d`; ancestry verified.
@@ -30,6 +30,11 @@ S2 result: eight focused rollout tests pass; scoped wrappers report zero finding
 nine rows and aggregate `conditional_pass` / `promote_with_conditions`: native health and quota
 state pass; Antigravity is explicitly auth-blocked; all four provider routes are explicitly
 credential-absent; interactive/mobile evidence is owner-accepted. Repair was dry-run only.
+
+S3 result: `ROLLOUT.md` is rendered from the checked-in matrix and equality-tested. Complete agentic
+tree is 201/0; scoped check/lint/fmt cover 84 files with zero findings. Artifact/diff/lock/privacy
+gates pass. Final aggregate is conditional pass with recommendation `promote_with_conditions`; this
+is data only, and owner approval plus coordinator action remain required.
 
 ## Resume rule
 
