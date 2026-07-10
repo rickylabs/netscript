@@ -19,6 +19,8 @@ thin CLI over it.
 | File | Role |
 | ---- | ---- |
 | `agentic-lib.ts` | Shared pure + impure primitives (the heart; all landmine logic). |
+| `wsl-foundation-lib.ts` | Pure runtime probe, auth-boundary, and doctor-report contracts. |
+| `wsl-foundation.ts` | Read-only native WSL doctor; S2 adds reversible bootstrap/rollback planning. |
 | `launch-codex-slice.ts` | Validate brief → push-safety check → stage → launch a Codex slice; record thread id. |
 | `codex-status.ts` | Read-only: daemon health, worktree git state, recent sessions. |
 | `codex-watch.ts` | Event-driven wait on a worktree's git activity (**runs inside WSL**). |
@@ -58,6 +60,47 @@ thin CLI over it.
   `--allow-base-main`. The head sha is pinned in the merge body so a race can't merge a moved tip.
 
 ## Tools
+
+### `wsl-foundation.ts`
+
+Inspect the native WSL agentic runtime without printing environment values or provider credentials:
+
+```bash
+deno task agentic:wsl-foundation doctor
+deno task agentic:wsl-foundation doctor --json
+deno task agentic:wsl-foundation bootstrap --dry-run --json
+deno task agentic:wsl-foundation bootstrap --json
+deno task agentic:wsl-foundation rollback-plan --json
+```
+
+The doctor reports a stable schema, native-ext4 proof, bounded tool versions, required Linux-local
+state directories, Codex managed/version-skew state, and Claude/Antigravity authentication
+boundaries. Antigravity readiness is based on its documented system-keyring/Google Sign-In marker
+files without reading credential contents; no `agy login` command or API-key policy is inferred.
+Exit: `0` ready · `2` degraded or browser auth required · `3` invalid ownership/configuration · `4`
+usage/execution failure.
+
+Bootstrap installs checksum-verified Node `26.5.0`, npm-stable Claude Code, and—when absent—the
+official checksum-verifying Antigravity installer at `/home/codex/.local/bin/agy`. It writes a
+mode-0600, value-free ownership manifest under `~/.config/netscript-agentic`. A legacy `gemini`
+symlink/package is removed only when the manifest proves it is NetScript-owned and still targets the
+owned npm prefix; mismatched legacy state is rejected. There is no `gemini` alias. `~/.gemini` is
+always preserved because Antigravity uses it, and `/root/.local/bin/agy` is never inspected or
+mutated. Before invoking the installer, bootstrap writes a value-free
+`agy-install-pending.json` ownership journal; the final manifest absorbs that ownership and removes
+the journal atomically enough for a later run to recover after interruption. Malformed or unreadable
+manifests/journals are hard failures and are never treated as absent or overwritten. Run
+`rollback-plan` for non-executing reversal guidance. Recovery finalizes ownership and removes the
+journal only after the canonical path is proven to be a regular, current-user-owned,
+owner-executable file; invalid ownership or mode leaves the journal in place with an actionable
+failure.
+
+Permissions are explicit in the task: read/write for the owned user-local paths, run for fixed
+`npm`/`tar` and version probes, environment access for key-presence/PATH checks, and network access
+restricted to `nodejs.org`, `registry.npmjs.org`, and `antigravity.google`. External requirements are `tar` with xz
+support and the pre-bootstrap system npm used only to resolve stable dist-tags. The doctor never
+writes despite sharing the bootstrap entry point; bootstrap refuses unproven legacy ownership before
+downloading or mutating anything.
 
 ### `launch-codex-slice.ts`
 Stage and launch a Codex slice from a Windows-authored brief, with a push-safety gate, and record
