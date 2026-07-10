@@ -143,3 +143,19 @@ after it is bounded and secret-safe; connect planner/aggregation only after posi
   owner verifies Google Sign-In outside automation.
 - Implementation is complete and awaiting coordinator Tier-A substantive review; this worker does
   not certify merge readiness.
+
+## Coordinator Tier-A Sign-off (2026-07-10, Claude Opus 4.8)
+
+Reviewed S1-S4 (`607040bc`/`cf891b44`/`f6508cc2`/`55bb6467`, diff `5c45e034..55bb6467`) independently:
+- Parent-env invariant (no `Deno.env.set/delete`); effects adapter-only; bounded `agy -p` request builder.
+- Honest evidence: JSON retains empirical `authentication_or_service_timeout`; live capabilities marked
+  `owner_accepted_working` (owner directive), NOT a fabricated `supported` probe result. Runtime stays
+  fail-closed (auth/service failure → blocked/failed at execution).
+- Planner enables the Antigravity evidence lane; `deferred-boundaries_test.ts` proves #580 apply still
+  blocked and #579/#581/#582 remain absent-not-hidden.
+- Human-usable CLI `antigravity-evidence-cli.ts` + `deno task`.
+- Gates re-run: full runtime suite 82/0; evidence CLI 2/0; scoped check 36/0; lint 36/0; secret/PII
+  scan clean; `deno.lock` unchanged. Push authoritative (`55bb6467`).
+
+Verdict: PASS (generator did not self-certify). Owner accepted the interactive live-canary path as
+working; empirical auth-block recorded in drift + evidence JSON.
