@@ -49,3 +49,14 @@
 - **Action:** apply thin-edge, adapter, side-effect, semantic-test, permission, naming, and LOC gates;
   mark package/public/composition/JSR-only gates N/A with reasons. Rescope if implementation grows
   into a publishable package or open extension surface.
+
+## 2026-07-10 - Locked broad format include reaches untouched S5 wrappers
+
+- **Expected:** The every-slice format command in `plan.md` is a green verdict over S2-owned files.
+- **Actual:** The exact broad include exits 1 on four pre-existing formatting findings in untouched
+  S5 wrapper files: `claude-remote-smoke.ts`, `codex-resume.ts`, `codex-status.ts`, and
+  `launch-codex-slice.ts`. `git diff ac71896 -- <those files>` is empty. The same scoped wrapper
+  over `runtime/|agentic-runtime` selects all 13 S2/S1 runtime files and exits 0 with zero findings.
+- **Severity:** minor gate-scope drift; no implementation or architecture drift.
+- **Action:** preserve the raw exit-1 evidence, use the owned-surface exit-0 wrapper as the S2
+  formatting verdict, and do not edit compatibility wrappers before locked slice S5.

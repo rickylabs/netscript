@@ -20,7 +20,9 @@ thin CLI over it.
 | ---- | ---- |
 | `agentic-lib.ts` | Shared pure + impure primitives (the heart; all landmine logic). |
 | `wsl-foundation-lib.ts` | Pure runtime probe, auth-boundary, and doctor-report contracts. |
-| `wsl-foundation.ts` | Read-only native WSL doctor; S2 adds reversible bootstrap/rollback planning. |
+| `wsl-foundation.ts` | Native WSL doctor plus reversible foundation bootstrap/rollback planning. |
+| `agentic-runtime.ts` | Canonical schema-1.0 runtime doctor/status and mutation-free planning edge. |
+| `runtime/` | Typed controller contracts, pure planner, renderers, and owned adapters. |
 | `launch-codex-slice.ts` | Validate brief → push-safety check → stage → launch a Codex slice; record thread id. |
 | `codex-status.ts` | Read-only: daemon health, worktree git state, recent sessions. |
 | `codex-watch.ts` | Event-driven wait on a worktree's git activity (**runs inside WSL**). |
@@ -101,6 +103,30 @@ restricted to `nodejs.org`, `registry.npmjs.org`, and `antigravity.google`. Exte
 support and the pre-bootstrap system npm used only to resolve stable dist-tags. The doctor never
 writes despite sharing the bootstrap entry point; bootstrap refuses unproven legacy ownership before
 downloading or mutating anything.
+
+### `agentic-runtime.ts`
+
+Use the canonical desired-state surface for stable read-only inspection and S2 dry-run planning:
+
+```bash
+deno task agentic:runtime doctor --json
+deno task agentic:runtime status --json
+deno task agentic:runtime bootstrap --dry-run --json
+deno task agentic:runtime configure --state ./desired-runtime.json --dry-run --json
+deno task agentic:runtime repair codex-remote --worktree /home/codex/repos/worktree --dry-run --json
+```
+
+`doctor` and `status` are inspect-only. Bootstrap/configure plans are data only and receive no
+mutation ports. Controller state and checkpoints are value-free JSON under
+`~/.config/netscript-agentic/runtime`, written atomically at mode `0600` only by apply code. S2 does
+not execute apply actions: bootstrap/configure without `--dry-run` block explicitly, and live Codex
+repair remains a structured #580 capability block.
+
+The task declares read/write/run/env permissions because one entry serves future apply commands,
+but the S2 controller mechanically accepts only read ports. The foundation doctor child runs with
+read/run/env permissions and preserves PR 0A schema `1.0`; no provider login, network access,
+session send, daemon repair, or global route mutation occurs. JSON and human output derive from the
+same secret-safe `RuntimeResult`.
 
 ### `launch-codex-slice.ts`
 Stage and launch a Codex slice from a Windows-authored brief, with a push-safety gate, and record

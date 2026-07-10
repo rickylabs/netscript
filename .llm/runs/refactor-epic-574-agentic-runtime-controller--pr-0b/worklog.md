@@ -3,8 +3,10 @@
 ## Status
 
 Research and Design are complete. Tier-A coordinator Plan-Gate review returned `PASS` under the
-owner-authorized external-evaluator waiver. Tier-A requested three S1 contract remediations; they
-are implemented and their automated gates pass. Tier-A re-review is pending; S2 has not started.
+owner-authorized external-evaluator waiver. Tier-A requested three S1 contract remediations, then
+substantively approved them at supervisor sign-off `ac71896` over implementation head `197bc51`.
+S2 implementation and automated gates are complete on the same daemon-managed thread. Tier-A S2
+review is pending; S3 has not started.
 
 ## Design
 
@@ -77,8 +79,8 @@ fields. Shared identity types are:
 - `RouteIdentity` = agent, provider, non-empty model, effort, native worktree, optional session ID,
   and `mobileRequired`.
 - `SessionIdentity` = agent, opaque session/thread ID, native worktree, and turn-boundary state.
-- `ContentReference` = normalized file path, byte count/fingerprint after read; never file content in
-  state or result.
+- `ContentReference` = normalized file path only. `ContentReferenceSummary` records byte count and
+  fingerprint after reading; neither type records file content in state or result.
 
 Command-specific invariants:
 
@@ -183,7 +185,9 @@ tested adapter classifier; unknown text is `unexpected_error`/`provider_unavaila
 | Port | Read/mutate boundary |
 | --- | --- |
 | `RuntimeInspectorPort` | Read component, auth, worktree, state, session, and mobile observations. |
-| `DesiredStateStorePort` | Read desired/controller state; atomically write only in apply mode. |
+| `PersistedStateReaderPort` | Read persisted controller state without exposing mutation methods. |
+| `DesiredStateSourcePort` | Load/parse value-free desired state from a `ContentReference`. |
+| `DesiredStateWriterPort` | Atomically write controller-owned state only in apply mode. |
 | `CheckpointStorePort` | Read/write mode-0600 owned checkpoints; no provider-session access. |
 | `ProcessPort` | Execute fixed binary + argv arrays with timeout/abort and bounded capture. |
 | `FileContentPort` | Read prompt/message/config references; write only controller-owned state/staging in apply. |
@@ -192,9 +196,9 @@ tested adapter classifier; unknown text is `unexpected_error`/`provider_unavaila
 | `MobileControlAdapter` | Read mobile capability/session status; mutating repair is unavailable until #580. |
 | `ClockPort` | Deterministic timestamps/durations in tests. |
 
-Read ports and mutation ports are separate constructor fields/types. The controller's inspect/plan
-branches are typed without mutation-port access. `applyPlan()` is the only function receiving
-mutation ports.
+Read ports and mutation ports are separate constructor fields/types. `doctor` and `status` are
+inspect-only; effectful commands are plan/apply-only. The controller's inspect/plan branches are
+typed without mutation-port access. `applyPlan()` is the only function receiving mutation ports.
 
 ### Adapters and Composition
 
@@ -463,3 +467,64 @@ PR #585 and issue #576 remain open in implementation. Their Tier-A `S1 CHANGES R
 match the remediated scope exactly. PR #585 remains draft with `Closes #576`, `Part of #574`, and
 its PR #584 stack; Definition-of-Done remains unchecked. No comment or label expands this turn into
 S2, and no child-issue implementation was pulled forward.
+
+## S2 — Read-only Controller, Renderers, and Foundation State Adapters
+
+### Delivered Scope
+
+- `.llm/tools/agentic/agentic-runtime.ts`: 150-LOC canonical S2 parser/composition edge for
+  `doctor`, `status`, bootstrap/configure planning, and `repair codex-remote`; lifecycle/provider
+  commands remain unavailable until S3.
+- `runtime/controller.ts`: observation and planning orchestration that accepts `RuntimeReadPorts`
+  only. Inspect/plan paths cannot receive mutation ports; apply remains an explicit block.
+- `runtime/output.ts`: JSON/human renderers and canonical exit mapping from one `RuntimeResult`.
+- `runtime/adapters/foundation-adapter.ts`: invokes the existing PR 0A doctor read-only and
+  translates every schema-1.0 executable/policy probe into stable observed state.
+- `runtime/adapters/local-state-adapter.ts`: strict value-free parsing, PR 0A ownership-state
+  migration, content summaries, and controller-owned atomic mode-0600 state/checkpoint writes.
+- `runtime/adapters/mobile-control-adapter.ts`: read-only Codex managed/version capability
+  translation; live repair remains an explicit #580 block.
+- `runtime/controller_test.ts`: semantic read-only, dry-run, migration, permissions, sentinel,
+  output, CLI-boundary, and deferred-repair coverage.
+- `deno.json` and the agentic README: canonical task registration, S2 command/permission contract,
+  and explicit S3/S4 deferrals.
+
+No Claude/Codex/Gemini/provider lifecycle adapter, provider profile, automatic fallback, durable
+sender lock/repair, routing-policy migration, rollout promotion, compatibility-wrapper edit, new
+dependency, or `deno.lock` change was introduced.
+
+### S2 Evidence
+
+| Gate | Exact command / proof | Raw outcome |
+| --- | --- | --- |
+| Focused S2 tests | `rtk proxy deno test --no-lock --allow-read --allow-write .llm/tools/agentic/runtime/controller_test.ts` | exit 0; `8 passed | 0 failed` |
+| Full agentic/runtime unit set | `rtk proxy deno test --no-lock --allow-read --allow-write --allow-env .llm/tools/agentic/agentic-lib_test.ts .llm/tools/agentic/wsl-foundation_test.ts .llm/tools/agentic/runtime/contract_test.ts .llm/tools/agentic/runtime/planner_test.ts .llm/tools/agentic/runtime/controller_test.ts` | exit 0; `95 passed | 0 failed` |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .llm/tools/agentic --ext ts --pretty` | exit 0; 32 files, 1 batch, 0 failures/findings; wrapper used `--unstable-kv` |
+| Scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root .llm/tools/agentic --ext ts --include '(^|/)(runtime/|agentic-runtime|wsl-foundation|launch-codex-slice|codex-resume|codex-status|claude-remote-smoke)' --pretty` | exit 0; 20 files, 0 findings |
+| Locked broad format command | Same include through `.llm/tools/run-deno-fmt.ts` | exit 1; four pre-existing findings in untouched S5 wrappers; `git diff ac71896 -- <four files>` exit 0 |
+| Owned S2 format verdict | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root .llm/tools/agentic --ext ts --include '(^|/)(runtime/|agentic-runtime)' --pretty` | exit 0; 13 files, 0 findings |
+| Live doctor repeat | `deno task agentic:runtime doctor --json` twice; Deno harness removed only `.timing` and compared controller-tree/repository hashes | both exit 2 (`degraded`, browser auth required); semantic equality `true`; controller tree equality `true`; repository state equality `true` |
+| Dry-run mutation/tree gate | Focused tests `doctor and status are stable read-only commands` and `bootstrap and configure plans call zero mutation ports and preserve tree hashes` | mutation calls `0`; `changed: false`; before/after temp-tree hashes equal |
+| Secret/content sentinel | Focused tests plus field/raw-capture scans across S2 source | PASS across JSON, human output, diagnostics, desired/controller state, checkpoints, and fixed doctor argv |
+| PR 0A migration | Focused migration/translation tests | complete 16-probe public vocabulary retained; generated timestamp does not change observed identity; ownership paths are discarded from migrated controller state |
+| File budgets | `wc -l` over the seven S2 TypeScript files | PASS: CLI `150/150`; controller `227/300`; output `56/220`; adapters `139/350`, `326/350`, `24/350`; test `384/450` |
+| Native API inspection | `deno doc --filter` for `runRuntimeCommand`, `LocalRuntimeStateAdapter`, `translateFoundationReport`, and `parseRuntimeArgs` | all exit 0; isolated public signatures resolve |
+| Lock hygiene | `git rev-parse ac71896:deno.lock`; `git hash-object deno.lock`; `git diff --exit-code ac71896 -- deno.lock` | both blobs `8694862878e6f9a430bf56497a4d5bf3f8eb1f3d`; diff exit 0 |
+| Patch hygiene | `git diff --cached --check` | exit 0 |
+
+### S2 Safety and Handoff
+
+- Worktree: `/home/codex/repos/netscript-epic-574-pr0b-controller` (native ext4).
+- Sole mobile-visible thread: `019f4b72-2ea4-7050-917e-6d6918371265`; no sender was launched.
+- Plan/architecture drift: none. Minor gate-scope drift for the broad format include is recorded in
+  `drift.md`; the four findings are untouched S5 files and the owned S2 surface is green.
+- Architecture debt: none introduced. The approved functional internal-tool Archetype 6 deviation
+  remains intact: thin edge, explicit ports/adapters, effects at edges, no new spine/registry.
+- Next action: coordinator performs substantive Tier-A S2 review. Do not start S3.
+
+## Reconcile Note — S2
+
+PR #585 and issue #576 remain open in implementation. Both contain the coordinator's `S1 APPROVED /
+S2 START` record naming sign-off `ac71896`, this sole thread, and this worktree. PR #585 remains
+draft with `Closes #576`, `Part of #574`, and its PR #584 stack; Definition-of-Done remains
+unchecked. No newer comment or label expands S2 or authorizes S3.
