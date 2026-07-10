@@ -36,6 +36,24 @@ When the user says `use harness`, activate the harness workflow. The evaluator m
 session from the implementation session — the full evaluator protocol (PLAN-EVAL / IMPL-EVAL,
 required sessions and models) lives in `.agents/skills/netscript-harness` and `.llm/harness/`.
 
+## Default Operating Workflow (agentic runtime)
+
+Multi-agent work in this repo runs on the epic #574 agentic runtime system by default — not on
+ad-hoc shell orchestration:
+
+- **Routing is data, not prose.** Select every lane's provider/model/effort from
+  `.llm/harness/workflow/lane-policy.md`; its machine bindings live in
+  `.llm/tools/agentic/runtime/routing-policy.ts`. Do not restate or invent model routes.
+- **Volatile values have one home.** Model ids, tool versions, and endpoints live only in
+  `.llm/tools/agentic/config/` (`models.ts`, `versions.ts`, `endpoints.ts`); a guard test fails the
+  suite if they are hardcoded elsewhere.
+- **Drive lanes through the agentic suite.** `.llm/tools/agentic/` (exposed as `deno task
+  agentic:*`) is the only interface for launching/watching/steering Codex, dispatching OpenHands,
+  and PR lifecycle — never ad-hoc `wsl.exe`/PowerShell. The desired-state runtime controller
+  (`deno task agentic:runtime doctor|status|repair codex-remote`) is the health/repair entry point.
+  The suite map is `.llm/tools/agentic/README.md`; the harness-facing index is
+  `.llm/harness/workflow/tooling.md`.
+
 ## Operating Rules
 
 1. Doctrine first for `packages/` and `plugins/`: identify archetype, public surface, gates, and
