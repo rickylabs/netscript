@@ -107,3 +107,21 @@ Start at `runtime/contract.ts` for canonical vocabulary, follow the action into 
 - Review L2–L9 first: lock schema/liveness and repair anchoring/refusal are the decisions that would force rework.
 - Interactive reconnect canaries are owner-accepted only and must not be reported as raw executions.
 - Tier-A should inspect `isAnchoredCodexAppServer`, the repeated PID allowlist in `terminateAnchored`, the exact socket comparison, and active-session/child-command refusal first.
+
+## Coordinator Tier-A Sign-off (2026-07-10, Claude Opus 4.8)
+
+Reviewed 65900e52/d5430c5a/3e20fc39 + remediation 6bd16afc (diff 1d165762..6bd16afc):
+- Repair safety verified: no broad process killing in source; anchored `$HOME/.codex/.../codex
+  app-server` PID match; `repairRefusal` refuses active sessions/child commands AND unanchored
+  processes before any mutation; inspect→anchored-terminate→stale-socket→restart→verify→redacted
+  evidence order; OS/process/fs behind injected ports; dry-run/fixture tests never destroy the real
+  daemon. `Deno.kill` only on anchored PIDs.
+- Ownership: atomic-create single-sender lock, value-free record, resume never forks a rival.
+- COORDINATOR-REQUESTED REMEDIATION (stale-deferral): `DEFERRED_ISSUES` reduced to future-only
+  `[581,582]`; controller lifecycle apply reclassified from `capability_deferred→#580` to a permanent
+  `capability_unsupported` design boundary pointing at the ownership-enforced launcher; boundary tests
+  updated. Honest and correct.
+- Gates re-run: full runtime suite 103/0; scoped check/lint 48/0; secret/PII clean; deno.lock
+  unchanged. Push authoritative (6bd16afc).
+
+Verdict: PASS (generator did not self-certify; coordinator caught and drove the deferral reconciliation).
