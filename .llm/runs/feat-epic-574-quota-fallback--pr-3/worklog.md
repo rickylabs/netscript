@@ -123,3 +123,17 @@ Final gate commands/results:
 - `deno.lock`: unchanged.
 
 Implementation worker does not self-certify. Final status is awaiting coordinator Tier-A review.
+
+## Coordinator Tier-A Sign-off (2026-07-10, Claude Opus 4.8)
+
+Reviewed 27eafa2e/d49cc84a/f3cceac3/64e8818c (diff 1879df14..64e8818c). Independent verification:
+- Acceptance invariants all test-covered: boundary+reset+canary-gated restoration; backoff on failed
+  canary; restart-safe bounded history; active-slice + max-depth block-without-selecting; evaluation
+  blocks rather than selecting author family; outside-plan/higher-effort Fable requires approval;
+  structured-diagnostics-first classifier with pinned-version fallback failing closed.
+- Desired route persisted separately from active; no global/opportunistic default mutation.
+- #580 apply blocked; #581/#582 absent (regression tests); #579 removed from deferred registry.
+- Human CLI `routing-state.ts`. Gates re-run: suite 92/0; scoped check/lint 42/0; secret/PII clean;
+  deno.lock unchanged. Push authoritative (64e8818c).
+
+Verdict: PASS (generator did not self-certify).
