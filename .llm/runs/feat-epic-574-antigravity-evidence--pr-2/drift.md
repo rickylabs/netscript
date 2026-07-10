@@ -29,3 +29,16 @@
 - **Severity:** minor
 - **Action:** accept as `probe_capture_failed`; never infer provider behavior from missing capture.
 - **Evidence:** `antigravity-capability-evidence.json`.
+
+## 2026-07-10 — owner accepts live capability despite blocked automation canary
+
+- **What:** The coordinator approved implementation and directed the live-enablement path to treat
+  Antigravity as working for merge/close purposes.
+- **Source:** Owner directive after Plan-Gate approval in the daemon-attached Codex thread.
+- **Expected:** The approved plan required a positive empirical live canary before enablement.
+- **Actual:** The empirical automation canary remains `authentication_or_service_timeout`; owner
+  acceptance replaces that merge gate but does not replace or rewrite the observation.
+- **Severity:** significant
+- **Action:** accept owner override; label capabilities `owner_accepted_working`, enable the bounded
+  path, and keep runtime auth/service/quota/timeout behavior fail-closed.
+- **Evidence:** This entry, machine evidence owner-acceptance note, and PR #587 slice comments.

@@ -45,18 +45,19 @@
     }
   ],
   "capabilities": {
-    "headlessSuccess": "unproven_auth_or_service_blocked",
+    "headlessSuccess": "owner_accepted_working",
     "serverFailureExit": "observed_exit_1_with_timeout_classification",
     "structuredOutput": "unsupported_by_advertised_cli_surface",
-    "sandboxBehavior": "deferred_live_session_unavailable",
-    "webSearchFetch": "deferred_live_session_unavailable",
-    "citationPersistence": "deferred_live_session_unavailable",
+    "sandboxBehavior": "owner_accepted_working",
+    "webSearchFetch": "owner_accepted_working",
+    "citationPersistence": "owner_accepted_working",
     "quotaClassification": "deferred_to_issue_579_no_quota_signal_observed",
     "boundedFallback": "deferred_to_issue_579",
-    "agentsInstructionBehavior": "deferred_live_session_unavailable",
-    "geminiInstructionBehavior": "deferred_no_fixture_or_live_session",
+    "agentsInstructionBehavior": "owner_accepted_working",
+    "geminiInstructionBehavior": "owner_accepted_working",
     "legacyGeminiStateCompatibility": "state_directory_present_runtime_parser_already_normalizes_legacy_state"
   },
-  "operatorAction": "Owner should verify the documented Google Sign-In session outside automation, without sharing account identifiers, then resume this same thread for the deferred live canaries.",
+  "ownerAcceptanceNote": "The empirical automation canary remains authentication_or_service_timeout. The owner directed treating live capabilities as working for merge and close purposes; this is not a fabricated observed pass and runtime remains fail-closed.",
+  "operatorAction": "If runtime reports authentication or service failure, the owner should verify documented Google Sign-In outside automation without sharing account identifiers.",
   "fanOutEligible": false
 }

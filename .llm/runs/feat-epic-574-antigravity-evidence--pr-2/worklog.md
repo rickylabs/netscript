@@ -66,6 +66,8 @@ after it is bounded and secret-safe; connect planner/aggregation only after posi
 | 2026-07-10 | S0 | Pre-flight | HEAD descends from `800848ae`; #577 profile file present; scoped fetch used after stale refspec failure. |
 | 2026-07-10 | S0 | Research | Static flags classified; one initial capture failure and one exit-1 auth/service timeout retry; further live calls stopped. |
 | 2026-07-10 | S0 | Design | Negative evidence drives fail-closed adapter plan; no implementation started. |
+| 2026-07-10 | S1 | Plan-Gate | Coordinator approved; owner directed explicit `owner_accepted_working` live enablement while preserving fail-closed execution. |
+| 2026-07-10 | S1 | Contract/classifier | Finite evidence and sanitized citations landed; focused tests 4/4 and scoped check/lint/fmt are green. |
 
 ## Drift
 
@@ -83,6 +85,15 @@ after it is bounded and secret-safe; connect planner/aggregation only after posi
 | Implementation gates | NOT_RUN | Hard stop; no adapter implementation. |
 | Artifact syntax/diff | PASS | Evidence JSON parsed; `git diff --cached --check` exit 0. |
 | Secret/PII safety | PASS | Staged-diff credential-value scan found no matches; machine evidence contains classifications only. |
+
+### S1 Gates
+
+| Gate | Exit | Result |
+| ---- | ---- | ------ |
+| Focused evidence tests | 0 | 4 passed, 0 failed |
+| Scoped check | 0 | 32 files, 0 findings |
+| Scoped lint | 0 | 32 files, 0 findings |
+| Scoped fmt | 0 | 32 files, 0 findings |
 
 ## Handoff Notes
 

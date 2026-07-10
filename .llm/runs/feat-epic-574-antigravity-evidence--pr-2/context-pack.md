@@ -12,22 +12,23 @@
 
 ## Current State
 
-Planning and bounded research are complete. Static `agy` flags are classified. Live headless success
-is not proven: the evidentiary retry exited 1 with auth/service timeout indicators. No further live
-calls were made, no raw output was retained, and no adapter implementation has begun.
+Plan-Gate is coordinator-approved. Static `agy` flags are classified. Live headless success was not
+empirically proven: the evidentiary retry exited 1 with auth/service timeout indicators. The owner
+directed live enablement as `owner_accepted_working`; the empirical result remains unchanged and
+runtime execution remains fail-closed.
 
 ## Completed
 
 - Pre-flight ancestry and #577 content checks.
 - Scoped fetch workaround without remote-config mutation.
 - Redacted machine evidence, research, plan, Design, and drift artifacts.
+- S1 finite evidence contract, pure fail-closed classifier, sanitized citation metadata, and focused
+  tests; owner acceptance is explicit and does not overwrite the empirical failed observation.
 
 ## Next Steps
 
-1. Coordinator reviews S0 and runs Plan-Gate; this implementation worker does not self-certify.
-2. Owner verifies documented Google Sign-In readiness outside automation if live work is desired.
-3. Resume this same Codex thread; do not launch a second sender.
-4. After approval, implement S1-S3 synthetically; run S4/enable integration only after live gates pass.
+1. Complete S2 bounded Antigravity process adapter and fail-closed execution.
+2. Continue S3/S4 in this same thread; do not launch a second sender.
 
 ## Key Decisions
 
@@ -47,6 +48,8 @@ calls were made, no raw output was retained, and no adapter implementation has b
 | `worklog.md` | new | Design checkpoint and planning evidence. |
 | `context-pack.md` | new | Resumable state. |
 | `drift.md` | new | Pre-flight/live drift. |
+| `.llm/tools/agentic/runtime/antigravity-evidence.ts` | new | Finite evidence and pure classifier. |
+| `.llm/tools/agentic/runtime/antigravity-evidence_test.ts` | new | Semantic S1 matrix. |
 
 ## Gates
 
