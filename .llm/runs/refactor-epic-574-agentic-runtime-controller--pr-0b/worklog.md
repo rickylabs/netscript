@@ -925,3 +925,17 @@ refused. No executable alias or credential policy was introduced.
 Evidence: focused runtime `46/0`; complete agentic/runtime/foundation `123/0`; scoped
 check/lint/fmt `40/24/21`, all exit 0. Alias/secret scans clean; lock unchanged at
 `8694862878e6f9a430bf56497a4d5bf3f8eb1f3d`; LOC caps pass.
+
+## 2026-07-10 S5 Compatibility Wrappers and Documentation
+
+All five legacy task names remain mapped. The four orchestration scripts carry an explicit
+one-cycle deprecation/retirement boundary; foundation remains the merged canonical wrapper. No
+entry point was deleted or redirected to incompatible output. The compatibility matrix locks task
+paths, accepted flags, shared-primitive delegation, and retirement markers. README documents the
+canonical Antigravity boundary and separately reviewed #577-#582 retirement prerequisite.
+
+Evidence: focused compatibility `2/0`; complete suite `125/0`; scoped check/lint/source-format
+`41/28/28`, all exit 0. Doctor repeat exits `0/0`, status `no_change/no_change`, 18 components,
+timing-normalized semantic equality and source-tree equality. Existing controller tests cover the
+nine-command dry-run mutation matrix, secret sentinel, route, checkpoint, compensation, partial
+retry, and rollback refusal contracts. No lock/dependency/cache or runtime behavior change.

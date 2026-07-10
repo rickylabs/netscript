@@ -1,3 +1,4 @@
+/** @deprecated Retained through one compatibility cycle; retirement requires reviewed #577-#582 completion. */
 /**
  * codex-status.ts — read-only health/state snapshot for WSL Codex orchestration.
  *
@@ -21,7 +22,7 @@
  * Exit codes: 0 = ok · 2 = usage error · 5 = --worktree given but not found.
  */
 
-import { requireValue, wsl, wslGitInfo, wslGitLogsPath, wslUser } from "./agentic-lib.ts";
+import { requireValue, wsl, wslGitInfo, wslGitLogsPath, wslUser } from './agentic-lib.ts';
 
 interface Options {
   worktree?: string;
@@ -32,16 +33,16 @@ interface Options {
 
 function printHelp(): void {
   console.log([
-    "Usage:",
-    "  deno run --allow-run .llm/tools/agentic/codex-status.ts [options]",
-    "",
-    "Options:",
-    "  --worktree <path>  WSL worktree to report branch/HEAD/upstream/dirty + logs path.",
-    "  --user <name>      WSL user. Default: codex.",
-    "  --sessions <n>     List the N most recent session rollout files. Default: 5 (0 to skip).",
-    "  --pretty           Human-readable output instead of JSON.",
-    "  --help             Show this help.",
-  ].join("\n"));
+    'Usage:',
+    '  deno run --allow-run .llm/tools/agentic/codex-status.ts [options]',
+    '',
+    'Options:',
+    '  --worktree <path>  WSL worktree to report branch/HEAD/upstream/dirty + logs path.',
+    '  --user <name>      WSL user. Default: codex.',
+    '  --sessions <n>     List the N most recent session rollout files. Default: 5 (0 to skip).',
+    '  --pretty           Human-readable output instead of JSON.',
+    '  --help             Show this help.',
+  ].join('\n'));
 }
 
 function parseArgs(args: string[]): Options | null {
@@ -49,29 +50,29 @@ function parseArgs(args: string[]): Options | null {
   for (let i = 0; i < args.length; i++) {
     const a = args[i];
     switch (a) {
-      case "--worktree":
+      case '--worktree':
         o.worktree = requireValue(args, i, a);
         i++;
         break;
-      case "--user":
+      case '--user':
         o.user = requireValue(args, i, a);
         i++;
         break;
-      case "--sessions":
+      case '--sessions':
         o.sessions = Number(requireValue(args, i, a));
         i++;
         break;
-      case "--pretty":
+      case '--pretty':
         o.pretty = true;
         break;
-      case "--help":
+      case '--help':
         printHelp();
         return null;
       default:
         throw new Error(`Unknown argument: ${a}`);
     }
   }
-  if (!Number.isFinite(o.sessions) || o.sessions < 0) throw new Error("--sessions must be >= 0");
+  if (!Number.isFinite(o.sessions) || o.sessions < 0) throw new Error('--sessions must be >= 0');
   return o;
 }
 
@@ -98,7 +99,7 @@ async function main(): Promise<void> {
   );
   report.daemon = {
     version: daemon.stdout.match(/^VERSION=(.*)$/m)?.[1]?.trim() || null,
-    appServerProcesses: Number(daemon.stdout.match(/^PROCS=(\d+)$/m)?.[1] ?? "0"),
+    appServerProcesses: Number(daemon.stdout.match(/^PROCS=(\d+)$/m)?.[1] ?? '0'),
   };
 
   // Worktree state + logs path.
@@ -120,15 +121,19 @@ async function main(): Promise<void> {
       `find ~/.codex/sessions -type f -name '*.jsonl' -printf '%T@ %p\\n' 2>/dev/null | ` +
         `sort -nr | head -n ${o.sessions} | sed -E 's/^[0-9.]+ //'`,
     );
-    report.sessions = sess.stdout ? sess.stdout.split("\n").filter(Boolean) : [];
+    report.sessions = sess.stdout ? sess.stdout.split('\n').filter(Boolean) : [];
   }
 
   if (o.pretty) {
-    console.log(`daemon  : version=${report.daemon.version ?? "?"} app-server-procs=${report.daemon.appServerProcesses}`);
+    console.log(
+      `daemon  : version=${
+        report.daemon.version ?? '?'
+      } app-server-procs=${report.daemon.appServerProcesses}`,
+    );
     if (report.worktree) {
       const w = report.worktree;
       console.log(`worktree: ${w.branch}@${w.head} upstream=${w.upstream} dirty=${w.dirty}`);
-      console.log(`          logs=${w.logsPath ?? "?"}`);
+      console.log(`          logs=${w.logsPath ?? '?'}`);
     }
     if (report.sessions) {
       console.log(`sessions: ${report.sessions.length} recent`);

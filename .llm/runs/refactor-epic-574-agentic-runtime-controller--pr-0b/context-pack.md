@@ -259,3 +259,11 @@ read/mutation. Unrelated status remains usable. Focused `42/0`, complete `111/0`
   only when unambiguous, otherwise refuses. No alias; live policy remains #578 deferred.
 - Gates: focused 46/0, complete 123/0, check/lint/fmt 40/24/21 clean; lock unchanged.
 - Next: commit/push this slice, then S5 wrappers/docs only.
+
+## S5 Handoff
+
+- Five compatibility tasks retained; four orchestration scripts explicitly deprecated for one
+  cycle and retirement gated on reviewed #577-#582 completion.
+- Static compatibility tests lock task paths, flags, delegation, and retirement markers.
+- Complete 125/0; check/lint/fmt 41/28/28 clean; doctor 0/0, 18 components, semantic/tree equal.
+- Next: commit/push S5, run final raw gates and DoD reconciliation, await coordinator Tier-A review.

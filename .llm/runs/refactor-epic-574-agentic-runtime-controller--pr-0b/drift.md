@@ -119,3 +119,11 @@
   ambiguity refusal.
 - **Severity:** owner-approved transition, no architecture debt.
 - **Action:** retain #578 deferrals; never add a Gemini executable alias or inferred agy policy.
+
+## 2026-07-10 - S5 resolved prior wrapper-format drift
+
+- **Expected:** S5 owns the four previously untouched wrapper formatting findings and explicit
+  retirement boundaries.
+- **Actual:** All owned wrapper formatting is now green and behavior/task mappings are retained.
+- **Severity:** planned closure of recorded minor drift.
+- **Action:** keep wrappers for one cycle; removal requires a separate reviewed change.

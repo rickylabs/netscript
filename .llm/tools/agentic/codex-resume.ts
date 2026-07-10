@@ -1,3 +1,4 @@
+/** @deprecated Retained through one compatibility cycle; retirement requires reviewed #577-#582 completion. */
 /**
  * codex-resume.ts — steer an existing Codex thread (never fork a rival).
  *
@@ -21,7 +22,7 @@
  * Exit codes: 0 = ok / dry-run clean · 1 = resume failed · 2 = usage error.
  */
 
-import { requireValue, sq, UUID, wsl, wslUser } from "./agentic-lib.ts";
+import { requireValue, sq, UUID, wsl, wslUser } from './agentic-lib.ts';
 
 interface Options {
   threadId?: string;
@@ -34,19 +35,19 @@ interface Options {
 
 function printHelp(): void {
   console.log([
-    "Usage:",
-    "  deno run --allow-read --allow-run .llm/tools/agentic/codex-resume.ts \\",
-    "    --thread-id <uuid> --message \"<follow-up>\" [options]",
-    "",
-    "Options:",
-    "  --thread-id <uuid>    Existing Codex thread/session id to resume. Required.",
-    "  --message <text>      Follow-up message. Required unless --message-file is given.",
-    "  --message-file <path> Windows path to a file holding the follow-up message.",
-    "  --worktree <path>     WSL worktree to cd into before resuming (optional).",
-    "  --user <name>         WSL user. Default: codex.",
-    "  --dry-run             Print the exact command without sending.",
-    "  --help                Show this help.",
-  ].join("\n"));
+    'Usage:',
+    '  deno run --allow-read --allow-run .llm/tools/agentic/codex-resume.ts \\',
+    '    --thread-id <uuid> --message "<follow-up>" [options]',
+    '',
+    'Options:',
+    '  --thread-id <uuid>    Existing Codex thread/session id to resume. Required.',
+    '  --message <text>      Follow-up message. Required unless --message-file is given.',
+    '  --message-file <path> Windows path to a file holding the follow-up message.',
+    '  --worktree <path>     WSL worktree to cd into before resuming (optional).',
+    '  --user <name>         WSL user. Default: codex.',
+    '  --dry-run             Print the exact command without sending.',
+    '  --help                Show this help.',
+  ].join('\n'));
 }
 
 function parseArgs(args: string[]): Options | null {
@@ -54,30 +55,30 @@ function parseArgs(args: string[]): Options | null {
   for (let i = 0; i < args.length; i++) {
     const a = args[i];
     switch (a) {
-      case "--thread-id":
+      case '--thread-id':
         o.threadId = requireValue(args, i, a);
         i++;
         break;
-      case "--message":
+      case '--message':
         o.message = requireValue(args, i, a);
         i++;
         break;
-      case "--message-file":
+      case '--message-file':
         o.messageFile = requireValue(args, i, a);
         i++;
         break;
-      case "--worktree":
+      case '--worktree':
         o.worktree = requireValue(args, i, a);
         i++;
         break;
-      case "--user":
+      case '--user':
         o.user = requireValue(args, i, a);
         i++;
         break;
-      case "--dry-run":
+      case '--dry-run':
         o.dryRun = true;
         break;
-      case "--help":
+      case '--help':
         printHelp();
         return null;
       default:
@@ -99,7 +100,7 @@ async function main(): Promise<void> {
   if (!o) return;
 
   if (!o.threadId || !new RegExp(`^${UUID}$`).test(o.threadId)) {
-    console.error("--thread-id is required and must be a valid thread/session UUID.");
+    console.error('--thread-id is required and must be a valid thread/session UUID.');
     Deno.exit(2);
   }
 
@@ -107,19 +108,21 @@ async function main(): Promise<void> {
   if (o.messageFile) {
     message = await Deno.readTextFile(o.messageFile);
   }
-  message = (message ?? "").replace(/\r/g, "").trim();
+  message = (message ?? '').replace(/\r/g, '').trim();
   if (!message) {
-    console.error("--message (or --message-file) is required and must be non-empty.");
+    console.error('--message (or --message-file) is required and must be non-empty.');
     Deno.exit(2);
   }
 
-  const cd = o.worktree ? `cd ${sq(o.worktree)} && ` : "";
-  const script = `${cd}export PATH="$HOME/.local/bin:$PATH"; codex exec resume ${o.threadId} -- ${sq(message)}`;
+  const cd = o.worktree ? `cd ${sq(o.worktree)} && ` : '';
+  const script = `${cd}export PATH="$HOME/.local/bin:$PATH"; codex exec resume ${o.threadId} -- ${
+    sq(message)
+  }`;
 
   if (o.dryRun) {
     console.log(
       JSON.stringify({
-        mode: "dry-run",
+        mode: 'dry-run',
         ok: true,
         threadId: o.threadId,
         worktree: o.worktree ?? null,
