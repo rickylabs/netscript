@@ -11,14 +11,15 @@ export const RUNTIME_COMPONENT_IDS = [
   'codex',
   'codex-app-server',
   'claude',
-  'gemini',
-  'gemini-auth-policy',
+  'antigravity',
+  'antigravity-auth',
+  'legacy-gemini-ownership',
   'dotnet',
   'aspire',
   'docker',
   'state-claude',
   'state-codex',
-  'state-gemini',
+  'state-antigravity',
   'state-netscript-agentic',
 ] as const;
 
@@ -45,9 +46,9 @@ export interface RuntimeProbe {
 }
 
 export interface AuthBoundaryProbe {
-  provider: 'claude' | 'gemini';
+  provider: 'claude' | 'antigravity';
   status: 'ready' | 'auth_required' | 'auth_conflict';
-  route: 'provider-native' | 'google-subscription';
+  route: 'provider-native' | 'google-sign-in';
   conflicts: string[];
   detail: string;
 }
@@ -73,20 +74,20 @@ export interface RuntimeDoctorReport {
 
 export interface DesiredCliVersions {
   claude: string;
-  gemini: string;
 }
 
 export type InstallAction =
   | { kind: 'create_directory'; relativePath: string }
   | { kind: 'install_node'; version: string; archive: string }
   | { kind: 'install_npm_clis'; packages: string[] }
-  | { kind: 'configure_gemini_auth'; selectedType: 'oauth-personal' }
+  | { kind: 'install_antigravity'; installer: 'https://antigravity.google/cli/install.sh' }
+  | { kind: 'migrate_legacy_gemini_ownership' }
   | { kind: 'ensure_symlinks'; names: string[] }
   | { kind: 'write_state'; relativePath: string };
 
 export interface BootstrapPlan {
   schemaVersion: typeof FOUNDATION_SCHEMA_VERSION;
-  desired: { node: string; claude: string; gemini: string };
+  desired: { node: string; claude: string; antigravity: 'official-installer' };
   actions: InstallAction[];
   changed: boolean;
 }
@@ -99,14 +100,6 @@ export interface RollbackPlan {
   windowsClaude: 'preserved';
 }
 
-export const FORBIDDEN_GEMINI_AUTH_KEYS = [
-  'GEMINI_API_KEY',
-  'GOOGLE_API_KEY',
-  'GOOGLE_CLOUD_PROJECT',
-  'GOOGLE_CLOUD_LOCATION',
-  'GOOGLE_GENAI_USE_VERTEXAI',
-] as const;
-
 export const CLAUDE_AUTH_KEYS = ['ANTHROPIC_API_KEY'] as const;
 
 export const LOCAL_STATE_DIRS: Readonly<Record<RuntimeComponentId, string | null>> = {
@@ -117,14 +110,15 @@ export const LOCAL_STATE_DIRS: Readonly<Record<RuntimeComponentId, string | null
   codex: null,
   'codex-app-server': null,
   claude: null,
-  gemini: null,
-  'gemini-auth-policy': null,
+  antigravity: null,
+  'antigravity-auth': null,
+  'legacy-gemini-ownership': null,
   dotnet: null,
   aspire: null,
   docker: null,
   'state-claude': '.claude',
   'state-codex': '.codex',
-  'state-gemini': '.gemini',
+  'state-antigravity': '.gemini',
   'state-netscript-agentic': '.config/netscript-agentic',
 };
 
@@ -206,42 +200,54 @@ export function classifyStateDirectory(
   };
 }
 
-/** Requires the owner-approved Google subscription route without reading credential material. */
-export function classifyGeminiAuthPolicy(
-  exists: boolean,
-  selectedType: string | null,
-  enforcedType: string | null,
+/** Classifies Antigravity's documented keyring/Google Sign-In markers without reading credentials. */
+export function classifyAntigravityAuth(
+  accountMarkerPresent: boolean,
+  credentialMarkerPresent: boolean,
 ): RuntimeProbe {
-  const required = 'oauth-personal';
-  if (!exists) {
-    return {
-      component: 'gemini-auth-policy',
-      detectedVersion: null,
-      expected: required,
-      status: 'missing',
-      detail: 'Google subscription auth policy not configured',
-    };
-  }
-  const compatible = selectedType === required && enforcedType === required;
+  const ready = accountMarkerPresent && credentialMarkerPresent;
   return {
-    component: 'gemini-auth-policy',
+    component: 'antigravity-auth',
     detectedVersion: null,
-    expected: required,
-    status: compatible ? 'ready' : 'auth_conflict',
-    detail: compatible
-      ? 'Google subscription auth policy enforced'
-      : 'Gemini settings do not enforce Google subscription auth',
+    expected: 'system-keyring-or-google-sign-in',
+    status: ready ? 'ready' : 'auth_required',
+    detail: ready
+      ? 'Google Sign-In account and credential markers present'
+      : 'official keyring/Google Sign-In session required',
   };
 }
 
-/** Enforces subscription-only Gemini auth and reports environment key names, never values. */
+/** Classifies whether legacy NetScript-owned Gemini state can be migrated safely. */
+export function classifyLegacyGeminiOwnership(
+  manifestExists: boolean,
+  ownedLinkRecorded: boolean,
+  ownedLinkMatches: boolean,
+): RuntimeProbe {
+  const status = !manifestExists || !ownedLinkRecorded
+    ? 'ready'
+    : ownedLinkMatches
+    ? 'outdated'
+    : 'auth_conflict';
+  return {
+    component: 'legacy-gemini-ownership',
+    detectedVersion: null,
+    expected: 'no NetScript-owned gemini executable',
+    status,
+    detail: status === 'ready'
+      ? 'no legacy NetScript-owned Gemini executable recorded'
+      : status === 'outdated'
+      ? 'legacy NetScript-owned Gemini state requires explicit migration'
+      : 'legacy Gemini ownership does not match the manifest; refusing migration',
+  };
+}
+
+/** Reports provider-native session readiness without inferring Antigravity key policy. */
 export function classifyAuth(
   presentKeys: ReadonlySet<string>,
   claudeSessionPresent: boolean,
-  geminiSessionPresent: boolean,
+  antigravitySessionPresent: boolean,
 ): AuthBoundaryProbe[] {
   const claudeConflicts = CLAUDE_AUTH_KEYS.filter((key) => presentKeys.has(key));
-  const geminiConflicts = FORBIDDEN_GEMINI_AUTH_KEYS.filter((key) => presentKeys.has(key));
   return [
     {
       provider: 'claude',
@@ -259,19 +265,13 @@ export function classifyAuth(
         : 'provider-native browser sign-in required',
     },
     {
-      provider: 'gemini',
-      route: 'google-subscription',
-      conflicts: [...geminiConflicts],
-      status: geminiConflicts.length > 0
-        ? 'auth_conflict'
-        : geminiSessionPresent
-        ? 'ready'
-        : 'auth_required',
-      detail: geminiConflicts.length > 0
-        ? 'API-key or Vertex environment route is forbidden'
-        : geminiSessionPresent
-        ? 'Google subscription session metadata present'
-        : 'Google subscription browser sign-in required',
+      provider: 'antigravity',
+      route: 'google-sign-in',
+      conflicts: [],
+      status: antigravitySessionPresent ? 'ready' : 'auth_required',
+      detail: antigravitySessionPresent
+        ? 'official keyring/Google Sign-In session markers present'
+        : 'official keyring/Google Sign-In required',
     },
   ];
 }
@@ -338,19 +338,22 @@ export function planBootstrap(
   if (byId.get('claude')?.detectedVersion !== desired.claude) {
     packages.push(`@anthropic-ai/claude-code@${desired.claude}`);
   }
-  if (byId.get('gemini')?.detectedVersion !== desired.gemini) {
-    packages.push(`@google/gemini-cli@${desired.gemini}`);
-  }
   if (packages.length > 0) actions.push({ kind: 'install_npm_clis', packages });
-  if (byId.get('gemini-auth-policy')?.status === 'missing') {
-    actions.push({ kind: 'configure_gemini_auth', selectedType: 'oauth-personal' });
+  if (byId.get('antigravity')?.status === 'missing') {
+    actions.push({
+      kind: 'install_antigravity',
+      installer: 'https://antigravity.google/cli/install.sh',
+    });
+  }
+  if (byId.get('legacy-gemini-ownership')?.status === 'outdated') {
+    actions.push({ kind: 'migrate_legacy_gemini_ownership' });
   }
   if (
     actions.some((action) => action.kind === 'install_node' || action.kind === 'install_npm_clis')
   ) {
     actions.push({
       kind: 'ensure_symlinks',
-      names: ['node', 'npm', 'npx', 'claude', 'gemini'],
+      names: ['node', 'npm', 'npx', 'claude'],
     });
   }
   if (actions.length > 0) {
@@ -361,7 +364,7 @@ export function planBootstrap(
   }
   return {
     schemaVersion: FOUNDATION_SCHEMA_VERSION,
-    desired: { node: NODE_VERSION, ...desired },
+    desired: { node: NODE_VERSION, ...desired, antigravity: 'official-installer' },
     actions,
     changed: actions.length > 0,
   };
@@ -375,15 +378,15 @@ export function buildRollbackPlan(): RollbackPlan {
     ownedRoots: [
       '$HOME/.local/share/netscript-agentic',
       '$HOME/.config/netscript-agentic',
-      '$HOME/.local/bin/{node,npm,npx,claude,gemini}',
-      '$HOME/.gemini/settings.json (only when foundation-state.json records it as created)',
+      '$HOME/.local/bin/{node,npm,npx,claude}',
+      '$HOME/.local/bin/agy (only when foundation-state.json records it as installed)',
     ],
     steps: [
-      'Stop native WSL Claude/Gemini sessions before rollback.',
+      'Stop native WSL Claude/Antigravity sessions before rollback.',
       'Inspect foundation-state.json; detach only owned symlinks and restore each non-null previous target.',
       'Remove the user-local npm and Node roots after the symlinks are detached.',
-      'Remove Gemini settings only when createdFiles records it and its auth policy is still oauth-personal.',
-      'Leave ~/.codex and all provider auth/session directories intact.',
+      'Remove agy only when createdFiles records that exact canonical-user executable.',
+      'Preserve ~/.gemini, ~/.codex, and all provider auth/session material.',
       'Open native Windows Claude and run claude --version as the break-glass verification.',
     ],
     windowsClaude: 'preserved',

@@ -1,9 +1,10 @@
 import {
   buildDoctorReport,
   buildRollbackPlan,
+  classifyAntigravityAuth,
   classifyAuth,
   classifyComponent,
-  classifyGeminiAuthPolicy,
+  classifyLegacyGeminiOwnership,
   classifyMobileControl,
   classifyStateDirectory,
   FOUNDATION_SCHEMA_VERSION,
@@ -68,26 +69,15 @@ Deno.test('state directory detail never contains an absolute home path', () => {
   assertEquals(probe.status, 'ready');
 });
 
-Deno.test('Gemini API and Vertex routes are explicit conflicts without values', () => {
-  const probes = classifyAuth(
-    new Set(['GEMINI_API_KEY', 'GOOGLE_GENAI_USE_VERTEXAI']),
-    false,
-    false,
-  );
-  const gemini = probes.find((probe) => probe.provider === 'gemini');
-  assert(gemini, 'Gemini probe exists');
-  assertEquals(gemini.status, 'auth_conflict');
-  assertEquals(gemini.route, 'google-subscription');
-  assertEquals(gemini.conflicts, ['GEMINI_API_KEY', 'GOOGLE_GENAI_USE_VERTEXAI']);
+Deno.test('Antigravity auth uses only secret-safe official session markers', () => {
+  assertEquals(classifyAntigravityAuth(false, false).status, 'auth_required');
+  assertEquals(classifyAntigravityAuth(true, true).status, 'ready');
 });
 
-Deno.test('Gemini settings must enforce the Google subscription route', () => {
-  assertEquals(classifyGeminiAuthPolicy(false, null, null).status, 'missing');
-  assertEquals(
-    classifyGeminiAuthPolicy(true, 'oauth-personal', 'oauth-personal').status,
-    'ready',
-  );
-  assertEquals(classifyGeminiAuthPolicy(true, 'gemini-api-key', null).status, 'auth_conflict');
+Deno.test('legacy Gemini cleanup requires a matching ownership manifest', () => {
+  assertEquals(classifyLegacyGeminiOwnership(false, false, false).status, 'ready');
+  assertEquals(classifyLegacyGeminiOwnership(true, true, true).status, 'outdated');
+  assertEquals(classifyLegacyGeminiOwnership(true, true, false).status, 'auth_conflict');
 });
 
 Deno.test('missing provider sessions are non-fatal auth-required states', () => {
@@ -110,7 +100,7 @@ Deno.test('doctor report prioritizes auth conflict over degraded state', () => {
     components: [
       classifyComponent({ component: 'node', output: 'v26.5.0', exitCode: 0, expected: '26.5.0' }),
     ],
-    auth: classifyAuth(new Set(['GOOGLE_API_KEY']), true, false),
+    auth: classifyAuth(new Set(['ANTHROPIC_API_KEY']), true, false),
     mobileControl: classifyMobileControl(true, '0.144.1', '0.144.1'),
   });
   assertEquals(report.schemaVersion, FOUNDATION_SCHEMA_VERSION);
@@ -124,21 +114,27 @@ Deno.test('bootstrap plan is ordered, exact-versioned, and reversible by ownersh
     components: [
       classifyComponent({ component: 'node', output: 'v18.19.1', exitCode: 0, expected: '26.5.0' }),
       classifyComponent({ component: 'claude', output: '', exitCode: 127 }),
-      classifyComponent({ component: 'gemini', output: '', exitCode: 127 }),
+      classifyComponent({ component: 'antigravity', output: '', exitCode: 127 }),
       classifyStateDirectory('state-claude', '.claude', false),
-      classifyGeminiAuthPolicy(false, null, null),
+      classifyAntigravityAuth(false, false),
+      classifyLegacyGeminiOwnership(true, true, true),
     ],
     auth: classifyAuth(new Set(), false, false),
     mobileControl: classifyMobileControl(true, '0.144.1', '0.144.1'),
   });
-  const plan = planBootstrap(report, { claude: '2.1.206', gemini: '0.50.0' });
+  const plan = planBootstrap(report, { claude: '2.1.206' });
   assertEquals(plan.changed, true);
-  assertEquals(plan.desired, { node: '26.5.0', claude: '2.1.206', gemini: '0.50.0' });
+  assertEquals(plan.desired, {
+    node: '26.5.0',
+    claude: '2.1.206',
+    antigravity: 'official-installer',
+  });
   assertEquals(plan.actions.map((action) => action.kind), [
     'create_directory',
     'install_node',
     'install_npm_clis',
-    'configure_gemini_auth',
+    'install_antigravity',
+    'migrate_legacy_gemini_ownership',
     'ensure_symlinks',
     'write_state',
   ]);
@@ -146,7 +142,6 @@ Deno.test('bootstrap plan is ordered, exact-versioned, and reversible by ownersh
   assert(npmAction?.kind === 'install_npm_clis', 'npm action exists');
   assertEquals(npmAction.packages, [
     '@anthropic-ai/claude-code@2.1.206',
-    '@google/gemini-cli@0.50.0',
   ]);
 });
 
@@ -157,17 +152,18 @@ Deno.test('bootstrap plan is empty when desired state is already present', () =>
     components: [
       classifyComponent({ component: 'node', output: 'v26.5.0', exitCode: 0, expected: '26.5.0' }),
       classifyComponent({ component: 'claude', output: '2.1.206', exitCode: 0 }),
-      classifyComponent({ component: 'gemini', output: '0.50.0', exitCode: 0 }),
+      classifyComponent({ component: 'antigravity', output: '1.1.1', exitCode: 0 }),
       classifyStateDirectory('state-claude', '.claude', true),
       classifyStateDirectory('state-codex', '.codex', true),
-      classifyStateDirectory('state-gemini', '.gemini', true),
+      classifyStateDirectory('state-antigravity', '.gemini', true),
       classifyStateDirectory('state-netscript-agentic', '.config/netscript-agentic', true),
-      classifyGeminiAuthPolicy(true, 'oauth-personal', 'oauth-personal'),
+      classifyAntigravityAuth(true, true),
+      classifyLegacyGeminiOwnership(true, false, false),
     ],
     auth: classifyAuth(new Set(), true, true),
     mobileControl: classifyMobileControl(true, '0.144.1', '0.144.1'),
   });
-  const plan = planBootstrap(report, { claude: '2.1.206', gemini: '0.50.0' });
+  const plan = planBootstrap(report, { claude: '2.1.206' });
   assertEquals(plan.changed, false);
   assertEquals(plan.actions, []);
 });
@@ -178,5 +174,9 @@ Deno.test('rollback plan never removes Codex or provider session directories', (
   assertEquals(rollback.windowsClaude, 'preserved');
   const rendered = JSON.stringify(rollback);
   assert(!rendered.includes('$HOME/.codex'), 'Codex home is not an owned rollback root');
-  assert(rendered.includes('Leave ~/.codex'), 'Codex preservation is explicit');
+  assert(
+    rendered.includes('Preserve ~/.gemini, ~/.codex'),
+    'provider state preservation is explicit',
+  );
+  assert(!rendered.includes('/root/.local/bin/agy'), 'root installation is outside rollback scope');
 });

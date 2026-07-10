@@ -2,13 +2,13 @@ import {
   type BootstrapPlan,
   buildDoctorReport,
   buildRollbackPlan,
+  classifyAntigravityAuth,
   classifyAuth,
   classifyComponent,
-  classifyGeminiAuthPolicy,
+  classifyLegacyGeminiOwnership,
   classifyMobileControl,
   classifyStateDirectory,
   EXIT_CODES,
-  FORBIDDEN_GEMINI_AUTH_KEYS,
   NODE_VERSION,
   planBootstrap,
   type RawComponentProbe,
@@ -31,7 +31,7 @@ const COMMAND_SPECS: CommandSpec[] = [
   { component: 'codex', command: 'codex', args: ['--version'] },
   { component: 'codex-app-server', command: 'codex', args: ['app-server', 'daemon', 'version'] },
   { component: 'claude', command: 'claude', args: ['--version'] },
-  { component: 'gemini', command: 'gemini', args: ['--version'] },
+  { component: 'antigravity', command: '/home/codex/.local/bin/agy', args: ['--version'] },
   { component: 'dotnet', command: 'dotnet', args: ['--version'] },
   { component: 'aspire', command: 'aspire', args: ['--version'] },
   { component: 'docker', command: 'docker', args: ['--version'] },
@@ -124,6 +124,27 @@ async function pathExists(path: string): Promise<boolean> {
   }
 }
 
+async function canonicalAgyOwnership(home: string): Promise<{ ready: boolean; detail: string }> {
+  const path = `${home}/.local/bin/agy`;
+  try {
+    const info = await Deno.lstat(path);
+    const homeInfo = await Deno.stat(home);
+    const executable = info.mode === null || (info.mode & 0o100) !== 0;
+    const ownedByCurrentUser = info.uid === null || info.uid === homeInfo.uid;
+    return {
+      ready: info.isFile && executable && ownedByCurrentUser,
+      detail: info.isFile && executable && ownedByCurrentUser
+        ? 'canonical executable is current-user owned and executable'
+        : 'canonical executable ownership/type/mode is invalid',
+    };
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) {
+      return { ready: false, detail: 'canonical executable missing' };
+    }
+    throw error;
+  }
+}
+
 async function hasSessionMetadata(providerDir: string): Promise<boolean> {
   if (!(await exists(providerDir))) return false;
   for await (const entry of Deno.readDir(providerDir)) {
@@ -144,24 +165,19 @@ async function readJsonObject(path: string): Promise<Record<string, unknown> | n
   }
 }
 
-async function readGeminiAuthPolicy(home: string): Promise<{
-  exists: boolean;
-  selectedType: string | null;
-  enforcedType: string | null;
+async function legacyGeminiOwnership(home: string): Promise<{
+  manifest: Record<string, unknown> | null;
+  recorded: boolean;
+  matches: boolean;
 }> {
-  const path = `${home}/.gemini/settings.json`;
-  const fileExists = await pathExists(path);
-  const settings = fileExists ? await readJsonObject(path) : null;
-  const security = settings?.security && typeof settings.security === 'object'
-    ? settings.security as Record<string, unknown>
-    : null;
-  const auth = security?.auth && typeof security.auth === 'object'
-    ? security.auth as Record<string, unknown>
-    : null;
+  const manifest = await readJsonObject(`${home}/.config/netscript-agentic/foundation-state.json`);
+  const link = `${home}/.local/bin/gemini`;
+  const recorded = Array.isArray(manifest?.ownedLinks) && manifest.ownedLinks.includes(link);
+  const target = recorded ? await readSymlink(link) : null;
   return {
-    exists: fileExists,
-    selectedType: typeof auth?.selectedType === 'string' ? auth.selectedType : null,
-    enforcedType: typeof auth?.enforcedType === 'string' ? auth.enforcedType : null,
+    manifest,
+    recorded,
+    matches: recorded && target === `${home}/${NPM_PREFIX}/bin/gemini`,
   };
 }
 
@@ -169,10 +185,20 @@ async function doctor(): Promise<RuntimeDoctorReport> {
   const home = Deno.env.get('HOME') ?? '';
   const raw = await Promise.all(COMMAND_SPECS.map(run));
   const components = raw.map(classifyComponent);
+  const agyIndex = components.findIndex((probe) => probe.component === 'antigravity');
+  const agyOwnership = await canonicalAgyOwnership(home);
+  if (agyIndex >= 0 && components[agyIndex].status === 'ready') {
+    components[agyIndex] = {
+      ...components[agyIndex],
+      expected: `${home}/.local/bin/agy (current-user owned executable)`,
+      status: agyOwnership.ready ? 'ready' : 'unavailable',
+      detail: agyOwnership.detail,
+    };
+  }
   const statePaths = [
     ['state-claude', '.claude'],
     ['state-codex', '.codex'],
-    ['state-gemini', '.gemini'],
+    ['state-antigravity', '.gemini'],
     ['state-netscript-agentic', '.config/netscript-agentic'],
   ] as const;
   for (const [component, relativePath] of statePaths) {
@@ -180,21 +206,20 @@ async function doctor(): Promise<RuntimeDoctorReport> {
       classifyStateDirectory(component, relativePath, await exists(`${home}/${relativePath}`)),
     );
   }
-  const geminiPolicy = await readGeminiAuthPolicy(home);
+  const accountMarker = await pathExists(`${home}/.gemini/google_accounts.json`);
+  const credentialMarker = await pathExists(`${home}/.gemini/oauth_creds.json`);
+  components.push(classifyAntigravityAuth(accountMarker, credentialMarker));
+  const legacy = await legacyGeminiOwnership(home);
   components.push(
-    classifyGeminiAuthPolicy(
-      geminiPolicy.exists,
-      geminiPolicy.selectedType,
-      geminiPolicy.enforcedType,
-    ),
+    classifyLegacyGeminiOwnership(Boolean(legacy.manifest), legacy.recorded, legacy.matches),
   );
 
-  const inspectedKeys = ['ANTHROPIC_API_KEY', ...FORBIDDEN_GEMINI_AUTH_KEYS];
+  const inspectedKeys = ['ANTHROPIC_API_KEY'];
   const presentKeys = new Set(inspectedKeys.filter((key) => Deno.env.get(key) !== undefined));
   const auth = classifyAuth(
     presentKeys,
     await hasSessionMetadata(`${home}/.claude`),
-    await hasSessionMetadata(`${home}/.gemini`),
+    accountMarker && credentialMarker,
   );
   const cliVersion = components.find((probe) => probe.component === 'codex')?.detectedVersion ??
     null;
@@ -211,7 +236,7 @@ async function doctor(): Promise<RuntimeDoctorReport> {
   });
 }
 
-async function resolveStableCliVersions(): Promise<{ claude: string; gemini: string }> {
+async function resolveStableCliVersions(): Promise<{ claude: string }> {
   const resolve = async (packageName: string): Promise<string> => {
     const result = await runExternal('npm', ['view', packageName, 'dist-tags.latest', '--json']);
     if (result.code !== 0) {
@@ -223,11 +248,7 @@ async function resolveStableCliVersions(): Promise<{ claude: string; gemini: str
     }
     return value;
   };
-  const [claude, gemini] = await Promise.all([
-    resolve('@anthropic-ai/claude-code'),
-    resolve('@google/gemini-cli'),
-  ]);
-  return { claude, gemini };
+  return { claude: await resolve('@anthropic-ai/claude-code') };
 }
 
 function toHex(bytes: ArrayBuffer): string {
@@ -338,6 +359,7 @@ async function executeBootstrap(home: string, plan: BootstrapPlan): Promise<void
   const binRoot = `${home}/.local/bin`;
   const previousTargets: Record<string, string | null> = {};
   const createdFiles: string[] = [];
+  let migratedLegacyGemini = false;
   for (const action of plan.actions) {
     if (action.kind === 'create_directory') {
       await Deno.mkdir(`${home}/${action.relativePath}`, { recursive: true, mode: 0o700 });
@@ -359,29 +381,48 @@ async function executeBootstrap(home: string, plan: BootstrapPlan): Promise<void
           `native WSL CLI install failed (exit ${result.code}): ${result.stderr.slice(0, 240)}`,
         );
       }
-    } else if (action.kind === 'configure_gemini_auth') {
-      const settingsPath = `${home}/.gemini/settings.json`;
-      if (await pathExists(settingsPath)) {
-        throw new Error(
-          'refusing to replace existing Gemini settings; doctor reports the conflict',
-        );
+    } else if (action.kind === 'migrate_legacy_gemini_ownership') {
+      const legacy = await legacyGeminiOwnership(home);
+      if (!legacy.recorded || !legacy.matches) {
+        throw new Error('refusing legacy Gemini migration without matching ownership manifest');
       }
-      await writeJsonAtomic(settingsPath, {
-        security: {
-          auth: {
-            selectedType: action.selectedType,
-            enforcedType: action.selectedType,
-          },
-        },
+      const uninstall = await runExternal(`${nodeRoot}/bin/npm`, [
+        'uninstall',
+        '--global',
+        '--prefix',
+        npmPrefix,
+        '@google/gemini-cli',
+      ], { PATH: `${nodeRoot}/bin:${home}/.local/bin:${Deno.env.get('PATH') ?? ''}` });
+      if (uninstall.code !== 0) {
+        throw new Error(`legacy Gemini package removal failed (exit ${uninstall.code})`);
+      }
+      await Deno.remove(`${home}/.local/bin/gemini`);
+      migratedLegacyGemini = true;
+    } else if (action.kind === 'install_antigravity') {
+      const response = await fetch(action.installer);
+      if (!response.ok) {
+        throw new Error(`official Antigravity installer fetch failed (${response.status})`);
+      }
+      const installerPath = `${home}/${OWNED_ROOT}/.agy-install-${crypto.randomUUID()}.sh`;
+      await Deno.writeTextFile(installerPath, await response.text(), {
+        createNew: true,
+        mode: 0o700,
       });
-      createdFiles.push(settingsPath);
+      try {
+        const installed = await runExternal('bash', [installerPath]);
+        if (installed.code !== 0) {
+          throw new Error(`official Antigravity installer failed (exit ${installed.code})`);
+        }
+      } finally {
+        await Deno.remove(installerPath);
+      }
+      createdFiles.push(`${home}/.local/bin/agy`);
     } else if (action.kind === 'ensure_symlinks') {
       const targets: Record<string, string> = {
         node: `${nodeRoot}/bin/node`,
         npm: `${nodeRoot}/bin/npm`,
         npx: `${nodeRoot}/bin/npx`,
         claude: `${npmPrefix}/bin/claude`,
-        gemini: `${npmPrefix}/bin/gemini`,
       };
       for (const name of action.names) {
         if (!(await pathExists(targets[name]))) {
@@ -404,9 +445,17 @@ async function executeBootstrap(home: string, plan: BootstrapPlan): Promise<void
         installedAt: new Date().toISOString(),
         desired: plan.desired,
         ownedRoots: [`${home}/${OWNED_ROOT}`, `${home}/${NPM_PREFIX}`],
-        ownedLinks: ['node', 'npm', 'npx', 'claude', 'gemini'].map((name) => `${binRoot}/${name}`),
+        ownedLinks: ['node', 'npm', 'npx', 'claude'].map((name) => `${binRoot}/${name}`),
         previousTargets: { ...existingTargets, ...previousTargets },
         createdFiles: [...new Set([...existingCreated, ...createdFiles])],
+        migrations: migratedLegacyGemini
+          ? {
+            ...(existing?.migrations && typeof existing.migrations === 'object'
+              ? existing.migrations as Record<string, unknown>
+              : {}),
+            legacyGeminiOwnership: 'removed-after-manifest-match',
+          }
+          : existing?.migrations ?? {},
       });
     }
   }

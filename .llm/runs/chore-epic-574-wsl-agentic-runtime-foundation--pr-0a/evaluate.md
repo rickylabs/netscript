@@ -51,3 +51,11 @@ does not certify the owner-authorized Antigravity replacement. PR #584 remains d
 the reviewed foundation refactor plus canonical `codex`-user `agy` path/version/auth/doctor and
 migration-safety evidence. Headless output/exits, quota, research/citations, and instruction-file
 behavior remain downstream #578 canaries and do not block PR #584.
+
+## 2026-07-10 Antigravity Implementation Boundary
+
+The Antigravity foundation migration has implementation and generator-gate evidence, but this file
+does not extend the historical Gemini `PASS` verdict to the new code. The owner waived a separate
+review request and authorized the implementation turn; that authorization is not represented as a
+generator self-certification. Coordinator Tier-A review remains the next gate, and PR #584 remains
+draft. Downstream #578 contracts and controller PR #585 remain explicitly unevaluated here.

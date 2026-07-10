@@ -122,3 +122,23 @@ the remaining interactive acceptance checks.
   quota, structured output, and research capabilities remain downstream #578 canaries and do not
   block PR #584.
 - PR #584 stays draft; no implementation resumes until scope review.
+
+## 2026-07-10 Antigravity Foundation Migration Handoff
+
+- Owner-authorized implementation now replaces the future Gemini foundation lane with Antigravity
+  while retaining every historical Gemini fact above.
+- Canonical `codex`-user proof passes: `/home/codex/.local/bin/agy`, version `1.1.1`, regular
+  executable mode `0755`, owner `codex:codex`.
+- Doctor classifies Antigravity auth only from documented Google Sign-In/keyring persistence markers;
+  it never reads or logs credential contents and does not claim `agy login`.
+- The old manifest and live symlink matched exactly, so bootstrap removed only the NetScript-owned
+  Gemini npm package/symlink, preserved `~/.gemini`, and recorded
+  `legacyGeminiOwnership=removed-after-manifest-match`.
+- Immediate repeat is idempotent (`actions: []`, overall `ready`, exit `0`). Full agentic tests are
+  `69 passed`; scoped check/lint/fmt wrappers have zero findings; secret-redaction and rollback/
+  ownership matrices pass; `deno.lock` is unchanged.
+- #578 contracts, #585, S4/S5, daemon state, root installs, Windows state, credentials, locks, and
+  caches were not touched.
+- Next legal action after commit/push/#575/#584 evidence is coordinator Tier-A review. This
+  implementation session does not self-certify that review or a new Antigravity evaluator verdict;
+  PR #584 remains draft.

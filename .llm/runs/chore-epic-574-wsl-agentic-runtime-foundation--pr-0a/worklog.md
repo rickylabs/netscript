@@ -255,3 +255,30 @@ The future implementation must remove only NetScript-owned Gemini links/package 
 `agy login` command. Canonical-user auth, headless execution, structured output, exit taxonomy,
 quota/subscription, web research/citations, and instruction-file behavior remain unpassed canaries.
 No runtime source changed in this reconciliation; PR #584 remains draft.
+
+## 2026-07-10 Antigravity Foundation Migration Implementation
+
+The owner authorized the reviewed PR 0A foundation rescope at reviewed head `88a8f77`. This slice
+replaces only the future Gemini desired state in the foundation tool. Historical Gemini evidence
+above remains unchanged. Issue #578 contracts, PR #585, S4/S5, daemon state, credentials, root
+installs, locks, and caches remain outside the slice.
+
+### Contract and migration evidence
+
+| Gate | Result | Raw exit / evidence |
+| --- | --- | --- |
+| Canonical path/version/ownership | PASS | `/home/codex/.local/bin/agy`; `1.1.1`; regular executable `0755`, `codex:codex` |
+| Official auth classification | PASS | Secret-safe presence checks found Antigravity Google account and OAuth credential markers owned by `codex`; contents were not read or logged |
+| Pre-migration doctor | EXPECTED_DEGRADED | exit `2`; all runtime/auth probes ready except manifest-proven legacy Gemini ownership |
+| Bootstrap dry-run | PASS | exit `2`; exactly `migrate_legacy_gemini_ownership` + `write_state`; no install/root/daemon/credential action |
+| Live migration | PASS | exit `0`; removed only the manifest-recorded symlink and npm package; preserved `~/.gemini` and existing `agy` |
+| Immediate idempotence | PASS | exit `0`; `actions: []`, `changed: false`, overall `ready` |
+| Full agentic tests | PASS | exit `0`; `69 passed`, `0 failed` |
+| Scoped check/lint/fmt wrappers | PASS | exits `0`; 3 owned TS files, 1 batch each, 0 findings |
+| Secret-redaction canary | PASS | fake `ANTHROPIC_API_KEY` produced expected exit `3`; sentinel absent from captured output |
+| Rollback/ownership matrix | PASS | rollback preserves `~/.gemini`/`~/.codex`; `agy` removable only if manifest-created; migrated manifest excludes `gemini` and records explicit migration |
+| Unsupported capability boundary | PASS | no `agy login`, Gemini alias, headless/quota/research/citation/instruction contract, or unsupported auth-policy claim |
+| Lock hygiene | PASS | `deno.lock` unchanged; no cache operation |
+
+Implementation-session review notes are evidence, not harness sign-off. The generator does not
+self-certify Tier-A review or IMPL-EVAL. PR #584 remains draft for coordinator Tier-A review.

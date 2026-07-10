@@ -74,26 +74,26 @@ deno task agentic:wsl-foundation rollback-plan --json
 ```
 
 The doctor reports a stable schema, native-ext4 proof, bounded tool versions, required Linux-local
-state directories, Codex managed/version-skew state, and Claude/Gemini authentication boundaries.
-Gemini is restricted to Google subscription sign-in; API-key and Vertex environment key *names* are
-reported as conflicts without reading or printing their values. Exit: `0` ready · `2` degraded or
-browser auth required · `3` forbidden auth route · `4` usage/execution failure.
+state directories, Codex managed/version-skew state, and Claude/Antigravity authentication
+boundaries. Antigravity readiness is based on its documented system-keyring/Google Sign-In marker
+files without reading credential contents; no `agy login` command or API-key policy is inferred.
+Exit: `0` ready · `2` degraded or browser auth required · `3` invalid ownership/configuration · `4`
+usage/execution failure.
 
-Bootstrap installs the checksum-verified Node `26.5.0` distribution and npm stable Claude Code /
-Gemini CLI releases below `~/.local/share/netscript-agentic`, then exposes only owned symlinks in
-`~/.local/bin`. It writes a mode-0600, value-free ownership manifest under
-`~/.config/netscript-agentic`; it never changes Windows Claude, `~/.codex`, or provider session
-files. Run `rollback-plan` to print non-executing reversal guidance before removing any owned path.
-When `~/.gemini/settings.json` is absent, bootstrap creates a mode-0600 file enforcing
-`oauth-personal` (Sign in with Google) and records it in the rollback manifest. An existing Gemini
-settings file is never overwritten; any non-matching auth policy is an explicit conflict.
+Bootstrap installs checksum-verified Node `26.5.0`, npm-stable Claude Code, and—when absent—the
+official checksum-verifying Antigravity installer at `/home/codex/.local/bin/agy`. It writes a
+mode-0600, value-free ownership manifest under `~/.config/netscript-agentic`. A legacy `gemini`
+symlink/package is removed only when the manifest proves it is NetScript-owned and still targets the
+owned npm prefix; mismatched legacy state is rejected. There is no `gemini` alias. `~/.gemini` is
+always preserved because Antigravity uses it, and `/root/.local/bin/agy` is never inspected or
+mutated. Run `rollback-plan` for non-executing reversal guidance.
 
 Permissions are explicit in the task: read/write for the owned user-local paths, run for fixed
 `npm`/`tar` and version probes, environment access for key-presence/PATH checks, and network access
-restricted to `nodejs.org` plus `registry.npmjs.org`. External requirements are `tar` with xz
+restricted to `nodejs.org`, `registry.npmjs.org`, and `antigravity.google`. External requirements are `tar` with xz
 support and the pre-bootstrap system npm used only to resolve stable dist-tags. The doctor never
-writes despite sharing the bootstrap entry point; bootstrap refuses forbidden Gemini auth routes
-before downloading or mutating anything.
+writes despite sharing the bootstrap entry point; bootstrap refuses unproven legacy ownership before
+downloading or mutating anything.
 
 ### `launch-codex-slice.ts`
 Stage and launch a Codex slice from a Windows-authored brief, with a push-safety gate, and record
