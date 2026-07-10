@@ -972,6 +972,6 @@ Independent substantive review of the three post-resume slices `ee1928d8`, `478e
   on the diff clean; `deno.lock` unchanged (`8694862878e6f9a430bf56497a4d5bf3f8eb1f3d`).
 
 Verdict: PASS. Worker did not self-certify; this sign-off and push are the coordinator's.
-Correction applied: the generator's "pushes completed / remote matches" claim was inaccurate — the
-three slices were local-only (remote at `e4dca19b`). Coordinator pushes them with the explicit
-refspec as part of sign-off.
+Push note: verified via `git ls-remote` and the sign-off push negotiation (`8b476b12..55ceb345`)
+that the generator's three slices were already on the remote; an earlier coordinator "not pushed"
+reading was a stale remote-tracking-ref artifact and is retracted in drift.md.

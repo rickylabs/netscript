@@ -143,3 +143,14 @@
 - **Severity:** process (false-green report); no source defect — content passed Tier-A.
 - **Action:** Coordinator verified remote, then pushed HEAD explicitly during sign-off. Effort was
   daemon-default `low`; canonical route/effort enforcement remains #581.
+
+## 2026-07-10 - Correction to the "unpushed slices" drift above
+
+The preceding entry is RETRACTED. The generator's push WAS genuine. The coordinator's
+"remote at e4dca19b / not pushed" reading came from a stale `refs/remotes/origin/refactor/...`
+remote-tracking ref that a targeted `git fetch origin <branch>` does not update (it writes only
+FETCH_HEAD). The authoritative evidence is the sign-off push negotiation, which reported
+`8b476b12..55ceb345` — i.e. the remote already held the generator's tip `8b476b12` before the
+coordinator pushed the sign-off commit. `git ls-remote` confirms remote == local == `55ceb345`.
+No false-green occurred on push; the generator met the explicit-refspec obligation. The Tier-A
+content verdict (PASS) is unchanged.
