@@ -701,3 +701,15 @@ worker does not self-certify or start S4.
 Issue #576 and draft PR #585 remain the authoritative S3 scope. The remediation is limited to the
 two Tier-A findings against `a0baef2`, retains explicit child boundaries #577/#578, and leaves S4
 unstarted. The sole thread and native worktree identities are unchanged.
+
+## Coordinator Tier-A S3 Sign-off
+
+Coordinator substantive review approved remediation head `d597c0846f0d57b3486972850e8bbe9d882ce14a`.
+The launch plan now binds execution to the inspected Git HEAD through `--expect-base`, rejects a
+missing HEAD before request construction, and normalizes bounded launch output fail-closed across
+thread, worktree, model, and nonzero process exit. Independent replacement validation reproduced
+`105 passed | 0 failed` plus zero scoped check, lint, and owned-format findings. Raw remote head
+matched the reviewed commit, the worktree was clean, and `deno.lock` was unchanged.
+
+S3 is complete. S4 may begin only from this approved head in the same native WSL worktree and sole
+thread. S5 wrappers and child-issue capabilities remain out of scope.

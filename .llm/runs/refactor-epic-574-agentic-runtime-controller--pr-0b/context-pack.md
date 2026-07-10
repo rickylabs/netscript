@@ -8,7 +8,7 @@
 | Branch | `refactor/epic-574-agentic-runtime-controller` |
 | Worktree | `/home/codex/repos/netscript-epic-574-pr0b-controller` |
 | Base | PR #584 sign-off `9b75470` |
-| Phase | S3 Tier-A remediation/gates complete; coordinator re-review pending |
+| Phase | S3 coordinator-approved; S4 activation pending |
 | Thread | `019f4b72-2ea4-7050-917e-6d6918371265` (resume only) |
 
 ## Current State
@@ -36,7 +36,8 @@ connects the mutation guard to the actual ports object, and runs the sentinel th
 failure, renderer, and writer paths. Coordinator substantive review approved S2 in supervisor
 sign-off `6756a54`. S3 now provides data-only Codex/Claude/Gemini/provider lifecycle adapters.
 Tier-A remediation pins Codex launches to the inspected Git HEAD and makes launch observation fail
-closed on complete route identity and process result. Replacement gates pass; S4 has not started.
+closed on complete route identity and process result. Coordinator substantive review approved S3
+remediation head `d597c08`; S4 has not started.
 
 ## Locked Boundaries
 
@@ -54,8 +55,7 @@ closed on complete route identity and process result. Replacement gates pass; S4
 1. S1 contract/state/ports/pure planner: coordinator-approved at `ac71896`.
 2. S2 controller/renderers/foundation/local-state/mobile adapters and read-only canonical CLI:
    coordinator-approved at `6756a54`.
-3. S3 Claude/Codex/Gemini/provider lifecycle adapters: Tier-A remediation/gates complete;
-   coordinator re-review pending.
+3. S3 Claude/Codex/Gemini/provider lifecycle adapters: coordinator-approved at `d597c08`.
 4. S4 transactional apply, explicit fallback/restore, rollback, and failure behavior: not started.
 5. S5 compatibility wrappers, documentation, and full scoped gates: not started.
 
@@ -146,8 +146,8 @@ closed on complete route identity and process result. Replacement gates pass; S4
 
 ## Next Action
 
-Coordinator substantively re-reviews the pushed S3 remediation commit. Do not start S4 or launch
-another sender; resume this exact thread only after an approved S4 brief.
+Activate locked S4 transactional apply, compensation, explicit fallback/restore, checkpoint,
+rollback, and failure behavior in the same worktree/thread. Do not start S5 or launch another sender.
 
 ## Safety
 
