@@ -14,3 +14,11 @@
   owner-accepted evidence.
 - **Impact:** compatible with generator/evaluator session separation. No implementation authority or
   promotion authority is inferred.
+
+## 2026-07-10 — Plan-Gate handoff form
+
+- **Severity:** process-note.
+- **What:** the Claude coordinator supplied `Plan-Gate: APPROVED` and the implementation resume
+  directive directly, but did not add a `plan-eval.md` commit to this branch.
+- **Resolution:** recorded the explicit approval in run artifacts and resumed S1. This worker did
+  not create an evaluator artifact or self-certify.

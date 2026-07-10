@@ -2,7 +2,7 @@
 
 ## Current state
 
-- Phase: Plan & Design complete; hard stop awaiting separate coordinator PLAN-EVAL.
+- Phase: implementation S1 gates green; pending commit/push/comment.
 - Branch/worktree: `feat/epic-574-rollout-canaries` at
   `/home/codex/repos/netscript-epic-574-pr6-rollout`.
 - Baseline: `b438f16d`; ancestry verified.
@@ -22,8 +22,13 @@ merge, and behavioral changes to earlier slices are prohibited.
 2. Thin injected runner plus live checked-in matrix.
 3. Human outcome report and final DoD evidence.
 
+S1 result: five focused tests pass; scoped check/lint/fmt report zero findings; diff and lock gates
+pass. Defensive sensitive-pattern source and its fake rejection fixture are the only scan matches;
+no artifact contains a sensitive value.
+
 ## Resume rule
 
-Do not implement until `plan-eval.md` contains a separate-session `PASS` and the coordinator resumes
-this thread. After resume, execute one slice at a time with focused tests, scoped wrappers,
-diff/secret/lock gates, explicit-refspec push, PR comment, and Tier-A review.
+The coordinator resumed this thread with an explicit Plan-Gate APPROVED directive; no
+`plan-eval.md` commit was added, and this worker did not fabricate one. Execute one slice at a time
+with focused tests, scoped wrappers, diff/secret/lock gates, explicit-refspec push, PR comment, and
+Tier-A review.

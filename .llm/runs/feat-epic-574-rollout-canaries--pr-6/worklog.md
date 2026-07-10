@@ -83,4 +83,27 @@ agentic behavior is extended in its owning #576–#581 module, not inside this r
 
 ## Phase status
 
-Plan & Design ready for separate Claude coordinator Plan-Gate. No implementation has begun.
+Coordinator Plan-Gate APPROVED in the 2026-07-10 resume directive. No evaluator artifact was added
+to the branch by the coordinator; this worker did not create one or impersonate the evaluator.
+
+## S1 — contract + pure aggregation
+
+- Added the closed nine-ID contract, four evidence modes, finite statuses/classifications, safe
+  evidence validator, complete-matrix aggregation, and recommendation-only outcome reducer.
+- Explicitly rejects unconditional pass for `auth_blocked`, `credential_absent`,
+  `owner_accepted_working`, runtime degradation, and unsafe repair.
+- Promotion surface is data only; no promote/apply operation exists.
+
+### S1 gate evidence
+
+| Gate | Result |
+| --- | --- |
+| Focused semantic tests | 5 passed, 0 failed |
+| Scoped check | 2 files, 0 findings |
+| Scoped lint | 2 files, 0 findings |
+| Scoped format check | 2 files, 0 findings |
+| `git diff --check` | exit 0 |
+| Sensitive-data scan | No values in artifacts; source-only matches are the defensive regex and its deliberately fake rejection fixture. |
+| `deno.lock` | unchanged |
+
+S1 files: `runtime/rollout-canary.ts`, `runtime/rollout-canary_test.ts`, and run artifacts.
