@@ -24,11 +24,13 @@ runtime execution remains fail-closed.
 - Redacted machine evidence, research, plan, Design, and drift artifacts.
 - S1 finite evidence contract, pure fail-closed classifier, sanitized citation metadata, and focused
   tests; owner acceptance is explicit and does not overwrite the empirical failed observation.
+- S2 bounded evidence adapter with fixed prompts, sandbox, timeout, capture ceiling, rival-provider
+  environment clearing, and blocked/failed auth/service/quota/timeout outcomes.
 
 ## Next Steps
 
-1. Complete S2 bounded Antigravity process adapter and fail-closed execution.
-2. Continue S3/S4 in this same thread; do not launch a second sender.
+1. Complete S3 instruction/citation/legacy-state evidence and conditional aggregation.
+2. Continue S4 in this same thread; do not launch a second sender.
 
 ## Key Decisions
 
@@ -50,6 +52,8 @@ runtime execution remains fail-closed.
 | `drift.md` | new | Pre-flight/live drift. |
 | `.llm/tools/agentic/runtime/antigravity-evidence.ts` | new | Finite evidence and pure classifier. |
 | `.llm/tools/agentic/runtime/antigravity-evidence_test.ts` | new | Semantic S1 matrix. |
+| `.llm/tools/agentic/runtime/adapters/antigravity-adapter.ts` | changed | Bounded evidence adapter. |
+| `.llm/tools/agentic/runtime/adapters/antigravity-adapter_test.ts` | new | S2 process/failure matrix. |
 
 ## Gates
 

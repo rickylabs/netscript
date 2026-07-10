@@ -68,6 +68,7 @@ after it is bounded and secret-safe; connect planner/aggregation only after posi
 | 2026-07-10 | S0 | Design | Negative evidence drives fail-closed adapter plan; no implementation started. |
 | 2026-07-10 | S1 | Plan-Gate | Coordinator approved; owner directed explicit `owner_accepted_working` live enablement while preserving fail-closed execution. |
 | 2026-07-10 | S1 | Contract/classifier | Finite evidence and sanitized citations landed; focused tests 4/4 and scoped check/lint/fmt are green. |
+| 2026-07-10 | S2 | Bounded adapter | Fixed read-only probes, sandbox, timeout, capture ceiling, child-only environment, and fail-closed runtime classification landed. |
 
 ## Drift
 
@@ -94,6 +95,15 @@ after it is bounded and secret-safe; connect planner/aggregation only after posi
 | Scoped check | 0 | 32 files, 0 findings |
 | Scoped lint | 0 | 32 files, 0 findings |
 | Scoped fmt | 0 | 32 files, 0 findings |
+
+### S2 Gates
+
+| Gate | Exit | Result |
+| ---- | ---- | ------ |
+| Focused evidence/adapter tests | 0 | 8 passed, 0 failed |
+| Scoped check | 0 | 33 files, 0 findings |
+| Scoped lint | 0 | 33 files, 0 findings |
+| Scoped fmt | 0 | 33 files, 0 findings |
 
 ## Handoff Notes
 
