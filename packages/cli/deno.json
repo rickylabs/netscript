@@ -2,7 +2,7 @@
   "name": "@netscript/cli",
   "version": "0.0.1-beta.5",
   "description": "Public and maintainer command-line tooling for NetScript workspaces.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "exports": {
     ".": "./mod.ts",
     "./scaffolding": "./scaffolding.ts",

@@ -1,39 +1,46 @@
 # beta6-nondash supervisor drift
 
-## 2026-07-08 — T5 / #406
+## 2026-07-08 - T5 / #406
 
 - Severity: none.
 - No plan or doctrine divergence recorded.
 - Operational note: `deno.lock` churned during validation after package import-map additions and
   publish dry-run; the lockfile was reverted per the slice constraint.
 
-## 2026-07-08 — T7 / #408
+## 2026-07-08 - T6 / #407 original implementation
+
+- Severity: major.
+- Owner + supervisor review found wrap-do-not-reinvent drift: the original T6 implementation
+  hand-rolled oRPC span lifecycle management in `packages/telemetry/src/orpc/tracing-plugin.ts`
+  even though oRPC ships first-party OpenTelemetry via `@orpc/otel`.
+- Resolution: rework PR #568 in beta.6 by registering `ORPCInstrumentation` behind the existing
+  telemetry/provider seam and limiting NetScript code to attribute customization on the active span.
+
+## 2026-07-08 - T7 / #408
 
 - Severity: minor.
 - The branch's `.llm/runs/beta6-nondash--supervisor/` directory did not contain unsuffixed
   `plan.md`, `plan-eval.md`, `worklog.md`, or `context-pack.md` at slice start; only prior
   slice/evaluator artifacts were present. The user prompt supplied the approved PLAN-EVAL state and
   scope fence, so T7 proceeded without re-planning and created the required T7 worklog/context
-  artifacts in this branch.
+  artifacts in that branch.
 
-## 2026-07-08 — T7 adapter size
+## 2026-07-08 - T7 adapter size
 
 - Severity: minor.
 - The initial Aspire adapter implementation exceeded the 500-line doctrine warning threshold. The
   backend normalization code was split into a sibling adapter-internal module, removing the new
   adapter size warning; remaining telemetry doctrine WARN rows are pre-existing package debt.
 
-## 2026-07-08 — T7 command interruption
+## 2026-07-08 - T7 command interruption
 
 - Severity: process.
 - A malformed `gh pr comment --body "..."` command interpreted Markdown backticks as shell command
   substitution after the slice commit. It printed shell errors and started `deno task e2e:cli`,
   which was interrupted immediately with Ctrl-C and exited 130. No scaffold runtime verdict was
-  produced, and the interrupted command is not used as evidence. The valid T7 evidence remains the
-  scoped telemetry wrappers, focused tests, full export doc-lint, and publish dry-run recorded in
-  `worklog-408.md`.
+  produced, and the interrupted command is not used as evidence.
 
-## 2026-07-08 — PR #567 merge conflict
+## 2026-07-08 - PR #567 merge conflict
 
 - Severity: minor.
 - PR #567 conflicted with `main` after T5 / #406 landed. The conflicts were limited to shared

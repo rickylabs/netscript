@@ -14,6 +14,11 @@ visible from Codex Desktop/mobile.
 
 ## Workflow
 
+Native Claude sessions authenticated through the Anthropic client are the mobile-visible operator
+surface. Experimental Claude sessions launched through OpenRouter/custom gateways are separate
+provider-runner sessions: they may be supervised and recorded, but must never be described as native
+Claude mobile-visible sessions.
+
 1. Re-baseline the worktree and branch first.
 2. If the user says `use harness`, read `.agents/skills/netscript-harness/SKILL.md`. If a native
    Claude `/netscript-harness` skill is unavailable, load the repo file directly.
@@ -32,8 +37,8 @@ visible from Codex Desktop/mobile.
 
 - Claude supervisor sessions may gather state, write prompts, launch/check agents, and update
   harness artifacts.
-- PLAN-EVAL uses OpenHands with minimax M3 unless the run artifact records a blocked launch.
-- IMPL-EVAL uses OpenHands with qwen 3.7 max unless the run artifact records a blocked launch.
+- PLAN-EVAL and IMPL-EVAL use separate opposite-family sessions selected from the canonical
+  `.llm/harness/workflow/lane-policy.md`; blocked routes are recorded in the run.
 - Implementation slices use daemon-attached WSL Codex sessions with recorded thread id, worktree,
   daemon proof, and steering command.
 - Do not count Claude internal subagents or plugin helper agents as NetScript implementation agents.
@@ -62,14 +67,9 @@ outcome.
   slice-by-slice.
 - Keep OpenHands as the evaluator. Claude workflows may prepare evaluator inputs, but they do not
   replace PLAN-EVAL or IMPL-EVAL.
-- For cost control, route Claude dynamic-workflow stages by model: **Sonnet 5 by default**, and
-  **Opus only for genuinely complex, thinking-heavy stages** (hard planning, adversarial
-  verify/judge). **Never use Fable 5 inside a workflow** — it is the most powerful *and* the
-  priciest model, so fanning it out burns plan tokens; reserve Fable 5 for a single
-  deliberately-spawned sub-agent on an extremely complex, single-threaded engineering task. Run
-  supervisor/evaluator sessions on **Opus 4.8 at high effort**. Launch workflow-oriented Claude
-  sessions with `opusplan` or `high` only when planning complexity justifies it; reserve
-  Ultracode/xhigh for explicit user requests or extreme design uncertainty.
+- Route every Claude workflow, supervisor, and review session through the canonical lane table in
+  `.llm/harness/workflow/lane-policy.md`. Do not reproduce model/effort defaults here or infer a
+  paid escalation from workflow prose.
 - A workflow output is acceptable only if it produces compact artifacts: updated harness plan,
   slice briefs, agent prompts, or decision records. It should not leave hidden untracked work.
 

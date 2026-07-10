@@ -14,7 +14,11 @@ import type { AgentLoopInput } from '../agent.ts';
 import type { ChatClientEvent } from '../src/ports/chat-client.ts';
 import type { AgentChunk } from '../src/contracts/chunk.ts';
 import type { Message } from '../src/contracts/message.ts';
-import { createFakeChatModelProvider, createInMemoryToolRegistry } from '../src/testing/mod.ts';
+import {
+  createFakeChatModelProvider,
+  createFakeTelemetryPort,
+  createInMemoryToolRegistry,
+} from '../src/testing/mod.ts';
 
 const MODEL = 'anthropic:claude-sonnet-4-5';
 
@@ -59,6 +63,28 @@ Deno.test('agent loop: single text turn transitions idle -> running -> done', as
 
   // resolveModelId strips the provider prefix.
   assertEquals(provider.modelIds, ['claude-sonnet-4-5']);
+});
+
+Deno.test('agent loop: records model spans through the injected telemetry port', async () => {
+  const provider = createFakeChatModelProvider(MODEL, [[
+    { type: 'text', delta: 'Hello' },
+    {
+      type: 'finish',
+      usage: { promptTokens: 2, completionTokens: 3, totalTokens: 5 },
+      finishReason: 'stop',
+    },
+  ]]);
+  const telemetry = createFakeTelemetryPort();
+  const loop = createAgentLoop({ modelProvider: provider, telemetry });
+
+  await collect(loop.run(userInput('hi')));
+
+  assertEquals(
+    telemetry.records.filter((record) => record.kind === 'span').map((record) => record.name),
+    ['gen_ai.chat', 'gen_ai.chat.turn'],
+  );
+  assertEquals(telemetry.records[0]?.attributes?.['gen_ai.provider.name'], MODEL);
+  assertEquals(telemetry.records[0]?.attributes?.['gen_ai.operation.name'], 'chat');
 });
 
 Deno.test('agent loop: tool call round-trips through the injected registry', async () => {

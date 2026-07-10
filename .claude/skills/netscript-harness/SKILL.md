@@ -101,9 +101,8 @@ routing here — defer to that file. The items below are the parts of the contra
   for every implementation tier (B Opus sub-agents, C Workflow-generated slices, D WSL Codex); no
   lane self-certifies. See `workflow/lane-policy.md` for the rule and `workflow/run-loop.md` for the
   step placement.
-- **Evaluator model bindings.** PLAN-EVAL runs OpenHands minimax-M3; IMPL-EVAL runs OpenHands
-  qwen-3.7-max — each unless the run artifact explicitly records why that launch path is
-  unavailable. The two-failure eval loop is unchanged.
+- **Evaluator route binding.** Select the opposite-family review route from
+  `workflow/lane-policy.md` and record it in the run. The two-failure eval loop is unchanged.
 - **Tier-D mobile-visibility proof.** A Tier-D (WSL Codex) implementation slice is launched only via
   skills + `.llm/tools/agentic/` (never ad-hoc `wsl.exe`), and only when the run artifacts include
   the WSL worktree path, concrete Codex thread id, daemon-managed `remote-control` proof, and the
@@ -198,7 +197,7 @@ There are **two** separate-session evaluator passes.
 
 **PLAN-EVAL** (before implementation):
 
-- Runs in OpenHands with minimax M3 unless blocked and recorded.
+- Runs in a separate opposite-family session selected from `workflow/lane-policy.md`.
 - Reads `evaluator/plan-protocol.md` + `gates/plan-gate.md`.
 - Reads `research.md`, `plan.md`, and the `## Design` section.
 - Writes `plan-eval.md`.
@@ -207,7 +206,7 @@ There are **two** separate-session evaluator passes.
 
 **IMPL-EVAL** (final pass, after implementation):
 
-- Runs in OpenHands with qwen 3.7 max unless blocked and recorded.
+- Runs in a separate opposite-family session selected from `workflow/lane-policy.md`.
 - Generator writes `worklog.md`, `context-pack.md`, and `drift.md`.
 - Evaluator reads `.llm/harness/evaluator/protocol.md`, the plan, worklog, context pack, drift, the
   draft-PR commit list + per-slice PR comments (the commit trail), selected archetype, overlays, and
@@ -299,11 +298,11 @@ User says "use harness"
       `supervisor.md`/`drift.md`.
 - [ ] Plan-Gate checklist (`gates/plan-gate.md`) was reviewed.
 - [ ] PLAN-EVAL returned `PASS` before any implementation slice.
-- [ ] PLAN-EVAL used OpenHands/minimax M3, or the blocked launch was recorded.
+- [ ] PLAN-EVAL used the recorded opposite-family route, or the blocked launch was recorded.
 - [ ] Tier-D (WSL Codex) slices recorded daemon-managed proof, thread id, worktree, and steering
       command.
 - [ ] The slice review gate was performed (Tier-A substantive review) before each sign-off commit;
       no lane self-certified.
 - [ ] Each implementation slice was committed, pushed, and commented on the draft PR.
 - [ ] IMPL-EVAL is a separate session from the generator.
-- [ ] IMPL-EVAL used OpenHands/qwen 3.7 max, or the blocked launch was recorded.
+- [ ] IMPL-EVAL used the recorded opposite-family route, or the blocked launch was recorded.

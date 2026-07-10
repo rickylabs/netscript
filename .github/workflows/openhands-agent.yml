@@ -19,7 +19,7 @@
 # every run that reaches the request step ends with exactly one final status
 # comment (edited in place over the "Running" acknowledge comment) containing:
 #   <!-- openhands-agent-summary -->                      (legacy marker, kept
-#       for .llm/tools/agentic/openhands-status.ts compatibility)
+#       for .llm/tools/agentic/openhands/openhands-status.ts compatibility)
 #   <!-- openhands-run: {"run_id":..,"attempt":..,"conclusion":..,
 #        "state":..,"verdict":..,"verdict_source":..} -->  (machine marker, v2)
 #   ## OpenHands Agent — <Completed|Completed — no agent summary|Agent failed|
@@ -58,7 +58,7 @@
 # PR/issue replaces (supersedes) the previously QUEUED run — the newest request
 # wins, the running one always finishes. This supersession is a deliberate,
 # documented choice: dispatch one trigger per intended run
-# (.llm/tools/agentic/dispatch-openhands.ts already enforces this note); a
+# (.llm/tools/agentic/openhands/dispatch-openhands.ts already enforces this note); a
 # superseded queued run never starts and never comments.
 #
 # Security: least-privilege permissions are granted at the job level (the

@@ -34,7 +34,7 @@
  *   deno task release:publish -- 0.0.1-alpha.20 --message "One-line intro." --dry-run
  */
 
-import { githubRequest, resolveGithubToken } from '../agentic/agentic-lib.ts';
+import { githubRequest, resolveGithubToken } from '../agentic/lib/agentic-lib.ts';
 
 const DEFAULT_REPO = 'rickylabs/netscript';
 

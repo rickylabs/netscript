@@ -148,16 +148,16 @@ identifiers as your local-profile placeholders, not fixed values.
   re-verify per branch with the toolchain command in [Verification Commands](#verification-commands).
 - Snapshot toolchain: Deno `2.7.11`, .NET SDK `10.0.109`, Aspire CLI `13.3.0`, Docker `29.1.3`, Node `18.19.1`, npm `9.2.0`
 
-Default reasoning remains `medium`. Override per launch only when the task calls for it:
+Model, provider, and effort are required launch identity. Select them from
+`.llm/harness/workflow/lane-policy.md`; this skill does not carry a second effort table. Pinned
+tool versions are centralized in `.llm/tools/agentic/config/versions.ts` — treat version literals
+above as snapshots.
 
-| Task | Effort |
-| ---- | ------ |
-| Mechanical launch, status, prompt steering, or no-edit smoke | `low` |
-| Daily implementation and ordinary supervision | `medium` |
-| Debugging, self-evaluation, or ambiguous solution finding | `high` |
-| Explicit user request or unusually complex/high-risk work | `xhigh` |
-
-The Windows-side helper lives at:
+For daemon/session health and repair, reach for the runtime controller **first**:
+`deno task agentic:runtime doctor` / `status --worktree <path>` are inspect-only, and
+`deno task agentic:runtime repair codex-remote --worktree <path> [--dry-run]` plans the smallest
+safe repair of unmanaged app-server daemon state without interrupting active sessions. The
+Windows-side PowerShell helper below is the manual transport-restoration fallback; it lives at:
 
 ```powershell
 $env:USERPROFILE\.codex\skills\codex-wsl-remote\scripts\start-codex-wsl-remote.ps1
@@ -283,10 +283,10 @@ Prefer the agentic suite: `launch-codex-slice.ts` validates the brief, runs the 
 stages with CRLF stripped, launches, and records the thread id for you (see the table above).
 
 Supervise without polling: run `.llm/tools/harness/watch-run.ts <run-dir>` (run-artifact watcher), or
-`.llm/tools/agentic/codex-watch.ts` from inside WSL — `--worktree <wsl path>` to wake on git
+`.llm/tools/agentic/codex/codex-watch.ts` from inside WSL — `--worktree <wsl path>` to wake on git
 activity (progress), and `--mode turn --thread-id <uuid>` to wake when the turn finishes (idle). The
 git event alone does not mean the agent stopped; pair the two. Steer only with
-`.llm/tools/agentic/codex-resume.ts` (or `codex exec resume <thread-id>`); never fire a second
+`.llm/tools/agentic/codex/codex-resume.ts` (or `codex exec resume <thread-id>`); never fire a second
 `send-message-v2` at the same worktree.
 
 For full CLI E2E, use the `netscript-cli` skill and run:

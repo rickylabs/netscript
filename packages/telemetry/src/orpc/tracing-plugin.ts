@@ -1,25 +1,22 @@
 /**
- * oRPC Tracing Plugin
+ * oRPC OpenTelemetry plugin adapter.
  *
- * Enriches Deno OTEL HTTP spans with oRPC-specific metadata.
- * This plugin adds RPC attributes to the active span without creating duplicate spans.
- *
- * Uses oRPC's interceptor-based plugin architecture to hook into the request lifecycle.
+ * Registers oRPC's first-party OpenTelemetry instrumentation and annotates the
+ * active oRPC span with NetScript RPC attributes.
  *
  * @module
  */
 
-import { trace } from '@opentelemetry/api';
-import { SpanStatusCode } from '../application/mod.ts';
+import { type Span, SpanStatusCode, trace } from '@opentelemetry/api';
+import { ORPCInstrumentation, type ORPCInstrumentationConfig } from '@orpc/otel';
+import type { Attributes, AttributeValue } from '../application/mod.ts';
 import type { GenericHandlerOptions } from './_types.ts';
 import { extractInputKeys } from './_utils.ts';
 
-// ============================================================================
-// TYPES
-// ============================================================================
+let sharedInstrumentation: ORPCInstrumentation | undefined;
 
 /**
- * Options for the TracingPlugin
+ * Options for the oRPC tracing plugin.
  */
 export interface TracingPluginOptions {
   /**
@@ -47,21 +44,115 @@ export interface TracingPluginOptions {
    * @default '' (no prefix)
    */
   attributePrefix?: string;
+
+  /**
+   * Optional upstream oRPC instrumentation config.
+   */
+  instrumentationConfig?: ORPCInstrumentationConfig;
+
+  /**
+   * Optional instrumentation instance for tests or custom composition roots.
+   */
+  instrumentation?: Pick<ORPCInstrumentation, 'enable'>;
+
+  /**
+   * Optional active-span reader for tests. Production uses
+   * `trace.getActiveSpan()`.
+   */
+  activeSpanProvider?: () => Span | undefined;
 }
 
-// ============================================================================
-// PLUGIN IMPLEMENTATION
-// ============================================================================
+interface ErrorLike {
+  readonly message?: string;
+  readonly code?: string;
+  readonly status?: number;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object';
+}
+
+function readProperty(source: unknown, key: string): unknown {
+  return isRecord(source) ? source[key] : undefined;
+}
+
+function readPath(source: unknown): string {
+  const path = readProperty(source, 'path');
+  if (Array.isArray(path)) {
+    return path.map((part) => String(part)).join('.');
+  }
+  return typeof path === 'string' ? path : 'unknown';
+}
+
+function toErrorLike(error: unknown): ErrorLike {
+  if (error instanceof Error) {
+    const code = readProperty(error, 'code');
+    const status = readProperty(error, 'status');
+    return {
+      message: error.message,
+      ...(typeof code === 'string' ? { code } : {}),
+      ...(typeof status === 'number' ? { status } : {}),
+    };
+  }
+  if (isRecord(error)) {
+    const message = readProperty(error, 'message');
+    const code = readProperty(error, 'code');
+    const status = readProperty(error, 'status');
+    return {
+      ...(typeof message === 'string' ? { message } : {}),
+      ...(typeof code === 'string' ? { code } : {}),
+      ...(typeof status === 'number' ? { status } : {}),
+    };
+  }
+  return { message: String(error) };
+}
+
+function recordException(span: Span, error: unknown): void {
+  span.recordException(error instanceof Error ? error : new Error(String(error)));
+}
+
+function prefixedAttributes(
+  prefix: string,
+  attributes: Readonly<Record<string, AttributeValue>>,
+): Attributes {
+  const result: Attributes = {};
+  for (const [key, value] of Object.entries(attributes)) {
+    result[`${prefix}${key}`] = value;
+  }
+  return result;
+}
+
+function getOrCreateInstrumentation(
+  config?: ORPCInstrumentationConfig,
+): ORPCInstrumentation {
+  sharedInstrumentation ??= new ORPCInstrumentation(config);
+  return sharedInstrumentation;
+}
+
+/**
+ * Register oRPC's first-party OpenTelemetry instrumentation.
+ *
+ * @param config - Optional upstream instrumentation config.
+ * @returns The enabled instrumentation instance.
+ */
+export function registerORPCInstrumentation(
+  config?: ORPCInstrumentationConfig,
+): ORPCInstrumentation {
+  const instrumentation = getOrCreateInstrumentation(config);
+  instrumentation.enable();
+  return instrumentation;
+}
 
 /**
  * TracingPlugin for oRPC handlers.
  *
- * Enriches the active Deno OTEL span with RPC-specific attributes:
+ * The plugin delegates span creation and lifecycle to `@orpc/otel`
+ * `ORPCInstrumentation`. Its interceptors only enrich the active upstream span:
  * - `rpc.system`: Always "orpc"
  * - `rpc.service`: The service name
- * - `rpc.method`: The full procedure path (e.g., "v1.users.list")
+ * - `rpc.method`: The full procedure path (e.g. "v1.users.list")
  * - `rpc.input_keys`: Comma-separated list of input keys (optional)
- * - `rpc.error.code`: Error code on failure
+ * - `netscript.rpc.*`: NetScript RPC attributes
  *
  * @example
  * ```ts
@@ -76,10 +167,17 @@ export interface TracingPluginOptions {
  * ```
  */
 export class TracingPlugin {
-  private readonly options: Required<TracingPluginOptions>;
+  private readonly options: Required<
+    Omit<
+      TracingPluginOptions,
+      'activeSpanProvider' | 'instrumentation' | 'instrumentationConfig'
+    >
+  >;
+  private readonly instrumentation: Pick<ORPCInstrumentation, 'enable'>;
+  private readonly activeSpanProvider: () => Span | undefined;
 
   /**
-   * Plugin order - run early to set attributes before other processing
+   * Plugin order - run early to set attributes before other processing.
    */
   order = 1000;
 
@@ -87,6 +185,9 @@ export class TracingPlugin {
    * Create an oRPC tracing plugin.
    */
   constructor(options: TracingPluginOptions = {}) {
+    this.instrumentation = options.instrumentation ??
+      getOrCreateInstrumentation(options.instrumentationConfig);
+    this.activeSpanProvider = options.activeSpanProvider ?? (() => trace.getActiveSpan());
     this.options = {
       serviceName: options.serviceName ?? 'unknown',
       recordInputKeys: options.recordInputKeys ?? true,
@@ -96,114 +197,93 @@ export class TracingPlugin {
   }
 
   /**
-   * Initialize the plugin by adding interceptors to the handler options.
-   * This is called by oRPC when the handler is created.
-   *
-   * Uses generic types to be compatible with any oRPC handler version.
+   * Initialize the plugin by registering upstream instrumentation and adding
+   * NetScript attribute interceptors to the handler options.
    */
-  // deno-lint-ignore no-explicit-any -- oRPC does not export the router type consumed by plugin init.
-  init(handlerOptions: GenericHandlerOptions, _router?: any): void {
+  init(handlerOptions: GenericHandlerOptions, _router?: unknown): void {
+    this.instrumentation.enable();
+
     const { serviceName, recordInputKeys, maxInputKeys, attributePrefix } = this.options;
 
-    // Add root interceptor for request-level tracing
     handlerOptions.rootInterceptors ??= [];
-    // deno-lint-ignore no-explicit-any
-    handlerOptions.rootInterceptors.push(async (options: any) => {
-      const span = trace.getActiveSpan();
-
-      if (span) {
-        // Set base RPC attributes at request start
-        span.setAttributes({
-          [`${attributePrefix}rpc.system`]: 'orpc',
-          [`${attributePrefix}rpc.service`]: serviceName,
-        });
-      }
+    handlerOptions.rootInterceptors.push(async (options: unknown) => {
+      const span = this.activeSpanProvider();
+      span?.setAttributes(prefixedAttributes(attributePrefix, {
+        'rpc.system': 'orpc',
+        'rpc.service': serviceName,
+        'netscript.rpc.transport': 'orpc',
+      }));
 
       try {
-        const result = await options.next();
-
-        // Set success status if we have a matched response
-        if (span && result?.matched) {
-          span.setStatus({ code: SpanStatusCode.OK });
-        }
-
+        const result = await readNext(options)();
+        span?.setStatus({ code: SpanStatusCode.OK });
         return result;
       } catch (error) {
-        // Handle errors at root level
         if (span) {
-          const err = error as Error & { code?: string; status?: number };
+          const err = toErrorLike(error);
           span.setStatus({
             code: SpanStatusCode.ERROR,
             message: err.message,
           });
-          span.setAttributes({
-            [`${attributePrefix}rpc.error.code`]: err.code ?? 'UNKNOWN',
-          });
-          span.recordException(err);
+          span.setAttributes(prefixedAttributes(attributePrefix, {
+            'rpc.error.code': err.code ?? 'UNKNOWN',
+          }));
+          recordException(span, error);
         }
         throw error;
       }
     });
 
-    // Add client interceptor for procedure-level tracing
     handlerOptions.clientInterceptors ??= [];
-    // deno-lint-ignore no-explicit-any
-    handlerOptions.clientInterceptors.push(async (options: any) => {
-      const span = trace.getActiveSpan();
+    handlerOptions.clientInterceptors.push(async (options: unknown) => {
+      const span = this.activeSpanProvider();
+      const procedurePath = readPath(options);
 
       if (span) {
-        // Set procedure path
-        const procedurePath = Array.isArray(options.path)
-          ? options.path.join('.')
-          : String(options.path);
-        span.setAttributes({
-          [`${attributePrefix}rpc.method`]: procedurePath,
-        });
+        span.setAttributes(prefixedAttributes(attributePrefix, {
+          'rpc.method': procedurePath,
+          'netscript.rpc.procedure': procedurePath,
+        }));
 
-        // Record input keys if enabled
-        if (recordInputKeys && options.input) {
-          const inputKeys = extractInputKeys(options.input, maxInputKeys);
+        const input = readProperty(options, 'input');
+        if (recordInputKeys && input) {
+          const inputKeys = extractInputKeys(input, maxInputKeys);
           if (inputKeys.length > 0) {
             span.setAttribute(`${attributePrefix}rpc.input_keys`, inputKeys.join(','));
           }
         }
 
-        // Add event for procedure start
         span.addEvent('rpc.procedure.start', {
           'rpc.method': procedurePath,
         });
       }
 
       try {
-        const result = await options.next();
-
-        if (span) {
-          span.addEvent('rpc.procedure.success');
-        }
-
+        const result = await readNext(options)();
+        span?.addEvent('rpc.procedure.success');
         return result;
       } catch (error) {
         if (span) {
-          const err = error as Error & { code?: string; status?: number };
+          const err = toErrorLike(error);
 
           span.setStatus({
             code: SpanStatusCode.ERROR,
-            message: err.message,
+            message: err.message ?? 'Unknown oRPC error',
           });
 
-          span.setAttributes({
-            [`${attributePrefix}rpc.error.code`]: err.code ?? 'UNKNOWN',
-            [`${attributePrefix}rpc.error.message`]: err.message,
-          });
+          span.setAttributes(prefixedAttributes(attributePrefix, {
+            'rpc.error.code': err.code ?? 'UNKNOWN',
+            'rpc.error.message': err.message ?? 'Unknown oRPC error',
+          }));
 
           if (err.status) {
             span.setAttribute(`${attributePrefix}rpc.error.status`, err.status);
           }
 
-          span.recordException(err);
+          recordException(span, error);
           span.addEvent('rpc.procedure.error', {
             'error.code': err.code ?? 'UNKNOWN',
-            'error.message': err.message,
+            'error.message': err.message ?? 'Unknown oRPC error',
           });
         }
 
@@ -213,15 +293,19 @@ export class TracingPlugin {
   }
 }
 
-// ============================================================================
-// FACTORY FUNCTION
-// ============================================================================
+function readNext(source: unknown): () => Promise<unknown> {
+  const next = readProperty(source, 'next');
+  if (typeof next !== 'function') {
+    throw new TypeError('oRPC interceptor options must include next()');
+  }
+  return () => Promise.resolve(next.call(source));
+}
 
 /**
  * Create a TracingPlugin instance.
  *
- * @param options - Plugin options
- * @returns A new TracingPlugin instance
+ * @param options - Plugin options.
+ * @returns A new TracingPlugin instance.
  *
  * @example
  * ```ts

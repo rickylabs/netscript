@@ -2,7 +2,7 @@
   "name": "@netscript/plugin-sagas",
   "version": "0.0.1-beta.5",
   "description": "NetScript plugin for durable saga orchestration, workflow APIs, and saga runtime metadata.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "exports": {
     ".": "./mod.ts",
     "./adapter-cli": "./cli.ts",

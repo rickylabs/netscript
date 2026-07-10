@@ -2,7 +2,7 @@
   "name": "@netscript/plugin-streams-core",
   "version": "0.0.1-beta.5",
   "description": "Schema, producer, config, telemetry, testing, and diagnostics primitives for NetScript streams.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "exports": {
     ".": "./mod.ts",
     "./telemetry": "./src/telemetry/mod.ts",
