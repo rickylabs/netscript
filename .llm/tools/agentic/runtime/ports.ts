@@ -50,14 +50,40 @@ export interface AgentProcessRequest {
   readonly cwd: string;
   readonly timeoutMs: number;
   readonly maxCaptureBytes: number;
+  readonly environment?: ChildEnvironmentPolicy;
 }
+export interface ChildEnvironmentBinding {
+  readonly sourceKey: import('./provider-profiles.ts').ProviderCredentialKey;
+  readonly targetKey: import('./provider-profiles.ts').ProviderCredentialKey;
+}
+export interface ChildEnvironmentPolicy {
+  readonly clearKeys: readonly string[];
+  readonly emptyKeys?: readonly string[];
+  readonly bindings: readonly ChildEnvironmentBinding[];
+  readonly fixedValues?: readonly ChildEnvironmentFixedValue[];
+}
+export interface ChildEnvironmentFixedValue {
+  readonly targetKey: import('./provider-profiles.ts').ProviderRouteKey | 'CODEX_HOME' | 'WSLENV';
+  readonly value: string;
+}
+export interface ChildProcessOutcome {
+  readonly exitCode: number;
+  readonly timedOut: boolean;
+  readonly diagnostic?: RuntimeDiagnostic;
+}
+export type ChildProcessPort = { run(request: AgentProcessRequest): Promise<ChildProcessOutcome> };
 export interface AgentCommandPlan {
   readonly agent: AgentKind;
   readonly operation: AgentLifecycleOperation;
   readonly route: RouteIdentity;
   readonly content?: ContentReference;
   readonly request: AgentProcessRequest | null;
+  readonly providerCompatibility?: ProviderRouteCompatibility;
   readonly diagnostics: readonly RuntimeDiagnostic[];
+}
+export interface ProviderRouteCompatibility {
+  readonly remoteControl: 'available' | 'unavailable' | 'not_applicable';
+  readonly experimentalNonAnthropicModel: boolean;
 }
 export type RuntimeInspectorPort = { observeRuntime(): Promise<ObservedRuntimeState> };
 export type PersistedStateReaderPort = {

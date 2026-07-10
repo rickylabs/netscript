@@ -31,6 +31,8 @@ interface Options {
   worktree?: string;
   user: string;
   dryRun: boolean;
+  profile?: string;
+  profileHome?: string;
 }
 
 function printHelp(): void {
@@ -44,6 +46,8 @@ function printHelp(): void {
     '  --message <text>      Follow-up message. Required unless --message-file is given.',
     '  --message-file <path> Windows path to a file holding the follow-up message.',
     '  --worktree <path>     WSL worktree to cd into before resuming (optional).',
+    '  --profile <name>      Named Codex profile layer for this child only.',
+    '  --profile-home <dir>  Isolated CODEX_HOME containing the named profile.',
     '  --user <name>         WSL user. Default: codex.',
     '  --dry-run             Print the exact command without sending.',
     '  --help                Show this help.',
@@ -69,6 +73,14 @@ function parseArgs(args: string[]): Options | null {
         break;
       case '--worktree':
         o.worktree = requireValue(args, i, a);
+        i++;
+        break;
+      case '--profile':
+        o.profile = requireValue(args, i, a);
+        i++;
+        break;
+      case '--profile-home':
+        o.profileHome = requireValue(args, i, a);
         i++;
         break;
       case '--user':
@@ -103,6 +115,10 @@ async function main(): Promise<void> {
     console.error('--thread-id is required and must be a valid thread/session UUID.');
     Deno.exit(2);
   }
+  if (Boolean(o.profile) !== Boolean(o.profileHome)) {
+    console.error('--profile and --profile-home must be supplied together.');
+    Deno.exit(2);
+  }
 
   let message = o.message;
   if (o.messageFile) {
@@ -115,9 +131,13 @@ async function main(): Promise<void> {
   }
 
   const cd = o.worktree ? `cd ${sq(o.worktree)} && ` : '';
-  const script = `${cd}export PATH="$HOME/.local/bin:$PATH"; codex exec resume ${o.threadId} -- ${
-    sq(message)
-  }`;
+  const profile = o.profile && o.profileHome
+    ? `export CODEX_HOME=${sq(o.profileHome)}; codex --profile ${sq(o.profile)}`
+    : 'codex';
+  const script =
+    `${cd}export PATH="$HOME/.local/bin:$PATH"; ${profile} exec resume ${o.threadId} -- ${
+      sq(message)
+    }`;
 
   if (o.dryRun) {
     console.log(

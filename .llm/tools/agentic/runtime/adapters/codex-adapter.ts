@@ -9,6 +9,8 @@ import {
 } from '../../agentic-lib.ts';
 import type { RouteIdentity, RuntimeCommand, RuntimeDiagnostic } from '../contract.ts';
 import type { AgentCommandPlan, AgentProcessRequest } from '../ports.ts';
+import { childEnvironmentPolicyForProfile, resolveProviderProfile } from '../provider-profiles.ts';
+import type { CodexProfileReference } from './codex-profile-adapter.ts';
 import { validateProviderRoute } from './provider-adapter.ts';
 
 export const CODEX_LAUNCH_WRAPPER = '.llm/tools/agentic/launch-codex-slice.ts';
@@ -26,6 +28,7 @@ export interface CodexPlanningInput {
   readonly credentialKeyNames?: readonly string[];
   readonly handoff?: CodexHandoffInspection;
   readonly turn?: CodexTurnObservation;
+  readonly profile?: CodexProfileReference;
 }
 
 export interface CodexHandoffInspection {
@@ -93,6 +96,7 @@ export function planCodexCommand(input: CodexPlanningInput): AgentCommandPlan {
     credentialKeyNames: input.credentialKeyNames,
   });
   const diagnostics = [...provider.diagnostics];
+  const profile = resolveProviderProfile(command.route);
   if (command.route.agent !== 'codex') {
     diagnostics.push(
       diagnostic('route_conflict', 'policy', 'Codex adapter requires a Codex route'),
@@ -112,6 +116,13 @@ export function planCodexCommand(input: CodexPlanningInput): AgentCommandPlan {
     diagnostics.push(
       diagnostic('missing_identity', 'input', 'inspected git HEAD is missing'),
     );
+  }
+  if (profile?.endpointKind === 'openrouter' && !input.profile) {
+    diagnostics.push(diagnostic(
+      'state_missing',
+      'state',
+      'Codex OpenRouter route requires a materialized named profile',
+    ));
   }
   const safety = evaluateGitSafety(input.git, { branch: input.expectedBranch });
   if (!safety.ok || input.git.dirty !== 0) {
@@ -141,6 +152,9 @@ export function planCodexCommand(input: CodexPlanningInput): AgentCommandPlan {
         '--allow-write',
         '--allow-run',
         CODEX_LAUNCH_WRAPPER,
+        ...(input.profile
+          ? ['--profile', input.profile.name, '--profile-home', input.profile.home]
+          : []),
         '--brief',
         command.content.path,
         '--worktree',
@@ -164,6 +178,9 @@ export function planCodexCommand(input: CodexPlanningInput): AgentCommandPlan {
         '--allow-read',
         '--allow-run',
         CODEX_RESUME_WRAPPER,
+        ...(input.profile
+          ? ['--profile', input.profile.name, '--profile-home', input.profile.home]
+          : []),
         '--thread-id',
         command.session.sessionId,
         '--message-file',
@@ -178,7 +195,20 @@ export function planCodexCommand(input: CodexPlanningInput): AgentCommandPlan {
     operation: command.kind,
     route: command.route,
     content: command.content,
-    request: processRequest,
+    request: processRequest && profile
+      ? {
+        ...processRequest,
+        environment: childEnvironmentPolicyForProfile(
+          profile,
+          command.route,
+          input.profile?.home,
+        ),
+      }
+      : processRequest,
+    providerCompatibility: {
+      remoteControl: 'not_applicable',
+      experimentalNonAnthropicModel: false,
+    },
     diagnostics,
   };
 }

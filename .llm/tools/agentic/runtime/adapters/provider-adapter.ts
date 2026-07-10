@@ -8,6 +8,7 @@ import {
   type RuntimeDiagnostic,
 } from '../contract.ts';
 import type { SessionIdentity } from '../contract.ts';
+import { PROVIDER_CREDENTIAL_KEYS, resolveProviderProfile } from '../provider-profiles.ts';
 
 export const PROVIDER_AGENT_PAIRS = {
   anthropic: 'claude',
@@ -15,9 +16,11 @@ export const PROVIDER_AGENT_PAIRS = {
   google: 'antigravity',
 } as const;
 
-export const CONFLICTING_CREDENTIAL_KEYS = {
-  claude: ['ANTHROPIC_API_KEY'],
-  codex: ['OPENAI_API_KEY'],
+export const CONFLICTING_CREDENTIAL_KEYS: Readonly<
+  Record<(typeof AGENT_KINDS)[number], readonly string[]>
+> = {
+  claude: PROVIDER_CREDENTIAL_KEYS,
+  codex: PROVIDER_CREDENTIAL_KEYS,
   antigravity: [],
 } as const;
 
@@ -56,22 +59,44 @@ export function validateProviderRoute(input: ProviderValidationInput): ProviderV
   ) {
     diagnostics.push(diagnostic('missing_identity', 'input', 'route identity is incomplete'));
   }
+  if (route.provider === 'custom') {
+    try {
+      const baseUrl = new URL(route.baseUrl ?? '');
+      if (
+        baseUrl.protocol !== 'https:' || baseUrl.username || baseUrl.password || baseUrl.search ||
+        baseUrl.hash
+      ) throw new Error('unsafe URL');
+    } catch {
+      diagnostics.push(diagnostic(
+        'unsupported_route',
+        'provider',
+        'custom Claude route requires a credential-free HTTPS base URL',
+      ));
+    }
+  }
   if (!input.nativeExt4 || !route.worktree?.startsWith('/home/')) {
     diagnostics.push(
       diagnostic('non_native_worktree', 'policy', 'route worktree is not native ext4'),
     );
   }
-  if (route.provider === 'openrouter' || route.provider === 'custom') {
+  const profile = resolveProviderProfile(route);
+  const nativeAgent = (PROVIDER_AGENT_PAIRS as Partial<Record<string, string>>)[route.provider];
+  if (profile && (profile.agent !== route.agent || profile.provider !== route.provider)) {
     diagnostics.push(diagnostic(
-      'capability_deferred',
-      'capability',
-      'provider route profiles are deferred to issue #577',
-      577,
+      'route_conflict',
+      'policy',
+      'route identity conflicts with the selected provider profile',
     ));
-  } else if (PROVIDER_AGENT_PAIRS[route.provider] !== route.agent) {
+  } else if (nativeAgent && nativeAgent !== route.agent) {
     diagnostics.push(
       diagnostic('route_conflict', 'policy', 'agent and provider identities conflict'),
     );
+  } else if (!profile && nativeAgent !== route.agent) {
+    diagnostics.push(diagnostic(
+      'unsupported_route',
+      'provider',
+      'provider route requires a supported explicit profile',
+    ));
   }
   if (input.requireSession && (!session?.sessionId?.trim() || !runtimeRoute.sessionId)) {
     diagnostics.push(
@@ -87,9 +112,8 @@ export function validateProviderRoute(input: ProviderValidationInput): ProviderV
       diagnostic('route_conflict', 'policy', 'route and session identities conflict'),
     );
   }
-  const allowed = (CONFLICTING_CREDENTIAL_KEYS as Partial<Record<string, readonly string[]>>)[
-    route.agent
-  ] ?? [];
+  const allowed = profile?.clearKeys ??
+    (CONFLICTING_CREDENTIAL_KEYS as Partial<Record<string, readonly string[]>>)[route.agent] ?? [];
   const conflictingKeyNames = (input.credentialKeyNames ?? []).filter((key) =>
     allowed.includes(key)
   );
