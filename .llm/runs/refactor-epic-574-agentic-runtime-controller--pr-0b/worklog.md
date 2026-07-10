@@ -902,3 +902,13 @@ the matching contract fixture, and owned runtime adapter probes now derive from 
 finds the three literal versions only in that fixture; historical foundation tests remain untouched.
 An assertion locks key order and runtime immutability. Focused planner: `14/0`; complete suite:
 `110/0`; scoped check/lint/fmt: `38/26/19`, zero findings. Production policy and behavior unchanged.
+
+## 2026-07-10 Final Tier-A — Legacy Schema 1.0 Checkpoint Compatibility
+
+Exact pre-S4 checkpoint JSON remains readable when `rollbackState` and `previous.desired` are
+absent. Per-resource progress is derived only from the serialized checkpoint status. A missing
+desired-state inverse is represented by the bounded `legacyInverseUnavailable: true` marker;
+ownership inspection returns `rollback_refused` before fingerprint reads or mutation rather than
+inventing prior desired state. An unrelated status command reads the legacy checkpoint summary and
+returns `no_change`. Focused S4 runtime: `42/0`; complete suite: `111/0`; scoped check/lint/fmt:
+`39/27/20`, zero findings. LOC caps and schema `1.0` remain intact; no dependency or lock change.

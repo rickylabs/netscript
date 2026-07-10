@@ -236,6 +236,13 @@ Runtime component versions are centralized in the frozen test-only
 tests. Literal scan is clean outside that fixture; focused `14/0`, complete `110/0`, wrappers
 `38/26/19` green. No production or child-issue scope changed.
 
+### Legacy checkpoint compatibility follow-up
+
+Schema-1.0 checkpoints missing pre-S4 fields now parse safely. Status supplies bounded rollback
+progress; absent desired-state inverse is explicitly unavailable and rollback-refused before any
+read/mutation. Unrelated status remains usable. Focused `42/0`, complete `111/0`, wrappers
+`39/27/20` green. Await Tier-A re-review; do not start S5/#578.
+
 ## Safety
 
 - Native ext4 only; explicit push refspec only.

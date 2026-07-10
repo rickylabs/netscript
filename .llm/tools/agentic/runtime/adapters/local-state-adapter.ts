@@ -180,7 +180,7 @@ function parsePrevious(value: unknown, strict: boolean) {
   // deno-fmt-ignore
   if (previous.kind === 'state-directory') return { kind: 'state-directory' as const, present: boolean(previous.present, 'previous presence') };
   // deno-fmt-ignore
-  if (previous.kind === 'desired-state') return { kind: 'desired-state' as const, desired: previous.desired === null ? null : parseDesiredRuntimeState(previous.desired, strict) };
+  if (previous.kind === 'desired-state') return { kind: 'desired-state' as const, desired: previous.desired === undefined || previous.desired === null ? null : parseDesiredRuntimeState(previous.desired, strict) };
   // deno-fmt-ignore
   if (previous.kind === 'route') return { kind: 'route' as const, route: parseRoute(previous.route, strict) };
   throw new Error('previous owned state invalid');
@@ -192,17 +192,20 @@ function parseCheckpoint(value: unknown, strict = true): RuntimeCheckpointState 
   if (checkpoint.schemaVersion !== RUNTIME_SCHEMA_VERSION) {
     throw new Error('checkpoint schema unsupported');
   }
+  const status = member(checkpoint.status, ['prepared', 'applied', 'rolled_back', 'partial'] as const, 'checkpoint status');
   // deno-fmt-ignore
   return {
     schemaVersion: RUNTIME_SCHEMA_VERSION,
     checkpointId: string(checkpoint.checkpointId, 'checkpoint id'),
     commandId: string(checkpoint.commandId, 'checkpoint command id'),
     createdAt: string(checkpoint.createdAt, 'checkpoint created time'),
-    status: member(checkpoint.status, ['prepared', 'applied', 'rolled_back', 'partial'] as const, 'checkpoint status'),
+    status,
     resources: array(checkpoint.resources, 'resources').map((entry) => {
       const resource = object(entry, 'resource');
       // deno-fmt-ignore
-      known(resource, 'resourceId kind action beforeFingerprint afterFingerprint previous rollbackState', 'resource', strict);
+      known(resource, 'resourceId kind action beforeFingerprint afterFingerprint previous rollbackState legacyInverseUnavailable', 'resource', strict);
+      const previousObject = object(resource.previous, 'previous owned state');
+      const legacyInverseUnavailable = previousObject.kind === 'desired-state' && !Object.hasOwn(previousObject, 'desired');
       return {
         resourceId: string(resource.resourceId, 'resource id'),
         kind: member(resource.kind, ['directory', 'file', 'symlink', 'configuration'] as const, 'resource kind'),
@@ -210,7 +213,8 @@ function parseCheckpoint(value: unknown, strict = true): RuntimeCheckpointState 
         beforeFingerprint: resource.beforeFingerprint === null ? null : string(resource.beforeFingerprint, 'before fingerprint'),
         afterFingerprint: string(resource.afterFingerprint, 'after fingerprint'),
         previous: parsePrevious(resource.previous, strict),
-        rollbackState: member(resource.rollbackState, RESOURCE_ROLLBACK_STATES, 'rollback state'),
+        rollbackState: resource.rollbackState === undefined ? status === 'rolled_back' ? 'compensated' : status === 'applied' || status === 'partial' ? 'applied' : 'pending' : member(resource.rollbackState, RESOURCE_ROLLBACK_STATES, 'rollback state'),
+        ...(legacyInverseUnavailable || resource.legacyInverseUnavailable === true ? { legacyInverseUnavailable: true as const } : {}),
       };
     }),
     previousControllerState: checkpoint.previousControllerState === null ? null : parsePersistedRuntimeState(checkpoint.previousControllerState, strict),

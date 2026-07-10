@@ -102,3 +102,12 @@
   exact values; historical foundation tests were intentionally not refactored.
 - **Severity:** no implementation drift.
 - **Action:** retain explicit node/Claude/Gemini typing and order in the test fixture only.
+
+## 2026-07-10 - Schema 1.0 checkpoint reader gained bounded legacy migration
+
+- **Expected:** Adding rollback progress and exact desired inverse must not corrupt serialized
+  schema-1.0 checkpoints produced before S4.
+- **Actual:** The strict reader initially required both new fields without a schema transition.
+- **Severity:** backward-compatibility defect; unrelated commands could fail during checkpoint load.
+- **Action:** infer progress only from legacy checkpoint status and mark absent desired inverse as
+  unavailable. Refuse its rollback before ownership probes/mutation; do not invent metadata.

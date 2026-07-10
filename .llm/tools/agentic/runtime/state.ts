@@ -185,7 +185,7 @@ export function unavailableObservedSummary(stateId = 'unavailable'): ObservedSta
     checkpoints: [],
   };
 }
-export interface OwnedResourceState { readonly resourceId: string; readonly kind: OwnedResourceKind; readonly action: RuntimeAction; readonly beforeFingerprint: string | null; readonly afterFingerprint: string; readonly previous: OwnedResourcePrevious; readonly rollbackState: ResourceRollbackState; }
+export interface OwnedResourceState { readonly resourceId: string; readonly kind: OwnedResourceKind; readonly action: RuntimeAction; readonly beforeFingerprint: string | null; readonly afterFingerprint: string; readonly previous: OwnedResourcePrevious; readonly rollbackState: ResourceRollbackState; readonly legacyInverseUnavailable?: true; }
 export type OwnedResourcePrevious = Readonly<{ kind: 'component'; version: string | null }> | Readonly<{ kind: 'state-directory'; present: boolean }> | Readonly<{ kind: 'desired-state'; desired: DesiredRuntimeState | null }> | Readonly<{ kind: 'route'; route: RouteIdentity }>;
 export interface RuntimeCheckpointState {
   readonly schemaVersion: typeof RUNTIME_SCHEMA_VERSION;

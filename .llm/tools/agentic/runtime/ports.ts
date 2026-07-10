@@ -193,7 +193,7 @@ export async function inspectCheckpointOwnership(checkpoint: RuntimeCheckpointSt
   const remaining: import('./state.ts').OwnedResourceState[] = [];
   for (const resource of checkpoint.resources) {
     if (
-      ids.has(resource.resourceId) || !resource.action.reversible ||
+      ids.has(resource.resourceId) || resource.legacyInverseUnavailable || !resource.action.reversible ||
       resource.action.resourceIds.length !== 1 ||
       resource.action.resourceIds[0] !== resource.resourceId
     ) {
