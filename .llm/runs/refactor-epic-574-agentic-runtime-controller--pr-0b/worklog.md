@@ -939,3 +939,17 @@ Evidence: focused compatibility `2/0`; complete suite `125/0`; scoped check/lint
 timing-normalized semantic equality and source-tree equality. Existing controller tests cover the
 nine-command dry-run mutation matrix, secret sentinel, route, checkpoint, compensation, partial
 retry, and rollback refusal contracts. No lock/dependency/cache or runtime behavior change.
+
+## Final Generator Self-Review and DoD Handoff
+
+Substantive review found no uncommitted source defect. Remaining `gemini` production strings are
+restricted to the explicit legacy reader and merged foundation ownership probe ID. No executable
+alias, `agy login`, provider login, global default, sender, or child capability exists.
+
+DoD evidence is complete for stable JSON/human results, idempotent/version-aware planning, secret
+exclusion, exact route identity, transition/failure tests, and retained thin wrappers. The final
+Tier-A checkbox remains open for the Claude coordinator. Applicable internal-tool F-1/2/3/5/9/10/
+11/12/15/16/17/18/19 and F-CLI-1/2/5/15/16/19/21/23/25/26/28 pass via locked LOC, bounded
+contracts, explicit ports/adapters/renderers, scoped tests, and folder/scope inspection. Published-
+package/public/composition/asset/registry-only gates are N/A under the recorded deviation. No debt
+accepted; this generator does not self-certify.
