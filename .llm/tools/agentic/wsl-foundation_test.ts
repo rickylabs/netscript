@@ -45,6 +45,23 @@ Deno.test('component classifier distinguishes missing, outdated, and ready', () 
   );
 });
 
+Deno.test('component classifier rejects successful unparseable version output', () => {
+  const probe = classifyComponent({
+    component: 'node',
+    output: `not-a-version\n${'x'.repeat(200)}`,
+    exitCode: 0,
+    expected: '26.5.0',
+  });
+  assertEquals(probe.status, 'unavailable');
+  assertEquals(probe.detectedVersion, null);
+  assert(!probe.detail.includes('\n'), 'diagnostic must be single-line');
+  assert(probe.detail.length <= 108, 'diagnostic must be bounded');
+  assert(
+    probe.detail.startsWith('unparseable version output: not-a-version '),
+    'diagnostic is actionable',
+  );
+});
+
 Deno.test('state directory detail never contains an absolute home path', () => {
   const probe = classifyStateDirectory('state-claude', '.claude', true);
   assert(!probe.detail.includes('/home/'), 'detail must be home-path independent');

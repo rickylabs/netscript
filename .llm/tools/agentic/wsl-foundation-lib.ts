@@ -147,6 +147,11 @@ export function parseVersion(output: string): string | null {
   return output.match(/(\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?)/)?.[1] ?? null;
 }
 
+function boundedProbeDiagnostic(output: string): string {
+  const normalized = output.replace(/[\u0000-\u001f\u007f]+/g, ' ').replace(/\s+/g, ' ').trim();
+  return normalized ? normalized.slice(0, 80) : '<empty>';
+}
+
 /** Classifies one fixed tool probe into the stable doctor vocabulary. */
 export function classifyComponent(raw: RawComponentProbe): RuntimeProbe {
   const detectedVersion = parseVersion(raw.output);
@@ -157,6 +162,15 @@ export function classifyComponent(raw: RawComponentProbe): RuntimeProbe {
       expected: raw.expected ?? null,
       status: raw.exitCode === 127 ? 'missing' : 'unavailable',
       detail: raw.exitCode === 127 ? 'executable not found' : `probe exited ${raw.exitCode}`,
+    };
+  }
+  if (!detectedVersion) {
+    return {
+      component: raw.component,
+      detectedVersion: null,
+      expected: raw.expected ?? null,
+      status: 'unavailable',
+      detail: `unparseable version output: ${boundedProbeDiagnostic(raw.output)}`,
     };
   }
   if (raw.expected && detectedVersion && detectedVersion !== raw.expected) {
@@ -173,7 +187,7 @@ export function classifyComponent(raw: RawComponentProbe): RuntimeProbe {
     detectedVersion,
     expected: raw.expected ?? null,
     status: 'ready',
-    detail: detectedVersion ? 'version detected' : 'probe succeeded',
+    detail: 'version detected',
   };
 }
 

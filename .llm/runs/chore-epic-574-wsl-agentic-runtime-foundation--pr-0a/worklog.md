@@ -94,6 +94,7 @@ its rollback action; do not put provider credentials or values into reports.
 | 2026-07-10 | S3 | coordinator post-idle reconnect | After an anchored daemon repair, managed remote control returned `status=connected` on `YogaBook9i` / `env_e_6a2d7485c5a0832a82505a12442cd3ec`; CLI/app-server remained `0.144.1`. Same-thread resume returned exactly `CODEX_PR0A_RECONNECT_OK` with no edits. |
 | 2026-07-10 | S3 | coordinator Windows rollback | Native Windows Claude path remained present; version/help passed at `2.1.205`. A Windows no-edit interactive session remains owner-only and pending. |
 | 2026-07-10 | S3 | evidence reconcile | Coordinator evidence resolves the post-idle Codex reconnect gate and the Windows path/version/help checks. Claude/Gemini browser sign-in, mobile steering, sleep/network reconnect, and Windows no-edit interactive use remain pending. No evaluator was dispatched. |
+| 2026-07-10 | review fix | version false-green | Coordinator substantive review found that an exit-0 version probe with unparseable output was classified `ready`. The classifier now returns `unavailable` with a sanitized, bounded diagnostic; focused semantic coverage passes. |
 
 ## Decisions
 
@@ -195,6 +196,23 @@ subscription boundary. Existing settings are never overwritten; absent settings 
 edge is 498 LOC, below the internal-tool 500-LOC cap. No generic provider routing, daemon repair,
 credential acquisition, or evaluator work entered #575. Coordinator substantive review/sign-off is
 still required; this implementation worker does not self-certify.
+
+### Coordinator substantive review remediation — unparseable version output
+
+| Gate | Result | Raw exit | Evidence |
+| ---- | ------ | -------- | -------- |
+| Coordinator finding | FIXED | N/A | Exit-0 fixed version probes no longer become `ready` when `parseVersion` returns `null` |
+| Focused unit set | PASS | 0 | `12 passed`, `0 failed`; new test checks unavailable status, null version, single-line sanitization, 108-character total bound, and actionable diagnostic |
+| Scoped check wrapper | PASS | 0 | 3 owned TS files, 1 batch, 0 findings |
+| Scoped lint wrapper | PASS | 0 | 3 owned TS files, 1 batch, 0 findings |
+| Scoped format wrapper | PASS | 0 | 3 owned TS files, 1 batch, 0 findings |
+| Scope boundary | PASS | N/A | No #576 routing, #580 daemon repair, provider auth, or owner-canary behavior changed |
+
+Implementation detail: successful probes without a parsed semantic version now return
+`status: unavailable`, preserve `detectedVersion: null`, and report
+`unparseable version output: <diagnostic>`. The diagnostic replaces control/whitespace runs with one
+space and retains at most 80 characters of probe output. This closes the coordinator-identified
+false-green without changing missing, nonzero-exit, outdated, or ready semantics.
 
 ### Exact owner canaries still required
 

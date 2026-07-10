@@ -17,7 +17,9 @@ confirms managed remote control `status=connected` on `YogaBook9i` environment
 `env_e_6a2d7485c5a0832a82505a12442cd3ec`, matching CLI/app-server `0.144.1`, and same-thread resume
 returned exactly `CODEX_PR0A_RECONNECT_OK` without edits. Native Windows Claude path/version/help
 also passed at `2.1.205`. Owner-only provider login/mobile steering, sleep/network reconnect, and a
-Windows no-edit interactive session remain pending.
+Windows no-edit interactive session remain pending. Coordinator substantive review then found one
+doctor false-green: exit-0 version output with no parseable version was marked ready. The surgical
+classifier/test remediation is validated and ready to commit.
 
 ## Completed
 
@@ -38,10 +40,12 @@ Windows no-edit interactive session remain pending.
   boundaries without dispatching an evaluator.
 - Recorded coordinator post-idle anchored repair, managed reconnect, exact same-thread sentinel, and
   Windows Claude path/version/help evidence.
+- Fixed the coordinator-identified version-probe false-green: successful unparseable output is now
+  unavailable with a sanitized bounded diagnostic; focused tests and scoped wrappers pass.
 
 ## In Progress
 
-- Commit and explicitly push the coordinator evidence reconciliation and EOF-only hygiene fix.
+- Commit and explicitly push the coordinator-reviewed version-classification remediation.
 
 ## Next Steps
 
@@ -72,7 +76,7 @@ Windows no-edit interactive session remain pending.
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Static | S1-S3 PASS | 68 tests and scoped wrapper exits 0; `worklog.md` |
+| Static | S1-S3 + review fix PASS | prior 68-test gate plus focused 12-test remediation; scoped wrappers exit 0 |
 | Fitness | planned | `plan.md` |
 | Runtime | PARTIAL / OWNER CANARIES | Codex post-idle reconnect passes; provider mobile and sleep/network checks pending |
 | Consumer | PASS | clean non-login WSL shell resolves all installed tools |
@@ -87,6 +91,8 @@ Windows no-edit interactive session remain pending.
   `oauth-personal`, and forbidden environment routes are redaction-tested.
 - Codex post-idle managed reconnect and exact same-thread no-edit sentinel pass by coordinator
   evidence. Windows Claude path/version/help pass at `2.1.205`; interactive no-edit use remains.
+- No open implementation question remains from coordinator substantive review; owner browser/mobile
+  boundaries are unchanged and unclaimed.
 
 ## Drift and Debt
 
