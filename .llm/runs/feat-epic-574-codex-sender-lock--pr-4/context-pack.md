@@ -6,13 +6,13 @@
 | ----- | ----- |
 | Run ID | `feat-epic-574-codex-sender-lock--pr-4` |
 | Branch | `feat/epic-574-codex-sender-lock` |
-| Current phase | `plan-eval` |
+| Current phase | `implement` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `docs` |
 
 ## Current State
 
-Plan slice authored at HEAD `4756eb4`, descended from integration baseline `fe3c63fb`. No source implementation has begun. The external Claude coordinator owns PLAN-EVAL, Tier-A review/sign-off, and merge.
+Plan slice landed as `1d165762`, descended from integration baseline `fe3c63fb`. The external Claude coordinator approved the Plan-Gate and continues to own Tier-A review/sign-off and merge. Slice 2 now implements the ownership domain/store and pre-spawn Codex duplicate refusal.
 
 ## Completed
 
@@ -23,13 +23,12 @@ Plan slice authored at HEAD `4756eb4`, descended from integration baseline `fe3c
 
 ## In Progress
 
-- Slice 1 validation, commit, explicit-refspec push, and PR plan comment.
+- Slice 2 commit, explicit-refspec push, and PR evidence.
 
 ## Next Steps
 
-1. Coordinator performs separate PLAN-EVAL and records PASS/required changes.
-2. Only after PASS, implement slice 2 and hand it to Tier-A for substantive review before sign-off.
-3. Implement slice 3, run full gates, and hand off for coordinator Tier-A/IMPL-EVAL workflow.
+1. Land slice 2 with required PR evidence.
+2. Implement slice 3, run full gates, and hand off for coordinator Tier-A/IMPL-EVAL workflow.
 
 ## Key Decisions
 
@@ -41,14 +40,15 @@ Plan slice authored at HEAD `4756eb4`, descended from integration baseline `fe3c
 
 ## Files Changed
 
-- Run artifacts only in slice 1; `codex-thread-ids.md` existed before worker edits and is preserved as run identity evidence.
+- Slice 2: sender ownership domain/store/tests, Codex adapter duplicate refusal, and run artifacts.
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Plan | awaiting coordinator | `research.md`, `plan.md`, `worklog.md ## Design` |
-| Static/Fitness/Runtime/Consumer | not run | implementation prohibited before Plan-Gate PASS |
+| Plan | PASS | coordinator approval recorded in `plan-eval.md` |
+| Slice 2 static | PASS | check/lint/fmt: 45 files, 0 findings each |
+| Slice 2 runtime | PASS | 15 focused tests passed, 0 failed |
 
 ## Open Questions
 

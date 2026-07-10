@@ -60,12 +60,20 @@ Start at `runtime/contract.ts` for canonical vocabulary, follow the action into 
 | ---- | ----- | ---- | ----- |
 | 2026-07-10 | 1 | pre-flight | Explicit fetch succeeded after stale local origin refspec failed; ancestry exit 0; one pre-existing untracked thread-id artifact preserved. |
 | 2026-07-10 | 1 | design | Research and plan recorded; implementation is stopped pending separate coordinator Plan-Gate. |
+| 2026-07-10 | 1 | Plan-Gate | External Claude coordinator approved the locked plan; slice 2 implementation authorized. |
+| 2026-07-10 | 2 | implementation | Added strict sender ownership domain/atomic store and pre-spawn duplicate refusal with resume guidance. |
+| 2026-07-10 | 2 | reconcile | #580 remains the only owned issue; #581/#582 surfaces are unchanged. PR #589 remains draft pending coordinator review. |
 
 ## Gate Results
 
 | Gate | Result | Notes |
 | ---- | ------ | ----- |
-| PLAN-EVAL | NOT_RUN | Must be performed by coordinator/separate session; this worker does not self-certify. |
+| PLAN-EVAL | PASS | External coordinator approval recorded in `plan-eval.md`; worker does not self-certify. |
+| Slice 2 focused tests | PASS | 15 passed, 0 failed; exit 0. |
+| Slice 2 scoped check | PASS | 45 files, 0 findings; exit 0. |
+| Slice 2 scoped lint | PASS | 45 files, 0 findings; exit 0. |
+| Slice 2 scoped fmt | PASS | 45 files, 0 findings; exit 0. |
+| Slice 2 diff/lock | PASS | `git diff --check` exit 0; `deno.lock` unchanged. |
 
 ## Handoff Notes
 

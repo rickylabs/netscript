@@ -9,6 +9,7 @@ import {
 } from '../../agentic-lib.ts';
 import type { RouteIdentity, RuntimeCommand, RuntimeDiagnostic } from '../contract.ts';
 import type { AgentCommandPlan, AgentProcessRequest } from '../ports.ts';
+import { decideSenderOwnership, type SenderOwnershipObservation } from '../sender-ownership.ts';
 import { childEnvironmentPolicyForProfile, resolveProviderProfile } from '../provider-profiles.ts';
 import type { CodexProfileReference } from './codex-profile-adapter.ts';
 import { validateProviderRoute } from './provider-adapter.ts';
@@ -29,6 +30,7 @@ export interface CodexPlanningInput {
   readonly handoff?: CodexHandoffInspection;
   readonly turn?: CodexTurnObservation;
   readonly profile?: CodexProfileReference;
+  readonly ownership?: SenderOwnershipObservation;
 }
 
 export interface CodexHandoffInspection {
@@ -134,6 +136,15 @@ export function planCodexCommand(input: CodexPlanningInput): AgentCommandPlan {
   }
   let processRequest: AgentProcessRequest | null = null;
   if (command.kind === 'launch') {
+    const ownership = decideSenderOwnership(
+      command.route.worktree,
+      input.ownership ?? {
+        record: null,
+        ownerProcessAlive: false,
+        sessionActive: false,
+      },
+    );
+    if (ownership.kind === 'blocked') diagnostics.push(ownership.diagnostic);
     if (command.route.sessionId) {
       diagnostics.push(
         diagnostic('active_session', 'safety', 'launch route already names a session'),

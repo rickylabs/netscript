@@ -105,6 +105,37 @@ Deno.test('Codex launch uses a content file and preserves exact worktree identit
   ]);
 });
 
+Deno.test('Codex launch refuses an owned worktree before constructing a rival process', () => {
+  const command: Extract<RuntimeCommand, { kind: 'launch' }> = {
+    kind: 'launch',
+    commandId: 'duplicate',
+    mode: 'plan',
+    route: codexRoute,
+    content,
+  };
+  const record = {
+    schemaVersion: '1.0',
+    worktree,
+    ownerPid: 91,
+    leaseToken: 'lease',
+    state: 'active',
+    acquiredAt: '2026-07-10T20:00:00.000Z',
+    updatedAt: '2026-07-10T20:00:01.000Z',
+    sessionId: threadId,
+  } as const;
+  const plan = planCodexCommand({
+    command,
+    git,
+    expectedBranch: 'feature',
+    nativeExt4: true,
+    handoff: inspectCodexHandoff(handoff),
+    ownership: { record, ownerProcessAlive: true, sessionActive: true },
+  });
+  assertEquals(plan.request, null);
+  assertEquals(codes(plan.diagnostics), ['duplicate_sender_risk']);
+  assertEquals(plan.diagnostics[0]?.operatorAction, `resume existing session ${threadId}`);
+});
+
 Deno.test('Codex resume is same-thread only and cannot construct a new sender', () => {
   const command: Extract<RuntimeCommand, { kind: 'resume' }> = {
     kind: 'resume',
