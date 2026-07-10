@@ -1,4 +1,5 @@
 import { discoverWorkspaceMembers } from './publish-workspace.ts';
+import { JSR_API_BASE_URL } from './config/endpoints.ts';
 
 interface Options {
   readonly scope: string;
@@ -38,7 +39,6 @@ type ApiResult =
     readonly message: string;
   };
 
-const API_BASE_URL = 'https://api.jsr.io';
 const DEFAULT_SCOPE = 'netscript';
 const DEFAULT_REPO = 'rickylabs/netscript';
 const JSR_PACKAGE_PREFIX = '@netscript/';
@@ -220,7 +220,7 @@ async function requestApi(
     headers.set('authorization', `Bearer ${tokenValue}`);
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await fetch(`${JSR_API_BASE_URL}${path}`, {
     method,
     headers,
     body: body === undefined ? undefined : JSON.stringify(body),

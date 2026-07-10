@@ -127,9 +127,14 @@ routing here — defer to that file. The items below are the parts of the contra
   is a process failure.
 - **Self-evaluation** — The evaluator must be a separate session. The generator does not
   self-certify.
-- **Wrong evaluator surface** — Claude internal subagents are not PLAN-EVAL or IMPL-EVAL. Use
-  OpenHands with the required model, or record a blocked launch. The generator session may never
-  evaluate its own output.
+- **Wrong evaluator surface** — the generator session may never evaluate its own output. For a
+  **local-machine run**, PLAN-EVAL/IMPL-EVAL is a **separate local session of the opposite model
+  family** (e.g. a Codex GPT-5.6 session reviews Claude-authored work; a Claude session reviews
+  Codex-authored work), and the **supervisor chooses when to trigger it** — never auto-dispatch a
+  cloud evaluator from a sub-agent. **OpenHands is open-models-only (minimax M3 / Qwen 3.7) and
+  cloud-driven-runs-only; dispatching it with a closed model (Claude/GPT/Gemini) is prohibited (it
+  burns paid OpenRouter credit).** See `.agents/skills/openhands-handoff/SKILL.md` "Routing policy".
+  If no evaluator surface is available, record a blocked launch in `drift.md`.
 - **Self-certifying a slice** — a green automated gate is not a sign-off. The Tier-A supervisor must
   substantively review the slice before the sign-off commit, for every implementation lane
   (`workflow/lane-policy.md` invariant 2). No lane self-certifies.

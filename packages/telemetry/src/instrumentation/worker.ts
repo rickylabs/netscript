@@ -7,6 +7,7 @@
  * @module
  */
 
+import { metrics } from '@opentelemetry/api';
 import {
   addSpanEvent,
   type Attributes,
@@ -35,6 +36,7 @@ import {
   WorkerAttributes,
 } from '../attributes/mod.ts';
 import { getOtelEnvVars } from '../config/mod.ts';
+import type { Counter, Histogram, ObservableCallback, ObservableGauge } from '../ports/mod.ts';
 
 // ============================================================================
 // TYPES
@@ -127,6 +129,95 @@ export interface TracedWorkerConfig {
   queueName: string;
   /** Number of jobs the worker may process concurrently. */
   concurrency?: number;
+}
+
+/** Worker metric values emitted through the shared telemetry layer. */
+export interface WorkerMetricValues {
+  /** Number of jobs currently active on the worker. */
+  readonly activeJobs: number;
+  /** Number of jobs processed by this measurement point. */
+  readonly processedJobs?: number;
+  /** Number of failed jobs observed by this measurement point. */
+  readonly failedJobs?: number;
+  /** Average job duration in milliseconds. */
+  readonly avgDurationMs?: number;
+}
+
+/** Worker metric instruments owned by `@netscript/telemetry`. */
+export interface WorkerMetricInstruments {
+  /** Gauge reporting active job count. */
+  readonly activeJobs: ObservableGauge;
+  /** Counter for processed jobs. */
+  readonly processedJobs: Counter;
+  /** Counter for failed jobs. */
+  readonly failedJobs: Counter;
+  /** Histogram for job duration. */
+  readonly jobDuration: Histogram;
+}
+
+interface ActiveJobObservation {
+  readonly value: number;
+  readonly attributes: Attributes;
+}
+
+let sharedWorkerMetricInstruments: WorkerMetricInstruments | null = null;
+let activeJobObservations: ActiveJobObservation[] = [];
+
+const observeActiveJobs: ObservableCallback = (result) => {
+  for (const observation of activeJobObservations) {
+    result.observe(observation.value, observation.attributes);
+  }
+};
+
+/** Create shared worker metric instruments. */
+export function createWorkerMetricInstruments(): WorkerMetricInstruments {
+  const meter = metrics.getMeter('@netscript/worker', '1.0.0');
+  const activeJobs = meter.createObservableGauge('netscript.worker.active_jobs', {
+    description: 'Active NetScript worker jobs.',
+    unit: '{job}',
+  });
+  activeJobs.addCallback(observeActiveJobs);
+  return {
+    activeJobs,
+    processedJobs: meter.createCounter('netscript.worker.jobs.processed', {
+      description: 'NetScript worker jobs processed.',
+      unit: '{job}',
+    }),
+    failedJobs: meter.createCounter('netscript.worker.jobs.failed', {
+      description: 'NetScript worker jobs failed.',
+      unit: '{job}',
+    }),
+    jobDuration: meter.createHistogram('netscript.worker.job.duration', {
+      description: 'NetScript worker job duration.',
+      unit: 'ms',
+    }),
+  };
+}
+
+/** Return process-shared worker metric instruments. */
+export function getWorkerMetricInstruments(): WorkerMetricInstruments {
+  if (!sharedWorkerMetricInstruments) {
+    sharedWorkerMetricInstruments = createWorkerMetricInstruments();
+  }
+  return sharedWorkerMetricInstruments;
+}
+
+/** Emit worker metric values through shared telemetry instruments. */
+export function recordSharedWorkerMetrics(
+  values: WorkerMetricValues,
+  attributes: Attributes = {},
+): void {
+  const instruments = getWorkerMetricInstruments();
+  activeJobObservations = [{ value: values.activeJobs, attributes: { ...attributes } }];
+  if (values.processedJobs !== undefined) {
+    instruments.processedJobs.add(values.processedJobs, attributes);
+  }
+  if (values.failedJobs !== undefined) {
+    instruments.failedJobs.add(values.failedJobs, attributes);
+  }
+  if (values.avgDurationMs !== undefined) {
+    instruments.jobDuration.record(values.avgDurationMs, attributes);
+  }
 }
 
 // ============================================================================

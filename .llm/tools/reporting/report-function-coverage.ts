@@ -1,3 +1,5 @@
+import { dirname } from '@std/path';
+
 interface Options {
   coverageDir: string;
   out: string;
@@ -301,12 +303,6 @@ function normalizePath(path: string): string {
     return path;
   }
   return `${path}.ts`;
-}
-
-function dirname(path: string): string {
-  const normalized = path.replace(/\/+$/, '');
-  const slash = normalized.lastIndexOf('/');
-  return slash === -1 ? '.' : normalized.slice(0, slash);
 }
 
 async function exists(path: string): Promise<boolean> {
