@@ -6,15 +6,15 @@
 | --- | --- |
 | Run ID | `chore-epic-574-wsl-agentic-runtime-foundation--pr-0a` |
 | Branch | `chore/epic-574-wsl-agentic-runtime-foundation` |
-| Current phase | `plan` |
+| Current phase | `implement` |
 | Archetype | 6 — CLI / Tooling, scoped internal-tool variant |
 | Scope overlays | none |
 
 ## Current State
 
-The native WSL child worktree exists at the integration baseline with no upstream. Research, the
-locked plan, and the Design checkpoint are ready for the separate PLAN-EVAL. No implementation or
-machine mutation has begun.
+The native WSL child worktree exists at the integration baseline with no upstream. The owner
+personally reviewed the plan and waived the separate PLAN-EVAL. The single daemon-attached WSL
+Codex worker is authorized to implement S1-S3.
 
 ## Completed
 
@@ -24,14 +24,13 @@ machine mutation has begun.
 
 ## In Progress
 
-- First plan commit, explicit push, early draft PR, and OpenHands PLAN-EVAL dispatch.
+- Record the waiver commit, launch the one mobile-visible Codex thread, and hand it S1-S3.
 
 ## Next Steps
 
-1. Commit/push the child run and open the draft sub-PR against the integration branch.
-2. Dispatch minimax-M3 PLAN-EVAL and accept implementation only after committed `PASS`.
-3. Launch one attach-only GPT-5.6 Sol high Codex turn through `launch-codex-slice.ts`.
-4. Post exact thread/worktree/daemon/resume identity, then resume that thread for S1.
+1. Launch one GPT-5.6 Sol high Codex turn through `launch-codex-slice.ts`.
+2. Post exact thread/worktree/daemon/resume identity.
+3. Let that thread implement and push S1-S3.
 
 ## Key Decisions
 
@@ -69,4 +68,3 @@ machine mutation has begun.
 ## Commits
 
 - See the draft PR's commit list + per-slice PR comments.
-

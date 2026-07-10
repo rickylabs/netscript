@@ -76,6 +76,7 @@ its rollback action; do not put provider credentials or values into reports.
 | ---- | ----- | ---- | ----- |
 | 2026-07-10 | plan | baseline | Native WSL toolchain, managed Codex daemon, and Windows rollback versions captured. |
 | 2026-07-10 | plan | worktree | Native ext4 worktree created at `/home/codex/repos/netscript-epic-574-pr0a-foundation` with no upstream. |
+| 2026-07-10 | plan-eval | owner waiver | Owner personally reviewed the plan, declared it passed, and directed immediate WSL Codex delegation. |
 
 ## Decisions
 
@@ -99,10 +100,9 @@ its rollback action; do not put provider credentials or values into reports.
 | ---- | ------ | -------- | ----- |
 | Research current | PASS | `research.md` | Re-baselined at `b58b4c2a`. |
 | Design checkpoint | PASS | This section | Contract, ports, constants, slices, deferred scope, and contributor path recorded. |
-| PLAN-EVAL | NOT_RUN | `plan-eval.md` pending | Implementation remains blocked. |
+| PLAN-EVAL | PASS | `plan-eval.md` | Owner-reviewed explicit waiver. |
 
 ## Handoff Notes
 
 - Evaluator should challenge the #575/#576 boundary and whether every mobile/auth acceptance item has
   a concrete gate without requiring credentials in artifacts.
-

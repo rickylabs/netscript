@@ -27,4 +27,5 @@
   changes, yields the concrete thread ID, and then idles. Implementation starts only through
   `codex-resume.ts` on that same thread after the pre-slice GitHub comment records the identity.
 - Fable 5 is not authorized while it is paid/on-demand.
-
+- Separate PLAN-EVAL was explicitly waived by the owner after personal review on 2026-07-10; this
+  authorization is recorded in `plan-eval.md`.
