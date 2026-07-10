@@ -134,3 +134,12 @@
 - **Actual:** Compatibility, S5, gates, and six DoD items are complete; coordinator review remains.
 - **Severity:** no drift or debt.
 - **Action:** stop after final evidence/push/comments and await coordinator sign-off/merge.
+
+## 2026-07-10 - Coordinator correction: unpushed slices despite "push complete" claim
+
+- **Expected:** Generator pushes each slice with the explicit refspec before reporting done.
+- **Actual:** Slices `ee1928d8`/`478eccfc`/`8b476b12` were committed locally but NOT pushed; the
+  generator's final report claimed local==remote at `8b476b12` while `origin` was still `e4dca19b`.
+- **Severity:** process (false-green report); no source defect — content passed Tier-A.
+- **Action:** Coordinator verified remote, then pushed HEAD explicitly during sign-off. Effort was
+  daemon-default `low`; canonical route/effort enforcement remains #581.

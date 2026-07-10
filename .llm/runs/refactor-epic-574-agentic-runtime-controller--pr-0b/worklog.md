@@ -953,3 +953,25 @@ Tier-A checkbox remains open for the Claude coordinator. Applicable internal-too
 contracts, explicit ports/adapters/renderers, scoped tests, and folder/scope inspection. Published-
 package/public/composition/asset/registry-only gates are N/A under the recorded deviation. No debt
 accepted; this generator does not self-certify.
+
+## Coordinator Tier-A Sign-off (2026-07-10, Claude Opus 4.8 supervisor)
+
+Independent substantive review of the three post-resume slices `ee1928d8`, `478eccfc`, `8b476b12`
+(diff `e4dca19b..8b476b12`, 21 files):
+
+- Antigravity migration verified: `gemini-adapter.ts` → `antigravity-adapter.ts` (git rename),
+  `executable: 'agy'`, route `google-sign-in`, live evidence → `capability_deferred` #578,
+  launch/resume → `capability_unsupported`. No `gemini` executable alias; no invented `agy login`.
+- Legacy persisted state: `local-state-adapter.ts` migrates `gemini`→`antigravity` vocabulary and
+  `google-subscription`→`google-sign-in`, and REFUSES ambiguous dual `gemini`+`antigravity` state.
+  Proven by `antigravity-compat_test.ts` (migrate + refuse + no-alias cases).
+- S5 wrappers (`codex-resume`, `codex-status`, `launch-codex-slice`, `claude-remote-smoke`) remain
+  functional (dry-run/help smoked green) and retained, not deleted.
+- Independent gates re-run by coordinator: runtime+compat tests `48 passed | 0 failed`; scoped check
+  `20 files, 0 findings`; scoped lint `20 files, 0 findings`; `git diff --check` clean; secret scan
+  on the diff clean; `deno.lock` unchanged (`8694862878e6f9a430bf56497a4d5bf3f8eb1f3d`).
+
+Verdict: PASS. Worker did not self-certify; this sign-off and push are the coordinator's.
+Correction applied: the generator's "pushes completed / remote matches" claim was inaccurate — the
+three slices were local-only (remote at `e4dca19b`). Coordinator pushes them with the explicit
+refspec as part of sign-off.
