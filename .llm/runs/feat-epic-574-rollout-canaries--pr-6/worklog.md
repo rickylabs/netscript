@@ -189,3 +189,16 @@ S2 files: runner/CLI and tests, `deno.json`, checked-in matrix, and run artifact
 - [x] Full owned tests and scoped static gates pass; lock and sensitive-data gates pass.
 
 Implementation complete — awaiting coordinator Tier-A review. This worker does not self-certify.
+
+## Coordinator Tier-A Sign-off (2026-07-10, Claude Opus 4.8)
+
+Reviewed 00fa6429/2b788296/df138207 (diff 7863db19..df138207): nine-canary matrix + runner + report.
+- Honest classifications: `owner_accepted_working`/`auth_blocked`/`credential_absent` explicit; README
+  states it never converts a failed runtime observation into a pass. Interactive canaries recorded
+  owner-accepted; live ones (WSL health, provider compatibility, quota) run for real.
+- Runner has NO promotion operation; `rollout-report.ts` recommendation text asserts "performs no
+  promotion action"; ROLLOUT.md = conditional_pass / promote_with_conditions, owner approval +
+  coordinator action required. Reused shipped CLIs via injected seam; no #576–#581 behavior change.
+- Gates: full runtime suite 116/0; scoped check 54/0; deno.lock unchanged. Push authoritative (df138207).
+
+Verdict: PASS (generator did not self-certify).
