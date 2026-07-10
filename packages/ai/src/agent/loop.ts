@@ -27,6 +27,8 @@ import type { ModelId, ModelRef } from '../contracts/model.ts';
 import type { ToolCall, ToolResult } from '../contracts/tool.ts';
 import type { Usage } from '../contracts/usage.ts';
 import type { ChatModelProviderPort } from '../ports/chat-client.ts';
+import type { TelemetryPort, TelemetrySpan } from '../ports/telemetry.ts';
+import { createNoopTelemetryPort } from '../ports/telemetry.ts';
 import type { ToolRegistryPort } from '../ports/tool-registry.ts';
 import { createNoopToolRegistry } from '../ports/tool-registry.ts';
 import type { AgentLoopInput, AgentLoopOptions, AgentLoopPort } from '../ports/agent-loop.ts';
@@ -47,6 +49,8 @@ export interface AgentLoopDeps {
   readonly modelProvider: ChatModelProviderPort;
   /** Registry resolving tool handlers. Defaults to a no-op (no tools). */
   readonly tools?: ToolRegistryPort;
+  /** Telemetry port used to record AI spans/events. Defaults to a no-op. */
+  readonly telemetry?: TelemetryPort;
   /** Transcript-truncation strategy. Defaults to a sliding window. */
   readonly history?: HistoryStrategy;
   /** Step bound used when a run supplies no `maxSteps`. */
@@ -90,6 +94,7 @@ export interface AgentLoop extends AgentLoopPort {
 export function createAgentLoop(deps: AgentLoopDeps): AgentLoop {
   const provider = deps.modelProvider;
   const tools = deps.tools ?? createNoopToolRegistry();
+  const telemetry = deps.telemetry ?? createNoopTelemetryPort();
   const history = deps.history ?? slidingWindowHistory();
   const configuredMaxSteps = deps.defaultMaxSteps ?? DEFAULT_MAX_STEPS;
 
@@ -109,6 +114,12 @@ export function createAgentLoop(deps: AgentLoopDeps): AgentLoop {
     let sawUsage = false;
     const working: Message[] = [...input.messages];
     const modelId = resolveModelId(input.model);
+    const runSpan = telemetry.startSpan('gen_ai.chat', {
+      'gen_ai.provider.name': provider.id,
+      'gen_ai.request.model': modelId,
+      'gen_ai.operation.name': 'chat',
+      'netscript.ai.max_steps': maxSteps,
+    });
 
     state = 'running';
     try {
@@ -128,54 +139,74 @@ export function createAgentLoop(deps: AgentLoopDeps): AgentLoop {
 
         const client = provider.createChatClient(modelId);
         const messages = history.apply(working);
+        const turnSpan = telemetry.startSpan('gen_ai.chat.turn', {
+          'gen_ai.provider.name': provider.id,
+          'gen_ai.request.model': modelId,
+          'gen_ai.operation.name': 'chat',
+          'netscript.ai.step': step,
+          'netscript.ai.tool_count': input.tools?.length ?? 0,
+        });
 
         let assistantText = '';
         const turnToolCalls: ToolCall[] = [];
         let turnErrored = false;
 
-        for await (
-          const event of client.stream(
-            { messages, system: input.system, tools: input.tools, options: input.options },
-            { signal },
-          )
-        ) {
-          if (signal.aborted) {
-            break;
-          }
-          switch (event.type) {
-            case 'text': {
-              assistantText += event.delta;
-              yield { type: 'text', delta: event.delta };
+        try {
+          for await (
+            const event of client.stream(
+              { messages, system: input.system, tools: input.tools, options: input.options },
+              { signal },
+            )
+          ) {
+            if (signal.aborted) {
               break;
             }
-            case 'reasoning': {
-              // Reasoning deltas are surfaced verbatim but not folded into the
-              // committed assistant transcript text (they are a separate trace).
-              yield { type: 'reasoning', delta: event.delta };
-              break;
-            }
-            case 'tool-call': {
-              turnToolCalls.push(event.toolCall);
-              yield { type: 'tool-call', toolCall: event.toolCall };
-              break;
-            }
-            case 'finish': {
-              if (event.usage) {
-                sawUsage = true;
-                addUsage(aggregate, event.usage);
-                yield { type: 'usage', usage: event.usage };
+            switch (event.type) {
+              case 'text': {
+                assistantText += event.delta;
+                yield { type: 'text', delta: event.delta };
+                break;
               }
-              break;
+              case 'reasoning': {
+                // Reasoning deltas are surfaced verbatim but not folded into the
+                // committed assistant transcript text (they are a separate trace).
+                yield { type: 'reasoning', delta: event.delta };
+                break;
+              }
+              case 'tool-call': {
+                turnToolCalls.push(event.toolCall);
+                telemetry.recordEvent('gen_ai.tool.call', {
+                  'gen_ai.provider.name': provider.id,
+                  'gen_ai.request.model': modelId,
+                  'gen_ai.tool.name': event.toolCall.name,
+                  'netscript.ai.step': step,
+                });
+                yield { type: 'tool-call', toolCall: event.toolCall };
+                break;
+              }
+              case 'finish': {
+                if (event.usage) {
+                  sawUsage = true;
+                  addUsage(aggregate, event.usage);
+                  recordUsage(turnSpan, event.usage);
+                  yield { type: 'usage', usage: event.usage };
+                }
+                break;
+              }
+              case 'error': {
+                turnErrored = true;
+                turnSpan.recordException(event.cause ?? event.message);
+                yield { type: 'error', error: event.message, cause: event.cause };
+                break;
+              }
             }
-            case 'error': {
-              turnErrored = true;
-              yield { type: 'error', error: event.message, cause: event.cause };
+            if (turnErrored) {
               break;
             }
           }
-          if (turnErrored) {
-            break;
-          }
+        } finally {
+          turnSpan.setAttribute('netscript.ai.tool_calls', turnToolCalls.length);
+          turnSpan.end();
         }
 
         if (signal.aborted) {
@@ -215,6 +246,7 @@ export function createAgentLoop(deps: AgentLoopDeps): AgentLoop {
         state = 'running';
       }
     } catch (cause) {
+      runSpan.recordException(cause);
       if (signal.aborted) {
         state = 'aborted';
         yield doneChunk(sawUsage, aggregate);
@@ -224,6 +256,10 @@ export function createAgentLoop(deps: AgentLoopDeps): AgentLoop {
       yield { type: 'error', error: errorMessage(cause), cause };
       yield doneChunk(sawUsage, aggregate);
     } finally {
+      if (sawUsage) {
+        recordUsage(runSpan, aggregate);
+      }
+      runSpan.end();
       if (activeController === controller) {
         activeController = null;
       }
@@ -255,6 +291,13 @@ function addUsage(aggregate: MutableUsage, usage: Usage): void {
   aggregate.promptTokens += usage.promptTokens;
   aggregate.completionTokens += usage.completionTokens;
   aggregate.totalTokens += usage.totalTokens;
+}
+
+/** Record provider-reported usage on an injected telemetry span. */
+function recordUsage(span: TelemetrySpan, usage: Usage): void {
+  span.setAttribute('gen_ai.usage.input_tokens', usage.promptTokens);
+  span.setAttribute('gen_ai.usage.output_tokens', usage.completionTokens);
+  span.setAttribute('netscript.ai.usage.total_tokens', usage.totalTokens);
 }
 
 /** Build the terminal `done` chunk, carrying aggregate usage when any was seen. */

@@ -9,6 +9,7 @@ import {
 import type { MessageContext } from '@netscript/queue';
 import {
   addJobStepEvent,
+  recordSharedWorkerMetrics,
   type TracedMessageContext,
   traceJobExecution,
 } from '@netscript/telemetry/instrumentation';
@@ -121,6 +122,10 @@ export async function processWorkerJob(
           WorkerAttributes.WORKER_ACTIVE_JOBS,
           context.activeJobs.size,
         );
+        recordSharedWorkerMetrics(
+          { activeJobs: context.activeJobs.size },
+          { [WorkerAttributes.WORKER_ID]: context.workerId },
+        );
 
         addJobStepEvent('state_update', { status: 'running' });
         await context.executionState.start(executionId!);
@@ -148,6 +153,14 @@ export async function processWorkerJob(
         } else {
           await context.idempotency.release(claim!.key);
         }
+        recordSharedWorkerMetrics(
+          {
+            activeJobs: context.activeJobs.size,
+            processedJobs: result.success ? 1 : 0,
+            failedJobs: result.success ? 0 : 1,
+          },
+          { [WorkerAttributes.WORKER_ID]: context.workerId },
+        );
         await context.executionState.complete(executionId!, {
           status: result.success ? 'completed' : 'failed',
           exitCode: result.exitCode ?? (result.success ? 0 : 1),
@@ -166,6 +179,10 @@ export async function processWorkerJob(
   } finally {
     if (executionId) {
       context.activeJobs.delete(executionId);
+      recordSharedWorkerMetrics(
+        { activeJobs: context.activeJobs.size },
+        { [WorkerAttributes.WORKER_ID]: context.workerId },
+      );
     }
   }
 }
