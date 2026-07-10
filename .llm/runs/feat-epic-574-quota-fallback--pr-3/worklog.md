@@ -76,9 +76,18 @@ before adding behavior. Policy stays pure; IO stays in adapters.
 | --- | --- | --- | --- |
 | 2026-07-10 | P0 | ready for coordinator Plan-Gate | Research, locked plan, Design, context, drift, thread identity prepared. |
 | 2026-07-10 | S1 | gates green | Pure policy selects explicit candidates only; active/depth/approval/opposite-family guards fail closed; structured diagnostics precede exact pinned text. Focused tests: 7 passed, 0 failed. Scoped check/lint/fmt: exit 0, 0 findings. |
+| 2026-07-10 | S2 | gates green | Durable reducer persists desired/active routes, reason/session/times/depth/restoration/canary and bounded transitions; reset/backoff/minimal canary and new-boundary restoration proven across adapter restart. New matrix: 10 passed; adjacent controller/boundary matrix: 17 passed; 0 failed. Scoped check/lint/fmt: exit 0, 0 findings. |
 
 ### S1 Reconcile
 
 - PR #588 remains draft and issue #579 remains the sole resolving scope.
 - #580 lifecycle/sender work, #581 global/default migration, and #582 rollout remain untouched.
 - No plan readjustment or architectural drift was discovered; S2 remains persistence/reducer work.
+
+### S2 Reconcile
+
+- Existing controller/checkpoint round trips remain compatible and machine-local state stays mode
+  `0600`.
+- #580 apply/repair blocks and #581/#582 absence regressions remain green.
+- S3 must remove issue #579 from the legacy deferred registry while retaining #580-#582; this is the
+  planned consumer integration, not design drift.

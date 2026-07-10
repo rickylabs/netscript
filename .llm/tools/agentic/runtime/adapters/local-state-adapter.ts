@@ -18,6 +18,8 @@ import {
   RESOURCE_ROLLBACK_STATES,
   type RuntimeCheckpointState,
 } from '../state.ts';
+import { MAX_ROUTING_HISTORY, RESTORATION_STATUSES, ROUTING_CANARY_STATUSES, ROUTING_PHASES, type RoutingState } from '../routing-state-machine.ts';
+import { ROUTING_REASON_CATEGORIES } from '../routing-signal-classifier.ts';
 export const CONTROLLER_STATE_FILE = 'controller-state.json';
 export const CHECKPOINTS_DIRECTORY = 'checkpoints';
 type JsonObject = Record<string, unknown>;
@@ -51,10 +53,12 @@ function member<T extends readonly unknown[]>(value: unknown, values: T, label: 
 }
 function parseRoute(value: unknown, strict: boolean) {
   const route = object(value, 'route');
-  known(route, 'agent provider model effort worktree sessionId mobileRequired', 'route', strict);
+  known(route, 'agent provider profileId baseUrl model effort worktree sessionId mobileRequired', 'route', strict);
   return {
     agent: member(route.agent === 'gemini' ? 'antigravity' : route.agent, AGENT_KINDS, 'route agent'),
     provider: member(route.provider, PROVIDER_KINDS, 'route provider'),
+    ...(route.profileId === undefined ? {} : { profileId: string(route.profileId, 'route profile id') as import('../provider-profiles.ts').ProviderProfileId }),
+    ...(route.baseUrl === undefined ? {} : { baseUrl: string(route.baseUrl, 'route base URL') }),
     model: string(route.model, 'route model'),
     effort: member(route.effort, EFFORTS, 'route effort'),
     worktree: string(route.worktree, 'route worktree'),
@@ -134,10 +138,24 @@ export function parseDesiredRuntimeState(value: unknown, strict = true): Desired
     sessions: array(state.sessions, 'sessions').map((entry) => parseSession(entry, strict)),
   };
 }
+function parseRoutingState(value: unknown, strict: boolean): RoutingState {
+  const state = object(value, 'routing state');
+  known(state, 'schemaVersion routingStateId phase desiredRoute activeRoute reasonCategory detectedAt resetAt lastProbeAt nextProbeAt affectedSession fallbackDepth restorationStatus canary notificationRequired transitions', 'routing state', strict);
+  if (state.schemaVersion !== RUNTIME_SCHEMA_VERSION) throw new Error('routing schema unsupported');
+  const canary = object(state.canary, 'routing canary');
+  known(canary, 'status checkedAt diagnosticCode', 'routing canary', strict);
+  const transitions = array(state.transitions, 'routing transitions').map((value) => {
+    const entry = object(value, 'routing transition');
+    known(entry, 'id from to reason occurredAt sessionId fallbackDepth notificationRequired', 'routing transition', strict);
+    return { id: string(entry.id, 'transition id'), from: member(entry.from, ROUTING_PHASES, 'transition from'), to: member(entry.to, ROUTING_PHASES, 'transition to'), reason: member(entry.reason, ROUTING_REASON_CATEGORIES, 'transition reason'), occurredAt: string(entry.occurredAt, 'transition time'), sessionId: string(entry.sessionId, 'transition session'), fallbackDepth: Number(entry.fallbackDepth), notificationRequired: boolean(entry.notificationRequired, 'transition notification') };
+  });
+  if (transitions.length > MAX_ROUTING_HISTORY) throw new Error('routing history exceeds bound');
+  return { schemaVersion: RUNTIME_SCHEMA_VERSION, routingStateId: string(state.routingStateId, 'routing state id'), phase: member(state.phase, ROUTING_PHASES, 'routing phase'), desiredRoute: parseRoute(state.desiredRoute, strict), activeRoute: parseRoute(state.activeRoute, strict), reasonCategory: member(state.reasonCategory, ROUTING_REASON_CATEGORIES, 'routing reason'), detectedAt: string(state.detectedAt, 'detected time'), ...(state.resetAt === undefined ? {} : { resetAt: string(state.resetAt, 'reset time') }), ...(state.lastProbeAt === undefined ? {} : { lastProbeAt: string(state.lastProbeAt, 'probe time') }), ...(state.nextProbeAt === undefined ? {} : { nextProbeAt: string(state.nextProbeAt, 'next probe time') }), affectedSession: parseSession(state.affectedSession, strict), fallbackDepth: Number(state.fallbackDepth), restorationStatus: member(state.restorationStatus, RESTORATION_STATUSES, 'restoration status'), canary: { status: member(canary.status, ROUTING_CANARY_STATUSES, 'canary status'), ...(canary.checkedAt === undefined ? {} : { checkedAt: string(canary.checkedAt, 'canary time') }), ...(canary.diagnosticCode === undefined ? {} : { diagnosticCode: string(canary.diagnosticCode, 'canary diagnostic') }) }, notificationRequired: boolean(state.notificationRequired, 'routing notification'), transitions };
+}
 function parsePersistedRuntimeState(value: unknown, strict = true): PersistedRuntimeState {
   const state = object(value, 'persisted state');
   // deno-fmt-ignore
-  known(state, 'schemaVersion stateId desired checkpointIds lastAppliedCommandId', 'persisted state', strict);
+  known(state, 'schemaVersion stateId desired checkpointIds lastAppliedCommandId routingStates', 'persisted state', strict);
   if (state.schemaVersion !== RUNTIME_SCHEMA_VERSION) {
     throw new Error('persisted schema unsupported');
   }
@@ -151,6 +169,7 @@ function parsePersistedRuntimeState(value: unknown, strict = true): PersistedRun
     lastAppliedCommandId: state.lastAppliedCommandId === null
       ? null
       : string(state.lastAppliedCommandId, 'last command id'),
+    ...(state.routingStates === undefined ? {} : { routingStates: array(state.routingStates, 'routing states').map((entry) => parseRoutingState(entry, strict)) }),
   };
 }
 function parseAction(value: unknown, strict: boolean): RuntimeAction {

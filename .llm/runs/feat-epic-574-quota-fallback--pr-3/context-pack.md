@@ -4,7 +4,7 @@
 
 - Branch: `feat/epic-574-quota-fallback`; worktree native ext4 at the requested path.
 - HEAD before plan commit: `783e505e`; locked base `c90bc938`; ancestry verified.
-- Phase: implementation; coordinator Plan-Gate APPROVED. S1 is implemented and gated.
+- Phase: implementation; coordinator Plan-Gate APPROVED. S1-S2 are implemented and gated.
 - Coordinator: Claude Opus 4.8; Codex thread `019f4d6c-bed7-7d62-a61f-3dccd822fcc2`.
 
 ## Locked Scope
@@ -29,6 +29,15 @@ route, never mutate defaults/global environment, and block same-family evaluatio
 - Scoped check/lint/fmt: exit 0, zero findings.
 - No persistence, execution, global mutation, or paid behavior was introduced.
 
+## S2 Result
+
+- Added pure durable routing transitions with bounded history, reset/backoff, one minimal canary,
+  boundary-safe restoration, and machine-local mode-0600 restart round trips.
+- New S1-S2 matrix: 10 passed, 0 failed; adjacent controller/checkpoint/deferred matrix: 17 passed,
+  0 failed.
+- Scoped check/lint/fmt: exit 0, zero findings.
+
 ## Next Action
 
-Commit/push/comment S1, then implement S2 state transitions and machine-local restart persistence.
+Commit/push/comment S2, then integrate the consumer surface/README and remove only the now-landed
+#579 deferred marker while preserving #580-#582 blocks.

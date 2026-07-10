@@ -202,6 +202,7 @@ export interface PersistedRuntimeState {
   readonly desired: DesiredRuntimeState;
   readonly checkpointIds: readonly string[];
   readonly lastAppliedCommandId: string | null;
+  readonly routingStates?: readonly import('./routing-state-machine.ts').RoutingState[];
 }
 function canonicalize(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(canonicalize);
