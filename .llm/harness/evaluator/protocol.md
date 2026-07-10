@@ -6,6 +6,13 @@ a separate, earlier pass governed by `plan-protocol.md`. Both passes are separat
 The evaluator is a separate session from the generator. Its job is to verify the approved plan
 against the changed state, not to continue implementation.
 
+**Evaluator surface (local vs cloud).** On a local-machine run the evaluator is a separate **local**
+session of the **opposite model family** (e.g. Codex GPT-5.6 reviews Claude-authored work; a Claude
+session reviews Codex-authored work), triggered by the **supervisor** — never an auto-dispatched
+cloud OpenHands run from a sub-agent. **OpenHands is open-models-only (minimax M3 / Qwen 3.7) and for
+cloud-driven runs only; dispatching it with a closed model (Claude/GPT/Gemini) is prohibited — it
+burns paid OpenRouter credit.** See `.agents/skills/openhands-handoff/SKILL.md` "Routing policy".
+
 ## Required Inputs
 
 | Input                      | Required                    | Purpose                                                |

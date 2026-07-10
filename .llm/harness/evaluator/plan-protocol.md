@@ -4,6 +4,11 @@ PLAN-EVAL is the harness's first evaluator pass. It judges the **plan**, not the
 the Plan-Gate before any implementation slice is committed. PLAN-EVAL is always a **separate
 session** from the generator and from IMPL-EVAL.
 
+On a local-machine run PLAN-EVAL is a separate **local** session of the **opposite model family**,
+triggered by the **supervisor** — never an auto-dispatched cloud OpenHands run, and never a closed
+model on OpenHands (open models only: minimax M3 / Qwen 3.7). See `evaluator/protocol.md` and
+`.agents/skills/openhands-handoff/SKILL.md` "Routing policy".
+
 ## Inputs
 
 Read, in order:

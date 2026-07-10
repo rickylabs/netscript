@@ -23,13 +23,31 @@ required summary artifacts keep local and cloud agents synchronized.
   this skill only for the OpenHands trigger/handoff mechanics.
 - For JSR publish readiness, use `jsr-audit`.
 
+## Routing policy — READ FIRST (open models + cloud only)
+
+OpenHands is **not** the evaluator for local runs. Two hard rules:
+
+1. **OpenHands runs OPEN models only** — e.g. `minimax/minimax-m3`, `qwen/qwen3.7-max`. NEVER dispatch
+   OpenHands with a closed/paid model (Claude/`sonnet`, GPT/`gpt`, Gemini/`gemini`). Closed models on
+   OpenHands route through paid OpenRouter/LiteLLM credit and can silently burn the owner's balance —
+   this is prohibited.
+2. **OpenHands is for CLOUD-driven runs only** — small GitHub-Copilot-style tasks the owner wants
+   reviewed fully in the cloud with adversarial agents. For any run on the **local machine**, do NOT
+   dispatch cloud OpenHands at all. Use a **local opposite-family adversarial agent** for
+   PLAN-EVAL / IMPL-EVAL / review (e.g. Codex GPT-5.6 reviews Claude-authored work; a Claude session
+   reviews Codex-authored work), launched locally. The **supervisor chooses what to trigger** —
+   sub-agents/implementers must NEVER auto-dispatch a cloud evaluator.
+
+If a local run's harness step calls for PLAN-EVAL/IMPL-EVAL and no local adversarial agent is
+available, record the gap in `drift.md` and let the supervisor decide — do not fall back to OpenHands.
+
 ## Key Concepts
 
 | Concept          | Meaning                                                                                                                                                                      |
 | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Actions agent    | `.github/workflows/openhands-agent.yml`, used for short cloud runs.                                                                                                          |
 | VPS session      | Long-running OpenHands Web UI/SDK deployment from `ops/openhands/docker-compose.yml`.                                                                                        |
-| Model profile    | `sonnet`, `gpt`, or `gemini`; maps to a LiteLLM model id in the workflow.                                                                                                    |
+| Model profile    | OPEN models only (e.g. `minimax/minimax-m3`, `qwen/qwen3.7-max`). Closed models (`sonnet`/`gpt`/`gemini`) are PROHIBITED on OpenHands — see the routing policy above.        |
 | Literal model    | Any LiteLLM-compatible `provider/model` string supplied with `model=...`.                                                                                                    |
 | Provider secret  | `LLM_API_KEY_<PROVIDER>`, inferred from the model prefix, with `LLM_API_KEY` fallback.                                                                                       |
 | Output mode      | `pr-comment`, `respond-comments`, `thread-replies`, or `summary-only`.                                                                                                       |
