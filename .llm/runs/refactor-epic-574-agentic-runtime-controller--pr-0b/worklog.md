@@ -5,8 +5,8 @@
 Research and Design are complete. Tier-A coordinator Plan-Gate review returned `PASS` under the
 owner-authorized external-evaluator waiver. Tier-A requested three S1 contract remediations, then
 substantively approved them at supervisor sign-off `ac71896` over implementation head `197bc51`.
-S2 implementation and automated gates are complete on the same daemon-managed thread. Tier-A S2
-review is pending; S3 has not started.
+S2 implementation received four Tier-A changes requested. The remediation and replacement evidence
+are complete on the same daemon-managed thread. Tier-A S2 re-review is pending; S3 has not started.
 
 ## Design
 
@@ -493,7 +493,7 @@ No Claude/Codex/Gemini/provider lifecycle adapter, provider profile, automatic f
 sender lock/repair, routing-policy migration, rollout promotion, compatibility-wrapper edit, new
 dependency, or `deno.lock` change was introduced.
 
-### S2 Evidence
+### Initial S2 Evidence (superseded where Tier-A found gaps)
 
 | Gate | Exact command / proof | Raw outcome |
 | --- | --- | --- |
@@ -504,8 +504,8 @@ dependency, or `deno.lock` change was introduced.
 | Locked broad format command | Same include through `.llm/tools/run-deno-fmt.ts` | exit 1; four pre-existing findings in untouched S5 wrappers; `git diff ac71896 -- <four files>` exit 0 |
 | Owned S2 format verdict | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root .llm/tools/agentic --ext ts --include '(^|/)(runtime/|agentic-runtime)' --pretty` | exit 0; 13 files, 0 findings |
 | Live doctor repeat | `deno task agentic:runtime doctor --json` twice; Deno harness removed only `.timing` and compared controller-tree/repository hashes | both exit 2 (`degraded`, browser auth required); semantic equality `true`; controller tree equality `true`; repository state equality `true` |
-| Dry-run mutation/tree gate | Focused tests `doctor and status are stable read-only commands` and `bootstrap and configure plans call zero mutation ports and preserve tree hashes` | mutation calls `0`; `changed: false`; before/after temp-tree hashes equal |
-| Secret/content sentinel | Focused tests plus field/raw-capture scans across S2 source | PASS across JSON, human output, diagnostics, desired/controller state, checkpoints, and fixed doctor argv |
+| Dry-run mutation/tree gate | Initial focused tests and tree hashes | Tier-A rejected the mutation-call count as disconnected; replacement passed-ports proxy evidence is below |
+| Secret/content sentinel | Initial focused test and field scans | Tier-A rejected the synthetic output/argv claim; real data-flow evidence and S2 argv N/A classification are below |
 | PR 0A migration | Focused migration/translation tests | complete 16-probe public vocabulary retained; generated timestamp does not change observed identity; ownership paths are discarded from migrated controller state |
 | File budgets | `wc -l` over the seven S2 TypeScript files | PASS: CLI `150/150`; controller `227/300`; output `56/220`; adapters `139/350`, `326/350`, `24/350`; test `384/450` |
 | Native API inspection | `deno doc --filter` for `runRuntimeCommand`, `LocalRuntimeStateAdapter`, `translateFoundationReport`, and `parseRuntimeArgs` | all exit 0; isolated public signatures resolve |
@@ -528,3 +528,58 @@ PR #585 and issue #576 remain open in implementation. Both contain the coordinat
 S2 START` record naming sign-off `ac71896`, this sole thread, and this worktree. PR #585 remains
 draft with `Closes #576`, `Part of #574`, and its PR #584 stack; Definition-of-Done remains
 unchecked. No newer comment or label expands S2 or authorizes S3.
+
+## S2 Tier-A Remediation
+
+Tier-A review of `2ad1d9c` requested four corrections: restore the locked safe result summaries and
+real status filters, reject unknown desired-state vocabulary, replace the disconnected mutation
+spy, and exercise the sentinel through real data flow without overstating argv coverage.
+
+### Corrections
+
+- `RuntimeResult` now exposes bounded value-free `desiredSummary` and `observedSummary` projections.
+  Doctor retains all 16 PR 0A component facts. Status filters narrow agent auth/capability/session
+  facts and worktree/session identities; unmatched identities return `missing_identity` with exit 3.
+- Untyped desired-state loading rejects unknown top-level, foundation-version, agent, route,
+  worktree, and session keys. Persisted state/checkpoint reads are strict too. Controller-owned
+  writes use a separate projection mode, preserving the prior secret/content stripping guarantee.
+- The actual `RuntimeReadPorts` object passed to doctor, status, bootstrap-plan, and configure-plan
+  is wrapped in an access-counting proxy whose mutation surfaces throw if resolved. Calls remain
+  zero and the before/after state-tree hashes remain equal.
+- The sentinel now enters untyped desired, persisted, and checkpoint JSON, then traverses the real
+  parsers, controller failure path, and JSON/human renderers. Each input is rejected as
+  `invalid_state_file`; the sentinel is absent from results and rendered output. Owned writer tests
+  separately prove projection strips synthetic extra content. Content-bearing lifecycle process
+  argv does not exist in S2, so that sub-gate is **N/A** and remains for S3.
+
+### Remediation Evidence
+
+| Gate | Exact command / proof | Raw outcome |
+| --- | --- | --- |
+| Focused changed tests | `rtk proxy deno test --no-lock --allow-read --allow-write .llm/tools/agentic/runtime/contract_test.ts .llm/tools/agentic/runtime/controller_test.ts` | exit 0; `16 passed | 0 failed` |
+| Complete agentic/runtime unit set | `rtk proxy deno test --no-lock --allow-read --allow-write --allow-env .llm/tools/agentic/agentic-lib_test.ts .llm/tools/agentic/wsl-foundation_test.ts .llm/tools/agentic/runtime/contract_test.ts .llm/tools/agentic/runtime/planner_test.ts .llm/tools/agentic/runtime/controller_test.ts` | exit 0; `96 passed | 0 failed` |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .llm/tools/agentic --ext ts --pretty` | exit 0; 32 files, 1 batch, 0 findings |
+| Scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root .llm/tools/agentic --ext ts --include '(^|/)(runtime/|agentic-runtime|wsl-foundation|launch-codex-slice|codex-resume|codex-status|claude-remote-smoke)' --pretty` | exit 0; 20 files, 0 findings |
+| Owned format | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root .llm/tools/agentic --ext ts --include '(^|/)(runtime/|agentic-runtime)' --pretty` | exit 0; 13 files, 0 findings |
+| Live doctor repeat | Deno 2.9 in-memory harness invoked `deno task agentic:runtime doctor --json` twice and removed only `.timing` | exits `2/2`, statuses `degraded/degraded`, 16 components, semantic/controller-tree/repository equality all `true` |
+| Live status filters | Deno 2.9 in-memory harness invoked live `status --agent codex --json` and an unmatched `--session` | filtered exit 0 with only `codex` capability; unmatched exit 3, status `blocked`, diagnostic `missing_identity` |
+| Mutation/tree proof | Focused `bootstrap and configure plans...` test passes the throwing proxy to all four read-only/plan commands | mutation-surface resolutions `0`; tree hashes equal |
+| Strict input matrix | Focused contract test mutates top-level, version, agent, route, worktree, and session keys | all six rejected |
+| Sentinel flow | Focused controller/writer tests plus implementation/run-artifact sentinel scan | desired/persisted/checkpoint inputs rejected; JSON/human/writes clean; lifecycle argv N/A for S2 |
+| File budgets | `wc -l` over the locked CLI/runtime/adapters/tests | PASS: CLI 150; contracts/state/ports/planner/controller/output 220/293/123/348/278/57; adapters 139/340/24; tests 300/274/444 |
+| Secret/content scan | `rg` over owned implementation plus an exact sentinel scan excluding tests | only fixed Deno child-process `stdout`/`stderr` pipe plumbing matched; sentinel absent from implementation/run artifacts |
+| Lock hygiene | `git rev-parse 2ad1d9c:deno.lock`; `git hash-object deno.lock`; `git diff --exit-code 2ad1d9c -- deno.lock` | both blobs `8694862878e6f9a430bf56497a4d5bf3f8eb1f3d`; diff exit 0 |
+| Raw scope/status | raw `git status --short`; `git diff --name-only 2ad1d9c` | only the eight permitted runtime/README files and two mandatory run artifacts; no `deno.lock`, CLI edge, wrapper, or S3 file |
+| Patch hygiene | `git diff --check` | exit 0 |
+
+No S3 lifecycle adapter, provider profile, live repair, dependency, lock/cache, root-format, or
+compatibility-wrapper work was introduced. The existing broad-format scope drift entry remains
+authoritative and unchanged; no new architecture debt was created.
+
+## Reconcile Note — S2 Remediation
+
+PR #585 and issue #576 were reread after the replacement gates. Both remain open at `status:impl`,
+and both record the same four Tier-A findings against `2ad1d9c`. The implementation scope remains
+aligned with #576, the draft PR still carries `Closes #576` and `Part of #574`, and no comment or
+label authorizes S3. Next action is coordinator substantive Tier-A re-review of the remediation
+commit; this worker does not self-certify.

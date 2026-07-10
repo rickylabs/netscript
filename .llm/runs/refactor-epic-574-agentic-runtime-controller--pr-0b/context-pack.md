@@ -8,7 +8,7 @@
 | Branch | `refactor/epic-574-agentic-runtime-controller` |
 | Worktree | `/home/codex/repos/netscript-epic-574-pr0b-controller` |
 | Base | PR #584 sign-off `9b75470` |
-| Phase | S2 automated gates complete; Tier-A S2 review pending |
+| Phase | S2 Tier-A remediation complete; coordinator re-review pending |
 | Thread | `019f4b72-2ea4-7050-917e-6d6918371265` (resume only) |
 
 ## Current State
@@ -30,9 +30,10 @@ change occurred. Coordinator substantive review approved S1 implementation/remed
 
 S2 now provides the canonical read-only CLI edge, controller/result renderers, complete PR 0A
 foundation translation, strict value-free local-state migration/storage, and read-only mobile
-capability translation. Focused S2 tests pass `8/8`; the full agentic/runtime set passes `95/95`.
-Live doctor output is semantically stable across two runs after removing only timing, and neither
-repository nor controller state changed. Tier-A S2 review remains pending; S3 has not started.
+capability translation. Tier-A found four gaps in `2ad1d9c`; remediation restores safe desired and
+observed summaries with real status filters, makes untyped desired/persisted/checkpoint reads strict,
+connects the mutation guard to the actual ports object, and runs the sentinel through real input,
+failure, renderer, and writer paths. Coordinator re-review remains pending; S3 has not started.
 
 ## Locked Boundaries
 
@@ -49,7 +50,7 @@ repository nor controller state changed. Tier-A S2 review remains pending; S3 ha
 
 1. S1 contract/state/ports/pure planner: coordinator-approved at `ac71896`.
 2. S2 controller/renderers/foundation/local-state/mobile adapters and read-only canonical CLI:
-   implementation/gates complete; Tier-A review pending.
+   Tier-A remediation/gates complete; coordinator re-review pending.
 3. S3 Claude/Codex/Gemini/provider lifecycle adapters: not started.
 4. S4 transactional apply, explicit fallback/restore, rollback, and failure behavior: not started.
 5. S5 compatibility wrappers, documentation, and full scoped gates: not started.
@@ -74,21 +75,37 @@ repository nor controller state changed. Tier-A S2 review remains pending; S3 ha
   `runtime/adapters/{foundation,local-state,mobile-control}-adapter.ts`, and
   `runtime/controller_test.ts`.
 - Updated: `deno.json`, `.llm/tools/agentic/README.md`, and required run artifacts.
-- Tests: focused `8 passed | 0 failed`; complete current agentic/runtime set
-  `95 passed | 0 failed`.
+- Remediated tests: focused changed set `16 passed | 0 failed`; complete current agentic/runtime set
+  `96 passed | 0 failed`.
 - Scoped check/lint: exit 0, zero findings. Owned runtime/CLI format: exit 0, zero findings.
 - Live doctor repeat: expected exit 2; normalized semantic output, controller tree, and repository
   state all equal.
-- Dry-run mutation calls: `0`; before/after temp state-tree hashes equal.
-- Sentinel, non-edge-effect, S3-scope, LOC-budget, and lock-hygiene scans: PASS.
+- Passed-ports mutation proxy resolves zero mutation surfaces; before/after temp state-tree hashes
+  equal. Strict unknown-key and real sentinel flows pass; lifecycle argv is N/A until S3.
 - Drift: broad locked format include reaches four untouched S5 wrapper findings; recorded in
   `drift.md`, with no diff in those files and a green owned-surface format verdict.
 - Debt: none.
 
+## S2 Remediation Evidence
+
+- Focused changed tests: `16 passed | 0 failed`; complete current set: `96 passed | 0 failed`.
+- Scoped check/lint/owned format: exit 0, zero findings (`32`/`20`/`13` selected files).
+- Live doctor twice: exits 2; timing-normalized semantics, 16-component summary, controller tree,
+  and repository state all equal. Live agent filter narrowed to Codex; unmatched session returned
+  exit 3 with `missing_identity`.
+- Actual passed-ports mutation guard: zero mutation resolutions across doctor, status, bootstrap
+  plan, and configure plan; temp tree unchanged.
+- Strict parser matrix rejects unknown top-level/version/agent/route/worktree/session keys.
+- Real sentinel flow rejects desired/persisted/checkpoint inputs and stays absent from results,
+  renderers, and owned writes. Content-bearing lifecycle argv is N/A in S2 and deferred to S3.
+- Locked LOC budgets, `git diff --check`, scope/secret scans, and lock hygiene pass. Existing broad
+  format-scope drift remains; no new architecture debt.
+
 ## Next Action
 
-Coordinator reviews the pushed S2 commit and records the Tier-A result. Do not start S3 or launch
-another sender. Resume this exact thread only after coordinator approval and a concrete S3 brief.
+Coordinator reviews the pushed S2 remediation commit and records the Tier-A result. Do not start S3
+or launch another sender. Resume this exact thread only after coordinator approval and a concrete
+S3 brief.
 
 ## Safety
 

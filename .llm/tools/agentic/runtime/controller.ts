@@ -9,7 +9,17 @@ import {
 } from './contract.ts';
 import { planReconciliation } from './planner.ts';
 import type { RuntimeReadPorts } from './ports.ts';
-import type { DesiredRuntimeState, ObservedRuntimeState } from './state.ts';
+import type {
+  DesiredRuntimeState,
+  DesiredStateSummary,
+  ObservedRuntimeState,
+  ObservedStateSummary,
+} from './state.ts';
+import {
+  summarizeDesiredState,
+  summarizeObservedState,
+  unavailableObservedSummary,
+} from './state.ts';
 
 function diagnostic(
   code: RuntimeDiagnostic['code'],
@@ -42,12 +52,16 @@ function componentDiagnostic(
   }
 }
 
-function observationDiagnostics(observed: ObservedRuntimeState): RuntimeDiagnostic[] {
+function observationDiagnostics(
+  observed: ObservedRuntimeState,
+  agent?: StatusCommand['agent'],
+): RuntimeDiagnostic[] {
   const diagnostics = observed.components.flatMap((component) => {
     const entry = componentDiagnostic(component);
     return entry ? [entry] : [];
   });
   for (const auth of observed.auth) {
+    if (agent && auth.agent !== agent) continue;
     if (auth.status === 'ready') continue;
     diagnostics.push(
       diagnostic(
@@ -62,7 +76,7 @@ function observationDiagnostics(observed: ObservedRuntimeState): RuntimeDiagnost
       diagnostic('non_native_worktree', 'policy', 'runtime execution is not on native ext4'),
     );
   }
-  if (observed.capabilities.codex === 'blocked') {
+  if ((!agent || agent === 'codex') && observed.capabilities.codex === 'blocked') {
     diagnostics.push(
       diagnostic('mobile_disconnected', 'transport', 'Codex mobile control is unavailable'),
     );
@@ -93,12 +107,45 @@ function routeFor(command: RuntimeCommand) {
   return command.kind === 'fallback' ? command.targetRoute : undefined;
 }
 
+type StatusCommand = Extract<RuntimeCommand, { kind: 'status' }>;
+
+function unmatchedFilters(
+  filter: StatusCommand,
+  desired: DesiredStateSummary | null,
+  observed: ObservedStateSummary,
+): RuntimeDiagnostic[] {
+  const agents = new Set([
+    ...Object.keys(desired?.agents ?? {}),
+    ...observed.auth.map((entry) => entry.agent),
+    ...Object.keys(observed.capabilities),
+    ...observed.sessions.map((entry) => entry.identity.agent),
+  ]);
+  const worktrees = new Set([
+    ...(desired?.worktrees.map((entry) => entry.path) ?? []),
+    ...Object.values(desired?.agents ?? {}).flatMap((entry) =>
+      entry.route ? [entry.route.worktree] : []
+    ),
+    ...observed.worktrees.map((entry) => entry.path),
+    ...observed.sessions.map((entry) => entry.identity.worktree),
+  ]);
+  const sessions = new Set([
+    ...(desired?.sessions.map((entry) => entry.sessionId) ?? []),
+    ...observed.sessions.map((entry) => entry.identity.sessionId),
+  ]);
+  const missing = (filter.agent && !agents.has(filter.agent)) ||
+    (filter.worktree && !worktrees.has(filter.worktree)) ||
+    (filter.sessionId && !sessions.has(filter.sessionId));
+  return missing
+    ? [diagnostic('missing_identity', 'input', 'status filter matched no runtime identity')]
+    : [];
+}
+
 function failureResult(
   command: RuntimeCommand,
   startedAt: string,
   completedAt: string,
   failure: RuntimeDiagnostic,
-  observedStateId = 'unavailable',
+  observed: ObservedRuntimeState | null = null,
 ): RuntimeResult {
   return {
     schemaVersion: RUNTIME_SCHEMA_VERSION,
@@ -107,8 +154,8 @@ function failureResult(
     mode: command.mode,
     status: failure.category === 'capability' ? 'blocked' : 'failed',
     changed: false,
-    desiredStateId: null,
-    observedStateId,
+    desiredSummary: null,
+    observedSummary: observed ? summarizeObservedState(observed) : unavailableObservedSummary(),
     actions: [],
     diagnostics: [failure],
     route: routeFor(command),
@@ -157,7 +204,6 @@ export async function runRuntimeCommand(
   ports: RuntimeReadPorts,
 ): Promise<RuntimeResult> {
   const startedAt = ports.clock.now();
-  let observedStateId = 'unavailable';
   let baseObserved: ObservedRuntimeState;
   try {
     baseObserved = await ports.inspector.observeRuntime();
@@ -173,12 +219,15 @@ export async function runRuntimeCommand(
   try {
     const persisted = await ports.persistedStateReader.readPersistedState();
     const observed = await mergeControllerState(baseObserved, ports, persisted);
-    observedStateId = observed.stateId;
     const desired = await desiredFor(command, ports, persisted);
     const plan = planReconciliation({ command, desired, observed });
     const diagnostics = [...plan.diagnostics];
+    const filter = command.kind === 'status' ? command : undefined;
+    const desiredSummary = summarizeDesiredState(desired, filter);
+    const observedSummary = summarizeObservedState(observed, filter);
+    if (filter) diagnostics.push(...unmatchedFilters(filter, desiredSummary, observedSummary));
     if (command.kind === 'doctor' || command.kind === 'status') {
-      diagnostics.push(...observationDiagnostics(observed));
+      diagnostics.push(...observationDiagnostics(observed, filter?.agent));
     }
     if (command.mode === 'apply' && plan.status !== 'blocked') {
       const completedAt = ports.clock.now();
@@ -191,7 +240,7 @@ export async function runRuntimeCommand(
           'capability',
           'apply execution is not available in the read-only S2 controller',
         ),
-        observed.stateId,
+        observed,
       );
     }
     const completedAt = ports.clock.now();
@@ -200,14 +249,16 @@ export async function runRuntimeCommand(
       commandId: command.commandId,
       command: command.kind,
       mode: command.mode,
-      status: plan.status === 'blocked'
+      status: plan.status === 'blocked' || diagnostics.some((entry) =>
+          entry.code === 'missing_identity'
+        )
         ? 'blocked'
         : diagnostics.length > 0
         ? 'degraded'
         : plan.status,
       changed: false,
-      desiredStateId: desired?.stateId ?? null,
-      observedStateId: observed.stateId,
+      desiredSummary,
+      observedSummary,
       actions: actionResults(plan.actions),
       diagnostics,
       route: routeFor(command),
@@ -221,7 +272,7 @@ export async function runRuntimeCommand(
       startedAt,
       completedAt,
       diagnostic('invalid_state_file', 'input', 'runtime state could not be read or parsed'),
-      observedStateId,
+      baseObserved,
     );
   }
 }

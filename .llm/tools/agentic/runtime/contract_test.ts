@@ -21,6 +21,7 @@ import {
   type RuntimeCommand,
   type RuntimeResult,
 } from './contract.ts';
+import { parseDesiredRuntimeState } from './adapters/local-state-adapter.ts';
 import { type DesiredStateSourcePort, MUTATION_PORT_METHODS, READ_PORT_METHODS } from './ports.ts';
 import type {
   DesiredRuntimeState,
@@ -40,6 +41,10 @@ function assertEquals(actual: unknown, expected: unknown, message = 'values diff
 
 function assertUnique(values: readonly unknown[], label: string): void {
   assert(new Set(values).size === values.length, `${label} contains duplicates`);
+}
+
+function record(value: unknown): Record<string, unknown> {
+  return value as Record<string, unknown>;
 }
 
 const route = {
@@ -186,8 +191,24 @@ Deno.test('persisted and result contracts expose identifiers and fingerprints on
     mode: 'apply',
     status: 'succeeded',
     changed: true,
-    desiredStateId: desired.stateId,
-    observedStateId: 'observed-1',
+    desiredSummary: {
+      stateId: desired.stateId,
+      foundation: desired.foundation,
+      agents: desired.agents,
+      worktrees: desired.worktrees,
+      sessions: desired.sessions,
+    },
+    observedSummary: {
+      stateId: 'observed-1',
+      nativeExt4: true,
+      components: [],
+      auth: [],
+      stateDirectories: [],
+      capabilities: {},
+      worktrees: [],
+      sessions: [],
+      checkpoints: [],
+    },
     actions: [{
       id: '03:01:persist_desired_state',
       kind: 'persist_desired_state',
@@ -254,4 +275,26 @@ Deno.test('reconciliation plans are serializable data, not executable closures',
   };
   visit(plan);
   assert(JSON.parse(JSON.stringify(plan)).actions.length === 1, 'plan did not round-trip as data');
+});
+
+Deno.test('strict desired-state vocabulary rejects unknown nested keys', () => {
+  const mutations = [
+    (value: unknown) => record(value).unknown = true,
+    (value: unknown) => record(record(record(value).foundation).versions).deno = '2.9.0',
+    (value: unknown) => record(record(value).agents).unknown = {},
+    (value: unknown) => record(record(record(record(value).agents).codex).route).unknown = true,
+    (value: unknown) => (record(value).worktrees as Record<string, unknown>[])[0].unknown = true,
+    (value: unknown) => (record(value).sessions as Record<string, unknown>[])[0].unknown = true,
+  ];
+  for (const mutate of mutations) {
+    const value = structuredClone(desired);
+    mutate(value);
+    let rejected = false;
+    try {
+      parseDesiredRuntimeState(value);
+    } catch {
+      rejected = true;
+    }
+    assert(rejected, 'unknown desired-state key was accepted');
+  }
 });

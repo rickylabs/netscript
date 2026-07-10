@@ -128,6 +128,11 @@ read/run/env permissions and preserves PR 0A schema `1.0`; no provider login, ne
 session send, daemon repair, or global route mutation occurs. JSON and human output derive from the
 same secret-safe `RuntimeResult`.
 
+Schema `1.0` results include bounded `desiredSummary` and `observedSummary` projections rather than
+raw adapter output. Status identity filters narrow worktree, session, auth, and capability facts;
+an unmatched filter returns the finite `missing_identity` diagnostic. Desired-state files reject
+unknown top-level or nested keys, while controller-owned writes project typed value-free fields.
+
 ### `launch-codex-slice.ts`
 Stage and launch a Codex slice from a Windows-authored brief, with a push-safety gate, and record
 the thread id to the run-artifact dir.

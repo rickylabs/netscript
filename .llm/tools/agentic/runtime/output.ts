@@ -20,8 +20,9 @@ export function renderRuntimeHuman(result: RuntimeResult): string {
   const lines = [
     `Agentic runtime ${result.command}: ${result.status} (schema ${result.schemaVersion})`,
     `mode: ${result.mode}; changed: ${result.changed ? 'yes' : 'no'}`,
-    `desired state: ${result.desiredStateId ?? 'none'}`,
-    `observed state: ${result.observedStateId}`,
+    `desired state: ${result.desiredSummary?.stateId ?? 'none'}`,
+    `observed state: ${result.observedSummary.stateId}`,
+    `components: ${result.observedSummary.components.length}; sessions: ${result.observedSummary.sessions.length}`,
   ];
   for (const action of result.actions) {
     lines.push(

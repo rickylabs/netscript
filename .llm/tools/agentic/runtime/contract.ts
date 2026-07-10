@@ -210,8 +210,8 @@ export interface RuntimeResult {
   readonly mode: RuntimeMode;
   readonly status: RuntimeStatus;
   readonly changed: boolean;
-  readonly desiredStateId: string | null;
-  readonly observedStateId: string;
+  readonly desiredSummary: import('./state.ts').DesiredStateSummary | null;
+  readonly observedSummary: import('./state.ts').ObservedStateSummary;
   readonly actions: readonly RuntimeActionResult[];
   readonly diagnostics: readonly RuntimeDiagnostic[];
   readonly route?: RouteIdentity;

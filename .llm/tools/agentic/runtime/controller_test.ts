@@ -7,7 +7,6 @@ import {
   type RuntimeDoctorReport,
 } from '../wsl-foundation-lib.ts';
 import {
-  foundationDoctorArguments,
   type FoundationReportReader,
   FoundationRuntimeInspector,
   translateFoundationReport,
@@ -17,7 +16,7 @@ import { deferredMobileRepairDiagnostic } from './adapters/mobile-control-adapte
 import { RUNTIME_SCHEMA_VERSION, type RuntimeCommand, type RuntimeResult } from './contract.ts';
 import { runRuntimeCommand } from './controller.ts';
 import { renderRuntimeHuman, renderRuntimeJson, runtimeExitCode } from './output.ts';
-import type { RuntimeMutationPorts, RuntimeReadPorts } from './ports.ts';
+import type { RuntimeReadPorts } from './ports.ts';
 import type {
   DesiredRuntimeState,
   ObservedRuntimeState,
@@ -210,7 +209,22 @@ Deno.test('doctor and status are stable read-only commands', async () => {
   const root = await Deno.makeTempDir();
   try {
     const local = new LocalRuntimeStateAdapter(`${root}/runtime`, `${root}/foundation.json`);
-    const observed = await translateFoundationReport(report());
+    const base = await translateFoundationReport(report());
+    const observed: ObservedRuntimeState = {
+      ...base,
+      worktrees: [{
+        path: worktree,
+        branch: 'feature',
+        upstream: null,
+        dirty: false,
+        nativeExt4: true,
+        found: true,
+      }],
+      sessions: [{
+        identity: { agent: 'codex', sessionId: 'session-s2', worktree, boundary: 'idle' },
+        mobileState: 'available',
+      }],
+    };
     const ports = readPorts(local, observed);
     const before = await treeHash(root);
     const doctor = await runRuntimeCommand(
@@ -221,12 +235,28 @@ Deno.test('doctor and status are stable read-only commands', async () => {
       { kind: 'doctor', commandId: 'doctor-s2', mode: 'inspect' },
       ports,
     );
-    const status = await runRuntimeCommand(
-      { kind: 'status', commandId: 'status-s2', mode: 'inspect' },
-      ports,
-    );
+    const status = await runRuntimeCommand({
+      kind: 'status',
+      commandId: 'status-s2',
+      mode: 'inspect',
+      agent: 'codex',
+      worktree,
+      sessionId: 'session-s2',
+    }, ports);
+    const unmatched = await runRuntimeCommand({
+      kind: 'status',
+      commandId: 'missing-s2',
+      mode: 'inspect',
+      sessionId: 'missing',
+    }, ports);
     assertEquals(doctor, repeated);
     assertEquals(doctor.changed, false);
+    assertEquals(doctor.observedSummary.components.length, 16);
+    assertEquals(Object.keys(status.observedSummary.capabilities), ['codex']);
+    assertEquals(status.observedSummary.sessions.length, 1);
+    assertEquals(status.observedSummary.worktrees.length, 1);
+    assertEquals(unmatched.status, 'blocked');
+    assertEquals(unmatched.diagnostics[0]?.code, 'missing_identity');
     assertEquals(status.changed, false);
     assertEquals(await treeHash(root), before);
   } finally {
@@ -252,35 +282,38 @@ Deno.test('bootstrap and configure plans call zero mutation ports and preserve t
           : component
       ),
     };
-    const ports = readPorts(local, observed);
-    const spies: RuntimeMutationPorts = {
-      desiredStateWriter: {
-        writeDesiredState: () => {
-          mutationCalls++;
-          return Promise.resolve();
+    const mutationKeys = new Set([
+      'desiredStateWriter',
+      'checkpointWriter',
+      'actionExecutor',
+      'actionCompensator',
+    ]);
+    const ports = new Proxy(
+      Object.assign(readPorts(local, observed), {
+        desiredStateWriter: {},
+        checkpointWriter: {},
+        actionExecutor: {},
+        actionCompensator: {},
+      }),
+      {
+        get(target, property, receiver) {
+          if (typeof property === 'string' && mutationKeys.has(property)) {
+            mutationCalls++;
+            throw new Error('read-only controller resolved a mutation surface');
+          }
+          return Reflect.get(target, property, receiver);
         },
       },
-      checkpointWriter: {
-        writeCheckpoint: () => {
-          mutationCalls++;
-          return Promise.resolve();
-        },
-      },
-      actionExecutor: {
-        executeAction: () => {
-          mutationCalls++;
-          return Promise.resolve(null);
-        },
-      },
-      actionCompensator: {
-        compensateAction: () => {
-          mutationCalls++;
-          return Promise.resolve(null);
-        },
-      },
-    };
-    assert(spies !== undefined, 'mutation spies missing');
+    ) as RuntimeReadPorts;
     const before = await treeHash(root);
+    await runRuntimeCommand(
+      { kind: 'doctor', commandId: 'doctor-plan-s2', mode: 'inspect' },
+      ports,
+    );
+    await runRuntimeCommand(
+      { kind: 'status', commandId: 'status-plan-s2', mode: 'inspect' },
+      ports,
+    );
     const bootstrap = await runRuntimeCommand(
       { kind: 'bootstrap', commandId: 'bootstrap-s2', mode: 'plan' },
       ports,
@@ -320,47 +353,74 @@ Deno.test('live mobile repair remains a data-only issue 580 block', async () => 
   }
 });
 
-Deno.test('sentinel content is absent from output, state, checkpoints, and process argv', async () => {
+Deno.test('sentinel is rejected through desired, persisted, checkpoint, and result flows', async () => {
   const sentinel = 'SYNTHETIC_SECRET_PROMPT_SENTINEL';
-  const result: RuntimeResult = {
-    schemaVersion: RUNTIME_SCHEMA_VERSION,
-    commandId: 'doctor-sentinel',
-    command: 'doctor',
-    mode: 'inspect',
-    status: 'no_change',
-    changed: false,
-    desiredStateId: null,
-    observedStateId: 'observed-sentinel-safe',
-    actions: [],
-    diagnostics: [],
-    timing: {
-      startedAt: '2026-07-10T00:00:00.000Z',
-      completedAt: '2026-07-10T00:00:00.000Z',
-      durationMs: 0,
-    },
-  };
-  const surfaces = [
-    renderRuntimeJson(result),
-    renderRuntimeHuman(result),
-    JSON.stringify(desired),
-    JSON.stringify({ checkpointId: 'safe', resources: [] }),
-    JSON.stringify(foundationDoctorArguments()),
-  ];
-  assert(surfaces.every((surface) => !surface.includes(sentinel)), 'sentinel leaked to a surface');
-  assertEquals(
-    runtimeExitCode({
-      ...result,
-      status: 'degraded',
-      diagnostics: [{
-        code: 'auth_conflict',
-        category: 'authentication',
-        retryable: false,
-        message: 'authentication route conflicts with policy',
-      }],
-    }),
-    3,
-    'auth conflicts must preserve the PR 0A invalid-configuration exit',
-  );
+  const root = await Deno.makeTempDir();
+  try {
+    const stateRoot = `${root}/runtime`;
+    const desiredPath = `${root}/desired.json`;
+    const local = new LocalRuntimeStateAdapter(stateRoot, `${root}/foundation.json`);
+    const ports = readPorts(local, await translateFoundationReport(report()));
+    await Deno.writeTextFile(desiredPath, JSON.stringify({ ...desired, promptContent: sentinel }));
+    const results: RuntimeResult[] = [
+      await runRuntimeCommand({
+        kind: 'configure',
+        commandId: 'desired-sentinel',
+        mode: 'plan',
+        desiredState: { path: desiredPath },
+      }, ports),
+    ];
+    await Deno.mkdir(`${stateRoot}/checkpoints`, { recursive: true });
+    await Deno.writeTextFile(
+      `${stateRoot}/controller-state.json`,
+      JSON.stringify({
+        ...persisted(),
+        promptContent: sentinel,
+      }),
+    );
+    results.push(
+      await runRuntimeCommand(
+        { kind: 'doctor', commandId: 'state-sentinel', mode: 'inspect' },
+        ports,
+      ),
+    );
+    await Deno.writeTextFile(
+      `${stateRoot}/controller-state.json`,
+      JSON.stringify({
+        ...persisted(),
+        checkpointIds: ['sentinel'],
+      }),
+    );
+    await Deno.writeTextFile(
+      `${stateRoot}/checkpoints/sentinel.json`,
+      JSON.stringify({
+        schemaVersion: '1.0',
+        checkpointId: 'sentinel',
+        commandId: 'safe',
+        createdAt: '2026-07-10T00:00:00.000Z',
+        status: 'prepared',
+        actionIds: [],
+        resources: [],
+        promptContent: sentinel,
+      }),
+    );
+    results.push(
+      await runRuntimeCommand(
+        { kind: 'doctor', commandId: 'checkpoint-sentinel', mode: 'inspect' },
+        ports,
+      ),
+    );
+    for (const result of results) {
+      assertEquals(result.diagnostics[0]?.code, 'invalid_state_file');
+      assert(
+        !`${renderRuntimeJson(result)}${renderRuntimeHuman(result)}`.includes(sentinel),
+        'sentinel leaked',
+      );
+      assertEquals(runtimeExitCode(result), 3);
+    }
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
 });
 
 Deno.test('CLI parser exposes S2 commands only and keeps lifecycle commands deferred', () => {

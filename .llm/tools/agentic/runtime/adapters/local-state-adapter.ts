@@ -20,6 +20,7 @@ import type {
   PersistedStateReaderPort,
 } from '../ports.ts';
 import type {
+  DesiredAgentState,
   DesiredRuntimeState,
   PersistedRuntimeState,
   RuntimeCheckpointState,
@@ -35,6 +36,13 @@ function object(value: unknown, label: string): JsonObject {
     throw new Error(`${label} invalid`);
   }
   return value as JsonObject;
+}
+
+function known(value: JsonObject, keys: string, label: string, strict: boolean): void {
+  const allowed = new Set(keys.split(' '));
+  if (strict && Object.keys(value).some((key) => !allowed.has(key))) {
+    throw new Error(`${label} contains unknown field`);
+  }
 }
 
 function string(value: unknown, label: string): string {
@@ -57,8 +65,9 @@ function member<T extends readonly unknown[]>(value: unknown, values: T, label: 
   return value as T[number];
 }
 
-function parseRoute(value: unknown) {
+function parseRoute(value: unknown, strict: boolean) {
   const route = object(value, 'route');
+  known(route, 'agent provider model effort worktree sessionId mobileRequired', 'route', strict);
   return {
     agent: member(route.agent, AGENT_KINDS, 'route agent'),
     provider: member(route.provider, PROVIDER_KINDS, 'route provider'),
@@ -70,8 +79,9 @@ function parseRoute(value: unknown) {
   };
 }
 
-function parseSession(value: unknown) {
+function parseSession(value: unknown, strict: boolean) {
   const session = object(value, 'session');
+  known(session, 'agent sessionId worktree boundary', 'session', strict);
   return {
     agent: member(session.agent, AGENT_KINDS, 'session agent'),
     sessionId: string(session.sessionId, 'session id'),
@@ -80,33 +90,30 @@ function parseSession(value: unknown) {
   };
 }
 
-/** Parses and strips unknown fields from a desired-state document. */
-export function parseDesiredRuntimeState(value: unknown): DesiredRuntimeState {
+/** Strictly parses an untyped desired-state document; writes use projection mode. */
+export function parseDesiredRuntimeState(value: unknown, strict = true): DesiredRuntimeState {
   const state = object(value, 'desired state');
+  // deno-fmt-ignore
+  known(state, 'schemaVersion stateId foundation agents worktrees sessions', 'desired state', strict);
   if (state.schemaVersion !== RUNTIME_SCHEMA_VERSION) throw new Error('desired schema unsupported');
   const foundation = object(state.foundation, 'foundation');
+  known(foundation, 'nativeExt4 versions stateDirectories', 'foundation', strict);
   if (foundation.nativeExt4 !== true) throw new Error('native ext4 requirement invalid');
   const rawVersions = object(foundation.versions, 'foundation versions');
+  known(rawVersions, INSTALLABLE_FOUNDATION_COMPONENTS.join(' '), 'foundation versions', strict);
   const versions: Record<string, string> = {};
   for (const component of INSTALLABLE_FOUNDATION_COMPONENTS) {
     if (rawVersions[component] !== undefined) {
       versions[component] = string(rawVersions[component], `${component} version`);
     }
   }
-  const agents: Partial<
-    Record<
-      AgentKind,
-      {
-        required: boolean;
-        authRoute: 'provider-native' | 'google-subscription';
-        route?: ReturnType<typeof parseRoute>;
-      }
-    >
-  > = {};
+  const agents: Partial<Record<AgentKind, DesiredAgentState>> = {};
   const rawAgents = object(state.agents, 'agents');
+  known(rawAgents, AGENT_KINDS.join(' '), 'agents', strict);
   for (const agent of AGENT_KINDS) {
     if (rawAgents[agent] === undefined) continue;
     const entry = object(rawAgents[agent], `${agent} desired state`);
+    known(entry, 'required authRoute route', `${agent} desired state`, strict);
     agents[agent] = {
       required: boolean(entry.required, `${agent} required`),
       authRoute: member(
@@ -114,7 +121,7 @@ export function parseDesiredRuntimeState(value: unknown): DesiredRuntimeState {
         ['provider-native', 'google-subscription'] as const,
         `${agent} auth route`,
       ),
-      ...(entry.route === undefined ? {} : { route: parseRoute(entry.route) }),
+      ...(entry.route === undefined ? {} : { route: parseRoute(entry.route, strict) }),
     };
   }
   return {
@@ -130,6 +137,7 @@ export function parseDesiredRuntimeState(value: unknown): DesiredRuntimeState {
     agents,
     worktrees: array(state.worktrees, 'worktrees').map((entry) => {
       const worktree = object(entry, 'worktree');
+      known(worktree, 'path branch upstream clean', 'worktree', strict);
       if (worktree.upstream !== 'none') throw new Error('worktree upstream invalid');
       return {
         path: string(worktree.path, 'worktree path'),
@@ -138,19 +146,21 @@ export function parseDesiredRuntimeState(value: unknown): DesiredRuntimeState {
         clean: boolean(worktree.clean, 'worktree clean'),
       };
     }),
-    sessions: array(state.sessions, 'sessions').map(parseSession),
+    sessions: array(state.sessions, 'sessions').map((entry) => parseSession(entry, strict)),
   };
 }
 
-function parsePersistedRuntimeState(value: unknown): PersistedRuntimeState {
+function parsePersistedRuntimeState(value: unknown, strict = true): PersistedRuntimeState {
   const state = object(value, 'persisted state');
+  // deno-fmt-ignore
+  known(state, 'schemaVersion stateId desired checkpointIds lastAppliedCommandId', 'persisted state', strict);
   if (state.schemaVersion !== RUNTIME_SCHEMA_VERSION) {
     throw new Error('persisted schema unsupported');
   }
   return {
     schemaVersion: RUNTIME_SCHEMA_VERSION,
     stateId: string(state.stateId, 'controller state id'),
-    desired: parseDesiredRuntimeState(state.desired),
+    desired: parseDesiredRuntimeState(state.desired, strict),
     checkpointIds: array(state.checkpointIds, 'checkpoint ids').map((entry) =>
       string(entry, 'checkpoint id')
     ),
@@ -160,8 +170,10 @@ function parsePersistedRuntimeState(value: unknown): PersistedRuntimeState {
   };
 }
 
-function parseCheckpoint(value: unknown): RuntimeCheckpointState {
+function parseCheckpoint(value: unknown, strict = true): RuntimeCheckpointState {
   const checkpoint = object(value, 'checkpoint');
+  // deno-fmt-ignore
+  known(checkpoint, 'schemaVersion checkpointId commandId createdAt status actionIds resources', 'checkpoint', strict);
   if (checkpoint.schemaVersion !== RUNTIME_SCHEMA_VERSION) {
     throw new Error('checkpoint schema unsupported');
   }
@@ -178,6 +190,8 @@ function parseCheckpoint(value: unknown): RuntimeCheckpointState {
     actionIds: array(checkpoint.actionIds, 'action ids').map((entry) => string(entry, 'action id')),
     resources: array(checkpoint.resources, 'resources').map((entry) => {
       const resource = object(entry, 'resource');
+      // deno-fmt-ignore
+      known(resource, 'resourceId kind fingerprint previousFingerprint previousLinkTarget', 'resource', strict);
       const previous = resource.previousFingerprint;
       const link = resource.previousLinkTarget;
       return {
@@ -311,12 +325,12 @@ export class LocalRuntimeStateAdapter
   async writeDesiredState(state: PersistedRuntimeState): Promise<void> {
     await writeJsonAtomic(
       `${this.root}/${CONTROLLER_STATE_FILE}`,
-      parsePersistedRuntimeState(state),
+      parsePersistedRuntimeState(state, false),
     );
   }
 
   async writeCheckpoint(checkpoint: RuntimeCheckpointState): Promise<void> {
-    const sanitized = parseCheckpoint(checkpoint);
+    const sanitized = parseCheckpoint(checkpoint, false);
     if (!/^[A-Za-z0-9._-]+$/.test(sanitized.checkpointId)) throw new Error('checkpoint id invalid');
     await writeJsonAtomic(
       `${this.root}/${CHECKPOINTS_DIRECTORY}/${sanitized.checkpointId}.json`,
