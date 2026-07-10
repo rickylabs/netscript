@@ -57,3 +57,31 @@
 - **Action:** changed ownership only for this run directory to the existing `codex:codex` owner via
   a one-shot local Docker bind-mount command; file contents and modes were preserved.
 - **Evidence:** post-repair `stat` reports `codex:codex` and mode `0644` for all run Markdown files.
+
+## 2026-07-10 — Active-thread reconnect probe reports unmanaged app-server
+
+- **What:** Passive evidence shows the managed `--remote-control` app-server, daemon loop, control
+  socket, matching `0.144.1` versions, and this thread's rollout. During the active worker turn,
+  `codex remote-control start --json` nevertheless returned "app server is running but is not
+  managed by codex app-server daemon".
+- **Source:** S3 process/status/reconnect canaries.
+- **Expected:** Idempotent reconnect returns `connected` while managed state is healthy.
+- **Actual:** The active thread also owns proxy/standalone app-server children; reconnect cannot be
+  safely distinguished or repaired until the worker is idle.
+- **Severity:** significant
+- **Action:** do not restart or repair during active work. Re-run the reconnect canary after this
+  turn is idle; durable single-sender diagnosis/repair remains #580.
+- **Evidence:** raw reconnect exit `1`; passive status/process/socket checks exit `0`.
+
+## 2026-07-10 — Worker environment cannot execute Windows rollback command
+
+- **What:** The native WSL worker has no `WSLInterop` binfmt registration, so invoking Windows
+  `powershell.exe` returns `Exec format error`.
+- **Source:** S3 Windows rollback canary.
+- **Expected:** Re-verify Windows Claude `2.1.205` from the host.
+- **Actual:** Research retains the coordinator's pre-mutation `2.1.205` evidence, but this worker
+  cannot independently execute the host binary.
+- **Severity:** significant
+- **Action:** owner/coordinator runs `claude --version` in native Windows PowerShell after S3; no
+  Windows files or Claude installation were changed by this run.
+- **Evidence:** absent `/proc/sys/fs/binfmt_misc/WSLInterop`; raw PowerShell exit `126`.

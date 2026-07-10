@@ -84,6 +84,9 @@ Gemini CLI releases below `~/.local/share/netscript-agentic`, then exposes only 
 `~/.local/bin`. It writes a mode-0600, value-free ownership manifest under
 `~/.config/netscript-agentic`; it never changes Windows Claude, `~/.codex`, or provider session
 files. Run `rollback-plan` to print non-executing reversal guidance before removing any owned path.
+When `~/.gemini/settings.json` is absent, bootstrap creates a mode-0600 file enforcing
+`oauth-personal` (Sign in with Google) and records it in the rollback manifest. An existing Gemini
+settings file is never overwritten; any non-matching auth policy is an explicit conflict.
 
 Permissions are explicit in the task: read/write for the owned user-local paths, run for fixed
 `npm`/`tar` and version probes, environment access for key-presence/PATH checks, and network access

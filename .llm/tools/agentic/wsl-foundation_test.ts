@@ -3,6 +3,7 @@ import {
   buildRollbackPlan,
   classifyAuth,
   classifyComponent,
+  classifyGeminiAuthPolicy,
   classifyMobileControl,
   classifyStateDirectory,
   FOUNDATION_SCHEMA_VERSION,
@@ -63,6 +64,15 @@ Deno.test('Gemini API and Vertex routes are explicit conflicts without values', 
   assertEquals(gemini.conflicts, ['GEMINI_API_KEY', 'GOOGLE_GENAI_USE_VERTEXAI']);
 });
 
+Deno.test('Gemini settings must enforce the Google subscription route', () => {
+  assertEquals(classifyGeminiAuthPolicy(false, null, null).status, 'missing');
+  assertEquals(
+    classifyGeminiAuthPolicy(true, 'oauth-personal', 'oauth-personal').status,
+    'ready',
+  );
+  assertEquals(classifyGeminiAuthPolicy(true, 'gemini-api-key', null).status, 'auth_conflict');
+});
+
 Deno.test('missing provider sessions are non-fatal auth-required states', () => {
   const probes = classifyAuth(new Set(), false, false);
   assert(
@@ -99,6 +109,7 @@ Deno.test('bootstrap plan is ordered, exact-versioned, and reversible by ownersh
       classifyComponent({ component: 'claude', output: '', exitCode: 127 }),
       classifyComponent({ component: 'gemini', output: '', exitCode: 127 }),
       classifyStateDirectory('state-claude', '.claude', false),
+      classifyGeminiAuthPolicy(false, null, null),
     ],
     auth: classifyAuth(new Set(), false, false),
     mobileControl: classifyMobileControl(true, '0.144.1', '0.144.1'),
@@ -110,6 +121,7 @@ Deno.test('bootstrap plan is ordered, exact-versioned, and reversible by ownersh
     'create_directory',
     'install_node',
     'install_npm_clis',
+    'configure_gemini_auth',
     'ensure_symlinks',
     'write_state',
   ]);
@@ -133,6 +145,7 @@ Deno.test('bootstrap plan is empty when desired state is already present', () =>
       classifyStateDirectory('state-codex', '.codex', true),
       classifyStateDirectory('state-gemini', '.gemini', true),
       classifyStateDirectory('state-netscript-agentic', '.config/netscript-agentic', true),
+      classifyGeminiAuthPolicy(true, 'oauth-personal', 'oauth-personal'),
     ],
     auth: classifyAuth(new Set(), true, true),
     mobileControl: classifyMobileControl(true, '0.144.1', '0.144.1'),

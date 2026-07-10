@@ -12,10 +12,12 @@
 
 ## Current State
 
-S1 is pushed at `ac48bd6`. S2 is ready to commit: Node `26.5.0`, Claude `2.1.206`, and Gemini
-`0.50.0` are installed user-locally in native WSL, with an immediate second bootstrap returning no
-actions. All toolchain/state probes are ready; Claude and Gemini remain explicitly `AUTH_REQUIRED`
-for owner browser sign-in. The sole worker is thread `019f4b4b-6375-7373-aab5-6750c3fdaf04`.
+S1 (`ac48bd6`) and S2 (`3f18b1b`) are pushed. S3's safe independent implementation/canaries are
+ready to commit. Node `26.5.0`, Claude `2.1.206`, and Gemini `0.50.0` are native and user-local;
+Gemini settings enforce `oauth-personal`; repeated bootstrap is idempotent. Claude/Gemini browser
+sign-in, post-idle Codex reconnect, host sleep/network reconnect, and Windows Claude execution are
+explicit owner/coordinator canaries. The sole worker is thread
+`019f4b4b-6375-7373-aab5-6750c3fdaf04`.
 
 ## Completed
 
@@ -30,16 +32,20 @@ for owner browser sign-in. The sole worker is thread `019f4b4b-6375-7373-aab5-67
   owned user-local root; preserved Deno/Codex.
 - Proved bootstrap idempotence (`actions: []`) and emitted a non-destructive rollback plan.
 - Proved non-login native WSL resolution for all six agent/runtime commands.
+- Enforced and tested Gemini's Google-subscription-only policy without credentials.
+- Recorded native Codex/Claude/Gemini command, path, thread, socket, and auth-boundary evidence.
+- Ran every safe independent S3 gate; documented exact owner/coordinator actions for host/browser
+  boundaries without dispatching an evaluator.
 
 ## In Progress
 
-- Commit, explicitly push, and comment S2; then run S3 mobile/auth/reconnect/Windows rollback canaries.
+- Commit, explicitly push, and comment S3; hand owner/coordinator the remaining browser/host canaries.
 
 ## Next Steps
 
-1. Land S2 with explicit-refspec push and per-slice GitHub evidence.
-2. Run all safe S3 canaries; classify owner-only browser login and host reconnect actions exactly.
-3. Update PR acceptance evidence without dispatching IMPL-EVAL.
+1. Land S3 with explicit-refspec push and per-slice GitHub evidence.
+2. Owner/coordinator completes the five exact canaries in `worklog.md` and performs slice sign-off.
+3. Coordinator dispatches separate-session IMPL-EVAL only after acceptance evidence is complete.
 
 ## Key Decisions
 
@@ -58,15 +64,16 @@ for owner browser sign-in. The sole worker is thread `019f4b4b-6375-7373-aab5-67
 | `.llm/tools/agentic/README.md`, `deno.json` | modified | Doctor usage and task entry. |
 | `~/.local/share/netscript-agentic`, `~/.local/bin/*` | machine-local | Owned Node/npm CLI installation and symlinks. |
 | `~/.config/netscript-agentic/foundation-state.json` | machine-local | Mode-0600 rollback ownership manifest. |
+| `~/.gemini/settings.json` | machine-local | Mode-0600 enforced `oauth-personal` policy; rollback-recorded. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Static | S1 PASS | scoped wrapper exits 0; `worklog.md` |
+| Static | S1-S3 PASS | 68 tests and scoped wrapper exits 0; `worklog.md` |
 | Fitness | planned | `plan.md` |
-| Runtime | S2 PASS / AUTH_REQUIRED | idempotent bootstrap; provider browser sign-in pending |
-| Consumer | S2 PASS | clean non-login WSL shell resolves all installed tools |
+| Runtime | PARTIAL / OWNER CANARIES | native installs/policy pass; browser/reconnect/host checks pending |
+| Consumer | PASS | clean non-login WSL shell resolves all installed tools |
 
 ## Open Questions
 
@@ -74,6 +81,10 @@ for owner browser sign-in. The sole worker is thread `019f4b4b-6375-7373-aab5-67
   implementation, installation, doctor, or rollback work.
 - Native WSL Claude Remote Control identifies the exact owner action: sign in with the claude.ai
   subscription, then repeat the remote-control/worktree canary.
+- Native Gemini identifies Google browser sign-in as the remaining action; settings enforce
+  `oauth-personal`, and forbidden environment routes are redaction-tested.
+- Codex passive managed evidence passes, but active-turn reconnect returned exit 1; retry only when
+  this worker is idle. Windows rollback proof requires the host because WSLInterop is absent here.
 
 ## Drift and Debt
 

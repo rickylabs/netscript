@@ -12,6 +12,7 @@ export const RUNTIME_COMPONENT_IDS = [
   'codex-app-server',
   'claude',
   'gemini',
+  'gemini-auth-policy',
   'dotnet',
   'aspire',
   'docker',
@@ -79,6 +80,7 @@ export type InstallAction =
   | { kind: 'create_directory'; relativePath: string }
   | { kind: 'install_node'; version: string; archive: string }
   | { kind: 'install_npm_clis'; packages: string[] }
+  | { kind: 'configure_gemini_auth'; selectedType: 'oauth-personal' }
   | { kind: 'ensure_symlinks'; names: string[] }
   | { kind: 'write_state'; relativePath: string };
 
@@ -116,6 +118,7 @@ export const LOCAL_STATE_DIRS: Readonly<Record<RuntimeComponentId, string | null
   'codex-app-server': null,
   claude: null,
   gemini: null,
+  'gemini-auth-policy': null,
   dotnet: null,
   aspire: null,
   docker: null,
@@ -189,6 +192,34 @@ export function classifyStateDirectory(
   };
 }
 
+/** Requires the owner-approved Google subscription route without reading credential material. */
+export function classifyGeminiAuthPolicy(
+  exists: boolean,
+  selectedType: string | null,
+  enforcedType: string | null,
+): RuntimeProbe {
+  const required = 'oauth-personal';
+  if (!exists) {
+    return {
+      component: 'gemini-auth-policy',
+      detectedVersion: null,
+      expected: required,
+      status: 'missing',
+      detail: 'Google subscription auth policy not configured',
+    };
+  }
+  const compatible = selectedType === required && enforcedType === required;
+  return {
+    component: 'gemini-auth-policy',
+    detectedVersion: null,
+    expected: required,
+    status: compatible ? 'ready' : 'auth_conflict',
+    detail: compatible
+      ? 'Google subscription auth policy enforced'
+      : 'Gemini settings do not enforce Google subscription auth',
+  };
+}
+
 /** Enforces subscription-only Gemini auth and reports environment key names, never values. */
 export function classifyAuth(
   presentKeys: ReadonlySet<string>,
@@ -256,7 +287,8 @@ export function classifyMobileControl(
 export function buildDoctorReport(
   input: Omit<RuntimeDoctorReport, 'schemaVersion' | 'overall'>,
 ): RuntimeDoctorReport {
-  const authConflict = input.auth.some((probe) => probe.status === 'auth_conflict');
+  const authConflict = input.auth.some((probe) => probe.status === 'auth_conflict') ||
+    input.components.some((probe) => probe.status === 'auth_conflict');
   const degraded = input.components.some((probe) => probe.status !== 'ready') ||
     input.auth.some((probe) => probe.status !== 'ready') ||
     input.mobileControl.status !== 'ready' ||
@@ -296,6 +328,9 @@ export function planBootstrap(
     packages.push(`@google/gemini-cli@${desired.gemini}`);
   }
   if (packages.length > 0) actions.push({ kind: 'install_npm_clis', packages });
+  if (byId.get('gemini-auth-policy')?.status === 'missing') {
+    actions.push({ kind: 'configure_gemini_auth', selectedType: 'oauth-personal' });
+  }
   if (
     actions.some((action) => action.kind === 'install_node' || action.kind === 'install_npm_clis')
   ) {
@@ -327,11 +362,13 @@ export function buildRollbackPlan(): RollbackPlan {
       '$HOME/.local/share/netscript-agentic',
       '$HOME/.config/netscript-agentic',
       '$HOME/.local/bin/{node,npm,npx,claude,gemini}',
+      '$HOME/.gemini/settings.json (only when foundation-state.json records it as created)',
     ],
     steps: [
       'Stop native WSL Claude/Gemini sessions before rollback.',
       'Inspect foundation-state.json; detach only owned symlinks and restore each non-null previous target.',
       'Remove the user-local npm and Node roots after the symlinks are detached.',
+      'Remove Gemini settings only when createdFiles records it and its auth policy is still oauth-personal.',
       'Leave ~/.codex and all provider auth/session directories intact.',
       'Open native Windows Claude and run claude --version as the break-glass verification.',
     ],

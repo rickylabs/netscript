@@ -87,6 +87,10 @@ its rollback action; do not put provider credentials or values into reports.
 | 2026-07-10 | S2 | live bootstrap | Official Node archive/checksum verified; installed Node, Claude, and Gemini below `~/.local/share/netscript-agentic`; created owned links/state dirs and mode-0600 manifest. Raw exit `2`: installation ready, browser auth still required. |
 | 2026-07-10 | S2 | idempotence | Immediate second live bootstrap resolved the same stable versions and returned `actions: []`, `changed: false`; raw exit `2` solely for provider auth. |
 | 2026-07-10 | S2 | reconcile | #575/#584 remain open at `status:impl`; no new reviewer/evaluator comment changed scope. Owner-only Claude/Gemini browser sign-in is now the only provider-session prerequisite. |
+| 2026-07-10 | S3 | Codex canary | Native worktree/branch, exact rollout, managed `--remote-control` process, socket, and CLI/app-server `0.144.1` passed. Active-turn reconnect returned unmanaged-state exit 1; no repair/restart attempted. |
+| 2026-07-10 | S3 | provider canaries | Claude/Gemini native binaries and command surfaces pass; Claude requires claude.ai `/login`; Gemini policy now enforces `oauth-personal` and requires owner Google browser sign-in. |
+| 2026-07-10 | S3 | rollback/reconnect boundary | WSL rollback output passes. Host sleep/network and Windows Claude proof require the owner/coordinator; WSLInterop is absent in this worker, so PowerShell returned exit 126. |
+| 2026-07-10 | S3 | reconcile | #575/#584 remain `status:impl`; closing keyword and issue milestone/labels remain correct. No evaluator was dispatched. Owner canaries and coordinator slice sign-off remain before IMPL-EVAL. |
 
 ## Decisions
 
@@ -104,6 +108,8 @@ its rollback action; do not put provider credentials or values into reports.
 | Launcher lacked UNC write permission; unmanaged daemon surfaced before first turn. | significant | yes |
 | Persisted worker used daemon-default `medium` effort instead of requested `high`. | significant | yes |
 | Coordinator-created run artifacts were root-owned. | minor | yes |
+| Active-thread Codex reconnect probe reports unmanaged state despite passive managed proof. | significant | yes |
+| Worker WSL lacks Windows interop for the host rollback command. | significant | yes |
 
 ## Gate Results
 
@@ -126,7 +132,7 @@ its rollback action; do not put provider credentials or values into reports.
 | Doctor JSON baseline | EXPECTED_DEGRADED | 2 | Stable schema `1.0`; native ext4 true; explicit missing/outdated/auth-required states; no secret values |
 | Lock hygiene | PASS | 0 | `deno.lock` unchanged |
 
-Substantive slice review: the pure module contains no `Deno.*`, filesystem, process, or output side
+Worker review notes (not harness sign-off): the pure module contains no `Deno.*`, filesystem, process, or output side
 effects; the CLI edge uses fixed command/argument specs and bounds retained command output. Gemini
 forbidden routes expose key names only. File sizes are 242/167/89 LOC, below the internal-tool hard
 cap, and no generic desired-state routing from #576 was introduced.
@@ -151,13 +157,57 @@ cap, and no generic desired-state routing from #576 was introduced.
 | Deno/Codex preservation | PASS | 0 | Deno `2.9.0`; Codex CLI/app-server `0.144.1`, managed |
 | Lock hygiene | PASS | 0 | `deno.lock` unchanged |
 
-Substantive slice review: Node installation verifies the official SHA-256 before extraction and
+Worker review notes (not harness sign-off): Node installation verifies the official SHA-256 before extraction and
 atomically renames a user-owned staging directory. npm stable tags are resolved before exact-version
 installation; fixed argv and bounded output keep credentials out of reports. Existing non-symlink
 files are refused, previous symlink targets are recorded, and rollback output never executes.
 Machine mutation is confined to the documented user-local roots. Source files remain under the
 500-LOC internal-tool cap at 340/436/152 LOC. Generic routing/state transitions remain deferred to
 #576/#579.
+
+### S3 — Mobile, auth-boundary, reconnect, and rollback evidence
+
+| Gate | Result | Raw exit | Evidence |
+| ---- | ------ | -------- | -------- |
+| Full agentic unit set | PASS | 0 | `68 passed`, `0 failed`; includes Gemini auth-policy semantics |
+| Scoped check/lint/fmt wrappers | PASS | 0 each | 3 owned TS files, 0 findings |
+| Final doctor | EXPECTED_DEGRADED | 2 | 16 component/policy probes ready; Claude/Gemini browser sessions auth-required only |
+| Bootstrap after policy fix | IDEMPOTENT | 2 | immediate repeat returned `actions: []`; auth-required only |
+| Codex native/thread proof | PASS | 0 | native ext4 cwd/branch, exact rollout, managed process/socket, matching `0.144.1` versions |
+| Codex active-turn reconnect | BLOCKED_ACTIVE_THREAD | 1 | reconnect command reports unmanaged while proxy/worker app-server is active; no unsafe repair |
+| Claude native surface | PASS | 0 | version `2.1.206`; help exposes remote-control, worktree, session prefix, and tmux flags |
+| Claude Remote Control | AUTH_REQUIRED | 1 | exact CLI response requires claude.ai subscription `/login` |
+| Gemini native surface | PASS | 0 | version/help execute from `~/.local/bin/gemini` on native WSL |
+| Gemini auth policy | PASS | 0 | mode-0600 settings enforce `selectedType=enforcedType=oauth-personal`; created file recorded for rollback |
+| Gemini grounded prompt | AUTH_REQUIRED | 41 | pre-policy canary stopped at missing auth method; post-policy browser auth intentionally left to owner |
+| Forbidden-auth redaction | PASS | 0 | fake-key canary observed doctor raw exit 3 + `auth_conflict`; fake value absent from output |
+| Sleep/network reconnect | OWNER_CANARY_REQUIRED | N/A | no firewall/network mutation or host sleep performed from the active worker |
+| Windows Claude rollback | HOST_CANARY_REQUIRED | 126 | WSLInterop absent; pre-mutation coordinator evidence remains Windows Claude `2.1.205` |
+| Rollback output | PASS | 0 | preserves provider sessions/Codex, restores prior links, conditionally removes only recorded Gemini settings |
+| Lock hygiene | PASS | 0 | `deno.lock` unchanged |
+
+Worker review notes (not harness sign-off): the S3 code change is limited to the locked Gemini
+subscription boundary. Existing settings are never overwritten; absent settings are created mode
+0600 with `oauth-personal`, recorded in the rollback manifest, and checked by the doctor. The CLI
+edge is 498 LOC, below the internal-tool 500-LOC cap. No generic provider routing, daemon repair,
+credential acquisition, or evaluator work entered #575. Coordinator substantive review/sign-off is
+still required; this implementation worker does not self-certify.
+
+### Exact owner/coordinator canaries still required
+
+1. In native WSL, run `claude`, enter `/login`, and complete the claude.ai subscription browser
+   flow. Then start two distinct sessions from this repo using `--remote-control <name>` with
+   `--worktree <name>`, and steer both from mobile.
+2. In native WSL, run `gemini`, select **Sign in with Google**, and complete the browser flow using
+   the subscription account. Do not set an API key or Vertex variable. Re-run the grounded native
+   prompt canary afterward.
+3. After this Codex worker turn is idle, run `codex remote-control start --json`; require
+   `status=connected`. Steer the same thread with
+   `codex exec resume 019f4b4b-6375-7373-aab5-6750c3fdaf04 -- "Reply with exactly CODEX_PR0A_RECONNECT_OK; do not edit files."`.
+4. With both mobile sessions visible, perform one host sleep or network disconnect/reconnect and
+   steer them again. Record raw outcomes without tokens, URLs, or credential material.
+5. In native Windows PowerShell, run `claude --version` and open a no-edit break-glass session to
+   confirm Windows Claude remains usable.
 
 ## Handoff Notes
 

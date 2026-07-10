@@ -1,11 +1,10 @@
-/** Read-only doctor and reversible bootstrap entry point for the native WSL foundation. */
-
 import {
   type BootstrapPlan,
   buildDoctorReport,
   buildRollbackPlan,
   classifyAuth,
   classifyComponent,
+  classifyGeminiAuthPolicy,
   classifyMobileControl,
   classifyStateDirectory,
   EXIT_CODES,
@@ -39,12 +38,10 @@ const COMMAND_SPECS: CommandSpec[] = [
 ];
 
 function usage(): string {
-  return [
-    'Usage:',
-    '  deno task agentic:wsl-foundation doctor [--json]',
-    '  deno task agentic:wsl-foundation bootstrap [--dry-run] [--json]',
-    '  deno task agentic:wsl-foundation rollback-plan [--json]',
-  ].join('\n');
+  return `Usage:
+  deno task agentic:wsl-foundation doctor [--json]
+  deno task agentic:wsl-foundation bootstrap [--dry-run] [--json]
+  deno task agentic:wsl-foundation rollback-plan [--json]`;
 }
 
 const OWNED_ROOT = '.local/share/netscript-agentic';
@@ -135,6 +132,39 @@ async function hasSessionMetadata(providerDir: string): Promise<boolean> {
   return false;
 }
 
+async function readJsonObject(path: string): Promise<Record<string, unknown> | null> {
+  try {
+    const value: unknown = JSON.parse(await Deno.readTextFile(path));
+    return value && typeof value === 'object' && !Array.isArray(value)
+      ? value as Record<string, unknown>
+      : null;
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) return null;
+    return null;
+  }
+}
+
+async function readGeminiAuthPolicy(home: string): Promise<{
+  exists: boolean;
+  selectedType: string | null;
+  enforcedType: string | null;
+}> {
+  const path = `${home}/.gemini/settings.json`;
+  const fileExists = await pathExists(path);
+  const settings = fileExists ? await readJsonObject(path) : null;
+  const security = settings?.security && typeof settings.security === 'object'
+    ? settings.security as Record<string, unknown>
+    : null;
+  const auth = security?.auth && typeof security.auth === 'object'
+    ? security.auth as Record<string, unknown>
+    : null;
+  return {
+    exists: fileExists,
+    selectedType: typeof auth?.selectedType === 'string' ? auth.selectedType : null,
+    enforcedType: typeof auth?.enforcedType === 'string' ? auth.enforcedType : null,
+  };
+}
+
 async function doctor(): Promise<RuntimeDoctorReport> {
   const home = Deno.env.get('HOME') ?? '';
   const raw = await Promise.all(COMMAND_SPECS.map(run));
@@ -150,6 +180,14 @@ async function doctor(): Promise<RuntimeDoctorReport> {
       classifyStateDirectory(component, relativePath, await exists(`${home}/${relativePath}`)),
     );
   }
+  const geminiPolicy = await readGeminiAuthPolicy(home);
+  components.push(
+    classifyGeminiAuthPolicy(
+      geminiPolicy.exists,
+      geminiPolicy.selectedType,
+      geminiPolicy.enforcedType,
+    ),
+  );
 
   const inspectedKeys = ['ANTHROPIC_API_KEY', ...FORBIDDEN_GEMINI_AUTH_KEYS];
   const presentKeys = new Set(inspectedKeys.filter((key) => Deno.env.get(key) !== undefined));
@@ -247,12 +285,10 @@ async function installNode(home: string): Promise<void> {
     try {
       await Deno.remove(archivePath);
     } catch {
-      // Best-effort cleanup of a checksum-verified temporary archive.
     }
     try {
       await Deno.remove(staging, { recursive: true });
     } catch {
-      // The atomic rename removes the staging path on success.
     }
   }
 }
@@ -280,7 +316,6 @@ async function ensureSymlink(target: string, link: string): Promise<string | nul
     try {
       await Deno.remove(temporary);
     } catch {
-      // Preserve the original failure while cleaning the temporary link.
     }
     throw error;
   }
@@ -302,6 +337,7 @@ async function executeBootstrap(home: string, plan: BootstrapPlan): Promise<void
   const npmPrefix = `${home}/${NPM_PREFIX}`;
   const binRoot = `${home}/.local/bin`;
   const previousTargets: Record<string, string | null> = {};
+  const createdFiles: string[] = [];
   for (const action of plan.actions) {
     if (action.kind === 'create_directory') {
       await Deno.mkdir(`${home}/${action.relativePath}`, { recursive: true, mode: 0o700 });
@@ -323,6 +359,22 @@ async function executeBootstrap(home: string, plan: BootstrapPlan): Promise<void
           `native WSL CLI install failed (exit ${result.code}): ${result.stderr.slice(0, 240)}`,
         );
       }
+    } else if (action.kind === 'configure_gemini_auth') {
+      const settingsPath = `${home}/.gemini/settings.json`;
+      if (await pathExists(settingsPath)) {
+        throw new Error(
+          'refusing to replace existing Gemini settings; doctor reports the conflict',
+        );
+      }
+      await writeJsonAtomic(settingsPath, {
+        security: {
+          auth: {
+            selectedType: action.selectedType,
+            enforcedType: action.selectedType,
+          },
+        },
+      });
+      createdFiles.push(settingsPath);
     } else if (action.kind === 'ensure_symlinks') {
       const targets: Record<string, string> = {
         node: `${nodeRoot}/bin/node`,
@@ -338,13 +390,23 @@ async function executeBootstrap(home: string, plan: BootstrapPlan): Promise<void
         previousTargets[name] = await ensureSymlink(targets[name], `${binRoot}/${name}`);
       }
     } else if (action.kind === 'write_state') {
-      await writeJsonAtomic(`${home}/${action.relativePath}`, {
+      const statePath = `${home}/${action.relativePath}`;
+      const existing = await readJsonObject(statePath);
+      const existingTargets =
+        existing?.previousTargets && typeof existing.previousTargets === 'object'
+          ? existing.previousTargets as Record<string, string | null>
+          : {};
+      const existingCreated = Array.isArray(existing?.createdFiles)
+        ? existing.createdFiles.filter((value): value is string => typeof value === 'string')
+        : [];
+      await writeJsonAtomic(statePath, {
         schemaVersion: plan.schemaVersion,
         installedAt: new Date().toISOString(),
         desired: plan.desired,
         ownedRoots: [`${home}/${OWNED_ROOT}`, `${home}/${NPM_PREFIX}`],
         ownedLinks: ['node', 'npm', 'npx', 'claude', 'gemini'].map((name) => `${binRoot}/${name}`),
-        previousTargets,
+        previousTargets: { ...existingTargets, ...previousTargets },
+        createdFiles: [...new Set([...existingCreated, ...createdFiles])],
       });
     }
   }
