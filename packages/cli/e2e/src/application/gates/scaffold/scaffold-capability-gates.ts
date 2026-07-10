@@ -7,6 +7,7 @@ import { createGeneratedPluginCheckGates } from './generated-plugins-check-gate.
 import { createOtelGates } from './otel-gates.ts';
 import { createCleanupGates, createRuntimeGates } from './runtime-gates.ts';
 import { createPreflightGates, createScaffoldGates } from './scaffold-gates.ts';
+import { createUiAiGates } from './ui-ai-gates.ts';
 
 /** Build the scaffold capability gate list. */
 export function createScaffoldCapabilityGates(
@@ -16,6 +17,7 @@ export function createScaffoldCapabilityGates(
   return [
     ...createPreflightGates(),
     ...createScaffoldGates(state),
+    ...createUiAiGates(),
     ...createDatabaseGates(),
     ...createGeneratedCheckGates(),
     ...createGeneratedPluginCheckGates(),
