@@ -69,3 +69,9 @@ runtime behavior gate, before the new render assertion failed to parse because q
 lost while composing the inline `deno eval` source. The assertion now constructs attribute markers
 with template literals, eliminating the nested string-escaping ambiguity; no product behavior or
 assertion strength changed.
+
+The corrected render gate then executed against the retained generated project and showed Preact's
+actual safe text serialization: it escapes each opening angle bracket (`&lt;script>` and
+`&lt;/script>`) but does not encode the harmless closing `>` characters. The assertion now matches
+that serializer contract while still independently rejecting any literal `<script>` or `<img`
+element in the DOM output.

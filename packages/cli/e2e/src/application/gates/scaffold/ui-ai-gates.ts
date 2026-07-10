@@ -99,7 +99,7 @@ const UI_RENDER_ASSERTION_SCRIPT = [
   '  if (!nested.includes(marker)) throw new Error(`missing rendered marker: ${marker}\n${nested}`);',
   '}',
   'if (nested.includes("<script>")) throw new Error(`renderer emitted raw HTML: ${nested}`);',
-  'if (!nested.includes("&lt;script&gt;alert(1)&lt;/script&gt;")) throw new Error(`renderer did not escape text: ${nested}`);',
+  'if (!nested.includes("&lt;script>alert(1)&lt;/script>")) throw new Error(`renderer did not escape text: ${nested}`);',
   'const unknown = render(renderUiPayload({ component: "raw-html", props: { html: "<img src=x onerror=alert(1)>" } }));',
   'if (!unknown.includes(`data-render-ui-fallback="unknown-type"`)) throw new Error(`missing unknown fallback: ${unknown}`);',
   'if (unknown.includes("<img")) throw new Error(`unknown fallback emitted raw HTML: ${unknown}`);',
