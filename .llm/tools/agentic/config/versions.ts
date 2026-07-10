@@ -17,6 +17,13 @@
 export const NODE_TARGET_VERSION = '26.5.0';
 
 /**
+ * TARGET: the Antigravity component's install marker. Antigravity has no numeric
+ * version in the bootstrap plan; it is installed via its official installer, so
+ * the "desired version" is this fixed marker string.
+ */
+export const ANTIGRAVITY_INSTALL_MARKER = 'official-installer';
+
+/**
  * TARGET: doctor "expected" version per runtime component. A component absent
  * from this map is treated as "present is enough" (no version pin), preserving
  * the historical behavior where only Node carried an expected version.
@@ -38,9 +45,10 @@ export const COMPAT_PINNED_TOOL_VERSIONS = {
 
 /**
  * TEST: value-only expected component versions for runtime-controller tests.
- * `node` intentionally repeats the `NODE_TARGET_VERSION` literal (isolated
- * declarations cannot inline a cross-const reference inside `as const`); both
- * live in this file, so there is still a single source of truth.
+ * `node` and `antigravity` intentionally repeat the `NODE_TARGET_VERSION` and
+ * `ANTIGRAVITY_INSTALL_MARKER` literals (isolated declarations cannot inline a
+ * cross-const reference inside `as const`); all live in this file, so there is
+ * still a single source of truth.
  */
 export const TEST_COMPONENT_VERSIONS = {
   node: '26.5.0',

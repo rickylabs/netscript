@@ -6,7 +6,7 @@ import {
   type FailureClassification,
   type RolloutOutcome,
 } from '../rollout-canary.ts';
-import { OPENROUTER_MODEL_IDS } from '../../config/models.ts';
+import { NATIVE_CANARY_MODEL_ARGS, OPENROUTER_MODEL_IDS } from '../../config/models.ts';
 
 export interface CommandRequest {
   readonly display: string;
@@ -25,8 +25,8 @@ export interface RolloutCommandRunner {
 const OWNER_RISK =
   'Interactive behavior is owner-accepted; automation does not reproduce mobile UI.';
 const PROVIDER_COMMANDS = [
-  ['claude-anthropic-native', 'claude-opus-4-8', 'high'],
-  ['codex-openai-native', 'gpt-5.6', 'medium'],
+  ['claude-anthropic-native', NATIVE_CANARY_MODEL_ARGS.claudeOpus, 'high'],
+  ['codex-openai-native', NATIVE_CANARY_MODEL_ARGS.codex, 'medium'],
   ['claude-openrouter', OPENROUTER_MODEL_IDS.minimax, 'high'],
   ['codex-openrouter', OPENROUTER_MODEL_IDS.glm, 'xhigh'],
 ] as const;

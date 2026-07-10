@@ -29,6 +29,17 @@ export const MODEL_IDS = {
 } as const;
 
 /**
+ * Native-provider model ids in the CLI-argument spelling the rollout canary
+ * passes to `provider-canary` (`claude`/`codex` `--model` args). These use the
+ * provider CLIs' own dashed spelling, distinct from the routing ids in
+ * `MODEL_IDS` (e.g. `claude-opus-4-8` vs the routing id `opus-4.8`).
+ */
+export const NATIVE_CANARY_MODEL_ARGS = {
+  claudeOpus: 'claude-opus-4-8',
+  codex: 'gpt-5.6',
+} as const;
+
+/**
  * Validated OpenRouter preset model ids (verified against provider docs
  * 2026-07-10). Presets are suggestions, not global defaults or fallback policy.
  */

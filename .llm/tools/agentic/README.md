@@ -74,11 +74,13 @@ deno run --allow-read --allow-run .llm/tools/agentic/codex/launch-codex-slice.ts
   --slice-dir <win-path> --provider openai --model gpt-5.6-sol --effort medium --dry-run
 ```
 
-Pick provider/model/effort from `.llm/harness/workflow/lane-policy.md` — prose in the brief is not
-launch authority. Drop `--dry-run` for the real launch; it fails closed unless the observed
-provider/model/effort match what you requested. Exit: `0` ok/dry-run/parse-log · `1` stage failed ·
-`2` watcher heartbeat · `3` brief contract violation · `4` git-safety violation (e.g. inherited
-upstream) · `5` worktree not found.
+The `--model gpt-5.6-sol` above is an **illustrative literal** for a runnable example — it is not a
+source of truth. Pick the real provider/model/effort from `.llm/harness/workflow/lane-policy.md`
+(whose bindings live in `runtime/routing-policy.ts`, referencing the ids in `config/models.ts`);
+prose in the brief is not launch authority. Drop `--dry-run` for the real launch; it fails closed
+unless the observed provider/model/effort match what you requested. Exit: `0` ok/dry-run/parse-log ·
+`1` stage failed · `2` watcher heartbeat · `3` brief contract violation · `4` git-safety violation
+(e.g. inherited upstream) · `5` worktree not found.
 
 ### 2. Watch it — `codex/codex-watch.ts` (runs **inside** WSL)
 

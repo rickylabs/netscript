@@ -1,7 +1,7 @@
 /** Pure contracts and classifiers for the native WSL agentic foundation. */
 
 import { ANTIGRAVITY_INSTALLER_URL } from '../config/endpoints.ts';
-import { NODE_TARGET_VERSION } from '../config/versions.ts';
+import { ANTIGRAVITY_INSTALL_MARKER, NODE_TARGET_VERSION } from '../config/versions.ts';
 
 export const FOUNDATION_SCHEMA_VERSION = '1.0';
 /** Re-exported from the central config; the single source is `config/versions.ts`. */
@@ -93,7 +93,7 @@ export type InstallAction =
 
 export interface BootstrapPlan {
   schemaVersion: typeof FOUNDATION_SCHEMA_VERSION;
-  desired: { node: string; claude: string; antigravity: 'official-installer' };
+  desired: { node: string; claude: string; antigravity: typeof ANTIGRAVITY_INSTALL_MARKER };
   actions: InstallAction[];
   changed: boolean;
 }
@@ -430,7 +430,7 @@ export function planBootstrap(
   }
   return {
     schemaVersion: FOUNDATION_SCHEMA_VERSION,
-    desired: { node: NODE_VERSION, ...desired, antigravity: 'official-installer' },
+    desired: { node: NODE_VERSION, ...desired, antigravity: ANTIGRAVITY_INSTALL_MARKER },
     actions,
     changed: actions.length > 0,
   };
