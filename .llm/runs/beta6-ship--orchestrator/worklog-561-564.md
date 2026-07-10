@@ -62,7 +62,7 @@ that the generated root config had no JSX transform for app-owned root-level TSX
 files were therefore parsed with the classic React transform despite the dashboard member's Fresh
 config. The local-source preparation gate now adds the same Preact precompile settings used by the
 generated Fresh app before checking the copied files. This is fixture configuration, not a source
-  or dependency bypass; the type-check remains mandatory.
+or dependency bypass; the type-check remains mandatory.
 
 The second canonical run passed 50 gates, including the copied-file type-check and every existing
 runtime behavior gate, before the new render assertion failed to parse because quote escaping was
@@ -75,3 +75,41 @@ actual safe text serialization: it escapes each opening angle bracket (`&lt;scri
 `&lt;/script>`) but does not encode the harmless closing `>` characters. The assertion now matches
 that serializer contract while still independently rejecting any literal `<script>` or `<img`
 element in the DOM output.
+
+## Completion
+
+Final one-pass acceptance command:
+
+`deno task e2e:cli run scaffold.runtime --cleanup --format pretty`
+
+Result: **PASS — 54 passed, 0 failed**. This includes:
+
+- `scaffold.ui-add-ai`: collection resolution and copy completed.
+- `scaffold.ui-local-source`: seven widget/theme/renderer targets verified; emitted unpublished JSR
+  alias validated and mapped to the copied local workspace member; Preact TSX configured.
+- `generated.ui-ai-check`: copied `McpUiWidget.tsx` and `render-ui.tsx` type-check cleanly.
+- `behavior.ui-render`: nested layout/viz/data DOM output, unknown-type fallback, depth-overflow
+  fallback, escaped text, and no raw HTML all pass.
+
+Final evidence:
+
+| Gate | Result |
+| --- | --- |
+| scoped check wrapper, `packages/cli`, `ts,tsx` | PASS — 593 files, 0 diagnostics |
+| scoped lint wrapper, `packages/cli`, `ts,tsx` | PASS — 593 files, 0 findings |
+| scoped fmt wrapper, `packages/cli`, `ts,tsx` | PASS — 593 files, 0 findings |
+| `deno test --allow-all packages/cli/e2e/tests` | PASS — 35 passed, 0 failed |
+| canonical `scaffold.runtime` one-pass smoke | PASS — 54 passed, 0 failed |
+| new `as` casts | PASS — none |
+| `deno.lock` churn | PASS — none |
+
+Implementation commits pushed with the required explicit refspec:
+
+- `93e0c40e` — initial AI collection E2E gates and worklog.
+- `3d1c1e8d` — generated Fresh TSX consumer configuration.
+- `378abb64` — robust inline render marker construction.
+- `9ef220dd` — align escaped-text assertion with Preact serialization.
+
+Final reconcile: the implementation satisfies #561 and #564 acceptance on the stacked #258
+renderer branch. No PR was opened; Tier-A supervisor `fb43bc3e` retains PR lifecycle and evaluator
+ownership.
