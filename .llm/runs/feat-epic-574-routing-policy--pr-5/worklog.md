@@ -117,3 +117,26 @@ and #582 deferred rollout remain intact.
 All current operational routing prose now refers to `workflow/lane-policy.md`. Transport-syntax
 examples are labeled compatibility mechanisms rather than routing authority. Historical debt/run
 evidence was not rewritten, and #582 remains deferred.
+
+## Slice 5 — Definition-of-Done evidence
+
+- Full `.llm/tools/agentic` suite: 192 passed, 0 failed.
+- Whole-agentic scoped check: 76 files, 0 findings.
+- Whole-agentic scoped lint: 76 files, 0 findings.
+- Whole-agentic scoped fmt: 76 files, 0 findings. Two prior baseline findings in
+  `openhands-status.ts` and `validate-claude-surface.ts` were mechanically formatted so the final
+  owned-root verdict is clean; no behavior changed.
+- `validate-claude-surface.ts`: all checks PASS, including exact `.agents` → `.claude` mirror parity
+  and three hook runs with `deno.lock` unchanged.
+- PR #590 DoD verified: single policy table, enforced/recorded route identity, separate evaluator,
+  generated mirrors, and native-Claude/gateway distinction are all implemented with linked slice
+  evidence.
+- Final whitespace, secret scan, lock check, raw status, and remote ref verification run immediately
+  before the final commit/push.
+
+### Reconcile note
+
+PR #590 remains draft with `status:impl` for coordinator Tier-A review. The implementation worker
+does not mark `status:ready-merge`, merge, or self-certify. Issue #581 carries no acceptance
+checkboxes; its five prose acceptance items are mirrored as checked PR DoD items with slice comments
+and this worklog as evidence.

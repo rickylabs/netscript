@@ -28,4 +28,6 @@ Slice 2 is commit `c41a790e`. Slice 3 adds required provider/model/effort at Cod
 launch edges plus requested-versus-observed evidence and fail-closed Codex mismatch handling. Finish
 Slice 3 is commit `8f98a7cc`. Slice 4 updates skills/docs/templates, distinguishes native mobile
 Claude from experimental gateways, regenerates `.claude/skills`, and passes Claude-surface
-validation. Finish slice 4 hygiene/commit/push/comment, then run the complete DoD gate slice.
+validation. Slice 4 is commit `f44496c5`. The final DoD pass is green: 192 tests, whole-agentic
+check/lint/fmt with zero findings, and Claude-surface validation PASS. Commit/push/comment the final
+evidence slice, then await coordinator Tier-A review; do not self-certify or merge.

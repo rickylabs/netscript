@@ -98,7 +98,9 @@ async function runHookLockCheck(): Promise<CheckResult> {
     });
     const child = command.spawn();
     const writer = child.stdin.getWriter();
-    await writer.write(new TextEncoder().encode(JSON.stringify({ hook_event_name: 'agentic-check', seq: i })));
+    await writer.write(
+      new TextEncoder().encode(JSON.stringify({ hook_event_name: 'agentic-check', seq: i })),
+    );
     await writer.close();
     const result = await child.output();
     if (result.code !== 0) {
