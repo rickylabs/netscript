@@ -10,11 +10,12 @@ across sessions; temporary investigation scripts belong under `.llm/tmp/`.
 - Keep tool permissions explicit. Most scanners only need `--allow-read`.
 - Do not duplicate doctrine/package fitness gates here. The current repo keeps those under
   `.llm/tools/fitness/`.
-- The maintained full CLI E2E gate is `deno task e2e:cli`; the legacy scaffold tool is diagnostic
-  only.
+- The maintained full CLI E2E gate is `deno task e2e:cli`; the independent scaffold behavioral tool
+  is diagnostic only.
 - For any "is this the latest version" decision use `deps:latest` (registry **stable** channel),
   **never** `deno outdated --latest` — the native `--latest` view ignores semver and reports
-  pre-release tags as latest (it once reported `@fedify/fedify 2.3.0-dev.*` while stable was `2.2.5`).
+  pre-release tags as latest (it once reported `@fedify/fedify 2.3.0-dev.*` while stable was
+  `2.2.5`).
 
 ## Dependency toolbelt (`deps/`)
 
@@ -29,8 +30,8 @@ command map.
   registry's **stable** channel (jsr `meta.json.latest` / npm `dist-tags.latest`), pre-release
   filtered. This is the authority for "latest stable", fixing the `deno outdated --latest`
   pre-release trap.
-- Flags: `--pretty`, `--behind-only`, `--filter "@fedify/*"`, `--allow-prerelease`,
-  `--fail-behind` (exit 1 when any dep is behind — for CI report lanes).
+- Flags: `--pretty`, `--behind-only`, `--filter "@fedify/*"`, `--allow-prerelease`, `--fail-behind`
+  (exit 1 when any dep is behind — for CI report lanes).
 - Example: `deno run --allow-read --allow-net .llm/tools/deps/latest.ts --behind-only --pretty`
 - Scope note: reads **declared** specifiers (what we bump). Use `deps/outdated.ts` for the
   lock-aware / transitive view.
@@ -52,12 +53,14 @@ command map.
 
 - Purpose: wrap `deno audit --level <floor>`, normalize to JSON (exit code + advisory lines).
 - Flags: `--level critical|high|moderate|low`, `--pretty`, `--fail-on-find`.
-- Example: `deno run --allow-read --allow-net --allow-run .llm/tools/deps/audit.ts --level critical --pretty`
+- Example:
+  `deno run --allow-read --allow-net --allow-run .llm/tools/deps/audit.ts --level critical --pretty`
 
 ### `deps/prod-install.ts` — published-surface install (`deno task deps:prod-install`)
 
 - Purpose: wrap `deno ci --prod` — proves the production (non-dev) surface installs against the
-  lockfile enforced by `deno ci`. **Additive** to the quality lane (`check`/`lint` still need dev deps).
+  lockfile enforced by `deno ci`. **Additive** to the quality lane (`check`/`lint` still need dev
+  deps).
 - Flags: `--skip-types`, `--pretty`.
 
 ## Full CLI E2E
@@ -84,8 +87,8 @@ command map.
 
 ### `e2e/scaffold-e2e-test.ts`
 
-- Purpose: legacy generated-project scaffold smoke kept as a comparison harness while the maintained
-  `packages/cli/e2e` runner covers the merge gate.
+- Purpose: independent generated-project behavioral scaffold diagnostic retained alongside the
+  maintained `packages/cli/e2e` merge gate.
 - Why MCP-friendly: emits step-level output and a streaming log under `.llm/tmp/scaffold-e2e-test/`.
 - Example commands:
   - `deno run --allow-read --allow-write --allow-run --allow-net --allow-env .llm/tools/e2e/scaffold-e2e-test.ts --format pretty --cleanup`
@@ -113,36 +116,6 @@ command map.
   - `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --ignore-line-endings`
 - Notes: `--ignore-line-endings` counts known baseline line-ending drift without listing every
   ignored file. Add `--show-ignored` only when the ignored file list is needed.
-
-### `search/find-lines.ts`
-
-- Purpose: scan roots for substring or regex matches and print `path:line: text`.
-- Example command:
-  - `deno run --allow-read .llm/tools/search/find-lines.ts --root packages/cli --regex "scaffold\\.(runtime|plugins)"`
-
-### `search/find-import-patterns.ts`
-
-- Purpose: scan imports and CSS `@import` lines for legacy aliases and relative-path debt.
-- Example command:
-  - `deno run --allow-read .llm/tools/search/find-import-patterns.ts --root packages/cli`
-
-### `search/find-symbol-usages.ts`
-
-- Purpose: scan for symbol usages with symbol-boundary matching for refactor prep.
-- Example command:
-  - `deno run --allow-read .llm/tools/search/find-symbol-usages.ts --root packages/cli --symbol copyOfficialPlugin`
-
-### `search/list-exports.ts`
-
-- Purpose: inventory exported symbols and re-exports across a package or app surface.
-- Example command:
-  - `deno run --allow-read .llm/tools/search/list-exports.ts --root packages/contracts`
-
-### `search/compare-export-surface.ts`
-
-- Purpose: compare actual exported symbols against an expected contract list.
-- Example command:
-  - `deno run --allow-read .llm/tools/search/compare-export-surface.ts --root packages/contracts --expect contract`
 
 ### `git/git-commit-paths.ts`
 

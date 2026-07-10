@@ -3,8 +3,8 @@
 Doctrine archetype: **6 - CLI / Tooling**.
 
 This package owns NetScript CLI capability smoke suites. It is additive to the existing
-`@netscript/cli` package and keeps `.llm/tools/scaffold-e2e-test.ts` as an independent behavioral
-baseline while the product-grade suite matures.
+`@netscript/cli` package and keeps `.llm/tools/e2e/scaffold-e2e-test.ts` as an independent
+behavioral baseline while the product-grade suite matures.
 
 ## Quick Start
 
@@ -54,9 +54,9 @@ specifier.
 
 Version pinning. The generated project pins `jsr:@netscript/*@<CLI deno.json version>`. The suite is
 green only when that version is already published on JSR. On `main`/alpha.4 -> published -> green.
-On a version-bump branch (e.g. alpha.5 before publish) -> expected-pending until publish.
-Follow-up idea: a `--package-version` override on the public `init` to target an explicit published
-version (out of scope here).
+On a version-bump branch (e.g. alpha.5 before publish) -> expected-pending until publish. Follow-up
+idea: a `--package-version` override on the public `init` to target an explicit published version
+(out of scope here).
 
 #124 blind spot. Prod-local runs the public bin from LOCAL source (`file://`), so it does NOT
 exercise the `https://` asset-read path and CANNOT catch the CLI-self-asset class (#124). That

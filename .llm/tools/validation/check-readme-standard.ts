@@ -228,7 +228,9 @@ async function main(): Promise<void> {
     } else if (ok) {
       console.log('A2 README standard OK - ' + results.length + ' README(s) conform.');
     } else {
-      console.error('A2 README standard FAIL - ' + failed.length + '/' + results.length + ' non-conformant:');
+      console.error(
+        'A2 README standard FAIL - ' + failed.length + '/' + results.length + ' non-conformant:',
+      );
       for (const r of failed) {
         console.error('  ' + r.path);
         for (const v of r.violations) console.error('    - [' + v.rule + '] ' + v.message);

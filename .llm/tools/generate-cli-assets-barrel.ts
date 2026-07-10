@@ -193,7 +193,10 @@ if (import.meta.main) {
     Deno.exit(0);
   }
 
-  await Deno.writeTextFile(CLI_OUTPUT_URL, await formatTypeScript(await renderCliEmbeddedContent()));
+  await Deno.writeTextFile(
+    CLI_OUTPUT_URL,
+    await formatTypeScript(await renderCliEmbeddedContent()),
+  );
   await Deno.writeTextFile(
     PLUGIN_OUTPUT_URL,
     await formatTypeScript(await renderPluginEmbeddedContent()),

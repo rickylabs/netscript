@@ -1,3 +1,5 @@
+import { dirname } from '@std/path';
+
 /**
  * check-caveat-refs.ts — verify every `<!-- caveat: … -->` marker in docs Markdown
  * references a resolvable target: a GitHub issue (`gh:#N`) or an existing
@@ -192,15 +194,4 @@ function addUnresolved(unresolved: Map<string, string[]>, file: string, ref: str
   const refs = unresolved.get(file) ?? [];
   refs.push(ref);
   unresolved.set(file, refs);
-}
-
-function dirname(path: string): string {
-  const withoutTrailingSlash = path.replace(/\/+$/, '') || '/';
-  const slashIndex = withoutTrailingSlash.lastIndexOf('/');
-
-  if (slashIndex <= 0) {
-    return '/';
-  }
-
-  return withoutTrailingSlash.slice(0, slashIndex);
 }
