@@ -24,6 +24,8 @@
  * behavior is unit-testable with no side effects. See `agentic-lib_test.ts`.
  */
 
+import { GITHUB_API_BASE_URL } from '../config/endpoints.ts';
+
 // ---------------------------------------------------------------------------
 // Path + shell quoting (pure)
 // ---------------------------------------------------------------------------
@@ -966,7 +968,7 @@ export interface GitHubResponse {
 /**
  * Minimal GitHub REST call. `token` is used only as the Authorization header and
  * is never written to disk, argv, or output. `path` is appended to
- * `https://api.github.com`.
+ * `GITHUB_API_BASE_URL` (`config/endpoints.ts`).
  */
 export async function githubRequest(
   method: string,
@@ -974,7 +976,7 @@ export async function githubRequest(
   token: string,
   body?: unknown,
 ): Promise<GitHubResponse> {
-  const res = await fetch(`https://api.github.com${path}`, {
+  const res = await fetch(`${GITHUB_API_BASE_URL}${path}`, {
     method,
     headers: {
       'Authorization': `Bearer ${token}`,

@@ -1,6 +1,7 @@
 /** Structured-first classification of provider routing failures. */
 
 import type { DiagnosticCode, RuntimeDiagnostic } from './contract.ts';
+import { COMPAT_PINNED_TOOL_VERSIONS } from '../config/versions.ts';
 
 export const ROUTING_REASON_CATEGORIES = [
   'quota',
@@ -40,9 +41,24 @@ interface PinnedTextRule {
 }
 
 const PINNED_TEXT_RULES: readonly PinnedTextRule[] = [
-  { tool: 'claude', version: '1.0.33', pattern: /usage limit reached/i, reason: 'plan_limit' },
-  { tool: 'codex', version: '0.91.0', pattern: /session limit reached/i, reason: 'session_limit' },
-  { tool: 'antigravity', version: '1.5.1', pattern: /quota exhausted/i, reason: 'quota' },
+  {
+    tool: 'claude',
+    version: COMPAT_PINNED_TOOL_VERSIONS.claude,
+    pattern: /usage limit reached/i,
+    reason: 'plan_limit',
+  },
+  {
+    tool: 'codex',
+    version: COMPAT_PINNED_TOOL_VERSIONS.codex,
+    pattern: /session limit reached/i,
+    reason: 'session_limit',
+  },
+  {
+    tool: 'antigravity',
+    version: COMPAT_PINNED_TOOL_VERSIONS.antigravity,
+    pattern: /quota exhausted/i,
+    reason: 'quota',
+  },
 ];
 
 /** Classifies structured diagnostics before exact tool/version compatibility text. */

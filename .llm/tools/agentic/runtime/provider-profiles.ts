@@ -1,6 +1,11 @@
 /** Finite provider profiles and validated OpenRouter presets for agentic runners. */
 
 import type { AgentKind, Effort, ProviderKind, RouteIdentity } from './contract.ts';
+import {
+  OPENROUTER_ANTHROPIC_BASE_URL as CONFIG_OPENROUTER_ANTHROPIC_BASE_URL,
+  OPENROUTER_RESPONSES_BASE_URL as CONFIG_OPENROUTER_RESPONSES_BASE_URL,
+} from '../config/endpoints.ts';
+import { OPENROUTER_MODEL_IDS } from '../config/models.ts';
 
 export const PROVIDER_PROFILE_IDS = [
   'claude-anthropic-native',
@@ -33,8 +38,9 @@ export interface ProviderProfile {
   readonly clearKeys: readonly (ProviderCredentialKey | ProviderRouteKey)[];
 }
 
-export const OPENROUTER_ANTHROPIC_BASE_URL = 'https://openrouter.ai/api' as const;
-export const OPENROUTER_RESPONSES_BASE_URL = 'https://openrouter.ai/api/v1' as const;
+/** Re-exported from the central config; the single source is `config/endpoints.ts`. */
+export const OPENROUTER_ANTHROPIC_BASE_URL: string = CONFIG_OPENROUTER_ANTHROPIC_BASE_URL;
+export const OPENROUTER_RESPONSES_BASE_URL: string = CONFIG_OPENROUTER_RESPONSES_BASE_URL;
 
 function profile(
   values: Omit<ProviderProfile, 'clearKeys'>,
@@ -99,11 +105,15 @@ export const OPENROUTER_PRESET_IDS = [
   'codex-long-medium-grok-4-5',
 ] as const;
 export type OpenRouterPresetId = typeof OPENROUTER_PRESET_IDS[number];
-export const OPENROUTER_PRESET_MODELS = [
-  'minimax/minimax-m3',
-  'z-ai/glm-5.2',
-  'x-ai/grok-4.5',
-] as const;
+export const OPENROUTER_PRESET_MODELS: readonly [
+  typeof OPENROUTER_MODEL_IDS.minimax,
+  typeof OPENROUTER_MODEL_IDS.glm,
+  typeof OPENROUTER_MODEL_IDS.grok,
+] = [
+  OPENROUTER_MODEL_IDS.minimax,
+  OPENROUTER_MODEL_IDS.glm,
+  OPENROUTER_MODEL_IDS.grok,
+];
 
 export interface OpenRouterPreset {
   readonly id: OpenRouterPresetId;
@@ -118,21 +128,21 @@ export const OPENROUTER_PRESETS: Readonly<Record<OpenRouterPresetId, OpenRouterP
     'claude-fanout-minimax-m3': Object.freeze({
       id: 'claude-fanout-minimax-m3',
       profileId: 'claude-openrouter',
-      model: 'minimax/minimax-m3',
+      model: OPENROUTER_MODEL_IDS.minimax,
       effort: 'high',
       purpose: 'workflow-fanout',
     }),
     'codex-design-glm-5-2': Object.freeze({
       id: 'codex-design-glm-5-2',
       profileId: 'codex-openrouter',
-      model: 'z-ai/glm-5.2',
+      model: OPENROUTER_MODEL_IDS.glm,
       effort: 'xhigh',
       purpose: 'creative-design',
     }),
     'codex-long-medium-grok-4-5': Object.freeze({
       id: 'codex-long-medium-grok-4-5',
       profileId: 'codex-openrouter',
-      model: 'x-ai/grok-4.5',
+      model: OPENROUTER_MODEL_IDS.grok,
       effort: 'medium',
       purpose: 'long-running-medium',
     }),

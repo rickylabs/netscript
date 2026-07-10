@@ -17,6 +17,8 @@ import {
   type RuntimeComponentId,
   type RuntimeDoctorReport,
 } from './wsl-foundation-lib.ts';
+import { NODE_DIST_HOST } from '../config/endpoints.ts';
+import { COMPONENT_EXPECTED_VERSIONS } from '../config/versions.ts';
 
 interface CommandSpec {
   component: RuntimeComponentId;
@@ -26,7 +28,12 @@ interface CommandSpec {
 }
 
 const COMMAND_SPECS: CommandSpec[] = [
-  { component: 'node', command: 'node', args: ['--version'], expected: '26.5.0' },
+  {
+    component: 'node',
+    command: 'node',
+    args: ['--version'],
+    expected: COMPONENT_EXPECTED_VERSIONS.node,
+  },
   { component: 'npm', command: 'npm', args: ['--version'] },
   { component: 'deno', command: 'deno', args: ['--version'] },
   { component: 'git', command: 'git', args: ['--version'] },
@@ -325,7 +332,7 @@ function toHex(bytes: ArrayBuffer): string {
 
 async function installNode(home: string): Promise<void> {
   const archiveName = `node-v${NODE_VERSION}-linux-x64.tar.xz`;
-  const baseUrl = `https://nodejs.org/dist/v${NODE_VERSION}`;
+  const baseUrl = `${NODE_DIST_HOST}/dist/v${NODE_VERSION}`;
   const [checksumsResponse, archiveResponse] = await Promise.all([
     fetch(`${baseUrl}/SHASUMS256.txt`),
     fetch(`${baseUrl}/${archiveName}`),

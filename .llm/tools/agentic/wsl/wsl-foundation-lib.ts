@@ -1,7 +1,11 @@
 /** Pure contracts and classifiers for the native WSL agentic foundation. */
 
+import { ANTIGRAVITY_INSTALLER_URL } from '../config/endpoints.ts';
+import { NODE_TARGET_VERSION } from '../config/versions.ts';
+
 export const FOUNDATION_SCHEMA_VERSION = '1.0';
-export const NODE_VERSION = '26.5.0';
+/** Re-exported from the central config; the single source is `config/versions.ts`. */
+export const NODE_VERSION: string = NODE_TARGET_VERSION;
 
 export const RUNTIME_COMPONENT_IDS = [
   'node',
@@ -81,7 +85,7 @@ export type InstallAction =
   | { kind: 'create_directory'; relativePath: string }
   | { kind: 'install_node'; version: string; archive: string }
   | { kind: 'install_npm_clis'; packages: string[] }
-  | { kind: 'install_antigravity'; installer: 'https://antigravity.google/cli/install.sh' }
+  | { kind: 'install_antigravity'; installer: typeof ANTIGRAVITY_INSTALLER_URL }
   | { kind: 'recover_antigravity_ownership' }
   | { kind: 'migrate_legacy_gemini_ownership' }
   | { kind: 'ensure_symlinks'; names: string[] }
@@ -401,7 +405,7 @@ export function planBootstrap(
     }
     actions.push({
       kind: 'install_antigravity',
-      installer: 'https://antigravity.google/cli/install.sh',
+      installer: ANTIGRAVITY_INSTALLER_URL,
     });
   }
   if (byId.get('antigravity-install-ownership')?.status === 'outdated') {

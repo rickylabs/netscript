@@ -6,6 +6,7 @@ import {
   type FailureClassification,
   type RolloutOutcome,
 } from '../rollout-canary.ts';
+import { OPENROUTER_MODEL_IDS } from '../../config/models.ts';
 
 export interface CommandRequest {
   readonly display: string;
@@ -26,8 +27,8 @@ const OWNER_RISK =
 const PROVIDER_COMMANDS = [
   ['claude-anthropic-native', 'claude-opus-4-8', 'high'],
   ['codex-openai-native', 'gpt-5.6', 'medium'],
-  ['claude-openrouter', 'minimax/minimax-m3', 'high'],
-  ['codex-openrouter', 'z-ai/glm-5.2', 'xhigh'],
+  ['claude-openrouter', OPENROUTER_MODEL_IDS.minimax, 'high'],
+  ['codex-openrouter', OPENROUTER_MODEL_IDS.glm, 'xhigh'],
 ] as const;
 
 class LocalCommandRunner implements RolloutCommandRunner {
