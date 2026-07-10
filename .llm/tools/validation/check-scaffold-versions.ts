@@ -61,7 +61,12 @@ function main(): void {
     .filter(([key]) => !args.aspireOnly || ASPIRE_KEYS.has(key));
 
   const violations = entries
-    .map(([key, version]) => ({ key, version, prerelease: prereleaseOf(version), aspire: ASPIRE_KEYS.has(key) }))
+    .map(([key, version]) => ({
+      key,
+      version,
+      prerelease: prereleaseOf(version),
+      aspire: ASPIRE_KEYS.has(key),
+    }))
     .filter((row) => row.prerelease !== null);
 
   const ok = violations.length === 0;
@@ -76,9 +81,13 @@ function main(): void {
   if (!args.quiet) {
     if (args.pretty) {
       if (ok) {
-        console.log(`E-12 OK — ${entries.length} scaffold pin(s) are stable (no prerelease suffix).`);
+        console.log(
+          `E-12 OK — ${entries.length} scaffold pin(s) are stable (no prerelease suffix).`,
+        );
       } else {
-        console.error(`E-12 FAIL — ${violations.length} scaffold pin(s) carry a prerelease suffix:`);
+        console.error(
+          `E-12 FAIL — ${violations.length} scaffold pin(s) carry a prerelease suffix:`,
+        );
         for (const v of violations) {
           console.error(`  ${v.key} = ${v.version}  (prerelease: ${v.prerelease})`);
         }

@@ -136,9 +136,7 @@ async function main() {
   // --- Docs ---
   const readmePath = join(ROOT, 'README.md');
   const hasReadme = await exists(readmePath);
-  const readmeLines = hasReadme
-    ? (await Deno.readTextFile(readmePath)).split(/\r?\n/).length
-    : 0;
+  const readmeLines = hasReadme ? (await Deno.readTextFile(readmePath)).split(/\r?\n/).length : 0;
   const hasDocsFolder = await exists(join(ROOT, 'docs'));
 
   const moduleTagOnEntries: Record<string, boolean> = {};
@@ -211,12 +209,38 @@ async function main() {
   // --- F-DOCT-1 folder vocabulary ---
   // ALLOWED list reserved for future positive-list enforcement; kept as documentation.
   const _ALLOWED = new Set([
-    'domain', 'ports', 'application', 'adapters', 'runtime', 'state',
-    'middleware', 'presets', 'registry', 'diagnostics', 'presentation',
-    'testing', 'internal', 'tests', 'examples', 'src', 'docs', 'bin',
-    'kernel', 'public', 'local', 'maintainer', 'mod', 'e2e',
-    'schemas', 'types', 'config', 'commands', 'producer', 'plugin',
-    'plugins', 'adapters-redis', // legacy aliases
+    'domain',
+    'ports',
+    'application',
+    'adapters',
+    'runtime',
+    'state',
+    'middleware',
+    'presets',
+    'registry',
+    'diagnostics',
+    'presentation',
+    'testing',
+    'internal',
+    'tests',
+    'examples',
+    'src',
+    'docs',
+    'bin',
+    'kernel',
+    'public',
+    'local',
+    'maintainer',
+    'mod',
+    'e2e',
+    'schemas',
+    'types',
+    'config',
+    'commands',
+    'producer',
+    'plugin',
+    'plugins',
+    'adapters-redis', // legacy aliases
   ]);
   const FORBIDDEN_NAMES = new Set(['utils', 'helpers', 'common', 'lib', 'interfaces']);
   for await (
@@ -232,7 +256,8 @@ async function main() {
       findings.push({
         gate: 'F-DOCT-4 vocabulary',
         level: 'WARN',
-        message: `forbidden folder name '${seg}' (utils/helpers/common/lib/interfaces) — needs migration plan + debt entry`,
+        message:
+          `forbidden folder name '${seg}' (utils/helpers/common/lib/interfaces) — needs migration plan + debt entry`,
         path: relative(ROOT, dir.path),
       });
     }
@@ -431,11 +456,19 @@ function printText(r: AuditReport) {
     `  docs: README=${r.docs.hasReadme}(${r.docs.readmeLines}L) docs/=${r.docs.hasDocsFolder} desc=${r.docs.descriptionLen}c`,
   );
   console.log(`  tests: ${r.tests.fileCount} files`);
-  console.log(`  surface: ${Object.entries(r.surface).map(([k, v]) => `${k}=${v.rawCount}`).join(', ')}`);
-  console.log(`  dry-run: ${r.slowTypes.ok ? 'OK' : 'FAIL'} slowTypeWarnings=${r.slowTypes.warnings.length}`);
+  console.log(
+    `  surface: ${Object.entries(r.surface).map(([k, v]) => `${k}=${v.rawCount}`).join(', ')}`,
+  );
+  console.log(
+    `  dry-run: ${r.slowTypes.ok ? 'OK' : 'FAIL'} slowTypeWarnings=${r.slowTypes.warnings.length}`,
+  );
   console.log(`  findings: ${r.gates.length}`);
   for (const f of r.gates) {
-    console.log(`    ${f.level} ${f.gate}: ${f.message}${f.path ? ` (${f.path}${f.line ? ':' + f.line : ''})` : ''}`);
+    console.log(
+      `    ${f.level} ${f.gate}: ${f.message}${
+        f.path ? ` (${f.path}${f.line ? ':' + f.line : ''})` : ''
+      }`,
+    );
   }
 }
 

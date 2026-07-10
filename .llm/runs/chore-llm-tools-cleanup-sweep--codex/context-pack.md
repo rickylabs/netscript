@@ -22,7 +22,7 @@ explicit owner waiver. Implementation is cleared.
 
 ## In Progress
 
-- Slice 2: approved search deletion and retained-e2e reference correction.
+- Slice 3: release config and Deno/@std harmonization.
 
 ## Next Steps
 

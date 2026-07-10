@@ -47,14 +47,17 @@ the stable root task name.
 
 ## Progress Log
 
-| Time       | Slice | Step     | Notes                                                          |
-| ---------- | ----- | -------- | -------------------------------------------------------------- |
-| 2026-07-11 | 1     | baseline | 55 TS files: check 0, lint 0, fmt 7 pre-existing, tests 23/23. |
-| 2026-07-11 | 2 | coordinator gate | Owner-waived external evaluator; separate Opus 4.8 coordinator approved with e2e KEEP correction. |
-| 2026-07-11 | 2 | legacy removal | Deleted five approved unreferenced search tools; repaired retained e2e documented path. |
-| 2026-07-11 | 2 | reconcile | PR #595 remains independent; no issue-closing keyword applies. |
+| Time       | Slice | Step             | Notes                                                                                                                       |
+| ---------- | ----- | ---------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| 2026-07-11 | 1     | baseline         | 55 TS files: check 0, lint 0, fmt 7 pre-existing, tests 23/23.                                                              |
+| 2026-07-11 | 2     | coordinator gate | Owner-waived external evaluator; separate Opus 4.8 coordinator approved with e2e KEEP correction.                           |
+| 2026-07-11 | 2     | legacy removal   | Deleted five approved unreferenced search tools; repaired retained e2e documented path.                                     |
+| 2026-07-11 | 2     | reconcile        | PR #595 remains independent; no issue-closing keyword applies.                                                              |
+| 2026-07-11 | 3     | Deno/@std        | Replaced two hand-rolled dirname helpers with `@std/path`; centralized duplicated JSR API endpoint under `release/config/`. |
+| 2026-07-11 | 3     | consistency      | Resolved all seven pre-existing formatter findings without changing contracts; added endpoint drift guard.                  |
+| 2026-07-11 | 3     | reconcile        | No new deletion or dependency; `deno.lock` restored after validator wildcard churn.                                         |
 
 ## Gate Results
 
-Slice 2 evidence: scoped check 53 files/0 findings; lint 0; fmt 0; raw touched-file check exit 0;
-11 touched tests passed.
+Slice 2 evidence: scoped check 53 files/0 findings; lint 0; fmt 0; raw touched-file check exit 0; 11
+touched tests passed.
