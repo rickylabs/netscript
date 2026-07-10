@@ -1,9 +1,9 @@
 /** Pure deterministic reconciliation planner for schema 1.0 commands. */
-
 import {
   type AdapterKind,
   type DeferredIssue,
-  FOUNDATION_COMPONENTS,
+  hasLegalRuntimeCommandMode,
+  INSTALLABLE_FOUNDATION_COMPONENTS,
   type ReconcilePlan,
   type RouteIdentity,
   RUNTIME_SCHEMA_VERSION,
@@ -18,15 +18,12 @@ import {
   desiredStatesEqual,
   type ObservedRuntimeState,
 } from './state.ts';
-
 export interface ReconciliationInput {
   readonly command: RuntimeCommand;
   readonly desired: DesiredRuntimeState | null;
   readonly observed: ObservedRuntimeState;
 }
-
 type PlanBuilder = { readonly actions: RuntimeAction[]; readonly diagnostics: RuntimeDiagnostic[] };
-
 function diagnostic(
   code: RuntimeDiagnostic['code'],
   category: RuntimeDiagnostic['category'],
@@ -35,7 +32,6 @@ function diagnostic(
 ): RuntimeDiagnostic {
   return { code, category, retryable: false, message, ownerIssue };
 }
-
 function addAction(
   builder: PlanBuilder,
   command: RuntimeCommand,
@@ -50,7 +46,6 @@ function addAction(
     ...values,
   });
 }
-
 function addBlockedIntent(
   builder: PlanBuilder,
   command: RuntimeCommand,
@@ -65,7 +60,6 @@ function addBlockedIntent(
     diagnostic: failure,
   });
 }
-
 function observedWorktreeSafe(observed: ObservedRuntimeState, worktree: string): boolean {
   const state = observed.worktrees.find((entry) => entry.path === worktree);
   return Boolean(
@@ -73,12 +67,10 @@ function observedWorktreeSafe(observed: ObservedRuntimeState, worktree: string):
       (state.upstream === null || state.upstream === 'NONE'),
   );
 }
-
 function routeDeferred(route: RouteIdentity): DeferredIssue | null {
   if (route.provider === 'openrouter' || route.provider === 'custom') return 577;
   return route.agent === 'gemini' ? 578 : null;
 }
-
 function planRouteAction(
   builder: PlanBuilder,
   command: RuntimeCommand,
@@ -119,12 +111,20 @@ function planRouteAction(
     sessionId,
   });
 }
-
 /** Produces data-only actions in stable order and never executes effects. */
 export function planReconciliation(input: ReconciliationInput): ReconcilePlan {
   const { command, desired, observed } = input;
   const builder: PlanBuilder = { actions: [], diagnostics: [] };
-
+  const runtimeShape: Readonly<{ kind: unknown; mode: unknown }> = command;
+  if (!hasLegalRuntimeCommandMode(runtimeShape)) {
+    addBlockedIntent(
+      builder,
+      command,
+      diagnostic('invalid_command', 'input', 'command mode is not legal for this command'),
+      [`command:${String(runtimeShape.kind)}`],
+    );
+    return finish(command, builder);
+  }
   if (observed.schemaVersion !== RUNTIME_SCHEMA_VERSION) {
     addBlockedIntent(
       builder,
@@ -148,7 +148,7 @@ export function planReconciliation(input: ReconciliationInput): ReconcilePlan {
           builder,
           command,
           diagnostic('invalid_state_file', 'input', 'configure requires desired runtime state'),
-          [`state:${command.stateId}`],
+          [`desired-state-source:${command.desiredState.path}`],
         );
       } else if (!desiredStatesEqual(desired, observed.configuredDesiredState)) {
         addAction(builder, command, 'persist_desired_state', 'state', {
@@ -308,7 +308,7 @@ function planBootstrap(
     );
     return;
   }
-  for (const component of FOUNDATION_COMPONENTS) {
+  for (const component of INSTALLABLE_FOUNDATION_COMPONENTS) {
     const targetVersion = command.desiredVersions?.[component] ??
       desired.foundation.versions[component];
     if (!targetVersion) continue;

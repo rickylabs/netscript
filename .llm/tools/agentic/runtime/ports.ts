@@ -16,7 +16,8 @@ import type {
 
 export const READ_PORT_METHODS = [
   'observeRuntime',
-  'readDesiredState',
+  'readPersistedState',
+  'loadDesiredState',
   'readCheckpoint',
   'summarizeContent',
   'probeProcess',
@@ -54,8 +55,12 @@ export interface RuntimeInspectorPort {
   observeRuntime(): Promise<ObservedRuntimeState>;
 }
 
-export interface DesiredStateReaderPort {
-  readDesiredState(): Promise<PersistedRuntimeState | null>;
+export interface PersistedStateReaderPort {
+  readPersistedState(): Promise<PersistedRuntimeState | null>;
+}
+
+export interface DesiredStateSourcePort {
+  loadDesiredState(reference: ContentReference): Promise<DesiredRuntimeState>;
 }
 
 export interface CheckpointReaderPort {
@@ -76,7 +81,8 @@ export interface ClockPort {
 
 export interface RuntimeReadPorts {
   readonly inspector: RuntimeInspectorPort;
-  readonly desiredStateReader: DesiredStateReaderPort;
+  readonly persistedStateReader: PersistedStateReaderPort;
+  readonly desiredStateSource: DesiredStateSourcePort;
   readonly checkpointReader: CheckpointReaderPort;
   readonly contentReader: ContentReaderPort;
   readonly processProbe: ProcessProbePort;

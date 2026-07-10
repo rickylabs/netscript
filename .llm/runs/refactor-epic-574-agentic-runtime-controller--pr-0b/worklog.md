@@ -3,8 +3,8 @@
 ## Status
 
 Research and Design are complete. Tier-A coordinator Plan-Gate review returned `PASS` under the
-owner-authorized external-evaluator waiver. Approved slice S1 is implemented and its automated
-gates pass. Tier-A implementation review is pending; S2 has not started.
+owner-authorized external-evaluator waiver. Tier-A requested three S1 contract remediations; they
+are implemented and their automated gates pass. Tier-A re-review is pending; S2 has not started.
 
 ## Design
 
@@ -411,3 +411,55 @@ Issue #576 and draft PR #585 remain open at exactly one `status:impl`; issue mil
 remain correct. PR #585 retains `Closes #576`, `Part of #574`, and its PR #584 stack. The coordinator
 Plan-Gate approval and S1 START comments are present, no review comment changes the locked scope,
 acceptance/DoD remains unchecked, and the PR remains draft pending Tier-A S1 review.
+
+## S1 Remediation — Tier-A Contract Findings
+
+Tier-A posted the same three `S1 CHANGES REQUESTED` findings on PR #585 and issue #576. This
+remediation changed only the existing S1 contract/state/ports/planner files, their two focused test
+files, and the required run artifacts.
+
+### Findings Addressed
+
+1. Observation now derives `ObservedFoundationComponentId` from the complete 16-component PR 0A
+   executable/policy doctor vocabulary: Node, npm, Deno, Git, Codex, Codex app-server, Claude,
+   Gemini, Gemini auth policy, dotnet, Aspire, Docker, and four state-directory probes. Bootstrap
+   actions separately derive `InstallableFoundationComponentId` from Node/Claude/Gemini only, so
+   unsupported installs cannot be planned.
+2. `RuntimeCommandBase<K>.mode` now derives from `RuntimeCommandMode<K>`: `doctor` and `status` are
+   inspect-only; all effectful commands are plan/apply-only. Compile-time negative assertions reject
+   `doctor/apply` and `launch/inspect`; the runtime mode guard makes a forced illegal planner input
+   an `invalid_command` blocked intent rather than a success-shaped plan.
+3. `configure` now requires `desiredState: ContentReference`. `DesiredStateSourcePort` loads and
+   parses a value-free `DesiredRuntimeState` from that reference, while `PersistedStateReaderPort`
+   remains the distinct controller-state reader. Neither persisted state nor runtime results retain
+   source, prompt, message, or configuration content.
+
+### Remediation Evidence
+
+| Gate | Exact command / proof | Raw outcome |
+| --- | --- | --- |
+| Focused tests | `rtk proxy deno test --no-lock .llm/tools/agentic/runtime/contract_test.ts .llm/tools/agentic/runtime/planner_test.ts` | exit 0; `18 passed | 0 failed`; no permissions requested |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .llm/tools/agentic/runtime --ext ts --pretty` | exit 0; 6 files, 1 batch, 0 failures/findings; `--unstable-kv` applied by wrapper |
+| Scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root .llm/tools/agentic/runtime --ext ts --pretty` | exit 0; 6 files, 0 findings |
+| Scoped format | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root .llm/tools/agentic/runtime --ext ts --pretty` | exit 0; 6 files, 0 findings |
+| Native API inspection | `deno doc --filter RuntimeCommand contract.ts`; filters for `ObservedRuntimeState`, `DesiredStateSourcePort`, and `planReconciliation` on their runtime modules | all exit 0; remediated public signatures resolve |
+| Secret/content boundary | field scans across `contract.ts`, `state.ts`, `ports.ts`, and `planner.ts` | `SECRET_FIELD_SCAN=PASS`; `CONTENT_FIELD_SCAN=PASS` |
+| File budgets | `wc -l` over all six S1 files | PASS: `220/220`, `152/300`, `123/220`, `348/350`, `257/450`, `274/450` |
+| Lock hygiene | `git rev-parse 9f59ad8:deno.lock`; `git hash-object deno.lock`; `git diff --exit-code 9f59ad8 -- deno.lock` | both blobs `8694862878e6f9a430bf56497a4d5bf3f8eb1f3d`; diff exit 0 |
+| Patch hygiene | `git diff --cached --check` | exit 0 |
+
+### Remediation Drift, Debt, and Handoff
+
+- Plan drift: none. These are in-scope corrections to the locked S1 contracts and tests.
+- Architecture debt: none introduced; no dependency, adapter, CLI edge, executor, or wrapper was
+  added.
+- Lock drift: none; `deno.lock` remains byte-identical to S1 commit `9f59ad8`.
+- Review state: automated remediation gates pass, but this worker does not self-certify Tier-A.
+- Next action: coordinator performs substantive Tier-A S1 re-review. S2 remains blocked.
+
+## Reconcile Note — S1 Remediation
+
+PR #585 and issue #576 remain open in implementation. Their Tier-A `S1 CHANGES REQUESTED` comments
+match the remediated scope exactly. PR #585 remains draft with `Closes #576`, `Part of #574`, and
+its PR #584 stack; Definition-of-Done remains unchecked. No comment or label expands this turn into
+S2, and no child-issue implementation was pulled forward.

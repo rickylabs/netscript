@@ -8,7 +8,10 @@ import {
   DIAGNOSTIC_CODES,
   EFFORTS,
   FAILURE_CATEGORIES,
-  FOUNDATION_COMPONENTS,
+  hasLegalRuntimeCommandMode,
+  INSTALLABLE_FOUNDATION_COMPONENTS,
+  LEGAL_COMMAND_MODES,
+  OBSERVED_FOUNDATION_COMPONENTS,
   PROVIDER_KINDS,
   type ReconcilePlan,
   RUNTIME_COMMANDS,
@@ -18,7 +21,7 @@ import {
   type RuntimeCommand,
   type RuntimeResult,
 } from './contract.ts';
-import { MUTATION_PORT_METHODS, READ_PORT_METHODS } from './ports.ts';
+import { type DesiredStateSourcePort, MUTATION_PORT_METHODS, READ_PORT_METHODS } from './ports.ts';
 import type {
   DesiredRuntimeState,
   PersistedRuntimeState,
@@ -55,6 +58,11 @@ const session = {
   boundary: 'idle',
 } as const;
 
+// @ts-expect-error doctor is inspect-only by construction.
+const illegalDoctorMode: Extract<RuntimeCommand, { kind: 'doctor' }>['mode'] = 'apply';
+// @ts-expect-error launch has effects and cannot use inspect mode.
+const illegalLaunchMode: Extract<RuntimeCommand, { kind: 'launch' }>['mode'] = 'inspect';
+
 const desired: DesiredRuntimeState = {
   schemaVersion: RUNTIME_SCHEMA_VERSION,
   stateId: 'desired-1',
@@ -75,7 +83,8 @@ Deno.test('schema vocabularies are finite and duplicate-free', () => {
     AGENT_KINDS,
     PROVIDER_KINDS,
     EFFORTS,
-    FOUNDATION_COMPONENTS,
+    OBSERVED_FOUNDATION_COMPONENTS,
+    INSTALLABLE_FOUNDATION_COMPONENTS,
     RUNTIME_STATUSES,
     FAILURE_CATEGORIES,
     DIAGNOSTIC_CODES,
@@ -93,7 +102,7 @@ Deno.test('command union covers the complete schema 1.0 command vocabulary', () 
   const commands = [
     { kind: 'doctor', commandId: '01', mode: 'inspect' },
     { kind: 'bootstrap', commandId: '02', mode: 'plan' },
-    { kind: 'configure', commandId: '03', mode: 'apply', stateId: desired.stateId },
+    { kind: 'configure', commandId: '03', mode: 'apply', desiredState: { path: '/desired.json' } },
     { kind: 'launch', commandId: '04', mode: 'plan', route, content: { path: '/brief.md' } },
     {
       kind: 'resume',
@@ -112,6 +121,40 @@ Deno.test('command union covers the complete schema 1.0 command vocabulary', () 
   ] as const satisfies readonly RuntimeCommand[];
 
   assertEquals(commands.map((command) => command.kind), RUNTIME_COMMANDS);
+});
+
+Deno.test('command mode policy rejects illegal combinations at runtime', () => {
+  for (const kind of RUNTIME_COMMANDS) {
+    const expected = kind === 'doctor' || kind === 'status' ? ['inspect'] : ['plan', 'apply'];
+    assertEquals(LEGAL_COMMAND_MODES[kind], expected, `${kind} mode policy differs`);
+    for (const mode of RUNTIME_MODES) {
+      assertEquals(
+        hasLegalRuntimeCommandMode({ kind, mode }),
+        expected.includes(mode),
+        `${kind}/${mode} legality differs`,
+      );
+    }
+  }
+  assert(
+    !hasLegalRuntimeCommandMode({ kind: 'doctor', mode: illegalDoctorMode }),
+    'doctor/apply accepted',
+  );
+  assert(
+    !hasLegalRuntimeCommandMode({ kind: 'launch', mode: illegalLaunchMode }),
+    'launch/inspect accepted',
+  );
+});
+
+Deno.test('desired-state source loads a value-free state from a content reference', async () => {
+  const source: DesiredStateSourcePort = {
+    loadDesiredState(reference) {
+      assertEquals(reference, { path: '/desired.json' });
+      return Promise.resolve(desired);
+    },
+  };
+  const loaded = await source.loadDesiredState({ path: '/desired.json' });
+  assertEquals(loaded, desired);
+  assert(!('desiredState' in loaded), 'source reference leaked into desired state');
 });
 
 Deno.test('persisted and result contracts expose identifiers and fingerprints only', () => {

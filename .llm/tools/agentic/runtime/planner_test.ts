@@ -1,4 +1,9 @@
-import { type RouteIdentity, RUNTIME_SCHEMA_VERSION, type RuntimeCommand } from './contract.ts';
+import {
+  OBSERVED_FOUNDATION_COMPONENTS,
+  type RouteIdentity,
+  RUNTIME_SCHEMA_VERSION,
+  type RuntimeCommand,
+} from './contract.ts';
 import { planReconciliation } from './planner.ts';
 import type { DesiredRuntimeState, ObservedRuntimeState } from './state.ts';
 
@@ -74,7 +79,7 @@ Deno.test('equal configured state plans no actions', () => {
     kind: 'configure',
     commandId: 'configure-1',
     mode: 'plan',
-    stateId: desired.stateId,
+    desiredState: { path: '/desired.json' },
   });
   assertEquals(result.status, 'no_change');
   assertEquals(result.actions, []);
@@ -87,12 +92,42 @@ Deno.test('equal bootstrap state plans no actions', () => {
   assertEquals(result.actions, []);
 });
 
+Deno.test('doctor accepts the complete PR 0A observed component vocabulary', () => {
+  const components = OBSERVED_FOUNDATION_COMPONENTS.map((component) => ({
+    component,
+    version: null,
+    status: 'ready' as const,
+  }));
+  const result = plan(
+    { kind: 'doctor', commandId: 'doctor-full-surface', mode: 'inspect' },
+    observed({ components }),
+  );
+  assertEquals(result.status, 'no_change');
+  assertEquals(result.actions, []);
+  assertEquals(components.map((entry) => entry.component), OBSERVED_FOUNDATION_COMPONENTS);
+});
+
+Deno.test('planner blocks a runtime-forced illegal command mode', () => {
+  const command = {
+    kind: 'doctor',
+    commandId: 'doctor-illegal',
+    mode: 'apply',
+  } as unknown as RuntimeCommand;
+  const result = plan(command);
+  assertEquals(result.status, 'blocked');
+  assertEquals(result.diagnostics[0]?.code, 'invalid_command');
+  assertEquals(result.actions.map((action) => action.kind), ['blocked_intent']);
+});
+
 Deno.test('bootstrap drift yields deterministic data-only actions in finite order', () => {
   const drifted = observed({
     components: [
       { component: 'node', version: '18.19.1', status: 'outdated' },
       { component: 'claude', version: null, status: 'missing' },
       { component: 'gemini', version: '0.49.0', status: 'outdated' },
+      { component: 'deno', version: null, status: 'missing' },
+      { component: 'docker', version: null, status: 'missing' },
+      { component: 'gemini-auth-policy', version: null, status: 'auth_conflict' },
     ],
     stateDirectories: [],
   });
@@ -124,6 +159,13 @@ Deno.test('bootstrap drift yields deterministic data-only actions in finite orde
     'bootstrap-2:06:create_state_directory',
     'bootstrap-2:07:create_state_directory',
   ]);
+  assertEquals(
+    first.actions.filter((action) => action.kind === 'install_component').map((action) =>
+      action.component
+    ),
+    ['node', 'claude', 'gemini'],
+    'bootstrap planned an unsupported foundation install',
+  );
   assert(first.actions.every((action) => action.reversible), 'bootstrap action is not reversible');
   assert(!JSON.stringify(first).includes('function'), 'plan contains executable data');
 });

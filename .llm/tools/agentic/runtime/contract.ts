@@ -1,60 +1,56 @@
 /** Versioned, value-free contracts for the agentic runtime controller. */
 
 export const RUNTIME_SCHEMA_VERSION = '1.0' as const;
-
 // deno-fmt-ignore
 export const RUNTIME_COMMANDS = [
   'doctor', 'bootstrap', 'configure', 'launch', 'resume', 'smoke', 'fallback', 'restore',
   'status', 'repair-codex-remote', 'rollback',
 ] as const;
 export type RuntimeCommandKind = typeof RUNTIME_COMMANDS[number];
-
 export const RUNTIME_MODES = ['inspect', 'plan', 'apply'] as const;
 export type RuntimeMode = typeof RUNTIME_MODES[number];
 
+// deno-fmt-ignore
+export const LEGAL_COMMAND_MODES: Readonly<
+  Record<RuntimeCommandKind, readonly RuntimeMode[]>
+> = {
+  doctor: ['inspect'], bootstrap: ['plan', 'apply'], configure: ['plan', 'apply'],
+  launch: ['plan', 'apply'], resume: ['plan', 'apply'], smoke: ['plan', 'apply'],
+  fallback: ['plan', 'apply'], restore: ['plan', 'apply'], status: ['inspect'],
+  'repair-codex-remote': ['plan', 'apply'], rollback: ['plan', 'apply'],
+};
+export type RuntimeCommandMode<K extends RuntimeCommandKind> = K extends 'doctor' | 'status'
+  ? 'inspect'
+  : 'plan' | 'apply';
 export const AGENT_KINDS = ['claude', 'codex', 'gemini'] as const;
 export type AgentKind = typeof AGENT_KINDS[number];
-
 export const PROVIDER_KINDS = ['anthropic', 'openai', 'google', 'openrouter', 'custom'] as const;
 export type ProviderKind = typeof PROVIDER_KINDS[number];
-
 export const EFFORTS = ['low', 'medium', 'high', 'xhigh', 'max'] as const;
 export type Effort = typeof EFFORTS[number];
-
-export const FOUNDATION_COMPONENTS = ['node', 'claude', 'gemini'] as const;
-export type FoundationComponentId = typeof FOUNDATION_COMPONENTS[number];
-
+// deno-fmt-ignore
+export const OBSERVED_FOUNDATION_COMPONENTS = [
+  'node', 'npm', 'deno', 'git', 'codex', 'codex-app-server', 'claude', 'gemini',
+  'gemini-auth-policy', 'dotnet', 'aspire', 'docker', 'state-claude', 'state-codex',
+  'state-gemini', 'state-netscript-agentic',
+] as const;
+export type ObservedFoundationComponentId = typeof OBSERVED_FOUNDATION_COMPONENTS[number];
+export const INSTALLABLE_FOUNDATION_COMPONENTS = ['node', 'claude', 'gemini'] as const;
+export type InstallableFoundationComponentId = typeof INSTALLABLE_FOUNDATION_COMPONENTS[number];
 export const STATE_DIRECTORY_IDS = ['claude', 'codex', 'gemini', 'netscript-agentic'] as const;
 export type StateDirectoryId = typeof STATE_DIRECTORY_IDS[number];
-
+// deno-fmt-ignore
 export const RUNTIME_STATUSES = [
-  'succeeded',
-  'no_change',
-  'planned',
-  'degraded',
-  'blocked',
-  'failed',
-  'rolled_back',
+  'succeeded', 'no_change', 'planned', 'degraded', 'blocked', 'failed', 'rolled_back',
   'partially_rolled_back',
 ] as const;
 export type RuntimeStatus = typeof RUNTIME_STATUSES[number];
-
+// deno-fmt-ignore
 export const FAILURE_CATEGORIES = [
-  'input',
-  'policy',
-  'authentication',
-  'compatibility',
-  'safety',
-  'provider',
-  'transport',
-  'execution',
-  'state',
-  'rollback',
-  'capability',
-  'internal',
+  'input', 'policy', 'authentication', 'compatibility', 'safety', 'provider', 'transport',
+  'execution', 'state', 'rollback', 'capability', 'internal',
 ] as const;
 export type FailureCategory = typeof FAILURE_CATEGORIES[number];
-
 // deno-fmt-ignore
 export const DIAGNOSTIC_CODES = [
   'invalid_command', 'missing_identity', 'invalid_state_file', 'invalid_checkpoint', 'route_conflict',
@@ -68,7 +64,6 @@ export const DIAGNOSTIC_CODES = [
   'unexpected_error',
 ] as const;
 export type DiagnosticCode = typeof DIAGNOSTIC_CODES[number];
-
 export const ACTION_EFFECTS = ['none', 'write', 'process', 'network', 'session'] as const;
 export type ActionEffect = typeof ACTION_EFFECTS[number];
 // deno-fmt-ignore
@@ -79,14 +74,9 @@ export const ACTION_KINDS = [
 ] as const;
 export type RuntimeActionKind = typeof ACTION_KINDS[number];
 
+// deno-fmt-ignore
 export const ADAPTER_KINDS = [
-  'foundation',
-  'state',
-  'provider',
-  'claude',
-  'codex',
-  'gemini',
-  'mobile-control',
+  'foundation', 'state', 'provider', 'claude', 'codex', 'gemini', 'mobile-control',
 ] as const;
 export type AdapterKind = typeof ADAPTER_KINDS[number];
 
@@ -94,7 +84,6 @@ export const CAPABILITY_STATES = ['available', 'degraded', 'blocked', 'deferred'
 export type CapabilityState = typeof CAPABILITY_STATES[number];
 export const DEFERRED_ISSUES = [577, 578, 579, 580, 581, 582] as const;
 export type DeferredIssue = typeof DEFERRED_ISSUES[number];
-
 export interface RouteIdentity {
   readonly agent: AgentKind;
   readonly provider: ProviderKind;
@@ -119,15 +108,26 @@ export interface ContentReference {
 export interface RuntimeCommandBase<K extends RuntimeCommandKind> {
   readonly kind: K;
   readonly commandId: string;
-  readonly mode: RuntimeMode;
+  readonly mode: RuntimeCommandMode<K>;
+}
+
+/** Checks the finite command/mode policy at an untyped input boundary. */
+export function hasLegalRuntimeCommandMode(
+  command: Readonly<{ kind: unknown; mode: unknown }>,
+): command is Readonly<{ kind: RuntimeCommandKind; mode: RuntimeMode }> {
+  if (typeof command.kind !== 'string' || typeof command.mode !== 'string') return false;
+  if (!RUNTIME_COMMANDS.includes(command.kind as RuntimeCommandKind)) return false;
+  return LEGAL_COMMAND_MODES[command.kind as RuntimeCommandKind].includes(
+    command.mode as RuntimeMode,
+  );
 }
 
 export type RuntimeCommand =
   | (RuntimeCommandBase<'doctor'> & { readonly agents?: readonly AgentKind[] })
   | (RuntimeCommandBase<'bootstrap'> & {
-    readonly desiredVersions?: Readonly<Partial<Record<FoundationComponentId, string>>>;
+    readonly desiredVersions?: Readonly<Partial<Record<InstallableFoundationComponentId, string>>>;
   })
-  | (RuntimeCommandBase<'configure'> & { readonly stateId: string })
+  | (RuntimeCommandBase<'configure'> & { readonly desiredState: ContentReference })
   | (RuntimeCommandBase<'launch'> & {
     readonly route: RouteIdentity;
     readonly content: ContentReference;
@@ -174,7 +174,7 @@ export interface RuntimeAction {
   readonly effect: ActionEffect;
   readonly reversible: boolean;
   readonly resourceIds: readonly string[];
-  readonly component?: FoundationComponentId;
+  readonly component?: InstallableFoundationComponentId;
   readonly targetVersion?: string;
   readonly stateDirectory?: StateDirectoryId;
   readonly route?: RouteIdentity;

@@ -8,7 +8,7 @@
 | Branch | `refactor/epic-574-agentic-runtime-controller` |
 | Worktree | `/home/codex/repos/netscript-epic-574-pr0b-controller` |
 | Base | PR #584 sign-off `9b75470` |
-| Phase | S1 automated gates pass; Tier-A S1 review pending |
+| Phase | S1 remediation gates pass; Tier-A S1 re-review pending |
 | Thread | `019f4b72-2ea4-7050-917e-6d6918371265` (resume only) |
 
 ## Current State
@@ -18,10 +18,14 @@ schema `1.0` contracts, value-free desired/observed/checkpoint state, separate r
 and a pure deterministic reconciliation planner. Equal state plans no actions, actions are data
 only, and deferred capability requests return explicit blocked intents.
 
-The six S1 implementation/test files stay within their locked file and LOC budgets. Focused tests
-pass `14/14`; scoped check, lint, format, `git diff --check`, secret/content scans, and lock proof
-pass. No dependency or `deno.lock` change occurred. Tier-A S1 review is not self-certified and is
-still pending; no S2 work has started.
+Tier-A requested three S1 corrections: preserve the complete PR 0A observed component vocabulary
+while restricting bootstrap to an installable subset, make command modes legal by construction and
+runtime-guarded, and give configure a desired-state content reference plus a dedicated read-only
+source port. All three are implemented in the existing S1 files.
+
+Focused tests pass `18/18`; scoped check, lint, format, `git diff --check`, secret/content scans, and
+lock proof pass. All six files remain within their locked LOC budgets. No dependency or `deno.lock`
+change occurred. Tier-A S1 re-review is not self-certified and remains pending; S2 has not started.
 
 ## Locked Boundaries
 
@@ -36,8 +40,8 @@ still pending; no S2 work has started.
 
 ## Slice State
 
-1. S1 contract/state/ports/pure planner: implementation complete; automated gates pass; Tier-A
-   review pending.
+1. S1 contract/state/ports/pure planner: Tier-A findings remediated; automated gates pass; Tier-A
+   re-review pending.
 2. S2 controller/renderers/foundation/local-state/mobile adapters and read-only canonical CLI: not
    started.
 3. S3 Claude/Codex/Gemini/provider lifecycle adapters: not started.
@@ -52,16 +56,17 @@ still pending; no S2 work has started.
 - `.llm/tools/agentic/runtime/planner.ts`
 - `.llm/tools/agentic/runtime/contract_test.ts`
 - `.llm/tools/agentic/runtime/planner_test.ts`
-- Focused test: exit 0, `14 passed | 0 failed`, with `--no-lock` and no permissions.
+- Focused test: exit 0, `18 passed | 0 failed`, with `--no-lock` and no permissions.
 - Scoped wrappers: check/lint/format exit 0 across all 6 files with 0 findings.
-- Hard LOC budgets: PASS (`220`, `151`, `117`, `348`, `214`, `232` lines respectively).
-- Secret-bearing/content field scans: PASS. `deno.lock` matches plan commit `f1dfdc9` exactly.
+- Hard LOC budgets: PASS (`220`, `152`, `123`, `348`, `257`, `274` lines respectively).
+- Secret-bearing/content field scans: PASS. `deno.lock` matches S1 commit `9f59ad8` exactly.
 - Drift/debt: none. Deferred implementation remains assigned to #577 through #582 as planned.
 
 ## Next Action
 
-Coordinator reviews the pushed S1 commit and records the Tier-A result. Do not start S2 or launch
-another sender. Resume this exact thread only after coordinator approval and a concrete S2 brief.
+Coordinator reviews the separate S1 remediation commit and records the Tier-A re-review result. Do
+not start S2 or launch another sender. Resume this exact thread only after coordinator approval and
+a concrete S2 brief.
 
 ## Safety
 

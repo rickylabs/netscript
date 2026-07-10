@@ -3,7 +3,8 @@
 import type {
   AgentKind,
   CapabilityState,
-  FoundationComponentId,
+  InstallableFoundationComponentId,
+  ObservedFoundationComponentId,
   RouteIdentity,
   SessionIdentity,
   StateDirectoryId,
@@ -32,7 +33,7 @@ export type OwnedResourceKind = typeof OWNED_RESOURCE_KINDS[number];
 
 export interface DesiredFoundationState {
   readonly nativeExt4: true;
-  readonly versions: Readonly<Partial<Record<FoundationComponentId, string>>>;
+  readonly versions: Readonly<Partial<Record<InstallableFoundationComponentId, string>>>;
   readonly stateDirectories: readonly StateDirectoryId[];
 }
 
@@ -59,7 +60,7 @@ export interface DesiredRuntimeState {
 }
 
 export interface ObservedComponentState {
-  readonly component: FoundationComponentId;
+  readonly component: ObservedFoundationComponentId;
   readonly version: string | null;
   readonly status: ComponentStatus;
 }
