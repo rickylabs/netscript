@@ -44,3 +44,27 @@
 - **Severity:** minor
 - **Action:** fix within the locked L6/L7 safety design.
 - **Evidence:** child-environment and runner-profile tests; no credential values in artifacts.
+
+## 2026-07-10 — thin runnable canary edge added
+
+- **What:** Added `agentic:provider-canary` as a thin CLI/task over the planned S4 adapter.
+- **Source:** #577 acceptance requires canaries runnable before fan-out.
+- **Expected:** Plan named an adapter-level runnable canary operation but did not enumerate a CLI
+  file in the S4 table.
+- **Actual:** The CLI only parses explicit route identity, invokes the adapter, prints structured
+  non-secret JSON, and exits by status. It has run/env permissions and no filesystem-write or
+  network permission.
+- **Severity:** minor
+- **Action:** accept; no scope or architecture expansion.
+- **Evidence:** targeted `deno check`; final runtime 70/0; README command documented.
+
+## 2026-07-10 — complete-suite permission correction
+
+- **What:** The first final suite command omitted temp filesystem permissions.
+- **Source:** three pre-existing tests use `Deno.makeTempDir`.
+- **Expected:** Complete runtime suite passes.
+- **Actual:** No-permission attempt reached 67/70 with three `NotCapable` setup errors; authoritative
+  rerun with `--allow-read --allow-write` passed 70/0.
+- **Severity:** minor
+- **Action:** fix command and record both outcomes; no code change resulted from the setup miss.
+- **Evidence:** worklog final gate table.

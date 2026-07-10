@@ -26,6 +26,7 @@ coordinator Plan-Gate approves that checkpoint.
 | 2026-07-10 | S1 | implementation | Added finite runner/provider profiles and OpenRouter presets; removed only #577 route deferral while preserving #578 and #580 blocks. |
 | 2026-07-10 | S2 | implementation | Added late-bound child environment policy and adapter; credential values exist only in the fresh child env passed directly to `Deno.Command`. |
 | 2026-07-10 | S3 | implementation | Wired supported Claude model/base-route env and Codex named profile mechanisms; custom Claude explicitly reports Remote Control unavailable and experimental non-Anthropic behavior. |
+| 2026-07-10 | S4 | implementation | Added runnable read-only canaries that reduce private JSONL to structured evidence and block fan-out unless tools, reasoning, and streaming are all observed supported. |
 
 ## Provider slug verification
 
@@ -41,8 +42,8 @@ All three planned slugs were current; no registry correction or slug drift was r
 
 | Gate | Result | Notes |
 | ---- | ------ | ----- |
-| Plan-Gate | NOT_RUN | Coordinator owns approval; hard stop. |
-| Implementation/static/runtime gates | NOT_RUN | Implementation is prohibited before Plan-Gate approval. |
+| Plan-Gate | APPROVED | Coordinator approval received in the existing implementation thread before S1. |
+| Implementation/static/runtime gates | PASS | Per-slice evidence below; final complete runtime and wrappers green. |
 | Secret hygiene | PASS (plan slice) | Artifacts name environment keys only and contain no credential values. |
 | Dependency/lock hygiene | PASS (plan slice) | No dependency or `deno.lock` change. |
 | S1 focused tests | PASS | Exit 0; 30 passed, 0 failed across profile, provider-adapter, and planner suites. |
@@ -60,6 +61,14 @@ All three planned slugs were current; no registry correction or slug drift was r
 | S3 custom Claude | PASS | Credential-free HTTPS base URL validation; result metadata reports `remoteControl: unavailable` and `experimentalNonAnthropicModel: true`. |
 | S3 patch/effect/secret/lock | PASS | `git diff --check` clean; no parent mutation API; runtime effects remain adapter-only; credential scan and lock proof clean. |
 | S3 LOC | PASS | provider 128/280; ports 246/300; planner 350/420; Claude 115/300; Codex 249/350; profile adapter 94/300; focused test 224/450. |
+| S4 focused tests | PASS | Exit 0; 48 passed, 0 failed across canary, deferred-boundary, profile, environment, adapter, and planner suites. |
+| S4 complete runtime | PASS | Final authoritative run: exit 0; 70 passed, 0 failed with required temp read/write permissions. Initial no-permission attempt reached 67/70 and had three `NotCapable` setup errors only; it is not the verdict. |
+| S4 compatibility wrappers | PASS | Exit 0; 2 passed, 0 failed. |
+| S4 scoped check/lint/fmt | PASS | Final exit 0 each; 30 runtime files selected, zero findings. Targeted canary/wrapper check also exits 0. |
+| S4 canary behavior | PASS | Credential absence blocks without spawn; private output reduces to safe counts; malformed/timeout/process failure/unknown/unsupported capability blocks or fails with finite diagnostics; only complete observed compatibility is eligible. |
+| S4 deferred boundaries | PASS | #578 live evidence and every provider lifecycle apply/#580 repair block still fire; #579/#581/#582 remain absent capabilities, not hidden implementations. |
+| S4 patch/effect/secret/lock | PASS | `git diff --check` clean; no credential-shaped value; no parent mutation; adapter-only runtime effects; `deno.lock` unchanged. |
+| S4 LOC | PASS | canary adapter 228/320; canary contract 132; canary test 160/450; deferred test 119/450; provider 128/280; ports 246/300; planner 350/420. |
 
 ## Reconcile Notes
 
@@ -71,6 +80,9 @@ All three planned slugs were current; no registry correction or slug drift was r
 - **S3:** S2 PR comment is present. Current OpenRouter Claude documentation requires
   `ANTHROPIC_API_KEY` to be explicitly empty (not merely absent), so the child-only policy now
   models safe empty keys. This is a compatibility correction within L6/L7, not expanded scope.
+- **S4:** S3 PR comment is present. No reviewer comment changed scope. The read-only canary CLI is
+  a thin operational edge over the planned adapter so the acceptance canary is directly runnable;
+  it has no filesystem-write or network permission and retains no raw provider output.
 
 ## Handoff Notes
 
@@ -78,4 +90,4 @@ All three planned slugs were current; no registry correction or slug drift was r
   false-green boundaries.
 - The current Codex custom-provider wire is Responses-only; OpenRouter runner compatibility is a
   canary outcome, not a planning assumption.
-- Do not resume implementation without an explicit Plan-Gate approval in this same thread.
+- Implementation is complete; coordinator Tier-A substantive review is required before sign-off.

@@ -12,8 +12,9 @@
 
 ## Current State
 
-Coordinator Plan-Gate is approved. S1 implements profile routing, S2 child-only environment
-injection, and S3 supported Claude/Codex profile mechanisms. S4 fail-closed canaries are next.
+S1–S4 implementation is complete. Provider profiles, child-only environment injection, supported
+runner mechanisms, and fail-closed read-only canaries are green. Await coordinator Tier-A
+substantive review after the S4 handoff.
 
 ## Completed
 
@@ -25,13 +26,15 @@ injection, and S3 supported Claude/Codex profile mechanisms. S4 fail-closed cana
 - S2 focused tests pass 10/0; scoped check/lint/fmt pass with 24 files and zero findings.
 - S3 focused tests pass 19/0 plus compatibility wrappers 2/0; scoped check/lint/fmt pass with 26
   runtime files and zero findings.
+- S4 focused tests pass 48/0. Final complete runtime passes 70/0; compatibility wrappers pass 2/0;
+  scoped check/lint/fmt pass over 30 runtime files with zero findings.
 - OpenRouter slugs verified 2026-07-10: `minimax/minimax-m3`, `z-ai/glm-5.2`,
   `x-ai/grok-4.5`.
 
 ## Next Steps
 
-1. Commit, push, and comment S3.
-2. Implement S4 read-only compatibility canaries and documentation.
+1. Commit, push, and comment S4 with final gate evidence.
+2. Coordinator performs Tier-A substantive review; implementation worker does not self-certify.
 
 ## Key Decisions
 
@@ -51,10 +54,14 @@ injection, and S3 supported Claude/Codex profile mechanisms. S4 fail-closed cana
 | S2 static wrappers | PASS | check/lint/fmt exit 0; 24 files, zero findings |
 | S3 focused | PASS | 19 passed, 0 failed; compatibility wrappers 2 passed |
 | S3 static wrappers | PASS | check/lint/fmt exit 0; 26 files, zero findings |
+| S4 focused | PASS | 48 passed, 0 failed |
+| Complete runtime | PASS | 70 passed, 0 failed |
+| Final static wrappers | PASS | check/lint/fmt exit 0; 30 files, zero findings |
 
 ## Open Questions
 
-- None. Live model compatibility remains intentionally resolved by a fail-closed canary during S4.
+- None. No live credential was available; credential absence is covered by a structured blocked
+  canary diagnostic and never reported as a pass.
 
 ## Drift and Debt
 
