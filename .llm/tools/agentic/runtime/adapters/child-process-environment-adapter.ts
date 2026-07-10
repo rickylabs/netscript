@@ -136,7 +136,7 @@ export class ChildProcessEnvironmentAdapter implements ChildProcessPort {
       drain(child.stdout, request.maxCaptureBytes),
       drain(child.stderr, request.maxCaptureBytes),
     ]);
-    let timeoutId: number | undefined;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
     const timeout = new Promise<null>((resolve) => {
       timeoutId = setTimeout(() => resolve(null), request.timeoutMs);
     });
