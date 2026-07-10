@@ -1,7 +1,5 @@
 /** Finite, secret-safe evidence contracts for bounded Antigravity capability probes. */
-
 import type { RuntimeDiagnostic } from './contract.ts';
-
 export const ANTIGRAVITY_EVIDENCE_SCHEMA_VERSION = '1.0' as const;
 export const ANTIGRAVITY_CAPABILITIES = [
   'headless',
@@ -38,7 +36,6 @@ export const ANTIGRAVITY_FAILURE_SIGNALS = [
   'unsupported',
 ] as const;
 export type AntigravityFailureSignal = typeof ANTIGRAVITY_FAILURE_SIGNALS[number];
-
 export interface AntigravityEvidenceObservation {
   readonly exitCode: number | null;
   readonly timedOut: boolean;
@@ -49,7 +46,6 @@ export interface AntigravityEvidenceObservation {
   readonly staticCapabilities?: readonly AntigravityCapability[];
   readonly ownerAcceptedCapabilities?: readonly AntigravityCapability[];
 }
-
 export interface AntigravityCitationEvidence {
   readonly url: string;
   readonly persisted: true;
@@ -64,7 +60,6 @@ export interface AntigravityEvidence {
   readonly rawOutputRetained: false;
   readonly ownerAcceptanceApplied: boolean;
 }
-
 export interface AntigravityEvidenceResult {
   readonly status: AntigravityEvidenceStatus;
   readonly evidence: AntigravityEvidence;

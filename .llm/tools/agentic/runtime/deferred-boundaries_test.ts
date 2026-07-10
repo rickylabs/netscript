@@ -36,11 +36,11 @@ function plan(command: RuntimeCommand) {
   return planReconciliation({ command, desired: null, observed });
 }
 
-Deno.test('deferred child-issue registry remains complete for issues 578 through 582', () => {
-  assertEquals(DEFERRED_ISSUES.filter((issue) => issue >= 578), [578, 579, 580, 581, 582]);
+Deno.test('deferred child-issue registry retains issues 579 through 582 after evidence enablement', () => {
+  assertEquals(DEFERRED_ISSUES.filter((issue) => issue >= 579), [579, 580, 581, 582]);
 });
 
-Deno.test('Antigravity live evidence remains issue 578 blocked', () => {
+Deno.test('Antigravity live evidence plans while apply remains issue 580 blocked', () => {
   const result = plan({
     kind: 'smoke',
     commandId: 'deferred-578',
@@ -55,8 +55,24 @@ Deno.test('Antigravity live evidence remains issue 578 blocked', () => {
     },
     level: 'live',
   });
-  assertEquals(result.diagnostics.map((entry) => [entry.code, entry.ownerIssue]), [
-    ['capability_deferred', 578],
+  assertEquals(result.status, 'planned');
+  assertEquals(result.actions.map((entry) => entry.kind), ['smoke_session']);
+  const apply = plan({
+    kind: 'smoke',
+    commandId: 'apply-580',
+    mode: 'apply',
+    route: {
+      agent: 'antigravity',
+      provider: 'google',
+      model: 'caller-model',
+      effort: 'low',
+      worktree,
+      mobileRequired: false,
+    },
+    level: 'live',
+  });
+  assertEquals(apply.diagnostics.map((entry) => [entry.code, entry.ownerIssue]), [
+    ['capability_deferred', 580],
   ]);
 });
 

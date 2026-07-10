@@ -70,6 +70,7 @@ after it is bounded and secret-safe; connect planner/aggregation only after posi
 | 2026-07-10 | S1 | Contract/classifier | Finite evidence and sanitized citations landed; focused tests 4/4 and scoped check/lint/fmt are green. |
 | 2026-07-10 | S2 | Bounded adapter | Fixed read-only probes, sandbox, timeout, capture ceiling, child-only environment, and fail-closed runtime classification landed. |
 | 2026-07-10 | S3 | Conditional aggregation | Citation metadata writes only after empirical support; owner acceptance alone cannot write; instruction and legacy-state regressions are green. |
+| 2026-07-10 | S4 | Owner-accepted enablement | Removed #578 plan/live deferrals, added human CLI/task/README, retained #580 apply and #579/#581/#582 boundaries. |
 
 ## Drift
 
@@ -115,8 +116,30 @@ after it is bounded and secret-safe; connect planner/aggregation only after posi
 | Scoped lint | 0 | 36 files, 0 findings |
 | Scoped fmt | 0 | 36 files, 0 findings |
 
+### S4 Gates
+
+| Gate | Exit | Result |
+| ---- | ---- | ------ |
+| Focused enablement/CLI/boundary tests | 0 | 52 passed, 0 failed |
+| Complete agentic/runtime suite | 0 | 82 passed, 0 failed |
+| CLI scoped check/lint/fmt | 0 | 2 files, 0 findings each |
+| Runtime scoped check/lint/fmt | 0 | 36 files, 0 findings each |
+| `deno task arch:check` | 0 | No FAIL findings; pre-existing WARN/INFO inventory reported |
+| `deno.json` format | 0 | 1 file, 0 findings |
+
+### S4 Manual Archetype Evidence
+
+- Evidence contract: 200 LOC; Antigravity adapter: 279 LOC; aggregation adapter: 51 LOC; CLI edge:
+  102 LOC. All remain below the approved A6 budgets and 500 LOC hard cap.
+- `Deno.Command`, `Deno.env`, filesystem writes, and console output remain adapter/CLI-edge only.
+- No package/JSR export or dependency changed; JSR gate remains N/A.
+- Apply-mode session lifecycle remains a structured #580 block; no #579 fallback, #581 routing
+  policy, or #582 rollout behavior exists.
+
 ## Handoff Notes
 
 - Inspect the machine evidence and L11/live integration gate first.
 - A Plan-Gate approval does not fabricate external readiness; resume the same thread only after the
   owner verifies Google Sign-In outside automation.
+- Implementation is complete and awaiting coordinator Tier-A substantive review; this worker does
+  not certify merge readiness.

@@ -6,7 +6,7 @@
 | ----- | ----- |
 | Run ID | `feat-epic-574-antigravity-evidence--pr-2` |
 | Branch | `feat/epic-574-antigravity-evidence` |
-| Current phase | plan / awaiting Plan-Gate |
+| Current phase | implementation complete / awaiting Tier-A review |
 | Archetype | 6 — CLI / Tooling, scoped internal-tool variant |
 | Scope overlays | none |
 
@@ -28,11 +28,13 @@ runtime execution remains fail-closed.
   environment clearing, and blocked/failed auth/service/quota/timeout outcomes.
 - S3 conditional run-resource aggregation, private atomic citation metadata adapter, independent
   AGENTS/GEMINI marker classification, and existing legacy Gemini normalization/rejection coverage.
+- S4 live-evidence planning enablement, fail-closed human CLI/task, README operator flow, full runtime
+  suite, and preserved #579–#582 boundaries.
 
 ## Next Steps
 
-1. Complete S4 planner/live enablement, CLI task, README, boundary regressions, and full gates.
-2. Continue in this same thread; do not launch a second sender.
+1. Coordinator performs Tier-A substantive review; this implementation worker does not self-certify.
+2. Coordinator may request fixes by resuming this same thread; do not launch a second sender.
 
 ## Key Decisions
 
@@ -59,19 +61,24 @@ runtime execution remains fail-closed.
 | `.llm/tools/agentic/runtime/antigravity-evidence-aggregation.ts` | new | Conditional evidence handoff. |
 | `.llm/tools/agentic/runtime/adapters/run-resource-aggregation-adapter.ts` | new | Private atomic citation metadata writer. |
 | `.llm/tools/agentic/runtime/ports.ts` | changed | Citation aggregation port. |
+| `.llm/tools/agentic/antigravity-evidence-cli.ts` | new | Human bounded evidence entry point. |
+| `.llm/tools/agentic/antigravity-evidence-cli_test.ts` | new | CLI safety/parser tests. |
+| `.llm/tools/agentic/README.md` | changed | Google Sign-In, invocation, exits, and safety guidance. |
+| `deno.json` | changed | `agentic:antigravity-evidence` task. |
+| Runtime planner/contracts/tests | changed | #578 unblock; #579–#582 regression boundaries. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Static | PLAN-SLICE PASS | Evidence JSON parse and staged `git diff --check` exit 0; no implementation gates run. |
-| Fitness | PLANNED | A6 manual/`arch:check` gates selected. |
-| Runtime | BLOCKED | Owner session readiness required. |
-| Consumer | N/A | Internal tooling; no consumer surface change in S0. |
+| Static | PASS | Scoped check/lint/fmt zero findings for runtime and CLI. |
+| Fitness | PASS with pre-existing warnings | `arch:check` exit 0; owned A6 LOC/effect evidence recorded in worklog. |
+| Runtime | PASS (synthetic) | 82 passed, 0 failed; empirical canary remains owner-accepted, not fabricated. |
+| Consumer | PASS | Human CLI parser/task/README present; fixed probes only. |
 
 ## Open Questions
 
-- Owner-confirmed Google Sign-In readiness and subscription-specific model/agent availability.
+- Runtime Google Sign-In/session availability remains an operator condition and fails closed.
 
 ## Drift and Debt
 

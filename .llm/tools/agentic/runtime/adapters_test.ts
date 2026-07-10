@@ -287,7 +287,7 @@ Deno.test('Claude static smoke uses fixed bounded argv and blocks owner-only liv
   assertEquals(codes(live.diagnostics), ['capability_unsupported']);
 });
 
-Deno.test('Antigravity observations are finite and live evidence is issue 578 blocked', () => {
+Deno.test('Antigravity observations are finite and live evidence is bounded', () => {
   const observation = normalizeAntigravityObservation({
     version: RUNTIME_TEST_COMPONENT_VERSIONS.antigravity,
     authStatus: 'ready',
@@ -314,9 +314,14 @@ Deno.test('Antigravity observations are finite and live evidence is issue 578 bl
     content,
   };
   const plan = planAntigravityCommand({ command, nativeExt4: true });
-  assertEquals(plan.request, null);
-  assertEquals(plan.diagnostics[0]?.ownerIssue, 578);
-  assertEquals(codes(plan.diagnostics), ['capability_deferred']);
+  assertEquals(plan.request?.executable, 'agy');
+  assertEquals(plan.request?.arguments.slice(0, 4), [
+    '--print',
+    '--print-timeout',
+    '30000ms',
+    '--sandbox',
+  ]);
+  assertEquals(codes(plan.diagnostics), []);
 });
 
 Deno.test('provider requires explicit issue 577 profiles and never exposes input values', () => {

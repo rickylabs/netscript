@@ -67,6 +67,14 @@ export type AntigravityCommandFactory = (
 export interface AntigravityEnvironmentReader {
   toObject(): Record<string, string>;
 }
+const ADVERTISED_STATIC_CAPABILITIES: readonly AntigravityCapability[] = [
+  'model_flag',
+  'agent_flag',
+  'project_flag',
+  'conversation_flag',
+  'sandbox',
+  'legacy_state',
+];
 function diagnostic(
   code: RuntimeDiagnostic['code'],
   category: RuntimeDiagnostic['category'],
@@ -109,6 +117,22 @@ function staticRequest(cwd: string): AgentProcessRequest {
     cwd,
     timeoutMs: AGENT_COMMAND_TIMEOUT_MS,
     maxCaptureBytes: MAX_AGENT_CAPTURE_BYTES,
+  };
+}
+
+function liveRequest(cwd: string): AgentProcessRequest {
+  return {
+    executable: 'agy',
+    arguments: [
+      '--print',
+      '--print-timeout',
+      `${ANTIGRAVITY_CANARY_TIMEOUT_MS}ms`,
+      '--sandbox',
+      prompt('headless'),
+    ],
+    cwd,
+    timeoutMs: ANTIGRAVITY_CANARY_TIMEOUT_MS,
+    maxCaptureBytes: ANTIGRAVITY_MAX_CAPTURE_BYTES,
   };
 }
 
@@ -194,6 +218,7 @@ export class AntigravityEvidenceAdapter {
           : request.probe === 'gemini-instructions'
           ? 'GEMINI'
           : undefined,
+        staticCapabilities: ADVERTISED_STATIC_CAPABILITIES,
         ownerAcceptedCapabilities: request.ownerAcceptedCapabilities,
       });
     } catch (error) {
@@ -204,6 +229,7 @@ export class AntigravityEvidenceAdapter {
         stdout: '',
         stderr: timedOut ? 'timeout' : '',
         expectedMarker: expectedMarker(request.probe),
+        staticCapabilities: ADVERTISED_STATIC_CAPABILITIES,
         ownerAcceptedCapabilities: request.ownerAcceptedCapabilities,
       });
     } finally {
@@ -211,7 +237,7 @@ export class AntigravityEvidenceAdapter {
     }
   }
 }
-/** Plans only the documented static version probe; live behavior remains issue #578. */
+/** Plans documented static and bounded live evidence probes; launch/resume remain unsupported. */
 export function planAntigravityCommand(input: AntigravityPlanningInput): AgentCommandPlan {
   const { command } = input;
   const session = command.kind === 'resume' ? command.session : undefined;
@@ -237,16 +263,11 @@ export function planAntigravityCommand(input: AntigravityPlanningInput): AgentCo
         'Antigravity launch and resume are not implemented by the compatibility adapter',
       ),
     );
-  } else if (command.level === 'live') {
-    diagnostics.push(
-      diagnostic(
-        'capability_deferred',
-        'capability',
-        'Antigravity live evidence is deferred to issue #578',
-        578,
-      ),
-    );
-  } else if (!diagnostics.length) request = staticRequest(command.route.worktree);
+  } else if (!diagnostics.length) {
+    request = command.level === 'live'
+      ? liveRequest(command.route.worktree)
+      : staticRequest(command.route.worktree);
+  }
   return {
     agent: 'antigravity',
     operation: command.kind,
