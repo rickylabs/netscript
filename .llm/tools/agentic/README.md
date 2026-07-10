@@ -14,27 +14,55 @@ CLI over it.
 > (`deno check`) and unit-tested (`deno test`). Lint them ad hoc with
 > `deno lint --no-config <files>` if you touch them.
 
-## Files
+## Map — find your tool in seconds
 
-| File                         | Role                                                                                                                                                                                                                                                    |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `agentic-lib.ts`             | Shared pure + impure primitives (the heart; all landmine logic).                                                                                                                                                                                        |
-| `wsl-foundation-lib.ts`      | Pure runtime probe, auth-boundary, and doctor-report contracts.                                                                                                                                                                                         |
-| `wsl-foundation.ts`          | Native WSL doctor plus reversible foundation bootstrap/rollback planning.                                                                                                                                                                               |
-| `agentic-runtime.ts`         | Canonical schema-1.0 runtime doctor/status and mutation-free planning edge.                                                                                                                                                                             |
-| `runtime/`                   | Typed controller contracts, pure planner, renderers, and owned adapters.                                                                                                                                                                                |
-| `launch-codex-slice.ts`      | Validate brief → push-safety check → stage → launch a Codex slice; record thread id.                                                                                                                                                                    |
-| `codex-status.ts`            | Read-only: daemon health, worktree git state, recent sessions.                                                                                                                                                                                          |
-| `codex-watch.ts`             | Event-driven wait on a worktree's git activity (**runs inside WSL**).                                                                                                                                                                                   |
-| `codex-resume.ts`            | Steer an existing thread via `codex exec resume` (never forks a rival).                                                                                                                                                                                 |
-| `dispatch-openhands.ts`      | Validate prompt contract → build & POST an `@openhands-agent` trigger comment.                                                                                                                                                                          |
-| `openhands-status.ts`        | Read-only run status from the committed trace (default) or the PR status comment.                                                                                                                                                                       |
-| `watch-openhands-verdict.ts` | Poll a PR for the eval verdict with layered extraction (contract line → formal header → summary heuristics).                                                                                                                                            |
-| `gh-pr.ts`                   | Leaf-PR lifecycle: `create` / `verdict` / `merge` over the GitHub REST API (eval-gated merge).                                                                                                                                                          |
-| `gh-watch.ts`                | Background CI/verdict watch — polls a PR's OpenHands summary until the IMPL/PLAN-EVAL verdict is terminal, then exits to re-wake the supervisor (token-free re-wake, no polling loop in agent context).                                                 |
-| `gh-token.ts`                | Durable GitHub-token resolver/store — `check` validates a token from any healthy source (env → `gh auth token` → GCM) printing source+login only; `store` persists one stdin PAT to Windows GCM + WSL `gh` so future sessions resolve it automatically. |
-| `agentic-lib_test.ts`        | `deno test` unit suite over the pure primitives + real fixtures.                                                                                                                                                                                        |
-| `__fixtures__/`              | Real Codex launch log + a real-shaped OpenHands status comment.                                                                                                                                                                                         |
+Folders are named by concern. The **desired-state brain** lives in `runtime/` (typed contracts, pure
+planner, controller, adapters); everything else is an execution lane or a thin CLI edge over shared
+primitives. Tests live next to what they test (`*_test.ts`). The one root-level test,
+`compatibility-wrappers_test.ts`, guards the #576 one-deprecation-cycle wrapper boundary across
+`codex/`, `claude/`, and `wsl/`. Every tool is exposed as a stable `deno task agentic:*` task in the
+root `deno.json`.
+
+| Folder         | Concern                                                                                                                                                                                     |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `runtime/`     | Desired-state runtime controller: contract, state, planner, controller, output, routing + rollout policy, provider profiles, and `adapters/` (the only home for `Deno.env`/`Deno.Command`). |
+| `runtime/cli/` | Entry points over the brain: canonical doctor/status/repair, routing state, Antigravity evidence, provider + rollout canaries.                                                              |
+| `codex/`       | WSL Codex lane: launch a slice, watch progress/turn-completion, steer, inspect.                                                                                                             |
+| `openhands/`   | OpenHands lane: dispatch a run, read status, watch for the eval verdict.                                                                                                                    |
+| `github/`      | GitHub REST lane: leaf-PR lifecycle, CI/verdict watch, durable token resolution.                                                                                                            |
+| `wsl/`         | WSL foundation: native doctor + reversible bootstrap/rollback planning.                                                                                                                     |
+| `claude/`      | Claude surface: hook logger, remote-control smoke, skill-mirror sync, surface validator.                                                                                                    |
+| `lib/`         | Shared pure + impure primitives (all landmine logic), unit suite, real fixtures.                                                                                                            |
+
+### Per-file roles
+
+| File                                      | Role                                                                                                                                                                                                                                                    |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `lib/agentic-lib.ts`                      | Shared pure + impure primitives (the heart; all landmine logic).                                                                                                                                                                                        |
+| `lib/agentic-lib_test.ts`                 | `deno test` unit suite over the pure primitives + real fixtures.                                                                                                                                                                                        |
+| `lib/__fixtures__/`                       | Real Codex launch log + a real-shaped OpenHands status comment.                                                                                                                                                                                         |
+| `runtime/`                                | Typed controller contracts, pure planner, renderers, policies, and owned adapters.                                                                                                                                                                      |
+| `runtime/cli/agentic-runtime.ts`          | Canonical schema-1.0 runtime doctor/status, mutation-free planning edge, and guarded `repair codex-remote`.                                                                                                                                             |
+| `runtime/cli/routing-state.ts`            | Read-only quota-fallback routing state + transition history (#579).                                                                                                                                                                                     |
+| `runtime/cli/antigravity-evidence-cli.ts` | Bounded read-only Antigravity evidence probes (#578).                                                                                                                                                                                                   |
+| `runtime/cli/provider-canary.ts`          | Pre-fan-out provider/model compatibility canary (#577); CLI edge over the pure `runtime/provider-canary.ts` contract.                                                                                                                                   |
+| `runtime/cli/rollout-canary-cli.ts`       | Rollout canary matrix + report (#582); `rollout-canary-runner.ts` beside it is the orchestrator.                                                                                                                                                        |
+| `codex/launch-codex-slice.ts`             | Validate brief → push-safety check → stage → launch a Codex slice; record thread id.                                                                                                                                                                    |
+| `codex/codex-status.ts`                   | Read-only: daemon health, worktree git state, recent sessions.                                                                                                                                                                                          |
+| `codex/codex-watch.ts`                    | Event-driven wait on a worktree's git activity or turn completion (**runs inside WSL**).                                                                                                                                                                |
+| `codex/codex-resume.ts`                   | Steer an existing thread via `codex exec resume` (never forks a rival).                                                                                                                                                                                 |
+| `openhands/dispatch-openhands.ts`         | Validate prompt contract → build & POST an `@openhands-agent` trigger comment.                                                                                                                                                                          |
+| `openhands/openhands-status.ts`           | Read-only run status from the committed trace (default) or the PR status comment.                                                                                                                                                                       |
+| `openhands/watch-openhands-verdict.ts`    | Poll a PR for the eval verdict with layered extraction (contract line → formal header → summary heuristics).                                                                                                                                            |
+| `github/gh-pr.ts`                         | Leaf-PR lifecycle: `create` / `verdict` / `merge` over the GitHub REST API (eval-gated merge).                                                                                                                                                          |
+| `github/gh-watch.ts`                      | Background CI/verdict watch — polls a PR's OpenHands summary until the IMPL/PLAN-EVAL verdict is terminal, then exits to re-wake the supervisor (token-free re-wake, no polling loop in agent context).                                                 |
+| `github/gh-token.ts`                      | Durable GitHub-token resolver/store — `check` validates a token from any healthy source (env → `gh auth token` → GCM) printing source+login only; `store` persists one stdin PAT to Windows GCM + WSL `gh` so future sessions resolve it automatically. |
+| `wsl/wsl-foundation.ts`                   | Native WSL doctor plus reversible foundation bootstrap/rollback planning.                                                                                                                                                                               |
+| `wsl/wsl-foundation-lib.ts`               | Pure runtime probe, auth-boundary, and doctor-report contracts.                                                                                                                                                                                         |
+| `claude/claude-hook-log.ts`               | Claude Code hook sink → `.llm/tmp/claude/hooks/<run-id>/events.jsonl` (wired in `.claude/settings.json`).                                                                                                                                               |
+| `claude/claude-remote-smoke.ts`           | Claude remote-control smoke check (`agentic:smoke-claude-remote`).                                                                                                                                                                                      |
+| `claude/sync-claude-skills.ts`            | Generates `.claude/skills/` mirrors from `.agents/skills/` (`agentic:sync-claude[:check]`). Never hand-edit mirrors.                                                                                                                                    |
+| `claude/validate-claude-surface.ts`       | Validates the whole `.claude/` surface: settings JSON, gitignore, mirror sync, hook lock hygiene (`agentic:check-claude`).                                                                                                                              |
 
 ## Landmines defended (and where)
 
@@ -234,8 +262,8 @@ environment/read-only-process permissions only; it does not receive filesystem w
 
 #### Quota fallback state and restoration
 
-Inspect the machine-local routing state and concise transition history without contacting a
-provider or changing a route:
+Inspect the machine-local routing state and concise transition history without contacting a provider
+or changing a route:
 
 ```bash
 deno task agentic:routing-state
@@ -250,8 +278,8 @@ transitions. Controller-owned JSON remains under `~/.config/netscript-agentic/ru
 
 Fallback and restoration are data decisions only at an idle/new turn or session boundary. An
 active/critical slice blocks. After restart, the adapter reloads the same active route and history;
-the desired route is restored only after the provider reset time, a minimal successful canary, and
-a fresh boundary. Failed canaries record a five-minute backoff. The command above is read-only: it
+the desired route is restored only after the provider reset time, a minimal successful canary, and a
+fresh boundary. Failed canaries record a five-minute backoff. The command above is read-only: it
 does not log in, probe a provider, start/repair a sender, mutate global defaults/environment, or
 invoke paid/on-demand models. #580 owns sender/daemon execution, #581 owns global policy migration,
 and #582 owns rollout.
@@ -271,10 +299,10 @@ launch authority.
 
 ```powershell
 # Parse a saved launch log for the thread id (no side effects):
-deno run --allow-read .llm/tools/agentic/launch-codex-slice.ts --parse-log <log>
+deno run --allow-read .llm/tools/agentic/codex/launch-codex-slice.ts --parse-log <log>
 
 # Dry-run the full plan (validates brief + git safety, stages nothing, launches nothing):
-deno run --allow-read --allow-run .llm/tools/agentic/launch-codex-slice.ts \
+deno run --allow-read --allow-run .llm/tools/agentic/codex/launch-codex-slice.ts \
   --brief <win-path> --worktree <wsl path> --branch <branch> --slug <slug> \
   --slice-dir <win path> --provider openai --model gpt-5.6-sol --effort medium --dry-run
 
@@ -290,8 +318,8 @@ contract violation · `4` git-safety violation (e.g. inherited upstream) · `5` 
 Read-only snapshot — safe to run anytime.
 
 ```powershell
-deno run --allow-read --allow-run .llm/tools/agentic/codex-status.ts --pretty
-deno run --allow-read --allow-run .llm/tools/agentic/codex-status.ts --worktree <wsl path> --pretty
+deno run --allow-read --allow-run .llm/tools/agentic/codex/codex-status.ts --pretty
+deno run --allow-read --allow-run .llm/tools/agentic/codex/codex-status.ts --worktree <wsl path> --pretty
 ```
 
 Reports daemon version + app-server proc count, worktree git state + logs path (if `--worktree`),
@@ -311,11 +339,11 @@ Token-free event-driven wait. Two modes — pick by **which signal you need**:
 
 ```bash
 # progress — wake on the next commit/ref event:
-deno run --allow-read --allow-run .llm/tools/agentic/codex-watch.ts \
+deno run --allow-read --allow-run .llm/tools/agentic/codex/codex-watch.ts \
   --worktree <wsl path> --timeout-seconds 1800
 
 # finish — wake when the steered/launched turn completes (resolve rollout by thread id):
-deno run --allow-read --allow-env --allow-run .llm/tools/agentic/codex-watch.ts \
+deno run --allow-read --allow-env --allow-run .llm/tools/agentic/codex/codex-watch.ts \
   --mode turn --thread-id <uuid> --timeout-seconds 1800
 # (or pass --rollout <path> directly; --sessions-dir defaults to $HOME/.codex/sessions)
 ```
@@ -331,7 +359,7 @@ args / worktree, logs dir, or rollout not found.
 Steer an existing thread. Never fires a second send at a worktree.
 
 ```powershell
-deno run --allow-read --allow-run .llm/tools/agentic/codex-resume.ts \
+deno run --allow-read --allow-run .llm/tools/agentic/codex/codex-resume.ts \
   --thread-id <uuid> --message "<follow-up>" [--worktree <wsl path>] [--dry-run]
 ```
 
@@ -344,13 +372,13 @@ Validate the dispatch-prompt contract, build the `@openhands-agent` trigger, and
 
 ```powershell
 # Dry-run (no token, no network) — see the exact comment that would post:
-deno run --allow-read .llm/tools/agentic/dispatch-openhands.ts \
+deno run --allow-read .llm/tools/agentic/openhands/dispatch-openhands.ts \
   --pr 86 --prompt-file <win-path> --model openrouter/qwen/qwen3.7-max \
   --output pr-comment --iterations 800 --provider openrouter --effort xhigh --dry-run --pretty
 
 # Real post: set the token in-process first, then drop --dry-run:
 $env:GH_TOKEN = (read from your secret store)   # never commit / echo this
-deno run --allow-read --allow-env --allow-net .llm/tools/agentic/dispatch-openhands.ts \
+deno run --allow-read --allow-env --allow-net .llm/tools/agentic/openhands/dispatch-openhands.ts \
   --pr 86 --prompt-file <win-path> --model openrouter/qwen/qwen3.7-max \
   --provider openrouter --effort xhigh --output pr-comment
 ```
@@ -358,8 +386,8 @@ deno run --allow-read --allow-env --allow-net .llm/tools/agentic/dispatch-openha
 The prompt MUST begin with `use harness` and contain a `## SKILL` chapter (handoff contract). Output
 modes: `pr-comment` · `respond-comments` · `thread-replies` · `summary-only`. A `--pr` trigger
 checks out the PR branch; `--issue` checks out the default branch. Exit: `0` ok / dry-run · `1` post
-failed · `2` usage error · `3` prompt contract violation · `4` missing token (non-dry-run).
-The trigger records requested provider/model/effort and marks observed identity pending until the
+failed · `2` usage error · `3` prompt contract violation · `4` missing token (non-dry-run). The
+trigger records requested provider/model/effort and marks observed identity pending until the
 asynchronous Action status is available.
 
 By default every dispatched prompt gets a **verdict output-contract epilogue**
@@ -375,10 +403,10 @@ Read the verdict without hand-writing PowerShell.
 
 ```powershell
 # Local (default, no token): newest committed trace under .llm/tmp/run/openhands/pr-<n>/
-deno run --allow-read .llm/tools/agentic/openhands-status.ts --pr 37 --pretty
+deno run --allow-read .llm/tools/agentic/openhands/openhands-status.ts --pr 37 --pretty
 
 # Remote: parse the workflow's status comment via the API (needs a token in GH_TOKEN)
-deno run --allow-read --allow-env --allow-net .llm/tools/agentic/openhands-status.ts \
+deno run --allow-read --allow-env --allow-net .llm/tools/agentic/openhands/openhands-status.ts \
   --source remote --repo rickylabs/netscript --pr 86 --pretty
 ```
 
@@ -396,7 +424,7 @@ dispatch/trigger comment (which quotes the `[VERDICT: <verdict>]` template) is n
 
 ```powershell
 $env:GH_TOKEN = (read from your secret store)   # never commit / echo this
-deno run --allow-env --allow-net .llm/tools/agentic/watch-openhands-verdict.ts \
+deno run --allow-env --allow-net .llm/tools/agentic/openhands/watch-openhands-verdict.ts \
   --repo rickylabs/netscript --pr 86 --since 2026-07-05T10:00:00Z \
   --timeout-seconds 1800 --interval-seconds 30
 ```
@@ -413,16 +441,16 @@ is identical to the OpenHands tools (in-process env var only; `create --dry-run`
 
 ```powershell
 # create — open a leaf PR (refuses base 'main' without --allow-base-main):
-deno run --allow-read .llm/tools/agentic/gh-pr.ts create \
+deno run --allow-read .llm/tools/agentic/github/gh-pr.ts create \
   --repo rickylabs/netscript --head feat/prime-time/auth-s4-backends \
   --base feat/prime-time/auth --title "..." --body-file <win-path> --dry-run --pretty
 
 # verdict — read the latest OpenHands IMPL/PLAN-EVAL comment on a PR:
 $env:GH_TOKEN = (read from your secret store)
-deno run --allow-read --allow-env --allow-net .llm/tools/agentic/gh-pr.ts verdict --pr 95 --pretty
+deno run --allow-read --allow-env --allow-net .llm/tools/agentic/github/gh-pr.ts verdict --pr 95 --pretty
 
 # merge — eval-gated, clean-gated, base-guarded, head-sha-pinned:
-deno run --allow-read --allow-env --allow-net .llm/tools/agentic/gh-pr.ts merge \
+deno run --allow-read --allow-env --allow-net .llm/tools/agentic/github/gh-pr.ts merge \
   --pr 95 --method merge --title "..." --message "..." --pretty
 ```
 
@@ -452,12 +480,13 @@ The `wslUser()` / `wslHome()` helpers in `agentic-lib.ts` are the single source 
 ## Tests & validation
 
 ```powershell
-deno test --allow-read --allow-env .llm/tools/agentic/agentic-lib_test.ts   # 54 unit tests
-deno check --unstable-kv .llm/tools/agentic/*.ts                   # type-check (clean)
-deno lint  --no-config   .llm/tools/agentic/*.ts                   # lint (repo excludes .llm/)
+deno test --no-lock -A .llm/tools/agentic/                    # full suite (201 tests)
+deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .llm/tools/agentic --ext ts,tsx
+deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts  --root .llm/tools/agentic --ext ts,tsx
+deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts   --root .llm/tools/agentic --ext ts,tsx
 ```
 
 Unit tests use a local throw-based `assert`/`assertEquals` (the repo's import map is empty, so
 `@std/assert` is unavailable — matches `fitness/check-ds-gates_test.ts`). `parseThreadInfo` is
-asserted against the **real** launch fixture (`__fixtures__/codex-launch-s1.head.log`, thread
+asserted against the **real** launch fixture (`lib/__fixtures__/codex-launch-s1.head.log`, thread
 `019ee68a-9a41-7f01-b7d5-072fbd469b09`).
