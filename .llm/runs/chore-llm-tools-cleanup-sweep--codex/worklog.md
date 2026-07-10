@@ -64,3 +64,20 @@ the stable root task name.
 
 Slice 2 evidence: scoped check 53 files/0 findings; lint 0; fmt 0; raw touched-file check exit 0; 11
 touched tests passed.
+
+### Final gate evidence — 2026-07-11
+
+| Gate                        | Raw result                                                               |
+| --------------------------- | ------------------------------------------------------------------------ |
+| Scoped check                | 53 files selected; 0 occurrences; 0 failed batches                       |
+| Scoped lint                 | 53 files selected; 0 occurrences; exit 0                                 |
+| Scoped format               | 53 files selected; 0 findings; 0 failed batches                          |
+| Raw touched-file check      | 14 surviving touched TS files; `RAW_CHECK_EXIT=0`                        |
+| Touched tests               | 11 passed; 0 failed; `TOUCHED_TEST_EXIT=0`                               |
+| Docs maintenance            | 96 docs; 0 broken links/anchors; mirror and Claude surface clean; exit 0 |
+| Whole-repo stale references | No live basename matches for any deleted search tool                     |
+| Whitespace                  | `git diff --check` exit 0                                                |
+| Lock hygiene                | No committed `deno.lock` delta; validator-created wildcard rows removed  |
+
+Raw logs are retained in `.llm/tmp/llm-tools-cleanup/final/` and summarized here because scratch
+artifacts are not committed.

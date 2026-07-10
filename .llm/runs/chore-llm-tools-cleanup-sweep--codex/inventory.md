@@ -88,3 +88,30 @@ evidence will be appended as slices land.
 - `packages/cli/e2e/README.md`: corrected the retained diagnostic's actual path.
 - `.agents/skills/netscript-tools/SKILL.md`: added canonical release endpoint and maintenance-map
   pointers; its `.claude/skills/` mirror is regenerated, not hand-edited.
+
+## Final structure
+
+```text
+.llm/tools/
+├── agentic/                  # excluded; unchanged by this sweep
+├── deps/                     # dependency evidence and policy gates
+├── docs/                     # docs-site source validation
+├── e2e/                      # retained independent behavioral diagnostic
+├── fitness/                  # doctrine and readiness gates
+├── git/                      # shell-free git operations
+├── harness/                  # run wake utility
+├── release/
+│   ├── config/               # centralized volatile release endpoints + guard
+│   └── tests/fixtures/       # preflight behavior fixtures
+├── reporting/                # coverage reporting
+├── validation/               # CI and maintenance policy checks
+├── run-deno-*.ts             # stable-path scoped gate entry points
+├── generate-cli-assets-barrel.ts
+├── CLEANUP-PLAYBOOK.md
+├── README.md
+└── entry.md
+```
+
+The former `search/` folder is deleted. No files were moved: whole-repo analysis showed the
+remaining concern folders were already coherent, while root entry points are stable external path
+contracts.

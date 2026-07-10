@@ -6,14 +6,14 @@
 | -------------- | -------------------------------------- |
 | Run ID         | `chore-llm-tools-cleanup-sweep--codex` |
 | Branch         | `chore/llm-tools-cleanup-sweep`        |
-| Current phase  | `implement`                            |
+| Current phase  | `evaluate`                             |
 | Archetype      | `6 — CLI / Tooling`                    |
 | Scope overlays | docs maintenance                       |
 
 ## Current State
 
-Baseline and whole-repo reference matrix are complete. Coordinator PLAN-EVAL passed under the
-explicit owner waiver. Implementation is cleared.
+The cleanup sweep is implemented and all generator gates pass. The branch awaits the separate Claude
+coordinator's opposite-family implementation review; Codex has not self-certified or merged.
 
 ## Completed
 
@@ -22,12 +22,12 @@ explicit owner waiver. Implementation is cleared.
 
 ## In Progress
 
-- Slice 4: documentation and canonical maintenance pointers.
+- Final evidence commit and coordinator IMPL-EVAL handoff.
 
 ## Next Steps
 
-1. Implement slices in plan order.
-2. Run each slice gate, push, and comment on PR #595.
+1. Push final evidence.
+2. Claude coordinator performs opposite-family review before merge.
 
 ## Drift and Debt
 
