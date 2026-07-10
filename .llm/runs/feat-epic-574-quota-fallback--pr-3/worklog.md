@@ -75,4 +75,10 @@ before adding behavior. Policy stays pure; IO stays in adapters.
 | Date | Slice | Status | Evidence |
 | --- | --- | --- | --- |
 | 2026-07-10 | P0 | ready for coordinator Plan-Gate | Research, locked plan, Design, context, drift, thread identity prepared. |
+| 2026-07-10 | S1 | gates green | Pure policy selects explicit candidates only; active/depth/approval/opposite-family guards fail closed; structured diagnostics precede exact pinned text. Focused tests: 7 passed, 0 failed. Scoped check/lint/fmt: exit 0, 0 findings. |
 
+### S1 Reconcile
+
+- PR #588 remains draft and issue #579 remains the sole resolving scope.
+- #580 lifecycle/sender work, #581 global/default migration, and #582 rollout remain untouched.
+- No plan readjustment or architectural drift was discovered; S2 remains persistence/reducer work.

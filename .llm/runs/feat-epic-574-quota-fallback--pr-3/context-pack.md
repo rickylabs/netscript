@@ -4,7 +4,7 @@
 
 - Branch: `feat/epic-574-quota-fallback`; worktree native ext4 at the requested path.
 - HEAD before plan commit: `783e505e`; locked base `c90bc938`; ancestry verified.
-- Phase: Plan & Design, awaiting coordinator Plan-Gate. No implementation authored.
+- Phase: implementation; coordinator Plan-Gate APPROVED. S1 is implemented and gated.
 - Coordinator: Claude Opus 4.8; Codex thread `019f4d6c-bed7-7d62-a61f-3dccd822fcc2`.
 
 ## Locked Scope
@@ -22,8 +22,13 @@ route, never mutate defaults/global environment, and block same-family evaluatio
 - Machine-local bounded state/history plus concise run transition projection.
 - #580-#582 remain blocked/deferred.
 
+## S1 Result
+
+- Added pure routing policy data/guards and structured-first, version-pinned signal classification.
+- Focused tests: 7 passed, 0 failed.
+- Scoped check/lint/fmt: exit 0, zero findings.
+- No persistence, execution, global mutation, or paid behavior was introduced.
+
 ## Next Action
 
-Commit/push P0 and post the structured PLAN comment, then stop for the coordinator’s separate
-Plan-Gate verdict. Implementation must not begin before recorded PASS.
-
+Commit/push/comment S1, then implement S2 state transitions and machine-local restart persistence.
