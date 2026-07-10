@@ -5,6 +5,7 @@ import {
   classifyAntigravityAuth,
   classifyAntigravityInstallOwnership,
   classifyAuth,
+  classifyCanonicalAgyOwnership,
   classifyComponent,
   classifyLegacyGeminiOwnership,
   classifyMobileControl,
@@ -134,12 +135,7 @@ async function canonicalAgyOwnership(home: string): Promise<{ ready: boolean; de
     const homeInfo = await Deno.stat(home);
     const executable = info.mode === null || (info.mode & 0o100) !== 0;
     const ownedByCurrentUser = info.uid === null || info.uid === homeInfo.uid;
-    return {
-      ready: info.isFile && executable && ownedByCurrentUser,
-      detail: info.isFile && executable && ownedByCurrentUser
-        ? 'canonical executable is current-user owned and executable'
-        : 'canonical executable ownership/type/mode is invalid',
-    };
+    return classifyCanonicalAgyOwnership(info.isFile, executable, ownedByCurrentUser);
   } catch (error) {
     if (error instanceof Deno.errors.NotFound) {
       return { ready: false, detail: 'canonical executable missing' };
@@ -270,10 +266,11 @@ async function doctor(): Promise<RuntimeDoctorReport> {
   const credentialMarker = await pathExists(`${home}/.gemini/oauth_creds.json`);
   components.push(classifyAntigravityAuth(accountMarker, credentialMarker));
   const pending = await readJsonObject(`${home}/${AGY_PENDING_RELATIVE_PATH}`);
+  const pendingCanonicalAgy = await canonicalAgyOwnership(home);
   components.push(
     classifyAntigravityInstallOwnership(
       pending.status,
-      await pathExists(`${home}/.local/bin/agy`),
+      pendingCanonicalAgy.ready,
     ),
   );
   const legacy = await legacyGeminiOwnership(home);
@@ -424,7 +421,7 @@ async function writeJsonAtomic(path: string, value: unknown): Promise<void> {
   await Deno.rename(temporary, path);
 }
 
-async function executeBootstrap(home: string, plan: BootstrapPlan): Promise<void> {
+export async function executeBootstrap(home: string, plan: BootstrapPlan): Promise<void> {
   const nodeRoot = `${home}/${OWNED_ROOT}/node-v${NODE_VERSION}-linux-x64`;
   const npmPrefix = `${home}/${NPM_PREFIX}`;
   const binRoot = `${home}/.local/bin`;
@@ -473,9 +470,10 @@ async function executeBootstrap(home: string, plan: BootstrapPlan): Promise<void
       await installAntigravity(home, plan.schemaVersion, action.installer);
     } else if (action.kind === 'recover_antigravity_ownership') {
       const pending = await readJsonObject(`${home}/${AGY_PENDING_RELATIVE_PATH}`);
-      if (pending.status !== 'valid' || !(await pathExists(`${home}/.local/bin/agy`))) {
+      const canonical = await canonicalAgyOwnership(home);
+      if (pending.status !== 'valid' || !canonical.ready) {
         throw new Error(
-          'refusing Antigravity ownership recovery without valid journal and executable',
+          `refusing Antigravity ownership recovery: ${canonical.detail}`,
         );
       }
     } else if (action.kind === 'ensure_symlinks') {
@@ -511,7 +509,8 @@ async function executeBootstrap(home: string, plan: BootstrapPlan): Promise<void
       }
       if (pendingRead.status === 'valid') {
         const pendingPath = pendingRead.value.ownedExecutable;
-        if (pendingPath !== `${home}/.local/bin/agy` || !(await pathExists(pendingPath))) {
+        const canonical = await canonicalAgyOwnership(home);
+        if (pendingPath !== `${home}/.local/bin/agy` || !canonical.ready) {
           throw new Error('refusing inconsistent Antigravity ownership journal');
         }
         createdFiles.push(pendingPath);

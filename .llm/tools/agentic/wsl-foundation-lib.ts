@@ -273,6 +273,25 @@ export function classifyAntigravityInstallOwnership(
   };
 }
 
+/** Validates canonical agy metadata before NetScript records or recovers its ownership. */
+export function classifyCanonicalAgyOwnership(
+  isFile: boolean,
+  executable: boolean,
+  currentUserOwned: boolean,
+): { ready: boolean; detail: string } {
+  const ready = isFile && executable && currentUserOwned;
+  return {
+    ready,
+    detail: ready
+      ? 'canonical executable is current-user owned and executable'
+      : !isFile
+      ? 'canonical agy path is not a regular file'
+      : !currentUserOwned
+      ? 'canonical agy executable is not owned by the current user'
+      : 'canonical agy file is not owner-executable',
+  };
+}
+
 /** Reports provider-native session readiness without inferring Antigravity key policy. */
 export function classifyAuth(
   presentKeys: ReadonlySet<string>,

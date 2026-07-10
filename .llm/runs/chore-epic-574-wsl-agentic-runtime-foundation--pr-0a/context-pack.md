@@ -154,3 +154,14 @@ the remaining interactive acceptance checks.
 - Current real machine remains ready and idempotent; no pending ownership journal exists.
 - Historical evidence and all #578/#585/S4/S5 exclusions remain intact. After commit/push and
   #575/#584 comments, stop for coordinator re-review; this thread does not self-certify it.
+
+## 2026-07-10 Final Recovery Validation Handoff
+
+- Final re-review found recovery accepted mere path existence.
+- Recovery now requires regular-file type, current-user ownership, and owner-executable mode before
+  adding `agy` to `createdFiles` or deleting `agy-install-pending.json`.
+- Wrong-owner and non-executable metadata fail with actionable details; a real non-executable
+  fixture proves the manifest remains unchanged and journal remains. A valid fixture proves
+  manifest-first finalization followed by journal removal.
+- Focused `20/0`, complete agentic `77/0`, scoped wrappers zero findings, and doctor/bootstrap/
+  idempotence/rollback/diff/scope/lock gates pass. #578/#585 remain excluded.

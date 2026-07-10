@@ -67,3 +67,10 @@ Coordinator review of `8a18b25` returned `CHANGES_REQUESTED` for owned-root orde
 adds focused regressions and green generator gates for exactly those findings. This section records
 evidence only: it does not convert the coordinator verdict to `PASS`, extend the historical Gemini
 verdict, or evaluate #578/#585. PR #584 remains draft pending coordinator re-review.
+
+## 2026-07-10 Final Re-review Remediation Boundary
+
+The remaining `b2afdb7` recovery finding is remediated with canonical ownership/mode validation and
+exact wrong-owner, non-executable, and valid-recovery regressions. Green generator gates are
+recorded in `worklog.md`. This does not self-certify the coordinator verdict or evaluate #578/#585;
+PR #584 remains draft pending final coordinator re-review.

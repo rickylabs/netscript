@@ -4,6 +4,7 @@ import {
   classifyAntigravityAuth,
   classifyAntigravityInstallOwnership,
   classifyAuth,
+  classifyCanonicalAgyOwnership,
   classifyComponent,
   classifyLegacyGeminiOwnership,
   classifyMobileControl,
@@ -12,7 +13,7 @@ import {
   parseVersion,
   planBootstrap,
 } from './wsl-foundation-lib.ts';
-import { installAntigravity, readJsonObject } from './wsl-foundation.ts';
+import { executeBootstrap, installAntigravity, readJsonObject } from './wsl-foundation.ts';
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`assertion failed: ${message}`);
@@ -219,6 +220,54 @@ Deno.test('unfinished Antigravity install is recoverable into the ownership mani
   ]);
 });
 
+Deno.test('canonical recovery rejects wrong-owner and non-executable agy metadata', () => {
+  const wrongOwner = classifyCanonicalAgyOwnership(true, true, false);
+  assertEquals(wrongOwner.ready, false);
+  assert(wrongOwner.detail.includes('not owned by the current user'), 'wrong owner is actionable');
+  const nonExecutable = classifyCanonicalAgyOwnership(true, false, true);
+  assertEquals(nonExecutable.ready, false);
+  assert(nonExecutable.detail.includes('not owner-executable'), 'mode failure is actionable');
+  assertEquals(classifyCanonicalAgyOwnership(true, true, true).ready, true);
+});
+
+Deno.test('non-executable agy cannot finalize ownership or remove recovery journal', async () => {
+  const home = await makeRecoveryHome(0o600);
+  try {
+    let rejected = false;
+    try {
+      await executeBootstrap(home, recoveryPlan());
+    } catch (error) {
+      rejected = String(error).includes('not owner-executable');
+    }
+    assert(rejected, 'non-executable recovery fails with actionable detail');
+    assert(
+      await pathIsFile(`${home}/.config/netscript-agentic/agy-install-pending.json`),
+      'journal retained',
+    );
+    const state = await readJsonObject(`${home}/.config/netscript-agentic/foundation-state.json`);
+    assert(state.status === 'valid', 'state remains valid');
+    assertEquals(state.value.createdFiles, []);
+  } finally {
+    await Deno.remove(home, { recursive: true });
+  }
+});
+
+Deno.test('valid canonical agy recovery finalizes ownership then removes journal', async () => {
+  const home = await makeRecoveryHome(0o700);
+  try {
+    await executeBootstrap(home, recoveryPlan());
+    const state = await readJsonObject(`${home}/.config/netscript-agentic/foundation-state.json`);
+    assert(state.status === 'valid', 'state is valid');
+    assertEquals(state.value.createdFiles, [`${home}/.local/bin/agy`]);
+    assert(
+      !(await pathIsFile(`${home}/.config/netscript-agentic/agy-install-pending.json`)),
+      'journal removed after finalization',
+    );
+  } finally {
+    await Deno.remove(home, { recursive: true });
+  }
+});
+
 Deno.test('installer creates its root and durable journal before execution', async () => {
   const home = await Deno.makeTempDir({ prefix: 'netscript-agy-install-' });
   try {
@@ -286,4 +335,35 @@ async function pathIsFile(path: string): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+function recoveryPlan() {
+  return {
+    schemaVersion: '1.0' as const,
+    desired: { node: '26.5.0', claude: '2.1.206', antigravity: 'official-installer' as const },
+    actions: [
+      { kind: 'recover_antigravity_ownership' as const },
+      {
+        kind: 'write_state' as const,
+        relativePath: '.config/netscript-agentic/foundation-state.json',
+      },
+    ],
+    changed: true,
+  };
+}
+
+async function makeRecoveryHome(agyMode: number): Promise<string> {
+  const home = await Deno.makeTempDir({ prefix: 'netscript-agy-recovery-' });
+  await Deno.mkdir(`${home}/.local/bin`, { recursive: true });
+  await Deno.mkdir(`${home}/.config/netscript-agentic`, { recursive: true });
+  await Deno.writeTextFile(`${home}/.local/bin/agy`, 'installed', { mode: agyMode });
+  await Deno.writeTextFile(
+    `${home}/.config/netscript-agentic/agy-install-pending.json`,
+    JSON.stringify({ schemaVersion: '1.0', ownedExecutable: `${home}/.local/bin/agy` }),
+  );
+  await Deno.writeTextFile(
+    `${home}/.config/netscript-agentic/foundation-state.json`,
+    JSON.stringify({ createdFiles: [], previousTargets: {}, migrations: {} }),
+  );
+  return home;
 }

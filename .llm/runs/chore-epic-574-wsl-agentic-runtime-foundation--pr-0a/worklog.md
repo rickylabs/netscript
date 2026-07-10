@@ -310,3 +310,24 @@ implementation thread fixed only those blockers:
 Historical evidence is unchanged. #578 contracts, #585/S4/S5, daemon state, root installs,
 credentials, locks, and caches remain excluded. This generator records remediation evidence but does
 not self-certify coordinator re-review; PR #584 remains draft.
+
+## 2026-07-10 Final Recovery Ownership Remediation
+
+Final coordinator re-review of `b2afdb7` found one remaining blocker: pending-install recovery used
+existence alone and could finalize a wrong-owner or non-executable `agy`. The same thread changed
+only that recovery condition. Doctor classification, the explicit recovery action, and final
+manifest absorption now share one canonical validator requiring a regular file, current-user
+ownership, and owner-executable mode. Failure returns actionable detail, leaves the ownership
+journal intact, and neither records the path nor removes recovery state.
+
+| Gate | Result | Raw exit / evidence |
+| --- | --- | --- |
+| Focused foundation tests | PASS | `20 passed`, `0 failed`; exact wrong-owner and non-executable rejection plus valid finalization/removal recovery |
+| Complete agentic tests | PASS | `77 passed`, `0 failed` |
+| Scoped check/lint/fmt | PASS | exits `0`; 3 files, 1 batch, zero findings |
+| Doctor/bootstrap/idempotence | PASS | exits `0`; ready and `actions: []` for dry-run/live bootstrap |
+| Rollback | PASS | exit `0`; pending/final ownership guidance unchanged and provider state preserved |
+| Diff/scope/lock | PASS | `git diff --check` exit `0`; only foundation code/docs/artifacts; `deno.lock` unchanged |
+
+Historical evidence remains unchanged. #578/#585 are excluded. This is generator remediation
+evidence only; PR #584 remains draft pending coordinator re-review.

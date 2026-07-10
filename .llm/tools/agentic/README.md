@@ -90,7 +90,10 @@ mutated. Before invoking the installer, bootstrap writes a value-free
 `agy-install-pending.json` ownership journal; the final manifest absorbs that ownership and removes
 the journal atomically enough for a later run to recover after interruption. Malformed or unreadable
 manifests/journals are hard failures and are never treated as absent or overwritten. Run
-`rollback-plan` for non-executing reversal guidance.
+`rollback-plan` for non-executing reversal guidance. Recovery finalizes ownership and removes the
+journal only after the canonical path is proven to be a regular, current-user-owned,
+owner-executable file; invalid ownership or mode leaves the journal in place with an actionable
+failure.
 
 Permissions are explicit in the task: read/write for the owned user-local paths, run for fixed
 `npm`/`tar` and version probes, environment access for key-presence/PATH checks, and network access
