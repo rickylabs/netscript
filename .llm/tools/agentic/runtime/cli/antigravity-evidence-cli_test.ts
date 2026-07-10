@@ -1,12 +1,5 @@
 import { parseAntigravityEvidenceArgs } from './antigravity-evidence-cli.ts';
-
-function assertEquals(actual: unknown, expected: unknown, message = 'values differ'): void {
-  if (JSON.stringify(actual) !== JSON.stringify(expected)) {
-    throw new Error(
-      `${message}\nactual: ${JSON.stringify(actual)}\nexpected: ${JSON.stringify(expected)}`,
-    );
-  }
-}
+import { assertEquals } from '@std/assert';
 
 Deno.test('evidence CLI accepts only bounded identifiers and fixed probe kinds', () => {
   assertEquals(

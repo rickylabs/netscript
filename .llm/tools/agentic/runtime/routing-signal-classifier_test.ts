@@ -1,10 +1,5 @@
 import { classifyRoutingSignal } from './routing-signal-classifier.ts';
-
-function equal(actual: unknown, expected: unknown): void {
-  if (JSON.stringify(actual) !== JSON.stringify(expected)) {
-    throw new Error(`actual ${JSON.stringify(actual)} != expected ${JSON.stringify(expected)}`);
-  }
-}
+import { assertEquals as equal } from '@std/assert';
 
 Deno.test('structured diagnostics take precedence over compatibility text', () => {
   equal(

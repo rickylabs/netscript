@@ -7,17 +7,9 @@ import { runtimeExitCode } from './output.ts';
 import type { RuntimeMutationPorts, RuntimeReadPorts } from './ports.ts';
 import type { DesiredRuntimeState, ObservedRuntimeState, PersistedRuntimeState, RuntimeCheckpointState } from './state.ts';
 import { fingerprintRuntimeValue } from './state.ts';
+import { assert } from '@std/assert';
+import { assertEquals as equal } from '@std/assert';
 
-function assert(value: unknown, message: string): asserts value {
-  if (!value) throw new Error(message);
-}
-function equal(actual: unknown, expected: unknown, message = 'values differ'): void {
-  if (JSON.stringify(actual) !== JSON.stringify(expected)) {
-    throw new Error(
-      `${message}\nactual: ${JSON.stringify(actual)}\nexpected: ${JSON.stringify(expected)}`,
-    );
-  }
-}
 const worktree = '/home/codex/repos/worktree';
 const route: RouteIdentity = { agent: 'codex', provider: 'openai', model: 'primary', effort: 'high', worktree, mobileRequired: true };
 const desired: DesiredRuntimeState = { schemaVersion: RUNTIME_SCHEMA_VERSION, stateId: 'desired-s4', foundation: { nativeExt4: true, versions: { node: '2.0.0' }, stateDirectories: ['codex'] }, agents: { codex: { required: true, authRoute: 'provider-native', route } }, worktrees: [{ path: worktree, branch: 'feature', upstream: 'none', clean: true }], sessions: [] };

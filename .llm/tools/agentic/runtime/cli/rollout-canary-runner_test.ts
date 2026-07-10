@@ -4,14 +4,7 @@ import {
   type RolloutCommandRunner,
   runRolloutCanaries,
 } from './rollout-canary-runner.ts';
-
-function equals(actual: unknown, expected: unknown): void {
-  if (JSON.stringify(actual) !== JSON.stringify(expected)) {
-    throw new Error(
-      `values differ: actual=${JSON.stringify(actual)} expected=${JSON.stringify(expected)}`,
-    );
-  }
-}
+import { assertEquals as equals } from '@std/assert';
 
 class FakeRunner implements RolloutCommandRunner {
   readonly requests: CommandRequest[] = [];

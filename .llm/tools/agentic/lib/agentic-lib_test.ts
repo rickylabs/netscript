@@ -33,15 +33,7 @@ import {
   wslHome,
   wslUser,
 } from './agentic-lib.ts';
-
-function assert(cond: unknown, msg: string): void {
-  if (!cond) throw new Error(`assertion failed: ${msg}`);
-}
-function assertEquals<T>(actual: T, expected: T, msg = ''): void {
-  if (actual !== expected) {
-    throw new Error(`expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)} ${msg}`);
-  }
-}
+import { assert, assertEquals } from '@std/assert';
 
 const here = new URL('.', import.meta.url).pathname;
 // On Windows the pathname is like /C:/...; strip the leading slash for Deno.readTextFile.

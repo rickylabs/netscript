@@ -7,10 +7,7 @@ import {
   LocalSenderOwnershipAdapter,
   parseSenderOwnershipRecord,
 } from './adapters/local-sender-ownership-adapter.ts';
-
-function assert(condition: unknown, message = 'assertion failed'): asserts condition {
-  if (!condition) throw new Error(message);
-}
+import { assert } from '@std/assert';
 
 const worktree = '/home/codex/repos/worktree';
 const now = '2026-07-10T20:00:00.000Z';

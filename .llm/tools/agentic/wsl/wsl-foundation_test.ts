@@ -14,16 +14,7 @@ import {
   planBootstrap,
 } from './wsl-foundation-lib.ts';
 import { executeBootstrap, installAntigravity, readJsonObject } from './wsl-foundation.ts';
-
-function assert(condition: unknown, message: string): asserts condition {
-  if (!condition) throw new Error(`assertion failed: ${message}`);
-}
-
-function assertEquals<T>(actual: T, expected: T): void {
-  if (JSON.stringify(actual) !== JSON.stringify(expected)) {
-    throw new Error(`expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
-  }
-}
+import { assert, assertEquals } from '@std/assert';
 
 Deno.test('parseVersion accepts common tool banners', () => {
   assertEquals(parseVersion('v26.5.0\n'), '26.5.0');

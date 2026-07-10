@@ -24,16 +24,7 @@ import {
 } from '../wsl/wsl-foundation-lib.ts';
 import { fingerprintRuntimeValue } from './state.ts';
 import { RUNTIME_TEST_COMPONENT_VERSIONS } from './test-fixtures.ts';
-
-function assert(condition: unknown, message: string): asserts condition {
-  if (!condition) throw new Error(message);
-}
-
-function assertEquals(actual: unknown, expected: unknown, message = 'values differ'): void {
-  const left = JSON.stringify(actual);
-  const right = JSON.stringify(expected);
-  if (left !== right) throw new Error(`${message}\nactual: ${left}\nexpected: ${right}`);
-}
+import { assert, assertEquals } from '@std/assert';
 
 function codes(diagnostics: readonly RuntimeDiagnostic[]): string[] {
   return diagnostics.map((entry) => entry.code);

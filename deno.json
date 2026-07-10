@@ -110,6 +110,10 @@
     "arch:check": "deno task deps:check && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/plugin-auth-core && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/auth-workos && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/auth-better-auth && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/auth-kv-oauth && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root plugins/auth && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/plugin && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root plugins/workers && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root plugins/sagas && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root plugins/triggers && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root plugins/streams && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/plugin-sagas-core && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/plugin-triggers-core && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/plugin-workers-core && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/plugin-ai-core && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/ai && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root plugins/ai",
     "arch:check:repo": "deno run --allow-read .llm/tools/fitness/check-doctrine.ts"
   },
+  "imports": {
+    "@std/assert": "jsr:@std/assert@1",
+    "@std/path": "jsr:@std/path@1"
+  },
   "compilerOptions": {
     "strict": true,
     "noImplicitAny": true,

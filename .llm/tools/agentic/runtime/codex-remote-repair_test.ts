@@ -10,10 +10,7 @@ import {
   isAnchoredCodexAppServer,
   parseProcessTable,
 } from './adapters/local-codex-remote-adapter.ts';
-
-function assert(condition: unknown, message = 'assertion failed'): asserts condition {
-  if (!condition) throw new Error(message);
-}
+import { assert } from '@std/assert';
 
 const home = '/home/codex';
 const worktree = '/home/codex/repos/worktree';

@@ -3,17 +3,8 @@ import {
   type AntigravityCommandOptions,
   AntigravityEvidenceAdapter,
 } from './antigravity-adapter.ts';
+import { assert, assertEquals } from '@std/assert';
 
-function assert(condition: unknown, message = 'assertion failed'): asserts condition {
-  if (!condition) throw new Error(message);
-}
-function assertEquals(actual: unknown, expected: unknown, message = 'values differ'): void {
-  if (JSON.stringify(actual) !== JSON.stringify(expected)) {
-    throw new Error(
-      `${message}\nactual: ${JSON.stringify(actual)}\nexpected: ${JSON.stringify(expected)}`,
-    );
-  }
-}
 const encoder = new TextEncoder();
 
 Deno.test('Antigravity adapter builds a bounded sandboxed request with child-only environment', async () => {

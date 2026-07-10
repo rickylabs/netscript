@@ -1,3 +1,5 @@
+import { dirname } from '@std/path';
+
 interface SkillFile {
   path: string;
   text: string;
@@ -132,9 +134,4 @@ async function removeGeneratedTarget(path: string): Promise<void> {
       throw error;
     }
   }
-}
-
-function dirname(path: string): string {
-  const index = path.lastIndexOf('/');
-  return index === -1 ? '.' : path.slice(0, index);
 }

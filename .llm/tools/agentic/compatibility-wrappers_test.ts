@@ -1,6 +1,5 @@
-function assert(value: unknown, message: string): asserts value {
-  if (!value) throw new Error(message);
-}
+import { assert } from '@std/assert';
+
 const root = new URL('../../../', import.meta.url);
 const denoConfig = JSON.parse(await Deno.readTextFile(new URL('deno.json', root))) as {
   tasks: Record<string, string>;

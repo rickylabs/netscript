@@ -4,12 +4,7 @@ import { applyRuntimeCommand, runRuntimeCommand } from './controller.ts';
 import type { RuntimeMutationPorts, RuntimeReadPorts } from './ports.ts';
 import type { DesiredRuntimeState, ObservedRuntimeState } from './state.ts';
 import { RUNTIME_TEST_COMPONENT_VERSIONS } from './test-fixtures.ts';
-
-function equal(actual: unknown, expected: unknown): void {
-  if (JSON.stringify(actual) !== JSON.stringify(expected)) {
-    throw new Error(`actual ${JSON.stringify(actual)} != expected ${JSON.stringify(expected)}`);
-  }
-}
+import { assertEquals as equal } from '@std/assert';
 
 const desired: DesiredRuntimeState = {
   schemaVersion: RUNTIME_SCHEMA_VERSION,

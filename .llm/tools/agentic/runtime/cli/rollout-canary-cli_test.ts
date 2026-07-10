@@ -1,8 +1,5 @@
 import { parseRolloutArgs } from './rollout-canary-cli.ts';
-
-function assert(condition: unknown): asserts condition {
-  if (!condition) throw new Error('assertion failed');
-}
+import { assert } from '@std/assert';
 
 Deno.test('rollout CLI accepts only worktree and output paths', () => {
   const parsed = parseRolloutArgs([

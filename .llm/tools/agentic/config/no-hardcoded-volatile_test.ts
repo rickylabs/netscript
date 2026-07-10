@@ -12,10 +12,6 @@
  * and reference it — do not silence this test.
  */
 
-function assert(value: unknown, message: string): asserts value {
-  if (!value) throw new Error(message);
-}
-
 import {
   MODEL_IDS,
   NODE_TARGET_VERSION,
@@ -25,6 +21,7 @@ import {
 } from './mod.ts';
 import { ANTIGRAVITY_INSTALLER_URL, NODE_DIST_HOST } from './endpoints.ts';
 import { COMPAT_PINNED_TOOL_VERSIONS, TEST_COMPONENT_VERSIONS } from './versions.ts';
+import { assert } from '@std/assert';
 
 const suiteRoot = new URL('../', import.meta.url);
 

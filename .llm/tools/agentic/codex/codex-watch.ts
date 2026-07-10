@@ -43,6 +43,7 @@
  */
 
 import { parseTurnComplete, requireValue, runBin, UUID, wslHome } from '../lib/agentic-lib.ts';
+import { dirname } from '@std/path';
 
 type Mode = 'git' | 'turn';
 
@@ -179,11 +180,6 @@ async function readTail(path: string, maxBytes = 65536): Promise<string> {
   } finally {
     f.close();
   }
-}
-
-function dirname(p: string): string {
-  const i = p.replace(/\\/g, '/').lastIndexOf('/');
-  return i <= 0 ? '/' : p.slice(0, i);
 }
 
 async function watchGit(o: Options): Promise<never> {

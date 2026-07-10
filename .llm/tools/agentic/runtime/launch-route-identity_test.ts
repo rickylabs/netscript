@@ -1,10 +1,5 @@
 import { compareLaunchIdentity, requestedLaunchIdentity } from './launch-route-identity.ts';
-
-function equal(actual: unknown, expected: unknown): void {
-  if (JSON.stringify(actual) !== JSON.stringify(expected)) {
-    throw new Error(`actual ${JSON.stringify(actual)} != expected ${JSON.stringify(expected)}`);
-  }
-}
+import { assertEquals as equal } from '@std/assert';
 
 Deno.test('launch identity rejects missing or unsupported provider model and effort', () => {
   for (
