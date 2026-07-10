@@ -2,7 +2,7 @@
   "name": "@netscript/plugin-auth",
   "version": "0.0.1-beta.5",
   "description": "NetScript plugin for a unified auth API, single-active backend selection, auth database schema, and auth session streams.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "exports": {
     ".": "./mod.ts",
     "./public": "./src/public/mod.ts",

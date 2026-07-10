@@ -76,5 +76,5 @@ the root entrypoint keeps the Redis driver out of your module graph.
 
 ## 📝 License
 
-MIT — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
+Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
 cryptographically verified provenance.

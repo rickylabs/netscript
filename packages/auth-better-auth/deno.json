@@ -2,7 +2,7 @@
   "name": "@netscript/auth-better-auth",
   "version": "0.0.1-beta.5",
   "description": "better-auth integration helpers for NetScript services.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "exports": {
     ".": "./mod.ts"
   },

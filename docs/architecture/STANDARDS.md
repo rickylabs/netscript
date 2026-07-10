@@ -68,7 +68,7 @@ Every package MUST satisfy the JSR audit fields and these repo-wide invariants:
 {
   "name": "@netscript/<pkg>",
   "version": "0.0.1-alpha.0",
-  "license": "MIT",                                  // F-JSR-1
+  "license": "Apache-2.0",                            // F-JSR-1
   "description": "<≤250 chars, ends with a period>", // F-JSR-4
   "exports": {
     ".": "./mod.ts",
@@ -265,7 +265,7 @@ export abstract class BaseWorker<TPayload> {
 Every README MUST contain these sections in this order, each with concrete
 content (no "TODO"). Minimum length is 150 lines.
 
-1. **Heading + 1-line tagline + JSR/MIT badges** — see template
+1. **Heading + 1-line tagline + JSR/Apache-2.0 badges** — see template
 2. **Overview** — what problem does this package solve, in 3 paragraphs
 3. **Quickstart** — copy-pasteable working example (the 80% path, A3)
 4. **Mental model** — diagram + 3-paragraph explanation of the abstractions

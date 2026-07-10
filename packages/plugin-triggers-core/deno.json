@@ -2,7 +2,7 @@
   "name": "@netscript/plugin-triggers-core",
   "version": "0.0.1-beta.5",
   "description": "Trigger DSL, runtime ports, adapters, telemetry, config, and testing primitives for NetScript trigger plugins.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "exports": {
     ".": "./mod.ts",
     "./adapters": "./src/adapters/mod.ts",

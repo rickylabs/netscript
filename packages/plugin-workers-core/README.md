@@ -117,4 +117,4 @@ await runtime.stop('deploy');
 
 ## 📝 License
 
-MIT — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE).
+Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE).
