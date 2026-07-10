@@ -2,7 +2,7 @@
 
 ## Current state
 
-- Phase: implementation S1 gates green; pending commit/push/comment.
+- Phase: S1 landed as `00fa6429`; S2 live matrix and gates green, pending commit/push/comment.
 - Branch/worktree: `feat/epic-574-rollout-canaries` at
   `/home/codex/repos/netscript-epic-574-pr6-rollout`.
 - Baseline: `b438f16d`; ancestry verified.
@@ -25,6 +25,11 @@ merge, and behavioral changes to earlier slices are prohibited.
 S1 result: five focused tests pass; scoped check/lint/fmt report zero findings; diff and lock gates
 pass. Defensive sensitive-pattern source and its fake rejection fixture are the only scan matches;
 no artifact contains a sensitive value.
+
+S2 result: eight focused rollout tests pass; scoped wrappers report zero findings. Live matrix has
+nine rows and aggregate `conditional_pass` / `promote_with_conditions`: native health and quota
+state pass; Antigravity is explicitly auth-blocked; all four provider routes are explicitly
+credential-absent; interactive/mobile evidence is owner-accepted. Repair was dry-run only.
 
 ## Resume rule
 

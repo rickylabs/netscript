@@ -1,0 +1,189 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-07-10T20:24:04.059Z",
+  "baseline": "b438f16d",
+  "canaries": [
+    {
+      "id": "native_wsl_health",
+      "command": "deno --version; git --version; node --version; deno task agentic:runtime doctor --json",
+      "expected": "Native WSL toolchain responds and runtime doctor returns structured health evidence.",
+      "actual": "Version probes succeeded; runtime doctor reported no_change.",
+      "evidenceMode": "live",
+      "classification": "none",
+      "status": "pass",
+      "residualRisks": [],
+      "evidence": {
+        "summary": "Live version exits 0/0/0; doctor exit 0.",
+        "exitCodes": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "id": "claude_mobile_reconnect",
+      "command": "Owner procedure: interrupt sleep/network, reopen Claude Remote Control, and resume the same session.",
+      "expected": "The same Claude session reconnects after sleep or network interruption.",
+      "actual": "Owner accepted reconnect behavior as working; no raw mobile session evidence is fabricated.",
+      "evidenceMode": "owner_accepted",
+      "classification": "owner_accepted_working",
+      "status": "conditional_pass",
+      "residualRisks": [
+        "Interactive behavior is owner-accepted; automation does not reproduce mobile UI."
+      ],
+      "evidence": {
+        "summary": "Owner directive records accepted working behavior."
+      }
+    },
+    {
+      "id": "claude_isolated_sessions",
+      "command": "Owner procedure: launch Claude sessions in two isolated worktrees and verify independent resume.",
+      "expected": "Multiple Claude sessions remain isolated by worktree and resume independently.",
+      "actual": "Owner accepted isolated-session behavior as working; automation does not invent UI evidence.",
+      "evidenceMode": "owner_accepted",
+      "classification": "owner_accepted_working",
+      "status": "conditional_pass",
+      "residualRisks": [
+        "Interactive behavior is owner-accepted; automation does not reproduce mobile UI."
+      ],
+      "evidence": {
+        "summary": "Owner directive records accepted working behavior."
+      }
+    },
+    {
+      "id": "codex_remote_lifecycle",
+      "command": "deno task agentic:runtime status --agent codex --worktree $WORKTREE --json; deno task agentic:runtime repair codex-remote --worktree $WORKTREE --dry-run --json",
+      "expected": "Status and repair inspection are structured; no daemon restart occurs; owner confirms mobile visibility.",
+      "actual": "Status and repair dry-run completed without restarting the active daemon; mobile visibility is owner-accepted working.",
+      "evidenceMode": "owner_accepted",
+      "classification": "owner_accepted_working",
+      "status": "conditional_pass",
+      "residualRisks": [
+        "Interactive behavior is owner-accepted; automation does not reproduce mobile UI.",
+        "Daemon restart and rescue were not forced during an active implementation thread."
+      ],
+      "evidence": {
+        "summary": "Live status exit 3; repair dry-run exit 4; no live repair requested.",
+        "exitCodes": [
+          3,
+          4
+        ]
+      }
+    },
+    {
+      "id": "antigravity_grounded_search",
+      "command": "deno task agentic:antigravity-evidence --probe web-citations --cwd $WORKTREE --timeout-ms 30000 --json",
+      "expected": "Bounded grounded-search evidence is classified without raw output; owner acceptance remains distinct from live auth state.",
+      "actual": "Live evidence remained auth-blocked; grounded search and citation persistence are owner-accepted working.",
+      "evidenceMode": "owner_accepted",
+      "classification": "auth_blocked",
+      "status": "conditional_pass",
+      "residualRisks": [
+        "Interactive behavior is owner-accepted; automation does not reproduce mobile UI.",
+        "Automated Antigravity evidence remains authentication-blocked."
+      ],
+      "evidence": {
+        "summary": "Live bounded Antigravity evidence exit 4; structured status blocked.",
+        "exitCodes": [
+          4
+        ],
+        "references": [
+          "PR #587"
+        ]
+      }
+    },
+    {
+      "id": "provider_compatibility",
+      "command": "deno task agentic:provider-canary for Claude/Codex native and OpenRouter profiles (see evidence references)",
+      "expected": "Four read-only canaries return structured compatibility evidence; absent credentials block without fabricated success.",
+      "actual": "Provider canaries returned structured credential-absent diagnostics; no compatibility pass was fabricated.",
+      "evidenceMode": "live",
+      "classification": "credential_absent",
+      "status": "conditional_pass",
+      "residualRisks": [
+        "Credentialed provider compatibility remains unobserved on this machine."
+      ],
+      "evidence": {
+        "summary": "Live provider statuses: blocked, blocked, blocked, blocked; exits 4/4/4/4.",
+        "exitCodes": [
+          4,
+          4,
+          4,
+          4
+        ],
+        "references": [
+          "claude-anthropic-native:claude-opus-4-8:high",
+          "codex-openai-native:gpt-5.6:medium",
+          "claude-openrouter:minimax/minimax-m3:high",
+          "codex-openrouter:z-ai/glm-5.2:xhigh"
+        ]
+      }
+    },
+    {
+      "id": "quota_fallback_restoration",
+      "command": "deno test --no-lock --allow-read --allow-write .llm/tools/agentic/runtime/routing-state-machine_test.ts; deno task agentic:routing-state --json",
+      "expected": "Synthetic transition suite proves exhaust/fallback/persist/reset/restore and live persisted state parses read-only.",
+      "actual": "Synthetic transition suite passed; live routing-state inspection parsed 0 persisted entries.",
+      "evidenceMode": "synthetic",
+      "classification": "none",
+      "status": "pass",
+      "residualRisks": [],
+      "evidence": {
+        "summary": "State-machine test exit 0; routing-state exit 0.",
+        "exitCodes": [
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "id": "opposite_family_epic_run",
+      "command": "Review merged PRs #585, #586, #587, #588, #589, and #590 plus coordinator Tier-A records.",
+      "expected": "Epic planning and implementation use Codex with opposite-family Claude coordinator evaluation.",
+      "actual": "Merged PR provenance records the six preceding epic layers and opposite-family coordinator review.",
+      "evidenceMode": "provenance",
+      "classification": "none",
+      "status": "pass",
+      "residualRisks": [],
+      "evidence": {
+        "summary": "Integration baseline b438f16d contains merged PRs #585-#590.",
+        "references": [
+          "PR #585",
+          "PR #586",
+          "PR #587",
+          "PR #588",
+          "PR #589",
+          "PR #590"
+        ]
+      }
+    },
+    {
+      "id": "windows_native_rollback",
+      "command": "Follow PR #584 Windows break-glass: select native Windows Claude and restore native-provider defaults.",
+      "expected": "Documented rollback returns operation to native Windows Claude and native-provider defaults.",
+      "actual": "PR #584 is the proven Windows break-glass provenance; rollout code does not execute rollback.",
+      "evidenceMode": "provenance",
+      "classification": "none",
+      "status": "pass",
+      "residualRisks": [],
+      "evidence": {
+        "summary": "Rollback procedure is documented and provenance-cited.",
+        "references": [
+          "PR #584"
+        ]
+      }
+    }
+  ],
+  "overallStatus": "conditional_pass",
+  "residualRisks": [
+    "Interactive behavior is owner-accepted; automation does not reproduce mobile UI.",
+    "Daemon restart and rescue were not forced during an active implementation thread.",
+    "Automated Antigravity evidence remains authentication-blocked.",
+    "Credentialed provider compatibility remains unobserved on this machine."
+  ],
+  "rollbackStatus": "documented_and_provenance_cited",
+  "promotionRecommendation": "promote_with_conditions",
+  "promotionBoundary": "Recommendation only. Owner approval and coordinator action are required."
+}

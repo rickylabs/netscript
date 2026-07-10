@@ -22,3 +22,19 @@
   directive directly, but did not add a `plan-eval.md` commit to this branch.
 - **Resolution:** recorded the explicit approval in run artifacts and resumed S1. This worker did
   not create an evaluator artifact or self-certify.
+
+## 2026-07-10 — S2 runner observations
+
+- **Severity:** minor implementation correction.
+- **What:** the first quota synthetic command omitted read/write permissions needed only for the
+  existing persistence test's temporary directory.
+- **Resolution:** corrected the runner argv and reran live evidence. Final state-machine and
+  routing-state exits are `0/0`; no #579 behavior changed.
+
+- **Severity:** minor scope-budget drift.
+- **What:** the formatted orchestration module is 382 LOC versus the 360 LOC planning target. The
+  contract (165 LOC) and CLI edge (53 LOC) remain separate and below their budgets.
+- **Rationale:** the module spells out nine canary commands and evidence policies without hiding
+  them behind dynamic configuration or duplicating upstream logic. Splitting the five small live
+  row builders would add navigation seams without reducing behavior. All TypeScript remains below
+  the Archetype-6 hard cap of 500 LOC.

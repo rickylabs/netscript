@@ -107,3 +107,44 @@ to the branch by the coordinator; this worker did not create one or impersonate 
 | `deno.lock` | unchanged |
 
 S1 files: `runtime/rollout-canary.ts`, `runtime/rollout-canary_test.ts`, and run artifacts.
+
+## S2 — thin runner + live matrix
+
+- Added injected `RolloutCommandRunner`, thin orchestration over shipped runtime/provider/
+  Antigravity/routing-state CLIs, CLI parser/writer, and `agentic:rollout-canary` task.
+- CLI accepts only `--worktree` and `--output`; there is no promotion or live-repair flag.
+- Repair evidence invoked `repair codex-remote --dry-run` only. No daemon restart occurred.
+- Initial live quota test exposed missing temp-directory permissions in runner argv (2 tests passed,
+  persistence test denied). Added the test's required read/write permissions and regenerated the
+  matrix; this did not change #579 behavior.
+
+### Live canary evidence (2026-07-10)
+
+| Canary | Actual bounded result |
+| --- | --- |
+| Native WSL health | version exits `0/0/0`; runtime doctor exit `0`; pass |
+| Claude reconnect | `owner_accepted_working`; conditional pass |
+| Claude isolated sessions | `owner_accepted_working`; conditional pass |
+| Codex lifecycle | status exit `3`, repair dry-run exit `4`; no restart; mobile visibility owner-accepted; conditional pass |
+| Antigravity grounded search | structured `blocked`, exit `4`; explicit `auth_blocked`; owner-accepted capability; conditional pass |
+| Provider compatibility | four structured `blocked` results, exits `4/4/4/4`; explicit `credential_absent`; conditional pass |
+| Quota fallback/restoration | state-machine suite exit `0`, routing-state exit `0`; pass |
+| Opposite-family epic run | provenance #585–#590; pass |
+| Windows rollback | break-glass provenance #584; pass |
+
+Matrix aggregate: `conditional_pass`; recommendation: `promote_with_conditions`. This is a
+recommendation only and requires owner approval plus coordinator action.
+
+### S2 gate evidence
+
+| Gate | Result |
+| --- | --- |
+| Focused rollout tests | 8 passed, 0 failed |
+| Scoped check | 6 files, 0 findings |
+| Scoped lint | 6 files, 0 findings |
+| Scoped format check | 6 files, 0 findings |
+| Live matrix validator | 9 rows; sensitive-key scan clean; aggregate `conditional_pass` |
+| `git diff --check` | exit 0 |
+| `deno.lock` | unchanged |
+
+S2 files: runner/CLI and tests, `deno.json`, checked-in matrix, and run artifacts.
