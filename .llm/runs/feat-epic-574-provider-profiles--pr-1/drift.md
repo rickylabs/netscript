@@ -21,3 +21,14 @@
 - **Severity:** minor
 - **Action:** accept as a no-divergence checkpoint.
 - **Evidence:** `provider-profiles.ts`; focused tests 30 passed / 0 failed.
+
+## 2026-07-10 — S2 matched child-only injection design
+
+- **What:** No S2 design drift; environment values remain unrepresentable above the adapter edge.
+- **Source:** child environment adapter and focused tests.
+- **Expected:** Late-bind one selected credential, clear all rivals, never mutate the parent.
+- **Actual:** Fresh child environment passed directly to `Deno.Command`; parent map unchanged;
+  missing credentials return `auth_required` without spawn.
+- **Severity:** minor
+- **Action:** accept as a no-divergence checkpoint.
+- **Evidence:** focused tests 10 passed / 0 failed; effect scan clean.

@@ -140,6 +140,19 @@ export function getProviderProfile(id: ProviderProfileId): ProviderProfile {
   return PROVIDER_PROFILES[id];
 }
 
+/** Builds a value-free child environment policy for a selected profile. */
+export function childEnvironmentPolicyForProfile(
+  profile: ProviderProfile,
+): import('./ports.ts').ChildEnvironmentPolicy {
+  return {
+    clearKeys: profile.clearKeys,
+    bindings: [{
+      sourceKey: profile.credentialSourceKey,
+      targetKey: profile.credentialTargetKey,
+    }],
+  };
+}
+
 /** Resolves the explicit profile or the backward-compatible native profile for a route. */
 export function resolveProviderProfile(route: RouteIdentity): ProviderProfile | null {
   if (route.profileId) return PROVIDER_PROFILES[route.profileId] ?? null;

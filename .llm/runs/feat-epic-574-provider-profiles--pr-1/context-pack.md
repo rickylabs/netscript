@@ -12,8 +12,9 @@
 
 ## Current State
 
-Coordinator Plan-Gate is approved. S1 implements the finite profile/preset registry and profile-aware
-provider/planner validation. S2 child-only environment injection is next.
+Coordinator Plan-Gate is approved. S1 implements profile/preset routing. S2 implements child-only
+late-bound environment injection with explicit conflict clearing and no parent mutation. S3 runner
+profile mechanisms are next.
 
 ## Completed
 
@@ -22,13 +23,14 @@ provider/planner validation. S2 child-only environment injection is next.
 - Recorded `research.md`, `plan.md`, and the `## Design` checkpoint.
 - Locked four implementation slices after S0, with explicit #578–#582 boundaries and LOC budgets.
 - S1 focused tests pass 30/0; scoped check/lint/fmt pass with 22 files and zero findings.
+- S2 focused tests pass 10/0; scoped check/lint/fmt pass with 24 files and zero findings.
 - OpenRouter slugs verified 2026-07-10: `minimax/minimax-m3`, `z-ai/glm-5.2`,
   `x-ai/grok-4.5`.
 
 ## Next Steps
 
-1. Commit, push, and comment S1.
-2. Implement S2 value-free child environment policy and adapter.
+1. Commit, push, and comment S2.
+2. Implement S3 Claude/Codex profile mechanisms and custom-Claude route diagnostics.
 
 ## Key Decisions
 
@@ -44,6 +46,8 @@ provider/planner validation. S2 child-only environment injection is next.
 | Plan | READY | `research.md`, `plan.md`, `worklog.md#Design` |
 | S1 focused | PASS | 30 passed, 0 failed |
 | S1 static wrappers | PASS | check/lint/fmt exit 0; zero findings |
+| S2 focused | PASS | 10 passed, 0 failed |
+| S2 static wrappers | PASS | check/lint/fmt exit 0; 24 files, zero findings |
 
 ## Open Questions
 

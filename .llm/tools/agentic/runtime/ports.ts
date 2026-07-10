@@ -50,7 +50,22 @@ export interface AgentProcessRequest {
   readonly cwd: string;
   readonly timeoutMs: number;
   readonly maxCaptureBytes: number;
+  readonly environment?: ChildEnvironmentPolicy;
 }
+export interface ChildEnvironmentBinding {
+  readonly sourceKey: import('./provider-profiles.ts').ProviderCredentialKey;
+  readonly targetKey: import('./provider-profiles.ts').ProviderCredentialKey;
+}
+export interface ChildEnvironmentPolicy {
+  readonly clearKeys: readonly string[];
+  readonly bindings: readonly ChildEnvironmentBinding[];
+}
+export interface ChildProcessOutcome {
+  readonly exitCode: number;
+  readonly timedOut: boolean;
+  readonly diagnostic?: RuntimeDiagnostic;
+}
+export type ChildProcessPort = { run(request: AgentProcessRequest): Promise<ChildProcessOutcome> };
 export interface AgentCommandPlan {
   readonly agent: AgentKind;
   readonly operation: AgentLifecycleOperation;
