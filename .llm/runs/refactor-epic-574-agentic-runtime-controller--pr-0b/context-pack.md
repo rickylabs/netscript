@@ -3,15 +3,15 @@
 ## Current State
 
 Issue #576 is bootstrapped on native WSL branch `refactor/epic-574-agentic-runtime-controller` at
-foundation baseline `9b75470`. The early draft PR, worker attachment, detailed research, and locked
-plan are next.
+foundation baseline `9b75470`; draft PR #585 is open. Managed WSL Codex thread
+`019f4b72-2ea4-7050-917e-6d6918371265` is attached and mobile-visible. Detailed research and the
+locked plan are next.
 
 ## Next Steps
 
-1. Commit and explicitly push the bootstrap.
-2. Open the early draft PR against `chore/epic-574-wsl-agentic-runtime-foundation`.
-3. Launch exactly one daemon-attached WSL Codex worker and record its thread identity.
-4. Complete research, Design, plan-gate waiver record, then implementation slices.
+1. Resume the existing thread for research and plan-only work.
+2. Complete the Design checkpoint and owner-authorized Plan-Gate waiver record.
+3. Resume the same thread for implementation slices after coordinator plan review.
 
 ## Boundaries
 

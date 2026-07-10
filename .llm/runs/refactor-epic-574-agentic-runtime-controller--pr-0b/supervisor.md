@@ -18,8 +18,8 @@
 | Role | Route | Status |
 | --- | --- | --- |
 | Coordinator / Tier-A review | GPT-5.6 Sol | active |
-| Planning + implementation | one daemon-attached WSL Codex thread, GPT-5.6 Sol high requested | pending launch |
+| Planning + implementation | WSL Codex `019f4b72-2ea4-7050-917e-6d6918371265`, GPT-5.6 Sol | attached; actual effort `medium` |
 | PLAN-EVAL / IMPL-EVAL | owner-authorized external-evaluator waiver | recorded as explicit drift |
 
-No concurrent sender is permitted in this worktree. Once attached, all steering resumes the same
-thread.
+No concurrent sender is permitted in this worktree. All steering resumes thread
+`019f4b72-2ea4-7050-917e-6d6918371265`.
