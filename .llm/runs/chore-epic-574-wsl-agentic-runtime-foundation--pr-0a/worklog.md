@@ -91,6 +91,9 @@ its rollback action; do not put provider credentials or values into reports.
 | 2026-07-10 | S3 | provider canaries | Claude/Gemini native binaries and command surfaces pass; Claude requires claude.ai `/login`; Gemini policy now enforces `oauth-personal` and requires owner Google browser sign-in. |
 | 2026-07-10 | S3 | rollback/reconnect boundary | WSL rollback output passes. Host sleep/network and Windows Claude proof require the owner/coordinator; WSLInterop is absent in this worker, so PowerShell returned exit 126. |
 | 2026-07-10 | S3 | reconcile | #575/#584 remain `status:impl`; closing keyword and issue milestone/labels remain correct. No evaluator was dispatched. Owner canaries and coordinator slice sign-off remain before IMPL-EVAL. |
+| 2026-07-10 | S3 | coordinator post-idle reconnect | After an anchored daemon repair, managed remote control returned `status=connected` on `YogaBook9i` / `env_e_6a2d7485c5a0832a82505a12442cd3ec`; CLI/app-server remained `0.144.1`. Same-thread resume returned exactly `CODEX_PR0A_RECONNECT_OK` with no edits. |
+| 2026-07-10 | S3 | coordinator Windows rollback | Native Windows Claude path remained present; version/help passed at `2.1.205`. A Windows no-edit interactive session remains owner-only and pending. |
+| 2026-07-10 | S3 | evidence reconcile | Coordinator evidence resolves the post-idle Codex reconnect gate and the Windows path/version/help checks. Claude/Gemini browser sign-in, mobile steering, sleep/network reconnect, and Windows no-edit interactive use remain pending. No evaluator was dispatched. |
 
 ## Decisions
 
@@ -174,7 +177,7 @@ Machine mutation is confined to the documented user-local roots. Source files re
 | Final doctor | EXPECTED_DEGRADED | 2 | 16 component/policy probes ready; Claude/Gemini browser sessions auth-required only |
 | Bootstrap after policy fix | IDEMPOTENT | 2 | immediate repeat returned `actions: []`; auth-required only |
 | Codex native/thread proof | PASS | 0 | native ext4 cwd/branch, exact rollout, managed process/socket, matching `0.144.1` versions |
-| Codex active-turn reconnect | BLOCKED_ACTIVE_THREAD | 1 | reconnect command reports unmanaged while proxy/worker app-server is active; no unsafe repair |
+| Codex active-turn reconnect | EXPECTED_BLOCKED_THEN_RESOLVED | 1 worker; coordinator exit not supplied | Active-turn reconnect reported unmanaged; post-idle anchored repair restored managed `status=connected`, and same-thread resume returned the exact no-edit sentinel |
 | Claude native surface | PASS | 0 | version `2.1.206`; help exposes remote-control, worktree, session prefix, and tmux flags |
 | Claude Remote Control | AUTH_REQUIRED | 1 | exact CLI response requires claude.ai subscription `/login` |
 | Gemini native surface | PASS | 0 | version/help execute from `~/.local/bin/gemini` on native WSL |
@@ -182,7 +185,7 @@ Machine mutation is confined to the documented user-local roots. Source files re
 | Gemini grounded prompt | AUTH_REQUIRED | 41 | pre-policy canary stopped at missing auth method; post-policy browser auth intentionally left to owner |
 | Forbidden-auth redaction | PASS | 0 | fake-key canary observed doctor raw exit 3 + `auth_conflict`; fake value absent from output |
 | Sleep/network reconnect | OWNER_CANARY_REQUIRED | N/A | no firewall/network mutation or host sleep performed from the active worker |
-| Windows Claude rollback | HOST_CANARY_REQUIRED | 126 | WSLInterop absent; pre-mutation coordinator evidence remains Windows Claude `2.1.205` |
+| Windows Claude rollback | PARTIAL_HOST_PASS | 126 worker; coordinator exit not supplied | WSLInterop absent in worker; coordinator confirmed native path plus version/help at `2.1.205`; no-edit interactive session pending |
 | Rollback output | PASS | 0 | preserves provider sessions/Codex, restores prior links, conditionally removes only recorded Gemini settings |
 | Lock hygiene | PASS | 0 | `deno.lock` unchanged |
 
@@ -193,7 +196,7 @@ edge is 498 LOC, below the internal-tool 500-LOC cap. No generic provider routin
 credential acquisition, or evaluator work entered #575. Coordinator substantive review/sign-off is
 still required; this implementation worker does not self-certify.
 
-### Exact owner/coordinator canaries still required
+### Exact owner canaries still required
 
 1. In native WSL, run `claude`, enter `/login`, and complete the claude.ai subscription browser
    flow. Then start two distinct sessions from this repo using `--remote-control <name>` with
@@ -201,13 +204,10 @@ still required; this implementation worker does not self-certify.
 2. In native WSL, run `gemini`, select **Sign in with Google**, and complete the browser flow using
    the subscription account. Do not set an API key or Vertex variable. Re-run the grounded native
    prompt canary afterward.
-3. After this Codex worker turn is idle, run `codex remote-control start --json`; require
-   `status=connected`. Steer the same thread with
-   `codex exec resume 019f4b4b-6375-7373-aab5-6750c3fdaf04 -- "Reply with exactly CODEX_PR0A_RECONNECT_OK; do not edit files."`.
-4. With both mobile sessions visible, perform one host sleep or network disconnect/reconnect and
+3. With both mobile sessions visible, perform one host sleep or network disconnect/reconnect and
    steer them again. Record raw outcomes without tokens, URLs, or credential material.
-5. In native Windows PowerShell, run `claude --version` and open a no-edit break-glass session to
-   confirm Windows Claude remains usable.
+4. In native Windows PowerShell, open a no-edit break-glass Claude session to confirm interactive
+   Windows use. Path, version, and help already passed at `2.1.205`.
 
 ## Handoff Notes
 

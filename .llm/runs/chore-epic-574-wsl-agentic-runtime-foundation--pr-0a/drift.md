@@ -85,3 +85,30 @@
 - **Action:** owner/coordinator runs `claude --version` in native Windows PowerShell after S3; no
   Windows files or Claude installation were changed by this run.
 - **Evidence:** absent `/proc/sys/fs/binfmt_misc/WSLInterop`; raw PowerShell exit `126`.
+
+## 2026-07-10 — Coordinator post-idle evidence resolves reconnect ambiguity
+
+- **What:** After this worker became idle, the coordinator performed the skill-authorized anchored
+  daemon repair and re-ran the managed reconnect and same-thread canary.
+- **Source:** coordinator follow-up in thread `019f4b4b-6375-7373-aab5-6750c3fdaf04`.
+- **Expected:** Managed remote control reconnects and the existing thread remains resumable without
+  a second sender.
+- **Actual:** Remote control returned `status=connected` on `YogaBook9i` environment
+  `env_e_6a2d7485c5a0832a82505a12442cd3ec`; CLI/app-server were `0.144.1`; same-thread resume returned
+  exactly `CODEX_PR0A_RECONNECT_OK` with no edits.
+- **Severity:** resolution evidence for the significant active-thread reconnect drift above.
+- **Action:** treat the PR 0A post-idle Codex reconnect canary as passed. Durable generalized repair
+  remains #580; do not expand #575 into that controller.
+- **Evidence:** coordinator-managed daemon and exact sentinel report; this reconciliation commit.
+
+## 2026-07-10 — Coordinator partially resolves Windows rollback boundary
+
+- **What:** The coordinator verified the native Windows Claude path remains present and version/help
+  pass at `2.1.205`, bypassing this worker's unavailable WSLInterop route.
+- **Source:** coordinator host-side follow-up.
+- **Expected:** Windows Claude remains available as break-glass rollback.
+- **Actual:** Path/version/help pass; the owner-only no-edit interactive Windows session is still
+  pending and is not claimed complete.
+- **Severity:** partial resolution evidence for the significant worker-environment limitation above.
+- **Action:** retain the owner boundary until the Windows interactive canary is recorded.
+- **Evidence:** coordinator path/version/help report; this reconciliation commit.

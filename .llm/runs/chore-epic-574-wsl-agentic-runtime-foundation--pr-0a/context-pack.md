@@ -12,12 +12,12 @@
 
 ## Current State
 
-S1 (`ac48bd6`) and S2 (`3f18b1b`) are pushed. S3's safe independent implementation/canaries are
-ready to commit. Node `26.5.0`, Claude `2.1.206`, and Gemini `0.50.0` are native and user-local;
-Gemini settings enforce `oauth-personal`; repeated bootstrap is idempotent. Claude/Gemini browser
-sign-in, post-idle Codex reconnect, host sleep/network reconnect, and Windows Claude execution are
-explicit owner/coordinator canaries. The sole worker is thread
-`019f4b4b-6375-7373-aab5-6750c3fdaf04`.
+S1 (`ac48bd6`), S2 (`3f18b1b`), and S3 (`5a72828`) are pushed. Coordinator post-idle evidence now
+confirms managed remote control `status=connected` on `YogaBook9i` environment
+`env_e_6a2d7485c5a0832a82505a12442cd3ec`, matching CLI/app-server `0.144.1`, and same-thread resume
+returned exactly `CODEX_PR0A_RECONNECT_OK` without edits. Native Windows Claude path/version/help
+also passed at `2.1.205`. Owner-only provider login/mobile steering, sleep/network reconnect, and a
+Windows no-edit interactive session remain pending.
 
 ## Completed
 
@@ -36,16 +36,18 @@ explicit owner/coordinator canaries. The sole worker is thread
 - Recorded native Codex/Claude/Gemini command, path, thread, socket, and auth-boundary evidence.
 - Ran every safe independent S3 gate; documented exact owner/coordinator actions for host/browser
   boundaries without dispatching an evaluator.
+- Recorded coordinator post-idle anchored repair, managed reconnect, exact same-thread sentinel, and
+  Windows Claude path/version/help evidence.
 
 ## In Progress
 
-- Commit, explicitly push, and comment S3; hand owner/coordinator the remaining browser/host canaries.
+- Commit and explicitly push the coordinator evidence reconciliation and EOF-only hygiene fix.
 
 ## Next Steps
 
-1. Land S3 with explicit-refspec push and per-slice GitHub evidence.
-2. Owner/coordinator completes the five exact canaries in `worklog.md` and performs slice sign-off.
-3. Coordinator dispatches separate-session IMPL-EVAL only after acceptance evidence is complete.
+1. Owner completes the four exact canaries remaining in `worklog.md`.
+2. Coordinator performs slice sign-off after the owner evidence is recorded.
+3. Separate-session IMPL-EVAL remains undispatched until explicitly authorized after acceptance.
 
 ## Key Decisions
 
@@ -72,7 +74,7 @@ explicit owner/coordinator canaries. The sole worker is thread
 | ----------- | -------------- | -------- |
 | Static | S1-S3 PASS | 68 tests and scoped wrapper exits 0; `worklog.md` |
 | Fitness | planned | `plan.md` |
-| Runtime | PARTIAL / OWNER CANARIES | native installs/policy pass; browser/reconnect/host checks pending |
+| Runtime | PARTIAL / OWNER CANARIES | Codex post-idle reconnect passes; provider mobile and sleep/network checks pending |
 | Consumer | PASS | clean non-login WSL shell resolves all installed tools |
 
 ## Open Questions
@@ -83,12 +85,13 @@ explicit owner/coordinator canaries. The sole worker is thread
   subscription, then repeat the remote-control/worktree canary.
 - Native Gemini identifies Google browser sign-in as the remaining action; settings enforce
   `oauth-personal`, and forbidden environment routes are redaction-tested.
-- Codex passive managed evidence passes, but active-turn reconnect returned exit 1; retry only when
-  this worker is idle. Windows rollback proof requires the host because WSLInterop is absent here.
+- Codex post-idle managed reconnect and exact same-thread no-edit sentinel pass by coordinator
+  evidence. Windows Claude path/version/help pass at `2.1.205`; interactive no-edit use remains.
 
 ## Drift and Debt
 
-- Drift: model override, launcher recovery, and ignored requested-effort override recorded.
+- Drift: model override and launcher recovery remain recorded; post-idle reconnect and Windows
+  path/version/help now have coordinator resolution evidence.
 - Debt: none.
 
 ## Commits

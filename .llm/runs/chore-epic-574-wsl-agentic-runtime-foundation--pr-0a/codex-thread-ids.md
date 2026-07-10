@@ -30,4 +30,3 @@ persisted and the UUID was not resumable. Active-work and rollout checks found n
 implementation turn. The coordinator used the skill's anchored PID repair, removed only the known
 control socket, restored a daemon-managed app-server, and launched the sole real worker recorded
 above. No further sender was launched.
-

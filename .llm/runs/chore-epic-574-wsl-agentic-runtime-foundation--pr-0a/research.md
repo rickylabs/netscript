@@ -35,4 +35,3 @@
 - None that force rework. Google subscription sign-in and Claude sign-in may require an owner browser
   interaction; the bootstrap must classify that as `AUTH_REQUIRED` and continue every independent
   installation/doctor/rollback check.
-

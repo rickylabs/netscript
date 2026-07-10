@@ -170,4 +170,3 @@ evidence.
 - Provider installers require system-wide or credential-bearing arguments.
 - Claude/Gemini CLI auth cannot distinguish subscription sign-in from forbidden routes.
 - Any requirement to restart an active Codex daemon.
-
