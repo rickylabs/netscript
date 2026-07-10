@@ -209,6 +209,20 @@ thread only after coordinator approval.
 - Stop at S4 remediation. Coordinator performs Tier-A re-review; do not self-certify, start S5,
   implement #577-#582, or launch another sender.
 
+## S4 Remediation 2 C5-C8 Handoff
+
+- Partial rollback is durable and retryable per resource; controller state retains checkpoint
+  authority until all compensation and prior-state restoration succeed.
+- Checkpoint prior metadata is canonical-fingerprint-bound; successful adapters are re-probed before
+  advancement. Route/session/worktree/agent/sessionId claims must agree.
+- Apply launch/resume/static smoke are honest #580 `capability_deferred` blocks; plan mode stays
+  mutation-free. Foundation and local state readers prove canonical owned fingerprints.
+- Ownership probe failures return `failed`/exit 5, while drift remains a blocked safety conflict.
+- Final generator gates: complete suite 109/0; wrappers 37/25/18 with zero findings. Doctor repeat is
+  deterministic but exits 5 because the external PR 0A foundation state now contains deferred
+  `antigravity` vocabulary; no migration was authorized in C5-C8.
+- Next: coordinator Tier-A re-review. Do not start S5/#578 or self-certify.
+
 ## Safety
 
 - Native ext4 only; explicit push refspec only.

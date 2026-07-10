@@ -1,4 +1,4 @@
-/** Thin canonical CLI edge for the desired-state agentic runtime controller. */
+// deno-fmt-ignore-file
 import { AGENT_KINDS, type AgentKind, type RuntimeCommand } from './runtime/contract.ts';
 import { runRuntimeCommand } from './runtime/controller.ts';
 import {
@@ -8,16 +8,8 @@ import {
 import { LocalRuntimeStateAdapter } from './runtime/adapters/local-state-adapter.ts';
 import { renderRuntimeHuman, renderRuntimeJson, runtimeExitCode } from './runtime/output.ts';
 import type { RuntimeReadPorts } from './runtime/ports.ts';
-interface ParsedRuntimeArgs {
-  readonly command: RuntimeCommand;
-  readonly json: boolean;
-}
-interface CliOptions {
-  readonly positional: readonly string[];
-  readonly json: boolean;
-  readonly dryRun: boolean;
-  readonly values: ReadonlyMap<string, string>;
-}
+interface ParsedRuntimeArgs { readonly command: RuntimeCommand; readonly json: boolean; }
+interface CliOptions { readonly positional: readonly string[]; readonly json: boolean; readonly dryRun: boolean; readonly values: ReadonlyMap<string, string>; }
 function usage(): string {
   return `Usage:
   deno task agentic:runtime doctor [--json]
@@ -119,12 +111,18 @@ export function parseRuntimeArgs(args: readonly string[]): ParsedRuntimeArgs {
 function createReadPorts(home: string): RuntimeReadPorts {
   // deno-fmt-ignore
   const local = new LocalRuntimeStateAdapter(`${home}/.config/netscript-agentic/runtime`, `${home}/.config/netscript-agentic/foundation-state.json`);
+  const inspector = new FoundationRuntimeInspector(new CommandFoundationReportReader());
   return {
-    inspector: new FoundationRuntimeInspector(new CommandFoundationReportReader()),
+    inspector,
     persistedStateReader: local,
     desiredStateSource: local,
     checkpointReader: local,
-    ownedResourceReader: local,
+    ownedResourceReader: {
+      readOwnedResourceFingerprint: (id) =>
+        id.startsWith('state:')
+          ? local.readOwnedResourceFingerprint(id)
+          : inspector.readOwnedResourceFingerprint(id),
+    },
     contentReader: local,
     processProbe: {
       probeProcess: ({ probeId }) => Promise.resolve({ probeId, exitCode: 1, timedOut: false }),

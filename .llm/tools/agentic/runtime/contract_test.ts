@@ -190,7 +190,8 @@ Deno.test('persisted and result contracts expose identifiers and fingerprints on
       },
       beforeFingerprint: 'sha256:old',
       afterFingerprint: 'sha256:new',
-      previous: { kind: 'desired-state' },
+      previous: { kind: 'desired-state', desired: null },
+      rollbackState: 'pending',
     }],
     previousControllerState: null,
   };

@@ -2,15 +2,15 @@
 
 import type { RuntimeDoctorReport } from '../../wsl-foundation-lib.ts';
 import { FOUNDATION_SCHEMA_VERSION } from '../../wsl-foundation-lib.ts';
-import { RUNTIME_SCHEMA_VERSION } from '../contract.ts';
+import { INSTALLABLE_FOUNDATION_COMPONENTS, RUNTIME_SCHEMA_VERSION } from '../contract.ts';
 import type {
   AgentKind,
   CapabilityState,
   RuntimeDiagnostic,
   StateDirectoryId,
 } from '../contract.ts';
-import type { RuntimeInspectorPort } from '../ports.ts';
-import type { ObservedRuntimeState } from '../state.ts';
+import type { OwnedResourceReaderPort, RuntimeInspectorPort } from '../ports.ts';
+import { fingerprintRuntimeValue, type ObservedRuntimeState } from '../state.ts';
 import { translateMobileControl } from './mobile-control-adapter.ts';
 
 const MAX_REPORT_BYTES = 256 * 1024;
@@ -187,10 +187,36 @@ export async function translateFoundationReport(
 }
 
 /** Supplies normalized foundation observations through the strict read port. */
-export class FoundationRuntimeInspector implements RuntimeInspectorPort {
+export class FoundationRuntimeInspector implements RuntimeInspectorPort, OwnedResourceReaderPort {
   constructor(private readonly reader: FoundationReportReader) {}
 
   async observeRuntime(): Promise<ObservedRuntimeState> {
     return await translateFoundationReport(await this.reader.readReport());
+  }
+
+  async readOwnedResourceFingerprint(resourceId: string): Promise<string | null> {
+    const report = await this.reader.readReport();
+    if (resourceId.startsWith('component:')) {
+      const component = resourceId.slice('component:'.length);
+      if (!(INSTALLABLE_FOUNDATION_COMPONENTS as readonly string[]).includes(component)) {
+        return null;
+      }
+      const probe = report.components.find((entry) => entry.component === component);
+      return await fingerprintRuntimeValue({
+        kind: 'component',
+        version: probe?.detectedVersion ?? null,
+      });
+    }
+    if (resourceId.startsWith('state-directory:')) {
+      const stateDirectory = resourceId.slice('state-directory:'.length);
+      const probe = report.components.find((entry) =>
+        STATE_DIRECTORY_COMPONENTS[entry.component] === stateDirectory
+      );
+      return await fingerprintRuntimeValue({
+        kind: 'state-directory',
+        present: probe?.status === 'ready',
+      });
+    }
+    return null;
   }
 }

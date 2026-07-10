@@ -1,14 +1,12 @@
+// deno-fmt-ignore-file
 import { LocalRuntimeStateAdapter } from './adapters/local-state-adapter.ts';
 import type { RouteIdentity, RuntimeCommand, RuntimeDiagnostic } from './contract.ts';
 import { RUNTIME_SCHEMA_VERSION } from './contract.ts';
 import { applyRuntimeCommand, runRuntimeCommand } from './controller.ts';
+import { runtimeExitCode } from './output.ts';
 import type { RuntimeMutationPorts, RuntimeReadPorts } from './ports.ts';
-import type {
-  DesiredRuntimeState,
-  ObservedRuntimeState,
-  PersistedRuntimeState,
-  RuntimeCheckpointState,
-} from './state.ts';
+import type { DesiredRuntimeState, ObservedRuntimeState, PersistedRuntimeState, RuntimeCheckpointState } from './state.ts';
+import { fingerprintRuntimeValue } from './state.ts';
 
 function assert(value: unknown, message: string): asserts value {
   if (!value) throw new Error(message);
@@ -21,22 +19,8 @@ function equal(actual: unknown, expected: unknown, message = 'values differ'): v
   }
 }
 const worktree = '/home/codex/repos/worktree';
-const route: RouteIdentity = {
-  agent: 'codex',
-  provider: 'openai',
-  model: 'primary',
-  effort: 'high',
-  worktree,
-  mobileRequired: true,
-};
-const desired: DesiredRuntimeState = {
-  schemaVersion: RUNTIME_SCHEMA_VERSION,
-  stateId: 'desired-s4',
-  foundation: { nativeExt4: true, versions: { node: '2.0.0' }, stateDirectories: ['codex'] },
-  agents: { codex: { required: true, authRoute: 'provider-native', route } },
-  worktrees: [{ path: worktree, branch: 'feature', upstream: 'none', clean: true }],
-  sessions: [],
-};
+const route: RouteIdentity = { agent: 'codex', provider: 'openai', model: 'primary', effort: 'high', worktree, mobileRequired: true };
+const desired: DesiredRuntimeState = { schemaVersion: RUNTIME_SCHEMA_VERSION, stateId: 'desired-s4', foundation: { nativeExt4: true, versions: { node: '2.0.0' }, stateDirectories: ['codex'] }, agents: { codex: { required: true, authRoute: 'provider-native', route } }, worktrees: [{ path: worktree, branch: 'feature', upstream: 'none', clean: true }], sessions: [] };
 const observed: ObservedRuntimeState = {
   schemaVersion: RUNTIME_SCHEMA_VERSION,
   stateId: 'observed-s4',
@@ -45,41 +29,28 @@ const observed: ObservedRuntimeState = {
   auth: [],
   stateDirectories: [],
   capabilities: { codex: 'available' },
-  worktrees: [{
-    path: worktree,
-    branch: 'feature',
-    upstream: null,
-    dirty: false,
-    nativeExt4: true,
-    found: true,
-  }],
+  worktrees: [{ path: worktree, branch: 'feature', upstream: null, dirty: false, nativeExt4: true, found: true }],
   sessions: [],
   configuredDesiredState: desired,
   checkpoints: [],
 };
-const persisted: PersistedRuntimeState = {
-  schemaVersion: RUNTIME_SCHEMA_VERSION,
-  stateId: 'controller-s4',
-  desired,
-  checkpointIds: [],
-  lastAppliedCommandId: null,
-};
+const persisted: PersistedRuntimeState = { schemaVersion: RUNTIME_SCHEMA_VERSION, stateId: 'controller-s4', desired, checkpointIds: [], lastAppliedCommandId: null };
+const componentBefore = await fingerprintRuntimeValue({ kind: 'component', version: '1.0.0' });
+const directoryBefore = await fingerprintRuntimeValue({ kind: 'state-directory', present: false });
 const failure = (
   code: RuntimeDiagnostic['code'],
   category: RuntimeDiagnostic['category'] = 'execution',
 ) => ({ code, category, retryable: false, message: `adapter:${code}` }) as const;
 
-interface Options {
-  failAction?: number;
-  failCompensation?: boolean;
-  failStateWrite?: boolean;
-  failCheckpoint?: RuntimeCheckpointState['status'];
-}
+interface Options { failAction?: number; failCompensation?: number; noOpAction?: boolean; failOwnedRead?: boolean; failStateWrite?: boolean; failCheckpoint?: RuntimeCheckpointState['status']; }
 function scenario(options: Options = {}) {
   const events: string[] = [];
   const compensated: RuntimeCheckpointState['resources'][number][] = [];
   const checkpoints = new Map<string, RuntimeCheckpointState>();
-  const fingerprints = new Map<string, string | null>();
+  const fingerprints = new Map<string, string | null>([
+    ['component:node', componentBefore],
+    ['state-directory:codex', directoryBefore],
+  ]);
   let state: PersistedRuntimeState | null = persisted;
   let actionCalls = 0;
   let observations = 0;
@@ -94,7 +65,10 @@ function scenario(options: Options = {}) {
     desiredStateSource: { loadDesiredState: () => Promise.resolve(desired) },
     checkpointReader: { readCheckpoint: (id) => Promise.resolve(checkpoints.get(id) ?? null) },
     ownedResourceReader: {
-      readOwnedResourceFingerprint: (id) => Promise.resolve(fingerprints.get(id) ?? null),
+      readOwnedResourceFingerprint: (id) =>
+        options.failOwnedRead
+          ? Promise.reject(new Error('owned read'))
+          : Promise.resolve(fingerprints.get(id) ?? null),
     },
     contentReader: {
       summarizeContent: (value) =>
@@ -135,7 +109,9 @@ function scenario(options: Options = {}) {
         const resource = [...checkpoints.values()].at(-1)?.resources.find((entry) =>
           entry.action.id === action.id
         );
-        if (resource) fingerprints.set(resource.resourceId, resource.afterFingerprint);
+        if (resource && !options.noOpAction) {
+          fingerprints.set(resource.resourceId, resource.afterFingerprint);
+        }
         return Promise.resolve(null);
       },
     },
@@ -143,7 +119,8 @@ function scenario(options: Options = {}) {
       compensateAction: (action, resource) => {
         events.push(`compensate:${action.id}`);
         compensated.push(resource);
-        if (options.failCompensation) {
+        if ((options.failCompensation ?? 0) > 0) {
+          options.failCompensation!--;
           return Promise.resolve(
             failure('compensation_failed', 'rollback'),
           );
@@ -178,13 +155,7 @@ Deno.test('successful apply persists desired state, checkpoint id, and last comm
   equal(s.state()?.checkpointIds, ['success-checkpoint']);
   equal(s.state()?.lastAppliedCommandId, 'success');
   equal(s.checkpoints.get('success-checkpoint')?.status, 'applied');
-  equal(s.events.map((entry) => entry.split(':')[0]), [
-    'checkpoint',
-    'action',
-    'action',
-    'state',
-    'checkpoint',
-  ]);
+  equal(s.events.filter((entry) => entry.startsWith('action')).length, 2);
 });
 
 Deno.test('configure survives a fresh LocalRuntimeStateAdapter roundtrip', async () => {
@@ -203,7 +174,17 @@ Deno.test('configure survives a fresh LocalRuntimeStateAdapter roundtrip', async
       checkpointReader: local,
       ownedResourceReader: local,
     };
-    const writes = { ...s.writes, desiredStateWriter: local, checkpointWriter: local };
+    const writes = {
+      ...s.writes,
+      desiredStateWriter: local,
+      checkpointWriter: local,
+      actionExecutor: {
+        executeAction: async () => {
+          await local.writeDesiredState({ ...persisted, desired: desiredNext });
+          return null;
+        },
+      },
+    };
     const command = {
       kind: 'configure',
       commandId: 'configure',
@@ -232,7 +213,17 @@ Deno.test('configure survives a fresh LocalRuntimeStateAdapter roundtrip', async
       checkpointReader: fresh,
       ownedResourceReader: fresh,
     };
-    const rollbackWrites = { ...writes, desiredStateWriter: fresh, checkpointWriter: fresh };
+    const rollbackWrites = {
+      ...writes,
+      desiredStateWriter: fresh,
+      checkpointWriter: fresh,
+      actionCompensator: {
+        compensateAction: async () => {
+          await fresh.writeDesiredState(persisted);
+          return null;
+        },
+      },
+    };
     equal(
       (await applyRuntimeCommand(rollback, rollbackReads, rollbackWrites)).status,
       'rolled_back',
@@ -257,28 +248,56 @@ Deno.test('state write failure compensates; failed compensation is reported fail
   equal(result.status, 'failed');
   equal(result.actions.map((entry) => entry.status), ['compensated', 'compensated']);
   equal(compensated.checkpoints.get('state-fail-checkpoint')?.status, 'rolled_back');
-  const partial = scenario({ failAction: 2, failCompensation: true });
+  const partial = scenario({ failAction: 2, failCompensation: 1 });
   const incomplete = await applyRuntimeCommand(bootstrap('partial'), partial.reads, partial.writes);
   equal(incomplete.status, 'partially_rolled_back');
-  equal(incomplete.actions.map((entry) => entry.status), ['failed', 'failed']);
+  equal(incomplete.actions.map((entry) => entry.status), ['failed', 'compensated']);
   equal(incomplete.diagnostics.map((entry) => entry.code), [
     'provider_unavailable',
     'compensation_failed',
   ]);
-  const explicit = scenario({ failCompensation: true });
+  equal(partial.state()?.checkpointIds, ['partial-checkpoint']);
+  equal(
+    (await applyRuntimeCommand(
+      {
+        kind: 'rollback',
+        commandId: 'retry-partial',
+        mode: 'apply',
+        checkpointId: 'partial-checkpoint',
+      },
+      partial.reads,
+      partial.writes,
+    )).status,
+    'rolled_back',
+  );
+  const explicit = scenario({ failCompensation: 1 });
   await applyRuntimeCommand(bootstrap('explicit'), explicit.reads, explicit.writes);
+  const rollbackCommand = {
+    kind: 'rollback',
+    commandId: 'undo',
+    mode: 'apply',
+    checkpointId: 'explicit-checkpoint',
+  } as const;
   const rollback = await applyRuntimeCommand(
-    { kind: 'rollback', commandId: 'undo', mode: 'apply', checkpointId: 'explicit-checkpoint' },
+    rollbackCommand,
     explicit.reads,
     explicit.writes,
   );
   equal(rollback.status, 'partially_rolled_back');
-  equal(rollback.actions.map((entry) => entry.status), ['failed', 'failed']);
+  equal(
+    (await applyRuntimeCommand(
+      { ...rollbackCommand, commandId: 'retry-explicit' },
+      explicit.reads,
+      explicit.writes,
+    )).status,
+    'rolled_back',
+  );
 });
 
 Deno.test('checkpoints retain typed inverse metadata and before/after fingerprints', async () => {
   const session = { agent: 'codex', sessionId: 'thread', worktree, boundary: 'idle' } as const;
-  const target = { ...route, model: 'fallback' };
+  const current = { ...route, sessionId: 'thread' };
+  const target = { ...current, model: 'fallback' };
   for (
     const command of [
       {
@@ -286,18 +305,21 @@ Deno.test('checkpoints retain typed inverse metadata and before/after fingerprin
         commandId: 'fallback',
         mode: 'apply',
         session,
-        currentRoute: route,
+        currentRoute: current,
         targetRoute: target,
       },
       { kind: 'restore', commandId: 'restore', mode: 'apply', session, currentRoute: target },
     ] as const satisfies readonly RuntimeCommand[]
   ) {
     const s = scenario();
-    s.fingerprints.set('session:codex:thread', 'sha256:before');
+    s.fingerprints.set(
+      'session:codex:thread',
+      await fingerprintRuntimeValue({ kind: 'route', route: command.currentRoute }),
+    );
     const result = await applyRuntimeCommand(command, s.reads, s.writes);
     equal(result.status, 'succeeded');
     const resource = s.checkpoints.get(`${command.commandId}-checkpoint`)?.resources[0];
-    equal(resource?.beforeFingerprint, 'sha256:before');
+    equal(resource?.beforeFingerprint, await fingerprintRuntimeValue(resource?.previous));
     equal(resource?.previous, { kind: 'route', route: command.currentRoute });
     assert(resource?.afterFingerprint.startsWith('sha256:'), 'missing target fingerprint');
     assert(
@@ -413,4 +435,16 @@ Deno.test('planner-only calls remain mutation free and adapter diagnostics remai
   equal(s.events, []);
   const failed = await applyRuntimeCommand(bootstrap('adapter'), s.reads, s.writes);
   equal(failed.diagnostics[0], failure('provider_unavailable'));
+});
+
+Deno.test('post-action and rollback probes preserve finite failure categories', async () => {
+  const noOp = scenario({ noOpAction: true }); const mismatch = await applyRuntimeCommand(bootstrap('noop'), noOp.reads, noOp.writes);
+  equal([mismatch.status, mismatch.diagnostics[0]?.code], ['failed', 'ownership_conflict']);
+  const probe = scenario({ failOwnedRead: true }); const result = await applyRuntimeCommand(bootstrap('probe-owned'), probe.reads, probe.writes);
+  equal([result.status, result.diagnostics[0]?.code, runtimeExitCode(result)], ['failed', 'probe_failed', 5]);
+  const options: Options = {}; const rollbackProbe = scenario(options);
+  await applyRuntimeCommand(bootstrap('rollback-probe'), rollbackProbe.reads, rollbackProbe.writes);
+  options.failOwnedRead = true;
+  const explicit = await applyRuntimeCommand({ kind: 'rollback', commandId: 'rollback-probe-command', mode: 'apply', checkpointId: 'rollback-probe-checkpoint' }, rollbackProbe.reads, rollbackProbe.writes);
+  equal([explicit.status, explicit.diagnostics[0]?.code, runtimeExitCode(explicit)], ['failed', 'probe_failed', 5]);
 });

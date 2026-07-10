@@ -1,17 +1,5 @@
-import {
-  ACTION_EFFECTS,
-  ACTION_KINDS,
-  ADAPTER_KINDS,
-  AGENT_KINDS,
-  type AgentKind,
-  type ContentReference,
-  EFFORTS,
-  INSTALLABLE_FOUNDATION_COMPONENTS,
-  PROVIDER_KINDS,
-  RUNTIME_SCHEMA_VERSION,
-  type RuntimeAction,
-  STATE_DIRECTORY_IDS,
-} from '../contract.ts';
+// deno-fmt-ignore-file
+import { ACTION_EFFECTS, ACTION_KINDS, ADAPTER_KINDS, AGENT_KINDS, type AgentKind, type ContentReference, EFFORTS, INSTALLABLE_FOUNDATION_COMPONENTS, PROVIDER_KINDS, RUNTIME_SCHEMA_VERSION, type RuntimeAction, STATE_DIRECTORY_IDS } from '../contract.ts';
 import type {
   CheckpointReaderPort,
   CheckpointWriterPort,
@@ -27,6 +15,7 @@ import {
   type DesiredRuntimeState,
   fingerprintRuntimeValue,
   type PersistedRuntimeState,
+  RESOURCE_ROLLBACK_STATES,
   type RuntimeCheckpointState,
 } from '../state.ts';
 export const CONTROLLER_STATE_FILE = 'controller-state.json';
@@ -185,12 +174,13 @@ function parseAction(value: unknown, strict: boolean): RuntimeAction {
 }
 function parsePrevious(value: unknown, strict: boolean) {
   const previous = object(value, 'previous owned state');
-  known(previous, 'kind version present route', 'previous owned state', strict);
+  known(previous, 'kind version present route desired', 'previous owned state', strict);
   // deno-fmt-ignore
   if (previous.kind === 'component') return { kind: 'component' as const, version: previous.version === null ? null : string(previous.version, 'previous version') };
   // deno-fmt-ignore
   if (previous.kind === 'state-directory') return { kind: 'state-directory' as const, present: boolean(previous.present, 'previous presence') };
-  if (previous.kind === 'desired-state') return { kind: 'desired-state' as const };
+  // deno-fmt-ignore
+  if (previous.kind === 'desired-state') return { kind: 'desired-state' as const, desired: previous.desired === null ? null : parseDesiredRuntimeState(previous.desired, strict) };
   // deno-fmt-ignore
   if (previous.kind === 'route') return { kind: 'route' as const, route: parseRoute(previous.route, strict) };
   throw new Error('previous owned state invalid');
@@ -212,7 +202,7 @@ function parseCheckpoint(value: unknown, strict = true): RuntimeCheckpointState 
     resources: array(checkpoint.resources, 'resources').map((entry) => {
       const resource = object(entry, 'resource');
       // deno-fmt-ignore
-      known(resource, 'resourceId kind action beforeFingerprint afterFingerprint previous', 'resource', strict);
+      known(resource, 'resourceId kind action beforeFingerprint afterFingerprint previous rollbackState', 'resource', strict);
       return {
         resourceId: string(resource.resourceId, 'resource id'),
         kind: member(resource.kind, ['directory', 'file', 'symlink', 'configuration'] as const, 'resource kind'),
@@ -220,6 +210,7 @@ function parseCheckpoint(value: unknown, strict = true): RuntimeCheckpointState 
         beforeFingerprint: resource.beforeFingerprint === null ? null : string(resource.beforeFingerprint, 'before fingerprint'),
         afterFingerprint: string(resource.afterFingerprint, 'after fingerprint'),
         previous: parsePrevious(resource.previous, strict),
+        rollbackState: member(resource.rollbackState, RESOURCE_ROLLBACK_STATES, 'rollback state'),
       };
     }),
     previousControllerState: checkpoint.previousControllerState === null ? null : parsePersistedRuntimeState(checkpoint.previousControllerState, strict),
@@ -338,7 +329,10 @@ export class LocalRuntimeStateAdapter
   async readOwnedResourceFingerprint(resourceId: string): Promise<string | null> {
     if (!resourceId.startsWith('state:')) return null;
     const state = await this.readPersistedState();
-    return state ? await fingerprintRuntimeValue(state.desired) : null;
+    return await fingerprintRuntimeValue({
+      kind: 'desired-state',
+      desired: state?.desired ?? null,
+    });
   }
   async writeCheckpoint(checkpoint: RuntimeCheckpointState): Promise<void> {
     const sanitized = parseCheckpoint(checkpoint, false);

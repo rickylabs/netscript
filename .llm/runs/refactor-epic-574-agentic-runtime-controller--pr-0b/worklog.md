@@ -852,3 +852,32 @@ executable alias. Official sources verify Google Sign-In and headless `-p`, but 
 structured output, complete exits, quota/subscription, search/fetch/citations, and instruction-file
 behavior remain acceptance canaries owned by revised #578. S4 remediation, S5, and #578 stay paused
 pending scope review.
+
+## 2026-07-10 S4 Tier-A Remediation 2 — C5-C8 COMPLETE (generator evidence)
+
+- C5 persists per-resource `pending`/`applied`/`compensated` progress. Partial checkpoints remain
+  indexed and retryable; fresh ownership reads skip compensated resources, retry only proven applied
+  resources, and refuse drift. Automatic and explicit partial-then-success tests assert checkpoint
+  and controller-state authority.
+- C6 binds typed prior component/directory/desired/route metadata to its canonical before
+  fingerprint and re-observes every successful action before checkpoint advancement. False route
+  identity, no-op action, mismatch, and probe failures have finite regression coverage.
+- C7 explicitly blocks launch/resume/static-smoke apply with `capability_deferred` owned by #580;
+  plan mode remains data-only. Foundation and local-state owned readers use the same canonical
+  shapes as checkpoint construction. This narrows the earlier S4 lifecycle-apply claim without
+  implementing #580.
+- C8 maps ownership probe failures to `failed` and exit `5`; policy/safety conflicts remain
+  `blocked`.
+
+### Raw replacement evidence
+
+| Gate | Command / raw outcome |
+| --- | --- |
+| Focused + complete runtime | `deno test --no-lock --allow-read --allow-write --allow-env --unstable-kv ...` — exit 0, `109 passed | 0 failed`; final controller probe run exit 0, 9 passed |
+| Scoped check/lint/fmt | repo wrappers selected `37/25/18` files; all exit 0, zero findings |
+| Doctor repeat | `deno task agentic:runtime doctor --json` twice — exits `5/5`, statuses `failed/failed`, timing-normalized outputs equal and dirty-tree hash equal. Exact diagnostic is `state_corrupt`: the owner-managed PR 0A foundation state contains future `antigravity` vocabulary; this slice intentionally does not migrate it. |
+| C5-C8 matrices | 40 focused runtime tests cover partial retry, route binding, no-op/post-action verification, lifecycle #580 blocks, real local/foundation readers, rollback ownership, and probe exit `5`; all pass |
+| Budgets | CLI 147/150; ports 220/220; state 300/300; planner 350/350; controller 300/300; local/foundation adapters 343/350 and 222/350; focused tests each <=450 |
+
+No dependency, lock, provider login/send, daemon, Antigravity migration, S5, #578, or #584 change was
+made. Coordinator Tier-A re-review remains required; this generator does not self-certify.

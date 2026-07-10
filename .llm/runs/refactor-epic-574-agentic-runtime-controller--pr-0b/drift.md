@@ -70,3 +70,19 @@
 - **Action:** preserve historical Gemini evidence, pause S4/S5/#578, revise GitHub and harness plans,
   and implement a reviewed compatibility migration later. Do not infer Gemini auth, quota, output,
   or research contracts for `agy`.
+
+## 2026-07-10 - S4 lifecycle apply boundary clarified
+
+- **Expected:** The earlier S4 plan broadly named lifecycle apply behavior.
+- **Actual:** Transaction-safe launch/resume/static-smoke apply requires durable one-sender ownership
+  owned by #580, so C7 returns an explicit #580 capability block while retaining data-only plan mode.
+- **Severity:** reviewed child-boundary clarification; no hidden implementation debt.
+- **Action:** keep lifecycle mutation deferred to #580 and do not claim it executable in #576.
+
+## 2026-07-10 - Doctor repeat reflects deferred owner-state vocabulary
+
+- **Expected:** Prior S4 doctor evidence exited 2 against the PR 0A foundation-state vocabulary.
+- **Actual:** Both current repeats deterministically exit 5 with `state_corrupt` because the external
+  owner-managed foundation state contains `antigravity`, whose migration is explicitly outside C5-C8.
+- **Severity:** environment/input drift, not nondeterminism or a C5-C8 source regression.
+- **Action:** preserve raw `5/5` evidence; do not migrate Antigravity vocabulary in this slice.

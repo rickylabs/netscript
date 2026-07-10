@@ -1,3 +1,4 @@
+// deno-fmt-ignore-file
 import type {
   AgentKind,
   ContentReference,
@@ -23,7 +24,6 @@ export const READ_PORT_METHODS = [
   'probeProcess',
   'now',
 ] as const;
-// deno-fmt-ignore
 export const MUTATION_PORT_METHODS = ['writeDesiredState', 'writeCheckpoint', 'executeAction', 'compensateAction'] as const;
 export interface ContentReferenceSummary {
   readonly path: string;
@@ -186,33 +186,35 @@ export async function readRuntimeInput(
   }
   return { desired, observed, persisted };
 }
-export async function checkpointOwnershipDiagnostic(
-  checkpoint: RuntimeCheckpointState,
-  reader: OwnedResourceReaderPort,
-): Promise<RuntimeDiagnostic | null> {
+export interface CheckpointOwnershipResult { readonly resources: readonly import('./state.ts').OwnedResourceState[]; readonly remaining: readonly import('./state.ts').OwnedResourceState[]; readonly diagnostic: RuntimeDiagnostic | null; }
+export async function inspectCheckpointOwnership(checkpoint: RuntimeCheckpointState, reader: OwnedResourceReaderPort): Promise<CheckpointOwnershipResult> {
   const ids = new Set<string>();
+  const resources: import('./state.ts').OwnedResourceState[] = [];
+  const remaining: import('./state.ts').OwnedResourceState[] = [];
   for (const resource of checkpoint.resources) {
     if (
       ids.has(resource.resourceId) || !resource.action.reversible ||
       resource.action.resourceIds.length !== 1 ||
       resource.action.resourceIds[0] !== resource.resourceId
     ) {
-      return ownershipIssue(
-        'rollback_refused',
-        'rollback',
-        'checkpoint ownership metadata is invalid',
-      );
+      return { resources, remaining, diagnostic: ownershipIssue('rollback_refused', 'rollback', 'checkpoint ownership metadata is invalid') };
     }
     ids.add(resource.resourceId);
     let current: string | null;
     try {
       current = await reader.readOwnedResourceFingerprint(resource.resourceId);
     } catch {
-      return ownershipIssue('probe_failed', 'execution', 'owned resource observation failed');
+      return { resources, remaining, diagnostic: ownershipIssue('probe_failed', 'execution', 'owned resource observation failed') };
     }
-    if (current !== resource.afterFingerprint) {
-      return ownershipIssue('ownership_conflict', 'safety', 'owned resource changed after apply');
+    if (current === resource.beforeFingerprint) {
+      resources.push({ ...resource, rollbackState: 'compensated' });
+    } else if (current === resource.afterFingerprint && resource.rollbackState !== 'compensated') {
+      const applied = { ...resource, rollbackState: 'applied' } as const;
+      resources.push(applied);
+      remaining.push(applied);
+    } else {
+      return { resources, remaining, diagnostic: ownershipIssue('ownership_conflict', 'safety', 'owned resource changed after apply') };
     }
   }
-  return null;
+  return { resources, remaining, diagnostic: null };
 }

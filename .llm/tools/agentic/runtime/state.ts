@@ -1,3 +1,4 @@
+// deno-fmt-ignore-file
 import type {
   AgentKind,
   CapabilityState,
@@ -44,6 +45,7 @@ export const CHECKPOINT_STATUSES = ['prepared', 'applied', 'rolled_back', 'parti
 export type CheckpointStatus = typeof CHECKPOINT_STATUSES[number];
 export const OWNED_RESOURCE_KINDS = ['directory', 'file', 'symlink', 'configuration'] as const;
 export type OwnedResourceKind = typeof OWNED_RESOURCE_KINDS[number];
+export const RESOURCE_ROLLBACK_STATES = ['pending', 'applied', 'compensated'] as const; export type ResourceRollbackState = typeof RESOURCE_ROLLBACK_STATES[number];
 export interface DesiredFoundationState {
   readonly nativeExt4: true;
   readonly versions: Readonly<Partial<Record<InstallableFoundationComponentId, string>>>;
@@ -183,19 +185,8 @@ export function unavailableObservedSummary(stateId = 'unavailable'): ObservedSta
     checkpoints: [],
   };
 }
-export interface OwnedResourceState {
-  readonly resourceId: string;
-  readonly kind: OwnedResourceKind;
-  readonly action: RuntimeAction;
-  readonly beforeFingerprint: string | null;
-  readonly afterFingerprint: string;
-  readonly previous: OwnedResourcePrevious;
-}
-export type OwnedResourcePrevious =
-  | Readonly<{ kind: 'component'; version: string | null }>
-  | Readonly<{ kind: 'state-directory'; present: boolean }>
-  | Readonly<{ kind: 'desired-state' }>
-  | Readonly<{ kind: 'route'; route: RouteIdentity }>;
+export interface OwnedResourceState { readonly resourceId: string; readonly kind: OwnedResourceKind; readonly action: RuntimeAction; readonly beforeFingerprint: string | null; readonly afterFingerprint: string; readonly previous: OwnedResourcePrevious; readonly rollbackState: ResourceRollbackState; }
+export type OwnedResourcePrevious = Readonly<{ kind: 'component'; version: string | null }> | Readonly<{ kind: 'state-directory'; present: boolean }> | Readonly<{ kind: 'desired-state'; desired: DesiredRuntimeState | null }> | Readonly<{ kind: 'route'; route: RouteIdentity }>;
 export interface RuntimeCheckpointState {
   readonly schemaVersion: typeof RUNTIME_SCHEMA_VERSION;
   readonly checkpointId: string;
@@ -232,6 +223,7 @@ function previousFor(
   action: RuntimeAction,
   command: RuntimeCommand,
   observed: ObservedRuntimeState,
+  persisted: PersistedRuntimeState | null,
 ): OwnedResourcePrevious | null {
   if (action.component) {
     const version = observed.components.find((entry) =>
@@ -243,20 +235,25 @@ function previousFor(
     const present = observed.stateDirectories.includes(action.stateDirectory);
     return { kind: 'state-directory', present };
   }
-  if (action.kind === 'persist_desired_state') return { kind: 'desired-state' };
+  if (action.kind === 'persist_desired_state') {
+    return { kind: 'desired-state', desired: persisted?.desired ?? null };
+  }
   if (action.kind === 'switch_route' || action.kind === 'restore_route') {
     if (command.kind !== 'fallback' && command.kind !== 'restore') return null;
     return { kind: 'route', route: command.currentRoute };
   }
   return null;
 }
-function targetFor(action: RuntimeAction, desired: DesiredRuntimeState | null): unknown {
-  if (action.component) return { component: action.component, version: action.targetVersion };
-  if (action.stateDirectory) return { stateDirectory: action.stateDirectory, present: true };
-  if (action.kind === 'persist_desired_state') return desired;
-  return action.route ?? { kind: action.kind, resourceIds: action.resourceIds };
+function targetFor(
+  action: RuntimeAction,
+  desired: DesiredRuntimeState | null,
+): OwnedResourcePrevious | null {
+  if (action.component) return { kind: 'component', version: action.targetVersion ?? null };
+  if (action.stateDirectory) return { kind: 'state-directory', present: true };
+  if (action.kind === 'persist_desired_state') return { kind: 'desired-state', desired };
+  if (action.route) return { kind: 'route', route: action.route };
+  return null;
 }
-/** Creates an invertible checkpoint from typed action targets and observed owned metadata. */
 export async function createRuntimeCheckpoint(
   command: RuntimeCommand,
   createdAt: string,
@@ -269,16 +266,20 @@ export async function createRuntimeCheckpoint(
   const resources: OwnedResourceState[] = [];
   for (const action of actions) {
     if (!action.reversible || action.resourceIds.length !== 1) return null;
-    const previous = previousFor(action, command, observed);
-    if (!previous) return null;
+    const previous = previousFor(action, command, observed, persisted);
+    const target = targetFor(action, desired);
+    if (!previous || !target) return null;
     const resourceId = action.resourceIds[0];
+    const beforeFingerprint = beforeFingerprints.get(resourceId) ?? null;
+    if (beforeFingerprint !== await fingerprintRuntimeValue(previous)) return null;
     resources.push({
       resourceId,
       kind: resourceId.startsWith('state-directory:') ? 'directory' : 'configuration',
       action,
-      beforeFingerprint: beforeFingerprints.get(resourceId) ?? null,
-      afterFingerprint: await fingerprintRuntimeValue(targetFor(action, desired)),
+      beforeFingerprint,
+      afterFingerprint: await fingerprintRuntimeValue(target),
       previous,
+      rollbackState: 'pending',
     });
   }
   return {
@@ -291,7 +292,6 @@ export async function createRuntimeCheckpoint(
     previousControllerState: persisted,
   };
 }
-/** Compares desired state deterministically without relying on object key insertion order. */
 export function desiredStatesEqual(
   left: DesiredRuntimeState | null,
   right: DesiredRuntimeState | null,

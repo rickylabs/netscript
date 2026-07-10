@@ -1,44 +1,12 @@
-/** Pure deterministic reconciliation planner for schema 1.0 commands. */
-import {
-  type AdapterKind,
-  type DeferredIssue,
-  hasLegalRuntimeCommandMode,
-  INSTALLABLE_FOUNDATION_COMPONENTS,
-  type ReconcilePlan,
-  type RouteIdentity,
-  RUNTIME_SCHEMA_VERSION,
-  type RuntimeAction,
-  type RuntimeActionKind,
-  type RuntimeCommand,
-  type RuntimeDiagnostic,
-  STATE_DIRECTORY_IDS,
-} from './contract.ts';
-import {
-  type DesiredRuntimeState,
-  desiredStatesEqual,
-  type ObservedRuntimeState,
-} from './state.ts';
-export interface ReconciliationInput {
-  readonly command: RuntimeCommand;
-  readonly desired: DesiredRuntimeState | null;
-  readonly observed: ObservedRuntimeState;
-}
+// deno-fmt-ignore-file
+import { type AdapterKind, type DeferredIssue, hasLegalRuntimeCommandMode, INSTALLABLE_FOUNDATION_COMPONENTS, type ReconcilePlan, type RouteIdentity, RUNTIME_SCHEMA_VERSION, type RuntimeAction, type RuntimeActionKind, type RuntimeCommand, type RuntimeDiagnostic, type SessionIdentity, STATE_DIRECTORY_IDS } from './contract.ts';
+import { type DesiredRuntimeState, desiredStatesEqual, type ObservedRuntimeState } from './state.ts';
+export interface ReconciliationInput { readonly command: RuntimeCommand; readonly desired: DesiredRuntimeState | null; readonly observed: ObservedRuntimeState; }
 type PlanBuilder = { readonly actions: RuntimeAction[]; readonly diagnostics: RuntimeDiagnostic[] };
-function diagnostic(
-  code: RuntimeDiagnostic['code'],
-  category: RuntimeDiagnostic['category'],
-  message: string,
-  ownerIssue?: DeferredIssue,
-): RuntimeDiagnostic {
+function diagnostic(code: RuntimeDiagnostic['code'], category: RuntimeDiagnostic['category'], message: string, ownerIssue?: DeferredIssue): RuntimeDiagnostic {
   return { code, category, retryable: false, message, ownerIssue };
 }
-function addAction(
-  builder: PlanBuilder,
-  command: RuntimeCommand,
-  kind: RuntimeActionKind,
-  adapter: AdapterKind,
-  values: Omit<RuntimeAction, 'id' | 'kind' | 'adapter'>,
-): void {
+function addAction(builder: PlanBuilder, command: RuntimeCommand, kind: RuntimeActionKind, adapter: AdapterKind, values: Omit<RuntimeAction, 'id' | 'kind' | 'adapter'>): void {
   builder.actions.push({
     id: `${command.commandId}:${String(builder.actions.length + 1).padStart(2, '0')}:${kind}`,
     kind,
@@ -46,12 +14,7 @@ function addAction(
     ...values,
   });
 }
-function addBlockedIntent(
-  builder: PlanBuilder,
-  command: RuntimeCommand,
-  failure: RuntimeDiagnostic,
-  resourceIds: readonly string[],
-): void {
+function addBlockedIntent(builder: PlanBuilder, command: RuntimeCommand, failure: RuntimeDiagnostic, resourceIds: readonly string[]): void {
   builder.diagnostics.push(failure);
   addAction(builder, command, 'blocked_intent', 'state', {
     effect: 'none',
@@ -67,18 +30,9 @@ function observedWorktreeSafe(observed: ObservedRuntimeState, worktree: string):
       (state.upstream === null || state.upstream === 'NONE'),
   );
 }
-function routeDeferred(route: RouteIdentity): DeferredIssue | null {
-  if (route.provider === 'openrouter' || route.provider === 'custom') return 577;
-  return route.agent === 'gemini' ? 578 : null;
-}
-function planRouteAction(
-  builder: PlanBuilder,
-  command: RuntimeCommand,
-  kind: 'launch_session' | 'resume_session' | 'smoke_session' | 'switch_route' | 'restore_route',
-  route: RouteIdentity,
-  observed: ObservedRuntimeState,
-  sessionId?: string,
-): void {
+function routeDeferred(route: RouteIdentity): DeferredIssue | null { if (route.provider === 'openrouter' || route.provider === 'custom') return 577; return route.agent === 'gemini' ? 578 : null; }
+function routeMatchesSession(route: RouteIdentity, session: SessionIdentity): boolean { return route.agent === session.agent && route.worktree === session.worktree && route.sessionId === session.sessionId; }
+function planRouteAction(builder: PlanBuilder, command: RuntimeCommand, kind: 'launch_session' | 'resume_session' | 'smoke_session' | 'switch_route' | 'restore_route', route: RouteIdentity, observed: ObservedRuntimeState, sessionId?: string): void {
   const deferred = routeDeferred(route);
   if (deferred) {
     addBlockedIntent(
@@ -111,7 +65,23 @@ function planRouteAction(
     sessionId,
   });
 }
-/** Produces data-only actions in stable order and never executes effects. */
+function planLifecycleAction(builder: PlanBuilder, command: RuntimeCommand, kind: 'launch_session' | 'resume_session' | 'smoke_session', route: RouteIdentity, observed: ObservedRuntimeState, sessionId?: string): void {
+  if (command.mode !== 'apply' || routeDeferred(route)) {
+    planRouteAction(builder, command, kind, route, observed, sessionId);
+    return;
+  }
+  addBlockedIntent(
+    builder,
+    command,
+    diagnostic(
+      'capability_deferred',
+      'capability',
+      'live lifecycle apply requires durable sender ownership from issue #580',
+      580,
+    ),
+    [`session:${route.agent}:${sessionId ?? 'new'}`],
+  );
+}
 export function planReconciliation(input: ReconciliationInput): ReconcilePlan {
   const { command, desired, observed } = input;
   const builder: PlanBuilder = { actions: [], diagnostics: [] };
@@ -160,17 +130,30 @@ export function planReconciliation(input: ReconciliationInput): ReconcilePlan {
       }
       break;
     case 'launch':
-      planRouteAction(builder, command, 'launch_session', command.route, observed);
+      planLifecycleAction(builder, command, 'launch_session', command.route, observed);
       break;
     case 'resume':
-      planRouteAction(
-        builder,
-        command,
-        'resume_session',
-        command.route,
-        observed,
-        command.session.sessionId,
-      );
+      if (!routeMatchesSession(command.route, command.session)) {
+        addBlockedIntent(
+          builder,
+          command,
+          diagnostic(
+            'route_conflict',
+            'policy',
+            'resume route and session identity do not match',
+          ),
+          [`session:${command.session.sessionId}`],
+        );
+      } else {
+        planLifecycleAction(
+          builder,
+          command,
+          'resume_session',
+          command.route,
+          observed,
+          command.session.sessionId,
+        );
+      }
       break;
     case 'smoke':
       if (command.route.agent === 'gemini' && command.level === 'live') {
@@ -186,11 +169,22 @@ export function planReconciliation(input: ReconciliationInput): ReconcilePlan {
           ['capability:gemini-live-smoke'],
         );
       } else {
-        planRouteAction(builder, command, 'smoke_session', command.route, observed);
+        planLifecycleAction(builder, command, 'smoke_session', command.route, observed);
       }
       break;
     case 'fallback':
-      if (command.session.boundary === 'active') {
+      if (!routeMatchesSession(command.currentRoute, command.session)) {
+        addBlockedIntent(
+          builder,
+          command,
+          diagnostic(
+            'route_conflict',
+            'policy',
+            'current route and session identity do not match',
+          ),
+          [`session:${command.session.sessionId}`],
+        );
+      } else if (command.session.boundary === 'active') {
         addBlockedIntent(
           builder,
           command,
@@ -213,6 +207,19 @@ export function planReconciliation(input: ReconciliationInput): ReconcilePlan {
       }
       break;
     case 'restore': {
+      if (!routeMatchesSession(command.currentRoute, command.session)) {
+        addBlockedIntent(
+          builder,
+          command,
+          diagnostic(
+            'route_conflict',
+            'policy',
+            'current route and session identity do not match',
+          ),
+          [`session:${command.session.sessionId}`],
+        );
+        break;
+      }
       if (command.session.boundary === 'active') {
         addBlockedIntent(
           builder,
@@ -284,12 +291,7 @@ export function planReconciliation(input: ReconciliationInput): ReconcilePlan {
   return finish(command, builder);
 }
 
-function planBootstrap(
-  builder: PlanBuilder,
-  command: RuntimeCommand & { readonly kind: 'bootstrap' },
-  desired: DesiredRuntimeState | null,
-  observed: ObservedRuntimeState,
-): void {
+function planBootstrap(builder: PlanBuilder, command: RuntimeCommand & { readonly kind: 'bootstrap' }, desired: DesiredRuntimeState | null, observed: ObservedRuntimeState): void {
   if (!desired) {
     addBlockedIntent(
       builder,

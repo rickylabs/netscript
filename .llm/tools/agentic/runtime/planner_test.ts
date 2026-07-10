@@ -215,7 +215,7 @@ Deno.test('fallback never changes route inside an active turn', () => {
     commandId: 'fallback-1',
     mode: 'plan',
     session: { agent: 'codex', sessionId: 'session-1', worktree, boundary: 'active' },
-    currentRoute: route,
+    currentRoute: { ...route, sessionId: 'session-1' },
     targetRoute: route,
   });
   assertEquals(result.status, 'blocked');
@@ -246,6 +246,60 @@ Deno.test('unsafe worktree blocks launch before any session action', () => {
   assertEquals(result.status, 'blocked');
   assertEquals(result.diagnostics[0]?.code, 'unsafe_worktree');
   assertEquals(result.actions.map((action) => action.kind), ['blocked_intent']);
+});
+
+Deno.test('lifecycle apply is explicitly deferred to issue 580 while plans stay data-only', () => {
+  const session = { agent: 'codex', sessionId: 'session-1', worktree, boundary: 'idle' } as const;
+  const liveRoute = { ...route, sessionId: session.sessionId };
+  const commands: RuntimeCommand[] = [
+    {
+      kind: 'launch',
+      commandId: 'apply-launch',
+      mode: 'apply',
+      route,
+      content: { path: '/brief' },
+    },
+    {
+      kind: 'resume',
+      commandId: 'apply-resume',
+      mode: 'apply',
+      route: liveRoute,
+      session,
+      content: { path: '/turn' },
+    },
+    { kind: 'smoke', commandId: 'apply-smoke', mode: 'apply', route, level: 'static' },
+  ];
+  for (const command of commands) {
+    const result = plan(command);
+    assertEquals([result.status, result.actions[0]?.kind, result.diagnostics[0]?.ownerIssue], [
+      'blocked',
+      'blocked_intent',
+      580,
+    ]);
+  }
+  assertEquals(
+    plan({
+      kind: 'launch',
+      commandId: 'plan-launch',
+      mode: 'plan',
+      route,
+      content: { path: '/brief' },
+    }).actions[0]?.kind,
+    'launch_session',
+  );
+});
+
+Deno.test('false current-route metadata is rejected before route mutation planning', () => {
+  const session = { agent: 'codex', sessionId: 'session-1', worktree, boundary: 'idle' } as const;
+  const result = plan({
+    kind: 'fallback',
+    commandId: 'false-route',
+    mode: 'apply',
+    session,
+    currentRoute: route,
+    targetRoute: route,
+  });
+  assertEquals([result.status, result.diagnostics[0]?.code], ['blocked', 'route_conflict']);
 });
 
 Deno.test('rollback is idempotent and plans only an observed prepared checkpoint', () => {

@@ -12,6 +12,14 @@ import {
 import { CLAUDE_SMOKE_WRAPPER, planClaudeCommand } from './adapters/claude-adapter.ts';
 import { normalizeGeminiObservation, planGeminiCommand } from './adapters/gemini-adapter.ts';
 import { CONFLICTING_CREDENTIAL_KEYS, validateProviderRoute } from './adapters/provider-adapter.ts';
+import { FoundationRuntimeInspector } from './adapters/foundation-adapter.ts';
+import {
+  buildDoctorReport,
+  classifyAuth,
+  classifyComponent,
+  classifyMobileControl,
+} from '../wsl-foundation-lib.ts';
+import { fingerprintRuntimeValue } from './state.ts';
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -388,4 +396,21 @@ Deno.test('unsupported lifecycle operations return finite diagnostics and no req
   const gemini = planGeminiCommand({ command: geminiResume, nativeExt4: true });
   assertEquals(gemini.request, null);
   assertEquals(codes(gemini.diagnostics), ['capability_unsupported']);
+});
+
+Deno.test('foundation owned readers match checkpoint canonical component shapes', async () => {
+  const report = buildDoctorReport({
+    generatedAt: '2026-07-10T00:00:00.000Z',
+    nativePath: { cwd: worktree, nativeExt4: true },
+    components: [
+      classifyComponent({ component: 'node', output: 'v26.5.0', exitCode: 0, expected: '26.5.0' }),
+    ],
+    auth: classifyAuth(new Set(), false, false),
+    mobileControl: classifyMobileControl(true, '0.144.1', '0.144.1'),
+  });
+  const inspector = new FoundationRuntimeInspector({ readReport: () => Promise.resolve(report) });
+  assertEquals(
+    await inspector.readOwnedResourceFingerprint('component:node'),
+    await fingerprintRuntimeValue({ kind: 'component', version: '26.5.0' }),
+  );
 });
