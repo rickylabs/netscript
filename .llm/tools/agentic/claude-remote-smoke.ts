@@ -1,3 +1,4 @@
+/** @deprecated Retained through one compatibility cycle; retirement requires reviewed #577-#582 completion. */
 interface Args {
   envAware: boolean;
   live: boolean;
@@ -30,7 +31,8 @@ if (args.live && !claudeMissing) {
 }
 
 const skipped = args.envAware && claudeMissing;
-const ok = skipped || (checks.every((check) => check.code === 0) && (!liveResult || liveResult.code === 0));
+const ok = skipped ||
+  (checks.every((check) => check.code === 0) && (!liveResult || liveResult.code === 0));
 const report = {
   gate: 'agentic:smoke-claude-remote',
   ok,
@@ -51,7 +53,11 @@ if (args.pretty) {
     console.log('SKIP claude remote smoke: claude executable not found on PATH');
   }
   for (const check of checks) {
-    console.log(`${check.ok ? 'OK' : check.missingExecutable ? 'MISS' : 'FAIL'} claude ${check.args.join(' ')} exit=${check.code}`);
+    console.log(
+      `${check.ok ? 'OK' : check.missingExecutable ? 'MISS' : 'FAIL'} claude ${
+        check.args.join(' ')
+      } exit=${check.code}`,
+    );
   }
   if (liveResult) {
     console.log(`${liveResult.ok ? 'OK' : 'FAIL'} claude --bg live smoke exit=${liveResult.code}`);

@@ -1,3 +1,4 @@
+/** @deprecated Retained through one compatibility cycle; retirement requires reviewed #577-#582 completion. */
 /**
  * launch-codex-slice.ts — stage, safety-check, launch, and record a WSL Codex slice.
  *
@@ -52,10 +53,10 @@ import {
   wslGitInfo,
   wslHome,
   wslUser,
-} from "./agentic-lib.ts";
+} from './agentic-lib.ts';
 
 interface Options {
-  mode: "launch" | "dry-run" | "parse-log";
+  mode: 'launch' | 'dry-run' | 'parse-log';
   brief?: string;
   worktree?: string;
   branch?: string;
@@ -70,76 +71,76 @@ interface Options {
 
 function printHelp(): void {
   console.log([
-    "Usage:",
-    "  deno run --allow-read --allow-write --allow-run \\",
-    "    .llm/tools/agentic/launch-codex-slice.ts --brief <win path> \\",
-    "    --worktree <wsl path> --branch <branch> --slug <slug> --slice-dir <win path> [options]",
-    "",
-    "Options:",
-    "  --brief <path>       Windows path to the slice brief (implement.md). Required to launch.",
-    "  --worktree <path>    WSL worktree path (e.g. /home/codex/repos/<wt>). Required to launch.",
-    "  --branch <name>      Expected branch in the worktree. Verified before launch.",
-    "  --slug <name>        Short slug; default dest = /home/codex/<slug>-brief.md.",
-    "  --dest <wsl path>    Explicit WSL staging path for the brief. Overrides --slug.",
-    "  --slice-dir <path>   Windows path to the run-artifact slice dir for codex-thread-ids.md.",
-    "  --expect-base <sha>  If set, worktree HEAD short sha must equal this before launch.",
-    "  --user <name>        WSL user. Default: codex.",
-    "  --dry-run            Validate + safety-check + stage + print launch command; do not send.",
-    "  --parse-log <file>   Parse a saved launch log for thread id and exit.",
-    "  --pretty             Human-readable output instead of JSON.",
-    "  --help               Show this help.",
-  ].join("\n"));
+    'Usage:',
+    '  deno run --allow-read --allow-write --allow-run \\',
+    '    .llm/tools/agentic/launch-codex-slice.ts --brief <win path> \\',
+    '    --worktree <wsl path> --branch <branch> --slug <slug> --slice-dir <win path> [options]',
+    '',
+    'Options:',
+    '  --brief <path>       Windows path to the slice brief (implement.md). Required to launch.',
+    '  --worktree <path>    WSL worktree path (e.g. /home/codex/repos/<wt>). Required to launch.',
+    '  --branch <name>      Expected branch in the worktree. Verified before launch.',
+    '  --slug <name>        Short slug; default dest = /home/codex/<slug>-brief.md.',
+    '  --dest <wsl path>    Explicit WSL staging path for the brief. Overrides --slug.',
+    '  --slice-dir <path>   Windows path to the run-artifact slice dir for codex-thread-ids.md.',
+    '  --expect-base <sha>  If set, worktree HEAD short sha must equal this before launch.',
+    '  --user <name>        WSL user. Default: codex.',
+    '  --dry-run            Validate + safety-check + stage + print launch command; do not send.',
+    '  --parse-log <file>   Parse a saved launch log for thread id and exit.',
+    '  --pretty             Human-readable output instead of JSON.',
+    '  --help               Show this help.',
+  ].join('\n'));
 }
 
 function parseArgs(args: string[]): Options | null {
-  const o: Options = { mode: "launch", user: wslUser(), pretty: false };
+  const o: Options = { mode: 'launch', user: wslUser(), pretty: false };
   for (let i = 0; i < args.length; i++) {
     const a = args[i];
     switch (a) {
-      case "--brief":
+      case '--brief':
         o.brief = requireValue(args, i, a);
         i++;
         break;
-      case "--worktree":
+      case '--worktree':
         o.worktree = requireValue(args, i, a);
         i++;
         break;
-      case "--branch":
+      case '--branch':
         o.branch = requireValue(args, i, a);
         i++;
         break;
-      case "--slug":
+      case '--slug':
         o.slug = requireValue(args, i, a);
         i++;
         break;
-      case "--dest":
+      case '--dest':
         o.dest = requireValue(args, i, a);
         i++;
         break;
-      case "--slice-dir":
+      case '--slice-dir':
         o.sliceDir = requireValue(args, i, a);
         i++;
         break;
-      case "--expect-base":
+      case '--expect-base':
         o.expectBase = requireValue(args, i, a);
         i++;
         break;
-      case "--user":
+      case '--user':
         o.user = requireValue(args, i, a);
         i++;
         break;
-      case "--parse-log":
-        o.mode = "parse-log";
+      case '--parse-log':
+        o.mode = 'parse-log';
         o.parseLog = requireValue(args, i, a);
         i++;
         break;
-      case "--dry-run":
-        o.mode = "dry-run";
+      case '--dry-run':
+        o.mode = 'dry-run';
         break;
-      case "--pretty":
+      case '--pretty':
         o.pretty = true;
         break;
-      case "--help":
+      case '--help':
         printHelp();
         return null;
       default:
@@ -151,26 +152,26 @@ function parseArgs(args: string[]): Options | null {
 
 function threadRecord(o: Options, info: ThreadInfo, dest: string): string {
   return [
-    `# ${o.slug ?? "slice"} — Codex implementation thread`,
-    "",
-    `- **Thread / session id:** \`${info.threadId ?? "UNKNOWN"}\``,
-    info.rollout ? `- **Rollout:** \`${info.rollout}\`` : "",
+    `# ${o.slug ?? 'slice'} — Codex implementation thread`,
+    '',
+    `- **Thread / session id:** \`${info.threadId ?? 'UNKNOWN'}\``,
+    info.rollout ? `- **Rollout:** \`${info.rollout}\`` : '',
     `- **Worktree:** \`${o.worktree}\``,
     `- **Branch:** \`${o.branch}\`${
-      o.expectBase ? ` @ \`${o.expectBase}\`` : ""
+      o.expectBase ? ` @ \`${o.expectBase}\`` : ''
     } (NO upstream by design).`,
     `- **Push rule:** explicit refspec only — \`git push origin HEAD:refs/heads/${o.branch}\`.`,
-    `- **Model:** ${info.model ?? "?"} · approval=never · sandbox=dangerFullAccess`,
+    `- **Model:** ${info.model ?? '?'} · approval=never · sandbox=dangerFullAccess`,
     `- **Brief (staged):** \`${dest}\``,
-    "",
-    "## Steering (same thread — never a second send-message-v2 at this worktree)",
-    "```bash",
-    `codex exec resume ${info.threadId ?? "<thread-id>"} -- "<follow-up>"`,
-    "```",
-    "",
-    "_Written by `.llm/tools/agentic/launch-codex-slice.ts`._",
-    "",
-  ].filter((l) => l !== "").join("\n");
+    '',
+    '## Steering (same thread — never a second send-message-v2 at this worktree)',
+    '```bash',
+    `codex exec resume ${info.threadId ?? '<thread-id>'} -- "<follow-up>"`,
+    '```',
+    '',
+    '_Written by `.llm/tools/agentic/launch-codex-slice.ts`._',
+    '',
+  ].filter((l) => l !== '').join('\n');
 }
 
 async function main(): Promise<void> {
@@ -185,34 +186,34 @@ async function main(): Promise<void> {
   if (!o) return;
 
   // --- parse-log mode (safe, no side effects) ---
-  if (o.mode === "parse-log") {
+  if (o.mode === 'parse-log') {
     const log = await Deno.readTextFile(o.parseLog!);
     const info = parseThreadInfo(log);
     if (o.pretty) {
-      console.log(`threadId: ${info.threadId ?? "(none)"}`);
-      console.log(`rollout:  ${info.rollout ?? "(none)"}`);
-      console.log(`model:    ${info.model ?? "(none)"}`);
-      console.log(`cwd:      ${info.cwd ?? "(none)"}`);
+      console.log(`threadId: ${info.threadId ?? '(none)'}`);
+      console.log(`rollout:  ${info.rollout ?? '(none)'}`);
+      console.log(`model:    ${info.model ?? '(none)'}`);
+      console.log(`cwd:      ${info.cwd ?? '(none)'}`);
     } else {
-      console.log(JSON.stringify({ mode: "parse-log", ...info }));
+      console.log(JSON.stringify({ mode: 'parse-log', ...info }));
     }
     Deno.exit(info.threadId ? 0 : 1);
   }
 
   // launch / dry-run require the core inputs
   if (!o.brief || !o.worktree) {
-    console.error("--brief and --worktree are required to launch. See --help.");
+    console.error('--brief and --worktree are required to launch. See --help.');
     Deno.exit(2);
   }
-  const dest = o.dest ?? `${wslHome()}/${o.slug ?? "slice"}-brief.md`;
+  const dest = o.dest ?? `${wslHome()}/${o.slug ?? 'slice'}-brief.md`;
 
   // 1) Validate the brief contract (read on Windows; LF-normalize in memory).
   const content = await Deno.readTextFile(o.brief);
   const check = validateHandoffContract(content);
   if (!check.ok) {
-    const payload = { stage: "validate", ok: false, problems: check.problems };
+    const payload = { stage: 'validate', ok: false, problems: check.problems };
     console.log(
-      o.pretty ? `FAIL brief contract: ${check.problems.join("; ")}` : JSON.stringify(payload),
+      o.pretty ? `FAIL brief contract: ${check.problems.join('; ')}` : JSON.stringify(payload),
     );
     Deno.exit(3);
   }
@@ -221,9 +222,17 @@ async function main(): Promise<void> {
   const info = await wslGitInfo(o.user, o.worktree);
   const safety = evaluateGitSafety(info, { branch: o.branch, expectBase: o.expectBase });
   if (!safety.ok) {
-    const report = { branch: info.branch, head: info.head, upstream: info.upstream, dirty: info.dirty, problems: safety.problems };
+    const report = {
+      branch: info.branch,
+      head: info.head,
+      upstream: info.upstream,
+      dirty: info.dirty,
+      problems: safety.problems,
+    };
     console.log(
-      o.pretty ? `FAIL git-safety: ${JSON.stringify(report)}` : JSON.stringify({ stage: "git-safety", ok: false, ...report }),
+      o.pretty
+        ? `FAIL git-safety: ${JSON.stringify(report)}`
+        : JSON.stringify({ stage: 'git-safety', ok: false, ...report }),
     );
     Deno.exit(safety.code);
   }
@@ -237,10 +246,10 @@ async function main(): Promise<void> {
     } | tr -d ' ')" && echo "SKILL=$(grep -c '^## SKILL' ${sq(dest)})"`,
   );
   if (stage.code !== 0) {
-    console.log(JSON.stringify({ stage: "stage", ok: false, stderr: stage.stderr }));
+    console.log(JSON.stringify({ stage: 'stage', ok: false, stderr: stage.stderr }));
     Deno.exit(1);
   }
-  const stagedBytes = Number(stage.stdout.match(/^STAGED_BYTES=(\d+)$/m)?.[1] ?? "0");
+  const stagedBytes = Number(stage.stdout.match(/^STAGED_BYTES=(\d+)$/m)?.[1] ?? '0');
 
   // Native `--cd` sets the WSL working directory at the interop layer. An
   // in-script `cd <wsl path>` can silently fail to stick when wsl.exe is
@@ -262,38 +271,38 @@ async function main(): Promise<void> {
   };
 
   // 4a) Dry-run: stop here.
-  if (o.mode === "dry-run") {
+  if (o.mode === 'dry-run') {
     if (o.pretty) {
-      console.log("DRY-RUN ok");
+      console.log('DRY-RUN ok');
       console.log(`  brief valid : use harness=${check.useHarness} ## SKILL=${check.skillChapter}`);
       console.log(`  staged      : ${dest} (${stagedBytes} bytes)`);
       console.log(`  git-safety  : ${JSON.stringify(launchPlan.gitSafety)}`);
       console.log(`  would run   : ${launchCommand}`);
     } else {
-      console.log(JSON.stringify({ mode: "dry-run", ok: true, ...launchPlan }));
+      console.log(JSON.stringify({ mode: 'dry-run', ok: true, ...launchPlan }));
     }
     Deno.exit(0);
   }
 
   // 4b) Launch: stream the turn, record thread id as soon as thread/start lands.
-  const child = new Deno.Command("wsl.exe", {
+  const child = new Deno.Command('wsl.exe', {
     args: [
-      "-u",
+      '-u',
       o.user,
-      "--cd",
+      '--cd',
       o.worktree,
-      "--",
-      "bash",
-      "-lc",
+      '--',
+      'bash',
+      '-lc',
       `~/launch_slice.sh ${sq(dest)}`,
     ],
-    stdout: "piped",
-    stderr: "inherit",
+    stdout: 'piped',
+    stderr: 'inherit',
   }).spawn();
 
   const reader = child.stdout.getReader();
   const dec = new TextDecoder();
-  let buf = "";
+  let buf = '';
   let recorded = false;
   while (true) {
     const { value, done } = await reader.read();
@@ -305,11 +314,13 @@ async function main(): Promise<void> {
       if (info2.threadId) {
         recorded = true;
         if (o.sliceDir) {
-          const recPath = `${o.sliceDir.replace(/[\\/]$/, "")}/codex-thread-ids.md`;
+          const recPath = `${o.sliceDir.replace(/[\\/]$/, '')}/codex-thread-ids.md`;
           await Deno.writeTextFile(recPath, threadRecord(o, info2, dest));
           console.log(`\n[launch-codex-slice] recorded thread ${info2.threadId} -> ${recPath}`);
         } else {
-          console.log(`\n[launch-codex-slice] thread ${info2.threadId} (no --slice-dir; not recorded)`);
+          console.log(
+            `\n[launch-codex-slice] thread ${info2.threadId} (no --slice-dir; not recorded)`,
+          );
         }
       }
     }
