@@ -6,6 +6,8 @@ import {
   FoundationRuntimeInspector,
 } from './runtime/adapters/foundation-adapter.ts';
 import { LocalRuntimeStateAdapter } from './runtime/adapters/local-state-adapter.ts';
+import { LocalCodexRemoteAdapter } from './runtime/adapters/local-codex-remote-adapter.ts';
+import { runCodexRemoteRepair } from './runtime/codex-remote-repair.ts';
 import { renderRuntimeHuman, renderRuntimeJson, runtimeExitCode } from './runtime/output.ts';
 import type { RuntimeReadPorts } from './runtime/ports.ts';
 interface ParsedRuntimeArgs { readonly command: RuntimeCommand; readonly json: boolean; }
@@ -133,6 +135,27 @@ function createReadPorts(home: string): RuntimeReadPorts {
 async function main(): Promise<number> {
   try {
     const parsed = parseRuntimeArgs(Deno.args);
+    if (parsed.command.kind === 'repair-codex-remote') {
+      const home = Deno.env.get('HOME') ?? '';
+      const result = await runCodexRemoteRepair(
+        parsed.command.worktree,
+        parsed.command.mode === 'plan',
+        new LocalCodexRemoteAdapter(
+          home,
+          `${home}/.config/netscript-agentic/runtime/evidence`,
+        ),
+      );
+      console.log(
+        parsed.json
+          ? JSON.stringify(result)
+          : [
+            `codex-remote: ${result.state}`,
+            `status: ${result.status}`,
+            ...result.diagnostics.map((entry) => `${entry.code}: ${entry.message}`),
+          ].join('\n'),
+      );
+      return result.status === 'blocked' ? 4 : result.status === 'failed' ? 5 : 0;
+    }
     const result = await runRuntimeCommand(
       parsed.command,
       createReadPorts(Deno.env.get('HOME') ?? ''),

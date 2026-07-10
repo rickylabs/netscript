@@ -12,13 +12,12 @@ export function translateMobileControl(probe: MobileControlProbe): CapabilitySta
     : 'blocked';
 }
 
-/** Describes unavailable live repair without executing or suggesting a mutation. */
-export function deferredMobileRepairDiagnostic(): RuntimeDiagnostic {
+/** Describes a repair refusal when active work makes mutation unsafe. */
+export function activeMobileRepairDiagnostic(): RuntimeDiagnostic {
   return {
-    code: 'capability_deferred',
-    category: 'capability',
+    code: 'active_session',
+    category: 'safety',
     retryable: false,
-    message: 'live Codex remote repair is deferred to issue #580',
-    ownerIssue: 580,
+    message: 'Codex remote repair refuses to interrupt active work',
   };
 }

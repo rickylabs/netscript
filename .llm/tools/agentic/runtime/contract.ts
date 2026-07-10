@@ -67,7 +67,7 @@ export type ActionEffect = typeof ACTION_EFFECTS[number];
 export const ACTION_KINDS = [
   'install_component', 'create_state_directory', 'configure_auth_route', 'persist_desired_state',
   'launch_session', 'resume_session', 'smoke_session', 'switch_route', 'restore_route',
-  'rollback_checkpoint', 'blocked_intent',
+  'repair_codex_remote', 'rollback_checkpoint', 'blocked_intent',
 ] as const;
 export type RuntimeActionKind = typeof ACTION_KINDS[number];
 // deno-fmt-ignore
@@ -78,7 +78,7 @@ export type AdapterKind = typeof ADAPTER_KINDS[number];
 
 export const CAPABILITY_STATES = ['available', 'degraded', 'blocked', 'deferred'] as const;
 export type CapabilityState = typeof CAPABILITY_STATES[number];
-export const DEFERRED_ISSUES = [577, 580, 581, 582] as const;
+export const DEFERRED_ISSUES = [581, 582] as const;
 export type DeferredIssue = typeof DEFERRED_ISSUES[number];
 export interface RouteIdentity {
   readonly agent: AgentKind;

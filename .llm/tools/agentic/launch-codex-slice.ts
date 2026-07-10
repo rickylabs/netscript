@@ -54,6 +54,12 @@ import {
   wslHome,
   wslUser,
 } from './agentic-lib.ts';
+import { LocalSenderOwnershipAdapter } from './runtime/adapters/local-sender-ownership-adapter.ts';
+import {
+  activateSenderOwnership,
+  decideSenderOwnership,
+  newSenderOwnershipRecord,
+} from './runtime/sender-ownership.ts';
 
 interface Options {
   mode: 'launch' | 'dry-run' | 'parse-log';
@@ -306,6 +312,48 @@ async function main(): Promise<void> {
     Deno.exit(0);
   }
 
+  // Acquire durable ownership after every non-mutating check and immediately
+  // before process spawn. A returned thread remains the worktree owner so the
+  // next operator is directed to resume instead of creating a rival thread.
+  const ownership = new LocalSenderOwnershipAdapter(
+    `${Deno.env.get('HOME') ?? ''}/.config/netscript-agentic/runtime/senders`,
+  );
+  const existing = await ownership.read(o.worktree);
+  if (existing) {
+    const decision = decideSenderOwnership(o.worktree, {
+      record: existing,
+      ownerProcessAlive: ownership.isProcessAlive(existing.ownerPid),
+      sessionActive: Boolean(existing.sessionId),
+    });
+    if (decision.kind === 'blocked') {
+      console.log(JSON.stringify({
+        stage: 'sender-ownership',
+        ok: false,
+        code: decision.diagnostic.code,
+        message: decision.diagnostic.message,
+        operatorAction: decision.diagnostic.operatorAction,
+      }));
+      Deno.exit(4);
+    }
+    await ownership.release(o.worktree, existing.leaseToken);
+  }
+  const leaseToken = crypto.randomUUID();
+  const owner = newSenderOwnershipRecord({
+    worktree: o.worktree,
+    ownerPid: Deno.pid,
+    leaseToken,
+    now: new Date().toISOString(),
+  });
+  if (!await ownership.create(owner)) {
+    console.log(JSON.stringify({
+      stage: 'sender-ownership',
+      ok: false,
+      code: 'duplicate_sender_risk',
+      message: 'another launcher acquired this worktree before process spawn',
+    }));
+    Deno.exit(4);
+  }
+
   // 4b) Launch: stream the turn, record thread id as soon as thread/start lands.
   const child = new Deno.Command('wsl.exe', {
     args: [
@@ -335,6 +383,10 @@ async function main(): Promise<void> {
       const info2 = parseThreadInfo(buf);
       if (info2.threadId) {
         recorded = true;
+        await ownership.replace(
+          activateSenderOwnership(owner, leaseToken, info2.threadId, new Date().toISOString()),
+          leaseToken,
+        );
         if (o.sliceDir) {
           const recPath = `${o.sliceDir.replace(/[\\/]$/, '')}/codex-thread-ids.md`;
           await Deno.writeTextFile(recPath, threadRecord(o, info2, dest));

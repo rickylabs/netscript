@@ -185,18 +185,16 @@ Deno.test('bootstrap drift yields deterministic data-only actions in finite orde
   assert(!JSON.stringify(first).includes('function'), 'plan contains executable data');
 });
 
-Deno.test('deferred Codex repair is an explicit blocked intent owned by issue 580', () => {
+Deno.test('Codex repair plans one explicit mobile-control action', () => {
   const result = plan({
     kind: 'repair-codex-remote',
     commandId: 'repair-1',
     mode: 'plan',
     worktree,
   });
-  assertEquals(result.status, 'blocked');
-  assertEquals(result.actions.map((action) => action.kind), ['blocked_intent']);
-  assertEquals(result.diagnostics.map((entry) => [entry.code, entry.ownerIssue]), [
-    ['capability_deferred', 580],
-  ]);
+  assertEquals(result.status, 'planned');
+  assertEquals(result.actions.map((action) => action.kind), ['repair_codex_remote']);
+  assertEquals(result.diagnostics, []);
   assertEquals(result.changed, false);
 });
 
@@ -263,7 +261,7 @@ Deno.test('unsafe worktree blocks launch before any session action', () => {
   assertEquals(result.actions.map((action) => action.kind), ['blocked_intent']);
 });
 
-Deno.test('lifecycle apply is explicitly deferred to issue 580 while plans stay data-only', () => {
+Deno.test('controller lifecycle apply is a permanent plan-only boundary', () => {
   const session = { agent: 'codex', sessionId: 'session-1', worktree, boundary: 'idle' } as const;
   const liveRoute = { ...route, sessionId: session.sessionId };
   const openrouter = { ...liveRoute, provider: 'openrouter' } as const;
@@ -336,14 +334,20 @@ Deno.test('lifecycle apply is explicitly deferred to issue 580 while plans stay 
     assertEquals([
       result.status,
       result.actions[0]?.kind,
+      result.diagnostics[0]?.code,
       result.diagnostics[0]?.ownerIssue,
       runtimeExitCode({ status: result.status, diagnostics: result.diagnostics } as RuntimeResult),
     ], [
       'blocked',
       'blocked_intent',
-      580,
+      'capability_unsupported',
+      undefined,
       4,
     ]);
+    assert(
+      result.diagnostics[0]?.message.includes('ownership-enforced agent launcher'),
+      'unsupported apply did not direct the caller to the launcher',
+    );
   }
   assertEquals(
     plan({

@@ -74,10 +74,9 @@ function planLifecycleAction(builder: PlanBuilder, command: RuntimeCommand, kind
     builder,
     command,
     diagnostic(
-      'capability_deferred',
+      'capability_unsupported',
       'capability',
-      'live lifecycle apply requires durable sender ownership from issue #580',
-      580,
+      'controller lifecycle apply is plan-only; use the ownership-enforced agent launcher and same-thread resume tools',
     ),
     [`session:${route.agent}:${sessionId ?? 'new'}`],
   );
@@ -240,17 +239,11 @@ export function planReconciliation(input: ReconciliationInput): ReconcilePlan {
       break;
     }
     case 'repair-codex-remote':
-      addBlockedIntent(
-        builder,
-        command,
-        diagnostic(
-          'capability_deferred',
-          'capability',
-          'live Codex repair is deferred to issue #580',
-          580,
-        ),
-        [`worktree:${command.worktree}`],
-      );
+      addAction(builder, command, 'repair_codex_remote', 'mobile-control', {
+        effect: command.mode === 'apply' ? 'process' : 'none',
+        reversible: false,
+        resourceIds: [`worktree:${command.worktree}`],
+      });
       break;
     case 'rollback': {
       const checkpoint = observed.checkpoints.find((entry) =>

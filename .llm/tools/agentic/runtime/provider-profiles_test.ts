@@ -113,7 +113,7 @@ Deno.test('profile mismatch and rival credential presence fail explicitly by key
   assertEquals(conflict.diagnostics.map((entry) => entry.code), ['auth_conflict']);
 });
 
-Deno.test('OpenRouter plan mode is enabled but apply remains issue 580 blocked', () => {
+Deno.test('OpenRouter plan mode is enabled while controller apply remains unsupported', () => {
   const observed = observedState({
     worktrees: [{
       path: worktree,
@@ -140,8 +140,8 @@ Deno.test('OpenRouter plan mode is enabled but apply remains issue 580 blocked',
     observed,
   });
   assertEquals(apply.status, 'blocked');
-  assertEquals(apply.diagnostics[0]?.ownerIssue, 580);
-  assertEquals(apply.diagnostics[0]?.code, 'capability_deferred');
+  assertEquals(apply.diagnostics[0]?.ownerIssue, undefined);
+  assertEquals(apply.diagnostics[0]?.code, 'capability_unsupported');
 });
 
 Deno.test('Antigravity live evidence plans without changing provider profiles', () => {
