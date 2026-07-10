@@ -66,7 +66,7 @@ function planRouteAction(builder: PlanBuilder, command: RuntimeCommand, kind: 'l
   });
 }
 function planLifecycleAction(builder: PlanBuilder, command: RuntimeCommand, kind: 'launch_session' | 'resume_session' | 'smoke_session', route: RouteIdentity, observed: ObservedRuntimeState, sessionId?: string): void {
-  if (command.mode !== 'apply' || routeDeferred(route)) {
+  if (command.mode !== 'apply') {
     planRouteAction(builder, command, kind, route, observed, sessionId);
     return;
   }

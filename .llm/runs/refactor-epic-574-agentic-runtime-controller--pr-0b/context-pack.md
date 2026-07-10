@@ -223,6 +223,12 @@ thread only after coordinator approval.
   `antigravity` vocabulary; no migration was authorized in C5-C8.
 - Next: coordinator Tier-A re-review. Do not start S5/#578 or self-certify.
 
+### C7 precedence follow-up
+
+Apply-mode lifecycle ownership now wins before provider-route deferral: Gemini/OpenRouter
+launch/resume/static smoke are #580 blocks with exit 4. Provider-specific plan/read-only behavior
+remains #577/#578. Await coordinator Tier-A re-review.
+
 ## Safety
 
 - Native ext4 only; explicit push refspec only.

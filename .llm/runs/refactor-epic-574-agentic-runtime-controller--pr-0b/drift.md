@@ -86,3 +86,11 @@
   owner-managed foundation state contains `antigravity`, whose migration is explicitly outside C5-C8.
 - **Severity:** environment/input drift, not nondeterminism or a C5-C8 source regression.
 - **Action:** preserve raw `5/5` evidence; do not migrate Antigravity vocabulary in this slice.
+
+## 2026-07-10 - C7 lifecycle deferral precedence corrected
+
+- **Expected:** Every lifecycle apply path is owned by #580 before provider capability routing.
+- **Actual:** `f0a59a6` checked #577/#578 provider deferral first for Gemini/OpenRouter routes.
+- **Severity:** narrow attribution defect; no mutation escaped and plan paths remained read-only.
+- **Action:** apply mode now wins first; exact provider × launch/resume/smoke status/owner/exit tests
+  prevent recurrence. Non-apply provider deferrals remain unchanged.

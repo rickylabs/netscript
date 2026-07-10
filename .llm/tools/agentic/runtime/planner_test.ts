@@ -3,8 +3,10 @@ import {
   type RouteIdentity,
   RUNTIME_SCHEMA_VERSION,
   type RuntimeCommand,
+  type RuntimeResult,
 } from './contract.ts';
 import { planReconciliation } from './planner.ts';
+import { runtimeExitCode } from './output.ts';
 import type { DesiredRuntimeState, ObservedRuntimeState } from './state.ts';
 
 function assert(condition: unknown, message: string): asserts condition {
@@ -251,6 +253,9 @@ Deno.test('unsafe worktree blocks launch before any session action', () => {
 Deno.test('lifecycle apply is explicitly deferred to issue 580 while plans stay data-only', () => {
   const session = { agent: 'codex', sessionId: 'session-1', worktree, boundary: 'idle' } as const;
   const liveRoute = { ...route, sessionId: session.sessionId };
+  const openrouter = { ...liveRoute, provider: 'openrouter' } as const;
+  const geminiSession = { ...session, agent: 'gemini' } as const;
+  const gemini = { ...liveRoute, agent: 'gemini', provider: 'google' } as const;
   const commands: RuntimeCommand[] = [
     {
       kind: 'launch',
@@ -268,13 +273,63 @@ Deno.test('lifecycle apply is explicitly deferred to issue 580 while plans stay 
       content: { path: '/turn' },
     },
     { kind: 'smoke', commandId: 'apply-smoke', mode: 'apply', route, level: 'static' },
+    {
+      kind: 'launch',
+      commandId: 'apply-openrouter-launch',
+      mode: 'apply',
+      route: openrouter,
+      content: { path: '/brief' },
+    },
+    {
+      kind: 'resume',
+      commandId: 'apply-openrouter-resume',
+      mode: 'apply',
+      route: openrouter,
+      session,
+      content: { path: '/turn' },
+    },
+    {
+      kind: 'smoke',
+      commandId: 'apply-openrouter-smoke',
+      mode: 'apply',
+      route: openrouter,
+      level: 'static',
+    },
+    {
+      kind: 'launch',
+      commandId: 'apply-gemini-launch',
+      mode: 'apply',
+      route: gemini,
+      content: { path: '/brief' },
+    },
+    {
+      kind: 'resume',
+      commandId: 'apply-gemini-resume',
+      mode: 'apply',
+      route: gemini,
+      session: geminiSession,
+      content: { path: '/turn' },
+    },
+    {
+      kind: 'smoke',
+      commandId: 'apply-gemini-smoke',
+      mode: 'apply',
+      route: gemini,
+      level: 'static',
+    },
   ];
   for (const command of commands) {
     const result = plan(command);
-    assertEquals([result.status, result.actions[0]?.kind, result.diagnostics[0]?.ownerIssue], [
+    assertEquals([
+      result.status,
+      result.actions[0]?.kind,
+      result.diagnostics[0]?.ownerIssue,
+      runtimeExitCode({ status: result.status, diagnostics: result.diagnostics } as RuntimeResult),
+    ], [
       'blocked',
       'blocked_intent',
       580,
+      4,
     ]);
   }
   assertEquals(

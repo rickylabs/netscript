@@ -881,3 +881,15 @@ pending scope review.
 
 No dependency, lock, provider login/send, daemon, Antigravity migration, S5, #578, or #584 change was
 made. Coordinator Tier-A re-review remains required; this generator does not self-certify.
+
+## 2026-07-10 S4 C7 Precedence Remediation
+
+Tier-A found that provider deferral ran before lifecycle-apply ownership. `planLifecycleAction` now
+checks apply mode first, so Gemini and OpenRouter launch/resume/static-smoke apply all return the
+exact `blocked` / `capability_deferred` / owner `#580` / exit `4` contract. Plan-mode OpenRouter and
+Gemini-live behavior remains owned by #577/#578, and all inspect/non-lifecycle behavior is unchanged.
+Exact provider × lifecycle tests cover all six combinations. Gates and delivery evidence follow in
+the remediation commit comment; coordinator re-review remains required. Complete agentic/runtime
+suite: `109 passed | 0 failed`; scoped check/lint/fmt: `37/25/18`, zero findings; doctor repeat:
+deterministic `5/5` `state_corrupt` with tree equality (previously recorded deferred owner-state
+vocabulary); planner/test budgets `350/350` and `384/450`; `deno.lock` unchanged; secret scan clean.
