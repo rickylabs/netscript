@@ -10,10 +10,8 @@ import {
 } from './routing-state-machine.ts';
 import type { PersistedRuntimeState } from './state.ts';
 import { RUNTIME_SCHEMA_VERSION } from './contract.ts';
+import { assertEquals as equal } from '@std/assert';
 
-function equal(actual: unknown, expected: unknown): void {
-  if (JSON.stringify(actual) !== JSON.stringify(expected)) throw new Error('values differ');
-}
 const worktree = '/home/codex/repos/routing-state';
 const desiredRoute: RouteIdentity = {
   agent: 'codex',
@@ -119,7 +117,10 @@ Deno.test('routing state and bounded history survive a fresh local adapter', asy
     const adapter = new LocalRuntimeStateAdapter(`${root}/runtime`, `${root}/foundation.json`);
     await adapter.writeDesiredState(persisted);
     const fresh = new LocalRuntimeStateAdapter(`${root}/runtime`, `${root}/foundation.json`);
-    equal(await fresh.readPersistedState(), persisted);
+    // The store serializes to JSON (dropping `undefined` optionals); compare against
+    // the JSON-normalized shape so this asserts round-trip fidelity, not in-memory
+    // `undefined` keys the store never persists.
+    equal(await fresh.readPersistedState(), JSON.parse(JSON.stringify(persisted)));
     equal((await Deno.stat(`${root}/runtime/controller-state.json`)).mode! & 0o777, 0o600);
   } finally {
     await Deno.remove(root, { recursive: true });

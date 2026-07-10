@@ -23,7 +23,7 @@ Preferred triggers:
 - commit message `[openhands model=<provider/model> output=<mode>] ...`,
 - manual `OpenHands Agent` workflow dispatch.
 
-For harness work, prefer `.llm/tools/agentic/dispatch-openhands.ts` with explicit provider, model,
+For harness work, prefer `.llm/tools/agentic/openhands/dispatch-openhands.ts` with explicit provider, model,
 and effort selected from `workflow/lane-policy.md`. The legacy triggers above are transport syntax,
 not canonical routing policy.
 
@@ -58,7 +58,7 @@ This **replaces** the older ad-hoc `.llm/tmp/run/openhands/…` and `.llm/tmp/op
 paths: those remain git-ignored per-run scratch only and are never the harness verdict of record.
 The workflow still posts the summary comment back to the issue or PR unless output mode is
 `summary-only`. Dispatch the run and read its verdict through the agentic suite
-(`.llm/tools/agentic/dispatch-openhands.ts`, `.llm/tools/agentic/openhands-status.ts`).
+(`.llm/tools/agentic/openhands/dispatch-openhands.ts`, `.llm/tools/agentic/openhands/openhands-status.ts`).
 
 For review-comment response loops:
 

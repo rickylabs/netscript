@@ -4,12 +4,8 @@ import {
   parseDesiredRuntimeState,
 } from './adapters/local-state-adapter.ts';
 import type { RouteIdentity, RuntimeCommand } from './contract.ts';
+import { assertEquals as equal } from '@std/assert';
 
-function equal(actual: unknown, expected: unknown): void {
-  if (JSON.stringify(actual) !== JSON.stringify(expected)) {
-    throw new Error(`${JSON.stringify(actual)} != ${JSON.stringify(expected)}`);
-  }
-}
 const worktree = '/home/codex/repos/worktree';
 const route: RouteIdentity = {
   agent: 'antigravity',

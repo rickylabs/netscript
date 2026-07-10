@@ -6,12 +6,7 @@ import {
   type RoutingPolicyContext,
   selectFallbackCandidate,
 } from './routing-policy.ts';
-
-function equal(actual: unknown, expected: unknown): void {
-  if (JSON.stringify(actual) !== JSON.stringify(expected)) {
-    throw new Error(`actual ${JSON.stringify(actual)} != expected ${JSON.stringify(expected)}`);
-  }
-}
+import { assertEquals as equal } from '@std/assert';
 
 const worktree = '/home/codex/repos/routing-policy';
 const session = { agent: 'codex', sessionId: 'session-1', worktree, boundary: 'new' } as const;

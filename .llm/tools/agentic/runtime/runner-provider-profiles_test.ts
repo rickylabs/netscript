@@ -1,4 +1,4 @@
-import type { GitInfo } from '../agentic-lib.ts';
+import type { GitInfo } from '../lib/agentic-lib.ts';
 import { planClaudeCommand } from './adapters/claude-adapter.ts';
 import {
   CODEX_OPENROUTER_PROFILE_FILE,
@@ -8,15 +8,7 @@ import {
 } from './adapters/codex-profile-adapter.ts';
 import { inspectCodexHandoff, planCodexCommand } from './adapters/codex-adapter.ts';
 import type { RouteIdentity, RuntimeCommand } from './contract.ts';
-
-function assert(condition: unknown, message = 'assertion failed'): asserts condition {
-  if (!condition) throw new Error(message);
-}
-function assertEquals(actual: unknown, expected: unknown, message = 'values differ'): void {
-  const left = JSON.stringify(actual);
-  const right = JSON.stringify(expected);
-  if (left !== right) throw new Error(`${message}\nactual: ${left}\nexpected: ${right}`);
-}
+import { assert, assertEquals } from '@std/assert';
 
 const worktree = '/home/codex/repos/provider-profile-test';
 const content = { path: '/home/codex/provider-profile-brief.md' } as const;

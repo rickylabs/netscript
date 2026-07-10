@@ -10,16 +10,9 @@ import {
 } from './provider-profiles.ts';
 import { validateProviderRoute } from './adapters/provider-adapter.ts';
 import type { ObservedRuntimeState } from './state.ts';
+import { assert, assertEquals } from '@std/assert';
 
 const worktree = '/home/codex/repos/provider-profile-test';
-function assert(condition: unknown, message = 'assertion failed'): asserts condition {
-  if (!condition) throw new Error(message);
-}
-function assertEquals(actual: unknown, expected: unknown, message = 'values differ'): void {
-  const left = JSON.stringify(actual);
-  const right = JSON.stringify(expected);
-  if (left !== right) throw new Error(`${message}\nactual: ${left}\nexpected: ${right}`);
-}
 function route(values: Partial<RouteIdentity> = {}): RouteIdentity {
   return {
     agent: 'codex',

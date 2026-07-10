@@ -4,23 +4,7 @@ import {
   ROLLOUT_CANARY_IDS,
   validateCanaryResult,
 } from './rollout-canary.ts';
-
-function assertEquals(actual: unknown, expected: unknown): void {
-  if (JSON.stringify(actual) !== JSON.stringify(expected)) {
-    throw new Error(
-      `values differ: actual=${JSON.stringify(actual)} expected=${JSON.stringify(expected)}`,
-    );
-  }
-}
-function assertThrows(fn: () => unknown, message: string): void {
-  try {
-    fn();
-  } catch (error) {
-    if (error instanceof Error && error.message.includes(message)) return;
-    throw error;
-  }
-  throw new Error(`expected error containing: ${message}`);
-}
+import { assertEquals, assertThrows } from '@std/assert';
 
 function row(id: CanaryResult['id'], overrides: Partial<CanaryResult> = {}): CanaryResult {
   return {
@@ -40,7 +24,7 @@ function row(id: CanaryResult['id'], overrides: Partial<CanaryResult> = {}): Can
 Deno.test('aggregate requires exactly nine ordered stable canary ids', () => {
   const unordered = [...ROLLOUT_CANARY_IDS].reverse().map((id) => row(id));
   const outcome = aggregateRolloutOutcome(unordered, '2026-07-10T00:00:00.000Z', 'b438f16d');
-  assertEquals(outcome.canaries.map((entry) => entry.id), ROLLOUT_CANARY_IDS);
+  assertEquals(outcome.canaries.map((entry) => entry.id), [...ROLLOUT_CANARY_IDS]);
   assertThrows(
     () => aggregateRolloutOutcome(unordered.slice(1), '2026-07-10T00:00:00.000Z', 'b438f16d'),
     'missing=',

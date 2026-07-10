@@ -1,9 +1,6 @@
 import { renderRolloutReport } from './rollout-report.ts';
 import type { RolloutOutcome } from './rollout-canary.ts';
-
-function assert(condition: unknown, message: string): asserts condition {
-  if (!condition) throw new Error(message);
-}
+import { assert } from '@std/assert';
 
 Deno.test('checked-in report is traceable to every machine-readable canary', async () => {
   const root = new URL('../../../../', import.meta.url);

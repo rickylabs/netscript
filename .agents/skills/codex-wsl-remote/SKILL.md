@@ -277,10 +277,10 @@ Prefer the agentic suite: `launch-codex-slice.ts` validates the brief, runs the 
 stages with CRLF stripped, launches, and records the thread id for you (see the table above).
 
 Supervise without polling: run `.llm/tools/harness/watch-run.ts <run-dir>` (run-artifact watcher), or
-`.llm/tools/agentic/codex-watch.ts` from inside WSL — `--worktree <wsl path>` to wake on git
+`.llm/tools/agentic/codex/codex-watch.ts` from inside WSL — `--worktree <wsl path>` to wake on git
 activity (progress), and `--mode turn --thread-id <uuid>` to wake when the turn finishes (idle). The
 git event alone does not mean the agent stopped; pair the two. Steer only with
-`.llm/tools/agentic/codex-resume.ts` (or `codex exec resume <thread-id>`); never fire a second
+`.llm/tools/agentic/codex/codex-resume.ts` (or `codex exec resume <thread-id>`); never fire a second
 `send-message-v2` at the same worktree.
 
 For full CLI E2E, use the `netscript-cli` skill and run:

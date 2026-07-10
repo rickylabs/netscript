@@ -1,15 +1,5 @@
 import { ANTIGRAVITY_CAPABILITIES, classifyAntigravityEvidence } from './antigravity-evidence.ts';
-
-function assert(condition: unknown, message = 'assertion failed'): asserts condition {
-  if (!condition) throw new Error(message);
-}
-function assertEquals(actual: unknown, expected: unknown, message = 'values differ'): void {
-  if (JSON.stringify(actual) !== JSON.stringify(expected)) {
-    throw new Error(
-      `${message}\nactual: ${JSON.stringify(actual)}\nexpected: ${JSON.stringify(expected)}`,
-    );
-  }
-}
+import { assert, assertEquals } from '@std/assert';
 
 Deno.test('finite Antigravity evidence proves exact headless markers without raw output', () => {
   const result = classifyAntigravityEvidence({

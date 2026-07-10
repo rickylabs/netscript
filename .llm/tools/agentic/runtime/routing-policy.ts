@@ -1,6 +1,7 @@
 /** Pure policy data and guards for quota fallback route selection. */
 
 import type { RouteIdentity, SessionIdentity } from './contract.ts';
+import { MODEL_IDS } from '../config/models.ts';
 
 export const MODEL_FAMILIES = ['anthropic', 'openai', 'google', 'other'] as const;
 export type ModelFamily = typeof MODEL_FAMILIES[number];
@@ -53,7 +54,7 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     purpose: 'implementation',
     agent: 'codex',
     provider: 'openai',
-    model: 'gpt-5.6-sol',
+    model: MODEL_IDS.codexSol,
     effort: 'medium',
   },
   {
@@ -61,7 +62,7 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     purpose: 'implementation',
     agent: 'codex',
     provider: 'openai',
-    model: 'gpt-5.6-luna',
+    model: MODEL_IDS.codexLuna,
     effort: 'max',
   },
   {
@@ -69,7 +70,7 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     purpose: 'analysis',
     agent: 'codex',
     provider: 'openai',
-    model: 'gpt-5.6-sol',
+    model: MODEL_IDS.codexSol,
     effort: 'xhigh',
     condition: 'primary',
   },
@@ -78,7 +79,7 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     purpose: 'analysis',
     agent: 'claude',
     provider: 'anthropic',
-    model: 'fable-5',
+    model: MODEL_IDS.fable,
     effort: 'max',
     condition: 'fallback_only_after_codex_quota_exhausted',
   },
@@ -87,7 +88,7 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     purpose: 'orchestration',
     agent: 'claude',
     provider: 'anthropic',
-    model: 'fable-5',
+    model: MODEL_IDS.fable,
     effort: 'medium',
     condition: 'temporary_owner_override',
     effectiveThrough: '2026-07-12',
@@ -97,7 +98,7 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     purpose: 'orchestration',
     agent: 'codex',
     provider: 'openai',
-    model: 'gpt-5.6-sol',
+    model: MODEL_IDS.codexSol,
     effort: 'max',
     condition: 'dated_transition',
     effectiveFrom: '2026-07-13',
@@ -107,7 +108,7 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     purpose: 'documentation',
     agent: 'claude',
     provider: 'anthropic',
-    model: 'opus-4.8',
+    model: MODEL_IDS.opus,
     effort: 'high',
   },
   {
@@ -115,7 +116,7 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     purpose: 'claude_workflow',
     agent: 'claude',
     provider: 'anthropic',
-    model: 'opus-4.8',
+    model: MODEL_IDS.opus,
     effort: 'low',
   },
   {
@@ -123,7 +124,7 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     purpose: 'research_extraction',
     agent: 'antigravity',
     provider: 'google',
-    model: 'agy',
+    model: MODEL_IDS.antigravity,
     effort: 'low',
   },
   {
@@ -131,7 +132,7 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     purpose: 'orchestration',
     agent: 'claude',
     provider: 'anthropic',
-    model: 'fable-5',
+    model: MODEL_IDS.fable,
     effort: 'low',
     condition: 'when_subscription_includes_fable',
     subscriptionState: 'included',
@@ -141,7 +142,7 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     purpose: 'orchestration',
     agent: 'claude',
     provider: 'anthropic',
-    model: 'fable-5',
+    model: MODEL_IDS.fable,
     effort: 'high',
     condition: 'exceptional_paid_on_demand',
     subscriptionState: 'outside_plan',
@@ -152,7 +153,7 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     purpose: 'evaluation',
     agent: 'codex',
     provider: 'openai',
-    model: 'gpt-5.6-sol',
+    model: MODEL_IDS.codexSol,
     effort: 'xhigh',
   },
 ] as const;
