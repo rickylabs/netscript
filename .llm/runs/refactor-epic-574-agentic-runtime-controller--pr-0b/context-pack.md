@@ -250,3 +250,12 @@ read/mutation. Unrelated status remains usable. Focused `42/0`, complete `111/0`
 - No global provider defaults, provider login, live daemon repair, root formatting, dependency
   change, lock deletion/reload, or rollout promotion.
 - Compatibility wrappers are retained; no deletion in #576.
+
+## Antigravity Compatibility Handoff
+
+- Foundation `faefbdf` / merge `998bb099` are ancestors; no further rebase required (`0/38`
+  behind/ahead versus origin/main).
+- Runtime vocabulary/adapter is canonical Antigravity/`agy`; legacy persisted Gemini state migrates
+  only when unambiguous, otherwise refuses. No alias; live policy remains #578 deferred.
+- Gates: focused 46/0, complete 123/0, check/lint/fmt 40/24/21 clean; lock unchanged.
+- Next: commit/push this slice, then S5 wrappers/docs only.

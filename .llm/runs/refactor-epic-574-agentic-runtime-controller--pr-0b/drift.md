@@ -111,3 +111,11 @@
 - **Severity:** backward-compatibility defect; unrelated commands could fail during checkpoint load.
 - **Action:** infer progress only from legacy checkpoint status and mark absent desired inverse as
   unavailable. Refuse its rollback before ownership probes/mutation; do not invent metadata.
+
+## 2026-07-10 - Antigravity compatibility implemented after foundation merge
+
+- **Expected:** Replace historical Gemini controller vocabulary after PR #584 merges.
+- **Actual:** Canonical Antigravity vocabulary is implemented; legacy state has bounded migration or
+  ambiguity refusal.
+- **Severity:** owner-approved transition, no architecture debt.
+- **Action:** retain #578 deferrals; never add a Gemini executable alias or inferred agy policy.

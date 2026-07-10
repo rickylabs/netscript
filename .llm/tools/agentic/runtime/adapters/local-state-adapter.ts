@@ -21,7 +21,6 @@ import {
 export const CONTROLLER_STATE_FILE = 'controller-state.json';
 export const CHECKPOINTS_DIRECTORY = 'checkpoints';
 type JsonObject = Record<string, unknown>;
-
 function object(value: unknown, label: string): JsonObject {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     throw new Error(`${label} invalid`);
@@ -54,7 +53,7 @@ function parseRoute(value: unknown, strict: boolean) {
   const route = object(value, 'route');
   known(route, 'agent provider model effort worktree sessionId mobileRequired', 'route', strict);
   return {
-    agent: member(route.agent, AGENT_KINDS, 'route agent'),
+    agent: member(route.agent === 'gemini' ? 'antigravity' : route.agent, AGENT_KINDS, 'route agent'),
     provider: member(route.provider, PROVIDER_KINDS, 'route provider'),
     model: string(route.model, 'route model'),
     effort: member(route.effort, EFFORTS, 'route effort'),
@@ -67,13 +66,12 @@ function parseSession(value: unknown, strict: boolean) {
   const session = object(value, 'session');
   known(session, 'agent sessionId worktree boundary', 'session', strict);
   return {
-    agent: member(session.agent, AGENT_KINDS, 'session agent'),
+    agent: member(session.agent === 'gemini' ? 'antigravity' : session.agent, AGENT_KINDS, 'session agent'),
     sessionId: string(session.sessionId, 'session id'),
     worktree: string(session.worktree, 'session worktree'),
     boundary: member(session.boundary, ['active', 'idle', 'new'] as const, 'session boundary'),
   };
 }
-/** Strictly parses an untyped desired-state document; writes use projection mode. */
 export function parseDesiredRuntimeState(value: unknown, strict = true): DesiredRuntimeState {
   const state = object(value, 'desired state');
   // deno-fmt-ignore
@@ -83,16 +81,20 @@ export function parseDesiredRuntimeState(value: unknown, strict = true): Desired
   known(foundation, 'nativeExt4 versions stateDirectories', 'foundation', strict);
   if (foundation.nativeExt4 !== true) throw new Error('native ext4 requirement invalid');
   const rawVersions = object(foundation.versions, 'foundation versions');
-  known(rawVersions, INSTALLABLE_FOUNDATION_COMPONENTS.join(' '), 'foundation versions', strict);
+  known(rawVersions, `${INSTALLABLE_FOUNDATION_COMPONENTS.join(' ')} gemini`, 'foundation versions', strict);
+  if (rawVersions.gemini !== undefined && rawVersions.antigravity !== undefined) throw new Error('ambiguous legacy Gemini desired version');
   const versions: Record<string, string> = {};
   for (const component of INSTALLABLE_FOUNDATION_COMPONENTS) {
     if (rawVersions[component] !== undefined) {
       versions[component] = string(rawVersions[component], `${component} version`);
     }
   }
+  if (rawVersions.gemini !== undefined) versions.antigravity = string(rawVersions.gemini, 'legacy Gemini version');
   const agents: Partial<Record<AgentKind, DesiredAgentState>> = {};
   const rawAgents = object(state.agents, 'agents');
-  known(rawAgents, AGENT_KINDS.join(' '), 'agents', strict);
+  known(rawAgents, `${AGENT_KINDS.join(' ')} gemini`, 'agents', strict);
+  if (rawAgents.gemini !== undefined && rawAgents.antigravity !== undefined) throw new Error('ambiguous legacy Gemini agent state');
+  if (rawAgents.gemini !== undefined) rawAgents.antigravity = rawAgents.gemini;
   for (const agent of AGENT_KINDS) {
     if (rawAgents[agent] === undefined) continue;
     const entry = object(rawAgents[agent], `${agent} desired state`);
@@ -100,8 +102,8 @@ export function parseDesiredRuntimeState(value: unknown, strict = true): Desired
     agents[agent] = {
       required: boolean(entry.required, `${agent} required`),
       authRoute: member(
-        entry.authRoute,
-        ['provider-native', 'google-subscription'] as const,
+        entry.authRoute === 'google-subscription' ? 'google-sign-in' : entry.authRoute,
+        ['provider-native', 'google-sign-in'] as const,
         `${agent} auth route`,
       ),
       ...(entry.route === undefined ? {} : { route: parseRoute(entry.route, strict) }),
@@ -114,7 +116,7 @@ export function parseDesiredRuntimeState(value: unknown, strict = true): Desired
       nativeExt4: true,
       versions,
       stateDirectories: array(foundation.stateDirectories, 'state directories').map((entry) =>
-        member(entry, STATE_DIRECTORY_IDS, 'state directory')
+        member(entry === 'gemini' ? 'antigravity' : entry, STATE_DIRECTORY_IDS, 'state directory')
       ),
     },
     agents,
@@ -226,6 +228,8 @@ function migrateFoundationState(value: unknown): PersistedRuntimeState {
     throw new Error('foundation schema unsupported');
   }
   const desired = object(state.desired, 'foundation desired versions');
+  if (desired.gemini !== undefined && desired.antigravity !== undefined) throw new Error('ambiguous foundation Google CLI state');
+  const antigravity = desired.antigravity ?? desired.gemini;
   return {
     schemaVersion: RUNTIME_SCHEMA_VERSION,
     stateId: 'foundation-migration-1.0',
@@ -237,13 +241,13 @@ function migrateFoundationState(value: unknown): PersistedRuntimeState {
         versions: {
           node: string(desired.node, 'node version'),
           claude: string(desired.claude, 'claude version'),
-          gemini: string(desired.gemini, 'gemini version'),
+          antigravity: string(antigravity, 'antigravity install channel'),
         },
         stateDirectories: [...STATE_DIRECTORY_IDS],
       },
       agents: {
         claude: { required: true, authRoute: 'provider-native' },
-        gemini: { required: true, authRoute: 'google-subscription' },
+        antigravity: { required: true, authRoute: 'google-sign-in' },
       },
       worktrees: [],
       sessions: [],
@@ -283,7 +287,6 @@ async function writeJsonAtomic(path: string, value: unknown): Promise<void> {
     throw error;
   }
 }
-/** Implements controller reads and ownership-scoped atomic state writes. */
 export class LocalRuntimeStateAdapter
   implements
     PersistedStateReaderPort,

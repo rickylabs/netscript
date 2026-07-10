@@ -12,19 +12,13 @@ import type { SessionIdentity } from '../contract.ts';
 export const PROVIDER_AGENT_PAIRS = {
   anthropic: 'claude',
   openai: 'codex',
-  google: 'gemini',
+  google: 'antigravity',
 } as const;
 
 export const CONFLICTING_CREDENTIAL_KEYS = {
   claude: ['ANTHROPIC_API_KEY'],
   codex: ['OPENAI_API_KEY'],
-  gemini: [
-    'GEMINI_API_KEY',
-    'GOOGLE_API_KEY',
-    'GOOGLE_CLOUD_PROJECT',
-    'GOOGLE_CLOUD_LOCATION',
-    'GOOGLE_GENAI_USE_VERTEXAI',
-  ],
+  antigravity: [],
 } as const;
 
 export interface ProviderValidationInput {

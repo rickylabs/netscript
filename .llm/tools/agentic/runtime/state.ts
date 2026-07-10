@@ -39,7 +39,7 @@ export const COMPONENT_STATUSES = [
   'unavailable',
 ] as const;
 export type ComponentStatus = typeof COMPONENT_STATUSES[number];
-export const AUTH_ROUTES = ['provider-native', 'google-subscription'] as const;
+export const AUTH_ROUTES = ['provider-native', 'google-sign-in'] as const;
 export type AuthRoute = typeof AUTH_ROUTES[number];
 export const CHECKPOINT_STATUSES = ['prepared', 'applied', 'rolled_back', 'partial'] as const;
 export type CheckpointStatus = typeof CHECKPOINT_STATUSES[number];

@@ -30,7 +30,7 @@ function observedWorktreeSafe(observed: ObservedRuntimeState, worktree: string):
       (state.upstream === null || state.upstream === 'NONE'),
   );
 }
-function routeDeferred(route: RouteIdentity): DeferredIssue | null { if (route.provider === 'openrouter' || route.provider === 'custom') return 577; return route.agent === 'gemini' ? 578 : null; }
+function routeDeferred(route: RouteIdentity): DeferredIssue | null { if (route.provider === 'openrouter' || route.provider === 'custom') return 577; return route.agent === 'antigravity' ? 578 : null; }
 function routeMatchesSession(route: RouteIdentity, session: SessionIdentity): boolean { return route.agent === session.agent && route.worktree === session.worktree && route.sessionId === session.sessionId; }
 function planRouteAction(builder: PlanBuilder, command: RuntimeCommand, kind: 'launch_session' | 'resume_session' | 'smoke_session' | 'switch_route' | 'restore_route', route: RouteIdentity, observed: ObservedRuntimeState, sessionId?: string): void {
   const deferred = routeDeferred(route);
@@ -156,17 +156,17 @@ export function planReconciliation(input: ReconciliationInput): ReconcilePlan {
       }
       break;
     case 'smoke':
-      if (command.route.agent === 'gemini' && command.level === 'live') {
+      if (command.route.agent === 'antigravity' && command.level === 'live') {
         addBlockedIntent(
           builder,
           command,
           diagnostic(
             'capability_deferred',
             'capability',
-            'Gemini live evidence is deferred to issue #578',
+            'Antigravity live evidence is deferred to issue #578',
             578,
           ),
-          ['capability:gemini-live-smoke'],
+          ['capability:antigravity-live-smoke'],
         );
       } else {
         planLifecycleAction(builder, command, 'smoke_session', command.route, observed);

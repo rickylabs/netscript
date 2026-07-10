@@ -20,7 +20,7 @@ const STATE_DIRECTORY_COMPONENTS: Readonly<
 > = {
   'state-claude': 'claude',
   'state-codex': 'codex',
-  'state-gemini': 'gemini',
+  'state-antigravity': 'antigravity',
   'state-netscript-agentic': 'netscript-agentic',
 };
 
@@ -177,7 +177,7 @@ export async function translateFoundationReport(
     capabilities: {
       claude: authCapability(report, 'claude'),
       codex: translateMobileControl(report.mobileControl),
-      gemini: 'deferred',
+      antigravity: authCapability(report, 'antigravity'),
     },
     worktrees: [],
     sessions: [],

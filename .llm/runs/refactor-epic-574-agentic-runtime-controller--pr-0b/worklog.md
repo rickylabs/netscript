@@ -912,3 +912,16 @@ ownership inspection returns `rollback_refused` before fingerprint reads or muta
 inventing prior desired state. An unrelated status command reads the legacy checkpoint summary and
 returns `no_change`. Focused S4 runtime: `42/0`; complete suite: `111/0`; scoped check/lint/fmt:
 `39/27/20`, zero findings. LOC caps and schema `1.0` remain intact; no dependency or lock change.
+
+## 2026-07-10 Antigravity Compatibility Slice
+
+Pre-flight confirmed foundation `faefbdf` and merge `998bb099` are ancestors of HEAD;
+`origin/main...HEAD` is `0 behind / 38 ahead`, so no further rebase was required. Canonical runtime
+vocabulary is now Antigravity/`agy`/`google-sign-in` and matches the merged probe surface. The
+static adapter constructs only `agy --version`; live auth/quota/output/research remains #578
+deferred. Exact legacy persisted `gemini` state migrates only when unambiguous; mixed state is
+refused. No executable alias or credential policy was introduced.
+
+Evidence: focused runtime `46/0`; complete agentic/runtime/foundation `123/0`; scoped
+check/lint/fmt `40/24/21`, all exit 0. Alias/secret scans clean; lock unchanged at
+`8694862878e6f9a430bf56497a4d5bf3f8eb1f3d`; LOC caps pass.

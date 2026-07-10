@@ -133,6 +133,22 @@ raw adapter output. Status identity filters narrow worktree, session, auth, and 
 an unmatched filter returns the finite `missing_identity` diagnostic. Desired-state files reject
 unknown top-level or nested keys, while controller-owned writes project typed value-free fields.
 
+The canonical Google CLI identity is Antigravity (`agent: "antigravity"`) and the only static
+executable probe is `agy --version`; the canonical user-owned target is `/home/codex/.local/bin/agy`.
+Legacy persisted `gemini` desired-state keys are normalized to Antigravity only when unambiguous;
+mixed legacy/canonical state is refused. No `gemini` executable alias is created, `~/.gemini` is
+preserved, and `/root/.local/bin/agy` is outside the controller boundary. Live authentication,
+subscription/quota behavior, JSON/JSONL, complete exits, research/citations, and instruction-file
+semantics remain structured #578 capability deferrals; this controller does not invent `agy login`.
+
+### Compatibility-cycle boundary
+
+The existing `agentic:wsl-foundation`, `agentic:launch-codex-slice`, `agentic:codex-resume`,
+`agentic:codex-status`, and `agentic:smoke-claude-remote` tasks remain supported thin compatibility
+edges for one deprecation cycle. They retain their documented flags, output, and exit contracts and
+delegate to the shared agentic primitives; they are not deleted by #576. Retirement requires the
+downstream reliability/policy issues (#577–#582) to land and a separately reviewed removal change.
+
 ### `launch-codex-slice.ts`
 Stage and launch a Codex slice from a Windows-authored brief, with a push-safety gate, and record
 the thread id to the run-artifact dir.

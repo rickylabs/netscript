@@ -6,5 +6,5 @@ export const RUNTIME_TEST_COMPONENT_VERSIONS: Readonly<
 > = Object.freeze({
   node: '26.5.0',
   claude: '2.1.206',
-  gemini: '0.50.0',
+  antigravity: 'official-installer',
 });

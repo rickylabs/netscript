@@ -36,7 +36,7 @@ const desired: DesiredRuntimeState = {
   foundation: {
     nativeExt4: true,
     versions: RUNTIME_TEST_COMPONENT_VERSIONS,
-    stateDirectories: ['claude', 'codex', 'gemini', 'netscript-agentic'],
+    stateDirectories: ['claude', 'codex', 'antigravity', 'netscript-agentic'],
   },
   agents: {
     codex: { required: true, authRoute: 'provider-native', route },
@@ -53,11 +53,15 @@ function observed(overrides: Partial<ObservedRuntimeState> = {}): ObservedRuntim
     components: [
       { component: 'node', version: RUNTIME_TEST_COMPONENT_VERSIONS.node, status: 'ready' },
       { component: 'claude', version: RUNTIME_TEST_COMPONENT_VERSIONS.claude, status: 'ready' },
-      { component: 'gemini', version: RUNTIME_TEST_COMPONENT_VERSIONS.gemini, status: 'ready' },
+      {
+        component: 'antigravity',
+        version: RUNTIME_TEST_COMPONENT_VERSIONS.antigravity,
+        status: 'ready',
+      },
     ],
     auth: [],
-    stateDirectories: ['claude', 'codex', 'gemini', 'netscript-agentic'],
-    capabilities: { claude: 'available', codex: 'available', gemini: 'deferred' },
+    stateDirectories: ['claude', 'codex', 'antigravity', 'netscript-agentic'],
+    capabilities: { claude: 'available', codex: 'available', antigravity: 'deferred' },
     worktrees: [{
       path: worktree,
       branch: 'feature',
@@ -78,7 +82,7 @@ function plan(command: RuntimeCommand, state = observed(), wanted = desired) {
 }
 
 Deno.test('runtime component version fixture is immutable and explicitly ordered', () => {
-  assertEquals(Object.keys(RUNTIME_TEST_COMPONENT_VERSIONS), ['node', 'claude', 'gemini']);
+  assertEquals(Object.keys(RUNTIME_TEST_COMPONENT_VERSIONS), ['node', 'claude', 'antigravity']);
   assert(
     Object.isFrozen(RUNTIME_TEST_COMPONENT_VERSIONS),
     'component version fixture must be frozen',
@@ -135,10 +139,10 @@ Deno.test('bootstrap drift yields deterministic data-only actions in finite orde
     components: [
       { component: 'node', version: '18.19.1', status: 'outdated' },
       { component: 'claude', version: null, status: 'missing' },
-      { component: 'gemini', version: '0.49.0', status: 'outdated' },
+      { component: 'antigravity', version: null, status: 'outdated' },
       { component: 'deno', version: null, status: 'missing' },
       { component: 'docker', version: null, status: 'missing' },
-      { component: 'gemini-auth-policy', version: null, status: 'auth_conflict' },
+      { component: 'antigravity-auth', version: null, status: 'auth_required' },
     ],
     stateDirectories: [],
   });
@@ -174,7 +178,7 @@ Deno.test('bootstrap drift yields deterministic data-only actions in finite orde
     first.actions.filter((action) => action.kind === 'install_component').map((action) =>
       action.component
     ),
-    ['node', 'claude', 'gemini'],
+    ['node', 'claude', 'antigravity'],
     'bootstrap planned an unsupported foundation install',
   );
   assert(first.actions.every((action) => action.reversible), 'bootstrap action is not reversible');
@@ -208,12 +212,12 @@ Deno.test('OpenRouter route planning blocks explicitly on issue 577', () => {
   assertEquals(result.diagnostics[0]?.ownerIssue, 577);
 });
 
-Deno.test('Gemini live smoke planning blocks explicitly on issue 578', () => {
+Deno.test('Antigravity live smoke planning blocks explicitly on issue 578', () => {
   const result = plan({
     kind: 'smoke',
-    commandId: 'smoke-gemini',
+    commandId: 'smoke-antigravity',
     mode: 'plan',
-    route: { ...route, agent: 'gemini', provider: 'google' },
+    route: { ...route, agent: 'antigravity', provider: 'google' },
     level: 'live',
   });
   assertEquals(result.status, 'blocked');
@@ -263,8 +267,8 @@ Deno.test('lifecycle apply is explicitly deferred to issue 580 while plans stay 
   const session = { agent: 'codex', sessionId: 'session-1', worktree, boundary: 'idle' } as const;
   const liveRoute = { ...route, sessionId: session.sessionId };
   const openrouter = { ...liveRoute, provider: 'openrouter' } as const;
-  const geminiSession = { ...session, agent: 'gemini' } as const;
-  const gemini = { ...liveRoute, agent: 'gemini', provider: 'google' } as const;
+  const antigravitySession = { ...session, agent: 'antigravity' } as const;
+  const antigravity = { ...liveRoute, agent: 'antigravity', provider: 'google' } as const;
   const commands: RuntimeCommand[] = [
     {
       kind: 'launch',
@@ -306,24 +310,24 @@ Deno.test('lifecycle apply is explicitly deferred to issue 580 while plans stay 
     },
     {
       kind: 'launch',
-      commandId: 'apply-gemini-launch',
+      commandId: 'apply-antigravity-launch',
       mode: 'apply',
-      route: gemini,
+      route: antigravity,
       content: { path: '/brief' },
     },
     {
       kind: 'resume',
-      commandId: 'apply-gemini-resume',
+      commandId: 'apply-antigravity-resume',
       mode: 'apply',
-      route: gemini,
-      session: geminiSession,
+      route: antigravity,
+      session: antigravitySession,
       content: { path: '/turn' },
     },
     {
       kind: 'smoke',
-      commandId: 'apply-gemini-smoke',
+      commandId: 'apply-antigravity-smoke',
       mode: 'apply',
-      route: gemini,
+      route: antigravity,
       level: 'static',
     },
   ];

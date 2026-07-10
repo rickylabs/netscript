@@ -75,7 +75,7 @@ const desired: DesiredRuntimeState = {
   foundation: {
     nativeExt4: true,
     versions: RUNTIME_TEST_COMPONENT_VERSIONS,
-    stateDirectories: ['claude', 'codex', 'gemini', 'netscript-agentic'],
+    stateDirectories: ['claude', 'codex', 'antigravity', 'netscript-agentic'],
   },
   agents: { codex: { required: true, authRoute: 'provider-native', route } },
   worktrees: [{ path: route.worktree, branch: 'feature', upstream: 'none', clean: true }],

@@ -10,7 +10,10 @@ import {
   planCodexCommand,
 } from './adapters/codex-adapter.ts';
 import { CLAUDE_SMOKE_WRAPPER, planClaudeCommand } from './adapters/claude-adapter.ts';
-import { normalizeGeminiObservation, planGeminiCommand } from './adapters/gemini-adapter.ts';
+import {
+  normalizeAntigravityObservation,
+  planAntigravityCommand,
+} from './adapters/antigravity-adapter.ts';
 import { CONFLICTING_CREDENTIAL_KEYS, validateProviderRoute } from './adapters/provider-adapter.ts';
 import { FoundationRuntimeInspector } from './adapters/foundation-adapter.ts';
 import {
@@ -282,19 +285,18 @@ Deno.test('Claude static smoke uses fixed bounded argv and blocks owner-only liv
   assertEquals(codes(live.diagnostics), ['capability_unsupported']);
 });
 
-Deno.test('Gemini observations are finite and live evidence is issue 578 blocked', () => {
-  const observation = normalizeGeminiObservation({
-    version: RUNTIME_TEST_COMPONENT_VERSIONS.gemini,
+Deno.test('Antigravity observations are finite and live evidence is issue 578 blocked', () => {
+  const observation = normalizeAntigravityObservation({
+    version: RUNTIME_TEST_COMPONENT_VERSIONS.antigravity,
     authStatus: 'ready',
-    credentialKeyNames: ['IGNORED_KEY'],
   });
   assertEquals(observation.components.map((entry) => entry.component), [
-    'gemini',
-    'gemini-auth-policy',
+    'antigravity',
+    'antigravity-auth',
   ]);
   assertEquals(observation.capability, 'available');
   const route: RouteIdentity = {
-    agent: 'gemini',
+    agent: 'antigravity',
     provider: 'google',
     model: 'caller-model',
     effort: 'low',
@@ -303,13 +305,13 @@ Deno.test('Gemini observations are finite and live evidence is issue 578 blocked
   };
   const command: Extract<RuntimeCommand, { kind: 'smoke' }> = {
     kind: 'smoke',
-    commandId: 'gemini-live',
+    commandId: 'antigravity-live',
     mode: 'plan',
     route,
     level: 'live',
     content,
   };
-  const plan = planGeminiCommand({ command, nativeExt4: true });
+  const plan = planAntigravityCommand({ command, nativeExt4: true });
   assertEquals(plan.request, null);
   assertEquals(plan.diagnostics[0]?.ownerIssue, 578);
   assertEquals(codes(plan.diagnostics), ['capability_deferred']);
@@ -377,8 +379,8 @@ Deno.test('unsupported lifecycle operations return finite diagnostics and no req
   const claude = planClaudeCommand({ command: claudeLaunch, nativeExt4: true });
   assertEquals(claude.request, null);
   assertEquals(codes(claude.diagnostics), ['capability_unsupported']);
-  const geminiRoute: RouteIdentity = {
-    agent: 'gemini',
+  const antigravityRoute: RouteIdentity = {
+    agent: 'antigravity',
     provider: 'google',
     model: 'caller-model',
     effort: 'low',
@@ -386,17 +388,17 @@ Deno.test('unsupported lifecycle operations return finite diagnostics and no req
     sessionId: threadId,
     mobileRequired: false,
   };
-  const geminiResume: Extract<RuntimeCommand, { kind: 'resume' }> = {
+  const antigravityResume: Extract<RuntimeCommand, { kind: 'resume' }> = {
     kind: 'resume',
-    commandId: 'gemini-resume',
+    commandId: 'antigravity-resume',
     mode: 'plan',
-    route: geminiRoute,
-    session: { ...codexSession, agent: 'gemini' },
+    route: antigravityRoute,
+    session: { ...codexSession, agent: 'antigravity' },
     content,
   };
-  const gemini = planGeminiCommand({ command: geminiResume, nativeExt4: true });
-  assertEquals(gemini.request, null);
-  assertEquals(codes(gemini.diagnostics), ['capability_unsupported']);
+  const antigravity = planAntigravityCommand({ command: antigravityResume, nativeExt4: true });
+  assertEquals(antigravity.request, null);
+  assertEquals(codes(antigravity.diagnostics), ['capability_unsupported']);
 });
 
 Deno.test('foundation owned readers match checkpoint canonical component shapes', async () => {

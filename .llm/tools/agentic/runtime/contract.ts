@@ -19,7 +19,7 @@ export const LEGAL_COMMAND_MODES: Readonly<
 export type RuntimeCommandMode<K extends RuntimeCommandKind> = K extends 'doctor' | 'status'
   ? 'inspect'
   : 'plan' | 'apply';
-export const AGENT_KINDS = ['claude', 'codex', 'gemini'] as const;
+export const AGENT_KINDS = ['claude', 'codex', 'antigravity'] as const;
 export type AgentKind = typeof AGENT_KINDS[number];
 export const PROVIDER_KINDS = ['anthropic', 'openai', 'google', 'openrouter', 'custom'] as const;
 export type ProviderKind = typeof PROVIDER_KINDS[number];
@@ -27,14 +27,14 @@ export const EFFORTS = ['low', 'medium', 'high', 'xhigh', 'max'] as const;
 export type Effort = typeof EFFORTS[number];
 // deno-fmt-ignore
 export const OBSERVED_FOUNDATION_COMPONENTS = [
-  'node', 'npm', 'deno', 'git', 'codex', 'codex-app-server', 'claude', 'gemini',
-  'gemini-auth-policy', 'dotnet', 'aspire', 'docker', 'state-claude', 'state-codex',
-  'state-gemini', 'state-netscript-agentic',
+  'node', 'npm', 'deno', 'git', 'codex', 'codex-app-server', 'claude', 'antigravity',
+  'antigravity-auth', 'antigravity-install-ownership', 'legacy-gemini-ownership', 'dotnet',
+  'aspire', 'docker', 'state-claude', 'state-codex', 'state-antigravity', 'state-netscript-agentic',
 ] as const;
 export type ObservedFoundationComponentId = typeof OBSERVED_FOUNDATION_COMPONENTS[number];
-export const INSTALLABLE_FOUNDATION_COMPONENTS = ['node', 'claude', 'gemini'] as const;
+export const INSTALLABLE_FOUNDATION_COMPONENTS = ['node', 'claude', 'antigravity'] as const;
 export type InstallableFoundationComponentId = typeof INSTALLABLE_FOUNDATION_COMPONENTS[number];
-export const STATE_DIRECTORY_IDS = ['claude', 'codex', 'gemini', 'netscript-agentic'] as const;
+export const STATE_DIRECTORY_IDS = ['claude', 'codex', 'antigravity', 'netscript-agentic'] as const;
 export type StateDirectoryId = typeof STATE_DIRECTORY_IDS[number];
 // deno-fmt-ignore
 export const RUNTIME_STATUSES = [
@@ -72,7 +72,7 @@ export const ACTION_KINDS = [
 export type RuntimeActionKind = typeof ACTION_KINDS[number];
 // deno-fmt-ignore
 export const ADAPTER_KINDS = [
-  'foundation', 'state', 'provider', 'claude', 'codex', 'gemini', 'mobile-control',
+  'foundation', 'state', 'provider', 'claude', 'codex', 'antigravity', 'mobile-control',
 ] as const;
 export type AdapterKind = typeof ADAPTER_KINDS[number];
 
