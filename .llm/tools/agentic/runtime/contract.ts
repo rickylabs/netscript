@@ -1,5 +1,3 @@
-/** Versioned, value-free contracts for the agentic runtime controller. */
-
 export const RUNTIME_SCHEMA_VERSION = '1.0' as const;
 // deno-fmt-ignore
 export const RUNTIME_COMMANDS = [
@@ -9,7 +7,6 @@ export const RUNTIME_COMMANDS = [
 export type RuntimeCommandKind = typeof RUNTIME_COMMANDS[number];
 export const RUNTIME_MODES = ['inspect', 'plan', 'apply'] as const;
 export type RuntimeMode = typeof RUNTIME_MODES[number];
-
 // deno-fmt-ignore
 export const LEGAL_COMMAND_MODES: Readonly<
   Record<RuntimeCommandKind, readonly RuntimeMode[]>
@@ -73,7 +70,6 @@ export const ACTION_KINDS = [
   'rollback_checkpoint', 'blocked_intent',
 ] as const;
 export type RuntimeActionKind = typeof ACTION_KINDS[number];
-
 // deno-fmt-ignore
 export const ADAPTER_KINDS = [
   'foundation', 'state', 'provider', 'claude', 'codex', 'gemini', 'mobile-control',
@@ -144,9 +140,13 @@ export type RuntimeCommand =
   })
   | (RuntimeCommandBase<'fallback'> & {
     readonly session: SessionIdentity;
+    readonly currentRoute: RouteIdentity;
     readonly targetRoute: RouteIdentity;
   })
-  | (RuntimeCommandBase<'restore'> & { readonly session: SessionIdentity })
+  | (RuntimeCommandBase<'restore'> & {
+    readonly session: SessionIdentity;
+    readonly currentRoute: RouteIdentity;
+  })
   | (RuntimeCommandBase<'status'> & {
     readonly agent?: AgentKind;
     readonly worktree?: string;

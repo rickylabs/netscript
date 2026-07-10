@@ -174,6 +174,27 @@ automated gates pass and coordinator review is pending. S5 has not started.
 Coordinator substantively reviews S4. Do not start S5 or launch another sender; resume this exact
 thread only after coordinator approval.
 
+## S4 Tier-A Remediation Handoff
+
+- Controller-state persistence is transactional: successful apply writes desired/checkpoint/last
+  command identity; state or final-checkpoint failure compensates and restores prior persisted state.
+- Checkpoints contain complete data-only actions, canonical before/after fingerprints, typed prior
+  component/directory/desired-state/route metadata, and prior controller state. Rollback refuses
+  external drift and passes exact metadata to compensation.
+- Configure has a fresh local-adapter apply/read/rollback/read proof. Fallback and restore carry and
+  restore caller route identity. Failed automatic and explicit compensation results are `failed`.
+- Blocked apply uses one observation and preserves only its owner diagnostic. Read-stage mapping is
+  `probe_failed` / `state_corrupt` / `invalid_checkpoint` / `invalid_state_file`; adapter failures
+  are preserved exactly.
+- Replacement gates: focused runtime `36 passed`; complete runtime `105 passed`; scoped
+  check/lint/format 37/25/18 files with zero findings after correcting the initially detected CLI
+  port composition; doctor exits `2/2` with normalized semantics and trees equal; dry-run/source
+  trees equal; lock blob unchanged.
+- Locked caps pass: CLI 149, contract 220, ports 218, state 300, controller 295, output 185, local
+  adapter 349, controller test 416. Existing S5-wrapper format drift is unchanged; no new debt.
+- Stop at S4 remediation. Coordinator performs Tier-A re-review; do not self-certify, start S5,
+  implement #577-#582, or launch another sender.
+
 ## Safety
 
 - Native ext4 only; explicit push refspec only.

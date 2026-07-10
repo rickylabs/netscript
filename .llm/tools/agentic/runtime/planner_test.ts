@@ -215,6 +215,7 @@ Deno.test('fallback never changes route inside an active turn', () => {
     commandId: 'fallback-1',
     mode: 'plan',
     session: { agent: 'codex', sessionId: 'session-1', worktree, boundary: 'active' },
+    currentRoute: route,
     targetRoute: route,
   });
   assertEquals(result.status, 'blocked');

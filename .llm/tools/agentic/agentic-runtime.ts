@@ -117,15 +117,14 @@ export function parseRuntimeArgs(args: readonly string[]): ParsedRuntimeArgs {
   throw new Error(usage());
 }
 function createReadPorts(home: string): RuntimeReadPorts {
-  const local = new LocalRuntimeStateAdapter(
-    `${home}/.config/netscript-agentic/runtime`,
-    `${home}/.config/netscript-agentic/foundation-state.json`,
-  );
+  // deno-fmt-ignore
+  const local = new LocalRuntimeStateAdapter(`${home}/.config/netscript-agentic/runtime`, `${home}/.config/netscript-agentic/foundation-state.json`);
   return {
     inspector: new FoundationRuntimeInspector(new CommandFoundationReportReader()),
     persistedStateReader: local,
     desiredStateSource: local,
     checkpointReader: local,
+    ownedResourceReader: local,
     contentReader: local,
     processProbe: {
       probeProcess: ({ probeId }) => Promise.resolve({ probeId, exitCode: 1, timedOut: false }),

@@ -1,6 +1,7 @@
-/** Controller-owned, value-free local state storage with atomic mode-0600 writes. */
-
 import {
+  ACTION_EFFECTS,
+  ACTION_KINDS,
+  ADAPTER_KINDS,
   AGENT_KINDS,
   type AgentKind,
   type ContentReference,
@@ -8,6 +9,7 @@ import {
   INSTALLABLE_FOUNDATION_COMPONENTS,
   PROVIDER_KINDS,
   RUNTIME_SCHEMA_VERSION,
+  type RuntimeAction,
   STATE_DIRECTORY_IDS,
 } from '../contract.ts';
 import type {
@@ -17,18 +19,18 @@ import type {
   ContentReferenceSummary,
   DesiredStateSourcePort,
   DesiredStateWriterPort,
+  OwnedResourceReaderPort,
   PersistedStateReaderPort,
 } from '../ports.ts';
-import type {
-  DesiredAgentState,
-  DesiredRuntimeState,
-  PersistedRuntimeState,
-  RuntimeCheckpointState,
+import {
+  type DesiredAgentState,
+  type DesiredRuntimeState,
+  fingerprintRuntimeValue,
+  type PersistedRuntimeState,
+  type RuntimeCheckpointState,
 } from '../state.ts';
-
 export const CONTROLLER_STATE_FILE = 'controller-state.json';
 export const CHECKPOINTS_DIRECTORY = 'checkpoints';
-
 type JsonObject = Record<string, unknown>;
 
 function object(value: unknown, label: string): JsonObject {
@@ -37,34 +39,28 @@ function object(value: unknown, label: string): JsonObject {
   }
   return value as JsonObject;
 }
-
 function known(value: JsonObject, keys: string, label: string, strict: boolean): void {
   const allowed = new Set(keys.split(' '));
   if (strict && Object.keys(value).some((key) => !allowed.has(key))) {
     throw new Error(`${label} contains unknown field`);
   }
 }
-
 function string(value: unknown, label: string): string {
   if (typeof value !== 'string' || value.length === 0) throw new Error(`${label} invalid`);
   return value;
 }
-
 function boolean(value: unknown, label: string): boolean {
   if (typeof value !== 'boolean') throw new Error(`${label} invalid`);
   return value;
 }
-
 function array(value: unknown, label: string): readonly unknown[] {
   if (!Array.isArray(value)) throw new Error(`${label} invalid`);
   return value;
 }
-
 function member<T extends readonly unknown[]>(value: unknown, values: T, label: string): T[number] {
   if (!values.includes(value)) throw new Error(`${label} invalid`);
   return value as T[number];
 }
-
 function parseRoute(value: unknown, strict: boolean) {
   const route = object(value, 'route');
   known(route, 'agent provider model effort worktree sessionId mobileRequired', 'route', strict);
@@ -78,7 +74,6 @@ function parseRoute(value: unknown, strict: boolean) {
     mobileRequired: boolean(route.mobileRequired, 'mobile requirement'),
   };
 }
-
 function parseSession(value: unknown, strict: boolean) {
   const session = object(value, 'session');
   known(session, 'agent sessionId worktree boundary', 'session', strict);
@@ -89,7 +84,6 @@ function parseSession(value: unknown, strict: boolean) {
     boundary: member(session.boundary, ['active', 'idle', 'new'] as const, 'session boundary'),
   };
 }
-
 /** Strictly parses an untyped desired-state document; writes use projection mode. */
 export function parseDesiredRuntimeState(value: unknown, strict = true): DesiredRuntimeState {
   const state = object(value, 'desired state');
@@ -149,7 +143,6 @@ export function parseDesiredRuntimeState(value: unknown, strict = true): Desired
     sessions: array(state.sessions, 'sessions').map((entry) => parseSession(entry, strict)),
   };
 }
-
 function parsePersistedRuntimeState(value: unknown, strict = true): PersistedRuntimeState {
   const state = object(value, 'persisted state');
   // deno-fmt-ignore
@@ -169,48 +162,69 @@ function parsePersistedRuntimeState(value: unknown, strict = true): PersistedRun
       : string(state.lastAppliedCommandId, 'last command id'),
   };
 }
-
+function parseAction(value: unknown, strict: boolean): RuntimeAction {
+  const action = object(value, 'checkpoint action');
+  // deno-fmt-ignore
+  known(action, 'id kind adapter effect reversible resourceIds component targetVersion stateDirectory route sessionId stateId checkpointId', 'checkpoint action', strict);
+  // deno-fmt-ignore
+  return {
+    id: string(action.id, 'action id'),
+    kind: member(action.kind, ACTION_KINDS, 'action kind'),
+    adapter: member(action.adapter, ADAPTER_KINDS, 'action adapter'),
+    effect: member(action.effect, ACTION_EFFECTS, 'action effect'),
+    reversible: boolean(action.reversible, 'action reversible'),
+    resourceIds: array(action.resourceIds, 'action resources').map((entry) => string(entry, 'resource id')),
+    ...(action.component === undefined ? {} : { component: member(action.component, INSTALLABLE_FOUNDATION_COMPONENTS, 'component') }),
+    ...(action.targetVersion === undefined ? {} : { targetVersion: string(action.targetVersion, 'target version') }),
+    ...(action.stateDirectory === undefined ? {} : { stateDirectory: member(action.stateDirectory, STATE_DIRECTORY_IDS, 'state directory') }),
+    ...(action.route === undefined ? {} : { route: parseRoute(action.route, strict) }),
+    ...(action.sessionId === undefined ? {} : { sessionId: string(action.sessionId, 'session id') }),
+    ...(action.stateId === undefined ? {} : { stateId: string(action.stateId, 'state id') }),
+    ...(action.checkpointId === undefined ? {} : { checkpointId: string(action.checkpointId, 'checkpoint id') }),
+  };
+}
+function parsePrevious(value: unknown, strict: boolean) {
+  const previous = object(value, 'previous owned state');
+  known(previous, 'kind version present route', 'previous owned state', strict);
+  // deno-fmt-ignore
+  if (previous.kind === 'component') return { kind: 'component' as const, version: previous.version === null ? null : string(previous.version, 'previous version') };
+  // deno-fmt-ignore
+  if (previous.kind === 'state-directory') return { kind: 'state-directory' as const, present: boolean(previous.present, 'previous presence') };
+  if (previous.kind === 'desired-state') return { kind: 'desired-state' as const };
+  // deno-fmt-ignore
+  if (previous.kind === 'route') return { kind: 'route' as const, route: parseRoute(previous.route, strict) };
+  throw new Error('previous owned state invalid');
+}
 function parseCheckpoint(value: unknown, strict = true): RuntimeCheckpointState {
   const checkpoint = object(value, 'checkpoint');
   // deno-fmt-ignore
-  known(checkpoint, 'schemaVersion checkpointId commandId createdAt status actionIds resources', 'checkpoint', strict);
+  known(checkpoint, 'schemaVersion checkpointId commandId createdAt status resources previousControllerState', 'checkpoint', strict);
   if (checkpoint.schemaVersion !== RUNTIME_SCHEMA_VERSION) {
     throw new Error('checkpoint schema unsupported');
   }
+  // deno-fmt-ignore
   return {
     schemaVersion: RUNTIME_SCHEMA_VERSION,
     checkpointId: string(checkpoint.checkpointId, 'checkpoint id'),
     commandId: string(checkpoint.commandId, 'checkpoint command id'),
     createdAt: string(checkpoint.createdAt, 'checkpoint created time'),
-    status: member(
-      checkpoint.status,
-      ['prepared', 'applied', 'rolled_back', 'partial'] as const,
-      'checkpoint status',
-    ),
-    actionIds: array(checkpoint.actionIds, 'action ids').map((entry) => string(entry, 'action id')),
+    status: member(checkpoint.status, ['prepared', 'applied', 'rolled_back', 'partial'] as const, 'checkpoint status'),
     resources: array(checkpoint.resources, 'resources').map((entry) => {
       const resource = object(entry, 'resource');
       // deno-fmt-ignore
-      known(resource, 'resourceId kind fingerprint previousFingerprint previousLinkTarget', 'resource', strict);
-      const previous = resource.previousFingerprint;
-      const link = resource.previousLinkTarget;
+      known(resource, 'resourceId kind action beforeFingerprint afterFingerprint previous', 'resource', strict);
       return {
         resourceId: string(resource.resourceId, 'resource id'),
-        kind: member(
-          resource.kind,
-          ['directory', 'file', 'symlink', 'configuration'] as const,
-          'resource kind',
-        ),
-        fingerprint: string(resource.fingerprint, 'fingerprint'),
-        previousFingerprint: previous === null ? null : string(previous, 'previous fingerprint'),
-        ...(link === undefined ? {} : {
-          previousLinkTarget: link === null ? null : string(link, 'previous link target'),
-        }),
+        kind: member(resource.kind, ['directory', 'file', 'symlink', 'configuration'] as const, 'resource kind'),
+        action: parseAction(resource.action, strict),
+        beforeFingerprint: resource.beforeFingerprint === null ? null : string(resource.beforeFingerprint, 'before fingerprint'),
+        afterFingerprint: string(resource.afterFingerprint, 'after fingerprint'),
+        previous: parsePrevious(resource.previous, strict),
       };
     }),
+    previousControllerState: checkpoint.previousControllerState === null ? null : parsePersistedRuntimeState(checkpoint.previousControllerState, strict),
   };
 }
-
 function migrateFoundationState(value: unknown): PersistedRuntimeState {
   const state = object(value, 'foundation state');
   if (state.schemaVersion !== RUNTIME_SCHEMA_VERSION) {
@@ -243,7 +257,6 @@ function migrateFoundationState(value: unknown): PersistedRuntimeState {
     lastAppliedCommandId: null,
   };
 }
-
 async function readJson(path: string): Promise<unknown | null> {
   try {
     return JSON.parse(await Deno.readTextFile(path));
@@ -252,7 +265,6 @@ async function readJson(path: string): Promise<unknown | null> {
     throw new Error('controller-owned JSON is unreadable or invalid');
   }
 }
-
 async function writeJsonAtomic(path: string, value: unknown): Promise<void> {
   const separator = path.lastIndexOf('/');
   const directory = path.slice(0, separator);
@@ -276,14 +288,6 @@ async function writeJsonAtomic(path: string, value: unknown): Promise<void> {
     throw error;
   }
 }
-
-async function fingerprint(bytes: Uint8Array): Promise<string> {
-  const digest = new Uint8Array(
-    await crypto.subtle.digest('SHA-256', Uint8Array.from(bytes).buffer),
-  );
-  return `sha256:${[...digest].map((value) => value.toString(16).padStart(2, '0')).join('')}`;
-}
-
 /** Implements controller reads and ownership-scoped atomic state writes. */
 export class LocalRuntimeStateAdapter
   implements
@@ -291,50 +295,55 @@ export class LocalRuntimeStateAdapter
     DesiredStateSourcePort,
     CheckpointReaderPort,
     ContentReaderPort,
+    OwnedResourceReaderPort,
     DesiredStateWriterPort,
     CheckpointWriterPort {
   constructor(
     private readonly root: string,
     private readonly foundationStatePath: string,
   ) {}
-
   async readPersistedState(): Promise<PersistedRuntimeState | null> {
     const current = await readJson(`${this.root}/${CONTROLLER_STATE_FILE}`);
     if (current !== null) return parsePersistedRuntimeState(current);
     const foundation = await readJson(this.foundationStatePath);
     return foundation === null ? null : migrateFoundationState(foundation);
   }
-
   async loadDesiredState(reference: ContentReference): Promise<DesiredRuntimeState> {
     const value = await readJson(reference.path);
     if (value === null) throw new Error('desired state file is missing');
     return parseDesiredRuntimeState(value);
   }
-
   async readCheckpoint(checkpointId: string): Promise<RuntimeCheckpointState | null> {
     if (!/^[A-Za-z0-9._-]+$/.test(checkpointId)) throw new Error('checkpoint id invalid');
     const value = await readJson(`${this.root}/${CHECKPOINTS_DIRECTORY}/${checkpointId}.json`);
     return value === null ? null : parseCheckpoint(value);
   }
-
   async summarizeContent(reference: ContentReference): Promise<ContentReferenceSummary> {
     const bytes = await Deno.readFile(reference.path);
-    return { path: reference.path, bytes: bytes.byteLength, fingerprint: await fingerprint(bytes) };
+    // deno-fmt-ignore
+    return { path: reference.path, bytes: bytes.byteLength, fingerprint: await fingerprintRuntimeValue([...bytes]) };
   }
-
-  async writeDesiredState(state: PersistedRuntimeState): Promise<void> {
-    await writeJsonAtomic(
-      `${this.root}/${CONTROLLER_STATE_FILE}`,
-      parsePersistedRuntimeState(state, false),
-    );
+  async writeDesiredState(state: PersistedRuntimeState | null): Promise<void> {
+    if (state === null) {
+      try {
+        await Deno.remove(`${this.root}/${CONTROLLER_STATE_FILE}`);
+      } catch (error) {
+        if (!(error instanceof Deno.errors.NotFound)) throw error;
+      }
+      return;
+    }
+    const path = `${this.root}/${CONTROLLER_STATE_FILE}`;
+    await writeJsonAtomic(path, parsePersistedRuntimeState(state, false));
   }
-
+  async readOwnedResourceFingerprint(resourceId: string): Promise<string | null> {
+    if (!resourceId.startsWith('state:')) return null;
+    const state = await this.readPersistedState();
+    return state ? await fingerprintRuntimeValue(state.desired) : null;
+  }
   async writeCheckpoint(checkpoint: RuntimeCheckpointState): Promise<void> {
     const sanitized = parseCheckpoint(checkpoint, false);
     if (!/^[A-Za-z0-9._-]+$/.test(sanitized.checkpointId)) throw new Error('checkpoint id invalid');
-    await writeJsonAtomic(
-      `${this.root}/${CHECKPOINTS_DIRECTORY}/${sanitized.checkpointId}.json`,
-      sanitized,
-    );
+    const path = `${this.root}/${CHECKPOINTS_DIRECTORY}/${sanitized.checkpointId}.json`;
+    await writeJsonAtomic(path, sanitized);
   }
 }

@@ -1,207 +1,177 @@
-import {
-  type ReconcilePlan,
-  type RuntimeAction,
-  type RuntimeActionResult,
-  type RuntimeCommand,
-  type RuntimeDiagnostic,
-  type RuntimeResult,
-} from './contract.ts';
+// deno-fmt-ignore
+import type { ReconcilePlan, RuntimeActionResult, RuntimeCommand, RuntimeDiagnostic, RuntimeResult } from './contract.ts';
+import { RUNTIME_SCHEMA_VERSION } from './contract.ts';
 import { foundationDiagnostics } from './adapters/foundation-adapter.ts';
-import { buildRuntimeResult } from './output.ts';
+// deno-fmt-ignore
+import { buildPlanResult, buildReadFailureResult, buildRuntimeResult, projectAction, runtimeDiagnostic } from './output.ts';
 import { planReconciliation } from './planner.ts';
-import type { RuntimeMutationPorts, RuntimeReadPorts } from './ports.ts';
-import {
-  checkpointRollbackActions,
-  createRuntimeCheckpoint,
-  type DesiredRuntimeState,
-  type ObservedRuntimeState,
-  type RuntimeCheckpointState,
-} from './state.ts';
-type Code = RuntimeDiagnostic['code'];
-type Category = RuntimeDiagnostic['category'];
-type Command = RuntimeCommand;
-function diagnostic(code: Code, category: Category, message: string): RuntimeDiagnostic {
-  return { code, category, retryable: false, message };
-}
-function actionResult(action: RuntimeAction, status: RuntimeActionResult['status']) {
-  const { id, kind, adapter, effect, reversible } = action;
-  return { id, kind, adapter, effect, reversible, status };
-}
-interface Prepared {
-  readonly desired: DesiredRuntimeState | null;
-  readonly observed: ObservedRuntimeState;
+// deno-fmt-ignore
+import type { RuntimeMutationPorts, RuntimeReadFailure, RuntimeReadInput, RuntimeReadPorts } from './ports.ts';
+import { checkpointOwnershipDiagnostic, readRuntimeInput } from './ports.ts';
+// deno-fmt-ignore
+import { createRuntimeCheckpoint, type OwnedResourceState, type PersistedRuntimeState, type RuntimeCheckpointState } from './state.ts';
+
+interface Prepared extends RuntimeReadInput {
   readonly plan: ReconcilePlan;
 }
-function finish(
+interface Context {
+  readonly command: RuntimeCommand;
+  readonly start: string;
+  readonly reads: RuntimeReadPorts;
+  readonly prepared: Prepared;
+}
+type Values = Pick<RuntimeResult, 'status' | 'changed' | 'actions' | 'diagnostics'>;
+// deno-fmt-ignore
+function values(status: Values['status'], changed: boolean, actions: Values['actions'] = [], diagnostics: Values['diagnostics'] = []): Values {
+  return { status, changed, actions, diagnostics };
+}
+
+function finish(context: Context, values: Values, checkpointId?: string): RuntimeResult {
+  const { command, start, reads, prepared } = context;
+  // deno-fmt-ignore
+  return buildRuntimeResult(command, start, reads.clock.now(), prepared.desired, prepared.observed, values, checkpointId);
+}
+
+async function prepare(
   command: RuntimeCommand,
-  start: string,
-  ports: RuntimeReadPorts,
-  prepared: Prepared,
-  values: Pick<RuntimeResult, 'status' | 'changed' | 'actions' | 'diagnostics'>,
-  checkpointId?: string,
-): RuntimeResult {
-  return buildRuntimeResult(
-    command,
-    start,
-    ports.clock.now(),
-    prepared.desired,
-    prepared.observed,
-    values,
-    checkpointId,
-  );
+  reads: RuntimeReadPorts,
+): Promise<Prepared | RuntimeReadFailure> {
+  const input = await readRuntimeInput(command, reads);
+  return 'failure' in input ? input : { ...input, plan: planReconciliation({ command, ...input }) };
 }
-async function prepare(command: RuntimeCommand, ports: RuntimeReadPorts): Promise<Prepared> {
-  const base = await ports.inspector.observeRuntime();
-  const persisted = await ports.persistedStateReader.readPersistedState();
-  const ids = new Set(persisted?.checkpointIds ?? []);
-  if (command.kind === 'rollback') ids.add(command.checkpointId);
-  const checkpoints = await Promise.all(
-    [...ids].map((id) => ports.checkpointReader.readCheckpoint(id)),
-  );
-  const observed = {
-    ...base,
-    configuredDesiredState: persisted?.desired ?? base.configuredDesiredState,
-    checkpoints: checkpoints.flatMap((entry) =>
-      entry
-        ? [{ checkpointId: entry.checkpointId, commandId: entry.commandId, status: entry.status }]
-        : []
-    ),
-  };
-  const desired = command.kind === 'configure'
-    ? await ports.desiredStateSource.loadDesiredState(command.desiredState)
-    : persisted?.desired ?? null;
-  return { desired, observed, plan: planReconciliation({ command, desired, observed }) };
-}
-function stateFailure(command: Command, start: string, end: string): RuntimeResult {
-  return buildRuntimeResult(command, start, end, null, null, {
-    status: 'failed',
-    changed: false,
-    actions: [],
-    diagnostics: [
-      diagnostic(
-        command.kind === 'configure' ? 'invalid_state_file' : 'state_corrupt',
-        command.kind === 'configure' ? 'input' : 'state',
-        'runtime state could not be read or parsed',
-      ),
-    ],
-  });
-}
+
 /** Observes and plans a command without accepting mutation ports. */
 export async function runRuntimeCommand(
   command: RuntimeCommand,
-  ports: RuntimeReadPorts,
+  reads: RuntimeReadPorts,
 ): Promise<RuntimeResult> {
-  const start = ports.clock.now();
-  try {
-    const prepared = await prepare(command, ports);
-    const diagnostics = [...prepared.plan.diagnostics];
-    if (command.kind === 'doctor' || command.kind === 'status') {
-      diagnostics.push(
-        ...foundationDiagnostics(
-          prepared.observed,
-          command.kind === 'status' ? command.agent : undefined,
-        ),
-      );
-    }
-    if (command.mode === 'apply' && prepared.plan.status !== 'blocked') {
-      diagnostics.push(
-        diagnostic(
-          'capability_unsupported',
-          'capability',
-          'apply requires explicit mutation ports',
-        ),
-      );
-    }
-    const blocked = prepared.plan.status === 'blocked' || command.mode === 'apply';
-    return finish(command, start, ports, prepared, {
-      status: blocked ? 'blocked' : diagnostics.length ? 'degraded' : prepared.plan.status,
-      changed: false,
-      actions: prepared.plan.actions.map((action) => actionResult(action, 'pending')),
-      diagnostics,
-    }, command.kind === 'rollback' ? command.checkpointId : undefined);
-  } catch {
-    return stateFailure(command, start, ports.clock.now());
+  const start = reads.clock.now();
+  const prepared = await prepare(command, reads);
+  if ('failure' in prepared) {
+    // deno-fmt-ignore
+    return buildReadFailureResult(command, start, reads.clock.now(), prepared.observed, prepared.failure);
   }
+  const diagnostics = command.kind === 'doctor' || command.kind === 'status'
+    ? foundationDiagnostics(
+      prepared.observed,
+      command.kind === 'status' ? command.agent : undefined,
+    )
+    : [];
+  if (command.mode === 'apply' && prepared.plan.status !== 'blocked') {
+    diagnostics.push(
+      runtimeDiagnostic(
+        'capability_unsupported',
+        'capability',
+        'apply requires explicit mutation ports',
+      ),
+    );
+  }
+  // deno-fmt-ignore
+  return buildPlanResult(command, start, reads.clock.now(), prepared.desired, prepared.observed, prepared.plan, diagnostics);
 }
-async function writeCheckpoint(
-  ports: RuntimeMutationPorts,
-  checkpoint: RuntimeCheckpointState,
-  status: RuntimeCheckpointState['status'],
-): Promise<RuntimeDiagnostic | null> {
+
+// deno-fmt-ignore
+async function writeCheckpoint(writes: RuntimeMutationPorts, checkpoint: RuntimeCheckpointState, status: RuntimeCheckpointState['status']): Promise<RuntimeDiagnostic | null> {
   try {
-    await ports.checkpointWriter.writeCheckpoint({ ...checkpoint, status });
+    await writes.checkpointWriter.writeCheckpoint({ ...checkpoint, status });
     return null;
   } catch {
-    return diagnostic('state_write_failed', 'execution', 'checkpoint write failed');
+    return runtimeDiagnostic('state_write_failed', 'execution', 'checkpoint write failed');
   }
 }
-async function compensate(
-  actions: readonly RuntimeAction[],
-  ports: RuntimeMutationPorts,
-  outcomes: RuntimeActionResult[],
-): Promise<RuntimeDiagnostic[]> {
+
+// deno-fmt-ignore
+async function writeState(writes: RuntimeMutationPorts, state: PersistedRuntimeState | null): Promise<RuntimeDiagnostic | null> {
+  try {
+    await writes.desiredStateWriter.writeDesiredState(state);
+    return null;
+  } catch {
+    return runtimeDiagnostic('state_write_failed', 'execution', 'controller state write failed');
+  }
+}
+
+// deno-fmt-ignore
+async function compensate(resources: readonly OwnedResourceState[], writes: RuntimeMutationPorts, outcomes: RuntimeActionResult[]): Promise<RuntimeDiagnostic[]> {
   const failures: RuntimeDiagnostic[] = [];
-  for (const action of [...actions].reverse()) {
+  for (const resource of [...resources].reverse()) {
     let failure: RuntimeDiagnostic | null;
     try {
-      failure = await ports.actionCompensator.compensateAction(action);
+      failure = await writes.actionCompensator.compensateAction(resource.action, resource);
     } catch {
-      failure = diagnostic('compensation_failed', 'rollback', 'action compensation failed');
+      failure = runtimeDiagnostic('compensation_failed', 'rollback', 'action compensation failed');
     }
-    const index = outcomes.findIndex((entry) => entry.id === action.id);
+    const index = outcomes.findIndex((entry) => entry.id === resource.action.id);
     if (failure) failures.push(failure);
-    else if (index >= 0) outcomes[index] = actionResult(action, 'compensated');
+    if (index >= 0) {
+      outcomes[index] = projectAction(resource.action, failure ? 'failed' : 'compensated');
+    }
   }
   return failures;
 }
+
 async function applyRollback(
-  command: Extract<RuntimeCommand, { kind: 'rollback' }>,
-  prepared: Prepared,
-  reads: RuntimeReadPorts,
+  context: Context & { readonly command: Extract<RuntimeCommand, { kind: 'rollback' }> },
   writes: RuntimeMutationPorts,
-  start: string,
 ): Promise<RuntimeResult> {
-  const checkpoint = await reads.checkpointReader.readCheckpoint(command.checkpointId);
+  const { command, prepared, reads } = context;
+  let checkpoint: RuntimeCheckpointState | null;
+  try {
+    checkpoint = await reads.checkpointReader.readCheckpoint(command.checkpointId);
+  } catch {
+    const failure = runtimeDiagnostic(
+      'invalid_checkpoint',
+      'state',
+      'runtime checkpoint is invalid',
+    );
+    // deno-fmt-ignore
+    return finish(context, values('failed', false, [], [failure]), command.checkpointId);
+  }
   if (!checkpoint || checkpoint.status !== 'applied') {
     const repeated = checkpoint?.status === 'rolled_back';
-    return finish(command, start, reads, prepared, {
-      status: repeated ? 'no_change' : 'blocked',
-      changed: false,
-      actions: [],
-      diagnostics: repeated
-        ? []
-        : [diagnostic('rollback_refused', 'rollback', 'checkpoint is incomplete or not applied')],
-    }, command.checkpointId);
+    const failures = repeated ? [] : [runtimeDiagnostic(
+      'rollback_refused',
+      'rollback',
+      'checkpoint is incomplete or not applied',
+    )];
+    // deno-fmt-ignore
+    return finish(context, values(repeated ? 'no_change' : 'blocked', false, [], failures), command.checkpointId);
   }
-  const actions = checkpointRollbackActions(checkpoint);
-  if (!actions || actions.length !== checkpoint.actionIds.length) {
-    return finish(command, start, reads, prepared, {
-      status: 'blocked',
-      changed: false,
-      actions: [],
-      diagnostics: [
-        diagnostic(
-          'rollback_refused',
-          'rollback',
-          'checkpoint ownership or reversibility is invalid',
-        ),
-      ],
-    }, command.checkpointId);
+  const conflict = await checkpointOwnershipDiagnostic(checkpoint, reads.ownedResourceReader);
+  if (conflict) {
+    // deno-fmt-ignore
+    return finish(context, values('blocked', false, [], [conflict]), command.checkpointId);
   }
-  const outcomes = actions.map((action) => actionResult(action, 'succeeded'));
-  const failures = await compensate(actions, writes, outcomes);
-  const status = failures.length ? 'partial' : 'rolled_back';
-  const writeFailure = await writeCheckpoint(writes, checkpoint, status);
+  const outcomes = checkpoint.resources.map((entry) => projectAction(entry.action, 'succeeded'));
+  const failures = await compensate(checkpoint.resources, writes, outcomes);
+  const stateFailure = await writeState(writes, checkpoint.previousControllerState);
+  if (stateFailure) failures.push(stateFailure);
+  const writeFailure = await writeCheckpoint(
+    writes,
+    checkpoint,
+    failures.length ? 'partial' : 'rolled_back',
+  );
   if (writeFailure) failures.push(writeFailure);
-  return finish(command, start, reads, prepared, {
-    status: failures.length
-      ? (status === 'partial' ? 'partially_rolled_back' : 'failed')
-      : 'rolled_back',
-    changed: true,
-    actions: outcomes,
-    diagnostics: failures,
-  }, command.checkpointId);
+  const status = failures.length ? 'partially_rolled_back' : 'rolled_back';
+  // deno-fmt-ignore
+  return finish(context, values(status, true, outcomes, failures), command.checkpointId);
 }
+
+async function observeBefore(
+  actions: ReconcilePlan['actions'],
+  reads: RuntimeReadPorts,
+): Promise<Map<string, string | null> | null> {
+  const before = new Map<string, string | null>();
+  try {
+    for (const action of actions) {
+      const id = action.resourceIds[0];
+      before.set(id, await reads.ownedResourceReader.readOwnedResourceFingerprint(id));
+    }
+    return before;
+  } catch {
+    return null;
+  }
+}
+
 /** Applies one planned command only when explicit mutation ports are supplied. */
 export async function applyRuntimeCommand(
   command: RuntimeCommand,
@@ -210,88 +180,116 @@ export async function applyRuntimeCommand(
 ): Promise<RuntimeResult> {
   const start = reads.clock.now();
   if (command.mode !== 'apply') return await runRuntimeCommand(command, reads);
-  let prepared: Prepared;
-  try {
-    prepared = await prepare(command, reads);
-    if (prepared.plan.status === 'blocked') return await runRuntimeCommand(command, reads);
-    if (command.kind === 'rollback') {
-      return await applyRollback(command, prepared, reads, writes, start);
-    }
-  } catch {
-    return stateFailure(command, start, reads.clock.now());
+  const prepared = await prepare(command, reads);
+  if ('failure' in prepared) {
+    // deno-fmt-ignore
+    return buildReadFailureResult(command, start, reads.clock.now(), prepared.observed, prepared.failure);
+  }
+  if (prepared.plan.status === 'blocked') {
+    // deno-fmt-ignore
+    return buildPlanResult(command, start, reads.clock.now(), prepared.desired, prepared.observed, prepared.plan);
+  }
+  const context = { command, start, reads, prepared };
+  if (command.kind === 'rollback') {
+    return await applyRollback({ ...context, command }, writes);
   }
   const actions = prepared.plan.actions;
   if (!actions.length) {
-    return finish(command, start, reads, prepared, {
-      status: 'no_change',
-      changed: false,
-      actions: [],
-      diagnostics: [],
-    });
+    return finish(context, values('no_change', false));
   }
-  if (
-    actions.some((action) =>
-      !action.reversible || action.resourceIds.length !== 1 || action.id.length > 256 ||
-      action.resourceIds[0].length > 256
-    )
-  ) {
-    return finish(command, start, reads, prepared, {
-      status: 'blocked',
-      changed: false,
-      actions: actions.map((action) => actionResult(action, 'pending')),
-      diagnostics: [
-        diagnostic('rollback_refused', 'rollback', 'apply plan contains an irreversible action'),
-      ],
-    });
+  if (!prepared.desired) {
+    const pending = actions.map((entry) => projectAction(entry, 'pending'));
+    const failure = runtimeDiagnostic(
+      'state_missing',
+      'state',
+      'apply requires configured desired state',
+    );
+    // deno-fmt-ignore
+    return finish(context, values('blocked', false, pending, [failure]));
   }
-  const checkpoint = createRuntimeCheckpoint(command.commandId, reads.clock.now(), actions);
-  const outcomes = actions.map((action) => actionResult(action, 'pending'));
+  const before = await observeBefore(actions, reads);
+  if (!before) {
+    const failure = runtimeDiagnostic(
+      'probe_failed',
+      'execution',
+      'owned resource observation failed',
+    );
+    // deno-fmt-ignore
+    return finish(context, values('failed', false, [], [failure]));
+  }
+  const checkpoint = await createRuntimeCheckpoint(
+    command,
+    reads.clock.now(),
+    actions,
+    prepared.persisted,
+    prepared.desired,
+    prepared.observed,
+    before,
+  );
+  if (!checkpoint) {
+    const pending = actions.map((entry) => projectAction(entry, 'pending'));
+    const failure = runtimeDiagnostic(
+      'rollback_refused',
+      'rollback',
+      'apply lacks exact reversible metadata',
+    );
+    // deno-fmt-ignore
+    return finish(context, values('blocked', false, pending, [failure]));
+  }
+  const outcomes = actions.map((action) => projectAction(action, 'pending'));
   const initialFailure = await writeCheckpoint(writes, checkpoint, 'prepared');
   if (initialFailure) {
-    return finish(command, start, reads, prepared, {
-      status: 'failed',
-      changed: false,
-      actions: outcomes,
-      diagnostics: [initialFailure],
-    }, checkpoint.checkpointId);
+    // deno-fmt-ignore
+    return finish(context, values('failed', false, outcomes, [initialFailure]), checkpoint.checkpointId);
   }
-  const completed: RuntimeAction[] = [];
+  const completed: OwnedResourceState[] = [];
   let primary: RuntimeDiagnostic | null = null;
-  for (const [index, action] of actions.entries()) {
+  for (const [index, resource] of checkpoint.resources.entries()) {
     try {
-      primary = await writes.actionExecutor.executeAction(action);
+      primary = await writes.actionExecutor.executeAction(resource.action);
     } catch {
-      primary = diagnostic('action_failed', 'execution', 'runtime action failed');
+      primary = runtimeDiagnostic('action_failed', 'execution', 'runtime action failed');
     }
-    outcomes[index] = actionResult(action, primary ? 'failed' : 'succeeded');
+    outcomes[index] = projectAction(resource.action, primary ? 'failed' : 'succeeded');
     if (primary) break;
-    completed.push(action);
+    completed.push(resource);
+  }
+  let stateWritten = false;
+  if (!primary) {
+    const next: PersistedRuntimeState = {
+      schemaVersion: RUNTIME_SCHEMA_VERSION,
+      stateId: prepared.persisted?.stateId ?? `controller-${prepared.desired.stateId}`,
+      desired: prepared.desired,
+      checkpointIds: [
+        ...new Set([
+          ...(prepared.persisted?.checkpointIds ?? []),
+          checkpoint.checkpointId,
+        ]),
+      ],
+      lastAppliedCommandId: command.commandId,
+    };
+    primary = await writeState(writes, next);
+    stateWritten = !primary;
   }
   if (!primary) {
-    const appliedFailure = await writeCheckpoint(writes, checkpoint, 'applied');
-    if (!appliedFailure) {
-      return finish(command, start, reads, prepared, {
-        status: 'succeeded',
-        changed: true,
-        actions: outcomes,
-        diagnostics: [],
-      }, checkpoint.checkpointId);
+    primary = await writeCheckpoint(writes, checkpoint, 'applied');
+    if (!primary) {
+      // deno-fmt-ignore
+      return finish(context, values('succeeded', true, outcomes), checkpoint.checkpointId);
     }
-    primary = appliedFailure;
   }
-  const compensationFailures = await compensate(completed, writes, outcomes);
-  const failures = [primary, ...compensationFailures];
-  const partial = compensationFailures.length > 0;
+  const failures = await compensate(completed, writes, outcomes);
+  if (stateWritten) {
+    const restoreFailure = await writeState(writes, checkpoint.previousControllerState);
+    if (restoreFailure) failures.push(restoreFailure);
+  }
   const finalFailure = await writeCheckpoint(
     writes,
     checkpoint,
-    partial ? 'partial' : 'rolled_back',
+    failures.length ? 'partial' : 'rolled_back',
   );
   if (finalFailure) failures.push(finalFailure);
-  return finish(command, start, reads, prepared, {
-    status: partial ? 'partially_rolled_back' : 'failed',
-    changed: partial,
-    actions: outcomes,
-    diagnostics: failures,
-  }, checkpoint.checkpointId);
+  const status = failures.length ? 'partially_rolled_back' : 'failed';
+  // deno-fmt-ignore
+  return finish(context, values(status, failures.length > 0, outcomes, [primary, ...failures]), checkpoint.checkpointId);
 }

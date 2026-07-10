@@ -1,7 +1,14 @@
 /** Canonical JSON, human, and exit-code rendering for runtime results. */
 
 import { RUNTIME_SCHEMA_VERSION } from './contract.ts';
-import type { RuntimeCommand, RuntimeResult } from './contract.ts';
+import type {
+  ReconcilePlan,
+  RuntimeAction,
+  RuntimeActionResult,
+  RuntimeCommand,
+  RuntimeDiagnostic,
+  RuntimeResult,
+} from './contract.ts';
 import type { DesiredRuntimeState, ObservedRuntimeState } from './state.ts';
 import {
   summarizeDesiredState,
@@ -16,6 +23,56 @@ export const CANONICAL_EXIT_CODES = {
   blocked: 4,
   failure: 5,
 } as const;
+
+export function runtimeDiagnostic(
+  code: RuntimeDiagnostic['code'],
+  category: RuntimeDiagnostic['category'],
+  message: string,
+): RuntimeDiagnostic {
+  return { code, category, retryable: false, message };
+}
+
+export function buildReadFailureResult(
+  command: RuntimeCommand,
+  startedAt: string,
+  completedAt: string,
+  observed: ObservedRuntimeState | null,
+  failure: RuntimeDiagnostic,
+): RuntimeResult {
+  return buildRuntimeResult(command, startedAt, completedAt, null, observed, {
+    status: failure.category === 'capability' ? 'blocked' : 'failed',
+    changed: false,
+    actions: [],
+    diagnostics: [failure],
+  }, command.kind === 'rollback' ? command.checkpointId : undefined);
+}
+
+export function projectAction(
+  action: RuntimeAction,
+  status: RuntimeActionResult['status'],
+): RuntimeActionResult {
+  const { id, kind, adapter, effect, reversible } = action;
+  return { id, kind, adapter, effect, reversible, status };
+}
+
+export function buildPlanResult(
+  command: RuntimeCommand,
+  startedAt: string,
+  completedAt: string,
+  desired: DesiredRuntimeState | null,
+  observed: ObservedRuntimeState,
+  plan: ReconcilePlan,
+  extra: readonly RuntimeDiagnostic[] = [],
+): RuntimeResult {
+  const diagnostics = [...plan.diagnostics, ...extra];
+  const blocked = plan.status === 'blocked' || command.mode === 'apply';
+  return buildRuntimeResult(command, startedAt, completedAt, desired, observed, {
+    status: blocked ? 'blocked' : diagnostics.length ? 'degraded' : plan.status,
+    changed: false,
+    actions: plan.actions.map((action) => projectAction(action, 'pending')),
+    diagnostics,
+  }, command.kind === 'rollback' ? command.checkpointId : undefined);
+}
 
 /** Builds the bounded canonical result shared by read, plan, and apply paths. */
 export function buildRuntimeResult(

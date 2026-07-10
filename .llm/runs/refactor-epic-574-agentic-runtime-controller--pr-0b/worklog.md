@@ -795,3 +795,46 @@ or #577-#582 implementation changed.
 Issue #576 and draft PR #585 remain open at `status:impl` with the correct `Closes #576`,
 `Part of #574`, milestone, and tooling/type/wave taxonomy. Both record coordinator sign-off `83f2f5d` and the
 same locked S4 scope. S5 and #577-#582 remain explicitly unstarted.
+
+## S4 Tier-A Remediation
+
+### Corrections
+
+- Successful owned apply now persists the value-free `PersistedRuntimeState` through the dedicated
+  writer, including the loaded configure desired state, retained checkpoint ID, and
+  `lastAppliedCommandId`. A controller-state write failure compensates completed actions; an
+  applied-checkpoint write failure also restores the exact prior controller state.
+- Checkpoints now retain each complete data-only action, canonical SHA-256 before/after identity,
+  typed previous component/directory/desired-state/route metadata, and the previous controller
+  state. Compensation receives that typed metadata directly; no action-ID fingerprint or
+  string-split reconstruction remains. Rollback observes each owned resource and refuses
+  `ownership_conflict` before mutation when its applied fingerprint has drifted.
+- Fallback and restore commands carry the caller's current route. Configure and both route actions
+  have exact rollback coverage; fresh `LocalRuntimeStateAdapter` reads prove configure persistence
+  and restoration across adapter instances.
+- A blocked apply renders its already-prepared plan. The #580 repair case observes once, produces
+  only the owning `capability_deferred` diagnostic, and executes no mutation.
+- Pre-plan reads use narrow stage catches: inspector `probe_failed`, persisted state
+  `state_corrupt`, rollback checkpoint `invalid_checkpoint`, and desired input
+  `invalid_state_file`. Adapter action diagnostics remain unchanged. Failed automatic and explicit
+  compensation action results are `failed`, with `partially_rolled_back` retained.
+- The canonical S2 CLI composition adds the new local owned-resource reader in one line and remains
+  `149/150` LOC. No compatibility/S5 wrapper behavior changed.
+
+### Replacement Evidence
+
+| Gate | Exact command / outcome |
+| --- | --- |
+| Focused S4 | `deno test --allow-read --allow-write --unstable-kv .llm/tools/agentic/runtime/{contract_test.ts,planner_test.ts,controller_test.ts,adapters_test.ts}` — exit 0, `36 passed`, then focused controller replacement run `8 passed` |
+| Complete runtime set | `rtk proxy deno test --no-lock --allow-read --allow-write --allow-env .llm/tools/agentic/agentic-lib_test.ts .llm/tools/agentic/wsl-foundation_test.ts .llm/tools/agentic/runtime/{contract_test.ts,planner_test.ts,controller_test.ts,adapters_test.ts}` — exit 0, `105 passed | 0 failed` |
+| Scoped check | First run honestly failed on the newly required CLI `ownedResourceReader` composition; after wiring that existing local adapter, the identical wrapper selected 37 files and exited 0 with zero findings |
+| Scoped lint / owned format | Locked wrappers selected 25 / 18 files; both exit 0 with zero findings |
+| Live doctor repeat | Deno 2.9 in-memory harness ran `deno task agentic:runtime doctor --json` twice: exits `2/2`, statuses `degraded/degraded`, schema `1.0`, 16 components, timing-normalized semantic equality plus controller-state/source tree equality all `true` |
+| Dry-run/tree and round trips | Full nine-command plan matrix reports `changed:false`, zero mutation events; controller test harness exit 0 with controller-state and source-tree hashes equal. Fresh local adapter configure apply/read/rollback/read succeeds |
+| Rollback/failure/safety | Exact configure/fallback/restore inverses, external-change refusal, automatic/explicit failed compensation, stage classification, and adapter-diagnostic tests all pass; secret-field scan finds only the finite diagnostic vocabulary and its negative test |
+| Budgets | CLI `149/150`; contract `220/220`; ports `218/220`; state `300/300`; controller `295/300`; output `185/220`; local adapter `349/350`; focused tests all <=450 |
+| Patch/lock/scope | `git diff --check` passes; baseline/current `deno.lock` blob is `8694862878e6f9a430bf56497a4d5bf3f8eb1f3d`; no dependency, cache, provider login/send, global default, S5 wrapper, or #577-#582 implementation |
+
+No new plan or architecture drift was introduced. The existing broad-format S5-wrapper drift is
+unchanged. Next action is coordinator Tier-A re-review; this worker does not self-certify or start
+S5.

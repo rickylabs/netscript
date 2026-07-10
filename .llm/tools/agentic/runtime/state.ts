@@ -1,17 +1,15 @@
-/** Value-free desired, observed, persisted, and checkpoint state contracts. */
 import type {
-  AdapterKind,
   AgentKind,
   CapabilityState,
   InstallableFoundationComponentId,
   ObservedFoundationComponentId,
   RouteIdentity,
   RuntimeAction,
+  RuntimeCommand,
   SessionIdentity,
   StateDirectoryId,
 } from './contract.ts';
 import {
-  ACTION_KINDS,
   AGENT_KINDS,
   INSTALLABLE_FOUNDATION_COMPONENTS,
   RUNTIME_SCHEMA_VERSION,
@@ -30,7 +28,6 @@ function safeSummaryClone<T>(value: T): T {
   return JSON.parse(JSON.stringify(value, (key, entry) =>
     !key || SUMMARY_KEYS.has(key) || /^\d+$/.test(key) ? entry : undefined));
 }
-
 export const COMPONENT_STATUSES = [
   'ready',
   'missing',
@@ -189,21 +186,25 @@ export function unavailableObservedSummary(stateId = 'unavailable'): ObservedSta
 export interface OwnedResourceState {
   readonly resourceId: string;
   readonly kind: OwnedResourceKind;
-  readonly fingerprint: string;
-  readonly previousFingerprint: string | null;
-  readonly previousLinkTarget?: string | null;
+  readonly action: RuntimeAction;
+  readonly beforeFingerprint: string | null;
+  readonly afterFingerprint: string;
+  readonly previous: OwnedResourcePrevious;
 }
-
+export type OwnedResourcePrevious =
+  | Readonly<{ kind: 'component'; version: string | null }>
+  | Readonly<{ kind: 'state-directory'; present: boolean }>
+  | Readonly<{ kind: 'desired-state' }>
+  | Readonly<{ kind: 'route'; route: RouteIdentity }>;
 export interface RuntimeCheckpointState {
   readonly schemaVersion: typeof RUNTIME_SCHEMA_VERSION;
   readonly checkpointId: string;
   readonly commandId: string;
   readonly createdAt: string;
   readonly status: CheckpointStatus;
-  readonly actionIds: readonly string[];
   readonly resources: readonly OwnedResourceState[];
+  readonly previousControllerState: PersistedRuntimeState | null;
 }
-
 export interface PersistedRuntimeState {
   readonly schemaVersion: typeof RUNTIME_SCHEMA_VERSION;
   readonly stateId: string;
@@ -211,74 +212,6 @@ export interface PersistedRuntimeState {
   readonly checkpointIds: readonly string[];
   readonly lastAppliedCommandId: string | null;
 }
-
-/** Builds the value-free checkpoint persisted before the first owned action. */
-export function createRuntimeCheckpoint(
-  commandId: string,
-  createdAt: string,
-  actions: readonly RuntimeAction[],
-): RuntimeCheckpointState {
-  return {
-    schemaVersion: RUNTIME_SCHEMA_VERSION,
-    checkpointId: `${commandId}-checkpoint`,
-    commandId,
-    createdAt,
-    status: 'prepared',
-    actionIds: actions.map((action) => action.id),
-    resources: actions.flatMap((action) =>
-      action.resourceIds.map((resourceId) => ({
-        resourceId,
-        kind: resourceId.startsWith('state-directory:') ? 'directory' : 'configuration',
-        fingerprint: action.id,
-        previousFingerprint: null,
-      }))
-    ),
-  };
-}
-
-function rollbackAdapter(resourceId: string): AdapterKind {
-  if (resourceId.startsWith('component:') || resourceId.startsWith('state-directory:')) {
-    return 'foundation';
-  }
-  if (resourceId.startsWith('session:codex:')) return 'codex';
-  if (resourceId.startsWith('session:claude:')) return 'claude';
-  if (resourceId.startsWith('session:gemini:')) return 'gemini';
-  return 'state';
-}
-
-/** Reconstructs only controller-owned reversible action identities from a strict checkpoint. */
-export function checkpointRollbackActions(
-  checkpoint: RuntimeCheckpointState,
-): RuntimeAction[] | null {
-  if (!checkpoint.actionIds.length || checkpoint.actionIds.length !== checkpoint.resources.length) {
-    return null;
-  }
-  if (
-    new Set(checkpoint.actionIds).size !== checkpoint.actionIds.length ||
-    new Set(checkpoint.resources.map((entry) => entry.resourceId)).size !==
-      checkpoint.resources.length
-  ) return null;
-  const actions: RuntimeAction[] = [];
-  for (const [index, id] of checkpoint.actionIds.entries()) {
-    const kind = ACTION_KINDS.find((entry) => entry === id.split(':').at(-1));
-    const resourceId = checkpoint.resources[index].resourceId;
-    if (
-      !kind || kind === 'blocked_intent' ||
-      !/^(component|state-directory|state|session):[^/\\]+$/.test(resourceId) ||
-      checkpoint.resources[index].fingerprint !== id
-    ) return null;
-    actions.push({
-      id,
-      kind,
-      adapter: rollbackAdapter(resourceId),
-      effect: 'write',
-      reversible: true,
-      resourceIds: [resourceId],
-    });
-  }
-  return actions;
-}
-
 function canonicalize(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(canonicalize);
   if (value !== null && typeof value === 'object') {
@@ -289,7 +222,75 @@ function canonicalize(value: unknown): unknown {
   }
   return value;
 }
-
+/** Produces a bounded SHA-256 fingerprint of canonical value-free runtime metadata. */
+export async function fingerprintRuntimeValue(value: unknown): Promise<string> {
+  const bytes = new TextEncoder().encode(JSON.stringify(canonicalize(value)));
+  const digest = new Uint8Array(await crypto.subtle.digest('SHA-256', bytes));
+  return `sha256:${[...digest].map((entry) => entry.toString(16).padStart(2, '0')).join('')}`;
+}
+function previousFor(
+  action: RuntimeAction,
+  command: RuntimeCommand,
+  observed: ObservedRuntimeState,
+): OwnedResourcePrevious | null {
+  if (action.component) {
+    const version = observed.components.find((entry) =>
+      entry.component === action.component
+    )?.version ?? null;
+    return { kind: 'component', version };
+  }
+  if (action.stateDirectory) {
+    const present = observed.stateDirectories.includes(action.stateDirectory);
+    return { kind: 'state-directory', present };
+  }
+  if (action.kind === 'persist_desired_state') return { kind: 'desired-state' };
+  if (action.kind === 'switch_route' || action.kind === 'restore_route') {
+    if (command.kind !== 'fallback' && command.kind !== 'restore') return null;
+    return { kind: 'route', route: command.currentRoute };
+  }
+  return null;
+}
+function targetFor(action: RuntimeAction, desired: DesiredRuntimeState | null): unknown {
+  if (action.component) return { component: action.component, version: action.targetVersion };
+  if (action.stateDirectory) return { stateDirectory: action.stateDirectory, present: true };
+  if (action.kind === 'persist_desired_state') return desired;
+  return action.route ?? { kind: action.kind, resourceIds: action.resourceIds };
+}
+/** Creates an invertible checkpoint from typed action targets and observed owned metadata. */
+export async function createRuntimeCheckpoint(
+  command: RuntimeCommand,
+  createdAt: string,
+  actions: readonly RuntimeAction[],
+  persisted: PersistedRuntimeState | null,
+  desired: DesiredRuntimeState | null,
+  observed: ObservedRuntimeState,
+  beforeFingerprints: ReadonlyMap<string, string | null>,
+): Promise<RuntimeCheckpointState | null> {
+  const resources: OwnedResourceState[] = [];
+  for (const action of actions) {
+    if (!action.reversible || action.resourceIds.length !== 1) return null;
+    const previous = previousFor(action, command, observed);
+    if (!previous) return null;
+    const resourceId = action.resourceIds[0];
+    resources.push({
+      resourceId,
+      kind: resourceId.startsWith('state-directory:') ? 'directory' : 'configuration',
+      action,
+      beforeFingerprint: beforeFingerprints.get(resourceId) ?? null,
+      afterFingerprint: await fingerprintRuntimeValue(targetFor(action, desired)),
+      previous,
+    });
+  }
+  return {
+    schemaVersion: RUNTIME_SCHEMA_VERSION,
+    checkpointId: `${command.commandId}-checkpoint`,
+    commandId: command.commandId,
+    createdAt,
+    status: 'prepared',
+    resources,
+    previousControllerState: persisted,
+  };
+}
 /** Compares desired state deterministically without relying on object key insertion order. */
 export function desiredStatesEqual(
   left: DesiredRuntimeState | null,
