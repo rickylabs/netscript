@@ -1,278 +1,297 @@
-/** Read-only observation and planning controller for runtime schema 1.0. */
-
 import {
-  RUNTIME_SCHEMA_VERSION,
+  type ReconcilePlan,
+  type RuntimeAction,
   type RuntimeActionResult,
   type RuntimeCommand,
   type RuntimeDiagnostic,
   type RuntimeResult,
 } from './contract.ts';
+import { foundationDiagnostics } from './adapters/foundation-adapter.ts';
+import { buildRuntimeResult } from './output.ts';
 import { planReconciliation } from './planner.ts';
-import type { RuntimeReadPorts } from './ports.ts';
-import type {
-  DesiredRuntimeState,
-  DesiredStateSummary,
-  ObservedRuntimeState,
-  ObservedStateSummary,
-} from './state.ts';
+import type { RuntimeMutationPorts, RuntimeReadPorts } from './ports.ts';
 import {
-  summarizeDesiredState,
-  summarizeObservedState,
-  unavailableObservedSummary,
+  checkpointRollbackActions,
+  createRuntimeCheckpoint,
+  type DesiredRuntimeState,
+  type ObservedRuntimeState,
+  type RuntimeCheckpointState,
 } from './state.ts';
-
-function diagnostic(
-  code: RuntimeDiagnostic['code'],
-  category: RuntimeDiagnostic['category'],
-  message: string,
-  ownerIssue?: RuntimeDiagnostic['ownerIssue'],
-): RuntimeDiagnostic {
-  return { code, category, retryable: false, message, ownerIssue };
+type Code = RuntimeDiagnostic['code'];
+type Category = RuntimeDiagnostic['category'];
+type Command = RuntimeCommand;
+function diagnostic(code: Code, category: Category, message: string): RuntimeDiagnostic {
+  return { code, category, retryable: false, message };
 }
-
-function componentDiagnostic(
-  component: ObservedRuntimeState['components'][number],
-): RuntimeDiagnostic | null {
-  const message = `foundation component ${component.component} is ${component.status}`;
-  switch (component.status) {
-    case 'ready':
-      return null;
-    case 'missing':
-      return diagnostic('component_missing', 'compatibility', message);
-    case 'outdated':
-      return diagnostic('component_outdated', 'compatibility', message);
-    case 'version_skew':
-      return diagnostic('version_skew', 'compatibility', message);
-    case 'auth_required':
-      return diagnostic('auth_required', 'authentication', message);
-    case 'auth_conflict':
-      return diagnostic('auth_conflict', 'authentication', message);
-    case 'unavailable':
-      return diagnostic('probe_failed', 'execution', message);
-  }
+function actionResult(action: RuntimeAction, status: RuntimeActionResult['status']) {
+  const { id, kind, adapter, effect, reversible } = action;
+  return { id, kind, adapter, effect, reversible, status };
 }
-
-function observationDiagnostics(
-  observed: ObservedRuntimeState,
-  agent?: StatusCommand['agent'],
-): RuntimeDiagnostic[] {
-  const diagnostics = observed.components.flatMap((component) => {
-    const entry = componentDiagnostic(component);
-    return entry ? [entry] : [];
-  });
-  for (const auth of observed.auth) {
-    if (agent && auth.agent !== agent) continue;
-    if (auth.status === 'ready') continue;
-    diagnostics.push(
-      diagnostic(
-        auth.status === 'auth_required' ? 'auth_required' : 'auth_conflict',
-        'authentication',
-        `${auth.agent} authentication is ${auth.status}`,
-      ),
-    );
-  }
-  if (!observed.nativeExt4) {
-    diagnostics.push(
-      diagnostic('non_native_worktree', 'policy', 'runtime execution is not on native ext4'),
-    );
-  }
-  if ((!agent || agent === 'codex') && observed.capabilities.codex === 'blocked') {
-    diagnostics.push(
-      diagnostic('mobile_disconnected', 'transport', 'Codex mobile control is unavailable'),
-    );
-  }
-  return diagnostics;
+interface Prepared {
+  readonly desired: DesiredRuntimeState | null;
+  readonly observed: ObservedRuntimeState;
+  readonly plan: ReconcilePlan;
 }
-
-function actionResults(
-  actions: ReturnType<typeof planReconciliation>['actions'],
-): RuntimeActionResult[] {
-  return actions.map((action) => ({
-    id: action.id,
-    kind: action.kind,
-    adapter: action.adapter,
-    effect: action.effect,
-    reversible: action.reversible,
-    status: 'pending',
-  }));
-}
-
-function duration(startedAt: string, completedAt: string): number {
-  const value = Date.parse(completedAt) - Date.parse(startedAt);
-  return Number.isFinite(value) && value >= 0 ? value : 0;
-}
-
-function routeFor(command: RuntimeCommand) {
-  if ('route' in command) return command.route;
-  return command.kind === 'fallback' ? command.targetRoute : undefined;
-}
-
-type StatusCommand = Extract<RuntimeCommand, { kind: 'status' }>;
-
-function unmatchedFilters(
-  filter: StatusCommand,
-  desired: DesiredStateSummary | null,
-  observed: ObservedStateSummary,
-): RuntimeDiagnostic[] {
-  const agents = new Set([
-    ...Object.keys(desired?.agents ?? {}),
-    ...observed.auth.map((entry) => entry.agent),
-    ...Object.keys(observed.capabilities),
-    ...observed.sessions.map((entry) => entry.identity.agent),
-  ]);
-  const worktrees = new Set([
-    ...(desired?.worktrees.map((entry) => entry.path) ?? []),
-    ...Object.values(desired?.agents ?? {}).flatMap((entry) =>
-      entry.route ? [entry.route.worktree] : []
-    ),
-    ...observed.worktrees.map((entry) => entry.path),
-    ...observed.sessions.map((entry) => entry.identity.worktree),
-  ]);
-  const sessions = new Set([
-    ...(desired?.sessions.map((entry) => entry.sessionId) ?? []),
-    ...observed.sessions.map((entry) => entry.identity.sessionId),
-  ]);
-  const missing = (filter.agent && !agents.has(filter.agent)) ||
-    (filter.worktree && !worktrees.has(filter.worktree)) ||
-    (filter.sessionId && !sessions.has(filter.sessionId));
-  return missing
-    ? [diagnostic('missing_identity', 'input', 'status filter matched no runtime identity')]
-    : [];
-}
-
-function failureResult(
+function finish(
   command: RuntimeCommand,
-  startedAt: string,
-  completedAt: string,
-  failure: RuntimeDiagnostic,
-  observed: ObservedRuntimeState | null = null,
+  start: string,
+  ports: RuntimeReadPorts,
+  prepared: Prepared,
+  values: Pick<RuntimeResult, 'status' | 'changed' | 'actions' | 'diagnostics'>,
+  checkpointId?: string,
 ): RuntimeResult {
-  return {
-    schemaVersion: RUNTIME_SCHEMA_VERSION,
-    commandId: command.commandId,
-    command: command.kind,
-    mode: command.mode,
-    status: failure.category === 'capability' ? 'blocked' : 'failed',
-    changed: false,
-    desiredSummary: null,
-    observedSummary: observed ? summarizeObservedState(observed) : unavailableObservedSummary(),
-    actions: [],
-    diagnostics: [failure],
-    route: routeFor(command),
-    ...('checkpointId' in command ? { checkpointId: command.checkpointId } : {}),
-    timing: { startedAt, completedAt, durationMs: duration(startedAt, completedAt) },
-  };
-}
-
-async function desiredFor(
-  command: RuntimeCommand,
-  ports: RuntimeReadPorts,
-  persisted: Awaited<ReturnType<RuntimeReadPorts['persistedStateReader']['readPersistedState']>>,
-): Promise<DesiredRuntimeState | null> {
-  if (command.kind === 'configure') {
-    return await ports.desiredStateSource.loadDesiredState(command.desiredState);
-  }
-  return persisted?.desired ?? null;
-}
-
-async function mergeControllerState(
-  observed: ObservedRuntimeState,
-  ports: RuntimeReadPorts,
-  persisted: Awaited<ReturnType<RuntimeReadPorts['persistedStateReader']['readPersistedState']>>,
-): Promise<ObservedRuntimeState> {
-  const checkpoints = await Promise.all(
-    (persisted?.checkpointIds ?? []).map((id) => ports.checkpointReader.readCheckpoint(id)),
+  return buildRuntimeResult(
+    command,
+    start,
+    ports.clock.now(),
+    prepared.desired,
+    prepared.observed,
+    values,
+    checkpointId,
   );
-  return {
-    ...observed,
-    configuredDesiredState: persisted?.desired ?? observed.configuredDesiredState,
-    checkpoints: checkpoints.flatMap((checkpoint) =>
-      checkpoint
-        ? [{
-          checkpointId: checkpoint.checkpointId,
-          commandId: checkpoint.commandId,
-          status: checkpoint.status,
-        }]
+}
+async function prepare(command: RuntimeCommand, ports: RuntimeReadPorts): Promise<Prepared> {
+  const base = await ports.inspector.observeRuntime();
+  const persisted = await ports.persistedStateReader.readPersistedState();
+  const ids = new Set(persisted?.checkpointIds ?? []);
+  if (command.kind === 'rollback') ids.add(command.checkpointId);
+  const checkpoints = await Promise.all(
+    [...ids].map((id) => ports.checkpointReader.readCheckpoint(id)),
+  );
+  const observed = {
+    ...base,
+    configuredDesiredState: persisted?.desired ?? base.configuredDesiredState,
+    checkpoints: checkpoints.flatMap((entry) =>
+      entry
+        ? [{ checkpointId: entry.checkpointId, commandId: entry.commandId, status: entry.status }]
         : []
     ),
   };
+  const desired = command.kind === 'configure'
+    ? await ports.desiredStateSource.loadDesiredState(command.desiredState)
+    : persisted?.desired ?? null;
+  return { desired, observed, plan: planReconciliation({ command, desired, observed }) };
 }
-
+function stateFailure(command: Command, start: string, end: string): RuntimeResult {
+  return buildRuntimeResult(command, start, end, null, null, {
+    status: 'failed',
+    changed: false,
+    actions: [],
+    diagnostics: [
+      diagnostic(
+        command.kind === 'configure' ? 'invalid_state_file' : 'state_corrupt',
+        command.kind === 'configure' ? 'input' : 'state',
+        'runtime state could not be read or parsed',
+      ),
+    ],
+  });
+}
 /** Observes and plans a command without accepting mutation ports. */
 export async function runRuntimeCommand(
   command: RuntimeCommand,
   ports: RuntimeReadPorts,
 ): Promise<RuntimeResult> {
-  const startedAt = ports.clock.now();
-  let baseObserved: ObservedRuntimeState;
+  const start = ports.clock.now();
   try {
-    baseObserved = await ports.inspector.observeRuntime();
-  } catch {
-    const completedAt = ports.clock.now();
-    return failureResult(
-      command,
-      startedAt,
-      completedAt,
-      diagnostic('probe_failed', 'execution', 'runtime observation failed'),
-    );
-  }
-  try {
-    const persisted = await ports.persistedStateReader.readPersistedState();
-    const observed = await mergeControllerState(baseObserved, ports, persisted);
-    const desired = await desiredFor(command, ports, persisted);
-    const plan = planReconciliation({ command, desired, observed });
-    const diagnostics = [...plan.diagnostics];
-    const filter = command.kind === 'status' ? command : undefined;
-    const desiredSummary = summarizeDesiredState(desired, filter);
-    const observedSummary = summarizeObservedState(observed, filter);
-    if (filter) diagnostics.push(...unmatchedFilters(filter, desiredSummary, observedSummary));
+    const prepared = await prepare(command, ports);
+    const diagnostics = [...prepared.plan.diagnostics];
     if (command.kind === 'doctor' || command.kind === 'status') {
-      diagnostics.push(...observationDiagnostics(observed, filter?.agent));
+      diagnostics.push(
+        ...foundationDiagnostics(
+          prepared.observed,
+          command.kind === 'status' ? command.agent : undefined,
+        ),
+      );
     }
-    if (command.mode === 'apply' && plan.status !== 'blocked') {
-      const completedAt = ports.clock.now();
-      return failureResult(
-        command,
-        startedAt,
-        completedAt,
+    if (command.mode === 'apply' && prepared.plan.status !== 'blocked') {
+      diagnostics.push(
         diagnostic(
           'capability_unsupported',
           'capability',
-          'apply execution is not available in the read-only S2 controller',
+          'apply requires explicit mutation ports',
         ),
-        observed,
       );
     }
-    const completedAt = ports.clock.now();
-    return {
-      schemaVersion: RUNTIME_SCHEMA_VERSION,
-      commandId: command.commandId,
-      command: command.kind,
-      mode: command.mode,
-      status: plan.status === 'blocked' || diagnostics.some((entry) =>
-          entry.code === 'missing_identity'
-        )
-        ? 'blocked'
-        : diagnostics.length > 0
-        ? 'degraded'
-        : plan.status,
+    const blocked = prepared.plan.status === 'blocked' || command.mode === 'apply';
+    return finish(command, start, ports, prepared, {
+      status: blocked ? 'blocked' : diagnostics.length ? 'degraded' : prepared.plan.status,
       changed: false,
-      desiredSummary,
-      observedSummary,
-      actions: actionResults(plan.actions),
+      actions: prepared.plan.actions.map((action) => actionResult(action, 'pending')),
       diagnostics,
-      route: routeFor(command),
-      ...('checkpointId' in command ? { checkpointId: command.checkpointId } : {}),
-      timing: { startedAt, completedAt, durationMs: duration(startedAt, completedAt) },
-    };
+    }, command.kind === 'rollback' ? command.checkpointId : undefined);
   } catch {
-    const completedAt = ports.clock.now();
-    return failureResult(
-      command,
-      startedAt,
-      completedAt,
-      diagnostic('invalid_state_file', 'input', 'runtime state could not be read or parsed'),
-      baseObserved,
-    );
+    return stateFailure(command, start, ports.clock.now());
   }
+}
+async function writeCheckpoint(
+  ports: RuntimeMutationPorts,
+  checkpoint: RuntimeCheckpointState,
+  status: RuntimeCheckpointState['status'],
+): Promise<RuntimeDiagnostic | null> {
+  try {
+    await ports.checkpointWriter.writeCheckpoint({ ...checkpoint, status });
+    return null;
+  } catch {
+    return diagnostic('state_write_failed', 'execution', 'checkpoint write failed');
+  }
+}
+async function compensate(
+  actions: readonly RuntimeAction[],
+  ports: RuntimeMutationPorts,
+  outcomes: RuntimeActionResult[],
+): Promise<RuntimeDiagnostic[]> {
+  const failures: RuntimeDiagnostic[] = [];
+  for (const action of [...actions].reverse()) {
+    let failure: RuntimeDiagnostic | null;
+    try {
+      failure = await ports.actionCompensator.compensateAction(action);
+    } catch {
+      failure = diagnostic('compensation_failed', 'rollback', 'action compensation failed');
+    }
+    const index = outcomes.findIndex((entry) => entry.id === action.id);
+    if (failure) failures.push(failure);
+    else if (index >= 0) outcomes[index] = actionResult(action, 'compensated');
+  }
+  return failures;
+}
+async function applyRollback(
+  command: Extract<RuntimeCommand, { kind: 'rollback' }>,
+  prepared: Prepared,
+  reads: RuntimeReadPorts,
+  writes: RuntimeMutationPorts,
+  start: string,
+): Promise<RuntimeResult> {
+  const checkpoint = await reads.checkpointReader.readCheckpoint(command.checkpointId);
+  if (!checkpoint || checkpoint.status !== 'applied') {
+    const repeated = checkpoint?.status === 'rolled_back';
+    return finish(command, start, reads, prepared, {
+      status: repeated ? 'no_change' : 'blocked',
+      changed: false,
+      actions: [],
+      diagnostics: repeated
+        ? []
+        : [diagnostic('rollback_refused', 'rollback', 'checkpoint is incomplete or not applied')],
+    }, command.checkpointId);
+  }
+  const actions = checkpointRollbackActions(checkpoint);
+  if (!actions || actions.length !== checkpoint.actionIds.length) {
+    return finish(command, start, reads, prepared, {
+      status: 'blocked',
+      changed: false,
+      actions: [],
+      diagnostics: [
+        diagnostic(
+          'rollback_refused',
+          'rollback',
+          'checkpoint ownership or reversibility is invalid',
+        ),
+      ],
+    }, command.checkpointId);
+  }
+  const outcomes = actions.map((action) => actionResult(action, 'succeeded'));
+  const failures = await compensate(actions, writes, outcomes);
+  const status = failures.length ? 'partial' : 'rolled_back';
+  const writeFailure = await writeCheckpoint(writes, checkpoint, status);
+  if (writeFailure) failures.push(writeFailure);
+  return finish(command, start, reads, prepared, {
+    status: failures.length
+      ? (status === 'partial' ? 'partially_rolled_back' : 'failed')
+      : 'rolled_back',
+    changed: true,
+    actions: outcomes,
+    diagnostics: failures,
+  }, command.checkpointId);
+}
+/** Applies one planned command only when explicit mutation ports are supplied. */
+export async function applyRuntimeCommand(
+  command: RuntimeCommand,
+  reads: RuntimeReadPorts,
+  writes: RuntimeMutationPorts,
+): Promise<RuntimeResult> {
+  const start = reads.clock.now();
+  if (command.mode !== 'apply') return await runRuntimeCommand(command, reads);
+  let prepared: Prepared;
+  try {
+    prepared = await prepare(command, reads);
+    if (prepared.plan.status === 'blocked') return await runRuntimeCommand(command, reads);
+    if (command.kind === 'rollback') {
+      return await applyRollback(command, prepared, reads, writes, start);
+    }
+  } catch {
+    return stateFailure(command, start, reads.clock.now());
+  }
+  const actions = prepared.plan.actions;
+  if (!actions.length) {
+    return finish(command, start, reads, prepared, {
+      status: 'no_change',
+      changed: false,
+      actions: [],
+      diagnostics: [],
+    });
+  }
+  if (
+    actions.some((action) =>
+      !action.reversible || action.resourceIds.length !== 1 || action.id.length > 256 ||
+      action.resourceIds[0].length > 256
+    )
+  ) {
+    return finish(command, start, reads, prepared, {
+      status: 'blocked',
+      changed: false,
+      actions: actions.map((action) => actionResult(action, 'pending')),
+      diagnostics: [
+        diagnostic('rollback_refused', 'rollback', 'apply plan contains an irreversible action'),
+      ],
+    });
+  }
+  const checkpoint = createRuntimeCheckpoint(command.commandId, reads.clock.now(), actions);
+  const outcomes = actions.map((action) => actionResult(action, 'pending'));
+  const initialFailure = await writeCheckpoint(writes, checkpoint, 'prepared');
+  if (initialFailure) {
+    return finish(command, start, reads, prepared, {
+      status: 'failed',
+      changed: false,
+      actions: outcomes,
+      diagnostics: [initialFailure],
+    }, checkpoint.checkpointId);
+  }
+  const completed: RuntimeAction[] = [];
+  let primary: RuntimeDiagnostic | null = null;
+  for (const [index, action] of actions.entries()) {
+    try {
+      primary = await writes.actionExecutor.executeAction(action);
+    } catch {
+      primary = diagnostic('action_failed', 'execution', 'runtime action failed');
+    }
+    outcomes[index] = actionResult(action, primary ? 'failed' : 'succeeded');
+    if (primary) break;
+    completed.push(action);
+  }
+  if (!primary) {
+    const appliedFailure = await writeCheckpoint(writes, checkpoint, 'applied');
+    if (!appliedFailure) {
+      return finish(command, start, reads, prepared, {
+        status: 'succeeded',
+        changed: true,
+        actions: outcomes,
+        diagnostics: [],
+      }, checkpoint.checkpointId);
+    }
+    primary = appliedFailure;
+  }
+  const compensationFailures = await compensate(completed, writes, outcomes);
+  const failures = [primary, ...compensationFailures];
+  const partial = compensationFailures.length > 0;
+  const finalFailure = await writeCheckpoint(
+    writes,
+    checkpoint,
+    partial ? 'partial' : 'rolled_back',
+  );
+  if (finalFailure) failures.push(finalFailure);
+  return finish(command, start, reads, prepared, {
+    status: partial ? 'partially_rolled_back' : 'failed',
+    changed: partial,
+    actions: outcomes,
+    diagnostics: failures,
+  }, checkpoint.checkpointId);
 }

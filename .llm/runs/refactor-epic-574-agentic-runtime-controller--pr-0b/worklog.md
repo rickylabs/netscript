@@ -6,9 +6,9 @@ Research and Design are complete. Tier-A coordinator Plan-Gate review returned `
 owner-authorized external-evaluator waiver. Tier-A requested three S1 contract remediations, then
 substantively approved them at supervisor sign-off `ac71896` over implementation head `197bc51`.
 S2 implementation received four Tier-A changes requested. The remediation and replacement evidence
-were substantively approved in supervisor sign-off `6756a54`. S3 implementation and automated
-gates are complete on the same daemon-managed thread; coordinator review is pending and S4 has not
-started.
+were substantively approved in supervisor sign-off `6756a54`. S3 remediation was approved in
+supervisor sign-off `83f2f5d`. S4 implementation and automated gates are complete on the same
+daemon-managed thread; coordinator Tier-A review is pending and S5 has not started.
 
 ## Design
 
@@ -713,3 +713,85 @@ matched the reviewed commit, the worktree was clean, and `deno.lock` was unchang
 
 S3 is complete. S4 may begin only from this approved head in the same native WSL worktree and sole
 thread. S5 wrappers and child-issue capabilities remain out of scope.
+
+## S4 — Transactional Apply, Compensation, and Rollback
+
+### Scope Delivered
+
+- `controller.ts` retains `runRuntimeCommand(command, readPorts)` as the mutation-inaccessible
+  inspect/plan path and adds `applyRuntimeCommand(command, readPorts, mutationPorts)` as the sole
+  explicit effect boundary.
+- Before the first action, apply writes a value-free `prepared` checkpoint containing ordered action
+  IDs, controller-owned logical resource IDs, bounded fingerprints, and null previous fingerprints.
+  A checkpoint refusal returns `state_write_failed`, executes no action, and reports `changed: false`.
+- Actions execute in deterministic plan order and stop at the first failure. Every completed action
+  compensates in exact reverse order. Full compensation returns `failed`/`changed: false`; a failed
+  compensation returns `partially_rolled_back`/`changed: true`.
+- Final checkpoint transitions are `applied`, `rolled_back`, or `partial`. An applied-status write
+  failure cannot return success: completed actions compensate and the retained checkpoint metadata
+  is updated to the honest rollback state when possible.
+- Explicit rollback reads the named strict checkpoint, accepts only `applied`, one-resource-per-action
+  controller-owned reversible identities with bounded IDs/fingerprints, compensates them in reverse,
+  and writes `rolled_back`/`partial`. Unknown, incomplete, duplicate, unowned, path-shaped, or
+  irreversible identities refuse before mutation; repeated completed rollback is `no_change`.
+- Explicit fallback keeps the caller route exactly; restore exposes the configured desired route.
+  Both remain idle/new-boundary only through the pure planner. No route selection, quota detection,
+  global default, or transition history was added. Live Codex repair remains #580-blocked.
+- Result projection stays bounded and strips unknown summary keys. Foundation/auth/mobile failure
+  projection remains normalized in the foundation adapter; raw process/provider output never enters
+  the controller result.
+
+The implementation stayed in four existing planned runtime implementation files plus the focused
+controller test. No CLI edge, compatibility wrapper, dependency, new runtime file/spine/registry,
+or #577-#582 implementation changed.
+
+### S4 Evidence
+
+| Gate | Exact command / proof | Raw outcome |
+| --- | --- | --- |
+| Focused S4 integration | `rtk proxy deno test --no-lock --allow-read --allow-write .llm/tools/agentic/runtime/controller_test.ts` | exit 0; `10 passed | 0 failed` |
+| Complete agentic/runtime unit set | `rtk proxy deno test --no-lock --allow-read --allow-write --allow-env .llm/tools/agentic/agentic-lib_test.ts .llm/tools/agentic/wsl-foundation_test.ts .llm/tools/agentic/runtime/contract_test.ts .llm/tools/agentic/runtime/planner_test.ts .llm/tools/agentic/runtime/controller_test.ts .llm/tools/agentic/runtime/adapters_test.ts` | exit 0; `107 passed | 0 failed` |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .llm/tools/agentic --ext ts --pretty` | exit 0; 37 files, 1 batch, 0 findings |
+| Scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root .llm/tools/agentic --ext ts --include '(^|/)(runtime/|agentic-runtime|wsl-foundation|launch-codex-slice|codex-resume|codex-status|claude-remote-smoke)' --pretty` | exit 0; 25 files, 0 findings |
+| Owned format | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root .llm/tools/agentic --ext ts --include '(^|/)(runtime/|agentic-runtime)' --pretty` | exit 0; 18 files, 0 findings |
+| Live doctor repeat | Deno 2.9 harness invoked `deno task agentic:runtime doctor --json` twice and removed only timing | exits `2/2`; statuses `degraded/degraded`; schema `1.0`; 16 components; semantic equality, controller-runtime tree equality, and agentic source-tree equality all `true` |
+| Dry-run matrix | Focused plan test covers bootstrap/configure/launch/resume/smoke/fallback/restore/repair/rollback with mutation event log and SHA-256 temp-tree hash | all `changed: false`; mutation events `0`; before/after tree hashes equal |
+| Transaction matrix | Focused apply tests cover success, prepared-checkpoint refusal, first/later failure, applied-status failure, full reverse compensation, and partial compensation | expected finite statuses/changed values; checkpoint always precedes action; final states `applied`/`rolled_back`/`partial` |
+| Rollback matrix | Focused explicit rollback tests cover reverse order, repeated rollback, incomplete/unowned/path-shaped/irreversible refusal | full rollback `rolled_back`; repeat `no_change`; refusals `blocked`; mutation calls zero on refusal |
+| Route/failure matrix | Existing planner/adapter route matrix plus focused fallback/restore and structured failure table | caller routes exact; active boundary blocks; auth/conflict/missing/outdated/skew/route/worktree/ownership/session/quota/rate/provider/timeout/process/action categories remain finite |
+| Sentinel/state hygiene | Strict desired parser plus JSON/human projection; mode-0600 local state/checkpoint writes | synthetic sentinel absent from results/renderers/implementation/run artifacts; owned files mode `0600` |
+| File budgets | `wc -l` over runtime surfaces/tests/adapters | PASS: controller `297/300`; state `299/300`; output `128/220`; foundation adapter `196/350`; controller test `450/450`; all touched TypeScript <500 |
+| Lock/scope/patch | baseline/current lock blobs, raw status/name-only, effect/no-rival/global-policy/sentinel scans, `git diff --check` | `deno.lock` unchanged at `8694862878e6f9a430bf56497a4d5bf3f8eb1f3d`; four runtime implementation files + focused controller test + mandatory artifacts only; patch clean |
+
+### Manual Archetype 6 Evidence
+
+- F-1/F-10 and F-CLI-1/2: every touched file satisfies the locked layer/test caps; exact counts are
+  recorded above.
+- F-2: only Web Platform/Deno primitives and existing ports are used; no helper dependency or
+  platform-wrapper reinvention was added.
+- F-3/F-CLI-28: controller receives read/mutation dependencies explicitly; state/output remain pure;
+  the only direct process effect is the existing `Deno.Command` in the foundation adapter.
+- F-5/F-9: exported S4 functions have one-line JSDoc; no permission or package/public surface was
+  widened.
+- F-11/F-12/F-15/F-16/F-17/F-18 and F-CLI-19/21/25: no new folder, barrel, inheritance, registry,
+  upstream re-export, generic folder, or naming violation.
+- F-CLI-5/15/16/23/26: no presentation-side Deno effect, `Deno.exit`, long embedded template, or new
+  console call. F-CLI package spine/composition/asset gates remain N/A for the approved functional
+  internal-tool deviation recorded in Design.
+
+### S4 Safety and Handoff
+
+- Worktree/thread remain native ext4
+  `/home/codex/repos/netscript-epic-574-pr0b-controller` and sole managed thread
+  `019f4b72-2ea4-7050-917e-6d6918371265`; no rival sender was launched.
+- No provider login, real session send, global-default mutation, dependency/lock/cache change, root
+  format, S5 wrapper edit, or child-issue implementation occurred.
+- Existing broad-format S5-wrapper drift remains unchanged. No new plan/architecture drift or debt.
+- Next action: coordinator substantive Tier-A S4 review. This worker does not self-certify and does
+  not start S5.
+
+## Reconcile Note — S4
+
+Issue #576 and draft PR #585 remain open at `status:impl` with the correct `Closes #576`,
+`Part of #574`, milestone, and tooling/type/wave taxonomy. Both record coordinator sign-off `83f2f5d` and the
+same locked S4 scope. S5 and #577-#582 remain explicitly unstarted.

@@ -3,7 +3,12 @@
 import type { RuntimeDoctorReport } from '../../wsl-foundation-lib.ts';
 import { FOUNDATION_SCHEMA_VERSION } from '../../wsl-foundation-lib.ts';
 import { RUNTIME_SCHEMA_VERSION } from '../contract.ts';
-import type { AgentKind, CapabilityState, StateDirectoryId } from '../contract.ts';
+import type {
+  AgentKind,
+  CapabilityState,
+  RuntimeDiagnostic,
+  StateDirectoryId,
+} from '../contract.ts';
 import type { RuntimeInspectorPort } from '../ports.ts';
 import type { ObservedRuntimeState } from '../state.ts';
 import { translateMobileControl } from './mobile-control-adapter.ts';
@@ -21,6 +26,58 @@ const STATE_DIRECTORY_COMPONENTS: Readonly<
 
 export interface FoundationReportReader {
   readReport(): Promise<RuntimeDoctorReport>;
+}
+
+/** Maps normalized foundation/auth/mobile observations to finite diagnostics. */
+export function foundationDiagnostics(
+  observed: ObservedRuntimeState,
+  agent?: AgentKind,
+): RuntimeDiagnostic[] {
+  const diagnostics: RuntimeDiagnostic[] = [];
+  const mapping = {
+    missing: ['component_missing', 'compatibility'],
+    outdated: ['component_outdated', 'compatibility'],
+    version_skew: ['version_skew', 'compatibility'],
+    auth_required: ['auth_required', 'authentication'],
+    auth_conflict: ['auth_conflict', 'authentication'],
+    unavailable: ['probe_failed', 'execution'],
+  } as const;
+  for (const entry of observed.components) {
+    if (entry.status === 'ready') continue;
+    const [code, category] = mapping[entry.status];
+    diagnostics.push({
+      code,
+      category,
+      retryable: false,
+      message: `foundation component ${entry.component} is ${entry.status}`,
+    });
+  }
+  for (const auth of observed.auth) {
+    if ((agent && auth.agent !== agent) || auth.status === 'ready') continue;
+    diagnostics.push({
+      code: auth.status,
+      category: 'authentication',
+      retryable: false,
+      message: `${auth.agent} authentication is ${auth.status}`,
+    });
+  }
+  if (!observed.nativeExt4) {
+    diagnostics.push({
+      code: 'non_native_worktree',
+      category: 'policy',
+      retryable: false,
+      message: 'runtime execution is not on native ext4',
+    });
+  }
+  if ((!agent || agent === 'codex') && observed.capabilities.codex === 'blocked') {
+    diagnostics.push({
+      code: 'mobile_disconnected',
+      category: 'transport',
+      retryable: false,
+      message: 'Codex mobile control is unavailable',
+    });
+  }
+  return diagnostics;
 }
 
 /** Returns the fixed value-free argv used to invoke the existing PR 0A doctor. */

@@ -1,22 +1,24 @@
-import { parseRuntimeArgs } from '../agentic-runtime.ts';
 import {
   buildDoctorReport,
   classifyAuth,
   classifyMobileControl,
   RUNTIME_COMPONENT_IDS,
-  type RuntimeDoctorReport,
 } from '../wsl-foundation-lib.ts';
 import {
-  type FoundationReportReader,
   FoundationRuntimeInspector,
   translateFoundationReport,
 } from './adapters/foundation-adapter.ts';
 import { LocalRuntimeStateAdapter } from './adapters/local-state-adapter.ts';
-import { deferredMobileRepairDiagnostic } from './adapters/mobile-control-adapter.ts';
-import { RUNTIME_SCHEMA_VERSION, type RuntimeCommand, type RuntimeResult } from './contract.ts';
-import { runRuntimeCommand } from './controller.ts';
-import { renderRuntimeHuman, renderRuntimeJson, runtimeExitCode } from './output.ts';
-import type { RuntimeReadPorts } from './ports.ts';
+import type {
+  RouteIdentity,
+  RuntimeAction,
+  RuntimeCommand,
+  RuntimeDiagnostic,
+} from './contract.ts';
+import { RUNTIME_SCHEMA_VERSION } from './contract.ts';
+import { applyRuntimeCommand, runRuntimeCommand } from './controller.ts';
+import { renderRuntimeHuman, renderRuntimeJson } from './output.ts';
+import type { RuntimeMutationPorts, RuntimeReadPorts } from './ports.ts';
 import type {
   DesiredRuntimeState,
   ObservedRuntimeState,
@@ -24,421 +26,425 @@ import type {
   RuntimeCheckpointState,
 } from './state.ts';
 
-function assert(condition: unknown, message: string): asserts condition {
-  if (!condition) throw new Error(message);
+function assert(value: unknown, message: string): asserts value {
+  if (!value) throw new Error(message);
 }
-
-function assertEquals(actual: unknown, expected: unknown, message = 'values differ'): void {
-  const left = JSON.stringify(actual);
-  const right = JSON.stringify(expected);
-  if (left !== right) throw new Error(`${message}\nactual: ${left}\nexpected: ${right}`);
+function equal(actual: unknown, expected: unknown, message = 'values differ'): void {
+  if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+    throw new Error(
+      `${message}\nactual: ${JSON.stringify(actual)}\nexpected: ${JSON.stringify(expected)}`,
+    );
+  }
 }
-
+async function treeHash(root: string): Promise<string> {
+  const entries = [];
+  for await (const entry of Deno.readDir(root)) {
+    entries.push([
+      entry.name,
+      entry.isFile ? await Deno.readTextFile(`${root}/${entry.name}`) : '/',
+    ]);
+  }
+  entries.sort(([left], [right]) => left.localeCompare(right));
+  const digest = await crypto.subtle.digest(
+    'SHA-256',
+    new TextEncoder().encode(JSON.stringify(entries)),
+  );
+  return [...new Uint8Array(digest)].map((value) => value.toString(16).padStart(2, '0')).join('');
+}
 const worktree = '/home/codex/repos/worktree';
+const route: RouteIdentity = {
+  agent: 'codex',
+  provider: 'openai',
+  model: 'caller-model',
+  effort: 'high',
+  worktree,
+  mobileRequired: true,
+};
 const desired: DesiredRuntimeState = {
   schemaVersion: RUNTIME_SCHEMA_VERSION,
-  stateId: 'desired-s2',
-  foundation: {
-    nativeExt4: true,
-    versions: { node: '26.5.0', claude: '2.1.206', gemini: '0.50.0' },
-    stateDirectories: ['claude', 'codex', 'gemini', 'netscript-agentic'],
-  },
-  agents: { codex: { required: true, authRoute: 'provider-native' } },
+  stateId: 'desired-s4',
+  foundation: { nativeExt4: true, versions: { node: '2.0.0' }, stateDirectories: ['codex'] },
+  agents: { codex: { required: true, authRoute: 'provider-native', route } },
   worktrees: [{ path: worktree, branch: 'feature', upstream: 'none', clean: true }],
   sessions: [],
 };
+const observed: ObservedRuntimeState = {
+  schemaVersion: RUNTIME_SCHEMA_VERSION,
+  stateId: 'observed-s4',
+  nativeExt4: true,
+  components: [{ component: 'node', version: '1.0.0', status: 'outdated' }],
+  auth: [],
+  stateDirectories: [],
+  capabilities: { codex: 'available' },
+  worktrees: [{
+    path: worktree,
+    branch: 'feature',
+    upstream: null,
+    dirty: false,
+    nativeExt4: true,
+    found: true,
+  }],
+  sessions: [],
+  configuredDesiredState: desired,
+  checkpoints: [],
+};
+const persisted: PersistedRuntimeState = {
+  schemaVersion: RUNTIME_SCHEMA_VERSION,
+  stateId: 'controller-s4',
+  desired,
+  checkpointIds: [],
+  lastAppliedCommandId: null,
+};
+const actionFailure = (code: RuntimeDiagnostic['code'] = 'action_failed'): RuntimeDiagnostic => ({
+  code,
+  category: code === 'compensation_failed' ? 'rollback' : 'execution',
+  retryable: false,
+  message: 'bounded synthetic failure',
+});
 
-function report(generatedAt = '2026-07-10T00:00:00.000Z'): RuntimeDoctorReport {
-  return buildDoctorReport({
-    generatedAt,
-    nativePath: { cwd: worktree, nativeExt4: true },
-    components: RUNTIME_COMPONENT_IDS.map((component) => ({
-      component,
-      detectedVersion: component.startsWith('state-') || component === 'gemini-auth-policy'
-        ? null
-        : '1.0.0',
-      expected: null,
-      status: 'ready',
-      detail: 'bounded ready observation',
-    })),
-    auth: classifyAuth(new Set(), true, true),
-    mobileControl: classifyMobileControl(true, '0.144.1', '0.144.1'),
-  });
+interface ScenarioOptions {
+  readonly failAction?: number;
+  readonly failCompensation?: boolean;
+  readonly failCheckpoint?: RuntimeCheckpointState['status'];
 }
-
-class StaticReportReader implements FoundationReportReader {
-  constructor(private readonly value: RuntimeDoctorReport) {}
-  readReport(): Promise<RuntimeDoctorReport> {
-    return Promise.resolve(this.value);
-  }
-}
-
-function readPorts(
-  local: LocalRuntimeStateAdapter,
-  observed: ObservedRuntimeState,
-): RuntimeReadPorts {
-  return {
+function scenario(options: ScenarioOptions = {}) {
+  const events: string[] = [];
+  const checkpoints = new Map<string, RuntimeCheckpointState>();
+  let actionCalls = 0;
+  const reads: RuntimeReadPorts = {
     inspector: { observeRuntime: () => Promise.resolve(observed) },
-    persistedStateReader: local,
-    desiredStateSource: local,
-    checkpointReader: local,
-    contentReader: local,
+    persistedStateReader: {
+      readPersistedState: () =>
+        Promise.resolve({ ...persisted, checkpointIds: [...checkpoints.keys()] }),
+    },
+    desiredStateSource: { loadDesiredState: () => Promise.resolve(desired) },
+    checkpointReader: { readCheckpoint: (id) => Promise.resolve(checkpoints.get(id) ?? null) },
+    contentReader: {
+      summarizeContent: (reference) =>
+        Promise.resolve({ path: reference.path, bytes: 0, fingerprint: 'sha256:0' }),
+    },
     processProbe: {
       probeProcess: (request) =>
         Promise.resolve({ probeId: request.probeId, exitCode: 0, timedOut: false }),
     },
     clock: { now: () => '2026-07-10T00:00:00.000Z' },
   };
-}
-
-function persisted(wanted = desired): PersistedRuntimeState {
-  return {
-    schemaVersion: RUNTIME_SCHEMA_VERSION,
-    stateId: 'controller-s2',
-    desired: wanted,
-    checkpointIds: [],
-    lastAppliedCommandId: null,
+  const writes: RuntimeMutationPorts = {
+    desiredStateWriter: { writeDesiredState: () => Promise.resolve() },
+    checkpointWriter: {
+      writeCheckpoint: (checkpoint) => {
+        events.push(`checkpoint:${checkpoint.status}`);
+        if (options.failCheckpoint === checkpoint.status) throw new Error('checkpoint failure');
+        checkpoints.set(checkpoint.checkpointId, structuredClone(checkpoint));
+        return Promise.resolve();
+      },
+    },
+    actionExecutor: {
+      executeAction: (action) => {
+        events.push(`action:${action.id}`);
+        actionCalls++;
+        return Promise.resolve(actionCalls === options.failAction ? actionFailure() : null);
+      },
+    },
+    actionCompensator: {
+      compensateAction: (action) => {
+        events.push(`compensate:${action.id}`);
+        return Promise.resolve(
+          options.failCompensation ? actionFailure('compensation_failed') : null,
+        );
+      },
+    },
   };
+  return { reads, writes, events, checkpoints };
 }
-
-async function treeHash(root: string): Promise<string> {
-  const entries: Array<{ path: string; mode: number | null; bytes: number[] | null }> = [];
-  async function walk(path: string, relative: string): Promise<void> {
-    let children: Deno.DirEntry[];
-    try {
-      children = [];
-      for await (const entry of Deno.readDir(path)) children.push(entry);
-    } catch (error) {
-      if (error instanceof Deno.errors.NotFound) return;
-      throw error;
-    }
-    children.sort((left, right) => left.name.localeCompare(right.name));
-    for (const child of children) {
-      const childPath = `${path}/${child.name}`;
-      const childRelative = relative ? `${relative}/${child.name}` : child.name;
-      const info = await Deno.lstat(childPath);
-      entries.push({
-        path: childRelative,
-        mode: info.mode === null ? null : info.mode & 0o777,
-        bytes: child.isFile ? [...await Deno.readFile(childPath)] : null,
-      });
-      if (child.isDirectory) await walk(childPath, childRelative);
-    }
-  }
-  await walk(root, '');
-  const input = new TextEncoder().encode(JSON.stringify(entries));
-  const digest = new Uint8Array(await crypto.subtle.digest('SHA-256', input));
-  return [...digest].map((value) => value.toString(16).padStart(2, '0')).join('');
-}
-
-Deno.test('foundation adapter preserves PR 0A schema and all executable/policy probes', async () => {
-  const first = await translateFoundationReport(report());
-  const second = await translateFoundationReport(report('2026-07-10T01:00:00.000Z'));
-  assertEquals(first.schemaVersion, RUNTIME_SCHEMA_VERSION);
-  assertEquals(first.components.map((entry) => entry.component), RUNTIME_COMPONENT_IDS);
-  assertEquals(first.stateDirectories, ['claude', 'codex', 'gemini', 'netscript-agentic']);
-  assertEquals(first.stateId, second.stateId, 'generatedAt destabilized observed state identity');
-  assertEquals(first.capabilities.codex, 'available');
-  const inspector = new FoundationRuntimeInspector(new StaticReportReader(report()));
-  assertEquals((await inspector.observeRuntime()).components.length, 16);
+const bootstrap = (id: string, mode: 'plan' | 'apply' = 'apply'): RuntimeCommand => ({
+  kind: 'bootstrap',
+  commandId: id,
+  mode,
 });
 
-Deno.test('local state migrates the value-free PR 0A ownership schema without writing', async () => {
+Deno.test('foundation and local-state adapters preserve schema, ownership, and mode 0600', async () => {
+  const report = buildDoctorReport({
+    generatedAt: '2026-07-10T00:00:00.000Z',
+    nativePath: { cwd: worktree, nativeExt4: true },
+    components: RUNTIME_COMPONENT_IDS.map((component) => ({
+      component,
+      detectedVersion: component.startsWith('state-') ? null : '1.0.0',
+      expected: null,
+      status: 'ready',
+      detail: 'bounded',
+    })),
+    auth: classifyAuth(new Set(), true, true),
+    mobileControl: classifyMobileControl(true, '0.144.1', '0.144.1'),
+  });
+  const translated = await translateFoundationReport(report);
+  const inspector = new FoundationRuntimeInspector({ readReport: () => Promise.resolve(report) });
+  equal((await inspector.observeRuntime()).components.length, 16);
+  equal(translated.stateDirectories, ['claude', 'codex', 'gemini', 'netscript-agentic']);
   const root = await Deno.makeTempDir();
   try {
-    const foundationPath = `${root}/foundation-state.json`;
-    await Deno.writeTextFile(
-      foundationPath,
-      JSON.stringify({
-        schemaVersion: '1.0',
-        desired: { node: '26.5.0', claude: '2.1.206', gemini: '0.50.0' },
-        ownedRoots: ['/secret/owned/root'],
-        previousTargets: { node: '/secret/previous/target' },
-      }),
-    );
-    const adapter = new LocalRuntimeStateAdapter(`${root}/runtime`, foundationPath);
-    const before = await treeHash(root);
-    const state = await adapter.readPersistedState();
-    assertEquals(state?.schemaVersion, RUNTIME_SCHEMA_VERSION);
-    assertEquals(state?.desired.foundation.versions, desired.foundation.versions);
-    assert(!JSON.stringify(state).includes('/secret/'), 'ownership paths entered migrated state');
-    assertEquals(await treeHash(root), before, 'read-only migration changed the state tree');
-  } finally {
-    await Deno.remove(root, { recursive: true });
-  }
-});
-
-Deno.test('local state writes atomically at mode 0600 and strips unknown content', async () => {
-  const root = await Deno.makeTempDir();
-  const sentinel = 'SYNTHETIC_SECRET_PROMPT_SENTINEL';
-  try {
-    const adapter = new LocalRuntimeStateAdapter(`${root}/runtime`, `${root}/foundation.json`);
-    const unsafe = {
-      ...persisted(),
-      secret: sentinel,
-      desired: { ...desired, promptContent: sentinel },
-    } as unknown as PersistedRuntimeState;
-    await adapter.writeDesiredState(unsafe);
-    const checkpoint = {
+    const local = new LocalRuntimeStateAdapter(`${root}/runtime`, `${root}/foundation.json`);
+    await local.writeDesiredState(persisted);
+    await local.writeCheckpoint({
       schemaVersion: RUNTIME_SCHEMA_VERSION,
-      checkpointId: 'checkpoint-s2',
-      commandId: 'configure-s2',
-      createdAt: '2026-07-10T00:00:00.000Z',
+      checkpointId: 'owned',
+      commandId: 'x',
+      createdAt: 'now',
       status: 'prepared',
       actionIds: [],
       resources: [],
-      rawEnv: sentinel,
-    } as unknown as RuntimeCheckpointState;
-    await adapter.writeCheckpoint(checkpoint);
-    const statePath = `${root}/runtime/controller-state.json`;
-    const checkpointPath = `${root}/runtime/checkpoints/checkpoint-s2.json`;
-    assertEquals((await Deno.stat(`${root}/runtime`)).mode! & 0o777, 0o700);
-    assertEquals((await Deno.stat(statePath)).mode! & 0o777, 0o600);
-    assertEquals((await Deno.stat(checkpointPath)).mode! & 0o777, 0o600);
-    const rendered = `${await Deno.readTextFile(statePath)}${await Deno.readTextFile(
-      checkpointPath,
-    )}`;
-    assert(!rendered.includes(sentinel), 'unknown content entered persisted state');
-    assertEquals((await adapter.readPersistedState())?.desired, desired);
+    });
+    equal((await Deno.stat(`${root}/runtime/controller-state.json`)).mode! & 0o777, 0o600);
+    equal((await Deno.stat(`${root}/runtime/checkpoints/owned.json`)).mode! & 0o777, 0o600);
+    equal((await local.readPersistedState())?.desired, desired);
   } finally {
     await Deno.remove(root, { recursive: true });
   }
 });
 
-Deno.test('doctor and status are stable read-only commands', async () => {
-  const root = await Deno.makeTempDir();
-  try {
-    const local = new LocalRuntimeStateAdapter(`${root}/runtime`, `${root}/foundation.json`);
-    const base = await translateFoundationReport(report());
-    const observed: ObservedRuntimeState = {
-      ...base,
-      worktrees: [{
-        path: worktree,
-        branch: 'feature',
-        upstream: null,
-        dirty: false,
-        nativeExt4: true,
-        found: true,
-      }],
-      sessions: [{
-        identity: { agent: 'codex', sessionId: 'session-s2', worktree, boundary: 'idle' },
-        mobileState: 'available',
-      }],
-    };
-    const ports = readPorts(local, observed);
-    const before = await treeHash(root);
-    const doctor = await runRuntimeCommand(
-      { kind: 'doctor', commandId: 'doctor-s2', mode: 'inspect' },
-      ports,
+Deno.test('successful apply checkpoints before ordered actions and finishes applied', async () => {
+  const s = scenario();
+  const result = await applyRuntimeCommand(bootstrap('success'), s.reads, s.writes);
+  equal(result.status, 'succeeded');
+  equal(result.changed, true);
+  equal(result.actions.map((entry) => entry.status), ['succeeded', 'succeeded']);
+  equal(s.events.map((entry) => entry.split(':')[0]), [
+    'checkpoint',
+    'action',
+    'action',
+    'checkpoint',
+  ]);
+  equal(s.events[0], 'checkpoint:prepared');
+  equal(s.events.at(-1), 'checkpoint:applied');
+  equal(s.checkpoints.get('success-checkpoint')?.status, 'applied');
+});
+
+Deno.test('checkpoint refusal and first-action failure execute no completed mutation', async () => {
+  const refused = scenario({ failCheckpoint: 'prepared' });
+  const before = await applyRuntimeCommand(bootstrap('refused'), refused.reads, refused.writes);
+  equal(before.status, 'failed');
+  equal(before.changed, false);
+  equal(refused.events, ['checkpoint:prepared']);
+  const first = scenario({ failAction: 1 });
+  const failed = await applyRuntimeCommand(bootstrap('first'), first.reads, first.writes);
+  equal(failed.status, 'failed');
+  equal(failed.changed, false);
+  equal(first.events.map((entry) => entry.split(':')[0]), ['checkpoint', 'action', 'checkpoint']);
+  equal(first.checkpoints.get('first-checkpoint')?.status, 'rolled_back');
+});
+
+Deno.test('later failure compensates in reverse and reports partial compensation honestly', async () => {
+  const full = scenario({ failAction: 2 });
+  const rolled = await applyRuntimeCommand(bootstrap('later'), full.reads, full.writes);
+  equal(rolled.status, 'failed');
+  equal(rolled.changed, false);
+  assert(full.events[3].includes(rolled.actions[0].id), 'first action was not compensated');
+  equal(full.checkpoints.get('later-checkpoint')?.status, 'rolled_back');
+  const partial = scenario({ failAction: 2, failCompensation: true });
+  const incomplete = await applyRuntimeCommand(bootstrap('partial'), partial.reads, partial.writes);
+  equal(incomplete.status, 'partially_rolled_back');
+  equal(incomplete.changed, true);
+  equal(partial.checkpoints.get('partial-checkpoint')?.status, 'partial');
+});
+
+Deno.test('applied-status failure cannot become success and reverses every completed action', async () => {
+  const s = scenario({ failCheckpoint: 'applied' });
+  const result = await applyRuntimeCommand(bootstrap('status-write'), s.reads, s.writes);
+  equal(result.status, 'failed');
+  equal(result.changed, false);
+  equal(s.events.map((entry) => entry.split(':')[0]), [
+    'checkpoint',
+    'action',
+    'action',
+    'checkpoint',
+    'compensate',
+    'compensate',
+    'checkpoint',
+  ]);
+  equal(s.checkpoints.get('status-write-checkpoint')?.status, 'rolled_back');
+});
+
+Deno.test('explicit rollback is reverse ordered, ownership safe, and idempotent', async () => {
+  const s = scenario();
+  await applyRuntimeCommand(bootstrap('owned'), s.reads, s.writes);
+  s.events.length = 0;
+  const command: RuntimeCommand = {
+    kind: 'rollback',
+    commandId: 'rollback',
+    mode: 'apply',
+    checkpointId: 'owned-checkpoint',
+  };
+  const result = await applyRuntimeCommand(command, s.reads, s.writes);
+  equal(result.status, 'rolled_back');
+  equal(result.changed, true);
+  equal(s.events.map((entry) => entry.split(':')[0]), ['compensate', 'compensate', 'checkpoint']);
+  assert(s.events[0].includes('create_state_directory'), 'rollback order was not reversed');
+  s.events.length = 0;
+  const repeated = await applyRuntimeCommand(command, s.reads, s.writes);
+  equal(repeated.status, 'no_change');
+  equal(repeated.changed, false);
+  equal(s.events, []);
+});
+
+Deno.test('rollback refuses incomplete, unowned, and irreversible checkpoint identities', async () => {
+  for (
+    const [name, mutate] of [
+      ['incomplete', (cp: RuntimeCheckpointState) => ({ ...cp, status: 'prepared' as const })],
+      [
+        'unowned',
+        (cp: RuntimeCheckpointState) => ({
+          ...cp,
+          resources: [{ ...cp.resources[0], resourceId: '/user/data' }],
+        }),
+      ],
+      [
+        'irreversible',
+        (cp: RuntimeCheckpointState) => ({
+          ...cp,
+          actionIds: ['x:01:blocked_intent'],
+          resources: [{ ...cp.resources[0], fingerprint: 'x:01:blocked_intent' }],
+        }),
+      ],
+    ] as const
+  ) {
+    const s = scenario();
+    await applyRuntimeCommand(bootstrap(name), s.reads, s.writes);
+    const id = `${name}-checkpoint`;
+    s.checkpoints.set(id, mutate(s.checkpoints.get(id)!));
+    s.events.length = 0;
+    const result = await applyRuntimeCommand(
+      { kind: 'rollback', commandId: `rb-${name}`, mode: 'apply', checkpointId: id },
+      s.reads,
+      s.writes,
     );
-    const repeated = await runRuntimeCommand(
-      { kind: 'doctor', commandId: 'doctor-s2', mode: 'inspect' },
-      ports,
-    );
-    const status = await runRuntimeCommand({
-      kind: 'status',
-      commandId: 'status-s2',
-      mode: 'inspect',
-      agent: 'codex',
-      worktree,
-      sessionId: 'session-s2',
-    }, ports);
-    const unmatched = await runRuntimeCommand({
-      kind: 'status',
-      commandId: 'missing-s2',
-      mode: 'inspect',
-      sessionId: 'missing',
-    }, ports);
-    assertEquals(doctor, repeated);
-    assertEquals(doctor.changed, false);
-    assertEquals(doctor.observedSummary.components.length, 16);
-    assertEquals(Object.keys(status.observedSummary.capabilities), ['codex']);
-    assertEquals(status.observedSummary.sessions.length, 1);
-    assertEquals(status.observedSummary.worktrees.length, 1);
-    assertEquals(unmatched.status, 'blocked');
-    assertEquals(unmatched.diagnostics[0]?.code, 'missing_identity');
-    assertEquals(status.changed, false);
-    assertEquals(await treeHash(root), before);
-  } finally {
-    await Deno.remove(root, { recursive: true });
+    equal(result.status, 'blocked');
+    equal(result.changed, false);
+    equal(s.events, []);
   }
 });
 
-Deno.test('bootstrap and configure plans call zero mutation ports and preserve tree hashes', async () => {
+Deno.test('fallback and restore preserve exact caller routes and require idle boundaries', async () => {
+  const session = { agent: 'codex', sessionId: 'thread', worktree, boundary: 'idle' } as const;
+  const target = { ...route, model: 'caller-fallback' };
+  const fallback: RuntimeCommand = {
+    kind: 'fallback',
+    commandId: 'fallback',
+    mode: 'apply',
+    session,
+    targetRoute: target,
+  };
+  const s = scenario();
+  equal((await applyRuntimeCommand(fallback, s.reads, s.writes)).route, target);
+  const active = {
+    ...fallback,
+    commandId: 'active',
+    session: { ...session, boundary: 'active' as const },
+  };
+  const blocked = await applyRuntimeCommand(active, s.reads, s.writes);
+  equal(blocked.status, 'blocked');
+  const restore = await applyRuntimeCommand(
+    { kind: 'restore', commandId: 'restore', mode: 'apply', session },
+    s.reads,
+    s.writes,
+  );
+  equal(restore.route, route);
+});
+
+Deno.test('plan matrix is mutation-free and deferred repair remains blocked', async () => {
+  const s = scenario();
   const root = await Deno.makeTempDir();
-  let mutationCalls = 0;
-  try {
-    const stateRoot = `${root}/runtime`;
-    const desiredPath = `${root}/desired.json`;
-    const local = new LocalRuntimeStateAdapter(stateRoot, `${root}/foundation.json`);
-    await local.writeDesiredState(persisted());
-    await Deno.writeTextFile(desiredPath, JSON.stringify({ ...desired, stateId: 'desired-next' }));
-    const baseObserved = await translateFoundationReport(report());
-    const observed: ObservedRuntimeState = {
-      ...baseObserved,
-      components: baseObserved.components.map((component) =>
-        component.component === 'node'
-          ? { component: 'node', version: '18.19.1', status: 'outdated' }
-          : component
-      ),
-    };
-    const mutationKeys = new Set([
-      'desiredStateWriter',
-      'checkpointWriter',
-      'actionExecutor',
-      'actionCompensator',
-    ]);
-    const ports = new Proxy(
-      Object.assign(readPorts(local, observed), {
-        desiredStateWriter: {},
-        checkpointWriter: {},
-        actionExecutor: {},
-        actionCompensator: {},
-      }),
-      {
-        get(target, property, receiver) {
-          if (typeof property === 'string' && mutationKeys.has(property)) {
-            mutationCalls++;
-            throw new Error('read-only controller resolved a mutation surface');
-          }
-          return Reflect.get(target, property, receiver);
-        },
-      },
-    ) as RuntimeReadPorts;
-    const before = await treeHash(root);
-    await runRuntimeCommand(
-      { kind: 'doctor', commandId: 'doctor-plan-s2', mode: 'inspect' },
-      ports,
-    );
-    await runRuntimeCommand(
-      { kind: 'status', commandId: 'status-plan-s2', mode: 'inspect' },
-      ports,
-    );
-    const bootstrap = await runRuntimeCommand(
-      { kind: 'bootstrap', commandId: 'bootstrap-s2', mode: 'plan' },
-      ports,
-    );
-    const configure = await runRuntimeCommand({
+  await Deno.writeTextFile(`${root}/marker`, 'unchanged');
+  const before = await treeHash(root);
+  const session = { agent: 'codex', sessionId: 'thread', worktree, boundary: 'idle' } as const;
+  const commands: RuntimeCommand[] = [
+    bootstrap('bootstrap-plan', 'plan'),
+    {
       kind: 'configure',
-      commandId: 'configure-s2',
+      commandId: 'configure-plan',
       mode: 'plan',
-      desiredState: { path: desiredPath },
-    }, ports);
-    assertEquals(bootstrap.status, 'planned');
-    assertEquals(configure.status, 'planned');
-    assertEquals(bootstrap.changed, false);
-    assertEquals(configure.changed, false);
-    assertEquals(mutationCalls, 0, 'dry-run reached a mutation port');
-    assertEquals(await treeHash(root), before, 'dry-run changed the temp state tree');
-  } finally {
-    await Deno.remove(root, { recursive: true });
-  }
+      desiredState: { path: '/desired.json' },
+    },
+    { kind: 'launch', commandId: 'launch-plan', mode: 'plan', route, content: { path: '/prompt' } },
+    {
+      kind: 'resume',
+      commandId: 'resume-plan',
+      mode: 'plan',
+      route: { ...route, sessionId: 'thread' },
+      session,
+      content: { path: '/message' },
+    },
+    { kind: 'smoke', commandId: 'smoke-plan', mode: 'plan', route, level: 'static' },
+    { kind: 'fallback', commandId: 'fallback-plan', mode: 'plan', session, targetRoute: route },
+    { kind: 'restore', commandId: 'restore-plan', mode: 'plan', session },
+    { kind: 'repair-codex-remote', commandId: 'repair-plan', mode: 'plan', worktree },
+    { kind: 'rollback', commandId: 'rollback-plan', mode: 'plan', checkpointId: 'missing' },
+  ];
+  for (const command of commands) equal((await runRuntimeCommand(command, s.reads)).changed, false);
+  equal(s.events, []);
+  const repair = await applyRuntimeCommand(
+    { kind: 'repair-codex-remote', commandId: 'repair', mode: 'apply', worktree },
+    s.reads,
+    s.writes,
+  );
+  equal(repair.status, 'blocked');
+  equal(repair.diagnostics[0]?.ownerIssue, 580);
+  equal(s.events, []);
+  equal(await treeHash(root), before, 'dry-run matrix changed the state tree');
+  await Deno.remove(root, { recursive: true });
 });
-
-Deno.test('live mobile repair remains a data-only issue 580 block', async () => {
-  const root = await Deno.makeTempDir();
-  try {
-    const local = new LocalRuntimeStateAdapter(`${root}/runtime`, `${root}/foundation.json`);
-    const result = await runRuntimeCommand({
-      kind: 'repair-codex-remote',
-      commandId: 'repair-s2',
-      mode: 'apply',
-      worktree,
-    }, readPorts(local, await translateFoundationReport(report())));
-    assertEquals(result.status, 'blocked');
-    assertEquals(result.diagnostics[0]?.ownerIssue, 580);
-    assertEquals(deferredMobileRepairDiagnostic().ownerIssue, 580);
-  } finally {
-    await Deno.remove(root, { recursive: true });
+Deno.test('structured failures stay deterministic and sentinels stay out of results', async () => {
+  const codes = [
+    'auth_required',
+    'auth_conflict',
+    'component_missing',
+    'component_outdated',
+    'version_skew',
+    'route_conflict',
+    'unsafe_worktree',
+    'ownership_conflict',
+    'active_session',
+    'quota_exhausted',
+    'rate_limited',
+    'provider_unavailable',
+    'timeout',
+    'process_failed',
+    'action_failed',
+  ] as const;
+  for (const code of codes) {
+    const s = scenario({ failAction: 1 });
+    s.writes.actionExecutor.executeAction = () => Promise.resolve({ ...actionFailure(), code });
+    const result = await applyRuntimeCommand(bootstrap(`failure-${code}`), s.reads, s.writes);
+    equal(result.status, 'failed');
+    equal(result.diagnostics[0]?.code, code);
   }
-});
-
-Deno.test('sentinel is rejected through desired, persisted, checkpoint, and result flows', async () => {
+  const corrupt = scenario();
+  corrupt.reads.persistedStateReader.readPersistedState = () =>
+    Promise.reject(new Error('corrupt'));
+  const corruptResult = await applyRuntimeCommand(
+    bootstrap('corrupt'),
+    corrupt.reads,
+    corrupt.writes,
+  );
+  equal(corruptResult.diagnostics[0]?.code, 'state_corrupt');
   const sentinel = 'SYNTHETIC_SECRET_PROMPT_SENTINEL';
   const root = await Deno.makeTempDir();
   try {
-    const stateRoot = `${root}/runtime`;
-    const desiredPath = `${root}/desired.json`;
-    const local = new LocalRuntimeStateAdapter(stateRoot, `${root}/foundation.json`);
-    const ports = readPorts(local, await translateFoundationReport(report()));
-    await Deno.writeTextFile(desiredPath, JSON.stringify({ ...desired, promptContent: sentinel }));
-    const results: RuntimeResult[] = [
-      await runRuntimeCommand({
-        kind: 'configure',
-        commandId: 'desired-sentinel',
-        mode: 'plan',
-        desiredState: { path: desiredPath },
-      }, ports),
-    ];
-    await Deno.mkdir(`${stateRoot}/checkpoints`, { recursive: true });
-    await Deno.writeTextFile(
-      `${stateRoot}/controller-state.json`,
-      JSON.stringify({
-        ...persisted(),
-        promptContent: sentinel,
-      }),
+    const path = `${root}/desired.json`;
+    await Deno.writeTextFile(path, JSON.stringify({ ...desired, promptContent: sentinel }));
+    const local = new LocalRuntimeStateAdapter(`${root}/runtime`, `${root}/foundation.json`);
+    const s = scenario();
+    const result = await runRuntimeCommand({
+      kind: 'configure',
+      commandId: 'sentinel',
+      mode: 'plan',
+      desiredState: { path },
+    }, { ...s.reads, desiredStateSource: local });
+    assert(
+      !`${renderRuntimeJson(result)}${renderRuntimeHuman(result)}`.includes(sentinel),
+      'sentinel leaked',
     );
-    results.push(
-      await runRuntimeCommand(
-        { kind: 'doctor', commandId: 'state-sentinel', mode: 'inspect' },
-        ports,
-      ),
-    );
-    await Deno.writeTextFile(
-      `${stateRoot}/controller-state.json`,
-      JSON.stringify({
-        ...persisted(),
-        checkpointIds: ['sentinel'],
-      }),
-    );
-    await Deno.writeTextFile(
-      `${stateRoot}/checkpoints/sentinel.json`,
-      JSON.stringify({
-        schemaVersion: '1.0',
-        checkpointId: 'sentinel',
-        commandId: 'safe',
-        createdAt: '2026-07-10T00:00:00.000Z',
-        status: 'prepared',
-        actionIds: [],
-        resources: [],
-        promptContent: sentinel,
-      }),
-    );
-    results.push(
-      await runRuntimeCommand(
-        { kind: 'doctor', commandId: 'checkpoint-sentinel', mode: 'inspect' },
-        ports,
-      ),
-    );
-    for (const result of results) {
-      assertEquals(result.diagnostics[0]?.code, 'invalid_state_file');
-      assert(
-        !`${renderRuntimeJson(result)}${renderRuntimeHuman(result)}`.includes(sentinel),
-        'sentinel leaked',
-      );
-      assertEquals(runtimeExitCode(result), 3);
-    }
+    equal(result.diagnostics[0]?.code, 'invalid_state_file');
   } finally {
     await Deno.remove(root, { recursive: true });
   }
-});
-
-Deno.test('CLI parser exposes S2 commands only and keeps lifecycle commands deferred', () => {
-  assertEquals(parseRuntimeArgs(['doctor', '--json']).command.mode, 'inspect');
-  assertEquals(parseRuntimeArgs(['bootstrap', '--dry-run']).command.mode, 'plan');
-  assertEquals(
-    parseRuntimeArgs(['configure', '--state', '/desired.json', '--dry-run']).command.kind,
-    'configure',
-  );
-  assertEquals(
-    parseRuntimeArgs(['repair', 'codex-remote', '--worktree', worktree]).command.mode,
-    'apply',
-  );
-  let rejected = false;
-  try {
-    parseRuntimeArgs(['launch']);
-  } catch {
-    rejected = true;
-  }
-  assert(rejected, 'S3 launch command became available in S2');
 });

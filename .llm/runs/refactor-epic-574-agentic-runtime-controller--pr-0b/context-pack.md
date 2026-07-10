@@ -8,7 +8,7 @@
 | Branch | `refactor/epic-574-agentic-runtime-controller` |
 | Worktree | `/home/codex/repos/netscript-epic-574-pr0b-controller` |
 | Base | PR #584 sign-off `9b75470` |
-| Phase | S3 coordinator-approved; S4 activation pending |
+| Phase | S4 implementation/gates complete; coordinator Tier-A review pending |
 | Thread | `019f4b72-2ea4-7050-917e-6d6918371265` (resume only) |
 
 ## Current State
@@ -37,7 +37,9 @@ failure, renderer, and writer paths. Coordinator substantive review approved S2 
 sign-off `6756a54`. S3 now provides data-only Codex/Claude/Gemini/provider lifecycle adapters.
 Tier-A remediation pins Codex launches to the inspected Git HEAD and makes launch observation fail
 closed on complete route identity and process result. Coordinator substantive review approved S3
-remediation head `d597c08`; S4 has not started.
+remediation head `d597c08`. S4 now implements explicit-port transactional apply, checkpoint-first
+execution, reverse compensation, caller-selected fallback/restore, and strict idempotent rollback;
+automated gates pass and coordinator review is pending. S5 has not started.
 
 ## Locked Boundaries
 
@@ -56,7 +58,8 @@ remediation head `d597c08`; S4 has not started.
 2. S2 controller/renderers/foundation/local-state/mobile adapters and read-only canonical CLI:
    coordinator-approved at `6756a54`.
 3. S3 Claude/Codex/Gemini/provider lifecycle adapters: coordinator-approved at `d597c08`.
-4. S4 transactional apply, explicit fallback/restore, rollback, and failure behavior: not started.
+4. S4 transactional apply, explicit fallback/restore, rollback, and failure behavior: implementation
+   and gates complete; coordinator Tier-A review pending.
 5. S5 compatibility wrappers, documentation, and full scoped gates: not started.
 
 ## S1 Files and Evidence
@@ -144,10 +147,32 @@ remediation head `d597c08`; S4 has not started.
 - Only the Codex adapter, focused adapter test, and mandatory run artifacts changed. No new drift or
   architecture debt; no S4/S5 or child-issue work.
 
+## S4 Files and Evidence
+
+- Updated only existing planned files: `runtime/{controller,state,output}.ts`,
+  `runtime/adapters/foundation-adapter.ts`, `runtime/controller_test.ts`, and mandatory run artifacts.
+- `runRuntimeCommand` remains read-only/plan-only; `applyRuntimeCommand` alone accepts explicit
+  mutation ports. Apply writes `prepared` before any action, executes deterministic order, stops on
+  first failure, compensates completed actions in reverse, and records `applied`, `rolled_back`, or
+  `partial` without success-shaped failures.
+- Explicit rollback validates strict named checkpoints, bounded one-resource-per-action ownership,
+  reversibility, uniqueness, and fingerprints; it refuses before mutation and repeats as
+  `no_change`. Fallback/restore preserve caller/configured route and idle/new boundary policy.
+- Focused S4 tests: `10 passed | 0 failed`; complete set: `107 passed | 0 failed`. Scoped
+  check/lint/owned-format: 37/25/18 files, zero findings.
+- Live doctor repeat: exits `2/2`, statuses `degraded/degraded`, 16 components; timing-normalized
+  semantics plus controller-runtime and agentic-source trees are equal. Full dry-run matrix records
+  zero mutation events and equal temp-tree SHA-256 hashes.
+- Transaction/failure/rollback/route/sentinel/mode-0600/LOC/scope/patch/lock/manual Archetype 6
+  evidence passes. Controller/state/test sit at `297/300`, `299/300`, and `450/450`; `deno.lock`
+  remains blob `8694862878e6f9a430bf56497a4d5bf3f8eb1f3d`.
+- No new runtime file, dependency, CLI/wrapper edge, sender, provider policy/login, global default,
+  or child-issue behavior. Existing broad-format drift remains unchanged; no new debt.
+
 ## Next Action
 
-Activate locked S4 transactional apply, compensation, explicit fallback/restore, checkpoint,
-rollback, and failure behavior in the same worktree/thread. Do not start S5 or launch another sender.
+Coordinator substantively reviews S4. Do not start S5 or launch another sender; resume this exact
+thread only after coordinator approval.
 
 ## Safety
 

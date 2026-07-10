@@ -1,15 +1,35 @@
 /** Value-free desired, observed, persisted, and checkpoint state contracts. */
-
 import type {
+  AdapterKind,
   AgentKind,
   CapabilityState,
   InstallableFoundationComponentId,
   ObservedFoundationComponentId,
   RouteIdentity,
+  RuntimeAction,
   SessionIdentity,
   StateDirectoryId,
 } from './contract.ts';
-import { AGENT_KINDS, RUNTIME_SCHEMA_VERSION } from './contract.ts';
+import {
+  ACTION_KINDS,
+  AGENT_KINDS,
+  INSTALLABLE_FOUNDATION_COMPONENTS,
+  RUNTIME_SCHEMA_VERSION,
+} from './contract.ts';
+// deno-fmt-ignore
+const SUMMARY_KEYS = new Set([
+  'schemaVersion', 'stateId', 'foundation', 'versions', 'stateDirectories', 'nativeExt4',
+  'agents', 'required', 'authRoute', 'route', 'worktrees', 'sessions', 'path', 'branch',
+  'upstream', 'clean', 'agent', 'provider', 'model', 'effort', 'worktree', 'sessionId',
+  'mobileRequired', 'boundary', 'components', 'component', 'version', 'status', 'auth',
+  'conflictKeys', 'capabilities', 'dirty', 'found', 'mobileState', 'checkpoints',
+  'checkpointId', 'commandId', ...AGENT_KINDS, ...INSTALLABLE_FOUNDATION_COMPONENTS,
+]);
+function safeSummaryClone<T>(value: T): T {
+  // deno-fmt-ignore
+  return JSON.parse(JSON.stringify(value, (key, entry) =>
+    !key || SUMMARY_KEYS.has(key) || /^\d+$/.test(key) ? entry : undefined));
+}
 
 export const COMPONENT_STATUSES = [
   'ready',
@@ -21,35 +41,28 @@ export const COMPONENT_STATUSES = [
   'unavailable',
 ] as const;
 export type ComponentStatus = typeof COMPONENT_STATUSES[number];
-
 export const AUTH_ROUTES = ['provider-native', 'google-subscription'] as const;
 export type AuthRoute = typeof AUTH_ROUTES[number];
-
 export const CHECKPOINT_STATUSES = ['prepared', 'applied', 'rolled_back', 'partial'] as const;
 export type CheckpointStatus = typeof CHECKPOINT_STATUSES[number];
-
 export const OWNED_RESOURCE_KINDS = ['directory', 'file', 'symlink', 'configuration'] as const;
 export type OwnedResourceKind = typeof OWNED_RESOURCE_KINDS[number];
-
 export interface DesiredFoundationState {
   readonly nativeExt4: true;
   readonly versions: Readonly<Partial<Record<InstallableFoundationComponentId, string>>>;
   readonly stateDirectories: readonly StateDirectoryId[];
 }
-
 export interface DesiredAgentState {
   readonly required: boolean;
   readonly authRoute: AuthRoute;
   readonly route?: RouteIdentity;
 }
-
 export interface DesiredWorktreeState {
   readonly path: string;
   readonly branch: string;
   readonly upstream: 'none';
   readonly clean: boolean;
 }
-
 export interface DesiredRuntimeState {
   readonly schemaVersion: typeof RUNTIME_SCHEMA_VERSION;
   readonly stateId: string;
@@ -58,20 +71,17 @@ export interface DesiredRuntimeState {
   readonly worktrees: readonly DesiredWorktreeState[];
   readonly sessions: readonly SessionIdentity[];
 }
-
 export interface ObservedComponentState {
   readonly component: ObservedFoundationComponentId;
   readonly version: string | null;
   readonly status: ComponentStatus;
 }
-
 export interface ObservedAuthState {
   readonly agent: AgentKind;
   readonly route: AuthRoute;
   readonly status: 'ready' | 'auth_required' | 'auth_conflict';
   readonly conflictKeys: readonly string[];
 }
-
 export interface ObservedWorktreeState {
   readonly path: string;
   readonly branch: string;
@@ -80,18 +90,15 @@ export interface ObservedWorktreeState {
   readonly nativeExt4: boolean;
   readonly found: boolean;
 }
-
 export interface ObservedSessionState {
   readonly identity: SessionIdentity;
   readonly mobileState: CapabilityState;
 }
-
 export interface CheckpointSummary {
   readonly checkpointId: string;
   readonly commandId: string;
   readonly status: CheckpointStatus;
 }
-
 export interface ObservedRuntimeState {
   readonly schemaVersion: typeof RUNTIME_SCHEMA_VERSION;
   readonly stateId: string;
@@ -105,133 +112,66 @@ export interface ObservedRuntimeState {
   readonly configuredDesiredState: DesiredRuntimeState | null;
   readonly checkpoints: readonly CheckpointSummary[];
 }
-
 export type DesiredStateSummary = Omit<DesiredRuntimeState, 'schemaVersion'>;
 export type ObservedStateSummary = Omit<
   ObservedRuntimeState,
   'schemaVersion' | 'configuredDesiredState'
 >;
-
 export interface RuntimeStateFilter {
   readonly agent?: AgentKind;
   readonly worktree?: string;
   readonly sessionId?: string;
 }
-
-function summarizeRoute(route: RouteIdentity): RouteIdentity {
-  return {
-    agent: route.agent,
-    provider: route.provider,
-    model: route.model,
-    effort: route.effort,
-    worktree: route.worktree,
-    ...(route.sessionId ? { sessionId: route.sessionId } : {}),
-    mobileRequired: route.mobileRequired,
-  };
-}
-
-function summarizeSession(session: SessionIdentity): SessionIdentity {
-  return {
-    agent: session.agent,
-    sessionId: session.sessionId,
-    worktree: session.worktree,
-    boundary: session.boundary,
-  };
-}
-
 /** Projects parsed desired state into its bounded result-safe summary. */
 export function summarizeDesiredState(
   desired: DesiredRuntimeState | null,
   filter?: RuntimeStateFilter,
 ): DesiredStateSummary | null {
   if (!desired) return null;
+  const { schemaVersion: _, ...summary } = safeSummaryClone(desired);
   const agents = Object.fromEntries(
-    Object.entries(desired.agents).filter(([agent, entry]) =>
-      AGENT_KINDS.includes(agent as AgentKind) && (!filter?.agent || agent === filter.agent) &&
+    Object.entries(summary.agents).filter(([agent, entry]) =>
+      (!filter?.agent || agent === filter.agent) &&
       (!filter?.worktree || !entry.route || entry.route.worktree === filter.worktree)
-    ).map(([agent, entry]) => [agent, {
-      required: entry.required,
-      authRoute: entry.authRoute,
-      ...(entry.route ? { route: summarizeRoute(entry.route) } : {}),
-    }]),
+    ),
   ) as DesiredStateSummary['agents'];
   return {
-    stateId: desired.stateId,
-    foundation: {
-      nativeExt4: true,
-      versions: { ...desired.foundation.versions },
-      stateDirectories: [...desired.foundation.stateDirectories],
-    },
+    ...summary,
     agents,
-    worktrees: desired.worktrees.filter((entry) =>
+    worktrees: summary.worktrees.filter((entry) =>
       !filter?.worktree || entry.path === filter.worktree
-    ).map((entry) => ({
-      path: entry.path,
-      branch: entry.branch,
-      upstream: entry.upstream,
-      clean: entry.clean,
-    })),
-    sessions: desired.sessions.filter((entry) =>
+    ),
+    sessions: summary.sessions.filter((entry) =>
       (!filter?.agent || entry.agent === filter.agent) &&
       (!filter?.worktree || entry.worktree === filter.worktree) &&
       (!filter?.sessionId || entry.sessionId === filter.sessionId)
-    ).map(summarizeSession),
+    ),
   };
 }
-
 /** Projects observations into a bounded result-safe summary with real identity filters. */
 export function summarizeObservedState(
   observed: ObservedRuntimeState,
   filter?: RuntimeStateFilter,
 ): ObservedStateSummary {
+  const { schemaVersion: _, configuredDesiredState: __, ...summary } = safeSummaryClone(observed);
   return {
-    stateId: observed.stateId,
-    nativeExt4: observed.nativeExt4,
-    components: observed.components.map((entry) => ({
-      component: entry.component,
-      version: entry.version,
-      status: entry.status,
-    })),
-    auth: observed.auth.filter((entry) =>
-      AGENT_KINDS.includes(entry.agent) && (!filter?.agent || entry.agent === filter.agent)
-    ).map((entry) => ({
-      agent: entry.agent,
-      route: entry.route,
-      status: entry.status,
-      conflictKeys: [...entry.conflictKeys],
-    })),
-    stateDirectories: [...observed.stateDirectories],
+    ...summary,
+    auth: summary.auth.filter((entry) => !filter?.agent || entry.agent === filter.agent),
     capabilities: Object.fromEntries(
-      Object.entries(observed.capabilities).filter(([agent]) =>
-        AGENT_KINDS.includes(agent as AgentKind) && (!filter?.agent || agent === filter.agent)
+      Object.entries(summary.capabilities).filter(([agent]) =>
+        !filter?.agent || agent === filter.agent
       ),
     ),
-    worktrees: observed.worktrees.filter((entry) =>
+    worktrees: summary.worktrees.filter((entry) =>
       !filter?.worktree || entry.path === filter.worktree
-    ).map((entry) => ({
-      path: entry.path,
-      branch: entry.branch,
-      upstream: entry.upstream,
-      dirty: entry.dirty,
-      nativeExt4: entry.nativeExt4,
-      found: entry.found,
-    })),
-    sessions: observed.sessions.filter((entry) =>
+    ),
+    sessions: summary.sessions.filter((entry) =>
       (!filter?.agent || entry.identity.agent === filter.agent) &&
       (!filter?.worktree || entry.identity.worktree === filter.worktree) &&
       (!filter?.sessionId || entry.identity.sessionId === filter.sessionId)
-    ).map((entry) => ({
-      identity: summarizeSession(entry.identity),
-      mobileState: entry.mobileState,
-    })),
-    checkpoints: observed.checkpoints.map((entry) => ({
-      checkpointId: entry.checkpointId,
-      commandId: entry.commandId,
-      status: entry.status,
-    })),
+    ),
   };
 }
-
 /** Creates the finite result-safe observation used before an inspector succeeds. */
 export function unavailableObservedSummary(stateId = 'unavailable'): ObservedStateSummary {
   return {
@@ -246,7 +186,6 @@ export function unavailableObservedSummary(stateId = 'unavailable'): ObservedSta
     checkpoints: [],
   };
 }
-
 export interface OwnedResourceState {
   readonly resourceId: string;
   readonly kind: OwnedResourceKind;
@@ -271,6 +210,73 @@ export interface PersistedRuntimeState {
   readonly desired: DesiredRuntimeState;
   readonly checkpointIds: readonly string[];
   readonly lastAppliedCommandId: string | null;
+}
+
+/** Builds the value-free checkpoint persisted before the first owned action. */
+export function createRuntimeCheckpoint(
+  commandId: string,
+  createdAt: string,
+  actions: readonly RuntimeAction[],
+): RuntimeCheckpointState {
+  return {
+    schemaVersion: RUNTIME_SCHEMA_VERSION,
+    checkpointId: `${commandId}-checkpoint`,
+    commandId,
+    createdAt,
+    status: 'prepared',
+    actionIds: actions.map((action) => action.id),
+    resources: actions.flatMap((action) =>
+      action.resourceIds.map((resourceId) => ({
+        resourceId,
+        kind: resourceId.startsWith('state-directory:') ? 'directory' : 'configuration',
+        fingerprint: action.id,
+        previousFingerprint: null,
+      }))
+    ),
+  };
+}
+
+function rollbackAdapter(resourceId: string): AdapterKind {
+  if (resourceId.startsWith('component:') || resourceId.startsWith('state-directory:')) {
+    return 'foundation';
+  }
+  if (resourceId.startsWith('session:codex:')) return 'codex';
+  if (resourceId.startsWith('session:claude:')) return 'claude';
+  if (resourceId.startsWith('session:gemini:')) return 'gemini';
+  return 'state';
+}
+
+/** Reconstructs only controller-owned reversible action identities from a strict checkpoint. */
+export function checkpointRollbackActions(
+  checkpoint: RuntimeCheckpointState,
+): RuntimeAction[] | null {
+  if (!checkpoint.actionIds.length || checkpoint.actionIds.length !== checkpoint.resources.length) {
+    return null;
+  }
+  if (
+    new Set(checkpoint.actionIds).size !== checkpoint.actionIds.length ||
+    new Set(checkpoint.resources.map((entry) => entry.resourceId)).size !==
+      checkpoint.resources.length
+  ) return null;
+  const actions: RuntimeAction[] = [];
+  for (const [index, id] of checkpoint.actionIds.entries()) {
+    const kind = ACTION_KINDS.find((entry) => entry === id.split(':').at(-1));
+    const resourceId = checkpoint.resources[index].resourceId;
+    if (
+      !kind || kind === 'blocked_intent' ||
+      !/^(component|state-directory|state|session):[^/\\]+$/.test(resourceId) ||
+      checkpoint.resources[index].fingerprint !== id
+    ) return null;
+    actions.push({
+      id,
+      kind,
+      adapter: rollbackAdapter(resourceId),
+      effect: 'write',
+      reversible: true,
+      resourceIds: [resourceId],
+    });
+  }
+  return actions;
 }
 
 function canonicalize(value: unknown): unknown {
