@@ -62,4 +62,10 @@ that the generated root config had no JSX transform for app-owned root-level TSX
 files were therefore parsed with the classic React transform despite the dashboard member's Fresh
 config. The local-source preparation gate now adds the same Preact precompile settings used by the
 generated Fresh app before checking the copied files. This is fixture configuration, not a source
-or dependency bypass; the type-check remains mandatory.
+  or dependency bypass; the type-check remains mandatory.
+
+The second canonical run passed 50 gates, including the copied-file type-check and every existing
+runtime behavior gate, before the new render assertion failed to parse because quote escaping was
+lost while composing the inline `deno eval` source. The assertion now constructs attribute markers
+with template literals, eliminating the nested string-escaping ambiguity; no product behavior or
+assertion strength changed.
