@@ -91,3 +91,22 @@ All three planned slugs were current; no registry correction or slug drift was r
 - The current Codex custom-provider wire is Responses-only; OpenRouter runner compatibility is a
   canary outcome, not a planning assumption.
 - Implementation is complete; coordinator Tier-A substantive review is required before sign-off.
+
+## Coordinator Tier-A Sign-off (2026-07-10, Claude Opus 4.8)
+
+Substantive review of S1-S4 (`338b5ed2`, `51d96cf4`, `11521018`, `8524e252`, diff `e035d727..8524e252`,
+27 files) with independent re-verification:
+- Parent-environment invariant: NO `Deno.env.set/delete` in runtime; effects confined to `adapters/`.
+- Child-only credential injection: `child-process-environment-adapter.ts` starts a fresh child env
+  (`clearEnv:true`), explicitly clears rival keys, late-binds only the selected credential, and returns
+  no output/credential data; value-free `ChildEnvironmentPolicy` (no value representable in plan/result).
+- Custom `ANTHROPIC_BASE_URL` → `remoteControl:'unavailable'` + `experimentalNonAnthropicModel`, derived
+  from route kind (claude-adapter.ts:110-111), not probe success.
+- Canaries fail closed on credential-absent/malformed/timeout/unsupported (`blocked`/`failed`,
+  `fanOutEligible:false`).
+- Boundary regression: `deferred-boundaries_test.ts` keeps #578 & #580 blocked and #579/#581/#582 absent.
+- Gates re-run by coordinator: full runtime suite `70/0`; scoped check `30/0`; scoped lint `30/0`;
+  secret scan on diff clean; `deno.lock` unchanged.
+
+Verdict: PASS. Generator did not self-certify; sign-off is the coordinator's. Push verified authoritative
+(`git ls-remote` == local `8524e252`).
