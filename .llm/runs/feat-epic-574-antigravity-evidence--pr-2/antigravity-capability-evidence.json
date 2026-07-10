@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "1.0",
+  "observedAt": "2026-07-10",
+  "redaction": "classified-only-no-raw-output-no-account-identifiers",
+  "environment": {
+    "executable": "/home/codex/.local/bin/agy",
+    "version": "1.1.1",
+    "nativeExt4": true,
+    "legacyStateDirectoryPresent": true
+  },
+  "staticCapabilities": {
+    "headlessPrint": "advertised",
+    "printTimeout": "advertised",
+    "modelFlag": "advertised",
+    "agentFlag": "advertised",
+    "projectFlag": "advertised",
+    "conversationFlag": "advertised",
+    "continueFlag": "advertised",
+    "sandboxFlag": "advertised",
+    "jsonOutput": "unsupported_by_help",
+    "jsonlOutput": "unsupported_by_help"
+  },
+  "liveCanaries": [
+    {
+      "id": "headless-success-initial",
+      "timeoutSeconds": 45,
+      "exitCode": null,
+      "classification": "probe_capture_failed",
+      "stdoutRetained": false,
+      "stderrRetained": false
+    },
+    {
+      "id": "headless-success-retry",
+      "timeoutSeconds": 25,
+      "durationMs": 30660,
+      "exitCode": 1,
+      "stdoutPresent": false,
+      "stderrPresent": true,
+      "classification": "authentication_or_service_timeout",
+      "authenticationIndicator": true,
+      "serviceFailureIndicator": true,
+      "timeoutIndicator": true,
+      "stdoutRetained": false,
+      "stderrRetained": false
+    }
+  ],
+  "capabilities": {
+    "headlessSuccess": "unproven_auth_or_service_blocked",
+    "serverFailureExit": "observed_exit_1_with_timeout_classification",
+    "structuredOutput": "unsupported_by_advertised_cli_surface",
+    "sandboxBehavior": "deferred_live_session_unavailable",
+    "webSearchFetch": "deferred_live_session_unavailable",
+    "citationPersistence": "deferred_live_session_unavailable",
+    "quotaClassification": "deferred_to_issue_579_no_quota_signal_observed",
+    "boundedFallback": "deferred_to_issue_579",
+    "agentsInstructionBehavior": "deferred_live_session_unavailable",
+    "geminiInstructionBehavior": "deferred_no_fixture_or_live_session",
+    "legacyGeminiStateCompatibility": "state_directory_present_runtime_parser_already_normalizes_legacy_state"
+  },
+  "operatorAction": "Owner should verify the documented Google Sign-In session outside automation, without sharing account identifiers, then resume this same thread for the deferred live canaries.",
+  "fanOutEligible": false
+}
