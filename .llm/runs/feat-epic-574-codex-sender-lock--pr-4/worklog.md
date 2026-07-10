@@ -82,6 +82,21 @@ Start at `runtime/contract.ts` for canonical vocabulary, follow the action into 
 | Slice 3 scoped lint | PASS | 48 files, 0 findings; exit 0. |
 | Slice 3 scoped fmt | PASS | 48 files, 0 findings; exit 0. |
 | Slice 3 diff/lock | PASS | `git diff --check` exit 0; `deno.lock` unchanged. |
+| Final full agentic/runtime suite | PASS | 185 passed, 0 failed; exit 0. |
+| Final scoped check | PASS | 48 files, 0 findings; exit 0. |
+| Final scoped lint | PASS | 48 files, 0 findings; exit 0. |
+| Final scoped fmt | PASS | 48 files, 0 findings; exit 0. |
+
+## Final DoD Reconciliation
+
+- Duplicate launcher ownership is acquired atomically immediately before spawn; owned worktrees refuse with resume guidance.
+- Managed/unmanaged/stale-socket/disconnected/version-skew/absent states have semantic tests.
+- Active sessions, active child commands, and unanchored app-server processes block every repair mutation.
+- The production adapter uses per-PID `Deno.kill` only after repeated anchored argv validation and exact known-socket equality; no broad kill implementation exists.
+- Repair verification must return connected, version-aligned managed state before redacted evidence persists.
+- README covers command, dry-run, ownership/reclaim semantics, and anchored repair guarantees.
+- #581/#582 absence regression is green. Interactive reconnect canaries remain owner-accepted-working, not fabricated.
+- PR #589 is open, draft, merge-state clean, and awaiting coordinator Tier-A review; this worker has not merged or self-certified.
 
 ## Handoff Notes
 

@@ -6,13 +6,13 @@
 | ----- | ----- |
 | Run ID | `feat-epic-574-codex-sender-lock--pr-4` |
 | Branch | `feat/epic-574-codex-sender-lock` |
-| Current phase | `implement` |
+| Current phase | `evaluate` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `docs` |
 
 ## Current State
 
-Plan slice `1d165762` and ownership slice `65900e52` are landed. Slice 3 implements guarded remote repair and launcher-edge ownership and is ready to commit after integrity scans. The external Claude coordinator owns Tier-A review/sign-off and merge.
+Plan `1d165762`, ownership `65900e52`, and guarded recovery `d5430c5a` are landed. Final full tests pass 185/0 and scoped runtime check/lint/fmt report 0 findings. The external Claude coordinator owns Tier-A review/sign-off and merge.
 
 ## Completed
 
@@ -23,12 +23,12 @@ Plan slice `1d165762` and ownership slice `65900e52` are landed. Slice 3 impleme
 
 ## In Progress
 
-- Slice 3 integrity scan, commit, explicit-refspec push, and PR evidence.
+- Final evidence commit and coordinator Tier-A handoff.
 
 ## Next Steps
 
-1. Land slice 3 with required PR evidence.
-2. Run the final full agentic/runtime suite and hand off for coordinator Tier-A review.
+1. Commit/push final evidence and post “implementation complete — awaiting coordinator Tier-A review.”
+2. Coordinator performs substantive Tier-A review and any evaluator/merge workflow.
 
 ## Key Decisions
 
@@ -51,10 +51,12 @@ Plan slice `1d165762` and ownership slice `65900e52` are landed. Slice 3 impleme
 | Slice 2 runtime | PASS | 15 focused tests passed, 0 failed |
 | Slice 3 static | PASS | check/lint/fmt: 48 files, 0 findings each; launcher check exit 0 |
 | Slice 3 runtime | PASS | 39 focused/compatibility/ownership tests passed, 0 failed |
+| Final full runtime | PASS | 185 passed, 0 failed; exit 0 |
+| Final static | PASS | check/lint/fmt: 48 files, 0 findings each |
 
 ## Open Questions
 
-- None that force implementation rework; coordinator may request Plan-Gate corrections.
+- None from the implementation lane; coordinator Tier-A review may request corrections.
 
 ## Drift and Debt
 
