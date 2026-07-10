@@ -4,6 +4,13 @@ Paste this when starting a new agent session for a phase group (see `workflow/su
 Fill every `<…>` before sending.
 
 ```text
+use harness
+
+## SKILL
+
+- netscript-harness — run lifecycle, Plan-Gate, and evaluator separation.
+- <relevant-skill> — <why this phase needs it>.
+
 ## Context
 
 You are implementing Phase Group <X> (<name>) of the <supervisor> supervisor run.
@@ -25,7 +32,7 @@ You are implementing Phase Group <X> (<name>) of the <supervisor> supervisor run
 4. .agents/skills/netscript-harness/SKILL.md
 
 ### Harness mode
-Use harness. Read workflow/activation.md + workflow/run-loop.md.
+Read workflow/activation.md + workflow/run-loop.md.
 For package/plugin work also load .agents/skills/netscript-doctrine/SKILL.md and
 select your archetype from archetypes/README.md; apply scope overlays; read
 gates/archetype-gate-matrix.md and debt/arch-debt.md.

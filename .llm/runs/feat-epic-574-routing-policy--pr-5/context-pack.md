@@ -1,0 +1,33 @@
+# Context pack — canonical routing policy migration (#581)
+
+## State
+
+Plan-Gate was approved by the Claude coordinator. Slice 2 implements typed canonical policy data,
+the rendered single lane table, dated route tests, quota-only Fable fallback, Antigravity `agy`, and
+the retained #582 boundary. This Codex session does not self-certify.
+
+## Locked scope
+
+Migrate one canonical routing policy across harness/skills/docs/templates/generated mirrors and make
+Codex/OpenHands launch edges enforce and record provider/model/effort using existing #577
+`RouteIdentity`. Preserve #577–#580 and keep #582 rollout/promotion/canaries deferred.
+
+## Key decisions
+
+- One complete table: `.llm/harness/workflow/lane-policy.md`.
+- Dated Fable planning override through 2026-07-12; GPT-5.6 Sol max from 2026-07-13.
+- Deep analysis primary GPT-5.6 Sol xhigh; Fable only after classified quota exhaustion.
+- Massive research/extraction uses Antigravity `agy`; Gemini wording is superseded drift.
+- Outside-plan/higher-effort Fable is policy data only and requires explicit approval.
+- Opposite-family evaluator session remains mandatory.
+- `.claude/skills` is generator-owned; never hand-edit.
+
+## Resume point
+
+Slice 2 is commit `c41a790e`. Slice 3 adds required provider/model/effort at Codex and OpenHands
+launch edges plus requested-versus-observed evidence and fail-closed Codex mismatch handling. Finish
+Slice 3 is commit `8f98a7cc`. Slice 4 updates skills/docs/templates, distinguishes native mobile
+Claude from experimental gateways, regenerates `.claude/skills`, and passes Claude-surface
+validation. Slice 4 is commit `f44496c5`. The final DoD pass is green: 192 tests, whole-agentic
+check/lint/fmt with zero findings, and Claude-surface validation PASS. Commit/push/comment the final
+evidence slice, then await coordinator Tier-A review; do not self-certify or merge.

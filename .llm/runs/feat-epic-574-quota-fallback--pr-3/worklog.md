@@ -1,0 +1,139 @@
+# Worklog — persisted quota fallback and restoration (#579)
+
+## Design
+
+### Public Surface
+
+- Extend canonical runtime commands/results rather than introduce a second controller.
+- Export finite routing phases/reasons/restoration states and value-free state/transition types.
+- Export pure policy selection, signal classification, and state transition functions.
+- Persist through the existing controller state adapter; expose concise transitions in status/output.
+
+### Domain Vocabulary
+
+- `RoutingPhase`, `RoutingReasonCategory`, `RestorationStatus`, `RoutingCanaryStatus`.
+- `RoutingState`, `RoutingTransition`, `RoutingSignal`, `RoutingPolicyContext`, `FallbackCandidate`.
+- Route family is explicit policy data used to enforce author/evaluator independence.
+
+### Ports
+
+- Reuse `ClockPort` for deterministic timestamps.
+- Add narrow routing-state read/write seams only if existing persisted-state ports cannot carry the
+  new schema coherently.
+- Reuse bounded process/canary seams; no new raw process-output port.
+
+### Constants
+
+- Finite phases, reasons, restoration/canary states, model families, lane purposes.
+- Named maximum fallback depth/history length and backoff policy.
+- Exact compatibility classifier version keys.
+
+### Runtime Semantics
+
+- Identity: routing-state id plus affected session identity.
+- Lifecycle: desired → degraded → fallback active → probe due/failed → restoration ready → restored,
+  with blocked outcomes.
+- Supervisor boundary: pure reducer/planner decides; adapters persist and probe; handlers do not
+  swallow or reinterpret unexpected errors.
+- Cancellation: no new long-running loop; process canary remains bounded by existing request seam.
+- Delivery/concurrency: synchronous per-routing-state serial decisions; persistence is last-write
+  state plus bounded ordered transition history.
+- Diagnostics: structured diagnostic codes first; version-pinned compatibility text only in one
+  classifier.
+
+### Commit Slices
+
+1. P0 plan/design artifacts and run identity.
+2. S1 contract, policy, classifier, and matrix tests.
+3. S2 reducer, persistence, probes/restoration, restart tests.
+4. S3 consumer/README and deferred-boundary integration.
+5. S4 final gates and coordinator handoff.
+
+### Deferred Scope
+
+#580 sender/daemon work, #581 global/default migration, #582 rollout, notification transport, live
+provider login, paid-model execution, and global environment mutation.
+
+### Contributor Path
+
+Read policy → reducer → persisted state → planner. Extend finite constants and a table-driven test
+before adding behavior. Policy stays pure; IO stays in adapters.
+
+## Pre-flight Evidence
+
+| Check | Result |
+| --- | --- |
+| Explicit integration fetch | exit 0; `origin/rickylabs-epic-574-wsl-agentic-runtime` = `c90bc938` |
+| Feature fetch | exit 0; remote feature ref found |
+| Baseline ancestry | exit 0; HEAD `783e505e` descends from `c90bc938` |
+| #577 / #578 presence | provider profiles and Antigravity adapter present |
+| Initial status | only untracked coordinator `codex-thread-ids.md` |
+| Lock baseline | no `deno.lock` diff |
+
+## Slice Log
+
+| Date | Slice | Status | Evidence |
+| --- | --- | --- | --- |
+| 2026-07-10 | P0 | ready for coordinator Plan-Gate | Research, locked plan, Design, context, drift, thread identity prepared. |
+| 2026-07-10 | S1 | gates green | Pure policy selects explicit candidates only; active/depth/approval/opposite-family guards fail closed; structured diagnostics precede exact pinned text. Focused tests: 7 passed, 0 failed. Scoped check/lint/fmt: exit 0, 0 findings. |
+| 2026-07-10 | S2 | gates green | Durable reducer persists desired/active routes, reason/session/times/depth/restoration/canary and bounded transitions; reset/backoff/minimal canary and new-boundary restoration proven across adapter restart. New matrix: 10 passed; adjacent controller/boundary matrix: 17 passed; 0 failed. Scoped check/lint/fmt: exit 0, 0 findings. |
+| 2026-07-10 | S3 | gates green | Read-only `agentic:routing-state` human/JSON task exposes persisted concise state; README documents restart/restoration; #578 quota diagnostics hand off to landed #579 while #580-#582 stay deferred. Focused tests: 13 passed, 0 failed; CLI exit 0; scoped check/lint/fmt exit 0, 0 findings. |
+| 2026-07-10 | S4 | implementation complete; coordinator review pending | Full agentic/runtime inventory: 170 passed, 0 failed. Scoped check/lint/fmt: 42 files, exit 0, 0 findings. Diff/secret/PII/lock hygiene green. |
+
+### S1 Reconcile
+
+- PR #588 remains draft and issue #579 remains the sole resolving scope.
+- #580 lifecycle/sender work, #581 global/default migration, and #582 rollout remain untouched.
+- No plan readjustment or architectural drift was discovered; S2 remains persistence/reducer work.
+
+### S2 Reconcile
+
+- Existing controller/checkpoint round trips remain compatible and machine-local state stays mode
+  `0600`.
+- #580 apply/repair blocks and #581/#582 absence regressions remain green.
+- S3 must remove issue #579 from the legacy deferred registry while retaining #580-#582; this is the
+  planned consumer integration, not design drift.
+
+### S3 Reconcile
+
+- Removed only issue #579 from `DEFERRED_ISSUES` and from #578 quota/rate diagnostic ownership;
+  structured codes/categories are unchanged.
+- #580 lifecycle/repair remains explicitly blocked and #581/#582 hidden-capability regressions pass.
+- README/task changes are read-only and do not create routing-policy migration or rollout behavior.
+
+### S4 Reconcile / Definition of Done
+
+| Acceptance | Evidence | Result |
+| --- | --- | --- |
+| Defaults never mutate opportunistically/globally | Pure policy/reducer tests; child environment tests; no `Deno.env.set/delete` or default writer added | PASS |
+| No route change inside critical slice; restoration only at new boundary | active fallback/restore cases block; idle/new cases pass | PASS |
+| Reset/backoff and minimal canary precede restoration | pre-reset/early-backoff no-op, failed-canary backoff, passed-canary restoration matrix | PASS |
+| State survives restart with probe/transition history | fresh `LocalRuntimeStateAdapter` round trip; mode `0600`; bounded 32-entry history | PASS |
+| Same-family-only evaluation blocks | opposite-family policy matrix returns `opposite_family_unavailable` | PASS |
+
+Final gate commands/results:
+
+- `deno test --no-lock --allow-all .llm/tools/agentic/*_test.ts
+  .llm/tools/agentic/runtime/*_test.ts`: exit 0; 170 passed, 0 failed.
+- Scoped check wrapper: exit 0; 42 files; 0 findings.
+- Scoped lint wrapper: exit 0; 42 files; 0 findings.
+- Scoped fmt wrapper: exit 0; 42 files; 0 findings.
+- `git diff --check`: exit 0.
+- Secret/PII diff scan: 0 findings.
+- `deno.lock`: unchanged.
+
+Implementation worker does not self-certify. Final status is awaiting coordinator Tier-A review.
+
+## Coordinator Tier-A Sign-off (2026-07-10, Claude Opus 4.8)
+
+Reviewed 27eafa2e/d49cc84a/f3cceac3/64e8818c (diff 1879df14..64e8818c). Independent verification:
+- Acceptance invariants all test-covered: boundary+reset+canary-gated restoration; backoff on failed
+  canary; restart-safe bounded history; active-slice + max-depth block-without-selecting; evaluation
+  blocks rather than selecting author family; outside-plan/higher-effort Fable requires approval;
+  structured-diagnostics-first classifier with pinned-version fallback failing closed.
+- Desired route persisted separately from active; no global/opportunistic default mutation.
+- #580 apply blocked; #581/#582 absent (regression tests); #579 removed from deferred registry.
+- Human CLI `routing-state.ts`. Gates re-run: suite 92/0; scoped check/lint 42/0; secret/PII clean;
+  deno.lock unchanged. Push authoritative (64e8818c).
+
+Verdict: PASS (generator did not self-certify).
