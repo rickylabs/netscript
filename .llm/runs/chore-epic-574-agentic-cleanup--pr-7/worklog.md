@@ -145,3 +145,18 @@ was reverted (file restored byte-identical) and the guard returned to **4 passed
 | `deno.lock` delta vs base                    | +2 workspace deps (`jsr:@std/assert@1`, `jsr:@std/path@1`) only |
 
 Not merged. Awaiting coordinator sign-off and integration→main promotion.
+
+## Coordinator Tier-A Sign-off (2026-07-11, Claude Opus 4.8)
+
+Opposite-family GPT-5.6 review (thread 019f4dea) returned CONCERNS (3 findings); all remediated in
+`edd77a1e` + `aea142dd` and independently re-verified by the coordinator:
+- F1 native model IDs (`claude-opus-4-8`/`gpt-5.6`) + `official-installer` marker centralized into
+  `config/`; guard now derives its forbidden set from all config exports + a structural shape layer,
+  and demonstrably FAILS on reintroduction (worklog evidence).
+- F2 honest run artifacts reconstructed; drift records the no-external-PLAN-EVAL deviation plainly.
+- F3 guard claim narrowed to production TS; tests scanned with an explicit contract-literal allowlist;
+  README literal marked illustrative.
+- Gates: suite 205/0; scoped check/lint/fmt 0; docs:maintenance OK; deno.lock +@std only.
+
+Verdict: PASS. Opposite-family review honored per #581 policy (Claude-authored → GPT-5.6 review).
+Merging into integration.
