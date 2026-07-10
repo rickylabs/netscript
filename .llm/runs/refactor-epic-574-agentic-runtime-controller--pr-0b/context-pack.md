@@ -8,18 +8,20 @@
 | Branch | `refactor/epic-574-agentic-runtime-controller` |
 | Worktree | `/home/codex/repos/netscript-epic-574-pr0b-controller` |
 | Base | PR #584 sign-off `9b75470` |
-| Phase | Plan-Gate passed; implementation authorized |
+| Phase | S1 automated gates pass; Tier-A S1 review pending |
 | Thread | `019f4b72-2ea4-7050-917e-6d6918371265` (resume only) |
 
 ## Current State
 
-Research and Design are complete. The plan defines a typed schema `1.0`, separate desired/observed/
-plan models, read and mutation ports, Claude/Codex/Gemini/provider/mobile adapters, mechanically
-read-only inspection/dry-run, value-free local state, stable failure taxonomy, transactional apply
-and ownership-scoped rollback, five implementation slices, exact gates, and file/scope budgets.
+Research and Design are complete, and coordinator Plan-Gate approval authorized S1. S1 now provides
+schema `1.0` contracts, value-free desired/observed/checkpoint state, separate read/mutation ports,
+and a pure deterministic reconciliation planner. Equal state plans no actions, actions are data
+only, and deferred capability requests return explicit blocked intents.
 
-No implementation source was edited before approval. The owner waived external evaluator dispatch;
-Tier-A coordinator review passed every Plan-Gate item and recorded approval in `plan-eval.md`.
+The six S1 implementation/test files stay within their locked file and LOC budgets. Focused tests
+pass `14/14`; scoped check, lint, format, `git diff --check`, secret/content scans, and lock proof
+pass. No dependency or `deno.lock` change occurred. Tier-A S1 review is not self-certified and is
+still pending; no S2 work has started.
 
 ## Locked Boundaries
 
@@ -32,18 +34,34 @@ Tier-A coordinator review passed every Plan-Gate item and recorded approval in `
 - #582 owns full rollout canaries and promotion.
 - Deferred live capability returns a structured block; it never succeeds or mutates.
 
-## Planned Slices
+## Slice State
 
-1. Contract/state/ports/pure planner.
-2. Controller/renderers/foundation/local-state/mobile adapters and read-only canonical CLI.
-3. Claude/Codex/Gemini/provider lifecycle adapters.
-4. Transactional apply, explicit fallback/restore, rollback, and failure behavior.
-5. Compatibility wrappers, documentation, and full scoped gates.
+1. S1 contract/state/ports/pure planner: implementation complete; automated gates pass; Tier-A
+   review pending.
+2. S2 controller/renderers/foundation/local-state/mobile adapters and read-only canonical CLI: not
+   started.
+3. S3 Claude/Codex/Gemini/provider lifecycle adapters: not started.
+4. S4 transactional apply, explicit fallback/restore, rollback, and failure behavior: not started.
+5. S5 compatibility wrappers, documentation, and full scoped gates: not started.
+
+## S1 Files and Evidence
+
+- `.llm/tools/agentic/runtime/contract.ts`
+- `.llm/tools/agentic/runtime/state.ts`
+- `.llm/tools/agentic/runtime/ports.ts`
+- `.llm/tools/agentic/runtime/planner.ts`
+- `.llm/tools/agentic/runtime/contract_test.ts`
+- `.llm/tools/agentic/runtime/planner_test.ts`
+- Focused test: exit 0, `14 passed | 0 failed`, with `--no-lock` and no permissions.
+- Scoped wrappers: check/lint/format exit 0 across all 6 files with 0 findings.
+- Hard LOC budgets: PASS (`220`, `151`, `117`, `348`, `214`, `232` lines respectively).
+- Secret-bearing/content field scans: PASS. `deno.lock` matches plan commit `f1dfdc9` exactly.
+- Drift/debt: none. Deferred implementation remains assigned to #577 through #582 as planned.
 
 ## Next Action
 
-Resume this exact thread for S1 contract/state/ports/pure-planner implementation. Commit, explicitly
-push, comment, and Tier-A review each slice before proceeding. Do not launch another sender.
+Coordinator reviews the pushed S1 commit and records the Tier-A result. Do not start S2 or launch
+another sender. Resume this exact thread only after coordinator approval and a concrete S2 brief.
 
 ## Safety
 

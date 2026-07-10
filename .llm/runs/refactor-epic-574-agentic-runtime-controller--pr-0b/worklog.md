@@ -3,7 +3,8 @@
 ## Status
 
 Research and Design are complete. Tier-A coordinator Plan-Gate review returned `PASS` under the
-owner-authorized external-evaluator waiver. No implementation source was edited before approval.
+owner-authorized external-evaluator waiver. Approved slice S1 is implemented and its automated
+gates pass. Tier-A implementation review is pending; S2 has not started.
 
 ## Design
 
@@ -358,3 +359,55 @@ named contract/port/adapter/test here.
 Issue #576 and draft PR #585 remain open at exactly one `status:plan`; labels and issue milestone are
 correct. PR #585 retains `Closes #576`, `Part of #574`, and its PR #584 stack. Acceptance/DoD boxes
 remain unchecked and the PR remains draft. Implementation is authorized on the same thread.
+
+## S1 — Contract, State, Ports, and Pure Planner
+
+### Delivered Scope
+
+S1 created only the six locked runtime files plus these run-artifact updates:
+
+- `runtime/contract.ts`: schema `1.0`, finite constant vocabularies with derived unions, value-free
+  command/result/action/diagnostic contracts, and explicit deferred-capability ownership.
+- `runtime/state.ts`: value-free desired, observed, checkpoint, and persisted-state types with
+  deterministic desired-state equality.
+- `runtime/ports.ts`: structurally separate read and mutation port aggregates and disjoint finite
+  method vocabularies.
+- `runtime/planner.ts`: pure deterministic command reconciliation returning data-only actions;
+  equal desired/observed state returns no actions.
+- `runtime/contract_test.ts` and `runtime/planner_test.ts`: 14 focused contract, safety,
+  idempotence, ordering, deferred-intent, and rollback-planning tests.
+
+No CLI edge, executor, renderer, adapter, compatibility wrapper, provider preset, automatic
+fallback policy, live repair, provider login, dependency, or child-issue implementation was added.
+Deferred capabilities are explicit blocked intents owned by #577, #578, or #580.
+
+### S1 Evidence
+
+| Gate | Exact command / proof | Raw outcome |
+| --- | --- | --- |
+| Focused tests | `rtk proxy deno test --no-lock .llm/tools/agentic/runtime/contract_test.ts .llm/tools/agentic/runtime/planner_test.ts` | exit 0; `14 passed | 0 failed`; no permissions requested |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .llm/tools/agentic/runtime --ext ts --pretty` | exit 0; 6 files, 1 batch, 0 failed, 0 findings; wrapper used `--unstable-kv` |
+| Scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root .llm/tools/agentic/runtime --ext ts --pretty` | exit 0; 6 files, 0 findings |
+| Scoped format | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root .llm/tools/agentic/runtime --ext ts --write --pretty`, then the same command without `--write` | write exit 0 after the initial check identified 5 files; final check exit 0, 6 files, 0 findings |
+| Native API inspection | `deno doc --filter planReconciliation .llm/tools/agentic/runtime/planner.ts`; equivalent filters for `RuntimeCommand`, `RuntimeReadPorts`, and `RuntimeMutationPorts` | all exit 0; public signatures resolve without a dependency change |
+| Secret/content boundary | `rg` scans for secret-bearing field names and string/unknown/binary prompt-content fields across the four source files | `SECRET_FIELD_SCAN=PASS`; `CONTENT_FIELD_SCAN=PASS` |
+| File budgets | `wc -l` over the six S1 files, compared with the locked S1 caps | PASS: `220/220`, `151/300`, `117/220`, `348/350`, `214/450`, `232/450` |
+| Lock hygiene | `git rev-parse f1dfdc9:deno.lock`; `git hash-object deno.lock`; `git diff --exit-code f1dfdc9 -- deno.lock` | both blobs `8694862878e6f9a430bf56497a4d5bf3f8eb1f3d`; diff exit 0 |
+| Patch hygiene | `git diff --cached --check` | exit 0 |
+
+### Drift, Debt, and Handoff
+
+- Plan drift: none. S1 stayed within its six planned implementation/test files and hard LOC caps.
+- Architecture debt: none introduced. S1 is functional internal tooling with no new abstraction,
+  dependency, registry, or published surface.
+- Lock drift: none; `deno.lock` is byte-identical to plan commit `f1dfdc9`.
+- Review state: automated gates pass, but this implementation worker does not self-certify Tier-A.
+- Next action: coordinator performs substantive Tier-A S1 review. Do not start S2 until that review
+  is recorded and this same daemon-managed thread is resumed.
+
+## Reconcile Note — S1
+
+Issue #576 and draft PR #585 remain open at exactly one `status:impl`; issue milestone and taxonomy
+remain correct. PR #585 retains `Closes #576`, `Part of #574`, and its PR #584 stack. The coordinator
+Plan-Gate approval and S1 START comments are present, no review comment changes the locked scope,
+acceptance/DoD remains unchecked, and the PR remains draft pending Tier-A S1 review.
