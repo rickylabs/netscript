@@ -83,6 +83,10 @@ its rollback action; do not put provider credentials or values into reports.
 | 2026-07-10 | S1 | doctor baseline | Native ext4 PASS; Node `18.19.1` outdated; Claude/Gemini and their local state missing; both provider sessions `AUTH_REQUIRED`; Codex managed with CLI/app-server `0.144.1`. Raw exit `2` (expected degraded baseline). |
 | 2026-07-10 | S1 | reconcile | #575 and draft PR #584 remain open at `status:impl`; PR carries `Closes #575` and `Part of #574`; no new reviewer/evaluator comments changed scope. |
 | 2026-07-10 | S1 | artifact ownership | Root-owned run artifacts blocked mandatory updates; ownership was narrowed to `codex:codex` for this run directory only, with contents/modes preserved. |
+| 2026-07-10 | S2 | dry-run | Resolved npm stable dist-tags Claude `2.1.206` and Gemini `0.50.0`; planned 7 ordered actions with Node `26.5.0`; raw exit `2` only because pre-existing provider sessions were auth-required. |
+| 2026-07-10 | S2 | live bootstrap | Official Node archive/checksum verified; installed Node, Claude, and Gemini below `~/.local/share/netscript-agentic`; created owned links/state dirs and mode-0600 manifest. Raw exit `2`: installation ready, browser auth still required. |
+| 2026-07-10 | S2 | idempotence | Immediate second live bootstrap resolved the same stable versions and returned `actions: []`, `changed: false`; raw exit `2` solely for provider auth. |
+| 2026-07-10 | S2 | reconcile | #575/#584 remain open at `status:impl`; no new reviewer/evaluator comment changed scope. Owner-only Claude/Gemini browser sign-in is now the only provider-session prerequisite. |
 
 ## Decisions
 
@@ -126,6 +130,34 @@ Substantive slice review: the pure module contains no `Deno.*`, filesystem, proc
 effects; the CLI edge uses fixed command/argument specs and bounds retained command output. Gemini
 forbidden routes expose key names only. File sizes are 242/167/89 LOC, below the internal-tool hard
 cap, and no generic desired-state routing from #576 was introduced.
+
+### S2 — Idempotent bootstrap and rollback plan
+
+| Gate | Result | Raw exit | Evidence |
+| ---- | ------ | -------- | -------- |
+| Full agentic unit set | PASS | 0 | `67 passed`, `0 failed` across 2 files; S2 adds plan/idempotence/rollback semantics |
+| Scoped check wrapper | PASS | 0 | 3 files, 1 batch, 0 findings |
+| Scoped lint wrapper | PASS | 0 | 3 files, 1 batch, 0 findings |
+| Scoped format wrapper | PASS | 0 | 3 files, 1 batch, 0 findings |
+| Bootstrap dry-run | EXPECTED_DEGRADED | 2 | Exact Node/Claude/Gemini versions and 7 value-free ordered actions; auth-required only |
+| First live bootstrap | EXPECTED_DEGRADED | 2 | All tools/state ready; Claude/Gemini browser auth required; no forbidden auth conflicts |
+| Second live bootstrap | IDEMPOTENT | 2 | `actions: []`, `changed: false`; auth-required only |
+| Doctor JSON + human | EXPECTED_DEGRADED | 2 each | All 15 components ready; only two provider auth probes degraded |
+| Non-login consumer smoke | PASS | 0 | Native paths resolve Node 26.5.0, npm 11.17.0, Deno 2.9.0, Codex 0.144.1, Claude 2.1.206, Gemini 0.50.0 |
+| Claude static/native smoke | PARTIAL_AUTH_REQUIRED | 1 | version/help/agents pass; `remote-control --help` explicitly requires claude.ai subscription login |
+| Gemini help smoke | PASS | 0 | CLI help renders without credentials; Google subscription route remains owner-login pending |
+| Rollback plan | PASS | 0 | Non-destructive output scopes owned roots, restores previous symlink targets, preserves `~/.codex` and Windows Claude |
+| State manifest | PASS | 0 | mode `0600`, 2 owned roots, 5 owned links, no credential values |
+| Deno/Codex preservation | PASS | 0 | Deno `2.9.0`; Codex CLI/app-server `0.144.1`, managed |
+| Lock hygiene | PASS | 0 | `deno.lock` unchanged |
+
+Substantive slice review: Node installation verifies the official SHA-256 before extraction and
+atomically renames a user-owned staging directory. npm stable tags are resolved before exact-version
+installation; fixed argv and bounded output keep credentials out of reports. Existing non-symlink
+files are refused, previous symlink targets are recorded, and rollback output never executes.
+Machine mutation is confined to the documented user-local roots. Source files remain under the
+500-LOC internal-tool cap at 340/436/152 LOC. Generic routing/state transitions remain deferred to
+#576/#579.
 
 ## Handoff Notes
 

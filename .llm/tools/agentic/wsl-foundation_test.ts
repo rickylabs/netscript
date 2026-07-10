@@ -1,11 +1,13 @@
 import {
   buildDoctorReport,
+  buildRollbackPlan,
   classifyAuth,
   classifyComponent,
   classifyMobileControl,
   classifyStateDirectory,
   FOUNDATION_SCHEMA_VERSION,
   parseVersion,
+  planBootstrap,
 } from './wsl-foundation-lib.ts';
 
 function assert(condition: unknown, message: string): asserts condition {
@@ -86,4 +88,65 @@ Deno.test('doctor report prioritizes auth conflict over degraded state', () => {
   });
   assertEquals(report.schemaVersion, FOUNDATION_SCHEMA_VERSION);
   assertEquals(report.overall, 'invalid_configuration');
+});
+
+Deno.test('bootstrap plan is ordered, exact-versioned, and reversible by ownership', () => {
+  const report = buildDoctorReport({
+    generatedAt: '2026-07-10T00:00:00.000Z',
+    nativePath: { cwd: '/home/codex/repos/netscript', nativeExt4: true },
+    components: [
+      classifyComponent({ component: 'node', output: 'v18.19.1', exitCode: 0, expected: '26.5.0' }),
+      classifyComponent({ component: 'claude', output: '', exitCode: 127 }),
+      classifyComponent({ component: 'gemini', output: '', exitCode: 127 }),
+      classifyStateDirectory('state-claude', '.claude', false),
+    ],
+    auth: classifyAuth(new Set(), false, false),
+    mobileControl: classifyMobileControl(true, '0.144.1', '0.144.1'),
+  });
+  const plan = planBootstrap(report, { claude: '2.1.206', gemini: '0.50.0' });
+  assertEquals(plan.changed, true);
+  assertEquals(plan.desired, { node: '26.5.0', claude: '2.1.206', gemini: '0.50.0' });
+  assertEquals(plan.actions.map((action) => action.kind), [
+    'create_directory',
+    'install_node',
+    'install_npm_clis',
+    'ensure_symlinks',
+    'write_state',
+  ]);
+  const npmAction = plan.actions.find((action) => action.kind === 'install_npm_clis');
+  assert(npmAction?.kind === 'install_npm_clis', 'npm action exists');
+  assertEquals(npmAction.packages, [
+    '@anthropic-ai/claude-code@2.1.206',
+    '@google/gemini-cli@0.50.0',
+  ]);
+});
+
+Deno.test('bootstrap plan is empty when desired state is already present', () => {
+  const report = buildDoctorReport({
+    generatedAt: '2026-07-10T00:00:00.000Z',
+    nativePath: { cwd: '/home/codex/repos/netscript', nativeExt4: true },
+    components: [
+      classifyComponent({ component: 'node', output: 'v26.5.0', exitCode: 0, expected: '26.5.0' }),
+      classifyComponent({ component: 'claude', output: '2.1.206', exitCode: 0 }),
+      classifyComponent({ component: 'gemini', output: '0.50.0', exitCode: 0 }),
+      classifyStateDirectory('state-claude', '.claude', true),
+      classifyStateDirectory('state-codex', '.codex', true),
+      classifyStateDirectory('state-gemini', '.gemini', true),
+      classifyStateDirectory('state-netscript-agentic', '.config/netscript-agentic', true),
+    ],
+    auth: classifyAuth(new Set(), true, true),
+    mobileControl: classifyMobileControl(true, '0.144.1', '0.144.1'),
+  });
+  const plan = planBootstrap(report, { claude: '2.1.206', gemini: '0.50.0' });
+  assertEquals(plan.changed, false);
+  assertEquals(plan.actions, []);
+});
+
+Deno.test('rollback plan never removes Codex or provider session directories', () => {
+  const rollback = buildRollbackPlan();
+  assertEquals(rollback.destructive, false);
+  assertEquals(rollback.windowsClaude, 'preserved');
+  const rendered = JSON.stringify(rollback);
+  assert(!rendered.includes('$HOME/.codex'), 'Codex home is not an owned rollback root');
+  assert(rendered.includes('Leave ~/.codex'), 'Codex preservation is explicit');
 });

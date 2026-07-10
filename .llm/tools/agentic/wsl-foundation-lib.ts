@@ -70,6 +70,33 @@ export interface RuntimeDoctorReport {
   overall: 'ready' | 'degraded' | 'invalid_configuration';
 }
 
+export interface DesiredCliVersions {
+  claude: string;
+  gemini: string;
+}
+
+export type InstallAction =
+  | { kind: 'create_directory'; relativePath: string }
+  | { kind: 'install_node'; version: string; archive: string }
+  | { kind: 'install_npm_clis'; packages: string[] }
+  | { kind: 'ensure_symlinks'; names: string[] }
+  | { kind: 'write_state'; relativePath: string };
+
+export interface BootstrapPlan {
+  schemaVersion: typeof FOUNDATION_SCHEMA_VERSION;
+  desired: { node: string; claude: string; gemini: string };
+  actions: InstallAction[];
+  changed: boolean;
+}
+
+export interface RollbackPlan {
+  schemaVersion: typeof FOUNDATION_SCHEMA_VERSION;
+  destructive: false;
+  ownedRoots: string[];
+  steps: string[];
+  windowsClaude: 'preserved';
+}
+
 export const FORBIDDEN_GEMINI_AUTH_KEYS = [
   'GEMINI_API_KEY',
   'GOOGLE_API_KEY',
@@ -238,5 +265,76 @@ export function buildDoctorReport(
     schemaVersion: FOUNDATION_SCHEMA_VERSION,
     ...input,
     overall: authConflict ? 'invalid_configuration' : degraded ? 'degraded' : 'ready',
+  };
+}
+
+/** Plans only missing/outdated user-local state; execution remains at the CLI edge. */
+export function planBootstrap(
+  report: RuntimeDoctorReport,
+  desired: DesiredCliVersions,
+): BootstrapPlan {
+  const actions: InstallAction[] = [];
+  const missingDirs = report.components
+    .filter((probe) => probe.component.startsWith('state-') && probe.status === 'missing')
+    .map((probe) => probe.expected)
+    .filter((path): path is string => Boolean(path));
+  for (const relativePath of missingDirs) actions.push({ kind: 'create_directory', relativePath });
+
+  const byId = new Map(report.components.map((probe) => [probe.component, probe]));
+  if (byId.get('node')?.detectedVersion !== NODE_VERSION) {
+    actions.push({
+      kind: 'install_node',
+      version: NODE_VERSION,
+      archive: `node-v${NODE_VERSION}-linux-x64.tar.xz`,
+    });
+  }
+  const packages: string[] = [];
+  if (byId.get('claude')?.detectedVersion !== desired.claude) {
+    packages.push(`@anthropic-ai/claude-code@${desired.claude}`);
+  }
+  if (byId.get('gemini')?.detectedVersion !== desired.gemini) {
+    packages.push(`@google/gemini-cli@${desired.gemini}`);
+  }
+  if (packages.length > 0) actions.push({ kind: 'install_npm_clis', packages });
+  if (
+    actions.some((action) => action.kind === 'install_node' || action.kind === 'install_npm_clis')
+  ) {
+    actions.push({
+      kind: 'ensure_symlinks',
+      names: ['node', 'npm', 'npx', 'claude', 'gemini'],
+    });
+  }
+  if (actions.length > 0) {
+    actions.push({
+      kind: 'write_state',
+      relativePath: '.config/netscript-agentic/foundation-state.json',
+    });
+  }
+  return {
+    schemaVersion: FOUNDATION_SCHEMA_VERSION,
+    desired: { node: NODE_VERSION, ...desired },
+    actions,
+    changed: actions.length > 0,
+  };
+}
+
+/** Returns non-executing reversal guidance scoped to files owned by this bootstrap. */
+export function buildRollbackPlan(): RollbackPlan {
+  return {
+    schemaVersion: FOUNDATION_SCHEMA_VERSION,
+    destructive: false,
+    ownedRoots: [
+      '$HOME/.local/share/netscript-agentic',
+      '$HOME/.config/netscript-agentic',
+      '$HOME/.local/bin/{node,npm,npx,claude,gemini}',
+    ],
+    steps: [
+      'Stop native WSL Claude/Gemini sessions before rollback.',
+      'Inspect foundation-state.json; detach only owned symlinks and restore each non-null previous target.',
+      'Remove the user-local npm and Node roots after the symlinks are detached.',
+      'Leave ~/.codex and all provider auth/session directories intact.',
+      'Open native Windows Claude and run claude --version as the break-glass verification.',
+    ],
+    windowsClaude: 'preserved',
   };
 }
