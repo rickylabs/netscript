@@ -78,3 +78,13 @@ evidence will be appended as slices land.
 - Moved: none. Remaining folders already predict their concern; root wrappers and the asset
   generator are stable path contracts.
 - Whole-repo post-delete basename scans found no live references outside historical `.llm/runs/**`.
+
+## Documentation rewritten
+
+- `.llm/tools/README.md`: complete concern map, stable entry points, safety/ownership boundaries,
+  and maintenance map including `release/config/`.
+- `.llm/tools/entry.md`: removed the deleted search suite and corrected the retained independent e2e
+  diagnostic narrative.
+- `packages/cli/e2e/README.md`: corrected the retained diagnostic's actual path.
+- `.agents/skills/netscript-tools/SKILL.md`: added canonical release endpoint and maintenance-map
+  pointers; its `.claude/skills/` mirror is regenerated, not hand-edited.

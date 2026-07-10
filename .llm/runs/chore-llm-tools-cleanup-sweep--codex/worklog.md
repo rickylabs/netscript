@@ -47,15 +47,18 @@ the stable root task name.
 
 ## Progress Log
 
-| Time       | Slice | Step             | Notes                                                                                                                       |
-| ---------- | ----- | ---------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| 2026-07-11 | 1     | baseline         | 55 TS files: check 0, lint 0, fmt 7 pre-existing, tests 23/23.                                                              |
-| 2026-07-11 | 2     | coordinator gate | Owner-waived external evaluator; separate Opus 4.8 coordinator approved with e2e KEEP correction.                           |
-| 2026-07-11 | 2     | legacy removal   | Deleted five approved unreferenced search tools; repaired retained e2e documented path.                                     |
-| 2026-07-11 | 2     | reconcile        | PR #595 remains independent; no issue-closing keyword applies.                                                              |
-| 2026-07-11 | 3     | Deno/@std        | Replaced two hand-rolled dirname helpers with `@std/path`; centralized duplicated JSR API endpoint under `release/config/`. |
-| 2026-07-11 | 3     | consistency      | Resolved all seven pre-existing formatter findings without changing contracts; added endpoint drift guard.                  |
-| 2026-07-11 | 3     | reconcile        | No new deletion or dependency; `deno.lock` restored after validator wildcard churn.                                         |
+| Time       | Slice | Step               | Notes                                                                                                                       |
+| ---------- | ----- | ------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| 2026-07-11 | 1     | baseline           | 55 TS files: check 0, lint 0, fmt 7 pre-existing, tests 23/23.                                                              |
+| 2026-07-11 | 2     | coordinator gate   | Owner-waived external evaluator; separate Opus 4.8 coordinator approved with e2e KEEP correction.                           |
+| 2026-07-11 | 2     | legacy removal     | Deleted five approved unreferenced search tools; repaired retained e2e documented path.                                     |
+| 2026-07-11 | 2     | reconcile          | PR #595 remains independent; no issue-closing keyword applies.                                                              |
+| 2026-07-11 | 3     | Deno/@std          | Replaced two hand-rolled dirname helpers with `@std/path`; centralized duplicated JSR API endpoint under `release/config/`. |
+| 2026-07-11 | 3     | consistency        | Resolved all seven pre-existing formatter findings without changing contracts; added endpoint drift guard.                  |
+| 2026-07-11 | 3     | reconcile          | No new deletion or dependency; `deno.lock` restored after validator wildcard churn.                                         |
+| 2026-07-11 | 4     | docs               | Rewrote the concern map, retained e2e description, and maintenance map; removed deleted search documentation.               |
+| 2026-07-11 | 4     | canonical pointers | Updated `netscript-tools` source skill and regenerated its Claude mirror.                                                   |
+| 2026-07-11 | 4     | reconcile          | Rechecked documented tasks and paths; deletion list remains explicit in inventory and PR.                                   |
 
 ## Gate Results
 

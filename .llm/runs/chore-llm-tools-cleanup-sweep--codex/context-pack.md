@@ -22,7 +22,7 @@ explicit owner waiver. Implementation is cleared.
 
 ## In Progress
 
-- Slice 3: release config and Deno/@std harmonization.
+- Slice 4: documentation and canonical maintenance pointers.
 
 ## Next Steps
 
