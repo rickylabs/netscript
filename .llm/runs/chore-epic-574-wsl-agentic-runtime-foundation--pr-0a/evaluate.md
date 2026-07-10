@@ -43,3 +43,10 @@
 | --- | --- |
 | Verdict | `PASS` |
 | Rationale | The owner explicitly waived a separate evaluator run and instructed that personal review be treated as passed. Tier-A review found and remediated one correctness issue. This verdict does not waive the remaining interactive #575 acceptance checks or authorize merge while its Definition of Done is incomplete. |
+
+## 2026-07-10 Post-Evaluation Scope Change
+
+The prior implementation verdict covers the historical Gemini-based foundation at `9b75470`; it
+does not certify the owner-authorized Antigravity replacement. PR #584 remains draft. Merge now
+requires canonical `codex`-user `agy` install/auth evidence plus the documented headless and research
+acceptance canaries, after the planned foundation refactor is implemented and reviewed.

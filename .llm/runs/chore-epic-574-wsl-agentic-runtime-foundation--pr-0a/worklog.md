@@ -240,3 +240,18 @@ block merge readiness.
 
 - Evaluator should challenge the #575/#576 boundary and whether every mobile/auth acceptance item has
   a concrete gate without requiring credentials in artifacts.
+
+## 2026-07-10 Scope Reconciliation: Antigravity Replaces Future Gemini Lane
+
+Owner directive at 15:13:25 +02:00: uninstall the already-installed Gemini CLI, configure Google
+Antigravity CLI (`agy`), update related issues, and identify required refactoring. This changes the
+future desired state only; all completed Gemini facts in this log remain historical evidence.
+
+Planning-only reconciliation identifies the foundation refactor in
+`wsl-foundation-lib.ts`, `wsl-foundation.ts`, `wsl-foundation_test.ts`, and the agentic README.
+The future implementation must remove only NetScript-owned Gemini links/package state, preserve
+`~/.gemini`, install/prove `/home/codex/.local/bin/agy` as `codex`, and never touch
+`/root/.local/bin/agy`. Official sources verify interactive Google Sign-In and `/logout`, but not an
+`agy login` command. Canonical-user auth, headless execution, structured output, exit taxonomy,
+quota/subscription, web research/citations, and instruction-file behavior remain unpassed canaries.
+No runtime source changed in this reconciliation; PR #584 remains draft.

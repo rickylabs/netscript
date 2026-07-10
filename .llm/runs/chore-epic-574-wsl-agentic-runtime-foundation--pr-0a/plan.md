@@ -170,3 +170,30 @@ evidence.
 - Provider installers require system-wide or credential-bearing arguments.
 - Claude/Gemini CLI auth cannot distinguish subscription sign-in from forbidden routes.
 - Any requirement to restart an active Codex daemon.
+
+## 2026-07-10 Owner Rescope Addendum: Gemini CLI to Antigravity CLI
+
+The owner's 2026-07-10 15:13:25 +02:00 mobile directive supersedes the future desired-state
+references to Gemini CLI in this plan. Completed Gemini installation, policy, and smoke records above
+remain historical evidence and are not rewritten. The revised desired foundation component is Google
+Antigravity CLI (`agy`) installed as the `codex` WSL user at
+`/home/codex/.local/bin/agy`; `/root/.local/bin/agy` is unrelated and must not be changed.
+
+Official primary sources:
+
+- <https://github.com/google-antigravity/antigravity-cli>
+- <https://antigravity.google/cli/install.sh>
+- <https://github.com/google-antigravity/antigravity-cli/blob/main/CHANGELOG.md>
+
+The future implementation slice replaces Gemini component/version/install/auth probes and tests with
+Antigravity equivalents. It preserves `~/.gemini` because Antigravity uses
+`~/.gemini/config/` and `~/.gemini/antigravity-cli/`. No `gemini` executable alias is introduced.
+The bootstrap may remove only the NetScript-owned Gemini symlink/package recorded by its ownership
+manifest.
+
+The following are acceptance canaries, not assumed contracts: canonical-user installation and
+Google Sign-In, credential/keyring persistence, subscription/quota behavior, `agy --version`,
+machine-readable JSON/JSONL, complete exit-code taxonomy, deterministic web-search/fetch/citation
+behavior, `AGENTS.md`/`GEMINI.md` ingestion, and Gemini-state migration. The official README verifies
+keyring/Google Sign-In, browser/SSH authorization URL behavior, and `/logout`; it does not document
+an `agy login` command. Foundation implementation remains paused until this revised scope is reviewed.

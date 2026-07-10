@@ -104,3 +104,20 @@ the remaining interactive acceptance checks.
 ## Commits
 
 - See the draft PR's commit list + per-slice PR comments.
+
+## 2026-07-10 Desired-State Reconciliation
+
+- Future desired component: Google Antigravity CLI (`agy`), not Gemini CLI.
+- Historical Gemini installation/auth evidence remains true historical evidence.
+- Canonical proof target: `/home/codex/.local/bin/agy` owned and executed by user `codex`; never
+  mutate `/root/.local/bin/agy`.
+- Preserve `~/.gemini`; Antigravity uses it for shared and CLI-private configuration.
+- Future refactor surfaces:
+  `.llm/tools/agentic/wsl-foundation-lib.ts`, `wsl-foundation.ts`,
+  `wsl-foundation_test.ts`, and `.llm/tools/agentic/README.md`.
+- Replace component/version/install/auth/state probes and rollback ownership with `agy` semantics;
+  retain a bounded compatibility reader for already-recorded Gemini ownership state if required.
+- Owner reported Antigravity and Claude login, but canonical `codex`-user `agy` path/auth/headless
+  proof is not yet recorded. Authentication, quota, structured output, and research capabilities
+  remain acceptance canaries.
+- PR #584 stays draft; no implementation resumes until scope review.

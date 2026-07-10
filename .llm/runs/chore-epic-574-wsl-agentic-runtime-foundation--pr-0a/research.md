@@ -35,3 +35,28 @@
 - None that force rework. Google subscription sign-in and Claude sign-in may require an owner browser
   interaction; the bootstrap must classify that as `AUTH_REQUIRED` and continue every independent
   installation/doctor/rollback check.
+
+## 2026-07-10 Antigravity Reconciliation Research
+
+The owner replaced the future Gemini CLI lane with Google Antigravity CLI (`agy`). Official sources
+verify:
+
+- Linux installation is `curl -fsSL https://antigravity.google/cli/install.sh | bash`.
+- The installer defaults to `$HOME/.local/bin/agy`, accepts only `--dir`/`-d` and `--help`/`-h`,
+  verifies SHA-512, leaves an existing binary untouched, and says regular runs self-update.
+- The installer documents no uninstall command; its safe fresh-install instruction is removal of the
+  exact installed binary.
+- The official README says authentication uses the system keyring, falls back to Google Sign-In,
+  opens a browser locally, emits an authorization URL over SSH, and uses `/logout` to clear saved
+  credentials.
+- The official changelog documents headless `--print`/`-p`; version 1.1.1 makes server failures write
+  stderr and return nonzero and fixes subprocess stdin hangs. It also documents
+  `--conversation`/`-c`, `--model`, `--agent`, `--sandbox`, `--project`, `--new-project`, and
+  `--mode`.
+- Antigravity uses both `~/.gemini/config/` and `~/.gemini/antigravity-cli/`; therefore migration
+  must preserve `~/.gemini`.
+
+Official sources do not define JSON/JSONL output, a complete exit-code table, a named `agy login`
+command, subscription/quota semantics, a stable web-search/citation interface, instruction-file
+compatibility, or a Gemini executable/config migration contract. These remain explicit acceptance
+canaries.
