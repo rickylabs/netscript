@@ -55,3 +55,23 @@ mirrors, and run the documented gates. Do not add model tables to individual ski
 - Initial status: only untracked coordinator-owned `codex-thread-ids.md`; preserved.
 - Plain `git fetch origin`: failed due stale absent remote fetch ref; recorded in drift.
 
+## Slice 2 — canonical policy data and rendered lane table
+
+- Added finite typed canonical routes, dated resolution, quota-only fallback eligibility, and
+  opposite-family review data in `runtime/routing-policy.ts`.
+- Replaced the stale tier binding table with the canonical rendered policy view in
+  `workflow/lane-policy.md` and retained harness invariants plus the explicit #582 boundary.
+- Removed completed #581 from `DEFERRED_ISSUES`; #582 remains the sole deferred rollout owner.
+- Focused policy/contract/deferred-boundary tests: 20 passed, 0 failed.
+- Scoped wrapper check: 5 files, 0 findings.
+- Scoped wrapper lint: 5 files, 0 findings.
+- Scoped wrapper fmt: 5 files, 0 findings.
+- Full agentic-root fmt currently reports two pre-existing findings in `openhands-status.ts` and
+  `validate-claude-surface.ts`; neither file is owned by this slice. Changed-file fmt is green.
+- `git diff --check`, secret scan, and lock verification are required immediately before commit.
+
+### Reconcile note
+
+PR #590 remains draft at implementation phase. The approved plan is unchanged. The distinct Gemini
+model lane remains an owner open question; Antigravity `agy` is implemented as directed. No #582
+rollout/promotion capability was added.

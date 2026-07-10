@@ -2,9 +2,9 @@
 
 ## State
 
-Plan & Design prepared on branch `feat/epic-574-routing-policy`, stacked on `908d4f25`. Implementation
-must not begin until the Claude coordinator completes Plan-Gate approval. This Codex session does not
-self-certify.
+Plan-Gate was approved by the Claude coordinator. Slice 2 implements typed canonical policy data,
+the rendered single lane table, dated route tests, quota-only Fable fallback, Antigravity `agy`, and
+the retained #582 boundary. This Codex session does not self-certify.
 
 ## Locked scope
 
@@ -24,6 +24,5 @@ Codex/OpenHands launch edges enforce and record provider/model/effort using exis
 
 ## Resume point
 
-Await coordinator Plan-Gate. After approval, implement slices 2–5 from `plan.md`, one reviewed,
-committed, explicitly pushed, and PR-commented slice at a time while updating this run directory.
-
+Complete slice 2 hygiene, commit/push/comment it, then implement slice 3 launcher enforcement and
+requested-versus-observed evidence. Continue one explicitly pushed and PR-commented slice at a time.
