@@ -25,6 +25,7 @@ coordinator Plan-Gate approves that checkpoint.
 | 2026-07-10 | S0 | research/design | Re-baselined merged controller and current primary provider/profile docs; no implementation performed. |
 | 2026-07-10 | S1 | implementation | Added finite runner/provider profiles and OpenRouter presets; removed only #577 route deferral while preserving #578 and #580 blocks. |
 | 2026-07-10 | S2 | implementation | Added late-bound child environment policy and adapter; credential values exist only in the fresh child env passed directly to `Deno.Command`. |
+| 2026-07-10 | S3 | implementation | Wired supported Claude model/base-route env and Codex named profile mechanisms; custom Claude explicitly reports Remote Control unavailable and experimental non-Anthropic behavior. |
 
 ## Provider slug verification
 
@@ -53,6 +54,12 @@ All three planned slugs were current; no registry correction or slug drift was r
 | S2 environment invariant | PASS | Fresh child env clears rivals and contains only selected target binding; injected parent map is unchanged; missing credential does not spawn. |
 | S2 patch/effect/secret/lock | PASS | `git diff --check` clean; no `Deno.env.set/delete`; `Deno.env`/`Deno.Command` only under adapters; credential scan clean; lock unchanged. |
 | S2 LOC | PASS | child adapter 161/300; ports 235/300; profile registry 174/280; focused test 101/450. |
+| S3 focused tests | PASS | Exit 0; 19 passed, 0 failed across runner-profile, child-env, and adapter suites; compatibility wrappers 2/0 with required permissions. |
+| S3 scoped check/lint/fmt | PASS | Exit 0 each; 26 runtime files selected, zero findings. Targeted wrapper `deno check --unstable-kv` also exits 0. |
+| S3 provider mechanisms | PASS | Claude uses `--model`, OpenRouter Anthropic base `https://openrouter.ai/api`, child auth token plus explicit empty native key; Codex writes a credential-free mode-0600 named profile with Responses base and selects it using `--profile`. |
+| S3 custom Claude | PASS | Credential-free HTTPS base URL validation; result metadata reports `remoteControl: unavailable` and `experimentalNonAnthropicModel: true`. |
+| S3 patch/effect/secret/lock | PASS | `git diff --check` clean; no parent mutation API; runtime effects remain adapter-only; credential scan and lock proof clean. |
+| S3 LOC | PASS | provider 128/280; ports 246/300; planner 350/420; Claude 115/300; Codex 249/350; profile adapter 94/300; focused test 224/450. |
 
 ## Reconcile Notes
 
@@ -61,6 +68,9 @@ All three planned slugs were current; no registry correction or slug drift was r
   `capability_deferred` results; #579/#581/#582 code was not touched.
 - **S2:** S1 PR comment is present. No coordinator/reviewer comment changed scope. Environment
   injection stays adapter-only and value-free above the spawn edge; no #578–#582 behavior changed.
+- **S3:** S2 PR comment is present. Current OpenRouter Claude documentation requires
+  `ANTHROPIC_API_KEY` to be explicitly empty (not merely absent), so the child-only policy now
+  models safe empty keys. This is a compatibility correction within L6/L7, not expanded scope.
 
 ## Handoff Notes
 

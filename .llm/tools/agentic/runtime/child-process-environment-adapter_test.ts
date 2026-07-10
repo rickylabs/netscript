@@ -36,11 +36,11 @@ Deno.test('child environment late-binds only the selected target and leaves pare
     ['ANTHROPIC_API_KEY', crypto.randomUUID()],
   ]);
   const before = JSON.stringify([...parent]);
-  let childEnvironment: Readonly<Record<string, string>> | null = null;
+  const child: { environment: Readonly<Record<string, string>> | null } = { environment: null };
   const adapter = new ChildProcessEnvironmentAdapter(
     { get: (key) => parent.get(key), toObject: () => Object.fromEntries(parent) },
     (_executable, options) => {
-      childEnvironment = options.env;
+      child.environment = options.env;
       return {
         status: Promise.resolve({ success: true, code: 0, signal: null }),
         stdout: stream(),
@@ -52,7 +52,14 @@ Deno.test('child environment late-binds only the selected target and leaves pare
   const policy = childEnvironmentPolicyForProfile(PROVIDER_PROFILES['claude-openrouter']);
   const outcome = await adapter.run(request(policy));
   assertEquals(outcome, { exitCode: 0, timedOut: false });
-  assertEquals(childEnvironment, { ANTHROPIC_AUTH_TOKEN: opaque });
+  assertEquals(child.environment?.ANTHROPIC_API_KEY, '');
+  assertEquals(child.environment?.ANTHROPIC_AUTH_TOKEN, opaque);
+  assertEquals(child.environment?.ANTHROPIC_BASE_URL, 'https://openrouter.ai/api');
+  assertEquals(Object.keys(child.environment ?? {}).sort(), [
+    'ANTHROPIC_API_KEY',
+    'ANTHROPIC_AUTH_TOKEN',
+    'ANTHROPIC_BASE_URL',
+  ]);
   assertEquals(JSON.stringify([...parent]), before, 'parent environment map changed');
   assert(!JSON.stringify(outcome).includes(opaque), 'credential entered process outcome');
 });
@@ -95,6 +102,7 @@ Deno.test('policy refuses a selected target that is also explicitly cleared', as
   );
   const outcome = await adapter.run(request({
     clearKeys: ['OPENROUTER_API_KEY'],
+    emptyKeys: [],
     bindings: [{ sourceKey: 'OPENROUTER_API_KEY', targetKey: 'OPENROUTER_API_KEY' }],
   }));
   assertEquals(outcome.diagnostic?.code, 'auth_required');

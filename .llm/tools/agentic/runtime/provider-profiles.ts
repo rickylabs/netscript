@@ -33,6 +33,9 @@ export interface ProviderProfile {
   readonly clearKeys: readonly (ProviderCredentialKey | ProviderRouteKey)[];
 }
 
+export const OPENROUTER_ANTHROPIC_BASE_URL = 'https://openrouter.ai/api' as const;
+export const OPENROUTER_RESPONSES_BASE_URL = 'https://openrouter.ai/api/v1' as const;
+
 function profile(
   values: Omit<ProviderProfile, 'clearKeys'>,
   retainedKeys: readonly (ProviderCredentialKey | ProviderRouteKey)[],
@@ -143,13 +146,33 @@ export function getProviderProfile(id: ProviderProfileId): ProviderProfile {
 /** Builds a value-free child environment policy for a selected profile. */
 export function childEnvironmentPolicyForProfile(
   profile: ProviderProfile,
+  route?: RouteIdentity,
+  codexHome?: string,
 ): import('./ports.ts').ChildEnvironmentPolicy {
+  const fixedValues: import('./ports.ts').ChildEnvironmentFixedValue[] = [];
+  const emptyKeys: string[] = [];
+  if (profile.id === 'claude-openrouter') {
+    fixedValues.push({ targetKey: 'ANTHROPIC_BASE_URL', value: OPENROUTER_ANTHROPIC_BASE_URL });
+    emptyKeys.push('ANTHROPIC_API_KEY');
+  } else if (profile.id === 'claude-custom' && route?.baseUrl) {
+    fixedValues.push({ targetKey: 'ANTHROPIC_BASE_URL', value: route.baseUrl });
+    emptyKeys.push('ANTHROPIC_API_KEY');
+  }
+  if (codexHome) {
+    fixedValues.push({ targetKey: 'CODEX_HOME', value: codexHome });
+    fixedValues.push({
+      targetKey: 'WSLENV',
+      value: `${profile.credentialTargetKey}:CODEX_HOME/p`,
+    });
+  }
   return {
     clearKeys: profile.clearKeys,
+    ...(emptyKeys.length ? { emptyKeys } : {}),
     bindings: [{
       sourceKey: profile.credentialSourceKey,
       targetKey: profile.credentialTargetKey,
     }],
+    ...(fixedValues.length ? { fixedValues } : {}),
   };
 }
 

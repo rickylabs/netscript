@@ -84,6 +84,7 @@ export interface RouteIdentity {
   readonly agent: AgentKind;
   readonly provider: ProviderKind;
   readonly profileId?: import('./provider-profiles.ts').ProviderProfileId;
+  readonly baseUrl?: string;
   readonly model: string;
   readonly effort: Effort;
   readonly worktree: string;

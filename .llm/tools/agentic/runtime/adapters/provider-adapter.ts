@@ -59,6 +59,21 @@ export function validateProviderRoute(input: ProviderValidationInput): ProviderV
   ) {
     diagnostics.push(diagnostic('missing_identity', 'input', 'route identity is incomplete'));
   }
+  if (route.provider === 'custom') {
+    try {
+      const baseUrl = new URL(route.baseUrl ?? '');
+      if (
+        baseUrl.protocol !== 'https:' || baseUrl.username || baseUrl.password || baseUrl.search ||
+        baseUrl.hash
+      ) throw new Error('unsafe URL');
+    } catch {
+      diagnostics.push(diagnostic(
+        'unsupported_route',
+        'provider',
+        'custom Claude route requires a credential-free HTTPS base URL',
+      ));
+    }
+  }
   if (!input.nativeExt4 || !route.worktree?.startsWith('/home/')) {
     diagnostics.push(
       diagnostic('non_native_worktree', 'policy', 'route worktree is not native ext4'),

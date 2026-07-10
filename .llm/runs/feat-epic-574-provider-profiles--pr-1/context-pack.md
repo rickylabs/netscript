@@ -12,9 +12,8 @@
 
 ## Current State
 
-Coordinator Plan-Gate is approved. S1 implements profile/preset routing. S2 implements child-only
-late-bound environment injection with explicit conflict clearing and no parent mutation. S3 runner
-profile mechanisms are next.
+Coordinator Plan-Gate is approved. S1 implements profile routing, S2 child-only environment
+injection, and S3 supported Claude/Codex profile mechanisms. S4 fail-closed canaries are next.
 
 ## Completed
 
@@ -24,13 +23,15 @@ profile mechanisms are next.
 - Locked four implementation slices after S0, with explicit #578–#582 boundaries and LOC budgets.
 - S1 focused tests pass 30/0; scoped check/lint/fmt pass with 22 files and zero findings.
 - S2 focused tests pass 10/0; scoped check/lint/fmt pass with 24 files and zero findings.
+- S3 focused tests pass 19/0 plus compatibility wrappers 2/0; scoped check/lint/fmt pass with 26
+  runtime files and zero findings.
 - OpenRouter slugs verified 2026-07-10: `minimax/minimax-m3`, `z-ai/glm-5.2`,
   `x-ai/grok-4.5`.
 
 ## Next Steps
 
-1. Commit, push, and comment S2.
-2. Implement S3 Claude/Codex profile mechanisms and custom-Claude route diagnostics.
+1. Commit, push, and comment S3.
+2. Implement S4 read-only compatibility canaries and documentation.
 
 ## Key Decisions
 
@@ -48,6 +49,8 @@ profile mechanisms are next.
 | S1 static wrappers | PASS | check/lint/fmt exit 0; zero findings |
 | S2 focused | PASS | 10 passed, 0 failed |
 | S2 static wrappers | PASS | check/lint/fmt exit 0; 24 files, zero findings |
+| S3 focused | PASS | 19 passed, 0 failed; compatibility wrappers 2 passed |
+| S3 static wrappers | PASS | check/lint/fmt exit 0; 26 files, zero findings |
 
 ## Open Questions
 

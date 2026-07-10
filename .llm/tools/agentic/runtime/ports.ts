@@ -58,7 +58,13 @@ export interface ChildEnvironmentBinding {
 }
 export interface ChildEnvironmentPolicy {
   readonly clearKeys: readonly string[];
+  readonly emptyKeys?: readonly string[];
   readonly bindings: readonly ChildEnvironmentBinding[];
+  readonly fixedValues?: readonly ChildEnvironmentFixedValue[];
+}
+export interface ChildEnvironmentFixedValue {
+  readonly targetKey: import('./provider-profiles.ts').ProviderRouteKey | 'CODEX_HOME' | 'WSLENV';
+  readonly value: string;
 }
 export interface ChildProcessOutcome {
   readonly exitCode: number;
@@ -72,7 +78,12 @@ export interface AgentCommandPlan {
   readonly route: RouteIdentity;
   readonly content?: ContentReference;
   readonly request: AgentProcessRequest | null;
+  readonly providerCompatibility?: ProviderRouteCompatibility;
   readonly diagnostics: readonly RuntimeDiagnostic[];
+}
+export interface ProviderRouteCompatibility {
+  readonly remoteControl: 'available' | 'unavailable' | 'not_applicable';
+  readonly experimentalNonAnthropicModel: boolean;
 }
 export type RuntimeInspectorPort = { observeRuntime(): Promise<ObservedRuntimeState> };
 export type PersistedStateReaderPort = {

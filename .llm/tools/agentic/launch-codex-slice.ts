@@ -67,6 +67,8 @@ interface Options {
   user: string;
   parseLog?: string;
   pretty: boolean;
+  profile?: string;
+  profileHome?: string;
 }
 
 function printHelp(): void {
@@ -84,6 +86,8 @@ function printHelp(): void {
     '  --dest <wsl path>    Explicit WSL staging path for the brief. Overrides --slug.',
     '  --slice-dir <path>   Windows path to the run-artifact slice dir for codex-thread-ids.md.',
     '  --expect-base <sha>  If set, worktree HEAD short sha must equal this before launch.',
+    '  --profile <name>     Named Codex profile layer for this child only.',
+    '  --profile-home <dir> Isolated CODEX_HOME containing the named profile.',
     '  --user <name>        WSL user. Default: codex.',
     '  --dry-run            Validate + safety-check + stage + print launch command; do not send.',
     '  --parse-log <file>   Parse a saved launch log for thread id and exit.',
@@ -123,6 +127,14 @@ function parseArgs(args: string[]): Options | null {
         break;
       case '--expect-base':
         o.expectBase = requireValue(args, i, a);
+        i++;
+        break;
+      case '--profile':
+        o.profile = requireValue(args, i, a);
+        i++;
+        break;
+      case '--profile-home':
+        o.profileHome = requireValue(args, i, a);
         i++;
         break;
       case '--user':
@@ -205,6 +217,10 @@ async function main(): Promise<void> {
     console.error('--brief and --worktree are required to launch. See --help.');
     Deno.exit(2);
   }
+  if (Boolean(o.profile) !== Boolean(o.profileHome)) {
+    console.error('--profile and --profile-home must be supplied together.');
+    Deno.exit(2);
+  }
   const dest = o.dest ?? `${wslHome()}/${o.slug ?? 'slice'}-brief.md`;
 
   // 1) Validate the brief contract (read on Windows; LF-normalize in memory).
@@ -256,8 +272,14 @@ async function main(): Promise<void> {
   // spawned from a Windows cwd, leaving the launch (and `send-message-v2`,
   // which derives the agent's worktree from the ambient cwd) in the wrong
   // directory. See wslCd in agentic-lib.ts.
-  const launchCommand =
-    `wsl.exe -u ${o.user} --cd ${o.worktree} -- bash -lc "~/launch_slice.sh ${dest}"`;
+  const profileScript = o.profile && o.profileHome
+    ? `export PATH="$HOME/.local/bin:$PATH" CODEX_HOME=${sq(o.profileHome)}; msg="$(cat ${
+      sq(dest)
+    })"; codex --profile ${sq(o.profile)} debug app-server send-message-v2 "$msg"`
+    : `~/launch_slice.sh ${sq(dest)}`;
+  const launchCommand = `wsl.exe -u ${o.user} --cd ${o.worktree} -- bash -lc ${
+    JSON.stringify(profileScript)
+  }`;
   const launchPlan = {
     brief: o.brief,
     worktree: o.worktree,
@@ -294,7 +316,7 @@ async function main(): Promise<void> {
       '--',
       'bash',
       '-lc',
-      `~/launch_slice.sh ${sq(dest)}`,
+      profileScript,
     ],
     stdout: 'piped',
     stderr: 'inherit',

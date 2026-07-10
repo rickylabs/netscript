@@ -5,11 +5,13 @@ interface Args {
   promptPath: string | null;
   timeoutMs: number;
   pretty: boolean;
+  model: string | null;
 }
 
 const args = parseArgs(Deno.args);
 const checks = [
   await runClaude(['--version'], args.timeoutMs),
+  ...(args.model ? [await runClaude(['--model', args.model, '--version'], args.timeoutMs)] : []),
   await runClaude(['--help'], args.timeoutMs),
   await runClaude(['remote-control', '--help'], args.timeoutMs),
   await runClaude(['agents', '--help'], args.timeoutMs),
@@ -21,6 +23,7 @@ let liveResult: CommandResult | null = null;
 if (args.live && !claudeMissing) {
   const prompt = args.promptPath ? await Deno.readTextFile(args.promptPath) : smokePrompt();
   liveResult = await runClaude([
+    ...(args.model ? ['--model', args.model] : []),
     '--bg',
     '--permission-mode',
     'bypassPermissions',
@@ -120,10 +123,14 @@ async function runClaude(args: string[], timeoutMs: number): Promise<CommandResu
 
 function parseArgs(argv: string[]): Args {
   let promptPath: string | null = null;
+  let model: string | null = null;
   let timeoutMs = 15_000;
   for (let i = 0; i < argv.length; i += 1) {
     if (argv[i] === '--prompt' && argv[i + 1]) {
       promptPath = argv[i + 1];
+      i += 1;
+    } else if (argv[i] === '--model' && argv[i + 1]) {
+      model = argv[i + 1];
       i += 1;
     } else if (argv[i] === '--timeout-ms' && argv[i + 1]) {
       timeoutMs = Number(argv[i + 1]);
@@ -136,6 +143,7 @@ function parseArgs(argv: string[]): Args {
     promptPath,
     timeoutMs,
     pretty: argv.includes('--pretty'),
+    model,
   };
 }
 

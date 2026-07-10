@@ -2,6 +2,7 @@
 
 import type { RuntimeCommand, RuntimeDiagnostic } from '../contract.ts';
 import type { AgentCommandPlan, AgentProcessRequest } from '../ports.ts';
+import { childEnvironmentPolicyForProfile, resolveProviderProfile } from '../provider-profiles.ts';
 import { AGENT_COMMAND_TIMEOUT_MS, MAX_AGENT_CAPTURE_BYTES } from './codex-adapter.ts';
 import { validateProviderRoute } from './provider-adapter.ts';
 
@@ -23,7 +24,12 @@ function diagnostic(
   return { code, category, retryable: false, message };
 }
 
-function staticRequest(path: string, cwd: string): AgentProcessRequest {
+function staticRequest(
+  path: string,
+  cwd: string,
+  model: string,
+  environment: import('../ports.ts').ChildEnvironmentPolicy,
+): AgentProcessRequest {
   return {
     executable: 'deno',
     arguments: [
@@ -32,6 +38,8 @@ function staticRequest(path: string, cwd: string): AgentProcessRequest {
       '--allow-read',
       '--allow-run',
       CLAUDE_SMOKE_WRAPPER,
+      '--model',
+      model,
       '--prompt',
       path,
       '--timeout-ms',
@@ -40,6 +48,7 @@ function staticRequest(path: string, cwd: string): AgentProcessRequest {
     cwd,
     timeoutMs: AGENT_COMMAND_TIMEOUT_MS,
     maxCaptureBytes: MAX_AGENT_CAPTURE_BYTES,
+    environment,
   };
 }
 
@@ -55,6 +64,7 @@ export function planClaudeCommand(input: ClaudePlanningInput): AgentCommandPlan 
     credentialKeyNames: input.credentialKeyNames,
   });
   const diagnostics = [...provider.diagnostics];
+  const profile = resolveProviderProfile(command.route);
   if (command.route.agent !== 'claude') {
     diagnostics.push(
       diagnostic('route_conflict', 'policy', 'Claude adapter requires a Claude route'),
@@ -81,15 +91,25 @@ export function planClaudeCommand(input: ClaudePlanningInput): AgentCommandPlan 
         'Claude static smoke requires a content file reference',
       ),
     );
-  } else if (!diagnostics.length) {
-    request = staticRequest(command.content.path, command.route.worktree);
+  } else if (!diagnostics.length && profile) {
+    request = staticRequest(
+      command.content.path,
+      command.route.worktree,
+      command.route.model,
+      childEnvironmentPolicyForProfile(profile, command.route),
+    );
   }
+  const customRoute = profile?.endpointKind === 'custom' || profile?.endpointKind === 'openrouter';
   return {
     agent: 'claude',
     operation: command.kind,
     route: command.route,
     ...('content' in command && command.content ? { content: command.content } : {}),
     request,
+    providerCompatibility: {
+      remoteControl: customRoute ? 'unavailable' : 'available',
+      experimentalNonAnthropicModel: customRoute && !command.route.model.startsWith('anthropic/'),
+    },
     diagnostics,
   };
 }

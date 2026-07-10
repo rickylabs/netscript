@@ -50,8 +50,12 @@ function childEnvironment(
   if (!policy) return environment;
   const cleared = new Set(policy.clearKeys);
   for (const key of cleared) delete environment[key];
+  for (const key of policy.emptyKeys ?? []) environment[key] = '';
+  for (const fixed of policy.fixedValues ?? []) environment[fixed.targetKey] = fixed.value;
   for (const binding of policy.bindings) {
-    if (cleared.has(binding.targetKey)) return null;
+    if (cleared.has(binding.targetKey) || policy.emptyKeys?.includes(binding.targetKey)) {
+      return null;
+    }
     const value = reader.get(binding.sourceKey);
     if (!value) return null;
     environment[binding.targetKey] = value;

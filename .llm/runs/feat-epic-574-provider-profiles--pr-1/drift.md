@@ -32,3 +32,15 @@
 - **Severity:** minor
 - **Action:** accept as a no-divergence checkpoint.
 - **Evidence:** focused tests 10 passed / 0 failed; effect scan clean.
+
+## 2026-07-10 — Claude OpenRouter requires explicit empty native key
+
+- **What:** Current OpenRouter Claude Code docs require `ANTHROPIC_API_KEY` to be explicitly empty,
+  not merely removed, while `ANTHROPIC_AUTH_TOKEN` carries the selected child credential.
+- **Source:** https://openrouter.ai/docs/guides/coding-agents/claude-code-integration
+- **Expected:** S2 explicit conflict clearing would delete every rival key.
+- **Actual:** S3 refined the value-free child policy with an `emptyKeys` concept. The parent remains
+  unchanged; only the child receives an empty native key.
+- **Severity:** minor
+- **Action:** fix within the locked L6/L7 safety design.
+- **Evidence:** child-environment and runner-profile tests; no credential values in artifacts.
