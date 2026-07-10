@@ -140,3 +140,21 @@ PR #590 remains draft with `status:impl` for coordinator Tier-A review. The impl
 does not mark `status:ready-merge`, merge, or self-certify. Issue #581 carries no acceptance
 checkboxes; its five prose acceptance items are mirrored as checked PR DoD items with slice comments
 and this worklog as evidence.
+
+## Coordinator Tier-A Sign-off (2026-07-10, Claude Opus 4.8)
+
+Reviewed c41a790e/8f98a7cc/f44496c5/5f732472 (diff 691eb5f3..5f732472):
+- Owner adjustments encoded as typed policy data in routing-policy.ts: Fable fallback gated on
+  `fallback_only_after_codex_quota_exhausted`; Fable-medium `temporary_owner_override`
+  `effectiveThrough:2026-07-12`; Sol-max `effectiveFrom:2026-07-13` with no silent retention of an
+  expired override. Antigravity `agy` research/extraction lane; "Gemini 3.5 Flash" recorded superseded
+  with a distinct-model lane left as an owner open-question.
+- Single canonical source: `lane-policy.md` points to `CANONICAL_ROUTE_POLICY`; prose references, not
+  duplicates. Launcher (`launch-route-identity.ts`) validates requested-vs-observed provider/model/
+  effort with mismatch reporting, reading no credentials/provider output.
+- Generated `.claude` mirrors synced: `validate-claude-surface.ts` ok (17 skills / 21 files),
+  deno.lock unchanged after hook runs. Opposite-family evaluation preserved in policy.
+- Gates re-run: full runtime suite 110/0; scoped check/lint 50/0; secret scan clean. Push authoritative
+  (5f732472).
+
+Verdict: PASS (generator did not self-certify).
