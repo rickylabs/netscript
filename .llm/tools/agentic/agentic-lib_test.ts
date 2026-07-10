@@ -131,6 +131,8 @@ Deno.test('parseThreadInfo extracts the thread id from the real fixture', async 
     `rollout path should match, got ${info.rollout}`,
   );
   assertEquals(info.cwd, '/home/codex/repos/netscript-pt-auth-s1-contract');
+  assertEquals(info.provider, 'openai');
+  assertEquals(info.effort, 'Medium');
 });
 Deno.test('parseThreadInfo returns nulls for a log with no thread', () => {
   const info = parseThreadInfo('nothing useful here');
@@ -232,6 +234,7 @@ Deno.test('buildOpenHandsComment emits the trigger line and body', () => {
     outputMode: 'pr-comment',
     iterations: 800,
     provider: 'openrouter',
+    effort: 'xhigh',
     prompt: 'use harness\n\n## SKILL\n- x',
   });
   const first = body.split('\n')[0];
@@ -240,6 +243,7 @@ Deno.test('buildOpenHandsComment emits the trigger line and body', () => {
   assert(first.includes('output=pr-comment'), 'carries output');
   assert(first.includes('iterations=800'), 'carries iterations');
   assert(first.includes('provider=openrouter'), 'carries provider');
+  assert(first.includes('effort=xhigh'), 'carries effort');
   assert(body.includes('use harness'), 'includes the prompt body');
 });
 Deno.test('buildOpenHandsComment omits unset tokens and strips CRLF', () => {

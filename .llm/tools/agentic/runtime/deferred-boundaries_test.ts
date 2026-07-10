@@ -36,8 +36,8 @@ function plan(command: RuntimeCommand) {
   return planReconciliation({ command, desired: null, observed });
 }
 
-Deno.test('deferred registry contains only future issues 581 and 582', () => {
-  assertEquals(DEFERRED_ISSUES, [581, 582]);
+Deno.test('deferred registry retains only future rollout issue 582', () => {
+  assertEquals(DEFERRED_ISSUES, [582]);
 });
 
 Deno.test('Antigravity live evidence plans while controller apply remains unsupported', () => {
@@ -123,13 +123,13 @@ Deno.test('all controller lifecycle apply paths point to the ownership-enforced 
   assertEquals(repair.diagnostics, []);
 });
 
-Deno.test('issues 581 and 582 remain absent capabilities rather than hidden implementations', () => {
+Deno.test('issue 582 rollout promotion remains absent rather than a hidden implementation', () => {
   const serialized = JSON.stringify(plan({
     kind: 'doctor',
     commandId: 'deferred-no-hidden-policy',
     mode: 'inspect',
   }));
-  for (const forbidden of ['routing_policy_migration', 'rollout_promotion']) {
+  for (const forbidden of ['rollout_promotion', 'production_canary']) {
     assert(!serialized.includes(forbidden), `hidden deferred capability appeared: ${forbidden}`);
   }
 });

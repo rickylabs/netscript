@@ -54,10 +54,18 @@ the generated Aspire runtime left running for inspection. `scaffold.plugins` is 
 plugin scaffold and diagnostic suite; it does not run DB init/generate/seed or Aspire runtime
 behavior.
 
-OpenHands trigger template:
+OpenHands prompt template (dispatch it with `dispatch-openhands.ts` and the explicit
+provider/model/effort selected from `.llm/harness/workflow/lane-policy.md`):
 
 ```text
-@openhands-agent model=openrouter/qwen/qwen3.7-max output=pr-comment run the full scaffold runtime E2E smoke for this PR.
+use harness
+
+## SKILL
+
+- netscript-cli — run the canonical full scaffold smoke.
+- netscript-tools — report trustworthy gate evidence and preserve lock hygiene.
+
+Run the full scaffold runtime E2E smoke for this PR.
 
 Use this single one-pass command from the repository root:
 

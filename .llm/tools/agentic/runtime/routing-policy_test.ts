@@ -1,6 +1,8 @@
 import type { RouteIdentity } from './contract.ts';
 import {
+  CANONICAL_ROUTE_POLICY,
   type FallbackCandidate,
+  resolveCanonicalRoute,
   type RoutingPolicyContext,
   selectFallbackCandidate,
 } from './routing-policy.ts';
@@ -113,4 +115,44 @@ Deno.test('outside-plan and higher-effort Fable-shaped policy requires explicit 
     ).status,
     'selected',
   );
+});
+
+Deno.test('dated planning override changes from Fable medium to Sol max on 2026-07-13', () => {
+  const sunday = resolveCanonicalRoute('planning_decisions', new Date('2026-07-12T23:59:59Z'));
+  equal([sunday.model, sunday.effort], ['fable-5', 'medium']);
+  const monday = resolveCanonicalRoute('planning_decisions', new Date('2026-07-13T00:00:00Z'));
+  equal([monday.model, monday.effort], ['gpt-5.6-sol', 'max']);
+});
+
+Deno.test('deep-analysis Fable fallback requires classified Codex quota exhaustion', () => {
+  const fable = candidate({ purpose: 'analysis', requiresCodexQuotaExhaustion: true });
+  for (const failureCode of [undefined, 'rate_limited', 'provider_unavailable'] as const) {
+    equal(selectFallbackCandidate([fable], context({ purpose: 'analysis', failureCode })), {
+      status: 'blocked',
+      reason: 'route_unavailable',
+    });
+  }
+  equal(
+    selectFallbackCandidate(
+      [fable],
+      context({ purpose: 'analysis', failureCode: 'quota_exhausted' }),
+    ).status,
+    'selected',
+  );
+});
+
+Deno.test('canonical research lane is Antigravity agy and no Gemini model is inferred', () => {
+  const route = resolveCanonicalRoute('research_extraction', new Date('2026-07-10T00:00:00Z'));
+  equal([route.agent, route.provider, route.model], ['antigravity', 'google', 'agy']);
+  equal(CANONICAL_ROUTE_POLICY.some((entry) => /gemini/i.test(entry.model)), false);
+});
+
+Deno.test('Claude review stays opposite-family on GPT-5.6 Sol xhigh', () => {
+  const route = resolveCanonicalRoute('review_claude', new Date('2026-07-10T00:00:00Z'));
+  equal([route.agent, route.provider, route.model, route.effort], [
+    'codex',
+    'openai',
+    'gpt-5.6-sol',
+    'xhigh',
+  ]);
 });
