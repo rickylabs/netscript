@@ -191,9 +191,10 @@ Antigravity equivalents. It preserves `~/.gemini` because Antigravity uses
 The bootstrap may remove only the NetScript-owned Gemini symlink/package recorded by its ownership
 manifest.
 
-The following are acceptance canaries, not assumed contracts: canonical-user installation and
-Google Sign-In, credential/keyring persistence, subscription/quota behavior, `agy --version`,
-machine-readable JSON/JSONL, complete exit-code taxonomy, deterministic web-search/fetch/citation
-behavior, `AGENTS.md`/`GEMINI.md` ingestion, and Gemini-state migration. The official README verifies
-keyring/Google Sign-In, browser/SSH authorization URL behavior, and `/logout`; it does not document
-an `agy login` command. Foundation implementation remains paused until this revised scope is reviewed.
+Foundation acceptance owns canonical-user installation, `agy --version`, Google Sign-In,
+credential/keyring persistence, doctor/probe behavior, NetScript-owned Gemini cleanup, and explicit
+legacy ownership-state migration or refusal. Issue #578 owns headless output/exits,
+subscription/quota, deterministic web-search/fetch/citations, and instruction-file behavior; those
+downstream research canaries do not block PR #584. The official README verifies keyring/Google
+Sign-In, browser/SSH authorization URL behavior, and `/logout`; it does not document an `agy login`
+command. Foundation implementation remains paused until this revised scope is reviewed.

@@ -47,6 +47,7 @@
 ## 2026-07-10 Post-Evaluation Scope Change
 
 The prior implementation verdict covers the historical Gemini-based foundation at `9b75470`; it
-does not certify the owner-authorized Antigravity replacement. PR #584 remains draft. Merge now
-requires canonical `codex`-user `agy` install/auth evidence plus the documented headless and research
-acceptance canaries, after the planned foundation refactor is implemented and reviewed.
+does not certify the owner-authorized Antigravity replacement. PR #584 remains draft. Merge requires
+the reviewed foundation refactor plus canonical `codex`-user `agy` path/version/auth/doctor and
+migration-safety evidence. Headless output/exits, quota, research/citations, and instruction-file
+behavior remain downstream #578 canaries and do not block PR #584.

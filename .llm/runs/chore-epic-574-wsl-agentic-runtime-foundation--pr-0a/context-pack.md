@@ -117,7 +117,8 @@ the remaining interactive acceptance checks.
   `wsl-foundation_test.ts`, and `.llm/tools/agentic/README.md`.
 - Replace component/version/install/auth/state probes and rollback ownership with `agy` semantics;
   retain a bounded compatibility reader for already-recorded Gemini ownership state if required.
-- Owner reported Antigravity and Claude login, but canonical `codex`-user `agy` path/auth/headless
-  proof is not yet recorded. Authentication, quota, structured output, and research capabilities
-  remain acceptance canaries.
+- Owner reported Antigravity and Claude login, but canonical `codex`-user `agy` authentication is
+  not yet recorded. Foundation owns path/version/auth/doctor and migration safety. Headless output,
+  quota, structured output, and research capabilities remain downstream #578 canaries and do not
+  block PR #584.
 - PR #584 stays draft; no implementation resumes until scope review.
