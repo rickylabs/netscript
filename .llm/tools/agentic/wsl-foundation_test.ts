@@ -2,6 +2,7 @@ import {
   buildDoctorReport,
   buildRollbackPlan,
   classifyAntigravityAuth,
+  classifyAntigravityInstallOwnership,
   classifyAuth,
   classifyComponent,
   classifyLegacyGeminiOwnership,
@@ -11,6 +12,7 @@ import {
   parseVersion,
   planBootstrap,
 } from './wsl-foundation-lib.ts';
+import { installAntigravity, readJsonObject } from './wsl-foundation.ts';
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`assertion failed: ${message}`);
@@ -75,9 +77,10 @@ Deno.test('Antigravity auth uses only secret-safe official session markers', () 
 });
 
 Deno.test('legacy Gemini cleanup requires a matching ownership manifest', () => {
-  assertEquals(classifyLegacyGeminiOwnership(false, false, false).status, 'ready');
-  assertEquals(classifyLegacyGeminiOwnership(true, true, true).status, 'outdated');
-  assertEquals(classifyLegacyGeminiOwnership(true, true, false).status, 'auth_conflict');
+  assertEquals(classifyLegacyGeminiOwnership('missing', false, false).status, 'ready');
+  assertEquals(classifyLegacyGeminiOwnership('valid', true, true).status, 'outdated');
+  assertEquals(classifyLegacyGeminiOwnership('valid', true, false).status, 'auth_conflict');
+  assertEquals(classifyLegacyGeminiOwnership('invalid', false, false).status, 'auth_conflict');
 });
 
 Deno.test('missing provider sessions are non-fatal auth-required states', () => {
@@ -117,7 +120,7 @@ Deno.test('bootstrap plan is ordered, exact-versioned, and reversible by ownersh
       classifyComponent({ component: 'antigravity', output: '', exitCode: 127 }),
       classifyStateDirectory('state-claude', '.claude', false),
       classifyAntigravityAuth(false, false),
-      classifyLegacyGeminiOwnership(true, true, true),
+      classifyLegacyGeminiOwnership('valid', true, true),
     ],
     auth: classifyAuth(new Set(), false, false),
     mobileControl: classifyMobileControl(true, '0.144.1', '0.144.1'),
@@ -133,6 +136,7 @@ Deno.test('bootstrap plan is ordered, exact-versioned, and reversible by ownersh
     'create_directory',
     'install_node',
     'install_npm_clis',
+    'create_directory',
     'install_antigravity',
     'migrate_legacy_gemini_ownership',
     'ensure_symlinks',
@@ -158,7 +162,8 @@ Deno.test('bootstrap plan is empty when desired state is already present', () =>
       classifyStateDirectory('state-antigravity', '.gemini', true),
       classifyStateDirectory('state-netscript-agentic', '.config/netscript-agentic', true),
       classifyAntigravityAuth(true, true),
-      classifyLegacyGeminiOwnership(true, false, false),
+      classifyAntigravityInstallOwnership('missing', true),
+      classifyLegacyGeminiOwnership('valid', false, false),
     ],
     auth: classifyAuth(new Set(), true, true),
     mobileControl: classifyMobileControl(true, '0.144.1', '0.144.1'),
@@ -166,6 +171,99 @@ Deno.test('bootstrap plan is empty when desired state is already present', () =>
   const plan = planBootstrap(report, { claude: '2.1.206' });
   assertEquals(plan.changed, false);
   assertEquals(plan.actions, []);
+});
+
+Deno.test('Antigravity-only install creates the owned root before writing its installer', () => {
+  const report = buildDoctorReport({
+    generatedAt: '2026-07-10T00:00:00.000Z',
+    nativePath: { cwd: '/home/codex/repos/netscript', nativeExt4: true },
+    components: [
+      classifyComponent({ component: 'node', output: 'v26.5.0', exitCode: 0, expected: '26.5.0' }),
+      classifyComponent({ component: 'claude', output: '2.1.206', exitCode: 0 }),
+      classifyComponent({ component: 'antigravity', output: '', exitCode: 127 }),
+      classifyAntigravityAuth(false, false),
+      classifyAntigravityInstallOwnership('missing', false),
+      classifyLegacyGeminiOwnership('missing', false, false),
+    ],
+    auth: classifyAuth(new Set(), true, false),
+    mobileControl: classifyMobileControl(true, '0.144.1', '0.144.1'),
+  });
+  const plan = planBootstrap(report, { claude: '2.1.206' });
+  const kinds = plan.actions.map((action) => action.kind);
+  assertEquals(kinds.slice(0, 2), ['create_directory', 'install_antigravity']);
+  assertEquals(
+    plan.actions[0],
+    { kind: 'create_directory', relativePath: '.local/share/netscript-agentic' },
+  );
+});
+
+Deno.test('unfinished Antigravity install is recoverable into the ownership manifest', () => {
+  const report = buildDoctorReport({
+    generatedAt: '2026-07-10T00:00:00.000Z',
+    nativePath: { cwd: '/home/codex/repos/netscript', nativeExt4: true },
+    components: [
+      classifyComponent({ component: 'node', output: 'v26.5.0', exitCode: 0, expected: '26.5.0' }),
+      classifyComponent({ component: 'claude', output: '2.1.206', exitCode: 0 }),
+      classifyComponent({ component: 'antigravity', output: '1.1.1', exitCode: 0 }),
+      classifyAntigravityAuth(true, true),
+      classifyAntigravityInstallOwnership('valid', true),
+      classifyLegacyGeminiOwnership('valid', false, false),
+    ],
+    auth: classifyAuth(new Set(), true, true),
+    mobileControl: classifyMobileControl(true, '0.144.1', '0.144.1'),
+  });
+  const plan = planBootstrap(report, { claude: '2.1.206' });
+  assertEquals(plan.actions.map((action) => action.kind), [
+    'recover_antigravity_ownership',
+    'write_state',
+  ]);
+});
+
+Deno.test('installer creates its root and durable journal before execution', async () => {
+  const home = await Deno.makeTempDir({ prefix: 'netscript-agy-install-' });
+  try {
+    await installAntigravity(home, '1.0', 'https://antigravity.google/cli/install.sh', {
+      fetchText: () => Promise.resolve('#!/usr/bin/env bash\n'),
+      execute: async (scriptPath) => {
+        assert(await pathIsFile(scriptPath), 'installer script exists beneath the owned root');
+        const journal = await readJsonObject(
+          `${home}/.config/netscript-agentic/agy-install-pending.json`,
+        );
+        assertEquals(journal.status, 'valid');
+        await Deno.mkdir(`${home}/.local/bin`, { recursive: true });
+        await Deno.writeTextFile(`${home}/.local/bin/agy`, 'installed');
+        return { code: 0, stdout: '', stderr: '' };
+      },
+    });
+    assert(
+      await pathIsFile(`${home}/.config/netscript-agentic/agy-install-pending.json`),
+      'journal survives until manifest finalization',
+    );
+  } finally {
+    await Deno.remove(home, { recursive: true });
+  }
+});
+
+Deno.test('malformed ownership manifest is invalid rather than missing', async () => {
+  const path = await Deno.makeTempFile({ prefix: 'netscript-foundation-state-' });
+  try {
+    await Deno.writeTextFile(path, '{not-json');
+    assertEquals((await readJsonObject(path)).status, 'invalid');
+  } finally {
+    await Deno.remove(path);
+  }
+});
+
+Deno.test('unreadable ownership manifest is invalid rather than missing', async () => {
+  const path = await Deno.makeTempFile({ prefix: 'netscript-foundation-state-' });
+  try {
+    await Deno.writeTextFile(path, '{}');
+    await Deno.chmod(path, 0o000);
+    assertEquals((await readJsonObject(path)).status, 'invalid');
+  } finally {
+    await Deno.chmod(path, 0o600);
+    await Deno.remove(path);
+  }
 });
 
 Deno.test('rollback plan never removes Codex or provider session directories', () => {
@@ -178,5 +276,14 @@ Deno.test('rollback plan never removes Codex or provider session directories', (
     rendered.includes('Preserve ~/.gemini, ~/.codex'),
     'provider state preservation is explicit',
   );
+  assert(rendered.includes('agy-install-pending.json'), 'interrupted install is recoverable');
   assert(!rendered.includes('/root/.local/bin/agy'), 'root installation is outside rollback scope');
 });
+
+async function pathIsFile(path: string): Promise<boolean> {
+  try {
+    return (await Deno.stat(path)).isFile;
+  } catch {
+    return false;
+  }
+}

@@ -3,6 +3,7 @@ import {
   buildDoctorReport,
   buildRollbackPlan,
   classifyAntigravityAuth,
+  classifyAntigravityInstallOwnership,
   classifyAuth,
   classifyComponent,
   classifyLegacyGeminiOwnership,
@@ -46,6 +47,8 @@ function usage(): string {
 
 const OWNED_ROOT = '.local/share/netscript-agentic';
 const NPM_PREFIX = `${OWNED_ROOT}/npm`;
+const STATE_RELATIVE_PATH = '.config/netscript-agentic/foundation-state.json';
+const AGY_PENDING_RELATIVE_PATH = '.config/netscript-agentic/agy-install-pending.json';
 
 async function run(spec: CommandSpec): Promise<RawComponentProbe> {
   try {
@@ -153,29 +156,86 @@ async function hasSessionMetadata(providerDir: string): Promise<boolean> {
   return false;
 }
 
-async function readJsonObject(path: string): Promise<Record<string, unknown> | null> {
+export type JsonObjectRead =
+  | { status: 'valid'; value: Record<string, unknown> }
+  | { status: 'missing' | 'invalid'; value: null };
+
+export async function readJsonObject(path: string): Promise<JsonObjectRead> {
   try {
     const value: unknown = JSON.parse(await Deno.readTextFile(path));
     return value && typeof value === 'object' && !Array.isArray(value)
-      ? value as Record<string, unknown>
-      : null;
+      ? { status: 'valid', value: value as Record<string, unknown> }
+      : { status: 'invalid', value: null };
   } catch (error) {
-    if (error instanceof Deno.errors.NotFound) return null;
-    return null;
+    if (error instanceof Deno.errors.NotFound) return { status: 'missing', value: null };
+    return { status: 'invalid', value: null };
+  }
+}
+
+interface AntigravityInstallerDeps {
+  fetchText?: (url: string) => Promise<string>;
+  execute?: (scriptPath: string) => Promise<ExternalResult>;
+}
+
+/** Runs the official installer with a durable ownership journal already on disk. */
+export async function installAntigravity(
+  home: string,
+  schemaVersion: string,
+  installer: string,
+  deps: AntigravityInstallerDeps = {},
+): Promise<void> {
+  await Deno.mkdir(`${home}/${OWNED_ROOT}`, { recursive: true, mode: 0o700 });
+  await Deno.mkdir(`${home}/.config/netscript-agentic`, { recursive: true, mode: 0o700 });
+  await writeJsonAtomic(`${home}/${AGY_PENDING_RELATIVE_PATH}`, {
+    schemaVersion,
+    ownedExecutable: `${home}/.local/bin/agy`,
+  });
+  const fetchText = deps.fetchText ?? (async (url: string): Promise<string> => {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`official Antigravity installer fetch failed (${response.status})`);
+    }
+    return await response.text();
+  });
+  const execute = deps.execute ?? ((path: string) => runExternal('bash', [path]));
+  const installerPath = `${home}/${OWNED_ROOT}/.agy-install-${crypto.randomUUID()}.sh`;
+  try {
+    await Deno.writeTextFile(installerPath, await fetchText(installer), {
+      createNew: true,
+      mode: 0o700,
+    });
+    const installed = await execute(installerPath);
+    if (installed.code !== 0) {
+      throw new Error(`official Antigravity installer failed (exit ${installed.code})`);
+    }
+  } catch (error) {
+    if (!(await pathExists(`${home}/.local/bin/agy`))) {
+      await Deno.remove(`${home}/${AGY_PENDING_RELATIVE_PATH}`);
+    }
+    throw error;
+  } finally {
+    try {
+      await Deno.remove(installerPath);
+    } catch (error) {
+      if (!(error instanceof Deno.errors.NotFound)) throw error;
+    }
   }
 }
 
 async function legacyGeminiOwnership(home: string): Promise<{
   manifest: Record<string, unknown> | null;
+  manifestStatus: JsonObjectRead['status'];
   recorded: boolean;
   matches: boolean;
 }> {
-  const manifest = await readJsonObject(`${home}/.config/netscript-agentic/foundation-state.json`);
+  const read = await readJsonObject(`${home}/${STATE_RELATIVE_PATH}`);
+  const manifest = read.value;
   const link = `${home}/.local/bin/gemini`;
   const recorded = Array.isArray(manifest?.ownedLinks) && manifest.ownedLinks.includes(link);
   const target = recorded ? await readSymlink(link) : null;
   return {
     manifest,
+    manifestStatus: read.status,
     recorded,
     matches: recorded && target === `${home}/${NPM_PREFIX}/bin/gemini`,
   };
@@ -209,9 +269,20 @@ async function doctor(): Promise<RuntimeDoctorReport> {
   const accountMarker = await pathExists(`${home}/.gemini/google_accounts.json`);
   const credentialMarker = await pathExists(`${home}/.gemini/oauth_creds.json`);
   components.push(classifyAntigravityAuth(accountMarker, credentialMarker));
+  const pending = await readJsonObject(`${home}/${AGY_PENDING_RELATIVE_PATH}`);
+  components.push(
+    classifyAntigravityInstallOwnership(
+      pending.status,
+      await pathExists(`${home}/.local/bin/agy`),
+    ),
+  );
   const legacy = await legacyGeminiOwnership(home);
   components.push(
-    classifyLegacyGeminiOwnership(Boolean(legacy.manifest), legacy.recorded, legacy.matches),
+    classifyLegacyGeminiOwnership(
+      legacy.manifestStatus,
+      legacy.recorded,
+      legacy.matches,
+    ),
   );
 
   const inspectedKeys = ['ANTHROPIC_API_KEY'];
@@ -399,24 +470,14 @@ async function executeBootstrap(home: string, plan: BootstrapPlan): Promise<void
       await Deno.remove(`${home}/.local/bin/gemini`);
       migratedLegacyGemini = true;
     } else if (action.kind === 'install_antigravity') {
-      const response = await fetch(action.installer);
-      if (!response.ok) {
-        throw new Error(`official Antigravity installer fetch failed (${response.status})`);
+      await installAntigravity(home, plan.schemaVersion, action.installer);
+    } else if (action.kind === 'recover_antigravity_ownership') {
+      const pending = await readJsonObject(`${home}/${AGY_PENDING_RELATIVE_PATH}`);
+      if (pending.status !== 'valid' || !(await pathExists(`${home}/.local/bin/agy`))) {
+        throw new Error(
+          'refusing Antigravity ownership recovery without valid journal and executable',
+        );
       }
-      const installerPath = `${home}/${OWNED_ROOT}/.agy-install-${crypto.randomUUID()}.sh`;
-      await Deno.writeTextFile(installerPath, await response.text(), {
-        createNew: true,
-        mode: 0o700,
-      });
-      try {
-        const installed = await runExternal('bash', [installerPath]);
-        if (installed.code !== 0) {
-          throw new Error(`official Antigravity installer failed (exit ${installed.code})`);
-        }
-      } finally {
-        await Deno.remove(installerPath);
-      }
-      createdFiles.push(`${home}/.local/bin/agy`);
     } else if (action.kind === 'ensure_symlinks') {
       const targets: Record<string, string> = {
         node: `${nodeRoot}/bin/node`,
@@ -432,7 +493,11 @@ async function executeBootstrap(home: string, plan: BootstrapPlan): Promise<void
       }
     } else if (action.kind === 'write_state') {
       const statePath = `${home}/${action.relativePath}`;
-      const existing = await readJsonObject(statePath);
+      const existingRead = await readJsonObject(statePath);
+      if (existingRead.status === 'invalid') {
+        throw new Error('refusing to overwrite malformed or unreadable ownership manifest');
+      }
+      const existing = existingRead.value;
       const existingTargets =
         existing?.previousTargets && typeof existing.previousTargets === 'object'
           ? existing.previousTargets as Record<string, string | null>
@@ -440,6 +505,17 @@ async function executeBootstrap(home: string, plan: BootstrapPlan): Promise<void
       const existingCreated = Array.isArray(existing?.createdFiles)
         ? existing.createdFiles.filter((value): value is string => typeof value === 'string')
         : [];
+      const pendingRead = await readJsonObject(`${home}/${AGY_PENDING_RELATIVE_PATH}`);
+      if (pendingRead.status === 'invalid') {
+        throw new Error('refusing malformed or unreadable Antigravity ownership journal');
+      }
+      if (pendingRead.status === 'valid') {
+        const pendingPath = pendingRead.value.ownedExecutable;
+        if (pendingPath !== `${home}/.local/bin/agy` || !(await pathExists(pendingPath))) {
+          throw new Error('refusing inconsistent Antigravity ownership journal');
+        }
+        createdFiles.push(pendingPath);
+      }
       await writeJsonAtomic(statePath, {
         schemaVersion: plan.schemaVersion,
         installedAt: new Date().toISOString(),
@@ -457,6 +533,7 @@ async function executeBootstrap(home: string, plan: BootstrapPlan): Promise<void
           }
           : existing?.migrations ?? {},
       });
+      if (pendingRead.status === 'valid') await Deno.remove(`${home}/${AGY_PENDING_RELATIVE_PATH}`);
     }
   }
 }

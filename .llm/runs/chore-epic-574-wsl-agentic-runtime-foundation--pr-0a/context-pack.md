@@ -142,3 +142,15 @@ the remaining interactive acceptance checks.
 - Next legal action after commit/push/#575/#584 evidence is coordinator Tier-A review. This
   implementation session does not self-certify that review or a new Antigravity evaluator verdict;
   PR #584 remains draft.
+
+## 2026-07-10 Coordinator Remediation Handoff
+
+- `8a18b25` received coordinator `CHANGES_REQUESTED` for three failure-safety blockers.
+- Same-thread remediation now creates the owned root before Antigravity-only installer staging,
+  journals `agy` ownership before execution, recovers unfinished ownership on later runs, and
+  rejects malformed/unreadable ownership state without overwrite.
+- Regression evidence: focused `17/0`, complete agentic `74/0`, scoped check/lint/fmt zero findings,
+  doctor/bootstrap/idempotence/rollback/redaction/diff/scope/lock gates pass.
+- Current real machine remains ready and idempotent; no pending ownership journal exists.
+- Historical evidence and all #578/#585/S4/S5 exclusions remain intact. After commit/push and
+  #575/#584 comments, stop for coordinator re-review; this thread does not self-certify it.

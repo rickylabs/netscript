@@ -282,3 +282,31 @@ installs, locks, and caches remain outside the slice.
 
 Implementation-session review notes are evidence, not harness sign-off. The generator does not
 self-certify Tier-A review or IMPL-EVAL. PR #584 remains draft for coordinator Tier-A review.
+
+## 2026-07-10 Coordinator Remediation for `8a18b25`
+
+Coordinator review returned `CHANGES_REQUESTED` for three failure-safety blockers. The same
+implementation thread fixed only those blockers:
+
+1. Antigravity-only plans create `.local/share/netscript-agentic` before installer staging, and the
+   installer helper defensively creates it as well.
+2. A mode-0600, value-free `agy-install-pending.json` journal is written before installer execution.
+   It survives whenever `agy` exists, is finalized into `createdFiles` before journal removal, and
+   drives `recover_antigravity_ownership` on a later run after interruption.
+3. Ownership JSON reads now distinguish `missing`, `valid`, and `invalid`. Malformed or unreadable
+   manifests/journals produce invalid configuration and are never overwritten or treated as absent.
+
+| Remediation gate | Result | Raw exit / evidence |
+| --- | --- | --- |
+| Focused foundation tests | PASS | `17 passed`, `0 failed`; includes root order, on-disk pre-execution journal, next-run recovery, malformed manifest, and unreadable manifest regressions |
+| Complete agentic tests | PASS | `74 passed`, `0 failed` |
+| Scoped check/lint/fmt wrappers | PASS | exits `0`; 3 files, 1 batch, 0 findings each |
+| Doctor | PASS | exit `0`; all probes ready, including no unfinished Antigravity ownership |
+| Bootstrap dry-run + live idempotence | PASS | exits `0`; both report `actions: []`, `changed: false` |
+| Rollback | PASS | exit `0`; recognizes final manifest or pending journal ownership and preserves provider state |
+| Secret redaction | PASS | expected exit `3`; fake sentinel absent |
+| Diff/scope/lock | PASS | `git diff --check` exit `0`; only foundation code/docs plus mandatory artifacts; `deno.lock` unchanged |
+
+Historical evidence is unchanged. #578 contracts, #585/S4/S5, daemon state, root installs,
+credentials, locks, and caches remain excluded. This generator records remediation evidence but does
+not self-certify coordinator re-review; PR #584 remains draft.

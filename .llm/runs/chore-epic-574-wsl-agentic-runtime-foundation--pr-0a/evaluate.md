@@ -59,3 +59,11 @@ does not extend the historical Gemini `PASS` verdict to the new code. The owner 
 review request and authorized the implementation turn; that authorization is not represented as a
 generator self-certification. Coordinator Tier-A review remains the next gate, and PR #584 remains
 draft. Downstream #578 contracts and controller PR #585 remain explicitly unevaluated here.
+
+## 2026-07-10 Coordinator Remediation Boundary
+
+Coordinator review of `8a18b25` returned `CHANGES_REQUESTED` for owned-root ordering, interrupted
+`agy` ownership recovery, and malformed/unreadable manifest handling. The same-thread remediation
+adds focused regressions and green generator gates for exactly those findings. This section records
+evidence only: it does not convert the coordinator verdict to `PASS`, extend the historical Gemini
+verdict, or evaluate #578/#585. PR #584 remains draft pending coordinator re-review.

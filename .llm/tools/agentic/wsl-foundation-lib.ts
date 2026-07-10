@@ -13,6 +13,7 @@ export const RUNTIME_COMPONENT_IDS = [
   'claude',
   'antigravity',
   'antigravity-auth',
+  'antigravity-install-ownership',
   'legacy-gemini-ownership',
   'dotnet',
   'aspire',
@@ -81,6 +82,7 @@ export type InstallAction =
   | { kind: 'install_node'; version: string; archive: string }
   | { kind: 'install_npm_clis'; packages: string[] }
   | { kind: 'install_antigravity'; installer: 'https://antigravity.google/cli/install.sh' }
+  | { kind: 'recover_antigravity_ownership' }
   | { kind: 'migrate_legacy_gemini_ownership' }
   | { kind: 'ensure_symlinks'; names: string[] }
   | { kind: 'write_state'; relativePath: string };
@@ -112,6 +114,7 @@ export const LOCAL_STATE_DIRS: Readonly<Record<RuntimeComponentId, string | null
   claude: null,
   antigravity: null,
   'antigravity-auth': null,
+  'antigravity-install-ownership': null,
   'legacy-gemini-ownership': null,
   dotnet: null,
   aspire: null,
@@ -219,11 +222,13 @@ export function classifyAntigravityAuth(
 
 /** Classifies whether legacy NetScript-owned Gemini state can be migrated safely. */
 export function classifyLegacyGeminiOwnership(
-  manifestExists: boolean,
+  manifestStatus: 'missing' | 'valid' | 'invalid',
   ownedLinkRecorded: boolean,
   ownedLinkMatches: boolean,
 ): RuntimeProbe {
-  const status = !manifestExists || !ownedLinkRecorded
+  const status = manifestStatus === 'invalid'
+    ? 'auth_conflict'
+    : manifestStatus === 'missing' || !ownedLinkRecorded
     ? 'ready'
     : ownedLinkMatches
     ? 'outdated'
@@ -233,11 +238,38 @@ export function classifyLegacyGeminiOwnership(
     detectedVersion: null,
     expected: 'no NetScript-owned gemini executable',
     status,
-    detail: status === 'ready'
+    detail: manifestStatus === 'invalid'
+      ? 'ownership manifest is malformed or unreadable; refusing migration'
+      : status === 'ready'
       ? 'no legacy NetScript-owned Gemini executable recorded'
       : status === 'outdated'
       ? 'legacy NetScript-owned Gemini state requires explicit migration'
       : 'legacy Gemini ownership does not match the manifest; refusing migration',
+  };
+}
+
+/** Classifies a recoverable Antigravity install journal without claiming external agy ownership. */
+export function classifyAntigravityInstallOwnership(
+  pendingStatus: 'missing' | 'valid' | 'invalid',
+  canonicalAgyPresent: boolean,
+): RuntimeProbe {
+  const status = pendingStatus === 'invalid'
+    ? 'auth_conflict'
+    : pendingStatus === 'valid' && canonicalAgyPresent
+    ? 'outdated'
+    : pendingStatus === 'valid'
+    ? 'auth_conflict'
+    : 'ready';
+  return {
+    component: 'antigravity-install-ownership',
+    detectedVersion: null,
+    expected: 'no unfinished NetScript Antigravity install',
+    status,
+    detail: status === 'ready'
+      ? 'no unfinished NetScript Antigravity install'
+      : status === 'outdated'
+      ? 'installed agy ownership requires journal recovery'
+      : 'Antigravity ownership journal is invalid or its executable is missing',
   };
 }
 
@@ -340,10 +372,21 @@ export function planBootstrap(
   }
   if (packages.length > 0) actions.push({ kind: 'install_npm_clis', packages });
   if (byId.get('antigravity')?.status === 'missing') {
+    if (
+      !actions.some((action) =>
+        action.kind === 'create_directory' &&
+        action.relativePath === '.local/share/netscript-agentic'
+      )
+    ) {
+      actions.push({ kind: 'create_directory', relativePath: '.local/share/netscript-agentic' });
+    }
     actions.push({
       kind: 'install_antigravity',
       installer: 'https://antigravity.google/cli/install.sh',
     });
+  }
+  if (byId.get('antigravity-install-ownership')?.status === 'outdated') {
+    actions.push({ kind: 'recover_antigravity_ownership' });
   }
   if (byId.get('legacy-gemini-ownership')?.status === 'outdated') {
     actions.push({ kind: 'migrate_legacy_gemini_ownership' });
@@ -379,13 +422,13 @@ export function buildRollbackPlan(): RollbackPlan {
       '$HOME/.local/share/netscript-agentic',
       '$HOME/.config/netscript-agentic',
       '$HOME/.local/bin/{node,npm,npx,claude}',
-      '$HOME/.local/bin/agy (only when foundation-state.json records it as installed)',
+      '$HOME/.local/bin/agy (only when foundation-state.json or agy-install-pending.json records it)',
     ],
     steps: [
       'Stop native WSL Claude/Antigravity sessions before rollback.',
       'Inspect foundation-state.json; detach only owned symlinks and restore each non-null previous target.',
       'Remove the user-local npm and Node roots after the symlinks are detached.',
-      'Remove agy only when createdFiles records that exact canonical-user executable.',
+      'Remove agy only when the final manifest or pending-install journal records that exact canonical-user executable.',
       'Preserve ~/.gemini, ~/.codex, and all provider auth/session material.',
       'Open native Windows Claude and run claude --version as the break-glass verification.',
     ],

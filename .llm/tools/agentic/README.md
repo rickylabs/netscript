@@ -86,7 +86,11 @@ mode-0600, value-free ownership manifest under `~/.config/netscript-agentic`. A 
 symlink/package is removed only when the manifest proves it is NetScript-owned and still targets the
 owned npm prefix; mismatched legacy state is rejected. There is no `gemini` alias. `~/.gemini` is
 always preserved because Antigravity uses it, and `/root/.local/bin/agy` is never inspected or
-mutated. Run `rollback-plan` for non-executing reversal guidance.
+mutated. Before invoking the installer, bootstrap writes a value-free
+`agy-install-pending.json` ownership journal; the final manifest absorbs that ownership and removes
+the journal atomically enough for a later run to recover after interruption. Malformed or unreadable
+manifests/journals are hard failures and are never treated as absent or overwritten. Run
+`rollback-plan` for non-executing reversal guidance.
 
 Permissions are explicit in the task: read/write for the owned user-local paths, run for fixed
 `npm`/`tar` and version probes, environment access for key-presence/PATH checks, and network access
