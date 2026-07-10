@@ -101,3 +101,48 @@ None. Deletion candidates examined and rejected with evidence:
   (comments), then `deno task agentic:sync-claude` to regenerate `.claude/skills/` mirrors.
 - `compatibility-wrappers_test.ts`: wrapper map values now carry the folder prefix; task-name keys,
   required flags, and delegation assertions unchanged.
+
+## Expansion: central config, harmonization, tests, README (owner-directed, same PR)
+
+### Central config surface (`config/`)
+
+New single source for every volatile value; every prior hardcoded literal re-pointed at it.
+
+| Concern | Central location | De-hardcoded from |
+| --- | --- | --- |
+| Model ids | `config/models.ts` (`MODEL_IDS`, `OPENROUTER_MODEL_IDS`) | `runtime/routing-policy.ts`, `runtime/provider-profiles.ts`, `runtime/cli/rollout-canary-runner.ts` |
+| Routing bindings | `runtime/routing-policy.ts` (`CANONICAL_ROUTE_POLICY`, references config ids) | already the authority; now reconciled to config for the id strings |
+| Tool versions | `config/versions.ts` (`NODE_TARGET_VERSION`, `COMPONENT_EXPECTED_VERSIONS`, `COMPAT_PINNED_TOOL_VERSIONS`, `TEST_COMPONENT_VERSIONS`) | `wsl/wsl-foundation-lib.ts`, `wsl/wsl-foundation.ts`, `runtime/routing-signal-classifier.ts`, `runtime/test-fixtures.ts` |
+| Endpoints | `config/endpoints.ts` | `wsl/wsl-foundation.ts` (node dist host), `wsl/wsl-foundation-lib.ts` (installer), `runtime/provider-profiles.ts` (OpenRouter base URLs), `lib/agentic-lib.ts` (GitHub API base) |
+
+Enforcement: `config/no-hardcoded-volatile_test.ts` fails if any volatile literal reappears outside
+`config/`. It caught two real leaks during implementation (`rollout-canary-runner.ts` minimax/glm),
+now fixed. `MODEL_IDS.antigravity` (`agy`) is deliberately excluded because `agy` is also the
+legitimate CLI executable name across `wsl/` and the adapters. The one boundary: the
+`agentic:wsl-foundation` `--allow-net=` allowlist in `deno.json` cannot read a TS const (Deno parses
+task strings statically); documented in `config/endpoints.ts` to keep in sync.
+
+### Harmonization / consistency pass
+
+The #576–#582 modules were already contract-unified via `runtime/contract.ts` (`RouteIdentity`,
+`RuntimeDiagnostic`, `DiagnosticCode`, `EXIT_CODES`), `runtime/ports.ts` seams, and
+`runtime/adapters/**` as the sole impure boundary — no contract reshaping was needed or done (it
+would risk the 200+ invariant-pinning tests for no observable gain). Applied: uniform central-config
+surface, one doc-header style, `isolatedDeclarations`-clean export forms, consistently annotated
+re-export shims. Deliberately left as-is: per-test-file local `assert`/`assertEquals` helpers (empty
+import map makes `@std/assert` unavailable; documented repo convention; consolidating across 40+
+files is cosmetic churn with regression risk).
+
+### Useless-test audit
+
+**Deleted: none.** Audited every test name plus the smallest bodies. All assert a real invariant
+(bounded/finite edges, credential/prompt rejection, fail-closed, frozen fixtures, delegation
+boundaries). None trivial/duplicate/tautological, so removing any violates the invariant-coverage
+constraint. Net count 201 → 202 (the new enforcement guard).
+
+### README
+
+Rewritten from scratch in the NetScript docs house voice (studied `docs/site/cli-reference.md`):
+narrative arc (what it is → brain vs. hands → everyday flows → the brain → safety model →
+maintenance map), runnable blocks with real captured output, per-CLI purpose/when/example. All task
+names and file paths verified; example outputs captured from live read-only runs.

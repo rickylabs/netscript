@@ -5,6 +5,12 @@ bindings live in `../../tools/agentic/runtime/routing-policy.ts` as `CANONICAL_R
 table below is its rendered policy view. Skills, templates, and operator docs reference this file
 instead of copying the routes.
 
+To change a **model id**, edit `../../tools/agentic/config/models.ts` (the single source for model-id
+strings); the lane bindings in `routing-policy.ts` reference those constants. Tool versions and
+endpoints live in `config/versions.ts` and `config/endpoints.ts`. See the "Maintenance map" in
+`../../tools/agentic/README.md` for the full where-to-change-what table; a guard test
+(`config/no-hardcoded-volatile_test.ts`) fails if any of these values is hardcoded outside `config/`.
+
 ## Canonical routes
 
 | Task lane | Enforced route |

@@ -128,7 +128,15 @@ Two are durable GitHub infra utilities worth calling out:
 The rest of the family (`launch-codex-slice`, `codex-resume`, `codex-status`, `codex-watch`,
 `dispatch-openhands`, `openhands-status`, `gh-pr`) is indexed in
 `.llm/harness/workflow/tooling.md`. `.llm/tools/agentic/` is the **only** interface for driving Codex
-— never ad-hoc `wsl.exe`.
+— never ad-hoc `wsl.exe`. The suite is concern-grouped (`codex/`, `openhands/`, `github/`, `wsl/`,
+`claude/`, `runtime/` + `runtime/cli/`, `lib/`); its `README.md` is the canonical map.
+
+**Monthly maintenance (single source):** everything volatile lives in `.llm/tools/agentic/config/` —
+model ids in `config/models.ts`, tool versions in `config/versions.ts`, endpoints in
+`config/endpoints.ts`; routing lane→model bindings stay in `runtime/routing-policy.ts` (referencing
+the config ids). The "Maintenance map" table in the suite README says exactly where to change a
+model, version, policy, agent, or dep. A guard test (`config/no-hardcoded-volatile_test.ts`) fails
+the suite if any of these values is hardcoded outside `config/`.
 
 ## Lock Hygiene
 
