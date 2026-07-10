@@ -6,32 +6,35 @@
 | --- | --- |
 | Run ID | `rickylabs-epic-574-wsl-agentic-runtime--supervisor` |
 | Branch | `rickylabs-epic-574-wsl-agentic-runtime` |
-| Current phase | `plan` |
+| Current phase | `implement` |
 | Archetype | Group-specific |
 | Scope overlays | none |
 
 ## Current State
 
-Epic #574 and all eight children have been re-baselined against `main` at `f7898dba`. The harness is
-activated. The next legal action is to establish PR 0A's branch/native WSL worktree, create its
-nested plan artifacts, open the early draft PR, and dispatch PLAN-EVAL.
+The canonical stack is umbrella #583 (`b58b4c2a`) -> foundation #584 (`9b75470`) -> controller #585
+(`f1dfdc9`). PR 0A implementation and Tier-A sign-off are complete, but four owner-interactive
+canaries explicitly block its merge. Independent stacked development continues: PR 0B's research,
+Design, and owner-waived Plan-Gate are complete, and S1 is authorized on its sole WSL Codex thread.
 
 ## Completed
 
 - Read repository guidance, relevant skills, all `.llm/harness/**`, and the agentic suite.
 - Recorded issue dependencies, route overrides, current daemon state, risks, and group order.
 - Verified secret-safe GitHub token resolution and a managed Codex daemon control socket.
+- Opened foundation PR #584 on its own branch and completed implementation/sign-off at `9b75470`.
+- Opened controller PR #585 as a true stack on #584; Plan-Gate passed at `f1dfdc9`.
 
 ## In Progress
 
-- Supervisor bootstrap commit, push, issue taxonomy, and umbrella draft PR.
+- #576 S1 contract/state/ports/pure-planner implementation on thread
+  `019f4b72-2ea4-7050-917e-6d6918371265`.
 
 ## Next Steps
 
-1. Push the supervisor baseline and open the umbrella draft PR without closing #574.
-2. Create the #575 native WSL worktree and nested run.
-3. Open PR 0A early and dispatch separate OpenHands PLAN-EVAL.
-4. After PASS, launch exactly one GPT-5.6 Sol high Codex thread through the checked-in launcher.
+1. Complete and Tier-A review #576's five planned slices on PR #585.
+2. Keep #575/#584 draft until the owner executes and evidences all four interactive canaries.
+3. Stack #577 from the eventual canonical #576 head; do not attribute child commits to #583.
 
 ## Key Decisions
 
@@ -52,13 +55,14 @@ nested plan artifacts, open the early draft PR, and dispatch PLAN-EVAL.
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
 | Static | N/A | Planning artifacts only. |
-| Fitness | PLAN-EVAL pending per child | Child run artifacts. |
-| Runtime | Pending | #575 and later canaries. |
+| Fitness | PR 0A signed off; PR 0B Plan-Gate PASS | Child run artifacts. |
+| Runtime | PARTIAL | PR 0A safe independent gates pass; four owner canaries remain. |
 | Consumer | N/A | No product API changed. |
 
 ## Open Questions
 
-- None block preparing PR 0A.
+- Owner interaction is required only for the four #575 browser/mobile/host canaries; it does not
+  block the independent #576 stack.
 
 ## Drift and Debt
 
@@ -68,4 +72,3 @@ nested plan artifacts, open the early draft PR, and dispatch PLAN-EVAL.
 ## Commits
 
 - See the draft PR's commit list + per-slice PR comments.
-
