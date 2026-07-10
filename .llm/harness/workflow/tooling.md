@@ -68,6 +68,12 @@ ids; change a model/version/endpoint only there. See the suite README's "Mainten
 | `agentic:sync-claude` / `:check` | `sync-claude-skills.ts`      | regenerate / verify the `.claude/skills/` mirror from `.agents/skills/`                      |
 | `agentic:check-claude`           | `validate-claude-surface.ts` | validate the Claude configuration/skills/hooks surface                                       |
 | `agentic:smoke-claude-remote`    | `claude-remote-smoke.ts`     | smoke the Claude remote launch path                                                          |
+| `agentic:runtime`                | `runtime/cli/agentic-runtime.ts` | desired-state controller: `doctor` / `status` / `repair codex-remote` (inspect-first; `--dry-run`) |
+| `agentic:routing-state`          | `runtime/cli/routing-state.ts` | read-only view of persisted quota-fallback routing state                                   |
+| `agentic:antigravity-evidence`   | `runtime/cli/antigravity-evidence-cli.ts` | run/aggregate bounded Antigravity evidence-lane probes                            |
+| `agentic:provider-canary`        | `runtime/cli/provider-canary.ts` | canary a provider profile/model/effort launch identity (non-secret JSON)                   |
+| `agentic:rollout-canary`         | `runtime/cli/rollout-canary-cli.ts` | rollout canary + report for route promotion (#582)                                      |
+| `agentic:wsl-foundation`         | `wsl/wsl-foundation.ts`      | WSL foundation doctor + reversible bootstrap/rollback planner                                |
 
 `gh-watch.ts` and `gh-token.ts` are the two durable GitHub infra utilities — see **netscript-tools**
 § Supervisor Automation for their exit codes and token-handling rules.

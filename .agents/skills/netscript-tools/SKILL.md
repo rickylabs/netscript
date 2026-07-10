@@ -125,6 +125,12 @@ Two are durable GitHub infra utilities worth calling out:
   (Windows GCM + WSL `gh`) so later sessions auto-resolve. Use `check` at the start of any GitHub
   session; use `store` once when the supervisor's token is missing/rotated.
 
+The desired-state runtime controller is the default health/repair entry point:
+`deno task agentic:runtime doctor|status` for inspect-only environment/session snapshots, and
+`deno task agentic:runtime repair codex-remote --worktree <path> [--dry-run]` for planned,
+session-safe Codex daemon repair. `deno task agentic:routing-state` reads the persisted
+quota-fallback routing state.
+
 The rest of the family (`launch-codex-slice`, `codex-resume`, `codex-status`, `codex-watch`,
 `dispatch-openhands`, `openhands-status`, `gh-pr`) is indexed in
 `.llm/harness/workflow/tooling.md`. `.llm/tools/agentic/` is the **only** interface for driving Codex

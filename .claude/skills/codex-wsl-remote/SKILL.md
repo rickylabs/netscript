@@ -149,9 +149,15 @@ identifiers as your local-profile placeholders, not fixed values.
 - Snapshot toolchain: Deno `2.7.11`, .NET SDK `10.0.109`, Aspire CLI `13.3.0`, Docker `29.1.3`, Node `18.19.1`, npm `9.2.0`
 
 Model, provider, and effort are required launch identity. Select them from
-`.llm/harness/workflow/lane-policy.md`; this skill does not carry a second effort table.
+`.llm/harness/workflow/lane-policy.md`; this skill does not carry a second effort table. Pinned
+tool versions are centralized in `.llm/tools/agentic/config/versions.ts` — treat version literals
+above as snapshots.
 
-The Windows-side helper lives at:
+For daemon/session health and repair, reach for the runtime controller **first**:
+`deno task agentic:runtime doctor` / `status --worktree <path>` are inspect-only, and
+`deno task agentic:runtime repair codex-remote --worktree <path> [--dry-run]` plans the smallest
+safe repair of unmanaged app-server daemon state without interrupting active sessions. The
+Windows-side PowerShell helper below is the manual transport-restoration fallback; it lives at:
 
 ```powershell
 $env:USERPROFILE\.codex\skills\codex-wsl-remote\scripts\start-codex-wsl-remote.ps1
