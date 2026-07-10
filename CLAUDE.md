@@ -16,11 +16,8 @@
 
 ## Reasoning Policy
 
-- Use low effort for mechanical, no-reasoning tasks.
-- Use medium effort for daily implementation and supervision.
-- Use high effort when the agent must self-evaluate, debug an unclear failure, or choose among
-  plausible fixes.
-- Use xhigh only when explicitly requested or when the task is unusually complex and high-risk.
+- Select model/provider/effort from `.llm/harness/workflow/lane-policy.md` and pass the resulting
+  identity explicitly to the launcher. Do not maintain a second routing table here.
 
 ## Claude Workflow Policy
 
@@ -36,20 +33,16 @@
 
 - **Documentation authoring** (Markdown/Lume content, per-package README + reference prose,
   internal-doc consolidation) MAY use a Claude dynamic workflow as the implementation lane.
-  Rationale: doc quality is language-dominated, Opus 4.8 materially outperforms Codex/GPT here, and
-  authoring touches **no `packages/`/`plugins/` source code** — so the
+  Rationale: doc quality is language-dominated and the canonical documentation route is optimized
+  for that work; authoring touches **no `packages/`/`plugins/` source code** — so the
   supervisor-does-not-write-framework-code boundary is not crossed.
 - Conditions on this exception:
   - Authoring agents run **under the harness SKILL** (`netscript-harness` + the relevant domain
     skills: `jsr-audit`, `netscript-doctrine`, `deno-fresh` as applicable) so output respects
     doctrine, the publish surface, and gates.
-  - Route model/effort per slice: Opus medium for reference/concept pages, Opus low for mechanical
-    README standardization, **Sonnet 5** for trivial link-fix/cleanup. **Never route workflow stages
-    to Fable 5** — it is the most powerful *and* the priciest model, so fanning it out across a
-    workflow burns plan tokens; reserve Fable 5 for a single deliberately-spawned sub-agent on an
-    extremely complex, single-threaded engineering task.
-  - **Validation stays with OpenHands** (qwen 3.7 max, separate session) with a **per-package /
-    per-domain verdict** — the Claude workflow is the _generator only_; it does not self-certify.
+  - Route model/provider/effort per slice from `.llm/harness/workflow/lane-policy.md`.
+  - **Validation stays in a separate opposite-family session** with a per-package/per-domain
+    verdict — the Claude workflow is the generator only; it does not self-certify.
   - Any change to **framework source** (e.g. the `@netscript/fresh-ui` `*Namespace` type exports)
     remains a **WSL Codex** daemon-attached slice, never the Claude workflow.
 - This exception is scoped to documentation. Framework/plugin implementation slices stay on WSL

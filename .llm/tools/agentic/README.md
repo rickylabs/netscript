@@ -265,7 +265,9 @@ downstream reliability/policy issues (#577–#582) to land and a separately revi
 ### `launch-codex-slice.ts`
 
 Stage and launch a Codex slice from a Windows-authored brief, with a push-safety gate, and record
-the thread id to the run-artifact dir.
+the thread id plus secret-safe requested-versus-observed route identity to the run-artifact dir.
+Select provider/model/effort from `.llm/harness/workflow/lane-policy.md`; prose in the brief is not
+launch authority.
 
 ```powershell
 # Parse a saved launch log for the thread id (no side effects):
@@ -274,10 +276,10 @@ deno run --allow-read .llm/tools/agentic/launch-codex-slice.ts --parse-log <log>
 # Dry-run the full plan (validates brief + git safety, stages nothing, launches nothing):
 deno run --allow-read --allow-run .llm/tools/agentic/launch-codex-slice.ts \
   --brief <win-path> --worktree <wsl path> --branch <branch> --slug <slug> \
-  --slice-dir <win path> --dry-run
+  --slice-dir <win path> --provider openai --model gpt-5.6-sol --effort medium --dry-run
 
-# Real launch (omit --dry-run): stages the brief, spawns ~/launch_slice.sh, streams output,
-# writes codex-thread-ids.md into --slice-dir on first thread id.
+# Real launch (omit --dry-run): stages the brief, passes model/effort explicitly, streams output,
+# and fails closed unless observed provider/model/effort match the requested identity.
 ```
 
 Exit codes: `0` ok / dry-run / parse-log · `1` stage failed · `2` watcher heartbeat · `3` brief
@@ -344,18 +346,21 @@ Validate the dispatch-prompt contract, build the `@openhands-agent` trigger, and
 # Dry-run (no token, no network) — see the exact comment that would post:
 deno run --allow-read .llm/tools/agentic/dispatch-openhands.ts \
   --pr 86 --prompt-file <win-path> --model openrouter/qwen/qwen3.7-max \
-  --output pr-comment --iterations 800 --provider openrouter --dry-run --pretty
+  --output pr-comment --iterations 800 --provider openrouter --effort xhigh --dry-run --pretty
 
 # Real post: set the token in-process first, then drop --dry-run:
 $env:GH_TOKEN = (read from your secret store)   # never commit / echo this
 deno run --allow-read --allow-env --allow-net .llm/tools/agentic/dispatch-openhands.ts \
-  --pr 86 --prompt-file <win-path> --model openrouter/qwen/qwen3.7-max --output pr-comment
+  --pr 86 --prompt-file <win-path> --model openrouter/qwen/qwen3.7-max \
+  --provider openrouter --effort xhigh --output pr-comment
 ```
 
 The prompt MUST begin with `use harness` and contain a `## SKILL` chapter (handoff contract). Output
 modes: `pr-comment` · `respond-comments` · `thread-replies` · `summary-only`. A `--pr` trigger
 checks out the PR branch; `--issue` checks out the default branch. Exit: `0` ok / dry-run · `1` post
 failed · `2` usage error · `3` prompt contract violation · `4` missing token (non-dry-run).
+The trigger records requested provider/model/effort and marks observed identity pending until the
+asynchronous Action status is available.
 
 By default every dispatched prompt gets a **verdict output-contract epilogue**
 (`appendVerdictContractEpilogue`): post the formal `**[PHASE: …] [VERDICT: …]**` PR comment EARLY

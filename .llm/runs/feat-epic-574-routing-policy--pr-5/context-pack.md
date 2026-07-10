@@ -26,4 +26,6 @@ Codex/OpenHands launch edges enforce and record provider/model/effort using exis
 
 Slice 2 is commit `c41a790e`. Slice 3 adds required provider/model/effort at Codex and OpenHands
 launch edges plus requested-versus-observed evidence and fail-closed Codex mismatch handling. Finish
-slice 3 hygiene/commit/push/comment, then update skills/docs/templates and generated Claude mirrors.
+Slice 3 is commit `8f98a7cc`. Slice 4 updates skills/docs/templates, distinguishes native mobile
+Claude from experimental gateways, regenerates `.claude/skills`, and passes Claude-surface
+validation. Finish slice 4 hygiene/commit/push/comment, then run the complete DoD gate slice.

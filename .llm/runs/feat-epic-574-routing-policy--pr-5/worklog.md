@@ -95,3 +95,25 @@ The launch edges now treat route identity as enforced data rather than prompt pr
 synchronous observed identity and fails closed; OpenHands records pending observation because its
 GitHub Action is asynchronous. #577 provider validation, #579 fallback rules, #580 sender ownership,
 and #582 deferred rollout remain intact.
+
+## Slice 4 — reference docs, templates, and generated Claude mirrors
+
+- Replaced stale model bindings in harness/Claude/Codex/OpenHands/CLI skills and `CLAUDE.md` with
+  references to the canonical lane policy while preserving evaluator-session separation.
+- Updated agent briefing and supervisor templates to require `use harness`, a `## SKILL` section,
+  explicit route identity, and a reference rather than a copied policy table.
+- Updated agentic launcher documentation with required provider/model/effort flags and requested vs
+  observed behavior.
+- Documented that native Anthropic-authenticated Claude is the mobile-visible surface while
+  OpenRouter/custom gateway sessions are experimental provider-runner sessions, not native mobile
+  Claude.
+- Regenerated `.claude/skills` from `.agents/skills`; no mirror was hand-edited.
+- `validate-claude-surface.ts`: all five checks PASS; hook runs left `deno.lock` unchanged.
+- Remaining qwen strings are historical evidence in `arch-debt.md`; preserved under the explicit
+  no-historical-rewrite boundary.
+
+### Reconcile note
+
+All current operational routing prose now refers to `workflow/lane-policy.md`. Transport-syntax
+examples are labeled compatibility mechanisms rather than routing authority. Historical debt/run
+evidence was not rewritten, and #582 remains deferred.

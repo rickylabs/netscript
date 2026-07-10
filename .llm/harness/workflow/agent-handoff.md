@@ -23,6 +23,10 @@ Preferred triggers:
 - commit message `[openhands model=<provider/model> output=<mode>] ...`,
 - manual `OpenHands Agent` workflow dispatch.
 
+For harness work, prefer `.llm/tools/agentic/dispatch-openhands.ts` with explicit provider, model,
+and effort selected from `workflow/lane-policy.md`. The legacy triggers above are transport syntax,
+not canonical routing policy.
+
 The canonical details live in `AGENTS-handoff.md` and `.agents/skills/openhands-handoff/SKILL.md`.
 
 ## Harness Rules

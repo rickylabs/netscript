@@ -148,14 +148,8 @@ identifiers as your local-profile placeholders, not fixed values.
   re-verify per branch with the toolchain command in [Verification Commands](#verification-commands).
 - Snapshot toolchain: Deno `2.7.11`, .NET SDK `10.0.109`, Aspire CLI `13.3.0`, Docker `29.1.3`, Node `18.19.1`, npm `9.2.0`
 
-Default reasoning remains `medium`. Override per launch only when the task calls for it:
-
-| Task | Effort |
-| ---- | ------ |
-| Mechanical launch, status, prompt steering, or no-edit smoke | `low` |
-| Daily implementation and ordinary supervision | `medium` |
-| Debugging, self-evaluation, or ambiguous solution finding | `high` |
-| Explicit user request or unusually complex/high-risk work | `xhigh` |
+Model, provider, and effort are required launch identity. Select them from
+`.llm/harness/workflow/lane-policy.md`; this skill does not carry a second effort table.
 
 The Windows-side helper lives at:
 
