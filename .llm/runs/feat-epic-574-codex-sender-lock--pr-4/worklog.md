@@ -1,0 +1,73 @@
+# Worklog: Codex sender ownership and remote recovery
+
+## Run Metadata
+
+| Field | Value |
+| ----- | ----- |
+| Run ID | `feat-epic-574-codex-sender-lock--pr-4` |
+| Branch | `feat/epic-574-codex-sender-lock` |
+| Archetype | `6 — CLI / Tooling` |
+| Scope overlays | `docs` |
+
+## Design
+
+### Public Surface
+
+- Existing `deno task agentic:runtime repair codex-remote --worktree <path> [--session <id>] [--dry-run] [--json]` becomes functional.
+- Existing runtime `launch` refuses duplicate ownership before its process request executes.
+- Existing runtime `resume` remains the sole steering path for an owned thread.
+
+### Domain Vocabulary
+
+- `SenderOwnershipRecord` / `SenderOwnershipState` — durable privacy-safe owner identity and lifecycle.
+- `SenderOwnershipDecision` — acquired, blocked-with-resume, stale-reclaimable, or invalid.
+- `CodexRemoteState` — managed, unmanaged, stale socket, disconnected, version skew, or absent.
+- `CodexRemoteObservation` — versions, socket/control facts, anchored PIDs, sessions, and child commands.
+- `CodexRepairDecision` / `CodexRecoveryEvidence` — refusal or ordered recovery with redacted verification.
+
+### Ports
+
+- Ownership store/process observation — atomic create/read/replace/release and owner liveness without hidden globals.
+- Remote-control inspection/mutation — injected process/socket/restart/pair/verify operations so tests never touch the real daemon.
+
+### Constants
+
+- Sender ownership schema version and finite ownership states.
+- Finite Codex remote states.
+- Anchored app-server argv rule rooted below `$HOME/.codex/`.
+- Single known control socket relative path.
+
+### Commit Slices
+
+| # | Slice | Gate | Files |
+| - | ----- | ---- | ----- |
+| 1 | Lock research, design, safety, and slice boundaries. | Plan artifact checks | run-dir artifacts |
+| 2 | Prove durable single-sender launch ownership and resume steering. | focused ownership/adapter/controller tests + scoped wrappers | runtime contracts/ports, ownership implementation/tests, Codex adapter/controller tests, run artifacts |
+| 3 | Prove explicit daemon diagnosis and anchored active-work-safe recovery; document operator use. | full agentic/runtime suite + scoped wrappers/integrity gates | remote-control implementation/tests, planner/controller/CLI/output as needed, README, run artifacts |
+
+### Deferred Scope
+
+- #581 routing/global defaults and #582 rollout/model promotion.
+- Actual mobile/sleep/network reconnect execution; owner-accepted-working only.
+
+### Contributor Path
+
+Start at `runtime/contract.ts` for canonical vocabulary, follow the action into `runtime/planner.ts`, then the focused ownership/remote-control module and injected adapter; extend behavior with a semantic fixture test before changing an edge.
+
+## Progress Log
+
+| Time | Slice | Step | Notes |
+| ---- | ----- | ---- | ----- |
+| 2026-07-10 | 1 | pre-flight | Explicit fetch succeeded after stale local origin refspec failed; ancestry exit 0; one pre-existing untracked thread-id artifact preserved. |
+| 2026-07-10 | 1 | design | Research and plan recorded; implementation is stopped pending separate coordinator Plan-Gate. |
+
+## Gate Results
+
+| Gate | Result | Notes |
+| ---- | ------ | ----- |
+| PLAN-EVAL | NOT_RUN | Must be performed by coordinator/separate session; this worker does not self-certify. |
+
+## Handoff Notes
+
+- Review L2–L9 first: lock schema/liveness and repair anchoring/refusal are the decisions that would force rework.
+- Interactive reconnect canaries are owner-accepted only and must not be reported as raw executions.
