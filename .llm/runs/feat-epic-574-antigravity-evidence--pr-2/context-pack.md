@@ -26,11 +26,13 @@ runtime execution remains fail-closed.
   tests; owner acceptance is explicit and does not overwrite the empirical failed observation.
 - S2 bounded evidence adapter with fixed prompts, sandbox, timeout, capture ceiling, rival-provider
   environment clearing, and blocked/failed auth/service/quota/timeout outcomes.
+- S3 conditional run-resource aggregation, private atomic citation metadata adapter, independent
+  AGENTS/GEMINI marker classification, and existing legacy Gemini normalization/rejection coverage.
 
 ## Next Steps
 
-1. Complete S3 instruction/citation/legacy-state evidence and conditional aggregation.
-2. Continue S4 in this same thread; do not launch a second sender.
+1. Complete S4 planner/live enablement, CLI task, README, boundary regressions, and full gates.
+2. Continue in this same thread; do not launch a second sender.
 
 ## Key Decisions
 
@@ -54,6 +56,9 @@ runtime execution remains fail-closed.
 | `.llm/tools/agentic/runtime/antigravity-evidence_test.ts` | new | Semantic S1 matrix. |
 | `.llm/tools/agentic/runtime/adapters/antigravity-adapter.ts` | changed | Bounded evidence adapter. |
 | `.llm/tools/agentic/runtime/adapters/antigravity-adapter_test.ts` | new | S2 process/failure matrix. |
+| `.llm/tools/agentic/runtime/antigravity-evidence-aggregation.ts` | new | Conditional evidence handoff. |
+| `.llm/tools/agentic/runtime/adapters/run-resource-aggregation-adapter.ts` | new | Private atomic citation metadata writer. |
+| `.llm/tools/agentic/runtime/ports.ts` | changed | Citation aggregation port. |
 
 ## Gates
 

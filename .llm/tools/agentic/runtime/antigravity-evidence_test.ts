@@ -89,3 +89,25 @@ Deno.test('owner acceptance is explicit and does not overwrite observed failure'
   assertEquals(result.evidence.capabilities.headless, 'owner_accepted_working');
   assertEquals(result.aggregationEligible, false);
 });
+
+Deno.test('AGENTS and GEMINI instruction markers are classified independently', () => {
+  const agents = classifyAntigravityEvidence({
+    exitCode: 0,
+    timedOut: false,
+    stdout: 'AGENTS_INSTRUCTION_OK',
+    stderr: '',
+    expectedInstructionMarker: 'AGENTS',
+  });
+  const gemini = classifyAntigravityEvidence({
+    exitCode: 0,
+    timedOut: false,
+    stdout: 'GEMINI_INSTRUCTION_OK',
+    stderr: '',
+    expectedInstructionMarker: 'GEMINI',
+  });
+  assertEquals(agents.evidence.capabilities.agents_instructions, 'supported');
+  assertEquals(agents.evidence.capabilities.gemini_instructions, 'unknown');
+  assertEquals(gemini.evidence.capabilities.gemini_instructions, 'supported');
+  assertEquals(gemini.evidence.capabilities.agents_instructions, 'unknown');
+  assert(!JSON.stringify([agents, gemini]).includes('INSTRUCTION_OK'));
+});

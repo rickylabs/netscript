@@ -72,6 +72,11 @@ export interface ChildProcessOutcome {
   readonly diagnostic?: RuntimeDiagnostic;
 }
 export type ChildProcessPort = { run(request: AgentProcessRequest): Promise<ChildProcessOutcome> };
+export interface AntigravityCitationAggregationPort {
+  writeAntigravityCitations(
+    citations: readonly import('./antigravity-evidence.ts').AntigravityCitationEvidence[],
+  ): Promise<void>;
+}
 export interface AgentCommandPlan {
   readonly agent: AgentKind;
   readonly operation: AgentLifecycleOperation;

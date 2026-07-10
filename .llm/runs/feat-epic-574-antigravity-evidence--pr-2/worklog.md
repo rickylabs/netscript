@@ -69,6 +69,7 @@ after it is bounded and secret-safe; connect planner/aggregation only after posi
 | 2026-07-10 | S1 | Plan-Gate | Coordinator approved; owner directed explicit `owner_accepted_working` live enablement while preserving fail-closed execution. |
 | 2026-07-10 | S1 | Contract/classifier | Finite evidence and sanitized citations landed; focused tests 4/4 and scoped check/lint/fmt are green. |
 | 2026-07-10 | S2 | Bounded adapter | Fixed read-only probes, sandbox, timeout, capture ceiling, child-only environment, and fail-closed runtime classification landed. |
+| 2026-07-10 | S3 | Conditional aggregation | Citation metadata writes only after empirical support; owner acceptance alone cannot write; instruction and legacy-state regressions are green. |
 
 ## Drift
 
@@ -104,6 +105,15 @@ after it is bounded and secret-safe; connect planner/aggregation only after posi
 | Scoped check | 0 | 33 files, 0 findings |
 | Scoped lint | 0 | 33 files, 0 findings |
 | Scoped fmt | 0 | 33 files, 0 findings |
+
+### S3 Gates
+
+| Gate | Exit | Result |
+| ---- | ---- | ------ |
+| Focused evidence/aggregation/legacy tests | 0 | 16 passed, 0 failed |
+| Scoped check | 0 | 36 files, 0 findings |
+| Scoped lint | 0 | 36 files, 0 findings |
+| Scoped fmt | 0 | 36 files, 0 findings |
 
 ## Handoff Notes
 
