@@ -11,3 +11,13 @@
 - **Severity:** minor
 - **Action:** accept for this issue; do not mutate coordinator Git configuration.
 - **Evidence:** pre-flight output recorded in `research.md`.
+
+## 2026-07-10 — S1 matched locked profile design
+
+- **What:** No implementation drift in S1; all three OpenRouter slugs matched current provider docs.
+- **Source:** OpenRouter model pages and focused profile tests.
+- **Expected:** Typed profiles/presets remove only #577 route deferral.
+- **Actual:** Expected design landed; #578 Antigravity and #580 apply blocks remain.
+- **Severity:** minor
+- **Action:** accept as a no-divergence checkpoint.
+- **Evidence:** `provider-profiles.ts`; focused tests 30 passed / 0 failed.

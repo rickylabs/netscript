@@ -200,16 +200,16 @@ Deno.test('deferred Codex repair is an explicit blocked intent owned by issue 58
   assertEquals(result.changed, false);
 });
 
-Deno.test('OpenRouter route planning blocks explicitly on issue 577', () => {
+Deno.test('OpenRouter route planning is available after issue 577 profile selection', () => {
   const result = plan({
     kind: 'launch',
     commandId: 'launch-openrouter',
     mode: 'plan',
-    route: { ...route, provider: 'openrouter' },
+    route: { ...route, provider: 'openrouter', profileId: 'codex-openrouter' },
     content: { path: '/brief.md' },
   });
-  assertEquals(result.status, 'blocked');
-  assertEquals(result.diagnostics[0]?.ownerIssue, 577);
+  assertEquals(result.status, 'planned');
+  assertEquals(result.actions[0]?.kind, 'launch_session');
 });
 
 Deno.test('Antigravity live smoke planning blocks explicitly on issue 578', () => {

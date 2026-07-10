@@ -317,23 +317,27 @@ Deno.test('Antigravity observations are finite and live evidence is issue 578 bl
   assertEquals(codes(plan.diagnostics), ['capability_deferred']);
 });
 
-Deno.test('provider blocks issue 577 routes and never exposes credential values', () => {
+Deno.test('provider requires explicit issue 577 profiles and never exposes input values', () => {
   const sentinel = 'SYNTHETIC_SECRET_CREDENTIAL_VALUE';
   const openRouter = validateProviderRoute({
-    route: { ...codexRoute, provider: 'openrouter' },
+    route: { ...codexRoute, provider: 'openrouter', profileId: 'codex-openrouter' },
     nativeExt4: true,
     requireSession: false,
     credentialKeyNames: ['OPENAI_API_KEY', sentinel],
   });
   assertEquals(openRouter.ok, false);
-  assert(codes(openRouter.diagnostics).includes('capability_deferred'), 'OpenRouter did not block');
-  assertEquals(openRouter.diagnostics.find((entry) => entry.ownerIssue)?.ownerIssue, 577);
+  assertEquals(codes(openRouter.diagnostics), ['auth_conflict']);
   assertEquals(openRouter.conflictingKeyNames, ['OPENAI_API_KEY']);
   assert(
     !JSON.stringify(openRouter).includes(sentinel),
     'credential value entered provider result',
   );
-  assertEquals(CONFLICTING_CREDENTIAL_KEYS.codex, ['OPENAI_API_KEY']);
+  assertEquals(CONFLICTING_CREDENTIAL_KEYS.codex, [
+    'ANTHROPIC_API_KEY',
+    'ANTHROPIC_AUTH_TOKEN',
+    'OPENAI_API_KEY',
+    'OPENROUTER_API_KEY',
+  ]);
   const launch = planCodexCommand({
     command: {
       kind: 'launch',
@@ -353,11 +357,16 @@ Deno.test('provider blocks issue 577 routes and never exposes credential values'
     'content or credential value entered argv/result',
   );
   const custom = validateProviderRoute({
-    route: { ...codexRoute, provider: 'custom' },
+    route: {
+      ...codexRoute,
+      agent: 'claude',
+      provider: 'custom',
+      profileId: 'claude-custom',
+    },
     nativeExt4: true,
     requireSession: false,
   });
-  assertEquals(custom.diagnostics[0]?.ownerIssue, 577);
+  assertEquals(custom.ok, true);
 });
 
 Deno.test('unsupported lifecycle operations return finite diagnostics and no request', () => {

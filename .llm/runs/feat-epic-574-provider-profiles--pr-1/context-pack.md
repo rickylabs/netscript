@@ -6,14 +6,14 @@
 | ----- | ----- |
 | Run ID | `feat-epic-574-provider-profiles--pr-1` |
 | Branch | `feat/epic-574-provider-profiles` |
-| Current phase | `plan-eval` |
+| Current phase | `implement` |
 | Archetype | 6 — CLI / Tooling, scoped internal-tool variant |
 | Scope overlays | none |
 
 ## Current State
 
-Pre-flight, controller research, external primary-doc verification, and the locked S0 Design are
-complete. No implementation has begun. The coordinator must run the Plan-Gate before S1.
+Coordinator Plan-Gate is approved. S1 implements the finite profile/preset registry and profile-aware
+provider/planner validation. S2 child-only environment injection is next.
 
 ## Completed
 
@@ -21,11 +21,14 @@ complete. No implementation has begun. The coordinator must run the Plan-Gate be
 - Confirmed merged controller/provider/Antigravity surfaces under `.llm/tools/agentic/runtime`.
 - Recorded `research.md`, `plan.md`, and the `## Design` checkpoint.
 - Locked four implementation slices after S0, with explicit #578–#582 boundaries and LOC budgets.
+- S1 focused tests pass 30/0; scoped check/lint/fmt pass with 22 files and zero findings.
+- OpenRouter slugs verified 2026-07-10: `minimax/minimax-m3`, `z-ai/glm-5.2`,
+  `x-ai/grok-4.5`.
 
 ## Next Steps
 
-1. Coordinator evaluates the plan and records approval or changes requested.
-2. Only after explicit approval, resume this same Codex thread for S1.
+1. Commit, push, and comment S1.
+2. Implement S2 value-free child environment policy and adapter.
 
 ## Key Decisions
 
@@ -39,12 +42,12 @@ complete. No implementation has begun. The coordinator must run the Plan-Gate be
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
 | Plan | READY | `research.md`, `plan.md`, `worklog.md#Design` |
-| Static/Fitness/Runtime/Consumer | NOT_RUN | prohibited until Plan-Gate |
+| S1 focused | PASS | 30 passed, 0 failed |
+| S1 static wrappers | PASS | check/lint/fmt exit 0; zero findings |
 
 ## Open Questions
 
-- None that force pre-implementation rework. Live model compatibility is intentionally resolved by
-  a fail-closed canary during S4.
+- None. Live model compatibility remains intentionally resolved by a fail-closed canary during S4.
 
 ## Drift and Debt
 
