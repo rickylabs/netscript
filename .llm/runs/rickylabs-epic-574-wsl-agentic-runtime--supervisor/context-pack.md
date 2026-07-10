@@ -12,8 +12,9 @@
 
 ## Current State
 
-The canonical stack is umbrella #583 (`b58b4c2a`) -> foundation #584 (`9b75470`) -> controller #585
-(`f1dfdc9`). PR 0A implementation and Tier-A sign-off are complete, but four owner-interactive
+The canonical stack is umbrella #583 (live supervisor branch; bootstrap `b58b4c2a`) -> foundation
+#584 (`9b75470`) -> controller #585 (`f1dfdc9`). PR 0A implementation and Tier-A sign-off are
+complete, but four owner-interactive
 canaries explicitly block its merge. Independent stacked development continues: PR 0B's research,
 Design, and owner-waived Plan-Gate are complete, and S1 is authorized on its sole WSL Codex thread.
 

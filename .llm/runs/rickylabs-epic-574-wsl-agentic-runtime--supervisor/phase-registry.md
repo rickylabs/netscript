@@ -25,7 +25,7 @@
 
 | Layer | PR | Branch | Base | Canonical head | Merge state |
 | --- | --- | --- | --- | --- | --- |
-| Umbrella | #583 | `rickylabs-epic-574-wsl-agentic-runtime` | `main` | `b58b4c2a` | draft; contains supervisor artifacts only |
+| Umbrella | #583 | `rickylabs-epic-574-wsl-agentic-runtime` | `main` | live supervisor branch; bootstrap `b58b4c2a` | draft; contains supervisor artifacts only |
 | 0A foundation | #584 | `chore/epic-574-wsl-agentic-runtime-foundation` | umbrella branch | `9b75470` | draft; four owner-interactive canaries block merge |
 | 0B controller | #585 | `refactor/epic-574-agentic-runtime-controller` | foundation branch | `f1dfdc9` | draft; Plan-Gate passed, implementation active |
 
