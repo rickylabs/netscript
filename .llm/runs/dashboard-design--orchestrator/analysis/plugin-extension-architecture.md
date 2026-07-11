@@ -1,5 +1,9 @@
 # Dynamic Plugin/Extension System — Architecture Proposal (Axis 6)
 
+> Naming note: `playground-ref` and `chat-ref` are aliases for the two internal reference
+> apps (mapping known to the owner). Aliased here so this analysis can live on a public repo;
+> never expand these aliases in owner-facing design-prompt text.
+
 > Dashboard-design revamp run, plugin-system investigation slice. Analysis only — no product
 > code changed. Grounds the Axis-6 brief (`../improvement-brief.md`) and the S5/home
 > "contributed panels" seeds (`../screen-catalog.md`) in the existing plugin system and the

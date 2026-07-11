@@ -1,5 +1,9 @@
 # Routing Resort — the LOCKED routing hierarchy for the revamped dev dashboard (Axis 2)
 
+> Naming note: `playground-ref` and `chat-ref` are aliases for the two internal reference
+> apps (mapping known to the owner). Aliased here so this analysis can live on a public repo;
+> never expand these aliases in owner-facing design-prompt text.
+
 Analyst pass for umbrella PR #685 / branch `design/ddr-s2-routing`. Analysis only. This is the
 **locked proposal**: the complete routing hierarchy the revamped dashboard prototype MUST adopt.
 Grounded in `reference-routing-notes.md` (same dir), which extracts the two internal reference apps

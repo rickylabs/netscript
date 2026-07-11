@@ -1,5 +1,9 @@
 # Reference-App Routing Notes — grounding for the dev-dashboard routing resort (Axis 2)
 
+> Naming note: `playground-ref` and `chat-ref` are aliases for the two internal reference
+> apps (mapping known to the owner). Aliased here so this analysis can live on a public repo;
+> never expand these aliases in owner-facing design-prompt text.
+
 Analyst pass for umbrella PR #685 / branch `design/ddr-s2-routing`. Analysis only — no product
 code touched. This file extracts the **routing architecture** (not visual design) of the two
 internal reference apps and states which patterns transfer to the revamped NetScript dev dashboard.
@@ -19,7 +23,7 @@ co-located non-route folders `(_components)` / `(_islands)` / `(_shared)`.
 
 ---
 
-## A. Reference 1 — the playground dashboard (`/home/codex/repos/refs/netscript-start`)
+## A. Reference 1 — the playground dashboard (`/home/codex/repos/refs/playground-ref`)
 
 All paths below are under `apps/playground/routes/(dashboard)/dashboard/` unless absolute. This app
 already implements the exact list→detail→sub-detail, per-entity-URL, correlation-join experience the
@@ -144,7 +148,7 @@ consumers over a streams base URL).
 
 ---
 
-## B. Reference 2 — the production chat app (`/home/codex/repos/refs/eis-chat`)
+## B. Reference 2 — the production chat app (`/home/codex/repos/refs/chat-ref`)
 
 All paths under `apps/dashboard/`. This app is the model for the **deep addressable-entity spine +
 middleware guard cascade + URL-derived selection**. (Full extraction corroborated by a dedicated
@@ -258,7 +262,7 @@ param-driven spine. `routes/api/*` are handler-only endpoints.
 The following are internal and MUST be replaced with neutral wording in any Claude Design prompt
 derived from `routing-resort.md`:
 
-- Reference-app names: **`netscript-start`**, **`eis-chat`**, **playground**, **"the chat app"**.
+- Reference-app names: **`playground-ref`**, **`chat-ref`**, **playground**, **"the chat app"**.
 - Their domain segments used only as internal examples: **`project` / `channel` / `session` /
   `knowledge` / `skills` / `team`**, **`wi-09`**, **RFC 13/15/16/17**, `orders`/`users`/`products`
   demo CRUD, `eis_active_channel` cookie, issue refs (`#73`, `#16`, `#11`).

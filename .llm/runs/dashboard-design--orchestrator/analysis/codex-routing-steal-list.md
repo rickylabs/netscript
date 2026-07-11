@@ -1,5 +1,9 @@
 # Routing and UX steal list — internal grounding
 
+> Naming note: `playground-ref` and `chat-ref` are aliases for the two internal reference
+> apps (mapping known to the owner). Aliased here so this analysis can live on a public repo;
+> never expand these aliases in owner-facing design-prompt text.
+
 Purpose: concrete patterns to adapt into the NetScript Dev Dashboard. These source names are
 internal research references only and must not become required public naming in owner-facing design
 prompts.
@@ -11,15 +15,15 @@ prompts.
 The playground already models the right depth:
 
 - worker definitions:
-  [`plugin/workers/jobs/[jobId]/index.tsx`](/home/codex/repos/refs/netscript-start/apps/playground/routes/(dashboard)/dashboard/plugin/workers/jobs/[jobId]/index.tsx)
+  [`plugin/workers/jobs/[jobId]/index.tsx`](/home/codex/repos/refs/playground-ref/apps/playground/routes/(dashboard)/dashboard/plugin/workers/jobs/[jobId]/index.tsx)
 - job executions:
-  [`plugin/workers/jobs/[jobId]/executions/[executionId]/index.tsx`](/home/codex/repos/refs/netscript-start/apps/playground/routes/(dashboard)/dashboard/plugin/workers/jobs/[jobId]/executions/[executionId]/index.tsx)
+  [`plugin/workers/jobs/[jobId]/executions/[executionId]/index.tsx`](/home/codex/repos/refs/playground-ref/apps/playground/routes/(dashboard)/dashboard/plugin/workers/jobs/[jobId]/executions/[executionId]/index.tsx)
 - parallel task hierarchy:
-  [`plugin/workers/tasks/[taskId]/executions/[executionId]/index.tsx`](/home/codex/repos/refs/netscript-start/apps/playground/routes/(dashboard)/dashboard/plugin/workers/tasks/[taskId]/executions/[executionId]/index.tsx)
+  [`plugin/workers/tasks/[taskId]/executions/[executionId]/index.tsx`](/home/codex/repos/refs/playground-ref/apps/playground/routes/(dashboard)/dashboard/plugin/workers/tasks/[taskId]/executions/[executionId]/index.tsx)
 - saga definition then correlated instance:
-  [`plugin/sagas/[sagaName]/[correlationId]/index.tsx`](/home/codex/repos/refs/netscript-start/apps/playground/routes/(dashboard)/dashboard/plugin/sagas/[sagaName]/[correlationId]/index.tsx)
+  [`plugin/sagas/[sagaName]/[correlationId]/index.tsx`](/home/codex/repos/refs/playground-ref/apps/playground/routes/(dashboard)/dashboard/plugin/sagas/[sagaName]/[correlationId]/index.tsx)
 - trigger definition then event:
-  [`plugin/triggers/[id]/events/[eventId]/index.tsx`](/home/codex/repos/refs/netscript-start/apps/playground/routes/(dashboard)/dashboard/plugin/triggers/[id]/events/[eventId]/index.tsx)
+  [`plugin/triggers/[id]/events/[eventId]/index.tsx`](/home/codex/repos/refs/playground-ref/apps/playground/routes/(dashboard)/dashboard/plugin/triggers/[id]/events/[eventId]/index.tsx)
 
 Adapt it as:
 
@@ -65,10 +69,10 @@ Adaptation:
 ### 3. Typed route contracts as a dashboard product feature
 
 The playground route contract files validate path/search input, e.g.
-[`workers/jobs/[jobId]/index.route.ts`](/home/codex/repos/refs/netscript-start/apps/playground/routes/(dashboard)/dashboard/plugin/workers/jobs/[jobId]/index.route.ts),
-[`sagas/[sagaName]/[correlationId]/index.route.ts`](/home/codex/repos/refs/netscript-start/apps/playground/routes/(dashboard)/dashboard/plugin/sagas/[sagaName]/[correlationId]/index.route.ts),
+[`workers/jobs/[jobId]/index.route.ts`](/home/codex/repos/refs/playground-ref/apps/playground/routes/(dashboard)/dashboard/plugin/workers/jobs/[jobId]/index.route.ts),
+[`sagas/[sagaName]/[correlationId]/index.route.ts`](/home/codex/repos/refs/playground-ref/apps/playground/routes/(dashboard)/dashboard/plugin/sagas/[sagaName]/[correlationId]/index.route.ts),
 and
-[`triggers/[id]/events/[eventId]/index.route.ts`](/home/codex/repos/refs/netscript-start/apps/playground/routes/(dashboard)/dashboard/plugin/triggers/[id]/events/[eventId]/index.route.ts).
+[`triggers/[id]/events/[eventId]/index.route.ts`](/home/codex/repos/refs/playground-ref/apps/playground/routes/(dashboard)/dashboard/plugin/triggers/[id]/events/[eventId]/index.route.ts).
 The POC ground truth explicitly identifies `InferRouteContractPath/Search` as the basis
 ([POC §6](../design-project/feedback/POC-ground-truth.md)).
 
@@ -83,9 +87,9 @@ Adaptation:
 ### 4. Correlation back-links, not just forward drill-down
 
 The playground joins saga/trigger detail to worker executions through
-[`plugin/(_shared)/linked-worker-executions.ts`](/home/codex/repos/refs/netscript-start/apps/playground/routes/(dashboard)/dashboard/plugin/(_shared)/linked-worker-executions.ts)
+[`plugin/(_shared)/linked-worker-executions.ts`](/home/codex/repos/refs/playground-ref/apps/playground/routes/(dashboard)/dashboard/plugin/(_shared)/linked-worker-executions.ts)
 and resolves domain cross-references in
-[`plugin/(_shared)/cross-references.ts`](/home/codex/repos/refs/netscript-start/apps/playground/routes/(dashboard)/dashboard/plugin/(_shared)/cross-references.ts).
+[`plugin/(_shared)/cross-references.ts`](/home/codex/repos/refs/playground-ref/apps/playground/routes/(dashboard)/dashboard/plugin/(_shared)/cross-references.ts).
 Worker execution can back-link to its originating trigger event; saga and trigger loaders share the
 correlation query ([POC §1](../design-project/feedback/POC-ground-truth.md)).
 
@@ -101,10 +105,10 @@ Adaptation:
 
 Nested `.layout.tsx` files wrap list, definition, and occurrence levels throughout the playground,
 for example
-[`plugin/workers/index.layout.tsx`](/home/codex/repos/refs/netscript-start/apps/playground/routes/(dashboard)/dashboard/plugin/workers/index.layout.tsx),
-[`plugin/workers/jobs/[jobId]/index.layout.tsx`](/home/codex/repos/refs/netscript-start/apps/playground/routes/(dashboard)/dashboard/plugin/workers/jobs/[jobId]/index.layout.tsx),
+[`plugin/workers/index.layout.tsx`](/home/codex/repos/refs/playground-ref/apps/playground/routes/(dashboard)/dashboard/plugin/workers/index.layout.tsx),
+[`plugin/workers/jobs/[jobId]/index.layout.tsx`](/home/codex/repos/refs/playground-ref/apps/playground/routes/(dashboard)/dashboard/plugin/workers/jobs/[jobId]/index.layout.tsx),
 and
-[`plugin/sagas/[sagaName]/index.layout.tsx`](/home/codex/repos/refs/netscript-start/apps/playground/routes/(dashboard)/dashboard/plugin/sagas/[sagaName]/index.layout.tsx).
+[`plugin/sagas/[sagaName]/index.layout.tsx`](/home/codex/repos/refs/playground-ref/apps/playground/routes/(dashboard)/dashboard/plugin/sagas/[sagaName]/index.layout.tsx).
 
 Adaptation:
 
@@ -117,11 +121,11 @@ Adaptation:
 ### 6. Server-seeded live data with explicit freshness
 
 The loaders use plugin-specific query utilities and stream factories:
-[`workers/(_shared)/query-loaders.ts`](/home/codex/repos/refs/netscript-start/apps/playground/routes/(dashboard)/dashboard/plugin/workers/(_shared)/query-loaders.ts),
-[`sagas/(_shared)/query-loaders.ts`](/home/codex/repos/refs/netscript-start/apps/playground/routes/(dashboard)/dashboard/plugin/sagas/(_shared)/query-loaders.ts),
-[`triggers/(_shared)/query-loaders.ts`](/home/codex/repos/refs/netscript-start/apps/playground/routes/(dashboard)/dashboard/plugin/triggers/(_shared)/query-loaders.ts),
+[`workers/(_shared)/query-loaders.ts`](/home/codex/repos/refs/playground-ref/apps/playground/routes/(dashboard)/dashboard/plugin/workers/(_shared)/query-loaders.ts),
+[`sagas/(_shared)/query-loaders.ts`](/home/codex/repos/refs/playground-ref/apps/playground/routes/(dashboard)/dashboard/plugin/sagas/(_shared)/query-loaders.ts),
+[`triggers/(_shared)/query-loaders.ts`](/home/codex/repos/refs/playground-ref/apps/playground/routes/(dashboard)/dashboard/plugin/triggers/(_shared)/query-loaders.ts),
 and
-[`plugin/(_shared)/stream-loaders.ts`](/home/codex/repos/refs/netscript-start/apps/playground/routes/(dashboard)/dashboard/plugin/(_shared)/stream-loaders.ts).
+[`plugin/(_shared)/stream-loaders.ts`](/home/codex/repos/refs/playground-ref/apps/playground/routes/(dashboard)/dashboard/plugin/(_shared)/stream-loaders.ts).
 
 Adaptation:
 
@@ -138,15 +142,15 @@ Adaptation:
 The reference app makes context structural rather than implicit:
 
 - project:
-  [`project/[project]/index.tsx`](/home/codex/repos/refs/eis-chat/apps/dashboard/routes/project/[project]/index.tsx)
+  [`project/[project]/index.tsx`](/home/codex/repos/refs/chat-ref/apps/dashboard/routes/project/[project]/index.tsx)
 - channel:
-  [`project/[project]/channel/[channel]/index.tsx`](/home/codex/repos/refs/eis-chat/apps/dashboard/routes/project/[project]/channel/[channel]/index.tsx)
+  [`project/[project]/channel/[channel]/index.tsx`](/home/codex/repos/refs/chat-ref/apps/dashboard/routes/project/[project]/channel/[channel]/index.tsx)
 - session:
-  [`project/[project]/channel/[channel]/session/[session]/index.tsx`](/home/codex/repos/refs/eis-chat/apps/dashboard/routes/project/[project]/channel/[channel]/session/[session]/index.tsx)
+  [`project/[project]/channel/[channel]/session/[session]/index.tsx`](/home/codex/repos/refs/chat-ref/apps/dashboard/routes/project/[project]/channel/[channel]/session/[session]/index.tsx)
 - route-level context/guards:
-  [`project/[project]/_middleware.ts`](/home/codex/repos/refs/eis-chat/apps/dashboard/routes/project/[project]/_middleware.ts)
+  [`project/[project]/_middleware.ts`](/home/codex/repos/refs/chat-ref/apps/dashboard/routes/project/[project]/_middleware.ts)
   and
-  [`channel/[channel]/_middleware.ts`](/home/codex/repos/refs/eis-chat/apps/dashboard/routes/project/[project]/channel/[channel]/_middleware.ts)
+  [`channel/[channel]/_middleware.ts`](/home/codex/repos/refs/chat-ref/apps/dashboard/routes/project/[project]/channel/[channel]/_middleware.ts)
 
 Adaptation:
 
@@ -162,10 +166,10 @@ Adaptation:
 
 The reference app separates session context, scratch context, knowledge, instructions, and MCP/tool
 surfaces in
-[`session-context.tsx`](/home/codex/repos/refs/eis-chat/apps/dashboard/routes/project/[project]/channel/[channel]/session/[session]/(_components)/session-context.tsx),
-[`SessionScratch.tsx`](/home/codex/repos/refs/eis-chat/apps/dashboard/islands/SessionScratch.tsx),
-[`KnowledgePanel.tsx`](/home/codex/repos/refs/eis-chat/apps/dashboard/islands/KnowledgePanel.tsx),
-and [`McpPanel.tsx`](/home/codex/repos/refs/eis-chat/apps/dashboard/islands/McpPanel.tsx).
+[`session-context.tsx`](/home/codex/repos/refs/chat-ref/apps/dashboard/routes/project/[project]/channel/[channel]/session/[session]/(_components)/session-context.tsx),
+[`SessionScratch.tsx`](/home/codex/repos/refs/chat-ref/apps/dashboard/islands/SessionScratch.tsx),
+[`KnowledgePanel.tsx`](/home/codex/repos/refs/chat-ref/apps/dashboard/islands/KnowledgePanel.tsx),
+and [`McpPanel.tsx`](/home/codex/repos/refs/chat-ref/apps/dashboard/islands/McpPanel.tsx).
 
 Adaptation—not generic chat:
 
@@ -179,13 +183,13 @@ Adaptation—not generic chat:
 ### 9. Tool-call and generative UI transparency
 
 The reference has the central conversational surface in
-[`ChatPane.tsx`](/home/codex/repos/refs/eis-chat/apps/dashboard/islands/ChatPane.tsx), streaming
+[`ChatPane.tsx`](/home/codex/repos/refs/chat-ref/apps/dashboard/islands/ChatPane.tsx), streaming
 endpoints in
-[`api/chat-stream.ts`](/home/codex/repos/refs/eis-chat/apps/dashboard/routes/api/chat-stream.ts),
+[`api/chat-stream.ts`](/home/codex/repos/refs/chat-ref/apps/dashboard/routes/api/chat-stream.ts),
 MCP application calls in
-[`api/mcp-apps/call.ts`](/home/codex/repos/refs/eis-chat/apps/dashboard/routes/api/mcp-apps/call.ts),
+[`api/mcp-apps/call.ts`](/home/codex/repos/refs/chat-ref/apps/dashboard/routes/api/mcp-apps/call.ts),
 and a generative UI design specimen in
-[`design/generative.tsx`](/home/codex/repos/refs/eis-chat/apps/dashboard/routes/(design)/design/generative.tsx).
+[`design/generative.tsx`](/home/codex/repos/refs/chat-ref/apps/dashboard/routes/(design)/design/generative.tsx).
 
 Adaptation:
 
@@ -199,7 +203,7 @@ Adaptation:
 ### 10. Rail + full-page duality
 
 The reference app uses durable session routes plus rails/islands such as
-[`SessionRail.tsx`](/home/codex/repos/refs/eis-chat/apps/dashboard/islands/SessionRail.tsx). The
+[`SessionRail.tsx`](/home/codex/repos/refs/chat-ref/apps/dashboard/islands/SessionRail.tsx). The
 prototype uses rails, but without durable destination URLs.
 
 Adaptation:
