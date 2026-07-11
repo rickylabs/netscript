@@ -40,8 +40,8 @@ whole thing. You will read the live port map from the dashboard and confirm ever
 You should have finished [chapter 5](/tutorials/storefront/05-shipping-webhook/), so `my-shop/` has:
 
 - The `products` service and the `cart` contract.
-- The `sagas` plugin (with `CheckoutSaga` and the `process-payment` job) and the `triggers` plugin
-  (with the shipping webhook).
+- The `workers`, `sagas`, and `streams` plugins (with `CheckoutSaga` and the `process-payment` job)
+  and the `triggers` plugin (with the shipping webhook and its `process-shipping-update` job).
 
 Confirm the full plugin set is installed:
 
@@ -49,7 +49,7 @@ Confirm the full plugin set is installed:
 netscript plugin list
 ```
 
-You should see `sagas`, `streams` (its dependency), and `triggers`. If `aspire start` from earlier
+You should see `workers`, `sagas`, `streams`, and `triggers`. If `aspire start` from earlier
 chapters is still up, you can stop it now — this chapter starts the whole graph fresh.
 
 ## Step 1 — Confirm the AppHost was scaffolded
@@ -101,7 +101,7 @@ graph a single run stands up for the storefront:
   { name: "OTLP collector", type: "http://localhost:4318", desc: "OpenTelemetry endpoint the dashboard runs; framework spans and structured logs land here automatically." },
   { name: "postgres", type: "Container", desc: "Provisioned via Docker. The database your products handlers and saga store target — reachable only while Aspire is up." },
   { name: "redis", type: "Container (cache)", desc: "Redis cache — the default `--cache-backend`; Redis-compatible. Backs KV/queue workloads for the runtime plugins." },
-  { name: "products (service)", type: ":3001 (SERVICE range, from :3000)", desc: "Your catalog service. OpenAPI at /api/v1/products/* and RPC at /api/rpc/*." },
+  { name: "products (service)", type: ":3001 (SERVICE range, from :3000)", desc: "Your catalog service. OpenAPI at /api/products/* and RPC at /api/rpc/*." },
   { name: "sagas API", type: ":8092 (PLUGIN_API range)", desc: "Lists sagas and instances — where you watched CheckoutSaga in chapter 4." },
   { name: "triggers API", type: ":8093 (PLUGIN_API range)", desc: "The Hono webhook ingress from chapter 5 — /api/v1/webhooks/shipping/status." },
   { name: "workers API", type: ":8091 (PLUGIN_API range)", desc: "Lists job executions — where the enqueued shipping and payment jobs run." },
