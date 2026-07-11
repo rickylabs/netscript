@@ -61,15 +61,6 @@ const EXAMPLE_SERVICE_APP_TEMPLATE_URLS: TemplateUrlMap = {
   appTelemetryExampleSharedTemplate: TEMPLATE_KEYS.appRoutesExamplesTelemetrySharedTelemetryTrace,
 } as const;
 
-const LEGACY_ASPIRE_TEMPLATE_URLS: TemplateUrlMap = {
-  apphostCsprojTemplate: TEMPLATE_KEYS.aspireApphost,
-  extensionsCsTemplate: TEMPLATE_KEYS.aspireExtensions,
-  launchSettingsTemplate: TEMPLATE_KEYS.aspireLaunchsettings,
-  programCsTemplate: TEMPLATE_KEYS.aspireProgram,
-  serviceDefaultsCsprojTemplate: TEMPLATE_KEYS.aspireServicedefaults,
-  telemetryDefaultsCsTemplate: TEMPLATE_KEYS.aspireNetscripttelemetrydefaults,
-} as const;
-
 const ROOT_TEMPLATE_URLS: TemplateUrlMap = {
   bareMetalDeployWorkflowTemplate: TEMPLATE_KEYS.workspaceGithubWorkflowsDeployBareMetal,
   composeGhcrDeployWorkflowTemplate: TEMPLATE_KEYS.workspaceGithubWorkflowsDeployComposeGhcr,
@@ -90,9 +81,6 @@ type TemplateMap<T extends Record<string, TemplateKey>> = {
 export type AppScaffoldTemplateAssets = TemplateMap<typeof APP_TEMPLATE_URLS>;
 export type ExampleServiceAppTemplateAssets = TemplateMap<
   typeof EXAMPLE_SERVICE_APP_TEMPLATE_URLS
->;
-export type LegacyAspireTemplateAssets = TemplateMap<
-  typeof LEGACY_ASPIRE_TEMPLATE_URLS
 >;
 export type RootScaffoldTemplateAssets = TemplateMap<typeof ROOT_TEMPLATE_URLS>;
 export type AspireHelperTemplateAssets = TemplateMap<
@@ -120,12 +108,6 @@ export async function loadExampleServiceAppTemplateAssets(): Promise<
   ExampleServiceAppTemplateAssets
 > {
   return await loadTemplateMap(EXAMPLE_SERVICE_APP_TEMPLATE_URLS);
-}
-
-export async function loadLegacyAspireTemplateAssets(): Promise<
-  LegacyAspireTemplateAssets
-> {
-  return await loadTemplateMap(LEGACY_ASPIRE_TEMPLATE_URLS);
 }
 
 export async function loadRootScaffoldTemplateAssets(): Promise<

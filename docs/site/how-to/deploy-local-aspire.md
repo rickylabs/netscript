@@ -184,15 +184,6 @@ a Deno workspace problem.</li>
 </ul>
 {{ /comp }}
 
-{{ comp callout { type: "note", title: "A legacy config field to ignore" } }}
-<code>netscript.config.ts</code> may still carry a legacy <code>aspire: { appHost: ... }</code>
-value from the earlier C# AppHost shape. The <strong>real, generated</strong> AppHost is the
-TypeScript <code>aspire/apphost.mts</code> + <code>aspire.config.json</code> described above — those
-on-disk files are authoritative. (Pass <code>--legacy-aspire</code> at <code>init</code> only if you
-explicitly want the old C# <code>dotnet/AppHost</code> shape, started with
-<code>dotnet run</code> instead of <code>aspire start</code>.)
-{{ /comp }}
-
 ## See also
 
 - **Why it works this way:** {{ comp.xref({ key: "explain:aspire", text: "Orchestration with Aspire" }) }}

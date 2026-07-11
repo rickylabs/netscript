@@ -4,7 +4,7 @@
  *
  * Produced by the config loader by merging:
  * - netscript.config.ts (schema + service definitions)
- * - dotnet/AppHost/appsettings.json (runtime service config from Aspire)
+ * - appsettings.json (runtime service config from Aspire)
  * - .deploy/windows/config/runtime/*.json (hot-reload overrides)
  * - Environment variables (.env.local, .env)
  */

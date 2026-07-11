@@ -17,7 +17,6 @@ function baseOptions(overrides: Partial<ValidatedInitOptions> = {}): ValidatedIn
     dryRun: false,
     noGit: true,
     noAspire: false,
-    legacyAspire: false,
     dbEngine: 'none',
     cache: true,
     cacheBackend: 'redis',

@@ -11,7 +11,6 @@ export const SCAFFOLD_DEFAULTS = {
   CACHE_ENABLED: true,
   CACHE_BACKEND: 'redis' as const,
   EDITOR: 'none' as const,
-  ASPIRE_LEGACY_APPHOST_PATH: 'dotnet/AppHost',
   ASPIRE_TS_APPHOST_PATH: 'aspire/apphost.mts',
   COMPILER_OPTIONS: {
     strict: true,

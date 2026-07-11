@@ -86,12 +86,12 @@ describe('HelpersGeneratorPipeline', () => {
     const pipeline = new HelpersGeneratorPipeline();
     const files = await pipeline.execute({
       config: fixtures.POPULATED_CONFIG,
-      configPath: 'dotnet/AppHost/appsettings.json',
+      configPath: '../appsettings.json',
     });
     const apphost = files.find((f) => f.path === 'apphost.mts');
     assert(apphost, 'apphost.mts should exist in output');
     assertStringIncludes(apphost!.content, fixtures.FILE_HEADER);
-    assertStringIncludes(apphost!.content, 'dotnet/AppHost/appsettings.json');
+    assertStringIncludes(apphost!.content, '../appsettings.json');
     assertStringIncludes(apphost!.content, './.aspire/modules/aspire.mjs');
     assertStringIncludes(apphost!.content, './.helpers/index.mjs');
     assertStringIncludes(apphost!.content, 'createBuilder()');

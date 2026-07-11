@@ -99,7 +99,7 @@ run reports, or set <code>ASPIRE_DASHBOARD_OTLP_HTTP_ENDPOINT_URL</code> yoursel
 Two facts about the AppHost are worth internalizing because they contradict assumptions people
 carry from .NET Aspire:
 
-1. **It is TypeScript/Node, not C#.** `aspire.config.json` declares `language: "typescript/nodejs"`
+1. **It uses an isolated TypeScript/Node runtime.** `aspire.config.json` declares `language: "typescript/nodejs"`
    and `appHost.path: "apphost.mts"`. The AppHost runs on an isolated Node.js runtime inside
    `aspire/` (with its own `package.json` and `.aspire/` SDK modules) precisely so that the Node
    dependency graph never leaks into the Deno workspace at the project root. You author NetScript
@@ -109,17 +109,6 @@ carry from .NET Aspire:
    plugin contributes its own resources programmatically. `createNetScriptAppHost` reads the
    config, runs the contributions, and registers each resulting resource. The next section is the
    important one: it explains *how* that derivation works.
-
-{{ comp callout { type: "warning", title: "A known config divergence — trust the generated AppHost" } }}
-<code>netscript.config.ts</code> still carries a legacy field
-<code>aspire: { appHost: 'dotnet/AppHost' }</code>, a relic of the earlier C# AppHost shape. The
-<strong>real, generated</strong> AppHost is the TypeScript <code>aspire/apphost.mts</code> described
-above, configured by <code>aspire/aspire.config.json</code>. If the two ever appear to disagree,
-the on-disk <code>aspire/apphost.mts</code> + <code>aspire.config.json</code> are authoritative.
-Treat the <code>netscript.config.ts</code> value as cosmetic legacy until it is removed. (Use
-<code>--legacy-aspire</code> at <code>init</code> time only if you explicitly want the old C#
-<code>dotnet/AppHost</code> shape.)
-{{ /comp }}
 
 ## How the graph is generated from your plugins
 

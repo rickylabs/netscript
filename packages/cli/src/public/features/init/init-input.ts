@@ -14,7 +14,6 @@ export interface InitCommandInput {
   readonly cacheBackend?: CacheBackendChoice | string;
   readonly editor?: EditorChoice | string;
   readonly aspire?: boolean;
-  readonly legacyAspire?: boolean;
   readonly git?: boolean;
   readonly force?: boolean;
   readonly ci?: boolean;

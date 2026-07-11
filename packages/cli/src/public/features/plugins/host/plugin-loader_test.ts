@@ -128,7 +128,7 @@ function createConfig(plugins: readonly string[]): PluginHostConfig {
       timestamps: true,
     },
     aspire: {
-      appHost: 'dotnet/AppHost',
+      appHost: 'aspire/apphost.mts',
       dashboardPort: 18888,
     },
     databases: { config: [] },

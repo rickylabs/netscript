@@ -31,8 +31,6 @@ export interface MaintainerInitRequest {
   readonly noGit: boolean;
   /** Skip Aspire orchestration output. */
   readonly noAspire: boolean;
-  /** Generate the legacy C# AppHost instead of the TS path. */
-  readonly legacyAspire: boolean;
   /** Optional database engine selection. */
   readonly dbEngine?: DbEngineChoice;
   /** Whether to include an example oRPC service. */

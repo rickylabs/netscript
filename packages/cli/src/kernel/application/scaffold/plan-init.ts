@@ -172,7 +172,6 @@ export async function scaffoldRoot(
     name: options.name,
     appName: options.appName,
     noAspire: options.noAspire,
-    legacyAspire: options.legacyAspire,
     serviceName: plan.service?.name,
     dbEngine: options.dbEngine,
   });
@@ -197,7 +196,7 @@ export async function scaffoldRoot(
     const appsettingsContent = generateAppsettings({
       name: options.name,
       appName: options.appName,
-      appPort: options.legacyAspire ? PORT_RANGES.APP.start : PORT_RANGES.APP.start + 10,
+      appPort: PORT_RANGES.APP.start + 10,
       dbEngine: options.dbEngine,
       cache: options.cache,
       cacheBackend: options.cacheBackend,

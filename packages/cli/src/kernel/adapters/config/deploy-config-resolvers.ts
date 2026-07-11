@@ -409,6 +409,6 @@ export function resolveDenoDeployTarget(
  * Walk up from startDir looking for a NetScript project root.
  * A root is identified by the presence of:
  * - netscript.config.ts, OR
- * - dotnet/AppHost/appsettings.json, OR
+ * - appsettings.json, OR
  * - deno.json with a `workspace` array
  */

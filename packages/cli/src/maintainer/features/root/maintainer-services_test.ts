@@ -135,7 +135,6 @@ describe('maintainer application services', () => {
       dryRun: false,
       noGit: true,
       noAspire: true,
-      legacyAspire: false,
       dbEngine: 'postgres',
     }, {
       cwd: () => 'C:/repo',
@@ -182,7 +181,6 @@ describe('maintainer application services', () => {
           dryRun: false,
           noGit: true,
           noAspire: true,
-          legacyAspire: false,
         }, {
           cwd: () => '/tmp',
           detectMonorepoRoot: () => Promise.resolve(undefined),

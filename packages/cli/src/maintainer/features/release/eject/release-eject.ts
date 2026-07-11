@@ -180,7 +180,6 @@ async function runMaintainerSeedInit(
     dryRun: false,
     noGit: true,
     noAspire: false,
-    legacyAspire: false,
     dbEngine: 'none',
     editor: 'none',
     includeExampleService: false,

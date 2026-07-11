@@ -97,10 +97,7 @@ export function initNextSteps(options: ValidatedInitOptions): string[] {
     ? 'deno run -A packages/cli/bin/netscript-dev.ts db'
     : 'netscript db';
 
-  if (!options.noAspire && options.legacyAspire) {
-    steps.push('dotnet run --project dotnet/AppHost  # start C# Aspire orchestration');
-    if (options.dbEngine !== 'none') addDatabaseSteps(steps, dbCommand);
-  } else if (!options.noAspire) {
+  if (!options.noAspire) {
     steps.push('cd aspire  # TS AppHost lives here, isolated from the Deno workspace');
     steps.push('aspire restore  # download TypeScript AppHost SDK modules (run once)');
     steps.push('aspire start  # start TypeScript AppHost');

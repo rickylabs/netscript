@@ -3,8 +3,7 @@
  *
  * Tier 1 generator for the project root `README.md`.
  *
- * The README must reflect the answers the user actually gave — TS vs
- * legacy Aspire AppHost, whether an example service was scaffolded,
+ * The README must reflect whether Aspire and an example service were scaffolded,
  * which database engine (if any) was chosen. A static template cannot
  * express those conditionals so this lives as a programmatic generator.
  */
@@ -20,8 +19,6 @@ export interface ReadmeOptions {
   readonly appName: string;
   /** `true` when --no-aspire was used (no orchestration layer scaffolded). */
   readonly noAspire: boolean;
-  /** `true` when the user opted into the legacy C# AppHost. */
-  readonly legacyAspire: boolean;
   /** Scaffolded example service name, or `undefined`. */
   readonly serviceName?: string;
   /** Engine chosen for the primary database, or `'none'`. */
@@ -59,19 +56,12 @@ export function generateReadme(options: ReadmeOptions): string {
   lines.push('');
   lines.push('```bash');
   if (!options.noAspire) {
-    if (options.legacyAspire) {
-      lines.push('# Start the full Aspire orchestration (C# AppHost)');
-      lines.push('dotnet run --project dotnet/AppHost');
-    } else {
-      lines.push(
-        '# Restore Aspire SDK modules (once), then start orchestration',
-      );
-      lines.push(
-        '# (run from the aspire/ subfolder so `aspire` sees apphost.mts + aspire.config.json)',
-      );
-      lines.push('cd aspire && aspire restore');
-      lines.push('aspire start');
-    }
+    lines.push('# Restore Aspire SDK modules (once), then start orchestration');
+    lines.push(
+      '# (run from the aspire/ subfolder so `aspire` sees apphost.mts + aspire.config.json)',
+    );
+    lines.push('cd aspire && aspire restore');
+    lines.push('aspire start');
   } else {
     lines.push('# Start the Fresh app directly (no Aspire orchestration)');
     lines.push(`deno task --cwd apps/${options.appName} dev`);
@@ -91,11 +81,7 @@ export function generateReadme(options: ReadmeOptions): string {
     lines.push(`├── services/${options.serviceName}/ # Example oRPC service`);
   }
   lines.push('├── plugins/          # Plugin registry and implementations');
-  if (!options.noAspire && options.legacyAspire) {
-    lines.push(
-      '├── dotnet/           # Aspire C# orchestration (AppHost + ServiceDefaults)',
-    );
-  } else if (!options.noAspire) {
+  if (!options.noAspire) {
     lines.push(
       '├── aspire/           # Aspire TypeScript orchestration (isolated Node.js runtime)',
     );
@@ -135,18 +121,8 @@ export function generateReadme(options: ReadmeOptions): string {
     );
   }
   if (!options.noAspire) {
-    if (options.legacyAspire) {
-      lines.push(
-        '| `dotnet run --project dotnet/AppHost` | Start Aspire orchestration (C#) |',
-      );
-    } else {
-      lines.push(
-        '| `cd aspire && aspire restore` | Restore Aspire SDK modules (run once) |',
-      );
-      lines.push(
-        '| `cd aspire && aspire start` | Start Aspire orchestration (TypeScript AppHost) |',
-      );
-    }
+    lines.push('| `cd aspire && aspire restore` | Restore Aspire SDK modules (run once) |');
+    lines.push('| `cd aspire && aspire start` | Start Aspire orchestration (TypeScript AppHost) |');
   }
   lines.push('| `deno task check` | Type-check all workspace members |');
   lines.push('| `deno task lint`  | Run linter |');
@@ -218,7 +194,7 @@ export function generateReadme(options: ReadmeOptions): string {
       lines.push(
         `Primary database: **${engineLabel}** (key \`${options.dbEngine}\` in ` +
           '`appsettings.json`). The Aspire orchestration layer provisions it ' +
-          `on \`${options.legacyAspire ? 'dotnet run' : 'aspire start'}\` — no manual container ` +
+          'on `aspire start` — no manual container ' +
           'setup required.',
       );
     }
