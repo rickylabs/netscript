@@ -69,6 +69,8 @@ export function createRuntimeGates(
         'run',
         '--allow-read',
         '--allow-write',
+        '--allow-run=deno',
+        '--allow-env',
         'packages/cli/e2e/src/application/gates/scaffold/prepare-flow-b-fixture.ts',
         context.project.projectRoot,
         context.request.options.packageSource === PACKAGE_SOURCE.JSR ? 'published' : 'local',

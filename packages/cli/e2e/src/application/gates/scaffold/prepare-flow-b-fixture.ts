@@ -258,3 +258,36 @@ console.info('Flow-B generated callback fixture wired');
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
+
+// Pre-warm the flow-b module graph before Aspire launches workers-api: the
+// flow-b config introduces pins absent from the project's default graph (fresh
+// jsr pins in published mode, local source files otherwise). Cold resolution at
+// service start can exceed the health-probe window even though the executable
+// is 'running'. The generated launch args already carry
+// --minimum-dependency-age=0 in published mode; mirror it here.
+const servicesEntrypoint = mode === 'published'
+  ? `jsr:@netscript/plugin-workers@${publishedVersion}/services`
+  : '@netscript/plugin-workers/services';
+// `deno cache` treats bare CLI arguments as file paths, so warm through a
+// generated entrypoint module whose import resolves via the flow-b config.
+const warmupEntrypoint = `${projectRoot}/.netscript/e2e/flow-b-warmup.ts`;
+await Deno.writeTextFile(
+  warmupEntrypoint,
+  `import ${JSON.stringify(servicesEntrypoint)};\n`,
+);
+const warm = await new Deno.Command('deno', {
+  args: [
+    'cache',
+    '--minimum-dependency-age=0',
+    '--config',
+    flowBConfigPath,
+    warmupEntrypoint,
+  ],
+  cwd: projectRoot,
+}).output();
+if (!warm.success) {
+  throw new Error(
+    `flow-b graph pre-warm failed: ${new TextDecoder().decode(warm.stderr).slice(-1200)}`,
+  );
+}
+console.info('flow-b module graph pre-warmed');
