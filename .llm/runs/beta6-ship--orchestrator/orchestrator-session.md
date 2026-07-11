@@ -28,3 +28,12 @@
   items. Plan-stage PR #548 closed as executed. Release-ready summary posted on #548.
 - Codex threads + worktrees in `codex-thread-ids.md`; worklogs merged with each slice branch.
 - Worktrees left in place: ns-wt-409-t8 (on release-gates-main), ns-wt-561-564, ns-wt-464.
+
+## Handoff (2026-07-11 ~13:00)
+
+Beta-7 orchestrator launched: session `4eac5098` (`claude attach 4eac5098`), Fable 5 medium,
+acceptEdits (bypassPermissions blocked by classifier), cwd `/home/codex/repos/ns-beta7-orchestrator`.
+Board pre-groomed: 26 dev-dashboard issues moved beta.7→beta.8; #599/#601/#603–#607 scheduled into
+beta.7. Its brief: merge PR #624 (telemetry JSR-graph hotfix), cut+publish 0.0.1-beta.7
+(owner-authorized), then docs revamp + eval action items. Prompt archived at the beta-7 run dir
+and in this job's tmp.
