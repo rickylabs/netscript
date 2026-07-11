@@ -37,6 +37,9 @@ export {
   type HistoryStrategy,
   slidingWindowHistory,
   type SlidingWindowOptions,
+  tokenBudgetHistory,
+  type TokenBudgetHistoryOptions,
+  type TokenEstimator,
 } from './src/agent/history.ts';
 export {
   type AgentLoopState,
