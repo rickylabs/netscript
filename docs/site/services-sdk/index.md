@@ -14,8 +14,8 @@ renamed field or a changed response shape is a compile error on both ends before
 there is no hand-written client wrapper to keep in sync, and no separate "update the API docs"
 step.
 
-That property is not hypothetical. In eis-chat — the production app NetScript is dogfooded
-against — every dashboard data call goes through a typed client built directly off the contract
+That property is not hypothetical. In a production chat application built on NetScript,
+every dashboard data call goes through a typed client built directly off the contract
 type: adding a route to the channel contract makes it appear, fully typed, on the browser client
 with no extra wiring turn. The same discipline pays off whether the code is written by a teammate
 or an AI agent: one declared shape to read, one place to change it.

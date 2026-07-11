@@ -113,10 +113,8 @@ A project scaffolded with the published CLI (<code>--package-source jsr</code>) 
 <code>@netscript/sdk</code> and <code>@netscript/sdk/client</code> entries, and the scaffolded
 worker runtime resolves against that root config — so the background worker fails to load jobs
 (<code>Import "@netscript/sdk/client" not a dependency and not in import map</code>) until you add
-those two entries to the root import map yourself. Local-source scaffolds are not affected. Tracked
-in <a href="https://github.com/rickylabs/netscript/issues/638">#638</a>; the fix targets the next
-cut.
-<!-- caveat: gh:#638 -->
+those two entries to the root import map yourself. Local-source scaffolds are not affected. This is
+fixed on the main line and ships in the next release.
 {{ /comp }}
 
 For local-source contributor work inside this monorepo, use the maintainer binary when you need

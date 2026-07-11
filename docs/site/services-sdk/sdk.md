@@ -64,7 +64,7 @@ the client TanStack key (`clientKey()`), the `queryOptions`/`mutationOptions` he
 SWR cache reads. One edit to the contract updates the client, the docs surface, and the query
 layer together — there is no separate turn to keep them in sync.
 
-This is how eis-chat, the production app NetScript is dogfooded against, wires its dashboard:
+This is how a production chat application built on NetScript wires its dashboard:
 the typed client is built straight off the contract type, so a route added to the contract shows
 up on the client already typed. The mechanics of each layer are below; the type-flow theory is in
 [Contracts](/explanation/contracts/).

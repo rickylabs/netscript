@@ -15,8 +15,8 @@ membership row, warming a cache, and sending a welcome email before it answers. 
 work, and none of it should block the request that triggered it. This chapter moves that work off
 the request path: you add the **workers** plugin and author a `defineJobHandler` job that provisions
 a member into the workspace database from chapter 3, then trigger it over the Workers API on
-`:8091`. This is the same background-work seam a real NetScript app leans on — eis-chat runs its
-embedding and vision jobs through the same `workers` plugin.
+`:8091`. This is the same background-work seam a real NetScript app leans on — a production chat
+application built on NetScript runs its embedding and vision jobs through the same `workers` plugin.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/workspace/01-scaffold/" },

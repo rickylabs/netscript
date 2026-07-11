@@ -52,7 +52,7 @@ one on purpose, to keep workspace records cleanly separate from auth.
 {{ /comp }}
 
 {{ comp callout { type: "note", title: "This split is how a real NetScript app stores its data" } }}
-eis-chat — the context-accumulator the NetScript team builds against the framework — uses exactly
+A production context-accumulator chat application built on NetScript uses exactly
 this shape: one <strong>org-catalog</strong> datasource (Prisma-managed: who exists, which projects
 and channels there are) kept separate from the datastores each channel accumulates context into.
 Not everything is one database. The catalog answers "what is there and who belongs to it"; the
