@@ -50,6 +50,35 @@ const ai = createAiRuntime({ telemetry, defaultModelProvider: 'anthropic' });
 ai.telemetry.recordEvent('agent.finish', { ok: true });
 ```
 
+## Agent Skills
+
+`@netscript/ai/skills` validates a small `SKILL.md` standard and keeps discovery separate from full
+instruction loading. `list()` and both match operations use metadata only; `load(id)` is the only
+operation that requests the full Markdown body from the injected source.
+
+```ts
+import { createInMemorySkillContentSource, createSkillLoader } from '@netscript/ai/skills';
+
+const source = createInMemorySkillContentSource([{ id: 'review', markdown: `---
+id: review
+name: Code review
+tags: [review, quality]
+description: Reviews a change for correctness.
+---
+Inspect the diff and report actionable findings.
+` }]);
+
+const skills = createSkillLoader(source);
+const summaries = await skills.list();
+const matches = await skills.matchByQuery('review this change');
+const document = await skills.load(matches[0]!.skill.id);
+```
+
+Semantic matching is opt-in through an injected `EmbeddingProviderPort`. With semantic matching
+disabled—or with no provider supplied—the loader performs no embedding call and uses tag matching
+only. The shipped in-memory source uses caller-provided strings and requires no filesystem,
+network, git, or environment permission.
+
 ## Model registry (self-registration)
 
 Provider packages register themselves as an import side effect, exactly like `@netscript/kv/redis`
