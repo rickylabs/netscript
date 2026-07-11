@@ -1,0 +1,43 @@
+# Standalone JSR presentation-settings reconciliation (readmeSource, description,
+# runtimeCompat). Same tool as the non-critical post-publish step in publish.yml;
+# use this to (re)apply settings without a release — for all members or one package.
+name: jsr-settings
+
+on:
+  workflow_dispatch:
+    inputs:
+      package:
+        description: "Optional single package segment (e.g. ai, telemetry). Empty = all members."
+        required: false
+        type: string
+      dry-run:
+        description: "Report the diff without writing."
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: "2.9.0"
+
+      - name: Reconcile JSR package settings
+        env:
+          JSR_API_TOKEN: ${{ secrets.JSR_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          args=""
+          if [ -n "${{ inputs.package }}" ]; then args="$args --package ${{ inputs.package }}"; fi
+          if [ "${{ inputs.dry-run }}" = "true" ]; then args="$args --dry-run"; fi
+          deno run --allow-net --allow-read --allow-env .llm/tools/release/jsr-set-package-settings.ts $args

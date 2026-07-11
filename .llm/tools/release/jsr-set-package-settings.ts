@@ -47,8 +47,10 @@ import { discoverWorkspaceMembers, type PublishableMember } from './publish-work
 interface Options {
   readonly scope: string;
   readonly dryRun: boolean;
+  readonly bestEffort: boolean;
   readonly root: string;
   readonly configPath?: string;
+  readonly packages: readonly string[];
 }
 
 interface RuntimeCompat {
@@ -127,6 +129,8 @@ function printHelp(): void {
       '  --root <dir>      workspace root to discover members from',
       '  --config <path>   settings config (default: <root>/jsr-package-settings.json)',
       '  --dry-run         report the diff without writing (no token needed)',
+      '  --package <name>  reconcile only this package segment (repeatable)',
+      '  --best-effort     report failures but exit 0 (for non-critical CI steps)',
       '  --help, -h        show this help',
       '',
       'Writes require JSR_API_TOKEN with package-edit scope; without it the tool',
@@ -142,11 +146,20 @@ if (import.meta.main) {
   }
 
   const options = parseArgs(Deno.args);
-  const members = await discoverWorkspaceMembers(options.root);
+  const allMembers = await discoverWorkspaceMembers(options.root);
   const config = await loadConfig(options.configPath ?? `${options.root}/${CONFIG_BASENAME}`);
-  assertConfigPackagesExist(config, members);
+  assertConfigPackagesExist(config, allMembers);
 
-  console.log(`discovered ${members.length} workspace members`);
+  const members = options.packages.length === 0
+    ? allMembers
+    : allMembers.filter((member) => options.packages.includes(packageSegment(member.name)));
+  if (options.packages.length > 0 && members.length !== options.packages.length) {
+    const known = new Set(allMembers.map((member) => packageSegment(member.name)));
+    const missing = options.packages.filter((name) => !known.has(name));
+    throw new Error(`--package name(s) not in the publishable workspace: ${missing.join(', ')}`);
+  }
+
+  console.log(`discovered ${allMembers.length} workspace members; reconciling ${members.length}`);
 
   const token = Deno.env.get('JSR_API_TOKEN')?.trim();
   if (!token && !options.dryRun) {
@@ -234,6 +247,18 @@ if (import.meta.main) {
   );
 
   if (failures.length > 0) {
+    if (options.bestEffort) {
+      for (const failure of failures) {
+        console.error(
+          `BEST-EFFORT FAILURE (non-fatal) ${failure.packageName}: ${failure.action} failed: ${failure.reason}`,
+        );
+      }
+      console.error(
+        'best-effort mode: settings reconciliation is non-critical; exiting 0 despite failures. ' +
+          'Re-run standalone via the jsr-settings workflow or: deno run -A .llm/tools/release/jsr-set-package-settings.ts --package <name>',
+      );
+      Deno.exit(0);
+    }
     for (const failure of failures) {
       console.error(`${failure.packageName}: ${failure.action} failed: ${failure.reason}`);
     }
@@ -548,8 +573,10 @@ async function readJsonResponse(response: Response): Promise<unknown> {
 function parseArgs(args: readonly string[]): Options {
   let scope = DEFAULT_SCOPE;
   let dryRun = false;
+  let bestEffort = false;
   let root = Deno.cwd();
   let configPath: string | undefined;
+  const packages: string[] = [];
 
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
@@ -558,6 +585,11 @@ function parseArgs(args: readonly string[]): Options {
       index += 1;
     } else if (arg === '--dry-run') {
       dryRun = true;
+    } else if (arg === '--best-effort') {
+      bestEffort = true;
+    } else if (arg === '--package') {
+      packages.push(readValue(args, index, arg));
+      index += 1;
     } else if (arg === '--root') {
       root = readValue(args, index, arg);
       index += 1;
@@ -569,7 +601,7 @@ function parseArgs(args: readonly string[]): Options {
     }
   }
 
-  return { scope, dryRun, root, configPath };
+  return { scope, dryRun, bestEffort, root, configPath, packages };
 }
 
 function readValue(args: readonly string[], index: number, flag: string): string {

@@ -130,11 +130,16 @@ jobs:
       # package's main page, the description stays in sync with the README
       # tagline, and Deno shows as the supported runtime. Idempotent. Gated by the
       # applyOnPublish master switch resolved above.
+      # Non-critical: presentation settings must never red (or block) a run whose
+      # JSR publish already succeeded. --best-effort exits 0 on per-package/API
+      # failures and continue-on-error covers unexpected crashes; recover with the
+      # standalone jsr-settings.yml dispatch (optionally per package).
       - name: Apply JSR package settings
         if: steps.release.outputs.dry_run != 'true' && steps.jsr_settings.outputs.apply == 'true'
+        continue-on-error: true
         env:
           JSR_API_TOKEN: ${{ secrets.JSR_API_TOKEN }}
-        run: deno run --allow-net --allow-read --allow-env .llm/tools/release/jsr-set-package-settings.ts
+        run: deno run --allow-net --allow-read --allow-env .llm/tools/release/jsr-set-package-settings.ts --best-effort
 
       - name: Update GitHub Release with JSR links
         if: steps.release.outputs.dry_run != 'true'
