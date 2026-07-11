@@ -66,6 +66,22 @@ export interface ChatClientCallOptions {
    * construction-time model options; omission retains configured defaults.
    */
   readonly modelOptions?: Readonly<Record<string, unknown>>;
+  /**
+   * Provider connection values for this turn. Non-empty values override the
+   * provider's construction-time defaults without changing later turns.
+   * `host` is the Ollama daemon origin; hosted providers use `baseURL`.
+   */
+  readonly connection?: ChatClientConnectionOptions;
+}
+
+/** Provider connection values that may vary for each chat turn. */
+export interface ChatClientConnectionOptions {
+  /** API key used only for this turn. */
+  readonly apiKey?: string;
+  /** Hosted provider base URL used only for this turn. */
+  readonly baseURL?: string;
+  /** Ollama daemon host used only for this turn. */
+  readonly host?: string;
 }
 
 /** Incremental assistant text produced by the model. */

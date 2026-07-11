@@ -4,7 +4,7 @@
  *
  * @module
  */
-import { assert, assertEquals, assertRejects, assertThrows } from '@std/assert';
+import { assert, assertEquals, assertRejects } from '@std/assert';
 import '../openrouter.ts'; // side effect: self-registers 'openrouter'
 import {
   DEFAULT_OPENROUTER_BASE_URL,
@@ -13,7 +13,7 @@ import {
   openRouterReasoningModelOptions,
 } from '../openrouter.ts';
 import { getModelProvider, listModelProviders } from '../mod.ts';
-import { AiError, AiNotConfiguredError } from '../src/contracts/mod.ts';
+import { AiError } from '../src/contracts/mod.ts';
 
 const CONFIG = {
   apiKey: 'test-key',
@@ -66,13 +66,13 @@ Deno.test('openrouter: createChatClient wraps the TanStack client (F-13 stop pat
   assertEquals(client.name, 'openrouter');
 });
 
-Deno.test('openrouter: createChatClient throws AiNotConfiguredError without a key', () => {
+Deno.test('openrouter: createChatClient defers key resolution so a request can supply it', () => {
   // No apiKey in config and OPENROUTER_API_KEY not set in this process.
   const previous = Deno.env.get('OPENROUTER_API_KEY');
   Deno.env.delete('OPENROUTER_API_KEY');
   try {
     const provider = new OpenRouterModelProvider({ models: ['m1'] });
-    assertThrows(() => provider.createChatClient('m1'), AiNotConfiguredError);
+    assertEquals(provider.createChatClient('m1').kind, 'text');
   } finally {
     if (previous !== undefined) Deno.env.set('OPENROUTER_API_KEY', previous);
   }
