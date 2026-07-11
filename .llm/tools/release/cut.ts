@@ -1,5 +1,11 @@
 import { walk } from 'jsr:@std/fs@^1.0.0/walk';
 import { join, normalize, relative } from 'jsr:@std/path@^1.0.0';
+import {
+  buildPullRequestBody,
+  githubRequest,
+  type GitHubResponse,
+  resolveGithubToken,
+} from '../agentic/lib/agentic-lib.ts';
 import { runReleasePreflight } from './preflight-release.ts';
 
 export interface ReleaseCutOptions {
@@ -26,6 +32,21 @@ interface CommandResult {
   stdout: string;
   stderr: string;
 }
+
+export interface ReleasePrDependencies {
+  resolveToken: () => Promise<{ token: string; source: string }>;
+  request: (
+    method: string,
+    path: string,
+    token: string,
+    body?: unknown,
+  ) => Promise<GitHubResponse>;
+}
+
+const defaultReleasePrDependencies: ReleasePrDependencies = {
+  resolveToken: () => resolveGithubToken(),
+  request: githubRequest,
+};
 
 const semverPattern =
   /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$/;
@@ -277,6 +298,48 @@ async function runGate(name: string, command: string, args: string[], cwd: strin
   }
 }
 
+/** Open a release PR through the shared GitHub API token path. */
+export async function createReleasePullRequest(
+  version: string,
+  body: string,
+  dependencies: ReleasePrDependencies = defaultReleasePrDependencies,
+): Promise<boolean> {
+  const branch = `release/cut-${version}`;
+  try {
+    const { token, source } = await dependencies.resolveToken();
+    console.log(`release:cut GitHub token source: ${source}`);
+    const response = await dependencies.request(
+      'POST',
+      '/repos/rickylabs/netscript/pulls',
+      token,
+      buildPullRequestBody({
+        title: `chore(release): cut ${version}`,
+        head: branch,
+        base: 'main',
+        body,
+      }),
+    );
+    if (!response.ok) {
+      throw new Error(
+        `GitHub API returned ${response.status}: ${response.body?.message ?? response.body}`,
+      );
+    }
+    const url = typeof response.body?.html_url === 'string' ? response.body.html_url : '';
+    if (url) console.log(url);
+    return true;
+  } catch (error) {
+    console.error(
+      `release:cut could not create the release PR: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    );
+    console.error(
+      `Branch ${branch} was pushed successfully. Open the PR manually against main using the generated body file.`,
+    );
+    return false;
+  }
+}
+
 async function createReleasePr(root: string, version: string, files: string[]): Promise<void> {
   const branch = `release/cut-${version}`;
   await mustRun('git', ['checkout', '-b', branch], root);
@@ -302,19 +365,8 @@ Cut NetScript ${version}.
 Create and publish GitHub Release \`v${version}\`; \`publish.yml\` will publish with OIDC and hand the published version to \`e2e-cli-prod.yml\`.
 `,
   );
-  const pr = await runCommand('gh', [
-    'pr',
-    'create',
-    '--title',
-    `chore(release): cut ${version}`,
-    '--body-file',
-    bodyFile,
-  ], root);
-  if (pr.stdout.trim()) console.log(pr.stdout.trim());
-  if (pr.stderr.trim()) console.error(pr.stderr.trim());
-  if (pr.code !== 0) {
-    throw new Error(`gh pr create failed with exit ${pr.code}.`);
-  }
+  const body = await Deno.readTextFile(bodyFile);
+  await createReleasePullRequest(version, body);
 }
 
 async function mustRun(command: string, args: string[], cwd: string): Promise<void> {
