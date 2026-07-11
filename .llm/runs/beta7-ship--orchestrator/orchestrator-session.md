@@ -32,6 +32,12 @@
 
 ## Status — live
 
+- 2026-07-11 ~16:05 — **DOCS EPIC #401 CLOSED**: all 18 children shipped (#433–#450), evaluator
+  verdicts PASS (one fix loop, PR #652), residual stale-claim sweep merged (#650), verdicts
+  artifact merged (#653). Site verify green: 24,055 links / 167 pages / 28 caveats. #638 fix
+  merged (#640). Milestone 9 now blocked ONLY on the two owner decisions: (1) stray-issue triage
+  confirmation, (2) beta.7 verification accept-gap (A) vs beta.8 authorization (B).
+
 - 2026-07-11 ~15:20 — SECOND merge wave: #627→#606 ✓, #636→#603 ✓, #637→#607 ✓ (all pilot-eval
   items now closed), tutorial PRs #632→#435 ✓ #633→#437 ✓ #634→#438 ✓ #635→#436 ✓; #639→#439
   merging on green (watcher). `status:shipped` applied everywhere. **Prod E2E third onion layer**:

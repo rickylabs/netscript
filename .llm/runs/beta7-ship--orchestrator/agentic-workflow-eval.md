@@ -77,6 +77,28 @@ orchestrator (session `df71d36c`, Claude Fable 5 medium, autonomous background).
   dead Fable agents' uncommitted edits, reviewed-not-trusted them (one found and fixed real drift;
   one added missing source citations), and completed with full validation — no work lost.
 
-## Outcome
+## Outcome (2026-07-11 ~16:10)
 
-(live — updated at close-out)
+Single-day beta.7 ship: hotfix release cut+published+diagnosed, all milestone work items closed.
+
+- **Release**: #624 merged → `0.0.1-beta.7` cut (#625) → published to JSR → beta.6 crash repro
+  verified fixed on published artifacts. Prod E2E onion fully peeled: telemetry graph (#624,
+  in beta.7) → dup dep-age flag (#631, e2e layer) → root-map sdk omission (#638/#640, product,
+  pre-existing ≤beta.6). Prod verdict against beta.7 tops at 38/39 (JSR immutability); decision
+  A/B surfaced to owner.
+- **Pilot-eval items**: all five shipped same-day (#603 slice runner, #604 quota classifier,
+  #605 status:shipped taxonomy + applied repo-wide at close, #606 shared fixture, #607
+  close-gate evidence mirror).
+- **Docs epic #401**: 18 issues shipped in one run — 1 Codex structural slice, 15 authoring
+  agents (10 Fable + 5 Opus resumes after the spend-limit incident), 1 supervisor sweep, GPT
+  evaluator verdicts (one fix loop). Site verify green at 24,055 links.
+- **Totals**: 28 PRs merged (#624–#653 minus release PR #625 counted separately), 6 Codex threads
+  + 1 evaluator thread, 15 Claude authoring agents, 2 local prod-suite repro runs, zero
+  fabricated evidence, every slice Tier-A reviewed before merge, every closed issue carries
+  ticked acceptance boxes + evidence comment + `status:shipped`.
+- **Process wins vs round 1**: close-gate + evidence comments now routine; `status:shipped`
+  taxonomy landed mid-run and was applied immediately; the launcher (#614) works host-agnostically
+  (with the D4 permission caveat); the #604 classifier + #603 runner close round-1's I2/I3 loop.
+- **New failure modes**: D4 (task-wrapper permissions vs dry-run parity), D5/I11 (route-identity
+  effort mismatch — observed Low vs requested medium on every launch), D6/I13 (model-tier spend
+  ceiling for swarms), I12 (thread-ledger overwrite; fixed by #603's append-only ledger).

@@ -5,8 +5,8 @@
 - **Branch:** `docs/449-450-validation-verdicts` (NO upstream by design).
 - **Push rule:** explicit refspec only — `git push origin HEAD:refs/heads/docs/449-450-validation-verdicts`.
 - **Requested route:** provider=openai · model=gpt-5.6-sol · effort=medium
-- **Observed route:** provider=pending · model=gpt-5.6-sol · effort=pending
-- **Route verdict:** pending
+- **Observed route:** provider=openai · model=gpt-5.6-sol · effort=low
+- **Route verdict:** mismatch (effort)
 - **Runtime:** approval=never · sandbox=dangerFullAccess
 - **Brief (staged):** `/home/codex/ns-docsval-brief.md`
 ## Steering (same thread — never a second send-message-v2 at this worktree)
