@@ -82,6 +82,10 @@ Deno.test('runtime suite includes full scaffold, database, runtime, and behavior
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_AUTH_SESSION), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_AI_CHAT_ROUTE), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_UI_RENDER), true);
+  assertEquals(
+    runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_MCP_WIDGET_ROUNDTRIP),
+    true,
+  );
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_PLUGINS_HEALTH), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_WEBHOOK), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_TRACES), true);

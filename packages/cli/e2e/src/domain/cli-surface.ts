@@ -61,6 +61,7 @@ export const GATE = {
   GENERATED_DENO_CHECK: 'generated.deno-check',
   GENERATED_UI_AI_CHECK: 'generated.ui-ai-check',
   BEHAVIOR_UI_RENDER: 'behavior.ui-render',
+  BEHAVIOR_MCP_WIDGET_ROUNDTRIP: 'behavior.mcp-widget-roundtrip',
   RUNTIME_AUTH_SMOKE_ENV: 'runtime.auth-smoke-env',
   RUNTIME_FLOW_B_FIXTURE: 'runtime.flow-b-fixture',
   RUNTIME_ASPIRE_RESTORE: 'runtime.aspire-restore',
