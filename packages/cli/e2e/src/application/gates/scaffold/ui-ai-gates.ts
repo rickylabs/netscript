@@ -83,7 +83,7 @@ const UI_LOCAL_SOURCE_SCRIPT = [
   '}',
   'const path = "deno.json";',
   'const config = JSON.parse(await Deno.readTextFile(path));',
-  'if (!config.imports || config.imports["@netscript/ai"] !== "jsr:@netscript/ai@^0.0.1-beta.5") {',
+  'if (!config.imports || !/^jsr:@netscript\\/ai@\\^\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?$/.test(config.imports["@netscript/ai"] ?? "")) {',
   '  throw new Error("ui:add ai did not merge the expected @netscript/ai dependency");',
   '}',
   'config.imports["@netscript/ai"] = "./packages/ai/mod.ts";',
