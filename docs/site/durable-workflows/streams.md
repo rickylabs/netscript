@@ -237,9 +237,9 @@ const completions = defineStreamSchema({
 // assertResolvable defaults to true: this throws now if neither
 // DURABLE_STREAMS_URL nor services__streams__http__0 is wired.
 const producer = createServiceStreamProducer({
-  streamPath: "/eischat/completions",
+  streamPath: "/support-chat/completions",
   schema: completions,
-  producerId: "eischat-ingestion",
+  producerId: "support-chat-ingestion",
 });
 
 producer.upsert("completion", { id: "run-1", status: "done" });
