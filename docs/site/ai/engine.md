@@ -14,13 +14,13 @@ vocabulary, the capability seams, the model registries, the tool system, the age
 loop, MCP transports, and opt-in provider adapters. It wraps `@tanstack/ai*` and
 `@standard-schema/spec` and adds no schema DSL of its own.
 
-{{ comp callout { type: "important", title: "Available from 0.0.1-beta.2" } }}
-<code>@netscript/ai</code> is <strong>not published to JSR yet</strong> — it arrives in
-<strong>0.0.1-beta.2</strong>. Do not run <code>deno add jsr:@netscript/ai</code> or
-import <code>@netscript/ai/*</code> in an app today; the install does not resolve. This
-page documents the surface you will compose against once beta.2 lands. What ships
-<em>now</em> is the self-contained <a href="/ai/durable-chat/">durable-chat runtime</a>
-and the <a href="/ai/chat-ui/">chat UI</a>, neither of which depends on this engine.
+{{ comp callout { type: "note", title: "Published in 0.0.1-beta.7" } }}
+<code>@netscript/ai</code> is <strong>published on JSR</strong> and installs today:
+<code>deno add jsr:@netscript/ai</code>. Every subpath on this page resolves against the
+published <strong>0.0.1-beta.7</strong> surface. The engine carries zero
+<code>@netscript/*</code> dependencies, so you can adopt it on its own — the
+<a href="/ai/durable-chat/">durable-chat runtime</a> and <a href="/ai/chat-ui/">chat UI</a>
+each stand alone and neither requires it.
 {{ /comp }}
 
 ## The export map
@@ -210,21 +210,21 @@ a network: `createFakeChatModelProvider(id, turns)`, `createFakeAgentLoop(chunks
 `createInMemoryToolRegistry()`, and `createFakeTelemetryPort()` (whose `.records` capture
 emitted telemetry).
 
-## Generated runtime registries
+## Wiring tool and agent registries
 
-`netscript generate ai` produces the wiring that turns your app-owned tool and agent
-files into engine-ready registries. It generates **two targets, and only two**:
+Today you wire the engine's registries **directly** in your composition root:
+`createToolRegistry(defs?)` from `@netscript/ai/tools` for tools and
+`createAgentLoop(deps)` from `@netscript/ai/agent` for agent loops (both documented
+above). No codegen step sits between your files and the runtime — you register against
+the engine factories yourself.
 
-{{ comp.apiTable({
-  caption: "netscript generate ai — the two targets",
-  rows: [
-    { name: "ai-tools", type: "name-keyed registry", desc: "Keyed by `descriptor.name`; values are `AiToolDefinition` (from `@netscript/ai/tools`)." },
-    { name: "ai-agents", type: "stem-keyed registry", desc: "Keyed by file stem; values are a `() => AgentLoop` factory map." }
-  ]
-}) }}
-
-There is no `skills` target in this cut. Like the rest of the engine, the codegen is part
-of the beta.2 cut.
+{{ comp callout { type: "note", title: "Not in this release: netscript generate ai" } }}
+A <code>netscript generate ai</code> codegen — compiling app-owned tool and agent files
+into name-keyed and stem-keyed registries — is a planned target but is <strong>not in
+the CLI today</strong>. The shipped <code>netscript generate</code> targets are
+<code>plugins</code>, <code>runtime-schemas</code>, and <code>aspire</code>. Until an AI
+target lands, register tools and agent loops against the engine factories directly.
+{{ /comp }}
 
 ## Reference
 
@@ -242,13 +242,13 @@ of the beta.2 cut.
     icon: "←"
   },
   {
-    title: "Ships today — durable chat",
-    body: "The self-contained runtime you can build on now, ahead of the beta.2 engine.",
+    title: "Durable chat",
+    body: "The self-contained Fresh runtime for a durable AI chat — composes with this engine but does not require it.",
     href: "/ai/durable-chat/",
     icon: "◆"
   },
   {
-    title: "Ships today — chat UI",
+    title: "Chat UI",
     body: "The copy-registry components that render an agent transcript, including render_ui targets.",
     href: "/ai/chat-ui/",
     icon: "◆"

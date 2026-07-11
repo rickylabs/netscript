@@ -16,10 +16,11 @@ stream rather than component state. {{ comp.badge({ status: "alpha" }) }}
 It composes three upstream libraries — `@durable-streams/tanstack-ai-transport`,
 `@tanstack/ai-preact`, and `@tanstack/ai` — and adds only NetScript glue: durable-stream
 URL resolution, server-side auth headers, and the projection law below. It does **not**
-import `@netscript/ai`, which is why it ships and installs today, independently of the
-[beta.2 engine](/ai/engine/).
+import `@netscript/ai`, so it composes with the [AI engine](/ai/engine/) but installs
+independently — you can adopt durable chat without pulling in the engine.
 
-This subpath is published on JSR as part of `@netscript/fresh` and is usable now.
+This subpath is published on JSR as part of `@netscript/fresh@0.0.1-beta.7` and is usable
+now.
 
 ## The primitives at a glance
 
