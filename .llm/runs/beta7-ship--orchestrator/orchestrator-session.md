@@ -32,6 +32,16 @@
 
 ## Status — live
 
+- 2026-07-11 ~15:20 — SECOND merge wave: #627→#606 ✓, #636→#603 ✓, #637→#607 ✓ (all pilot-eval
+  items now closed), tutorial PRs #632→#435 ✓ #633→#437 ✓ #634→#438 ✓ #635→#436 ✓; #639→#439
+  merging on green (watcher). `status:shipped` applied everywhere. **Prod E2E third onion layer**:
+  #638 filed (published scaffold root map omits @netscript/sdk; PRE-EXISTING ≤beta.6; prod peak
+  38/39 against beta.7) — fix slice running (`ns-wt-638`); STOP-AND-SURFACE posted on #601
+  (accept-gap vs beta.8 authorization) + push notification sent. NINE positioning agents running
+  (#440–#448, branches docs/44X-positioning-*). #434 storefront agent still running. Remaining
+  after those: #449/#450 validation (opposite-family), residual stale-version sweep, board triage
+  confirmation, close-out.
+
 - 2026-07-11 ~13:15 — bootstrapped: identity recorded, worktree entered, predecessor artifacts read.
 - 2026-07-11 ~14:10 — **beta.7 published**: #624 reviewed (verified: zero @opentelemetry SDK refs in
   graph, 50/50 tests) + merged (`cad16831`); release PR #625 cut+merged on green 8-check CI
