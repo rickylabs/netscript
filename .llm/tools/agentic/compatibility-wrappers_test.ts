@@ -68,3 +68,14 @@ Deno.test('compatibility wrappers retain stable flag and delegation contracts', 
     'foundation wrapper stopped delegating to its contract library',
   );
 });
+
+Deno.test('launch task and dry-run preflight retain sender-registry permission parity', async () => {
+  const task = denoConfig.tasks['agentic:launch-codex-slice'];
+  assert(task.includes('--allow-env'), 'launch task must permit HOME resolution');
+
+  const launch = await Deno.readTextFile(new URL('codex/launch-codex-slice.ts', import.meta.url));
+  const registryPreflight = launch.indexOf("Deno.env.get('HOME')");
+  const dryRunBranch = launch.indexOf("if (o.mode === 'dry-run')", registryPreflight);
+  assert(registryPreflight >= 0, 'launch lost sender-registry HOME resolution');
+  assert(dryRunBranch > registryPreflight, 'dry-run bypasses sender-registry permission preflight');
+});

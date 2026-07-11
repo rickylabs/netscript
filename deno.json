@@ -63,7 +63,7 @@
     "agentic:codex-resume": "deno run --no-lock --allow-read --allow-run .llm/tools/agentic/codex/codex-resume.ts",
     "agentic:codex-status": "deno run --no-lock --allow-run .llm/tools/agentic/codex/codex-status.ts",
     "agentic:codex-watch": "deno run --no-lock --allow-read --allow-run --allow-env .llm/tools/agentic/codex/codex-watch.ts",
-    "agentic:launch-codex-slice": "deno run --no-lock --allow-read --allow-write --allow-run .llm/tools/agentic/codex/launch-codex-slice.ts",
+    "agentic:launch-codex-slice": "deno run --no-lock --allow-read --allow-write --allow-run --allow-env .llm/tools/agentic/codex/launch-codex-slice.ts",
     "agentic:dispatch-openhands": "deno run --no-lock --allow-read --allow-env --allow-net .llm/tools/agentic/openhands/dispatch-openhands.ts",
     "agentic:openhands-status": "deno run --no-lock --allow-read --allow-env --allow-net .llm/tools/agentic/openhands/openhands-status.ts",
     "agentic:gh-pr": "deno run --no-lock --allow-read --allow-env --allow-net .llm/tools/agentic/github/gh-pr.ts",
