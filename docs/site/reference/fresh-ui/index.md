@@ -225,8 +225,8 @@ types are package-internal (see note below).
 | `Tooltip` | `const Tooltip: TooltipNamespace` | Compound tooltip namespace with root and positioning subcomponents. |
 
 > **Surface note:** the `*Namespace` types backing these exports are currently package-internal.
-> `deno doc --lint` reports them as `private-type-ref` errors; making them public is tracked in
-> PR #58. The runtime exports themselves are stable.
+> `deno doc --lint` reports them as `private-type-ref` errors; making them public is planned for
+> a future release. The runtime exports themselves are stable.
 
 ## L0 primitives
 

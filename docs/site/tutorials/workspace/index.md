@@ -8,8 +8,8 @@ next: { label: "1 · Scaffold", href: "/tutorials/workspace/01-scaffold/" }
 
 # Team Workspace
 
-Picture the app this track is modeled on: **eis-chat**, the context-accumulator the NetScript team
-builds and runs against the framework itself. An operations team lives in it during an ERP cutover —
+Picture the app this track is modeled on: a production context-accumulator chat application
+built on NetScript. An operations team lives in it during an ERP cutover —
 projects and channels full of live incident context, diagnostics, and half-finished conclusions
 about a production system that is misbehaving *right now*. Underneath all of that sits an unglamorous
 layer that decides everything: **who is on the team, where their data lives, and which routes they
@@ -55,7 +55,7 @@ does this for you."
 {{ /comp }}
 
 {{ comp callout { type: "note", title: "Where this track's patterns come from" } }}
-The data shape is borrowed from a real app: eis-chat splits an <strong>org-catalog</strong>
+The data shape is borrowed from a real app: a production chat application built on NetScript splits an <strong>org-catalog</strong>
 datasource (who exists, which projects and channels there are) from the data each channel
 accumulates — the dual-database pattern you build in chapter 3, and the same
 <code>workers</code>-plugin background jobs you use in chapter 4. The <strong>auth chapters are the

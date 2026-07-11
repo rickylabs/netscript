@@ -48,7 +48,7 @@ A NetScript service removes the copies. The contract — plain `@orpc/contract` 
 input/output schemas, versioned in its own package — is the only declaration of the wire shape.
 The handler binds to it via `implement()`, the client imports it, and the OpenAPI spec is
 generated from it. Rename a field and the build fails in the handler *and* the caller before
-anything ships. In eis-chat, the production app NetScript is dogfooded against, this is how the
+anything ships. In a production chat application built on NetScript, this is how the
 whole API surface works: `implement(ChannelContractV1)` on the service side, a typed dashboard
 client built off the same contract type on the other — a new contract route is automatically
 typed on the client, with no "keep the API docs in sync" step in between.
