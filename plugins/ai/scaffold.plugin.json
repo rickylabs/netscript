@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "name": "@netscript/plugin-ai",
-  "version": "0.0.1-beta.5",
+  "version": "0.0.1-beta.6",
   "displayName": "AI Chat",
   "description": "Thin connector and scaffolder wiring an app-owned, in-process AI chat, tool, and agent surface onto @netscript/ai.",
   "peerDependencies": {
-    "@netscript/plugin": "0.0.1-beta.5"
+    "@netscript/plugin": "0.0.1-beta.6"
   },
   "capabilities": {
     "hasDatabaseMigrations": false,
