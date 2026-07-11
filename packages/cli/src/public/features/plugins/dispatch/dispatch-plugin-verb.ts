@@ -185,7 +185,10 @@ async function runScaffoldEntrypoint(
         '--context-json',
         JSON.stringify({
           workspaceRoot: options.projectRoot,
-          options: { pluginName: options.pluginName },
+          options: {
+            pluginName: options.pluginName,
+            mcp: options.scaffoldArgs?.includes('--mcp') === true,
+          },
           dryRun: options.dryRun,
         }),
         ...(options.scaffoldArgs ?? []),

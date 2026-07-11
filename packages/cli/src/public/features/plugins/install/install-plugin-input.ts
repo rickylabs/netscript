@@ -9,6 +9,7 @@ export interface InstallPluginCommandInput {
   readonly db?: string | false;
   readonly sagaStoreBackend?: string;
   readonly samples?: boolean;
+  readonly mcp?: boolean;
   readonly copySource?: boolean;
   readonly skipConfirmation?: boolean;
   readonly ci?: boolean;

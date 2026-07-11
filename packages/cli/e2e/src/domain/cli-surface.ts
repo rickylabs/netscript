@@ -48,6 +48,7 @@ export const GATE = {
   SERVICE_LIST: 'service.list',
   CONTRACT_LIST: 'contract.list',
   SCAFFOLD_PLUGIN_LIST: 'scaffold.plugin-list',
+  SCAFFOLD_PLUGIN_AI_MCP: 'scaffold.plugin.ai.mcp',
   SCAFFOLD_UI_ADD_AI: 'scaffold.ui-add-ai',
   SCAFFOLD_UI_LOCAL_SOURCE: 'scaffold.ui-local-source',
   DATABASE_INIT: 'database.init',

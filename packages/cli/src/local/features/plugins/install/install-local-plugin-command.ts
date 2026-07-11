@@ -39,6 +39,7 @@ export function createLocalPluginInstallCommand(
     .option('--saga-store-backend <backend:string>', 'Saga durable store backend: kv or prisma')
     .option('--samples', 'Scaffold plugin sample files', { default: true })
     .option('--no-samples', 'Skip plugin sample files')
+    .option('--mcp', 'Scaffold the AI SkillLoaderPort-backed MCP tool', { default: false })
     .option('--dry-run', 'Preview plugin-owned scaffold changes without writing files', {
       default: false,
     })
@@ -66,6 +67,7 @@ export function createLocalPluginInstallCommand(
         noDb: options.db === false,
         sagaStoreBackend: parseSagaStoreBackendOption(options.sagaStoreBackend),
         includeSamples: options.samples !== false,
+        mcp: kind === 'ai' && options.mcp === true,
         dryRun: options.dryRun ?? false,
         jsrUrl: options.jsrUrl,
         localPath: options.localPath,

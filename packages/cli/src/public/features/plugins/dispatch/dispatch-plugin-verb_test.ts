@@ -181,7 +181,7 @@ describe('plugin scaffold dispatch', () => {
         '--deny-run',
         'jsr:@acme/plugin-fixture@1.0.0/scaffold',
         '--context-json',
-        '{"workspaceRoot":"/workspace/app","options":{"pluginName":"fixture"},"dryRun":false}',
+        '{"workspaceRoot":"/workspace/app","options":{"pluginName":"fixture","mcp":false},"dryRun":false}',
       ],
       cwd: '/workspace/app',
     });

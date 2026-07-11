@@ -36,6 +36,9 @@ export interface PluginInstallRequest {
   /** Whether starter samples should be generated. */
   readonly includeSamples: boolean;
 
+  /** Whether the AI plugin should emit its SkillLoaderPort-backed MCP tool. */
+  readonly mcp?: boolean;
+
   /** Whether third-party plugin confirmation should be skipped. */
   readonly skipConfirmation?: boolean;
 

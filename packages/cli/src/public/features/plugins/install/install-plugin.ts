@@ -296,6 +296,7 @@ export async function runPluginOwnedScaffold(
     projectRoot: plan.projectRoot,
     pluginName: plan.pluginName,
     dryRun: request.dryRun === true,
+    scaffoldArgs: request.mcp === true ? ['--mcp'] : [],
     permissionFlags,
     processRunner,
     fileFetcher: dependencies.packageFileFetcher,

@@ -4,4 +4,5 @@ import type { PluginKind } from '../../../domain/extension-axes.ts';
 export interface PluginSuiteState {
   plugins: PluginKind[];
   samples: boolean;
+  aiMcp?: boolean;
 }

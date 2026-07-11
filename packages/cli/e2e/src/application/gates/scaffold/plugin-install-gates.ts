@@ -1,4 +1,4 @@
-import { GATE_PHASE, SCAFFOLD } from '../../../domain/cli-surface.ts';
+import { GATE, GATE_PHASE, SCAFFOLD } from '../../../domain/cli-surface.ts';
 import { PACKAGE_SOURCE, PLUGIN, type PluginKind } from '../../../domain/extension-axes.ts';
 import { join } from '@std/path';
 import type {
@@ -27,6 +27,7 @@ function localPluginDir(kind: PluginKind): string {
 function pluginInstallCommand(
   kind: PluginKind,
   state: PluginSuiteState,
+  mcp = false,
 ): CommandFactory {
   return (context) => {
     const args = [
@@ -40,6 +41,8 @@ function pluginInstallCommand(
       state.samples ? '--samples' : '--no-samples',
       '--force',
     ];
+
+    if (kind === PLUGIN.AI && mcp) args.push('--mcp');
 
     if (context.request.suiteId === SCAFFOLD.USERLAND_INSTALL) {
       args.push(
@@ -68,7 +71,7 @@ function pluginInstallCwd(kind: PluginKind): WorkingDirectoryFactory {
 
 /** Create scaffold gates that install every requested official plugin. */
 export function createPluginInstallGates(state: PluginSuiteState): readonly GateDefinition[] {
-  return state.plugins.map((kind) =>
+  const gates = state.plugins.map((kind) =>
     commandGate(
       `scaffold.plugin.${kind}`,
       `Install official ${kind} plugin`,
@@ -77,4 +80,14 @@ export function createPluginInstallGates(state: PluginSuiteState): readonly Gate
       pluginInstallCwd(kind),
     )
   );
+  if (state.aiMcp && state.plugins.includes(PLUGIN.AI)) {
+    gates.push(commandGate(
+      GATE.SCAFFOLD_PLUGIN_AI_MCP,
+      'Install official AI plugin with MCP skill tool',
+      GATE_PHASE.SCAFFOLD,
+      pluginInstallCommand(PLUGIN.AI, state, true),
+      pluginInstallCwd(PLUGIN.AI),
+    ));
+  }
+  return gates;
 }
