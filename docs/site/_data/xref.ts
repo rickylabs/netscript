@@ -6,7 +6,7 @@
  * and FAILS on an unknown key, so the build doubles as a link checker.
  *
  * Locked key namespaces (OD3):
- *   cap:        capability hub          (cap:services      -> /capabilities/services/)
+ *   cap:        capability hub          (cap:services      -> /services-sdk/services/)
  *   howto:      how-to recipe           (howto:add-a-plugin)
  *   tut:        tutorial chapter/track  (tut:first-workspace)
  *   explain:    explanation essay       (explain:architecture)
@@ -77,22 +77,22 @@ function refEntries(): Record<string, XrefTarget> {
 
 export const xref: Record<string, XrefTarget> = {
   // ─── Capability hubs (cap:) ────────────────────────────────────────────────
-  "cap:services": { href: "/capabilities/services/", label: "Services & contracts" },
-  "cap:background-jobs": { href: "/capabilities/background-jobs/", label: "Background jobs" },
-  "cap:durable-sagas": { href: "/capabilities/durable-sagas/", label: "Durable sagas" },
-  "cap:triggers": { href: "/capabilities/triggers/", label: "Triggers & ingress" },
-  "cap:streams": { href: "/capabilities/streams/", label: "Durable streams" },
-  "cap:database": { href: "/capabilities/database/", label: "Database & Prisma" },
-  "cap:kv-queues-cron": { href: "/capabilities/kv-queues-cron/", label: "KV, queues & cron" },
-  "cap:telemetry": { href: "/capabilities/telemetry/", label: "Telemetry & logging" },
-  "cap:auth": { href: "/capabilities/auth/", label: "Authentication" },
-  "cap:fresh-ui": { href: "/capabilities/fresh-ui/", label: "Fresh UI & design" },
-  "cap:index": { href: "/capabilities/", label: "Capabilities" },
+  "cap:services": { href: "/services-sdk/services/", label: "Services & contracts" },
+  "cap:background-jobs": { href: "/background-processing/workers/", label: "Background jobs" },
+  "cap:durable-sagas": { href: "/durable-workflows/sagas/", label: "Durable sagas" },
+  "cap:triggers": { href: "/durable-workflows/triggers/", label: "Triggers & ingress" },
+  "cap:streams": { href: "/durable-workflows/streams/", label: "Durable streams" },
+  "cap:database": { href: "/data-persistence/database/", label: "Database & Prisma" },
+  "cap:kv-queues-cron": { href: "/data-persistence/kv-queues-cron/", label: "KV, queues & cron" },
+  "cap:telemetry": { href: "/observability/telemetry/", label: "Telemetry & logging" },
+  "cap:auth": { href: "/identity-access/auth/", label: "Authentication" },
+  "cap:fresh-ui": { href: "/web-layer/fresh-ui/", label: "Fresh UI & design" },
+  "cap:index": { href: "/", label: "NetScript" },
   // v3 NEW capability hubs
-  "cap:fresh-framework": { href: "/capabilities/fresh-framework/", label: "Fresh meta-framework" },
-  "cap:sdk": { href: "/capabilities/sdk/", label: "Typed SDK & client" },
-  "cap:polyglot-tasks": { href: "/capabilities/polyglot-tasks/", label: "Polyglot tasks" },
-  "cap:runtime-config": { href: "/capabilities/runtime-config/", label: "Runtime configuration" },
+  "cap:fresh-framework": { href: "/web-layer/", label: "Fresh meta-framework" },
+  "cap:sdk": { href: "/services-sdk/sdk/", label: "Typed SDK & client" },
+  "cap:polyglot-tasks": { href: "/background-processing/polyglot-tasks/", label: "Polyglot tasks" },
+  "cap:runtime-config": { href: "/orchestration-runtime/runtime-config/", label: "Runtime configuration" },
 
   // ─── How-to recipes (howto:) ───────────────────────────────────────────────
   "howto:index": { href: "/how-to/", label: "How-to guides" },
