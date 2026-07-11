@@ -202,6 +202,52 @@ to point a client at a fixed URL with no orchestrator:
 services__users__http__0=http://localhost:3001 deno task --cwd web dev
 ```
 
+## End to end in one pass
+
+The four steps above, run start to finish against the example `users` service. Copy the file, then
+run the command sequence from the workspace root:
+
+```ts
+// web/src/clients/users.ts — the resulting file (contract in, typed client out)
+import { createServiceClient, isDefinedError, safe } from '@netscript/sdk/client';
+import { UsersContractV1 } from '@my-app/contracts';
+
+// serviceName is the discovery key — resolves services__users__http__0 at call time.
+export const usersClient = createServiceClient({
+  contract: UsersContractV1,
+  serviceName: 'users',
+});
+
+// A typed call with safe-style error handling — no hardcoded URL anywhere.
+export async function firstUsers() {
+  const [error, result] = await safe(usersClient.list({ limit: 20 }));
+  if (error && isDefinedError(error)) {
+    throw new Error(`users.list failed: ${error.code}`);
+  }
+  return result.items;
+}
+```
+
+```bash
+# From the workspace root, in order:
+
+# 1. Declare the dependency — add "users" to the caller's ServiceReferences
+#    array in aspire/appsettings.json (see Step 1 above).
+
+# 2. Regenerate the Aspire helpers so the reference is wired into the AppHost.
+netscript service generate
+
+# 3. Bring the graph up — Aspire injects services__users__http__0 into the caller.
+cd aspire && aspire start && cd ..
+
+# 4. Run the caller; the typed client resolves the URL lazily on the first call.
+deno task --cwd web dev
+```
+
+With `aspire start` up, `usersClient.list({ limit: 20 })` resolves
+`services__users__http__0`, issues the oRPC call to `<resolved-url>/api/rpc/v1/users`, and returns
+the contract's typed `items`. No registry, no `localhost:<port>`, no generated client file.
+
 ## Production pitfalls
 
 {{ comp callout { type: "warning", title: "Footguns before you ship" } }}

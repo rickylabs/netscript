@@ -120,6 +120,54 @@ if (!result.success) {
 }
 ```
 
+## Run it end to end
+
+The adapter and its registration above, run against a real task file. Copy the two files, then run
+the command sequence from the workspace root:
+
+```js
+// tasks/render-invoice.mjs — the external Node task the adapter spawns
+const idx = process.argv.indexOf('--invoice');
+const invoice = idx >= 0 ? process.argv[idx + 1] : 'unknown';
+console.log(`rendered ${invoice}`);
+```
+
+```ts
+// run-invoice.ts — register the adapter and execute one task
+import { createDefaultTaskExecutor } from '@netscript/plugin-workers-core/executor';
+import { nodeAdapter } from './node-adapter.ts';
+
+const executor = createDefaultTaskExecutor({
+  customAdapters: { node: nodeAdapter },
+  defaults: { cwd: Deno.cwd(), timeout: 300_000 },
+});
+
+const result = await executor.execute(
+  {
+    id: 'render-invoice',
+    type: 'node',
+    entrypoint: './tasks/render-invoice.mjs',
+    args: ['--invoice', 'inv_123'],
+  },
+  { correlationId: 'invoice.inv_123', onStdout: (line) => console.log(line) },
+);
+
+if (!result.success) throw new Error(result.error ?? 'task failed');
+console.log('status', result.status, 'exit', result.exitCode);
+```
+
+```bash
+# From the workspace root. --allow-run=node lets the adapter spawn the Node
+# binary; --allow-read lets it read the task file. Node must be on PATH.
+deno run --allow-run=node --allow-read run-invoice.ts
+#   rendered inv_123
+#   status completed exit 0
+```
+
+`supports(task)` matches `task.type === 'node'`, so the executor routes `render-invoice` to your
+adapter, which spawns `node ./tasks/render-invoice.mjs --invoice inv_123`, streams stdout through
+`onStdout`, and returns a `TaskResult` with `status: 'completed'` and `exitCode: 0`.
+
 ## Failure modes
 
 - `supports(task)` returns `false`: the executor returns a failed `TaskResult` for unsupported
