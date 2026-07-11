@@ -17,6 +17,11 @@ may touch**. Get it wrong in one direction and an off-boarded contractor can sti
 channels; get it wrong in the other and the engineer you just paged is locked out while production
 burns.
 
+The differentiator this track proves is that **the identity layer is NetScript's to ship, not
+yours to rebuild**: a pluggable auth backend, a normalized session, and a typed `.withAuthn()` /
+`.withAuthz()` route seam — in place of the bespoke sign-in flow and hand-rolled route middleware
+most stacks reimplement, and re-secure, once per app.
+
 That layer is what you build here, from an empty folder to a running, session-protected app under
 Aspire: you scaffold a workspace (Postgres by default, swappable to `mysql`, `mssql`, or `sqlite`
 via `--db`), sign users in through a pluggable auth backend, give team records their own isolated

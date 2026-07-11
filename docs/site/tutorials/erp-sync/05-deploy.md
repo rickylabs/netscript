@@ -14,6 +14,12 @@ triggers, queue, and cron processors — on one machine under `aspire start`, an
 the running system from the dashboard. It is the **local** orchestration story: one command,
 one observable stack, throwaway infrastructure.
 
+And you wrote none of the wiring that makes that possible. `netscript init` scaffolded the AppHost
+back in Chapter 1; every plugin you added since contributed its own API and background processor to
+the graph on its own; a single `aspire start` then boots the lot with cross-references resolved for
+you. That is the scaffold-to-Aspire story this chapter surfaces end to end — from an empty folder to
+a live, correctly-wired, observable stack with no hand-written orchestration config in between.
+
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/erp-sync/01-scaffold/" },
   { label: "2 · Import job", href: "/tutorials/erp-sync/02-import-job/" },
