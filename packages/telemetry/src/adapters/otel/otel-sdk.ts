@@ -89,17 +89,43 @@ function buildResourceAttributes(
  * `@opentelemetry/sdk-*` and `@opentelemetry/exporter-*-otlp-http` packages to
  * their own dependencies.
  */
+/**
+ * Import an `@opentelemetry/*` SDK module through a computed specifier.
+ *
+ * The computed form keeps these modules OUT of the statically-analyzed module
+ * graph: on JSR, bare specifiers that are not in this package's import map
+ * would otherwise be rewritten to package-relative paths and fail every
+ * consumer's integrity check at graph build (the beta.6 regression). At
+ * runtime inside a published package the bare form still cannot resolve, so
+ * failures produce an actionable error instead: bring the SDK by passing your
+ * own {@linkcode SdkLoader} (or run from a workspace that maps the packages).
+ */
+// deno-lint-ignore no-explicit-any -- dynamic SDK modules are untyped by design
+async function loadSdkModule(name: string): Promise<Record<string, any>> {
+  const specifier = `@opentelemetry/${name}`;
+  try {
+    return await import(specifier);
+  } catch (error) {
+    throw new Error(
+      `Failed to load ${specifier} for the opt-in OpenTelemetry SDK provider. ` +
+        'Published consumers must supply their own SdkLoader (createTelemetryProvider ' +
+        'sdkLoader option) backed by app-installed @opentelemetry/* packages, or map ' +
+        `${specifier} in the application import scope. Cause: ${String(error)}`,
+    );
+  }
+}
+
 export const defaultSdkLoader: SdkLoader = async (options): Promise<SdkBinding> => {
   const endpoint = normalizeEndpoint(options.endpoint);
   const resourceAttributes = buildResourceAttributes(options);
 
   const [traceExporterMod, sdkTraceNode, resourcesMod, metricExporterMod, sdkMetrics] =
     await Promise.all([
-      import('@opentelemetry/exporter-trace-otlp-http'),
-      import('@opentelemetry/sdk-trace-node'),
-      import('@opentelemetry/resources'),
-      import('@opentelemetry/exporter-metrics-otlp-http'),
-      import('@opentelemetry/sdk-metrics'),
+      loadSdkModule('exporter-trace-otlp-http'),
+      loadSdkModule('sdk-trace-node'),
+      loadSdkModule('resources'),
+      loadSdkModule('exporter-metrics-otlp-http'),
+      loadSdkModule('sdk-metrics'),
     ]);
 
   const resource = typeof resourcesMod.resourceFromAttributes === 'function'
