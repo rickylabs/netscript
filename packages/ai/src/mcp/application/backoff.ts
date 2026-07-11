@@ -1,4 +1,5 @@
 import type { McpBackoffConfig } from '../../ports/mcp-transport.ts';
+export { abortableDelay } from '../../application/backoff.ts';
 
 const DEFAULT_INITIAL_DELAY_MS = 100;
 const DEFAULT_MAX_DELAY_MS = 5_000;
@@ -16,28 +17,4 @@ export function retryDelayMs(config: McpBackoffConfig | undefined, attempt: numb
 /** Resolve the maximum reconnect attempts. */
 export function maxReconnectAttempts(config: McpBackoffConfig | undefined): number {
   return config?.maxAttempts ?? DEFAULT_MAX_ATTEMPTS;
-}
-
-/** Wait for the given delay while respecting cancellation. */
-export function abortableDelay(delayMs: number, signal: AbortSignal): Promise<void> {
-  if (delayMs <= 0) {
-    signal.throwIfAborted();
-    return Promise.resolve();
-  }
-  return new Promise((resolve, reject) => {
-    const timeout = setTimeout(done, delayMs);
-    function done(): void {
-      signal.removeEventListener('abort', aborted);
-      resolve();
-    }
-    function aborted(): void {
-      clearTimeout(timeout);
-      signal.removeEventListener('abort', aborted);
-      reject(signal.reason);
-    }
-    signal.addEventListener('abort', aborted, { once: true });
-    if (signal.aborted) {
-      aborted();
-    }
-  });
 }

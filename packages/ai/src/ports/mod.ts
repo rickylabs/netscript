@@ -22,3 +22,8 @@ export * from './mcp-transport.ts';
 export * from './skill-loader.ts';
 export * from './agent-loop.ts';
 export * from './memory.ts';
+export {
+  withRetryingChatClient,
+  withRetryingEmbeddingProvider,
+} from '../application/provider-retry.ts';
+export type { AiRetryPolicy } from '../application/provider-retry.ts';

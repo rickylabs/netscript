@@ -72,10 +72,16 @@ export type {
   VisionProviderConfig,
   VisionProviderPort,
 } from './src/ports/mod.ts';
+export {
+  withRetryingChatClient,
+  withRetryingEmbeddingProvider,
+} from './src/application/provider-retry.ts';
+export type { AiRetryPolicy } from './src/application/provider-retry.ts';
 
 export type { ModelHandle, ModelRef } from './src/contracts/model.ts';
 export {
   AiError,
   AiNotConfiguredError,
+  AiRateLimitError,
   ModelProviderNotFoundError,
 } from './src/contracts/errors.ts';
