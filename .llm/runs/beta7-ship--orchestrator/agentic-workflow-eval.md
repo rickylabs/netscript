@@ -32,6 +32,14 @@ orchestrator (session `df71d36c`, Claude Fable 5 medium, autonomous background).
   Tier-A review verdicts land as `COMMENT` reviews instead. Cosmetic, but means branch protection
   by required approvals can never be satisfied by the orchestrator token.
 
+- **D6 (owner lane correction, 2026-07-11 ~15:15)**: the 15-agent docs swarm was launched on
+  Fable 5 (per the launch brief's "Docs lane: Claude sub-agents (Fable, low)"); 10 completed but
+  the run hit the **Anthropic monthly spend limit** mid-swarm — 5 agents (#434 #444 #445 #447
+  #448) terminated with partial work stranded in their worktrees. Owner corrected the lane live:
+  **Opus 4.8 for docs swarms (high for complex docs); Fable prohibited for swarm use** (single
+  complex engineering delegation only). Relaunched the 5 dead slices on Opus 4.8 high against the
+  same partial worktrees. Lane-policy docs row should be updated to encode this.
+
 ## Good mechanics
 
 - The `e2e-cli-prod` hardening loop (#617–#623) paid off exactly as designed: the suite caught a
