@@ -18,9 +18,11 @@
 
 ## Slices
 
-1. Publish-set audit and tests.
-2. Markdown preflight, cut integration, and tests.
-3. Gate evidence, dry-run audit output, evaluator corrections, and final harness handoff.
+| Slice | What it proves | Files | Proving gate |
+| --- | --- | --- | --- |
+| 1. Publish-set audit | Intended scoped members are computed independently of `publish:false`; the effective publisher set is enumerated and unexplained missing/extra members fail. | `.llm/tools/release/preflight-release.ts` (new), `.llm/tools/release/preflight-release_test.ts` (new) | `deno test --no-lock -A .llm/tools/release/`; scoped release-tool check |
+| 2. Markdown policy + cut integration | Stale pins fail on the owned surface, deferred site pins report, and both audits run before expensive gates / Git mutation. | `.llm/tools/release/preflight-release.ts`, `.llm/tools/release/preflight-release_test.ts`, `.llm/tools/release/cut.ts`, `.llm/tools/release/cut_test.ts` | release test suite; scoped release-tool check/lint/fmt |
+| 3. Evidence and handoff | A safe read-only command enumerates the effective publish set and markdown verdict; no lock churn or release side effect occurs. | run `worklog.md`, `context-pack.md`, `drift.md`, PR body/comments | safe audit/preflight dry-run; raw `git diff -- deno.lock`; separate IMPL-EVAL |
 
 ## Gates
 
@@ -29,6 +31,7 @@
 - scoped lint and format wrappers for changed TypeScript
 - safe preflight/audit dry-run that cannot publish
 - raw Git verification that `deno.lock` is unchanged
+- `scaffold.runtime` and `e2e-cli-prod`: n/a; tooling-only audit does not change scaffold output or published CLI/plugin runtime shape
 
 ## Risks
 
