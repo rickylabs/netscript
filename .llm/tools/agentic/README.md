@@ -131,6 +131,21 @@ deno run --allow-read --allow-run .llm/tools/agentic/codex/codex-status.ts --wor
 
 Exit: `0` ok · `2` daemon unreachable · `5` worktree not found.
 
+### 5. Run a complete multi-turn slice — `codex/run-codex-slice.ts`
+
+The runner delegates a new thread to `launch-codex-slice.ts`, or attaches only when the durable
+sender registry already maps the requested worktree to the requested thread. It then issues one
+resume at a time until the final non-empty response line is exactly `DONE` or
+`BLOCKED: <reason>`. Markers earlier in a response do not terminate the slice.
+
+Every turn appends to `<slice-dir>/codex-thread-ids.md` and atomically refreshes
+`codex-slice-status.json`, which gives `watch-run.ts` a filesystem wake signal. The final stdout is
+structured JSON containing `threadId`, `turns`, `lastState`, and `quotaEvents`. `--max-turns` and
+`--max-wall-seconds` are mandatory safety budgets with bounded quota/capacity retry delays.
+
+Use repeated `--launch-arg` values to pass the ordinary launcher arguments, or `--thread-id` to
+attach. `--dry-run` emits a deterministic simulated transcript and writes/sends nothing.
+
 ## The everyday flow: evaluating with OpenHands
 
 Implementation is only half the loop. Evaluation runs on OpenHands via a GitHub Action triggered by
