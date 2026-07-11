@@ -64,8 +64,10 @@ deliberately distinct: `@netscript/config` owns the build-time contract, and
 ## Minimal example
 
 Author the project config once, then load and inspect it at startup. The `runtimeConfig`
-section of the project config controls where the **generated** runtime schema/output lives;
-the live overrides are read separately by `@netscript/runtime-config`.
+section of the project config controls where the **generated** runtime schema/output lives —
+`netscript generate runtime-schemas` derives those schemas from registered plugin metadata
+(see [CLI & scaffold](/orchestration-runtime/cli-scaffold/)); the live overrides are read
+separately by `@netscript/runtime-config`.
 
 ```ts
 // netscript.config.ts
