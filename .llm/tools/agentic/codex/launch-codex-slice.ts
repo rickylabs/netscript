@@ -369,6 +369,13 @@ async function main(): Promise<void> {
     requestedRoute: requested,
   };
 
+  // Resolve and inspect the durable sender registry before the dry-run branch so
+  // rehearsal exercises the same env and filesystem permission surface as launch.
+  const ownership = new LocalSenderOwnershipAdapter(
+    `${Deno.env.get('HOME') ?? ''}/.config/netscript-agentic/runtime/senders`,
+  );
+  const existing = await ownership.read(o.worktree);
+
   // 4a) Dry-run: stop here.
   if (o.mode === 'dry-run') {
     if (o.pretty) {
@@ -386,10 +393,6 @@ async function main(): Promise<void> {
   // Acquire durable ownership after every non-mutating check and immediately
   // before process spawn. A returned thread remains the worktree owner so the
   // next operator is directed to resume instead of creating a rival thread.
-  const ownership = new LocalSenderOwnershipAdapter(
-    `${Deno.env.get('HOME') ?? ''}/.config/netscript-agentic/runtime/senders`,
-  );
-  const existing = await ownership.read(o.worktree);
   if (existing) {
     const decision = decideSenderOwnership(o.worktree, {
       record: existing,
