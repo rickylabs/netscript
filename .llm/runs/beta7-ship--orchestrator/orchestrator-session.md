@@ -40,3 +40,12 @@
   beta.7 checks **clean**. e2e-cli-prod run 29152236349 in progress.
 - Board triage comment posted on #601 (awaiting owner). Codex slices launched: #599, #433, #606
   (threads pending in codex-thread-ids.md).
+- 2026-07-11 ~14:40 — slices #599/#433/#606 completed first turns → draft PRs #626/#627/#628
+  (labeled, milestone 9). Slices #604/#605 running. **e2e-cli-prod run 29152236349 FAILED**
+  (`runtime.wait.workers-api`); local repro on preserved project found root cause:
+  **duplicate `--minimum-dependency-age=0`** — beta.7 CLI's generated apphost carries the flag
+  natively (template) AND `prepare-flow-b-fixture.ts` published-mode injects it again → deno
+  rejects duplicate flag → workers-api crashes at spawn. Masked in beta.6 by the telemetry graph
+  crash. Hotfix slice launched on Luna (`fix/e2e-prod-dup-dep-age-flag`); after merge:
+  re-dispatch e2e-cli-prod with published-version=0.0.1-beta.7. The published beta.7 artifacts
+  themselves are good (deno check verified; all other 33 gates incl. every other service healthy).
