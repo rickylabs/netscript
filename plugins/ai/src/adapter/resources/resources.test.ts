@@ -1,7 +1,12 @@
 import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { artifactText, collectInstallArtifacts, substituteTokens } from '@netscript/plugin/adapter';
 import { aiAdapterPlugin, aiStarterResources } from '../plugin.ts';
-import { agentScaffolder, threadStoreScaffolder, toolScaffolder } from './mod.ts';
+import {
+  agentScaffolder,
+  mcpToolScaffolder,
+  threadStoreScaffolder,
+  toolScaffolder,
+} from './mod.ts';
 import { DEFAULT_TOOL_INPUT } from './tool/tool.ts';
 import { toolStub } from './tool/tool.stub.ts';
 
@@ -114,6 +119,15 @@ Deno.test('ai thread-store resource is opt-in (add-only, not installed by defaul
 
   assertEquals(installPaths.includes(store.path), false);
   assertEquals(store.path, 'ai/thread-store.ts');
+});
+
+Deno.test('ai MCP tool is conditional and consumes SkillLoaderPort', () => {
+  assertEquals(mcpToolScaffolder.emit({ enabled: false }), []);
+  const [artifact] = mcpToolScaffolder.emit({ enabled: true });
+  assertEquals(artifact.path, 'ai/tools/skill-loader.ts');
+  const source = artifactText(artifact);
+  assertStringIncludes(source, "import type { SkillLoaderPort } from '@netscript/ai/skills'");
+  assertStringIncludes(source, 'skills.matchByTag(tags)');
 });
 
 Deno.test('ai resource token map rejects misspelled tokens at compile time', () => {

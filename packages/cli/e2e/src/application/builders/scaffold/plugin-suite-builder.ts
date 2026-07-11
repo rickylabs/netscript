@@ -5,6 +5,7 @@ import type { PluginSuiteState } from './plugin-suite-state.ts';
 export interface PluginSuiteBuilder {
   withOfficial(kind: PluginKind): PluginSuiteBuilder;
   withSamples(enabled?: boolean): PluginSuiteBuilder;
+  withAiMcp(enabled?: boolean): PluginSuiteBuilder;
   buildState(): PluginSuiteState;
 }
 
@@ -12,6 +13,7 @@ export interface PluginSuiteBuilder {
 export function createPluginSuiteBuilder(): PluginSuiteBuilder {
   const plugins: PluginKind[] = [];
   let samples = true;
+  let aiMcp = true;
   return {
     withOfficial(kind) {
       plugins.push(kind);
@@ -21,8 +23,12 @@ export function createPluginSuiteBuilder(): PluginSuiteBuilder {
       samples = enabled;
       return this;
     },
+    withAiMcp(enabled = true) {
+      aiMcp = enabled;
+      return this;
+    },
     buildState() {
-      return { plugins: [...plugins], samples };
+      return { plugins: [...plugins], samples, aiMcp };
     },
   };
 }
