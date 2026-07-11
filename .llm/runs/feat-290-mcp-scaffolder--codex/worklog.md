@@ -33,6 +33,7 @@ PLAN-EVAL is owner-waived in the slice brief (carried drift D1).
 | resource + suite-builder unit tests | PASS; 13 passed, 0 failed. |
 | `deno task e2e:cli gates scaffold.plugins` | PASS; lists distinct `scaffold.plugin.ai.mcp` before generated check. |
 | `deno task e2e:cli run scaffold.plugins --cleanup --format pretty` | PASS; 12 passed, 0 failed, including AI default, AI MCP, and generated workspace/plugin check. |
+| `deno task --cwd /home/codex/repos/ns-b8-290/packages/cli test` | PASS after CI expectation repair; 329 tests / 401 steps passed, 0 failed. |
 
 No full `scaffold.runtime` run was performed, per the slice brief.
 
@@ -41,3 +42,9 @@ No full `scaffold.runtime` run was performed, per the slice brief.
 - Issue #290 remains open and scoped exactly to the opt-in MCP scaffolder and E2E variant.
 - Default AI install remains six starter artifacts; unit coverage proves flag-off emits no MCP artifact.
 - No `deno.lock` or cache changes were introduced.
+
+## CI expectation repair
+
+- Updated the exact third-party scaffolder argv expectation to retain the full confined permission list and include the intentional `mcp: false` context option.
+- Updated the exact plugin-suite gate expectation to include `GATE.SCAFFOLD_PLUGIN_AI_MCP` between the default AI install and plugin-list/generated checks.
+- Assertions remain exact; none were removed or weakened.

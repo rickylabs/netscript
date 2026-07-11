@@ -6,3 +6,4 @@
 - PLAN-EVAL: owner-waived (D1).
 - Status: implementation and targeted gates complete; awaiting commit/push.
 - Validation: scoped check/lint/fmt green, unit tests 13/13, `scaffold.plugins` 12/12.
+- CI repair: two exact expectation tables updated; full CLI tests green (329 tests / 401 steps).
