@@ -81,3 +81,11 @@
   crash. Hotfix slice launched on Luna (`fix/e2e-prod-dup-dep-age-flag`); after merge:
   re-dispatch e2e-cli-prod with published-version=0.0.1-beta.7. The published beta.7 artifacts
   themselves are good (deno check verified; all other 33 gates incl. every other service healthy).
+
+## CLOSE-OUT (2026-07-11 ~18:15)
+
+Owner decisions received (AskUserQuestion, in-session): **(A) accept 38/39** prod verdict for
+beta.7 (#638 gap documented; fix on main ships next release), and **triage confirmed as
+proposed** (10 strays → milestone 10 beta.8: #219 #238 #246 #269 #270 #290 #380 #460 #461 #389;
+2 → Backlog: #303 #307 — applied). Milestone 9 closed. #601 closed with completion summary
+(eval round 2 posted earlier). Run complete.
