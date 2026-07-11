@@ -34,7 +34,15 @@ under .NET Aspire** — so whichever you pick, you finish with something that bo
 serves, and survives a restart. The tracks don't depend on each other; start with
 the one closest to what you're building.
 
+Short on time? There is also a **single-sitting on-ramp** — the smallest working slice of
+the whole spine — before you commit to a deep track.
+
 {{ comp.featureGrid({ items: [
+  {
+    title: "Mini eis-chat (on-ramp)",
+    body: "The single-sitting on-ramp: scaffold, one typed message contract, one durable delivery worker, one live stream tailed over HTTP/SSE — then a map into the five deep tracks. Start here if you are new. 4 chapters.",
+    href: "/tutorials/eis-chat/"
+  },
   {
     title: "Storefront",
     body: "Build an e-commerce backend: a typed catalog service, contract-first cart, a durable <code>checkout</code> saga with compensation, and an HMAC-verified shipping webhook. The track for <strong>services + durable workflows</strong>. 6 chapters.",
@@ -75,8 +83,9 @@ the one closest to what you're building.
   ]
 }) }}
 
-New to NetScript entirely? Any track starts from zero, but **Storefront** is the
-broadest tour of the core ideas. To inspect the whole shape of a NetScript backend, start there.
+New to NetScript entirely? The [Mini eis-chat on-ramp](/tutorials/eis-chat/) proves the
+whole spine in one sitting. For a deep track, **Storefront** is the broadest tour of the
+core ideas — to inspect the whole shape of a NetScript backend, start there.
 
 ## Before you start
 
