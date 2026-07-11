@@ -10,12 +10,10 @@
  *
  * Design contract (see PR "ci: docs-only + label-gated skip lanes"):
  *
- *   - A file is "docs-only" (non-impacting for the scaffold/e2e gate) iff it
- *     matches the docs allowlist AND does NOT match the impacting denylist.
- *   - The denylist ALWAYS wins: anything under `packages/`, `plugins/`, `apps/`,
- *     any `deno.json*` / `deno.lock`, or `.github/workflows/**` is treated as
- *     impacting even if it is a Markdown file. This honours the hard rule that
- *     those surfaces must never be classified docs-only.
+ *   - Markdown / MDX is docs-only regardless of directory, except for explicit
+ *     critical paths (`deno.json*`, `deno.lock`, workflows), which always win.
+ *   - Non-Markdown paths under `packages/`, `plugins/`, and `apps/` remain
+ *     impacting; known documentation/agent-context directories remain allowed.
  *   - `docsOnly` is true only when there is at least one changed file and every
  *     changed file is docs-only.
  *
@@ -57,7 +55,7 @@ const DOCS_PREFIXES = [
   '.claude/',
 ] as const;
 
-/** Extensions that are docs-only wherever they live (subject to the denylist). */
+/** Extensions that are docs-only wherever they live (subject to critical paths). */
 const DOCS_EXTENSIONS = ['.md', '.mdx'] as const;
 
 /** Normalise a git path: strip a leading `./`, collapse backslashes. */
@@ -77,6 +75,14 @@ export function isImpacting(rawPath: string): boolean {
   return IMPACTING_PREFIXES.some((prefix) => path.startsWith(prefix));
 }
 
+/** Does this explicit configuration/workflow path always force the gate? */
+function isCritical(rawPath: string): boolean {
+  const path = normalise(rawPath);
+  const base = path.slice(path.lastIndexOf('/') + 1);
+  return path.startsWith('.github/workflows/') ||
+    base === 'deno.json' || base === 'deno.jsonc' || base === 'deno.lock';
+}
+
 /** Is this path a docs-only surface (only meaningful when not impacting)? */
 export function isDocs(rawPath: string): boolean {
   const path = normalise(rawPath);
@@ -86,10 +92,12 @@ export function isDocs(rawPath: string): boolean {
 }
 
 /**
- * True iff `path` is docs-only: matches the docs allowlist and is not on the
- * impacting denylist (denylist wins).
+ * True iff `path` is docs-only. Explicit critical paths win; Markdown / MDX
+ * then wins over ordinary impacting directory prefixes.
  */
 export function isDocsOnlyPath(path: string): boolean {
+  if (isCritical(path)) return false;
+  if (DOCS_EXTENSIONS.some((ext) => normalise(path).endsWith(ext))) return true;
   if (isImpacting(path)) return false;
   return isDocs(path);
 }

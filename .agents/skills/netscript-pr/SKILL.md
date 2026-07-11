@@ -228,7 +228,8 @@ a board column reflect reality.
 - `area:` — `cli`, `fresh`, `fresh-ui`, `plugins`, `auth`, `deps`, `aspire`, `tooling`, `database`,
   `kv`, `sdk`, `service`, `config`, `telemetry`, `ai-core`, `plugin-ai`, `docs`
 - `priority:` — `p0` (release blocker), `p1`, `p2`, `p3`
-- `ci:` — `skip-e2e`, `full` (manual overrides for the path-filtered CI); `gate:` — `e2e`, `jsr`
+- `ci:` — `skip-e2e`, `skip-scaffold`, `full` (manual overrides for the path-filtered CI);
+  `gate:` — `e2e`, `jsr`
 - `epic:` — groups every issue/PR belonging to a program epic (e.g. `epic:ai-stack`,
   `epic:deployment`); the epic's own umbrella issue carries `type:umbrella`.
 - `wave:` — scheduling band that drives the **milestone** (see below): `v1`, `v1-min`, `defer`.
@@ -307,5 +308,8 @@ human-facing mirror; `.github/labels.yml` is the machine-readable label set.
 
 ## Path-filter awareness (Phase C)
 
-Config/docs-only PRs are auto-skipped by CI `paths-ignore`; override with `ci:full` when a docs PR
-must run e2e, or `ci:skip-e2e` to suppress it. Don't fight the filter by editing workflows per-PR.
+When opening a docs-only PR, proactively apply `ci:skip-e2e`. Also apply `ci:skip-scaffold` when the
+change does not need the scaffold-static gate. These labels make the intended cheap lane explicit
+even when path classification would auto-skip the jobs. Apply `ci:full` instead when a docs-only PR
+must exercise the full CI surface; it is the precedence-winning escape hatch. Don't fight the
+filter by editing workflows per PR.

@@ -83,6 +83,11 @@ intent hint, not the final profile.
 11. **Run IMPL-EVAL (separate session).**
 12. Close: update `context-pack.md`, `arch-debt.md`, and promote lessons if warranted.
 
+When the opening diff is docs-only, proactively apply `ci:skip-e2e` to the draft PR and also apply
+`ci:skip-scaffold` when scaffold-static is not applicable. Use `ci:full` as the escape hatch when
+the docs-only change must exercise the full CI surface. Record the selection in the opening phase
+comment so the evaluator can verify that the cheap lane is intentional.
+
 ## Agent Delegation Contract
 
 Lane assignments and model bindings are configuration. The tiered A–E model, the selection rules
