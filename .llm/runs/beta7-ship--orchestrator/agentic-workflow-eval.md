@@ -18,6 +18,14 @@ orchestrator (session `df71d36c`, Claude Fable 5 medium, autonomous background).
   #625 opened via the GitHub API using the tool's generated body from `.llm/tmp/`. Improvement
   I9 filed below.
 
+- **D4**: `deno task agentic:launch-codex-slice` (non-dry-run path) crashes with
+  `NotCapable: Requires env access to "HOME"` — the task definition grants
+  `--allow-read --allow-write --allow-run` but the sender-registry code path
+  (`~/.config/netscript-agentic/runtime/senders`) needs `--allow-env`, which `--dry-run` never
+  reaches. Owner granted full access; fallback: invoke
+  `.llm/tools/agentic/codex/launch-codex-slice.ts` directly with `-A`. The #614 host-agnostic fix
+  itself works (dry-run validated, threads launch from inside WSL). Improvement I10 below.
+
 ## Blockers + fallbacks
 
 - **B1**: same-account PR review — GitHub rejects APPROVE on your own PR (single-token repo), so
@@ -39,6 +47,18 @@ orchestrator (session `df71d36c`, Claude Fable 5 medium, autonomous background).
   agentic suite (`resolveGithubToken`) instead of shelling to `gh pr create` — every orchestrator
   run on this host has had to hand-finish the PR (beta.6 B3, this run D3). Alternatively pass
   `--head release/cut-<version>` to gh.
+
+- **I10**: add `--allow-env` to the `agentic:launch-codex-slice` task definition (deno.json) so the
+  non-dry-run sender-registry path works; dry-run's permission surface should match the real run's
+  (a dry-run that passes while the real run crashes on permissions defeats its purpose).
+
+- **I11 / D5**: launcher route-identity validation reported `Observed route: effort=low` vs
+  requested `medium` on ns-606 (`-c model_reasoning_effort=medium` passed). Either the config
+  override isn't honored by `debug app-server send-message-v2` or the observed-identity probe reads
+  a different scope. Needs a runtime fix — this is exactly the drift the RouteIdentity contract
+  exists to catch, and today it only warns.
+- **I12**: `launch-codex-slice.ts` overwrites `codex-thread-ids.md` per launch (last-writer-wins
+  when several slices share a run dir). It should append/merge per-slice sections.
 
 ## Outcome
 

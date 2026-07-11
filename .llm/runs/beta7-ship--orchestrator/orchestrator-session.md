@@ -33,4 +33,10 @@
 ## Status — live
 
 - 2026-07-11 ~13:15 — bootstrapped: identity recorded, worktree entered, predecessor artifacts read.
-  Next: review PR #624.
+- 2026-07-11 ~14:10 — **beta.7 published**: #624 reviewed (verified: zero @opentelemetry SDK refs in
+  graph, 50/50 tests) + merged (`cad16831`); release PR #625 cut+merged on green 8-check CI
+  (`7790d20f`); GitHub Release v0.0.1-beta.7 created; publish.yml **success**; direct repro check:
+  `deno check` of `jsr:@netscript/telemetry@0.0.1-beta.6/otel` fails `package-manifest-missing-checksum`,
+  beta.7 checks **clean**. e2e-cli-prod run 29152236349 in progress.
+- Board triage comment posted on #601 (awaiting owner). Codex slices launched: #599, #433, #606
+  (threads pending in codex-thread-ids.md).
