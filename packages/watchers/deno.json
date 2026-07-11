@@ -1,6 +1,6 @@
 {
   "name": "@netscript/watchers",
-  "version": "0.0.1-beta.7",
+  "version": "0.0.1-beta.8",
   "description": "Composable file-watching runtime with strategies, filters, stability checks, and stop semantics for NetScript.",
   "license": "Apache-2.0",
   "exports": {
