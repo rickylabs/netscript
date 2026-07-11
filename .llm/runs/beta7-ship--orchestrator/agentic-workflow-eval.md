@@ -68,6 +68,15 @@ orchestrator (session `df71d36c`, Claude Fable 5 medium, autonomous background).
 - **I12**: `launch-codex-slice.ts` overwrites `codex-thread-ids.md` per launch (last-writer-wins
   when several slices share a run dir). It should append/merge per-slice sections.
 
+- **I13**: the harness needs a budget-aware swarm planner — the docs fan-out was correct
+  work-shape-wise but the model tier (Fable) blew the monthly spend cap mid-swarm (D6). Lane
+  policy should encode a per-tier concurrency/спend ceiling, and the Agent-launch path should fail
+  fast with a "tier not budgeted for N-agent swarm" error instead of letting the provider limit
+  kill agents mid-slice.
+- Resume-from-partial-worktree worked well as the recovery pattern: five Opus agents picked up the
+  dead Fable agents' uncommitted edits, reviewed-not-trusted them (one found and fixed real drift;
+  one added missing source citations), and completed with full validation — no work lost.
+
 ## Outcome
 
 (live — updated at close-out)
