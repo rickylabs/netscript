@@ -1,0 +1,3 @@
+# Context Pack
+
+Issue #497 E9 implemented as `@netscript/telemetry/ai`. The structurally typed adapter has no runtime or type import from AI core, uses pinned semconv constants, maps chat calls to OTel spans and tool events to `execute_tool` spans, and accepts an injected tracer. Scripted agent-loop exporter test and telemetry suite pass; scoped quality and publish dry-run pass. New subpath doc lint is clean. Full package doc lint retains nine pre-existing findings recorded as D2. Commit and push remain.

@@ -151,6 +151,23 @@ builders also emit deprecated bare aliases where an old key already shipped. The
 (TC-1..TC-14) additionally define span naming, SpanKind, status, W3C propagation, and the required
 `OTEL_SEMCONV_STABILITY_OPT_IN=messaging,rpc,gen_ai_latest_experimental` value.
 
+### AI telemetry adapter
+
+Inject the OpenTelemetry adapter into the AI runtime without adding an OTel
+dependency to `@netscript/ai`:
+
+```ts
+import { createAiRuntime } from '@netscript/ai';
+import { createOtelAiTelemetryPort } from '@netscript/telemetry/ai';
+
+const ai = createAiRuntime({ telemetry: createOtelAiTelemetryPort() });
+```
+
+Agent-loop chat operations become GenAI client spans, provider-reported usage
+is recorded as `gen_ai.usage.input_tokens` and `gen_ai.usage.output_tokens`, and
+tool-call signals become `execute_tool` spans. The adapter uses the global OTel
+tracer by default; tests and custom composition roots may inject a tracer.
+
 ---
 
 ## 📖 Documentation
