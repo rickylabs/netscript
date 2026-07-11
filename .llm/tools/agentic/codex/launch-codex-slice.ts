@@ -58,6 +58,7 @@ import {
 } from '../lib/agentic-lib.ts';
 import {
   compareLaunchIdentity,
+  enforceLaunchIdentity,
   type RequestedLaunchIdentity,
   requestedLaunchIdentity,
 } from '../runtime/launch-route-identity.ts';
@@ -85,6 +86,7 @@ interface Options {
   provider?: string;
   model?: string;
   effort?: string;
+  allowRouteMismatch: boolean;
 }
 
 function printHelp(): void {
@@ -107,6 +109,7 @@ function printHelp(): void {
     '  --provider <name>    Required provider identity (normally openai).',
     '  --model <name>       Required explicit Codex model.',
     '  --effort <level>     Required low|medium|high|xhigh|max reasoning effort.',
+    '  --allow-route-mismatch  Continue after mismatch (explicit operator exception; default blocks).',
     '  --user <name>        WSL user. Default: codex.',
     '  --dry-run            Validate + safety-check + stage + print launch command; do not send.',
     '  --parse-log <file>   Parse a saved launch log for thread id and exit.',
@@ -116,7 +119,12 @@ function printHelp(): void {
 }
 
 function parseArgs(args: string[]): Options | null {
-  const o: Options = { mode: 'launch', user: wslUser(), pretty: false };
+  const o: Options = {
+    mode: 'launch',
+    user: wslUser(),
+    pretty: false,
+    allowRouteMismatch: false,
+  };
   for (let i = 0; i < args.length; i++) {
     const a = args[i];
     switch (a) {
@@ -167,6 +175,9 @@ function parseArgs(args: string[]): Options | null {
       case '--effort':
         o.effort = requireValue(args, i, a);
         i++;
+        break;
+      case '--allow-route-mismatch':
+        o.allowRouteMismatch = true;
         break;
       case '--user':
         o.user = requireValue(args, i, a);
@@ -334,14 +345,15 @@ async function main(): Promise<void> {
   // spawned from a Windows cwd, leaving the launch (and `send-message-v2`,
   // which derives the agent's worktree from the ambient cwd) in the wrong
   // directory. See wslCd in agentic-lib.ts.
-  const routeFlags = `--model ${sq(requested.model)} -c model_reasoning_effort=${
-    sq(requested.effort)
-  }`;
-  const profileFlags = o.profile && o.profileHome ? `--profile ${sq(o.profile)}` : '';
+  const routeFlags = `--model ${sq(requested.model)} --effort ${sq(requested.effort)}`;
+  const profileFlags = o.profile && o.profileHome ? ` --profile ${sq(o.profile)}` : '';
+  const clientPath = `${o.worktree}/.llm/tools/agentic/codex/app-server-message-cli.ts`;
   const home = o.profileHome ? ` CODEX_HOME=${sq(o.profileHome)}` : '';
   const profileScript = `export PATH="$HOME/.local/bin:$PATH"${home}; msg="$(cat ${
     sq(dest)
-  })"; codex ${profileFlags} ${routeFlags} debug app-server send-message-v2 "$msg"`;
+  })"; deno run --allow-run ${sq(clientPath)} ${routeFlags}${profileFlags} --cwd ${
+    sq(o.worktree)
+  } --message "$msg"`;
   const commandPlan = await resolveWslCommand(o.user, profileScript, { cwd: o.worktree });
   const launchCommand = renderCommandPlan(commandPlan);
   const launchPlan = {
@@ -461,11 +473,12 @@ async function main(): Promise<void> {
     model: observed.model,
     effort: observed.effort,
   });
+  const enforcement = enforceLaunchIdentity(evidence, o.allowRouteMismatch);
   if (o.sliceDir) {
     const recPath = `${o.sliceDir.replace(/[\\/]$/, '')}/codex-thread-ids.md`;
     await Deno.writeTextFile(recPath, threadRecord(o, observed, dest, requested));
   }
-  if (evidence.status !== 'matched') {
+  if (!enforcement.allowed) {
     console.log(JSON.stringify({
       stage: 'route-identity',
       ok: false,
@@ -473,6 +486,7 @@ async function main(): Promise<void> {
       mismatches: evidence.mismatches,
       requested: evidence.requested,
       observed: evidence.observed,
+      operatorAction: enforcement.operatorAction,
     }));
     Deno.exit(1);
   }
