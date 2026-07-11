@@ -8,6 +8,30 @@ next: { label: "Authentication", href: "/identity-access/auth/" }
 
 # Fresh UI & design
 
+A design system earns its keep when the person — or agent — changing the UI can open every file
+involved. NetScript's Fresh UI layer is **copy-source**: components are installed into your repo as
+readable TypeScript and CSS you own, driven by design tokens you can edit, with a live gallery
+inside your own scaffolded app showing every primitive rendered with *your* tokens. Nothing in the
+visual layer hides behind a package boundary.
+
+## Why copy-source, concretely
+
+The recurring failure in agent-edited UIs is not bad taste — it is a boundary. Ask for "a
+destructive variant of our button" against a conventional installed component library and the agent
+cannot edit the component (it lives in an immutable package), so it wraps it, overrides its styles
+from outside, or hand-writes a lookalike `div`. Repeat that a few times and the codebase carries
+three button dialects, none of them token-driven, and the next change costs more turns than the
+first.
+
+Here, `netscript ui:add button` copies the component's source and its CSS into
+`apps/dashboard/components/ui/`, wired to the token layer in `assets/tokens.json`. The variant is
+an edit to a file that is already in the repo, in the same grammar as every other component — and
+the `(design)` route group in the scaffolded app renders the result immediately, next to every
+other primitive, styled by the same tokens. One vocabulary, visible in one place, owned by you.
+
+The rest of this page maps that layer end to end — and disentangles the two things it is easiest to
+conflate on the way in.
+
 NetScript gives you a **front end with the same contracts-first rigor as the back end** — and it
 does so in two distinct layers that are easy to conflate. There is **`@netscript/fresh`, a real
 meta-framework** (a published package of Fresh runtime extensions, route/island builders, a
@@ -175,8 +199,17 @@ UI is editing your own files — there is no framework component you cannot open
 `(design)` route group renders a live token, component, and composition gallery so you can see every
 primitive in your project.
 
+Astro's documentation answers "what does this look like?" with one-click browser sandboxes;
+NetScript answers it from inside your repo — the `(design)` gallery is a live preview of the
+components you actually installed, rendered with the tokens you actually set, served by your own
+app. When you edit a token or a copied component, the gallery is where you watch the whole
+vocabulary absorb the change.
+
 What ships falls into four groups, each installable by registry id (`ui:add <name>`) or as a named
-collection:
+collection. The AI/workspace group is worth calling out: it is a finite, token-driven component
+vocabulary for agent-facing surfaces — message threads, tool-call cards, citations, charts — that
+an application can map structured model output onto, so generated UI lands in your design language
+instead of ad-hoc markup:
 
 {{ comp.apiTable({
   caption: "What the registry ships",
