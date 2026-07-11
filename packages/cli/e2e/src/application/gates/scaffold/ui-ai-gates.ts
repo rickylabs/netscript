@@ -25,7 +25,7 @@ export function createUiAiGates(): readonly GateDefinition[] {
       GATE.SCAFFOLD_UI_LOCAL_SOURCE,
       'Map the unpublished AI dependency to the local workspace member',
       GATE_PHASE.SCAFFOLD,
-      () => ['deno', 'eval', UI_LOCAL_SOURCE_SCRIPT],
+      (context) => denoCommand(context, 'eval', UI_LOCAL_SOURCE_SCRIPT),
       (context) => context.project.projectRoot,
     ),
     commandGate(
@@ -46,20 +46,16 @@ export function createUiAiGates(): readonly GateDefinition[] {
       GATE.BEHAVIOR_UI_RENDER,
       'Render safe nested and fallback generative UI output',
       GATE_PHASE.BEHAVIOR,
-      () => ['deno', 'eval', '--config', 'deno.json', UI_RENDER_ASSERTION_SCRIPT],
+      (context) =>
+        denoCommand(context, 'eval', '--config', 'deno.json', UI_RENDER_ASSERTION_SCRIPT),
       (context) => context.project.projectRoot,
     ),
     commandGate(
       GATE.BEHAVIOR_MCP_WIDGET_ROUNDTRIP,
       'Round-trip an MCP UI resource through the widget renderer',
       GATE_PHASE.BEHAVIOR,
-      () => [
-        'deno',
-        'eval',
-        '--config',
-        'deno.json',
-        MCP_WIDGET_ROUNDTRIP_SCRIPT,
-      ],
+      (context) =>
+        denoCommand(context, 'eval', '--config', 'deno.json', MCP_WIDGET_ROUNDTRIP_SCRIPT),
       (context) => context.project.projectRoot,
     ),
   ];
