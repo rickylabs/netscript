@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="refresh" content="0; url={{ redirectTo |> url }}">
+    <link rel="canonical" href="{{ redirectTo |> url }}">
+    <title>Moved</title>
+  </head>
+  <body>
+    <p>This page moved to <a href="{{ redirectTo |> url }}">{{ redirectTo }}</a>.</p>
+    <script>location.replace({{ redirectTo |> url |> JSON.stringify }} + location.search + location.hash);</script>
+  </body>
+</html>

@@ -146,6 +146,7 @@ export const navSections: NavSection[] = [
     label: "AI & Agents",
     items: [
       { href: "/ai/", label: "Overview & Concepts", icon: "O" },
+      { href: "/ai/mcp/", label: "Guide: MCP", icon: "G" },
       { href: "/tutorials/chat/", label: "Quickstart: AI chat", icon: "Q" },
       { href: "/how-to/build-a-durable-chat/", label: "How-To: build a durable chat", icon: "H" },
       { href: "/ai/durable-chat/", label: "Guide: durable chat", icon: "G" },
@@ -187,6 +188,7 @@ export const navSections: NavSection[] = [
     label: "Orchestration & Runtime",
     items: [
       { href: "/orchestration-runtime/", label: "Overview & Concepts", icon: "O" },
+      { href: "/orchestration-runtime/cli-scaffold/", label: "Guide: CLI & scaffold", icon: "G" },
       { href: "/quickstart/", label: "Quickstart: run the workspace", icon: "Q" },
       { href: "/how-to/deno-lsp-code-intelligence/", label: "How-To: Deno LSP intelligence", icon: "H" },
       { href: "/how-to/deploy-local-aspire/", label: "How-To: deploy locally with Aspire", icon: "H" },
