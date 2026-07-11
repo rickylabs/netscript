@@ -7,6 +7,8 @@
 #
 # RULES:
 # - Exactly ONE `status:` label on an open issue/PR at a time (it is the board column).
+# - On completed closure, replace the phase label with `status:shipped`; for not-planned/wontfix
+#   closure, remove the `status:` label entirely.
 # - `type:`/`area:`/`priority:` are additive.
 # - Add new labels here first, then create them; do NOT delete existing labels (that strips them
 #   off live issues) — deprecate in this file and propose removal to the maintainer.
@@ -68,6 +70,9 @@
 - name: "status:ready-merge"
   color: "0e8a16"
   description: "Green and cleared to merge"
+- name: "status:shipped"
+  color: "5319e7"
+  description: "Terminal: replaces the phase label when completed work closes"
 - name: "status:close-gate-override"
   color: "b60205"
   description: "Audited exception to the closing-keyword acceptance gate"
