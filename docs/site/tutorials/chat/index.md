@@ -81,7 +81,7 @@ Each chapter adds exactly one link in the durable-chat spine:
 ] }) }}
 
 {{ comp callout { type: "note", title: "What this track deliberately leaves out" } }}
-The tutorial stops at what works on shipped seams: durable chat, streaming markdown, one server-side tool, and citations rendered from plain tool output. It does <strong>not</strong> cover MCP-UI widget round-trips, the generative-UI renderer, agent memory / semantic recall, or RAG — those seams are not shipped in this cut. The <code>@netscript/ai</code> engine that will own the model-call layer arrives in <code>0.0.1-beta.2</code> and is <code>publish:false</code> today.
+The tutorial stops at the durable-chat spine: durable chat, streaming markdown, one server-side tool, and citations rendered from plain tool output. It does <strong>not</strong> cover MCP-UI widget round-trips, the generative-UI renderer, agent memory / semantic recall, or RAG. The <a href="/ai/engine/">@netscript/ai engine</a> — model registry, agent loop, tool registry, and MCP transports — is published on JSR as of <code>0.0.1-beta.7</code>; this track still wires the model call directly on <code>@tanstack/ai</code>, because the durable session plane persists and replays TanStack chunk streams. Chapter 2 shows where the engine fits.
 {{ /comp }}
 
 ## What you built

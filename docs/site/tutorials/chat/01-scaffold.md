@@ -21,7 +21,7 @@ sessions have somewhere to live, set your model key, and boot the whole thing un
 
 ## What you will build
 
-A `chat-app/` workspace on disk: a [Fresh](/capabilities/fresh-framework/) app, the
+A `chat-app/` workspace on disk: a [Fresh](/web-layer/) app, the
 `streams` plugin wired for durable sessions, and Aspire orchestration. By the end the Aspire
 dashboard at `:18888` shows every resource running, `ANTHROPIC_API_KEY` reaches the app
 process, and the workspace type-checks. You reuse this same workspace for every later chapter.

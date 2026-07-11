@@ -55,8 +55,8 @@ const source = chat({
 // `source` is an AsyncIterable of TanStack stream chunks.
 ```
 
-{{ comp callout { type: "note", title: "The @netscript/ai engine replaces this in beta.2" } }}
-Calling <code>@tanstack/ai</code> directly is how the reference chat app wires the model on shipped seams today. The <code>@netscript/ai</code> engine — a model registry, provider ports, and an agent loop behind <code>import '@netscript/ai/anthropic'</code> — arrives in <code>0.0.1-beta.2</code> and will own this layer. It is <code>publish:false</code> right now, so do not <code>deno add jsr:@netscript/ai</code>; use the direct wiring above.
+{{ comp callout { type: "note", title: "Where the @netscript/ai engine fits" } }}
+NetScript also ships a provider-neutral engine — the <a href="/ai/engine/">@netscript/ai</a> package, published on JSR as of <code>0.0.1-beta.7</code>. Its entry seam is a model registry with self-registering providers: <code>import '@netscript/ai/anthropic'</code> registers the Anthropic provider, and <code>getModel('anthropic:claude-sonnet-4-5')</code> resolves a model handle; an agent loop, a tool registry, and MCP transports live behind its other subpaths (<a href="/reference/ai/">reference</a>). This route keeps the direct <code>@tanstack/ai</code> wiring because the durable session plane persists and reduces TanStack chunk streams, while the engine's chat clients stream the engine's own event vocabulary — two different wire shapes.
 {{ /comp }}
 
 ## Step 2 — The session route

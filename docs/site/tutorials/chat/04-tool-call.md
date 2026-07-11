@@ -61,7 +61,7 @@ export const searchDocs = toolDefinition({
 ```
 
 {{ comp callout { type: "note", title: "Citations are plain tool output — not RAG magic" } }}
-The <code>citations</code> array is ordinary structured data your tool returns. There is no retrieval framework, no vector store, and no semantic-recall seam behind it in this cut — you decide what <code>lookup</code> does. The UI renders whatever citations the tool hands back. Full RAG and agent memory are out of scope for this track.
+The <code>citations</code> array is ordinary structured data your tool returns. There is no retrieval framework or vector store behind it — you decide what <code>lookup</code> does, and the UI renders whatever citations the tool hands back. If you want embeddings-backed retrieval under <code>lookup</code>, the <a href="/ai/engine/">@netscript/ai engine</a> ships embedding provider ports (<code>@netscript/ai/openai-embeddings</code>); full RAG and agent memory stay out of scope for this track.
 {{ /comp }}
 
 ## Step 2 — Pass the tool to the model
@@ -181,6 +181,8 @@ Where to go next:
   [Customize Fresh UI](/how-to/customize-fresh-ui/).
 - The list/board/table live-data plane is a different tool:
   [Publish a durable stream](/how-to/publish-a-durable-stream/).
+- Compose the provider-neutral engine — model registry, agent loop, tool registry, MCP
+  transports: [AI engine](/ai/engine/).
 - Look up exact signatures in the [fresh reference](/reference/fresh/).
 
 {{ comp.nextPrev({ prev: { label: "3 · Chat UI", href: "/tutorials/chat/03-chat-ui/" }, next: { label: "Tutorials", href: "/tutorials/" } }) }}
