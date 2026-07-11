@@ -123,7 +123,7 @@ framework-side fix.
 ## Step 3 — Add a cron schedule
 
 Some migration work is time-driven, not file-driven: the nightly full re-sync that keeps CSB
-honest until cutover, an hourly cleanup of stale staging files. That is a **scheduled trigger** —
+aligned with VIF until cutover, an hourly cleanup of stale staging files. That is a **scheduled trigger** —
 `defineScheduledTrigger(handler, spec)` from
 `@netscript/plugin-triggers-core/builders`. Like the file-watch trigger, its handler returns an array
 of effects; here it enqueues a job on a cron cadence.

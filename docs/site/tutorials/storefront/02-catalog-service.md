@@ -54,7 +54,7 @@ netscript db seed               # verifies the connection (SELECT 1) — the tab
 
 The scaffolded seed script only checks connectivity; it does **not** insert sample rows. Your
 `products` table starts empty — you will create your first product over the API further down, which is
-the honest way to prove the write path.
+the direct way to prove the write path.
 
 Confirm the service is reachable before you change anything:
 
