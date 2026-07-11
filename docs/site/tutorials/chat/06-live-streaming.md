@@ -61,6 +61,7 @@ import { useSignal } from '@preact/signals';
 import { useEffect } from 'preact/hooks';
 import { createNetScriptChatConnection, resolveChatSnapshot } from '@netscript/fresh/ai';
 import type { NetScriptChatSnapshot } from '@netscript/fresh/ai';
+import { chatTurnRoute } from '@app/contracts/routes/chat-turn.ts';
 
 const Chat = ({ sessionId, seed }: { sessionId: string; seed: NetScriptChatSnapshot }) => {
   const snapshot = useSignal(seed);
@@ -93,7 +94,7 @@ const Chat = ({ sessionId, seed }: { sessionId: string; seed: NetScriptChatSnaps
     await connection.send([{ id: crypto.randomUUID(), role: 'user', content: text }]);
     // 2. Fire the model turn. Its chunks now arrive through the subscription above —
     //    no manual re-materialize here; the live loop owns rendering.
-    await fetch(`/api/chat/${sessionId}`, { method: 'POST' });
+    await fetch(chatTurnRoute.href({ path: { sessionId } }), { method: 'POST' });
   };
 
   return (

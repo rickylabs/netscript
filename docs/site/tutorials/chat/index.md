@@ -13,7 +13,11 @@ support-chat surface, the kind of assistant a real product ships next to its doc
 last chapter you will have a chat whose transcript — messages, streaming markdown, tool-call
 cards, and MCP widgets — survives reload, reconnect, and a second tab, and whose replies
 stream in live as the model produces them, because it is backed by a durable session stream
-rather than component state. It runs on shipped NetScript seams: the
+rather than component state. That is the differentiator this track proves: most chat UIs keep
+the conversation in component state, so a refresh, a dropped socket, or a second tab loses it —
+here the transcript lives in the durable session and the UI is only a view of it, so the same
+log replays identically on reload, reconnect, and every other tab watching. It runs on shipped
+NetScript seams: the
 [`@netscript/fresh/ai`](/reference/fresh/) durable-chat plane (published on JSR in
 `@netscript/fresh` and usable now, including the `ai/sandbox` MCP-UI subpath), the
 [`@netscript/fresh-ui`](/reference/fresh-ui/) copy-registry chat components, and the

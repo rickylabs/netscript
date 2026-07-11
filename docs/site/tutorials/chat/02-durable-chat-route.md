@@ -67,11 +67,30 @@ This route runs one turn and persists it. It pulls the transcript so far through
 `resolveChatSnapshot` (so the model has context), calls the model, and hands the stream to
 `toNetScriptChatResponse` — gated by an `authorize` hook.
 
+First give that dynamic route a **typed identity**. `createRouteReference` from
+`@netscript/fresh/route` infers the `{ sessionId }` path param straight from the `[sessionId]`
+pattern, so the id the server reads and the URL the browser posts to in chapter 3 both come from
+one declaration — never a string assembled two different ways. Put it in the shared `contracts/`
+tree so the route and the island import the *same* object:
+
+```ts
+// contracts/routes/chat-turn.ts
+import { createRouteReference } from '@netscript/fresh/route';
+
+/** The one place the chat turn route pattern is written. */
+export const chatTurnRoute = createRouteReference('/api/chat/[sessionId]');
+// chatTurnRoute.parsePath({ sessionId })      -> typed { sessionId: string }
+// chatTurnRoute.href({ path: { sessionId } }) -> "/api/chat/<id>"  (the island posts here in ch. 3)
+```
+
+Now the route reads its param **through the contract** instead of touching `ctx.params` by hand:
+
 ```ts
 // apps/dashboard/routes/api/chat/[sessionId].ts
 import { chat } from '@tanstack/ai';
 import { anthropicText } from '@tanstack/ai-anthropic';
 import { resolveChatSnapshot, toNetScriptChatResponse } from '@netscript/fresh/ai';
+import { chatTurnRoute } from '../../../../contracts/routes/chat-turn.ts';
 
 // REQUIRED in production — no default allow-all. Replace with your real check
 // (session cookie → owner lookup). Returning false denies the turn with a 403.
@@ -80,7 +99,9 @@ const authorize = (request: Request, sessionId: string): boolean =>
 
 export const handler = {
   async POST(ctx: { req: Request; params: { sessionId: string } }): Promise<Response> {
-    const target = { sessionId: ctx.params.sessionId } as const;
+    // Typed off the one route contract — the same object the island builds its URL from.
+    const { sessionId } = chatTurnRoute.parsePath(ctx.params);
+    const target = { sessionId } as const;
 
     // History so far, reduced through the SAME projection the island seeds from.
     const snapshot = await resolveChatSnapshot({ target });
@@ -123,6 +144,10 @@ const proxy = createNetScriptChatStreamProxy({
 
 export const handler = { GET: proxy, POST: proxy };
 ```
+
+{{ comp callout { type: "note", title: "Why a raw Request here, not a route contract" } }}
+This resolver is the one documented exception to NetScript's typed-route rule: <code>createNetScriptChatStreamProxy</code>'s <code>target</code> only ever receives the raw <code>Request</code>, so the session id is parsed from <code>req.url</code> by hand. Everywhere else you build a URL or read a path param, prefer a bound <a href="/reference/fresh/"><code>createRouteReference</code></a> contract so the pattern and its typed params come from one source of truth.
+{{ /comp }}
 
 {{ comp callout { type: "note", title: "Why a proxy at all?" } }}
 The proxy exists so the browser gets a durable stream <em>without</em> streams credentials. It attaches the <code>Authorization</code> header only on the server → streams hop (never echoed back), passes the body through unbuffered, and strips <code>content-encoding</code> / <code>content-length</code> — which stop describing the bytes once the stream is re-framed across the proxy. A client disconnect aborts the upstream fetch, so no stream is left dangling.
