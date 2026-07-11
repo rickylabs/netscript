@@ -59,3 +59,8 @@ Read `src/ports/retriever.ts` for the stable contract, then copy the constructor
 - Query embedding failures intentionally degrade to keyword-only results.
 - Reconcile: issue #270 remains open and in `status:plan`; no PR or issue mutation was authorized. The branch push is the required handoff.
 - No new or deepened architecture debt identified.
+
+## Commit and push
+
+- Implementation/evidence commit: `3bae03b9` (`feat(ai): prove hybrid retrieval with citation provenance`).
+- Push: PASS — `origin/feat/270-retriever-port` created at `3bae03b9`.
