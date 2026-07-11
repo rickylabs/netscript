@@ -6,30 +6,33 @@
 | --- | --- |
 | Run ID | `fix-602-agentic-host-agnostic--host-agnostic` |
 | Branch | `fix/602-agentic-host-agnostic` |
-| Current phase | `plan-eval` |
+| Current phase | `evaluate` |
 | Archetype | N/A — internal tooling |
 | Scope overlays | none |
 
 ## Current State
 
-Research, locked plan, and Design checkpoint were revised after the first PLAN-EVAL found two raw
-execution sites missed by the initial regex audit. Implementation remains blocked on PLAN-EVAL PASS.
+PLAN-EVAL cycle 2 passed. The single implementation slice is complete and all planned gates pass;
+the run is ready for separate-session IMPL-EVAL.
 
 ## Completed
 
 - Required skills, harness workflow, lane policy, plan gate, and full agentic README read.
 - Direct and shared `wsl.exe` call sites audited.
 - First PLAN-EVAL `FAIL_PLAN` received; all four required plan fixes applied.
+- PLAN-EVAL cycle 2 `PASS` recorded.
+- Host-aware plan, every execution consumer, pure tests, and README update implemented.
+- 209 tests plus scoped check/fmt and native-WSL dry-run pass; lockfile unchanged.
 
 ## In Progress
 
-- Commit/bootstrap the draft PR and obtain PLAN-EVAL.
+- Commit and push the supervisor-reviewed implementation slice.
 
 ## Next Steps
 
-1. Commit and push the revised plan artifacts with the explicit refspec.
-2. Request the second opposite-family PLAN-EVAL cycle.
-3. Implement only after PASS.
+1. Push with the explicit refspec and post implementation evidence to PR #614.
+2. Move the PR to `status:impl-eval`.
+3. Obtain separate opposite-family IMPL-EVAL and address any findings.
 
 ## Key Decisions
 
@@ -43,14 +46,16 @@ execution sites missed by the initial regex audit. Implementation remains blocke
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | NOT_RUN | blocked on PLAN-EVAL |
+| Static | PASS | 209 tests; scoped check/fmt clean |
 | Fitness | N/A | internal tooling |
-| Runtime | NOT_RUN | blocked on PLAN-EVAL |
-| Consumer | NOT_RUN | blocked on PLAN-EVAL |
+| Runtime | PASS | native-WSL dry-run with `WSL_EXE_ON_PATH=NONE` |
+| Consumer | PASS | exact Windows argv and Linux argv/cwd/mismatch tests |
 
 ## Drift and Debt
 
-- Drift: exact model suffix/effort unavailable; initial call-site regex missed streaming/stdin constructors and was corrected before implementation.
+- Drift: exact model suffix/effort unavailable; initial audit corrected before implementation;
+  requested nonexistent `status:in-progress` mapped to lifecycle-valid status; harness artifacts
+  accompany the `.llm/tools/**` product diff.
 - Debt: none.
 
 ## Commits

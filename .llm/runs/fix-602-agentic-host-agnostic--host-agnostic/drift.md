@@ -20,3 +20,26 @@
 - **Severity:** significant
 - **Action:** fix
 - **Evidence:** `plan-eval.md`, revised `research.md`, plan D1/D4/D5.
+
+## 2026-07-11 — Delivery metadata and harness artifacts
+
+- **What:** The requested `status:in-progress` label does not exist, and harness activation requires
+  committed `.llm/runs/**` artifacts in addition to the requested `.llm/tools/**` product diff.
+- **Source:** `.github/labels.yml`, `netscript-pr` lifecycle, and harness run-loop.
+- **Expected:** `status:in-progress`; diff described as `.llm/tools/**` only.
+- **Actual:** Lifecycle labels use `status:plan-eval` → `status:impl-eval`; product changes remain
+  `.llm/tools/**`, with required harness evidence under this run directory.
+- **Severity:** minor
+- **Action:** accept
+- **Evidence:** PR #614 labels and commit list.
+
+## 2026-07-11 — Linux identity permission edge
+
+- **What:** Under the requested `--allow-read --allow-run` invocation, Deno denies environment and
+  UID APIs, so current-user discovery falls back to argv-only `id -un` before plan construction.
+- **Source:** first native-WSL dry-run failure and focused permission probe.
+- **Expected:** Environment or UID lookup would identify the current user.
+- **Actual:** Both are permission-gated; `id -un` succeeds under existing `--allow-run`.
+- **Severity:** minor
+- **Action:** fix
+- **Evidence:** `resolveWslCommand`; final shim-free dry-run PASS.

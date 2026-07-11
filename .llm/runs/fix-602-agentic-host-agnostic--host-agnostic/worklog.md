@@ -52,7 +52,44 @@ pin host-specific argv in the adjacent unit test.
 | --- | --- | --- | --- |
 | 2026-07-11 | 1 | plan | Research and Design checkpoint complete; awaiting PLAN-EVAL. |
 | 2026-07-11 | 1 | plan revision | First PLAN-EVAL found streaming and stdin call sites missed by the initial audit; scope and D1 expanded before implementation. |
+| 2026-07-11 | 1 | plan gate | Separate Claude Opus cycle 2 returned `PASS`; implementation gate opened. |
+| 2026-07-11 | 1 | implement | Added the host plan and routed buffered, captured, streaming, stdin, and dry-run consumers through it. |
+| 2026-07-11 | 1 | gate | Full tests, scoped check/fmt, constructor audit, lock hygiene, and native-WSL dry-run passed. |
+| 2026-07-11 | 1 | slice review | Supervisor reviewed the full diff: Windows argv stays exact; Linux cwd/user semantics are explicit; brief, git-safety, route-identity, one-sender, LF, and token-stdin flows are unchanged. |
+
+### Post-slice reconcile
+
+- Issue #602 remains open and is closed by PR #614 via `Closes #602`; parent #601 is reference-only.
+- PR #614 carries `type:fix`, `area:cli`, `ci:skip-e2e`, beta.6 milestone, and one lifecycle status.
+- Requested `status:in-progress` is absent from `.github/labels.yml`; the lifecycle-valid status
+  advances from `status:plan-eval` to `status:impl-eval` for evaluation.
 
 ## Gate Results
 
-Not run before PLAN-EVAL.
+### Static Gates
+
+| Gate | Command or check | Result | Notes |
+| --- | --- | --- | --- |
+| Full unit suite | `deno test --no-lock -A .llm/tools/agentic/` | PASS | 209 passed, 0 failed |
+| Type check | scoped `run-deno-check.ts` | PASS | 89 files, 0 findings |
+| Format | scoped `run-deno-fmt.ts` | PASS | 89 files, 0 findings |
+| Raw constructor audit | search direct `wsl.exe` execution constructors | PASS | no matches outside shared plan construction |
+| Lock hygiene | `git diff -- deno.lock` | PASS | no output / unchanged |
+
+### Runtime Gates
+
+| Gate | Result | Evidence | Notes |
+| --- | --- | --- | --- |
+| Native WSL dry-run | PASS | `WSL_EXE_ON_PATH=NONE`; `DRY-RUN ok`; branch `fix/602-agentic-host-agnostic`, upstream `NONE`; rendered local `bash -lc` with worktree cwd | PATH excluded `/mnt/c` and scratch shim directories |
+
+### Consumer Gates
+
+| Consumer | Result | Evidence | Notes |
+| --- | --- | --- | --- |
+| Windows execution | PASS | pure tests assert exact legacy `wsl.exe` argv with and without `--cd` | no Windows process spawned |
+| Linux execution | PASS | pure tests + native dry-run | cwd maps to `Deno.Command.cwd`; mismatch diagnostic tested |
+
+## Handoff Notes
+
+- Inspect `buildWslCommand`/`resolveWslCommand` first, then verify every process consumer uses the plan.
+- Confirm the native-WSL proof exercises git safety with no `wsl.exe` available on PATH.

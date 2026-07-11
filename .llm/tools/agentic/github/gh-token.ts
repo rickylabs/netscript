@@ -30,7 +30,12 @@
  * 3 = stdin token did not validate.
  */
 
-import { resolveGithubToken, validateGithubToken, wslUser } from '../lib/agentic-lib.ts';
+import {
+  resolveGithubToken,
+  resolveWslCommand,
+  validateGithubToken,
+  wslUser,
+} from '../lib/agentic-lib.ts';
 
 type Sub = 'check' | 'store';
 
@@ -101,9 +106,11 @@ async function runWithStdin(
   cmd: string,
   args: string[],
   input: string,
+  opts: { cwd?: string } = {},
 ): Promise<{ ok: boolean; stderr: string }> {
   const child = new Deno.Command(cmd, {
     args,
+    cwd: opts.cwd,
     stdin: 'piped',
     stdout: 'null',
     stderr: 'piped',
@@ -157,14 +164,11 @@ async function doStore(o: Options): Promise<number> {
 
   // 2. WSL gh — `gh auth login --with-token` (gh keeps it fresh thereafter).
   if (!o.skipWsl) {
-    const r = await runWithStdin('wsl.exe', [
-      '-u',
+    const plan = await resolveWslCommand(
       o.wslUser,
-      '--',
-      'bash',
-      '-lc',
       'export PATH="$HOME/.local/bin:$PATH"; gh auth login --hostname github.com --with-token',
-    ], pat + '\n');
+    );
+    const r = await runWithStdin(plan.bin, plan.args, pat + '\n', { cwd: plan.cwd });
     if (r.ok) {
       results.push(`WSL gh (${o.wslUser}): logged in`);
     } else {
