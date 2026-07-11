@@ -77,6 +77,14 @@ export {
   withRetryingEmbeddingProvider,
 } from './src/application/provider-retry.ts';
 export type { AiRetryPolicy } from './src/application/provider-retry.ts';
+export type {
+  CitationProvenance,
+  CitationSpan,
+  RetrievalMatchKind,
+  RetrievalResult,
+  RetrieverPort,
+} from './src/ports/retriever.ts';
+export { RETRIEVAL_MATCH_KINDS } from './src/ports/retriever.ts';
 
 export type { ModelHandle, ModelRef } from './src/contracts/model.ts';
 export {

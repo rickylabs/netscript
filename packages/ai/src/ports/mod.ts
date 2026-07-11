@@ -27,3 +27,4 @@ export {
   withRetryingEmbeddingProvider,
 } from '../application/provider-retry.ts';
 export type { AiRetryPolicy } from '../application/provider-retry.ts';
+export * from './retriever.ts';
