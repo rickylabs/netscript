@@ -91,6 +91,11 @@ surface — read across a capability to see which backends it supports and how e
 one deliberate exception: the **PostgreSQL queue backend is explicit-provider only** — it is real
 and durable, but auto-detection never selects it (see the callout below).
 
+For contrast: BullMQ is a Redis-backed queue library, and Celery requires a message broker such
+as RabbitMQ or Redis — in both cases that infrastructure must be running before the first job
+enqueues. `createQueue()` starts on local Deno KV with nothing to provision, and the upgrade to
+Redis or RabbitMQ is an environment change, not a code change.
+
 {{ comp.apiTable({
   caption: "Adapter × capability — supported backends and how they are selected",
   rows: [
@@ -308,6 +313,14 @@ store holds the cursor, dedupe keys, or rate-limit counters that keep the whole 
 across restarts. None of these requires you to operate Redis, RabbitMQ, or PostgreSQL during
 development — the local Deno KV / in-memory adapters carry the same code until Aspire provisions
 the real backends (or until you opt in to the PostgreSQL queue explicitly).
+
+One failure mode worth designing out from the start: **keep queue payloads small — enqueue a
+reference, not the bytes**. A job that carries a raw file or image in its payload works right up
+until the payload outgrows the backend's message limits (Deno KV caps values at 64 KiB), and the
+enqueue itself starts failing. The durable shape is to enqueue a small identifier, store the
+bytes behind a service, and have the consumer fetch them back over a
+[typed service call](/services-sdk/sdk/) — the queue then only ever moves pointers, and the same
+payload works on every backend in the matrix above.
 
 {{ comp.apiTable({
   caption: "Picking the right primitive",

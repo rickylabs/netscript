@@ -8,6 +8,16 @@ next: { label: "KV, queues & cron", href: "/data-persistence/kv-queues-cron/" }
 
 # Database & Prisma
 
+A schema change is never just a schema change. Add one field to a model and three other
+things are now stale: the client types your services compile against, the runtime
+validation that guards your contract boundary, and the migration that has to reach the
+database before any of it works. Do those in separate tools and each one is a separate
+keep-in-sync step — and when an AI agent is writing the backend, each separate step is
+another turn where the pieces can drift apart. NetScript's answer is to make the
+`.prisma` file the single source: **one edit, one `netscript db generate`, and the
+Deno-runtime typed client and the matching zod schemas regenerate together**, with the
+migration created and applied by the same `netscript db` workflow.
+
 NetScript's persistence layer is **Prisma 7 over a driver adapter** (Postgres is the recommended engine,
 with MSSQL and MySQL adapters shipped alongside), generated for the Deno runtime and
 provisioned for you by **Aspire**. Every plugin contributes its own `.prisma` models, which
@@ -344,6 +354,25 @@ heavier <code>mssql</code> / native-Deno MySQL drivers. The MySQL driver itself 
 standalone <a href="/reference/prisma-adapter-mysql/"><code>@netscript/prisma-adapter-mysql</code></a>
 package.
 {{ /comp }}
+
+## How it compares
+
+Backend platforms answer the persistence question differently, and each answer is a real
+trade-off. **Convex** replaces the relational engine with its own reactive datastore and
+a TypeScript-declared schema; **Supabase** standardizes on hosted Postgres with a SQL
+schema. NetScript keeps the engine decision with you and makes the Prisma schema the
+contract everything else is generated from.
+
+| | NetScript | Convex | Supabase |
+|---|---|---|---|
+| Choice of relational engine (Postgres / MySQL / MSSQL / SQLite) | Yes — `--db` at scaffold time | No — Convex is its own datastore | No — Postgres |
+| Schema authored in Prisma files | Yes — aggregated per plugin | No — declared in TypeScript | No — SQL migrations |
+| Database runs in your own infrastructure by default | Yes — Aspire-provisioned container, or a server you point at | No — Convex Cloud by default (self-hosting available) | No — hosted Postgres by default (self-hosting available) |
+
+If your product wants a managed reactive datastore, those platforms are built for it. If
+your product needs to sit on a specific relational engine — an existing MSSQL estate, a
+Postgres you already operate, a file-backed SQLite for the desktop case — the driver
+adapters above are the mechanism that keeps your query code identical across all of them.
 
 ## Where to go next
 
