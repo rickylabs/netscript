@@ -98,6 +98,10 @@ and components:
   }
 ] }) }}
 
+Aspire injects `PORT` at runtime, so the entrypoint reads it from the environment; the typed source
+of truth is your `netscript.config.ts` `apps.<name>.port` field, which the scaffold wires as the
+fallback default — set the port there rather than editing this line.
+
 {{ comp callout { type: "note", title: "Two import roots, two jobs" } }}
 <code>@netscript/fresh</code> is the <strong>runtime meta-framework</strong>: it
 ships the app bootstrap (<code>/server</code>), route and page builders, and a typed

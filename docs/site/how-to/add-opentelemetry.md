@@ -195,6 +195,10 @@ app with the fluent builder and opts the RPC layer into trace context explicitly
   }
 ] }) }}
 
+Aspire injects `PORT` at runtime, so the entrypoint reads it from the environment; the typed source
+of truth is your `netscript.config.ts` `services.<name>.port` field, which the scaffold wires as the
+fallback default — set the port there rather than editing this line.
+
 {{ comp callout { type: "note", title: "traceparent is the join key" } }}
 NetScript follows the W3C Trace Context standard. When an inbound request carries a
 <code>traceparent</code> header, the service continues that trace instead of starting a new

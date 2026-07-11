@@ -126,6 +126,10 @@ two artifacts.
   }
 ] }) }}
 
+Aspire injects `PORT` at runtime, so the entrypoint reads it from the environment; the typed source
+of truth is your `netscript.config.ts` `services.<name>.port` field, which the scaffold wires as the
+fallback default — set the port there rather than editing this line.
+
 The `users` service listens on **port 3001** and exposes two parallel transports from the same
 contract: REST-shaped routes under `/api/v1/users/*` (driven by `oc.route({ method, path })`
 and surfaced in OpenAPI) and a typed RPC channel under `/api/rpc/v1/...` that the derived client
