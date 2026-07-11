@@ -462,12 +462,20 @@ function flattenMarkdown(text: string): string {
 }
 
 function truncate(text: string, max: number): string {
-  if (text.length <= max) {
+  // JSR's backend validates the description length in BYTES (Rust String::len),
+  // not UTF-16 units — multi-byte characters (em-dashes, accents) in a
+  // 250-JS-char string overflow the 250-byte cap with HTTP 400. Clamp by
+  // encoded byte length, then trim back to a word boundary.
+  const encoder = new TextEncoder();
+  if (encoder.encode(text).byteLength <= max) {
     return text;
   }
-  const slice = text.slice(0, max);
+  let slice = text;
+  while (slice.length > 0 && encoder.encode(slice).byteLength > max) {
+    slice = slice.slice(0, -1);
+  }
   const lastSpace = slice.lastIndexOf(' ');
-  const cut = lastSpace > max * 0.6 ? slice.slice(0, lastSpace) : slice;
+  const cut = lastSpace > slice.length * 0.6 ? slice.slice(0, lastSpace) : slice;
   return cut.replace(/[\s,;:.–-]+$/, '').trim();
 }
 
