@@ -58,6 +58,10 @@ await service.stop();
 - **Graceful lifecycle**: `onShutdown()` registers LIFO teardown hooks; `serve()` drains in-flight
   requests through `Deno.serve`'s shutdown, installs `SIGINT`/`SIGTERM` handlers, and accepts an
   external `AbortSignal`.
+- **First-party tracing**: the builder registers the `@netscript/telemetry/hono` tracing middleware
+  (wrapping Hono's first-party `@hono/otel` instrumentation) as the outermost middleware on every
+  service, so each request gets a server span with W3C propagation and the service name recorded —
+  no per-service wiring.
 - **Opt-in auth**: `@netscript/service/auth` ships provider-agnostic authentication and
   authorization ports plus static-credential, trusted-header, and scope-authorizer factories, kept
   off the import graph until a service uses it.
@@ -145,5 +149,5 @@ await running.stop();
 
 ## 📝 License
 
-Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
-cryptographically verified provenance.
+Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
+JSR with cryptographically verified provenance.

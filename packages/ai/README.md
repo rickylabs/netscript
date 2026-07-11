@@ -1,11 +1,21 @@
 # @netscript/ai
 
 Zero-dependency AI engine core for NetScript — domain contracts, capability ports, a model registry,
-and a composition root. This package is the foundation the AI stack builds on; it ships **no**
-concrete provider or behavior (those are the E2–E10 slices) and takes **no** `@netscript/*` runtime
-dependency.
+a bounded agent loop, a Standard-Schema tool system, an MCP client transport pool, and a composition
+root. The base entrypoint ships **no** concrete provider and takes **no** `@netscript/*` runtime
+dependency; providers and the MCP stack live on their own subpaths and enter the module graph only
+when imported.
 
 ## Install
+
+```bash
+# Deno (recommended)
+deno add jsr:@netscript/ai
+
+# Node.js / Bun
+npx jsr add @netscript/ai
+bunx jsr add @netscript/ai
+```
 
 ```ts
 import { createAiRuntime, getModel, registerModelProvider } from '@netscript/ai';
@@ -28,7 +38,8 @@ ai.telemetry.recordEvent('agent.start');
 // await ai.embeddings.embed({ model: 'x', input: 'hi' }); // AiNotConfiguredError
 ```
 
-Inject real ports (supplied by later slices or your app) via the config:
+Inject real ports via the config — for example a fake telemetry port in tests, or the real
+`@netscript/telemetry`-backed adapter in an app:
 
 ```ts
 import { createAiRuntime } from '@netscript/ai';
@@ -41,9 +52,9 @@ ai.telemetry.recordEvent('agent.finish', { ok: true });
 
 ## Model registry (self-registration)
 
-Provider packages (E2) register themselves as an import side effect, exactly like
-`@netscript/kv/redis` self-registers its adapter. Nothing in this core imports a provider, so no
-provider SDK enters the module graph until an app opts in.
+Provider packages register themselves as an import side effect, exactly like `@netscript/kv/redis`
+self-registers its adapter. Nothing in this core imports a provider, so no provider SDK enters the
+module graph until an app opts in.
 
 ```ts
 import { getModel, registerModelProvider } from '@netscript/ai';
@@ -61,8 +72,8 @@ const handle = await getModel('demo:some-model');
 
 ## Providers
 
-Two first-party providers ship as **self-registering subpaths**. Each wraps a TanStack AI client and
-implements the E1 `ModelProviderPort`. Importing a subpath runs a one-time side effect that
+First-party providers ship as **self-registering subpaths**. Each chat provider wraps a TanStack AI
+client and implements the `ModelProviderPort`. Importing a subpath runs a one-time side effect that
 registers its factory into the shared registry — no explicit wiring — then re-exports the provider
 class and its id/config for direct construction.
 
@@ -104,13 +115,27 @@ const provider = getModelProvider('openai-compatible', {
 const client = provider.createChatClient('deepseek-chat');
 ```
 
+### `@netscript/ai/openrouter` and `@netscript/ai/ollama`
+
+- `@netscript/ai/openrouter` — self-registering `OpenRouterModelProvider` for the OpenRouter
+  gateway, plus `openRouterReasoningModelOptions` for reasoning-model configuration.
+- `@netscript/ai/ollama` — self-registering `OllamaModelProvider` for local models, with an
+  injectable `ReachabilityPort` (`createHttpReachabilityPort` / `createAssumeReachablePort`) so
+  hosts can probe or skip endpoint availability checks.
+
+### `@netscript/ai/openai-embeddings`
+
+`OpenAiEmbeddingsProvider` implements the `EmbeddingProviderPort` against OpenAI-compatible
+embeddings endpoints and self-registers into the embeddings registry (`registerEmbeddingProvider` /
+`getEmbeddingProvider`).
+
 ### Stopping long-lived streams
 
 `createChatClient(modelId)` returns an owned `ChatClientPort` — **not** a raw TanStack adapter, so
 no provider-SDK type escapes the public surface. Its `stream(request, { signal })` method yields an
 owned `ChatClientEvent` union (`text` | `tool-call` | `finish` | `error`, where `finish` carries the
 real provider `Usage`). In-flight turns are cancelled by passing an `AbortSignal` — the port
-forwards it to the underlying TanStack `AbortController`, the documented stop path (F-13):
+forwards it to the underlying TanStack `AbortController`:
 
 ```ts
 const client = provider.createChatClient('claude-sonnet-4-5');
@@ -138,16 +163,16 @@ subprocess and asserts the registry contains **exactly** that one provider.
 ## Agent loop (`@netscript/ai/agent`)
 
 `createAgentLoop` drives a bounded, cancellable multi-turn conversation. It is programmed purely
-against the injected `ChatModelProviderPort` and `ToolRegistryPort` seams (A10) — importing this
-subpath pulls **no** provider SDK, so you choose a provider by importing e.g.
-`@netscript/ai/anthropic` separately.
+against the injected `ChatModelProviderPort` and `ToolRegistryPort` seams — importing this subpath
+pulls **no** provider SDK, so you choose a provider by importing e.g. `@netscript/ai/anthropic`
+separately.
 
 ```ts
 import { createAgentLoop, slidingWindowHistory } from '@netscript/ai/agent';
 
 const loop = createAgentLoop({
-  modelProvider, // a ChatModelProviderPort (E2)
-  tools, // a ToolRegistryPort (E4)
+  modelProvider, // a ChatModelProviderPort
+  tools, // a ToolRegistryPort
   history: slidingWindowHistory({ maxMessages: 12 }),
 });
 
@@ -181,9 +206,9 @@ current state.
 
 - **Bounded.** `maxSteps` (default 8) caps model turns; exceeding it emits an `error` chunk carrying
   `AgentMaxStepsExceededError` and settles in `errored`.
-- **Cancellable (F-13).** `options.signal` and `loop.stop()` are combined via `AbortSignal.any`; on
-  abort the loop stops streaming, emits a terminal `done` chunk, and settles in `aborted` — the
-  generator always returns, nothing leaks.
+- **Cancellable.** `options.signal` and `loop.stop()` are combined via `AbortSignal.any`; on abort
+  the loop stops streaming, emits a terminal `done` chunk, and settles in `aborted` — the generator
+  always returns, nothing leaks.
 - **Bounded context.** Each turn's history passes through the injected `HistoryStrategy` (default
   `slidingWindowHistory`, window 20), preserving leading system messages while trimming to the most
   recent turns.
@@ -192,6 +217,15 @@ current state.
 - **Owned tools.** Tool calls surfaced by the model are executed through the injected
   `ToolRegistryPort`; a missing handler yields an `error`-state `ToolResult` rather than throwing,
   and the loop resumes with the result appended.
+
+### Agent telemetry (injected `TelemetryPort`)
+
+The loop takes an optional `telemetry: TelemetryPort` dependency (default: no-op). When a real port
+is injected — e.g. the `@netscript/telemetry`-backed adapter — each run opens a per-run
+`gen_ai.chat` span, each model turn opens a per-turn `gen_ai.chat.turn` span, tool calls are
+recorded as `gen_ai.tool.call` events, and provider-reported usage lands on the spans. Attribute
+names follow the #402 telemetry convention (upstream `gen_ai.*` semconv keys; NetScript-owned keys
+under `netscript.*`). The core never imports `@netscript/telemetry` — the port is the seam.
 
 ## Tool system (`@netscript/ai/tools`)
 
@@ -227,13 +261,14 @@ await registry.dispatch('missing', {}); // throws ToolNotFoundError
 - `createToolRegistry(defs?)` — in-memory `AiToolRegistry` (a widened `ToolRegistryPort`):
   `register` / `has` / `get` / `list` / `resolveHandler` plus `define`, `getDefinition`,
   `listDefinitions`, and validated `dispatch`. A definition is bridged to the port `ToolHandler`, so
-  the agent loop drives E4 tools through the existing seam. Alternate registries (e.g. a future
-  MCP-backed one) substitute at the same seam.
+  the agent loop drives tools through the existing seam. Alternate registries substitute at the same
+  seam — the MCP registration below is one.
 
 ### `render_ui` wire contract
 
 `renderUiTool` is the built-in generative-UI tool **descriptor** — input schema + metadata only,
-**no renderer**. It is the wire contract the fresh-ui generative-UI slice consumes. Dispatching it
+**no renderer**. Its validated input type is `RenderUiToolInput`, the wire contract consumed by the
+`@netscript/fresh-ui` generative-UI renderer (`@netscript/fresh-ui/ai/render-ui`). Dispatching it
 validates the request and defers rendering downstream (`result.deferred === true`); the core ships
 no renderer and no fresh-ui dependency.
 
@@ -248,36 +283,81 @@ const result = await registry.dispatch('render_ui', {
 // result.deferred === true; result.input is the validated { component, props } envelope.
 ```
 
+## MCP client stack (`@netscript/ai/mcp`)
+
+The `./mcp` subpath is NetScript's **client-side** MCP surface: transport adapters, a multi-server
+**MCP client transport pool**, and tool-registry registration. It wraps the TanStack streamable-HTTP
+MCP connector (`@tanstack/ai-mcp`) behind owned transport ports, and enters the module graph only
+when imported.
+
+```ts
+import { createMcpTransportPool, registerMcpTools } from '@netscript/ai/mcp';
+import { createToolRegistry } from '@netscript/ai/tools';
+
+const pool = createMcpTransportPool({
+  servers: [{
+    kind: 'streamable-http',
+    serverId: 'search',
+    url: 'https://mcp.example.com',
+    auth: { mode: 'api-token', token: 'injected-at-runtime', scheme: 'Bearer' },
+  }],
+});
+
+const registry = createToolRegistry();
+await registerMcpTools(registry, pool);
+```
+
+- **Transports**: `StreamableHttpMcpTransport` (reconnectable, backoff-configurable via
+  `McpBackoffConfig`, injected auth modes) and `StdioMcpTransport`; `createMcpTransport` picks by
+  config kind.
+- **Pooling**: `createMcpTransportPool` / `McpTransportPool` manage connection lifecycle across
+  multiple MCP servers and dispatch pooled tool calls (`McpPooledToolResult`).
+- **Tool bridging**: `registerMcpTools` registers each remote MCP tool into a `ToolRegistryPort`, so
+  the agent loop calls MCP tools through the same seam as local ones.
+- **UI resources**: pooled tool results surface embedded `ui://` resources as `uiResources`
+  (`McpUiResource`, extracted via `extractMcpUiResources`) — the payload the fresh-ui `McpUiWidget`
+  island renders.
+
 ## Public surface
 
 | Verb / symbol                                             | Purpose                                              |
 | --------------------------------------------------------- | ---------------------------------------------------- |
-| `createAiRuntime(config)`                                 | Compose a runtime from injected ports (A10).         |
+| `createAiRuntime(config)`                                 | Compose a runtime from injected ports.               |
 | `getAiRuntime()` / `resetAiRuntime()`                     | `getKv()`-shaped process singleton + reset.          |
 | `registerModelProvider` / `getModelProvider` / `getModel` | Model registry: self-register + resolve.             |
 | `defineAiTool` / `createToolRegistry` / `renderUiTool`    | Tool system: define, register, dispatch (`./tools`). |
 | `createAgentLoop` / `slidingWindowHistory`                | Bounded, cancellable agent loop (`./agent`).         |
+| `createMcpTransportPool` / `registerMcpTools`             | MCP client transport pool + tool bridging (`./mcp`). |
 
 ### Subpath exports
 
 - `@netscript/ai` — composition root + model registry.
-- `@netscript/ai/contracts` — domain types (`Message`, `ToolDescriptor`, `Usage`, `AgentChunk`,
-  `RenderUiToolDescriptor`, …) and the typed error hierarchy.
-- `@netscript/ai/ports` — capability seams and their no-op/throwing defaults.
+- `@netscript/ai/contracts` — domain types (`Message`, `ToolDescriptor`, `Usage`,
+  `RenderUiToolDescriptor`, `UiResource`, …) and the typed error hierarchy.
+- `@netscript/ai/ports` — capability seams (including `TelemetryPort`, `AgentMemoryPort`,
+  `McpTransportPort`) and their no-op/throwing defaults.
 - `@netscript/ai/tools` — the tool system: `defineAiTool`, `createToolRegistry`, and the
-  `renderUiTool` wire contract (validates input via Standard Schema).
+  `renderUiTool` wire contract (`RenderUiToolInput`, validated via Standard Schema).
 - `@netscript/ai/agent` — the bounded, cancellable agent loop: `createAgentLoop`, the
   `slidingWindowHistory` strategy, the typestate/terminal vocabulary, and the
   `ChatModelProviderPort` / `ToolRegistryPort` seams it is injected with.
-- `@netscript/ai/testing` — deterministic fake ports for downstream unit tests.
+- `@netscript/ai/mcp` — MCP client transports, the transport pool, `ui://` resource extraction, and
+  tool-registry registration.
+- `@netscript/ai/testing` — deterministic fake ports (including `createFakeTelemetryPort`) for
+  downstream unit tests.
 - `@netscript/ai/anthropic` — self-registering Anthropic provider (wraps `@tanstack/ai-anthropic`);
   pulls the SDK only when imported.
 - `@netscript/ai/openai-compatible` — self-registering OpenAI-compatible provider (wraps
   `@tanstack/ai-openai`); pulls the SDK only when imported.
+- `@netscript/ai/openrouter` — self-registering OpenRouter provider.
+- `@netscript/ai/ollama` — self-registering Ollama provider with an injectable reachability port.
+- `@netscript/ai/openai-embeddings` — self-registering OpenAI-compatible embeddings provider.
 
 ## See also
 
 - `@netscript/kv` — the adapter self-registration + singleton pattern this package's model registry
   mirrors.
-- `@netscript/telemetry` — the real telemetry adapter injected as a `TelemetryPort` (slice E9);
-  never imported by this core.
+- `@netscript/telemetry` — the real telemetry adapter injected as a `TelemetryPort`; never imported
+  by this core.
+- `@netscript/fresh-ui` — consumes `RenderUiToolInput` in its safe generative-UI renderer and
+  renders MCP `ui://` resources via the `McpUiWidget` island.

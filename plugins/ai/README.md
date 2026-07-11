@@ -5,10 +5,10 @@ surface. Here _thin_ names a layering choice — the convention-bearing AI logic
 packages, not a reduced quality bar. This plugin is held to the same reference-plugin parity
 checklist as `workers` and `sagas` (verify harness, scaffolder golden tests, `plugin doctor`
 coverage, a `scaffold.runtime` e2e case, and an in-repo-exercised contract). The plugin ships no
-runtime AI logic: the engine lives in
-[`@netscript/ai`](jsr:@netscript/ai) and the durable-chat runtime in
-[`@netscript/fresh/ai`](jsr:@netscript/fresh). This package is a manifest, a connector, and a set of
-scaffolders that emit typesafe userland glue importing those installed dependencies directly.
+runtime AI logic: the engine lives in [`@netscript/ai`](jsr:@netscript/ai) and the durable-chat
+runtime in [`@netscript/fresh/ai`](jsr:@netscript/fresh). This package is a manifest, a connector,
+and a set of scaffolders that emit typesafe userland glue importing those installed dependencies
+directly.
 
 ## What it is
 
@@ -86,10 +86,20 @@ dependency, never a copy of framework source.
 The generated chat stream route threads the request's `AbortSignal` into the agent loop and exposes
 a `stop()` on the chat connection, so a client can cancel an in-flight generation mid-stream.
 
-## Deferred
+## Telemetry
 
-`--mcp` / skill-loader scaffolding is intentionally **not** included in this version (tracked in
-#290); it depends on a deferred core `SkillLoaderPort`.
+The scaffolded surface runs on `@netscript/ai`, whose agent loop records per-run and per-turn spans
+through an injected telemetry port when the app supplies one (e.g. the `@netscript/telemetry`
+adapter), following the #402 telemetry convention (`gen_ai.*` semconv keys, `netscript.*` for
+NetScript-owned attributes). This plugin scaffolds no telemetry wiring of its own.
+
+## MCP
+
+The MCP surface is **client-side**: `@netscript/ai/mcp` ships the MCP client transport pool
+(streamable-HTTP and stdio transports plus tool-registry bridging), which apps can wire into their
+scaffolded tool registry directly. This plugin does not scaffold any MCP server, and `--mcp` /
+skill-loader scaffolding is intentionally **not** included in this version (tracked in #290); it
+depends on a deferred core `SkillLoaderPort`.
 
 ## License
 

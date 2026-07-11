@@ -13,7 +13,7 @@ props.
 ```json
 {
   "imports": {
-    "@netscript/fresh": "jsr:@netscript/fresh@^0.0.1-alpha.0"
+    "@netscript/fresh": "jsr:@netscript/fresh"
   }
 }
 ```

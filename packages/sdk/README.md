@@ -28,7 +28,7 @@ Or pin it directly in your import map:
 ```json
 {
   "imports": {
-    "@netscript/sdk": "jsr:@netscript/sdk@^0.0.1-alpha.1"
+    "@netscript/sdk": "jsr:@netscript/sdk"
   }
 }
 ```
@@ -73,6 +73,10 @@ wires discovery, clients, and queries together. Drop to a focused subpath (`@net
   browser and island code server-first defaults, invalidation bridging, and KV-backed persistence.
 - **Composition preset**: `defineServices` assembles clients, query factories, and query utils from
   one service map, while focused subpaths keep narrow imports lean.
+- **Outbound RPC tracing**: service clients wrap each call in an oRPC CLIENT span and inject the W3C
+  `traceparent` header into the outgoing request, so client and server spans join one distributed
+  trace per the #402 telemetry convention (`netscript.*` vs semconv). The middleware type surface
+  lives on `@netscript/sdk/telemetry`.
 
 ---
 
@@ -89,5 +93,5 @@ wires discovery, clients, and queries together. Drop to a focused subpath (`@net
 
 ## 📝 License
 
-Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
-cryptographically verified provenance.
+Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
+JSR with cryptographically verified provenance.

@@ -124,6 +124,11 @@ mirrors — so the plugin IO can never diverge from the domain contract.
 - **Marketplace tooling** — reads the `describe` route's `AiCapabilities` document to introspect a
   running AI plugin without parsing source.
 
+This package carries no telemetry or MCP surface of its own: the AI runtime records spans and events
+through the telemetry port injected into `@netscript/ai` (per the #402 telemetry convention), and
+the MCP surface is **client-side** — the MCP client transport pool lives on `@netscript/ai/mcp`; no
+MCP server is part of this contract.
+
 ---
 
 ## 📖 Documentation
@@ -135,5 +140,5 @@ mirrors — so the plugin IO can never diverge from the domain contract.
 
 ## 📝 License
 
-Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
-cryptographically verified provenance.
+Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
+JSR with cryptographically verified provenance.
