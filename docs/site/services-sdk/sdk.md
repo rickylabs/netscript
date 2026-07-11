@@ -8,13 +8,16 @@ next: { label: "Polyglot tasks", href: "/background-processing/polyglot-tasks/" 
 
 # Typed SDK & client
 
+**Declare a contract action once and everything the caller needs — the typed method, the query
+key, the cache entry, the TanStack options — is derived from it, in one import.**
+
 The `@netscript/sdk` is the **typed client and data layer** for NetScript: it turns an
 [`@orpc/contract`](/explanation/contracts/) into a discovered, type-safe service client,
 wraps each contract action in a **cache-first query factory** (KV-backed SWR), and bridges
 those into [TanStack Query](https://tanstack.com/query) for islands. The contract object is
 the single source of truth — the *same* object the [service](/services-sdk/services/)
 implements is the one the client imports, so caller and server **cannot drift**.
-{{ comp.badge({ status: "alpha" }) }}
+{{ comp.badge({ status: "beta" }) }}
 
 {{ comp.diagram({
   src: "/assets/diagrams/sdk-data-flow.svg",
@@ -41,6 +44,30 @@ RPC; add <code>createQueryFactories</code> when you want KV-backed SWR and TanSt
 helpers; reach for <a href="/web-layer/">Fresh</a> when an island must
 hydrate that same query key on the client.
 {{ /comp }}
+
+## Declare once, derived everywhere
+
+The classic data-layer tax is the hand-rolled fetch wrapper: a `lib/api.ts` full of `fetch()`
+calls whose request and response types are re-typed by hand from whatever the server currently
+returns. Every server change costs a second edit in the wrapper, a third in the query keys, and
+whichever one is forgotten becomes a runtime bug. For an AI agent working the codebase the tax is
+worse — each of those copies is a separate turn, and a stale one is a wrong answer the agent
+cannot see until runtime.
+
+The SDK collapses those copies into one declaration. tRPC made this move famous for TypeScript
+APIs — declare a procedure on the server and the client's types follow, "end-to-end typesafe."
+NetScript keeps that declare-once property and shifts *where* the declaration
+lives: not inside server code, but in a standalone, versioned contract package that the server,
+the client, **and** the OpenAPI/Scalar surface all import. And the derivation goes further than
+method types — from one contract action the factory derives the server KV cache key (`key()`),
+the client TanStack key (`clientKey()`), the `queryOptions`/`mutationOptions` helpers, and the
+SWR cache reads. One edit to the contract updates the client, the docs surface, and the query
+layer together — there is no separate turn to keep them in sync.
+
+This is how eis-chat, the production app NetScript is dogfooded against, wires its dashboard:
+the typed client is built straight off the contract type, so a route added to the contract shows
+up on the client already typed. The mechanics of each layer are below; the type-flow theory is in
+[Contracts](/explanation/contracts/).
 
 ## Learn → / Do →
 
@@ -188,7 +215,7 @@ island receives hydrated state and a <code>clientKey()</code> for invalidation o
 <strong>client</strong> TanStack key (prefix-matchable). Invalidate on the client with
 <code>clientKey()</code> / <code>toClientKeyPrefix(...)</code> — passing a server
 <code>key()</code> to <code>invalidateQueries</code> will silently match nothing. NetScript is in
-alpha; subpath barrels are stable but signatures may still move.
+beta; subpath barrels are stable but signatures may still move.
 {{ /comp }}
 
 ## Reference →
