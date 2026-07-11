@@ -16,5 +16,15 @@
 - External evaluator dispatch owner-waived for this run (recorded as drift); supervisor still
   performs substantive opposite-family review per slice.
 
-## Status
-- Phase: bootstrap → research (gathering issue/PR/harness traces)
+## Status — FINAL (2026-07-11 ~04:30)
+
+**RELEASE-READY — awaiting owner publish go. Publish NOT executed.**
+
+- All milestone-8 issues resolved: #407(#568), #569(#571), #258(#594), #561+#564(#597),
+  #409(#598), #464(#600); epic #399 closed by hand (all T-handles landed).
+- Release gates green: scaffold.runtime 58/58 (local + CI), repo check green, tests 1782/0,
+  lint/fmt clean, publish:dry-run green. Promotion recommendation: main @ `76829704`.
+- Follow-ups filed: #599 (Flow-B product attribute-floor gaps), #601 pilot eval + #602–607 action
+  items. Plan-stage PR #548 closed as executed. Release-ready summary posted on #548.
+- Codex threads + worktrees in `codex-thread-ids.md`; worklogs merged with each slice branch.
+- Worktrees left in place: ns-wt-409-t8 (on release-gates-main), ns-wt-561-564, ns-wt-464.
