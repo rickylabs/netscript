@@ -3,7 +3,7 @@ layout: layouts/base.vto
 title: A verified shipping webhook
 templateEngine: [vento, md]
 prev: { label: "4 · Checkout saga", href: "/tutorials/storefront/04-checkout-saga/" }
-next: { label: "6 · Deploy", href: "/tutorials/storefront/06-deploy/" }
+next: { label: "6 · Storefront UI", href: "/tutorials/storefront/06-storefront-ui/" }
 ---
 
 # A verified shipping webhook
@@ -20,7 +20,8 @@ event straight to a background job. Triggers are how NetScript receives events f
   { label: "3 · Cart contracts", href: "/tutorials/storefront/03-cart-contracts/" },
   { label: "4 · Checkout saga", href: "/tutorials/storefront/04-checkout-saga/" },
   { label: "5 · Shipping webhook", href: "/tutorials/storefront/05-shipping-webhook/" },
-  { label: "6 · Deploy", href: "/tutorials/storefront/06-deploy/" }
+  { label: "6 · Storefront UI", href: "/tutorials/storefront/06-storefront-ui/" },
+  { label: "7 · Deploy", href: "/tutorials/storefront/07-deploy/" }
 ] }) }}
 
 ## What you will build
@@ -271,4 +272,4 @@ durable job.
 Your storefront now spans the full arc — catalog, cart, durable checkout, and a verified webhook from
 the outside world. The last chapter runs the whole thing as one orchestrated system on your machine.
 
-{{ comp.nextPrev({ prev: { label: "4 · Checkout saga", href: "/tutorials/storefront/04-checkout-saga/" }, next: { label: "6 · Deploy", href: "/tutorials/storefront/06-deploy/" } }) }}
+{{ comp.nextPrev({ prev: { label: "4 · Checkout saga", href: "/tutorials/storefront/04-checkout-saga/" }, next: { label: "6 · Storefront UI", href: "/tutorials/storefront/06-storefront-ui/" } }) }}

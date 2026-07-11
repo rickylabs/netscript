@@ -23,7 +23,8 @@ truth**.
   { label: "3 · Cart contracts", href: "/tutorials/storefront/03-cart-contracts/" },
   { label: "4 · Checkout saga", href: "/tutorials/storefront/04-checkout-saga/" },
   { label: "5 · Shipping webhook", href: "/tutorials/storefront/05-shipping-webhook/" },
-  { label: "6 · Deploy", href: "/tutorials/storefront/06-deploy/" }
+  { label: "6 · Storefront UI", href: "/tutorials/storefront/06-storefront-ui/" },
+  { label: "7 · Deploy", href: "/tutorials/storefront/07-deploy/" }
 ] }) }}
 
 ## What you will build
@@ -268,6 +269,15 @@ await defineService(router, {
   debug: true,
 });
 ```
+
+{{ comp callout { type: "note", title: "Where the port really comes from" } }}
+That <code>parseInt(Deno.env.get('PORT') || '3001')</code> is not the source of truth — it is the
+runtime read. Aspire <strong>injects</strong> <code>PORT</code> when it starts the service, and the
+typed <code>services.products.port</code> field in <code>netscript.config.ts</code> is what the
+scaffold uses to decide which port to inject. The <code>'3001'</code> fallback only applies when you
+run the entrypoint outside Aspire. So the env read stays (it is how the process receives its assigned
+port), but the number you would actually change lives in the typed config, not in this line.
+{{ /comp }}
 
 `defineService(router, { … })` is the one-shot form the scaffold uses, and what you will reach for
 99% of the time. NetScript also exposes a fluent `createService(router, { … })` builder when you need
