@@ -183,6 +183,32 @@ import each other. The heavy provider SDKs are scoped to their own subpath's mod
 This is enforced by `tests/provider_isolation_test.ts`, which imports a single subpath in a fresh
 subprocess and asserts the registry contains **exactly** that one provider.
 
+## System-prompt assembly
+
+`composeSystemPrompt` orders opaque, app-owned sections by ascending numeric `precedence`; ties
+retain contribution order. It drops whitespace-only content, trims retained blocks, and joins them
+with exactly one blank line (`\n\n`). Duplicate section names throw
+`DuplicatePromptSectionError`, including when one duplicate is blank.
+
+```ts
+import { composeSystemPrompt } from '@netscript/ai';
+
+const system = composeSystemPrompt([
+  { name: 'skills', precedence: 10, content: skillsSystemBlock },
+  { name: 'memory', precedence: 20, content: recalledMemory },
+  { name: 'catalog', precedence: 30, content: componentCatalog },
+  { name: 'app', precedence: 40, content: appInstructions },
+]);
+
+for await (const chunk of loop.run({ model, messages, system })) {
+  // consume chunks
+}
+```
+
+The framework owns only ordering and composition. Section names, precedence values, and content
+remain application or feature-slice policy. `new PromptAssembler(sections).compose()` provides the
+same contract as an immutable object seam.
+
 ## Agent loop (`@netscript/ai/agent`)
 
 `createAgentLoop` drives a bounded, cancellable multi-turn conversation. It is programmed purely
@@ -350,6 +376,7 @@ await registerMcpTools(registry, pool);
 | `registerModelProvider` / `getModelProvider` / `getModel` | Model registry: self-register + resolve.             |
 | `defineAiTool` / `createToolRegistry` / `renderUiTool`    | Tool system: define, register, dispatch (`./tools`). |
 | `createAgentLoop` / `slidingWindowHistory`                | Bounded, cancellable agent loop (`./agent`).         |
+| `composeSystemPrompt` / `PromptAssembler`                 | Ordered, named system-prompt composition.            |
 | `createMcpTransportPool` / `registerMcpTools`             | MCP client transport pool + tool bridging (`./mcp`). |
 
 ### Subpath exports

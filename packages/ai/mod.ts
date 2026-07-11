@@ -80,6 +80,13 @@ export type { AiRetryPolicy } from './src/application/provider-retry.ts';
 
 export type { ModelHandle, ModelRef } from './src/contracts/model.ts';
 export {
+  composeSystemPrompt,
+  DuplicatePromptSectionError,
+  PromptAssembler,
+  SYSTEM_PROMPT_SECTION_SEPARATOR,
+} from './src/contracts/prompt.ts';
+export type { PromptSection } from './src/contracts/prompt.ts';
+export {
   AiError,
   AiNotConfiguredError,
   AiRateLimitError,
