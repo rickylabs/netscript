@@ -60,7 +60,6 @@ export function createMaintainerInitCommand(
     .option('--service-port <port:number>', 'Example service port')
     .option('--editor <editor:string>', `Editor config (${EDITOR_CHOICES.join(' | ')})`)
     .option('--no-aspire', 'Skip Aspire orchestration layer')
-    .option('--legacy-aspire', 'Generate legacy C# AppHost', { default: false })
     .option('--no-git', 'Skip git init after scaffolding')
     .option('--force', 'Overwrite existing target directory', { default: false })
     .option('--ci', 'Non-interactive mode', { default: false })
@@ -95,7 +94,6 @@ export function createMaintainerInitCommand(
         from: options.from,
         noGit: options.git === false,
         noAspire: options.aspire === false,
-        legacyAspire: options.legacyAspire ?? false,
         dbEngine: parseDbEngine(options.db),
         includeExampleService: includeService,
         serviceName: options.serviceName,

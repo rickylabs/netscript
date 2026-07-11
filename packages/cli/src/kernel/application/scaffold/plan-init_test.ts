@@ -32,7 +32,6 @@ function options(
     dryRun: false,
     noGit: true,
     noAspire: false,
-    legacyAspire: false,
     dbEngine: 'none',
     cache: true,
     cacheBackend: 'redis',

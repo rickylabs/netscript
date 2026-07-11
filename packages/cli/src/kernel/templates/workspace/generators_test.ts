@@ -211,7 +211,6 @@ Deno.test('generateReadme — TS AppHost with service + postgres', () => {
     name: 'alpha-app',
     appName: 'dashboard',
     noAspire: false,
-    legacyAspire: false,
     serviceName: 'users',
     dbEngine: 'postgres',
   });
@@ -267,36 +266,11 @@ Deno.test('generateReadme — TS AppHost with service + postgres', () => {
   );
 });
 
-Deno.test('generateReadme — legacy C# AppHost', () => {
-  const md = generateReadme({
-    name: 'legacy-app',
-    appName: 'dashboard',
-    noAspire: false,
-    legacyAspire: true,
-    dbEngine: 'none',
-  });
-  assertStringIncludes(md, 'dotnet run --project dotnet/AppHost');
-  assertStringIncludes(md, 'dotnet/');
-  assert(
-    !md.includes('aspire run'),
-    'legacy README should not mention aspire run',
-  );
-  assert(
-    !md.includes('services/'),
-    'README should omit services section when no service',
-  );
-  assert(
-    !md.includes('## Database'),
-    'README should omit database section when dbEngine=none',
-  );
-});
-
 Deno.test('generateReadme — no aspire points at app dev task', () => {
   const md = generateReadme({
     name: 'no-aspire-app',
     appName: 'dashboard',
     noAspire: true,
-    legacyAspire: false,
     dbEngine: 'none',
   });
   assertStringIncludes(md, 'deno task --cwd apps/dashboard dev');
@@ -323,7 +297,6 @@ Deno.test('generateReadme — no aspire postgres asks for self-provisioning', ()
     name: 'no-aspire-app',
     appName: 'dashboard',
     noAspire: true,
-    legacyAspire: false,
     dbEngine: 'postgres',
   });
   assertStringIncludes(md, 'Primary database: **PostgreSQL**.');
@@ -341,7 +314,6 @@ Deno.test('generateReadme — sqlite gets non-persistent note', () => {
     name: 'sqlite-app',
     appName: 'dashboard',
     noAspire: false,
-    legacyAspire: false,
     dbEngine: 'sqlite',
   });
   assertStringIncludes(md, 'SQLite');
@@ -353,7 +325,6 @@ Deno.test('generateReadme — mysql gets persistent-container note', () => {
     name: 'mysql-app',
     appName: 'dashboard',
     noAspire: false,
-    legacyAspire: false,
     dbEngine: 'mysql',
   });
   assertStringIncludes(md, 'MySQL');

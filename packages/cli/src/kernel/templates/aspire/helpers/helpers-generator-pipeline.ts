@@ -121,7 +121,7 @@ export class HelpersGeneratorPipeline {
       files.push(
         await this.renderAppHost(
           configPath ??
-            `${SCAFFOLD_DIRS.DOTNET}/${SCAFFOLD_DIRS.APPHOST}/${SCAFFOLD_FILES.APPSETTINGS}`,
+            `../${SCAFFOLD_FILES.APPSETTINGS}`,
           templates,
         ),
       );

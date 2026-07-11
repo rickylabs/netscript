@@ -46,9 +46,7 @@ export async function runInitPipeline(
     phases.push(await scaffoldPackagesLocal(context, validated));
 
     phases.push(await scaffoldAspire(context, validated));
-    if (!validated.noAspire && validated.legacyAspire) {
-      human(options.quiet, 'Aspire orchestration (C# AppHost, ServiceDefaults, configs)');
-    } else if (!validated.noAspire) {
+    if (!validated.noAspire) {
       human(options.quiet, 'Aspire orchestration (TypeScript AppHost, .helpers/, package.json)');
     }
 

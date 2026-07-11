@@ -80,7 +80,6 @@ export function createInitCommand(
     )
     .option('--editor <editor:string>', `Editor config (${EDITOR_CHOICES.join(' | ')})`)
     .option('--no-aspire', 'Skip Aspire orchestration layer')
-    .option('--legacy-aspire', 'Generate legacy C# AppHost', { default: false })
     .option('--no-git', 'Skip git init after scaffolding')
     .option('--force', 'Overwrite existing target directory', { default: false })
     .option('--ci', 'Non-interactive mode', { default: false })
@@ -127,7 +126,6 @@ export function createInitCommand(
         from: resolvedOptions.from,
         noGit: resolvedOptions.git === false,
         noAspire: resolvedOptions.aspire === false,
-        legacyAspire: resolvedOptions.legacyAspire ?? false,
         dbEngine: dbEngine(resolvedOptions.db),
         cache: resolvedOptions.cache,
         cacheBackend: cacheBackend(resolvedOptions.cacheBackend),

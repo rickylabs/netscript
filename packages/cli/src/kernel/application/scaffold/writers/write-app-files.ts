@@ -25,7 +25,7 @@ export async function writeNormalizedAppFiles(
   filesSkipped: string[],
   directoriesCreated: string[],
 ): Promise<void> {
-  const appPort = options.legacyAspire ? PORT_RANGES.APP.start : PORT_RANGES.APP.start + 10;
+  const appPort = PORT_RANGES.APP.start + 10;
   const plan = createScaffoldPlan(options, {
     useWorkspacePackages: context.packagesAsWorkspaceMembers(options),
   });

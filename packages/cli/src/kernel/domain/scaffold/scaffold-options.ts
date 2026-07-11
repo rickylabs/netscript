@@ -58,9 +58,6 @@ export interface InitOptions {
   /** Skip Aspire orchestration layer. */
   readonly noAspire: boolean;
 
-  /** Generate legacy C# AppHost instead of TypeScript-only AppHost. */
-  readonly legacyAspire: boolean;
-
   /** Database engine to scaffold. */
   readonly dbEngine?: DbEngineChoice;
 
@@ -94,7 +91,6 @@ export interface ValidatedInitOptions extends
       | 'dryRun'
       | 'noGit'
       | 'noAspire'
-      | 'legacyAspire'
     >
   > {
   /** Validated application name. */

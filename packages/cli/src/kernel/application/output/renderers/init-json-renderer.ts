@@ -43,7 +43,6 @@ export function renderInitJson(
     plugins: [],
     aspire: {
       enabled: !options.noAspire,
-      legacy: options.legacyAspire,
       resourceCount: aspireResourceCount(options),
     },
     nextSteps: initNextSteps(options),

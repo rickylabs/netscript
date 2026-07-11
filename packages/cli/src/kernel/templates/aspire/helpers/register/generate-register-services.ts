@@ -87,9 +87,9 @@ export function generateRegisterServices(options: RegisterServicesOptions): stri
       `    await resource.withOtlpExporter({ protocol: OtlpProtocol.HttpProtobuf });`,
     );
 
-    // Database dependency — all services wait for primary DB (C# parity)
+    // Database dependency — all services wait for the primary database.
     lines.push(``);
-    lines.push(`    // Database dependency — all services wait for primary DB (C# parity)`);
+    lines.push(`    // Database dependency — all services wait for the primary database.`);
     lines.push(`    if (infrastructure.primaryDatabase) {`);
     lines.push(
       `      let databaseBinding = resource.withEnvironment('DATABASE_URL', infrastructure.primaryDatabase);`,

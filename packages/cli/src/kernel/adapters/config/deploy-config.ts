@@ -6,7 +6,7 @@ import { outputWarning } from '../../presentation/output/default-output.ts';
  *
  * Merges three configuration sources into a single ResolvedConfig:
  * 1. netscript.config.ts — service definitions (Zod-validated via @netscript/config)
- * 2. dotnet/AppHost/appsettings.json — runtime config from Aspire (services, plugins, infra)
+ * 2. appsettings.json — runtime config from Aspire (services, plugins, infra)
  * 3. .deploy/windows/config/runtime/*.json — hot-reload overrides (optional)
  *
  * Environment variables (.env.local / .env) are consumed transparently via

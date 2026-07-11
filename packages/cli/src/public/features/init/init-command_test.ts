@@ -35,7 +35,6 @@ Deno.test('init defaults cache on with redis backend in non-interactive mode', a
     dryRun: true,
     noGit: true,
     noAspire: false,
-    legacyAspire: false,
   });
 
   assertEquals(validated.cache, true);
@@ -53,7 +52,6 @@ Deno.test('init derives Prisma model name from service name', async () => {
     dryRun: true,
     noGit: true,
     noAspire: false,
-    legacyAspire: false,
     dbEngine: 'postgres',
     includeExampleService: true,
     serviceName: 'products',
@@ -73,7 +71,6 @@ Deno.test('init accepts validated Prisma model name override', async () => {
     dryRun: true,
     noGit: true,
     noAspire: false,
-    legacyAspire: false,
     dbEngine: 'postgres',
     includeExampleService: true,
     serviceName: 'products',
@@ -95,7 +92,6 @@ Deno.test('init rejects invalid Prisma model name override', async () => {
         dryRun: true,
         noGit: true,
         noAspire: false,
-        legacyAspire: false,
         dbEngine: 'postgres',
         includeExampleService: true,
         serviceName: 'products',

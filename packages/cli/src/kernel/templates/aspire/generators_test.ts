@@ -62,7 +62,7 @@ describe('generateAspireConfig', () => {
   it('should produce valid JSON with appHostPath', () => {
     const output = generateAspireConfig()
     const config = JSON.parse(output)
-    assertEquals(config.appHostPath, 'dotnet/AppHost')
+    assertEquals(config.appHostPath, 'aspire/apphost.mts')
   })
 
   it('should accept custom appHostPath', () => {
