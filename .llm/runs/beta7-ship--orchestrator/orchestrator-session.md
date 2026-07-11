@@ -107,3 +107,13 @@ Plan recorded on #301.
 10 overnight, stop at the beta.8 release-cut PR ready to merge (no merge/publish); lane rules
 (no Fable swarms; Opus 4.8 high docs / low-med workflows; Codex impl) + predecessor gotcha list
 embedded. Prompt archived at the beta-8 launch (job tmp beta8-prompt.md) and in this run dir.
+
+## SECOND HANDOFF (2026-07-12 ~00:50 local)
+
+Dashboard-design orchestrator launched: session `0e4ec217` (`claude attach 0e4ec217`), Fable 5
+medium, bypassPermissions, RC `ns-dashboard-design`. Analysis-only harness run on the beta.10 dev
+dashboard: prototype sync+screenshots (Claude Design project 4c19e768), routing resort grounded in
+both reference apps, beta.10 cross-coverage, GLM-5.2 OpenRouter design pass, Codex Sol-max
+adversarial UX/DX pass, Fable-low dynamic-plugin-system delegation; umbrella PR
+`design/dev-dashboard-revamp` (nothing merges to main); deliverable = multiple Claude-Design
+revamp prompts. Prompt archived as dashboard-launch-prompt.md in this run dir.
