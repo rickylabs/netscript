@@ -16,6 +16,15 @@ builder, persisted to a durable store, and served by the **sagas plugin** on por
 `:8092`. The model is closer to Temporal than to a job queue, but it lives in plain
 TypeScript inside your workspace — no separate cluster to operate.
 
+The stakes are easiest to see in the [storefront checkout saga](/tutorials/storefront/04-checkout-saga/):
+a payment is captured, fulfillment fails afterward, and the process restarts in between. Money has
+moved; the code that knew why is gone. A saga makes that in-between state durable and gives the undo
+— the refund — a declared place to live, so recovery is a matter of reading state, not
+reconstructing intent. And because the definition *is* data (typed state, enumerable handlers,
+enumerable compensations), the workflow is legible to more than the runtime: a coding agent asked to
+add a step can read the whole lifecycle from the builder chain, and verify the result against the
+`:8092` instances API instead of guessing.
+
 {{ comp.diagram({
   src: "/assets/diagrams/saga-state-machine.svg",
   alt: "Saga state machine: an event advances the saga through typed states, a compensation branch unwinds a failed step, and every transition checkpoints to a kv or prisma store.",
@@ -275,7 +284,7 @@ await notifications.listen(async (message) => {
 <code>createParallelQueue({ concurrency })</code> tunes how many <em>queue</em> messages a
 listener processes at once. <code>defineSaga().concurrency({ limit, key })</code> bounds
 how many messages run against one <em>saga instance</em> (or per derived key) — overlapping
-publishes for the same key are rejected. Use the queue knob for fan-out throughput; use the
+publishes for the same key are rejected. Use the queue knob for parallel fan-out; use the
 builder knob to serialize work on a single business entity (one order, one tenant).
 {{ /comp }}
 
@@ -471,6 +480,28 @@ handler; emit a <code>send(...)</code> effect and let the target do the work. Co
 follows the same rule — its undo runs in the <code>.compensate()</code> handler as more
 effects, not as inline cleanup.
 {{ /comp }}
+
+## Recovery models, compared
+
+Durable-workflow engines agree on the goal — a multi-step process that survives a crash — and
+differ on **what the author must keep deterministic** to get it. That difference is where the
+authoring models diverge, so it is the one comparison worth making precisely.
+
+{{ comp.apiTable({
+  caption: "How three durable-workflow models recover from a crash",
+  rows: [
+    { name: "Temporal", type: "replay-based", desc: "Workflow code is re-executed against its recorded event history on recovery, so it must stay deterministic: I/O, time, and randomness move into activities, and a non-deterministic code change surfaces as a replay error." },
+    { name: "Inngest", type: "step memoization", desc: "step.run results are memoized per run; code between steps re-executes on each invocation, so side effects belong inside steps — a convention the author maintains." },
+    { name: "NetScript sagas", type: "checkpointed state machine", desc: "The runtime persists typed state between messages and resumes from that checkpoint. A SagaHandler is synchronous and returns effects, so I/O cannot appear in the recovery path by construction — the constraint is the handler's type, not a convention." }
+  ]
+}) }}
+
+The trade NetScript makes is explicitness: you model the state machine yourself — states, handlers,
+compensations — rather than writing linear code an engine replays. What you get back is that the
+determinism requirement never depends on discipline. The handler signature rejects `async`, effects
+are the only side-effect channel, and the whole lifecycle is named outcomes returned as data — which
+is also what keeps a saga reviewable when the author of the next handler is an agent working from
+the definition alone.
 
 ## Why a saga, and why not
 
