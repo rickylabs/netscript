@@ -52,11 +52,17 @@ Edit the pure path predicates and add a table-style regression in `ci-classify-c
 | --- | --- | --- | --- |
 | 2026-07-11 | 1 | research/plan | Re-baselined at `origin/main`; awaiting separate PLAN-EVAL. |
 | 2026-07-11 | 1 | PLAN-EVAL | Separate Claude Opus evaluator returned `PASS`; implementation unlocked. |
+| 2026-07-11 | 2 | implementation | Global Markdown/MDX precedence added after critical-path guard; rename parsing preserved. |
+| 2026-07-11 | 2 | gates | 30 classifier tests, scoped check, and scoped format check passed. |
+| 2026-07-11 | 2 | reconcile | Issue #611 remains open; PR #613 has `Closes #611`, parent/motivating refs, beta.7 milestone, and `status:plan-eval` pending phase transition. No new comments required readjustment. |
 
 ## Gate Results
 
 - PLAN-EVAL — `PASS`; see `plan-eval.md`.
+- Classifier tests — `PASS` (30 passed, 0 failed).
+- Scoped check (`.github/scripts`, TS/TSX) — `PASS` (2 files, 0 findings).
+- Scoped format check (`.github/scripts`, TS/TSX) — `PASS` (2 files, 0 findings).
 
 ## Handoff Notes
 
-- PLAN-EVAL should scrutinize Markdown precedence versus explicit workflow/Deno critical paths and the rename-old-path behavior.
+- IMPL-EVAL should scrutinize Markdown precedence versus explicit workflow/Deno critical paths and the rename-old-path behavior.

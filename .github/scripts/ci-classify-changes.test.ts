@@ -47,6 +47,16 @@ Deno.test('parseNameStatus: docs-to-docs rename stays docs-only', () => {
   assertEquals(d.runRuntime, false);
 });
 
+Deno.test('rename of a Markdown file under packages stays docs-only', () => {
+  const files = parseNameStatus(
+    'R100\tpackages/cli/OLD_README.md\tpackages/cli/README.md',
+  );
+  const d = decide({ eventName: 'pull_request', files, labels: [] });
+  assertEquals(d.docsOnly, true);
+  assertEquals(d.runStatic, false);
+  assertEquals(d.runRuntime, false);
+});
+
 Deno.test('parseNameStatus: unrecognisable line degrades to a bare path (forces run)', () => {
   const files = parseNameStatus('something-weird-without-tab');
   assertEquals(files, ['something-weird-without-tab']);
@@ -105,11 +115,14 @@ Deno.test('docs surfaces are docs-only', () => {
   }
 });
 
-Deno.test('denylist wins over the markdown allowlist', () => {
-  // Markdown under an impacting prefix must NOT be docs-only.
-  assertEquals(isDocsOnlyPath('packages/cli/README.md'), false);
-  assertEquals(isDocsOnlyPath('plugins/workers/CHANGELOG.md'), false);
-  assertEquals(isDocsOnlyPath('apps/demo/README.md'), false);
+Deno.test('Markdown is docs-only under ordinary impacting directories', () => {
+  assertEquals(isDocsOnlyPath('packages/cli/README.md'), true);
+  assertEquals(isDocsOnlyPath('plugins/workers/CHANGELOG.md'), true);
+  assertEquals(isDocsOnlyPath('apps/demo/README.mdx'), true);
+});
+
+Deno.test('critical workflow paths win over the markdown allowlist', () => {
+  assertEquals(isDocsOnlyPath('.github/workflows/README.md'), false);
 });
 
 Deno.test('impacting surfaces force the gate', () => {
@@ -146,6 +159,39 @@ Deno.test('decide: docs-only PR skips both jobs', () => {
   assertEquals(d.docsOnly, true);
   assertEquals(d.runStatic, false);
   assertEquals(d.runRuntime, false);
+});
+
+Deno.test('decide: Markdown-only diff under packages is docs-only', () => {
+  const d = decide({
+    eventName: 'pull_request',
+    files: ['packages/cli/README.md', 'packages/sdk/guides/setup.mdx'],
+    labels: [],
+  });
+  assertEquals(d.docsOnly, true);
+  assertEquals(d.runStatic, false);
+  assertEquals(d.runRuntime, false);
+});
+
+Deno.test('decide: Markdown plus one TypeScript file is full', () => {
+  const d = decide({
+    eventName: 'pull_request',
+    files: ['packages/cli/README.md', 'packages/cli/mod.ts'],
+    labels: [],
+  });
+  assertEquals(d.docsOnly, false);
+  assertEquals(d.runStatic, true);
+  assertEquals(d.runRuntime, true);
+});
+
+Deno.test('decide: Markdown plus deno.lock is full', () => {
+  const d = decide({
+    eventName: 'pull_request',
+    files: ['packages/cli/README.md', 'deno.lock'],
+    labels: [],
+  });
+  assertEquals(d.docsOnly, false);
+  assertEquals(d.runStatic, true);
+  assertEquals(d.runRuntime, true);
 });
 
 Deno.test('decide: one code file forces both jobs', () => {
