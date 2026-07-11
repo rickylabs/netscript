@@ -143,6 +143,59 @@ becomes `{ items: [{ productId: "value" }] }`), so nested values arrive in the s
 schema expects. `normalizeFormValues` recursively converts empty strings to `undefined`
 before validation runs.
 
+## Posting the validated payload through a typed mutation
+
+Validation gives you a typed `result.data`; the write that follows should be typed
+too. Instead of a hand-written `fetch`, run the mutation through the same
+[typed SDK client](/services-sdk/sdk/) the rest of the app uses — the contract that
+typed the form's schema is the contract that types the write, so the two cannot
+drift. On the server, the handler calls the typed client directly with the
+validated data:
+
+```ts
+// apps/dashboard/routes/contact.ts (handler excerpt)
+import { contactsClient } from "../lib/api-clients.ts";
+
+// `result.data` is the contract-typed ContactValues from adapter.safeParse.
+const created = await contactsClient.create(result.data);
+// Redirect to the new record; the id is inferred from the contract output.
+return Response.redirect(`/contact/${created.id}`, 303);
+```
+
+When the form is progressively enhanced with an island, drive the identical
+contract write from the client with `useIslandMutation` and the query utils'
+`mutationOptions()` — the mirror of the read path in
+[Data loading and the query cache](/web-layer/query/). The validated values become
+the typed mutation input:
+
+```tsx
+// apps/dashboard/islands/ContactFormIsland.tsx
+import { useIslandMutation } from "@netscript/fresh/query";
+import { contacts } from "../lib/api-clients.ts";
+
+interface ContactValues {
+  email: string;
+  message: string;
+}
+
+function useContactSubmit(onDone: () => void) {
+  // mutationOptions() supplies the contract-bound mutationFn + mutationKey.
+  return useIslandMutation({
+    ...contacts.create.mutationOptions(),
+    onSuccess: onDone,
+  });
+}
+
+// After client-side validation succeeds, post the typed payload:
+//   submit.mutate(validated); // validated: ContactValues, checked at compile time
+export { useContactSubmit, type ContactValues };
+```
+
+`contacts` is one entry in the single `lib/api-clients.ts` module described in the
+[query cache page](/web-layer/query/): `createServiceClient` → `createServiceQueryUtils`.
+Either path — server handler or enhanced island — writes through the contract, so
+the form's read schema and its write can never fall out of sync.
+
 ## CSRF protection
 
 The form surface carries a CSRF token between the GET that renders the form and the POST
