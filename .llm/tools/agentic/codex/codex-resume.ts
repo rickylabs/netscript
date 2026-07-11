@@ -22,7 +22,15 @@
  * Exit codes: 0 = ok / dry-run clean · 1 = resume failed · 2 = usage error.
  */
 
-import { requireValue, sq, UUID, wsl, wslUser } from '../lib/agentic-lib.ts';
+import {
+  renderCommandPlan,
+  requireValue,
+  resolveWslCommand,
+  sq,
+  UUID,
+  wsl,
+  wslUser,
+} from '../lib/agentic-lib.ts';
 
 interface Options {
   threadId?: string;
@@ -140,6 +148,7 @@ async function main(): Promise<void> {
     }`;
 
   if (o.dryRun) {
+    const plan = await resolveWslCommand(o.user, script);
     console.log(
       JSON.stringify({
         mode: 'dry-run',
@@ -147,7 +156,7 @@ async function main(): Promise<void> {
         threadId: o.threadId,
         worktree: o.worktree ?? null,
         messageBytes: new TextEncoder().encode(message).length,
-        command: `wsl.exe -u ${o.user} -- bash -lc ${JSON.stringify(script)}`,
+        command: renderCommandPlan(plan),
       }),
     );
     Deno.exit(0);

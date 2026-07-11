@@ -44,7 +44,9 @@ import {
   type CommandResult,
   evaluateGitSafety,
   parseThreadInfo,
+  renderCommandPlan,
   requireValue,
+  resolveWslCommand,
   sq,
   type ThreadInfo,
   validateHandoffContract,
@@ -340,9 +342,8 @@ async function main(): Promise<void> {
   const profileScript = `export PATH="$HOME/.local/bin:$PATH"${home}; msg="$(cat ${
     sq(dest)
   })"; codex ${profileFlags} ${routeFlags} debug app-server send-message-v2 "$msg"`;
-  const launchCommand = `wsl.exe -u ${o.user} --cd ${o.worktree} -- bash -lc ${
-    JSON.stringify(profileScript)
-  }`;
+  const commandPlan = await resolveWslCommand(o.user, profileScript, { cwd: o.worktree });
+  const launchCommand = renderCommandPlan(commandPlan);
   const launchPlan = {
     brief: o.brief,
     worktree: o.worktree,
@@ -413,17 +414,9 @@ async function main(): Promise<void> {
   }
 
   // 4b) Launch: stream the turn, record thread id as soon as thread/start lands.
-  const child = new Deno.Command('wsl.exe', {
-    args: [
-      '-u',
-      o.user,
-      '--cd',
-      o.worktree,
-      '--',
-      'bash',
-      '-lc',
-      profileScript,
-    ],
+  const child = new Deno.Command(commandPlan.bin, {
+    args: commandPlan.args,
+    cwd: commandPlan.cwd,
     stdout: 'piped',
     stderr: 'inherit',
   }).spawn();

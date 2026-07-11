@@ -311,9 +311,9 @@ OK claude hook lock check: deno.lock unchanged after 3 hook runs
 The primitives in `lib/agentic-lib.ts` exist so each landmine is encoded once and pinned by a test.
 The invariants worth internalizing:
 
-- **No shell parses agent input.** Every WSL call goes through `wsl(user, script)` →
-  `Deno.Command("wsl.exe", ["-u", user, "--", "bash", "-lc", script])`. An argv array means
-  PowerShell never sees `<`, `>`, or `$(...)`.
+- **No shell parses agent input.** Every WSL-targeted call consumes the shared command plan: Windows
+  uses `Deno.Command("wsl.exe", ["-u", user, "--", "bash", "-lc", script])`, while Linux invokes
+  `bash -lc` locally. Both are argv arrays, so PowerShell never sees `<`, `>`, or `$(...)`.
 - **LF, always.** Deno writes LF and staging strips `\r`; a trailing `\r` under `bash -lc` silently
   breaks `cd` and redirects.
 - **Tokens never touch disk or argv.** A PAT is read from an in-process env var and used only as an
@@ -362,6 +362,11 @@ Reads are permission-guarded — a tool without `--allow-env` simply falls back.
 
 The `wslUser()` / `wslHome()` helpers in `lib/agentic-lib.ts` are the single source of truth;
 per-tool `--user` flags still override at call time.
+
+WSL-targeted commands are host-agnostic: on Windows the shared plan preserves the historical
+`wsl.exe -u <user> [--cd <dir>] -- bash -lc <script>` argv, while on Linux/WSL it runs
+`bash -lc <script>` locally and maps `--cd` to the process cwd. Local execution uses the current
+account and fails clearly when the requested WSL user differs; it never silently drops `-u`.
 
 ## Tests & validation
 
