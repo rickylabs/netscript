@@ -6,8 +6,23 @@ templateEngine: [vento, md]
 
 # Data & Persistence
 
-Data & Persistence covers database setup, migrations, multiple datasource wiring, KV, and adapter
-packages. Start here when the question is where state lives, how schema changes ship, or how the
+**Edit one schema file, run one generate, and every consumer follows** — the typed Prisma
+client, the matching zod validation schemas, and the migration all come out of the same
+`netscript db` workflow. That matters most when the one doing the editing is an AI agent:
+persistence is where a generated backend usually drifts, because a model change normally
+fans out into separate client, validation, and migration updates — each one a turn that
+can be missed. NetScript folds those into one cycle.
+
+The pillar splits state along one line. **Records** — durable, relational, queried with a
+typed client — live in the [database layer](/data-persistence/database/), where every
+plugin contributes its own models to the same datasource. **Execution state** — caches,
+sessions, work queues, scheduled ticks — lives in
+[KV, queues & cron](/data-persistence/kv-queues-cron/), provider-agnostic packages that
+run on zero-config local backends until [Aspire](/explanation/aspire/) provisions the
+production ones. The scaffold uses both from day one: Postgres for records, Redis/KV for
+execution state.
+
+Start here when the question is where state lives, how schema changes ship, or how the
 workspace resolves a second database.
 
 {{ comp.cardsGrid({ columns: 3, cards: [
