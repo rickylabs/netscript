@@ -76,6 +76,51 @@ The fixture's `url` is a `URL`, `req` is a `Request`, `params` is a
 that need to assert on cancellation can pass their own `signal` through the
 options and observe it on the returned context.
 
+## Testing a bound route contract
+
+A [route contract](/web-layer/route/) owns the parsing of a route's path and
+search params, so its `parsePath`/`parseSearch` (and the non-throwing
+`safeParsePath`/`safeParseSearch`) are worth testing directly — no context fixture
+needed. Bind the contract to a pattern, then assert on what it parses and what it
+rejects. This is the typed alternative to testing hand-rolled `URLSearchParams`
+juggling: the schema is the single source of truth, and the test pins it.
+
+```ts
+import { assert, assertEquals } from "@std/assert";
+import {
+  defineRouteContract,
+  enumPathParamSchema,
+  paginationSearchSchema,
+} from "@netscript/fresh/route";
+
+const ordersContract = defineRouteContract({
+  pathSchema: enumPathParamSchema("status", ["open", "closed"]),
+  searchSchema: paginationSearchSchema({ defaultLimit: 25 }),
+});
+const ordersRoute = ordersContract.bind("/orders/[status]");
+
+Deno.test("orders route parses pagination and derives offset", () => {
+  const search = ordersRoute.parseSearch(new URLSearchParams("page=3&limit=50"));
+  assertEquals(search.page, 3);
+  assertEquals(search.limit, 50);
+  assertEquals(search.offset, 100); // (page - 1) * limit
+});
+
+Deno.test("orders route rejects an out-of-enum status", () => {
+  const ok = ordersRoute.safeParsePath({ status: "open" });
+  assert(ok.success);
+  assertEquals(ok.data.status, "open");
+
+  const bad = ordersRoute.safeParsePath({ status: "archived" });
+  assertEquals(bad.success, false); // not in the ["open","closed"] enum
+});
+```
+
+`safeParsePath`/`safeParseSearch` return a `SchemaParseResult` — a
+`{ success: true, data }` success or a `{ success: false, error? }` failure — so a
+test can assert both the happy path and the rejection without a `try`/`catch`. The
+throwing `parsePath`/`parseSearch` variants suit tests that expect valid input.
+
 ## Testing layouts
 
 Layout tests read `layerData` from the context, a `Record<string, unknown>`

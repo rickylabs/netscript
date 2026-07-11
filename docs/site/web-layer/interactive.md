@@ -72,6 +72,60 @@ within a Suspense boundary that provides a fallback. Wire that boundary on the s
 [Deferred and streaming UI](/web-layer/defer-streaming-ui/).
 {{ /comp }}
 
+## What makes a NetScript island distinct: the typed query island
+
+A vanilla Fresh island is just hydrated Preact — you bring your own data fetching.
+A NetScript island earns its keep by hydrating **contract-typed** data: a typed
+route reference names the endpoint, and a `QueryIsland` renders the result of a
+contract-derived query. Nothing about the URL or the response shape is hand-typed,
+so the island cannot drift from the service.
+
+The route reference comes from [`@netscript/fresh/route`](/web-layer/route/); the
+query utils come from the single `lib/api-clients.ts` module described in
+[Data loading and the query cache](/web-layer/query/):
+
+```tsx
+// apps/dashboard/islands/WidgetPanel.tsx
+import { QueryIsland, useIslandQuery } from "@netscript/fresh/query";
+import { createRouteReference } from "@netscript/fresh/route";
+import { widgets } from "../lib/api-clients.ts";
+
+// A typed reference to the page this island lives on — hrefs are checked
+// against the pattern, so a broken link is a compile error.
+const widgetsRoute = createRouteReference("/widgets");
+
+function WidgetList() {
+  // queryKey + queryFn are derived from the widgets contract.
+  const query = useIslandQuery({
+    ...widgets.list.queryOptions({ input: {} }),
+    staleTime: 15_000,
+  });
+
+  if (query.isLoading) return <p>Loading…</p>;
+
+  return (
+    <div>
+      <a href={widgetsRoute.href()}>All widgets</a>
+      <ul>
+        {query.data?.map((widget) => <li key={widget.id}>{widget.name}</li>)}
+      </ul>
+    </div>
+  );
+}
+
+export default function WidgetPanel() {
+  return (
+    <QueryIsland>
+      <WidgetList />
+    </QueryIsland>
+  );
+}
+```
+
+The `usePromise`/`resolvedPromise` seam above and this typed query island are the
+two ways interactivity enters a page: read an in-flight promise during render, or
+hydrate a contract-typed query. Most data-driven islands use the second.
+
 ## API summary
 
 | Symbol | Description |
