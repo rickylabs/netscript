@@ -27,15 +27,28 @@ export function createOtelGates(): readonly GateDefinition[] {
       ],
     ),
     commandGate(
+      GATE.BEHAVIOR_OTEL_STREAM_CONSUMER,
+      'Consume real Flow-B stream with fan-in links',
+      GATE_PHASE.BEHAVIOR,
+      (context) => [
+        'deno',
+        'run',
+        '--allow-all',
+        '--unsafely-ignore-certificate-errors=localhost',
+        'packages/cli/e2e/src/application/gates/scaffold/consume-flow-b-stream.ts',
+        context.project.projectRoot,
+      ],
+    ),
+    commandGate(
       GATE.BEHAVIOR_OTEL_TRACES,
       'Validate OTEL trace chain via Dashboard API',
       GATE_PHASE.BEHAVIOR,
       (context) => [
         'deno',
-        'eval',
+        'run',
+        '--allow-all',
         '--unsafely-ignore-certificate-errors=localhost',
-        VALIDATE_TRACES_SCRIPT,
-        '--',
+        'packages/cli/e2e/src/application/gates/scaffold/validate-flow-b-traces.ts',
         context.project.appHost,
         context.project.projectRoot,
       ],
@@ -46,7 +59,9 @@ export function createOtelGates(): readonly GateDefinition[] {
   ];
 }
 
-const VALIDATE_TRACES_SCRIPT = resolveValidateTracesScript();
+// Retained temporarily as a compatibility export for downstream gate builders
+// while the real Flow-B validator moves to a checked module.
+export const VALIDATE_TRACES_SCRIPT = resolveValidateTracesScript();
 
 function resolveValidateTracesScript(): string {
   return [

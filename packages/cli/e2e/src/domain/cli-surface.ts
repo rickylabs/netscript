@@ -62,6 +62,7 @@ export const GATE = {
   GENERATED_UI_AI_CHECK: 'generated.ui-ai-check',
   BEHAVIOR_UI_RENDER: 'behavior.ui-render',
   RUNTIME_AUTH_SMOKE_ENV: 'runtime.auth-smoke-env',
+  RUNTIME_FLOW_B_FIXTURE: 'runtime.flow-b-fixture',
   RUNTIME_ASPIRE_RESTORE: 'runtime.aspire-restore',
   RUNTIME_ASPIRE_START: 'runtime.aspire-start',
   RUNTIME_WAIT_DATABASE: 'runtime.wait.database',
@@ -76,6 +77,7 @@ export const GATE = {
   RUNTIME_WAIT_TRIGGERS_API: 'runtime.wait.triggers-api',
   RUNTIME_WAIT_TRIGGERS: 'runtime.wait.triggers',
   RUNTIME_WAIT_AUTH: 'runtime.wait.auth',
+  RUNTIME_WAIT_STREAMS: 'runtime.wait.streams',
   RUNTIME_ASPIRE_DESCRIBE: 'runtime.aspire-describe',
   BEHAVIOR_WORKERS_HEALTH: 'behavior.workers-health',
   BEHAVIOR_WORKERS_JOBS: 'behavior.workers-jobs',
@@ -99,6 +101,7 @@ export const GATE = {
   DEPLOY_COMPOSE_RESOLUTION: 'deploy.compose-resolution',
   USERLAND_INSTALL_ASSERTIONS: 'userland-install.assertions',
   BEHAVIOR_OTEL_WEBHOOK: 'behavior.otel.webhook',
+  BEHAVIOR_OTEL_STREAM_CONSUMER: 'behavior.otel.stream-consumer',
   BEHAVIOR_OTEL_TRACES: 'behavior.otel.traces',
   CLEANUP_USERLAND_SMOKE_ROOT: 'cleanup.userland-smoke-root',
   CLEANUP_ASPIRE_STOP: 'cleanup.aspire-stop',
@@ -118,6 +121,7 @@ export const ASPIRE_RESOURCE = {
   TRIGGERS_API: 'triggers-api',
   TRIGGERS: 'triggers',
   AUTH: 'auth',
+  STREAMS: 'streams',
 } as const;
 
 export type ScaffoldSuiteId = typeof SCAFFOLD[keyof typeof SCAFFOLD];

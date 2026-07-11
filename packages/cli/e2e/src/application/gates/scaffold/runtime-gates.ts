@@ -61,6 +61,19 @@ export function createRuntimeGates(
       (context) => ['deno', 'eval', AUTH_SMOKE_ENV_SCRIPT, context.project.projectRoot],
     ),
     commandGate(
+      GATE.RUNTIME_FLOW_B_FIXTURE,
+      'Wire real Flow-B callback fixture',
+      GATE_PHASE.RUNTIME,
+      (context) => [
+        'deno',
+        'run',
+        '--allow-read',
+        '--allow-write',
+        'packages/cli/e2e/src/application/gates/scaffold/prepare-flow-b-fixture.ts',
+        context.project.projectRoot,
+      ],
+    ),
+    commandGate(
       GATE.RUNTIME_ASPIRE_START,
       'Start generated Aspire AppHost',
       GATE_PHASE.RUNTIME,
@@ -115,11 +128,18 @@ export function createRuntimeGates(
       'http://127.0.0.1:8091/api/v1/workers/seed',
       'POST',
     ),
-    httpGate(
+    commandGate(
       GATE.BEHAVIOR_WORKERS_TRIGGER_HEALTH_JOB,
       'Trigger workers plugin health job',
-      'http://127.0.0.1:8091/api/v1/workers/jobs/workers-plugin-health-check/trigger',
-      'POST',
+      GATE_PHASE.BEHAVIOR,
+      (context) => [
+        'deno',
+        'run',
+        '--allow-read',
+        '--allow-net=127.0.0.1:8091',
+        'packages/cli/e2e/src/application/gates/scaffold/configure-flow-b-job.ts',
+        context.project.projectRoot,
+      ],
     ),
     commandGate(
       GATE.BEHAVIOR_WORKERS_EXECUTIONS,
@@ -223,6 +243,7 @@ function runtimeResources(database: DatabaseEngine): readonly AspireResource[] {
     ASPIRE_RESOURCE.TRIGGERS_API,
     ASPIRE_RESOURCE.TRIGGERS,
     ASPIRE_RESOURCE.AUTH,
+    ASPIRE_RESOURCE.STREAMS,
   ];
 }
 
@@ -438,7 +459,7 @@ const AUTH_SMOKE_ENV_SCRIPT = [
 
 const VALIDATE_WORKER_EXECUTIONS_SCRIPT = [
   'const url = "http://127.0.0.1:8091/api/v1/workers/executions?limit=10";',
-  'const expectedJobId = "workers-plugin-health-check";',
+  'const expectedJobId = "health-check";',
   'let lastBody = "";',
   'for (let attempt = 1; attempt <= 30; attempt++) {',
   '  const response = await fetch(url);',
