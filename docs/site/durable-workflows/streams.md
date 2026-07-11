@@ -109,7 +109,10 @@ The producer side is two calls: freeze a typed schema, open a stream, write
 entity state. The consumer side is an HTTP/SSE read of the same `:4437` stream
 path — there is no in-process `subscribe()` handle, so a Fresh island (or any
 SSE client) reads the durable log directly and materializes the latest value per
-key.
+key. This is deliberate: exposing one HTTP/SSE surface instead of an in-process
+`subscribe()` means a browser island and a server-side consumer read the durable
+log through the exact same path and wire format, with no separate in-VM
+subscription API to keep in sync.
 
 {{ comp.tabbedCode({ tabs: [
   {

@@ -82,6 +82,82 @@ interactive-flow seam for the better-auth backend is tracked on the roadmap.
 <!-- caveat: arch-debt:seamless-auth-roadmap -->
 {{ /comp }}
 
+## Protect a route with the resolved session
+
+`createBetterAuthBackend` returns an `AuthBackendPort`, and the piece a page or API route needs is
+`backend.sessions.getSession({ request })`: it validates the request's better-auth session cookie
+through `auth.api.getSession` and returns the normalized `AuthSession` (or `undefined`). Map that
+session to a `Principal` with `backend.principalMapper.mapSessionToPrincipal(session)` and you have
+the scopes and roles to authorize on. The example below gates a Fresh route on an **active** session
+and an `admin` role, failing closed on both.
+
+```ts
+// server/auth-backend.ts — one shared backend instance for the app
+import { auth } from './better-auth.ts'; // your createNetscriptBetterAuth(...) instance
+import { createBetterAuthBackend } from '@netscript/auth-better-auth';
+
+export const backend = createBetterAuthBackend({
+  auth,
+  sessionTokenSecret: Deno.env.get('BETTER_AUTH_SECRET')!,
+});
+```
+
+```tsx
+// routes/admin/index.tsx — a page that only an authenticated admin can load
+import { HttpError } from 'fresh';
+import type { AuthnRequest } from '@netscript/service/auth';
+import { define } from '@/utils/state.ts';
+import { backend } from '../../server/auth-backend.ts';
+
+// Adapt the Fresh Request into the AuthnRequest the backend port reads.
+function toAuthnRequest(req: Request): AuthnRequest {
+  const url = new URL(req.url);
+  return {
+    header: (name) => req.headers.get(name) ?? undefined,
+    headers: () => req.headers,
+    cookie: (name) =>
+      req.headers.get('cookie')
+        ?.split('; ')
+        .find((c) => c.startsWith(`${name}=`))
+        ?.slice(name.length + 1),
+    method: req.method,
+    path: url.pathname,
+  };
+}
+
+export const handler = define.handlers(async (ctx) => {
+  // Resolve the session from the request's better-auth cookie.
+  const session = await backend.sessions.getSession({
+    request: toAuthnRequest(ctx.req),
+  });
+
+  // Fail closed: no active session → redirect to sign-in, never render anonymously.
+  if (!session || session.state !== 'active') {
+    return ctx.redirect('/api/v1/auth/signin');
+  }
+
+  // Map to a NetScript Principal and authorize on its roles.
+  const { principal } = backend.principalMapper.mapSessionToPrincipal(session);
+  if (!principal.roles.includes('admin')) {
+    throw new HttpError(403);
+  }
+
+  return { data: { subject: principal.subject, roles: principal.roles } };
+});
+
+export default define.page<typeof handler>(({ data }) => (
+  <main>
+    <h1>Admin dashboard</h1>
+    <p>Signed in as {data.subject} — roles: {data.roles.join(', ')}</p>
+  </main>
+));
+```
+
+Because `getSession` returns a typed `AuthSession | undefined` and the state check is explicit, the
+route cannot silently degrade to an anonymous render — the same fail-loud discipline the
+[authentication](/identity-access/auth/) page describes for the backend port. A machine-to-machine
+API route follows the identical shape: swap the redirect for `throw new HttpError(401)`.
+
 ## Where to go next
 
 - {{ comp.xref({ key: "explain:auth-model" }) }} — how Principals, sessions, and backends fit

@@ -55,6 +55,10 @@ await defineService(router, {
 });
 ```
 
+Aspire injects `PORT` at runtime, so the entrypoint reads it from the environment; the typed source
+of truth is your `netscript.config.ts` `services.<name>.port` field, which the scaffold wires as the
+fallback default — set the port there rather than editing this line.
+
 This wires three routes onto the service:
 
 {{ comp.apiTable({

@@ -330,6 +330,12 @@ and providers through their config bags. Two adapters resolve an API key from th
 > `Deno.env.get(...)` in your composition code. Reading a key from the environment requires
 > `--allow-env` for the variable in question.
 
+> **Provider keys have no typed config surface — by design.** Unlike service topology (typed
+> through `@netscript/config`), AI provider credentials are **not** modelled in
+> `netscript.config.ts`. Reading the key with raw `Deno.env.get(...)` (or letting the Anthropic /
+> OpenRouter adapters resolve their env var) is the **supported** path — secrets stay out of the
+> committed config and are injected by the runtime environment instead.
+
 ## Examples
 
 ### Compose a runtime

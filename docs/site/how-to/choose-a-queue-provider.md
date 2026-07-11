@@ -179,6 +179,49 @@ await queue.listen(async (message) => {
 For CPU-bound work, prefer Web Workers over queue concurrency — see
 [Tune the worker runtime](/how-to/tune-worker-runtime/).
 
+## Prove it end to end — same call site, two backends
+
+The pluggability claim is only convincing if you can watch one file run unchanged on two backends.
+Write the producer/consumer against the factory (no `provider`), then run it first on the Deno KV
+fallback locally and again on Redis under Aspire — the file never changes.
+
+```ts
+// jobs.ts — the resulting file: provider-neutral producer + consumer
+import { createTypedQueue } from '@netscript/queue';
+import { z } from 'zod';
+
+const JobSchema = z.object({ id: z.string(), kind: z.string() });
+
+// No provider → auto-discovery. Probe order: RabbitMQ → Redis → Deno KV.
+export const jobs = createTypedQueue('jobs', JobSchema);
+
+if (import.meta.main) {
+  await jobs.enqueue({ id: 'job-1', kind: 'reindex' });
+  await jobs.listen(async (message) => {
+    console.log('processed', message.id, message.kind);
+  });
+}
+```
+
+```bash
+# From the workspace root, in order:
+
+# 1. Local run — no Aspire, no broker. Auto-discovery falls through to Deno KV.
+#    The scaffold's deno.json already sets unstable: ['raw-imports', 'kv'];
+#    add --unstable-kv to any ad-hoc run that touches the queue.
+deno run --unstable-kv -A jobs.ts
+#    -> processed job-1 reindex   (on the Deno KV fallback)
+
+# 2. Provision the real backend, then run the SAME file untouched.
+cd aspire && aspire start && cd ..   # brings up Redis/Garnet
+deno run --unstable-kv -A jobs.ts
+#    -> processed job-1 reindex   (now auto-discovered onto Redis)
+```
+
+The call site — `createTypedQueue('jobs', JobSchema)`, `enqueue`, `listen` — is identical in both
+runs; only the resolved backend changed. Pin a specific provider with `provider: QueueProvider.*`
+(Step 2) when you want to take auto-discovery out of the loop.
+
 ## In-production pitfalls
 
 {{ comp callout { type: "warning", title: "Choosing a provider — read before you ship" } }}

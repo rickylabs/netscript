@@ -207,6 +207,10 @@ await defineService(router, {
 });
 ```
 
+Aspire injects `PORT` at runtime, so the entrypoint reads it from the environment; the typed source
+of truth is your `netscript.config.ts` `services.<name>.port` field, which the scaffold wires as the
+fallback default — set the port there rather than editing this line.
+
 `defineService` stands up the Hono + oRPC runtime, mounting your router under both an
 OpenAPI surface (`/api/v1/users/*`) and the RPC surface (`/api/rpc/v1/...`). The default
 RPC mount point is `/api/rpc` and the OpenAPI mount point is `/api`; both are overridable

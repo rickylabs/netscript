@@ -7,8 +7,11 @@ title: "@netscript/contracts"
 
 Contract vocabulary shared across NetScript package and plugin boundaries: the oRPC base
 contract, common error data, pagination schemas, result types, and schema helper factories.
-This page is generated from the package's public surface with `deno doc` (US-2). For the full
-index of packages and plugins return to the [reference overview](/reference/).
+Because a contract's input schema is enforced at the transport boundary, a service handler never
+hand-parses or validates `req.json()` — a request that doesn't match the schema is rejected before
+your code runs, and the same contract types the client that calls it. This page is generated from
+the package's public surface with `deno doc` (US-2). For the full index of packages and plugins
+return to the [reference overview](/reference/).
 
 The root entrypoint (`@netscript/contracts`) carries the core contract primitives. Three
 sub-path exports add higher-level builders:
