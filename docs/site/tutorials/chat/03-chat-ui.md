@@ -85,6 +85,7 @@ connection pointed at the proxy from chapter 2, and on submit: appends the user 
 import { useSignal } from '@preact/signals';
 import { createNetScriptChatConnection, resolveChatSnapshot } from '@netscript/fresh/ai';
 import type { NetScriptChatMessage, NetScriptChatSnapshot } from '@netscript/fresh/ai';
+import { chatTurnRoute } from '@app/contracts/routes/chat-turn.ts';
 import { Message, type MessageData } from '@app/components/ui/message.tsx';
 import { PromptInput } from '@app/components/ui/prompt-input.tsx';
 
@@ -115,7 +116,8 @@ const Chat = ({ sessionId, seed }: ChatProps) => {
     // 1. Append the user message to the durable session.
     await connection.send([{ id: crypto.randomUUID(), role: 'user', content: text }]);
     // 2. Fire the model turn (chapter 2's route streams + persists the reply).
-    await fetch(`/api/chat/${sessionId}`, { method: 'POST' });
+    //    The URL comes from the same route contract the server reads its param through.
+    await fetch(chatTurnRoute.href({ path: { sessionId } }), { method: 'POST' });
     // 3. Re-materialize the settled transcript through the same projection.
     snapshot.value = await resolveChatSnapshot({ target: { sessionId, baseUrl: base } });
     pending.value = false;
@@ -146,6 +148,10 @@ connection's `close` / `stop` / `dispose` are one idempotent teardown — call
 
 {{ comp callout { type: "note", title: "Live streaming vs settle-then-render" } }}
 This island re-materializes each turn once it <strong>settles</strong>, which keeps the code mechanical and correct — and reload durability, the headline feature, is fully in hand this way. The connection also exposes <code>subscribe(signal)</code> for token-by-token live chunks; <a href="/tutorials/chat/06-live-streaming/">chapter 6</a> upgrades this island to that live subscription so replies stream in as they arrive.
+{{ /comp }}
+
+{{ comp callout { type: "note", title: "Why not useIslandQuery for the transcript?" } }}
+NetScript's typed island-query hooks (<code>useIslandQuery</code> / <code>useLiveQuery</code>) are the right tool when a page reads a <strong>typed service contract</strong> — a cache-first read whose data lives behind an oRPC service, as the <a href="/tutorials/live-dashboard/04-definePage-QueryIsland/">live-dashboard track</a> shows end to end. The chat transcript is different: it is not a service query but a <strong>durable session stream</strong>, so it is read through <code>createNetScriptChatConnection</code> and reduced by the one projection, not fetched through a query key. If <em>this</em> page also showed, say, a typed list of past conversations from a service, that sidebar is exactly where a <code>useIslandQuery</code> island would belong — the transcript itself stays on the durable connection.
 {{ /comp }}
 
 ## Step 4 — Rich blocks with chat-render

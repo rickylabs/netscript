@@ -125,6 +125,10 @@ const proxy = createNetScriptChatStreamProxy({
 export const handler = { GET: proxy, POST: proxy };
 ```
 
+{{ comp callout { type: "note", title: "Why a raw Request here, not a route contract" } }}
+This resolver is the one documented exception to NetScript's typed-route rule: <code>createNetScriptChatStreamProxy</code>'s <code>target</code> only ever receives the raw <code>Request</code>, so the session id is parsed from <code>req.url</code> by hand. Everywhere else you build a URL or read a path param, prefer a bound <a href="/reference/fresh/"><code>createRouteReference</code></a> contract so the pattern and its typed params come from one source of truth.
+{{ /comp }}
+
 The proxy passes the durable-stream body through **unbuffered**, strips
 `content-encoding` / `content-length` (they no longer describe the re-framed bytes) plus
 the hop-by-hop headers, and propagates the client `AbortSignal` so a disconnect tears the
