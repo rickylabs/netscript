@@ -3,20 +3,45 @@ if (!projectRoot) {
   throw new Error('project root argument is required');
 }
 
+const mode = Deno.args[1] === 'published' ? 'published' : 'local';
 const healthJobPath = `${projectRoot}/workers/jobs/health-check.ts`;
-const sourceRoot = (await Deno.readTextFile(`${projectRoot}/.netscript-source-root`)).trim();
-if (!sourceRoot) throw new Error('generated project did not record its local source root');
 
 const denoConfigPath = `${projectRoot}/deno.json`;
 const denoConfig = JSON.parse(await Deno.readTextFile(denoConfigPath));
 if (!isRecord(denoConfig) || !isRecord(denoConfig.imports)) {
   throw new Error('generated deno.json did not contain imports');
 }
-const localImports = {
+
+const registerPluginsPath = `${projectRoot}/aspire/.helpers/register-plugins.mts`;
+const registerPlugins = await Deno.readTextFile(registerPluginsPath);
+
+// Published-JSR runs need no local-source mapping: the published packages carry
+// the T6/T5 telemetry behavior. Bare jsr aliases expand subpath imports
+// (@netscript/sdk/client, @netscript/telemetry/tracer) for the injected
+// callback. The release version is read from the generated workers resource pin.
+const publishedVersion = registerPlugins.match(
+  /jsr:@netscript\/plugin-workers@([^/']+)\/services/,
+)?.[1];
+if (mode === 'published' && !publishedVersion) {
+  throw new Error('generated register-plugins.mts did not reveal the published release version');
+}
+const sourceRoot = mode === 'published'
+  ? ''
+  : (await Deno.readTextFile(`${projectRoot}/.netscript-source-root`)).trim();
+if (mode === 'local' && !sourceRoot) {
+  throw new Error('generated project did not record its local source root');
+}
+const publishedImports = {
+  '@netscript/sdk': `jsr:@netscript/sdk@${publishedVersion}`,
+  '@netscript/telemetry': `jsr:@netscript/telemetry@${publishedVersion}`,
+};
+const sharedNpmImports = {
   '@opentelemetry/api': 'npm:@opentelemetry/api@^1.9.1',
   '@orpc/client': 'npm:@orpc/client@^1.14.6',
   '@orpc/contract': 'npm:@orpc/contract@^1.14.6',
   '@orpc/otel': 'npm:@orpc/otel@^1.14.7',
+};
+const localSourceImports = {
   '@netscript/plugin-workers-core/contracts/v1':
     `${sourceRoot}/packages/plugin-workers-core/src/contracts/v1/mod.ts`,
   '@netscript/plugin-workers/services': `${sourceRoot}/plugins/workers/services/src/main.ts`,
@@ -34,7 +59,11 @@ const localImports = {
   '@netscript/telemetry/testing': `${sourceRoot}/packages/telemetry/src/testing/mod.ts`,
   '@netscript/telemetry/tracer': `${sourceRoot}/packages/telemetry/tracer.ts`,
 };
-const flowBImports = { ...denoConfig.imports, ...localImports };
+const flowBImports = {
+  ...denoConfig.imports,
+  ...sharedNpmImports,
+  ...(mode === 'published' ? publishedImports : localSourceImports),
+};
 const flowBConfigPath = `${projectRoot}/.netscript-flow-b-deno.json`;
 const flowBImportMapPath = `${projectRoot}/.netscript/e2e/flow-b-import-map.json`;
 await Deno.mkdir(`${projectRoot}/.netscript/e2e`, { recursive: true });
@@ -47,8 +76,6 @@ await Deno.writeTextFile(
   `${JSON.stringify({ imports: flowBImports }, null, 2)}\n`,
 );
 
-const registerPluginsPath = `${projectRoot}/aspire/.helpers/register-plugins.mts`;
-const registerPlugins = await Deno.readTextFile(registerPluginsPath);
 const workersMarker = '  // --- workers-api ---';
 const workersIndex = registerPlugins.indexOf(workersMarker);
 const nextResourceIndex = registerPlugins.indexOf('  // --- ', workersIndex + workersMarker.length);
@@ -56,22 +83,25 @@ if (workersIndex < 0 || nextResourceIndex < 0) {
   throw new Error('generated register-plugins.mts did not contain the workers-api resource block');
 }
 const workersBlock = registerPlugins.slice(workersIndex, nextResourceIndex);
-const configuredWorkersBlock = workersBlock
-  .replace(
-    "['run', '--config', 'deno.json',",
-    "['run', '--config', '.netscript-flow-b-deno.json',",
-  )
-  .replace(
+let configuredWorkersBlock = workersBlock.replace(
+  "['run', '--config', 'deno.json',",
+  "['run', '--config', '.netscript-flow-b-deno.json',",
+);
+if (mode === 'local') {
+  configuredWorkersBlock = configuredWorkersBlock.replace(
     /'jsr:@netscript\/plugin-workers@[^']+\/services'/,
     "'@netscript/plugin-workers/services'",
   );
+}
 if (
   configuredWorkersBlock === workersBlock &&
   !workersBlock.includes("'--config', '.netscript-flow-b-deno.json'")
 ) {
   throw new Error('workers-api resource did not contain the expected Deno config argument');
 }
-if (!configuredWorkersBlock.includes("'@netscript/plugin-workers/services'")) {
+if (
+  mode === 'local' && !configuredWorkersBlock.includes("'@netscript/plugin-workers/services'")
+) {
   throw new Error('workers-api resource did not contain the expected service entrypoint');
 }
 await Deno.writeTextFile(

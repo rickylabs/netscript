@@ -4,7 +4,7 @@ import {
   GATE,
   GATE_PHASE,
 } from '../../../domain/cli-surface.ts';
-import { DATABASE, type DatabaseEngine } from '../../../domain/extension-axes.ts';
+import { DATABASE, type DatabaseEngine, PACKAGE_SOURCE } from '../../../domain/extension-axes.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
 import { commandGate, httpGate } from './gate-factory.ts';
 
@@ -71,6 +71,7 @@ export function createRuntimeGates(
         '--allow-write',
         'packages/cli/e2e/src/application/gates/scaffold/prepare-flow-b-fixture.ts',
         context.project.projectRoot,
+        context.request.options.packageSource === PACKAGE_SOURCE.JSR ? 'published' : 'local',
       ],
     ),
     commandGate(
