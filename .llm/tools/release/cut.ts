@@ -1,5 +1,6 @@
 import { walk } from 'jsr:@std/fs@^1.0.0/walk';
 import { join, normalize, relative } from 'jsr:@std/path@^1.0.0';
+import { runReleasePreflight } from './preflight-release.ts';
 
 export interface ReleaseCutOptions {
   version: string;
@@ -338,6 +339,8 @@ async function main(): Promise<void> {
       }`,
     );
   }
+
+  await runReleasePreflight(options.root, options.version);
 
   await runGate('release:preflight', 'deno', ['task', 'release:preflight'], options.root);
   await runGate('publish:dry-run', 'deno', ['task', 'publish:dry-run'], options.root);

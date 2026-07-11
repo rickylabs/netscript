@@ -9,4 +9,6 @@
 - PLAN-EVAL: cycle 1 `FAIL_PLAN` on slice attribution, corrected; cycle 2 separate-session `PASS`.
 - Implemented: intended/effective publish audit, explicit `packages/bench` exclusion, stale markdown scan, deferred-site reporting, and cut hook.
 - Real audit: 34 effective members including all three AI surfaces; zero deltas; markdown zero blocking / one deferred site finding.
-- Next: final gates, supervisor review, commit/push/comment, then separate IMPL-EVAL.
+- Final gates: 23 release tests pass; scoped check/lint/fmt pass; beta.6 audit shows 34 members / 0 deltas and markdown 0 blocking / 1 deferred; `deno.lock` unchanged.
+- Supervisor review completed, including prerelease/stable comparator correction.
+- Next: commit/push cut hook and evidence, then separate IMPL-EVAL.

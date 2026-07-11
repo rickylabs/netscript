@@ -48,11 +48,38 @@ Start in the release preflight module and its adjacent test. Add an intentional 
 - Real audit found and explicitly recorded `packages/bench` as an internal benchmark-only exclusion.
 - Real audit enumerated 34 effective members, including `@netscript/ai`, `@netscript/plugin-ai-core`, and `@netscript/plugin-ai`; zero unexplained deltas.
 - Markdown audit for target `0.0.1-beta.6`: zero blocking findings; one deferred `docs/site/**` finding (`docs/site/reference/plugin-ai/index.md:86`).
-- Release tests: 22 passed before the explicit-exclusion coverage addition; final rerun pending.
-- Scoped check and lint: pass. Initial format gate found the new module; targeted formatter applied, final gate pending.
+- Release tests: 23 passed, 0 failed.
+- Scoped check: 21 files, 0 failed batches / occurrences.
+- Scoped lint: 21 files, 0 findings.
+- Scoped format: 21 files, 0 failed batches / findings.
+- Safe beta.6 audit: 34 effective members, 0 unexplained deltas, 0 blocking markdown pins, 1 deferred site finding.
+- Raw `git diff --exit-code origin/main -- deno.lock`: exit 0; no lock churn.
 
 ## Reconcile — implementation slice 1
 
 - Issue/PR surface: draft PR #612 remains open and close-gated to #609; no new reviewer comments affected scope.
 - Drift: brief's missing-AI premise was already fixed by #508; the audit additionally exposed the intentional `packages/bench` omission.
 - Readjustment: no scope expansion; benchmark exclusion is now explicit as requested.
+
+## Supervisor slice review
+
+- Reviewed intended/effective independence, exclusion validation, path boundaries, semver ordering, cut ordering, and test reachability.
+- Corrected prerelease-vs-stable semver ordering before sign-off.
+- Confirmed the cut invokes the read-only audits after version coordination/residue detection and before existing expensive gates or Git mutation.
+
+## Gate table
+
+| Gate | Verdict |
+| --- | --- |
+| `deno test --no-lock -A .llm/tools/release/` | PASS — 23/23 |
+| scoped check wrapper | PASS — 21 files, 0 failures |
+| scoped lint wrapper | PASS — 21 files, 0 findings |
+| scoped format wrapper | PASS — 21 files, 0 findings |
+| beta.6 release audit CLI | PASS — 34 members / 0 deltas; markdown 0 blocking / 1 deferred |
+| raw `deno.lock` diff | PASS — unchanged |
+| `scaffold.runtime`, `e2e-cli-prod` | N/A — tooling-only; no scaffold or published runtime shape change |
+
+## Reconcile — implementation slice 2
+
+- PR #612 remains draft and carries `Closes #609`; lifecycle advances to IMPL-EVAL after this sign-off commit.
+- No plan rescope or doctrine debt. Deferred site finding remains owned by #445/#448.
