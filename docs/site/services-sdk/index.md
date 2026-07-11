@@ -6,9 +6,25 @@ templateEngine: [vento, md]
 
 # Services & SDK
 
-Services define the synchronous API boundary, and the SDK gives callers a typed client for those
-same contracts. Use this pillar when you are defining a service, exposing OpenAPI or Scalar, or
-connecting a front end to a service without duplicating request and response types.
+**Declare the API once — as a versioned contract — and the server handler, the typed client, the
+OpenAPI spec, and the query layer all derive from that one object.** That is this pillar in a
+sentence. A [service](/services-sdk/services/) implements the contract; the
+[SDK](/services-sdk/sdk/) consumes it. Because both sides import the *same* contract object, a
+renamed field or a changed response shape is a compile error on both ends before it can ship —
+there is no hand-written client wrapper to keep in sync, and no separate "update the API docs"
+step.
+
+That property is not hypothetical. In eis-chat — the production app NetScript is dogfooded
+against — every dashboard data call goes through a typed client built directly off the contract
+type: adding a route to the channel contract makes it appear, fully typed, on the browser client
+with no extra wiring turn. The same discipline pays off whether the code is written by a teammate
+or an AI agent: one declared shape to read, one place to change it.
+
+Use this pillar when you are defining a service, exposing OpenAPI or Scalar, or connecting a
+front end to a service without duplicating request and response types. Start with
+[Services & contracts](/services-sdk/services/) for the server side, then
+[Typed SDK & client](/services-sdk/sdk/) for the caller side; the type-flow theory lives in
+[Contracts](/explanation/contracts/).
 
 {{ comp callout { type: "note", title: "TLS & HTTP/2 are opt-in" } }}
 A service listens over plain HTTP by default. Pass a <code>tls</code> option

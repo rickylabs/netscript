@@ -8,6 +8,9 @@ next: { label: "Background jobs", href: "/background-processing/workers/" }
 
 # Services & contracts
 
+**Write the contract once; the handler, the typed client, and the OpenAPI surface are all derived
+from it — so an agent (or a teammate) never spends a turn keeping them in sync.**
+
 A NetScript **service** is a typed HTTP runtime that *implements* an
 [`@orpc/contract`](/explanation/contracts/) definition. You author the contract once
 (route + zod input/output), `implement()` it, bind `.handler()`s, and serve the resulting
@@ -33,6 +36,31 @@ off work</em> use a <a href="/durable-workflows/triggers/">trigger</a>; for
 <em>signed-in identity and sessions</em> compose the
 <a href="/identity-access/auth/">auth plugin</a>.
 {{ /comp }}
+
+## Why contract-first: the drift you never debug
+
+Every hand-synced API dies the same way. A field gets renamed on the server; the client wrapper,
+the API docs, and the front-end types each get updated in separate steps — and one of them gets
+missed. The bug ships silently and surfaces later as a runtime `undefined`, and the fix costs a
+round of archaeology to find which of the three copies drifted.
+
+A NetScript service removes the copies. The contract — plain `@orpc/contract` routes with zod
+input/output schemas, versioned in its own package — is the only declaration of the wire shape.
+The handler binds to it via `implement()`, the client imports it, and the OpenAPI spec is
+generated from it. Rename a field and the build fails in the handler *and* the caller before
+anything ships. In eis-chat, the production app NetScript is dogfooded against, this is how the
+whole API surface works: `implement(ChannelContractV1)` on the service side, a typed dashboard
+client built off the same contract type on the other — a new contract route is automatically
+typed on the client, with no "keep the API docs in sync" step in between.
+
+The same property is why contract-first services suit AI-agent codebases. Encore's
+[NestJS-alternatives article](https://encore.dev/articles/nestjs-alternatives) names the failure
+mode: TypeScript's backend ecosystem has many valid ways to structure validation, data access,
+and project layout, so coding agents pick a different combination on every prompt. Encore's
+answer is to fix the conventions in application code; NetScript locks the convention at the
+**contract layer** — one way to declare a route (contract + zod schemas + `implement()`), and
+everything downstream derived from it. An agent working in the codebase reads one declared shape
+and follows it, instead of inventing a new client wrapper per session.
 
 ## What it is
 
