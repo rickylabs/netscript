@@ -11,8 +11,11 @@ packages and plugins return to the [reference overview](/reference/).
 
 The root entrypoint (`@netscript/sdk`) is the high-level composition preset for service-aware
 applications: it re-exports the client, query, query-client, discovery, cache, telemetry, and
-OpenAPI surfaces and adds the `defineServices()` preset. Focused sub-path exports carry the
-same values for narrow imports - see [Sub-path exports](#sub-path-exports).
+OpenAPI surfaces and adds the `defineServices()` preset. A single `defineServices()` call wires the
+whole typed stack — service clients, cache-aware query factories, and query utils — from one service
+map, so a component imports ready-to-use `queryOptions()` / `mutationOptions()` instead of
+hand-writing fetch wrappers. Focused sub-path exports carry the same values for narrow imports - see
+[Sub-path exports](#sub-path-exports).
 
 ## Composition preset (`defineServices`)
 

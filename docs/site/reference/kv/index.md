@@ -137,6 +137,13 @@ A reusable contract harness for adapter authors. Re-exports the shared `KvStore`
 | `createMemoryKvAdapter` | function | `function createMemoryKvAdapter(): MemoryKvAdapter` | Factory for a clean in-memory KV adapter for downstream tests. |
 | `MemoryKvAdapter` | class | `class MemoryKvAdapter implements WatchableKv` | Volatile in-memory adapter (re-exported from the root). |
 
+## See it live
+
+- **How-to:** [Queue / KV / cron](/how-to/queue-kv-cron/) — read, write, and watch a KV store with
+  these symbols in a running workspace.
+- **Concept:** [KV, queues & cron](/data-persistence/kv-queues-cron/) — the durable-by-default KV
+  model and how it backs queues and cron.
+
 ---
 
 Back to the [reference overview](/reference/).
