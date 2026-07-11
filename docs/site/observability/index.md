@@ -6,9 +6,13 @@ templateEngine: [vento, md]
 
 # Observability
 
-Observability covers OpenTelemetry trace context, structured logging, service and background spans,
-and the Aspire dashboard view of the workspace. Use this pillar when you need to add tracing,
-inspect runtime behavior, or connect package-level telemetry to the running system.
+The most expensive turn in any change loop — whether the author is you or an AI agent — is the
+verification turn: *did the change actually work, across every process it touched?* This pillar is
+how NetScript answers it. The runtimes emit real OpenTelemetry spans, a single W3C `traceparent`
+groups a cross-process flow into one distributed trace, structured logs ride the same OTLP export,
+and both a dashboard and a **typed query port** read it all back — for you, or for an agent
+verifying its own change. Use this pillar when you need to add tracing, inspect runtime behavior,
+or connect package-level telemetry to the running system.
 
 {{ comp.cardsGrid({ columns: 3, cards: [
   { eyebrow: "Overview & Concepts", title: "Telemetry model", body: "Trace context and logging across services, workers, sagas, and orchestration.", href: "/explanation/observability/", icon: "O" },
@@ -33,5 +37,10 @@ learn the model:
 - **See where telemetry is collected:** {{ comp.xref({ key: "explain:aspire", text: "Orchestration with Aspire" }) }}
   explains the dashboard and OTLP collector the AppHost provisions; trace context crosses service
   boundaries at the {{ comp.xref({ key: "cap:services", text: "services" }) }} seam.
+- **Read a trace back in code:** the {{ comp.xref({ key: "cap:telemetry", text: "Telemetry & logging" }) }}
+  hub's *Close the loop* section covers the typed `TelemetryQueryPort` read side — how a test or an
+  agent asserts a span landed instead of eyeballing the dashboard.
 - **Look up exact symbols:** {{ comp.xref({ key: "ref:telemetry", text: "telemetry" }) }} and
-  {{ comp.xref({ key: "ref:logger", text: "logger" }) }} references.
+  {{ comp.xref({ key: "ref:logger", text: "logger" }) }} references, and the
+  [telemetry convention](/reference/telemetry/convention/) (span naming, SpanKind, the `netscript.*`
+  attribute rules).

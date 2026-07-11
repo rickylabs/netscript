@@ -8,15 +8,22 @@ next: { label: "Fresh UI & design", href: "/web-layer/fresh-ui/" }
 
 # Telemetry & logging
 
-NetScript treats observability as a built-in, not a bolt-on. Every service and plugin
+The most expensive turn in any change loop — whether the author is you or an AI agent — is the
+verification turn: *did the change actually work, across every process it touched?* NetScript
+closes that loop inside the framework. The runtimes emit real OpenTelemetry spans on their own, a
+single W3C `traceparent` groups a cross-process flow into **one distributed trace**, and a typed
+query surface reads the resulting spans back — so "did it work" is a trace you open (or query
+programmatically), not four console logs you correlate by eye.
+
+Concretely, observability is a built-in, not a bolt-on. Every service and plugin
 runtime is wired for **OpenTelemetry** — services serve their RPC handlers with
-trace-context propagation, the worker runtime wraps job dispatch, execution, scheduling,
-subprocess hand-off, and task execution in real OTel spans, and structured logs flow through
-the framework `logger`. The viewing surface is the **Aspire dashboard at
-`https://localhost:18888`**, which collects OTLP traces, metrics, and structured logs from
-every resource in the app graph (services, plugin APIs, background processors) the moment you
-run `aspire start`. You do not stand up Jaeger, Grafana, or a log shipper to get started — the
-AppHost provisions the OTLP collector and the dashboard for you.
+trace-context propagation (first-party oRPC and Hono instrumentation), the worker runtime wraps
+job dispatch, execution, scheduling, subprocess hand-off, and task execution in real OTel spans,
+and structured logs flow through the framework `logger`. The viewing surface is the **Aspire
+dashboard at `https://localhost:18888`**, which collects OTLP traces, metrics, and structured
+logs from every resource in the app graph (services, plugin APIs, background processors) the
+moment you run `aspire start`. You do not stand up Jaeger, Grafana, or a log shipper to get
+started — the AppHost provisions the OTLP collector and the dashboard for you.
 
 {{ comp.diagram({
   src: "/assets/diagrams/otel-traceparent.svg",
@@ -40,6 +47,27 @@ running there is no <code>:18888</code> surface to view traces or logs on. See
 <a href="/how-to/database-migration/">Database &amp; migration</a> for the full startup order.
 {{ /comp }}
 
+## The story: one grouped trace, end to end
+
+Picture the failure mode that eats an afternoon. A trigger fires, the scheduler dispatches, a
+queue hands the job to a worker, the job reports success — and the downstream callback never
+lands. With per-process logs you tail one console per resource and correlate timestamps by eye;
+an AI agent in the same position burns its turns asking you to check logs it cannot see.
+
+In NetScript that whole flow is **one grouped trace**: trigger → scheduler dispatch → queue
+enqueue/dequeue → `job.execute` → the SDK's `rpc.client` callback span, all under a single trace
+id, because the runtimes propagate W3C trace context across every process boundary for you. Where
+many producers feed one consumer — a fan-in into a durable-streams processor — `createFanInLinks`
+attaches **span links** from each producer trace instead of re-parenting, so the consumer span
+shows exactly which upstream flows fed it. And this shape is not aspirational: the grouped
+cross-process trace is exercised by a non-mocked merge gate in the framework's own CI, which
+scaffolds a real project, runs the flow under Aspire, and reads the live spans back before a
+change can land.
+
+The same spine covers AI workloads. Spans follow the upstream `gen_ai.*` semantic conventions
+(via `createGenAiAttributes` in `@netscript/telemetry/attributes`), so a traced agent turn shows
+the model call, the tool calls, and the durable write it produced — step by step, on one tree.
+
 ## What it is
 
 Telemetry in NetScript is three OpenTelemetry signals — **traces**, **metrics**, and
@@ -53,6 +81,18 @@ connection stats) and structured logs ride the same OTLP export. The framework o
 the worker, scheduler, queue, saga, and SSE runtimes are instrumented for you. The full
 mental model — what is framework-real versus a scaffold stub — is in
 [Observability](/explanation/observability/).
+
+Under the hood, `@netscript/telemetry` is structured as **telemetry ports and adapters**:
+application and runtime code programs against port contracts (`TracerProviderPort`, `MeterPort`,
+`PropagatorPort`, `SpanLinkPort`, `TelemetryQueryPort` — the `@netscript/telemetry/otel`
+subpath), with a zero-dependency default adapter (`OtelDenoTracerProvider`, bound to Deno's
+built-in OTLP exporter via `OTEL_DENO=true`) and an opt-in OpenTelemetry-SDK adapter
+(`OtelSdkTracerProvider`) for apps that bring the JS SDK — which also unlocks
+attribute-preserving span links. Attribute names follow one convention: upstream semconv keys
+(`rpc.*`, `messaging.*`, `gen_ai.*`, `server.*`) wherever OpenTelemetry defines them, and
+NetScript-owned keys under the single proprietary root `netscript.*` — correlated spans share
+`netscript.correlation.id`. The full rule set (span naming, SpanKind, status, propagation) is the
+[telemetry convention](/reference/telemetry/convention/).
 
 ## Learn → / Do →
 
@@ -242,21 +282,28 @@ cross-boundary trace in the diagram above possible.
   ]
 }) }}
 
-## Service & RPC tracing toggle
+## Service, RPC & HTTP tracing
 
-Services opt into trace propagation through the oRPC layer rather than by hand. The
-`@netscript/telemetry/orpc` subpath ships an oRPC **tracing plugin** that opens a SERVER span
-per RPC and continues any inbound `traceparent`, plus an error-handling plugin that classifies
-failures. On the service builder this is the `.withRPC({ traceContext: true })` toggle (see
-[Services](/services-sdk/services/)); the plugin
-factory below is the underlying surface if you mount oRPC yourself.
+Services opt into trace propagation through **first-party instrumentation** rather than by hand
+— NetScript wraps the upstream OTel packages instead of reinventing them. The
+`@netscript/telemetry/orpc` subpath ships an oRPC **tracing plugin** (backed by the upstream
+`@orpc/otel` instrumentation) that opens a SERVER span per RPC and continues any inbound
+`traceparent`, plus an error-handling plugin that classifies failures. The
+`@netscript/telemetry/hono` subpath does the same for plain HTTP: `createHonoTracingMiddleware`
+wraps Hono's first-party `@hono/otel` middleware and layers NetScript service naming and W3C
+propagation on top — the service builder registers it outermost for you. On the service builder
+the RPC side is the `.withRPC({ traceContext: true })` toggle (see
+[Services](/services-sdk/services/)); the factories below are the underlying surface if you
+mount oRPC or Hono yourself.
 
 {{ comp.apiTable({
-  caption: "oRPC tracing surface (@netscript/telemetry/orpc)",
+  caption: "oRPC + Hono tracing surface (@netscript/telemetry/orpc, @netscript/telemetry/hono)",
   rows: [
-    { name: "createTracingPlugin(options?)", type: "→ TracingPlugin", desc: "oRPC plugin that opens a SERVER span per call and continues an inbound traceparent. Options are TracingPluginOptions." },
+    { name: "createTracingPlugin(options?)", type: "→ TracingPlugin", desc: "oRPC plugin that opens a SERVER span per call and continues an inbound traceparent, following upstream rpc.* semconv. Options are TracingPluginOptions." },
+    { name: "registerORPCInstrumentation(config?)", type: "→ void", desc: "Registers the upstream @orpc/otel ORPCInstrumentation the tracing plugin is backed by — wrap-don't-reinvent, applied to oRPC." },
     { name: "createErrorHandlingPlugin(options?)", type: "→ ErrorHandlingPlugin", desc: "Classifies errors as client | server | transient and records them on the span; takes an optional ErrorClassifier and ErrorLogger." },
-    { name: "createTraceContext()", type: "→ TraceContext", desc: "Build the per-call trace context the plugin threads through. addEvent / setAttributes / getTraceId / getSpanId operate on the active span." }
+    { name: "createTraceContext()", type: "→ TraceContext", desc: "Build the per-call trace context the plugin threads through. addEvent / setAttributes / getTraceId / getSpanId operate on the active span." },
+    { name: "createHonoTracingMiddleware(options)", type: "→ HonoTracingMiddleware", desc: "Hono middleware wrapping @hono/otel's httpInstrumentationMiddleware with NetScript service naming + W3C propagation. app.use('*', createHonoTracingMiddleware({ serviceName: 'users' }))." }
   ]
 }) }}
 
@@ -367,6 +414,37 @@ lowest-effort observability path is to run <code>aspire start</code> and open
 <code>:18888</code> — no extra dependency, no collector to deploy. When you outgrow the local
 dashboard, the same OTLP export (<code>http://localhost:4318</code>) is the seam you point at a
 hosted backend.
+{{ /comp }}
+
+## Close the loop: read the trace back in code
+
+The dashboard answers *"what happened and where"* for a human. The same telemetry has a **typed,
+in-language read side** for programs — and for an AI agent verifying its own change without a
+browser. `@netscript/telemetry/query` publishes a `TelemetryQueryPort` contract with an
+Aspire-backed reader: `createAspireTelemetryQuery(...)` (or `createTelemetryQuery(...)` for the
+port type) reads the Aspire `/api/telemetry/*` surface into package-owned read models —
+`TelemetryTrace`, `TelemetrySpan` (with its `events` and `links`), `TelemetryLog`,
+`TelemetryResource`, `TelemetryMetric`. So the verification turn becomes an assertion: fetch the
+trace by id, check that the span you expected is present with the status you expected — no console
+to tail, no screenshot to read.
+
+{{ comp.apiTable({
+  caption: "Telemetry query read side (@netscript/telemetry/query)",
+  rows: [
+    { name: "createAspireTelemetryQuery(options) / createTelemetryQuery(options)", type: "→ AspireTelemetryQuery / TelemetryQueryPort", desc: "Build the Aspire-backed reader over the dashboard's /api/telemetry/* surface. The first returns the concrete adapter; the second returns it typed as the port contract." },
+    { name: "queryTraces(filter?) / getTrace(traceId)", type: "→ Promise<TelemetryTrace[]> / Promise<TelemetryTrace?>", desc: "List traces matching a TraceQueryFilter, or fetch a single trace by id — the assertion primitive for 'did my flow produce the span I expected'." },
+    { name: "querySpans / queryLogs / queryMetrics / queryResources", type: "→ Promise<readonly …[]>", desc: "Read spans, structured logs, metrics, and resource records back as package-owned models (TelemetrySpan / TelemetryLog / TelemetryMetric / TelemetryResource)." },
+    { name: "validateTraceQueryFilter / validateMetricQueryFilter / validateResourceQueryFilter", type: "(filter) → filter", desc: "Standard Schema validators for the query filters — a malformed query fails in-process rather than returning silently-wrong rows." }
+  ]
+}) }}
+
+{{ comp callout { type: "note", title: "One comparison: reading traces back to verify a change" } }}
+Encore ships an MCP server that exposes its local traces to an AI agent, so the agent can read
+back what its change did. NetScript closes the same loop from the other side: instead of a separate
+protocol server, the trace read side is a **typed in-language port** (<code>TelemetryQueryPort</code>)
+the app — or a test, or an agent's own tool — calls directly, returning the same package-owned read
+models the runtimes emit. Same goal — let the author verify a change *from the trace*, not by eye —
+kept inside the language and the type system.
 {{ /comp }}
 
 ## Production notes
