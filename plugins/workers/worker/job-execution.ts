@@ -15,10 +15,11 @@ export async function executeWorkerJob(
   payload: Record<string, unknown> | undefined,
   signal: AbortSignal,
   traceHeaders: Record<string, string>,
+  correlationId?: string,
 ): Promise<WorkerJobResult> {
   const executionType = jobDef.executionType ?? 'deno';
   if (executionType === 'deno') {
-    return await executeDenoJob(context, jobDef, payload, traceHeaders);
+    return await executeDenoJob(context, jobDef, payload, traceHeaders, correlationId);
   }
   return await executePolyglotTask(context, jobDef, payload, signal, traceHeaders);
 }
@@ -28,6 +29,7 @@ async function executeDenoJob(
   jobDef: JobDefinition,
   payload: Record<string, unknown> | undefined,
   traceHeaders: Record<string, string>,
+  correlationId?: string,
 ): Promise<WorkerJobResult> {
   const entrypoint = resolveDenoEntrypoint(context, jobDef);
 
@@ -42,6 +44,7 @@ async function executeDenoJob(
     triggeredBy: 'queue',
     triggeredAt: new Date().toISOString(),
     payload,
+    correlationId,
     traceparent: traceHeaders['traceparent'],
     tracestate: traceHeaders['tracestate'],
   };

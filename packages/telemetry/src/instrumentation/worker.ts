@@ -31,6 +31,7 @@ import {
   ExecutionAttributes,
   JobAttributes,
   JobStatuses,
+  NetScriptAttributeDomains,
   NetScriptCorrelationAttributes,
   SpanNames,
   WorkerAttributes,
@@ -303,6 +304,7 @@ export async function traceJobExecution<T extends TracedJobResult>(
     ...createJobAttributes(job),
     [ExecutionAttributes.EXECUTION_ID]: execution.executionId,
     [JobAttributes.JOB_STATUS]: JobStatuses.RUNNING,
+    [NetScriptAttributeDomains.OUTCOME]: JobStatuses.RUNNING,
   };
 
   if (execution.attempt) {
@@ -339,6 +341,10 @@ export async function traceJobExecution<T extends TracedJobResult>(
           JobAttributes.JOB_STATUS,
           result.success ? JobStatuses.COMPLETED : JobStatuses.FAILED,
         );
+        span.setAttribute(
+          NetScriptAttributeDomains.OUTCOME,
+          result.success ? JobStatuses.COMPLETED : JobStatuses.FAILED,
+        );
 
         if (result.exitCode !== undefined) {
           span.setAttribute(JobAttributes.JOB_EXIT_CODE, result.exitCode);
@@ -362,6 +368,7 @@ export async function traceJobExecution<T extends TracedJobResult>(
 
         span.setAttribute(JobAttributes.JOB_DURATION_MS, durationMs);
         span.setAttribute(JobAttributes.JOB_STATUS, JobStatuses.FAILED);
+        span.setAttribute(NetScriptAttributeDomains.OUTCOME, JobStatuses.FAILED);
 
         addSpanEvent(span, 'job.exception', {
           'exception.message': errorMessage,

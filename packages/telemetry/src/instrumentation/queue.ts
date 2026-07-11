@@ -29,6 +29,7 @@ import {
   MessagingAttributes,
   MessagingOperations,
   MessagingSystems,
+  NetScriptAttributeDomains,
   SpanNames,
 } from '../attributes/mod.ts';
 import type {
@@ -120,9 +121,11 @@ export class TracedQueue<T = unknown> implements MessageQueue<T> {
             destination: this.options.queueName,
             operation: MessagingOperations.PUBLISH,
             messageId,
+            correlationId: correlationIdFromMessage(message),
             priority: options?.priority,
           }),
         );
+        span.setAttribute(NetScriptAttributeDomains.OUTCOME, 'pending');
 
         // Prepare headers with the queue.enqueue span as the propagated parent.
         // Existing application headers are preserved, but trace context is replaced
@@ -144,6 +147,7 @@ export class TracedQueue<T = unknown> implements MessageQueue<T> {
           ...options,
           headers,
         });
+        span.setAttribute(NetScriptAttributeDomains.OUTCOME, 'completed');
 
         addSpanEvent(span, 'message.enqueued', {
           [MessagingAttributes.MESSAGE_ID]: messageId,
@@ -226,10 +230,12 @@ export class TracedQueue<T = unknown> implements MessageQueue<T> {
             destination: this.options.queueName,
             operation: MessagingOperations.RECEIVE,
             messageId: ctx.messageId,
+            correlationId: correlationIdFromMessage(message),
             deliveryCount: ctx.deliveryCount,
           }),
         },
       );
+      span.setAttribute(NetScriptAttributeDomains.OUTCOME, 'pending');
 
       // Create a context that includes the queue.dequeue span
       // This ensures that any spans created by the handler (e.g., job.execute)
@@ -247,10 +253,12 @@ export class TracedQueue<T = unknown> implements MessageQueue<T> {
         });
 
         setSpanOk(span);
+        span.setAttribute(NetScriptAttributeDomains.OUTCOME, 'completed');
         addSpanEvent(span, 'message.processed');
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         setSpanError(span, message, error instanceof Error ? error : undefined);
+        span.setAttribute(NetScriptAttributeDomains.OUTCOME, 'failed');
         addSpanEvent(span, 'message.failed', { 'error.message': message });
         throw error;
       } finally {
@@ -346,6 +354,14 @@ export class TracedQueue<T = unknown> implements MessageQueue<T> {
       },
     };
   }
+}
+
+function correlationIdFromMessage(message: unknown): string | undefined {
+  if (typeof message !== 'object' || message === null || !('correlationId' in message)) {
+    return undefined;
+  }
+  const correlationId = message.correlationId;
+  return typeof correlationId === 'string' ? correlationId : undefined;
 }
 
 // ============================================================================
