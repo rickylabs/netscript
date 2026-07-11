@@ -73,3 +73,19 @@
   applied. #687/#688 CI-not-triggering root cause: branches conflicted with main → GitHub creates no
   PR merge commit → no pull_request run; fix = rebase. Owner-decision items: #219 (A/B), #661 box 2
   (checkpoint execution), #238 epic close, milestone close. Next: run-artifacts PR + release cut.
+
+## CLOSE-OUT (2026-07-12 ~02:10)
+
+- **RELEASE PR #693 READY** (`release/cut-0.0.1-beta.8`, cut 54a0fcc6 from main 2c9e8f0c): all
+  release:cut gates green (preflight, publish dry-run, deno ci --prod), CI on the PR fully green.
+  STOPPED per mandate — awaiting owner merge + publish go. NOT merged, NOT published.
+- Cut incident: cut.ts PR-body write crashed (`.llm/tmp` absent in fresh worktree) BEFORE the new
+  #663 API path could run; branch/push unaffected; PR opened manually via the same token path;
+  follow-up issue filed (milestone beta.9, Refs #663).
+- **Milestone 10 scoreboard**: 24 PRs merged this run (#667–#684, #686–#691 + release #693 open
+  + artifacts #692). Issues closed+shipped: 663 664 665 659 460 461 495 496 497 498 500 380 246
+  269 270 290 660. Triage to Backlog: 247 271 499.
+- **Owner decisions outstanding**: (1) #219 — close on in-repo lifecycle proof (A) or keep open
+  for reference-app migration (B, move off milestone); (2) #661 — box 2 "checkpoint executed"
+  accepted as type-check+verify (close) or dedicated execution pass; (3) #238 epic close timing;
+  (4) milestone 10 close (blocked only on 1–3); (5) merge #693 + publish.
