@@ -52,3 +52,29 @@ Evaluator: GPT opposite-family lane; Claude-authored merged `main` docs cut. Val
 
 **Overall #450: PASS** — all nine pillar verdicts pass the requested shape, positioning, sampled
 API-trace, link/caveat, and stale-version gates.
+
+## Re-verdict after PR #652
+
+Scope: re-ran only the failed positioning-law dimension on merged-main commit `fe2e1b73`, trusting
+the original exercise shape, API-trace, link/caveat, stale-version, and all #450 results as directed.
+
+Command:
+
+```sh
+rg -n -i '\bhonest(y|ly)?\b|\bcand(or|our)\b' \
+  docs/site/tutorials/{storefront,erp-sync,eis-chat}
+```
+
+Result: no matches. Spot-reading the four formerly failing locations confirms that PR #652 replaced
+the banned framing without introducing an equivalent honesty/candor claim.
+
+| Track | Re-verdict | Fix evidence |
+|---|---|---|
+| storefront | **PASS** | `docs/site/tutorials/storefront/02-catalog-service.md:57` now says “direct way to prove the write path”; `04-checkout-saga.md:335` now says “observable checkpoint.” |
+| erp-sync | **PASS** | `docs/site/tutorials/erp-sync/04-queue-and-cron.md:126` now describes keeping CSB “aligned with VIF until cutover.” |
+| eis-chat (on-ramp) | **PASS** | `docs/site/tutorials/eis-chat/04-live-stream.md:170` now begins “Two notes on what the miniature simplified.” |
+
+**Final overall #449: PASS** — all three prior failures are clean after PR #652; the other three
+tracks retain their original PASS verdicts.
+
+**Final overall #450: PASS** — unchanged from the original verdict.
