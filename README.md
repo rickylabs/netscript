@@ -36,8 +36,8 @@ frontend, and five runtime plugins. Add any package with `deno add jsr:@netscrip
 `npx jsr add @netscript/<name>` on Node and Bun).
 
 > [!NOTE]
-> **Alpha (`0.0.1-alpha.1`).** The package surface and CLI are stabilizing toward a 1.0 line. APIs
-> may change between alpha releases — pin a version and track the
+> **Beta (`0.0.1-beta.x`).** The package surface and CLI are stabilizing toward a 1.0 line. APIs may
+> change between beta releases — pin a version and track the
 > [roadmap](https://github.com/rickylabs/netscript/milestones).
 
 ---
@@ -212,9 +212,9 @@ Full guides, tutorials, and per-package API references live at
 
 ## 📅 Roadmap & Maturity
 
-NetScript is at **`0.0.1-alpha.1`**: the architecture is in place across all 31 packages, and the
-surface is converging toward a stable 1.0 line. Pin a version in your import map, and follow what is
-landing next:
+NetScript is on the **`0.0.1-beta.x`** line: the architecture is in place across all 31 packages,
+and the surface is converging toward a stable 1.0 line. Pin a version in your import map, and follow
+what is landing next:
 
 - **[Milestones](https://github.com/rickylabs/netscript/milestones)** — release planning
 - **[Issues](https://github.com/rickylabs/netscript/issues)** — open work and proposals
@@ -235,5 +235,5 @@ feature proposals belong on the [issue tracker](https://github.com/rickylabs/net
 
 ## 📝 License
 
-Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Every `@netscript/*`
-package is published to JSR with cryptographically verified provenance.
+Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Every
+`@netscript/*` package is published to JSR with cryptographically verified provenance.

@@ -92,6 +92,13 @@ import { Icon, Show, VisuallyHidden } from '@netscript/fresh-ui/primitives';
   stroke icons, conditional rendering, and assistive-technology output without extra DOM wrappers.
 - **Semantic token vocabulary**: a theme-driven `--ns-*` custom-property surface that registry CSS
   targets, so themes and components stay decoupled.
+- **Generative-UI renderer**: `@netscript/fresh-ui/ai/render-ui` safely renders `render_ui` tool
+  payloads (`RenderUiToolInput` from `@netscript/ai/tools`) — a curated block whitelist (`stack`,
+  `grid`, `section`, `chart`, `metric`, `table`, `list`, `card`), a recursion depth guard
+  (`RENDER_UI_MAX_DEPTH = 6`), and named fallbacks for unknown or invalid nodes instead of throwing.
+- **AI registry collection**: `netscript ui:add ai` installs the AI/chat surface seams — message
+  thread, composer, model picker, tool-call disclosure, `render-ui`, and the `McpUiWidget` island
+  that renders MCP `ui://` resources surfaced by the `@netscript/ai/mcp` client transport pool.
 
 ---
 
@@ -108,5 +115,5 @@ import { Icon, Show, VisuallyHidden } from '@netscript/fresh-ui/primitives';
 
 ## 📝 License
 
-Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
-cryptographically verified provenance.
+Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
+JSR with cryptographically verified provenance.
