@@ -83,15 +83,9 @@ if (workersIndex < 0 || nextResourceIndex < 0) {
   throw new Error('generated register-plugins.mts did not contain the workers-api resource block');
 }
 const workersBlock = registerPlugins.slice(workersIndex, nextResourceIndex);
-// The published flow-b config introduces jsr pins that are minutes old at
-// release-verification time; the Aspire-launched service must bypass Deno's
-// dependency recency guard or it never starts (health probe timeout).
-const flowBRunPrefix = mode === 'published'
-  ? "['run', '--minimum-dependency-age=0', '--config', '.netscript-flow-b-deno.json',"
-  : "['run', '--config', '.netscript-flow-b-deno.json',";
 let configuredWorkersBlock = workersBlock.replace(
   "['run', '--config', 'deno.json',",
-  flowBRunPrefix,
+  "['run', '--config', '.netscript-flow-b-deno.json',",
 );
 if (mode === 'local') {
   configuredWorkersBlock = configuredWorkersBlock.replace(
@@ -258,3 +252,29 @@ console.info('Flow-B generated callback fixture wired');
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
+
+// Pre-warm the flow-b module graph before Aspire launches workers-api: the
+// flow-b config introduces pins absent from the project's default graph (fresh
+// jsr pins in published mode, local source files otherwise). Cold resolution at
+// service start can exceed the health-probe window even though the executable
+// is 'running'. The generated launch args already carry
+// --minimum-dependency-age=0 in published mode; mirror it here.
+const servicesEntrypoint = mode === 'published'
+  ? `jsr:@netscript/plugin-workers@${publishedVersion}/services`
+  : '@netscript/plugin-workers/services';
+const warm = await new Deno.Command('deno', {
+  args: [
+    'cache',
+    '--minimum-dependency-age=0',
+    '--config',
+    flowBConfigPath,
+    servicesEntrypoint,
+  ],
+  cwd: projectRoot,
+}).output();
+if (!warm.success) {
+  throw new Error(
+    `flow-b graph pre-warm failed: ${new TextDecoder().decode(warm.stderr).slice(-1200)}`,
+  );
+}
+console.info('flow-b module graph pre-warmed');
