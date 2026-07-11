@@ -25,6 +25,52 @@ together.
 From there, the Web Layer how-to guides isolate each capability so you can lift a
 single pattern into your own project.
 
+## The smallest typed example, end to end
+
+The shortest path from a contract to a rendered island: a typed route reference,
+a contract-derived query, and a `QueryIsland`. It composes three documented
+surfaces — [routing](/web-layer/route/), the [query cache](/web-layer/query/), and
+the [SDK bridge](/services-sdk/sdk/) — and nothing in it is hand-typed:
+
+```tsx
+// apps/dashboard/islands/OrdersPanel.tsx
+import { QueryIsland, useIslandQuery } from "@netscript/fresh/query";
+import { createRouteReference } from "@netscript/fresh/route";
+import { orders } from "../lib/api-clients.ts"; // createServiceQueryUtils(ordersClient)
+
+const ordersRoute = createRouteReference("/orders");
+
+function OrdersList() {
+  const query = useIslandQuery({
+    ...orders.list.queryOptions({ input: { limit: 20 } }),
+    staleTime: 15_000,
+  });
+
+  return (
+    <section>
+      <a href={ordersRoute.href()}>Orders</a>
+      <ul>
+        {query.data?.map((order) => <li key={order.id}>{order.reference}</li>)}
+      </ul>
+    </section>
+  );
+}
+
+export default function OrdersPanel() {
+  return (
+    <QueryIsland>
+      <OrdersList />
+    </QueryIsland>
+  );
+}
+```
+
+The `orders` query utils come from the single `lib/api-clients.ts` module the
+[query cache page](/web-layer/query/) builds — `createServiceClient` →
+`createServiceQueryUtils` — so a renamed contract field is a compile error here,
+not a runtime blank. For the full read/write pair (typed query plus optimistic
+mutation) see that page.
+
 ## The package surface
 
 `@netscript/fresh` keeps its capabilities on explicit subpaths. The package root
