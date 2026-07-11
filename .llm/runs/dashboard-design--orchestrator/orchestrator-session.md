@@ -26,3 +26,17 @@
 | Adversarial UX/DX pass | Codex · GPT-5.6 Sol · max via launch-codex-slice |
 | Dynamic plugin-system investigation | ONE Fable 5 low sub-agent (sanctioned single delegation; swarms prohibited) |
 | Complex doc/analysis sub-agents (if any) | Opus 4.8 high |
+
+## Final state (2026-07-12 close-out)
+
+Slices 1–7 all merged into `design/dev-dashboard-revamp` locally (see `run-eval.md` ledger).
+Slice branches pushed to origin: `ddr-s1` (via umbrella), `ddr-s3`, `ddr-s4` (brief),
+`ddr-s5`. NOT pushed (auto-mode classifier blocks reference-derived analysis to the public
+repo): umbrella tip with slices 2/4/6/7 merges + eval. Owner publishes with:
+`git -C /home/codex/repos/netscript-547-lffix/.claude/worktrees/dashboard-design-orchestrator push`
+
+Deliverables: `design-prompts/00..06` (six Claude-Design prompts + README),
+`analysis/routing-resort.md` (locked hierarchy), `analysis/plugin-extension-architecture.md`,
+`analysis/codex-ux-dx-verdict.md` + steal list, `analysis/glm-design-pass.md`,
+`coverage-matrix.md` + `issue-comment-drafts.md` (20 comments posted), `screen-catalog.md` +
+17 screenshots, `run-eval.md`.

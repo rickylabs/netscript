@@ -13,7 +13,7 @@ product code changed anywhere in this run.
 | 3 Adversarial UX/DX | Codex GPT-5.6 Sol max | `design/ddr-s3-codex-ux` | ✅ verdict + ranked 15 + steal list |
 | 4 GLM 5.2 design pass | OpenRouter (see findings) | `design/ddr-s4-glm-design` | ✅ critique delivered; agentic lanes non-viable |
 | 5 Plugin/extension architecture | Fable 5 low (sanctioned single delegation) | `design/ddr-s5-plugin-system` | ✅ 437-line proposal (7 contribution kinds, trust ladder, AppTarget) |
-| 6 Beta.10 coverage matrix | Opus 4.8 high agent | `design/ddr-s6-coverage` | (in flight at eval-writing; ledger updated in close-out comment) |
+| 6 Beta.10 coverage matrix | Opus 4.8 high agent | `design/ddr-s6-coverage` | ✅ 30-issue bidirectional matrix + 20 issue comments posted (all 201) |
 | 7 Claude Design prompts v3 | supervisor | `design/ddr-s7-prompts` | ✅ 6 prompts + README, leak-checked |
 
 ## GLM 5.2 capability test (explicit owner ask)
