@@ -19,6 +19,15 @@ export interface LaunchIdentityEvidence {
   readonly mismatches: readonly ('provider' | 'model' | 'effort')[];
 }
 
+export interface LaunchIdentityEnforcement {
+  readonly allowed: boolean;
+  readonly operatorAction: string | null;
+}
+
+export const ROUTE_MISMATCH_OPERATOR_ACTION: string =
+  'BLOCKED: inspect the requested/observed route and retry only after correcting the launch; ' +
+  'use --allow-route-mismatch only for an explicit operator-approved exception.';
+
 /** Validates explicit launch identity without reading credentials or provider output. */
 export function requestedLaunchIdentity(values: {
   provider?: string;
@@ -59,4 +68,15 @@ export function compareLaunchIdentity(
     status: mismatches.length > 0 ? 'mismatch' : missing ? 'pending' : 'matched',
     mismatches,
   };
+}
+
+/** Enforces route evidence by default, with one explicit operator opt-out. */
+export function enforceLaunchIdentity(
+  evidence: LaunchIdentityEvidence,
+  allowRouteMismatch: boolean,
+): LaunchIdentityEnforcement {
+  if (evidence.status === 'matched' || allowRouteMismatch) {
+    return { allowed: true, operatorAction: null };
+  }
+  return { allowed: false, operatorAction: ROUTE_MISMATCH_OPERATOR_ACTION };
 }

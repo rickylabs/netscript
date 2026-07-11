@@ -78,7 +78,11 @@ The `--model gpt-5.6-sol` above is an **illustrative literal** for a runnable ex
 source of truth. Pick the real provider/model/effort from `.llm/harness/workflow/lane-policy.md`
 (whose bindings live in `runtime/routing-policy.ts`, referencing the ids in `config/models.ts`);
 prose in the brief is not launch authority. Drop `--dry-run` for the real launch; it fails closed
-unless the observed provider/model/effort match what you requested. Exit: `0` ok/dry-run/parse-log ·
+unless the observed provider/model/effort match what you requested. The launcher uses the v2
+app-server JSONL protocol directly because Codex CLI 0.144.1's `debug app-server send-message-v2`
+helper does not propagate `-c model_reasoning_effort` to the child turn. Pass
+`--allow-route-mismatch` only for an explicit operator-approved exception; otherwise a pending or
+mismatched route exits non-zero with a `BLOCKED:` operator action. Exit: `0` ok/dry-run/parse-log ·
 `1` stage failed · `2` watcher heartbeat · `3` brief contract violation · `4` git-safety violation
 (e.g. inherited upstream) · `5` worktree not found.
 
