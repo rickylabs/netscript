@@ -1,6 +1,6 @@
 {
   "name": "@netscript/plugin-streams",
-  "version": "0.0.1-beta.6",
+  "version": "0.0.1-beta.7",
   "description": "Durable Streams service, CLI, Aspire, E2E, and scaffolding plugin for NetScript.",
   "license": "Apache-2.0",
   "exports": {
@@ -13,11 +13,11 @@
     "./services": "./services/src/main.ts"
   },
   "imports": {
-    "@netscript/aspire": "jsr:@netscript/aspire@0.0.1-beta.6",
-    "@netscript/contracts": "jsr:@netscript/contracts@0.0.1-beta.6",
-    "@netscript/plugin": "jsr:@netscript/plugin@0.0.1-beta.6",
-    "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.1-beta.6",
-    "@netscript/service": "jsr:@netscript/service@0.0.1-beta.6",
+    "@netscript/aspire": "jsr:@netscript/aspire@0.0.1-beta.7",
+    "@netscript/contracts": "jsr:@netscript/contracts@0.0.1-beta.7",
+    "@netscript/plugin": "jsr:@netscript/plugin@0.0.1-beta.7",
+    "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.1-beta.7",
+    "@netscript/service": "jsr:@netscript/service@0.0.1-beta.7",
     "@std/net": "jsr:@std/net@^1",
     "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
     "hono": "jsr:@hono/hono@4.12.24",

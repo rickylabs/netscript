@@ -1,6 +1,6 @@
 {
   "name": "@netscript/logger",
-  "version": "0.0.1-beta.6",
+  "version": "0.0.1-beta.7",
   "description": "Structured logging for NetScript services, packages, workers, and Hono/oRPC integrations.",
   "license": "Apache-2.0",
   "exports": {
