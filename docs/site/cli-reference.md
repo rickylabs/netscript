@@ -254,7 +254,6 @@ registry and runtime schemas stay in sync.
   rows: [
     { name: "netscript generate plugins", type: "netscript generate plugins", desc: "Generate the plugin registries from project source. Run this after every <code>plugin install</code> so the workspace picks up new contributions." },
     { name: "netscript generate runtime-schemas", type: "netscript generate runtime-schemas", desc: "Generate runtime configuration schemas from registered plugin metadata." },
-    { name: "netscript generate ai", type: "netscript generate ai", desc: "Available from <code>0.0.1-beta.2</code>: generate the AI runtime registries from the workspace's AI-stack configuration. Emits two targets: <code>ai-tools</code> (a registry keyed by <code>descriptor.name</code>, values are <code>AiToolDefinition</code> from <code>@netscript/ai/tools</code>) and <code>ai-agents</code> (a stem-keyed map of <code>() =&gt; AgentLoop</code> factories)." }
   ]
 }) }}
 
