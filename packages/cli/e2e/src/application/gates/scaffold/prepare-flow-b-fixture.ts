@@ -83,9 +83,15 @@ if (workersIndex < 0 || nextResourceIndex < 0) {
   throw new Error('generated register-plugins.mts did not contain the workers-api resource block');
 }
 const workersBlock = registerPlugins.slice(workersIndex, nextResourceIndex);
+// The published flow-b config introduces jsr pins that are minutes old at
+// release-verification time; the Aspire-launched service must bypass Deno's
+// dependency recency guard or it never starts (health probe timeout).
+const flowBRunPrefix = mode === 'published'
+  ? "['run', '--minimum-dependency-age=0', '--config', '.netscript-flow-b-deno.json',"
+  : "['run', '--config', '.netscript-flow-b-deno.json',";
 let configuredWorkersBlock = workersBlock.replace(
   "['run', '--config', 'deno.json',",
-  "['run', '--config', '.netscript-flow-b-deno.json',",
+  flowBRunPrefix,
 );
 if (mode === 'local') {
   configuredWorkersBlock = configuredWorkersBlock.replace(
