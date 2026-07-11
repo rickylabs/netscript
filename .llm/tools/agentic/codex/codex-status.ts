@@ -23,6 +23,7 @@
  */
 
 import { requireValue, wsl, wslGitInfo, wslGitLogsPath, wslUser } from '../lib/agentic-lib.ts';
+import { classifyCodexRolloutFailure } from './classify-codex-failure.ts';
 
 interface Options {
   worktree?: string;
@@ -122,6 +123,14 @@ async function main(): Promise<void> {
         `sort -nr | head -n ${o.sessions} | sed -E 's/^[0-9.]+ //'`,
     );
     report.sessions = sess.stdout ? sess.stdout.split('\n').filter(Boolean) : [];
+    const latest = await wsl(
+      o.user,
+      `latest=$(find ~/.codex/sessions -type f -name '*.jsonl' -printf '%T@ %p\\n' 2>/dev/null | ` +
+        `sort -nr | head -n 1 | sed -E 's/^[0-9.]+ //'); ` +
+        `if [ -n "$latest" ]; then tail -c 65536 "$latest"; fi`,
+    );
+    const failure = classifyCodexRolloutFailure(latest.stdout);
+    report.failure = failure.kind === 'other' ? null : failure;
   }
 
   if (o.pretty) {
@@ -138,6 +147,13 @@ async function main(): Promise<void> {
     if (report.sessions) {
       console.log(`sessions: ${report.sessions.length} recent`);
       for (const s of report.sessions) console.log(`          ${s}`);
+    }
+    if (report.failure) {
+      console.log(
+        `failure : ${report.failure.kind}${
+          report.failure.resetAt ? ` reset-at=${report.failure.resetAt}` : ''
+        }`,
+      );
     }
   } else {
     console.log(JSON.stringify(report));
