@@ -241,9 +241,13 @@ backend to run an interactive sign-in — the seam fails loud with a typed
 {{ comp.xref({ key: "explain:auth-model", text: "auth model" }) }} for the full port-and-adapter
 walkthrough.
 
-{{ comp callout { type: "note", title: "Alpha package pins" } }}
-Scaffolded JSR imports use exact <code>{{ releaseSpecifier }}</code> pins for the aligned alpha
-train. There is also no auth telemetry or audit surface yet — do not assume one exists.
+{{ comp callout { type: "note", title: "Package pins & the audit surface" } }}
+Scaffolded JSR imports use exact <code>{{ releaseSpecifier }}</code> pins for the aligned release
+train. Auth also ships a structured, redacted audit surface — <code>createAuthTelemetry</code>
+from <code>@netscript/plugin-auth-core</code> — which records audit spans only when a
+<code>subjectHashSalt</code> is configured (<code>NETSCRIPT_AUTH_AUDIT_SALT</code>); without a
+salt it runs as a no-op. See {{ comp.xref({ key: "explain:observability" }) }} for the full
+audit-trail model.
 {{ /comp }}
 
 ## Why the model looks like this

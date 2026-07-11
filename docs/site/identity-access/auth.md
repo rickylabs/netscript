@@ -8,6 +8,12 @@ next: null
 
 # Authentication
 
+**One env var and five endpoints separate a scaffolded workspace from a working OAuth sign-in —
+and the boundaries fail loud with typed errors instead of degrading to a silent anonymous
+session.** Auth is the part of a backend where "compiles and demos fine" and "actually holds"
+diverge most easily, so NetScript puts the conventions in the contract rather than in notes an
+agent has to remember to apply.
+
 NetScript ships authentication as a first-class official plugin: `netscript plugin install @netscript/plugin-auth`
 adds an `auth-api` oRPC service that boots on port **8094** alongside your workers, sagas, and
 triggers. The plugin is **pure-backend** — it owns the session lifecycle, OAuth/OIDC redirect
@@ -40,6 +46,43 @@ sessions and an opaque HMAC-signed session token. To wire it into a workspace st
 port model and why only one backend is active, see
 <a href="/explanation/auth-model/">The authentication model</a>.
 {{ /comp }}
+
+## Where agent-built auth goes wrong
+
+Auth is a security-sensitive surface, and security-sensitive surfaces have a specific
+build-efficiency failure shape: the mistake does not stop the build. A missing job queue fails a
+request; a mis-wired sign-in flow ships. Supabase's published agent-skills guidance names the
+pattern for its own platform — agents building on it skip RLS policies, hallucinate CLI commands,
+and create views without `security_invoker = true` — and its remedy is a skill: reference material
+the agent loads so it applies the conventions at the right moment. NetScript takes the other route
+for the same problem: move the conventions out of the agent's working memory and into the shipped
+contract, so the common wrong turns either don't type-check, don't configure, or fail loud at
+runtime with a typed error.
+
+Concretely, the contract closes off the classic failure modes:
+
+- **The silent anonymous fallback.** An agent wiring auth by hand tends to catch the failure and
+  degrade to an unauthenticated default. `backend.authenticate()` cannot express that: it returns
+  a typed `AuthnResult` — `{ ok: true, principal }` or `{ ok: false, reason }` — never a silent
+  anonymous principal.
+- **Calling a capability the backend doesn't have.** Asking a non-interactive backend (WorkOS,
+  better-auth) to run the interactive sign-in returns a typed `AUTH_PROVIDER_ERROR`, and direct
+  session mutations throw `AuthBackendOperationUnsupportedError` — a capability boundary, not a
+  no-op that looks like success.
+- **Two half-wired providers.** There is nothing to reconcile: `NETSCRIPT_AUTH_BACKEND` selects
+  exactly one active backend (single-active-backend), and every backend normalizes to the same
+  `Principal`, so downstream authorization code is identical regardless of provider.
+- **Hand-rolled session cookies.** The session cookie is `__Host-ns_session`; the `__Host-` prefix
+  makes the browser itself refuse a cookie with a `Domain`, a non-root `Path`, or a plain-HTTP
+  origin — the misconfiguration fails to set rather than silently weakening.
+- **Logging raw subjects.** The audit surface (`createAuthTelemetry`) redacts by construction —
+  subject hashes, stripped token-bearing claims — and runs as a no-op until a salt is configured,
+  because an un-salted hash would be worse than nothing.
+
+Each item above is the shipped behavior of the published packages, documented mechanism-by-mechanism
+in the sections below — start with
+{{ comp.xref({ key: "explain:auth-model", text: "the authentication model" }) }} for why the seam
+is shaped this way.
 
 ## What it is
 
@@ -261,15 +304,18 @@ the `AUTH_STREAM_EVENT_TYPES`: `auth.signin.started`, `auth.signin.failed`,
 is described by the `authStreamSchema` entity stream. For the streams runtime itself see
 {{ comp.xref({ key: "cap:streams", text: "Durable streams" }) }}.
 
-{{ comp callout { type: "warning", title: "Scope: events are best-effort, no audit surface" } }}
+{{ comp callout { type: "warning", title: "Scope: stream events are best-effort — the audit trail is separate" } }}
 The <code>auth.*</code> events are <strong>best-effort</strong>: they are no-ops unless the
 durable-streams service is wired (<code>DURABLE_STREAMS_URL</code> /
 <code>services__streams__http__0</code> set), so they are <strong>not</strong> a guaranteed audit
 trail. Only <code>oidc.completed</code>, <code>token.refreshed</code>, and
 <code>session.revoked</code> write the session projection; <code>signin.started</code> /
-<code>signin.failed</code> are diagnostic-only. There is <strong>no dedicated auth telemetry or
-audit-observability surface yet</strong> — do not build dashboards expecting one. For general
-tracing and structured logs see <a href="/observability/telemetry/">Telemetry &amp; logging</a>.
+<code>signin.failed</code> are diagnostic-only. The dedicated audit surface is separate:
+<code>createAuthTelemetry</code> records structured, redacted audit spans when a
+<code>subjectHashSalt</code> is configured (see the production notes below and
+{{ comp.xref({ key: "explain:observability" }) }}) — the raw stream events complement it, they do
+not replace it. For general tracing and structured logs see
+<a href="/observability/telemetry/">Telemetry &amp; logging</a>.
 {{ /comp }}
 
 ## Endpoints & ports
