@@ -9,7 +9,12 @@
 
 import { assert, assertEquals, assertInstanceOf } from '@std/assert';
 
-import { AgentMaxStepsExceededError, createAgentLoop, slidingWindowHistory } from '../agent.ts';
+import {
+  AgentMaxStepsExceededError,
+  createAgentLoop,
+  slidingWindowHistory,
+  tokenBudgetHistory,
+} from '../agent.ts';
 import type { AgentLoopInput } from '../agent.ts';
 import type { ChatClientEvent } from '../src/ports/chat-client.ts';
 import type { AgentChunk } from '../src/contracts/chunk.ts';
@@ -256,4 +261,64 @@ Deno.test('slidingWindowHistory: returns the input unchanged when within the win
     { role: 'assistant', content: 'b' },
   ];
   assertEquals(slidingWindowHistory({ maxMessages: 5 }).apply(history), history);
+});
+
+Deno.test('tokenBudgetHistory: respects the default character budget and keeps newest messages', () => {
+  const history: Message[] = [
+    { role: 'user', content: '1111' },
+    { role: 'assistant', content: '22222222' },
+    { role: 'user', content: '3333' },
+  ];
+
+  const bounded = tokenBudgetHistory({ budget: 3 }).apply(history);
+
+  assertEquals(bounded.map((message) => message.content), ['22222222', '3333']);
+});
+
+Deno.test('tokenBudgetHistory: preserves all leading system messages', () => {
+  const history: Message[] = [
+    { role: 'system', content: 'first' },
+    { role: 'system', content: 'second' },
+    { role: 'user', content: 'older' },
+    { role: 'assistant', content: 'newer' },
+  ];
+
+  const bounded = tokenBudgetHistory({ budget: 6 }).apply(history);
+
+  assertEquals(bounded.map((message) => message.content), ['first', 'second', 'newer']);
+});
+
+Deno.test('tokenBudgetHistory: honors a custom estimator', () => {
+  const history: Message[] = [
+    { role: 'user', content: 'old' },
+    { role: 'assistant', content: 'middle' },
+    { role: 'user', content: 'new' },
+  ];
+  const costs = new Map([['old', 4], ['middle', 2], ['new', 1]]);
+
+  const bounded = tokenBudgetHistory({
+    budget: 3,
+    estimator: (message) => costs.get(String(message.content)) ?? 0,
+  }).apply(history);
+
+  assertEquals(bounded.map((message) => message.content), ['middle', 'new']);
+});
+
+Deno.test('tokenBudgetHistory: zero budget retains only zero-cost newest messages', () => {
+  const history: Message[] = [
+    { role: 'user', content: 'costly' },
+    { role: 'assistant', content: '' },
+  ];
+
+  assertEquals(tokenBudgetHistory({ budget: 0 }).apply(history), [history[1]!]);
+});
+
+Deno.test('tokenBudgetHistory: tiny budgets preserve system framing even when it exceeds budget', () => {
+  const system: Message = { role: 'system', content: 'long system framing' };
+  const history: Message[] = [
+    system,
+    { role: 'user', content: 'x' },
+  ];
+
+  assertEquals(tokenBudgetHistory({ budget: 1 }).apply(history), [system]);
 });

@@ -20,6 +20,20 @@ export interface HistoryStrategy {
   apply(messages: readonly Message[]): readonly Message[];
 }
 
+/** Estimates the token cost of one conversation message. */
+export type TokenEstimator = (message: Readonly<Message>) => number;
+
+/** Options for {@linkcode tokenBudgetHistory}. */
+export interface TokenBudgetHistoryOptions {
+  /** Maximum estimated tokens retained across the returned messages. */
+  readonly budget: number;
+  /**
+   * Per-message token estimator. Defaults to approximately one token per four
+   * content characters.
+   */
+  readonly estimator?: TokenEstimator;
+}
+
 /** Options for {@linkcode slidingWindowHistory}. */
 export interface SlidingWindowOptions {
   /**
@@ -36,6 +50,22 @@ export interface SlidingWindowOptions {
 
 /** Default sliding-window size (non-system messages retained). */
 export const DEFAULT_HISTORY_WINDOW = 20;
+
+function contentCharacterCount(message: Readonly<Message>): number {
+  if (typeof message.content === 'string') {
+    return message.content.length;
+  }
+  return JSON.stringify(message.content).length;
+}
+
+function defaultTokenEstimator(message: Readonly<Message>): number {
+  return Math.ceil(contentCharacterCount(message) / 4);
+}
+
+function normalizedEstimate(estimator: TokenEstimator, message: Readonly<Message>): number {
+  const estimate = estimator(message);
+  return Number.isFinite(estimate) && estimate > 0 ? Math.ceil(estimate) : 0;
+}
 
 /**
  * A sliding-window {@linkcode HistoryStrategy}: keep every leading `system`
@@ -68,6 +98,66 @@ export function slidingWindowHistory(options: SlidingWindowOptions = {}): Histor
       const rest = messages.slice(leadingSystem.length);
       const recent = rest.slice(Math.max(0, rest.length - maxMessages));
       return [...leadingSystem, ...recent];
+    },
+  };
+}
+
+/**
+ * A token-budget {@linkcode HistoryStrategy}: preserve leading `system`
+ * messages, then keep the newest contiguous message suffix that fits the
+ * remaining estimated budget.
+ *
+ * Preserved system messages are never removed, even when their estimates alone
+ * exceed the budget. Supply `estimator` to use a model-specific tokenizer.
+ *
+ * @example
+ * ```ts
+ * import { tokenBudgetHistory } from "@netscript/ai/agent";
+ *
+ * const strategy = tokenBudgetHistory({
+ *   budget: 8_000,
+ *   estimator: (message) => tokenizer.encode(String(message.content)).length,
+ * });
+ * const bounded = strategy.apply(fullTranscript);
+ * ```
+ *
+ * @param options - Token budget and optional per-message estimator.
+ * @returns A pure, order-preserving history strategy.
+ */
+export function tokenBudgetHistory(options: TokenBudgetHistoryOptions): HistoryStrategy {
+  if (!Number.isFinite(options.budget) || options.budget < 0) {
+    throw new RangeError('Token history budget must be a finite non-negative number');
+  }
+
+  const budget = Math.floor(options.budget);
+  const estimator = options.estimator ?? defaultTokenEstimator;
+
+  return {
+    apply(messages: readonly Message[]): readonly Message[] {
+      let leadingSystemCount = 0;
+      let used = 0;
+      while (
+        leadingSystemCount < messages.length &&
+        messages[leadingSystemCount]?.role === 'system'
+      ) {
+        used += normalizedEstimate(estimator, messages[leadingSystemCount]!);
+        leadingSystemCount++;
+      }
+
+      let firstRecent = messages.length;
+      for (let index = messages.length - 1; index >= leadingSystemCount; index--) {
+        const estimate = normalizedEstimate(estimator, messages[index]!);
+        if (used + estimate > budget) {
+          break;
+        }
+        used += estimate;
+        firstRecent = index;
+      }
+
+      return [
+        ...messages.slice(0, leadingSystemCount),
+        ...messages.slice(firstRecent),
+      ];
     },
   };
 }
