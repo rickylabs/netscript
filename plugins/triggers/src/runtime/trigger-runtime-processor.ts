@@ -23,7 +23,12 @@ import {
 } from '@netscript/plugin-triggers-core/stores';
 import type { KvStore } from '@netscript/kv';
 import { traceJobDispatch } from '@netscript/telemetry/instrumentation';
-import { SpanNames, TriggerAttributes } from '@netscript/telemetry/attributes';
+import {
+  NetScriptAttributeDomains,
+  NetScriptCorrelationAttributes,
+  SpanNames,
+  TriggerAttributes,
+} from '@netscript/telemetry/attributes';
 import {
   type Context,
   contextWithSpan,
@@ -107,6 +112,8 @@ class TracedTriggerProcessor implements TriggerProcessorPort {
       [TriggerAttributes.EVENT_ID]: String(event.id),
       [TriggerAttributes.EVENT_KIND]: String(event.kind),
       [TriggerAttributes.EVENT_STATUS]: String(event.status),
+      [NetScriptCorrelationAttributes.CORRELATION_ID]: String(event.id),
+      [NetScriptAttributeDomains.OUTCOME]: 'pending',
     };
 
     return await this.#runSpan(
@@ -152,10 +159,12 @@ class TracedTriggerProcessor implements TriggerProcessorPort {
     const childContext = contextWithSpan(span, parentContext);
     try {
       const result = await fn(childContext);
+      span.setAttribute(NetScriptAttributeDomains.OUTCOME, 'completed');
       span.setStatus({ code: SpanStatusCode.OK });
       return result;
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : String(error);
+      span.setAttribute(NetScriptAttributeDomains.OUTCOME, 'failed');
       span.setStatus({ code: SpanStatusCode.ERROR, message });
       if (error instanceof Error) {
         span.recordException(error);

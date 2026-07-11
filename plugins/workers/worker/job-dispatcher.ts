@@ -145,6 +145,7 @@ export async function processWorkerJob(
           payload,
           abortController.signal,
           subprocessHeaders,
+          correlationId,
         );
 
         addJobStepEvent('state_update', { status: result.success ? 'completed' : 'failed' });
