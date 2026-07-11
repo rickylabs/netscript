@@ -39,11 +39,17 @@ import type { ToolCall, ToolDescriptor, ToolParameters } from '../contracts/tool
 import type { Usage } from '../contracts/usage.ts';
 import type {
   ChatClientCallOptions,
+  ChatClientConnectionOptions,
   ChatClientEvent,
   ChatClientPort,
   ChatClientRequest,
   ChatFinishReason,
 } from '../ports/chat-client.ts';
+
+/** Build the provider SDK adapter for one call's connection values. */
+export type ChatAdapterResolver = (
+  connection: ChatClientConnectionOptions | undefined,
+) => AnyTextAdapter;
 
 /** Identifying metadata for the wrapped client, surfaced on the owned port. */
 export interface ChatClientMeta {
@@ -133,7 +139,7 @@ export function resolveModelOptions(
  * @returns A provider-neutral chat client that translates to/from TanStack.
  */
 export function toTanstackChatClient(
-  adapter: AnyTextAdapter,
+  adapter: AnyTextAdapter | ChatAdapterResolver,
   meta: ChatClientMeta,
 ): ChatClientPort {
   return {
@@ -160,8 +166,11 @@ export function toTanstackChatClient(
       const pending = new Map<string, { name: string; args: string }>();
 
       try {
+        const resolvedAdapter = typeof adapter === 'function'
+          ? adapter(options?.connection)
+          : adapter;
         const streamed = chat({
-          adapter,
+          adapter: resolvedAdapter,
           messages,
           systemPrompts,
           tools,

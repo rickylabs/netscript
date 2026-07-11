@@ -171,6 +171,25 @@ for await (const event of client.stream({ messages }, { signal: abort.signal }))
 }
 ```
 
+Credentials and endpoints can be selected for one turn on that same call-level options surface.
+Non-empty request values override provider construction defaults; later turns fall back to the
+provider configuration again. Ollama uses `host` while hosted providers use `baseURL`:
+
+```ts
+await Array.fromAsync(client.stream(
+  { messages },
+  {
+    connection: {
+      apiKey: tenant.apiKey,
+      baseURL: tenant.baseURL,
+    },
+  },
+));
+```
+
+Connection values are used only to construct the request transport. Configuration errors identify
+missing field names but never include key or endpoint values.
+
 ### Bundle-isolation guarantee
 
 The base `@netscript/ai` entrypoint **never** imports a provider subpath, and the subpaths never

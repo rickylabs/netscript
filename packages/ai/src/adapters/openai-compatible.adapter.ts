@@ -157,7 +157,8 @@ export class OpenAiCompatibleModelProvider implements ModelProviderPort {
    *
    * @param model - A model id the endpoint exposes.
    * @returns An owned chat client bound to `model`.
-   * @throws {AiNotConfiguredError} When `baseURL` or `apiKey` is missing.
+   * Missing request/provider connection values surface as an
+   * {@linkcode AiNotConfiguredError} event when the returned stream is read.
    *
    * @example Stream one turn with cancellation
    * ```ts
@@ -174,22 +175,24 @@ export class OpenAiCompatibleModelProvider implements ModelProviderPort {
    * ```
    */
   createChatClient(model: string): ChatClientPort {
-    const { baseURL, apiKey, models, api, name } = this.#config;
-    if (baseURL === undefined || apiKey === undefined) {
-      throw new AiNotConfiguredError(
-        OPENAI_COMPATIBLE_PROVIDER_ID,
-        'Provide `baseURL` and `apiKey` to construct a client.',
-      );
-    }
-    const factory = openaiCompatible({
-      name: name ?? OPENAI_COMPATIBLE_PROVIDER_ID,
-      baseURL,
-      apiKey,
-      models: models ?? [model],
-      api,
-    });
-    const adapter = factory(model);
-    return toTanstackChatClient(adapter, {
+    const { models, api, name } = this.#config;
+    return toTanstackChatClient((connection) => {
+      const baseURL = nonEmpty(connection?.baseURL) ?? nonEmpty(this.#config.baseURL);
+      const apiKey = nonEmpty(connection?.apiKey) ?? nonEmpty(this.#config.apiKey);
+      if (baseURL === undefined || apiKey === undefined) {
+        throw new AiNotConfiguredError(
+          OPENAI_COMPATIBLE_PROVIDER_ID,
+          'Provide `baseURL` and `apiKey` for this request or provider.',
+        );
+      }
+      return openaiCompatible({
+        name: name ?? OPENAI_COMPATIBLE_PROVIDER_ID,
+        baseURL,
+        apiKey,
+        models: models ?? [model],
+        api,
+      })(model);
+    }, {
       name: name ?? OPENAI_COMPATIBLE_PROVIDER_ID,
       kind: 'text',
       mapModelOptions: openAiCompatibleGenerationModelOptions,
@@ -209,4 +212,8 @@ export class OpenAiCompatibleModelProvider implements ModelProviderPort {
       },
     };
   }
+}
+
+function nonEmpty(value: string | undefined): string | undefined {
+  return value !== undefined && value.length > 0 ? value : undefined;
 }

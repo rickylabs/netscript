@@ -176,14 +176,15 @@ export class OllamaModelProvider implements ModelProviderPort {
    * @param model - A model id the daemon exposes.
    */
   createChatClient(model: ModelId): ChatClientPort {
-    const factory = openaiCompatible({
-      name: OLLAMA_PROVIDER_ID,
-      baseURL: `${this.host.replace(/\/+$/, '')}/v1`,
-      apiKey: OLLAMA_PLACEHOLDER_KEY,
-      models: this.#config.models ?? [model],
-    });
-    const adapter = factory(model);
-    return toTanstackChatClient(adapter, {
+    return toTanstackChatClient((connection) => {
+      const host = nonEmpty(connection?.host) ?? this.host;
+      return openaiCompatible({
+        name: OLLAMA_PROVIDER_ID,
+        baseURL: `${host.replace(/\/+$/, '')}/v1`,
+        apiKey: OLLAMA_PLACEHOLDER_KEY,
+        models: this.#config.models ?? [model],
+      })(model);
+    }, {
       name: OLLAMA_PROVIDER_ID,
       kind: 'text',
       mapModelOptions: ollamaGenerationModelOptions,
@@ -203,4 +204,8 @@ export class OllamaModelProvider implements ModelProviderPort {
       },
     };
   }
+}
+
+function nonEmpty(value: string | undefined): string | undefined {
+  return value !== undefined && value.length > 0 ? value : undefined;
 }

@@ -188,25 +188,27 @@ export class OpenRouterModelProvider implements ModelProviderPort {
    * `stream(_, { signal })` option (F-13).
    *
    * @param model - A model id OpenRouter exposes.
-   * @throws {AiNotConfiguredError} When no API key is available.
+   * A missing request/provider/environment key surfaces as an
+   * {@linkcode AiNotConfiguredError} event when the returned stream is read.
    */
   createChatClient(model: ModelId): ChatClientPort {
-    const { baseURL, models, reasoningEffort } = this.#config;
-    const apiKey = resolveOpenRouterKey(this.#config.apiKey);
-    if (apiKey === undefined) {
-      throw new AiNotConfiguredError(
-        OPENROUTER_PROVIDER_ID,
-        `Provide \`apiKey\` or set ${OPENROUTER_API_KEY_ENV} to construct a client.`,
-      );
-    }
-    const factory = openaiCompatible({
-      name: OPENROUTER_PROVIDER_ID,
-      baseURL: baseURL ?? DEFAULT_OPENROUTER_BASE_URL,
-      apiKey,
-      models: models ?? [model],
-    });
-    const adapter = factory(model);
-    return toTanstackChatClient(adapter, {
+    const { models, reasoningEffort } = this.#config;
+    return toTanstackChatClient((connection) => {
+      const apiKey = nonEmpty(connection?.apiKey) ?? resolveOpenRouterKey(this.#config.apiKey);
+      if (apiKey === undefined) {
+        throw new AiNotConfiguredError(
+          OPENROUTER_PROVIDER_ID,
+          `Provide \`apiKey\` for this request/provider or set ${OPENROUTER_API_KEY_ENV}.`,
+        );
+      }
+      return openaiCompatible({
+        name: OPENROUTER_PROVIDER_ID,
+        baseURL: nonEmpty(connection?.baseURL) ?? nonEmpty(this.#config.baseURL) ??
+          DEFAULT_OPENROUTER_BASE_URL,
+        apiKey,
+        models: models ?? [model],
+      })(model);
+    }, {
       name: OPENROUTER_PROVIDER_ID,
       kind: 'text',
       modelOptions: openRouterReasoningModelOptions(reasoningEffort),
@@ -235,6 +237,10 @@ function resolveOpenRouterKey(configKey: string | undefined): string | undefined
     return configKey;
   }
   return readEnv(OPENROUTER_API_KEY_ENV);
+}
+
+function nonEmpty(value: string | undefined): string | undefined {
+  return value !== undefined && value.length > 0 ? value : undefined;
 }
 
 /** Read an environment variable, tolerating a missing `Deno`/`--allow-env`. */

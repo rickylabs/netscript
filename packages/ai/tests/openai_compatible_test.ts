@@ -3,14 +3,14 @@
  *
  * @module
  */
-import { assert, assertEquals, assertRejects, assertThrows } from '@std/assert';
+import { assert, assertEquals, assertRejects } from '@std/assert';
 import '../openai-compatible.ts'; // side effect: self-registers 'openai-compatible'
 import {
   OPENAI_COMPATIBLE_PROVIDER_ID,
   OpenAiCompatibleModelProvider,
 } from '../openai-compatible.ts';
 import { getModelProvider, listModelProviders } from '../mod.ts';
-import { AiError, AiNotConfiguredError } from '../src/contracts/mod.ts';
+import { AiError } from '../src/contracts/mod.ts';
 
 const CONFIG = {
   baseURL: 'https://api.deepseek.example/v1',
@@ -59,7 +59,7 @@ Deno.test('openai-compatible: createChatClient wraps the TanStack client (F-13 s
   assertEquals(client.kind, 'text');
 });
 
-Deno.test('openai-compatible: createChatClient throws AiNotConfiguredError without baseURL/apiKey', () => {
+Deno.test('openai-compatible: an unconfigured client can receive connection values per request', () => {
   const provider = new OpenAiCompatibleModelProvider({ models: ['m1'] });
-  assertThrows(() => provider.createChatClient('m1'), AiNotConfiguredError);
+  assertEquals(provider.createChatClient('m1').kind, 'text');
 });

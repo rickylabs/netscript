@@ -180,18 +180,24 @@ export class AnthropicModelProvider implements ModelProviderPort {
         `Model "${model}" is not offered by the "${ANTHROPIC_PROVIDER_ID}" provider.`,
       );
     }
-    const { apiKey, baseURL } = this.#config;
-    const clientConfig = baseURL === undefined ? undefined : { baseURL };
-    const adapter = apiKey === undefined
-      ? anthropicText(resolved, clientConfig)
-      : createAnthropicChat(resolved, apiKey, clientConfig);
-    return toTanstackChatClient(adapter, {
+    return toTanstackChatClient((connection) => {
+      const apiKey = nonEmpty(connection?.apiKey) ?? nonEmpty(this.#config.apiKey);
+      const baseURL = nonEmpty(connection?.baseURL) ?? nonEmpty(this.#config.baseURL);
+      const clientConfig = baseURL === undefined ? undefined : { baseURL };
+      return apiKey === undefined
+        ? anthropicText(resolved, clientConfig)
+        : createAnthropicChat(resolved, apiKey, clientConfig);
+    }, {
       name: ANTHROPIC_PROVIDER_ID,
       kind: 'text',
       mapModelOptions: anthropicGenerationModelOptions,
       validateModelOptions: validateAnthropicModelOptions,
     });
   }
+}
+
+function nonEmpty(value: string | undefined): string | undefined {
+  return value !== undefined && value.length > 0 ? value : undefined;
 }
 
 /** Build the {@linkcode ModelDescriptor} for an Anthropic model id. */
