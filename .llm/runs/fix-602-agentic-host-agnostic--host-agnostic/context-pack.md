@@ -12,13 +12,14 @@
 
 ## Current State
 
-Research, locked plan, and Design checkpoint are complete against the clean `origin/main` baseline.
-Implementation is blocked on separate-session PLAN-EVAL PASS.
+Research, locked plan, and Design checkpoint were revised after the first PLAN-EVAL found two raw
+execution sites missed by the initial regex audit. Implementation remains blocked on PLAN-EVAL PASS.
 
 ## Completed
 
 - Required skills, harness workflow, lane policy, plan gate, and full agentic README read.
 - Direct and shared `wsl.exe` call sites audited.
+- First PLAN-EVAL `FAIL_PLAN` received; all four required plan fixes applied.
 
 ## In Progress
 
@@ -26,8 +27,8 @@ Implementation is blocked on separate-session PLAN-EVAL PASS.
 
 ## Next Steps
 
-1. Commit and push the plan artifacts with the explicit refspec.
-2. Open the draft PR and request the opposite-family PLAN-EVAL.
+1. Commit and push the revised plan artifacts with the explicit refspec.
+2. Request the second opposite-family PLAN-EVAL cycle.
 3. Implement only after PASS.
 
 ## Key Decisions
@@ -36,6 +37,7 @@ Implementation is blocked on separate-session PLAN-EVAL PASS.
 | --- | --- | --- |
 | Pure command plan | plan D1 | Allows host/cwd/mismatch tests without spawn. |
 | Fail local user mismatch | issue brief + plan D3 | Preserves `-u` semantics. |
+| Shared plan for all output modes | PLAN-EVAL cycle 1 + plan D1/D5 | Includes buffered, captured, streaming, and stdin consumers. |
 
 ## Gates
 
@@ -48,7 +50,7 @@ Implementation is blocked on separate-session PLAN-EVAL PASS.
 
 ## Drift and Debt
 
-- Drift: exact model suffix/effort unavailable in this session identity; evaluator separation retained.
+- Drift: exact model suffix/effort unavailable; initial call-site regex missed streaming/stdin constructors and was corrected before implementation.
 - Debt: none.
 
 ## Commits

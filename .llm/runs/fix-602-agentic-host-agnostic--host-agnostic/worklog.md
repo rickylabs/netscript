@@ -14,7 +14,7 @@
 ### Public Surface
 
 - Pure host-aware WSL command-plan construction in `agentic-lib.ts`.
-- Existing `wsl()`, `wslCd()`, and token resolution behavior, now host-agnostic.
+- Existing `wsl()`, `wslCd()`, launcher streaming, token capture, and token login behavior, now host-agnostic.
 
 ### Domain Vocabulary
 
@@ -35,7 +35,7 @@
 
 | # | Slice | Gate | Files |
 | - | --- | --- | --- |
-| 1 | Prove host-agnostic command planning and suite-wide routing | Full agentic tests, scoped check/fmt, WSL dry-run | `lib/agentic-lib.ts`, adjacent test, `README.md`, run artifacts |
+| 1 | Prove host-agnostic command planning and suite-wide routing | Full agentic tests, scoped check/fmt, WSL dry-run | `lib/agentic-lib.ts`, adjacent test, `codex/launch-codex-slice.ts`, `github/gh-token.ts`, `README.md`, run artifacts |
 
 ### Deferred Scope
 
@@ -51,6 +51,7 @@ pin host-specific argv in the adjacent unit test.
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-07-11 | 1 | plan | Research and Design checkpoint complete; awaiting PLAN-EVAL. |
+| 2026-07-11 | 1 | plan revision | First PLAN-EVAL found streaming and stdin call sites missed by the initial audit; scope and D1 expanded before implementation. |
 
 ## Gate Results
 

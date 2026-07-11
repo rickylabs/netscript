@@ -20,7 +20,9 @@ without weakening argv, git, route-identity, or one-sender safety.
 
 - Add a pure host-aware command-plan builder in `lib/agentic-lib.ts`.
 - Make `wsl()` and `wslCd()` execute that plan and reject local user mismatches clearly.
-- Route the `gh auth token` WSL probe through the shared host-aware helper.
+- Route the token capture probe, stdin-bearing token login, and launcher's streaming spawn through
+  the shared host-aware plan.
+- Make dry-run/display diagnostics render the selected host plan instead of claiming `wsl.exe` on Linux.
 - Add pure selection, cwd, and mismatch tests and a concise README paragraph.
 
 ## Non-Scope
@@ -39,10 +41,11 @@ without weakening argv, git, route-identity, or one-sender safety.
 
 | ID | Decision | Rationale |
 | --- | --- | --- |
-| D1 | Model host dispatch as a pure `{ bin, args, cwd? }` plan. | Enables spawn-free unit tests and one construction source. |
+| D1 | Model host dispatch as a pure `{ bin, args, cwd? }` plan reusable by buffered, captured, streaming `.spawn()`, and stdin-bearing consumers. | Enables spawn-free unit tests and one construction source without conflating execution/output policy. |
 | D2 | Linux uses `bash -lc <script>` and Windows retains exact `wsl.exe -u ... [--cd ...] -- bash -lc ...` argv. | Matches the requested behavior and preserves Windows compatibility. |
 | D3 | Linux rejects a requested user different from the current user before command execution. | Prevents silently dropping `-u` semantics. |
-| D4 | The token probe calls the shared host-aware capture path rather than constructing `wsl.exe` itself. | Completes the suite-wide audit while retaining secret handling. |
+| D4 | The token capture and stdin login paths consume the shared host-aware plan; the PAT remains stdin-only. | Completes the suite-wide audit while retaining secret handling. |
+| D5 | The launcher consumes the same plan directly in its streaming `.spawn()` path and renders that plan for dry-run diagnostics. | Preserves early thread-id streaming while removing its raw host assumption. |
 
 ## Open-Decision Sweep
 
@@ -50,6 +53,7 @@ without weakening argv, git, route-identity, or one-sender safety.
 | --- | --- | --- |
 | Require positive WSL detection beyond Linux | safe to defer | The brief explicitly selects Linux; generic Linux local execution is valid. |
 | Add cross-user execution support | safe to defer | Explicitly out of scope; mismatch must fail. |
+| How streaming/stdin callers execute locally | resolved now | They consume the same pure plan and retain their existing stream/stdin options. |
 
 ## Risk Register
 
@@ -67,7 +71,7 @@ without weakening argv, git, route-identity, or one-sender safety.
 | 1 | Unit/runtime | `deno test --no-lock -A .llm/tools/agentic/` | PASS |
 | 2 | Type | scoped `run-deno-check.ts` for agentic | PASS |
 | 3 | Format | scoped `run-deno-fmt.ts` for agentic | PASS |
-| 4 | Audit | search raw `wsl.exe` call sites | Only the shared Windows plan literal remains |
+| 4 | Audit | search raw `wsl.exe` execution constructors | Only the shared Windows plan construction remains; explanatory text may name the executable |
 | 5 | Native WSL E2E | `launch-codex-slice.ts --dry-run` against this worktree with no shim | PASS including git safety |
 | 6 | Hygiene | compare `deno.lock` to baseline | unchanged |
 
@@ -75,6 +79,7 @@ without weakening argv, git, route-identity, or one-sender safety.
 
 - WSL distro selection and Linux cross-user privilege switching.
 - Host abstractions outside WSL command execution.
+- No raw execution call site is deferred; launcher streaming and both token paths are in scope.
 
 ## Drift Watch
 
