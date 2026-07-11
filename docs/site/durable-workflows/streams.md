@@ -70,6 +70,16 @@ those plugins runs a thin `streams/producer.ts` that mirrors its execution state
 through `createDurableStream`, so a Fresh dashboard can watch saga, worker, and
 trigger progress live without polling a request/response API.
 
+The workflow this replaces is familiar: a dashboard polls `GET /executions` on an interval, the
+interval is always wrong — too fast for the server, too slow for the operator watching a stuck
+import — and every new consumer re-implements the same polling loop against a slightly different
+endpoint. With a stream, the contract moves to the data itself. The
+[live-dashboard tutorial](/tutorials/live-dashboard/05-live-stream/) builds exactly this: worker
+execution state published once through a producer, read by a Fresh page that updates without a
+polling loop anywhere in it. And because the schema is a frozen, typed collection map, what a
+stream carries is enumerable from its definition — `inspectStreamTopic` renders it as a JSON-stable
+report, which is as useful to a CLI doctor or a coding agent as it is to a test.
+
 ## Learn → / Do →
 
 {{ comp.featureGrid({ items: [
@@ -361,6 +371,18 @@ directly.</li>
 <code>getStreamsAuth()</code> can attach it.</li>
 </ul>
 {{ /comp }}
+
+## Kept in sync, compared
+
+Convex is the reference point for live client state: sync there is a property of its hosted
+database — client queries are reactive subscriptions, and the platform re-runs them when the
+underlying data changes. A NetScript stream scopes the same promise differently: sync is a property
+of a **declared contract**, not of the database. You freeze a schema of collections, a producer
+writes latest-state per key to the `:4437` durable-stream service in your own Aspire graph, and any
+HTTP/SSE consumer materializes that view — independent of which store actually holds your data
+(the plugin itself requires neither a database nor KV). The practical consequence: you choose
+per-collection what becomes live state, and everything outside that schema stays on the
+request/response and persistence paths you already have.
 
 ## Reference
 

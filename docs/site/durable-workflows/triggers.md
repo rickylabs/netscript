@@ -27,6 +27,14 @@ This closes the continuous-app loop. A webhook lands on the triggers service, it
 [saga](/durable-workflows/sagas/) advances a workflow — all from one inbound
 POST.
 
+The failure modes ingress must absorb are mundane and expensive: a payment provider retries the
+same webhook five times because your handler took too long; a half-written CSV fires an import
+mid-copy on a network share; a cron host reboots through the 02:00 run. Each has a declared answer
+here — `idempotencyKey` collapses sender retries, `stabilityThreshold` waits out the half-written
+file, and `backfill` replays the missed fire. Because every trigger is a frozen definition rather
+than routing code, the registry surface can list what fires what — the same property that lets a
+coding agent enumerate an app's ingress edges before touching one.
+
 {{ comp callout { type: "important", title: "Typed oRPC contract, raw webhook ingress" } }}
 Like <a href="/services-sdk/services/">services</a>, <a href="/background-processing/workers/">workers</a>,
 and <a href="/durable-workflows/sagas/">sagas</a>, the triggers API service serves a
@@ -450,6 +458,18 @@ routes to the DLQ. Schedule delayed work from the enqueued workers job, or use a
 <code>defineScheduledTrigger</code> instead.</li>
 </ul>
 {{ /comp }}
+
+## Where ingress lives, compared
+
+Inngest — the closest neighbor for this event-to-work shape — models ingress as events sent to its
+platform: your app or a webhook transform sends events to Inngest's event API, and Inngest invokes
+the matching functions over HTTP, owning the scheduling and retry loop. A NetScript trigger keeps
+the same shape inside your workspace: the definition is a TypeScript file the runtime walker
+discovers, ingress is your own `:8093` service verifying HMAC over the raw request bytes, and the
+retry policy, event store, and dead-letter queue run in your trigger processor under Aspire. The
+difference to weigh is operational locus, not capability count — with triggers, the pieces that
+decide whether an event becomes work are resources in your own Aspire graph, inspectable in your
+own telemetry, and yours to run.
 
 ## Reference
 
