@@ -97,3 +97,15 @@ lint/fmt clean, publish:dry-run green. Publish deliberately NOT executed (owner 
 Quota timeline: one 5-hour Codex window exhausted mid-T8 (~03:30–05:42); bridged with Fable-lane
 subagents (board audit, FAI-9 fixture design, release pre-gates) and a scheduled rearm. Total
 orchestration: 3 Codex threads, 2 Claude subagents, ~10 CI waits, zero fabricated evidence.
+
+## Post-release addendum (owner-prompted, 2026-07-11 morning)
+
+- **I8 (owner note)**: doc-only PRs should carry `ci:skip-e2e`/`ci:skip-scaffold` — the labels and
+  skill guidance exist, but (a) this supervisor did not apply them to the #610 README pass (process
+  miss), and (b) the CI docs-only classifier (`ci-classify-changes.ts`) treats ANY `packages/` path
+  as non-docs, so `packages/**/*.md`-only diffs (README passes) always run the full aspire/docker
+  scaffold gate. Fix: classify `*.md(x)`-only diffs as docs-only regardless of directory; harness
+  skill: apply the skip labels when opening doc-only PRs. Filed as a #601 sub-issue.
+- **Release-cut version drift (owner-spotted)**: markdown version mentions are outside the cut's
+  bump surface, and `@netscript/ai`'s beta line was never in the publish set (JSR latest =
+  0.0.1-alpha.0). Filed as #609; README-layer instances fixed in PR #610.
