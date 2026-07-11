@@ -46,8 +46,8 @@ Confirm the plugins you have so far:
 netscript plugin list
 ```
 
-You should see `sagas` (and its `streams` dependency) from the previous chapter. You will add
-`triggers` next.
+You should see `workers`, `sagas`, and `streams` from the previous chapter. You will add `triggers`
+next.
 
 ## Step 1 — Add the triggers plugin
 
@@ -71,43 +71,53 @@ You should now see `triggers` alongside `sagas`.
 The canonical install is <code>plugins/triggers/</code> — the path <code>netscript.config.ts</code> points at. You may also see a slimmer top-level <code>triggers/</code> staging copy; author and read your webhooks under <code>plugins/triggers/</code>.
 {{ /comp }}
 
-## Step 2 — Author the verified webhook
+## Step 2 — Author the shipping-update job and the verified webhook
 
-A webhook is `defineWebhook(handler, spec)` from `@netscript/plugin-triggers-core/builders`. The
-handler resolves to an **array of effects**; the spec names the webhook and — for a real provider
-callback — declares HMAC verification so forged requests are rejected before your handler runs.
-
-First, a small helper that produces a typed reference to the worker job you want to enqueue. This
-mirrors the playground's `localJob` helper:
+The webhook hands each inbound event to a background job, so author that job first — the same
+`defineJobHandler` pattern you used for `process-payment` in chapter 4. A real integration would
+advance the order; here it validates and records the update:
 
 ```ts
-// plugins/triggers/_jobs.ts
-import type { JobDefinition, JobId } from '@netscript/plugin-workers-core';
+// workers/jobs/process-shipping-update.ts
+import { createSuccessResult, defineJobHandler } from '@netscript/plugin-workers-core';
+import { z } from 'zod';
 
-export function localJob<TId extends string>(id: TId): JobDefinition<TId> {
-  return Object.freeze({
-    id: id as JobId<TId>,
-    entrypoint: `./workers/jobs/${id}.ts`,
-    name: id.split('-').filter(Boolean).map((p) => p[0].toUpperCase() + p.slice(1)).join(' '),
-    topic: 'default',
-  });
-}
+const PayloadSchema = z.object({
+  orderId: z.string().min(1),
+  status: z.string().min(1),
+  trackingNumber: z.string().optional(),
+});
+
+const handler = defineJobHandler(async (ctx) => {
+  const update = PayloadSchema.parse(ctx.payload ?? {});
+  // ... advance the order / notify the customer ...
+  return createSuccessResult(update);
+});
+
+export default Object.assign(handler, { id: 'process-shipping-update' });
 ```
 
-Now the webhook itself. It verifies the inbound signature with `verifier: 'hmac-sha256'` against a
-secret read from the environment, and enqueues a `process-shipping-update` job with the request
-payload:
+Now the webhook. It is `defineWebhook(handler, spec)` from
+`@netscript/plugin-triggers-core/builders`: the handler resolves to an **array of effects**, and the
+spec names the webhook and — for a real provider callback — declares HMAC verification so forged
+requests are rejected before your handler runs. The job reference is an inline object typed with
+`satisfies JobDefinition` — no helper needed:
 
 ```ts
 // plugins/triggers/shipping-status-webhook.ts
 import { defineWebhook, enqueueJob } from '@netscript/plugin-triggers-core/builders';
-import { localJob } from './_jobs.ts';
+import type { JobDefinition } from '@netscript/plugin-workers-core';
 
-const processShippingJob = localJob('process-shipping-update');
+// A typed reference to the worker job authored above.
+const processShippingJob = {
+  id: 'process-shipping-update' as JobDefinition<'process-shipping-update'>['id'],
+  name: 'Process Shipping Update',
+  topic: 'default',
+} satisfies JobDefinition<'process-shipping-update'>;
 
 export default defineWebhook(
   // The handler returns effects. Here: enqueue one job with the inbound payload.
-  async (event) => [enqueueJob(processShippingJob, { payload: event.payload })],
+  (event) => Promise.resolve([enqueueJob(processShippingJob, { payload: event.payload })]),
   {
     id: 'shipping-status-webhook',
     path: 'shipping/status',
@@ -126,8 +136,9 @@ export default defineWebhook(
 
 Three things to read off this:
 
-- **`defineWebhook(handler, spec)`** takes the handler first, then the static spec. The handler is an
-  `async`/arrow function — never a bare `function` — and resolves to an **array of effects**.
+- **`defineWebhook(handler, spec)`** takes the handler first, then the static spec. The handler
+  resolves to an **array of effects** — return a `Promise` of the effect array (never a bare
+  `function`-keyword declaration).
 - **`verifier: 'hmac-sha256'` + `secretEnv`** is the security seam. The triggers ingress verifies the
   request's HMAC signature against the secret named by `secretEnv` (here `WEBHOOK_SHIPPING_SECRET`)
   *before* your handler is invoked. A request that fails verification never reaches your code. For
@@ -161,7 +172,7 @@ actually dispatches today, so you do not author against a stub:
 
 In other words: build with `enqueueJob(...)`. If you return a `defer(...)` action, the trigger runtime
 raises an unsupported-operation error and the event lands in the DLQ rather than being scheduled —
-reach for the scheduling features of the [triggers capability](/capabilities/triggers/) (cron and
+reach for the scheduling features of the [triggers capability](/durable-workflows/triggers/) (cron and
 file-watch triggers) when you need time-based work, not `defer`.
 
 ## Step 4 — Route shape (raw webhook ingress)
@@ -175,7 +186,7 @@ handler resolves a `POST /:triggerId` path: a request to `/api/v1/webhooks/shipp
 its effects are applied.
 
 {{ comp callout { type: "note", title: "Why the webhook ingress endpoint stays a raw route" } }}
-oRPC gives the rest of the triggers surface a typed contract shared with its clients. Webhooks have no NetScript client — the sender is a third party — so the ingress endpoint stays an ordinary, signature-verifying route you can point any webhook source at. See <a href="/capabilities/triggers/">the triggers capability</a> for verifiers, scheduling, and file-watch triggers.
+oRPC gives the rest of the triggers surface a typed contract shared with its clients. Webhooks have no NetScript client — the sender is a third party — so the ingress endpoint stays an ordinary, signature-verifying route you can point any webhook source at. See <a href="/durable-workflows/triggers/">the triggers capability</a> for verifiers, scheduling, and file-watch triggers.
 {{ /comp }}
 
 ## Step 5 — Set the secret and start the triggers service
@@ -204,15 +215,18 @@ curl http://localhost:8093/health
 ## Verify your progress
 
 Send an inbound request to your webhook's path. Because the webhook is `hmac-sha256`-verified, a real
-sender includes a signature header computed from the body and the shared secret; the carrier's
-dashboard does this for you. For local testing, point the verifier at `'memory'` temporarily, or
-compute the HMAC and pass it in the signature header your provider uses. With verification satisfied:
+sender includes an **`x-hub-signature-256`** header — a hex HMAC-SHA256 of the raw body under the
+shared secret (optionally `sha256=`-prefixed); the carrier's dashboard computes it for you. For a
+quick local smoke, flip `verifier` to `'memory'` (the open, no-signature verifier) so a bare `POST`
+is accepted; switch back to `'hmac-sha256'` for anything real. With verification satisfied:
 
 ```sh
 curl -X POST http://localhost:8093/api/v1/webhooks/shipping/status \
   -H "content-type: application/json" \
   -d '{"orderId":"ord_1001","status":"shipped","trackingNumber":"1Z999"}'
 ```
+
+An accepted request returns **`202`**.
 
 The request resolves the trigger id `shipping/status`, your handler runs, and its single
 `enqueueJob(...)` effect places the `process-shipping-update` job on the workers queue. Confirm both

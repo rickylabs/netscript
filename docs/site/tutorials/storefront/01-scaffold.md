@@ -134,7 +134,7 @@ What each piece is for:
   handlers live under `src/routers/`. You make it a real catalog in
   [chapter 2](/tutorials/storefront/02-catalog-service/).
 - **`apps/dashboard/`** — a Fresh app for your storefront UI, already wired to consume contracts. The
-  [`@netscript/fresh`](/capabilities/fresh-ui/) meta-framework powers it. This track stays on the
+  [`@netscript/fresh`](/web-layer/fresh-ui/) meta-framework powers it. This track stays on the
   backend, so you will not edit it.
 - **`plugins/`** — where background capabilities (workers, sagas, triggers, streams) register. Empty
   until you add the sagas plugin in [chapter 4](/tutorials/storefront/04-checkout-saga/).

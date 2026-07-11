@@ -27,12 +27,13 @@ when a step fails.
 
 ## What you will build
 
-You will add the official `sagas` plugin, then author a `CheckoutSaga` with `defineSaga(...)`: typed
-per-instance state, a correlation key, and message handlers that walk a checkout from
-`OrderCreated` → payment → inventory → shipment to completion. You will also author the
+You will add the runtime plugins checkout depends on, then author a `CheckoutSaga` with
+`defineSaga(...)`: typed per-instance state, a correlation key, and message handlers that walk a
+checkout from `OrderCreated` through payment toward fulfillment. You will also author the
 `process-payment` worker job that the saga drives, and you will wire the **failure path** so a
-declined payment cancels the order instead of stranding it. By the end you can drive a checkout to
-completion and watch a failure compensate, all observable on the Sagas API at `:8092`.
+declined payment cancels the order instead of stranding it. By the end you can drive a checkout to a
+**paid** order and watch a failed payment **compensate to cancelled** — both observable on the Sagas
+API at `:8092`.
 
 ## Before you begin
 
@@ -47,27 +48,31 @@ You should have finished [chapter 3](/tutorials/storefront/03-cart-contracts/), 
 The Sagas API service and its KV-backed registry come up as part of the orchestrated app. If you closed your <code>aspire start</code> terminal, restart it from the <code>aspire/</code> folder (<code>cd aspire &amp;&amp; aspire start</code>) <strong>before</strong> running any <code>netscript</code> command in this chapter — the durable store and registry only exist while Aspire is up.
 {{ /comp }}
 
-## Step 1 — Add the sagas plugin
+## Step 1 — Add the checkout runtime plugins
 
-Sagas ship as an official NetScript plugin. Add it from the project root, with its sample saga
-included so you have a working module to adapt:
+Checkout spans three official runtime plugins, and you install each one explicitly: **`sagas`** (the
+durable workflow), **`workers`** (the background jobs the saga drives), and **`streams`** (the durable
+transport that carries messages between them). Add them from the project root, with samples so you
+have working modules to adapt:
 
 ```sh
+netscript plugin install worker --name workers --samples
 netscript plugin install saga --name sagas --samples
+netscript plugin install stream --name streams --samples
 ```
 
-The plugin lands at the canonical location **`plugins/sagas/`**, and `netscript.config.ts` is updated
-to reference `./plugins/sagas/mod.ts`. A slimmer top-level `sagas/` directory is also created as the
-background-processor staging copy — you author against `plugins/sagas/`. Adding `saga` also pulls in
-its `streams` dependency, which is how cross-plugin messages travel.
+Each plugin lands at its canonical location (**`plugins/sagas/`**, `plugins/workers/`,
+`plugins/streams/`), and `netscript.config.ts` is updated to reference each `mod.ts`. A slimmer
+top-level staging copy (e.g. `sagas/`) is also created for the background processor — you author
+against `plugins/<name>/`.
 
-Confirm it registered:
+Confirm they registered:
 
 ```sh
 netscript plugin list
 ```
 
-You should see `sagas` in the list.
+You should see `workers`, `sagas`, and `streams` in the list.
 
 ## Step 2 — Read the saga builder
 
@@ -287,23 +292,57 @@ curl http://localhost:8092/api/v1/sagas/sagas
 ```
 
 You should see `CheckoutSaga` in the list, with `OrderCreated`, `PaymentCompleted`, and
-`PaymentFailed` among its handled message types. After driving a checkout through the orchestrated
-app, inspect the resulting instances:
+`PaymentFailed` among its handled message types. Now drive an instance directly by publishing
+messages to the saga bus — `POST /api/v1/sagas/publish` takes `{ type, payload }`, and the saga
+correlates on `payload.orderId`. Start an order, then complete its payment:
 
 ```sh
-curl http://localhost:8092/api/v1/sagas/instances
+# 1. Open the checkout — instance goes to payment_pending and sends process-payment.
+curl -X POST http://localhost:8092/api/v1/sagas/publish \
+  -H 'content-type: application/json' \
+  -d '{ "type": "OrderCreated", "payload": { "orderId": "ord_1001", "customerId": "cust_1001", "items": [{ "productId": "1", "quantity": 2 }], "total": 4999 } }'
+
+# 2. Payment succeeds — instance advances to paid, carrying its transactionId.
+curl -X POST http://localhost:8092/api/v1/sagas/publish \
+  -H 'content-type: application/json' \
+  -d '{ "type": "PaymentCompleted", "payload": { "orderId": "ord_1001", "transactionId": "txn_777" } }'
 ```
 
-A completed checkout shows an instance at `status: 'completed'` carrying its `transactionId`; a
-failed payment shows one at `status: 'cancelled'` carrying the `cancelReason` your compensation
-branch stamped.
+Inspect that instance and confirm it reached `paid`:
 
-- [ ] `netscript plugin install saga --name sagas --samples` landed `plugins/sagas/`.
+```sh
+curl http://localhost:8092/api/v1/sagas/instances/CheckoutSaga/ord_1001
+```
+
+Now prove **compensation**. Open a second order and fail its payment — the `PaymentFailed` branch
+walks the state machine to `cancelled`:
+
+```sh
+curl -X POST http://localhost:8092/api/v1/sagas/publish \
+  -H 'content-type: application/json' \
+  -d '{ "type": "OrderCreated", "payload": { "orderId": "ord_2002", "customerId": "cust_2002", "items": [{ "productId": "1", "quantity": 1 }], "total": 1999 } }'
+
+curl -X POST http://localhost:8092/api/v1/sagas/publish \
+  -H 'content-type: application/json' \
+  -d '{ "type": "PaymentFailed", "payload": { "orderId": "ord_2002", "reason": "card_declined" } }'
+
+curl http://localhost:8092/api/v1/sagas/instances/CheckoutSaga/ord_2002
+```
+
+The first instance shows `status: 'paid'` carrying its `transactionId`; the second shows
+`status: 'cancelled'` carrying the `cancelReason` your compensation branch stamped. (The forward path
+continues to `completed` once you also author the `reserve-inventory` and `create-shipment` jobs the
+saga `send`s — this track stops at the payment leg, so `paid` is checkout's honest checkpoint.)
+
+- [ ] `netscript plugin install worker/saga/stream ... --samples` landed `plugins/workers/`,
+      `plugins/sagas/`, and `plugins/streams/`.
 - [ ] `checkout-saga.ts` defines state, a correlation key, the forward handlers, and a
       `PaymentFailed` compensation branch.
 - [ ] `workers/jobs/process-payment.ts` publishes `PaymentCompleted` / `PaymentFailed` back to the
       saga.
 - [ ] `GET /api/v1/sagas/sagas` lists `CheckoutSaga`.
+- [ ] Publishing `OrderCreated` + `PaymentCompleted` yields an instance at `status: 'paid'`;
+      `PaymentFailed` yields one at `status: 'cancelled'`.
 - [ ] `deno task check` passes.
 
 {{ comp callout { type: "warning", title: "Durability is not free correctness" } }}
@@ -312,10 +351,12 @@ The durability tier persists instance state so a workflow survives a restart, bu
 
 ## What you built
 
-- The `sagas` plugin at `plugins/sagas/`, added with `netscript plugin install saga --name sagas --samples`.
+- The `workers`, `sagas`, and `streams` runtime plugins, each installed explicitly with
+  `netscript plugin install <kind> --name <name> --samples` — the workflow, its jobs, and the
+  transport between them.
 - A `CheckoutSaga` built with `defineSaga().state().correlate().on().build()` — a durable state
-  machine that walks order → payment → inventory → shipment, with a `PaymentFailed` **compensation
-  branch** that cancels the order.
+  machine that walks order → payment → fulfillment, with a `PaymentFailed` **compensation branch**
+  that cancels the order.
 - A `process-payment` worker job (`defineJobHandler`, `createSuccessResult` / `createFailureResult`)
   that publishes results back to the saga with `createSagaPublisher`, closing the choreography.
 - A workflow observable as instances on the Sagas API at `:8092`.
