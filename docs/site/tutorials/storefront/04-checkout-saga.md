@@ -22,7 +22,8 @@ when a step fails.
   { label: "3 · Cart contracts", href: "/tutorials/storefront/03-cart-contracts/" },
   { label: "4 · Checkout saga", href: "/tutorials/storefront/04-checkout-saga/" },
   { label: "5 · Shipping webhook", href: "/tutorials/storefront/05-shipping-webhook/" },
-  { label: "6 · Deploy", href: "/tutorials/storefront/06-deploy/" }
+  { label: "6 · Storefront UI", href: "/tutorials/storefront/06-storefront-ui/" },
+  { label: "7 · Deploy", href: "/tutorials/storefront/07-deploy/" }
 ] }) }}
 
 ## What you will build

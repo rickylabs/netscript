@@ -2,18 +2,24 @@
 layout: layouts/base.vto
 title: Run the whole storefront
 templateEngine: [vento, md]
-prev: { label: "5 · Shipping webhook", href: "/tutorials/storefront/05-shipping-webhook/" }
+prev: { label: "6 · Storefront UI", href: "/tutorials/storefront/06-storefront-ui/" }
 next: { label: "How-to guides", href: "/how-to/" }
 ---
 
 # Run the whole storefront
 
-Across the last five chapters you built the storefront one piece at a time, usually starting a single
-service in its own terminal. This final chapter zooms out: you run the **entire** `my-shop/` — the
-products service, the cart contract's consumers, the checkout saga, the shipping webhook, Postgres,
-and the cache — as one coherent system under a single `aspire start`, and watch all of it from one
-dashboard. This is NetScript's local topology: `git clone` → one command → a complete, observable
-stack.
+Across the previous six chapters you built the storefront one piece at a time, usually starting a
+single service in its own terminal. This final chapter zooms out: you run the **entire** `my-shop/` —
+the products service, the cart contract's consumers, the storefront page, the checkout saga, the
+shipping webhook, Postgres, and the cache — as one coherent system under a single `aspire start`, and
+watch all of it from one dashboard.
+
+This is the payoff of the whole track, and it is one command. Everything you added chapter by chapter
+— a service, three runtime plugins, a webhook, a Fresh page — the scaffold has been wiring into a
+single resource graph the entire time. You never edited an orchestrator by hand. `aspire start` reads
+that graph and boots all of it at once: **`netscript init` scaffolded it, `aspire start` runs it —
+from an empty folder to a complete, observable stack in two commands, no deploy YAML in between.**
+That one-command-from-scaffold story *is* NetScript's local topology.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/storefront/01-scaffold/" },
@@ -21,7 +27,8 @@ stack.
   { label: "3 · Cart contracts", href: "/tutorials/storefront/03-cart-contracts/" },
   { label: "4 · Checkout saga", href: "/tutorials/storefront/04-checkout-saga/" },
   { label: "5 · Shipping webhook", href: "/tutorials/storefront/05-shipping-webhook/" },
-  { label: "6 · Deploy", href: "/tutorials/storefront/06-deploy/" }
+  { label: "6 · Storefront UI", href: "/tutorials/storefront/06-storefront-ui/" },
+  { label: "7 · Deploy", href: "/tutorials/storefront/07-deploy/" }
 ] }) }}
 
 ## What you will build
@@ -37,9 +44,10 @@ whole thing. You will read the live port map from the dashboard and confirm ever
 
 ## Before you begin
 
-You should have finished [chapter 5](/tutorials/storefront/05-shipping-webhook/), so `my-shop/` has:
+You should have finished [chapter 6](/tutorials/storefront/06-storefront-ui/), so `my-shop/` has:
 
-- The `products` service and the `cart` contract.
+- The `products` service, the `cart` contract, and the storefront page that reads and mutates through
+  the typed clients from chapter 6.
 - The `workers`, `sagas`, and `streams` plugins (with `CheckoutSaga` and the `process-payment` job)
   and the `triggers` plugin (with the shipping webhook and its `process-shipping-update` job).
 
@@ -185,4 +193,4 @@ where it counts, and verified at its edges.
   [Contracts & type flow](/explanation/contracts/), and [The plugin system](/explanation/plugin-system/).
 - **Solve a specific task** → the full [How-to guides](/how-to/).
 
-{{ comp.nextPrev({ prev: { label: "5 · Shipping webhook", href: "/tutorials/storefront/05-shipping-webhook/" }, next: { label: "How-to guides", href: "/how-to/" } }) }}
+{{ comp.nextPrev({ prev: { label: "6 · Storefront UI", href: "/tutorials/storefront/06-storefront-ui/" }, next: { label: "How-to guides", href: "/how-to/" } }) }}
