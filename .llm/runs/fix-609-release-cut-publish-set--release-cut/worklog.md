@@ -83,3 +83,9 @@ Start in the release preflight module and its adjacent test. Add an intentional 
 
 - PR #612 remains draft and carries `Closes #609`; lifecycle advances to IMPL-EVAL after this sign-off commit.
 - No plan rescope or doctrine debt. Deferred site finding remains owned by #445/#448.
+
+## IMPL-EVAL
+
+- Fresh separate Claude Opus 4.8 evaluator verdict: `PASS`.
+- Independently reproduced 23/23 tests, scoped static gates, 34-member audit, all three AI surfaces, explicit bench exclusion, cut ordering, and unchanged `deno.lock`.
+- Advisory only: matcher is deliberately narrow to the beta.6 pin convention; widen if repository range conventions change.

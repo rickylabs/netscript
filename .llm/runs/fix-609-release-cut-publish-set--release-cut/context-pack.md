@@ -11,4 +11,6 @@
 - Real audit: 34 effective members including all three AI surfaces; zero deltas; markdown zero blocking / one deferred site finding.
 - Final gates: 23 release tests pass; scoped check/lint/fmt pass; beta.6 audit shows 34 members / 0 deltas and markdown 0 blocking / 1 deferred; `deno.lock` unchanged.
 - Supervisor review completed, including prerelease/stable comparator correction.
-- Next: commit/push cut hook and evidence, then separate IMPL-EVAL.
+- IMPL-EVAL: PASS from a fresh separate Claude Opus 4.8 session; `evaluate.md` records independently reproduced evidence.
+- Close-gate: issue #609 has three Acceptance boxes; evidence maps to markdown lint, full-set audit, and the publish:false fixture proving the new gate catches the omitted/unpublished-package defect class.
+- Final state: commit/push evaluator artifact, update PR/issue evidence, move to `status:ready-merge`.
