@@ -81,7 +81,8 @@ live in the `netscript-pr` agent skill.
 
 - `type:*` — `feat`, `fix`, `docs`, `chore`, `refactor`, `perf`, `test`, `umbrella`, `sub-pr`.
 - `status:*` — the board column. **Exactly one at a time**: `triage`, `research`, `plan`,
-  `plan-eval`, `impl`, `impl-eval`, `augment-review`, `ci-fail`, `ready-merge`.
+  `plan-eval`, `impl`, `impl-eval`, `augment-review`, `ci-fail`, `ready-merge`, then terminal
+  `shipped` when completed work closes. Not-planned/wontfix closures remove the phase label instead.
 - `area:*` — the package/plugin map (`cli`, `fresh`, `fresh-ui`, `plugins`, `auth`, `aspire`,
   `database`, `kv`, `sdk`, `service`, `config`, `telemetry`, `ai-core`, `plugin-ai`, `tooling`,
   `deps`, `docs`).

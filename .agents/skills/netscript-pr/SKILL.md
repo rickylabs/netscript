@@ -224,7 +224,7 @@ a board column reflect reality.
 
 - `type:` — `umbrella`, `sub-pr`, `chore`, `feat`, `fix`, `docs`, `refactor`, `perf`, `test`
 - `status:` — `triage` (incoming issues), `research`, `plan`, `plan-eval`, `impl`, `impl-eval`,
-  `augment-review`, `ci-fail`, `ready-merge`, `close-gate-override`
+  `augment-review`, `ci-fail`, `ready-merge`, `shipped` (terminal), `close-gate-override`
 - `area:` — `cli`, `fresh`, `fresh-ui`, `plugins`, `auth`, `deps`, `aspire`, `tooling`, `database`,
   `kv`, `sdk`, `service`, `config`, `telemetry`, `ai-core`, `plugin-ai`, `docs`
 - `priority:` — `p0` (release blocker), `p1`, `p2`, `p3`
@@ -256,11 +256,15 @@ moving the label in the **same action** as each phase comment:
 `status:research → status:plan → status:plan-eval → status:impl → status:impl-eval →
 status:augment-review` (optional advisory) `→ status:ready-merge`
 
-Exactly one `status:` at any moment. These are the existing `labels.yml` tokens — **no new stage
-names**. Enforcement exists because a practice audit found ~50% non-compliance: recent merged PRs
-shipped with **zero** labels or with `status:` frozen mid-lifecycle (merged still at `status:plan`).
-The close-gate keys off `status:ready-merge`, so a missing or frozen `status:` is a merge hazard, not
-a cosmetic lapse.
+Exactly one `status:` at every point in the open lifecycle. On a completed close, atomically remove
+the phase label and apply terminal `status:shipped`; do this for issues closed by a merged PR and for
+completed issues closed by hand. A not-planned/wontfix close is the sole exception: remove the phase
+label and leave the closed item with no `status:` label, because it did not ship. Reopening an item
+requires restoring exactly one appropriate non-terminal phase label. Enforcement exists because a
+practice audit found ~50% non-compliance: recent merged PRs shipped with **zero** labels or with
+`status:` frozen mid-lifecycle (merged still at `status:plan`). The close-gate keys off
+`status:ready-merge`, so a missing or frozen `status:` before merge is a merge hazard, not a cosmetic
+lapse.
 
 `status:close-gate-override` is outside the normal lifecycle and must be used only for the audited
 exception path described in the close-gate section.
