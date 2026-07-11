@@ -52,7 +52,7 @@ the one closest to what you're building.
   },
   {
     title: "Live Dashboard",
-    body: "Build a real-time UI: go from a typed contract to an SDK client, a cache-first query, a Fresh <code>definePage</code> with a hydrated <code>QueryIsland</code>, and finally a durable StreamDB feed that updates the table live. The track for <strong>the Fresh + SDK stack</strong>. 6 chapters.",
+    body: "Build a real-time UI that stays current with no polling and no hand-rolled WebSocket: go from a typed contract to an SDK client, a cache-first query, a Fresh <code>definePage</code> with a hydrated <code>QueryIsland</code>, and finally a durable StreamDB feed that pushes updates into the table live. The track for <strong>the typed-end-to-end Fresh + SDK stack</strong>. 6 chapters.",
     href: "/tutorials/live-dashboard/"
   },
   {
