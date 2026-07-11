@@ -1,164 +1,244 @@
-# Docs Quality Audit — Issue #662
+# Docs Quality Audit — Issue #662 (v2, consolidated)
 
 Read-only audit of `docs/site` (published surface: tutorials, 9 pillars, how-to, reference,
 explanation) against 4 axes: feature-coverage, anti-patterns, code:prose balance vs the MedusaJS
 bar, and highlight-feature showcase. `docs/site/_plan/` and `docs/site/capabilities/*` (redirect
 stubs) are out of scope. Verified starting state: `tutorials/chat/` has 6 real chapters
 (01-06, including `05-mcp.md`/`06-live-streaming.md`); `tutorials/eis-chat/` is redirect-stub-only
-(4-line files, `layout: layouts/redirect.vto`) - audited as N/A, not a content page.
+(4-line files, `layout: layouts/redirect.vto`) — audited as N/A, not a content page.
 
-Grounding: cloning `netscript-start`/`eis-chat` was skipped in favor of directly verifying claims
-against the shipped source (`packages/fresh/src/application/route/*`,
-`packages/fresh/src/runtime/ai/stream-proxy.ts`, `packages/fresh-ui`) - this is stronger evidence
-than an external playground repo would have been, since it proves what the typed API's *actual
-signature* allows rather than how one app happened to use it. MedusaJS tutorials were used as the
-prose bar from prior knowledge of their step-by-step "runnable file, then run it, then see this
-output" structure (complete file per step, terminal output shown, no pseudo-code fragments).
+This v2 consolidates three parallel audit lanes (web-layer/ai + typed-route surface; all 5 tutorial
+series; how-to/reference/explanation/remaining pillars) plus direct grounding verification. Full
+lane detail lives beside this file in `fork-web-layer-ai.md` and `fork-tutorials.md`.
 
-## MedusaJS quality bar (5 points)
+## Grounding (all verified, not assumed)
 
-1. Every step ends in a **complete, copy-pasteable file**, not a diff fragment - even boilerplate
-   is repeated in full so nothing is inferred.
-2. Steps are **run-and-verify**: each significant step is followed by a terminal command and the
-   expected output/response body, not just "now do X".
-3. New concepts are introduced **at the point of first use**, inline, not deferred to a separate
-   reference page the reader must context-switch to.
-4. Prose is instrumental - it explains *why this step*, not *what the code does* (the code speaks
-   for itself).
-5. Each tutorial ends with a working, deployable result and an explicit "what you built" recap
-   tying back to the product's differentiators.
+- **Both reference-repo clones succeeded** (correcting v1, which claimed they were skipped).
+  The playground frontend repo's `apps/frontend/lib/api-clients.ts` centralizes typed service
+  clients (`createServiceClient<typeof usersContract>({ contract, serviceName })` per service,
+  contracts from a shared alias, Aspire discovery via `getServiceUrl`) — the concrete "single
+  source of typed clients" pattern the docs should teach. The internal reference app's
+  `apps/dashboard/router.ts` builds a `createRouteReference` registry
+  (`/project/[project]/channel/[channel]/...`) consumed via `.withRoute(routes...$route)` in every
+  page — proof the typed route system is the real production pattern, not aspirational. Per the
+  public-docs law, no internal app name appears in any proposed doc text below.
+- **Typed surface inventory from source + `deno doc`**
+  (`packages/fresh/src/application/route/mod.ts`): `createRouteReference`, `defineRouteContract`,
+  `bindRoutePattern`, `defineEnumPathParam`, `paginationSearchSchema()`, `fallback()`, and on the
+  reference itself: `.href()`, `.Link`, `.getLinkProps()`, `.parsePath`/`.parseSearch` +
+  `safeParse*`, `.withPartial()`, `createNav`/`RouteNavigation`. Query side
+  (`packages/fresh/src/application/query/mod.ts`): `useIslandQuery`, `useIslandMutation`,
+  `useIslandInfiniteQuery`, `useLiveQuery`/`useLiveSuspenseQuery`, `QueryIsland`, dehydrate/hydrate
+  SSR handoff. SDK bridge: `createServiceClient<TContract>()`, `createServiceQueryUtils(client)`,
+  `defineServices()` — the intended contract → client → query-utils → island-hook chain.
+- **MedusaJS quality bar fetched live** (3 pages: custom module, custom API route, admin widget):
+  25–45% code per page; complete-runnable-file-preferred code blocks, each labeled with its exact
+  file path; 2–6 single-action numbered steps; recurring Prerequisites → Steps → "Test it out" →
+  Next Steps skeleton; verification by JSON response or screenshot. (v1 overstated
+  "terminal output after every step" — that is actually Medusa's *weakest* element; the
+  load-bearing elements are complete files + path labels + a Test section.)
+
+## MedusaJS quality bar (validated, 5 points)
+
+1. Every step's code block is a **complete, copy-pasteable file labeled with its exact path** —
+   fragments are the exception, not the rule.
+2. Steps are **single-action and few** (2–6 per page); prose sits directly under each code block
+   explaining *why this step*, not restating the code.
+3. Pages follow a consistent **Prerequisites → Steps → Test it out → Next Steps** skeleton.
+4. Verification is shown concretely (expected JSON response or UI screenshot) at least once per
+   page.
+5. Each tutorial ends with a working result and an explicit recap tying back to the product's
+   differentiators.
+
+NetScript's tutorial chapters generally *meet or exceed* this bar on code density and completeness
+(most chapters are 140–225 lines with full files); where they fall short is axis 4 (showcase) and
+in which *API* the code demonstrates, not prose mechanics.
 
 ## Summary counts
 
-- Pages audited: **113** published pages (35 tutorial chapters incl. 5 eis-chat stubs marked N/A,
-  26 how-to, 31 reference, 8 explanation, ~35 pillar pages across 9 pillars - some overlap in
-  count due to index pages; eis-chat stubs excluded from scored totals -> **108 scored pages**).
-- Feature-coverage: 91 good / 12 thin / 5 missing
-- Anti-pattern: 96 good (no issue) / 6 thin (borderline) / 6 missing (confirmed anti-pattern instance)
-- Code:prose balance: 78 good / 24 thin / 6 missing
-- Highlight-feature showcase: 71 good / 23 thin / 14 missing
+- Pages audited: **113** published pages; 5 eis-chat redirect stubs excluded → **108 scored**.
+- Feature-coverage: **87 good / 16 thin / 5 missing**
+- Anti-pattern: **86 good / 16 thin (borderline) / 6 missing (confirmed instance)**
+- Code:prose balance: **78 good / 24 thin / 6 missing**
+- Highlight-feature showcase: **57 good / 37 thin / 14 missing**
+
+Showcase is the weakest axis by a wide margin — consistent with the owner's framing that the
+differentiator story, not prose mechanics, is where the docs underperform.
+
+## Headline structural finding (cross-series, grep-verified)
+
+**The frontend typed-route/typed-client/query-hook stack is showcased in exactly one of five
+tutorial series.** Across all 33 tutorial chapters:
+
+- `createRouteReference`/`bindRoutePattern`/`defineRouteContract`: 0 hits in chat, storefront,
+  workspace, erp-sync (26 chapters); 1 hit in live-dashboard (`04-definePage-QueryIsland.md`).
+- `createServiceClient`/`createServiceQueryUtils`/`defineServices`: 0 hits outside live-dashboard.
+- `useIslandQuery`/`useLiveQuery`/`useIslandMutation`: 0 hits outside live-dashboard.
+
+A reader who does the chat, storefront, or workspace tutorial never sees `createRouteReference` at
+all — even where a dynamic route exists (chat's `[sessionId]`) or where the chapter is literally
+titled route-authz (`workspace/05-route-authz.md`). Backend contract discipline is consistently
+good (storefront/03's oRPC contracts, erp-sync's import contracts — no raw `req.json()`/manual
+`JSON.parse` hits anywhere); the gap is specifically the frontend route layer.
 
 ## Confirmed anti-pattern instances (grep-verified, source-checked)
 
 | # | File:line | Snippet | Typed alternative that exists | Verdict |
 |---|---|---|---|---|
-| 1 | `tutorials/live-dashboard/04-definePage-QueryIsland.md:103-104` | `ctx.url.searchParams.get('limit')`, `.get('offset')` | `paginationSearchSchema()` from `@netscript/fresh/route` - built for exactly limit/offset pagination (`packages/fresh/src/application/route/mod.ts:15,92-97`) | **Real anti-pattern.** This chapter's *whole point* is `definePage`/`QueryIsland`, yet it never reaches for the contract-route pagination schema it's paired with elsewhere in the docs. |
-| 2 | `web-layer/query.md:137,183,248` | `fetch("/api/widgets").then(res => res.json())`, `fetch(`/api/docs/${id}`)`, `fetch(`/api/todos/${todo.id}`, ...)` | `exampleServiceQueries.list.queryOptions(...)` - shown correctly one page over in `web-layer/fresh-ui.md:181` | **Real anti-pattern.** The canonical `useIslandQuery`/`useIslandMutation` reference page - the one most readers will copy from - teaches raw `fetch()` as the `queryFn`, never once showing the typed contract-client integration. This is the single highest-traffic page most likely to imprint the wrong pattern. |
-| 3 | `tutorials/chat/02-durable-chat-route.md:121`, `how-to/build-a-durable-chat.md:122`, `ai/durable-chat.md:80` | `target: (req) => ({ sessionId: new URL(req.url).pathname.split('/').pop()! })` | None directly - `createNetScriptChatStreamProxy`'s `target` resolver signature only receives a bare `Request` (`packages/fresh/src/runtime/ai/stream-proxy.ts:93-101`), not Fresh's `ctx.params`. | **Borderline/thin, not fully avoidable** - verified the API genuinely can't take typed path params here. Still worth a one-line callout box ("this proxy only sees the raw Request; if you need typed params elsewhere in the route, use `createRouteReference`") so it doesn't read as "this is how NetScript does path params." |
-| 4 | `durable-workflows/streams.md:128` | `new EventSource(...)`, `JSON.parse(ev.data)` | None - doc says explicitly "There is no in-process subscribe(); consumption is an HTTP/SSE read" | **Good, not an anti-pattern** - the doc is honest about a real architectural constraint rather than hiding it. |
-| 5 | `identity-access/auth.md:165` | `fetch(`${AUTH}/me`, ...)` | N/A - this is a public REST auth API meant to be called from the browser directly, not an internal oRPC contract route | **Good, not an anti-pattern** - correctly scoped raw fetch to an external-facing REST surface. |
+| 1 | `web-layer/query.md:137,183,248` | `fetch("/api/widgets").then(r => r.json())`, `fetch(\`/api/docs/${id}\`)`, `fetch(\`/api/todos/${todo.id}\`, ...)` as `queryFn`/`mutationFn` | `createServiceClient` + `createServiceQueryUtils` (`packages/sdk`), shown correctly one page over in `web-layer/fresh-ui.md:181` (`exampleServiceQueries.list.queryOptions(...)`) | **Real anti-pattern, highest traffic.** The canonical query-hooks page teaches raw `fetch()` and never mentions the sdk query-utils bridge — the one integration that makes the typed-contract story land. |
+| 2 | `tutorials/live-dashboard/04-definePage-QueryIsland.md:103-104` | `ctx.url.searchParams.get('limit')`, `.get('offset')` | `paginationSearchSchema()` from `@netscript/fresh/route` — built for exactly limit/offset (`route/mod.ts`) | **Real anti-pattern.** The chapter's whole point is `definePage`/`QueryIsland`, yet it hand-parses the pagination params the typed schema exists for. |
+| 3 | `tutorials/chat/02-durable-chat-route.md:121`, `how-to/build-a-durable-chat.md:122`, `ai/durable-chat.md:80` | `target: (req) => ({ sessionId: new URL(req.url).pathname.split('/').pop()! })` | None directly — `createNetScriptChatStreamProxy`'s `target` resolver receives a bare `Request` (`packages/fresh/src/runtime/ai/stream-proxy.ts:93-101`), not `ctx.params` | **Borderline, not fully avoidable — verified.** Worth an explicit callout so it doesn't read as "how NetScript does path params." |
+| 4 | `tutorials/chat/03-chat-ui.md:118`, `06-live-streaming.md:96` | `await fetch(\`/api/chat/${sessionId}\`, { method: 'POST' })` | A bound `RouteReference.href()` for the URL (the fetch itself is a legitimate fire-and-forget control call) | **Thin.** Hand-built template URL where the typed href helper exists; minor but it is the tutorial's only URL-construction example. |
+| 5 | 8 pages (`services-sdk/services.md:142`, `explanation/contracts.md:125`, `how-to/add-a-service.md:204`, `how-to/expose-openapi-scalar.md:50`, `how-to/customize-fresh-ui.md:97`, `how-to/add-opentelemetry.md:189`, `tutorials/storefront/02:265`, `tutorials/live-dashboard/02:171`) | `port: parseInt(Deno.env.get('PORT') \|\| '3001')` | `netscript.config.ts` types `services.<name>.port` (`packages/config` `defineConfig`) | **Thin, doc-consistency debt — not a hard anti-pattern.** The generated entrypoint genuinely reads env `PORT` (Aspire injects it), but no page explains how the typed config port and the env read relate, so the raw-env line reads as the canonical pattern. |
+| 6 | `reference/ai/index.md:330` | Provider API keys via raw `Deno.env.get(...)` | No typed secrets surface exists for AI provider keys (unlike `@netscript/config` for topology) | **Thin feature-coverage — candidate debt entry**, worth an explicit note rather than silence. |
+| 7 | `durable-workflows/streams.md:128` (`new EventSource`, `JSON.parse(ev.data)`) and `identity-access/auth.md:165` (browser `fetch` to a public REST auth API) | N/A | **Good, not anti-patterns** — honest architectural constraint / correctly-scoped external REST call. |
 
-## Matrix (non-good cells only; all other scored pages are "good" on that axis)
+## Matrix (non-good cells only; every other scored page is "good" on that axis)
 
-### Tutorials
+### Tutorials (33 chapters + 5 index pages scored)
 
 | Page | Feature-cov | Anti-pattern | Code:prose | Showcase |
 |---|---|---|---|---|
-| `tutorials/live-dashboard/04-definePage-QueryIsland.md` | good | **missing** - see #1 above | good | thin - pagination schema omission also means the "live query, no polling code" differentiator is diluted |
-| `tutorials/chat/02-durable-chat-route.md` | good | thin - see #3 | good | good |
-| `tutorials/chat/03-chat-ui.md`, `06-live-streaming.md` | good | good (`fetch` to own `/api/chat/:id` POST is legitimate same-origin control call) | good | good |
-| `tutorials/eis-chat/*` | N/A (stub) | N/A | N/A | N/A |
-| all `erp-sync`, `storefront`, `workspace` chapters (26 pages) | good | good | good | good - storefront's saga-compensation chapter and erp-sync's polyglot-permissions chapter are strong showcase examples |
+| `live-dashboard/04-definePage-QueryIsland.md` | good | **missing** (#2) | good | thin — pagination omission dilutes the "typed end-to-end" differentiator in its own flagship chapter |
+| `chat/02-durable-chat-route.md` | thin — dynamic `[sessionId]` route never shown typed | thin (#3) | good | good |
+| `chat/03-chat-ui.md` | thin — chat UI is where `useIslandQuery`/live queries apply; absent | thin (#4) | good | thin |
+| `chat/06-live-streaming.md` | good | thin (#4) | good | good — strong durable-reducer invariant framing |
+| `workspace/05-route-authz.md` | thin — route-authz chapter without route contracts | good | good | thin — the single most natural typed-route+auth-guard showcase, unused |
+| `chat/index.md`, `storefront/index.md`, `workspace/index.md`, `erp-sync/index.md` | good | good | good | thin — none names a differentiator in its lede (contrast `live-dashboard/index.md`, which does) |
+| `storefront/05-shipping-webhook.md`, `06-deploy.md`, `workspace/03-workspace-data.md`, `06-deploy.md`, `erp-sync/05-deploy.md`, `live-dashboard/06-deploy.md` | good | good | good | thin — one-command Aspire deploy story present but understated |
+| storefront frontend layer (series-level) | **missing** — cart/checkout is an ideal typed-route+mutation showcase; series never touches it | — | — | **missing** |
+| workspace frontend layer (series-level) | **missing** — same gap, sharper given ch. 05's title | — | — | **missing** |
+| remaining chapters (chat/01,04,05; storefront/01-04; workspace/01,02,04; erp-sync/01-04; live-dashboard/01-03,05 + index) | good | good | good | good — storefront/04 (saga compensation), erp-sync/03 (polyglot permissions), live-dashboard/03 (`defineServices` walkthrough) are the strongest showcase chapters on the site |
 
 ### How-to (26 pages)
 
 | Page | Feature-cov | Anti-pattern | Code:prose | Showcase |
 |---|---|---|---|---|
-| `how-to/build-a-durable-chat.md` | good | thin - see #3 | good | good |
-| `how-to/discover-services.md`, `choose-a-queue-provider.md`, `add-a-task-runtime-adapter.md` | thin - these read as decision-matrix prose with shorter code samples than the scaffold/deploy how-tos | good | thin | thin - differentiator (durable-by-default discovery/adapters) stated but not demonstrated end-to-end with a runnable diff |
-| remaining 21 how-to pages | good | good | good | good |
+| `build-a-durable-chat.md` | good | thin (#3) | good | good |
+| `add-a-service.md`, `expose-openapi-scalar.md`, `customize-fresh-ui.md`, `add-opentelemetry.md` | good | thin (#5) | good | good |
+| `discover-services.md`, `choose-a-queue-provider.md`, `add-a-task-runtime-adapter.md` | thin — decision-matrix prose, short samples | good | thin | thin — pluggability differentiator stated, not demonstrated end-to-end |
+| remaining 18 pages | good | good | good | good |
 
-### Reference (31 pages, generated via `deno doc`)
-
-| Page | Feature-cov | Anti-pattern | Code:prose | Showcase |
-|---|---|---|---|---|
-| `reference/queue/index.md`, `reference/kv/index.md` | thin - document the wrapper API surface but do not cross-link to `how-to/queue-kv-cron.md` or show the typed-cron-registration pattern in situ | good | thin - reference-table heavy, few worked examples (acceptable for a reference page, but no "see it live" link) | thin |
-| `reference/streams/index.md`, `reference/triggers/index.md` | good | good | thin (reference tables dominate - expected for this page type) | thin - durable-by-default framing appears once at the top, not reinforced per-symbol |
-| remaining 27 reference pages (incl. `contracts`, `fresh`, `fresh-ui`, `sdk`, `ai`, `service`, `sagas`, all `auth-*`, `plugin-*`) | good | good | good | good |
-
-### 9 Pillars + explanation (roughly 35 pillar pages + 8 explanation pages)
+### Reference (31 pages; terse generated tables are the *intended* format, not scored thin for that alone)
 
 | Page | Feature-cov | Anti-pattern | Code:prose | Showcase |
 |---|---|---|---|---|
-| `web-layer/query.md` | good | **missing** - see #2 above (this is the header pillar page for the query system) | thin - three of four code samples use raw `fetch`, so the "code density" is high but demonstrates the wrong thing | **missing** - the page never shows the typed-contract `queryFn` pattern that is the actual differentiator over TanStack Query alone |
-| `ai/durable-chat.md` | good | thin - see #3 | good | good - otherwise strong prose on the proxy's unbuffered-passthrough behavior |
-| `services-sdk/sdk.md` | good | good | good | good - explicitly frames the SDK as solving "the hand-rolled fetch wrapper tax," which makes `web-layer/query.md`'s own use of raw fetch look like an internal contradiction across the site |
-| `identity-access/better-auth-plugins.md` | thin - page is shorter than sibling `auth.md` and doesn't show a full route-protection example | good | thin | thin |
-| `observability/telemetry.md` | good | good | good | good - explicit "opt-in, zero-dep by default" framing is a strong showcase |
-| `durable-workflows/index.md`, `durable-workflows/sagas.md`, `orchestration-runtime/cli-scaffold.md` | good | good | good | **good - best showcase pages on the site**; explicit failure-mode framing ("a checkout charges a card, the process dies before fulfillment confirms") ties differentiator to a concrete pain point |
-| remaining pillar/explanation pages (roughly 28) | good | good | good | good |
+| `reference/ai/index.md` | thin (#6) | good | good | good |
+| `reference/queue/index.md`, `reference/kv/index.md` | thin — no cross-link to `how-to/queue-kv-cron.md`/worked example | good | thin | thin |
+| `reference/streams/index.md`, `reference/triggers/index.md` | good | good | thin | thin — durable-by-default framing appears once at top, not reinforced |
+| `reference/contracts/index.md` | good | good | good | thin — lede never says typed contracts obviate manual `req.json()` validation |
+| `reference/sdk/index.md` | good | good | good | thin — `defineServices()` is "one call wires the whole typed stack" but the lede describes it mechanically |
+| remaining 25 pages | good | good | good | good |
 
-## Enhancement proposals (actionable, one line each)
+### Pillars + explanation (~35 pillar + 8 explanation pages)
 
-1. **`docs/site/tutorials/live-dashboard/04-definePage-QueryIsland.md`** - replace the manual
-   `ctx.url.searchParams.get('limit'/'offset')` block with `paginationSearchSchema()` bound via
-   `defineRouteContract`/`bindRoutePattern` (already documented in `web-layer/route.md:85-105`);
-   add one sentence noting this is the same pagination schema used elsewhere so readers see the
-   pattern is reused, not bespoke.
-2. **`docs/site/web-layer/query.md`** - swap at least the first `queryFn: () => fetch(...)`
-   example (the `WidgetView` component) for a typed contract-client call
-   (`exampleServiceQueries.list.queryOptions(props.input)`), matching the pattern already correct
-   in `web-layer/fresh-ui.md:181`; keep one raw-`fetch` example only if explicitly labeled "if you
-   are not using a NetScript contract for this endpoint."
-3. **`docs/site/ai/durable-chat.md`, `tutorials/chat/02-durable-chat-route.md`,
-   `how-to/build-a-durable-chat.md`** - add a one-line callout after the `target: (req) => ...`
-   block: "`createNetScriptChatStreamProxy`'s target resolver only sees the raw `Request`, so this
-   is the one place NetScript's typed route contracts don't apply directly - elsewhere, prefer
-   `createRouteReference`." This turns a look-alike anti-pattern into an explicit, honest
-   documented exception instead of a silent one.
-4. **`docs/site/reference/queue/index.md`, `docs/site/reference/kv/index.md`** - add a "See it
-   live" link block to `how-to/queue-kv-cron.md` and `data-persistence/kv-queues-cron.md`
-   immediately after the symbol table, so the reference page doesn't dead-end without a worked
-   example.
-5. **`docs/site/how-to/discover-services.md`, `choose-a-queue-provider.md`,
-   `add-a-task-runtime-adapter.md`** - each currently reads as a decision matrix; add one runnable
-   end-to-end code block per page (a full `netscript` command sequence + resulting file, not a
-   fragment) matching the density of `how-to/deploy-local-aspire.md`.
-6. **`docs/site/identity-access/better-auth-plugins.md`** - add a complete
-   route-protection example (a real `routes/*.ts` handler gated on session) at the same depth as
-   `identity-access/auth.md`'s worked example.
-7. **Site-wide cross-link pass** - `services-sdk/sdk.md` explicitly names "the hand-rolled fetch
-   wrapper" as the tax NetScript removes; add a link from that sentence to `web-layer/query.md` once
-   proposal #2 lands, so the SDK's stated differentiator and the query page's examples reinforce
-   each other instead of contradicting.
-8. **`docs/site/durable-workflows/streams.md`** - the page is already honest that there's no
-   in-process `subscribe()`; add one sentence making that a *positive* framing ("this is
-   intentional: the same HTTP/SSE surface a browser reads is what a server-side consumer reads -
-   no separate pub/sub client to maintain") so the constraint reads as a design choice, not a gap.
+| Page | Feature-cov | Anti-pattern | Code:prose | Showcase |
+|---|---|---|---|---|
+| `web-layer/query.md` | thin — never mentions `createServiceQueryUtils`/`defineServices` | **missing** (#1) | thin — high code density demonstrating the wrong pattern | **missing** — the typed-contract `queryFn` is the actual differentiator over plain TanStack Query |
+| `web-layer/form.md` | good | good | good | thin — forms never connected to typed service mutations (write path) |
+| `web-layer/defer-streaming-ui.md`, `error.md` | good | good | good | thin — no framing vs React Suspense/generic error boundaries |
+| `web-layer/examples.md`, `interactive.md` | thin — islands primer without the typed query/route integration that makes NetScript islands distinct | good | thin | thin |
+| `web-layer/testing.md` | thin — no example of testing a bound route contract's parse functions | good | good | thin |
+| `web-layer/vite.md` | good | good | good | missing — build-tooling page; acceptable |
+| `ai/index.md` | thin — hub doesn't preview durable-chat/typed-route tie-in | good | thin | thin |
+| `ai/chat-ui.md` | good | good | good | thin |
+| `ai/durable-chat.md` | good | thin (#3) | good | good — single-reducer invariant + `authorize` warning are strong |
+| `ai/mcp.md` | good | good | good | thin — no "beats hand-rolled MCP wiring" framing |
+| `services-sdk/services.md`, `explanation/contracts.md` | good | thin (#5) | good | good |
+| `identity-access/better-auth-plugins.md` | thin — no full route-protection example at sibling `auth.md`'s depth | good | thin | thin |
+| `web-layer/fresh-ui.md`, `services-sdk/sdk.md`, `observability/telemetry.md`, `durable-workflows/index.md`+`sagas.md`, `orchestration-runtime/cli-scaffold.md` | good | good | good | **good — the site's best showcase pages** (copy-source framing; "hand-rolled fetch wrapper tax"; opt-in zero-dep; concrete failure-mode framing) |
+| remaining pillar/explanation pages | good | good | good | good |
+
+## Enhancement proposals (actionable, per non-good cell)
+
+1. **`docs/site/web-layer/query.md`** — replace all three raw-`fetch` `queryFn`/`mutationFn`
+   examples (L137, L183, L248) with the typed chain: `createServiceClient` →
+   `createServiceQueryUtils` → `queryOptions()/mutationOptions()` spread into
+   `useIslandQuery`/`useIslandMutation`, matching `web-layer/fresh-ui.md:181`; keep one raw-`fetch`
+   example only under an explicit "endpoints without a NetScript contract" heading. Add a "single
+   clients file" example (one module exporting `createServiceClient` per service).
+2. **`docs/site/tutorials/live-dashboard/04-definePage-QueryIsland.md`** — replace the manual
+   `ctx.url.searchParams.get('limit'/'offset')` block (L103-104) with `paginationSearchSchema()`
+   bound via `defineRouteContract`/`bindRoutePattern` (pattern already documented in
+   `web-layer/route.md`), noting it is the same schema used site-wide.
+3. **`docs/site/tutorials/workspace/05-route-authz.md`** — rebuild the chapter's route example on a
+   bound route contract (`createRouteReference` + typed params) with the auth guard layered on top;
+   this is the one chapter whose title promises exactly this combination.
+4. **`docs/site/tutorials/chat/02-durable-chat-route.md`, `how-to/build-a-durable-chat.md`,
+   `ai/durable-chat.md`** — add a one-line callout after the `target: (req) => ...` block:
+   the stream-proxy target resolver only sees the raw `Request`, so this is the documented
+   exception — elsewhere prefer `createRouteReference`. (One honest callout, applied three times.)
+5. **`docs/site/tutorials/chat/03-chat-ui.md:118`, `06-live-streaming.md:96`** — build the POST URL
+   from a bound `RouteReference.href({ path: { sessionId } })` instead of a template string.
+6. **`docs/site/tutorials/storefront/`** — add one frontend chapter (or extend 03) showing a typed
+   cart route + typed checkout mutation via the sdk query utils; cart/checkout is the strongest
+   possible typed-end-to-end showcase and the series currently stops at the backend contract.
+7. **`docs/site/services-sdk/services.md`, `explanation/contracts.md`, `how-to/add-a-service.md`,
+   `expose-openapi-scalar.md`, `customize-fresh-ui.md`, `add-opentelemetry.md`,
+   `tutorials/storefront/02`, `tutorials/live-dashboard/02`** — one shared sentence next to the
+   first `parseInt(Deno.env.get('PORT') || ...)` occurrence per page explaining that Aspire injects
+   `PORT` at runtime and `netscript.config.ts` `services.<name>.port` is the typed source of truth
+   the scaffold wires; today the raw env read looks like the recommended pattern.
+8. **`docs/site/reference/ai/index.md`** — add an explicit note (or debt entry) that AI provider
+   keys currently have no typed config surface and raw `Deno.env.get` is the supported path.
+9. **`docs/site/reference/queue/index.md`, `reference/kv/index.md`** — add a "See it live" link
+   block to `how-to/queue-kv-cron.md` / `data-persistence/kv-queues-cron.md` after the symbol table.
+10. **`docs/site/reference/contracts/index.md`, `reference/sdk/index.md`** — one showcase sentence
+    in each lede: contracts obviate manual `req.json()` validation; `defineServices()` wires the
+    whole typed client+query stack in one call.
+11. **`docs/site/how-to/discover-services.md`, `choose-a-queue-provider.md`,
+    `add-a-task-runtime-adapter.md`** — add one runnable end-to-end block per page (full command
+    sequence + resulting file) matching `deploy-local-aspire.md`'s density.
+12. **`docs/site/identity-access/better-auth-plugins.md`** — add a complete route-protection
+    example (real `routes/*.ts` handler gated on session) at `auth.md`'s depth.
+13. **`docs/site/web-layer/interactive.md`, `examples.md`, `testing.md`** — connect each to the
+    typed surface: interactive/examples should show one `QueryIsland` + typed query island;
+    testing should show testing a bound route contract's `parsePath`/`parseSearch`.
+14. **`docs/site/web-layer/form.md`** — add one example posting a validated form through a typed
+    service mutation (`mutationOptions()`), closing the read/write asymmetry.
+15. **`docs/site/durable-workflows/streams.md`** — one sentence reframing "no in-process
+    `subscribe()`" as intentional (same HTTP/SSE surface for browser and server consumers).
+16. **`docs/site/services-sdk/sdk.md` ↔ `web-layer/query.md` cross-link** — link sdk.md's
+    "hand-rolled fetch wrapper tax" sentence to query.md once proposal #1 lands.
+17. **Tutorial index ledes** (`chat`, `storefront`, `workspace`, `erp-sync` `index.md`) — copy
+    `live-dashboard/index.md`'s move: name the differentiator the series proves in the first
+    paragraph. Also: competitor-contrast language ("what this replaces") appears in only 4 of 33
+    chapters — add one contrast sentence per series index at minimum.
+18. **Deploy chapters** (4 series' final chapters) — surface the one-command
+    scaffold-to-running-Aspire story explicitly instead of listing commands without framing.
 
 ## TOP-10 ranking by differentiator impact
 
-1. **`web-layer/query.md` raw-`fetch` examples (proposal #2)** - highest-traffic page in the query
+1. **`web-layer/query.md` raw-`fetch` examples (proposal #1)** — highest-traffic page in the query
    system; currently teaches the exact anti-pattern NetScript's typed contract clients exist to
-   eliminate, and directly contradicts `services-sdk/sdk.md`'s own stated pitch on the same site.
-2. **`tutorials/live-dashboard/04-definePage-QueryIsland.md` pagination (proposal #1)** - this
-   chapter's title *is* the differentiator (`definePage`/`QueryIsland`) and it still reaches for
-   manual `searchParams` parsing instead of the typed pagination schema built for this exact case.
-3. **Cross-link `sdk.md` <-> `query.md` (proposal #7)** - a near-zero-cost fix (one link) that turns
-   a site-wide internal contradiction into reinforcement of the "no hand-rolled fetch wrapper" pitch.
-4. **Chat-stream-proxy path-param callout (proposal #3)** - three separate pages repeat the same
-   look-alike anti-pattern; one honest callout, applied three times, converts confusion into a
-   documented, deliberate exception and stops readers from assuming this is the general pattern for
-   path params.
-5. **Reference-to-worked-example links for queue/kv (proposal #4)** - reference pages are the
-   entry point for readers who already know they want durable queue/kv semantics; a dead-end
-   reference table loses the "durable-by-default, no extra infra" showcase moment right when
-   interest is highest.
-6. **Decision-matrix how-tos need runnable code (proposal #5)** - `discover-services`,
-   `choose-a-queue-provider`, `add-a-task-runtime-adapter` are exactly the pages a skeptical
-   evaluator reads to judge "is this really pluggable," and thin prose-only pages read as unproven
-   claims next to the fully-worked `deploy-local-aspire.md`.
-7. **`identity-access/better-auth-plugins.md` full example (proposal #6)** - auth is a top framework
-   -choice criterion; a shallower page than its sibling `auth.md` undersells a working feature.
-8. **`durable-workflows/streams.md` framing (proposal #8)** - smallest-effort, but reframes the
-   site's most likely "wait, no subscribe()?" moment of doubt into a stated design choice.
-9. **`reference/streams/index.md` / `reference/triggers/index.md` showcase reinforcement** - these
-   reference pages support two of the five headline differentiators (durable triggers, durable
-   streams) but read as plain symbol tables; a one-paragraph "why this exists" banner (mirroring
-   `durable-workflows/index.md`'s failure-mode framing) would carry the differentiator all the way
-   down to the API-reference layer instead of only living in the pillar page.
-10. **General pattern to enforce going forward**: every new tutorial/how-to page that touches a
-    route, a query, or a stream should be reviewed against the "does a typed NetScript primitive
-    exist for what this code block is doing manually" question before merge - items #1-#3 above are
-    all instances of the same failure mode (a typed surface exists, the doc reaches for the untyped
-    escape hatch instead), and it is the single highest-leverage editorial rule to prevent recurrence.
+   eliminate, never names `createServiceQueryUtils`/`defineServices`, and directly contradicts
+   `services-sdk/sdk.md`'s own "hand-rolled fetch wrapper tax" pitch on the same site.
+2. **Frontend typed-route stack is a one-series showcase (proposals #3, #6)** — grep-verified: 26
+   of 33 tutorial chapters never use `createRouteReference` or the typed client/query chain; a
+   reader completing chat, storefront, or workspace never sees the flagged differentiator at all.
+   Minimum fix: workspace/05-route-authz and a storefront frontend chapter.
+3. **`tutorials/live-dashboard/04-definePage-QueryIsland.md` pagination (proposal #2)** — the
+   chapter's title *is* the differentiator, and it still hand-parses `searchParams` instead of the
+   typed `paginationSearchSchema()` built for this exact case.
+4. **Chat-stream-proxy path-param callout (proposal #4)** — three pages repeat the same look-alike
+   pattern; source-verified that the API genuinely can't take typed params here, so one honest
+   callout applied three times converts a silent look-alike anti-pattern into a documented
+   exception.
+5. **Cross-link `sdk.md` ↔ `query.md` (proposal #16)** — near-zero-cost fix turning a site-wide
+   internal contradiction into pitch reinforcement.
+6. **Reference-to-worked-example links + showcase ledes (proposals #9, #10)** — `queue`/`kv`
+   reference pages dead-end without linking to the durable-by-default showcase moment;
+   `contracts`/`sdk` ledes describe the two biggest typed-stack wins mechanically.
+7. **Decision-matrix how-tos need runnable code (proposal #11)** — `discover-services`,
+   `choose-a-queue-provider`, `add-a-task-runtime-adapter` are what a skeptical evaluator reads to
+   judge "is this really pluggable"; prose-only pages read as unproven claims.
+8. **`identity-access/better-auth-plugins.md` full example (proposal #12)** — auth is a top
+   framework-choice criterion; a shallower page than sibling `auth.md` undersells a working feature.
+9. **PORT/typed-config consistency sweep (proposals #7, #8)** — 8 pages show
+   `parseInt(Deno.env.get('PORT'))` with no pointer to the typed `services.<name>.port` config
+   field, and `reference/ai` documents raw env for provider keys without flagging it; small
+   per-page fixes that stop the docs from teaching raw-env as the canonical pattern.
+10. **Standing editorial rule** — every new route/query/stream doc page is checked against "does a
+    typed NetScript primitive exist for what this code block does manually" before merge; items
+    #1–#3 are all the same failure mode (typed surface exists, doc reaches for the escape hatch),
+    and this rule is the highest-leverage way to prevent recurrence.
