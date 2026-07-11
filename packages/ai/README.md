@@ -129,6 +129,29 @@ const client = provider.createChatClient('deepseek-chat');
 embeddings endpoints and self-registers into the embeddings registry (`registerEmbeddingProvider` /
 `getEmbeddingProvider`).
 
+### Dedicated OpenAI-compatible vision adapter
+
+`OpenAiVisionProvider` implements the dedicated `VisionProviderPort` through an OpenAI-compatible
+Chat Completions endpoint. Importing `@netscript/ai/openai-compatible` self-registers the provider
+family for both model and vision registries; the adapter accepts remote URLs and inline base64
+sources, and reports provider token usage when available.
+
+```ts
+import '@netscript/ai/openai-compatible';
+import { getVisionProvider } from '@netscript/ai';
+
+const vision = getVisionProvider('openai-compatible', {
+  apiKey: Deno.env.get('OPENAI_API_KEY'),
+});
+const result = await vision.analyze(
+  { type: 'url', value: 'https://example.com/diagram.png' },
+  'Describe this diagram.',
+);
+```
+
+The adapter performs network access and callers that read the key from the environment also need the
+corresponding Deno environment permission.
+
 ### Stopping long-lived streams
 
 `createChatClient(modelId)` returns an owned `ChatClientPort` — **not** a raw TanStack adapter, so

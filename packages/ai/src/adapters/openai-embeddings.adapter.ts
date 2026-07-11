@@ -1,15 +1,14 @@
 /**
- * OpenAI-compatible embeddings and vision adapter.
+ * OpenAI-compatible embeddings adapter.
  *
  * This adapter speaks the OpenAI-compatible HTTP API directly with Web
  * `fetch`, keeping the optional provider dependency graph out of the core
- * entrypoint. It implements both E6 capability ports and is registered by the
+ * entrypoint. It implements the E6 embeddings port and is registered by the
  * `@netscript/ai/openai-embeddings` subpath.
  *
  * @module
  */
 
-import type { ContentSource } from '../contracts/content.ts';
 import { AiError, AiNotConfiguredError } from '../contracts/errors.ts';
 import type { Usage } from '../contracts/usage.ts';
 import type {
@@ -17,16 +16,12 @@ import type {
   EmbeddingProviderPort,
   EmbeddingResponse,
 } from '../ports/embedding.ts';
-import type { VisionCallOptions, VisionProviderPort, VisionResponse } from '../ports/vision.ts';
 
 /** Registry id under which the OpenAI-compatible E6 provider self-registers. */
 export const OPENAI_EMBEDDINGS_PROVIDER_ID = 'openai-embeddings' as const;
 
 /** Default OpenAI embeddings model used when neither config nor call options specify one. */
 export const DEFAULT_OPENAI_EMBEDDING_MODEL = 'text-embedding-3-small' as const;
-
-/** Default OpenAI vision-capable model used when neither config nor call options specify one. */
-export const DEFAULT_OPENAI_VISION_MODEL = 'gpt-4o-mini' as const;
 
 /** Configuration for {@linkcode OpenAiEmbeddingsProvider}. */
 export interface OpenAiEmbeddingsProviderConfig {
@@ -36,8 +31,6 @@ export interface OpenAiEmbeddingsProviderConfig {
   readonly apiKey?: string;
   /** Default embedding model. */
   readonly embeddingModel?: string;
-  /** Default vision-capable chat model. */
-  readonly visionModel?: string;
   /** Fetch implementation, primarily for unit tests. */
   readonly fetch?: typeof fetch;
 }
@@ -51,7 +44,7 @@ export interface OpenAiEmbeddingsProviderConfig {
  * const result = await provider.embed('hello');
  * ```
  */
-export class OpenAiEmbeddingsProvider implements EmbeddingProviderPort, VisionProviderPort {
+export class OpenAiEmbeddingsProvider implements EmbeddingProviderPort {
   readonly #config: OpenAiEmbeddingsProviderConfig;
 
   /** Construct a provider bound to the given `config`. */
@@ -76,33 +69,6 @@ export class OpenAiEmbeddingsProvider implements EmbeddingProviderPort, VisionPr
       input,
     }, options.signal);
     return parseEmbeddingResponse(payload, model);
-  }
-
-  /**
-   * Analyze an image with a prompt through `/chat/completions`.
-   *
-   * @param image - URL or inline base64 image source.
-   * @param prompt - Guiding question or instruction for the model.
-   * @param options - Optional model override and cancellation signal.
-   * @returns Provider-neutral textual answer plus usage when reported.
-   */
-  async analyze(
-    image: ContentSource,
-    prompt: string,
-    options: VisionCallOptions = {},
-  ): Promise<VisionResponse> {
-    const model = options.model ?? this.#config.visionModel ?? DEFAULT_OPENAI_VISION_MODEL;
-    const payload = await this.#postJson('/chat/completions', {
-      model,
-      messages: [{
-        role: 'user',
-        content: [
-          { type: 'text', text: prompt },
-          { type: 'image_url', image_url: { url: imageUrl(image) } },
-        ],
-      }],
-    }, options.signal);
-    return parseVisionResponse(payload);
   }
 
   async #postJson(
@@ -139,13 +105,6 @@ export class OpenAiEmbeddingsProvider implements EmbeddingProviderPort, VisionPr
 function endpoint(baseURL: string | undefined, path: string): string {
   const base = baseURL ?? 'https://api.openai.com/v1';
   return `${base.replace(/\/+$/, '')}${path}`;
-}
-
-function imageUrl(source: ContentSource): string {
-  if (source.type === 'url') {
-    return source.value;
-  }
-  return `data:${source.mimeType};base64,${source.value}`;
 }
 
 function parseJson(text: string): unknown {
@@ -191,20 +150,6 @@ function parseEmbeddingEntry(
     throw new AiError('OpenAI-compatible embeddings response was malformed: invalid vector entry.');
   }
   return { index: value.index, embedding: value.embedding };
-}
-
-function parseVisionResponse(payload: unknown): VisionResponse {
-  if (!isRecord(payload) || !Array.isArray(payload.choices)) {
-    throw new AiError('OpenAI-compatible vision response was malformed: missing choices array.');
-  }
-  const first = payload.choices[0];
-  if (!isRecord(first) || !isRecord(first.message) || typeof first.message.content !== 'string') {
-    throw new AiError('OpenAI-compatible vision response was malformed: missing message content.');
-  }
-  return {
-    text: first.message.content,
-    usage: parseUsage(payload.usage),
-  };
 }
 
 function parseUsage(value: unknown): Usage | undefined {
