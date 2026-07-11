@@ -262,13 +262,20 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 const servicesEntrypoint = mode === 'published'
   ? `jsr:@netscript/plugin-workers@${publishedVersion}/services`
   : '@netscript/plugin-workers/services';
+// `deno cache` treats bare CLI arguments as file paths, so warm through a
+// generated entrypoint module whose import resolves via the flow-b config.
+const warmupEntrypoint = `${projectRoot}/.netscript/e2e/flow-b-warmup.ts`;
+await Deno.writeTextFile(
+  warmupEntrypoint,
+  `import ${JSON.stringify(servicesEntrypoint)};\n`,
+);
 const warm = await new Deno.Command('deno', {
   args: [
     'cache',
     '--minimum-dependency-age=0',
     '--config',
     flowBConfigPath,
-    servicesEntrypoint,
+    warmupEntrypoint,
   ],
   cwd: projectRoot,
 }).output();
