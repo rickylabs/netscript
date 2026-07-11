@@ -61,6 +61,9 @@ Deno.test('runtime suite includes full scaffold, database, runtime, and behavior
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.DATABASE_GENERATE), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.DATABASE_SEED), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.GENERATED_DENO_CHECK), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.SCAFFOLD_UI_ADD_AI), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.SCAFFOLD_UI_LOCAL_SOURCE), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.GENERATED_UI_AI_CHECK), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_AUTH_SMOKE_ENV), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_ASPIRE_START), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_WORKERS_JOBS), true);
@@ -78,6 +81,7 @@ Deno.test('runtime suite includes full scaffold, database, runtime, and behavior
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_AUTH_READY), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_AUTH_SESSION), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_AI_CHAT_ROUTE), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_UI_RENDER), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_PLUGINS_HEALTH), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_WEBHOOK), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_TRACES), true);
