@@ -85,3 +85,15 @@ orchestrator (session `fb43bc3e`, Claude Fable 5 low, overnight autonomous).
 - **I7**: close-gate requires checked boxes on the ISSUE while the evidence often lands in the PR;
   a bot that mirrors PR-body gate evidence into issue checkboxes (or accepts PR-comment evidence)
   would remove a manual supervisor step.
+
+## Outcome (2026-07-11 ~04:25, close-out)
+
+Milestone 8 `0.0.1-beta.6` is RELEASE-READY. All 8 target issues resolved via 6 merged PRs
+(#568→#407, #571→#569, #594→#258, #597→#561+#564, #598→#409, #600→#464); epic #399 closed with
+all T-handles landed; product-gap follow-up #599 filed (found by the T8 gate, not masked).
+Release gates: scaffold.runtime 58/58 (local + CI), repo check green, 1782 tests passed,
+lint/fmt clean, publish:dry-run green. Publish deliberately NOT executed (owner hard stop).
+
+Quota timeline: one 5-hour Codex window exhausted mid-T8 (~03:30–05:42); bridged with Fable-lane
+subagents (board audit, FAI-9 fixture design, release pre-gates) and a scheduled rearm. Total
+orchestration: 3 Codex threads, 2 Claude subagents, ~10 CI waits, zero fabricated evidence.
