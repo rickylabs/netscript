@@ -28,3 +28,5 @@ export {
 } from '../application/provider-retry.ts';
 export type { AiRetryPolicy } from '../application/provider-retry.ts';
 export * from './retriever.ts';
+export { createVectorAgentMemory, recallAgentMemory } from '../application/vector-memory.ts';
+export { createInMemoryVectorMemoryStore } from '../adapters/in-memory-vector-memory-store.ts';
