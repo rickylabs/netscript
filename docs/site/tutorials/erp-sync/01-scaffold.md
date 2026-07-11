@@ -8,10 +8,12 @@ next: { label: "2 · Import job", href: "/tutorials/erp-sync/02-import-job/" }
 
 # Scaffold the workspace
 
-This is the first chapter of the ERP Sync track. Before you can watch files or run background jobs,
-you need a workspace with the right plugins installed and an orchestrator to run them. In this
-chapter you create `my-erp/`, add the **workers** and **triggers** plugins, and boot the whole stack
-under Aspire so the rest of the track has something real to build on.
+This is the first chapter of the ERP Sync track — the service that keeps **CSB**, the ERP your
+team is migrating to, fed from the file exports of **VIF**, the legacy system that is still the
+system of record. Before you can watch VIF's file drops or run background jobs, you need a
+workspace with the right plugins installed and an orchestrator to run them. In this chapter you
+create `my-erp/`, add the **workers** and **triggers** plugins, and boot the whole stack under
+Aspire so the rest of the track has something real to build on.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/erp-sync/01-scaffold/" },
@@ -102,7 +104,7 @@ NetScript's background capabilities arrive as plugins. Add the **workers** plugi
 jobs so you have a working reference to read and adapt:
 
 ```sh
-deno run -A packages/cli/bin/netscript-dev.ts plugin install worker --name workers --samples
+netscript plugin install worker --name workers --samples
 ```
 
 This lands the plugin at **`plugins/workers/`** — the canonical, config-referenced install location
@@ -116,7 +118,7 @@ Now add the **triggers** plugin, which is how NetScript receives events — incl
 trigger you build in [Chapter 2](/tutorials/erp-sync/02-import-job/):
 
 ```sh
-deno run -A packages/cli/bin/netscript-dev.ts plugin install trigger --name triggers --samples
+netscript plugin install trigger --name triggers --samples
 ```
 
 This lands a workspace at `plugins/triggers/` and registers it in `netscript.config.ts`
@@ -207,6 +209,6 @@ give it a few seconds and retry.
 
 A real NetScript workspace, `my-erp/`, with the **workers** and **triggers** plugins installed and
 the whole stack — Postgres, Redis, both plugin APIs and their background processors — running under
-one `aspire start` and visible in the dashboard. Next, you give it something to do.
+one `aspire start` and visible in the dashboard. Next, you give it VIF's first export to ingest.
 
 {{ comp.nextPrev({ prev: { label: "ERP Sync", href: "/tutorials/erp-sync/" }, next: { label: "2 · Import job", href: "/tutorials/erp-sync/02-import-job/" } }) }}

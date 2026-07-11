@@ -9,10 +9,13 @@ next: { label: "3 · Polyglot transform", href: "/tutorials/erp-sync/03-polyglot
 # A CSV file-watch import job
 
 In [Chapter 1](/tutorials/erp-sync/01-scaffold/) you stood up `my-erp/` with the workers and
-triggers plugins running. Now you wire the first real piece of the pipeline: a **file-watch trigger**
-that fires the moment a supplier drops a CSV into a watched folder, and a durable **background job**
-that parses it. This is the ingest core of an ERP sync — an inbound file becomes durable background
-work.
+triggers plugins running. Now you wire the first real piece of the pipeline: a **file-watch
+trigger** that fires the moment VIF's export job drops a CSV into the hand-off folder, and a
+durable **background job** that parses it. This is the ingest core of the migration — VIF cannot
+call an API, but it can write a file, and every file it writes must become durable background work.
+A file the watcher misses is a day of catalog changes CSB never sees; a file parsed twice is a day
+counted twice. Both failure modes start here, so this chapter is where the pipeline earns the word
+*durable*.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/erp-sync/01-scaffold/" },
@@ -59,8 +62,8 @@ watcher has something to attach to:
 mkdir -p .data/incoming/products
 ```
 
-This is just a local folder in your workspace. In production it would be a mounted share or sync
-target the supplier writes to; the trigger does not care where the bytes come from, only that a
+This is just a local folder in your workspace. In production it would be the mounted share VIF's
+nightly export job writes into; the trigger does not care where the bytes come from, only that a
 matching file appears.
 
 ## Step 2 — Author the import job
@@ -204,13 +207,14 @@ hot-reload) so the workers runtime and the file-watch processor pick up the new 
 ## Verify your progress
 
 With Aspire up, drop a matching CSV into the watched folder and watch the pipeline run end to end.
-First create a sample file:
+First create a sample file in VIF's export shape — legacy column names, prices in integer centimes
+(Chapter 3 transforms exactly this file into CSB's shape):
 
 ```sh
 cat > .data/incoming/products_2024.csv <<'CSV'
-name,sku,price
-Widget,WID-1,9.99
-Gadget,GAD-2,19.99
+art_no,designation,price_centimes
+WID-1,Widget,999
+GAD-2,Gadget,1999
 CSV
 mv .data/incoming/products_2024.csv .data/incoming/products/products_2024.csv
 ```
@@ -228,7 +232,7 @@ curl 'http://localhost:8091/api/v1/workers/executions?limit=10'
 
 Expected: the events feed lists a `product-import-trigger` event, and the executions feed shows a
 completed `import-products` run whose result is `{ "fileName": "products_2024.csv", "rowCount": 2,
-"headers": ["name","sku","price"] }`. Open the `workers` resource logs in the
+"headers": ["art_no","designation","price_centimes"] }`. Open the `workers` resource logs in the
 [Aspire dashboard](https://localhost:18888) to read the job's structured log lines.
 
 - [ ] `.data/incoming/products/` exists and you dropped a `products_*.csv` into it.
@@ -251,10 +255,11 @@ the directory in <code>paths</code>, not its parent.</li>
 
 ## What you built
 
-A file-watch trigger (`defineFileWatch`) that fires on every `products_*.csv` landing in a watched
-folder, and a durable background job (`defineJobHandler`) that parses it — wired together by
-`enqueueJob` and made addressable with `netscript generate plugins`. An inbound file now becomes
-durable background work with no HTTP in the loop. Next, you will see how a non-TypeScript step could
-join this pipeline.
+A file-watch trigger (`defineFileWatch`) that fires on every `products_*.csv` VIF drops into the
+hand-off folder, and a durable background job (`defineJobHandler`) that parses it — wired together
+by `enqueueJob` and made addressable with `netscript generate plugins`. An inbound VIF export now
+becomes durable background work with no HTTP in the loop. But the rows you just imported are still
+in VIF's legacy shape — column names CSB does not use and prices in centimes. Next, you build the
+transform stage that fixes that, and run it.
 
 {{ comp.nextPrev({ prev: { label: "1 · Scaffold", href: "/tutorials/erp-sync/01-scaffold/" }, next: { label: "3 · Polyglot transform", href: "/tutorials/erp-sync/03-polyglot-transform/" } }) }}

@@ -8,9 +8,13 @@ next: { label: "1 · Scaffold", href: "/tutorials/erp-sync/01-scaffold/" }
 
 # ERP Sync
 
-This track builds a **back-office data ingestion service** — an ERP sync backend that watches for
-supplier data files, turns each one into a durable background job, scales that work behind a queue,
-and runs scheduled maintenance on a cron. It is the durable-processing companion to the
+Your team is mid-migration between two ERPs. **VIF**, the legacy in-house system, is still the
+system of record — production plans against it every day. **CSB**, its replacement, goes live in
+stages, which means that for months the two run in parallel and CSB is only as correct as the sync
+that feeds it. VIF cannot call an API; what it can do is drop a file. This track builds that sync:
+a back-office service that watches for VIF's export drops, turns each one into a durable
+background job, transforms legacy rows into CSB's shape, absorbs backfill bursts behind a queue,
+and re-syncs nightly on a cron. It is the durable-processing companion to the
 [main tutorials ladder](/tutorials/): where that ladder ends at a request/response service plus a
 webhook, this one is about everything that happens **off** the request path.
 
@@ -25,35 +29,44 @@ webhook, this one is about everything that happens **off** the request path.
 ## What you will build
 
 By the end of this five-chapter track you will have `my-erp/` on disk: a NetScript workspace with
-the **workers** and **triggers** plugins installed, a file-watch trigger that fires the moment a
-supplier drops a `products_*.csv` into a watched folder, a background **job** that parses it, a
-**queue** sized for throughput, and a **cron** schedule that runs recurring maintenance — all
-orchestrated locally by Aspire and visible in one dashboard. You will also understand how NetScript
-runs **polyglot** (non-TypeScript) transform tasks, so a Python or shell step can join the pipeline
-when TypeScript is not the right tool.
+the **workers** and **triggers** plugins installed, a file-watch trigger that fires the moment
+VIF's export job drops a `products_*.csv` into the hand-off folder, a background **job** that
+parses it, a runnable **transform task** — executed as a sandboxed subprocess — that rewrites
+VIF's legacy columns and centime prices into CSB's shape, a **queue** sized for backfill bursts,
+and a **cron** schedule that re-syncs nightly — all orchestrated locally by Aspire and visible in
+one dashboard. Along the way you will see how the same task builder targets **polyglot**
+(non-TypeScript) runtimes, so a Python or shell step can join the pipeline when TypeScript is not
+the right tool.
 
-The spine is one idea repeated at every layer: **durable background processing**. An inbound file
-becomes a queued job; the job runs in an isolated worker; recurring work runs on a schedule; and
-nothing is lost across a restart.
+The spine is one idea repeated at every layer: **durable background processing**. The stakes are
+concrete: a file the watcher misses is a day of catalog changes CSB never sees; a row loaded
+untransformed puts prices off by a factor of one hundred; a burst that overwhelms a single worker
+delays the re-sync everyone plans against. An inbound file becomes a queued job; the job runs in
+an isolated worker; the transform runs in a sandboxed subprocess; recurring work runs on a
+schedule; and nothing is lost across a restart.
 
 ## The arc
 
 ```
-supplier drops products_2024.csv          (a file lands in .data/incoming/products)
+VIF's export job drops products_2024.csv   (a file lands in .data/incoming/products)
         │  defineFileWatch trigger fires on 'create'
         ▼
-enqueueJob('import-products')             (a durable worker job, :8091)
-        │  the job parses + records the rows
+enqueueJob('import-products')              (a durable worker job, :8091)
+        │  the job parses + records the raw VIF rows
         ▼
-queue provider (Deno KV → Redis/RabbitMQ) (sized for throughput in config)
+normalize-vif transform task               (sandboxed deno subprocess: VIF shape → CSB shape)
         │
         ▼
-cron / scheduled trigger                  (recurring re-sync + cleanup)
+queue provider (Deno KV → Redis/RabbitMQ)  (sized for backfill bursts in config)
+        │
+        ▼
+cron / scheduled trigger                   (nightly re-sync until cutover)
 ```
 
-Chapter 3 steps **off** this hands-on spine to teach the polyglot runtime: how to define a `python`
-or `shell` task, the per-runtime permission model, and which runtimes NetScript supports. It is the
-one chapter you read rather than run end-to-end — and it says so plainly.
+Every chapter on this spine is hands-on and closes on something you can observe — a JSON body, a
+log line, a file on disk. Chapter 3 also carries the track's one deliberately forward-looking
+section: the Python variant of the transform, marked plainly as a step for your own host because
+non-Deno runtimes are not sandboxed and need their interpreter installed.
 
 ## The chapters
 
@@ -65,22 +78,22 @@ one chapter you read rather than run end-to-end — and it says so plainly.
   },
   {
     title: "2 · Import job",
-    body: "Watch <code>.data/incoming/products</code> with <code>defineFileWatch</code> and turn every <code>products_*.csv</code> into a durable <code>defineJobHandler</code> background job that parses the rows.",
+    body: "Watch <code>.data/incoming/products</code> with <code>defineFileWatch</code> and turn every <code>products_*.csv</code> VIF drops into a durable <code>defineJobHandler</code> background job that parses the rows.",
     href: "/tutorials/erp-sync/02-import-job/"
   },
   {
     title: "3 · Polyglot transform",
-    body: "Read how a non-TypeScript transform step works: the <code>defineTask().runtime('python')</code> shape, the per-runtime permission model, and the runtime support matrix. A documented capability, not a run-it-now step.",
+    body: "Build and <strong>run</strong> the VIF→CSB transform as a sandboxed <code>deno</code> task: <code>defineTask</code>, explicit <code>.permissions()</code> compiled to <code>--allow-*</code> flags, and the executor. The Python variant is the caveated next step.",
     href: "/tutorials/erp-sync/03-polyglot-transform/"
   },
   {
     title: "4 · Queue & cron",
-    body: "Pick a <code>QueueProvider</code>, size worker concurrency in config, and add a <code>defineScheduledTrigger</code> cron that re-syncs on a cadence. Includes the concurrency env-var gotcha.",
+    body: "Pick a <code>QueueProvider</code>, size worker concurrency in config, and add a <code>defineScheduledTrigger</code> cron for the nightly re-sync. Includes the concurrency env-var gotcha.",
     href: "/tutorials/erp-sync/04-queue-and-cron/"
   },
   {
     title: "5 · Deploy locally",
-    body: "Run the whole ERP backend — workers, triggers, queue, and cron processors — on one machine under <code>aspire start</code>, and read it from the dashboard. Shows local-vs-production topology clearly.",
+    body: "Run the whole sync — workers, triggers, queue, and cron processors — on one machine under <code>aspire start</code>, and read it from the dashboard. Shows local-vs-production topology clearly.",
     href: "/tutorials/erp-sync/05-deploy/"
   }
 ] }) }}

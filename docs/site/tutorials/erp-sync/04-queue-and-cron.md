@@ -8,10 +8,12 @@ next: { label: "5 · Deploy", href: "/tutorials/erp-sync/05-deploy/" }
 
 # Add a queue and a cron schedule
 
-Your [import job](/tutorials/erp-sync/02-import-job/) runs one file at a time. A real ERP sync gets
-bursts — a supplier drops twenty files at once — and needs recurring work that no file triggers, like
-a nightly full re-sync. This chapter adds the two pieces that make that durable: a **queue provider**
-sized for throughput, and a **cron schedule** that fires on a cadence rather than an event.
+Your [import job](/tutorials/erp-sync/02-import-job/) runs one file at a time. A migration does
+not: the day you backfill CSB with VIF's historical exports, twenty files land in the hand-off
+folder at once, and until cutover the two systems only stay aligned if a full re-sync runs every
+night whether or not a file arrived. This chapter adds the two pieces that make both durable: a
+**queue provider** and a worker **concurrency** so bursts drain in parallel, and a **cron
+schedule** that fires on a cadence rather than an event.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/erp-sync/01-scaffold/" },
@@ -114,13 +116,15 @@ and defaults it to <code>1</code>. The Aspire contribution, however, declares an
 read, so the Aspire value is silently ignored and the process pool falls back to its default. Treat
 the config-driven <code>concurrency</code> (and per-topic <code>scaling.concurrency</code>) above as
 the durable control, and if you must override the pool by env, set <code>WORKERS_CONCURRENCY</code>
-explicitly on the background resource. This naming seam is a known rough edge.
+explicitly on the background resource. This naming seam is a known rough edge, tracked for a
+framework-side fix.
 {{ /comp }}
 
 ## Step 3 — Add a cron schedule
 
-Some ERP work is time-driven, not file-driven: a nightly full re-sync, an hourly cleanup of stale
-staging files. That is a **scheduled trigger** — `defineScheduledTrigger(handler, spec)` from
+Some migration work is time-driven, not file-driven: the nightly full re-sync that keeps CSB
+honest until cutover, an hourly cleanup of stale staging files. That is a **scheduled trigger** —
+`defineScheduledTrigger(handler, spec)` from
 `@netscript/plugin-triggers-core/builders`. Like the file-watch trigger, its handler returns an array
 of effects; here it enqueues a job on a cron cadence.
 
@@ -213,9 +217,9 @@ provider</a> for each backend's delivery semantics.
 
 ## What you built
 
-A workers config that names a queue provider and a worker concurrency so import bursts drain in
-parallel, and a `defineScheduledTrigger` cron that enqueues a re-sync on a cadence — plus the
-knowledge to set concurrency where it actually takes effect. The ERP sync now scales and runs
-recurring work. The last chapter runs the whole thing under Aspire.
+A workers config that names a queue provider and a worker concurrency so a VIF backfill burst
+drains in parallel, and a `defineScheduledTrigger` cron that enqueues the nightly re-sync — plus
+the knowledge to set concurrency where it actually takes effect. The sync now absorbs bursts and
+runs its recurring work unattended. The last chapter runs the whole thing under Aspire.
 
 {{ comp.nextPrev({ prev: { label: "3 · Polyglot transform", href: "/tutorials/erp-sync/03-polyglot-transform/" }, next: { label: "5 · Deploy", href: "/tutorials/erp-sync/05-deploy/" } }) }}
