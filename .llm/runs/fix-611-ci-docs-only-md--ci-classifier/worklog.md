@@ -51,10 +51,11 @@ Edit the pure path predicates and add a table-style regression in `ci-classify-c
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-07-11 | 1 | research/plan | Re-baselined at `origin/main`; awaiting separate PLAN-EVAL. |
+| 2026-07-11 | 1 | PLAN-EVAL | Separate Claude Opus evaluator returned `PASS`; implementation unlocked. |
 
 ## Gate Results
 
-Not run before PLAN-EVAL.
+- PLAN-EVAL — `PASS`; see `plan-eval.md`.
 
 ## Handoff Notes
 

@@ -65,6 +65,7 @@ Classify any non-empty PR diff containing only Markdown/MDX paths as docs-only r
 | 3 | generated mirror | `deno task agentic:sync-claude:check` | PASS |
 | 4 | focused format | scoped formatter check on owned TS | PASS |
 | 5 | lock hygiene | `git diff -- deno.lock` | empty |
+| 6 | docs overlay | manual source alignment, local-link existence, and terminology review | PASS |
 
 ## Deferred Scope and Debt
 
