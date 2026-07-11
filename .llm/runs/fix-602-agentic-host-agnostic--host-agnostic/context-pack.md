@@ -6,14 +6,14 @@
 | --- | --- |
 | Run ID | `fix-602-agentic-host-agnostic--host-agnostic` |
 | Branch | `fix/602-agentic-host-agnostic` |
-| Current phase | `evaluate` |
+| Current phase | `close` |
 | Archetype | N/A — internal tooling |
 | Scope overlays | none |
 
 ## Current State
 
-PLAN-EVAL cycle 2 passed. The single implementation slice is complete and all planned gates pass;
-the run is ready for separate-session IMPL-EVAL.
+PLAN-EVAL cycle 2 and the separate-session IMPL-EVAL both passed. The implementation and delivery
+evidence are complete; PR #614 is ready for review/merge subject to normal repository checks.
 
 ## Completed
 
@@ -23,16 +23,16 @@ the run is ready for separate-session IMPL-EVAL.
 - PLAN-EVAL cycle 2 `PASS` recorded.
 - Host-aware plan, every execution consumer, pure tests, and README update implemented.
 - 209 tests plus scoped check/fmt and native-WSL dry-run pass; lockfile unchanged.
+- IMPL-EVAL `PASS` independently confirmed all gates and safety invariants.
 
 ## In Progress
 
-- Commit and push the supervisor-reviewed implementation slice.
+- Finalize PR body, lifecycle label, and evaluator evidence commit.
 
 ## Next Steps
 
-1. Push with the explicit refspec and post implementation evidence to PR #614.
-2. Move the PR to `status:impl-eval`.
-3. Obtain separate opposite-family IMPL-EVAL and address any findings.
+1. Review and merge PR #614 when normal repository checks permit.
+2. Merge auto-closes #602; keep parent #601 open until its remaining work is complete.
 
 ## Key Decisions
 

@@ -56,6 +56,7 @@ pin host-specific argv in the adjacent unit test.
 | 2026-07-11 | 1 | implement | Added the host plan and routed buffered, captured, streaming, stdin, and dry-run consumers through it. |
 | 2026-07-11 | 1 | gate | Full tests, scoped check/fmt, constructor audit, lock hygiene, and native-WSL dry-run passed. |
 | 2026-07-11 | 1 | slice review | Supervisor reviewed the full diff: Windows argv stays exact; Linux cwd/user semantics are explicit; brief, git-safety, route-identity, one-sender, LF, and token-stdin flows are unchanged. |
+| 2026-07-11 | 1 | IMPL-EVAL | Separate Claude Opus evaluator returned `PASS` after independently rerunning gates and reproducing host/user behavior. |
 
 ### Post-slice reconcile
 
