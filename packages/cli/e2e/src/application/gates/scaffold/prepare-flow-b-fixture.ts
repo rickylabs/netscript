@@ -1,3 +1,5 @@
+import { configurePublishedWorkersBlock } from './configure-published-workers-block.ts';
+
 const projectRoot = Deno.args[0];
 if (!projectRoot) {
   throw new Error('project root argument is required');
@@ -86,13 +88,12 @@ const workersBlock = registerPlugins.slice(workersIndex, nextResourceIndex);
 // The published flow-b config introduces jsr pins that are minutes old at
 // release-verification time; the Aspire-launched service must bypass Deno's
 // dependency recency guard or it never starts (health probe timeout).
-const flowBRunPrefix = mode === 'published'
-  ? "['run', '--minimum-dependency-age=0', '--config', '.netscript-flow-b-deno.json',"
-  : "['run', '--config', '.netscript-flow-b-deno.json',";
-let configuredWorkersBlock = workersBlock.replace(
-  "['run', '--config', 'deno.json',",
-  flowBRunPrefix,
-);
+let configuredWorkersBlock = mode === 'published'
+  ? configurePublishedWorkersBlock(workersBlock)
+  : workersBlock.replace(
+    "['run', '--config', 'deno.json',",
+    "['run', '--config', '.netscript-flow-b-deno.json',",
+  );
 if (mode === 'local') {
   configuredWorkersBlock = configuredWorkersBlock.replace(
     /'jsr:@netscript\/plugin-workers@[^']+\/services'/,
