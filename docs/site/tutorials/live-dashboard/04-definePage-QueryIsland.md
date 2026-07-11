@@ -83,26 +83,32 @@ const ORDERS_SEARCH_SCHEMA = paginationSearchSchema({
 });
 
 export default defineRouteContract({ searchSchema: ORDERS_SEARCH_SCHEMA });
+
+// The parsed shape every loader and island receives — page, limit, offset, sortBy,
+// sortOrder, plus the search/status fields the schema extends with.
+export type OrdersSearch = ReturnType<typeof ORDERS_SEARCH_SCHEMA.parse>;
 ```
 
 `fallback(schema, default)` is the safety belt: a junk `?status=banana` resolves to the default
-instead of throwing, so a hand-edited URL never 500s the page.
+instead of throwing, so a hand-edited URL never 500s the page. This is the same
+`paginationSearchSchema()` the framework uses site-wide — every route that paginates parses `limit`
+and `offset` through it rather than reading `searchParams` by hand.
 
 ## Step 2 — Write the cache-first page loader
 
 The page reads the cache, not the service. Add a small loader that pulls the orders island's initial
-data from KV through the chapter-3 helpers. A cold cache returns `undefined`, which the page renders
+data from KV through the chapter-3 helpers. Because the page binds the Step 1 contract, the loader is
+handed a typed `search` object — `limit`, `offset`, and `status` are already parsed and defaulted, so
+there is no `searchParams.get(...)` to write. A cold cache returns `undefined`, which the page renders
 as a skeleton:
 
 ```ts
 // apps/dashboard/routes/(dashboard)/dashboard/orders/(_shared)/query-loaders.ts
 import { baseQueries } from '@app/lib/api-clients.ts';
+import type { OrdersSearch } from '../index.route.ts';
 
-export async function ordersQueryLoader(ctx: { url: URL }) {
-  const input = {
-    limit: Number(ctx.url.searchParams.get('limit') ?? 20),
-    offset: Number(ctx.url.searchParams.get('offset') ?? 0),
-  };
+export async function ordersQueryLoader({ search }: { search: OrdersSearch }) {
+  const input = { limit: search.limit, offset: search.offset, status: search.status };
   const entry = await baseQueries.orders.list.getCachedEntry(input);
 
   return {
@@ -115,6 +121,8 @@ export async function ordersQueryLoader(ctx: { url: URL }) {
 
 The loader returns three things the island needs: the cached `data`, the `cachedAt` timestamp (so
 the client knows how stale the seed is), and the `input` (so the client can refetch the same slice).
+The `search` object is the contract's payoff — the same typed slice the Step 3 layer loader reads, so
+both loaders agree on what `limit`/`offset` mean without either one touching the raw query string.
 
 ## Step 3 — Compose the page with definePage
 

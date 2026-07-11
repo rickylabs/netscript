@@ -10,8 +10,11 @@ next: { label: "How-to guides", href: "/how-to/" }
 
 You have built the full spine — contract, service, query layer, page, and live stream. This final
 chapter steps back and runs the entire graph as one system: the `orders` service, the Fresh
-dashboard, the durable-streams runtime, Postgres, and Redis, all under a single `aspire start`. It
-is also precise about what local Aspire is — a development orchestrator — and what it is not.
+dashboard, the durable-streams runtime, Postgres, and Redis, all under a single `aspire start`. That
+is the payoff of scaffolding on NetScript — you never wrote a compose file, a container manifest, or
+a service-discovery config, yet one command boots the whole graph in dependency order, resolves
+every cross-reference into injected environment variables, and hands you a live view of it. This
+chapter is also precise about what local Aspire is — a development orchestrator — and what it is not.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/live-dashboard/01-scaffold/" },
