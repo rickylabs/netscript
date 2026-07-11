@@ -90,12 +90,12 @@ full bodies on demand, and matches by tags or optional embeddings.
 
 ## Anti-Patterns to Resolve or Avoid
 
-| AP          | Status | Plan                                                                              |
-| ----------- | ------ | --------------------------------------------------------------------------------- |
-| AP-3        | risk   | Keep both ports limited to issue-owned operations.                                |
-| AP-8/AP-9   | avoid  | One explicit factory/options object; no container or mode-switch adapter.         |
-| AP-11/AP-25 | avoid  | No module-time state or I/O; caller-fed adapter only.                             |
-| AP-17/AP-22 | avoid  | Use `ports/`; public `skills.ts` is a real subpath manifest, not a nested barrel. |
+| AP          | Status | Plan                                                                         |
+| ----------- | ------ | ---------------------------------------------------------------------------- |
+| AP-3        | risk   | Keep both ports limited to issue-owned operations.                           |
+| AP-8/AP-9   | avoid  | One explicit factory/options object; no container or mode-switch adapter.    |
+| AP-11/AP-25 | avoid  | No module-time state or I/O; caller-fed adapter only.                        |
+| AP-17/AP-22 | avoid  | Use `ports/`; `src/skills/mod.ts` is the documented public subpath manifest. |
 
 ## Fitness Gates
 

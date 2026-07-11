@@ -20,3 +20,26 @@
 - **Action:** accept
 - **Evidence:** `/home/codex/repos/ns-b8-246/deno.json`, `packages/ai/deno.json`,
   `packages/ai/mod.ts`.
+
+## 2026-07-11 — F-16 moved the skills entrypoint below package root
+
+- **What:** Root `skills.ts` moved to `src/skills/mod.ts`.
+- **Source:** The doctrine checker initially reported 13 package-root children.
+- **Expected:** Mirror existing root subpath entry files.
+- **Actual:** Direct `./skills` mapping to the role folder preserves the API and yields zero
+  findings.
+- **Severity:** minor
+- **Action:** fix
+- **Evidence:** `packages/ai/deno.json`; final `FAIL=0 WARN=0 INFO=0`.
+
+## 2026-07-11 — Semantic injection uses a structural provider view
+
+- **What:** Options accept `SkillEmbeddingProvider`, satisfied structurally by
+  `EmbeddingProviderPort`.
+- **Source:** Raw doc-lint exposed unrelated transitive usage types from the full provider
+  interface.
+- **Expected:** Re-export the full embedding port from the skills subpath.
+- **Actual:** A focused single-method view keeps the surface below the export ceiling and doc-clean.
+- **Severity:** minor
+- **Action:** fix
+- **Evidence:** `src/skills/domain/types.ts`; raw doc-lint exit 0.

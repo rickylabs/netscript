@@ -39,10 +39,10 @@
 
 ### Commit Slices
 
-| # | Slice                                                          | Gate                                                   | Files                                                                                                     |
-| - | -------------------------------------------------------------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
-| 1 | Proves the validated two-tier loader and trigger contract      | targeted unit + scoped check                           | `packages/ai/skills.ts`, `packages/ai/src/skills/**`, replacement port, `deno.json`, tests, run artifacts |
-| 2 | Proves package layering, documentation, and JSR publishability | scoped lint/fmt, full AI tests, arch/doc/publish gates | fixes from gates, README, run artifacts                                                                   |
+| # | Slice                                                          | Gate                                                   | Files                                                                            |
+| - | -------------------------------------------------------------- | ------------------------------------------------------ | -------------------------------------------------------------------------------- |
+| 1 | Proves the validated two-tier loader and trigger contract      | targeted unit + scoped check                           | `packages/ai/src/skills/**`, replacement port, `deno.json`, tests, run artifacts |
+| 2 | Proves package layering, documentation, and JSR publishability | scoped lint/fmt, full AI tests, arch/doc/publish gates | fixes from gates, README, run artifacts                                          |
 
 ### Deferred Scope
 
@@ -51,15 +51,19 @@
 
 ### Contributor Path
 
-Start at `packages/ai/skills.ts` for the curated contract, add content-source technologies as named
-adapters implementing `src/skills/ports/skill-content-source.ts`, and keep selection policy in
+Start at `packages/ai/src/skills/mod.ts` for the curated contract, add content-source technologies
+as named adapters implementing `SkillContentSource`, and keep selection policy in
 `src/skills/application/` without importing adapters.
 
 ## Progress Log
 
-| Time       | Slice | Step     | Notes                                                                               |
-| ---------- | ----- | -------- | ----------------------------------------------------------------------------------- |
-| 2026-07-11 | plan  | complete | Issue read fully; baseline verified; package mapping and placeholder port recorded. |
+| Time       | Slice | Step      | Notes                                                                               |
+| ---------- | ----- | --------- | ----------------------------------------------------------------------------------- |
+| 2026-07-11 | plan  | complete  | Issue read fully; baseline verified; package mapping and placeholder port recorded. |
+| 2026-07-11 | 1     | complete  | Contract, parser, adapter, matchers, and five tests landed in `c67e0121`.           |
+| 2026-07-11 | 1     | reconcile | #246 remains open; no PR/comment by instruction; scope unchanged.                   |
+| 2026-07-11 | 2     | complete  | README and all requested package/doctrine/JSR gates are green.                      |
+| 2026-07-11 | 2     | reconcile | No new issue comments or scope changes; handoff is commit/push only.                |
 
 ## Decisions
 
@@ -70,15 +74,43 @@ adapters implementing `src/skills/ports/skill-content-source.ts`, and keep selec
 
 ## Drift
 
-| Drift                                | Severity    | Logged in drift.md |
-| ------------------------------------ | ----------- | ------------------ |
-| PLAN-EVAL owner-waived               | significant | yes                |
-| Old issue path maps to `packages/ai` | minor       | yes                |
+| Drift                                                 | Severity    | Logged in drift.md |
+| ----------------------------------------------------- | ----------- | ------------------ |
+| PLAN-EVAL owner-waived                                | significant | yes                |
+| Old issue path maps to `packages/ai`                  | minor       | yes                |
+| Entrypoint moved under `src/skills` for F-16          | minor       | yes                |
+| Semantic injection narrowed structurally for doc-lint | minor       | yes                |
 
 ## Gate Results
 
-Pending implementation.
+### Static Gates
+
+| Gate          | Result | Evidence                                     |
+| ------------- | ------ | -------------------------------------------- |
+| scoped check  | PASS   | 84 files, 0 findings via `run-deno-check.ts` |
+| scoped lint   | PASS   | 84 files, 0 findings via `run-deno-lint.ts`  |
+| scoped fmt    | PASS   | 84 files, 0 findings via `run-deno-fmt.ts`   |
+| focused tests | PASS   | 5/5 `skills_test.ts` tests                   |
+| package tests | PASS   | 94/94 `packages/ai` tests                    |
+
+### Fitness Gates
+
+| Gate                         | Result | Evidence                                                                           |
+| ---------------------------- | ------ | ---------------------------------------------------------------------------------- |
+| F-1–F-5, F-8–F-12, F-14–F-19 | PASS   | `check-doctrine.ts --root packages/ai`: `FAIL=0 WARN=0 INFO=0`                     |
+| F-6 gate:jsr                 | PASS   | `deno task publish:dry-run`: exit 0, `Success Dry run complete`, no slow-type flag |
+| F-7 docs                     | PASS   | raw `deno doc --lint packages/ai/src/skills/mod.ts`: exit 0                        |
+| F-13 lifecycle               | N/A    | no cache, timer, handle, or long-lived resource                                    |
+
+### Runtime and Consumer Gates
+
+| Gate                    | Result | Evidence                                            |
+| ----------------------- | ------ | --------------------------------------------------- |
+| external runtime        | N/A    | effect-free caller-fed adapter; no backend          |
+| `@netscript/ai` runtime | PASS   | root check and runtime tests in the 94-test suite   |
+| `@netscript/ai/skills`  | PASS   | direct check/doc-lint and focused tests; 16 exports |
 
 ## Handoff Notes
 
 - Evaluator should first inspect the two-phase source boundary and zero-embedding-call tests.
+- PLAN-EVAL was owner-waived; IMPL-EVAL remains a separate-session orchestrator responsibility.
