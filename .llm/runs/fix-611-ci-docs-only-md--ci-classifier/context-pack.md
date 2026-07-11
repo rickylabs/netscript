@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-611-ci-docs-only-md--ci-classifier` |
 | Branch | `fix/611-ci-docs-only-md` |
-| Current phase | `evaluate` |
+| Current phase | `close` |
 | Archetype | `N/A` |
 | Scope overlays | `docs` |
 
@@ -21,14 +21,15 @@ Research, locked plan, Design checkpoint, and separate-session PLAN-EVAL are com
 - Separate Claude Opus PLAN-EVAL returned `PASS` in `plan-eval.md`.
 - Classifier slice implemented with all 30 focused tests and scoped check/format green.
 - Skill guidance landed in source skills and Claude mirrors were regenerated/check-verified.
+- Separate Claude Opus IMPL-EVAL returned `PASS`; issue #611 close-gate acceptance is fully evidenced.
 
 ## In Progress
 
-- Separate-session IMPL-EVAL.
+- Refresh PR body/status and hand off ready-to-merge draft PR.
 
 ## Next Steps
 
-1. Obtain IMPL-EVAL and finalize PR status/metadata.
+1. Commit/push evaluator trail, refresh PR body, and transition canonical status.
 
 ## Key Decisions
 

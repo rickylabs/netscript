@@ -58,6 +58,7 @@ Edit the pure path predicates and add a table-style regression in `ci-classify-c
 | 2026-07-11 | 3 | implementation | Added proactive docs-only PR label guidance to both authoritative skills and regenerated only through `agentic:sync-claude`. |
 | 2026-07-11 | 3 | gates | Mirror check, final classifier tests/check, diff check, docs-overlay source/link/terminology review, and lock hygiene passed. |
 | 2026-07-11 | 3 | reconcile | PR #613 is not itself docs-only because it changes classifier TS, so skip labels are intentionally not applied; `ci:full` remains available. No new review comments changed scope. |
+| 2026-07-11 | final | IMPL-EVAL | Separate Claude Opus evaluator returned `PASS` after independently rerunning focused static/consumer gates and verifying the close-gate. |
 
 ## Gate Results
 
@@ -68,7 +69,9 @@ Edit the pure path predicates and add a table-style regression in `ci-classify-c
 - Claude skill mirror check — `PASS` (17 skills, 21 mirrored files).
 - Docs overlay — `PASS`: guidance aligns with classifier/labels, adds no broken local links, and uses checked-in CI label terms.
 - Lock hygiene — `PASS`: `deno.lock` unchanged.
+- Independent IMPL-EVAL — `PASS`; see `evaluate.md`.
 
 ## Handoff Notes
 
 - IMPL-EVAL should scrutinize Markdown precedence versus explicit workflow/Deno critical paths and the rename-old-path behavior.
+- Evaluator's optional DRY note about duplicated critical basenames is non-blocking and intentionally deferred to avoid expanding the focused classifier contract change.
