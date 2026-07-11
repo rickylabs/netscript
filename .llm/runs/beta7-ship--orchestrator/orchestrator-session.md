@@ -98,3 +98,12 @@ beta.11 desktop left room to grow): beta.8 AI+stabilization+docs-quality (24), b
 backlog (15). New issues: #659 C#-removal, #660 frontend typesafe overhaul, #661 MedusaJS-bar
 tutorials, #662 whole-site audit (Sonnet-high auditor running), #663/#664/#665 tooling fixes.
 Plan recorded on #301.
+
+## HANDOFF (2026-07-11 ~21:40)
+
+#662 audit merged (report on main, top-10 on the issue). Beta-8 orchestrator launched: session
+`4d300496` (`claude attach 4d300496`), Fable 5 low, bypassPermissions, remote-control
+`ns-beta8-orchestrator`, cwd `/home/codex/repos/ns-beta8-orchestrator`. Brief: implement milestone
+10 overnight, stop at the beta.8 release-cut PR ready to merge (no merge/publish); lane rules
+(no Fable swarms; Opus 4.8 high docs / low-med workflows; Codex impl) + predecessor gotcha list
+embedded. Prompt archived at the beta-8 launch (job tmp beta8-prompt.md) and in this run dir.
