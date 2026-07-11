@@ -16,7 +16,7 @@ import { ANTHROPIC_MODELS, anthropicText, createAnthropicChat } from '@tanstack/
 
 import type { GenerationOptions } from '../contracts/generation.ts';
 import type { ModelDescriptor, ModelHandle, ModelId } from '../contracts/model.ts';
-import { AiError } from '../contracts/errors.ts';
+import { AiError, InvalidModelOptionsError } from '../contracts/errors.ts';
 import type { ModelProviderPort } from '../ports/model-provider.ts';
 import type { ChatClientPort } from '../ports/chat-client.ts';
 import { toTanstackChatClient } from './tanstack-chat-client.ts';
@@ -52,6 +52,24 @@ export function anthropicGenerationModelOptions(
     modelOptions.max_tokens = options.maxOutputTokens;
   }
   return Object.keys(modelOptions).length > 0 ? modelOptions : undefined;
+}
+
+/** Reject Anthropic's deprecated fixed-budget thinking shape before transport. */
+export function validateAnthropicModelOptions(
+  options: Readonly<Record<string, unknown>>,
+): void {
+  const thinking = options.thinking;
+  if (
+    typeof thinking === 'object' && thinking !== null &&
+    'type' in thinking && thinking.type === 'enabled' &&
+    'budget_tokens' in thinking
+  ) {
+    throw new InvalidModelOptionsError(
+      ANTHROPIC_PROVIDER_ID,
+      '`thinking: { type: "enabled", budget_tokens }` is deprecated; use ' +
+        '`thinking: { type: "adaptive" }` with `output_config.effort`.',
+    );
+  }
 }
 
 /**
@@ -171,6 +189,7 @@ export class AnthropicModelProvider implements ModelProviderPort {
       name: ANTHROPIC_PROVIDER_ID,
       kind: 'text',
       mapModelOptions: anthropicGenerationModelOptions,
+      validateModelOptions: validateAnthropicModelOptions,
     });
   }
 }

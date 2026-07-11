@@ -10,21 +10,25 @@
  * @module
  */
 
-import { assertEquals } from '@std/assert';
+import { assertEquals, assertThrows } from '@std/assert';
 
 import type { GenerationOptions, ReasoningEffort } from '../src/contracts/generation.ts';
 import type { ChatClientEvent } from '../src/ports/chat-client.ts';
 import type { AgentChunk } from '../src/contracts/chunk.ts';
-import { anthropicGenerationModelOptions } from '../src/adapters/anthropic.adapter.ts';
+import {
+  anthropicGenerationModelOptions,
+  validateAnthropicModelOptions,
+} from '../src/adapters/anthropic.adapter.ts';
 import { openAiCompatibleGenerationModelOptions } from '../src/adapters/openai-compatible.adapter.ts';
 import {
   openRouterGenerationModelOptions,
   openRouterReasoningModelOptions,
 } from '../src/adapters/openrouter.adapter.ts';
 import { ollamaGenerationModelOptions } from '../src/adapters/ollama.adapter.ts';
-import { mergeModelOptions } from '../src/adapters/tanstack-chat-client.ts';
+import { mergeModelOptions, resolveModelOptions } from '../src/adapters/tanstack-chat-client.ts';
 import { createAgentLoop } from '../agent.ts';
 import { createFakeChatModelProvider } from '../src/testing/mod.ts';
+import { InvalidModelOptionsError } from '../src/contracts/errors.ts';
 
 const MODEL = 'anthropic:claude-sonnet-4-5';
 
@@ -127,6 +131,65 @@ Deno.test('mergeModelOptions: later layers win and an all-empty merge is undefin
     ),
     { reasoning: { enabled: false }, max_tokens: 10 },
   );
+});
+
+Deno.test('per-call modelOptions: exact provider request shapes pass through', () => {
+  const request = { messages: [] } as const;
+  assertEquals(
+    resolveModelOptions(
+      { name: 'anthropic', kind: 'text', validateModelOptions: validateAnthropicModelOptions },
+      request,
+      { modelOptions: { thinking: { type: 'adaptive' }, output_config: { effort: 'high' } } },
+    ),
+    { thinking: { type: 'adaptive' }, output_config: { effort: 'high' } },
+  );
+  assertEquals(
+    resolveModelOptions(
+      { name: 'openai-compatible', kind: 'text' },
+      request,
+      { modelOptions: { reasoning: { effort: 'medium' } } },
+    ),
+    { reasoning: { effort: 'medium' } },
+  );
+  assertEquals(
+    resolveModelOptions(
+      { name: 'openrouter', kind: 'text' },
+      request,
+      { modelOptions: { reasoning: { effort: 'high' }, maxCompletionTokens: 4_096 } },
+    ),
+    { reasoning: { effort: 'high' }, maxCompletionTokens: 4_096 },
+  );
+});
+
+Deno.test('per-call modelOptions override static options; omission is unchanged', () => {
+  const request = { messages: [] } as const;
+  const meta = {
+    name: 'openrouter',
+    kind: 'text',
+    modelOptions: { reasoning: { effort: 'low' }, maxCompletionTokens: 512 },
+  } as const;
+  assertEquals(resolveModelOptions(meta, request), meta.modelOptions);
+  assertEquals(
+    resolveModelOptions(meta, request, {
+      modelOptions: { reasoning: { effort: 'high' }, maxCompletionTokens: 2_048 },
+    }),
+    { reasoning: { effort: 'high' }, maxCompletionTokens: 2_048 },
+  );
+  assertEquals(resolveModelOptions({ name: 'ollama', kind: 'text' }, request), undefined);
+});
+
+Deno.test('anthropic rejects deprecated enabled + budget_tokens with typed 400 error', () => {
+  const error = assertThrows(
+    () =>
+      resolveModelOptions(
+        { name: 'anthropic', kind: 'text', validateModelOptions: validateAnthropicModelOptions },
+        { messages: [] },
+        { modelOptions: { thinking: { type: 'enabled', budget_tokens: 2_048 } } },
+      ),
+    InvalidModelOptionsError,
+  );
+  assertEquals(error.provider, 'anthropic');
+  assertEquals(error.statusCode, 400);
 });
 
 // --- Reasoning chunk through the loop ----------------------------------------

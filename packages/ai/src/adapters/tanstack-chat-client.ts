@@ -67,13 +67,17 @@ export interface ChatClientMeta {
    * (reasoning effort, output-token cap) to that provider's request-body keys
    * (Anthropic `output_config.effort`/`thinking`, OpenAI `reasoning_effort`,
    * OpenRouter `reasoning:{effort}`; Ollama maps only `max_tokens`). The result
-   * is merged over the static {@linkcode ChatClientMeta.modelOptions}, then the
-   * caller's `providerOptions` escape hatch is merged last (highest priority).
+   * is merged over the static {@linkcode ChatClientMeta.modelOptions}, followed
+   * by the request escape hatch and the call's `modelOptions` (highest priority).
    * Omit for providers that ignore per-turn options entirely.
    */
   readonly mapModelOptions?: (
     options: GenerationOptions,
   ) => Readonly<Record<string, unknown>> | undefined;
+  /** Validate provider-native per-call options before starting transport IO. */
+  readonly validateModelOptions?: (
+    options: Readonly<Record<string, unknown>>,
+  ) => void;
 }
 
 /**
@@ -95,6 +99,30 @@ export function mergeModelOptions(
     }
   }
   return seen ? merged : undefined;
+}
+
+/**
+ * Resolve the exact model-options bag handed to the provider transport.
+ * Layers are static defaults, neutral mapping, request escape hatch, then the
+ * per-call bag; later layers override earlier ones.
+ */
+export function resolveModelOptions(
+  meta: ChatClientMeta,
+  request: ChatClientRequest,
+  options?: ChatClientCallOptions,
+): Readonly<Record<string, unknown>> | undefined {
+  if (options?.modelOptions !== undefined) {
+    meta.validateModelOptions?.(options.modelOptions);
+  }
+  const perTurn = request.options !== undefined
+    ? meta.mapModelOptions?.(request.options)
+    : undefined;
+  return mergeModelOptions(
+    meta.modelOptions,
+    perTurn,
+    request.options?.providerOptions,
+    options?.modelOptions,
+  );
 }
 
 /**
@@ -126,17 +154,7 @@ export function toTanstackChatClient(
       const { systemPrompts, messages } = toTanstackMessages(request);
       const tools = toTanstackTools(request.tools);
 
-      // Layer the per-turn options over the provider's static override: static
-      // `meta.modelOptions`, then the provider-native mapping of the neutral
-      // options, then the caller's raw `providerOptions` escape hatch (wins).
-      const perTurn = request.options !== undefined
-        ? meta.mapModelOptions?.(request.options)
-        : undefined;
-      const modelOptions = mergeModelOptions(
-        meta.modelOptions,
-        perTurn,
-        request.options?.providerOptions,
-      );
+      const modelOptions = resolveModelOptions(meta, request, options);
 
       // Accumulate streamed tool-call fragments keyed by call id.
       const pending = new Map<string, { name: string; args: string }>();

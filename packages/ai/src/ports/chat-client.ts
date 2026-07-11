@@ -61,6 +61,11 @@ export interface ChatClientRequest {
 export interface ChatClientCallOptions {
   /** Cancellation signal for the turn; aborting stops the underlying request. */
   readonly signal?: AbortSignal;
+  /**
+   * Provider-native options for this turn. These override static
+   * construction-time model options; omission retains configured defaults.
+   */
+  readonly modelOptions?: Readonly<Record<string, unknown>>;
 }
 
 /** Incremental assistant text produced by the model. */
