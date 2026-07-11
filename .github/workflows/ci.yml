@@ -40,6 +40,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -48,6 +52,17 @@ jobs:
         uses: denoland/setup-deno@v2
         with:
           deno-version: "2.9.0"
+
+      - name: Mirror structured acceptance evidence
+        if: contains(github.event.pull_request.labels.*.name, 'status:ready-merge')
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >
+          deno run --allow-env --allow-net
+          .llm/tools/validation/mirror-acceptance-evidence.ts
+          --repo "${{ github.repository }}"
+          --pr "${{ github.event.pull_request.number }}"
+          --pretty
 
       - name: Referenced issue acceptance gate
         env:

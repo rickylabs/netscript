@@ -120,6 +120,23 @@ The machine convention is intentionally narrow:
   (command output, run URL, CI job, or reviewer/evaluator comment). The automation catches unchecked
   boxes; the coordinator/evaluator verifies the evidence link quality before closing.
 
+For the normal evidence-mirroring path, put an exact `## Acceptance evidence` section in the PR
+body or a PR comment. Include one checked line for every still-unchecked close-gated issue box,
+copying its text verbatim and following it with an em dash plus linked evidence:
+
+```markdown
+## Acceptance evidence
+
+- [x] <verbatim issue checkbox text> — <command output, run URL, CI job, or evaluator comment>
+```
+
+When the PR carries `status:ready-merge`, CI runs
+`.llm/tools/validation/mirror-acceptance-evidence.ts` before the close-gate. The mirror validates the
+complete mapping before it checks matched issue boxes and posts an issue provenance comment linking
+the PR. Unknown, duplicate, mismatched, or missing entries fail without mutation. Use `--dry-run`
+to validate a real PR safely. Issues mentioned without a closing keyword (including epics/umbrellas
+referenced with `Part of`) are never mutated.
+
 A PR whose `status:` is `research`, `plan`, or `plan-eval` **MUST NOT be merged** — a plan-only
 artifact set can never satisfy an implementation Definition-of-Done. Merge requires
 `status:ready-merge`, and moving to `status:ready-merge` requires all three:
@@ -138,9 +155,10 @@ Enforcement lives at three points:
 1. **Coordinator/evaluator review** — before closing an issue by hand, or before merging a PR whose
    body carries `Closes #N` / `Fixes #N` / `Resolves #N`, verify every close-gated issue checkbox is
    checked and has linked evidence.
-2. **CI close-gate** — `.github/workflows/ci.yml` runs
-   `.llm/tools/validation/check-close-gate.ts` on pull requests. It fetches each issue closed by the
-   PR body and fails if any close-gated issue checkbox remains unchecked.
+2. **CI close-gate** — `.github/workflows/ci.yml` runs the opt-in evidence mirror for
+   `status:ready-merge`, then `.llm/tools/validation/check-close-gate.ts` on pull requests. The
+   checker independently fetches each issue closed by the PR body and fails if any close-gated issue
+   checkbox remains unchecked; mirroring is not a bypass.
 3. **PR-template/evaluator checklist** — the PR close-gate checkbox and IMPL-EVAL pass both confirm
    the same evidence before `status:ready-merge`.
 
