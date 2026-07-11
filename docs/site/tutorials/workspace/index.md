@@ -8,12 +8,21 @@ next: { label: "1 · Scaffold", href: "/tutorials/workspace/01-scaffold/" }
 
 # Team Workspace
 
-This track builds an **authenticated team-workspace backend** from an empty folder to a running,
-session-protected app under Aspire. You will scaffold a workspace (Postgres by default, swappable to
-`mysql`, `mssql`, or `sqlite` via `--db`), sign users in through a pluggable
-auth backend, give the workspace its own isolated database, provision new members with a background
-job, and gate your service routes with the real `.withAuthz()` seam. It is one continuous app — your
-`my-workspace/` grows with every chapter.
+Picture the app this track is modeled on: **eis-chat**, the context-accumulator the NetScript team
+builds and runs against the framework itself. An operations team lives in it during an ERP cutover —
+projects and channels full of live incident context, diagnostics, and half-finished conclusions
+about a production system that is misbehaving *right now*. Underneath all of that sits an unglamorous
+layer that decides everything: **who is on the team, where their data lives, and which routes they
+may touch**. Get it wrong in one direction and an off-boarded contractor can still read incident
+channels; get it wrong in the other and the engineer you just paged is locked out while production
+burns.
+
+That layer is what you build here, from an empty folder to a running, session-protected app under
+Aspire: you scaffold a workspace (Postgres by default, swappable to `mysql`, `mssql`, or `sqlite`
+via `--db`), sign users in through a pluggable auth backend, give team records their own isolated
+database, provision new members with a background job that never blocks the caller, and gate your
+service routes with the real `.withAuthz()` seam. It is one continuous app — your `my-workspace/`
+grows with every chapter.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/workspace/01-scaffold/" },
@@ -27,11 +36,11 @@ job, and gate your service routes with the real `.withAuthz()` seam. It is one c
 ## What you will build
 
 By the end of this track you will have a NetScript workspace that signs a real user in through an
-OAuth/OIDC provider, mints a session cookie, stores workspace records in their own isolated Postgres (the default; or `mysql` / `mssql` / `sqlite` via `--db`),
-provisions a new member off the request path with a background job, and rejects unauthenticated
-requests to its guarded routes with a `401` — all running locally under one Aspire dashboard. The
-central idea: **authentication in NetScript is a pluggable backend, a session, and a route-authz
-seam — not a bespoke rewrite you carry yourself.**
+OAuth/OIDC provider, mints a session cookie, stores team records in their own isolated Postgres (the
+default; or `mysql` / `mssql` / `sqlite` via `--db`), provisions a new member off the request path
+with a background job, and rejects unauthenticated requests to its guarded routes with a `401` —
+all running locally under one Aspire dashboard. The central idea: **authentication in NetScript is
+a pluggable backend, a session, and a route-authz seam — not a bespoke rewrite you carry yourself.**
 
 {{ comp callout { type: "note", title: "What NetScript ships — and what stays your code" } }}
 NetScript ships <strong>pluggable auth backends</strong> (an <code>auth-api</code> service with a
@@ -43,6 +52,16 @@ track touches multi-tenant org scoping, it does so as a clearly-marked <em>app-l
 (you add your own <code>orgId</code> column and filter in your own queries), never as a
 framework-managed primitive. Read those asides as "here is how you would extend it," not "NetScript
 does this for you."
+{{ /comp }}
+
+{{ comp callout { type: "note", title: "Where this track's patterns come from" } }}
+The data shape is borrowed from a real app: eis-chat splits an <strong>org-catalog</strong>
+datasource (who exists, which projects and channels there are) from the data each channel
+accumulates — the dual-database pattern you build in chapter 3, and the same
+<code>workers</code>-plugin background jobs you use in chapter 4. The <strong>auth chapters are the
+exception</strong>: they are grounded in the framework's own packages and its
+<code>builder-auth</code> test suite (the 401/403/200 pattern in chapter 5), because that is where
+the authentication seam is actually defined and proven.
 {{ /comp }}
 
 ## The arc: auth → session → authz
@@ -102,9 +121,10 @@ it assumes you can scaffold and boot, then layers authentication on top. If `net
 
 ## What you built
 
-A clear map of the track: an authenticated team-workspace backend built on a pluggable auth backend,
-a session, and a route-authz seam — single-tenant by design, with org scoping as an explicit app-level
-extension. Start at chapter 1 and keep the same `my-workspace/` through to deploy.
+A clear map of the track: the team layer that a real operations tool stands on — a pluggable auth
+backend, a session, isolated team data, off-path provisioning, and a route-authz seam that fails
+closed. Single-tenant by design, with org scoping as an explicit app-level extension. Start at
+chapter 1 and keep the same `my-workspace/` through to deploy.
 
 {{ comp.nextPrev({ prev: { label: "Tutorials", href: "/tutorials/" }, next: { label: "1 · Scaffold", href: "/tutorials/workspace/01-scaffold/" } }) }}
 </content>

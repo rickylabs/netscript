@@ -12,7 +12,8 @@ Your app can sign users in, but it has nothing of its own to store yet. This cha
 workspace its own data: a **second, isolated database** with its own Prisma schema, migration history,
 and generated client — separate from the primary Postgres the auth plugin migrated into. The reason to
 isolate it is the same reason teams isolate any domain: an independent lifecycle you can migrate, scale,
-and back up on its own.
+and back up on its own. It also bounds the blast radius — a bad migration to your team schema cannot
+take the auth tables down with it, and vice versa.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/workspace/01-scaffold/" },
@@ -48,6 +49,15 @@ separate migration lifecycle and a datasource you can scale and back up independ
 wanted a new <em>table</em>, you would add a model to the primary schema instead. Adding a whole
 datasource means a second migration history and a second generated client to manage. This track adds
 one on purpose, to keep workspace records cleanly separate from auth.
+{{ /comp }}
+
+{{ comp callout { type: "note", title: "This split is how a real NetScript app stores its data" } }}
+eis-chat — the context-accumulator the NetScript team builds against the framework — uses exactly
+this shape: one <strong>org-catalog</strong> datasource (Prisma-managed: who exists, which projects
+and channels there are) kept separate from the datastores each channel accumulates context into.
+Not everything is one database. The catalog answers "what is there and who belongs to it"; the
+domain data lives on its own lifecycle. Your <code>workspace</code> datasource here plays the
+catalog role for your team records.
 {{ /comp }}
 
 ## Step 1 — Scaffold the second database
@@ -229,9 +239,10 @@ exist.
 ## What you built
 
 Your workspace now owns its data: a second, isolated Postgres datasource with `Workspace` and `Member`
-models, its own migration history, and its own typed client — cleanly separate from auth and the
-primary database. You also saw the boundary: org scoping is app-level, not a framework
-primitive. Next you provision new members off the request path with a background job.
+models, its own migration history, and its own typed client — the same catalog-versus-domain split a
+real NetScript app runs on, cleanly separate from auth and the primary database. You also saw the
+boundary: org scoping is app-level, not a framework primitive. Next comes the moment this data model
+exists for — adding a member to a team — and you do it off the request path with a background job.
 
 {{ comp.nextPrev({ prev: { label: "2 · Auth", href: "/tutorials/workspace/02-auth/" }, next: { label: "4 · Provision job", href: "/tutorials/workspace/04-provision-job/" } }) }}
 </content>

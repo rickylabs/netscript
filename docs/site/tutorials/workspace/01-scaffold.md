@@ -8,11 +8,15 @@ next: { label: "2 · Auth", href: "/tutorials/workspace/02-auth/" }
 
 # Scaffold the workspace
 
-Every chapter in this track adds one layer to a single app. This first chapter lays the foundation:
-a real NetScript workspace on disk named `my-workspace/`, with an example service and a Postgres
-database, booted under Aspire. You will not write auth yet — you will create the base that the auth
-backend, the workspace database, the provisioning job, and the route guards all attach to in the
-chapters that follow.
+You are building the team layer of an operations workspace — the part that will decide who is on
+the team, where team records live, and which routes a caller may reach. Every chapter in this track
+adds one layer to that single app. This first chapter lays the foundation: a real NetScript
+workspace on disk named `my-workspace/`, with an example service and a Postgres database, booted
+under Aspire. You will not write auth yet — you will create the base that the auth backend, the
+team database, the provisioning job, and the route guards all attach to in the chapters that
+follow. Everything that later fails closed or provisions off-path attaches to what you scaffold
+here, so the checkpoint at the end of this chapter — a healthy service and a clean type-check — is
+the ground truth the rest of the track builds on.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/workspace/01-scaffold/" },
@@ -186,7 +190,8 @@ starting — wait a few seconds and retry.
 
 A real NetScript workspace at `my-workspace/`: a typed `workspace` service on `:3001`, shared
 contracts, a Postgres database, and a Redis cache — all orchestrated by Aspire and visible in one
-dashboard. This is the base. Next you add authentication on top of it.
+dashboard. This is the base — and right now it answers absolutely anyone. Next you fix that: you
+add an identity layer, so the app can tell a team member from a stranger.
 
 {{ comp.nextPrev({ prev: { label: "Team Workspace", href: "/tutorials/workspace/" }, next: { label: "2 · Auth", href: "/tutorials/workspace/02-auth/" } }) }}
 </content>

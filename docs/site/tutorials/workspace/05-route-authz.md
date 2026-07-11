@@ -8,10 +8,15 @@ next: { label: "6 · Deploy", href: "/tutorials/workspace/06-deploy/" }
 
 # Protect routes with authz
 
-Your `workspace` service still answers anyone. This chapter closes the loop: you gate its routes with
-the real, tested `.withAuthn()` / `.withAuthz()` seam from `@netscript/service/auth`. An authenticated,
-correctly-scoped request succeeds with a `200`; an unauthenticated one is rejected with a `401`. This
-is the seam NetScript actually ships — not a bespoke middleware you write yourself.
+Your `workspace` service still answers anyone — and after chapters 3 and 4 it fronts data with real
+consequences: the member list, and the write path that adds people to a team. An endpoint like that
+must fail closed. Not "usually requires a login" — *closed*: no credential means `401` before the
+handler runs, and a valid credential without the right scope means `403`. This chapter closes the
+loop: you gate the routes with the `.withAuthn()` / `.withAuthz()` seam from
+`@netscript/service/auth` — the seam NetScript itself ships and proves in its own `builder-auth`
+test suite, not a bespoke middleware you write and maintain yourself. You then drive all three
+outcomes — `401`, `403`, `200` — against your running service, the same three assertions the
+framework's test makes.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/workspace/01-scaffold/" },
@@ -192,8 +197,10 @@ scoped call must succeed:
 
 A guarded `workspace` service that resolves a `Principal` with `.withAuthn()` and authorizes by scope
 with `.withAuthz()` — proven by a `401` for an anonymous request, a `403` for the wrong scope, and a
-`200` for a correctly-scoped one. You also saw the boundary: this is route-level scope authz,
-not org/role RBAC. The last chapter runs the whole authenticated workspace locally under Aspire.
+`200` for a correctly-scoped one: the exact three outcomes the framework's own `builder-auth` test
+asserts. The member list now fails closed. You also saw the boundary: this is route-level scope
+authz, not org/role RBAC. The last chapter runs the whole authenticated workspace locally under
+Aspire.
 
 {{ comp.nextPrev({ prev: { label: "4 · Provision job", href: "/tutorials/workspace/04-provision-job/" }, next: { label: "6 · Deploy", href: "/tutorials/workspace/06-deploy/" } }) }}
 </content>
