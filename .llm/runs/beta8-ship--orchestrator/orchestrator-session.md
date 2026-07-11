@@ -66,3 +66,10 @@
   Independent grep gates on all docs branches: 0 hits. #219 close decision surfaced to owner
   (in-repo proof vs reference-app migration criteria). #676 (497) failed CI on the CLI telemetry
   subpath rewrite-map guard — thread steered to fix. Still running: 664, 269, 270, 461, 290, 686.
+- 2026-07-12 ~01:55 — SECOND MERGE WAVE done: #686→660 ✓ (rebase resolved dup PORT-note), #676→497 ✓
+  (fix loop: CLI telemetry rewrite-map guard), #689→461 ✓, #690→290 ✓ (fix loop: two CLI expectation
+  tests), #691→664 ✓ (thread resumed after launcher-kill stall; rebased onto post-#668 launcher),
+  #688→270 ✓, #687→269 (rebased twice — union export merges — merging on green). All shipped labels
+  applied. #687/#688 CI-not-triggering root cause: branches conflicted with main → GitHub creates no
+  PR merge commit → no pull_request run; fix = rebase. Owner-decision items: #219 (A/B), #661 box 2
+  (checkpoint execution), #238 epic close, milestone close. Next: run-artifacts PR + release cut.
