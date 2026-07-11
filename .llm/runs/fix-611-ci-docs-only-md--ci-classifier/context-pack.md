@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-611-ci-docs-only-md--ci-classifier` |
 | Branch | `fix/611-ci-docs-only-md` |
-| Current phase | `implement` |
+| Current phase | `evaluate` |
 | Archetype | `N/A` |
 | Scope overlays | `docs` |
 
@@ -20,15 +20,15 @@ Research, locked plan, Design checkpoint, and separate-session PLAN-EVAL are com
 - Inspected classifier, tests, source skills, issue #611, branch, and clean worktree.
 - Separate Claude Opus PLAN-EVAL returned `PASS` in `plan-eval.md`.
 - Classifier slice implemented with all 30 focused tests and scoped check/format green.
+- Skill guidance landed in source skills and Claude mirrors were regenerated/check-verified.
 
 ## In Progress
 
-- Skill guidance and generated mirrors.
+- Separate-session IMPL-EVAL.
 
 ## Next Steps
 
-1. Implement slices 2–3 and run named gates.
-2. Obtain IMPL-EVAL and finalize PR status/metadata.
+1. Obtain IMPL-EVAL and finalize PR status/metadata.
 
 ## Key Decisions
 
@@ -43,6 +43,9 @@ Research, locked plan, Design checkpoint, and separate-session PLAN-EVAL are com
 | --- | --- | --- |
 | `.github/scripts/ci-classify-changes.ts` | changed | Critical-path guard precedes global Markdown/MDX classification. |
 | `.github/scripts/ci-classify-changes.test.ts` | changed | Requested mixed/lock/package/rename regressions. |
+| `.agents/skills/netscript-pr/SKILL.md` | changed | Proactive docs-only CI label guidance and taxonomy. |
+| `.agents/skills/netscript-harness/SKILL.md` | changed | Opening-session label guidance. |
+| `.claude/skills/netscript-{pr,harness}/SKILL.md` | generated | Synced from authoritative skills. |
 
 ## Gates
 
@@ -51,11 +54,11 @@ Research, locked plan, Design checkpoint, and separate-session PLAN-EVAL are com
 | Static | PASS | 30 tests; scoped check and format checks green. |
 | Fitness | N/A | No package/plugin surface. |
 | Runtime | N/A | Pure classifier tests cover behavior. |
-| Consumer | pending | Claude mirror sync/check remains. |
+| Consumer | PASS | Claude mirror sync/check: 17 skills, 21 files. |
 
 ## Drift and Debt
 
-- Drift: none so far.
+- Drift: beta milestone mapping recorded in `drift.md`.
 - Debt: none.
 
 ## Commits
