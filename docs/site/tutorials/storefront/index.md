@@ -8,11 +8,17 @@ next: { label: "1 · Scaffold", href: "/tutorials/storefront/01-scaffold/" }
 
 # Build a storefront backend
 
-This track is a project, not a tour. Across six chapters you build the backend for a small
-e-commerce storefront — a products catalog, a cart, a durable checkout, and a shipping webhook — in
-one workspace that grows chapter by chapter. It is the same spine the NetScript playground runs,
-re-themed as a shop, so every pattern you learn here is one the framework's own example app uses in
-anger.
+This track is a project, not a tour. Across seven chapters you build a small e-commerce storefront —
+a products catalog, a cart, a durable checkout, a shipping webhook, and a storefront page — in one
+workspace that grows chapter by chapter. It is the same spine the NetScript playground runs, re-themed
+as a shop, so every pattern you learn here is one the framework's own example app uses in anger.
+
+The differentiator this track proves is **one typed contract, honored from the database to the
+button**: the oRPC schema you write once is the same object the server handler validates against, the
+same one a page's query and checkout mutation are typed from, so a wrong field is a compile error, not
+a 2 a.m. incident. **What this replaces:** the hand-maintained REST-plus-fetch-wrapper-plus-DTO stack
+where the client's idea of a cart and the server's idea of a cart are two files that drift until
+production catches them apart.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/storefront/01-scaffold/" },
@@ -20,7 +26,8 @@ anger.
   { label: "3 · Cart contracts", href: "/tutorials/storefront/03-cart-contracts/" },
   { label: "4 · Checkout saga", href: "/tutorials/storefront/04-checkout-saga/" },
   { label: "5 · Shipping webhook", href: "/tutorials/storefront/05-shipping-webhook/" },
-  { label: "6 · Deploy", href: "/tutorials/storefront/06-deploy/" }
+  { label: "6 · Storefront UI", href: "/tutorials/storefront/06-storefront-ui/" },
+  { label: "7 · Deploy", href: "/tutorials/storefront/07-deploy/" }
 ] }) }}
 
 ## What you will build
@@ -67,7 +74,7 @@ You also do not need to read the whole framework before you start. Each chapter 
 one new capability, grounds it in real running code, and proves it with a command whose output you
 can check.
 
-## The six chapters
+## The seven chapters
 
 {{ comp.featureGrid({ items: [
   {
@@ -96,14 +103,19 @@ can check.
     href: "/tutorials/storefront/05-shipping-webhook/"
   },
   {
-    title: "6 · Deploy",
+    title: "6 · Storefront UI",
+    body: "Put a face on the backend: a typed cart route with <code>createRouteReference</code>, a catalog query and a checkout mutation driven through <code>createServiceClient</code> → <code>createServiceQueryUtils</code> in a Fresh island. The typed contract, honored all the way to the button.",
+    href: "/tutorials/storefront/06-storefront-ui/"
+  },
+  {
+    title: "7 · Deploy",
     body: "Run the whole storefront locally under one <code>aspire start</code> — every service, plugin API, and background processor in one resource graph, observable from the dashboard. The local topology, not a cloud deployer.",
-    href: "/tutorials/storefront/06-deploy/"
+    href: "/tutorials/storefront/07-deploy/"
   }
 ] }) }}
 
 {{ comp callout { type: "note", title: "One workspace, carried forward" } }}
-This is a tutorial track: state compounds. The <code>my-shop/</code> workspace you create in chapter 1 is the same one you finish in chapter 6 — each chapter begins by checking the project state the previous one left, and each "What you built" feeds the next chapter's objective. Work the chapters in order.
+This is a tutorial track: state compounds. The <code>my-shop/</code> workspace you create in chapter 1 is the same one you finish in chapter 7 — each chapter begins by checking the project state the previous one left, and each "What you built" feeds the next chapter's objective. Work the chapters in order.
 {{ /comp }}
 
 ## Start the build
