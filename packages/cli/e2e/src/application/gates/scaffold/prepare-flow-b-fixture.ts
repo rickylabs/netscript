@@ -1,4 +1,5 @@
 import { configurePublishedWorkersBlock } from './configure-published-workers-block.ts';
+import { prepareLocalSourceFixture } from './local-source-fixture.ts';
 
 const projectRoot = Deno.args[0];
 if (!projectRoot) {
@@ -43,40 +44,51 @@ const sharedNpmImports = {
   '@orpc/contract': 'npm:@orpc/contract@^1.14.6',
   '@orpc/otel': 'npm:@orpc/otel@^1.14.7',
 };
-const localSourceImports = {
-  '@netscript/plugin-workers-core/contracts/v1':
-    `${sourceRoot}/packages/plugin-workers-core/src/contracts/v1/mod.ts`,
-  '@netscript/plugin-workers/services': `${sourceRoot}/plugins/workers/services/src/main.ts`,
-  '@netscript/sdk/client': `${sourceRoot}/packages/sdk/src/client/mod.ts`,
-  '@netscript/telemetry': `${sourceRoot}/packages/telemetry/mod.ts`,
-  '@netscript/telemetry/attributes': `${sourceRoot}/packages/telemetry/attributes.ts`,
-  '@netscript/telemetry/config': `${sourceRoot}/packages/telemetry/config.ts`,
-  '@netscript/telemetry/context': `${sourceRoot}/packages/telemetry/context.ts`,
-  '@netscript/telemetry/hono': `${sourceRoot}/packages/telemetry/hono.ts`,
-  '@netscript/telemetry/instrumentation': `${sourceRoot}/packages/telemetry/instrumentation.ts`,
-  '@netscript/telemetry/orpc': `${sourceRoot}/packages/telemetry/orpc.ts`,
-  '@netscript/telemetry/otel': `${sourceRoot}/packages/telemetry/src/adapters/otel/mod.ts`,
-  '@netscript/telemetry/query': `${sourceRoot}/packages/telemetry/query.ts`,
-  '@netscript/telemetry/registry': `${sourceRoot}/packages/telemetry/registry.ts`,
-  '@netscript/telemetry/testing': `${sourceRoot}/packages/telemetry/src/testing/mod.ts`,
-  '@netscript/telemetry/tracer': `${sourceRoot}/packages/telemetry/tracer.ts`,
-};
-const flowBImports = {
-  ...denoConfig.imports,
-  ...sharedNpmImports,
-  ...(mode === 'published' ? publishedImports : localSourceImports),
-};
+const localSourcePackages = [
+  [
+    '@netscript/plugin-workers-core/contracts/v1',
+    'packages/plugin-workers-core/src/contracts/v1/mod.ts',
+  ],
+  ['@netscript/plugin-workers/services', 'plugins/workers/services/src/main.ts'],
+  ['@netscript/sdk/client', 'packages/sdk/src/client/mod.ts'],
+  ['@netscript/telemetry', 'packages/telemetry/mod.ts'],
+  ['@netscript/telemetry/attributes', 'packages/telemetry/attributes.ts'],
+  ['@netscript/telemetry/config', 'packages/telemetry/config.ts'],
+  ['@netscript/telemetry/context', 'packages/telemetry/context.ts'],
+  ['@netscript/telemetry/hono', 'packages/telemetry/hono.ts'],
+  ['@netscript/telemetry/instrumentation', 'packages/telemetry/instrumentation.ts'],
+  ['@netscript/telemetry/orpc', 'packages/telemetry/orpc.ts'],
+  ['@netscript/telemetry/otel', 'packages/telemetry/src/adapters/otel/mod.ts'],
+  ['@netscript/telemetry/query', 'packages/telemetry/query.ts'],
+  ['@netscript/telemetry/registry', 'packages/telemetry/registry.ts'],
+  ['@netscript/telemetry/testing', 'packages/telemetry/src/testing/mod.ts'],
+  ['@netscript/telemetry/tracer', 'packages/telemetry/tracer.ts'],
+].map(([specifier, entrypoint]) => ({ specifier, entrypoint }));
 const flowBConfigPath = `${projectRoot}/.netscript-flow-b-deno.json`;
 const flowBImportMapPath = `${projectRoot}/.netscript/e2e/flow-b-import-map.json`;
-await Deno.mkdir(`${projectRoot}/.netscript/e2e`, { recursive: true });
-await Deno.writeTextFile(
-  flowBConfigPath,
-  `${JSON.stringify({ ...denoConfig, imports: flowBImports }, null, 2)}\n`,
-);
-await Deno.writeTextFile(
-  flowBImportMapPath,
-  `${JSON.stringify({ imports: flowBImports }, null, 2)}\n`,
-);
+if (mode === 'local') {
+  await prepareLocalSourceFixture({
+    projectRoot,
+    sourceBase: sourceRoot,
+    packages: localSourcePackages,
+    imports: sharedNpmImports,
+    targets: [
+      { path: '.netscript-flow-b-deno.json', includeConfig: true },
+      { path: '.netscript/e2e/flow-b-import-map.json' },
+    ],
+  });
+} else {
+  const flowBImports = { ...denoConfig.imports, ...sharedNpmImports, ...publishedImports };
+  await Deno.mkdir(`${projectRoot}/.netscript/e2e`, { recursive: true });
+  await Deno.writeTextFile(
+    flowBConfigPath,
+    `${JSON.stringify({ ...denoConfig, imports: flowBImports }, null, 2)}\n`,
+  );
+  await Deno.writeTextFile(
+    flowBImportMapPath,
+    `${JSON.stringify({ imports: flowBImports }, null, 2)}\n`,
+  );
+}
 
 const workersMarker = '  // --- workers-api ---';
 const workersIndex = registerPlugins.indexOf(workersMarker);
