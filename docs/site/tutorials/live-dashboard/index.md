@@ -8,10 +8,18 @@ next: { label: "1 · Scaffold", href: "/tutorials/live-dashboard/01-scaffold/" }
 
 # Live Dashboard
 
-This track builds one thing end to end: a real-time operations dashboard for an order queue. By the
-last chapter you will have a table that updates **live** in the browser — no manual refresh, no
-hand-rolled WebSocket — fed by the full NetScript data spine, from a typed contract on the backend
-to a durable change-stream on the frontend.
+An order queue goes wrong quietly. The screen your fulfillment team watches shows five-minute-old
+rows, so the packing station ships an order the customer cancelled three minutes ago, and a payment
+that failed at 14:02 sits looking like `processing` until someone thinks to hit refresh. The usual
+fix — poll harder — just trades staleness for load and still leaves a gap for the next missed
+cancellation.
+
+This track builds the alternative end to end: a real-time operations dashboard for an order queue.
+By the last chapter you will have a table that updates **live** in the browser — no manual refresh,
+no polling loop, no hand-rolled WebSocket — fed by the full NetScript data spine, from a typed
+contract on the backend to a durable change-stream on the frontend. It is the same durable-stream
+seam the streams plugin scaffolds into a workspace for notification fan-out — here, pointed at your
+orders.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/live-dashboard/01-scaffold/" },
@@ -24,12 +32,13 @@ to a durable change-stream on the frontend.
 
 ## What you will build
 
-A `my-dashboard/` Fresh workspace whose home screen is a live order table. The reader scaffolds a
-fresh NetScript project, exposes an `orders` read-model through a typed oRPC service, wires a
-cache-first SDK query layer, renders the table with NetScript's `definePage` page builder and a
-hydrated TanStack Query island, then upgrades it to push real-time updates over a durable StreamDB.
-The final chapter runs the whole graph locally under Aspire. This is a learning track: the same
-project grows chapter by chapter, so do them in order.
+A `my-dashboard/` Fresh workspace whose home screen is the live order queue described above. You
+scaffold a fresh NetScript project, expose an `orders` read-model through a typed oRPC service, wire
+a cache-first SDK query layer, render the queue with NetScript's `definePage` page builder and a
+hydrated TanStack Query island, then upgrade it to push real-time updates over a durable
+change-stream — the point where the refresh button stops mattering. The final chapter runs the whole
+graph locally under Aspire. This is a learning track: the same project grows chapter by chapter, so
+do them in order.
 
 ## Before you begin
 
@@ -96,7 +105,9 @@ This track teaches the path. For exact symbols and signatures, the <a href="/ref
 
 ## What you built
 
-By the end of this track you will own a working live operations dashboard and — more importantly —
-the full NetScript read spine that powers it, from contract to durable stream.
+By the end of this track you will own an order queue your operations team can act on without
+second-guessing it — and, more importantly, the full NetScript read spine that powers it, from
+contract to durable stream. Every hop is typed off the same contract, so the row a packer sees is
+the row the service wrote.
 
 {{ comp.nextPrev({ prev: { label: "Tutorials", href: "/tutorials/" }, next: { label: "1 · Scaffold", href: "/tutorials/live-dashboard/01-scaffold/" } }) }}

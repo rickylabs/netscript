@@ -25,7 +25,9 @@ the server handler and, later, for the Fresh client.
 ## What you will build
 
 An `orders.list` procedure: a `GET` route that takes pagination plus a `status` filter and returns a
-typed page of orders. You will read the scaffolded contract, understand the
+typed page of orders. The `status` filter is not decoration — it is the lens an operations queue
+lives in: `pending` and `processing` are the work to do, `failed` is the money at risk, `cancelled`
+is the ship-it-and-regret-it pile. You will read the scaffolded contract, understand the
 `.route().input().output()` shape, and serve it on port **3002** with `defineService`. This is the
 read-model every later chapter consumes — the rows that will eventually update live in the browser.
 
@@ -96,7 +98,7 @@ The pattern is the whole point:
    base that pre-declares common errors (`NOT_FOUND`, `VALIDATION_ERROR`, and friends).
 
 {{ comp callout { type: "note", title: "The real scaffold derives schemas from Prisma" } }}
-The contract you generated wires its order schemas from <code>@database/zod</code> — Zod schemas generated from your Prisma models — so the contract and the database never drift. The hand-written <code>OrdersSchemaV1</code> above is the <em>same shape</em>, spelled out so you can read it. When you wire real persistence, prefer the generated schemas. See <a href="/capabilities/database/">Database &amp; Prisma</a>.
+The contract you generated wires its order schemas from <code>@database/zod</code> — Zod schemas generated from your Prisma models — so the contract and the database never drift. The hand-written <code>OrdersSchemaV1</code> above is the <em>same shape</em>, spelled out so you can read it. When you wire real persistence, prefer the generated schemas. See <a href="/data-persistence/database/">Database &amp; Prisma</a>.
 {{ /comp }}
 
 ## Step 2 — Read the handler
@@ -185,7 +187,7 @@ The service binds the router and exposes the same surface on port **3002**:
 }) }}
 
 {{ comp callout { type: "note", title: "Two ways to stand a service up" } }}
-The scaffold uses <code>defineService(router, { … })</code> — one call, sensible defaults. NetScript also offers a fluent <code>createService(router, { … }).withCors().withLogger().withRPC().serve()</code> builder when you need to control middleware order or add custom wiring. Stick with <code>defineService</code> for this track. See <a href="/capabilities/services/">the services capability</a>.
+The scaffold uses <code>defineService(router, { … })</code> — one call, sensible defaults. NetScript also offers a fluent <code>createService(router, { … }).withCors().withLogger().withRPC().serve()</code> builder when you need to control middleware order or add custom wiring. Stick with <code>defineService</code> for this track. See <a href="/services-sdk/services/">Services &amp; contracts</a>.
 {{ /comp }}
 
 ## Step 4 — Initialize the database

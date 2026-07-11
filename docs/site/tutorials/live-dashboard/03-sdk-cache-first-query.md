@@ -10,8 +10,9 @@ next: { label: "4 · definePage + island", href: "/tutorials/live-dashboard/04-d
 
 In chapter 2 you served an `orders.list` read-model on port **3002**. Now you will read it from the
 Fresh app. The SDK gives you a typed client built from the same contract, and a query factory that
-wraps every procedure in a KV-backed stale-while-revalidate cache — so the dashboard serves fast and
-refreshes in the background.
+wraps every procedure in a KV-backed stale-while-revalidate cache. For an operations screen that
+posture matters: the queue paints instantly from the last-known rows — even while the `orders`
+service is mid-redeploy — and refreshes in the background instead of blocking the person watching it.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/live-dashboard/01-scaffold/" },
@@ -130,8 +131,8 @@ themselves off your chapter-2 contract. To prove the discovery key resolves end 
 - [ ] `apps/dashboard/lib/api-clients.ts` exports `ordersClient`, `baseQueries`, and
       `ordersQueryUtils`.
 - [ ] `deno task check` is clean.
-- [ ] You can name the four per-procedure helpers (`queryOptions`, `clientKey`, `getCachedEntry`,
-      `key`) and where each runs.
+- [ ] `deno check apps/dashboard/lib/api-clients.ts --unstable-kv` passes on its own — the module
+      compiles against the chapter-2 contract with no other file in play.
 
 ## What you built
 
