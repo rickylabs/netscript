@@ -95,13 +95,21 @@ function validateFlowB(traces: readonly TelemetryTrace[]): void {
     'fan-in link preserves per-message attributes through the SDK provider',
   );
 
-  const assertedSpans = [callbackBoundary, fanIn];
-  for (const span of assertedSpans) {
+  const correlatedSpans = [execute, fanIn];
+  for (const span of correlatedSpans) {
     tcAssert(
       'TC-6/TC-7',
       typeof span.attributes['netscript.correlation.id'] === 'string',
       `${span.name} carries netscript.correlation.id`,
     );
+  }
+  tcAssert(
+    'TC-6/TC-7',
+    new Set(correlatedSpans.map((span) => span.attributes['netscript.correlation.id'])).size === 1,
+    'job.execute and fan-in consumer carry the same correlation id',
+  );
+
+  for (const span of [callbackBoundary, fanIn]) {
     tcAssert(
       'TC-6/TC-7',
       hasOutcome(span),

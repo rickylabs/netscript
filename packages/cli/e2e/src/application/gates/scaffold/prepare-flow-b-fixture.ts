@@ -102,6 +102,16 @@ const callbackBody = [
 ].join('\n');
 
 let updatedHealthJob = healthJob;
+updatedHealthJob = updatedHealthJob
+  .replace('  const flowBCorrelationId = context.correlationId ?? context.id;\n', '')
+  .replace(
+    "  await Deno.writeTextFile('.netscript/e2e/flow-b-correlation-id', flowBCorrelationId);\n",
+    '',
+  )
+  .replace(
+    "attributes: { 'netscript.correlation.id': flowBCorrelationId }",
+    "attributes: { 'netscript.correlation.id': context.correlationId ?? context.id }",
+  );
 if (!updatedHealthJob.includes("from '@netscript/sdk/client'")) {
   updatedHealthJob = `${callbackImports}\n${updatedHealthJob}`;
 }

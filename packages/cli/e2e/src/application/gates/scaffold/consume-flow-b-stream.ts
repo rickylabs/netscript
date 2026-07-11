@@ -31,6 +31,7 @@ const provider = createTelemetryProvider({
 await provider.register();
 
 try {
+  const flowBCorrelationId = await readJobExecuteCorrelation(metadata.dashboardUrl);
   const streamUrl = 'http://127.0.0.1:4437/v1/stream/netscript/workers/executions';
   let response = await fetch(
     `${streamUrl}?offset=-1`,
@@ -76,7 +77,7 @@ try {
     operation: 'fan-in',
     messages,
   });
-  span.setAttribute('netscript.correlation.id', messages[0]?.correlationId ?? 'flow-b-e2e');
+  span.setAttribute('netscript.correlation.id', flowBCorrelationId);
   span.setAttribute('netscript.stream.outcome', 'success');
   span.setStatus({ code: SpanStatusCode.OK });
   span.end();
@@ -84,6 +85,57 @@ try {
   console.info(`Flow-B real stream consumer linked ${messages.length} message(s)`);
 } finally {
   await provider.shutdown?.();
+}
+
+async function readJobExecuteCorrelation(dashboardUrl: unknown): Promise<string> {
+  if (typeof dashboardUrl !== 'string') {
+    throw new Error('Aspire start metadata did not contain dashboardUrl');
+  }
+  const tracesUrl = new URL('/api/telemetry/traces', dashboardUrl);
+  for (let attempt = 1; attempt <= 20; attempt++) {
+    const response = await fetch(tracesUrl);
+    if (!response.ok) throw new Error(`Dashboard traces read failed: HTTP ${response.status}`);
+    const correlationId = findJobExecuteCorrelation(await response.json());
+    if (correlationId) return correlationId;
+    if (attempt < 20) await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+  throw new Error('job.execute telemetry did not expose netscript.correlation.id');
+}
+
+function findJobExecuteCorrelation(value: unknown): string | undefined {
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const found = findJobExecuteCorrelation(item);
+      if (found) return found;
+    }
+    return undefined;
+  }
+  if (!isRecord(value)) return undefined;
+  if (value.name === 'job.execute' && Array.isArray(value.attributes)) {
+    const attributes = value.attributes;
+    const jobId = attributeString(attributes, ['netscript.job.id', 'job.id']);
+    const correlationId = attributeString(attributes, ['netscript.correlation.id']);
+    if (jobId === 'health-check' && correlationId) return correlationId;
+  }
+  for (const child of Object.values(value)) {
+    const found = findJobExecuteCorrelation(child);
+    if (found) return found;
+  }
+  return undefined;
+}
+
+function attributeString(
+  attributes: readonly unknown[],
+  keys: readonly string[],
+): string | undefined {
+  for (const attribute of attributes) {
+    if (
+      !isRecord(attribute) || !keys.includes(String(attribute.key)) ||
+      !isRecord(attribute.value)
+    ) continue;
+    if (typeof attribute.value.stringValue === 'string') return attribute.value.stringValue;
+  }
+  return undefined;
 }
 
 function collectMessages(value: unknown): Array<{

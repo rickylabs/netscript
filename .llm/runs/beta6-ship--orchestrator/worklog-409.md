@@ -41,6 +41,8 @@
 | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS, 57 passed / 0 failed |
 | `behavior.otel.stream-consumer` | PASS, real durable-stream read and SDK-backed fan-in link |
 | `behavior.otel.traces` | PASS, live T7 `AspireTelemetryQuery` read side; all TC-named assertions passed |
+| Focused OTEL gate chain after Tier-A hardening | PASS: fixture/start/waits/job/webhook/consumer/traces/cleanup; `behavior.otel.traces` passed in 109 ms |
+| Final `scaffold.runtime` after Tier-A hardening | PASS, 57 passed / 0 failed; hardened trace gate passed in 89 ms |
 | Lock/cast hygiene | PASS: no slice-owned `deno.lock` diff; no new `as` casts |
 
 ## Drift
@@ -55,6 +57,17 @@
 - D4 real workers-router oRPC probe returned 404 even with aligned local client/server sources.
   A product fix was not required for this slice: the callback uses the scaffold's generated users
   oRPC service, preserving the required real `rpc.client` edge without changing product source.
+- D5 follow-up — product-owned TC-6/TC-7 outcome floor: live `job.execute` carries
+  `netscript.correlation.id`, but its outcome is emitted only through the beta compatibility alias
+  `job.status`, not a canonical `netscript.*` outcome/status key. Trigger ingress/detect/process and
+  queue enqueue/dequeue likewise do not expose the complete canonical correlation + outcome pair.
+  Additionally, `plugins/workers/worker/job-execution.ts` rebuilds the in-process `JobMessage`
+  without copying `correlationId`, so the handler-owned `flow-b.callback` cannot inherit the
+  product span's correlation value. The hardened gate therefore requires correlation equality
+  across product `job.execute` and fan-in `stream.subscribe`, while retaining the full canonical
+  floor on both fixture-owned boundary spans. Canonicalizing product outcomes and preserving
+  correlation through `executeDenoJob()` belong in a telemetry/workers follow-up rather than this
+  e2e-only slice.
 - No telemetry package source was modified. No `deno.lock` change is owned by this slice.
 
 ## Reconcile

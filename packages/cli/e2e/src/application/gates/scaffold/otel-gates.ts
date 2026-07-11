@@ -34,6 +34,7 @@ export function createOtelGates(): readonly GateDefinition[] {
         'deno',
         'run',
         '--allow-all',
+        '--unsafely-ignore-certificate-errors=localhost',
         'packages/cli/e2e/src/application/gates/scaffold/consume-flow-b-stream.ts',
         context.project.projectRoot,
       ],
