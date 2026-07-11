@@ -167,7 +167,7 @@ deep track picks up one seam where this on-ramp left off:
   ]
 }) }}
 
-Two honest notes on what the miniature simplified. First, delivery and broadcast ran as
+Two notes on what the miniature simplified. First, delivery and broadcast ran as
 separate exercises here; in a full build the delivery job is what publishes to the stream,
 so accepting, persisting, and broadcasting are one durable path. Second, nothing was
 persisted to a database — the [Storefront](/tutorials/storefront/) and

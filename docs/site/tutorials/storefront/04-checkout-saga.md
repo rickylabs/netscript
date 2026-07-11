@@ -332,7 +332,7 @@ curl http://localhost:8092/api/v1/sagas/instances/CheckoutSaga/ord_2002
 The first instance shows `status: 'paid'` carrying its `transactionId`; the second shows
 `status: 'cancelled'` carrying the `cancelReason` your compensation branch stamped. (The forward path
 continues to `completed` once you also author the `reserve-inventory` and `create-shipment` jobs the
-saga `send`s — this track stops at the payment leg, so `paid` is checkout's honest checkpoint.)
+saga `send`s — this track stops at the payment leg, so `paid` is checkout's observable checkpoint.)
 
 - [ ] `netscript plugin install worker/saga/stream ... --samples` landed `plugins/workers/`,
       `plugins/sagas/`, and `plugins/streams/`.
