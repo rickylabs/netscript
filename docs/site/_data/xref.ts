@@ -157,6 +157,11 @@ export const xref: Record<string, XrefTarget> = {
   "tut:live-dashboard/04": { href: "/tutorials/live-dashboard/04-definePage-QueryIsland/", label: "Live Dashboard - Definepage Queryisland" },
   "tut:live-dashboard/05": { href: "/tutorials/live-dashboard/05-live-stream/", label: "Live Dashboard - Live Stream" },
   "tut:live-dashboard/06": { href: "/tutorials/live-dashboard/06-deploy/", label: "Live Dashboard - Deploy" },
+  "tut:eis-chat": { href: "/tutorials/eis-chat/", label: "Mini eis-chat" },
+  "tut:eis-chat/01": { href: "/tutorials/eis-chat/01-scaffold/", label: "Mini eis-chat - Scaffold" },
+  "tut:eis-chat/02": { href: "/tutorials/eis-chat/02-message-contract/", label: "Mini eis-chat - Message Contract" },
+  "tut:eis-chat/03": { href: "/tutorials/eis-chat/03-deliver-worker/", label: "Mini eis-chat - Delivery Worker" },
+  "tut:eis-chat/04": { href: "/tutorials/eis-chat/04-live-stream/", label: "Mini eis-chat - Live Stream" },
 
   // ─── Explanation essays (explain:) ─────────────────────────────────────────
   "explain:index": { href: "/explanation/", label: "Explanation" },

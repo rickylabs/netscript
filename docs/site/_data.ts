@@ -219,6 +219,7 @@ export const navSections: NavSection[] = [
     label: "Tutorials",
     items: [
       { href: "/tutorials/", label: "Tutorials index", icon: "T" },
+      { href: "/tutorials/eis-chat/", label: "Mini eis-chat", icon: "T" },
       { href: "/tutorials/live-dashboard/", label: "Live dashboard", icon: "T" },
       { href: "/tutorials/chat/", label: "AI Chat", icon: "T" },
       { href: "/tutorials/workspace/", label: "Workspace", icon: "T" },
