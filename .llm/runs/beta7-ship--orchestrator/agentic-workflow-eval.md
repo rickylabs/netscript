@@ -50,6 +50,17 @@ orchestrator (session `df71d36c`, Claude Fable 5 medium, autonomous background).
   standing `eis|VIF|CSB|PR #|dogfood` grep gate — the positioning law was enforced but had no
   "public-audience" clause.
 
+- **D8 (stale-base agent slice, 2026-07-11 ~16:50)**: the chat-merge agent's isolated worktree
+  stayed on the session-inherited HEAD — its `git checkout -b <branch> <explicit-main-sha>`
+  silently didn't take effect and the agent proceeded to rebuild content from the brief on a
+  pre-#433 tree (would have clobbered #438/#439 if merged). Caught in Tier-A review by two smells:
+  its `deno task verify` page/link counts (154 pages/23.2k links) didn't match real main
+  (167/24.0k), and `git merge-base` with origin/main returned an ancient commit. Agent resumed
+  with a mandatory base-verification preflight (check expected files exist + counts in range
+  before editing). Improvement **I14**: docs-agent briefs must include a base-verification step,
+  and the orchestrator must merge-base-check every agent branch before opening its PR (now
+  standard for this run).
+
 ## Good mechanics
 
 - The `e2e-cli-prod` hardening loop (#617–#623) paid off exactly as designed: the suite caught a
