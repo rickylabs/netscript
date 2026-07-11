@@ -30,6 +30,9 @@
     "jsr:@fresh/build-id@1": "1.0.1",
     "jsr:@fresh/core@^2.3.3": "2.3.3",
     "jsr:@hono/hono@4.12.24": "4.12.24",
+    "jsr:@hono/hono@^4.8.3": "4.12.24",
+    "jsr:@hono/otel@*": "1.1.2",
+    "jsr:@hono/otel@^1.1.2": "1.1.2",
     "jsr:@logtape/logtape@2": "2.1.4",
     "jsr:@logtape/logtape@^2.0.5": "2.1.4",
     "jsr:@olli/kvdex@^3.6.7": "3.6.7",
@@ -95,8 +98,11 @@
     "npm:@multiformats/base-x@^4.0.1": "4.0.1",
     "npm:@opentelemetry/api@^1.9.0": "1.9.1",
     "npm:@opentelemetry/api@^1.9.1": "1.9.1",
+    "npm:@opentelemetry/context-async-hooks@2": "2.9.0_@opentelemetry+api@1.9.1",
+    "npm:@opentelemetry/context-async-hooks@^2.9.0": "2.9.0_@opentelemetry+api@1.9.1",
     "npm:@opentelemetry/core@^2.5.0": "2.8.0_@opentelemetry+api@1.9.1",
     "npm:@opentelemetry/sdk-trace-base@^2.5.0": "2.8.0_@opentelemetry+api@1.9.1",
+    "npm:@opentelemetry/semantic-conventions@^1.28.0": "1.41.1",
     "npm:@opentelemetry/semantic-conventions@^1.39.0": "1.41.1",
     "npm:@orpc/client@1.14.6": "1.14.6_@opentelemetry+api@1.9.1",
     "npm:@orpc/client@^1.14.6": "1.14.6_@opentelemetry+api@1.9.1",
@@ -306,7 +312,7 @@
         "npm:@opentelemetry/api@^1.9.0",
         "npm:@opentelemetry/core",
         "npm:@opentelemetry/sdk-trace-base",
-        "npm:@opentelemetry/semantic-conventions",
+        "npm:@opentelemetry/semantic-conventions@^1.39.0",
         "npm:byte-encodings",
         "npm:es-toolkit@^1.43.0",
         "npm:json-canon",
@@ -386,6 +392,14 @@
     },
     "@hono/hono@4.12.24": {
       "integrity": "a74a40f06ae6704ddd0e8e576f6da9d34666c3e1e0f5412a2c1ff800ffd092f4"
+    },
+    "@hono/otel@1.1.2": {
+      "integrity": "9b735a965407845ab4c67ea58693c87f2c54a825d56d1a8217c9339e593347ce",
+      "dependencies": [
+        "jsr:@hono/hono@^4.8.3",
+        "npm:@opentelemetry/api@^1.9.0",
+        "npm:@opentelemetry/semantic-conventions@^1.28.0"
+      ]
     },
     "@logtape/logtape@2.1.4": {
       "integrity": "5f22088a90ccfd2f907d677f078232a9cc7fa63b320c365b954f9666175789b1"
@@ -1285,6 +1299,12 @@
     },
     "@opentelemetry/api@1.9.1": {
       "integrity": "sha512-gLyJlPHPZYdAk1JENA9LeHejZe1Ti77/pTeFm/nMXmQH/HFZlcS/O2XJB+L8fkbrNSqhdtlvjBVjxwUYanNH5Q=="
+    },
+    "@opentelemetry/context-async-hooks@2.9.0_@opentelemetry+api@1.9.1": {
+      "integrity": "sha512-OQ0vzvbZBiUhjqLnUaoNfYmP8553Crr3aggB4y0ZUi815mZ7idpdJXQmoKdeBKJelYttoBlLSSHubmyw3wvX4w==",
+      "dependencies": [
+        "@opentelemetry/api"
+      ]
     },
     "@opentelemetry/core@2.8.0_@opentelemetry+api@1.9.1": {
       "integrity": "sha512-hd1Lfh8p545nNz+jq1Ejfz+Mn1hyLuxYn1YzTfFNrxr8urEWMNQLPf1Th8kjOH+HxwawCrtgBp8JpBUR4ZSgww==",
@@ -3906,6 +3926,7 @@
       },
       "packages/telemetry": {
         "dependencies": [
+          "jsr:@hono/otel@^1.1.2",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1"
         ],

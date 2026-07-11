@@ -474,7 +474,7 @@ for (const f of tsFiles) {
       /^export\s+(?:type|interface)\s+\w+[^=]*=[^=]*\bany\b/.test(line)
     ) {
       findings.push({
-      ref: 'A1/F-5',
+        ref: 'A1/F-5',
         level: 'WARN',
         message: '`any` in exported declaration — use `unknown` or a specific type',
         path: relative(ROOT, f),

@@ -41,6 +41,7 @@
  *     [--scope netscript] [--root .] [--config jsr-package-settings.json] [--dry-run]
  */
 
+import { JSR_API_BASE_URL } from './config/endpoints.ts';
 import { discoverWorkspaceMembers, type PublishableMember } from './publish-workspace.ts';
 
 interface Options {
@@ -97,7 +98,6 @@ type ApiResult =
     readonly message: string;
   };
 
-const API_BASE_URL = 'https://api.jsr.io';
 const DEFAULT_SCOPE = 'netscript';
 const JSR_PACKAGE_PREFIX = '@netscript/';
 const README_BASENAME = 'README.md';
@@ -503,7 +503,7 @@ async function requestApi(
     headers.set('authorization', `Bearer ${tokenValue}`);
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await fetch(`${JSR_API_BASE_URL}${path}`, {
     method,
     headers,
     body: body === undefined ? undefined : JSON.stringify(body),

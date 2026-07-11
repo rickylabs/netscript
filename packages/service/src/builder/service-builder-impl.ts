@@ -13,6 +13,7 @@ import { type Context, Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { ensureLogging } from '@netscript/logger';
 import { loggerMiddleware, type LoggerMiddlewareOptions } from '@netscript/logger/middleware';
+import { createHonoTracingMiddleware } from '@netscript/telemetry/hono';
 import { createAuthnMiddleware, createAuthzMiddleware } from '../auth/auth-middleware.ts';
 import type { AuthnOptions, AuthzOptions } from '../auth/options.ts';
 import {
@@ -82,6 +83,7 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
     this.app = new Hono();
     this.router = router;
     this.config = config;
+    this.app.use('*', createHonoTracingMiddleware({ serviceName: this.config.name }));
   }
 
   /**

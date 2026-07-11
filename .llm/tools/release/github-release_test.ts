@@ -29,7 +29,7 @@ Deno.test('formatClosedIssues renders a bulleted list, empty when none', () => {
 Deno.test('composeReleaseBody orders intro, changelog, closed issues and drops blanks', () => {
   const body = composeReleaseBody({
     intro: 'Ships the UI surface.',
-    whatsChanged: '## What\'s Changed\n* thing (#1)',
+    whatsChanged: "## What's Changed\n* thing (#1)",
     closedIssues: '## Closed Issues\n\n- #1 thing',
   });
   assertEquals(
@@ -40,7 +40,7 @@ Deno.test('composeReleaseBody orders intro, changelog, closed issues and drops b
   // A blank closed-issues section is dropped and the body still ends in a newline.
   const noIssues = composeReleaseBody({
     intro: 'Intro.',
-    whatsChanged: '## What\'s Changed',
+    whatsChanged: "## What's Changed",
     closedIssues: '',
   });
   assertEquals(noIssues, "Intro.\n\n## What's Changed\n");

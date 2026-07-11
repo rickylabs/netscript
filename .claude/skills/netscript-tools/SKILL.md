@@ -58,9 +58,10 @@ exclude generated output, scratch workspaces, and future-wave packages.
 the published surface install / any advisories" question MUST be answered through the
 `.llm/tools/deps/*` wrappers, exposed as `deno task deps:latest|outdated|why|audit|prod-install` —
 never a hand-rolled registry `curl`, and never `deno outdated --latest` for "latest" (it ignores
-semver and surfaces pre-release tags as latest). The canonical command map, the `deno outdated
---latest` trap rationale, and the `catalog:` npm-only law live once in the **netscript-deno-toolchain**
-skill — read it there; this skill does not restate those gotchas.
+semver and surfaces pre-release tags as latest). The canonical command map, the
+`deno outdated
+--latest` trap rationale, and the `catalog:` npm-only law live once in the
+**netscript-deno-toolchain** skill — read it there; this skill does not restate those gotchas.
 
 For targeted `deno check` commands that touch workspace code, include `--unstable-kv`:
 
@@ -72,6 +73,10 @@ Do not run mutating root `deno task fmt` unless the user explicitly asks for rep
 changes. Use scoped formatting for owned files only.
 
 ## Publish And Docs
+
+Release automation keeps volatile JSR management endpoints in
+`.llm/tools/release/config/endpoints.ts`; the non-agentic suite maintenance map is in
+`.llm/tools/README.md`. Change the config value, not individual release feature modules.
 
 Package publishability gates commonly use:
 
@@ -112,18 +117,18 @@ The supervisor drives Tier-D Codex and Tier-E OpenHands through `.llm/tools/agen
 as an `agentic:*` `deno task` (see `deno.json` and the index in `.llm/harness/workflow/tooling.md`).
 Two are durable GitHub infra utilities worth calling out:
 
-- **`gh-watch.ts`** (`deno task agentic:gh-watch --pr <n>`) — token-free CI/verdict watch. Run it as a
-  **background** process: it polls a PR's OpenHands IMPL/PLAN-EVAL summary comment (and, with
+- **`gh-watch.ts`** (`deno task agentic:gh-watch --pr <n>`) — token-free CI/verdict watch. Run it as
+  a **background** process: it polls a PR's OpenHands IMPL/PLAN-EVAL summary comment (and, with
   `--run-id`, the triggered Actions run) until the state is terminal, then exits — re-waking the
   supervisor turn without a polling loop kept in context. Exit codes: `0` PASS · `10` FAIL · `12`
   final-no-verdict · `13` action-run-failed · `2` timeout · `4` no-token. Use it whenever you have
   dispatched an evaluator and must wait for the verdict.
-- **`gh-token.ts`** (`deno task agentic:gh-token check|store`) — durable GitHub-token resolver/store.
-  `check` resolves a token from any healthy source (env candidates → `gh auth token` Windows/WSL →
-  bounded GCM `git credential fill`), validates it against `GET /user`, and reports only the source +
-  login (never the token). `store` reads ONE PAT from stdin and persists it to every durable place
-  (Windows GCM + WSL `gh`) so later sessions auto-resolve. Use `check` at the start of any GitHub
-  session; use `store` once when the supervisor's token is missing/rotated.
+- **`gh-token.ts`** (`deno task agentic:gh-token check|store`) — durable GitHub-token
+  resolver/store. `check` resolves a token from any healthy source (env candidates → `gh auth token`
+  Windows/WSL → bounded GCM `git credential fill`), validates it against `GET /user`, and reports
+  only the source + login (never the token). `store` reads ONE PAT from stdin and persists it to
+  every durable place (Windows GCM + WSL `gh`) so later sessions auto-resolve. Use `check` at the
+  start of any GitHub session; use `store` once when the supervisor's token is missing/rotated.
 
 The desired-state runtime controller is the default health/repair entry point:
 `deno task agentic:runtime doctor|status` for inspect-only environment/session snapshots, and
@@ -132,10 +137,10 @@ session-safe Codex daemon repair. `deno task agentic:routing-state` reads the pe
 quota-fallback routing state.
 
 The rest of the family (`launch-codex-slice`, `codex-resume`, `codex-status`, `codex-watch`,
-`dispatch-openhands`, `openhands-status`, `gh-pr`) is indexed in
-`.llm/harness/workflow/tooling.md`. `.llm/tools/agentic/` is the **only** interface for driving Codex
-— never ad-hoc `wsl.exe`. The suite is concern-grouped (`codex/`, `openhands/`, `github/`, `wsl/`,
-`claude/`, `runtime/` + `runtime/cli/`, `lib/`); its `README.md` is the canonical map.
+`dispatch-openhands`, `openhands-status`, `gh-pr`) is indexed in `.llm/harness/workflow/tooling.md`.
+`.llm/tools/agentic/` is the **only** interface for driving Codex — never ad-hoc `wsl.exe`. The
+suite is concern-grouped (`codex/`, `openhands/`, `github/`, `wsl/`, `claude/`, `runtime/` +
+`runtime/cli/`, `lib/`); its `README.md` is the canonical map.
 
 **Monthly maintenance (single source):** everything volatile lives in `.llm/tools/agentic/config/` —
 model ids in `config/models.ts`, tool versions in `config/versions.ts`, endpoints in

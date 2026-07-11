@@ -231,6 +231,7 @@ const PLUGIN_SERVICE_SOURCE_IMPORTS: Readonly<Record<string, string>> = {
     'telemetry',
     '/instrumentation',
   ),
+  '@netscript/telemetry/hono': netscriptJsrSpecifier('telemetry', '/hono'),
   '@netscript/telemetry/orpc': netscriptJsrSpecifier('telemetry', '/orpc'),
   '@netscript/telemetry/otel': netscriptJsrSpecifier('telemetry', '/otel'),
   '@netscript/telemetry/query': netscriptJsrSpecifier('telemetry', '/query'),

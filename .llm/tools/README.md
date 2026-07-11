@@ -16,12 +16,19 @@ that govern _when_ to reach for these tools. For those, see:
 
 ## Subtree map
 
-| Subtree               | Purpose                                                                                                                                                                                                                                                             | Detail                                                                                                   |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| `.llm/tools/` (root)  | Scoped check/lint/fmt wrappers, text/import/symbol scanners, export inventory, the supervisor watch utility, and the CLI E2E smoke.                                                                                                                                 | This README + [`entry.md`](./entry.md).                                                                  |
-| `.llm/tools/deps/`    | Structured wrappers over the Deno 2.9 dependency commands (`latest`/`outdated`/`why`/`audit`/`prod-install`) plus the centralization/catalog/file-link scan gates.                                                                                                  | [Dependency toolbelt](#dependency-toolbelt-llmtoolsdeps) below and the `netscript-deno-toolchain` skill. |
-| `.llm/tools/agentic/` | The agent-orchestration suite: a desired-state runtime controller plus concern-grouped lanes (`codex/`, `openhands/`, `github/`, `wsl/`, `claude/`, `runtime/` + `runtime/cli/`, `lib/`). Everything volatile (models, versions, endpoints) lives in its `config/`. | [Agentic tooling](#agentic-tooling-llmtoolsagentic) below + the suite [`README`](./agentic/README.md).   |
-| `.llm/tools/fitness/` | Doctrine and package-readiness gates. Do not duplicate these under the `.llm/tools/` root.                                                                                                                                                                          | The `netscript-doctrine` skill + `docs/architecture/doctrine/`.                                          |
+| Subtree                  | Purpose                                                                                                                                                                                                                                                             | Detail                                                                                                   |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `.llm/tools/` (root)     | Stable-path scoped check/lint/fmt/doc-lint wrappers and the generated-assets barrel maintainer.                                                                                                                                                                     | This README + [`entry.md`](./entry.md).                                                                  |
+| `.llm/tools/deps/`       | Structured wrappers over the Deno 2.9 dependency commands (`latest`/`outdated`/`why`/`audit`/`prod-install`) plus the centralization/catalog/file-link scan gates.                                                                                                  | [Dependency toolbelt](#dependency-toolbelt-llmtoolsdeps) below and the `netscript-deno-toolchain` skill. |
+| `.llm/tools/agentic/`    | The agent-orchestration suite: a desired-state runtime controller plus concern-grouped lanes (`codex/`, `openhands/`, `github/`, `wsl/`, `claude/`, `runtime/` + `runtime/cli/`, `lib/`). Everything volatile (models, versions, endpoints) lives in its `config/`. | [Agentic tooling](#agentic-tooling-llmtoolsagentic) below + the suite [`README`](./agentic/README.md).   |
+| `.llm/tools/docs/`       | Docs-site source checks for internal links and caveat ownership.                                                                                                                                                                                                    | Invoked from `docs/site/deno.json`.                                                                      |
+| `.llm/tools/e2e/`        | Retained independent behavioral scaffold diagnostic; not the merge-readiness gate.                                                                                                                                                                                  | Prefer `deno task e2e:cli` for merge readiness.                                                          |
+| `.llm/tools/fitness/`    | Doctrine and package-readiness gates. Do not duplicate these under the `.llm/tools/` root.                                                                                                                                                                          | The `netscript-doctrine` skill + `docs/architecture/doctrine/`.                                          |
+| `.llm/tools/git/`        | Shell-free git verification and explicit-path commit support.                                                                                                                                                                                                       | Harness platform guidance names `git-verify.ts`.                                                         |
+| `.llm/tools/harness/`    | Token-free filesystem wake utility for active harness runs.                                                                                                                                                                                                         | [`watch-run.ts`](#supervisor-watch-watch-runts).                                                         |
+| `.llm/tools/release/`    | Version cutting, publish orchestration, JSR administration, and release preflight.                                                                                                                                                                                  | Volatile release endpoints live in `release/config/`.                                                    |
+| `.llm/tools/reporting/`  | Focused machine-readable coverage reporting.                                                                                                                                                                                                                        | Root `coverage:functions` task.                                                                          |
+| `.llm/tools/validation/` | CI and maintenance policy checks: close gate, docs links, README standard, scaffold versions.                                                                                                                                                                       | Root tasks and CI workflows.                                                                             |
 
 The [`CLEANUP-PLAYBOOK.md`](./CLEANUP-PLAYBOOK.md) is the operational spec for making any one
 `.llm/tools/<folder>/` suite production-grade (concern-folder structure, a central `config/` single
@@ -31,8 +38,8 @@ for replicating the `agentic/` cleanup standard on other folders.
 ## Start Here
 
 - Use `deno task e2e:cli` for the full CLI merge-readiness gate.
-- Use `.llm/tools/e2e/scaffold-e2e-test.ts` only as a legacy comparison smoke when debugging parity
-  with the previous repo checkout.
+- Use `.llm/tools/e2e/scaffold-e2e-test.ts` only as the retained independent behavioral diagnostic;
+  it does not replace the product-grade merge gate.
 - Use `.llm/tools/run-deno-check.ts` to run scoped type-checks or summarize noisy deno-check logs.
 - Use `.llm/tools/run-deno-lint.ts` to run scoped lint checks and summarize findings as JSON.
 - Use `.llm/tools/run-deno-fmt.ts` to run scoped, non-mutating fmt checks by root and extension. Add
@@ -156,22 +163,30 @@ deno run --allow-read .llm/tools/harness/watch-run.ts <run-dir> --files worklog.
 Defaults: `--files worklog.md`, `--timeout-seconds 1800`. See
 [`AGENTS.md` -> Tooling (Supervisor wake)](../../AGENTS.md#tooling) for the surrounding convention.
 
-## Tool Index
+## Maintenance map
+
+| Concern                                        | Single maintenance point                                                             |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Dependency policy and registry queries         | `deps/` plus the `netscript-deno-toolchain` skill                                    |
+| Release endpoints                              | `release/config/endpoints.ts`                                                        |
+| Release sequencing and safety                  | `release/cut.ts`, `release/publish-workspace.ts`, and the `netscript-release` skill  |
+| Package/doctrine gates                         | `fitness/` plus the Architecture Doctrine                                            |
+| Repository validation policy                   | `validation/` and the root `deno.json` task bindings                                 |
+| Scoped Deno gate behavior                      | Stable root `run-deno-*.ts` entry points                                             |
+| Agent models, versions, endpoints, and routing | `agentic/config/` and `agentic/runtime/routing-policy.ts` (excluded from this sweep) |
+| Generated Claude skill mirrors                 | Edit `.agents/skills/`, then run `deno task agentic:sync-claude`                     |
+
+## Tool index
 
 | Tool                                        | Use                                                                                                      |
 | ------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| `search/find-lines.ts`                      | Substring or regex scans across one or more roots.                                                       |
-| `search/find-import-patterns.ts`            | Import alias and relative-path debt scans.                                                               |
-| `search/find-symbol-usages.ts`              | Symbol-boundary usage scans for refactors.                                                               |
-| `search/list-exports.ts`                    | Export and re-export inventory for package surfaces.                                                     |
-| `search/compare-export-surface.ts`          | Compare actual exports against an expected symbol list.                                                  |
 | `run-deno-doc-lint.ts`                      | Structured `deno doc --lint` runner with per-entrypoint + per-file attribution.                          |
 | `run-deno-check.ts`                         | Scoped `deno check` runner and parser for saved, stdin, or wrapped command output.                       |
 | `run-deno-lint.ts`                          | Scoped lint runner with grouped JSON findings.                                                           |
 | `run-deno-fmt.ts`                           | Scoped fmt runner with non-mutating `--check` default.                                                   |
 | `harness/watch-run.ts`                      | Background supervisor wake: exit on run-dir change, heartbeat on timeout.                                |
 | `git/git-commit-paths.ts`                   | Commit/push selected paths without Windows shell quoting issues.                                         |
-| `e2e/scaffold-e2e-test.ts`                  | Legacy full scaffold smoke for CLI/plugin/DB/Aspire parity debugging.                                    |
+| `e2e/scaffold-e2e-test.ts`                  | Retained independent behavioral scaffold diagnostic; not a merge gate.                                   |
 | `deps/*.ts`                                 | Dependency-version, dead-import, audit, and prod-install decisions (see above).                          |
 | `agentic/claude/sync-claude-skills.ts`      | Generate or check `.claude/skills` from `.agents/skills`.                                                |
 | `agentic/claude/validate-claude-surface.ts` | Validate `CLAUDE.md`, Claude settings, gitignore, and skill mirror.                                      |
