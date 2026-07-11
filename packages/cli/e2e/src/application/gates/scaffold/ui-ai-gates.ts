@@ -2,6 +2,11 @@ import { GATE, GATE_PHASE } from '../../../domain/cli-surface.ts';
 import { PACKAGE_SOURCE } from '../../../domain/extension-axes.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
 import { cli, commandGate, denoCommand } from './gate-factory.ts';
+import { localSourceFixtureScript } from './local-source-fixture.ts';
+
+const AI_LOCAL_SOURCE_PACKAGES = [
+  { specifier: '@netscript/ai', entrypoint: 'ai/mod.ts' },
+] as const;
 
 /** Create generated-project gates for the Fresh UI AI collection. */
 export function createUiAiGates(): readonly GateDefinition[] {
@@ -31,8 +36,15 @@ export function createUiAiGates(): readonly GateDefinition[] {
           context,
           'eval',
           context.request.options.packageSource === PACKAGE_SOURCE.JSR
-            ? uiSourceScript(false)
-            : uiSourceScript(true),
+            ? uiSourceScript()
+            : `${uiSourceScript()}\n${
+              localSourceFixtureScript({
+                projectRoot: '.',
+                sourceBase: './packages',
+                packages: AI_LOCAL_SOURCE_PACKAGES,
+                targets: [{ path: 'deno.json', includeConfig: true }],
+              })
+            }`,
         ),
       (context) => context.project.projectRoot,
     ),
@@ -79,7 +91,7 @@ export function createUiAiGates(): readonly GateDefinition[] {
   ];
 }
 
-function uiSourceScript(rewriteToLocalWorkspace: boolean): string {
+function uiSourceScript(): string {
   return [
     'const requiredPaths = [',
     '  "islands/ui/McpUiWidget.tsx",',
@@ -106,9 +118,6 @@ function uiSourceScript(rewriteToLocalWorkspace: boolean): string {
     // bare alias auto-expands subpath imports (@netscript/ai/tools). Local runs
     // rewrite to the copied workspace member, whose workspace resolution handles
     // subpaths; a relative alias would not.
-    ...(rewriteToLocalWorkspace
-      ? ['config.imports["@netscript/ai"] = "./packages/ai/mod.ts";']
-      : []),
     'config.compilerOptions = {',
     '  ...config.compilerOptions,',
     '  jsx: "precompile",',
