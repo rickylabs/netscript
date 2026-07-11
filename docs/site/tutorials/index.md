@@ -47,7 +47,7 @@ the one closest to what you're building.
   },
   {
     title: "ERP Sync",
-    body: "Build a background-processing backend: watch for incoming data files, ingest them with durable jobs, add a queue provider and a cron schedule, and learn how polyglot (non-TypeScript) transform tasks are defined. The track for <strong>jobs, queues &amp; polyglot</strong>. 5 chapters.",
+    body: "Build a legacy-ERP migration sync: watch for incoming data files, ingest them with durable jobs, run a sandboxed transform task, and add a queue provider and a cron schedule. The track for <strong>jobs, queues &amp; polyglot</strong>. 5 chapters.",
     href: "/tutorials/erp-sync/"
   },
   {

@@ -8,8 +8,8 @@ next: { label: "How-to guides", href: "/how-to/" }
 
 # Run it locally under Aspire
 
-You have built the whole ERP sync: a file-watch import job, a queue, and a cron schedule, plus an
-understanding of polyglot transform tasks. This final chapter runs all of it together — workers,
+You have built the whole VIF→CSB sync: a file-watch import job, a sandboxed transform task, a
+queue, and a cron schedule. This final chapter runs all of it together — workers,
 triggers, queue, and cron processors — on one machine under `aspire start`, and shows you how to read
 the running system from the dashboard. It is the **local** orchestration story: one command,
 one observable stack, throwaway infrastructure.
@@ -42,8 +42,9 @@ walkthrough lives in <a href="/how-to/deploy-local-aspire/">Deploy locally with 
 ## Before you begin
 
 You need the complete `my-erp/` workspace from [Chapter 4](/tutorials/erp-sync/04-queue-and-cron/):
-the workers and triggers plugins, the `import-products` job, the `product-import-trigger` file watch,
-and the `daily-resync-schedule` cron. Docker must be running so Aspire can provision Postgres and
+the workers and triggers plugins, the `import-products` job, the `normalize-vif` transform task,
+the `product-import-trigger` file watch, and the `daily-resync-schedule` cron. Docker must be
+running so Aspire can provision Postgres and
 Redis. Confirm the AppHost was scaffolded (it is a TypeScript/Node program, not C#):
 
 ```sh
@@ -115,12 +116,13 @@ no <code>netscript generate aspire</code> — the AppHost is produced by <code>n
 
 ## Step 4 — Watch the pipeline run end to end
 
-With the full stack up, exercise the pipeline you built and read it from the dashboard. Drop a file:
+With the full stack up, exercise the pipeline you built and read it from the dashboard. Drop a
+file in VIF's export shape:
 
 ```sh
 cat > .data/incoming/products_live.csv <<'CSV'
-name,sku,price
-Anvil,ANV-9,49.99
+art_no,designation,price_centimes
+ANV-9,Anvil,4999
 CSV
 mv .data/incoming/products_live.csv .data/incoming/products/products_live.csv
 ```
@@ -184,11 +186,11 @@ OTLP <code>:4318</code>; a stale prior run holding a port blocks boot. Free it a
 
 ## What you built
 
-You ran the complete ERP sync — workers, triggers, queue, and cron — on one machine under a single
-`aspire start`, initialized the database through the running AppHost, and watched a file drop flow into
-a durable job execution with its trace in the dashboard. You now have an end-to-end durable
-background-processing backend, and you know exactly where the local story ends and a production
-deployment begins.
+You ran the complete VIF→CSB sync — workers, triggers, queue, and cron — on one machine under a
+single `aspire start`, initialized the database through the running AppHost, and watched a VIF
+export flow into a durable job execution with its trace in the dashboard. You now have an
+end-to-end durable background-processing backend that could carry a real migration's parallel-run,
+and you know exactly where the local story ends and a production deployment begins.
 
 ## Where to go next
 
@@ -196,8 +198,8 @@ You have finished the ERP Sync track. From here, branch into task-oriented and r
 
 - **Ship it remotely** → [Deploy](/how-to/deploy/) — the production companion to this local run:
   deployable units, managed backing services, and the `--no-aspire` path.
-- **Run a polyglot task for real** → [Run a polyglot task](/how-to/run-a-polyglot-task/) — turn
-  Chapter 3's documented capability into a running Python or shell step.
+- **Take the transform polyglot** → [Run a polyglot task](/how-to/run-a-polyglot-task/) — swap
+  Chapter 3's Deno transform for a Python or shell step on your own host.
 - **Tune throughput** → [Choose a queue provider](/how-to/choose-a-queue-provider/) and
   [Tune the worker runtime](/how-to/tune-worker-runtime/).
 - **Understand the orchestrator** → [Orchestration with Aspire](/explanation/aspire/) and the full
