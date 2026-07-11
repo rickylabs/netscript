@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "name": "@netscript/plugin-triggers",
-  "version": "0.0.1-beta.5",
+  "version": "0.0.1-beta.6",
   "displayName": "Trigger Processor",
   "description": "NetScript plugin for trigger ingress, scheduling, file watching, and trigger runtime APIs.",
   "peerDependencies": {
-    "@netscript/plugin": "0.0.1-beta.5"
+    "@netscript/plugin": "0.0.1-beta.6"
   },
   "capabilities": {
     "hasDatabaseMigrations": true,
