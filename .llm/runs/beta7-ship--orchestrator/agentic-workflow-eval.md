@@ -40,6 +40,16 @@ orchestrator (session `df71d36c`, Claude Fable 5 medium, autonomous background).
   complex engineering delegation only). Relaunched the 5 dead slices on Opus 4.8 high against the
   same partial worktrees. Lane-policy docs row should be updated to encode this.
 
+- **D7 (owner review, 2026-07-11 ~16:30)**: the docs cut leaked internal company wordings into
+  public docs — the design sources themselves (proposal/epic bodies) grounded premises in the
+  internal reference app (eis-chat) and an internal ERP migration (VIF→CSB), and agents faithfully
+  followed them; the T8-caution even cited an issue number. Owner directive: public docs carry
+  zero internal names/PR numbers/process framing. Remediation wave: merge eis-chat on-ramp into
+  the chat track (production-grade AI chat + MCP), ERP-agnostic rework (SAP→Microsoft Dynamics),
+  sweep of workspace/services-sdk/reference pages. Lesson promoted to memory: docs briefs need a
+  standing `eis|VIF|CSB|PR #|dogfood` grep gate — the positioning law was enforced but had no
+  "public-audience" clause.
+
 ## Good mechanics
 
 - The `e2e-cli-prod` hardening loop (#617–#623) paid off exactly as designed: the suite caught a
