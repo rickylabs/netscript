@@ -17,6 +17,12 @@ Redis cache, your `workspace` service, the `auth-api` service on `:8094`, the Wo
 **local** story, and this chapter is precise about exactly that: a complete observable stack on one
 machine, not a production deployer.
 
+The one-command reach is the differentiator, and you hand-wrote none of it: `netscript init`
+generated the AppHost in Chapter 1, each plugin you installed since — `auth`, then `workers` —
+contributed its own service and processor to the resource graph, and one `aspire start` boots the
+whole thing with cross-references resolved into injected environment. Scaffold to a running,
+observable stack, with no orchestration wiring you maintain by hand.
+
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/workspace/01-scaffold/" },
   { label: "2 · Auth", href: "/tutorials/workspace/02-auth/" },

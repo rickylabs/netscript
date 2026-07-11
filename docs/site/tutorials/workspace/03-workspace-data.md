@@ -15,6 +15,13 @@ isolate it is the same reason teams isolate any domain: an independent lifecycle
 and back up on its own. It also bounds the blast radius — a bad migration to your team schema cannot
 take the auth tables down with it, and vice versa.
 
+What makes this a NetScript capability and not just "run two Postgres containers" is the **typed
+data layer**: one `netscript db add` scaffolds the datasource, joins it to the Aspire graph, and —
+after a single migrate/generate loop — hands you a fully typed Prisma client scoped to *that*
+datasource, with its own migration history. The isolation is real at the type level, not just the
+connection string, and the whole `db` toolchain is multi-database-aware, so every command takes a
+`--db` target rather than leaving you to juggle two schemas by hand.
+
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/workspace/01-scaffold/" },
   { label: "2 · Auth", href: "/tutorials/workspace/02-auth/" },

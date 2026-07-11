@@ -19,6 +19,12 @@ and re-syncs nightly on a cron. It is the durable-processing companion to the
 [main tutorials ladder](/tutorials/): where that ladder ends at a request/response service plus a
 webhook, this one is about everything that happens **off** the request path.
 
+The differentiator this track proves is **durable background processing you did not hand-roll**:
+the file-watch trigger, the job, the queue, and the cron are first-class NetScript primitives wired
+into one orchestrated runtime — in place of the pile of cron entries, ad-hoc `nohup` workers, and
+bespoke glue scripts most teams reach for, the kind that silently drop a file or a row when a
+process dies mid-run.
+
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/erp-sync/01-scaffold/" },
   { label: "2 · Import job", href: "/tutorials/erp-sync/02-import-job/" },
