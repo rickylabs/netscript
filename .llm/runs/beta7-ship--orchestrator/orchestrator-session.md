@@ -32,6 +32,16 @@
 
 ## Status — live
 
+- 2026-07-11 ~17:05 — **De-internalization complete** (owner review): #657 merged the on-ramp
+  into one 6-chapter production AI-chat track (MCP ch5 + live-streaming ch6, redirects, zero
+  internal-app mentions); #656 made erp-sync ERP-agnostic (SAP→Microsoft Dynamics, ch3 re-executed);
+  #655+#658 swept provenance/PR-number/process framing (658 = supervisor redo of 655's lost edits,
+  D9). FINAL GATE on main `2eb108f1`: grep for
+  `eis-chat|eischat|VIF|CSB|PR #|pull/N|dogfood|gh:#|issues/N` over docs/site (excl. unpublished
+  _plan/) = **0 hits**; docs verify green (23,450 links / 169 pages / 27 caveats). Two agent
+  incidents (D8 stale-base, D9 lost edits — both the cd-prefix cwd failure) caught by Tier-A
+  merge-base/diff/grep gates; no bad content reached main uncorrected.
+
 - 2026-07-11 ~16:05 — **DOCS EPIC #401 CLOSED**: all 18 children shipped (#433–#450), evaluator
   verdicts PASS (one fix loop, PR #652), residual stale-claim sweep merged (#650), verdicts
   artifact merged (#653). Site verify green: 24,055 links / 167 pages / 28 caveats. #638 fix

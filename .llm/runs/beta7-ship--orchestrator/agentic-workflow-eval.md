@@ -61,6 +61,16 @@ orchestrator (session `df71d36c`, Claude Fable 5 medium, autonomous background).
   and the orchestrator must merge-base-check every agent branch before opening its PR (now
   standard for this run).
 
+- **D9 (lost sweep edits, 2026-07-11 ~17:00)**: PR #655's squash carried only the sweep agent's
+  worklog — its docs edits were authored in the wrong checkout (same `cd`-prefix cwd failure as
+  D8: agent bash calls reset cwd between invocations, and relative `cd` prefixes landed in the
+  shared main checkout instead of the agent worktree) and were wiped by the D8 cleanup reset.
+  Caught by the post-merge grep gate; supervisor re-applied the worklog's documented per-hit
+  intent verbatim (PR #658). Improvement **I15**: agent briefs must mandate absolute paths inside
+  the assigned worktree for every file operation, and the orchestrator's pre-merge review must
+  diff-check that a content PR actually contains content changes (a docs PR whose diff is
+  worklog-only is a red flag the review missed).
+
 ## Good mechanics
 
 - The `e2e-cli-prod` hardening loop (#617–#623) paid off exactly as designed: the suite caught a
