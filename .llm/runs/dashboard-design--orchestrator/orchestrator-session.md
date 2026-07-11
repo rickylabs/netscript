@@ -12,7 +12,7 @@
 - **Started**: 2026-07-12
 - **Worktree**: `/home/codex/repos/netscript-547-lffix/.claude/worktrees/dashboard-design-orchestrator`
 - **Umbrella branch**: `design/dev-dashboard-revamp` (from origin/main @ 955b4abf)
-- **Umbrella PR**: (recorded after creation — see below)
+- **Umbrella PR**: #685 (DRAFT) — https://github.com/rickylabs/netscript/pull/685
 - **Sibling**: beta.8 orchestrator session `4d300496` running concurrently — its lanes are off-limits;
   nothing from this run merges to main.
 
