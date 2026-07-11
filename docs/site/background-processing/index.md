@@ -6,9 +6,23 @@ templateEngine: [vento, md]
 
 # Background Processing
 
+**Work that outlives the request, from one handler file.** In NetScript, moving work off
+the request path means authoring a single typed handler — the queue, retry policy,
+scheduler, execution history, trigger API, and OpenTelemetry traces come from the worker
+runtime, so there is no separate queue-and-worker stack to assemble (or to explain to an
+AI agent) before the first job runs.
+
+Two page-level stories anchor this pillar. [Background jobs](/background-processing/workers/)
+opens with a production one: a vision job that turns a pasted alert-email screenshot into
+structured diagnosis fields — and the two contract properties (queue-borne payloads,
+compute-only workers) that shaped it, plus a factual side-by-side with Trigger.dev and
+Temporal. [Polyglot tasks](/background-processing/polyglot-tasks/) covers the step that is
+*not* TypeScript: an existing Python, .NET, or shell script that keeps its language and
+gains the same queue, retry, and trace behavior as everything else.
+
 Background Processing covers worker tasks, queue providers, scheduled work, runtime adapters, and
 per-task permissions. Start here when work should run outside the request path but does not need the
-durable saga state model.
+durable saga state model — for that, see [durable workflows](/durable-workflows/).
 
 {{ comp.cardsGrid({ columns: 3, cards: [
   { eyebrow: "Overview & Concepts", title: "Workers and queues", body: "Worker tasks consume queued work with provider and runtime choices kept inside the leaf.", href: "/background-processing/workers/", icon: "O" },

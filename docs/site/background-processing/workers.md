@@ -8,6 +8,12 @@ next: { label: "Durable sagas", href: "/durable-workflows/sagas/" }
 
 # Background jobs
 
+**One typed handler file is the whole job.** Registration, dispatch, retry, execution
+tracking, scheduling, tracing, and the HTTP trigger API all come from the worker runtime —
+so shipping a working background job (whether you write it or an AI agent does) means
+authoring a single `defineJobHandler` module, not first assembling a queue, a worker pool,
+and an inspection UI around it.
+
 A NetScript **background job** is a durable, KV-backed TypeScript handler that runs in
 its own thread-isolated worker, separate from your request-serving services. You author a
 job as one `defineJobHandler(...)` callable, give it an `id`, and the runtime takes care of
@@ -17,6 +23,32 @@ returns — charging a payment, sending a welcome email, processing an upload �
 blocking the caller.
 
 {{ comp.diagram({ src: "/assets/diagrams/queue-worker-scheduler.svg", alt: "An enqueue call (from a trigger, an HTTP POST to the workers API, or the scheduler) places a job on the durable queue; the worker runtime pulls it and runs the handler in one of three runner modes — in-process, web-worker (one V8 isolate per worker), or subprocess — then writes a JobResult to the KV-backed execution store, which streams updates back over SSE.", caption: "Enqueue → durable queue → worker runtime (in-process / web-worker / subprocess) → result store. The scheduler fires cron-defined jobs onto the same queue; graceful shutdown drains in-flight runs before the runner stops." }) }}
+
+## The story: a screenshot becomes a diagnosis
+
+The clearest picture of what this contract buys comes from a production incident-diagnosis
+assistant built on NetScript for a legacy ERP estate. A support engineer pastes an
+alert-email screenshot into a chat channel; a background job runs a vision model over the
+image and extracts the structured fields (program, error number, table, timestamp) that
+downstream tooling needs to trace the failure.
+
+Two properties of the job contract shaped that worker into its correct form:
+
+- **The payload is queue-borne, so it stays small.** The first version enqueued the raw
+  image bytes and hit Deno KV's 64&nbsp;KB enqueue limit. The fix — carry only a small
+  reference through the queue and fetch the bytes back over a typed service client inside
+  the handler — is exactly the shape the contract steers you toward: the queue moves
+  *references to work*, not blobs.
+- **Workers stay compute-only.** The app's channel database holds an exclusive OS file
+  lock, so a second process opening it crashes outright. Because a job handler receives a
+  `ctx` and returns a `JobResult` — rather than a database connection — writing results
+  back through the owning service's typed client was the natural default, not a
+  discipline the team had to invent. The single writer keeps owning its database; the
+  worker never touches it.
+
+The same run is traced end to end: dispatch, execution, progress events, and the
+subprocess hop (if any) land in the [Aspire dashboard](/explanation/aspire/) without
+handler-side wiring. The rest of this page is the mechanism behind that story.
 
 ## What it is
 
@@ -74,6 +106,18 @@ Add the workers plugin to a published workspace with the public package install 
 ```bash
 netscript plugin install @netscript/plugin-workers
 ```
+
+{{ comp callout { type: "caution", title: "Published-mode scaffolds on 0.0.1-beta.7: patch the root import map" } }}
+A project scaffolded with the published CLI (<code>--package-source jsr</code>) on
+<code>0.0.1-beta.7</code> generates a root <code>deno.json</code> whose import map omits the
+<code>@netscript/sdk</code> and <code>@netscript/sdk/client</code> entries, and the scaffolded
+worker runtime resolves against that root config — so the background worker fails to load jobs
+(<code>Import "@netscript/sdk/client" not a dependency and not in import map</code>) until you add
+those two entries to the root import map yourself. Local-source scaffolds are not affected. Tracked
+in <a href="https://github.com/rickylabs/netscript/issues/638">#638</a>; the fix targets the next
+cut.
+<!-- caveat: gh:#638 -->
+{{ /comp }}
 
 For local-source contributor work inside this monorepo, use the maintainer binary when you need
 first-party samples:
@@ -397,6 +441,29 @@ For spans you author *inside* a handler, import directly from **`@netscript/tele
 (e.g. `@netscript/telemetry/instrumentation` for `withChildSpan`). These nest correctly under
 the automatic dispatch span. See [Observability](/explanation/observability/) for the model and
 [Add OpenTelemetry](/how-to/add-opentelemetry/) for the recipe.
+
+## How it compares
+
+Trigger.dev is a managed platform for background jobs and agent workflows; Temporal is a
+durable-execution system you self-host or rent as Temporal Cloud; NetScript's worker
+runtime is a plugin that lives inside your own repository and process tree. Each model
+carries a real tradeoff — a managed platform removes operations, a replay-based cluster
+gives the strongest durability guarantees, a local-first plugin keeps everything in code
+you own. The rows below are structural facts drawn from each project's public
+documentation (as of mid-2026), not rankings.
+
+| | NetScript workers | Trigger.dev | Temporal |
+|---|---|---|---|
+| Handler code | Plain async TypeScript (`defineJobHandler`); failed runs are retried, never replayed | TypeScript tasks in your repo, executed by the platform | Workflow code replayed from event history; side effects live in activities |
+| Determinism constraint on orchestration code | None — handlers may call `Date.now()`, `Math.random()`, and do direct I/O | Not required | Required in workflow code: no `Date.now()`, `Math.random()`, or direct I/O |
+| Where handlers execute | Your own processes: in-process, web-worker, or subprocess runner | Managed cloud; self-hosting via Docker Compose | Self-hosted cluster or Temporal Cloud |
+| Backing stores | Pluggable queue (`deno-kv`, `redis`, `postgres`, `amqp`); Deno KV execution state; Postgres job definitions | Platform-managed | Database, Elasticsearch, server, and workers (self-hosted) |
+| Control plane | None separate — the workers API is one of your services (`:8091`) | The Trigger.dev platform | The Temporal cluster |
+
+The practical consequence of the first two rows: a NetScript job handler is ordinary
+TypeScript with no replay-safety rules to learn, so code an agent writes for a service
+moves into a worker unchanged — the isolation question is deferred to the runner mode
+(the `WORKER_RUNTIMES` table above), a deployment setting rather than a handler concern.
 
 ## Production notes
 
