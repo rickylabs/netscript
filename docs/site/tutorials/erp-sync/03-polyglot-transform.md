@@ -8,11 +8,11 @@ next: { label: "4 · Queue & cron", href: "/tutorials/erp-sync/04-queue-and-cron
 
 # A polyglot transform task
 
-In [Chapter 2](/tutorials/erp-sync/02-import-job/) you imported a VIF export as-is. But VIF's
-export is not CSB's import: the legacy system writes `art_no` where CSB wants `sku`,
-`designation` where CSB wants `name`, and — the one that really hurts — prices as **integer
-centimes** where CSB wants decimals. Load a VIF row into CSB untransformed and every price in the
-new system is wrong by a factor of one hundred. The pipeline needs a **transform stage**, and in
+In [Chapter 2](/tutorials/erp-sync/02-import-job/) you imported a SAP export as-is. But the SAP
+export is not a Dynamics import: the legacy system writes `material_no` where Dynamics wants `sku`,
+`description` where Dynamics wants `name`, and — the one that really hurts — prices as **integer
+cents** where Dynamics wants decimals. Load a legacy row into Dynamics untransformed and every price
+in the new system is wrong by a factor of one hundred. The pipeline needs a **transform stage**, and in
 NetScript that stage is a **task**: a standalone script defined with a builder, spawned as a
 subprocess, its result captured. In this chapter you build one and **run it**, using the `deno`
 runtime — the one task runtime NetScript sandboxes.
@@ -27,8 +27,8 @@ runtime — the one task runtime NetScript sandboxes.
 
 ## What you will build
 
-By the end of this chapter you will have a runnable **`normalize-vif`** task: a transform script
-that reads the VIF export you dropped in Chapter 2, rewrites its legacy columns into CSB's shape,
+By the end of this chapter you will have a runnable **`normalize-sap`** task: a transform script
+that reads the SAP export you dropped in Chapter 2, rewrites its legacy columns into Dynamics' shape,
 and writes the normalized file to a staging folder — executed through the workers task executor as
 a **sandboxed subprocess** whose filesystem access you granted explicitly. You will watch its
 output stream into your terminal, read its structured JSON result, and `cat` the normalized file
@@ -39,15 +39,15 @@ those runtimes are not sandboxed and need their interpreter installed.
 ## Before you begin
 
 You need the `my-erp/` workspace from [Chapter 2](/tutorials/erp-sync/02-import-job/) with the
-workers plugin installed and the VIF export still on disk from that chapter's file drop:
+workers plugin installed and the SAP export still on disk from that chapter's file drop:
 
 ```sh
 netscript plugin list
 cat .data/incoming/products/products_2024.csv
 ```
 
-Expected: `workers` appears in the plugin list, and the CSV prints VIF's legacy shape —
-`art_no,designation,price_centimes` and two rows. If the file is missing, re-create it exactly as
+Expected: `workers` appears in the plugin list, and the CSV prints the SAP legacy shape —
+`material_no,description,price_cents` and two rows. If the file is missing, re-create it exactly as
 in Chapter 2's [verify step](/tutorials/erp-sync/02-import-job/). Aspire does not need to be
 running for this chapter — the task executor runs the transform directly.
 
@@ -59,8 +59,8 @@ variables — never stdin. The result comes **back** as exactly one JSON object 
 transform as a plain Deno script honoring that contract:
 
 ```ts
-// plugins/workers/scripts/normalize-vif.ts
-// VIF export rows in -> CSB-shaped rows out. Runs as a sandboxed subprocess.
+// plugins/workers/scripts/normalize-sap.ts
+// Legacy SAP export rows in -> Microsoft Dynamics-shaped rows out. Runs as a sandboxed subprocess.
 
 // Input arrives as argv + env (NOT stdin).
 const input = Deno.args[Deno.args.indexOf('--input') + 1];
@@ -71,19 +71,19 @@ const lines = raw.trim().split('\n').filter((line) => line.trim().length > 0);
 const headers = lines[0].split(',').map((h) => h.trim().toLowerCase());
 const col = (name: string) => headers.indexOf(name);
 
-// VIF -> CSB: art_no -> sku, designation -> name, price_centimes -> price (decimal).
+// legacy -> target: material_no -> sku, description -> name, price_cents -> price (decimal).
 const out: string[] = ['sku,name,price'];
 let skipped = 0;
 for (const line of lines.slice(1)) {
   const values = line.split(',').map((v) => v.trim());
-  const sku = values[col('art_no')] ?? '';
-  const name = values[col('designation')] ?? '';
-  const centimes = Number.parseInt(values[col('price_centimes')] ?? '', 10);
-  if (sku === '' || Number.isNaN(centimes)) {
+  const sku = values[col('material_no')] ?? '';
+  const name = values[col('description')] ?? '';
+  const cents = Number.parseInt(values[col('price_cents')] ?? '', 10);
+  if (sku === '' || Number.isNaN(cents)) {
     skipped++;
     continue;
   }
-  out.push(`${sku},${name},${(centimes / 100).toFixed(2)}`);
+  out.push(`${sku},${name},${(cents / 100).toFixed(2)}`);
 }
 
 await Deno.mkdir(outDir, { recursive: true });
@@ -93,7 +93,7 @@ await Deno.writeTextFile(output, out.join('\n') + '\n');
 
 // Diagnostics go to stderr; the RESULT is the last stdout line and must be a
 // single JSON OBJECT (not an array) to populate result.result.
-console.error(`normalize-vif: ${lines.length - 1} rows in, ${out.length - 1} written`);
+console.error(`normalize-sap: ${lines.length - 1} rows in, ${out.length - 1} written`);
 console.log(JSON.stringify({ input, output, read: lines.length - 1, written: out.length - 1, skipped }));
 ```
 
@@ -117,12 +117,12 @@ the sandbox — each key compiles directly into an `--allow-*` flag on the spawn
 command line:
 
 ```ts
-// plugins/workers/tasks/normalize-vif.ts
+// plugins/workers/tasks/normalize-sap.ts
 import { defineTask } from '@netscript/plugin-workers-core/builders';
 
-export const normalizeVif = defineTask('normalize-vif')
+export const normalizeSap = defineTask('normalize-sap')
   .runtime('deno') // the default — and the only sandboxed runtime
-  .entrypoint('./plugins/workers/scripts/normalize-vif.ts')
+  .entrypoint('./plugins/workers/scripts/normalize-sap.ts')
   .args('--input', '.data/incoming/products/products_2024.csv')
   .env({ STAGING_DIR: '.data/staging' })
   .permissions({
@@ -133,7 +133,7 @@ export const normalizeVif = defineTask('normalize-vif')
   .timeout(30_000) // ms; defaults to 300_000
   .build();
 
-export default normalizeVif;
+export default normalizeSap;
 ```
 
 Read the permission set as a statement about the transform: it may read the incoming drop folder,
@@ -160,11 +160,11 @@ returns one `TaskResult`. Write a small runner:
 ```ts
 // plugins/workers/run-normalize.ts
 import { createDefaultTaskExecutor } from '@netscript/plugin-workers-core/executor';
-import { normalizeVif } from './tasks/normalize-vif.ts';
+import { normalizeSap } from './tasks/normalize-sap.ts';
 
 const executor = createDefaultTaskExecutor();
 
-const result = await executor.execute(normalizeVif, {
+const result = await executor.execute(normalizeSap, {
   onStdout: (line) => console.log('[normalize]', line),
   onStderr: (line) => console.warn('[normalize:err]', line),
 });
@@ -192,7 +192,7 @@ The runner itself is trusted host code, so `-A` is fine here — the sandbox tha
 the flags your permission set compiled to. You should see:
 
 ```
-[normalize:err] normalize-vif: 2 rows in, 2 written
+[normalize:err] normalize-sap: 2 rows in, 2 written
 [normalize] {"input":".data/incoming/products/products_2024.csv","output":".data/staging/products_2024.normalized.csv","read":2,"written":2,"skipped":0}
 normalized {
   input: ".data/incoming/products/products_2024.csv",
@@ -215,30 +215,30 @@ WID-1,Widget,9.99
 GAD-2,Gadget,19.99
 ```
 
-The centimes are decimals, the legacy columns are CSB's names, and the off-by-100 price bug never
+The cents are decimals, the legacy columns are Dynamics' names, and the off-by-100 price bug never
 gets a chance to exist. This is the transform stage of the pipeline: the
-[import job](/tutorials/erp-sync/02-import-job/) stages the raw VIF rows, `normalize-vif` rewrites
-them for CSB, and a follow-up job would upsert the staged file. Tasks run through the same workers
+[import job](/tutorials/erp-sync/02-import-job/) stages the raw SAP rows, `normalize-sap` rewrites
+them for Dynamics, and a follow-up job would upsert the staged file. Tasks run through the same workers
 runtime as jobs and propagate W3C trace context (`TRACEPARENT`/`TRACESTATE`) into the subprocess,
 so a cross-runtime span still stitches together in the Aspire dashboard.
 
 ## Step 4 — The same chain in another language
 
-`normalize-vif` is TypeScript because a column rename needs nothing more. But some transforms
-live more naturally elsewhere — a pandas dedupe across historical VIF exports, a shell pipeline
+`normalize-sap` is TypeScript because a column rename needs nothing more. But some transforms
+live more naturally elsewhere — a pandas dedupe across historical SAP exports, a shell pipeline
 through `jq`, a .NET routine you already own. The builder chain is identical; only the
 `.runtime(...)` argument and the entrypoint change:
 
 ```ts
 // The Python variant of the same stage — a forward step for your own host.
-export const dedupeVif = defineTask('dedupe-vif')
+export const dedupeSap = defineTask('dedupe-sap')
   .runtime('python')
-  .entrypoint('./plugins/workers/scripts/dedupe_vif.py')
+  .entrypoint('./plugins/workers/scripts/dedupe_sap.py')
   .args('--input', '.data/staging')
   .timeout(120_000)
   .build();
 
-// Spawns: python3 -u ./plugins/workers/scripts/dedupe_vif.py --input .data/staging
+// Spawns: python3 -u ./plugins/workers/scripts/dedupe_sap.py --input .data/staging
 ```
 
 The process contract is unchanged — argv + env in, one JSON object on the last `stdout` line out
@@ -303,7 +303,7 @@ re-create it and rerun. A <code>timeout</code> status means the 30s budget elaps
 
 ## What you built
 
-A runnable transform stage for the VIF→CSB pipeline: a plain-Deno script honoring the argv/env-in
+A runnable transform stage for the SAP→Dynamics pipeline: a plain-Deno script honoring the argv/env-in
 + JSON-out process contract, a `defineTask` definition whose `.permissions(...)` compile into real
 `--allow-*` flags on the spawned subprocess, and an executor run you observed end to end — plus
 the shape of the same stage in Python, clearly marked with the two rules that govern non-Deno
