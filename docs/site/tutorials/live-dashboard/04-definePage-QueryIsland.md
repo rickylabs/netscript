@@ -25,11 +25,13 @@ conceptually dense.
 
 ## What you will build
 
-An `/dashboard/orders/` route that renders a filterable orders table. The server shell is a
-`definePage` page with a cache-first `list` layer; the interactive part is a `QueryIsland` that reads
-through the chapter-3 query helpers with `useQuery` and advances order status with an optimistic
-`useMutation`. You end with a page that paints from KV cache on first byte and stays live on the
-client.
+An `/dashboard/orders/` route that renders a filterable orders table — the screen the fulfillment
+team keeps open. The server shell is a `definePage` page with a cache-first `list` layer; the
+interactive part is a `QueryIsland` that reads through the chapter-3 query helpers with `useQuery`
+and advances order status with an optimistic `useMutation`. Optimistic matters here: when a packer
+marks an order `shipped`, the row must move instantly — a badge that lags invites clicking it twice,
+and a double-advanced order is exactly the kind of quiet mistake this dashboard exists to prevent.
+You end with a page that paints from KV cache on first byte and stays live on the client.
 
 ## Before you begin
 
@@ -185,7 +187,7 @@ Read the builder one call at a time:
 }) }}
 
 {{ comp callout { type: "note", title: "This is the dense part — and it earns its weight" } }}
-The layer config carries a lot: a <code>loader</code> (cache-first server read), a <code>partial</code> + <code>partialName</code> (the refresh route), a <code>fallback</code> (cold-cache skeleton), and <code>staleTime</code> + <code>staleReloadMode</code> (the staleness window and how it refreshes). It is more upfront ceremony than a plain Fresh route — the payoff is that each region renders from cache independently and refreshes without a full navigation. If you only need a static page, a plain Fresh route is lighter; reach for <code>definePage</code> when a region must be cache-first and self-refreshing, which a live table is. See <a href="/capabilities/fresh-framework/">the Fresh meta-framework</a>.
+The layer config carries a lot: a <code>loader</code> (cache-first server read), a <code>partial</code> + <code>partialName</code> (the refresh route), a <code>fallback</code> (cold-cache skeleton), and <code>staleTime</code> + <code>staleReloadMode</code> (the staleness window and how it refreshes). It is more upfront ceremony than a plain Fresh route — the payoff is that each region renders from cache independently and refreshes without a full navigation. If you only need a static page, a plain Fresh route is lighter; reach for <code>definePage</code> when a region must be cache-first and self-refreshing, which a live table is. See <a href="/web-layer/">the Fresh meta-framework</a>.
 {{ /comp }}
 
 ## Step 4 — Hydrate the QueryIsland

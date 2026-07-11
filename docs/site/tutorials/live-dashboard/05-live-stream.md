@@ -9,9 +9,11 @@ next: { label: "6 · Deploy", href: "/tutorials/live-dashboard/06-deploy/" }
 # Real-time updates with durable streams
 
 In chapter 4 the table was live on the *client* — it refetched and mutated without a navigation.
-Now you make it live from the *server*: a durable StreamDB pushes change events to the browser, and a
-`useLiveQuery` hook re-renders rows the instant their state changes. This is the payoff of the whole
-track: a table that updates by itself.
+But it still only knows what it fetched: between revalidations, a cancelled order sits on the screen
+looking shippable. This chapter closes that gap from the *server* side: a durable change-stream
+pushes state changes to the browser, and a `useLiveQuery` hook re-renders rows the instant they
+change — no polling loop, no refresh button, no window where the screen and the database disagree.
+This is the payoff of the whole track: a table that updates by itself.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/live-dashboard/01-scaffold/" },
@@ -31,7 +33,7 @@ worked example is the **sagas** stream — the durable change-stream the showcas
 mechanism your order dashboard uses to go live.
 
 {{ comp callout { type: "note", title: "Why the example uses the sagas stream" } }}
-NetScript's durable-streams runtime mirrors execution state — saga instances, worker executions — into change-streams that the frontend can subscribe to. The showcase's canonical live table is the saga instance monitor, so that is what this chapter grounds in. The <code>createSagasStreamDB</code> → <code>useLiveQuery</code> pattern is identical for any StreamDB collection; once you have it, pointing a live table at your own stream is the same three moves. To follow this chapter against running data, the workspace needs the <strong>sagas</strong> plugin and its streams runtime — add the published package with <code>netscript plugin install @netscript/plugin-sagas</code> if it is not already installed.
+NetScript's durable-streams runtime mirrors execution state — saga instances, worker executions — into change-streams that the frontend can subscribe to. The sagas plugin ships the ready-made <em>typed</em> collection for this: <code>createSagasStreamDB</code> gives <code>useLiveQuery</code> a StreamDB it can query with full types, which is why this chapter's worked live table grounds there. The pattern is identical for any StreamDB collection; once you have it, pointing a live table at your own stream is the same three moves — and the producer half of that story is already in reach, because the streams plugin scaffolds a user-owned durable stream into your workspace (see the closing section). To follow this chapter against running data, the workspace needs the <strong>sagas</strong> plugin and its streams runtime — add the published package with <code>netscript plugin install @netscript/plugin-sagas</code> if it is not already installed.
 {{ /comp }}
 
 ## Before you begin
@@ -49,7 +51,7 @@ sagas plugin (which brings the stream) is not installed or Aspire has not finish
 the [dashboard](/explanation/aspire/) resource list at `:18888`.
 
 {{ comp callout { type: "note", title: "HTTP/2 is opt-in for live subscriptions" } }}
-The live subscription runs over plaintext <strong>HTTP/1.1</strong> by default, which caps how many concurrent SSE connections a browser opens per origin. HTTP/2 lifts that cap but is opt-in and requires TLS — via <code>ServiceTlsOptions</code> or the <code>NETSCRIPT_TLS_CERT_FILE</code> / <code>NETSCRIPT_TLS_KEY_FILE</code> environment variables. See <a href="/capabilities/streams/">Durable streams</a> for the connection-limit detail.
+The live subscription runs over plaintext <strong>HTTP/1.1</strong> by default, which caps how many concurrent SSE connections a browser opens per origin. HTTP/2 lifts that cap but is opt-in and requires TLS — via <code>ServiceTlsOptions</code> or the <code>NETSCRIPT_TLS_CERT_FILE</code> / <code>NETSCRIPT_TLS_KEY_FILE</code> environment variables. See {{ comp.xref({ key: "cap:streams" }) }} for the connection-limit detail.
 {{ /comp }}
 
 ## Step 1 — Open a StreamDB handle
@@ -148,7 +150,7 @@ island rehydrates from `dehydratedState`, so the inventory is present immediatel
 stream in on top.
 
 {{ comp callout { type: "warning", title: "Streams is its own runtime — and it must be up" } }}
-The durable-streams producer is a <strong>separate Aspire service on :4437</strong>, not part of your orders service. <code>getStreamsUrl()</code> resolves its address from the environment the same way <code>getServiceUrl</code> does for services — so it only works when <code>aspire start</code> has brought the streams runtime up. With no streams runtime, <code>useLiveQuery</code> has nothing to subscribe to and the live table stays empty (the <code>useQuery</code> inventory still renders from cache). See <a href="/capabilities/streams/">Durable streams</a>.
+The durable-streams producer is a <strong>separate Aspire service on :4437</strong>, not part of your orders service. <code>getStreamsUrl()</code> resolves its address from the environment the same way <code>getServiceUrl</code> does for services — so it only works when <code>aspire start</code> has brought the streams runtime up. With no streams runtime, <code>useLiveQuery</code> has nothing to subscribe to and the live table stays empty (the <code>useQuery</code> inventory still renders from cache). See {{ comp.xref({ key: "cap:streams" }) }}.
 {{ /comp }}
 
 ## Step 4 — Wrap the island in QueryIsland
@@ -175,7 +177,33 @@ export default function SagasLiveIsland(props) {
 
 `getIslandQueryClient()` returns the island's QueryClient; `hydrateFromDehydrated` seeds it from the
 server's `dehydratedState`. After that, `useQuery` reads the seeded inventory and `useLiveQuery`
-takes over the live rows.
+takes over the live rows. The island is now complete — prove it compiles as a unit:
+
+```sh
+deno check apps/dashboard/islands/SagasLiveIsland.tsx --unstable-kv
+```
+
+A clean check confirms the StreamDB handle, both query hooks, and the hydration wiring line up.
+
+## Point it at your own stream
+
+Everything above consumes a stream the framework produces for you. The producer half of the seam is
+just as close: if your workspace has the **streams** plugin installed (`netscript plugin install
+streams`), its scaffolder wrote `streams/notifications-stream.ts` — a user-owned durable stream you
+edit like any other source file. It is the same two primitives this whole chapter rides on:
+
+```ts
+// streams/notifications-stream.ts (scaffolded — yours to edit)
+// defineStreamSchema declares the typed collections; createDurableStream
+// returns the producer. Swap the sample event shape for your own domain
+// events — an order.cancelled event is one zod object away.
+import { createDurableStream, defineStreamSchema } from '@netscript/plugin-streams-core';
+```
+
+The producer publishes with `upsert(collection, row)` and `await flush()`; a browser consumes a
+user-defined stream over HTTP/SSE at its `streamPath`. The full producer surface, URL resolution,
+and current limitations are on {{ comp.xref({ key: "cap:streams", text: "the Durable streams page" }) }} —
+when you outgrow the sagas monitor, that is where your own `order-events` stream starts.
 
 ## Verify your progress
 
@@ -212,8 +240,9 @@ Two usual causes: the sagas plugin (and its streams runtime on :4437) is not ins
 ## What you built
 
 A real-time table: a durable StreamDB handle (`createSagasStreamDB`) driving `useLiveQuery`, seeded
-from the server with `getStreamsUrl` + dehydration, wrapped in a `QueryIsland`. Your dashboard now
-updates the instant server state changes — the full contract → client → query → island → stream
-spine, end to end. Next you run the whole graph locally under Aspire.
+from the server with `getStreamsUrl` + dehydration, wrapped in a `QueryIsland`. The refresh button is
+now irrelevant: the moment an order's state changes on the server, the row your operations team is
+looking at changes with it — the full contract → client → query → island → stream spine, end to end.
+Next you run the whole graph locally under Aspire.
 
 {{ comp.nextPrev({ prev: { label: "4 · definePage + island", href: "/tutorials/live-dashboard/04-definePage-QueryIsland/" }, next: { label: "6 · Deploy", href: "/tutorials/live-dashboard/06-deploy/" } }) }}

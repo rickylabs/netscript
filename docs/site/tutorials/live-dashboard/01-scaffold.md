@@ -8,9 +8,10 @@ next: { label: "2 · Contract to service", href: "/tutorials/live-dashboard/02-c
 
 # Scaffold the dashboard workspace
 
-Every track starts with a real project on disk. In this chapter you create `my-dashboard/` — a
-NetScript workspace with a Fresh frontend, an example service, and a Postgres database — then boot
-the whole thing under Aspire so the rest of the track has a running system to build on.
+Every track starts with a real project on disk. In this chapter you create `my-dashboard/` — the
+workspace that will grow into the live order queue from the [track index](/tutorials/live-dashboard/):
+a Fresh frontend, an `orders` service, and a Postgres database — then boot the whole thing under
+Aspire so the rest of the track has a running system to build on.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/live-dashboard/01-scaffold/" },
@@ -24,7 +25,7 @@ the whole thing under Aspire so the rest of the track has a running system to bu
 ## What you will build
 
 A `my-dashboard/` workspace on disk: shared contracts, an example `orders` service on port **3002**,
-a [Fresh](/capabilities/fresh-framework/) app, and a Postgres database — all orchestrated by Aspire.
+a [Fresh](/web-layer/) app, and a Postgres database — all orchestrated by Aspire.
 By the end the Aspire dashboard at `:18888` shows every resource running, and you understand which
 generated directory does what. You will reuse this same workspace for every later chapter.
 
@@ -105,7 +106,7 @@ Open `my-dashboard/`. The shape that matters for this track:
 The two directories this track lives in:
 
 - **`apps/dashboard/`** — your Fresh app. Its entry point is `main.ts`, which calls
-  [`defineFreshApp`](/capabilities/fresh-framework/); its build is configured by `vite.config.ts`.
+  [`defineFreshApp`](/web-layer/); its build is configured by `vite.config.ts`.
   Chapters 4 and 5 add routes and islands here. This is the heart of the track.
 - **`services/orders/`** and **`contracts/`** — the typed read-model your dashboard reads. You shape
   these in chapter 2, then consume them from the Fresh app in chapters 3–5.
@@ -218,6 +219,6 @@ Three checks cover most first-run snags: (1) is <code>aspire start</code> still 
 
 A real NetScript workspace — `my-dashboard/` — with a Fresh app, an `orders` service on `:3002`, and
 a Postgres database, all orchestrated by Aspire and visible at `:18888`. Next you will shape the
-`orders` read-model the dashboard consumes.
+`orders` read-model — the rows your operations team will eventually watch live.
 
 {{ comp.nextPrev({ prev: { label: "Live Dashboard", href: "/tutorials/live-dashboard/" }, next: { label: "2 · Contract to service", href: "/tutorials/live-dashboard/02-contract-to-service/" } }) }}

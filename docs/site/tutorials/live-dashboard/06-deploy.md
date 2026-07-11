@@ -10,8 +10,8 @@ next: { label: "How-to guides", href: "/how-to/" }
 
 You have built the full spine — contract, service, query layer, page, and live stream. This final
 chapter steps back and runs the entire graph as one system: the `orders` service, the Fresh
-dashboard, the durable-streams runtime, Postgres, and Redis, all under a single `aspire start`. We
-is precise about what local Aspire is — a development orchestrator — and what it is not.
+dashboard, the durable-streams runtime, Postgres, and Redis, all under a single `aspire start`. It
+is also precise about what local Aspire is — a development orchestrator — and what it is not.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/live-dashboard/01-scaffold/" },
@@ -161,8 +161,9 @@ Both should return healthy responses, and the dashboard at `:18888` should list 
 
 You ran the complete `my-dashboard/` graph under one `aspire start`: service, Fresh app, durable
 streams, Postgres, and Redis, wired automatically and observable in the dashboard at `:18888`. That
-closes the track — you have built and run a real live operations dashboard on the full NetScript
-spine.
+closes the track — the order queue from the opening premise is real now: no polling loop, no refresh
+button, no window where a cancelled order looks shippable. You built and ran it on the full
+NetScript spine.
 
 ## Where to go next
 
@@ -170,7 +171,8 @@ spine.
   database migrations, queue backends, and production pitfalls.
 - **Ship it remotely** → [Deploy](/how-to/deploy/) is the production companion to local Aspire.
 - **Go deeper** → [Orchestration with Aspire](/explanation/aspire/) explains the AppHost, plugin
-  contributions, and two-pass reference resolution; [Durable streams](/capabilities/streams/) and the
-  [Fresh meta-framework](/capabilities/fresh-framework/) back chapters 4 and 5.
+  contributions, and two-pass reference resolution; {{ comp.xref({ key: "cap:streams" }) }} and
+  {{ comp.xref({ key: "cap:fresh-framework", text: "the Fresh meta-framework" }) }} back chapters 4
+  and 5.
 
 {{ comp.nextPrev({ prev: { label: "5 · Live stream", href: "/tutorials/live-dashboard/05-live-stream/" }, next: { label: "How-to guides", href: "/how-to/" } }) }}
