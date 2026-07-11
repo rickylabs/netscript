@@ -16,7 +16,9 @@ sessions have somewhere to live, set your model key, and boot the whole thing un
   { label: "1 · Scaffold", href: "/tutorials/chat/01-scaffold/" },
   { label: "2 · Durable chat route", href: "/tutorials/chat/02-durable-chat-route/" },
   { label: "3 · Chat UI", href: "/tutorials/chat/03-chat-ui/" },
-  { label: "4 · Server-side tool call", href: "/tutorials/chat/04-tool-call/" }
+  { label: "4 · Server-side tool call", href: "/tutorials/chat/04-tool-call/" },
+  { label: "5 · MCP tools & widgets", href: "/tutorials/chat/05-mcp/" },
+  { label: "6 · Live streaming", href: "/tutorials/chat/06-live-streaming/" }
 ] }) }}
 
 ## What you will build

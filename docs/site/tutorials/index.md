@@ -34,15 +34,7 @@ under .NET Aspire** — so whichever you pick, you finish with something that bo
 serves, and survives a restart. The tracks don't depend on each other; start with
 the one closest to what you're building.
 
-Short on time? There is also a **single-sitting on-ramp** — the smallest working slice of
-the whole spine — before you commit to a deep track.
-
 {{ comp.featureGrid({ items: [
-  {
-    title: "Mini eis-chat (on-ramp)",
-    body: "The single-sitting on-ramp: scaffold, one typed message contract, one durable delivery worker, one live stream tailed over HTTP/SSE — then a map into the five deep tracks. Start here if you are new. 4 chapters.",
-    href: "/tutorials/eis-chat/"
-  },
   {
     title: "Storefront",
     body: "Build an e-commerce backend: a typed catalog service, contract-first cart, a durable <code>checkout</code> saga with compensation, and an HMAC-verified shipping webhook. The track for <strong>services + durable workflows</strong>. 6 chapters.",
@@ -65,7 +57,7 @@ the whole spine — before you commit to a deep track.
   },
   {
     title: "AI Chat",
-    body: "Build a durable AI chat app whose transcript, streaming markdown, and tool-call cards survive reload and reconnect: wire a durable chat route on <code>@netscript/fresh/ai</code>, hydrate the <code>fresh-ui</code> chat components, and add one server-side tool. The track for <strong>durable chat UI</strong>. 4 chapters.",
+    body: "Build a durable AI chat app whose transcript, streaming markdown, tool-call cards, and MCP widgets survive reload and reconnect: wire a durable chat route on <code>@netscript/fresh/ai</code>, hydrate the <code>fresh-ui</code> chat components, add a server-side tool, connect a remote MCP server, and turn the island live. The track for <strong>durable AI chat</strong>. 6 chapters.",
     href: "/tutorials/chat/"
   }
 ] }) }}
@@ -79,13 +71,12 @@ the whole spine — before you commit to a deep track.
     { name: "An app behind a login", type: "Team Workspace", desc: "You need authentication, sessions, and route-level access control before anything else. Teaches the auth backend, session crypto, and the .withAuthz() seam." },
     { name: "Data pipelines and scheduled work", type: "ERP Sync", desc: "Your work happens off the request path — file ingestion, batch jobs, scheduled syncs, and tasks in other languages. Teaches triggers, jobs, queues, cron, and the task runtime." },
     { name: "A live, reactive frontend", type: "Live Dashboard", desc: "You're rendering server data in a Fresh UI that stays current without a refresh. Teaches the SDK client, cache-first queries, the page builder, islands, and durable streams." },
-    { name: "A durable AI chat app", type: "AI Chat", desc: "You're building a chat UI whose transcript, streaming markdown, and tool-call cards survive reload and reconnect. Teaches the durable chat route on @netscript/fresh/ai, the fresh-ui chat components, and one server-side tool." }
+    { name: "A durable AI chat app", type: "AI Chat", desc: "You're building a chat UI whose transcript, streaming markdown, tool-call cards, and MCP widgets survive reload and reconnect, with replies that stream in live. Teaches the durable chat route on @netscript/fresh/ai, the fresh-ui chat components, a server-side tool, the MCP client stack, and the live subscription." }
   ]
 }) }}
 
-New to NetScript entirely? The [Mini eis-chat on-ramp](/tutorials/eis-chat/) proves the
-whole spine in one sitting. For a deep track, **Storefront** is the broadest tour of the
-core ideas — to inspect the whole shape of a NetScript backend, start there.
+New to NetScript entirely? Any track starts from zero, but **Storefront** is the broadest
+tour of the core ideas — to inspect the whole shape of a NetScript backend, start there.
 
 ## Before you start
 

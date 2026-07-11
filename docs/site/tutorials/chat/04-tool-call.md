@@ -3,12 +3,12 @@ layout: layouts/base.vto
 title: A server-side tool call
 templateEngine: [vento, md]
 prev: { label: "3 · Chat UI", href: "/tutorials/chat/03-chat-ui/" }
-next: { label: "Tutorials", href: "/tutorials/" }
+next: { label: "5 · MCP tools & widgets", href: "/tutorials/chat/05-mcp/" }
 ---
 
 # A server-side tool call
 
-A chat gets useful when the model can *do* something. In this final chapter you give the
+A chat gets useful when the model can *do* something. In this chapter you give the
 model one server-side tool, pass it into the same `chat()` call from chapter 2, and surface
 the invocation in the UI as a **tool-call card** whose results render as **citation chips**.
 The tool runs on the server — its result is captured in the durable transcript, so the card
@@ -18,7 +18,9 @@ survives a reload exactly like the messages around it.
   { label: "1 · Scaffold", href: "/tutorials/chat/01-scaffold/" },
   { label: "2 · Durable chat route", href: "/tutorials/chat/02-durable-chat-route/" },
   { label: "3 · Chat UI", href: "/tutorials/chat/03-chat-ui/" },
-  { label: "4 · Server-side tool call", href: "/tutorials/chat/04-tool-call/" }
+  { label: "4 · Server-side tool call", href: "/tutorials/chat/04-tool-call/" },
+  { label: "5 · MCP tools & widgets", href: "/tutorials/chat/05-mcp/" },
+  { label: "6 · Live streaming", href: "/tutorials/chat/06-live-streaming/" }
 ] }) }}
 
 ## What you will build
@@ -167,22 +169,10 @@ Models call a tool only when the description makes it obviously relevant. Sharpe
 
 ## What you built
 
-A complete durable AI chat: a scaffolded workspace, an `authorize`-gated session route that
-streams a model turn and persists it, a copied fresh-ui chat UI seeded from
-`resolveChatSnapshot`, and one server-side tool whose call and citations render as a durable
-tool-call card. Every part of that transcript — messages, streamed markdown, and the tool
-card — survives a reload, because it lives in the durable session rather than the browser.
+A server-side tool the model can call, wired into the same `authorize`-gated turn: its
+invocation and citations render as a durable `tool-call-card`, and because the tool runs on
+the server its result is captured in the durable transcript — so the card survives a reload
+exactly like the messages around it. Next you reach past your own code: chapter 5 connects
+the chat to a remote MCP server and renders the `ui://` widgets its tools return.
 
-Where to go next:
-
-- Reach for the seams directly with the [Build a durable chat](/how-to/build-a-durable-chat/)
-  recipe.
-- Restyle any chat component — you own the copied source:
-  [Customize Fresh UI](/how-to/customize-fresh-ui/).
-- The list/board/table live-data plane is a different tool:
-  [Publish a durable stream](/how-to/publish-a-durable-stream/).
-- Compose the provider-neutral engine — model registry, agent loop, tool registry, MCP
-  transports: [AI engine](/ai/engine/).
-- Look up exact signatures in the [fresh reference](/reference/fresh/).
-
-{{ comp.nextPrev({ prev: { label: "3 · Chat UI", href: "/tutorials/chat/03-chat-ui/" }, next: { label: "Tutorials", href: "/tutorials/" } }) }}
+{{ comp.nextPrev({ prev: { label: "3 · Chat UI", href: "/tutorials/chat/03-chat-ui/" }, next: { label: "5 · MCP tools & widgets", href: "/tutorials/chat/05-mcp/" } }) }}

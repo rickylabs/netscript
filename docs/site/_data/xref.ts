@@ -157,11 +157,13 @@ export const xref: Record<string, XrefTarget> = {
   "tut:live-dashboard/04": { href: "/tutorials/live-dashboard/04-definePage-QueryIsland/", label: "Live Dashboard - Definepage Queryisland" },
   "tut:live-dashboard/05": { href: "/tutorials/live-dashboard/05-live-stream/", label: "Live Dashboard - Live Stream" },
   "tut:live-dashboard/06": { href: "/tutorials/live-dashboard/06-deploy/", label: "Live Dashboard - Deploy" },
-  "tut:eis-chat": { href: "/tutorials/eis-chat/", label: "Mini eis-chat" },
-  "tut:eis-chat/01": { href: "/tutorials/eis-chat/01-scaffold/", label: "Mini eis-chat - Scaffold" },
-  "tut:eis-chat/02": { href: "/tutorials/eis-chat/02-message-contract/", label: "Mini eis-chat - Message Contract" },
-  "tut:eis-chat/03": { href: "/tutorials/eis-chat/03-deliver-worker/", label: "Mini eis-chat - Delivery Worker" },
-  "tut:eis-chat/04": { href: "/tutorials/eis-chat/04-live-stream/", label: "Mini eis-chat - Live Stream" },
+  "tut:chat": { href: "/tutorials/chat/", label: "AI Chat" },
+  "tut:chat/01": { href: "/tutorials/chat/01-scaffold/", label: "AI Chat - Scaffold" },
+  "tut:chat/02": { href: "/tutorials/chat/02-durable-chat-route/", label: "AI Chat - Durable Chat Route" },
+  "tut:chat/03": { href: "/tutorials/chat/03-chat-ui/", label: "AI Chat - Chat UI" },
+  "tut:chat/04": { href: "/tutorials/chat/04-tool-call/", label: "AI Chat - Tool Call" },
+  "tut:chat/05": { href: "/tutorials/chat/05-mcp/", label: "AI Chat - MCP Tools & Widgets" },
+  "tut:chat/06": { href: "/tutorials/chat/06-live-streaming/", label: "AI Chat - Live Streaming" },
 
   // ─── Explanation essays (explain:) ─────────────────────────────────────────
   "explain:index": { href: "/explanation/", label: "Explanation" },

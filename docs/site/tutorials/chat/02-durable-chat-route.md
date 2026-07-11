@@ -18,7 +18,9 @@ is durable.
   { label: "1 · Scaffold", href: "/tutorials/chat/01-scaffold/" },
   { label: "2 · Durable chat route", href: "/tutorials/chat/02-durable-chat-route/" },
   { label: "3 · Chat UI", href: "/tutorials/chat/03-chat-ui/" },
-  { label: "4 · Server-side tool call", href: "/tutorials/chat/04-tool-call/" }
+  { label: "4 · Server-side tool call", href: "/tutorials/chat/04-tool-call/" },
+  { label: "5 · MCP tools & widgets", href: "/tutorials/chat/05-mcp/" },
+  { label: "6 · Live streaming", href: "/tutorials/chat/06-live-streaming/" }
 ] }) }}
 
 ## The four seams
@@ -157,7 +159,11 @@ A provider error (bad or missing <code>ANTHROPIC_API_KEY</code>) surfaces <em>in
 ## What you built
 
 The durable backend: a session route that runs a model turn and persists it behind a
-required `authorize` gate, and the one proxy the browser reads through. Next you give it a
-face — copy the fresh-ui chat components and hydrate an island.
+required `authorize` gate, and the one proxy the browser reads through. Notice the
+discipline underneath — one agreed message shape (`NetScriptChatMessage`) flows through the
+route, and the turn is written to the durable session *before* anyone renders it, so an
+accepted reply survives the request that produced it. That "durable delivery" spine is what
+every later chapter builds on. Next you give it a face — copy the fresh-ui chat components
+and hydrate an island.
 
 {{ comp.nextPrev({ prev: { label: "1 · Scaffold", href: "/tutorials/chat/01-scaffold/" }, next: { label: "3 · Chat UI", href: "/tutorials/chat/03-chat-ui/" } }) }}

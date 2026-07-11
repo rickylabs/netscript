@@ -18,7 +18,9 @@ settle.
   { label: "1 · Scaffold", href: "/tutorials/chat/01-scaffold/" },
   { label: "2 · Durable chat route", href: "/tutorials/chat/02-durable-chat-route/" },
   { label: "3 · Chat UI", href: "/tutorials/chat/03-chat-ui/" },
-  { label: "4 · Server-side tool call", href: "/tutorials/chat/04-tool-call/" }
+  { label: "4 · Server-side tool call", href: "/tutorials/chat/04-tool-call/" },
+  { label: "5 · MCP tools & widgets", href: "/tutorials/chat/05-mcp/" },
+  { label: "6 · Live streaming", href: "/tutorials/chat/06-live-streaming/" }
 ] }) }}
 
 ## Step 1 — Copy the AI component collection
@@ -143,7 +145,7 @@ connection's `close` / `stop` / `dispose` are one idempotent teardown — call
 `connection.dispose()` when the island unmounts so no subscription leaks.
 
 {{ comp callout { type: "note", title: "Live streaming vs settle-then-render" } }}
-This island re-materializes each turn once it <strong>settles</strong>, which keeps the code mechanical and correct. The connection also exposes <code>subscribe(signal)</code> for token-by-token live chunks; folding those chunks incrementally is the job of the FB2 live island reducer landing alongside the durable-chat plane. Reload durability — the headline feature — is fully in hand either way.
+This island re-materializes each turn once it <strong>settles</strong>, which keeps the code mechanical and correct — and reload durability, the headline feature, is fully in hand this way. The connection also exposes <code>subscribe(signal)</code> for token-by-token live chunks; <a href="/tutorials/chat/06-live-streaming/">chapter 6</a> upgrades this island to that live subscription so replies stream in as they arrive.
 {{ /comp }}
 
 ## Step 4 — Rich blocks with chat-render
