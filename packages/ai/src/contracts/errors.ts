@@ -39,6 +39,21 @@ export class AiNotConfiguredError extends AiError {
   }
 }
 
+/** Raised when a provider rejects an obsolete or invalid model-options shape. */
+export class InvalidModelOptionsError extends AiError {
+  /** Provider whose model-options contract rejected the bag. */
+  readonly provider: string;
+  /** HTTP-equivalent status for API edges exposing this typed error. */
+  readonly statusCode: 400 = 400;
+
+  /** Construct a bad-request error for a provider-specific options problem. */
+  constructor(provider: string, detail: string) {
+    super(`Invalid ${provider} model options: ${detail}`);
+    this.name = 'InvalidModelOptionsError';
+    this.provider = provider;
+  }
+}
+
 /**
  * Raised when a model provider id cannot be resolved from the registry. The
  * remedy is almost always to import the provider package, which self-registers
