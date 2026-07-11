@@ -1,10 +1,49 @@
 import { assertEquals } from 'jsr:@std/assert@^1';
 import {
   coordinateVersionBump,
+  createReleasePullRequest,
   findVersionResidue,
   parseArgs,
   validateNewerVersion,
 } from './cut.ts';
+
+Deno.test('release cut creates its PR through the injected GitHub transport', async () => {
+  let request: { method: string; path: string; token: string; body?: unknown } | undefined;
+  const created = await createReleasePullRequest('0.0.1-beta.8', 'generated body', {
+    resolveToken: () => Promise.resolve({ token: 'secret-token', source: 'test' }),
+    request: (method, path, token, body) => {
+      request = { method, path, token, body };
+      return Promise.resolve({
+        ok: true,
+        status: 201,
+        body: { html_url: 'https://github.com/rickylabs/netscript/pull/999' },
+      });
+    },
+  });
+
+  assertEquals(created, true);
+  assertEquals(request, {
+    method: 'POST',
+    path: '/repos/rickylabs/netscript/pulls',
+    token: 'secret-token',
+    body: {
+      title: 'chore(release): cut 0.0.1-beta.8',
+      head: 'release/cut-0.0.1-beta.8',
+      base: 'main',
+      body: 'generated body',
+    },
+  });
+});
+
+Deno.test('release cut leaves PR creation failure non-fatal', async () => {
+  const created = await createReleasePullRequest('0.0.1-beta.8', 'generated body', {
+    resolveToken: () => Promise.resolve({ token: 'secret-token', source: 'test' }),
+    request: () =>
+      Promise.resolve({ ok: false, status: 422, body: { message: 'validation failed' } }),
+  });
+
+  assertEquals(created, false);
+});
 
 Deno.test('release cut bump coordinator updates root members and lock with no residue', async () => {
   const temp = await Deno.makeTempDir({ prefix: 'netscript-release-cut-' });
