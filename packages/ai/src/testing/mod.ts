@@ -21,3 +21,11 @@ export {
   type FakeTelemetryPort,
   type RecordedTelemetry,
 } from './fakes.ts';
+export {
+  DEFAULT_RETRIEVAL_ALPHA,
+  DEFAULT_RETRIEVAL_OVERFETCH_FACTOR,
+  DEFAULT_RETRIEVAL_TITLE_BOOST,
+  InMemoryRetriever,
+  type InMemoryRetrieverDocument,
+  type InMemoryRetrieverOptions,
+} from '../adapters/in-memory-retriever.adapter.ts';
