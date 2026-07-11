@@ -40,6 +40,12 @@
   beta.7 checks **clean**. e2e-cli-prod run 29152236349 in progress.
 - Board triage comment posted on #601 (awaiting owner). Codex slices launched: #599, #433, #606
   (threads pending in codex-thread-ids.md).
+- 2026-07-11 ~15:00 — merge wave: #626→#599 ✓, #628→#433 ✓ (docs lane unblocked), #629→#605 ✓,
+  #630→#604 ✓, #631 (prod dup-flag hotfix) ✓; `status:shipped` applied to closed issues.
+  e2e-cli-prod re-dispatched with published-version=0.0.1-beta.7 (watcher armed). #627 conflicted
+  post-#631 → ns-wt-606 thread steered to rebase. #603 + #607 Codex slices launched. SIX Claude
+  docs agents authoring tutorial tracks #434–#439 in isolated worktrees (branches
+  docs/43X-tutorial-*). Positioning wave #440–#448 queued after tutorial wave lands.
 - 2026-07-11 ~14:40 — slices #599/#433/#606 completed first turns → draft PRs #626/#627/#628
   (labeled, milestone 9). Slices #604/#605 running. **e2e-cli-prod run 29152236349 FAILED**
   (`runtime.wait.workers-api`); local repro on preserved project found root cause:
