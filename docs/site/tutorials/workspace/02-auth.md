@@ -8,11 +8,16 @@ next: { label: "3 · Workspace data", href: "/tutorials/workspace/03-workspace-d
 
 # Add auth and a session
 
-You have a running workspace, but anyone can hit it. This chapter gives it an identity layer: you add
-the official `auth` plugin, choose an authentication **backend**, run its database migration, and
-verify a live **session** through the `auth-api` service on `:8094`. The lesson underneath the steps:
-**auth in NetScript is a pluggable backend plus a session** — you pick the backend with one
-environment variable, and the contract is identical no matter which one you pick.
+You have a running workspace, but anyone can hit it — and for the app this track is building, that
+is not a cosmetic gap. A team workspace exists to hold things the whole internet must not read:
+member lists, project records, the operational context a team accumulates while something is on
+fire. Before any of that data lands (chapter 3), the app needs to answer one question reliably:
+*who is this?* This chapter gives it that identity layer: you add the official `auth` plugin, choose
+an authentication **backend**, run its database migration, and verify a live **session** through the
+`auth-api` service on `:8094`. The lesson underneath the steps: **auth in NetScript is a pluggable
+backend plus a session** — you pick the backend with one environment variable, and the contract is
+identical no matter which one you pick. Swapping providers later is a config change, not a rewrite
+you carry through every route.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/workspace/01-scaffold/" },
@@ -250,8 +255,9 @@ credentials — the fallback is a stub path, not a working login.
 
 Your workspace now has an identity layer: the `auth` plugin composed onto the interactive `kv-oauth`
 backend, the `auth.prisma` migration applied, and the `auth-api` service answering on `:8094` with the
-five-route contract. You proved the session endpoints are wired. Next you give the workspace its own
-data to protect — a separate database for workspace records.
+five-route contract. You proved the session endpoints are wired — the app can now tell a signed-in
+team member from a stranger. Next you give it something worth protecting: its own isolated database
+for team records.
 
 {{ comp.nextPrev({ prev: { label: "1 · Scaffold", href: "/tutorials/workspace/01-scaffold/" }, next: { label: "3 · Workspace data", href: "/tutorials/workspace/03-workspace-data/" } }) }}
 </content>

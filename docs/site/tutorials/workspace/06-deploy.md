@@ -8,9 +8,11 @@ next: { label: "How-to guides", href: "/how-to/" }
 
 # Deploy locally
 
-You have built every layer: scaffold, auth, workspace data, a provisioning job, and route guards. This
-final chapter runs the whole thing as one coherent system. A single `aspire start` stands up Postgres,
-the Redis cache, your `workspace` service, the `auth-api` service on `:8094`, the Workers API on
+You have built every layer of the team workspace: scaffold, an identity layer, isolated team data, a
+provisioning job that never blocks the caller, and routes that fail closed. This final chapter runs
+the whole thing as one coherent system — the point where the app stops being a set of chapters and
+becomes something a team could actually sit inside. A single `aspire start` stands up Postgres, the
+Redis cache, your `workspace` service, the `auth-api` service on `:8094`, the Workers API on
 `:8091`, and every background processor — all wired together and visible in one dashboard. It is the
 **local** story, and this chapter is precise about exactly that: a complete observable stack on one
 machine, not a production deployer.
@@ -166,9 +168,10 @@ ranges. A stale prior run holding a port blocks boot.</li>
 The complete authenticated team-workspace backend, running locally as one orchestrated system:
 Postgres, an isolated workspace database, Redis, the guarded `workspace` service, the `auth-api`
 service on `:8094`, and the Workers API and its processor — all in one Aspire resource graph,
-observable from one dashboard. You walked the whole arc: a pluggable auth backend, a session, workspace
-data, off-path provisioning, and a real route-authz seam — single-tenant by design, with org scoping an
-explicit app-level extension.
+observable from one dashboard. You walked the whole arc: a pluggable auth backend, a session, team
+data on its own catalog datasource, off-path provisioning, and a route-authz seam that fails closed —
+single-tenant by design, with org scoping an explicit app-level extension. The off-boarded contractor
+gets a `401`; the engineer you paged gets provisioned without anyone waiting on the write.
 
 ## Where to go next
 

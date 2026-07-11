@@ -8,10 +8,15 @@ next: { label: "5 · Route authz", href: "/tutorials/workspace/05-route-authz/" 
 
 # Provision with a background job
 
-Provisioning a new member is real work — write a membership row, maybe warm a cache, maybe send a
-welcome email. None of it should block the request that triggered it. This chapter moves that work off
-the request path: you add the **workers** plugin and author a `defineJobHandler` job that provisions a
-member into the workspace database from chapter 3, then trigger it over the Workers API on `:8091`.
+Think about when a team actually adds a member. Often it is the worst possible moment: something is
+broken, and the one person who understands the failing subsystem is not in the workspace yet. The
+admin who pages them should get an instant "done" — not sit on a request that is writing a
+membership row, warming a cache, and sending a welcome email before it answers. Provisioning is real
+work, and none of it should block the request that triggered it. This chapter moves that work off
+the request path: you add the **workers** plugin and author a `defineJobHandler` job that provisions
+a member into the workspace database from chapter 3, then trigger it over the Workers API on
+`:8091`. This is the same background-work seam a real NetScript app leans on — eis-chat runs its
+embedding and vision jobs through the same `workers` plugin.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/workspace/01-scaffold/" },
@@ -232,9 +237,10 @@ resource. Start <code>aspire start</code> from <code>aspire/</code> and retry.</
 ## What you built
 
 A `provision-member` background job that writes a workspace membership off the request path, triggered
-over the Workers API on `:8091` and observable in the Aspire dashboard. Provisioning no longer blocks
-the caller. Next you close the loop: protect your service routes so only authenticated callers can
-reach them.
+over the Workers API on `:8091` and observable in the Aspire dashboard. The caller gets an instant
+acknowledgment; the membership write happens reliably in the background. One gap remains, and it is
+the serious one: the `workspace` service itself still answers anyone who asks. Next you close the
+loop and make its routes fail closed.
 
 {{ comp.nextPrev({ prev: { label: "3 · Workspace data", href: "/tutorials/workspace/03-workspace-data/" }, next: { label: "5 · Route authz", href: "/tutorials/workspace/05-route-authz/" } }) }}
 </content>
