@@ -8,6 +8,11 @@ next: { label: "Runtime configuration", href: "/orchestration-runtime/runtime-co
 
 # Polyglot tasks
 
+**Keep the script, gain the runtime.** A working Python, .NET, or shell step becomes a
+queued, retried, traced unit of work by declaring it with `defineTask` — the script itself
+does not change, and nothing about your platform has to stop being TypeScript for one step
+that is not.
+
 A **polyglot task** runs non-TypeScript work — a Python script, a .NET program, a
 shell or PowerShell script, or any executable — as a **managed subprocess** spawned by the
 worker runtime. NetScript hands the task its input as command-line arguments and
@@ -17,6 +22,14 @@ escape hatch for the moments your platform is otherwise all-TypeScript: an ML mo
 Python, a legacy .NET DLL, a system `pwsh` script. {{ comp.badge({ status: "alpha" }) }}
 
 {{ comp.diagram({ src: "/assets/diagrams/polyglot-task-execution.svg", alt: "The worker runtime resolves a TaskDefinition to a runtime adapter, which builds an argv and spawns a python/node/dotnet subprocess; input flows in as args and env, the subprocess streams stdout/stderr back, and the last JSON line of stdout becomes the structured result returned to the queue and database.", caption: "A task is dispatched to a runtime adapter that spawns a subprocess. Input arrives as argv + env; the last JSON line of stdout is parsed into the result; the exit code, captured logs, and duration become a TaskResult." }) }}
+
+The typical story is an import pipeline with one step that already exists in another
+language: a legacy-data transform owned by a Python script, say, sitting in the middle of
+an otherwise-TypeScript flow. Rewriting it buys nothing; running it ad hoc loses the
+queue, retry, and trace behavior every other step has. Declaring it as a task resolves
+that tension — the [ERP Sync tutorial](/tutorials/erp-sync/03-polyglot-transform/) walks
+exactly this step, and trace context is injected into the subprocess environment so the
+Python span stitches into the same trace as the TypeScript steps around it.
 
 ## What it is
 
