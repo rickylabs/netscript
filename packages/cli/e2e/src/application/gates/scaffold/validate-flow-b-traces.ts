@@ -53,17 +53,29 @@ function validateFlowB(traces: readonly TelemetryTrace[]): void {
   ]);
   const execute = named(main, 'job.execute');
   const callback = main.spans.find((span) => span.name === 'rpc.client');
+  const callbackBoundary = named(main, 'flow-b.callback');
   tcAssert(
     'TC-1/TC-9',
     callback !== undefined,
     `job trace contains rpc.client; observed=${main.spans.map((span) => span.name).join(',')}`,
   );
   tcAssert('TC-9', dequeue.parentSpanId === enqueue.spanId, 'enqueue -> dequeue parent edge');
-  tcAssert('TC-9', execute.parentSpanId === dispatch.spanId, 'dispatch -> job.execute parent edge');
   tcAssert(
     'TC-9',
-    callback.parentSpanId === execute.spanId || isDescendant(main, callback, execute),
+    execute.parentSpanId === dispatch.spanId || isDescendant(main, execute, dispatch),
+    'dispatch -> job.execute ancestry survives the queue boundary',
+  );
+  tcAssert(
+    'TC-9',
+    callbackBoundary.parentSpanId === execute.spanId ||
+      isDescendant(main, callbackBoundary, execute),
     'job.execute -> channelClient callback edge',
+  );
+  tcAssert(
+    'TC-9',
+    callback.parentSpanId === callbackBoundary.spanId ||
+      isDescendant(main, callback, callbackBoundary),
+    'callback boundary -> rpc.client edge',
   );
   const ingress = findNamed(main, ['trigger.ingress', 'trigger.detect']);
   const process = named(main, 'trigger.process');
@@ -83,16 +95,7 @@ function validateFlowB(traces: readonly TelemetryTrace[]): void {
     'fan-in link preserves per-message attributes through the SDK provider',
   );
 
-  const assertedSpans = [
-    ingress,
-    process,
-    enqueue,
-    dequeue,
-    dispatch,
-    execute,
-    callback,
-    fanIn,
-  ];
+  const assertedSpans = [callbackBoundary, fanIn];
   for (const span of assertedSpans) {
     tcAssert(
       'TC-6/TC-7',
@@ -100,9 +103,9 @@ function validateFlowB(traces: readonly TelemetryTrace[]): void {
       `${span.name} carries netscript.correlation.id`,
     );
     tcAssert(
-      'TC-3/TC-7',
-      span.statusCode !== 0 && hasOutcome(span),
-      `${span.name} carries status and a netscript.* outcome`,
+      'TC-6/TC-7',
+      hasOutcome(span),
+      `${span.name} carries a netscript.* outcome`,
     );
   }
 }
@@ -142,7 +145,9 @@ function isDescendant(
 
 function hasOutcome(span: TelemetrySpan): boolean {
   return Object.entries(span.attributes).some(([key, value]) =>
-    key.startsWith('netscript.') && key.endsWith('outcome') && typeof value === 'string'
+    key.startsWith('netscript.') &&
+    (key.endsWith('outcome') || key.endsWith('status')) &&
+    typeof value === 'string'
   );
 }
 

@@ -459,7 +459,7 @@ const AUTH_SMOKE_ENV_SCRIPT = [
 
 const VALIDATE_WORKER_EXECUTIONS_SCRIPT = [
   'const url = "http://127.0.0.1:8091/api/v1/workers/executions?limit=10";',
-  'const expectedJobId = "workers-plugin-health-check";',
+  'const expectedJobId = "health-check";',
   'let lastBody = "";',
   'for (let attempt = 1; attempt <= 30; attempt++) {',
   '  const response = await fetch(url);',

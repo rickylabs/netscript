@@ -1,5 +1,5 @@
 import { createStreamsInstrumentation } from '@netscript/plugin-streams-core/telemetry';
-import { trace } from 'npm:@opentelemetry/api@^1.9.0';
+import { SpanStatusCode, trace } from 'npm:@opentelemetry/api@^1.9.0';
 import {
   BasicTracerProvider,
   type ReadableSpan,
@@ -78,6 +78,7 @@ try {
   });
   span.setAttribute('netscript.correlation.id', messages[0]?.correlationId ?? 'flow-b-e2e');
   span.setAttribute('netscript.stream.outcome', 'success');
+  span.setStatus({ code: SpanStatusCode.OK });
   span.end();
   await provider.forceFlush?.();
   console.info(`Flow-B real stream consumer linked ${messages.length} message(s)`);
