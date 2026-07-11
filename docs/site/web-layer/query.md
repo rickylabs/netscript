@@ -123,18 +123,61 @@ through the shared client; its options come from `IslandQueryOptions`:
 The hook returns an `IslandQueryResult` with `data`, `error`, `status`,
 `isLoading`, `isSuccess`, `isError`, and a `refetch()` method.
 
-```tsx
-import { QueryIsland, useIslandQuery } from "@netscript/fresh/query";
+### From contract to island: the typed query chain
 
-interface Widget {
-  id: string;
-  name: string;
-}
+`queryFn` can be any function that returns data — but on a NetScript service it
+should almost never be a hand-written `fetch`. A raw `fetch("/api/widgets")`
+re-types the response by hand, hardcodes the path, and drifts silently the moment
+the service changes. The [`@netscript/sdk`](/services-sdk/sdk/) bridge removes
+that gap: derive the `queryFn` (and its `queryKey`) straight from the same oRPC
+contract the service implements, so the island cannot drift from the API.
+
+The chain has three links, and it lives in **one module** per app — the single
+source of typed clients every loader and island imports:
+
+```ts
+// apps/dashboard/lib/api-clients.ts
+import { createServiceClient } from "@netscript/sdk/client";
+import { createServiceQueryUtils } from "@netscript/sdk/query-client";
+import { docsContract, todosContract, widgetsContract } from "@contracts";
+
+// 1. A typed client per service. `serviceName` resolves a URL via Aspire
+//    discovery; the contract drives every method signature.
+export const widgetsClient = createServiceClient<typeof widgetsContract>({
+  contract: widgetsContract,
+  serviceName: "widgets",
+});
+export const docsClient = createServiceClient<typeof docsContract>({
+  contract: docsContract,
+  serviceName: "docs",
+});
+export const todosClient = createServiceClient<typeof todosContract>({
+  contract: todosContract,
+  serviceName: "todos",
+});
+
+// 2. Frontend query utils per client. Each exposes `.queryOptions()`,
+//    `.mutationOptions()`, `.infiniteOptions()`, and `.key()` for every
+//    procedure on the contract — all inferred, no manual annotations.
+export const widgets = createServiceQueryUtils(widgetsClient, { path: ["widgets"] });
+export const docs = createServiceQueryUtils(docsClient, { path: ["docs"] });
+export const todos = createServiceQueryUtils(todosClient, { path: ["todos"] });
+```
+
+Islands then import from that module and spread the generated options into the
+island hooks. `queryOptions({ input })` supplies both the `queryKey` and a
+`queryFn` bound to the contract, so the hook call only adds island concerns like
+`staleTime`:
+
+```tsx
+// apps/dashboard/islands/WidgetIsland.tsx
+import { QueryIsland, useIslandQuery } from "@netscript/fresh/query";
+import { widgets } from "../lib/api-clients.ts";
 
 function WidgetView() {
-  const query = useIslandQuery<Widget[]>({
-    queryKey: ["widgets"],
-    queryFn: () => fetch("/api/widgets").then((res) => res.json()),
+  // queryKey + queryFn come from the contract; the input is typed, too.
+  const query = useIslandQuery({
+    ...widgets.list.queryOptions({ input: {} }),
     staleTime: 30_000,
   });
 
@@ -157,6 +200,14 @@ export default function WidgetIsland() {
 }
 ```
 
+`widgets.list.queryOptions(...)` returns a typed `{ queryKey, queryFn }`; the
+`widget` element is inferred from the contract's output, so a renamed field is a
+compile error, not a runtime surprise. The `@netscript/sdk/query-client` bridge
+(`createServiceQueryUtils`) is the pure client-to-island path; when you also want
+KV-backed server SWR and prefetch, `createQueryFactories` from the SDK adds a
+cache-first layer over the same contract — see the
+[Typed SDK & client](/services-sdk/sdk/) pillar for that variant.
+
 `initialData` is the bridge between a server loader and the island: pass the
 loader's cached payload as `initialData` so the island renders with data
 immediately and only refetches once `staleTime` elapses.
@@ -171,17 +222,13 @@ continue while the tab is backgrounded (the default stops polling on blur).
 
 ```tsx
 import { useIslandQuery } from "@netscript/fresh/query";
-
-interface Doc {
-  id: string;
-  status: "pending" | "embedding" | "ready";
-}
+import { docs } from "../lib/api-clients.ts";
 
 function DocStatus({ id }: { id: string }) {
-  const query = useIslandQuery<Doc>({
-    queryKey: ["doc", id],
-    queryFn: () => fetch(`/api/docs/${id}`).then((res) => res.json()),
-    // Poll every 2s until ready, then stop by returning false.
+  const query = useIslandQuery({
+    // Contract-derived queryKey + queryFn; `id` is the typed procedure input.
+    ...docs.getById.queryOptions({ input: { id } }),
+    // Poll every 2s; flip to false from state once the status reaches "ready".
     refetchInterval: 2_000,
     refetchIntervalInBackground: true,
   });
@@ -227,11 +274,13 @@ the cached list and returns it as context, `onError` restores that snapshot, and
 `onSettled` re-syncs with the server:
 
 ```tsx
+// apps/dashboard/islands/TodoIsland.tsx
 import {
   QueryIsland,
   useIslandMutation,
   useQueryClient,
 } from "@netscript/fresh/query";
+import { todos } from "../lib/api-clients.ts";
 
 interface Todo {
   id: string;
@@ -241,40 +290,42 @@ interface Todo {
 
 function TodoToggle({ todo }: { todo: Todo }) {
   const queryClient = useQueryClient();
+  const listKey = todos.list.queryKey({ input: {} });
 
-  const toggle = useIslandMutation<Todo, Error, boolean, { previous?: Todo[] }>({
-    // 1. The round-trip: PATCH the change and return the server's copy.
-    mutationFn: (done) =>
-      fetch(`/api/todos/${todo.id}`, {
-        method: "PATCH",
-        body: JSON.stringify({ done }),
-      }).then((res) => res.json() as Promise<Todo>),
+  const toggle = useIslandMutation({
+    // 1. The round-trip: mutationOptions() supplies the contract-bound
+    //    mutationFn and mutationKey; `mutate` takes the typed procedure input.
+    ...todos.update.mutationOptions(),
 
     // 2. Optimistic update: snapshot prior state, write the expected next state.
-    onMutate: async (done) => {
-      await queryClient.cancelQueries({ queryKey: ["todos"] });
-      const previous = queryClient.getQueryData<Todo[]>(["todos"]);
+    onMutate: async (variables: { id: string; done: boolean }) => {
+      await queryClient.cancelQueries({ queryKey: listKey });
+      const previous = queryClient.getQueryData<Todo[]>(listKey);
       queryClient.setQueryData<Todo[]>(
-        ["todos"],
-        (list) => (list ?? []).map((item) => item.id === todo.id ? { ...item, done } : item),
+        listKey,
+        (list) =>
+          (list ?? []).map((item) =>
+            item.id === variables.id ? { ...item, done: variables.done } : item
+          ),
       );
       return { previous };
     },
 
     // 3. Roll back to the snapshot when the server rejects the change.
-    onError: (_error, _done, context) => {
-      if (context?.previous) queryClient.setQueryData(["todos"], context.previous);
+    onError: (_error, _variables, context) => {
+      const snapshot = context as { previous?: Todo[] } | undefined;
+      if (snapshot?.previous) queryClient.setQueryData(listKey, snapshot.previous);
     },
 
     // 4. Re-sync with the server once the mutation settles, either way.
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ["todos"] }),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: listKey }),
   });
 
   return (
     <button
       type="button"
       disabled={toggle.isPending}
-      onClick={() => toggle.mutate(!todo.done)}
+      onClick={() => toggle.mutate({ id: todo.id, done: !todo.done })}
     >
       {todo.done ? "Mark undone" : "Mark done"}
     </button>
@@ -290,11 +341,50 @@ export default function TodoIsland({ todo }: { todo: Todo }) {
 }
 ```
 
-The four generic parameters mirror
-`IslandMutationOptions<TData, TError, TVariables, TContext>`: here `TData` is the
-server's `Todo`, `TVariables` is the `boolean` passed to `mutate`, and `TContext` is
-the snapshot threaded from `onMutate` into `onError` and `onSettled`. Call `mutate`
-for fire-and-forget UI updates, or `mutateAsync` when you need to await the result.
+Spreading `todos.update.mutationOptions()` supplies the contract-bound
+`mutationFn` and `mutationKey`; the optimistic seam — `onMutate`, `onError`,
+`onSettled` — is added on the island hook, exactly where the query cache lives.
+`mutate` takes the typed procedure input (`{ id, done }` here), and the
+`todos.list.queryKey({ input })` helper builds the same key the list query uses,
+so the snapshot, rollback, and invalidation all target the right cache entry.
+Call `mutate` for fire-and-forget UI updates, or `mutateAsync` when you need to
+await the result.
+
+### Endpoints without a NetScript contract
+
+Sometimes an island calls something that has no oRPC contract — a third-party
+REST API, a legacy endpoint, or a webhook receiver. That is the one case where a
+hand-written `queryFn` is correct: there is no contract to derive from, so you own
+the request and its type. Keep it explicit and isolated so it does not read as the
+default pattern:
+
+```tsx
+import { useIslandQuery } from "@netscript/fresh/query";
+
+interface Rate {
+  base: string;
+  value: number;
+}
+
+// No NetScript contract exists for this external endpoint, so the fetch and its
+// response type are written by hand — the deliberate exception, not the norm.
+function ExchangeRate() {
+  const query = useIslandQuery<Rate>({
+    queryKey: ["exchange-rate", "USD"],
+    queryFn: () =>
+      fetch("https://api.example.com/rates/USD").then(
+        (res) => res.json() as Promise<Rate>,
+      ),
+    staleTime: 60_000,
+  });
+
+  return <span>{query.data ? `1 ${query.data.base} = ${query.data.value}` : "…"}</span>;
+}
+```
+
+For any endpoint that *does* have a NetScript contract, reach for the typed chain
+above instead — the raw `fetch` here exists only because there is nothing typed to
+bind to.
 
 ## Server prefetch and hydration
 
@@ -362,6 +452,7 @@ Query subpath (`@netscript/fresh/query`):
 {{ comp.cardsGrid({ columns: 3, cards: [
   { title: "The Fresh page model", body: "How server pages compose and load.", href: "/web-layer/server/" },
   { title: "Routing and route contracts", body: "Route definitions and loaders.", href: "/web-layer/route/" },
+  { title: "Typed SDK & client", body: "The contract → client → query-utils bridge queryFn is built on.", href: "/services-sdk/sdk/" },
   { title: "Interactive islands", body: "Where query hooks run on the client.", href: "/web-layer/interactive/" },
   { title: "Deferred and streaming UI", body: "Stream data into hydrating islands.", href: "/web-layer/defer-streaming-ui/" },
   { title: "Server-validated forms", body: "Pair mutations with form handling.", href: "/web-layer/form/" },

@@ -47,9 +47,9 @@ hydrate that same query key on the client.
 
 ## Declare once, derived everywhere
 
-The classic data-layer tax is the hand-rolled fetch wrapper: a `lib/api.ts` full of `fetch()`
-calls whose request and response types are re-typed by hand from whatever the server currently
-returns. Every server change costs a second edit in the wrapper, a third in the query keys, and
+The classic data-layer tax is the [hand-rolled fetch wrapper](/web-layer/query/): a `lib/api.ts`
+full of `fetch()` calls whose request and response types are re-typed by hand from whatever the
+server currently returns. Every server change costs a second edit in the wrapper, a third in the query keys, and
 whichever one is forgotten becomes a runtime bug. For an AI agent working the codebase the tax is
 worse — each of those copies is a separate turn, and a stale one is a wrong answer the agent
 cannot see until runtime.
