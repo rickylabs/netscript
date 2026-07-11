@@ -19,6 +19,25 @@ export class AiError extends Error {
   }
 }
 
+/** Raised when a provider rate limit prevents an AI operation from completing. */
+export class AiRateLimitError extends AiError {
+  /** Server-requested delay before another attempt, in milliseconds. */
+  readonly retryAfterMs?: number;
+  /** Number of provider attempts made before this error escaped. */
+  readonly attempts: number;
+
+  /** Construct a rate-limit error with retry metadata and an optional cause. */
+  constructor(
+    message = 'AI provider rate limit exceeded.',
+    options: ErrorOptions & { readonly retryAfterMs?: number; readonly attempts?: number } = {},
+  ) {
+    super(message, options);
+    this.name = 'AiRateLimitError';
+    this.retryAfterMs = options.retryAfterMs;
+    this.attempts = options.attempts ?? 1;
+  }
+}
+
 /**
  * Raised when a capability port is invoked but no concrete adapter has been
  * wired for it (the default throwing ports raise this).
