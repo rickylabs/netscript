@@ -11,6 +11,8 @@ import { PluginWorkspaceMutator } from './workspace-mutator.ts';
 import type { PluginKindProvider } from '../../domain/plugin-kind.ts';
 import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
 import { SCAFFOLD_WORKSPACE_PACKAGES } from '../../constants/scaffold/scaffold-workspace-packages.ts';
+import { SCAFFOLD_PACKAGES } from '../../constants/scaffold/scaffold-packages.ts';
+import { resolveNetScriptImports } from '../scaffold/import-resolver.ts';
 
 const backgroundProvider: PluginKindProvider = {
   kind: 'background',
@@ -138,7 +140,66 @@ Deno.test('PluginWorkspaceMutator injects first-party plugin core imports into r
     config.imports['@netscript/plugin-auth-core/contracts/v1'],
     netscriptJsrSpecifier('plugin-auth-core', '/contracts/v1'),
   );
+  assertEquals(
+    config.imports[SCAFFOLD_PACKAGES.NETSCRIPT_SDK],
+    netscriptJsrSpecifier('sdk'),
+  );
+  assertEquals(
+    config.imports[SCAFFOLD_PACKAGES.NETSCRIPT_SDK_CLIENT],
+    netscriptJsrSpecifier('sdk', '/client'),
+  );
 });
+
+Deno.test('root-level scaffold NetScript imports resolve in both package-source modes', async () => {
+  // Scan the real root-owned worker sources plus the runtime E2E fixture that
+  // injects the generated service-client import into workers/jobs/health-check.ts.
+  const sourceUrls = [
+    ...await collectTypeScriptFiles(
+      new URL('../../../../../../plugins/workers/jobs', import.meta.url),
+    ),
+    ...await collectTypeScriptFiles(
+      new URL('../../../../../../plugins/workers/contracts', import.meta.url),
+    ),
+    new URL('../../../../../../packages/cli/e2e/src/application/gates/scaffold/prepare-flow-b-fixture.ts', import.meta.url),
+  ];
+  const specifierPattern = /(?:from|import)\s+['"](@netscript\/[^'"]+)['"]/g;
+  const rootLevelSpecifiers = new Set<string>();
+  for (const sourceUrl of sourceUrls) {
+    const source = await Deno.readTextFile(sourceUrl);
+    for (const match of source.matchAll(specifierPattern)) {
+      rootLevelSpecifiers.add(match[1]);
+    }
+  }
+  assert(
+    rootLevelSpecifiers.has(SCAFFOLD_PACKAGES.NETSCRIPT_SDK_CLIENT),
+    'expected the workers runtime fixture to emit @netscript/sdk/client',
+  );
+
+  for (const mode of ['jsr', 'local'] as const) {
+    const imports = resolveNetScriptImports(mode);
+    for (const specifier of [...rootLevelSpecifiers].sort()) {
+      const { pkg } = splitNetscriptSpecifier(specifier);
+      const rootAlias = `@netscript/${pkg}`;
+      assert(
+        imports[specifier] !== undefined || imports[rootAlias] !== undefined,
+        `Root-level scaffold import "${specifier}" is unresolved in ${mode} mode.`,
+      );
+    }
+  }
+});
+
+async function collectTypeScriptFiles(root: URL): Promise<URL[]> {
+  const files: URL[] = [];
+  for await (const entry of Deno.readDir(root)) {
+    const child = new URL(`${root.href}/${entry.name}`);
+    if (entry.isDirectory) {
+      files.push(...await collectTypeScriptFiles(child));
+    } else if (entry.isFile && entry.name.endsWith('.ts')) {
+      files.push(child);
+    }
+  }
+  return files;
+}
 
 Deno.test('PluginWorkspaceMutator registers background plugins with companion API service', async () => {
   const fs = new MemoryFileSystemAdapter();
