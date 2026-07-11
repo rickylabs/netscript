@@ -102,6 +102,7 @@
     "npm:@opentelemetry/context-async-hooks@^2.9.0": "2.9.0_@opentelemetry+api@1.9.1",
     "npm:@opentelemetry/core@^2.5.0": "2.8.0_@opentelemetry+api@1.9.1",
     "npm:@opentelemetry/sdk-trace-base@^2.5.0": "2.8.0_@opentelemetry+api@1.9.1",
+    "npm:@opentelemetry/semantic-conventions@1.41.1": "1.41.1",
     "npm:@opentelemetry/semantic-conventions@^1.28.0": "1.41.1",
     "npm:@opentelemetry/semantic-conventions@^1.39.0": "1.41.1",
     "npm:@orpc/client@1.14.6": "1.14.6_@opentelemetry+api@1.9.1",
@@ -3928,7 +3929,8 @@
         "dependencies": [
           "jsr:@hono/otel@^1.1.2",
           "jsr:@standard-schema/spec@1.1.0",
-          "jsr:@std/assert@1"
+          "jsr:@std/assert@1",
+          "npm:@opentelemetry/semantic-conventions@1.41.1"
         ],
         "packageJson": {
           "dependencies": [
