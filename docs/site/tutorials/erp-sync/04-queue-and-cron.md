@@ -9,7 +9,7 @@ next: { label: "5 · Deploy", href: "/tutorials/erp-sync/05-deploy/" }
 # Add a queue and a cron schedule
 
 Your [import job](/tutorials/erp-sync/02-import-job/) runs one file at a time. A migration does
-not: the day you backfill CSB with VIF's historical exports, twenty files land in the hand-off
+not: the day you backfill Dynamics with SAP's historical exports, twenty files land in the hand-off
 folder at once, and until cutover the two systems only stay aligned if a full re-sync runs every
 night whether or not a file arrived. This chapter adds the two pieces that make both durable: a
 **queue provider** and a worker **concurrency** so bursts drain in parallel, and a **cron
@@ -122,8 +122,8 @@ framework-side fix.
 
 ## Step 3 — Add a cron schedule
 
-Some migration work is time-driven, not file-driven: the nightly full re-sync that keeps CSB
-aligned with VIF until cutover, an hourly cleanup of stale staging files. That is a **scheduled trigger** —
+Some migration work is time-driven, not file-driven: the nightly full re-sync that keeps Dynamics
+aligned with SAP until cutover, an hourly cleanup of stale staging files. That is a **scheduled trigger** —
 `defineScheduledTrigger(handler, spec)` from
 `@netscript/plugin-triggers-core/builders`. Like the file-watch trigger, its handler returns an array
 of effects; here it enqueues a job on a cron cadence.
@@ -217,7 +217,7 @@ provider</a> for each backend's delivery semantics.
 
 ## What you built
 
-A workers config that names a queue provider and a worker concurrency so a VIF backfill burst
+A workers config that names a queue provider and a worker concurrency so a SAP backfill burst
 drains in parallel, and a `defineScheduledTrigger` cron that enqueues the nightly re-sync — plus
 the knowledge to set concurrency where it actually takes effect. The sync now absorbs bursts and
 runs its recurring work unattended. The last chapter runs the whole thing under Aspire.

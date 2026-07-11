@@ -8,10 +8,10 @@ next: { label: "2 · Import job", href: "/tutorials/erp-sync/02-import-job/" }
 
 # Scaffold the workspace
 
-This is the first chapter of the ERP Sync track — the service that keeps **CSB**, the ERP your
-team is migrating to, fed from the file exports of **VIF**, the legacy system that is still the
-system of record. Before you can watch VIF's file drops or run background jobs, you need a
-workspace with the right plugins installed and an orchestrator to run them. In this chapter you
+This is the first chapter of the ERP Sync track — the service that keeps **Microsoft Dynamics**,
+the ERP your team is migrating to, fed from the file exports of **SAP**, the legacy system that is
+still the system of record. Before you can watch the SAP file drops or run background jobs, you need
+a workspace with the right plugins installed and an orchestrator to run them. In this chapter you
 create `my-erp/`, add the **workers** and **triggers** plugins, and boot the whole stack under
 Aspire so the rest of the track has something real to build on.
 
@@ -209,6 +209,6 @@ give it a few seconds and retry.
 
 A real NetScript workspace, `my-erp/`, with the **workers** and **triggers** plugins installed and
 the whole stack — Postgres, Redis, both plugin APIs and their background processors — running under
-one `aspire start` and visible in the dashboard. Next, you give it VIF's first export to ingest.
+one `aspire start` and visible in the dashboard. Next, you give it the SAP export to ingest.
 
 {{ comp.nextPrev({ prev: { label: "ERP Sync", href: "/tutorials/erp-sync/" }, next: { label: "2 · Import job", href: "/tutorials/erp-sync/02-import-job/" } }) }}

@@ -8,7 +8,7 @@ next: { label: "How-to guides", href: "/how-to/" }
 
 # Run it locally under Aspire
 
-You have built the whole VIF→CSB sync: a file-watch import job, a sandboxed transform task, a
+You have built the whole SAP→Dynamics sync: a file-watch import job, a sandboxed transform task, a
 queue, and a cron schedule. This final chapter runs all of it together — workers,
 triggers, queue, and cron processors — on one machine under `aspire start`, and shows you how to read
 the running system from the dashboard. It is the **local** orchestration story: one command,
@@ -42,7 +42,7 @@ walkthrough lives in <a href="/how-to/deploy-local-aspire/">Deploy locally with 
 ## Before you begin
 
 You need the complete `my-erp/` workspace from [Chapter 4](/tutorials/erp-sync/04-queue-and-cron/):
-the workers and triggers plugins, the `import-products` job, the `normalize-vif` transform task,
+the workers and triggers plugins, the `import-products` job, the `normalize-sap` transform task,
 the `product-import-trigger` file watch, and the `daily-resync-schedule` cron. Docker must be
 running so Aspire can provision Postgres and
 Redis. Confirm the AppHost was scaffolded (it is a TypeScript/Node program, not C#):
@@ -117,11 +117,11 @@ no <code>netscript generate aspire</code> — the AppHost is produced by <code>n
 ## Step 4 — Watch the pipeline run end to end
 
 With the full stack up, exercise the pipeline you built and read it from the dashboard. Drop a
-file in VIF's export shape:
+file in the SAP export shape:
 
 ```sh
 cat > .data/incoming/products_live.csv <<'CSV'
-art_no,designation,price_centimes
+material_no,description,price_cents
 ANV-9,Anvil,4999
 CSV
 mv .data/incoming/products_live.csv .data/incoming/products/products_live.csv
@@ -186,8 +186,8 @@ OTLP <code>:4318</code>; a stale prior run holding a port blocks boot. Free it a
 
 ## What you built
 
-You ran the complete VIF→CSB sync — workers, triggers, queue, and cron — on one machine under a
-single `aspire start`, initialized the database through the running AppHost, and watched a VIF
+You ran the complete SAP→Dynamics sync — workers, triggers, queue, and cron — on one machine under a
+single `aspire start`, initialized the database through the running AppHost, and watched a SAP
 export flow into a durable job execution with its trace in the dashboard. You now have an
 end-to-end durable background-processing backend that could carry a real migration's parallel-run,
 and you know exactly where the local story ends and a production deployment begins.

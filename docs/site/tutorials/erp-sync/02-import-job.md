@@ -10,10 +10,11 @@ next: { label: "3 · Polyglot transform", href: "/tutorials/erp-sync/03-polyglot
 
 In [Chapter 1](/tutorials/erp-sync/01-scaffold/) you stood up `my-erp/` with the workers and
 triggers plugins running. Now you wire the first real piece of the pipeline: a **file-watch
-trigger** that fires the moment VIF's export job drops a CSV into the hand-off folder, and a
-durable **background job** that parses it. This is the ingest core of the migration — VIF cannot
-call an API, but it can write a file, and every file it writes must become durable background work.
-A file the watcher misses is a day of catalog changes CSB never sees; a file parsed twice is a day
+trigger** that fires the moment the SAP export job drops a CSV into the hand-off folder, and a
+durable **background job** that parses it. This is the ingest core of the migration — the SAP
+export reaches you as a file, not an API call, and every file it writes must become durable
+background work.
+A file the watcher misses is a day of catalog changes Dynamics never sees; a file parsed twice is a day
 counted twice. Both failure modes start here, so this chapter is where the pipeline earns the word
 *durable*.
 
@@ -62,7 +63,7 @@ watcher has something to attach to:
 mkdir -p .data/incoming/products
 ```
 
-This is just a local folder in your workspace. In production it would be the mounted share VIF's
+This is just a local folder in your workspace. In production it would be the mounted share the SAP
 nightly export job writes into; the trigger does not care where the bytes come from, only that a
 matching file appears.
 
@@ -207,12 +208,12 @@ hot-reload) so the workers runtime and the file-watch processor pick up the new 
 ## Verify your progress
 
 With Aspire up, drop a matching CSV into the watched folder and watch the pipeline run end to end.
-First create a sample file in VIF's export shape — legacy column names, prices in integer centimes
-(Chapter 3 transforms exactly this file into CSB's shape):
+First create a sample file in the SAP export shape — legacy column names, prices in integer cents
+(Chapter 3 transforms exactly this file into Dynamics' shape):
 
 ```sh
 cat > .data/incoming/products_2024.csv <<'CSV'
-art_no,designation,price_centimes
+material_no,description,price_cents
 WID-1,Widget,999
 GAD-2,Gadget,1999
 CSV
@@ -232,7 +233,7 @@ curl 'http://localhost:8091/api/v1/workers/executions?limit=10'
 
 Expected: the events feed lists a `product-import-trigger` event, and the executions feed shows a
 completed `import-products` run whose result is `{ "fileName": "products_2024.csv", "rowCount": 2,
-"headers": ["art_no","designation","price_centimes"] }`. Open the `workers` resource logs in the
+"headers": ["material_no","description","price_cents"] }`. Open the `workers` resource logs in the
 [Aspire dashboard](https://localhost:18888) to read the job's structured log lines.
 
 - [ ] `.data/incoming/products/` exists and you dropped a `products_*.csv` into it.
@@ -255,11 +256,11 @@ the directory in <code>paths</code>, not its parent.</li>
 
 ## What you built
 
-A file-watch trigger (`defineFileWatch`) that fires on every `products_*.csv` VIF drops into the
-hand-off folder, and a durable background job (`defineJobHandler`) that parses it — wired together
-by `enqueueJob` and made addressable with `netscript generate plugins`. An inbound VIF export now
-becomes durable background work with no HTTP in the loop. But the rows you just imported are still
-in VIF's legacy shape — column names CSB does not use and prices in centimes. Next, you build the
+A file-watch trigger (`defineFileWatch`) that fires on every `products_*.csv` the SAP export drops
+into the hand-off folder, and a durable background job (`defineJobHandler`) that parses it — wired
+together by `enqueueJob` and made addressable with `netscript generate plugins`. An inbound SAP
+export now becomes durable background work with no HTTP in the loop. But the rows you just imported
+are still in the legacy shape — column names Dynamics does not use and prices in cents. Next, you build the
 transform stage that fixes that, and run it.
 
 {{ comp.nextPrev({ prev: { label: "1 · Scaffold", href: "/tutorials/erp-sync/01-scaffold/" }, next: { label: "3 · Polyglot transform", href: "/tutorials/erp-sync/03-polyglot-transform/" } }) }}
