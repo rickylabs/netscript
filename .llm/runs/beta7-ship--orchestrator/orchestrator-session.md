@@ -89,3 +89,12 @@ beta.7 (#638 gap documented; fix on main ships next release), and **triage confi
 proposed** (10 strays → milestone 10 beta.8: #219 #238 #246 #269 #270 #290 #380 #460 #461 #389;
 2 → Backlog: #303 #307 — applied). Milestone 9 closed. #601 closed with completion summary
 (eval round 2 posted earlier). Run complete.
+
+## POST-CLOSE: release re-planning (owner-ratified, 2026-07-11 ~21:20)
+
+beta.8 (74 issues) split into 5 themed releases per owner amendments (PM gets its own beta.12;
+beta.11 desktop left room to grow): beta.8 AI+stabilization+docs-quality (24), beta.9 hardening
+(9), beta.10 dashboard (30), beta.11 desktop (8), beta.12 process-manager (35); stable gate (8);
+backlog (15). New issues: #659 C#-removal, #660 frontend typesafe overhaul, #661 MedusaJS-bar
+tutorials, #662 whole-site audit (Sonnet-high auditor running), #663/#664/#665 tooling fixes.
+Plan recorded on #301.
