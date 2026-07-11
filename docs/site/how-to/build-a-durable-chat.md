@@ -103,8 +103,8 @@ export const handler = {
 <code>toNetScriptChatResponse</code> only enforces access when you pass an <code>authorize</code> hook, and it applies <strong>no</strong> default. Without one, the session stream is unauthenticated. Supplying <code>authorize</code> without a <code>request</code> is a programming error and throws. Return <code>false</code> to deny — the response becomes <code>403 Forbidden</code> and the session stream is never touched.
 {{ /comp }}
 
-{{ comp callout { type: "note", title: "The @netscript/ai engine replaces this direct wiring in beta.2" } }}
-This recipe calls the model through <code>@tanstack/ai</code> + <code>@tanstack/ai-anthropic</code> directly, the same way the reference chat app wires it on shipped seams. The <code>@netscript/ai</code> engine (model registry, provider ports, agent loop) arrives in <code>0.0.1-beta.2</code> and will own this model-call layer behind <code>import '@netscript/ai/anthropic'</code>. It is <code>publish:false</code> today — do not <code>deno add jsr:@netscript/ai</code> yet.
+{{ comp callout { type: "note", title: "The @netscript/ai engine is published — this recipe still shows the direct wiring" } }}
+This recipe calls the model through <code>@tanstack/ai</code> + <code>@tanstack/ai-anthropic</code> directly, the same way the reference chat app wires it on shipped seams. The <code>@netscript/ai</code> engine (model registry, provider ports, agent loop) is published on JSR as of <code>0.0.1-beta.7</code> (<code>deno add jsr:@netscript/ai</code>) and can own this model-call layer behind <code>import '@netscript/ai/anthropic'</code> — see the <a href="/ai/engine/">AI engine</a> page. The direct wiring below remains a valid, dependency-light path.
 {{ /comp }}
 
 ## 2. The one stream proxy
