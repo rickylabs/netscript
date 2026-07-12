@@ -4,6 +4,7 @@ import {
   DEFAULT_CLI_COMMAND,
   SpawnCommandExecutor,
 } from '../src/infrastructure/spawn-command-executor.ts';
+import mcpPackageJson from '../deno.json' with { type: 'json' };
 
 Deno.test('static catalog defaults to an explicit unwired descriptor', async () => {
   const commands = await new StaticCommandCatalog().listCommands();
@@ -12,7 +13,12 @@ Deno.test('static catalog defaults to an explicit unwired descriptor', async () 
 });
 
 Deno.test('spawn executor uses the published CLI prefix by default', () => {
-  assertEquals(DEFAULT_CLI_COMMAND, ['deno', 'run', '-A', 'jsr:@netscript/cli']);
+  assertEquals(DEFAULT_CLI_COMMAND, [
+    'deno',
+    'run',
+    '-A',
+    `jsr:@netscript/cli@${mcpPackageJson.version}`,
+  ]);
 });
 
 Deno.test('spawn executor captures a cheap real subprocess', async () => {

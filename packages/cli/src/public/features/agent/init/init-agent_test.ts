@@ -1,5 +1,6 @@
 import { assertEquals, assertRejects, assertStringIncludes } from "@std/assert";
 import { join } from "@std/path";
+import { NETSCRIPT_RELEASE_VERSION } from "../../../../kernel/constants/jsr-specifiers.ts";
 import { DenoAgentInitFileSystem } from "./agent-init-file-system.ts";
 import { initAgent } from "./init-agent.ts";
 
@@ -15,7 +16,7 @@ Deno.test("agent init writes Claude config, skills, and marked AGENTS section id
     assertEquals(config.mcpServers.netscript.args.slice(0, 5), [
       "run",
       "-A",
-      "jsr:@netscript/cli",
+      `jsr:@netscript/cli@${NETSCRIPT_RELEASE_VERSION}`,
       "agent",
       "mcp",
     ]);
@@ -47,6 +48,13 @@ Deno.test("agent init selects VS Code and detect-or-all host table", async () =>
       await Deno.readTextFile(join(root, ".vscode/mcp.json")),
     );
     assertEquals(vscode.servers.netscript.command, "deno");
+    assertEquals(vscode.servers.netscript.args.slice(0, 5), [
+      "run",
+      "-A",
+      `jsr:@netscript/cli@${NETSCRIPT_RELEASE_VERSION}`,
+      "agent",
+      "mcp",
+    ]);
     const only = await Deno.makeTempDir();
     try {
       await Deno.mkdir(join(only, ".vscode"));

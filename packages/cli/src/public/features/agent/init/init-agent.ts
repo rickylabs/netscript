@@ -3,6 +3,7 @@ import {
   EMBEDDED_SKILL_BUNDLE_HASH,
   EMBEDDED_SKILL_FILES,
 } from "../../../../kernel/assets/skills.generated.ts";
+import { netscriptJsrSpecifier } from "../../../../kernel/constants/jsr-specifiers.ts";
 import type { AgentInitFileSystem } from "./agent-init-file-system.ts";
 import {
   type AgentHost,
@@ -118,7 +119,7 @@ async function writeHostConfig(
             args: [
               "run",
               "-A",
-              "jsr:@netscript/cli",
+              netscriptJsrSpecifier("cli"),
               "agent",
               "mcp",
               "--project-root",
