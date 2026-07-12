@@ -69,3 +69,14 @@ boxes are the locked contract.
 
 - D1 (carried, owner-approved): PLAN-EVAL is waived; this worklog contains the required short plan
   and design checkpoint before implementation.
+
+## Orchestrator fix-forward (Tier-A review, Codex lane quota-exhausted)
+
+- CI scaffold-runtime `behavior.ai-chat-route` failed; reproduced locally with a full
+  `e2e:cli run scaffold.runtime` in this worktree. Root cause: the generated tools registry
+  imported `ai/tools/skill-loader.ts` (the MCP scaffolder's opt-in FACTORY module, which needs a
+  SkillLoaderPort and exports no AiToolDefinition) and `resolveAiToolDefinitions` throws on
+  modules without a definition. Fix: `skill-loader.ts` added to `AI_TOOLS_TARGET.exclude` —
+  factory modules are composition-root-wired, not registry entries. plugins/ai tests 16/16,
+  scoped check 0 findings.
+- Applied by the beta-9 orchestrator (`09e5ae68`) — Codex lane at provider usage limit (resets 10:34).

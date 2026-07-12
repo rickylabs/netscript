@@ -56,7 +56,7 @@ export const AI_TOOLS_TARGET: AiRegistryTarget = {
   dir: 'ai/tools',
   registryPath: '.netscript/generated/plugin-ai/tools.registry.ts',
   fileSuffixes: ['.ts'],
-  exclude: ['_registry.ts', 'mod.ts', 'types.ts'],
+  exclude: ['_registry.ts', 'mod.ts', 'types.ts', 'skill-loader.ts'],
   varPrefix: 'tool',
   typeImport: { name: 'AiToolDefinition', from: '@netscript/ai/tools' },
 };
