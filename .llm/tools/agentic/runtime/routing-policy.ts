@@ -31,6 +31,7 @@ export const ROUTING_LANES = [
   'research_extraction',
   'mobile_orchestration',
   'review_claude',
+  'review_codex',
 ] as const;
 export type RoutingLane = typeof ROUTING_LANES[number];
 
@@ -51,6 +52,7 @@ export interface CanonicalRoutePolicy {
   readonly effectiveThrough?: string;
   readonly subscriptionState?: SubscriptionState;
   readonly requiresExplicitApproval?: boolean;
+  readonly evaluatesFamily?: ModelFamily;
 }
 
 const MAJOR_UI_UX_PRESET = OPENROUTER_PRESETS['claude-design-glm-5-2'];
@@ -187,8 +189,60 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     provider: 'openai',
     model: MODEL_IDS.codexSol,
     effort: 'xhigh',
+    evaluatesFamily: 'anthropic',
+  },
+  {
+    lane: 'review_codex',
+    purpose: 'evaluation',
+    agent: 'claude',
+    provider: 'anthropic',
+    model: MODEL_IDS.opus,
+    effort: 'high',
+    evaluatesFamily: 'openai',
   },
 ] as const;
+
+export interface EvaluatorAssignment {
+  readonly authorFamily: Exclude<ModelFamily, 'other'>;
+  readonly generatorSession: SessionIdentity;
+  readonly evaluatorSession: SessionIdentity;
+}
+
+function sessionFamily(session: SessionIdentity): ModelFamily {
+  if (session.agent === 'claude') return 'anthropic';
+  if (session.agent === 'codex') return 'openai';
+  return 'google';
+}
+
+/** Resolves an opposite-family evaluator while rejecting self-certification. */
+export function resolveCanonicalEvaluatorRoute(
+  assignment: EvaluatorAssignment,
+  at: Date,
+): CanonicalRoutePolicy {
+  if (assignment.generatorSession.sessionId === assignment.evaluatorSession.sessionId) {
+    throw new Error('generator and evaluator sessions must differ');
+  }
+  if (sessionFamily(assignment.generatorSession) !== assignment.authorFamily) {
+    throw new Error('generator session family must match the authored slice');
+  }
+  const evaluatorFamily = sessionFamily(assignment.evaluatorSession);
+  if (evaluatorFamily === assignment.authorFamily) {
+    throw new Error('evaluator must use the opposite model family');
+  }
+  const route = CANONICAL_ROUTE_POLICY.find((candidate) =>
+    candidate.purpose === 'evaluation' &&
+    candidate.evaluatesFamily === assignment.authorFamily &&
+    candidate.agent === assignment.evaluatorSession.agent
+  );
+  if (!route) {
+    throw new Error(
+      `no canonical evaluator route for ${assignment.authorFamily} at ${
+        at.toISOString().slice(0, 10)
+      }`,
+    );
+  }
+  return resolveCanonicalRoute(route.lane, at);
+}
 
 /** Resolves dated routes without silently retaining an expired temporary override. */
 export function resolveCanonicalRoute(lane: RoutingLane, at: Date): CanonicalRoutePolicy {

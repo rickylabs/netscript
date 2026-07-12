@@ -2,11 +2,12 @@ import type { RouteIdentity } from './contract.ts';
 import {
   CANONICAL_ROUTE_POLICY,
   type FallbackCandidate,
+  resolveCanonicalEvaluatorRoute,
   resolveCanonicalRoute,
   type RoutingPolicyContext,
   selectFallbackCandidate,
 } from './routing-policy.ts';
-import { assertEquals as equal } from '@std/assert';
+import { assertEquals as equal, assertThrows } from '@std/assert';
 
 const worktree = '/home/codex/repos/routing-policy';
 const session = { agent: 'codex', sessionId: 'session-1', worktree, boundary: 'new' } as const;
@@ -188,4 +189,47 @@ Deno.test('Claude review stays opposite-family on GPT-5.6 Sol xhigh', () => {
     'gpt-5.6-sol',
     'xhigh',
   ]);
+});
+
+Deno.test('canonical evaluator lanes bind each authored family to its opposite-family route', () => {
+  const at = new Date('2026-07-13T00:00:00Z');
+  const claudeReview = resolveCanonicalEvaluatorRoute({
+    authorFamily: 'anthropic',
+    generatorSession: { ...session, agent: 'claude', sessionId: 'claude-generator' },
+    evaluatorSession: { ...session, agent: 'codex', sessionId: 'codex-evaluator' },
+  }, at);
+  const codexReview = resolveCanonicalEvaluatorRoute({
+    authorFamily: 'openai',
+    generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
+    evaluatorSession: { ...session, agent: 'claude', sessionId: 'claude-evaluator' },
+  }, at);
+  equal([claudeReview.lane, claudeReview.model, claudeReview.effort], [
+    'review_claude',
+    'gpt-5.6-sol',
+    'xhigh',
+  ]);
+  equal([codexReview.lane, codexReview.model, codexReview.effort], [
+    'review_codex',
+    'opus-4.8',
+    'high',
+  ]);
+});
+
+Deno.test('canonical evaluator resolution rejects self-certification', () => {
+  const at = new Date('2026-07-13T00:00:00Z');
+  const generatorSession = { ...session, agent: 'codex', sessionId: 'generator' } as const;
+  assertThrows(() =>
+    resolveCanonicalEvaluatorRoute({
+      authorFamily: 'openai',
+      generatorSession,
+      evaluatorSession: generatorSession,
+    }, at)
+  );
+  assertThrows(() =>
+    resolveCanonicalEvaluatorRoute({
+      authorFamily: 'openai',
+      generatorSession,
+      evaluatorSession: { ...session, agent: 'codex', sessionId: 'same-family-evaluator' },
+    }, at)
+  );
 });
