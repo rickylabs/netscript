@@ -74,6 +74,16 @@ Contributor path:
 - Scoped format wrapper over `plugins/triggers` — PASS, 66 files selected, 0 findings.
 - Reconcile: no PR was opened per the slice brief; issue #705 remains the sole owned issue and no GitHub state was mutated.
 
+### Slice 2 — persisted events and authoritative enabled state
+
+- `deno test --allow-all --unstable-kv plugins/triggers/services/src/main_test.ts` — PASS, 5 tests (9 steps) / 0 failed. A live ephemeral service is disabled through the same HTTP adapter used by the CLI, rejects a raw webhook with 409, is re-enabled, accepts the webhook with 202, and returns that persisted event through `/api/v1/events`.
+- Targeted HTTP adapter, runtime processor, service connector, and CLI registry tests — PASS, 14 tests (9 steps) / 0 failed before the added live-ledger assertion; the final service-only rerun above includes that assertion.
+- Runtime processor test proves a disabled trigger fails before handler/action dispatch through `TriggerEnabledStatePort`.
+- Scoped check wrapper over `plugins/triggers` — PASS, 68 files selected, 0 occurrences.
+- Scoped lint wrapper over `plugins/triggers` — PASS, 68 files selected, 0 occurrences.
+- Scoped format wrapper over `plugins/triggers` — PASS, 68 files selected, 0 findings.
+- Reconcile: no PR was opened or commented per owner direction; no issue taxonomy or milestone mutation was authorized.
+
 ## Drift
 
 - D1 (carried, owner-authorized): PLAN-EVAL is waived; the short plan and design checkpoint live in this worklog.

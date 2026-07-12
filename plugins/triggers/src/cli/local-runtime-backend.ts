@@ -12,6 +12,7 @@ import {
 } from '../adapter/resources/mod.ts';
 import { LocalProjectFiles, type ProjectFiles } from '@netscript/plugin/cli';
 import type { TriggersCliBackend, TriggersCliCommandDefinition } from './command-types.ts';
+import { HttpTriggersService, type TriggersServiceClient } from './http-triggers-service.ts';
 import { compileTriggerRegistry } from './trigger-registry-compiler.ts';
 import {
   booleanFlag,
@@ -26,22 +27,25 @@ import {
   requiredValue,
   resolveTriggerDefinition,
   type TriggerInspectionEntry,
-  type TriggersRuntimeConfig,
 } from './triggers-cli-backend-support.ts';
 
 /** Options for local triggers runtime CLI command execution. */
 export interface LocalTriggersRuntimeBackendOptions {
   /** Project file adapter. */
   readonly files?: ProjectFiles;
+  /** Running triggers service adapter. */
+  readonly service?: TriggersServiceClient;
 }
 
 /** Local backend that implements trigger scaffold commands against project files. */
 export class LocalTriggersRuntimeBackend implements TriggersCliBackend {
   private readonly files: ProjectFiles;
+  private readonly service: TriggersServiceClient;
 
   /** Create a local triggers runtime backend. */
   constructor(options: LocalTriggersRuntimeBackendOptions = {}) {
     this.files = options.files ?? new LocalProjectFiles();
+    this.service = options.service ?? new HttpTriggersService();
   }
 
   /** Run a triggers CLI command against the local project. */
@@ -76,6 +80,11 @@ export class LocalTriggersRuntimeBackend implements TriggersCliBackend {
       }
       case 'list':
         return await this.listTriggers(args);
+      case 'events':
+        return await this.listEvents(args);
+      case 'update':
+      case 'remove':
+        return fail(`triggers ${definition.name} is not implemented yet.`);
       case 'test':
         return await this.invokeTrigger(args, 'test');
       case 'fire':
@@ -87,6 +96,24 @@ export class LocalTriggersRuntimeBackend implements TriggersCliBackend {
       case 'disable':
         return await this.setTriggerEnabled(args, false);
     }
+  }
+
+  /** List persisted trigger events through the running service. */
+  private async listEvents(args: PluginCliArgs): Promise<PluginCliResult> {
+    const limit = numericFlag(args, 'limit') ?? 50;
+    if (!Number.isInteger(limit) || limit < 1) {
+      return fail('Flag --limit must be a positive integer.');
+    }
+    const status = flag(args, 'status');
+    const page = await this.service.listEvents({
+      triggerId: args.values?.[0],
+      status: parseEventStatus(status),
+      limit,
+    });
+    return ok(`Found ${page.events.length} persisted trigger events.`, {
+      ...page,
+      format: booleanFlag(args, 'json') ? 'json' : 'table',
+    });
   }
 
   /** Write one trigger definition and refresh the generated registry. */
@@ -115,19 +142,17 @@ export class LocalTriggersRuntimeBackend implements TriggersCliBackend {
   private async listTriggers(args: PluginCliArgs): Promise<PluginCliResult> {
     const kind = flag(args, 'kind');
     const enabledOnly = booleanFlag(args, 'enabled-only');
-    const config = await this.readRuntimeConfig();
+    const enabledIds = booleanFlag(args, 'enabled-only')
+      ? new Set((await this.service.listTriggers(true)).map((trigger) => trigger.id))
+      : undefined;
     const files = await this.files.listFiles('triggers', ['.ts']);
     const triggers = (await Promise.all(files.map(async (file) => {
       const source = await this.files.readTextFile(file.relativePath);
       return source === undefined ? undefined : inspectTriggerSource(file.relativePath, source);
     })))
       .filter((entry): entry is TriggerInspectionEntry => entry !== undefined)
-      .map((entry) => ({
-        ...entry,
-        enabled: config.triggers[entry.id]?.enabled ?? true,
-      }))
       .filter((entry) => kind === undefined || entry.kind === kind)
-      .filter((entry) => !enabledOnly || entry.enabled);
+      .filter((entry) => !enabledOnly || enabledIds?.has(entry.id));
 
     return ok(`Found ${triggers.length} trigger definitions.`, { triggers });
   }
@@ -173,20 +198,14 @@ export class LocalTriggersRuntimeBackend implements TriggersCliBackend {
     });
   }
 
-  /** Persist the enabled state for a trigger id. */
+  /** Set enabled state through the authoritative running service. */
   private async setTriggerEnabled(
     args: PluginCliArgs,
     enabled: boolean,
   ): Promise<PluginCliResult> {
     const id = requiredValue(args, 'trigger id');
-    const config = await this.readRuntimeConfig();
-    const triggers = {
-      ...config.triggers,
-      [id]: { ...config.triggers[id], enabled },
-    };
-    const path = '.netscript/runtime/triggers.json';
-    await this.files.writeTextFile(path, `${JSON.stringify({ ...config, triggers }, null, 2)}\n`);
-    return ok(enabled ? 'Trigger enabled.' : 'Trigger disabled.', { id, enabled, path });
+    const state = await this.service.setEnabled(id, enabled);
+    return ok(enabled ? 'Trigger enabled.' : 'Trigger disabled.', state);
   }
 
   /** Load a trigger definition module by trigger id. */
@@ -218,10 +237,22 @@ export class LocalTriggersRuntimeBackend implements TriggersCliBackend {
     }
     return undefined;
   }
+}
 
-  /** Read runtime trigger configuration, defaulting to an empty config. */
-  private async readRuntimeConfig(): Promise<TriggersRuntimeConfig> {
-    const content = await this.files.readTextFile('.netscript/runtime/triggers.json');
-    return content === undefined ? { triggers: {} } : JSON.parse(content) as TriggersRuntimeConfig;
+function parseEventStatus(value: string | undefined):
+  | 'pending'
+  | 'in-flight'
+  | 'deferred'
+  | 'completed'
+  | 'failed'
+  | 'dlq'
+  | undefined {
+  if (value === undefined) return undefined;
+  if (
+    value === 'pending' || value === 'in-flight' || value === 'deferred' ||
+    value === 'completed' || value === 'failed' || value === 'dlq'
+  ) {
+    return value;
   }
+  throw new Error(`Unknown trigger event status: ${value}.`);
 }

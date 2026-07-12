@@ -17,11 +17,6 @@ export type TriggerInspectionEntry = Readonly<{
   file: string;
 }>;
 
-/** Runtime trigger config persisted by local CLI commands. */
-export type TriggersRuntimeConfig = Readonly<{
-  triggers: Record<string, Readonly<{ enabled?: boolean }>>;
-}>;
-
 export function ok(message: string, data: unknown): PluginCliResult {
   return { code: 0, message, data };
 }

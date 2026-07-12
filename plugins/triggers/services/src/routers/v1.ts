@@ -169,6 +169,9 @@ export const triggersV1: TriggersHandlers<TriggersV1RouteKey> = {
     if (definition === undefined) {
       notFound({ errors, path, resourceId: input.id });
     }
+    if (!await context.enabledState.isEnabled(definition.id)) {
+      throw new Error(`Trigger ${input.id} is disabled.`);
+    }
     const response = await context.manualDispatcher.fire(definition, input.body);
     return {
       accepted: response.accepted,
@@ -185,6 +188,9 @@ export const triggersV1: TriggersHandlers<TriggersV1RouteKey> = {
     }
     if (definition.kind !== 'webhook') {
       throw new Error(`Trigger ${input.id} is not a webhook trigger.`);
+    }
+    if (!await context.enabledState.isEnabled(definition.id)) {
+      throw new Error(`Trigger ${input.id} is disabled.`);
     }
     const response = await context.webhookTestDelivery.deliver(definition, input.body);
     return {

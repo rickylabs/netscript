@@ -180,7 +180,7 @@ export async function createTriggersServiceContext(
     createKvTriggerEnabledStateStore({ kv: requireKv(kv) });
   const eventSubscription = options.eventSubscription ?? createEventSubscription();
   const processor = options.processor ??
-    await createRuntimeTriggerProcessor({ kv, eventSubscription });
+    await createRuntimeTriggerProcessor({ kv, eventSubscription, enabledState });
   const manualDispatcher = options.manualDispatcher ??
     createManualDispatcher({ eventStore, processor });
   const hmacVerifier = new HmacSha256WebhookVerifier({
@@ -230,7 +230,12 @@ export function createTriggersService(
   const resolveContext = () => typeof context === 'function' ? context() : context;
   const webhookHandler = (c: Context): Promise<Response> => {
     const resolvedContext = resolveContext();
-    return acceptWebhook(c, resolvedContext.ingress, resolvedContext.definitions);
+    return acceptWebhook(
+      c,
+      resolvedContext.ingress,
+      resolvedContext.definitions,
+      resolvedContext.enabledState,
+    );
   };
   const listEventsHandler = (c: Context): Promise<Response> => {
     const resolvedContext = resolveContext();
@@ -387,6 +392,7 @@ async function acceptWebhook(
   c: Context,
   ingress: TriggerIngressPort,
   definitions: readonly ProcessableTriggerDefinition[],
+  enabledState: TriggerEnabledStatePort,
 ): Promise<Response> {
   const target = resolveWebhookTarget(c.req.path);
   // Resolve the external path parameter against loaded definitions and pass the
@@ -404,6 +410,14 @@ async function acceptWebhook(
       error: 'TRIGGER_NOT_FOUND',
       message: `Trigger ${target} not found.`,
     }, 404);
+  }
+  if (!await enabledState.isEnabled(definition.id)) {
+    return c.json({
+      accepted: false,
+      status: 409,
+      error: 'TRIGGER_DISABLED',
+      message: `Trigger ${definition.id} is disabled.`,
+    }, 409);
   }
   try {
     const response = await ingress.accept({
