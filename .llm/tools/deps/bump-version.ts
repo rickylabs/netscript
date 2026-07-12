@@ -50,6 +50,10 @@ export async function findVersionResidue(root: string, oldVersion: string): Prom
         /(?:^|[/\\])\.llm[/\\]runs(?:[/\\]|$)/,
         /(?:^|[/\\])\.claude[/\\]worktrees(?:[/\\]|$)/,
         /(?:^|[/\\])\.data(?:[/\\]|$)/,
+        // Captured public-surface snapshots legitimately embed the version they
+        // were taken at (the baseline the NEXT release diffs against); they are
+        // not live version manifests and must not be treated as bump residue.
+        /(?:^|[/\\])\.llm[/\\]tools[/\\]release[/\\]baselines(?:[/\\]|$)/,
       ],
     })
   ) {

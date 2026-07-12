@@ -105,3 +105,24 @@ Deno.test('bump-version wrapper coordinates an exact version with zero residue',
     await Deno.remove(temp, { recursive: true });
   }
 });
+
+Deno.test('findVersionResidue excludes captured public-surface baseline snapshots', async () => {
+  const { findVersionResidue } = await import('./bump-version.ts');
+  const root = await Deno.makeTempDir({ prefix: 'ns-residue-' });
+  try {
+    // A live manifest correctly bumped to the new version → not residue.
+    await Deno.writeTextFile(`${root}/deno.json`, JSON.stringify({ version: '0.0.1-beta.9' }));
+    // A captured surface snapshot legitimately embedding the previous version →
+    // must NOT be flagged as residue (it is the baseline the next release diffs
+    // against, not a live version manifest).
+    await Deno.mkdir(`${root}/.llm/tools/release/baselines`, { recursive: true });
+    await Deno.writeTextFile(
+      `${root}/.llm/tools/release/baselines/public-surfaces.json`,
+      JSON.stringify({ rootVersion: '0.0.1-beta.8', packages: {} }),
+    );
+    const residue = await findVersionResidue(root, '0.0.1-beta.8');
+    assertEquals(residue, []);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
