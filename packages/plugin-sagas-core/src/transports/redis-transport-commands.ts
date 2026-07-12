@@ -285,7 +285,7 @@ export async function claimRedisPendingEntry(
 }
 
 function createDefaultRedisClient(connection: RedisConnectionOptions): RedisStreamClient {
-  return new Redis(connection) as unknown as RedisStreamClient;
+  return new Redis(connection);
 }
 
 function isBusyGroupError(error: unknown): boolean {

@@ -299,5 +299,5 @@ function createDefaultListClient(connection: RedisConnectionOptions): ListTransp
     tls: connection.tls,
     maxRetriesPerRequest: null,
     enableReadyCheck: false,
-  }) as unknown as ListTransportClient;
+  });
 }

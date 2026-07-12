@@ -22,6 +22,26 @@ export interface StreamSchema<TOutput = unknown, TInput = unknown> {
 }
 
 /** Saga instance entity stored in the durable stream. */
+const SagaInstanceZodSchema = z.object({
+  instanceId: z.string().min(1),
+  sagaId: z.string().min(1),
+  correlationKey: z.string().min(1),
+  status: z.enum(SAGA_INSTANCE_STATUSES),
+  state: z.record(z.string(), z.unknown()).default({}),
+  currentStep: z.string().optional(),
+  message: z.record(z.string(), z.unknown()).optional(),
+  error: z.string().optional(),
+  version: z.number().int().nonnegative().default(0),
+  messageCount: z.number().int().nonnegative().default(0),
+  lastMessageType: z.string().optional(),
+  startedAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+  completedAt: z.string().datetime().optional(),
+  traceparent: z.string().optional(),
+  tracestate: z.string().optional(),
+});
+
+/** Saga instance entity stored in the durable stream. */
 export type SagaInstance = Readonly<{
   instanceId: string;
   sagaId: string;
@@ -41,28 +61,11 @@ export type SagaInstance = Readonly<{
   tracestate?: string;
 }>;
 
-const SagaInstanceZodSchema: z.ZodObject<Record<string, z.ZodType<unknown>>> = z.object({
-  instanceId: z.string().min(1),
-  sagaId: z.string().min(1),
-  correlationKey: z.string().min(1),
-  status: z.enum(SAGA_INSTANCE_STATUSES),
-  state: z.record(z.string(), z.unknown()).default({}),
-  currentStep: z.string().optional(),
-  message: z.record(z.string(), z.unknown()).optional(),
-  error: z.string().optional(),
-  version: z.number().int().nonnegative().default(0),
-  messageCount: z.number().int().nonnegative().default(0),
-  lastMessageType: z.string().optional(),
-  startedAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
-  completedAt: z.string().datetime().optional(),
-  traceparent: z.string().optional(),
-  tracestate: z.string().optional(),
-});
-
 /** Standard Schema-compatible schema for saga instances. */
-export const SagaInstanceSchema: StreamSchema<SagaInstance> =
-  SagaInstanceZodSchema as unknown as StreamSchema<SagaInstance>;
+export const SagaInstanceSchema: StreamSchema<
+  SagaInstance,
+  unknown
+> = SagaInstanceZodSchema;
 
 /** Durable stream schema definition for saga instance entities. */
 export type SagasStreamDefinition = Readonly<{
@@ -74,12 +77,16 @@ export type SagasStreamDefinition = Readonly<{
 }>;
 
 /** Entity-based durable stream schema for saga instances. */
-export const sagasStreamSchema: StateSchema<SagasStreamDefinition> = defineStreamSchema({
+const sagasStreamDefinition: SagasStreamDefinition = {
   sagaInstance: {
     schema: SagaInstanceZodSchema,
     type: 'saga-instance',
     primaryKey: 'instanceId',
   },
-}) as unknown as StateSchema<SagasStreamDefinition>;
+};
+
+export const sagasStreamSchema: StateSchema<SagasStreamDefinition> = defineStreamSchema(
+  sagasStreamDefinition,
+);
 
 export type { CollectionDefinition, CollectionEventHelpers, StateSchema, StreamStateDefinition };
