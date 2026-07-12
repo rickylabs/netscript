@@ -9,6 +9,7 @@ import { TriggersError } from '@netscript/plugin-triggers-core/domain';
 import type {
   ProcessableTriggerDefinition,
   TriggerDlqPort,
+  TriggerEnabledStatePort,
   TriggerEventSubscriptionPort,
   TriggerIdempotencyPort,
   TriggerProcessorPort,
@@ -50,6 +51,7 @@ export type RuntimeTriggerProcessorOptions = Readonly<{
   dlq?: TriggerDlqPort;
   jobQueue?: ReturnType<typeof createQueue<JobMessage>>;
   eventSubscription?: TriggerEventSubscriptionPort;
+  enabledState?: TriggerEnabledStatePort;
   /** Tracer override; defaults to the shared trigger-domain facade tracer. */
   tracer?: Tracer;
 }>;
@@ -70,7 +72,42 @@ export async function createRuntimeTriggerProcessor(
     eventSubscription: options.eventSubscription,
   });
 
-  return new TracedTriggerProcessor(processor, options.tracer);
+  const traced = new TracedTriggerProcessor(processor, options.tracer);
+  return options.enabledState === undefined
+    ? traced
+    : createEnabledTriggerProcessor(traced, options.enabledState);
+}
+
+/** Decorate a trigger processor with authoritative enabled-state enforcement. */
+export function createEnabledTriggerProcessor(
+  processor: TriggerProcessorPort,
+  enabledState: TriggerEnabledStatePort,
+): TriggerProcessorPort {
+  return new EnabledTriggerProcessor(processor, enabledState);
+}
+
+class EnabledTriggerProcessor implements TriggerProcessorPort {
+  readonly #processor: TriggerProcessorPort;
+  readonly #enabledState: TriggerEnabledStatePort;
+
+  constructor(processor: TriggerProcessorPort, enabledState: TriggerEnabledStatePort) {
+    this.#processor = processor;
+    this.#enabledState = enabledState;
+  }
+
+  async process<TDefinition extends ProcessableTriggerDefinition>(
+    event: TriggerEvent,
+    definition: TDefinition,
+  ): Promise<TriggerProcessResult> {
+    if (!await this.#enabledState.isEnabled(definition.id)) {
+      throw TriggersError.validationFailed(`Trigger ${definition.id} is disabled.`);
+    }
+    return await this.#processor.process(event, definition);
+  }
+
+  stop(options?: TriggerProcessorStopOptions): Promise<void> {
+    return this.#processor.stop(options);
+  }
 }
 
 function requireKv(kv: KvStore | undefined): KvStore {

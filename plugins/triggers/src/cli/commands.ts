@@ -78,8 +78,11 @@ export class AddWebhookCommand extends TriggersCliCommand {
       usage: 'ns-triggers add webhook <id> --path=<path> [--secret-env=<name> --job=<id>]',
       flags: [
         { name: 'path', description: 'Webhook route path.', required: true },
+        { name: 'verifier', description: 'Webhook verifier id.' },
         { name: 'secret-env', description: 'Environment variable containing the webhook secret.' },
         { name: 'job', description: 'Worker job id to enqueue from the trigger handler.' },
+        { name: 'description', description: 'Human-readable trigger description.' },
+        { name: 'tags', description: 'Comma-separated trigger tags.' },
         { name: 'force', description: 'Overwrite an existing trigger file.' },
       ],
     }, backend);
@@ -118,6 +121,8 @@ export class AddScheduledCommand extends TriggersCliCommand {
         { name: 'cron', description: 'Five-field cron expression.', required: true },
         { name: 'timezone', description: 'IANA timezone for schedule interpretation.' },
         { name: 'job', description: 'Worker job id to enqueue from the trigger handler.' },
+        { name: 'description', description: 'Human-readable trigger description.' },
+        { name: 'tags', description: 'Comma-separated trigger tags.' },
         { name: 'force', description: 'Overwrite an existing trigger file.' },
       ],
     }, backend);

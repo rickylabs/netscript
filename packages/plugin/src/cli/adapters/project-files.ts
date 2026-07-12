@@ -43,6 +43,8 @@ export interface ProjectFiles {
   writeTextFile(path: string, content: string): Promise<void>;
   /** Read a UTF-8 text file, returning `undefined` when absent. */
   readTextFile(path: string): Promise<string | undefined>;
+  /** Remove a file, returning false when it was already absent. */
+  removeFile?(path: string): Promise<boolean>;
   /** List files below a project-relative directory, optionally filtered by extension. */
   listFiles(path: string, extensions?: readonly string[]): Promise<readonly ProjectFileEntry[]>;
   /** Convert a path to an importable file URL. */
@@ -93,6 +95,19 @@ export class LocalProjectFiles implements ProjectFiles {
     } catch (error) {
       if (error instanceof Deno.errors.NotFound) {
         return undefined;
+      }
+      throw error;
+    }
+  }
+
+  /** Remove a project-relative file, returning false when it was absent. */
+  async removeFile(path: string): Promise<boolean> {
+    try {
+      await Deno.remove(this.resolve(path));
+      return true;
+    } catch (error) {
+      if (error instanceof Deno.errors.NotFound) {
+        return false;
       }
       throw error;
     }
