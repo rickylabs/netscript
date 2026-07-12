@@ -37,6 +37,8 @@ export const DEFAULT_COMMAND_POLICY: CommandPolicy = Object.freeze({
     rule('allow_plugin_sync', 'plugin', 'sync'),
     rule('allow_plugin_doctor', 'plugin', 'doctor'),
     rule('allow_ui', 'ui'),
+    rule('allow_ui_add', 'ui:add'),
+    rule('allow_ui_init', 'ui:init'),
   ]),
   deny: Object.freeze([
     rule('deny_deploy', 'deploy'),

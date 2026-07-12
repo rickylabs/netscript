@@ -93,13 +93,14 @@ export class SpawnCommandExecutor implements CommandExecutorPort {
     }
     if (timer !== undefined) clearTimeout(timer);
     await readers;
+    if (timedOut) {
+      tail.append(new TextEncoder().encode(`${tail.result().outputTail ? '\n' : ''}timed_out`));
+    }
     const output = tail.result();
     return {
       exitCode: timedOut ? 124 : status.code,
       durationMs: Math.max(0, Math.round(performance.now() - started)),
-      outputTail: timedOut
-        ? `${output.outputTail}${output.outputTail ? '\n' : ''}timed_out`
-        : output.outputTail,
+      outputTail: output.outputTail,
       truncated: output.truncated,
       timedOut,
     };

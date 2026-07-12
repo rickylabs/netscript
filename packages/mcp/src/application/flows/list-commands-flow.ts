@@ -1,4 +1,8 @@
-import type { CommandCatalogPort, CommandDescriptor } from '../../domain/command-catalog-port.ts';
+import {
+  type CommandCatalogPort,
+  type CommandDescriptor,
+  MAX_COMMAND_DESCRIPTOR_LENGTH,
+} from '../../domain/command-catalog-port.ts';
 import { isRecord } from '../../domain/schema.ts';
 import type { ToolExecutionResult, ToolFlow } from '../../domain/tool-types.ts';
 
@@ -10,7 +14,11 @@ export function createListCommandsFlow(catalog: CommandCatalogPort): ToolFlow {
       : '';
     const requested = isRecord(input) && typeof input.limit === 'number' ? input.limit : 100;
     const limit = Math.max(1, Math.min(100, Math.trunc(requested)));
-    const all = await catalog.listCommands();
+    const all = (await catalog.listCommands()).map((command): CommandDescriptor => ({
+      path: command.path.slice(0, MAX_COMMAND_DESCRIPTOR_LENGTH),
+      description: command.description.slice(0, MAX_COMMAND_DESCRIPTOR_LENGTH),
+      usage: command.usage.slice(0, MAX_COMMAND_DESCRIPTOR_LENGTH),
+    }));
     const commands: readonly CommandDescriptor[] = all.filter((command) =>
       !filter ||
       `${command.path} ${command.description} ${command.usage}`.toLowerCase().includes(filter)
