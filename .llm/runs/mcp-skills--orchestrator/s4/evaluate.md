@@ -1,4 +1,4 @@
-# Evaluation: `packages/mcp` — S4 trace intelligence
+# Evaluation: `packages/mcp` — S4 trace intelligence (cycle 2)
 
 Allowed result values: `PASS`, `FAIL`, `N/A`, `PENDING_SCRIPT`, `DEBT_ACCEPTED`, `NOT_RUN`.
 
@@ -10,87 +10,78 @@ Allowed result values: `PASS`, `FAIL`, `N/A`, `PENDING_SCRIPT`, `DEBT_ACCEPTED`,
 | Target         | `packages/mcp` (`get_last_job_result`, `analyze_service_performance`, `analyze_db_bottlenecks`) |
 | Archetype      | `6 - CLI / Tooling`                                               |
 | Scope overlays | `none`                                                           |
-| Evaluator      | opposite-family IMPL-EVAL (Opus 4.8), 2026-07-12, HEAD `545698f9` |
+| Evaluator      | opposite-family IMPL-EVAL (Opus 4.8), cycle 2, 2026-07-12, HEAD `d50b10b7` |
+| Prior cycle    | cycle 1 `FAIL_FIX` at `545698f9` (output contracts did not match flow outputs) |
 
 ## Verdict (summary)
 
-`FAIL_FIX` — the plan and archetype are correct and the pure math is sound, but the three tools'
-**output contracts do not match their flow outputs**. The MCP server enforces the output schema at
-runtime (`mcp-server.ts:100`, `additionalProperties:false`), so every real result path returns
-`-32603 invalid_tool_result`. The 24-test suite is green only because it asserts on flow return
-values directly and never routes a found/populated result through `validateSchema(tool.outputSchema,
-…)`. This is a false-done state, not a working slice.
+`PASS` — the cycle-1 blocking finding is fully resolved. The three tools' output schemas now match
+their flow/summary shapes exactly, and the fix is proven at the same enforced boundary the server
+uses (`validateSchema(TOOL_OUTPUT_SCHEMAS[name], …)`), for both populated and empty results. All
+approved scope is complete, static/fitness gates are green or `PENDING_SCRIPT` with manual evidence,
+no new architecture debt, and run artifacts are resume-ready.
 
-## Process Verification
+## Cycle-1 findings — disposition
 
-| Check                                  | Result   | Evidence                                                                                 |
-| -------------------------------------- | -------- | ---------------------------------------------------------------------------------------- |
-| Plan-Gate passed before implementation | PASS     | `plan-eval.md` verdict `PASS`; separate opposite-family session recorded in `worklog.md`. |
-| Design section exists in worklog       | PASS     | `worklog.md` §Design (public surface, vocabulary, ports, constants, slices, contributor path). |
-| Commit slices match design plan        | FAIL     | Plan/`plan-eval` locked **3** ordered slices; the branch is a **single** squashed commit `545698f9 feat(mcp): add trace intelligence analytics (#728)`. No per-slice gate trail exists on the commit history. Minor process finding. |
-| Each slice has a passing gate          | PARTIAL  | `worklog.md` §Gate evidence lists aggregate gates (check/lint/fmt/tests/arch/doc/publish), not per-slice gates. Independently reproduced 24/0 tests; but the gates do not exercise the enforced output contract (see Findings F1). |
-| No speculative seams (unused files)    | PASS     | Three flow files + summary types are all wired via `cli.ts` and consumed by tests; no dead files. |
-| Constants used for finite vocabularies | PASS     | KV/job/exec/saga/trigger attrs from `@netscript/telemetry/attributes`; `db.` documented as OTel semconv namespace; window/limit/label constants named. No NetScript value-string duplication. |
+| ID | Cycle-1 finding | Status | Evidence |
+| -- | --------------- | ------ | -------- |
+| F1 (high) | All three tools violated their server-enforced output contract (`analyze_*` on every call; `get_last_job_result` on every found job). | **RESOLVED** | `tool-contracts.ts` output schemas rewritten to mirror the summaries: `get_last_job_result` adds `startUnixMs`/`completedUnixMs` (required `['found']`); `analyze_service_performance` replaces the phantom `summary` with the real fields (`service`, `sinceUnixMs`, `sampleCount`, `errorCount`, `errorRate`, `averageDurationMs`, `p50/p95DurationMs`, `throughputPerMinute`, `topOperations`, all required); `analyze_db_bottlenecks` adds `sinceUnixMs` (required). Independently reran the real validator against real aggregation outputs — **6/6 PASS** (found + empty for each tool), where cycle 1 showed 5/6 FAIL. |
+| F2 (medium) | No test exercised the enforced output path, so the green suite masked F1. | **RESOLVED** | `telemetry-aggregation_test.ts` now calls `validateSchema(TOOL_OUTPUT_SCHEMAS.<tool>, …)` on both a populated result and an empty result for all three tools (job found/`{found:false}`; service populated/empty; db populated/empty). A regression of F1 would now fail the suite. |
+| F3 (low) | Single squashed commit instead of 3 locked slices; aggregate (not per-slice) gate evidence. | UNCHANGED (non-blocking) | Fix landed as one additional commit `d50b10b7`. Process note only; no correctness or debt impact. |
 
 ## Static Gates
 
-| Gate            | Command or check                                             | Result | Evidence |
-| --------------- | ----------------------------------------------------------- | ------ | -------- |
-| Scoped check    | `.llm/tools/run-deno-check.ts --root packages/mcp`          | PASS   | Generator: 37 files, 0 failed batches. Type surface compiles (contract mismatch is a runtime, not a type, error — flows return `unknown`-typed `value`). |
-| Format          | scoped fmt wrapper                                           | PASS   | Generator: 37 files, 0 findings. |
-| Lint            | scoped lint wrapper                                          | PASS   | Generator: 37 files, 0 occurrences. |
-| Doc lint        | full-export doc lint (`cli.ts` + `mod.ts`)                  | PASS   | Generator: 0 errors / 0 private refs / 0 missing JSDoc. Exported summary types + aggregation fns carry return types + JSDoc. |
-| Publish dry-run | `deno publish --dry-run` (`@netscript/mcp@0.0.1-beta.8`)   | PASS   | Generator: slow-type checks passed, "Success Dry run complete". |
-| MCP tests       | `deno test … packages/mcp/tests/` (`--unstable-kv`)        | PASS*  | Independently reproduced: **24 passed / 0 failed**. *Green but non-probative for the output contract — see F1. |
+| Gate            | Command or check                                          | Result | Evidence |
+| --------------- | -------------------------------------------------------- | ------ | -------- |
+| Scoped check    | `.llm/tools/run-deno-check.ts --root packages/mcp`      | PASS   | Generator cycle-2 green; contract change is type-consistent (schemas are data literals). |
+| Format          | scoped fmt wrapper                                        | PASS   | Generator cycle-2 green. |
+| Lint            | scoped lint wrapper                                       | PASS   | Generator cycle-2 green. |
+| Doc lint        | full-export doc lint (`cli.ts` + `mod.ts`)              | PASS   | No exported-surface change beyond schema literals; cycle-1 doc lint clean, unchanged. |
+| Publish dry-run | `deno publish --dry-run` (`@netscript/mcp`)             | PASS   | No new dependency/export-map/lock change (`deno.lock` untouched); cycle-1 dry-run clean, unchanged. |
+| MCP tests       | `deno test … packages/mcp/tests/` (`--unstable-kv`)     | PASS   | Independently reproduced: **24 passed / 0 failed** — now including the output-contract round-trips added by the fix. |
 
 ## Fitness Gates (Archetype 6, applicable subset)
 
 | Gate    | Function                | Result         | Evidence |
 | ------- | ----------------------- | -------------- | -------- |
-| F-1     | File-size lint          | PASS           | `telemetry-aggregation.ts` = 409 LOC, < 500 universal ceiling; other new files small. |
-| F-2     | Helper-reinvention scan | PASS           | Extends existing aggregation/summary seams; reuses `TelemetryQueryPort`, `duration`, `serviceOf`, `spanStatus`. No parallel analytics abstraction. |
-| F-3     | Layering check          | PASS           | `deno task arch:check` exit 0 (generator); domain→application flow, no effects in aggregation. |
-| F-5     | Public surface audit    | PASS           | No new export-map entry or dependency; flows composition-internal. |
+| F-1     | File-size lint          | PASS           | `telemetry-aggregation.ts` unchanged (409 LOC < 500); contracts file grew by data literals only. |
+| F-2     | Helper-reinvention scan | PASS           | No new abstraction; reuses existing aggregation/summary/`validateSchema` seams. |
+| F-3     | Layering check          | PASS           | `deno task arch:check` clean (generator); no effects introduced. |
+| F-5     | Public surface audit    | PASS           | No new export-map entry or dependency. |
 | F-6/F-7 | JSR publish / doc-score  | PASS           | Doc lint + publish dry-run green. |
-| F-9     | Permission declaration  | PASS           | No new permission surface; `cli.ts` unchanged in flags. |
-| F-CLI-1..31 | scoped CLI fitness   | PENDING_SCRIPT | Per Arch-6 profile, F-CLI gates have no dedicated script; `arch:check` reported clean by generator. No CLI verb/surface change in S4. |
+| F-9     | Permission declaration  | PASS           | No new permission surface. |
+| F-CLI-1..31 | scoped CLI fitness   | PENDING_SCRIPT | No dedicated script per Arch-6 profile; `arch:check` clean; no CLI verb/surface change in S4. |
 
 ## Runtime / Consumer Gates
 
-| Gate                              | Validation                                                                 | Result | Evidence |
-| --------------------------------- | -------------------------------------------------------------------------- | ------ | -------- |
-| Tool output-contract round-trip   | server validates `tool.outputSchema` against flow `value` (`mcp-server.ts:100`) | **FAIL** | Reproduced below (F1): all three tools violate their output schema on real results. No test covers this path. |
-| stdio round-trip (existing tools) | `stdio_test.ts` initialize/list/doctor                                     | PASS   | Unchanged; only exercises `doctor`. `tools/list` count still 13. |
-
-## Findings
-
-| Severity | Finding | Evidence | Required action |
-| -------- | ------- | -------- | --------------- |
-| **high** | **F1 — All three S4 tools fail the server-enforced output contract.** `analyze_service_performance` and `analyze_db_bottlenecks` fail on **every** call (empty and populated); `get_last_job_result` fails on **every found job** (its primary success path). The server returns `-32603 invalid_tool_result` instead of a result. | Ran the actual validator against actual aggregation outputs (`validateSchema(TOOL_OUTPUT_SCHEMAS[name], aggregate…())`):<br>• `get_last_job_result` (found): `$.startUnixMs is not allowed; $.completedUnixMs is not allowed` — `LastJobResultSummary` returns `startUnixMs`/`completedUnixMs` (aggregation L251-252) but the output schema (`tool-contracts.ts:104-114`, `additionalProperties:false`) omits them.<br>• `analyze_service_performance` (empty **and** populated): `$.summary is required; $.service…p50…p95…throughputPerMinute is not allowed` — flow returns the full `ServicePerformanceSummary`, but the schema (`tool-contracts.ts:115-119`) requires a `summary` object and forbids the actual fields.<br>• `analyze_db_bottlenecks` (empty **and** populated): `$.sinceUnixMs is not allowed` — `DbBottleneckSummary` includes `sinceUnixMs` (L328) not in schema (`tool-contracts.ts:120-123`). | fix |
-| medium | F2 — Tests do not exercise the enforced output contract. `telemetry-flows_test.ts` asserts on flow `.value` directly; `telemetry-aggregation_test.ts` asserts on aggregation returns; `registry_test.ts` validates only **input** schemas + malformed rejection; `stdio_test.ts` calls only `doctor`. Nothing routes a found/populated S4 result through `TOOL_OUTPUT_SCHEMAS`, so the green suite masks F1. Brief deliverable #3 ("contract fit … keep existing tests green") and plan slice 1 ("proves typed outputs") are not actually proven. | Test file reads above; reproduced 24/0 pass with F1 latent. | fix (add an output-contract round-trip test per S4 tool, both found and empty) |
-| low | F3 — Single squashed commit instead of the 3 locked slices; per-slice gate evidence is aggregate. Weakens auditability but not correctness. | `git log dd89ced9..HEAD` = one commit. | note / follow process next slice |
-
-Non-findings (verified, correct): input relaxation of `get_last_job_result` to optional
-`jobId`/`jobName` with newest-overall (design-conformant, `tool-contracts.ts:57-62`); nearest-rank
-interpolation-free percentiles (`nearestRank`, test L91 p50=20/p95=40); DB candidate detection over
-`netscript.kv.*` + OTel `db.` with KV→`db.operation.name`→statement→span-name labeling +
-whitespace-normalize/truncate; conjunctive job filters; completed-span-only durations; window default
-15 min with `sinceUnixMs` override + defensive re-filter; `limit` bounded ≤ 20; additive `cli.ts`
-wiring; no leaf PR and `#728` referenced without a closing keyword (both per explicit supervisor
-instruction — **not** findings); `## SKILL` chapter present in `implement.md`.
+| Gate                            | Validation                                                                       | Result | Evidence |
+| ------------------------------- | -------------------------------------------------------------------------------- | ------ | -------- |
+| Tool output-contract round-trip | server validates `tool.outputSchema` vs flow `value` (`mcp-server.ts:100`)      | **PASS** | Independently reproduced 6/6 PASS (found+empty × 3 tools) via the real validator; now also covered in-suite. |
+| stdio round-trip (existing)     | `stdio_test.ts` initialize/list/doctor; `tools/list` count 13                    | PASS   | Unchanged. |
 
 ## Arch-Debt Delta
 
 | Metric                | Count | Evidence |
 | --------------------- | ----- | -------- |
-| New entries           | 0     | No new dependency, lock, or seam; `deno.lock` unchanged. |
+| New entries           | 0     | Schema/test-only change; no dependency, lock, or seam change. |
 | Resolved entries      | 0     | — |
-| Deepened violations   | 0     | `MCP-A6-V2-SHAPE` horizontal skeleton extended in place, not broadened; aggregation module < 500 LOC. |
-| Unrecorded violations | 0     | F1 is a correctness/contract defect, not an architecture-debt gap; `FAIL_FIX`, not `FAIL_DEBT`. |
+| Deepened violations   | 0     | `MCP-A6-V2-SHAPE` not broadened. |
+| Unrecorded violations | 0     | — |
+
+## Findings
+
+| Severity | Finding | Evidence | Required action |
+| -------- | ------- | -------- | --------------- |
+| low | F3 (carried) — fix shipped as a single follow-up commit; slice/gate trail remains aggregate rather than per the 3 locked slices. Non-blocking auditability note. | `git log 545698f9..d50b10b7` = one commit. | note only |
+
+No blocking findings remain. Verified non-findings from cycle 1 (input relaxation, nearest-rank
+percentiles, DB/KV detection + labeling, windowing/defensive re-filter, `limit ≤ 20`, additive
+`cli.ts` wiring, intentional no-PR / `#728` without closing keyword, `## SKILL` chapter) are
+unchanged by this commit.
 
 ## Verdict
 
 | Field     | Value |
 | --------- | ----- |
-| Verdict   | `FAIL_FIX` |
-| Rationale | Plan, archetype, scope, and pure aggregation are sound, so this is neither `FAIL_RESCOPE` nor `FAIL_DEBT`. But the implementation ships three tools that cannot return a valid result: the server enforces each tool's output schema (`mcp-server.ts:100`, `additionalProperties:false`) and the flow outputs violate it — `analyze_service_performance` and `analyze_db_bottlenecks` on every call, `get_last_job_result` on every found job. Brief deliverable #3 (contract fit) is met for none of the three, and no test covers the enforced output path (F2), so all gates report green over a functionally broken slice. Required fix: reconcile the three output schemas in `tool-contracts.ts` with the actual `LastJobResultSummary` / `ServicePerformanceSummary` / `DbBottleneckSummary` shapes (or reshape the flow outputs to the schemas), and add an output-contract round-trip test per tool for both found and empty cases. |
+| Verdict   | `PASS` |
+| Rationale | The sole blocking issue from cycle 1 (F1) is fully corrected: the `get_last_job_result`, `analyze_service_performance`, and `analyze_db_bottlenecks` output schemas now match their `LastJobResultSummary` / `ServicePerformanceSummary` / `DbBottleneckSummary` shapes, verified independently at the server's own `validateSchema`/`TOOL_OUTPUT_SCHEMAS` boundary with 6/6 PASS across found and empty paths (cycle 1 was 5/6 FAIL). F2 is closed by in-suite output-contract round-trips, so a regression would now fail the 24/24-green suite. Approved scope is complete, required static and fitness gates pass or are `PENDING_SCRIPT` with manual evidence, no new or deepened architecture debt (`deno.lock` untouched), and artifacts are resume-ready. Only a low, non-blocking process note (F3, single-commit trail) remains. |
