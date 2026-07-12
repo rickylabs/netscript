@@ -23,8 +23,11 @@ describe('local contributor CLI composition', () => {
       'marketplace',
       'plugin',
       'service',
-      'ui:add',
-      'ui:init',
+        'ui:add',
+        'ui:init',
+        'ui:list',
+        'ui:update',
+        'ui:remove',
     ]);
   });
 });

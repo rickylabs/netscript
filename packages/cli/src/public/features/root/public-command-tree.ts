@@ -9,6 +9,9 @@ import { createPluginCommand } from '../plugins/plugins-group.ts';
 import { createServiceCommand } from '../services/services-group.ts';
 import { createUiAddCommand } from '../ui/add/add-ui-command.ts';
 import { createUiInitCommand } from '../ui/init/init-ui-command.ts';
+import { createUiListCommand } from '../ui/list/list-ui-command.ts';
+import { createUiUpdateCommand } from '../ui/update/update-ui-command.ts';
+import { createUiRemoveCommand } from '../ui/remove/remove-ui-command.ts';
 import {
   createPublicCommandDependencies,
   type PublicCommandDependencies,
@@ -91,6 +94,9 @@ export function createPublicCommandRegistry(): CliCommandRegistry<PublicCommandC
         resolveProjectRoot: dependencies.resolveProjectRoot,
       }),
   });
+  for (const [id, create] of [
+    ['ui:list', createUiListCommand], ['ui:update', createUiUpdateCommand], ['ui:remove', createUiRemoveCommand],
+  ] as const) registry.register(id, { id, create: ({ dependencies }) => create({ installDependencies: dependencies.uiInstallDependencies, resolveProjectRoot: dependencies.resolveProjectRoot }) });
 
   return registry;
 }
