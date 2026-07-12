@@ -89,3 +89,39 @@ output on two turns here, so this slice was moved to the normal implementation r
 stalls again on other slices, that is a lane-policy signal worth raising.
 
 **Severity:** minor. No scope change, no work lost.
+
+## D5 — IMPL-EVAL returned FAIL_FIX; the process gap it named (F6) is real (significant)
+
+The opposite-family IMPL-EVAL (Codex `gpt-5.6-sol` xhigh, thread `019f58a1`) returned **FAIL_FIX**
+with 8 findings. **All 8 were independently reproduced before being fixed — every one was real.**
+The verdict is recorded verbatim at `evaluate.md`.
+
+This is the system working. Two findings would have shipped:
+
+- **F1** — the fmt wrapper could **false-green**. My crash-vs-finding classification was computed
+  globally, so a crashed batch hid behind an unrelated batch's formatting finding — and when the only
+  findings were line-ending ones filtered by `--ignore-line-endings`, the gate exited **0** with a
+  crashed batch. I reintroduced, one level up, the exact bug class I was fixing. The lint wrapper
+  classified per batch; the fmt wrapper did not, and my fmt tests were renderer-only, so they could
+  not catch it.
+- **F2** — `netscript plugin add workers`, the README's primary quick-start line, **does not exist**
+  (the verb is `plugin install`). It fails on copy with exit 2. I had claimed the command map was
+  generated from the live `--help` tree; it was not, or not faithfully.
+
+**F6 (process) is upheld and not remediable after the fact.** This stream ran as a directed
+fix-forward from the orchestrator brief and began at "Slice 1" with **no `research.md`, no `plan.md`,
+no PLAN-EVAL, and no `## Design` checkpoint** for its own new scope (the wrapper fixes, the root
+exclusions, the tagline gate). The harness requires PLAN-EVAL `PASS` before an implementation slice.
+The earlier umbrella S9 Plan-Gate covered the original docs/stdio work — it did not plan any of this.
+
+I will not manufacture a retroactive plan; that would be evidence-faking. Recording it as drift is the
+honest disposition. The evaluator's own read is worth keeping: the missing Plan-Gate *"explains why
+the fmt mixed-batch invariant and the extra tagline scope were not captured before implementation"* —
+i.e. the process gap and the F1/F5 defects are the same failure, not two.
+
+**Lesson (candidate for `.llm/harness/lessons/`):** a "small fix-forward" that grows a new tool
+surface, a new CI gate, and a public-docs rewrite is no longer a fix-forward, and skipping its
+Plan-Gate is what let a false-green gate and a non-existent command reach a merge-ready PR.
+
+**Severity:** significant — process invariant violated; the resulting defects are fixed, the process
+gap is not retroactively fixable.
