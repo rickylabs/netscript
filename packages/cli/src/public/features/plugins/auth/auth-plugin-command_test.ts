@@ -49,7 +49,13 @@ Deno.test('plugin doctor reports the configured active auth backend', async () =
     fs,
     loadConfig: () => Promise.resolve({ plugins: ['auth'] } as never),
     loadRegisteredPlugins: () => Promise.resolve({
-      auth: { name: 'auth', workdir: 'auth', rootDir: '/workspace/auth', permissions: ['--allow-env'] },
+      auth: {
+        name: 'auth',
+        workdir: 'auth',
+        rootDir: '/workspace/auth',
+        permissions: ['--allow-env'],
+        cli: { doctorChecks: ['auth-backend'] },
+      },
     }),
   });
   assertEquals(reports[0].checks.find((check) => check.id === 'auth-backend')?.message, 'better-auth');

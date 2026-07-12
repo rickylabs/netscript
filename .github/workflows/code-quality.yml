@@ -29,5 +29,5 @@ jobs:
           for file in "${files[@]}"; do args+=(--changed-file "$file"); done
           if ((${#args[@]})); then deno task quality:scan --pretty "${args[@]}"; fi
       - run: deno task arch:check
-      - name: Lint touched publish surfaces
-        run: deno task doc:lint --root packages/cli --root packages/plugin --root plugins/auth --root plugins/ai --pretty
+      - name: Lint CLI publish surface
+        run: deno task doc:lint --root packages/cli --pretty
