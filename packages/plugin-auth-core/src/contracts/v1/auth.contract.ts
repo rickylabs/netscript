@@ -14,7 +14,7 @@ import {
   type BasePluginDescribeRoute,
 } from '@netscript/plugin/contract-base';
 import { AUTH_SESSION_STATES } from '../../domain/mod.ts';
-
+import { toContractErrorDefinition } from './base-error-adapter.ts';
 export { AUTH_SESSION_STATES } from '../../domain/mod.ts';
 
 /** Input accepted by the signin endpoint. */
@@ -130,15 +130,15 @@ export interface AuthCapabilities {
   readonly capabilities: readonly string[];
 }
 
-// --- Auth-specific error vocabulary ------------------------------------------
-// Auth converges onto the shared plugin error vocabulary (NOT_FOUND,
-// VALIDATION_ERROR, INTERNAL) AND keeps its plugin-specific errors
-// (UNAUTHORIZED, AUTH_PROVIDER_ERROR). The auth-specific VALIDATION_ERROR
-// carries the same form/field shape as the base entry; spelling it last means
-// the merged map keeps auth's 422 spelling. Like `BASE_PLUGIN_ERRORS`, each
-// `data` field is a plain Zod schema (a value, not a builder fragment), so the
-// merged map crosses into the oRPC contract builder via the single sanctioned
-// centralized-contract boundary cast.
+// Auth extends the shared errors with provider failures and authorization; its
+// final VALIDATION_ERROR retains the 422 spelling. Shared `unknown` data crosses
+// the boundary only through the Standard Schema adapter below.
+
+const CONTRACT_BASE_ERRORS = {
+  NOT_FOUND: toContractErrorDefinition(BASE_PLUGIN_ERRORS.NOT_FOUND),
+  VALIDATION_ERROR: toContractErrorDefinition(BASE_PLUGIN_ERRORS.VALIDATION_ERROR),
+  INTERNAL: toContractErrorDefinition(BASE_PLUGIN_ERRORS.INTERNAL),
+} satisfies ErrorMap;
 
 const validationErrorDataSchema: z.ZodObject<{
   formErrors: z.ZodArray<z.ZodString>;
@@ -179,7 +179,7 @@ const AUTH_SPECIFIC_ERRORS: Readonly<{
 };
 
 const baseContract: ReturnType<typeof oc.errors> = oc.errors(
-  { ...BASE_PLUGIN_ERRORS, ...AUTH_SPECIFIC_ERRORS } as unknown as Parameters<typeof oc.errors>[0],
+  { ...CONTRACT_BASE_ERRORS, ...AUTH_SPECIFIC_ERRORS } satisfies ErrorMap,
 );
 
 /**

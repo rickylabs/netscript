@@ -13,23 +13,24 @@
 ## Current State
 
 The mandated hard reset is complete at `3b3d615b`. Research and design are locked. Baseline is 16
-findings/0 allowances; the rejected pass used 6 allowances. Independent PLAN-EVAL passed. Slices 1
-and 2 are reviewed green and reduce the scanner to the two plugin-core findings with 0 allowances.
+findings/0 allowances; the rejected pass used 6 allowances. Independent PLAN-EVAL passed. Slices
+1-3 are reviewed green; the exact seven-root scanner now has 0 findings and allowCount 0.
 
 ## Completed
 
 - Skills/doctrine/harness reads, reset preflight, baseline scanner, upstream type inspection, plan.
 - Slice 1 telemetry and lexical typing fixes, gates, review, and sign-off commit.
 - Slice 2 SDK/Fresh UI typing fixes, regression tests, FAIL_FIX correction, and PASS review.
+- Slice 3 plugin error-map adapters, success/rejection tests, package gates, and PASS review.
 
 ## In Progress
 
-- Slice 3 plugin-core error-map typing.
+- Full seven-package acceptance matrix and final IMPL-EVAL.
 
 ## Next Steps
 
-1. Implement and review slice 3, eliminating the final two casts.
-2. Run full acceptance and separate IMPL-EVAL, then force-push with lease.
+1. Run every required seven-package gate and reconcile final worklog evidence.
+2. Run separate IMPL-EVAL, sign off artifacts, then force-push with lease.
 
 ## Key Decisions
 
@@ -47,19 +48,20 @@ and 2 are reviewed green and reduce the scanner to the two plugin-core findings 
 | `packages/{aspire,sdk,bench}/**` | changed | prose-only lexical scanner hits |
 | `packages/fresh-ui/**` | changed | truthful primitive/style/summary types and focused render test |
 | `packages/sdk/**` | changed | validated oRPC router boundary and regression test |
+| `packages/plugin-{ai,auth}-core/**` | changed | Standard Schema adapters and contract-map tests |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | slices 1-2 green | scanner 2 residual findings / allowCount 0; scoped gates green |
-| Fitness | plan + slice reviews PASS | `plan-eval.md`, `slice-review-1.md`, `slice-review-2.md` |
+| Static | slices 1-3 green | scanner 0 findings / allowCount 0; scoped gates green |
+| Fitness | plan + slice reviews PASS | plan evaluation and all three review artifacts |
 | Runtime | slice 2 green | SDK link guard and Fresh SSR summary regression tests |
 | Consumer | slice 2 green | SDK 16 tests; Fresh UI 134 tests |
 
 ## Open Questions
 
-- None blocking; evaluator may return plan fixes.
+- None blocking; final evaluator may return implementation fixes.
 
 ## Drift and Debt
 

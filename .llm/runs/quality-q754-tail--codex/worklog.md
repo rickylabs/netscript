@@ -68,6 +68,10 @@ running the scoped wrapper and publish gates.
 | 2026-07-12 | slice 2 | fail-fix | First Claude Opus review found a Fresh public doc-lint regression and missing guard/accordion tests. The new SDK test then exposed and closed vacuous empty-router / reserved-`~orpc` acceptance. |
 | 2026-07-12 | slice 2 | gates | Scanner 6→2 / allowCount 0; SDK 16 tests and Fresh UI 134 tests pass; scoped check/lint/fmt green; curated Fresh doc entrypoints return to 0. |
 | 2026-07-12 | slice 2 | review | Claude Opus session `99d47bf8-00fd-464e-89b3-13d7b90ff04d` correction pass returned PASS; generated root/package lock churn removed before sign-off. |
+| 2026-07-12 | slice 3 | implementation | Both plugin cores validate shared `unknown` error data as Standard Schema V1, normalize typed entries, and pass maps through `satisfies ErrorMap`; the final two casts are gone. |
+| 2026-07-12 | slice 3 | structure | Package-local adapters keep the genuine seams local; AI contract is 476 lines (under cap) and auth remains its exact 517-line baseline. |
+| 2026-07-12 | slice 3 | gates | Exact scanner is `ok:true` with 0 findings / allowCount 0; AI 4 tests and auth 29 tests pass; scoped check/lint/fmt, publish, and doctrine FAIL=0. |
+| 2026-07-12 | slice 3 | review | Claude Opus session `100d5cca-6dbb-4bb7-a74a-e59919e735ba` returned PASS with no blocking findings. |
 
 ## Decisions
 
@@ -101,6 +105,12 @@ running the scoped wrapper and publish gates.
 | Fresh UI tests | `deno task test` | PASS | 134 passed / 0 failed, including summary/disabled SSR regression |
 | SDK doc lint | `deno task doc:lint --root packages/sdk --pretty` | RECORDED | primary entrypoint clean; one combined pre-existing downstream private reference |
 | Fresh UI doc lint | `deno task doc:lint --root packages/fresh-ui --pretty` | RECORDED | `mod.ts` and `primitives.tsx` clean; 123 pre-existing interactive diagnostics |
+| final implementation scanner | exact seven-root command `--max-allow 4` | PASS | `ok:true`; 0 findings; allowCount 0; no surviving allowance |
+| plugin-core check/lint/fmt | scoped wrappers | PASS | 0 diagnostics/findings across 34 files |
+| plugin AI tests | `deno task test` | PASS | 4 passed / 0 failed; adapter rejection + contract map covered |
+| plugin auth tests | `deno task test` | PASS | 29 passed / 0 failed; adapter rejection + contract map covered |
+| plugin-core publish | package-local dry-runs | PASS | both succeed with no slow types |
+| plugin-core doc lint | root wrapper per package | RECORDED | 2 private references each, independently confirmed pre-existing |
 
 ### Fitness Gates
 
@@ -109,6 +119,8 @@ running the scoped wrapper and publish gates.
 | Plan-Gate | PASS | `plan-eval.md` | implementation unblocked |
 | slice 1 doctrine | PASS | `check-doctrine.ts --root packages/telemetry` | FAIL=0; warnings pre-existing |
 | slice 2 review | PASS | `slice-review-2.md` | first FAIL_FIX corrected and independently re-reviewed |
+| slice 3 doctrine | PASS | direct checker per plugin root | FAIL=0; no line-cap debt introduced or deepened |
+| slice 3 review | PASS | `slice-review-3.md` | structural Standard Schema narrowing independently verified |
 
 ### Runtime Gates
 
@@ -121,8 +133,9 @@ running the scoped wrapper and publish gates.
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | SDK + Fresh UI | PASS | scoped wrappers and package tests | typed adapter/public-surface consumers proven |
+| plugin AI + auth cores | PASS | package tests and contract error-map assertions | typed Standard Schema boundary proven |
 
 ## Handoff Notes
 
 - PLAN-EVAL should challenge every claimed guard and the Fresh summary public-type correction.
-- Prior attempt allowance count: 6. Final allowance count: pending; target 0.
+- Prior attempt allowance count: 6. Current/final implementation allowance count: 0; no survivor requires justification.
