@@ -64,6 +64,8 @@ import {
 import type { RemovePluginDependencies } from '../plugins/remove/remove-plugin.ts';
 import type { PluginScaffoldDependencies } from '../plugins/scaffold/scaffold-plugin-use-case.ts';
 import type { PublicCliHost } from './public-command-tree.ts';
+import { FetchAuthSessionHttp } from '../plugins/auth/auth-session-client.ts';
+import type { AuthSessionHttpPort } from '../plugins/auth/auth-types.ts';
 
 /** Dependencies shared by public command groups. */
 export interface PublicCommandDependencies {
@@ -143,6 +145,8 @@ export interface PublicCommandDependencies {
   readonly pluginRemoveDependencies: RemovePluginDependencies;
   /** Dependencies for host-side plugin diagnostics. */
   readonly pluginDoctorDependencies: Pick<DoctorPluginCommandDependencies, 'doctor'>;
+  /** HTTP adapter used by auth session projection and revocation commands. */
+  readonly authSessionHttp: AuthSessionHttpPort;
   /** Dependencies for plugin package scaffolding. */
   readonly pluginScaffoldDependencies: PluginScaffoldDependencies;
   /** Dependencies for runtime config schema generation. */
@@ -291,6 +295,7 @@ export function createPublicCommandDependencies(
           loadConfig,
         }),
     },
+    authSessionHttp: new FetchAuthSessionHttp(),
     pluginScaffoldDependencies: {
       fs,
     },

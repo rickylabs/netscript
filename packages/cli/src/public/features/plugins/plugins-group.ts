@@ -15,6 +15,7 @@ import { createUpdatePluginCommand } from "./update/update-plugin-command.ts";
 import { createAddPluginItemCommand } from "./item/add-plugin-item-command.ts";
 import type { PublicCommandDependencies } from "../root/public-command-dependencies.ts";
 import { createAiPluginCommand } from "./ai/ai-plugin-command.ts";
+import { createAuthPluginCommand } from "./auth/auth-plugin-command.ts";
 
 const CONCRETE_VERBS = new Set<FrameworkVerb>([
   "install",
@@ -112,7 +113,15 @@ export function createPluginCommand(
         resolveProjectRoot: dependencies.resolveProjectRoot,
       }),
     )
-    .command("item-add", createAddPluginItemCommand(dependencies));
+    .command("item-add", createAddPluginItemCommand(dependencies))
+    .command(
+      "auth",
+      createAuthPluginCommand({
+        fs: dependencies.fs,
+        resolveProjectRoot: dependencies.resolveProjectRoot,
+        sessions: dependencies.authSessionHttp,
+      }),
+    );
 
   for (
     const verb of FRAMEWORK_VERBS.filter((candidate) =>
