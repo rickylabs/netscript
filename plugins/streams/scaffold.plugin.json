@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "name": "@netscript/plugin-streams",
-  "version": "0.0.1-beta.7",
+  "version": "0.0.1-beta.8",
   "displayName": "Durable Streams",
   "description": "Durable Streams service, CLI, Aspire, E2E, and scaffolding plugin for NetScript.",
   "peerDependencies": {
-    "@netscript/plugin": "0.0.1-beta.7"
+    "@netscript/plugin": "0.0.1-beta.8"
   },
   "capabilities": {
     "hasDatabaseMigrations": false,

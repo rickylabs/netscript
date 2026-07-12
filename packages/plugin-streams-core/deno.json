@@ -1,6 +1,6 @@
 {
   "name": "@netscript/plugin-streams-core",
-  "version": "0.0.1-beta.7",
+  "version": "0.0.1-beta.8",
   "description": "Schema, producer, config, telemetry, testing, and diagnostics primitives for NetScript streams.",
   "license": "Apache-2.0",
   "exports": {
@@ -9,7 +9,7 @@
     "./testing": "./src/testing/mod.ts"
   },
   "imports": {
-    "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.1-beta.7",
+    "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.1-beta.8",
     "@std/assert": "jsr:@std/assert@^1"
   },
   "tasks": {
