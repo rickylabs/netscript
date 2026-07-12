@@ -88,3 +88,13 @@ Executed:
 Class 2 (host-side plugin names) re-verified post-merge: my S5 `ProjectDoctorPort` injection still
 compiles against #747's plugin capability seam; no name branching in my code. **Epic is
 #745-compliant.**
+
+## Umbrella IMPL-EVAL — lane deviation (2026-07-12)
+
+- Dispatched OpenHands qwen-3.7-max (Tier E canonical IMPL-EVAL) on PR #715 → **workflow FAILURE**
+  (`conclusion:failure state:agent-failed verdict:NONE`, run 29191209531 — agent failed before
+  producing a summary; consistent with the known-flaky OpenRouter agentic lanes).
+- Fallback per lane-policy (deviations recorded here): **separate-session WSL Codex evaluator**
+  (gpt-5.6-sol high, review lane), evaluate-only in a fresh worktree at the umbrella tip. Distinct
+  session from every slice generator → #306 generator≠evaluator invariant preserved. Opposite-family
+  external re-check (OpenHands) to be retried at owner discretion if the lane recovers.
