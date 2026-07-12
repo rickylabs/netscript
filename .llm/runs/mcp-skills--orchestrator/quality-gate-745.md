@@ -65,3 +65,26 @@ against the capability-seam refactor.
 
 Until step 5 is green, S9 completes as normal but the umbrella stays DRAFT and no
 ready-for-merge claim is made.
+
+## Compliance RESULT (2026-07-12, umbrella @ cf762f47)
+
+Executed:
+1. Watched #745 → fixing PR **#747** merged to main as `e4dbe7a3`.
+2. Merged `origin/main` into the umbrella (`925d9e21`); resolved one conflict in
+   `public-command-tree.ts` (union of my `agent` group with main's `config` + `ui:list/update/remove`).
+3. Applied the canonical **`CliffyCommand`** helper to the three agent command factories
+   (`agent-group.ts`, `mcp/agent-mcp-command.ts`, `init/init-agent-command.ts`) — removed every
+   `Command<any,…>` and `as unknown as` cast.
+4. `json-rpc.ts` parse: replaced `as unknown as JsonRpcRequest` with an explicit typed
+   construction after the existing validation (no cast, no `quality-allow` needed).
+5. Gates GREEN (evidence):
+   - `quality:scan` over `packages/mcp` + agent group → `{ok:true, findings:[], allowCount:0}`.
+   - `deno task quality:scan` (repo mode) exit 0, 0 findings (19 pre-existing allowances, none
+     mine); `deno task arch:check` exit 0 → **`quality:gate` PASS**.
+   - `deno check --unstable-kv` clean; `doc:lint --root packages/mcp` totalErrors 0;
+     `deno publish --dry-run` (packages/mcp) Success.
+   - Tests: packages/mcp 39/39, agent group 4/4, stdio e2e smoke 1/1.
+
+Class 2 (host-side plugin names) re-verified post-merge: my S5 `ProjectDoctorPort` injection still
+compiles against #747's plugin capability seam; no name branching in my code. **Epic is
+#745-compliant.**
