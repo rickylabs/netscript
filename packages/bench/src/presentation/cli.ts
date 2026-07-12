@@ -83,16 +83,26 @@ function fakeScript(): ScriptedTurn[] {
 async function runFake(): Promise<void> {
   const manifest = fakeManifest();
   const attempts: TaskAttemptResult[] = [];
+  const loader = new DynamicImportSuiteLoader();
 
   for (const task of TASKS) {
+    // Import the real frozen suite even though probe outcomes stay synthetic.
+    // This proves every registered task id/path/export/probe list is wired.
+    const suite = await loader.load(task.testSuitePath);
+    if (suite.taskId !== task.id) {
+      throw new Error(`task '${task.id}' loaded mismatched suite '${suite.taskId}'`);
+    }
+    const total = suite.probes.length;
+    if (total === 0) throw new Error(`task '${task.id}' has no frozen probes`);
+
     // Fixture goes red -> red -> green: turns_to_green = 3.
     const runner = createBenchRunner({
       driver: new FakeAgentDriver(fakeScript()),
       sandboxes: new LocalWorkspaceSandbox({ seedTaskFiles: false }),
       testRunner: new FixtureTestRunner([
-        fixtureResult(2, 5),
-        fixtureResult(4, 5),
-        fixtureResult(5, 5),
+        fixtureResult(Math.max(1, Math.floor(total * 0.4)), total),
+        fixtureResult(Math.max(1, Math.floor(total * 0.8)), total),
+        fixtureResult(total, total),
       ]),
       tokenMeter: new PricingTokenMeter(pricingFor(manifest.model)),
       clock: new SystemClock(),
