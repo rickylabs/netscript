@@ -18,6 +18,7 @@ import {
   type WorkersTaskRuntime,
 } from '../input.ts';
 import { denoTaskStub, powershellTaskStub, pythonTaskStub, shellTaskStub } from './task.stub.ts';
+import { renderWorkerResourceMetadata } from '../resource-metadata.ts';
 
 /** Canonical starter task input emitted during workers install. */
 export const DEFAULT_TASK_INPUT: TaskInput = { id: 'validate-payload', runtime: 'deno' };
@@ -26,8 +27,20 @@ export const DEFAULT_TASK_INPUT: TaskInput = { id: 'validate-payload', runtime: 
 export const taskScaffolder: ItemScaffolder<TaskInput> = {
   name: 'task',
   emit(input: TaskInput): readonly ScaffoldArtifact[] {
+    const metadata = renderWorkerResourceMetadata({
+      kind: 'task',
+      id: input.id,
+      enabled: true,
+      entrypoint: taskPath(input.id, input.runtime, input.entrypoint),
+      runtime: input.runtime,
+      timeout: input.timeoutMs,
+      maxRetries: input.maxRetries,
+    });
     return [
-      textArtifact(taskPath(input.id, input.runtime), taskSource(input)),
+      textArtifact(
+        taskPath(input.id, input.runtime, input.entrypoint),
+        insertMetadata(taskSource(input), metadata),
+      ),
     ];
   },
 };
@@ -41,7 +54,12 @@ export const taskResource: PluginResource<TaskInput> = {
 };
 
 /** Return the generated userland path for a task input. */
-export function taskPath(id: string, runtime: WorkersTaskRuntime): string {
+export function taskPath(
+  id: string,
+  runtime: WorkersTaskRuntime,
+  entrypoint?: string,
+): string {
+  if (entrypoint) return normalizeEntrypoint(entrypoint);
   const extension = runtime === 'python'
     ? '.py'
     : runtime === 'shell'
@@ -50,6 +68,14 @@ export function taskPath(id: string, runtime: WorkersTaskRuntime): string {
     ? '.ps1'
     : '.ts';
   return `workers/tasks/${fileStem(id)}${extension}`;
+}
+
+function normalizeEntrypoint(entrypoint: string): string {
+  const normalized = entrypoint.trim().replaceAll('\\', '/').replace(/^\.\//, '');
+  if (!normalized || normalized.startsWith('/') || normalized.split('/').includes('..')) {
+    throw new Error('Task --entrypoint must be a project-relative path without parent traversal.');
+  }
+  return normalized;
 }
 
 function taskSource(input: TaskInput): string {
@@ -66,4 +92,12 @@ function taskSource(input: TaskInput): string {
         TASK_EXPORT: `${exportStem(input.id)}Task`,
       });
   }
+}
+
+function insertMetadata(source: string, metadata: string): string {
+  if (!source.startsWith('#!')) return metadata + source;
+  const firstNewline = source.indexOf('\n');
+  return firstNewline < 0
+    ? `${source}\n${metadata}`
+    : `${source.slice(0, firstNewline + 1)}${metadata}${source.slice(firstNewline + 1)}`;
 }

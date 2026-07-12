@@ -24,6 +24,11 @@ export {
   TestTriggerCommand,
   TriggersCliCommand,
 } from './commands.ts';
+export {
+  ListTriggerEventsCommand,
+  RemoveTriggerCommand,
+  UpdateTriggerCommand,
+} from './management-commands.ts';
 export { TRIGGERS_CLI_COMMANDS } from './command-types.ts';
 export type {
   TriggersCliBackend,

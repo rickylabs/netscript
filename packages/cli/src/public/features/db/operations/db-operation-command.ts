@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 /**
  * @module public/features/db/operations/db-operation-command
  */
@@ -12,8 +13,6 @@ import { DbWorkspaceResolver } from '../../../../kernel/adapters/database/worksp
 import { RemoteError } from '../../../../kernel/domain/errors/cli-exit-error.ts';
 import type { DbOperation } from '../../../../kernel/domain/db-engine.ts';
 
-// deno-lint-ignore no-explicit-any
-type AnyCliffyCommand = Command<any, any, any, any, any, any, any, any>;
 
 /** Common options for database operation commands. */
 export interface DbOperationCommandOptions {
@@ -31,7 +30,7 @@ export interface DbOperationCommandDependencies {
 }
 
 /** Shared public database operation command owner. */
-export class DbOperationCommand extends CliCommand<AnyCliffyCommand> {
+export class DbOperationCommand extends CliCommand<CliffyCommand> {
   readonly id: string;
 
   constructor(
@@ -43,7 +42,7 @@ export class DbOperationCommand extends CliCommand<AnyCliffyCommand> {
     this.id = `public.db.${operation}`;
   }
 
-  define(): AnyCliffyCommand {
+  define(): CliffyCommand {
     return new Command()
       .name(this.operation)
       .description(this.descriptionText)
@@ -61,7 +60,7 @@ export function createDbOperationCommand(
   operation: DbOperation,
   description: string,
   dependencies: DbOperationCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   return new DbOperationCommand(operation, description, dependencies).define();
 }
 

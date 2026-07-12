@@ -1,4 +1,4 @@
-import { assertEquals, assertStringIncludes } from '@std/assert';
+import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import { defineWebhook, enqueueJob } from '@netscript/plugin-triggers-core/builders';
 import { defineJob } from '@netscript/plugin-workers-core';
 import type { JobMessage } from '@netscript/plugin-workers-core/runtime';
@@ -7,6 +7,7 @@ import type {
   TriggerEventId,
   TriggerId,
 } from '@netscript/plugin-triggers-core/domain';
+import { TriggersError } from '@netscript/plugin-triggers-core/domain';
 import type {
   TriggerDlqEntry,
   TriggerDlqPort,
@@ -15,6 +16,7 @@ import type {
   TriggerIdempotencyPort,
 } from '@netscript/plugin-triggers-core/ports';
 import { createRuntimeTriggerProcessor } from './trigger-runtime-processor.ts';
+import { MemoryTriggerEnabledStateStore } from '@netscript/plugin-triggers-core/testing';
 
 Deno.test('runtime processor rejects defer actions instead of silently dropping them', async () => {
   const idempotency = new MemoryIdempotency();
@@ -67,6 +69,26 @@ Deno.test('runtime processor stamps idempotency key onto enqueued worker job bod
   assertEquals(queue.messages.length, 1);
   assertEquals(queue.messages[0].idempotencyKey, 'action-key');
   assertEquals(queue.options[0]?.deduplicationId, 'action-key');
+});
+
+Deno.test('runtime processor rejects a trigger disabled in the authoritative state store', async () => {
+  const enabledState = new MemoryTriggerEnabledStateStore();
+  const definition = defineWebhook(
+    () => Promise.resolve([]),
+    { id: 'stripe-payments', path: '/webhooks/stripe', verifier: 'memory' },
+  );
+  await enabledState.setEnabled(definition.id, false);
+  const processor = await createRuntimeTriggerProcessor({
+    idempotency: new MemoryIdempotency(),
+    dlq: new MemoryDlq(),
+    enabledState,
+  });
+
+  await assertRejects(
+    () => processor.process(webhookEvent(), definition),
+    TriggersError,
+    'Trigger stripe-payments is disabled.',
+  );
 });
 
 class MemoryIdempotency implements TriggerIdempotencyPort {

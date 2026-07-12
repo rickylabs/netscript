@@ -51,6 +51,7 @@ import {
 } from '@netscript/plugin-triggers-core/runtime';
 import { createTriggersService } from './main.ts';
 import type { TriggerServiceContext } from './routers/v1-types.ts';
+import { HttpTriggersService } from '../../src/cli/http-triggers-service.ts';
 
 /** Minimal in-memory event store; the smoke test exercises read paths only. */
 class InMemoryEventStore implements TriggerEventStorePort {
@@ -293,6 +294,20 @@ Deno.test('triggers connector smoke', async (t) => {
       const disabledBody = await disabledList.json() as { triggers: Array<{ id: string }> };
       assertEquals(disabledBody.triggers.map((trigger) => trigger.id), ['sched-1']);
 
+      const fireRoute = await findRoute(
+        baseUrl,
+        (method, path) => method === 'POST' && /\/fire$/.test(path),
+      );
+      const disabledFire = await fetch(
+        `${baseUrl}/api${fireRoute.path.replace('{id}', 'sched-1')}`,
+        {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ payload: { shouldNotDispatch: true } }),
+        },
+      );
+      assertEquals(disabledFire.ok, false);
+
       const enableRoute = await findRoute(
         baseUrl,
         (method, path) => method === 'POST' && /\/enable$/.test(path),
@@ -482,6 +497,51 @@ Deno.test('triggers legacy events path lists stored events', async () => {
     assertEquals(Array.isArray(body.events), true);
     assertEquals(body.events?.length, 1);
     assertEquals(body.total, 1);
+  } finally {
+    await running.stop();
+  }
+});
+
+Deno.test('CLI service adapter observes fired webhook ledger and authoritative state', async () => {
+  const context = buildWebhookTestContext();
+  const running: RunningService = await createTriggersService(context, { port: 0 })
+    .serve({ port: 0 });
+  const host = running.addr.hostname === '0.0.0.0' ? '127.0.0.1' : running.addr.hostname;
+  const baseUrl = `http://${host}:${running.addr.port}`;
+  const client = new HttpTriggersService({ baseUrl: `${baseUrl}/api/v1` });
+
+  try {
+    const disabled = await client.setEnabled('test-webhook', false);
+    assertEquals(disabled.id, 'test-webhook');
+    assertEquals(disabled.enabled, false);
+    const rejected = await fetch(`${baseUrl}/api/v1/webhooks/test-webhook`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ orderId: 'disabled-order' }),
+    });
+    assertEquals(rejected.status, 409);
+
+    assertEquals((await client.setEnabled('test-webhook', true)).enabled, true);
+    const accepted = await fetch(`${baseUrl}/api/v1/webhooks/test-webhook`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ orderId: 'accepted-order' }),
+    });
+    assertEquals(accepted.status, 202);
+
+    const ledger = await client.listEvents({ triggerId: 'test-webhook', limit: 10 });
+    assertEquals(ledger.total, 1);
+    assertEquals(ledger.events[0]?.triggerId, 'test-webhook');
+    const payload = ledger.events[0]?.payload as {
+      body?: unknown;
+      headers?: Record<string, string>;
+      method?: string;
+      path?: string;
+    };
+    assertEquals(payload.body, { orderId: 'accepted-order' });
+    assertEquals(payload.headers?.['content-type'], 'application/json');
+    assertEquals(payload.method, 'POST');
+    assertEquals(payload.path, '/api/v1/webhooks/test-webhook');
   } finally {
     await running.stop();
   }

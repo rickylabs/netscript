@@ -5,6 +5,7 @@ import {
   CacheModeSchema,
   NetScriptConfigSchema,
   parseAppSettings,
+  PluginEntrySchema,
   ServiceEntrySchema,
 } from '../config.ts';
 
@@ -64,6 +65,14 @@ Deno.test('config', async (t) => {
     assertEquals(workersApi.Port, 8091);
     assertEquals(workersApi.RequiresKv, true);
     assertEquals(workersApi.RequiresDb, true);
+  });
+
+  await t.step('PluginEntrySchema: preserves configured environment', () => {
+    const plugin = PluginEntrySchema.parse({
+      Port: 8094,
+      Environment: { NETSCRIPT_AUTH_BACKEND: 'kv-oauth' },
+    });
+    assertEquals(plugin.Environment, { NETSCRIPT_AUTH_BACKEND: 'kv-oauth' });
   });
 
   await t.step('AppSettingsSchema: preserves saga store metadata', () => {

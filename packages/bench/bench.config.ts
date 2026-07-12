@@ -117,7 +117,7 @@ export const CAPS: RunCaps = {
   suiteTimeoutMs: 60_000,
 };
 
-/** The single framework lane for Slice 1. */
+/** The NetScript framework lane used by every self-bench task. */
 export const NETSCRIPT_LANE: FrameworkLane = {
   id: 'netscript',
   name: 'NetScript',
@@ -135,8 +135,19 @@ export const T1_STOREFRONT_API: BenchTask = {
   lanes: [NETSCRIPT_LANE],
 };
 
+/** Task 2: durable saga + queued worker work + scheduled cron trigger. */
+export const T2_SAGA_QUEUE_CRON: BenchTask = {
+  id: 't2-saga-queue-cron',
+  title: 'Saga, queued work, and cron trigger',
+  dir: `${PACKAGE_DIR}tasks/t2-saga-queue-cron`,
+  promptPath: 'prompt.md',
+  rubricPath: 'rubric.md',
+  testSuitePath: `${PACKAGE_DIR}tasks/t2-saga-queue-cron/tests/frozen-suite.ts`,
+  lanes: [NETSCRIPT_LANE],
+};
+
 /** Ordered task list. */
-export const TASKS: readonly BenchTask[] = [T1_STOREFRONT_API];
+export const TASKS: readonly BenchTask[] = [T1_STOREFRONT_API, T2_SAGA_QUEUE_CRON];
 
 /** Run design for Slice 1: single repeat (N-repeats deferred to a later slice). */
 export const RUN_DESIGN = {

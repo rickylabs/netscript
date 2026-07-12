@@ -199,6 +199,8 @@ export interface PluginResource<TInput = unknown> {
    * @returns Validated resource input.
    */
   parseInput?(args: PluginCliArgs): TInput | Promise<TInput>;
+  /** Run plugin-owned synchronization after the resource artifact is applied. */
+  afterWrite?(context: PluginCommandContext): void | Promise<void>;
   /**
    * List known resource instances.
    *

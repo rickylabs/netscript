@@ -98,6 +98,54 @@ export class DatabaseWorkspaceMutator {
     await this.fs.writeFile(path, JSON.stringify(root, null, 2) + '\n');
   }
 
+  /** Deregister a database and repair primary/tool references. */
+  async removeDatabaseFromAppsettings(
+    projectRoot: string,
+    configKey: string,
+  ): Promise<void> {
+    const path = join(projectRoot, SCAFFOLD_FILES.APPSETTINGS);
+    if (!(await this.fs.exists(path))) {
+      throw new ScaffoldValidationError('appsettings.json not found.', { projectRoot });
+    }
+    const root = asMutableRecord(JSON.parse(await this.fs.readFile(path)) as unknown);
+    const netScript = ensureRecord(root, 'NetScript');
+    const databases = ensureRecord(netScript, 'Databases');
+    if (databases[configKey] === undefined) {
+      throw new ScaffoldValidationError(`Database "${configKey}" is not registered.`, {
+        configKey,
+      });
+    }
+    delete databases[configKey];
+    const replacement = Object.keys(databases)[0];
+    if (netScript.PrimaryDatabase === configKey) {
+      if (replacement) netScript.PrimaryDatabase = replacement;
+      else delete netScript.PrimaryDatabase;
+    }
+    const tools = ensureRecord(netScript, 'Tools');
+    for (const tool of Object.values(tools)) {
+      if (tool && typeof tool === 'object' && !Array.isArray(tool)) {
+        const record = tool as Record<string, unknown>;
+        if (record.Database === configKey) {
+          if (replacement) record.Database = replacement;
+          else delete record.Database;
+        }
+      }
+    }
+    await this.fs.writeFile(path, JSON.stringify(root, null, 2) + '\n');
+  }
+
+  /** Remove a database workspace member from root `deno.json`. */
+  async removeDatabaseWorkspaceMember(projectRoot: string, engineDirName: string): Promise<void> {
+    const path = join(projectRoot, SCAFFOLD_FILES.DENO_JSON);
+    if (!(await this.fs.exists(path))) return;
+    const root = asMutableRecord(JSON.parse(await this.fs.readFile(path)) as unknown);
+    const member = `./${SCAFFOLD_DIRS.DATABASE}/${engineDirName}`;
+    if (Array.isArray(root.workspace)) {
+      root.workspace = root.workspace.filter((value) => value !== member && value !== member.slice(2));
+      await this.fs.writeFile(path, JSON.stringify(root, null, 2) + '\n');
+    }
+  }
+
   /** Add a database workspace member to root `deno.json`. */
   async addDatabaseWorkspaceMember(
     projectRoot: string,

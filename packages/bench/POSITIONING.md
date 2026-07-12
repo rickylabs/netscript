@@ -42,10 +42,10 @@ The thesis is operationalized by `@netscript/bench` — a clean-architecture har
 coding agent through a task in an isolated sandbox, runs a **frozen black-box HTTP suite** after
 every turn, and scores the attempt. The instrument is real and CI-guarded today:
 
-- **Golden reference + conformance gate (shipped, key-free).** A cast-free NetScript reference for
-  `t1-storefront-api` passes the frozen suite **10/10** over HTTP, with a real process restart
-  proving `@netscript/kv` persistence. The `conformance` gate boots it and replays the suite every
-  CI run, proving a compliant NetScript service _can_ go green without spending an agent run.
+- **Golden references + conformance gate (shipped, key-free).** NetScript references for
+  `t1-storefront-api` and `t2-saga-queue-cron` pass their frozen HTTP suites, with real process
+  restarts proving `@netscript/kv` persistence. The `conformance` gate boots each reference and
+  replays both suites, proving compliant services _can_ go green without spending an agent run.
 - **Four scored build-efficiency axes** (default preset weights):
 
   | Metric           | Direction | Anchor (worst → best) | Weight |

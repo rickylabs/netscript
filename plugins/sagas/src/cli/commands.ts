@@ -106,6 +106,45 @@ export class GenerateRegistryCommand extends SagasCliCommand {
   }
 }
 
+/** Publish a message through the durable saga runtime. */
+export class PublishCommand extends SagasCliCommand {
+  /** Create the saga publish command wrapper. */
+  constructor(backend?: SagasCliBackend) {
+    super({
+      name: 'publish',
+      category: 'runtime',
+      description: 'Publish a message to the durable saga bus.',
+      usage: 'ns-sagas publish <type> --payload=<json> [--correlation-key --idempotency-key]',
+      flags: [
+        { name: 'payload', description: 'JSON object delivered with the message.', required: true },
+        { name: 'correlation-key', description: 'Saga correlation key.' },
+        { name: 'idempotency-key', description: 'Message idempotency key.' },
+        { name: 'json', description: 'Render structured JSON output.' },
+      ],
+    }, backend);
+  }
+}
+
+/** List registered saga definitions or durable instances. */
+export class ListSagasCommand extends SagasCliCommand {
+  /** Create the saga list command wrapper. */
+  constructor(backend?: SagasCliBackend) {
+    super({
+      name: 'list',
+      category: 'runtime',
+      description: 'List registered sagas or durable saga instances.',
+      usage: 'ns-sagas list [--registered|--instances --status --saga --json]',
+      flags: [
+        { name: 'registered', description: 'List registered saga definitions.' },
+        { name: 'instances', description: 'List durable saga instances.' },
+        { name: 'status', description: 'Filter instances by status.' },
+        { name: 'saga', description: 'Filter instances by saga name.' },
+        { name: 'json', description: 'Render structured JSON output.' },
+      ],
+    }, backend);
+  }
+}
+
 /** Inspect saga definitions discovered in project source. */
 export class InspectCommand extends SagasCliCommand {
   /** Create the saga-inspection command wrapper. */
@@ -113,9 +152,44 @@ export class InspectCommand extends SagasCliCommand {
     super({
       name: 'inspect',
       category: 'inspection',
-      description: 'Inspect fluent saga definitions in project source.',
-      usage: 'ns-sagas inspect [--root=sagas]',
-      flags: [{ name: 'root', description: 'Comma-separated project roots to scan.' }],
+      description: 'Inspect saga metadata from the runtime, with local source fallback.',
+      usage: 'ns-sagas inspect [id] [--root=sagas --json]',
+      flags: [
+        { name: 'root', description: 'Comma-separated project roots to scan.' },
+        { name: 'json', description: 'Render structured JSON output.' },
+      ],
+    }, backend);
+  }
+}
+
+/** Update a generated saga definition/config and regenerate the registry. */
+export class UpdateSagaCommand extends SagasCliCommand {
+  /** Create the saga update command wrapper. */
+  constructor(backend?: SagasCliBackend) {
+    super({
+      name: 'update-saga',
+      category: 'scaffolding',
+      description: 'Update a generated saga definition and config.',
+      usage: 'ns-sagas update saga <id> [--durability --topic --tags --description]',
+      flags: [
+        { name: 'durability', description: 'Saga durability tier.' },
+        { name: 'topic', description: 'Message routing topic.' },
+        { name: 'tags', description: 'Comma-separated config tags.' },
+        { name: 'description', description: 'Human-readable saga description.' },
+      ],
+    }, backend);
+  }
+}
+
+/** Remove generated saga files and regenerate the registry. */
+export class RemoveSagaCommand extends SagasCliCommand {
+  /** Create the saga remove command wrapper. */
+  constructor(backend?: SagasCliBackend) {
+    super({
+      name: 'remove-saga',
+      category: 'scaffolding',
+      description: 'Remove a generated saga definition and config.',
+      usage: 'ns-sagas remove saga <id>',
     }, backend);
   }
 }

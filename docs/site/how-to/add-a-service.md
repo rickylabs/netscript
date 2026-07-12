@@ -96,9 +96,25 @@ imported through the <code>@&lt;project&gt;/contracts</code> alias (for the exam
 
 ## Step 2 — Define the contract
 
-A service implements a contract; define it first. Add a versioned contract module under
-`contracts/versions/v1/` using `@orpc/contract` + `zod`, then `implement()` it so the
-result is ready for `.handler()` binding.
+A service implements a contract; define it first. `service add` creates the initial versioned
+contract and aggregate. Add each procedure through the CLI so it updates the existing contract
+without hand-editing the aggregate:
+
+```bash
+netscript contract add-route users findByEmail \
+  --method POST \
+  --path /users/by-email \
+  --input "z.object({ email: z.string().email() })" \
+  --output "UsersListItemSchemaV1.optional()"
+
+netscript contract inspect users
+netscript contract inspect users --json
+```
+
+The command appends an `@orpc/contract` + Zod route to
+`contracts/versions/v1/users.contract.ts`. The generated module calls `implement()` so the result
+is ready for `.handler()` binding. The equivalent source shape is shown below so you know what to
+customize:
 
 ```ts
 // contracts/versions/v1/users.contract.ts
@@ -129,7 +145,7 @@ export const UsersContractV1 = {
 export const UsersV1 = implement(UsersContractV1);
 ```
 
-Re-export it from the contracts barrel so callers and the service share one type source:
+The CLI maintains this aggregate so callers and the service share one type source:
 
 ```ts
 // contracts/versions/v1/mod.ts
@@ -144,11 +160,27 @@ binds — and the very same contract is what a typed client imports. Change the 
 place and both the service handler and every caller fail to type-check until they agree.
 {{ /comp }}
 
+For a breaking schema change, promote the contract instead of editing v1 in place. This creates
+the v2 aggregate and updates the root contract exports:
+
+```bash
+netscript contract version add users --from v1 --to v2
+netscript contract list
+```
+
 ## Step 3 — Implement the handlers
 
-Bind handlers to the implemented contract. Import the contract through the project alias,
-not a relative path. At this scaffold stage handlers return seeded in-memory records — no
-database is wired yet, which keeps the contract↔client proof isolated.
+Create the binding stub with the paired service verb, then replace its intentional
+`Not implemented` error with your business logic:
+
+```bash
+netscript service add-handler users findByEmail
+```
+
+The command verifies that `findByEmail` exists in the users contract, then appends a compiling
+`.handler()` binding to `services/users/src/routers/v1.ts`. Import the contract through the project
+alias, not a relative path. At this scaffold stage handlers can return seeded in-memory records —
+no database is wired yet, which keeps the contract↔client proof isolated.
 
 ```ts
 // services/users/src/routers/v1.ts
@@ -190,7 +222,9 @@ export const router = { v1 };
 
 ## Step 4 — Serve it with `defineService`
 
-The service entry point passes the router to `defineService(...)`. The port reads from
+`netscript service add` already creates this entry point and registers it in appsettings and the
+Deno workspace; `netscript service generate` can regenerate Aspire helpers after later config
+edits. The service entry point passes the router to `defineService(...)`. The port reads from
 the `PORT` env var with a literal fallback so the same code runs locally and under Aspire.
 
 ```ts
@@ -215,6 +249,10 @@ fallback default — set the port there rather than editing this line.
 OpenAPI surface (`/api/v1/users/*`) and the RPC surface (`/api/rpc/v1/...`). The default
 RPC mount point is `/api/rpc` and the OpenAPI mount point is `/api`; both are overridable
 via the builder's `rpcPath` / `apiPath` options if you reach for `createService`.
+
+To reverse this lifecycle, `netscript service remove users` removes the service workspace,
+appsettings/workspace registrations, paired contracts, and regenerated helpers. Pass
+`--keep-contract` when the API definition must remain published after the runtime is retired.
 
 {{ comp callout { type: "note", title: "Need CORS, a database, or auth? Use createService" } }}
 When a service must layer cross-cutting concerns, swap <code>defineService</code> for the fluent

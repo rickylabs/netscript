@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
 /**
  * @module public/features/db/generate/generate-db-command
@@ -18,6 +19,6 @@ export class GenerateDbCommand extends DbOperationCommand {
 /** Create the public `db generate` command. */
 export function createDbGenerateCommand(
   dependencies: DbOperationCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   return new GenerateDbCommand(dependencies).define();
 }

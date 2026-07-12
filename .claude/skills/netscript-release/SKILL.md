@@ -86,6 +86,18 @@ After the release PR merges:
    `jsr:@netscript/cli@<version>`, and runs the published CLI smoke and scaffold runtime suite.
 5. The manual `workflow_dispatch` path still accepts `published-version` for targeted rechecks.
 
+## Hard Release Completion Gate
+
+A release is **done only when both** of these independent workflow verdicts are green:
+
+1. `publish.yml` is all-green for the GitHub Release-triggered publish run.
+2. The corresponding artifact-pinned `e2e-cli-prod` run is green.
+
+Any red result in either workflow is a real release defect. Do not relabel it as infrastructure
+noise, bypass it, delete the release record, or treat a partial publish as done. Investigate the
+exact failing version and fix-forward; when code changes are required, cut the next patch or
+prerelease and repeat both gates. The release is not complete until the pair is green.
+
 ## Rationale
 
 - #122: one command prevents manual root version, member version, and lockfile drift.

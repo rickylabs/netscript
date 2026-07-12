@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../kernel/presentation/command-types.ts";
 import { outputText } from '../../../kernel/presentation/output/default-output.ts';
 import { Command } from '@cliffy/command';
 import { probeMonorepo, type ProbeMonorepoDependencies } from './probe-monorepo.ts';
@@ -23,7 +24,7 @@ export interface ProbeMonorepoCommandDependencies {
 /** Create the maintainer `probe monorepo` command. */
 export function createProbeMonorepoCommand(
   dependencies: ProbeMonorepoCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   const print = dependencies.print ?? outputText;
   return new Command()
     .name('monorepo')

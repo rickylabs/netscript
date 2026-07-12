@@ -43,7 +43,10 @@ export async function runPluginCliCommand(
     case 'update':
       return runUpdateCommand({ plugin: options.plugin });
     case 'remove':
-      return runRemoveCommand({ plugin: options.plugin });
+      return options.args.values?.length &&
+          options.plugin.commands?.some((item) => item.verb === 'remove')
+        ? await runExtraCommand(options)
+        : runRemoveCommand({ plugin: options.plugin });
     case 'add':
     case 'generate':
       return await runResourceCommand(options);
@@ -76,6 +79,10 @@ async function runResourceCommand(
     },
     context: options.context,
   });
+
+  if (result.status !== 'failed' && !options.context.dryRun) {
+    await resource.afterWrite?.(options.context);
+  }
 
   return {
     code: result.status === 'failed' ? 1 : 0,

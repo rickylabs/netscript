@@ -132,8 +132,8 @@ export function createPluginHostLoader(
   options: PluginHostLoaderOptions,
 ): PluginHostLoaderPort {
   return createInternalPluginHostLoader(
-    options as unknown as InternalPluginHostLoaderOptions,
-  ) as unknown as InternalPluginHostLoaderPort as unknown as PluginHostLoaderPort;
+    options as unknown as InternalPluginHostLoaderOptions, // quality-allow: public facade bridges duplicated internal and exported plugin port identities pending package-boundary unification
+  ) as unknown as InternalPluginHostLoaderPort as unknown as PluginHostLoaderPort; // quality-allow: public facade bridges duplicated internal and exported plugin port identities pending package-boundary unification
 }
 
 /**
@@ -155,7 +155,7 @@ export function resolvePluginManifest(
 ): Promise<PluginHostManifest> {
   return resolveInternalPluginManifest(
     spec,
-    options as unknown as InternalResolvePluginManifestOptions,
+    options as unknown as InternalResolvePluginManifestOptions, // quality-allow: public facade bridges duplicated internal and exported plugin port identities pending package-boundary unification
   ) as Promise<PluginHostManifest>;
 }
 
@@ -272,8 +272,8 @@ export function scaffoldPluginPackage(
   dependencies: PluginScaffoldDependencies,
 ): Promise<PluginScaffoldResult> {
   return scaffoldInternalPluginPackage(
-    options as unknown as InternalPluginScaffoldOptions,
-    dependencies as unknown as InternalPluginScaffoldDependencies,
+    options as unknown as InternalPluginScaffoldOptions, // quality-allow: public facade bridges duplicated internal and exported plugin port identities pending package-boundary unification
+    dependencies as unknown as InternalPluginScaffoldDependencies, // quality-allow: public facade bridges duplicated internal and exported plugin port identities pending package-boundary unification
   ) as Promise<PluginScaffoldResult>;
 }
 

@@ -74,9 +74,15 @@ The canonical install is <code>plugins/triggers/</code> — the path <code>netsc
 
 ## Step 2 — Author the shipping-update job and the verified webhook
 
-The webhook hands each inbound event to a background job, so author that job first — the same
-`defineJobHandler` pattern you used for `process-payment` in chapter 4. A real integration would
-advance the order; here it validates and records the update:
+The webhook hands each inbound event to a background job, so scaffold that job first:
+
+```sh
+ns-workers add job process-shipping-update
+```
+
+Extend the generated payload schema with `orderId`, `status`, and `trackingNumber`, then replace the
+starter handler body with the validation and application logic. A real integration would advance
+the order; here it validates and records the update:
 
 ```ts
 // workers/jobs/process-shipping-update.ts
@@ -98,14 +104,29 @@ const handler = defineJobHandler(async (ctx) => {
 export default Object.assign(handler, { id: 'process-shipping-update' });
 ```
 
-Now the webhook. It is `defineWebhook(handler, spec)` from
+Scaffold the webhook and its worker-job action with the triggers CLI first:
+
+The `add-webhook` verb uses the spaced `add webhook` shell syntax:
+
+```bash
+ns-triggers add webhook shipping-status-webhook \
+  --path=shipping/status \
+  --job=process-shipping-update \
+  --verifier=hmac-sha256 \
+  --secret-env=WEBHOOK_SHIPPING_SECRET \
+  --description="Receives carrier shipping-status callbacks and enqueues a processing job." \
+  --tags=webhook,shipping,saga
+```
+
+The command writes `triggers/shipping-status-webhook-trigger.ts` and recompiles the generated
+trigger registry. The generated definition uses `defineWebhook(handler, spec)` from
 `@netscript/plugin-triggers-core/builders`: the handler resolves to an **array of effects**, and the
 spec names the webhook and — for a real provider callback — declares HMAC verification so forged
 requests are rejected before your handler runs. The job reference is an inline object typed with
-`satisfies JobDefinition` — no helper needed:
+`satisfies JobDefinition` — no helper needed. Its relevant shape is:
 
 ```ts
-// plugins/triggers/shipping-status-webhook.ts
+// triggers/shipping-status-webhook-trigger.ts
 import { defineWebhook, enqueueJob } from '@netscript/plugin-triggers-core/builders';
 import type { JobDefinition } from '@netscript/plugin-workers-core';
 
@@ -238,7 +259,7 @@ sides of the hand-off:
 curl "http://localhost:8093/api/v1/events?limit=10"
 
 # 2. The worker job it enqueued has executed (workers API, :8091)
-curl "http://localhost:8091/api/v1/workers/executions?limit=10"
+ns-workers executions --limit=10 --json
 ```
 
 You should see the inbound event listed by the triggers events endpoint and a fresh execution of

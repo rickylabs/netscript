@@ -1,10 +1,11 @@
+import type { CliffyCommand } from "../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
 
 import { createMarketplacePublishCommand } from './publish/marketplace-publish-command.ts';
 import { createMarketplaceSearchCommand } from './search/marketplace-search-command.ts';
 
 /** Create the public marketplace command group. */
-export function createMarketplaceCommand(): Command<any, any, any, any, any, any, any, any> {
+export function createMarketplaceCommand(): CliffyCommand {
   return new Command()
     .name('marketplace')
     .description('Discover and publish NetScript plugins')

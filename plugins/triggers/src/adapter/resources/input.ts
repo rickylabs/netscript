@@ -19,6 +19,12 @@ export interface TriggerInput {
   readonly fileName?: string;
   /** Whether an existing generated file may be overwritten by local CLI commands. */
   readonly force?: boolean;
+  /** Optional worker job id enqueued by the generated trigger handler. */
+  readonly job?: string;
+  /** Optional human-readable trigger description. */
+  readonly description?: string;
+  /** Optional trigger tags. */
+  readonly tags?: readonly string[];
 }
 
 /** Input accepted by the webhook trigger resource. */
@@ -27,6 +33,8 @@ export interface WebhookInput extends TriggerInput {
   readonly path?: string;
   /** Optional environment variable containing the webhook secret. */
   readonly secretEnv?: string;
+  /** Webhook verifier registered with the trigger runtime. */
+  readonly verifier?: string;
 }
 
 /** Input accepted by the file-watch trigger resource. */
@@ -78,6 +86,10 @@ export function parseWebhookInput(args: PluginCliArgs): WebhookInput {
     id: requiredResourceId(args),
     path: stringFlag(args, 'path'),
     secretEnv: stringFlag(args, 'secret-env'),
+    verifier: stringFlag(args, 'verifier'),
+    job: stringFlag(args, 'job'),
+    description: stringFlag(args, 'description'),
+    tags: listFlag(args, 'tags'),
     force: booleanFlag(args, 'force'),
   };
 }
@@ -99,6 +111,9 @@ export function parseScheduledInput(args: PluginCliArgs): ScheduledInput {
     id: requiredResourceId(args),
     cron: stringFlag(args, 'cron'),
     timezone: stringFlag(args, 'timezone'),
+    job: stringFlag(args, 'job'),
+    description: stringFlag(args, 'description'),
+    tags: listFlag(args, 'tags'),
     force: booleanFlag(args, 'force'),
   };
 }

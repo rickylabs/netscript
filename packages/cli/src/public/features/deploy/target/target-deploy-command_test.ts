@@ -150,6 +150,33 @@ Deno.test('router omits verbs the adapter does not advertise', () => {
   assertEquals(verbs, ['plan']);
 });
 
+Deno.test('router exposes secrets set/get/list and forwards the selected operation', async () => {
+  const calls: RecordedOp[] = [];
+  const target = fakeTarget(calls);
+  const registry = new DeployTargetRegistry([[
+    'compose',
+    { ...target, operations: [...target.operations, 'secrets'], secrets: (request) => {
+      calls.push({ operation: 'secrets', request });
+      return Promise.resolve({ target: 'compose', operation: 'secrets', message: 'secrets ok' });
+    } },
+  ]]);
+  const dependencies = {
+    deployTargets: registry,
+    resolveProjectRoot: () => Promise.resolve('/resolved-root'),
+    loadConfig: () => Promise.resolve({}),
+  } as unknown as PublicCommandDependencies;
+  const command = createTargetDeployCommand('compose', dependencies);
+  const secrets = command.getCommands().find((entry) => entry.getName() === 'secrets');
+  assertEquals(secrets?.getCommands().map((entry) => entry.getName()).sort(), ['get', 'list', 'set']);
+
+  await command.parse(['secrets', 'set', 'DATABASE_URL', 'secret']);
+  assertEquals(calls[0].request.secrets, {
+    operation: 'set',
+    key: 'DATABASE_URL',
+    value: 'secret',
+  });
+});
+
 Deno.test('deploy target routers resolve their default registry targets', () => {
   const dependencies = {
     deployTargets: new DeployTargetRegistry(),

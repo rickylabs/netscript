@@ -10,7 +10,7 @@ import { HelpersGeneratorPipeline } from '../../templates/aspire/helpers/helpers
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
 import { ScaffoldValidationError } from '../../domain/errors.ts';
-import { addWorkspaceMember } from '../scaffold/workspace-writer.ts';
+import { addWorkspaceMember, removeWorkspaceMember } from '../scaffold/workspace-writer.ts';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../ports/template-port.ts';
 import type { ServiceConfigEntry } from '../../domain/service-shape.ts';
@@ -101,6 +101,36 @@ export async function addServiceWorkspaceMember(
   );
 }
 
+/** Remove a service entry from root `appsettings.json` when present. */
+export async function removeServiceAppsettingsEntry(
+  projectRoot: string,
+  serviceName: string,
+  fs: FileSystemPort,
+): Promise<boolean> {
+  const configPath = join(projectRoot, SCAFFOLD_FILES.APPSETTINGS);
+  if (!await fs.exists(configPath)) return false;
+  const raw = JSON.parse(await fs.readFile(configPath)) as {
+    NetScript?: { Services?: Record<string, ServiceConfigEntry> };
+  };
+  if (!raw.NetScript?.Services?.[serviceName]) return false;
+  delete raw.NetScript.Services[serviceName];
+  await fs.writeFile(configPath, JSON.stringify(raw, null, 2) + '\n');
+  return true;
+}
+
+/** Remove `services/<name>` from the root Deno workspace. */
+export async function removeServiceWorkspaceMember(
+  projectRoot: string,
+  serviceName: string,
+  fs: FileSystemPort,
+): Promise<boolean> {
+  return await removeWorkspaceMember(
+    projectRoot,
+    `${SCAFFOLD_DIRS.SERVICES}/${serviceName}`,
+    fs,
+  );
+}
+
 /** Regenerate TypeScript Aspire helper files from root `appsettings.json`. */
 export async function regenerateAspireHelpers(
   projectRoot: string,
@@ -125,9 +155,11 @@ export async function regenerateAspireHelpers(
   }
 
   const parsed = await parseAppSettings(appsettingsPath);
+  const rawAppsettings = JSON.parse(await fs.readFile(appsettingsPath)) as unknown;
+  const config = preservePluginEnvironment(parsed.config, rawAppsettings);
   const pipeline = new HelpersGeneratorPipeline(templateAdapter);
   const files = await pipeline.execute({
-    config: parsed.config,
+    config,
     configPath: `../${SCAFFOLD_FILES.APPSETTINGS}`,
     generateAppHost: true,
   });
@@ -141,6 +173,32 @@ export async function regenerateAspireHelpers(
   }
 
   return written;
+}
+
+function preservePluginEnvironment<TConfig extends { Plugins: Record<string, unknown> }>(
+  config: TConfig,
+  rawAppsettings: unknown,
+): TConfig {
+  if (!isRecord(rawAppsettings) || !isRecord(rawAppsettings.NetScript)) return config;
+  const rawPlugins = rawAppsettings.NetScript.Plugins;
+  if (!isRecord(rawPlugins)) return config;
+
+  const plugins = { ...config.Plugins };
+  for (const [name, rawPlugin] of Object.entries(rawPlugins)) {
+    if (!isRecord(rawPlugin) || !isStringRecord(rawPlugin.Environment)) continue;
+    const parsedPlugin = plugins[name];
+    if (!isRecord(parsedPlugin)) continue;
+    plugins[name] = { ...parsedPlugin, Environment: rawPlugin.Environment };
+  }
+  return { ...config, Plugins: plugins };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function isStringRecord(value: unknown): value is Record<string, string> {
+  return isRecord(value) && Object.values(value).every((entry) => typeof entry === 'string');
 }
 
 async function hasLocalPackageWorkspace(

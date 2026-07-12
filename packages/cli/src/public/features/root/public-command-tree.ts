@@ -1,6 +1,7 @@
 import { CliCommandRegistry } from '../../composition/cli-command-registry.ts';
 import { contractCommand } from '../contracts/contracts-group.ts';
 import { createDbCommand } from '../db/db-group.ts';
+import { createConfigCommand } from '../config/config-group.ts';
 import { createDeployCommand } from '../deploy/deploy-group.ts';
 import { createGenerateCommand } from '../generate/generate-group.ts';
 import { createInitCommand } from '../init/init-command.ts';
@@ -10,6 +11,9 @@ import { createServiceCommand } from '../services/services-group.ts';
 import { createUiAddCommand } from '../ui/add/add-ui-command.ts';
 import { createUiInitCommand } from '../ui/init/init-ui-command.ts';
 import { createAgentCommand } from '../agent/agent-group.ts';
+import { createUiListCommand } from '../ui/list/list-ui-command.ts';
+import { createUiUpdateCommand } from '../ui/update/update-ui-command.ts';
+import { createUiRemoveCommand } from '../ui/remove/remove-ui-command.ts';
 import {
   createPublicCommandDependencies,
   type PublicCommandDependencies,
@@ -48,7 +52,10 @@ export function createPublicCommandRegistry(): CliCommandRegistry<PublicCommandC
     id: 'agent',
     create: ({ host, dependencies }) => createAgentCommand(host, dependencies),
   });
-
+  registry.register('config', {
+    id: 'config',
+    create: ({ dependencies }) => createConfigCommand(dependencies),
+  });
   registry.register('deploy', {
     id: 'deploy',
     create: ({ dependencies }) => createDeployCommand(dependencies),
@@ -97,6 +104,9 @@ export function createPublicCommandRegistry(): CliCommandRegistry<PublicCommandC
         resolveProjectRoot: dependencies.resolveProjectRoot,
       }),
   });
+  for (const [id, create] of [
+    ['ui:list', createUiListCommand], ['ui:update', createUiUpdateCommand], ['ui:remove', createUiRemoveCommand],
+  ] as const) registry.register(id, { id, create: ({ dependencies }) => create({ installDependencies: dependencies.uiInstallDependencies, resolveProjectRoot: dependencies.resolveProjectRoot }) });
 
   return registry;
 }

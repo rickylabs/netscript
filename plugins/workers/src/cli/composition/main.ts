@@ -9,7 +9,22 @@ import { LocalWorkersRuntimeBackend } from '../local-runtime-backend.ts';
 
 export { WorkersCli } from '../workers-cli.ts';
 export { PluginCli } from '@netscript/plugin/cli';
-export type { PluginCliArgs, PluginCliCommand, PluginCliResult } from '@netscript/plugin/cli';
+export type {
+  PluginCliArgs,
+  PluginCliCommand,
+  PluginCliResult,
+  ProjectFileEntry,
+  ProjectFiles,
+} from '@netscript/plugin/cli';
+export type {
+  RuntimeTaskMetadata,
+  TaskDefinition,
+  TaskExecutionOptions,
+  TaskLogEntry,
+  TaskResult,
+  WorkerTaskPermissionField,
+  WorkerTaskPermissions,
+} from '@netscript/plugin-workers-core/executor';
 export { CliCommand, WorkersCommand } from '@netscript/plugin-workers-core/abstracts';
 export type { WorkersCommandDefinition } from '@netscript/plugin-workers-core/abstracts';
 export {
@@ -21,10 +36,19 @@ export {
   ConfigPublishCommand,
   DisableCommand,
   EnableCommand,
+  ExecutionsCommand,
   ListJobsCommand,
   ListTasksCommand,
   LogsCommand,
+  RemoveJobCommand,
+  RemoveTaskCommand,
   RunJobCommand,
+  RunTaskCommand,
+  ShowJobCommand,
+  ShowTaskCommand,
+  TriggerJobCommand,
+  UpdateJobCommand,
+  UpdateTaskCommand,
   WorkersCliCommand,
 } from '../commands.ts';
 export { WORKERS_CLI_COMMANDS } from '../command-types.ts';
@@ -35,9 +59,23 @@ export type {
   WorkersCliCommandName,
   WorkersCliFlagDefinition,
 } from '../command-types.ts';
+export { FetchWorkersRuntimeApiClient } from '../adapters/runtime-api-client.ts';
+export type {
+  FetchWorkersRuntimeApiClientOptions,
+  WorkersRuntimeApiClient,
+  WorkersRuntimeRequest,
+} from '../adapters/runtime-api-client.ts';
+export type {
+  LocalWorkersRuntimeBackendOptions,
+  TaskExecutorLike,
+} from '../local-runtime-backend.ts';
 
 /** Default CLI instance used by the host CLI walker. */
-export const workersCli: WorkersCli = new WorkersCli(new LocalWorkersRuntimeBackend());
+export const workersCli: WorkersCli = new WorkersCli(
+  new LocalWorkersRuntimeBackend({
+    output: (line, stream) => stream === 'stderr' ? console.error(line) : console.log(line),
+  }),
+);
 
 if (import.meta.main) {
   const args = toWorkersCliArgs(Deno.args);

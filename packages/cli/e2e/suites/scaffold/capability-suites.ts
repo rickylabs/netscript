@@ -52,6 +52,7 @@ const RUNTIME_GATES = [
   'scaffold.plugin.auth',
   'scaffold.plugin.ai',
   'scaffold.plugin.ai.mcp',
+  GATE.SCAFFOLD_PLUGIN_AI_LIFECYCLE,
   GATE.SCAFFOLD_PLUGIN_LIST,
   GATE.SCAFFOLD_UI_ADD_AI,
   GATE.SCAFFOLD_UI_LOCAL_SOURCE,
@@ -114,6 +115,7 @@ const PLUGIN_GATES = [
   'scaffold.plugin.auth',
   'scaffold.plugin.ai',
   'scaffold.plugin.ai.mcp',
+  GATE.SCAFFOLD_PLUGIN_AI_LIFECYCLE,
   GATE.SCAFFOLD_PLUGIN_LIST,
   GATE.GENERATED_PLUGINS_CHECK,
   GATE.BEHAVIOR_PLUGINS_HEALTH,
@@ -159,12 +161,20 @@ export function createScaffoldCapabilitySuite(
     .withWorkspace((workspace) => {
       let next = workspace;
       if (overrides.repoRoot) next = next.withRepoRoot(overrides.repoRoot);
-      if (overrides.cliEntrypoint) next = next.withCliEntrypoint(overrides.cliEntrypoint);
+      if (overrides.cliEntrypoint) {
+        next = next.withCliEntrypoint(overrides.cliEntrypoint);
+      }
       if (overrides.smokeRoot) next = next.withSmokeRoot(overrides.smokeRoot);
-      if (overrides.projectName) next = next.withProjectName(overrides.projectName);
+      if (overrides.projectName) {
+        next = next.withProjectName(overrides.projectName);
+      }
       if (overrides.database) next = next.withDatabase(overrides.database);
-      if (overrides.packageSource) next = next.withPackageSource(overrides.packageSource);
-      if (overrides.cleanup !== undefined) next = next.withCleanup(overrides.cleanup);
+      if (overrides.packageSource) {
+        next = next.withPackageSource(overrides.packageSource);
+      }
+      if (overrides.cleanup !== undefined) {
+        next = next.withCleanup(overrides.cleanup);
+      }
       return next;
     })
     .withScaffold((scaffold) =>
@@ -193,11 +203,17 @@ export function createScaffoldCapabilitySuite(
   const gatesById = new Map(suite.gates.map((gate) => [gate.id, gate]));
   return {
     ...suite,
-    gates: runtimeGateIds(capability.gates, suite.defaultOptions.database).map((id) => {
-      const gate = gatesById.get(id);
-      if (!gate) throw new Error(`Gate "${id}" is not registered for suite "${capability.id}".`);
-      return gate;
-    }),
+    gates: runtimeGateIds(capability.gates, suite.defaultOptions.database).map(
+      (id) => {
+        const gate = gatesById.get(id);
+        if (!gate) {
+          throw new Error(
+            `Gate "${id}" is not registered for suite "${capability.id}".`,
+          );
+        }
+        return gate;
+      },
+    ),
   };
 }
 

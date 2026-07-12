@@ -7,9 +7,9 @@
  * scores the attempt on `test_pass_rate`, `turns_to_green`, `cost`, and wall
  * time (with `lines_of_code` reported at weight 0).
  *
- * Slice 1 ships the full instrument validated by unit tests with a fake driver,
- * plus the committed golden reference and a real conformance gate (10/10 green
- * over HTTP); only the live paid agent run remains gated pending OQ2.
+ * The package ships the instrument validated by unit tests with a fake driver,
+ * plus committed t1+t2 golden references and a real conformance gate (green
+ * over HTTP with restart persistence); only live paid runs remain owner-gated.
  *
  * @example
  * ```ts

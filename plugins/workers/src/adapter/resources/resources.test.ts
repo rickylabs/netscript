@@ -29,8 +29,11 @@ Deno.test('workers add job emits the same shape at the user-named path', () => {
   const [artifact] = jobScaffolder.emit({ id: 'welcome-email' });
 
   assertEquals(artifact.path, 'workers/jobs/welcome-email.ts');
-  assertStringIncludes(artifactText(artifact), 'welcomeEmailJob');
-  assertStringIncludes(artifactText(artifact), "jobId: 'welcome-email'");
+  const source = artifactText(artifact);
+  assertStringIncludes(source, 'welcomeEmailJob');
+  assertStringIncludes(source, "jobId: 'welcome-email'");
+  assertStringIncludes(source, 'const PayloadSchema = z.object({}).passthrough().default({})');
+  assertStringIncludes(source, 'PayloadSchema.parse(context.payload)');
 });
 
 Deno.test('workers install emits only userland glue under workers', () => {
@@ -71,6 +74,13 @@ Deno.test('workers task scaffolder preserves multi-runtime task emission', () =>
     taskScaffolder.emit({ id: 'resize-image', runtime: 'powershell' })[0].path,
     'workers/tasks/resize-image.ps1',
   );
+  const custom = taskScaffolder.emit({
+    id: 'resize-image',
+    runtime: 'python',
+    entrypoint: 'scripts/resize.py',
+  })[0];
+  assertEquals(custom.path, 'scripts/resize.py');
+  assertStringIncludes(artifactText(custom), 'sys.argv[1:]');
 });
 
 Deno.test('workers workflow resource is add-only', () => {

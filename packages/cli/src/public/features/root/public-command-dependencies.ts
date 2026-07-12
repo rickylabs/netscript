@@ -12,6 +12,8 @@ import {
 import type { buildWindowsDeployment } from '../deploy/build/build-windows-strategy.ts';
 import { loadRegisteredPlugins } from '../../../kernel/adapters/config/plugin-registry.ts';
 import { createProjectConfigLoader } from '../../../kernel/adapters/config/project-config-loader.ts';
+import { DenoRuntimeConfigStore } from '../../../kernel/adapters/config/runtime-config/deno-runtime-config-store.ts';
+import type { RuntimeConfigStorePort } from '../../../kernel/ports/runtime-config-store-port.ts';
 import { createContractScaffolder } from '../../../kernel/adapters/contracts/contract-scaffolder.ts';
 import { DefaultContractTemplateRegistry } from '../../../kernel/adapters/contracts/templates/contract-template-registry.ts';
 import { ContractVersionRegistry } from '../../../kernel/adapters/contracts/version-registry.ts';
@@ -30,6 +32,7 @@ import { PluginScaffolder } from '../../../kernel/adapters/plugin/scaffolder.ts'
 import { PluginWorkspaceMutator } from '../../../kernel/adapters/plugin/workspace-mutator.ts';
 import { PortAllocator } from '../../../kernel/adapters/service/port-allocator.ts';
 import { ServiceScaffolder } from '../../../kernel/adapters/service/scaffolder.ts';
+import { ServiceClientScaffolder } from '../../../kernel/adapters/service/client-scaffolder.ts';
 import { ServiceWorkspaceResolver } from '../../../kernel/adapters/service/workspace-resolver.ts';
 import { emptyScaffoldResult } from '../../../kernel/application/scaffold/support/helpers.ts';
 import { DbEngineRegistry } from '../../../kernel/application/registries/db-engine-registry.ts';
@@ -61,6 +64,9 @@ import {
 import type { RemovePluginDependencies } from '../plugins/remove/remove-plugin.ts';
 import type { PluginScaffoldDependencies } from '../plugins/scaffold/scaffold-plugin-use-case.ts';
 import type { PublicCliHost } from './public-command-tree.ts';
+import { FetchAuthSessionHttp } from '../plugins/auth/auth-session-client.ts';
+import type { AuthSessionHttpPort } from '../plugins/auth/auth-types.ts';
+import { generateAspire } from '../generate/aspire/generate-aspire.ts';
 
 /** Dependencies shared by public command groups. */
 export interface PublicCommandDependencies {
@@ -78,6 +84,8 @@ export interface PublicCommandDependencies {
   readonly dbRegistry: DbEngineRegistry;
   /** Load project config under the project's own Deno config. */
   readonly loadConfig: ReturnType<typeof createProjectConfigLoader>;
+  /** Versioned runtime override store. */
+  readonly runtimeConfigStore: RuntimeConfigStorePort;
   /** Resolve a project root from an optional flag. */
   readonly resolveProjectRoot: (projectRoot?: string) => Promise<string | undefined>;
   /** Dependencies for public init. */
@@ -109,6 +117,7 @@ export interface PublicCommandDependencies {
     readonly serviceResolver: ServiceWorkspaceResolver;
     readonly contractScaffolder: ReturnType<typeof createContractScaffolder>;
     readonly serviceScaffolder: ServiceScaffolder;
+    readonly clientScaffolder: ServiceClientScaffolder;
   };
   /** Dependencies for plugin install. */
   readonly pluginInstallDependencies: {
@@ -137,6 +146,10 @@ export interface PublicCommandDependencies {
   readonly pluginRemoveDependencies: RemovePluginDependencies;
   /** Dependencies for host-side plugin diagnostics. */
   readonly pluginDoctorDependencies: Pick<DoctorPluginCommandDependencies, 'doctor'>;
+  /** HTTP adapter used by auth session projection and revocation commands. */
+  readonly authSessionHttp: AuthSessionHttpPort;
+  /** Regenerate Aspire helpers after auth configuration changes. */
+  readonly authRegenerateAspire: (projectRoot: string) => Promise<void>;
   /** Dependencies for plugin package scaffolding. */
   readonly pluginScaffoldDependencies: PluginScaffoldDependencies;
   /** Dependencies for runtime config schema generation. */
@@ -178,6 +191,7 @@ export function createPublicCommandDependencies(
   const pluginRegistry = new PluginKindRegistry();
   const dbRegistry = new DbEngineRegistry();
   const loadConfig = createProjectConfigLoader({ process });
+  const runtimeConfigStore = DenoRuntimeConfigStore.fromEnvironment(host.cwd());
   const resolveProjectRoot = async (projectRoot?: string) =>
     projectRoot ? host.resolvePath(projectRoot) : await findDeployProjectRoot(host.cwd()) ??
       undefined;
@@ -207,6 +221,7 @@ export function createPublicCommandDependencies(
       workspaceResolver: new ContractWorkspaceResolver(fs),
     }),
     serviceScaffolder: new ServiceScaffolder(scaffolder, fs, templateAdapter),
+    clientScaffolder: new ServiceClientScaffolder(scaffolder, fs),
   };
   const createInitContext = (initFs: FileSystemPort): InitPipelineContext => {
     const initTemplateAdapter = new StringTemplateAdapter(initFs);
@@ -233,6 +248,7 @@ export function createPublicCommandDependencies(
     pluginRegistry,
     dbRegistry,
     loadConfig,
+    runtimeConfigStore,
     resolveProjectRoot,
     initCommandDependencies: {
       defaultProjectName: () => host.cwd().split(/[/\\]/).pop() ?? 'my-app',
@@ -282,6 +298,10 @@ export function createPublicCommandDependencies(
           loadConfig,
         }),
     },
+    authSessionHttp: new FetchAuthSessionHttp(),
+    authRegenerateAspire: async (projectRoot) => {
+      await generateAspire({ projectRoot }, { fs, scaffolder, templateAdapter });
+    },
     pluginScaffoldDependencies: {
       fs,
     },
@@ -315,7 +335,7 @@ export function createPublicCommandDependencies(
         const resolved = await resolveManifest(options);
         return {
           ...resolved,
-          manifest: resolved.manifest as unknown as ServiceManifest,
+          manifest: resolved.manifest as unknown as ServiceManifest, // quality-allow: service manifest loader resolves a runtime module whose structural service contract is wider than the public loader port
         };
       },
     },

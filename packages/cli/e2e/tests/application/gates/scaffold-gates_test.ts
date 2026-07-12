@@ -47,6 +47,30 @@ Deno.test('--source jsr generated check targets prod workspace members', () => {
   );
 });
 
+Deno.test('scaffold contract add gate targets the generated workspace', () => {
+  const gate = createScaffoldGates({ plugins: [], samples: false }).find((entry) =>
+    entry.id === GATE.CONTRACT_ADD
+  );
+  if (!gate || gate.kind !== 'command') {
+    throw new Error('Expected contract add gate to be a command gate.');
+  }
+
+  assertEquals(
+    gate.command(createContext('/repo/packages/cli/bin/netscript.ts', PACKAGE_SOURCE.LOCAL)),
+    [
+      'deno',
+      'run',
+      '-A',
+      '/repo/packages/cli/bin/netscript.ts',
+      'contract',
+      'add',
+      'catalog-items',
+      '--path',
+      '/repo/.llm/tmp/cli-e2e/prod-local-test',
+    ],
+  );
+});
+
 function scaffoldInitGate(): CommandGateDefinition {
   const gate = createScaffoldGates({ plugins: [], samples: false }).find((entry) =>
     entry.id === GATE.SCAFFOLD_INIT

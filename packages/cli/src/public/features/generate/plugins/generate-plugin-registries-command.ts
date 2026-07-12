@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
 import { join } from '@std/path';
 import type {
@@ -13,8 +14,6 @@ import { outputText } from '../../../../kernel/presentation/output/default-outpu
 import { type ProjectRootResolver, requireProjectRoot } from '../../../presentation/support.ts';
 import { resolveWalkerEmissions } from '../../plugins/host/trigger-walker.ts';
 
-// deno-lint-ignore no-explicit-any
-type AnyCliffyCommand = Command<any, any, any, any, any, any, any, any>;
 
 interface GeneratePluginRegistriesCommandInput {
   readonly dryRun?: boolean;
@@ -39,14 +38,14 @@ export interface GeneratePluginRegistriesCommandDependencies {
 }
 
 /** Public `generate plugins` command definition owner. */
-export class GeneratePluginRegistriesCommand extends CliCommand<AnyCliffyCommand> {
+export class GeneratePluginRegistriesCommand extends CliCommand<CliffyCommand> {
   readonly id = 'public.generate.plugins';
 
   constructor(private readonly dependencies: GeneratePluginRegistriesCommandDependencies) {
     super();
   }
 
-  define(): AnyCliffyCommand {
+  define(): CliffyCommand {
     const print = this.dependencies.print ?? outputText;
     return new Command()
       .name('plugins')
@@ -87,7 +86,7 @@ export class GeneratePluginRegistriesCommand extends CliCommand<AnyCliffyCommand
 /** Create the public `generate plugins` command. */
 export function createGeneratePluginRegistriesCommand(
   dependencies: GeneratePluginRegistriesCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   return new GeneratePluginRegistriesCommand(dependencies).define();
 }
 

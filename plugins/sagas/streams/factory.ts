@@ -52,6 +52,6 @@ export function createSagasStreamDB(options: { baseUrl?: string } = {}): SagasSt
       contentType: 'application/json',
       headers: getStreamsAuth(),
     },
-    state: sagasStreamSchema as unknown as DurableStreamStateDefinition,
-  }) as unknown as SagasStreamDB;
+    state: sagasStreamSchema as unknown as DurableStreamStateDefinition, // quality-allow: durable-stream schema generics are invariant across the generated saga entity map
+  }) as unknown as SagasStreamDB; // quality-allow: durable-stream schema generics are invariant across the generated saga entity map
 }

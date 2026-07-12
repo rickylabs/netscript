@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import { Command } from '@cliffy/command';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../kernel/application/registries/template-registry.ts';
@@ -20,7 +21,7 @@ export interface ServiceGenerateCommandDependencies {
 /** Create the public `service generate` command. */
 export function createServiceGenerateCommand(
   dependencies: ServiceGenerateCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   const print = dependencies.print ?? outputText;
   return new Command()
     .name('generate')

@@ -56,6 +56,9 @@ export type UiInstallResult = {
   readonly dependenciesMerged: readonly string[];
 };
 
+export type UiRegistryListEntry = UiRegistryItem & { readonly installed: boolean };
+export type UiUpdateResult = { readonly updated: readonly string[]; readonly drifted: readonly string[] };
+
 type PlannedFile = {
   readonly source: string;
   readonly target: string;
@@ -121,6 +124,75 @@ export async function installUiRegistryItems(
     denoJsonPath: mergeResult.path,
     dependenciesMerged: mergeResult.added,
   };
+}
+
+/** List manifest items with installed state derived from their target files. */
+export async function listUiRegistryItems(
+  projectRootInput: string,
+  fs: FileSystemPort,
+): Promise<{ readonly items: readonly UiRegistryListEntry[]; readonly collections: readonly UiRegistryCollection[] }> {
+  const projectRoot = resolve(projectRootInput);
+  const items = await Promise.all(freshUiRegistryManifest.items.map(async (item) => ({
+    ...item,
+    installed: item.files.length > 0 && (await Promise.all(
+      item.files.map((file) => fs.exists(resolveTarget(projectRoot, file.target))),
+    )).every(Boolean),
+  })));
+  return { items, collections: freshUiRegistryManifest.collections };
+}
+
+/** Update missing/unchanged registry files while reporting locally edited files as drift. */
+export async function updateUiRegistryItems(
+  projectRootInput: string,
+  names: readonly string[],
+  fs: FileSystemPort,
+): Promise<UiUpdateResult> {
+  const projectRoot = resolve(projectRootInput);
+  const selected = names.length ? resolveRegistryItems(freshUiRegistryManifest, names) :
+    (await listUiRegistryItems(projectRoot, fs)).items.filter((item) => item.installed);
+  const updated: string[] = [];
+  const drifted: string[] = [];
+  for (const file of planFiles(undefined, projectRoot, selected)) {
+    const desired = rewriteRegistryImports(
+      readRegistryContent(FRESH_UI_REGISTRY_CONTENT, file.source), file.source, file.target,
+      undefined, new Map(planFiles(undefined, projectRoot, selected).map((entry) => [normalize(entry.source), entry.target])),
+    );
+    if (!await fs.exists(file.target)) {
+      await fs.writeFile(file.target, desired);
+      updated.push(file.target);
+    } else if (await fs.readFile(file.target) !== desired) drifted.push(file.target);
+  }
+  return { updated, drifted };
+}
+
+/** Remove an installed registry item and prune dependency imports it contributed. */
+export async function removeUiRegistryItem(
+  projectRootInput: string,
+  name: string,
+  fs: FileSystemPort,
+): Promise<readonly string[]> {
+  const projectRoot = resolve(projectRootInput);
+  const item = freshUiRegistryManifest.items.find((candidate) => candidate.name === name);
+  if (!item) throw new Error(`Unknown Fresh UI registry item: ${name}`);
+  const removed: string[] = [];
+  for (const file of item.files) {
+    const target = resolveTarget(projectRoot, file.target);
+    if (await fs.exists(target)) { await fs.remove(target); removed.push(target); }
+  }
+  const denoJsonPath = resolve(projectRoot, 'deno.json');
+  if (await fs.exists(denoJsonPath)) {
+    const config = JSON.parse(await fs.readFile(denoJsonPath)) as { imports?: Record<string, string> };
+    for (const dependency of item.dependencies ?? []) {
+      const stillRequired = (await listUiRegistryItems(projectRoot, fs)).items.some((candidate) =>
+        candidate.name !== name && candidate.installed && candidate.dependencies?.includes(dependency)
+      );
+      if (stillRequired) continue;
+      const value = Object.entries(config.imports ?? {}).find(([, candidate]) => candidate === dependency);
+      if (value) delete config.imports![value[0]];
+    }
+    await fs.writeFile(denoJsonPath, `${JSON.stringify(config, null, 2)}\n`);
+  }
+  return removed;
 }
 
 export async function loadRegistryManifest(registryRoot: string): Promise<UiRegistryManifest> {

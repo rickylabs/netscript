@@ -37,6 +37,24 @@ Deno.test('runtime gates wait for postgres resource by default', () => {
   assertEquals(gateIds.includes(GATE.RUNTIME_WAIT_MYSQL), false);
 });
 
+Deno.test('runtime gates include durable workers and sagas CLI parity', () => {
+  const gate = createRuntimeGates().find((entry) => entry.id === GATE.BEHAVIOR_DURABLE_CLI_PARITY);
+  if (gate?.kind !== 'command') {
+    throw new Error('Expected durable CLI parity gate to be a command gate.');
+  }
+  const context = {
+    project: { repoRoot: '/repo', projectRoot: '/workspace/app' },
+  } as RunContext;
+  assertEquals(gate.cwd(context), '/workspace/app');
+  assertEquals(gate.command(context), [
+    'deno',
+    'run',
+    '--allow-net=127.0.0.1:8091,127.0.0.1:8092',
+    '--allow-read',
+    '/repo/packages/cli/e2e/src/application/gates/scaffold/durable-cli-parity.ts',
+  ]);
+});
+
 Deno.test('runtime gates wait for mysql resource when mysql is selected', () => {
   const gateIds = createRuntimeGates(DATABASE.MYSQL).map((entry) => entry.id);
 

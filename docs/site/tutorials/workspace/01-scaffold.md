@@ -31,7 +31,7 @@ the ground truth the rest of the track builds on.
 
 A working `my-workspace/` directory: a typed `workspace` service on its own port, a Postgres database,
 the Aspire orchestration that provisions Postgres and the Redis cache, and a clean
-`deno task check`. By the end you will have the Aspire dashboard open on `:18888` showing your
+`deno task check`. By the end you will have the Aspire dashboard open on `https://localhost:18888` showing your
 service, database, and cache running together — the control plane you keep up for the rest of the
 track.
 
@@ -174,7 +174,7 @@ the scaffold, contracts, and service all line up.
 
 - [ ] `netscript --help` lists the public command groups.
 - [ ] `my-workspace/` exists with `services/workspace/`, `plugins/`, `database/`, and `aspire/`.
-- [ ] `aspire start` is up; `postgres` and `redis` are green in the dashboard on `:18888`.
+- [ ] `aspire start` is up; `postgres` and `redis` are green in the dashboard at `https://localhost:18888`.
 - [ ] `curl http://localhost:3001/health` returns a healthy response.
 - [ ] `deno task check` passes.
 

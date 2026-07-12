@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 /**
  * @module
  *
@@ -20,7 +21,7 @@ export interface MarketplaceSearchCommandDependencies {
 /** Create the public marketplace search stub command. */
 export function createMarketplaceSearchCommand(
   dependencies: MarketplaceSearchCommandDependencies = {},
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   const print = dependencies.print ?? outputText;
   return new Command()
     .name('search')
@@ -30,5 +31,5 @@ export function createMarketplaceSearchCommand(
       const encoded = encodeURIComponent(`netscript-plugin-${query}`);
       print('Plugin marketplace coming soon.');
       print(`Find plugins at https://jsr.io/?search=${encoded}`);
-    }) as unknown as Command;
+    });
 }

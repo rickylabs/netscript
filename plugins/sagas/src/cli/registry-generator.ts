@@ -128,6 +128,7 @@ function isProjectFileEntry(entry: ProjectFileEntry | undefined): entry is Proje
 
 function isIncludedSourcePath(path: string, options: GenerateSagaRegistryOptions): boolean {
   const fileName = basename(path);
+  if (fileName.endsWith('.config.ts')) return false;
   const suffixes = options.fileSuffixes;
   if (suffixes && !suffixes.some((suffix) => fileName.endsWith(suffix))) {
     return false;

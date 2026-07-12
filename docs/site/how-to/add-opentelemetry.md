@@ -108,7 +108,7 @@ running surface and a trace appears.
   {
     label: "Trigger a worker job",
     lang: "bash",
-    code: "# Workers API on :8091 — enqueue the sample health-check job by id.\n# Dispatch + execution + scheduler spans are emitted automatically.\ncurl -s -X POST http://localhost:8091/api/v1/workers/jobs/workers-plugin-health-check/trigger\n\n# then list recent executions\ncurl -s 'http://localhost:8091/api/v1/workers/executions?limit=10'"
+    code: "# Workers API on :8091 — enqueue the sample health-check job by id.\n# Dispatch + execution + scheduler spans are emitted automatically.\nns-workers trigger workers-plugin-health-check\n\n# then list recent executions\nns-workers executions --limit=10 --json"
   },
   {
     label: "Hit the users service",

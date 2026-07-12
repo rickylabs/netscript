@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
 
 import { buildWindowsDeployment } from './build/build-windows-strategy.ts';
@@ -13,18 +14,20 @@ import { stopCommand } from './stop/stop-deploy-command.ts';
 import { createDeployUninstallCommand } from './uninstall/uninstall-deploy-command.ts';
 import { upgradeCommand } from './upgrade/upgrade-deploy-command.ts';
 import { createTargetDeployCommand } from './target/target-deploy-command.ts';
+import { createListDeployTargetsCommand } from './list/list-deploy-targets-command.ts';
 import type { PublicCommandDependencies } from '../root/public-command-dependencies.ts';
 
 /** Create the public deploy command group. */
 export function createDeployCommand(
   dependencies: PublicCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   return new Command()
     .name('deploy')
     .description('Build and manage NetScript Windows Service deployments')
     .action(function () {
       this.showHelp();
     })
+    .command('list', createListDeployTargetsCommand(dependencies))
     .command(
       'build',
       createDeployBuildCommand({

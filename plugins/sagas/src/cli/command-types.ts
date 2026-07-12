@@ -4,7 +4,11 @@ import type { PluginCliArgs, PluginCliResult } from '@netscript/plugin/cli';
 export const SAGAS_CLI_COMMANDS = [
   'add-saga',
   'generate-registry',
+  'publish',
+  'list',
   'inspect',
+  'update-saga',
+  'remove-saga',
   'codemod',
 ] as const;
 
@@ -12,7 +16,12 @@ export const SAGAS_CLI_COMMANDS = [
 export type SagasCliCommandName = typeof SAGAS_CLI_COMMANDS[number];
 
 /** Saga CLI command category used for grouped help output. */
-export type SagasCliCategory = 'scaffolding' | 'registry' | 'inspection' | 'migration';
+export type SagasCliCategory =
+  | 'scaffolding'
+  | 'registry'
+  | 'runtime'
+  | 'inspection'
+  | 'migration';
 
 /** Flag metadata shown by host CLI help renderers. */
 export interface SagasCliFlagDefinition {

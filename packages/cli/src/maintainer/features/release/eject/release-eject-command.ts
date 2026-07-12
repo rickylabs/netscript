@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import { Command } from '@cliffy/command';
 import {
@@ -20,7 +21,7 @@ export interface ReleaseEjectCommandDependencies {
 /** Create the maintainer `release eject` command. */
 export function createReleaseEjectCommand(
   dependencies: ReleaseEjectCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   const print = dependencies.print ?? outputText;
   return new Command()
     .name('eject')

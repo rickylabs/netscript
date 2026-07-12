@@ -54,6 +54,8 @@ export function generateDatabaseDenoJson(
     'db:migrate:all': 'deno task db:migrate',
     'db:migrate:deploy':
       `${DENO_SCRIPT_RUN} npm:prisma@^7.4.2 migrate deploy --config prisma.config.ts`,
+    [`db:deploy:${provider.engine}`]: 'deno task db:migrate:deploy',
+    'db:deploy:all': 'deno task db:migrate:deploy',
     'db:push': `${DENO_SCRIPT_RUN} npm:prisma@^7.4.2 db push --config prisma.config.ts`,
     'db:studio':
       `${DENO_SCRIPT_RUN} npm:prisma@^7.4.2 studio --config prisma.config.ts --port 5555`,
@@ -73,6 +75,16 @@ export function generateDatabaseDenoJson(
     [`db:status:${provider.engine}`]: 'deno task db:status',
     'db:status:all': 'deno task db:status',
     'db:validate': `${DENO_SCRIPT_RUN} npm:prisma@^7.4.2 validate --schema schema/schema.prisma`,
+    [`db:validate:${provider.engine}`]: 'deno task db:validate',
+    'db:validate:all': 'deno task db:validate',
+    'db:resolve-applied':
+      `${DENO_SCRIPT_RUN} npm:prisma@^7.4.2 migrate resolve --applied=$PRISMA_MIGRATION_NAME --config prisma.config.ts`,
+    [`db:resolve-applied:${provider.engine}`]: 'deno task db:resolve-applied',
+    'db:resolve-applied:all': 'deno task db:resolve-applied',
+    'db:resolve-rolled-back':
+      `${DENO_SCRIPT_RUN} npm:prisma@^7.4.2 migrate resolve --rolled-back=$PRISMA_MIGRATION_NAME --config prisma.config.ts`,
+    [`db:resolve-rolled-back:${provider.engine}`]: 'deno task db:resolve-rolled-back',
+    'db:resolve-rolled-back:all': 'deno task db:resolve-rolled-back',
   };
 
   if (provider.capabilities.hasPrismaFormat) {

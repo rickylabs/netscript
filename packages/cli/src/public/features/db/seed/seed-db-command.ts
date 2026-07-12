@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
 /**
  * @module public/features/db/seed/seed-db-command
@@ -18,6 +19,6 @@ export class SeedDbCommand extends DbOperationCommand {
 /** Create the public `db seed` command. */
 export function createDbSeedCommand(
   dependencies: DbOperationCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   return new SeedDbCommand(dependencies).define();
 }

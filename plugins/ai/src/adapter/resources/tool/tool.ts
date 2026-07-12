@@ -12,6 +12,7 @@ import {
 } from '@netscript/plugin/adapter';
 import { type AiResourceInput, exportStem, fileStem, parseResourceInput } from '../input.ts';
 import { toolStub } from './tool.stub.ts';
+import { syncAiProject } from '../../../cli/sync-ai-project.ts';
 
 /** Canonical starter tool input emitted during AI install. */
 export const DEFAULT_TOOL_INPUT: AiResourceInput = { id: 'echo' };
@@ -38,4 +39,5 @@ export const toolResource: PluginResource<AiResourceInput> = {
   scaffolder: toolScaffolder,
   defaultInput: DEFAULT_TOOL_INPUT,
   parseInput: parseResourceInput,
+  afterWrite: syncAiProject,
 };

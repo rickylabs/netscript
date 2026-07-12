@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "declarations": [
+    {
+      "package": "@netscript/example",
+      "export": ".",
+      "symbol": "Changed",
+      "reason": "Synthetic fixture declares the signature change."
+    },
+    {
+      "package": "@netscript/example",
+      "export": ".",
+      "symbol": "Removed",
+      "reason": "Synthetic fixture declares the symbol removal."
+    }
+  ]
+}

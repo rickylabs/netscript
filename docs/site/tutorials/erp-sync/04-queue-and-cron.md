@@ -125,11 +125,24 @@ framework-side fix.
 Some migration work is time-driven, not file-driven: the nightly full re-sync that keeps Dynamics
 aligned with SAP until cutover, an hourly cleanup of stale staging files. That is a **scheduled trigger** —
 `defineScheduledTrigger(handler, spec)` from
-`@netscript/plugin-triggers-core/builders`. Like the file-watch trigger, its handler returns an array
-of effects; here it enqueues a job on a cron cadence.
+`@netscript/plugin-triggers-core/builders`. The `add-scheduled` verb uses the spaced
+`add scheduled` shell syntax and can scaffold the job action already wired:
+
+```sh
+ns-triggers add scheduled daily-resync-schedule \
+  --cron="0 6 * * *" \
+  --timezone=UTC \
+  --job=import-products \
+  --description="Runs a full product re-sync every morning." \
+  --tags=resync,products,scheduled
+```
+
+The command writes `triggers/daily-resync-schedule-trigger.ts` and refreshes the trigger registry.
+Like the file-watch trigger, its generated handler returns an array of effects; here the `--job`
+flag supplies the enqueue action without hand-authoring the definition.
 
 ```ts
-// plugins/triggers/scheduled-resync.ts
+// triggers/daily-resync-schedule-trigger.ts (generated excerpt)
 import { defineScheduledTrigger, enqueueJob } from '@netscript/plugin-triggers-core/builders';
 import type { JobDefinition } from '@netscript/plugin-workers-core';
 
@@ -171,15 +184,9 @@ enters the workers runtime the same way, however it was kicked off. The scaffold
 ship several <code>defineScheduledTrigger</code> examples under the triggers plugin to crib from.
 {{ /comp }}
 
-## Step 4 — Register the new trigger
+## Step 4 — Load the new trigger
 
-The scheduled trigger has to be picked up by the triggers runtime. Regenerate the registries:
-
-```sh
-netscript generate plugins
-```
-
-Then restart `aspire start` (or let it hot-reload) so the triggers processor loads
+The scaffold command already refreshed the registry. Restart `aspire start` (or let it hot-reload) so the triggers processor loads
 `daily-resync-schedule`.
 
 ## Verify your progress
@@ -195,7 +202,7 @@ temporarily set its `cron` to `*/2 * * * *` (every two minutes), regenerate, res
 and read the executions feed:
 
 ```sh
-curl 'http://localhost:8091/api/v1/workers/executions?limit=10'
+ns-workers executions --limit=10 --json
 ```
 
 Expected: an `import-products` execution appears on the cron cadence with no file dropped — the

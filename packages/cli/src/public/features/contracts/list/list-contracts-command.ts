@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 /**
  * @module public/features/contract-list-command
@@ -7,7 +8,7 @@ import { outputText } from '../../../../kernel/presentation/output/default-outpu
 
 import { Command } from '@cliffy/command';
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
-import { DEFAULT_CONTRACT_VERSION } from '../../../../kernel/adapters/contracts/types.ts';
+import { parseContractVersion } from '../../../../kernel/adapters/contracts/types.ts';
 import { ContractWorkspaceResolver } from '../../../../kernel/adapters/contracts/workspace-resolver.ts';
 import { findProjectRoot } from '../../../../kernel/adapters/config/deploy-config.ts';
 import { ScaffoldValidationError } from '../../../../kernel/domain/errors.ts';
@@ -24,34 +25,29 @@ async function resolveProjectRoot(pathFlag: string | undefined): Promise<string>
 }
 
 /** `netscript contract list` command. */
-export const contractListCommand: Command<any, any, any, any, any, any, any, any> = new Command()
+export const contractListCommand: CliffyCommand = new Command()
   .name('list')
   .description('List contracts in the current NetScript workspace')
-  .option('--version <version:string>', 'Contract version to inspect', {
-    default: DEFAULT_CONTRACT_VERSION,
-  })
+  .option('--version <version:string>', 'Contract version to inspect')
   .option('--path <path:string>', 'Workspace path to search from')
   .action(async (flags: ListContractsInput): Promise<void> => {
-    if (flags.version !== DEFAULT_CONTRACT_VERSION) {
-      throw new ScaffoldValidationError(
-        `Unsupported contract version "${flags.version}". Only ${DEFAULT_CONTRACT_VERSION} is supported.`,
-        { version: flags.version },
-      );
-    }
-
     const fs = new DenoFileSystem();
     const projectRoot = await resolveProjectRoot(flags.path);
     const resolver = new ContractWorkspaceResolver(fs);
-    const discovered = await resolver.discoverVersion(projectRoot, DEFAULT_CONTRACT_VERSION);
-
-    if (discovered.contracts.length === 0) {
-      outputText(`No ${DEFAULT_CONTRACT_VERSION} contracts found.`);
-      return;
+    const versions = flags.version
+      ? [parseContractVersion(flags.version)]
+      : await resolver.discoverVersions(projectRoot);
+    let count = 0;
+    for (const version of versions) {
+      const discovered = await resolver.discoverVersion(projectRoot, version);
+      outputText(`Contracts (${version})`);
+      for (const contract of discovered.contracts) {
+        count++;
+        const pairing = contract.hasService ? 'service paired' : 'contract only';
+        outputText(`  ${contract.name}  ${pairing}`);
+      }
     }
-
-    outputText(`Contracts (${DEFAULT_CONTRACT_VERSION})`);
-    for (const contract of discovered.contracts) {
-      const pairing = contract.hasService ? 'service paired' : 'contract only';
-      outputText(`  ${contract.name}  ${pairing}`);
+    if (count === 0) {
+      outputText('No contracts found.');
     }
   });

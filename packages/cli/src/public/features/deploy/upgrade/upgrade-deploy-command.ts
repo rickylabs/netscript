@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { failDeployCommand } from '../../../../kernel/adapters/deploy/deploy-exit.ts';
 import { outputError, outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import { Command } from '@cliffy/command';
@@ -28,7 +29,7 @@ import {
 // COMMAND
 // ============================================================================
 
-export const upgradeCommand: Command<any, any, any, any, any, any, any, any> = new Command()
+export const upgradeCommand: CliffyCommand = new Command()
   .name('upgrade')
   .description(
     'Build, sync, reinstall, and restart services in one step',

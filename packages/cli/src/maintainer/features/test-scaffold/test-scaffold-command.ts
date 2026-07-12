@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../kernel/presentation/command-types.ts";
 import { outputText } from '../../../kernel/presentation/output/default-output.ts';
 import { Command } from '@cliffy/command';
 import { runScaffoldTest, type RunScaffoldTestDependencies } from './run-scaffold-test.ts';
@@ -28,7 +29,7 @@ function parseFormat(raw: string | undefined): 'pretty' | 'json' | 'ndjson' | un
 /** Create the maintainer `test scaffold` command. */
 export function createTestScaffoldCommand(
   dependencies: TestScaffoldCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   const print = dependencies.print ?? outputText;
   return new Command()
     .name('scaffold')

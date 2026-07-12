@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import { Command } from '@cliffy/command';
 import { CliCommand } from '../../../../kernel/application/abstracts/cli-command.ts';
@@ -9,8 +10,6 @@ import {
 import { type ProjectRootResolver, requireProjectRoot } from '../../../presentation/support.ts';
 import type { GenerateRuntimeSchemasCommandInput } from './generate-runtime-schemas-input.ts';
 
-// deno-lint-ignore no-explicit-any
-type AnyCliffyCommand = Command<any, any, any, any, any, any, any, any>;
 
 /** Dependencies for the public runtime-schema generation command. */
 export interface GenerateRuntimeSchemasCommandDependencies {
@@ -28,14 +27,14 @@ export interface GenerateRuntimeSchemasCommandDependencies {
 }
 
 /** Public `generate runtime-schemas` command definition owner. */
-export class GenerateRuntimeSchemasCommand extends CliCommand<AnyCliffyCommand> {
+export class GenerateRuntimeSchemasCommand extends CliCommand<CliffyCommand> {
   readonly id = 'public.generate.runtime-schemas';
 
   constructor(private readonly dependencies: GenerateRuntimeSchemasCommandDependencies) {
     super();
   }
 
-  define(): AnyCliffyCommand {
+  define(): CliffyCommand {
     const print = this.dependencies.print ?? outputText;
     return new Command()
       .name('runtime-schemas')
@@ -70,6 +69,6 @@ export class GenerateRuntimeSchemasCommand extends CliCommand<AnyCliffyCommand> 
 /** Create the public `generate runtime-schemas` command. */
 export function createGenerateRuntimeSchemasCommand(
   dependencies: GenerateRuntimeSchemasCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   return new GenerateRuntimeSchemasCommand(dependencies).define();
 }

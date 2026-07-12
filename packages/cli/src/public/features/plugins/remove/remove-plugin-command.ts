@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 /**
  * @module
  *
@@ -38,7 +39,7 @@ export interface RemovePluginCommandInput {
 /** Create the public `plugin remove` command. */
 export function createRemovePluginCommand(
   dependencies: RemovePluginCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   const print = dependencies.print ?? outputText;
   return new Command()
     .name('remove')
@@ -66,5 +67,5 @@ export function createRemovePluginCommand(
       print(`Removed plugin "${name}".`);
       print(`Removed ${appsettingsCount} appsettings entries.`);
       print(`Removed ${result.removedGeneratedDirs.length} generated directories.`);
-    }) as unknown as Command;
+    });
 }

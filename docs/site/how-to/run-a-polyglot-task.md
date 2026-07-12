@@ -75,35 +75,22 @@ The subprocess returns structured data by printing **one JSON object as the last
   }
 ] }) }}
 
-### 3. Run it through the executor
+### 3. Run it through the workers CLI
 
-`createDefaultTaskExecutor()` builds a `MultiRuntimeTaskExecutor` wired with every built-in
-runtime adapter. Call `executor.execute(task, options?)` to resolve the matching adapter,
-spawn the subprocess, and get back one `TaskResult`. Per-call `options` (a
-`TaskExecutionOptions`) can add `args`, `env`, a `timeout`, an `AbortSignal`, a
-`correlationId`, and the `onStdout`/`onStderr`/`onLog` streaming callbacks.
+`ns-workers run-task` resolves the generated task metadata and delegates to the same
+`MultiRuntimeTaskExecutor` used by the worker runtime. Pass argv and environment as JSON; stdout and
+stderr stream while the subprocess runs, followed by the complete `TaskResult`.
 
-```ts
-// workers/run-score.ts
-import { createDefaultTaskExecutor } from '@netscript/plugin-workers-core/executor';
-import { scoreBatch } from './tasks/score-batch.ts';
-
-const executor = createDefaultTaskExecutor();
-
-const result = await executor.execute(scoreBatch, {
-  // options.env merges OVER the task's env; trace headers are injected automatically.
-  onStdout: (line) => console.log('[score]', line),
-  onStderr: (line) => console.warn('[score:err]', line),
-});
-
-if (result.success) {
-  // result.result is the parsed JSON object from the LAST stdout line, or null.
-  console.log('scored', result.result, `in ${result.duration}ms`);
-} else {
-  // status is 'failed' | 'timeout' | 'cancelled'; exitCode is -1 when the process never ran.
-  console.error('task failed', result.status, result.exitCode, result.error);
-}
+```sh
+ns-workers run-task score-batch \
+  --args='["--threshold","0.8"]' \
+  --env='{"MODEL_PATH":"./models/scorer.pkl"}' \
+  --timeout=120000 \
+  --json
 ```
+
+The programmatic `createDefaultTaskExecutor()` API remains available for runtime integrations and
+custom adapters; ordinary task execution no longer needs a hand-written runner module.
 
 ### 4. Sandbox a `deno` task with explicit permissions
 

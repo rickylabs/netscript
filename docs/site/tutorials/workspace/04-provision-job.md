@@ -105,32 +105,25 @@ they just do not yet add custom spans. <code>log.*</code> emits real structured 
 custom spans today, import from <code>@netscript/telemetry</code> directly.
 {{ /comp }}
 
-## Step 3 — Author the provision-member job
+## Step 3 — Scaffold the provision-member job
 
-Add a new file in `plugins/workers/jobs/` that provisions a member into the workspace datasource from
-chapter 3. It parses its payload with Zod, writes a `Member` row, and returns a success result:
+Start from the workers scaffold instead of creating the module by hand:
+
+The workers CLI calls this the `add-job` verb; its shell syntax uses the spaced `add job` form:
+
+```sh
+ns-workers add job provision-member
+```
+
+The command writes `workers/jobs/provision-member.ts` with the stable export, payload-schema block,
+and handler wrapper already in place, then refreshes the worker registry. Extend the generated
+payload schema with `workspaceId`, `subject`, and `role`; import `createFailureResult`; add the
+workspace Prisma import and client; then replace only the starter handler body with this application
+logic:
 
 ```ts
-// plugins/workers/jobs/provision-member.ts
-import {
-  createFailureResult,
-  createSuccessResult,
-  defineJobHandler,
-} from '@netscript/plugin-workers-core';
-import { z } from 'zod';
-import { PrismaClient as WorkspacePrisma } from '../../../database/workspace/schema/.generated/client.server.ts';
-
-const ProvisionMemberPayloadSchema = z.object({
-  workspaceId: z.string().min(1),
-  // The auth Principal.subject from chapter 2 — the user being provisioned.
-  subject: z.string().min(1),
-  role: z.string().default('member'),
-});
-
-const workspaceDb = new WorkspacePrisma();
-
 const handler = defineJobHandler(async (ctx) => {
-  const parsed = ProvisionMemberPayloadSchema.safeParse(ctx.payload ?? {});
+  const parsed = PayloadSchema.safeParse(ctx.payload ?? {});
   if (!parsed.success) {
     return createFailureResult('invalid provision-member payload');
   }
@@ -143,33 +136,24 @@ const handler = defineJobHandler(async (ctx) => {
 
   return createSuccessResult({ memberId: member.id, workspaceId, subject });
 });
-
-export default Object.assign(handler, { id: 'provision-member' as const });
 ```
 
 This is the whole job — small on purpose. The membership write happens off the request path, so the
 caller that triggered provisioning never waits for it.
 
 {{ comp callout { type: "note", title: "Triggering a job from your own code" } }}
-This chapter triggers the job over HTTP (Step 5) so you can watch it run. From inside another NetScript
+This chapter triggers the job through <code>ns-workers</code> (Step 5) so you can watch it run. From inside another NetScript
 runtime — a trigger or a scheduled job — you enqueue work with the builder's
 <code>enqueueJob(...)</code> step rather than an HTTP call; that path is covered in the
 <a href="/tutorials/storefront/05-shipping-webhook/">webhook tutorial</a> and the
-<a href="/capabilities/background-jobs/">background-jobs capability</a>. For this track, the HTTP
-trigger is the clearest way to prove the job ran.
+<a href="/capabilities/background-jobs/">background-jobs capability</a>. For this track, the
+runtime-backed CLI trigger is the clearest way to prove the job ran.
 {{ /comp }}
 
-## Step 4 — Generate the runtime registry
+## Step 4 — Confirm the generated registry
 
-The Workers API addresses jobs by `id`, so it needs a generated registry mapping each id to its
-handler. Generate the plugin registries so `provision-member` is discoverable:
-
-```sh
-netscript generate plugins
-```
-
-This scans `plugins/workers/jobs` and writes a registry the running service loads. After this,
-`provision-member` is addressable over the API.
+The Workers API addresses jobs by `id`, so the scaffold command refreshes the generated registry
+before it returns. `provision-member` is already discoverable; do not run a second generation step.
 
 {{ comp callout { type: "note", title: "Restart the processor if it was already running" } }}
 If <code>aspire start</code> was up before you generated the registry, restart it (or let it hot-reload)
@@ -183,14 +167,13 @@ registered, then trigger it by its `id`. You need a real `workspaceId` — creat
 first (or use one your seed created) and pass its id:
 
 ```sh
-# Health, then confirm the job is registered
+# Health is still a plain liveness probe.
 curl http://localhost:8091/health
-curl http://localhost:8091/api/v1/workers/jobs   # provision-member should appear
 
-# Trigger it — the trigger enqueues an execution the background processor runs
-curl -X POST http://localhost:8091/api/v1/workers/jobs/provision-member/trigger \
-  -H 'content-type: application/json' \
-  -d '{ "payload": { "workspaceId": "ws-1", "subject": "user:alice", "role": "member" } }'
+# Inspect metadata, then enqueue through the durable workers API.
+ns-workers show-job provision-member --json
+ns-workers trigger provision-member \
+  --payload='{ "workspaceId": "ws-1", "subject": "user:alice", "role": "member" }'
 ```
 
 ## Verify your progress
@@ -199,7 +182,7 @@ A trigger returns quickly because the work runs in the background. Confirm it ac
 reading the executions feed:
 
 ```sh
-curl 'http://localhost:8091/api/v1/workers/executions?limit=10'
+ns-workers executions --limit=10 --json
 ```
 
 You should see an execution record for `provision-member` with a succeeded status and a result payload
@@ -211,16 +194,16 @@ automatically.
   caption: "Workers API · :8091 (endpoints used here)",
   rows: [
     { name: "GET /health", type: "HTTP", desc: "Liveness check for the Workers API service." },
-    { name: "GET /api/v1/workers/jobs", type: "HTTP", desc: "List registered job handlers by id — provision-member appears after generate." },
-    { name: "POST /api/v1/workers/jobs/{id}/trigger", type: "HTTP", desc: "Enqueue an execution of a job by id." },
-    { name: "GET /api/v1/workers/executions?limit=10", type: "HTTP", desc: "Recent executions and their result payloads." }
+    { name: "ns-workers show-job {id} --json", type: "CLI", desc: "Inspect local job metadata by id." },
+    { name: "ns-workers trigger {id} --payload=…", type: "CLI → :8091", desc: "Enqueue an execution through the durable workers API." },
+    { name: "ns-workers executions --limit=10 --json", type: "CLI → :8091", desc: "Recent executions and their result payloads." }
   ]
 }) }}
 
 - [ ] `netscript plugin list` shows the `workers` plugin.
 - [ ] `plugins/workers/jobs/provision-member.ts` exists and exports an `id`.
-- [ ] `GET /api/v1/workers/jobs` lists `provision-member`.
-- [ ] Triggering it returns quickly, and the executions feed shows it succeeded with a `memberId`.
+- [ ] `ns-workers show-job provision-member --json` shows its metadata.
+- [ ] `ns-workers trigger` returns quickly, and `ns-workers executions` shows it succeeded with a `memberId`.
 - [ ] The job-dispatch trace appears in the Aspire Traces view.
 
 {{ comp callout { type: "important", title: "If the execution never appears" } }}

@@ -118,7 +118,11 @@ export type DbOperation =
   | 'studio'
   | 'introspect'
   | 'reset'
-  | 'status';
+  | 'status'
+  | 'deploy'
+  | 'validate'
+  | 'resolve-applied'
+  | 'resolve-rolled-back';
 
 /** Request passed to the database operation runner. */
 export interface DbOperationRequest {

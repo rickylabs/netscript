@@ -4,6 +4,7 @@ import type { NetScriptConfig } from '@netscript/config';
 import type { RegisteredPluginConfig } from '../../../../kernel/domain/resolved-config.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import { loadRegisteredPluginMetadata } from '../../../../kernel/adapters/config/plugin-registry.ts';
+import { showAuthBackend } from '../auth/auth-config.ts';
 
 /** Health status for one plugin doctor check. */
 export type PluginDoctorCheckStatus = 'healthy' | 'warning' | 'error';
@@ -92,6 +93,7 @@ async function diagnosePlugin(
     await checkWorkdir(projectRoot, plugin, dependencies.fs),
     checkPermissions(plugin),
     checkRuntimeConfig(plugin),
+    ...await checkAuthBackend(projectRoot, plugin, dependencies.fs),
   ];
 
   return {
@@ -99,6 +101,30 @@ async function diagnosePlugin(
     status: aggregateStatus(checks),
     checks,
   };
+}
+
+async function checkAuthBackend(
+  projectRoot: string,
+  plugin: RegisteredPluginConfig,
+  fs: FileSystemPort,
+): Promise<readonly PluginDoctorCheck[]> {
+  if (!plugin.cli?.doctorChecks?.includes('auth-backend')) return [];
+  try {
+    const backend = await showAuthBackend(projectRoot, fs);
+    return [{
+      id: 'auth-backend',
+      title: 'Active auth backend',
+      status: 'healthy',
+      message: backend,
+    }];
+  } catch (error) {
+    return [{
+      id: 'auth-backend',
+      title: 'Active auth backend',
+      status: 'error',
+      message: error instanceof Error ? error.message : String(error),
+    }];
+  }
 }
 
 async function checkWorkdir(

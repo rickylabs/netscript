@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 /**
  * @module public/features/service-list-command
@@ -14,7 +15,7 @@ import { ScaffoldValidationError } from '../../../../kernel/domain/errors.ts';
 import type { ListServicesInput } from './list-services-input.ts';
 
 /** `netscript service list` command. */
-export const serviceListCommand: Command<any, any, any, any, any, any, any, any> = new Command()
+export const serviceListCommand: CliffyCommand = new Command()
   .name('list')
   .description('List configured NetScript services')
   .option('--project-root <path:string>', 'Project root directory')

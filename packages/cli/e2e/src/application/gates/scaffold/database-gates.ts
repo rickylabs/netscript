@@ -23,6 +23,28 @@ Deno.exit(status.code);
 export function createDatabaseGates(): readonly GateDefinition[] {
   return [
     commandGate(
+      GATE.DATABASE_LIST,
+      'Enumerate generated database targets as JSON',
+      GATE_PHASE.DATABASE,
+      (context) =>
+        cli(context, 'db', 'list', '--json', '--project-root', context.project.projectRoot),
+    ),
+    commandGate(
+      GATE.DATABASE_VALIDATE,
+      'Validate generated database schema',
+      GATE_PHASE.DATABASE,
+      (context) =>
+        cli(
+          context,
+          'db',
+          'validate',
+          '--project-root',
+          context.project.projectRoot,
+          '--db',
+          context.request.options.database,
+        ),
+    ),
+    commandGate(
       GATE.DATABASE_INIT,
       'Initialize generated database',
       GATE_PHASE.DATABASE,
@@ -48,6 +70,21 @@ export function createDatabaseGates(): readonly GateDefinition[] {
           context,
           'db',
           'generate',
+          '--project-root',
+          context.project.projectRoot,
+          '--db',
+          context.request.options.database,
+        ),
+    ),
+    commandGate(
+      GATE.DATABASE_DEPLOY,
+      'Apply pending migrations without creating one',
+      GATE_PHASE.DATABASE,
+      (context) =>
+        cli(
+          context,
+          'db',
+          'deploy',
           '--project-root',
           context.project.projectRoot,
           '--db',

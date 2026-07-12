@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 /**
  * @module
  *
@@ -20,7 +21,7 @@ export interface MarketplacePublishCommandDependencies {
 /** Create the public marketplace publish stub command. */
 export function createMarketplacePublishCommand(
   dependencies: MarketplacePublishCommandDependencies = {},
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   const print = dependencies.print ?? outputText;
   return new Command()
     .name('publish')
@@ -28,5 +29,5 @@ export function createMarketplacePublishCommand(
     .action((): void => {
       print('Plugin marketplace publishing coming soon.');
       print('Publish plugin packages to JSR with the netscript-plugin keyword for now.');
-    }) as unknown as Command;
+    });
 }

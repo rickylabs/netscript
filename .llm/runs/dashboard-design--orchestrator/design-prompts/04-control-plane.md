@@ -17,7 +17,8 @@ The flagship becomes a full **audit + control workspace**:
 - **Override detail `/overrides/:key`:** current value, full history of that key across
   versions, impacted-entity links, and controls: set/adjust (typed editor per value kind:
   switch, rollout slider, enum), **Clear override**, **Rollback to version…** — all
-  confirm+CLI (`netscript config override set flags.checkout-v2 --rollout 30`). After
+  confirm+CLI (`netscript config override set flags.checkout-v2 --rollout 30` — verb pending
+  #708, which locks the canonical name; today no override-write CLI exists). After
   Execute, the feed, stat grid, and version chain all visibly update as one causal state (the
   demo IS the coherence).
 - **Version detail `/versions/:version`:** snapshot + diff vs previous, "Restore this
@@ -95,3 +96,20 @@ because it shows the CLI.
 editing (typed domain controls only).
 
 **Theme:** NS One tokens; light+dark; `STATUS_VARIANT`; mono ids/versions; reduced-motion.
+
+## CLI dependency map (epic #701 — beta.9 foundation; verbs marked pending do not exist yet)
+
+| Write/read surface | CLI verb | Status | Issue |
+|---|---|---|---|
+| Override set / adjust / clear (S3 flagship confirms) | runtime override set (canonical name locked in the issue) | pending — today the prototype prints a command with zero writers | #708 |
+| Rollback to version / restore version | `config runtime rollback` | pending | #708 |
+| Config topology provenance, `Re-resolve`, node detail | `config inspect` / `config get` (inspectConfig wiring) | pending | #708 |
+| Stack-map mutation, otel endpoint read, deploy targets | `generate aspire` / `service ref` / `config get telemetry.*` / `deploy list` | pending | #708 |
+| Catalog "Bind route…" | `contract add-route` + `service add-handler` | pending | #706 |
+| Procedure detail (schema/duality/coverage/provenance) | `contract inspect --json` | pending | #706 |
+| Catalog retire/decommission | `contract remove` / `service remove` | pending | #706 |
+| Migrations "Apply" | `netscript db migrate` | exists | — |
+| Home pending-migration card / datasource panels | `db list --json` | pending | #711 |
+| DLQ "Reprocess selected" | `netscript queue dlq reprocess` | pending — co-req #555 (NOT epic #701; sequence with #553/#554) | #555 |
+| Auth "Revoke session" / "Revoke all" | `plugin auth session list\|revoke` | pending | #709 |
+| Auth configure tabs + doctor remediation | `plugin auth backend\|provider\|secret` verbs | pending | #709 |

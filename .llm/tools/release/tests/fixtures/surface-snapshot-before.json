@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "rootVersion": "1.1.0",
+  "packages": {
+    "@netscript/example": {
+      "path": "packages/example",
+      "exports": {
+        ".": {
+          "symbols": {
+            "Changed": { "signature": "before" },
+            "Removed": { "signature": "removed" }
+          }
+        }
+      }
+    }
+  }
+}

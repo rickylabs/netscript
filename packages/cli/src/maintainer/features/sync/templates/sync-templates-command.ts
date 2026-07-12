@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import { Command } from '@cliffy/command';
 import { syncTemplates, type SyncTemplatesDependencies } from './sync-templates.ts';
@@ -20,7 +21,7 @@ export interface SyncTemplatesCommandDependencies {
 /** Create the maintainer `sync templates` command. */
 export function createSyncTemplatesCommand(
   dependencies: SyncTemplatesCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   const print = dependencies.print ?? outputText;
   return new Command()
     .name('templates')

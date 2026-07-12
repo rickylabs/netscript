@@ -4,11 +4,18 @@
  * Public `netscript plugin new` command.
  */
 
-import { Command } from '@cliffy/command';
+import { Command } from "@cliffy/command";
 
-import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
-import { type ProjectRootResolver, requireProjectRoot } from '../../../presentation/support.ts';
-import { createNewPlugin, type NewPluginDependencies } from './new-plugin-use-case.ts';
+import { outputText } from "../../../../kernel/presentation/output/default-output.ts";
+import {
+  type ProjectRootResolver,
+  requireProjectRoot,
+} from "../../../presentation/support.ts";
+import {
+  createNewPlugin,
+  type NewPluginDependencies,
+} from "./new-plugin-use-case.ts";
+import type { PluginWorkspaceMutator } from "../../../../kernel/adapters/plugin/workspace-mutator.ts";
 
 /** Dependencies for the public plugin new command. */
 export interface NewPluginCommandDependencies {
@@ -16,6 +23,8 @@ export interface NewPluginCommandDependencies {
   readonly newPluginDependencies: NewPluginDependencies;
   /** Resolve the project root from flags or environment. */
   readonly resolveProjectRoot: ProjectRootResolver;
+  /** Register the generated connector in `netscript.config.ts`. */
+  readonly workspaceMutator: PluginWorkspaceMutator;
   /** Print completion lines. */
   readonly print?: (message: string) => void;
 }
@@ -28,6 +37,8 @@ export interface NewPluginCommandInput {
   readonly feature?: boolean;
   /** Overwrite generated files if they already exist. */
   readonly force?: boolean;
+  /** Register the generated plugin. Defaults to true. */
+  readonly register?: boolean;
 }
 
 /** Create the public `plugin new` command. */
@@ -36,28 +47,49 @@ export function createNewPluginCommand(
 ) {
   const print = dependencies.print ?? outputText;
   return new Command()
-    .name('new')
-    .description('Generate a dual-tier NetScript plugin')
-    .arguments('<name:string>')
-    .option('--project-root <path:string>', 'Project root directory')
-    .option('--feature', 'Generate route-backed feature defaults', { default: false })
-    .option('--force', 'Overwrite generated files if they already exist', { default: false })
-    .action(async (options: NewPluginCommandInput, name: string): Promise<void> => {
-      const projectRoot = await requireProjectRoot(
-        dependencies.resolveProjectRoot,
-        options.projectRoot,
-      );
-      const result = await createNewPlugin({
-        name,
-        projectRoot,
-        kind: options.feature ? 'feature' : 'proxy',
-        overwrite: options.force ?? false,
-      }, dependencies.newPluginDependencies);
+    .name("new")
+    .description("Generate a dual-tier NetScript plugin")
+    .arguments("<name:string>")
+    .option("--project-root <path:string>", "Project root directory")
+    .option("--feature", "Generate route-backed feature defaults", {
+      default: false,
+    })
+    .option("--force", "Overwrite generated files if they already exist", {
+      default: false,
+    })
+    .option(
+      "--register",
+      "Register the generated plugin in netscript.config.ts",
+      {
+        default: true,
+      },
+    )
+    .action(
+      async (options: NewPluginCommandInput, name: string): Promise<void> => {
+        const projectRoot = await requireProjectRoot(
+          dependencies.resolveProjectRoot,
+          options.projectRoot,
+        );
+        const result = await createNewPlugin({
+          name,
+          projectRoot,
+          kind: options.feature ? "feature" : "proxy",
+          overwrite: options.force ?? false,
+        }, dependencies.newPluginDependencies);
 
-      print(`Generated ${result.descriptor.connectorPackage}.`);
-      print(`Created ${result.filesCreated.length} files.`);
-      if (result.filesSkipped.length > 0) {
-        print(`Skipped ${result.filesSkipped.length} existing files.`);
-      }
-    });
+        if (options.register !== false) {
+          await dependencies.workspaceMutator.ensureNetScriptConfigPlugin(
+            projectRoot,
+            result.descriptor.name,
+            result.descriptor.connectorRoot,
+          );
+        }
+
+        print(`Generated ${result.descriptor.connectorPackage}.`);
+        print(`Created ${result.filesCreated.length} files.`);
+        if (result.filesSkipped.length > 0) {
+          print(`Skipped ${result.filesSkipped.length} existing files.`);
+        }
+      },
+    );
 }

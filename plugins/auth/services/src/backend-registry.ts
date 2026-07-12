@@ -33,10 +33,12 @@ export type AuthServiceAppsettings = Readonly<{
   auth?: {
     backend?: string;
     audit?: { salt?: string };
+    environment?: Readonly<Record<string, string>>;
   };
   Auth?: {
     Backend?: string;
     Audit?: { Salt?: string };
+    Environment?: Readonly<Record<string, string>>;
   };
 }>;
 
@@ -95,9 +97,12 @@ type WorkosSdkCookieSession = Readonly<{
 export async function createAuthServiceBackendRegistry(
   options: CreateAuthServiceBackendRegistryOptions = {},
 ): Promise<ResolvedAuthBackendRegistry> {
-  const env = options.env ?? Deno.env.toObject();
+  const env = {
+    ...(options.appsettings?.auth?.environment ?? options.appsettings?.Auth?.Environment ?? {}),
+    ...(options.env ?? Deno.env.toObject()),
+  };
   const activeName = resolveActiveBackendName(env, options.appsettings);
-  const backend = await createActiveBackend(activeName, options);
+  const backend = await createActiveBackend(activeName, { ...options, env });
   return createAuthBackendRegistry(
     new Map<string, AuthBackendPort>([[activeName, backend]]),
     activeName,
@@ -267,7 +272,12 @@ function resolveKvOAuthProviderEnv(
 
 function resolveKvOAuthKey(env: Readonly<Record<string, string | undefined>>): ArrayBuffer {
   const configured = requiredEnv(env, 'NETSCRIPT_AUTH_KV_OAUTH_KEY');
-  const bytes = Uint8Array.from(atob(configured), (char) => char.charCodeAt(0));
+  const normalized = configured.replaceAll('-', '+').replaceAll('_', '/');
+  const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '=');
+  const bytes = Uint8Array.from(atob(padded), (char) => char.charCodeAt(0));
+  if (bytes.byteLength !== 32) {
+    throw new Error('NETSCRIPT_AUTH_KV_OAUTH_KEY must decode to exactly 32 bytes.');
+  }
   return copyArrayBuffer(bytes);
 }
 

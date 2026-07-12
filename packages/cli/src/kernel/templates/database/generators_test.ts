@@ -47,6 +47,10 @@ describe('database template generators', () => {
       config.tasks['db:migrate'],
       'deno run -A --minimum-dependency-age=0 scripts/migrate.ts',
     );
+    assertEquals(config.tasks['db:deploy:postgres'], 'deno task db:migrate:deploy');
+    assertEquals(config.tasks['db:validate:postgres'], 'deno task db:validate');
+    assertStringIncludes(config.tasks['db:resolve-applied'], 'migrate resolve --applied=');
+    assertStringIncludes(config.tasks['db:resolve-rolled-back'], 'migrate resolve --rolled-back=');
     assertEquals(
       config.imports['@netscript/database/scripts'],
       '../../packages/database/scripts/mod.ts',

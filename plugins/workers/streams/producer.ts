@@ -49,7 +49,7 @@ export function getWorkersStreamProducer(): WorkersStreamProducer {
 export function createStreamMutationHook(): ExecutionMutationHook {
   return createCoreStreamMutationHook(
     getWorkersStreamProducer(),
-  ) as unknown as ExecutionMutationHook;
+  ) as unknown as ExecutionMutationHook; // quality-allow: durable-stream mutation hook upstream type omits the worker execution extension fields
 }
 
 /**

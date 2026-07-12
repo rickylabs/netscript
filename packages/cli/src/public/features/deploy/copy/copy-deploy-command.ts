@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { failDeployCommand } from '../../../../kernel/adapters/deploy/deploy-exit.ts';
 import { outputError, outputText } from '../../../../kernel/presentation/output/default-output.ts';
 /**
@@ -42,7 +43,7 @@ import {
 // COMMAND
 // ============================================================================
 
-export const copyCommand: Command<any, any, any, any, any, any, any, any> = new Command()
+export const copyCommand: CliffyCommand = new Command()
   .name('copy')
   .description(
     'Copy build artifacts to the install directory (no Servy registration)',
