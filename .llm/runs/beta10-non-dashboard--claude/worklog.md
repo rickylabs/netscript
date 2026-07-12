@@ -397,3 +397,40 @@ against live JSR, not by the prod gate. That gap is deliberate and must be state
 
 **Verdict (supervisor):** on track, high quality. Not merged. Not self-certified — this is a
 Claude-family review of Codex-authored code, which is the required opposite-family direction.
+
+---
+
+# HANDOFF — what is still moving
+
+| Item | State | Where |
+| --- | --- | --- |
+| **#715 IMPL-EVAL** | **RUNNING** — Codex `gpt-5.6-sol` xhigh, thread `019f58a1-c152-7c93-bbc3-53d93b1c07dd` | verdict → `/home/codex/repos/b10-715-eval/.llm/runs/beta10-non-dashboard--claude/evaluate.md` |
+| **#762** | **RUNNING** — 3 of ~5 packages done (fresh, sagas-core, streams-core); triggers-core + `plugins/*` + the CI flip remain | `/home/codex/repos/b10-762-tssweep`, thread `019f5891` |
+| **#763** | **DONE, pushed, reviewed** | `fix/763-pin-plugin-cli-specifier` @ `40ecc87c` |
+| **JSR taglines** | **DONE, pushed, reviewed** | `docs/jsr-tagline-byte-cap` @ `458879fb` |
+
+## What an owner does next, in order
+
+1. **Read the IMPL-EVAL verdict** in `b10-715-eval/.llm/runs/.../evaluate.md`. It covers the
+   **Claude-authored** half of #715 (both wrapper fixes, the `deno.json` excludes, the two READMEs,
+   the mcp reference page). The Codex-authored slices (#762/#763) are reviewed by the Claude
+   supervisor instead — that split is recorded above, and both halves have opposite-family cover.
+2. **#715** — all CI green, `Closes #725 … Closes #733` already in the body. Merge is an **owner**
+   decision, gated on that verdict. Not merged tonight by design.
+3. **#763** and **taglines** — pushed, reviewed, **no PRs opened** (deliberate). They need PRs raised
+   with closing keywords (`Closes #763`) + labels + milestone before merge.
+4. **#762** — let it finish, then review the remaining commits the same way (grep every `+` line for
+   new suppressions; the bar is *typed, not laundered*).
+
+## Stop-lines held tonight
+
+No merges. No publish. No release. No milestone closed. **No writes to the JSR registry** — the
+tagline branch fixes READMEs only; jsr.io descriptions will **not** change when it merges, and the
+registry re-sync remains a separate, owner-supervised publish action.
+
+## Issues filed
+
+- **#767** — `docs:readme:check` is a dead gate (checker ⇄ template ⇄ house-style divergence).
+  Resolution recorded: house style wins. `Backlog / Triage`.
+- **#768** — OpenHands agent runtime cannot bootstrap (`No module named 'fastapi'`); the open-model
+  evaluator lane is down. `Backlog / Triage`.
