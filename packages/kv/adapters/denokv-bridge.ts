@@ -32,14 +32,23 @@ export type DenoKvKeyPart = string | number | bigint | boolean | Uint8Array;
 export type DenoKvStrictKey = readonly DenoKvKeyPart[];
 
 /** Entry shape returned by `get()` / `getMany()` / `list()`. */
-export interface DenoKvEntryMaybe<T = unknown> {
-  /** The key of the entry. */
-  key: DenoKvStrictKey;
-  /** The value, or `null` if the key does not exist. */
-  value: T | null;
-  /** Optimistic-concurrency stamp, or `null` for missing entries. */
-  versionstamp: string | null;
-}
+export type DenoKvEntryMaybe<T = unknown> =
+  | {
+    /** The key of the entry. */
+    key: DenoKvStrictKey;
+    /** The stored value. */
+    value: T;
+    /** Optimistic-concurrency stamp for the stored value. */
+    versionstamp: string;
+  }
+  | {
+    /** The requested missing key. */
+    key: DenoKvStrictKey;
+    /** Missing entries have no value. */
+    value: null;
+    /** Missing entries have no versionstamp. */
+    versionstamp: null;
+  };
 
 /** Selector variants for `list()`. */
 export type DenoKvListSelector =
@@ -354,7 +363,7 @@ export class WatchableKvBridge {
     return {
       key: entry.key as DenoKvStrictKey,
       value: entry.value,
-      versionstamp: entry.versionstamp,
+      versionstamp: entry.versionstamp ?? generateVersionstamp(),
     };
   }
 
@@ -573,8 +582,7 @@ export class WatchableKvBridge {
         // Subscribe to changes via WatchableKv.watch()
         abortController = new AbortController();
         try {
-          const kvKeys = keys as unknown as KvKey[];
-          const iterable = bridge.#kv.watch<T>(kvKeys, {
+          const iterable = bridge.#kv.watch<T>(keys, {
             signal: abortController.signal,
           });
           watchIterator = iterable[Symbol.asyncIterator]() as AsyncIterator<unknown[]>;

@@ -11,6 +11,11 @@
 
 import { ParallelMessageQueue } from '@fedify/fedify';
 import type {
+  MessageQueue as FedifyMessageQueue,
+  MessageQueueEnqueueOptions as FedifyEnqueueOptions,
+  MessageQueueListenOptions as FedifyListenOptions,
+} from '@fedify/fedify';
+import type {
   EnqueueOptions,
   ListenOptions,
   MessageContext,
@@ -48,32 +53,32 @@ export function wrapWithParallel<T>(
     return queue;
   }
 
-  // Create Fedify's ParallelMessageQueue wrapper
-  // Note: Fedify's ParallelMessageQueue uses `any` for message type
-  // deno-lint-ignore no-explicit-any
-  const parallelQueue = new ParallelMessageQueue(queue as any, concurrency);
+  const parallelQueue = new ParallelMessageQueue(
+    new FedifyQueueAdapter(queue),
+    concurrency,
+  );
 
   // Return a queue that delegates to the parallel queue
   // while maintaining our MessageQueue<T> interface
-  return {
+  const wrappedQueue: MessageQueue<T> & ParallelQueueMarker<T> = {
+    queue,
+    workers: concurrency,
+
     get nativeRetrial(): boolean {
       return parallelQueue.nativeRetrial ?? queue.nativeRetrial;
     },
 
     async enqueue(message: T, options?: EnqueueOptions): Promise<void> {
-      // deno-lint-ignore no-explicit-any -- Fedify queue options are not exposed with a precise public type.
-      await parallelQueue.enqueue(message, options as any);
+      await parallelQueue.enqueue(message, toFedifyEnqueueOptions(options));
     },
 
     async enqueueMany(messages: T[], options?: EnqueueOptions): Promise<void> {
       if (parallelQueue.enqueueMany) {
-        // deno-lint-ignore no-explicit-any -- Fedify queue options are not exposed with a precise public type.
-        await parallelQueue.enqueueMany(messages, options as any);
+        await parallelQueue.enqueueMany(messages, toFedifyEnqueueOptions(options));
       } else {
         // Fallback to sequential enqueue
         for (const message of messages) {
-          // deno-lint-ignore no-explicit-any -- Fedify queue options are not exposed with a precise public type.
-          await parallelQueue.enqueue(message, options as any);
+          await parallelQueue.enqueue(message, toFedifyEnqueueOptions(options));
         }
       }
     },
@@ -85,7 +90,7 @@ export function wrapWithParallel<T>(
       // Fedify's ParallelMessageQueue.listen takes a simpler handler signature
       // We need to adapt our handler to work with it
       await parallelQueue.listen(
-        async (message: unknown) => {
+        async (message: T) => {
           // Create a minimal context for compatibility
           // Note: Fedify's parallel queue doesn't provide the full context,
           // so we create a stub. The underlying queue's listen will provide
@@ -98,9 +103,9 @@ export function wrapWithParallel<T>(
             ack: async () => {},
             nack: async () => {},
           };
-          await handler(message as T, context);
+          await handler(message, context);
         },
-        options,
+        { signal: options?.signal },
       );
     },
 
@@ -108,6 +113,12 @@ export function wrapWithParallel<T>(
       await queue.stop();
     },
   };
+  return wrappedQueue;
+}
+
+interface ParallelQueueMarker<T> {
+  readonly queue: MessageQueue<T>;
+  readonly workers: number;
 }
 
 /**
@@ -117,9 +128,11 @@ export function wrapWithParallel<T>(
  * @param queue - Queue to check
  * @returns True if the queue is a parallel wrapper
  */
-export function isParallelQueue<T>(queue: MessageQueue<T>): boolean {
-  // ParallelMessageQueue has specific properties we can check
-  return 'queue' in queue && 'workers' in queue;
+export function isParallelQueue<T>(
+  queue: MessageQueue<T>,
+): queue is MessageQueue<T> & { readonly queue: MessageQueue<T>; readonly workers: number } {
+  return 'queue' in queue && 'workers' in queue &&
+    typeof queue.workers === 'number';
 }
 
 /**
@@ -131,7 +144,99 @@ export function isParallelQueue<T>(queue: MessageQueue<T>): boolean {
  */
 export function getQueueConcurrency<T>(queue: MessageQueue<T>): number {
   if (isParallelQueue(queue)) {
-    return (queue as unknown as { workers: number }).workers;
+    return queue.workers;
   }
   return 1;
+}
+
+type FedifyBridgeEnqueueOptions =
+  & FedifyEnqueueOptions
+  & Omit<EnqueueOptions, 'delay'>;
+
+class FedifyQueueAdapter<T> implements FedifyMessageQueue {
+  readonly nativeRetrial: boolean;
+
+  constructor(private readonly queue: MessageQueue<T>) {
+    this.nativeRetrial = queue.nativeRetrial;
+  }
+
+  enqueue(message: T, options?: FedifyEnqueueOptions): Promise<void> {
+    return this.queue.enqueue(message, toNetScriptEnqueueOptions(options));
+  }
+
+  async enqueueMany(messages: readonly T[], options?: FedifyEnqueueOptions): Promise<void> {
+    const netScriptOptions = toNetScriptEnqueueOptions(options);
+    if (this.queue.enqueueMany) {
+      await this.queue.enqueueMany([...messages], netScriptOptions);
+      return;
+    }
+    for (const message of messages) {
+      await this.queue.enqueue(message, netScriptOptions);
+    }
+  }
+
+  listen(
+    handler: (message: T) => Promise<void> | void,
+    options?: FedifyListenOptions,
+  ): Promise<void> {
+    return this.queue.listen(
+      async (message) => await handler(message),
+      { signal: options?.signal },
+    );
+  }
+}
+
+function toFedifyEnqueueOptions(
+  options: EnqueueOptions | undefined,
+): FedifyBridgeEnqueueOptions | undefined {
+  if (!options) return undefined;
+  const { delay, ...metadata } = options;
+  return {
+    ...metadata,
+    ...(delay === undefined ? {} : { delay: Temporal.Duration.from({ milliseconds: delay }) }),
+  };
+}
+
+function toNetScriptEnqueueOptions(
+  options: FedifyEnqueueOptions | undefined,
+): EnqueueOptions | undefined {
+  if (!options) return undefined;
+  const metadata: object = options;
+  return {
+    ...(options.delay === undefined
+      ? {}
+      : { delay: options.delay.total({ unit: 'milliseconds' }) }),
+    ...readNumberProperty(metadata, 'priority'),
+    ...readStringProperty(metadata, 'deduplicationId'),
+    ...readHeadersProperty(metadata),
+  };
+}
+
+function readNumberProperty(
+  value: object,
+  key: 'priority',
+): Pick<EnqueueOptions, 'priority'> {
+  if (key in value && typeof value[key] === 'number') {
+    return { [key]: value[key] };
+  }
+  return {};
+}
+
+function readStringProperty(
+  value: object,
+  key: 'deduplicationId',
+): Pick<EnqueueOptions, 'deduplicationId'> {
+  if (key in value && typeof value[key] === 'string') {
+    return { [key]: value[key] };
+  }
+  return {};
+}
+
+function readHeadersProperty(value: object): Pick<EnqueueOptions, 'headers'> {
+  if (!('headers' in value) || typeof value.headers !== 'object' || value.headers === null) {
+    return {};
+  }
+  const entries = Object.entries(value.headers);
+  if (!entries.every(([, entry]) => typeof entry === 'string')) return {};
+  return { headers: Object.fromEntries(entries) };
 }

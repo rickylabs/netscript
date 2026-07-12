@@ -7,9 +7,14 @@
  * @module
  */
 
+import { createStateSchema } from '@durable-streams/state';
 import { createStreamDB } from '@durable-streams/state/db';
 import { buildStreamUrl, getStreamsAuth } from '@netscript/plugin-streams-core';
-import { type TriggerEvent, triggersStreamSchema } from './schema.ts';
+import {
+  type TriggerEvent,
+  type TriggersStreamDefinition,
+  TriggerStreamEntitySchema,
+} from './schema.ts';
 
 export type { TriggerEvent };
 
@@ -48,6 +53,13 @@ export function createTriggersStreamDB(
   options: TriggersStreamDBOptions = {},
 ): TriggersStreamDB {
   const baseUrl = options.baseUrl ?? 'http://localhost:4437';
+  const state = createStateSchema<TriggersStreamDefinition>({
+    triggerEvent: {
+      schema: TriggerStreamEntitySchema,
+      type: 'triggerEvent',
+      primaryKey: 'eventId',
+    },
+  });
 
   return createStreamDB({
     streamOptions: {
@@ -55,6 +67,6 @@ export function createTriggersStreamDB(
       contentType: 'application/json',
       headers: getStreamsAuth(),
     },
-    state: triggersStreamSchema as never,
-  }) as unknown as TriggersStreamDB; // quality-allow: durable-stream schema generics are invariant across the generated trigger entity map
+    state,
+  });
 }

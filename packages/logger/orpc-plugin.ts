@@ -28,12 +28,6 @@ export interface ClientLoggingInterceptorOptions {
 }
 
 /**
- * Broad interceptor signature compatible with oRPC handler option arrays.
- */
-// deno-lint-ignore no-explicit-any
-export type LoggingInterceptor = (...args: any[]) => Promise<any>;
-
-/**
  * Root-level logging interceptor signature.
  */
 export type RootLoggingInterceptor = (
@@ -46,6 +40,9 @@ export type RootLoggingInterceptor = (
 export type ClientLoggingInterceptor = (
   options: ClientLoggingInterceptorOptions,
 ) => Promise<unknown>;
+
+/** Logging interceptor variants accepted by the plugin's handler arrays. */
+export type LoggingInterceptor = RootLoggingInterceptor | ClientLoggingInterceptor;
 
 /**
  * Minimal mutable handler options contract accepted by {@link LoggingPlugin#init}.
