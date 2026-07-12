@@ -24,15 +24,15 @@ bunx jsr add @netscript/cli
 ### Usage
 
 ```typescript
-import { createPublicCli } from "@netscript/cli";
+import { createPublicCli } from '@netscript/cli';
 
 // Build the public NetScript command tree against host-supplied services.
 const cli = createPublicCli({
   cwd: () => Deno.cwd(),
-  resolvePath: (path = ".") => new URL(path, `file://${Deno.cwd()}/`).pathname,
+  resolvePath: (path = '.') => new URL(path, `file://${Deno.cwd()}/`).pathname,
 });
 
-await cli.parse(["--help"]);
+await cli.parse(['--help']);
 ```
 
 For a binary edge, wrap the tree in `runPublicCli()` for consistent NetScript error formatting.
@@ -74,14 +74,14 @@ The bare-metal targets implement the canonical `plan` / `emit` / `up` / `down` /
 
 The bare-metal deploy lifecycle compiles binaries, manages OS services, writes release/secret material, and health-probes the running service, so a host binary embedding this surface must grant:
 
-| Permission     | Why                                                                              |
-| -------------- | -------------------------------------------------------------------------------- |
-| `--allow-run`  | `deno compile` the service binaries and invoke `servy` / `systemctl` / `icacls`. |
-| `--allow-read` | Read the workspace config, entrypoints, and release/secret files.                |
-| `--allow-write`| Emit compiled binaries, release directories, the `current` link, and env files.  |
-| `--allow-net`  | Health-probe the activated service (`FetchHealthProbe`).                          |
-| `--allow-sys`  | Resolve the host OS/triple to pick the Servy vs. systemd adapter and target.      |
-| `--allow-env`  | Read the deploy owner principal for the Windows secret-file ACL.                 |
+| Permission      | Why                                                                              |
+| --------------- | -------------------------------------------------------------------------------- |
+| `--allow-run`   | `deno compile` the service binaries and invoke `servy` / `systemctl` / `icacls`. |
+| `--allow-read`  | Read the workspace config, entrypoints, and release/secret files.                |
+| `--allow-write` | Emit compiled binaries, release directories, the `current` link, and env files.  |
+| `--allow-net`   | Health-probe the activated service (`FetchHealthProbe`).                         |
+| `--allow-sys`   | Resolve the host OS/triple to pick the Servy vs. systemd adapter and target.     |
+| `--allow-env`   | Read the deploy owner principal for the Windows secret-file ACL.                 |
 
 ---
 
@@ -105,12 +105,12 @@ pushes warn but proceed.
 The deploy subcommands shell out to the `deno deploy` CLI and read project files,
 so a host binary embedding this surface must grant:
 
-| Permission     | Why                                                            |
-| -------------- | ------------------------------------------------------------- |
+| Permission     | Why                                                               |
+| -------------- | ----------------------------------------------------------------- |
 | `--allow-run`  | Spawn the `deno deploy` CLI (`plan`/`up`/`down`/`status`/`logs`). |
-| `--allow-read` | Read `deno.json` + the entrypoint for the unstable-API guard. |
-| `--allow-net`  | The `deno deploy` CLI uploads to and queries the platform.    |
-| `--allow-env`  | The `deno deploy` CLI reads auth/token environment variables. |
+| `--allow-read` | Read `deno.json` + the entrypoint for the unstable-API guard.     |
+| `--allow-net`  | The `deno deploy` CLI uploads to and queries the platform.        |
+| `--allow-env`  | The `deno deploy` CLI reads auth/token environment variables.     |
 
 Authentication is delegated to the `deno deploy` CLI (its token/login flow); this
 surface issues no credentials of its own.
@@ -150,11 +150,11 @@ deploy <service> --image <registry>/<imageName>`.
 
 Cluster and cloud authentication are intentionally operator-owned:
 
-| Target | Prerequisites |
-| ------ | ------------- |
-| `kubernetes` | `aspire add kubernetes`, a configured `kubectl` context, Helm 4.2+, and a registry reachable by the cluster. |
+| Target                                          | Prerequisites                                                                                                                                                                       |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `kubernetes`                                    | `aspire add kubernetes`, a configured `kubectl` context, Helm 4.2+, and a registry reachable by the cluster.                                                                        |
 | `azure-aca` / `azure-app-service` / `azure-aks` | Azure CLI login, subscription/location parameters, and the matching Azure hosting integration in the AppHost. AKS also needs `kubectl`, Helm, and RBAC that can manage the cluster. |
-| `cloud-run` | Docker, Google Cloud CLI auth, Artifact Registry or compatible Docker registry access, and Cloud Run IAM/RBAC that can push the image and update the service. |
+| `cloud-run`                                     | Docker, Google Cloud CLI auth, Artifact Registry or compatible Docker registry access, and Cloud Run IAM/RBAC that can push the image and update the service.                       |
 
 NetScript does not mint cloud credentials, assign RBAC, or hand-author Helm,
 Bicep, Kubernetes, or Azure provider manifests in the CLI. Kubernetes/Azure
@@ -162,6 +162,28 @@ adapters delegate to Aspire after AppHost validation; Cloud Run owns only the
 Docker image build/push/apply seam.
 
 ---
+
+## Agent tooling
+
+Install the version-matched NetScript skills and MCP host configuration from a project root:
+
+```bash
+netscript agent init
+```
+
+Claude Code receives `.mcp.json`, the NetScript skill bundle under `.claude/skills/`, and a marked
+section in `AGENTS.md`. VS Code receives `.vscode/mcp.json`. Host directories are detected, or use
+`--host claude`, `--host vscode`, or `--host all` explicitly. Re-running the command preserves
+other host configuration and leaves unchanged files alone.
+
+The installed server entry runs `netscript agent mcp`. Prefer ordinary CLI commands for direct,
+repeatable operations; use MCP for bounded telemetry aggregation, cross-domain diagnostics, and the
+public-docs search-to-get workflow. The MCP data boundary covers telemetry, project metadata,
+generated registries, and public docs—never project source, environment values, credentials, or
+secrets.
+
+See [Agent tooling](https://rickylabs.github.io/netscript/capabilities/agent-tooling/) for the full
+13-tool catalog and command policy.
 
 ## 📖 Documentation
 
