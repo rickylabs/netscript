@@ -228,6 +228,8 @@ directed. Therefore live workers/sagas service behavior is honestly recorded as 
 the orchestrator runs `scaffold.runtime`. No PR was opened, and IMPL-EVAL remains a separate-session
 orchestrator responsibility.
 
+- Commit/push: `895417e6` pushed to `origin/feat/704-durable-cli-parity`.
+
 ### Drift
 
 | ID | Severity | Detail |
