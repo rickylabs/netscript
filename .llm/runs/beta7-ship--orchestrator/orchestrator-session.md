@@ -144,3 +144,12 @@ cwd `/home/codex/repos/ns-beta9-orchestrator`. Brief leads with the HARD STOP-LI
 release:publish / gh release create / merging release-cut PRs — incident-referenced) then
 milestone 11 (epic #701 children #702–#712 + hardening + docs accuracy). Prompt archived as
 beta9-launch-prompt.md.
+
+## FOURTH HANDOFF (2026-07-12 ~04:25)
+
+MCP+skills orchestrator launched: `078ecac1`, Fable 5 low, bypassPermissions, RC `ns-mcp-skills`,
+cwd `/home/codex/repos/ns-mcp-skills-orchestrator`. Mission: NetScript agentic combo
+(CLI × SKILL × MCP, Aspire model) — monitoring/debugging/doctor/docs/CLI-trigger/trace-intelligence
+tools + public skills; umbrella `feat/netscript-mcp-skills`; epic+children filed to Backlog for
+owner scheduling; Refs #302 (benchmark epic) in the umbrella PR; MCP-wraps-CLI dependency on epic
+#701 recorded. Prompt archived as mcp-launch-prompt.md.
