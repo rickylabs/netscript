@@ -9,4 +9,6 @@
 - Validation: scoped check/lint/fmt green (22 files); 13 tests green; architecture, doc lint,
   publish dry-run, public-wording, and lock-hygiene gates green. The JSR helper's sole warning is a
   banner-count false positive contradicted by the successful authoritative raw dry-run.
-- Remaining: review the owned diff, commit logically, and push for supervisor review.
+- Implementation commit `74aa1c94` pushed to
+  `origin/feat/netscript-mcp-skills-s2-docs`; remaining action is the evidence-only handoff commit
+  and raw local/remote cleanliness verification.

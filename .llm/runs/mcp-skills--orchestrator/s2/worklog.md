@@ -52,3 +52,10 @@ Append-only implementation evidence for issue #726 on branch
 
 Reconcile: S2 remains limited to issue #726 and introduces no issue-state, taxonomy, milestone, or
 umbrella changes. The supervisor owns umbrella review and integration; this lane opens no PR.
+
+## 2026-07-12 — commit trail
+
+- Implementation and gate evidence commit: `74aa1c94` —
+  `feat(mcp): add public docs corpus tools (#726)`.
+- Push: exit 0 to `origin/feat/netscript-mcp-skills-s2-docs`.
+- No pull request was opened, as required by the slice brief.
