@@ -24,7 +24,7 @@ implementation has begun.
 
 ## In Progress
 
-- Slice 1 route/builder typing.
+- Slice 2 form/Zod typing commit.
 
 ## Next Steps
 
@@ -45,6 +45,7 @@ implementation has begun.
 | Path | Status | Notes |
 | ---- | ------ | ----- |
 | `.llm/runs/quality-q752-fresh--codex/*` | new | harness bootstrap/plan artifacts only |
+| `packages/fresh/src/application/{builders,route}/**` | changed | Actual generic factories and compatibility aliases replace facade erasure. |
 
 ## Gates
 

@@ -17,7 +17,6 @@ import {
   createRouteNav,
   type FreshLinkAttributes,
   Link,
-  type LinkProps,
   type TypedRouteTarget,
 } from './link.tsx';
 export { useCurrentPath, useCurrentRoute, useCurrentSearch } from './hooks.ts';
@@ -143,8 +142,8 @@ export function usePageRoute<TValue extends DefinePageTypeCarrier>(): CurrentDef
   const CurrentLink: ComponentType<BoundLinkProps<TTarget>> = (props: BoundLinkProps<TTarget>) => {
     return Link<TTarget>({
       to: target,
-      ...(props as unknown as Omit<LinkProps<TTarget>, 'to'>),
-    } as LinkProps<TTarget>);
+      ...props,
+    });
   };
 
   return {

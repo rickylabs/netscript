@@ -95,7 +95,10 @@ export interface DefinePageBuilder<
    * the NetScript Vite plugin inserts the `$route` pattern from the page
    * module's path during codegen, so authors typically omit `$route`.
    */
-  withRouteContract<TPathSchema = unknown, TSearchSchema = unknown>(
+  withRouteContract<
+    TPathSchema extends PathParamSchema<object> | undefined = undefined,
+    TSearchSchema extends SearchParamSchema<object> | undefined = undefined,
+  >(
     contract: DefinePageRouteContractInput<TPathSchema, TSearchSchema>,
   ): DefinePageBuilder<
     DefinePageWithRouteContract<TTypes, TPathSchema, TSearchSchema>,
