@@ -56,7 +56,7 @@ export function createWorkersStreamProducer(
     streamPath: options.streamPath ?? DEFAULT_STREAM_PATH,
     schema: workersStreamSchema as never,
     producerId: options.producerId ?? DEFAULT_PRODUCER_ID,
-  }) as unknown as WorkersStreamProducer;
+  }) as WorkersStreamProducer;
 }
 
 /** Convert an execution record into the durable stream execution entity shape. */

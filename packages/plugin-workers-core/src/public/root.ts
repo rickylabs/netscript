@@ -306,21 +306,21 @@ export type StartWorkersOptions =
 export function defineJob<TId extends string>(
   id: TId,
 ): JobBuilder<TId, 'initial', unknown, unknown> {
-  return defineJobImpl(id) as unknown as JobBuilder<TId, 'initial', unknown, unknown>;
+  return defineJobImpl(id) as JobBuilder<TId, 'initial', unknown, unknown>;
 }
 
 /** Start a worker task definition chain. */
 export function defineTask<TId extends string>(
   id: TId,
 ): TaskBuilder<TId, 'initial', unknown, unknown> {
-  return defineTaskImpl(id) as unknown as TaskBuilder<TId, 'initial', unknown, unknown>;
+  return defineTaskImpl(id) as TaskBuilder<TId, 'initial', unknown, unknown>;
 }
 
 /** Start a worker workflow definition chain. */
 export function defineWorkflow<TId extends string>(
   id: TId,
 ): WorkflowBuilder<TId, 'initial', unknown, unknown> {
-  return defineWorkflowImpl(id) as unknown as WorkflowBuilder<TId, 'initial', unknown, unknown>;
+  return defineWorkflowImpl(id) as WorkflowBuilder<TId, 'initial', unknown, unknown>;
 }
 
 /** Cron schedule helpers for worker jobs. */

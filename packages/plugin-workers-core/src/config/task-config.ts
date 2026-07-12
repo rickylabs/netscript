@@ -106,4 +106,4 @@ export const TaskConfigZodSchema: AnyZodObject = z.object({
 
 /** Runtime task configuration. */
 export const TaskConfigSchema: ConfigSchema<TaskConfig> =
-  TaskConfigZodSchema as unknown as ConfigSchema<TaskConfig>;
+  TaskConfigZodSchema as unknown as ConfigSchema<TaskConfig>; // quality-allow: Zod 4's invariant input parameter does not overlap the package's parse-only ConfigSchema facade despite identical parsed TaskConfig output.

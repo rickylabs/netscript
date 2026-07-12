@@ -113,18 +113,18 @@ class JobBuilderImpl<
 
   entrypoint(path: string): JobBuilder<TId, 'entrypoint-set', TPayload, TResult> {
     this.#entrypoint = path;
-    return this as unknown as JobBuilder<TId, 'entrypoint-set', TPayload, TResult>;
+    return this as JobBuilder<TId, 'entrypoint-set', TPayload, TResult>;
   }
 
   handler<TNextPayload = TPayload, TNextResult = TResult>(
     fn: JobHandler<TNextPayload, TNextResult>,
   ): JobBuilder<TId, 'handler-set', TNextPayload, TNextResult> {
-    this.#handler = fn as unknown as DomainJobHandler<TPayload, TResult>;
-    return this as unknown as JobBuilder<TId, 'handler-set', TNextPayload, TNextResult>;
+    this.#handler = fn as unknown as DomainJobHandler<TPayload, TResult>; // quality-allow: The handler method changes the builder's invariant payload/result parameters while storing the same callback for the returned typestate.
+    return this as JobBuilder<TId, 'handler-set', TNextPayload, TNextResult>;
   }
 
   payload<TNextPayload>(): JobBuilder<TId, TConfigured, TNextPayload, TResult> {
-    return this as unknown as JobBuilder<TId, TConfigured, TNextPayload, TResult>;
+    return this as JobBuilder<TId, TConfigured, TNextPayload, TResult>;
   }
 
   /** @deprecated Define recurring work with `defineScheduledTrigger(...).enqueueJob(...)`. */
@@ -221,9 +221,9 @@ class JobBuilderImpl<
       permissions: this.#permissions,
       retention: this.#retention,
       handler: this.#handler,
-    }) as unknown as DomainJobDefinition<TId, TPayload, TResult>;
+    }) as DomainJobDefinition<TId, TPayload, TResult>;
 
-    return definition as unknown as TConfigured extends 'entrypoint-set' | 'handler-set'
+    return definition as unknown as TConfigured extends 'entrypoint-set' | 'handler-set' // quality-allow: TypeScript cannot narrow a class-level typestate parameter from the runtime entrypoint/handler guard used by build().
       ? JobDefinition<TId, TPayload, TResult>
       : never;
   }

@@ -84,7 +84,7 @@ const WorkerGroupObjectSchema = z.object({
   jobs: z.array(JobConfigZodSchema).default([]),
 });
 
-const WorkerGroupZodSchema = WorkerGroupObjectSchema as unknown as z.ZodType<WorkerGroupData>;
+const WorkerGroupZodSchema = WorkerGroupObjectSchema as unknown as z.ZodType<WorkerGroupData>; // quality-allow: Zod 4 keeps object input/output generics invariant, while the schema defaults produce the declared WorkerGroupData output.
 
 /** Worker group configuration schema. */
 export const WorkerGroupSchema: ConfigSchema<WorkerGroupData> = WorkerGroupZodSchema;
@@ -122,11 +122,11 @@ const WorkersConfigZodSchema = WorkersConfigObjectSchema.transform(
       })),
     })),
   }),
-).optional() as unknown as z.ZodType<WorkersConfigData | undefined>;
+).optional() as unknown as z.ZodType<WorkersConfigData | undefined>; // quality-allow: Zod 4 preprocess plus optional has an invariant unknown input that cannot be annotated as its transformed WorkersConfigData output directly.
 
 /** Workers plugin configuration schema. */
 export const WorkersConfigSchema: ConfigSchema<WorkersConfigData | undefined> =
-  WorkersConfigZodSchema as unknown as ConfigSchema<WorkersConfigData | undefined>;
+  WorkersConfigZodSchema as ConfigSchema<WorkersConfigData | undefined>;
 
 /** Per-topic worker scaling configuration. */
 export type ScalingConfig = ScalingConfigData | undefined;

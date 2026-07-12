@@ -68,7 +68,7 @@ class WorkflowBuilderImpl<
   }
 
   payload<TNextPayload>(): WorkflowBuilder<TId, TConfigured, TNextPayload, TResult> {
-    return this as unknown as WorkflowBuilder<TId, TConfigured, TNextPayload, TResult>;
+    return this as WorkflowBuilder<TId, TConfigured, TNextPayload, TResult>;
   }
 
   jobStep(
@@ -76,7 +76,7 @@ class WorkflowBuilderImpl<
     options: WorkflowJobStepOptions<TPayload>,
   ): WorkflowBuilder<TId, 'step-set', TPayload, TResult> {
     this.#steps.push({ id, jobId: options.jobId, kind: 'job', payload: options.payload });
-    return this as unknown as WorkflowBuilder<TId, 'step-set', TPayload, TResult>;
+    return this as WorkflowBuilder<TId, 'step-set', TPayload, TResult>;
   }
 
   taskStep(
@@ -84,12 +84,12 @@ class WorkflowBuilderImpl<
     options: WorkflowTaskStepOptions<TPayload>,
   ): WorkflowBuilder<TId, 'step-set', TPayload, TResult> {
     this.#steps.push({ id, kind: 'task', payload: options.payload, taskId: options.taskId });
-    return this as unknown as WorkflowBuilder<TId, 'step-set', TPayload, TResult>;
+    return this as WorkflowBuilder<TId, 'step-set', TPayload, TResult>;
   }
 
   sleep(id: string, durationMs: number): WorkflowBuilder<TId, 'step-set', TPayload, TResult> {
     this.#steps.push({ durationMs, id, kind: 'sleep' });
-    return this as unknown as WorkflowBuilder<TId, 'step-set', TPayload, TResult>;
+    return this as WorkflowBuilder<TId, 'step-set', TPayload, TResult>;
   }
 
   tags(...tags: string[]): this {

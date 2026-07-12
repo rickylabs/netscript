@@ -42,7 +42,7 @@ import {
 // (routes, input/output schemas, the contract type, `implement`) is genuinely
 // typed.
 const baseContract: ReturnType<typeof oc.errors> = oc.errors(
-  { ...BASE_PLUGIN_ERRORS } as unknown as Parameters<typeof oc.errors>[0],
+  { ...BASE_PLUGIN_ERRORS } as Parameters<typeof oc.errors>[0],
 );
 
 /**
@@ -519,6 +519,9 @@ const workersContractDefinition: WorkersContractDefinition = {
     .output(listTopicsOutput),
 };
 
+/** Fully typed workers v1 contract definition. */
+export type { WorkersContractDefinition };
+
 /**
  * The fully-typed workers v1 contract definition type.
  *
@@ -526,8 +529,6 @@ const workersContractDefinition: WorkersContractDefinition = {
  * `workers.contract-types.ts` derive from it instead of hand-authoring a
  * parallel shape.
  */
-export type { WorkersContractDefinition };
-
 /**
  * Worker service contract definition for client generation.
  *

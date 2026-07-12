@@ -136,13 +136,13 @@ export function createWorkersRuntime(options: WorkersRuntimeOptions = {}): Worke
   return Object.freeze({
     id,
     clock: options.clock ?? systemClock,
-    jobRegistry: jobRegistry as unknown as RuntimeJobStoragePort,
+    jobRegistry: jobRegistry as RuntimeJobStoragePort,
     taskRegistry,
-    worker: worker as unknown as RuntimeWorkerPort,
+    worker: worker as RuntimeWorkerPort,
     scheduler: options.scheduler,
-    shutdown: shutdown as unknown as RuntimeShutdownManager,
-    taskExecutor: taskExecutor as unknown as RuntimeTaskExecutor,
-    workflowExecutor: workflowExecutor as unknown as RuntimeWorkflowExecutor,
+    shutdown: shutdown as unknown as RuntimeShutdownManager, // quality-allow: The legacy ShutdownManager lacks the runtime port's metadata-only id while implementing the register/shutdown behavior used here.
+    taskExecutor: taskExecutor as RuntimeTaskExecutor,
+    workflowExecutor: workflowExecutor as unknown as RuntimeWorkflowExecutor, // quality-allow: The legacy WorkflowExecutor lacks the runtime port's metadata-only id while providing the execute behavior used here.
     start(): Promise<void> {
       started = true;
       return Promise.resolve();

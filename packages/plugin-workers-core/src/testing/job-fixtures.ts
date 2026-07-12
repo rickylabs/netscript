@@ -63,7 +63,7 @@ export function createJobFixture<TId extends string = 'test-job'>(
     .topic(options.topic ?? DEFAULT_TOPIC)
     .tags(...options.tags ?? [])
     .metadata(options.metadata ?? {})
-    .build() as unknown as JobDefinition<TId>;
+    .build() as unknown as JobDefinition<TId>; // quality-allow: The public builder returns its thin branded definition, while this legacy test fixture exposes the richer domain JobDefinition expected by test consumers.
 }
 
 /** Create an execution record with realistic defaults. */
@@ -101,8 +101,8 @@ export function createTestWorkersRuntime(
   const runtime = createWorkersRuntime({
     ...options,
     clock: options.clock ?? Object.freeze({ now: () => new Date(0) }),
-    jobRegistry: jobStorage as unknown as WorkersRuntimeOptions['jobRegistry'],
-    worker: worker as unknown as WorkersRuntimeOptions['worker'],
+    jobRegistry: jobStorage as WorkersRuntimeOptions['jobRegistry'],
+    worker: worker as WorkersRuntimeOptions['worker'],
   });
   return Object.freeze({
     ...runtime,

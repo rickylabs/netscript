@@ -48,7 +48,7 @@ export const JobDefinitionResponseZodSchema: typeof JobResponseSchema = JobRespo
 
 /** Schema for worker job definition responses. */
 export const JobDefinitionResponseSchema: ContractSchema<JobDefinitionResponse> =
-  JobDefinitionResponseZodSchema as unknown as ContractSchema<JobDefinitionResponse>;
+  JobDefinitionResponseZodSchema as ContractSchema<JobDefinitionResponse>;
 
 type ExecutionRecordResponseShape =
   & Omit<
@@ -74,13 +74,13 @@ export const ExecutionRecordResponseZodSchema: z.ZodObject<ExecutionRecordRespon
 
 /** Schema for worker execution record responses. */
 export const ExecutionRecordResponseSchema: ContractSchema<ExecutionRecordResponse> =
-  ExecutionRecordResponseZodSchema as unknown as ContractSchema<ExecutionRecordResponse>;
+  ExecutionRecordResponseZodSchema as ContractSchema<ExecutionRecordResponse>;
 
 export const TaskDefinitionResponseZodSchema: typeof TaskResponseSchema = TaskResponseSchema;
 
 /** Schema for worker task definition responses. */
 export const TaskDefinitionResponseSchema: ContractSchema<TaskDefinitionResponse> =
-  TaskDefinitionResponseZodSchema as unknown as ContractSchema<TaskDefinitionResponse>;
+  TaskDefinitionResponseZodSchema as ContractSchema<TaskDefinitionResponse>;
 
 type JobFiltersShape = {
   enabled: z.ZodOptional<z.ZodCoercedBoolean<unknown>>;
@@ -103,7 +103,7 @@ export const JobFiltersZodSchema: z.ZodObject<typeof JobFiltersShape> = z.object
 
 /** Schema for list-jobs filters. */
 export const JobFiltersSchema: ContractSchema<Readonly<Record<string, unknown>>> =
-  JobFiltersZodSchema as unknown as ContractSchema<Readonly<Record<string, unknown>>>;
+  JobFiltersZodSchema as ContractSchema<Readonly<Record<string, unknown>>>;
 
 type ExecutionFiltersShape = {
   jobId: z.ZodOptional<z.ZodString>;
@@ -124,7 +124,7 @@ export const ExecutionFiltersZodSchema: z.ZodObject<typeof ExecutionFiltersShape
 
 /** Schema for list-executions filters. */
 export const ExecutionFiltersSchema: ContractSchema<Readonly<Record<string, unknown>>> =
-  ExecutionFiltersZodSchema as unknown as ContractSchema<Readonly<Record<string, unknown>>>;
+  ExecutionFiltersZodSchema as ContractSchema<Readonly<Record<string, unknown>>>;
 
 type TaskFiltersShape = {
   type: z.ZodOptional<z.ZodString>;
@@ -145,7 +145,7 @@ export const TaskFiltersZodSchema: z.ZodObject<typeof TaskFiltersShape> = z.obje
 
 /** Schema for list-tasks filters. */
 export const TaskFiltersSchema: ContractSchema<Readonly<Record<string, unknown>>> =
-  TaskFiltersZodSchema as unknown as ContractSchema<Readonly<Record<string, unknown>>>;
+  TaskFiltersZodSchema as ContractSchema<Readonly<Record<string, unknown>>>;
 
 type JobCreateInputShape = typeof JobEditableSchema.shape & {
   id: z.ZodOptional<z.ZodString>;
@@ -165,7 +165,7 @@ export const JobCreateInputZodSchema: z.ZodObject<typeof JobCreateInputShape> = 
 
 /** Schema for creating worker job definitions. */
 export const JobCreateInputSchema: ContractSchema<Readonly<Record<string, unknown>>> =
-  JobCreateInputZodSchema as unknown as ContractSchema<Readonly<Record<string, unknown>>>;
+  JobCreateInputZodSchema as ContractSchema<Readonly<Record<string, unknown>>>;
 
 type JobUpdateInputShape = {
   [TKey in keyof typeof JobEditableSchema.shape]: z.ZodOptional<
@@ -179,7 +179,7 @@ export const JobUpdateInputZodSchema: z.ZodObject<JobUpdateInputShape> = JobUpda
 
 /** Schema for updating worker job definitions. */
 export const JobUpdateInputSchema: ContractSchema<Readonly<Record<string, unknown>>> =
-  JobUpdateInputZodSchema as unknown as ContractSchema<Readonly<Record<string, unknown>>>;
+  JobUpdateInputZodSchema as ContractSchema<Readonly<Record<string, unknown>>>;
 
 type JobUpdateWithIdShape = JobUpdateInputShape & {
   id: z.ZodString;
@@ -197,7 +197,7 @@ export const JobUpdateWithIdZodSchema: z.ZodObject<typeof JobUpdateWithIdShape> 
 
 /** Schema for updating a worker job definition by id. */
 export const JobUpdateWithIdSchema: ContractSchema<Readonly<Record<string, unknown>>> =
-  JobUpdateWithIdZodSchema as unknown as ContractSchema<Readonly<Record<string, unknown>>>;
+  JobUpdateWithIdZodSchema as ContractSchema<Readonly<Record<string, unknown>>>;
 
 type JobTriggerInputShape =
   & Pick<
@@ -233,7 +233,7 @@ export const JobTriggerInputZodSchema: z.ZodObject<JobTriggerInputShape> =
 
 /** Schema for triggering a worker job by id. */
 export const JobTriggerInputSchema: ContractSchema<JobTriggerInput> =
-  JobTriggerInputZodSchema as unknown as ContractSchema<JobTriggerInput>;
+  JobTriggerInputZodSchema as ContractSchema<JobTriggerInput>;
 
 export const TaskTriggerInputZodSchema: z.ZodType<TaskTriggerInput> = z.object({
   // The `{id}` path segment is the single source of truth for the target task:
@@ -250,7 +250,8 @@ export const TaskTriggerInputZodSchema: z.ZodType<TaskTriggerInput> = z.object({
 export const SSEEventZodSchema: typeof DomainSSEEventSchema = DomainSSEEventSchema;
 
 /** Schema for server-sent event payloads emitted by the workers service. */
-export const SSEEventSchema: ContractSchema<SSEEvent> =
-  SSEEventZodSchema as unknown as ContractSchema<SSEEvent>;
+export const SSEEventSchema: ContractSchema<SSEEvent> = SSEEventZodSchema as ContractSchema<
+  SSEEvent
+>;
 
 export { ExecutionRecordSchema };

@@ -142,7 +142,7 @@ const WorkerExecutionZodSchema: AnyZodObject = ExecutionRecordSchema.pick({
 });
 /** Stream entity schema for worker executions. */
 export const WorkerExecutionSchema: WorkerStreamEntitySchema<WorkerExecution> =
-  WorkerExecutionZodSchema as unknown as WorkerStreamEntitySchema<WorkerExecution>;
+  WorkerExecutionZodSchema as unknown as WorkerStreamEntitySchema<WorkerExecution>; // quality-allow: The upstream durable-stream schema facade is invariant in entity input while this Zod object guarantees the WorkerExecution parsed output.
 
 /** Zod schema for a worker job entity stored in the durable stream. */
 const WorkerJobZodSchema: AnyZodObject = JobResponseSchema.pick({
@@ -161,7 +161,7 @@ const WorkerJobZodSchema: AnyZodObject = JobResponseSchema.pick({
 });
 /** Stream entity schema for worker jobs. */
 export const WorkerJobSchema: WorkerStreamEntitySchema<WorkerJob> =
-  WorkerJobZodSchema as unknown as WorkerStreamEntitySchema<WorkerJob>;
+  WorkerJobZodSchema as unknown as WorkerStreamEntitySchema<WorkerJob>; // quality-allow: The upstream durable-stream schema facade is invariant in entity input while this Zod projection guarantees the WorkerJob parsed output.
 
 /** Durable stream definition for worker execution and job entities. */
 export type WorkersStreamDefinition = {
@@ -200,4 +200,4 @@ const workersStreamStateSchema = defineStreamSchema({
 });
 /** Stream schema definition for worker executions and jobs. */
 export const workersStreamSchema: WorkersStreamSchema<WorkersStreamDefinition> =
-  workersStreamStateSchema as unknown as WorkersStreamSchema<WorkersStreamDefinition>;
+  workersStreamStateSchema as unknown as WorkersStreamSchema<WorkersStreamDefinition>; // quality-allow: createStateSchema returns an upstream invariant StateSchema whose entity map is structurally the declared WorkersStreamDefinition.

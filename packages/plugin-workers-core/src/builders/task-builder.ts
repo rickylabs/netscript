@@ -85,18 +85,18 @@ class TaskBuilderImpl<
 
   entrypoint(path: string): TaskBuilder<TId, 'entrypoint-set', TPayload, TResult> {
     this.#entrypoint = path;
-    return this as unknown as TaskBuilder<TId, 'entrypoint-set', TPayload, TResult>;
+    return this as TaskBuilder<TId, 'entrypoint-set', TPayload, TResult>;
   }
 
   handler<TNextPayload = TPayload, TNextResult = TResult>(
     fn: TaskHandler<TNextPayload, TNextResult>,
   ): TaskBuilder<TId, 'handler-set', TNextPayload, TNextResult> {
-    this.#handler = fn as unknown as DomainTaskHandler<TPayload, TResult>;
-    return this as unknown as TaskBuilder<TId, 'handler-set', TNextPayload, TNextResult>;
+    this.#handler = fn as unknown as DomainTaskHandler<TPayload, TResult>; // quality-allow: The handler method changes the builder's invariant payload/result parameters while storing the same callback for the returned typestate.
+    return this as TaskBuilder<TId, 'handler-set', TNextPayload, TNextResult>;
   }
 
   payload<TNextPayload>(): TaskBuilder<TId, TConfigured, TNextPayload, TResult> {
-    return this as unknown as TaskBuilder<TId, TConfigured, TNextPayload, TResult>;
+    return this as TaskBuilder<TId, TConfigured, TNextPayload, TResult>;
   }
 
   timeout(ms: number): this {
@@ -173,9 +173,9 @@ class TaskBuilderImpl<
       maxConcurrency: 1,
       persist: true,
       handler: this.#handler,
-    }) as unknown as DomainTaskDefinition<TId, TPayload, TResult>;
+    }) as DomainTaskDefinition<TId, TPayload, TResult>;
 
-    return definition as unknown as TConfigured extends 'entrypoint-set' | 'handler-set'
+    return definition as unknown as TConfigured extends 'entrypoint-set' | 'handler-set' // quality-allow: TypeScript cannot narrow a class-level typestate parameter from the runtime entrypoint/handler guard used by build().
       ? TaskDefinition<TId, TPayload, TResult>
       : never;
   }

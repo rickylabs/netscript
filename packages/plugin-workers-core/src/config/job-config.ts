@@ -84,7 +84,7 @@ const RetentionConfigZodSchema: z.ZodOptional<AnyZodObject> = z.object({
 
 /** Retention settings for worker job executions. */
 export const RetentionConfigSchema: ConfigSchema<RetentionConfig | undefined> =
-  RetentionConfigZodSchema as unknown as ConfigSchema<RetentionConfig | undefined>;
+  RetentionConfigZodSchema as ConfigSchema<RetentionConfig | undefined>;
 
 export const JobConfigZodSchema: AnyZodObject = z.object({
   id: z.string(),
@@ -106,4 +106,4 @@ export const JobConfigZodSchema: AnyZodObject = z.object({
 
 /** Worker job configuration schema. */
 export const JobConfigSchema: ConfigSchema<JobConfig> =
-  JobConfigZodSchema as unknown as ConfigSchema<JobConfig>;
+  JobConfigZodSchema as unknown as ConfigSchema<JobConfig>; // quality-allow: Zod 4's invariant input parameter does not overlap the package's parse-only ConfigSchema facade despite identical parsed JobConfig output.
