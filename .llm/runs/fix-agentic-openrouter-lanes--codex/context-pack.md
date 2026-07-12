@@ -6,13 +6,13 @@
 | --- | --- |
 | Run ID | `fix-agentic-openrouter-lanes--codex` |
 | Branch | `fix/agentic-openrouter-lanes` |
-| Current phase | `impl-eval` |
+| Current phase | `close` |
 | Archetype | `6 - CLI / Tooling` |
 | Scope overlays | none |
 
 ## Current State
 
-PLAN-EVAL passed. All three implementation slices are gated. Claude/OpenRouter is the viable GLM agentic lane; Codex/OpenRouter GLM is explicitly unsupported for native namespace tools; the default provider canary now validates every preset without credentials or provider traffic, while live turns require `--live`.
+PLAN-EVAL and separate-session IMPL-EVAL passed. All three implementation slices are committed and gated. Claude/OpenRouter is the viable GLM agentic lane; Codex/OpenRouter GLM is explicitly unsupported for native namespace tools; the default provider canary validates every preset without credentials or provider traffic, while live turns require `--live`.
 
 ## Completed
 
@@ -24,16 +24,17 @@ PLAN-EVAL passed. All three implementation slices are gated. Claude/OpenRouter i
 - S2 Claude gateway wrapper/environment/capability data; three live GLM proofs.
 - S3 exhaustive static preset canary, explicit live boundary, rollout-runner migration, CI wiring, and launcher structural extraction.
 - Final implementation gates: 239 tests and 105-file scoped check/lint/fmt, all clean; no secret or lock churn.
+- Separate Claude Opus 4.8 IMPL-EVAL PASS with independent gate reproduction and all seven mission boundaries verified.
 
 ## In Progress
 
-- Separate-session Claude Opus 4.8 IMPL-EVAL of the committed branch and PR evidence.
+- Final PR evidence/comment/label handoff; no implementation work remains.
 
 ## Next Steps
 
-1. Run the opposite-family evaluator under `impl-eval-prompt.md`.
-2. If PASS, record the verdict and complete the final PR checklist.
-3. Change the sole phase label to `status:ready-merge` and post the redacted completion evidence.
+1. Commit and push the evaluator/close artifacts.
+2. Complete the PR checklist, change the sole phase label to `status:ready-merge`, and post the evaluator + live-proof comments.
+3. Hand PR #696 back to the owner; do not merge without direction.
 
 ## Key Decisions
 
@@ -66,15 +67,16 @@ PLAN-EVAL passed. All three implementation slices are gated. Claude/OpenRouter i
 | Static | PASS | 239 tests; scoped check/lint/fmt over 105 files; volatile guard; secret scan |
 | Runtime | PASS | Claude GLM live tool turn and wrapper; Codex incompatibility structured |
 | Consumer | PASS | default exhaustive canary task plus explicit-live rollout-runner coverage and CI step |
+| IMPL-EVAL | PASS | separate Claude Opus 4.8 session independently reproduced gates and verified all acceptance boundaries |
 
 ## Open Questions
 
-- None; S3 is deterministic canary coverage and final gating.
+- None.
 
 ## Drift and Debt
 
-- Drift: launcher implementation already moved to a JSONL app-server client versus the carried-in direct-command description; recorded in `drift.md`.
-- Debt: none.
+- Drift: launcher/client evolution, effort misobservation, cached Claude auth, and the temporary launcher LOC overage are recorded in `drift.md`.
+- Debt: none introduced or deepened; evaluator's legacy `agentic-lib.ts` LOC observation is low/non-blocking.
 
 ## Commits
 

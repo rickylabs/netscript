@@ -75,6 +75,8 @@ Add or modify model strings/endpoints only in `config/`; declare a preset and ca
 | 2026-07-12 | S3 | slice review | Reviewed all four preset rows, capability coherence, real Claude/Codex command planners, explicit live parsing, rollout-runner migration, CI wiring, secret safety, and lock hygiene. No blocking findings remain. |
 | 2026-07-12 | S3 | reconcile | Commit `1596c32f` pushed and phase evidence posted to PR #696; required taxonomy/milestone remain correct, PR is ready for review, and sole phase label is now `status:impl-eval`. |
 | 2026-07-12 | eval | handoff | Prepared a read-only, opposite-family Claude Opus 4.8 prompt with the required `## SKILL` chapter; evaluator owns only `evaluate.md` and is forbidden from another paid live probe. |
+| 2026-07-12 | eval | IMPL-EVAL | Separate Claude Opus 4.8 session `5f1cf1f0-90b2-431d-b1fa-f9fe03c34b8e` returned PASS after independently reproducing 239 tests, 105-file scoped gates, the credential-free static canary, and all seven mission boundaries. |
+| 2026-07-12 | eval | finding reconcile | Recorded the evaluator's low non-blocking observation that legacy `agentic-lib.ts` is 1103 LOC; corrected the final ledger to scope the 499-LOC claim to the run-authored launcher/modules. Evaluated source remains unchanged; no debt or code action was required by the verdict. |
 
 ## Gate Results
 
@@ -126,7 +128,8 @@ PLAN-EVAL: PASS (`plan-eval.md`).
 | Scoped check | PASS | 105 files, 0 findings. |
 | Scoped lint | PASS | 105 files, 0 findings. |
 | Scoped format | PASS | 105 files, 0 findings. |
-| CLI hard cap | PASS | `launch-codex-slice.ts` 499 LOC; extracted `launcher-route.ts` 142 LOC; new canary modules at or below 193 LOC. |
+| Run-authored file cap | PASS | `launch-codex-slice.ts` 499 LOC; extracted `launcher-route.ts` 142 LOC; new canary modules at or below 193 LOC. |
+| Legacy LOC observation | REVIEWED | Pre-existing shared `agentic-lib.ts` is 1103 LOC and received only the narrow v0.144 parser delta; IMPL-EVAL classified this low/non-blocking with no required action. |
 | Secret scan | PASS | No OpenRouter/Anthropic key-shaped values in changed tooling or run artifacts. |
 | Lock hygiene | PASS | `deno.lock` unchanged. |
 | Consumer wiring | PASS | CI invokes the credential-free default task; rollout live probes use the explicit opt-in contract. |
@@ -142,11 +145,21 @@ PLAN-EVAL: PASS (`plan-eval.md`).
 | F-7 doc-score | N/A (internal tooling) | No JSR public export surface. |
 | F-8 workspace lib override | N/A (internal tooling) | No package workspace import map. |
 | F-9 permission declaration | N/A (internal tooling) | Task permissions remain declared in the root task definition; no package manifest is involved. |
-| F-CLI-1/F-CLI-2 | PASS / reviewed | Changed files were manually classified; the universal 500-LOC hard cap is met (maximum 499), and new focused modules remain 193 LOC or less. |
+| F-CLI-1/F-CLI-2 | PASS / reviewed | The run-authored launcher is 499 LOC and new focused modules are at most 193 LOC. The pre-existing 1103-LOC shared `agentic-lib.ts` received a narrow parser delta; IMPL-EVAL recorded it as a low, non-blocking legacy observation rather than a new monolith. |
 | F-CLI-3..F-CLI-31 | reviewed / N/A where package-layout-specific | No new `src/` CLI package, surface/composition layer, barrels, templates, registries, abstracts, or extension axes; changed flat internal-tooling edges were reviewed for direct Deno/process use and output remains confined to CLI/adapters. |
 | Runtime acceptance | PASS | Real GLM 5.2 tool turn completed through the checked-in Claude wrapper; Codex namespace incompatibility was independently observed and encoded. |
 | Consumer acceptance | PASS | Exhaustive static task runs in CI and the broader rollout runner retains explicit bounded live probes. |
 
+### IMPL-EVAL
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Session separation | PASS | Codex generator; separate Claude Opus 4.8 evaluator session. |
+| Independent static/runtime reproduction | PASS | 239/239 agentic tests; scoped check/lint/fmt over 105 files; default four-preset canary with credentials unset; no provider spend. |
+| Mission boundary audit | PASS | All seven acceptance boundaries verified against source, tests, redacted live evidence, and PR history in `evaluate.md`. |
+| Debt/close gate | PASS | No new/deepened debt; issue close-gate and release gates N/A; required PR checklist may be completed. |
+| Verdict | PASS | `.llm/runs/fix-agentic-openrouter-lanes--codex/evaluate.md`. |
+
 ## Handoff Notes
 
-- IMPL-EVAL should independently inspect profile/effort identity, the redacted GLM live proof, the structured Codex incompatibility, exhaustive preset coverage, and the final gate ledger.
+- Implementation and both evaluator passes are complete. PR #696 can carry `status:ready-merge`; no merge was requested in this run.

@@ -2,7 +2,7 @@
 
 Repair the repo's OpenRouter agentic lanes: supported Codex profile handling and exit semantics, a proven GLM 5.2 route, and exhaustive preset canaries. This PR is independent of design umbrella PR #685 and targets `main` directly.
 
-Do not merge until the Plan-Gate and final IMPL-EVAL pass are complete.
+Plan-Gate and final separate-session IMPL-EVAL both passed.
 
 ## Scope
 
@@ -31,7 +31,7 @@ Do not merge until the Plan-Gate and final IMPL-EVAL pass are complete.
 - [x] Successful sends exit 0 and v0.144 thread identity is parsed when present.
 - [x] Every OpenRouter preset has a cheap structured canary in the test surface.
 - [x] Scoped check/lint/fmt and relevant tests pass without lock churn.
-- [ ] Separate-session IMPL-EVAL returns PASS.
+- [x] Separate-session IMPL-EVAL returns PASS.
 
 ## Validation
 
@@ -45,12 +45,13 @@ Do not merge until the Plan-Gate and final IMPL-EVAL pass are complete.
 - Default preset canary with credentials unset — all four presets validated; no provider process.
 - Full agentic suite after S3 — 239 passed, 0 failed.
 - Final scoped check/lint/fmt — 105 files, 0 findings; `deno.lock` unchanged.
+- Separate Claude Opus 4.8 IMPL-EVAL — PASS; independently reproduced the 239-test suite, scoped gates, static four-preset canary, lock/secret checks, and all seven mission boundaries.
 
 ## Harness
 
 - Run dir: `.llm/runs/fix-agentic-openrouter-lanes--codex/`
-- Phase: impl-eval
+- Phase: ready-merge
 
 ## Drift / Debt
 
-- Minor carried-in launcher-path drift recorded in `drift.md`; no accepted debt.
+- Minor carried-in/runtime drift recorded in `drift.md`; no accepted debt. IMPL-EVAL noted one low, non-blocking pre-existing shared-file LOC observation with no required action.
