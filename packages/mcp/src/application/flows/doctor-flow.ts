@@ -2,26 +2,37 @@ import type { DoctorCheck, DoctorResult, DoctorStatus } from '../../domain/tool-
 import type { TelemetryProbePort } from '../../domain/telemetry-probe-port.ts';
 import type { ToolExecutionResult, ToolFlow } from '../../domain/tool-types.ts';
 import { isRecord } from '../../domain/schema.ts';
-
-/** Default local Aspire telemetry endpoint. */
-export const DEFAULT_TELEMETRY_ENDPOINT = 'http://localhost:18888';
+import {
+  resolveTelemetryEndpoint,
+  type TelemetryEndpointEnvironment,
+} from '../../domain/telemetry-endpoint.ts';
 
 /** Create the S1 doctor flow for telemetry reachability. */
 export function createDoctorFlow(
   probe: TelemetryProbePort,
-  environmentEndpoint?: string,
+  environment: TelemetryEndpointEnvironment = {},
 ): ToolFlow {
   return async (input: unknown): Promise<ToolExecutionResult> => {
     const explicit = isRecord(input) && typeof input.endpoint === 'string'
       ? input.endpoint
       : undefined;
-    const endpoint = explicit || environmentEndpoint || DEFAULT_TELEMETRY_ENDPOINT;
-    const result = await probe.probe(endpoint);
+    const resolved = resolveTelemetryEndpoint(explicit, environment);
+    let endpoint = resolved.endpoint;
+    let result = await probe.probe(endpoint);
+    if (!result.reachable && resolved.httpsFallback) {
+      const fallback = await probe.probe(resolved.httpsFallback);
+      if (fallback.reachable) {
+        endpoint = resolved.httpsFallback;
+        result = fallback;
+      }
+    }
     const status: DoctorStatus = result.reachable ? 'pass' : 'warn';
     const check: DoctorCheck = {
       name: 'telemetry_endpoint',
       status,
-      summary: result.message,
+      summary: `${result.message} Resolved from ${resolved.source}; using ${
+        new URL(endpoint).protocol
+      }`,
       ...(result.reachable ? {} : {
         fix:
           `Start the telemetry dashboard or set NETSCRIPT_TELEMETRY_ENDPOINT to a reachable URL.`,

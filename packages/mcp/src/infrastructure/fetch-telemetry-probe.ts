@@ -26,8 +26,3 @@ export class FetchTelemetryProbe implements TelemetryProbePort {
     }
   }
 }
-
-/** Resolve telemetry endpoint precedence without exposing environment values in results. */
-export function readTelemetryEndpointEnvironment(): string | undefined {
-  return Deno.env.get('NETSCRIPT_TELEMETRY_ENDPOINT');
-}

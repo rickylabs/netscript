@@ -4,13 +4,18 @@
  */
 import { createMcpServer } from './src/application/runner/mcp-server.ts';
 import { createDocsFlows } from './src/application/flows/docs-flows.ts';
+import { FetchTelemetryProbe } from './src/infrastructure/fetch-telemetry-probe.ts';
 import {
-  FetchTelemetryProbe,
+  createResolvedTelemetryQuery,
   readTelemetryEndpointEnvironment,
-} from './src/infrastructure/fetch-telemetry-probe.ts';
+} from './src/infrastructure/telemetry-query-adapter.ts';
 import { runNewlineStdio } from './src/infrastructure/stdio-transport.ts';
 import { FilesystemDocsCorpus } from './src/infrastructure/filesystem-docs-corpus.ts';
 import { resolve } from '@std/path';
+import { createGetAppStatusFlow } from './src/application/flows/get-app-status-flow.ts';
+import { createGetRecentErrorsFlow } from './src/application/flows/get-recent-errors-flow.ts';
+import { createGetRunFlow } from './src/application/flows/get-run-flow.ts';
+import { createListRunsFlow } from './src/application/flows/list-runs-flow.ts';
 
 /** Resolve the public documentation root from flags, environment, or the project directory. */
 export function resolveDocsRoot(
@@ -26,11 +31,19 @@ export function resolveDocsRoot(
 
 /** Run the MCP server on Deno standard input and output. */
 export async function runMcpStdioServer(): Promise<void> {
+  const environment = readTelemetryEndpointEnvironment();
+  const query = createResolvedTelemetryQuery(undefined, environment);
   const docsCorpus = new FilesystemDocsCorpus({ root: resolveDocsRoot() });
   const server = createMcpServer({
     probe: new FetchTelemetryProbe(),
-    environmentEndpoint: readTelemetryEndpointEnvironment(),
-    flows: createDocsFlows(docsCorpus),
+    environment,
+    flows: {
+      ...createDocsFlows(docsCorpus),
+      get_app_status: createGetAppStatusFlow(query),
+      list_runs: createListRunsFlow(query),
+      get_run: createGetRunFlow(query),
+      get_recent_errors: createGetRecentErrorsFlow(query),
+    },
   });
   await runNewlineStdio(server, Deno.stdin.readable, Deno.stdout.writable);
 }
