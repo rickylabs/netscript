@@ -62,3 +62,30 @@ fallback requires owner authorization and must be recorded in `supervisor.md`.
 image), or (b) authorize the local Codex evaluator fallback for #715.
 
 **Severity:** significant — it blocks the merge gate, not the implementation.
+
+## D4 — #763 Codex thread stalled; relaunched on a different route (minor)
+
+Thread `019f588f` (gpt-5.6-luna · **max**) burned ~1 MB of rollout reasoning and produced **zero file
+edits** in 15 minutes, going silent 7.5 min after emitting "Applying patch and finalizing worklog
+design". Its sender-lease `ownerPid` (32729) was dead.
+
+Distinguished a stalled thread from a merely-slow one by comparing rollout write times across all
+three live slices: `#762` and the tagline slice were both writing within the last 3–5 minutes and had
+real file changes on disk; `#763` had neither. Launcher-process death alone is **not** evidence — the
+`#762` launcher was SIGTERM'd too and its thread kept committing normally.
+
+Per the known lease defect (a recorded session id blocks relaunch permanently even when dead), the
+stale lease was **archived** to `senders/archive/763-stalled-<ts>.json` and released, then the slice
+was relaunched with `send-message-v2` — **not** `codex exec resume`, which spawns an unmanaged
+standalone process the daemon cannot see.
+
+- **Old thread:** `019f588f-44df-7013-842c-be28f1bb1a56` — abandoned, no work lost (0 commits, 0 dirty).
+- **New thread:** `019f589e-3e7a-7870-b996-c5634fd67f8c` — provider=openai · **gpt-5.6-sol** ·
+  effort=**high** (route verdict: matched). Confirmed working within a minute
+  ("Designing CLI version extraction helper").
+
+Route changed deliberately: `luna`/`max` is the small-fix route per lane policy, but it produced no
+output on two turns here, so this slice was moved to the normal implementation route. If `luna`/`max`
+stalls again on other slices, that is a lane-policy signal worth raising.
+
+**Severity:** minor. No scope change, no work lost.
