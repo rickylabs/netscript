@@ -76,6 +76,19 @@ by real signin/callback handlers is listed and invalidated through the CLI comma
 The GitHub preset is proven against backend-registry composition and the interactive signin/callback
 handlers. No live third-party GitHub OAuth exchange was executed.
 
+### Slice 2 — consumer documentation and scaffold-runtime coverage
+
+- Rewrote how-to Steps 2 and 4 so backend/provider/secret CLI verbs are the primary path and direct
+  environment exports are explicitly the deployment escape hatch.
+- Replaced the scaffold runtime's auth helper-source mutation with parser-level execution of
+  `backend set`, `secret generate`, and GitHub `provider set`, plus semantic assertions on the
+  resulting appsettings seam.
+- Scoped E2E source check / lint / format: **PASS** — 86 files, 0 findings from each wrapper.
+- `scaffold.runtime` execution: **UNPROVEN HERE**. The slice brief explicitly reserves this expensive
+  gate for the beta-9 orchestrator; this implementation agent did not run it.
+- Live provider OAuth: **UNPROVEN**. Backend registry and interactive handler integration are green,
+  but no GitHub network round-trip was attempted.
+
 ## Drift
 
 - D1 (carried, owner-approved): PLAN-EVAL is waived for this slice; the short plan and design live

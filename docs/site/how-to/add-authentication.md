@@ -81,7 +81,7 @@ cross-backend account linking in v1. You pick the backend in Step 2.
 <!-- caveat: arch-debt:auth-single-active-backend-boundary -->
 {{ /comp }}
 
-## Step 2 — Choose a backend with `NETSCRIPT_AUTH_BACKEND`
+## Step 2 — Choose a backend with the auth CLI
 
 The active backend is selected by the `NETSCRIPT_AUTH_BACKEND` environment variable (or the
 `auth.backend` appsettings key). Three backends are valid; the default is **`kv-oauth`**.
@@ -107,12 +107,19 @@ where sign-in already happened elsewhere and you only need NetScript to <em>vali
 <!-- caveat: arch-debt:seamless-auth-roadmap -->
 {{ /comp }}
 
-For the rest of this recipe we use the default, `kv-oauth`. You can make the choice explicit in your
-environment:
+For the rest of this recipe we use `kv-oauth`. Persist the choice in the workspace boot seam and
+confirm what the service will use:
 
 ```sh
-export NETSCRIPT_AUTH_BACKEND=kv-oauth
+netscript plugin auth backend set kv-oauth
+netscript plugin auth backend show
+netscript plugin doctor
 ```
+
+The command reconciles `NETSCRIPT_AUTH_BACKEND` in the project `.env`, so scaffolded service tasks
+boot without a shell-specific export. Directly setting the environment variable or the
+`auth.backend` / `Auth.Backend` appsettings key remains an escape hatch for deployment systems that
+own configuration externally.
 
 ## Step 3 — Run the auth database migration
 
@@ -153,11 +160,35 @@ netscript db status              # confirm the migration is applied
 See [Run a database migration](/how-to/database-migration/) for the full DB workflow and the
 Aspire-up dependency.
 
-## Step 4 — Configure the backend environment
+## Step 4 — Configure the provider and secrets
 
-Each backend reads its own environment block. For the default `kv-oauth` backend you supply a real
-OAuth/OIDC provider (client id, secret, redirect URI) plus optional cookie/KV tuning. Set these in
-your `appsettings.json` / environment before starting the service.
+Each backend reads its own environment block. The auth CLI owns the normal setup path and writes the
+same project `.env` seam as Step 2. For GitHub on `kv-oauth`:
+
+```sh
+# Generate the boot key through the CLI and persist it with the provider config
+KV_OAUTH_KEY="$(netscript plugin auth secret generate kv-oauth-key)"
+netscript plugin auth provider set \
+  --preset github \
+  --client-id your-client-id \
+  --client-secret your-client-secret \
+  --redirect-uri http://localhost:8094/api/v1/auth/callback \
+  --kv-oauth-key "$KV_OAUTH_KEY"
+```
+
+Tenant presets such as `okta`, `auth0`, `azure-ad`, `aws-cognito`, `logto`, and `clerk` additionally
+accept `--issuer`. The non-interactive variants use their boot-native credential names:
+
+```sh
+netscript plugin auth provider set --preset workos \
+  --api-key sk_... --client-id client_... --cookie-password "$(netscript plugin auth secret generate workos-cookie)"
+
+netscript plugin auth provider set --preset better-auth \
+  --secret "$(netscript plugin auth secret generate better-auth)"
+```
+
+The explicit exports below are the escape hatch for CI/deployment systems that inject environment
+variables themselves; they are no longer required for ordinary workspace setup.
 
 {{ comp.tabbedCode({ tabs: [
   {
