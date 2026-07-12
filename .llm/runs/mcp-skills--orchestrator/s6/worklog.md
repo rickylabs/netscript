@@ -55,7 +55,9 @@ Add or replace a catalog by implementing `CommandCatalogPort` at the outer compo
 | 2026-07-12 | bootstrap/research | Required skills/harness/doctrine read; current MCP/CLI surfaces and scaffold invocation re-baselined; plan/design provisioned. |
 | 2026-07-12 | plan gate | Separate opposite-family PLAN-EVAL cycle 1 returned `PASS` on all eight checklist items. |
 | 2026-07-12 | slice 1 | Added command catalog/executor contracts, immutable deny-wins policy, bounded list flow, policy-gated execute flow, exports, and table tests. Focused tests: 3 passed; scoped check: 53 files, 0 findings. Tier-A substantive review pending supervisor handoff. |
+| 2026-07-12 | slice 2 | Added bounded static catalog and subprocess executor with published CLI default, injectable prefix/deadline/tail, real process, timeout, and truncation tests. Command tests: 8 passed; scoped check: 56 files, 0 findings. |
 
 ## Slice Reconcile Notes
 
 - **Slice 1:** Scope remains aligned with #730 and excludes S7/S8. No new issue/PR surface was opened by this implementation session. The separate PLAN-EVAL advisory to assert the default CLI prefix is assigned to Slice 2. No plan or doctrine drift detected.
+- **Slice 2:** Default prefix assertion added as advised. One test fixture used `--quiet`, which `deno eval` consumed before `Deno.args`; replaced with a positional sentinel. No design drift, lock change, dependency change, or issue/PR update.

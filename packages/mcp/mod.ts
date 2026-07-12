@@ -33,6 +33,17 @@ export type {
 export { createDoctorFlow } from './src/application/flows/doctor-flow.ts';
 export { createListCommandsFlow } from './src/application/flows/list-commands-flow.ts';
 export { createExecuteCommandFlow } from './src/application/flows/execute-command-flow.ts';
+export {
+  StaticCommandCatalog,
+  UNWIRED_COMMAND_DESCRIPTOR,
+} from './src/infrastructure/static-command-catalog.ts';
+export {
+  DEFAULT_CLI_COMMAND,
+  DEFAULT_COMMAND_TIMEOUT_MS,
+  DEFAULT_OUTPUT_TAIL_BYTES,
+  SpawnCommandExecutor,
+} from './src/infrastructure/spawn-command-executor.ts';
+export type { SpawnCommandExecutorOptions } from './src/infrastructure/spawn-command-executor.ts';
 export { PluginDoctorFamily } from './src/infrastructure/plugin-doctor-family.ts';
 export type { JsonSchema, ToolSchema } from './src/domain/schema.ts';
 export { validateSchema } from './src/domain/schema.ts';
