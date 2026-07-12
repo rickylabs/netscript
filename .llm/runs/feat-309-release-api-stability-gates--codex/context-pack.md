@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `feat-309-release-api-stability-gates--codex` |
 | Branch | `feat/309-release-api-stability-gates` |
-| Current phase | `implement` |
+| Current phase | `close` |
 | Archetype | `6 - CLI / Tooling` |
 | Scope overlays | `docs` |
 
@@ -14,7 +14,8 @@
 
 All three implementation slices are implemented and gated. Version bumps share a full-workspace coordinator; the
 surface classifier, normalized live baseline, declarations, beta CI workflow, and doctrine policy
-are present; release completion wording and generated mirror are synchronized.
+are present; release completion wording and generated mirror are synchronized. Separate IMPL-EVAL
+returned PASS.
 
 ## Completed
 
@@ -25,16 +26,16 @@ are present; release completion wording and generated mirror are synchronized.
 - Slice 2 classifier tests passed 3/3; baseline covers 34 packages, 258 exports, and 6,654 symbols.
 - Live surface task is patch; synthetic CLI proof exits 1 undeclared and 0 declared.
 - Mirror sync/check, Claude validation, and docs link validation pass.
+- Claude Opus 4.8 IMPL-EVAL session `63940c83-7803-48ff-9820-3fdc96ea3c04` returned PASS with no
+  blocking findings.
 
 ## In Progress
 
-- Separate opposite-family IMPL-EVAL, then evaluator evidence commit/push.
+- Final evaluator/run-artifact commit and explicit refspec push.
 
 ## Next Steps
 
-1. Implement and gate three planned slices.
-2. Dispatch separate opposite-family IMPL-EVAL.
-3. Commit and push the final evaluator/worklog state without opening a PR.
+1. Stable-line owner flips `.github/workflows/surface-diff.yml` to blocking in future #309 scope.
 
 ## Key Decisions
 
@@ -61,6 +62,7 @@ are present; release completion wording and generated mirror are synchronized.
 | `docs/architecture/doctrine/02-public-surface.md` | changed | Machine-readable deprecation/removal convention. |
 | `.agents/skills/netscript-release/SKILL.md` | changed | Hard two-workflow completion and fix-forward policy. |
 | `.claude/skills/netscript-release/SKILL.md` | generated | Synced mirror of canonical release skill. |
+| `.llm/runs/feat-309-release-api-stability-gates--codex/evaluate.md` | new | Separate IMPL-EVAL PASS. |
 
 ## Gates
 
@@ -83,4 +85,7 @@ are present; release completion wording and generated mirror are synchronized.
 
 ## Commits
 
-- No implementation commits yet. Owner forbids PR creation; use branch commits and push evidence.
+- `132ae6e6` — zero-residue workspace bumps.
+- `14c6c172` — public API stability classifier/baseline/CI/doctrine.
+- `dc4c6bf3` — hard release completion wording, mirror, exact declarations.
+- All three pushed to `origin/feat/309-release-api-stability-gates`; owner forbids PR creation.

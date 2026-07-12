@@ -73,6 +73,8 @@ when the reviewed API delta should become the new reference.
 | 2026-07-12 | slice 3 | implementation | Added hard release completion/fix-forward wording, generated Claude mirror, and tightened major declarations to exact package/export/symbol matches. |
 | 2026-07-12 | slice 3 | gate | Version 7/7, surface 3/3, scoped wrappers, live patch, docs links, mirror check, and Claude validation all pass. |
 | 2026-07-12 | slice 3 | reconcile | #309 remains open for stable blocking; no release, publish, PR, issue-state, label, or milestone mutation performed. |
+| 2026-07-12 | evaluate | IMPL-EVAL | Separate Claude Opus 4.8 session `63940c83-7803-48ff-9820-3fdc96ea3c04` independently reproduced gates and returned PASS. |
+| 2026-07-12 | close | commit trail | Slices `132ae6e6`, `14c6c172`, and `dc4c6bf3` pushed with explicit refspec; evaluator artifact prepared for final push. |
 
 ## Decisions
 
@@ -112,6 +114,7 @@ when the reviewed API delta should become the new reference.
 | F-10 | PASS | coordinator + exact wrapper tests | Full workspace pattern classes and lock mirrors covered. |
 | F-5 | PASS | live baseline + patch verdict | 34 packages, 258 exports, 6,654 symbols. |
 | F-19 | PASS | scoped check/lint/fmt wrappers | 36 selected TypeScript files, zero findings. |
+| IMPL-EVAL | PASS | `evaluate.md` | Separate opposite-family review; no blocking findings or debt. |
 
 ### Runtime Gates
 
@@ -128,5 +131,6 @@ when the reviewed API delta should become the new reference.
 
 ## Handoff Notes
 
-- Evaluator should inspect normalization stability, exact major declaration matching, every-member bump
-  coverage, lock hygiene, and the non-blocking workflow choice first.
+- Beta subset is complete and independently evaluated PASS. Stable-line blocking remains open on
+  #309; the evaluator recorded one low, non-blocking watch note about broad version-string
+  replacement for the eventual stable cut.
