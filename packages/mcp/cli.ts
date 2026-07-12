@@ -26,6 +26,21 @@ import {
 } from './src/infrastructure/plugin-doctor-family.ts';
 import { ProjectWiringDoctorFamily } from './src/infrastructure/project-wiring-doctor-family.ts';
 import { createDoctorFlow } from './src/application/flows/doctor-flow.ts';
+import type { CommandCatalogPort } from './src/domain/command-catalog-port.ts';
+import type { CommandExecutorPort } from './src/domain/command-executor-port.ts';
+import { type CommandPolicy, DEFAULT_COMMAND_POLICY } from './src/domain/command-policy.ts';
+import { createListCommandsFlow } from './src/application/flows/list-commands-flow.ts';
+import { createExecuteCommandFlow } from './src/application/flows/execute-command-flow.ts';
+import { StaticCommandCatalog } from './src/infrastructure/static-command-catalog.ts';
+import { SpawnCommandExecutor } from './src/infrastructure/spawn-command-executor.ts';
+
+/** Optional CLI trigger collaborators and policy supplied by an outer composition. */
+export interface McpCliOptions {
+  /** Dynamic command catalog, supplied by the NetScript CLI in S7. */ readonly commandCatalog?:
+    CommandCatalogPort;
+  /** Command execution adapter. */ readonly commandExecutor?: CommandExecutorPort;
+  /** Override for the conservative command allowlist. */ readonly commandPolicy?: CommandPolicy;
+}
 
 /** Resolve the public documentation root from flags, environment, or the project directory. */
 export function resolveDocsRoot(
@@ -40,7 +55,7 @@ export function resolveDocsRoot(
 }
 
 /** Run the MCP server on Deno standard input and output. */
-export async function runMcpStdioServer(): Promise<void> {
+export async function runMcpStdioServer(options: McpCliOptions = {}): Promise<void> {
   const environment = readTelemetryEndpointEnvironment();
   const query = createResolvedTelemetryQuery(undefined, environment);
   const docsCorpus = new FilesystemDocsCorpus({ root: resolveDocsRoot() });
@@ -57,6 +72,11 @@ export async function runMcpStdioServer(): Promise<void> {
       get_last_job_result: createGetLastJobResultFlow(query),
       analyze_service_performance: createAnalyzeServicePerformanceFlow(query),
       analyze_db_bottlenecks: createAnalyzeDbBottlenecksFlow(query),
+      list_commands: createListCommandsFlow(options.commandCatalog ?? new StaticCommandCatalog()),
+      execute_command: createExecuteCommandFlow(
+        options.commandExecutor ?? new SpawnCommandExecutor(),
+        options.commandPolicy ?? DEFAULT_COMMAND_POLICY,
+      ),
       doctor: createDoctorFlow(probe, environment, [
         new AspireDoctorFamily(),
         new ProjectWiringDoctorFamily(),

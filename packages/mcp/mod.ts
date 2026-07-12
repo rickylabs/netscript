@@ -18,7 +18,32 @@ export type {
   DoctorFamilyResult,
 } from './src/domain/doctor-check-family.ts';
 export type { ProjectDoctorPort } from './src/domain/project-doctor-port.ts';
+export type { CommandCatalogPort, CommandDescriptor } from './src/domain/command-catalog-port.ts';
+export type {
+  CommandExecutionRequest,
+  CommandExecutionResult,
+  CommandExecutorPort,
+} from './src/domain/command-executor-port.ts';
+export { decideCommand, DEFAULT_COMMAND_POLICY } from './src/domain/command-policy.ts';
+export type {
+  CommandPolicy,
+  CommandPolicyDecision,
+  CommandPolicyRule,
+} from './src/domain/command-policy.ts';
 export { createDoctorFlow } from './src/application/flows/doctor-flow.ts';
+export { createListCommandsFlow } from './src/application/flows/list-commands-flow.ts';
+export { createExecuteCommandFlow } from './src/application/flows/execute-command-flow.ts';
+export {
+  StaticCommandCatalog,
+  UNWIRED_COMMAND_DESCRIPTOR,
+} from './src/infrastructure/static-command-catalog.ts';
+export {
+  DEFAULT_CLI_COMMAND,
+  DEFAULT_COMMAND_TIMEOUT_MS,
+  DEFAULT_OUTPUT_TAIL_BYTES,
+  SpawnCommandExecutor,
+} from './src/infrastructure/spawn-command-executor.ts';
+export type { SpawnCommandExecutorOptions } from './src/infrastructure/spawn-command-executor.ts';
 export { PluginDoctorFamily } from './src/infrastructure/plugin-doctor-family.ts';
 export type { JsonSchema, ToolSchema } from './src/domain/schema.ts';
 export { validateSchema } from './src/domain/schema.ts';

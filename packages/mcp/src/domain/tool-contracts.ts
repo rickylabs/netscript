@@ -191,13 +191,23 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
   ]),
   list_commands: objectSchema({
     count: { type: 'integer' },
-    commands: { type: 'array', maxItems: 100 },
+    commands: {
+      type: 'array',
+      maxItems: 100,
+      items: objectSchema({
+        path: stringProperty,
+        description: stringProperty,
+        usage: stringProperty,
+      }, ['path', 'description', 'usage']),
+    },
   }, ['count', 'commands']),
   execute_command: objectSchema({
     exitCode: { type: 'integer' },
-    summary: stringProperty,
-    tail: { type: 'array', maxItems: 50 },
-  }, ['exitCode', 'summary']),
+    durationMs: { type: 'number' },
+    outputTail: stringProperty,
+    truncated: { type: 'boolean' },
+    timedOut: { type: 'boolean' },
+  }, ['exitCode', 'durationMs', 'outputTail', 'truncated', 'timedOut']),
 };
 
 /** Standard-Schema input contracts for the complete v1 tool surface. */

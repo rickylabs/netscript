@@ -35,8 +35,9 @@ const summaries: Readonly<Record<ToolName, string>> = {
   search_docs: 'Search public NetScript documentation.',
   list_docs: 'List public NetScript documentation summaries.',
   get_doc: 'Get one public document or documentation section.',
-  list_commands: 'List available structured CLI commands.',
-  execute_command: 'Execute one allowlisted CLI command.',
+  list_commands: 'List bounded CLI command descriptors from the injected command catalog.',
+  execute_command:
+    'Execute one CLI command through an explicit allowlist gate and return only a bounded combined output tail.',
 };
 
 /** Build the immutable enumerable v1 tool registry. */
