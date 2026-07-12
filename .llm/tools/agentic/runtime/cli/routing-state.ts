@@ -8,9 +8,12 @@ export function renderCanonicalEvaluatorRoutes(): string {
   const routes = CANONICAL_ROUTE_POLICY.filter((route) => route.purpose === 'evaluation');
   return [
     'Canonical evaluator routes:',
-    ...routes.map((route) =>
-      `  ${route.lane}: evaluates=${route.evaluatesFamily} route=${route.agent}/${route.provider}/${route.model} effort=${route.effort}`
-    ),
+    ...routes.map((route) => {
+      const constraint = route.evaluatorModelPolicy
+        ? `policy=${route.evaluatorModelPolicy}`
+        : `evaluates=${route.evaluatesFamily}`;
+      return `  ${route.lane}: ${constraint} route=${route.agent}/${route.provider}/${route.model} effort=${route.effort}`;
+    }),
   ].join('\n');
 }
 
