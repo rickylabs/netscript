@@ -28,10 +28,19 @@ import type { MySqlCapabilities, MySqlConnectionConfig, PrismaMySqlOptions } fro
 const PACKAGE_NAME = '@netscript/prisma-adapter-mysql';
 const debug = Debug('prisma:driver-adapter:deno-mysql');
 
-// deno-lint-ignore no-explicit-any
-type AnyClient = any;
-// deno-lint-ignore no-explicit-any
-type AnyConnection = any;
+interface DriverConnection {
+  query(sql: string, values?: readonly unknown[]): Promise<Record<string, unknown>[]>;
+  execute(
+    sql: string,
+    values?: readonly unknown[],
+  ): Promise<Mysql2ExecuteResult & { rows?: unknown[] }>;
+}
+
+interface DriverClient extends DriverConnection {
+  connect(): Promise<DriverClient>;
+  useConnection<T>(fn: (connection: DriverConnection) => Promise<T>): Promise<T>;
+  close(): Promise<void>;
+}
 
 interface Mysql2Module {
   createPool(options: Mysql2PoolOptions): Mysql2Pool;
@@ -111,7 +120,7 @@ class MySqlQueryable implements SqlQueryable {
   readonly adapterName = PACKAGE_NAME;
 
   constructor(
-    protected client: AnyClient | AnyConnection,
+    protected client: DriverConnection,
     protected getFields?: () => MySqlFieldInfo[] | undefined,
   ) {}
 
@@ -264,7 +273,7 @@ class MySqlTransaction extends MySqlQueryable implements Transaction {
   private rolledBack = false;
 
   constructor(
-    private conn: AnyConnection,
+    private conn: DriverConnection,
     options: TransactionOptions,
     private cleanup?: () => void,
   ) {
@@ -332,7 +341,7 @@ class MySqlTransaction extends MySqlQueryable implements Transaction {
  */
 class PrismaMySqlAdapter extends MySqlQueryable implements SqlDriverAdapter {
   constructor(
-    client: AnyClient,
+    client: DriverClient,
     private readonly capabilities: MySqlCapabilities,
     private readonly options?: PrismaMySqlOptions,
   ) {
@@ -370,15 +379,15 @@ class PrismaMySqlAdapter extends MySqlQueryable implements SqlDriverAdapter {
     const tag = '[js::startTransaction]';
     debug('%s options: %O', tag, options);
 
-    const client = this.client as AnyClient;
+    const client = this.client as DriverClient;
 
     // Deferred to signal when we have the connection ready
-    const connectionReady = new Deferred<AnyConnection>();
+    const connectionReady = new Deferred<DriverConnection>();
     // Deferred to signal when the transaction should end (release connection)
     const transactionEnd = new Deferred<void>();
 
     // Start the connection lifecycle in the background
-    const connectionLifecycle = client.useConnection(async (conn: AnyConnection) => {
+    const connectionLifecycle = client.useConnection(async (conn: DriverConnection) => {
       try {
         // Set isolation level if specified
         if (isolationLevel) {
@@ -424,14 +433,14 @@ class PrismaMySqlAdapter extends MySqlQueryable implements SqlDriverAdapter {
    * Dispose of the adapter and close connections.
    */
   async dispose(): Promise<void> {
-    await (this.client as AnyClient).close();
+    await (this.client as DriverClient).close();
   }
 
   /**
    * Get the underlying driver client.
    */
-  underlyingDriver(): AnyClient {
-    return this.client as AnyClient;
+  underlyingDriver(): DriverClient {
+    return this.client as DriverClient;
   }
 }
 
@@ -581,9 +590,9 @@ export class PrismaMySqlAdapterFactory {
    * Connect to the database and create an adapter instance.
    */
   async connect(): Promise<PrismaMySqlConnectedAdapter> {
-    const { createPool } = await import('mysql2/promise') as unknown as Mysql2Module;
+    const { createPool } = await import('mysql2/promise') as unknown as Mysql2Module; // quality-allow: mysql2's published module namespace type is wider than the adapter's deliberately minimal createPool contract
 
-    let client: AnyClient;
+    let client: DriverClient;
     try {
       client = createMysql2Client(createPool(toMysql2PoolOptions(this.#config)));
     } catch (error) {
@@ -609,9 +618,9 @@ export class PrismaMySqlAdapterFactory {
   }
 }
 
-function createMysql2Client(pool: Mysql2Pool): AnyClient {
+function createMysql2Client(pool: Mysql2Pool): DriverClient {
   return {
-    connect(): Promise<AnyClient> {
+    connect(): Promise<DriverClient> {
       return Promise.resolve(this);
     },
     async query(sql: string, values?: readonly unknown[]): Promise<Record<string, unknown>[]> {
@@ -629,7 +638,7 @@ function createMysql2Client(pool: Mysql2Pool): AnyClient {
       };
     },
     async useConnection<T>(
-      fn: (conn: AnyConnection) => Promise<T>,
+      fn: (conn: DriverConnection) => Promise<T>,
     ): Promise<T> {
       const connection = await pool.getConnection();
       try {
@@ -644,7 +653,7 @@ function createMysql2Client(pool: Mysql2Pool): AnyClient {
   };
 }
 
-function createMysql2Connection(connection: Mysql2Connection): AnyConnection {
+function createMysql2Connection(connection: Mysql2Connection): DriverConnection {
   return {
     async query(sql: string, values?: readonly unknown[]): Promise<Record<string, unknown>[]> {
       const [rows] = await connection.query(sql, values);
@@ -687,7 +696,7 @@ function toMysql2PoolOptions(config: MySqlConnectionConfig): Mysql2PoolOptions {
  * Detect MySQL server capabilities.
  */
 async function getCapabilities(
-  client: AnyClient,
+  client: DriverClient,
 ): Promise<MySqlCapabilities> {
   const tag = '[js::getCapabilities]';
 

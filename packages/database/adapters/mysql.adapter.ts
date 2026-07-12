@@ -429,7 +429,7 @@ export class MysqlAdapter<
       query: TemplateStringsArray | string,
       ...params: unknown[]
     ) => Promise<T>;
-    return $queryRaw(query as unknown as TemplateStringsArray, ...params);
+    return $queryRaw(query as unknown as TemplateStringsArray, ...params); // quality-allow: Prisma's tagged-template query API is invariant although this compatibility method accepts the legacy string form
   }
 
   /** Execute an unsafe raw command through the configured Prisma client. */

@@ -17,6 +17,9 @@ import type {
   MessageQueue,
 } from '../ports/message-queue.ts';
 
+type FedifyQueue = ConstructorParameters<typeof ParallelMessageQueue>[0];
+type FedifyEnqueueOptions = Parameters<ParallelMessageQueue['enqueue']>[1];
+
 /**
  * Wrap a MessageQueue with ParallelMessageQueue for concurrent processing.
  *
@@ -49,9 +52,10 @@ export function wrapWithParallel<T>(
   }
 
   // Create Fedify's ParallelMessageQueue wrapper
-  // Note: Fedify's ParallelMessageQueue uses `any` for message type
-  // deno-lint-ignore no-explicit-any
-  const parallelQueue = new ParallelMessageQueue(queue as any, concurrency);
+  const parallelQueue = new ParallelMessageQueue(
+    queue as unknown as FedifyQueue, // quality-allow: Fedify fixes ParallelMessageQueue to a non-generic any payload while NetScript preserves the caller's T at its wrapper boundary
+    concurrency,
+  );
 
   // Return a queue that delegates to the parallel queue
   // while maintaining our MessageQueue<T> interface
@@ -61,19 +65,16 @@ export function wrapWithParallel<T>(
     },
 
     async enqueue(message: T, options?: EnqueueOptions): Promise<void> {
-      // deno-lint-ignore no-explicit-any -- Fedify queue options are not exposed with a precise public type.
-      await parallelQueue.enqueue(message, options as any);
+      await parallelQueue.enqueue(message, options as unknown as FedifyEnqueueOptions); // quality-allow: NetScript uses millisecond delays while Fedify uses Duration
     },
 
     async enqueueMany(messages: T[], options?: EnqueueOptions): Promise<void> {
       if (parallelQueue.enqueueMany) {
-        // deno-lint-ignore no-explicit-any -- Fedify queue options are not exposed with a precise public type.
-        await parallelQueue.enqueueMany(messages, options as any);
+        await parallelQueue.enqueueMany(messages, options as unknown as FedifyEnqueueOptions); // quality-allow: NetScript uses millisecond delays while Fedify uses Duration
       } else {
         // Fallback to sequential enqueue
         for (const message of messages) {
-          // deno-lint-ignore no-explicit-any -- Fedify queue options are not exposed with a precise public type.
-          await parallelQueue.enqueue(message, options as any);
+          await parallelQueue.enqueue(message, options as unknown as FedifyEnqueueOptions); // quality-allow: NetScript uses millisecond delays while Fedify uses Duration
         }
       }
     },
@@ -117,7 +118,9 @@ export function wrapWithParallel<T>(
  * @param queue - Queue to check
  * @returns True if the queue is a parallel wrapper
  */
-export function isParallelQueue<T>(queue: MessageQueue<T>): boolean {
+export function isParallelQueue<T>(
+  queue: MessageQueue<T>,
+): queue is MessageQueue<T> & { readonly workers: number } {
   // ParallelMessageQueue has specific properties we can check
   return 'queue' in queue && 'workers' in queue;
 }
@@ -131,7 +134,7 @@ export function isParallelQueue<T>(queue: MessageQueue<T>): boolean {
  */
 export function getQueueConcurrency<T>(queue: MessageQueue<T>): number {
   if (isParallelQueue(queue)) {
-    return (queue as unknown as { workers: number }).workers;
+    return queue.workers;
   }
   return 1;
 }

@@ -173,7 +173,7 @@ export function mapArg<A>(
 
   // Handle datetime string conversion
   if (typeof arg === 'string' && argType.scalarType === 'datetime') {
-    arg = new Date(arg) as unknown as A;
+    return formatDateTime(new Date(arg));
   }
 
   // Handle Date formatting based on database type

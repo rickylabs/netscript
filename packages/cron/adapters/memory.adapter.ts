@@ -35,7 +35,7 @@ interface RegisteredJob {
   job: ScheduledJob;
   handler: JobHandler | ContextualJobHandler;
   abortController: AbortController;
-  timerId?: number;
+  timerId?: ReturnType<typeof setInterval>;
 }
 
 /**
@@ -116,7 +116,7 @@ export class MemoryCronAdapter implements CronScheduler {
     const intervalMs = this.cronToInterval(schedule);
 
     // Set up interval if enabled
-    let timerId: number | undefined;
+    let timerId: ReturnType<typeof setInterval> | undefined;
     if (enabled && intervalMs > 0) {
       timerId = setInterval(async () => {
         if (!this.running || !job.enabled) {
@@ -124,7 +124,7 @@ export class MemoryCronAdapter implements CronScheduler {
         }
 
         await this.executeJob(id);
-      }, intervalMs) as unknown as number;
+      }, intervalMs);
     }
 
     // Store job registration
@@ -199,7 +199,7 @@ export class MemoryCronAdapter implements CronScheduler {
           return;
         }
         await this.executeJob(id);
-      }, intervalMs) as unknown as number;
+      }, intervalMs);
     }
 
     return Promise.resolve(true);

@@ -40,13 +40,12 @@ import { type PluginCapabilities, PluginCapabilitiesSchema } from './capabilitie
  *
  * A real oRPC {@link ContractProcedure} whose `.output(...)` schema yields a
  * {@link PluginCapabilities} document. The input schema and error map are left
- * open (`any` / {@link ErrorMap}) so a plugin may layer additional inputs or
+ * open (`unknown` / {@link ErrorMap}) so a plugin may layer additional inputs or
  * errors onto the seam route, but the output is invariant: a `describe` route
  * whose output is not `PluginCapabilities` fails `satisfies BasePluginContract`.
  */
 export type BasePluginDescribeProcedure = ContractProcedure<
-  // deno-lint-ignore no-explicit-any -- input is intentionally open; only the output is constrained.
-  any,
+  Schema<unknown, unknown>,
   Schema<unknown, PluginCapabilities>,
   ErrorMap,
   Meta
@@ -111,12 +110,12 @@ export const BASE_PLUGIN_CONTRACT_ROUTES: { readonly describe: BasePluginDescrib
     // Centralized contract definition: `BASE_PLUGIN_ERRORS` types each `data`
     // field as `unknown` (it is a plain error vocabulary, not a builder fragment),
     // so the error map crosses into the oRPC contract builder via the single
-    // sanctioned centralized-contract `as unknown as` boundary cast — the same
+    // sanctioned centralized-contract boundary cast — the same
     // pattern `@netscript/contracts` uses for `baseContract`. Everything after
     // this point is genuinely typed: the route, the output schema, and the
     // `satisfies BasePluginContract` conformance carry real oRPC types.
     describe: oc
-      .errors({ ...BASE_PLUGIN_ERRORS } as unknown as Parameters<typeof oc.errors>[0])
+      .errors({ ...BASE_PLUGIN_ERRORS } as unknown as Parameters<typeof oc.errors>[0]) // quality-allow: oRPC requires its invariant builder error-map input while the shared error vocabulary intentionally stores unknown data
       .route({ method: 'GET', path: '/describe' })
       .output(PluginCapabilitiesSchema),
   });

@@ -573,7 +573,7 @@ export class WatchableKvBridge {
         // Subscribe to changes via WatchableKv.watch()
         abortController = new AbortController();
         try {
-          const kvKeys = keys as unknown as KvKey[];
+          const kvKeys = keys as unknown as KvKey[]; // quality-allow: kvdex readonly key tuples and the NetScript mutable KvKey port are structurally equal but differ in mutability
           const iterable = bridge.#kv.watch<T>(kvKeys, {
             signal: abortController.signal,
           });

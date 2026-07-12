@@ -56,7 +56,7 @@ export class MemoryKvAdapter implements WatchableKv {
     (a, b) => a.expiresAt - b.expiresAt,
   );
   private closed = false;
-  private expirationTimer?: number;
+  private expirationTimer?: ReturnType<typeof setInterval>;
 
   /**
    * The memory adapter supports watch operations.
@@ -316,13 +316,13 @@ export class MemoryKvAdapter implements WatchableKv {
     try {
       while (!options?.signal?.aborted && !this.closed) {
         if (eventQueue.length === 0) {
-          let timeoutId: number | undefined;
+          let timeoutId: ReturnType<typeof setTimeout> | undefined;
           await Promise.race([
             new Promise<void>((resolve) => {
               resolveNext = resolve;
             }),
             new Promise<void>((resolve) => {
-              timeoutId = setTimeout(resolve, 1000) as unknown as number;
+              timeoutId = setTimeout(resolve, 1000);
             }),
           ]);
           if (timeoutId !== undefined) {
@@ -402,13 +402,13 @@ export class MemoryKvAdapter implements WatchableKv {
     try {
       while (!options?.signal?.aborted && !this.closed) {
         if (eventQueue.length === 0) {
-          let timeoutId: number | undefined;
+          let timeoutId: ReturnType<typeof setTimeout> | undefined;
           await Promise.race([
             new Promise<void>((resolve) => {
               resolveNext = resolve;
             }),
             new Promise<void>((resolve) => {
-              timeoutId = setTimeout(resolve, options?.pollInterval ?? 1000) as unknown as number;
+              timeoutId = setTimeout(resolve, options?.pollInterval ?? 1000);
             }),
           ]);
           if (timeoutId !== undefined) {
@@ -486,7 +486,7 @@ export class MemoryKvAdapter implements WatchableKv {
         this.storage.delete(top.keyStr);
         this.notifyWatchers(entry.key, null, entry.value, 'delete');
       }
-    }, 1000) as unknown as number;
+    }, 1000);
   }
 
   /**

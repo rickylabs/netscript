@@ -178,7 +178,7 @@ function endSpan<T>(span: PrismaTracingSpan, result: T): T {
         span.end();
         throw reason;
       },
-    ) as unknown as T;
+    ) as unknown as T; // quality-allow: Prisma's callback contract permits synchronous or promise-like T, whose conditional result cannot be expressed without an invariant boundary cast
   }
   span.end();
   return result;
