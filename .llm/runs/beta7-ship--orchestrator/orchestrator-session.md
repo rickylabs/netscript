@@ -127,3 +127,12 @@ slice, ships next cut). beta.8 verdict 54/55 documented (#638 gap VERIFIED FIXED
 Milestone 10 closed (48 issues). Incident + structural mitigation recorded on #301 and in memory
 (deny-rules on release:publish for future overnight runs). Dashboard-design orchestrator
 (0e4ec217) unaffected, still running.
+
+## CLI-COVERAGE EPIC + BOARD CLEANUP (2026-07-12 ~04:00)
+
+Owner directives executed: Prisma line (#313-#318) fully backlogged; epic #701 "CLI features
+coverage" + #702 contract lifecycle filed in beta.9; 13-agent Opus-medium discovery workflow
+(1.47M tokens) + Fable-low consolidation + dashboard-run correlation (merged PR #685 artifacts)
+→ children #703–#712 filed (9 unblocks-dashboard), matrix on #701, dashboard-cli-report.md
+delivered by resuming the dashboard session (new turn 5cafcd3c) to fold CLI dependencies into its
+design prompts + DDX issues. Next: beta.9 orchestrator launch (pending the dashboard follow-up).
