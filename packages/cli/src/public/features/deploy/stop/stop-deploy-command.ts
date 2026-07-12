@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { failDeployCommand } from '../../../../kernel/adapters/deploy/deploy-exit.ts';
 import { outputError, outputText } from '../../../../kernel/presentation/output/default-output.ts';
 /**
@@ -28,7 +29,7 @@ import {
 import { DenoProcess } from '../../../../kernel/adapters/runtime/process/deno-process.ts';
 import { createOsServicePort } from '../../../adapters/os-service-factory.ts';
 
-export const stopCommand: Command<any, any, any, any, any, any, any, any> = new Command()
+export const stopCommand: CliffyCommand = new Command()
   .name('stop')
   .description('Stop registered services via Servy (requires admin)')
   .arguments('[service:string]')

@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import { Command } from '@cliffy/command';
 import { DeployStepCommand } from '../../../../kernel/presentation/abstracts/deploy-step-command.ts';
@@ -6,8 +7,6 @@ import {
   type UninstallServiceDeployDependencies,
 } from './uninstall-service-deploy.ts';
 
-// deno-lint-ignore no-explicit-any
-type AnyCliffyCommand = Command<any, any, any, any, any, any, any, any>;
 
 /** Dependencies for the public `deploy uninstall` command handler. */
 export interface DeployUninstallCommandDependencies {
@@ -18,7 +17,7 @@ export interface DeployUninstallCommandDependencies {
 }
 
 /** Public `deploy uninstall` command owner. */
-export class UninstallDeployCommand extends DeployStepCommand<AnyCliffyCommand> {
+export class UninstallDeployCommand extends DeployStepCommand<CliffyCommand> {
   readonly id = 'public.deploy.uninstall';
   protected readonly phase = 'uninstall';
 
@@ -26,7 +25,7 @@ export class UninstallDeployCommand extends DeployStepCommand<AnyCliffyCommand> 
     super();
   }
 
-  define(): AnyCliffyCommand {
+  define(): CliffyCommand {
     const print = this.dependencies.print ?? outputText;
     return new Command()
       .name('uninstall')
@@ -52,6 +51,6 @@ export class UninstallDeployCommand extends DeployStepCommand<AnyCliffyCommand> 
 /** Create the public `deploy uninstall` command. */
 export function createDeployUninstallCommand(
   dependencies: DeployUninstallCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   return new UninstallDeployCommand(dependencies).define();
 }

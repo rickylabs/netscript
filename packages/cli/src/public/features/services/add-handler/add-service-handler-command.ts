@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
 import {
   DEFAULT_CONTRACT_VERSION,
@@ -21,7 +22,7 @@ export interface AddServiceHandlerCommandDependencies {
 /** Create the public `service add-handler` command. */
 export function createServiceAddHandlerCommand(
   dependencies: AddServiceHandlerCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   return new Command()
     .name('add-handler')
     .description('Bind a contract procedure with a compiling service handler stub')

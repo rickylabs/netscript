@@ -10,7 +10,8 @@
   "capabilities": {
     "hasDatabaseMigrations": false,
     "hasRoutes": true,
-    "hasBackgroundWorkers": false
+    "hasBackgroundWorkers": false,
+    "supportsMcpScaffold": true
   },
   "scaffolder": {
     "export": "./scaffold",

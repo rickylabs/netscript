@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
 
 import type { PublicCommandDependencies } from '../root/public-command-dependencies.ts';
@@ -8,7 +9,7 @@ import { createProjectConfigCommands } from './project/project-config-command.ts
 /** Create the public configuration operations group. */
 export function createConfigCommand(
   dependencies: PublicCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   const group = new Command().name('config').description('Inspect and mutate NetScript configuration')
     .action(function () {
       this.showHelp();

@@ -52,6 +52,18 @@ The wrappers accept roots, extensions, include/exclude filters, and batching, an
 compact output. Package-quality formatting gates target source TypeScript only (`--ext ts,tsx`) and
 exclude generated output, scratch workspaces, and future-wave packages.
 
+**Code-quality gate (required for `packages/**`/`plugins/**` waves).** The scoped check/lint/fmt
+wrappers above are necessary but NOT sufficient: they pass code containing `any`, honor an inline
+`// deno-lint-ignore no-explicit-any`, and do not flag host-side hardcoded plugin-name coupling —
+the two doctrine violations that reached `main` in the beta.9 CLI wave (#745). Run `deno task
+quality:gate` (which chains `deno task quality:scan` + `deno task arch:check`) on any framework-wave
+slice; `deno task quality:scan:repo` audits the whole `packages/cli/src`+`plugins` surface. The
+scanner (`.llm/tools/quality/scan-code-quality.ts`) fails on `any`/`as unknown as`/`as any`,
+blanket `no-explicit-any` ignores, and host-side plugin-name checks; the only suppression is an
+inline `// quality-allow: <reason>` on the offending line (reason required, count reported,
+`--max-allow <n>` bounds it). CI mirrors this in `code-quality.yml`. A green scoped wrapper is never
+a substitute for `quality:gate` on framework source.
+
 ## Dependency Evidence
 
 **MANDATE (harness runs).** Any "is this the latest / is this outdated / is this import dead / does

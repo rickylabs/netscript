@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import { Command } from '@cliffy/command';
 import type { DbEngine } from '../../../../kernel/domain/db-engine.ts';
@@ -34,7 +35,7 @@ function parseDbEngines(raw: string | undefined): readonly DbEngine[] | undefine
 /** Create the maintainer `sync packages` command. */
 export function createSyncPackagesCommand(
   dependencies: SyncPackagesCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   const print = dependencies.print ?? outputText;
   return new Command()
     .name('packages')

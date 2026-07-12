@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
 
 import type { PublicCommandDependencies } from '../../root/public-command-dependencies.ts';
@@ -7,7 +8,7 @@ import { runTargetOperation } from './run-target-operation.ts';
 export function createTargetSecretsCommand(
   key: string,
   dependencies: PublicCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   const group = new Command().name('secrets').description('Manage target deployment secrets')
     .action(function () {
       this.showHelp();

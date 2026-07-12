@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../kernel/presentation/command-types.ts";
 import { outputText } from '../../../kernel/presentation/output/default-output.ts';
 import { Command } from '@cliffy/command';
 import type { DbEngineChoice } from '../../../kernel/domain/db-engine.ts';
@@ -46,7 +47,7 @@ function parseEditor(raw: string | undefined): EditorChoice | undefined {
 /** Create the maintainer `init` command. */
 export function createMaintainerInitCommand(
   dependencies: MaintainerInitCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   const print = dependencies.print ?? outputText;
   return new Command()
     .name('init')

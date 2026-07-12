@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
 
 import { outputJson, outputText } from '../../../../kernel/presentation/output/default-output.ts';
@@ -7,7 +8,7 @@ import { listDeployTargets } from './list-deploy-targets.ts';
 /** Create `deploy list` target discovery. */
 export function createListDeployTargetsCommand(
   dependencies: PublicCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   return new Command().name('list').description('List registered deploy targets and operations')
     .option('--json', 'Emit machine-readable target descriptors')
     .action((options: { json?: boolean }) => {

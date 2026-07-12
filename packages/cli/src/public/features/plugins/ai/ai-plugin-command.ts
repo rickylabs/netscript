@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 /** Host command that forwards `plugin ai ...` to the AI plugin CLI. */
 
 import { Command } from "@cliffy/command";
@@ -34,7 +35,7 @@ export class AiPluginCommand extends CliCommand<Command> {
   }
 
   /** Build the `plugin ai` command. */
-  define(): Command<any, any, any, any, any, any, any, any> {
+  define(): CliffyCommand {
     const dispatch = this.dependencies.dispatch ?? dispatchAiPluginCommand;
     const print = this.dependencies.print ?? outputText;
     return new Command()
@@ -61,7 +62,7 @@ export class AiPluginCommand extends CliCommand<Command> {
         if (result.code !== 0) {
           throw new Error(`AI plugin command failed with code ${result.code}.`);
         }
-      }) as unknown as Command;
+      });
   }
 }
 
@@ -104,6 +105,6 @@ export async function dispatchAiPluginCommand(
 /** Create the public `plugin ai` command. */
 export function createAiPluginCommand(
   dependencies: AiPluginCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   return new AiPluginCommand(dependencies).define();
 }

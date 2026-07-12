@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
 
 import { createGeneratePluginRegistriesCommand } from './plugins/generate-plugin-registries-command.ts';
@@ -8,7 +9,7 @@ import type { PublicCommandDependencies } from '../root/public-command-dependenc
 /** Create the public code-generation command group. */
 export function createGenerateCommand(
   dependencies: PublicCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   return new Command()
     .name('generate')
     .description('Code generation commands')

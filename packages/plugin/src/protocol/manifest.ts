@@ -21,6 +21,8 @@ export interface PluginManifestCapabilities {
   readonly hasRoutes: boolean;
   /** Whether the plugin scaffolder adds background workers or processors. */
   readonly hasBackgroundWorkers: boolean;
+  /** Whether the plugin-owned scaffolder accepts the optional MCP scaffold request. */
+  readonly supportsMcpScaffold?: boolean;
 }
 
 /** Plugin-owned scaffold entrypoint declared by the manifest. */
@@ -145,6 +147,7 @@ const capabilitiesSchema: z.ZodType<PluginManifestCapabilities> = z.object({
   hasDatabaseMigrations: z.boolean(),
   hasRoutes: z.boolean(),
   hasBackgroundWorkers: z.boolean(),
+  supportsMcpScaffold: z.boolean().optional(),
 }).strict();
 
 const exportPathSchema = z.string().min(1).refine(isSafeExportPath, {

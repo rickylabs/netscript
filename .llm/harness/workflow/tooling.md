@@ -23,6 +23,14 @@ Type-check / lint / format / doc-lint / dependency evidence MUST come from these
 | Lint       | `deno task lint` · `.llm/tools/run-deno-lint.ts --root <path> --ext ts,tsx`     | scoped; excludes generated/future-wave                      |
 | Format     | `deno task fmt:check` · `.llm/tools/run-deno-fmt.ts --root <path> --ext ts,tsx` | source TS only (`--ext ts,tsx`)                             |
 | Doc-lint   | `deno task doc:lint --root <pkg> --pretty` · `.llm/tools/run-deno-doc-lint.ts`  | lints the full `deno.json` export map; per-file attribution |
+| Code-quality | `deno task quality:gate` (`quality:scan` + `arch:check`) · repo audit `quality:scan:repo` | **required** for any `packages/**`/`plugins/**` wave; the scoped check/lint/fmt wrappers do NOT catch `any`/`as unknown as`/host-side hardcoded plugin names or an inline `deno-lint-ignore no-explicit-any` — `quality:gate` does. Mirrored by CI `code-quality.yml`. See #745. |
+
+**Framework-wave gate law:** a slice touching `packages/**` or `plugins/**` is not gate-complete on
+the scoped check/lint/fmt wrappers alone — run `deno task quality:gate`. A green wrapper over code
+containing `any`, `as unknown as`, or a hardcoded plugin-name branch is a false pass; that is the
+exact hole that let the beta.9 CLI wave merge violations (#745). The `quality:scan` escape hatch is
+an inline `// quality-allow: <reason>` on the offending line only — never a blanket ignore — and its
+count is reported (`--max-allow <n>` bounds it).
 
 See **netscript-tools** § Validation Wrappers / Publish And Docs.
 

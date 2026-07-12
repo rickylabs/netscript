@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../kernel/presentation/command-types.ts";
 /**
  * @module public/features/contract-root-command
  *
@@ -13,7 +14,7 @@ import { contractAddRouteCommand } from './add-route/add-contract-route-command.
 import { contractInspectCommand } from './inspect/inspect-contract-command.ts';
 
 /** Root `netscript contract` command group. */
-export const contractCommand: Command<any, any, any, any, any, any, any, any> = new Command()
+export const contractCommand: CliffyCommand = new Command()
   .name('contract')
   .description('Manage NetScript workspace contracts')
   .action(function () {

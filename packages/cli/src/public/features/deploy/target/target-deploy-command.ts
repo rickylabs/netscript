@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 /**
  * @module public/features/deploy/target/target-deploy-command
  *
@@ -44,8 +45,7 @@ const OPERATION_DESCRIPTIONS: Readonly<Record<DeployOperation, string>> = {
 export function createTargetDeployCommand(
   key: string,
   dependencies: PublicCommandDependencies,
-  // deno-lint-ignore no-explicit-any -- cliffy's generic command surface is `any` at the router edge.
-): Command<any, any, any, any, any, any, any, any> {
+  ): CliffyCommand {
   const target = dependencies.deployTargets.get(key);
   const label = target?.label ?? key;
   const group = new Command()

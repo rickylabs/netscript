@@ -31,6 +31,7 @@ type RegisteredPluginSnapshot = Pick<
   | 'entrypoints'
   | 'runtime'
   | 'runtimeConfig'
+  | 'cli'
 >;
 
 type NetScriptConfigWithPlugins = NetScriptConfig & {
@@ -452,6 +453,7 @@ function resolveRegisteredPluginSnapshot(
     runtimeConfig: definition.contributions.runtimeConfigTopics?.length
       ? { schemas: [] }
       : undefined,
+    cli: definition.contributions.cli,
   };
 }
 

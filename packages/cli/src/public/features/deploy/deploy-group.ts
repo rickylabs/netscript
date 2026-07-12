@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
 
 import { buildWindowsDeployment } from './build/build-windows-strategy.ts';
@@ -19,7 +20,7 @@ import type { PublicCommandDependencies } from '../root/public-command-dependenc
 /** Create the public deploy command group. */
 export function createDeployCommand(
   dependencies: PublicCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   return new Command()
     .name('deploy')
     .description('Build and manage NetScript Windows Service deployments')

@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { failDeployCommand } from '../../../../kernel/adapters/deploy/deploy-exit.ts';
 import { outputError, outputText } from '../../../../kernel/presentation/output/default-output.ts';
 /**
@@ -18,7 +19,7 @@ import { exists } from '@std/fs';
 import { WindowsRequiredError } from '../../../../kernel/domain/errors.ts';
 import { OPTION_DEFAULTS, resolveManifest } from '../../../../kernel/adapters/deploy/shared.ts';
 
-export const logsCommand: Command<any, any, any, any, any, any, any, any> = new Command()
+export const logsCommand: CliffyCommand = new Command()
   .name('logs')
   .description('Show recent logs for a service')
   .arguments('<service:string>')

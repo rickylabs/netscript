@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import { Command } from '@cliffy/command';
 import { DeployStepCommand } from '../../../../kernel/presentation/abstracts/deploy-step-command.ts';
@@ -6,8 +7,6 @@ import {
   type InstallServiceDeployDependencies,
 } from './install-service-deploy.ts';
 
-// deno-lint-ignore no-explicit-any
-type AnyCliffyCommand = Command<any, any, any, any, any, any, any, any>;
 
 /** Dependencies for the public `deploy install` command handler. */
 export interface DeployInstallCommandDependencies {
@@ -18,7 +17,7 @@ export interface DeployInstallCommandDependencies {
 }
 
 /** Public `deploy install` command owner. */
-export class InstallDeployCommand extends DeployStepCommand<AnyCliffyCommand> {
+export class InstallDeployCommand extends DeployStepCommand<CliffyCommand> {
   readonly id = 'public.deploy.install';
   protected readonly phase = 'install';
 
@@ -26,7 +25,7 @@ export class InstallDeployCommand extends DeployStepCommand<AnyCliffyCommand> {
     super();
   }
 
-  define(): AnyCliffyCommand {
+  define(): CliffyCommand {
     const print = this.dependencies.print ?? outputText;
     return new Command()
       .name('install')
@@ -52,6 +51,6 @@ export class InstallDeployCommand extends DeployStepCommand<AnyCliffyCommand> {
 /** Create the public `deploy install` command. */
 export function createDeployInstallCommand(
   dependencies: DeployInstallCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   return new InstallDeployCommand(dependencies).define();
 }

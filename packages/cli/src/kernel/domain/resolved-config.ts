@@ -162,6 +162,9 @@ export interface RegisteredPluginConfig {
   entrypoints?: Record<string, RegisteredPluginEntrypoint>;
   runtime?: RegisteredPluginRuntimeContribution;
   runtimeConfig?: RegisteredPluginRuntimeConfig;
+  cli?: {
+    readonly doctorChecks?: readonly 'auth-backend'[];
+  };
 }
 
 /**

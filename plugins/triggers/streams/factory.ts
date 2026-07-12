@@ -56,5 +56,5 @@ export function createTriggersStreamDB(
       headers: getStreamsAuth(),
     },
     state: triggersStreamSchema as never,
-  }) as unknown as TriggersStreamDB;
+  }) as unknown as TriggersStreamDB; // quality-allow: durable-stream schema generics are invariant across the generated trigger entity map
 }

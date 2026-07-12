@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
 import { findProjectRoot } from '../../../../kernel/adapters/config/deploy-config.ts';
 import {
@@ -11,7 +12,7 @@ import type { InspectContractInput } from './inspect-contract-input.ts';
 import { inspectContract } from './inspect-contract.ts';
 
 /** `netscript contract inspect` command. */
-export const contractInspectCommand: Command<any, any, any, any, any, any, any, any> = new Command()
+export const contractInspectCommand: CliffyCommand = new Command()
   .name('inspect')
   .description('Inspect contract procedures and schema expressions')
   .arguments('<name:string>')

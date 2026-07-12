@@ -156,6 +156,14 @@ routing here — defer to that file. The items below are the parts of the contra
   line-ending drift (which is not a package-quality verdict source unless the plan explicitly owns
   repo-wide formatting). The wrapper invocations and verdict rules live in
   `.agents/skills/netscript-tools`.
+- **Scoped wrappers as a full quality verdict** — the scoped check/lint/fmt wrappers pass code
+  containing `any` and honor inline `// deno-lint-ignore no-explicit-any`, so a green wrapper run
+  does NOT prove doctrine/jsr compliance. For any slice touching `packages/**` or `plugins/**`, the
+  Tier-A slice review MUST additionally run `deno task quality:scan` (fails on `any`+casting and
+  host-side hardcoded plugin names — the two classes that reached `main` in #745) and
+  `deno task arch:check` (doctrine fitness), plus the jsr-audit skill for package/plugin waves. A
+  new `// deno-lint-ignore` or `as unknown as` introduced to green a wrapper is a review-blocking
+  finding, not a pass. Reviewing on wrappers alone is the exact hole that let #745 merge.
 
 ## Run Artifacts
 

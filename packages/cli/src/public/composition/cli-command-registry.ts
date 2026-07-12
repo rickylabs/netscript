@@ -1,17 +1,16 @@
+import type { CliffyCommand } from "../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
 
 import { Registry } from '../../kernel/application/abstracts/registry.ts';
 import { ScaffoldValidationError } from '../../kernel/domain/errors.ts';
 
-/** Cliffy command shape used by CLI composition registries. */
-type CliCliffyCommand = Command<any, any, any, any, any, any, any, any>;
 
 /** Factory registered for one top-level CLI command. */
 export interface CliCommandFactory<TContext> {
   /** Stable command identifier. */
   readonly id: string;
   /** Create the command from the composition context. */
-  readonly create: (context: TContext) => CliCliffyCommand;
+  readonly create: (context: TContext) => CliffyCommand;
 }
 
 /** Options used to materialize a root Cliffy program from registered commands. */
@@ -59,7 +58,7 @@ export class CliCommandRegistry<TContext> extends Registry<string, CliCommandFac
   }
 
   /** Build a Cliffy root command from the registered factories. */
-  program(options: CliCommandProgramOptions<TContext>): CliCliffyCommand {
+  program(options: CliCommandProgramOptions<TContext>): CliffyCommand {
     const program = new Command()
       .name(options.name)
       .version(options.version)

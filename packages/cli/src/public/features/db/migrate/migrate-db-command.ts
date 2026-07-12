@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 /**
  * @module public/features/db/migrate/migrate-db-command
  */
@@ -10,18 +11,16 @@ import {
   runDbOperation,
 } from '../operations/db-operation-command.ts';
 
-// deno-lint-ignore no-explicit-any
-type AnyCliffyCommand = Command<any, any, any, any, any, any, any, any>;
 
 /** Public `db migrate` command owner. */
-export class MigrateDbCommand extends CliCommand<AnyCliffyCommand> {
+export class MigrateDbCommand extends CliCommand<CliffyCommand> {
   readonly id = 'public.db.migrate';
 
   constructor(private readonly dependencies: DbOperationCommandDependencies) {
     super();
   }
 
-  define(): AnyCliffyCommand {
+  define(): CliffyCommand {
     return new Command()
       .name('migrate')
       .description('Create and apply a Prisma migration')
@@ -46,6 +45,6 @@ export class MigrateDbCommand extends CliCommand<AnyCliffyCommand> {
 /** Create the public `db migrate` command. */
 export function createDbMigrateCommand(
   dependencies: DbOperationCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   return new MigrateDbCommand(dependencies).define();
 }

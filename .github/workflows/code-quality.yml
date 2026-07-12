@@ -1,0 +1,58 @@
+name: Code quality
+
+on:
+  pull_request:
+    paths:
+      - 'packages/**'
+      - 'plugins/**'
+      - '.llm/tools/quality/**'
+      - 'deno.json'
+  push:
+    branches: [main]
+  schedule:
+    # Weekly repo-wide drift scan (Mon 07:17 UTC) so unchanged-file drift on
+    # main is surfaced even when no PR touches it.
+    - cron: '17 7 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  # PR gate — blocking. Scans only the files the PR changed.
+  code-quality:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.9.0
+      - name: Scan changed source files
+        shell: bash
+        run: |
+          mapfile -t files < <(git diff --name-only --diff-filter=ACMR "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}" -- packages plugins)
+          args=()
+          for file in "${files[@]}"; do args+=(--changed-file "$file"); done
+          if ((${#args[@]})); then deno task quality:scan --pretty "${args[@]}"; fi
+      - run: deno task arch:check
+      - name: Lint changed publish surfaces
+        run: |
+          deno task doc:lint --root packages/cli --pretty
+          deno doc --lint packages/plugin/src/config/mod.ts packages/plugin/src/protocol/mod.ts
+
+  # Repo-wide drift scan on push-to-main + schedule. Observational until the
+  # baseline-green epic (#746) clears the pre-existing whole-repo violations,
+  # then flip continue-on-error to false to make main-drift hard-blocking.
+  code-quality-repo:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.9.0
+      - name: Repo-wide quality scan (observational until #746 closes)
+        continue-on-error: true
+        run: deno task quality:scan:repo --pretty

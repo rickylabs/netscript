@@ -114,9 +114,16 @@ export async function installPlugin(
       ci: request.ci,
     });
   }
-  const planningRequest = resolvedPlugin?.planningKind === undefined
+  const capabilityRequest = resolvedPlugin === undefined
     ? request
-    : { ...request, kind: resolvedPlugin.planningKind };
+    : {
+      ...request,
+      mcp: request.mcp === true &&
+        resolvedPlugin.descriptor.manifest.capabilities.supportsMcpScaffold === true,
+    };
+  const planningRequest = resolvedPlugin?.planningKind === undefined
+    ? capabilityRequest
+    : { ...capabilityRequest, kind: resolvedPlugin.planningKind };
   const plan = await planPluginInstall(planningRequest, {
     fs: dependencies.fs,
     registry,

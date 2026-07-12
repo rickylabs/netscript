@@ -67,7 +67,7 @@ export function createLocalPluginInstallCommand(
         noDb: options.db === false,
         sagaStoreBackend: parseSagaStoreBackendOption(options.sagaStoreBackend),
         includeSamples: options.samples !== false,
-        mcp: kind === 'ai' && options.mcp === true,
+        mcp: options.mcp === true,
         dryRun: options.dryRun ?? false,
         jsrUrl: options.jsrUrl,
         localPath: options.localPath,

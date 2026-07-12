@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 /**
  * @module public/features/db/init/init-db-command
  */
@@ -11,18 +12,16 @@ import {
   runDbOperation,
 } from '../operations/db-operation-command.ts';
 
-// deno-lint-ignore no-explicit-any
-type AnyCliffyCommand = Command<any, any, any, any, any, any, any, any>;
 
 /** Public `db init` command owner. */
-export class InitDbCommand extends CliCommand<AnyCliffyCommand> {
+export class InitDbCommand extends CliCommand<CliffyCommand> {
   readonly id = 'public.db.init';
 
   constructor(private readonly dependencies: DbOperationCommandDependencies) {
     super();
   }
 
-  define(): AnyCliffyCommand {
+  define(): CliffyCommand {
     return new Command()
       .name('init')
       .description('Create and apply the initial Prisma migration')
@@ -46,6 +45,6 @@ export class InitDbCommand extends CliCommand<AnyCliffyCommand> {
 /** Create the public `db init` command. */
 export function createDbInitCommand(
   dependencies: DbOperationCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   return new InitDbCommand(dependencies).define();
 }
