@@ -21,6 +21,7 @@ const supported = {
   exitCode: 0,
   timedOut: false,
   malformed: false,
+  incompatibility: null,
   eventCounts: { tools: 1, reasoning: 1, streaming: 3 },
 } as const;
 
@@ -149,4 +150,43 @@ Deno.test('Codex canary requires the named profile and uses ephemeral read-only 
   assertEquals(spawned, false);
   assertEquals(result.fanOutEligible, false);
   assertEquals(result.status, 'blocked');
+});
+
+Deno.test('Codex namespace rejection is reduced to a structured incompatibility', async () => {
+  const codexRoute = route({
+    agent: 'codex',
+    profileId: 'codex-openrouter',
+    model: 'z-ai/glm-5.2',
+    effort: 'xhigh',
+  });
+  const adapter = new ProviderCanaryAdapter(
+    {
+      get: () => crypto.randomUUID(),
+      toObject: () => ({ PATH: '/usr/bin' }),
+    },
+    () => ({
+      output: () =>
+        Promise.resolve({
+          code: 1,
+          stdout: new TextEncoder().encode(
+            `${JSON.stringify({ type: 'thread.started' })}\n${JSON.stringify({ type: 'error' })}`,
+          ),
+          stderr: new TextEncoder().encode(
+            'No endpoints found that support the native namespace tool type',
+          ),
+        }),
+    }),
+  );
+  const result = await adapter.run(codexRoute, {
+    name: 'netscript-openrouter',
+    home: '/home/codex/.cache/profile',
+    path: '/home/codex/.cache/profile/netscript-openrouter.config.toml',
+  });
+  assertEquals(result.evidence?.incompatibility, 'codex-native-namespace-tool');
+  assertEquals(result.evidence?.incompatibilitySource, 'observed');
+  assert(
+    result.diagnostics.some((entry) =>
+      entry.message.includes('native namespace tools are unsupported')
+    ),
+  );
 });

@@ -166,12 +166,29 @@ Deno.test('parseThreadInfo extracts the thread id from the real fixture', async 
   );
   assertEquals(info.cwd, '/home/codex/repos/netscript-pt-auth-s1-contract');
   assertEquals(info.provider, 'openai');
-  assertEquals(info.effort, 'Medium');
+  assertEquals(info.effort, 'medium');
 });
 Deno.test('parseThreadInfo returns nulls for a log with no thread', () => {
   const info = parseThreadInfo('nothing useful here');
   assertEquals(info.threadId, null);
   assertEquals(info.rollout, null);
+});
+Deno.test('parseThreadInfo accepts v0.144 camel-case app-server identity', () => {
+  const id = '019f53f6-dab2-7331-a90f-4b3f1ea33432';
+  const info = parseThreadInfo(JSON.stringify({
+    id: 'netscript-thread-start',
+    result: {
+      thread: { id },
+      model: 'fixture-model',
+      modelProvider: 'openai',
+      reasoningEffort: 'max',
+      cwd: '/home/codex/repos/worktree',
+    },
+  }));
+  assertEquals(info.threadId, id);
+  assertEquals(info.provider, 'openai');
+  assertEquals(info.effort, 'max');
+  assertEquals(info.cwd, '/home/codex/repos/worktree');
 });
 
 // --- parseTurnComplete (rollout turn-state) -------------------------------

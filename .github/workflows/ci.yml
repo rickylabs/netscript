@@ -95,6 +95,9 @@ jobs:
       - name: Repo-wide test
         run: deno task test
 
+      - name: Agentic OpenRouter preset canary
+        run: deno task agentic:provider-canary
+
   quality:
     runs-on: ubuntu-latest
     timeout-minutes: 30

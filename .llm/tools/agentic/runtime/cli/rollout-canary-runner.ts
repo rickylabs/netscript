@@ -215,6 +215,7 @@ async function providers(runner: RolloutCommandRunner, cwd: string): Promise<Can
         [
           'task',
           'agentic:provider-canary',
+          '--live',
           '--profile',
           profile,
           '--model',
@@ -225,7 +226,7 @@ async function providers(runner: RolloutCommandRunner, cwd: string): Promise<Can
           cwd,
         ],
         cwd,
-        `deno task agentic:provider-canary --profile ${profile} --model ${model} --effort ${effort} --worktree $WORKTREE`,
+        `deno task agentic:provider-canary --live --profile ${profile} --model ${model} --effort ${effort} --worktree $WORKTREE`,
       ))
     ),
   );

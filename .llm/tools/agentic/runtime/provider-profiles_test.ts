@@ -61,6 +61,13 @@ Deno.test('OpenRouter preset slugs and route purposes are locked', () => {
     'x-ai/grok-4.5',
   ]);
   assertEquals(matchOpenRouterPreset(route()), OPENROUTER_PRESETS['codex-design-glm-5-2']);
+  assertEquals(OPENROUTER_PRESETS['codex-design-glm-5-2'].agenticTurn, 'unsupported');
+  assertEquals(
+    OPENROUTER_PRESETS['codex-design-glm-5-2'].incompatibility,
+    'codex-native-namespace-tool',
+  );
+  assertEquals(OPENROUTER_PRESETS['claude-design-glm-5-2'].agenticTurn, 'supported');
+  assertEquals(OPENROUTER_PRESETS['claude-design-glm-5-2'].transport, 'anthropic-messages');
   assertEquals(matchOpenRouterPreset(route({ effort: 'medium' })), null);
   assertEquals(
     matchOpenRouterPreset(route({

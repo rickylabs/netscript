@@ -7,6 +7,7 @@ import { AGENT_COMMAND_TIMEOUT_MS, MAX_AGENT_CAPTURE_BYTES } from './codex-adapt
 import { validateProviderRoute } from './provider-adapter.ts';
 
 export const CLAUDE_SMOKE_WRAPPER = '.llm/tools/agentic/claude/claude-remote-smoke.ts';
+export const CLAUDE_PRINT_WRAPPER = '.llm/tools/agentic/claude/claude-print.ts';
 
 type ClaudeCommand = Extract<RuntimeCommand, { kind: 'launch' | 'resume' | 'smoke' }>;
 
@@ -52,7 +53,34 @@ function staticRequest(
   };
 }
 
-/** Builds the bounded Claude static smoke or an explicit unsupported lifecycle result. */
+function printRequest(
+  command: Extract<ClaudeCommand, { kind: 'launch' | 'resume' }>,
+  environment: import('../ports.ts').ChildEnvironmentPolicy,
+): AgentProcessRequest {
+  return {
+    executable: 'deno',
+    arguments: [
+      'run',
+      '--no-lock',
+      '--allow-read',
+      '--allow-run',
+      CLAUDE_PRINT_WRAPPER,
+      '--model',
+      command.route.model,
+      '--effort',
+      command.route.effort,
+      '--prompt',
+      command.content.path,
+      ...(command.kind === 'resume' ? ['--resume', command.session.sessionId] : []),
+    ],
+    cwd: command.route.worktree,
+    timeoutMs: AGENT_COMMAND_TIMEOUT_MS,
+    maxCaptureBytes: MAX_AGENT_CAPTURE_BYTES,
+    environment,
+  };
+}
+
+/** Builds bounded Claude smoke or isolated gateway launch/resume requests. */
 export function planClaudeCommand(input: ClaudePlanningInput): AgentCommandPlan {
   const { command } = input;
   const session = command.kind === 'resume' ? command.session : undefined;
@@ -71,35 +99,48 @@ export function planClaudeCommand(input: ClaudePlanningInput): AgentCommandPlan 
     );
   }
   let request: AgentProcessRequest | null = null;
-  if (command.kind !== 'smoke') {
+  const customRoute = profile?.endpointKind === 'custom' || profile?.endpointKind === 'openrouter';
+  if (command.kind === 'smoke') {
+    if (command.level === 'live') {
+      diagnostics.push(diagnostic(
+        'capability_unsupported',
+        'capability',
+        'Claude interactive login and mobile canaries require explicit owner execution',
+      ));
+    } else if (!command.content?.path.trim()) {
+      diagnostics.push(
+        diagnostic(
+          'invalid_state_file',
+          'input',
+          'Claude static smoke requires a content file reference',
+        ),
+      );
+    } else if (!diagnostics.length && profile) {
+      request = staticRequest(
+        command.content.path,
+        command.route.worktree,
+        command.route.model,
+        childEnvironmentPolicyForProfile(profile, command.route),
+      );
+    }
+  } else if (!customRoute || command.route.mobileRequired) {
     diagnostics.push(diagnostic(
       'capability_unsupported',
       'capability',
-      'Claude launch and resume are not implemented by the S3 static-smoke adapter',
+      customRoute
+        ? 'Claude gateway print sessions do not provide native mobile remote control'
+        : 'native Claude launch/resume requires the remote-control session adapter',
     ));
-  } else if (command.level === 'live') {
-    diagnostics.push(diagnostic(
-      'capability_unsupported',
-      'capability',
-      'Claude interactive login and mobile canaries require explicit owner execution',
-    ));
-  } else if (!command.content?.path.trim()) {
+  } else if (!command.content.path.trim()) {
     diagnostics.push(
-      diagnostic(
-        'invalid_state_file',
-        'input',
-        'Claude static smoke requires a content file reference',
-      ),
+      diagnostic('invalid_state_file', 'input', 'Claude content file reference is missing'),
     );
   } else if (!diagnostics.length && profile) {
-    request = staticRequest(
-      command.content.path,
-      command.route.worktree,
-      command.route.model,
+    request = printRequest(
+      command,
       childEnvironmentPolicyForProfile(profile, command.route),
     );
   }
-  const customRoute = profile?.endpointKind === 'custom' || profile?.endpointKind === 'openrouter';
   return {
     agent: 'claude',
     operation: command.kind,

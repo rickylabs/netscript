@@ -35,8 +35,8 @@
  *     --slice-dir <win-path-to-slice-run-dir> \
  *     [--expect-base <sha>] [--user codex] [--pretty] [--dry-run]
  *
- * Exit codes: 0 = ok (launched / dry-run clean / parsed) · 1 = launch failed or
- * no thread id · 2 = usage error · 3 = brief contract violation · 4 = push-safety
+ * Exit codes: 0 = ok (launched / dry-run clean / parsed) · 1 = launch or route
+ * identity failure · 2 = usage error · 3 = brief contract violation · 4 = push-safety
  * violation (upstream set / wrong branch / wrong base) · 5 = worktree not found.
  */
 
@@ -48,7 +48,6 @@ import {
   requireValue,
   resolveWslCommand,
   sq,
-  type ThreadInfo,
   validateHandoffContract,
   winToWsl,
   wsl,
@@ -62,6 +61,13 @@ import {
   type RequestedLaunchIdentity,
   requestedLaunchIdentity,
 } from '../runtime/launch-route-identity.ts';
+import {
+  launcherExitCode,
+  type LauncherProfilePlan,
+  materializeLauncherProfile,
+  planLauncherProfile,
+  renderThreadRecord,
+} from './launcher-route.ts';
 import { LocalSenderOwnershipAdapter } from '../runtime/adapters/local-sender-ownership-adapter.ts';
 import {
   activateSenderOwnership,
@@ -204,47 +210,6 @@ function parseArgs(args: string[]): Options | null {
   return o;
 }
 
-function threadRecord(
-  o: Options,
-  info: ThreadInfo,
-  dest: string,
-  requested: RequestedLaunchIdentity,
-): string {
-  const evidence = compareLaunchIdentity(requested, {
-    provider: info.provider,
-    model: info.model,
-    effort: info.effort,
-  });
-  return [
-    `# ${o.slug ?? 'slice'} — Codex implementation thread`,
-    '',
-    `- **Thread / session id:** \`${info.threadId ?? 'UNKNOWN'}\``,
-    info.rollout ? `- **Rollout:** \`${info.rollout}\`` : '',
-    `- **Worktree:** \`${o.worktree}\``,
-    `- **Branch:** \`${o.branch}\`${
-      o.expectBase ? ` @ \`${o.expectBase}\`` : ''
-    } (NO upstream by design).`,
-    `- **Push rule:** explicit refspec only — \`git push origin HEAD:refs/heads/${o.branch}\`.`,
-    `- **Requested route:** provider=${requested.provider} · model=${requested.model} · effort=${requested.effort}`,
-    `- **Observed route:** provider=${info.provider ?? 'pending'} · model=${
-      info.model ?? 'pending'
-    } · effort=${info.effort?.toLowerCase() ?? 'pending'}`,
-    `- **Route verdict:** ${evidence.status}${
-      evidence.mismatches.length ? ` (${evidence.mismatches.join(', ')})` : ''
-    }`,
-    `- **Runtime:** approval=never · sandbox=dangerFullAccess`,
-    `- **Brief (staged):** \`${dest}\``,
-    '',
-    '## Steering (same thread — never a second send-message-v2 at this worktree)',
-    '```bash',
-    `codex exec resume ${info.threadId ?? '<thread-id>'} -- "<follow-up>"`,
-    '```',
-    '',
-    '_Written by `.llm/tools/agentic/codex/launch-codex-slice.ts`._',
-    '',
-  ].filter((l) => l !== '').join('\n');
-}
-
 async function main(): Promise<void> {
   let o: Options | null;
   try {
@@ -293,6 +258,14 @@ async function main(): Promise<void> {
   if (requested.provider !== 'openai' && !o.profile) {
     console.error('non-OpenAI Codex routes require an explicit --profile and --profile-home');
     Deno.exit(2);
+  }
+  let profilePlan: LauncherProfilePlan | null;
+  try {
+    profilePlan = planLauncherProfile(requested, o);
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : String(error));
+    Deno.exit(2);
+    return;
   }
   const dest = o.dest ?? `${wslHome()}/${o.slug ?? 'slice'}-brief.md`;
 
@@ -346,12 +319,11 @@ async function main(): Promise<void> {
   // which derives the agent's worktree from the ambient cwd) in the wrong
   // directory. See wslCd in agentic-lib.ts.
   const routeFlags = `--model ${sq(requested.model)} --effort ${sq(requested.effort)}`;
-  const profileFlags = o.profile && o.profileHome ? ` --profile ${sq(o.profile)}` : '';
   const clientPath = `${o.worktree}/.llm/tools/agentic/codex/app-server-message-cli.ts`;
-  const home = o.profileHome ? ` CODEX_HOME=${sq(o.profileHome)}` : '';
+  const home = profilePlan ? ` CODEX_HOME=${sq(profilePlan.home)}` : '';
   const profileScript = `export PATH="$HOME/.local/bin:$PATH"${home}; msg="$(cat ${
     sq(dest)
-  })"; deno run --allow-run ${sq(clientPath)} ${routeFlags}${profileFlags} --cwd ${
+  })"; deno run --allow-run ${sq(clientPath)} ${routeFlags} --cwd ${
     sq(o.worktree)
   } --message "$msg"`;
   const commandPlan = await resolveWslCommand(o.user, profileScript, { cwd: o.worktree });
@@ -367,6 +339,14 @@ async function main(): Promise<void> {
     gitSafety: { branch: info.branch, head: info.head, upstream: info.upstream, dirty: info.dirty },
     launchCommand,
     requestedRoute: requested,
+    profile: profilePlan
+      ? {
+        home: profilePlan.home,
+        name: profilePlan.name,
+        namedPath: profilePlan.namedPath,
+        appServerPath: profilePlan.appServerPath,
+      }
+      : null,
   };
 
   // Resolve and inspect the durable sender registry before the dry-run branch so
@@ -428,6 +408,18 @@ async function main(): Promise<void> {
     Deno.exit(4);
   }
 
+  if (profilePlan) {
+    if (!await materializeLauncherProfile(o.user, profilePlan)) {
+      await ownership.release(o.worktree, leaseToken);
+      console.log(JSON.stringify({
+        stage: 'profile-materialization',
+        ok: false,
+        message: 'credential-free Codex OpenRouter profile could not be materialized',
+      }));
+      Deno.exit(1);
+    }
+  }
+
   // 4b) Launch: stream the turn, record thread id as soon as thread/start lands.
   const child = new Deno.Command(commandPlan.bin, {
     args: commandPlan.args,
@@ -455,7 +447,7 @@ async function main(): Promise<void> {
         );
         if (o.sliceDir) {
           const recPath = `${o.sliceDir.replace(/[\\/]$/, '')}/codex-thread-ids.md`;
-          await Deno.writeTextFile(recPath, threadRecord(o, info2, dest, requested));
+          await Deno.writeTextFile(recPath, renderThreadRecord(o, info2, dest, requested));
           console.log(`\n[launch-codex-slice] recorded thread ${info2.threadId} -> ${recPath}`);
         } else {
           console.log(
@@ -466,10 +458,6 @@ async function main(): Promise<void> {
     }
   }
   const status = await child.status;
-  if (!recorded) {
-    console.log(`\n[launch-codex-slice] WARN: no thread id captured (exit ${status.code})`);
-    Deno.exit(1);
-  }
   const observed = parseThreadInfo(buf);
   const evidence = compareLaunchIdentity(requested, {
     provider: observed.provider,
@@ -477,11 +465,23 @@ async function main(): Promise<void> {
     effort: observed.effort,
   });
   const enforcement = enforceLaunchIdentity(evidence, o.allowRouteMismatch);
+  const exitCode = launcherExitCode(status.code, evidence, o.allowRouteMismatch);
+  if (!recorded) {
+    await ownership.release(o.worktree, leaseToken);
+    console.log(JSON.stringify({
+      stage: 'thread-identity',
+      ok: status.code === 0,
+      warning: 'no thread id captured',
+      processExitCode: status.code,
+      routeStatus: evidence.status,
+    }));
+    Deno.exit(exitCode);
+  }
   if (o.sliceDir) {
     const recPath = `${o.sliceDir.replace(/[\\/]$/, '')}/codex-thread-ids.md`;
-    await Deno.writeTextFile(recPath, threadRecord(o, observed, dest, requested));
+    await Deno.writeTextFile(recPath, renderThreadRecord(o, observed, dest, requested));
   }
-  if (!enforcement.allowed) {
+  if (!enforcement.allowed && evidence.status === 'mismatch') {
     console.log(JSON.stringify({
       stage: 'route-identity',
       ok: false,
@@ -493,7 +493,7 @@ async function main(): Promise<void> {
     }));
     Deno.exit(1);
   }
-  Deno.exit(status.code === 0 ? 0 : 1);
+  Deno.exit(exitCode);
 }
 
 if (import.meta.main) await main();
