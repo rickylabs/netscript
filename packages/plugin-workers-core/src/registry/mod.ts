@@ -23,6 +23,7 @@ export type {
   TaskExecutionType,
   TaskSource,
 } from './registry-types.ts';
+export type { TaskPermissionsInput as RegistryTaskPermissionsInput } from '../domain/mod.ts';
 export type {
   KvEntry,
   KvListSelector,

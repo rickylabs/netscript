@@ -85,7 +85,14 @@ export const WORKER_RUNTIMES = [
 ] as const;
 
 /** Supported task execution runtime. */
-export type TaskType = (typeof TASK_TYPES)[number];
+export type TaskType =
+  | 'cmd'
+  | 'deno'
+  | 'dotnet'
+  | 'executable'
+  | 'powershell'
+  | 'python'
+  | 'shell';
 
 /** Supported task execution status. */
 export type TaskStatus = (typeof TASK_STATUSES)[number];

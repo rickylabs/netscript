@@ -4,8 +4,6 @@ import { TaskPermissionsInputSchema } from '../domain/task.ts';
 import type { ConfigSchema } from './config-schema.ts';
 import type { WorkerConfigPermissions } from './job-config.ts';
 
-type AnyZodObject = z.ZodObject<Record<string, z.ZodTypeAny>>;
-
 /** Runtime used to execute a task. */
 export type WorkerTaskType =
   | 'deno'
@@ -75,7 +73,7 @@ export interface TaskConfig {
   readonly persist: boolean;
 }
 
-export const TaskConfigZodSchema: AnyZodObject = z.object({
+export const TaskConfigZodSchema: z.ZodType<TaskConfig> = z.object({
   id: z.string(),
   topic: z.string().optional(),
   name: z.string(),
@@ -105,5 +103,4 @@ export const TaskConfigZodSchema: AnyZodObject = z.object({
 });
 
 /** Runtime task configuration. */
-export const TaskConfigSchema: ConfigSchema<TaskConfig> =
-  TaskConfigZodSchema as unknown as ConfigSchema<TaskConfig>;
+export const TaskConfigSchema: ConfigSchema<TaskConfig> = TaskConfigZodSchema;

@@ -24,6 +24,8 @@ export type WorkflowExecutorOptions =
 
 /** Executes workflow definitions as explicit durable state machines. */
 export class WorkflowExecutor {
+  /** Stable workflow executor identifier. */
+  readonly id = 'workflow-executor';
   readonly #clock: WorkflowClock;
   readonly #stateStore: WorkflowStateStore;
   readonly #stepRunner: WorkflowStepRunner;
