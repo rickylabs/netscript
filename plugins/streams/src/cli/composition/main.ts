@@ -12,6 +12,7 @@ import {
   subscribeToStream,
 } from '../adapters/runtime-client.ts';
 import { discoverStreamTopics } from '../adapters/topic-walker.ts';
+import { writeStreamArtifacts } from '../adapters/artifact-writer.ts';
 
 /** CLI command group for the streams plugin. */
 export { StreamsCli };
@@ -30,6 +31,7 @@ export const streamsCli: StreamsCli = new StreamsCli({
   subscribe: subscribeToStream,
   inspect: inspectDiscoveredTopic,
   clear: clearStream,
+  writeArtifacts: writeStreamArtifacts,
 });
 
 if (import.meta.main) {
@@ -63,11 +65,15 @@ function parseArgs(command: string, values: readonly string[]) {
     }
     const [name, inline] = value.slice(2).split('=', 2);
     const next = values[index + 1];
-    if (inline !== undefined) flags[name] = inline;
+    if (inline !== undefined) flags[name] = appendFlag(flags[name], inline);
     else if (next && !next.startsWith('--')) {
-      flags[name] = next;
+      flags[name] = appendFlag(flags[name], next);
       index += 1;
     } else flags[name] = true;
   }
   return { command, values: positionals, flags };
+}
+
+function appendFlag(current: string | boolean | undefined, value: string): string {
+  return typeof current === 'string' ? `${current},${value}` : value;
 }

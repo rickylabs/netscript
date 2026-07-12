@@ -39,6 +39,9 @@ Deno.test('StreamsCli executes discovery and diagnostic verbs through injected s
     'stats',
     'inspect',
     'clear',
+    'add-schema',
+    'add-producer',
+    'add-consumer',
   ]);
 
   const listed = await runStreamsCommand(cli, { command: 'list-topics' });
@@ -145,6 +148,7 @@ Deno.test({
         subscribe: subscribeToStream,
         inspect: inspectDiscoveredTopic,
         clear: clearStream,
+        writeArtifacts: () => Promise.resolve([]),
       });
       const id = crypto.randomUUID();
       const published = await runStreamsCommand(cli, {
@@ -179,7 +183,48 @@ Deno.test({
 
 Deno.test('streamsCli composition root provides the default CLI instance', () => {
   assertEquals(streamsCli.name, 'streams');
-  assertEquals(streamsCli.commands().length, 6);
+  assertEquals(streamsCli.commands().length, 9);
+});
+
+Deno.test('StreamsCli add verbs write schema, producer, and consumer artifacts', async () => {
+  const written: string[] = [];
+  const cli = new StreamsCli(createServices({
+    writeArtifacts: (_root, artifacts) => {
+      written.push(...artifacts.map((artifact) => artifact.path));
+      return Promise.resolve(artifacts.map((artifact) => artifact.path));
+    },
+  }));
+
+  assertEquals(
+    (await runStreamsCommand(cli, {
+      command: 'add-schema',
+      values: ['orders'],
+      flags: { collection: 'order=order.changed:id' },
+    })).code,
+    0,
+  );
+  assertEquals(
+    (await runStreamsCommand(cli, {
+      command: 'add-producer',
+      values: ['orders'],
+      flags: { 'stream-path': '/orders/events', 'producer-id': 'orders-service' },
+    })).code,
+    0,
+  );
+  assertEquals(
+    (await runStreamsCommand(cli, {
+      command: 'add-consumer',
+      values: ['/orders/events'],
+    })).code,
+    0,
+  );
+  assertEquals(written, [
+    'streams/orders-schema.ts',
+    'streams/orders-producer.ts',
+    'streams/events-db.ts',
+    'islands/EventsStream.tsx',
+    'routes/api/streams/events/seed.ts',
+  ]);
 });
 
 function createServices(overrides: Partial<StreamsCliServices> = {}): StreamsCliServices {
@@ -196,6 +241,8 @@ function createServices(overrides: Partial<StreamsCliServices> = {}): StreamsCli
         producerId: value.producerId,
       }),
     clear: () => Promise.resolve(),
+    writeArtifacts: (_root, artifacts) =>
+      Promise.resolve(artifacts.map((artifact) => artifact.path)),
     ...overrides,
   };
 }

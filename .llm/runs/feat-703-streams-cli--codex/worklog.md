@@ -69,3 +69,21 @@ client uses the workspace npm catalog entry already pinned for `@durable-streams
 Reconcile: issue #703 scope remains unchanged. The walker intentionally tolerates core-owned
 producer factories that do not expose a literal stream path; those topics use a deterministic
 plugin name until explicit metadata is available. No new architecture debt was introduced.
+
+### Slice 2 — schema, producer, and consumer scaffolders
+
+- Added exact `add-schema`, `add-producer`, and `add-consumer` verbs plus equivalent generic plugin
+  resources. The outputs are a `defineStreamSchema` module, a `createDurableStream` producer, and a
+  StreamDB factory + query island + Fresh 2.x seed route.
+- Generated-artifact validation writes all outputs to a temporary project, confirms the topic
+  walker discovers `/billing/invoices`, and runs `deno check --no-lock --unstable-kv` across every
+  generated `.ts`/`.tsx` module — PASS.
+- Targeted Streams tests — PASS, 13/13 across CLI runtime behavior, real server round-trip,
+  resource semantics, generated compilation, and discovery.
+- Scoped wrappers for `plugins/streams`: check PASS (45 files, 0 diagnostics), lint PASS (45 files,
+  0 findings), fmt PASS (45 files, 0 findings).
+- `git diff --exit-code -- deno.lock` — PASS.
+
+Reconcile: generated consumer code follows stable Fresh 2.x (`createDefine`, single-context
+handler) and remains userland glue over core/upstream primitives. No rescope or architecture-debt
+entry is required.

@@ -1,6 +1,13 @@
 import { PluginCli } from '@netscript/plugin/cli';
 import type { PluginCliArgs, PluginCliCommand, PluginCliResult } from '@netscript/plugin/cli';
 import type { DiscoveredStreamTopic, StreamsCliServices } from './streams-types.ts';
+import {
+  parseStreamProducerInput,
+  parseStreamSchemaInput,
+  streamConsumerScaffolder,
+  streamProducerScaffolder,
+  streamSchemaScaffolder,
+} from '../adapter/resources/mod.ts';
 
 /** Stable Streams command names. */
 export const STREAMS_COMMANDS = [
@@ -10,10 +17,12 @@ export const STREAMS_COMMANDS = [
   'stats',
   'inspect',
   'clear',
+  'add-schema',
+  'add-producer',
+  'add-consumer',
 ] as const;
 
 type StreamsCommand = typeof STREAMS_COMMANDS[number];
-
 /** CLI command group for `@netscript/plugin-streams`. */
 export class StreamsCli extends PluginCli {
   /** Plugin CLI name used by mounted command lists. */
@@ -49,6 +58,19 @@ async function runStreamsCommand(
   services: StreamsCliServices,
 ): Promise<PluginCliResult> {
   const root = stringFlag(args, 'project-root') ?? services.workspaceRoot();
+  if (command.startsWith('add-')) {
+    const artifacts = command === 'add-schema'
+      ? streamSchemaScaffolder.emit(parseStreamSchemaInput({ ...args, command: 'legacy' }))
+      : command === 'add-producer'
+      ? streamProducerScaffolder.emit(parseStreamProducerInput({ ...args, command: 'legacy' }))
+      : streamConsumerScaffolder.emit({ topic: requiredValue(args) });
+    const createdFiles = await services.writeArtifacts(root, artifacts);
+    return {
+      code: 0,
+      message: `${createdFiles.length} stream artifact(s) created.`,
+      data: { createdFiles },
+    };
+  }
   const topics = await services.discoverTopics(root);
   if (command === 'list-topics') {
     return { code: 0, message: `${topics.length} stream topic(s) discovered.`, data: { topics } };
@@ -106,6 +128,12 @@ function parseJsonObject(value: string): Readonly<Record<string, unknown>> {
   return parsed as Readonly<Record<string, unknown>>;
 }
 
+function requiredValue(args: PluginCliArgs): string {
+  const value = args.values?.[0];
+  if (!value) throw new TypeError('Missing streams resource name.');
+  return value;
+}
+
 function commandDescription(command: StreamsCommand): string {
   const descriptions: Record<StreamsCommand, string> = {
     'list-topics': 'List producer-backed topics discovered in the current project.',
@@ -114,6 +142,9 @@ function commandDescription(command: StreamsCommand): string {
     stats: 'Show the JSON-stable topic inspection report.',
     inspect: 'Inspect schema, stream path, and producer metadata as JSON.',
     clear: 'Delete a development stream and its current state.',
+    'add-schema': 'Generate a defineStreamSchema module.',
+    'add-producer': 'Generate a durable stream producer module.',
+    'add-consumer': 'Generate a StreamDB factory, query island, and seed loader.',
   };
   return descriptions[command];
 }

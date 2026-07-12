@@ -1,4 +1,5 @@
 import type { StreamTopicInspectionReport } from '@netscript/plugin-streams-core';
+import type { ScaffoldArtifact } from '@netscript/plugin/adapter';
 
 /** One collection declared by a discovered durable stream schema. */
 export interface DiscoveredStreamCollection {
@@ -62,4 +63,9 @@ export interface StreamsCliServices {
   readonly inspect: (topic: DiscoveredStreamTopic) => StreamTopicInspectionReport;
   /** Delete one development stream. */
   readonly clear: (input: ClearStreamInput) => Promise<void>;
+  /** Write generated userland artifacts beneath a project root. */
+  readonly writeArtifacts: (
+    workspaceRoot: string,
+    artifacts: readonly ScaffoldArtifact[],
+  ) => Promise<readonly string[]>;
 }
