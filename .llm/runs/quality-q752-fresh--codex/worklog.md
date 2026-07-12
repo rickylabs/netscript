@@ -59,6 +59,7 @@ and add a focused inference/runtime case beside that feature before extending a 
 | 2026-07-12 | preflight | reset/research | HEAD `3b3d615b`; baseline 25 findings / 0 allowances; rejected pass 25 allowances. |
 | 2026-07-12 | plan-gate | PLAN-EVAL | Separate Claude Opus/high session `7197d457-c50d-48fe-ad43-b84ade676b0e` returned PASS. |
 | 2026-07-12 | slice 1 | route/builders | Unified compatibility aliases with implementation types, propagated route factory generics, explicitly built link props, and narrowed complete route references. Scoped check passed; route/builder tests passed in the 197-test package run. Reconcile: no GitHub mutation per owner directive. |
+| 2026-07-12 | slice 2 | form/Zod | Used a mutable string-keyed internal error map and Zod class/property guards (`unwrap`, `_zod.def.items`) instead of mapped writes and double assertions. Form/schema tests passed in the 197-test package run. Reconcile: no GitHub mutation per owner directive. |
 
 ## Decisions
 

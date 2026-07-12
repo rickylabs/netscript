@@ -24,7 +24,7 @@ implementation has begun.
 
 ## In Progress
 
-- Slice 2 form/Zod typing commit.
+- Slice 3 TanStack query typing commit.
 
 ## Next Steps
 
@@ -46,6 +46,7 @@ implementation has begun.
 | ---- | ------ | ----- |
 | `.llm/runs/quality-q752-fresh--codex/*` | new | harness bootstrap/plan artifacts only |
 | `packages/fresh/src/application/{builders,route}/**` | changed | Actual generic factories and compatibility aliases replace facade erasure. |
+| `packages/fresh/src/application/form/**` | changed | Typed mutable error map and guarded Zod internals. |
 
 ## Gates
 
