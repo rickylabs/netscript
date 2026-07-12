@@ -2,9 +2,11 @@
  * Converter: fresh-ui (Preact/Fresh) registry sources → a synthetic React
  * package the Claude Design canvas can execute.
  *
- * The eis-chat recipe applies: Preact appears in registry components as
- * type-only imports, so compiling the same source under a classic React JSX
- * transform yields genuine React components. The converter therefore only:
+ * The eis-chat recipe still applies to the registry's component surface,
+ * which is mostly type-only Preact imports, but islands and interactive
+ * subpaths also use a finite value surface. Compiling the same source under
+ * a classic React JSX transform therefore needs React-backed equivalents for
+ * those values as well. The converter therefore only:
  *
  *  1. rewrites the three Preact specifiers to local shims
  *     (`preact` → types + Fragment compat, `preact/hooks` → React hooks,
@@ -26,25 +28,27 @@ import type {
   SyncConfig,
 } from './types.ts';
 
-const HOOK_NAMES = [
-  'useState',
-  'useEffect',
-  'useLayoutEffect',
-  'useMemo',
-  'useCallback',
-  'useRef',
-  'useContext',
-  'useReducer',
-  'useId',
-  'useImperativeHandle',
-];
-
 /** Value exports the preact compat shim knows how to map onto React. */
 const PREACT_VALUE_COMPAT: Record<string, string> = {
   Fragment: 'export const Fragment = React.Fragment;',
+  h: 'export const h = React.createElement;',
   createContext: 'export const createContext = React.createContext;',
   cloneElement: 'export const cloneElement = React.cloneElement;',
   toChildArray: 'export const toChildArray = React.Children.toArray;',
+};
+
+/** Preact hook value exports with direct React equivalents. */
+const HOOK_VALUE_COMPAT: Record<string, string> = {
+  useCallback: 'export const useCallback = React.useCallback;',
+  useContext: 'export const useContext = React.useContext;',
+  useEffect: 'export const useEffect = React.useEffect;',
+  useId: 'export const useId = React.useId;',
+  useImperativeHandle: 'export const useImperativeHandle = React.useImperativeHandle;',
+  useLayoutEffect: 'export const useLayoutEffect = React.useLayoutEffect;',
+  useMemo: 'export const useMemo = React.useMemo;',
+  useReducer: 'export const useReducer = React.useReducer;',
+  useRef: 'export const useRef = React.useRef;',
+  useState: 'export const useState = React.useState;',
 };
 
 const SIGNAL_IMPL: Record<string, string> = {
@@ -123,8 +127,24 @@ export interface ConvertOutput {
     jsxMembers: Set<string>;
     typeNames: Set<string>;
     valueNames: Set<string>;
+    hookNames: Set<string>;
     signalNames: Set<string>;
   };
+}
+
+/** Raised when registry source cannot be represented by the React compatibility layer. */
+export class ConversionError extends Error {
+  constructor(readonly diagnostics: readonly string[]) {
+    super(`conversion errors:\n${diagnostics.map((error) => `  ! ${error}`).join('\n')}`);
+    this.name = 'ConversionError';
+  }
+}
+
+function importBinding(binding: string): { imported: string; typeOnly: boolean } {
+  const trimmed = binding.trim();
+  const typeOnly = trimmed.startsWith('type ');
+  const withoutType = trimmed.replace(/^type\s+/, '');
+  return { imported: withoutType.split(/\s+as\s+/)[0], typeOnly };
 }
 
 function pascal(unitName: string): string {
@@ -180,26 +200,40 @@ export function convertSource(
       const bindings = names.split(',').map((n) => n.trim()).filter(Boolean);
       if (spec === 'preact') {
         for (const b of bindings) {
-          const name = b.replace(/^type\s+/, '');
-          if (typeOnly || b.startsWith('type ')) scan.typeNames.add(name);
+          const binding = importBinding(b);
+          if (typeOnly || binding.typeOnly) scan.typeNames.add(binding.imported);
           else {
-            if (!PREACT_VALUE_COMPAT[name]) {
-              errors.push(`unmapped preact value import "${name}" in ${pkgPath}`);
+            if (!PREACT_VALUE_COMPAT[binding.imported]) {
+              errors.push(`unmapped preact value import "${binding.imported}" in ${pkgPath}`);
             }
-            scan.valueNames.add(name);
+            scan.valueNames.add(binding.imported);
           }
         }
         return `import ${typeOnly ?? ''}{ ${names.trim()} } from '${ds}/preact-compat.ts';`;
       }
       if (spec === 'preact/hooks') {
+        for (const b of bindings) {
+          const binding = importBinding(b);
+          if (typeOnly || binding.typeOnly) continue;
+          if (!HOOK_VALUE_COMPAT[binding.imported]) {
+            errors.push(
+              `unmapped preact/hooks value import "${binding.imported}" in ${pkgPath}`,
+            );
+          }
+          scan.hookNames.add(binding.imported);
+        }
         return `import { ${names.trim()} } from '${ds}/hooks.ts';`;
       }
       for (const b of bindings) {
-        const name = b.replace(/^type\s+/, '');
-        if (!SIGNAL_IMPL[name] && !typeOnly) {
-          errors.push(`unmapped signal import "${name}" in ${pkgPath}`);
+        const binding = importBinding(b);
+        if (!typeOnly && !binding.typeOnly) {
+          if (!SIGNAL_IMPL[binding.imported]) {
+            errors.push(
+              `unmapped @preact/signals value import "${binding.imported}" in ${pkgPath}`,
+            );
+          }
         }
-        scan.signalNames.add(name);
+        scan.signalNames.add(binding.imported);
       }
       return `import { ${names.trim()} } from '${ds}/signals.ts';`;
     },
@@ -232,6 +266,7 @@ export function convertUnits(
     jsxMembers: new Set(),
     typeNames: new Set(),
     valueNames: new Set(),
+    hookNames: new Set(),
     signalNames: new Set(),
   };
 
@@ -309,6 +344,11 @@ export function convertUnits(
     conversions.push(result);
   }
 
+  const diagnostics = conversions.flatMap((conversion) =>
+    conversion.errors.map((error) => `${conversion.unit}: ${error}`)
+  );
+  if (diagnostics.length) throw new ConversionError(diagnostics);
+
   emitShims(pkgFiles, shims);
   return { conversions, pkgFiles, shims };
 }
@@ -341,10 +381,12 @@ function emitShims(pkgFiles: Map<string, string>, shims: ConvertOutput['shims'])
       (valueLines.length ? `\n${valueLines.join('\n')}\n` : ''),
   );
 
+  const hookLines = [...shims.hookNames].sort()
+    .map((name) => HOOK_VALUE_COMPAT[name])
+    .filter((line): line is string => Boolean(line));
   pkgFiles.set(
     '__ds/hooks.ts',
-    `import { React } from './react-scope.ts';\n\n` +
-      HOOK_NAMES.map((h) => `export const ${h} = React.${h};`).join('\n') + '\n',
+    `import { React } from './react-scope.ts';\n\n${hookLines.join('\n')}\n`,
   );
 
   const signalBodies = [...shims.signalNames].sort()

@@ -3,7 +3,7 @@
 # (`/home/codex/repos`). Existing files on ext4 are already LF, so this normalizes
 # new commits only — no mass renormalization is triggered.
 *.md      text eol=lf
-*.ts      text eol=lf
+*.ts      text eol=lf diff
 *.tsx     text eol=lf
 *.js      text eol=lf
 *.jsonc   text eol=lf
