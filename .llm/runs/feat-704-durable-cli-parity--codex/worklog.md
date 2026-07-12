@@ -230,6 +230,28 @@ orchestrator responsibility.
 
 - Commit/push: `895417e6` pushed to `origin/feat/704-durable-cli-parity`.
 
+### Corrective slice — service-only scaffold type-check
+
+CI on PR #741 exposed that `scaffold.service` copies `packages/cli/e2e` into the generated workspace
+and type-checks all copied package sources even though that suite intentionally installs no workers
+or sagas plugins. The new durable parity gate helper imported `@netscript/plugin-workers/cli` and
+`@netscript/plugin-sagas/cli` statically, so the service-only workspace failed with two `TS2307`
+missing-dependency diagnostics. This was not generated job/task source failure.
+
+The helper now resolves those optional plugin composition roots with non-literal dynamic imports at
+runtime. Its only static dependency remains the shared `@netscript/plugin/cli` types already present
+in a service scaffold. The full runtime suite supplies the two plugin import-map entries when the
+gate actually executes.
+
+| Evidence | Result |
+| --- | --- |
+| `scaffold.service` exact requested run | PASS — 5 passed, 0 failed |
+| `generated.service-check` | PASS — generated `./packages` and `./services` type-check in 36,356 ms |
+| CLI E2E gate builder tests | PASS — 6 passed, 0 failed |
+| Targeted durable helper check | PASS — `deno check --unstable-kv` |
+| Scoped CLI E2E check/lint/format | PASS — 87 files, 0 findings |
+| `deno.lock` | UNCHANGED |
+
 ### Drift
 
 | ID | Severity | Detail |
@@ -237,3 +259,4 @@ orchestrator responsibility.
 | D1 | significant, owner-approved | PLAN-EVAL was explicitly waived in the slice brief; short plan/design recorded here before implementation. |
 | D2 | minor | Full workers export-map doc-lint has 18 pre-existing private-type references. The newly touched CLI entrypoint was brought to 0; unrelated baseline findings were not expanded into this slice. |
 | D3 | minor | Full sagas export-map doc-lint has 12 pre-existing private-type references. The touched CLI entrypoint is clean; unrelated runtime/contracts findings remain outside #704. |
+| D4 | significant, corrected | The first durable E2E helper used static optional-plugin imports, which broke the service-only scaffold's copied-package type-check. PR #741 CI exposed it; the helper now loads those plugins only when the full runtime gate executes, and the exact `scaffold.service` suite passes. |

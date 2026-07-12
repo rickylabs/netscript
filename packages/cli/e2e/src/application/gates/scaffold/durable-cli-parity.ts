@@ -1,6 +1,9 @@
-import { workersCli } from '@netscript/plugin-workers/cli';
-import { sagasCli } from '@netscript/plugin-sagas/cli';
 import type { PluginCli, PluginCliArgs, PluginCliResult } from '@netscript/plugin/cli';
+
+const workersSpecifier = '@netscript/plugin-workers/cli';
+const sagasSpecifier = '@netscript/plugin-sagas/cli';
+const { workersCli } = await import(workersSpecifier) as Readonly<{ workersCli: PluginCli }>;
+const { sagasCli } = await import(sagasSpecifier) as Readonly<{ sagasCli: PluginCli }>;
 
 const correlationId = `cli-e2e-${crypto.randomUUID()}`;
 
