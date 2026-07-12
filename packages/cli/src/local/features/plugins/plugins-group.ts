@@ -59,16 +59,8 @@ export function createLocalPluginCommand(
       'update',
       createUpdatePluginCommand({
         resolveProjectRoot: dependencies.resolveProjectRoot,
-        processRunner: dependencies.process,
-        dispatch: async (verb, pkg, args, options) => {
-          await dependencies.pluginDispatchDependencies.dispatchPort.dispatch({
-            verb,
-            pkg,
-            args,
-            projectRoot: options.projectRoot,
-            processRunner: options.processRunner,
-          });
-        },
+        installPluginDependencies: dependencies.pluginInstallDependencies,
+        registryDependencies: dependencies.generatePluginRegistriesCommandDependencies,
       }),
     )
     .command(
