@@ -70,3 +70,13 @@ The full generated-project/scaffold runtime acceptance remains unproven in this 
 
 - D1 (carried): PLAN-EVAL owner-waived; concise plan recorded above before implementation.
 - D2: dashboard-panel contribution axis split recommended as a separate framework issue; no framework-axis code in this slice.
+
+## Orchestrator fix-forward (Tier-A review, Codex lane quota-exhausted)
+
+- CI check-test caught a missed call-site: `packages/cli/src/local/features/plugins/plugins-group.ts`
+  still passed the retired `processRunner`/`dispatch` shape to `createUpdatePluginCommand`. Rewired
+  to the new `installPluginDependencies` + `registryDependencies` contract (mirrors the public
+  group). Scoped check on `packages/cli/src/local` (8 files) + fmt: 0 findings.
+- Drift: applied directly by the beta-9 orchestrator (`09e5ae68`) because the Codex lane hit the
+  provider usage limit (resets 10:34) — recorded as the owner-authorized fallback for mechanical
+  CI fixes.
