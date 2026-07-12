@@ -4,10 +4,11 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The reusable trigger primitives for NetScript: a handler-first DSL that defines webhook,
-scheduled, and file-watch triggers, plus an ack-then-process ingress and a durable processor that
-drains them through explicit runtime ports — the core that the deployable
-`@netscript/plugin-triggers` plugin binds to the host.**
+**The reusable trigger core for NetScript: a handler-first DSL for webhook, scheduled, and
+file-watch triggers, with ack-then-process ingress and durable processing.**
+
+The processor drains triggers through explicit runtime ports; the deployable
+`@netscript/plugin-triggers` plugin binds this core to the host.
 
 ---
 

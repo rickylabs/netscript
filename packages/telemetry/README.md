@@ -4,10 +4,11 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**OpenTelemetry tracing for NetScript, structured as ports and adapters: domain tracers, W3C context
-propagation across job subprocesses, fan-in span links, first-party oRPC and Hono instrumentation,
-and a telemetry query read model — all linking scheduler, queue, worker, RPC, and SSE spans into one
-distributed trace.**
+**OpenTelemetry tracing for NetScript: connect scheduler, queue, worker, RPC, and SSE spans into one
+distributed trace through explicit ports and adapters.**
+
+Includes domain tracers, W3C context propagation across job subprocesses, fan-in span links,
+first-party oRPC and Hono instrumentation, and a telemetry query read model.
 
 ---
 

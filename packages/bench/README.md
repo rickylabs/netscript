@@ -1,8 +1,10 @@
 # @netscript/bench
 
-The NetScript **self-bench instrument**: a clean-architecture harness that measures how effectively
-a coding agent builds a working NetScript service. It drives an agent through a task in an isolated
-sandbox, runs a frozen black-box HTTP suite after every turn, and scores the attempt on four axes.
+**The NetScript self-bench instrument: measure how effectively a coding agent builds a working
+NetScript service in an isolated sandbox.**
+
+The clean-architecture harness drives an agent through a task, runs a frozen black-box HTTP suite
+after every turn, and scores the attempt on four axes.
 
 > **Status.** This package ships the full instrument architecture, validated end-to-end by unit
 > tests with a deterministic **fake driver**. Committed golden references cover

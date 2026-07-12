@@ -4,9 +4,10 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The reusable saga primitives for NetScript: a fluent DSL for defining durable, multi-step
-workflows plus the runtime ports, native engine, transports, and deterministic testing primitives —
-the core that the deployable `@netscript/plugin-sagas` plugin binds to the host.**
+**The reusable saga core for NetScript: a fluent DSL for durable, multi-step workflows plus runtime
+ports, a native engine, transports, and deterministic testing primitives.**
+
+The deployable `@netscript/plugin-sagas` plugin binds this core to the host.
 
 ---
 

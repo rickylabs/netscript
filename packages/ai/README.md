@@ -1,10 +1,11 @@
 # @netscript/ai
 
-Zero-dependency AI engine core for NetScript — domain contracts, capability ports, a model registry,
-a bounded agent loop, a Standard-Schema tool system, an MCP client transport pool, and a composition
-root. The base entrypoint ships **no** concrete provider and takes **no** `@netscript/*` runtime
-dependency; providers and the MCP stack live on their own subpaths and enter the module graph only
-when imported.
+**The zero-dependency AI engine core for NetScript: domain contracts, capability ports, model and
+tool registries, a bounded agent loop, MCP client transport, and a composition root.**
+
+The base entrypoint ships **no** concrete provider and takes **no** `@netscript/*` runtime
+dependency. Its tool system accepts Standard Schema validators; providers and the MCP stack live on
+their own subpaths and enter the module graph only when imported.
 
 ## Install
 
