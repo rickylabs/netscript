@@ -14,6 +14,7 @@ import { createPluginScaffoldCommand } from "./scaffold/scaffold-plugin-command.
 import { createUpdatePluginCommand } from "./update/update-plugin-command.ts";
 import { createAddPluginItemCommand } from "./item/add-plugin-item-command.ts";
 import type { PublicCommandDependencies } from "../root/public-command-dependencies.ts";
+import { createAiPluginCommand } from "./ai/ai-plugin-command.ts";
 
 const CONCRETE_VERBS = new Set<FrameworkVerb>([
   "install",
@@ -59,6 +60,13 @@ export function createPluginCommand(
       createPluginInstallCommand({
         installPluginDependencies: dependencies.pluginInstallDependencies,
         resolveProjectRoot: dependencies.resolveProjectRoot,
+      }),
+    )
+    .command(
+      "ai",
+      createAiPluginCommand({
+        resolveProjectRoot: dependencies.resolveProjectRoot,
+        processRunner: dependencies.process,
       }),
     )
     .command(
