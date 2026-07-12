@@ -10,7 +10,12 @@ import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
 import { ScaffoldValidationError } from '../../domain/errors.ts';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
-import type { ContractVersion, DiscoveredContract, DiscoveredVersion } from './types.ts';
+import {
+  type ContractVersion,
+  type DiscoveredContract,
+  type DiscoveredVersion,
+  parseContractVersion,
+} from './types.ts';
 
 /** Resolve and inspect a workspace's contracts area. */
 export class ContractWorkspaceResolver {
@@ -74,5 +79,21 @@ export class ContractWorkspaceResolver {
       contracts,
       modPath: join(versionDir, SCAFFOLD_FILES.MOD),
     };
+  }
+
+  /** Discover all contract version directories in numeric order. */
+  async discoverVersions(rootPath: string): Promise<ContractVersion[]> {
+    const versionsDir = join(rootPath, SCAFFOLD_DIRS.CONTRACTS, SCAFFOLD_DIRS.VERSIONS);
+    if (!await this.fs.exists(versionsDir)) {
+      throw new ScaffoldValidationError(
+        `Contracts workspace not found at ${versionsDir}. Run netscript init first.`,
+        { rootPath },
+      );
+    }
+    const entries = await this.fs.readDir(versionsDir);
+    return entries
+      .filter((entry) => entry.isDirectory && /^v[1-9]\d*$/.test(entry.name))
+      .map((entry) => parseContractVersion(entry.name))
+      .sort((left, right) => Number(left.slice(1)) - Number(right.slice(1)));
   }
 }

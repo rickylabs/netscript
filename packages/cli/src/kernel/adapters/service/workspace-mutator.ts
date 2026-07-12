@@ -10,7 +10,7 @@ import { HelpersGeneratorPipeline } from '../../templates/aspire/helpers/helpers
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
 import { ScaffoldValidationError } from '../../domain/errors.ts';
-import { addWorkspaceMember } from '../scaffold/workspace-writer.ts';
+import { addWorkspaceMember, removeWorkspaceMember } from '../scaffold/workspace-writer.ts';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../ports/template-port.ts';
 import type { ServiceConfigEntry } from '../../domain/service-shape.ts';
@@ -95,6 +95,36 @@ export async function addServiceWorkspaceMember(
   fs: FileSystemPort,
 ): Promise<void> {
   await addWorkspaceMember(
+    projectRoot,
+    `${SCAFFOLD_DIRS.SERVICES}/${serviceName}`,
+    fs,
+  );
+}
+
+/** Remove a service entry from root `appsettings.json` when present. */
+export async function removeServiceAppsettingsEntry(
+  projectRoot: string,
+  serviceName: string,
+  fs: FileSystemPort,
+): Promise<boolean> {
+  const configPath = join(projectRoot, SCAFFOLD_FILES.APPSETTINGS);
+  if (!await fs.exists(configPath)) return false;
+  const raw = JSON.parse(await fs.readFile(configPath)) as {
+    NetScript?: { Services?: Record<string, ServiceConfigEntry> };
+  };
+  if (!raw.NetScript?.Services?.[serviceName]) return false;
+  delete raw.NetScript.Services[serviceName];
+  await fs.writeFile(configPath, JSON.stringify(raw, null, 2) + '\n');
+  return true;
+}
+
+/** Remove `services/<name>` from the root Deno workspace. */
+export async function removeServiceWorkspaceMember(
+  projectRoot: string,
+  serviceName: string,
+  fs: FileSystemPort,
+): Promise<boolean> {
+  return await removeWorkspaceMember(
     projectRoot,
     `${SCAFFOLD_DIRS.SERVICES}/${serviceName}`,
     fs,

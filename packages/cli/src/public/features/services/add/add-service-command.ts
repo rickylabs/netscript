@@ -33,6 +33,7 @@ export function createServiceAddCommand(
     .option('--refs <refs:string>', 'Comma-separated service references')
     .option('--project-root <path:string>', 'Project root directory')
     .option('--force', 'Overwrite generated files if they already exist', { default: false })
+    .option('--with-client', 'Scaffold app workspace client and query helpers', { default: false })
     .action(async (options: AddServiceCommandInput): Promise<void> => {
       await DEFAULT_TEMPLATE_REGISTRY.hydrate();
       const projectRoot = await requireProjectRoot(
@@ -46,11 +47,13 @@ export function createServiceAddCommand(
         serviceReferences: parseList(options.refs),
         projectRoot,
         overwrite: options.force ?? false,
+        withClient: options.withClient ?? false,
       }, dependencies.addServiceDependencies);
 
       print(`Added service "${serviceName}" on port ${result.service.port}.`);
       print(`Created ${result.contract.scaffoldResult.filesCreated.length} contract files.`);
       print(`Created ${result.service.scaffoldResult.filesCreated.length} service files.`);
       print(`Regenerated ${result.helperFiles.length} Aspire helper files.`);
+      if (result.clientPath) print(`Created typed client helpers at ${result.clientPath}.`);
     });
 }

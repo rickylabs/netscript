@@ -9,8 +9,8 @@ import { TEMPLATE_KEYS } from '../../../assets/manifest.ts';
 import { readTemplateAssetSync } from '../../templates/template-asset.ts';
 
 export { generateContractsDenoJson } from './generate-deno-json.ts';
-export { generateV1Mod } from './generate-v1-mod.ts';
-export type { GenerateV1ModOptions } from './generate-v1-mod.ts';
+export { generateV1Mod, generateVersionMod } from './generate-v1-mod.ts';
+export type { GenerateV1ModOptions, GenerateVersionModOptions } from './generate-v1-mod.ts';
 
 /** Default in-package registry for contract Tier 2 templates. */
 export class DefaultContractTemplateRegistry implements ContractTemplateRegistry {

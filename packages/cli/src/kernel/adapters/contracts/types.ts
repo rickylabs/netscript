@@ -7,11 +7,19 @@
 import type { PackageSourceMode } from '../../domain/scaffold/scaffold-options.ts';
 import type { ScaffoldResult } from '../../domain/core-types.ts';
 
-/** Supported contract versions. */
-export type ContractVersion = 'v1';
+/** Valid version directory names for workspace contracts. */
+export type ContractVersion = `v${number}`;
 
 /** Default version for newly scaffolded contracts. */
 export const DEFAULT_CONTRACT_VERSION: ContractVersion = 'v1';
+
+/** Parse and validate a contract version supplied by a user or directory name. */
+export function parseContractVersion(value: string): ContractVersion {
+  if (!/^v[1-9]\d*$/.test(value)) {
+    throw new Error(`Invalid contract version "${value}". Expected v1, v2, and so on.`);
+  }
+  return value as ContractVersion;
+}
 
 /** Base options shared by contract scaffold operations. */
 export interface ContractScaffoldOptions {
@@ -89,6 +97,20 @@ export interface DiscoveredContract {
 
   /** Whether a matching service directory exists. */
   readonly hasService: boolean;
+}
+
+/** Inspectable route metadata for one contract procedure. */
+export interface ContractProcedure {
+  /** Procedure property name inside the contract object. */
+  readonly name: string;
+  /** HTTP method declared by the route. */
+  readonly method: string;
+  /** Explicit REST path, or null when oRPC derives it. */
+  readonly path: string | null;
+  /** Input schema source summary, or null when omitted. */
+  readonly input: string | null;
+  /** Output schema source summary, or null when omitted. */
+  readonly output: string | null;
 }
 
 /** Discovered contracts for one version directory. */
