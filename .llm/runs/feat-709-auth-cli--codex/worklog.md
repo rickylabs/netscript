@@ -99,3 +99,10 @@ handlers. No live third-party GitHub OAuth exchange was executed.
 - D3 (implementation): `.env` alone was insufficient evidence that Aspire passes configuration into
   the plugin service. The CLI also reconciles `Auth.Backend` and `Auth.Environment` in appsettings,
   which the existing plugin service context already supplies to backend composition.
+
+## Orchestrator fix-forward (Tier-A review, Codex lane quota-exhausted)
+
+- CI scaffold-runtime `runtime.auth-smoke-env` failed in 6ms: the gate spawned
+  `deno eval --allow-all <script>` and `deno eval` rejects `--allow-all` (eval always runs fully
+  permissioned) — reproduced locally verbatim. Dropped the flag; scoped check clean.
+- Applied by the beta-9 orchestrator (`09e5ae68`) — Codex lane at provider usage limit (resets 10:34).
