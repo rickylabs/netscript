@@ -20,6 +20,7 @@ import type {
   TransactionOptions,
 } from '@prisma/driver-adapter-utils';
 import { Debug, DriverAdapterError } from '@prisma/driver-adapter-utils';
+import type { Pool, PoolConnection, PoolOptions } from 'mysql2/promise';
 
 import { mapArg, mapColumnType, mapRow, type MySqlFieldInfo } from './conversion.ts';
 import { convertDriverError } from './errors.ts';
@@ -28,47 +29,18 @@ import type { MySqlCapabilities, MySqlConnectionConfig, PrismaMySqlOptions } fro
 const PACKAGE_NAME = '@netscript/prisma-adapter-mysql';
 const debug = Debug('prisma:driver-adapter:deno-mysql');
 
-// deno-lint-ignore no-explicit-any
-type AnyClient = any;
-// deno-lint-ignore no-explicit-any
-type AnyConnection = any;
-
-interface Mysql2Module {
-  createPool(options: Mysql2PoolOptions): Mysql2Pool;
-}
-
-interface Mysql2PoolOptions {
-  host?: string;
-  port?: number;
-  user?: string;
-  password?: string;
-  database?: string;
-  waitForConnections: boolean;
-  connectionLimit: number;
-  multipleStatements: boolean;
-  connectTimeout?: number;
-  ssl?: {
-    ca?: string;
-  };
-}
-
-interface Mysql2Pool {
-  query(sql: string, values?: readonly unknown[]): Promise<readonly [unknown, readonly unknown[]]>;
+interface MysqlQueryableClient {
+  query(sql: string, values?: readonly unknown[]): Promise<Record<string, unknown>[]>;
   execute(
     sql: string,
     values?: readonly unknown[],
-  ): Promise<readonly [Mysql2ExecuteResult, readonly unknown[]]>;
-  getConnection(): Promise<Mysql2Connection>;
-  end(): Promise<void>;
+  ): Promise<Mysql2ExecuteResult & { rows?: unknown[] }>;
 }
 
-interface Mysql2Connection {
-  query(sql: string, values?: readonly unknown[]): Promise<readonly [unknown, readonly unknown[]]>;
-  execute(
-    sql: string,
-    values?: readonly unknown[],
-  ): Promise<readonly [Mysql2ExecuteResult, readonly unknown[]]>;
-  release(): void;
+interface MysqlPoolClient extends MysqlQueryableClient {
+  connect(): Promise<MysqlPoolClient>;
+  useConnection<T>(fn: (connection: MysqlQueryableClient) => Promise<T>): Promise<T>;
+  close(): Promise<void>;
 }
 
 interface Mysql2ExecuteResult {
@@ -76,6 +48,20 @@ interface Mysql2ExecuteResult {
   insertId?: number | bigint;
   lastInsertId?: number | bigint;
 }
+
+interface Mysql2Queryable {
+  query(
+    sql: string,
+    values?: readonly unknown[],
+  ): Promise<readonly [unknown, readonly unknown[]]>;
+  execute(
+    sql: string,
+    values?: readonly unknown[],
+  ): Promise<readonly [unknown, readonly unknown[]]>;
+}
+
+type TypedMysql2Pool = Pool & Mysql2Queryable;
+type TypedMysql2PoolConnection = PoolConnection & Mysql2Queryable;
 
 /**
  * Simple deferred promise for synchronization
@@ -106,12 +92,12 @@ interface QueryResultWithMeta {
 /**
  * Base queryable class implementing common query logic.
  */
-class MySqlQueryable implements SqlQueryable {
+class MySqlQueryable<TClient extends MysqlQueryableClient> implements SqlQueryable {
   readonly provider = 'mysql' as const;
   readonly adapterName = PACKAGE_NAME;
 
   constructor(
-    protected client: AnyClient | AnyConnection,
+    protected client: TClient,
     protected getFields?: () => MySqlFieldInfo[] | undefined,
   ) {}
 
@@ -258,13 +244,13 @@ class MySqlQueryable implements SqlQueryable {
 /**
  * Transaction implementation for MySQL.
  */
-class MySqlTransaction extends MySqlQueryable implements Transaction {
+class MySqlTransaction extends MySqlQueryable<MysqlQueryableClient> implements Transaction {
   readonly options: TransactionOptions;
   private committed = false;
   private rolledBack = false;
 
   constructor(
-    private conn: AnyConnection,
+    private conn: MysqlQueryableClient,
     options: TransactionOptions,
     private cleanup?: () => void,
   ) {
@@ -330,9 +316,9 @@ class MySqlTransaction extends MySqlQueryable implements Transaction {
  * const prisma = new PrismaClient({ adapter });
  * ```
  */
-class PrismaMySqlAdapter extends MySqlQueryable implements SqlDriverAdapter {
+class PrismaMySqlAdapter extends MySqlQueryable<MysqlPoolClient> implements SqlDriverAdapter {
   constructor(
-    client: AnyClient,
+    client: MysqlPoolClient,
     private readonly capabilities: MySqlCapabilities,
     private readonly options?: PrismaMySqlOptions,
   ) {
@@ -362,7 +348,7 @@ class PrismaMySqlAdapter extends MySqlQueryable implements SqlDriverAdapter {
    * This implementation uses a deferred pattern to hold the connection
    * from the pool until the transaction is committed or rolled back.
    */
-  async startTransaction(isolationLevel?: IsolationLevel): Promise<Transaction> {
+  async startTransaction(isolationLevel?: IsolationLevel): Promise<MySqlTransaction> {
     const options: TransactionOptions = {
       usePhantomQuery: false,
     };
@@ -370,15 +356,15 @@ class PrismaMySqlAdapter extends MySqlQueryable implements SqlDriverAdapter {
     const tag = '[js::startTransaction]';
     debug('%s options: %O', tag, options);
 
-    const client = this.client as AnyClient;
+    const client = this.client;
 
     // Deferred to signal when we have the connection ready
-    const connectionReady = new Deferred<AnyConnection>();
+    const connectionReady = new Deferred<MysqlQueryableClient>();
     // Deferred to signal when the transaction should end (release connection)
     const transactionEnd = new Deferred<void>();
 
     // Start the connection lifecycle in the background
-    const connectionLifecycle = client.useConnection(async (conn: AnyConnection) => {
+    const connectionLifecycle = client.useConnection(async (conn: MysqlQueryableClient) => {
       try {
         // Set isolation level if specified
         if (isolationLevel) {
@@ -424,14 +410,14 @@ class PrismaMySqlAdapter extends MySqlQueryable implements SqlDriverAdapter {
    * Dispose of the adapter and close connections.
    */
   async dispose(): Promise<void> {
-    await (this.client as AnyClient).close();
+    await this.client.close();
   }
 
   /**
    * Get the underlying driver client.
    */
-  underlyingDriver(): AnyClient {
-    return this.client as AnyClient;
+  underlyingDriver(): MysqlPoolClient {
+    return this.client;
   }
 }
 
@@ -581,11 +567,15 @@ export class PrismaMySqlAdapterFactory {
    * Connect to the database and create an adapter instance.
    */
   async connect(): Promise<PrismaMySqlConnectedAdapter> {
-    const { createPool } = await import('mysql2/promise') as unknown as Mysql2Module;
+    const { createPool } = await import('mysql2/promise');
 
-    let client: AnyClient;
+    let client: MysqlPoolClient;
     try {
-      client = createMysql2Client(createPool(toMysql2PoolOptions(this.#config)));
+      const pool = createPool(toMysql2PoolOptions(this.#config));
+      if (!isMysql2Queryable(pool)) {
+        throw new TypeError('mysql2 promise pool does not expose query and execute methods');
+      }
+      client = createMysql2Client(pool);
     } catch (error) {
       // Check for connection string parsing errors
       if (error instanceof Error && error.message.includes('connect')) {
@@ -605,34 +595,39 @@ export class PrismaMySqlAdapterFactory {
       client,
       this.#capabilities,
       this.#options,
-    ) as PrismaMySqlConnectedAdapter;
+    );
   }
 }
 
-function createMysql2Client(pool: Mysql2Pool): AnyClient {
+function createMysql2Client(pool: TypedMysql2Pool): MysqlPoolClient {
   return {
-    connect(): Promise<AnyClient> {
+    connect(): Promise<MysqlPoolClient> {
       return Promise.resolve(this);
     },
     async query(sql: string, values?: readonly unknown[]): Promise<Record<string, unknown>[]> {
-      const [rows] = await pool.query(sql, values);
-      return Array.isArray(rows) ? rows as Record<string, unknown>[] : [];
+      const [rows] = await pool.query(sql, [...(values ?? [])]);
+      return Array.isArray(rows) ? rows.filter(isRecord) : [];
     },
     async execute(
       sql: string,
       values?: readonly unknown[],
     ): Promise<Mysql2ExecuteResult & { rows?: unknown[] }> {
-      const [result] = await pool.execute(sql, values);
+      const [result] = await pool.execute(sql, [...(values ?? [])]);
       return {
-        affectedRows: result.affectedRows,
-        lastInsertId: result.lastInsertId ?? result.insertId,
+        affectedRows: hasExecutionMetadata(result) ? result.affectedRows : undefined,
+        lastInsertId: hasExecutionMetadata(result) ? result.insertId : undefined,
       };
     },
     async useConnection<T>(
-      fn: (conn: AnyConnection) => Promise<T>,
+      fn: (conn: MysqlQueryableClient) => Promise<T>,
     ): Promise<T> {
       const connection = await pool.getConnection();
       try {
+        if (!isMysql2Queryable(connection)) {
+          throw new TypeError(
+            'mysql2 promise pool connection does not expose query and execute methods',
+          );
+        }
         return await fn(createMysql2Connection(connection));
       } finally {
         connection.release();
@@ -644,27 +639,27 @@ function createMysql2Client(pool: Mysql2Pool): AnyClient {
   };
 }
 
-function createMysql2Connection(connection: Mysql2Connection): AnyConnection {
+function createMysql2Connection(connection: TypedMysql2PoolConnection): MysqlQueryableClient {
   return {
     async query(sql: string, values?: readonly unknown[]): Promise<Record<string, unknown>[]> {
-      const [rows] = await connection.query(sql, values);
-      return Array.isArray(rows) ? rows as Record<string, unknown>[] : [];
+      const [rows] = await connection.query(sql, [...(values ?? [])]);
+      return Array.isArray(rows) ? rows.filter(isRecord) : [];
     },
     async execute(
       sql: string,
       values?: readonly unknown[],
     ): Promise<Mysql2ExecuteResult & { rows?: unknown[] }> {
-      const [result] = await connection.execute(sql, values);
+      const [result] = await connection.execute(sql, [...(values ?? [])]);
       return {
-        affectedRows: result.affectedRows,
-        lastInsertId: result.lastInsertId ?? result.insertId,
+        affectedRows: hasExecutionMetadata(result) ? result.affectedRows : undefined,
+        lastInsertId: hasExecutionMetadata(result) ? result.insertId : undefined,
       };
     },
   };
 }
 
-function toMysql2PoolOptions(config: MySqlConnectionConfig): Mysql2PoolOptions {
-  const options: Mysql2PoolOptions = {
+function toMysql2PoolOptions(config: MySqlConnectionConfig): PoolOptions {
+  const options: PoolOptions = {
     host: config.hostname,
     port: config.port,
     user: config.username,
@@ -683,11 +678,27 @@ function toMysql2PoolOptions(config: MySqlConnectionConfig): Mysql2PoolOptions {
   return options;
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isMysql2Queryable(value: unknown): value is Mysql2Queryable {
+  return isRecord(value) && typeof value.query === 'function' &&
+    typeof value.execute === 'function';
+}
+
+function hasExecutionMetadata(
+  value: unknown,
+): value is { affectedRows: number; insertId: number | bigint } {
+  return isRecord(value) && typeof value.affectedRows === 'number' &&
+    (typeof value.insertId === 'number' || typeof value.insertId === 'bigint');
+}
+
 /**
  * Detect MySQL server capabilities.
  */
 async function getCapabilities(
-  client: AnyClient,
+  client: MysqlQueryableClient,
 ): Promise<MySqlCapabilities> {
   const tag = '[js::getCapabilities]';
 

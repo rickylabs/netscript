@@ -5,17 +5,49 @@
  */
 
 import { z } from 'zod';
-import { defineStreamSchema } from '@netscript/plugin-streams-core';
-import { TRIGGER_EVENT_STATUSES, type TriggerEvent } from '@netscript/plugin-triggers-core/domain';
+import {
+  type CollectionEventHelpers,
+  defineStreamSchema,
+  type StateSchema,
+} from '@netscript/plugin-streams-core';
+import {
+  TRIGGER_EVENT_STATUSES,
+  type TriggerEvent,
+  type TriggerKind,
+} from '@netscript/plugin-triggers-core/domain';
 
-/** Parser surface exposed by trigger stream schema objects. */
-export type TriggerSchemaObject<TOutput = unknown> = Readonly<{
+/** Wire-safe trigger event parsed from the stream before domain ID branding. */
+export type TriggerStreamEvent =
+  & Omit<
+    TriggerEvent<TriggerKind, unknown>,
+    'id' | 'triggerId'
+  >
+  & Readonly<{ id: string; triggerId: string }>;
+
+/** Package-owned Standard Schema parser surface for trigger stream entities. */
+export interface TriggerSchemaObject<TOutput = unknown> {
+  /** Standard Schema metadata and validator consumed by durable-streams. */
+  readonly '~standard': {
+    readonly version: 1;
+    readonly vendor: string;
+    validate(value: unknown):
+      | { readonly value: TOutput }
+      | { readonly issues: readonly { readonly message: string }[] }
+      | Promise<
+        | { readonly value: TOutput }
+        | { readonly issues: readonly { readonly message: string }[] }
+      >;
+  };
+  /** Parse an input or throw a schema error. */
   parse(input: unknown): TOutput;
-  safeParse(input: unknown): unknown;
-}>;
+  /** Parse an input and return a discriminated result. */
+  safeParse(input: unknown):
+    | { readonly success: true; readonly data: TOutput }
+    | { readonly success: false; readonly error: unknown };
+}
 
 /** Zod schema for a trigger event stream envelope. */
-export const TriggerEventSchema: TriggerSchemaObject<TriggerEvent> = z.object({
+export const TriggerEventSchema: TriggerSchemaObject<TriggerStreamEvent> = z.object({
   id: z.string(),
   triggerId: z.string(),
   kind: z.string(),
@@ -25,8 +57,11 @@ export const TriggerEventSchema: TriggerSchemaObject<TriggerEvent> = z.object({
   detectedAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
   idempotencyKey: z.string().optional(),
+  requestHeaders: z.record(z.string(), z.string()).optional(),
+  traceparent: z.string().optional(),
+  tracestate: z.string().optional(),
   metadata: z.record(z.string(), z.unknown()).optional(),
-}) as unknown as TriggerSchemaObject<TriggerEvent>; // quality-allow: durable-stream schema generics are invariant across the generated trigger entity map
+});
 
 /** Zod schema for the durable stream trigger event entity. */
 export const TriggerStreamEntitySchema: TriggerSchemaObject<TriggerStreamEntity> = z.object({
@@ -38,7 +73,7 @@ export const TriggerStreamEntitySchema: TriggerSchemaObject<TriggerStreamEntity>
   updatedAt: z.string(),
   payload: z.unknown(),
   metadata: z.record(z.string(), z.unknown()).optional(),
-}) as unknown as TriggerSchemaObject<TriggerStreamEntity>; // quality-allow: durable-stream schema generics are invariant across the generated trigger entity map
+});
 
 /** Durable stream entity stored for one trigger event. */
 export type TriggerStreamEntity = Readonly<{
@@ -55,32 +90,27 @@ export type TriggerStreamEntity = Readonly<{
 /** Durable stream state definition for trigger event entities. */
 export type TriggersStreamDefinition = Readonly<{
   triggerEvent: {
-    readonly schema: TriggerSchemaObject<TriggerStreamEntity>;
+    readonly schema: typeof TriggerStreamEntitySchema;
     readonly type: 'triggerEvent';
     readonly primaryKey: 'eventId';
   };
 }>;
 
-/** Helper methods attached to trigger stream collections. */
-export type TriggerStreamCollectionHelpers = Readonly<{
-  insert(value: TriggerStreamEntity): unknown;
-  update(value: TriggerStreamEntity): unknown;
-  upsert(value: TriggerStreamEntity): unknown;
-  delete(key: string): unknown;
-}>;
-
 /** Entity-based durable stream schema surface for trigger events. */
-export type TriggersStreamSchema = Readonly<{
-  triggerEvent: TriggersStreamDefinition['triggerEvent'] & TriggerStreamCollectionHelpers;
-}>;
+export type TriggersStreamSchema = StateSchema<TriggersStreamDefinition>;
+
+/** Helper methods attached to trigger stream collections. */
+export type TriggerStreamCollectionHelpers = CollectionEventHelpers<TriggerStreamEntity>;
 
 /** Entity-based durable stream schema for trigger events. */
-export const triggersStreamSchema: TriggersStreamSchema = defineStreamSchema({
+export const triggersStreamSchema: TriggersStreamSchema = defineStreamSchema<
+  TriggersStreamDefinition
+>({
   triggerEvent: {
     schema: TriggerStreamEntitySchema,
     type: 'triggerEvent',
     primaryKey: 'eventId',
   },
-}) as unknown as TriggersStreamSchema; // quality-allow: durable-stream schema generics are invariant across the generated trigger entity map
+});
 
 export type { TriggerEvent };

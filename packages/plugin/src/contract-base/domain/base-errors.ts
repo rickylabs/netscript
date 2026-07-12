@@ -41,7 +41,45 @@ export interface BasePluginErrorDefinition {
   /** Default human-readable message for the error. */
   readonly message: string;
   /** Standard-schema describing the error `data` payload. */
-  readonly data: unknown;
+  readonly data: PluginErrorDataSchema;
+}
+
+interface ParseSchema<TOutput> {
+  parse(value: unknown): TOutput;
+}
+
+/** Package-owned Standard Schema surface used for oRPC error data. */
+export interface PluginErrorDataSchema<TOutput = unknown> {
+  /** Standard Schema metadata and validator consumed by oRPC. */
+  readonly '~standard': {
+    readonly version: 1;
+    readonly vendor: string;
+    validate(value: unknown):
+      | { readonly value: TOutput }
+      | { readonly issues: readonly { readonly message: string }[] }
+      | Promise<
+        | { readonly value: TOutput }
+        | { readonly issues: readonly { readonly message: string }[] }
+      >;
+  };
+}
+
+function toStandardSchema<TOutput>(schema: ParseSchema<TOutput>): PluginErrorDataSchema<TOutput> {
+  return {
+    '~standard': {
+      version: 1,
+      vendor: '@netscript/plugin',
+      validate(value: unknown) {
+        try {
+          return { value: schema.parse(value) };
+        } catch (error: unknown) {
+          return {
+            issues: [{ message: error instanceof Error ? error.message : String(error) }],
+          };
+        }
+      },
+    },
+  };
 }
 
 /**
@@ -67,12 +105,12 @@ export const BASE_PLUGIN_ERRORS: Readonly<{
   NOT_FOUND: {
     status: 404,
     message: 'Resource not found',
-    data: NotFoundErrorSchema,
+    data: toStandardSchema(NotFoundErrorSchema),
   },
   VALIDATION_ERROR: {
     status: 422,
     message: 'Validation failed',
-    data: ValidationErrorSchema,
+    data: toStandardSchema(ValidationErrorSchema),
   },
   INTERNAL: {
     status: 500,

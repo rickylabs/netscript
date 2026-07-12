@@ -25,6 +25,7 @@
 import { oc } from '@orpc/contract';
 import type {
   AnyContractRouter,
+  AnySchema,
   ContractProcedure,
   ContractProcedureBuilderWithOutput,
   ErrorMap,
@@ -45,8 +46,7 @@ import { type PluginCapabilities, PluginCapabilitiesSchema } from './capabilitie
  * whose output is not `PluginCapabilities` fails `satisfies BasePluginContract`.
  */
 export type BasePluginDescribeProcedure = ContractProcedure<
-  // deno-lint-ignore no-explicit-any -- input is intentionally open; only the output is constrained.
-  any,
+  AnySchema,
   Schema<unknown, PluginCapabilities>,
   ErrorMap,
   Meta
@@ -108,15 +108,8 @@ export type BasePluginDescribeRoute = ContractProcedureBuilderWithOutput<
  */
 export const BASE_PLUGIN_CONTRACT_ROUTES: { readonly describe: BasePluginDescribeRoute } = Object
   .freeze({
-    // Centralized contract definition: `BASE_PLUGIN_ERRORS` types each `data`
-    // field as `unknown` (it is a plain error vocabulary, not a builder fragment),
-    // so the error map crosses into the oRPC contract builder via the single
-    // sanctioned centralized-contract `as unknown as` boundary cast — the same
-    // pattern `@netscript/contracts` uses for `baseContract`. Everything after
-    // this point is genuinely typed: the route, the output schema, and the
-    // `satisfies BasePluginContract` conformance carry real oRPC types.
     describe: oc
-      .errors({ ...BASE_PLUGIN_ERRORS } as unknown as Parameters<typeof oc.errors>[0])
+      .errors({ ...BASE_PLUGIN_ERRORS })
       .route({ method: 'GET', path: '/describe' })
       .output(PluginCapabilitiesSchema),
   });

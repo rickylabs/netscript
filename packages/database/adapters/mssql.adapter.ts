@@ -340,6 +340,7 @@ export class MssqlAdapter<
     $connect(): Promise<void>;
     $disconnect(): Promise<void>;
     $queryRaw: unknown;
+    $queryRawUnsafe: unknown;
     $executeRaw: unknown;
     $executeRawUnsafe: unknown;
   },
@@ -492,11 +493,11 @@ export class MssqlAdapter<
   /** Execute a raw query through the configured Prisma client. */
   executeRaw<T = unknown>(query: string, ...params: unknown[]): Promise<T> {
     const client = this.getClient();
-    const $queryRaw = client.$queryRaw as (
-      query: TemplateStringsArray | string,
+    const $queryRawUnsafe = client.$queryRawUnsafe as (
+      query: string,
       ...params: unknown[]
     ) => Promise<T>;
-    return $queryRaw(query as unknown as TemplateStringsArray, ...params);
+    return $queryRawUnsafe(query, ...params);
   }
 
   /** Execute an unsafe raw command through the configured Prisma client. */
@@ -518,6 +519,7 @@ export function createMssqlAdapter<
     $connect(): Promise<void>;
     $disconnect(): Promise<void>;
     $queryRaw: unknown;
+    $queryRawUnsafe: unknown;
     $executeRaw: unknown;
     $executeRawUnsafe: unknown;
   },

@@ -1,5 +1,7 @@
 import { getKv } from '@netscript/kv';
 import { collection, createNetscriptDb, type KvObject, model } from '@netscript/kv/kvdex';
+import { z } from 'zod';
+import { SAGA_INSTANCE_STATUSES } from '@netscript/plugin-sagas-core/domain';
 import type {
   PrismaRecord,
   SagaDefinitionResponse,
@@ -37,49 +39,46 @@ export type SagaInstanceKv = Readonly<{
   lastMessageType?: string;
 }>;
 
-/** KV fallback document shape returned by kvdex queries. */
-export type SagaKvDocument = Readonly<{
-  /** Stored saga instance value. */
-  value: unknown;
-}>;
-
-/** KV fallback query result shape. */
-export type SagaKvQueryResult = Readonly<{
-  /** Query result documents. */
-  result: readonly SagaKvDocument[];
-}>;
-
-/** KV fallback collection operations used by V1 handlers. */
-export interface SagaKvCollection {
-  /** Find documents by a secondary index. */
-  findBySecondaryIndex(
-    index: 'sagaName' | 'status',
-    value: string,
-    options?: { filter?: (doc: SagaKvDocument) => boolean },
-  ): Promise<SagaKvQueryResult>;
-  /** Return all saga instance documents. */
-  getMany(): Promise<SagaKvQueryResult>;
-}
-
-/** KV fallback database shape used by V1 handlers. */
-export interface SagaKvDatabase {
-  /** Saga instance collection. */
-  sagaInstances: SagaKvCollection;
-}
+const SagaInstanceKvSchema: z.ZodType<SagaInstanceKv> = z.object({
+  sagaName: z.string(),
+  correlationId: z.string(),
+  state: z.record(z.string(), z.unknown()),
+  status: z.enum(SAGA_INSTANCE_STATUSES),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  completedAt: z.string().optional(),
+  version: z.number(),
+  messageCount: z.number(),
+  lastMessageType: z.string().optional(),
+});
 
 const sagaModel = model<KvObject>();
 const sagaIdGen = (instance: KvObject) =>
   `${String(instance.sagaName)}:${String(instance.correlationId)}`;
 
-const sagaInstancesSchema = {
-  sagaInstances: collection(sagaModel, {
-    idGenerator: sagaIdGen,
-    indices: {
-      sagaName: 'secondary',
-      status: 'secondary',
-    },
-  }),
+type SagaCollectionOptions = {
+  idGenerator: typeof sagaIdGen;
+  indices: { sagaName: 'secondary'; status: 'secondary' };
 };
+
+const sagaInstances: ReturnType<
+  typeof collection<KvObject, KvObject, SagaCollectionOptions>
+> = collection(sagaModel, {
+  idGenerator: sagaIdGen,
+  indices: {
+    sagaName: 'secondary',
+    status: 'secondary',
+  },
+});
+
+const sagaInstancesSchema: { sagaInstances: typeof sagaInstances } = {
+  sagaInstances,
+};
+
+/** Inferred KV database returned by the NetScript Kvdex factory. */
+export type SagaKvDatabase = Awaited<
+  ReturnType<typeof createNetscriptDb<typeof sagaInstancesSchema>>
+>;
 
 let sagaDb: Awaited<ReturnType<typeof createNetscriptDb<typeof sagaInstancesSchema>>> | null = null;
 
@@ -89,7 +88,12 @@ export async function getSagaDb(): Promise<SagaKvDatabase> {
     await getKv();
     sagaDb = await createNetscriptDb(sagaInstancesSchema);
   }
-  return sagaDb as unknown as SagaKvDatabase; // quality-allow: Prisma extension erases the concrete saga KV database methods from its generated client type
+  return sagaDb;
+}
+
+/** Validate and return one KV-backed saga instance. */
+export function parseSagaInstanceKv(value: unknown): SagaInstanceKv {
+  return SagaInstanceKvSchema.parse(value);
 }
 
 /** Whether a database value exposes the Prisma saga instance subset. */
