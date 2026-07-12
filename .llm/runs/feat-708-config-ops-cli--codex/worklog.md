@@ -100,3 +100,9 @@ not invented in this CLI slice. The orchestrator owns `scaffold.runtime` / full 
 - **D1 (carried, owner-authorized):** PLAN-EVAL is waived in the slice brief. This worklog records a
   short plan/design checkpoint before implementation; this implementation lane does not claim a
   PLAN-EVAL or IMPL-EVAL verdict.
+
+## Orchestrator fix-forward (Tier-A review, Codex lane quota-exhausted)
+
+- CI check-test: `local-contributor-command-tree_test.ts` expectation missed the new `config`
+  command group. Rebased onto post-#717 main and added `config` to the expected list (test green).
+- Applied by the beta-9 orchestrator (`09e5ae68`) — Codex lane at provider usage limit (resets 10:34).
