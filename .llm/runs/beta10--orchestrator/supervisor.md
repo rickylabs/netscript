@@ -9,8 +9,8 @@
 | Mode | Foreground interactive, remote control on |
 | Session id | _record on launch_ |
 | Host | WSL2 (`/home/codex`) |
-| Checkout | `/home/codex/repos/ns-dashboard-design-orchestrator` |
-| Branch | `main` @ `93546ae3` (baseline) |
+| Checkout | `/home/codex/repos/netscript-beta10` (worktree, cut from `origin/main`) |
+| Branch | `feat/beta10-integration` @ `0341c434` (baseline = `origin/main`) |
 | Milestone | [0.0.1-beta.10](https://github.com/rickylabs/netscript/milestone/12) — 44 open / 3 closed |
 
 ## Routing overrides in force
