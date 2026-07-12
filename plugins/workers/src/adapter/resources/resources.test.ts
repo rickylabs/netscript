@@ -32,7 +32,7 @@ Deno.test('workers add job emits the same shape at the user-named path', () => {
   const source = artifactText(artifact);
   assertStringIncludes(source, 'welcomeEmailJob');
   assertStringIncludes(source, "jobId: 'welcome-email'");
-  assertStringIncludes(source, 'const PayloadSchema = z.object({}).passthrough()');
+  assertStringIncludes(source, 'const PayloadSchema = z.object({}).passthrough().default({})');
   assertStringIncludes(source, 'PayloadSchema.parse(context.payload)');
 });
 

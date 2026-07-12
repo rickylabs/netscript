@@ -60,6 +60,8 @@ plugin's `src/cli/commands.ts` and input parser.
 | 2026-07-12 | 1 | reconcile | Current source/contracts still match the locked plan; no issue/PR mutation permitted and no scope adjustment needed. |
 | 2026-07-12 | 2 | implement | Rewrote tutorials around verified commands and corrected auth install wording. |
 | 2026-07-12 | 2 | reconcile | `add file-watch` has no `--job`; docs use its real flags and retain a small generated-handler edit. No plan rescope required. |
+| 2026-07-12 | CI repair | diagnosis | PR runtime feedback showed the health-check trigger passed but execution polling failed. The generated health-check receives no payload, and `PayloadSchema.parse(undefined)` threw before returning success. |
+| 2026-07-12 | CI repair | implement | Defaulted the generated empty starter schema to `{}` and strengthened the artifact regression assertion; typed payload customization remains intact. |
 
 ## Gate Results
 
@@ -85,7 +87,14 @@ plugin's `src/cli/commands.ts` and input parser.
 | Auth naming | PASS | Auth README contains `plugin install`; stale `plugin add` wording removed. |
 | Public-docs law | PASS | Added-line scan against the baseline returned 0 forbidden internal-wording hits. |
 | Lock hygiene | PASS | `deno.lock` is unchanged; `git diff --check` passes. |
-| Runtime E2E | NOT_RUN | Explicitly prohibited for this lane; orchestrator owns `scaffold.runtime`. |
+| Runtime E2E | PASS | Owner-authorized CI repair run: `scaffold.runtime` passed 60, failed 0; `behavior.workers-executions` passed in 1121 ms. |
+
+### CI repair override
+
+The owner subsequently authorized one serialized local `scaffold.runtime` run to repair PR CI. The
+one-pass command exited 0 with `passed=60 failed=0`; the previously failing
+`behavior.workers-executions` gate passed in 1121 ms. This authorization superseded the earlier lane
+prohibition for this repair only.
 
 ## Handoff Notes
 

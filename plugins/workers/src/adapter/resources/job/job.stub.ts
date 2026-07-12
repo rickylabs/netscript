@@ -15,7 +15,7 @@ export const jobStub: StubSource<'JOB_ID' | 'JOB_EXPORT'> = defineStub({
 } from '@netscript/plugin-workers-core';
 import { z } from 'zod';
 
-const PayloadSchema = z.object({}).passthrough();
+const PayloadSchema = z.object({}).passthrough().default({});
 type Payload = z.infer<typeof PayloadSchema>;
 
 /**
