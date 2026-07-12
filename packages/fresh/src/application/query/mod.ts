@@ -25,6 +25,8 @@ export { getIslandQueryClient, resetIslandQueryClient } from './query-client.ts'
 export type {
   DehydratedState,
   InitialDataFor,
+  IslandInfiniteData,
+  IslandInfiniteQueryContext,
   IslandInfiniteQueryOptions,
   IslandInfiniteQueryResult,
   IslandLiveQueryFactory,

@@ -66,11 +66,36 @@ export interface IslandSuspenseQueryResult<TData = unknown, TError = unknown>
   readonly data: TData;
 }
 
+/** Page collection returned by an island infinite query. */
+export interface IslandInfiniteData<TData = unknown, TPageParam = unknown> {
+  /** Loaded query pages in fetch order. */
+  readonly pages: TData[];
+  /** Page parameters corresponding to each loaded page. */
+  readonly pageParams: TPageParam[];
+}
+
+/** Context passed to an island infinite-query loader. */
+export interface IslandInfiniteQueryContext<TPageParam = unknown> {
+  /** Query client executing the load. */
+  readonly client: IslandQueryClient;
+  /** Stable key for the query. */
+  readonly queryKey: QueryKey;
+  /** Signal aborted when the query is canceled. */
+  readonly signal: AbortSignal;
+  /** Page parameter selected by the pagination callback. */
+  readonly pageParam: TPageParam;
+  /** Optional query metadata. */
+  readonly meta: Record<string, unknown> | undefined;
+}
+
 /** Result of an island infinite query hook call. */
-export interface IslandInfiniteQueryResult<TData = unknown, TError = unknown>
-  extends IslandQueryResult<TData, TError> {
+export interface IslandInfiniteQueryResult<
+  TData = unknown,
+  TError = unknown,
+  TPageParam = unknown,
+> extends IslandQueryResult<IslandInfiniteData<TData, TPageParam>, TError> {
   /** Fetch the next page from the underlying infinite query. */
-  fetchNextPage(): Promise<IslandInfiniteQueryResult<TData, TError>>;
+  fetchNextPage(): Promise<IslandInfiniteQueryResult<TData, TError, TPageParam>>;
   /** Whether another page is available. */
   readonly hasNextPage: boolean;
   /** Whether the next page is being fetched. */
@@ -130,13 +155,19 @@ export interface IslandQueryOptions<TData = unknown, TError = unknown, TSelected
 
 /** Options accepted by `useIslandInfiniteQuery`. */
 export interface IslandInfiniteQueryOptions<TData = unknown, TError = unknown, TPageParam = unknown>
-  extends Omit<IslandQueryOptions<TData, TError, TData>, 'queryFn'> {
+  extends Omit<IslandQueryOptions<TData, TError, TData>, 'queryFn' | 'initialData' | 'select'> {
   /** Function that loads one page of query data. */
-  queryFn: (context: { pageParam: TPageParam }) => Promise<TData> | TData;
+  queryFn: (context: IslandInfiniteQueryContext<TPageParam>) => Promise<TData> | TData;
   /** Initial page parameter. */
   initialPageParam: TPageParam;
+  /** Previously loaded pages supplied from a Fresh server loader. */
+  initialData?: IslandInfiniteData<TData, TPageParam>;
+  /** Optional projection applied to the complete page collection. */
+  select?: (
+    data: IslandInfiniteData<TData, TPageParam>,
+  ) => IslandInfiniteData<TData, TPageParam>;
   /** Resolve the next page parameter from the current page set. */
-  getNextPageParam?: (
+  getNextPageParam: (
     lastPage: TData,
     allPages: readonly TData[],
   ) => TPageParam | undefined;

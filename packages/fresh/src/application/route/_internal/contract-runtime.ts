@@ -349,20 +349,20 @@ export function pairRouteTargets<
   };
 }
 
-export function createRouteReference<const TRoutePattern extends string>(
+export function createRouteReference<
+  const TRoutePattern extends string,
+  TPath extends object = InferRoutePatternPath<TRoutePattern>,
+>(
   routePattern: TRoutePattern,
   metadata?: RouteReferenceOptions,
-): RouteReference<InferRoutePatternPath<TRoutePattern>, SearchParamInput> {
-  return createRouteReferenceBase<InferRoutePatternPath<TRoutePattern>, SearchParamInput>({
+): RouteReference<TPath, SearchParamInput> {
+  return createRouteReferenceBase<TPath, SearchParamInput>({
     routePattern,
     parsePath(input) {
-      return inferRoutePathFromPattern<InferRoutePatternPath<TRoutePattern>>(routePattern, input);
+      return inferRoutePathFromPattern<TPath>(routePattern, input);
     },
     safeParsePath(input) {
-      return safeInferRoutePathFromPattern<InferRoutePatternPath<TRoutePattern>>(
-        routePattern,
-        input,
-      );
+      return safeInferRoutePathFromPattern<TPath>(routePattern, input);
     },
     parseSearch(input) {
       return toSearchParamInput(input);
@@ -370,6 +370,34 @@ export function createRouteReference<const TRoutePattern extends string>(
     safeParseSearch(input) {
       return { success: true, data: toSearchParamInput(input) };
     },
+    metadata,
+  });
+}
+
+/** Output-typed route contract consumed by the public compatibility facade. */
+export interface OutputRouteContract<TPath extends object, TSearch extends object> {
+  readonly pathSchema?: PathParamSchema<TPath>;
+  readonly searchSchema?: SearchParamSchema<TSearch>;
+  parsePath(input: PathParamInput): TPath;
+  safeParsePath(input: PathParamInput): SchemaParseResult<TPath>;
+  parseSearch(input: URLSearchParams | SearchParamInput): TSearch;
+  safeParseSearch(input: URLSearchParams | SearchParamInput): SchemaParseResult<TSearch>;
+}
+
+/** Bind an output-typed contract without erasing its path and search generics. */
+export function bindOutputRoutePattern<TPath extends object, TSearch extends object>(
+  contract: OutputRouteContract<TPath, TSearch>,
+  routePattern: string,
+  metadata?: RouteReferenceOptions,
+): RouteReference<TPath, TSearch> {
+  return createRouteReferenceBase({
+    routePattern,
+    pathSchema: contract.pathSchema,
+    searchSchema: contract.searchSchema,
+    parsePath: (input) => contract.parsePath(input),
+    safeParsePath: (input) => contract.safeParsePath(input),
+    parseSearch: (input) => contract.parseSearch(input),
+    safeParseSearch: (input) => contract.safeParseSearch(input),
     metadata,
   });
 }

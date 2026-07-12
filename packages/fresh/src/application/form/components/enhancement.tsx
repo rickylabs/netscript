@@ -167,16 +167,16 @@ export function useFormEnhancement<TValues extends FormValues>(
   };
 }
 
+type MutableFormFieldErrors = Record<string, string[]> & { _form: string[] };
+
 function createEmptyFieldErrors<TValues extends FormValues>(
   fallback: FormFieldErrors<TValues>,
-): FormFieldErrors<TValues> {
-  const empty = { _form: [] } as FormFieldErrors<TValues>;
+): MutableFormFieldErrors {
+  const empty: MutableFormFieldErrors = { _form: [] };
 
   for (const key of Object.keys(fallback)) {
     if (key !== '_form') {
-      empty[key as Extract<keyof TValues, string>] = [] as unknown as FormFieldErrors<TValues>[
-        Extract<keyof TValues, string>
-      ];
+      empty[key] = [];
     }
   }
 
@@ -196,11 +196,7 @@ function toClientFieldErrors<TValues extends FormValues>(
         continue;
       }
 
-      nextErrors[field as Extract<keyof TValues, string>] = [
-        ...messages,
-      ] as unknown as FormFieldErrors<TValues>[
-        Extract<keyof TValues, string>
-      ];
+      nextErrors[field] = [...messages];
     }
 
     nextErrors._form = [...flattened.formErrors];

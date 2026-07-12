@@ -451,7 +451,10 @@ function createBuilder<TTypes extends AnyDefinePageTypeState, THasConfiguredRout
     type TRouteTypes = DefinePageWithRoute<TTypes, TRoute>;
     return createBuilder<TRouteTypes, true>(promoteRouteConfig(config, route));
   }
-  function withRouteContract<TPathSchema = unknown, TSearchSchema = unknown>(
+  function withRouteContract<
+    TPathSchema extends PathParamSchema<object> | undefined = undefined,
+    TSearchSchema extends SearchParamSchema<object> | undefined = undefined,
+  >(
     contract: DefinePageRouteContractInput<TPathSchema, TSearchSchema>,
   ): DefinePageBuilder<DefinePageWithRouteContract<TTypes, TPathSchema, TSearchSchema>, true> {
     type TRouteTypes = DefinePageWithRouteContract<TTypes, TPathSchema, TSearchSchema>;

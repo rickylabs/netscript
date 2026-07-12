@@ -16,7 +16,6 @@ import type {
   DefinePageRouteNav,
   EmptyRecord,
   HasPathParams,
-  InferSchemaOutput,
   PathParamInput,
   PathParamSchema,
   SchemaParseResult,
@@ -25,6 +24,7 @@ import type {
   Simplify,
   ValidatedRouteHref,
 } from '../../builders/define-page/types.ts';
+import type { SchemaObjectOutput } from '../schema-output.ts';
 
 export type {
   CurrentRouteState,
@@ -57,12 +57,8 @@ export interface EnumPathParamDefinition<
   parse(value: string | undefined): TValues[number] | null;
 }
 
-export type RouteContractPathOf<TPathSchema> = InferSchemaOutput<TPathSchema> extends object
-  ? InferSchemaOutput<TPathSchema>
-  : EmptyRecord;
-export type RouteContractSearchOf<TSearchSchema> = InferSchemaOutput<TSearchSchema> extends object
-  ? InferSchemaOutput<TSearchSchema>
-  : EmptyRecord;
+export type RouteContractPathOf<TPathSchema> = SchemaObjectOutput<TPathSchema>;
+export type RouteContractSearchOf<TSearchSchema> = SchemaObjectOutput<TSearchSchema>;
 
 type StripLeadingSlash<TPattern extends string> = TPattern extends `/${infer TRest}` ? TRest
   : TPattern;
