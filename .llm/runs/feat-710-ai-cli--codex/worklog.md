@@ -36,6 +36,9 @@ boxes are the locked contract.
 
 ### Implementation slice
 
+- Commit `646456f4` (`feat(cli): make AI resources self-configuring`) contains the adapter contract,
+  host `plugin ai` forwarding surface, AI lifecycle commands, generated composition, and focused
+  tests.
 - Scoped check wrappers passed for `plugins/ai` (37 files), `packages/plugin` (151 files),
   `packages/cli/src/public/features/plugins` (43 files), and `packages/cli/e2e` (86 files), all with
   zero diagnostics and `--unstable-kv` supplied by the wrapper.
@@ -54,6 +57,13 @@ boxes are the locked contract.
   now contains `scaffold.plugin.ai.lifecycle`, which adds `e2e-tool`, and the AI chat behavior gate
   resolves and calls that tool through the generated composition root. Execution remains unproven
   until the orchestrator runs the gate.
+
+### Reconcile notes
+
+- Slice 1: acceptance scope remains items 1–5; skills lifecycle remains deferred. No PR was opened
+  or commented because the brief explicitly prohibits this implementation lane from opening PRs.
+- Slice 2: E2E coverage is registered in both `scaffold.plugins` and `scaffold.runtime`; execution is
+  deliberately left to the beta-9 orchestrator.
 
 ## Drift
 
