@@ -58,8 +58,9 @@
 | same in `plugins/auth` | 0 | success; no slow-type allowance |
 
 Full historical `doc:lint` remains red in `packages/plugin` (13 private-type-ref diagnostics in
-untouched contract-base/service files), `plugins/auth` (2 upstream auth-contract diagnostics after
-the touched public manifest was fixed), and `plugins/ai` (16 pre-existing diagnostics). The touched
-plugin config/protocol entrypoints are clean, and the CI workflow therefore runs the already-clean
-CLI publish surface rather than laundering those unrelated baselines. `arch:check` similarly reports
-pre-existing warnings but exits 0. No `scaffold.runtime` was run, by owner instruction.
+untouched contract-base/service files), `plugins/auth` (2 upstream auth-contract diagnostics), and
+`plugins/ai` (16 pre-existing diagnostics). CI runs the clean CLI export map plus every public
+entrypoint changed by this slice (`packages/plugin` config/protocol and the auth public manifest),
+so none of the new surface is omitted while unrelated baseline debt is not misreported as slice
+regression. `arch:check` similarly reports pre-existing warnings but exits 0. No
+`scaffold.runtime` was run, by owner instruction.

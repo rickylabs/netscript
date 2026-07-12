@@ -89,7 +89,7 @@ export async function getSagaDb(): Promise<SagaKvDatabase> {
     await getKv();
     sagaDb = await createNetscriptDb(sagaInstancesSchema);
   }
-  return sagaDb as unknown as SagaKvDatabase; // quality-allow: compatibility boundary between independently resolved upstream generic types
+  return sagaDb as unknown as SagaKvDatabase; // quality-allow: Prisma extension erases the concrete saga KV database methods from its generated client type
 }
 
 /** Whether a database value exposes the Prisma saga instance subset. */
