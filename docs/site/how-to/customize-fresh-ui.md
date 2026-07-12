@@ -123,6 +123,11 @@ explains how the two relate and where each layer's responsibilities begin and en
 
 ## Edit a route
 
+Create a typed page first with `netscript ui:add page status --route status --island`, then
+customize its generated view. This writes `routes/status/index.tsx` with `definePage()`; `--island`
+also creates colocated `(_islands)/` and `(_shared)/query-loaders.ts` seams. The Vite route
+generator discovers it on the next build.
+
 Routes are plain `.tsx` files under `routes/`. The scaffold uses the `definePage()`
 builder (from `@app/utils.ts`) so a page declares its route, metadata, and the view
 it renders in one typed chain. To change the home page, edit
@@ -164,6 +169,10 @@ removed route fails the type-check rather than 404-ing at runtime.
 {{ /comp }}
 
 ## Add interactivity with an island
+
+Generate a standalone signals island with `netscript ui:add island Counter`. Add `--query` for a
+`QueryIsland` provider wired to `@netscript/fresh/query`, then import the generated island from the
+route where it should hydrate.
 
 Server-rendered routes ship zero client JavaScript. When you need state in the
 browser — a toggle, a form, a live panel — add an **island** under `islands/`.
