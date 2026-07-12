@@ -29,3 +29,13 @@ export type {
   TelemetryProbePort,
   TelemetryProbeResult,
 } from './src/domain/telemetry-probe-port.ts';
+export { MAX_INDEXED_DOC_LENGTH, slugifyDocsHeading } from './src/domain/docs-corpus-port.ts';
+export type {
+  DocsCorpusPort,
+  DocsDocument,
+  DocsSearchMatch,
+  DocsSection,
+  DocsSummary,
+} from './src/domain/docs-corpus-port.ts';
+export { FilesystemDocsCorpus } from './src/infrastructure/filesystem-docs-corpus.ts';
+export type { FilesystemDocsCorpusOptions } from './src/infrastructure/filesystem-docs-corpus.ts';
