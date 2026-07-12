@@ -166,6 +166,12 @@ export function planCodexCommand(input: CodexPlanningInput): AgentCommandPlan {
         ...(input.profile
           ? ['--profile', input.profile.name, '--profile-home', input.profile.home]
           : []),
+        '--provider',
+        command.route.provider,
+        '--model',
+        command.route.model,
+        '--effort',
+        command.route.effort,
         '--brief',
         command.content.path,
         '--worktree',

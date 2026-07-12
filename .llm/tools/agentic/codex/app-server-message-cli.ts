@@ -10,10 +10,9 @@ if (import.meta.main) {
   const effort = value(Deno.args, '--effort');
   const cwd = value(Deno.args, '--cwd');
   const message = value(Deno.args, '--message');
-  const profile = value(Deno.args, '--profile') ?? undefined;
   if (!model || !effort || !cwd || !message) {
     console.error('Usage: app-server-message-cli --model M --effort E --cwd PATH --message TEXT');
     Deno.exit(2);
   }
-  Deno.exit(await sendAppServerMessage({ model, effort, cwd, profile }, message));
+  Deno.exit(await sendAppServerMessage({ model, effort, cwd }, message));
 }

@@ -59,9 +59,15 @@ import {
 import {
   compareLaunchIdentity,
   enforceLaunchIdentity,
+  type LaunchIdentityEvidence,
   type RequestedLaunchIdentity,
   requestedLaunchIdentity,
 } from '../runtime/launch-route-identity.ts';
+import {
+  CODEX_OPENROUTER_PROFILE_FILE,
+  CODEX_OPENROUTER_PROFILE_NAME,
+  renderCodexOpenRouterProfile,
+} from '../runtime/adapters/codex-profile-adapter.ts';
 import { LocalSenderOwnershipAdapter } from '../runtime/adapters/local-sender-ownership-adapter.ts';
 import {
   activateSenderOwnership,
@@ -87,6 +93,66 @@ interface Options {
   model?: string;
   effort?: string;
   allowRouteMismatch: boolean;
+}
+
+export interface LauncherProfilePlan {
+  readonly home: string;
+  readonly name: string;
+  readonly namedPath: string;
+  readonly appServerPath: string;
+  readonly content: string;
+}
+
+/** Plans the isolated named profile and equivalent app-server base config. */
+export function planLauncherProfile(
+  requested: RequestedLaunchIdentity,
+  options: Readonly<Pick<Options, 'profile' | 'profileHome' | 'worktree'>>,
+): LauncherProfilePlan | null {
+  if (requested.provider !== 'openrouter') {
+    if (options.profile || options.profileHome) {
+      throw new Error('named launcher profiles are supported only for the Codex OpenRouter route');
+    }
+    return null;
+  }
+  if (
+    options.profile !== CODEX_OPENROUTER_PROFILE_NAME ||
+    !options.profileHome?.startsWith('/home/') || !options.worktree
+  ) {
+    throw new Error(
+      `OpenRouter launches require --profile ${CODEX_OPENROUTER_PROFILE_NAME} and a native /home profile directory`,
+    );
+  }
+  const home = options.profileHome.replace(/\/$/, '');
+  const content = renderCodexOpenRouterProfile({
+    agent: 'codex',
+    provider: 'openrouter',
+    profileId: 'codex-openrouter',
+    model: requested.model,
+    effort: requested.effort,
+    worktree: options.worktree,
+    mobileRequired: false,
+  });
+  if (!content) throw new Error('OpenRouter profile could not be rendered');
+  return {
+    home,
+    name: options.profile,
+    namedPath: `${home}/${CODEX_OPENROUTER_PROFILE_FILE}`,
+    // app-server does not accept top-level --profile. Its isolated CODEX_HOME
+    // therefore consumes the exact same supported profile as base config.
+    appServerPath: `${home}/config.toml`,
+    content,
+  };
+}
+
+/** Keeps successful process outcome truthful while still failing route mismatches. */
+export function launcherExitCode(
+  processCode: number,
+  evidence: LaunchIdentityEvidence,
+  allowRouteMismatch: boolean,
+): number {
+  if (processCode !== 0) return 1;
+  if (evidence.status === 'mismatch' && !allowRouteMismatch) return 1;
+  return 0;
 }
 
 function printHelp(): void {
@@ -294,6 +360,14 @@ async function main(): Promise<void> {
     console.error('non-OpenAI Codex routes require an explicit --profile and --profile-home');
     Deno.exit(2);
   }
+  let profilePlan: LauncherProfilePlan | null;
+  try {
+    profilePlan = planLauncherProfile(requested, o);
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : String(error));
+    Deno.exit(2);
+    return;
+  }
   const dest = o.dest ?? `${wslHome()}/${o.slug ?? 'slice'}-brief.md`;
 
   // 1) Validate the brief contract (read on Windows; LF-normalize in memory).
@@ -346,12 +420,11 @@ async function main(): Promise<void> {
   // which derives the agent's worktree from the ambient cwd) in the wrong
   // directory. See wslCd in agentic-lib.ts.
   const routeFlags = `--model ${sq(requested.model)} --effort ${sq(requested.effort)}`;
-  const profileFlags = o.profile && o.profileHome ? ` --profile ${sq(o.profile)}` : '';
   const clientPath = `${o.worktree}/.llm/tools/agentic/codex/app-server-message-cli.ts`;
-  const home = o.profileHome ? ` CODEX_HOME=${sq(o.profileHome)}` : '';
+  const home = profilePlan ? ` CODEX_HOME=${sq(profilePlan.home)}` : '';
   const profileScript = `export PATH="$HOME/.local/bin:$PATH"${home}; msg="$(cat ${
     sq(dest)
-  })"; deno run --allow-run ${sq(clientPath)} ${routeFlags}${profileFlags} --cwd ${
+  })"; deno run --allow-run ${sq(clientPath)} ${routeFlags} --cwd ${
     sq(o.worktree)
   } --message "$msg"`;
   const commandPlan = await resolveWslCommand(o.user, profileScript, { cwd: o.worktree });
@@ -367,6 +440,14 @@ async function main(): Promise<void> {
     gitSafety: { branch: info.branch, head: info.head, upstream: info.upstream, dirty: info.dirty },
     launchCommand,
     requestedRoute: requested,
+    profile: profilePlan
+      ? {
+        home: profilePlan.home,
+        name: profilePlan.name,
+        namedPath: profilePlan.namedPath,
+        appServerPath: profilePlan.appServerPath,
+      }
+      : null,
   };
 
   // Resolve and inspect the durable sender registry before the dry-run branch so
@@ -428,6 +509,26 @@ async function main(): Promise<void> {
     Deno.exit(4);
   }
 
+  if (profilePlan) {
+    const encoded = new TextEncoder().encode(profilePlan.content).toBase64();
+    const materialized = await wsl(
+      o.user,
+      `install -d -m 700 ${sq(profilePlan.home)} && ` +
+        `printf %s ${sq(encoded)} | base64 -d > ${sq(profilePlan.namedPath)} && ` +
+        `cp ${sq(profilePlan.namedPath)} ${sq(profilePlan.appServerPath)} && ` +
+        `chmod 600 ${sq(profilePlan.namedPath)} ${sq(profilePlan.appServerPath)}`,
+    );
+    if (materialized.code !== 0) {
+      await ownership.release(o.worktree, leaseToken);
+      console.log(JSON.stringify({
+        stage: 'profile-materialization',
+        ok: false,
+        message: 'credential-free Codex OpenRouter profile could not be materialized',
+      }));
+      Deno.exit(1);
+    }
+  }
+
   // 4b) Launch: stream the turn, record thread id as soon as thread/start lands.
   const child = new Deno.Command(commandPlan.bin, {
     args: commandPlan.args,
@@ -466,10 +567,6 @@ async function main(): Promise<void> {
     }
   }
   const status = await child.status;
-  if (!recorded) {
-    console.log(`\n[launch-codex-slice] WARN: no thread id captured (exit ${status.code})`);
-    Deno.exit(1);
-  }
   const observed = parseThreadInfo(buf);
   const evidence = compareLaunchIdentity(requested, {
     provider: observed.provider,
@@ -477,11 +574,23 @@ async function main(): Promise<void> {
     effort: observed.effort,
   });
   const enforcement = enforceLaunchIdentity(evidence, o.allowRouteMismatch);
+  const exitCode = launcherExitCode(status.code, evidence, o.allowRouteMismatch);
+  if (!recorded) {
+    await ownership.release(o.worktree, leaseToken);
+    console.log(JSON.stringify({
+      stage: 'thread-identity',
+      ok: status.code === 0,
+      warning: 'no thread id captured',
+      processExitCode: status.code,
+      routeStatus: evidence.status,
+    }));
+    Deno.exit(exitCode);
+  }
   if (o.sliceDir) {
     const recPath = `${o.sliceDir.replace(/[\\/]$/, '')}/codex-thread-ids.md`;
     await Deno.writeTextFile(recPath, threadRecord(o, observed, dest, requested));
   }
-  if (!enforcement.allowed) {
+  if (!enforcement.allowed && evidence.status === 'mismatch') {
     console.log(JSON.stringify({
       stage: 'route-identity',
       ok: false,
@@ -493,7 +602,7 @@ async function main(): Promise<void> {
     }));
     Deno.exit(1);
   }
-  Deno.exit(status.code === 0 ? 0 : 1);
+  Deno.exit(exitCode);
 }
 
 if (import.meta.main) await main();

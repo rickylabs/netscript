@@ -94,6 +94,14 @@ Deno.test('Codex OpenRouter plans select the named isolated profile and child cr
     '--profile-home',
     home,
   ]);
+  assertEquals(plan.request?.arguments.slice(10, 16), [
+    '--provider',
+    'openrouter',
+    '--model',
+    'z-ai/glm-5.2',
+    '--effort',
+    'xhigh',
+  ]);
   assertEquals(plan.request?.environment?.bindings, [{
     sourceKey: 'OPENROUTER_API_KEY',
     targetKey: 'OPENROUTER_API_KEY',

@@ -4,7 +4,6 @@ export interface AppServerRoute {
   readonly model: string;
   readonly effort: string;
   readonly cwd: string;
-  readonly profile?: string;
 }
 
 export interface AppServerThreadIdentity {
@@ -34,7 +33,13 @@ export function threadStartRequest(route: AppServerRoute): JsonRpcMessage {
   return {
     id: APP_SERVER_REQUEST_IDS.threadStart,
     method: 'thread/start',
-    params: { model: route.model, cwd: route.cwd },
+    params: {
+      model: route.model,
+      cwd: route.cwd,
+      // Resolve effort before thread/start returns its authoritative identity.
+      // A turn-only override made launch evidence report the stale default.
+      config: { model_reasoning_effort: route.effort },
+    },
   };
 }
 
@@ -90,6 +95,15 @@ function initializeRequest(): JsonRpcMessage {
   };
 }
 
+/** Builds app-server argv without the unsupported top-level `--profile` flag. */
+export function appServerArguments(route: AppServerRoute): string[] {
+  return [
+    '-c',
+    `model_reasoning_effort=${JSON.stringify(route.effort)}`,
+    'app-server',
+  ];
+}
+
 async function writeMessage(
   writer: WritableStreamDefaultWriter<Uint8Array>,
   message: JsonRpcMessage,
@@ -102,11 +116,8 @@ export async function sendAppServerMessage(
   route: AppServerRoute,
   message: string,
 ): Promise<number> {
-  const args = ['-c', `model_reasoning_effort=${route.effort}`];
-  if (route.profile) args.push('--profile', route.profile);
-  args.push('app-server');
   const child = new Deno.Command('codex', {
-    args,
+    args: appServerArguments(route),
     cwd: route.cwd,
     stdin: 'piped',
     stdout: 'piped',

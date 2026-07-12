@@ -17,6 +17,7 @@
 | 4 | Claude OpenRouter command planning rejects launch/resume and only builds static smoke requests. | `runtime/adapters/claude-adapter.ts`. |
 | 5 | Provider canary requires tools, reasoning, and streaming for every route and exposes only one explicit route per invocation. | `runtime/provider-canary.ts`, adapter, and CLI. |
 | 6 | `OPENROUTER_PRESETS` has three entries but no exhaustive cheap CI canary contract. | `runtime/provider-profiles.ts`; existing tests only spot-check matching. |
+| 7 | Codex 0.144 layers `--profile` from `$CODEX_HOME/<name>.config.toml`, but `app-server --help` does not accept that global flag; app-server does accept `-c` and v2 `thread/start.config`. | Current CLI help, generated v0.144 protocol, and official Codex developer-command/app-server docs. |
 
 ## jsr-audit surface scan
 

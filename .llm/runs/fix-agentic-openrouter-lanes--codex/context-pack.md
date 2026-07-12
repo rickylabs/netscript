@@ -12,7 +12,7 @@
 
 ## Current State
 
-Research, locked plan, and Design checkpoint are complete. Separate Claude Opus 4.8 PLAN-EVAL returned PASS. S1 is starting with the owner-reported effort mismatch folded into its acceptance criteria.
+Research, locked plan, and Design checkpoint are complete. Separate Claude Opus 4.8 PLAN-EVAL returned PASS. S1 implementation and gates are complete: profile materialization, effort propagation/observation, v0.144 identity parsing, and truthful exit behavior.
 
 ## Completed
 
@@ -20,16 +20,17 @@ Research, locked plan, and Design checkpoint are complete. Separate Claude Opus 
 - Archetype/gate selection.
 - Three ordered commit slices and risk controls.
 - Separate-session PLAN-EVAL PASS.
+- S1 code, focused tests, scoped wrappers, volatile guard, and live no-turn effort handshake.
 
 ## In Progress
 
-- S1 launcher profile, effort, identity, and exit semantics.
+- S1 commit/push/comment, then S2 GLM lane viability.
 
 ## Next Steps
 
-1. Implement and gate S1.
-2. Supervisor-review, commit, push, and comment S1.
-3. Reconcile before S2 live lane work.
+1. Commit/push/comment S1.
+2. Run bounded Codex/Claude OpenRouter probes for S2.
+3. Implement the viable GLM lane and structured capability boundary.
 
 ## Key Decisions
 
@@ -44,19 +45,22 @@ Research, locked plan, and Design checkpoint are complete. Separate Claude Opus 
 | Path | Status | Notes |
 | --- | --- | --- |
 | `.llm/runs/fix-agentic-openrouter-lanes--codex/` | changed/new | Harness bootstrap and carried-in brief/thread identity. |
+| `.llm/tools/agentic/codex/` | changed/new | S1 app-server and launcher behavior/tests. |
+| `.llm/tools/agentic/lib/agentic-lib.ts` | changed | v0.144 identity parsing. |
+| `.llm/tools/agentic/runtime/adapters/codex-adapter.ts` | changed | Explicit route flags reach launcher. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Plan | PASS | `plan-eval.md` |
-| Static | not run | implementation not started |
+| Static | PASS for S1 | scoped check/lint/fmt; focused suite and volatile guard |
 | Runtime | not run | live GLM gate pending |
 | Consumer | not run | implementation pending |
 
 ## Open Questions
 
-- Which of Codex or Claude can currently complete GLM 5.2 through OpenRouter?
+- Which of Codex or Claude can currently complete GLM 5.2 through OpenRouter? Resolve in S2.
 
 ## Drift and Debt
 
