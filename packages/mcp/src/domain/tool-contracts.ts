@@ -1,0 +1,153 @@
+import { createToolSchema, isRecord, type ToolSchema } from './schema.ts';
+import type { ToolName } from './tool-types.ts';
+
+const objectSchema = (
+  properties: Record<string, unknown> = {},
+  required: string[] = [],
+): Readonly<Record<string, unknown>> => ({
+  type: 'object',
+  properties,
+  required,
+  additionalProperties: false,
+});
+const stringProperty = { type: 'string' } as const;
+const limitProperty = { type: 'integer', minimum: 1, maximum: 100 } as const;
+const isObject = (value: unknown): value is Record<string, unknown> => isRecord(value);
+
+/** Compact diagnostic severity. */
+export type DoctorStatus = 'pass' | 'warn' | 'fail';
+/** One doctor diagnostic check. */
+export interface DoctorCheck {
+  /** Stable check name. */ readonly name: string;
+  /** Check severity. */ readonly status: DoctorStatus;
+  /** Bounded human-readable outcome. */ readonly summary: string;
+  /** Action that can resolve a warning or failure. */ readonly fix?: string;
+}
+/** Doctor check counts grouped by severity. */
+export interface DoctorCounts {
+  /** Passing checks. */ readonly pass: number;
+  /** Warning checks. */ readonly warn: number;
+  /** Failing checks. */ readonly fail: number;
+}
+/** Bounded doctor result. */
+export interface DoctorResult {
+  /** Overall severity. */ readonly status: DoctorStatus;
+  /** Endpoint label that was probed. */ readonly endpoint: string;
+  /** Counts grouped by severity. */ readonly counts: DoctorCounts;
+  /** Bounded diagnostic checks. */ readonly checks: readonly DoctorCheck[];
+}
+
+const inputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
+  get_app_status: objectSchema({ service: stringProperty, limit: limitProperty }),
+  list_runs: objectSchema({
+    domain: stringProperty,
+    status: stringProperty,
+    service: stringProperty,
+    sinceUnixMs: { type: 'number' },
+    limit: limitProperty,
+  }),
+  get_run: objectSchema({ id: stringProperty }, ['id']),
+  get_recent_errors: objectSchema({
+    service: stringProperty,
+    domain: stringProperty,
+    sinceUnixMs: { type: 'number' },
+    limit: limitProperty,
+  }),
+  get_last_job_result: objectSchema({ jobId: stringProperty, service: stringProperty }, ['jobId']),
+  analyze_service_performance: objectSchema({
+    service: stringProperty,
+    sinceUnixMs: { type: 'number' },
+    limit: limitProperty,
+  }, ['service']),
+  analyze_db_bottlenecks: objectSchema({
+    service: stringProperty,
+    sinceUnixMs: { type: 'number' },
+    limit: limitProperty,
+  }),
+  doctor: objectSchema({ endpoint: stringProperty }),
+  search_docs: objectSchema({ query: stringProperty, limit: limitProperty }, ['query']),
+  list_docs: objectSchema({ limit: limitProperty }),
+  get_doc: objectSchema({ slug: stringProperty, section: stringProperty }, ['slug']),
+  list_commands: objectSchema({ filter: stringProperty, limit: limitProperty }),
+  execute_command: objectSchema({
+    command: stringProperty,
+    args: { type: 'array', items: stringProperty, maxItems: 32 },
+  }, ['command']),
+};
+
+const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
+  get_app_status: objectSchema({
+    counts: { type: 'object' },
+    services: { type: 'array', maxItems: 20 },
+  }, ['counts', 'services']),
+  list_runs: objectSchema({ count: { type: 'integer' }, runs: { type: 'array', maxItems: 100 } }, [
+    'count',
+    'runs',
+  ]),
+  get_run: objectSchema({
+    id: stringProperty,
+    summary: stringProperty,
+    spans: { type: 'array', maxItems: 50 },
+  }, ['id', 'summary']),
+  get_recent_errors: objectSchema({
+    count: { type: 'integer' },
+    groups: { type: 'array', maxItems: 20 },
+  }, ['count', 'groups']),
+  get_last_job_result: objectSchema({ found: { type: 'boolean' }, summary: stringProperty }, [
+    'found',
+    'summary',
+  ]),
+  analyze_service_performance: objectSchema({
+    sampleCount: { type: 'integer' },
+    summary: { type: 'object' },
+    topOperations: { type: 'array', maxItems: 20 },
+  }, ['sampleCount', 'summary']),
+  analyze_db_bottlenecks: objectSchema({
+    sampleCount: { type: 'integer' },
+    operations: { type: 'array', maxItems: 20 },
+  }, ['sampleCount', 'operations']),
+  doctor: objectSchema({
+    status: { enum: ['pass', 'warn', 'fail'] },
+    endpoint: stringProperty,
+    counts: { type: 'object' },
+    checks: { type: 'array', maxItems: 20 },
+  }, ['status', 'endpoint', 'counts', 'checks']),
+  search_docs: objectSchema({
+    count: { type: 'integer' },
+    matches: { type: 'array', maxItems: 20 },
+  }, ['count', 'matches']),
+  list_docs: objectSchema({ count: { type: 'integer' }, docs: { type: 'array', maxItems: 100 } }, [
+    'count',
+    'docs',
+  ]),
+  get_doc: objectSchema({ slug: stringProperty, title: stringProperty, content: stringProperty }, [
+    'slug',
+    'title',
+    'content',
+  ]),
+  list_commands: objectSchema({
+    count: { type: 'integer' },
+    commands: { type: 'array', maxItems: 100 },
+  }, ['count', 'commands']),
+  execute_command: objectSchema({
+    exitCode: { type: 'integer' },
+    summary: stringProperty,
+    tail: { type: 'array', maxItems: 50 },
+  }, ['exitCode', 'summary']),
+};
+
+/** Standard-Schema input contracts for the complete v1 tool surface. */
+export const TOOL_INPUT_SCHEMAS: Readonly<Record<ToolName, ToolSchema<unknown>>> = Object
+  .fromEntries(
+    Object.entries(inputShapes).map((
+      [name, schema],
+    ) => [name, createToolSchema(schema, isObject, `${name} input must be an object`)]),
+  ) as Record<ToolName, ToolSchema<unknown>>;
+
+/** Standard-Schema output contracts for the complete v1 tool surface. */
+export const TOOL_OUTPUT_SCHEMAS: Readonly<Record<ToolName, ToolSchema<unknown>>> = Object
+  .fromEntries(
+    Object.entries(outputShapes).map((
+      [name, schema],
+    ) => [name, createToolSchema(schema, isObject, `${name} output must be an object`)]),
+  ) as Record<ToolName, ToolSchema<unknown>>;

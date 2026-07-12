@@ -3765,6 +3765,12 @@
           "npm:@orpc/server@^1.14.6"
         ]
       },
+      "packages/mcp": {
+        "dependencies": [
+          "jsr:@standard-schema/spec@1.1.0",
+          "jsr:@std/assert@1"
+        ]
+      },
       "packages/plugin": {
         "dependencies": [
           "jsr:@netscript/contracts@0.0.1-beta.8",
