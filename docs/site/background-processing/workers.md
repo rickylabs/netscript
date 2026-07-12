@@ -410,7 +410,11 @@ so <code>workers/jobs/process-payment.ts</code> registers as <code>process-payme
 the <code>:8091</code> API service <em>and</em> the background runner load that single registry at
 startup: the API service registers the generated user job definitions <em>before it serves</em>,
 so your jobs — not just the built-in <code>workers-plugin-health-check</code> — appear in
-<code>GET /api/v1/workers/jobs</code> and resolve on trigger. Background execution runs from
+<code>GET /api/v1/workers/jobs</code> and resolve on trigger. Registration order decides id
+collisions: the plugin's own jobs register first, then the generated user definitions load and
+<em>skip any id already present</em>, so a user file that reuses a built-in id (such as
+<code>workers-plugin-health-check</code>) leaves the plugin job in place rather than overwriting it —
+first registration wins. Background execution runs from
 <code>plugins/workers/bin/combined.ts</code>, a <em>separate</em> process from the API service —
 the API enqueues, the runner executes. A missing generated registry is tolerated as an empty set,
 so a fresh workspace boots before you author any job. Set <code>WORKERS_CONCURRENCY</code> on the

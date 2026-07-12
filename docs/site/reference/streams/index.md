@@ -49,6 +49,13 @@ live in the internal `@netscript/plugin-streams-core` package, documented in
 > from [`@netscript/plugin-streams-core`](#internals). See the
 > [durable streams capability page](/capabilities/streams/) for the full producer/consumer model.
 
+> **Browser consumers read over HTTP/SSE.** There is no in-process `subscribe()`; a browser
+> consumes a stream by reading its HTTP/SSE endpoint (for example with `EventSource`). The local
+> AppHost serves the generated app over `http://`, and under HTTP/1.1 browsers typically allow only
+> about **six concurrent connections per origin** — so several long-lived stream subscriptions from
+> one page can starve later requests. Serve over HTTPS (HTTP/2) when a page needs many simultaneous
+> stream consumers.
+
 ### Re-exported plugin framework types
 
 The root export re-exports the shared NetScript plugin-framework contribution types unchanged from
