@@ -197,6 +197,23 @@ A published export is one of:
 The default is **stable**. Experimental status is opt-in and time-
 limited.
 
+### Deprecation and removal convention
+
+A stable exported symbol scheduled for removal uses this machine-readable JSDoc form:
+
+```ts
+/**
+ * @deprecated{removal: 0.2} Use `createCurrentThing` instead.
+ */
+export function createLegacyThing(): LegacyThing;
+```
+
+The value is the first `major.minor` release line in which the symbol must no longer be exported.
+Deprecation must therefore land before that line, with migration guidance in the same JSDoc tag.
+The public-surface diff gate warns when an export carrying this tag remains present at or beyond its
+declared removal line. Removing the symbol is still a semver-major surface change and requires an
+explicit major declaration until the stable-line policy makes that release intent authoritative.
+
 ## Sanctioned exception: slow-types for oRPC-bound packages
 
 One exception to the "no slow types" bar is sanctioned and
