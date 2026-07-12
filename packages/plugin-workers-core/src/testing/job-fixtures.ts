@@ -1,9 +1,12 @@
-import { defineJob } from '../builders/mod.ts';
+import {
+  defineJob,
+  type JobDefinition as BuilderJobDefinition,
+  type JobHandler as BuilderJobHandler,
+} from '../builders/mod.ts';
 import { createSuccessResult, DEFAULT_TOPIC, type TriggerType } from '../domain/mod.ts';
 import type { ExecutionRecord } from '../registry/mod.ts';
 import {
   createWorkersRuntime,
-  type JobDefinition,
   type JobHandler,
   type JobResult,
   type WorkersRuntime,
@@ -13,18 +16,20 @@ import { MemoryJobStorage } from './memory-job-storage.ts';
 import { MemoryWorker } from './memory-worker.ts';
 
 /** Options for creating a test job definition. */
-export type JobFixtureOptions<TId extends string> = Readonly<{
-  /** Optional job identifier. */
-  id?: TId;
-  /** Optional stream topic. */
-  topic?: string;
-  /** Optional handler for the job. */
-  handler?: JobHandler;
-  /** Optional job tags. */
-  tags?: readonly string[];
-  /** Optional job metadata. */
-  metadata?: Record<string, unknown>;
-}>;
+export type JobFixtureOptions<TId extends string, TPayload = unknown, TResult = unknown> = Readonly<
+  {
+    /** Optional job identifier. */
+    id?: TId;
+    /** Optional stream topic. */
+    topic?: string;
+    /** Optional handler for the job. */
+    handler?: BuilderJobHandler<TPayload, TResult>;
+    /** Optional job tags. */
+    tags?: readonly string[];
+    /** Optional job metadata. */
+    metadata?: Record<string, unknown>;
+  }
+>;
 
 /** Partial execution record fields used to override fixture defaults. */
 export type ExecutionRecordFixtureOptions = Partial<ExecutionRecord>;
@@ -53,17 +58,22 @@ export type TestWorkersRuntime =
   }>;
 
 /** Create a runnable job definition for tests. */
-export function createJobFixture<TId extends string = 'test-job'>(
-  options: JobFixtureOptions<TId> = {},
-): JobDefinition<TId> {
+export function createJobFixture<
+  TId extends string = 'test-job',
+  TPayload = unknown,
+  TResult = unknown,
+>(
+  options: JobFixtureOptions<TId, TPayload, TResult> = {},
+): BuilderJobDefinition<TId, TPayload, TResult> {
   const id = options.id ?? 'test-job' as TId;
-  const handler = options.handler ?? (() => createSuccessResult());
+  const handler: BuilderJobHandler<TPayload, TResult> = options.handler ??
+    (() => createSuccessResult<TResult>());
   return defineJob(id)
-    .handler(handler as never)
+    .handler(handler)
     .topic(options.topic ?? DEFAULT_TOPIC)
     .tags(...options.tags ?? [])
     .metadata(options.metadata ?? {})
-    .build() as unknown as JobDefinition<TId>;
+    .build();
 }
 
 /** Create an execution record with realistic defaults. */
@@ -101,8 +111,8 @@ export function createTestWorkersRuntime(
   const runtime = createWorkersRuntime({
     ...options,
     clock: options.clock ?? Object.freeze({ now: () => new Date(0) }),
-    jobRegistry: jobStorage as unknown as WorkersRuntimeOptions['jobRegistry'],
-    worker: worker as unknown as WorkersRuntimeOptions['worker'],
+    jobRegistry: jobStorage,
+    worker,
   });
   return Object.freeze({
     ...runtime,

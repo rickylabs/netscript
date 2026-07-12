@@ -59,4 +59,10 @@ export type WorkerTelemetryEvent =
   (typeof WorkerTelemetryEvents)[keyof typeof WorkerTelemetryEvents];
 
 /** Worker telemetry status. */
-export type WorkerTelemetryStatus = (typeof WorkerTelemetryStatuses)[number];
+export type WorkerTelemetryStatus =
+  | 'cancelled'
+  | 'completed'
+  | 'failed'
+  | 'pending'
+  | 'running'
+  | 'timeout';

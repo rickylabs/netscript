@@ -138,6 +138,49 @@ Verified in isolation: this form compiles the ready-state `build()` and hard-rej
 change; the three `build()`-on-initial cases must then error, and the existing 25 package tests +
 scoped check/lint/fmt/scanner must stay green.
 
+## Correction recheck (2026-07-12, same reviewer session family)
+
+**Correction inspected.** All six `build()` signatures now make the explicit `this` type conditional
+on the receiver's own `TConfigured`, collapsing to `never` in the unconfigured state — the exact
+pattern F1 prescribed:
+
+- `job-builder.ts` interface (L76–79) + impl (L237–240): `this: TConfigured extends 'entrypoint-set'
+  | 'handler-set' ? JobBuilder<…>/JobBuilderImpl<…> : never`.
+- `task-builder.ts` interface (L56–59) + impl (L184–187): same shape over `TaskBuilder`/
+  `TaskBuilderImpl`.
+- `workflow-builder.ts` interface (L51–53) + impl (L134–136): `this: TConfigured extends 'step-set' ?
+  WorkflowBuilder<…>/WorkflowBuilderImpl<…> : never`.
+- `public/root.ts` job (L212–215), task (L260–263), workflow (L299–302): same conditional on the thin
+  root interfaces.
+
+**Probes I ran myself** (`deno check --unstable-kv` against real specifiers `@netscript/plugin-workers-core`
+and `@netscript/plugin-workers-core/builders`; probe files under the job tmp dir, not committed):
+
+| Probe | Expectation | Result |
+| --- | --- | --- |
+| **Ready-state build()** — `defineJob().handler().build()`, `.entrypoint().build()`, `defineTask` (both), `defineWorkflow().sleep().build()`, all on `.` **and** `./builders` | compile CLEAN (no false positive) | **PASS** — `Check … exit=0`, zero diagnostics. |
+| **Initial-state build()** — `defineJob('j').build()`, `defineTask('t').build()`, `defineWorkflow('w').build()` on `.` **and** `./builders`, each under `@ts-expect-error` | every directive CONSUMED (i.e. build() now errors) | **PASS** — check clean, no `TS2578`; all six `@ts-expect-error` consumed ⇒ `build()` on `'initial'` is rejected. |
+| **Negative control** — `@ts-expect-error` on a *valid* ready-state `build()` | must report `TS2578` unused ⇒ check FAILS | **PASS (as designed)** — `TS2578 [ERROR]: Unused '@ts-expect-error' directive` + "Type checking failed". Confirms the harness genuinely detects unused directives, so the initial-state probe's clean pass is meaningful, not a false green. |
+| **Payload guard regression** — `defineJob().handler().payload()` under `@ts-expect-error` | still rejected (directive consumed) | **PASS** — clean, guard intact. |
+
+**Gates re-run post-correction (fresh evidence):**
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Scanner (`--root packages/plugin-workers-core --max-allow 5`) | PASS for Slice 2 | `ok:false` overall, but the 8 findings are **exclusively** Slice-3 files (`runtime/composition-root.ts` ×5, `testing/job-fixtures.ts` ×3); **0** in `builders/*` + `public/root.ts`; `allowCount:0`. |
+| Scoped check | PASS | 110 files, `failedBatches:0`, `totalOccurrences:0`. |
+| Scoped fmt | PASS | `findings:0, failedBatches:0`. |
+| `deno.lock` | CLEAN | `git diff --exit-code 3b3d615b -- deno.lock` → no churn. |
+
+(Scoped lint and the 25-test package suite were green on the pre-correction pass; this correction is a
+type-annotation-only change to `build`'s `this` parameter with no runtime or lint surface — the clean
+110-file check and unchanged formatting confirm no regression. Runtime `build()` still throws its
+"requires an entrypoint or handler" error, unchanged.)
+
+**Conclusion.** F1 is fully resolved: `build()` is now a real typestate gate on both published
+surfaces, with no false positive on ready builders and no regression to the payload guard. No new
+suppression markers, no `as unknown as`, no lock churn. **Verdict: `PASS`.**
+
 ## Carry-forward (non-blocking, for IMPL-EVAL / Slice 3)
 - `./builders` subpath `JobDefinition`/`TaskDefinition`/`WorkflowDefinition` widened to the canonical
   domain types (see §5) — intentional, no in-repo consumer; note in changelog.

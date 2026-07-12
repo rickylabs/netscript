@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { DEFAULT_TOPIC, TaskSourceSchema, TaskStatusSchema, TaskTypeSchema } from './constants.ts';
+import type { TaskType } from './constants.ts';
 import { TaskDefinitionPublicBaseSchema } from './public-schema.ts';
 
 /** Branded worker task identifier. */
@@ -63,7 +64,15 @@ export const TaskPermissionsSchema: z.ZodObject<typeof TaskPermissionsShape> = z
 export type TaskPermissionValue = TaskPermissionField;
 
 /** Partial task permissions input. */
-export type TaskPermissionsInput = typeof TaskPermissionsInputSchema['_output'];
+export type TaskPermissionsInput = Readonly<{
+  net?: boolean | string[];
+  read?: boolean | string[];
+  write?: boolean | string[];
+  env?: boolean | string[];
+  run?: boolean | string[];
+  ffi?: boolean;
+  import?: string[];
+}>;
 
 /** Full task permissions with defaults applied. */
 export type TaskPermissions = typeof TaskPermissionsSchema['_output'];
@@ -176,7 +185,42 @@ export type TaskEditable = z.output<typeof TaskEditableSchema>;
 export type TaskSystem = z.output<typeof TaskSystemSchema>;
 
 /** Stored task definition. */
-export type StoredTaskDefinition = TaskEditable & TaskSystem;
+export type StoredTaskDefinition = Readonly<{
+  id: string;
+  name: string;
+  description?: string;
+  topic: string;
+  type: TaskType;
+  entrypoint: string;
+  schedule?: string;
+  timeout: number;
+  maxRetries: number;
+  priority: number;
+  enabled: boolean;
+  tags: string[];
+  metadata?: Record<string, unknown>;
+  source: 'inline' | 'local' | 'plugin' | 'remote' | 'shared';
+  sourceUrl?: string;
+  importMapUrl?: string;
+  args: string[];
+  cwd?: string;
+  env?: Record<string, string>;
+  permissions?: Readonly<{
+    net: boolean | string[];
+    read: boolean | string[];
+    write: boolean | string[];
+    env: boolean | string[];
+    run: boolean | string[];
+    ffi: boolean;
+    import?: string[];
+  }>;
+  pluginId?: string;
+  inlineScript?: string;
+  timezone: string;
+  retryDelay: number;
+  maxConcurrency: number;
+  persist: boolean;
+}>;
 
 /** Public task definition produced by the task builder. */
 export type TaskDefinition<
@@ -186,7 +230,7 @@ export type TaskDefinition<
 > = Readonly<
   Omit<StoredTaskDefinition, 'id' | 'entrypoint'> & {
     id: TaskId<TId>;
-    type: z.output<typeof TaskTypeSchema>;
+    type: TaskType;
     entrypoint?: string;
     handler?: TaskHandler<TPayload, TResult>;
   }

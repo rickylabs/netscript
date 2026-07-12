@@ -46,7 +46,7 @@ export const WorkflowStepKindSchema: z.ZodEnum<typeof WORKFLOW_STEP_KINDS> = z.e
 );
 
 /** Workflow step kind. */
-export type WorkflowStepKind = typeof WorkflowStepKindSchema['_output'];
+export type WorkflowStepKind = 'job' | 'sleep' | 'task';
 
 type WorkflowStepShape = {
   id: z.ZodType<string>;
@@ -73,8 +73,14 @@ export const WorkflowStepSchema: z.ZodObject<typeof WorkflowStepShape> = z.objec
 
 /** Single workflow step in a worker workflow definition. */
 export type WorkflowStep = Readonly<
-  & Pick<typeof WorkflowStepSchema['_output'], 'id' | 'kind'>
-  & Partial<Omit<typeof WorkflowStepSchema['_output'], 'id' | 'kind'>>
+  {
+    id: string;
+    kind: WorkflowStepKind;
+    taskId?: string;
+    jobId?: string;
+    payload?: unknown;
+    durationMs?: number;
+  }
 >;
 
 type WorkflowDefinitionShape = {
@@ -100,14 +106,13 @@ export const WorkflowDefinitionSchema: z.ZodObject<typeof WorkflowDefinitionShap
 );
 
 /** Public workflow definition produced by the workflow builder. */
-export type WorkflowDefinition<TId extends string = string> = Readonly<
-  Omit<typeof WorkflowDefinitionSchema['_output'], 'id' | 'metadata' | 'steps' | 'tags'> & {
-    id: WorkflowId<TId>;
-    steps: readonly WorkflowStep[];
-    tags?: readonly string[];
-    metadata?: Readonly<Record<string, unknown>>;
-  }
->;
+export type WorkflowDefinition<TId extends string = string> = Readonly<{
+  id: WorkflowId<TId>;
+  steps: readonly WorkflowStep[];
+  timeout?: number;
+  tags?: readonly string[];
+  metadata?: Readonly<Record<string, unknown>>;
+}>;
 
 type WorkflowStepResultShape = {
   stepId: z.ZodType<string>;

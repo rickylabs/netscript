@@ -31,11 +31,11 @@ export type WorkerTaskPermissionField = boolean | readonly string[];
 
 /** Permission set accepted by Deno task execution. */
 export type WorkerTaskPermissions = Readonly<{
-  readonly net: WorkerTaskPermissionField;
-  readonly read: WorkerTaskPermissionField;
-  readonly write: WorkerTaskPermissionField;
-  readonly env: WorkerTaskPermissionField;
-  readonly run: WorkerTaskPermissionField;
+  readonly net: boolean | readonly string[];
+  readonly read: boolean | readonly string[];
+  readonly write: boolean | readonly string[];
+  readonly env: boolean | readonly string[];
+  readonly run: boolean | readonly string[];
   readonly ffi: boolean;
   readonly import?: readonly string[];
 }>;

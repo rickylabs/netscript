@@ -12,7 +12,7 @@
 
 ## Current State
 
-PLAN-EVAL passed. Slices 1 and 2 are implemented and independently reviewed `PASS`: schema/contract/stream boundaries and immutable builder typestate are properly typed, overall scanner count is 8 findings / 0 allowances, and no lock churn exists.
+PLAN-EVAL passed. All three slices are implemented and independently reviewed `PASS`. The exact scanner reports 0 findings / 0 allowances, all package gates are green, doc-lint improved to 13 combined private refs with runtime/registry at 0, and no lock churn exists.
 
 ## Completed
 
@@ -25,17 +25,19 @@ PLAN-EVAL passed. Slices 1 and 2 are implemented and independently reviewed `PAS
 - Slice 1 independent substantive review PASS.
 - Slice 2 immutable typestate and canonical domain outputs implemented; scoped check/fmt and 25 package tests pass.
 - Slice 2 independent review's typestate defect was corrected and rechecked PASS.
+- Slice 3 canonical runtime/fixture port typing implemented; all eight remaining casts removed.
+- Slice 3 doc-lint regression caught by review, corrected below baseline, and rechecked PASS.
+- Final scoped check/lint/fmt, package + KV tests, publish dry-run, doc lint, architecture, scanner, and lock gates recorded.
 
 ## In Progress
 
-- Slice 3 runtime composition and fixture port alignment.
+- Final IMPL-EVAL, commit, and force-push handoff.
 
 ## Next Steps
 
-1. Commit Slice 2 sign-off.
-2. Implement and review Slice 3.
-3. Run final full gate set and separate IMPL-EVAL.
-4. Force-push with lease; do not open a PR.
+1. Commit Slice 3 sign-off.
+2. Run separate-session IMPL-EVAL.
+3. Commit evaluator artifact and force-push with lease; do not open a PR.
 
 ## Key Decisions
 
@@ -54,15 +56,18 @@ PLAN-EVAL passed. Slices 1 and 2 are implemented and independently reviewed `PAS
 | `packages/plugin-workers-core/src/streams/*` | changed | Derived entities, upstream state schema, correlated producer wrapper. |
 | `packages/plugin-workers-core/src/builders/*` | changed | Immutable typestate and canonical domain aliases. |
 | `packages/plugin-workers-core/src/public/root.ts` | changed | Structurally typed builder root surface without facade casts. |
+| `packages/plugin-workers-core/src/runtime/*` | changed | Canonical structural ports and direct composition. |
+| `packages/plugin-workers-core/src/testing/*` | changed | Generic fixtures and direct memory-port wiring. |
+| `packages/plugin-workers-core/src/domain/*`, `src/registry/*` | changed | Explicit schema-equivalent public contracts and permission alignment. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | Slices 1–2 green | scanner 8/0 overall; scoped check/fmt and package tests PASS |
-| Fitness | pending | plan |
-| Runtime | pending | plan |
-| Consumer | pending | plan |
+| Static | green | scanner 0/0; check/lint/fmt PASS |
+| Fitness | green/recorded | doc lint 13 (improved), arch check exit 0, publish PASS |
+| Runtime | green | 25 package + 5 KV tests PASS |
+| Consumer | green | published subpaths check and publish dry-run PASS |
 
 ## Open Questions
 

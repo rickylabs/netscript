@@ -64,6 +64,9 @@ Start at the exported schema/builder/runtime type, follow its concrete generic t
 | 2026-07-12 | slice 2 | implementation | Replaced builder self-rebranding with immutable snapshots and freshly parameterized builders over canonical domain types; removed root facade casts. Scanner reduced 27 → 8 with allowCount 0. |
 | 2026-07-12 | slice 2 | review | Independent Opus/high review `c73951cb-4291-4fc9-a932-954e9ce96def` found a vacuous fixed-union `build()` receiver guard (`FAIL_FIX`). Conditional receiver types tied to `TConfigured` fixed all job/task/workflow surfaces; the same reviewer reproduced initial-state rejection and updated the verdict to `PASS`. |
 | 2026-07-12 | slice 2 | reconcile | Scope remains locked. The `./builders` definition aliases now expose the canonical domain shape intentionally; no in-repo consumer break, allowance, debt entry, or lock churn. Remaining 8 findings belong only to Slice 3. |
+| 2026-07-12 | slice 3 | implementation | Replaced all eight runtime/fixture cast bridges with canonical structural ports, precise option types, direct fixture generics, and stable workflow/shutdown identities. Scanner reduced 8 → 0 with allowCount 0. |
+| 2026-07-12 | slice 3 | review | Independent Opus/high review `d2768a42-6d10-4b9a-a702-ffb87935da6d` confirmed the typing but found Slice-3 doc-lint regression 24 → 33 (`FAIL_FIX`). Canonical alias targets were exposed and schema-derived public types made explicit/equivalent; same reviewer proved runtime/registry entrypoints 0 and combined doc debt 13, then updated to `PASS`. |
+| 2026-07-12 | slice 3 | reconcile | Final target met with 0 findings / 0 allowances. No allowance requires justification. Doc-lint improves the pre-Slice-3 24 to 13 (0 missing JSDoc) and no new architecture debt is introduced. |
 
 ## Decisions
 
@@ -98,6 +101,15 @@ Start at the exported schema/builder/runtime type, follow its concrete generic t
 | Slice 2 fmt | scoped wrapper | PASS | 6 selected files, 0 findings. |
 | Slice 2 tests | package task | PASS | 25 passed, 0 failed. |
 | Slice 2 typestate probes | independent reviewer | PASS after fix | Initial `build()` rejected on root and builders subpaths; configured `build()` accepted. |
+| Final scanner | exact owner command with `--max-allow 5` | PASS | `ok:true`; 0 findings; allowCount 0; no allowances. |
+| Final check | scoped wrapper | PASS | 110 files, 0 errors. |
+| Final lint | scoped wrapper | PASS | 110 files, 0 findings; no lint ignore. |
+| Final fmt | scoped wrapper | PASS | 110 files, 0 findings. |
+| Final publish | package dry-run | PASS | No slow types; only known unanalyzable dynamic-import warning. |
+| Final doc lint | root structured wrapper | RECORDED / IMPROVED | Combined private refs 13 versus pre-Slice-3 24; runtime/registry 0; missing JSDoc 0. |
+| Final tests | package task + co-located KV test | PASS | 25 package tests + 5 KV tests passed. |
+| Architecture | `deno task arch:check` | PASS with warnings | Exit 0; package has existing size/layout warnings, no failures. |
+| Lock hygiene | diff from `3b3d615b` | PASS | No `deno.lock` churn. |
 
 ### Fitness Gates
 
@@ -110,13 +122,13 @@ Start at the exported schema/builder/runtime type, follow its concrete generic t
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Package runtime tests | NOT_RUN | planned | Type-only change still runs full package tests. |
+| Package runtime tests | PASS | 25 package tests + 5 co-located KV tests | No failures. |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Export-map consumers | NOT_RUN | planned | Run focused checks if compiler identifies impact. |
+| Export-map consumers | PASS | 110-file scoped check + publish dry-run | Runtime/registry/builders subpaths type-check and document without new private refs. |
 
 ## Handoff Notes
 
