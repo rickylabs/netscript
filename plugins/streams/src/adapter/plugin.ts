@@ -8,7 +8,10 @@ import {
   barrelScaffolder,
   DEFAULT_BARREL_INPUT,
   DEFAULT_STREAM_INPUT,
+  streamConsumerResource,
+  streamProducerResource,
   streamResource,
+  streamSchemaResource,
 } from './resources/mod.ts';
 
 /** Starter resources emitted by the streams install command. */
@@ -48,5 +51,5 @@ export const streamsAdapterPlugin: NetScriptPlugin = {
   remove: {
     strategy: 'manifest-only',
   },
-  resources: [streamResource],
+  resources: [streamResource, streamSchemaResource, streamProducerResource, streamConsumerResource],
 };
