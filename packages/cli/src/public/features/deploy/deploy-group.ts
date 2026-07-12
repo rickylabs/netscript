@@ -13,6 +13,7 @@ import { stopCommand } from './stop/stop-deploy-command.ts';
 import { createDeployUninstallCommand } from './uninstall/uninstall-deploy-command.ts';
 import { upgradeCommand } from './upgrade/upgrade-deploy-command.ts';
 import { createTargetDeployCommand } from './target/target-deploy-command.ts';
+import { createListDeployTargetsCommand } from './list/list-deploy-targets-command.ts';
 import type { PublicCommandDependencies } from '../root/public-command-dependencies.ts';
 
 /** Create the public deploy command group. */
@@ -25,6 +26,7 @@ export function createDeployCommand(
     .action(function () {
       this.showHelp();
     })
+    .command('list', createListDeployTargetsCommand(dependencies))
     .command(
       'build',
       createDeployBuildCommand({

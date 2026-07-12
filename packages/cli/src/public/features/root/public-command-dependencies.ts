@@ -12,6 +12,8 @@ import {
 import type { buildWindowsDeployment } from '../deploy/build/build-windows-strategy.ts';
 import { loadRegisteredPlugins } from '../../../kernel/adapters/config/plugin-registry.ts';
 import { createProjectConfigLoader } from '../../../kernel/adapters/config/project-config-loader.ts';
+import { DenoRuntimeConfigStore } from '../../../kernel/adapters/config/runtime-config/deno-runtime-config-store.ts';
+import type { RuntimeConfigStorePort } from '../../../kernel/ports/runtime-config-store-port.ts';
 import { createContractScaffolder } from '../../../kernel/adapters/contracts/contract-scaffolder.ts';
 import { DefaultContractTemplateRegistry } from '../../../kernel/adapters/contracts/templates/contract-template-registry.ts';
 import { ContractVersionRegistry } from '../../../kernel/adapters/contracts/version-registry.ts';
@@ -78,6 +80,8 @@ export interface PublicCommandDependencies {
   readonly dbRegistry: DbEngineRegistry;
   /** Load project config under the project's own Deno config. */
   readonly loadConfig: ReturnType<typeof createProjectConfigLoader>;
+  /** Versioned runtime override store. */
+  readonly runtimeConfigStore: RuntimeConfigStorePort;
   /** Resolve a project root from an optional flag. */
   readonly resolveProjectRoot: (projectRoot?: string) => Promise<string | undefined>;
   /** Dependencies for public init. */
@@ -178,6 +182,7 @@ export function createPublicCommandDependencies(
   const pluginRegistry = new PluginKindRegistry();
   const dbRegistry = new DbEngineRegistry();
   const loadConfig = createProjectConfigLoader({ process });
+  const runtimeConfigStore = DenoRuntimeConfigStore.fromEnvironment(host.cwd());
   const resolveProjectRoot = async (projectRoot?: string) =>
     projectRoot ? host.resolvePath(projectRoot) : await findDeployProjectRoot(host.cwd()) ??
       undefined;
@@ -233,6 +238,7 @@ export function createPublicCommandDependencies(
     pluginRegistry,
     dbRegistry,
     loadConfig,
+    runtimeConfigStore,
     resolveProjectRoot,
     initCommandDependencies: {
       defaultProjectName: () => host.cwd().split(/[/\\]/).pop() ?? 'my-app',
