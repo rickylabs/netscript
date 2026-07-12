@@ -18,11 +18,13 @@ import {
   useLiveQuery as useTanStackLiveQuery,
   useLiveSuspenseQuery as useTanStackLiveSuspenseQuery,
 } from '@tanstack/react-db';
+import type { Context } from '@tanstack/react-db';
 import type { QueryFunctionContext } from '@tanstack/query-core';
 import type {
   IslandInfiniteData,
   IslandInfiniteQueryOptions,
   IslandInfiniteQueryResult,
+  IslandLiveQueryData,
   IslandLiveQueryFactory,
   IslandLiveQueryResult,
   IslandMutationOptions,
@@ -134,52 +136,49 @@ export function useIslandMutation<
 
 /** Return the active island QueryClient handle. */
 export function useQueryClient(): IslandQueryClient {
-  return useTanStackQueryClient() as IslandQueryClient;
+  return useTanStackQueryClient();
 }
 
 /** Count active island queries matching the optional filters. */
 export function useIsFetching(filters?: IslandQueryFilters): number {
-  return useTanStackIsFetching(filters as never);
+  return useTanStackIsFetching(filters);
 }
 
 /** Count active island mutations matching the optional filters. */
 export function useIsMutating(filters?: IslandQueryFilters): number {
-  return useTanStackIsMutating(filters as never);
+  return useTanStackIsMutating(filters);
 }
 
 /** Run an island live query through the NetScript Fresh query surface. */
-export function useLiveQuery<TData = unknown>(
-  queryFactory: IslandLiveQueryFactory,
+export function useLiveQuery<TContext extends Context>(
+  queryFactory: IslandLiveQueryFactory<TContext>,
   deps?: readonly unknown[],
-): IslandLiveQueryResult<TData> {
+): IslandLiveQueryResult<IslandLiveQueryData<TContext>> {
   const result = useTanStackLiveQuery(
-    queryFactory as never,
+    queryFactory,
     deps ? [...deps] : undefined,
-  ) as Record<string, unknown>;
+  );
 
   return {
-    data: result.data as TData | undefined,
+    data: result.data,
     status: typeof result.status === 'string' ? result.status : undefined,
-    error: result.error,
-    details: result,
+    details: { ...result },
   };
 }
 
 /** Run an island suspense live query through the NetScript Fresh query surface. */
-export function useLiveSuspenseQuery<TData = unknown>(
-  queryFactory: IslandLiveQueryFactory,
+export function useLiveSuspenseQuery<TContext extends Context>(
+  queryFactory: IslandLiveQueryFactory<TContext>,
   deps?: readonly unknown[],
-): IslandLiveQueryResult<TData> {
+): IslandLiveQueryResult<IslandLiveQueryData<TContext>> {
   const result = useTanStackLiveSuspenseQuery(
-    queryFactory as never,
+    queryFactory,
     deps ? [...deps] : undefined,
-  ) as Record<string, unknown>;
+  );
 
   return {
-    data: result.data as TData | undefined,
-    status: typeof result.status === 'string' ? result.status : undefined,
-    error: result.error,
-    details: result,
+    data: result.data,
+    details: { ...result },
   };
 }
 

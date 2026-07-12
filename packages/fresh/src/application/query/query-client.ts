@@ -46,7 +46,7 @@ export function getIslandQueryClient(): IslandQueryClient {
       },
     });
   }
-  return islandQueryClient as IslandQueryClient;
+  return islandQueryClient;
 }
 
 /**
