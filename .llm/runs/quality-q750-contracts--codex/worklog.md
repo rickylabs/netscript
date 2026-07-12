@@ -77,6 +77,7 @@ module, then add a parse and type-inference test. Never cast a Zod value into a 
 | 2026-07-12 | bootstrap | preflight | Hard reset confirmed exact baseline and branch. |
 | 2026-07-12 | research | baseline | Fresh scanner: 50 findings, 0 allowances; rejected pass: 41 allowances. |
 | 2026-07-12 | plan | Plan-Gate | Separate Claude Opus 4.8 session `b2f5d950-e468-4fde-8177-0460ffada95e` returned PASS; no package implementation preceded it. |
+| 2026-07-12 | 1 | application typing | Replaced Prisma argument `any` bags and heterogeneous transformer `any` accumulation with `unknown`-safe types; scanner reduced 50 → 41, allowances remain 0. |
 
 ## Decisions
 
@@ -108,8 +109,10 @@ module, then add a parse and type-inference test. Never cast a Zod value into a 
 
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
-| Scoped check/lint/fmt | plan validation commands | NOT_RUN | Run per slice after PLAN-EVAL PASS |
-| Package tests | package `deno task test` | NOT_RUN | Run per slice after PLAN-EVAL PASS |
+| Scoped check | wrapper over `packages/contracts` | PASS | 20 files, 1 batch, 0 diagnostics |
+| Scoped lint | wrapper over `packages/contracts` | PASS | 20 files, 0 findings; all explicit-any ignores removed |
+| Scoped format | wrapper over `packages/contracts` | PASS | 20 files, 0 findings |
+| Package tests | package `deno task test` | PASS | 5 passed, 0 failed |
 | Publish/doc | plan validation commands | NOT_RUN | Final evidence after implementation |
 
 ### Fitness Gates
@@ -117,6 +120,14 @@ module, then add a parse and type-inference test. Never cast a Zod value into a 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | F-1..F-12, F-14..F-19 | NOT_RUN | planned `arch:check`, quality scanner, wrappers, docs/publish | Archetype 4 set |
+
+### Slice 1 Reconcile
+
+- Scanner delta matches the plan: nine findings removed (seven explicit `any`/ignore findings and
+  two related unsafe casts), leaving 41 schema/CRUD casts and zero allowances.
+- No PR/comment reconciliation is possible under the owner no-PR override; branch/run artifacts are
+  current and no new issue input was introduced.
+- `deno.lock` remains unchanged. No plan or doctrine drift discovered.
 
 ### Runtime Gates
 
@@ -136,3 +147,50 @@ module, then add a parse and type-inference test. Never cast a Zod value into a 
   baseline finding family has an implementation slice and proving gate.
 - Final worklog must report prior allowance count 41 versus final count and justify every survivor
   individually; an empty survivor table is preferred.
+
+## Slice Reviews
+
+### Slice 1 — Application boundary typing — PASS
+
+- **Reviewer:** Claude Opus 4.8 (Anthropic), separate Tier-A session — opposite family to the
+  GPT-5.6 Sol generator. Reviewed 2026-07-12.
+- **Scope reviewed:** `src/application/paginated-query.ts`, `src/application/transform-helpers.ts`,
+  plus `worklog.md`/`context-pack.md` slice updates. Diff is exactly the four intended files; no
+  unrelated churn, no `deno.lock` change.
+
+**Correctness / type safety**
+
+- `paginated-query.ts`: `Record<string, any>` → `Record<string, unknown>` at all three `findManyArgs`
+  sites. `PrismaModelDelegate.findMany(args?: unknown)` accepts the record by widening, so no cast is
+  introduced and runtime behavior is identical.
+- `transform-helpers.ts` omit factory: the `(result as any)[key]` write and the `{} as Omit<T,K>`
+  accumulator are replaced by a `Partial<T>` accumulator with a keyed write (`result[key] =
+  input[key]`, `key: keyof T`) and a single `result as Omit<T,K>` return assertion. That surviving
+  assertion is structurally justified — TS cannot track the runtime key exclusion — and mirrors the
+  pre-existing accepted `{} as Pick<T,K>` pattern in `createPickTransformer`. It is a single
+  assertion, not `as unknown as`, so the scanner does not flag it (file now reports 0 findings).
+- `composeTransformers`: the `any/any` implementation signature becomes `unknown/unknown` with
+  `reduce<unknown>`; the four typed public overloads are unchanged, so caller-facing inference is
+  preserved. Variance is correct and `deno check --unstable-kv` (strict) passes with 0 diagnostics.
+- Two `// deno-lint-ignore no-explicit-any` directives removed; none added. No new `as unknown as`.
+
+**Evidence re-run (not trusting the reported gates)**
+
+- Scanner `--root packages/contracts --max-allow 8`: `ok:false`, **41 findings / 0 allowances** —
+  matches the reported 50→41 delta. All 41 residual findings are in slice 2/3 files
+  (`crud/create-crud-contract.ts`, `schemas/filters.ts`, `schemas/pagination.ts`,
+  `application/zod-helpers.ts`, `domain/schemas.ts`); **zero** remain in either Slice 1 file. The
+  scanner is red only because slices 2–3 are unimplemented, which is expected for a partial slice —
+  not a green-by-suppression result (allowCount is 0).
+- Scoped check / lint / fmt over 20 files: 0 diagnostics / 0 findings / 0 findings.
+- Package `deno task test`: 5 passed, 0 failed.
+- `git status`: only the four intended files; `git diff --stat -- deno.lock` empty.
+
+**Minor observations (non-blocking)**
+
+- No new focused test was added for Slice 1. Acceptable here: the changes are type-only with
+  identical runtime behavior, proven by strict `deno check`; input/output and CRUD inference tests
+  are owned by slices 2–3 per the plan.
+
+**Verdict:** `PASS`. Sign-off commit created by the Tier-A supervisor (not the implementer);
+implementation lane did not self-certify.

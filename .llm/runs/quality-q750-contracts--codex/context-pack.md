@@ -15,17 +15,20 @@
 The owner-mandated reset is complete at `3b3d615b`. Research and Design are written. The fresh
 scanner baseline is 50 findings / 0 allowances; the rejected prior pass used 41 allowances. The
 load-bearing design decision is to replace the lossy output-only schema facade at composition
-boundaries with native Zod input/output/object generics. No package implementation has started.
+boundaries with native Zod input/output/object generics. Slice 1 is implemented and green.
 
 ## Completed
 
 - Preflight, skill/doctrine/harness loading, scanner and JSR baselines.
 - Recovery and verification of the rejected pass's allowance count.
 - Research, plan, supervisor identity, Design checkpoint, and drift artifacts.
+- PLAN-EVAL PASS before implementation.
+- Slice 1 implementation and automated gates: scanner 50 → 41, allowances 0; scoped wrappers and
+  five package tests green.
 
 ## In Progress
 
-- Slice 1: application boundary typing.
+- Slice 1 separate review and sign-off commit, then Slice 2 native Zod typing.
 
 ## Next Steps
 
@@ -46,13 +49,15 @@ boundaries with native Zod input/output/object generics. No package implementati
 | Path | Status | Notes |
 | --- | --- | --- |
 | `.llm/runs/quality-q750-contracts--codex/*` | new | Harness plan artifacts only |
+| `packages/contracts/src/application/paginated-query.ts` | changed | Prisma argument bags use `unknown` |
+| `packages/contracts/src/application/transform-helpers.ts` | changed | typed omit construction and heterogeneous transformer accumulator |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | baseline only | publish PASS; doc lint recorded |
-| Fitness | failing baseline | scanner 50 findings / 0 allowances |
+| Static | slice 1 PASS | scoped check/lint/fmt and five tests green |
+| Fitness | improving | scanner 41 findings / 0 allowances after slice 1 |
 | Runtime | N/A | no runtime behavior |
 | Consumer | pending | planned after implementation |
 
