@@ -8,7 +8,9 @@ import { DATABASE, type DatabaseEngine, PACKAGE_SOURCE } from '../../../domain/e
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
 import { commandGate, denoCommand, httpGate } from './gate-factory.ts';
 
-const ASPIRE_RESOURCE_WAIT_TIMEOUT_SECONDS: Partial<Record<AspireResource, number>> = {
+const ASPIRE_RESOURCE_WAIT_TIMEOUT_SECONDS: Partial<
+  Record<AspireResource, number>
+> = {
   [ASPIRE_RESOURCE.MSSQL]: 600,
 };
 
@@ -29,7 +31,14 @@ function runtimeWaitGate(resource: AspireResource): GateDefinition {
       ];
       const timeoutSeconds = ASPIRE_RESOURCE_WAIT_TIMEOUT_SECONDS[resource];
       if (timeoutSeconds !== undefined) {
-        command.splice(3, 0, '--status', 'healthy', '--timeout', String(timeoutSeconds));
+        command.splice(
+          3,
+          0,
+          '--status',
+          'healthy',
+          '--timeout',
+          String(timeoutSeconds),
+        );
       }
       return command;
     },
@@ -58,7 +67,9 @@ export function createRuntimeGates(
       GATE.RUNTIME_AUTH_SMOKE_ENV,
       'Wire auth smoke environment',
       GATE_PHASE.RUNTIME,
-      (context) => ['deno', 'eval', AUTH_SMOKE_ENV_SCRIPT, context.project.projectRoot],
+      (
+        context,
+      ) => ['deno', 'eval', AUTH_SMOKE_ENV_SCRIPT, context.project.projectRoot],
     ),
     commandGate(
       GATE.RUNTIME_FLOW_B_FIXTURE,
@@ -108,7 +119,15 @@ export function createRuntimeGates(
       GATE.BEHAVIOR_SERVICE_HEALTH,
       'Users service health',
       GATE_PHASE.BEHAVIOR,
-      (context) => ['deno', 'eval', PROBE_SERVICE_HEALTH_SCRIPT, context.project.appHost, 'users'],
+      (
+        context,
+      ) => [
+        'deno',
+        'eval',
+        PROBE_SERVICE_HEALTH_SCRIPT,
+        context.project.appHost,
+        'users',
+      ],
     ),
     httpGate(
       GATE.BEHAVIOR_WORKERS_HEALTH,
@@ -150,7 +169,11 @@ export function createRuntimeGates(
       GATE_PHASE.BEHAVIOR,
       () => ['deno', 'eval', VALIDATE_WORKER_EXECUTIONS_SCRIPT],
     ),
-    httpGate(GATE.BEHAVIOR_SAGAS_HEALTH, 'Sagas API health', 'http://127.0.0.1:8092/health/live'),
+    httpGate(
+      GATE.BEHAVIOR_SAGAS_HEALTH,
+      'Sagas API health',
+      'http://127.0.0.1:8092/health/live',
+    ),
     httpGate(
       GATE.BEHAVIOR_SAGAS_LIST,
       'List saga definitions',
@@ -178,8 +201,16 @@ export function createRuntimeGates(
       GATE_PHASE.BEHAVIOR,
       () => ['deno', 'eval', VALIDATE_TRIGGER_EVENTS_SCRIPT],
     ),
-    httpGate(GATE.BEHAVIOR_AUTH_LIVE, 'Auth API liveness', 'http://127.0.0.1:8094/health/live'),
-    httpGate(GATE.BEHAVIOR_AUTH_READY, 'Auth API readiness', 'http://127.0.0.1:8094/health/ready'),
+    httpGate(
+      GATE.BEHAVIOR_AUTH_LIVE,
+      'Auth API liveness',
+      'http://127.0.0.1:8094/health/live',
+    ),
+    httpGate(
+      GATE.BEHAVIOR_AUTH_READY,
+      'Auth API readiness',
+      'http://127.0.0.1:8094/health/ready',
+    ),
     httpGate(
       GATE.BEHAVIOR_AUTH_SESSION,
       'Read auth session route',
@@ -189,7 +220,13 @@ export function createRuntimeGates(
       GATE.BEHAVIOR_AI_CHAT_ROUTE,
       'Import generated AI chat route',
       GATE_PHASE.BEHAVIOR,
-      (context) => denoCommand(context, 'eval', VALIDATE_AI_CHAT_ROUTE_SCRIPT, context.project.projectRoot),
+      (context) =>
+        denoCommand(
+          context,
+          'eval',
+          VALIDATE_AI_CHAT_ROUTE_SCRIPT,
+          context.project.projectRoot,
+        ),
       (context) => context.project.projectRoot,
     ),
   ];
@@ -254,6 +291,7 @@ const VALIDATE_AI_CHAT_ROUTE_SCRIPT = [
   'const projectRoot = Deno.args[0];',
   'if (!projectRoot) throw new Error("project root argument is required");',
   'const route = await import(`file://${projectRoot}/ai/routes/chat-stream.ts`);',
+  'const composition = await import(`file://${projectRoot}/ai/ai.ts`);',
   'if (typeof route.handler !== "function") throw new Error("AI chat-stream handler is not exported");',
   'if (typeof route.aiRouter !== "object" || route.aiRouter === null) {',
   '  throw new Error("AI chat-stream route did not export a contract-bound aiRouter");',
@@ -261,10 +299,16 @@ const VALIDATE_AI_CHAT_ROUTE_SCRIPT = [
   'if (typeof route.aiRouteContract !== "object" || route.aiRouteContract === null) {',
   '  throw new Error("AI chat-stream route did not export aiContractV1 handle");',
   '}',
+  'const handler = composition.ai().tools.resolveHandler("e2e-tool");',
+  'if (typeof handler !== "function") throw new Error("plugin ai add tool did not self-wire e2e-tool");',
+  'const result = await handler({ id: "e2e", name: "e2e-tool", arguments: JSON.stringify({ query: "ping" }), state: "input-complete" });',
+  'if (!result || result.state === "error") throw new Error("self-wired e2e-tool was not callable");',
   'console.info("AI chat route contract import smoke passed");',
 ].join('\n');
 
-function databaseRuntimeResources(database: DatabaseEngine): readonly AspireResource[] {
+function databaseRuntimeResources(
+  database: DatabaseEngine,
+): readonly AspireResource[] {
   switch (database) {
     case DATABASE.POSTGRES:
       return [ASPIRE_RESOURCE.POSTGRES];
@@ -495,15 +539,20 @@ const VALIDATE_WORKER_EXECUTIONS_SCRIPT = [
 /** Create cleanup gates that stop generated runtime resources. */
 export function createCleanupGates(): readonly GateDefinition[] {
   return [
-    commandGate(GATE.CLEANUP_ASPIRE_STOP, 'Stop generated Aspire AppHost', GATE_PHASE.CLEANUP, (
-      context,
-    ) => [
-      'aspire',
-      'stop',
-      '--apphost',
-      context.project.appHost,
-      '--non-interactive',
-      '--nologo',
-    ]),
+    commandGate(
+      GATE.CLEANUP_ASPIRE_STOP,
+      'Stop generated Aspire AppHost',
+      GATE_PHASE.CLEANUP,
+      (
+        context,
+      ) => [
+        'aspire',
+        'stop',
+        '--apphost',
+        context.project.appHost,
+        '--non-interactive',
+        '--nologo',
+      ],
+    ),
   ];
 }

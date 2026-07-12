@@ -18,6 +18,7 @@ export {
 export { DEFAULT_TOOL_INPUT, toolResource, toolScaffolder } from './tool/tool.ts';
 export { agentResource, agentScaffolder, DEFAULT_AGENT_INPUT } from './agent/agent.ts';
 export { type McpToolInput, mcpToolScaffolder } from './mcp-tool/mcp-tool.ts';
+export { emitMcpRegistry, emitMcpServer, type McpServerInput } from './mcp-server/mcp-server.ts';
 export {
   DEFAULT_THREAD_STORE_INPUT,
   threadStoreResource,

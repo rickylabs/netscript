@@ -50,6 +50,28 @@ export interface AiRegistryTarget {
   readonly typeImport: AiRegistryTypeImport;
 }
 
+/** Canonical generated tool registry target used by AI resource commands. */
+export const AI_TOOLS_TARGET: AiRegistryTarget = {
+  kind: 'ai-tools',
+  dir: 'ai/tools',
+  registryPath: '.netscript/generated/plugin-ai/tools.registry.ts',
+  fileSuffixes: ['.ts'],
+  exclude: ['_registry.ts', 'mod.ts', 'types.ts', 'skill-loader.ts'],
+  varPrefix: 'tool',
+  typeImport: { name: 'AiToolDefinition', from: '@netscript/ai/tools' },
+};
+
+/** Canonical generated agent registry target used by AI resource commands. */
+export const AI_AGENTS_TARGET: AiRegistryTarget = {
+  kind: 'ai-agents',
+  dir: 'ai/agents',
+  registryPath: '.netscript/generated/plugin-ai/agents.registry.ts',
+  fileSuffixes: ['.ts'],
+  exclude: ['_registry.ts', 'mod.ts', 'types.ts'],
+  varPrefix: 'agent',
+  typeImport: { name: 'AgentLoop', from: '@netscript/ai/agent' },
+};
+
 /** Result of compiling one AI runtime-registry target. */
 export interface AiRegistryCompileResult {
   /** Project-relative source files included in the registry, sorted. */

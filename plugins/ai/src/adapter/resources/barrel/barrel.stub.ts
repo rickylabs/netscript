@@ -22,10 +22,12 @@ import {
   type ModelHandle,
 } from '@netscript/ai';
 import { createToolRegistry } from '@netscript/ai/tools';
-// Side-effect import: registers the 'anthropic' provider on the model registry.
+import { registry as toolRegistry } from '../.netscript/generated/plugin-ai/tools.registry.ts';
+import { registry as agentRegistry } from '../.netscript/generated/plugin-ai/agents.registry.ts';
+import { initializeMcpTools } from './mcp/registry.ts';
+// Side-effect import: registers the default provider.
 import '@netscript/ai/anthropic';
 import { DEFAULT_CHAT_MODEL } from './models.ts';
-import { echoTool } from './tools/echo.ts';
 
 let runtime: AiRuntime | undefined;
 
@@ -33,7 +35,10 @@ let runtime: AiRuntime | undefined;
 export const DEFAULT_CHAT_PROVIDER: string = DEFAULT_CHAT_MODEL.split(':')[0] ?? 'anthropic';
 
 /** App-owned AI tool registry consumed by the agent loop and /v1/ai/tools/:name. */
-export const aiTools = createToolRegistry([echoTool]);
+export const aiTools = createToolRegistry([...toolRegistry.values()]);
+
+/** App-owned AI agent factories discovered from ai/agents. */
+export const aiAgents = agentRegistry;
 
 /** Get (or lazily create) the app-wide AI runtime. */
 export function ai(): AiRuntime {
@@ -42,6 +47,7 @@ export function ai(): AiRuntime {
       defaultModelProvider: DEFAULT_CHAT_PROVIDER,
       tools: aiTools,
     });
+    void initializeMcpTools(runtime.tools);
   }
   return runtime ??
     createAiRuntime({ defaultModelProvider: DEFAULT_CHAT_PROVIDER, tools: aiTools });

@@ -14,11 +14,14 @@ import {
   DEFAULT_MODELS_INPUT,
   DEFAULT_STREAM_PROXY_INPUT,
   DEFAULT_TOOL_INPUT,
+  emitMcpRegistry,
   modelsScaffolder,
   streamProxyScaffolder,
   threadStoreResource,
   toolResource,
 } from './resources/mod.ts';
+import { aiCommands } from '../cli/ai-commands.ts';
+import { diagnoseAiProject } from '../cli/ai-project.ts';
 
 export type { InstallStarterResource, NetScriptPlugin } from '@netscript/plugin/adapter';
 
@@ -33,6 +36,10 @@ export const aiStarterResources: readonly InstallStarterResource[] = [
   { scaffolder: barrelScaffolder, input: DEFAULT_BARREL_INPUT },
   { scaffolder: toolResource.scaffolder, input: DEFAULT_TOOL_INPUT },
   { scaffolder: agentResource.scaffolder, input: DEFAULT_AGENT_INPUT },
+  {
+    scaffolder: { name: 'mcp-registry', emit: () => [emitMcpRegistry([])] },
+    input: {},
+  },
   { scaffolder: streamProxyScaffolder, input: DEFAULT_STREAM_PROXY_INPUT },
   { scaffolder: chatRouteScaffolder, input: DEFAULT_CHAT_ROUTE_INPUT },
 ];
@@ -48,7 +55,24 @@ export const aiAdapterPlugin: NetScriptPlugin = {
     configParams: ['AI_MODEL', 'ANTHROPIC_API_KEY'],
   },
   doctor: {
-    requiredConfigKeys: ['ANTHROPIC_API_KEY'],
+    extraChecks: [
+      {
+        name: 'ai-project',
+        async run(context) {
+          const result = await diagnoseAiProject(context);
+          const failures = [
+            ...result.modelRefs.map((ref) => `Dangling model ref ${ref}`),
+            ...result.missingProviderKeys.map((key) => `Missing provider key ${key}`),
+            ...result.unwiredTools.map((tool) => `Tool ${tool} is not wired`),
+          ];
+          return {
+            name: 'ai-project',
+            ok: failures.length === 0,
+            message: failures.join('; ') || undefined,
+          };
+        },
+      },
+    ],
   },
   info: {
     capabilities: [
@@ -68,4 +92,5 @@ export const aiAdapterPlugin: NetScriptPlugin = {
     strategy: 'manifest-only',
   },
   resources: [toolResource, agentResource, threadStoreResource],
+  commands: aiCommands,
 };

@@ -12,6 +12,7 @@ import {
 } from '@netscript/plugin/adapter';
 import { type AiResourceInput, exportStem, fileStem, parseResourceInput } from '../input.ts';
 import { agentStub } from './agent.stub.ts';
+import { syncAiProject } from '../../../cli/sync-ai-project.ts';
 
 /** Canonical starter agent input emitted during AI install. */
 export const DEFAULT_AGENT_INPUT: AiResourceInput = { id: 'assistant' };
@@ -38,4 +39,5 @@ export const agentResource: PluginResource<AiResourceInput> = {
   scaffolder: agentScaffolder,
   defaultInput: DEFAULT_AGENT_INPUT,
   parseInput: parseResourceInput,
+  afterWrite: syncAiProject,
 };

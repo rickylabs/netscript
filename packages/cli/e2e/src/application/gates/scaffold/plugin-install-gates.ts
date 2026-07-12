@@ -53,10 +53,18 @@ function pluginInstallCommand(
       return cli(context, ...args);
     }
 
-    if (context.request.options.packageSource === PACKAGE_SOURCE.JSR) return cli(context, ...args);
+    if (context.request.options.packageSource === PACKAGE_SOURCE.JSR) {
+      return cli(context, ...args);
+    }
 
     if (kind === PLUGIN.SAGA) {
-      return ['deno', 'run', '-A', 'packages/cli/bin/netscript-dev.ts', ...args];
+      return [
+        'deno',
+        'run',
+        '-A',
+        'packages/cli/bin/netscript-dev.ts',
+        ...args,
+      ];
     }
     return cli(context, ...args);
   };
@@ -64,13 +72,16 @@ function pluginInstallCommand(
 
 function pluginInstallCwd(kind: PluginKind): WorkingDirectoryFactory {
   return (context) =>
-    kind === PLUGIN.SAGA || kind === PLUGIN.TRIGGER || kind === PLUGIN.AUTH || kind === PLUGIN.AI
+    kind === PLUGIN.SAGA || kind === PLUGIN.TRIGGER || kind === PLUGIN.AUTH ||
+      kind === PLUGIN.AI
       ? context.project.projectRoot
       : context.project.repoRoot;
 }
 
 /** Create scaffold gates that install every requested official plugin. */
-export function createPluginInstallGates(state: PluginSuiteState): readonly GateDefinition[] {
+export function createPluginInstallGates(
+  state: PluginSuiteState,
+): readonly GateDefinition[] {
   const gates = state.plugins.map((kind) =>
     commandGate(
       `scaffold.plugin.${kind}`,
@@ -87,6 +98,36 @@ export function createPluginInstallGates(state: PluginSuiteState): readonly Gate
       GATE_PHASE.SCAFFOLD,
       pluginInstallCommand(PLUGIN.AI, state, true),
       pluginInstallCwd(PLUGIN.AI),
+    ));
+  }
+  if (state.plugins.includes(PLUGIN.AI)) {
+    gates.push(commandGate(
+      GATE.SCAFFOLD_PLUGIN_AI_LIFECYCLE,
+      'Add and self-wire an AI tool through the plugin CLI',
+      GATE_PHASE.SCAFFOLD,
+      (context) =>
+        context.request.options.packageSource === PACKAGE_SOURCE.JSR
+          ? [
+            'deno',
+            'x',
+            '-A',
+            'jsr:@netscript/plugin-ai/cli',
+            'add',
+            'tool',
+            'e2e-tool',
+            `--workspaceRoot=${context.project.projectRoot}`,
+          ]
+          : [
+            'deno',
+            'run',
+            '-A',
+            join(context.project.repoRoot, 'plugins', 'ai', 'cli.ts'),
+            'add',
+            'tool',
+            'e2e-tool',
+            `--workspaceRoot=${context.project.projectRoot}`,
+          ],
+      (context) => context.project.repoRoot,
     ));
   }
   return gates;

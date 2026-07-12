@@ -29,6 +29,7 @@ Deno.test('ai install emits only userland glue under ai/', () => {
     'ai/ai.ts',
     'ai/tools/echo.ts',
     'ai/agents/assistant.ts',
+    'ai/mcp/registry.ts',
     'ai/routes/chat-stream.ts',
     'ai/routes/chat.tsx',
   ]);
@@ -44,12 +45,13 @@ Deno.test('ai install emits only userland glue under ai/', () => {
   }
 });
 
-Deno.test('ai starter resources cover the six current emitters', () => {
+Deno.test('ai starter resources cover the current emitters', () => {
   assertEquals(aiStarterResources.map((resource) => resource.scaffolder.name), [
     'models',
     'barrel',
     'tool',
     'agent',
+    'mcp-registry',
     'stream-proxy',
     'chat-route',
   ]);
@@ -61,7 +63,11 @@ Deno.test('ai scaffold emitters have focused golden content', () => {
 
   assertStringIncludes(byPath.get('ai/models.ts') ?? '', 'DEFAULT_CHAT_MODEL');
   assertStringIncludes(byPath.get('ai/ai.ts') ?? '', 'createAiRuntime');
-  assertStringIncludes(byPath.get('ai/ai.ts') ?? '', 'createToolRegistry([echoTool])');
+  assertStringIncludes(
+    byPath.get('ai/ai.ts') ?? '',
+    'createToolRegistry([...toolRegistry.values()])',
+  );
+  assertStringIncludes(byPath.get('ai/ai.ts') ?? '', 'initializeMcpTools(runtime.tools)');
   assertStringIncludes(byPath.get('ai/tools/echo.ts') ?? '', "defineAiTool('echo')");
   assertStringIncludes(byPath.get('ai/agents/assistant.ts') ?? '', 'createAgentLoop');
   assertStringIncludes(byPath.get('ai/agents/assistant.ts') ?? '', 'modelProvider');
