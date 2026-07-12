@@ -65,3 +65,8 @@ manifest data rather than a new exported type and its no-slow-types dry-run is g
 doc-lint baseline is not misreported as slice regression. `arch:check` similarly reports
 pre-existing warnings but exits 0. No
 `scaffold.runtime` was run, by owner instruction.
+
+## Evaluation
+
+Separate-session IMPL-EVAL returned **PASS** at `58861a84` after independently rerunning the scanner,
+scanner tests, exact CI documentation sequence, diff/lock checks, and reviewing both typed seams.
