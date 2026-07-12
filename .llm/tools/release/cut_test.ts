@@ -76,12 +76,20 @@ Deno.test('release cut bump coordinator updates root members and lock with no re
   try {
     await write(`${temp}/deno.json`, {
       version: '0.0.1-alpha.11',
-      workspace: ['packages/*', 'plugins/*'],
+      workspace: [
+        'packages/*',
+        'packages/cli/e2e',
+        'plugins/*',
+        'examples/*',
+        'apps/*',
+      ],
       publish: false,
     });
     await Deno.mkdir(`${temp}/packages/contracts`, { recursive: true });
     await Deno.mkdir(`${temp}/packages/cli/e2e`, { recursive: true });
     await Deno.mkdir(`${temp}/plugins/workers`, { recursive: true });
+    await Deno.mkdir(`${temp}/examples/storefront`, { recursive: true });
+    await Deno.mkdir(`${temp}/apps/dashboard`, { recursive: true });
     await write(`${temp}/packages/contracts/deno.json`, {
       name: '@netscript/contracts',
       version: '0.0.1-alpha.11',
@@ -99,6 +107,20 @@ Deno.test('release cut bump coordinator updates root members and lock with no re
         '@netscript/contracts': 'jsr:@netscript/contracts@0.0.1-alpha.11',
         '@netscript/config': 'jsr:@netscript/config@^0.0.1-alpha.11',
       },
+    });
+    await write(`${temp}/plugins/workers/scaffold.plugin.json`, {
+      name: 'workers',
+      version: '0.0.1-alpha.11',
+    });
+    await write(`${temp}/examples/storefront/deno.json`, {
+      name: '@netscript/example-storefront',
+      version: '0.0.1-alpha.11',
+      publish: false,
+    });
+    await write(`${temp}/apps/dashboard/deno.json`, {
+      name: '@netscript/dashboard',
+      version: '0.0.1-alpha.11',
+      publish: false,
     });
     await Deno.writeTextFile(
       `${temp}/deno.lock`,
@@ -118,7 +140,20 @@ Deno.test('release cut bump coordinator updates root members and lock with no re
     assertEquals(result.oldVersion, '0.0.1-alpha.11');
     assertEquals(result.newVersion, '0.0.1-alpha.99');
     assertEquals(await findVersionResidue(temp, result.oldVersion), []);
-    assertEquals(await Deno.readTextFile(`${temp}/deno.json`).then(readVersion), '0.0.1-alpha.99');
+    const expectedVersionFiles = [
+      `${temp}/apps/dashboard/deno.json`,
+      `${temp}/deno.json`,
+      `${temp}/deno.lock`,
+      `${temp}/examples/storefront/deno.json`,
+      `${temp}/packages/cli/e2e/deno.json`,
+      `${temp}/packages/contracts/deno.json`,
+      `${temp}/plugins/workers/deno.json`,
+      `${temp}/plugins/workers/scaffold.plugin.json`,
+    ].sort();
+    assertEquals([...result.files], expectedVersionFiles);
+    for (const file of expectedVersionFiles.filter((path) => path.endsWith('.json'))) {
+      assertEquals(await Deno.readTextFile(file).then(readVersion), '0.0.1-alpha.99');
+    }
     assertEquals(
       (await Deno.readTextFile(`${temp}/plugins/workers/deno.json`)).includes(
         'jsr:@netscript/config@^0.0.1-alpha.99',
@@ -128,6 +163,12 @@ Deno.test('release cut bump coordinator updates root members and lock with no re
     assertEquals(
       (await Deno.readTextFile(`${temp}/deno.lock`)).includes(
         'jsr:@netscript/contracts@0.0.1-alpha.99',
+      ),
+      true,
+    );
+    assertEquals(
+      (await Deno.readTextFile(`${temp}/deno.lock`)).includes(
+        'jsr:@netscript/config@^0.0.1-alpha.99',
       ),
       true,
     );
