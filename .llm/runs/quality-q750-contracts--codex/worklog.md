@@ -76,7 +76,7 @@ module, then add a parse and type-inference test. Never cast a Zod value into a 
 | --- | --- | --- | --- |
 | 2026-07-12 | bootstrap | preflight | Hard reset confirmed exact baseline and branch. |
 | 2026-07-12 | research | baseline | Fresh scanner: 50 findings, 0 allowances; rejected pass: 41 allowances. |
-| 2026-07-12 | plan | Plan-Gate | Awaiting separate Claude-family PLAN-EVAL; no package implementation started. |
+| 2026-07-12 | plan | Plan-Gate | Separate Claude Opus 4.8 session `b2f5d950-e468-4fde-8177-0460ffada95e` returned PASS; no package implementation preceded it. |
 
 ## Decisions
 
@@ -102,6 +102,7 @@ module, then add a parse and type-inference test. Never cast a Zod value into a 
 | Scanner | FAIL expected | 50 findings, 0 allowances on clean baseline |
 | Publish dry-run | PASS | No slow-type flag required |
 | Doc lint | RECORDED | Exit 0; 12 combined private refs, 0 missing JSDoc |
+| PLAN-EVAL | PASS | All eight Plan-Gate checks passed in separate opposite-family session |
 
 ### Static Gates
 
@@ -135,4 +136,3 @@ module, then add a parse and type-inference test. Never cast a Zod value into a 
   baseline finding family has an implementation slice and proving gate.
 - Final worklog must report prior allowance count 41 versus final count and justify every survivor
   individually; an empty survivor table is preferred.
-

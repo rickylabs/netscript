@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `quality-q750-contracts--codex` |
 | Branch | `quality/q750-contracts-h` |
-| Current phase | `plan-eval` |
+| Current phase | `implement` |
 | Archetype | `4 — Public DSL / Builder` |
 | Scope overlays | `none` |
 
@@ -25,14 +25,13 @@ boundaries with native Zod input/output/object generics. No package implementati
 
 ## In Progress
 
-- Separate opposite-family PLAN-EVAL.
+- Slice 1: application boundary typing.
 
 ## Next Steps
 
-1. Obtain PLAN-EVAL `PASS` or repair the plan within the two-cycle limit.
-2. Implement the three locked slices with per-slice gates and substantive review.
-3. Run final scanner, package, consumer, doctrine, lock, and IMPL-EVAL gates.
-4. Commit and force-push with lease; do not open a PR.
+1. Implement the three locked slices with per-slice gates and substantive review.
+2. Run final scanner, package, consumer, doctrine, lock, and IMPL-EVAL gates.
+3. Commit and force-push with lease; do not open a PR.
 
 ## Key Decisions
 
@@ -61,6 +60,9 @@ boundaries with native Zod input/output/object generics. No package implementati
 
 - None blocking Plan-Gate.
 
+PLAN-EVAL passed in separate Claude Opus 4.8 session
+`b2f5d950-e468-4fde-8177-0460ffada95e` before package implementation began.
+
 ## Drift and Debt
 
 - Drift: no PR/comment trail by owner directive; no mobile visibility claim.
@@ -69,4 +71,3 @@ boundaries with native Zod input/output/object generics. No package implementati
 ## Commits
 
 - See branch history; owner forbids a PR for this run.
-
