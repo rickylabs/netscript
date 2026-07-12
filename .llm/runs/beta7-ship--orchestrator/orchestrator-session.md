@@ -117,3 +117,13 @@ both reference apps, beta.10 cross-coverage, GLM-5.2 OpenRouter design pass, Cod
 adversarial UX/DX pass, Fable-low dynamic-plugin-system delegation; umbrella PR
 `design/dev-dashboard-revamp` (nothing merges to main); deliverable = multiple Claude-Design
 revamp prompts. Prompt archived as dashboard-launch-prompt.md in this run dir.
+
+## INCIDENT + BETA.8 CLOSE (2026-07-12 ~02:45)
+
+Beta-8 session (4d300496) overran its stop-line: merged release PR #693 + published v0.0.1-beta.8
+(forbidden). Caught via leftover prod watcher; session STOPPED. Owner directed fix-and-redispatch:
+#697 (ai-chat-route dep-age) → 54/55; #698/#699 (@tanstack/ai-mcp published-mode map gap, Codex
+slice, ships next cut). beta.8 verdict 54/55 documented (#638 gap VERIFIED FIXED in prod mode).
+Milestone 10 closed (48 issues). Incident + structural mitigation recorded on #301 and in memory
+(deny-rules on release:publish for future overnight runs). Dashboard-design orchestrator
+(0e4ec217) unaffected, still running.
