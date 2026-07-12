@@ -16,29 +16,35 @@ after file changes settle, and passes the current `RuntimeConfig` to your callba
 
 - A writable runtime config directory.
 - `NETSCRIPT_RUNTIME_CONFIG_DIR` set for the process that reads overrides.
-- A `current` pointer file in that directory.
+- The `netscript` CLI with write access to that directory. The CLI creates and atomically replaces
+  the `current` pointer.
 - A service or worker process that can call `watchRuntimeConfig(...)` during startup.
 
 ## Create an override topic
 
-Runtime config files are versioned behind the `current` pointer. Stage the new version beside the
-old one, then swap `current` atomically so readers either see the previous version or the next one.
+Runtime config files are versioned behind the `current` pointer. Author the topic payload locally,
+then publish it; the CLI writes `runtime/<topic>/v<version>.json` before atomically replacing
+`current`, so readers see either the previous version or the next one.
 
 ```bash
 export NETSCRIPT_RUNTIME_CONFIG_DIR=/etc/netscript/runtime-config
-mkdir -p "$NETSCRIPT_RUNTIME_CONFIG_DIR"
-
-cat > "$NETSCRIPT_RUNTIME_CONFIG_DIR/2026-06-22.json" <<'JSON'
+cat > ./features-v2026-06-22.json <<'JSON'
 {
-  "features": {
-    "workers.high-throughput": true
-  }
+  "flags": [
+    { "id": "workers.high-throughput", "enabled": true }
+  ]
 }
 JSON
 
-tmp="$(mktemp "$NETSCRIPT_RUNTIME_CONFIG_DIR/current.XXXX")"
-printf "2026-06-22.json\n" > "$tmp"
-mv "$tmp" "$NETSCRIPT_RUNTIME_CONFIG_DIR/current"
+netscript config override publish features ./features-v2026-06-22.json \
+  --version 2026-06-22
+```
+
+For a single dashboard-style feature change, the CLI can create and activate the next snapshot
+directly:
+
+```bash
+netscript config override set flags.checkout-v2 --rollout 30
 ```
 
 ## Watch and apply changes
@@ -79,12 +85,11 @@ version file first, then replace `current` in a single rename.
 
 ## Roll back
 
-Rollback is the same pointer swap in reverse:
+Rollback validates that the requested topic version exists, preserves the other active topic
+pointers, and atomically replaces `current`:
 
 ```bash
-tmp="$(mktemp "$NETSCRIPT_RUNTIME_CONFIG_DIR/current.XXXX")"
-printf "2026-06-21.json\n" > "$tmp"
-mv "$tmp" "$NETSCRIPT_RUNTIME_CONFIG_DIR/current"
+netscript config override rollback features 2026-06-21
 ```
 
 The next watcher reload sees the previous version and calls `onChange` again.
@@ -94,7 +99,8 @@ The next watcher reload sees the previous version and calls `onChange` again.
 - Missing directory or missing files load as empty defaults so the process can start.
 - A malformed pointed-to file is surfaced in the runtime config summary; publish that summary to
   logs or health output.
-- A non-atomic edit can produce a partial read. Stage a complete version file and swap `current`.
+- Hand-editing `current` can produce a partial read. Use `config override publish|rollback`, which
+  stage a complete pointer and replace it with one rename.
 - A long-running `onChange` callback can lag later updates. Keep the callback bounded and hand off
   heavier work to a queue.
 

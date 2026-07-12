@@ -63,6 +63,12 @@ export interface DeployTargetRequest {
   readonly nonInteractive?: boolean;
   /** Target-specific config resolved from `deploy.targets.<key>`. */
   readonly targetConfig?: DeployTargetRequestConfig;
+  /** Optional secrets sub-operation routed to a target's secret backend. */
+  readonly secrets?: {
+    readonly operation: 'set' | 'get' | 'list';
+    readonly key?: string;
+    readonly value?: string;
+  };
 }
 
 /** Result returned by deploy target operations. */

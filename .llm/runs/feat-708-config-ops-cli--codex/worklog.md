@@ -74,6 +74,27 @@ not invented in this CLI slice. The orchestrator owns `scaffold.runtime` / full 
   tree. `deploy-local-aspire.md` now documents regeneration and graph mutation without re-scaffold.
 - Reconcile: no PR opened; no issue state changed by this implementation lane.
 
+### Slice 3 — deploy discovery, target secrets routing, docs, final gates
+
+- Focused config/service/deploy test selection: 15 passed, 0 failed.
+- Scoped check wrapper: 69 files selected, 1 batch, 0 failed batches, 0 diagnostics; command includes
+  `--unstable-kv`.
+- Scoped lint wrapper: 67 files selected, 0 findings. Scoped format wrapper: 67 files selected,
+  0 findings.
+- Live `netscript-dev deploy list --json`: exit 0 and returned all 10 default registry targets with
+  each adapter's advertised operation list.
+- Target secrets parser test proves `secrets set|get|list` is exposed for a target that advertises
+  the canonical `secrets` operation and forwards `{ operation, key, value }` without target-specific
+  command logic. Default adapters currently advertise no `secrets` operation until their existing
+  deploy-core store wiring is composed; no end-to-end secret backend claim is made here.
+- `roll-out-runtime-overrides.md` replaces `cat`/`printf` pointer manipulation with
+  `config override publish|rollback` and documents the dashboard-aligned set spelling.
+- Full `deno task e2e:cli` / `scaffold.runtime`: **not run by instruction**; orchestrator-owned and
+  therefore unproven in this worklog.
+- `deno.lock`: unchanged.
+- Reconcile: no PR opened; final issue taxonomy/milestone/acceptance reconciliation remains with the
+  beta-9 orchestrator.
+
 ## Drift
 
 - **D1 (carried, owner-authorized):** PLAN-EVAL is waived in the slice brief. This worklog records a
