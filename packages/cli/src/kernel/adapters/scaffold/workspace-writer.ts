@@ -59,6 +59,23 @@ export async function addWorkspaceMember(
   await fs.writeFile(configPath, JSON.stringify(config, null, 2) + '\n');
 }
 
+/** Remove a workspace member when present, preserving sorted configuration output. */
+export async function removeWorkspaceMember(
+  rootPath: string,
+  memberPath: string,
+  fs: FileSystemPort,
+): Promise<boolean> {
+  const configPath = join(rootPath, SCAFFOLD_FILES.DENO_JSON);
+  const config = JSON.parse(await fs.readFile(configPath)) as Record<string, unknown>;
+  const workspace = (config.workspace ?? []) as string[];
+  const normalized = './' + memberPath.replace(/\\/g, '/').replace(/^\.\//, '');
+  const next = workspace.filter((member) => member !== normalized && member !== memberPath);
+  if (next.length === workspace.length) return false;
+  config.workspace = next.sort();
+  await fs.writeFile(configPath, JSON.stringify(config, null, 2) + '\n');
+  return true;
+}
+
 /**
  * Allocate an available port within the predefined range for a resource type.
  *

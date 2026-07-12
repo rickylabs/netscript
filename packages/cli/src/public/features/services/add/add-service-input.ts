@@ -7,6 +7,7 @@ export interface AddServiceCommandInput {
   readonly refs?: string;
   readonly projectRoot?: string;
   readonly force?: boolean;
+  readonly withClient?: boolean;
 }
 
 /** User request handled by the public add-service use case. */

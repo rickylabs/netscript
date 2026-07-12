@@ -4,6 +4,8 @@ import { createServiceAddCommand } from './add/add-service-command.ts';
 import { createServiceGenerateCommand } from './generate/generate-service-command.ts';
 import { serviceListCommand } from './list/list-services-command.ts';
 import type { PublicCommandDependencies } from '../root/public-command-dependencies.ts';
+import { createServiceRemoveCommand } from './remove/remove-service-command.ts';
+import { createServiceAddHandlerCommand } from './add-handler/add-service-handler-command.ts';
 
 /** Create the public service command group. */
 export function createServiceCommand(
@@ -23,6 +25,22 @@ export function createServiceCommand(
       }),
     )
     .command('list', serviceListCommand)
+    .command(
+      'remove',
+      createServiceRemoveCommand({
+        fs: dependencies.fs,
+        scaffolder: dependencies.scaffolder,
+        templateAdapter: dependencies.templateAdapter,
+        resolveProjectRoot: dependencies.resolveProjectRoot,
+      }),
+    )
+    .command(
+      'add-handler',
+      createServiceAddHandlerCommand({
+        fs: dependencies.fs,
+        resolveProjectRoot: dependencies.resolveProjectRoot,
+      }),
+    )
     .command(
       'generate',
       createServiceGenerateCommand({

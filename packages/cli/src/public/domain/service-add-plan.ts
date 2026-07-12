@@ -17,6 +17,9 @@ export interface ServiceAddRequest {
 
   /** Whether existing generated files may be overwritten. */
   readonly overwrite: boolean;
+
+  /** Whether to scaffold a typed SDK/query module for this service. */
+  readonly withClient?: boolean;
 }
 
 /** Planned service addition with project metadata resolved. */
@@ -41,4 +44,7 @@ export interface ServiceRenderResult {
 export interface AddServiceResult extends ServiceRenderResult {
   /** AppHost helper files regenerated after config mutation. */
   readonly helperFiles: readonly string[];
+
+  /** Typed client/query module written for the service, when requested. */
+  readonly clientPath?: string;
 }

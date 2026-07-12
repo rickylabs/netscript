@@ -30,6 +30,7 @@ import { PluginScaffolder } from '../../../kernel/adapters/plugin/scaffolder.ts'
 import { PluginWorkspaceMutator } from '../../../kernel/adapters/plugin/workspace-mutator.ts';
 import { PortAllocator } from '../../../kernel/adapters/service/port-allocator.ts';
 import { ServiceScaffolder } from '../../../kernel/adapters/service/scaffolder.ts';
+import { ServiceClientScaffolder } from '../../../kernel/adapters/service/client-scaffolder.ts';
 import { ServiceWorkspaceResolver } from '../../../kernel/adapters/service/workspace-resolver.ts';
 import { emptyScaffoldResult } from '../../../kernel/application/scaffold/support/helpers.ts';
 import { DbEngineRegistry } from '../../../kernel/application/registries/db-engine-registry.ts';
@@ -109,6 +110,7 @@ export interface PublicCommandDependencies {
     readonly serviceResolver: ServiceWorkspaceResolver;
     readonly contractScaffolder: ReturnType<typeof createContractScaffolder>;
     readonly serviceScaffolder: ServiceScaffolder;
+    readonly clientScaffolder: ServiceClientScaffolder;
   };
   /** Dependencies for plugin install. */
   readonly pluginInstallDependencies: {
@@ -207,6 +209,7 @@ export function createPublicCommandDependencies(
       workspaceResolver: new ContractWorkspaceResolver(fs),
     }),
     serviceScaffolder: new ServiceScaffolder(scaffolder, fs, templateAdapter),
+    clientScaffolder: new ServiceClientScaffolder(scaffolder, fs),
   };
   const createInitContext = (initFs: FileSystemPort): InitPipelineContext => {
     const initTemplateAdapter = new StringTemplateAdapter(initFs);
