@@ -2,7 +2,7 @@ import { assertEquals } from '@std/assert';
 
 Deno.test('stdio initialize, list, and unreachable doctor round trip', async () => {
   const command = new Deno.Command(Deno.execPath(), {
-    args: ['run', '--allow-env', '--allow-net', 'cli.ts'],
+    args: ['run', '--allow-env', '--allow-net', '--allow-read', 'cli.ts'],
     cwd: new URL('..', import.meta.url),
     stdin: 'piped',
     stdout: 'piped',

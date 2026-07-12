@@ -16,6 +16,13 @@ import { createGetAppStatusFlow } from './src/application/flows/get-app-status-f
 import { createGetRecentErrorsFlow } from './src/application/flows/get-recent-errors-flow.ts';
 import { createGetRunFlow } from './src/application/flows/get-run-flow.ts';
 import { createListRunsFlow } from './src/application/flows/list-runs-flow.ts';
+import { AspireDoctorFamily } from './src/infrastructure/aspire-doctor-family.ts';
+import {
+  PluginDoctorFamily,
+  UnwiredProjectDoctor,
+} from './src/infrastructure/plugin-doctor-family.ts';
+import { ProjectWiringDoctorFamily } from './src/infrastructure/project-wiring-doctor-family.ts';
+import { createDoctorFlow } from './src/application/flows/doctor-flow.ts';
 
 /** Resolve the public documentation root from flags, environment, or the project directory. */
 export function resolveDocsRoot(
@@ -34,8 +41,9 @@ export async function runMcpStdioServer(): Promise<void> {
   const environment = readTelemetryEndpointEnvironment();
   const query = createResolvedTelemetryQuery(undefined, environment);
   const docsCorpus = new FilesystemDocsCorpus({ root: resolveDocsRoot() });
+  const probe = new FetchTelemetryProbe();
   const server = createMcpServer({
-    probe: new FetchTelemetryProbe(),
+    probe,
     environment,
     flows: {
       ...createDocsFlows(docsCorpus),
@@ -43,6 +51,11 @@ export async function runMcpStdioServer(): Promise<void> {
       list_runs: createListRunsFlow(query),
       get_run: createGetRunFlow(query),
       get_recent_errors: createGetRecentErrorsFlow(query),
+      doctor: createDoctorFlow(probe, environment, [
+        new AspireDoctorFamily(),
+        new ProjectWiringDoctorFamily(),
+        new PluginDoctorFamily(new UnwiredProjectDoctor()),
+      ], Deno.cwd()),
     },
   });
   await runNewlineStdio(server, Deno.stdin.readable, Deno.stdout.writable);
