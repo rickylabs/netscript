@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
 
 import { createSyncPackagesCommand } from './packages/sync-packages-command.ts';
@@ -10,7 +11,7 @@ import type { MaintainerCommandDependencies } from '../root/maintainer-command-d
 export function createSyncCommand(
   host: MaintainerCliHost,
   dependencies: MaintainerCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   return new Command()
     .name('sync')
     .description('Sync local monorepo assets into a scaffolded workspace')

@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
 
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
@@ -9,7 +10,7 @@ import { generateAspire } from './generate-aspire.ts';
 /** Create `generate aspire`, regenerating helpers without re-scaffolding. */
 export function createGenerateAspireCommand(
   dependencies: PublicCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   return new Command().name('aspire')
     .description('Regenerate Aspire AppHost helpers from appsettings.json')
     .option('--project-root <path:string>', 'Project root directory')

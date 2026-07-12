@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 /**
  * @module
  *
@@ -39,7 +40,7 @@ export interface PluginScaffoldCommandInput {
 /** Create the public `plugin scaffold` command. */
 export function createPluginScaffoldCommand(
   dependencies: PluginScaffoldCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   const print = dependencies.print ?? outputText;
   return new Command()
     .name('scaffold')
@@ -69,7 +70,7 @@ export function createPluginScaffoldCommand(
       if (result.filesSkipped.length > 0) {
         print(`Skipped ${result.filesSkipped.length} existing plugin files.`);
       }
-    }) as unknown as Command;
+    });
 }
 
 function resolveCommandTarget(projectRoot: string, pluginName: string, target?: string): string {

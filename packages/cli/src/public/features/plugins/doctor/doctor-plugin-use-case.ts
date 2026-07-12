@@ -108,7 +108,7 @@ async function checkAuthBackend(
   plugin: RegisteredPluginConfig,
   fs: FileSystemPort,
 ): Promise<readonly PluginDoctorCheck[]> {
-  if (plugin.name !== 'auth' && !plugin.name.includes('plugin-auth')) return [];
+  if (!plugin.cli?.doctorChecks?.includes('auth-backend')) return [];
   try {
     const backend = await showAuthBackend(projectRoot, fs);
     return [{

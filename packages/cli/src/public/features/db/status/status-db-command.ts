@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
 /**
  * @module public/features/db/status/status-db-command
@@ -18,6 +19,6 @@ export class StatusDbCommand extends DbOperationCommand {
 /** Create the public `db status` command. */
 export function createDbStatusCommand(
   dependencies: DbOperationCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   return new StatusDbCommand(dependencies).define();
 }

@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
 import { parseContractVersion } from '../../../../kernel/adapters/contracts/types.ts';
@@ -9,7 +10,7 @@ import type { AddContractVersionInput } from './add-contract-version-input.ts';
 import { addContractVersion } from './add-contract-version.ts';
 
 /** `netscript contract version add` command. */
-export const contractVersionAddCommand: Command<any, any, any, any, any, any, any, any> =
+export const contractVersionAddCommand: CliffyCommand =
   new Command()
     .name('add')
     .description('Promote a contract into a new version directory')

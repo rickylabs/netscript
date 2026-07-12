@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 /**
  * @module public/features/contract-add-command
@@ -31,7 +32,7 @@ async function resolveProjectRoot(pathFlag: string | undefined): Promise<string>
 }
 
 /** `netscript contract add` command. */
-export const contractAddCommand: Command<any, any, any, any, any, any, any, any> = new Command()
+export const contractAddCommand: CliffyCommand = new Command()
   .name('add')
   .description('Add a v1 contract to an existing NetScript workspace')
   .arguments('<name:string>')

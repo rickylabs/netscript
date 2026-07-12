@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
 
 import { outputJson, outputText } from '../../../../kernel/presentation/output/default-output.ts';
@@ -12,7 +13,7 @@ import { createRuntimeLifecycleCommands } from './runtime-lifecycle-command.ts';
 /** Create the dashboard-aligned runtime override command group. */
 export function createOverrideCommand(
   dependencies: PublicCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   const group = new Command().name('override').description('Manage runtime overrides')
     .action(function () {
       this.showHelp();
@@ -40,7 +41,7 @@ export function createOverrideCommand(
 function mutationCommand(
   dependencies: PublicCommandDependencies,
   verb: string,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   return new Command().arguments('<path:string> [value:string]')
     .option('--rollout <percent:number>', 'Feature rollout percentage')
     .action(async (options: { rollout?: number }, path: string, value?: string) => {

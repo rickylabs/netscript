@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
 import {
   CACHE_BACKEND_CHOICES,
@@ -62,7 +63,7 @@ function isCacheBackendChoice(value: string): value is CacheBackendChoice {
 /** Create the public `init` command. */
 export function createInitCommand(
   dependencies: InitCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   return new Command()
     .name('init')
     .description('Scaffold a new NetScript workspace')

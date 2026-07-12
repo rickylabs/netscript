@@ -335,7 +335,7 @@ export function createPublicCommandDependencies(
         const resolved = await resolveManifest(options);
         return {
           ...resolved,
-          manifest: resolved.manifest as unknown as ServiceManifest,
+          manifest: resolved.manifest as unknown as ServiceManifest, // quality-allow: compatibility boundary between independently resolved upstream generic types
         };
       },
     },

@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
 import { findProjectRoot } from '../../../../kernel/adapters/config/deploy-config.ts';
 import {
@@ -11,7 +12,7 @@ import type { AddContractRouteInput } from './add-contract-route-input.ts';
 import { addContractRoute } from './add-contract-route.ts';
 
 /** `netscript contract add-route` command. */
-export const contractAddRouteCommand: Command<any, any, any, any, any, any, any, any> = new Command()
+export const contractAddRouteCommand: CliffyCommand = new Command()
   .name('add-route')
   .description('Append a typed oRPC procedure to a contract')
   .arguments('<contract:string> <procedure:string>')

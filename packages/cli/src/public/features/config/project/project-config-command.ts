@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
 import { join } from '@std/path';
 
@@ -14,7 +15,7 @@ import { requireProjectRoot } from '../../../presentation/support.ts';
 /** Create project configuration read/write commands. */
 export function createProjectConfigCommands(
   dependencies: PublicCommandDependencies,
-): readonly Command<any, any, any, any, any, any, any, any>[] {
+): readonly CliffyCommand[] {
   const inspect = new Command().name('inspect')
     .description('Inspect the resolved project configuration')
     .option('--project-root <path:string>', 'Project root directory')

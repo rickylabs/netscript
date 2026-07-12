@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
 
 import { CliCommand } from '../../../../kernel/application/abstracts/cli-command.ts';
@@ -26,7 +27,7 @@ export class HostPluginCommand extends CliCommand<Command> {
   }
 
   /** Build the command definition consumed by the CLI runner. */
-  define(): Command<any, any, any, any, any, any, any, any> {
+  define(): CliffyCommand {
     const print = this.dependencies.print ?? outputText;
     return new Command()
       .name('sync')
@@ -39,13 +40,13 @@ export class HostPluginCommand extends CliCommand<Command> {
         );
         const state = await this.dependencies.createLoader(projectRoot).resolve();
         print(`Synchronized ${state.plugins.length} plugin(s).`);
-      }) as unknown as Command;
+      });
   }
 }
 
 /** Create the host-side plugin command adapter. */
 export function createHostPluginCommand(
   dependencies: HostPluginCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   return new HostPluginCommand(dependencies).define();
 }

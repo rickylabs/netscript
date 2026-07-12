@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import { Command } from '@cliffy/command';
 import { ScaffoldCommand } from '../../../../kernel/presentation/abstracts/scaffold-command.ts';
@@ -5,8 +6,6 @@ import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../kernel/application/regist
 import { addDb, type AddDbDependencies } from './add-db.ts';
 import type { AddDbCommandInput } from './add-db-input.ts';
 
-// deno-lint-ignore no-explicit-any
-type AnyCliffyCommand = Command<any, any, any, any, any, any, any, any>;
 
 /** Dependencies for the public `db add` command handler. */
 export interface DbAddCommandDependencies {
@@ -19,7 +18,7 @@ export interface DbAddCommandDependencies {
 }
 
 /** Public `db add` command definition owner. */
-export class AddDbCommand extends ScaffoldCommand<AnyCliffyCommand> {
+export class AddDbCommand extends ScaffoldCommand<CliffyCommand> {
   readonly id = 'public.db.add';
   protected readonly scaffoldSubject = 'database workspace';
 
@@ -27,7 +26,7 @@ export class AddDbCommand extends ScaffoldCommand<AnyCliffyCommand> {
     super();
   }
 
-  define(): AnyCliffyCommand {
+  define(): CliffyCommand {
     const print = this.dependencies.print ?? outputText;
     return new Command()
       .name('add')
@@ -55,6 +54,6 @@ export class AddDbCommand extends ScaffoldCommand<AnyCliffyCommand> {
 /** Create the public `db add` command. */
 export function createDbAddCommand(
   dependencies: DbAddCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   return new AddDbCommand(dependencies).define();
 }

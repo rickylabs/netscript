@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 /**
  * @module
  *
@@ -20,7 +21,7 @@ export type InfoPluginCommandDependencies = Omit<PluginVerbCommandDependencies, 
 /** Create the public `plugin info` command. */
 export function createInfoPluginCommand(
   dependencies: InfoPluginCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   return createPluginVerbCommand({
     ...dependencies,
     verb: 'info',

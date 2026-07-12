@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
 
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
@@ -24,7 +25,7 @@ export interface AuthPluginCommandDependencies {
 /** Create the public auth configuration and session command group. */
 export function createAuthPluginCommand(
   dependencies: AuthPluginCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   const print = dependencies.print ?? outputText;
 
   const backend = new Command().name('backend').description('Select the active auth backend')

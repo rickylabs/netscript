@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
 
 import { createReleaseEjectCommand } from './eject/release-eject-command.ts';
@@ -8,7 +9,7 @@ import type { MaintainerCommandDependencies } from '../root/maintainer-command-d
 export function createReleaseCommand(
   host: MaintainerCliHost,
   dependencies: MaintainerCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   return new Command()
     .name('release')
     .description('Release and public-repository maintainer workflows')

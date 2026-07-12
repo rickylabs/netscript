@@ -1,0 +1,33 @@
+name: Code quality
+
+on:
+  pull_request:
+    paths:
+      - 'packages/**'
+      - 'plugins/**'
+      - '.llm/tools/quality/**'
+      - 'deno.json'
+
+permissions:
+  contents: read
+
+jobs:
+  code-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.9.0
+      - name: Scan changed source files
+        shell: bash
+        run: |
+          mapfile -t files < <(git diff --name-only --diff-filter=ACMR "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}" -- packages plugins)
+          args=()
+          for file in "${files[@]}"; do args+=(--changed-file "$file"); done
+          if ((${#args[@]})); then deno task quality:scan --pretty "${args[@]}"; fi
+      - run: deno task arch:check
+      - name: Lint touched publish surfaces
+        run: deno task doc:lint --root packages/cli --root packages/plugin --root plugins/auth --root plugins/ai --pretty

@@ -10,6 +10,11 @@ import type { TelemetryContribution } from './telemetry-contribution.ts';
 
 /** Contribution groups supported by plugin manifests. */
 export interface PluginContributions {
+  /** CLI capabilities owned by the plugin and consumed generically by the host. */
+  readonly cli?: {
+    /** Host doctor checks contributed by this plugin. */
+    readonly doctorChecks?: readonly 'auth-backend'[];
+  };
   /** Service contributions registered by the plugin. */
   readonly services?: readonly ServiceContribution[];
   /** Background processor contributions registered by the plugin. */

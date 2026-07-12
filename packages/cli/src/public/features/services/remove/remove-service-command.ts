@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../../../kernel/ports/template-port.ts';
@@ -20,7 +21,7 @@ export interface RemoveServiceCommandDependencies {
 /** Create the public `service remove` command. */
 export function createServiceRemoveCommand(
   dependencies: RemoveServiceCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   return new Command()
     .name('remove')
     .description('Remove a service workspace and reverse its registrations')

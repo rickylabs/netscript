@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
 
 import { createTestScaffoldCommand } from './test-scaffold-command.ts';
@@ -8,7 +9,7 @@ import type { MaintainerCommandDependencies } from '../root/maintainer-command-d
 export function createTestCommand(
   host: MaintainerCliHost,
   dependencies: MaintainerCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   return new Command()
     .name('test')
     .description('Run maintainer validation suites')

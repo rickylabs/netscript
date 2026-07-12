@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
 
 import { CliCommand } from '../../../../kernel/application/abstracts/cli-command.ts';
@@ -37,7 +38,7 @@ export class PluginVerbCommand extends CliCommand<Command> {
   }
 
   /** Build the command definition consumed by the CLI runner. */
-  define(): Command<any, any, any, any, any, any, any, any> {
+  define(): CliffyCommand {
     const dispatch = this.dependencies.dispatch ?? dispatchPluginVerb;
     const print = this.dependencies.print ?? outputText;
     return new Command()
@@ -60,13 +61,13 @@ export class PluginVerbCommand extends CliCommand<Command> {
         if (result?.stderr) {
           print(result.stderr, 'stderr');
         }
-      }) as unknown as Command;
+      });
   }
 }
 
 /** Create a framework plugin verb command. */
 export function createPluginVerbCommand(
   dependencies: PluginVerbCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   return new PluginVerbCommand(dependencies).define();
 }

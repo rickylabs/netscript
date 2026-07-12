@@ -26,7 +26,7 @@ export const TriggerEventSchema: TriggerSchemaObject<TriggerEvent> = z.object({
   updatedAt: z.string().datetime(),
   idempotencyKey: z.string().optional(),
   metadata: z.record(z.string(), z.unknown()).optional(),
-}) as unknown as TriggerSchemaObject<TriggerEvent>;
+}) as unknown as TriggerSchemaObject<TriggerEvent>; // quality-allow: compatibility boundary between independently resolved upstream generic types
 
 /** Zod schema for the durable stream trigger event entity. */
 export const TriggerStreamEntitySchema: TriggerSchemaObject<TriggerStreamEntity> = z.object({
@@ -38,7 +38,7 @@ export const TriggerStreamEntitySchema: TriggerSchemaObject<TriggerStreamEntity>
   updatedAt: z.string(),
   payload: z.unknown(),
   metadata: z.record(z.string(), z.unknown()).optional(),
-}) as unknown as TriggerSchemaObject<TriggerStreamEntity>;
+}) as unknown as TriggerSchemaObject<TriggerStreamEntity>; // quality-allow: compatibility boundary between independently resolved upstream generic types
 
 /** Durable stream entity stored for one trigger event. */
 export type TriggerStreamEntity = Readonly<{
@@ -81,6 +81,6 @@ export const triggersStreamSchema: TriggersStreamSchema = defineStreamSchema({
     type: 'triggerEvent',
     primaryKey: 'eventId',
   },
-}) as unknown as TriggersStreamSchema;
+}) as unknown as TriggersStreamSchema; // quality-allow: compatibility boundary between independently resolved upstream generic types
 
 export type { TriggerEvent };

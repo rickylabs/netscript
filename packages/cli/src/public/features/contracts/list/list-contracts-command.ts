@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 /**
  * @module public/features/contract-list-command
@@ -24,7 +25,7 @@ async function resolveProjectRoot(pathFlag: string | undefined): Promise<string>
 }
 
 /** `netscript contract list` command. */
-export const contractListCommand: Command<any, any, any, any, any, any, any, any> = new Command()
+export const contractListCommand: CliffyCommand = new Command()
   .name('list')
   .description('List contracts in the current NetScript workspace')
   .option('--version <version:string>', 'Contract version to inspect')

@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
 import { basename } from '@std/path';
 
@@ -12,7 +13,7 @@ import { publishRuntimeOverride, rollbackRuntimeOverride } from './manage-runtim
 /** Create publish/rollback runtime snapshot lifecycle commands. */
 export function createRuntimeLifecycleCommands(
   dependencies: PublicCommandDependencies,
-): readonly Command<any, any, any, any, any, any, any, any>[] {
+): readonly CliffyCommand[] {
   const publish = new Command()
     .name('publish')
     .description('Publish and atomically activate a versioned runtime topic file')

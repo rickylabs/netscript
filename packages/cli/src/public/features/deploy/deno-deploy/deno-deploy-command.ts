@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 /**
  * @module commands/deploy/deno-deploy
  *
@@ -92,8 +93,8 @@ async function dispatch(
 
 /** Attach the flags shared by every Deno Deploy subcommand. */
 function withDenoDeployFlags(
-  command: Command<any, any, any, any, any, any, any, any>,
-): Command<any, any, any, any, any, any, any, any> {
+  command: CliffyCommand,
+): CliffyCommand {
   return command
     .option('--org <org:string>', 'Deno Deploy organization slug')
     .option('--app <app:string>', 'Deno Deploy application/project name')
@@ -105,7 +106,7 @@ function withDenoDeployFlags(
 /** Create the `netscript deploy deno-deploy` command group. */
 export function createDenoDeployCommand(
   dependencies: DenoDeployCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   const toFlags = (options: Record<string, unknown>): DenoDeployFlags => ({
     org: options.org as string | undefined,
     app: options.app as string | undefined,

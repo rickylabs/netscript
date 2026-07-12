@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import { Command } from '@cliffy/command';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../kernel/application/registries/template-registry.ts';
@@ -23,7 +24,7 @@ export interface PluginInstallCommandDependencies {
 /** Create the public `plugin install` command. */
 export function createPluginInstallCommand(
   dependencies: PluginInstallCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   const print = dependencies.print ?? outputText;
   return new Command()
     .name('install')
@@ -69,7 +70,7 @@ export function createPluginInstallCommand(
         noDb: options.db === false,
         sagaStoreBackend: parseSagaStoreBackendOption(options.sagaStoreBackend),
         includeSamples: options.samples !== false,
-        mcp: kind === 'ai' && options.mcp === true,
+        mcp: options.mcp === true,
         skipConfirmation: options.skipConfirmation ?? false,
         ci: options.ci ?? false,
         dryRun: options.dryRun ?? false,

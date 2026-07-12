@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { failDeployCommand } from '../../../../kernel/adapters/deploy/deploy-exit.ts';
 import { outputError, outputText } from '../../../../kernel/presentation/output/default-output.ts';
 /**
@@ -53,7 +54,7 @@ async function removeSilent(path: string): Promise<void> {
 
 // ── Command ──────────────────────────────────────────────────────────────────
 
-export const packageCliCommand: Command<any, any, any, any, any, any, any, any> = new Command()
+export const packageCliCommand: CliffyCommand = new Command()
   .name('package-cli')
   .description(
     'Compile the NetScript CLI into a self-shippable Windows .exe binary',

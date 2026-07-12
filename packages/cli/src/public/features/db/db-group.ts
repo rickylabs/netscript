@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
 
 import { createDbAddCommand } from './add/add-db-command.ts';
@@ -21,7 +22,7 @@ import type { PublicCommandDependencies } from '../root/public-command-dependenc
 export function createDbCommand(
   host: PublicCliHost,
   dependencies: PublicCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   return new Command()
     .name('db')
     .description('Database lifecycle management')

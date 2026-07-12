@@ -34,6 +34,8 @@
       ]
     },
     "test": "deno test --allow-all",
+    "quality:scan": "deno run --allow-read .llm/tools/quality/scan-code-quality.ts",
+    "quality:scan:repo": "deno run --allow-read .llm/tools/quality/scan-code-quality.ts --root packages/cli/src --root plugins",
     "coverage:functions": "rm -rf .llm/tmp/coverage/functions && deno test --allow-all --coverage=.llm/tmp/coverage/functions --coverage-raw-data-only packages/contracts/tests/errors_test.ts packages/service/tests/_fixtures/readme-examples_test.ts && deno run --allow-read --allow-write .llm/tools/reporting/report-function-coverage.ts --coverage .llm/tmp/coverage/functions --out .llm/tmp/coverage/function-report.json --package packages/contracts --package packages/plugin-triggers-core --package packages/service --package packages/plugin",
     "audit:critical": "deno audit --level critical",
     "deps:latest": "deno run --allow-read --allow-net .llm/tools/deps/latest.ts --pretty --behind-only",

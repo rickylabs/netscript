@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 /**
  * @module
  *
@@ -32,7 +33,7 @@ export interface DoctorPluginCommandInput {
 /** Create the public `plugin doctor` command. */
 export function createDoctorPluginCommand(
   dependencies: DoctorPluginCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   const print = dependencies.print ?? outputText;
   return new Command()
     .name('doctor')
@@ -45,7 +46,7 @@ export function createDoctorPluginCommand(
       );
       const reports = await dependencies.doctor({ projectRoot });
       renderDoctorReports(reports, print);
-    }) as unknown as Command;
+    });
 }
 
 function renderDoctorReports(

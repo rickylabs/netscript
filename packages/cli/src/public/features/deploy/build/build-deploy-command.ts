@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import { Command } from '@cliffy/command';
 import { DEFAULT_DEPLOY_OUTPUT_DIR } from '../../../../kernel/constants/runtime.ts';
@@ -5,8 +6,6 @@ import { DeployStepCommand } from '../../../../kernel/presentation/abstracts/dep
 import { buildDeploy, type BuildDeployDependencies } from './build-deploy.ts';
 import { parseList } from '../../../presentation/support.ts';
 
-// deno-lint-ignore no-explicit-any
-type AnyCliffyCommand = Command<any, any, any, any, any, any, any, any>;
 
 /** Dependencies for the public `deploy build` command handler. */
 export interface DeployBuildCommandDependencies {
@@ -17,7 +16,7 @@ export interface DeployBuildCommandDependencies {
 }
 
 /** Public `deploy build` command owner. */
-export class BuildDeployCommand extends DeployStepCommand<AnyCliffyCommand> {
+export class BuildDeployCommand extends DeployStepCommand<CliffyCommand> {
   readonly id = 'public.deploy.build';
   protected readonly phase = 'build';
 
@@ -25,7 +24,7 @@ export class BuildDeployCommand extends DeployStepCommand<AnyCliffyCommand> {
     super();
   }
 
-  define(): AnyCliffyCommand {
+  define(): CliffyCommand {
     const print = this.dependencies.print ?? outputText;
     return new Command()
       .name('build')
@@ -79,6 +78,6 @@ export class BuildDeployCommand extends DeployStepCommand<AnyCliffyCommand> {
 /** Create the public `deploy build` command. */
 export function createDeployBuildCommand(
   dependencies: DeployBuildCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   return new BuildDeployCommand(dependencies).define();
 }

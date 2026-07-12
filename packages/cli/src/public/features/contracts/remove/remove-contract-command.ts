@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
 import { findProjectRoot } from '../../../../kernel/adapters/config/deploy-config.ts';
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
@@ -10,7 +11,7 @@ import type { RemoveContractInput } from './remove-contract-input.ts';
 import { removeContract } from './remove-contract.ts';
 
 /** `netscript contract remove` command. */
-export const contractRemoveCommand: Command<any, any, any, any, any, any, any, any> = new Command()
+export const contractRemoveCommand: CliffyCommand = new Command()
   .name('remove')
   .description('Remove a contract and regenerate version aggregates')
   .arguments('<name:string>')

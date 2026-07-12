@@ -20,7 +20,7 @@ const AUTH_SERVICE_PERMISSIONS = [
   '--allow-write',
 ] as const;
 
-const authManifest: PluginManifest = definePlugin(
+const builtAuthManifest: PluginManifest = definePlugin(
   '@netscript/plugin-auth',
   AUTH_PLUGIN_VERSION,
 )
@@ -55,6 +55,14 @@ const authManifest: PluginManifest = definePlugin(
     },
   })
   .build();
+
+const authManifest: PluginManifest = Object.freeze({
+  ...builtAuthManifest,
+  contributions: Object.freeze({
+    ...builtAuthManifest.contributions,
+    cli: { doctorChecks: ['auth-backend'] as const },
+  }),
+});
 
 /** Plugin manifest for NetScript auth. */
 export const authPlugin: PluginManifest = authManifest;

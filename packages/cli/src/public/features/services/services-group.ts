@@ -1,3 +1,4 @@
+import type { CliffyCommand } from "../../../kernel/presentation/command-types.ts";
 import { Command } from '@cliffy/command';
 
 import { createServiceAddCommand } from './add/add-service-command.ts';
@@ -11,7 +12,7 @@ import { createServiceAddHandlerCommand } from './add-handler/add-service-handle
 /** Create the public service command group. */
 export function createServiceCommand(
   dependencies: PublicCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   const mutations = createServiceConfigCommands(dependencies);
   return new Command()
     .name('service')

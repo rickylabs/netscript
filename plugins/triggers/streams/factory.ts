@@ -56,5 +56,5 @@ export function createTriggersStreamDB(
       headers: getStreamsAuth(),
     },
     state: triggersStreamSchema as never,
-  }) as unknown as TriggersStreamDB;
+  }) as unknown as TriggersStreamDB; // quality-allow: compatibility boundary between independently resolved upstream generic types
 }

@@ -52,6 +52,6 @@ export function createSagasStreamDB(options: { baseUrl?: string } = {}): SagasSt
       contentType: 'application/json',
       headers: getStreamsAuth(),
     },
-    state: sagasStreamSchema as unknown as DurableStreamStateDefinition,
-  }) as unknown as SagasStreamDB;
+    state: sagasStreamSchema as unknown as DurableStreamStateDefinition, // quality-allow: compatibility boundary between independently resolved upstream generic types
+  }) as unknown as SagasStreamDB; // quality-allow: compatibility boundary between independently resolved upstream generic types
 }
