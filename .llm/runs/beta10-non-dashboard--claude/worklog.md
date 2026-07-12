@@ -251,3 +251,46 @@ started; nothing stranded.
 3. **JSR descriptions of already-published packages are truncated mid-sentence** (`@netscript/telemetry`,
    `@netscript/service`, and others) because their README taglines exceed the 250-byte cap. Fixed for
    `cli` and `mcp`; the rest would need a tagline pass + a `jsr-settings` re-run. Cosmetic but public.
+
+---
+
+## Session end — slice status at handoff
+
+### Slice review performed (Tier-A duty, per the NUL-byte warning)
+
+**#762** — reviewed the 3 landed commits directly, not the verdict:
+
+- No binary/NUL corruption: `git diff --numstat` shows no binary files; no `\x00` in any changed file.
+- **22 suppressions removed, 0 new suppressions introduced** — grepped every `+` line for
+  `quality-allow` / `deno-lint-ignore` / `@ts-ignore` / `as never` / `as unknown as` / `: any`:
+  **empty**. No laundering.
+- Spot-checked `packages/fresh/src/application/query/hooks.ts`: it imported the real upstream types
+  (`Context` from `@tanstack/react-db`, `IslandLiveQueryData`) and **deleted** the `as never` casts so
+  the calls type-check naturally. That is the brief's bar — typed, not annotated away.
+
+Verdict so far: on track. Still running; final review pending its completion.
+
+### Live slice state
+
+| Slice | Branch | Commits | State |
+| --- | --- | --- | --- |
+| **#762** | `quality/762-ts-ignore-sweep` | 3 (+6 dirty) | Working — fresh, sagas-core, streams-core done |
+| **JSR taglines** | `docs/jsr-tagline-byte-cap` | 1 seed (+16 dirty) | Working — editing the 16 over-cap READMEs |
+| **#763** | `fix/763-pin-plugin-cli-specifier` | 0 | **Thread alive but no writes yet** — gpt-5.6-luna at `max` effort; last reasoning event 01:08. Watch it; if it stays silent, relaunch with `send-message-v2` (do **not** `codex exec resume` a dead thread) and release the sender lease first if it reports `duplicate_sender_risk`. |
+
+None of the three has pushed. **None is reviewed-and-signed-off. Nothing may merge.**
+
+### New this session
+
+- **#767 filed** (`Backlog / Triage`) — `docs:readme:check` is a dead gate; checker ⇄ template ⇄
+  house-style three-way divergence; resolution recorded as "house style wins". Not started.
+- **`deno task docs:tagline:check`** — new gate (`.llm/tools/validation/check-jsr-tagline-length.ts`)
+  that extracts the tagline exactly as the release tool does and measures it in **bytes**. Currently
+  `checked=35 over=16`. It is committed on the `docs/jsr-tagline-byte-cap` branch, not on #715.
+
+### JSR registry — untouched, deliberately
+
+`jsr-set-package-settings.ts` / `jsr-provision-packages.ts` were **not run**, and no call that writes
+to jsr.io was made. The tagline slice prepares README fixes only. **The descriptions on jsr.io will
+not change when that branch merges** — the registry re-sync is a publish action and happens later
+under owner supervision.
