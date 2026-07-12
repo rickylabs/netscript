@@ -36,8 +36,8 @@ export interface SurfaceChange {
 
 export interface MajorDeclaration {
   readonly package: string;
-  readonly export?: string;
-  readonly symbol?: string;
+  readonly export: string;
+  readonly symbol: string;
   readonly reason: string;
 }
 
@@ -360,8 +360,8 @@ function normalizeValue(value: unknown): unknown {
 
 function matches(declaration: MajorDeclaration, item: SurfaceChange): boolean {
   return declaration.package === item.package &&
-    (declaration.export === undefined || declaration.export === item.export) &&
-    (declaration.symbol === undefined || declaration.symbol === item.symbol) &&
+    declaration.export === item.export &&
+    declaration.symbol === item.symbol &&
     declaration.reason.trim().length > 0;
 }
 
@@ -394,13 +394,18 @@ async function readDeclarations(path: string): Promise<MajorDeclaration[]> {
   }
   return parsed.declarations.map((value) => {
     const item = requireObject(value, 'major declaration');
-    if (typeof item.package !== 'string' || typeof item.reason !== 'string') {
-      throw new Error('Each major declaration requires package and reason strings.');
+    if (
+      typeof item.package !== 'string' || typeof item.export !== 'string' ||
+      typeof item.symbol !== 'string' || typeof item.reason !== 'string'
+    ) {
+      throw new Error(
+        'Each major declaration requires package, export, symbol, and reason strings.',
+      );
     }
     return {
       package: item.package,
-      export: typeof item.export === 'string' ? item.export : undefined,
-      symbol: typeof item.symbol === 'string' ? item.symbol : undefined,
+      export: item.export,
+      symbol: item.symbol,
       reason: item.reason,
     };
   });

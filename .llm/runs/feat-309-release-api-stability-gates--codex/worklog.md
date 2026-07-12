@@ -70,6 +70,9 @@ when the reviewed API delta should become the new reference.
 | 2026-07-12 | slice 2 | implementation | Added normalized surface gate, 34-package/258-export/6,654-symbol baseline, declarations, CI, fixtures, and doctrine convention. |
 | 2026-07-12 | slice 2 | gate | Classifier 3/3; live task patch; two-snapshot CLI returned undeclared=1 and declared=0; scoped check/lint/fmt passed after formatting. |
 | 2026-07-12 | slice 2 | reconcile | Stable blocking flip remains deferred on open #309; Deno-doc deprecation payload loss logged as D5 and handled by declaration-local source fallback. |
+| 2026-07-12 | slice 3 | implementation | Added hard release completion/fix-forward wording, generated Claude mirror, and tightened major declarations to exact package/export/symbol matches. |
+| 2026-07-12 | slice 3 | gate | Version 7/7, surface 3/3, scoped wrappers, live patch, docs links, mirror check, and Claude validation all pass. |
+| 2026-07-12 | slice 3 | reconcile | #309 remains open for stable blocking; no release, publish, PR, issue-state, label, or milestone mutation performed. |
 
 ## Decisions
 
@@ -98,6 +101,9 @@ when the reviewed API delta should become the new reference.
 | Focused version tests | `deno task version:bump:test` | PASS | 7 passed, 0 failed. |
 | Surface classifier | `deno task surface:diff:test` | PASS | 3 passed, 0 failed. |
 | Root manifest format | explicit `deno fmt --check` | PASS | 1 file. |
+| Docs links | `deno task docs:links` | PASS | 96 docs; 0 broken links/anchors/orphans. |
+| Skill mirror | sync + `agentic:sync-claude:check` | PASS | 17 skills, 21 mirrored files. |
+| Claude surface | `agentic:check-claude` | PASS | settings, mirror, and hook lock checks green. |
 
 ### Fitness Gates
 
@@ -122,5 +128,5 @@ when the reviewed API delta should become the new reference.
 
 ## Handoff Notes
 
-- Evaluator should inspect normalization stability, major declaration matching, every-member bump
+- Evaluator should inspect normalization stability, exact major declaration matching, every-member bump
   coverage, lock hygiene, and the non-blocking workflow choice first.

@@ -3,7 +3,15 @@
   "declarations": [
     {
       "package": "@netscript/example",
-      "reason": "Synthetic fixture declares all example-package majors."
+      "export": ".",
+      "symbol": "Changed",
+      "reason": "Synthetic fixture declares the signature change."
+    },
+    {
+      "package": "@netscript/example",
+      "export": ".",
+      "symbol": "Removed",
+      "reason": "Synthetic fixture declares the symbol removal."
     }
   ]
 }

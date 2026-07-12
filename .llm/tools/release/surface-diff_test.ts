@@ -41,7 +41,20 @@ Deno.test('surface classifier accepts explicitly declared majors without hiding 
   const result = evaluateSurfaceDiff(
     snapshot(await snapshotDocJson(beforeDoc), '1.1.0'),
     snapshot(await snapshotDocJson(afterDoc, deprecatedSource), '1.2.0'),
-    [{ package: '@netscript/example', reason: 'Reviewed breaking release.' }],
+    [
+      {
+        package: '@netscript/example',
+        export: '.',
+        symbol: 'OldThing',
+        reason: 'Reviewed symbol removal.',
+      },
+      {
+        package: '@netscript/example',
+        export: '.',
+        symbol: 'createThing',
+        reason: 'Reviewed signature change.',
+      },
+    ],
   );
   assertEquals(result.verdict, 'major');
   assertEquals(result.undeclaredMajors, []);

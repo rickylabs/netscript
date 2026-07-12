@@ -12,9 +12,9 @@
 
 ## Current State
 
-Slices 1 and 2 are implemented and gated. Version bumps share a full-workspace coordinator; the
+All three implementation slices are implemented and gated. Version bumps share a full-workspace coordinator; the
 surface classifier, normalized live baseline, declarations, beta CI workflow, and doctrine policy
-are present.
+are present; release completion wording and generated mirror are synchronized.
 
 ## Completed
 
@@ -24,10 +24,11 @@ are present.
 - Slice 1 focused tests passed 7/7 and `deno.lock` is unchanged.
 - Slice 2 classifier tests passed 3/3; baseline covers 34 packages, 258 exports, and 6,654 symbols.
 - Live surface task is patch; synthetic CLI proof exits 1 undeclared and 0 declared.
+- Mirror sync/check, Claude validation, and docs link validation pass.
 
 ## In Progress
 
-- Slice 3: release skill wording/mirror, final gates, separate IMPL-EVAL, commit/push.
+- Separate opposite-family IMPL-EVAL, then evaluator evidence commit/push.
 
 ## Next Steps
 
@@ -58,6 +59,8 @@ are present.
 | `.llm/tools/release/surface-diff_test.ts` + fixtures | new | Synthetic semantic and CLI verdict coverage. |
 | `.github/workflows/surface-diff.yml` | new | Package-path PR gate, beta non-blocking rollout. |
 | `docs/architecture/doctrine/02-public-surface.md` | changed | Machine-readable deprecation/removal convention. |
+| `.agents/skills/netscript-release/SKILL.md` | changed | Hard two-workflow completion and fix-forward policy. |
+| `.claude/skills/netscript-release/SKILL.md` | generated | Synced mirror of canonical release skill. |
 
 ## Gates
 
@@ -66,7 +69,7 @@ are present.
 | Static | PASS | scoped check/lint/fmt wrappers, zero findings |
 | Fitness | PASS | version 7/7; surface 3/3; live patch |
 | Runtime | N/A | no cut/publish |
-| Consumer | NOT_RUN | planned task/workflow proof |
+| Consumer | PASS | live task patch + snapshot CLI exit-path proof |
 
 ## Open Questions
 
