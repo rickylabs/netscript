@@ -2086,6 +2086,28 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   injects the bare-metal ports) and an e2e/runtime smoke exercises health-gated `up`, `rollback`,
   and `secrets` against a real systemd/SERVY service.
 
+## packages/mcp — brief-locked horizontal Archetype-6 skeleton (`MCP-A6-V2-SHAPE`)
+
+- **ID:** `MCP-A6-V2-SHAPE`
+- **Title:** The S1 MCP protocol engine uses the owner-locked horizontal Archetype-6 folder law
+  instead of the current v2 kernel/vertical CLI surface shape.
+- **Context:** S1 creates a small stdio protocol engine with one implemented flow and no Cliffy
+  command tree, templates, output renderers, extension registries, public/maintainer surfaces, or
+  CLI composition. Its accepted brief explicitly requires
+  `src/{domain,application/{flows,runner},presentation,infrastructure}`. The newer harness profile
+  expects `src/kernel` plus vertical command surfaces for full CLI packages.
+- **Why deferred:** Inventing kernel spine abstracts and vertical CLI features before the CLI
+  integration slice would create speculative seams and conflict with the owner-approved S1 scope.
+- **Owner:** Agentic-combo epic #721, CLI integration slice S7.
+- **Target:** Reassess when S7 adds `netscript agent mcp` and the package has a real CLI surface;
+  migrate to the v2 shape if the engine owns that surface rather than remaining a library engine.
+- **Linked plan:** `.llm/runs/mcp-skills--orchestrator/s1/plan.md` decision D8.
+- **Created:** 2026-07-12
+- **Status:** open, DEBT_ACCEPTED — explicit owner-brief compatibility deviation.
+- **Gate:** Close when S7 either migrates `packages/mcp` to the normative Archetype-6 v2
+  kernel/vertical shape and passes F-CLI-1..31, or doctrine/harness formally classify the package as
+  a protocol-engine subtype whose horizontal shape is normative.
+
 ## docs/architecture/doctrine/06-archetypes.md — Archetype 5 folder-shape reconciliation deferred (`doctrine-06-archetype-5-folder-shape`)
 
 - **Reason:** The doctrine-06 "Archetype 5 — Plugin Package" Minimum shape nests contribution
