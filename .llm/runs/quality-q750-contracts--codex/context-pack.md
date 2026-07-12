@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `quality-q750-contracts--codex` |
 | Branch | `quality/q750-contracts-h` |
-| Current phase | `evaluate` |
+| Current phase | `close` |
 | Archetype | `4 — Public DSL / Builder` |
 | Scope overlays | `none` |
 
@@ -18,6 +18,7 @@ load-bearing design decision is to replace the lossy output-only schema facade a
 boundaries with native Zod input/output/object generics. All implementation and generator gates are
 green: scanner 0 findings / 0 allowances, scoped wrappers clean, 8 tests pass, publish succeeds,
 doc lint improves 12 → 9 combined private refs, and focused consumers check.
+Separate IMPL-EVAL returned `PASS`.
 
 ## Completed
 
@@ -31,15 +32,16 @@ doc lint improves 12 → 9 combined private refs, and focused consumers check.
 - Combined slices 2+3 implementation and generator gates: scanner 41 → 0 with no allowances;
   scoped wrappers, 8 tests, publish, docs, doctrine, and consumers complete.
 - Combined slices 2+3 independent review PASS and supervisor commit `22c608f2`.
+- Separate IMPL-EVAL PASS in Claude Opus 4.8 session
+  `38ce04ab-ebad-4b05-a83e-ee1309b213ef`.
 
 ## In Progress
 
-- Separate opposite-family IMPL-EVAL.
+- Commit close artifacts and force-push with lease.
 
 ## Next Steps
 
-1. Run separate IMPL-EVAL and address any verdict.
-2. Force-push with lease; do not open a PR.
+1. Force-push with lease; do not open a PR.
 
 ## Key Decisions
 
