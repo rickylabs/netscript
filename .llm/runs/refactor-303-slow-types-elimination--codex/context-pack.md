@@ -31,12 +31,11 @@ waiver, and closes four stale debt records.
 
 ## In Progress
 
-- Final review, commit, push, and remote verification.
+- Artifact handoff commit and final remote verification.
 
 ## Next Steps
 
-1. Review, commit, push, and verify remote state without opening a PR.
-2. Hand off for separate-session IMPL-EVAL.
+1. Hand off for separate-session IMPL-EVAL.
 
 ## Drift and Debt
 
@@ -44,3 +43,8 @@ waiver, and closes four stale debt records.
 - Drift: the workspace publisher had a separate global waiver; removed and root gate re-proven.
 - Debt: four T4 slow-type records closed; pre-existing oRPC doc-lint findings are recorded in the
   worklog without expanding this slice into public-surface redesign.
+
+## Commits
+
+- Implementation: `c85431f6`, pushed to `origin/refactor/303-slow-types-elimination`.
+- No PR was opened by owner direction.

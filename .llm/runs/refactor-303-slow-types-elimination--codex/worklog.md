@@ -56,6 +56,7 @@ annotations follow only explicit diagnostics, and an exception requires a named 
 | 2026-07-12 | 1 | plan | Owner-waived PLAN-EVAL recorded; config-only slice locked before implementation. |
 | 2026-07-12 | 1 | implementation | Removed four package-task waivers and the independently discovered workspace-wide release waiver; closed four matching debt entries. |
 | 2026-07-12 | 1 | validation | Acceptance, scoped quality, tests, and lock hygiene complete. |
+| 2026-07-12 | 1 | commit/push | Implementation commit `c85431f6` pushed to `origin/refactor/303-slow-types-elimination`. |
 
 ## Decisions
 
@@ -144,6 +145,8 @@ includes `--unstable-kv` as supplied by the wrapper.
 - Reconcile: issue #303 is intentionally not closed; consolidation scope remains. Four T4 debt
   entries are closed because their stated F-6 gate is satisfied.
 - No PR was opened, per owner direction.
+- Implementation slice: `c85431f6` (`refactor(publish): enforce no-slow-types workspace bar`),
+  push succeeded to the requested remote ref.
 - IMPL-EVAL remains a separate-session orchestrator responsibility; this Codex implementation lane
   does not self-certify it.
 - Evaluator should inspect the release-helper argument removal, the four task strings, and the
