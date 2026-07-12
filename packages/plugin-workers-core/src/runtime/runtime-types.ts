@@ -1,12 +1,5 @@
 import type { ExecutionStatus, TriggerType } from '../domain/constants.ts';
-import type {
-  JobContext as DomainJobContext,
-  JobDefinition as DomainJobDefinition,
-  JobHandler as DomainJobHandler,
-  JobId as DomainJobId,
-  JobResult as DomainJobResult,
-  TaskPermissionsInput,
-} from '../domain/mod.ts';
+import type { JobResult as DomainJobResult } from '../domain/mod.ts';
 import type { TaskExecutor } from '../abstracts/task-executor.ts';
 import type { MultiRuntimeTaskExecutorOptions } from '../executor/mod.ts';
 import type { RegistryJobStoragePort } from '../registry/mod.ts';
@@ -15,7 +8,7 @@ import type { WorkflowExecutor, WorkflowExecutorOptions } from '../workflow/mod.
 import type { WorkflowDefinition as DomainWorkflowDefinition } from '../domain/mod.ts';
 
 /** Runtime job identifier. */
-export type JobId<TId extends string = string> = DomainJobId<TId>;
+export type JobId<TId extends string = string> = TId & { readonly __brand: 'JobId' };
 
 /** Runtime task identifier. */
 export type TaskId<TId extends string = string> = TId & { readonly __brand: 'TaskId' };
@@ -27,23 +20,67 @@ export type WorkflowId<TId extends string = string> = TId & { readonly __brand: 
 export type JobResult<TResult = unknown> = DomainJobResult<TResult>;
 
 /** Context supplied to runtime job handlers. */
-export type JobContext<TPayload = unknown, TResult = unknown> = DomainJobContext<TPayload, TResult>;
+export type JobContext<TPayload = unknown, TResult = unknown> = Readonly<{
+  readonly id: string;
+  readonly job: JobDefinition<string, TPayload, TResult>;
+  readonly payload: TPayload;
+  readonly correlationId?: string;
+  readonly traceparent?: string;
+  readonly tracestate?: string;
+  readonly reportProgress?: (percent: number, message?: string) => void;
+}>;
 
 /** Function that executes a runtime job. */
-export type JobHandler<TPayload = unknown, TResult = unknown> = DomainJobHandler<TPayload, TResult>;
+export type JobHandler<TPayload = unknown, TResult = unknown> = (
+  context: JobContext<TPayload, TResult>,
+) => JobResult<TResult> | Promise<JobResult<TResult>>;
 
 /** Runtime permission value accepted by task and job execution. */
 export type RuntimePermissionValue = boolean | string[];
 
 /** Runtime permission bag accepted by task and job execution. */
-export type RuntimePermissions = TaskPermissionsInput;
+export type RuntimePermissions = Readonly<{
+  readonly net?: RuntimePermissionValue;
+  readonly read?: RuntimePermissionValue;
+  readonly write?: RuntimePermissionValue;
+  readonly env?: RuntimePermissionValue;
+  readonly run?: RuntimePermissionValue;
+  readonly ffi?: boolean;
+  readonly import?: string[];
+}>;
 
 /** Runtime job definition. */
 export type JobDefinition<
   TId extends string = string,
   TPayload = unknown,
   TResult = unknown,
-> = DomainJobDefinition<TId, TPayload, TResult>;
+> = Readonly<
+  Record<string, unknown> & {
+    readonly id: TId;
+    readonly name?: string;
+    readonly description?: string;
+    readonly topic?: string;
+    readonly entrypoint?: string;
+    readonly schedule?: string;
+    readonly timezone?: string;
+    readonly timeout?: number;
+    readonly maxRetries?: number;
+    readonly priority?: number;
+    readonly enabled?: boolean;
+    readonly tags?: string[];
+    readonly metadata?: Record<string, unknown>;
+    readonly retryDelay?: number;
+    readonly maxConcurrency?: number;
+    readonly persist?: boolean;
+    readonly source?: string;
+    readonly sourceUrl?: string;
+    readonly importMapUrl?: string;
+    readonly executionType?: string;
+    readonly pluginId?: string;
+    readonly permissions?: RuntimePermissions;
+    readonly handler?: JobHandler<TPayload, TResult>;
+  }
+>;
 
 /** Runtime task definition. */
 export type TaskDefinition<TId extends string = string, TPayload = unknown, TResult = unknown> =

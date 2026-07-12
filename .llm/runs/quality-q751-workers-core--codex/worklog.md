@@ -68,6 +68,8 @@ Start at the exported schema/builder/runtime type, follow its concrete generic t
 | 2026-07-12 | slice 3 | review | Independent Opus/high review `d2768a42-6d10-4b9a-a702-ffb87935da6d` confirmed the typing but found Slice-3 doc-lint regression 24 → 33 (`FAIL_FIX`). Canonical alias targets were exposed and schema-derived public types made explicit/equivalent; same reviewer proved runtime/registry entrypoints 0 and combined doc debt 13, then updated to `PASS`. |
 | 2026-07-12 | slice 3 | reconcile | Final target met with 0 findings / 0 allowances. No allowance requires justification. Doc-lint improves the pre-Slice-3 24 to 13 (0 missing JSDoc) and no new architecture debt is introduced. |
 | 2026-07-12 | impl-eval | PASS | Fresh Opus/high session `5407040d-e2d7-4442-97df-6da4c7f7e9da` independently reran gates and returned `PASS`; only low, non-blocking stream doc-completeness and prompt-heading observations remain. |
+| 2026-07-12 | CI remediation | implementation | Restored the established loose `./runtime` compatibility descriptors (plain IDs, arbitrary execution types, partial permissions/metadata) while retaining canonical strict domain and port types internally. Replaced the fixture boundary with an explicit handler adapter and a structural fixture intersection; no casts or allowances added. |
+| 2026-07-12 | CI remediation | verification | Root check, 132 workers/plugin tests, `scaffold.service` (5/5), repository quality scan/gate, full publish dry-run, and scoped check/lint/fmt all pass. Workers-core remains 0 findings / 0 allowances and `deno.lock` is unchanged. |
 
 ## Decisions
 
@@ -112,6 +114,11 @@ Start at the exported schema/builder/runtime type, follow its concrete generic t
 | Architecture | `deno task arch:check` | PASS with warnings | Exit 0; package has existing size/layout warnings, no failures. |
 | Lock hygiene | diff from `3b3d615b` | PASS | No `deno.lock` churn. |
 | Final IMPL-EVAL | `evaluate.md` | PASS | Separate Opus/high evaluator; no high/medium findings. |
+| CI remediation root check | `deno task check` | PASS | 2,296 files across 20 batches; downstream registry, scheduler, executor, polyglot execution-type, and plain-ID consumers compile. |
+| CI remediation tests | workers/plugin suites | PASS | 132 passed, 0 failed. |
+| CI remediation scaffold | `deno task e2e:cli run scaffold.service --cleanup --format pretty` | PASS | 5 passed, 0 failed; generated service check passes. |
+| CI remediation quality | repo scan + quality gate + publish dry-run | PASS | Repository scan has 0 findings (19 pre-existing allowances outside this slice); workers-core exact scanner has 0 findings / 0 allowances; gate and full publish simulation exit 0. |
+| CI remediation formatting | scoped wrappers | PASS | Check/lint/fmt cover 202 package and plugin worker files with 0 findings. |
 
 ### Fitness Gates
 
@@ -135,3 +142,4 @@ Start at the exported schema/builder/runtime type, follow its concrete generic t
 ## Handoff Notes
 
 - Slice 3 owns only runtime composition and testing-fixture boundaries; the target remains zero allowances.
+- CI remediation preserves backward compatibility at the exported runtime facade and keeps tighter canonical typing behind that facade. Final workers-core allowance count remains 0; there are no surviving allowances to justify.

@@ -13,6 +13,7 @@ export {
 } from './job-fixtures.ts';
 export type {
   ExecutionRecordFixtureOptions,
+  JobFixtureDefinition,
   JobFixtureOptions,
   TestWorkersRuntime,
   TestWorkersRuntimeOptions,

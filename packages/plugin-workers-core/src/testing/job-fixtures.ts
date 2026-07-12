@@ -7,6 +7,7 @@ import { createSuccessResult, DEFAULT_TOPIC, type TriggerType } from '../domain/
 import type { ExecutionRecord } from '../registry/mod.ts';
 import {
   createWorkersRuntime,
+  type JobDefinition,
   type JobHandler,
   type JobResult,
   type WorkersRuntime,
@@ -30,6 +31,15 @@ export type JobFixtureOptions<TId extends string, TPayload = unknown, TResult = 
     metadata?: Record<string, unknown>;
   }
 >;
+
+/** Runnable fixture definition with runtime-compatible handlers and fully built metadata. */
+export type JobFixtureDefinition<
+  TId extends string = string,
+  TPayload = unknown,
+  TResult = unknown,
+> =
+  & JobDefinition<TId, TPayload, TResult>
+  & Omit<BuilderJobDefinition<TId, TPayload, TResult>, 'handler'>;
 
 /** Partial execution record fields used to override fixture defaults. */
 export type ExecutionRecordFixtureOptions = Partial<ExecutionRecord>;
@@ -64,16 +74,19 @@ export function createJobFixture<
   TResult = unknown,
 >(
   options: JobFixtureOptions<TId, TPayload, TResult> = {},
-): BuilderJobDefinition<TId, TPayload, TResult> {
+): JobFixtureDefinition<TId, TPayload, TResult> {
   const id = options.id ?? 'test-job' as TId;
   const handler: BuilderJobHandler<TPayload, TResult> = options.handler ??
     (() => createSuccessResult<TResult>());
-  return defineJob(id)
+  const definition: BuilderJobDefinition<TId, TPayload, TResult> = defineJob(id)
     .handler(handler)
     .topic(options.topic ?? DEFAULT_TOPIC)
     .tags(...options.tags ?? [])
     .metadata(options.metadata ?? {})
     .build();
+  const runtimeHandler: JobHandler<TPayload, TResult> = (context) =>
+    handler({ ...context, job: definition });
+  return Object.freeze({ ...definition, handler: runtimeHandler });
 }
 
 /** Create an execution record with realistic defaults. */
