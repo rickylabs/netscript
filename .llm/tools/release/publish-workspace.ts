@@ -51,8 +51,8 @@ export async function publishWorkspace(
     // (cd per member) breaks that resolution: a sibling's source files fall
     // outside the member's own publish tarball, so the module graph fails with
     // "Module not found". deno publish skips versions already on the registry,
-    // so re-running after a partial publish is safe and idempotent. Slow types
-    // are accepted workspace-wide.
+    // so re-running after a partial publish is safe and idempotent. Every
+    // workspace member must satisfy the normal no-slow-types publish bar.
     //
     // Bundled assets are inlined as plain string constants in the *.generated.ts
     // barrels (see .llm/tools/generate-cli-assets-barrel.ts), NOT imported via
@@ -63,7 +63,7 @@ export async function publishWorkspace(
     // this: text imports are stable (no flag exists) and `--unstable-raw-imports`
     // only toggles `bytes` imports, which this workspace does not use. Plain
     // string constants publish cleanly with no flag.
-    const baseArgs = ['publish', '--allow-dirty', '--allow-slow-types'];
+    const baseArgs = ['publish', '--allow-dirty'];
 
     if (options.mode === 'preflight') {
       await runPublishPreflight(baseArgs, root);

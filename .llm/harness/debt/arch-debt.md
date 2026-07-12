@@ -123,7 +123,8 @@ finding into a debt entry.
 - **Target:** Narrow public contract helper return types before beta.
 - **Linked plan:** `.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/plan.md` (LD-5).
 - **Created:** 2026-06-15
-- **Status:** open, DEBT_ACCEPTED.
+- **Status:** closed 2026-07-12 — Deno 2.9 publish analysis passes without the carve-out; the
+  package task now enforces the normal no-slow-types bar.
 - **Gate:** F-6; close when `packages/contracts` dry-run passes without `--allow-slow-types`.
 
 ## root toolchain — T5 deferred esbuild audit advisory
@@ -397,7 +398,8 @@ finding into a debt entry.
   beta.
 - **Linked plan:** `.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/plan.md` (LD-5).
 - **Created:** 2026-06-15
-- **Status:** open, DEBT_ACCEPTED.
+- **Status:** closed 2026-07-12 — Deno 2.9 publish analysis passes without the carve-out; the
+  package task now enforces the normal no-slow-types bar.
 - **Gate:** F-6; close when `packages/plugin-triggers-core` dry-run passes without
   `--allow-slow-types`.
 
@@ -641,7 +643,8 @@ finding into a debt entry.
   beta.
 - **Linked plan:** `.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/plan.md` (LD-5).
 - **Created:** 2026-06-15
-- **Status:** open, DEBT_ACCEPTED.
+- **Status:** closed 2026-07-12 — Deno 2.9 publish analysis passes without the carve-out; the
+  package task now enforces the normal no-slow-types bar.
 - **Gate:** F-6; close when `packages/service` dry-run passes without `--allow-slow-types`.
 
 ## packages/plugin — AP-1 / doctrine verdict Restructure (types.ts 1,005 LOC)
@@ -667,7 +670,8 @@ finding into a debt entry.
   before beta.
 - **Linked plan:** `.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/plan.md` (LD-5).
 - **Created:** 2026-06-15
-- **Status:** open, DEBT_ACCEPTED.
+- **Status:** closed 2026-07-12 — Deno 2.9 publish analysis passes without the carve-out; the
+  package task now enforces the normal no-slow-types bar.
 - **Gate:** F-6; close when `packages/plugin` dry-run passes without `--allow-slow-types`.
 
 ## packages/plugin/src/config/builders/plugin-builder.ts — F-1 size (360 LOC)
