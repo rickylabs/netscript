@@ -13,8 +13,8 @@
 ## Current State
 
 The mandated hard reset is complete at `3b3d615b`. Research and design are locked. Baseline is 16
-findings/0 allowances; the rejected pass used 6 allowances. Independent PLAN-EVAL passed and
-implementation is unblocked.
+findings/0 allowances; the rejected pass used 6 allowances. Independent PLAN-EVAL passed. Slice 1
+is reviewed green and reduces the scanner to 6 findings with 0 allowances.
 
 ## Completed
 
@@ -22,11 +22,11 @@ implementation is unblocked.
 
 ## In Progress
 
-- Slice 1 telemetry typing and lexical false positives.
+- Slice 2 SDK and Fresh UI typed boundaries.
 
 ## Next Steps
 
-1. Implement the four designed slices with per-slice gates and supervisor review.
+1. Implement slices 2-4 with per-slice gates and supervisor review.
 2. Run full acceptance and separate IMPL-EVAL, then force-push with lease.
 
 ## Key Decisions
@@ -41,12 +41,14 @@ implementation is unblocked.
 | Path | Status | Notes |
 | --- | --- | --- |
 | `.llm/runs/quality-q754-tail--codex/*` | new | harness research/design state |
+| `packages/telemetry/**` | changed | dynamic-module and oRPC callback typing |
+| `packages/{aspire,sdk,bench}/**` | changed | prose-only lexical scanner hits |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | baseline red | scanner 16 findings |
+| Static | slice 1 green | scanner 6 residual findings / allowCount 0; telemetry gates green |
 | Fitness | plan PASS | `plan-eval.md` |
 | Runtime | N/A | typing-only plan |
 | Consumer | pending | implementation not started |

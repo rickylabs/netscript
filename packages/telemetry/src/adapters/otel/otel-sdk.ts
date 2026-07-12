@@ -62,6 +62,101 @@ export interface SdkBinding {
  */
 export type SdkLoader = (options: TelemetryProviderOptions) => Promise<SdkBinding>;
 
+type UnknownConstructor = new (options: unknown) => unknown;
+
+interface ResourceModule {
+  readonly Resource: UnknownConstructor;
+  readonly resourceFromAttributes?: (attributes: Record<string, string>) => unknown;
+}
+
+interface TraceExporterModule {
+  readonly OTLPTraceExporter: UnknownConstructor;
+}
+
+interface TraceSdkModule {
+  readonly BatchSpanProcessor: UnknownConstructor;
+  readonly NodeTracerProvider: UnknownConstructor;
+}
+
+interface MetricExporterModule {
+  readonly OTLPMetricExporter: UnknownConstructor;
+}
+
+interface MetricSdkModule {
+  readonly MeterProvider: UnknownConstructor;
+  readonly PeriodicExportingMetricReader: UnknownConstructor;
+}
+
+interface MeterProviderHandle extends SdkMeterProviderHandle {
+  getMeter(name: string, version?: string): ReturnType<typeof metrics.getMeter>;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object';
+}
+
+function isConstructor(value: unknown): value is UnknownConstructor {
+  return typeof value === 'function';
+}
+
+function assertResourceModule(value: unknown): asserts value is ResourceModule {
+  if (
+    !isRecord(value) || !isConstructor(value.Resource) ||
+    (value.resourceFromAttributes !== undefined &&
+      typeof value.resourceFromAttributes !== 'function')
+  ) {
+    throw new TypeError('OpenTelemetry resources module has an incompatible shape');
+  }
+}
+
+function assertTraceExporterModule(value: unknown): asserts value is TraceExporterModule {
+  if (!isRecord(value) || !isConstructor(value.OTLPTraceExporter)) {
+    throw new TypeError('OpenTelemetry trace exporter module has an incompatible shape');
+  }
+}
+
+function assertTraceSdkModule(value: unknown): asserts value is TraceSdkModule {
+  if (
+    !isRecord(value) || !isConstructor(value.BatchSpanProcessor) ||
+    !isConstructor(value.NodeTracerProvider)
+  ) {
+    throw new TypeError('OpenTelemetry trace SDK module has an incompatible shape');
+  }
+}
+
+function assertMetricExporterModule(value: unknown): asserts value is MetricExporterModule {
+  if (!isRecord(value) || !isConstructor(value.OTLPMetricExporter)) {
+    throw new TypeError('OpenTelemetry metric exporter module has an incompatible shape');
+  }
+}
+
+function assertMetricSdkModule(value: unknown): asserts value is MetricSdkModule {
+  if (
+    !isRecord(value) || !isConstructor(value.MeterProvider) ||
+    !isConstructor(value.PeriodicExportingMetricReader)
+  ) {
+    throw new TypeError('OpenTelemetry metric SDK module has an incompatible shape');
+  }
+}
+
+function assertTracerProviderHandle(value: unknown): asserts value is SdkTracerProviderHandle {
+  if (
+    !isRecord(value) || typeof value.register !== 'function' ||
+    typeof value.forceFlush !== 'function' || typeof value.shutdown !== 'function'
+  ) {
+    throw new TypeError('OpenTelemetry tracer provider has an incompatible shape');
+  }
+}
+
+function assertMeterProviderHandle(value: unknown): asserts value is MeterProviderHandle {
+  if (
+    !isRecord(value) || typeof value.getMeter !== 'function' ||
+    typeof value.forceFlush !== 'function' || typeof value.shutdown !== 'function'
+  ) {
+    throw new TypeError('OpenTelemetry meter provider has an incompatible shape');
+  }
+}
+
 function normalizeEndpoint(endpoint: string | undefined): string {
   const base = endpoint ?? 'http://localhost:4318';
   return base.endsWith('/') ? base.slice(0, -1) : base;
@@ -100,8 +195,7 @@ function buildResourceAttributes(
  * failures produce an actionable error instead: bring the SDK by passing your
  * own {@linkcode SdkLoader} (or run from a workspace that maps the packages).
  */
-// deno-lint-ignore no-explicit-any -- dynamic SDK modules are untyped by design
-async function loadSdkModule(name: string): Promise<Record<string, any>> {
+async function loadSdkModule(name: string): Promise<unknown> {
   const specifier = `@opentelemetry/${name}`;
   try {
     return await import(specifier);
@@ -128,6 +222,12 @@ export const defaultSdkLoader: SdkLoader = async (options): Promise<SdkBinding> 
       loadSdkModule('sdk-metrics'),
     ]);
 
+  assertTraceExporterModule(traceExporterMod);
+  assertTraceSdkModule(sdkTraceNode);
+  assertResourceModule(resourcesMod);
+  assertMetricExporterModule(metricExporterMod);
+  assertMetricSdkModule(sdkMetrics);
+
   const resource = typeof resourcesMod.resourceFromAttributes === 'function'
     ? resourcesMod.resourceFromAttributes(resourceAttributes)
     : new resourcesMod.Resource(resourceAttributes);
@@ -140,6 +240,7 @@ export const defaultSdkLoader: SdkLoader = async (options): Promise<SdkBinding> 
     resource,
     spanProcessors: [spanProcessor],
   });
+  assertTracerProviderHandle(tracerProvider);
 
   const metricExporter = new metricExporterMod.OTLPMetricExporter({
     url: `${endpoint}/v1/metrics`,
@@ -151,6 +252,7 @@ export const defaultSdkLoader: SdkLoader = async (options): Promise<SdkBinding> 
     resource,
     readers: [metricReader],
   });
+  assertMeterProviderHandle(meterProvider);
   metrics.setGlobalMeterProvider(meterProvider);
 
   return {

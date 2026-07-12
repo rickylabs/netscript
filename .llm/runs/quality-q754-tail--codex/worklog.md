@@ -60,6 +60,10 @@ running the scoped wrapper and publish gates.
 | --- | --- | --- | --- |
 | 2026-07-12 | plan | baseline | Hard reset confirmed; baseline 16 findings / 0 allowances; rejected pass 6 allowances. |
 | 2026-07-12 | plan-eval | verdict | Independent Claude session `session_01WMKgGNRNc4UG9E7bjDryF1` returned PASS. |
+| 2026-07-12 | slice 1 | implementation | Telemetry dynamic modules use structural guards; oRPC callbacks use exact package-owned shapes; three prose hits removed. |
+| 2026-07-12 | slice 1 | gates | Scanner 16→6 / allowCount 0; telemetry package + scoped checks/lint/fmt green; 51 tests pass; publish green; doctrine FAIL=0. |
+| 2026-07-12 | slice 1 | review | Claude Opus correction review `ba454352-eec5-46ef-a5cb-9d9eb14d3c5e` PASS on final diff. |
+| 2026-07-12 | slice 1 | reconcile | No PR by owner override; no new issue/comment input; plan unchanged; lock churn removed before sign-off. |
 
 ## Decisions
 
@@ -81,12 +85,18 @@ running the scoped wrapper and publish gates.
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
 | baseline scanner | exact seven-root command | FAIL (expected) | 16 findings, allowCount 0 |
+| slice 1 scanner | exact seven-root command | PASS for owned sites | 6 residual findings, allowCount 0; all residual sites are slices 2/3 |
+| telemetry check | package task + scoped wrapper | PASS | 0 diagnostics |
+| telemetry lint/fmt | scoped wrappers | PASS | 0 findings |
+| telemetry tests | `deno task test` | PASS | 51 passed / 0 failed |
+| telemetry publish | `deno publish --dry-run --allow-dirty` | PASS | no slow types; intentional computed-import warning only |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | Plan-Gate | PASS | `plan-eval.md` | implementation unblocked |
+| slice 1 doctrine | PASS | `check-doctrine.ts --root packages/telemetry` | FAIL=0; warnings pre-existing |
 
 ### Runtime Gates
 

@@ -6,7 +6,7 @@
  *   - Procedures are built on `os.errors(...)` from `@orpc/server` — the exact
  *     primitive `@netscript/contracts` uses internally for its `baseContract`.
  *     The public `baseContract` export is intentionally type-erased (its
- *     procedures are `{ '~orpc': any }`), so binding a sound, non-`any`
+ *     procedures expose only an opaque `~orpc` marker), so binding a sound
  *     `.handler()` to it is not possible without a cast. The reference declares
  *     a minimal local error map whose codes/statuses are identical to the
  *     framework's shared map (`NOT_FOUND` 404, `VALIDATION_ERROR` 422) and
