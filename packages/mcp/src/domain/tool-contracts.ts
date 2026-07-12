@@ -77,9 +77,10 @@ const inputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
 
 const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
   get_app_status: objectSchema({
+    status: { enum: ['pass', 'warn', 'fail'] },
     counts: { type: 'object' },
-    services: { type: 'array', maxItems: 20 },
-  }, ['counts', 'services']),
+    domains: { type: 'array', maxItems: 5 },
+  }, ['status', 'counts', 'domains']),
   list_runs: objectSchema({ count: { type: 'integer' }, runs: { type: 'array', maxItems: 100 } }, [
     'count',
     'runs',
@@ -88,6 +89,7 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
     id: stringProperty,
     summary: stringProperty,
     spans: { type: 'array', maxItems: 50 },
+    logs: { type: 'array', maxItems: 20 },
   }, ['id', 'summary']),
   get_recent_errors: objectSchema({
     count: { type: 'integer' },

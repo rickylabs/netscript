@@ -13,6 +13,11 @@ export interface McpServerOptions {
   /** Telemetry reachability adapter. */
   readonly probe: TelemetryProbePort;
   /** Endpoint read from the environment edge. */
+  readonly environment?: Readonly<{
+    NETSCRIPT_TELEMETRY_ENDPOINT?: string;
+    ASPIRE_DASHBOARD_PORT?: string;
+  }>;
+  /** Backward-compatible S1 endpoint injection. */
   readonly environmentEndpoint?: string;
   /** Optional server-side output bounds. */
   readonly truncation?: TruncationPolicy;
@@ -31,7 +36,11 @@ export interface McpServer {
 export function createMcpServer(options: McpServerOptions): McpServer {
   const tools = createToolRegistry({
     ...options.flows,
-    doctor: options.flows?.doctor ?? createDoctorFlow(options.probe, options.environmentEndpoint),
+    doctor: options.flows?.doctor ?? createDoctorFlow(options.probe, {
+      ...options.environment,
+      NETSCRIPT_TELEMETRY_ENDPOINT: options.environment?.NETSCRIPT_TELEMETRY_ENDPOINT ??
+        options.environmentEndpoint,
+    }),
   });
   const policy = options.truncation ?? DEFAULT_TRUNCATION_POLICY;
   return {
