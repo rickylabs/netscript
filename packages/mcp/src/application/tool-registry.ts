@@ -34,7 +34,7 @@ const summaries: Readonly<Record<ToolName, string>> = {
   doctor: 'Check NetScript diagnostic prerequisites.',
   search_docs: 'Search public NetScript documentation.',
   list_docs: 'List public NetScript documentation summaries.',
-  get_doc: 'Get one public documentation section.',
+  get_doc: 'Get one public document or documentation section.',
   list_commands: 'List available structured CLI commands.',
   execute_command: 'Execute one allowlisted CLI command.',
 };

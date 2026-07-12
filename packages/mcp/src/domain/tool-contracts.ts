@@ -12,6 +12,7 @@ const objectSchema = (
 });
 const stringProperty = { type: 'string' } as const;
 const limitProperty = { type: 'integer', minimum: 1, maximum: 100 } as const;
+const searchLimitProperty = { type: 'integer', minimum: 1, maximum: 20 } as const;
 const isObject = (value: unknown): value is Record<string, unknown> => isRecord(value);
 
 /** Compact diagnostic severity. */
@@ -65,7 +66,7 @@ const inputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
     limit: limitProperty,
   }),
   doctor: objectSchema({ endpoint: stringProperty }),
-  search_docs: objectSchema({ query: stringProperty, limit: limitProperty }, ['query']),
+  search_docs: objectSchema({ query: stringProperty, limit: searchLimitProperty }, ['query']),
   list_docs: objectSchema({ limit: limitProperty }),
   get_doc: objectSchema({ slug: stringProperty, section: stringProperty }, ['slug']),
   list_commands: objectSchema({ filter: stringProperty, limit: limitProperty }),
@@ -114,13 +115,38 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
   }, ['status', 'endpoint', 'counts', 'checks']),
   search_docs: objectSchema({
     count: { type: 'integer' },
-    matches: { type: 'array', maxItems: 20 },
+    matches: {
+      type: 'array',
+      maxItems: 20,
+      items: objectSchema({
+        slug: stringProperty,
+        title: stringProperty,
+        snippet: stringProperty,
+        score: { type: 'number' },
+      }, ['slug', 'title', 'snippet', 'score']),
+    },
   }, ['count', 'matches']),
-  list_docs: objectSchema({ count: { type: 'integer' }, docs: { type: 'array', maxItems: 100 } }, [
+  list_docs: objectSchema({
+    count: { type: 'integer' },
+    docs: {
+      type: 'array',
+      maxItems: 100,
+      items: objectSchema({
+        slug: stringProperty,
+        title: stringProperty,
+        description: stringProperty,
+      }, ['slug', 'title', 'description']),
+    },
+  }, [
     'count',
     'docs',
   ]),
-  get_doc: objectSchema({ slug: stringProperty, title: stringProperty, content: stringProperty }, [
+  get_doc: objectSchema({
+    slug: stringProperty,
+    title: stringProperty,
+    section: stringProperty,
+    content: stringProperty,
+  }, [
     'slug',
     'title',
     'content',
