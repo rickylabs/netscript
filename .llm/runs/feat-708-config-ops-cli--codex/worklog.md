@@ -64,6 +64,16 @@ not invented in this CLI slice. The orchestrator owns `scaffold.runtime` / full 
 - Reconcile: no PR was opened per the slice brief; issue/label reconciliation stays with orchestrator
   `09e5ae68`.
 
+### Slice 2 — Aspire graph operations
+
+- `deno check --unstable-kv packages/cli/bin/netscript.ts`: exit 0 after command wiring.
+- `mutate-service-config_test.ts`: 2 passed, 0 failed. The tests prove add/remove references and
+  port/enabled changes persist to `appsettings.json`, with helper regeneration invoked in the same
+  awaited operation.
+- Live local help shows `generate aspire`, `service ref`, and `service set` on the public command
+  tree. `deploy-local-aspire.md` now documents regeneration and graph mutation without re-scaffold.
+- Reconcile: no PR opened; no issue state changed by this implementation lane.
+
 ## Drift
 
 - **D1 (carried, owner-authorized):** PLAN-EVAL is waived in the slice brief. This worklog records a
