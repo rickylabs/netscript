@@ -9,8 +9,9 @@ description: >
 # Claude Manager
 
 Use this skill when the task involves Claude Code session orchestration rather than package code.
-Claude is the supervisor. OpenHands evaluates. WSL Codex implements harness slices that must be
-visible from Codex Desktop/mobile.
+Claude is the supervisor. WSL Codex implements harness slices that must be visible from Codex
+Desktop/mobile. Evaluation runs on the evaluator lane in `.llm/harness/workflow/lane-policy.md`:
+locally Claude Code + OpenRouter with an open model, and OpenHands for automated cloud runs.
 
 ## Workflow
 
@@ -65,8 +66,10 @@ outcome.
 - Do not use Claude workflows as the default NetScript implementation agent. WSL Codex remains the
   preferred implementation lane because it is daemon-attached, mobile-visible, and cheaper to steer
   slice-by-slice.
-- Keep OpenHands as the evaluator. Claude workflows may prepare evaluator inputs, but they do not
-  replace PLAN-EVAL or IMPL-EVAL.
+- Keep the evaluator a separate session on the evaluator lane from
+  `.llm/harness/workflow/lane-policy.md` — locally Claude Code + OpenRouter with an **open model**, or
+  OpenHands for cloud runs. Claude workflows may prepare evaluator inputs, but they do not replace
+  PLAN-EVAL or IMPL-EVAL, and no session self-certifies.
 - Route every Claude workflow, supervisor, and review session through the canonical lane table in
   `.llm/harness/workflow/lane-policy.md`. Do not reproduce model/effort defaults here or infer a
   paid escalation from workflow prose.
@@ -97,6 +100,7 @@ session should be started.
 
 - [ ] Current branch/worktree is verified.
 - [ ] Harness skill was loaded for harnessed work.
-- [ ] Evaluator surface is OpenHands when evaluating.
+- [ ] Evaluator surface is the lane-policy evaluator route (open model): Claude Code + OpenRouter
+      locally, OpenHands for cloud runs.
 - [ ] Implementation surface is WSL Codex when slice work must be mobile-visible.
 - [ ] Claude remote-control or Codex daemon visibility is proven before claiming phone visibility.

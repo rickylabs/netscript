@@ -27,19 +27,42 @@ required summary artifacts keep local and cloud agents synchronized.
 
 OpenHands is **not** the evaluator for local runs. Two hard rules:
 
-1. **OpenHands runs OPEN models only** — e.g. `minimax/minimax-m3`, `qwen/qwen3.7-max`. NEVER dispatch
-   OpenHands with a closed/paid model (Claude/`sonnet`, GPT/`gpt`, Gemini/`gemini`). Closed models on
-   OpenHands route through paid OpenRouter/LiteLLM credit and can silently burn the owner's balance —
-   this is prohibited.
+1. **OpenHands runs OPEN models only** — e.g. `minimax/minimax-m3`, `qwen/qwen3.7-max`. NEVER
+   dispatch OpenHands with a closed/paid model (Claude/`sonnet`, GPT/`gpt`, Gemini/`gemini`). Closed
+   models on OpenHands route through paid OpenRouter/LiteLLM credit and can silently burn the
+   owner's balance — this is prohibited.
 2. **OpenHands is for CLOUD-driven runs only** — small GitHub-Copilot-style tasks the owner wants
-   reviewed fully in the cloud with adversarial agents. For any run on the **local machine**, do NOT
-   dispatch cloud OpenHands at all. Use a **local opposite-family adversarial agent** for
-   PLAN-EVAL / IMPL-EVAL / review (e.g. Codex GPT-5.6 reviews Claude-authored work; a Claude session
-   reviews Codex-authored work), launched locally. The **supervisor chooses what to trigger** —
-   sub-agents/implementers must NEVER auto-dispatch a cloud evaluator.
+   reviewed fully in the cloud with adversarial agents. OpenHands remains the **default automated
+   cloud agent**; nothing below changes that. For any run on the **local machine**, do NOT dispatch
+   cloud OpenHands at all — use the local evaluator transport named below. The **supervisor chooses
+   what to trigger** — sub-agents/implementers must NEVER auto-dispatch a cloud evaluator.
 
-If a local run's harness step calls for PLAN-EVAL/IMPL-EVAL and no local adversarial agent is
-available, record the gap in `drift.md` and let the supervisor decide — do not fall back to OpenHands.
+### The local evaluator transport (named, 2026-07-13)
+
+A local run's PLAN-EVAL / IMPL-EVAL used to have no named transport — this skill described the gap
+and told you to log it. It is now filled:
+
+**Local PLAN-EVAL / IMPL-EVAL runs on Claude Code + OpenRouter** — the `claude-openrouter` provider
+profile driven via `claude-print` — with an **OPEN model** (`minimax/minimax-m3`,
+`qwen/qwen3.7-max`). **Rule 1 above applies verbatim to this lane: OPEN models only; closed/paid
+models (Claude/`sonnet`, GPT/`gpt`, Gemini) are PROHIBITED** — they bill the owner's OpenRouter
+balance and can silently burn it. An open model is neither Claude-family nor Codex-family, so it is
+adversarial to **both** generators, which satisfies the generator-≠-evaluator invariant more
+robustly than a family swap alone.
+
+**Ordinary (non-formal) review** — the slice review gate, code/PR review — still uses a **local
+opposite-family** agent: Codex GPT-5.6 reviews Claude-authored work; a Claude session reviews
+Codex-authored work. Do not conflate it with the formal evaluator pass.
+
+**Capability (verified; drift D-4 amended):** both approved open models return a **real reasoning
+trace** and have a **verified agentic turn** (real tool calls) on this transport, so the evaluator
+**can run gates** and its `effort` is genuine — not nominal. The zero-reasoning behaviour is
+**specific to GLM 5.2** over OpenRouter (a design-lane model), **not** a client-wide gap: never cite
+"GLM 5.2 · xhigh reasoning" as gate evidence, and do not restate that caveat as a property of the
+transport or of the evaluator lane.
+
+If neither the local transport nor a cloud run can be launched, record the gap in `drift.md` and let
+the supervisor decide — never self-certify.
 
 ## Key Concepts
 
@@ -108,11 +131,11 @@ fallback).
 | `summary-only`     | Upload artifacts only; do not comment.                                                  |
 
 The agent must write `OPENHANDS_SUMMARY_PATH` before exit. For a harness run, the verdict of record
-and its trace live in the **tracked** run dir: `OPENHANDS_RUN_DIR` is the run's `.llm/runs/<run-id>/`
-dir (where the evaluator's `plan-eval.md`/`evaluate.md` is committed), and `TRACE_DIR` is `trace/`
-beneath it (env `OPENHANDS_TRACE_DIR`) for compact trace metadata. Do not reuse legacy
-`.llm/tmp/openhands/summary.md` or `.llm/tmp/run/openhands/…` scratch as the verdict — see
-`.llm/harness/workflow/agent-handoff.md` for the full output contract.
+and its trace live in the **tracked** run dir: `OPENHANDS_RUN_DIR` is the run's
+`.llm/runs/<run-id>/` dir (where the evaluator's `plan-eval.md`/`evaluate.md` is committed), and
+`TRACE_DIR` is `trace/` beneath it (env `OPENHANDS_TRACE_DIR`) for compact trace metadata. Do not
+reuse legacy `.llm/tmp/openhands/summary.md` or `.llm/tmp/run/openhands/…` scratch as the verdict —
+see `.llm/harness/workflow/agent-handoff.md` for the full output contract.
 
 ## Token Rule
 
@@ -138,8 +161,8 @@ and carry a `## SKILL` chapter — see step 2 below) and reads the GitHub token 
 in-process env var (`--token-env`, default `GH_TOKEN`), never from a file or argv. It posts exactly
 one trigger comment, respecting the per-PR concurrency-cancel rule.
 `openhands-status.ts --source
-local` needs no token and reads the newest committed trace under the run's `TRACE_DIR`
-(`.llm/runs/<run-id>/trace/`).
+local` needs no token and reads the newest committed trace under the
+run's `TRACE_DIR` (`.llm/runs/<run-id>/trace/`).
 
 ## Workflow
 
@@ -184,7 +207,8 @@ local` needs no token and reads the newest committed trace under the run's `TRAC
   budget during exploration, leaving zero artifacts. Split the task into sequential triggers and/or
   raise `iterations=`, and require the agent to create deliverable files early and grow them
   incrementally.
-- **Eval run mutating `deno.lock`**: a PLAN-EVAL/IMPL-EVAL run's `deno check` / `deno publish
+- **Eval run mutating `deno.lock`**: a PLAN-EVAL/IMPL-EVAL run's `deno check` /
+  `deno publish
   --dry-run` can silently re-resolve and commit `deno.lock` churn (observed: a
   `@opentelemetry/semantic-conventions` downgrade riding into a merged umbrella). Rule: **an
   evaluator must never mutate the lock** — instruct the run prompt to `git checkout -- deno.lock`
@@ -192,18 +216,18 @@ local` needs no token and reads the newest committed trace under the run's `TRAC
   from), not the working baseline — an in-branch "unchanged" claim hides churn that predates the
   first slice. Reconcile-don't-revert mid-wave (Golden Rule 6: never delete the lock or `--reload`
   without approval). The lock is not the only churn: an IMPL-EVAL commit-back can also push
-  scratch/junk files alongside the verdict artifact. **Verify the committed file set before merge** —
-  the intended change is the run's `evaluate.md`/`plan-eval.md` plus any authorized fix, not a
+  scratch/junk files alongside the verdict artifact. **Verify the committed file set before merge**
+  — the intended change is the run's `evaluate.md`/`plan-eval.md` plus any authorized fix, not a
   re-resolved `deno.lock` or stray workspace files; drop anything outside that set.
 - **Trusting the persistent PR summary comment**: the `<!-- openhands-agent-summary -->` comment is
   one per PR and is **not always regenerated** for a new run — it can show a prior run's package,
   phase, and verdict while only its `updated_at` bumps. **The verdict source is the committed run
   artifact** (`plan-eval.md` for PLAN-EVAL, `evaluate.md` for IMPL-EVAL), never the PR comment;
   confirm it names the right run id, slices, and surface before accepting it.
-- **Stacking `@openhands` comments on one PR**: multiple `@openhands` triggers on the same PR
-  cancel all-but-one under the per-PR concurrency group. Post exactly one trigger per intended run.
-  Trigger placement also chooses the checkout: a **PR comment** runs against the PR branch, an
-  **issue comment** runs against `main`.
+- **Stacking `@openhands` comments on one PR**: multiple `@openhands` triggers on the same PR cancel
+  all-but-one under the per-PR concurrency group. Post exactly one trigger per intended run. Trigger
+  placement also chooses the checkout: a **PR comment** runs against the PR branch, an **issue
+  comment** runs against `main`.
 
 ## Reference Files
 

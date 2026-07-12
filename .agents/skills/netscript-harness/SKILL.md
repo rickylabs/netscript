@@ -106,8 +106,9 @@ routing here — defer to that file. The items below are the parts of the contra
   for every implementation tier (B Opus sub-agents, C Workflow-generated slices, D WSL Codex); no
   lane self-certifies. See `workflow/lane-policy.md` for the rule and `workflow/run-loop.md` for the
   step placement.
-- **Evaluator route binding.** Select the opposite-family review route from
-  `workflow/lane-policy.md` and record it in the run. The two-failure eval loop is unchanged.
+- **Evaluator route binding.** Select the evaluator route from `workflow/lane-policy.md` — the
+  open-model evaluator lane for a formal PLAN-EVAL/IMPL-EVAL, or the opposite-family route for
+  ordinary review — and record it in the run. The two-failure eval loop is unchanged.
 - **Tier-D mobile-visibility proof.** A Tier-D (WSL Codex) implementation slice is launched only via
   skills + `.llm/tools/agentic/` (never ad-hoc `wsl.exe`), and only when the run artifacts include
   the WSL worktree path, concrete Codex thread id, daemon-managed `remote-control` proof, and the
@@ -133,13 +134,17 @@ routing here — defer to that file. The items below are the parts of the contra
 - **Self-evaluation** — The evaluator must be a separate session. The generator does not
   self-certify.
 - **Wrong evaluator surface** — the generator session may never evaluate its own output. For a
-  **local-machine run**, PLAN-EVAL/IMPL-EVAL is a **separate local session of the opposite model
-  family** (e.g. a Codex GPT-5.6 session reviews Claude-authored work; a Claude session reviews
-  Codex-authored work), and the **supervisor chooses when to trigger it** — never auto-dispatch a
-  cloud evaluator from a sub-agent. **OpenHands is open-models-only (minimax M3 / Qwen 3.7) and
-  cloud-driven-runs-only; dispatching it with a closed model (Claude/GPT/Gemini) is prohibited (it
-  burns paid OpenRouter credit).** See `.agents/skills/openhands-handoff/SKILL.md` "Routing policy".
-  If no evaluator surface is available, record a blocked launch in `drift.md`.
+  **local-machine run**, PLAN-EVAL/IMPL-EVAL is a **separate local session on Claude Code +
+  OpenRouter** (`claude-openrouter` profile → `claude-print`) running an **OPEN model**
+  (`minimax/minimax-m3`, `qwen/qwen3.7-max`) — an open model is adversarial to both the Claude and
+  Codex families. **Ordinary (non-formal) review** — the slice review gate, code/PR review — uses a
+  local **opposite-family** session instead (a Codex GPT-5.6 session reviews Claude-authored work; a
+  Claude session reviews Codex-authored work). The **supervisor chooses when to trigger** — never
+  auto-dispatch a cloud evaluator from a sub-agent. **Both evaluator transports are open-models-only
+  (minimax M3 / Qwen 3.7); dispatching either with a closed model (Claude/GPT/Gemini) is prohibited
+  (it burns paid OpenRouter credit).** OpenHands remains the default automated **cloud** agent. See
+  `.agents/skills/openhands-handoff/SKILL.md` "Routing policy". If no evaluator surface is available,
+  record a blocked launch in `drift.md`.
 - **Self-certifying a slice** — a green automated gate is not a sign-off. The Tier-A supervisor must
   substantively review the slice before the sign-off commit, for every implementation lane
   (`workflow/lane-policy.md` invariant 2). No lane self-certifies.
@@ -211,11 +216,13 @@ When external docs or examples matter:
 
 ## Evaluator Separation
 
-There are **two** separate-session evaluator passes.
+There are **two** separate-session evaluator passes. Both run on the evaluator lane selected from
+`workflow/lane-policy.md`: locally on **Claude Code + OpenRouter with an OPEN model**, or in the
+cloud on **OpenHands** (also open-models-only). Closed/paid models are prohibited on both.
 
 **PLAN-EVAL** (before implementation):
 
-- Runs in a separate opposite-family session selected from `workflow/lane-policy.md`.
+- Runs in a separate session on the evaluator lane selected from `workflow/lane-policy.md`.
 - Reads `evaluator/plan-protocol.md` + `gates/plan-gate.md`.
 - Reads `research.md`, `plan.md`, and the `## Design` section.
 - Writes `plan-eval.md`.
@@ -224,7 +231,7 @@ There are **two** separate-session evaluator passes.
 
 **IMPL-EVAL** (final pass, after implementation):
 
-- Runs in a separate opposite-family session selected from `workflow/lane-policy.md`.
+- Runs in a separate session on the evaluator lane selected from `workflow/lane-policy.md`.
 - Generator writes `worklog.md`, `context-pack.md`, and `drift.md`.
 - Evaluator reads `.llm/harness/evaluator/protocol.md`, the plan, worklog, context pack, drift, the
   draft-PR commit list + per-slice PR comments (the commit trail), selected archetype, overlays, and
@@ -316,11 +323,11 @@ User says "use harness"
       `supervisor.md`/`drift.md`.
 - [ ] Plan-Gate checklist (`gates/plan-gate.md`) was reviewed.
 - [ ] PLAN-EVAL returned `PASS` before any implementation slice.
-- [ ] PLAN-EVAL used the recorded opposite-family route, or the blocked launch was recorded.
+- [ ] PLAN-EVAL used the recorded evaluator route (open model), or the blocked launch was recorded.
 - [ ] Tier-D (WSL Codex) slices recorded daemon-managed proof, thread id, worktree, and steering
       command.
 - [ ] The slice review gate was performed (Tier-A substantive review) before each sign-off commit;
       no lane self-certified.
 - [ ] Each implementation slice was committed, pushed, and commented on the draft PR.
 - [ ] IMPL-EVAL is a separate session from the generator.
-- [ ] IMPL-EVAL used the recorded opposite-family route, or the blocked launch was recorded.
+- [ ] IMPL-EVAL used the recorded evaluator route (open model), or the blocked launch was recorded.
