@@ -15,26 +15,68 @@ export interface QualityFinding {
 
 const PLUGIN_NAMES = ['ai', 'auth', 'sagas', 'streams', 'triggers', 'workers'];
 const DEFAULT_ROOTS = ['packages/cli/src', 'plugins'];
+const EMPTY_TAINT: Set<string> = new Set();
 
-function ruleFor(line: string, file: string): QualityRule | undefined {
+/**
+ * Same-file identifiers bound to a plugin name — `const target = 'auth'` or an
+ * array literal containing one. Host code that compares `plugin.name` against
+ * such an identifier is the plugin-identity anti-pattern hidden behind an
+ * innocent-looking extraction, so these idents are treated as plugin names.
+ */
+function collectPluginNameIdents(lines: readonly string[]): Set<string> {
+  const names = PLUGIN_NAMES.join('|');
+  const stringBind = new RegExp(
+    `\\b(?:const|let|var)\\s+([A-Za-z_$][\\w$]*)\\s*(?::[^=]+)?=\\s*[\"'](?:${names})[\"']`,
+  );
+  const arrayBind = new RegExp(
+    `\\b(?:const|let|var)\\s+([A-Za-z_$][\\w$]*)\\s*(?::[^=]+)?=\\s*\\[[^\\]]*[\"'](?:${names})[\"']`,
+  );
+  const tainted = new Set<string>();
+  for (const line of lines) {
+    const s = stringBind.exec(line);
+    if (s) tainted.add(s[1]);
+    const a = arrayBind.exec(line);
+    if (a) tainted.add(a[1]);
+  }
+  return tainted;
+}
+
+function ruleFor(line: string, file: string, tainted: Set<string>): QualityRule | undefined {
   // Template/fixture source strings are data, not syntax in the scanned module.
   if (/^\s*[`'\"]/.test(line)) return undefined;
   if (/deno-lint-ignore(?:-file)?\s+no-explicit-any/.test(line)) return 'explicit-any-ignore';
   if (/\bas\s+unknown\s+as\b|\bas\s+any\b/.test(line)) return 'unsafe-cast';
   if (/(?:<|:\s*)any(?:\s*[,>;)\]}]|\b)/.test(line)) return 'explicit-any';
-  // Host-side plugin identity: equality against a plugin name, OR a string
-  // predicate (startsWith/endsWith/includes) taking a complete quoted plugin
-  // name. Requiring the closing quote keeps `'auth-backend'` (a capability id)
-  // from matching the `auth` plugin name — only exact identities are flagged.
+  // Host-side plugin identity: equality/predicate against a plugin name whether
+  // written as a quoted literal OR a same-file identifier bound to one (const
+  // indirection). Requiring the closing quote on literals keeps `'auth-backend'`
+  // (a capability id) from matching the `auth` plugin name.
   if (file.includes('/features/plugins/')) {
     const names = PLUGIN_NAMES.join('|');
-    const equality = new RegExp(
+    const literalEquality = new RegExp(
       `(?:===|!==)\\s*[\"'](?:${names})[\"']|[\"'](?:${names})[\"']\\s*(?:===|!==)`,
     );
-    const predicate = new RegExp(
+    const literalPredicate = new RegExp(
       `\\.(?:startsWith|endsWith|includes)\\(\\s*[\"'](?:${names})[\"']`,
     );
-    if (equality.test(line) || predicate.test(line)) return 'plugin-name-check';
+    if (literalEquality.test(line) || literalPredicate.test(line)) return 'plugin-name-check';
+    if (tainted.size > 0) {
+      const idents = [...tainted].map((id) => id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+      // `.name`/`kind` compared to a tainted ident, or a predicate on it, or a
+      // tainted array `.includes(plugin.name)`.
+      const identEquality = new RegExp(
+        `(?:\\.name|\\bkind)\\s*(?:===|!==)\\s*(?:${idents})\\b|\\b(?:${idents})\\s*(?:===|!==)\\s*(?:[\\w.]*\\.name|kind)\\b`,
+      );
+      const identPredicate = new RegExp(
+        `\\.(?:startsWith|endsWith|includes)\\(\\s*(?:${idents})\\b`,
+      );
+      const arrayIncludes = new RegExp(
+        `\\b(?:${idents})\\.includes\\(\\s*[\\w.]*(?:\\.name|kind)\\b`,
+      );
+      if (identEquality.test(line) || identPredicate.test(line) || arrayIncludes.test(line)) {
+        return 'plugin-name-check';
+      }
+    }
   }
   return undefined;
 }
@@ -83,13 +125,17 @@ export async function scanCodeQualityDetailed(
   const allowances: QualityAllowance[] = [];
   for (const file of files) {
     const lines = (await Deno.readTextFile(file)).split(/\r?\n/);
+    const normalized = file.replaceAll('\\', '/');
+    const tainted = normalized.includes('/features/plugins/')
+      ? collectPluginNameIdents(lines)
+      : EMPTY_TAINT;
     for (let index = 0; index < lines.length; index++) {
       const line = lines[index];
       const allowance = line.match(/\/\/\s*quality-allow:\s*(.+)$/);
       if (allowance?.[1].trim()) {
         // A quality-allow only suppresses a line that would otherwise fire a
         // rule — an allowance on a clean line is dead weight, not counted.
-        if (ruleFor(line.replace(/\/\/\s*quality-allow:.*$/, ''), file.replaceAll('\\', '/'))) {
+        if (ruleFor(line.replace(/\/\/\s*quality-allow:.*$/, ''), normalized, tainted)) {
           allowances.push({
             file: relative(cwd, file),
             line: index + 1,
@@ -98,7 +144,7 @@ export async function scanCodeQualityDetailed(
         }
         continue;
       }
-      const rule = ruleFor(line, file.replaceAll('\\', '/'));
+      const rule = ruleFor(line, normalized, tainted);
       if (rule) {
         findings.push({ rule, file: relative(cwd, file), line: index + 1, text: line.trim() });
       }

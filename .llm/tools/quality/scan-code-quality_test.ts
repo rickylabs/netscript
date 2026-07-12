@@ -66,3 +66,22 @@ Deno.test('capability id containing a plugin name is NOT a false positive', asyn
   );
   assertEquals(await scanCodeQuality(['packages/cli/src'], root), []);
 });
+
+Deno.test('scanner catches plugin-identity via const/array indirection (Opus IMPL-EVAL bypass)', async () => {
+  const root = await Deno.makeTempDir();
+  const dir = join(root, 'packages/cli/src/public/features/plugins');
+  await Deno.mkdir(dir, { recursive: true });
+  await Deno.writeTextFile(
+    join(dir, 'indirect.ts'),
+    [
+      "const target = 'auth';",
+      'if (plugin.name === target) return;',
+      "const gated = ['ai', 'workers'];",
+      'if (gated.includes(plugin.name)) enable();',
+      "const pred = 'streams';",
+      'if (plugin.name.startsWith(pred)) return;',
+    ].join('\n'),
+  );
+  const findings = await scanCodeQuality(['packages/cli/src'], root);
+  assertEquals(findings.filter((f) => f.rule === 'plugin-name-check').length, 3);
+});

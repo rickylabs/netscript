@@ -99,3 +99,24 @@ Attacks probed → outcome:
 
 Final: scanner tests 4/4; quality:gate green (0 findings, allowCount 19 ≤ 25); scanner scoped check
 0; fmt clean; mirror sync OK.
+
+## IMPL-EVAL FAIL_FIX remediation (Opus 4.8 opposite-family eval; OpenHands infra-down)
+
+OpenHands agent-stage failed on both open models (qwen, kimi — infra/runner docker errors, verdict
+NONE), so the IMPL-EVAL ran as the lane-policy-correct local opposite-family reviewer (Opus 4.8
+reviews GPT/Codex implementation). Verdict: FAIL_FIX — 4/5 claims VERIFIED; one durable scanner
+bypass found:
+
+- **Attempt A (const/array indirection): SLIPPED** — `const target = 'auth'; if (plugin.name === target)`
+  in features/plugins evaded the literal-only plugin-name-check, reintroducing the host-side
+  plugin-identity anti-pattern behind an innocent extraction. FIXED: added same-file taint tracking
+  (`collectPluginNameIdents`) — const/let/var bound to a plugin-name string or an array containing
+  one; `plugin-name-check` now also fires on `.name`/`kind` equality or `.startsWith/.includes/.endsWith`
+  against a tainted ident, and on a tainted array `.includes(plugin.name)`. Regression test added
+  (const + array + predicate = 3 hits).
+- Attempts B (multi-line `as\nunknown\nas`) and C (bare `any` wrapped): confirmed defended-in-depth —
+  `deno fmt` collapses B onto one line (scanner then fires), `deno lint` AST `no-explicit-any` flags C
+  (the scanner's unique job is catching `deno-lint-ignore no-explicit-any` suppressions, which it does).
+
+Post-fix: scanner tests 5/5; `quality:scan:repo` ok=true (0 findings, 19 reasoned allowances — no new
+false positives from the broadened rule); scanner scoped check 0; arch:check FAIL=0; fmt clean.
