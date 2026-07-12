@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `quality-q750-contracts--codex` |
 | Branch | `quality/q750-contracts-h` |
-| Current phase | `gate` |
+| Current phase | `evaluate` |
 | Archetype | `4 — Public DSL / Builder` |
 | Scope overlays | `none` |
 
@@ -30,16 +30,16 @@ doc lint improves 12 → 9 combined private refs, and focused consumers check.
 - Slice 1 independent review PASS and supervisor commit `9a6bd419`.
 - Combined slices 2+3 implementation and generator gates: scanner 41 → 0 with no allowances;
   scoped wrappers, 8 tests, publish, docs, doctrine, and consumers complete.
+- Combined slices 2+3 independent review PASS and supervisor commit `22c608f2`.
 
 ## In Progress
 
-- Separate Tier-A review and sign-off for combined slices 2+3.
+- Separate opposite-family IMPL-EVAL.
 
 ## Next Steps
 
-1. Obtain combined slices 2+3 review/sign-off commit.
-2. Run separate IMPL-EVAL and address any verdict.
-3. Force-push with lease; do not open a PR.
+1. Run separate IMPL-EVAL and address any verdict.
+2. Force-push with lease; do not open a PR.
 
 ## Key Decisions
 
