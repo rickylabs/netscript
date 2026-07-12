@@ -34,6 +34,10 @@ Deno.test('sagas add saga emits the same shape at the user-named path', () => {
   ]);
   assertStringIncludes(artifactText(artifacts[0]), 'InvoicePaymentSaga');
   assertStringIncludes(artifactText(artifacts[0]), "defineSaga(\n  'invoice-payment'");
+  assertStringIncludes(
+    artifactText(artifacts[0]),
+    ".compensate<Message['type'], Message['payload']>",
+  );
   assertStringIncludes(artifactText(artifacts[1]), 'InvoicePaymentSagaConfig');
 });
 

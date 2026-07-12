@@ -95,15 +95,25 @@ The other primitive you need is **`send(target, payload)`** — also from `@nets
 — which a handler returns to drive the next step: it sends a command (to a worker job) or emits an
 event. Handlers return an **array** of these effects.
 
-## Step 3 — Author the checkout saga
+## Step 3 — Scaffold the checkout saga
 
-Now write the saga. It correlates by `orderId`, starts `pending`, and walks the lifecycle. Crucially,
+Start with the saga definition and config scaffold:
+
+The `add-saga` verb uses the spaced `add saga` shell syntax:
+
+```sh
+ns-sagas add saga checkout --message-type=OrderCreated --durability=t1 --topic=checkout
+```
+
+The command writes `sagas/checkout-saga.ts` plus `sagas/checkout.config.ts`, including a normal
+handler and a compensation-handler skeleton, and refreshes the saga registry. Extend that generated
+definition with the checkout state and lifecycle below. It correlates by `orderId`, starts `pending`,
+and walks the lifecycle. Crucially,
 it has explicit **failure branches**: if payment fails or inventory is unavailable, it transitions to
-`cancelled` and emits a cancellation — this is compensation. Open the sample under `plugins/sagas/`
-and replace it:
+`cancelled` and emits a cancellation — this is compensation.
 
 ```ts
-// plugins/sagas/checkout-saga.ts
+// sagas/checkout-saga.ts
 import { defineSaga, send } from '@netscript/plugin-sagas-core';
 import type { SagaState } from '@netscript/plugin-sagas-core/domain';
 
@@ -177,7 +187,7 @@ export const checkoutSaga = defineSaga('CheckoutSaga')
   })
 
   // === Compensation: PaymentFailed → cancel the order. ===
-  .on('PaymentFailed', (saga, event) => {
+  .compensate('PaymentFailed', (saga, event) => {
     if (saga.state.status !== 'payment_pending') return [];
     const msg = event.payload as { reason: string };
     saga.state = { ...saga.state, status: 'cancelled', cancelReason: `Payment failed: ${msg.reason}` };

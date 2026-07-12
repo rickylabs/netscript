@@ -157,6 +157,16 @@ The framework also ships named presets so you do not hand-roll the object. `perm
 `@netscript/plugin-workers-core` exposes `minimal`, `none`, `network`, `filesystem`,
 `readOnly`, `subprocess`, `full`, and `allAccess`.
 
+Start a new Deno task from the CLI, then tune the generated builder instead of creating its file by
+hand. The `add-task` verb uses the spaced `add task` shell syntax:
+
+```sh
+ns-workers add task charge-customer --runtime=deno
+```
+
+For a non-Deno entrypoint, choose its runtime and path explicitly, for example
+`ns-workers add task sync-report --runtime=python --entrypoint=scripts/sync-report.py`.
+
 {{ comp.tabbedCode({ tabs: [
   {
     label: "Scoped object",

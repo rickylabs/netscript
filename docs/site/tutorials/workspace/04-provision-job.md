@@ -105,32 +105,25 @@ they just do not yet add custom spans. <code>log.*</code> emits real structured 
 custom spans today, import from <code>@netscript/telemetry</code> directly.
 {{ /comp }}
 
-## Step 3 — Author the provision-member job
+## Step 3 — Scaffold the provision-member job
 
-Add a new file in `plugins/workers/jobs/` that provisions a member into the workspace datasource from
-chapter 3. It parses its payload with Zod, writes a `Member` row, and returns a success result:
+Start from the workers scaffold instead of creating the module by hand:
+
+The workers CLI calls this the `add-job` verb; its shell syntax uses the spaced `add job` form:
+
+```sh
+ns-workers add job provision-member
+```
+
+The command writes `workers/jobs/provision-member.ts` with the stable export, payload-schema block,
+and handler wrapper already in place, then refreshes the worker registry. Extend the generated
+payload schema with `workspaceId`, `subject`, and `role`; import `createFailureResult`; add the
+workspace Prisma import and client; then replace only the starter handler body with this application
+logic:
 
 ```ts
-// plugins/workers/jobs/provision-member.ts
-import {
-  createFailureResult,
-  createSuccessResult,
-  defineJobHandler,
-} from '@netscript/plugin-workers-core';
-import { z } from 'zod';
-import { PrismaClient as WorkspacePrisma } from '../../../database/workspace/schema/.generated/client.server.ts';
-
-const ProvisionMemberPayloadSchema = z.object({
-  workspaceId: z.string().min(1),
-  // The auth Principal.subject from chapter 2 — the user being provisioned.
-  subject: z.string().min(1),
-  role: z.string().default('member'),
-});
-
-const workspaceDb = new WorkspacePrisma();
-
 const handler = defineJobHandler(async (ctx) => {
-  const parsed = ProvisionMemberPayloadSchema.safeParse(ctx.payload ?? {});
+  const parsed = PayloadSchema.safeParse(ctx.payload ?? {});
   if (!parsed.success) {
     return createFailureResult('invalid provision-member payload');
   }
@@ -143,8 +136,6 @@ const handler = defineJobHandler(async (ctx) => {
 
   return createSuccessResult({ memberId: member.id, workspaceId, subject });
 });
-
-export default Object.assign(handler, { id: 'provision-member' as const });
 ```
 
 This is the whole job — small on purpose. The membership write happens off the request path, so the
@@ -159,21 +150,10 @@ runtime — a trigger or a scheduled job — you enqueue work with the builder's
 runtime-backed CLI trigger is the clearest way to prove the job ran.
 {{ /comp }}
 
-## Step 4 — Generate the runtime registry for a hand-authored file
+## Step 4 — Confirm the generated registry
 
-The Workers API addresses jobs by `id`, so it needs a generated registry mapping each id to its
-handler. Generate the plugin registries so `provision-member` is discoverable:
-
-```sh
-netscript generate plugins
-```
-
-This scans `plugins/workers/jobs` and writes a registry the running service loads. After this,
-`provision-member` is addressable over the API.
-
-When you create a job with `ns-workers add job <id>`, that command regenerates the registry before
-it returns; do not run a second generate step. This chapter authored a custom handler directly, so
-the explicit generation above is still required once.
+The Workers API addresses jobs by `id`, so the scaffold command refreshes the generated registry
+before it returns. `provision-member` is already discoverable; do not run a second generation step.
 
 {{ comp callout { type: "note", title: "Restart the processor if it was already running" } }}
 If <code>aspire start</code> was up before you generated the registry, restart it (or let it hot-reload)

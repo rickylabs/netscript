@@ -17,16 +17,16 @@ projections through a single declarative manifest.**
 From the root of a generated NetScript project:
 
 ```bash
-netscript plugin add auth
+netscript plugin install auth
 ```
 
-`plugin add` resolves `@netscript/plugin-auth` from JSR and runs the plugin's own scaffolder — the
+`plugin install` resolves `@netscript/plugin-auth` from JSR and runs the plugin's own scaffolder — the
 plugin owns its setup, so the CLI ships no embedded templates. The scaffolder wires the auth API
 service, the auth database schema, session streams, and Aspire resources into your workspace, then
 pins the matching `@netscript/*` versions.
 
 > **Provisioning:** auth requires both Postgres (for the auth schema) and Deno KV (for sessions).
-> `plugin add` records these requirements from the manifest so `netscript db` and Aspire
+> `plugin install` records these requirements from the manifest so `netscript db` and Aspire
 > orchestration provision them for you.
 
 ### Use it as a library
@@ -85,7 +85,7 @@ The domain schemas, `AuthBackendPort` seam, oRPC v1 contract, and Zod config liv
 
 ## 🧩 Install manifest
 
-The plugin root ships `scaffold.plugin.json` — the declarative contract `plugin add` reads to
+The plugin root ships `scaffold.plugin.json` — the declarative contract `plugin install` reads to
 install the plugin. It is editor-validated through a bundled JSON Schema (`$schema`), so the
 manifest gives you IntelliSense and validation in any schema-aware editor.
 
