@@ -510,7 +510,7 @@ const AUTH_SMOKE_ENV_SCRIPT = [
   ']);',
   'const configured = JSON.parse(await Deno.readTextFile(`${projectRoot}/appsettings.json`));',
   'if (configured.Auth?.Backend !== "kv-oauth") throw new Error("auth backend CLI did not persist appsettings");',
-  'if (configured.Auth?.Environment?.NETSCRIPT_AUTH_PROVIDER_ID !== "github") throw new Error("auth provider CLI did not persist preset");',
+  'if (configured.NetScript?.Plugins?.auth?.Environment?.NETSCRIPT_AUTH_PROVIDER_ID !== "github") throw new Error("auth provider CLI did not persist plugin environment");',
 ].join('\n');
 
 const VALIDATE_WORKER_EXECUTIONS_SCRIPT = [

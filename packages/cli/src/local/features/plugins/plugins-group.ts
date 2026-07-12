@@ -84,6 +84,7 @@ export function createLocalPluginCommand(
         fs: dependencies.fs,
         resolveProjectRoot: dependencies.resolveProjectRoot,
         sessions: dependencies.authSessionHttp,
+        regenerateAspire: dependencies.authRegenerateAspire,
       }),
     );
 }

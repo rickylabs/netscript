@@ -194,6 +194,20 @@ async function writeAuthConfig(
     ...(values.NETSCRIPT_AUTH_BACKEND ? { Backend: values.NETSCRIPT_AUTH_BACKEND } : {}),
     Environment: { ...environment, ...values },
   };
+  const netScript = isRecord(current.NetScript) ? current.NetScript : {};
+  const plugins = isRecord(netScript.Plugins) ? netScript.Plugins : {};
+  const authPlugin = isRecord(plugins.auth) ? plugins.auth : {};
+  const pluginEnvironment = isStringRecord(authPlugin.Environment) ? authPlugin.Environment : {};
+  current.NetScript = {
+    ...netScript,
+    Plugins: {
+      ...plugins,
+      auth: {
+        ...authPlugin,
+        Environment: { ...pluginEnvironment, ...values },
+      },
+    },
+  };
   await fs.writeFile(path, `${JSON.stringify(current, null, 2)}\n`);
 }
 

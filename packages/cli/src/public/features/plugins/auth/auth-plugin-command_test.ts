@@ -75,6 +75,10 @@ Deno.test('github provider preset writes boot-ready OAuth environment', async ()
   assertMatch(env, new RegExp(`NETSCRIPT_AUTH_KV_OAUTH_KEY=${kvOAuthKey}`));
   const appsettings = JSON.parse(await fs.readFile('/workspace/appsettings.json'));
   assertEquals(appsettings.Auth.Environment.NETSCRIPT_AUTH_PROVIDER_ID, 'github');
+  assertEquals(
+    appsettings.NetScript.Plugins.auth.Environment.NETSCRIPT_AUTH_KV_OAUTH_KEY,
+    kvOAuthKey,
+  );
   const registry = await createAuthServiceBackendRegistry({
     env: {},
     appsettings,
@@ -143,6 +147,7 @@ Deno.test('fetch session adapter lists projections and revokes through signout',
 Deno.test('plugin auth parser drives backend and session verbs', async () => {
   const fs = new MemoryFileSystemAdapter();
   const output: string[] = [];
+  const regenerated: string[] = [];
   const sessions: AuthSessionHttpPort = {
     list: () => Promise.resolve([
       { id: 'active-1', state: 'active', userId: 'user-1' },
@@ -155,6 +160,10 @@ Deno.test('plugin auth parser drives backend and session verbs', async () => {
     sessions,
     resolveProjectRoot: (value) => Promise.resolve(value ?? '/workspace'),
     print: (line) => output.push(line),
+    regenerateAspire: (projectRoot) => {
+      regenerated.push(projectRoot);
+      return Promise.resolve();
+    },
   });
 
   await command.parse(['backend', 'set', 'kv-oauth', '--project-root', '/workspace']);
@@ -166,6 +175,7 @@ Deno.test('plugin auth parser drives backend and session verbs', async () => {
     'active-1\tuser-1\t-\tactive\t-',
     'Revoked active-1.',
   ]);
+  assertEquals(regenerated, ['/workspace']);
 });
 
 Deno.test('session CLI lists a signed-in backend session and revoke invalidates it', async () => {

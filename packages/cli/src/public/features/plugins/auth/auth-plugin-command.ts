@@ -16,6 +16,8 @@ export interface AuthPluginCommandDependencies {
   readonly fs: FileSystemPort;
   readonly resolveProjectRoot: ProjectRootResolver;
   readonly sessions: AuthSessionHttpPort;
+  /** Regenerate Aspire helpers after persisted auth configuration changes. */
+  readonly regenerateAspire?: (projectRoot: string) => Promise<void>;
   readonly print?: (message: string) => void;
 }
 
@@ -31,6 +33,7 @@ export function createAuthPluginCommand(
       .action(async (options: { projectRoot?: string }, value: string) => {
         const projectRoot = await requireProjectRoot(dependencies.resolveProjectRoot, options.projectRoot);
         print(await setAuthBackend(projectRoot, value, dependencies.fs));
+        await dependencies.regenerateAspire?.(projectRoot);
       }))
     .command('show', new Command().option('--project-root <path:string>', 'Project root directory')
       .action(async (options: { projectRoot?: string }) => {
@@ -64,6 +67,7 @@ export function createAuthPluginCommand(
           secret: options.secret,
           kvOAuthKey: options.kvOauthKey,
         }, dependencies.fs);
+        await dependencies.regenerateAspire?.(projectRoot);
         print(`Configured ${preset}.`);
       }));
 

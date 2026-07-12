@@ -84,8 +84,8 @@ handlers. No live third-party GitHub OAuth exchange was executed.
   `backend set`, `secret generate`, and GitHub `provider set`, plus semantic assertions on the
   resulting appsettings seam.
 - Scoped E2E source check / lint / format: **PASS** — 86 files, 0 findings from each wrapper.
-- `scaffold.runtime` execution: **UNPROVEN HERE**. The slice brief explicitly reserves this expensive
-  gate for the beta-9 orchestrator; this implementation agent did not run it.
+- Initial `scaffold.runtime` execution was orchestrator-owned; the CI round-3 fix authorization
+  superseded that restriction. See the round-3 evidence below.
 - Live provider OAuth: **UNPROVEN**. Backend registry and interactive handler integration are green,
   but no GitHub network round-trip was attempted.
 
@@ -96,9 +96,10 @@ handlers. No live third-party GitHub OAuth exchange was executed.
 - D2 (implementation): the existing key resolver accepted padded standard base64 only while the issue
   requires base64url. The resolver now normalizes base64url and rejects decoded keys that are not
   exactly 32 bytes.
-- D3 (implementation): `.env` alone was insufficient evidence that Aspire passes configuration into
-  the plugin service. The CLI also reconciles `Auth.Backend` and `Auth.Environment` in appsettings,
-  which the existing plugin service context already supplies to backend composition.
+- D3 (corrected by round-3 evidence): `.env` and top-level `Auth.Environment` were persisted, but the
+  generated host neither loads `.env` nor supplies appsettings through `PluginServiceContext`.
+  Runtime variables must flow through `NetScript.Plugins.auth.Environment` into generated Aspire
+  `withEnvironment` calls.
 
 ## Orchestrator fix-forward (Tier-A review, Codex lane quota-exhausted)
 
@@ -115,3 +116,24 @@ handlers. No live third-party GitHub OAuth exchange was executed.
   group in `local/features/plugins/plugins-group.ts` mirroring the public wiring; reproduced the
   exact CLI call locally against a scratch project — appsettings `Auth.Backend=kv-oauth` persisted.
   Scoped check 0 findings; local composition test green.
+
+## CI round 3 — auth service boot fix
+
+- Reproduced from rebased head `4487b5e16668c389a6f5e0f468870ac887c2c2b5`: auth reached a terminal
+  state before `runtime.wait.auth` (exit 18). The generated helper contained no auth environment
+  injection even though appsettings contained top-level `Auth.Environment`.
+- Root cause: the boot seam was written to a section the generated AppHost does not consume. In
+  addition, helper regeneration parsed appsettings through the currently published Aspire beta,
+  which strips the new plugin environment field, and `netscript-dev` did not forward the helper
+  regeneration dependency from its local plugin group.
+- Fix: persist the same values under `NetScript.Plugins.auth.Environment`; preserve that raw field
+  while regenerating against older published Aspire parsers; extend the typed Aspire plugin schema;
+  emit configured plugin environment variables in `register-plugins.mts`; regenerate helpers after
+  backend/provider mutations in both public and local CLI trees.
+- Targeted tests: **PASS**, 13 tests / 53 steps across auth CLI, Aspire config parsing, and helper
+  generation.
+- Full gate: `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` — **PASS**, 60 passed,
+  0 failed. Specifically `runtime.wait.auth`, `behavior.auth-live`, `behavior.auth-ready`, and
+  `behavior.auth-session` all passed; cleanup passed.
+- Scoped wrappers: CLI check/lint/format **PASS** (673 files, 0 findings); Aspire check/lint/format
+  **PASS** (45 files, 0 findings).

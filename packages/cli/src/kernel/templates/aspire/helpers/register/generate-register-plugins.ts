@@ -79,6 +79,12 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
     lines.push(
       `    await resource.withEnvironment('NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE', bootstrapModule);`,
     );
+    if (entry.Environment && Object.keys(entry.Environment).length > 0) {
+      lines.push(`    const configuredEnvironment = ${JSON.stringify(entry.Environment)};`);
+      lines.push(`    for (const [key, value] of Object.entries(configuredEnvironment)) {`);
+      lines.push(`      await resource.withEnvironment(key, value);`);
+      lines.push(`    }`);
+    }
     if (isTriggersApiResource(name, entrypoint)) {
       lines.push(
         `    const triggerRegistryModule = new URL('../../.netscript/generated/plugin-triggers/triggers.registry.ts', import.meta.url).href;`,

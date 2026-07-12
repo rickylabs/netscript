@@ -120,6 +120,7 @@ export function createPluginCommand(
         fs: dependencies.fs,
         resolveProjectRoot: dependencies.resolveProjectRoot,
         sessions: dependencies.authSessionHttp,
+        regenerateAspire: dependencies.authRegenerateAspire,
       }),
     );
 

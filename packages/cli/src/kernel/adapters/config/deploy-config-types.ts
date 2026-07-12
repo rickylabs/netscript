@@ -41,6 +41,7 @@ export interface RawPluginConfig {
   RequiresDb?: boolean;
   Permissions?: string[];
   Description?: string;
+  Environment?: Record<string, string>;
 }
 
 export interface RawAppConfig {

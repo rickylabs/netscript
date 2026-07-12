@@ -172,6 +172,8 @@ export interface PluginEntry extends BaseEntry, ReferenceEntry {
   RequiresKv: boolean;
   /** Whether the plugin requires database access. */
   RequiresDb: boolean;
+  /** Environment variables supplied to the plugin service resource. */
+  Environment?: Readonly<Record<string, string>>;
   /** Saga-specific metadata for saga plugin resources. */
   Sagas?: SagaResourceConfig;
 }
@@ -437,6 +439,7 @@ const PluginEntryZod = z.object({
   Workdir: z.string().optional(),
   RequiresKv: z.boolean().default(false),
   RequiresDb: z.boolean().default(false),
+  Environment: z.record(z.string(), z.string()).optional(),
   Sagas: SagaResourceConfigZod.optional(),
 }).meta({ title: 'PluginEntry', description: 'Configuration for a plugin service resource' });
 /** Plugin entry schema. */
