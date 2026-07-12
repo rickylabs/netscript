@@ -153,9 +153,38 @@ Reconcile note: issue/PR state and per-slice PR comments are orchestrator-owned 
 explicitly told not to open a PR. Tier-A substantive review remains pending after this implementation
 commit; this lane does not self-certify it.
 
+- Commit/push: `9b6a4859` pushed to `origin/feat/704-durable-cli-parity`.
+
+### Slice 2 — sagas runtime/file parity
+
+- Added contract-backed `publish` and `list` commands, including registered/instance selection and
+  instance `--status`/`--saga` query filters. `inspect` now queries runtime metadata first and falls
+  back to local source inspection only when the service is unavailable.
+- Added `update saga`/`remove saga` normalization and standalone CLI execution. Update edits
+  durability in the definition and topic/tags/description in the config through a syntax-aware
+  fluent-call editor; remove deletes both generated files.
+- Add/update/remove regenerate the static registry. Registry generation now excludes `.config.ts`
+  modules so only real `SagaDefinition` modules are imported.
+
+| Evidence | Result |
+| --- | --- |
+| Targeted sagas CLI/resource tests | PASS — 11 passed, 0 failed |
+| Runtime route/body tests | PASS — publish body, instance status/saga query, runtime inspect route |
+| Syntax-aware rewrite tests | PASS — strings/comments ignored; nested call arguments replaced as one span |
+| Scoped check — `plugins/sagas` | PASS — 69 files, 0 diagnostics, `--unstable-kv` wrapper |
+| Scoped lint | PASS — 0 findings |
+| Scoped format | PASS — 0 findings |
+| Touched sagas CLI doc-lint | PASS — `src/cli/mod.ts`, 0 diagnostics |
+| Full sagas export-map doc-lint | BASELINE DEBT — 12 pre-existing `private-type-ref`; touched CLI entrypoint is clean |
+| `deno.lock` | UNCHANGED |
+
+Reconcile note: no PR was opened or commented per the lane brief. Tier-A slice review and
+separate-session IMPL-EVAL remain orchestrator-owned.
+
 ### Drift
 
 | ID | Severity | Detail |
 | --- | --- | --- |
 | D1 | significant, owner-approved | PLAN-EVAL was explicitly waived in the slice brief; short plan/design recorded here before implementation. |
 | D2 | minor | Full workers export-map doc-lint has 18 pre-existing private-type references. The newly touched CLI entrypoint was brought to 0; unrelated baseline findings were not expanded into this slice. |
+| D3 | minor | Full sagas export-map doc-lint has 12 pre-existing private-type references. The touched CLI entrypoint is clean; unrelated runtime/contracts findings remain outside #704. |

@@ -24,7 +24,7 @@ Deno.test('SagasCli exposes the sagas command registry', async () => {
   assertEquals(inspect.data, {
     command: 'inspect',
     category: 'inspection',
-    usage: 'ns-sagas inspect [--root=sagas]',
+    usage: 'ns-sagas inspect [id] [--root=sagas --json]',
     flags: { root: 'sagas,services' },
     values: ['project/sagas'],
   });
@@ -40,7 +40,11 @@ Deno.test('SagasCli exposes command metadata with categories and flags', () => {
   assertEquals(definitions.map((definition) => definition.description), [
     'Create a saga definition and config entry.',
     'Generate the static saga registry for compiled runtimes.',
-    'Inspect fluent saga definitions in project source.',
+    'Publish a message to the durable saga bus.',
+    'List registered sagas or durable saga instances.',
+    'Inspect saga metadata from the runtime, with local source fallback.',
+    'Update a generated saga definition and config.',
+    'Remove a generated saga definition and config.',
     'Rewrite legacy sagas imports to plugin package specifiers.',
   ]);
 });
