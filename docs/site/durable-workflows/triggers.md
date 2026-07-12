@@ -422,7 +422,7 @@ returns an array of `enqueueJob` actions — the only supported trigger action.
   {
     label: "Call it — curl",
     lang: "bash",
-    code: "# Triggers API runs on :8093. POST to the webhook's resolved path.\ncurl -X POST http://localhost:8093/api/v1/webhooks/inbound/generic \\\n  -H 'content-type: application/json' \\\n  -d '{\"verbose\": false}'\n\n# Watch the resulting ingress events:\ncurl 'http://localhost:8093/api/v1/events?limit=10'\n\n# The enqueued job lands on the workers plugin (:8091):\ncurl http://localhost:8091/api/v1/workers/executions?limit=10"
+    code: "# Triggers API runs on :8093. POST to the webhook's resolved path.\ncurl -X POST http://localhost:8093/api/v1/webhooks/inbound/generic \\\n  -H 'content-type: application/json' \\\n  -d '{\"verbose\": false}'\n\n# Watch the resulting ingress events:\ncurl 'http://localhost:8093/api/v1/events?limit=10'\n\n# The enqueued job lands on the workers plugin (:8091):\nns-workers executions --limit=10 --json"
   }
 ] }) }}
 

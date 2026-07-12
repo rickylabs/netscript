@@ -126,6 +126,7 @@ export class ListJobsCommand extends WorkersCliCommand {
       flags: [
         { name: 'topic', description: 'Filter jobs by stream topic.' },
         { name: 'enabled-only', description: 'Only include enabled jobs.' },
+        { name: 'json', description: 'Render structured JSON output.' },
       ],
     }, backend);
   }
@@ -139,8 +140,70 @@ export class ListTasksCommand extends WorkersCliCommand {
       name: 'list-tasks',
       category: 'tasks',
       description: 'List worker tasks discovered for the current project.',
-      usage: 'ns-workers list-tasks [--type]',
-      flags: [{ name: 'type', description: 'Filter tasks by runtime type.' }],
+      usage: 'ns-workers list-tasks [--type --json]',
+      flags: [
+        { name: 'type', description: 'Filter tasks by runtime type.' },
+        { name: 'json', description: 'Render structured JSON output.' },
+      ],
+    }, backend);
+  }
+}
+
+/** Show metadata for one configured worker job. */
+export class ShowJobCommand extends WorkersCliCommand {
+  /** Create a show-job command with an optional backend override. */
+  constructor(backend?: WorkersCliBackend) {
+    super({
+      name: 'show-job',
+      category: 'jobs',
+      description: 'Show worker job metadata.',
+      usage: 'ns-workers show-job <id> [--json]',
+      flags: [{ name: 'json', description: 'Render structured JSON output.' }],
+    }, backend);
+  }
+}
+
+/** Show metadata for one configured worker task. */
+export class ShowTaskCommand extends WorkersCliCommand {
+  /** Create a show-task command with an optional backend override. */
+  constructor(backend?: WorkersCliBackend) {
+    super({
+      name: 'show-task',
+      category: 'tasks',
+      description: 'Show worker task metadata.',
+      usage: 'ns-workers show-task <id> [--json]',
+      flags: [{ name: 'json', description: 'Render structured JSON output.' }],
+    }, backend);
+  }
+}
+
+/** List durable worker executions from the running API. */
+export class ExecutionsCommand extends WorkersCliCommand {
+  /** Create an executions command with an optional backend override. */
+  constructor(backend?: WorkersCliBackend) {
+    super({
+      name: 'executions',
+      category: 'runtime',
+      description: 'List durable worker executions.',
+      usage: 'ns-workers executions [--limit --status --json]',
+      flags: [{ name: 'limit', description: 'Maximum execution count.' }, {
+        name: 'status',
+        description: 'Filter by execution status.',
+      }, { name: 'json', description: 'Render structured JSON output.' }],
+    }, backend);
+  }
+}
+
+/** Enqueue a configured job through the durable workers API. */
+export class TriggerJobCommand extends WorkersCliCommand {
+  /** Create a trigger command with an optional backend override. */
+  constructor(backend?: WorkersCliBackend) {
+    super({
+      name: 'trigger',
+      category: 'runtime',
+      description: 'Enqueue a worker job through the durable runtime.',
+      usage: 'ns-workers trigger <job-id> [--payload=<json>]',
+      flags: [{ name: 'payload', description: 'JSON payload passed to the job.' }],
     }, backend);
   }
 }
@@ -152,9 +215,83 @@ export class RunJobCommand extends WorkersCliCommand {
     super({
       name: 'run',
       category: 'runtime',
-      description: 'Run a worker job by identifier.',
+      description: 'Enqueue a worker job by identifier (compatibility alias for trigger).',
       usage: 'ns-workers run <job-id> [--payload=<json>]',
       flags: [{ name: 'payload', description: 'JSON payload passed to the job.' }],
+    }, backend);
+  }
+}
+
+/** Execute a configured polyglot task through MultiRuntimeTaskExecutor. */
+export class RunTaskCommand extends WorkersCliCommand {
+  /** Create a run-task command with an optional backend override. */
+  constructor(backend?: WorkersCliBackend) {
+    super({
+      name: 'run-task',
+      category: 'runtime',
+      description: 'Execute a polyglot worker task.',
+      usage: 'ns-workers run-task <id> [--args=<json> --env=<json> --timeout=<ms>]',
+      flags: [
+        { name: 'args', description: 'JSON array of argv values.' },
+        { name: 'env', description: 'JSON object of environment values.' },
+        { name: 'timeout', description: 'Execution timeout in milliseconds.' },
+        { name: 'json', description: 'Render the TaskResult as JSON.' },
+      ],
+    }, backend);
+  }
+}
+
+/** Update metadata for a worker job and regenerate its registry. */
+export class UpdateJobCommand extends WorkersCliCommand {
+  /** Create an update-job command with an optional backend override. */
+  constructor(backend?: WorkersCliBackend) {
+    super({
+      name: 'update-job',
+      category: 'jobs',
+      description: 'Update worker job metadata.',
+      usage:
+        'ns-workers update-job <id> [--topic --schedule --timeout --max-retries --tags --enabled]',
+      flags: resourceUpdateFlags(false),
+    }, backend);
+  }
+}
+
+/** Update metadata for a worker task and regenerate its registry. */
+export class UpdateTaskCommand extends WorkersCliCommand {
+  /** Create an update-task command with an optional backend override. */
+  constructor(backend?: WorkersCliBackend) {
+    super({
+      name: 'update-task',
+      category: 'tasks',
+      description: 'Update worker task metadata.',
+      usage: 'ns-workers update-task <id> [--runtime --entrypoint --timeout --enabled]',
+      flags: resourceUpdateFlags(true),
+    }, backend);
+  }
+}
+
+/** Remove a worker job file and regenerate its registry. */
+export class RemoveJobCommand extends WorkersCliCommand {
+  /** Create a remove-job command with an optional backend override. */
+  constructor(backend?: WorkersCliBackend) {
+    super({
+      name: 'remove-job',
+      category: 'jobs',
+      description: 'Remove a worker job.',
+      usage: 'ns-workers remove-job <id>',
+    }, backend);
+  }
+}
+
+/** Remove a worker task file and regenerate its registry. */
+export class RemoveTaskCommand extends WorkersCliCommand {
+  /** Create a remove-task command with an optional backend override. */
+  constructor(backend?: WorkersCliBackend) {
+    super({
+      name: 'remove-task',
+      category: 'tasks',
+      description: 'Remove a worker task.',
+      usage: 'ns-workers remove-task <id>',
     }, backend);
   }
 }
@@ -250,4 +387,21 @@ function isPluginCliArgs(input: unknown): input is PluginCliArgs {
     return false;
   }
   return typeof (input as { readonly command?: unknown }).command === 'string';
+}
+
+function resourceUpdateFlags(task: boolean): readonly { name: string; description: string }[] {
+  return [
+    ...(task
+      ? [{ name: 'runtime', description: 'Task runtime kind.' }, {
+        name: 'entrypoint',
+        description: 'Task entrypoint path.',
+      }]
+      : [{ name: 'topic', description: 'Job stream topic.' }, {
+        name: 'schedule',
+        description: 'Job cron schedule.',
+      }, { name: 'tags', description: 'Comma-separated job tags.' }]),
+    { name: 'timeout', description: 'Timeout in milliseconds.' },
+    { name: 'max-retries', description: 'Maximum retry count.' },
+    { name: 'enabled', description: 'Whether the resource is enabled.' },
+  ];
 }

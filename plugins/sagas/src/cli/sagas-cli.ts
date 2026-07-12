@@ -6,6 +6,10 @@ import {
   CodemodCommand,
   GenerateRegistryCommand,
   InspectCommand,
+  ListSagasCommand,
+  PublishCommand,
+  RemoveSagaCommand,
+  UpdateSagaCommand,
 } from './commands.ts';
 
 /** CLI command group for `@netscript/plugin-sagas`. */
@@ -29,7 +33,11 @@ export class SagasCli extends PluginCli {
     return [
       new AddSagaCommand(this.backend),
       new GenerateRegistryCommand(this.backend),
+      new PublishCommand(this.backend),
+      new ListSagasCommand(this.backend),
       new InspectCommand(this.backend),
+      new UpdateSagaCommand(this.backend),
+      new RemoveSagaCommand(this.backend),
       new CodemodCommand(this.backend),
     ].map((command) => command.toPluginCommand());
   }

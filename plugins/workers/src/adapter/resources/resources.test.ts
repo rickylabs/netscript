@@ -71,6 +71,13 @@ Deno.test('workers task scaffolder preserves multi-runtime task emission', () =>
     taskScaffolder.emit({ id: 'resize-image', runtime: 'powershell' })[0].path,
     'workers/tasks/resize-image.ps1',
   );
+  const custom = taskScaffolder.emit({
+    id: 'resize-image',
+    runtime: 'python',
+    entrypoint: 'scripts/resize.py',
+  })[0];
+  assertEquals(custom.path, 'scripts/resize.py');
+  assertStringIncludes(artifactText(custom), 'sys.argv[1:]');
 });
 
 Deno.test('workers workflow resource is add-only', () => {
