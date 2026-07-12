@@ -340,14 +340,11 @@ export async function createReleasePullRequest(
   }
 }
 
-async function createReleasePr(root: string, version: string, files: string[]): Promise<void> {
-  const branch = `release/cut-${version}`;
-  await mustRun('git', ['checkout', '-b', branch], root);
-  await mustRun('git', ['add', ...files], root);
-  await mustRun('git', ['commit', '-m', `chore(release): cut ${version}`], root);
-  await mustRun('git', ['push', 'origin', `HEAD:refs/heads/${branch}`], root);
-
-  const bodyFile = join(root, '.llm', 'tmp', `release-cut-${version}-body.md`);
+/** Write the generated release PR body to the scratch file used by the cut flow. */
+export async function writeReleasePrBody(root: string, version: string): Promise<string> {
+  const bodyDirectory = join(root, '.llm', 'tmp');
+  const bodyFile = join(bodyDirectory, `release-cut-${version}-body.md`);
+  await Deno.mkdir(bodyDirectory, { recursive: true });
   await Deno.writeTextFile(
     bodyFile,
     `## Summary
@@ -365,6 +362,17 @@ Cut NetScript ${version}.
 Create and publish GitHub Release \`v${version}\`; \`publish.yml\` will publish with OIDC and hand the published version to \`e2e-cli-prod.yml\`.
 `,
   );
+  return bodyFile;
+}
+
+async function createReleasePr(root: string, version: string, files: string[]): Promise<void> {
+  const branch = `release/cut-${version}`;
+  await mustRun('git', ['checkout', '-b', branch], root);
+  await mustRun('git', ['add', ...files], root);
+  await mustRun('git', ['commit', '-m', `chore(release): cut ${version}`], root);
+  await mustRun('git', ['push', 'origin', `HEAD:refs/heads/${branch}`], root);
+
+  const bodyFile = await writeReleasePrBody(root, version);
   const body = await Deno.readTextFile(bodyFile);
   await createReleasePullRequest(version, body);
 }
