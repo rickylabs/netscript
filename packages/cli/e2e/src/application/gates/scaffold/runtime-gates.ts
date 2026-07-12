@@ -6,7 +6,7 @@ import {
 } from '../../../domain/cli-surface.ts';
 import { DATABASE, type DatabaseEngine, PACKAGE_SOURCE } from '../../../domain/extension-axes.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
-import { commandGate, httpGate } from './gate-factory.ts';
+import { commandGate, denoCommand, httpGate } from './gate-factory.ts';
 
 const ASPIRE_RESOURCE_WAIT_TIMEOUT_SECONDS: Partial<Record<AspireResource, number>> = {
   [ASPIRE_RESOURCE.MSSQL]: 600,
@@ -189,7 +189,7 @@ export function createRuntimeGates(
       GATE.BEHAVIOR_AI_CHAT_ROUTE,
       'Import generated AI chat route',
       GATE_PHASE.BEHAVIOR,
-      (context) => ['deno', 'eval', VALIDATE_AI_CHAT_ROUTE_SCRIPT, context.project.projectRoot],
+      (context) => denoCommand(context, 'eval', VALIDATE_AI_CHAT_ROUTE_SCRIPT, context.project.projectRoot),
       (context) => context.project.projectRoot,
     ),
   ];
