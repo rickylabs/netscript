@@ -96,3 +96,11 @@ files were restored before sign-off commits; the blocker is resolved.
 - Restored supervisor-owned `s7/implement.md`; all implementation notes remain in this worklog.
 - Re-ran combined tests and scoped checks after restoration: 43/43 tests pass; MCP 57 files and CLI
   612 files check with zero findings.
+
+## Final evaluation
+
+- Separate-session IMPL-EVAL retry returned `PASS` (Claude/Opus family, distinct from PLAN-EVAL).
+- Evaluator independently reproduced 43/43 tests, 669 scoped check files with zero findings,
+  `arch:check` exit 0, deterministic asset regeneration, JSR-safe string embedding, clean dependency
+  direction, and both supervisor-requested restorations.
+- Commits evaluated: `5d588ac6`, `ef39b332`.
