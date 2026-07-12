@@ -23,6 +23,10 @@ export type {
 } from './src/application/contract-primitives.ts';
 export type {
   ContractObjectSchema,
+  ContractObjectSchemaLike,
   ContractParseResult,
   ContractSchema,
+  ContractSchemaInput,
+  ContractSchemaLike,
+  ContractSchemaOutput,
 } from './src/domain/schema-types.ts';

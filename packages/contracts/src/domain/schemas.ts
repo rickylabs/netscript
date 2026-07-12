@@ -7,8 +7,6 @@ import {
 } from './constants.ts';
 import type { ContractObjectSchema, ContractSchema } from './schema-types.ts';
 
-type UntypedZodObjectSchema = ReturnType<typeof z.object>;
-
 /** Offset-based pagination input for request bodies. */
 export type OffsetPaginationInput = Readonly<{
   limit: number;
@@ -89,57 +87,70 @@ export type ServiceUnavailableError = Readonly<{
   reason?: string;
 }>;
 
-const notFoundErrorSchema: UntypedZodObjectSchema = z.object({
+const notFoundErrorSchema: ContractObjectSchema<NotFoundError, NotFoundError> = z.object({
   resourceType: z.string().describe('Type of resource'),
   resourceId: z.union([z.string(), z.number()]).describe('Resource identifier'),
 });
 
-const validationErrorSchema: UntypedZodObjectSchema = z.object({
+const validationErrorSchema: ContractObjectSchema<ValidationError, ValidationError> = z.object({
   formErrors: z.array(z.string()).describe('Form-level errors'),
   fieldErrors: z.record(z.string(), z.array(z.string()).optional()).describe('Field-level errors'),
 });
 
-const unauthorizedErrorSchema: UntypedZodObjectSchema = z.object({
-  reason: z.enum(['missing_token', 'invalid_token', 'expired_token']).optional(),
-});
+const unauthorizedErrorSchema: ContractObjectSchema<UnauthorizedError, UnauthorizedError> = z
+  .object({
+    reason: z.enum(['missing_token', 'invalid_token', 'expired_token']).optional(),
+  });
 
-const forbiddenErrorSchema: UntypedZodObjectSchema = z.object({
+const forbiddenErrorSchema: ContractObjectSchema<ForbiddenError, ForbiddenError> = z.object({
   requiredRole: z.string().optional().describe('Required role for this action'),
   userRole: z.string().optional().describe('Current user role'),
 });
 
-const rateLimitErrorSchema: UntypedZodObjectSchema = z.object({
+const rateLimitErrorSchema: ContractObjectSchema<RateLimitError, RateLimitError> = z.object({
   retryAfter: z.number().int().min(1).describe('Seconds to wait before retrying'),
   limit: z.number().int().describe('Rate limit threshold'),
 });
 
-const serviceUnavailableErrorSchema: UntypedZodObjectSchema = z.object({
+const serviceUnavailableErrorSchema: ContractObjectSchema<
+  ServiceUnavailableError,
+  ServiceUnavailableError
+> = z.object({
   retryAfter: z.number().int().min(1).optional().describe('Seconds to wait before retrying'),
   reason: z.string().optional().describe('Why the service is unavailable'),
 });
 
 /** Offset pagination schema for request bodies. */
-export const OffsetPaginationInputSchema: ContractObjectSchema<OffsetPaginationInput> = z.object({
+export const OffsetPaginationInputSchema: ContractObjectSchema<
+  OffsetPaginationInput,
+  Readonly<{ limit?: number; offset?: number }>
+> = z.object({
   limit: z.number().int().min(1).max(DEFAULT_PAGINATION_LIMIT_MAX).default(
     DEFAULT_PAGINATION_LIMIT,
   ).describe('Results per page'),
   offset: z.number().int().min(0).max(DEFAULT_INTEGER_MAX).default(
     DEFAULT_PAGINATION_OFFSET,
   ).describe('Offset for pagination'),
-}) as unknown as ContractObjectSchema<OffsetPaginationInput>;
+});
 
 /** Offset pagination schema for URL query parameters. */
-export const OffsetPaginationQuerySchema: ContractObjectSchema<OffsetPaginationQuery> = z.object({
+export const OffsetPaginationQuerySchema: ContractObjectSchema<
+  OffsetPaginationQuery,
+  Readonly<{ limit?: unknown; offset?: unknown }>
+> = z.object({
   limit: z.coerce.number().int().min(1).max(DEFAULT_PAGINATION_LIMIT_MAX).optional().default(
     DEFAULT_PAGINATION_LIMIT,
   ).describe('Results per page'),
   offset: z.coerce.number().int().min(0).max(DEFAULT_INTEGER_MAX).optional().default(
     DEFAULT_PAGINATION_OFFSET,
   ).describe('Offset for pagination'),
-}) as unknown as ContractObjectSchema<OffsetPaginationQuery>;
+});
 
 /** Offset pagination metadata schema for responses. */
-export const OffsetPaginationMetaSchema: ContractObjectSchema<OffsetPaginationMeta> = z.object({
+export const OffsetPaginationMetaSchema: ContractObjectSchema<
+  OffsetPaginationMeta,
+  Readonly<{ total: number; limit?: number; offset?: number; hasMore: boolean }>
+> = z.object({
   total: z.number().int().min(0).max(DEFAULT_INTEGER_MAX).describe('Total count of items'),
   limit: z.number().int().min(1).max(DEFAULT_PAGINATION_LIMIT_MAX).default(
     DEFAULT_PAGINATION_LIMIT,
@@ -148,62 +159,73 @@ export const OffsetPaginationMetaSchema: ContractObjectSchema<OffsetPaginationMe
     DEFAULT_PAGINATION_OFFSET,
   ).describe('Current offset'),
   hasMore: z.boolean().describe('True if more results are available'),
-}) as unknown as ContractObjectSchema<OffsetPaginationMeta>;
+});
 
 /** Cursor pagination schema for request bodies. */
-export const CursorPaginationInputSchema: ContractObjectSchema<CursorPaginationInput> = z.object({
+export const CursorPaginationInputSchema: ContractObjectSchema<
+  CursorPaginationInput,
+  Readonly<{ limit?: number; cursor?: string }>
+> = z.object({
   limit: z.number().int().min(1).max(DEFAULT_PAGINATION_LIMIT_MAX).default(
     DEFAULT_PAGINATION_LIMIT,
   ).describe('Results per page'),
   cursor: z.string().optional().describe('Cursor for the next page'),
-}) as unknown as ContractObjectSchema<CursorPaginationInput>;
+});
 
 /** Cursor pagination schema for URL query parameters. */
-export const CursorPaginationQuerySchema: ContractObjectSchema<CursorPaginationQuery> = z.object({
+export const CursorPaginationQuerySchema: ContractObjectSchema<
+  CursorPaginationQuery,
+  Readonly<{ limit?: unknown; cursor?: string }>
+> = z.object({
   limit: z.coerce.number().int().min(1).max(DEFAULT_PAGINATION_LIMIT_MAX).optional().default(
     DEFAULT_PAGINATION_LIMIT,
   ).describe('Results per page'),
   cursor: z.string().optional().describe('Cursor for the next page'),
-}) as unknown as ContractObjectSchema<CursorPaginationQuery>;
+});
 
 /** Cursor pagination metadata schema for responses. */
-export const CursorPaginationMetaSchema: ContractObjectSchema<CursorPaginationMeta> = z.object({
+export const CursorPaginationMetaSchema: ContractObjectSchema<
+  CursorPaginationMeta,
+  Readonly<{ limit?: number; nextCursor: string | null; hasMore: boolean }>
+> = z.object({
   limit: z.number().int().min(1).max(DEFAULT_PAGINATION_LIMIT_MAX).default(
     DEFAULT_PAGINATION_LIMIT,
   ).describe('Results per page'),
   nextCursor: z.string().nullable().describe('Cursor for the next page'),
   hasMore: z.boolean().describe('True if more results are available'),
-}) as unknown as ContractObjectSchema<CursorPaginationMeta>;
+});
 
 /** Common success response schema. */
-export const SuccessSchema: ContractSchema<SuccessResponse> = z.object({
+export const SuccessSchema: ContractSchema<SuccessResponse, SuccessResponse> = z.object({
   success: z.boolean().describe('True if the operation completed'),
   message: z.string().optional().describe('Optional success message'),
-}) as unknown as ContractSchema<SuccessResponse>;
+});
 
 /** Common not-found error schema. */
-export const NotFoundErrorSchema: ContractSchema<NotFoundError> =
-  notFoundErrorSchema as unknown as ContractSchema<NotFoundError>;
+export const NotFoundErrorSchema: ContractSchema<NotFoundError, NotFoundError> =
+  notFoundErrorSchema;
 
 /** Common validation error schema. */
-export const ValidationErrorSchema: ContractSchema<ValidationError> =
-  validationErrorSchema as unknown as ContractSchema<ValidationError>;
+export const ValidationErrorSchema: ContractSchema<ValidationError, ValidationError> =
+  validationErrorSchema;
 
 /** Common rate-limit error schema. */
-export const RateLimitErrorSchema: ContractSchema<RateLimitError> =
-  rateLimitErrorSchema as unknown as ContractSchema<RateLimitError>;
+export const RateLimitErrorSchema: ContractSchema<RateLimitError, RateLimitError> =
+  rateLimitErrorSchema;
 
 /** Common unauthorized error schema. */
-export const UnauthorizedErrorSchema: ContractSchema<UnauthorizedError> =
-  unauthorizedErrorSchema as unknown as ContractSchema<UnauthorizedError>;
+export const UnauthorizedErrorSchema: ContractSchema<UnauthorizedError, UnauthorizedError> =
+  unauthorizedErrorSchema;
 
 /** Common forbidden error schema. */
-export const ForbiddenErrorSchema: ContractSchema<ForbiddenError> =
-  forbiddenErrorSchema as unknown as ContractSchema<ForbiddenError>;
+export const ForbiddenErrorSchema: ContractSchema<ForbiddenError, ForbiddenError> =
+  forbiddenErrorSchema;
 
 /** Common service-unavailable error schema. */
-export const ServiceUnavailableErrorSchema: ContractSchema<ServiceUnavailableError> =
-  serviceUnavailableErrorSchema as unknown as ContractSchema<ServiceUnavailableError>;
+export const ServiceUnavailableErrorSchema: ContractSchema<
+  ServiceUnavailableError,
+  ServiceUnavailableError
+> = serviceUnavailableErrorSchema;
 
 export {
   forbiddenErrorSchema,
