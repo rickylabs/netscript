@@ -43,3 +43,15 @@ Drift is append-only.
 - **Severity:** minor
 - **Action:** accept; preserve per-slice commit/push evidence in the worklog.
 - **Evidence:** `supervisor.md`, future commit hashes and push results.
+
+## 2026-07-12 — D5 Deno-doc drops attached deprecation payload
+
+- **What:** Deno 2.9 recognizes `@deprecated{removal: 1.2}` as deprecated but omits `removal` from
+  its JSON tag object.
+- **Source:** Live `deno doc --json` probe against an exact-convention exported function.
+- **Expected:** The removal payload would be present in the Deno-doc JSON tag.
+- **Actual:** JSON emits `{ "kind": "deprecated" }` only.
+- **Severity:** minor
+- **Action:** fix within scope by reading the narrow source window identified by the exported
+  declaration location; signature hashing remains based on normalized Deno-doc definitions.
+- **Evidence:** `surface-diff.ts` source-reader fallback and synthetic fixture test.

@@ -55,7 +55,9 @@ export async function findVersionResidue(root: string, oldVersion: string): Prom
   ) {
     const relativePath = normalize(relative(root, entry.path));
     if (!entry.path.endsWith('.json') && relativePath !== 'deno.lock') continue;
-    if ((await Deno.readTextFile(entry.path)).includes(oldVersion)) residue.push(normalize(entry.path));
+    if ((await Deno.readTextFile(entry.path)).includes(oldVersion)) {
+      residue.push(normalize(entry.path));
+    }
   }
   return residue.sort();
 }
@@ -82,7 +84,10 @@ export function parseSemver(version: string): Semver {
 export async function discoverVersionFiles(root: string): Promise<string[]> {
   const rootDenoJson = join(root, 'deno.json');
   const rootConfig = parseJsonObject(await Deno.readTextFile(rootDenoJson), rootDenoJson);
-  if (!Array.isArray(rootConfig.workspace) || !rootConfig.workspace.every((item) => typeof item === 'string')) {
+  if (
+    !Array.isArray(rootConfig.workspace) ||
+    !rootConfig.workspace.every((item) => typeof item === 'string')
+  ) {
     throw new Error(`${rootDenoJson} must declare a string-valued workspace array.`);
   }
 
@@ -189,7 +194,9 @@ async function run(args: Args): Promise<number> {
 
   const result = {
     generatedAt: new Date().toISOString(),
-    command: exactVersion ? `version:bump ${args.nativeArgs[0]}` : `deno bump-version ${args.nativeArgs.join(' ')}`,
+    command: exactVersion
+      ? `version:bump ${args.nativeArgs[0]}`
+      : `deno bump-version ${args.nativeArgs.join(' ')}`,
     cwd: args.cwd,
     exitCode,
     ok: exitCode === 0,

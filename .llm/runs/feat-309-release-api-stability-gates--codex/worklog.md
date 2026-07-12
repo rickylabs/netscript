@@ -67,6 +67,9 @@ when the reviewed API delta should become the new reference.
 | 2026-07-12 | bootstrap | research/plan | Preflight passed; plan recorded before implementation. |
 | 2026-07-12 | slice 1 | implementation/gate | Unified coordinator; `version:bump:test` passed 7/7; `deno.lock` unchanged. |
 | 2026-07-12 | slice 1 | reconcile | Issue #309 remains open by scope; no PR/comment action authorized; no plan adjustment. |
+| 2026-07-12 | slice 2 | implementation | Added normalized surface gate, 34-package/258-export/6,654-symbol baseline, declarations, CI, fixtures, and doctrine convention. |
+| 2026-07-12 | slice 2 | gate | Classifier 3/3; live task patch; two-snapshot CLI returned undeclared=1 and declared=0; scoped check/lint/fmt passed after formatting. |
+| 2026-07-12 | slice 2 | reconcile | Stable blocking flip remains deferred on open #309; Deno-doc deprecation payload loss logged as D5 and handled by declaration-local source fallback. |
 
 ## Decisions
 
@@ -89,15 +92,20 @@ when the reviewed API delta should become the new reference.
 
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
-| Scoped check/lint/fmt | planned | NOT_RUN | Before handoff. |
+| Scoped check | release+deps wrappers | PASS | 36 files, 0 findings. |
+| Scoped lint | release+deps wrappers | PASS | 36 files, 0 findings. |
+| Scoped fmt | release+deps wrappers | PASS | 36 files, 0 findings after formatting six owned files. |
 | Focused version tests | `deno task version:bump:test` | PASS | 7 passed, 0 failed. |
+| Surface classifier | `deno task surface:diff:test` | PASS | 3 passed, 0 failed. |
+| Root manifest format | explicit `deno fmt --check` | PASS | 1 file. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | F-10 | PASS | coordinator + exact wrapper tests | Full workspace pattern classes and lock mirrors covered. |
-| F-5/F-19 | NOT_RUN | planned surface tests/wrappers | Before handoff. |
+| F-5 | PASS | live baseline + patch verdict | 34 packages, 258 exports, 6,654 symbols. |
+| F-19 | PASS | scoped check/lint/fmt wrappers | 36 selected TypeScript files, zero findings. |
 
 ### Runtime Gates
 
@@ -109,7 +117,8 @@ when the reviewed API delta should become the new reference.
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| CI surface-diff task | NOT_RUN | planned live task | Non-blocking beta rollout. |
+| CI surface-diff task | PASS | `deno task surface:diff` | Live current vs committed baseline = patch. |
+| Snapshot verdict CLI | PASS | explicit before/after paths | Undeclared major exit 1; declared major exit 0; stale deprecation warning emitted. |
 
 ## Handoff Notes
 

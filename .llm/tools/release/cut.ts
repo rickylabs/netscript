@@ -1,7 +1,7 @@
 import { join } from 'jsr:@std/path@^1.0.0';
 import {
-  coordinateVersionBump,
   type BumpResult,
+  coordinateVersionBump,
   findVersionResidue,
   validateNewerVersion,
 } from '../deps/bump-version.ts';
@@ -40,7 +40,6 @@ const defaultReleasePrDependencies: ReleasePrDependencies = {
   resolveToken: () => resolveGithubToken(),
   request: githubRequest,
 };
-
 
 export function parseArgs(argv: string[]): ReleaseCutOptions {
   let version = '';

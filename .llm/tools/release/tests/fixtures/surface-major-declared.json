@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "declarations": [
+    {
+      "package": "@netscript/example",
+      "reason": "Synthetic fixture declares all example-package majors."
+    }
+  ]
+}

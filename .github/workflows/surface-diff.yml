@@ -1,0 +1,27 @@
+name: public-surface-diff
+
+on:
+  pull_request:
+    paths:
+      - "packages/**"
+
+permissions:
+  contents: read
+
+jobs:
+  surface-diff:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: "2.9.0"
+
+      # Beta rollout is observational. Issue #309 owns the stable-line flip to blocking.
+      - name: Classify public API changes
+        run: deno task surface:diff
+        continue-on-error: true

@@ -56,7 +56,8 @@ Deno.test('bump-version wrapper coordinates an exact version with zero residue',
     await Deno.mkdir(`${temp}/packages/example`, { recursive: true });
     await Deno.writeTextFile(
       `${temp}/deno.json`,
-      JSON.stringify({ version: '1.2.3', workspace: ['packages/*'], publish: false }, null, 2) + '\n',
+      JSON.stringify({ version: '1.2.3', workspace: ['packages/*'], publish: false }, null, 2) +
+        '\n',
     );
     await Deno.writeTextFile(
       `${temp}/packages/example/deno.json`,
@@ -64,7 +65,15 @@ Deno.test('bump-version wrapper coordinates an exact version with zero residue',
     );
     await Deno.writeTextFile(
       `${temp}/deno.lock`,
-      JSON.stringify({ workspace: { members: { 'packages/example': { dependencies: ['jsr:@netscript/example@1.2.3'] } } } }, null, 2) + '\n',
+      JSON.stringify(
+        {
+          workspace: {
+            members: { 'packages/example': { dependencies: ['jsr:@netscript/example@1.2.3'] } },
+          },
+        },
+        null,
+        2,
+      ) + '\n',
     );
     const wrapped = await run(
       'deno',
@@ -86,7 +95,9 @@ Deno.test('bump-version wrapper coordinates an exact version with zero residue',
     assertEquals(wrapped.code, 0);
     assertEquals(result.ok, true);
     assertEquals(result.files.length, 3);
-    for (const path of [`${temp}/deno.json`, `${temp}/packages/example/deno.json`, `${temp}/deno.lock`]) {
+    for (
+      const path of [`${temp}/deno.json`, `${temp}/packages/example/deno.json`, `${temp}/deno.lock`]
+    ) {
       assertStringIncludes(await Deno.readTextFile(path), '1.3.0');
       assertEquals((await Deno.readTextFile(path)).includes('1.2.3'), false);
     }

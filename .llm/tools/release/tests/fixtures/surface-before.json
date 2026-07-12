@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "nodes": {
+    "file:///fixture/mod.ts": {
+      "symbols": [
+        {
+          "name": "createThing",
+          "declarations": [
+            {
+              "kind": "function",
+              "location": { "filename": "before.ts", "line": 1 },
+              "jsDoc": { "doc": "Creates a thing." },
+              "def": {
+                "params": [{ "kind": "identifier", "name": "name", "tsType": { "repr": "string", "kind": "keyword", "value": "string" } }],
+                "returnType": { "repr": "Thing", "kind": "typeRef", "value": { "typeName": "Thing", "resolution": { "kind": "local" } } },
+                "hasBody": true
+              }
+            }
+          ]
+        },
+        {
+          "name": "OldThing",
+          "declarations": [{ "kind": "interface", "def": { "properties": [] } }]
+        }
+      ]
+    }
+  }
+}

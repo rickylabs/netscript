@@ -1,0 +1,31 @@
+{
+  "version": 2,
+  "nodes": {
+    "file:///different-worktree/mod.ts": {
+      "symbols": [
+        {
+          "name": "createThing",
+          "declarations": [
+            {
+              "kind": "function",
+              "location": { "filename": "after.ts", "line": 99 },
+              "jsDoc": {
+                "doc": "Creates a renamed thing.",
+                "tags": [{ "kind": "deprecated" }]
+              },
+              "def": {
+                "params": [{ "kind": "identifier", "name": "name", "tsType": { "repr": "number", "kind": "keyword", "value": "number" } }],
+                "returnType": { "repr": "Thing", "kind": "typeRef", "value": { "typeName": "Thing", "resolution": { "kind": "import", "specifier": "./moved.ts" } } },
+                "hasBody": false
+              }
+            }
+          ]
+        },
+        {
+          "name": "NewThing",
+          "declarations": [{ "kind": "interface", "def": { "properties": [] } }]
+        }
+      ]
+    }
+  }
+}
