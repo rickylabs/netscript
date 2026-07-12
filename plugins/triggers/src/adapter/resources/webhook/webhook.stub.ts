@@ -7,15 +7,25 @@ import { defineStub, type StubSource } from '@netscript/plugin/adapter';
 
 /** Type-checked webhook trigger stub with named substitution tokens. */
 export const webhookStub: StubSource<
-  'PATH' | 'SECRET_ENV_LINE' | 'TRIGGER_EXPORT' | 'TRIGGER_ID' | 'VERIFIER'
+  | 'BUILDER_IMPORTS'
+  | 'HANDLER'
+  | 'JOB_BLOCK'
+  | 'JOB_IMPORT'
+  | 'METADATA_LINES'
+  | 'PATH'
+  | 'SECRET_ENV_LINE'
+  | 'TRIGGER_EXPORT'
+  | 'TRIGGER_ID'
+  | 'VERIFIER'
 > = defineStub({
-  source: `import { defineWebhook } from '@netscript/plugin-triggers-core/builders';
+  source: `import { %%BUILDER_IMPORTS%% } from '@netscript/plugin-triggers-core/builders';
 import type {
   TriggerContext,
   TriggerEvent,
   WebhookDefinition,
   WebhookTriggerPayload,
 } from '@netscript/plugin-triggers-core/domain';
+%%JOB_IMPORT%%%%JOB_BLOCK%%
 
 /**
  * Starter inbound-webhook trigger for %%TRIGGER_ID%%.
@@ -25,20 +35,28 @@ export const %%TRIGGER_EXPORT%%: WebhookDefinition<
   TriggerEvent<'webhook', WebhookTriggerPayload<unknown>>,
   TriggerContext
 > = defineWebhook(
-  // deno-lint-ignore require-await -- starter handler; the runtime contract is async.
-  async () => {
-    return [];
-  },
+  %%HANDLER%%,
   {
     id: '%%TRIGGER_ID%%',
     path: '%%PATH%%',
-    verifier: '%%VERIFIER%%'%%SECRET_ENV_LINE%%
+    verifier: '%%VERIFIER%%'%%SECRET_ENV_LINE%%%%METADATA_LINES%%
   },
 );
 
 export default %%TRIGGER_EXPORT%%;
 `,
-  tokens: ['PATH', 'SECRET_ENV_LINE', 'TRIGGER_EXPORT', 'TRIGGER_ID', 'VERIFIER'] as const,
+  tokens: [
+    'BUILDER_IMPORTS',
+    'HANDLER',
+    'JOB_BLOCK',
+    'JOB_IMPORT',
+    'METADATA_LINES',
+    'PATH',
+    'SECRET_ENV_LINE',
+    'TRIGGER_EXPORT',
+    'TRIGGER_ID',
+    'VERIFIER',
+  ] as const,
 });
 
 /** Default installed webhook used by scaffold runtime and OTEL smoke gates. */
