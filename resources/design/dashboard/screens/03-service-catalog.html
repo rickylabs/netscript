@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>NetScript Dev Dashboard — Catalog</title>
+    <script>
+      (function () {
+        var dark = false;
+        try { dark = new URLSearchParams(location.search).get('theme') === 'dark'; } catch (e) {}
+        if (dark) document.documentElement.dataset.theme = 'dark';
+        else delete document.documentElement.dataset.theme;
+        try { localStorage.setItem('ns-theme', dark ? 'dark' : 'light'); } catch (e) {}
+      })();
+    </script>
+    <link rel="stylesheet" href="../_ns_styles.css">
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="proto.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="../_ns_runtime.js"></script>
+    <script>
+      (function () {
+        var R = window.React;
+        var NS = window.NSOne;
+        var h = R.createElement;
+
+        /* ---------- shared shell ---------- */
+
+        var NAV = [
+          {
+            label: 'Console',
+            items: [
+              { href: '/stack', label: 'Stack Map', icon: '◈' },
+              { href: '/catalog', label: 'Catalog', icon: '▤' },
+              { href: '/traces', label: 'Traces', icon: '⌁' },
+              { href: '/runs', label: 'Runs', icon: '◎' },
+              { href: '/logs', label: 'Logs', icon: '≡' },
+              { href: '/resources', label: 'Resources', icon: '⏻' },
+            ],
+          },
+          {
+            label: 'Capabilities',
+            items: [
+              { href: '/cap/workers', label: 'workers', icon: '⚙' },
+              { href: '/cap/sagas', label: 'sagas', icon: '⤿' },
+              { href: '/cap/triggers', label: 'triggers', icon: '⚡' },
+              { href: '/cap/streams', label: 'streams', icon: '≋' },
+            ],
+          },
+          {
+            label: 'Host',
+            items: [
+              { href: '/plugins', label: 'Plugin Control', icon: '❖' },
+            ],
+          },
+        ];
+
+        function EnvBar() {
+          return h('span', { class: 'ns-envbar', 'data-state': 'running' }, [
+            h('span', { key: 'dot', class: 'ns-envbar__dot', 'aria-hidden': 'true' }),
+            h('span', { key: 'env', class: 'ns-envbar__seg' }, 'local'),
+            h('span', { key: 'app', class: 'ns-envbar__seg', 'data-part': 'app' }, 'my-app'),
+            h('span', { key: 'orch', class: 'ns-envbar__seg' }, 'aspire'),
+          ]);
+        }
+
+        function Shell(props) {
+          return h(NS.SidebarShell, {
+            pathname: '/catalog',
+            navigation: NAV,
+            brand: 'NetScript',
+            brandBadge: h(NS.Badge, { variant: 'muted' }, 'dev'),
+            footer: h('span', { class: 'ns-text-2xs ns-muted-fg' }, 'netscript 0.0.1-beta.5'),
+            topbarStart: h(NS.Breadcrumb, {
+              items: [{ label: 'Console', href: '/' }, { label: 'Catalog' }],
+            }),
+            topbarEnd: h(R.Fragment, null, [
+              h(EnvBar, { key: 'env' }),
+              h(NS.Search, { key: 'search', placeholder: 'Jump to…', shortcut: '⌘K' }),
+              h(NS.ThemeToggle, { key: 'theme' }),
+            ]),
+          }, props.children);
+        }
+
+        var METHOD_VARIANT = {
+          GET: 'muted',
+          POST: 'primary',
+          PATCH: 'warning',
+          DELETE: 'destructive',
+        };
+
+        /* ---------- contract registry ---------- */
+
+        function ep(method, name, summary, p95) {
+          return { method: method, name: name, summary: summary, p95: p95 };
+        }
+
+        var REGISTRY = [
+          {
+            id: 'workers',
+            count: 12,
+            state: 'installed',
+            namespaces: [
+              {
+                id: 'jobs',
+                label: 'jobs',
+                desc: 'Enqueue, inspect, and manage background jobs.',
+                endpoints: [
+                  ep('POST', 'workers.jobs.enqueue', 'Enqueue a job onto a queue', '24 ms'),
+                  ep('GET', 'workers.jobs.get', 'Fetch one job by id', '6 ms'),
+                  ep('GET', 'workers.jobs.list', 'List jobs with status filter', '18 ms'),
+                  ep('POST', 'workers.jobs.cancel', 'Cancel a queued job', '11 ms'),
+                  ep('POST', 'workers.jobs.retry', 'Re-enqueue a failed job', '13 ms'),
+                  ep('DELETE', 'workers.jobs.purge', 'Drop dead-letter jobs', '21 ms'),
+                ],
+              },
+              {
+                id: 'queues',
+                label: 'queues',
+                desc: 'Queue depth, throughput, and pause control.',
+                endpoints: [
+                  ep('GET', 'workers.queues.list', 'List queues with depth', '5 ms'),
+                  ep('GET', 'workers.queues.stats', 'Throughput and latency stats', '9 ms'),
+                  ep('POST', 'workers.queues.pause', 'Pause or resume a queue', '7 ms'),
+                ],
+              },
+              {
+                id: 'schedules',
+                label: 'schedules',
+                desc: 'Recurring enqueue schedules.',
+                endpoints: [
+                  ep('POST', 'workers.schedules.create', 'Create a recurring schedule', '12 ms'),
+                  ep('GET', 'workers.schedules.list', 'List active schedules', '6 ms'),
+                  ep('DELETE', 'workers.schedules.delete', 'Delete a schedule', '8 ms'),
+                ],
+              },
+            ],
+          },
+          {
+            id: 'sagas',
+            count: 8,
+            state: 'installed',
+            namespaces: [
+              {
+                id: 'definitions',
+                label: 'definitions',
+                desc: 'Registered saga definitions.',
+                endpoints: [
+                  ep('GET', 'sagas.definitions.list', 'List registered sagas', '4 ms'),
+                  ep('GET', 'sagas.definitions.get', 'Definition with step graph', '5 ms'),
+                  ep('POST', 'sagas.definitions.validate', 'Validate a definition', '16 ms'),
+                ],
+              },
+              {
+                id: 'runs',
+                label: 'runs',
+                desc: 'Start and steer saga runs.',
+                endpoints: [
+                  ep('POST', 'sagas.runs.start', 'Start a saga run', '19 ms'),
+                  ep('GET', 'sagas.runs.get', 'Run with step states', '7 ms'),
+                  ep('GET', 'sagas.runs.list', 'List runs by status', '14 ms'),
+                  ep('POST', 'sagas.runs.cancel', 'Cancel and compensate', '22 ms'),
+                  ep('POST', 'sagas.runs.retryStep', 'Retry a failed step', '15 ms'),
+                ],
+              },
+            ],
+          },
+          {
+            id: 'triggers',
+            count: 9,
+            state: 'installed',
+            namespaces: [
+              {
+                id: 'rules',
+                label: 'rules',
+                desc: 'Event-condition-action rules.',
+                endpoints: [
+                  ep('POST', 'triggers.rules.create', 'Create a rule', '13 ms'),
+                  ep('GET', 'triggers.rules.list', 'List rules', '5 ms'),
+                  ep('GET', 'triggers.rules.get', 'Rule with condition source', '5 ms'),
+                  ep('POST', 'triggers.rules.test', 'Dry-run against a payload', '18 ms'),
+                  ep('DELETE', 'triggers.rules.delete', 'Delete a rule', '9 ms'),
+                ],
+              },
+              {
+                id: 'firings',
+                label: 'firings',
+                desc: 'Rule firing history and replay.',
+                endpoints: [
+                  ep('GET', 'triggers.firings.list', 'Firing history', '11 ms'),
+                  ep('GET', 'triggers.firings.get', 'One firing with outcome', '6 ms'),
+                  ep('POST', 'triggers.firings.replay', 'Replay a firing', '17 ms'),
+                  ep('GET', 'triggers.firings.stats', 'Firing rate per rule', '10 ms'),
+                ],
+              },
+            ],
+          },
+          {
+            id: 'streams',
+            count: 7,
+            state: 'installed',
+            namespaces: [
+              {
+                id: 'topics',
+                label: 'topics',
+                desc: 'Named event streams.',
+                endpoints: [
+                  ep('POST', 'streams.topics.create', 'Create a topic', '10 ms'),
+                  ep('GET', 'streams.topics.list', 'List topics', '4 ms'),
+                  ep('GET', 'streams.topics.get', 'Topic with retention config', '5 ms'),
+                ],
+              },
+              {
+                id: 'subscriptions',
+                label: 'subscriptions',
+                desc: 'Subscriber registrations.',
+                endpoints: [
+                  ep('POST', 'streams.subscriptions.create', 'Subscribe a consumer', '11 ms'),
+                  ep('DELETE', 'streams.subscriptions.delete', 'Remove a subscription', '8 ms'),
+                ],
+              },
+              {
+                id: 'deliveries',
+                label: 'deliveries',
+                desc: 'Delivery attempts and redrive.',
+                endpoints: [
+                  ep('GET', 'streams.deliveries.list', 'Delivery attempts by status', '12 ms'),
+                  ep('POST', 'streams.deliveries.redrive', 'Redrive failed deliveries', '20 ms'),
+                ],
+              },
+            ],
+          },
+          {
+            id: 'auth',
+            count: 11,
+            state: 'installed',
+            namespaces: [
+              {
+                id: 'sessions',
+                label: 'sessions',
+                desc: 'Session lifecycle.',
+                endpoints: [
+                  ep('POST', 'auth.sessions.create', 'Sign in, mint a session', '31 ms'),
+                  ep('GET', 'auth.sessions.get', 'Current session', '4 ms'),
+                  ep('GET', 'auth.sessions.list', 'Active sessions for a user', '8 ms'),
+                  ep('POST', 'auth.sessions.revoke', 'Revoke a session', '9 ms'),
+                ],
+              },
+              {
+                id: 'users',
+                label: 'users',
+                desc: 'User records.',
+                endpoints: [
+                  ep('POST', 'auth.users.create', 'Create a user', '26 ms'),
+                  ep('GET', 'auth.users.get', 'Fetch a user', '5 ms'),
+                  ep('GET', 'auth.users.list', 'List users', '12 ms'),
+                  ep('PATCH', 'auth.users.update', 'Update profile fields', '14 ms'),
+                ],
+              },
+              {
+                id: 'api-keys',
+                label: 'api-keys',
+                desc: 'Machine credentials.',
+                endpoints: [
+                  ep('POST', 'auth.api-keys.create', 'Issue an API key', '22 ms'),
+                  ep('GET', 'auth.api-keys.list', 'List keys with last-used', '7 ms'),
+                  ep('DELETE', 'auth.api-keys.revoke', 'Revoke a key', '8 ms'),
+                ],
+              },
+            ],
+          },
+          {
+            id: 'crons',
+            count: 5,
+            state: 'available',
+            desc: 'Cron-expression schedules for procedures, timezone-aware, executed through workers.',
+            namespaces: [],
+          },
+        ];
+
+        /* ---------- tree nav ---------- */
+
+        function TreeNav(props) {
+          return h('nav', { class: 'ns-tree-nav', 'aria-label': 'Contract tree' },
+            REGISTRY.map(function (plugin) {
+              var gated = plugin.state === 'available';
+              var open = props.openPlugin === plugin.id;
+              return h('details', {
+                key: plugin.id,
+                class: 'ns-tree-nav__group',
+                'data-state': gated ? 'gated' : undefined,
+                open: open,
+              }, [
+                h('summary', {
+                  key: 'sum',
+                  onClick: function (e) {
+                    if (gated) {
+                      e.preventDefault();
+                      props.onSelectGated(plugin.id);
+                    } else {
+                      props.onTogglePlugin(plugin.id);
+                    }
+                  },
+                }, [
+                  h('span', { key: 'n' }, plugin.id),
+                  gated
+                    ? h(NS.Badge, { key: 'b', variant: 'muted' }, 'available')
+                    : h('span', { key: 'c', class: 'ns-tree-nav__count' }, String(plugin.count)),
+                ]),
+                !gated && h('div', { key: 'items', class: 'ns-tree-nav__items' },
+                  plugin.namespaces.map(function (ns) {
+                    var selected = props.selected
+                      && props.selected.plugin === plugin.id
+                      && props.selected.ns === ns.id;
+                    return h('button', {
+                      key: ns.id,
+                      type: 'button',
+                      class: 'ns-tree-nav__item',
+                      'data-state': selected ? 'selected' : undefined,
+                      onClick: function () { props.onSelectNs(plugin.id, ns.id); },
+                    }, [
+                      h('span', { key: 'l' }, ns.label),
+                      h('span', { key: 'c', class: 'ns-tree-nav__count' }, String(ns.endpoints.length)),
+                    ]);
+                  })),
+              ]);
+            }));
+        }
+
+        /* ---------- endpoint table ---------- */
+
+        var COLS = '4.5rem minmax(0, 2.4fr) minmax(0, 2.6fr) 4rem';
+
+        function EndpointTable(props) {
+          var ns = props.ns;
+          return h(NS.DataTable, null, [
+            h(NS.DataTable.Header, { key: 'head' }, [
+              h('div', { key: 't', class: 'ns-stack ns-stack--xs' }, [
+                h('h2', { key: 'h', class: 'ns-panel__title' }, props.plugin + '.' + ns.label),
+                h('p', { key: 'd', class: 'ns-text-xs ns-muted-fg' }, ns.desc),
+              ]),
+              h(NS.Badge, { key: 'b', variant: 'muted' }, ns.endpoints.length + ' procedures'),
+            ]),
+            h(NS.DataTable.Row, {
+              key: 'cols',
+              cols: COLS,
+              style: { paddingBlock: 'var(--ns-space-2)' },
+            }, [
+              h('span', { key: 'm', class: 'ns-label' }, 'method'),
+              h('span', { key: 'n', class: 'ns-label' }, 'procedure'),
+              h('span', { key: 's', class: 'ns-label' }, 'summary'),
+              h('span', { key: 'p', class: 'ns-label', style: { textAlign: 'right' } }, 'p95'),
+            ]),
+            h(NS.DataTable.Body, { key: 'body', role: 'listbox', 'aria-label': 'Procedures' },
+              ns.endpoints.map(function (endpoint) {
+                var selected = props.selectedEp === endpoint.name;
+                return h(NS.DataTable.Row, {
+                  key: endpoint.name,
+                  cols: COLS,
+                  class: 'ns-ep-row',
+                  role: 'option',
+                  tabIndex: 0,
+                  'aria-selected': selected ? 'true' : 'false',
+                  onClick: function () { props.onSelectEp(endpoint.name); },
+                  onKeyDown: function (e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      props.onSelectEp(endpoint.name);
+                    }
+                  },
+                }, [
+                  h('span', { key: 'm' }, h(NS.Badge, { variant: METHOD_VARIANT[endpoint.method] }, endpoint.method)),
+                  h('span', { key: 'n', class: 'ns-ep-row__name' }, endpoint.name),
+                  h('span', { key: 's', class: 'ns-ep-row__summary' }, endpoint.summary),
+                  h('span', { key: 'p', class: 'ns-ep-row__p95' }, endpoint.p95),
+                ]);
+              })),
+            h(NS.DataTable.Footer, { key: 'foot' },
+              h('span', { class: 'ns-text-2xs ns-muted-fg' },
+                'Typed contract from @netscript/plugin-' + props.plugin + ' · regenerate with netscript plugin registry')),
+          ]);
+        }
+
+        /* ---------- API explorer ---------- */
+
+        function Explorer(props) {
+          var endpoint = props.endpoint;
+          if (!endpoint) {
+            return h(NS.EmptyState, { heading: 'No procedure selected' },
+              'Select a procedure to call it against local.');
+          }
+          var rich = endpoint.name === 'workers.jobs.enqueue';
+
+          var paramsFields = rich
+            ? [
+              h(NS.FormField, { key: 'queue', label: 'queue', name: 'queue' },
+                h(NS.Select, {
+                  options: [
+                    { value: 'imports', label: 'imports' },
+                    { value: 'emails', label: 'emails' },
+                    { value: 'default', label: 'default' },
+                  ],
+                  defaultValue: 'imports',
+                })),
+              h(NS.FormField, { key: 'name', label: 'job name', name: 'name', required: true },
+                h(NS.Input, { defaultValue: 'import.parse' })),
+              h(NS.FormField, {
+                key: 'payload',
+                label: 'payload',
+                name: 'payload',
+                helpText: 'Validated against ImportParseInput before enqueue.',
+              },
+                h(NS.Textarea, {
+                  rows: 6,
+                  style: { fontFamily: 'var(--ns-font-mono)', fontSize: 'var(--ns-text-xs)' },
+                  defaultValue: '{\n  "source": "s3://imports/feb.csv",\n  "importId": "imp_2291"\n}',
+                })),
+              h(NS.Switch, { key: 'dedupe', description: 'Skip enqueue if an identical key is pending.' }, 'dedupe by key'),
+            ]
+            : [
+              h(NS.FormField, {
+                key: 'input',
+                label: 'input',
+                name: 'input',
+                helpText: 'JSON body for ' + endpoint.name + '.',
+              },
+                h(NS.Textarea, {
+                  rows: 6,
+                  style: { fontFamily: 'var(--ns-font-mono)', fontSize: 'var(--ns-text-xs)' },
+                  defaultValue: '{}',
+                })),
+            ];
+
+          var responseJson = rich
+            ? '{\n  "jobId": "job_4187",\n  "queue": "imports",\n  "position": 3\n}'
+            : '{\n  "ok": true\n}';
+          var responseType = rich
+            ? 'interface EnqueueResult {\n  jobId: string;\n  queue: string;\n  position: number;\n}'
+            : 'type Result = { ok: boolean };';
+
+          return h(NS.Panel, { tone: 'raised' }, [
+            h(NS.Panel.Header, { key: 'head' }, [
+              h(NS.Panel.Title, { key: 't' }, endpoint.name),
+              h('div', { key: 'b', class: 'ns-cluster ns-cluster--sm' }, [
+                h(NS.Badge, { key: 'm', variant: METHOD_VARIANT[endpoint.method] }, endpoint.method),
+                h(NS.Badge, { key: 'a', variant: 'muted' }, 'session'),
+              ]),
+            ]),
+            h(NS.Panel.Body, { key: 'body' },
+              h(NS.Tabs.Root, { defaultValue: 'params' }, [
+                h(NS.Tabs.List, { key: 'list', class: 'ns-tabs__list', 'aria-label': 'Request sections' }, [
+                  h(NS.Tabs.Trigger, { key: 'p', value: 'params', class: 'ns-tabs__trigger' }, 'Params'),
+                  h(NS.Tabs.Trigger, { key: 'h', value: 'headers', class: 'ns-tabs__trigger' }, 'Headers'),
+                  h(NS.Tabs.Trigger, { key: 'r', value: 'response', class: 'ns-tabs__trigger' }, 'Response'),
+                ]),
+                h(NS.Tabs.Content, { key: 'pc', value: 'params' },
+                  h('div', { class: 'ns-stack ns-stack--md', style: { paddingTop: 'var(--ns-space-4)' } }, paramsFields)),
+                h(NS.Tabs.Content, { key: 'hc', value: 'headers' },
+                  h('div', { class: 'ns-stack ns-stack--md', style: { paddingTop: 'var(--ns-space-4)' } }, [
+                    h(NS.FormField, { key: 'auth', label: 'authorization', name: 'authorization' },
+                      h(NS.Input, { defaultValue: 'Bearer dev-session' })),
+                    h(NS.FormField, {
+                      key: 'ct',
+                      label: 'content-type',
+                      name: 'content-type',
+                      helpText: 'Fixed by the typed client.',
+                    },
+                      h(NS.Input, { defaultValue: 'application/json', readOnly: true })),
+                  ])),
+                h(NS.Tabs.Content, { key: 'rc', value: 'response' },
+                  h('div', { class: 'ns-stack ns-stack--md', style: { paddingTop: 'var(--ns-space-4)' } }, [
+                    h('div', { key: 'meta', class: 'ns-cluster ns-cluster--sm' }, [
+                      h(NS.Badge, { key: 's', variant: 'success' }, rich ? '202 accepted' : '200 ok'),
+                      h('span', { key: 'd', class: 'ns-text-2xs ns-muted-fg' }, endpoint.p95 + ' p95'),
+                    ]),
+                    h(NS.CodeBlock, { key: 'json', code: responseJson, lang: 'json' }),
+                    h(NS.CodeBlock, {
+                      key: 'type',
+                      code: responseType,
+                      lang: 'ts',
+                      filename: 'generated/client.d.ts',
+                    }),
+                  ])),
+              ])),
+            h(NS.Panel.Footer, { key: 'foot', class: 'ns-cluster ns-cluster--sm' }, [
+              h(NS.Button, { key: 'send', variant: 'primary', size: 'sm' }, 'Send request'),
+              h(NS.Button, { key: 'curl', variant: 'ghost', size: 'sm' }, 'Copy as curl'),
+            ]),
+          ]);
+        }
+
+        /* ---------- gated view ---------- */
+
+        function GatedView(props) {
+          var plugin = props.plugin;
+          return h('div', { class: 'ns-plugin-gated-view', 'data-state': 'not-installed' }, [
+            h('p', { key: 't', class: 'ns-plugin-gated-view__title' }, plugin.id + ' is not installed'),
+            h('p', { key: 'd', class: 'ns-plugin-gated-view__desc' }, plugin.desc),
+            h('div', { key: 'c', class: 'ns-plugin-gated-view__cmd' },
+              h(NS.CodeBlock, { code: 'netscript plugin add ' + plugin.id, lang: 'sh' })),
+            h('p', { key: 'n', class: 'ns-text-2xs ns-muted-fg' },
+              plugin.count + ' procedures register here after install.'),
+          ]);
+        }
+
+        /* ---------- page ---------- */
+
+        function Page() {
+          var selSt = R.useState({ kind: 'ns', plugin: 'workers', ns: 'jobs' });
+          var sel = selSt[0], setSel = selSt[1];
+          var openSt = R.useState('workers');
+          var openPlugin = openSt[0], setOpenPlugin = openSt[1];
+          var epSt = R.useState('workers.jobs.enqueue');
+          var selectedEp = epSt[0], setSelectedEp = epSt[1];
+
+          var plugin = null;
+          REGISTRY.forEach(function (p) { if (p.id === sel.plugin) plugin = p; });
+          var ns = null;
+          if (plugin && sel.kind === 'ns') {
+            plugin.namespaces.forEach(function (n) { if (n.id === sel.ns) ns = n; });
+          }
+          var endpoint = null;
+          if (ns) {
+            ns.endpoints.forEach(function (e) { if (e.name === selectedEp) endpoint = e; });
+          }
+
+          function selectNs(pluginId, nsId) {
+            setSel({ kind: 'ns', plugin: pluginId, ns: nsId });
+            var p = null;
+            REGISTRY.forEach(function (x) { if (x.id === pluginId) p = x; });
+            var n = null;
+            if (p) p.namespaces.forEach(function (x) { if (x.id === nsId) n = x; });
+            setSelectedEp(n && n.endpoints.length ? n.endpoints[0].name : null);
+          }
+
+          return h(Shell, null, h('div', { class: 'ns-stack ns-stack--lg' }, [
+            h(NS.PageHeader, { key: 'header', class: 'ns-page-header--console' },
+              h(NS.PageHeader.Main, null, [
+                h(NS.PageHeader.Intro, { key: 'intro' }, [
+                  h('h1', { key: 'h' }, 'Catalog'),
+                  h('p', { key: 'p', class: 'ns-lede' },
+                    'Every procedure the app exposes, grouped by plugin contract. Select one to call it against local.'),
+                ]),
+                h(NS.PageHeader.Status, { key: 'status' }, [
+                  h('span', { key: '1' }, '5 plugins installed'),
+                  h('span', { key: 's1', class: 'ns-status-bar__sep' }, '·'),
+                  h('span', { key: '2' }, '47 procedures'),
+                  h('span', { key: 's2', class: 'ns-status-bar__sep' }, '·'),
+                  h('span', { key: '3' }, '1 available'),
+                ]),
+              ]),
+            ),
+            h('div', { key: 'body', class: 'ns-rail-grid' }, [
+              h(NS.Panel, { key: 'tree', tone: 'muted' }, [
+                h(NS.Panel.Header, { key: 'head' },
+                  h(NS.Panel.Title, null, 'Contracts')),
+                h(NS.Panel.Body, { key: 'body' },
+                  h(TreeNav, {
+                    selected: sel.kind === 'ns' ? sel : null,
+                    openPlugin: openPlugin,
+                    onTogglePlugin: function (id) {
+                      setOpenPlugin(openPlugin === id ? null : id);
+                    },
+                    onSelectNs: function (pluginId, nsId) {
+                      setOpenPlugin(pluginId);
+                      selectNs(pluginId, nsId);
+                    },
+                    onSelectGated: function (pluginId) {
+                      setSel({ kind: 'gated', plugin: pluginId });
+                    },
+                  })),
+              ]),
+              sel.kind === 'gated'
+                ? h(GatedView, { key: 'gated', plugin: plugin })
+                : h('div', { key: 'main', class: 'ns-content-rail' }, [
+                  h('div', { key: 'table' },
+                    ns
+                      ? h(EndpointTable, {
+                        plugin: sel.plugin,
+                        ns: ns,
+                        selectedEp: selectedEp,
+                        onSelectEp: setSelectedEp,
+                      })
+                      : h(NS.EmptyState, { heading: 'No namespace selected' },
+                        'Pick a namespace from the contract tree.')),
+                  h('div', { key: 'rail' }, h(Explorer, { endpoint: endpoint })),
+                ]),
+            ]),
+          ]));
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(h(Page));
+      })();
+    </script>
+  </body>
+</html>

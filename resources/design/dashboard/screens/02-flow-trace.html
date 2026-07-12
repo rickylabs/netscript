@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>NetScript Dev Dashboard — Traces</title>
+    <script>
+      (function () {
+        var dark = false;
+        try { dark = new URLSearchParams(location.search).get('theme') === 'dark'; } catch (e) {}
+        if (dark) document.documentElement.dataset.theme = 'dark';
+        else delete document.documentElement.dataset.theme;
+        try { localStorage.setItem('ns-theme', dark ? 'dark' : 'light'); } catch (e) {}
+      })();
+    </script>
+    <link rel="stylesheet" href="../_ns_styles.css">
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="proto.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="../_ns_runtime.js"></script>
+    <script>
+      (function () {
+        var R = window.React;
+        var NS = window.NSOne;
+        var h = R.createElement;
+
+        /* ---------- shared shell ---------- */
+
+        var NAV = [
+          {
+            label: 'Console',
+            items: [
+              { href: '/stack', label: 'Stack Map', icon: '◈' },
+              { href: '/catalog', label: 'Catalog', icon: '▤' },
+              { href: '/traces', label: 'Traces', icon: '⌁' },
+              { href: '/runs', label: 'Runs', icon: '◎' },
+              { href: '/logs', label: 'Logs', icon: '≡' },
+              { href: '/resources', label: 'Resources', icon: '⏻' },
+            ],
+          },
+          {
+            label: 'Capabilities',
+            items: [
+              { href: '/cap/workers', label: 'workers', icon: '⚙' },
+              { href: '/cap/sagas', label: 'sagas', icon: '⤿' },
+              { href: '/cap/triggers', label: 'triggers', icon: '⚡' },
+              { href: '/cap/streams', label: 'streams', icon: '≋' },
+            ],
+          },
+          {
+            label: 'Host',
+            items: [
+              { href: '/plugins', label: 'Plugin Control', icon: '❖' },
+            ],
+          },
+        ];
+
+        function EnvBar() {
+          return h('span', { class: 'ns-envbar', 'data-state': 'running' }, [
+            h('span', { key: 'dot', class: 'ns-envbar__dot', 'aria-hidden': 'true' }),
+            h('span', { key: 'env', class: 'ns-envbar__seg' }, 'local'),
+            h('span', { key: 'app', class: 'ns-envbar__seg', 'data-part': 'app' }, 'my-app'),
+            h('span', { key: 'orch', class: 'ns-envbar__seg' }, 'aspire'),
+          ]);
+        }
+
+        var STATUS_VARIANT = {
+          running: 'primary',
+          completed: 'success',
+          failed: 'destructive',
+          retrying: 'warning',
+          degraded: 'warning',
+          queued: 'muted',
+        };
+
+        function StatusBadge(status) {
+          return h(NS.Badge, { variant: STATUS_VARIANT[status] || 'muted' }, status);
+        }
+
+        function Shell(props) {
+          return h(NS.SidebarShell, {
+            pathname: '/traces',
+            navigation: NAV,
+            brand: 'NetScript',
+            brandBadge: h(NS.Badge, { variant: 'muted' }, 'dev'),
+            footer: h('span', { class: 'ns-text-2xs ns-muted-fg' }, 'netscript 0.0.1-beta.5'),
+            topbarStart: h(NS.Breadcrumb, {
+              items: [{ label: 'Console', href: '/' }, { label: 'Traces' }],
+            }),
+            topbarEnd: h(R.Fragment, null, [
+              h(EnvBar, { key: 'env' }),
+              h(NS.Search, { key: 'search', placeholder: 'Jump to…', shortcut: '⌘K' }),
+              h(NS.ThemeToggle, { key: 'theme' }),
+            ]),
+          }, props.children);
+        }
+
+        /* ---------- service palette (tokens only) ---------- */
+
+        var SERVICE_COLOR = {
+          api: 'var(--ns-primary)',
+          workers: 'color-mix(in oklab, var(--ns-fg) 55%, var(--ns-primary) 45%)',
+          postgres: 'var(--ns-secondary)',
+          streams: 'color-mix(in oklab, var(--ns-success) 70%, var(--ns-fg) 30%)',
+          triggers: 'color-mix(in oklab, var(--ns-primary) 55%, var(--ns-secondary) 45%)',
+        };
+
+        var STATE_COLOR = {
+          retrying: 'var(--ns-warning)',
+          failed: 'var(--ns-destructive)',
+        };
+
+        function barColor(span) {
+          return STATE_COLOR[span.status] || SERVICE_COLOR[span.service] || 'var(--ns-primary)';
+        }
+
+        function fmtMs(ms) {
+          return ms >= 1000 ? (ms / 1000).toFixed(2) + ' s' : ms + ' ms';
+        }
+
+        /* ---------- trace data ---------- */
+
+        var TRACES = [
+          {
+            id: 't1',
+            title: 'POST /api/imports',
+            status: 'completed',
+            meta: '1.12 s · 13 spans · 12:04:18',
+            totalMs: 1120,
+            defaultSpan: 's4',
+            spans: [
+              { id: 's0', name: 'POST /api/imports', service: 'api', start: 0, dur: 46, depth: 0, status: 'completed',
+                attrs: { 'http.method': 'POST', 'http.route': '/api/imports', 'http.status_code': 202 } },
+              { id: 's1', name: 'validate multipart body', service: 'api', start: 2, dur: 5, depth: 1, status: 'completed',
+                attrs: { 'payload.bytes': 2201344, 'fields': 3 } },
+              { id: 's2', name: 'workers.enqueue import.parse', service: 'api', start: 9, dur: 22, depth: 1, status: 'completed',
+                attrs: { 'job.name': 'import.parse', 'queue': 'imports' } },
+              { id: 's3', name: 'INSERT ns_jobs', service: 'postgres', start: 14, dur: 13, depth: 2, status: 'completed',
+                attrs: { 'db.system': 'postgresql', 'db.table': 'ns_jobs', 'rows': 1 } },
+              { id: 's4', name: 'import.parse · job_4183', service: 'workers', start: 118, dur: 720, depth: 0, status: 'completed',
+                attrs: { 'job.id': 'job_4183', 'job.name': 'import.parse', 'queue': 'imports', 'attempt': 1, 'worker.id': 'wrk-2', 'payload.bytes': 2201344 },
+                events: [['+118 ms', 'dequeued · queue wait 72 ms'], ['+838 ms', 'completed']],
+                run: true },
+              { id: 's5', name: 'fetch s3://imports/feb.csv', service: 'workers', start: 131, dur: 253, depth: 1, status: 'completed',
+                attrs: { 'source.uri': 's3://imports/feb.csv', 'bytes': 2189312 } },
+              { id: 's6', name: 'parse rows', service: 'workers', start: 388, dur: 312, depth: 1, status: 'completed',
+                attrs: { 'rows.parsed': 12412, 'rows.rejected': 0 } },
+              { id: 's7', name: 'callback write import.result', service: 'workers', start: 703, dur: 68, depth: 1, status: 'completed',
+                attrs: { 'callback': 'import.result', 'import.id': 'imp_2291' } },
+              { id: 's8', name: "UPDATE imports SET status='parsed'", service: 'postgres', start: 709, dur: 33, depth: 2, status: 'completed',
+                attrs: { 'db.system': 'postgresql', 'db.table': 'imports', 'rows': 1 } },
+              { id: 's9', name: 'streams.publish import.completed', service: 'workers', start: 774, dur: 38, depth: 1, status: 'completed',
+                attrs: { 'stream': 'import.completed', 'subscribers': 2 } },
+              { id: 's10', name: 'fan-out import.completed', service: 'streams', start: 815, dur: 277, depth: 0, status: 'completed',
+                attrs: { 'stream': 'import.completed', 'deliveries': 2 } },
+              { id: 's11', name: 'deliver → eis-chat', service: 'streams', start: 821, dur: 271, depth: 1, status: 'retrying',
+                attrs: { 'subscriber': 'eis-chat', 'attempt': 2, 'max_attempts': 5, 'last_error': 'ECONNRESET' },
+                events: [['+871 ms', 'attempt 1 failed: ECONNRESET'], ['+901 ms', 'retry 2/5 scheduled in 30 s']] },
+              { id: 's12', name: 'deliver → webhook:acme', service: 'streams', start: 823, dur: 48, depth: 1, status: 'completed',
+                attrs: { 'subscriber': 'webhook:acme', 'http.status_code': 200 } },
+            ],
+            logs: [
+              ['12:04:18.102', 'api', 'info', 'POST /api/imports 202 · 46 ms'],
+              ['12:04:18.220', 'workers', 'info', 'dequeue import.parse job_4183 · queue wait 72 ms'],
+              ['12:04:18.233', 'workers', 'debug', 'fetch s3://imports/feb.csv · 2.1 MiB'],
+              ['12:04:18.490', 'workers', 'info', 'parsed 12412 rows · 0 rejected'],
+              ['12:04:18.873', 'workers', 'info', 'callback import.result written · imp_2291'],
+              ['12:04:18.915', 'streams', 'info', 'publish import.completed → 2 subscribers'],
+              ['12:04:18.973', 'streams', 'warn', 'deliver eis-chat: ECONNRESET · retry 2/5 in 30 s'],
+            ],
+          },
+          {
+            id: 't2',
+            title: 'GET /api/orders?page=2',
+            status: 'completed',
+            meta: '86 ms · 4 spans · 12:04:11',
+            totalMs: 86,
+            defaultSpan: 'o0',
+            spans: [
+              { id: 'o0', name: 'GET /api/orders', service: 'api', start: 0, dur: 86, depth: 0, status: 'completed',
+                attrs: { 'http.method': 'GET', 'http.route': '/api/orders', 'http.status_code': 200, 'page': 2 } },
+              { id: 'o1', name: 'auth session lookup', service: 'api', start: 2, dur: 7, depth: 1, status: 'completed',
+                attrs: { 'session.id': 'ses_9f2', 'cache': 'hit' } },
+              { id: 'o2', name: 'SELECT orders LIMIT 50', service: 'postgres', start: 12, dur: 59, depth: 1, status: 'completed',
+                attrs: { 'db.system': 'postgresql', 'db.table': 'orders', 'rows': 50 } },
+              { id: 'o3', name: 'serialize response', service: 'api', start: 72, dur: 12, depth: 1, status: 'completed',
+                attrs: { 'bytes': 41208 } },
+            ],
+            logs: [
+              ['12:04:11.410', 'api', 'info', 'GET /api/orders?page=2 200 · 86 ms'],
+            ],
+          },
+          {
+            id: 't3',
+            title: 'email.send · job_4177',
+            status: 'failed',
+            meta: '340 ms · 4 spans · 12:03:52',
+            totalMs: 340,
+            defaultSpan: 'e2',
+            spans: [
+              { id: 'e0', name: 'email.send · job_4177', service: 'workers', start: 0, dur: 340, depth: 0, status: 'failed',
+                attrs: { 'job.id': 'job_4177', 'job.name': 'email.send', 'queue': 'emails', 'attempt': 3, 'worker.id': 'wrk-1' },
+                events: [['+330 ms', 'attempt 3 failed — job moved to dead-letter']],
+                run: true },
+              { id: 'e1', name: 'render template order-receipt', service: 'workers', start: 8, dur: 56, depth: 1, status: 'completed',
+                attrs: { 'template': 'order-receipt', 'bytes': 18240 } },
+              { id: 'e2', name: 'smtp connect mailpit:1025', service: 'workers', start: 70, dur: 120, depth: 1, status: 'failed',
+                attrs: { 'smtp.host': 'mailpit', 'smtp.port': 1025, 'error': 'connection refused' },
+                events: [['+190 ms', 'connection refused']] },
+              { id: 'e3', name: 'smtp connect mailpit:1025 (attempt 2)', service: 'workers', start: 210, dur: 120, depth: 1, status: 'failed',
+                attrs: { 'smtp.host': 'mailpit', 'smtp.port': 1025, 'error': 'connection refused' } },
+            ],
+            logs: [
+              ['12:03:52.115', 'workers', 'info', 'dequeue email.send job_4177 · attempt 3'],
+              ['12:03:52.305', 'workers', 'error', 'smtp connect mailpit:1025: connection refused'],
+              ['12:03:52.455', 'workers', 'error', 'email.send job_4177 failed · moved to dead-letter'],
+            ],
+          },
+          {
+            id: 't4',
+            title: 'POST /api/chat/messages',
+            status: 'completed',
+            meta: '212 ms · 6 spans · 12:03:40',
+            totalMs: 212,
+            defaultSpan: 'c0',
+            spans: [
+              { id: 'c0', name: 'POST /api/chat/messages', service: 'api', start: 0, dur: 92, depth: 0, status: 'completed',
+                attrs: { 'http.method': 'POST', 'http.route': '/api/chat/messages', 'http.status_code': 201 } },
+              { id: 'c1', name: 'auth session lookup', service: 'api', start: 2, dur: 6, depth: 1, status: 'completed',
+                attrs: { 'session.id': 'ses_2ab', 'cache': 'hit' } },
+              { id: 'c2', name: 'INSERT messages', service: 'postgres', start: 11, dur: 37, depth: 1, status: 'completed',
+                attrs: { 'db.system': 'postgresql', 'db.table': 'messages', 'rows': 1 } },
+              { id: 'c3', name: 'streams.publish message.created', service: 'api', start: 52, dur: 36, depth: 1, status: 'completed',
+                attrs: { 'stream': 'message.created', 'subscribers': 1 } },
+              { id: 'c4', name: 'fan-out message.created', service: 'streams', start: 96, dur: 112, depth: 0, status: 'completed',
+                attrs: { 'stream': 'message.created', 'deliveries': 1 } },
+              { id: 'c5', name: 'deliver → eis-chat', service: 'streams', start: 102, dur: 104, depth: 1, status: 'completed',
+                attrs: { 'subscriber': 'eis-chat', 'http.status_code': 200 } },
+            ],
+            logs: [
+              ['12:03:40.220', 'api', 'info', 'POST /api/chat/messages 201 · 92 ms'],
+              ['12:03:40.430', 'streams', 'info', 'deliver message.created → eis-chat · 200'],
+            ],
+          },
+          {
+            id: 't5',
+            title: 'trigger order.paid',
+            status: 'completed',
+            meta: '148 ms · 5 spans · 12:02:58',
+            totalMs: 148,
+            defaultSpan: 'g0',
+            spans: [
+              { id: 'g0', name: 'trigger order.paid → invoice.create', service: 'triggers', start: 0, dur: 148, depth: 0, status: 'completed',
+                attrs: { 'trigger': 'order.paid', 'target': 'invoice.create', 'order.id': 'o_98412' } },
+              { id: 'g1', name: 'evaluate condition', service: 'triggers', start: 2, dur: 8, depth: 1, status: 'completed',
+                attrs: { 'condition': "total > 0 && status == 'paid'", 'result': true } },
+              { id: 'g2', name: 'invoke invoice.create', service: 'api', start: 14, dur: 124, depth: 1, status: 'completed',
+                attrs: { 'procedure': 'billing.invoice.create' } },
+              { id: 'g3', name: 'INSERT invoices', service: 'postgres', start: 40, dur: 80, depth: 2, status: 'completed',
+                attrs: { 'db.system': 'postgresql', 'db.table': 'invoices', 'rows': 1 } },
+              { id: 'g4', name: 'ack trigger firing', service: 'triggers', start: 140, dur: 6, depth: 1, status: 'completed',
+                attrs: { 'firing.id': 'fir_1204' } },
+            ],
+            logs: [
+              ['12:02:58.512', 'triggers', 'info', 'order.paid fired → invoice.create · o_98412'],
+              ['12:02:58.660', 'api', 'info', 'billing.invoice.create ok · inv_5521'],
+            ],
+          },
+          {
+            id: 't6',
+            title: 'GET /api/health',
+            status: 'completed',
+            meta: '3 ms · 1 span · 12:02:30',
+            totalMs: 3,
+            defaultSpan: 'z0',
+            spans: [
+              { id: 'z0', name: 'GET /api/health', service: 'api', start: 0, dur: 3, depth: 0, status: 'completed',
+                attrs: { 'http.method': 'GET', 'http.route': '/api/health', 'http.status_code': 200 } },
+            ],
+            logs: [
+              ['12:02:30.101', 'api', 'debug', 'GET /api/health 200 · 3 ms'],
+            ],
+          },
+        ];
+
+        /* ---------- waterfall ---------- */
+
+        function Waterfall(props) {
+          var trace = props.trace;
+          var total = trace.totalMs;
+          var ticks = [0, 0.25, 0.5, 0.75, 1].map(function (f) { return Math.round(total * f); });
+
+          return h('div', { class: 'ns-waterfall', role: 'listbox', 'aria-label': 'Trace spans' }, [
+            h('div', { key: 'axis', class: 'ns-waterfall__axis' }, [
+              h('div', { key: 'spacer' }),
+              h('div', { key: 'track', class: 'ns-waterfall__axis-track' }, ticks.map(function (tick, i) {
+                var pct = total === 0 ? 0 : (tick / total) * 100;
+                return h('span', {
+                  key: i,
+                  class: 'ns-waterfall__tick',
+                  style: i === ticks.length - 1
+                    ? { left: pct + '%', transform: 'translateX(-100%)' }
+                    : { left: pct + '%' },
+                }, fmtMs(tick));
+              })),
+            ]),
+          ].concat(trace.spans.map(function (span) {
+            var startPct = (span.start / total) * 100;
+            var widthPct = Math.max((span.dur / total) * 100, 0.4);
+            var endPct = startPct + widthPct;
+            var durStyle = endPct > 80
+              ? { right: (100 - startPct) + '%', paddingLeft: 0, paddingRight: 'var(--ns-space-1-5)' }
+              : { left: endPct + '%' };
+            var selected = props.selectedId === span.id;
+            return h('button', {
+              key: span.id,
+              type: 'button',
+              role: 'option',
+              class: 'ns-waterfall__row',
+              'data-depth': String(span.depth),
+              'data-state': span.status,
+              'aria-selected': selected ? 'true' : 'false',
+              onClick: function () { props.onSelect(span.id); },
+            }, [
+              h('span', { key: 'label', class: 'ns-waterfall__label' }, [
+                h('span', {
+                  key: 'dot',
+                  class: 'ns-waterfall__dot',
+                  'aria-hidden': 'true',
+                  style: { background: barColor(span) },
+                }),
+                h('span', { key: 'name' }, span.name),
+              ]),
+              h('span', { key: 'track', class: 'ns-waterfall__track' }, [
+                h('span', {
+                  key: 'bar',
+                  class: 'ns-waterfall__bar',
+                  style: { left: startPct + '%', width: widthPct + '%', background: barColor(span) },
+                }),
+                h('span', { key: 'dur', class: 'ns-waterfall__duration', style: durStyle }, fmtMs(span.dur)),
+              ]),
+            ]);
+          })));
+        }
+
+        function Legend(props) {
+          var seen = [];
+          props.trace.spans.forEach(function (s) {
+            if (seen.indexOf(s.service) < 0) seen.push(s.service);
+          });
+          return h('div', { class: 'ns-cluster ns-cluster--sm' }, seen.map(function (svc) {
+            return h('span', { key: svc, class: 'ns-connector__row' }, [
+              h('span', { key: 'd', class: 'ns-waterfall__dot', 'aria-hidden': 'true', style: { background: SERVICE_COLOR[svc] } }),
+              h('span', { key: 'n', class: 'ns-connector__probe' }, svc),
+            ]);
+          }));
+        }
+
+        /* ---------- span detail rail ---------- */
+
+        function SpanDetail(props) {
+          var span = props.span;
+          if (!span) {
+            return h(NS.EmptyState, { heading: 'No span selected' },
+              'Select a span to inspect timing, attributes, and events.');
+          }
+          var body = [
+            h('div', { key: 'timing', class: 'ns-stack ns-stack--xs' }, [
+              h('p', { key: 'l', class: 'ns-label' }, 'Timing'),
+              h('div', { key: 'v', class: 'ns-connector' }, [
+                h('span', { key: 'start', class: 'ns-connector__row' }, [
+                  h('span', { key: 'p', class: 'ns-connector__probe' }, 'start'),
+                  h('span', { key: 'r', class: 'ns-connector__result' }, '+' + span.start + ' ms'),
+                ]),
+                h('span', { key: 'dur', class: 'ns-connector__row' }, [
+                  h('span', { key: 'p', class: 'ns-connector__probe' }, 'duration'),
+                  h('span', { key: 'r', class: 'ns-connector__result' }, fmtMs(span.dur)),
+                ]),
+              ]),
+            ]),
+            h('div', { key: 'attrs', class: 'ns-stack ns-stack--xs' }, [
+              h('p', { key: 'l', class: 'ns-label' }, 'Attributes'),
+              h(NS.CodeBlock, { key: 'v', code: JSON.stringify(span.attrs || {}, null, 2), lang: 'json' }),
+            ]),
+          ];
+          if (span.events) {
+            body.push(h('div', { key: 'events', class: 'ns-stack ns-stack--xs' }, [
+              h('p', { key: 'l', class: 'ns-label' }, 'Events'),
+              h('div', { key: 'v', class: 'ns-activity-feed' }, span.events.map(function (ev, i) {
+                var tone = /fail|refused|ECONN/.test(ev[1])
+                  ? 'destructive'
+                  : /retry/.test(ev[1]) ? 'warning' : /completed/.test(ev[1]) ? 'success' : 'primary';
+                return h('div', { key: i, class: 'ns-activity-feed__item', 'data-tone': tone }, [
+                  h('span', { key: 'm', class: 'ns-activity-feed__marker', 'aria-hidden': 'true' }),
+                  h('div', { key: 'b', class: 'ns-activity-feed__body' }, [
+                    h('p', { key: 't', class: 'ns-activity-feed__text' }, ev[1]),
+                    h('p', { key: 'ts', class: 'ns-activity-feed__time' }, ev[0]),
+                  ]),
+                ]);
+              })),
+            ]));
+          }
+          var footer = [];
+          if (span.run) {
+            footer.push(h(NS.Button, { key: 'run', variant: 'ghost', size: 'sm' }, 'Open in Run Inspector'));
+          }
+          return h(NS.Panel, { tone: 'raised' }, [
+            h(NS.Panel.Header, { key: 'head' }, [
+              h(NS.Panel.Title, { key: 't' }, span.name),
+              h('div', { key: 'b', class: 'ns-cluster ns-cluster--sm' }, [
+                h(NS.Badge, { key: 'svc', variant: 'muted' }, span.service),
+                h(R.Fragment, { key: 'st' }, StatusBadge(span.status)),
+              ]),
+            ]),
+            h(NS.Panel.Body, { key: 'body', class: 'ns-stack ns-stack--md' }, body),
+          ].concat(footer.length
+            ? [h(NS.Panel.Footer, { key: 'foot', class: 'ns-cluster ns-cluster--sm' }, footer)]
+            : []));
+        }
+
+        /* ---------- log strip ---------- */
+
+        function LogStrip(props) {
+          return h('div', { class: 'ns-log-stream', 'data-state': 'following' }, [
+            h('div', { key: 'bar', class: 'ns-log-stream__toolbar' }, [
+              h('span', { key: 'l', class: 'ns-label' }, 'Correlated logs'),
+              h('span', { key: 'sp', style: { flex: '1' } }),
+              h(NS.Switch, { key: 'follow', defaultChecked: true }, 'Follow'),
+            ]),
+            h('div', { key: 'lines', class: 'ns-log-stream__lines' }, props.logs.map(function (line, i) {
+              return h('div', { key: i, class: 'ns-log-stream__line', 'data-severity': line[2] }, [
+                h('span', { key: 'ts', class: 'ns-log-stream__ts' }, line[0]),
+                h('span', { key: 'res', class: 'ns-log-stream__resource' }, line[1]),
+                h('span', { key: 'sev', class: 'ns-log-stream__severity' }, line[2]),
+                h('span', { key: 'msg', class: 'ns-log-stream__msg' }, line[3]),
+              ]);
+            })),
+          ]);
+        }
+
+        /* ---------- trace list ---------- */
+
+        function TraceList(props) {
+          return h(NS.Panel, { tone: 'muted' }, [
+            h(NS.Panel.Header, { key: 'head' }, [
+              h(NS.Panel.Title, { key: 't' }, 'Traces'),
+              h(NS.Badge, { key: 'c', variant: 'muted' }, 'live'),
+            ]),
+            h(NS.Panel.Body, { key: 'body', class: 'ns-stack ns-stack--sm' }, [
+              h(NS.Input, { key: 'q', placeholder: 'Filter traces', 'aria-label': 'Filter traces' }),
+              h(NS.Select, {
+                key: 'status',
+                'aria-label': 'Status filter',
+                options: [
+                  { value: 'all', label: 'All statuses' },
+                  { value: 'completed', label: 'completed' },
+                  { value: 'failed', label: 'failed' },
+                  { value: 'retrying', label: 'retrying' },
+                ],
+                defaultValue: 'all',
+              }),
+              h('div', { key: 'list', class: 'ns-entity-rail', role: 'listbox', 'aria-label': 'Recent traces' },
+                TRACES.map(function (t) {
+                  return h('button', {
+                    key: t.id,
+                    type: 'button',
+                    role: 'option',
+                    class: 'ns-entity-rail__item',
+                    'data-state': props.selectedId === t.id ? 'selected' : undefined,
+                    'aria-selected': props.selectedId === t.id ? 'true' : 'false',
+                    onClick: function () { props.onSelect(t.id); },
+                  }, [
+                    h('span', { key: 't', class: 'ns-entity-rail__title' }, [
+                      h('span', { key: 'n' }, t.title),
+                      h(R.Fragment, { key: 'b' }, StatusBadge(t.status)),
+                    ]),
+                    h('span', { key: 'm', class: 'ns-entity-rail__meta' }, t.meta),
+                  ]);
+                })),
+            ]),
+          ]);
+        }
+
+        /* ---------- page ---------- */
+
+        function Page() {
+          var traceSt = R.useState('t1');
+          var traceId = traceSt[0], setTraceId = traceSt[1];
+          var trace = TRACES[0];
+          TRACES.forEach(function (t) { if (t.id === traceId) trace = t; });
+
+          var spanSt = R.useState(trace.defaultSpan);
+          var spanId = spanSt[0], setSpanId = spanSt[1];
+          var span = null;
+          trace.spans.forEach(function (s) { if (s.id === spanId) span = s; });
+
+          function selectTrace(id) {
+            setTraceId(id);
+            var next = null;
+            TRACES.forEach(function (t) { if (t.id === id) next = t; });
+            if (next) setSpanId(next.defaultSpan);
+          }
+
+          return h(Shell, null, h('div', { class: 'ns-stack ns-stack--lg' }, [
+            h(NS.PageHeader, { key: 'header', class: 'ns-page-header--console' },
+              h(NS.PageHeader.Main, null, [
+                h(NS.PageHeader.Intro, { key: 'intro' }, [
+                  h('h1', { key: 'h' }, 'Traces'),
+                  h('p', { key: 'p', class: 'ns-lede' },
+                    'Cross-service flow for every request, job, firing, and delivery. One trace id ties the waterfall, span detail, and logs together.'),
+                ]),
+                h(NS.PageHeader.Status, { key: 'status' }, [
+                  h('span', { key: '1' }, '6 traces in the last 5 min'),
+                  h('span', { key: 's1', class: 'ns-status-bar__sep' }, '·'),
+                  h('span', { key: '2' }, '1 failed'),
+                  h('span', { key: 's2', class: 'ns-status-bar__sep' }, '·'),
+                  h('span', { key: '3' }, '1 retrying'),
+                ]),
+              ]),
+            ),
+            h('div', { key: 'body', class: 'ns-rail-grid' }, [
+              h(TraceList, { key: 'list', selectedId: traceId, onSelect: selectTrace }),
+              h('div', { key: 'main', class: 'ns-content-rail' }, [
+                h('div', { key: 'wf', class: 'ns-stack ns-stack--md' }, [
+                  h(NS.Card, { key: 'card' }, [
+                    h(NS.Card.Header, { key: 'head' }, [
+                      h('div', { key: 'title', class: 'ns-stack ns-stack--xs' }, [
+                        h(NS.Card.Title, { key: 't' }, trace.title),
+                        h(NS.Card.Description, { key: 'd' }, trace.meta),
+                      ]),
+                      h(Legend, { key: 'legend', trace: trace }),
+                    ]),
+                    h(NS.Card.Body, { key: 'body' },
+                      h(Waterfall, { trace: trace, selectedId: spanId, onSelect: setSpanId })),
+                  ]),
+                  h(LogStrip, { key: 'logs', logs: trace.logs }),
+                ]),
+                h('div', { key: 'rail' }, h(SpanDetail, { span: span })),
+              ]),
+            ]),
+          ]));
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(h(Page));
+      })();
+    </script>
+  </body>
+</html>
