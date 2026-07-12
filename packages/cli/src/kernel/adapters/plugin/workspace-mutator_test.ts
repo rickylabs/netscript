@@ -150,7 +150,7 @@ Deno.test('PluginWorkspaceMutator injects first-party plugin core imports into r
   );
 });
 
-Deno.test('root-level scaffold NetScript imports resolve in both package-source modes', async () => {
+Deno.test('root-level scaffold runtime imports resolve in both package-source modes', async () => {
   // Scan the real root-owned worker sources plus the runtime E2E fixture that
   // injects the generated service-client import into workers/jobs/health-check.ts.
   const sourceUrls = [
@@ -186,7 +186,80 @@ Deno.test('root-level scaffold NetScript imports resolve in both package-source 
       );
     }
   }
+
+  // @netscript/ai deliberately computes its optional MCP adapter imports so
+  // they stay out of the static JSR graph. Reconstruct those real specifiers
+  // and prove that the generated project owns their runtime resolution.
+  const tanstackConnectorUrl = new URL(
+    '../../../../../../packages/ai/src/mcp/adapters/tanstack-connector.ts',
+    import.meta.url,
+  );
+  const tanstackConnectorSource = await Deno.readTextFile(tanstackConnectorUrl);
+  const computedSpecifierPattern =
+    /\[\s*['"](@[^'"]+)['"]\s*,\s*['"]([^'"]+)['"]\s*\]\.join\(\s*['"]{2}\s*\)/g;
+  const computedRuntimeSpecifiers = new Set<string>();
+  for (const match of tanstackConnectorSource.matchAll(computedSpecifierPattern)) {
+    computedRuntimeSpecifiers.add(`${match[1]}${match[2]}`);
+  }
+  assert(
+    computedRuntimeSpecifiers.has('@tanstack/ai-mcp'),
+    'expected @netscript/ai to compute the @tanstack/ai-mcp runtime specifier',
+  );
+  assert(
+    computedRuntimeSpecifiers.has('@tanstack/ai-mcp/stdio'),
+    'expected @netscript/ai to compute the @tanstack/ai-mcp/stdio runtime specifier',
+  );
+
+  const aiDenoJson = JSON.parse(
+    await Deno.readTextFile(
+      new URL('../../../../../../packages/ai/deno.json', import.meta.url),
+    ),
+  ) as { imports: Record<string, string> };
+  const mcpRootAlias = rootPackageAlias('@tanstack/ai-mcp');
+  const expectedMcpTarget = aiDenoJson.imports[mcpRootAlias];
+  assert(expectedMcpTarget !== undefined, `${mcpRootAlias} must be pinned by packages/ai/deno.json`);
+
+  for (const mode of ['jsr', 'local'] as const) {
+    const resolverImports = resolveNetScriptImports(mode);
+    const fs = new MemoryFileSystemAdapter();
+    await fs.writeFile(
+      '/project/deno.json',
+      JSON.stringify({ workspace: ['./plugins/*'], imports: {} }, null, 2) + '\n',
+    );
+    if (mode === 'local') {
+      await fs.writeFile(
+        join('/project', 'packages', 'cli', 'deno.json'),
+        JSON.stringify({ name: '@netscript/cli' }, null, 2) + '\n',
+      );
+    }
+    await new PluginWorkspaceMutator(fs).ensureRootImportsForPluginKind('/project', 'ai');
+    const generatedConfig = JSON.parse(await fs.readFile('/project/deno.json')) as {
+      imports: Record<string, string>;
+    };
+
+    for (const specifier of [...computedRuntimeSpecifiers].sort()) {
+      const rootAlias = rootPackageAlias(specifier);
+      assertEquals(
+        resolverImports[specifier] ?? resolverImports[rootAlias],
+        expectedMcpTarget,
+        `Computed @netscript/ai runtime import "${specifier}" is unresolved or mis-pinned by the ${mode} resolver.`,
+      );
+      assertEquals(
+        generatedConfig.imports[specifier] ?? generatedConfig.imports[rootAlias],
+        expectedMcpTarget,
+        `Computed @netscript/ai runtime import "${specifier}" is unresolved in the ${mode} generated root map.`,
+      );
+    }
+  }
 });
+
+function rootPackageAlias(specifier: string): string {
+  const match = /^(@[^/]+\/[^/]+|[^/]+)/.exec(specifier);
+  if (match?.[1] === undefined) {
+    throw new Error(`Cannot derive a root package alias from "${specifier}".`);
+  }
+  return match[1];
+}
 
 async function collectTypeScriptFiles(root: URL): Promise<URL[]> {
   const files: URL[] = [];

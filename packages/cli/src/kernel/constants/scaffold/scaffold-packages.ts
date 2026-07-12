@@ -59,6 +59,7 @@ export const SCAFFOLD_PACKAGES = {
   NETSCRIPT_KV: '@netscript/kv',
   NETSCRIPT_FRESH_UI: '@netscript/fresh-ui',
   NETSCRIPT_FRESH_UI_INTERACTIVE: '@netscript/fresh-ui/interactive',
+  TANSTACK_AI_MCP: '@tanstack/ai-mcp',
   ZOD: 'zod',
 } as const;
 

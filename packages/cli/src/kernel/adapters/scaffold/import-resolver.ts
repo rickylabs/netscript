@@ -15,6 +15,8 @@ import { JSR_SPECIFIERS } from '../../constants/jsr-specifiers.ts';
 import { SCAFFOLD_PACKAGES } from '../../constants/scaffold/scaffold-packages.ts';
 import type { PackageSourceMode } from '../../domain/scaffold/scaffold-options.ts';
 
+const TANSTACK_AI_MCP_SPECIFIER = 'npm:@tanstack/ai-mcp@0.2.1';
+
 /**
  * Maps all scaffold package specifiers to their JSR/npm specifiers.
  * Used when `importMode` is `'jsr'` for registry-based resolution.
@@ -111,6 +113,7 @@ const PACKAGE_TO_JSR: Record<string, string> = {
   [SCAFFOLD_PACKAGES.NETSCRIPT_KV]: JSR_SPECIFIERS.kv,
   [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_UI]: JSR_SPECIFIERS['fresh-ui'],
   [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_UI_INTERACTIVE]: `${JSR_SPECIFIERS['fresh-ui']}/interactive`,
+  [SCAFFOLD_PACKAGES.TANSTACK_AI_MCP]: TANSTACK_AI_MCP_SPECIFIER,
   [SCAFFOLD_PACKAGES.STD_PATH]: 'jsr:@std/path@^1.0.0',
   [SCAFFOLD_PACKAGES.STD_FS]: 'jsr:@std/fs@^1.0.0',
   [SCAFFOLD_PACKAGES.STD_ASSERT]: 'jsr:@std/assert@^1.0.0',
@@ -190,6 +193,7 @@ const PACKAGE_TO_LOCAL_PATH: Readonly<Record<string, string>> = {
 };
 
 const EXTERNAL_DEPS: Readonly<Record<string, string>> = {
+  [SCAFFOLD_PACKAGES.TANSTACK_AI_MCP]: TANSTACK_AI_MCP_SPECIFIER,
   [SCAFFOLD_PACKAGES.STD_PATH]: 'jsr:@std/path@^1.0.0',
   [SCAFFOLD_PACKAGES.STD_FS]: 'jsr:@std/fs@^1.0.0',
   [SCAFFOLD_PACKAGES.STD_ASSERT]: 'jsr:@std/assert@^1.0.0',

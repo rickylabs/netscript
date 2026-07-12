@@ -23,6 +23,7 @@ describe('resolveNetScriptImports', () => {
           'jsr:@netscript/plugin-workers/jobs/health-check.ts':
             netscriptJsrSpecifier('plugin-workers', '/jobs/health-check.ts'),
           '@netscript/auth-kv-oauth': netscriptJsrSpecifier('auth-kv-oauth'),
+          '@tanstack/ai-mcp': 'npm:@tanstack/ai-mcp@0.2.1',
           '@std/path': 'jsr:@std/path',
           zod: 'npm:zod',
         },
@@ -38,6 +39,7 @@ describe('resolveNetScriptImports', () => {
           'jsr:@netscript/plugin-workers/jobs/health-check.ts':
             '../../../monorepo/plugins/workers/jobs/health-check.ts',
           '@netscript/auth-kv-oauth': '../../../monorepo/packages/auth-kv-oauth/mod.ts',
+          '@tanstack/ai-mcp': 'npm:@tanstack/ai-mcp@0.2.1',
           '@std/path': 'jsr:@std/path',
           zod: 'npm:zod',
         },
@@ -56,6 +58,7 @@ describe('resolveNetScriptImports', () => {
     const imports = resolveNetScriptImports('jsr');
     assertStringIncludes(imports['@netscript/config'], 'jsr:@netscript/config');
     assertStringIncludes(imports['@netscript/service'], 'jsr:@netscript/service');
+    assertEquals(imports['@tanstack/ai-mcp'], 'npm:@tanstack/ai-mcp@0.2.1');
     assertStringIncludes(imports['@std/path'], 'jsr:@std/path');
     assertStringIncludes(imports['zod'], 'npm:zod');
   });
@@ -74,6 +77,7 @@ describe('resolveNetScriptImports', () => {
     );
     assertEquals(imports['@netscript/auth-kv-oauth'], '../../packages/auth-kv-oauth/mod.ts');
     // External deps still use registry
+    assertEquals(imports['@tanstack/ai-mcp'], 'npm:@tanstack/ai-mcp@0.2.1');
     assertStringIncludes(imports['@std/path'], 'jsr:@std/path');
     assertStringIncludes(imports['zod'], 'npm:zod');
   });
