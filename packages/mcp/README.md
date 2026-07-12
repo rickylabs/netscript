@@ -1,128 +1,320 @@
 # @netscript/mcp
 
-`@netscript/mcp` is the token-bounded MCP engine for NetScript diagnostics, framework-aware
-telemetry summaries, public documentation, and controlled CLI actions. Its 13 tools share the same
-vocabulary as the NetScript CLI and installed agent skills.
+[![JSR](https://jsr.io/badges/@netscript/mcp)](https://jsr.io/@netscript/mcp)
+[![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
+[![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-## Public API
+**The Model Context Protocol server for NetScript workspaces: 13 token-bounded tools that let a
+coding agent monitor a running app, debug a correlated execution, read framework-semantic telemetry,
+run the doctor, search the public documentation, and trigger allowlisted CLI commands — over stdio,
+with no npm SDK.**
 
-- `createToolRegistry()` returns immutable enumerable tool definitions.
-- `createMcpServer()` composes the protocol runner with truncation defaults.
-- `runMcpStdioServer()` runs the newline-delimited JSON-RPC stdio transport.
-- Standard-Schema input and output contracts are exported for every tool.
-- `createMcpCliServer()` composes the executable server with replaceable CLI, project-doctor, docs,
-  telemetry, and command-policy seams.
+---
 
-```ts
-import { createToolRegistry } from '@netscript/mcp';
+## 🧭 Why
 
-for (const tool of createToolRegistry()) console.log(tool.name, tool.kind);
+An agent working on a NetScript app has to answer operational questions — _did the last import job
+succeed, why is the checkout service slow, which query is hammering the database, is my Aspire
+wiring broken_ — and it usually answers them by shelling out, tailing logs, and pasting thousands of
+tokens of raw trace JSON into its own context. That is slow, expensive, and lossy: the agent burns
+its budget re-deriving structure NetScript already knows.
+
+`@netscript/mcp` closes that gap. It exposes NetScript's own read models — the
+[`TelemetryQueryPort`](https://jsr.io/@netscript/telemetry/doc/query) trace/span/log reader, the
+project's generated registries, the plugin doctor, and the public docs corpus — as MCP tools whose
+results are **summaries, not dumps**. Every successful result is bounded server-side before it
+reaches the model, and the analytics tools return percentiles, error rates, and ranked operations
+rather than the spans they were computed from. The tools are NetScript-semantic, not generic OTLP:
+they speak `worker`, `saga`, `trigger`, `stream`, and `service`, because they classify spans by the
+`netscript.*` attribute conventions the framework already emits.
+
+The server is one third of the NetScript agentic surface — the CLI is the hands, the skills are the
+doctrine, MCP is the eyes. It deliberately **wraps the CLI rather than reimplementing it**:
+`list_commands` reflects the live command tree, and `execute_command` shells the real binary through
+a default-deny policy. An agent that can run `netscript db migrate` directly should just run it; MCP
+exists for what a shell cannot cheaply give it — bounded aggregation, cross-domain diagnostics, and
+documentation lookup.
+
+---
+
+## 🚀 Quick Start
+
+### Installation
+
+Most users never import this package. Install the server into a project with the CLI:
+
+```bash
+netscript agent init
 ```
 
-Prefer the CLI for direct scripted operations. Use MCP for compact interactive diagnostics and
-framework-semantic summaries.
+That writes `.mcp.json` (Claude Code) and/or `.vscode/mcp.json` pointing at `netscript agent mcp`,
+and installs the version-matched NetScript skills. Start the app, and the agent can ask its
+questions:
 
-For an embedding host that supplies its own telemetry probe and seams, compose the server
-explicitly and hand each JSON-RPC message to `handle` (it parses and validates internally,
-returning `undefined` for notifications):
+> _"Is the app healthy?"_ → `get_app_status` · _"Why did the last import job fail?"_ →
+> `get_last_job_result`, then `get_run` · _"What is slowing down `checkout`?"_ →
+> `analyze_service_performance`
 
-```ts
-import { createMcpServer, type TelemetryProbePort } from '@netscript/mcp';
+To embed the server in your own host process, add it as a library:
 
-const server = createMcpServer({
-  probe: hostProbe satisfies TelemetryProbePort,
-  environment: { NETSCRIPT_TELEMETRY_ENDPOINT: endpoint },
-});
-const response = await server.handle(JSON.parse(line));
-if (response) console.log(JSON.stringify(response));
+```bash
+deno add jsr:@netscript/mcp
 ```
 
-## Tool catalog
+### Usage
 
-| Tool                          | Bounded result                                                  |
-| ----------------------------- | --------------------------------------------------------------- |
-| `get_app_status`              | Overall health, counts, and runtime-domain summaries            |
-| `list_runs`                   | Recent filtered execution summaries                             |
-| `get_run`                     | One correlated execution with bounded spans and logs            |
-| `get_recent_errors`           | Recent errors grouped by service and domain                     |
-| `get_last_job_result`         | The latest matching job outcome                                 |
-| `analyze_service_performance` | Duration percentiles, throughput, and error rate                |
-| `analyze_db_bottlenecks`      | Ranked database and KV operations                               |
-| `doctor`                      | Telemetry, Aspire, wiring, and plugin checks with fixes         |
-| `search_docs`                 | Ranked public-document matches and snippets                     |
-| `list_docs`                   | Public-document summaries                                       |
-| `get_doc`                     | One public document or named section                            |
-| `list_commands`               | Current CLI command descriptors from an injected catalog        |
-| `execute_command`             | Policy-gated execution with exit status and bounded output tail |
+```ts
+import { createMcpCliServer, runMcpStdioServer } from '@netscript/mcp/cli';
 
-The documentation tools form a search-to-get funnel: locate a slug with `search_docs`, then retrieve
-only the needed document or section with `get_doc`. Limits and server-side truncation keep results
-bounded.
+// The 80% path: run the full server (telemetry + docs + doctor + CLI trigger) on stdio.
+await runMcpStdioServer({ projectRoot: Deno.cwd(), endpoint: 'http://localhost:18888' });
 
-## Executable composition
+// Or drive it message by message.
+const server = createMcpCliServer({ projectRoot: Deno.cwd() });
+const response = await server.handle({ jsonrpc: '2.0', id: 1, method: 'tools/list' });
+console.log(response?.result);
+```
 
-The `@netscript/mcp/cli` export provides `createMcpCliServer()`, `runMcpStdioServer()`, and
-`resolveDocsRoot()`. `McpCliOptions` accepts these outer composition seams:
+---
 
-| Seam                  | Purpose                                                       |
-| --------------------- | ------------------------------------------------------------- |
-| `CommandCatalogPort`  | Supplies the live CLI command tree to `list_commands`         |
-| `CommandExecutorPort` | Runs an allowed command and returns structured process data   |
-| `CommandPolicy`       | Defines ordered allow and deny prefixes for `execute_command` |
-| `ProjectDoctorPort`   | Supplies typed project and plugin diagnostics                 |
-| `docsRoot`            | Selects the public Markdown corpus                            |
-| `endpoint`            | Overrides telemetry endpoint discovery                        |
+## 🧩 Mental model
 
-The public CLI composition injects the real command catalog and project doctor while preserving
-package direction: MCP does not import the CLI package.
+```text
+       agent (Claude Code, VS Code, …)
+                 │  JSON-RPC over stdio
+       ┌─────────▼──────────┐
+       │  runner + policy   │  initialize · tools/list · tools/call
+       │  (truncation)      │  every result bounded before it is returned
+       └─────────┬──────────┘
+                 │  13 tool flows
+   ┌─────────────┼───────────────┬──────────────────┐
+   ▼             ▼               ▼                  ▼
+telemetry     docs corpus    doctor families    command policy
+(read model)  (public .md)   (aspire/wiring/    (default-deny
+                              plugins)           allowlist)
+   │                              │                  │
+   ▼                              ▼                  ▼
+Aspire dashboard HTTP      project metadata      `netscript` binary
+```
 
-## Telemetry endpoint discovery
+Three ideas carry the design.
 
-Telemetry tools and `doctor` share one discovery policy:
+**Tools are flows over ports.** A tool is a name, an input contract, an output contract, and a flow.
+The flow depends only on a port — `TelemetryProbePort`, `DocsCorpusPort`, `CommandCatalogPort`,
+`CommandExecutorPort`, `ProjectDoctorPort` — never on a concrete client. That is why this package
+can report on the CLI without depending on it: `@netscript/cli` implements the ports and injects
+them at its own composition root, so the dependency points inward and no cycle exists.
 
-1. an explicit `endpoint` option (the CLI exposes it as `--endpoint`);
+**Results are bounded by construction.** `truncateResult` walks every successful result and caps
+arrays at 50 elements and strings at 2,000 UTF-16 code units before the runner serializes it. The
+analytics tools go further and never return raw spans at all. A failure is a structured tool error,
+not a crash: an unreachable telemetry endpoint produces a `warn`/`fail` result the agent can reason
+about.
+
+**Execution is default-deny.** `execute_command` matches a normalized command path against an
+ordered policy. Deny rules win; unmatched paths are denied. Destructive and account-bound verbs are
+never reachable through MCP.
+
+---
+
+## 🧰 Tool catalog
+
+| Tool                          | Required input | Bounded result                                              |
+| ----------------------------- | -------------- | ----------------------------------------------------------- |
+| `get_app_status`              | —              | Health verdict, counts, per-domain summaries                |
+| `list_runs`                   | —              | Recent executions filtered by domain, status, service, time |
+| `get_run`                     | `id`           | One correlated execution with bounded spans and logs        |
+| `get_recent_errors`           | —              | Recent errors grouped by service and domain                 |
+| `get_last_job_result`         | —              | The latest matching job outcome                             |
+| `analyze_service_performance` | `service`      | Duration percentiles, throughput, error rate                |
+| `analyze_db_bottlenecks`      | —              | Ranked database and KV operations                           |
+| `doctor`                      | —              | Telemetry, Aspire, wiring, and plugin checks with fixes     |
+| `search_docs`                 | `query`        | Ranked public-document matches with snippets                |
+| `list_docs`                   | —              | Public-document summaries                                   |
+| `get_doc`                     | `slug`         | One public document, or one named section of it             |
+| `list_commands`               | —              | Live CLI command descriptors from the injected catalog      |
+| `execute_command`             | `command`      | Policy decision, exit status, bounded output tail           |
+
+### Recipes
+
+- **Triage a failing app.** `doctor` first — it aggregates telemetry reachability, Aspire markers,
+  project wiring, and plugin diagnostics into one verdict with suggested fixes, so a single call
+  usually names the broken seam.
+- **Find why the last job failed.** `get_last_job_result` (optionally filtered by `jobName` or
+  `service`) returns the outcome and its correlation id; feed that id to `get_run` for the
+  correlated spans and logs of just that execution.
+- **Investigate a slow service.** `analyze_service_performance` with `{ service: "checkout" }`
+  returns p50/p95/p99, throughput, and error rate over the window — not the spans. Narrow the window
+  with `sinceUnixMs`.
+- **Read the docs without burning context.** Funnel, never dump: `search_docs` to locate a slug,
+  then `get_doc` with that slug and — when you only need one part — a `section` heading.
+- **Discover and run a safe command.** `list_commands` reflects the CLI's live command tree (so it
+  never drifts from the installed binary); `execute_command` runs an allowlisted one, e.g.
+  `{ command: "db", args: ["migrate"] }`. A denied path returns `command_denied` _before_ the
+  executor is invoked.
+
+---
+
+## 📦 Public surface
+
+The default entrypoint publishes the contracts, registry, and generic server composition; `./cli`
+publishes the executable composition that binds the real adapters.
+
+| Export                                                                      | Entry   | Role                                                        |
+| --------------------------------------------------------------------------- | ------- | ----------------------------------------------------------- |
+| `createToolRegistry()`                                                      | `.`     | Immutable, enumerable definitions of the 13 tools           |
+| `createMcpServer()`                                                         | `.`     | Protocol runner: `initialize` / `tools/list` / `tools/call` |
+| `TOOL_NAMES`, `TOOL_INPUT_SCHEMAS`, `TOOL_OUTPUT_SCHEMAS`, `validateSchema` | `.`     | Standard Schema contracts for every tool                    |
+| `DEFAULT_TRUNCATION_POLICY`, `truncateResult`                               | `.`     | Server-side output bounds                                   |
+| `DEFAULT_COMMAND_POLICY`, `decideCommand`                                   | `.`     | The default-deny allowlist and its decision function        |
+| `TelemetryProbePort`, `DocsCorpusPort`, `ProjectDoctorPort`, …              | `.`     | Port contracts an embedder implements                       |
+| `FilesystemDocsCorpus`, `SpawnCommandExecutor`, `StaticCommandCatalog`      | `.`     | Default adapters                                            |
+| `createMcpCliServer()`                                                      | `./cli` | Full composition: telemetry, docs, doctor, CLI trigger      |
+| `runMcpStdioServer()`                                                       | `./cli` | Newline-delimited JSON-RPC stdio loop                       |
+| `resolveDocsRoot()`                                                         | `./cli` | Docs-root resolution from flag, environment, project root   |
+
+Full symbol reference: [`deno doc jsr:@netscript/mcp`](https://jsr.io/@netscript/mcp/doc).
+
+---
+
+## ⚙️ Configuration
+
+### Telemetry endpoint discovery
+
+Telemetry tools and `doctor` share one ordered policy:
+
+1. an explicit `endpoint` option (the CLI surfaces it as `--endpoint`);
 2. `NETSCRIPT_TELEMETRY_ENDPOINT`;
 3. `ASPIRE_DASHBOARD_PORT`, converted to a local HTTP endpoint with an HTTPS fallback;
 4. `http://localhost:18888`.
 
-Only valid HTTP or HTTPS endpoints are accepted. An unreachable endpoint produces a structured
-warning or failure result rather than crashing the server.
+Only `http:` and `https:` endpoints are accepted. An unreachable endpoint yields a structured
+warning or failure result rather than a crash.
 
-## Doctor composition
+### Composition seams
 
-`doctor` aggregates telemetry reachability, NetScript Aspire markers, project wiring, and plugin
-diagnostics. Plugin diagnostics are dependency-inverted: MCP does not import or duplicate
-`@netscript/cli`; the CLI composition supplies its typed plugin-doctor adapter. The standalone
-plugin family returns a visible warning rather than claiming success.
+`createMcpCliServer(options)` / `runMcpStdioServer(options)` accept:
 
-## Data boundary and command policy
+| Option            | Purpose                                                        |
+| ----------------- | -------------------------------------------------------------- |
+| `commandCatalog`  | Supplies the live CLI command tree to `list_commands`          |
+| `commandExecutor` | Runs an allowed command, returning structured process data     |
+| `commandPolicy`   | Replaces the ordered allow/deny prefixes for `execute_command` |
+| `projectDoctor`   | Supplies typed project and plugin diagnostics                  |
+| `projectRoot`     | Root for docs, execution, and doctor flows                     |
+| `docsRoot`        | Selects the public Markdown corpus (default `docs/site`)       |
+| `endpoint`        | Overrides telemetry endpoint discovery                         |
 
-The server may read telemetry, NetScript project metadata, generated registries, and public
-documentation. It never returns project source code, environment-variable values, credentials, or
-secrets. Stdio is process-local; outbound telemetry probes use the resolved endpoint only.
+The generic `createMcpServer(options)` takes the lower-level seams instead — `probe`, `environment`,
+`flows`, and `truncation`, the last of which overrides the 50-item / 2,000-character output bounds.
 
-`execute_command` is default-deny. Explicit rules allow selected database, generation, contract,
-service-read, plugin, and UI command paths. Deny rules take precedence and block deployment, project
-initialization, marketplace operations, database reset, and plugin removal. Unmatched paths return
-`command_denied` before the executor is called.
+### Command policy
 
-## Required permissions
+`DEFAULT_COMMAND_POLICY` **allows** `db init|generate|migrate|seed|status|introspect`, `generate`,
+`contract`, `service list|status`, `plugin add|list|sync|doctor`, and the `ui` verbs. It **denies**
+`deploy`, `init`, `marketplace`, `db reset`, and `plugin remove`. Deny beats allow; anything
+unmatched is denied by default. Pass your own `CommandPolicy` to tighten or (deliberately) widen it.
 
-The executable needs environment access to resolve telemetry settings, network access to query and
-probe the selected HTTP endpoint, read access for project metadata and docs, and run access only
-when `execute_command` is enabled with a process executor. The public CLI binary grants these at its
-edge. Embedders should grant only the capabilities used by their selected adapters.
+### Data boundary and permissions
 
-## Transport
+The server reads telemetry, project metadata, generated registries, and public documentation. It
+never returns project source, environment-variable values, credentials, or secrets. Stdio is
+process-local; the only outbound traffic is the telemetry probe to the resolved endpoint.
 
-The stdio transport is UTF-8 newline-delimited JSON-RPC and implements `initialize`, `tools/list`,
-and `tools/call`. It intentionally uses a minimal zero-dependency transport instead of the npm MCP
-SDK, keeping the published graph and lockfile stable.
+The executable needs `--allow-env` (endpoint discovery), `--allow-net` (telemetry), `--allow-read`
+(project metadata and docs), and `--allow-run` only when `execute_command` is wired to a process
+executor. The `netscript` binary grants these at its edge; embedders should grant only what their
+chosen adapters use.
 
-## Archetype 6 v2 deviations
+---
 
-The owner-approved package skeleton uses the horizontal
-`domain → application → presentation/infrastructure` layout from the package design instead of the
-newer kernel/vertical CLI feature tree. The package has no Cliffy command tree, templates, output
-renderer, extension axes, or public/maintainer split, so creating those seams would be speculative.
-Debt `MCP-A6-V2-SHAPE` requires reassessment when those concerns emerge.
+## 🔭 Observability
+
+This package is a telemetry **consumer**, not a producer: it emits no spans of its own. It reads
+through `TelemetryQueryPort` from `@netscript/telemetry/query` and classifies what it reads using
+the `netscript.*` attribute convention, mapping namespace prefixes onto the five semantic domains it
+exposes:
+
+| Domain    | Classified from                         |
+| --------- | --------------------------------------- |
+| `worker`  | `netscript.worker.*`                    |
+| `saga`    | `netscript.saga.*`                      |
+| `trigger` | `netscript.trigger.*`                   |
+| `stream`  | `netscript.stream.*`, `netscript.sse.*` |
+| `service` | `netscript.job.*`                       |
+
+Correlated lookups (`get_run`, `get_last_job_result`) key off the shared correlation floor
+`netscript.correlation.id`. The convention itself is owned by `@netscript/telemetry` — see
+[the telemetry convention](https://rickylabs.github.io/netscript/reference/telemetry/convention/).
+
+---
+
+## 🏗 Architecture
+
+Archetype 6 (CLI/Tooling) — a thin protocol router over flows. The package is layered
+`domain → application → infrastructure`: tool contracts, schemas, port interfaces, and pure policy
+in `src/domain/`; the tool flows and the protocol runner in `src/application/`; and the concrete
+telemetry, docs, doctor, and process adapters in `src/infrastructure/`. Dependencies point inward —
+flows know ports, never adapters.
+
+The transport is deliberately minimal — UTF-8 newline-delimited JSON-RPC implementing `initialize`,
+`tools/list`, and `tools/call` against protocol version `2025-11-25` — rather than the npm MCP SDK.
+That keeps the published dependency graph and the lockfile stable, which matters because this
+package ships inside the CLI binary.
+
+The CLI surface (`netscript agent mcp`, `netscript agent init`) lives in `@netscript/cli`, not here;
+this package stays a library engine. See
+[Agent tooling](https://rickylabs.github.io/netscript/capabilities/agent-tooling/) for the whole
+combo.
+
+### Testing
+
+There is no `./testing` entrypoint, and none is needed: every flow depends on a port, so a test
+supplies a fake and asserts on the bounded result.
+
+```ts
+import { assertEquals } from '@std/assert';
+import { createMcpServer, type TelemetryProbePort } from '@netscript/mcp';
+
+const probe: TelemetryProbePort = {
+  probe: (endpoint: string) =>
+    Promise.resolve({ reachable: true, status: 200, message: `reached ${endpoint}` }),
+};
+
+const server = createMcpServer({ probe });
+const response = await server.handle({ jsonrpc: '2.0', id: 1, method: 'tools/list' });
+assertEquals((response?.result?.tools as unknown[]).length, 13);
+```
+
+Assert against `TOOL_INPUT_SCHEMAS` / `TOOL_OUTPUT_SCHEMAS` via `validateSchema`, so a flow that
+drifts from its published contract fails locally rather than at the agent.
+
+---
+
+## 🧱 Compatibility
+
+| Runtime       | Support                                                                           |
+| ------------- | --------------------------------------------------------------------------------- |
+| Deno 2.9+     | Full — library surface and the `./cli` executable composition                     |
+| Node.js / Bun | Library surface (`.`) only; `./cli` uses `Deno.stdin`, `Deno.env`, `Deno.Command` |
+
+The MCP **host** only needs to spawn a process and speak JSON-RPC over stdio, so any MCP-capable
+client (Claude Code, VS Code, and others) can consume the server regardless of its own runtime.
+
+---
+
+## 📖 Documentation
+
+- **Reference**:
+  [rickylabs.github.io/netscript/reference/mcp/](https://rickylabs.github.io/netscript/reference/mcp/)
+- **Agent tooling**:
+  [rickylabs.github.io/netscript/capabilities/agent-tooling/](https://rickylabs.github.io/netscript/capabilities/agent-tooling/)
+- **Telemetry convention**:
+  [rickylabs.github.io/netscript/reference/telemetry/convention/](https://rickylabs.github.io/netscript/reference/telemetry/convention/)
+
+---
+
+## 📝 License
+
+Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
+JSR with cryptographically verified provenance.
