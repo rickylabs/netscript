@@ -134,3 +134,11 @@ when the reviewed API delta should become the new reference.
 - Beta subset is complete and independently evaluated PASS. Stable-line blocking remains open on
   #309; the evaluator recorded one low, non-blocking watch note about broad version-string
   replacement for the eventual stable cut.
+
+## Orchestrator rebase (Tier-A)
+
+- Branch conflicted with post-#714 main in `cut.ts` (writeReleasePrBody vs the slice's
+  createReleasePr edits) → GitHub created no PR merge commit, so PR #740 CI never triggered
+  (beta-8 known pattern). Rebased onto main, kept main's mkdir-bearing `writeReleasePrBody`,
+  widened `createReleasePr` files param to `readonly string[]`. Scoped check 0 findings;
+  version:bump:test 8/8; surface:diff:test 3/3.

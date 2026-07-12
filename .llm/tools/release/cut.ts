@@ -183,7 +183,7 @@ Create and publish GitHub Release \`v${version}\`; \`publish.yml\` will publish 
   return bodyFile;
 }
 
-async function createReleasePr(root: string, version: string, files: string[]): Promise<void> {
+async function createReleasePr(root: string, version: string, files: readonly string[]): Promise<void> {
   const branch = `release/cut-${version}`;
   await mustRun('git', ['checkout', '-b', branch], root);
   await mustRun('git', ['add', ...files], root);
