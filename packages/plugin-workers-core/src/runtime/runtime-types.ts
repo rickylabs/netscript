@@ -1,4 +1,11 @@
 import type { ExecutionStatus, TriggerType } from '../domain/constants.ts';
+import type { JobResult as DomainJobResult } from '../domain/mod.ts';
+import type { TaskExecutor } from '../abstracts/task-executor.ts';
+import type { MultiRuntimeTaskExecutorOptions } from '../executor/mod.ts';
+import type { RegistryJobStoragePort } from '../registry/mod.ts';
+import type { ShutdownManager, ShutdownManagerOptions, ShutdownResource } from '../shutdown/mod.ts';
+import type { WorkflowExecutor, WorkflowExecutorOptions } from '../workflow/mod.ts';
+import type { WorkflowDefinition as DomainWorkflowDefinition } from '../domain/mod.ts';
 
 /** Runtime job identifier. */
 export type JobId<TId extends string = string> = TId & { readonly __brand: 'JobId' };
@@ -10,9 +17,7 @@ export type TaskId<TId extends string = string> = TId & { readonly __brand: 'Tas
 export type WorkflowId<TId extends string = string> = TId & { readonly __brand: 'WorkflowId' };
 
 /** Result returned by runtime job handlers. */
-export type JobResult<TResult = unknown> =
-  | Readonly<{ success: true; data?: TResult }>
-  | Readonly<{ success: false; error: string; data?: TResult }>;
+export type JobResult<TResult = unknown> = DomainJobResult<TResult>;
 
 /** Context supplied to runtime job handlers. */
 export type JobContext<TPayload = unknown, TResult = unknown> = Readonly<{
@@ -35,44 +40,47 @@ export type RuntimePermissionValue = boolean | string[];
 
 /** Runtime permission bag accepted by task and job execution. */
 export type RuntimePermissions = Readonly<{
-  readonly net: RuntimePermissionValue;
-  readonly read: RuntimePermissionValue;
-  readonly write: RuntimePermissionValue;
-  readonly env: RuntimePermissionValue;
-  readonly run: RuntimePermissionValue;
-  readonly ffi: boolean;
+  readonly net?: RuntimePermissionValue;
+  readonly read?: RuntimePermissionValue;
+  readonly write?: RuntimePermissionValue;
+  readonly env?: RuntimePermissionValue;
+  readonly run?: RuntimePermissionValue;
+  readonly ffi?: boolean;
   readonly import?: string[];
 }>;
 
 /** Runtime job definition. */
-export type JobDefinition<TId extends string = string, TPayload = unknown, TResult = unknown> =
-  Readonly<
-    Record<string, unknown> & {
-      readonly id: TId;
-      readonly name?: string;
-      readonly description?: string;
-      readonly topic?: string;
-      readonly entrypoint?: string;
-      readonly schedule?: string;
-      readonly timezone?: string;
-      readonly timeout?: number;
-      readonly maxRetries?: number;
-      readonly priority?: number;
-      readonly enabled?: boolean;
-      readonly tags?: string[];
-      readonly metadata?: Record<string, unknown>;
-      readonly retryDelay?: number;
-      readonly maxConcurrency?: number;
-      readonly persist?: boolean;
-      readonly source?: string;
-      readonly sourceUrl?: string;
-      readonly importMapUrl?: string;
-      readonly executionType?: string;
-      readonly pluginId?: string;
-      readonly permissions?: RuntimePermissions;
-      readonly handler?: JobHandler<TPayload, TResult>;
-    }
-  >;
+export type JobDefinition<
+  TId extends string = string,
+  TPayload = unknown,
+  TResult = unknown,
+> = Readonly<
+  Record<string, unknown> & {
+    readonly id: TId;
+    readonly name?: string;
+    readonly description?: string;
+    readonly topic?: string;
+    readonly entrypoint?: string;
+    readonly schedule?: string;
+    readonly timezone?: string;
+    readonly timeout?: number;
+    readonly maxRetries?: number;
+    readonly priority?: number;
+    readonly enabled?: boolean;
+    readonly tags?: string[];
+    readonly metadata?: Record<string, unknown>;
+    readonly retryDelay?: number;
+    readonly maxConcurrency?: number;
+    readonly persist?: boolean;
+    readonly source?: string;
+    readonly sourceUrl?: string;
+    readonly importMapUrl?: string;
+    readonly executionType?: string;
+    readonly pluginId?: string;
+    readonly permissions?: RuntimePermissions;
+    readonly handler?: JobHandler<TPayload, TResult>;
+  }
+>;
 
 /** Runtime task definition. */
 export type TaskDefinition<TId extends string = string, TPayload = unknown, TResult = unknown> =
@@ -208,14 +216,7 @@ export type JobDispatcherOptions = Readonly<{
 }>;
 
 /** Runtime job storage contract. */
-export type RuntimeJobStoragePort = Readonly<{
-  readonly id: string;
-  saveJob(job: JobDefinition): Promise<void>;
-  findJob(jobId: string): Promise<JobDefinition | undefined>;
-  listJobs(topic?: string): Promise<readonly JobDefinition[]>;
-  saveExecution(record: ExecutionRecord): Promise<void>;
-  findExecution(executionId: string): Promise<ExecutionRecord | undefined>;
-}>;
+export type RuntimeJobStoragePort = RegistryJobStoragePort;
 
 /** Runtime scheduler contract. */
 export type RuntimeSchedulerPort = Readonly<{
@@ -236,54 +237,32 @@ export type RuntimeWorkerPort = Readonly<{
 }>;
 
 /** Runtime task executor contract. */
-export type RuntimeTaskExecutor = Readonly<{
-  readonly id: string;
-  supports(task: TaskDefinition): boolean;
-  execute(task: TaskDefinition, options?: TaskExecutionOptions): Promise<TaskResult>;
-}>;
+export type RuntimeTaskExecutor = Readonly<Pick<TaskExecutor, 'execute' | 'id' | 'supports'>>;
 
 /** Runtime task executor configuration. */
-export type RuntimeTaskExecutorOptions = Readonly<Record<string, unknown>>;
+export type RuntimeTaskExecutorOptions = MultiRuntimeTaskExecutorOptions;
 
 /** Runtime workflow executor contract. */
-export type RuntimeWorkflowExecutor = Readonly<{
-  readonly id: string;
-  execute(workflow: RuntimeWorkflowDefinition, options?: RuntimeWorkflowOptions): Promise<unknown>;
-}>;
-
-/** Runtime workflow definition accepted by composition. */
-export type RuntimeWorkflowDefinition = Readonly<
-  Record<string, unknown> & {
-    readonly id: WorkflowId | string;
-    readonly name: string;
-  }
+export type RuntimeWorkflowExecutor = Readonly<
+  Pick<WorkflowExecutor, 'execute'> & { readonly id: string }
 >;
 
+/** Runtime workflow definition accepted by composition. */
+export type RuntimeWorkflowDefinition<TId extends string = string> = DomainWorkflowDefinition<TId>;
+
 /** Runtime workflow executor options. */
-export type RuntimeWorkflowOptions = Readonly<{
-  readonly clock?: unknown;
-  readonly runJobStep?: unknown;
-  readonly runTaskStep?: unknown;
-  readonly sleep?: unknown;
-  readonly stateStore?: unknown;
-}>;
+export type RuntimeWorkflowOptions = WorkflowExecutorOptions;
 
 /** Runtime shutdown manager contract. */
-export type RuntimeShutdownManager = Readonly<{
-  readonly id: string;
-  register(resource: RuntimeShutdownResource): void;
-  shutdown(reason?: string): Promise<void>;
-}>;
+export type RuntimeShutdownManager = Readonly<
+  Pick<ShutdownManager, 'register' | 'shutdown'> & { readonly id: string }
+>;
 
 /** Resource managed during runtime shutdown. */
-export type RuntimeShutdownResource = Readonly<{
-  readonly id: string;
-  readonly priority?: number;
-  stop(reason?: string): Promise<void> | void;
-}>;
+export type RuntimeShutdownResource = ShutdownResource;
 
 /** Runtime shutdown configuration. */
-export type RuntimeShutdownOptions = Readonly<Record<string, unknown>>;
+export type RuntimeShutdownOptions = ShutdownManagerOptions;
 
 /** Public shape for runtime KV key factories. */
 export type RuntimeJobKvKeyFactories = Readonly<{

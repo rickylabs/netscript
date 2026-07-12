@@ -33,15 +33,8 @@ export interface ComponentLike<TProps extends object> {
   (props: TProps): PageRenderable;
 }
 
-/** Minimal route config surface emitted by framework partial routes. */
-export interface PartialRouteConfig {
-  /** Skip the app wrapper for the route. */
-  readonly skipAppWrapper?: boolean;
-  /** Skip inherited layouts for the route. */
-  readonly skipInheritedLayouts?: boolean;
-  /** Additional route config keys forwarded to Fresh. */
-  readonly [key: string]: unknown;
-}
+/** Fresh route config emitted by framework partial routes. */
+export type PartialRouteConfig = import('fresh').RouteConfig;
 
 /** Minimal cache-entry shape accepted by page layer loaders. */
 export interface PageCacheEntry<T> {

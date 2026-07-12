@@ -11,7 +11,9 @@ import type {
   PageRequestContext,
 } from './context-types.ts';
 import type { PageMethod } from './form-types.ts';
-import type { PageRouteNavigation, PageRouteReference } from './route-types.ts';
+import type { PageRouteReference } from './route-types.ts';
+import type { DefinePageDefinitionFor, DefinePageRoutedDefinitionFor } from '../catalog.ts';
+import type { DefinePageTypeState } from '../types.ts';
 
 /** Slot function exposed to layouts for a resolved layer. */
 export type PageSlot<TProps extends object> = (() => PageRenderable) & {
@@ -100,20 +102,15 @@ export interface PageBuildOptions {
 }
 
 /** Unrouted page definition returned by `build()` without a route. */
-export interface PageDefinition<
+export type PageDefinition<
   TState = EmptyRecord,
   TResources extends UnknownRecord = EmptyRecord,
   TPath extends object = EmptyRecord,
   TSearch extends object = EmptyRecord,
   TLayerData extends PageLayerMap = EmptyRecord,
-> {
-  /** Page renderer used by Fresh route modules. */
-  readonly page: (ctx: PageRequestContext<TState>) => Promise<PageRenderable>;
-  /** Default export-compatible page renderer. */
-  readonly default: (ctx: PageRequestContext<TState>) => Promise<PageRenderable>;
-  /** Optional built handlers. */
-  readonly handler?: PageHandlers<TState>;
-}
+> = DefinePageDefinitionFor<
+  DefinePageTypeState<TState, TResources, TPath, TSearch, TLayerData>
+>;
 
 /** Hook bundle returned on routed page definitions. */
 export interface PageHooks<
@@ -153,17 +150,12 @@ export interface PageHooks<
 }
 
 /** Routed page definition returned by `build()` with route metadata. */
-export interface RoutedPageDefinition<
+export type RoutedPageDefinition<
   TState = EmptyRecord,
   TResources extends UnknownRecord = EmptyRecord,
   TPath extends object = EmptyRecord,
   TSearch extends object = EmptyRecord,
   TLayerData extends PageLayerMap = EmptyRecord,
-> extends PageDefinition<TState, TResources, TPath, TSearch, TLayerData> {
-  /** Typed href builder for the page route. */
-  readonly nav: PageRouteNavigation<TPath, TSearch>;
-  /** Bound route reference for the page. */
-  readonly route: PageRouteReference<TPath, TSearch>;
-  /** Typed hook bundle for the page. */
-  readonly hooks: PageHooks<TState, TResources, TPath, TSearch, TLayerData>;
-}
+> = DefinePageRoutedDefinitionFor<
+  DefinePageTypeState<TState, TResources, TPath, TSearch, TLayerData>
+>;

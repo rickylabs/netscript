@@ -14,6 +14,7 @@ import {
   mapHistoryEntry,
   mapPrismaRecordToInstance,
   mapSagaToResponse,
+  parseSagaInstanceKv,
 } from './v1-helpers.ts';
 import type { SagaInstanceKv } from './v1-helpers.ts';
 import type {
@@ -118,18 +119,18 @@ export const sagasV1: SagasHandlers<SagasV1RouteKey> = {
 
     if (sagaName && status) {
       const { result } = await sagaColl.findBySecondaryIndex('sagaName', sagaName, {
-        filter: (doc) => (doc.value as unknown as SagaInstanceKv).status === status, // quality-allow: Prisma KV query values are unknown while the generated saga model is validated by the repository schema
+        filter: (doc) => parseSagaInstanceKv(doc.value).status === status,
       });
-      instances = result.map((doc) => doc.value as unknown as SagaInstanceKv); // quality-allow: Prisma KV query values are unknown while the generated saga model is validated by the repository schema
+      instances = result.map((doc) => parseSagaInstanceKv(doc.value));
     } else if (sagaName) {
       const { result } = await sagaColl.findBySecondaryIndex('sagaName', sagaName);
-      instances = result.map((doc) => doc.value as unknown as SagaInstanceKv); // quality-allow: Prisma KV query values are unknown while the generated saga model is validated by the repository schema
+      instances = result.map((doc) => parseSagaInstanceKv(doc.value));
     } else if (status) {
       const { result } = await sagaColl.findBySecondaryIndex('status', status);
-      instances = result.map((doc) => doc.value as unknown as SagaInstanceKv); // quality-allow: Prisma KV query values are unknown while the generated saga model is validated by the repository schema
+      instances = result.map((doc) => parseSagaInstanceKv(doc.value));
     } else {
       const { result } = await sagaColl.getMany();
-      instances = result.map((doc) => doc.value as unknown as SagaInstanceKv); // quality-allow: Prisma KV query values are unknown while the generated saga model is validated by the repository schema
+      instances = result.map((doc) => parseSagaInstanceKv(doc.value));
     }
 
     const total = instances.length;

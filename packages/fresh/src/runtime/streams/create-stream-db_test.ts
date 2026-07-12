@@ -1,18 +1,19 @@
 import { assertEquals } from '@std/assert';
-import {
-  createNetScriptStreamDB,
-  type NetScriptStreamDBFactoryInput,
-  type NetScriptStreamStateDefinition,
-} from './create-stream-db.ts';
+import { createStateSchema } from '@durable-streams/state';
+import { z } from 'zod';
+import { createNetScriptStreamDB, type NetScriptStreamDBFactoryInput } from './create-stream-db.ts';
 
-type TestState = NetScriptStreamStateDefinition & {
-  readonly events: unknown;
+const stateDefinition = {
+  events: {
+    schema: z.object({ id: z.string() }),
+    type: 'event',
+    primaryKey: 'id',
+  },
 };
+type TestState = typeof stateDefinition;
 
 Deno.test('createNetScriptStreamDB wires stream URL, schema, and lifecycle handle through the factory', () => {
-  const schema = {
-    events: { primaryKey: 'id' },
-  };
+  const schema = createStateSchema(stateDefinition);
   let captured: NetScriptStreamDBFactoryInput<TestState> | undefined;
   let stopped = false;
 

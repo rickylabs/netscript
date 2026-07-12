@@ -13,7 +13,7 @@
  * @module
  */
 
-import { kvdex } from '@olli/kvdex';
+import { kvdex, type SchemaDefinition } from '@olli/kvdex';
 import { MapKv } from '@olli/kvdex/kv/map';
 import { createPackageLogger } from '@netscript/logger';
 import { getActiveProvider, getKv, getRawKv } from '../application/shared.ts';
@@ -24,12 +24,8 @@ export type { KvProvider } from '../application/shared.ts';
 
 const logger = createPackageLogger('kv:kvdex');
 
-/**
- * Accepted schema shape — mirrors kvdex's `SchemaDefinition` without importing
- * the internal generic. Structural typing ensures compatibility.
- */
-// deno-lint-ignore no-explicit-any
-export type KvdexSchema = Record<string, any>;
+/** Accepted recursive collection schema published by kvdex. */
+export type KvdexSchema = SchemaDefinition;
 
 /**
  * Options for {@linkcode createNetscriptDb}.
@@ -96,9 +92,7 @@ export async function createNetscriptDb<T extends KvdexSchema>(
       const watchableKv = await getKv();
       const bridge = new WatchableKvBridge(watchableKv);
       logger.debug('Using WatchableKvBridge for kvdex (Redis/Garnet backend)');
-      // kvdex accepts any object matching the DenoKv structural type
-      // deno-lint-ignore no-explicit-any
-      return kvdex({ kv: bridge as any, schema });
+      return kvdex({ kv: bridge, schema });
     }
 
     case 'memory': {

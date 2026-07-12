@@ -82,7 +82,7 @@ export type WorkersContractV1 = typeof workersContractV1;
  *
  * Derived from {@link WorkersContractV1} by binding an opaque request context,
  * so each `WorkersRouter[route]` is the real oRPC procedure implementer (not a
- * `(options: any) => unknown` structural stand-in). Connectors bind their own
+ * `(options: unknown) => unknown` structural stand-in). Connectors bind their own
  * concrete context via `workersContractV1.$context<TheirContext>()`.
  */
 export type WorkersRouter = ReturnType<

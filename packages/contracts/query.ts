@@ -13,8 +13,12 @@
 
 export type {
   ContractObjectSchema,
+  ContractObjectSchemaLike,
   ContractParseResult,
   ContractSchema,
+  ContractSchemaInput,
+  ContractSchemaLike,
+  ContractSchemaOutput,
 } from './src/domain/schema-types.ts';
 export * from './src/application/paginated-query.ts';
 export * from './schemas/filters.ts';

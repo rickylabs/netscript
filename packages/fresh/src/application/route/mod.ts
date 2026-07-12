@@ -4,8 +4,10 @@
  * @module
  */
 
+import type { z } from 'zod';
+
 import {
-  bindRoutePattern as bindRoutePatternImpl,
+  bindOutputRoutePattern,
   createRouteReference as createRouteReferenceImpl,
   defineRouteContract as defineRouteContractImpl,
   enumPathParamSchema as enumPathParamSchemaImpl,
@@ -29,9 +31,7 @@ import type {
   PathParamSchema,
   RouteReference,
   RouteReferenceOptions,
-  SchemaField,
-  SchemaFieldOutput,
-  SchemaOutput,
+  SchemaObjectOutput,
   SearchParamInput,
   SearchParamSchema,
 } from './types.ts';
@@ -53,10 +53,10 @@ export function createRouteReference<const TRoutePattern extends string>(
   routePattern: TRoutePattern,
   metadata?: RouteReferenceOptions,
 ): RouteReference<InferRoutePatternPath<TRoutePattern>, SearchParamInput> {
-  return createRouteReferenceImpl(routePattern, metadata) as unknown as RouteReference<
-    InferRoutePatternPath<TRoutePattern>,
-    SearchParamInput
-  >;
+  return createRouteReferenceImpl<TRoutePattern, InferRoutePatternPath<TRoutePattern>>(
+    routePattern,
+    metadata,
+  );
 }
 
 /**
@@ -75,11 +75,7 @@ export function bindRoutePattern<
   routePattern: string,
   metadata?: RouteReferenceOptions,
 ): BoundRouteContract<TPath, TSearch> {
-  return bindRoutePatternImpl(
-    contract as unknown as Parameters<typeof bindRoutePatternImpl>[0],
-    routePattern,
-    metadata,
-  ) as unknown as BoundRouteContract<TPath, TSearch>;
+  return bindOutputRoutePattern(contract, routePattern, metadata);
 }
 
 /**
@@ -101,10 +97,25 @@ export function defineRouteContract<
   TSearchSchema extends SearchParamSchema<object> | undefined = undefined,
 >(
   options: DefineRouteContractOptions<TPathSchema, TSearchSchema> = {},
-): DefineRouteContract<SchemaOutput<TPathSchema>, SchemaOutput<TSearchSchema>> {
-  return defineRouteContractImpl(
-    options as unknown as Parameters<typeof defineRouteContractImpl>[0],
-  ) as unknown as DefineRouteContract<SchemaOutput<TPathSchema>, SchemaOutput<TSearchSchema>>;
+): DefineRouteContract<SchemaObjectOutput<TPathSchema>, SchemaObjectOutput<TSearchSchema>> {
+  const contract = defineRouteContractImpl<TPathSchema, TSearchSchema>(options);
+  const pathSchema: PathParamSchema<SchemaObjectOutput<TPathSchema>> | undefined =
+    options.pathSchema ? { safeParse: (input) => contract.safeParsePath(input) } : undefined;
+  const searchSchema: SearchParamSchema<SchemaObjectOutput<TSearchSchema>> | undefined =
+    options.searchSchema ? { safeParse: (input) => contract.safeParseSearch(input) } : undefined;
+
+  return {
+    pathSchema,
+    searchSchema,
+    createNav: (routePattern) => contract.createNav(routePattern),
+    bind(routePattern) {
+      return bindRoutePattern(this, routePattern);
+    },
+    parsePath: (input) => contract.parsePath(input),
+    safeParsePath: (input) => contract.safeParsePath(input),
+    parseSearch: (input) => contract.parseSearch(input),
+    safeParseSearch: (input) => contract.safeParseSearch(input),
+  };
 }
 
 /**
@@ -160,14 +171,11 @@ export function defineEnumPathParam<
  * @param defaultValue - Value returned when parsing fails or the field is missing.
  * @returns A `z.catch()` wrapper suitable for `paginationSearchSchema().extend(...)`.
  */
-export function fallback<TSchema extends SchemaField<unknown>>(
+export function fallback<TSchema extends z.ZodType>(
   schema: TSchema,
-  defaultValue: SchemaFieldOutput<TSchema>,
-): TSchema {
-  return fallbackImpl(
-    schema as unknown as Parameters<typeof fallbackImpl>[0],
-    defaultValue,
-  ) as unknown as TSchema;
+  defaultValue: z.output<TSchema>,
+): z.ZodCatch<TSchema> {
+  return fallbackImpl(schema, defaultValue);
 }
 
 /**
@@ -179,7 +187,5 @@ export function fallback<TSchema extends SchemaField<unknown>>(
 export function paginationSearchSchema(
   options: PaginationSearchSchemaOptions = {},
 ): PaginationSearchSchema<PaginationSearchBaseShape> {
-  return paginationSearchSchemaImpl(options) as unknown as PaginationSearchSchema<
-    PaginationSearchBaseShape
-  >;
+  return paginationSearchSchemaImpl(options);
 }

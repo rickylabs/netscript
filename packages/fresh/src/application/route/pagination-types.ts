@@ -5,6 +5,7 @@
  */
 
 import type { SchemaParseResult, SearchParamValue } from './types.ts';
+import type { z } from 'zod';
 export type {
   SchemaParseFailure,
   SchemaParseResult,
@@ -49,23 +50,25 @@ export type SchemaFieldOutput<TSchema> = TSchema extends {
   : unknown;
 
 /** Base schema shape returned by `paginationSearchSchema()`. */
-export interface PaginationSearchBaseShape extends Record<string, SchemaField<unknown>> {
+export type PaginationSearchBaseShape = {
   /** Page field schema. */
-  readonly page: SchemaField<number>;
+  readonly page: z.ZodType<number>;
   /** Limit field schema. */
-  readonly limit: SchemaField<number>;
+  readonly limit: z.ZodType<number>;
   /** Sort key field schema. */
-  readonly sortBy: SchemaField<string>;
+  readonly sortBy: z.ZodType<string>;
   /** Sort direction field schema. */
-  readonly sortOrder: SchemaField<'asc' | 'desc'>;
-}
+  readonly sortOrder: z.ZodType<'asc' | 'desc'>;
+};
 
 /** Public facade for pagination-aware query string parsing. */
-export interface PaginationSearchSchema<TShape extends Record<string, SchemaField>> {
+export interface PaginationSearchSchema<
+  TShape extends z.ZodRawShape & PaginationSearchBaseShape,
+> {
   /** Typed input accepted by the schema. */
   readonly _input: Record<string, SearchParamValue>;
   /** Typed output returned by the schema. */
-  readonly _output: ShapeOutput<TShape> & PaginationSearchState;
+  readonly _output: z.output<z.ZodObject<TShape>> & PaginationSearchState;
 
   /**
    * Extend the schema with additional search fields.
@@ -73,7 +76,7 @@ export interface PaginationSearchSchema<TShape extends Record<string, SchemaFiel
    * @param shape - Additional Zod shape entries.
    * @returns A new pagination schema with the extra fields.
    */
-  extend<TAugmentation extends Record<string, SchemaField>>(
+  extend<TAugmentation extends z.ZodRawShape>(
     shape: TAugmentation,
   ): PaginationSearchSchema<TShape & TAugmentation>;
 
@@ -85,7 +88,7 @@ export interface PaginationSearchSchema<TShape extends Record<string, SchemaFiel
    */
   safeParse(
     input: Record<string, SearchParamValue>,
-  ): SchemaParseResult<ShapeOutput<TShape> & PaginationSearchState>;
+  ): SchemaParseResult<z.output<z.ZodObject<TShape>> & PaginationSearchState>;
 
   /**
    * Parse raw query params into typed pagination state.
@@ -93,7 +96,9 @@ export interface PaginationSearchSchema<TShape extends Record<string, SchemaFiel
    * @param input - Raw search input.
    * @returns Parsed pagination state.
    */
-  parse(input: Record<string, SearchParamValue>): ShapeOutput<TShape> & PaginationSearchState;
+  parse(
+    input: Record<string, SearchParamValue>,
+  ): z.output<z.ZodObject<TShape>> & PaginationSearchState;
 
   /**
    * Async variant of `safeParse()`.
@@ -103,7 +108,7 @@ export interface PaginationSearchSchema<TShape extends Record<string, SchemaFiel
    */
   safeParseAsync(
     input: Record<string, SearchParamValue>,
-  ): Promise<SchemaParseResult<ShapeOutput<TShape> & PaginationSearchState>>;
+  ): Promise<SchemaParseResult<z.output<z.ZodObject<TShape>> & PaginationSearchState>>;
 
   /**
    * Async variant of `parse()`.
@@ -113,7 +118,7 @@ export interface PaginationSearchSchema<TShape extends Record<string, SchemaFiel
    */
   parseAsync(
     input: Record<string, SearchParamValue>,
-  ): Promise<ShapeOutput<TShape> & PaginationSearchState>;
+  ): Promise<z.output<z.ZodObject<TShape>> & PaginationSearchState>;
 }
 
 /** Infer the resolved object output carried by a pagination schema shape. */

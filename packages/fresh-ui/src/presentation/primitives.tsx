@@ -164,20 +164,17 @@ export type PrimitiveChildren = PrimitiveChild | readonly PrimitiveChild[];
 
 /**
  * Structural node returned by element-producing L0 primitives.
+ *
+ * The deliberately minimal shape is satisfied by Preact VNodes without
+ * exposing Preact's generic props parameter through the package surface.
  */
 export interface PrimitiveNode {
-  /**
-   * Render target, such as an intrinsic element name or component function.
-   */
-  type: unknown;
-  /**
-   * Props attached to the rendered node.
-   */
-  props: Record<string, unknown>;
-  /**
-   * Optional render key carried by the rendered node.
-   */
-  key: unknown;
+  /** Render target, such as an intrinsic element name or component function. */
+  readonly type: unknown;
+  /** Props attached to the rendered node. */
+  readonly props: unknown;
+  /** Optional render key carried by the rendered node. */
+  readonly key: unknown;
 }
 
 /**
@@ -238,7 +235,7 @@ export function Icon(props: IconProps): PrimitiveNode {
     },
     title === undefined ? null : h('title', null, title),
     ...ICON_PATHS[name].map((d) => h('path', { d, key: d })),
-  ) as unknown as PrimitiveNode;
+  );
 }
 
 /**

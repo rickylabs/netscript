@@ -48,81 +48,108 @@ export interface WorkflowBuilder<
   /** Set the workflow timeout in milliseconds. */
   timeout(ms: number): this;
   /** Build the workflow definition after at least one step has been configured. */
-  build(): TConfigured extends 'step-set' ? WorkflowDefinition<TId> : never;
+  build(
+    this: TConfigured extends 'step-set' ? WorkflowBuilder<TId, TConfigured, TPayload, TResult>
+      : never,
+  ): WorkflowDefinition<TId>;
 }
+
+type WorkflowBuilderData<TId extends string> = Readonly<{
+  id: TId;
+  steps: readonly DomainWorkflowStep[];
+  metadata: Readonly<Record<string, unknown>>;
+  tags: readonly string[];
+  timeout?: number;
+}>;
 
 class WorkflowBuilderImpl<
   TId extends string,
   TConfigured extends WorkflowBuilderState,
   TPayload,
   TResult,
-> implements WorkflowBuilder<TId, TConfigured, TPayload, TResult> {
-  readonly #id: TId;
-  #steps: DomainWorkflowStep[] = [];
-  #metadata: Record<string, unknown> = {};
-  #tags: string[] = [];
-  #timeout?: number;
+> {
+  readonly #data: WorkflowBuilderData<TId>;
 
-  constructor(id: TId) {
-    this.#id = id;
+  constructor(data: WorkflowBuilderData<TId>) {
+    this.#data = data;
   }
 
   payload<TNextPayload>(): WorkflowBuilder<TId, TConfigured, TNextPayload, TResult> {
-    return this as unknown as WorkflowBuilder<TId, TConfigured, TNextPayload, TResult>;
+    return new WorkflowBuilderImpl<TId, TConfigured, TNextPayload, TResult>(this.#data);
   }
 
   jobStep(
     id: string,
     options: WorkflowJobStepOptions<TPayload>,
   ): WorkflowBuilder<TId, 'step-set', TPayload, TResult> {
-    this.#steps.push({ id, jobId: options.jobId, kind: 'job', payload: options.payload });
-    return this as unknown as WorkflowBuilder<TId, 'step-set', TPayload, TResult>;
+    return new WorkflowBuilderImpl<TId, 'step-set', TPayload, TResult>({
+      ...this.#data,
+      steps: [
+        ...this.#data.steps,
+        { id, jobId: options.jobId, kind: 'job', payload: options.payload },
+      ],
+    });
   }
 
   taskStep(
     id: string,
     options: WorkflowTaskStepOptions<TPayload>,
   ): WorkflowBuilder<TId, 'step-set', TPayload, TResult> {
-    this.#steps.push({ id, kind: 'task', payload: options.payload, taskId: options.taskId });
-    return this as unknown as WorkflowBuilder<TId, 'step-set', TPayload, TResult>;
+    return new WorkflowBuilderImpl<TId, 'step-set', TPayload, TResult>({
+      ...this.#data,
+      steps: [
+        ...this.#data.steps,
+        { id, kind: 'task', payload: options.payload, taskId: options.taskId },
+      ],
+    });
   }
 
   sleep(id: string, durationMs: number): WorkflowBuilder<TId, 'step-set', TPayload, TResult> {
-    this.#steps.push({ durationMs, id, kind: 'sleep' });
-    return this as unknown as WorkflowBuilder<TId, 'step-set', TPayload, TResult>;
+    return new WorkflowBuilderImpl<TId, 'step-set', TPayload, TResult>({
+      ...this.#data,
+      steps: [...this.#data.steps, { durationMs, id, kind: 'sleep' }],
+    });
   }
 
-  tags(...tags: string[]): this {
-    this.#tags = [...new Set([...this.#tags, ...tags])];
-    return this;
+  tags(...tags: string[]): WorkflowBuilderImpl<TId, TConfigured, TPayload, TResult> {
+    return new WorkflowBuilderImpl({
+      ...this.#data,
+      tags: [...new Set([...this.#data.tags, ...tags])],
+    });
   }
 
-  metadata(data: Record<string, unknown>): this {
-    this.#metadata = { ...this.#metadata, ...data };
-    return this;
+  metadata(
+    data: Record<string, unknown>,
+  ): WorkflowBuilderImpl<TId, TConfigured, TPayload, TResult> {
+    return new WorkflowBuilderImpl({
+      ...this.#data,
+      metadata: { ...this.#data.metadata, ...data },
+    });
   }
 
-  timeout(ms: number): this {
-    this.#timeout = ms;
-    return this;
+  timeout(ms: number): WorkflowBuilderImpl<TId, TConfigured, TPayload, TResult> {
+    return new WorkflowBuilderImpl({ ...this.#data, timeout: ms });
   }
 
-  build(): TConfigured extends 'step-set' ? WorkflowDefinition<TId> : never {
-    if (this.#steps.length === 0) {
-      throw new Error(`Workflow "${this.#id}" requires at least one step before build().`);
+  build(
+    this: TConfigured extends 'step-set' ? WorkflowBuilderImpl<TId, TConfigured, TPayload, TResult>
+      : never,
+  ): WorkflowDefinition<TId> {
+    if (this.#data.steps.length === 0) {
+      throw new Error(`Workflow "${this.#data.id}" requires at least one step before build().`);
     }
 
     const definition: DomainWorkflowDefinition<TId> = Object.freeze({
-      id: this.#id as DomainWorkflowId<TId>,
-      metadata: Object.keys(this.#metadata).length > 0
-        ? Object.freeze({ ...this.#metadata })
+      id: this.#data.id as DomainWorkflowId<TId>,
+      metadata: Object.keys(this.#data.metadata).length > 0
+        ? Object.freeze({ ...this.#data.metadata })
         : undefined,
-      steps: this.#steps,
-      tags: this.#tags.length > 0 ? Object.freeze([...this.#tags]) : undefined,
-      timeout: this.#timeout,
+      steps: this.#data.steps,
+      tags: this.#data.tags.length > 0 ? Object.freeze([...this.#data.tags]) : undefined,
+      timeout: this.#data.timeout,
     });
 
-    return definition as TConfigured extends 'step-set' ? WorkflowDefinition<TId> : never;
+    return definition;
   }
 }
 
@@ -130,5 +157,10 @@ class WorkflowBuilderImpl<
 export function defineWorkflow<TId extends string>(
   id: TId,
 ): WorkflowBuilder<TId, 'initial', unknown, unknown> {
-  return new WorkflowBuilderImpl<TId, 'initial', unknown, unknown>(id);
+  return new WorkflowBuilderImpl<TId, 'initial', unknown, unknown>({
+    id,
+    metadata: {},
+    steps: [],
+    tags: [],
+  });
 }

@@ -42,11 +42,11 @@ export function useAccordion({
     value,
   });
   const itemOrder = useRef<string[]>([]);
-  const itemRefs = useRef(new Map<string, HTMLButtonElement | null>());
+  const itemRefs = useRef(new Map<string, HTMLElement | null>());
   const itemDisabledState = useRef(new Map<string, boolean>());
   const focusedValue = focusedValueSignal.value;
 
-  const registerItemTrigger = useCallback((itemValue: string, node: HTMLButtonElement | null) => {
+  const registerItemTrigger = useCallback((itemValue: string, node: HTMLElement | null) => {
     if (node === null) {
       itemRefs.current.delete(itemValue);
       itemOrder.current = itemOrder.current.filter((entry) => entry !== itemValue);
@@ -189,7 +189,7 @@ export function useAccordion({
   const getItemTriggerProps = useCallback(
     (
       item: AccordionItemOptions,
-      props: JSX.ButtonHTMLAttributes<HTMLButtonElement> = {},
+      props: JSX.HTMLAttributes<HTMLElement> = {},
     ): AccordionItemTriggerElementProps => {
       const state = getItemState(item);
       const triggerId = `${rootId}-trigger-${item.value}`;
@@ -206,14 +206,14 @@ export function useAccordion({
         'data-part': 'item-trigger',
         'data-scope': 'accordion',
         'data-state': getAccordionDataState(state.expanded),
-        disabled: state.disabled || props.disabled ? true : undefined,
+        'aria-disabled': state.disabled ? 'true' : props['aria-disabled'],
         id: props.id ?? triggerId,
         onBlur: composeEventHandlers(props.onBlur, () => setFocusedValue(null)),
         onClick: composeEventHandlers(props.onClick, () => toggleItem(item)),
         onFocus: composeEventHandlers(props.onFocus, () => setFocusedValue(item.value)),
         onKeyDown: composeEventHandlers(
           props.onKeyDown,
-          (event: JSX.TargetedKeyboardEvent<HTMLButtonElement>) => {
+          (event: JSX.TargetedKeyboardEvent<HTMLElement>) => {
             const supportedKeys = [
               'ArrowLeft',
               'ArrowRight',
@@ -233,9 +233,8 @@ export function useAccordion({
         ),
         ref: composeRefs(
           props.ref,
-          (node: HTMLButtonElement | null) => registerItemTrigger(item.value, node),
+          (node: HTMLElement | null) => registerItemTrigger(item.value, node),
         ),
-        type: props.type ?? 'button',
       };
     },
     [

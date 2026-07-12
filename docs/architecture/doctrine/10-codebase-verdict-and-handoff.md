@@ -50,6 +50,12 @@ The verdict is one of:
 | `plugins/triggers`            | 5         | 3,170  | Refactor    | Confirm `verify-plugin.ts` exists.                                      |
 | `plugins/workers`             | 5         | 4,345  | Refactor    | Confirm `verify-plugin.ts` exists; review `worker/` vs `jobs/` split.   |
 
+Tracked `@netscript/fresh` restructure debt (2026-07-12): consolidate the public route-contract
+documentation surface exposed by the typed implementation boundary. Ownership stays with the
+existing `@netscript/fresh` Restructure verdict. The closing gate is
+`deno task doc:lint --root packages/fresh` returning zero route-entrypoint diagnostics without
+restoring compatibility casts or adding scanner allowances.
+
 ## Top-priority remediations
 
 1. **`@netscript/cli`** — the CLI is the largest single package and

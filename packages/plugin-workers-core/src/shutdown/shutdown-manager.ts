@@ -31,6 +31,8 @@ export type ShutdownReport = Readonly<{
 
 /** Coordinates graceful shutdown for runtime resources. */
 export class ShutdownManager {
+  /** Stable shutdown coordinator identifier. */
+  readonly id = 'shutdown-manager';
   readonly #resources = new Map<string, ShutdownResource>();
   readonly #waiters = new Set<() => void>();
   readonly #timeoutMs: number;

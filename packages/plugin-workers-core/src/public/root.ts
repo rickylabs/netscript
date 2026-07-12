@@ -180,7 +180,10 @@ export interface JobBuilder<
     ) => JobResult<TNextResult> | Promise<JobResult<TNextResult>>,
   ): JobBuilder<TId, 'handler-set', TNextPayload, TNextResult>;
   /** Narrow the payload type carried by this job definition. */
-  payload<TNextPayload>(): JobBuilder<TId, TConfigured, TNextPayload, TResult>;
+  payload<TNextPayload>(
+    this: TConfigured extends 'handler-set' ? never
+      : JobBuilder<TId, TConfigured, TPayload, TResult>,
+  ): JobBuilder<TId, TConfigured, TNextPayload, TResult>;
   /** Set the cron schedule expression for this job.
    * @deprecated Define recurring work with `defineScheduledTrigger(...).enqueueJob(...)`.
    */
@@ -206,7 +209,11 @@ export interface JobBuilder<
   /** Set the queue trigger name for this job. */
   queueTrigger(name: string): this;
   /** Build the job definition after an entrypoint or handler has been configured. */
-  build(): TConfigured extends 'entrypoint-set' | 'handler-set' ? JobDefinition<TId> : never;
+  build(
+    this: TConfigured extends 'entrypoint-set' | 'handler-set'
+      ? JobBuilder<TId, TConfigured, TPayload, TResult>
+      : never,
+  ): JobDefinition<TId>;
 }
 
 /** Root-surface task builder typestate API. */
@@ -227,7 +234,10 @@ export interface TaskBuilder<
     ) => TNextResult | Promise<TNextResult>,
   ): TaskBuilder<TId, 'handler-set', TNextPayload, TNextResult>;
   /** Narrow the payload type carried by this task definition. */
-  payload<TNextPayload>(): TaskBuilder<TId, TConfigured, TNextPayload, TResult>;
+  payload<TNextPayload>(
+    this: TConfigured extends 'handler-set' ? never
+      : TaskBuilder<TId, TConfigured, TPayload, TResult>,
+  ): TaskBuilder<TId, TConfigured, TNextPayload, TResult>;
   /** Set the task timeout in milliseconds. */
   timeout(ms: number): this;
   /** Set the maximum retry count. */
@@ -247,7 +257,11 @@ export interface TaskBuilder<
   /** Enable or disable this task definition. */
   enabled(value: boolean): this;
   /** Build the task definition after an entrypoint or handler has been configured. */
-  build(): TConfigured extends 'entrypoint-set' | 'handler-set' ? TaskDefinition<TId> : never;
+  build(
+    this: TConfigured extends 'entrypoint-set' | 'handler-set'
+      ? TaskBuilder<TId, TConfigured, TPayload, TResult>
+      : never,
+  ): TaskDefinition<TId>;
 }
 
 /** Root-surface workflow builder typestate API. */
@@ -282,7 +296,10 @@ export interface WorkflowBuilder<
   /** Set the workflow timeout in milliseconds. */
   timeout(ms: number): this;
   /** Build the workflow definition after at least one step has been configured. */
-  build(): TConfigured extends 'step-set' ? WorkflowDefinition<TId> : never;
+  build(
+    this: TConfigured extends 'step-set' ? WorkflowBuilder<TId, TConfigured, TPayload, TResult>
+      : never,
+  ): WorkflowDefinition<TId>;
 }
 
 /** Minimal workers runtime handle returned by root helpers. */
@@ -306,21 +323,21 @@ export type StartWorkersOptions =
 export function defineJob<TId extends string>(
   id: TId,
 ): JobBuilder<TId, 'initial', unknown, unknown> {
-  return defineJobImpl(id) as unknown as JobBuilder<TId, 'initial', unknown, unknown>;
+  return defineJobImpl(id);
 }
 
 /** Start a worker task definition chain. */
 export function defineTask<TId extends string>(
   id: TId,
 ): TaskBuilder<TId, 'initial', unknown, unknown> {
-  return defineTaskImpl(id) as unknown as TaskBuilder<TId, 'initial', unknown, unknown>;
+  return defineTaskImpl(id);
 }
 
 /** Start a worker workflow definition chain. */
 export function defineWorkflow<TId extends string>(
   id: TId,
 ): WorkflowBuilder<TId, 'initial', unknown, unknown> {
-  return defineWorkflowImpl(id) as unknown as WorkflowBuilder<TId, 'initial', unknown, unknown>;
+  return defineWorkflowImpl(id);
 }
 
 /** Cron schedule helpers for worker jobs. */

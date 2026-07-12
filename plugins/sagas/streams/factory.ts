@@ -7,10 +7,11 @@
  * @module
  */
 
+import { createStateSchema } from '@durable-streams/state';
 import { createStreamDB } from '@durable-streams/state/db';
-import type { StreamStateDefinition as DurableStreamStateDefinition } from '@durable-streams/state';
 import { buildStreamUrl, getStreamsAuth } from '@netscript/plugin-streams-core';
-import { type SagaInstance, sagasStreamSchema } from './schema.ts';
+import { z } from 'zod';
+import { type SagaInstance, SagaInstanceSchema } from './schema.ts';
 
 export type { SagaInstance };
 
@@ -45,6 +46,16 @@ export interface SagasStreamDB {
  */
 export function createSagasStreamDB(options: { baseUrl?: string } = {}): SagasStreamDB {
   const baseUrl = options.baseUrl ?? 'http://localhost:4437';
+  const sagaInstanceSchema: z.ZodType<SagaInstance> = z.unknown().transform(
+    (value): SagaInstance => SagaInstanceSchema.parse(value),
+  );
+  const state = createStateSchema({
+    sagaInstance: {
+      schema: sagaInstanceSchema,
+      type: 'saga-instance',
+      primaryKey: 'instanceId',
+    },
+  });
 
   return createStreamDB({
     streamOptions: {
@@ -52,6 +63,6 @@ export function createSagasStreamDB(options: { baseUrl?: string } = {}): SagasSt
       contentType: 'application/json',
       headers: getStreamsAuth(),
     },
-    state: sagasStreamSchema as unknown as DurableStreamStateDefinition, // quality-allow: durable-stream schema generics are invariant across the generated saga entity map
-  }) as unknown as SagasStreamDB; // quality-allow: durable-stream schema generics are invariant across the generated saga entity map
+    state,
+  });
 }

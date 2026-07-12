@@ -4,6 +4,10 @@
  * @module
  */
 
+import type { RouteReference } from './_internal/contract-types.ts';
+export type { RouteReference } from './_internal/contract-types.ts';
+export type { SchemaObjectOutput, SchemaOutput } from './schema-output.ts';
+
 export type * from './pagination-types.ts';
 
 /** Empty object shape used by route helpers without typed params. */
@@ -264,96 +268,6 @@ export interface RouteReferenceOptions {
   readonly kind?: RouteReferenceKind;
 }
 
-/**
- * Stable route reference returned by route contracts and generated manifests.
- */
-export interface RouteReference<
-  TPath extends object = EmptyRecord,
-  TSearch extends object = EmptyRecord,
-> extends RouteContractTypeCarrier<TPath, TSearch> {
-  /** Fresh route pattern used to generate the href. */
-  readonly routePattern: string;
-  /** Optional typed path schema for the route. */
-  readonly pathSchema?: PathParamSchema<TPath>;
-  /** Optional typed search schema for the route. */
-  readonly searchSchema?: SearchParamSchema<TSearch>;
-  /** Typed href builder for the route. */
-  readonly nav: RouteNavigation<TPath, TSearch>;
-  /** Raw pattern emitted into the generated route manifest. */
-  readonly $pattern: string;
-  /** Static href when the route has no dynamic path params. */
-  readonly $href?: ValidatedRouteHref;
-  /** Optional manifest id. */
-  readonly $id?: string;
-  /** Optional manifest route kind. */
-  readonly $kind?: RouteReferenceKind;
-
-  /**
-   * Build a validated href for the route.
-   *
-   * @param args - Optional path and search input.
-   * @returns A route href ready for links or redirects.
-   */
-  href(...args: RouteHrefArgs<TPath, TSearch>): ValidatedRouteHref;
-
-  /**
-   * Materialize Fresh link props for the route.
-   *
-   * @param input - Bound link config without the target route.
-   * @returns Anchor props with a generated `href`.
-   */
-  getLinkProps(
-    input: RouteLinkPropsInput<TPath, TSearch>,
-  ): FreshLinkAttributes & { readonly href: ValidatedRouteHref };
-
-  /**
-   * Parse raw path params into typed route path state.
-   *
-   * @param input - Raw Fresh path params.
-   * @returns The parsed path object.
-   */
-  parsePath(input: PathParamInput): TPath;
-
-  /**
-   * Safely parse raw path params into typed route path state.
-   *
-   * @param input - Raw Fresh path params.
-   * @returns Success or failure parse result.
-   */
-  safeParsePath(input: PathParamInput): SchemaParseResult<TPath>;
-
-  /**
-   * Parse raw query params into typed route search state.
-   *
-   * @param input - Raw query params as `URLSearchParams` or a plain object.
-   * @returns The parsed search object.
-   */
-  parseSearch(input: URLSearchParams | SearchParamInput): TSearch;
-
-  /**
-   * Safely parse raw query params into typed route search state.
-   *
-   * @param input - Raw query params as `URLSearchParams` or a plain object.
-   * @returns Success or failure parse result.
-   */
-  safeParseSearch(input: URLSearchParams | SearchParamInput): SchemaParseResult<TSearch>;
-
-  /**
-   * Fresh link component already bound to the route reference.
-   */
-  readonly Link: (props: RouteLinkComponentProps<TPath, TSearch>) => unknown;
-
-  /**
-   * Pair the page route with a framework partial route.
-   *
-   * @param partialRoute - Partial route reference.
-   * @returns A helper that can produce page and partial hrefs together.
-   */
-  withPartial<TPartialPath extends object, TPartialSearch extends object>(
-    partialRoute: RouteReference<TPartialPath, TPartialSearch>,
-  ): PairedRouteTarget<TPath, TSearch, TPartialPath, TPartialSearch>;
-}
-
 /** Bound route reference created from a route contract and concrete route pattern. */
 export type BoundRouteContract<
   TPath extends object = EmptyRecord,
@@ -498,10 +412,3 @@ export interface EnumPathParamDefinition<
    */
   parse(value: string | undefined): TValues[number] | null;
 }
-
-/** Infer the output object carried by a route schema. */
-export type SchemaOutput<TSchema> = TSchema extends undefined ? EmptyRecord
-  : TSchema extends { readonly _output: infer TOutput extends object } ? TOutput
-  : TSchema extends { safeParse(input: unknown): SchemaParseResult<infer TOutput extends object> }
-    ? TOutput
-  : EmptyRecord;

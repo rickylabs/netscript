@@ -5,7 +5,7 @@ import type { FreshUiChildren } from '../_internal/public-props.ts';
 export type AccordionRootElementProps = JSX.HTMLAttributes<HTMLDivElement> & MachineDataAttributes;
 export type AccordionItemElementProps = JSX.HTMLAttributes<HTMLDivElement> & MachineDataAttributes;
 export type AccordionItemTriggerElementProps =
-  & JSX.ButtonHTMLAttributes<HTMLButtonElement>
+  & JSX.HTMLAttributes<HTMLElement>
   & MachineDataAttributes;
 export type AccordionItemIndicatorElementProps =
   & JSX.HTMLAttributes<HTMLDivElement>
@@ -64,7 +64,7 @@ export interface UseAccordionReturn {
   getItemState: (item: AccordionItemOptions) => AccordionItemState;
   getItemTriggerProps: (
     item: AccordionItemOptions,
-    props?: JSX.ButtonHTMLAttributes<HTMLButtonElement>,
+    props?: JSX.HTMLAttributes<HTMLElement>,
   ) => AccordionItemTriggerElementProps;
   getRootProps: (props?: JSX.HTMLAttributes<HTMLDivElement>) => AccordionRootElementProps;
   orientation: AccordionOrientation;
@@ -86,7 +86,6 @@ export type AccordionItemProps = AccordionItemElementProps & {
 /** Props for an accordion item trigger component. */
 export type AccordionItemTriggerProps = AccordionItemTriggerElementProps & {
   children: FreshUiChildren;
-  type?: 'button' | 'submit' | 'reset';
 };
 
 /** Props for an accordion item indicator component. */

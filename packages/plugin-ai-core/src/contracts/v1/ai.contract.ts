@@ -51,6 +51,7 @@ import {
   toolResultStateZodSchema,
   usageZodSchema,
 } from './ai.contract-schemas.ts';
+import { toContractErrorDefinition } from './base-error-adapter.ts';
 
 // --- Message-body type re-exports --------------------------------------------
 // Plugin IO derives from the engine vocabulary rather than redeclaring it.
@@ -122,13 +123,16 @@ export interface AiCapabilities {
 
 // --- Base contract vocabulary ------------------------------------------------
 // Converge onto the shared plugin error vocabulary (NOT_FOUND, VALIDATION_ERROR,
-// INTERNAL). `BASE_PLUGIN_ERRORS` types each `data` field as `unknown` (a plain
-// error vocabulary, not a builder fragment), so it crosses into the oRPC
-// contract builder via the single sanctioned centralized-contract boundary cast
-// — the same pattern `BASE_PLUGIN_CONTRACT_ROUTES` uses. Everything downstream
-// (routes, schemas, the contract type, `implement`) is genuinely typed.
+// INTERNAL). The shared vocabulary intentionally exposes `data` as `unknown`,
+// so this adapter validates the Standard Schema boundary before oRPC receives it.
+const CONTRACT_BASE_ERRORS = {
+  NOT_FOUND: toContractErrorDefinition(BASE_PLUGIN_ERRORS.NOT_FOUND),
+  VALIDATION_ERROR: toContractErrorDefinition(BASE_PLUGIN_ERRORS.VALIDATION_ERROR),
+  INTERNAL: toContractErrorDefinition(BASE_PLUGIN_ERRORS.INTERNAL),
+} satisfies ErrorMap;
+
 const baseContract: ReturnType<typeof oc.errors> = oc.errors(
-  { ...BASE_PLUGIN_ERRORS } as unknown as Parameters<typeof oc.errors>[0],
+  CONTRACT_BASE_ERRORS,
 );
 
 /**

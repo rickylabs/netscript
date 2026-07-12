@@ -103,3 +103,14 @@ Deno.test('ai contract exposes a precise, non-loosened type surface', () => {
   assertEquals(_badTranscribeResponse.text as unknown, 42);
   assertEquals(typeof _router.chat, 'object');
 });
+
+Deno.test('ai contract carries validated Standard Schema base error data', () => {
+  const errorMap = aiContractV1.models['~orpc'].errorMap;
+
+  for (const code of ['NOT_FOUND', 'VALIDATION_ERROR', 'INTERNAL'] as const) {
+    const definition = errorMap[code];
+    assert(definition?.data, `${code} must carry a data schema`);
+    assertEquals(definition.data['~standard'].version, 1);
+    assertEquals(typeof definition.data['~standard'].validate, 'function');
+  }
+});

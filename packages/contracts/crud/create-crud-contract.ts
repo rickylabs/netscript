@@ -44,9 +44,16 @@ import { baseContract, type BaseContractRoute } from '../src/application/contrac
  * are the sound `BaseContractRoute` type exported by this package.
  */
 const asSchema = (schema: unknown): AnySchema => schema as AnySchema;
+/** Bridges structurally compatible Zod copies only while composing local schemas. */
+const asZodSchema = <TOutput, TInput>(schema: unknown): z.ZodType<TOutput, TInput> =>
+  schema as z.ZodType<TOutput, TInput>;
+/** Bridges an object schema across npm/JSR module identities to read its shape. */
+const asZodObject = (schema: unknown): z.ZodObject => schema as z.ZodObject;
 import type {
   ContractObjectSchema,
-  ContractSchema,
+  ContractObjectSchemaLike,
+  ContractSchemaInput,
+  ContractSchemaLike,
   ContractSchemaOutput,
 } from '../src/domain/schema-types.ts';
 import {
@@ -54,6 +61,7 @@ import {
   type PaginatedResult,
   type PaginationInput,
   PaginationInputSchema,
+  type PaginationOutputSchema,
 } from '../schemas/pagination.ts';
 
 // ============================================================================
@@ -64,11 +72,11 @@ import {
  * Options for creating a CRUD contract.
  */
 export interface CrudContractOptions<
-  TEntity extends ContractSchema<unknown>,
-  TCreate extends ContractSchema<unknown>,
-  TUpdate extends ContractSchema<unknown>,
-  TId extends ContractSchema<unknown> = ContractSchema<number>,
-  TFilter extends ContractObjectSchema<unknown> | undefined = undefined,
+  TEntity extends ContractSchemaLike<unknown>,
+  TCreate extends ContractSchemaLike<unknown>,
+  TUpdate extends ContractSchemaLike<unknown>,
+  TId extends ContractSchemaLike<unknown> = ContractSchemaLike<number>,
+  TFilter extends ContractObjectSchemaLike<unknown> | undefined = undefined,
 > {
   /** Resource name (used in route paths, e.g., 'users' → /users) */
   resource: string;
@@ -119,8 +127,8 @@ export type CrudRoute = BaseContractRoute<AnySchema, AnySchema>;
  * typing stays precise.
  */
 export type CrudContractOperation<
-  TInputSchema extends ContractSchema<unknown> = ContractSchema<unknown>,
-  TOutputSchema extends ContractSchema<unknown> = ContractSchema<unknown>,
+  TInputSchema extends ContractSchemaLike<unknown> = ContractSchemaLike<unknown>,
+  TOutputSchema extends ContractSchemaLike<unknown> = ContractSchemaLike<unknown>,
 > =
   & CrudRoute
   & Readonly<{
@@ -137,39 +145,46 @@ export type CrudContractOperation<
   }>;
 
 /** Input schema shape for CRUD operations addressed by identifier. */
-export type CrudIdInput<TId extends ContractSchema<unknown>> = ContractObjectSchema<
-  Readonly<{ id: ContractSchemaOutput<TId> }>
+export type CrudIdInput<TId extends ContractSchemaLike<unknown>> = ContractObjectSchema<
+  Readonly<{ id: ContractSchemaOutput<TId> }>,
+  Readonly<{ id: ContractSchemaInput<TId> }>
 >;
 
 /** Input schema shape for list operations with pagination and optional filters. */
-export type CrudListInput<TFilter extends ContractObjectSchema<unknown> | undefined> =
-  TFilter extends ContractObjectSchema<infer TFilterOutput> ? ContractObjectSchema<
-      PaginationInput & TFilterOutput
+export type CrudListInput<TFilter extends ContractObjectSchemaLike<unknown> | undefined> =
+  TFilter extends ContractObjectSchemaLike<infer TFilterOutput> ? ContractObjectSchema<
+      PaginationInput & TFilterOutput,
+      ContractSchemaInput<typeof PaginationInputSchema> & ContractSchemaInput<TFilter>
     >
-    : ContractObjectSchema<PaginationInput>;
+    : typeof PaginationInputSchema;
 
 /** Output schema shape for list operations with paginated entities. */
-export type CrudListOutput<TEntity extends ContractSchema<unknown>> = ContractObjectSchema<
-  PaginatedResult<ContractSchemaOutput<TEntity>>
+export type CrudListOutput<TEntity extends ContractSchemaLike<unknown>> = ContractObjectSchema<
+  PaginatedResult<ContractSchemaOutput<TEntity>>,
+  Readonly<{
+    data: ContractSchemaInput<TEntity>[];
+    pagination: ContractSchemaInput<typeof PaginationOutputSchema>;
+  }>
 >;
 
 /** Input schema shape for update operations addressed by identifier. */
 export type CrudUpdateInput<
-  TId extends ContractSchema<unknown>,
-  TUpdate extends ContractSchema<unknown>,
+  TId extends ContractSchemaLike<unknown>,
+  TUpdate extends ContractSchemaLike<unknown>,
 > = ContractObjectSchema<
-  Readonly<{ id: ContractSchemaOutput<TId>; data: ContractSchemaOutput<TUpdate> }>
+  Readonly<{ id: ContractSchemaOutput<TId>; data: ContractSchemaOutput<TUpdate> }>,
+  Readonly<{ id: ContractSchemaInput<TId>; data: ContractSchemaInput<TUpdate> }>
 >;
 
 /**
  * Generated CRUD contract shape.
  */
 export type CrudContract<
-  TEntity extends ContractSchema<unknown> = ContractSchema<unknown>,
-  TCreate extends ContractSchema<unknown> = ContractSchema<unknown>,
-  TUpdate extends ContractSchema<unknown> = ContractSchema<unknown>,
-  TId extends ContractSchema<unknown> = ContractSchema<number>,
-  TFilter extends ContractObjectSchema<unknown> | undefined = undefined,
+  TEntity extends ContractSchemaLike<unknown> = ContractSchemaLike<unknown>,
+  TCreate extends ContractSchemaLike<unknown> = ContractSchemaLike<unknown>,
+  TUpdate extends ContractSchemaLike<unknown> = ContractSchemaLike<unknown>,
+  TId extends ContractSchemaLike<unknown> = ContractSchemaLike<number>,
+  TFilter extends ContractObjectSchemaLike<unknown> | undefined = undefined,
 > = Readonly<{
   list: CrudContractOperation<CrudListInput<TFilter>, CrudListOutput<TEntity>>;
   getById: CrudContractOperation<CrudIdInput<TId>, TEntity>;
@@ -180,19 +195,19 @@ export type CrudContract<
 
 /** Generated CRUD contract shape when selected operations are disabled. */
 export type PartialCrudContract<
-  TEntity extends ContractSchema<unknown> = ContractSchema<unknown>,
-  TCreate extends ContractSchema<unknown> = ContractSchema<unknown>,
-  TUpdate extends ContractSchema<unknown> = ContractSchema<unknown>,
-  TId extends ContractSchema<unknown> = ContractSchema<number>,
-  TFilter extends ContractObjectSchema<unknown> | undefined = undefined,
+  TEntity extends ContractSchemaLike<unknown> = ContractSchemaLike<unknown>,
+  TCreate extends ContractSchemaLike<unknown> = ContractSchemaLike<unknown>,
+  TUpdate extends ContractSchemaLike<unknown> = ContractSchemaLike<unknown>,
+  TId extends ContractSchemaLike<unknown> = ContractSchemaLike<number>,
+  TFilter extends ContractObjectSchemaLike<unknown> | undefined = undefined,
 > = Readonly<Partial<CrudContract<TEntity, TCreate, TUpdate, TId, TFilter>>>;
 
 type MutablePartialCrudContract<
-  TEntity extends ContractSchema<unknown>,
-  TCreate extends ContractSchema<unknown>,
-  TUpdate extends ContractSchema<unknown>,
-  TId extends ContractSchema<unknown>,
-  TFilter extends ContractObjectSchema<unknown> | undefined,
+  TEntity extends ContractSchemaLike<unknown>,
+  TCreate extends ContractSchemaLike<unknown>,
+  TUpdate extends ContractSchemaLike<unknown>,
+  TId extends ContractSchemaLike<unknown>,
+  TFilter extends ContractObjectSchemaLike<unknown> | undefined,
 > = {
   -readonly [K in keyof CrudContract<TEntity, TCreate, TUpdate, TId, TFilter>]?: CrudContract<
     TEntity,
@@ -204,8 +219,8 @@ type MutablePartialCrudContract<
 };
 
 function crudOperation<
-  TInputSchema extends ContractSchema<unknown>,
-  TOutputSchema extends ContractSchema<unknown>,
+  TInputSchema extends ContractSchemaLike<unknown>,
+  TOutputSchema extends ContractSchemaLike<unknown>,
 >(
   operation: CrudRoute,
 ): CrudContractOperation<TInputSchema, TOutputSchema> {
@@ -261,11 +276,11 @@ function crudOperation<
  * Create a full CRUD contract with every operation enabled.
  */
 export function createCrudContract<
-  TEntity extends ContractSchema<unknown>,
-  TCreate extends ContractSchema<unknown>,
-  TUpdate extends ContractSchema<unknown>,
-  TId extends ContractSchema<unknown> = ContractSchema<number>,
-  TFilter extends ContractObjectSchema<unknown> | undefined = undefined,
+  TEntity extends ContractSchemaLike<unknown>,
+  TCreate extends ContractSchemaLike<unknown>,
+  TUpdate extends ContractSchemaLike<unknown>,
+  TId extends ContractSchemaLike<unknown> = ContractSchemaLike<number>,
+  TFilter extends ContractObjectSchemaLike<unknown> | undefined = undefined,
 >(
   options: CrudContractOptions<TEntity, TCreate, TUpdate, TId, TFilter> & {
     readonly disable?: undefined;
@@ -275,22 +290,22 @@ export function createCrudContract<
  * Create a CRUD contract with selected operations disabled.
  */
 export function createCrudContract<
-  TEntity extends ContractSchema<unknown>,
-  TCreate extends ContractSchema<unknown>,
-  TUpdate extends ContractSchema<unknown>,
-  TId extends ContractSchema<unknown> = ContractSchema<number>,
-  TFilter extends ContractObjectSchema<unknown> | undefined = undefined,
+  TEntity extends ContractSchemaLike<unknown>,
+  TCreate extends ContractSchemaLike<unknown>,
+  TUpdate extends ContractSchemaLike<unknown>,
+  TId extends ContractSchemaLike<unknown> = ContractSchemaLike<number>,
+  TFilter extends ContractObjectSchemaLike<unknown> | undefined = undefined,
 >(
   options: CrudContractOptions<TEntity, TCreate, TUpdate, TId, TFilter> & {
     readonly disable: CrudOperationDisable;
   },
 ): PartialCrudContract<TEntity, TCreate, TUpdate, TId, TFilter>;
 export function createCrudContract<
-  TEntity extends ContractSchema<unknown>,
-  TCreate extends ContractSchema<unknown>,
-  TUpdate extends ContractSchema<unknown>,
-  TId extends ContractSchema<unknown> = ContractSchema<number>,
-  TFilter extends ContractObjectSchema<unknown> | undefined = undefined,
+  TEntity extends ContractSchemaLike<unknown>,
+  TCreate extends ContractSchemaLike<unknown>,
+  TUpdate extends ContractSchemaLike<unknown>,
+  TId extends ContractSchemaLike<unknown> = ContractSchemaLike<number>,
+  TFilter extends ContractObjectSchemaLike<unknown> | undefined = undefined,
 >(
   options: CrudContractOptions<TEntity, TCreate, TUpdate, TId, TFilter>,
 ):
@@ -307,30 +322,28 @@ export function createCrudContract<
     entitySchema,
     createSchema,
     updateSchema,
-    idSchema = z.coerce.number().int().positive() as unknown as TId,
+    idSchema: configuredIdSchema,
     filterSchema,
     disable,
   } = options;
+  const idSchema = configuredIdSchema ?? z.coerce.number().int().positive();
 
   // Build list input schema (pagination + optional filters)
-  const listInputSchema = (
-    filterSchema
-      ? PaginationInputSchema.merge(filterSchema as unknown as z.ZodObject)
-      : PaginationInputSchema
-  ) as CrudListInput<TFilter>;
+  const listInputSchema = filterSchema
+    ? z.object({ ...PaginationInputSchema.shape, ...asZodObject(filterSchema).shape })
+    : PaginationInputSchema;
 
   // Build list output schema
-  const listOutputSchema = createPaginatedOutput(
-    entitySchema,
-  ) as CrudListOutput<TEntity>;
+  const listOutputSchema = createPaginatedOutput(entitySchema);
 
   // ID input schema
   const idInputSchema = z.object({
-    id: idSchema as unknown as z.ZodTypeAny,
-  }) as unknown as CrudIdInput<TId>;
-  const updateInputSchema = idInputSchema.merge(
-    z.object({ data: updateSchema as unknown as z.ZodTypeAny }),
-  ) as CrudUpdateInput<TId, TUpdate>;
+    id: asZodSchema(idSchema),
+  });
+  const updateInputSchema = z.object({
+    id: asZodSchema(idSchema),
+    data: asZodSchema(updateSchema),
+  });
 
   const operations: CrudContract<TEntity, TCreate, TUpdate, TId, TFilter> = {
     list: crudOperation(
@@ -409,24 +422,24 @@ export function createCrudContract<
  * });
  * ```
  */
-export function createReadOnlyContract<TEntity extends ContractSchema<unknown>>(options: {
+export function createReadOnlyContract<TEntity extends ContractSchemaLike<unknown>>(options: {
   resource: string;
   entitySchema: TEntity;
-  idSchema?: ContractSchema<unknown>;
-  filterSchema?: ContractObjectSchema<unknown>;
+  idSchema?: ContractSchemaLike<unknown>;
+  filterSchema?: ContractObjectSchemaLike<unknown>;
 }): PartialCrudContract<
   TEntity,
-  ContractSchema<never>,
-  ContractSchema<never>,
-  ContractSchema<unknown>,
-  ContractObjectSchema<unknown> | undefined
+  ContractSchemaLike<never>,
+  ContractSchemaLike<never>,
+  ContractSchemaLike<unknown>,
+  ContractObjectSchemaLike<unknown> | undefined
 > {
   return createCrudContract<
     TEntity,
-    ContractSchema<never>,
-    ContractSchema<never>,
-    ContractSchema<unknown>,
-    ContractObjectSchema<unknown> | undefined
+    ContractSchemaLike<never>,
+    ContractSchemaLike<never>,
+    ContractSchemaLike<unknown>,
+    ContractObjectSchemaLike<unknown> | undefined
   >({
     resource: options.resource,
     entitySchema: options.entitySchema,
@@ -453,23 +466,23 @@ export function createReadOnlyContract<TEntity extends ContractSchema<unknown>>(
  * });
  * ```
  */
-export function createListOnlyContract<TEntity extends ContractSchema<unknown>>(options: {
+export function createListOnlyContract<TEntity extends ContractSchemaLike<unknown>>(options: {
   resource: string;
   entitySchema: TEntity;
-  filterSchema?: ContractObjectSchema<unknown>;
+  filterSchema?: ContractObjectSchemaLike<unknown>;
 }): PartialCrudContract<
   TEntity,
-  ContractSchema<never>,
-  ContractSchema<never>,
-  ContractSchema<number>,
-  ContractObjectSchema<unknown> | undefined
+  ContractSchemaLike<never>,
+  ContractSchemaLike<never>,
+  ContractSchemaLike<number>,
+  ContractObjectSchemaLike<unknown> | undefined
 > {
   return createCrudContract<
     TEntity,
-    ContractSchema<never>,
-    ContractSchema<never>,
-    ContractSchema<number>,
-    ContractObjectSchema<unknown> | undefined
+    ContractSchemaLike<never>,
+    ContractSchemaLike<never>,
+    ContractSchemaLike<number>,
+    ContractObjectSchemaLike<unknown> | undefined
   >({
     resource: options.resource,
     entitySchema: options.entitySchema,

@@ -9,6 +9,7 @@ import {
 } from './constants.ts';
 import { JobDefinitionPublicBaseSchema } from './public-schema.ts';
 import { TaskPermissionsInputSchema } from './task.ts';
+import type { TaskPermissionsInput } from './task.ts';
 
 /** Branded worker job identifier. */
 export type JobId<TId extends string = string> = TId & { readonly __brand: 'JobId' };
@@ -118,7 +119,35 @@ export type JobEditable = typeof JobEditableSchema['_output'];
 export type JobSystem = typeof JobSystemSchema['_output'];
 
 /** Stored job definition. */
-export type StoredJobDefinition = JobEditable & JobSystem;
+export type StoredJobDefinition = Readonly<{
+  id: string;
+  name: string;
+  description?: string;
+  topic: string;
+  entrypoint: string;
+  schedule?: string;
+  timezone: string;
+  timeout: number;
+  maxRetries: number;
+  priority: number;
+  enabled: boolean;
+  tags: string[];
+  metadata?: Record<string, unknown>;
+  retention?: Record<string, unknown>;
+  source: 'database' | 'local' | 'plugin' | 'remote';
+  pluginId?: string;
+  executionType: 'deno' | 'wrapper';
+  sourceUrl?: string;
+  importMapUrl?: string;
+  allowedImportHosts?: string[];
+  wrapperType?: string;
+  wrapperConfig?: Record<string, unknown>;
+  retryDelay: number;
+  maxConcurrency: number;
+  persist: boolean;
+  permissions?: TaskPermissionsInput;
+  signature?: Record<string, unknown>;
+}>;
 
 /** Public job definition produced by the job builder. */
 export type JobDefinition<
@@ -126,7 +155,7 @@ export type JobDefinition<
   TPayload = unknown,
   TResult = unknown,
 > = Readonly<
-  Omit<typeof JobDefinitionSchema['_output'], 'id' | 'entrypoint'> & {
+  Omit<StoredJobDefinition, 'id' | 'entrypoint'> & {
     id: JobId<TId>;
     entrypoint?: string;
     handler?: JobHandler<TPayload, TResult>;

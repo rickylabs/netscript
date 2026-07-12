@@ -81,8 +81,7 @@ export async function paginatedQuery<T>(
   const orderBy = sortBy ? { [sortBy]: sortOrder } : { createdAt: sortOrder };
 
   // Build query args
-  // deno-lint-ignore no-explicit-any
-  const findManyArgs: Record<string, any> = {
+  const findManyArgs: Record<string, unknown> = {
     where,
     orderBy,
     skip,
@@ -160,8 +159,7 @@ export async function offsetPaginatedQuery<T>(
 
   const orderBy = sortBy ? { [sortBy]: sortOrder } : { createdAt: sortOrder };
 
-  // deno-lint-ignore no-explicit-any
-  const findManyArgs: Record<string, any> = {
+  const findManyArgs: Record<string, unknown> = {
     where,
     orderBy,
     skip: offset,
@@ -235,8 +233,7 @@ export async function cursorPaginatedQuery<T extends { id: string | number }>(
 
   const orderBy = { [cursorField]: direction === 'forward' ? 'asc' : 'desc' };
 
-  // deno-lint-ignore no-explicit-any
-  const findManyArgs: Record<string, any> = {
+  const findManyArgs: Record<string, unknown> = {
     where,
     orderBy,
     take: limit + 1, // Fetch one extra to check if there's more

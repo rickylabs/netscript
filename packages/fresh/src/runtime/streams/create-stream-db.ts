@@ -116,10 +116,35 @@ export function createNetScriptStreamDB<TDef extends NetScriptStreamStateDefinit
 function defaultCreateStreamDB<TDef extends NetScriptStreamStateDefinition>(
   input: NetScriptStreamDBFactoryInput<TDef>,
 ): NetScriptStreamDB<TDef> {
+  if (!isDurableStateSchema(input.state)) {
+    throw new TypeError(
+      'NetScript StreamDB schemas must be created from durable-stream collection definitions',
+    );
+  }
+
   return createStreamDB(
     {
       streamOptions: input.streamOptions,
-      state: input.state as unknown as StateSchema<StreamStateDefinition>,
-    } as Parameters<typeof createStreamDB>[0],
-  ) as unknown as NetScriptStreamDB<TDef>;
+      state: input.state,
+    },
+  );
+}
+
+function isDurableStateSchema(
+  state: Record<PropertyKey, unknown>,
+): state is StateSchema<StreamStateDefinition> {
+  return Object.values(state).every((collection) =>
+    isRecord(collection) &&
+    isRecord(collection.schema) &&
+    typeof collection.type === 'string' &&
+    typeof collection.primaryKey === 'string' &&
+    typeof collection.insert === 'function' &&
+    typeof collection.update === 'function' &&
+    typeof collection.delete === 'function' &&
+    typeof collection.upsert === 'function'
+  );
+}
+
+function isRecord(value: unknown): value is Record<PropertyKey, unknown> {
+  return typeof value === 'object' && value !== null;
 }

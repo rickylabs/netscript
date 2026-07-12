@@ -4,6 +4,7 @@ import type {
   JobDefinition as DomainJobDefinition,
   JobHandler as DomainJobHandler,
   JobId as DomainJobId,
+  TaskPermissionsInput,
 } from '../domain/mod.ts';
 import type { BuilderPermissions, JobDefinition, JobHandler } from './builder-types.ts';
 
@@ -43,7 +44,10 @@ export interface JobBuilder<
     fn: JobHandler<TNextPayload, TNextResult>,
   ): JobBuilder<TId, 'handler-set', TNextPayload, TNextResult>;
   /** Narrow the payload type carried by this job definition. */
-  payload<TNextPayload>(): JobBuilder<TId, TConfigured, TNextPayload, TResult>;
+  payload<TNextPayload>(
+    this: TConfigured extends 'handler-set' ? never
+      : JobBuilder<TId, TConfigured, TPayload, TResult>,
+  ): JobBuilder<TId, TConfigured, TNextPayload, TResult>;
   /** Set the cron schedule expression for this job.
    * @deprecated Define recurring work with `defineScheduledTrigger(...).enqueueJob(...)`.
    */
@@ -69,163 +73,204 @@ export interface JobBuilder<
   /** Set the queue trigger name for this job. */
   queueTrigger(name: string): this;
   /** Build the job definition after an entrypoint or handler has been configured. */
-  build(): TConfigured extends 'entrypoint-set' | 'handler-set'
-    ? JobDefinition<TId, TPayload, TResult>
-    : never;
+  build(
+    this: TConfigured extends 'entrypoint-set' | 'handler-set'
+      ? JobBuilder<TId, TConfigured, TPayload, TResult>
+      : never,
+  ): JobDefinition<TId, TPayload, TResult>;
 }
+
+function mutablePermission(
+  value: boolean | readonly string[] | undefined,
+): boolean | string[] | undefined {
+  if (typeof value === 'boolean' || value === undefined) return value;
+  return [...value];
+}
+
+function toDomainPermissions(
+  permissions: BuilderPermissions | undefined,
+): TaskPermissionsInput | undefined {
+  if (!permissions) return undefined;
+  return {
+    net: mutablePermission(permissions.net),
+    read: mutablePermission(permissions.read),
+    write: mutablePermission(permissions.write),
+    env: mutablePermission(permissions.env),
+    run: mutablePermission(permissions.run),
+    ffi: permissions.ffi,
+    import: permissions.import ? [...permissions.import] : undefined,
+  };
+}
+
+type JobBuilderData<TId extends string, TPayload, TResult> = Readonly<{
+  id: TId;
+  name?: string;
+  description?: string;
+  entrypoint?: string;
+  handler?: DomainJobHandler<TPayload, TResult>;
+  schedule?: string;
+  timezone: string;
+  timeout: number;
+  maxRetries: number;
+  permissions?: BuilderPermissions;
+  tags: readonly string[];
+  metadata: Readonly<Record<string, unknown>>;
+  retention?: Readonly<Record<string, unknown>>;
+  enabled: boolean;
+  topic: string;
+  queueTrigger?: string;
+}>;
 
 class JobBuilderImpl<
   TId extends string,
   TConfigured extends JobBuilderState,
   TPayload,
   TResult,
-> implements JobBuilder<TId, TConfigured, TPayload, TResult> {
-  readonly #id: TId;
-  #name?: string;
-  #description?: string;
-  #entrypoint?: string;
-  #handler?: DomainJobHandler<TPayload, TResult>;
-  #schedule: string | undefined;
-  #timezone = 'UTC';
-  #timeout = 300_000;
-  #maxRetries = 3;
-  #permissions?: BuilderPermissions;
-  #tags: string[] = [];
-  #metadata: Record<string, unknown> = {};
-  #retention?: Record<string, unknown>;
-  #enabled = true;
-  #topic = DEFAULT_TOPIC;
-  #queueTrigger?: string;
+> {
+  readonly #data: JobBuilderData<TId, TPayload, TResult>;
 
-  constructor(id: TId) {
-    this.#id = id;
+  constructor(data: JobBuilderData<TId, TPayload, TResult>) {
+    this.#data = data;
   }
 
-  name(value: string): this {
-    this.#name = value;
-    return this;
+  name(value: string): JobBuilderImpl<TId, TConfigured, TPayload, TResult> {
+    return new JobBuilderImpl({ ...this.#data, name: value });
   }
 
-  description(value: string): this {
-    this.#description = value;
-    return this;
+  description(value: string): JobBuilderImpl<TId, TConfigured, TPayload, TResult> {
+    return new JobBuilderImpl({ ...this.#data, description: value });
   }
 
   entrypoint(path: string): JobBuilder<TId, 'entrypoint-set', TPayload, TResult> {
-    this.#entrypoint = path;
-    return this as unknown as JobBuilder<TId, 'entrypoint-set', TPayload, TResult>;
+    return new JobBuilderImpl<TId, 'entrypoint-set', TPayload, TResult>({
+      ...this.#data,
+      entrypoint: path,
+    });
   }
 
   handler<TNextPayload = TPayload, TNextResult = TResult>(
     fn: JobHandler<TNextPayload, TNextResult>,
   ): JobBuilder<TId, 'handler-set', TNextPayload, TNextResult> {
-    this.#handler = fn as unknown as DomainJobHandler<TPayload, TResult>;
-    return this as unknown as JobBuilder<TId, 'handler-set', TNextPayload, TNextResult>;
+    const { handler: _previousHandler, ...data } = this.#data;
+    return new JobBuilderImpl<TId, 'handler-set', TNextPayload, TNextResult>({
+      ...data,
+      handler: fn,
+    });
   }
 
-  payload<TNextPayload>(): JobBuilder<TId, TConfigured, TNextPayload, TResult> {
-    return this as unknown as JobBuilder<TId, TConfigured, TNextPayload, TResult>;
+  payload<TNextPayload>(
+    this: TConfigured extends 'handler-set' ? never
+      : JobBuilderImpl<TId, TConfigured, TPayload, TResult>,
+  ): JobBuilder<TId, TConfigured, TNextPayload, TResult> {
+    const { handler: _handler, ...data } = this.#data;
+    return new JobBuilderImpl<TId, TConfigured, TNextPayload, TResult>(data);
   }
 
   /** @deprecated Define recurring work with `defineScheduledTrigger(...).enqueueJob(...)`. */
-  schedule(expression: CronExpression | string): this {
-    this.#schedule = expression;
-    return this;
+  schedule(
+    expression: CronExpression | string,
+  ): JobBuilderImpl<TId, TConfigured, TPayload, TResult> {
+    return new JobBuilderImpl({ ...this.#data, schedule: expression });
   }
 
-  timezone(value: string): this {
-    this.#timezone = value;
-    return this;
+  timezone(value: string): JobBuilderImpl<TId, TConfigured, TPayload, TResult> {
+    return new JobBuilderImpl({ ...this.#data, timezone: value });
   }
 
-  timeout(ms: number): this {
-    this.#timeout = ms;
-    return this;
+  timeout(ms: number): JobBuilderImpl<TId, TConfigured, TPayload, TResult> {
+    return new JobBuilderImpl({ ...this.#data, timeout: ms });
   }
 
-  retry(maxRetries: number, options?: RetryOptions): this {
-    this.#maxRetries = maxRetries;
-    if (options) this.metadata({ retry: options });
-    return this;
+  retry(
+    maxRetries: number,
+    options?: RetryOptions,
+  ): JobBuilderImpl<TId, TConfigured, TPayload, TResult> {
+    return new JobBuilderImpl({
+      ...this.#data,
+      maxRetries,
+      metadata: options ? { ...this.#data.metadata, retry: options } : this.#data.metadata,
+    });
   }
 
-  permissions(perms: BuilderPermissions): this {
-    this.#permissions = perms;
-    return this;
+  permissions(perms: BuilderPermissions): JobBuilderImpl<TId, TConfigured, TPayload, TResult> {
+    return new JobBuilderImpl({ ...this.#data, permissions: perms });
   }
 
-  tags(...tags: string[]): this {
-    this.#tags = [...new Set([...this.#tags, ...tags])];
-    return this;
+  tags(...tags: string[]): JobBuilderImpl<TId, TConfigured, TPayload, TResult> {
+    return new JobBuilderImpl({
+      ...this.#data,
+      tags: [...new Set([...this.#data.tags, ...tags])],
+    });
   }
 
-  metadata(data: Record<string, unknown>): this {
-    this.#metadata = { ...this.#metadata, ...data };
-    return this;
+  metadata(data: Record<string, unknown>): JobBuilderImpl<TId, TConfigured, TPayload, TResult> {
+    return new JobBuilderImpl({
+      ...this.#data,
+      metadata: { ...this.#data.metadata, ...data },
+    });
   }
 
-  retention(options: JobRetentionOptions): this {
-    this.#retention = {
-      archiveToDb: options.archiveToDb,
-      kvRetentionDays: options.kvDays,
-      dbRetentionDays: options.dbDays,
-      maxExecutions: options.maxExecutions,
-    };
-    return this;
+  retention(options: JobRetentionOptions): JobBuilderImpl<TId, TConfigured, TPayload, TResult> {
+    return new JobBuilderImpl({
+      ...this.#data,
+      retention: {
+        archiveToDb: options.archiveToDb,
+        kvRetentionDays: options.kvDays,
+        dbRetentionDays: options.dbDays,
+        maxExecutions: options.maxExecutions,
+      },
+    });
   }
 
-  enabled(value: boolean): this {
-    this.#enabled = value;
-    return this;
+  enabled(value: boolean): JobBuilderImpl<TId, TConfigured, TPayload, TResult> {
+    return new JobBuilderImpl({ ...this.#data, enabled: value });
   }
 
-  topic(name: string): this {
-    this.#topic = name;
-    return this;
+  topic(name: string): JobBuilderImpl<TId, TConfigured, TPayload, TResult> {
+    return new JobBuilderImpl({ ...this.#data, topic: name });
   }
 
-  queueTrigger(name: string): this {
-    this.#queueTrigger = name;
-    return this;
+  queueTrigger(name: string): JobBuilderImpl<TId, TConfigured, TPayload, TResult> {
+    return new JobBuilderImpl({ ...this.#data, queueTrigger: name });
   }
 
-  build(): TConfigured extends 'entrypoint-set' | 'handler-set'
-    ? JobDefinition<TId, TPayload, TResult>
-    : never {
-    if (!this.#entrypoint && !this.#handler) {
-      throw new Error(`Job "${this.#id}" requires an entrypoint or handler before build().`);
+  build(
+    this: TConfigured extends 'entrypoint-set' | 'handler-set'
+      ? JobBuilderImpl<TId, TConfigured, TPayload, TResult>
+      : never,
+  ): JobDefinition<TId, TPayload, TResult> {
+    if (!this.#data.entrypoint && !this.#data.handler) {
+      throw new Error(`Job "${this.#data.id}" requires an entrypoint or handler before build().`);
     }
 
-    const metadata = this.#queueTrigger
-      ? { ...this.#metadata, queueTrigger: this.#queueTrigger }
-      : this.#metadata;
-    const definition = Object.freeze({
-      id: this.#id as DomainJobId<TId>,
-      topic: this.#topic,
-      name: this.#name ?? this.#id,
-      description: this.#description,
-      entrypoint: this.#entrypoint,
-      schedule: this.#schedule,
-      timezone: this.#timezone,
-      timeout: this.#timeout,
-      maxRetries: this.#maxRetries,
+    const metadata = this.#data.queueTrigger
+      ? { ...this.#data.metadata, queueTrigger: this.#data.queueTrigger }
+      : this.#data.metadata;
+    const definition: DomainJobDefinition<TId, TPayload, TResult> = Object.freeze({
+      id: this.#data.id as DomainJobId<TId>,
+      topic: this.#data.topic,
+      name: this.#data.name ?? this.#data.id,
+      description: this.#data.description,
+      entrypoint: this.#data.entrypoint,
+      schedule: this.#data.schedule,
+      timezone: this.#data.timezone,
+      timeout: this.#data.timeout,
+      maxRetries: this.#data.maxRetries,
       priority: 50,
-      enabled: this.#enabled,
-      tags: this.#tags,
+      enabled: this.#data.enabled,
+      tags: [...this.#data.tags],
       metadata: Object.keys(metadata).length > 0 ? metadata : undefined,
       source: 'local',
       executionType: 'deno',
       retryDelay: 1000,
       maxConcurrency: 1,
       persist: true,
-      permissions: this.#permissions,
-      retention: this.#retention,
-      handler: this.#handler,
-    }) as unknown as DomainJobDefinition<TId, TPayload, TResult>;
+      permissions: toDomainPermissions(this.#data.permissions),
+      retention: this.#data.retention,
+      handler: this.#data.handler,
+    });
 
-    return definition as unknown as TConfigured extends 'entrypoint-set' | 'handler-set'
-      ? JobDefinition<TId, TPayload, TResult>
-      : never;
+    return definition;
   }
 }
 
@@ -233,5 +278,14 @@ class JobBuilderImpl<
 export function defineJob<TId extends string>(
   id: TId,
 ): JobBuilder<TId, 'initial', unknown, unknown> {
-  return new JobBuilderImpl<TId, 'initial', unknown, unknown>(id);
+  return new JobBuilderImpl<TId, 'initial', unknown, unknown>({
+    id,
+    enabled: true,
+    maxRetries: 3,
+    metadata: {},
+    tags: [],
+    timeout: 300_000,
+    timezone: 'UTC',
+    topic: DEFAULT_TOPIC,
+  });
 }

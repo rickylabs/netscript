@@ -7,6 +7,7 @@ import { promoteConfigToRoute } from './factory.ts';
 import {
   bindRoutePattern,
   defineRouteContract,
+  type RouteReference,
 } from '../../../route/_internal/contract-runtime.ts';
 import type { RuntimePageConfig } from '../internal.ts';
 import type {
@@ -17,7 +18,15 @@ import type {
   PathParamSchema,
   SearchParamSchema,
 } from '../types.ts';
-import type { TypedRouteTarget } from '../navigation/mod.ts';
+import type { InferRoutePath, InferRouteSearch, TypedRouteTarget } from '../navigation/mod.ts';
+
+function isRouteReference<TRoute extends TypedRouteTarget<object, object>>(
+  route: TRoute,
+): route is TRoute & RouteReference<InferRoutePath<TRoute>, InferRouteSearch<TRoute>> {
+  return 'nav' in route && 'href' in route && typeof route.href === 'function' &&
+    'parsePath' in route && typeof route.parsePath === 'function' &&
+    'parseSearch' in route && typeof route.parseSearch === 'function';
+}
 
 /** Promote an unrouted page config to a routed page config. */
 export function promoteRouteConfig<
@@ -30,12 +39,18 @@ export function promoteRouteConfig<
 ): RuntimePageConfig<DefinePageWithRoute<TTypes, TRoute>, true> {
   type TRouteTypes = DefinePageWithRoute<TTypes, TRoute>;
 
+  if (!isRouteReference(route)) {
+    throw new TypeError(
+      'definePage().withRoute(...) requires a complete route reference with navigation and parsers.',
+    );
+  }
+
   return {
     ...promoteConfigToRoute<TTypes, TRouteTypes, THasConfiguredRoute>(config),
     defaultRoutePattern: route.routePattern,
     pathSchema: route.pathSchema as RuntimePageConfig<TRouteTypes, true>['pathSchema'],
     searchSchema: route.searchSchema as RuntimePageConfig<TRouteTypes, true>['searchSchema'],
-    route: route as unknown as RuntimePageConfig<TRouteTypes, true>['route'],
+    route,
   };
 }
 
@@ -50,8 +65,8 @@ export function promoteRouteConfig<
  */
 export function promoteRouteContractConfig<
   TTypes extends AnyDefinePageTypeState,
-  TPathSchema,
-  TSearchSchema,
+  TPathSchema extends PathParamSchema<object> | undefined,
+  TSearchSchema extends SearchParamSchema<object> | undefined,
   THasConfiguredRoute extends boolean,
 >(
   config: RuntimePageConfig<TTypes, THasConfiguredRoute>,
@@ -68,8 +83,8 @@ export function promoteRouteContractConfig<
   }
 
   const routeContract = defineRouteContract({
-    pathSchema: contract.pathSchema as PathParamSchema<object> | undefined,
-    searchSchema: contract.searchSchema as SearchParamSchema<object> | undefined,
+    pathSchema: contract.pathSchema,
+    searchSchema: contract.searchSchema,
   });
   const boundRoute = bindRoutePattern(routeContract, contract.$route);
 
@@ -78,6 +93,6 @@ export function promoteRouteContractConfig<
     defaultRoutePattern: boundRoute.routePattern,
     pathSchema: contract.pathSchema as RuntimePageConfig<TRouteTypes, true>['pathSchema'],
     searchSchema: contract.searchSchema as RuntimePageConfig<TRouteTypes, true>['searchSchema'],
-    route: boundRoute as unknown as RuntimePageConfig<TRouteTypes, true>['route'],
+    route: boundRoute as unknown as RuntimePageConfig<TRouteTypes, true>['route'], // quality-allow: DefinePageWithRouteContract preserves prior path/search output when either optional schema is omitted, but BoundRouteContract maps an omitted schema to EmptyRecord; TypeScript cannot equate those conditional states without presence-specific legacy builder overloads
   };
 }

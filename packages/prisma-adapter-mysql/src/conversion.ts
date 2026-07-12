@@ -158,10 +158,10 @@ export function mapColumnType(field: MySqlFieldInfo): ColumnType {
 /**
  * Maps an argument value to the appropriate MySQL format.
  */
-export function mapArg<A>(
-  arg: A | Date,
+export function mapArg(
+  arg: unknown,
   argType: ArgType,
-): null | bigint | string | Uint8Array | A {
+): unknown {
   if (arg === null) {
     return null;
   }
@@ -173,7 +173,7 @@ export function mapArg<A>(
 
   // Handle datetime string conversion
   if (typeof arg === 'string' && argType.scalarType === 'datetime') {
-    arg = new Date(arg) as unknown as A;
+    arg = new Date(arg);
   }
 
   // Handle Date formatting based on database type

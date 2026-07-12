@@ -76,14 +76,6 @@ function readProperty(source: unknown, key: string): unknown {
   return isRecord(source) ? source[key] : undefined;
 }
 
-function readPath(source: unknown): string {
-  const path = readProperty(source, 'path');
-  if (Array.isArray(path)) {
-    return path.map((part) => String(part)).join('.');
-  }
-  return typeof path === 'string' ? path : 'unknown';
-}
-
 function toErrorLike(error: unknown): ErrorLike {
   if (error instanceof Error) {
     const code = readProperty(error, 'code');
@@ -206,7 +198,7 @@ export class TracingPlugin {
     const { serviceName, recordInputKeys, maxInputKeys, attributePrefix } = this.options;
 
     handlerOptions.rootInterceptors ??= [];
-    handlerOptions.rootInterceptors.push(async (options: unknown) => {
+    handlerOptions.rootInterceptors.push(async (options) => {
       const span = this.activeSpanProvider();
       span?.setAttributes(prefixedAttributes(attributePrefix, {
         'rpc.system': 'orpc',
@@ -215,7 +207,7 @@ export class TracingPlugin {
       }));
 
       try {
-        const result = await readNext(options)();
+        const result = await options.next();
         span?.setStatus({ code: SpanStatusCode.OK });
         return result;
       } catch (error) {
@@ -235,9 +227,9 @@ export class TracingPlugin {
     });
 
     handlerOptions.clientInterceptors ??= [];
-    handlerOptions.clientInterceptors.push(async (options: unknown) => {
+    handlerOptions.clientInterceptors.push(async (options) => {
       const span = this.activeSpanProvider();
-      const procedurePath = readPath(options);
+      const procedurePath = options.path.join('.');
 
       if (span) {
         span.setAttributes(prefixedAttributes(attributePrefix, {
@@ -245,7 +237,7 @@ export class TracingPlugin {
           'netscript.rpc.procedure': procedurePath,
         }));
 
-        const input = readProperty(options, 'input');
+        const input = options.input;
         if (recordInputKeys && input) {
           const inputKeys = extractInputKeys(input, maxInputKeys);
           if (inputKeys.length > 0) {
@@ -259,7 +251,7 @@ export class TracingPlugin {
       }
 
       try {
-        const result = await readNext(options)();
+        const result = await options.next();
         span?.addEvent('rpc.procedure.success');
         return result;
       } catch (error) {
@@ -291,14 +283,6 @@ export class TracingPlugin {
       }
     });
   }
-}
-
-function readNext(source: unknown): () => Promise<unknown> {
-  const next = readProperty(source, 'next');
-  if (typeof next !== 'function') {
-    throw new TypeError('oRPC interceptor options must include next()');
-  }
-  return () => Promise.resolve(next.call(source));
 }
 
 /**

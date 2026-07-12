@@ -6,10 +6,10 @@
 
 import type { RouteConfig } from 'fresh';
 import { Partial } from 'fresh/runtime';
-import type { ComponentType, JSX } from 'preact';
 import { ErrorDisplay } from '../../diagnostics/error/ErrorDisplay.tsx';
 import { errorHandler, hasError } from '../../diagnostics/error/handler.ts';
-import type { ErrorPrimitives } from '../../diagnostics/error/primitives.ts';
+import type { ComponentLike } from './define-page/page-compat/shared-types.ts';
+import type { PageErrorPrimitives } from './define-page/page-compat/route-types.ts';
 
 /** Default Fresh route config used by framework partial routes. */
 export const PARTIAL_ROUTE_CONFIG: RouteConfig = {
@@ -19,10 +19,14 @@ export const PARTIAL_ROUTE_CONFIG: RouteConfig = {
 
 /** Materialized partial route contract returned by `definePartial()`. */
 export interface DefinedPartialRoute<TContext, THandler = undefined> {
+  /** Fresh route configuration for the partial. */
   config: RouteConfig;
+  /** Optional Fresh handler attached to the partial route. */
   handler?: THandler;
-  page: (ctx: TContext) => Promise<JSX.Element>;
-  readonly default: (ctx: TContext) => Promise<JSX.Element>;
+  /** Render the partial for a Fresh request context. */
+  page: (ctx: TContext) => Promise<unknown>;
+  /** Default-export-compatible partial renderer. */
+  readonly default: (ctx: TContext) => Promise<unknown>;
 }
 
 /** Options for creating a framework-owned partial route. */
@@ -31,12 +35,19 @@ export interface DefinePartialOptions<
   TContext,
   THandler = undefined,
 > {
+  /** Stable partial name rendered into the response. */
   name: string;
+  /** Load the component props for a request. */
   loader: (ctx: TContext) => Promise<TProps>;
-  component: ComponentType<TProps>;
-  errorComponent?: ComponentType<ErrorPrimitives>;
+  /** Component rendered inside the partial boundary. */
+  component: ComponentLike<TProps>;
+  /** Optional component rendered inside the default error shell. */
+  errorComponent?: ComponentLike<PageErrorPrimitives>;
+  /** Optional override for the default partial error title. */
   errorTitle?: string;
+  /** Optional Fresh handler attached to the partial route. */
   handler?: THandler;
+  /** Optional Fresh route configuration merged with framework defaults. */
   config?: RouteConfig;
 }
 
@@ -53,7 +64,7 @@ export function definePartial<
     ...PARTIAL_ROUTE_CONFIG,
   } satisfies RouteConfig;
 
-  const page = async (ctx: TContext): Promise<JSX.Element> => {
+  const page = async (ctx: TContext): Promise<unknown> => {
     const load = errorHandler(() => options.loader(ctx));
     const result = await load();
 
@@ -94,6 +105,7 @@ export interface DefineStatsPartialOptions<
   TContext,
   THandler = undefined,
 > extends Omit<DefinePartialOptions<TProps, TContext, THandler>, 'loader'> {
+  /** Resolve the context-free stats payload. */
   query: () => Promise<TProps>;
 }
 

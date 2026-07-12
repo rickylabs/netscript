@@ -167,7 +167,12 @@ function isPromiseLike<T>(value: unknown): value is PromiseLike<T> {
   return value != null && typeof (value as PromiseLike<T>)['then'] === 'function';
 }
 
-function endSpan<T>(span: PrismaTracingSpan, result: T): T {
+function endSpan<T>(span: PrismaTracingSpan, result: PromiseLike<T>): PromiseLike<T>;
+function endSpan<T>(span: PrismaTracingSpan, result: T): T;
+function endSpan<T>(
+  span: PrismaTracingSpan,
+  result: T | PromiseLike<T>,
+): T | PromiseLike<T> {
   if (isPromiseLike(result)) {
     return result.then(
       (value) => {
@@ -178,7 +183,7 @@ function endSpan<T>(span: PrismaTracingSpan, result: T): T {
         span.end();
         throw reason;
       },
-    ) as unknown as T;
+    );
   }
   span.end();
   return result;

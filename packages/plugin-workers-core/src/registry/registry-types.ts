@@ -52,12 +52,12 @@ export type JobDefinition = Readonly<
     readonly retryDelay: number;
     readonly maxConcurrency: number;
     readonly persist: boolean;
-    readonly source: JobSource;
+    readonly source: 'database' | 'local' | 'plugin' | 'remote';
     readonly sourceUrl?: string;
     readonly importMapUrl?: string;
     readonly executionType: string;
     readonly pluginId?: string;
-    readonly permissions?: RuntimePermissions;
+    readonly permissions?: TaskPermissionsInput;
   }
 >;
 
@@ -107,15 +107,7 @@ export type TaskDefinition = Readonly<
 export type RuntimePermissionValue = boolean | string[];
 
 /** Runtime permission bag accepted by registry task and job definitions. */
-export type RuntimePermissions = Readonly<{
-  readonly net: RuntimePermissionValue;
-  readonly read: RuntimePermissionValue;
-  readonly write: RuntimePermissionValue;
-  readonly env: RuntimePermissionValue;
-  readonly run: RuntimePermissionValue;
-  readonly ffi: boolean;
-  readonly import?: string[];
-}>;
+export type RuntimePermissions = TaskPermissionsInput;
 
 /** Input accepted when registering a job. */
 export type RegisterJobInput = Readonly<Omit<JobDefinition, 'id'> & { readonly id?: string }>;
@@ -156,3 +148,4 @@ export type RegistryJobStoragePort = Readonly<{
   saveExecution(record: ExecutionRecord): Promise<void>;
   findExecution(executionId: string): Promise<ExecutionRecord | undefined>;
 }>;
+import type { TaskPermissionsInput } from '../domain/mod.ts';

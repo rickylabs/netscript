@@ -87,6 +87,13 @@ function isAttributes(value: unknown): value is Attributes {
     !(value instanceof Date);
 }
 
+async function invokeInterceptor(interceptor: unknown, options: unknown): Promise<unknown> {
+  if (typeof interceptor !== 'function') {
+    throw new TypeError('Expected the plugin to register an interceptor');
+  }
+  return await Reflect.apply(interceptor, undefined, [options]);
+}
+
 Deno.test('TracingPlugin registers upstream instrumentation and oRPC interceptors', () => {
   const handlerOptions: GenericHandlerOptions = {};
   const instrumentation = new FakeInstrumentation();
@@ -108,10 +115,10 @@ Deno.test('TracingPlugin decorates the active upstream oRPC SERVER span', async 
     activeSpanProvider: () => span,
   }).init(handlerOptions);
 
-  await handlerOptions.rootInterceptors?.[0]?.({
+  await invokeInterceptor(handlerOptions.rootInterceptors?.[0], {
     next: () => Promise.resolve({ matched: true }),
   });
-  await handlerOptions.clientInterceptors?.[0]?.({
+  await invokeInterceptor(handlerOptions.clientInterceptors?.[0], {
     path: ['v1', 'users', 'list'],
     input: { id: '123', expand: true },
     next: () => Promise.resolve({ id: '123' }),
@@ -142,8 +149,8 @@ Deno.test('TracingPlugin records oRPC errors on the active upstream span', async
   }).init(handlerOptions);
 
   try {
-    await handlerOptions.clientInterceptors?.[0]?.({
-      path: 'v1.users.get',
+    await invokeInterceptor(handlerOptions.clientInterceptors?.[0], {
+      path: ['v1', 'users', 'get'],
       next: () => Promise.reject(error),
     });
   } catch {

@@ -133,14 +133,13 @@ export function createOmitTransformer<T extends Record<string, unknown>>(): Omit
   return <K extends keyof T>(...keys: K[]): Transformer<T, Omit<T, K>> => {
     const keysSet = new Set(keys);
     return createTransformer((input: T) => {
-      const result = {} as Omit<T, K>;
+      const result: Partial<T> = {};
       for (const key of Object.keys(input) as (keyof T)[]) {
         if (!keysSet.has(key as K)) {
-          // deno-lint-ignore no-explicit-any
-          (result as any)[key] = input[key];
+          result[key] = input[key];
         }
       }
-      return result;
+      return result as Omit<T, K>;
     });
   };
 }
@@ -173,10 +172,10 @@ export function composeTransformers<A, B, C, D, E>(
   t3: TransformFn<C, D>,
   t4: TransformFn<D, E>,
 ): Transformer<A, E>;
-// deno-lint-ignore no-explicit-any
-export function composeTransformers(...transforms: TransformFn<any, any>[]): Transformer<any, any> {
-  return createTransformer((input) =>
-    // deno-lint-ignore no-explicit-any
-    transforms.reduce((acc, transform) => transform(acc), input as any)
+export function composeTransformers(
+  ...transforms: TransformFn<unknown, unknown>[]
+): Transformer<unknown, unknown> {
+  return createTransformer((input: unknown): unknown =>
+    transforms.reduce<unknown>((acc, transform) => transform(acc), input)
   );
 }
