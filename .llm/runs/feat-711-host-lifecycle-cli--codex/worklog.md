@@ -47,6 +47,24 @@ Deferred scope / decision:
 
 The full generated-project/scaffold runtime acceptance remains unproven in this lane because the brief reserves `e2e:cli` and `scaffold.runtime` execution for the orchestrator.
 
+### Slice 2 — database lifecycle symmetry and gates
+
+- `db list [--json]` projects every discovered datasource as `configKey`, `engine`, `databaseName`, `enabled`, and `migrationState` (`unknown` until an operation probes Prisma; disabled targets report `disabled`).
+- `db remove <configKey> [--purge]` repairs `PrimaryDatabase` and tool database references, removes the workspace member and files only when the engine workspace is no longer shared, then regenerates Aspire config/helpers.
+- `db deploy`, `db validate`, and both `db resolve` modes are registered and flow through the existing Aspire operation runner. Generated database tasks map deploy to Prisma `migrate deploy`, validate to Prisma `validate`, and resolve to Prisma `migrate resolve` with the migration name.
+- Targeted tests: `deno test --allow-all` over plugin-new, CLI normalization, DB mutation, database generators, and operation runner — exit 0; 5 files / 19 steps passed.
+- Scoped wrapper check over `packages/cli/src`: completed with no diagnostics (exit 0).
+- Scoped wrapper lint over `packages/cli/src`: exit 0, 511 files, 0 findings.
+- Scoped wrapper format over `packages/cli/src --ignore-line-endings`: exit 0, 511 files, 0 findings.
+- Public CLI DB help smoke: exit 0 and lists `list`, `remove`, `deploy`, `validate`, and `resolve`.
+- `deno.lock`: unchanged.
+
+### Unproven acceptance / orchestrator handoff
+
+- No live JSR stale-version update was executed; unit/type evidence proves the latest-stable validator/install path is selected, but registry/network behavior remains for orchestrator E2E.
+- No live Prisma datasource was deployed/validated/resolved; task generation and Aspire runner routing are covered, while runtime application remains for orchestrator `scaffold.runtime`.
+- The orchestrator must run the prohibited full CLI E2E gate and record its result before merge readiness.
+
 ## Drift
 
 - D1 (carried): PLAN-EVAL owner-waived; concise plan recorded above before implementation.
