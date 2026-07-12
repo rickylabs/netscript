@@ -2,6 +2,7 @@ import type {
   TaskDefinition as DomainTaskDefinition,
   TaskHandler as DomainTaskHandler,
   TaskId as DomainTaskId,
+  TaskPermissions,
 } from '../domain/mod.ts';
 import type {
   BuilderPermissions,
@@ -29,7 +30,10 @@ export interface TaskBuilder<
     fn: TaskHandler<TNextPayload, TNextResult>,
   ): TaskBuilder<TId, 'handler-set', TNextPayload, TNextResult>;
   /** Narrow the payload type carried by this task definition. */
-  payload<TNextPayload>(): TaskBuilder<TId, TConfigured, TNextPayload, TResult>;
+  payload<TNextPayload>(
+    this: TConfigured extends 'handler-set' ? never
+      : TaskBuilder<TId, TConfigured, TPayload, TResult>,
+  ): TaskBuilder<TId, TConfigured, TNextPayload, TResult>;
   /** Set the task timeout in milliseconds. */
   timeout(ms: number): this;
   /** Set the maximum retry count. */
@@ -49,135 +53,168 @@ export interface TaskBuilder<
   /** Enable or disable this task definition. */
   enabled(value: boolean): this;
   /** Build the task definition after an entrypoint or handler has been configured. */
-  build(): TConfigured extends 'entrypoint-set' | 'handler-set'
-    ? TaskDefinition<TId, TPayload, TResult>
-    : never;
+  build(
+    this: TConfigured extends 'entrypoint-set' | 'handler-set'
+      ? TaskBuilder<TId, TConfigured, TPayload, TResult>
+      : never,
+  ): TaskDefinition<TId, TPayload, TResult>;
 }
+
+function mutablePermission(
+  value: boolean | readonly string[] | undefined,
+): boolean | string[] | undefined {
+  if (typeof value === 'boolean' || value === undefined) return value;
+  return [...value];
+}
+
+function toDomainPermissions(
+  permissions: BuilderPermissions | undefined,
+): TaskPermissions | undefined {
+  if (!permissions) return undefined;
+  return {
+    net: mutablePermission(permissions.net) ?? false,
+    read: mutablePermission(permissions.read) ?? false,
+    write: mutablePermission(permissions.write) ?? false,
+    env: mutablePermission(permissions.env) ?? false,
+    run: mutablePermission(permissions.run) ?? false,
+    ffi: permissions.ffi ?? false,
+    import: permissions.import ? [...permissions.import] : undefined,
+  };
+}
+
+type TaskBuilderData<TId extends string, TPayload, TResult> = Readonly<{
+  id: TId;
+  runtime: BuilderTaskType;
+  entrypoint?: string;
+  handler?: DomainTaskHandler<TPayload, TResult>;
+  timeout: number;
+  maxRetries: number;
+  permissions?: BuilderPermissions;
+  args: readonly string[];
+  env?: Readonly<Record<string, string>>;
+  cwd?: string;
+  tags: readonly string[];
+  metadata: Readonly<Record<string, unknown>>;
+  enabled: boolean;
+}>;
 
 class TaskBuilderImpl<
   TId extends string,
   TConfigured extends TaskBuilderState,
   TPayload,
   TResult,
-> implements TaskBuilder<TId, TConfigured, TPayload, TResult> {
-  readonly #id: TId;
-  #runtime: BuilderTaskType = 'deno';
-  #entrypoint?: string;
-  #handler?: DomainTaskHandler<TPayload, TResult>;
-  #timeout = 300_000;
-  #maxRetries = 1;
-  #permissions?: BuilderPermissions;
-  #args: string[] = [];
-  #env?: Record<string, string>;
-  #cwd?: string;
-  #tags: string[] = [];
-  #metadata: Record<string, unknown> = {};
-  #enabled = true;
+> {
+  readonly #data: TaskBuilderData<TId, TPayload, TResult>;
 
-  constructor(id: TId) {
-    this.#id = id;
+  constructor(data: TaskBuilderData<TId, TPayload, TResult>) {
+    this.#data = data;
   }
 
-  runtime(type: BuilderTaskType): this {
-    this.#runtime = type;
-    return this;
+  runtime(type: BuilderTaskType): TaskBuilderImpl<TId, TConfigured, TPayload, TResult> {
+    return new TaskBuilderImpl({ ...this.#data, runtime: type });
   }
 
   entrypoint(path: string): TaskBuilder<TId, 'entrypoint-set', TPayload, TResult> {
-    this.#entrypoint = path;
-    return this as unknown as TaskBuilder<TId, 'entrypoint-set', TPayload, TResult>;
+    return new TaskBuilderImpl<TId, 'entrypoint-set', TPayload, TResult>({
+      ...this.#data,
+      entrypoint: path,
+    });
   }
 
   handler<TNextPayload = TPayload, TNextResult = TResult>(
     fn: TaskHandler<TNextPayload, TNextResult>,
   ): TaskBuilder<TId, 'handler-set', TNextPayload, TNextResult> {
-    this.#handler = fn as unknown as DomainTaskHandler<TPayload, TResult>;
-    return this as unknown as TaskBuilder<TId, 'handler-set', TNextPayload, TNextResult>;
+    const { handler: _previousHandler, ...data } = this.#data;
+    return new TaskBuilderImpl<TId, 'handler-set', TNextPayload, TNextResult>({
+      ...data,
+      handler: fn,
+    });
   }
 
-  payload<TNextPayload>(): TaskBuilder<TId, TConfigured, TNextPayload, TResult> {
-    return this as unknown as TaskBuilder<TId, TConfigured, TNextPayload, TResult>;
+  payload<TNextPayload>(
+    this: TConfigured extends 'handler-set' ? never
+      : TaskBuilderImpl<TId, TConfigured, TPayload, TResult>,
+  ): TaskBuilder<TId, TConfigured, TNextPayload, TResult> {
+    const { handler: _handler, ...data } = this.#data;
+    return new TaskBuilderImpl<TId, TConfigured, TNextPayload, TResult>(data);
   }
 
-  timeout(ms: number): this {
-    this.#timeout = ms;
-    return this;
+  timeout(ms: number): TaskBuilderImpl<TId, TConfigured, TPayload, TResult> {
+    return new TaskBuilderImpl({ ...this.#data, timeout: ms });
   }
 
-  retry(maxRetries: number): this {
-    this.#maxRetries = maxRetries;
-    return this;
+  retry(maxRetries: number): TaskBuilderImpl<TId, TConfigured, TPayload, TResult> {
+    return new TaskBuilderImpl({ ...this.#data, maxRetries });
   }
 
-  permissions(perms: BuilderPermissions): this {
-    this.#permissions = perms;
-    return this;
+  permissions(perms: BuilderPermissions): TaskBuilderImpl<TId, TConfigured, TPayload, TResult> {
+    return new TaskBuilderImpl({ ...this.#data, permissions: perms });
   }
 
-  args(...args: string[]): this {
-    this.#args.push(...args);
-    return this;
+  args(...args: string[]): TaskBuilderImpl<TId, TConfigured, TPayload, TResult> {
+    return new TaskBuilderImpl({ ...this.#data, args: [...this.#data.args, ...args] });
   }
 
-  env(vars: Record<string, string>): this {
-    this.#env = { ...this.#env, ...vars };
-    return this;
+  env(vars: Record<string, string>): TaskBuilderImpl<TId, TConfigured, TPayload, TResult> {
+    return new TaskBuilderImpl({ ...this.#data, env: { ...this.#data.env, ...vars } });
   }
 
-  workingDir(path: string): this {
-    this.#cwd = path;
-    return this;
+  workingDir(path: string): TaskBuilderImpl<TId, TConfigured, TPayload, TResult> {
+    return new TaskBuilderImpl({ ...this.#data, cwd: path });
   }
 
-  tags(...tags: string[]): this {
-    this.#tags = [...new Set([...this.#tags, ...tags])];
-    return this;
+  tags(...tags: string[]): TaskBuilderImpl<TId, TConfigured, TPayload, TResult> {
+    return new TaskBuilderImpl({
+      ...this.#data,
+      tags: [...new Set([...this.#data.tags, ...tags])],
+    });
   }
 
-  metadata(data: Record<string, unknown>): this {
-    this.#metadata = { ...this.#metadata, ...data };
-    return this;
+  metadata(data: Record<string, unknown>): TaskBuilderImpl<TId, TConfigured, TPayload, TResult> {
+    return new TaskBuilderImpl({
+      ...this.#data,
+      metadata: { ...this.#data.metadata, ...data },
+    });
   }
 
-  enabled(value: boolean): this {
-    this.#enabled = value;
-    return this;
+  enabled(value: boolean): TaskBuilderImpl<TId, TConfigured, TPayload, TResult> {
+    return new TaskBuilderImpl({ ...this.#data, enabled: value });
   }
 
-  build(): TConfigured extends 'entrypoint-set' | 'handler-set'
-    ? TaskDefinition<TId, TPayload, TResult>
-    : never {
-    if (!this.#entrypoint && !this.#handler) {
-      throw new Error(`Task "${this.#id}" requires an entrypoint or handler before build().`);
+  build(
+    this: TConfigured extends 'entrypoint-set' | 'handler-set'
+      ? TaskBuilderImpl<TId, TConfigured, TPayload, TResult>
+      : never,
+  ): TaskDefinition<TId, TPayload, TResult> {
+    if (!this.#data.entrypoint && !this.#data.handler) {
+      throw new Error(`Task "${this.#data.id}" requires an entrypoint or handler before build().`);
     }
 
-    const definition = Object.freeze({
-      id: this.#id as DomainTaskId<TId>,
+    const definition: DomainTaskDefinition<TId, TPayload, TResult> = Object.freeze({
+      id: this.#data.id as DomainTaskId<TId>,
       topic: 'default',
-      name: this.#id,
-      type: this.#runtime,
-      entrypoint: this.#entrypoint,
-      timeout: this.#timeout,
-      maxRetries: this.#maxRetries,
+      name: this.#data.id,
+      type: this.#data.runtime,
+      entrypoint: this.#data.entrypoint,
+      timeout: this.#data.timeout,
+      maxRetries: this.#data.maxRetries,
       priority: 50,
-      enabled: this.#enabled,
-      tags: this.#tags,
-      metadata: Object.keys(this.#metadata).length > 0 ? this.#metadata : undefined,
+      enabled: this.#data.enabled,
+      tags: [...this.#data.tags],
+      metadata: Object.keys(this.#data.metadata).length > 0 ? this.#data.metadata : undefined,
       source: 'local',
-      args: this.#args,
-      cwd: this.#cwd,
-      env: this.#env,
-      permissions: this.#permissions,
+      args: [...this.#data.args],
+      cwd: this.#data.cwd,
+      env: this.#data.env ? { ...this.#data.env } : undefined,
+      permissions: toDomainPermissions(this.#data.permissions),
       timezone: 'UTC',
       retryDelay: 1000,
       maxConcurrency: 1,
       persist: true,
-      handler: this.#handler,
-    }) as unknown as DomainTaskDefinition<TId, TPayload, TResult>;
+      handler: this.#data.handler,
+    });
 
-    return definition as unknown as TConfigured extends 'entrypoint-set' | 'handler-set'
-      ? TaskDefinition<TId, TPayload, TResult>
-      : never;
+    return definition;
   }
 }
 
@@ -185,5 +222,14 @@ class TaskBuilderImpl<
 export function defineTask<TId extends string>(
   id: TId,
 ): TaskBuilder<TId, 'initial', unknown, unknown> {
-  return new TaskBuilderImpl<TId, 'initial', unknown, unknown>(id);
+  return new TaskBuilderImpl<TId, 'initial', unknown, unknown>({
+    id,
+    args: [],
+    enabled: true,
+    maxRetries: 1,
+    metadata: {},
+    runtime: 'deno',
+    tags: [],
+    timeout: 300_000,
+  });
 }

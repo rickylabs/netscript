@@ -12,7 +12,7 @@
 
 ## Current State
 
-PLAN-EVAL passed. Slice 1 is implemented and independently reviewed `PASS`: config, contract, and stream boundaries are properly typed, overall scanner count is 27 findings / 0 allowances, and no lock churn exists.
+PLAN-EVAL passed. Slices 1 and 2 are implemented and independently reviewed `PASS`: schema/contract/stream boundaries and immutable builder typestate are properly typed, overall scanner count is 8 findings / 0 allowances, and no lock churn exists.
 
 ## Completed
 
@@ -23,15 +23,17 @@ PLAN-EVAL passed. Slice 1 is implemented and independently reviewed `PASS`: conf
 - PLAN-EVAL PASS in separate Opus session.
 - Slice 1 scanner/check/lint/fmt/tests/publish evidence green after one mechanical fmt remediation.
 - Slice 1 independent substantive review PASS.
+- Slice 2 immutable typestate and canonical domain outputs implemented; scoped check/fmt and 25 package tests pass.
+- Slice 2 independent review's typestate defect was corrected and rechecked PASS.
 
 ## In Progress
 
-- Slice 2 immutable builder typestate implementation.
+- Slice 3 runtime composition and fixture port alignment.
 
 ## Next Steps
 
-1. Commit Slice 1 sign-off.
-2. Implement/review Slices 2 and 3.
+1. Commit Slice 2 sign-off.
+2. Implement and review Slice 3.
 3. Run final full gate set and separate IMPL-EVAL.
 4. Force-push with lease; do not open a PR.
 
@@ -50,12 +52,14 @@ PLAN-EVAL passed. Slice 1 is implemented and independently reviewed `PASS`: conf
 | `packages/plugin-workers-core/src/config/*` | changed | Directly typed Zod outputs/default variance. |
 | `packages/plugin-workers-core/src/contracts/v1/*` | changed | Direct schema assignment + Standard-Schema error narrowing. |
 | `packages/plugin-workers-core/src/streams/*` | changed | Derived entities, upstream state schema, correlated producer wrapper. |
+| `packages/plugin-workers-core/src/builders/*` | changed | Immutable typestate and canonical domain aliases. |
+| `packages/plugin-workers-core/src/public/root.ts` | changed | Structurally typed builder root surface without facade casts. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | Slice 1 green | scanner 27/0 overall; Slice 1 check/lint/fmt/publish PASS |
+| Static | Slices 1–2 green | scanner 8/0 overall; scoped check/fmt and package tests PASS |
 | Fitness | pending | plan |
 | Runtime | pending | plan |
 | Consumer | pending | plan |
@@ -71,4 +75,4 @@ PLAN-EVAL passed. Slice 1 is implemented and independently reviewed `PASS`: conf
 
 ## Commits
 
-- PLAN-EVAL preceded implementation. Slice 1 sign-off commit is next; owner prohibited a PR, so local artifact evidence replaces PR comments.
+- `ac532d94` records Slice 1. Slice 2 sign-off is next; owner prohibited a PR, so local artifact evidence replaces PR comments.

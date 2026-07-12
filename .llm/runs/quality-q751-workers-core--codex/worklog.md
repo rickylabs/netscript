@@ -61,6 +61,9 @@ Start at the exported schema/builder/runtime type, follow its concrete generic t
 | 2026-07-12 | slice 1 | implementation | Config/contract/stream casts replaced by typed Zod outputs, runtime Standard-Schema narrowing, upstream stream generics, and a correlated producer wrapper. Scanner reduced 50 → 27 with allowCount 0. |
 | 2026-07-12 | slice 1 | review | Independent Opus review `c2028493-5a2e-49a2-9988-7c1fa04c1376`: initial `FAIL_FIX` only for fmt; scoped formatter remediated 5 files; same review updated to `PASS`. |
 | 2026-07-12 | slice 1 | reconcile | No PR/issue sweep by owner directive; scope remains unchanged, no new debt, no lock churn, and remaining 27 findings map only to locked slices 2–3. |
+| 2026-07-12 | slice 2 | implementation | Replaced builder self-rebranding with immutable snapshots and freshly parameterized builders over canonical domain types; removed root facade casts. Scanner reduced 27 → 8 with allowCount 0. |
+| 2026-07-12 | slice 2 | review | Independent Opus/high review `c73951cb-4291-4fc9-a932-954e9ce96def` found a vacuous fixed-union `build()` receiver guard (`FAIL_FIX`). Conditional receiver types tied to `TConfigured` fixed all job/task/workflow surfaces; the same reviewer reproduced initial-state rejection and updated the verdict to `PASS`. |
+| 2026-07-12 | slice 2 | reconcile | Scope remains locked. The `./builders` definition aliases now expose the canonical domain shape intentionally; no in-repo consumer break, allowance, debt entry, or lock churn. Remaining 8 findings belong only to Slice 3. |
 
 ## Decisions
 
@@ -90,13 +93,18 @@ Start at the exported schema/builder/runtime type, follow its concrete generic t
 | Slice 1 fmt | scoped wrapper | PASS after fix | Initial review caught 5 mechanical findings; write + check returned 0. |
 | Slice 1 tests | contracts + streams | PASS | 7 passed, 0 failed. |
 | Slice 1 publish | package dry-run | PASS | Reviewer confirmed no slow types. |
+| Slice 2 scanner | scoped scanner | PASS | 0 findings in builders/root; overall 8 findings / 0 allowances remain. |
+| Slice 2 check | scoped wrapper | PASS | 110 files, 0 errors. |
+| Slice 2 fmt | scoped wrapper | PASS | 6 selected files, 0 findings. |
+| Slice 2 tests | package task | PASS | 25 passed, 0 failed. |
+| Slice 2 typestate probes | independent reviewer | PASS after fix | Initial `build()` rejected on root and builders subpaths; configured `build()` accepted. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | F-1–F-19 | NOT_RUN | planned | Run after implementation. |
-| Slice review gate | PASS | `slice-1-review.md` | Substantive opposite-family review; fmt remediation verified. |
+| Slice review gate | PASS | `slice-1-review.md`, `slice-2-review.md` | Substantive opposite-family reviews; both remediation loops verified. |
 
 ### Runtime Gates
 
@@ -112,4 +120,4 @@ Start at the exported schema/builder/runtime type, follow its concrete generic t
 
 ## Handoff Notes
 
-- PLAN-EVAL should challenge D2–D5, verify all 50 findings have an owned slice, and reject any plan that treats allowances as an implementation technique.
+- Slice 3 owns only runtime composition and testing-fixture boundaries; the target remains zero allowances.
