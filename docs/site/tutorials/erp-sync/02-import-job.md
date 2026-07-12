@@ -67,30 +67,24 @@ This is just a local folder in your workspace. In production it would be the mou
 nightly export job writes into; the trigger does not care where the bytes come from, only that a
 matching file appears.
 
-## Step 2 — Author the import job
+## Step 2 — Scaffold the import job
 
 A NetScript job is a function wrapped by `defineJobHandler`, given a stable `id`, and exported as the
 module default. Inside the handler you receive a `ctx` carrying the payload, do the work, and return
 a result built with `createSuccessResult` / `createFailureResult`. Create the job under the workers
-plugin:
+plugin. Let the CLI create the payload schema, handler wrapper, stable export, and registry entry:
+
+```sh
+ns-workers add job import-products
+```
+
+In `workers/jobs/import-products.ts`, extend the generated `PayloadSchema` with `filePath` and
+`fileName`, import `createFailureResult`, and replace only the starter handler body with the CSV
+logic below:
 
 ```ts
-// plugins/workers/jobs/import-products.ts
-import {
-  createFailureResult,
-  createSuccessResult,
-  defineJobHandler,
-} from '@netscript/plugin-workers-core';
-import { z } from 'zod';
-
-// The file-watch trigger hands the job the path of the file that landed.
-const ImportProductsPayloadSchema = z.object({
-  filePath: z.string().min(1),
-  fileName: z.string().min(1),
-});
-
 const handler = defineJobHandler(async (ctx) => {
-  const { filePath, fileName } = ImportProductsPayloadSchema.parse(ctx.payload ?? {});
+  const { filePath, fileName } = PayloadSchema.parse(ctx.payload ?? {});
 
   // 1. Read the staged file.
   let rawContent: string;
@@ -117,8 +111,6 @@ const handler = defineJobHandler(async (ctx) => {
   // 3. Return a structured result. The runtime records it on the execution.
   return createSuccessResult({ fileName, rowCount: rows.length, headers });
 });
-
-export default Object.assign(handler, { id: 'import-products' });
 ```
 
 The two things to read off this: the handler is an `async`/arrow function (never a bare `function`),
@@ -132,15 +124,26 @@ small and independently retryable. The scaffold's <code>--samples</code> jobs sh
 under <code>plugins/workers/jobs/</code>; for this track one job is enough to prove the pipeline.
 {{ /comp }}
 
-## Step 3 — Author the file-watch trigger
+## Step 3 — Scaffold the file-watch trigger
 
-Now the trigger. `defineFileWatch(handler, spec)` comes from
+Create the watcher from the current trigger CLI surface:
+
+The `add-file-watch` verb uses the spaced `add file-watch` shell syntax:
+
+```sh
+ns-triggers add file-watch product-import-trigger \
+  --path=.data/incoming/products \
+  --pattern=products_*.csv
+```
+
+The command writes `triggers/product-import-trigger.ts` and refreshes the trigger registry. The
+file-watch command deliberately scaffolds a neutral handler, so replace that generated handler with
+the enqueue effect shown below. `defineFileWatch(handler, spec)` comes from
 `@netscript/plugin-triggers-core/builders`. The handler returns an **array of effects**; the one you
 want is `enqueueJob(jobRef, { payload })`, which hands a worker job the inbound event. The job is
 referenced by a small typed object — its `id`, `name`, `topic`, and `entrypoint`.
 
 ```ts
-// plugins/triggers/product-import.ts
 import { defineFileWatch, enqueueJob } from '@netscript/plugin-triggers-core/builders';
 import type { JobDefinition } from '@netscript/plugin-workers-core';
 

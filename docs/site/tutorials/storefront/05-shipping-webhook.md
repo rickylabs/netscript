@@ -74,9 +74,15 @@ The canonical install is <code>plugins/triggers/</code> — the path <code>netsc
 
 ## Step 2 — Author the shipping-update job and the verified webhook
 
-The webhook hands each inbound event to a background job, so author that job first — the same
-`defineJobHandler` pattern you used for `process-payment` in chapter 4. A real integration would
-advance the order; here it validates and records the update:
+The webhook hands each inbound event to a background job, so scaffold that job first:
+
+```sh
+ns-workers add job process-shipping-update
+```
+
+Extend the generated payload schema with `orderId`, `status`, and `trackingNumber`, then replace the
+starter handler body with the validation and application logic. A real integration would advance
+the order; here it validates and records the update:
 
 ```ts
 // workers/jobs/process-shipping-update.ts
@@ -99,6 +105,8 @@ export default Object.assign(handler, { id: 'process-shipping-update' });
 ```
 
 Scaffold the webhook and its worker-job action with the triggers CLI first:
+
+The `add-webhook` verb uses the spaced `add webhook` shell syntax:
 
 ```bash
 ns-triggers add webhook shipping-status-webhook \

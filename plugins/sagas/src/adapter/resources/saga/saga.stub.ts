@@ -46,6 +46,15 @@ export const %%SAGA_EXPORT%%: SagaDefinition<'%%SAGA_ID%%', State, Message> = de
       }),
     ];
   })
+  .compensate<Message['type'], Message['payload']>('%%MESSAGE_TYPE%%', (saga, _message, context) => {
+    saga.state = {
+      ...saga.state,
+      status: '%%INITIAL_STATUS%%',
+      processedAt: context.now.toISOString(),
+    };
+
+    return [];
+  })
   .build();
 
 export default %%SAGA_EXPORT%%;
