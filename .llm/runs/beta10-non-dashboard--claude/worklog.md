@@ -294,3 +294,59 @@ None of the three has pushed. **None is reviewed-and-signed-off. Nothing may mer
 to jsr.io was made. The tagline slice prepares README fixes only. **The descriptions on jsr.io will
 not change when that branch merges** — the registry re-sync is a publish action and happens later
 under owner supervision.
+
+---
+
+## IMPL-EVAL — re-routed to Codex (OpenHands transport is down)
+
+OpenHands failed **twice** on the same infrastructure fault (`No module named 'fastapi'`), on two
+different open models — model-independent, so it is the agent image, not the route. Filed as **#768**.
+
+The harness invariant is *generator session ≠ evaluator session, opposite family*. OpenHands is a
+**transport**, not the requirement, and `lane-policy.md` already binds *Review of Claude
+implementation → Codex · OpenAI · GPT-5.6 Sol · xhigh*. So the IMPL-EVAL was re-dispatched on that
+route rather than leaving a merge-ready PR ungated.
+
+| | |
+| --- | --- |
+| **Thread** | `019f58a1-c152-7c93-bbc3-53d93b1c07dd` |
+| **Route** | openai · `gpt-5.6-sol` · **xhigh** (route verdict: matched) |
+| **Worktree** | `/home/codex/repos/b10-715-eval` (branch `eval/715-impl-eval` @ `f41e33b9`) |
+| **Brief** | `slices/715-impl-eval/implement.md` |
+| **Deliverable** | `evaluate.md` + a verdict token. Read-only: it reviews, it does not fix. |
+
+### Review-coverage split (PR #715 is mixed authorship)
+
+| Authored by | Content | Reviewed by |
+| --- | --- | --- |
+| **Claude** (this session) | both wrapper fixes + their tests, the `deno.json` task/exclude changes, `packages/cli` + `packages/mcp` READMEs, `docs/site/reference/mcp/index.md` | **Codex `gpt-5.6-sol` xhigh** (opposite family) — thread above |
+| **Codex** (#762, #763) | framework source, on **other branches** — not in #715 | **Claude supervisor** (this session), reading the diffs |
+
+Both halves are covered by an opposite family. Neither lane self-certifies.
+
+## Slice 3 — JSR tagline byte cap — COMPLETE (reviewed, not pushed)
+
+**Branch:** `docs/jsr-tagline-byte-cap` · **Thread:** `019f5897-8e2c-7fa1-8ea0-bd23a97a25e3`
+
+| Commit | What |
+| --- | --- |
+| `952afca1` | new gate `.llm/tools/validation/check-jsr-tagline-length.ts` + `deno task docs:tagline:check` |
+| `822453f6` | 16 over-cap taglines fitted |
+| `458879fb` | gate wired into CI (`quality` job, after Format check) |
+
+**Supervisor review (Tier-A, performed — not taken on trust):**
+
+- `deno task docs:tagline:check` → **`checked=35 over=0`**. Was `over=16`.
+- CI step verified present in `.github/workflows/ci.yml` at line 122, **and it is the last commit** —
+  the gate is only made blocking *after* the branch makes it green, which is the correct order.
+- No binary/NUL corruption in any changed file.
+- Spot-checked the `plugins/ai` outlier (760 B → in-cap): it had **no bold tagline at all**, which is
+  why extraction swallowed its whole 9-line lead paragraph. The slice *added* a proper tagline and
+  demoted the rest to following prose — **no claim dropped**. That is the right fix, not a truncation.
+
+**The JSR registry was NOT touched** — `jsr-set-package-settings.ts` / `jsr-provision-packages.ts` were
+never run. Confirmed by the slice in its own report. **The descriptions on jsr.io will not change when
+this merges**; the registry re-sync is a publish action, owner-supervised, at the next publish.
+
+This turns a one-off #715 fix into a standing guard: an over-cap tagline now fails CI instead of
+appearing truncated on jsr.io.
