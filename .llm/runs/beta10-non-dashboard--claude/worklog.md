@@ -86,3 +86,79 @@ fixture code, so the exclusion is scoped to the one fixture tree that is a neste
 File count moved 1685 → 1682: exactly the three `.ts` files under the excluded doctor fixture tree.
 
 **Self-certification:** none. These are generator-session results only; the verdict is IMPL-EVAL's.
+
+---
+
+## Slice 2 — P0(b): README rewrite (`packages/cli`, `packages/mcp`)
+
+**Status:** implemented, gates green locally. Awaiting IMPL-EVAL (separate session).
+**Commit:** `394f9223`
+
+### House style, established from the exemplars first
+
+Read `packages/telemetry`, `packages/service`, and `packages/ai` before writing. The repo has two
+README shapes: the **majority/emoji** style (telemetry, service, aspire, fresh, cli, plugin-\*-core)
+and a plain-heading style used only by `packages/ai`. Since `cli` and `mcp` ship together as the
+agentic combo and `cli` was already emoji-styled, both targets follow the majority style. No new
+shape invented.
+
+### `packages/cli/README.md`
+
+Was deploy-skewed to the point of misrepresenting the package: **~110 of 198 lines** were deployment
+targets, the Quick Start led with the `createPublicCli` *embedding* API rather than the command
+surface, and there was **no command map at all** — a reader could not learn what verbs exist.
+
+Rewritten around what the CLI is: scaffold a workspace, then grow it with verbs that regenerate the
+derived layers (Aspire helpers, plugin registries, contract aggregates). Added a command map for
+every top-level group — **generated from the live `netscript --help` tree, not from memory** — kept
+the embedding API as a real but secondary capability, and compressed deployment into one target table
+plus the permissions matrix.
+
+### `packages/mcp/README.md`
+
+Was a 128-line API stub for a brand-new published package. Rewritten to the depth of the strongest
+siblings: why the package exists, the mental model, the 13-tool catalog, recipes, configuration
+seams, command policy, data boundary, observability, and layering.
+
+An uncommitted ~313-line draft existed in the stale orchestrator worktree (see drift D1). It was
+treated as **input to review, not landed work** — and reviewing it caught two factual errors that
+would otherwise have shipped:
+
+| Draft claim | Reality |
+| --- | --- |
+| Layered `domain → ports → application → adapters` with `ports/` and `adapters/` folders | Actual layout is `src/domain/`, `src/application/`, `src/infrastructure/` — no such folders exist |
+| `truncation` is an `McpCliOptions` composition seam | `truncation` is a `createMcpServer` (`McpServerOptions`) seam; `McpCliOptions` has no such field |
+
+Every other claim was re-verified against source rather than carried over: the 13 tool names from
+`TOOL_NAMES`; the 50-item / 2,000-UTF-16-code-unit bounds from `DEFAULT_TRUNCATION_POLICY`; the
+allow/deny lists from `DEFAULT_COMMAND_POLICY`; protocol version `2025-11-25` from
+`MCP_PROTOCOL_VERSION`.
+
+### `docs/site/reference/mcp/index.md` (new)
+
+`@netscript/mcp` is a new published package and was the **only one without a reference page** — every
+sibling has `docs/site/reference/<pkg>/index.md`. The README's reference link would have shipped as a
+404. Added the page in the established shape. Reference pages are hand-authored (no generator), so
+this is not generated output.
+
+### Gates
+
+| Gate | Command | Verdict |
+| --- | --- | --- |
+| Format | `deno fmt --check` (3 files) | **PASS** |
+| Internal doc links | `deno task docs:links` | **PASS** — 96 docs, 0 broken links/anchors |
+| Public-docs wording | grep for issue/PR numbers, harness/evaluator/slice/orchestrator terms | **PASS** — clean |
+
+### Finding (not fixed here) — `docs:readme:check` is a dead gate
+
+`deno task docs:readme:check` is **not wired into any CI workflow** and currently **fails for nearly
+every README in the repo**: it enforces the `docs/site/_includes/readme-template.md` shape (`##
+Install` / `## Quick example` / `## Docs` as literal H2 text), which the shipped house style diverged
+from long ago (emoji H2s, `### Installation` nested under `## 🚀 Quick Start`). Conforming `cli` and
+`mcp` to the checker would have made them the only two packages that look nothing like their
+siblings.
+
+Chose consistency with the shipped house style, per the brief ("match the existing best-in-class
+READMEs; do not invent a new shape"). The checker/template/house-style three-way divergence should be
+reconciled repo-wide as its own item — it is CI-gate hygiene and pairs naturally with #762. Raised to
+the orchestrator rather than fixed inside #715.
