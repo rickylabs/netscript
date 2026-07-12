@@ -155,9 +155,11 @@ export async function regenerateAspireHelpers(
   }
 
   const parsed = await parseAppSettings(appsettingsPath);
+  const rawAppsettings = JSON.parse(await fs.readFile(appsettingsPath)) as unknown;
+  const config = preservePluginEnvironment(parsed.config, rawAppsettings);
   const pipeline = new HelpersGeneratorPipeline(templateAdapter);
   const files = await pipeline.execute({
-    config: parsed.config,
+    config,
     configPath: `../${SCAFFOLD_FILES.APPSETTINGS}`,
     generateAppHost: true,
   });
@@ -171,6 +173,32 @@ export async function regenerateAspireHelpers(
   }
 
   return written;
+}
+
+function preservePluginEnvironment<TConfig extends { Plugins: Record<string, unknown> }>(
+  config: TConfig,
+  rawAppsettings: unknown,
+): TConfig {
+  if (!isRecord(rawAppsettings) || !isRecord(rawAppsettings.NetScript)) return config;
+  const rawPlugins = rawAppsettings.NetScript.Plugins;
+  if (!isRecord(rawPlugins)) return config;
+
+  const plugins = { ...config.Plugins };
+  for (const [name, rawPlugin] of Object.entries(rawPlugins)) {
+    if (!isRecord(rawPlugin) || !isStringRecord(rawPlugin.Environment)) continue;
+    const parsedPlugin = plugins[name];
+    if (!isRecord(parsedPlugin)) continue;
+    plugins[name] = { ...parsedPlugin, Environment: rawPlugin.Environment };
+  }
+  return { ...config, Plugins: plugins };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function isStringRecord(value: unknown): value is Record<string, string> {
+  return isRecord(value) && Object.values(value).every((entry) => typeof entry === 'string');
 }
 
 async function hasLocalPackageWorkspace(

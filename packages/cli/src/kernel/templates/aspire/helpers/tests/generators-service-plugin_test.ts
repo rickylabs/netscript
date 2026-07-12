@@ -210,6 +210,23 @@ describe('generateRegisterPlugins', () => {
     assertStringIncludes(output, '// OTEL telemetry (full executable env set)');
   });
 
+  it('should inject configured plugin environment variables', () => {
+    const output = generateRegisterPlugins({
+      ...emptyOptions,
+      plugins: {
+        auth: {
+          ...fixtures.MINIMAL_PLUGIN,
+          Environment: { NETSCRIPT_AUTH_BACKEND: 'kv-oauth', AUTH_SECRET: 'test-secret' },
+        },
+      },
+    });
+    assertStringIncludes(
+      output,
+      'const configuredEnvironment = {"NETSCRIPT_AUTH_BACKEND":"kv-oauth","AUTH_SECRET":"test-secret"}',
+    );
+    assertStringIncludes(output, 'resource.withEnvironment(key, value)');
+  });
+
   it('should wire plugin\u2192plugin references in pass 2', () => {
     const output = generateRegisterPlugins({
       ...emptyOptions,

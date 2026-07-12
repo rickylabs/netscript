@@ -1,5 +1,6 @@
 import { Command } from '@cliffy/command';
 
+import { createAuthPluginCommand } from '../../../public/features/plugins/auth/auth-plugin-command.ts';
 import { createDoctorPluginCommand } from '../../../public/features/plugins/doctor/doctor-plugin-command.ts';
 import { createInfoPluginCommand } from '../../../public/features/plugins/info/info-plugin-command.ts';
 import { createPluginListCommand } from '../../../public/features/plugins/list/list-plugins-command.ts';
@@ -75,6 +76,15 @@ export function createLocalPluginCommand(
       createDoctorPluginCommand({
         ...dependencies.pluginDoctorDependencies,
         resolveProjectRoot: dependencies.resolveProjectRoot,
+      }),
+    )
+    .command(
+      'auth',
+      createAuthPluginCommand({
+        fs: dependencies.fs,
+        resolveProjectRoot: dependencies.resolveProjectRoot,
+        sessions: dependencies.authSessionHttp,
+        regenerateAspire: dependencies.authRegenerateAspire,
       }),
     );
 }
