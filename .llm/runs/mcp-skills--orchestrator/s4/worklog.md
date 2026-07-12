@@ -59,3 +59,7 @@ Separate opposite-family session `bf32fc7e-e116-493a-a067-29f69cfedb71` wrote `p
 
 - Slice 1/2: issue #728 remains supervisor-owned umbrella work; this branch references it without a closing keyword and opens no PR. Sibling-sensitive edits stayed additive/minimal. No new review comments were available in this leaf worktree.
 - Slice 3: scope remained S4-only; `deno.lock` is unchanged. Existing `MCP-A6-V2-SHAPE` debt was not structurally broadened; the aggregation module is 408 lines, below the universal 500-line ceiling.
+
+## IMPL-EVAL cycle 1
+
+`FAIL_FIX`: evaluator exercised real output-schema validation and found all three flow result shapes diverged from `tool-contracts.ts`; direct flow tests had not crossed the server validation boundary. Cycle-2 fix aligns schemas with typed summaries and adds populated + empty output-contract round trips for each S4 tool.
