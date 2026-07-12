@@ -3770,7 +3770,8 @@
           "jsr:@netscript/aspire@0.0.1-beta.8",
           "jsr:@netscript/telemetry@0.0.1-beta.8",
           "jsr:@standard-schema/spec@1.1.0",
-          "jsr:@std/assert@1"
+          "jsr:@std/assert@1",
+          "jsr:@std/path@1"
         ]
       },
       "packages/plugin": {

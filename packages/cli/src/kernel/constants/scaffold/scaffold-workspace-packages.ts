@@ -9,6 +9,7 @@ export const SCAFFOLD_WORKSPACE_PACKAGES = [
   'fresh-ui',
   'kv',
   'logger',
+  'mcp',
   'plugin',
   'plugin-ai-core',
   'plugin-auth-core',
