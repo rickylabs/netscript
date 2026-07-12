@@ -37,7 +37,16 @@ conversation, in order — P1 locks the shell/routing frame the others plug into
    `reserve-inventory` (`job_4183`, attempt 2/3) → stream `payment-events` (`msg_88f`, 2/3
    delivered · 1 failed). Same ids on every screen; every cross-link resolves.
 7. **Public framing:** never name internal reference applications or internal process artifacts in
-   the produced screens' copy.
+   the produced screens' copy. AI fixtures use neutral model labels (e.g. `ops-model-large`),
+   never real vendor model ids.
+8. **Retire-list:** `ns-waterfall` and `ns-preview-tag` are removed from the system — any screen
+   that renders either is a defect (waterfall violates the satellite doctrine; preview tags
+   violate final-product framing).
+9. **CLI invariant (hard):** an `ns-confirm` without a populated CLI-equivalent line is a defect,
+   not a styling choice — the CLI block is a required slot on every mutation dialog.
+10. **Numbers reconcile:** every stat/count/id is drawn from the one canonical fixture and the
+   derived-stats rules in the POC ground truth; two screens showing different values for the
+   same fact is a defect.
 
 ## Grounding artifacts (same run dir)
 

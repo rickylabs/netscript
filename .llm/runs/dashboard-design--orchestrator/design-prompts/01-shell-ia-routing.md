@@ -44,7 +44,9 @@ addressability is visible (e.g. `/sagas/PaymentWebhookSaga/ch_3QK9dR2eZ?tab=hist
 ## Chrome
 
 - **Sidebar** (`sidebar-shell`): four labeled groups — **Overview / Capabilities / Data /
-  System** — exactly the items and order in the tree above. Active state by URL prefix (deep
+  System**. This rename is NOT cosmetic: the current sidebar has two near-identical adjacent
+  group labels (`Console` / `Consoles`) — an active scannability defect; do not reintroduce any
+  "Console"-style prefix — exactly the items and order in the tree above. Active state by URL prefix (deep
   pages keep their section lit). Each item carries a small derived-stat badge, warning-toned
   only when non-zero: Config = unwired nodes; Runtime = disabled overrides; Catalog = unbound
   routes; Live Flow + Run Inspector + Workers + AI = running counts (primary tone); Sagas =
@@ -52,7 +54,8 @@ addressability is visible (e.g. `/sagas/PaymentWebhookSaga/ch_3QK9dR2eZ?tab=hist
   total depth; Auth = active sessions (muted); Extensions = contributed-panel count (muted).
   Collapsible to icon rail; mobile drawer.
 - **Topbar:** breadcrumb derived purely from the pathname with entity ids resolved to display
-  names (`Workers / Jobs / reserve-inventory / Execution exec_88f`); environment pill
+  names — NO constant synthetic prefix crumb (the current fixed `Console /` root is a defect);
+  the first crumb is Home (`/`) or the route-group label, nothing else (`Workers / Jobs / reserve-inventory / Execution exec_88f`); environment pill
   `local · my-app · aspire` with status dot; global search button opening the ⌘K palette;
   theme toggle; a prominent "Open Aspire Dashboard ↗" affordance.
 - **⌘K command palette** (`command-palette`): three sections — **Navigate** (fuzzy over every
