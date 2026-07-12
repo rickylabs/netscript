@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `quality-q751-workers-core--codex` |
 | Branch | `quality/q751-workers-core-h` |
-| Current phase | `implement` |
+| Current phase | `handoff` |
 | Archetype | `3 — Runtime / Behavior` |
 | Scope overlays | `none` |
 
@@ -28,16 +28,16 @@ PLAN-EVAL passed. All three slices are implemented and independently reviewed `P
 - Slice 3 canonical runtime/fixture port typing implemented; all eight remaining casts removed.
 - Slice 3 doc-lint regression caught by review, corrected below baseline, and rechecked PASS.
 - Final scoped check/lint/fmt, package + KV tests, publish dry-run, doc lint, architecture, scanner, and lock gates recorded.
+- Final independent IMPL-EVAL PASS (`5407040d-e2d7-4442-97df-6da4c7f7e9da`).
 
 ## In Progress
 
-- Final IMPL-EVAL, commit, and force-push handoff.
+- Commit evaluator artifact and force-push handoff.
 
 ## Next Steps
 
-1. Commit Slice 3 sign-off.
-2. Run separate-session IMPL-EVAL.
-3. Commit evaluator artifact and force-push with lease; do not open a PR.
+1. Commit evaluator artifact.
+2. Force-push with lease; do not open a PR.
 
 ## Key Decisions
 

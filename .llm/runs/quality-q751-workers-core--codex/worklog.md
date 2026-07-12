@@ -67,6 +67,7 @@ Start at the exported schema/builder/runtime type, follow its concrete generic t
 | 2026-07-12 | slice 3 | implementation | Replaced all eight runtime/fixture cast bridges with canonical structural ports, precise option types, direct fixture generics, and stable workflow/shutdown identities. Scanner reduced 8 → 0 with allowCount 0. |
 | 2026-07-12 | slice 3 | review | Independent Opus/high review `d2768a42-6d10-4b9a-a702-ffb87935da6d` confirmed the typing but found Slice-3 doc-lint regression 24 → 33 (`FAIL_FIX`). Canonical alias targets were exposed and schema-derived public types made explicit/equivalent; same reviewer proved runtime/registry entrypoints 0 and combined doc debt 13, then updated to `PASS`. |
 | 2026-07-12 | slice 3 | reconcile | Final target met with 0 findings / 0 allowances. No allowance requires justification. Doc-lint improves the pre-Slice-3 24 to 13 (0 missing JSDoc) and no new architecture debt is introduced. |
+| 2026-07-12 | impl-eval | PASS | Fresh Opus/high session `5407040d-e2d7-4442-97df-6da4c7f7e9da` independently reran gates and returned `PASS`; only low, non-blocking stream doc-completeness and prompt-heading observations remain. |
 
 ## Decisions
 
@@ -106,10 +107,11 @@ Start at the exported schema/builder/runtime type, follow its concrete generic t
 | Final lint | scoped wrapper | PASS | 110 files, 0 findings; no lint ignore. |
 | Final fmt | scoped wrapper | PASS | 110 files, 0 findings. |
 | Final publish | package dry-run | PASS | No slow types; only known unanalyzable dynamic-import warning. |
-| Final doc lint | root structured wrapper | RECORDED / IMPROVED | Combined private refs 13 versus pre-Slice-3 24; runtime/registry 0; missing JSDoc 0. |
+| Final doc lint | root structured wrapper | RECORDED | Combined private refs: literal base 4 → pre-Slice-3 24 → final 13; runtime/registry 0; contract surface unchanged at 4; missing JSDoc 0. The remaining +9 versus literal base is stream generic doc-completeness, recorded by IMPL-EVAL as low/non-blocking. |
 | Final tests | package task + co-located KV test | PASS | 25 package tests + 5 KV tests passed. |
 | Architecture | `deno task arch:check` | PASS with warnings | Exit 0; package has existing size/layout warnings, no failures. |
 | Lock hygiene | diff from `3b3d615b` | PASS | No `deno.lock` churn. |
+| Final IMPL-EVAL | `evaluate.md` | PASS | Separate Opus/high evaluator; no high/medium findings. |
 
 ### Fitness Gates
 
