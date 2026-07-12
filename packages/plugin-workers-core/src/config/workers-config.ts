@@ -77,14 +77,12 @@ const TopicRetentionConfigZodSchema: z.ZodType<TopicRetentionConfigData | undefi
 export const TopicRetentionConfigSchema: ConfigSchema<TopicRetentionConfigData | undefined> =
   TopicRetentionConfigZodSchema;
 
-const WorkerGroupObjectSchema = z.object({
+const WorkerGroupZodSchema: z.ZodType<WorkerGroupData> = z.object({
   topic: z.string().describe('Topic identifier for queue routing'),
   scaling: ScalingConfigZodSchema,
   retention: TopicRetentionConfigZodSchema,
   jobs: z.array(JobConfigZodSchema).default([]),
 });
-
-const WorkerGroupZodSchema = WorkerGroupObjectSchema as unknown as z.ZodType<WorkerGroupData>;
 
 /** Worker group configuration schema. */
 export const WorkerGroupSchema: ConfigSchema<WorkerGroupData> = WorkerGroupZodSchema;
@@ -111,22 +109,23 @@ const WorkersConfigObjectSchema = z.object({
   enabled: z.boolean().default(true),
 });
 
-const WorkersConfigZodSchema = WorkersConfigObjectSchema.transform(
-  (config: z.output<typeof WorkersConfigObjectSchema>) => ({
-    ...config,
-    groups: config.groups.map((group: WorkerGroupData) => ({
-      ...group,
-      jobs: group.jobs.map((job: JobConfig) => ({
-        ...job,
-        topic: group.topic,
+const WorkersConfigZodSchema: z.ZodType<WorkersConfigData | undefined> = WorkersConfigObjectSchema
+  .transform(
+    (config: z.output<typeof WorkersConfigObjectSchema>) => ({
+      ...config,
+      groups: config.groups.map((group: WorkerGroupData) => ({
+        ...group,
+        jobs: group.jobs.map((job: JobConfig) => ({
+          ...job,
+          topic: group.topic,
+        })),
       })),
-    })),
-  }),
-).optional() as unknown as z.ZodType<WorkersConfigData | undefined>;
+    }),
+  ).optional();
 
 /** Workers plugin configuration schema. */
 export const WorkersConfigSchema: ConfigSchema<WorkersConfigData | undefined> =
-  WorkersConfigZodSchema as unknown as ConfigSchema<WorkersConfigData | undefined>;
+  WorkersConfigZodSchema;
 
 /** Per-topic worker scaling configuration. */
 export type ScalingConfig = ScalingConfigData | undefined;

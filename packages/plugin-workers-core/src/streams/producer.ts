@@ -7,9 +7,16 @@ const DEFAULT_PRODUCER_ID = 'workers-service';
 
 /** Durable stream producer type for the workers stream schema. */
 export type WorkersStreamProducer = Readonly<{
-  upsert(entity: 'execution', value: WorkerExecution): void | Promise<void>;
-  upsert(entity: 'job', value: WorkerJob): void | Promise<void>;
+  upsert<TEntity extends keyof WorkerStreamEntities>(
+    entity: TEntity,
+    value: WorkerStreamEntities[TEntity],
+  ): void | Promise<void>;
   delete(entity: 'execution' | 'job', id: string): void | Promise<void>;
+}>;
+
+type WorkerStreamEntities = Readonly<{
+  execution: WorkerExecution;
+  job: WorkerJob;
 }>;
 
 /** Execution record shape mirrored into the workers durable stream. */
@@ -17,7 +24,7 @@ export type WorkerExecutionRecord = Readonly<
   Record<string, unknown> & {
     readonly id: string;
     readonly jobId: string;
-    readonly status: string;
+    readonly status: WorkerExecution['status'];
     readonly topic?: string;
     readonly concept?: 'job' | 'task';
     readonly correlationId?: string;
@@ -52,11 +59,22 @@ export type ExecutionMutationHook = (mutation: ExecutionMutation) => void;
 export function createWorkersStreamProducer(
   options: WorkersStreamProducerOptions = {},
 ): WorkersStreamProducer {
-  return createDurableStream({
+  const producer = createDurableStream({
     streamPath: options.streamPath ?? DEFAULT_STREAM_PATH,
-    schema: workersStreamSchema as never,
+    schema: workersStreamSchema,
     producerId: options.producerId ?? DEFAULT_PRODUCER_ID,
-  }) as unknown as WorkersStreamProducer;
+  });
+  return Object.freeze({
+    delete(entity: keyof WorkerStreamEntities, id: string): void {
+      producer.delete(entity, id);
+    },
+    upsert<TEntity extends keyof WorkerStreamEntities>(
+      entity: TEntity,
+      value: WorkerStreamEntities[TEntity],
+    ): void {
+      producer.upsert(entity, { ...value });
+    },
+  });
 }
 
 /** Convert an execution record into the durable stream execution entity shape. */

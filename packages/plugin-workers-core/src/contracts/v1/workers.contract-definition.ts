@@ -41,8 +41,34 @@ import {
 // `BASE_PLUGIN_CONTRACT_ROUTES` uses. Everything downstream of `baseContract`
 // (routes, input/output schemas, the contract type, `implement`) is genuinely
 // typed.
+function isContractSchema(value: unknown): value is AnySchema {
+  return typeof value === 'object' && value !== null && '~standard' in value;
+}
+
+function requireContractSchema(value: unknown, code: string): AnySchema {
+  if (!isContractSchema(value)) {
+    throw new TypeError(`Base plugin error ${code} does not provide a Standard Schema`);
+  }
+  return value;
+}
+
+const basePluginErrors = {
+  NOT_FOUND: {
+    ...BASE_PLUGIN_ERRORS.NOT_FOUND,
+    data: requireContractSchema(BASE_PLUGIN_ERRORS.NOT_FOUND.data, 'NOT_FOUND'),
+  },
+  VALIDATION_ERROR: {
+    ...BASE_PLUGIN_ERRORS.VALIDATION_ERROR,
+    data: requireContractSchema(BASE_PLUGIN_ERRORS.VALIDATION_ERROR.data, 'VALIDATION_ERROR'),
+  },
+  INTERNAL: {
+    ...BASE_PLUGIN_ERRORS.INTERNAL,
+    data: requireContractSchema(BASE_PLUGIN_ERRORS.INTERNAL.data, 'INTERNAL'),
+  },
+} satisfies ErrorMap;
+
 const baseContract: ReturnType<typeof oc.errors> = oc.errors(
-  { ...BASE_PLUGIN_ERRORS } as unknown as Parameters<typeof oc.errors>[0],
+  basePluginErrors,
 );
 
 /**

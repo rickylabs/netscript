@@ -1,10 +1,10 @@
 import { defineStreamSchema } from '@netscript/plugin-streams-core';
+import type { StateSchema, StreamStateDefinition } from '@netscript/plugin-streams-core';
 import type { z } from 'zod';
 import { ExecutionRecordSchema, JobResponseSchema } from '../domain/mod.ts';
 
-type AnyZodObject = z.ZodObject<Record<string, z.ZodTypeAny>>;
 /** Standard Schema compatible public schema surface for stream entities. */
-export interface WorkerStreamStandardSchema<TOutput> {
+export interface WorkerStreamStandardSchema<TOutput, TInput = unknown> {
   /** Standard Schema metadata and validation hooks. */
   readonly '~standard': {
     readonly version: 1;
@@ -29,14 +29,15 @@ export interface WorkerStreamStandardSchema<TOutput> {
           }>;
         }
       >;
-    readonly types?: { readonly input: unknown; readonly output: TOutput } | undefined;
+    readonly types?: { readonly input: TInput; readonly output: TOutput } | undefined;
   };
 }
 
 /** Package-owned structural schema surface for worker stream entities. */
-export interface WorkerStreamEntitySchema<TOutput> extends WorkerStreamStandardSchema<TOutput> {
+export interface WorkerStreamEntitySchema<TOutput, TInput = unknown>
+  extends WorkerStreamStandardSchema<TOutput, TInput> {
   /** Parse an unknown value into the entity output. */
-  parse(value: unknown): TOutput;
+  parse(value: TInput): TOutput;
   /** Validate an unknown value without throwing. */
   safeParse(value: unknown):
     | { readonly success: true; readonly data: TOutput }
@@ -44,9 +45,9 @@ export interface WorkerStreamEntitySchema<TOutput> extends WorkerStreamStandardS
 }
 
 /** Package-owned structural stream collection definition. */
-export interface WorkerStreamCollectionDefinition<TOutput> {
+export interface WorkerStreamCollectionDefinition<TOutput, TInput = unknown> {
   /** Standard Schema compatible validator for collection entities. */
-  readonly schema: WorkerStreamEntitySchema<TOutput>;
+  readonly schema: WorkerStreamEntitySchema<TOutput, TInput>;
   /** State Protocol type discriminator emitted for the collection. */
   readonly type: string;
   /** Property name used as the entity primary key. */
@@ -54,63 +55,39 @@ export interface WorkerStreamCollectionDefinition<TOutput> {
 }
 
 /** Structural stream schema definition map. */
-export type StreamSchemaDefinition = Record<string, WorkerStreamCollectionDefinition<unknown>>;
+export type StreamSchemaDefinition = StreamStateDefinition;
 
 /** Package-owned structural workers stream schema surface. */
-export type WorkersStreamSchema<TDefinition extends StreamSchemaDefinition> = TDefinition;
+export type WorkersStreamSchema<TDefinition extends StreamSchemaDefinition> = StateSchema<
+  TDefinition
+>;
 
 /** Worker execution entity stored in the durable stream. */
-export type WorkerExecution = Readonly<{
-  /** Unique execution identifier. */
-  id: string;
-  /** Job or task identifier associated with the execution. */
-  jobId: string;
-  /** Current execution status. */
-  status: string;
-  /** Stream topic associated with the execution. */
-  topic?: string;
-  /** Runtime concept represented by this execution. */
-  concept?: 'job' | 'task';
-  /** Correlation identifier used to join related executions. */
-  correlationId?: string;
-  /** ISO timestamp for when the execution was triggered. */
-  triggeredAt?: string;
-  /** ISO timestamp for when the execution started. */
-  startedAt?: string | null;
-  /** ISO timestamp for when the execution completed. */
-  completedAt?: string | null;
-  /** Execution duration in milliseconds. */
-  duration?: number | null;
-  /** Process-style exit code for the execution result. */
-  exitCode?: number | null;
-  /** Error message recorded for failed executions. */
-  error?: string | null;
-  /** Structured execution result payload. */
-  result?: Record<string, unknown> | null;
-  /** Worker identifier that ran the execution. */
-  workerId?: string | null;
-  /** Current retry attempt number. */
-  attempt?: number;
-}>;
+export type WorkerExecution = Readonly<z.output<typeof WorkerExecutionZodSchema>>;
 
 /** Worker job entity stored in the durable stream. */
-export type WorkerJob = Readonly<{
-  /** Unique job identifier. */
-  id: string;
-  /** Human-readable job name. */
-  name?: string;
-  /** Stream topic associated with the job. */
-  topic?: string;
-  /** Whether the job is enabled. */
-  enabled?: boolean;
-  /** @deprecated Recurring jobs are modelled as scheduled triggers. */
-  schedule?: unknown;
-  /** Human-readable job description. */
-  description?: string;
-}>;
+export type WorkerJob = Readonly<z.output<typeof WorkerJobZodSchema>>;
+
+type WorkerExecutionShape = {
+  id: typeof ExecutionRecordSchema.shape.id;
+  jobId: typeof ExecutionRecordSchema.shape.jobId;
+  status: typeof ExecutionRecordSchema.shape.status;
+  topic: z.ZodOptional<typeof ExecutionRecordSchema.shape.topic>;
+  concept: z.ZodOptional<typeof ExecutionRecordSchema.shape.concept>;
+  correlationId: z.ZodOptional<typeof ExecutionRecordSchema.shape.correlationId>;
+  triggeredAt: z.ZodOptional<typeof ExecutionRecordSchema.shape.triggeredAt>;
+  startedAt: z.ZodOptional<typeof ExecutionRecordSchema.shape.startedAt>;
+  completedAt: z.ZodOptional<typeof ExecutionRecordSchema.shape.completedAt>;
+  duration: z.ZodOptional<typeof ExecutionRecordSchema.shape.duration>;
+  exitCode: z.ZodOptional<typeof ExecutionRecordSchema.shape.exitCode>;
+  error: z.ZodOptional<typeof ExecutionRecordSchema.shape.error>;
+  result: z.ZodOptional<typeof ExecutionRecordSchema.shape.result>;
+  workerId: z.ZodOptional<typeof ExecutionRecordSchema.shape.workerId>;
+  attempt: z.ZodOptional<typeof ExecutionRecordSchema.shape.attempt>;
+};
 
 /** Zod schema for a worker execution entity stored in the durable stream. */
-const WorkerExecutionZodSchema: AnyZodObject = ExecutionRecordSchema.pick({
+const WorkerExecutionZodSchema: z.ZodObject<WorkerExecutionShape> = ExecutionRecordSchema.pick({
   id: true,
   jobId: true,
   topic: true,
@@ -141,11 +118,22 @@ const WorkerExecutionZodSchema: AnyZodObject = ExecutionRecordSchema.pick({
   attempt: true,
 });
 /** Stream entity schema for worker executions. */
-export const WorkerExecutionSchema: WorkerStreamEntitySchema<WorkerExecution> =
-  WorkerExecutionZodSchema as unknown as WorkerStreamEntitySchema<WorkerExecution>;
+export const WorkerExecutionSchema: WorkerStreamEntitySchema<
+  WorkerExecution,
+  z.input<typeof WorkerExecutionZodSchema>
+> = WorkerExecutionZodSchema;
+
+type WorkerJobShape = {
+  id: typeof JobResponseSchema.shape.id;
+  name: z.ZodOptional<typeof JobResponseSchema.shape.name>;
+  topic: z.ZodOptional<typeof JobResponseSchema.shape.topic>;
+  enabled: z.ZodOptional<typeof JobResponseSchema.shape.enabled>;
+  schedule: z.ZodOptional<typeof JobResponseSchema.shape.schedule>;
+  description: z.ZodOptional<typeof JobResponseSchema.shape.description>;
+};
 
 /** Zod schema for a worker job entity stored in the durable stream. */
-const WorkerJobZodSchema: AnyZodObject = JobResponseSchema.pick({
+const WorkerJobZodSchema: z.ZodObject<WorkerJobShape> = JobResponseSchema.pick({
   id: true,
   name: true,
   topic: true,
@@ -160,33 +148,26 @@ const WorkerJobZodSchema: AnyZodObject = JobResponseSchema.pick({
   description: true,
 });
 /** Stream entity schema for worker jobs. */
-export const WorkerJobSchema: WorkerStreamEntitySchema<WorkerJob> =
-  WorkerJobZodSchema as unknown as WorkerStreamEntitySchema<WorkerJob>;
+export const WorkerJobSchema: WorkerStreamEntitySchema<
+  WorkerJob,
+  z.input<typeof WorkerJobZodSchema>
+> = WorkerJobZodSchema;
 
 /** Durable stream definition for worker execution and job entities. */
-export type WorkersStreamDefinition = {
-  /** Execution entity stream definition. */
-  execution: WorkerStreamCollectionDefinition<WorkerExecution> & {
-    /** Execution entity schema. */
-    readonly schema: WorkerStreamEntitySchema<WorkerExecution>;
-    /** Execution entity discriminator. */
-    readonly type: 'execution';
-    /** Execution entity primary key. */
-    readonly primaryKey: 'id';
-  };
-  /** Job entity stream definition. */
-  job: WorkerStreamCollectionDefinition<WorkerJob> & {
-    /** Job entity schema. */
-    readonly schema: WorkerStreamEntitySchema<WorkerJob>;
-    /** Job entity discriminator. */
-    readonly type: 'job';
-    /** Job entity primary key. */
-    readonly primaryKey: 'id';
-  };
-} & StreamSchemaDefinition;
+export type WorkersStreamDefinition = Readonly<{
+  execution: Readonly<{
+    schema: typeof WorkerExecutionZodSchema;
+    type: 'execution';
+    primaryKey: 'id';
+  }>;
+  job: Readonly<{
+    schema: typeof WorkerJobZodSchema;
+    type: 'job';
+    primaryKey: 'id';
+  }>;
+}>;
 
-/** Entity-based durable stream schema for worker executions and jobs. */
-const workersStreamStateSchema = defineStreamSchema({
+const workersStreamDefinition: WorkersStreamDefinition = {
   execution: {
     schema: WorkerExecutionZodSchema,
     type: 'execution',
@@ -197,7 +178,9 @@ const workersStreamStateSchema = defineStreamSchema({
     type: 'job',
     primaryKey: 'id',
   },
-});
+};
+
 /** Stream schema definition for worker executions and jobs. */
-export const workersStreamSchema: WorkersStreamSchema<WorkersStreamDefinition> =
-  workersStreamStateSchema as unknown as WorkersStreamSchema<WorkersStreamDefinition>;
+export const workersStreamSchema: WorkersStreamSchema<WorkersStreamDefinition> = defineStreamSchema(
+  workersStreamDefinition,
+);
