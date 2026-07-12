@@ -9,6 +9,7 @@ import { createPluginCommand } from '../plugins/plugins-group.ts';
 import { createServiceCommand } from '../services/services-group.ts';
 import { createUiAddCommand } from '../ui/add/add-ui-command.ts';
 import { createUiInitCommand } from '../ui/init/init-ui-command.ts';
+import { createAgentCommand } from '../agent/agent-group.ts';
 import {
   createPublicCommandDependencies,
   type PublicCommandDependencies,
@@ -42,6 +43,11 @@ export interface PublicCommandContext {
 /** Create the registry of public command factories. */
 export function createPublicCommandRegistry(): CliCommandRegistry<PublicCommandContext> {
   const registry = new CliCommandRegistry<PublicCommandContext>();
+
+  registry.register('agent', {
+    id: 'agent',
+    create: ({ host, dependencies }) => createAgentCommand(host, dependencies),
+  });
 
   registry.register('deploy', {
     id: 'deploy',
