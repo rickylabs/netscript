@@ -1,6 +1,6 @@
 # Context Pack — `@netscript/mcp` S5
 
-Status: implementation and requested gates complete; separate-session IMPL-EVAL pending.
+Status: implementation and requested gates complete; separate-session IMPL-EVAL PASS. Ready for Tier-A supervisor substantive review.
 
 Baseline is supervisor-corrected `dd89ced9` on `feat/netscript-mcp-skills-s5-doctor`. Scope is doctor aggregation only. Locked dependency decision: MCP directly uses leaf `@netscript/aspire`, never imports or reimplements CLI plugin doctor, and instead exposes an injected `ProjectDoctorPort` with a clearly warned S7 stub. Four families are telemetry, Aspire, project wiring, and plugins. Existing doctor output remains compatible and gains bounded family attribution.
 

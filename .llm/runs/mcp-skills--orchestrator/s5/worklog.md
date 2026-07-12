@@ -56,6 +56,7 @@ Add a family by implementing the narrow `DoctorCheckFamily` port, keeping side e
 | 2026-07-12 | slice 1 | Added family contracts, aggregation, shared telemetry family, explicit-endpoint severity, and failure isolation. |
 | 2026-07-12 | slice 2 | Added real Aspire wrapper, fixture-driven project wiring, S7 plugin-doctor injection seam/stub, CLI composition, README permissions, and workspace dependency. |
 | 2026-07-12 | slice 3 | Required static, architecture, docs, publish, and consumer gates passed. |
+| 2026-07-12 | IMPL-EVAL | Separate opposite-family evaluator independently re-ran gates and returned `PASS`; Tier-A substantive review remains the supervisor handoff. |
 
 ## Gate Results
 
