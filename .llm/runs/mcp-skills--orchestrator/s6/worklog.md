@@ -57,6 +57,7 @@ Add or replace a catalog by implementing `CommandCatalogPort` at the outer compo
 | 2026-07-12 | slice 1 | Added command catalog/executor contracts, immutable deny-wins policy, bounded list flow, policy-gated execute flow, exports, and table tests. Focused tests: 3 passed; scoped check: 53 files, 0 findings. Tier-A substantive review pending supervisor handoff. |
 | 2026-07-12 | slice 2 | Added bounded static catalog and subprocess executor with published CLI default, injectable prefix/deadline/tail, real process, timeout, and truncation tests. Command tests: 8 passed; scoped check: 56 files, 0 findings. |
 | 2026-07-12 | slice 3 | Wired catalog/executor/policy through `McpCliOptions`, finalized structured schemas/descriptions, bounded live descriptors and timeout markers, and completed generator gates. |
+| 2026-07-12 | IMPL-EVAL | Fresh separate opposite-family evaluator independently reran applicable gates and returned `PASS`; Tier-A substantive sign-off remains the supervisor handoff. |
 
 ## Slice Reconcile Notes
 
