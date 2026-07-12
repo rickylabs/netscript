@@ -150,7 +150,18 @@ overlays:
 - fitness gates when implemented or explicitly pending for Phase A,
 - runtime gates when the run touches runtime behavior,
 - consumer gates when exports or downstream contracts change,
-- **jsr-audit** as a required gate for package/plugin waves.
+- **jsr-audit** as a required gate for package/plugin waves,
+- **the code-quality gate** (`deno task quality:scan` + `deno task arch:check`) as a required gate
+  for any wave touching `packages/**` or `plugins/**`.
+
+**The scoped check/lint/fmt wrappers are necessary but NOT sufficient.** They pass code containing
+`any` and they honor inline `// deno-lint-ignore no-explicit-any`, so they cannot catch the two
+violation classes that reached `main` in the beta.9 CLI wave (#745): (1) `any` + manual casting
+(`Command<any,…>` under a lint-ignore, `as unknown as`/`as any`), and (2) host-side hardcoded
+plugin-name coupling (`plugin.name === 'auth'`, `kind === 'ai'`). Running `quality:scan` (which
+fails on both) and `arch:check` (doctrine fitness) per slice is what catches them. A green scoped
+wrapper is never a substitute for these two gates on a framework-source wave. A `// deno-lint-ignore`
+added to make a wrapper pass is itself a finding — never silence a gate to green it.
 
 Gate **evidence is wrapper-sourced and mandatory**: type-check / lint / format from the scoped
 wrappers (`.llm/tools/run-deno-check|lint|fmt.ts`), doc-lint from `deno task doc:lint`, and
