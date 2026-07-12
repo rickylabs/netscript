@@ -31,3 +31,34 @@ boundary and does not require a WSL Codex slice. Had the correct fix been to alt
 the MCP doctor's test, that would have been delegated to Tier D.
 
 **Severity:** minor. Within approved scope.
+
+## D3 — IMPL-EVAL evaluator surface failed to bootstrap (significant)
+
+**Attempt 1** — OpenHands, `openrouter/qwen/qwen3.7-max`, run `29212768065` — died before producing
+a verdict:
+
+```text
+openhands.sdk.conversation.exceptions.ConversationRunError:
+  Conversation run failed for id=61793d3e-fce4-4846-8d54-26494802be37: No module named 'fastapi'
+```
+
+This is an **OpenHands runtime bootstrap fault**, not a task verdict — the workflow's own summary
+classifies it `state=agent-failed, verdict=NONE, "This is a workflow failure, not a task verdict."`
+Housekeeping steps (ack, trace, commit-artifacts) all succeeded, so the trigger and routing are
+fine; the agent container is missing a Python dependency.
+
+**Attempt 2** dispatched on `openrouter/minimax/minimax-m3` (the other permitted open model —
+OpenHands is open-models-only; dispatching a closed model is prohibited). The fault looks
+model-independent (a runtime bootstrap dependency, not a model call), so attempt 2 may fail the same
+way.
+
+**Consequence if it does:** the evaluator surface is **blocked**, and per the harness skill that is
+recorded here rather than silently skipped. PR #715 does **not** merge without an opposite-family
+IMPL-EVAL verdict. If OpenHands stays broken, the fallback is a separate local Codex (GPT-family)
+session as the evaluator — which is a valid opposite-family route to Claude-generated work — but that
+fallback requires owner authorization and must be recorded in `supervisor.md`.
+
+**Owner decision needed:** either (a) fix the OpenHands runtime (`fastapi` missing from the agent
+image), or (b) authorize the local Codex evaluator fallback for #715.
+
+**Severity:** significant — it blocks the merge gate, not the implementation.
