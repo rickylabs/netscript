@@ -32,6 +32,8 @@
 - **Actual:** 8 private-type references and 17 missing JSDoc entries are reported for the internal
   route contract surface; publish dry-run and slow-type validation remain green.
 - **Severity:** minor
-- **Action:** defer documentation-surface consolidation; do not restore a cast solely to hide the
+- **Action:** tracked under the existing `@netscript/fresh` Restructure verdict with a zero-route-
+  diagnostics/no-new-allowances closing gate; do not restore a cast solely to hide the
   implementation type from documentation.
-- **Evidence:** final worklog gate table; package publish dry-run.
+- **Evidence:** `docs/architecture/doctrine/10-codebase-verdict-and-handoff.md`; IMPL-EVAL;
+  package publish dry-run.

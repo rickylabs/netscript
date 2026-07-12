@@ -70,6 +70,7 @@ and add a focused inference/runtime case beside that feature before extending a 
 | Target zero allowances | Owner rejected suppression as strategy. | owner directive / plan D6 |
 | Retain one inline-contract allowance | Optional inline schemas preserve prior builder output types, while the bound-route generic maps omission to `EmptyRecord`; a direct attempt and presence-constrained generics could not equate those states without redesigning legacy overloads. | `route-support.ts`; compiler evidence |
 | Treat the prior allowance count as 25 | The rejected dangling implementation contained one `quality-allow` marker for every scanner finding; base itself had 25 findings and no allowances. | rejected commit `cb538f4008c5f3a6af6f309db5408aef9f535f6e`; preflight scanner |
+| Track route documentation consolidation | The typed route implementation is now visible to `deno doc`; resolving its 25 diagnostics belongs to the existing Fresh Restructure verdict, not to a cast-restoration workaround. Closing gate: zero route diagnostics without new allowances. | doctrine `10-codebase-verdict-and-handoff.md`; IMPL-EVAL finding 1 |
 
 ## Drift
 
@@ -100,6 +101,7 @@ and add a focused inference/runtime case beside that feature before extending a 
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
 | Plan-Gate | PASS | `plan-eval.md` | Separate opposite-family review completed before source edits. |
+| Impl-Gate | PASS | `evaluate.md` | Separate Claude Opus/high session `622b530c`; all acceptance evidence independently reproduced. |
 
 ### Runtime Gates
 
