@@ -1,0 +1,1 @@
+Killed by the beta.6 rescope. Structured/console logs + `?follow` NDJSON + level filters + `withBrowserLogs` capture are Aspire-native. `ns-log-stream` survives **only** as a correlated read-only strip inside Run Inspector (#419) that deep-links to Aspire structured logs (`{aspireBase}/structuredlogs?resource={name}`). No owned logs screen ships. Closing as superseded.

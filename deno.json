@@ -57,6 +57,7 @@
     "agentic:antigravity-evidence": "deno run --no-lock --allow-read --allow-write --allow-run --allow-env .llm/tools/agentic/runtime/cli/antigravity-evidence-cli.ts",
     "agentic:provider-canary": "deno run --no-lock --allow-run --allow-env .llm/tools/agentic/runtime/cli/provider-canary.ts",
     "agentic:rollout-canary": "deno run --no-lock --allow-read --allow-write --allow-run --allow-env .llm/tools/agentic/runtime/cli/rollout-canary-cli.ts",
+    "design:sync": "deno run --no-lock --allow-read --allow-write --allow-run --allow-env tools/design-sync/mod.ts",
     "docs:links": "deno run --no-lock --allow-read .llm/tools/validation/check-internal-doc-links.ts --pretty",
     "docs:maintenance": "deno task docs:links && deno task agentic:sync-claude:check && deno task agentic:check-claude",
     "agentic:smoke-claude-remote": "deno run --no-lock --allow-read --allow-run .llm/tools/agentic/claude/claude-remote-smoke.ts --env-aware --pretty",

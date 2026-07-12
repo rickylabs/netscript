@@ -1,0 +1,1 @@
+Superseded by #507, which delivers the `tools/design-sync/` system + a full E2E Claude Design prototype of the rescoped shell + screens. Design-sync tooling and the panel prototype now live there. Closing as superseded; no separate deliverable remains here.
