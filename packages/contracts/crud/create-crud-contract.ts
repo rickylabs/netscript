@@ -47,6 +47,7 @@ const asSchema = (schema: unknown): AnySchema => schema as AnySchema;
 import type {
   ContractObjectSchema,
   ContractSchema,
+  ContractSchemaInput,
   ContractSchemaOutput,
 } from '../src/domain/schema-types.ts';
 import {
@@ -54,6 +55,7 @@ import {
   type PaginatedResult,
   type PaginationInput,
   PaginationInputSchema,
+  type PaginationOutputSchema,
 } from '../schemas/pagination.ts';
 
 // ============================================================================
@@ -138,19 +140,25 @@ export type CrudContractOperation<
 
 /** Input schema shape for CRUD operations addressed by identifier. */
 export type CrudIdInput<TId extends ContractSchema<unknown>> = ContractObjectSchema<
-  Readonly<{ id: ContractSchemaOutput<TId> }>
+  Readonly<{ id: ContractSchemaOutput<TId> }>,
+  Readonly<{ id: ContractSchemaInput<TId> }>
 >;
 
 /** Input schema shape for list operations with pagination and optional filters. */
 export type CrudListInput<TFilter extends ContractObjectSchema<unknown> | undefined> =
   TFilter extends ContractObjectSchema<infer TFilterOutput> ? ContractObjectSchema<
-      PaginationInput & TFilterOutput
+      PaginationInput & TFilterOutput,
+      ContractSchemaInput<typeof PaginationInputSchema> & ContractSchemaInput<TFilter>
     >
-    : ContractObjectSchema<PaginationInput>;
+    : typeof PaginationInputSchema;
 
 /** Output schema shape for list operations with paginated entities. */
 export type CrudListOutput<TEntity extends ContractSchema<unknown>> = ContractObjectSchema<
-  PaginatedResult<ContractSchemaOutput<TEntity>>
+  PaginatedResult<ContractSchemaOutput<TEntity>>,
+  Readonly<{
+    data: ContractSchemaInput<TEntity>[];
+    pagination: ContractSchemaInput<typeof PaginationOutputSchema>;
+  }>
 >;
 
 /** Input schema shape for update operations addressed by identifier. */
@@ -158,7 +166,8 @@ export type CrudUpdateInput<
   TId extends ContractSchema<unknown>,
   TUpdate extends ContractSchema<unknown>,
 > = ContractObjectSchema<
-  Readonly<{ id: ContractSchemaOutput<TId>; data: ContractSchemaOutput<TUpdate> }>
+  Readonly<{ id: ContractSchemaOutput<TId>; data: ContractSchemaOutput<TUpdate> }>,
+  Readonly<{ id: ContractSchemaInput<TId>; data: ContractSchemaInput<TUpdate> }>
 >;
 
 /**
@@ -307,30 +316,28 @@ export function createCrudContract<
     entitySchema,
     createSchema,
     updateSchema,
-    idSchema = z.coerce.number().int().positive() as unknown as TId,
+    idSchema: configuredIdSchema,
     filterSchema,
     disable,
   } = options;
+  const idSchema = configuredIdSchema ?? z.coerce.number().int().positive();
 
   // Build list input schema (pagination + optional filters)
-  const listInputSchema = (
-    filterSchema
-      ? PaginationInputSchema.merge(filterSchema as unknown as z.ZodObject)
-      : PaginationInputSchema
-  ) as CrudListInput<TFilter>;
+  const listInputSchema = filterSchema
+    ? z.object({ ...PaginationInputSchema.shape, ...filterSchema.shape })
+    : PaginationInputSchema;
 
   // Build list output schema
-  const listOutputSchema = createPaginatedOutput(
-    entitySchema,
-  ) as CrudListOutput<TEntity>;
+  const listOutputSchema = createPaginatedOutput(entitySchema);
 
   // ID input schema
   const idInputSchema = z.object({
-    id: idSchema as unknown as z.ZodTypeAny,
-  }) as unknown as CrudIdInput<TId>;
-  const updateInputSchema = idInputSchema.merge(
-    z.object({ data: updateSchema as unknown as z.ZodTypeAny }),
-  ) as CrudUpdateInput<TId, TUpdate>;
+    id: idSchema,
+  });
+  const updateInputSchema = z.object({
+    id: idSchema,
+    data: updateSchema,
+  });
 
   const operations: CrudContract<TEntity, TCreate, TUpdate, TId, TFilter> = {
     list: crudOperation(

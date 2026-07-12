@@ -160,6 +160,12 @@ Zod input/output/default/coercion variance and CRUD composition with real generi
    route construction and exact markers, then run all acceptance and consumer gates. Files:
    `crud/create-crud-contract.ts`, focused tests/exports if required, run artifacts.
 
+Execution note (2026-07-12): slices 2 and 3 are landing as one sign-off unit. Replacing the public
+schema alias immediately changes the type checked at the pre-existing CRUD cast sites, so the
+schema model cannot form an independently green commit without either preserving or moving a cast.
+Combining them keeps the branch compiling and avoids the exact suppression/cast-relocation strategy
+the owner rejected. Scope and final gates are unchanged; see `drift.md`.
+
 ## Deferred Scope
 
 - Broader package restructuring and the accepted root `crud/` layout.
@@ -170,4 +176,3 @@ Zod input/output/default/coercion variance and CRUD composition with real generi
 
 - Log if native Zod typing requires a public export rename, if allowance count cannot reach eight,
   if doc/publish diagnostics regress, or if consumer checks expose cross-package migration scope.
-

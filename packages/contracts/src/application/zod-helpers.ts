@@ -5,12 +5,7 @@ import {
   DEFAULT_PAGINATION_LIMIT_MAX,
   DEFAULT_PAGINATION_OFFSET,
 } from '../domain/constants.ts';
-import type {
-  ContractDefaultableSchema,
-  ContractNumberSchema,
-  ContractSchema,
-  ContractStringSchema,
-} from '../domain/schema-types.ts';
+import type { ContractNumberSchema, ContractStringSchema } from '../domain/schema-types.ts';
 
 /** Options accepted by contract integer schema factories. */
 export type IntegerSchemaOptions = Readonly<{
@@ -46,9 +41,7 @@ export function positiveInt(options: IntegerSchemaOptions = {}): ContractNumberS
     .min(options.min ?? 1)
     .max(options.max ?? DEFAULT_INTEGER_MAX);
 
-  return (options.description
-    ? schema.describe(options.description)
-    : schema) as unknown as ContractNumberSchema;
+  return options.description ? schema.describe(options.description) : schema;
 }
 
 /** Creates a non-negative integer schema with NetScript's default integer cap. */
@@ -58,9 +51,7 @@ export function nonNegativeInt(options: IntegerSchemaOptions = {}): ContractNumb
     .min(options.min ?? 0)
     .max(options.max ?? DEFAULT_INTEGER_MAX);
 
-  return (options.description
-    ? schema.describe(options.description)
-    : schema) as unknown as ContractNumberSchema;
+  return options.description ? schema.describe(options.description) : schema;
 }
 
 /** Creates a defaulted pagination-limit schema. */
@@ -73,9 +64,7 @@ export function paginationLimit(
     .max(options.max ?? DEFAULT_PAGINATION_LIMIT_MAX)
     .default(options.default ?? DEFAULT_PAGINATION_LIMIT);
 
-  return (options.description
-    ? schema.describe(options.description)
-    : schema) as unknown as ContractNumberSchema;
+  return options.description ? schema.describe(options.description) : schema;
 }
 
 /** Creates a defaulted pagination-offset schema. */
@@ -88,9 +77,7 @@ export function paginationOffset(
     .max(options.max ?? DEFAULT_INTEGER_MAX)
     .default(options.default ?? DEFAULT_PAGINATION_OFFSET);
 
-  return (options.description
-    ? schema.describe(options.description)
-    : schema) as unknown as ContractNumberSchema;
+  return options.description ? schema.describe(options.description) : schema;
 }
 
 /** Creates a bounded string schema. */
@@ -99,43 +86,37 @@ export function boundedString(options: BoundedStringSchemaOptions): ContractStri
     .min(options.min ?? 1)
     .max(options.max);
 
-  return (options.description
-    ? schema.describe(options.description)
-    : schema) as unknown as ContractStringSchema;
+  return options.description ? schema.describe(options.description) : schema;
 }
 
 /** Creates a positive decimal-number schema. */
 export function positiveNumber(options: StringSchemaOptions = {}): ContractNumberSchema {
   const schema = z.number().positive();
-  return (options.description
-    ? schema.describe(options.description)
-    : schema) as unknown as ContractNumberSchema;
+  return options.description ? schema.describe(options.description) : schema;
 }
 
 /** Creates a non-negative decimal-number schema. */
 export function nonNegativeNumber(options: StringSchemaOptions = {}): ContractNumberSchema {
   const schema = z.number().nonnegative();
-  return (options.description
-    ? schema.describe(options.description)
-    : schema) as unknown as ContractNumberSchema;
+  return options.description ? schema.describe(options.description) : schema;
 }
 
 /** Coerces a numeric string into a number and validates it with `outputSchema`. */
 export function stringToNumber(
-  outputSchema: ContractDefaultableSchema<number>,
-): ContractSchema<number> {
-  return z.codec(z.string().regex(z.regexes.number), outputSchema as z.ZodNumber, {
+  outputSchema: ContractNumberSchema,
+): z.ZodCodec<z.ZodString, ContractNumberSchema> {
+  return z.codec(z.string().regex(z.regexes.number), outputSchema, {
     decode: (value: string) => Number.parseFloat(value),
-    encode: (value: number) => (value ?? 0).toString(),
-  }) as unknown as ContractSchema<number>;
+    encode: (value: number | undefined) => (value ?? 0).toString(),
+  });
 }
 
 /** Coerces an integer string into a number and validates it with `outputSchema`. */
 export function stringToInt(
-  outputSchema: ContractDefaultableSchema<number>,
-): ContractSchema<number> {
-  return z.codec(z.string().regex(z.regexes.integer), outputSchema as z.ZodNumber, {
+  outputSchema: ContractNumberSchema,
+): z.ZodCodec<z.ZodString, ContractNumberSchema> {
+  return z.codec(z.string().regex(z.regexes.integer), outputSchema, {
     decode: (value: string) => Number.parseInt(value, 10),
-    encode: (value: number) => (value ?? 0).toString(),
-  }) as unknown as ContractSchema<number>;
+    encode: (value: number | undefined) => (value ?? 0).toString(),
+  });
 }

@@ -78,6 +78,7 @@ module, then add a parse and type-inference test. Never cast a Zod value into a 
 | 2026-07-12 | research | baseline | Fresh scanner: 50 findings, 0 allowances; rejected pass: 41 allowances. |
 | 2026-07-12 | plan | Plan-Gate | Separate Claude Opus 4.8 session `b2f5d950-e468-4fde-8177-0460ffada95e` returned PASS; no package implementation preceded it. |
 | 2026-07-12 | 1 | application typing | Replaced Prisma argument `any` bags and heterogeneous transformer `any` accumulation with `unknown`-safe types; scanner reduced 50 → 41, allowances remain 0. |
+| 2026-07-12 | 2+3 | schema/CRUD typing | Replaced the output-only facade with Zod input/output generics, typed schema factories and CRUD composition, and added variance/inference tests; scanner reduced 41 → 0 with 0 allowances. |
 
 ## Decisions
 
@@ -109,17 +110,20 @@ module, then add a parse and type-inference test. Never cast a Zod value into a 
 
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
-| Scoped check | wrapper over `packages/contracts` | PASS | 20 files, 1 batch, 0 diagnostics |
-| Scoped lint | wrapper over `packages/contracts` | PASS | 20 files, 0 findings; all explicit-any ignores removed |
-| Scoped format | wrapper over `packages/contracts` | PASS | 20 files, 0 findings |
-| Package tests | package `deno task test` | PASS | 5 passed, 0 failed |
-| Publish/doc | plan validation commands | NOT_RUN | Final evidence after implementation |
+| Scoped check | wrapper over `packages/contracts` | PASS | 21 files, 1 batch, 0 diagnostics |
+| Scoped lint | wrapper over `packages/contracts` | PASS | 21 files, 0 findings; no explicit-any ignore remains |
+| Scoped format | wrapper over `packages/contracts` | PASS | 21 files, 0 findings |
+| Package tests | package `deno task test` | PASS | 8 passed, 0 failed, including input/output and CRUD inference coverage |
+| Publish dry-run | package `deno publish --dry-run --allow-dirty` | PASS | Green without `--allow-slow-types`; intended 21-file publish set |
+| Doc lint | `deno task doc:lint --root packages/contracts --pretty` | RECORDED / IMPROVED | 9 combined private refs vs 12 baseline; 0 missing JSDoc |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| F-1..F-12, F-14..F-19 | NOT_RUN | planned `arch:check`, quality scanner, wrappers, docs/publish | Archetype 4 set |
+| Code-quality scanner | PASS | `ok:true`, 0 findings, allowCount 0 under `--max-allow 8` | No suppression |
+| F-1..F-12, F-14..F-19 | PASS with baseline warnings | package doctrine check: FAIL=0, WARN=2, INFO=1; root `arch:check` exit 0 | Existing README/Result/docs warnings are outside this typing slice |
+| F-6 JSR publishability | PASS | raw package dry-run exit 0; JSR audit exit 0 | Audit helper counts the banner text as one informational slow-type line; raw authority has no slow-type failure |
 
 ### Slice 1 Reconcile
 
@@ -128,6 +132,29 @@ module, then add a parse and type-inference test. Never cast a Zod value into a 
 - No PR/comment reconciliation is possible under the owner no-PR override; branch/run artifacts are
   current and no new issue input was introduced.
 - `deno.lock` remains unchanged. No plan or doctrine drift discovered.
+
+### Slices 2+3 Reconcile
+
+- The public helper names and four entrypoints remain; `ContractSchemaInput` and
+  `ContractSchemaOutput` are now consistently exported so consumers can name the two directions.
+- Three focused schema tests became eight total package tests and prove coerced input versus parsed
+  output, generic paginated factory variance, and custom CRUD identifier inference.
+- The schema alias change and CRUD cast removal were combined to keep every sign-off commit
+  compiling; this minor execution drift is recorded in `plan.md` and `drift.md`.
+- No PR/comment reconciliation is possible under the owner override. No new issue input or scope
+  expansion was introduced. `deno.lock` remains unchanged.
+
+## Allowance Accounting
+
+| Measure | Count | Evidence |
+| --- | ---: | --- |
+| Rejected prior Sol-low pass | 41 | recovered worklog at unreachable commit `11a2e3fe` |
+| Fresh re-dispatch baseline | 0 | baseline had 50 unsuppressed findings |
+| Final | **0** | scanner `ok:true`, no findings, `allowCount:0` |
+
+### Surviving Allowances
+
+None. No structural upstream limitation required a `quality-allow` marker.
 
 ### Runtime Gates
 
@@ -139,14 +166,12 @@ module, then add a parse and type-inference test. Never cast a Zod value into a 
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Contracts exports and downstream schema consumers | NOT_RUN | focused post-implementation checks | Required because public helper types change |
+| Contracts exports and downstream schema consumers | PASS | targeted `deno check --unstable-kv` over package/plugin routes using `@netscript/contracts` | 7 consumer entry files green |
 
 ## Handoff Notes
 
-- PLAN-EVAL should inspect the facade mismatch in `src/domain/schema-types.ts` and verify that every
-  baseline finding family has an implementation slice and proving gate.
-- Final worklog must report prior allowance count 41 versus final count and justify every survivor
-  individually; an empty survivor table is preferred.
+- IMPL-EVAL should inspect `schema-types.ts`, the generic pagination/CRUD paths, the new inference
+  tests, and the empty allowance table first.
 
 ## Slice Reviews
 
@@ -193,4 +218,118 @@ module, then add a parse and type-inference test. Never cast a Zod value into a 
   are owned by slices 2–3 per the plan.
 
 **Verdict:** `PASS`. Sign-off commit created by the Tier-A supervisor (not the implementer);
+implementation lane did not self-certify.
+
+### Slices 2+3 — Native Zod input/output model + CRUD generic composition — PASS
+
+- **Reviewer:** Claude Opus 4.8 (Anthropic), separate Tier-A session — opposite family to the
+  GPT-5.6 Sol generator. Reviewed 2026-07-12.
+- **Scope reviewed:** the entire current uncommitted diff — `src/domain/schema-types.ts`,
+  `src/domain/schemas.ts`, `src/application/zod-helpers.ts`, `schemas/pagination.ts`,
+  `schemas/filters.ts`, `crud/create-crud-contract.ts`, the three public re-export barrels
+  (`crud.ts`, `query.ts`, `src/public/mod.ts`), the new `tests/schema-types_test.ts`, and the run
+  artifacts. No unrelated churn; `deno.lock` unmodified.
+
+**Type soundness — genuine native projections (owner's first named concern)**
+
+- `ContractSchema<TOutput, TInput> = z.ZodType<TOutput, TInput>` — the hand-written
+  `{ parse; safeParse; optional; describe }` facade that manufactured the casts is gone. The
+  contract type is now the real Zod class type.
+- `ContractSchemaInput<TSchema> = z.input<TSchema>` and `ContractSchemaOutput<TSchema> =
+  z.output<TSchema>` are literal native projections — not re-derived structural clones. Verified by
+  a bidirectional type-equality assertion (`[A] extends [B] ? [B] extends [A]`): for
+  `PaginationInputSchema`, the projected input/output **exactly equal** `z.input`/`z.output` of an
+  independently reconstructed identical `z.object` (compiled clean under `deno check --unstable-kv`).
+  Zod 4 marks both `ZodType` params covariant, so the explicit `= z.object({...})` assignments
+  enforce declared-input ⊇ true-input; the equality assertion additionally proves the declared
+  inputs are faithful (not loosely over-widened).
+- `ContractParseResult<TOutput> = z.ZodSafeParseResult<TOutput>` replaces the previous facade
+  result shape. This is the *truthful* type of what a real Zod `.safeParse` returns; the old
+  `{ success; data?; error? }` was the lie. It is public via `mod.ts` but has no structural external
+  consumer (grep: re-exports only).
+
+**Zod input/output/default/coercion variance**
+
+- Coercion divergence is real and tested: `OffsetPaginationQuerySchema` accepts `{ limit: '25',
+  offset: '5' }` (string input) and parses to `{ limit: 25, offset: 5 }` (number output); the type
+  test binds both `ContractSchemaInput` and `ContractSchemaOutput` and the runtime `assertEquals`
+  passes.
+- Default-driven optionality is represented in the explicit input annotations (`page?: unknown`,
+  `sortOrder?: 'asc'|'desc'`, etc.); confirmed exact against `z.input` as above.
+- Helper factories (`positiveInt`/`paginationLimit`/`boundedString`/`stringToNumber`/…) dropped all
+  `as unknown as ContractNumberSchema/ContractSchema<number>` — return types are now the real
+  `z.ZodNumber | z.ZodDefault<z.ZodNumber>` / `z.ZodString` / `z.ZodCodec<...>`. Codec `encode`
+  signature correctly widened to `value: number | undefined` to match a defaulted output schema.
+
+**Generic pagination / CRUD composition**
+
+- `createPaginatedOutput<TOutput, TInput>` / `createCursorPaginatedOutput` are now dual-generic and
+  return their composed object shape with no trailing cast; the generic-factory type test proves an
+  item schema's coerced input (`id: '7'`) and parsed output (`id: 7`) both survive composition.
+- CRUD marker types (`CrudIdInput`, `CrudListInput`, `CrudListOutput`, `CrudUpdateInput`) gained a
+  second (input) type parameter, so downstream SDK client typing now sees distinct accepted-input
+  vs parsed-output — a strict improvement over the prior input≡output markers.
+- The SDK extraction path (`packages/sdk/src/ports/service-client.ts` →
+  `ProcedureInputFromNode`/`ProcedureOutputFromNode` reading `__netscriptSchemas`/`~orpc`) still
+  type-checks against the enriched markers.
+
+**Runtime semantics — CRUD filter composition preserves merge/override (owner's second named concern)**
+
+- Prior code: `PaginationInputSchema.merge(filterSchema as unknown as z.ZodObject)`. New code:
+  `z.object({ ...PaginationInputSchema.shape, ...filterSchema.shape })`. Proven behaviorally
+  identical at runtime: on a colliding key (`sortBy`), the filter's schema overrides pagination's
+  (spread order `...pagination, ...filter` = merge's B-wins), a bad enum value is rejected by both,
+  and pagination defaults (`page:1`, `limit:10`, `sortOrder:'desc'`) are preserved by both. `.shape`
+  is why `Pick<z.ZodObject,'shape'>` was added to `ContractObjectSchema`.
+- `idSchema` default is unchanged runtime (`z.coerce.number().int().positive()`); the change only
+  moved it from a cast-laden default parameter to a `??` fallback, removing `as unknown as TId`.
+- `idInputSchema`/`updateInputSchema` are now plain `z.object({...})` with no `as unknown as
+  z.ZodTypeAny` on the members. The two surviving single-`as` boundaries (`asSchema`,
+  `crudOperation`) are **pre-existing at HEAD** (unchanged by this diff) and are documented sound
+  widenings, not relocated casts.
+
+**Green-by-suppression audit (owner rejection criteria)**
+
+- Diff grep for added `deno-lint-ignore` / `as unknown as` / `as any` / `: any` / `<any>` /
+  `quality-allow`: **none**. Cast-bearing added lines: 0; cast-bearing removed lines: 48. Casts were
+  deleted, not moved.
+- Scanner `--root packages/contracts --max-allow 8`: `ok:true`, **0 findings, 0 allowances** — no
+  survivor allowance, target-zero met (not merely under the eight ceiling).
+
+**Evidence re-run independently (not trusting reported gates)**
+
+- Scanner: `ok:true` 0/0. Scoped check: 21 files, 0 diagnostics. Scoped lint: 21 files, 0 findings
+  (0 lint-ignores). Scoped fmt: 21 files, 0 findings.
+- Package tests: **8 passed / 0 failed** (incl. the 3 new variance/factory/CRUD-marker tests).
+- Publish dry-run: `Success` **without `--allow-slow-types`** — JSR slow-type bar intact.
+- `arch:check`: exit 0, zero `FAIL=` across all reported packages; contracts layout unchanged so no
+  per-package doctrine regression is possible.
+- Consumers: `deno check --unstable-kv` over SDK client/ports, `@netscript/plugin` contract-base,
+  and the workers/sagas/triggers service routers — exit 0.
+- `doc:lint`: 9 errors, **all** pre-existing oRPC `private-type-ref`s (`AnySchema`,
+  `BaseContractErrors`, `ContractProcedureBuilder*`, `Schema`, `oc`); baseline with this diff
+  stashed = 12, so this slice *removed* 3 and introduced **zero** new missing-JSDoc/private-type
+  diagnostics. The new public types produce no doc-lint diagnostic. Matches the plan's explicit
+  scope-out of the oRPC doc debt.
+- `deno.lock`: `git status`/`diff` clean — unmodified.
+
+**Public compatibility**
+
+- Four entrypoints (`.`, `./crud`, `./query`, `./transform`) intact. Existing helper names
+  preserved; `ContractSchemaInput`/`ContractSchemaOutput` added as additive exports;
+  `ContractDefaultableSchema` retained (now `z.ZodType`-backed). Publish file set and export map
+  unchanged.
+
+**Minor observations (non-blocking)**
+
+- `ContractObjectSchema` retains `'merge'` in its `Pick<z.ZodObject, …>` though the generator no
+  longer calls `.merge()` (Zod 4 deprecates it in favor of `.extend`/shape-spread). Harmless and
+  keeps source-level compatibility for any external caller; not worth a follow-up in this slice.
+- Marker types remain phantom (declared via `crudOperation`'s return-type inference, as at HEAD).
+  Unchanged design; the improvement here is removing the `as unknown as` at every schema
+  construction site.
+
+**Verdict:** `PASS`. This is a genuine native-Zod variance repair — casts removed (not relocated or
+suppressed), runtime merge/override and defaults preserved, publish/doc bars intact, `deno.lock`
+untouched. Sign-off commit created by the Tier-A supervisor (not the implementer); the
 implementation lane did not self-certify.

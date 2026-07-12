@@ -27,7 +27,7 @@ import type { ContractObjectSchema, ContractSchema } from '../src/domain/schema-
 /**
  * Available filter operators.
  */
-export const FilterOperatorSchema: ContractSchema<FilterOperator> = z.enum([
+export const FilterOperatorSchema: ContractSchema<FilterOperator, FilterOperator> = z.enum([
   'equals',
   'not',
   'contains',
@@ -41,7 +41,7 @@ export const FilterOperatorSchema: ContractSchema<FilterOperator> = z.enum([
   'notIn',
   'isNull',
   'isNotNull',
-]) as unknown as ContractSchema<FilterOperator>;
+]);
 
 /**
  * Single filter condition schema.
@@ -50,7 +50,7 @@ const filterConditionSchema = z.object({
   /** Field name to filter on */
   field: z.string(),
   /** Filter operator */
-  operator: FilterOperatorSchema as unknown as z.ZodType<FilterOperator>,
+  operator: FilterOperatorSchema,
   /** Value to compare against (not needed for isNull/isNotNull) */
   value: z.unknown().optional(),
 });
@@ -58,8 +58,8 @@ const filterConditionSchema = z.object({
 /**
  * Single filter condition schema.
  */
-export const FilterConditionSchema: ContractObjectSchema<FilterCondition> =
-  filterConditionSchema as unknown as ContractObjectSchema<FilterCondition>;
+export const FilterConditionSchema: ContractObjectSchema<FilterCondition, FilterCondition> =
+  filterConditionSchema;
 
 /**
  * Array of filter conditions.
@@ -69,21 +69,19 @@ const filtersSchema = z.array(filterConditionSchema);
 /**
  * Array of filter conditions.
  */
-export const FiltersSchema: ContractSchema<Filters> = filtersSchema as unknown as ContractSchema<
-  Filters
->;
+export const FiltersSchema: ContractSchema<Filters, Filters> = filtersSchema;
 
 /**
  * Search input schema with filters.
  */
-export const SearchInputSchema: ContractObjectSchema<SearchInput> = z.object({
+export const SearchInputSchema: ContractObjectSchema<SearchInput, SearchInput> = z.object({
   /** Search query string */
   search: z.string().optional(),
   /** Fields to search in */
   searchFields: z.array(z.string()).optional(),
   /** Filter conditions */
   filters: filtersSchema.optional(),
-}) as unknown as ContractObjectSchema<SearchInput>;
+});
 
 // ============================================================================
 // FILTER HELPERS

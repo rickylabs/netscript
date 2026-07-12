@@ -23,3 +23,15 @@
 - **Action:** accept
 - **Evidence:** `supervisor.md`; orchestrator `09e5ae68` launch record.
 
+## 2026-07-12 — Schema and CRUD typing landed as one sign-off unit
+
+- **What:** Planned slices 2 and 3 were implemented and reviewed together rather than committed
+  separately.
+- **Source:** Scoped check after replacing `ContractSchema`/`ContractObjectSchema` exposed the
+  remaining pre-existing CRUD cast as the sole compile failure.
+- **Expected:** Schema/factory typing and CRUD generic composition would each form a green commit.
+- **Actual:** A standalone schema commit would need to preserve or relocate an unsafe CRUD cast;
+  completing the five CRUD sites immediately produced a clean compile and zero scanner findings.
+- **Severity:** minor
+- **Action:** accept
+- **Evidence:** scanner progression 41 → 5 → 0; final scoped check 0 diagnostics.

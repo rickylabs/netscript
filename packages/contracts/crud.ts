@@ -25,4 +25,6 @@ export type {
   ContractObjectSchema,
   ContractParseResult,
   ContractSchema,
+  ContractSchemaInput,
+  ContractSchemaOutput,
 } from './src/domain/schema-types.ts';

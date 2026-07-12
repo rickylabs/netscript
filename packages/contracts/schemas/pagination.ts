@@ -25,7 +25,15 @@ import type { ContractObjectSchema, ContractSchema } from '../src/domain/schema-
  * Standard pagination input schema for list endpoints.
  * Supports page-based pagination with sorting.
  */
-export const PaginationInputSchema: ContractObjectSchema<PaginationInput> = z.object({
+export const PaginationInputSchema: ContractObjectSchema<
+  PaginationInput,
+  Readonly<{
+    page?: unknown;
+    limit?: unknown;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+  }>
+> = z.object({
   /** Page number (1-indexed) */
   page: z.coerce.number().int().min(1).default(1),
   /** Items per page (1-100) */
@@ -34,13 +42,21 @@ export const PaginationInputSchema: ContractObjectSchema<PaginationInput> = z.ob
   sortBy: z.string().optional(),
   /** Sort direction */
   sortOrder: z.enum(['asc', 'desc']).default('desc'),
-}) as unknown as ContractObjectSchema<PaginationInput>;
+});
 
 /**
  * Offset-based pagination input schema.
  * Alternative to page-based pagination for more flexibility.
  */
-export const OffsetPaginationInputSchema: ContractObjectSchema<OffsetPaginationInput> = z.object({
+export const OffsetPaginationInputSchema: ContractObjectSchema<
+  OffsetPaginationInput,
+  Readonly<{
+    offset?: unknown;
+    limit?: unknown;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+  }>
+> = z.object({
   /** Number of items to skip */
   offset: z.coerce.number().int().min(0).default(0),
   /** Number of items to return */
@@ -49,20 +65,27 @@ export const OffsetPaginationInputSchema: ContractObjectSchema<OffsetPaginationI
   sortBy: z.string().optional(),
   /** Sort direction */
   sortOrder: z.enum(['asc', 'desc']).default('desc'),
-}) as unknown as ContractObjectSchema<OffsetPaginationInput>;
+});
 
 /**
  * Cursor-based pagination input schema.
  * Best for infinite scroll and real-time data.
  */
-export const CursorPaginationInputSchema: ContractObjectSchema<CursorPaginationInput> = z.object({
+export const CursorPaginationInputSchema: ContractObjectSchema<
+  CursorPaginationInput,
+  Readonly<{
+    cursor?: string;
+    limit?: unknown;
+    direction?: 'forward' | 'backward';
+  }>
+> = z.object({
   /** Cursor for fetching next page */
   cursor: z.string().optional(),
   /** Number of items to return */
   limit: z.coerce.number().int().min(1).max(100).default(10),
   /** Direction to paginate */
   direction: z.enum(['forward', 'backward']).default('forward'),
-}) as unknown as ContractObjectSchema<CursorPaginationInput>;
+});
 
 // ============================================================================
 // OUTPUT SCHEMAS
@@ -71,32 +94,36 @@ export const CursorPaginationInputSchema: ContractObjectSchema<CursorPaginationI
 /**
  * Standard pagination metadata for responses.
  */
-export const PaginationOutputSchema: ContractObjectSchema<PaginationOutput> = z.object({
-  /** Current page number */
-  page: z.number(),
-  /** Items per page */
-  limit: z.number(),
-  /** Total number of items */
-  total: z.number(),
-  /** Total number of pages */
-  totalPages: z.number(),
-  /** Whether there's a next page */
-  hasNext: z.boolean(),
-  /** Whether there's a previous page */
-  hasPrev: z.boolean(),
-}) as unknown as ContractObjectSchema<PaginationOutput>;
+export const PaginationOutputSchema: ContractObjectSchema<PaginationOutput, PaginationOutput> = z
+  .object({
+    /** Current page number */
+    page: z.number(),
+    /** Items per page */
+    limit: z.number(),
+    /** Total number of items */
+    total: z.number(),
+    /** Total number of pages */
+    totalPages: z.number(),
+    /** Whether there's a next page */
+    hasNext: z.boolean(),
+    /** Whether there's a previous page */
+    hasPrev: z.boolean(),
+  });
 
 /**
  * Cursor pagination metadata for responses.
  */
-export const CursorPaginationOutputSchema: ContractObjectSchema<CursorPaginationOutput> = z.object({
+export const CursorPaginationOutputSchema: ContractObjectSchema<
+  CursorPaginationOutput,
+  CursorPaginationOutput
+> = z.object({
   /** Cursor for next page */
   nextCursor: z.string().nullable(),
   /** Cursor for previous page */
   prevCursor: z.string().nullable(),
   /** Whether there are more items */
   hasMore: z.boolean(),
-}) as unknown as ContractObjectSchema<CursorPaginationOutput>;
+});
 
 // ============================================================================
 // FACTORY FUNCTIONS
@@ -111,13 +138,16 @@ export const CursorPaginationOutputSchema: ContractObjectSchema<CursorPagination
  * // { data: User[], pagination: PaginationOutput }
  * ```
  */
-export function createPaginatedOutput<T>(
-  itemSchema: ContractSchema<T>,
-): ContractObjectSchema<PaginatedResult<T>> {
+export function createPaginatedOutput<TOutput, TInput>(
+  itemSchema: ContractSchema<TOutput, TInput>,
+): ContractObjectSchema<
+  PaginatedResult<TOutput>,
+  Readonly<{ data: TInput[]; pagination: PaginationOutput }>
+> {
   return z.object({
-    data: z.array(itemSchema as z.ZodType<T>),
-    pagination: PaginationOutputSchema as unknown as z.ZodType<PaginationOutput>,
-  }) as unknown as ContractObjectSchema<PaginatedResult<T>>;
+    data: z.array(itemSchema),
+    pagination: PaginationOutputSchema,
+  });
 }
 
 /**
@@ -129,13 +159,16 @@ export function createPaginatedOutput<T>(
  * // { data: User[], pagination: CursorPaginationOutput }
  * ```
  */
-export function createCursorPaginatedOutput<T>(
-  itemSchema: ContractSchema<T>,
-): ContractObjectSchema<CursorPaginatedResult<T>> {
+export function createCursorPaginatedOutput<TOutput, TInput>(
+  itemSchema: ContractSchema<TOutput, TInput>,
+): ContractObjectSchema<
+  CursorPaginatedResult<TOutput>,
+  Readonly<{ data: TInput[]; pagination: CursorPaginationOutput }>
+> {
   return z.object({
-    data: z.array(itemSchema as z.ZodType<T>),
-    pagination: CursorPaginationOutputSchema as unknown as z.ZodType<CursorPaginationOutput>,
-  }) as unknown as ContractObjectSchema<CursorPaginatedResult<T>>;
+    data: z.array(itemSchema),
+    pagination: CursorPaginationOutputSchema,
+  });
 }
 
 // ============================================================================
