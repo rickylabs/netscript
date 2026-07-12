@@ -17,10 +17,12 @@ Shared endpoint discovery plus `get_app_status`, `list_runs`, `get_run`, and `ge
 
 ## Next
 
-1. Inspect diff and lock hygiene.
-2. Commit logical S3 implementation/evidence with `#727` and no closing keyword.
-3. Push exact requested refspec and verify remote SHA.
+1. Tier-A substantively review/reconcile combined implementation commit `1f17fbcd` and record sign-off or required fixes.
+2. Run IMPL-EVAL cycle 2 after that evidence exists.
+3. If PASS, push the artifact-only follow-up and hand off remote SHA.
 
 ## Gate Summary
 
 Scoped check/lint/fmt, 14 tests, root architecture, direct MCP doctrine, full-export doc lint, package publish dry-run, and consumer smoke are PASS.
+
+Implementation commit `1f17fbcd` and initial harness commit `ac22eba7` are pushed at remote SHA `ac22eba7972df0541ec97cdc2e0229a78837031b`. IMPL-EVAL cycle 1 is `FAIL_FIX` on process evidence only; product gates independently passed.

@@ -66,7 +66,7 @@ Start with telemetry summary types and pure aggregation, bind a flow through the
 | direct MCP doctrine | PASS | `FAIL=0 WARN=0`; informational architecture-doc threshold only |
 | full-export doc lint | PASS | 2 entrypoints, 0 errors/private refs/missing docs |
 | package publish dry-run | PASS | `@netscript/mcp@0.0.1-beta.8`, intended 24-file set, no slow types |
-| consumer smoke | PASS | public import, server construction, `tools=13`, exit 0 |
+| consumer smoke | PASS | valid Deno 2.9 command `deno eval --no-lock '<public import + probe + server.tools assertion>'`; output `tools=13`, exit 0. The earlier planned `--allow-env/--allow-net` eval flags were invalid and are superseded by this recorded command. |
 
 F-1..F-12 and F-15..F-19: PASS via wrappers/doctrine/doc/publish evidence where automated; F-13 N/A (no runtime ownership); F-14 PASS (no new console output). F-CLI-1..31: applicable size/layer/effect/composition/import/public-surface rules manually PASS; command-spine/tree/template/registry rules N/A to this non-command S3 slice under accepted `MCP-A6-V2-SHAPE`; unavailable dedicated scripts remain PENDING_SCRIPT with the direct doctrine scan as structural evidence.
 
@@ -74,3 +74,4 @@ F-1..F-12 and F-15..F-19: PASS via wrappers/doctrine/doc/publish evidence where 
 
 - Bootstrap: issue #727 is partial umbrella work; no PR and no closing keyword per brief.
 - Slice 1/2: no new issue/PR surface was created; scope remains partial #727 and sibling overlap stayed minimal/additive.
+- Post-eval: implementation for planned Slices 1 and 2 landed together in `1f17fbcd`; Tier-A combined-slice substantive review/reconciliation remains required. Pushed history is not rewritten.
