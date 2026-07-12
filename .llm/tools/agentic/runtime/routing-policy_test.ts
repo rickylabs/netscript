@@ -119,6 +119,29 @@ Deno.test('dated planning override changes from Fable medium to Sol max on 2026-
   equal([monday.model, monday.effort], ['gpt-5.6-sol', 'max']);
 });
 
+Deno.test('major UI/UX work is GLM-led or receives the mandatory GLM adversarial pass', () => {
+  const at = new Date('2026-07-12T00:00:00Z');
+  const lead = resolveCanonicalRoute('major_ui_ux_design', at);
+  const adversarial = resolveCanonicalRoute('major_ui_ux_adversarial_review', at);
+  for (const route of [lead, adversarial]) {
+    equal([
+      route.agent,
+      route.provider,
+      route.profileId,
+      route.presetId,
+      route.effort,
+    ], [
+      'claude',
+      'openrouter',
+      'claude-openrouter',
+      'claude-design-glm-5-2',
+      'xhigh',
+    ]);
+  }
+  equal(lead.condition, 'lead_route_for_major_ui_ux_work');
+  equal(adversarial.condition, 'required_before_merge_when_glm_not_lead');
+});
+
 Deno.test('deep-analysis Fable fallback requires classified Codex quota exhaustion', () => {
   const fable = candidate({ purpose: 'analysis', requiresCodexQuotaExhaustion: true });
   for (const failureCode of [undefined, 'rate_limited', 'provider_unavailable'] as const) {

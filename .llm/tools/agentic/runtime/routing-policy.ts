@@ -2,6 +2,7 @@
 
 import type { RouteIdentity, SessionIdentity } from './contract.ts';
 import { MODEL_IDS } from '../config/models.ts';
+import { OPENROUTER_PRESETS, type OpenRouterPresetId } from './provider-profiles.ts';
 
 export const MODEL_FAMILIES = ['anthropic', 'openai', 'google', 'other'] as const;
 export type ModelFamily = typeof MODEL_FAMILIES[number];
@@ -10,6 +11,7 @@ export const ROUTING_LANE_PURPOSES = [
   'orchestration',
   'implementation',
   'analysis',
+  'design',
   'documentation',
   'claude_workflow',
   'research_extraction',
@@ -22,6 +24,8 @@ export const ROUTING_LANES = [
   'fast_iteration',
   'deep_analysis',
   'planning_decisions',
+  'major_ui_ux_design',
+  'major_ui_ux_adversarial_review',
   'documentation_review',
   'claude_workflow',
   'research_extraction',
@@ -40,12 +44,16 @@ export interface CanonicalRoutePolicy {
   readonly provider: RouteIdentity['provider'];
   readonly model: string;
   readonly effort: RouteIdentity['effort'];
+  readonly profileId?: RouteIdentity['profileId'];
+  readonly presetId?: OpenRouterPresetId;
   readonly condition?: string;
   readonly effectiveFrom?: string;
   readonly effectiveThrough?: string;
   readonly subscriptionState?: SubscriptionState;
   readonly requiresExplicitApproval?: boolean;
 }
+
+const MAJOR_UI_UX_PRESET = OPENROUTER_PRESETS['claude-design-glm-5-2'];
 
 /** Canonical machine-readable route bindings rendered by the harness lane-policy document. */
 export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
@@ -104,12 +112,35 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     effectiveFrom: '2026-07-13',
   },
   {
+    lane: 'major_ui_ux_design',
+    purpose: 'design',
+    agent: 'claude',
+    provider: 'openrouter',
+    profileId: MAJOR_UI_UX_PRESET.profileId,
+    presetId: MAJOR_UI_UX_PRESET.id,
+    model: MAJOR_UI_UX_PRESET.model,
+    effort: MAJOR_UI_UX_PRESET.effort,
+    condition: 'lead_route_for_major_ui_ux_work',
+  },
+  {
+    lane: 'major_ui_ux_adversarial_review',
+    purpose: 'design',
+    agent: 'claude',
+    provider: 'openrouter',
+    profileId: MAJOR_UI_UX_PRESET.profileId,
+    presetId: MAJOR_UI_UX_PRESET.id,
+    model: MAJOR_UI_UX_PRESET.model,
+    effort: MAJOR_UI_UX_PRESET.effort,
+    condition: 'required_before_merge_when_glm_not_lead',
+  },
+  {
     lane: 'documentation_review',
     purpose: 'documentation',
     agent: 'claude',
     provider: 'anthropic',
     model: MODEL_IDS.opus,
     effort: 'high',
+    condition: 'excludes_major_ui_ux_work',
   },
   {
     lane: 'claude_workflow',
