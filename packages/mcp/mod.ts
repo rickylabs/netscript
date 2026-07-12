@@ -58,7 +58,7 @@ export type {
   ToolName,
   ToolSuccess,
 } from './src/domain/tool-types.ts';
-export type { JsonRpcError, JsonRpcRequest, JsonRpcResponse } from './src/presentation/json-rpc.ts';
+export type { JsonRpcError, JsonRpcRequest, JsonRpcResponse } from './src/domain/json-rpc.ts';
 export type {
   TelemetryProbePort,
   TelemetryProbeResult,

@@ -22,6 +22,21 @@ for (const tool of createToolRegistry()) console.log(tool.name, tool.kind);
 Prefer the CLI for direct scripted operations. Use MCP for compact interactive diagnostics and
 framework-semantic summaries.
 
+For an embedding host that supplies its own telemetry probe and seams, compose the server
+explicitly and hand each JSON-RPC message to `handle` (it parses and validates internally,
+returning `undefined` for notifications):
+
+```ts
+import { createMcpServer, type TelemetryProbePort } from '@netscript/mcp';
+
+const server = createMcpServer({
+  probe: hostProbe satisfies TelemetryProbePort,
+  environment: { NETSCRIPT_TELEMETRY_ENDPOINT: endpoint },
+});
+const response = await server.handle(JSON.parse(line));
+if (response) console.log(JSON.stringify(response));
+```
+
 ## Tool catalog
 
 | Tool                          | Bounded result                                                  |
