@@ -23,6 +23,10 @@ Harness mode activates when the user says `use harness` or explicitly asks for a
 10. For a **seed run** (planning-only: the deliverable is a GitHub board — epics, milestones,
     issues, design packs — not code), read `workflow/seed-run.md` and follow its stage contracts
     A–I. Seed runs are drafts-only until owner ratification.
+11. For a **research/RFC run** (evaluation-only: the deliverable is a verdict on an external
+    technology proposal — an evidence corpus plus an RFC or a documented rejection), read
+    `workflow/research-rfc-run.md` and follow its stage contracts A–H. Research/RFC runs are
+    drafts-only until owner ratification.
 
 ## Run ID
 
