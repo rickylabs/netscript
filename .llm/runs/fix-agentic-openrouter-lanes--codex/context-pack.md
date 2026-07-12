@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-agentic-openrouter-lanes--codex` |
 | Branch | `fix/agentic-openrouter-lanes` |
-| Current phase | `implement` (all slices gated; IMPL-EVAL next) |
+| Current phase | `impl-eval` |
 | Archetype | `6 - CLI / Tooling` |
 | Scope overlays | none |
 
@@ -27,13 +27,13 @@ PLAN-EVAL passed. All three implementation slices are gated. Claude/OpenRouter i
 
 ## In Progress
 
-- Commit/push/comment S3, then launch the separate-session IMPL-EVAL.
+- Separate-session Claude Opus 4.8 IMPL-EVAL of the committed branch and PR evidence.
 
 ## Next Steps
 
-1. Commit and push S3; update PR #696 evidence.
-2. Change the PR phase to `status:impl-eval` and run the opposite-family evaluator.
-3. If PASS, record the verdict, mark the PR ready to merge, and post the redacted completion evidence.
+1. Run the opposite-family evaluator under `impl-eval-prompt.md`.
+2. If PASS, record the verdict and complete the final PR checklist.
+3. Change the sole phase label to `status:ready-merge` and post the redacted completion evidence.
 
 ## Key Decisions
 

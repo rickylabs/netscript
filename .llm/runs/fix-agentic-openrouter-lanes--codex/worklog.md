@@ -73,6 +73,8 @@ Add or modify model strings/endpoints only in `config/`; declare a preset and ca
 | 2026-07-12 | S3 | CI/consumer | Added the default static preset canary to the CI check/test job and documented static versus live invocation in the suite and harness indexes. |
 | 2026-07-12 | S3 | structural review | The S1 launcher had grown to 608 LOC; route/profile materialization and evidence rendering moved to `launcher-route.ts`, leaving the compatibility entrypoint at 499 LOC and preserving behavior through focused tests. |
 | 2026-07-12 | S3 | slice review | Reviewed all four preset rows, capability coherence, real Claude/Codex command planners, explicit live parsing, rollout-runner migration, CI wiring, secret safety, and lock hygiene. No blocking findings remain. |
+| 2026-07-12 | S3 | reconcile | Commit `1596c32f` pushed and phase evidence posted to PR #696; required taxonomy/milestone remain correct, PR is ready for review, and sole phase label is now `status:impl-eval`. |
+| 2026-07-12 | eval | handoff | Prepared a read-only, opposite-family Claude Opus 4.8 prompt with the required `## SKILL` chapter; evaluator owns only `evaluate.md` and is forbidden from another paid live probe. |
 
 ## Gate Results
 

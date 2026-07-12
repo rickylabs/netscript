@@ -49,7 +49,7 @@ Do not merge until the Plan-Gate and final IMPL-EVAL pass are complete.
 ## Harness
 
 - Run dir: `.llm/runs/fix-agentic-openrouter-lanes--codex/`
-- Phase: impl (all slices complete; IMPL-EVAL next)
+- Phase: impl-eval
 
 ## Drift / Debt
 
