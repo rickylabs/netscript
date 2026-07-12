@@ -24,8 +24,10 @@ dialog (plan → from→to diff → exact CLI line → Execute → result + undo
   executions table (each row → the execution leaf), **worker-pool liveness line**
   ("reserve-inventory queue · 2 workers polling · heartbeat 1 s ago" — error state when zero
   polling), scheduler-vs-config drift panel that names its cause and links to the override.
-  Writes: "Run now", "Pause schedule", "Edit retry policy" — each confirm+CLI
-  (`netscript workers run reserve-inventory`).
+  Writes: "Run now", "Pause schedule", "Edit retry policy" — each confirm+CLI. "Run now" is the
+  queue-backed trigger (`netscript workers trigger reserve-inventory`, pending #704 — the
+  legacy in-process run would not appear in the executions feed); pause/edit are
+  `workers update-job` (pending #704).
 - **Execution leaf:** step timeline w/ attempt pills, I/O payloads, correlated log strip
   (out-link to Aspire), "Open correlation journey → `/flow/:id`", "Open originating trigger
   event" back-link, "Re-run from step" write.
@@ -48,8 +50,9 @@ dialog (plan → from→to diff → exact CLI line → Execute → result + undo
 
 - **List:** ALL EIGHT trigger types (file · webhook · schedule · cron · kv · polling ·
   composite · manual) as filterable type chips with per-type icons; per-row enable/disable
-  switch (operable, confirm+CLI `netscript triggers disable payment-webhook`), next-fire
-  preview inline for scheduled kinds.
+  switch (operable, confirm+CLI `netscript triggers disable payment-webhook` — authoritative runtime-backed
+  toggle pending #705), next-fire preview inline for scheduled kinds (real 5-field cron
+  evaluator pending #705).
 - **Trigger detail (`?tab=events|schedule|config`):** headline the **future-fire preview**
   ("Next: 02:00 · 03:00 · 04:00 (Europe/Zurich) · backfill on") — nobody else computes forward
   schedules; events tab = firing feed where each event expands its **action chain**
@@ -97,3 +100,21 @@ footnote.
 domain actions with CLI transparency); no schema/data browsing (DB stays in Aspire/DB tools).
 
 **Theme:** NS One tokens; light+dark; `STATUS_VARIANT`; mono ids; reduced-motion fallbacks.
+
+## CLI dependency map (epic #701 — beta.9 foundation; verbs marked pending do not exist yet)
+
+| Write/read surface | CLI verb | Status | Issue |
+|---|---|---|---|
+| Workers "Run now" (queue-backed, lands in executions feed) | `workers trigger` | pending | #704 |
+| Executions tables + execution leaves | `workers executions --json` | pending | #704 |
+| Polyglot Tasks (run + `?runtime=` metadata) | `workers run-task` / `show-task` | pending | #704 |
+| Pause schedule / edit retry / re-run from step | `workers update-job` + rerun seam | pending | #704 |
+| Saga instance tables + instance leaves | `sagas list --instances` | pending | #704 |
+| Retry step / force-complete / publish message | `sagas publish` + instance ops | pending | #704 |
+| Trigger enable/disable switch (authoritative) | `triggers enable\|disable` | pending (today's verb writes an unread file) | #705 |
+| Future-fire preview (tz+backfill correct) | 5-field cron evaluator | pending (today only min+hour parsed) | #705 |
+| Events tab + event leaves | `triggers events` (ledger) | pending | #705 |
+| Trigger-builder save / AI-drafted automations landing | `triggers update` + dynamic registration | pending | #705 |
+| Webhook test-delivery (persisted, HMAC) | runtime-backed `triggers fire` | pending | #705 |
+| ALL Streams verbs (feeds, writes, wiring, teaching empty-state scaffold line) | streams runtime + scaffold verbs | pending (all five runtime verbs are stubs) | #703 |
+| Teaching empty states (workers/triggers create commands) | existing `add-*` verbs | exist — docs adoption | #712 |
