@@ -106,3 +106,12 @@ handlers. No live third-party GitHub OAuth exchange was executed.
   `deno eval --allow-all <script>` and `deno eval` rejects `--allow-all` (eval always runs fully
   permissioned) — reproduced locally verbatim. Dropped the flag; scoped check clean.
 - Applied by the beta-9 orchestrator (`09e5ae68`) — Codex lane at provider usage limit (resets 10:34).
+
+## Orchestrator fix-forward 2 (Tier-A, Codex lane quota-exhausted)
+
+- `runtime.auth-smoke-env` still failed post-flag-fix (325ms): the `plugin auth` group was
+  registered only in the PUBLIC command tree; the e2e drives `netscript-dev` (LOCAL contributor
+  tree) where `plugin auth` did not exist ("Unknown option --project-root"). Registered the auth
+  group in `local/features/plugins/plugins-group.ts` mirroring the public wiring; reproduced the
+  exact CLI call locally against a scratch project — appsettings `Auth.Backend=kv-oauth` persisted.
+  Scoped check 0 findings; local composition test green.
