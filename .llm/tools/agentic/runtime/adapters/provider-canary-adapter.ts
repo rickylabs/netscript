@@ -86,10 +86,13 @@ function observeOutput(
       exitCode: 1,
       timedOut,
       malformed: false,
+      incompatibility: null,
       eventCounts: { tools: 0, reasoning: 0, streaming: 0 },
     };
   }
   const text = new TextDecoder().decode(output.stdout.slice(0, CANARY_CAPTURE_BYTES));
+  const errorText = new TextDecoder().decode(output.stderr.slice(0, CANARY_CAPTURE_BYTES));
+  const combinedError = `${text}\n${errorText}`.toLowerCase();
   const events = text.split(/\r?\n/).filter(Boolean).flatMap((line) => {
     try {
       return [JSON.parse(line) as unknown];
@@ -102,6 +105,10 @@ function observeOutput(
     exitCode: output.code,
     timedOut,
     malformed: events.length === 0,
+    incompatibility: combinedError.includes('native') && combinedError.includes('namespace') &&
+        combinedError.includes('tool')
+      ? 'codex-native-namespace-tool'
+      : null,
     eventCounts: {
       tools: events.filter((event) => includesCapability(event, 'tools')).length,
       reasoning: events.filter((event) => includesCapability(event, 'reasoning')).length,
@@ -180,6 +187,7 @@ export class ProviderCanaryAdapter {
         exitCode: null,
         timedOut: false,
         malformed: false,
+        incompatibility: null,
         eventCounts: { tools: 0, reasoning: 0, streaming: 0 },
       });
     }
@@ -189,6 +197,7 @@ export class ProviderCanaryAdapter {
         exitCode: null,
         timedOut: false,
         malformed: false,
+        incompatibility: null,
         eventCounts: { tools: 0, reasoning: 0, streaming: 0 },
       });
     }
@@ -200,6 +209,7 @@ export class ProviderCanaryAdapter {
         exitCode: null,
         timedOut: false,
         malformed: false,
+        incompatibility: null,
         eventCounts: { tools: 0, reasoning: 0, streaming: 0 },
       });
     }

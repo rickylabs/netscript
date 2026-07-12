@@ -50,8 +50,8 @@ Make at least one OpenRouter GLM 5.2 agentic lane complete a real bounded turn, 
 
 | Decision | Status | Notes |
 | --- | --- | --- |
-| Codex vs Claude as viable GLM lane | must resolve now | Decide by bounded live probes; encode the losing lane as unsupported if proven. |
-| OpenRouter Anthropic base path/model mapping | must resolve now | Probe without printing credentials. |
+| Codex vs Claude as viable GLM lane | resolved | Claude Anthropic-skin lane passed a real tool turn; Codex Responses lane is structured unsupported for native namespace tools. |
+| OpenRouter Anthropic base path/model mapping | resolved | Central Anthropic-skin endpoint plus configured GLM model succeeded with isolated Claude state and rival auth cleared. |
 | Remote control for custom Claude route | safe to defer | Remains explicitly unavailable. |
 
 ## Risk Register

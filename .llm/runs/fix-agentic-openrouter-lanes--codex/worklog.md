@@ -64,6 +64,11 @@ Add or modify model strings/endpoints only in `config/`; declare a preset and ca
 | 2026-07-12 | S1 | runtime proof | With global effort `max`, a no-turn v0.144 handshake requested `low` in `thread/start.config` and observed `low`, with thread/provider/cwd identity present. |
 | 2026-07-12 | S1 | slice review | Reviewed profile content as credential-free, WSL paths/modes as 0700/0600, child env inheritance, sender-lease release on missing identity/materialization failure, and mismatch fail-closed behavior. No blocking findings; added rejection for silently ignored native named profiles. |
 | 2026-07-12 | S1 | reconcile | PR #696 remains independent of #685, has no resolving issue/closing keyword, carries one `status:impl`, required taxonomy, and Backlog/Triage milestone; no new review comments required readjustment. |
+| 2026-07-12 | S2 | diagnosis | Official OpenRouter recipe plus isolated `CLAUDE_CONFIG_DIR` showed cached native Claude state caused the empty-output symptom; explicit empty rival auth produced non-empty GLM text. |
+| 2026-07-12 | S2 | live acceptance | GLM completed a Bash `pwd` tool call and returned `GLM_AGENTIC_OK`; checked-in `claude-print.ts` then completed the same agentic flow as `GLM_RUNTIME_ADAPTER_OK`. Redacted evidence is in `glm-live-evidence.md`. |
+| 2026-07-12 | S2 | capability boundary | Added supported Claude GLM preset and retained the Codex GLM preset as explicit `codex-native-namespace-tool` unsupported; live canaries returned Claude PASS and Codex structured FAIL. |
+| 2026-07-12 | S2 | slice review | Reviewed child-only credential binding, cached-auth isolation, non-mobile boundary, prompt-file reachability, same-session resume argv, declared-vs-observed incompatibility provenance, and provider-id canonicalization. Tightened incompatibility evidence with an explicit source and derived finite constants; no blocking findings remain. |
+| 2026-07-12 | S2 | reconcile | PR #696 remains `status:impl` with required labels/milestone and no closing issue. The carried-in GLM unknowns are resolved in `plan.md`; no reviewer comment changed scope. |
 
 ## Gate Results
 
@@ -90,6 +95,19 @@ PLAN-EVAL: PASS (`plan-eval.md`).
 | F-7 doc-score | N/A | Internal tooling, no JSR public export surface. |
 | F-8 workspace lib override | N/A | Internal tooling, no package workspace import map. |
 | F-9 permission declaration | N/A | Internal tooling task permissions remain declared in root task definitions; no package manifest. |
+
+### S2 Gates
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Full agentic suite | PASS | 235 passed, 0 failed. |
+| Focused provider/adapter suite | PASS | 36 passed, 0 failed plus volatile guard 4/4. |
+| Scoped check | PASS | 101 files, 0 findings. |
+| Scoped lint | PASS | 101 files, 0 findings. |
+| Scoped format | PASS | 101 files, 0 findings. |
+| Claude GLM provider canary | PASS | tools/reasoning/streaming supported; exit 0; fan-out eligible. |
+| Codex GLM provider canary | EXPECTED UNSUPPORTED | exit 1; observed `codex-native-namespace-tool`; fan-out blocked. |
+| Checked-in runtime wrapper | PASS | two-turn Bash `pwd`; exact non-empty `GLM_RUNTIME_ADAPTER_OK`. |
 
 ## Handoff Notes
 

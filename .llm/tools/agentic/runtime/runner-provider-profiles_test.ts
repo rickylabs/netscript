@@ -1,5 +1,5 @@
 import type { GitInfo } from '../lib/agentic-lib.ts';
-import { planClaudeCommand } from './adapters/claude-adapter.ts';
+import { CLAUDE_PRINT_WRAPPER, planClaudeCommand } from './adapters/claude-adapter.ts';
 import {
   CODEX_OPENROUTER_PROFILE_FILE,
   CODEX_OPENROUTER_PROFILE_NAME,
@@ -175,11 +175,68 @@ Deno.test('Claude native and OpenRouter routes use model plus isolated child env
   assertEquals(openRouter.request?.environment?.fixedValues, [{
     targetKey: 'ANTHROPIC_BASE_URL',
     value: 'https://openrouter.ai/api',
+  }, {
+    targetKey: 'CLAUDE_CONFIG_DIR',
+    value: '/home/codex/.config/netscript-agentic/runtime/claude-openrouter',
   }]);
   assertEquals(openRouter.request?.environment?.bindings, [{
     sourceKey: 'OPENROUTER_API_KEY',
     targetKey: 'ANTHROPIC_AUTH_TOKEN',
   }]);
+});
+
+Deno.test('Claude OpenRouter launch and resume use the isolated print wrapper', () => {
+  const openRouterRoute = route({
+    agent: 'claude',
+    profileId: 'claude-openrouter',
+    model: 'z-ai/glm-5.2',
+    effort: 'xhigh',
+  });
+  const launch = planClaudeCommand({
+    command: {
+      kind: 'launch',
+      commandId: 'claude-openrouter-launch',
+      mode: 'plan',
+      route: openRouterRoute,
+      content,
+    },
+    nativeExt4: true,
+  });
+  assertEquals(launch.diagnostics, []);
+  assertEquals(launch.request?.arguments.slice(0, 5), [
+    'run',
+    '--no-lock',
+    '--allow-read',
+    '--allow-run',
+    CLAUDE_PRINT_WRAPPER,
+  ]);
+  assertEquals(launch.request?.arguments.slice(5), [
+    '--model',
+    'z-ai/glm-5.2',
+    '--effort',
+    'xhigh',
+    '--prompt',
+    content.path,
+  ]);
+  const sessionId = '019f53f6-dab2-7331-a90f-4b3f1ea33432';
+  const resume = planClaudeCommand({
+    command: {
+      kind: 'resume',
+      commandId: 'claude-openrouter-resume',
+      mode: 'plan',
+      route: { ...openRouterRoute, sessionId },
+      session: {
+        agent: 'claude',
+        sessionId,
+        worktree,
+        boundary: 'idle',
+      },
+      content,
+    },
+    nativeExt4: true,
+  });
+  assertEquals(resume.diagnostics, []);
+  assertEquals(resume.request?.arguments.slice(-2), ['--resume', sessionId]);
 });
 
 Deno.test('custom Claude base URL is sanitized and always reports experimental remote unavailable', () => {
@@ -210,6 +267,9 @@ Deno.test('custom Claude base URL is sanitized and always reports experimental r
   assertEquals(plan.request?.environment?.fixedValues, [{
     targetKey: 'ANTHROPIC_BASE_URL',
     value: 'https://gateway.example.test',
+  }, {
+    targetKey: 'CLAUDE_CONFIG_DIR',
+    value: '/home/codex/.config/netscript-agentic/runtime/claude-custom',
   }]);
   const rejected = planClaudeCommand({
     command: {

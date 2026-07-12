@@ -12,7 +12,7 @@
 
 ## Current State
 
-Research, locked plan, and Design checkpoint are complete. Separate Claude Opus 4.8 PLAN-EVAL returned PASS. S1 implementation and gates are complete: profile materialization, effort propagation/observation, v0.144 identity parsing, and truthful exit behavior.
+PLAN-EVAL passed. S1 is landed. S2 is implemented and gated: Claude/OpenRouter is the viable GLM agentic lane; Codex/OpenRouter GLM is explicitly unsupported for native namespace tools; runtime launch/resume planning and redacted live proof exist.
 
 ## Completed
 
@@ -21,16 +21,17 @@ Research, locked plan, and Design checkpoint are complete. Separate Claude Opus 
 - Three ordered commit slices and risk controls.
 - Separate-session PLAN-EVAL PASS.
 - S1 code, focused tests, scoped wrappers, volatile guard, and live no-turn effort handshake.
+- S2 Claude gateway wrapper/environment/capability data; full 235-test suite and three live GLM proofs.
 
 ## In Progress
 
-- S1 commit/push/comment, then S2 GLM lane viability.
+- S2 commit/push/comment, then S3 exhaustive preset canaries.
 
 ## Next Steps
 
-1. Commit/push/comment S1.
-2. Run bounded Codex/Claude OpenRouter probes for S2.
-3. Implement the viable GLM lane and structured capability boundary.
+1. Commit/push/comment S2.
+2. Add exhaustive static preset-canary mode and explicit live selection.
+3. Run final gate ledger and hand off to IMPL-EVAL.
 
 ## Key Decisions
 
@@ -48,6 +49,9 @@ Research, locked plan, and Design checkpoint are complete. Separate Claude Opus 
 | `.llm/tools/agentic/codex/` | changed/new | S1 app-server and launcher behavior/tests. |
 | `.llm/tools/agentic/lib/agentic-lib.ts` | changed | v0.144 identity parsing. |
 | `.llm/tools/agentic/runtime/adapters/codex-adapter.ts` | changed | Explicit route flags reach launcher. |
+| `.llm/tools/agentic/claude/claude-print.ts` | new | Isolated gateway launch/resume wrapper. |
+| `.llm/tools/agentic/runtime/provider-profiles.ts` | changed | Supported Claude GLM and unsupported Codex GLM capability records. |
+| `.llm/runs/fix-agentic-openrouter-lanes--codex/glm-live-evidence.md` | new | Redacted acceptance transcript and structured canaries. |
 
 ## Gates
 
@@ -55,12 +59,12 @@ Research, locked plan, and Design checkpoint are complete. Separate Claude Opus 
 | --- | --- | --- |
 | Plan | PASS | `plan-eval.md` |
 | Static | PASS for S1 | scoped check/lint/fmt; focused suite and volatile guard |
-| Runtime | not run | live GLM gate pending |
+| Runtime | PASS | Claude GLM live tool turn and wrapper; Codex incompatibility structured |
 | Consumer | not run | implementation pending |
 
 ## Open Questions
 
-- Which of Codex or Claude can currently complete GLM 5.2 through OpenRouter? Resolve in S2.
+- None; S3 is deterministic canary coverage and final gating.
 
 ## Drift and Debt
 

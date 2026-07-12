@@ -269,6 +269,17 @@ command is strictly read-only.
 structured, non-secret compatibility facts. A credential-absent machine returns an actionable
 `auth_required` diagnostic; it never fabricates a pass.
 
+OpenRouter Claude routes run with an isolated `CLAUDE_CONFIG_DIR`, explicitly empty
+`ANTHROPIC_API_KEY`, late-bound `ANTHROPIC_AUTH_TOKEN`, and the Anthropic-skin base URL from
+`config/endpoints.ts`. This prevents a cached native Claude login from silently overriding the
+gateway. `claude/claude-print.ts` is the launch/resume wrapper for non-mobile gateway sessions.
+Native Claude remote control remains a different surface.
+
+Preset capability is data in `runtime/provider-profiles.ts`: the Claude GLM design preset is
+live-agentic supported, while the legacy Codex GLM design preset is explicitly unsupported because
+the Responses route declares a native namespace tool that the available OpenRouter endpoints reject.
+Canaries surface that incompatibility as a structured diagnostic rather than retrying a dead lane.
+
 ```console
 $ deno run --allow-run --allow-env .llm/tools/agentic/runtime/cli/provider-canary.ts
 Usage: deno task agentic:provider-canary --profile <id> --model <id> --effort <effort>

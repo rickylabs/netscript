@@ -1,18 +1,24 @@
 /** Structured, non-secret provider compatibility canary contracts and evaluation. */
 
 import type { RouteIdentity, RuntimeDiagnostic } from './contract.ts';
-import { resolveProviderProfile } from './provider-profiles.ts';
+import {
+  matchOpenRouterPreset,
+  type OpenRouterIncompatibility,
+  resolveProviderProfile,
+} from './provider-profiles.ts';
 
 export const PROVIDER_CANARY_CAPABILITIES = ['tools', 'reasoning', 'streaming'] as const;
 export type ProviderCanaryCapability = typeof PROVIDER_CANARY_CAPABILITIES[number];
 export type ProviderCapabilityStatus = 'supported' | 'unsupported' | 'unknown' | 'not_applicable';
 export type ProviderCanaryStatus = 'passed' | 'blocked' | 'failed';
+export type ProviderIncompatibility = OpenRouterIncompatibility;
 
 export interface ProviderCanaryObservation {
   readonly credential: 'available' | 'absent';
   readonly exitCode: number | null;
   readonly timedOut: boolean;
   readonly malformed: boolean;
+  readonly incompatibility: ProviderIncompatibility | null;
   readonly eventCounts: Readonly<Record<ProviderCanaryCapability, number>>;
 }
 
@@ -27,6 +33,8 @@ export interface ProviderCompatibilityEvidence {
   readonly experimentalNonAnthropicModel: boolean;
   readonly capabilities: Readonly<Record<ProviderCanaryCapability, ProviderCapabilityStatus>>;
   readonly eventCounts: Readonly<Record<ProviderCanaryCapability, number>>;
+  readonly incompatibility: ProviderIncompatibility | null;
+  readonly incompatibilitySource: 'declared' | 'observed' | null;
 }
 
 export interface ProviderCanaryResult {
@@ -65,6 +73,13 @@ export function evaluateProviderCanary(
     };
   }
   const customClaude = profile.endpointKind !== 'native' && profile.agent === 'claude';
+  const declaredIncompatibility = matchOpenRouterPreset(route)?.incompatibility ?? null;
+  const incompatibility = observation.incompatibility ?? declaredIncompatibility;
+  const incompatibilitySource = observation.incompatibility
+    ? 'observed'
+    : declaredIncompatibility
+    ? 'declared'
+    : null;
   const capabilities = Object.fromEntries(PROVIDER_CANARY_CAPABILITIES.map((capability) => [
     capability,
     observation.malformed || observation.exitCode === null
@@ -88,6 +103,8 @@ export function evaluateProviderCanary(
     experimentalNonAnthropicModel: customClaude && !route.model.startsWith('anthropic/'),
     capabilities,
     eventCounts: observation.eventCounts,
+    incompatibility,
+    incompatibilitySource,
   };
   const diagnostics: RuntimeDiagnostic[] = [];
   if (observation.credential === 'absent') {
@@ -108,6 +125,13 @@ export function evaluateProviderCanary(
       'provider canary returned no parseable structured events',
     ));
   }
+  if (incompatibility === 'codex-native-namespace-tool') {
+    diagnostics.push(diagnostic(
+      'capability_unsupported',
+      'compatibility',
+      'Codex Responses native namespace tools are unsupported by the selected OpenRouter endpoint',
+    ));
+  }
   for (const capability of PROVIDER_CANARY_CAPABILITIES) {
     if (capabilities[capability] !== 'supported') {
       diagnostics.push(diagnostic(
@@ -120,7 +144,7 @@ export function evaluateProviderCanary(
   const processFailed = observation.timedOut ||
     (observation.exitCode !== null && observation.exitCode !== 0);
   const fanOutEligible = observation.credential === 'available' && !processFailed &&
-    !observation.malformed &&
+    !observation.malformed && !incompatibility &&
     PROVIDER_CANARY_CAPABILITIES.every((capability) => capabilities[capability] === 'supported');
   return {
     status: fanOutEligible ? 'passed' : processFailed ? 'failed' : 'blocked',

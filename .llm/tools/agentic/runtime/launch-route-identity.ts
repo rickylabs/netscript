@@ -1,4 +1,5 @@
 import { type Effort, EFFORTS, PROVIDER_KINDS, type ProviderKind } from './contract.ts';
+import { CODEX_OPENROUTER_MODEL_PROVIDER_ID } from './provider-profiles.ts';
 
 export interface RequestedLaunchIdentity {
   readonly provider: ProviderKind;
@@ -55,7 +56,10 @@ export function compareLaunchIdentity(
 ): LaunchIdentityEvidence {
   const missing = observed.provider === null || observed.model === null || observed.effort === null;
   const mismatches: ('provider' | 'model' | 'effort')[] = [];
-  if (observed.provider !== null && observed.provider.toLowerCase() !== requested.provider) {
+  const observedProvider = observed.provider?.toLowerCase() === CODEX_OPENROUTER_MODEL_PROVIDER_ID
+    ? 'openrouter'
+    : observed.provider?.toLowerCase();
+  if (observedProvider !== undefined && observedProvider !== requested.provider) {
     mismatches.push('provider');
   }
   if (observed.model !== null && observed.model !== requested.model) mismatches.push('model');

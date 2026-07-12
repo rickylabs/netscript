@@ -25,6 +25,6 @@ N/A: this is internal `.llm/tools/agentic` tooling, with no package export or JS
 
 ## Open questions
 
-- Must resolve now: whether Codex can suppress the native namespace tool for GLM 5.2, or whether Claude's Anthropic-compatible path is the viable lane.
-- Must resolve now: the exact OpenRouter Anthropic base path/model mapping accepted by Claude CLI.
+- Resolved: Codex's Responses tool declaration remains incompatible; the canary observes the native-namespace rejection and the preset declares it unsupported.
+- Resolved: Claude's OpenRouter Anthropic-skin route completes text, tool, and runtime-wrapper turns when `ANTHROPIC_API_KEY` is explicitly empty and `CLAUDE_CONFIG_DIR` isolates cached native auth.
 - Safe to defer: remote-control support for experimental Claude/OpenRouter sessions; this mission requires a real bounded turn, not native Claude mobile control.

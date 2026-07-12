@@ -1,7 +1,10 @@
 /** Credential-free Codex profile-file materialization for OpenRouter routes. */
 
 import type { RouteIdentity, RuntimeDiagnostic } from '../contract.ts';
-import { OPENROUTER_RESPONSES_BASE_URL } from '../provider-profiles.ts';
+import {
+  CODEX_OPENROUTER_MODEL_PROVIDER_ID,
+  OPENROUTER_RESPONSES_BASE_URL,
+} from '../provider-profiles.ts';
 
 export const CODEX_OPENROUTER_PROFILE_NAME = 'netscript-openrouter' as const;
 export const CODEX_OPENROUTER_PROFILE_FILE: 'netscript-openrouter.config.toml' =
@@ -42,10 +45,10 @@ export function renderCodexOpenRouterProfile(route: RouteIdentity): string | nul
   if (!model) return null;
   return [
     `model = ${model}`,
-    'model_provider = "netscript_openrouter"',
+    `model_provider = "${CODEX_OPENROUTER_MODEL_PROVIDER_ID}"`,
     `model_reasoning_effort = ${JSON.stringify(route.effort)}`,
     '',
-    '[model_providers.netscript_openrouter]',
+    `[model_providers.${CODEX_OPENROUTER_MODEL_PROVIDER_ID}]`,
     'name = "OpenRouter"',
     `base_url = ${JSON.stringify(OPENROUTER_RESPONSES_BASE_URL)}`,
     'env_key = "OPENROUTER_API_KEY"',

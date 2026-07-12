@@ -24,7 +24,11 @@ export const PROVIDER_CREDENTIAL_KEYS = [
 ] as const;
 export type ProviderCredentialKey = typeof PROVIDER_CREDENTIAL_KEYS[number];
 
-export const PROVIDER_ROUTE_KEYS = ['ANTHROPIC_BASE_URL', 'OPENAI_BASE_URL'] as const;
+export const PROVIDER_ROUTE_KEYS = [
+  'ANTHROPIC_BASE_URL',
+  'OPENAI_BASE_URL',
+  'CLAUDE_CONFIG_DIR',
+] as const;
 export type ProviderRouteKey = typeof PROVIDER_ROUTE_KEYS[number];
 
 export type ProviderEndpointKind = 'native' | 'openrouter' | 'custom';
@@ -41,6 +45,8 @@ export interface ProviderProfile {
 /** Re-exported from the central config; the single source is `config/endpoints.ts`. */
 export const OPENROUTER_ANTHROPIC_BASE_URL: string = CONFIG_OPENROUTER_ANTHROPIC_BASE_URL;
 export const OPENROUTER_RESPONSES_BASE_URL: string = CONFIG_OPENROUTER_RESPONSES_BASE_URL;
+/** Codex-local id for the custom OpenRouter Responses provider table. */
+export const CODEX_OPENROUTER_MODEL_PROVIDER_ID = 'netscript_openrouter' as const;
 
 function profile(
   values: Omit<ProviderProfile, 'clearKeys'>,
@@ -101,10 +107,21 @@ export const PROVIDER_PROFILES: Readonly<Record<ProviderProfileId, ProviderProfi
 
 export const OPENROUTER_PRESET_IDS = [
   'claude-fanout-minimax-m3',
+  'claude-design-glm-5-2',
   'codex-design-glm-5-2',
   'codex-long-medium-grok-4-5',
 ] as const;
 export type OpenRouterPresetId = typeof OPENROUTER_PRESET_IDS[number];
+export const OPENROUTER_AGENTIC_TURN_STATUSES = [
+  'supported',
+  'unsupported',
+  'unverified',
+] as const;
+export type OpenRouterAgenticTurnStatus = typeof OPENROUTER_AGENTIC_TURN_STATUSES[number];
+export const OPENROUTER_TRANSPORTS = ['anthropic-messages', 'responses'] as const;
+export type OpenRouterTransport = typeof OPENROUTER_TRANSPORTS[number];
+export const OPENROUTER_INCOMPATIBILITIES = ['codex-native-namespace-tool'] as const;
+export type OpenRouterIncompatibility = typeof OPENROUTER_INCOMPATIBILITIES[number];
 export const OPENROUTER_PRESET_MODELS: readonly [
   typeof OPENROUTER_MODEL_IDS.minimax,
   typeof OPENROUTER_MODEL_IDS.glm,
@@ -121,6 +138,9 @@ export interface OpenRouterPreset {
   readonly model: typeof OPENROUTER_PRESET_MODELS[number];
   readonly effort: Effort;
   readonly purpose: 'workflow-fanout' | 'creative-design' | 'long-running-medium';
+  readonly agenticTurn: OpenRouterAgenticTurnStatus;
+  readonly transport: OpenRouterTransport;
+  readonly incompatibility: OpenRouterIncompatibility | null;
 }
 
 export const OPENROUTER_PRESETS: Readonly<Record<OpenRouterPresetId, OpenRouterPreset>> = Object
@@ -131,6 +151,19 @@ export const OPENROUTER_PRESETS: Readonly<Record<OpenRouterPresetId, OpenRouterP
       model: OPENROUTER_MODEL_IDS.minimax,
       effort: 'high',
       purpose: 'workflow-fanout',
+      agenticTurn: 'unverified',
+      transport: 'anthropic-messages',
+      incompatibility: null,
+    }),
+    'claude-design-glm-5-2': Object.freeze({
+      id: 'claude-design-glm-5-2',
+      profileId: 'claude-openrouter',
+      model: OPENROUTER_MODEL_IDS.glm,
+      effort: 'xhigh',
+      purpose: 'creative-design',
+      agenticTurn: 'supported',
+      transport: 'anthropic-messages',
+      incompatibility: null,
     }),
     'codex-design-glm-5-2': Object.freeze({
       id: 'codex-design-glm-5-2',
@@ -138,6 +171,9 @@ export const OPENROUTER_PRESETS: Readonly<Record<OpenRouterPresetId, OpenRouterP
       model: OPENROUTER_MODEL_IDS.glm,
       effort: 'xhigh',
       purpose: 'creative-design',
+      agenticTurn: 'unsupported',
+      transport: 'responses',
+      incompatibility: 'codex-native-namespace-tool',
     }),
     'codex-long-medium-grok-4-5': Object.freeze({
       id: 'codex-long-medium-grok-4-5',
@@ -145,6 +181,9 @@ export const OPENROUTER_PRESETS: Readonly<Record<OpenRouterPresetId, OpenRouterP
       model: OPENROUTER_MODEL_IDS.grok,
       effort: 'medium',
       purpose: 'long-running-medium',
+      agenticTurn: 'unverified',
+      transport: 'responses',
+      incompatibility: null,
     }),
   });
 
@@ -167,6 +206,15 @@ export function childEnvironmentPolicyForProfile(
   } else if (profile.id === 'claude-custom' && route?.baseUrl) {
     fixedValues.push({ targetKey: 'ANTHROPIC_BASE_URL', value: route.baseUrl });
     emptyKeys.push('ANTHROPIC_API_KEY');
+  }
+  if (profile.agent === 'claude' && profile.endpointKind !== 'native' && route) {
+    const home = route.worktree.match(/^(\/home\/[^/]+)(?:\/|$)/)?.[1];
+    if (home) {
+      fixedValues.push({
+        targetKey: 'CLAUDE_CONFIG_DIR',
+        value: `${home}/.config/netscript-agentic/runtime/${profile.id}`,
+      });
+    }
   }
   if (codexHome) {
     fixedValues.push({ targetKey: 'CODEX_HOME', value: codexHome });

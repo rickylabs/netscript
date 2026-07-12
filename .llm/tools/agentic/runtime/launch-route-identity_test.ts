@@ -50,6 +50,22 @@ Deno.test('launch evidence records matched requested and observed identity', () 
   );
 });
 
+Deno.test('Codex custom provider id is canonicalized to OpenRouter identity', () => {
+  const openRouter = requestedLaunchIdentity({
+    provider: 'openrouter',
+    model: 'caller-model',
+    effort: 'xhigh',
+  });
+  equal(
+    compareLaunchIdentity(openRouter, {
+      provider: 'netscript_openrouter',
+      model: 'caller-model',
+      effort: 'xhigh',
+    }).status,
+    'matched',
+  );
+});
+
 Deno.test('launch evidence exposes mismatch fields without provider output or credentials', () => {
   equal(
     compareLaunchIdentity(requested, {

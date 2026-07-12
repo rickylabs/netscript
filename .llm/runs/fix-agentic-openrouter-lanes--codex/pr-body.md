@@ -21,7 +21,7 @@ Do not merge until the Plan-Gate and final IMPL-EVAL pass are complete.
 ## Slices
 
 - [x] S1 Codex profile, identity, and exit semantics
-- [ ] S2 GLM lane viability and structured capabilities
+- [x] S2 GLM lane viability and structured capabilities
 - [ ] S3 exhaustive preset canaries and final gates
 
 ## Definition of Done
@@ -39,6 +39,9 @@ Do not merge until the Plan-Gate and final IMPL-EVAL pass are complete.
 - S1 scoped check/lint/fmt — 99 files, 0 findings.
 - Volatile-config guard — 4 passed, 0 failed.
 - v0.144 no-turn effort handshake — requested `low` over global `max`; observed `low` with complete identity.
+- Full agentic suite after S2 — 235 passed, 0 failed.
+- Claude GLM live tool canary — PASS; Codex GLM canary — structured unsupported (`codex-native-namespace-tool`).
+- Checked-in Claude runtime wrapper — non-empty `GLM_RUNTIME_ADAPTER_OK` after Bash `pwd`.
 
 ## Harness
 

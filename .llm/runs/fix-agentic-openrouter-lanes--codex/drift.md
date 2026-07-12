@@ -19,3 +19,13 @@
 - **Severity:** significant
 - **Action:** fix
 - **Evidence:** S1 adds explicit initialization propagation and a v0.144 observation fixture.
+
+## 2026-07-12 — Claude empty output was cached-auth contamination
+
+- **What:** The reported Claude/OpenRouter command returned empty output because the normal Claude config carried native cached state into the custom gateway process.
+- **Source:** Official OpenRouter integration guidance and bounded isolated live probes.
+- **Expected:** Anthropic-compatible endpoint/model mapping might itself be incompatible.
+- **Actual:** With a dedicated `CLAUDE_CONFIG_DIR`, explicit empty `ANTHROPIC_API_KEY`, and late-bound auth token, GLM completed text and Bash-tool turns.
+- **Severity:** significant
+- **Action:** fix
+- **Evidence:** `glm-live-evidence.md`; `provider-profiles.ts`; `claude-print.ts`.
