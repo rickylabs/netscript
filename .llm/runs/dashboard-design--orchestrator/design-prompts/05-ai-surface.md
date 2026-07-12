@@ -84,11 +84,11 @@ no anthropomorphic personality chrome (it's an instrument, tone stays factual).
 **Theme:** NS One tokens; the existing ✦ AI accent treatment (primary-subtle gradient) used
 consistently and ONLY for AI artifacts; light+dark; reduced-motion.
 
-## CLI dependency map (epic #701 — beta.9 foundation; verbs marked pending do not exist yet)
+## CLI dependency map (epic #701 — SHIPPED in beta.9; use these exact verbs)
 
-| Surface | CLI verb | Status | Issue |
-|---|---|---|---|
-| Tools tab (contract procedures as tools, per-plugin grouping) | `plugin ai list tools\|agents\|models --json` | pending | #710 |
-| "Add tool/agent" producing runnable resources | self-wiring `plugin ai add tool\|agent` | pending (today's output is inert until hand-wired) | #710 |
-| MCP-backed tool sources, models/providers panel | `plugin ai mcp add\|list`, model/provider verbs | pending | #710 |
-| AI-drafted automations landing as trigger drafts | dynamic (api-source) trigger registration | pending | #705 |
+| Surface | Shipped CLI verb |
+|---|---|
+| Tools tab (contract procedures as agent tools, per-plugin grouping) | `netscript plugin ai` (tools / agents / models / providers / MCP) |
+| "Add tool / add agent" producing runnable, self-wired resources | `netscript plugin ai add tool <name>` · `plugin ai add agent <name>` |
+| MCP-backed tool sources, models/providers panel | `netscript plugin ai` MCP + model/provider verbs |
+| AI-drafted automations landing as reviewable trigger drafts | `netscript triggers add` · `triggers update` |

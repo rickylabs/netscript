@@ -154,11 +154,13 @@ detail routes); a net-new issue is justified only for Auth if #400 augmentation 
 
 ---
 
-# CLI dependency overlay (epic #701, beta.9 — added 2026-07-12)
+# CLI dependency overlay (epic #701 — SHIPPED in beta.9; updated 2026-07-12)
 
-The CLI-features-coverage epic **#701** (beta.9, children #702–#712) is the write-action
-foundation this design consumes: **the CLI ships in beta.9, the dashboard consumes it in
-beta.10.** Source: `reference/cli-correlation-report.md` (40 design surfaces mapped; 16
+**STATUS UPDATE: epic #701 and all 11 children (#702–#712) are CLOSED and shipped in the
+0.0.1-beta.9 cut.** Every verb below now exists — the design prompts print real commands and
+the "pending" language in the original overlay is superseded. Verified against
+`netscript --help` at beta.9 (see `design-prompts/*` CLI dependency maps for the exact
+verified verb strings). The dashboard (beta.10) now consumes a complete CLI foundation. Source: `reference/cli-correlation-report.md` (40 design surfaces mapped; 16
 previously-unbacked assumptions). Direction-A rows above gain the third dimension below —
 a surface is only fully "covered" when its screen, its DDX issue, AND its CLI verb exist.
 

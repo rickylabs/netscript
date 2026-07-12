@@ -47,13 +47,12 @@ conversation, in order — P1 locks the shell/routing frame the others plug into
 10. **Numbers reconcile:** every stat/count/id is drawn from the one canonical fixture and the
    derived-stats rules in the POC ground truth; two screens showing different values for the
    same fact is a defect.
-11. **CLI verbs are canonical, not decorative.** Every CLI-equivalent line in a confirm dialog
-   names a real (or explicitly issue-tracked) verb. The CLI foundation ships in the
-   CLI-features-coverage epic #701 (beta.9, children #702–#712) — the dashboard (beta.10)
-   consumes it. Each prompt ends with a "CLI dependency map" table; verbs marked
-   `pending #70X` do not exist yet — the design keeps the line, the issue delivers the verb.
-   Full 40-surface mapping: `../reference/cli-correlation-report.md` +
-   `../coverage-matrix.md` §CLI overlay.
+11. **CLI verbs are canonical and SHIPPED.** The CLI-features-coverage epic #701 landed in
+   beta.9 — every verb these prompts print now exists. Use the exact strings in each prompt's
+   "CLI dependency map" table; do not invent verbs, do not hedge with "coming soon". Verified
+   against `netscript --help` at beta.9. Full surface mapping:
+   `../reference/cli-correlation-report.md` + `../coverage-matrix.md` §CLI overlay.
+
 
 ## Grounding artifacts (same run dir)
 
