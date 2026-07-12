@@ -4,7 +4,8 @@ export type QualityRule =
   | 'explicit-any-ignore'
   | 'unsafe-cast'
   | 'explicit-any'
-  | 'plugin-name-check';
+  | 'plugin-name-check'
+  | 'ts-error-suppression';
 
 export interface QualityFinding {
   readonly rule: QualityRule;
@@ -45,7 +46,8 @@ function ruleFor(line: string, file: string, tainted: Set<string>): QualityRule 
   // Template/fixture source strings are data, not syntax in the scanned module.
   if (/^\s*[`'\"]/.test(line)) return undefined;
   if (/deno-lint-ignore(?:-file)?\s+no-explicit-any/.test(line)) return 'explicit-any-ignore';
-  if (/\bas\s+unknown\s+as\b|\bas\s+any\b/.test(line)) return 'unsafe-cast';
+  if (/@ts-(?:ignore|expect-error|nocheck)\b/.test(line)) return 'ts-error-suppression';
+  if (/\bas\s+unknown\s+as\b|\bas\s+any\b|\bas\s+never\b/.test(line)) return 'unsafe-cast';
   if (/(?:<|:\s*)any(?:\s*[,>;)\]}]|\b)/.test(line)) return 'explicit-any';
   // Host-side plugin identity: equality/predicate against a plugin name whether
   // written as a quoted literal OR a same-file identifier bound to one (const

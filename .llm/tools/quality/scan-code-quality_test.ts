@@ -85,3 +85,18 @@ Deno.test('scanner catches plugin-identity via const/array indirection (Opus IMP
   const findings = await scanCodeQuality(['packages/cli/src'], root);
   assertEquals(findings.filter((f) => f.rule === 'plugin-name-check').length, 3);
 });
+
+Deno.test('scanner catches @ts-error suppressions and `as never` (source-side type escapes)', async () => {
+  const root = await Deno.makeTempDir();
+  await Deno.mkdir(`${root}/packages/cli/src`, { recursive: true });
+  await Deno.writeTextFile(`${root}/packages/cli/src/escape.ts`, [
+    '// @ts-expect-error upstream type mismatch',
+    'const a = wrong();',
+    'const b = value as never;',
+    '// @ts-ignore',
+    'const c = other();',
+  ].join('\n'));
+  const rules = (await scanCodeQuality(['packages/cli/src'], root)).map((f) => f.rule);
+  assertEquals(rules.filter((r) => r === 'ts-error-suppression').length, 2);
+  assertEquals(rules.filter((r) => r === 'unsafe-cast').length, 1);
+});
