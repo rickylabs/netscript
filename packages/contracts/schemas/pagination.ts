@@ -15,7 +15,11 @@
  */
 
 import { z } from 'zod';
-import type { ContractObjectSchema, ContractSchema } from '../src/domain/schema-types.ts';
+import type { ContractObjectSchema, ContractSchemaLike } from '../src/domain/schema-types.ts';
+
+/** Bridges equal-version npm/JSR Zod copies while composing a local Zod schema. */
+const asZodSchema = <TOutput, TInput>(schema: unknown): z.ZodType<TOutput, TInput> =>
+  schema as z.ZodType<TOutput, TInput>;
 
 // ============================================================================
 // INPUT SCHEMAS
@@ -139,13 +143,13 @@ export const CursorPaginationOutputSchema: ContractObjectSchema<
  * ```
  */
 export function createPaginatedOutput<TOutput, TInput>(
-  itemSchema: ContractSchema<TOutput, TInput>,
+  itemSchema: ContractSchemaLike<TOutput, TInput>,
 ): ContractObjectSchema<
   PaginatedResult<TOutput>,
   Readonly<{ data: TInput[]; pagination: PaginationOutput }>
 > {
   return z.object({
-    data: z.array(itemSchema),
+    data: z.array(asZodSchema<TOutput, TInput>(itemSchema)),
     pagination: PaginationOutputSchema,
   });
 }
@@ -160,13 +164,13 @@ export function createPaginatedOutput<TOutput, TInput>(
  * ```
  */
 export function createCursorPaginatedOutput<TOutput, TInput>(
-  itemSchema: ContractSchema<TOutput, TInput>,
+  itemSchema: ContractSchemaLike<TOutput, TInput>,
 ): ContractObjectSchema<
   CursorPaginatedResult<TOutput>,
   Readonly<{ data: TInput[]; pagination: CursorPaginationOutput }>
 > {
   return z.object({
-    data: z.array(itemSchema),
+    data: z.array(asZodSchema<TOutput, TInput>(itemSchema)),
     pagination: CursorPaginationOutputSchema,
   });
 }

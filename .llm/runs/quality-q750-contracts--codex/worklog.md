@@ -81,6 +81,8 @@ module, then add a parse and type-inference test. Never cast a Zod value into a 
 | 2026-07-12 | 2+3 | schema/CRUD typing | Replaced the output-only facade with Zod input/output generics, typed schema factories and CRUD composition, and added variance/inference tests; scanner reduced 41 → 0 with 0 allowances. |
 | 2026-07-12 | 2+3 | slice review | Separate Claude Opus 4.8 Tier-A review returned PASS and created sign-off commit `22c608f2`. |
 | 2026-07-12 | final | IMPL-EVAL | Separate Claude Opus 4.8 session `38ce04ab-ebad-4b05-a83e-ee1309b213ef` returned PASS after independently rerunning all acceptance gates. |
+| 2026-07-12 | CI feedback | generated consumer repair | Reproduced `generated.service-check` failure: generated Prisma schemas import npm Zod while the copied contracts package imports JSR Zod, so the concrete exported `ZodType` constraint exposed module-identity-specific `toJSONSchema` internals. Kept native Zod output types and changed only consumer-supplied generic constraints to the structural `_input`/`_output`/`parse` boundary shared by both resolutions. |
+| 2026-07-12 | CI feedback | scaffold proof | Exact `scaffold.service` run passed all 5 gates; `generated.service-check` passed in 51.9s. Scanner remained 0 findings / 0 allowances. |
 
 ## Decisions
 
@@ -170,6 +172,22 @@ None. No structural upstream limitation required a `quality-allow` marker.
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | Contracts exports and downstream schema consumers | PASS | targeted `deno check --unstable-kv` over package/plugin routes using `@netscript/contracts` | 7 consumer entry files green |
+| Generated service workspace | PASS | `deno task e2e:cli run scaffold.service --cleanup --format pretty` (exit 0) | 5/5 gates green; generated Prisma npm-Zod schemas compile against copied JSR-Zod contracts package |
+
+### CI Feedback Reconciliation
+
+- The first pushed typing pass made consumer schema generic constraints concrete JSR `ZodType`
+  instances. That was locally sound but source-incompatible with generated Prisma schemas resolving
+  the same Zod version through npm: Zod's `toJSONSchema` implementation types carry their module
+  identity across that boundary.
+- `ContractSchema` and all package-produced schemas remain native Zod types, preserving the public
+  parsed-output shapes and precise `z.input`/`z.output` behavior. New additive
+  `ContractSchemaLike`/`ContractObjectSchemaLike` types are used only where callers provide schemas.
+  Local composition crosses into native Zod through one documented, single assertions boundary;
+  there is no double assertion and no scanner allowance.
+- Final feedback gates: scoped check/lint/fmt all green (21 files), package tests 8/8, publish
+  dry-run green, doc lint recorded at the unchanged 9 combined private refs, scanner 0/0, and exact
+  `scaffold.service` 5/5 green. `deno.lock` remains unchanged.
 
 ## Handoff Notes
 

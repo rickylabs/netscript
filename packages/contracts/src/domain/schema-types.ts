@@ -3,14 +3,37 @@ import type { z } from 'zod';
 /** Parse result returned by contract schema values. */
 export type ContractParseResult<TOutput> = z.ZodSafeParseResult<TOutput>;
 
-/** Infer the accepted input value type from a contract schema. */
-export type ContractSchemaInput<TSchema extends z.ZodType> = z.input<TSchema>;
+/** Infer the accepted input value type from a Zod-compatible schema. */
+export type ContractSchemaInput<TSchema> = TSchema extends { readonly _input: infer TInput }
+  ? TInput
+  : unknown;
 
-/** Infer the parsed output value type from a contract schema. */
-export type ContractSchemaOutput<TSchema extends z.ZodType> = z.output<TSchema>;
+/** Infer the parsed output value type from a Zod-compatible schema. */
+export type ContractSchemaOutput<TSchema> = TSchema extends { readonly _output: infer TOutput }
+  ? TOutput
+  : unknown;
 
 /** Zod-backed contract schema retaining both parsed output and accepted input. */
 export type ContractSchema<TOutput = unknown, TInput = unknown> = z.ZodType<TOutput, TInput>;
+
+/**
+ * Cross-resolution schema constraint used at consumer-supplied boundaries.
+ *
+ * Generated workspaces can resolve the same Zod version through npm while
+ * this package resolves it through JSR. The `_input`/`_output` markers are the
+ * stable structural contract shared by both copies; Zod implementation members
+ * such as `toJSONSchema` are intentionally excluded.
+ */
+export type ContractSchemaLike<TOutput = unknown, TInput = unknown> = Readonly<{
+  _output: TOutput;
+  _input: TInput;
+  parse(value: unknown): TOutput;
+}>;
+
+/** Cross-resolution object-schema constraint for consumer-supplied shapes. */
+export type ContractObjectSchemaLike<TOutput = unknown, TInput = unknown> =
+  & ContractSchemaLike<TOutput, TInput>
+  & Readonly<{ shape: Readonly<Record<string, unknown>> }>;
 
 /** Contract schema value that supports a default output. */
 export type ContractDefaultableSchema<TOutput, TInput = unknown> = z.ZodType<TOutput, TInput>;

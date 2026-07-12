@@ -38,9 +38,11 @@ export type {
   ContractDefaultableSchema,
   ContractNumberSchema,
   ContractObjectSchema,
+  ContractObjectSchemaLike,
   ContractParseResult,
   ContractSchema,
   ContractSchemaInput,
+  ContractSchemaLike,
   ContractSchemaOutput,
   ContractStringSchema,
 } from '../domain/schema-types.ts';
