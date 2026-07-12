@@ -1,6 +1,7 @@
 import { CliCommandRegistry } from '../../composition/cli-command-registry.ts';
 import { contractCommand } from '../contracts/contracts-group.ts';
 import { createDbCommand } from '../db/db-group.ts';
+import { createConfigCommand } from '../config/config-group.ts';
 import { createDeployCommand } from '../deploy/deploy-group.ts';
 import { createGenerateCommand } from '../generate/generate-group.ts';
 import { createInitCommand } from '../init/init-command.ts';
@@ -46,6 +47,10 @@ export interface PublicCommandContext {
 export function createPublicCommandRegistry(): CliCommandRegistry<PublicCommandContext> {
   const registry = new CliCommandRegistry<PublicCommandContext>();
 
+  registry.register('config', {
+    id: 'config',
+    create: ({ dependencies }) => createConfigCommand(dependencies),
+  });
   registry.register('deploy', {
     id: 'deploy',
     create: ({ dependencies }) => createDeployCommand(dependencies),
