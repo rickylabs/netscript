@@ -58,6 +58,9 @@ interface WorkspaceDenoConfig {
 }
 
 const PLUGIN_KIND_ROOT_IMPORTS: Readonly<Record<string, readonly string[]>> = {
+  // @netscript/ai computes its optional MCP adapter imports at runtime, so the
+  // published JSR graph cannot retain this dependency for consumer resolution.
+  ai: [SCAFFOLD_PACKAGES.TANSTACK_AI_MCP],
   auth: [
     SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE,
     SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_CONFIG,
