@@ -38,7 +38,7 @@ export const %%TRIGGER_EXPORT%%: ScheduledTriggerDefinition<
   {
     id: '%%TRIGGER_ID%%',
     cron: '%%CRON%%'%%TIMEZONE_LINE%%,
-    persistent: false,
+    persistent: true,
     backfill: { enabled: true, windowMs: 3_600_000, policy: 'fire-once' }%%METADATA_LINES%%,
   },
 );

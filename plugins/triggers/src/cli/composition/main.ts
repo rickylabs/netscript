@@ -17,15 +17,17 @@ export {
   DisableTriggerCommand,
   EnableTriggerCommand,
   FireTriggerCommand,
-  ListTriggerEventsCommand,
   ListTriggersCommand,
   PreviewScheduleCommand,
-  RemoveTriggerCommand,
   StaticTriggersCliBackend,
   TestTriggerCommand,
   TriggersCliCommand,
-  UpdateTriggerCommand,
 } from '../commands.ts';
+export {
+  ListTriggerEventsCommand,
+  RemoveTriggerCommand,
+  UpdateTriggerCommand,
+} from '../management-commands.ts';
 export { TRIGGERS_CLI_COMMANDS } from '../command-types.ts';
 export type {
   TriggersCliBackend,

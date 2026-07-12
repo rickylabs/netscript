@@ -8,13 +8,15 @@ import {
   DisableTriggerCommand,
   EnableTriggerCommand,
   FireTriggerCommand,
-  ListTriggerEventsCommand,
   ListTriggersCommand,
   PreviewScheduleCommand,
-  RemoveTriggerCommand,
   TestTriggerCommand,
-  UpdateTriggerCommand,
 } from './commands.ts';
+import {
+  ListTriggerEventsCommand,
+  RemoveTriggerCommand,
+  UpdateTriggerCommand,
+} from './management-commands.ts';
 
 /** CLI command group for `@netscript/plugin-triggers`. */
 export class TriggersCli extends PluginCli {

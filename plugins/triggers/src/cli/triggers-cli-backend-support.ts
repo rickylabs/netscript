@@ -15,6 +15,13 @@ export type TriggerInspectionEntry = Readonly<{
   id: string;
   kind: TriggerKind | 'unknown';
   file: string;
+  cron?: string;
+  timezone?: string;
+  path?: string;
+  verifier?: string;
+  secretEnv?: string;
+  description?: string;
+  tags?: readonly string[];
 }>;
 
 export function ok(message: string, data: unknown): PluginCliResult {
@@ -70,7 +77,7 @@ export function inspectTriggerSource(
   file: string,
   source: string,
 ): TriggerInspectionEntry | undefined {
-  const id = source.match(/\bid:\s*(['"`])([^'"`]+)\1/)?.[2];
+  const id = [...source.matchAll(/\bid:\s*(['"`])([^'"`]+)\1/g)].at(-1)?.[2];
   if (id === undefined) {
     return undefined;
   }
@@ -78,6 +85,13 @@ export function inspectTriggerSource(
     id,
     kind: detectKind(source),
     file,
+    cron: stringProperty(source, 'cron'),
+    timezone: stringProperty(source, 'timezone'),
+    path: stringProperty(source, 'path'),
+    verifier: stringProperty(source, 'verifier'),
+    secretEnv: stringProperty(source, 'secretEnv'),
+    description: stringProperty(source, 'description'),
+    tags: stringArrayProperty(source, 'tags'),
   };
 }
 
@@ -106,20 +120,6 @@ export function createSyntheticEvent(
     idempotencyKey,
   };
   return eventBase as TriggerEvent;
-}
-
-export function previewCron(expression: string, count: number): readonly Date[] {
-  const [minute = '*', hour = '*'] = expression.trim().split(/\s+/);
-  const dates: Date[] = [];
-  let cursor = new Date();
-  cursor.setSeconds(0, 0);
-
-  while (dates.length < count) {
-    cursor = nextCronCandidate(cursor, minute, hour);
-    dates.push(new Date(cursor));
-  }
-
-  return dates;
 }
 
 function detectKind(source: string): TriggerInspectionEntry['kind'] {
@@ -180,32 +180,19 @@ function payloadForKind(definition: TriggerDefinition, payload: unknown): unknow
   }
 }
 
-function nextCronCandidate(current: Date, minute: string, hour: string): Date {
-  const next = new Date(current);
-  const everyMinutes = minute.match(/^\*\/(\d+)$/)?.[1];
+function stringProperty(source: string, property: string): string | undefined {
+  return source.match(new RegExp(`\\b${property}:\\s*(['\"])(.*?)\\1`))?.[2];
+}
 
-  if (minute === '*' && hour === '*') {
-    next.setMinutes(next.getMinutes() + 1);
-    return next;
+function stringArrayProperty(source: string, property: string): readonly string[] | undefined {
+  const literal = source.match(new RegExp(`\\b${property}:\\s*(\\[[^\\]]*\\])`))?.[1];
+  if (literal === undefined) return undefined;
+  try {
+    const value = JSON.parse(literal);
+    return Array.isArray(value) && value.every((item) => typeof item === 'string')
+      ? value
+      : undefined;
+  } catch {
+    return undefined;
   }
-  if (everyMinutes !== undefined && hour === '*') {
-    const interval = Number(everyMinutes);
-    const nextMinute = Math.ceil((next.getMinutes() + 1) / interval) * interval;
-    if (nextMinute >= 60) {
-      next.setHours(next.getHours() + 1, nextMinute % 60, 0, 0);
-    } else {
-      next.setMinutes(nextMinute, 0, 0);
-    }
-    return next;
-  }
-  if (/^\d+$/.test(minute) && /^\d+$/.test(hour)) {
-    next.setHours(Number(hour), Number(minute), 0, 0);
-    if (next <= current) {
-      next.setDate(next.getDate() + 1);
-    }
-    return next;
-  }
-
-  next.setHours(next.getHours() + 1);
-  return next;
 }

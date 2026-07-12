@@ -98,14 +98,27 @@ const handler = defineJobHandler(async (ctx) => {
 export default Object.assign(handler, { id: 'process-shipping-update' });
 ```
 
-Now the webhook. It is `defineWebhook(handler, spec)` from
+Scaffold the webhook and its worker-job action with the triggers CLI first:
+
+```bash
+ns-triggers add webhook shipping-status-webhook \
+  --path=shipping/status \
+  --job=process-shipping-update \
+  --verifier=hmac-sha256 \
+  --secret-env=WEBHOOK_SHIPPING_SECRET \
+  --description="Receives carrier shipping-status callbacks and enqueues a processing job." \
+  --tags=webhook,shipping,saga
+```
+
+The command writes `triggers/shipping-status-webhook-trigger.ts` and recompiles the generated
+trigger registry. The generated definition uses `defineWebhook(handler, spec)` from
 `@netscript/plugin-triggers-core/builders`: the handler resolves to an **array of effects**, and the
 spec names the webhook and — for a real provider callback — declares HMAC verification so forged
 requests are rejected before your handler runs. The job reference is an inline object typed with
-`satisfies JobDefinition` — no helper needed:
+`satisfies JobDefinition` — no helper needed. Its relevant shape is:
 
 ```ts
-// plugins/triggers/shipping-status-webhook.ts
+// triggers/shipping-status-webhook-trigger.ts
 import { defineWebhook, enqueueJob } from '@netscript/plugin-triggers-core/builders';
 import type { JobDefinition } from '@netscript/plugin-workers-core';
 

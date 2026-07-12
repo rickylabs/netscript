@@ -1,5 +1,5 @@
 import { assertEquals, assertRejects } from '@std/assert';
-import { HttpTriggersService } from './http-triggers-service.ts';
+import { HttpTriggersService } from '../../src/cli/http-triggers-service.ts';
 
 Deno.test('HTTP triggers service reads persisted events with filters', async () => {
   const requests: Request[] = [];

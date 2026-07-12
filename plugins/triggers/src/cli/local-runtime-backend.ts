@@ -1,6 +1,7 @@
 import type { PluginCliArgs, PluginCliResult } from '@netscript/plugin/cli';
 import { artifactText, type ScaffoldArtifact } from '@netscript/plugin/adapter';
 import type { TriggerContext, TriggerDefinition } from '@netscript/plugin-triggers-core/domain';
+import { computeNextFireTimes } from '@netscript/plugin-triggers-core/runtime';
 import {
   fileStem,
   fileWatchScaffolder,
@@ -23,11 +24,11 @@ import {
   numericFlag,
   ok,
   parseJsonFlag,
-  previewCron,
   requiredValue,
   resolveTriggerDefinition,
   type TriggerInspectionEntry,
 } from './triggers-cli-backend-support.ts';
+import { type TriggerSourceUpdates, updateTriggerSource } from './trigger-source-editor.ts';
 
 /** Options for local triggers runtime CLI command execution. */
 export interface LocalTriggersRuntimeBackendOptions {
@@ -83,8 +84,9 @@ export class LocalTriggersRuntimeBackend implements TriggersCliBackend {
       case 'events':
         return await this.listEvents(args);
       case 'update':
+        return await this.updateTrigger(args);
       case 'remove':
-        return fail(`triggers ${definition.name} is not implemented yet.`);
+        return await this.removeTrigger(args);
       case 'test':
         return await this.invokeTrigger(args, 'test');
       case 'fire':
@@ -96,6 +98,40 @@ export class LocalTriggersRuntimeBackend implements TriggersCliBackend {
       case 'disable':
         return await this.setTriggerEnabled(args, false);
     }
+  }
+
+  /** Rewrite supported static trigger fields and refresh the registry. */
+  private async updateTrigger(args: PluginCliArgs): Promise<PluginCliResult> {
+    const id = requiredValue(args, 'trigger id');
+    const path = await this.findTriggerPath(id);
+    if (path === undefined) return fail(`Trigger not found: ${id}`);
+    const source = await this.files.readTextFile(path);
+    if (source === undefined) return fail(`Trigger source disappeared: ${path}`);
+    const inspection = inspectTriggerSource(path, source);
+    if (inspection === undefined) return fail(`Unable to inspect trigger source: ${path}`);
+    const updates = triggerSourceUpdates(args);
+    const updated = updateTriggerSource(source, inspection.kind, updates);
+    await this.files.writeTextFile(path, updated);
+    const registry = await compileTriggerRegistry(this.files);
+    return ok('Trigger definition updated.', {
+      id,
+      file: path,
+      updates,
+      registry,
+    });
+  }
+
+  /** Remove a code-defined trigger and refresh the registry. */
+  private async removeTrigger(args: PluginCliArgs): Promise<PluginCliResult> {
+    const id = requiredValue(args, 'trigger id');
+    const path = await this.findTriggerPath(id);
+    if (path === undefined) return fail(`Trigger not found: ${id}`);
+    if (this.files.removeFile === undefined) {
+      return fail('The configured project file adapter does not support removal.');
+    }
+    if (!await this.files.removeFile(path)) return fail(`Trigger not found: ${id}`);
+    const registry = await compileTriggerRegistry(this.files);
+    return ok('Trigger definition removed.', { id, file: path, registry });
   }
 
   /** List persisted trigger events through the running service. */
@@ -194,7 +230,7 @@ export class LocalTriggersRuntimeBackend implements TriggersCliBackend {
       id: definition.id,
       cron: definition.cron,
       timezone: definition.timezone,
-      fireTimes: previewCron(definition.cron, count).map((date) => date.toISOString()),
+      fireTimes: computeNextFireTimes(definition, count),
     });
   }
 
@@ -214,7 +250,7 @@ export class LocalTriggersRuntimeBackend implements TriggersCliBackend {
     if (path === undefined) {
       throw new Error(`Trigger not found: ${id}`);
     }
-    const module = await import(this.files.toImportUrl(path));
+    const module = await import(`${this.files.toImportUrl(path)}?cli=${crypto.randomUUID()}`);
     const definition = resolveTriggerDefinition(module);
     if (definition === undefined) {
       throw new Error(`Trigger module does not export a trigger definition: ${path}`);
@@ -237,6 +273,19 @@ export class LocalTriggersRuntimeBackend implements TriggersCliBackend {
     }
     return undefined;
   }
+}
+
+function triggerSourceUpdates(args: PluginCliArgs): TriggerSourceUpdates {
+  const tags = flag(args, 'tags');
+  return {
+    cron: flag(args, 'cron'),
+    timezone: flag(args, 'timezone'),
+    path: flag(args, 'path'),
+    verifier: flag(args, 'verifier'),
+    secretEnv: flag(args, 'secret-env'),
+    description: flag(args, 'description'),
+    tags: tags?.split(',').map((tag) => tag.trim()).filter(Boolean),
+  };
 }
 
 function parseEventStatus(value: string | undefined):

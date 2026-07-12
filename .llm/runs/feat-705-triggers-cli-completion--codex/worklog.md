@@ -84,7 +84,30 @@ Contributor path:
 - Scoped format wrapper over `plugins/triggers` — PASS, 68 files selected, 0 findings.
 - Reconcile: no PR was opened or commented per owner direction; no issue taxonomy or milestone mutation was authorized.
 
+### Slice 3 — update/remove, full cron preview, and tutorial adoption
+
+- Final targeted matrix across scaffold resources, live service connector, runtime processor, CLI registry, registry golden output, HTTP adapter, and local backend — PASS, 25 tests (9 steps) / 0 failed. A subsequent focused backend rerun after multiline-tag hardening passed 3 / 0.
+- The local backend integration proves add scheduled → update cron → `list` observes the new cron → preview produces three Mondays at 02:00 UTC; a second update proves day-of-month previews land on the 15th at 04:30 UTC.
+- The same integration removes the trigger, observes the source file absent, and observes a recompiled registry with `triggerCount: 0`.
+- A webhook update round-trip proves path, verifier, secret env, description, and tags mutate without changing the inline job reference; multiline tag arrays are also replaced safely.
+- Scoped wrappers over `plugins/triggers` — check PASS (72 files), lint PASS (72 files), format PASS (72 files), zero findings.
+- Scoped wrappers over `packages/plugin` — check PASS (151 files / 2 batches), lint PASS (151 files), format PASS (151 files), zero findings.
+- Doctrine readiness: `plugins/triggers` FAIL=0, WARN=12, INFO=2 after moving CLI tests out of `src/cli` and extracting raw routes; `packages/plugin` FAIL=0, WARN=3, INFO=1. Remaining findings are pre-existing package-level cardinality/default-export/docs warnings; this slice removed its initially introduced `src/cli` cardinality and `services/src/main.ts` >500 warnings.
+- Tutorial source alignment: the storefront shipping webhook now begins with `ns-triggers add webhook ... --job ... --verifier ... --secret-env ... --description ... --tags ...` and points to the generated `triggers/` path.
+- Reconcile: no PR was opened or commented, as explicitly required. The orchestrator still owns the full `e2e:cli` / `scaffold.runtime` execution.
+
+### Acceptance status
+
+- PASS — `add webhook <id> --job=x` emits a compiling handler whose runtime action targets job `x`.
+- PASS — a running ephemeral service accepts a real raw webhook and the CLI HTTP adapter reads the persisted event from `/api/v1/events`; this is not the synthetic test/fire path.
+- PASS — disabling through the CLI adapter changes the service response for the raw webhook to 409 and blocks oRPC manual fire; enabling restores 202 acceptance. The processor also checks the same port before dispatch.
+- PASS — scheduled cron update appears in `list`; remove deletes the definition and recompiles an empty registry.
+- PASS — CLI preview delegates to triggers-core `computeNextFireTimes`; command-level tests cover day-of-week and day-of-month expressions.
+- PASS — storefront tutorial references the add verb for scaffolding.
+- UNPROVEN HERE — the orchestrator-owned full `deno task e2e:cli` / `scaffold.runtime` gate was intentionally not executed.
+
 ## Drift
 
 - D1 (carried, owner-authorized): PLAN-EVAL is waived; the short plan and design checkpoint live in this worklog.
 - D2 (scope): dynamic API/config-source registration is deferred p3 and is not implemented.
+- D3 (observed route shape): oRPC assembly prefixes the contract namespace, so management procedures are served under `/api/v1/triggers/triggers/...`; the stable raw event-ledger endpoint remains `/api/v1/events`. The CLI adapter follows the actual OpenAPI-mounted paths rather than inventing aliases.
