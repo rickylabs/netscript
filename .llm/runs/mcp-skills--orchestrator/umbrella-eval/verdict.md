@@ -75,3 +75,27 @@ packages/cli/src/public/features/agent/: 4 passed | 0 failed (exit 0)
 1. `packages/mcp/src/application/runner/mcp-server.ts:6` — The application-layer MCP runner imports `presentation/json-rpc.ts`, reversing the doctrine dependency direction (`presentation -> application -> ports/domain`). Move the JSON-RPC request/response contract and parser to a domain/application-owned module that the presentation edge and application runner can both consume, or move protocol handling to presentation so presentation calls an application-owned request handler. Remove every application-to-presentation import and add a regression gate/test for the layer edge.
 
 [PHASE: IMPL-EVAL] [VERDICT: CHANGES_REQUESTED]
+
+## Cycle 2
+
+- Evaluated HEAD: `e1141197` (supervisor fix `d83f7f35` is an ancestor).
+- Finding closure — **PASS**:
+  - `grep -rn "presentation" packages/mcp/src/application packages/mcp/src/domain --include='*.ts'` found only `domain/schema.ts:6`, where “presentation” is ordinary comment text; no import matched.
+  - A package-wide import grep for `presentation/` returned no matches (`grep_exit=1`).
+  - `packages/mcp/src/application/runner/mcp-server.ts:6` now imports `JsonRpcResponse` and `parseJsonRpcRequest` from `../../domain/json-rpc.ts`.
+  - `packages/mcp/src/domain/json-rpc.ts` exists and the former `packages/mcp/src/presentation/json-rpc.ts` does not.
+- README public-surface check — **PASS**:
+  - The advanced example imports only `createMcpServer` and `TelemetryProbePort` from `@netscript/mcp`, then calls `server.handle(...)`.
+  - `deno doc --filter createMcpServer packages/mcp/mod.ts`: exit 0; signature returns `McpServer`.
+  - `deno doc --filter TelemetryProbePort packages/mcp/mod.ts`: exit 0; the interface is exported.
+  - `deno doc --filter McpServer packages/mcp/mod.ts`: exit 0; `handle(message: unknown): Promise<JsonRpcResponse | undefined>` is public.
+- Regression gates — **PASS**:
+  - `deno task quality:gate` (run through `rtk proxy`): exit 0; `quality:scan` emitted `{"ok":true,"findings":[]}` and `arch:check` completed successfully.
+  - `deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/mcp`: exit 0; `FAIL=0 WARN=0 INFO=1`. The former README A3 warning is cleared; the remaining A9 architecture-doc line is informational.
+  - `deno test --no-lock --allow-all packages/cli/e2e/tests/agent/agent-mcp-stdio_test.ts`: exit 0; `1 passed | 0 failed`.
+  - `deno test --no-lock --allow-env --allow-net --allow-run --allow-read packages/mcp/tests/`: exit 0; `39 passed | 0 failed`.
+  - `deno test --no-lock --allow-env --allow-net --allow-run --allow-read --allow-write packages/cli/src/public/features/agent/`: exit 0; `4 passed | 0 failed`.
+
+Cycle-1 finding status: **CLOSED**. No new findings.
+
+[PHASE: IMPL-EVAL] [VERDICT: PASS]
