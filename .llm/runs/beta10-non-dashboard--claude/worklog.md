@@ -350,3 +350,50 @@ this merges**; the registry re-sync is a publish action, owner-supervised, at th
 
 This turns a one-off #715 fix into a standing guard: an over-cap tagline now fails CI instead of
 appearing truncated on jsr.io.
+
+## Slice 4 — #763 pin plugin CLI JSR specifier — COMPLETE (reviewed, pushed)
+
+**Branch:** `fix/763-pin-plugin-cli-specifier` · **Commit:** `40ecc87c` · **Thread:** `019f589e`
+(gpt-5.6-sol · high — after the luna/max thread stalled; see drift D4)
+
+**Supervisor review (Tier-A, Claude-family review of Codex-authored code — performed, not trusted):**
+
+The fix is exactly the shape the brief specified, and it fixed the *framework* bug, not just the test:
+
+```ts
+export function resolvePluginCliSpecifier(pkg: string): string {
+  let spec = pkg.startsWith('jsr:') ? pkg : `jsr:${pkg}`;
+  const netscriptPackage = /^(jsr:@netscript\/[^/@]+)(@[^/]+)?(\/.*)?$/.exec(spec);
+  if (netscriptPackage && !netscriptPackage[2]) {
+    spec = `${netscriptPackage[1]}@${NETSCRIPT_RELEASE_VERSION}${netscriptPackage[3] ?? ''}`;
+  }
+  return spec.endsWith('/cli') ? spec : `${spec}/cli`;
+}
+```
+
+- Pins **only** an unpinned `@netscript/*` spec. Group 2 (`@version`) present ⇒ untouched.
+- Third-party packages are untouched (the regex only matches the `@netscript/` scope) — correct, since
+  we cannot know their versions and they are not lockstep with us.
+- `NETSCRIPT_RELEASE_VERSION` is imported from the CLI's own `deno.json` via a JSON import — the
+  existing lockstep source of truth. It did **not** invent a second version source, as instructed.
+- The E2E gate (`plugin-install-gates.ts`) is fixed too, so the originally-failing
+  `scaffold.plugin.ai.lifecycle` path is corrected at both layers.
+
+**Tests** — 4 files, +126 lines. `dispatch-plugin-verb_test.ts` asserts the full matrix: unpinned →
+pinned; `jsr:` prefix + `/cli` → pinned; already-pinned (`@1.2.3`) → untouched; already-pinned with
+`jsr:`+`/cli` → untouched. It also added the regression guard I asked for:
+
+> `Deno.test('no version-less NetScript JSR specifiers in CLI command sources')`
+
+— a repo-wide guard, so this class of bug cannot silently return while we are on a pre-release line.
+
+**Gates:** `packages/cli` suite **371 passed (407 steps), 0 failed**. No new suppressions (grepped
+every `+` line for `as never` / `as unknown as` / `@ts-*` / `deno-lint-ignore` / `: any`: **0**). No
+binary/NUL corruption.
+
+**Not proven:** the published-mode E2E (`e2e:cli:prod`) has **not** been re-run — it needs the
+published artifact. The fix is verified by unit tests and by direct reproduction of the root cause
+against live JSR, not by the prod gate. That gap is deliberate and must be stated at merge.
+
+**Verdict (supervisor):** on track, high quality. Not merged. Not self-certified — this is a
+Claude-family review of Codex-authored code, which is the required opposite-family direction.
