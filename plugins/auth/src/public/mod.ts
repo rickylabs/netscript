@@ -5,7 +5,6 @@
  */
 
 import { definePlugin, type PluginManifest } from '@netscript/plugin';
-export type { PluginManifest } from '@netscript/plugin';
 import {
   AUTH_API_DEFAULT_PORT,
   AUTH_API_SERVICE_NAME,

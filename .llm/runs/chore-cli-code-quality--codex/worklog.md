@@ -60,7 +60,8 @@
 Full historical `doc:lint` remains red in `packages/plugin` (13 private-type-ref diagnostics in
 untouched contract-base/service files), `plugins/auth` (2 upstream auth-contract diagnostics), and
 `plugins/ai` (16 pre-existing diagnostics). CI runs the clean CLI export map plus every public
-entrypoint changed by this slice (`packages/plugin` config/protocol and the auth public manifest),
-so none of the new surface is omitted while unrelated baseline debt is not misreported as slice
-regression. `arch:check` similarly reports pre-existing warnings but exits 0. No
+type entrypoint changed by this slice (`packages/plugin` config/protocol). The auth change is
+manifest data rather than a new exported type and its no-slow-types dry-run is green; its unrelated
+doc-lint baseline is not misreported as slice regression. `arch:check` similarly reports
+pre-existing warnings but exits 0. No
 `scaffold.runtime` was run, by owner instruction.

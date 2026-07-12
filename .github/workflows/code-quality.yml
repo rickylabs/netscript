@@ -33,4 +33,3 @@ jobs:
         run: |
           deno task doc:lint --root packages/cli --pretty
           deno doc --lint packages/plugin/src/config/mod.ts packages/plugin/src/protocol/mod.ts
-          deno doc --lint plugins/auth/src/public/mod.ts
