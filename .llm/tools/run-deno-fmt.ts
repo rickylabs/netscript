@@ -333,16 +333,33 @@ function isNoTargetFilesResult(result: BatchResult): boolean {
 }
 
 /**
- * Render batches that failed WITHOUT producing a parseable formatting finding.
+ * Identify the batches that CRASHED, judged per batch.
  *
- * That combination is a crash (config parse error, permission error, a file `deno fmt` cannot
- * handle), not a formatting difference. The JSON report is machine-consumed on stdout; this goes to
- * stderr so a failing CI job shows the underlying error instead of `findings: 0` and a bare exit 1.
+ * A batch is a crash when it exits non-zero and **its own output** yields no parseable formatting
+ * finding — a config parse error, a permission error, a file `deno fmt` cannot handle. It is an
+ * ordinary formatting difference when its own output does parse into findings.
+ *
+ * This must be decided per batch, never across the run. Judging globally (`some batch failed` AND
+ * `no findings anywhere`) lets a crashed batch hide behind an unrelated batch's formatting finding —
+ * and, when the only findings are ignored via `--ignore-line-endings`, lets the run exit 0 with a
+ * crashed batch. Both are false greens on a repository gate.
+ */
+export function crashedBatches(results: readonly BatchResult[]): BatchResult[] {
+  return results.filter((result) =>
+    result.exitCode !== 0 &&
+    !isNoTargetFilesResult(result) &&
+    parseFindings([result]).length === 0
+  );
+}
+
+/**
+ * Render crashed batches for the human/CI log.
+ *
+ * The JSON report is machine-consumed on stdout; this goes to stderr so a failing CI job shows the
+ * underlying error instead of `findings: 0` and a bare exit code.
  */
 export function formatFailedBatches(results: readonly BatchResult[]): string {
-  const failed = results.filter((result) =>
-    result.exitCode !== 0 && !isNoTargetFilesResult(result)
-  );
+  const failed = crashedBatches(results);
 
   const lines: string[] = [
     `${failed.length} deno fmt batch(es) failed without producing formatting findings.`,
@@ -386,10 +403,11 @@ async function main(): Promise<void> {
     : allFindings;
   const failedBatches =
     results.filter((result) => result.exitCode !== 0 && !isNoTargetFilesResult(result)).length;
-  const failedWithoutParsedFindings = failedBatches > 0 && allFindings.length === 0;
-  const effectiveFailedBatches = findings.length > 0 || failedWithoutParsedFindings
-    ? failedBatches
-    : 0;
+  // Crashes are judged PER BATCH. A batch that failed with no parseable finding of its own is a
+  // crash even if some other batch produced findings, and even if the only findings in the run are
+  // line-ending ones we ignore. Judging this globally is a false-green (see crashedBatches).
+  const crashed = crashedBatches(results);
+  const effectiveFailedBatches = findings.length > 0 || crashed.length > 0 ? failedBatches : 0;
   const report: OutputReport = {
     command: `deno fmt${options.check ? ' --check' : ''}`,
     cwd: options.cwd,
@@ -410,10 +428,11 @@ async function main(): Promise<void> {
 
   console.log(JSON.stringify(report, null, options.pretty ? 2 : undefined));
 
-  // A batch that failed without any parseable finding is a crash. Never let it exit 1 silently.
-  if (failedWithoutParsedFindings) console.error(formatFailedBatches(results));
+  // A batch that failed without any parseable finding of its own is a crash. Never let it exit
+  // silently, and never let it pass just because another batch had findings.
+  if (crashed.length > 0) console.error(formatFailedBatches(results));
 
-  if (findings.length > 0 || failedWithoutParsedFindings) Deno.exit(1);
+  if (findings.length > 0 || crashed.length > 0) Deno.exit(1);
 }
 
 if (import.meta.main) await main();

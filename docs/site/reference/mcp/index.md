@@ -5,9 +5,10 @@ title: '@netscript/mcp'
 
 # `@netscript/mcp`
 
-The Model Context Protocol server for NetScript workspaces. This page is generated from the
-package's public surface with `deno doc` (US-2). For the full index of packages and plugins return
-to the [reference overview](/reference/).
+The Model Context Protocol server for NetScript workspaces. This page describes the package's public
+surface and is maintained by hand; the authoritative, always-current symbol list is
+[`deno doc jsr:@netscript/mcp`](https://jsr.io/@netscript/mcp/doc). For the full index of packages
+and plugins return to the [reference overview](/reference/).
 
 `@netscript/mcp` publishes 13 token-bounded MCP tools that let a coding agent monitor a running app,
 debug a correlated execution, read framework-semantic telemetry, run the doctor, search the public

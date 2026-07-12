@@ -32,8 +32,8 @@ they speak `worker`, `saga`, `trigger`, `stream`, and `service`, because they cl
 
 The server is one third of the NetScript agentic surface — the CLI is the hands, the skills are the
 doctrine, MCP is the eyes. It deliberately **wraps the CLI rather than reimplementing it**:
-`list_commands` reflects the live command tree, and `execute_command` shells the real binary through
-a default-deny policy. An agent that can run `netscript db migrate` directly should just run it; MCP
+`list_commands` reflects the live command tree, and `execute_command` shells the CLI through a
+default-deny policy. An agent that can run `netscript db migrate` directly should just run it; MCP
 exists for what a shell cannot cheaply give it — bounded aggregation, cross-domain diagnostics, and
 documentation lookup.
 
@@ -143,11 +143,11 @@ never reachable through MCP.
   project wiring, and plugin diagnostics into one verdict with suggested fixes, so a single call
   usually names the broken seam.
 - **Find why the last job failed.** `get_last_job_result` (optionally filtered by `jobName` or
-  `service`) returns the outcome and its correlation id; feed that id to `get_run` for the
-  correlated spans and logs of just that execution.
+  `service`) returns the outcome plus its execution `id`; feed that `id` to `get_run` for the spans
+  and logs of just that execution.
 - **Investigate a slow service.** `analyze_service_performance` with `{ service: "checkout" }`
-  returns p50/p95/p99, throughput, and error rate over the window — not the spans. Narrow the window
-  with `sinceUnixMs`.
+  returns p50/p95 duration, throughput, and error rate over the window — not the spans. Narrow the
+  window with `sinceUnixMs`.
 - **Read the docs without burning context.** Funnel, never dump: `search_docs` to locate a slug,
   then `get_doc` with that slug and — when you only need one part — a `section` heading.
 - **Discover and run a safe command.** `list_commands` reflects the CLI's live command tree (so it
@@ -245,8 +245,9 @@ exposes:
 | `stream`  | `netscript.stream.*`, `netscript.sse.*` |
 | `service` | `netscript.job.*`                       |
 
-Correlated lookups (`get_run`, `get_last_job_result`) key off the shared correlation floor
-`netscript.correlation.id`. The convention itself is owned by `@netscript/telemetry` — see
+Execution lookups (`get_run`, `get_last_job_result`) key off the first execution identifier a span
+carries — `netscript.execution.id`, then the job, saga-instance, and trigger ids — and widen to the
+whole trace from there. The attribute convention itself is owned by `@netscript/telemetry` — see
 [the telemetry convention](https://rickylabs.github.io/netscript/reference/telemetry/convention/).
 
 ---

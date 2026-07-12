@@ -39,7 +39,7 @@ cd my-app
 
 netscript db migrate           # evolve the schema
 netscript service add          # add another service + its v1 contract
-netscript plugin add workers   # durable background processing
+netscript plugin install workers  # durable background processing
 ```
 
 Every verb that changes the shape of the workspace **regenerates what is derived from it** — the
@@ -59,7 +59,7 @@ write without touching the disk.
 | `contract`    | `add`, `add-route`, `version`, `inspect`, `list`, `remove` — the typed oRPC contract surface.                                         |
 | `service`     | `add`, `add-handler`, `ref`, `set`, `list`, `remove`, `generate` — service workspaces and their Aspire registration.                  |
 | `db`          | `add`, `init`, `migrate`, `generate`, `seed`, `status`, `studio`, `introspect`, `reset`, `deploy` — Prisma lifecycle.                 |
-| `plugin`      | `new`, `scaffold`, `install`, `add`/`remove`, `sync`, `update`, `doctor`, `list`, `ai`, `auth` — first-party and third-party plugins. |
+| `plugin`      | `new`, `scaffold`, `install`, `remove`, `sync`, `update`, `doctor`, `list`, `info`, `ai`, `auth` — first-party and third-party plugins. |
 | `ui:*`        | `ui:init`, `ui:add`, `ui:list`, `ui:update`, `ui:remove` — the Fresh UI registry (pages, islands, collections).                       |
 | `generate`    | `aspire`, `plugins`, `runtime-schemas` — regenerate derived artifacts on demand.                                                      |
 | `config`      | `inspect`, `get`, `set`, `override`, `runtime` — resolved configuration and runtime overrides.                                        |
@@ -81,9 +81,10 @@ definitions this package exports, so it never drifts from the binary you install
   against a `PublicCliHost`, so a host binary owns the process boundary — argv, exit codes,
   permissions — while NetScript owns the verbs. `runPublicCli()` adds the standard NetScript error
   formatting for a binary edge.
-- **Plugin verb dispatch**: `dispatchPluginVerb` and `FRAMEWORK_VERBS` route framework-owned verbs
-  (`add`, `remove`, `enable`, `sync`, `doctor`, …) into a plugin's own published CLI via
-  `deno dx jsr:<pkg>/cli` — so a plugin implements its verbs once and inherits the command surface.
+- **Plugin verb dispatch**: `dispatchPluginVerb` and `FRAMEWORK_VERBS` route the framework-owned verbs
+  (`install`, `remove`, `enable`, `disable`, `sync`, `setup`, `update`, `doctor`, `info`) into a
+  plugin's own published CLI via `deno x -A jsr:<pkg>/cli` — so a plugin implements its verbs once
+  and inherits the command surface.
 - **Plugin host loading**: `createPluginHostLoader` and `resolvePluginManifest` resolve configured
   plugin specs, walk the project, and aggregate runtime contributions through structural ports.
 - **Plugin scaffolding**: `scaffoldPluginPackage` and the `@netscript/cli/scaffolding` engine render
@@ -104,8 +105,8 @@ definitions this package exports, so it never drifts from the binary you install
 
 ## 🤖 Agent tooling
 
-NetScript's agentic surface is one version-locked triple: the **CLI** is the hands, the **skills** are
-the doctrine, and **MCP** is the eyes. Install all three into a project root:
+NetScript's agentic surface is one triple: the **CLI** is the hands, the **skills** are the doctrine,
+and **MCP** is the eyes. Install all three into a project root:
 
 ```bash
 netscript agent init
