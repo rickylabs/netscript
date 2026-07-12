@@ -162,3 +162,92 @@ Chose consistency with the shipped house style, per the brief ("match the existi
 READMEs; do not invent a new shape"). The checker/template/house-style three-way divergence should be
 reconciled repo-wide as its own item — it is CI-gate hygiene and pairs naturally with #762. Raised to
 the orchestrator rather than fixed inside #715.
+
+---
+
+# COLD-START STATE (for the owner, morning pickup)
+
+Written at the end of the beta.10 non-dashboard stream session. **Nothing was merged, published,
+released, or closed.** Per orchestrator stop-line.
+
+## PR #715 — `feat/netscript-mcp-skills` — MERGE-READY, awaiting IMPL-EVAL + owner
+
+**All CI checks green** (check-test, quality, scaffold-static, scaffold-runtime, close-gate,
+surface-diff, code-quality, deps-report). Already carries `Closes #725 … Closes #733`.
+
+Commits added by this stream (on top of `5b1a9877`):
+
+| Commit | What |
+| --- | --- |
+| `907423d0` | lint wrapper: surface crashed batches + regression test; exclude the malformed mcp doctor fixture |
+| `394f9223` | `packages/cli` + `packages/mcp` README rewrite; new `docs/site/reference/mcp/index.md` |
+| `25a986e7` | worklog evidence |
+| `97eed9b1` | JSR preview descriptions fit the 250-**byte** cap; false Node/Bun compat claim corrected |
+| `9a2be44d` | fmt wrapper: same silent-failure fix + regression test; same fixture exclusion |
+
+**IMPL-EVAL dispatched** to OpenHands (Qwen 3.7, opposite family) — verdict not yet returned.
+**Owner action needed:** merge decision after IMPL-EVAL. Nothing self-certified.
+
+### The headline finding
+
+The `quality` job had **two** silent-failure bugs, not one. Fixing the lint wrapper moved the failure
+to the Format check step, exposing the identical bug in `run-deno-fmt.ts`. Both wrappers exited 1
+while swallowing the real error. The error both were hiding was the same:
+`packages/mcp/tests/fixtures/doctor/broken/deno.json` (an intentionally malformed
+`{"workspace":"packages/*"}` fixture) makes `deno lint` **and** `deno fmt` abort during config
+discovery. Both wrappers are now silent-failure-proof and regression-tested.
+
+## In flight — two WSL Codex slices (launched, unattended)
+
+| Issue | Branch / worktree | Codex thread | Route |
+| --- | --- | --- | --- |
+| **#763** | `fix/763-pin-plugin-cli-specifier` @ `/home/codex/repos/b10-763-pluginspec` | `019f588f-44df-7013-842c-be28f1bb1a56` | openai · gpt-5.6-luna · max (matched) |
+| **#762** | `quality/762-ts-ignore-sweep` @ `/home/codex/repos/b10-762-tssweep` | `019f5891-881b-77d1-b348-9556bb76e4fa` | openai · gpt-5.6-sol · medium (matched) |
+
+Both worktrees are **upstream-free** by design; push is explicit-refspec only. Briefs are in
+`slices/<id>/implement.md`. Neither is reviewed yet — **read the actual diffs, not just their
+verdicts** (a sibling stream had a slice pass every gate while writing NUL bytes into a `.ts` file).
+
+Steering (same thread only — never a second `send-message-v2` at the same worktree):
+
+```bash
+codex exec resume 019f588f-44df-7013-842c-be28f1bb1a56 -- "<follow-up>"
+codex exec resume 019f5891-881b-77d1-b348-9556bb76e4fa -- "<follow-up>"
+```
+
+### #763 — root cause corrected (the filed hypothesis was wrong)
+
+The issue guessed "barrel re-emit / JSR module resolution". **Actual cause:** the E2E gate
+(`packages/cli/e2e/src/application/gates/scaffold/plugin-install-gates.ts:114`) hardcodes
+`jsr:@netscript/plugin-ai/cli` with **no version**. Deno resolves that to `*`, and **semver `*` does
+not match pre-releases**. Every `@netscript/plugin-ai` version is a `0.0.1-beta.x` pre-release, so
+JSR reports `latest: null` and resolution fails outright. Deterministic, not a race; published-mode
+only because the local import map short-circuits JSR.
+
+**Nothing was skipped from the beta.9 publish** — `plugin-ai@0.0.1-beta.9` *is* in `meta.json`. The
+specifier simply cannot select it.
+
+**Wider than the test:** `resolvePluginCliSpecifier()`
+(`packages/cli/src/public/features/plugins/dispatch/dispatch-plugin-verb.ts:69`) emits the same
+unpinned spec, so **real users** dispatching any plugin verb against a published pre-release plugin
+hit the identical wall. The slice fixes both. Root cause posted to #763; issue relabelled
+`status:in-progress`.
+
+## Deferred
+
+**#695** (tutorial checkpoint validation) → milestone `Backlog / Triage`, with rationale comment. Not
+started; nothing stranded.
+
+## Open items needing an owner decision
+
+1. **Merge #715** after the IMPL-EVAL verdict lands.
+2. **`docs:readme:check` is a dead gate.** It is wired into **no CI workflow** and currently fails for
+   nearly every README: it enforces the `docs/site/_includes/readme-template.md` shape (`## Install` /
+   `## Quick example` / `## Docs` as literal H2 text), which the shipped house style abandoned long
+   ago (emoji H2s, `### Installation` nested under `## 🚀 Quick Start`). `packages/ai` follows the
+   template; everything else follows the house style. Three-way divergence between checker, template,
+   and reality. Not fixed here (out of #715's scope) — needs a repo-wide decision on which shape wins.
+   Pairs naturally with #762 as CI-gate hygiene.
+3. **JSR descriptions of already-published packages are truncated mid-sentence** (`@netscript/telemetry`,
+   `@netscript/service`, and others) because their README taglines exceed the 250-byte cap. Fixed for
+   `cli` and `mcp`; the rest would need a tagline pass + a `jsr-settings` re-run. Cosmetic but public.
