@@ -119,6 +119,9 @@ jobs:
       - name: Format check
         run: deno task fmt:check
 
+      - name: JSR tagline length
+        run: deno task docs:tagline:check
+
       - name: Scaffold version guard (no preview pins)
         run: deno task check:scaffold-versions
 
