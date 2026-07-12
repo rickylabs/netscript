@@ -72,6 +72,8 @@ running the scoped wrapper and publish gates.
 | 2026-07-12 | slice 3 | structure | Package-local adapters keep the genuine seams local; AI contract is 476 lines (under cap) and auth remains its exact 517-line baseline. |
 | 2026-07-12 | slice 3 | gates | Exact scanner is `ok:true` with 0 findings / allowCount 0; AI 4 tests and auth 29 tests pass; scoped check/lint/fmt, publish, and doctrine FAIL=0. |
 | 2026-07-12 | slice 3 | review | Claude Opus session `100d5cca-6dbb-4bb7-a74a-e59919e735ba` returned PASS with no blocking findings. |
+| 2026-07-12 | slice 4 | acceptance | Seven-root scanner/check/lint/fmt, all package tests, six publish dry-runs, seven doc-lint runs, seven direct doctrine checks, and aggregate arch check completed. |
+| 2026-07-12 | impl-eval | verdict | Independent Claude Opus session `98c30a17-d22e-43b8-900a-55a06c8b0f00` returned PASS; no unresolved correctness, acceptance, debt, or process defect. |
 
 ## Decisions
 
@@ -111,6 +113,14 @@ running the scoped wrapper and publish gates.
 | plugin auth tests | `deno task test` | PASS | 29 passed / 0 failed; adapter rejection + contract map covered |
 | plugin-core publish | package-local dry-runs | PASS | both succeed with no slow types |
 | plugin-core doc lint | root wrapper per package | RECORDED | 2 private references each, independently confirmed pre-existing |
+| seven-root check | scoped wrapper with `--ext ts,tsx` | PASS | 420 files, 4 batches, 0 failed batches / diagnostics |
+| seven-root lint | scoped wrapper with `--ext ts,tsx` | PASS | 420 files, 0 findings |
+| seven-root format | scoped wrapper with `--ext ts,tsx` | PASS | 420 files, 0 findings |
+| all package tests | package-local `deno task test` | PASS | telemetry 51; SDK 16; Fresh UI 134; Aspire 18 tests/58 steps; bench 22; AI 4; auth 29 |
+| six publishable packages | package-local `deno publish --dry-run --allow-dirty` | PASS | no slow types; telemetry computed-import warning is pre-existing/intentional |
+| bench publish | same dry-run command | N/A | explicit `publish:false` correctly refuses publication |
+| seven doc-lint runs | `deno task doc:lint --root <pkg> --pretty` | RECORDED | combined totals: telemetry 7, SDK 1, Fresh UI 123, Aspire 0, bench 118, AI 2, auth 2; slice-owned regressions 0 |
+| lock/ignore hygiene | raw diff plus scanner/sweep | PASS | root and Fresh package locks unchanged; no new `deno-lint-ignore`; no `quality-allow` in scope |
 
 ### Fitness Gates
 
@@ -121,6 +131,9 @@ running the scoped wrapper and publish gates.
 | slice 2 review | PASS | `slice-review-2.md` | first FAIL_FIX corrected and independently re-reviewed |
 | slice 3 doctrine | PASS | direct checker per plugin root | FAIL=0; no line-cap debt introduced or deepened |
 | slice 3 review | PASS | `slice-review-3.md` | structural Standard Schema narrowing independently verified |
+| seven direct doctrine checks | PASS | checker per root | FAIL=0 in every package; warnings/infos baseline-only |
+| aggregate architecture | PASS | `deno task arch:check` | exit 0 |
+| final IMPL-EVAL | PASS | `evaluate.md` | evaluator independently reproduced central and package gates |
 
 ### Runtime Gates
 
@@ -137,5 +150,7 @@ running the scoped wrapper and publish gates.
 
 ## Handoff Notes
 
-- PLAN-EVAL should challenge every claimed guard and the Fresh summary public-type correction.
-- Prior attempt allowance count: 6. Current/final implementation allowance count: 0; no survivor requires justification.
+- Final IMPL-EVAL must verify the complete commit trail and compare every claimed doc/doctrine
+  diagnostic with baseline rather than treating recorded pre-existing debt as newly green.
+- Prior attempt allowance count: 6. Final allowance count: 0. There are no surviving allowances,
+  so the required per-survivor structural justification is empty by construction.

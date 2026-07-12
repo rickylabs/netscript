@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `quality-q754-tail--codex` |
 | Branch | `quality/q754-tail-h` |
-| Current phase | implement |
+| Current phase | complete / push |
 | Archetype | 1/2/4/6 by package |
 | Scope overlays | frontend for fresh-ui |
 
@@ -25,12 +25,12 @@ findings/0 allowances; the rejected pass used 6 allowances. Independent PLAN-EVA
 
 ## In Progress
 
-- Full seven-package acceptance matrix and final IMPL-EVAL.
+- Final independent IMPL-EVAL PASS; artifact commit and remote verification remain.
 
 ## Next Steps
 
-1. Run every required seven-package gate and reconcile final worklog evidence.
-2. Run separate IMPL-EVAL, sign off artifacts, then force-push with lease.
+1. Commit the final artifacts.
+2. Force-push with lease and verify the remote ref.
 
 ## Key Decisions
 
@@ -54,14 +54,15 @@ findings/0 allowances; the rejected pass used 6 allowances. Independent PLAN-EVA
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | slices 1-3 green | scanner 0 findings / allowCount 0; scoped gates green |
+| Static | full acceptance green | scanner 0/0; 420-file check/lint/fmt green |
 | Fitness | plan + slice reviews PASS | plan evaluation and all three review artifacts |
-| Runtime | slice 2 green | SDK link guard and Fresh SSR summary regression tests |
-| Consumer | slice 2 green | SDK 16 tests; Fresh UI 134 tests |
+| Runtime | all package tests green | seven package-local suites |
+| Consumer | publish/tests green | six dry-runs plus all package tests; bench private by design |
+| Final evaluation | PASS | `evaluate.md`, Claude session `98c30a17-d22e-43b8-900a-55a06c8b0f00` |
 
 ## Open Questions
 
-- None blocking; final evaluator may return implementation fixes.
+- None.
 
 ## Drift and Debt
 
