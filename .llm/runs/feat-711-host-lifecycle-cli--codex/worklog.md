@@ -57,6 +57,7 @@ The full generated-project/scaffold runtime acceptance remains unproven in this 
 - Scoped wrapper lint over `packages/cli/src`: exit 0, 511 files, 0 findings.
 - Scoped wrapper format over `packages/cli/src --ignore-line-endings`: exit 0, 511 files, 0 findings.
 - Public CLI DB help smoke: exit 0 and lists `list`, `remove`, `deploy`, `validate`, and `resolve`.
+- `scaffold.runtime` coverage source now schedules `db list --json`, `db validate`, and `db deploy`; targeted `deno check --unstable-kv` of the E2E gate/ID files exits 0. The gate itself was not run here.
 - `deno.lock`: unchanged.
 
 ### Unproven acceptance / orchestrator handoff
