@@ -12,11 +12,16 @@ export type WorkerResourceMetadata = Readonly<{
   runtime?: string;
 }>;
 
-const METADATA_PREFIX = '// netscript-workers-resource: ';
+const METADATA_TOKEN = 'netscript-workers-resource: ';
+const TYPESCRIPT_METADATA_PREFIX = `// ${METADATA_TOKEN}`;
+const SCRIPT_METADATA_PREFIX = `# ${METADATA_TOKEN}`;
 
 /** Render the stable source marker consumed by worker CLI management commands. */
 export function renderWorkerResourceMetadata(metadata: WorkerResourceMetadata): string {
-  return `${METADATA_PREFIX}${JSON.stringify(metadata)}\n`;
+  const prefix = metadata.kind === 'task' && metadata.runtime !== 'deno'
+    ? SCRIPT_METADATA_PREFIX
+    : TYPESCRIPT_METADATA_PREFIX;
+  return `${prefix}${JSON.stringify(metadata)}\n`;
 }
 
 /** Parse embedded metadata, falling back to metadata inferred from the source path. */
@@ -25,9 +30,11 @@ export function parseWorkerResourceMetadata(
   path: string,
   kind: 'job' | 'task',
 ): WorkerResourceMetadata {
-  const line = source.split(/\r?\n/, 8).find((candidate) => candidate.startsWith(METADATA_PREFIX));
+  const line = source.split(/\r?\n/, 8).find(isMetadataLine);
   if (line) {
-    const parsed: unknown = JSON.parse(line.slice(METADATA_PREFIX.length));
+    const parsed: unknown = JSON.parse(
+      line.slice(line.indexOf(METADATA_TOKEN) + METADATA_TOKEN.length),
+    );
     if (isWorkerResourceMetadata(parsed, kind)) return Object.freeze(parsed);
   }
   const id = fileStem(path);
@@ -47,10 +54,15 @@ export function updateWorkerResourceMetadata(
 ): string {
   const marker = renderWorkerResourceMetadata(metadata).trimEnd();
   const lines = source.split(/\r?\n/);
-  const index = lines.findIndex((line) => line.startsWith(METADATA_PREFIX));
+  const index = lines.findIndex(isMetadataLine);
   if (index >= 0) lines[index] = marker;
+  else if (lines[0]?.startsWith('#!')) lines.splice(1, 0, marker);
   else lines.unshift(marker);
   return `${lines.join('\n').replace(/\n*$/, '')}\n`;
+}
+
+function isMetadataLine(line: string): boolean {
+  return line.startsWith(TYPESCRIPT_METADATA_PREFIX) || line.startsWith(SCRIPT_METADATA_PREFIX);
 }
 
 function isWorkerResourceMetadata(

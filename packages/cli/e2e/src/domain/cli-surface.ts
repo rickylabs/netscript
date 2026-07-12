@@ -96,6 +96,7 @@ export const GATE = {
   BEHAVIOR_SAGAS_HEALTH: 'behavior.sagas-health',
   BEHAVIOR_SAGAS_LIST: 'behavior.sagas-list',
   BEHAVIOR_SAGAS_INSTANCES: 'behavior.sagas-instances',
+  BEHAVIOR_DURABLE_CLI_PARITY: 'behavior.durable-cli-parity',
   BEHAVIOR_TRIGGERS_HEALTH: 'behavior.triggers-health',
   BEHAVIOR_TRIGGERS_WEBHOOK: 'behavior.triggers-webhook',
   BEHAVIOR_TRIGGERS_EVENTS: 'behavior.triggers-events',

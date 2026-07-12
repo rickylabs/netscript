@@ -1,4 +1,5 @@
 import { assertEquals, assertStringIncludes } from '@std/assert';
+import { LocalProjectFiles } from '@netscript/plugin/cli';
 import type { ProjectFileEntry, ProjectFiles } from '@netscript/plugin/cli';
 import type {
   TaskDefinition,
@@ -140,6 +141,37 @@ Deno.test('worker metadata filters, updates, shows, and removes with registry re
     files.contents.has('.netscript/generated/plugin-workers/job-registry.ts'),
     true,
   );
+});
+
+Deno.test('run-task executes a generated shell task and returns its TaskResult', async () => {
+  const root = await Deno.makeTempDir({ prefix: 'netscript-workers-cli-' });
+  const streamed: string[] = [];
+  try {
+    const backend = new LocalWorkersRuntimeBackend({
+      files: new LocalProjectFiles(root),
+      output: (line, stream) => streamed.push(`${stream}:${line}`),
+    });
+    const added = await backend.handle(new AddTaskCommand().definition, {
+      command: 'add-task',
+      values: ['echo-args'],
+      flags: { runtime: 'shell' },
+    });
+    assertEquals(added.code, 0);
+
+    const run = await backend.handle(new RunTaskCommand().definition, {
+      command: 'run-task',
+      values: ['echo-args'],
+      flags: { args: '["alpha","two words"]', timeout: 10_000, json: true },
+    });
+    assertEquals(run.code, 0, run.message);
+    const result = (run.data as { result: TaskResult }).result;
+    assertEquals(result.success, true);
+    assertEquals(result.taskId, 'echo-args');
+    assertEquals(result.result, { taskId: 'echo-args', args: ['alpha', 'two words'] });
+    assertEquals(streamed.some((entry) => entry.includes('echo-args')), true);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
 });
 
 class RecordingRuntimeClient implements WorkersRuntimeApiClient {

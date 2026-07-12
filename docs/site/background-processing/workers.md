@@ -172,13 +172,12 @@ export default Object.assign(handler, { id: 'process-payment' });
 Once the workers API is up (Aspire first — see Production notes), enqueue a run by `id`:
 
 ```bash
-# Enqueue the process-payment job (workers API on port 8091).
-curl -X POST http://localhost:8091/api/v1/workers/jobs/process-payment/trigger \
-  -H 'content-type: application/json' \
-  -d '{"orderId":"o_42","amountCents":4999}'
+# Enqueue through the workers API (port 8091), without hand-writing HTTP.
+ns-workers trigger process-payment \
+  --payload='{"orderId":"o_42","amountCents":4999}'
 
 # Watch it land in the KV-backed execution history.
-curl http://localhost:8091/api/v1/workers/executions?limit=10
+ns-workers executions --limit=10 --json
 ```
 
 ## Key types first — `JobHandlerContext` & `JobResult`
@@ -285,7 +284,7 @@ export default handler;
 
 ## Trigger a job from a typed client
 
-The `…/trigger` curl above is the OpenAPI/REST way in. Because the workers API is a **plugin
+The `ns-workers trigger` command above calls the same OpenAPI route. Because the workers API is a **plugin
 service**, the same trigger is reachable with a generated typed client over the RPC route
 `/api/rpc/*` — no OpenAPI-only fallback and no transport `404`. A first-party plugin API mounts
 its router under a named segment, so the client takes a `routerName` alongside `serviceName`;

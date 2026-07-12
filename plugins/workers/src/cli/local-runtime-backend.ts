@@ -277,7 +277,7 @@ export class LocalWorkersRuntimeBackend implements WorkersCliBackend {
       const source = await this.#files.readTextFile(file.relativePath) ?? '';
       if (
         kind === 'task' && !file.relativePath.startsWith('workers/tasks/') &&
-        !source.includes('// netscript-workers-resource: ')
+        !source.includes('netscript-workers-resource: ')
       ) return undefined;
       return parseWorkerResourceMetadata(source, file.relativePath, kind);
     }));

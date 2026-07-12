@@ -141,28 +141,23 @@ export class LocalProjectFiles implements ProjectFiles {
     entries: ProjectFileEntry[],
     extensions: readonly string[],
   ): Promise<void> {
-    let iterator: AsyncIterable<Deno.DirEntry>;
     try {
-      iterator = Deno.readDir(root);
+      for await (const entry of Deno.readDir(root)) {
+        const path = join(root, entry.name);
+        if (entry.isDirectory) {
+          await this.collectFiles(path, entries, extensions);
+        } else if (
+          !extensions.length || extensions.some((extension) => entry.name.endsWith(extension))
+        ) {
+          const info = await Deno.stat(path);
+          entries.push(
+            Object.freeze({ path, relativePath: this.relative(path), size: info.size }),
+          );
+        }
+      }
     } catch (error) {
-      if (error instanceof Deno.errors.NotFound) {
-        return;
-      }
+      if (error instanceof Deno.errors.NotFound) return;
       throw error;
-    }
-
-    for await (const entry of iterator) {
-      const path = join(root, entry.name);
-      if (entry.isDirectory) {
-        await this.collectFiles(path, entries, extensions);
-      } else if (
-        !extensions.length || extensions.some((extension) => entry.name.endsWith(extension))
-      ) {
-        const info = await Deno.stat(path);
-        entries.push(
-          Object.freeze({ path, relativePath: this.relative(path), size: info.size }),
-        );
-      }
     }
   }
 }

@@ -184,6 +184,19 @@ export function createRuntimeGates(
       'List saga instances',
       'http://127.0.0.1:8092/api/v1/sagas/instances',
     ),
+    commandGate(
+      GATE.BEHAVIOR_DURABLE_CLI_PARITY,
+      'Drive workers and sagas through durable CLI verbs',
+      GATE_PHASE.BEHAVIOR,
+      (context) => [
+        'deno',
+        'run',
+        '--allow-net=127.0.0.1:8091,127.0.0.1:8092',
+        '--allow-read',
+        `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/durable-cli-parity.ts`,
+      ],
+      (context) => context.project.projectRoot,
+    ),
     httpGate(
       GATE.BEHAVIOR_TRIGGERS_HEALTH,
       'Triggers API health',

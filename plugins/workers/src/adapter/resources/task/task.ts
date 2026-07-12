@@ -27,18 +27,19 @@ export const DEFAULT_TASK_INPUT: TaskInput = { id: 'validate-payload', runtime: 
 export const taskScaffolder: ItemScaffolder<TaskInput> = {
   name: 'task',
   emit(input: TaskInput): readonly ScaffoldArtifact[] {
+    const metadata = renderWorkerResourceMetadata({
+      kind: 'task',
+      id: input.id,
+      enabled: true,
+      entrypoint: taskPath(input.id, input.runtime, input.entrypoint),
+      runtime: input.runtime,
+      timeout: input.timeoutMs,
+      maxRetries: input.maxRetries,
+    });
     return [
       textArtifact(
         taskPath(input.id, input.runtime, input.entrypoint),
-        renderWorkerResourceMetadata({
-          kind: 'task',
-          id: input.id,
-          enabled: true,
-          entrypoint: taskPath(input.id, input.runtime, input.entrypoint),
-          runtime: input.runtime,
-          timeout: input.timeoutMs,
-          maxRetries: input.maxRetries,
-        }) + taskSource(input),
+        insertMetadata(taskSource(input), metadata),
       ),
     ];
   },
@@ -91,4 +92,12 @@ function taskSource(input: TaskInput): string {
         TASK_EXPORT: `${exportStem(input.id)}Task`,
       });
   }
+}
+
+function insertMetadata(source: string, metadata: string): string {
+  if (!source.startsWith('#!')) return metadata + source;
+  const firstNewline = source.indexOf('\n');
+  return firstNewline < 0
+    ? `${source}\n${metadata}`
+    : `${source.slice(0, firstNewline + 1)}${metadata}${source.slice(firstNewline + 1)}`;
 }

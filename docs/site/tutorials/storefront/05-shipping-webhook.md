@@ -251,7 +251,7 @@ sides of the hand-off:
 curl "http://localhost:8093/api/v1/events?limit=10"
 
 # 2. The worker job it enqueued has executed (workers API, :8091)
-curl "http://localhost:8091/api/v1/workers/executions?limit=10"
+ns-workers executions --limit=10 --json
 ```
 
 You should see the inbound event listed by the triggers events endpoint and a fresh execution of

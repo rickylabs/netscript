@@ -228,7 +228,7 @@ watcher seeing a half-written file). Now confirm both sides of the hand-off:
 curl 'http://localhost:8093/api/v1/events?limit=10'
 
 # 2. The job it enqueued executed (:8091).
-curl 'http://localhost:8091/api/v1/workers/executions?limit=10'
+ns-workers executions --limit=10 --json
 ```
 
 Expected: the events feed lists a `product-import-trigger` event, and the executions feed shows a

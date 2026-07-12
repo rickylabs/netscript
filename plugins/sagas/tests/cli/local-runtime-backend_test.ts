@@ -47,7 +47,7 @@ Deno.test('saga publish and list commands use runtime contract routes and filter
         body: {
           type: 'OrderCreated',
           payload: { orderId: 'ord-1' },
-          correlationId: 'ord-1',
+          correlationKey: 'ord-1',
           idempotencyKey: 'msg-1',
         },
       },

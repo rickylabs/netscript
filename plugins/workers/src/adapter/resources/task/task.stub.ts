@@ -40,7 +40,7 @@ set -eu
 printf '{"taskId":"%%TASK_ID%%","args":['
 separator=''
 for argument in "$@"; do
-  escaped=$(printf '%s' "$argument" | sed 's/\\/\\\\/g; s/"/\\"/g')
+  escaped=$(printf '%s' "$argument" | sed 's/\\\\/\\\\\\\\/g; s/"/\\\\"/g')
   printf '%s"%s"' "$separator" "$escaped"
   separator=','
 done

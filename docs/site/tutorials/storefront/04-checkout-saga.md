@@ -286,48 +286,48 @@ message types.
 
 ## Verify your progress
 
-With Aspire up, confirm the saga registered. Against the **Sagas API on `:8092`**:
+With Aspire up, confirm the saga registered through the **Sagas API on `:8092`**:
 
 ```sh
-curl http://localhost:8092/api/v1/sagas/sagas
+ns-sagas list --registered --json
 ```
 
 You should see `CheckoutSaga` in the list, with `OrderCreated`, `PaymentCompleted`, and
 `PaymentFailed` among its handled message types. Now drive an instance directly by publishing
-messages to the saga bus — `POST /api/v1/sagas/publish` takes `{ type, payload }`, and the saga
+messages to the saga bus — `ns-sagas publish` sends `{ type, payload }`, and the saga
 correlates on `payload.orderId`. Start an order, then complete its payment:
 
 ```sh
 # 1. Open the checkout — instance goes to payment_pending and sends process-payment.
-curl -X POST http://localhost:8092/api/v1/sagas/publish \
-  -H 'content-type: application/json' \
-  -d '{ "type": "OrderCreated", "payload": { "orderId": "ord_1001", "customerId": "cust_1001", "items": [{ "productId": "1", "quantity": 2 }], "total": 4999 } }'
+ns-sagas publish OrderCreated \
+  --payload='{ "orderId": "ord_1001", "customerId": "cust_1001", "items": [{ "productId": "1", "quantity": 2 }], "total": 4999 }' \
+  --correlation-key=ord_1001
 
 # 2. Payment succeeds — instance advances to paid, carrying its transactionId.
-curl -X POST http://localhost:8092/api/v1/sagas/publish \
-  -H 'content-type: application/json' \
-  -d '{ "type": "PaymentCompleted", "payload": { "orderId": "ord_1001", "transactionId": "txn_777" } }'
+ns-sagas publish PaymentCompleted \
+  --payload='{ "orderId": "ord_1001", "transactionId": "txn_777" }' \
+  --correlation-key=ord_1001
 ```
 
 Inspect that instance and confirm it reached `paid`:
 
 ```sh
-curl http://localhost:8092/api/v1/sagas/instances/CheckoutSaga/ord_1001
+ns-sagas list --instances --saga=CheckoutSaga --json
 ```
 
 Now prove **compensation**. Open a second order and fail its payment — the `PaymentFailed` branch
 walks the state machine to `cancelled`:
 
 ```sh
-curl -X POST http://localhost:8092/api/v1/sagas/publish \
-  -H 'content-type: application/json' \
-  -d '{ "type": "OrderCreated", "payload": { "orderId": "ord_2002", "customerId": "cust_2002", "items": [{ "productId": "1", "quantity": 1 }], "total": 1999 } }'
+ns-sagas publish OrderCreated \
+  --payload='{ "orderId": "ord_2002", "customerId": "cust_2002", "items": [{ "productId": "1", "quantity": 1 }], "total": 1999 }' \
+  --correlation-key=ord_2002
 
-curl -X POST http://localhost:8092/api/v1/sagas/publish \
-  -H 'content-type: application/json' \
-  -d '{ "type": "PaymentFailed", "payload": { "orderId": "ord_2002", "reason": "card_declined" } }'
+ns-sagas publish PaymentFailed \
+  --payload='{ "orderId": "ord_2002", "reason": "card_declined" }' \
+  --correlation-key=ord_2002
 
-curl http://localhost:8092/api/v1/sagas/instances/CheckoutSaga/ord_2002
+ns-sagas list --instances --saga=CheckoutSaga --json
 ```
 
 The first instance shows `status: 'paid'` carrying its `transactionId`; the second shows
@@ -341,7 +341,7 @@ saga `send`s — this track stops at the payment leg, so `paid` is checkout's ob
       `PaymentFailed` compensation branch.
 - [ ] `workers/jobs/process-payment.ts` publishes `PaymentCompleted` / `PaymentFailed` back to the
       saga.
-- [ ] `GET /api/v1/sagas/sagas` lists `CheckoutSaga`.
+- [ ] `ns-sagas list --registered --json` lists `CheckoutSaga`.
 - [ ] Publishing `OrderCreated` + `PaymentCompleted` yields an instance at `status: 'paid'`;
       `PaymentFailed` yields one at `status: 'cancelled'`.
 - [ ] `deno task check` passes.

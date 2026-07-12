@@ -168,7 +168,7 @@ curl http://localhost:8091/health
 curl http://localhost:8093/health
 
 # The dropped file produced an import execution.
-curl 'http://localhost:8091/api/v1/workers/executions?limit=10'
+ns-workers executions --limit=10 --json
 ```
 
 Expected: both health checks return healthy JSON, and the executions feed shows a completed

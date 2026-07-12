@@ -89,7 +89,7 @@ export class LocalSagasRuntimeBackend implements SagasCliBackend {
       body: {
         type,
         payload,
-        correlationId: flag(args, 'correlation-key'),
+        correlationKey: flag(args, 'correlation-key'),
         idempotencyKey: flag(args, 'idempotency-key'),
       },
     });

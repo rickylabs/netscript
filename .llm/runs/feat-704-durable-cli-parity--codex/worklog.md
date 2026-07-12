@@ -181,6 +181,53 @@ commit; this lane does not self-certify it.
 Reconcile note: no PR was opened or commented per the lane brief. Tier-A slice review and
 separate-session IMPL-EVAL remain orchestrator-owned.
 
+- Commit/push: `725b8db2` pushed to `origin/feat/704-durable-cli-parity`.
+
+### Slice 3 — acceptance coverage and CLI-first docs
+
+- Replaced the documented raw workers trigger/executions and sagas publish/list flows with the new
+  CLI verbs. The polyglot guide now uses `ns-workers run-task` instead of requiring a hand-written
+  executor module.
+- Added `behavior.durable-cli-parity` to the existing `scaffold.runtime` behavior phase. Its command
+  gate triggers the generated `health-check` job, polls executions, publishes the generated starter
+  saga's `user.registered` message, and polls instances by `correlationKey`.
+- Added a real subprocess test which scaffolds a shell task, runs it with quoted argv through the
+  default `MultiRuntimeTaskExecutor`, observes streamed output, and asserts the parsed `TaskResult`.
+  This test exposed and fixed two edge cases: absent resource directories are now empty scans rather
+  than errors, and script metadata/JSON escaping now produces executable shell stubs.
+- Corrected `--correlation-key` to the contract's `correlationKey` field (not `correlationId`) and
+  asserted the exact publish body in the runtime-client test.
+
+| Evidence | Result |
+| --- | --- |
+| Final workers targeted tests | PASS — 13 passed, 0 failed, including a real shell subprocess |
+| Shared `packages/plugin` tests | PASS — 11 passed, 0 failed |
+| Final sagas CLI tests | PASS — 7 passed, 0 failed (route/body, rewrite, registry, composition) |
+| CLI E2E gate builder tests | PASS — 6 passed, 0 failed |
+| Targeted durable gate check | PASS — `deno check --unstable-kv` |
+| Scoped checks | PASS — package/plugin 151, workers 93, sagas 69, CLI E2E 87 files; 0 diagnostics |
+| Scoped lint and TypeScript format | PASS — all four touched code roots, 0 findings |
+| Documentation links | PASS — 96 documents, 0 broken links or anchors |
+| Full `scaffold.runtime` execution | NOT RUN — explicitly reserved for the orchestrator |
+| `deno.lock` | UNCHANGED |
+
+### Acceptance reconciliation
+
+| Acceptance contract | Implementation-lane verdict |
+| --- | --- |
+| Workers durable executions/trigger | IMPLEMENTED; exact route/query/body tests pass. Live service proof is deferred to the wired orchestrator gate. |
+| Multi-runtime `run-task` | PROVEN locally with a generated shell subprocess, streamed output, quoted argv, and parsed `TaskResult`; injected-executor tests also prove env/timeout forwarding. |
+| Worker/saga update/remove and add regeneration | PROVEN by semantic file/registry tests. |
+| Saga publish then list instance | IMPLEMENTED; exact publish/list contract tests pass. End-to-end running-service proof is deferred to the wired orchestrator gate. |
+| Filters and JSON | PROVEN by command metadata and semantic route/local-filter tests for worker topic/enabled/type and saga status/saga filters. |
+| CLI-first documentation | PROVEN by source review and the 96-document link gate. |
+| Saga definition versioning | DEFERRED — item 7 is the explicitly separate framework follow-up. |
+
+Reconcile note: this lane wrote the required full-runtime coverage but did not execute it, exactly as
+directed. Therefore live workers/sagas service behavior is honestly recorded as unproven here until
+the orchestrator runs `scaffold.runtime`. No PR was opened, and IMPL-EVAL remains a separate-session
+orchestrator responsibility.
+
 ### Drift
 
 | ID | Severity | Detail |

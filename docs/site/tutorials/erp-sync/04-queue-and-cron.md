@@ -195,7 +195,7 @@ temporarily set its `cron` to `*/2 * * * *` (every two minutes), regenerate, res
 and read the executions feed:
 
 ```sh
-curl 'http://localhost:8091/api/v1/workers/executions?limit=10'
+ns-workers executions --limit=10 --json
 ```
 
 Expected: an `import-products` execution appears on the cron cadence with no file dropped — the
