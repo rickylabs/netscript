@@ -1,4 +1,5 @@
 import { Command } from "@cliffy/command";
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import { outputText } from "../../../../kernel/presentation/output/default-output.ts";
 import type { InitAgentInput, InitAgentResult } from "./init-agent-input.ts";
 
@@ -11,7 +12,7 @@ export interface InitAgentCommandDependencies {
 /** Create the public agent integration installer command. */
 export function createInitAgentCommand(
   dependencies: InitAgentCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   return new Command()
     .name("init")
     .description("Install NetScript MCP and skills for detected agent hosts")
@@ -31,5 +32,5 @@ export function createInitAgentCommand(
             result.hosts.join(", ")
           }.`,
       );
-    }) as unknown as Command<any, any, any, any, any, any, any, any>;
+    });
 }

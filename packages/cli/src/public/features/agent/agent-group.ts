@@ -1,4 +1,5 @@
 import { Command } from "@cliffy/command";
+import type { CliffyCommand } from "../../../kernel/presentation/command-types.ts";
 import type { PublicCliHost } from "../root/public-command-tree.ts";
 import type { PublicCommandDependencies } from "../root/public-command-dependencies.ts";
 import { DenoAgentInitFileSystem } from "./init/agent-init-file-system.ts";
@@ -11,7 +12,7 @@ import { runAgentMcp } from "./mcp/run-agent-mcp.ts";
 export function createAgentCommand(
   host: PublicCliHost,
   dependencies: PublicCommandDependencies,
-): Command {
+): CliffyCommand {
   const fs = new DenoAgentInitFileSystem();
   return new Command()
     .name("agent")
@@ -32,5 +33,5 @@ export function createAgentCommand(
         projectRoot: host.cwd,
         init: (input) => initAgent(input, { fs }),
       }),
-    ) as unknown as Command;
+    );
 }

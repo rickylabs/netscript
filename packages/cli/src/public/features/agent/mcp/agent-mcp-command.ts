@@ -1,4 +1,5 @@
 import { Command } from "@cliffy/command";
+import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
 import type { AgentMcpInput } from "./agent-mcp-input.ts";
 
 /** Dependencies for `netscript agent mcp`. */
@@ -10,7 +11,7 @@ export interface AgentMcpCommandDependencies {
 /** Create the stdio MCP server command. */
 export function createAgentMcpCommand(
   dependencies: AgentMcpCommandDependencies,
-): Command<any, any, any, any, any, any, any, any> {
+): CliffyCommand {
   return new Command()
     .name("mcp")
     .description("Start the NetScript MCP server over standard input/output")
@@ -30,5 +31,5 @@ export function createAgentMcpCommand(
             : undefined,
         });
       },
-    ) as unknown as Command<any, any, any, any, any, any, any, any>;
+    );
 }

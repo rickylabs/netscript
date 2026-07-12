@@ -43,5 +43,11 @@ export function parseJsonRpcRequest(value: unknown): JsonRpcRequest {
   if (value.params !== undefined && !isRecord(value.params)) {
     throw new Error('JSON-RPC params must be an object');
   }
-  return value as unknown as JsonRpcRequest;
+  const request: JsonRpcRequest = {
+    jsonrpc: '2.0',
+    method: value.method,
+    ...(value.id === undefined ? {} : { id: value.id }),
+    ...(value.params === undefined ? {} : { params: value.params }),
+  };
+  return request;
 }
