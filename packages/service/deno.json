@@ -1,6 +1,6 @@
 {
   "name": "@netscript/service",
-  "version": "0.0.1-beta.8",
+  "version": "0.0.1-beta.9",
   "description": "Service bootstrap builders, health probes, and Hono/oRPC runtime wiring for NetScript applications.",
   "license": "Apache-2.0",
   "exports": {

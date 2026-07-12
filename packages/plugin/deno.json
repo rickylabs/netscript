@@ -1,6 +1,6 @@
 {
   "name": "@netscript/plugin",
-  "version": "0.0.1-beta.8",
+  "version": "0.0.1-beta.9",
   "description": "Plugin manifest, validation, discovery, and host-context contracts for NetScript.",
   "license": "Apache-2.0",
   "exports": {
@@ -23,8 +23,8 @@
     "@std/path": "jsr:@std/path@^1",
     "zod": "jsr:@zod/zod@4.4.3",
     "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
-    "@netscript/contracts": "jsr:@netscript/contracts@0.0.1-beta.8",
-    "@netscript/service": "jsr:@netscript/service@0.0.1-beta.8",
+    "@netscript/contracts": "jsr:@netscript/contracts@0.0.1-beta.9",
+    "@netscript/service": "jsr:@netscript/service@0.0.1-beta.9",
     "@orpc/contract": "npm:@orpc/contract@^1.14.6",
     "@orpc/server": "npm:@orpc/server@^1.14.6"
   },

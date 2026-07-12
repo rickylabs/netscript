@@ -1,6 +1,6 @@
 {
   "name": "@netscript/fresh",
-  "version": "0.0.1-beta.8",
+  "version": "0.0.1-beta.9",
   "description": "Fresh runtime extensions, builders, forms, defer primitives, and route contracts for NetScript.",
   "license": "Apache-2.0",
   "exports": {
@@ -39,8 +39,8 @@
     "zod": "jsr:@zod/zod@4.4.3",
     "@durable-streams/state": "npm:@durable-streams/state@^0.3.1",
     "@durable-streams/tanstack-ai-transport": "npm:@durable-streams/tanstack-ai-transport@^0.0.8",
-    "@netscript/ai": "jsr:@netscript/ai@0.0.1-beta.8",
-    "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.1-beta.8",
+    "@netscript/ai": "jsr:@netscript/ai@0.0.1-beta.9",
+    "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.1-beta.9",
     "@tanstack/ai": "npm:@tanstack/ai@^0.39.0",
     "@tanstack/ai-preact": "npm:@tanstack/ai-preact@^0.10.1"
   },
