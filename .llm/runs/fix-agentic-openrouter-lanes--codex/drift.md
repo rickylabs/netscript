@@ -29,3 +29,13 @@
 - **Severity:** significant
 - **Action:** fix
 - **Evidence:** `glm-live-evidence.md`; `provider-profiles.ts`; `claude-print.ts`.
+
+## 2026-07-12 — Launcher growth crossed the tooling hard cap during implementation
+
+- **What:** Profile materialization, route identity, and evidence rendering made the compatibility launcher 608 LOC after S1/S2.
+- **Source:** S3 structural review against Archetype 6 F-CLI-2.
+- **Expected:** Every changed TypeScript file remains at or below the 500-LOC hard cap.
+- **Actual:** The temporary integrated entrypoint exceeded the cap; focused helpers now live in `launcher-route.ts`, leaving the entrypoint at 499 LOC.
+- **Severity:** minor
+- **Action:** fixed before slice commit
+- **Evidence:** focused launcher tests plus final 239-test suite and 105-file scoped gates.

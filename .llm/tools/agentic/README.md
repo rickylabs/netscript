@@ -281,12 +281,16 @@ the Responses route declares a native namespace tool that the available OpenRout
 Canaries surface that incompatibility as a structured diagnostic rather than retrying a dead lane.
 
 ```console
-$ deno run --allow-run --allow-env .llm/tools/agentic/runtime/cli/provider-canary.ts
-Usage: deno task agentic:provider-canary --profile <id> --model <id> --effort <effort>
-  --worktree <native-ext4-path> [--base-url <https-url>] [--codex-profile-home <path>]
+$ deno task agentic:provider-canary
+{"mode":"static","status":"passed","expectedPresetIds":[...],"rows":[...]}
 
-Prints structured non-secret JSON. Exit: 0 passed · 4 blocked · 5 failed · 2 usage.
+$ deno task agentic:provider-canary --live --profile <id> --model <id> --effort <effort> \
+    --worktree <native-ext4-path> [--base-url <https-url>] [--codex-profile-home <path>]
 ```
+
+Default mode validates registry coverage, capability coherence, and the real Claude/Codex launch
+planners for every `OPENROUTER_PRESETS` entry without reading credentials or spawning a provider.
+The `--live` flag is mandatory before any provider process can run.
 
 `rollout-canary-cli.ts` runs the broader rollout matrix and renders a report; it orchestrates the
 shipped CLIs rather than re-implementing probes.

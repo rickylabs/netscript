@@ -65,6 +65,12 @@ Deno.test('runner orchestrates shipped commands and returns nine secret-safe row
     runner.requests.filter((request) => request.display.includes('provider-canary')).length,
     4,
   );
+  equals(
+    runner.requests.filter((request) => request.display.includes('provider-canary')).every(
+      (request) => request.args.includes('--live'),
+    ),
+    true,
+  );
   equals(runner.requests.some((request) => request.display.includes('--dry-run')), true);
   equals(
     runner.requests.some((request) =>

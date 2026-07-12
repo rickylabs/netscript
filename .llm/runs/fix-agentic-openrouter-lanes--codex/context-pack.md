@@ -6,13 +6,13 @@
 | --- | --- |
 | Run ID | `fix-agentic-openrouter-lanes--codex` |
 | Branch | `fix/agentic-openrouter-lanes` |
-| Current phase | `implement` |
+| Current phase | `implement` (all slices gated; IMPL-EVAL next) |
 | Archetype | `6 - CLI / Tooling` |
 | Scope overlays | none |
 
 ## Current State
 
-PLAN-EVAL passed. S1 is landed. S2 is implemented and gated: Claude/OpenRouter is the viable GLM agentic lane; Codex/OpenRouter GLM is explicitly unsupported for native namespace tools; runtime launch/resume planning and redacted live proof exist.
+PLAN-EVAL passed. All three implementation slices are gated. Claude/OpenRouter is the viable GLM agentic lane; Codex/OpenRouter GLM is explicitly unsupported for native namespace tools; the default provider canary now validates every preset without credentials or provider traffic, while live turns require `--live`.
 
 ## Completed
 
@@ -21,17 +21,19 @@ PLAN-EVAL passed. S1 is landed. S2 is implemented and gated: Claude/OpenRouter i
 - Three ordered commit slices and risk controls.
 - Separate-session PLAN-EVAL PASS.
 - S1 code, focused tests, scoped wrappers, volatile guard, and live no-turn effort handshake.
-- S2 Claude gateway wrapper/environment/capability data; full 235-test suite and three live GLM proofs.
+- S2 Claude gateway wrapper/environment/capability data; three live GLM proofs.
+- S3 exhaustive static preset canary, explicit live boundary, rollout-runner migration, CI wiring, and launcher structural extraction.
+- Final implementation gates: 239 tests and 105-file scoped check/lint/fmt, all clean; no secret or lock churn.
 
 ## In Progress
 
-- S2 commit/push/comment, then S3 exhaustive preset canaries.
+- Commit/push/comment S3, then launch the separate-session IMPL-EVAL.
 
 ## Next Steps
 
-1. Commit/push/comment S2.
-2. Add exhaustive static preset-canary mode and explicit live selection.
-3. Run final gate ledger and hand off to IMPL-EVAL.
+1. Commit and push S3; update PR #696 evidence.
+2. Change the PR phase to `status:impl-eval` and run the opposite-family evaluator.
+3. If PASS, record the verdict, mark the PR ready to merge, and post the redacted completion evidence.
 
 ## Key Decisions
 
@@ -52,15 +54,18 @@ PLAN-EVAL passed. S1 is landed. S2 is implemented and gated: Claude/OpenRouter i
 | `.llm/tools/agentic/claude/claude-print.ts` | new | Isolated gateway launch/resume wrapper. |
 | `.llm/tools/agentic/runtime/provider-profiles.ts` | changed | Supported Claude GLM and unsupported Codex GLM capability records. |
 | `.llm/runs/fix-agentic-openrouter-lanes--codex/glm-live-evidence.md` | new | Redacted acceptance transcript and structured canaries. |
+| `.llm/tools/agentic/runtime/preset-canary.ts` | new | Exhaustive credential-free preset and launch-plan validation. |
+| `.llm/tools/agentic/runtime/cli/provider-canary.ts` | changed | Static default; explicit `--live` provider boundary. |
+| `.github/workflows/ci.yml` | changed | Runs the exhaustive static preset canary. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Plan | PASS | `plan-eval.md` |
-| Static | PASS for S1 | scoped check/lint/fmt; focused suite and volatile guard |
+| Static | PASS | 239 tests; scoped check/lint/fmt over 105 files; volatile guard; secret scan |
 | Runtime | PASS | Claude GLM live tool turn and wrapper; Codex incompatibility structured |
-| Consumer | not run | implementation pending |
+| Consumer | PASS | default exhaustive canary task plus explicit-live rollout-runner coverage and CI step |
 
 ## Open Questions
 

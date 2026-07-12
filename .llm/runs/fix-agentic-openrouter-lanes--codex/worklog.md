@@ -69,6 +69,10 @@ Add or modify model strings/endpoints only in `config/`; declare a preset and ca
 | 2026-07-12 | S2 | capability boundary | Added supported Claude GLM preset and retained the Codex GLM preset as explicit `codex-native-namespace-tool` unsupported; live canaries returned Claude PASS and Codex structured FAIL. |
 | 2026-07-12 | S2 | slice review | Reviewed child-only credential binding, cached-auth isolation, non-mobile boundary, prompt-file reachability, same-session resume argv, declared-vs-observed incompatibility provenance, and provider-id canonicalization. Tightened incompatibility evidence with an explicit source and derived finite constants; no blocking findings remain. |
 | 2026-07-12 | S2 | reconcile | PR #696 remains `status:impl` with required labels/milestone and no closing issue. The carried-in GLM unknowns are resolved in `plan.md`; no reviewer comment changed scope. |
+| 2026-07-12 | S3 | implementation | `agentic:provider-canary` now defaults to exhaustive, credential-free validation of every OpenRouter preset and requires `--live` before any provider process; the rollout runner was migrated to the explicit flag. |
+| 2026-07-12 | S3 | CI/consumer | Added the default static preset canary to the CI check/test job and documented static versus live invocation in the suite and harness indexes. |
+| 2026-07-12 | S3 | structural review | The S1 launcher had grown to 608 LOC; route/profile materialization and evidence rendering moved to `launcher-route.ts`, leaving the compatibility entrypoint at 499 LOC and preserving behavior through focused tests. |
+| 2026-07-12 | S3 | slice review | Reviewed all four preset rows, capability coherence, real Claude/Codex command planners, explicit live parsing, rollout-runner migration, CI wiring, secret safety, and lock hygiene. No blocking findings remain. |
 
 ## Gate Results
 
@@ -109,6 +113,38 @@ PLAN-EVAL: PASS (`plan-eval.md`).
 | Codex GLM provider canary | EXPECTED UNSUPPORTED | exit 1; observed `codex-native-namespace-tool`; fan-out blocked. |
 | Checked-in runtime wrapper | PASS | two-turn Bash `pwd`; exact non-empty `GLM_RUNTIME_ADAPTER_OK`. |
 
+### S3 and Final Implementation Gates
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Exhaustive preset canary | PASS | Default task, with provider credential variables unset, validated all four `OPENROUTER_PRESETS` rows and their real launch plans without a provider process. |
+| Live opt-in contract | PASS | CLI tests reject provider route flags without `--live`; rollout runner tests require `--live` on every provider request. |
+| Full agentic suite | PASS | 239 passed, 0 failed. |
+| Volatile config guard | PASS | 4 passed, 0 failed as part of the full suite. |
+| Scoped check | PASS | 105 files, 0 findings. |
+| Scoped lint | PASS | 105 files, 0 findings. |
+| Scoped format | PASS | 105 files, 0 findings. |
+| CLI hard cap | PASS | `launch-codex-slice.ts` 499 LOC; extracted `launcher-route.ts` 142 LOC; new canary modules at or below 193 LOC. |
+| Secret scan | PASS | No OpenRouter/Anthropic key-shaped values in changed tooling or run artifacts. |
+| Lock hygiene | PASS | `deno.lock` unchanged. |
+| Consumer wiring | PASS | CI invokes the credential-free default task; rollout live probes use the explicit opt-in contract. |
+
+### Final Fitness Ledger
+
+| Gate | Result | Evidence / rationale |
+| --- | --- | --- |
+| F-1/F-3/F-5/F-10..F-12/F-15..F-19 | PASS / reviewed | Typed checks, lint/format, 239-test suite, finite preset registry, secret scan, and changed-file structural review; no package architecture surface changed. |
+| F-2 helper reinvention | PASS (manual) | Reused the existing Claude/Codex command planners, provider-profile resolver, profile renderer, route-identity comparison, WSL helper, and rollout runner instead of adding parallel process/config abstractions. |
+| F-4 inheritance audit | PASS (manual) | No class hierarchy or inheritance was introduced; new behavior is finite typed data plus pure planning/validation functions at existing edges. |
+| F-6 JSR publishability | N/A (internal tooling) | `.llm/tools/agentic` is not a published package. |
+| F-7 doc-score | N/A (internal tooling) | No JSR public export surface. |
+| F-8 workspace lib override | N/A (internal tooling) | No package workspace import map. |
+| F-9 permission declaration | N/A (internal tooling) | Task permissions remain declared in the root task definition; no package manifest is involved. |
+| F-CLI-1/F-CLI-2 | PASS / reviewed | Changed files were manually classified; the universal 500-LOC hard cap is met (maximum 499), and new focused modules remain 193 LOC or less. |
+| F-CLI-3..F-CLI-31 | reviewed / N/A where package-layout-specific | No new `src/` CLI package, surface/composition layer, barrels, templates, registries, abstracts, or extension axes; changed flat internal-tooling edges were reviewed for direct Deno/process use and output remains confined to CLI/adapters. |
+| Runtime acceptance | PASS | Real GLM 5.2 tool turn completed through the checked-in Claude wrapper; Codex namespace incompatibility was independently observed and encoded. |
+| Consumer acceptance | PASS | Exhaustive static task runs in CI and the broader rollout runner retains explicit bounded live probes. |
+
 ## Handoff Notes
 
-- PLAN-EVAL should spot-check launcher profile handling and the preset registry.
+- IMPL-EVAL should independently inspect profile/effort identity, the redacted GLM live proof, the structured Codex incompatibility, exhaustive preset coverage, and the final gate ledger.

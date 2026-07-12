@@ -35,8 +35,8 @@
  *     --slice-dir <win-path-to-slice-run-dir> \
  *     [--expect-base <sha>] [--user codex] [--pretty] [--dry-run]
  *
- * Exit codes: 0 = ok (launched / dry-run clean / parsed) · 1 = launch failed or
- * no thread id · 2 = usage error · 3 = brief contract violation · 4 = push-safety
+ * Exit codes: 0 = ok (launched / dry-run clean / parsed) · 1 = launch or route
+ * identity failure · 2 = usage error · 3 = brief contract violation · 4 = push-safety
  * violation (upstream set / wrong branch / wrong base) · 5 = worktree not found.
  */
 
@@ -48,7 +48,6 @@ import {
   requireValue,
   resolveWslCommand,
   sq,
-  type ThreadInfo,
   validateHandoffContract,
   winToWsl,
   wsl,
@@ -59,15 +58,16 @@ import {
 import {
   compareLaunchIdentity,
   enforceLaunchIdentity,
-  type LaunchIdentityEvidence,
   type RequestedLaunchIdentity,
   requestedLaunchIdentity,
 } from '../runtime/launch-route-identity.ts';
 import {
-  CODEX_OPENROUTER_PROFILE_FILE,
-  CODEX_OPENROUTER_PROFILE_NAME,
-  renderCodexOpenRouterProfile,
-} from '../runtime/adapters/codex-profile-adapter.ts';
+  launcherExitCode,
+  type LauncherProfilePlan,
+  materializeLauncherProfile,
+  planLauncherProfile,
+  renderThreadRecord,
+} from './launcher-route.ts';
 import { LocalSenderOwnershipAdapter } from '../runtime/adapters/local-sender-ownership-adapter.ts';
 import {
   activateSenderOwnership,
@@ -93,66 +93,6 @@ interface Options {
   model?: string;
   effort?: string;
   allowRouteMismatch: boolean;
-}
-
-export interface LauncherProfilePlan {
-  readonly home: string;
-  readonly name: string;
-  readonly namedPath: string;
-  readonly appServerPath: string;
-  readonly content: string;
-}
-
-/** Plans the isolated named profile and equivalent app-server base config. */
-export function planLauncherProfile(
-  requested: RequestedLaunchIdentity,
-  options: Readonly<Pick<Options, 'profile' | 'profileHome' | 'worktree'>>,
-): LauncherProfilePlan | null {
-  if (requested.provider !== 'openrouter') {
-    if (options.profile || options.profileHome) {
-      throw new Error('named launcher profiles are supported only for the Codex OpenRouter route');
-    }
-    return null;
-  }
-  if (
-    options.profile !== CODEX_OPENROUTER_PROFILE_NAME ||
-    !options.profileHome?.startsWith('/home/') || !options.worktree
-  ) {
-    throw new Error(
-      `OpenRouter launches require --profile ${CODEX_OPENROUTER_PROFILE_NAME} and a native /home profile directory`,
-    );
-  }
-  const home = options.profileHome.replace(/\/$/, '');
-  const content = renderCodexOpenRouterProfile({
-    agent: 'codex',
-    provider: 'openrouter',
-    profileId: 'codex-openrouter',
-    model: requested.model,
-    effort: requested.effort,
-    worktree: options.worktree,
-    mobileRequired: false,
-  });
-  if (!content) throw new Error('OpenRouter profile could not be rendered');
-  return {
-    home,
-    name: options.profile,
-    namedPath: `${home}/${CODEX_OPENROUTER_PROFILE_FILE}`,
-    // app-server does not accept top-level --profile. Its isolated CODEX_HOME
-    // therefore consumes the exact same supported profile as base config.
-    appServerPath: `${home}/config.toml`,
-    content,
-  };
-}
-
-/** Keeps successful process outcome truthful while still failing route mismatches. */
-export function launcherExitCode(
-  processCode: number,
-  evidence: LaunchIdentityEvidence,
-  allowRouteMismatch: boolean,
-): number {
-  if (processCode !== 0) return 1;
-  if (evidence.status === 'mismatch' && !allowRouteMismatch) return 1;
-  return 0;
 }
 
 function printHelp(): void {
@@ -268,47 +208,6 @@ function parseArgs(args: string[]): Options | null {
     }
   }
   return o;
-}
-
-function threadRecord(
-  o: Options,
-  info: ThreadInfo,
-  dest: string,
-  requested: RequestedLaunchIdentity,
-): string {
-  const evidence = compareLaunchIdentity(requested, {
-    provider: info.provider,
-    model: info.model,
-    effort: info.effort,
-  });
-  return [
-    `# ${o.slug ?? 'slice'} — Codex implementation thread`,
-    '',
-    `- **Thread / session id:** \`${info.threadId ?? 'UNKNOWN'}\``,
-    info.rollout ? `- **Rollout:** \`${info.rollout}\`` : '',
-    `- **Worktree:** \`${o.worktree}\``,
-    `- **Branch:** \`${o.branch}\`${
-      o.expectBase ? ` @ \`${o.expectBase}\`` : ''
-    } (NO upstream by design).`,
-    `- **Push rule:** explicit refspec only — \`git push origin HEAD:refs/heads/${o.branch}\`.`,
-    `- **Requested route:** provider=${requested.provider} · model=${requested.model} · effort=${requested.effort}`,
-    `- **Observed route:** provider=${info.provider ?? 'pending'} · model=${
-      info.model ?? 'pending'
-    } · effort=${info.effort?.toLowerCase() ?? 'pending'}`,
-    `- **Route verdict:** ${evidence.status}${
-      evidence.mismatches.length ? ` (${evidence.mismatches.join(', ')})` : ''
-    }`,
-    `- **Runtime:** approval=never · sandbox=dangerFullAccess`,
-    `- **Brief (staged):** \`${dest}\``,
-    '',
-    '## Steering (same thread — never a second send-message-v2 at this worktree)',
-    '```bash',
-    `codex exec resume ${info.threadId ?? '<thread-id>'} -- "<follow-up>"`,
-    '```',
-    '',
-    '_Written by `.llm/tools/agentic/codex/launch-codex-slice.ts`._',
-    '',
-  ].filter((l) => l !== '').join('\n');
 }
 
 async function main(): Promise<void> {
@@ -510,15 +409,7 @@ async function main(): Promise<void> {
   }
 
   if (profilePlan) {
-    const encoded = new TextEncoder().encode(profilePlan.content).toBase64();
-    const materialized = await wsl(
-      o.user,
-      `install -d -m 700 ${sq(profilePlan.home)} && ` +
-        `printf %s ${sq(encoded)} | base64 -d > ${sq(profilePlan.namedPath)} && ` +
-        `cp ${sq(profilePlan.namedPath)} ${sq(profilePlan.appServerPath)} && ` +
-        `chmod 600 ${sq(profilePlan.namedPath)} ${sq(profilePlan.appServerPath)}`,
-    );
-    if (materialized.code !== 0) {
+    if (!await materializeLauncherProfile(o.user, profilePlan)) {
       await ownership.release(o.worktree, leaseToken);
       console.log(JSON.stringify({
         stage: 'profile-materialization',
@@ -556,7 +447,7 @@ async function main(): Promise<void> {
         );
         if (o.sliceDir) {
           const recPath = `${o.sliceDir.replace(/[\\/]$/, '')}/codex-thread-ids.md`;
-          await Deno.writeTextFile(recPath, threadRecord(o, info2, dest, requested));
+          await Deno.writeTextFile(recPath, renderThreadRecord(o, info2, dest, requested));
           console.log(`\n[launch-codex-slice] recorded thread ${info2.threadId} -> ${recPath}`);
         } else {
           console.log(
@@ -588,7 +479,7 @@ async function main(): Promise<void> {
   }
   if (o.sliceDir) {
     const recPath = `${o.sliceDir.replace(/[\\/]$/, '')}/codex-thread-ids.md`;
-    await Deno.writeTextFile(recPath, threadRecord(o, observed, dest, requested));
+    await Deno.writeTextFile(recPath, renderThreadRecord(o, observed, dest, requested));
   }
   if (!enforcement.allowed && evidence.status === 'mismatch') {
     console.log(JSON.stringify({

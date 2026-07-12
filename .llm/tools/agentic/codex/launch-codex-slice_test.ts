@@ -2,7 +2,7 @@ import { assert, assertEquals } from '@std/assert';
 import { OPENROUTER_MODEL_IDS } from '../config/models.ts';
 import { CODEX_OPENROUTER_PROFILE_NAME } from '../runtime/adapters/codex-profile-adapter.ts';
 import { compareLaunchIdentity } from '../runtime/launch-route-identity.ts';
-import { launcherExitCode, planLauncherProfile } from './launch-codex-slice.ts';
+import { launcherExitCode, planLauncherProfile } from './launcher-route.ts';
 
 const requested = {
   provider: 'openrouter',
