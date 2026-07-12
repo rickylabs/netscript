@@ -54,15 +54,14 @@ function AccordionItemTrigger({ children, ...props }: AccordionItemTriggerProps)
   const accordion = useAccordionContext('Accordion.ItemTrigger');
   const item = useAccordionItemContext('Accordion.ItemTrigger');
   const triggerProps = accordion.getItemTriggerProps(item, props);
-  const { disabled, onClick, type: _type, ...summaryProps } = triggerProps;
+  const { onClick, ...summaryProps } = triggerProps;
 
   return (
     <summary
       {...(summaryProps as JSX.HTMLAttributes<HTMLElement>)}
-      aria-disabled={disabled ? 'true' : summaryProps['aria-disabled']}
       onClick={(event) => {
         event.preventDefault();
-        onClick?.(event as unknown as JSX.TargetedMouseEvent<HTMLButtonElement>);
+        onClick?.(event);
       }}
       role={summaryProps.role ?? 'button'}
     >

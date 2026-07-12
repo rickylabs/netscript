@@ -13,20 +13,22 @@
 ## Current State
 
 The mandated hard reset is complete at `3b3d615b`. Research and design are locked. Baseline is 16
-findings/0 allowances; the rejected pass used 6 allowances. Independent PLAN-EVAL passed. Slice 1
-is reviewed green and reduces the scanner to 6 findings with 0 allowances.
+findings/0 allowances; the rejected pass used 6 allowances. Independent PLAN-EVAL passed. Slices 1
+and 2 are reviewed green and reduce the scanner to the two plugin-core findings with 0 allowances.
 
 ## Completed
 
 - Skills/doctrine/harness reads, reset preflight, baseline scanner, upstream type inspection, plan.
+- Slice 1 telemetry and lexical typing fixes, gates, review, and sign-off commit.
+- Slice 2 SDK/Fresh UI typing fixes, regression tests, FAIL_FIX correction, and PASS review.
 
 ## In Progress
 
-- Slice 2 SDK and Fresh UI typed boundaries.
+- Slice 3 plugin-core error-map typing.
 
 ## Next Steps
 
-1. Implement slices 2-4 with per-slice gates and supervisor review.
+1. Implement and review slice 3, eliminating the final two casts.
 2. Run full acceptance and separate IMPL-EVAL, then force-push with lease.
 
 ## Key Decisions
@@ -43,15 +45,17 @@ is reviewed green and reduces the scanner to 6 findings with 0 allowances.
 | `.llm/runs/quality-q754-tail--codex/*` | new | harness research/design state |
 | `packages/telemetry/**` | changed | dynamic-module and oRPC callback typing |
 | `packages/{aspire,sdk,bench}/**` | changed | prose-only lexical scanner hits |
+| `packages/fresh-ui/**` | changed | truthful primitive/style/summary types and focused render test |
+| `packages/sdk/**` | changed | validated oRPC router boundary and regression test |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | slice 1 green | scanner 6 residual findings / allowCount 0; telemetry gates green |
-| Fitness | plan PASS | `plan-eval.md` |
-| Runtime | N/A | typing-only plan |
-| Consumer | pending | implementation not started |
+| Static | slices 1-2 green | scanner 2 residual findings / allowCount 0; scoped gates green |
+| Fitness | plan + slice reviews PASS | `plan-eval.md`, `slice-review-1.md`, `slice-review-2.md` |
+| Runtime | slice 2 green | SDK link guard and Fresh SSR summary regression tests |
+| Consumer | slice 2 green | SDK 16 tests; Fresh UI 134 tests |
 
 ## Open Questions
 
@@ -59,7 +63,7 @@ is reviewed green and reduces the scanner to 6 findings with 0 allowances.
 
 ## Drift and Debt
 
-- Drift: remote branch absent; owner forbids PR creation.
+- Drift: remote branch absent; owner forbids PR creation; Fresh test task gained the minimal existing-test read permission.
 - Debt: no new or deepened entry planned.
 
 ## Commits

@@ -19,3 +19,16 @@
 - **Severity:** minor
 - **Action:** accept
 - **Evidence:** final push will create or update the owner-specified ref with force-with-lease.
+
+## 2026-07-12 — Fresh UI test permission correction
+
+- **What:** The package test task now grants read-only filesystem access.
+- **Source:** `tests/ai/render-ui.test.tsx` reads its source fixture with `Deno.readTextFile`.
+- **Expected:** The baseline `deno task test` should exercise all package tests successfully.
+- **Actual:** The baseline task failed only on the missing permission; `--allow-read` is the narrow
+  permission required by that existing test and leaves network, environment, write, and run access
+  denied.
+- **Severity:** minor
+- **Action:** accept and keep the correction in the slice so the mandated package test gate is real.
+- **Evidence:** independent slice review reproduced baseline failure and 133/133 success with the
+  scoped permission.

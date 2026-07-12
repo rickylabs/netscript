@@ -23,19 +23,23 @@ export function getPositionArea(placement: string): string {
 
 export function mergePlatformStyle(
   style: unknown,
-  declarations: Record<string, string>,
-): JSX.CSSProperties {
+  declarations: JSX.CSSProperties,
+): string | JSX.CSSProperties {
   if (typeof style === 'string') {
     const appended = Object.entries(declarations).map(([name, value]) => `${name}: ${value}`).join(
       '; ',
     );
-    return `${style}; ${appended}` as unknown as JSX.CSSProperties;
+    return `${style}; ${appended}`;
   }
 
   return {
-    ...((style && typeof style === 'object') ? style : {}),
+    ...(isCssProperties(style) ? style : {}),
     ...declarations,
-  } as JSX.CSSProperties;
+  };
+}
+
+function isCssProperties(value: unknown): value is JSX.CSSProperties {
+  return value !== null && typeof value === 'object';
 }
 
 export function isPopoverOpen(element: HTMLElement | null): boolean {
