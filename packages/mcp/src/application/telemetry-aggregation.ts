@@ -1,4 +1,5 @@
 import {
+  KVAttributes,
   NetScriptExecutionAttributes,
   NetScriptJobAttributes,
   SagaAttributes,
@@ -7,9 +8,14 @@ import {
 import type { TelemetryLog, TelemetryResource, TelemetrySpan } from '@netscript/telemetry/query';
 import {
   type AppStatusSummary,
+  type DbBottleneckSummary,
+  type DbOperationSummary,
   DOMAIN_ATTRIBUTE_PREFIXES,
   type ErrorGroupSummary,
+  type LastJobResultSummary,
+  type OperationPerformanceSummary,
   type RunSummary,
+  type ServicePerformanceSummary,
   type SpanTreeNode,
   type TelemetryDomain,
 } from '../domain/telemetry-summaries.ts';
@@ -27,6 +33,11 @@ export const MAX_SPAN_TREE_DEPTH = 8;
 export const MAX_CORRELATED_LOGS = 20;
 const SERVICE_NAME = 'service.name';
 const OUTCOME = SagaAttributes.OUTCOME;
+const OTEL_DB_ATTRIBUTE_PREFIX = 'db.';
+const DB_STATEMENT = 'db.statement';
+const DB_OPERATION = 'db.operation.name';
+const MAX_ANALYSIS_RESULTS = 20;
+const MAX_DB_LABEL_LENGTH = 120;
 
 /** Classify a span or log by stable NetScript attribute namespace. */
 export function classifyDomain(attributes: Readonly<Record<string, unknown>>): TelemetryDomain {
@@ -207,6 +218,165 @@ export function serviceOf(attributes: Readonly<Record<string, unknown>>): string
 export function correlatedLogs(logs: readonly TelemetryLog[], traceId: string): TelemetryLog[] {
   return logs.filter((log) => log.traceId === traceId).sort((a, b) => a.timeUnixMs - b.timeUnixMs)
     .slice(0, MAX_CORRELATED_LOGS);
+}
+
+/** Select the newest completed job matching optional identity filters. */
+export function aggregateLastJobResult(
+  spans: readonly TelemetrySpan[],
+  filter: { readonly jobId?: string; readonly jobName?: string; readonly service?: string } = {},
+): LastJobResultSummary {
+  const selected = spans.filter((span) => span.endTimeUnixMs !== undefined)
+    .filter((span) => attributeString(span, NetScriptJobAttributes.JOB_ID) !== undefined)
+    .filter((span) =>
+      !filter.jobId || attributeString(span, NetScriptJobAttributes.JOB_ID) === filter.jobId
+    )
+    .filter((span) =>
+      !filter.jobName || attributeString(span, NetScriptJobAttributes.JOB_NAME) === filter.jobName
+    )
+    .filter((span) => !filter.service || serviceOf(span.attributes) === filter.service)
+    .sort((a, b) =>
+      (b.endTimeUnixMs ?? 0) - (a.endTimeUnixMs ?? 0) ||
+      b.startTimeUnixMs - a.startTimeUnixMs
+    )[0];
+  if (!selected) return { found: false };
+  const exitCode = selected.attributes[NetScriptJobAttributes.JOB_EXIT_CODE];
+  const outcome = selected.attributes[OUTCOME];
+  return {
+    found: true,
+    jobName: attributeString(selected, NetScriptJobAttributes.JOB_NAME) ?? selected.name,
+    jobId: attributeString(selected, NetScriptJobAttributes.JOB_ID),
+    status: attributeString(selected, NetScriptJobAttributes.JOB_STATUS) ?? spanStatus(selected),
+    ...(typeof outcome === 'string' ? { outcome } : {}),
+    ...(typeof exitCode === 'number' ? { exitCode } : {}),
+    startUnixMs: selected.startTimeUnixMs,
+    completedUnixMs: selected.endTimeUnixMs,
+    durationMs: duration(selected),
+    ...(selected.statusMessage ? { errorMessage: selected.statusMessage } : {}),
+    traceId: selected.traceId,
+  };
+}
+
+/** Aggregate completed service spans using interpolation-free nearest-rank percentiles. */
+export function aggregateServicePerformance(
+  spans: readonly TelemetrySpan[],
+  options: {
+    readonly service: string;
+    readonly sinceUnixMs: number;
+    readonly nowUnixMs: number;
+    readonly limit?: number;
+  },
+): ServicePerformanceSummary {
+  const selected = completedDurations(
+    spans.filter((span) =>
+      serviceOf(span.attributes) === options.service && span.startTimeUnixMs >= options.sinceUnixMs
+    ),
+  );
+  const values = selected.map((item) => item.durationMs);
+  const topOperations: OperationPerformanceSummary[] = [...groupDurations(selected).entries()].map(
+    ([name, durations]) => ({
+      name,
+      count: durations.length,
+      p95DurationMs: nearestRank(durations, 0.95),
+    }),
+  ).sort((a, b) =>
+    b.p95DurationMs - a.p95DurationMs || b.count - a.count || a.name.localeCompare(b.name)
+  )
+    .slice(0, boundedLimit(options.limit));
+  const errorCount = selected.filter((item) => item.span.statusCode === 2).length;
+  const windowMinutes = Math.max(1, options.nowUnixMs - options.sinceUnixMs) / 60_000;
+  return {
+    service: options.service,
+    sinceUnixMs: options.sinceUnixMs,
+    sampleCount: selected.length,
+    errorCount,
+    errorRate: selected.length ? errorCount / selected.length : 0,
+    averageDurationMs: values.length
+      ? values.reduce((sum, value) => sum + value, 0) / values.length
+      : 0,
+    p50DurationMs: nearestRank(values, 0.5),
+    p95DurationMs: nearestRank(values, 0.95),
+    throughputPerMinute: selected.length / windowMinutes,
+    topOperations,
+  };
+}
+
+/** Rank OTel `db.` semantic-convention and NetScript KV operations by total time then p95. */
+export function aggregateDbBottlenecks(
+  spans: readonly TelemetrySpan[],
+  options: { readonly sinceUnixMs: number; readonly service?: string; readonly limit?: number },
+): DbBottleneckSummary {
+  const selected = completedDurations(
+    spans.filter((span) => span.startTimeUnixMs >= options.sinceUnixMs)
+      .filter((span) => !options.service || serviceOf(span.attributes) === options.service)
+      .filter(isDbSpan),
+  );
+  const groups = new Map<string, Array<{ span: TelemetrySpan; durationMs: number }>>();
+  for (const item of selected) {
+    groups.set(dbLabel(item.span), [...(groups.get(dbLabel(item.span)) ?? []), item]);
+  }
+  const operations: DbOperationSummary[] = [...groups.entries()].map(([operation, items]) => ({
+    operation,
+    count: items.length,
+    totalDurationMs: items.reduce((sum, item) => sum + item.durationMs, 0),
+    p95DurationMs: nearestRank(items.map((item) => item.durationMs), 0.95),
+    errorCount: items.filter((item) => item.span.statusCode === 2).length,
+  })).sort((a, b) =>
+    b.totalDurationMs - a.totalDurationMs || b.p95DurationMs - a.p95DurationMs ||
+    a.operation.localeCompare(b.operation)
+  )
+    .slice(0, boundedLimit(options.limit));
+  return { sinceUnixMs: options.sinceUnixMs, sampleCount: selected.length, operations };
+}
+
+function completedDurations(
+  spans: readonly TelemetrySpan[],
+): Array<{ span: TelemetrySpan; durationMs: number }> {
+  return spans.flatMap((span) => {
+    const value = duration(span);
+    return value === undefined ? [] : [{ span, durationMs: value }];
+  });
+}
+function groupDurations(
+  items: readonly { span: TelemetrySpan; durationMs: number }[],
+): Map<string, number[]> {
+  const groups = new Map<string, number[]>();
+  for (const item of items) {
+    groups.set(item.span.name, [...(groups.get(item.span.name) ?? []), item.durationMs]);
+  }
+  return groups;
+}
+function nearestRank(values: readonly number[], percentile: number): number {
+  if (!values.length) return 0;
+  const sortedValues = [...values].sort((a, b) => a - b);
+  return sortedValues[Math.max(0, Math.ceil(percentile * sortedValues.length) - 1)] ?? 0;
+}
+function isDbSpan(span: TelemetrySpan): boolean {
+  return Object.keys(span.attributes).some((key) =>
+    key.startsWith('netscript.kv.') || key.startsWith(OTEL_DB_ATTRIBUTE_PREFIX)
+  );
+}
+function dbLabel(span: TelemetrySpan): string {
+  const kv = span.attributes[KVAttributes.KV_OPERATION];
+  const dbOperation = span.attributes[DB_OPERATION];
+  const statement = span.attributes[DB_STATEMENT];
+  const raw = typeof kv === 'string'
+    ? kv
+    : typeof dbOperation === 'string'
+    ? dbOperation
+    : typeof statement === 'string'
+    ? statement
+    : span.name;
+  const normalized = raw.replace(/\s+/g, ' ').trim();
+  return normalized.length <= MAX_DB_LABEL_LENGTH
+    ? normalized
+    : `${normalized.slice(0, MAX_DB_LABEL_LENGTH - 1)}…`;
+}
+function attributeString(span: TelemetrySpan, key: string): string | undefined {
+  const value = span.attributes[key];
+  return typeof value === 'string' && value ? value : undefined;
+}
+function boundedLimit(limit: number | undefined): number {
+  return Math.min(Math.max(1, limit ?? 5), MAX_ANALYSIS_RESULTS);
 }
 function toRun(id: string, span: TelemetrySpan): RunSummary {
   const statusValue = span.attributes[NetScriptJobAttributes.JOB_STATUS];

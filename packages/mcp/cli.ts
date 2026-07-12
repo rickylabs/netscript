@@ -16,6 +16,9 @@ import { createGetAppStatusFlow } from './src/application/flows/get-app-status-f
 import { createGetRecentErrorsFlow } from './src/application/flows/get-recent-errors-flow.ts';
 import { createGetRunFlow } from './src/application/flows/get-run-flow.ts';
 import { createListRunsFlow } from './src/application/flows/list-runs-flow.ts';
+import { createGetLastJobResultFlow } from './src/application/flows/get-last-job-result-flow.ts';
+import { createAnalyzeServicePerformanceFlow } from './src/application/flows/analyze-service-performance-flow.ts';
+import { createAnalyzeDbBottlenecksFlow } from './src/application/flows/analyze-db-bottlenecks-flow.ts';
 
 /** Resolve the public documentation root from flags, environment, or the project directory. */
 export function resolveDocsRoot(
@@ -43,6 +46,9 @@ export async function runMcpStdioServer(): Promise<void> {
       list_runs: createListRunsFlow(query),
       get_run: createGetRunFlow(query),
       get_recent_errors: createGetRecentErrorsFlow(query),
+      get_last_job_result: createGetLastJobResultFlow(query),
+      analyze_service_performance: createAnalyzeServicePerformanceFlow(query),
+      analyze_db_bottlenecks: createAnalyzeDbBottlenecksFlow(query),
     },
   });
   await runNewlineStdio(server, Deno.stdin.readable, Deno.stdout.writable);
