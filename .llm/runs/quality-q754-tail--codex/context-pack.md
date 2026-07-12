@@ -6,14 +6,15 @@
 | --- | --- |
 | Run ID | `quality-q754-tail--codex` |
 | Branch | `quality/q754-tail-h` |
-| Current phase | plan-eval |
+| Current phase | implement |
 | Archetype | 1/2/4/6 by package |
 | Scope overlays | frontend for fresh-ui |
 
 ## Current State
 
 The mandated hard reset is complete at `3b3d615b`. Research and design are locked. Baseline is 16
-findings/0 allowances; the rejected pass used 6 allowances. No implementation has begun.
+findings/0 allowances; the rejected pass used 6 allowances. Independent PLAN-EVAL passed and
+implementation is unblocked.
 
 ## Completed
 
@@ -21,13 +22,12 @@ findings/0 allowances; the rejected pass used 6 allowances. No implementation ha
 
 ## In Progress
 
-- Separate opposite-family PLAN-EVAL.
+- Slice 1 telemetry typing and lexical false positives.
 
 ## Next Steps
 
-1. Obtain PLAN-EVAL PASS.
-2. Implement the four designed slices with per-slice gates and supervisor review.
-3. Run full acceptance and separate IMPL-EVAL, then force-push with lease.
+1. Implement the four designed slices with per-slice gates and supervisor review.
+2. Run full acceptance and separate IMPL-EVAL, then force-push with lease.
 
 ## Key Decisions
 
@@ -47,7 +47,7 @@ findings/0 allowances; the rejected pass used 6 allowances. No implementation ha
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Static | baseline red | scanner 16 findings |
-| Fitness | plan pending | PLAN-EVAL not yet run |
+| Fitness | plan PASS | `plan-eval.md` |
 | Runtime | N/A | typing-only plan |
 | Consumer | pending | implementation not started |
 
@@ -63,4 +63,3 @@ findings/0 allowances; the rejected pass used 6 allowances. No implementation ha
 ## Commits
 
 - No PR by owner directive; use local commit history, pushed branch, and evaluator artifacts.
-

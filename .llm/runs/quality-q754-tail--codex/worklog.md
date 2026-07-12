@@ -59,6 +59,7 @@ running the scoped wrapper and publish gates.
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-07-12 | plan | baseline | Hard reset confirmed; baseline 16 findings / 0 allowances; rejected pass 6 allowances. |
+| 2026-07-12 | plan-eval | verdict | Independent Claude session `session_01WMKgGNRNc4UG9E7bjDryF1` returned PASS. |
 
 ## Decisions
 
@@ -85,7 +86,7 @@ running the scoped wrapper and publish gates.
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Plan-Gate | NOT_RUN | pending separate Claude session | implementation blocked until PASS |
+| Plan-Gate | PASS | `plan-eval.md` | implementation unblocked |
 
 ### Runtime Gates
 
@@ -103,4 +104,3 @@ running the scoped wrapper and publish gates.
 
 - PLAN-EVAL should challenge every claimed guard and the Fresh summary public-type correction.
 - Prior attempt allowance count: 6. Final allowance count: pending; target 0.
-
