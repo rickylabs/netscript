@@ -19,7 +19,7 @@ Screens: `/plugins` (?tab=installed|available|contributions) → `/plugins/:plug
   telemetry/config/CLI/dashboard). The dashboard plugin itself appears in the list.
 - **Available tab:** installable plugins (registry cards) with an **Install write**: confirm
   shows what will be generated/wired into the project (file list, config diff, deps) + the CLI
-  (`netscript plugin install crons` — the shipped verb; naming canonicalized per #711/#712), Execute → progress → success with "what got wired" summary
+  (`netscript plugin install crons`), Execute → progress → success with "what got wired" summary
   and links. This is the Axis-3 scaffold-from-UI showcase — design the file-diff preview.
 - **Contributions tab:** flat list of every UI contribution in the app (panel/action/tool/tab/
   card), each row: kind icon, title, contributing plugin, mount target, status.
@@ -37,7 +37,7 @@ Screens: `/plugins` (?tab=installed|available|contributions) → `/plugins/:plug
 - **Config tab:** the plugin's runtime-config topics, linking into `/runtime/overrides/:key`.
 - **Create-from-template:** a first-class "New plugin…" flow (from `/plugins` header and ⌘K):
   pick archetype template → name/options typed form → generated-file tree preview + config
-  diff → confirm+CLI (`netscript plugin new --template capability my-plugin` — shipped verb; project registration pending #711) → success
+  diff → confirm+CLI (`netscript plugin new my-plugin`) → success
   state with "develop your panel" pointers.
 
 ## `/extensions` — the extension manager (Axis-6 flagship, NEW surface)
@@ -92,14 +92,16 @@ sandboxing chrome must never look like an error state.
 **Theme:** NS One tokens; light+dark; provenance chips use muted tone (never compete with
 status); reduced-motion.
 
-## CLI dependency map (epic #701 — beta.9 foundation; verbs marked pending do not exist yet)
+## CLI dependency map (epic #701 — SHIPPED in beta.9; use these exact verbs)
 
-| Surface | CLI verb | Status | Issue |
-|---|---|---|---|
-| Available-tab Install write | `plugin install` | exists (prompt strings use the shipped verb) | #711/#712 naming |
-| Plugin update w/ changelog diff | `plugin update <installed-name>` re-pin semantics | pending (today: pass-through, no installed-vs-latest fact) | #711 |
-| Create-from-template | `plugin new --template` (+ `--register`) | partial (registration pending) | #711 |
-| Extension quarantine "built for v1, host at v2" | `contract version add` (v2) | pending (ContractVersion hard-locked to v1) | #706 |
-| Contribution seam (7-member family) framework precondition | dashboard-panel contribution axis | pending | #711 item 4 / #427 |
-| Doctor per-check remediation writes | backend set / bind route / … | pending (spread) | #709/#711/#706 |
-| Scaffold-from-UI web layer ("New page/island…") | `ui:add page\|island`, `ui:list --json`, `ui:update\|remove` | pending | #707 |
+| Surface | Shipped CLI verb |
+|---|---|
+| Available-tab Install write | `netscript plugin install <kind>` |
+| Plugin update with changelog diff (re-pin semantics) | `netscript plugin update <name>` |
+| Create-from-template | `netscript plugin new <name>` (dual-tier generator) · `plugin scaffold <name>` |
+| Remove / enable / disable an extension | `netscript plugin remove\|enable\|disable <name>` |
+| Doctor tab + per-check remediation | `netscript plugin doctor` (+ the auth/contract verbs in P4) |
+| Contribution sync (contributed panels/actions registry) | `netscript plugin sync` |
+| Extension quarantine "built for contract v1, host at v2" | `netscript contract version add` |
+| Scaffold-from-UI web layer ("New page / island…") | `netscript ui:add <kind> [name]` · `ui:list` · `ui:update` · `ui:remove` |
+| Marketplace-lite discovery | `netscript marketplace` |

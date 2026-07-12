@@ -17,8 +17,8 @@ The flagship becomes a full **audit + control workspace**:
 - **Override detail `/overrides/:key`:** current value, full history of that key across
   versions, impacted-entity links, and controls: set/adjust (typed editor per value kind:
   switch, rollout slider, enum), **Clear override**, **Rollback to version…** — all
-  confirm+CLI (`netscript config override set flags.checkout-v2 --rollout 30` — verb pending
-  #708, which locks the canonical name; today no override-write CLI exists). After
+  confirm+CLI (`netscript config override set flags.checkout-v2 --rollout 30` — the shipped
+  verb; rollback/restore print `netscript config override rollback <topic> <version>`). After
   Execute, the feed, stat grid, and version chain all visibly update as one causal state (the
   demo IS the coherence).
 - **Version detail `/versions/:version`:** snapshot + diff vs previous, "Restore this
@@ -97,19 +97,20 @@ editing (typed domain controls only).
 
 **Theme:** NS One tokens; light+dark; `STATUS_VARIANT`; mono ids/versions; reduced-motion.
 
-## CLI dependency map (epic #701 — beta.9 foundation; verbs marked pending do not exist yet)
+## CLI dependency map (epic #701 — SHIPPED in beta.9; use these exact verbs)
 
-| Write/read surface | CLI verb | Status | Issue |
-|---|---|---|---|
-| Override set / adjust / clear (S3 flagship confirms) | runtime override set (canonical name locked in the issue) | pending — today the prototype prints a command with zero writers | #708 |
-| Rollback to version / restore version | `config runtime rollback` | pending | #708 |
-| Config topology provenance, `Re-resolve`, node detail | `config inspect` / `config get` (inspectConfig wiring) | pending | #708 |
-| Stack-map mutation, otel endpoint read, deploy targets | `generate aspire` / `service ref` / `config get telemetry.*` / `deploy list` | pending | #708 |
-| Catalog "Bind route…" | `contract add-route` + `service add-handler` | pending | #706 |
-| Procedure detail (schema/duality/coverage/provenance) | `contract inspect --json` | pending | #706 |
-| Catalog retire/decommission | `contract remove` / `service remove` | pending | #706 |
-| Migrations "Apply" | `netscript db migrate` | exists | — |
-| Home pending-migration card / datasource panels | `db list --json` | pending | #711 |
-| DLQ "Reprocess selected" | `netscript queue dlq reprocess` | pending — co-req #555 (NOT epic #701; sequence with #553/#554) | #555 |
-| Auth "Revoke session" / "Revoke all" | `plugin auth session list\|revoke` | pending | #709 |
-| Auth configure tabs + doctor remediation | `plugin auth backend\|provider\|secret` verbs | pending | #709 |
+| Write/read surface | Shipped CLI verb |
+|---|---|
+| Override set / clear / enable / disable (S3 flagship confirms) | `netscript config override set <path> <value>` · `override clear\|enable\|disable` |
+| Version publish + rollback (version chain, "Restore this version") | `netscript config override publish <topic> <file>` · `override rollback <topic> <version>` |
+| Override + version listing / reads | `netscript config override list` · `override get <path>` |
+| Config topology provenance, "Re-resolve", node detail | `netscript config inspect` · `config get <path>` |
+| Generated appsettings writes | `netscript config set <path> <value>` |
+| Catalog "Bind route…" | `netscript contract add-route` |
+| Procedure detail (schema / duality / coverage / provenance) | `netscript contract inspect` (+ `contract list`) |
+| Contract v2 (powers the extension quarantine story) | `netscript contract version add` |
+| Catalog retire / decommission | `netscript contract remove` |
+| Migrations apply + status | `netscript db migrate` · `db status` |
+| Auth "Revoke session" / "Revoke all for user" | `netscript plugin auth session` (inspect + revoke) |
+| Auth configure tabs (backend / provider / secrets) | `netscript plugin auth backend\|provider\|secret` |
+| DLQ "Reprocess selected" | co-req **#555** (not part of #701 — sequence with #553/#554) |
