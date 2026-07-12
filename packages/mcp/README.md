@@ -4,10 +4,12 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The Model Context Protocol server for NetScript workspaces: 13 token-bounded tools that let a
-coding agent monitor a running app, debug a correlated execution, read framework-semantic telemetry,
-run the doctor, search the public documentation, and trigger allowlisted CLI commands — over stdio,
-with no npm SDK.**
+**The Model Context Protocol server for NetScript: 13 token-bounded tools that let a coding agent
+monitor a running app, debug a correlated execution, read framework-semantic telemetry, run the
+doctor, and search the docs — all over stdio.**
+
+It also triggers allowlisted CLI commands through a default-deny policy, and carries no npm MCP SDK
+on its dependency graph.
 
 ---
 
@@ -293,13 +295,18 @@ drifts from its published contract fails locally rather than at the agent.
 
 ## 🧱 Compatibility
 
-| Runtime       | Support                                                                           |
-| ------------- | --------------------------------------------------------------------------------- |
-| Deno 2.9+     | Full — library surface and the `./cli` executable composition                     |
-| Node.js / Bun | Library surface (`.`) only; `./cli` uses `Deno.stdin`, `Deno.env`, `Deno.Command` |
+| Runtime       | Support                                                                    |
+| ------------- | -------------------------------------------------------------------------- |
+| Deno 2.9+     | Full — both the `.` library surface and the `./cli` executable composition |
+| Node.js / Bun | Not supported — both entrypoints reach for `Deno.*`                        |
 
-The MCP **host** only needs to spawn a process and speak JSON-RPC over stdio, so any MCP-capable
-client (Claude Code, VS Code, and others) can consume the server regardless of its own runtime.
+The `.` entrypoint is Deno-only, not just `./cli`: it re-exports the default adapters
+`FilesystemDocsCorpus` (`Deno.readDir`, `Deno.readTextFile`, `Deno.stat`) and `SpawnCommandExecutor`
+(`Deno.Command`), and `./cli` additionally uses `Deno.stdin` and `Deno.env`.
+
+That constrains the **server**, not the **client**. An MCP host only has to spawn a process and
+speak JSON-RPC over stdio, so any MCP-capable client — Claude Code, VS Code, and others — can
+consume this server regardless of the runtime it is written in.
 
 ---
 

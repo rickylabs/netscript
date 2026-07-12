@@ -5,9 +5,10 @@
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
 **The NetScript command surface: scaffold a workspace, then grow it — contracts, services, databases,
-plugins, Fresh UI, agent tooling, and deployment — with verbs that regenerate the Aspire host and the
-plugin registries for you. Ships as the `netscript` binary, and as an embeddable command tree you can
-mount inside your own CLI.**
+plugins, Fresh UI, deployment — with verbs that regenerate the Aspire host and the plugin registries
+for you.**
+
+Ships as the `netscript` binary, and as an embeddable command tree you can mount inside your own CLI.
 
 ---
 
