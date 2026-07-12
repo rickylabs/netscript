@@ -136,3 +136,11 @@ coverage" + #702 contract lifecycle filed in beta.9; 13-agent Opus-medium discov
 → children #703–#712 filed (9 unblocks-dashboard), matrix on #701, dashboard-cli-report.md
 delivered by resuming the dashboard session (new turn 5cafcd3c) to fold CLI dependencies into its
 design prompts + DDX issues. Next: beta.9 orchestrator launch (pending the dashboard follow-up).
+
+## THIRD HANDOFF (2026-07-12 ~04:10)
+
+Beta-9 orchestrator launched: `09e5ae68`, Fable 5 low, bypassPermissions, RC `ns-beta9-orchestrator`,
+cwd `/home/codex/repos/ns-beta9-orchestrator`. Brief leads with the HARD STOP-LINE (forbidden:
+release:publish / gh release create / merging release-cut PRs — incident-referenced) then
+milestone 11 (epic #701 children #702–#712 + hardening + docs accuracy). Prompt archived as
+beta9-launch-prompt.md.
