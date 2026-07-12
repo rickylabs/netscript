@@ -1,10 +1,12 @@
 import { assertEquals } from 'jsr:@std/assert@^1';
+import { join } from 'jsr:@std/path@^1.0.0';
 import {
   coordinateVersionBump,
   createReleasePullRequest,
   findVersionResidue,
   parseArgs,
   validateNewerVersion,
+  writeReleasePrBody,
 } from './cut.ts';
 
 Deno.test('release cut creates its PR through the injected GitHub transport', async () => {
@@ -43,6 +45,30 @@ Deno.test('release cut leaves PR creation failure non-fatal', async () => {
   });
 
   assertEquals(created, false);
+});
+
+Deno.test('release cut writes its PR body in a fresh worktree', async () => {
+  const temp = await Deno.makeTempDir({ prefix: 'netscript-release-cut-fresh-' });
+  try {
+    const version = '0.0.1-beta.9';
+    const bodyDirectory = join(temp, '.llm', 'tmp');
+    const directoryExistedBeforeWrite = await Deno.stat(bodyDirectory).then(
+      () => true,
+      (error) => {
+        if (error instanceof Deno.errors.NotFound) return false;
+        throw error;
+      },
+    );
+    assertEquals(directoryExistedBeforeWrite, false);
+
+    const bodyFile = await writeReleasePrBody(temp, version);
+
+    assertEquals(bodyFile, join(bodyDirectory, `release-cut-${version}-body.md`));
+    assertEquals((await Deno.stat(bodyDirectory)).isDirectory, true);
+    assertEquals((await Deno.readTextFile(bodyFile)).includes(`Cut NetScript ${version}.`), true);
+  } finally {
+    await Deno.remove(temp, { recursive: true });
+  }
 });
 
 Deno.test('release cut bump coordinator updates root members and lock with no residue', async () => {
