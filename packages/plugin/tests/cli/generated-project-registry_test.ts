@@ -12,6 +12,7 @@ const files: ProjectFiles = {
   resolve: (path) => `/repo/app/${path}`,
   writeTextFile: () => Promise.resolve(),
   readTextFile: () => Promise.resolve(undefined),
+  removeFile: () => Promise.resolve(false),
   listFiles: () => Promise.resolve([]),
   toImportUrl: (path) => `file:///repo/app/${path}`,
   relative: (path) => path.replace('/repo/app/', ''),

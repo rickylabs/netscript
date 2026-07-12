@@ -35,6 +35,8 @@ export interface JobInput extends WorkersResourceInput {
 export interface TaskInput extends WorkersResourceInput {
   /** Task runtime for generated task source. */
   readonly runtime: WorkersTaskRuntime;
+  /** Optional generated script entrypoint. */
+  readonly entrypoint?: string;
   /** Optional task timeout in milliseconds. */
   readonly timeoutMs?: number;
   /** Optional retry count for generated metadata. */
@@ -77,6 +79,7 @@ export function parseTaskInput(args: PluginCliArgs): TaskInput {
   return {
     id: requiredResourceId(args),
     runtime: parseTaskRuntime(stringFlag(args, 'runtime')),
+    entrypoint: stringFlag(args, 'entrypoint'),
     timeoutMs: numberFlag(args, 'timeout'),
     maxRetries: numberFlag(args, 'max-retries'),
   };

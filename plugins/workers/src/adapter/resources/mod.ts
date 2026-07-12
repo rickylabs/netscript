@@ -13,6 +13,12 @@ export { DEFAULT_JOB_INPUT, jobResource, jobScaffolder } from './job/job.ts';
 export { DEFAULT_TASK_INPUT, taskPath, taskResource, taskScaffolder } from './task/task.ts';
 export { workflowResource, workflowScaffolder } from './workflow/workflow.ts';
 export {
+  parseWorkerResourceMetadata,
+  renderWorkerResourceMetadata,
+  updateWorkerResourceMetadata,
+} from './resource-metadata.ts';
+export type { WorkerResourceMetadata } from './resource-metadata.ts';
+export {
   fileStem,
   parseJobInput,
   parseTaskInput,

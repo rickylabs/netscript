@@ -103,6 +103,11 @@ class MemoryProjectFiles implements ProjectFiles {
   }
 
   // deno-lint-ignore require-await
+  async removeFile(path: string): Promise<boolean> {
+    return this.#contents.delete(path);
+  }
+
+  // deno-lint-ignore require-await
   async listFiles(path: string, extensions: readonly string[] = []): Promise<
     readonly ProjectFileEntry[]
   > {

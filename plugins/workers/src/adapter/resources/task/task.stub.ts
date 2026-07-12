@@ -24,10 +24,10 @@ export const %%TASK_EXPORT%%: TaskDefinition<'%%TASK_ID%%'> = defineTask('%%TASK
 /** Python workers task script stub with named substitution tokens. */
 export const pythonTaskStub: StubSource<'TASK_ID'> = defineStub({
   source: `import json
+import os
 import sys
 
-payload = json.loads(sys.stdin.read() or "{}")
-print(json.dumps({"taskId": "%%TASK_ID%%", "payload": payload}))
+print(json.dumps({"taskId": "%%TASK_ID%%", "args": sys.argv[1:], "env": dict(os.environ)}))
 `,
   tokens: ['TASK_ID'] as const,
 });
@@ -37,7 +37,14 @@ export const shellTaskStub: StubSource<'TASK_ID'> = defineStub({
   source: `#!/usr/bin/env sh
 set -eu
 
-printf '%s\\n' '{"taskId":"%%TASK_ID%%"}'
+printf '{"taskId":"%%TASK_ID%%","args":['
+separator=''
+for argument in "$@"; do
+  escaped=$(printf '%s' "$argument" | sed 's/\\/\\\\/g; s/"/\\"/g')
+  printf '%s"%s"' "$separator" "$escaped"
+  separator=','
+done
+printf ']}\\n'
 `,
   tokens: ['TASK_ID'] as const,
 });
@@ -46,7 +53,7 @@ printf '%s\\n' '{"taskId":"%%TASK_ID%%"}'
 export const powershellTaskStub: StubSource<'TASK_ID'> = defineStub({
   source: `$ErrorActionPreference = "Stop"
 
-[Console]::Out.WriteLine('{"taskId":"%%TASK_ID%%"}')
+[Console]::Out.WriteLine((@{ taskId = '%%TASK_ID%%'; args = @($args) } | ConvertTo-Json -Compress))
 `,
   tokens: ['TASK_ID'] as const,
 });
