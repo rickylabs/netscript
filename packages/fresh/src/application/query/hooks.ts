@@ -19,6 +19,7 @@ import {
   useLiveSuspenseQuery as useTanStackLiveSuspenseQuery,
 } from '@tanstack/react-db';
 import type {
+  IslandInfiniteData,
   IslandInfiniteQueryOptions,
   IslandInfiniteQueryResult,
   IslandLiveQueryFactory,
@@ -30,23 +31,21 @@ import type {
   IslandQueryOptions,
   IslandQueryResult,
   IslandSuspenseQueryResult,
+  QueryKey,
 } from './query-types.ts';
 
 /** Run an island query through the shared NetScript Fresh QueryClient. */
 export function useIslandQuery<TData = unknown, TError = unknown, TSelected = TData>(
   options: IslandQueryOptions<TData, TError, TSelected>,
 ): IslandQueryResult<TSelected, TError> {
-  return useTanStackQuery(options as never) as unknown as IslandQueryResult<TSelected, TError>;
+  return useTanStackQuery<TData, TError, TSelected, QueryKey>(options);
 }
 
 /** Run a suspense island query through the shared NetScript Fresh QueryClient. */
 export function useIslandSuspenseQuery<TData = unknown, TError = unknown, TSelected = TData>(
   options: IslandQueryOptions<TData, TError, TSelected>,
 ): IslandSuspenseQueryResult<TSelected, TError> {
-  return useTanStackSuspenseQuery(options as never) as unknown as IslandSuspenseQueryResult<
-    TSelected,
-    TError
-  >;
+  return useTanStackSuspenseQuery<TData, TError, TSelected, QueryKey>(options);
 }
 
 /** Run an island infinite query through the shared NetScript Fresh QueryClient. */
@@ -56,11 +55,14 @@ export function useIslandInfiniteQuery<
   TPageParam = unknown,
 >(
   options: IslandInfiniteQueryOptions<TData, TError, TPageParam>,
-): IslandInfiniteQueryResult<TData, TError> {
-  return useTanStackInfiniteQuery(options as never) as unknown as IslandInfiniteQueryResult<
+): IslandInfiniteQueryResult<TData, TError, TPageParam> {
+  return useTanStackInfiniteQuery<
     TData,
-    TError
-  >;
+    TError,
+    IslandInfiniteData<TData, TPageParam>,
+    QueryKey,
+    TPageParam
+  >(options);
 }
 
 /** Run a suspense island infinite query through the shared NetScript Fresh QueryClient. */
@@ -70,11 +72,14 @@ export function useIslandSuspenseInfiniteQuery<
   TPageParam = unknown,
 >(
   options: IslandInfiniteQueryOptions<TData, TError, TPageParam>,
-): IslandInfiniteQueryResult<TData, TError> {
-  return useTanStackSuspenseInfiniteQuery(options as never) as unknown as IslandInfiniteQueryResult<
+): IslandInfiniteQueryResult<TData, TError, TPageParam> {
+  return useTanStackSuspenseInfiniteQuery<
     TData,
-    TError
-  >;
+    TError,
+    IslandInfiniteData<TData, TPageParam>,
+    QueryKey,
+    TPageParam
+  >(options);
 }
 
 /** Run an island mutation through the shared NetScript Fresh QueryClient. */
@@ -86,12 +91,12 @@ export function useIslandMutation<
 >(
   options: IslandMutationOptions<TData, TError, TVariables, TContext>,
 ): IslandMutationResult<TData, TError, TVariables, TContext> {
-  return useTanStackMutation(options as never) as unknown as IslandMutationResult<
-    TData,
-    TError,
-    TVariables,
-    TContext
-  >;
+  const { mutationFn, ...upstreamOptions } = options;
+
+  return useTanStackMutation<TData, TError, TVariables, TContext>({
+    ...upstreamOptions,
+    mutationFn: async (variables) => await mutationFn(variables),
+  });
 }
 
 /** Return the active island QueryClient handle. */

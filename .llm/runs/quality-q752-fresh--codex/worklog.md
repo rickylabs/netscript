@@ -60,6 +60,7 @@ and add a focused inference/runtime case beside that feature before extending a 
 | 2026-07-12 | plan-gate | PLAN-EVAL | Separate Claude Opus/high session `7197d457-c50d-48fe-ad43-b84ade676b0e` returned PASS. |
 | 2026-07-12 | slice 1 | route/builders | Unified compatibility aliases with implementation types, propagated route factory generics, explicitly built link props, and narrowed complete route references. Scoped check passed; route/builder tests passed in the 197-test package run. Reconcile: no GitHub mutation per owner directive. |
 | 2026-07-12 | slice 2 | form/Zod | Used a mutable string-keyed internal error map and Zod class/property guards (`unwrap`, `_zod.def.items`) instead of mapped writes and double assertions. Form/schema tests passed in the 197-test package run. Reconcile: no GitHub mutation per owner directive. |
+| 2026-07-12 | slice 3 | query | Bound all five hooks to upstream generic parameters, modeled infinite `{ pages, pageParams }` data, required upstream pagination callbacks, and adapted synchronous mutations to the async upstream function. Query tests passed in the 197-test package run. Reconcile: no GitHub mutation per owner directive. |
 
 ## Decisions
 
