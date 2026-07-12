@@ -336,8 +336,7 @@ export class ErrorHandlingPlugin {
   /**
    * Initialize the plugin by adding interceptors to the handler options.
    */
-  // deno-lint-ignore no-explicit-any -- oRPC does not export the router type consumed by plugin init.
-  init(handlerOptions: GenericHandlerOptions, _router?: any): void {
+  init(handlerOptions: GenericHandlerOptions, _router?: unknown): void {
     const {
       serviceName,
       logger,
@@ -350,11 +349,8 @@ export class ErrorHandlingPlugin {
 
     // Add client interceptor for procedure-level error handling
     handlerOptions.clientInterceptors ??= [];
-    // deno-lint-ignore no-explicit-any
-    handlerOptions.clientInterceptors.push(async (options: any) => {
-      const procedurePath = Array.isArray(options.path)
-        ? options.path.join('.')
-        : String(options.path);
+    handlerOptions.clientInterceptors.push(async (options) => {
+      const procedurePath = options.path.join('.');
 
       try {
         return await options.next();

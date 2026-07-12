@@ -15,6 +15,7 @@ import type { StandardLinkClientInterceptorOptions } from '@orpc/client/standard
 import {
   type AnyContractRouter as ORPCAnyContractRouter,
   inferRPCMethodFromContractRouter,
+  isContractProcedure,
 } from '@orpc/contract';
 import { SpanNames } from '@netscript/telemetry/attributes';
 import { contextWithSpan, injectContext } from '@netscript/telemetry/context';
@@ -26,6 +27,21 @@ import type { ContractLike, ServiceClientContext } from '../ports/service-client
 type HttpRuntimeClientContext = ServiceClientContext & ClientRetryPluginContext;
 
 const RPC_CLIENT_TRACER = '@netscript/sdk';
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object';
+}
+
+function isOrpcContractRouter(value: unknown): value is ORPCAnyContractRouter {
+  if (isContractProcedure(value)) {
+    return true;
+  }
+  if (!isRecord(value) || Array.isArray(value) || '~orpc' in value) {
+    return false;
+  }
+  const children = Object.values(value);
+  return children.length > 0 && children.every(isOrpcContractRouter);
+}
 
 /** Options for the HTTP service-client link adapter. */
 export interface HttpClientLinkOptions<TContract extends ContractLike> {
@@ -58,6 +74,10 @@ export function createHttpClientLink({
   propagateTraceContext,
   getTraceHeaders,
 }: HttpClientLinkOptions<ContractLike>): ClientLinkPort<ServiceClientContext> {
+  if (!isOrpcContractRouter(contract)) {
+    throw new TypeError('Service client contracts must contain oRPC contract procedures');
+  }
+
   const link: unknown = new RPCLink<HttpRuntimeClientContext>({
     // Resolve lazily so browser clients can rely on SSR-injected discovery
     // data instead of touching Deno APIs at import time.
@@ -65,7 +85,7 @@ export function createHttpClientLink({
       const baseUrl = getServiceUrl(serviceName, protocol);
       return `${baseUrl}${apiPath}/${apiVersion}/${pathSegment}`;
     },
-    method: inferRPCMethodFromContractRouter(contract as unknown as ORPCAnyContractRouter),
+    method: inferRPCMethodFromContractRouter(contract),
     headers: (options: ClientOptions<HttpRuntimeClientContext>) => {
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',

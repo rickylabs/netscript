@@ -1,7 +1,8 @@
-import { assert, assertEquals, assertRejects } from '@std/assert';
+import { assert, assertEquals, assertRejects, assertThrows } from '@std/assert';
 import { os } from '@orpc/server';
 import { createService } from '../../../service/mod.ts';
 import { createServiceClient } from '../../src/client/service-client.ts';
+import { createHttpClientLink } from '../../src/client/http-client-link.ts';
 import { createServerServiceEnvKey } from '../../src/discovery/service-url.ts';
 
 const SERVICE_NAME = 'sdk-live';
@@ -36,6 +37,29 @@ function createRuntimeRouter() {
     ),
   };
 }
+
+function createLink(contract: Parameters<typeof createHttpClientLink>[0]['contract']) {
+  return createHttpClientLink({
+    apiPath: '/api/rpc',
+    apiVersion: 'v1',
+    contract,
+    getTraceHeaders: () => ({}),
+    pathSegment: SERVICE_NAME,
+    propagateTraceContext: false,
+    protocol: 'http',
+    serviceName: SERVICE_NAME,
+  });
+}
+
+Deno.test('createHttpClientLink accepts real oRPC routers and rejects structural impostors', () => {
+  assert(createLink(createRuntimeRouter()));
+
+  assertThrows(
+    () => createLink({ '~orpc': {} }),
+    TypeError,
+    'Service client contracts must contain oRPC contract procedures',
+  );
+});
 
 Deno.test('createServiceClient round-trips through live service discovery', async () => {
   const router = createRuntimeRouter();

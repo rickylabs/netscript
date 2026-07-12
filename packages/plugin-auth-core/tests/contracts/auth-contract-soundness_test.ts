@@ -1,4 +1,4 @@
-import { assertEquals } from '@std/assert';
+import { assert, assertEquals } from '@std/assert';
 import type {
   AuthSessionResponse,
   SessionResponse,
@@ -87,4 +87,15 @@ Deno.test('auth contract exposes a precise, non-loosened type surface', () => {
   assertEquals(_validState, AUTH_SESSION_STATES.active);
   assertEquals(_badState as unknown, 'pending');
   assertEquals(_badSessionResponse.authenticated as unknown, 'maybe');
+});
+
+Deno.test('auth contract carries validated Standard Schema base error data', () => {
+  const errorMap = authContractV1.signin['~orpc'].errorMap;
+
+  for (const code of ['NOT_FOUND', 'VALIDATION_ERROR', 'INTERNAL'] as const) {
+    const definition = errorMap[code];
+    assert(definition?.data, `${code} must carry a data schema`);
+    assertEquals(definition.data['~standard'].version, 1);
+    assertEquals(typeof definition.data['~standard'].validate, 'function');
+  }
 });
