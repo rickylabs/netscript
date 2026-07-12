@@ -9,3 +9,13 @@
 - **Severity:** minor
 - **Action:** fix
 - **Evidence:** `research.md` findings 1–3.
+
+## 2026-07-12 — App-server effort override is ineffective or misobserved
+
+- **What:** The run requested effort `max`, but the app-server launch record observed `low` and reported a route mismatch.
+- **Source:** owner steering plus `codex-thread-ids.md` requested/observed identity.
+- **Expected:** App-server initialization applies and reports the explicitly requested effort.
+- **Actual:** Requested `max`; observed `low`.
+- **Severity:** significant
+- **Action:** fix
+- **Evidence:** S1 adds explicit initialization propagation and a v0.144 observation fixture.

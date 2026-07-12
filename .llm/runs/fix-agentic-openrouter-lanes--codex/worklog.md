@@ -58,10 +58,12 @@ Add or modify model strings/endpoints only in `config/`; declare a preset and ca
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-07-12 | bootstrap | research/plan | Re-baselined against `ec61dc78`; implementation blocked pending PLAN-EVAL PASS. |
+| 2026-07-12 | plan-gate | PLAN-EVAL | Separate Claude Opus 4.8 session returned PASS. F-2/F-4 manual evidence and F-6..F-9 internal-tooling N/A entries are required in the final ledger. |
+| 2026-07-12 | S1 | added acceptance | Owner-provided launch record proves requested `max` was observed as `low`; effort propagation and truthful observation added to S1. |
 
 ## Gate Results
 
-Not run; Plan-Gate pending.
+PLAN-EVAL: PASS (`plan-eval.md`). Implementation gates not yet run.
 
 ## Handoff Notes
 

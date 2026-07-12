@@ -5,8 +5,8 @@
 - **Branch:** `fix/agentic-openrouter-lanes` (NO upstream by design).
 - **Push rule:** explicit refspec only — `git push origin HEAD:refs/heads/fix/agentic-openrouter-lanes`.
 - **Requested route:** provider=openai · model=gpt-5.6-sol · effort=max
-- **Observed route:** provider=pending · model=gpt-5.6-sol · effort=pending
-- **Route verdict:** pending
+- **Observed route:** provider=openai · model=gpt-5.6-sol · effort=low
+- **Route verdict:** mismatch (effort)
 - **Runtime:** approval=never · sandbox=dangerFullAccess
 - **Brief (staged):** `/home/codex/fix-agentic-lanes-brief.md`
 ## Steering (same thread — never a second send-message-v2 at this worktree)
