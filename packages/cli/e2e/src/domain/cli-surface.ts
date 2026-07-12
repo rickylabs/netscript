@@ -46,6 +46,7 @@ export const GATE = {
   PREFLIGHT_ASPIRE: 'preflight.aspire',
   SCAFFOLD_INIT: 'scaffold.init',
   SERVICE_LIST: 'service.list',
+  CONTRACT_ADD: 'contract.add',
   CONTRACT_LIST: 'contract.list',
   SCAFFOLD_PLUGIN_LIST: 'scaffold.plugin-list',
   SCAFFOLD_PLUGIN_AI_MCP: 'scaffold.plugin.ai.mcp',

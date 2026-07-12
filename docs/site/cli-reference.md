@@ -119,6 +119,29 @@ The defaults scaffold a Fresh + Aspire workspace with a <code>redis</code> cache
 unless you pass <code>--db</code>. Run <code>netscript --version</code> to print the installed CLI version.
 {{ /comp }}
 
+## Contracts
+
+Contracts live in explicit version folders and are aggregated for typed service and client
+consumers. The lifecycle surface in this release creates and discovers v1 contract modules; evolve
+breaking shapes in a parallel version rather than overwriting a contract that existing consumers
+still use.
+
+{{ comp.apiTable({
+  caption: "Contract workspace commands",
+  rows: [
+    { name: "netscript contract add", type: "netscript contract add catalog-items", desc: "Create <code>contracts/versions/v1/catalog-items.contract.ts</code> from the NetScript oRPC contract template and regenerate the v1 aggregate exports. Run it from the workspace root, or pass <code>--path &lt;workspace&gt;</code>. Existing contract files are preserved unless you pass <code>--force</code>." },
+    { name: "contract add --version", type: "netscript contract add catalog-items --version v1", desc: "Select the target contract version. This release supports <code>v1</code>; parallel-version evolution is tracked separately and is not implied by <code>--force</code>." },
+    { name: "netscript contract list", type: "netscript contract list", desc: "List v1 contract modules and show whether each has a matching service workspace. Pass <code>--path &lt;workspace&gt;</code> when invoking it from outside the project." }
+  ]
+}) }}
+
+{{ comp callout { type: "note", title: "Contract add creates the typed starting point" } }}
+<code>contract add</code> replaces the manual step of creating and exporting an initial versioned
+contract file. Add your domain-specific procedures to that generated module. Route-level mutation,
+handler generation, detailed JSON inspection, removal, and v2 promotion belong to the follow-up
+contract-evolution surface.
+{{ /comp }}
+
 ## Plugins
 
 Plugins add capabilities — background workers, durable sagas, webhook triggers, durable

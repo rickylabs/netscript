@@ -74,6 +74,20 @@ export function createScaffoldGates(state: PluginSuiteState): readonly GateDefin
       (context) => cli(context, 'service', 'list', '--project-root', context.project.projectRoot),
     ),
     commandGate(
+      GATE.CONTRACT_ADD,
+      'Add a generated contract',
+      GATE_PHASE.SCAFFOLD,
+      (context) =>
+        cli(
+          context,
+          'contract',
+          'add',
+          'catalog-items',
+          '--path',
+          context.project.projectRoot,
+        ),
+    ),
+    commandGate(
       GATE.CONTRACT_LIST,
       'List generated contracts',
       GATE_PHASE.SCAFFOLD,
