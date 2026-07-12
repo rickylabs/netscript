@@ -19,7 +19,9 @@ endpoints live in `config/versions.ts` and `config/endpoints.ts`. See the "Maint
 | Small fixes / fast iteration | Codex · OpenAI · GPT-5.6 Luna · max |
 | Deep technical analysis, research, complex integration | Primary: Codex · OpenAI · GPT-5.6 Sol · xhigh. Fallback: Claude · Anthropic · Fable 5 · max, only after a classified Codex `quota_exhausted` signal. |
 | Long-running planning and decision intelligence | Temporary owner override through Sunday 2026-07-12: Claude · Anthropic · Fable 5 · medium. From Monday 2026-07-13: Codex · OpenAI · GPT-5.6 Sol · max. |
-| Documentation, writing, design, review of GPT implementation, interim mobile orchestration | Claude · Anthropic · Opus 4.8 · high. Interim mobile use applies while Fable 5 is outside the Anthropic subscription. |
+| Major UI/UX work — lead route | Claude · OpenRouter · GLM 5.2 · `claude-design-glm-5-2` preset / `claude-print` · xhigh. Applies to design-system work, dashboard/console surfaces, and significant frontend UX. |
+| Major UI/UX work — adversarial minimum when another lane leads | Claude · OpenRouter · GLM 5.2 · `claude-design-glm-5-2` preset / `claude-print` · xhigh, required before merge. |
+| Documentation, writing, general design support excluding major UI/UX work, review of GPT implementation, interim mobile orchestration | Claude · Anthropic · Opus 4.8 · high. Interim mobile use applies while Fable 5 is outside the Anthropic subscription. |
 | Claude workflows | Claude · Anthropic · Opus 4.8 · low |
 | Massive external research / extraction | Antigravity CLI · Google · `agy` · low |
 | Mobile orchestration after Fable 5 returns to the subscription | Claude · Anthropic · Fable 5 · low by default. Higher effort is an exceptional, explicit paid/on-demand escalation while outside the plan; policy data never authorizes spend. |
@@ -40,6 +42,9 @@ an inferred route.
    effort through the runtime `RouteIdentity` contract and record requested versus observed identity.
 4. **No implicit paid escalation.** Outside-plan or higher-effort Fable routes remain blocked until
    explicit owner approval; policy selection itself never launches or spends.
+5. **Major UI/UX work requires GLM 5.2.** Design-system work, dashboard/console surfaces, and
+   significant frontend UX are either led through the `claude-design-glm-5-2` route or receive its
+   adversarial design pass before merge.
 
 ## Selection and handoff rules
 
