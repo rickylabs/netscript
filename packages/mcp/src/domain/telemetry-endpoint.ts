@@ -3,7 +3,9 @@ export const DEFAULT_TELEMETRY_ENDPOINT = 'http://localhost:18888';
 
 /** Ordered environment inputs accepted by telemetry endpoint discovery. */
 export interface TelemetryEndpointEnvironment {
+  /** Fully qualified endpoint configured for NetScript telemetry. */
   readonly NETSCRIPT_TELEMETRY_ENDPOINT?: string;
+  /** Aspire dashboard port used to derive a local endpoint. */
   readonly ASPIRE_DASHBOARD_PORT?: string;
 }
 

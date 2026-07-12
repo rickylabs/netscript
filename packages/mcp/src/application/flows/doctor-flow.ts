@@ -1,48 +1,57 @@
-import type { DoctorCheck, DoctorResult, DoctorStatus } from '../../domain/tool-contracts.ts';
+import type { DoctorCheck, DoctorResult } from '../../domain/tool-contracts.ts';
+import {
+  countDoctorChecks,
+  type DoctorCheckFamily,
+  type DoctorFamilyResult,
+  worstDoctorStatus,
+} from '../../domain/doctor-check-family.ts';
 import type { TelemetryProbePort } from '../../domain/telemetry-probe-port.ts';
 import type { ToolExecutionResult, ToolFlow } from '../../domain/tool-types.ts';
 import { isRecord } from '../../domain/schema.ts';
-import {
-  resolveTelemetryEndpoint,
-  type TelemetryEndpointEnvironment,
-} from '../../domain/telemetry-endpoint.ts';
+import type { TelemetryEndpointEnvironment } from '../../domain/telemetry-endpoint.ts';
+import { createTelemetryDoctorFamily } from './telemetry-doctor-family.ts';
 
 /** Create the S1 doctor flow for telemetry reachability. */
 export function createDoctorFlow(
   probe: TelemetryProbePort,
   environment: TelemetryEndpointEnvironment = {},
+  families: readonly DoctorCheckFamily[] = [],
+  projectRoot = '.',
 ): ToolFlow {
   return async (input: unknown): Promise<ToolExecutionResult> => {
     const explicit = isRecord(input) && typeof input.endpoint === 'string'
       ? input.endpoint
       : undefined;
-    const resolved = resolveTelemetryEndpoint(explicit, environment);
-    let endpoint = resolved.endpoint;
-    let result = await probe.probe(endpoint);
-    if (!result.reachable && resolved.httpsFallback) {
-      const fallback = await probe.probe(resolved.httpsFallback);
-      if (fallback.reachable) {
-        endpoint = resolved.httpsFallback;
-        result = fallback;
+    const telemetry = createTelemetryDoctorFamily(probe, explicit, environment);
+    const context = { projectRoot, explicitTelemetryEndpoint: explicit !== undefined };
+    const results: DoctorFamilyResult[] = [];
+    for (const family of [telemetry, ...families]) {
+      let checks: readonly DoctorCheck[];
+      try {
+        checks = await family.check(context);
+      } catch (error) {
+        checks = [{
+          name: `${family.name}_family`,
+          status: 'fail',
+          summary: error instanceof Error ? error.message : String(error),
+          fix: `Resolve the ${family.name} diagnostic failure and run doctor again.`,
+        }];
       }
+      results.push({
+        name: family.name,
+        status: worstDoctorStatus(checks),
+        counts: countDoctorChecks(checks),
+        checks,
+      });
     }
-    const status: DoctorStatus = result.reachable ? 'pass' : 'warn';
-    const check: DoctorCheck = {
-      name: 'telemetry_endpoint',
-      status,
-      summary: `${result.message} Resolved from ${resolved.source}; using ${
-        new URL(endpoint).protocol
-      }`,
-      ...(result.reachable ? {} : {
-        fix:
-          `Start the telemetry dashboard or set NETSCRIPT_TELEMETRY_ENDPOINT to a reachable URL.`,
-      }),
-    };
+    const checks = results.flatMap((family) => family.checks);
+    const status = worstDoctorStatus(checks);
     const value: DoctorResult = {
       status,
-      endpoint,
-      counts: { pass: status === 'pass' ? 1 : 0, warn: status === 'warn' ? 1 : 0, fail: 0 },
-      checks: [check],
+      endpoint: telemetry.endpoint,
+      counts: countDoctorChecks(checks),
+      checks,
+      families: results,
     };
     return { ok: true, value };
   };

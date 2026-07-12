@@ -19,6 +19,13 @@ import { createListRunsFlow } from './src/application/flows/list-runs-flow.ts';
 import { createGetLastJobResultFlow } from './src/application/flows/get-last-job-result-flow.ts';
 import { createAnalyzeServicePerformanceFlow } from './src/application/flows/analyze-service-performance-flow.ts';
 import { createAnalyzeDbBottlenecksFlow } from './src/application/flows/analyze-db-bottlenecks-flow.ts';
+import { AspireDoctorFamily } from './src/infrastructure/aspire-doctor-family.ts';
+import {
+  PluginDoctorFamily,
+  UnwiredProjectDoctor,
+} from './src/infrastructure/plugin-doctor-family.ts';
+import { ProjectWiringDoctorFamily } from './src/infrastructure/project-wiring-doctor-family.ts';
+import { createDoctorFlow } from './src/application/flows/doctor-flow.ts';
 
 /** Resolve the public documentation root from flags, environment, or the project directory. */
 export function resolveDocsRoot(
@@ -37,8 +44,9 @@ export async function runMcpStdioServer(): Promise<void> {
   const environment = readTelemetryEndpointEnvironment();
   const query = createResolvedTelemetryQuery(undefined, environment);
   const docsCorpus = new FilesystemDocsCorpus({ root: resolveDocsRoot() });
+  const probe = new FetchTelemetryProbe();
   const server = createMcpServer({
-    probe: new FetchTelemetryProbe(),
+    probe,
     environment,
     flows: {
       ...createDocsFlows(docsCorpus),
@@ -49,6 +57,11 @@ export async function runMcpStdioServer(): Promise<void> {
       get_last_job_result: createGetLastJobResultFlow(query),
       analyze_service_performance: createAnalyzeServicePerformanceFlow(query),
       analyze_db_bottlenecks: createAnalyzeDbBottlenecksFlow(query),
+      doctor: createDoctorFlow(probe, environment, [
+        new AspireDoctorFamily(),
+        new ProjectWiringDoctorFamily(),
+        new PluginDoctorFamily(new UnwiredProjectDoctor()),
+      ], Deno.cwd()),
     },
   });
   await runNewlineStdio(server, Deno.stdin.readable, Deno.stdout.writable);

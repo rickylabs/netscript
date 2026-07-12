@@ -36,6 +36,8 @@ export interface DoctorResult {
   /** Endpoint label that was probed. */ readonly endpoint: string;
   /** Counts grouped by severity. */ readonly counts: DoctorCounts;
   /** Bounded diagnostic checks. */ readonly checks: readonly DoctorCheck[];
+  /** Checks grouped by diagnostic family. */ readonly families:
+    readonly import('./doctor-check-family.ts').DoctorFamilyResult[];
 }
 
 const inputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
@@ -147,7 +149,8 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
     endpoint: stringProperty,
     counts: { type: 'object' },
     checks: { type: 'array', maxItems: 20 },
-  }, ['status', 'endpoint', 'counts', 'checks']),
+    families: { type: 'array', maxItems: 4 },
+  }, ['status', 'endpoint', 'counts', 'checks', 'families']),
   search_docs: objectSchema({
     count: { type: 'integer' },
     matches: {

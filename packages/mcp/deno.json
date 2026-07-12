@@ -8,6 +8,7 @@
     "./cli": "./cli.ts"
   },
   "imports": {
+    "@netscript/aspire": "jsr:@netscript/aspire@0.0.1-beta.8",
     "@netscript/telemetry/attributes": "jsr:@netscript/telemetry@0.0.1-beta.8/attributes",
     "@netscript/telemetry/query": "jsr:@netscript/telemetry@0.0.1-beta.8/query",
     "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
