@@ -6,16 +6,22 @@ Deno.test('scanner reports every guarded quality rule and honors reasoned line a
   const root = await Deno.makeTempDir();
   const host = join(root, 'packages/cli/src/public/features/plugins/host.ts');
   await Deno.mkdir(join(root, 'packages/cli/src/public/features/plugins'), { recursive: true });
-  await Deno.writeTextFile(host, [
-    '// deno-lint-ignore no-explicit-any',
-    'type Value = Map<any, string>;',
-    'const cast = value as unknown as Value;',
-    "if (plugin.name === 'auth') return;",
-    'const allowed: any = value; // quality-allow: upstream untyped boundary',
-  ].join('\n'));
+  await Deno.writeTextFile(
+    host,
+    [
+      '// deno-lint-ignore no-explicit-any',
+      'type Value = Map<any, string>;',
+      'const cast = value as unknown as Value;',
+      "if (plugin.name === 'auth') return;",
+      'const allowed: any = value; // quality-allow: upstream untyped boundary',
+    ].join('\n'),
+  );
   const findings = await scanCodeQuality(['packages/cli/src'], root);
   assertEquals(findings.map((finding) => finding.rule), [
-    'explicit-any-ignore', 'explicit-any', 'unsafe-cast', 'plugin-name-check',
+    'explicit-any-ignore',
+    'explicit-any',
+    'unsafe-cast',
+    'plugin-name-check',
   ]);
 });
 
@@ -24,4 +30,39 @@ Deno.test('scanner accepts exact changed files and ignores tests and generated s
   await Deno.writeTextFile(join(root, 'clean.ts'), 'export const value: string = "ok";\n');
   await Deno.writeTextFile(join(root, 'ignored_test.ts'), 'const value: any = 1;\n');
   assertEquals(await scanCodeQuality(['clean.ts', 'ignored_test.ts'], root), []);
+});
+
+Deno.test('scanner catches evasion attempts: file-wide ignore, spaced casts, predicate name checks', async () => {
+  const root = await Deno.makeTempDir();
+  const dir = join(root, 'packages/cli/src/public/features/plugins');
+  await Deno.mkdir(dir, { recursive: true });
+  await Deno.writeTextFile(
+    join(dir, 'evade.ts'),
+    [
+      '// deno-lint-ignore-file no-explicit-any',
+      'const a = value as   unknown   as Value;',
+      "if (plugin.name.startsWith('auth')) return;",
+      "if (kind.includes('ai')) enableMcp();",
+      "const b = plugin.slug.endsWith('workers');",
+    ].join('\n'),
+  );
+  const findings = await scanCodeQuality(['packages/cli/src'], root);
+  const rules = findings.map((f) => f.rule);
+  assertEquals(rules.includes('explicit-any-ignore'), true); // file-wide ignore
+  assertEquals(rules.includes('unsafe-cast'), true); // irregular whitespace
+  assertEquals(rules.filter((r) => r === 'plugin-name-check').length, 3); // startsWith/includes/endsWith
+});
+
+Deno.test('capability id containing a plugin name is NOT a false positive', async () => {
+  const root = await Deno.makeTempDir();
+  const dir = join(root, 'packages/cli/src/public/features/plugins');
+  await Deno.mkdir(dir, { recursive: true });
+  await Deno.writeTextFile(
+    join(dir, 'ok.ts'),
+    [
+      "if (plugin.cli?.doctorChecks?.includes('auth-backend')) return check();",
+      "const cap = 'ai-tools';",
+    ].join('\n'),
+  );
+  assertEquals(await scanCodeQuality(['packages/cli/src'], root), []);
 });

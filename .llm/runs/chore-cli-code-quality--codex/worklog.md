@@ -70,3 +70,32 @@ pre-existing warnings but exits 0. No
 
 Separate-session IMPL-EVAL returned **PASS** at `58861a84` after independently rerunning the scanner,
 scanner tests, exact CI documentation sequence, diff/lock checks, and reviewing both typed seams.
+
+## Adversarial hardening pass (orchestrator-applied; delegation launcher aborted 4×)
+
+The GPT-5.6 Sol-low adversarial delegation could not be launched (repeated app-server
+launcher-abort + multi-agent-subagent restriction). The hardening is all tooling/harness (in the
+orchestrator lane, no packages/plugins framework source), so it was applied directly; the OpenHands
+IMPL-EVAL provides the independent open-model adversarial check on the whole PR.
+
+Attacks probed → outcome:
+1. Agentic-run enforcement was PROSE-ONLY → added `deno task quality:gate` (quality:scan +
+   arch:check); referenced as the REQUIRED framework-wave gate in tooling.md + netscript-tools
+   skill (mirror regenerated, sync check OK). An agent running the standard gate now hits the scanner.
+2. `deno-lint-ignore-file no-explicit-any` (file-wide) → CAUGHT (regex already `(?:-file)?`); test added.
+3. `as   unknown   as` irregular whitespace → CAUGHT (`\s+`); test added.
+4. Predicate name checks `.startsWith('auth')`/`.includes('ai')`/`.endsWith('workers')` in
+   features/plugins → previously BYPASSED equality-only rule; tightened `ruleFor` to also match
+   string predicates on a complete quoted plugin name; 3-hit test added.
+5. False-positive guard: `'auth-backend'` capability id must NOT match the `auth` plugin name →
+   verified (closing-quote required); test added.
+6. `quality-allow` abuse → added `allowCount` + full `allowances` (file/line/reason) to the JSON
+   summary and a `--max-allow <n>` ceiling; an allowance on a clean line is not counted. Current
+   CLI/plugin surface: 19 reasoned allowances (invariant durable-stream generics, Prisma-extension
+   type erasure, facade re-export bridging) — all specific and auditable, bounded via --max-allow 25.
+7. CI coverage: PR job scans changed files (blocking); added push-to-main + weekly schedule
+   `code-quality-repo` job running quality:scan:repo (observational until #746 baseline epic closes,
+   then flip continue-on-error:false). PR gate is NOT continue-on-error (hard-blocking).
+
+Final: scanner tests 4/4; quality:gate green (0 findings, allowCount 19 ≤ 25); scanner scoped check
+0; fmt clean; mirror sync OK.
