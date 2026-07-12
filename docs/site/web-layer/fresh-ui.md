@@ -231,6 +231,16 @@ You manage that library with two CLI commands (run from the workspace root):
   ]
 }) }}
 
+{{ comp callout { type: "note", title: "DataGrid is a runtime export, not a ui:add block" } }}
+The generic <code>DataGrid</code> component — a typed <code>columns</code>/<code>rows</code> contract
+with <code>strong</code>/<code>num</code> cell variants and plain, button, or Fresh-navigation rows —
+is exported from the <code>@netscript/fresh-ui</code> package root, so you <strong>import it
+directly</strong> rather than <code>ui:add</code>-ing it. It is the runtime successor to the
+copy-source <code>data-table</code> block; both still ship, so reach for <code>DataGrid</code> when
+you want a templated grid you do not have to own and copy in. See the
+<a href="/reference/fresh-ui/">reference</a> for its full API.
+{{ /comp }}
+
 {{ comp callout { type: "warning", title: "Copy-source ownership tradeoff" } }}
 Because <code>ui:add</code> copies code into your repo, you own it: customize freely, but you do
 <strong>not</strong> get automatic upstream updates. Re-running <code>ui:add … --force</code>
