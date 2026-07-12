@@ -3,7 +3,7 @@ import { createToolRegistry } from '../tool-registry.ts';
 import type { TelemetryProbePort } from '../../domain/telemetry-probe-port.ts';
 import { validateSchema } from '../../domain/schema.ts';
 import type { ToolDefinition, ToolFlow, ToolName } from '../../domain/tool-types.ts';
-import { type JsonRpcResponse, parseJsonRpcRequest } from '../../presentation/json-rpc.ts';
+import { type JsonRpcResponse, parseJsonRpcRequest } from '../../domain/json-rpc.ts';
 import { DEFAULT_TRUNCATION_POLICY, truncateResult, type TruncationPolicy } from './truncation.ts';
 
 /** Current stable MCP protocol revision implemented by the runner. */

@@ -1,4 +1,4 @@
-import { isRecord } from '../domain/schema.ts';
+import { isRecord } from './schema.ts';
 
 /** JSON-RPC request accepted by the S1 runner. */
 export interface JsonRpcRequest {
