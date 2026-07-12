@@ -54,7 +54,12 @@ const inputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
     sinceUnixMs: { type: 'number' },
     limit: limitProperty,
   }),
-  get_last_job_result: objectSchema({ jobId: stringProperty, service: stringProperty }, ['jobId']),
+  get_last_job_result: objectSchema({
+    jobId: stringProperty,
+    jobName: stringProperty,
+    service: stringProperty,
+    sinceUnixMs: { type: 'number' },
+  }),
   analyze_service_performance: objectSchema({
     service: stringProperty,
     sinceUnixMs: { type: 'number' },
@@ -96,10 +101,17 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
     count: { type: 'integer' },
     groups: { type: 'array', maxItems: 20 },
   }, ['count', 'groups']),
-  get_last_job_result: objectSchema({ found: { type: 'boolean' }, summary: stringProperty }, [
-    'found',
-    'summary',
-  ]),
+  get_last_job_result: objectSchema({
+    found: { type: 'boolean' },
+    jobName: stringProperty,
+    jobId: stringProperty,
+    status: stringProperty,
+    outcome: stringProperty,
+    exitCode: { type: 'number' },
+    durationMs: { type: 'number' },
+    errorMessage: stringProperty,
+    traceId: stringProperty,
+  }, ['found']),
   analyze_service_performance: objectSchema({
     sampleCount: { type: 'integer' },
     summary: { type: 'object' },

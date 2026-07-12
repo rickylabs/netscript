@@ -7,6 +7,9 @@ import { createGetAppStatusFlow } from '../src/application/flows/get-app-status-
 import { createGetRecentErrorsFlow } from '../src/application/flows/get-recent-errors-flow.ts';
 import { createGetRunFlow } from '../src/application/flows/get-run-flow.ts';
 import { createListRunsFlow } from '../src/application/flows/list-runs-flow.ts';
+import { createGetLastJobResultFlow } from '../src/application/flows/get-last-job-result-flow.ts';
+import { createAnalyzeServicePerformanceFlow } from '../src/application/flows/analyze-service-performance-flow.ts';
+import { createAnalyzeDbBottlenecksFlow } from '../src/application/flows/analyze-db-bottlenecks-flow.ts';
 import { FakeTelemetryQuery, log, span } from './telemetry-fixtures.ts';
 
 const spans = [span({
@@ -40,6 +43,21 @@ Deno.test('all four telemetry flows return bounded semantic summaries', async ()
   const errors = await createGetRecentErrorsFlow(query)({ limit: 1 });
   assert(errors.ok);
   assertEquals((errors.value as { groups: unknown[] }).groups.length, 1);
+});
+
+Deno.test('trace intelligence flows apply windows and return structured empty summaries', async () => {
+  const empty = new FakeTelemetryQuery();
+  const job = await createGetLastJobResultFlow(empty, () => 1_000_000)({ jobName: 'missing' });
+  assert(job.ok);
+  assertEquals(job.value, { found: false });
+  const performance = await createAnalyzeServicePerformanceFlow(empty, () => 1_000_000)({
+    service: 'api',
+  });
+  assert(performance.ok);
+  assertEquals((performance.value as { sampleCount: number }).sampleCount, 0);
+  const db = await createAnalyzeDbBottlenecksFlow(empty, () => 1_000_000)({ sinceUnixMs: 123 });
+  assert(db.ok);
+  assertEquals(db.value, { sinceUnixMs: 123, sampleCount: 0, operations: [] });
 });
 
 Deno.test('get_run returns structured not found', async () => {

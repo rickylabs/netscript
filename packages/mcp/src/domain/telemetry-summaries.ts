@@ -61,3 +61,55 @@ export interface ErrorGroupSummary {
   readonly relatedRunIds: readonly string[];
   readonly relatedTraceIds: readonly string[];
 }
+
+/** Most recent completed job execution. */
+export interface LastJobResultSummary {
+  readonly found: boolean;
+  readonly jobName?: string;
+  readonly jobId?: string;
+  readonly status?: string;
+  readonly outcome?: string;
+  readonly exitCode?: number;
+  readonly startUnixMs?: number;
+  readonly completedUnixMs?: number;
+  readonly durationMs?: number;
+  readonly errorMessage?: string;
+  readonly traceId?: string;
+}
+
+/** Duration rollup for one service operation. */
+export interface OperationPerformanceSummary {
+  readonly name: string;
+  readonly count: number;
+  readonly p95DurationMs: number;
+}
+
+/** Compact service performance rollup. */
+export interface ServicePerformanceSummary {
+  readonly service: string;
+  readonly sinceUnixMs: number;
+  readonly sampleCount: number;
+  readonly errorCount: number;
+  readonly errorRate: number;
+  readonly averageDurationMs: number;
+  readonly p50DurationMs: number;
+  readonly p95DurationMs: number;
+  readonly throughputPerMinute: number;
+  readonly topOperations: readonly OperationPerformanceSummary[];
+}
+
+/** Ranked database or KV operation rollup. */
+export interface DbOperationSummary {
+  readonly operation: string;
+  readonly count: number;
+  readonly totalDurationMs: number;
+  readonly p95DurationMs: number;
+  readonly errorCount: number;
+}
+
+/** Compact database bottleneck analysis. */
+export interface DbBottleneckSummary {
+  readonly sinceUnixMs: number;
+  readonly sampleCount: number;
+  readonly operations: readonly DbOperationSummary[];
+}
