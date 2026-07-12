@@ -260,3 +260,11 @@ gate actually executes.
 | D2 | minor | Full workers export-map doc-lint has 18 pre-existing private-type references. The newly touched CLI entrypoint was brought to 0; unrelated baseline findings were not expanded into this slice. |
 | D3 | minor | Full sagas export-map doc-lint has 12 pre-existing private-type references. The touched CLI entrypoint is clean; unrelated runtime/contracts findings remain outside #704. |
 | D4 | significant, corrected | The first durable E2E helper used static optional-plugin imports, which broke the service-only scaffold's copied-package type-check. PR #741 CI exposed it; the helper now loads those plugins only when the full runtime gate executes, and the exact `scaffold.service` suite passes. |
+
+## Orchestrator rebase (Tier-A)
+
+- Branch conflicted with post-merge main (ProjectFiles.removeFile added on both sides; AI-chat gate
+  formatting) → CI non-trigger on PR #741. Rebased; kept the REQUIRED `removeFile` signature (all
+  in-repo implementers define it; the durable remove verbs invoke it unconditionally). Repo-wide
+  scoped check across plugin/cli/workers/sagas/ai/triggers/streams roots: 0 findings; plugin,
+  workers, sagas suites green.
