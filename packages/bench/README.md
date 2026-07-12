@@ -5,14 +5,14 @@ a coding agent builds a working NetScript service. It drives an agent through a 
 sandbox, runs a frozen black-box HTTP suite after every turn, and scores the attempt on four axes.
 
 > **Status.** This package ships the full instrument architecture, validated end-to-end by unit
-> tests with a deterministic **fake driver**. Slice 1b adds the committed **golden reference** for
-> `t1-storefront-api` and a real **conformance** gate that boots it and runs the frozen suite 10/10
-> green over HTTP. Only the live paid agent run (`bench self` without `--fake`) remains gated
+> tests with a deterministic **fake driver**. Committed golden references cover
+> `t1-storefront-api` and `t2-saga-queue-cron`; the real **conformance** gate boots both and runs
+> their frozen suites green over HTTP. Only the live paid agent run (`bench self` without `--fake`) remains gated
 > pending the cost/key/cadence decision (OQ2). `publish: false`.
 
 ## Protocol
 
-1. A **task** (`tasks/t1-storefront-api/`) provides an agent-facing `prompt.md`, per-lane
+1. A **task** (`tasks/t1-storefront-api/`, `tasks/t2-saga-queue-cron/`) provides an agent-facing `prompt.md`, per-lane
    `context/AGENTS.md` guidance, a provisional `rubric.md`, and a **frozen** `tests/frozen-suite.ts`
    the agent never sees.
 2. The runner provisions a throwaway **sandbox** in the OS temp area (never the in-tree `.llm/tmp`)
@@ -65,8 +65,8 @@ deno task cli self --fake
 # Live self-bench — pinned model, real Claude Code (gated pending OQ2).
 deno task cli self
 
-# Conformance — key-free gate: boots the golden reference, runs the frozen
-# suite 10/10 green over HTTP (with a real KV-preserving restart).
+# Conformance — key-free gate: boots each golden reference, runs both frozen
+# suites green over HTTP (with real KV-preserving restarts).
 deno task cli conformance
 ```
 
@@ -92,7 +92,7 @@ src/
   adapters/     agent (claude-code, fake), sandbox, test-runner, http, reporting
   application/  runner (turn accounting), scoring (normalizer + scorer), builders
   presentation/ cli
-tasks/          task specs + frozen suites (t1-storefront-api)
+tasks/          task specs + frozen suites (t1 storefront; t2 saga/queue/cron)
 results/        committed scored summaries
 ```
 
