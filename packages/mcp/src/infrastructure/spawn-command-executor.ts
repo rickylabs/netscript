@@ -77,7 +77,7 @@ export class SpawnCommandExecutor implements CommandExecutorPort {
     const tail = new TailCollector(Math.max(1, this.#outputTailBytes));
     const readers = Promise.all([collect(child.stdout, tail), collect(child.stderr, tail)]);
     let timedOut = false;
-    let timer: number | undefined;
+    let timer: ReturnType<typeof setTimeout> | undefined;
     const deadline = new Promise<undefined>((resolve) => {
       timer = setTimeout(() => resolve(undefined), Math.max(1, this.#timeoutMs));
     });
