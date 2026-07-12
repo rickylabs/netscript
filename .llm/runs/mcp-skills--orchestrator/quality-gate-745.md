@@ -33,6 +33,22 @@ use-case — it does not add new name branches. NOTE: the pre-existing anchors #
 not modify; the #745 PR fixes those. After I pull the PR, re-verify my injection still compiles
 against the capability-seam refactor.
 
+## Canonical patterns from the fixing PR #747 (open, status:ready-merge; base main)
+
+- Typed helper: **`CliffyCommand = Command['cmd']`** in
+  `packages/cli/src/kernel/presentation/command-types.ts` — replaces every `Command<any,…>` /
+  `AnyCliffyCommand`. Remove `as unknown as` / `as any`. Target: zero `Command<any` in
+  `packages/cli/src`.
+- Plugin capability seam: `plugin.cli.doctorChecks` capability on the manifest;
+  `install-plugin-command.ts` uses a generic `--mcp` flag (no `kind === 'ai'`). (Pre-existing
+  files, fixed by #747; my S7 injection must recompile against the new use-case signature.)
+- Gate: **`deno task quality:gate`** = `quality:scan` + `arch:check`; scanner at
+  `.llm/tools/quality/scan-code-quality.ts` (repo mode `quality:scan:repo`, PR changed-file
+  mode). Honest escape: inline `// quality-allow: <reason>` (bounded by `--max-allow`).
+- Gate is REQUIRED per-slice for `packages/**`/`plugins/**` per updated `run-loop.md` +
+  Tier-A slice-review checklist + `.github/workflows/code-quality.yml`.
+- Merge commit (once landed): `fed76a91…`.
+
 ## Compliance plan (blocks umbrella ready-for-merge)
 
 1. **Watch #745** → capture the fixing PR number; wait for it to merge to main.
