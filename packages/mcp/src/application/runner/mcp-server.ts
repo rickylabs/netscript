@@ -57,7 +57,7 @@ export function createMcpServer(options: McpServerOptions): McpServer {
         return rpcResult(request.id, {
           protocolVersion: MCP_PROTOCOL_VERSION,
           capabilities: { tools: {} },
-          serverInfo: { name: '@netscript/mcp', version: '0.0.1-beta.8' },
+          serverInfo: { name: '@netscript/mcp', version: '0.0.1-beta.9' },
         });
       }
       if (request.method === 'tools/list') {
