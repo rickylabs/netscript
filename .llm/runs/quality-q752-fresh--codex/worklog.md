@@ -61,6 +61,7 @@ and add a focused inference/runtime case beside that feature before extending a 
 | 2026-07-12 | slice 1 | route/builders | Unified compatibility aliases with implementation types, propagated route factory generics, explicitly built link props, and narrowed complete route references. Scoped check passed; route/builder tests passed in the 197-test package run. Reconcile: no GitHub mutation per owner directive. |
 | 2026-07-12 | slice 2 | form/Zod | Used a mutable string-keyed internal error map and Zod class/property guards (`unwrap`, `_zod.def.items`) instead of mapped writes and double assertions. Form/schema tests passed in the 197-test package run. Reconcile: no GitHub mutation per owner directive. |
 | 2026-07-12 | slice 3 | query | Bound all five hooks to upstream generic parameters, modeled infinite `{ pages, pageParams }` data, required upstream pagination callbacks, and adapted synchronous mutations to the async upstream function. Query tests passed in the 197-test package run. Reconcile: no GitHub mutation per owner directive. |
+| 2026-07-12 | slice 4 | streams/final gates | Narrowed the package-owned loose StreamDB schema at the upstream boundary with a structural guard, then passed the generated `StateSchema<StreamStateDefinition>` directly to `createStreamDB`. Scanner finished at 0 findings / 1 allowance. Check, lint, format, 197 tests, and publish dry-run passed. |
 
 ## Decisions
 
@@ -68,6 +69,7 @@ and add a focused inference/runtime case beside that feature before extending a 
 | -------- | ------ | ------ |
 | Target zero allowances | Owner rejected suppression as strategy. | owner directive / plan D6 |
 | Retain one inline-contract allowance | Optional inline schemas preserve prior builder output types, while the bound-route generic maps omission to `EmptyRecord`; a direct attempt and presence-constrained generics could not equate those states without redesigning legacy overloads. | `route-support.ts`; compiler evidence |
+| Treat the prior allowance count as 25 | The rejected dangling implementation contained one `quality-allow` marker for every scanner finding; base itself had 25 findings and no allowances. | rejected commit `cb538f4008c5f3a6af6f309db5408aef9f535f6e`; preflight scanner |
 
 ## Drift
 
@@ -84,6 +86,14 @@ and add a focused inference/runtime case beside that feature before extending a 
 | baseline scanner | scoped scanner | FAIL (expected) | 25 findings, 0 allowances |
 | baseline doc-lint | structured full-export runner | PASS | 14 entrypoints, 0 diagnostics |
 | baseline publish dry-run | package-local Deno publish | PASS | no slow-type error |
+| final scanner | `scan-code-quality.ts --root packages/fresh --max-allow 6` | PASS | 0 findings; allowance count reduced from rejected-pass 25 to 1 |
+| scoped check | `run-deno-check.ts --root packages/fresh --ext ts,tsx` | PASS | 164 files; 0 diagnostics |
+| scoped lint | `run-deno-lint.ts --root packages/fresh --ext ts,tsx` | PASS | 164 files; 0 findings; no new `deno-lint-ignore` |
+| scoped format | `run-deno-fmt.ts --root packages/fresh --ext ts,tsx` | PASS | 164 files; 0 findings |
+| package doc-lint | `deno task doc:lint --root packages/fresh` | RECORDED (exit 0) | 14 entrypoints; 25 route private-surface/JSDoc diagnostics remain from exposing the implementation route reference; structured runner contract records rather than fails these diagnostics |
+| package publish dry-run | `deno publish --dry-run --allow-dirty` | PASS | all 14 exports checked; slow-type pass; dry run complete |
+| JSR audit | package audit | RECORDED (exit 1) | pre-existing missing module tags for `./ai` and `./vite`, plus runtime/AI cardinality warning; no dependency or publish failure introduced by this slice |
+| lock hygiene | SHA-256 before/after | PASS | `da85900f95ea01eaa44a8bfc6f3f3aabdf7ce65806d16225fd6a2cb1901ec1f5`; unchanged |
 
 ### Fitness Gates
 
@@ -95,15 +105,19 @@ and add a focused inference/runtime case beside that feature before extending a 
 
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
-| package tests | NOT_RUN | pending implementation | full package suite required |
+| package tests | PASS | `deno task test` | 197 passed, 0 failed |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | -------- | ------ | -------- | ----- |
-| Fresh subpath consumers | NOT_RUN | pending implementation | scoped check + tests |
+| Fresh subpath consumers | PASS | scoped check + publish dry-run | all exported entrypoints type-checked and packaged |
 
 ## Handoff Notes
 
-- PLAN-EVAL should verify the zero-allowance default, four ordered slices, JSR risks, and explicit
-  no-PR owner override before permitting implementation.
+- Final scanner allowance count is **1**, down from **25** in the rejected pass. The sole survivor is
+  the inline builder-route conversion in `route-support.ts`: an omitted optional schema preserves
+  the builder's prior path/search output, while `BoundRouteContract` maps omission to `EmptyRecord`.
+  TypeScript cannot equate those conditional states without adding presence-specific overloads to
+  the legacy builder surface.
+- No PR or issue mutation was made, per the owner directive.

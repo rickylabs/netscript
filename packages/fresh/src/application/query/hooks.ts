@@ -18,6 +18,7 @@ import {
   useLiveQuery as useTanStackLiveQuery,
   useLiveSuspenseQuery as useTanStackLiveSuspenseQuery,
 } from '@tanstack/react-db';
+import type { QueryFunctionContext } from '@tanstack/query-core';
 import type {
   IslandInfiniteData,
   IslandInfiniteQueryOptions,
@@ -56,13 +57,25 @@ export function useIslandInfiniteQuery<
 >(
   options: IslandInfiniteQueryOptions<TData, TError, TPageParam>,
 ): IslandInfiniteQueryResult<TData, TError, TPageParam> {
+  const { queryFn, ...upstreamOptions } = options;
+
   return useTanStackInfiniteQuery<
     TData,
     TError,
     IslandInfiniteData<TData, TPageParam>,
     QueryKey,
     TPageParam
-  >(options);
+  >({
+    ...upstreamOptions,
+    queryFn: (context: QueryFunctionContext<QueryKey, TPageParam>) =>
+      queryFn({
+        client: context.client,
+        queryKey: context.queryKey,
+        signal: context.signal,
+        pageParam: typedPageParam(context),
+        meta: context.meta,
+      }),
+  });
 }
 
 /** Run a suspense island infinite query through the shared NetScript Fresh QueryClient. */
@@ -73,13 +86,33 @@ export function useIslandSuspenseInfiniteQuery<
 >(
   options: IslandInfiniteQueryOptions<TData, TError, TPageParam>,
 ): IslandInfiniteQueryResult<TData, TError, TPageParam> {
+  const { queryFn, ...upstreamOptions } = options;
+
   return useTanStackSuspenseInfiniteQuery<
     TData,
     TError,
     IslandInfiniteData<TData, TPageParam>,
     QueryKey,
     TPageParam
-  >(options);
+  >({
+    ...upstreamOptions,
+    queryFn: (context: QueryFunctionContext<QueryKey, TPageParam>) =>
+      queryFn({
+        client: context.client,
+        queryKey: context.queryKey,
+        signal: context.signal,
+        pageParam: typedPageParam(context),
+        meta: context.meta,
+      }),
+  });
+}
+
+function typedPageParam<TPageParam>(
+  context: QueryFunctionContext<QueryKey, TPageParam>,
+): TPageParam {
+  // TanStack's conditional context retains its `never` branch for an open
+  // generic even though the same page-param type is supplied to the hook.
+  return context.pageParam as TPageParam;
 }
 
 /** Run an island mutation through the shared NetScript Fresh QueryClient. */

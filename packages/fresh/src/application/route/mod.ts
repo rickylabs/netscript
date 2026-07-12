@@ -31,7 +31,7 @@ import type {
   PathParamSchema,
   RouteReference,
   RouteReferenceOptions,
-  SchemaOutput,
+  SchemaObjectOutput,
   SearchParamInput,
   SearchParamSchema,
 } from './types.ts';
@@ -97,12 +97,11 @@ export function defineRouteContract<
   TSearchSchema extends SearchParamSchema<object> | undefined = undefined,
 >(
   options: DefineRouteContractOptions<TPathSchema, TSearchSchema> = {},
-): DefineRouteContract<SchemaOutput<TPathSchema>, SchemaOutput<TSearchSchema>> {
+): DefineRouteContract<SchemaObjectOutput<TPathSchema>, SchemaObjectOutput<TSearchSchema>> {
   const contract = defineRouteContractImpl<TPathSchema, TSearchSchema>(options);
-  const pathSchema: PathParamSchema<SchemaOutput<TPathSchema>> | undefined = options.pathSchema
-    ? { safeParse: (input) => contract.safeParsePath(input) }
-    : undefined;
-  const searchSchema: SearchParamSchema<SchemaOutput<TSearchSchema>> | undefined =
+  const pathSchema: PathParamSchema<SchemaObjectOutput<TPathSchema>> | undefined =
+    options.pathSchema ? { safeParse: (input) => contract.safeParsePath(input) } : undefined;
+  const searchSchema: SearchParamSchema<SchemaObjectOutput<TSearchSchema>> | undefined =
     options.searchSchema ? { safeParse: (input) => contract.safeParseSearch(input) } : undefined;
 
   return {

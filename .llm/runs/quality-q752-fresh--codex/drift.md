@@ -21,3 +21,17 @@
 - **Severity:** minor
 - **Action:** fix
 - **Evidence:** `plan.md`; no source implementation preceded the correction.
+
+## 2026-07-12 — Structured doc-lint diagnostics recorded
+
+- **What:** The canonical doc-lint runner exits successfully but records 25 diagnostics for the
+  route implementation reference now exposed directly instead of hidden by a compatibility cast.
+- **Source:** Slice acceptance requires `deno task doc:lint --root <pkg>` to be recorded; the
+  repository wrapper treats diagnostics as structured evidence rather than a failing verdict.
+- **Expected:** Baseline recorded zero diagnostics.
+- **Actual:** 8 private-type references and 17 missing JSDoc entries are reported for the internal
+  route contract surface; publish dry-run and slow-type validation remain green.
+- **Severity:** minor
+- **Action:** defer documentation-surface consolidation; do not restore a cast solely to hide the
+  implementation type from documentation.
+- **Evidence:** final worklog gate table; package publish dry-run.

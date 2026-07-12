@@ -4,10 +4,9 @@
  * @module
  */
 
-import type {
-  RouteContractPathOf,
-  RouteReference as RuntimeRouteReference,
-} from './_internal/contract-types.ts';
+import type { RouteReference } from './_internal/contract-types.ts';
+export type { RouteReference } from './_internal/contract-types.ts';
+export type { SchemaObjectOutput, SchemaOutput } from './schema-output.ts';
 
 export type * from './pagination-types.ts';
 
@@ -269,12 +268,6 @@ export interface RouteReferenceOptions {
   readonly kind?: RouteReferenceKind;
 }
 
-/** Stable route reference returned by route contracts and generated manifests. */
-export type RouteReference<
-  TPath extends object = EmptyRecord,
-  TSearch extends object = EmptyRecord,
-> = RuntimeRouteReference<TPath, TSearch>;
-
 /** Bound route reference created from a route contract and concrete route pattern. */
 export type BoundRouteContract<
   TPath extends object = EmptyRecord,
@@ -419,6 +412,3 @@ export interface EnumPathParamDefinition<
    */
   parse(value: string | undefined): TValues[number] | null;
 }
-
-/** Infer the output object carried by a route schema. */
-export type SchemaOutput<TSchema> = RouteContractPathOf<TSchema>;
