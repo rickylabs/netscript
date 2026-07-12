@@ -91,7 +91,7 @@
     "bench:conformance": "deno run --allow-all packages/bench/cli.ts conformance",
     "fmt": "deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" --write",
     "fmt:check": {
-      "command": "deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" --ignore-line-endings",
+      "command": "deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|packages/mcp/tests/fixtures/|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" --ignore-line-endings",
       "files": [
         "packages/**/*.ts",
         "packages/**/*.tsx",

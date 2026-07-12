@@ -29,7 +29,7 @@ interface FormatFinding {
   reason: string;
 }
 
-interface BatchResult {
+export interface BatchResult {
   files: string[];
   exitCode: number;
   output: string;
@@ -332,6 +332,37 @@ function isNoTargetFilesResult(result: BatchResult): boolean {
   return result.exitCode !== 0 && result.output.includes(NO_TARGET_FILES_MESSAGE);
 }
 
+/**
+ * Render batches that failed WITHOUT producing a parseable formatting finding.
+ *
+ * That combination is a crash (config parse error, permission error, a file `deno fmt` cannot
+ * handle), not a formatting difference. The JSON report is machine-consumed on stdout; this goes to
+ * stderr so a failing CI job shows the underlying error instead of `findings: 0` and a bare exit 1.
+ */
+export function formatFailedBatches(results: readonly BatchResult[]): string {
+  const failed = results.filter((result) =>
+    result.exitCode !== 0 && !isNoTargetFilesResult(result)
+  );
+
+  const lines: string[] = [
+    `${failed.length} deno fmt batch(es) failed without producing formatting findings.`,
+    'This is a tooling/parse/permission failure, not a formatting difference.',
+  ];
+
+  for (const [index, result] of failed.entries()) {
+    lines.push(
+      '',
+      `--- batch ${index} — exit ${result.exitCode} — ${result.files.length} file(s)`,
+    );
+    const sample = result.files.slice(0, 10);
+    lines.push(`files: ${sample.join(', ')}${result.files.length > sample.length ? ', …' : ''}`);
+    const output = result.output.replaceAll(ANSI_PATTERN, '').trimEnd();
+    if (output) lines.push('output:', output);
+  }
+
+  return lines.join('\n');
+}
+
 async function main(): Promise<void> {
   const options = parseArgs(Deno.args);
   if (!options) return;
@@ -379,7 +410,10 @@ async function main(): Promise<void> {
 
   console.log(JSON.stringify(report, null, options.pretty ? 2 : undefined));
 
+  // A batch that failed without any parseable finding is a crash. Never let it exit 1 silently.
+  if (failedWithoutParsedFindings) console.error(formatFailedBatches(results));
+
   if (findings.length > 0 || failedWithoutParsedFindings) Deno.exit(1);
 }
 
-await main();
+if (import.meta.main) await main();
