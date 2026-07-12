@@ -112,11 +112,26 @@ Deno.test('outside-plan and higher-effort Fable-shaped policy requires explicit 
   );
 });
 
-Deno.test('dated planning override changes from Fable medium to Sol max on 2026-07-13', () => {
-  const sunday = resolveCanonicalRoute('planning_decisions', new Date('2026-07-12T23:59:59Z'));
-  equal([sunday.model, sunday.effort], ['fable-5', 'medium']);
-  const monday = resolveCanonicalRoute('planning_decisions', new Date('2026-07-13T00:00:00Z'));
-  equal([monday.model, monday.effort], ['gpt-5.6-sol', 'max']);
+Deno.test('orchestration lanes run Opus 4.8 medium while Fable 5 is outside the subscription', () => {
+  const at = new Date('2026-07-13T00:00:00Z');
+  for (const lane of ['planning_decisions', 'mobile_orchestration'] as const) {
+    const route = resolveCanonicalRoute(lane, at);
+    equal([route.agent, route.provider, route.model, route.effort], [
+      'claude',
+      'anthropic',
+      'opus-4.8',
+      'medium',
+    ]);
+  }
+});
+
+Deno.test('Fable 5 stays authorized on explicit owner request but is never auto-selected', () => {
+  const fableRoutes = CANONICAL_ROUTE_POLICY.filter((route) => route.model === 'fable-5');
+  equal(fableRoutes.length > 0, true);
+  for (const route of fableRoutes) {
+    equal(route.subscriptionState, 'outside_plan');
+    equal(route.requiresExplicitApproval, true);
+  }
 });
 
 Deno.test('major UI/UX work is GLM-led or receives the mandatory GLM adversarial pass', () => {
