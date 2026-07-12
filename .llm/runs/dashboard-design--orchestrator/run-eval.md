@@ -15,6 +15,7 @@ product code changed anywhere in this run.
 | 5 Plugin/extension architecture | Fable 5 low (sanctioned single delegation) | `design/ddr-s5-plugin-system` | ✅ 437-line proposal (7 contribution kinds, trust ladder, AppTarget) |
 | 6 Beta.10 coverage matrix | Opus 4.8 high agent | `design/ddr-s6-coverage` | ✅ 30-issue bidirectional matrix + 20 issue comments posted (all 201) |
 | 7 Claude Design prompts v3 | supervisor | `design/ddr-s7-prompts` | ✅ 6 prompts + README, leak-checked |
+| 8 Absorb PR #506 | supervisor | merge of `feat/dashboard-design-prototype` | ✅ design-sync tool (57 files, scoped check green) + run artifacts absorbed; packages/fresh-ui residue deliberately dropped (superseded by #547/#509) |
 
 ## GLM 5.2 capability test (explicit owner ask)
 
