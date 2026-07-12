@@ -111,3 +111,13 @@ Contributor path:
 - D1 (carried, owner-authorized): PLAN-EVAL is waived; the short plan and design checkpoint live in this worklog.
 - D2 (scope): dynamic API/config-source registration is deferred p3 and is not implemented.
 - D3 (observed route shape): oRPC assembly prefixes the contract namespace, so management procedures are served under `/api/v1/triggers/triggers/...`; the stable raw event-ledger endpoint remains `/api/v1/events`. The CLI adapter follows the actual OpenAPI-mounted paths rather than inventing aliases.
+
+## Handoff
+
+- Slice 1: `85f25c8d` — compiling job-wired scaffold output.
+- Slice 2: `de6d2377` — persisted events and authoritative runtime state.
+- Slice 3: `d70f6afb` — update/remove lifecycle, real cron preview, tutorial adoption.
+- Initial branch push: PASS via `git -C /home/codex/repos/ns-b9-705 push origin HEAD:refs/heads/feat/705-triggers-cli-completion`.
+- `deno.lock` was not modified.
+- No PR was opened, per owner direction.
+- Full CLI/scaffold runtime E2E was not run, per owner direction; orchestrator execution remains required before merge readiness.
