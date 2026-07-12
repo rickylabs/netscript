@@ -179,7 +179,7 @@ const AUTH_SPECIFIC_ERRORS: Readonly<{
 };
 
 const baseContract: ReturnType<typeof oc.errors> = oc.errors(
-  { ...BASE_PLUGIN_ERRORS, ...AUTH_SPECIFIC_ERRORS } as unknown as Parameters<typeof oc.errors>[0],
+  { ...BASE_PLUGIN_ERRORS, ...AUTH_SPECIFIC_ERRORS } as unknown as Parameters<typeof oc.errors>[0], // quality-allow: oRPC's invariant error-map input rejects the merged package-owned error vocabularies despite matching their runtime schemas.
 );
 
 /**

@@ -128,7 +128,7 @@ export interface AiCapabilities {
 // — the same pattern `BASE_PLUGIN_CONTRACT_ROUTES` uses. Everything downstream
 // (routes, schemas, the contract type, `implement`) is genuinely typed.
 const baseContract: ReturnType<typeof oc.errors> = oc.errors(
-  { ...BASE_PLUGIN_ERRORS } as unknown as Parameters<typeof oc.errors>[0],
+  { ...BASE_PLUGIN_ERRORS } as unknown as Parameters<typeof oc.errors>[0], // quality-allow: oRPC's invariant error-map input rejects the shared package-owned error vocabulary despite matching its runtime schema.
 );
 
 /**

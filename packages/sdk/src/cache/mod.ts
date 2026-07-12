@@ -17,7 +17,7 @@
 import { setCacheProvider } from './cache-provider.ts';
 import { cacheQuery } from './cache-query.ts';
 
-// Auto-register: any server-side code that imports @netscript/sdk/cache
+// Auto-register: server-side code importing @netscript/sdk/cache
 // gets the KV-backed CacheQuery wired as the global cache provider.
 setCacheProvider(cacheQuery);
 

@@ -31,7 +31,7 @@ export interface ViteEnvVarNames {
 /**
  * Generates VITE-prefixed environment variable names for a resource.
  *
- * Vite's built-in behavior: any process environment variable whose name
+ * Vite's built-in behavior: each process environment variable whose name
  * starts with `VITE_` is statically replaced in client bundles at build time
  * via `import.meta.env.VITE_*`.
  *

@@ -62,7 +62,7 @@ function AccordionItemTrigger({ children, ...props }: AccordionItemTriggerProps)
       aria-disabled={disabled ? 'true' : summaryProps['aria-disabled']}
       onClick={(event) => {
         event.preventDefault();
-        onClick?.(event as unknown as JSX.TargetedMouseEvent<HTMLButtonElement>);
+        onClick?.(event as unknown as JSX.TargetedMouseEvent<HTMLButtonElement>); // quality-allow: the button-compatible public trigger handler is rendered on a semantic summary element.
       }}
       role={summaryProps.role ?? 'button'}
     >

@@ -29,7 +29,7 @@ export function mergePlatformStyle(
     const appended = Object.entries(declarations).map(([name, value]) => `${name}: ${value}`).join(
       '; ',
     );
-    return `${style}; ${appended}` as unknown as JSX.CSSProperties;
+    return `${style}; ${appended}` as unknown as JSX.CSSProperties; // quality-allow: Preact accepts string styles at runtime although JSX.CSSProperties models only object-form declarations.
   }
 
   return {

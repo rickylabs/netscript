@@ -37,7 +37,7 @@
   },
   "tasks": {
     "check": "deno check --lock=deno.lock --unstable-kv \"**/*.ts\" \"**/*.tsx\"",
-    "test": "deno test --lock=deno.lock --unstable-kv \"tests/**/*.ts\" \"tests/**/*.tsx\"",
+    "test": "deno test --lock=deno.lock --unstable-kv --allow-read \"tests/**/*.ts\" \"tests/**/*.tsx\"",
     "tokens:build": "deno run --lock=deno.lock --allow-read=. --allow-write=registry/theme --allow-env --allow-net=registry.npmjs.org scripts/build-tokens.ts",
     "tokens:check": "deno task tokens:build && git diff --exit-code registry/theme/tokens.css registry/theme/theme-bridge.css registry/theme/tokens.json"
   },

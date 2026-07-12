@@ -65,7 +65,7 @@ export function createHttpClientLink({
       const baseUrl = getServiceUrl(serviceName, protocol);
       return `${baseUrl}${apiPath}/${apiVersion}/${pathSegment}`;
     },
-    method: inferRPCMethodFromContractRouter(contract as unknown as ORPCAnyContractRouter),
+    method: inferRPCMethodFromContractRouter(contract as unknown as ORPCAnyContractRouter), // quality-allow: oRPC's method inference requires its invariant branded router while the SDK accepts the package's structural ContractLike boundary.
     headers: (options: ClientOptions<HttpRuntimeClientContext>) => {
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',

@@ -238,7 +238,7 @@ export function Icon(props: IconProps): PrimitiveNode {
     },
     title === undefined ? null : h('title', null, title),
     ...ICON_PATHS[name].map((d) => h('path', { d, key: d })),
-  ) as unknown as PrimitiveNode;
+  ) as unknown as PrimitiveNode; // quality-allow: Preact h() returns ComponentChild, while this public primitive intentionally excludes bigint from its narrower node contract.
 }
 
 /**
