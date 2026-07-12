@@ -1,7 +1,7 @@
 /** Pure policy data and guards for quota fallback route selection. */
 
 import type { RouteIdentity, SessionIdentity } from './contract.ts';
-import { MODEL_IDS, OPEN_EVALUATOR_MODEL_IDS, OPENROUTER_MODEL_IDS } from '../config/models.ts';
+import { MODEL_IDS, OPEN_EVALUATOR_MODEL_IDS } from '../config/models.ts';
 import { OPENROUTER_PRESETS, type OpenRouterPresetId } from './provider-profiles.ts';
 
 export const MODEL_FAMILIES = ['anthropic', 'openai', 'google', 'open', 'other'] as const;
@@ -55,10 +55,10 @@ export interface CanonicalRoutePolicy {
   readonly requiresExplicitApproval?: boolean;
   readonly evaluatesFamily?: ModelFamily;
   readonly evaluatorModelPolicy?: 'open_only';
-  readonly effortObservability?: 'observable' | 'nominal_no_reasoning_trace';
 }
 
 const MAJOR_UI_UX_PRESET = OPENROUTER_PRESETS['claude-design-glm-5-2'];
+const FORMAL_EVALUATOR_PRESET = OPENROUTER_PRESETS['claude-evaluator-qwen-3-7-max'];
 
 /** Canonical machine-readable route bindings rendered by the harness lane-policy document. */
 export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
@@ -190,11 +190,11 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     purpose: 'evaluation',
     agent: 'claude',
     provider: 'openrouter',
-    profileId: 'claude-openrouter',
-    model: OPENROUTER_MODEL_IDS.qwen,
-    effort: 'high',
+    profileId: FORMAL_EVALUATOR_PRESET.profileId,
+    presetId: FORMAL_EVALUATOR_PRESET.id,
+    model: FORMAL_EVALUATOR_PRESET.model,
+    effort: FORMAL_EVALUATOR_PRESET.effort,
     evaluatorModelPolicy: 'open_only',
-    effortObservability: 'nominal_no_reasoning_trace',
   },
   {
     lane: 'review_claude',
@@ -277,14 +277,17 @@ export function resolveCanonicalFormalEvaluatorRoute(
     throw new Error('generator session family must match the authored slice');
   }
   const route = assignment.route ?? resolveCanonicalRoute('formal_evaluation', at);
+  const preset = route.presetId ? OPENROUTER_PRESETS[route.presetId] : undefined;
   if (
     route.purpose !== 'evaluation' || route.agent !== 'claude' ||
     route.provider !== 'openrouter' || route.profileId !== 'claude-openrouter' ||
     route.evaluatorModelPolicy !== 'open_only' ||
-    !OPEN_EVALUATOR_MODEL_IDS.some((model) => model === route.model)
+    !OPEN_EVALUATOR_MODEL_IDS.some((model) => model === route.model) ||
+    !preset || preset.purpose !== 'evaluation' || preset.model !== route.model ||
+    preset.agenticTurn !== 'supported' || preset.reasoningTrace !== 'present'
   ) {
     throw new Error(
-      'formal evaluator requires the Claude OpenRouter profile and an approved open model',
+      'formal evaluator requires a supported Claude OpenRouter evaluation preset with an approved open model',
     );
   }
   return route;

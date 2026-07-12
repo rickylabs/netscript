@@ -236,7 +236,7 @@ Deno.test('canonical evaluator resolution rejects self-certification', () => {
   );
 });
 
-Deno.test('formal evaluator is Claude OpenRouter with an open model and nominal effort', () => {
+Deno.test('formal evaluator is Claude OpenRouter with the supported Qwen evaluation preset', () => {
   const route = resolveCanonicalFormalEvaluatorRoute({
     authorFamily: 'openai',
     generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
@@ -247,17 +247,17 @@ Deno.test('formal evaluator is Claude OpenRouter with an open model and nominal 
     route.agent,
     route.provider,
     route.profileId,
+    route.presetId,
     route.model,
     route.evaluatorModelPolicy,
-    route.effortObservability,
   ], [
     'formal_evaluation',
     'claude',
     'openrouter',
     'claude-openrouter',
+    'claude-evaluator-qwen-3-7-max',
     OPENROUTER_MODEL_IDS.qwen,
     'open_only',
-    'nominal_no_reasoning_trace',
   ]);
 });
 
