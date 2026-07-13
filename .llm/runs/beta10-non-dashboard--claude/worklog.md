@@ -585,3 +585,78 @@ Seven false-greens in a single run:
 
 The fix is the same shape every time: **assert on the content, not the status — and prove the
 assertion by making it fail.**
+
+---
+
+## IMPL-EVAL cycle 2 — **PASS** (open-model lane, `qwen/qwen3.7-max`)
+
+Verdict recorded verbatim at `evaluate-cycle2.md`. Snapshot: `6976a3f6`.
+
+All eight cycle-1 findings verified **FIXED**; **F6's disposition ACCEPTED** —
+
+> *"a retroactive `plan.md` would be evidence-faking — writing a plan after the fact to clear a gate
+> destroys the only signal the artifact carries."*
+
+It earned the verdict rather than rubber-stamping it: it **constructed** the failures instead of
+watching the gates pass. On F1 it built both halves (mixed finding+crash, and the
+`--ignore-line-endings` filtered case) and proved the gate exits 1; on #769's guard it seeded a
+version-less specifier and proved it fires. Nothing it could not reproduce.
+
+### The extraction trap fired on the very first real run
+
+```json
+{"verdict":"PASS","textLength":8296,"resultFieldLength":0,"reportedSuccess":true}
+```
+
+**`resultFieldLength: 0`.** On a substantive 8,296-character `PASS`, the `result` field was **empty**.
+Reading it — the obvious, conventional field — would have yielded a blank string on a passing
+evaluation, and on a *failing* one would have been read as "no findings".
+`.llm/tools/harness/extract-verdict.ts` is what stood between that and a false PASS.
+
+---
+
+## NF1 — the MCP command policy allowlists verbs that do not exist
+
+Cycle-2's one new finding. It is worse than its `medium` label: `execute_command({command:'plugin',
+args:['install','workers']})` returns **`default_deny`**, because the policy allowlists a phantom
+`plugin add` and never allowlists the real `plugin install`. **Installing a plugin through MCP does
+not work** — a headline capability of the agentic combo, dead in the shipped policy.
+
+### Audit — NF1 was NOT alone. 3 of 17 allow rules are phantoms.
+
+Every allowlisted verb checked against the shipped CLI (`bin/netscript.ts <verb> --help`):
+
+| Allow rule | Verdict |
+| --- | --- |
+| `plugin add` | ✗ **PHANTOM** — real verb is `plugin install`, which is **not** allowlisted |
+| `service status` | ✗ **PHANTOM** — `service` has `add, list, ref, set, remove, add-handler, generate` |
+| `ui` (bare) | ✗ **PHANTOM** — no bare `ui` command; verbs are `ui:add/init/list/update/remove` |
+
+Everything else verified real: `db init|generate|migrate|seed|status|introspect`, `generate`,
+`contract`, `service list`, `plugin list|sync|doctor`, `ui:add`, `ui:init`.
+
+**Coverage gap:** `ui:list`, `ui:update`, `ui:remove` exist and are **not** allowlisted, while the MCP
+README claims "and the `ui` verbs".
+
+**18% of a default-deny security policy references verbs that do not exist.** A phantom *deny* rule
+would be worse still — dead code giving false assurance — so the deny side is being audited too.
+
+### The durable fix
+
+A cross-check test: **every verb in the MCP allowlist must exist in the CLI's real command surface.**
+Layering trap: `packages/mcp` must not import `packages/cli`, but `cli` already depends on `mcp`, so
+the test lives in `packages/cli` and **derives** the verb set rather than duplicating it into a third
+place. Same shape as #769's guard — kill the class, not the instance.
+
+Delegated: `fix/715-nf1-mcp-command-policy`, thread `019f593b`.
+
+### The pattern this completes
+
+A phantom `plugin add` verb — invented, never checked against the shipped CLI — produced **three**
+separate defects: **F2** (the CLI README's quick-start line, which failed on copy), **F3**-adjacent
+prose, and now **NF1** (the executable security policy). The README was fixed; the policy was not,
+because nobody cross-checked the two against the binary.
+
+**Documentation and policy that are never executed against the real surface will drift, and the drift
+is invisible until a user hits it.** The cross-check test is the same answer as the specifier guard:
+derive from the source of truth, assert structurally, and prove the assertion fails.
