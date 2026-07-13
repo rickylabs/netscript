@@ -27,6 +27,7 @@
 import { assert } from '@std/assert';
 import * as config from './mod.ts';
 import { MODEL_IDS } from './models.ts';
+import { OPENCODE_TOOL } from './versions.ts';
 
 const suiteRoot = new URL('../', import.meta.url);
 
@@ -43,9 +44,15 @@ collectStrings(config, configValues);
 /**
  * `agy` (=`MODEL_IDS.antigravity`) is also the Antigravity CLI executable name,
  * used as a path/argv token across `wsl/` and the adapters — it is not a
- * "hardcoded model id" in those non-config sources. This is the ONLY exclusion.
+ * "hardcoded model id" in those non-config sources.
  */
-const OVERLOADED_EXCLUSIONS = new Set<string>([MODEL_IDS.antigravity]);
+const OVERLOADED_EXCLUSIONS = new Set<string>([
+  MODEL_IDS.antigravity,
+  // These OpenCode values are also finite domain vocabulary used in typed
+  // contracts and policy data, not independently pinned volatile values.
+  OPENCODE_TOOL.binary,
+  OPENCODE_TOOL.defaultVariant,
+]);
 const EXACT_FORBIDDEN = [...configValues].filter((v) => !OVERLOADED_EXCLUSIONS.has(v));
 
 // --- Layer B: structural shapes of model ids / versions / endpoints -----------

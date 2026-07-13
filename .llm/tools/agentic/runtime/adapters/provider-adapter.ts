@@ -22,6 +22,7 @@ export const CONFLICTING_CREDENTIAL_KEYS: Readonly<
   claude: PROVIDER_CREDENTIAL_KEYS,
   codex: PROVIDER_CREDENTIAL_KEYS,
   antigravity: [],
+  opencode: [],
 } as const;
 
 export interface ProviderValidationInput {
