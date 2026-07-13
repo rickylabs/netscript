@@ -483,3 +483,36 @@ already made once. **Rejected from the slice** and sent back to be reverted.
 **New finding, recorded not fixed:** `packages/fresh-ui/registry.generated.ts` is **stale on the
 branch** — regenerating it produces a diff, and that diff contains a recursion-depth bug fix that has
 never been reviewed. Worth its own issue; deliberately not fixed here.
+
+## CI caveat — "green" on #770/#771/#772 is a THIN signal, and must not be read as merge-safe
+
+`.github/workflows/ci.yml` triggers only on `push`/`pull_request` to **`main`** (and
+`feat/package-quality`):
+
+```yaml
+on:
+  push:
+    branches: [main, "feat/package-quality"]
+  pull_request:
+    branches: [main, "feat/package-quality"]
+```
+
+All three of these PRs target **`feat/beta10-integration`**, so the full `ci` workflow — `check-test`,
+`quality` (check + lint + fmt:check) — **does not run on them at all.** They show only `surface-diff`
+and `code-quality`. Their "0 fail" is real but nearly empty.
+
+The consequences worth stating out loud:
+
+- The **repo-drift blocking flip** (#772) and the **tagline gate** (#771) are wired into the `quality`
+  job — which **never executes on their own PRs.** Neither new gate has actually run in CI yet. They
+  will fire for the first time on the `feat/beta10-integration` → `main` PR.
+- The same is true of the fmt/lint wrapper fixes and the `#769` specifier guard: their CI proof
+  arrives only at the integration→main merge.
+
+**What the merge evidence actually rests on** is the gates run locally against each branch and
+recorded per slice above (`quality:scan:repo` 0 findings on the enforced scope, `deno task lint` exit
+0, `arch:check` PASS, `packages/cli` 371 tests, the seeded-violation proof that the #769 guard exits
+1), **not** on the green ticks on the PR pages.
+
+Do not treat these PRs as CI-validated. The integration→main PR is the first honest CI verdict, and it
+is where three newly-blocking gates get their first real exercise — expect it to be the loud one.
