@@ -19,7 +19,7 @@
   "tasks": {
     "ci": "deno ci && deno task ci:quality && deno task coverage:functions && deno task publish:dry-run && deno task audit:critical",
     "ci:quality": {
-      "dependencies": ["check", "lint", "fmt:check", "deps:check"]
+      "dependencies": ["check", "lint", "fmt:check", "deps:check", "check:netscript-jsr-specifiers"]
     },
     "check": {
       "command": "deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(fresh-ui)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\"",
@@ -77,6 +77,7 @@
     "gen:assets-barrel": "deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-cli-assets-barrel.ts",
     "check:assets-barrel": "deno task gen:assets-barrel && git diff --exit-code -- packages/cli/src/kernel/assets/embedded.generated.ts packages/plugin/src/kernel/assets/embedded.generated.ts packages/fresh-ui/registry.generated.ts packages/service/src/primitives/scalar.generated.ts",
     "check:scaffold-versions": "deno run .llm/tools/validation/check-scaffold-versions.ts --pretty",
+    "check:netscript-jsr-specifiers": "deno run --allow-read .llm/tools/validation/check-netscript-jsr-specifiers.ts --pretty",
     "release:preflight": "deno run --allow-read .llm/tools/release/preflight-text-imports.ts",
     "release:cut": "deno run --allow-read --allow-write --allow-run --allow-env .llm/tools/release/cut.ts",
     "release:publish": "deno run --allow-net --allow-env --allow-run --allow-read .llm/tools/release/github-release.ts",

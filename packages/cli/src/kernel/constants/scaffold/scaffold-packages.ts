@@ -26,7 +26,7 @@ export const SCAFFOLD_PACKAGES = {
   NETSCRIPT_AUTH_KV_OAUTH: '@netscript/auth-kv-oauth',
   NETSCRIPT_PLUGIN_WORKERS_RUNTIME: '@netscript/plugin-workers/runtime',
   NETSCRIPT_PLUGIN_WORKERS_HEALTH_CHECK:
-    'jsr:@netscript/plugin-workers/jobs/health-check.ts',
+    'jsr:@netscript/plugin-workers/jobs/health-check.ts', // jsr-versionless-ok: import-map alias key maps to an exact release target.
   NETSCRIPT_WORKERS: '@netscript/plugin-workers-core',
   NETSCRIPT_WORKERS_RUNTIME: '@netscript/plugin-workers-core/runtime',
   NETSCRIPT_WORKERS_SCHEMAS: '@netscript/plugin-workers-core/schemas',
