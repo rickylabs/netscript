@@ -48,3 +48,9 @@ export const OPENROUTER_MODEL_IDS = {
   glm: 'z-ai/glm-5.2',
   grok: 'x-ai/grok-4.5',
 } as const;
+
+/** OpenRouter model ids invoked through the native OpenCode lane. */
+export const OPENCODE_MODEL_IDS = {
+  /** Vision-capable adversarial design evaluator. */
+  visionEval: 'openrouter/moonshotai/kimi-k2.6',
+} as const;

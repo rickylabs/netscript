@@ -1,7 +1,7 @@
 /** Pure policy data and guards for quota fallback route selection. */
 
 import type { RouteIdentity, SessionIdentity } from './contract.ts';
-import { MODEL_IDS } from '../config/models.ts';
+import { MODEL_IDS, OPENCODE_MODEL_IDS } from '../config/models.ts';
 import { OPENROUTER_PRESETS, type OpenRouterPresetId } from './provider-profiles.ts';
 
 export const MODEL_FAMILIES = ['anthropic', 'openai', 'google', 'other'] as const;
@@ -26,6 +26,7 @@ export const ROUTING_LANES = [
   'planning_decisions',
   'major_ui_ux_design',
   'major_ui_ux_adversarial_review',
+  'adversarial_design_eval',
   'documentation_review',
   'claude_workflow',
   'research_extraction',
@@ -134,6 +135,15 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     model: MAJOR_UI_UX_PRESET.model,
     effort: MAJOR_UI_UX_PRESET.effort,
     condition: 'required_before_merge_when_glm_not_lead',
+  },
+  {
+    lane: 'adversarial_design_eval',
+    purpose: 'evaluation',
+    agent: 'opencode',
+    provider: 'openrouter',
+    model: OPENCODE_MODEL_IDS.visionEval,
+    effort: 'high',
+    condition: 'vision_evidence_complements_required_glm_design_review',
   },
   {
     lane: 'documentation_review',

@@ -7,6 +7,7 @@ import {
   selectFallbackCandidate,
 } from './routing-policy.ts';
 import { assertEquals as equal } from '@std/assert';
+import { OPENCODE_MODEL_IDS } from '../config/models.ts';
 
 const worktree = '/home/codex/repos/routing-policy';
 const session = { agent: 'codex', sessionId: 'session-1', worktree, boundary: 'new' } as const;
@@ -155,6 +156,17 @@ Deno.test('major UI/UX work is GLM-led or receives the mandatory GLM adversarial
   }
   equal(lead.condition, 'lead_route_for_major_ui_ux_work');
   equal(adversarial.condition, 'required_before_merge_when_glm_not_lead');
+});
+
+Deno.test('OpenCode vision evaluation complements the mandatory GLM design pass', () => {
+  const route = resolveCanonicalRoute('adversarial_design_eval', new Date('2026-07-14T00:00:00Z'));
+  equal([route.agent, route.provider, route.model, route.effort], [
+    'opencode',
+    'openrouter',
+    OPENCODE_MODEL_IDS.visionEval,
+    'high',
+  ]);
+  equal(route.condition, 'vision_evidence_complements_required_glm_design_review');
 });
 
 Deno.test('deep-analysis Fable fallback requires classified Codex quota exhaustion', () => {

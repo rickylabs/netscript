@@ -22,6 +22,7 @@ and endpoints live in `config/versions.ts` and `config/endpoints.ts`. See the "M
 | Long-running planning and decision intelligence (orchestrator)                                                                        | Claude · Anthropic · Opus 4.8 · medium, while Fable 5 is outside the subscription. Fable 5 · medium remains authorized as an explicit owner-requested paid route.                                                                                         |
 | Major UI/UX work — lead route                                                                                                         | Claude · OpenRouter · GLM 5.2 · `claude-design-glm-5-2` preset / `claude-print` · xhigh. Applies to design-system work, dashboard/console surfaces, and significant frontend UX.                                                                          |
 | Major UI/UX work — adversarial minimum when another lane leads                                                                        | Claude · OpenRouter · GLM 5.2 · `claude-design-glm-5-2` preset / `claude-print` · xhigh, required before merge.                                                                                                                                           |
+| Vision-capable adversarial design evidence                                                                                             | OpenCode · OpenRouter · Kimi K2.6 vision · high variant. This visual-evidence lane complements and does not replace the required GLM 5.2 design pass for major UI/UX work.                                                                                |
 | Documentation, writing, general design support excluding major UI/UX work, review of GPT implementation, interim mobile orchestration | Claude · Anthropic · Opus 4.8 · high. Interim mobile use applies while Fable 5 is outside the Anthropic subscription.                                                                                                                                     |
 | Claude workflows                                                                                                                      | Claude · Anthropic · Opus 4.8 · low                                                                                                                                                                                                                       |
 | Massive external research / extraction                                                                                                | Antigravity CLI · Google · `agy` · low                                                                                                                                                                                                                    |
@@ -51,6 +52,13 @@ agentic tooling), not a distinct doctrine. The evaluator rules that govern OpenH
 identically: the generator session is never the evaluator session, and no lane self-certifies. GLM
 5.2 remains scoped to **pure design work** (the `major_ui_ux_*` lanes); it is not an implementation
 or general-evaluation model.
+
+### OpenRouter through OpenCode
+
+OpenCode is the native-WSL terminal/web transport for the vision-capable adversarial design-evidence
+lane. Its policy `effort` is passed to `opencode run` as `--variant`; the canonical Kimi model id
+remains centralized in `config/models.ts`. This lane adds screenshot/image evidence and does not
+supersede the GLM 5.2 requirement for major UI/UX work.
 
 ## Harness invariants
 

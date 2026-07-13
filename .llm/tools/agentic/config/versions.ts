@@ -55,3 +55,13 @@ export const TEST_COMPONENT_VERSIONS = {
   claude: '2.1.206',
   antigravity: 'official-installer',
 } as const;
+
+/** Pinned OpenCode executable contract and portable launcher defaults. */
+export const OPENCODE_TOOL = {
+  binary: 'opencode',
+  pinnedVersion: '1.17.20',
+  defaultVariant: 'high',
+  openRouterEnvRelativePath: '.config/netscript-agentic/openrouter.env',
+  webDefaultHostname: '127.0.0.1',
+  webDefaultPort: 0,
+} as const;

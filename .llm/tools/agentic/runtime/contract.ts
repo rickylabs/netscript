@@ -19,7 +19,7 @@ export const LEGAL_COMMAND_MODES: Readonly<
 export type RuntimeCommandMode<K extends RuntimeCommandKind> = K extends 'doctor' | 'status'
   ? 'inspect'
   : 'plan' | 'apply';
-export const AGENT_KINDS = ['claude', 'codex', 'antigravity'] as const;
+export const AGENT_KINDS = ['claude', 'codex', 'antigravity', 'opencode'] as const;
 export type AgentKind = typeof AGENT_KINDS[number];
 export const PROVIDER_KINDS = ['anthropic', 'openai', 'google', 'openrouter', 'custom'] as const;
 export type ProviderKind = typeof PROVIDER_KINDS[number];
@@ -72,7 +72,7 @@ export const ACTION_KINDS = [
 export type RuntimeActionKind = typeof ACTION_KINDS[number];
 // deno-fmt-ignore
 export const ADAPTER_KINDS = [
-  'foundation', 'state', 'provider', 'claude', 'codex', 'antigravity', 'mobile-control',
+  'foundation', 'state', 'provider', 'claude', 'codex', 'antigravity', 'opencode', 'mobile-control',
 ] as const;
 export type AdapterKind = typeof ADAPTER_KINDS[number];
 

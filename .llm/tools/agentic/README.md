@@ -2,9 +2,10 @@
 
 This directory is the machinery a NetScript supervisor uses to run other agents. The supervisor — a
 Claude session — does not implement framework code by hand; it delegates implementation slices to
-**WSL Codex** and evaluation to **OpenHands**, then watches, steers, and gates the results. Driving
-those lanes by hand from Windows PowerShell is fragile and token-expensive, so every step is encoded
-here as a small, typed Deno tool with a stable `deno task agentic:*` entry point.
+**WSL Codex**, terminal/vision turns to **OpenCode**, and evaluation to **OpenHands**, then watches,
+steers, and gates the results. Driving those lanes by hand from Windows PowerShell is fragile and
+token-expensive, so every step is encoded here as a small, typed Deno tool with a stable
+`deno task agentic:*` entry point.
 
 Two things make this suite worth reading rather than skimming. First, it is a **control system**: at
 its centre is a desired-state runtime controller — the "brain" — that observes the real machine,
@@ -32,10 +33,10 @@ are the _only_ place `Deno.env` and `Deno.Command` may live. The brain never mut
 `doctor`, `status`, and every `--dry-run` are inspect-only, and generic apply is deliberately
 withheld until explicit mutation ports are wired.
 
-The **hands** are the concern-grouped lanes around it — `codex/`, `openhands/`, `github/`, `wsl/`,
-`claude/` — plus `lib/` (shared primitives) and `runtime/cli/` (the human/agent entry points that
-drive the brain). A hand does one job well: launch a slice, watch a PR, resolve a token. It is safe
-to read any one of them in isolation.
+The **hands** are the concern-grouped lanes around it — `codex/`, `opencode/`, `openhands/`,
+`github/`, `wsl/`, `claude/` — plus `lib/` (shared primitives) and `runtime/cli/` (the human/agent
+entry points that drive the brain). A hand does one job well: launch a slice, watch a PR, resolve a
+token. It is safe to read any one of them in isolation.
 
 ## Folder map
 
@@ -44,6 +45,7 @@ to read any one of them in isolation.
 | `runtime/`     | The desired-state controller: `contract.ts`, `state.ts`, `ports.ts`, pure `planner.ts`, `controller.ts`, `output.ts`, the routing/rollout policy, provider profiles, and `adapters/` (the only home for `Deno.env`/`Deno.Command`). |
 | `runtime/cli/` | Entry points over the brain: the canonical `agentic-runtime` doctor/status/repair, routing-state, Antigravity evidence, and the provider + rollout canaries.                                                                        |
 | `codex/`       | The WSL Codex lane: launch a slice, watch it, steer it, inspect the daemon.                                                                                                                                                         |
+| `opencode/`    | The native WSL OpenCode lane: run general terminal turns, capture Kimi vision evaluations, or host the browser UI.                                                                                                                  |
 | `openhands/`   | The OpenHands lane: dispatch an evaluator, read its status, watch for the verdict.                                                                                                                                                  |
 | `github/`      | The GitHub REST lane: leaf-PR lifecycle, background CI/verdict watch, durable token resolution.                                                                                                                                     |
 | `wsl/`         | The WSL foundation: a native doctor and a reversible bootstrap/rollback planner.                                                                                                                                                    |
@@ -139,8 +141,8 @@ Exit: `0` ok · `2` daemon unreachable · `5` worktree not found.
 
 The runner delegates a new thread to `launch-codex-slice.ts`, or attaches only when the durable
 sender registry already maps the requested worktree to the requested thread. It then issues one
-resume at a time until the final non-empty response line is exactly `DONE` or
-`BLOCKED: <reason>`. Markers earlier in a response do not terminate the slice.
+resume at a time until the final non-empty response line is exactly `DONE` or `BLOCKED: <reason>`.
+Markers earlier in a response do not terminate the slice.
 
 Every turn appends to `<slice-dir>/codex-thread-ids.md` and atomically refreshes
 `codex-slice-status.json`, which gives `watch-run.ts` a filesystem wake signal. The final stdout is
@@ -340,6 +342,49 @@ OK .claude/skills: agentic:sync-claude OK: 17 skill(s), 21 mirrored file(s)
 OK claude hook lock check: deno.lock unchanged after 3 hook runs
 ```
 
+## The OpenCode surface — `opencode/`
+
+OpenCode is one native WSL product with terminal, TUI, and browser surfaces. The non-interactive
+launcher resolves `OPENCODE_BIN` when set and otherwise asks `Deno.Command` to resolve the
+configured `opencode` binary name on `PATH`; it never uses Windows interop or translates paths.
+
+```bash
+deno task agentic:opencode --message "Review this implementation" \
+  --model openrouter/moonshotai/kimi-k2.6 --variant high
+
+deno task agentic:opencode-eval --prompt "Adversarially review this design" \
+  -f /home/me/screens/dashboard.png -f /home/me/screens/detail.png
+```
+
+The child invocation is
+`opencode run "<message>" -m <provider/model> --variant <effort> -f
+<wsl-image>`. The message is
+deliberately built **before every flag**: OpenCode's `-f` is an array flag, so a trailing positional
+message is swallowed as another filename. Repeating `-f` passes native WSL paths through unchanged.
+Add `--format json` to the general launcher when structured event output is required; the evaluator
+captures default markdown.
+
+OpenRouter requires `OPENROUTER_API_KEY`. An already-exported value wins; otherwise the launcher
+loads only that assignment from `$HOME/.config/netscript-agentic/openrouter.env` and never prints
+it.
+
+For browser access, `agentic:opencode-web` wraps the native
+[`opencode web`](https://opencode.ai/docs/web/) server:
+
+```bash
+# Local browser only; an ephemeral port is selected by default.
+deno task agentic:opencode-web
+
+# LAN access is explicit and fail-closed unless basic authentication is configured.
+OPENCODE_SERVER_PASSWORD='<secret>' deno task agentic:opencode-web \
+  --hostname 0.0.0.0 --port 4096
+```
+
+The web launcher binds loopback by default. Any non-loopback hostname or `--mdns` requires
+`OPENCODE_SERVER_PASSWORD`; `OPENCODE_SERVER_USERNAME` remains OpenCode's optional username setting.
+This is LAN-hosted remote access to the same OpenCode sessions, not a vendor cloud relay. Repeated
+`--cors <origin>` and `--mdns-domain <name>` pass through to OpenCode.
+
 ## The safety model
 
 The primitives in `lib/agentic-lib.ts` exist so each landmine is encoded once and pinned by a test.
@@ -374,9 +419,9 @@ again outside `config/`.
 
 | To change a…                                        | Edit                                                   | Notes                                                                                                                                                                                 |
 | --------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Model id**                                        | `config/models.ts`                                     | `MODEL_IDS` (native) and `OPENROUTER_MODEL_IDS` (presets). These are the only model-id string literals.                                                                               |
+| **Model id**                                        | `config/models.ts`                                     | `MODEL_IDS` (native), `OPENROUTER_MODEL_IDS` (presets), and `OPENCODE_MODEL_IDS` (native OpenCode lane). These are the only model-id string literals.                                 |
 | **Routing binding** (lane → agent → model → effort) | `runtime/routing-policy.ts` (`CANONICAL_ROUTE_POLICY`) | The lane authority, rendered by `.llm/harness/workflow/lane-policy.md`; it references `config/models.ts` for the ids.                                                                 |
-| **Tool version**                                    | `config/versions.ts`                                   | `NODE_TARGET_VERSION` + `COMPONENT_EXPECTED_VERSIONS` (bump targets), `COMPAT_PINNED_TOOL_VERSIONS` (frozen verification markers), `TEST_COMPONENT_VERSIONS` (test-only).             |
+| **Tool version**                                    | `config/versions.ts`                                   | Runtime version sets plus `OPENCODE_TOOL` for the pinned OpenCode version, binary name, auth-file location, variant, and web defaults.                                                |
 | **Endpoint / host / installer URL**                 | `config/endpoints.ts`                                  | Node dist host, npm registry, Antigravity host + installer, OpenRouter base URLs, GitHub API base. Keep the `agentic:wsl-foundation` `--allow-net=` allowlist in `deno.json` in sync. |
 | **Provider profile / OpenRouter preset**            | `runtime/provider-profiles.ts`                         | Credential-key wiring and preset effort/purpose; model ids come from `config/models.ts`.                                                                                              |
 | **Fallback / lane policy**                          | `runtime/routing-policy.ts`                            | Fallback candidate rules, subscription/approval gates, dated transitions.                                                                                                             |
@@ -389,10 +434,13 @@ The suite ships portable: every machine-specific default is read through an env 
 fallback is the historical value, so with nothing set the behavior is byte-identical to before.
 Reads are permission-guarded — a tool without `--allow-env` simply falls back.
 
-| Env var              | Overrides                                             | Default                      |
-| -------------------- | ----------------------------------------------------- | ---------------------------- |
-| `NETSCRIPT_WSL_USER` | The WSL Linux user the suite drives Codex under.      | `codex`                      |
-| `NETSCRIPT_WSL_HOME` | The WSL home dir (brief dest, sessions-dir fallback). | `/home/<NETSCRIPT_WSL_USER>` |
+| Env var                    | Overrides                                             | Default                        |
+| -------------------------- | ----------------------------------------------------- | ------------------------------ |
+| `NETSCRIPT_WSL_USER`       | The WSL Linux user the suite drives Codex under.      | `codex`                        |
+| `NETSCRIPT_WSL_HOME`       | The WSL home dir (brief dest, sessions-dir fallback). | `/home/<NETSCRIPT_WSL_USER>`   |
+| `OPENCODE_BIN`             | The native OpenCode executable or executable name.    | Configured `opencode` name     |
+| `OPENROUTER_API_KEY`       | OpenRouter credential inherited by OpenCode.          | Configured user env file       |
+| `OPENCODE_SERVER_PASSWORD` | Enables authenticated non-loopback/mDNS web access.   | Unset; remote exposure refused |
 
 The `wslUser()` / `wslHome()` helpers in `lib/agentic-lib.ts` are the single source of truth;
 per-tool `--user` flags still override at call time.
