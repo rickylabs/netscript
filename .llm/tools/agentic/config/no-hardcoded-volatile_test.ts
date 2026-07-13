@@ -112,6 +112,8 @@ const TESTS_ALLOWED_TO_PIN_CONTRACT_LITERALS = new Set<string>([
 const README_ILLUSTRATIVE_ALLOWLIST = new Set<string>([
   MODEL_IDS.codexSol,
   config.NATIVE_CANARY_MODEL_ARGS.codex,
+  config.OPENCODE_MODEL_IDS.visionEval,
+  OPENCODE_TOOL.openRouterEnvRelativePath,
 ]);
 
 interface SourceFile {
