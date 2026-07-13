@@ -125,3 +125,57 @@ Plan-Gate is what let a false-green gate and a non-existent command reach a merg
 
 **Severity:** significant — process invariant violated; the resulting defects are fixed, the process
 gap is not retroactively fixable.
+
+## D6 — I reported a fix as landed without checking it was on the branch (significant)
+
+The NF1 slice completed, committed `36adc1a6`, and **never pushed**. I reported it as dispatched; the
+orchestrator recorded it as landed and wrote "NF1 fixed on top" into the owner's morning hand-off.
+
+**Neither of us checked the PR.** `origin/feat/netscript-mcp-skills` still carried
+`rule('allow_plugin_add', 'plugin', 'add')` at line 35, and `git branch -r --contains 36adc1a6`
+returned nothing. **The commit existed on no remote branch.** The owner could have merged #715 believing
+the MCP could install a plugin, when the shipped policy still returned `default_deny`.
+
+### This is the night's own lesson, turned on us
+
+Every defect this run found was the same shape: **something shipped that was never checked against the
+thing it claims to control.**
+
+- A lint wrapper that never surfaced the error it caught.
+- A `deno fmt` gate that could exit 0 with a crashed batch.
+- A README quick-start command that had never been run against the binary.
+- A security policy allowlisting verbs that do not exist in the CLI.
+- An evaluator reporting `success` with an empty verdict.
+- A version-drift guard scoped to one directory.
+
+And then: **a supervisor reporting a fix as landed without checking the branch.** The correction is
+identical to all of them.
+
+> **A fix that exists on a disk somewhere is not a fix that shipped. Verify where the code *is*, not
+> where you remember putting it.**
+
+### Corrective action
+
+- `36adc1a6` rebased onto `feat/netscript-mcp-skills` and pushed. Verified **from `origin`** (and from
+  the GitHub contents API, not from a local worktree): `allow_plugin_install` present, **zero** phantom
+  rules.
+- The parity guard was proven to fail before pushing — seeded `allow_plugin_frobnicate`, got
+  `AssertionError: MCP command policy rule "allow_plugin_frobnicate" references missing CLI command
+  "plugin frobnicate"`, reverted. It runs under `deno task test`, i.e. the `check-test` CI job.
+- **Full wave audit** (local head vs `origin`, every branch):
+
+| Branch | Local | Remote | Match |
+| --- | --- | --- | --- |
+| `fix/715-nf1-mcp-command-policy` | `8b09ebb6` | `8b09ebb6` | ✅ |
+| `fix/715-f4-pin-agent-specifiers` | `6976a3f6` | `6976a3f6` | ✅ |
+| `fix/763-pin-plugin-cli-specifier` | `40ecc87c` | `40ecc87c` | ✅ |
+| `quality/762-ts-ignore-sweep` | `a4266cb8` | `a4266cb8` | ✅ |
+| `docs/jsr-tagline-byte-cap` | `458879fb` | `458879fb` | ✅ |
+| `feat/netscript-mcp-skills` | (stale worktree) | `8b09ebb6` | ✅ contains all local work |
+
+**NF1 was the only one.** Every other branch's remote already matched. But the check cost nothing and
+the assumption cost a false statement in the owner's hand-off — so it is now a standing step, not a
+one-off.
+
+**Severity:** significant — a false "landed" claim in a merge hand-off is a correctness failure in the
+supervisor, not the code.

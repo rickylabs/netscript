@@ -231,3 +231,42 @@ They all rhyme:
 
 The fix is the same shape every time: **assert on the content, not on the status.** And prove the
 assertion works by making it fail on purpose.
+
+## A fix that exists on a disk somewhere is not a fix that shipped
+
+Source run: `beta10-non-dashboard--claude` (PR #715), drift **D6**.
+
+An implementation slice completed, committed, and **never pushed**. The supervisor reported it as
+dispatched; the orchestrator recorded it as landed and wrote "fixed on top" into the owner's merge
+hand-off. **Neither checked the branch.** The PR on GitHub still shipped the defect, and the owner
+could have merged it believing the fix was in.
+
+It cost one command to detect:
+
+```bash
+git branch -r --contains <sha>          # empty  => on NO remote branch
+git show origin/<branch>:<file>         # still shows the defect
+```
+
+### Rule
+
+- **Report a fix as landed only after verifying it from `origin`** — never from a local worktree,
+  and never from memory of having dispatched it. `git ls-remote`, `git branch -r --contains`, or the
+  forge's own contents API. A slice agent finishing is not a slice agent pushing.
+- Before any hand-off that says "merge-ready", audit **every** branch in the wave: local head vs
+  remote head, and confirm the remote actually contains the commits you think it does. If one fix
+  silently failed to reach its PR, assume others did.
+- Pushing to a feature branch is **not** a merge. It is what "merge-ready" actually means — a fix
+  nobody can see is not a fix.
+
+### Why this belongs with the others
+
+Every defect this run found had one shape: **something shipped that was never checked against the
+thing it claims to control** — a wrapper that never surfaced its error, a gate that exited 0 on a
+crash, a README command never run against the binary, a security policy allowlisting verbs that do
+not exist, an evaluator returning `success` with an empty verdict, a guard scoped to one directory.
+
+And then the supervisor did it too. The correction is identical, and it generalizes past code:
+
+> **Verify where the artifact _is_, not where you remember putting it. Assert on the content, not
+> the status.**
