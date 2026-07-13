@@ -434,3 +434,52 @@ registry re-sync remains a separate, owner-supervised publish action.
   Resolution recorded: house style wins. `Backlog / Triage`.
 - **#768** — OpenHands agent runtime cannot bootstrap (`No module named 'fastapi'`); the open-model
   evaluator lane is down. `Backlog / Triage`.
+
+---
+
+## Slice 5 — #769 / F4: pin every emitted JSR specifier + repo-wide guard
+
+**Branch:** `fix/715-f4-pin-agent-specifiers` · **Thread:** `019f58b4` (gpt-5.6-sol · high)
+
+### The guard is verified — by me, not by its author
+
+`.llm/tools/validation/check-netscript-jsr-specifiers.ts` (`deno task check:netscript-jsr-specifiers`),
+wired **blocking** into the `quality` CI job.
+
+I did not accept "the guard passes" as evidence. Per the lesson this run promoted — *a guard never
+seen to fail is not a guard* — I seeded a violation myself and measured it:
+
+| Tree | Guard exit | Output |
+| --- | --- | --- |
+| clean | **0** | `scanned=2147 allowances=1 failures=0` |
+| version-less `jsr:@netscript/cli` seeded into `init-agent.ts` | **1** | `FAIL … init-agent.ts:122 jsr:@netscript/cli — framework-emitted or executed jsr:@netscript/* specifier must include a version` |
+
+It names the file and line, and it **fails the build**. (My first measurement read `exit=0` — that was
+`tail`'s exit code through a pipe, not the guard's. Worth recording: even the verification of a gate
+can silently measure the wrong thing.)
+
+### What it caught that the brief did not know about
+
+The scaffolded **GitHub Actions deploy workflows** (`deploy-bare-metal`, `deploy-compose-ghcr`,
+`deploy-deno-deploy`) ran `deno x -A jsr:@netscript/cli deploy …` **unversioned**. So every project
+NetScript scaffolds shipped a deploy pipeline that fails on first run — a far larger blast radius than
+"`agent init` emits a dead config". #769 was rewritten to lead with that.
+
+Fixed by **templatizing**: `jsr:@netscript/cli` → `{{netscriptCliSpecifier}}`, substituted with the
+pinned version at scaffold time. `embedded.generated.ts` regenerated; it now carries no raw
+unversioned specifier. That is the right shape — the version is injected when the project is
+generated, not frozen into the template.
+
+### Supervisor review — one contamination rejected
+
+`packages/fresh-ui/registry.generated.ts` was modified. It is **unrelated to #769**: a stale generated
+artifact being re-synced, carrying a real **behaviour change**
+(`renderNode(child, depth, context)` → `depth + 1`, a recursion-depth fix, plus `VNode` →
+`RenderUiNode` and added `key` props).
+
+Unrelated executable scope riding silently in a p0 specifier PR is precisely the F5 mistake this run
+already made once. **Rejected from the slice** and sent back to be reverted.
+
+**New finding, recorded not fixed:** `packages/fresh-ui/registry.generated.ts` is **stale on the
+branch** — regenerating it produces a diff, and that diff contains a recursion-depth bug fix that has
+never been reviewed. Worth its own issue; deliberately not fixed here.
