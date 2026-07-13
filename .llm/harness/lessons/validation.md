@@ -179,3 +179,55 @@ things.
 - Before pushing, diff the commit's file list against what the commit message claims. If the message
   says "record evidence" and the stat shows a `.ts` tool and a lockfile, the message is wrong or the
   staging is.
+
+## An evaluator that returns nothing must fail loudly — never silently pass
+
+Source run: `beta10-non-dashboard--claude`, found by the beta.10 orchestrator while dogfooding the
+open-model evaluator lane.
+
+Claude Code's terminal `result` event carries an **empty `result` string** on some model/transport
+combinations — observed on the OpenRouter open-model evaluator lane (`qwen/qwen3.7-max`) — while the
+run reports success:
+
+```json
+{ "type": "result", "subtype": "success", "is_error": false, "result": "" }
+```
+
+The verdict is **not missing**. It is in the assistant `message.content[].text` blocks. The lane
+works perfectly: real tool calls, real reasoning, a real verdict. **Our extraction was wrong.** A
+harness that reads the obvious, conventional `result` field gets an **empty string that looks like a
+successful run**.
+
+The consequence is the worst one available: an evaluator whose empty output is read as _"no
+findings"_ and therefore as a PASS. **That is worse than having no evaluator at all** — it
+manufactures precisely the false confidence that generator-≠-evaluator exists to prevent. A
+`FAIL_FIX` PR could be merged on the strength of a blank page.
+
+### Rule
+
+- Read an evaluator verdict from the **assistant text blocks**, never from `result`.
+- **Empty evaluator output is a HARD ERROR, never a pass.** Bake the assertion in; it is the single
+  most important line in the harness.
+- Output that contains **no verdict token** (`PASS` / `FAIL_FIX` / `FAIL_RESCOPE` / `FAIL_DEBT` /
+  `FAIL_PLAN`) is _also_ a failure to evaluate. A confident-sounding essay with no verdict is not a
+  verdict.
+- Do **not** add a "fall back to `result` if the text blocks are empty" convenience path. That
+  re-opens the exact hole.
+
+Tooling: `.llm/tools/harness/extract-verdict.ts` implements this and exits non-zero on both failure
+modes; `extract-verdict_test.ts` pins them.
+
+### The shape all of these share
+
+This was the **seventh** false-green in a single run — alongside a lint wrapper that swallowed a
+crash, a fmt wrapper that could exit 0 with a crashed batch, a CI gate that never ran on the PRs
+that introduced it, a `deno task` cache that printed nothing and exited 0, and a guard verification
+whose own exit code was read through a pipe (`tail`'s, not the guard's).
+
+They all rhyme:
+
+> **An exit code, a `subtype: success`, or a green tick is not evidence. Evidence is output you can
+> point at.**
+
+The fix is the same shape every time: **assert on the content, not on the status.** And prove the
+assertion works by making it fail on purpose.
