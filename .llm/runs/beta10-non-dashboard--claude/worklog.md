@@ -516,3 +516,72 @@ recorded per slice above (`quality:scan:repo` 0 findings on the enforced scope, 
 
 Do not treat these PRs as CI-validated. The integration→main PR is the first honest CI verdict, and it
 is where three newly-blocking gates get their first real exercise — expect it to be the loud one.
+
+## Slice 5 complete — #769 landed on the #715 PR branch
+
+**Commits (rebased onto #715):** `f0850532` (pin emitted specifiers) + `6976a3f6` (repo-wide guard).
+
+**Supervisor review — gates re-run after rebase, not before:**
+
+| Gate | Verdict |
+| --- | --- |
+| `arch:check` (mcp must not import cli) | **PASS** |
+| `packages/cli` tests | **376 passed (407 steps), 0 failed** |
+| `packages/mcp` tests | **39 passed, 0 failed** |
+| JSR specifier guard, clean tree | **exit 0** — `scanned=2147 allowances=1 failures=0` |
+| JSR specifier guard, seeded violation | **exit 1** — names `init-agent.ts:122` |
+
+The contamination (`packages/fresh-ui/registry.generated.ts`) is gone from the slice: 0 fresh-ui files
+in the diff.
+
+The p0 fix is now **on the PR branch**, so cycle-2 evaluates the complete artifact rather than a
+half-fixed one. Assembling a slice into the umbrella head is the umbrella pattern (S1–S9 did the same)
+— it is not a merge to `main`, and nothing shipped.
+
+---
+
+## False-green #7 — inside the evaluator itself (the worst one)
+
+Found by the beta.10 orchestrator dogfooding the open-model evaluator lane, **before** cycle-2 ran.
+
+Claude Code's terminal `result` event is **empty** on the OpenRouter open-model lane
+(`qwen/qwen3.7-max`), while reporting `subtype: success`, `is_error: false`. The verdict is not
+missing — it lives in the assistant `message.content[].text` blocks.
+
+**The lane works.** Real tool calls, real reasoning, a real verdict. **Our extraction was wrong.** A
+harness reading the obvious `result` field gets an empty string that looks like a successful run.
+
+That is the worst failure available to this system: an evaluator whose empty output is read as "no
+findings", and therefore as a PASS. Cycle-2 would have merged a `FAIL_FIX` PR on the strength of a
+blank page.
+
+Fixed by `.llm/tools/harness/extract-verdict.ts` (6 tests):
+
+- reads assistant text blocks, **never** `result`;
+- **empty output is a hard error**, never a pass — whatever the status claims;
+- **no verdict token is also a failure to evaluate** — a confident essay with no verdict is not a
+  verdict;
+- substring-safe (`PASSED` / `PASSTHROUGH` must not match a bare `PASS` — that would have been the
+  *next* false-green);
+- **deliberately no "fall back to `result`" path**, which would re-open the hole.
+
+Proven by making it fail on the exact trap: `{"subtype":"success","is_error":false,"result":""}` →
+exit 1, *"Status is not evidence."*
+
+### The tally, and the one sentence that covers all of it
+
+Seven false-greens in a single run:
+
+1. lint wrapper swallowed a crashed batch (exit 1, zero diagnostics);
+2. fmt wrapper could **exit 0** with a crashed batch (global classification + filtered findings);
+3. `docs:readme:check` — a gate wired into no CI at all (#767);
+4. the newly-blocking gates **never run on the PRs that introduce them** (integration-branch CI);
+5. `deno task` input caching printed nothing and exited 0 — not a green run;
+6. my own guard verification read `tail`'s exit code through a pipe, not the guard's;
+7. the evaluator reporting `success` with an empty verdict.
+
+> **An exit code, a `subtype: success`, or a green tick is not evidence. Evidence is output you can
+> point at.**
+
+The fix is the same shape every time: **assert on the content, not the status — and prove the
+assertion by making it fail.**
