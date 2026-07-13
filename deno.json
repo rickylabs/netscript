@@ -74,6 +74,8 @@
     "agentic:gh-watch": "deno run --no-lock --allow-env --allow-net .llm/tools/agentic/github/gh-watch.ts",
     "agentic:gh-token": "deno run --no-lock --allow-run --allow-env --allow-net .llm/tools/agentic/github/gh-token.ts",
     "agentic:claude-hook-log": "deno run --no-lock --allow-env --allow-write .llm/tools/agentic/claude/claude-hook-log.ts",
+    "agentic:opencode": "deno run --no-lock --allow-read --allow-run --allow-env .llm/tools/agentic/opencode/opencode-run.ts",
+    "agentic:opencode-eval": "deno run --no-lock --allow-read --allow-run --allow-env .llm/tools/agentic/opencode/opencode-eval.ts",
     "gen:assets-barrel": "deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-cli-assets-barrel.ts",
     "check:assets-barrel": "deno task gen:assets-barrel && git diff --exit-code -- packages/cli/src/kernel/assets/embedded.generated.ts packages/plugin/src/kernel/assets/embedded.generated.ts packages/fresh-ui/registry.generated.ts packages/service/src/primitives/scalar.generated.ts",
     "check:scaffold-versions": "deno run .llm/tools/validation/check-scaffold-versions.ts --pretty",
