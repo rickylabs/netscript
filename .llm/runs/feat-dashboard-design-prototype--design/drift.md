@@ -125,3 +125,20 @@ documentation.
   styles; ModelSelector OPEN staged; `proto.css` waterfall tick container-query + rail StatsGrid
   column cap. All re-shot locally and verified before upload.
 - **Severity:** significant (false "fixed" state shipped in 3.2; render-gate process gap now closed).
+
+## D7 — 2026-07-13 — canvas-shots harness slice activation and test permission correction (minor)
+
+- **What:** The reusable screenshot gate moved from the scratch render loop described in D6 to the
+  dedicated `.llm/tools/canvas-shots/` slice. Its separate Claude-family PLAN-EVAL first launch
+  stalled without output and was terminated; a second isolated read-only PLAN-EVAL completed
+  `PASS` before implementation. The owner-scoped run forbade new plan-eval artifacts, so the
+  verdict remained session evidence and this append is the only run-dir change.
+- **Validation drift:** The brief specified bare `deno test .llm/tools/canvas-shots/` while also
+  requiring the browser resolver to be tested against a temporary directory. Deno denies temp-dir
+  creation without parent `--allow-read --allow-write`; per-test permissions cannot escalate the
+  parent test process. The executable gate is therefore `deno test --allow-read --allow-write
+  .llm/tools/canvas-shots/` (9 tests), preserving the required real temp-directory coverage.
+- **Dependency decision:** Playwright is pinned through the root npm catalog/import alias; `deno
+  task deps:latest --filter playwright` reported `0 behind / 1 total`. Pre-existing `deno.lock`
+  churn was preserved as unrelated and excluded from the slice commit.
+- **Severity:** minor (process/command correction; no product or canvas contract change).
