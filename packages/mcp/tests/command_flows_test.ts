@@ -7,7 +7,14 @@ import { decideCommand, DEFAULT_COMMAND_POLICY } from '../src/domain/command-pol
 Deno.test('default command policy is deny-wins with default deny', () => {
   const cases: Array<[string[], boolean, string]> = [
     [['db', 'migrate'], true, 'allow_db_migrate'],
+    [['plugin', 'install'], true, 'allow_plugin_install'],
     [['plugin', 'doctor'], true, 'allow_plugin_doctor'],
+    [['service', 'status'], false, 'default_deny'],
+    [['plugin', 'add'], false, 'default_deny'],
+    [['ui'], false, 'default_deny'],
+    [['ui:list'], true, 'allow_ui_list'],
+    [['ui:update'], true, 'allow_ui_update'],
+    [['ui:remove'], false, 'deny_ui_remove'],
     [['db', 'reset'], false, 'deny_db_reset'],
     [['deploy'], false, 'deny_deploy'],
     [['unknown'], false, 'default_deny'],
@@ -22,6 +29,30 @@ Deno.test('default command policy is deny-wins with default deny', () => {
     }, ['db', 'reset']),
     { allowed: false, rule: 'specific' },
   );
+});
+
+Deno.test('execute command allows plugin install supplied through command args', async () => {
+  const calls: Array<{ readonly path: readonly string[]; readonly args: readonly string[] }> = [];
+  const executor: CommandExecutorPort = {
+    execute: (input) => {
+      calls.push(input);
+      return Promise.resolve({
+        exitCode: 0,
+        durationMs: 1,
+        outputTail: '',
+        truncated: false,
+        timedOut: false,
+      });
+    },
+  };
+
+  const result = await createExecuteCommandFlow(executor)({
+    command: 'plugin',
+    args: ['install', 'workers'],
+  });
+
+  assert(result.ok);
+  assertEquals(calls, [{ path: ['plugin'], args: ['install', 'workers'] }]);
 });
 
 Deno.test('list commands filters and limits dynamic catalog results', async () => {

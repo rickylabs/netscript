@@ -31,14 +31,14 @@ export const DEFAULT_COMMAND_POLICY: CommandPolicy = Object.freeze({
     rule('allow_generate', 'generate'),
     rule('allow_contract', 'contract'),
     rule('allow_service_list', 'service', 'list'),
-    rule('allow_service_status', 'service', 'status'),
-    rule('allow_plugin_add', 'plugin', 'add'),
+    rule('allow_plugin_install', 'plugin', 'install'),
     rule('allow_plugin_list', 'plugin', 'list'),
     rule('allow_plugin_sync', 'plugin', 'sync'),
     rule('allow_plugin_doctor', 'plugin', 'doctor'),
-    rule('allow_ui', 'ui'),
     rule('allow_ui_add', 'ui:add'),
     rule('allow_ui_init', 'ui:init'),
+    rule('allow_ui_list', 'ui:list'),
+    rule('allow_ui_update', 'ui:update'),
   ]),
   deny: Object.freeze([
     rule('deny_deploy', 'deploy'),
@@ -46,6 +46,7 @@ export const DEFAULT_COMMAND_POLICY: CommandPolicy = Object.freeze({
     rule('deny_marketplace', 'marketplace'),
     rule('deny_db_reset', 'db', 'reset'),
     rule('deny_plugin_remove', 'plugin', 'remove'),
+    rule('deny_ui_remove', 'ui:remove'),
   ]),
 });
 

@@ -20,7 +20,7 @@ export function createExecuteCommandFlow(
     const args = isRecord(input) && Array.isArray(input.args)
       ? input.args.filter((value): value is string => typeof value === 'string')
       : [];
-    const decision = decideCommand(policy, path);
+    const decision = decideCommand(policy, [...path, ...args]);
     if (!decision.allowed) {
       return {
         ok: false,

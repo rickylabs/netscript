@@ -213,9 +213,10 @@ The generic `createMcpServer(options)` takes the lower-level seams instead — `
 ### Command policy
 
 `DEFAULT_COMMAND_POLICY` **allows** `db init|generate|migrate|seed|status|introspect`, `generate`,
-`contract`, `service list|status`, `plugin add|list|sync|doctor`, and the `ui` verbs. It **denies**
-`deploy`, `init`, `marketplace`, `db reset`, and `plugin remove`. Deny beats allow; anything
-unmatched is denied by default. Pass your own `CommandPolicy` to tighten or (deliberately) widen it.
+`contract`, `service list`, `plugin install|list|sync|doctor`, and
+`ui:add|ui:init|ui:list|ui:update`. It **denies** `deploy`, `init`, `marketplace`, `db reset`,
+`plugin remove`, and `ui:remove`. Deny beats allow; anything unmatched is denied by default. Pass
+your own `CommandPolicy` to tighten or (deliberately) widen it.
 
 ### Data boundary and permissions
 
