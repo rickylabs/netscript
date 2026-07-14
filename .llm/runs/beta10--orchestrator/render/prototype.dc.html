@@ -628,43 +628,167 @@
 
       <!-- @S2-END -->
       <sc-if value="{{ isRuntime }}" hint-placeholder-val="{{ false }}">
-        <div class="ns-screen" data-screen-label="S3 Runtime Config">
+        <div class="ns-screen ns-runtime" data-screen-label="S3 Runtime Config">
           <header class="ns-page-header ns-page-header--console">
             <div class="ns-toolbar">
               <div style="display:grid;gap:var(--ns-space-2)">
+                <div class="ns-catcrumb" aria-hidden="true"><span class="ns-catcrumb__root">Override store</span><span class="ns-catcrumb__sep">›</span><span class="ns-catcrumb__leaf">current · {{ s3Head.rev }}</span></div>
                 <h1>Runtime config</h1>
-                <p class="ns-lede">The live override layer neither Aspire nor Scalar can know exists — streamed as it changes, with gated controls to flip it back.</p>
+                <p class="ns-lede">The live override layer neither Aspire nor Scalar can know exists — the write side of config resolution, streamed as it changes, with gated controls to flip it back.</p>
               </div>
             </div>
           </header>
 
-          <div class="ns-stats-grid" style="margin-bottom:var(--ns-space-6)">
-            <sc-for list="{{ s3Stats }}" as="st" hint-placeholder-count="5">
-              <div class="ns-card" style="background:var(--ns-card);padding:var(--ns-space-4)">
-                <div class="ns-stats-grid__label">{{ st.label }}</div>
-                <div class="ns-stats-grid__value" style="font-family:var(--ns-font-mono);font-size:var(--ns-text-2xl)">{{ st.value }}</div>
+          <!-- header composite: override-store micro-viz (NOT number cards) -->
+          <div class="ns-rchead">
+            <div class="ns-rchead__cell ns-rchead__cell--total">
+              <span class="ns-rchead__glyph" aria-hidden="true">⧉</span>
+              <div class="ns-rchead__main">
+                <span class="ns-rchead__value">{{ s3Head.total }}</span>
+                <span class="ns-rchead__label">active overrides</span>
               </div>
-            </sc-for>
+              <div class="ns-rchead__pips">
+                <sc-for list="{{ s3Head.pips }}" as="p" hint-placeholder-count="4">
+                  <span class="ns-rchead__pip" data-tone="{{ p.tone }}" title="{{ p.label }}: {{ p.n }}"><span class="ns-rchead__pip-g" aria-hidden="true">{{ p.glyph }}</span>{{ p.n }}</span>
+                </sc-for>
+              </div>
+            </div>
+            <div class="ns-rchead__cell">
+              <span class="ns-rchead__label">diverging from base</span>
+              <div class="ns-rchead__ratio" role="img" aria-label="Keys diverging from base">
+                <div class="ns-rchead__ratiofill {{ s3Head.divWClass }}"></div>
+                <span class="ns-rchead__ratiopct">{{ s3Head.divN }}<span class="ns-rchead__ratioof"> / {{ s3Head.baseN }} keys</span></span>
+              </div>
+              <span class="ns-rchead__sub">{{ s3Head.divPct }} of resolved keys overridden</span>
+            </div>
+            <div class="ns-rchead__cell">
+              <span class="ns-rchead__label">last revision</span>
+              <div class="ns-rchead__rev">
+                <span class="ns-rchead__revtag">{{ s3Head.rev }}</span>
+                <div class="ns-rchead__revmeta"><span class="ns-rchead__revby">{{ s3Head.revBy }}</span><span class="ns-rchead__revat">{{ s3Head.revAt }}</span></div>
+              </div>
+              <span class="ns-rchead__sub">writes append a new store revision</span>
+            </div>
+            <div class="ns-rchead__cell">
+              <span class="ns-rchead__label">hot-reload</span>
+              <div class="ns-rchead__reload" data-tone="{{ s3Head.reloadTone }}">
+                <span class="ns-rchead__reload-dot" aria-hidden="true"></span>
+                <span class="ns-rchead__reload-main">{{ s3Head.reloadLabel }}</span>
+              </div>
+              <div class="ns-rchead__reload-bar" aria-hidden="true"><span class="ns-rchead__reload-live" style="flex:{{ s3Head.liveN }}"></span><span class="ns-rchead__reload-pend" style="flex:{{ s3Head.pendN }}"></span></div>
+            </div>
           </div>
 
-          <div style="display:grid;gap:var(--ns-space-6);grid-template-columns:repeat(auto-fit,minmax(min(26rem,100%),1fr));align-items:start">
-            <div style="display:grid;gap:var(--ns-space-6);min-width:0">
+          <div class="ns-runtime__grid">
+            <div class="ns-runtime__main">
+              <!-- HERO: the live override set — one dense editable-looking store -->
+              <section class="ns-card ns-ovstore" style="background:var(--ns-card)">
+                <div class="ns-ovstore__head">
+                  <div class="ns-ovstore__head-l">
+                    <span class="ns-card__title">Live override set</span>
+                    <span class="ns-ovstore__hint">key · base → override · provenance · hot-reload</span>
+                  </div>
+                  <span class="ns-livedot" data-state="{{ s3LiveState }}">sse</span>
+                </div>
+                <div class="ns-ovstore__cols" aria-hidden="true">
+                  <span>override key</span><span>base → value</span><span class="ns-ovstore__col-prov">applied</span><span class="ns-ovstore__col-rl">reload</span><span></span>
+                </div>
+                <div class="ns-ovstore__body">
+                  <sc-for list="{{ s3Store }}" as="o" hint-placeholder-count="5">
+                    <div class="ns-ovrow" data-kind="{{ o.kind }}" data-sel="{{ o.selState }}">
+                      <button class="ns-ovrow__key" onClick="{{ o.select }}">
+                        <span class="ns-ovrow__glyph" data-tone="{{ o.tone }}" aria-hidden="true">{{ o.glyph }}</span>
+                        <span class="ns-ovrow__keytext">{{ o.key }}</span>
+                      </button>
+                      <div class="ns-ovrow__val">
+                        <span class="ns-ovrow__base">{{ o.base }}</span>
+                        <span class="ns-ovrow__arrow" aria-hidden="true">→</span>
+                        <span class="{{ o.valClass }}">{{ o.val }}</span>
+                      </div>
+                      <div class="ns-ovrow__prov">
+                        <span class="ns-ovrow__by">{{ o.by }}</span>
+                        <span class="ns-ovrow__at">{{ o.at }} · {{ o.rev }}</span>
+                      </div>
+                      <span class="ns-ovrow__rl" data-state="{{ o.reload }}">{{ o.reloadLabel }}</span>
+                      <button class="{{ o.actClass }} ns-ovrow__act" onClick="{{ o.act }}">{{ o.actLabel }}</button>
+                    </div>
+                  </sc-for>
+                  <sc-if value="{{ s3NoStore }}" hint-placeholder-val="{{ false }}">
+                    <div class="ns-empty-state ns-empty-state--ov" style="margin:var(--ns-space-3)"><span class="ns-empty-state__heading">Store is clean</span> Nothing overridden — runtime config resolves entirely to defaults.</div>
+                  </sc-if>
+                </div>
+              </section>
+
+              <!-- Revision history — the config-store revision log with rollback -->
               <section class="ns-card" style="background:var(--ns-card)">
                 <div class="ns-card__header" style="padding:var(--ns-space-4) var(--ns-space-5);border-bottom:1px solid var(--ns-border);flex-direction:row;align-items:center;justify-content:space-between">
+                  <div style="display:grid;gap:2px">
+                    <span class="ns-card__title">Revision history</span>
+                    <span style="font-family:var(--ns-font-mono);font-size:var(--ns-text-2xs);color:var(--ns-muted-fg)">store revisions over time · roll back to any</span>
+                  </div>
+                  <div class="ns-seg" role="group" aria-label="Diff view">
+                    <button class="ns-seg__btn" data-state="{{ s3SegAll.state }}" onClick="{{ s3SegAll.set }}">All</button>
+                    <button class="ns-seg__btn" data-state="{{ s3SegCompact.state }}" onClick="{{ s3SegCompact.set }}">Compact</button>
+                    <button class="ns-seg__btn" data-state="{{ s3SegJson.state }}" onClick="{{ s3SegJson.set }}">JSON</button>
+                  </div>
+                </div>
+                <div style="padding:var(--ns-space-3) var(--ns-space-5) var(--ns-space-4)">
+                  <div class="ns-revchain">
+                    <sc-for list="{{ s3Vers }}" as="v" hint-placeholder-count="3">
+                      <div class="ns-revchain__step" data-state="{{ v.current }}">
+                        <span class="ns-revchain__tag" data-state="{{ v.current }}">{{ v.v }}</span>
+                        <div class="ns-revchain__main">
+                          <div class="ns-revchain__titlerow">
+                            <span class="ns-revchain__title">{{ v.title }}</span>
+                            <sc-if value="{{ v.current }}" hint-placeholder-val="{{ false }}"><span class="ns-badge ns-badge--primary">current</span></sc-if>
+                          </div>
+                          <div class="ns-revchain__meta">
+                            <span class="ns-revchain__by">{{ v.by }}</span>
+                            <span class="ns-revchain__sep">·</span>
+                            <span>{{ v.meta }}</span>
+                            <span class="ns-revchain__pips" aria-hidden="true"><sc-for list="{{ v.pips }}" as="p" hint-placeholder-count="2"><span class="ns-revchain__pip"></span></sc-for></span>
+                          </div>
+                          <sc-if value="{{ v.showJson }}" hint-placeholder-val="{{ false }}">
+                            <div class="ns-code" style="margin-top:var(--ns-space-2)"><div class="ns-code__head"><span class="ns-code__name">{{ v.v }}.json</span><span class="ns-code__lang">json</span></div><pre><code>{{ v.json }}</code></pre></div>
+                          </sc-if>
+                          <sc-if value="{{ v.showDiff }}" hint-placeholder-val="{{ false }}">
+                            <div class="ns-diff" style="margin-top:var(--ns-space-2)">
+                              <sc-for list="{{ v.diff }}" as="d" hint-placeholder-count="3">
+                                <span class="ns-diff__line" data-op="{{ d.op }}">{{ d.text }}</span>
+                              </sc-for>
+                            </div>
+                          </sc-if>
+                          <div class="ns-revchain__acts">
+                            <button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ v.toggle }}">{{ v.toggleLabel }}</button>
+                            <sc-if value="{{ v.canRoll }}" hint-placeholder-val="{{ false }}">
+                              <button class="ns-btn ns-btn--secondary ns-btn--sm ns-revchain__roll" onClick="{{ v.rollback }}"><span aria-hidden="true">⟲</span> Roll back to {{ v.v }}</button>
+                            </sc-if>
+                          </div>
+                        </div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            <aside class="ns-runtime__aside">
+              <!-- Live override feed (write events streamed) -->
+              <section class="ns-card" style="background:var(--ns-card)">
+                <div class="ns-card__header" style="padding:var(--ns-space-3) var(--ns-space-4);border-bottom:1px solid var(--ns-border);flex-direction:row;align-items:center;justify-content:space-between">
                   <span class="ns-card__title">Live override feed</span>
                   <div class="ns-feed-toolbar">
                     <sc-if value="{{ s3HasPending }}" hint-placeholder-val="{{ false }}">
                       <button class="ns-newpill" onClick="{{ s3Catch }}">{{ s3PendingCount }} new changes</button>
                     </sc-if>
-                    <span class="ns-livedot" data-state="{{ s3LiveState }}">sse</span>
                     <label class="ns-choice" style="align-items:center">
                       <span style="position:relative;display:inline-flex"><input type="checkbox" class="ns-switch" checked="{{ s3Follow }}" onChange="{{ s3ToggleFollow }}"><span class="ns-switch__track" style="display:inline-flex;align-items:center;width:2.35rem;height:1.3rem;border:1px solid var(--ns-border-strong);border-radius:var(--ns-radius-full);background:var(--ns-surface);padding:2px;transition:background 140ms ease,border-color 140ms ease"><span class="ns-switch__thumb" style="width:0.95rem;height:0.95rem;border-radius:var(--ns-radius-full);background:var(--ns-card);box-shadow:var(--ns-shadow-xs);transition:transform 140ms ease"></span></span></span>
                       <span class="ns-choice__label" style="font-size:var(--ns-text-xs)">Follow</span>
                     </label>
                   </div>
                 </div>
-                <div style="padding:var(--ns-space-2) var(--ns-space-5) var(--ns-space-4);max-height:22rem;overflow-y:auto">
-                  <div class="ns-activity-feed">
+                <div style="padding:var(--ns-space-2) var(--ns-space-4) var(--ns-space-3);max-height:20rem;overflow-y:auto">
+                  <div class="ns-activity-feed ns-activity-feed--dense">
                     <sc-for list="{{ s3FeedItems }}" as="f" hint-placeholder-count="4">
                       <div class="ns-activity-feed__item" data-tone="{{ f.tone }}">
                         <span class="ns-activity-feed__marker" aria-hidden="true"></span>
@@ -678,107 +802,60 @@
                 </div>
               </section>
 
-              <section class="ns-card" style="background:var(--ns-card)">
-                <div class="ns-card__header" style="padding:var(--ns-space-4) var(--ns-space-5);border-bottom:1px solid var(--ns-border);flex-direction:row;align-items:center;justify-content:space-between">
-                  <span class="ns-card__title">Version history</span>
-                  <div class="ns-seg" role="group" aria-label="Diff view">
-                    <button class="ns-seg__btn" data-state="{{ s3SegAll.state }}" onClick="{{ s3SegAll.set }}">All</button>
-                    <button class="ns-seg__btn" data-state="{{ s3SegCompact.state }}" onClick="{{ s3SegCompact.set }}">Compact</button>
-                    <button class="ns-seg__btn" data-state="{{ s3SegJson.state }}" onClick="{{ s3SegJson.set }}">JSON</button>
+              <!-- Pending hot-reloads — overrides written but needing a restart to take effect -->
+              <section class="ns-card ns-hotreload" style="background:var(--ns-card)">
+                <div class="ns-hotreload__head">
+                  <div class="ns-hotreload__head-l">
+                    <span class="ns-hotreload__dot" aria-hidden="true"></span>
+                    <span class="ns-card__title">Pending hot-reloads</span>
                   </div>
+                  <span class="ns-hotreload__count">{{ s3Head.reloadLabel }}</span>
                 </div>
-                <div style="padding:var(--ns-space-3) var(--ns-space-5) var(--ns-space-4)">
-                  <div class="ns-verchain">
-                    <sc-for list="{{ s3Vers }}" as="v" hint-placeholder-count="3">
-                      <div class="ns-verchain__step" data-state="{{ v.current }}">
-                        <span class="ns-verchain__tag">{{ v.v }}</span>
-                        <div class="ns-verchain__main">
-                          <div class="ns-verchain__title">{{ v.title }}
-                            <sc-if value="{{ v.current }}" hint-placeholder-val="{{ false }}"><span class="ns-badge ns-badge--primary">current</span></sc-if>
-                          </div>
-                          <span class="ns-verchain__meta">{{ v.meta }}</span>
-                          <sc-if value="{{ v.showJson }}" hint-placeholder-val="{{ false }}">
-                            <div class="ns-code" style="margin-top:var(--ns-space-2)"><div class="ns-code__head"><span class="ns-code__name">{{ v.v }}.json</span><span class="ns-code__lang">json</span></div><pre><code>{{ v.json }}</code></pre></div>
-                          </sc-if>
-                          <sc-if value="{{ v.showDiff }}" hint-placeholder-val="{{ false }}">
-                            <div class="ns-diff" style="margin-top:var(--ns-space-2)">
-                              <sc-for list="{{ v.diff }}" as="d" hint-placeholder-count="3">
-                                <span class="ns-diff__line" data-op="{{ d.op }}">{{ d.text }}</span>
-                              </sc-for>
-                            </div>
-                          </sc-if>
-                          <button class="ns-btn ns-btn--ghost ns-btn--sm" style="justify-self:start;margin-top:var(--ns-space-1)" onClick="{{ v.toggle }}">{{ v.toggleLabel }}</button>
-                        </div>
+                <div class="ns-hotreload__body">
+                  <sc-for list="{{ s3PendingReloads }}" as="p" hint-placeholder-count="2">
+                    <div class="ns-hotrow">
+                      <span class="ns-hotrow__glyph" data-tone="{{ p.tone }}" aria-hidden="true">{{ p.glyph }}</span>
+                      <div class="ns-hotrow__main">
+                        <span class="ns-hotrow__key">{{ p.key }}</span>
+                        <span class="ns-hotrow__note">needs restart to take effect</span>
                       </div>
+                      <button class="ns-btn ns-btn--secondary ns-btn--sm ns-hotrow__act" onClick="{{ p.act }}" title="{{ p.actLabel }} · {{ p.by }} · {{ p.rev }}"><span aria-hidden="true">⟳</span> {{ p.actLabel }}</button>
+                    </div>
+                  </sc-for>
+                  <sc-if value="{{ s3NoPending }}" hint-placeholder-val="{{ false }}">
+                    <div class="ns-hotreload__clean"><span class="ns-hotreload__clean-glyph" aria-hidden="true">✓</span> All overrides are live — nothing awaiting a restart.</div>
+                  </sc-if>
+                </div>
+              </section>
+
+              <!-- Change authors — operators who applied overrides (derived from provenance) -->
+              <section class="ns-card ns-authors" style="background:var(--ns-card)">
+                <div class="ns-authors__head">
+                  <span class="ns-card__title">Change authors</span>
+                  <span class="ns-authors__hint">who applied the live overrides</span>
+                </div>
+                <div class="ns-authors__body">
+                  <sc-for list="{{ s3Authors }}" as="a" hint-placeholder-count="3">
+                    <div class="ns-authorrow">
+                      <span class="ns-authorrow__avatar" aria-hidden="true">{{ a.initials }}</span>
+                      <div class="ns-authorrow__main">
+                        <span class="ns-authorrow__by">{{ a.by }}</span>
+                        <span class="ns-authorrow__meta">last change {{ a.at }} · {{ a.rev }}</span>
+                      </div>
+                      <div class="ns-authorrow__stats">
+                        <span class="ns-authorrow__stat"><span class="ns-authorrow__stat-n">{{ a.n }}</span><span class="ns-authorrow__stat-l">ovr</span></span>
+                        <span class="ns-authorrow__stat"><span class="ns-authorrow__stat-n">{{ a.revN }}</span><span class="ns-authorrow__stat-l">rev</span></span>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+                <div class="ns-authors__drift">
+                  <span class="ns-authors__drift-label">base drift by type</span>
+                  <div class="ns-authors__drift-row">
+                    <sc-for list="{{ s3Drift }}" as="d" hint-placeholder-count="4">
+                      <span class="ns-driftchip" data-tone="{{ d.tone }}" title="{{ d.label }}: {{ d.n }} diverging"><span class="ns-driftchip__g" aria-hidden="true">{{ d.glyph }}</span><span class="ns-driftchip__n">{{ d.n }}</span><span class="ns-driftchip__l">{{ d.label }}</span></span>
                     </sc-for>
                   </div>
-                </div>
-              </section>
-            </div>
-
-            <aside style="display:grid;gap:var(--ns-space-6);min-width:0">
-              <section class="ns-card" style="background:var(--ns-card)">
-                <div class="ns-card__header" style="padding:var(--ns-space-4) var(--ns-space-5);border-bottom:1px solid var(--ns-border)">
-                  <span class="ns-card__title">Feature flags</span>
-                  <span class="ns-card__description">Flipping opens a confirm with the exact CLI equivalent, then writes to the runtime-config override store — the watcher hot-reloads it live.</span>
-                </div>
-                <div style="padding:var(--ns-space-2) var(--ns-space-5) var(--ns-space-3)">
-                  <sc-for list="{{ s3Flags }}" as="f" hint-placeholder-count="3">
-                    <div style="display:flex;align-items:center;gap:var(--ns-space-3);padding:var(--ns-space-2-5) 0;border-bottom:1px solid color-mix(in oklab, var(--ns-border) 55%, transparent)">
-                      <div style="display:grid;gap:2px;min-width:0;flex:1">
-                        <span style="font-family:var(--ns-font-mono);font-size:var(--ns-text-sm)">{{ f.id }}</span>
-                        <span style="font-family:var(--ns-font-mono);font-size:var(--ns-text-2xs);color:var(--ns-muted-fg)">{{ f.meta }}</span>
-                      </div>
-                      <span style="position:relative;display:inline-flex;cursor:pointer"><input type="checkbox" class="ns-switch" checked="{{ f.checked }}" onChange="{{ f.toggle }}"><span class="ns-switch__track" style="display:inline-flex;align-items:center;width:2.35rem;height:1.3rem;border:1px solid var(--ns-border-strong);border-radius:var(--ns-radius-full);background:var(--ns-surface);padding:2px;transition:background 140ms ease,border-color 140ms ease"><span class="ns-switch__thumb" style="width:0.95rem;height:0.95rem;border-radius:var(--ns-radius-full);background:var(--ns-card);box-shadow:var(--ns-shadow-xs);transition:transform 140ms ease"></span></span></span>
-                    </div>
-                  </sc-for>
-                </div>
-              </section>
-
-              <section class="ns-card" style="background:var(--ns-card)">
-                <div class="ns-card__header" style="padding:var(--ns-space-4) var(--ns-space-5);border-bottom:1px solid var(--ns-border)">
-                  <span class="ns-card__title">Disabled entities</span>
-                </div>
-                <div style="padding:var(--ns-space-2) var(--ns-space-5) var(--ns-space-3)">
-                  <sc-for list="{{ s3Jobs }}" as="j" hint-placeholder-count="1">
-                    <div style="display:flex;align-items:center;gap:var(--ns-space-2);padding:var(--ns-space-2-5) 0;border-bottom:1px solid color-mix(in oklab, var(--ns-border) 55%, transparent)">
-                      <span class="ns-badge ns-badge--muted">job</span>
-                      <span style="font-family:var(--ns-font-mono);font-size:var(--ns-text-sm);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">{{ j.id }}</span>
-                      <button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ j.openWorkers }}">Open in Workers</button>
-                      <button class="ns-btn ns-btn--secondary ns-btn--sm" onClick="{{ j.enable }}">Enable</button>
-                    </div>
-                  </sc-for>
-                  <sc-for list="{{ s3Trigs }}" as="t" hint-placeholder-count="1">
-                    <div style="display:flex;align-items:center;gap:var(--ns-space-2);padding:var(--ns-space-2-5) 0;border-bottom:1px solid color-mix(in oklab, var(--ns-border) 55%, transparent)">
-                      <span class="ns-badge ns-badge--muted">trigger</span>
-                      <span style="font-family:var(--ns-font-mono);font-size:var(--ns-text-sm);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">{{ t.id }}</span>
-                      <button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ t.openTriggers }}">Open in Triggers</button>
-                      <button class="ns-btn ns-btn--secondary ns-btn--sm" onClick="{{ t.enable }}">Enable</button>
-                    </div>
-                  </sc-for>
-                  <sc-if value="{{ s3NoDisabled }}" hint-placeholder-val="{{ false }}">
-                    <div class="ns-empty-state" style="margin:var(--ns-space-2) 0">Nothing disabled — runtime config is at defaults.</div>
-                  </sc-if>
-                </div>
-              </section>
-
-              <section class="ns-card" style="background:var(--ns-card)">
-                <div class="ns-card__header" style="padding:var(--ns-space-4) var(--ns-space-5);border-bottom:1px solid var(--ns-border)">
-                  <span class="ns-card__title">Task overrides</span>
-                </div>
-                <div style="padding:var(--ns-space-2) var(--ns-space-5) var(--ns-space-3)">
-                  <sc-for list="{{ s3Tasks }}" as="tk" hint-placeholder-count="3">
-                    <div style="display:flex;align-items:center;gap:var(--ns-space-2);padding:var(--ns-space-2-5) 0;border-bottom:1px solid color-mix(in oklab, var(--ns-border) 55%, transparent)">
-                      <div style="display:grid;gap:2px;min-width:0;flex:1">
-                        <span style="font-family:var(--ns-font-mono);font-size:var(--ns-text-sm)">{{ tk.id }}</span>
-                        <span style="font-family:var(--ns-font-mono);font-size:var(--ns-text-2xs);color:var(--ns-muted-fg)">{{ tk.note }}</span>
-                      </div>
-                      <button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ tk.clear }}">Clear override</button>
-                    </div>
-                  </sc-for>
-                  <sc-if value="{{ s3NoTasks }}" hint-placeholder-val="{{ false }}">
-                    <div class="ns-empty-state" style="margin:var(--ns-space-2) 0">No task overrides.</div>
-                  </sc-if>
                 </div>
               </section>
             </aside>
@@ -3489,7 +3566,7 @@
             <div class="ns-toolbar">
               <div style="display:grid;gap:var(--ns-space-2)">
                 <h1>Extensions</h1>
-                <p class="ns-lede">Every UI contribution in the app — panels, ⌘K actions, and AI tools — with its provenance, trust tier, and permissions. The dashboard is itself a plugin.</p>
+                <p class="ns-lede">Installed add-ons and the host surfaces they extend.</p>
               </div>
               <div class="ns-seg ns-extseg" role="group" aria-label="Extensions view">
                 <button class="ns-seg__btn ns-extseg__btn" data-state="{{ extSegPanels.state }}" onClick="{{ extSegPanels.set }}">Providers</button>
@@ -3502,7 +3579,6 @@
           <!-- ============ HEADER COMPOSITE: installed count + surface-distribution channel + enabled meter + compat alert ============ -->
           <section class="ns-exthead" aria-label="Extensions overview">
             <div class="ns-exthead__cell ns-exthead__cell--hero">
-              <span class="ns-exthead__glyph" aria-hidden="true">◈</span>
               <div class="ns-exthead__hero-main">
                 <span class="ns-exthead__hero-num">{{ extHead.installed }}<span class="ns-exthead__hero-unit">extensions</span></span>
                 <span class="ns-exthead__hero-sub">{{ extHead.enabledLbl }} · {{ extHead.contribLbl }}</span>
@@ -3528,13 +3604,12 @@
               </div>
               <div class="ns-extratio__foot"><span>{{ extHead.enabled }} enabled</span><span class="ns-extratio__muted">{{ extHead.disabled }} disabled</span></div>
               <div class="ns-exthead__tiers">
-                <sc-for list="{{ extHead.tierChips }}" as="tc" hint-placeholder-count="2"><span class="ns-exttier" data-tier="{{ tc.tier }}"><span class="ns-exttier__glyph" aria-hidden="true">{{ tc.glyph }}</span>{{ tc.label }} <b>{{ tc.n }}</b></span></sc-for>
+                <sc-for list="{{ extHead.tierChips }}" as="tc" hint-placeholder-count="2"><span class="ns-exttier" data-tier="{{ tc.tier }}">{{ tc.label }} <b>{{ tc.n }}</b></span></sc-for>
               </div>
             </div>
             <div class="ns-exthead__cell ns-exthead__cell--alert">
               <span class="ns-exthead__label">compatibility</span>
               <div class="ns-extcompat" data-state="{{ extHead.compatState }}">
-                <span class="ns-extcompat__glyph" aria-hidden="true">{{ extHead.compatGlyph }}</span>
                 <div class="ns-extcompat__body">
                   <span class="ns-extcompat__head">{{ extHead.compatHead }}</span>
                   <span class="ns-extcompat__note">{{ extHead.compatNote }}</span>
@@ -3558,8 +3633,6 @@
               <div class="ns-extroster" role="list" aria-label="Installed extensions">
                 <sc-for list="{{ extProviders }}" as="e" hint-placeholder-count="6">
                   <button class="ns-extprov" role="listitem" data-ext-id="{{ e.id }}" data-state="{{ e.selState }}" data-disabled="{{ e.disabled }}" onClick="{{ e.select }}">
-                    <span class="ns-extprov__rail" aria-hidden="true"></span>
-                    <span class="ns-extprov__glyph" data-tier="{{ e.tier }}" aria-hidden="true">{{ e.glyph }}</span>
                     <div class="ns-extprov__main">
                       <div class="ns-extprov__top">
                         <span class="ns-extprov__name">{{ e.name }}</span>
@@ -3570,7 +3643,7 @@
                         <sc-for list="{{ e.barSegs }}" as="b" hint-placeholder-count="2"><span class="ns-extprov__barseg {{ b.wClass }}" data-kind="{{ b.kind }}" title="{{ b.title }}"></span></sc-for>
                       </div>
                       <div class="ns-extprov__pips">
-                        <sc-for list="{{ e.pips }}" as="pp" hint-placeholder-count="2"><span class="ns-extprov__pip" data-kind="{{ pp.kind }}"><span class="ns-extprov__pip-glyph" aria-hidden="true">{{ pp.glyph }}</span>{{ pp.label }}</span></sc-for>
+                        <sc-for list="{{ e.pips }}" as="pp" hint-placeholder-count="2"><span class="ns-extprov__pip" data-kind="{{ pp.kind }}">{{ pp.label }}</span></sc-for>
                         <span class="ns-extprov__src">{{ e.source }}</span>
                       </div>
                     </div>
@@ -3580,7 +3653,6 @@
 
               <aside class="ns-extmanifest" aria-label="Extension manifest">
                 <div class="ns-extmanifest__head">
-                  <span class="ns-extmanifest__glyph" data-tier="{{ extSel.tier }}" aria-hidden="true">{{ extSel.glyph }}</span>
                   <div class="ns-extmanifest__id">
                     <div class="ns-extmanifest__name-row"><span class="ns-extmanifest__name">{{ extSel.name }}</span><span class="ns-extmanifest__ver">{{ extSel.version }}</span><span class="{{ extSel.tierBadge }}">{{ extSel.tier }}</span></div>
                     <span class="ns-extmanifest__sub">{{ extSel.source }} · contributes to {{ extSel.surfLbl }}</span>
@@ -3596,11 +3668,10 @@
                 <div class="ns-extmanifest__groups">
                   <sc-for list="{{ extSel.groups }}" as="g" hint-placeholder-count="2">
                     <div class="ns-extgroup" data-kind="{{ g.kind }}">
-                      <div class="ns-extgroup__head"><span class="ns-extgroup__glyph" aria-hidden="true">{{ g.glyph }}</span><span class="ns-extgroup__title">{{ g.title }}</span><span class="ns-extgroup__n">{{ g.n }}</span></div>
+                      <div class="ns-extgroup__head"><span class="ns-extgroup__title">{{ g.title }}</span><span class="ns-extgroup__n">{{ g.n }}</span></div>
                       <div class="ns-extgroup__items">
                         <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="2">
                           <div class="ns-extcontrib">
-                            <span class="ns-extcontrib__glyph" aria-hidden="true">{{ it.icon }}</span>
                             <div class="ns-extcontrib__main">
                               <span class="ns-extcontrib__title">{{ it.title }}</span>
                               <span class="ns-extcontrib__path">{{ it.meta }}</span>
@@ -3615,12 +3686,12 @@
 
                 <div class="ns-extmanifest__section-label">plugs into</div>
                 <div class="ns-extmounts">
-                  <sc-for list="{{ extSel.mounts }}" as="m" hint-placeholder-count="2"><span class="ns-extmount" data-kind="{{ m.kind }}"><span class="ns-extmount__glyph" aria-hidden="true">{{ m.glyph }}</span>{{ m.label }}</span></sc-for>
+                  <sc-for list="{{ extSel.mounts }}" as="m" hint-placeholder-count="2"><span class="ns-extmount" data-kind="{{ m.kind }}">{{ m.label }}</span></sc-for>
                 </div>
 
                 <div class="ns-extmanifest__actions">
                   <button class="{{ extSel.toggleClass }}" onClick="{{ extSel.toggle }}">{{ extSel.actionLabel }}</button>
-                  <button class="ns-btn ns-btn--ghost" onClick="{{ extSel.viewPlugin }}">View plugin →</button>
+                  <button class="ns-btn ns-btn--ghost" onClick="{{ extSel.viewPlugin }}">View plugin</button>
                 </div>
               </aside>
             </div>
@@ -3632,7 +3703,6 @@
               <sc-for list="{{ extLanes }}" as="ln" hint-placeholder-count="3">
                 <section class="ns-extlane" data-kind="{{ ln.kind }}">
                   <header class="ns-extlane__head">
-                    <span class="ns-extlane__glyph" aria-hidden="true">{{ ln.glyph }}</span>
                     <span class="ns-extlane__title">{{ ln.title }}</span>
                     <span class="ns-extlane__n">{{ ln.n }}</span>
                   </header>
@@ -3646,18 +3716,17 @@
                     <sc-for list="{{ ln.items }}" as="it" hint-placeholder-count="3">
                       <div class="ns-extmount-card">
                         <div class="ns-extmount-card__top">
-                          <span class="ns-extmount-card__icon" aria-hidden="true">{{ it.icon }}</span>
                           <span class="ns-extmount-card__title">{{ it.title }}</span>
                           <span class="ns-extmount-card__prov" data-tier="{{ it.tier }}">{{ it.plugin }}</span>
                         </div>
                         <div class="ns-extmount-card__row">
                           <span class="ns-extmount-card__path">{{ it.meta }}</span>
-                          <span class="ns-extmount-card__perm"><span class="ns-extmount-card__perm-glyph" aria-hidden="true">{{ it.permGlyph }}</span>{{ it.perm }}</span>
+                          <span class="ns-extmount-card__perm">{{ it.perm }}</span>
                         </div>
                       </div>
                     </sc-for>
                   </div>
-                  <footer class="ns-extlane__foot"><span class="ns-extlane__foot-glyph" aria-hidden="true">↳</span>{{ ln.foot }}</footer>
+                  <footer class="ns-extlane__foot">{{ ln.foot }}</footer>
                 </section>
               </sc-for>
             </div>
@@ -3668,11 +3737,9 @@
             <div class="ns-extavail">
               <sc-for list="{{ extAvailable }}" as="e" hint-placeholder-count="2">
                 <div class="ns-extavailcard" data-quar="{{ e.quarantine }}">
-                  <span class="ns-extavailcard__rail" aria-hidden="true"></span>
                   <div class="ns-extavailcard__head">
-                    <span class="ns-extavailcard__glyph" data-tier="{{ e.tier }}" aria-hidden="true">{{ e.glyph }}</span>
                     <div class="ns-extavailcard__id">
-                      <div class="ns-extavailcard__name-row"><span class="ns-extavailcard__name">{{ e.title }}</span><span class="ns-chip">{{ e.publisher }}</span></div>
+                      <div class="ns-extavailcard__name-row"><span class="ns-extavailcard__name">{{ e.title }}</span><span class="ns-badge ns-badge--muted">{{ e.publisher }}</span></div>
                       <span class="ns-extavailcard__desc">{{ e.desc }}</span>
                     </div>
                     <sc-if value="{{ e.quarantine }}" hint-placeholder-val="{{ false }}"><span class="ns-badge ns-badge--warning">held · contract v1</span></sc-if>
@@ -3684,12 +3751,12 @@
                   </div>
                   <sc-if value="{{ e.quarantine }}" hint-placeholder-val="{{ false }}">
                     <div class="ns-inline-notice ns-inline-notice--warning ns-extavailcard__hold">
-                      <span aria-hidden="true">⚠</span><span>Quarantined: built for contract v1, host at v2. Installed but held — not an error.</span>
+                      <span>Held: built for contract v1; host contract v2.</span>
                     </div>
                   </sc-if>
                   <div class="ns-extavailcard__foot">
                     <div class="ns-extavailcard__adds">
-                      <sc-for list="{{ e.adds }}" as="ad" hint-placeholder-count="3"><span class="ns-extprov__pip" data-kind="{{ ad.kind }}"><span class="ns-extprov__pip-glyph" aria-hidden="true">{{ ad.glyph }}</span>{{ ad.label }}</span></sc-for>
+                      <sc-for list="{{ e.adds }}" as="ad" hint-placeholder-count="3"><span class="ns-extprov__pip" data-kind="{{ ad.kind }}">{{ ad.label }}</span></sc-for>
                     </div>
                     <button class="{{ e.actClass }}" onClick="{{ e.act }}">{{ e.actLabel }}</button>
                   </div>
@@ -3774,6 +3841,35 @@
         <button class="ns-btn ns-btn--secondary" onClick="{{ s2GoRuntime }}">Open override store →</button>
         <button class="ns-btn ns-btn--ghost" onClick="{{ s2ViewPlugin }}">View plugin</button>
         <button class="ns-btn ns-btn--ghost" onClick="{{ s2ViewContracts }}">View contracts</button>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ sheetIsS3 }}" hint-placeholder-val="{{ false }}">
+    <div class="ns-sheet-body">
+      <div class="ns-ovsheet__hero">
+        <span class="ns-ovsheet__glyph" data-tone="{{ s3Detail.tone }}" aria-hidden="true">{{ s3Detail.glyph }}</span>
+        <div class="ns-ovsheet__hero-main">
+          <span class="ns-ovsheet__eyebrow">{{ s3Detail.kind }} override</span>
+          <div class="ns-ovsheet__transition">
+            <span class="ns-ovsheet__base">{{ s3Detail.base }}</span>
+            <span class="ns-ovsheet__arrow" aria-hidden="true">→</span>
+            <span class="ns-ovsheet__val" data-tone="{{ s3Detail.tone }}">{{ s3Detail.val }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="ns-ovsheet__reload" data-state="{{ s3Detail.reload }}">
+        <span class="ns-ovsheet__reload-dot" aria-hidden="true"></span>
+        <span class="ns-ovsheet__reload-txt">{{ s3Detail.reloadLabel }}</span>
+      </div>
+      <p class="ns-ovsheet__note">{{ s3Detail.note }}</p>
+      <div class="ns-authkv">
+        <sc-for list="{{ s3Detail.kv }}" as="kv" hint-placeholder-count="7">
+          <div class="ns-authkv__row"><span class="ns-authkv__k">{{ kv.k }}</span><span class="ns-authkv__v">{{ kv.v }}</span></div>
+        </sc-for>
+      </div>
+      <div style="display:grid;gap:var(--ns-space-2)">
+        <button class="{{ s3Detail.actClass }}" onClick="{{ s3Detail.act }}">{{ s3Detail.actLabel }} override</button>
+        <button class="ns-btn ns-btn--ghost" onClick="{{ s3Detail.go }}">Open in {{ s3Detail.goLabel }} →</button>
       </div>
     </div>
   </sc-if>
@@ -4157,7 +4253,6 @@
   <sc-if value="{{ sheetIsS16 }}" hint-placeholder-val="{{ false }}">
     <div class="ns-sheet-body">
       <div class="ns-extmanifest__head ns-extmanifest__head--sheet">
-        <span class="ns-extmanifest__glyph" data-tier="{{ extSel.tier }}" aria-hidden="true">{{ extSel.glyph }}</span>
         <div class="ns-extmanifest__id">
           <div class="ns-extmanifest__name-row"><span class="ns-extmanifest__name">{{ extSel.name }}</span><span class="ns-extmanifest__ver">{{ extSel.version }}</span></div>
           <span class="ns-extmanifest__sub">{{ extSel.source }} · {{ extSel.surfLbl }}</span>
@@ -4171,11 +4266,10 @@
       <div class="ns-extmanifest__groups">
         <sc-for list="{{ extSel.groups }}" as="g" hint-placeholder-count="2">
           <div class="ns-extgroup" data-kind="{{ g.kind }}">
-            <div class="ns-extgroup__head"><span class="ns-extgroup__glyph" aria-hidden="true">{{ g.glyph }}</span><span class="ns-extgroup__title">{{ g.title }}</span><span class="ns-extgroup__n">{{ g.n }}</span></div>
+            <div class="ns-extgroup__head"><span class="ns-extgroup__title">{{ g.title }}</span><span class="ns-extgroup__n">{{ g.n }}</span></div>
             <div class="ns-extgroup__items">
               <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="2">
                 <div class="ns-extcontrib">
-                  <span class="ns-extcontrib__glyph" aria-hidden="true">{{ it.icon }}</span>
                   <div class="ns-extcontrib__main"><span class="ns-extcontrib__title">{{ it.title }}</span><span class="ns-extcontrib__meta">{{ it.meta }}</span></div>
                   <span class="ns-extcontrib__perm">{{ it.perm }}</span>
                 </div>
@@ -4186,11 +4280,11 @@
       </div>
       <div class="ns-extmanifest__section-label">plugs into</div>
       <div class="ns-extmounts">
-        <sc-for list="{{ extSel.mounts }}" as="m" hint-placeholder-count="2"><span class="ns-extmount" data-kind="{{ m.kind }}"><span class="ns-extmount__glyph" aria-hidden="true">{{ m.glyph }}</span>{{ m.label }}</span></sc-for>
+        <sc-for list="{{ extSel.mounts }}" as="m" hint-placeholder-count="2"><span class="ns-extmount" data-kind="{{ m.kind }}">{{ m.label }}</span></sc-for>
       </div>
       <div class="ns-extmanifest__actions">
         <button class="{{ extSel.toggleClass }}" onClick="{{ extSel.toggle }}">{{ extSel.actionLabel }}</button>
-        <button class="ns-btn ns-btn--ghost" onClick="{{ extSel.viewPlugin }}">View plugin →</button>
+        <button class="ns-btn ns-btn--ghost" onClick="{{ extSel.viewPlugin }}">View plugin</button>
       </div>
     </div>
   </sc-if>
@@ -4268,15 +4362,15 @@ class Component extends DCLogic {
         F('warning', 'job nightly-reconcile → disabled', '13:54:31'),
         F('primary', 'flag checkout-v2 → 30% rollout', '13:52:07'),
       ],
-      s3View: 'compact', s3OpenVer: 'v43', s3VerDyn: [], verSeq: 44,
+      s3View: 'compact', s3OpenVer: 'v43', s3VerDyn: [], verSeq: 44, s3Ov: null, s3Rev: 'v43',
       flags: [
-        { id: 'checkout-v2', on: true, rollout: 30 },
-        { id: 'new-onboarding', on: true, rollout: 100 },
-        { id: 'beta-search', on: false, rollout: 0 },
+        { id: 'checkout-v2', on: true, rollout: 30, base: '10%', by: 'ada@ops', at: '14 min ago', rev: 'v43', reload: 'live' },
+        { id: 'new-onboarding', on: true, rollout: 100, base: 'off', by: 'sam@ops', at: '3 days ago', rev: 'v38', reload: 'live' },
+        { id: 'beta-search', on: false, rollout: 0, base: 'off', by: 'default', at: '—', rev: '—', reload: 'live' },
       ],
-      jobs3: [ { id: 'nightly-reconcile', disabled: true }, { id: 'cache-warm', disabled: true } ],
-      trigs3: [ { id: 'noisy-filewatch', disabled: true } ],
-      tasks3: [ { id: 'send-receipt', note: 'timeout 30s → 90s' }, { id: 'sync-ledger', note: 'retries 3 → 6' }, { id: 'export-csv', note: 'concurrency 4 → 1' } ],
+      jobs3: [ { id: 'nightly-reconcile', disabled: true, by: 'ada@ops', at: '14 min ago', rev: 'v43', reload: 'live' }, { id: 'cache-warm', disabled: true, by: 'sam@ops', at: '2 h ago', rev: 'v42', reload: 'pending' } ],
+      trigs3: [ { id: 'noisy-filewatch', disabled: true, by: 'kai@ops', at: 'yesterday', rev: 'v40', reload: 'live' } ],
+      tasks3: [ { id: 'send-receipt', note: 'timeout 30s → 90s', base: '30s', val: '90s', field: 'timeoutMs', by: 'ada@ops', at: '2 h ago', rev: 'v42', reload: 'live' }, { id: 'sync-ledger', note: 'retries 3 → 6', base: '3', val: '6', field: 'retries', by: 'kai@ops', at: 'yesterday', rev: 'v39', reload: 'live' }, { id: 'export-csv', note: 'concurrency 4 → 1', base: '4', val: '1', field: 'concurrency', by: 'sam@ops', at: '4 days ago', rev: 'v35', reload: 'pending' } ],
       // S4 — Catalog: contract registry explorer (browse → drill)
       s4Tab: 'contracts', s4Sel: 'order.fulfillment.start', s4Kind: 'all', s4Method: 'all', s4Cov: 'all', s4Q: '',
       // S15 — Auth Sessions: session-security roster (identity → TTL → detail → revoke)
@@ -5864,7 +5958,10 @@ class Component extends DCLogic {
       valClass: (selWinner && l.ord < selWinner.ord) ? 'ns-cfgtrail__val ns-cfgtrail__val--shadowed' : 'ns-cfgtrail__val ns-cfgval--' + cfgValType(l.value),
     }));
 
-    // ----- S3 -----
+    // ----- S3 — the live runtime OVERRIDE STORE (write side) -----
+    // Every overridden key is one entry in ONE store: kind · key · base→override ·
+    // provenance (who/when · revision) · hot-reload state · gated action. Flags,
+    // disabled entities, and task overrides are all rows of the same store.
     const s3Stats = [
       { label: 'Feature flags', value: String(s.flags.filter(f => f.on).length) + ' active' },
       { label: 'Disabled jobs', value: String(s.jobs3.filter(j => j.disabled).length) },
@@ -5872,53 +5969,148 @@ class Component extends DCLogic {
       { label: 'Disabled triggers', value: String(s.trigs3.filter(t => t.disabled).length) },
       { label: 'Task overrides', value: String(s.tasks3.length) },
     ];
-    const s3Flags = s.flags.map(f => ({
-      ...f, meta: f.on ? f.rollout + '% rollout' : 'off', checked: f.on,
-      toggle: () => this.askConfirm({
-        title: (f.on ? 'Disable' : 'Enable') + ' feature flag',
+    // --- build the unified override-set entries (only keys that DIVERGE from base) ---
+    const ovConfirm = (cfg) => () => this.askConfirm(cfg);
+    const ovFlags = s.flags.filter(f => f.on).map(f => ({
+      uid: 'flags.' + f.id, kind: 'flag', glyph: '⚑', key: 'flags.' + f.id,
+      base: f.base, val: f.rollout + '%', tone: 'primary', reload: f.reload,
+      by: f.by, at: f.at, rev: f.rev, valType: 'num',
+      note: 'Feature flag rollout — served to ' + f.rollout + '% of traffic.',
+      goRoute: 'workers', goLabel: 'Workers',
+      actLabel: 'Disable', actKind: 'ghost',
+      act: {
+        title: 'Disable feature flag',
         desc: 'Writes to the runtime-config override store. The watcher hot-reloads it; the change lands in the live feed like any other event.',
-        from: 'flags.' + f.id + ' = ' + (f.on ? f.rollout + '%' : 'off'),
-        to: f.on ? 'off' : '100%',
-        cli: 'netscript config override ' + (f.on ? 'disable flags.' + f.id : 'set flags.' + f.id + ' --rollout 100'),
-        feed: 'flag ' + f.id + ' → ' + (f.on ? 'disabled' : '100% rollout'),
-        feedTone: f.on ? 'warning' : 'primary',
-        action: f.on ? 'Disable flag' : 'Enable flag',
-        apply: () => this.setState(st => ({ flags: st.flags.map(x => x.id === f.id ? { ...x, on: !x.on, rollout: x.on ? 0 : 100 } : x) })),
-      }),
+        from: 'flags.' + f.id + ' = ' + f.rollout + '%', to: 'off',
+        cli: 'netscript config override disable flags.' + f.id,
+        feed: 'flag ' + f.id + ' → disabled', feedTone: 'warning', action: 'Disable flag',
+        apply: () => this.setState(st => ({ flags: st.flags.map(x => x.id === f.id ? { ...x, on: false, rollout: 0 } : x) })),
+      },
     }));
-    const s3Jobs = s.jobs3.filter(j => j.disabled).map(j => ({
-      id: j.id,
-      enable: () => this.askConfirm({
+    const ovJobs = s.jobs3.filter(j => j.disabled).map(j => ({
+      uid: 'jobs.' + j.id, kind: 'job', glyph: '⚙', key: 'jobs.' + j.id,
+      base: 'enabled', val: 'disabled', tone: 'warning', reload: j.reload,
+      by: j.by, at: j.at, rev: j.rev, valType: 'off',
+      note: 'Job disabled by override — the scheduler skips it until the override is cleared.',
+      goRoute: 'workers', goLabel: 'Workers',
+      actLabel: 'Enable', actKind: 'secondary',
+      act: {
         title: 'Enable job', desc: 'Clears the disable override for this job. The scheduler picks it up on the next hot-reload.',
         from: 'jobs.' + j.id + ' = disabled', to: 'enabled',
         cli: 'netscript config override clear jobs.' + j.id,
         feed: 'job ' + j.id + ' → re-enabled', feedTone: 'success', action: 'Enable job',
         apply: () => this.setState(st => ({ jobs3: st.jobs3.map(x => x.id === j.id ? { ...x, disabled: false } : x) })),
-      }),
-      openWorkers: go('workers'),
+      },
     }));
-    const s3Trigs = s.trigs3.filter(t => t.disabled).map(t => ({
-      id: t.id,
-      enable: () => this.askConfirm({
+    const ovTrigs = s.trigs3.filter(t => t.disabled).map(t => ({
+      uid: 'triggers.' + t.id, kind: 'trigger', glyph: '⚡', key: 'triggers.' + t.id,
+      base: 'enabled', val: 'disabled', tone: 'warning', reload: t.reload,
+      by: t.by, at: t.at, rev: t.rev, valType: 'off',
+      note: 'Trigger disabled by override — it will not fire until the override is cleared.',
+      goRoute: 'triggers', goLabel: 'Triggers',
+      actLabel: 'Enable', actKind: 'secondary',
+      act: {
         title: 'Enable trigger', desc: 'Clears the disable override; the trigger resumes firing immediately.',
         from: 'triggers.' + t.id + ' = disabled', to: 'enabled',
         cli: 'netscript triggers enable ' + t.id,
         feed: 'trigger ' + t.id + ' → re-enabled', feedTone: 'success', action: 'Enable trigger',
         apply: () => this.setState(st => ({ trigs3: st.trigs3.map(x => x.id === t.id ? { ...x, disabled: false } : x) })),
-      }),
-      openTriggers: go('triggers'),
+      },
     }));
-    const s3Tasks = s.tasks3.map(tk => ({
-      ...tk,
-      clear: () => this.askConfirm({
+    const ovTasks = s.tasks3.map(tk => ({
+      uid: 'tasks.' + tk.id, kind: 'task', glyph: '◆', key: 'tasks.' + tk.id + '.' + tk.field,
+      base: tk.base, val: tk.val, tone: 'primary', reload: tk.reload,
+      by: tk.by, at: tk.at, rev: tk.rev, valType: 'num',
+      note: 'Task field override — ' + tk.note + '. Clearing reverts to the declared definition.',
+      goRoute: 'workers', goLabel: 'Workers',
+      actLabel: 'Clear', actKind: 'ghost',
+      act: {
         title: 'Clear task override', desc: 'Removes the override; the task reverts to its declared definition.',
         from: 'tasks.' + tk.id + ' · ' + tk.note, to: 'defaults',
         cli: 'netscript config override clear tasks.' + tk.id,
         feed: 'task ' + tk.id + ' → override cleared', feedTone: 'muted', action: 'Clear override',
         apply: () => this.setState(st => ({ tasks3: st.tasks3.filter(x => x.id !== tk.id) })),
-      }),
+      },
     }));
+    const ovAll = [...ovFlags, ...ovJobs, ...ovTrigs, ...ovTasks];
+    const kindMeta = { flag: 'primary', job: 'warning', trigger: 'warning', task: 'primary' };
+    const s3Store = ovAll.map(o => ({
+      uid: o.uid, kind: o.kind, glyph: o.glyph, key: o.key, base: o.base, val: o.val,
+      tone: o.tone, valClass: 'ns-ovstore__val ns-ovval--' + o.valType,
+      reload: o.reload, reloadLabel: o.reload === 'pending' ? 'pending' : 'live',
+      by: o.by, at: o.at, rev: o.rev,
+      selState: s.s3Ov === o.uid ? 'sel' : null,
+      select: () => this.setState({ s3Ov: o.uid, sheet: 's3' }),
+      act: ovConfirm(o.act), actLabel: o.actLabel,
+      actClass: 'ns-btn ns-btn--' + o.actKind + ' ns-btn--sm',
+    }));
+    const pendingReload = ovAll.filter(o => o.reload === 'pending').length;
+    const liveReload = ovAll.length - pendingReload;
+    // selected override → detail-drawer payload
+    const ovSel = ovAll.find(o => o.uid === s.s3Ov) || ovAll[0] || null;
+    const s3Detail = ovSel ? {
+      kind: ovSel.kind, glyph: ovSel.glyph, key: ovSel.key, base: ovSel.base, val: ovSel.val,
+      tone: ovSel.tone, reload: ovSel.reload, reloadLabel: ovSel.reload === 'pending' ? 'pending restart' : 'hot-reloaded · live',
+      note: ovSel.note, actLabel: ovSel.actLabel, actClass: 'ns-btn ns-btn--' + (ovSel.kind === 'flag' || ovSel.kind === 'task' ? 'destructive' : 'secondary'),
+      act: ovConfirm(ovSel.act), goRoute: ovSel.goRoute, goLabel: ovSel.goLabel,
+      go: go(ovSel.goRoute),
+      kv: [
+        { k: 'key', v: ovSel.key },
+        { k: 'base (shadows)', v: ovSel.base },
+        { k: 'override value', v: ovSel.val },
+        { k: 'applied in', v: ovSel.rev },
+        { k: 'applied by', v: ovSel.by },
+        { k: 'applied', v: ovSel.at },
+        { k: 'hot-reload', v: ovSel.reload === 'pending' ? 'pending restart' : 'live' },
+      ],
+    } : null;
+    // header composite: type distribution pips (glyph → count)
+    const s3Head = {
+      total: String(ovAll.length),
+      pips: [
+        { kind: 'flag', glyph: '⚑', label: 'flags', n: ovFlags.length, tone: 'primary' },
+        { kind: 'job', glyph: '⚙', label: 'jobs', n: ovJobs.length, tone: 'warning' },
+        { kind: 'trigger', glyph: '⚡', label: 'triggers', n: ovTrigs.length, tone: 'warning' },
+        { kind: 'task', glyph: '◆', label: 'tasks', n: ovTasks.length, tone: 'primary' },
+      ],
+      divN: String(ovAll.length), baseN: 42, // keys diverging vs total known keys
+      divWClass: 'ns-rchead__ratiofill--w' + Math.min(20, Math.round(ovAll.length / 42 * 20)),
+      divPct: Math.round(ovAll.length / 42 * 100) + '%',
+      rev: 'v' + (s.verSeq - 1), revBy: s.flags.find(f => f.rev === 'v43') ? 'ada@ops' : 'ops',
+      revAt: '14 min ago',
+      liveN: String(liveReload), pendN: String(pendingReload),
+      reloadTone: pendingReload > 0 ? 'warning' : 'success',
+      reloadLabel: pendingReload > 0 ? pendingReload + ' pending restart' : 'all live',
+    };
     const s3FeedItems = s.s3Feed.map(f => ({ ...f }));
+    // --- derived aside widgets (right column) — no invented data ---
+    // (a) Pending hot-reloads: overrides that need a restart to take effect.
+    const s3PendingReloads = ovAll.filter(o => o.reload === 'pending').map(o => ({
+      key: o.key, glyph: o.glyph, tone: o.tone, rev: o.rev, at: o.at, by: o.by,
+      act: ovConfirm(o.act), actLabel: 'Restart to apply',
+    }));
+    const s3NoPending = s3PendingReloads.length === 0;
+    // (b) Change authors: operators who applied overrides — count + revisions + last change.
+    //     Derived from the override provenance (who/when/rev) already on every row.
+    const revNum = (r) => { const m = /^v(\d+)$/.exec(r || ''); return m ? +m[1] : -1; };
+    const s3AuthorMap = {};
+    ovAll.forEach(o => {
+      if (!o.by || o.by === 'default') return;
+      const a = s3AuthorMap[o.by] || (s3AuthorMap[o.by] = { by: o.by, n: 0, revs: {}, topRev: -1, at: o.at });
+      a.n += 1; a.revs[o.rev] = 1;
+      if (revNum(o.rev) > a.topRev) { a.topRev = revNum(o.rev); a.at = o.at; }
+    });
+    const s3Authors = Object.keys(s3AuthorMap).map(k => s3AuthorMap[k])
+      .sort((a, b) => b.topRev - a.topRev || b.n - a.n)
+      .map(a => ({
+        by: a.by, initials: a.by.slice(0, 2).toUpperCase(),
+        n: String(a.n), revN: String(Object.keys(a.revs).length),
+        rev: a.topRev >= 0 ? 'v' + a.topRev : '—', at: a.at,
+      }));
+    // (c) Base-drift by type — the divergence-by-kind summary (glyph · count).
+    const s3Drift = s3Head.pips.filter(p => p.n > 0).map(p => ({
+      glyph: p.glyph, label: p.label, n: String(p.n), tone: p.tone,
+    }));
     const verDiffs = {
       v43: [
         { op: 'ctx', text: 'runtime-config/current → v43' },
@@ -5936,19 +6128,29 @@ class Component extends DCLogic {
       ],
     };
     const verBase = [
-      { v: 'v43', title: 'flag rollout bumped · job disabled', meta: '14 min ago · 2 changes', diff: verDiffs.v43 },
-      { v: 'v42', title: 'task override applied', meta: '2 h ago · 1 change', diff: verDiffs.v42 },
-      { v: 'v41', title: 'checkout-v2 introduced at 10%', meta: 'yesterday · 1 change', diff: verDiffs.v41 },
+      { v: 'v43', title: 'flag rollout bumped · job disabled', meta: '14 min ago · 2 changes', by: 'ada@ops', n: 2, diff: verDiffs.v43 },
+      { v: 'v42', title: 'task override applied', meta: '2 h ago · 1 change', by: 'ada@ops', n: 1, diff: verDiffs.v42 },
+      { v: 'v41', title: 'checkout-v2 introduced at 10%', meta: 'yesterday · 1 change', by: 'kai@ops', n: 1, diff: verDiffs.v41 },
     ];
     const s3Vers = [...s.s3VerDyn, ...verBase].map((v, i) => ({
       ...v,
+      by: v.by || 'ops', n: v.n || (v.diff ? v.diff.filter(d => d.op !== 'ctx').length : 1),
+      pips: Array.from({ length: Math.min(4, v.n || (v.diff ? v.diff.filter(d => d.op !== 'ctx').length : 1)) }),
       current: i === 0 ? 'current' : null,
+      canRoll: i !== 0,
       open: s.s3OpenVer === v.v,
       showDiff: s.s3OpenVer === v.v && s.s3View !== 'json',
       showJson: s.s3OpenVer === v.v && s.s3View === 'json',
       toggleLabel: s.s3OpenVer === v.v ? 'Hide changes' : 'Show changes',
       toggle: () => s.s3OpenVer === v.v ? this.nav('/runtime') : this.nav('/runtime/versions/' + encodeURIComponent(v.v) + (s.s3View === 'all' ? '' : '?view=' + encodeURIComponent(s.s3View))),
       json: JSON.stringify({ version: v.v, changes: v.diff.filter(d => d.op !== 'ctx').map(d => d.text.slice(2)) }, null, 2),
+      rollback: () => this.askConfirm({
+        title: 'Roll back the override store', desc: 'Reverts the runtime-config override store to ' + v.v + '. The watcher hot-reloads it; the rollback lands in the live feed as a new revision.',
+        from: 'runtime-config/current = ' + ('v' + (s.verSeq - 1)), to: 'runtime-config/current = ' + v.v,
+        cli: 'netscript config override rollback ' + v.v,
+        feed: 'store rolled back → ' + v.v, feedTone: 'warning', action: 'Roll back to ' + v.v,
+        apply: () => {},
+      }),
     }));
     const segBtn = (key, val) => ({ state: s[key] === val ? 'active' : null, set: () => {
       if (key === 's3View') this.updateQuery({ view: val }, { [key]: val });
@@ -7878,8 +8080,8 @@ class Component extends DCLogic {
       s1Sheet: s.detailSheet || { eyebrow: '', icon: '', tone: 'muted', value: '', title: '', pill: '', pillClass: 'ns-badge ns-badge--muted', desc: '', cta: 'Open', rows: [], go: () => {} },
       closeDetailSheet: () => this.setState({ detailSheet: null }),
       // sheet
-      sheetIsS2: s.sheet === 's2', sheetIsS13: s.sheet === 's13', sheetIsS7: s.sheet === 's7', sheetIsS8: s.sheet === 's8', sheetIsS9: s.sheet === 's9', sheetIsS11: s.sheet === 's11', sheetIsS12: s.sheet === 's12', sheetIsS4: s.sheet === 's4', sheetIsS15: s.sheet === 's15', sheetIsS16: s.sheet === 's16',
-      sheetTitle: s.sheet === 's2' ? selDef.key : s.sheet === 's7' ? s7Detail.name : s.sheet === 's8' ? (s8SelNode ? s8SelNode.name : s8.saga) : s.sheet === 's9' ? s9Detail.id : s.sheet === 's11' ? s11Detail.name : s.sheet === 's12' ? (s12Detail ? s12Detail.id : '') : s.sheet === 's4' ? (s4Detail ? s4Detail.proc : '') : s.sheet === 's15' ? (s15Detail ? s15Detail.id : '') : s.sheet === 's16' ? (extSel ? extSel.name : '') : (selNode13 ? selNode13.name : ''),
+      sheetIsS2: s.sheet === 's2', sheetIsS13: s.sheet === 's13', sheetIsS7: s.sheet === 's7', sheetIsS8: s.sheet === 's8', sheetIsS9: s.sheet === 's9', sheetIsS11: s.sheet === 's11', sheetIsS12: s.sheet === 's12', sheetIsS4: s.sheet === 's4', sheetIsS15: s.sheet === 's15', sheetIsS16: s.sheet === 's16', sheetIsS3: s.sheet === 's3',
+      sheetTitle: s.sheet === 's2' ? selDef.key : s.sheet === 's3' ? (s3Detail ? s3Detail.key : '') : s.sheet === 's7' ? s7Detail.name : s.sheet === 's8' ? (s8SelNode ? s8SelNode.name : s8.saga) : s.sheet === 's9' ? s9Detail.id : s.sheet === 's11' ? s11Detail.name : s.sheet === 's12' ? (s12Detail ? s12Detail.id : '') : s.sheet === 's4' ? (s4Detail ? s4Detail.proc : '') : s.sheet === 's15' ? (s15Detail ? s15Detail.id : '') : s.sheet === 's16' ? (extSel ? extSel.name : '') : (selNode13 ? selNode13.name : ''),
       closeSheet: () => this.setState({ sheet: null }),
       // S1
       s1Stats, s1CmdGroups, s1Contribs, s1Teaser, s1Kpis, s1Hero, s1Ai,
@@ -7922,11 +8124,10 @@ class Component extends DCLogic {
       s2ViewPlugin: () => { this.setState({ s5Sel: selDef.ns === 'flags' || selDef.ns === 'jobs' ? 'workers' : (selDef.ns === 'streams' ? 'streams' : (selDef.ns === 'sagas' ? 'sagas' : (selDef.ns === 'triggers' ? 'triggers' : 'workers'))) }); this.nav('plugins'); },
       s2ViewContracts: go('catalog'),
       s2GoRuntime: go('runtime'),
-      // S3
-      s3Stats, s3Flags, s3Jobs, s3Trigs, s3Tasks, s3FeedItems, s3Vers,
-      s3HasJobs: s3Jobs.length > 0, s3HasTrigs: s3Trigs.length > 0, s3HasTasks: s3Tasks.length > 0,
-      s3NoDisabled: s3Jobs.length === 0 && s3Trigs.length === 0,
-      s3NoTasks: s3Tasks.length === 0,
+      // S3 — override store
+      s3Stats, s3FeedItems, s3Vers, s3Store, s3Head, s3Detail,
+      s3PendingReloads, s3NoPending, s3Authors, s3Drift,
+      s3HasStore: s3Store.length > 0, s3NoStore: s3Store.length === 0,
       s3Follow: s.s3Follow,
       s3ToggleFollow: () => this.setState(st => ({ s3Follow: !st.s3Follow })),
       s3PendingCount: s.s3Pending.length, s3HasPending: s.s3Pending.length > 0,
