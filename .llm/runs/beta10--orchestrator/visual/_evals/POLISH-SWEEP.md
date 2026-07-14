@@ -47,3 +47,13 @@ DECLINED — the gate prescribed changes that VIOLATE the design language / vari
 - add a side-by-side schema DIFF viewer → Config Resolution owns the diff pattern; Catalog steered away ON PURPOSE
 - "Add JS filter" code-drawer query language → gold-plating (search + kind/method/coverage chips already live-filter)
 Note: gate is now applying a fixed generic wishlist to strong screens; MUST filter against NS One + variety.
+
+## Auth Sessions (gate 64 — ACCEPTED on verified quality; one valid density residual)
+Valid residuals (sweep):
+- Densify the bottom "Auth event stream" (sparse 2-col list, ~45% dead space) → dense event rows/table
+  (Timestamp · Event · Principal · correlation), status-colored dots, copy preserved [ref 11]  ← real
+- Group the detail KV into Identity / Network / Lifecycle sections with bold headers [ref 11] (minor)
+- Connect the session-lifecycle timeline dots with a line (trivial)
+DECLINED (off-doctrine / anti-variety): convert identity-forward roster CARDS → generic table (kills the
+session-roster idiom + echoes the consoles); per-provider brand icons [ref 07 off-domain]; KPI "fat cards"
+→ tiles (header already carries the status-distribution bar + scope/MFA meters + expiry-horizon — not plain cards).

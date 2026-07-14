@@ -796,3 +796,69 @@ other screens' markup.
 Producer/consumer nodes stay non-interactive labels (no canonical target ids in the data); no v→v
 schema diff viewer (brief: schema is "secondary, not a giant diff" → single line-numbered block); the
 Routes secondary tab keeps the generic dense table (Contracts explorer carries the bespoke weight).
+
+## Pass V11 — Auth Sessions (session-security roster)
+
+**Design question →** *What components best showcase active authenticated sessions (who / what
+device / from where / issued→expires TTL / scopes / status) an operator inspects and can revoke?*
+**Answer: a session-security console** — identity-forward session cards + a live TTL/expiry
+visualization + a lifecycle view + revoke. The screen-owning idiom is **time-to-live** (nothing else
+in the app expresses a lifespan), which makes Auth visually distinct from the monitoring consoles,
+the Config waterfall, the Migrations arc, the DLQ clusters, and the Catalog rail.
+
+### New components / tokens
+- **`ns-authcard`** — identity-forward session card: initials **avatar** + **device-glyph badge**
+  (browser/cli/ci/mobile/service) + name + elevated flag + uid/email + tinted **`ns-authprov`**
+  provider chip + geo location + MFA state + status badge + **`ns-ttlbar`** live TTL bar + countdown
+  + scope-chip footer + revoke; left status rail (active=success / idle=warning / expiring=
+  destructive / revoked=muted, dimmed).
+- **`ns-ttlbar`** — per-card remaining-fill bar, tone by urgency, **hatched** when expiring (≤12%);
+  `--w0..--w20` width buckets. The signature per-row viz.
+- **`ns-authttl`** — detail **lifespan visualization**: hatched **elapsed** vs toned **remaining** +
+  a **now-marker** positioned at the elapsed boundary (left-bucket classes) + issued/TTL/expiry
+  labels + elapsed/remaining footnotes.
+- **`ns-authhead`** — security header composite: glyph+count hero + **`ns-authchan`** status
+  distribution channel bar (click-to-filter) + legend + **`ns-authratio`** elevated-scope meter +
+  MFA-coverage meter + **`ns-authhz`** expiry-horizon strip (live sessions ordered soonest→latest,
+  per-row track + countdown, click-selects). Zero plain number cards.
+- **`ns-authbar`** — roster toolbar: search + status filter chips (`ns-authbar__chip`) + sort
+  segmented (soonest expiry / by status).
+- **`ns-authdetail`** — sticky detail panel: identity header + TTL viz + **`ns-authkv`** (mono
+  alternating-tint KV) + scopes + **`ns-authtl`** tone-dotted lifecycle timeline + revoke;
+  revoked-note variant.
+- **`ns-scopechip`** — RBAC scope chips; elevated (admin/deploy/write) tinted copper vs muted read.
+- **`ns-auth__now`** live server-clock chip (pulsing dot) + gated **Revoke all N** (destructive).
+- **`ns-authstream`** — two-column `auth.*` event feed (reuses `ns-activity-feed`, copy preserved).
+- **`sheetIsS15`** — mobile bottom-sheet reusing the shared `ns-sheet-dialog` (right drawer desktop
+  ≤900px auto-hidden → bottom sheet ≤640px via `matchMedia`): identity + TTL + KV + scopes +
+  timeline + revoke.
+- Geometry via shared **`--w0..--w20`** width-bucket idiom (plus marker left-buckets) — NO SVG
+  `{{ }}` holes.
+
+### Data model (visual metadata only, fully derived)
+`s15Raw` enriches the session projection with derived `dev`/`agent`/`ip`/`loc`/`geo`/`issued`/
+`expires`/`ttlFrac`/`lifespan`/`scopes`/`elevated`/`mfa`/`corr`. Original 3 sessions preserved in
+meaning + enriched; 2 added (idle + service/expiring) so the roster is dense and covers every status.
+Derived: `s15Sessions`, `s15Head` (counts/dist/elevated%/MFA%/horizon), `s15Detail` (KV +
+lifecycle), `s15FilterChips`/`s15SortChips`, `s15Filtered`/`s15HasResults`/`s15NoResults`. New state
+`s15Sel`/`s15Filter`/`s15Sort`/`s15Q`. `authFeed` retained verbatim. Revoke + Revoke-all reuse shared
+`askConfirm` → `ns-confirm-dialog` with the correct `netscript auth sessions revoke` CLI. No
+route/logic/copy-meaning change.
+
+### Gotcha recorded
+**`sc-if` has no `negate`** — the engine's `walkIf` only evaluates `value` truthiness. Negated
+branches (empty-state, revoked-note) must be gated on **inverted bindings** (`s15NoResults`,
+`s15Detail.cannotRevoke`), not a `negate` attribute (which is silently ignored → both branches show).
+
+### Verification
+0 `{{ }}` / 0 real console errors (only favicon 404) / 0 h-overflow across desktop 1440 + mobile 390
+(both themes) plus session-selected (expiring @3% + active/elevated @50%, now-marker verified),
+revoke confirm (light+dark), mobile revoke-all confirm, mobile bottom-sheet (light+dark), Revoked
+filter, and empty/no-match state. Full 16-route regression clean. No edits to `support.js`,
+`proto.css`, `_ds/*`, or other screens' markup.
+
+### Declined (no data-invention)
+Auth event stream kept generic (copy-locked secondary strip); avatars are initials (no avatar URLs in
+the projection); TTL is a static snapshot at the app clock (no live tick loop); device/geo/scope are
+illustrative visual metadata; "Open in Aspire" is a placeholder (no canonical session resource to
+deep-link).

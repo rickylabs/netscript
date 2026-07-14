@@ -3277,62 +3277,207 @@
         </div>
       </sc-if>
 <sc-if value="{{ isAuthc }}" hint-placeholder-val="{{ false }}">
-        <div class="ns-screen" data-screen-label="S15 Auth Sessions">
+        <div class="ns-screen ns-auth" data-screen-label="S15 Auth Sessions">
           <header class="ns-page-header ns-page-header--console">
             <div class="ns-toolbar">
               <div style="display:grid;gap:var(--ns-space-2)">
                 <h1>Auth sessions</h1>
                 <p class="ns-lede">The session projection from <span class="ns-inline-code">plugin-auth-core</span>’s durable stream — live <span class="ns-inline-code">auth.*</span> events, no provider console needed for local dev.</p>
               </div>
+              <span class="ns-panel__flex" style="flex:1"></span>
+              <div class="ns-auth__now" aria-label="Server clock"><span class="ns-auth__now-dot" aria-hidden="true"></span>now <b>{{ s15Head.now }}</b></div>
+              <button class="ns-btn ns-btn--destructive ns-btn--sm ns-auth__revokeall" onClick="{{ s15RevokeAll }}" title="Revoke every live session"><span class="ns-auth__revokeall-glyph" aria-hidden="true">⛒</span>Revoke all <span class="ns-auth__revokeall-n">{{ s15RevokeAllN }}</span></button>
             </div>
           </header>
-          <div style="display:grid;gap:var(--ns-space-6);grid-template-columns:repeat(auto-fit,minmax(min(26rem,100%),1fr));align-items:start">
-            <section class="ns-responsive-table">
-              <div class="ns-responsive-table__scroller">
-                <table class="ns-responsive-table__table" style="min-width:34rem">
-                  <caption class="ns-responsive-table__caption">Active sessions · AuthSessionSchema projection</caption>
-                  <thead class="ns-responsive-table__head">
-                    <tr class="ns-responsive-table__row">
-                      <th class="ns-responsive-table__header">User</th>
-                      <th class="ns-responsive-table__header">Provider</th>
-                      <th class="ns-responsive-table__header">State</th>
-                      <th class="ns-responsive-table__header">Started</th>
-                      <th class="ns-responsive-table__header">Last event</th>
-                      <th class="ns-responsive-table__header"></th>
-                    </tr>
-                  </thead>
-                  <tbody class="ns-responsive-table__body">
-                    <sc-for list="{{ authSessions }}" as="a" hint-placeholder-count="3">
-                      <tr class="ns-responsive-table__row">
-                        <td class="ns-responsive-table__cell"><button style="all:unset;cursor:pointer;color:var(--ns-primary);font-family:var(--ns-font-mono);font-size:var(--ns-text-xs)" onClick="{{ a.open }}">{{ a.user }}</button></td>
-                        <td class="ns-responsive-table__cell"><span class="ns-chip">{{ a.provider }}</span></td>
-                        <td class="ns-responsive-table__cell"><span class="{{ a.sBadge }}">{{ a.state }}</span></td>
-                        <td class="ns-responsive-table__cell"><span style="font-family:var(--ns-font-mono);font-size:var(--ns-text-2xs);color:var(--ns-muted-fg)">{{ a.started }}</span></td>
-                        <td class="ns-responsive-table__cell"><span style="font-size:var(--ns-text-xs);color:var(--ns-muted-fg)">{{ a.last }}</span></td>
-                        <td class="ns-responsive-table__cell"><button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ a.revoke }}">Revoke</button></td>
-                      </tr>
-                    </sc-for>
-                  </tbody>
-                </table>
+
+          <!-- Security header composite (micro-viz, no plain number cards) -->
+          <section class="ns-authhead" aria-label="Session security summary">
+            <div class="ns-authhead__cell ns-authhead__cell--hero">
+              <span class="ns-authhead__glyph" aria-hidden="true">◐</span>
+              <div class="ns-authhead__hero-main">
+                <span class="ns-authhead__value">{{ s15Head.activeN }}<span class="ns-authhead__value-sub">/ {{ s15Head.liveN }} live</span></span>
+                <span class="ns-authhead__label">active sessions</span>
               </div>
+              <div class="ns-authhead__chan" aria-label="Status distribution">
+                <sc-for list="{{ s15Head.dist }}" as="d" hint-placeholder-count="4">
+                  <button class="ns-authchan__seg {{ d.wClass }}" data-tone="{{ d.tone }}" data-active="{{ d.active }}" onClick="{{ d.go }}" title="{{ d.label }} · {{ d.n }}" aria-label="{{ d.label }} {{ d.n }}"></button>
+                </sc-for>
+              </div>
+              <div class="ns-authhead__chan-legend">
+                <sc-for list="{{ s15Head.dist }}" as="d" hint-placeholder-count="4">
+                  <span class="ns-authhead__legend-item"><span class="ns-authhead__legend-dot" data-tone="{{ d.tone }}" aria-hidden="true"></span>{{ d.label }} <b>{{ d.n }}</b></span>
+                </sc-for>
+              </div>
+            </div>
+            <div class="ns-authhead__cell">
+              <div class="ns-authhead__ratio-head"><span class="ns-authhead__ratio-glyph" aria-hidden="true">⚑</span><span class="ns-authhead__ratio-label">elevated scope</span><span class="ns-authhead__ratio-val">{{ s15Head.elevatedN }}<span class="ns-authhead__ratio-pct">· {{ s15Head.elevPctLbl }}</span></span></div>
+              <div class="ns-authratio" data-tone="destructive"><span class="ns-authratio__fill {{ s15Head.elevWClass }}" data-tone="destructive"></span></div>
+              <span class="ns-authhead__ratio-sub">admin / deploy / write grants across live sessions</span>
+            </div>
+            <div class="ns-authhead__cell">
+              <div class="ns-authhead__ratio-head"><span class="ns-authhead__ratio-glyph" aria-hidden="true">⛨</span><span class="ns-authhead__ratio-label">MFA coverage</span><span class="ns-authhead__ratio-val">{{ s15Head.mfaN }}<span class="ns-authhead__ratio-pct">· {{ s15Head.mfaPctLbl }}</span></span></div>
+              <div class="ns-authratio" data-tone="success"><span class="ns-authratio__fill {{ s15Head.mfaWClass }}" data-tone="success"></span></div>
+              <span class="ns-authhead__ratio-sub">totp / passkey verified · live sessions</span>
+            </div>
+            <div class="ns-authhead__cell ns-authhead__cell--hz">
+              <div class="ns-authhead__hz-head"><span class="ns-authhead__ratio-glyph" aria-hidden="true">⧗</span><span class="ns-authhead__ratio-label">expiry horizon</span><span class="ns-authhead__hz-soon">soonest · {{ s15Head.soonUser }} <b>{{ s15Head.soonRem }}</b></span></div>
+              <div class="ns-authhz" aria-label="Soonest-to-expire sessions">
+                <sc-for list="{{ s15Head.horizon }}" as="h" hint-placeholder-count="4">
+                  <button class="ns-authhz__row" data-sel="{{ h.sel }}" onClick="{{ h.go }}" title="{{ h.user }} · expires {{ h.remLbl }}">
+                    <span class="ns-authhz__u">{{ h.user }}</span>
+                    <span class="ns-authhz__track" aria-hidden="true"><span class="ns-authhz__fill {{ h.wClass }}" data-tone="{{ h.tone }}"></span></span>
+                    <span class="ns-authhz__t" data-tone="{{ h.tone }}">{{ h.remLbl }}</span>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+          </section>
+
+          <!-- Roster toolbar -->
+          <div class="ns-authbar">
+            <label class="ns-authbar__search">
+              <span class="ns-authbar__search-glyph" aria-hidden="true">⌕</span>
+              <input class="ns-authbar__input" type="text" placeholder="Search principal · provider · location…" value="{{ s15Q }}" onInput="{{ s15SetQ }}" aria-label="Search sessions" />
+            </label>
+            <div class="ns-authbar__chips" role="group" aria-label="Filter by status">
+              <sc-for list="{{ s15FilterChips }}" as="c" hint-placeholder-count="5">
+                <button class="ns-authbar__chip" data-state="{{ c.state }}" onClick="{{ c.set }}">{{ c.label }}</button>
+              </sc-for>
+            </div>
+            <span class="ns-panel__flex" style="flex:1"></span>
+            <div class="ns-seg ns-authbar__seg" role="tablist" aria-label="Sort sessions">
+              <sc-for list="{{ s15SortChips }}" as="c" hint-placeholder-count="2">
+                <button class="ns-seg__btn" role="tab" data-state="{{ c.state }}" onClick="{{ c.set }}">{{ c.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+
+          <!-- Two-pane: identity-forward roster + session detail -->
+          <div class="ns-authgrid">
+            <section class="ns-authroster" aria-label="Active session roster">
+              <sc-if value="{{ s15HasResults }}" hint-placeholder-val="{{ true }}">
+                <sc-for list="{{ s15Sessions }}" as="a" hint-placeholder-count="5">
+                  <article class="ns-authcard" data-state="{{ a.effState }}" data-selected="{{ a.selState }}" data-om-id="auth-card">
+                    <button class="ns-authcard__body" data-ns-auth-card onClick="{{ a.select }}" aria-label="Inspect session {{ a.id }}">
+                      <span class="ns-authcard__avatar" data-kind="{{ a.kind }}" aria-hidden="true">{{ a.initials }}<span class="ns-authcard__dev" data-dev="{{ a.dev }}">{{ a.devGlyph }}</span></span>
+                      <div class="ns-authcard__ident">
+                        <div class="ns-authcard__id-row">
+                          <span class="ns-authcard__name">{{ a.name }}</span>
+                          <sc-if value="{{ a.elevated }}" hint-placeholder-val="{{ false }}"><span class="ns-authcard__elev" title="Elevated scope">⚑</span></sc-if>
+                        </div>
+                        <span class="ns-authcard__sub"><span class="ns-authcard__uid">{{ a.user }}</span> · {{ a.email }}</span>
+                        <div class="ns-authcard__meta">
+                          <span class="ns-authprov" data-tone="{{ a.provTone }}">{{ a.provLbl }}</span>
+                          <span class="ns-authcard__loc"><span class="ns-authcard__geo" data-geo="{{ a.geo }}" aria-hidden="true">◉</span>{{ a.loc }}</span>
+                          <span class="ns-authcard__mfa" data-on="{{ a.mfaOn }}">⛨ {{ a.mfaLbl }}</span>
+                        </div>
+                      </div>
+                      <div class="ns-authcard__right">
+                        <span class="{{ a.sBadge }}">{{ a.effState }}</span>
+                        <div class="ns-ttlbar" data-tone="{{ a.ttlTone }}" aria-label="Time-to-live {{ a.ttlPctLbl }}">
+                          <span class="ns-ttlbar__fill {{ a.ttlWClass }}" data-tone="{{ a.ttlTone }}"></span>
+                        </div>
+                        <span class="ns-authcard__ttl-lbl" data-tone="{{ a.ttlTone }}">⧗ {{ a.remLbl }} <span class="ns-authcard__ttl-pct">{{ a.ttlPctLbl }}</span></span>
+                      </div>
+                    </button>
+                    <div class="ns-authcard__foot">
+                      <div class="ns-authcard__scopes">
+                        <sc-for list="{{ a.scopeChips }}" as="sc" hint-placeholder-count="3"><span class="ns-scopechip" data-elev="{{ sc.elevated }}">{{ sc.label }}</span></sc-for>
+                      </div>
+                      <button class="ns-btn ns-btn--ghost ns-btn--sm ns-authcard__revoke" data-ns-auth-revoke onClick="{{ a.revoke }}">Revoke</button>
+                    </div>
+                  </article>
+                </sc-for>
+              </sc-if>
+              <sc-if value="{{ s15NoResults }}" hint-placeholder-val="{{ false }}">
+                <div class="ns-authroster__empty">
+                  <span class="ns-authroster__empty-glyph" aria-hidden="true">◐</span>
+                  <span class="ns-authroster__empty-title">No sessions match</span>
+                  <span class="ns-authroster__empty-sub">Adjust the status filter or clear the search.</span>
+                  <button class="ns-btn ns-btn--secondary ns-btn--sm" onClick="{{ s15ClearFilters }}">Clear filters</button>
+                </div>
+              </sc-if>
             </section>
-            <aside class="ns-card" style="background:var(--ns-card);min-width:0">
-              <div class="ns-card__header" style="padding:var(--ns-space-4) var(--ns-space-5);border-bottom:1px solid var(--ns-border)">
-                <span class="ns-card__title">Auth event stream</span>
-                <span class="ns-card__description">signin · token refresh · revocation · oidc — folds the <span class="ns-inline-code">auth.*</span> stream</span>
+
+            <!-- Session detail -->
+            <aside class="ns-authdetail" aria-label="Session detail">
+              <div class="ns-authdetail__head">
+                <span class="ns-authdetail__avatar" data-kind="{{ s15Detail.kind }}" aria-hidden="true">{{ s15Detail.initials }}<span class="ns-authcard__dev" data-dev="{{ s15Detail.dev }}">{{ s15Detail.devGlyph }}</span></span>
+                <div class="ns-authdetail__head-main">
+                  <div class="ns-authdetail__name-row"><span class="ns-authdetail__name">{{ s15Detail.name }}</span><sc-if value="{{ s15Detail.elevated }}" hint-placeholder-val="{{ false }}"><span class="ns-authcard__elev" title="Elevated scope">⚑</span></sc-if></div>
+                  <span class="ns-authdetail__uid">{{ s15Detail.id }} · {{ s15Detail.email }}</span>
+                </div>
+                <span class="{{ s15Detail.sBadge }}">{{ s15Detail.effState }}</span>
               </div>
-              <div style="padding:var(--ns-space-2) var(--ns-space-5) var(--ns-space-4)">
-                <div class="ns-activity-feed">
-                  <sc-for list="{{ authFeed }}" as="f" hint-placeholder-count="4">
-                    <div class="ns-activity-feed__item" data-tone="{{ f.tone }}">
-                      <span class="ns-activity-feed__marker" aria-hidden="true"></span>
-                      <div class="ns-activity-feed__body"><span class="ns-activity-feed__text">{{ f.text }}</span><span class="ns-activity-feed__time">{{ f.time }}</span></div>
+
+              <!-- TTL lifespan visualization -->
+              <div class="ns-authdetail__ttl">
+                <div class="ns-authttl" data-tone="{{ s15Detail.ttlTone }}">
+                  <div class="ns-authttl__labels"><span>issued {{ s15Detail.issued }}</span><span class="ns-authttl__lifespan">{{ s15Detail.lifespan }} TTL</span><span>{{ s15Detail.remLbl }}</span></div>
+                  <div class="ns-authttl__track" aria-label="Elapsed vs remaining">
+                    <span class="ns-authttl__elapsed {{ s15Detail.elapsedWClass }}"></span>
+                    <span class="ns-authttl__marker {{ s15Detail.ttlMarkerClass }}" aria-hidden="true"></span>
+                    <span class="ns-authttl__remain {{ s15Detail.ttlWClass }}" data-tone="{{ s15Detail.ttlTone }}"></span>
+                  </div>
+                  <div class="ns-authttl__foot"><span class="ns-authttl__elapsed-lbl">{{ s15Detail.issuedAgo }} elapsed</span><span class="ns-authttl__remain-lbl" data-tone="{{ s15Detail.ttlTone }}">⧗ {{ s15Detail.ttlPctLbl }} remaining</span></div>
+                </div>
+              </div>
+
+              <!-- Identity / device / geo KV -->
+              <div class="ns-authkv">
+                <sc-for list="{{ s15Detail.kv }}" as="kv" hint-placeholder-count="8">
+                  <div class="ns-authkv__row"><span class="ns-authkv__k">{{ kv.k }}</span><span class="ns-authkv__v">{{ kv.v }}</span></div>
+                </sc-for>
+              </div>
+
+              <!-- Scopes -->
+              <div class="ns-authdetail__block">
+                <span class="ns-drawer__section-label">granted scopes <span class="ns-authdetail__count">{{ s15Detail.scopeN }}</span></span>
+                <div class="ns-authcard__scopes">
+                  <sc-for list="{{ s15Detail.scopeChips }}" as="sc" hint-placeholder-count="4"><span class="ns-scopechip ns-scopechip--lg" data-elev="{{ sc.elevated }}">{{ sc.label }}</span></sc-for>
+                </div>
+              </div>
+
+              <!-- Session lifecycle timeline -->
+              <div class="ns-authdetail__block">
+                <span class="ns-drawer__section-label">session lifecycle</span>
+                <div class="ns-authtl">
+                  <sc-for list="{{ s15Detail.timeline }}" as="t" hint-placeholder-count="2">
+                    <div class="ns-authtl__step" data-tone="{{ t.tone }}">
+                      <span class="ns-authtl__marker" aria-hidden="true"></span>
+                      <div class="ns-authtl__body"><span class="ns-authtl__text">{{ t.text }}</span><span class="ns-authtl__at">{{ t.at }}</span></div>
                     </div>
                   </sc-for>
                 </div>
               </div>
+
+              <sc-if value="{{ s15Detail.canRevoke }}" hint-placeholder-val="{{ true }}">
+                <div class="ns-authdetail__actions">
+                  <button class="ns-btn ns-btn--destructive" onClick="{{ s15Detail.revoke }}">Revoke session</button>
+                  <button class="ns-btn ns-btn--ghost" onClick="{{ s15Detail.select }}">Open in Aspire ↗</button>
+                </div>
+              </sc-if>
+              <sc-if value="{{ s15Detail.cannotRevoke }}" hint-placeholder-val="{{ false }}">
+                <div class="ns-authdetail__revoked-note"><span aria-hidden="true">⛒</span> Session revoked — {{ s15Detail.last }}</div>
+              </sc-if>
             </aside>
           </div>
+
+          <!-- Auth event stream (folds auth.*) -->
+          <section class="ns-authstream">
+            <div class="ns-authstream__head">
+              <span class="ns-card__title">Auth event stream</span>
+              <span class="ns-card__description">signin · token refresh · revocation · oidc — folds the <span class="ns-inline-code">auth.*</span> stream</span>
+            </div>
+            <div class="ns-activity-feed ns-authstream__feed">
+              <sc-for list="{{ authFeed }}" as="f" hint-placeholder-count="4">
+                <div class="ns-activity-feed__item" data-tone="{{ f.tone }}">
+                  <span class="ns-activity-feed__marker" aria-hidden="true"></span>
+                  <div class="ns-activity-feed__body"><span class="ns-activity-feed__text">{{ f.text }}</span><span class="ns-activity-feed__time">{{ f.time }}</span></div>
+                </div>
+              </sc-for>
+            </div>
+          </section>
         </div>
       </sc-if>
 
@@ -3824,6 +3969,57 @@
       </div>
     </div>
   </sc-if>
+  <sc-if value="{{ sheetIsS15 }}" hint-placeholder-val="{{ false }}">
+    <div class="ns-sheet-body">
+      <div class="ns-authdetail__head">
+        <span class="ns-authdetail__avatar" data-kind="{{ s15Detail.kind }}" aria-hidden="true">{{ s15Detail.initials }}<span class="ns-authcard__dev" data-dev="{{ s15Detail.dev }}">{{ s15Detail.devGlyph }}</span></span>
+        <div class="ns-authdetail__head-main">
+          <div class="ns-authdetail__name-row"><span class="ns-authdetail__name">{{ s15Detail.name }}</span><sc-if value="{{ s15Detail.elevated }}" hint-placeholder-val="{{ false }}"><span class="ns-authcard__elev" title="Elevated scope">⚑</span></sc-if></div>
+          <span class="ns-authdetail__uid">{{ s15Detail.id }} · {{ s15Detail.email }}</span>
+        </div>
+        <span class="{{ s15Detail.sBadge }}">{{ s15Detail.effState }}</span>
+      </div>
+      <div class="ns-authttl" data-tone="{{ s15Detail.ttlTone }}">
+        <div class="ns-authttl__labels"><span>issued {{ s15Detail.issued }}</span><span class="ns-authttl__lifespan">{{ s15Detail.lifespan }} TTL</span><span>{{ s15Detail.remLbl }}</span></div>
+        <div class="ns-authttl__track" aria-label="Elapsed vs remaining">
+          <span class="ns-authttl__elapsed {{ s15Detail.elapsedWClass }}"></span>
+          <span class="ns-authttl__marker {{ s15Detail.ttlMarkerClass }}" aria-hidden="true"></span>
+          <span class="ns-authttl__remain {{ s15Detail.ttlWClass }}" data-tone="{{ s15Detail.ttlTone }}"></span>
+        </div>
+        <div class="ns-authttl__foot"><span class="ns-authttl__elapsed-lbl">{{ s15Detail.issuedAgo }} elapsed</span><span class="ns-authttl__remain-lbl" data-tone="{{ s15Detail.ttlTone }}">⧗ {{ s15Detail.ttlPctLbl }} remaining</span></div>
+      </div>
+      <div class="ns-authkv">
+        <sc-for list="{{ s15Detail.kv }}" as="kv" hint-placeholder-count="8">
+          <div class="ns-authkv__row"><span class="ns-authkv__k">{{ kv.k }}</span><span class="ns-authkv__v">{{ kv.v }}</span></div>
+        </sc-for>
+      </div>
+      <div class="ns-authdetail__block">
+        <span class="ns-drawer__section-label">granted scopes <span class="ns-authdetail__count">{{ s15Detail.scopeN }}</span></span>
+        <div class="ns-authcard__scopes">
+          <sc-for list="{{ s15Detail.scopeChips }}" as="sc" hint-placeholder-count="4"><span class="ns-scopechip ns-scopechip--lg" data-elev="{{ sc.elevated }}">{{ sc.label }}</span></sc-for>
+        </div>
+      </div>
+      <div class="ns-authdetail__block">
+        <span class="ns-drawer__section-label">session lifecycle</span>
+        <div class="ns-authtl">
+          <sc-for list="{{ s15Detail.timeline }}" as="t" hint-placeholder-count="2">
+            <div class="ns-authtl__step" data-tone="{{ t.tone }}">
+              <span class="ns-authtl__marker" aria-hidden="true"></span>
+              <div class="ns-authtl__body"><span class="ns-authtl__text">{{ t.text }}</span><span class="ns-authtl__at">{{ t.at }}</span></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <sc-if value="{{ s15Detail.canRevoke }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;gap:var(--ns-space-2)">
+          <button class="ns-btn ns-btn--destructive" onClick="{{ s15Detail.revoke }}">Revoke session</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{ s15Detail.cannotRevoke }}" hint-placeholder-val="{{ false }}">
+        <div class="ns-authdetail__revoked-note"><span aria-hidden="true">⛒</span> Session revoked — {{ s15Detail.last }}</div>
+      </sc-if>
+    </div>
+  </sc-if>
 </dialog>
 
 <dialog id="ns-detailsheet-dialog" data-part="content" data-side="bottom" class="ns-detailsheet">
@@ -3909,6 +4105,8 @@ class Component extends DCLogic {
       tasks3: [ { id: 'send-receipt', note: 'timeout 30s → 90s' }, { id: 'sync-ledger', note: 'retries 3 → 6' }, { id: 'export-csv', note: 'concurrency 4 → 1' } ],
       // S4 — Catalog: contract registry explorer (browse → drill)
       s4Tab: 'contracts', s4Sel: 'order.fulfillment.start', s4Kind: 'all', s4Method: 'all', s4Cov: 'all', s4Q: '',
+      // S15 — Auth Sessions: session-security roster (identity → TTL → detail → revoke)
+      s15Sel: 'sess_31', s15Filter: 'all', s15Sort: 'expiry', s15Q: '',
       // S5
       s5Sel: 'triggers', s5ShowCli: false,
       // S6
@@ -5582,6 +5780,166 @@ class Component extends DCLogic {
       unbound: '2 routes unbound',
     };
 
+    // ----- S15 — Auth Sessions: session-security roster ------------------------
+    // Visual metadata only (device / geo / issued→expires TTL / scopes / MFA).
+    // Fully derived; no route/logic/copy-meaning change. "now" = the app clock.
+    const s15NowLbl = '14:02:11';
+    // wbucket: value 0..1 → --w0..--w20 (5% steps), shared bar geometry idiom.
+    const wbucket = (frac) => 'w' + Math.max(0, Math.min(20, Math.round((frac || 0) * 20)));
+    // ttlFrac = remaining / lifespan. elapsedFrac = 1 - ttlFrac.
+    const S15_DEV_GLYPH = { browser: '🖥', cli: '⌨', ci: '⚙', mobile: '▢', service: '◈' };
+    const S15_PROV_TONE = { oidc: 'primary', password: 'warning', 'api-key': 'muted', magic: 'primary' };
+    const s15Raw = [
+      { id: 'sess_31', user: 'usr_31', email: 'maya@acme.dev', name: 'Maya Okonkwo', kind: 'human',
+        provider: 'oidc', idp: 'workos', dev: 'browser', agent: 'Chrome 141 · macOS 15.2',
+        ip: '81.2.69.142', loc: 'Zürich, CH', geo: 'eu', state: 'active', elevated: true, mfa: 'totp',
+        issued: '13:02:41', issuedAgo: '59m', expires: '15:02:41', ttlFrac: 0.502, lifespan: '2h',
+        scopes: ['read', 'write', 'admin:runtime', 'deploy'], last: 'token refreshed 14:00:12',
+        corr: 'ch_3QK9dR2eZ' },
+      { id: 'sess_18', user: 'usr_18', email: 'dev@local', name: 'Local Dev', kind: 'human',
+        provider: 'password', idp: 'local', dev: 'browser', agent: 'Firefox 133 · Linux',
+        ip: '127.0.0.1', loc: 'localhost', geo: 'local', state: 'active', elevated: false, mfa: 'none',
+        issued: '09:44:02', issuedAgo: '4h 18m', expires: '14:14:02', ttlFrac: 0.093, lifespan: '4h 30m',
+        scopes: ['read', 'write'], last: 'signin 09:44:02', corr: 'ch_7bV1mE0aQ' },
+      { id: 'sess_44', user: 'usr_44', email: ' next@studio.io', name: 'Nadia Petrov', kind: 'human',
+        provider: 'oidc', idp: 'google', dev: 'mobile', agent: 'Safari · iOS 18.2',
+        ip: '203.0.113.51', loc: 'Berlin, DE', geo: 'eu', state: 'idle', elevated: false, mfa: 'passkey',
+        issued: '11:20:08', issuedAgo: '2h 42m', expires: '19:20:08', ttlFrac: 0.663, lifespan: '8h',
+        scopes: ['read'], last: 'idle since 13:31:00 · 31m', corr: 'ch_9pL2xW4rN' },
+      { id: 'sess_07', user: 'usr_07', email: 'ci-bot', name: 'CI Runner', kind: 'service',
+        provider: 'api-key', idp: 'gha', dev: 'ci', agent: 'netscript-ci/2.4 · runner',
+        ip: '140.82.112.3', loc: 'GitHub Actions', geo: 'cloud', state: 'revoked', elevated: false, mfa: 'none',
+        issued: '08:11:56', issuedAgo: '5h 50m', expires: '—', ttlFrac: 0, lifespan: '—',
+        scopes: ['read', 'deploy'], last: 'session revoked 12:30:00 · by admin', corr: 'ch_2sD8kR1tP' },
+      { id: 'sess_52', user: 'svc_52', email: 'analytics-sync', name: 'Analytics Sync', kind: 'service',
+        provider: 'api-key', idp: 'kv', dev: 'service', agent: 'streams-consumer/1.4',
+        ip: '10.0.4.11', loc: 'aspire · internal', geo: 'cloud', state: 'active', elevated: false, mfa: 'none',
+        issued: '13:58:30', issuedAgo: '3m', expires: '14:07:11', ttlFrac: 0.031, lifespan: '15m',
+        scopes: ['read'], last: 'token refreshed 13:58:30', corr: 'ch_5tG3nB8vC' },
+    ];
+    const S15_STATE_TONE = { active: 'success', idle: 'warning', revoked: 'muted', expiring: 'destructive' };
+    // Derived per-session view fields.
+    const s15Sessions = s15Raw.map(x => {
+      const expiringSoon = x.state === 'active' && x.ttlFrac > 0 && x.ttlFrac <= 0.12;
+      const effState = x.state === 'active' && expiringSoon ? 'expiring' : x.state;
+      const remFrac = x.state === 'revoked' ? 0 : x.ttlFrac;
+      const elapsedFrac = x.state === 'revoked' ? 1 : (1 - x.ttlFrac);
+      const ttlPctLbl = x.state === 'revoked' ? 'revoked' : Math.round(remFrac * 100) + '%';
+      const remLbl = x.state === 'revoked' ? 'revoked' : x.expires;
+      return {
+        ...x, effState, expiringSoon,
+        devGlyph: S15_DEV_GLYPH[x.dev] || '◇',
+        provTone: S15_PROV_TONE[x.provider] || 'muted',
+        provLbl: x.provider + (x.idp ? ' · ' + x.idp : ''),
+        stTone: S15_STATE_TONE[effState] || 'muted',
+        sBadge: 'ns-badge ns-badge--' + (S15_STATE_TONE[effState] || 'muted'),
+        initials: (x.name || x.user).split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase(),
+        ttlWClass: 'ns-ttlbar__fill--' + wbucket(remFrac),
+        elapsedWClass: 'ns-ttlbar__fill--' + wbucket(elapsedFrac),
+        ttlMarkerClass: 'ns-authttl__marker--' + wbucket(elapsedFrac),
+        ttlPctLbl, remLbl, ttlTone: expiringSoon ? 'destructive' : (effState === 'idle' ? 'warning' : (x.state === 'revoked' ? 'muted' : 'success')),
+        scopeChips: x.scopes.map(sc => ({ label: sc, elevated: /admin|deploy|write/.test(sc) ? '1' : '0' })),
+        scopeN: String(x.scopes.length),
+        mfaLbl: x.mfa === 'none' ? 'no MFA' : x.mfa,
+        mfaOn: x.mfa === 'none' ? '0' : '1',
+        selState: x.id === s.s15Sel ? 'selected' : null,
+        select: () => this.setState(st => ({ s15Sel: x.id, sheet: (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(max-width: 640px)').matches) ? 's15' : st.sheet })),
+        revoke: () => this.askConfirm({ title: 'Revoke auth session', desc: 'Revokes this projected session and emits auth.session.revoked.', from: x.id + ' · ' + x.state, to: 'revoked', cli: 'netscript auth sessions revoke ' + x.id, action: 'Revoke', danger: true, toast: x.id + ' revoked', resultPath: '/auth/sessions/' + x.id }),
+      };
+    });
+    // Filter + sort (roster toolbar).
+    const s15q = (s.s15Q || '').trim().toLowerCase();
+    const s15Match = (x) => (s.s15Filter === 'all'
+        || (s.s15Filter === 'active' && (x.effState === 'active' || x.effState === 'expiring'))
+        || (s.s15Filter === 'elevated' && x.elevated)
+        || (s.s15Filter === x.effState))
+      && (!s15q || (x.user + ' ' + x.email + ' ' + x.name + ' ' + x.provider + ' ' + x.loc).toLowerCase().includes(s15q));
+    let s15Filtered = s15Sessions.filter(s15Match);
+    const s15Rank = { expiring: 0, active: 1, idle: 2, revoked: 3 };
+    if (s.s15Sort === 'expiry') {
+      s15Filtered = s15Filtered.slice().sort((a, b) => {
+        const ar = a.state === 'revoked' ? 99 : (a.state === 'idle' ? 2 : 0) + a.ttlFrac;
+        const br = b.state === 'revoked' ? 99 : (b.state === 'idle' ? 2 : 0) + b.ttlFrac;
+        return ar - br;
+      });
+    } else {
+      s15Filtered = s15Filtered.slice().sort((a, b) => (s15Rank[a.effState] - s15Rank[b.effState]) || a.user.localeCompare(b.user));
+    }
+    const s15HasResults = s15Filtered.length > 0;
+    // Header composite metrics.
+    const s15Active = s15Sessions.filter(x => x.effState === 'active' || x.effState === 'expiring').length;
+    const s15Idle = s15Sessions.filter(x => x.effState === 'idle').length;
+    const s15Revoked = s15Sessions.filter(x => x.state === 'revoked').length;
+    const s15Elevated = s15Sessions.filter(x => x.elevated).length;
+    const s15Live = s15Sessions.filter(x => x.state !== 'revoked');
+    const s15Total = s15Sessions.length;
+    // status distribution channel bar (active / expiring / idle / revoked)
+    const s15Dist = [
+      { key: 'active', label: 'active', tone: 'success', n: s15Sessions.filter(x => x.effState === 'active').length },
+      { key: 'expiring', label: 'expiring', tone: 'destructive', n: s15Sessions.filter(x => x.effState === 'expiring').length },
+      { key: 'idle', label: 'idle', tone: 'warning', n: s15Idle },
+      { key: 'revoked', label: 'revoked', tone: 'muted', n: s15Revoked },
+    ].filter(d => d.n > 0).map(d => ({ ...d, wClass: 'ns-authchan__seg--w' + Math.max(1, Math.round(d.n / s15Total * 20)),
+      active: s.s15Filter === d.key, go: () => this.setState(st => ({ s15Filter: st.s15Filter === d.key ? 'all' : d.key })) }));
+    // soonest-to-expire horizon strip (live sessions, ordered by remaining)
+    const s15Horizon = s15Live.slice().sort((a, b) => a.ttlFrac - b.ttlFrac).map(x => ({
+      id: x.id, user: x.user, remLbl: x.expires, pctLbl: Math.round(x.ttlFrac * 100) + '%',
+      wClass: 'ns-authhz__fill--' + wbucket(x.ttlFrac),
+      tone: x.expiringSoon ? 'destructive' : (x.effState === 'idle' ? 'warning' : 'success'),
+      sel: x.id === s.s15Sel ? '1' : '0',
+      go: () => this.setState({ s15Sel: x.id }),
+    }));
+    const s15SoonId = s15Horizon.length ? s15Horizon[0] : null;
+    const s15Head = {
+      activeN: String(s15Active), liveN: String(s15Live.length), total: String(s15Total),
+      idleN: String(s15Idle), revokedN: String(s15Revoked),
+      elevatedN: String(s15Elevated),
+      elevWClass: 'ns-authratio__fill--' + wbucket(s15Elevated / Math.max(1, s15Live.length)),
+      elevPctLbl: Math.round(s15Elevated / Math.max(1, s15Live.length) * 100) + '%',
+      mfaN: s15Live.filter(x => x.mfa !== 'none').length,
+      mfaPctLbl: Math.round(s15Live.filter(x => x.mfa !== 'none').length / Math.max(1, s15Live.length) * 100) + '%',
+      mfaWClass: 'ns-authratio__fill--' + wbucket(s15Live.filter(x => x.mfa !== 'none').length / Math.max(1, s15Live.length)),
+      dist: s15Dist, horizon: s15Horizon,
+      soonUser: s15SoonId ? s15SoonId.user : '—', soonRem: s15SoonId ? s15SoonId.remLbl : '—',
+      now: s15NowLbl,
+    };
+    // Roster filter chips.
+    const s15FilterChips = [
+      { v: 'all', label: 'All' }, { v: 'active', label: 'Active' }, { v: 'idle', label: 'Idle' },
+      { v: 'elevated', label: 'Elevated' }, { v: 'revoked', label: 'Revoked' },
+    ].map(o => ({ ...o, state: s.s15Filter === o.v ? 'active' : null, set: () => this.setState({ s15Filter: o.v }) }));
+    const s15SortChips = [
+      { v: 'expiry', label: 'Soonest expiry' }, { v: 'identity', label: 'By status' },
+    ].map(o => ({ ...o, state: s.s15Sort === o.v ? 'active' : null, set: () => this.setState({ s15Sort: o.v }) }));
+    // Selected session detail.
+    const s15Selected = s15Sessions.find(x => x.id === s.s15Sel) || s15Sessions[0];
+    const s15Detail = s15Selected ? {
+      ...s15Selected,
+      kv: [
+        { k: 'principal', v: s15Selected.user + ' · ' + s15Selected.email },
+        { k: 'provider', v: s15Selected.provLbl },
+        { k: 'device', v: s15Selected.agent },
+        { k: 'ip · location', v: s15Selected.ip + ' · ' + s15Selected.loc },
+        { k: 'issued', v: s15Selected.issued + ' · ' + s15Selected.issuedAgo + ' ago' },
+        { k: 'expires', v: s15Selected.state === 'revoked' ? 'revoked' : s15Selected.expires + ' · ' + s15Selected.lifespan + ' TTL' },
+        { k: 'mfa', v: s15Selected.mfaLbl },
+        { k: 'correlation', v: s15Selected.corr },
+      ],
+      canRevoke: s15Selected.state !== 'revoked',
+      cannotRevoke: s15Selected.state === 'revoked',
+      timeline: (() => {
+        const t = [
+          { at: s15Selected.issued, kind: 'issued', tone: 'success', text: (s15Selected.provider === 'password' ? 'signin · password' : s15Selected.provider === 'api-key' ? 'api-key auth' : 'oidc.completed · ' + s15Selected.idp) },
+        ];
+        if (s15Selected.state === 'active' && /refreshed/.test(s15Selected.last)) t.push({ at: '14:00:12', kind: 'refresh', tone: 'primary', text: 'token.refreshed' });
+        if (s15Selected.state === 'idle') t.push({ at: '13:31:00', kind: 'idle', tone: 'warning', text: 'idle · no activity' });
+        if (s15Selected.state === 'revoked') t.push({ at: '12:30:00', kind: 'revoked', tone: 'destructive', text: 'session.revoked · by admin' });
+        return t;
+      })(),
+    } : null;
+    // all-revoked / empty edge derivations (kept clean by markup).
+    const s15AllRevoked = s15Live.length === 0;
+
     // ----- S5 -----
     const plugins = [
       { id: 'workers', ver: 'v1.4.0', status: 'healthy', drift: null },
@@ -7176,11 +7534,13 @@ class Component extends DCLogic {
       isWorkers: s.route === 'workers', isSagas: s.route === 'sagas', isTriggers: s.route === 'triggers',
       isStreams: s.route === 'streams', isMigrations: s.route === 'migrations', isDlq: s.route === 'dlq',
       isFlows: s.route === 'flows', isAi: s.route === 'ai', isAuthc: s.route === 'authc',
-      authSessions: [
-        { id: 'usr_31', user: 'usr_31 · maya@acme.dev', provider: 'oidc · workos', state: 'active', started: '13:02:41', last: 'token refreshed 14:00:12' },
-        { id: 'usr_18', user: 'usr_18 · dev@local', provider: 'password', state: 'active', started: '09:44:02', last: 'signin 09:44:02' },
-        { id: 'usr_07', user: 'usr_07 · ci-bot', provider: 'api-key', state: 'revoked', started: '08:11:56', last: 'session revoked 12:30:00' },
-      ].map(x => ({ ...x, sBadge: x.state === 'active' ? 'ns-badge ns-badge--success' : 'ns-badge ns-badge--muted', open: () => this.nav('/auth/sessions/' + x.id), revoke: () => this.askConfirm({ title: 'Revoke auth session', desc: 'Revokes this projected session and emits auth.session.revoked.', from: x.id + ' · ' + x.state, to: 'revoked', cli: 'netscript auth sessions revoke ' + x.id, action: 'Revoke', danger: true, toast: x.id + ' revoked', resultPath: '/auth/sessions/' + x.id }) })),
+      // S15 — Auth Sessions (session-security roster)
+      s15Sessions: s15Filtered, s15Head, s15Detail, s15HasResults, s15NoResults: !s15HasResults, s15AllRevoked,
+      s15FilterChips, s15SortChips, s15Q: s.s15Q,
+      s15SetQ: (e) => this.setState({ s15Q: e.target.value }),
+      s15ClearFilters: () => this.setState({ s15Filter: 'all', s15Sort: 'expiry', s15Q: '' }),
+      s15RevokeAll: () => this.askConfirm({ title: 'Revoke all live sessions', desc: 'Revokes every non-revoked session (' + s15Live.length + ') and emits auth.session.revoked for each. Elevated + human sessions included.', from: s15Live.length + ' live sessions', to: 'all revoked', cli: 'netscript auth sessions revoke --all', action: 'Revoke all', danger: true, toast: 'all sessions revoked' }),
+      s15RevokeAllN: String(s15Live.length),
       authFeed: [
         { tone: 'primary', text: 'auth.token.refreshed · usr_31 · workos', time: '14:00:12' },
         { tone: 'warning', text: 'auth.session.revoked · usr_07 · by admin', time: '12:30:00' },
@@ -7207,8 +7567,8 @@ class Component extends DCLogic {
       s1Sheet: s.detailSheet || { eyebrow: '', icon: '', tone: 'muted', value: '', title: '', pill: '', pillClass: 'ns-badge ns-badge--muted', desc: '', cta: 'Open', rows: [], go: () => {} },
       closeDetailSheet: () => this.setState({ detailSheet: null }),
       // sheet
-      sheetIsS2: s.sheet === 's2', sheetIsS13: s.sheet === 's13', sheetIsS7: s.sheet === 's7', sheetIsS8: s.sheet === 's8', sheetIsS9: s.sheet === 's9', sheetIsS11: s.sheet === 's11', sheetIsS12: s.sheet === 's12', sheetIsS4: s.sheet === 's4',
-      sheetTitle: s.sheet === 's2' ? selDef.key : s.sheet === 's7' ? s7Detail.name : s.sheet === 's8' ? (s8SelNode ? s8SelNode.name : s8.saga) : s.sheet === 's9' ? s9Detail.id : s.sheet === 's11' ? s11Detail.name : s.sheet === 's12' ? (s12Detail ? s12Detail.id : '') : s.sheet === 's4' ? (s4Detail ? s4Detail.proc : '') : (selNode13 ? selNode13.name : ''),
+      sheetIsS2: s.sheet === 's2', sheetIsS13: s.sheet === 's13', sheetIsS7: s.sheet === 's7', sheetIsS8: s.sheet === 's8', sheetIsS9: s.sheet === 's9', sheetIsS11: s.sheet === 's11', sheetIsS12: s.sheet === 's12', sheetIsS4: s.sheet === 's4', sheetIsS15: s.sheet === 's15',
+      sheetTitle: s.sheet === 's2' ? selDef.key : s.sheet === 's7' ? s7Detail.name : s.sheet === 's8' ? (s8SelNode ? s8SelNode.name : s8.saga) : s.sheet === 's9' ? s9Detail.id : s.sheet === 's11' ? s11Detail.name : s.sheet === 's12' ? (s12Detail ? s12Detail.id : '') : s.sheet === 's4' ? (s4Detail ? s4Detail.proc : '') : s.sheet === 's15' ? (s15Detail ? s15Detail.id : '') : (selNode13 ? selNode13.name : ''),
       closeSheet: () => this.setState({ sheet: null }),
       // S1
       s1Stats, s1CmdGroups, s1Contribs, s1Teaser, s1Kpis, s1Hero, s1Ai,
