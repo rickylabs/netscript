@@ -3484,81 +3484,215 @@
       <!-- @S13-END -->
 
       <sc-if value="{{ isExtensions }}" hint-placeholder-val="{{ false }}">
-        <div class="ns-screen" data-screen-label="S16 Extensions">
+        <div class="ns-screen ns-extscreen" data-screen-label="S16 Extensions">
           <header class="ns-page-header ns-page-header--console">
             <div class="ns-toolbar">
               <div style="display:grid;gap:var(--ns-space-2)">
                 <h1>Extensions</h1>
                 <p class="ns-lede">Every UI contribution in the app — panels, ⌘K actions, and AI tools — with its provenance, trust tier, and permissions. The dashboard is itself a plugin.</p>
               </div>
-              <div class="ns-seg" role="group" aria-label="Extensions view">
-                <button class="ns-seg__btn" data-state="{{ extSegPanels.state }}" onClick="{{ extSegPanels.set }}">Panels</button>
-                <button class="ns-seg__btn" data-state="{{ extSegActions.state }}" onClick="{{ extSegActions.set }}">Actions</button>
-                <button class="ns-seg__btn" data-state="{{ extSegAvail.state }}" onClick="{{ extSegAvail.set }}">Available</button>
+              <div class="ns-seg ns-extseg" role="group" aria-label="Extensions view">
+                <button class="ns-seg__btn ns-extseg__btn" data-state="{{ extSegPanels.state }}" onClick="{{ extSegPanels.set }}">Providers</button>
+                <button class="ns-seg__btn ns-extseg__btn" data-state="{{ extSegActions.state }}" onClick="{{ extSegActions.set }}">Surfaces</button>
+                <button class="ns-seg__btn ns-extseg__btn" data-state="{{ extSegAvail.state }}" onClick="{{ extSegAvail.set }}">Available</button>
               </div>
             </div>
           </header>
 
-          <sc-if value="{{ extTabPanels }}" hint-placeholder-val="{{ true }}">
-            <div style="display:grid;gap:var(--ns-space-4);grid-template-columns:repeat(auto-fill,minmax(min(20rem,100%),1fr))">
-              <sc-for list="{{ extPanels }}" as="p" hint-placeholder-count="6">
-                <div class="ns-card" style="background:var(--ns-card);padding:var(--ns-space-4);display:grid;gap:var(--ns-space-2-5)">
-                  <div style="display:flex;align-items:center;gap:var(--ns-space-2);flex-wrap:wrap">
-                    <button style="all:unset;cursor:pointer;color:var(--ns-primary);font-weight:600;font-size:var(--ns-text-sm)" onClick="{{ p.open }}">{{ p.title }}</button>
-                    <span class="{{ p.tierBadge }}">{{ p.tier }}</span>
-                  </div>
-                  <div class="ns-kv">
-                    <div class="ns-kv__row"><span class="ns-kv__key">id</span><span class="ns-kv__val">{{ p.id }}</span></div>
-                    <div class="ns-kv__row"><span class="ns-kv__key">mount target</span><span class="ns-kv__val">{{ p.mount }}</span></div>
-                    <div class="ns-kv__row"><span class="ns-kv__key">slots</span><span class="ns-kv__val">{{ p.slots }}</span></div>
-                  </div>
-                  <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--ns-space-2)">
-                    <span class="ns-chip">contributed by {{ p.plugin }}</span>
-                    <button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ p.toggle }}">{{ p.actionLabel }}</button>
-                  </div>
+          <!-- ============ HEADER COMPOSITE: installed count + surface-distribution channel + enabled meter + compat alert ============ -->
+          <section class="ns-exthead" aria-label="Extensions overview">
+            <div class="ns-exthead__cell ns-exthead__cell--hero">
+              <span class="ns-exthead__glyph" aria-hidden="true">◈</span>
+              <div class="ns-exthead__hero-main">
+                <span class="ns-exthead__hero-num">{{ extHead.installed }}<span class="ns-exthead__hero-unit">extensions</span></span>
+                <span class="ns-exthead__hero-sub">{{ extHead.enabledLbl }} · {{ extHead.contribLbl }}</span>
+              </div>
+            </div>
+            <div class="ns-exthead__cell">
+              <span class="ns-exthead__label">contributions by surface</span>
+              <div class="ns-extchan" aria-label="Contribution surface distribution">
+                <sc-for list="{{ extHead.surfSegs }}" as="sg" hint-placeholder-count="3">
+                  <button class="ns-extchan__seg {{ sg.wClass }}" data-kind="{{ sg.kind }}" data-active="{{ sg.active }}" onClick="{{ sg.filter }}" title="{{ sg.title }}"><span class="ns-extchan__seg-n">{{ sg.n }}</span></button>
+                </sc-for>
+              </div>
+              <div class="ns-extchan__legend">
+                <sc-for list="{{ extHead.surfSegs }}" as="lg" hint-placeholder-count="3">
+                  <span class="ns-extchan__leg" data-kind="{{ lg.kind }}"><span class="ns-extchan__leg-dot" aria-hidden="true"></span>{{ lg.label }} <b>{{ lg.n }}</b></span>
+                </sc-for>
+              </div>
+            </div>
+            <div class="ns-exthead__cell">
+              <span class="ns-exthead__label">enabled coverage</span>
+              <div class="ns-extratio" data-tone="{{ extHead.enTone }}">
+                <span class="ns-extratio__fill {{ extHead.enWClass }}"></span>
+              </div>
+              <div class="ns-extratio__foot"><span>{{ extHead.enabled }} enabled</span><span class="ns-extratio__muted">{{ extHead.disabled }} disabled</span></div>
+              <div class="ns-exthead__tiers">
+                <sc-for list="{{ extHead.tierChips }}" as="tc" hint-placeholder-count="2"><span class="ns-exttier" data-tier="{{ tc.tier }}"><span class="ns-exttier__glyph" aria-hidden="true">{{ tc.glyph }}</span>{{ tc.label }} <b>{{ tc.n }}</b></span></sc-for>
+              </div>
+            </div>
+            <div class="ns-exthead__cell ns-exthead__cell--alert">
+              <span class="ns-exthead__label">compatibility</span>
+              <div class="ns-extcompat" data-state="{{ extHead.compatState }}">
+                <span class="ns-extcompat__glyph" aria-hidden="true">{{ extHead.compatGlyph }}</span>
+                <div class="ns-extcompat__body">
+                  <span class="ns-extcompat__head">{{ extHead.compatHead }}</span>
+                  <span class="ns-extcompat__note">{{ extHead.compatNote }}</span>
                 </div>
+              </div>
+              <span class="ns-extcompat__host">host contract <b>{{ extHead.hostContract }}</b></span>
+            </div>
+          </section>
+
+          <!-- ============ PROVIDERS: roster (contribution manifest per extension) + detail ============ -->
+          <sc-if value="{{ extTabPanels }}" hint-placeholder-val="{{ true }}">
+            <div class="ns-extbar">
+              <span class="ns-extbar__label">show</span>
+              <div class="ns-extbar__chips">
+                <sc-for list="{{ extSurfChips }}" as="fc" hint-placeholder-count="4"><button class="ns-extbar__chip" data-kind="{{ fc.kind }}" data-state="{{ fc.state }}" onClick="{{ fc.set }}">{{ fc.label }}<span class="ns-extbar__chip-n">{{ fc.n }}</span></button></sc-for>
+              </div>
+              <span style="flex:1"></span>
+              <span class="ns-extbar__count">{{ extProvCount }} providers</span>
+            </div>
+            <div class="ns-extgrid">
+              <div class="ns-extroster" role="list" aria-label="Installed extensions">
+                <sc-for list="{{ extProviders }}" as="e" hint-placeholder-count="6">
+                  <button class="ns-extprov" role="listitem" data-ext-id="{{ e.id }}" data-state="{{ e.selState }}" data-disabled="{{ e.disabled }}" onClick="{{ e.select }}">
+                    <span class="ns-extprov__rail" aria-hidden="true"></span>
+                    <span class="ns-extprov__glyph" data-tier="{{ e.tier }}" aria-hidden="true">{{ e.glyph }}</span>
+                    <div class="ns-extprov__main">
+                      <div class="ns-extprov__top">
+                        <span class="ns-extprov__name">{{ e.name }}</span>
+                        <span class="ns-extprov__ver">{{ e.version }}</span>
+                        <span class="ns-extprov__status" data-en="{{ e.enabled }}"><span class="ns-extprov__status-dot" aria-hidden="true"></span>{{ e.statusLbl }}</span>
+                      </div>
+                      <div class="ns-extprov__contribbar" aria-label="Contribution shape">
+                        <sc-for list="{{ e.barSegs }}" as="b" hint-placeholder-count="2"><span class="ns-extprov__barseg {{ b.wClass }}" data-kind="{{ b.kind }}" title="{{ b.title }}"></span></sc-for>
+                      </div>
+                      <div class="ns-extprov__pips">
+                        <sc-for list="{{ e.pips }}" as="pp" hint-placeholder-count="2"><span class="ns-extprov__pip" data-kind="{{ pp.kind }}"><span class="ns-extprov__pip-glyph" aria-hidden="true">{{ pp.glyph }}</span>{{ pp.label }}</span></sc-for>
+                        <span class="ns-extprov__src">{{ e.source }}</span>
+                      </div>
+                    </div>
+                  </button>
+                </sc-for>
+              </div>
+
+              <aside class="ns-extmanifest" aria-label="Extension manifest">
+                <div class="ns-extmanifest__head">
+                  <span class="ns-extmanifest__glyph" data-tier="{{ extSel.tier }}" aria-hidden="true">{{ extSel.glyph }}</span>
+                  <div class="ns-extmanifest__id">
+                    <div class="ns-extmanifest__name-row"><span class="ns-extmanifest__name">{{ extSel.name }}</span><span class="ns-extmanifest__ver">{{ extSel.version }}</span><span class="{{ extSel.tierBadge }}">{{ extSel.tier }}</span></div>
+                    <span class="ns-extmanifest__sub">{{ extSel.source }} · contributes to {{ extSel.surfLbl }}</span>
+                  </div>
+                  <span class="ns-extmanifest__status" data-en="{{ extSel.enabled }}"><span class="ns-extprov__status-dot" aria-hidden="true"></span>{{ extSel.statusLbl }}</span>
+                </div>
+
+                <div class="ns-extmanifest__kv">
+                  <sc-for list="{{ extSel.kv }}" as="kv" hint-placeholder-count="4"><div class="ns-extmanifest__kv-row"><span class="ns-extmanifest__kv-k">{{ kv.k }}</span><span class="ns-extmanifest__kv-v" data-tone="{{ kv.tone }}">{{ kv.v }}</span></div></sc-for>
+                </div>
+
+                <div class="ns-extmanifest__section-label">contributes</div>
+                <div class="ns-extmanifest__groups">
+                  <sc-for list="{{ extSel.groups }}" as="g" hint-placeholder-count="2">
+                    <div class="ns-extgroup" data-kind="{{ g.kind }}">
+                      <div class="ns-extgroup__head"><span class="ns-extgroup__glyph" aria-hidden="true">{{ g.glyph }}</span><span class="ns-extgroup__title">{{ g.title }}</span><span class="ns-extgroup__n">{{ g.n }}</span></div>
+                      <div class="ns-extgroup__items">
+                        <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="2">
+                          <div class="ns-extcontrib">
+                            <span class="ns-extcontrib__glyph" aria-hidden="true">{{ it.icon }}</span>
+                            <div class="ns-extcontrib__main">
+                              <span class="ns-extcontrib__title">{{ it.title }}</span>
+                              <span class="ns-extcontrib__path">{{ it.meta }}</span>
+                            </div>
+                            <span class="ns-extcontrib__perm">{{ it.perm }}</span>
+                          </div>
+                        </sc-for>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+
+                <div class="ns-extmanifest__section-label">plugs into</div>
+                <div class="ns-extmounts">
+                  <sc-for list="{{ extSel.mounts }}" as="m" hint-placeholder-count="2"><span class="ns-extmount" data-kind="{{ m.kind }}"><span class="ns-extmount__glyph" aria-hidden="true">{{ m.glyph }}</span>{{ m.label }}</span></sc-for>
+                </div>
+
+                <div class="ns-extmanifest__actions">
+                  <button class="{{ extSel.toggleClass }}" onClick="{{ extSel.toggle }}">{{ extSel.actionLabel }}</button>
+                  <button class="ns-btn ns-btn--ghost" onClick="{{ extSel.viewPlugin }}">View plugin →</button>
+                </div>
+              </aside>
+            </div>
+          </sc-if>
+
+          <!-- ============ SURFACES: contribution-surface visualization (lanes by surface kind) ============ -->
+          <sc-if value="{{ extTabActions }}" hint-placeholder-val="{{ false }}">
+            <div class="ns-extlanes" aria-label="Contribution surfaces">
+              <sc-for list="{{ extLanes }}" as="ln" hint-placeholder-count="3">
+                <section class="ns-extlane" data-kind="{{ ln.kind }}">
+                  <header class="ns-extlane__head">
+                    <span class="ns-extlane__glyph" aria-hidden="true">{{ ln.glyph }}</span>
+                    <span class="ns-extlane__title">{{ ln.title }}</span>
+                    <span class="ns-extlane__n">{{ ln.n }}</span>
+                  </header>
+                  <div class="ns-extlane__stat">
+                    <div class="ns-extlane__meter" aria-label="Share of contributions">
+                      <span class="ns-extlane__meter-fill {{ ln.shareWClass }}"></span>
+                    </div>
+                    <span class="ns-extlane__mounts">{{ ln.mountSummary }}</span>
+                  </div>
+                  <div class="ns-extlane__items">
+                    <sc-for list="{{ ln.items }}" as="it" hint-placeholder-count="3">
+                      <div class="ns-extmount-card">
+                        <div class="ns-extmount-card__top">
+                          <span class="ns-extmount-card__icon" aria-hidden="true">{{ it.icon }}</span>
+                          <span class="ns-extmount-card__title">{{ it.title }}</span>
+                          <span class="ns-extmount-card__prov" data-tier="{{ it.tier }}">{{ it.plugin }}</span>
+                        </div>
+                        <div class="ns-extmount-card__row">
+                          <span class="ns-extmount-card__path">{{ it.meta }}</span>
+                          <span class="ns-extmount-card__perm"><span class="ns-extmount-card__perm-glyph" aria-hidden="true">{{ it.permGlyph }}</span>{{ it.perm }}</span>
+                        </div>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <footer class="ns-extlane__foot"><span class="ns-extlane__foot-glyph" aria-hidden="true">↳</span>{{ ln.foot }}</footer>
+                </section>
               </sc-for>
             </div>
           </sc-if>
 
-          <sc-if value="{{ extTabActions }}" hint-placeholder-val="{{ false }}">
-            <section class="ns-responsive-table">
-              <div class="ns-responsive-table__scroller">
-                <table class="ns-responsive-table__table" style="min-width:38rem">
-                  <thead class="ns-responsive-table__head"><tr class="ns-responsive-table__row">
-                    <th class="ns-responsive-table__header">Contribution</th><th class="ns-responsive-table__header">Kind</th><th class="ns-responsive-table__header">Plugin</th><th class="ns-responsive-table__header">Permission</th>
-                  </tr></thead>
-                  <tbody>
-                    <sc-for list="{{ extActions }}" as="a" hint-placeholder-count="4">
-                      <tr class="ns-responsive-table__row">
-                        <td class="ns-responsive-table__cell"><span style="display:inline-flex;align-items:center;gap:var(--ns-space-2)"><span aria-hidden="true">{{ a.icon }}</span><span>{{ a.title }}</span></span></td>
-                        <td class="ns-responsive-table__cell"><span class="{{ a.kindBadge }}">{{ a.kind }}</span></td>
-                        <td class="ns-responsive-table__cell"><span class="ns-chip">{{ a.plugin }}</span></td>
-                        <td class="ns-responsive-table__cell"><span style="font-family:var(--ns-font-mono);font-size:var(--ns-text-2xs);color:var(--ns-muted-fg)">{{ a.perm }}</span></td>
-                      </tr>
-                    </sc-for>
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          </sc-if>
-
+          <!-- ============ AVAILABLE: install / quarantine with compat meter ============ -->
           <sc-if value="{{ extTabAvail }}" hint-placeholder-val="{{ false }}">
-            <div style="display:grid;gap:var(--ns-space-4);grid-template-columns:repeat(auto-fill,minmax(min(22rem,100%),1fr))">
+            <div class="ns-extavail">
               <sc-for list="{{ extAvailable }}" as="e" hint-placeholder-count="2">
-                <div class="ns-card" style="background:var(--ns-card);padding:var(--ns-space-4);display:grid;gap:var(--ns-space-2-5)">
-                  <div style="display:flex;align-items:center;gap:var(--ns-space-2);flex-wrap:wrap">
-                    <span style="font-weight:600;font-size:var(--ns-text-sm);font-family:var(--ns-font-mono)">{{ e.title }}</span>
-                    <span class="ns-chip">{{ e.publisher }}</span>
+                <div class="ns-extavailcard" data-quar="{{ e.quarantine }}">
+                  <span class="ns-extavailcard__rail" aria-hidden="true"></span>
+                  <div class="ns-extavailcard__head">
+                    <span class="ns-extavailcard__glyph" data-tier="{{ e.tier }}" aria-hidden="true">{{ e.glyph }}</span>
+                    <div class="ns-extavailcard__id">
+                      <div class="ns-extavailcard__name-row"><span class="ns-extavailcard__name">{{ e.title }}</span><span class="ns-chip">{{ e.publisher }}</span></div>
+                      <span class="ns-extavailcard__desc">{{ e.desc }}</span>
+                    </div>
                     <sc-if value="{{ e.quarantine }}" hint-placeholder-val="{{ false }}"><span class="ns-badge ns-badge--warning">held · contract v1</span></sc-if>
                   </div>
-                  <span style="font-size:var(--ns-text-xs);color:var(--ns-muted-fg);line-height:var(--ns-leading-relaxed)">{{ e.desc }}</span>
+                  <div class="ns-extcompatbar" aria-label="Contract compatibility">
+                    <div class="ns-extcompatbar__row"><span class="ns-extcompatbar__lbl">built for</span><span class="ns-extcompatbar__pin" data-ok="{{ e.builtOk }}">{{ e.builtFor }}</span></div>
+                    <div class="ns-extcompatbar__track"><span class="ns-extcompatbar__seg {{ e.compatWClass }}" data-ok="{{ e.builtOk }}"></span><span class="ns-extcompatbar__now" aria-hidden="true"></span></div>
+                    <div class="ns-extcompatbar__row"><span class="ns-extcompatbar__lbl">host</span><span class="ns-extcompatbar__pin" data-ok="true">contract v2</span></div>
+                  </div>
                   <sc-if value="{{ e.quarantine }}" hint-placeholder-val="{{ false }}">
-                    <div class="ns-inline-notice ns-inline-notice--warning" style="display:flex;gap:var(--ns-space-2);align-items:center;padding:var(--ns-space-2) var(--ns-space-3);border-radius:var(--ns-radius-md)">
-                      <span style="font-size:var(--ns-text-2xs)">Quarantined: built for contract v1, host at v2. Installed but held — not an error.</span>
+                    <div class="ns-inline-notice ns-inline-notice--warning ns-extavailcard__hold">
+                      <span aria-hidden="true">⚠</span><span>Quarantined: built for contract v1, host at v2. Installed but held — not an error.</span>
                     </div>
                   </sc-if>
-                  <button class="{{ e.actClass }}" style="width:fit-content" onClick="{{ e.act }}">{{ e.actLabel }}</button>
+                  <div class="ns-extavailcard__foot">
+                    <div class="ns-extavailcard__adds">
+                      <sc-for list="{{ e.adds }}" as="ad" hint-placeholder-count="3"><span class="ns-extprov__pip" data-kind="{{ ad.kind }}"><span class="ns-extprov__pip-glyph" aria-hidden="true">{{ ad.glyph }}</span>{{ ad.label }}</span></sc-for>
+                    </div>
+                    <button class="{{ e.actClass }}" onClick="{{ e.act }}">{{ e.actLabel }}</button>
+                  </div>
                 </div>
               </sc-for>
             </div>
@@ -4018,6 +4152,46 @@
       <sc-if value="{{ s15Detail.cannotRevoke }}" hint-placeholder-val="{{ false }}">
         <div class="ns-authdetail__revoked-note"><span aria-hidden="true">⛒</span> Session revoked — {{ s15Detail.last }}</div>
       </sc-if>
+    </div>
+  </sc-if>
+  <sc-if value="{{ sheetIsS16 }}" hint-placeholder-val="{{ false }}">
+    <div class="ns-sheet-body">
+      <div class="ns-extmanifest__head ns-extmanifest__head--sheet">
+        <span class="ns-extmanifest__glyph" data-tier="{{ extSel.tier }}" aria-hidden="true">{{ extSel.glyph }}</span>
+        <div class="ns-extmanifest__id">
+          <div class="ns-extmanifest__name-row"><span class="ns-extmanifest__name">{{ extSel.name }}</span><span class="ns-extmanifest__ver">{{ extSel.version }}</span></div>
+          <span class="ns-extmanifest__sub">{{ extSel.source }} · {{ extSel.surfLbl }}</span>
+        </div>
+        <span class="ns-extmanifest__status" data-en="{{ extSel.enabled }}"><span class="ns-extprov__status-dot" aria-hidden="true"></span>{{ extSel.statusLbl }}</span>
+      </div>
+      <div class="ns-extmanifest__kv">
+        <sc-for list="{{ extSel.kv }}" as="kv" hint-placeholder-count="4"><div class="ns-extmanifest__kv-row"><span class="ns-extmanifest__kv-k">{{ kv.k }}</span><span class="ns-extmanifest__kv-v" data-tone="{{ kv.tone }}">{{ kv.v }}</span></div></sc-for>
+      </div>
+      <div class="ns-extmanifest__section-label">contributes</div>
+      <div class="ns-extmanifest__groups">
+        <sc-for list="{{ extSel.groups }}" as="g" hint-placeholder-count="2">
+          <div class="ns-extgroup" data-kind="{{ g.kind }}">
+            <div class="ns-extgroup__head"><span class="ns-extgroup__glyph" aria-hidden="true">{{ g.glyph }}</span><span class="ns-extgroup__title">{{ g.title }}</span><span class="ns-extgroup__n">{{ g.n }}</span></div>
+            <div class="ns-extgroup__items">
+              <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="2">
+                <div class="ns-extcontrib">
+                  <span class="ns-extcontrib__glyph" aria-hidden="true">{{ it.icon }}</span>
+                  <div class="ns-extcontrib__main"><span class="ns-extcontrib__title">{{ it.title }}</span><span class="ns-extcontrib__meta">{{ it.meta }}</span></div>
+                  <span class="ns-extcontrib__perm">{{ it.perm }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div class="ns-extmanifest__section-label">plugs into</div>
+      <div class="ns-extmounts">
+        <sc-for list="{{ extSel.mounts }}" as="m" hint-placeholder-count="2"><span class="ns-extmount" data-kind="{{ m.kind }}"><span class="ns-extmount__glyph" aria-hidden="true">{{ m.glyph }}</span>{{ m.label }}</span></sc-for>
+      </div>
+      <div class="ns-extmanifest__actions">
+        <button class="{{ extSel.toggleClass }}" onClick="{{ extSel.toggle }}">{{ extSel.actionLabel }}</button>
+        <button class="ns-btn ns-btn--ghost" onClick="{{ extSel.viewPlugin }}">View plugin →</button>
+      </div>
     </div>
   </sc-if>
 </dialog>
@@ -5400,10 +5574,147 @@ class Component extends DCLogic {
       { kind: 'tool', icon: '✦', title: 'config.overrideSet', plugin: 'runtime-config', perm: 'writes: via confirm only' },
     ].map(a => ({ ...a, kindBadge: 'ns-badge ns-badge--' + (a.kind === 'tool' ? 'primary' : 'secondary') }));
     const extInstall = (name) => this.askConfirm({ title: 'Install ' + name, desc: 'Generates and wires the plugin into your project — source files, config, and dashboard contributions.', from: name + ' · not installed', to: 'installed + wired', cli: 'netscript plugin add ' + name, action: 'Install', apply: () => this.setState(st => ({ extInstalled: [...new Set([...st.extInstalled, name])] })), toast: name + ' installed — contributions registered' });
-    const extAvailable = [
+    const extAvailableRaw = [
       { id: 'crons', title: 'crons', publisher: 'netscript', desc: 'Adds a schedule namespace, a cron dashboard panel, and ⌘K actions.', quarantine: false, act: () => extInstall('crons'), actLabel: 'Install', actClass: 'ns-btn ns-btn--primary ns-btn--sm' },
       { id: 'analytics-plus', title: 'analytics-plus', publisher: 'community', desc: 'Delivery-analytics panels. Built for contract v1 — the host is at v2.', quarantine: true, act: () => this.askConfirm({ title: 'Update analytics-plus to contract v2', desc: 'Re-pins the extension to the current contract version and lifts the quarantine hold.', from: 'contract v1 · held', to: 'contract v2 · active', cli: 'netscript plugin update analytics-plus --contract v2', action: 'Update', apply: () => this.setState(st => ({ extInstalled: [...new Set([...st.extInstalled, 'analytics-plus'])] })), toast: 'analytics-plus updated — quarantine lifted', resultPath: '/extensions/analytics-plus' }), actLabel: 'Update & lift hold', actClass: 'ns-btn ns-btn--secondary ns-btn--sm' },
     ];
+
+    // ===== Derived contribution-manifest model (visual metadata only; copy/logic preserved) =====
+    // width-bucket helper: map a fraction (0..1) → --w0..--w20 (5% steps)
+    const extWCls = (frac) => 'ns-w' + Math.max(0, Math.min(20, Math.round((frac || 0) * 20)));
+    // surface kinds → glyph/label/tone-token (copper/teal/amber only)
+    const SURF = {
+      panel:   { glyph: '▦', label: 'Panels',   short: 'panels',   noun: 'panel' },
+      command: { glyph: '⌘', label: 'Commands', short: 'cmds',     noun: 'command' },
+      tool:    { glyph: '✦', label: 'AI tools', short: 'tools',    noun: 'tool' },
+    };
+    // per-plugin version + source metadata (illustrative visual metadata, consistent with tier)
+    const EXTMETA = {
+      workers:           { version: 'v2.4.0', source: 'netscript', tier: 'first-party' },
+      sagas:             { version: 'v2.4.0', source: 'netscript', tier: 'first-party' },
+      triggers:          { version: 'v2.4.0', source: 'netscript', tier: 'first-party' },
+      streams:           { version: 'v2.4.0', source: 'netscript', tier: 'first-party' },
+      auth:              { version: 'v1.9.2', source: 'netscript', tier: 'first-party' },
+      'runtime-config':  { version: 'v2.4.0', source: 'netscript', tier: 'first-party' },
+    };
+    const tierGlyph = (t) => t === 'first-party' ? '◆' : t === 'verified' ? '✓' : '○';
+    // every contribution (panels + actions), tagged by surface kind
+    const extContribs = [
+      ...extPanels.map(p => ({ kind: 'panel', id: p.id, title: p.title, plugin: p.plugin, tier: p.tier, mount: p.mount, slots: p.slots, perm: 'mounts: ' + p.slots, icon: '▦', disabled: p.disabled, toggle: p.toggle, actionLabel: p.actionLabel })),
+      ...extActions.map(a => ({ kind: a.kind === 'tool' ? 'tool' : 'command', id: a.plugin + '.' + a.title, title: a.title, plugin: a.plugin, tier: (EXTMETA[a.plugin] || {}).tier || 'first-party', mount: a.kind === 'tool' ? '⌘K · AI runtime' : '⌘K palette', slots: a.kind, perm: a.perm, icon: a.icon, disabled: false })),
+    ];
+    // surface-kind roster filter
+    const extSurfFilter = s.extSurf || 'all';
+    // group contributions by provider (the extension)
+    const extProvMap = {};
+    extContribs.forEach(c => { (extProvMap[c.plugin] = extProvMap[c.plugin] || []).push(c); });
+    const extProvOrder = ['workers', 'sagas', 'triggers', 'streams', 'auth', 'runtime-config'];
+    const extProvList = extProvOrder.filter(k => extProvMap[k]).map(plugin => {
+      const items = extProvMap[plugin];
+      const meta = EXTMETA[plugin] || { version: '—', source: 'community', tier: 'community' };
+      const tier = meta.tier;
+      const byKind = { panel: 0, command: 0, tool: 0 };
+      items.forEach(i => { byKind[i.kind] = (byKind[i.kind] || 0) + 1; });
+      const total = items.length;
+      // a provider is disabled only if ALL its panel contributions are disabled and it has panels
+      const panels = items.filter(i => i.kind === 'panel');
+      const enabled = panels.length ? panels.some(p => !p.disabled) : true;
+      // contribution shape bar (segments per surface kind, width ∝ count)
+      const barSegs = ['panel', 'command', 'tool'].filter(k => byKind[k]).map(k => ({ kind: k, wClass: extWCls(byKind[k] / total), title: byKind[k] + ' ' + SURF[k].label.toLowerCase() }));
+      const pips = ['panel', 'command', 'tool'].filter(k => byKind[k]).map(k => ({ kind: k, glyph: SURF[k].glyph, label: '+' + byKind[k] + ' ' + (byKind[k] === 1 ? SURF[k].noun : SURF[k].short) }));
+      return { id: plugin, plugin, name: plugin, version: meta.version, source: meta.source, tier,
+        glyph: tierGlyph(tier), enabled, disabled: !enabled, statusLbl: enabled ? 'enabled' : 'disabled',
+        selState: (s.extSel || 'workers') === plugin ? 'selected' : null,
+        barSegs, pips, byKind, total, items,
+        select: () => { this.setState(st => ({ extSel: plugin, sheet: (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(max-width: 900px)').matches) ? 's16' : st.sheet })); },
+      };
+    });
+    // apply surface-kind filter (roster shows only providers that contribute the chosen kind)
+    const extProviders = extProvList.filter(p => extSurfFilter === 'all' || p.byKind[extSurfFilter]);
+    // resolve the selected provider (fallback to first visible)
+    const extSelId = (s.extSel && extProvList.some(p => p.id === s.extSel)) ? s.extSel : (extProviders[0] || extProvList[0]).id;
+    const extSelProv = extProvList.find(p => p.id === extSelId) || extProvList[0];
+    // build the selected extension's full manifest
+    const buildManifest = (prov) => {
+      const groups = ['panel', 'command', 'tool'].filter(k => prov.byKind[k]).map(k => ({
+        kind: k, glyph: SURF[k].glyph, title: SURF[k].label, n: String(prov.byKind[k]),
+        items: prov.items.filter(i => i.kind === k).map(i => ({ icon: i.icon, title: i.title, meta: i.mount, perm: i.perm })),
+      }));
+      const mountSet = Array.from(new Set(prov.items.map(i => i.kind === 'panel' ? i.mount.split('/')[0] : (i.kind === 'tool' ? 'ai-runtime' : 'cmdk'))));
+      const mountMeta = { capabilities: { glyph: '▣', label: 'capabilities/*', kind: 'panel' }, data: { glyph: '▤', label: 'data/*', kind: 'panel' }, cmdk: { glyph: '⌘', label: '⌘K palette', kind: 'command' }, 'ai-runtime': { glyph: '✦', label: 'AI runtime', kind: 'tool' } };
+      const mounts = mountSet.map(m => mountMeta[m] || { glyph: '▦', label: m, kind: 'panel' });
+      const firstPanel = prov.items.find(i => i.kind === 'panel');
+      const anyDisabled = prov.items.some(i => i.kind === 'panel' && i.disabled);
+      const contribSummary = ['panel', 'command', 'tool'].filter(k => prov.byKind[k]).map(k => prov.byKind[k] + ' ' + (prov.byKind[k] === 1 ? SURF[k].noun : SURF[k].short)).join(' · ');
+      return {
+        id: prov.id, name: prov.name, version: prov.version, tier: prov.tier, source: prov.source,
+        glyph: tierGlyph(prov.tier), tierBadge: extTierBadge(prov.tier),
+        enabled: prov.enabled, statusLbl: prov.enabled ? 'enabled' : 'disabled',
+        surfLbl: ['panel', 'command', 'tool'].filter(k => prov.byKind[k]).map(k => SURF[k].label.toLowerCase()).join(' + '),
+        kv: [
+          { k: 'source', v: prov.source, tone: 'str' },
+          { k: 'version', v: prov.version, tone: 'num' },
+          { k: 'trust tier', v: prov.tier, tone: 'primary' },
+          { k: 'contract', v: 'v2 · compatible', tone: 'ok' },
+          { k: 'contributes', v: contribSummary, tone: 'str' },
+        ],
+        groups, mounts,
+        toggle: firstPanel ? firstPanel.toggle : (() => this.askConfirm({ title: (prov.enabled ? 'Disable ' : 'Enable ') + prov.name, desc: 'Changes this extension in the host registry without affecting the plugin package.', from: prov.name + (prov.enabled ? ' = enabled' : ' = disabled'), to: prov.enabled ? 'disabled' : 'enabled', cli: 'netscript plugin ' + (prov.enabled ? 'disable ' : 'enable ') + prov.plugin, action: prov.enabled ? 'Disable' : 'Enable', toast: prov.name + ' ' + (prov.enabled ? 'disabled' : 'enabled') })),
+        toggleClass: prov.enabled ? 'ns-btn ns-btn--secondary' : 'ns-btn ns-btn--primary',
+        actionLabel: prov.enabled ? 'Disable extension' : 'Enable extension',
+        viewPlugin: firstPanel ? firstPanel.toggle && (() => this.nav('/extensions/' + encodeURIComponent(firstPanel.id))) : (() => this.nav('/plugins')),
+      };
+    };
+    const extSel = buildManifest(extSelProv);
+    // header composite metrics
+    const extAllProv = extProvList;
+    const totByKind = { panel: 0, command: 0, tool: 0 };
+    extContribs.forEach(c => { totByKind[c.kind] = (totByKind[c.kind] || 0) + 1; });
+    const totContribs = extContribs.length;
+    const enabledN = extAllProv.filter(p => p.enabled).length;
+    const disabledN = extAllProv.length - enabledN;
+    const tierCount = {};
+    extAllProv.forEach(p => { tierCount[p.tier] = (tierCount[p.tier] || 0) + 1; });
+    const setSurf = (k) => this.setState(st => ({ extSurf: (st.extSurf || 'all') === k ? 'all' : k }));
+    const extHead = {
+      installed: String(extAllProv.length),
+      enabledLbl: enabledN + ' enabled · ' + disabledN + ' disabled',
+      contribLbl: totContribs + ' contributions across ' + Object.keys(totByKind).filter(k => totByKind[k]).length + ' surfaces',
+      surfSegs: ['panel', 'command', 'tool'].filter(k => totByKind[k]).map(k => ({ kind: k, n: String(totByKind[k]), label: SURF[k].label, title: totByKind[k] + ' ' + SURF[k].label.toLowerCase(), wClass: extWCls(totByKind[k] / totContribs), active: extSurfFilter === k ? 'true' : null, filter: () => setSurf(k) })),
+      enabled: String(enabledN), disabled: String(disabledN), enTone: disabledN ? 'warning' : 'ok',
+      enWClass: extWCls(enabledN / Math.max(1, extAllProv.length)),
+      tierChips: Object.keys(tierCount).map(t => ({ tier: t, glyph: tierGlyph(t), label: t, n: String(tierCount[t]) })),
+      compatState: 'hold', compatGlyph: '⚠',
+      compatHead: '1 update held',
+      compatNote: 'analytics-plus built for contract v1 — quarantined at host v2',
+      hostContract: 'v2',
+    };
+    // roster surface-kind filter chips
+    const extSurfChips = [{ kind: 'all', label: 'all', n: String(extAllProv.length) },
+      ...['panel', 'command', 'tool'].filter(k => totByKind[k]).map(k => ({ kind: k, label: SURF[k].label, n: String(extAllProv.filter(p => p.byKind[k]).length) }))]
+      .map(c => ({ ...c, state: (extSurfFilter === c.kind || (c.kind === 'all' && extSurfFilter === 'all')) ? 'active' : null, set: () => this.setState({ extSurf: c.kind }) }));
+    const extProvCount = String(extProviders.length);
+
+    // SURFACES view — contribution lanes grouped by surface kind
+    const extMountHost = { panel: 'capabilities/* · data/*', command: '⌘K palette', tool: 'AI runtime' };
+    const extLanes = ['panel', 'command', 'tool'].filter(k => totByKind[k]).map(k => {
+      const laneItems = extContribs.filter(c => c.kind === k);
+      const provN = new Set(laneItems.map(c => c.plugin)).size;
+      return {
+        kind: k, glyph: SURF[k].glyph, title: SURF[k].label, n: String(totByKind[k]),
+        shareWClass: extWCls(totByKind[k] / totContribs),
+        mountSummary: extMountHost[k],
+        foot: totByKind[k] + ' ' + (totByKind[k] === 1 ? SURF[k].noun : SURF[k].short) + ' from ' + provN + ' provider' + (provN === 1 ? '' : 's'),
+        items: laneItems.map(c => ({ icon: c.icon, title: c.title, plugin: c.plugin, tier: c.tier, meta: c.mount + (c.slots && c.kind === 'panel' ? ' · slots: ' + c.slots : ''), perm: c.perm, permGlyph: /writes/.test(c.perm) ? '✎' : '◎' })),
+      };
+    });
+
+    // AVAILABLE — enrich with compat meter + adds pips (copy/CLIs preserved)
+    const extAvailMeta = {
+      crons: { tier: 'verified', glyph: tierGlyph('verified'), builtFor: 'contract v2', builtOk: 'true', compatFrac: 1, adds: [{ kind: 'panel', glyph: '▦', label: '+1 panel' }, { kind: 'command', glyph: '⌘', label: '+2 cmds' }] },
+      'analytics-plus': { tier: 'community', glyph: tierGlyph('community'), builtFor: 'contract v1', builtOk: 'false', compatFrac: 0.5, adds: [{ kind: 'panel', glyph: '▦', label: '+2 panels' }] },
+    };
+    const extAvailable = extAvailableRaw.map(e => { const m = extAvailMeta[e.id] || {}; return { ...e, tier: m.tier, glyph: m.glyph, builtFor: m.builtFor, builtOk: m.builtOk, compatWClass: extWCls(m.compatFrac), adds: m.adds || [] }; });
 
     // ----- S2 : Config Resolution (layered-precedence) -----
     const cfgLayers = this.s2LayerDefs();                 // low → high precedence
@@ -7567,8 +7878,8 @@ class Component extends DCLogic {
       s1Sheet: s.detailSheet || { eyebrow: '', icon: '', tone: 'muted', value: '', title: '', pill: '', pillClass: 'ns-badge ns-badge--muted', desc: '', cta: 'Open', rows: [], go: () => {} },
       closeDetailSheet: () => this.setState({ detailSheet: null }),
       // sheet
-      sheetIsS2: s.sheet === 's2', sheetIsS13: s.sheet === 's13', sheetIsS7: s.sheet === 's7', sheetIsS8: s.sheet === 's8', sheetIsS9: s.sheet === 's9', sheetIsS11: s.sheet === 's11', sheetIsS12: s.sheet === 's12', sheetIsS4: s.sheet === 's4', sheetIsS15: s.sheet === 's15',
-      sheetTitle: s.sheet === 's2' ? selDef.key : s.sheet === 's7' ? s7Detail.name : s.sheet === 's8' ? (s8SelNode ? s8SelNode.name : s8.saga) : s.sheet === 's9' ? s9Detail.id : s.sheet === 's11' ? s11Detail.name : s.sheet === 's12' ? (s12Detail ? s12Detail.id : '') : s.sheet === 's4' ? (s4Detail ? s4Detail.proc : '') : s.sheet === 's15' ? (s15Detail ? s15Detail.id : '') : (selNode13 ? selNode13.name : ''),
+      sheetIsS2: s.sheet === 's2', sheetIsS13: s.sheet === 's13', sheetIsS7: s.sheet === 's7', sheetIsS8: s.sheet === 's8', sheetIsS9: s.sheet === 's9', sheetIsS11: s.sheet === 's11', sheetIsS12: s.sheet === 's12', sheetIsS4: s.sheet === 's4', sheetIsS15: s.sheet === 's15', sheetIsS16: s.sheet === 's16',
+      sheetTitle: s.sheet === 's2' ? selDef.key : s.sheet === 's7' ? s7Detail.name : s.sheet === 's8' ? (s8SelNode ? s8SelNode.name : s8.saga) : s.sheet === 's9' ? s9Detail.id : s.sheet === 's11' ? s11Detail.name : s.sheet === 's12' ? (s12Detail ? s12Detail.id : '') : s.sheet === 's4' ? (s4Detail ? s4Detail.proc : '') : s.sheet === 's15' ? (s15Detail ? s15Detail.id : '') : s.sheet === 's16' ? (extSel ? extSel.name : '') : (selNode13 ? selNode13.name : ''),
       closeSheet: () => this.setState({ sheet: null }),
       // S1
       s1Stats, s1CmdGroups, s1Contribs, s1Teaser, s1Kpis, s1Hero, s1Ai,
@@ -7576,6 +7887,7 @@ class Component extends DCLogic {
       s1WarnCount: healthy ? 'nothing' : String(s1Stats.filter(x => x.tone === 'warning').length),
       s1ContribCount: String(s1Contribs.length),
       extPanels, extActions, extAvailable,
+      extProviders, extSel, extHead, extSurfChips, extProvCount, extLanes,
       extTabPanels: s.extTab === 'panels', extTabActions: s.extTab === 'actions', extTabAvail: s.extTab === 'available',
       extSegPanels: { state: s.extTab === 'panels' ? 'active' : null, set: () => this.updateQuery({ tab: 'panels' }, { extTab: 'panels' }) },
       extSegActions: { state: s.extTab === 'actions' ? 'active' : null, set: () => this.updateQuery({ tab: 'actions' }, { extTab: 'actions' }) },

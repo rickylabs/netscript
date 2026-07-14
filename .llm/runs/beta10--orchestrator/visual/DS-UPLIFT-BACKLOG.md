@@ -862,3 +862,113 @@ Auth event stream kept generic (copy-locked secondary strip); avatars are initia
 the projection); TTL is a static snapshot at the app clock (no live tick loop); device/geo/scope are
 illustrative visual metadata; "Open in Aspire" is a placeholder (no canonical session resource to
 deep-link).
+
+## Pass V12 — Extensions
+
+**Design question → answer.** *What best showcases EXTENSIONS — installed add-ons, each with what
+it CONTRIBUTES (its surfaces), a version + source, enabled/disabled status, and config?* →
+A **contribution manifest**, not an app-store grid. An extension is a *provider* that mounts
+contributions into named host **surfaces** (UI panels/routes, ⌘K commands, AI tools). The
+screen-owning idiom is the **surface-typed contribution** (copper=panel / teal=command / amber=tool):
+a per-provider **contribution bar** + surface **pips**, a **surface-grouped manifest** with a
+**"plugs into" mount map**, and a **built-for-vs-host contract meter**. Three composable views on one
+header: Providers (roster + manifest), Surfaces (the cross-cut lanes), Available (install/quarantine).
+
+### New components (all `ns-ext*`, appended to `ns-ext.css`)
+- **`ns-exthead`** header composite — count-hero + surface **channel bar** (`ns-extchan`,
+  click-to-filter) + enabled **ratio meter** (`ns-extratio`) + tier chips + **compat alert**
+  (`ns-extcompat`). Replaces the old airy 3-col KV grid; no plain number cards.
+- **`ns-extbar`** surface-kind filter chips (all / Panels / Commands / AI-tools, tinted-active).
+- **`ns-extprov`** provider row — glyph(tier) + name + version + status dot + **`__contribbar`**
+  (signature stacked surface-colored bar) + surface **pips** + source; left status rail; the roster
+  unit. Compact, multi-metadata (density default #2).
+- **`ns-extmanifest`** manifest pane — identity head + alternating-tint **KV** (source/version/tier/
+  contract/contributes) + **`ns-extgroup`** contribution groups (by surface kind, tinted) + **`ns-extmounts`**
+  "plugs into" chips + gated toggle. Sticky desktop → **bottom sheet** (`sheetIsS16`) mobile.
+- **`ns-extlane` / `ns-extmount-card`** — Surfaces view: 3 tinted lanes (Panels/Commands/AI-tools),
+  each a dense list of contributions + provider-provenance chip + mount + perm.
+- **`ns-extavailcard` + `ns-extcompatbar`** — Available: install/quarantine cards with a
+  **contract-compatibility meter** (built-for fill teal-if-==host / amber-if-behind + host "now"
+  marker) + hold banner + adds-pips.
+
+### New tokens / variants
+- **Surface-kind colour system** on `.ns-extscreen`: `--ext-panel`(copper) / `--ext-command`(teal-5) /
+  `--ext-tool`(amber-5) each with `-subtle` / `-border`, selected by `[data-kind]`. Copper/teal/amber
+  only — no off-palette green/blue.
+- **Shared width-bucket helpers** `.ns-w0..ns-w20` setting `--wpct` (0–100%) + `--wnum` (flex-grow
+  0–20) — reusable geometry with **no SVG `{{ }}` holes** (fills use `--wpct`, flex segments `--wnum`).
+- Segmented-view relabel (visual): Panels→**Providers**, Actions→**Surfaces** (query param `extTab`
+  unchanged so routing/deep-links round-trip).
+
+### Mobile optimizations
+- Header composite: 4-col → 2-col ≤1180 → 1-col ≤720. Providers grid collapses to roster-only ≤1023;
+  manifest → shared bottom sheet on tap (`sheetIsS16`, `matchMedia(900px)`). Lanes + Available →
+  single column ≤720. No h-overflow at 390.
+
+### Reactivity / data-driven states
+Enabled/disabled fully derived from the existing `extDisabled` map: disabling a panel dims its
+provider row (gray rail + DISABLED), updates the header enabled-meter + hero sub-label, flips the
+manifest to "Enable extension", and toasts — verified end-to-end via the shared `askConfirm`.
+
+### Gotcha reused
+`sc-if` has no `negate` (from V11) — kept all branch logic on positive bindings; no empty-state
+branch needed here (roster is always non-empty; filtered-to-none falls back to first provider).
+
+### Verification
+0 `{{ }}` / 0 real console errors (only favicon/resource 404) / 0 h-overflow across Providers +
+Surfaces + Available × {desktop 1440, mobile 390} × {light, dark}, plus provider-selected, surface
+filter (Commands → roster narrows, count updates), tool-only provider, disable-confirm (light+dark),
+disabled state, and mobile bottom sheet (light+dark). **Full 16-route regression clean in both
+themes.** No edits to `support.js`, `proto.css`, `_ds/*`, or other screens' markup.
+
+### Declined (no data-invention)
+Version/source (`v2.4.0` / `netscript`) + contract-compat values are illustrative visual metadata
+consistent with each plugin's first-party tier (no real registry in the static prototype); no
+free-form config editor (prototype exposes none); the `/extensions/:extensionId` deep-link is
+preserved but the in-page manifest / bottom sheet is the primary drill; on a surface filter that
+hides the selected provider, the manifest falls back to the first visible one (keeps the pane
+populated).
+
+## Pass V12-fix — Extensions
+
+Density-only tighten after the adversarial vision gate (58/100). Idiom KEPT
+(provider roster + surface-grouped manifest + Surfaces lanes + Available); the gate's
+table-conversion / maintainer-avatar / version-timeline asks were DECLINED (echo the consoles or
+invent absent data). Overrides appended to `ns-ext.css` by cascade order, all `.ns-ext*`-scoped;
+markup + `extLanes` JS extended with values derived from existing counts (no new data).
+
+### New / refined components
+- **Slim contribution micro-bar** (`ns-extprov__contribbar`): 8px thick track → **4px** segmented
+  micro-rule with no track fill, sitting directly under the provider name. Copper/teal/amber surface
+  segmentation preserved via a faint per-segment inset. Frees ~4px + a row-gap per card.
+- **Compact provider card** (`ns-extprov`): padding `space-2-5`→`7px`, `__main` gap 8px→3px, glyph
+  `2.1rem`→`1.75rem`. **88px → 59px card height (−33%)** with every row still content-bearing.
+- **Dense CONTRIBUTES row** (`ns-extcontrib`): ~64px wrapping row → **44px** single-line row =
+  glyph + bold name + surface-tinted **path chip** (`__path`, ellipsised) + right perm. Group header
+  is now **sticky** (`position:sticky; top:0`), slim + uppercased.
+- **Surfaces lane header stat** (`ns-extlane__stat`): a 4px **share meter** (fill ∝ contribution
+  count, surface colour) + monospace **mount summary** (`capabilities/* · data/*` / `⌘K palette` /
+  `AI runtime`).
+- **Surfaces lane footer** (`ns-extlane__foot`): slim dashed `↳ N <surface> from M provider(s)`
+  summary — carries the count signal the removed description paragraph used to.
+- **Denser mount-card** (`ns-extmount-card__row`): path + perm collapsed to one `space-between` row.
+
+### New layout pattern — 2-column independent-height lanes (the Surfaces whitespace fix)
+The uneven-lane whitespace (6-item Panels lane vs two 2-item lanes leaving ~372px empty
+lower-right) is fixed by breaking the equal `auto-fit` row: **Panels spans the left column
+(`grid-row:1/span 2`, `1.35fr`); Commands (row 1) + AI-tools (row 2) stack in the right column
+(`1fr`)** — keyed to `data-kind` so it degrades if lane counts change. Right column
+(256+256+gap ≈ 525px) now matches Panels (520px); empty region **372px → ~5px**. Collapses to a
+single stacked column ≤720px.
+
+### Tighter stat composite
+`ns-exthead` cell padding `space-4/5`→`space-3/3-5`, hero glyph `2.75`→`2.25rem`, hero number
+`3xl`→`2xl`, channel bar `1.5rem`→`1.25rem`. Micro-viz (segmented surface bar, enabled meter, tier
+chips, compat alert) all preserved — denser, not flattened.
+
+### Verification
+Provider card 88→59px, micro-bar 8→4px, contrib row ~64→44px, Surfaces empty 372→~5px (measured via
+Playwright). 0 `{{ }}` / 0 real console errors (pre-existing favicon 404 only) / 0 h-overflow across
+Providers + Surfaces + Available × {1440, 390} × {light, dark} + provider-selected + mobile manifest
+sheet. **Full 16-route regression clean.** No edits to `support.js`, `_ns_styles.css`, `_ds/*`, or
+other screens' markup.
