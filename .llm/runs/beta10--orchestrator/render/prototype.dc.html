@@ -133,7 +133,7 @@
                 <p class="ns-lede">Is my app wired the way I declared it — and where do I jump to fix it. Facts only NetScript can compute; everything else hands off.</p>
               </div>
               <div class="ns-cluster ns-cluster--sm">
-                <button class="ns-btn ns-btn--secondary" onClick="{{ openAspire }}">Open Aspire Dashboard ↗</button>
+                <button class="ns-btn ns-btn--secondary" onClick="{{ openAspire }}">Open Aspire Dashboard</button>
               </div>
             </div>
             <div class="ns-status-bar">
@@ -513,7 +513,7 @@
                     <span class="{{ r.valClass }}">{{ r.effective }}<span class="ns-cfgrow__unit">{{ r.unit }}</span></span>
                     <span class="ns-cfgrow__win">
                       <span class="ns-cfglayerchip ns-cfglayerchip--sm" data-tone="{{ r.winTone }}">{{ r.winLabel }}</span>
-                      <sc-if value="{{ r.hasOverride }}" hint-placeholder-val="{{ true }}"><span class="ns-cfgrow__ovr" title="runtime override active">◆</span></sc-if>
+                      <sc-if value="{{ r.hasOverride }}" hint-placeholder-val="{{ true }}"><span class="ns-cfgrow__ovr" title="runtime override active">override</span></sc-if>
                       <sc-if value="{{ r.shadowCount }}" hint-placeholder-val="{{ 1 }}"><span class="ns-cfgrow__shadow">{{ r.shadowCount }} shadowed</span></sc-if>
                     </span>
                   </button>
@@ -793,7 +793,7 @@
           <header class="ns-page-header ns-page-header--console">
             <div class="ns-toolbar">
               <div style="display:grid;gap:var(--ns-space-2)">
-                <div class="ns-catcrumb" aria-hidden="true"><span class="ns-catcrumb__root">Contract registry</span><span class="ns-catcrumb__sep">›</span><span class="ns-catcrumb__leaf">{{ s4Detail.proc }}</span></div>
+                <div class="ns-catcrumb" aria-hidden="true"><span class="ns-catcrumb__root">Contract registry</span><span class="ns-catcrumb__sep">/</span><span class="ns-catcrumb__leaf">{{ s4Detail.proc }}</span></div>
                 <h1>Service &amp; contract catalog</h1>
               </div>
               <div class="ns-seg ns-tabs--underline ns-cat-tabs" role="tablist" aria-label="Catalog view">
@@ -805,7 +805,7 @@
 
           <sc-if value="{{ s4IsContracts }}" hint-placeholder-val="{{ true }}">
             <!-- Ref 13: one compact registry metadata rail, exact facts only. -->
-            <div class="ns-cat2-meta" aria-label="Catalog summary">
+            <div class="ns-card ns-cat2-meta" aria-label="Catalog summary">
               <span><b>CONTRACTS</b><strong>{{ s4Head.total }}</strong><small>{{ s4Head.versions }}</small></span>
               <span><b>DESCRIBE()</b><strong>{{ s4Head.covPctLabel }}</strong><small>{{ s4Head.completeN }} complete · {{ s4Head.thinN }} thin</small></span>
               <sc-for list="{{ s4Head.reach }}" as="r" hint-placeholder-count="3">
@@ -816,7 +816,6 @@
             <!-- filter toolbar (ref 11) -->
             <div class="ns-catbar">
               <div class="ns-catbar__search">
-                <span class="ns-catbar__search-ico" aria-hidden="true">⌕</span>
                 <input class="ns-catbar__input" type="search" placeholder="Search procedures, types…" value="{{ s4Q }}" onInput="{{ s4SetQ }}" aria-label="Search contracts">
               </div>
               <div class="ns-catbar__chips" role="group" aria-label="Kind filter">
@@ -833,7 +832,7 @@
 
             <div class="ns-catgrid">
               <!-- Ref 12: compact grouped registry records. -->
-              <aside class="ns-catreg ns-cat2-reg" aria-label="Contract registry">
+              <aside class="ns-data-table ns-catreg ns-cat2-reg" aria-label="Contract registry">
                 <sc-for list="{{ s4Groups }}" as="g" hint-placeholder-count="4">
                   <div class="ns-catreg__group" data-kind="{{ g.key }}">
                     <div class="ns-catreg__group-head">
@@ -868,7 +867,6 @@
                 </div>
                 <sc-if value="{{ s4NoResults }}" hint-placeholder-val="{{ false }}">
                   <div class="ns-catreg__empty">
-                    <span class="ns-catreg__empty-glyph" aria-hidden="true">⌕</span>
                     <span class="ns-catreg__empty-title">No contracts match</span>
                     <button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ s4ResetFilters }}">Clear filters</button>
                   </div>
@@ -876,7 +874,7 @@
               </aside>
 
               <!-- Ref 13: persistent signature/schema inspector. -->
-              <section class="ns-catdetail ns-cat2-detail" style="min-width:0">
+              <section class="ns-card ns-catdetail ns-cat2-detail" style="min-width:0">
                 <div class="ns-catdetail__head">
                   <div class="ns-catdetail__title">
                     <span class="ns-catdetail__proc">{{ s4Detail.proc }}</span>
@@ -923,7 +921,7 @@
                 </div>
 
                 <div class="ns-catdetail__actions">
-                  <button class="ns-btn ns-btn--secondary ns-btn--sm" onClick="{{ s4Detail.scalar }}">Open in Scalar ↗</button>
+                  <button class="ns-btn ns-btn--secondary ns-btn--sm" onClick="{{ s4Detail.scalar }}">Open in Scalar</button>
                 </div>
               </section>
             </div>
@@ -1063,7 +1061,7 @@
                   <button class="ns-seg__btn" onClick="{{ s6ToJourney }}">Journey</button>
                   <button class="ns-seg__btn" data-state="active">Inspector</button>
                 </div>
-                <button class="ns-btn ns-btn--secondary" onClick="{{ s6OpenTrace }}">View full trace in Aspire ↗</button>
+                <button class="ns-btn ns-btn--secondary" onClick="{{ s6OpenTrace }}">View full trace in Aspire</button>
               </div>
             </div>
           </header>
@@ -1228,12 +1226,12 @@
                 </sc-for>
                 <div class="ns-logstrip__more">
                   <span>Bounded to the last lines correlated to this run.</span>
-                  <button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ s6OpenLogs }}">Full log view in Aspire ↗</button>
+                  <button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ s6OpenLogs }}">Full log view in Aspire</button>
                 </div>
               </div>
               <div style="display:flex;gap:var(--ns-space-2);flex-wrap:wrap">
-                <button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ s6OpenFlow }}">View originating flow →</button>
-                <button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ s6OpenTrigger }}">Open trigger event evt_2210 →</button>
+                <button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ s6OpenFlow }}">View originating flow</button>
+                <button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ s6OpenTrigger }}">Open trigger event evt_2210</button>
               </div>
               <div class="ns-panel" style="background:var(--ns-card)">
                 <div class="ns-panel__header" style="padding:var(--ns-space-3) var(--ns-space-4);border-bottom:1px solid var(--ns-border)"><span class="ns-panel__title">Assist &amp; actions</span></div>
@@ -1272,7 +1270,7 @@
             <div class="ns-conhead">
               <div class="ns-conbread">
                 <span class="ns-conbread__crumb">Capabilities</span>
-                <span class="ns-conbread__sep">›</span>
+                <span class="ns-conbread__sep">/</span>
                 <span class="ns-conbread__crumb ns-conbread__crumb--here">Workers</span>
                 <span class="ns-chip" style="margin-left:var(--ns-space-2)">contributed by the workers plugin</span>
               </div>
@@ -1904,14 +1902,14 @@
                   <span class="ns-tbuild__wire-line"></span>
                   <span class="ns-tbuild__cond">if {{ s9Builder.cond }}</span>
                   <span class="ns-tbuild__wire-line"></span>
-                  <span class="ns-tbuild__wire-arrow">▶</span>
+                  <span class="ns-tbuild__wire-arrow" aria-hidden="true"></span>
                 </div>
                 <!-- DO node -->
                 <div class="ns-tbuild__node" data-role="do" data-tone="{{ s9Builder.actTone }}">
                   <span class="ns-tbuild__node-kicker">DO</span>
                   <span class="ns-tbuild__node-head"><span class="ns-tbuild__node-glyph" aria-hidden="true">{{ s9Builder.actGlyph }}</span><span class="ns-tbuild__node-title">{{ s9Builder.actName }}</span></span>
                   <span class="ns-tbuild__node-sub">{{ s9Builder.doesLabel }}</span>
-                  <button class="ns-tbuild__node-link" onClick="{{ s9Builder.openAction }}">open target →</button>
+                  <button class="ns-tbuild__node-link" onClick="{{ s9Builder.openAction }}">Open target</button>
                 </div>
               </div>
               <!-- action-type palette (ref 21 component palette) -->
@@ -2691,7 +2689,7 @@
                         <span class="ns-dlqrow__cell"><span class="ns-dlqsig" data-tone="{{ r.sigTone }}">{{ r.sig }}</span></span>
                         <span class="ns-dlqrow__cell ns-dlqrow__retry"><span class="ns-dlqpips" aria-hidden="true"><sc-for list="{{ r.pips }}" as="p" hint-placeholder-count="3"><span class="ns-dlqpip" data-on="{{ p.on }}" data-exh="{{ r.exhausted }}"></span></sc-for></span><span class="ns-dlqrow__retrylabel">{{ r.retryLabel }}</span></span>
                         <span class="ns-dlqrow__cell ns-dlqrow__age">{{ r.age }}</span>
-                        <button class="ns-dlqrow__cell ns-dlqrow__inspect" onClick="{{ r.open }}">Inspect →</button>
+                        <button class="ns-dlqrow__cell ns-dlqrow__inspect" onClick="{{ r.open }}">Inspect</button>
                       </div>
                     </sc-for>
                     <sc-if value="{{ s12Empty }}" hint-placeholder-val="{{ false }}">
@@ -2912,7 +2910,7 @@
                     <div class="ns-kv__row"><span class="ns-kv__key">trace</span><span class="ns-kv__val">{{ s13Detail.trace }}</span></div>
                   </div>
                   <div style="display:grid;gap:var(--ns-space-2)">
-                    <button class="ns-btn ns-btn--primary ns-btn--sm" onClick="{{ s13OpenEntity }}">Open {{ s13Detail.entity }} →</button>
+                    <button class="ns-btn ns-btn--secondary ns-btn--sm" onClick="{{ s13OpenEntity }}">Open {{ s13Detail.entity }}</button>
                     <div style="display:flex;gap:var(--ns-space-2)">
                       <button class="ns-btn ns-btn--ghost ns-btn--sm" style="flex:1" onClick="{{ s13OpenTrace }}">Raw trace ↗</button>
                       <button class="ns-btn ns-btn--ghost ns-btn--sm" style="flex:1" onClick="{{ s13OpenRun }}">Run Inspector →</button>
