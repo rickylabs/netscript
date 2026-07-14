@@ -1605,134 +1605,297 @@
       <sc-if value="{{ isTriggers }}" hint-placeholder-val="{{ false }}">
         <div class="ns-screen" data-screen-label="S9 Triggers">
           <header class="ns-page-header ns-page-header--console">
-            <div class="ns-toolbar">
-              <div style="display:grid;gap:var(--ns-space-2)">
-                <h1>Triggers</h1>
-                <span class="ns-chip" style="width:fit-content">contributed by the triggers plugin</span>
-                <p class="ns-lede">When does this cron actually fire next given tz + backfill — and silence a misbehaving trigger without redeploy.</p>
-                <div style="display:flex;align-items:baseline;gap:var(--ns-space-2);flex-wrap:wrap">
-                  <span class="ns-mini-label">next fires · nightly-reconcile</span>
-                  <span style="font-family:var(--ns-font-mono);font-size:var(--ns-text-base);font-weight:600">02:00 · 02:00 · 02:00</span>
-                  <span style="font-size:var(--ns-text-xs);color:var(--ns-muted-fg)">next 3 days · Europe/Zurich · backfill on — computed from declared cron</span>
+            <div class="ns-conhead">
+              <div class="ns-conbread">
+                <span class="ns-conbread__crumb">Capabilities</span>
+                <span class="ns-conbread__sep">›</span>
+                <span class="ns-conbread__crumb ns-conbread__crumb--here">Triggers</span>
+                <span class="ns-chip" style="margin-left:var(--ns-space-2)">contributed by the triggers plugin</span>
+              </div>
+              <div class="ns-toolbar">
+                <div style="display:grid;gap:var(--ns-space-2);min-width:0">
+                  <h1>Triggers</h1>
+                  <p class="ns-lede">Every trigger is a rule — <b>when</b> an event fires, <b>do</b> an action. Read the wiring, know the next fire, and silence a misbehaving rule without redeploy.</p>
                 </div>
+              </div>
+              <!-- iconified metric strip: glyph + value + micro trend/spark (ref 19) -->
+              <div class="ns-tmetric">
+                <sc-for list="{{ s9StatTiles }}" as="st" hint-placeholder-count="5">
+                  <div class="ns-tmetric__tile" data-tone="{{ st.tone }}" data-spark-tone="{{ st.sparkTone }}">
+                    <span class="ns-tmetric__glyph" aria-hidden="true">{{ st.glyph }}</span>
+                    <span class="ns-tmetric__body">
+                      <span class="ns-tmetric__top">
+                        <span class="ns-tmetric__value">{{ st.value }}</span>
+                        <sc-if value="{{ st.trend }}" hint-placeholder-val="{{ false }}">
+                          <span class="ns-tmetric__trend" data-dir="{{ st.trendDir }}"><span class="ns-tmetric__trend-glyph" aria-hidden="true">{{ st.trendDir }}</span>{{ st.trend }}</span>
+                        </sc-if>
+                      </span>
+                      <span class="ns-tmetric__label">{{ st.label }}</span>
+                      <sc-if value="{{ st.spark }}" hint-placeholder-val="{{ false }}">
+                        <span class="ns-tmetric__spark" aria-hidden="true">
+                          <sc-for list="{{ st.spark }}" as="b" hint-placeholder-count="12">
+                            <span class="ns-tmetric__bar" style="height:{{ b.h }}%"></span>
+                          </sc-for>
+                        </span>
+                      </sc-if>
+                      <sc-if value="{{ st.meter }}" hint-placeholder-val="{{ false }}">
+                        <span class="ns-tmetric__meter"><span class="ns-tmetric__meter-fill" data-tone="{{ st.meterTone }}" style="width:{{ st.meter }}%"></span></span>
+                      </sc-if>
+                      <sc-if value="{{ st.sub }}" hint-placeholder-val="{{ false }}">
+                        <span class="ns-tmetric__sub">{{ st.sub }}</span>
+                      </sc-if>
+                    </span>
+                  </div>
+                </sc-for>
               </div>
             </div>
           </header>
-          <div style="display:grid;gap:var(--ns-space-6);grid-template-columns:repeat(auto-fit,minmax(min(26rem,100%),1fr));align-items:start">
-            <div style="display:grid;gap:var(--ns-space-6);min-width:0">
-              <section class="ns-card" style="background:var(--ns-card)">
-                <div class="ns-card__header" style="padding:var(--ns-space-4) var(--ns-space-5);border-bottom:1px solid var(--ns-border);flex-direction:row;align-items:center;justify-content:space-between">
-                  <span class="ns-card__title">Event history — each event is its own action chain</span>
-                  <div class="ns-feed-toolbar">
-                    <sc-if value="{{ s9HasPending }}" hint-placeholder-val="{{ false }}">
-                      <button class="ns-newpill" onClick="{{ s9Catch }}">{{ s9PendingCount }} new</button>
-                    </sc-if>
-                    <span class="ns-livedot" data-state="{{ s9LiveState }}">sse</span>
-                    <label class="ns-choice" style="align-items:center">
-                      <span style="position:relative;display:inline-flex"><input type="checkbox" class="ns-switch" checked="{{ s9Follow }}" onChange="{{ s9ToggleFollow }}"><span class="ns-switch__track" style="display:inline-flex;align-items:center;width:2.35rem;height:1.3rem;border:1px solid var(--ns-border-strong);border-radius:var(--ns-radius-full);background:var(--ns-surface);padding:2px;transition:background 140ms ease,border-color 140ms ease"><span class="ns-switch__thumb" style="width:0.95rem;height:0.95rem;border-radius:var(--ns-radius-full);background:var(--ns-card);box-shadow:var(--ns-shadow-xs);transition:transform 140ms ease"></span></span></span>
-                      <span class="ns-choice__label" style="font-size:var(--ns-text-xs)">Follow</span>
-                    </label>
-                  </div>
-                </div>
-                <div style="padding:var(--ns-space-2) var(--ns-space-5) var(--ns-space-4);max-height:28rem;overflow-y:auto">
-                  <div class="ns-activity-feed">
-                    <sc-for list="{{ s9EventItems }}" as="ev" hint-placeholder-count="4">
-                      <div class="ns-activity-feed__item" data-tone="{{ ev.tone }}">
-                        <span class="ns-activity-feed__marker" aria-hidden="true"></span>
-                        <div class="ns-activity-feed__body">
-                          <button style="all:unset;cursor:pointer;display:block" onClick="{{ ev.toggleOpen }}">
-                            <span class="ns-activity-feed__text"><span style="font-family:var(--ns-font-mono)">{{ ev.trigger }}</span> · {{ ev.id }} <span class="{{ ev.sBadge }}">{{ ev.status }}</span> <span class="ns-chip">{{ ev.kind }}</span></span>
-                            <span class="ns-activity-feed__time">{{ ev.time }} · corr {{ ev.corr }}</span>
-                          </button>
-                          <sc-if value="{{ ev.open }}" hint-placeholder-val="{{ false }}">
-                            <div class="ns-achain">
-                              <sc-for list="{{ ev.chainRows }}" as="a" hint-placeholder-count="2">
-                                <div class="ns-achain__row" data-state="{{ a.state }}">
-                                  <span class="ns-achain__dot" aria-hidden="true"></span>
-                                  <span class="ns-achain__type">{{ a.type }}</span>
-                                  <span>{{ a.detail }}</span>
-                                  <span>· {{ a.dur }}</span>
-                                  <sc-if value="{{ a.go }}" hint-placeholder-val="{{ false }}">
-                                    <button class="ns-achain__link" onClick="{{ a.go }}">{{ a.linkLabel }} →</button>
-                                  </sc-if>
-                                </div>
-                              </sc-for>
-                            </div>
-                          </sc-if>
-                        </div>
-                      </div>
-                    </sc-for>
-                  </div>
-                </div>
-                <div class="ns-card__footer" style="display:flex;gap:var(--ns-space-2);padding:var(--ns-space-3) var(--ns-space-5);border-top:1px solid var(--ns-border)">
-                  <button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ s9OpenRun }}">Open firing run</button>
-                  <button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ s9OpenDlq }}">Trigger DLQ →</button>
-                </div>
-              </section>
 
-              <section class="ns-panel" style="background:var(--ns-card)">
-                <div class="ns-panel__header" style="padding:var(--ns-space-4) var(--ns-space-5);border-bottom:1px solid var(--ns-border)">
-                  <span class="ns-panel__title">Schedule preview <span style="font-family:var(--ns-font-mono);font-weight:400;color:var(--ns-muted-fg)">cron.nightly-reconcile · 0 2 * * *</span></span>
-                  <span class="ns-panel__description">Next 5 fires · tz Europe/Zurich · backfill honored</span>
-                </div>
-                <div class="ns-panel__body" style="padding:var(--ns-space-4) var(--ns-space-5)">
-                  <div class="ns-connector">
-                    <sc-for list="{{ s9Preview }}" as="p" hint-placeholder-count="5">
-                      <div class="ns-connector__row" data-state="{{ p.state }}">
-                        <span class="ns-connector__dot" aria-hidden="true"></span>
-                        <span class="ns-connector__probe">{{ p.probe }}</span>
-                        <span class="ns-connector__result">{{ p.result }}</span>
-                      </div>
-                    </sc-for>
-                  </div>
-                </div>
-              </section>
+          <!-- BESPOKE CATEGORY BAND: activation mechanism, tinted, with firing sparkbars -->
+          <div class="ns-tcat" role="group" aria-label="Trigger categories">
+            <sc-for list="{{ s9Cats }}" as="c" hint-placeholder-count="4">
+              <button class="ns-tcat__card" data-cat="{{ c.cat }}" data-state="{{ c.selState }}" data-tone="{{ c.tone }}" data-hollow="{{ c.hollow }}" onClick="{{ c.pick }}">
+                <span class="ns-tcat__top">
+                  <span class="ns-tcat__glyph" aria-hidden="true">{{ c.glyph }}</span>
+                  <span class="ns-tcat__label">{{ c.label }}</span>
+                  <span class="ns-tcat__count">{{ c.count }}</span>
+                </span>
+                <span class="ns-tcat__blurb">{{ c.blurb }}</span>
+                <span class="ns-tcat__spark" data-hollow="{{ c.hollow }}" aria-hidden="true">
+                  <sc-for list="{{ c.bars }}" as="b" hint-placeholder-count="12">
+                    <span class="ns-tcat__bar" style="height:{{ b.h }}%"></span>
+                  </sc-for>
+                  <sc-if value="{{ c.hollow }}" hint-placeholder-val="{{ false }}">
+                    <span class="ns-tcat__idle">no fires · 24h</span>
+                  </sc-if>
+                </span>
+                <span class="ns-tcat__foot">
+                  <span class="ns-tcat__state" data-tone="{{ c.tone }}">{{ c.stateLabel }}</span>
+                  <span class="ns-tcat__fires">{{ c.emptyLabel }}</span>
+                </span>
+              </button>
+            </sc-for>
+          </div>
+
+          <!-- HERO: TRIGGER BUILDER — when → do rule strip + action palette (ref 21) -->
+          <section class="ns-panel ns-tbuild" style="background:var(--ns-card)">
+            <div class="ns-panel__header" style="padding:var(--ns-space-4) var(--ns-space-5);border-bottom:1px solid var(--ns-border);display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:var(--ns-space-3);flex-wrap:wrap">
+              <div style="display:flex;align-items:baseline;gap:var(--ns-space-3);flex-wrap:wrap;min-width:0">
+                <span class="ns-panel__title">Rule builder</span>
+                <span class="ns-panel__description" style="font-family:var(--ns-font-mono);font-size:var(--ns-text-2xs)">{{ s9Builder.id }}</span>
+              </div>
+              <span class="ns-tbuild__armpill" data-on="{{ s9Builder.on }}">
+                <span class="ns-tbuild__armdot" aria-hidden="true"></span>{{ s9Builder.on }}
+              </span>
             </div>
-
-            <aside style="display:grid;gap:var(--ns-space-6);min-width:0">
-              <section class="ns-card" style="background:var(--ns-card)">
-                <div class="ns-card__header" style="padding:var(--ns-space-4) var(--ns-space-5);border-bottom:1px solid var(--ns-border)">
-                  <span class="ns-card__title">Enable / disable</span>
-                  <span class="ns-card__description">Runtime <span class="ns-inline-code">TriggerEnabledStateOverride</span> — confirm-gated, CLI shown, hot-reloaded live.</span>
+            <div class="ns-panel__body" style="padding:var(--ns-space-5)">
+              <div class="ns-tbuild__flow">
+                <!-- WHEN node -->
+                <div class="ns-tbuild__node" data-role="when" data-cat="{{ s9Builder.cat }}">
+                  <span class="ns-tbuild__node-kicker">WHEN</span>
+                  <span class="ns-tbuild__node-head"><span class="ns-tbuild__node-glyph" aria-hidden="true">{{ s9Builder.catGlyph }}</span><span class="ns-tbuild__node-title">{{ s9Builder.when }}</span></span>
+                  <span class="ns-tbuild__node-sub">{{ s9Builder.whenSrc }}</span>
+                  <span class="ns-tbuild__node-tag" data-cat="{{ s9Builder.cat }}">{{ s9Builder.catLabel }}</span>
                 </div>
-                <div style="padding:var(--ns-space-2) var(--ns-space-5) var(--ns-space-3)">
-                  <sc-for list="{{ s9Trigs }}" as="t" hint-placeholder-count="4">
-                    <div style="display:flex;align-items:center;gap:var(--ns-space-3);padding:var(--ns-space-2-5) 0;border-bottom:1px solid color-mix(in oklab, var(--ns-border) 55%, transparent)">
-                      <div style="display:grid;gap:2px;min-width:0;flex:1">
-                        <span style="font-family:var(--ns-font-mono);font-size:var(--ns-text-sm)">{{ t.id }}</span>
-                        <span style="display:flex;gap:var(--ns-space-2);align-items:center"><span class="ns-chip">{{ t.kind }}</span><span style="font-size:var(--ns-text-2xs);color:var(--ns-muted-fg)">{{ t.human }}</span></span>
-                      </div>
-                      <span style="position:relative;display:inline-flex;cursor:pointer"><input type="checkbox" class="ns-switch" checked="{{ t.on }}" onChange="{{ t.toggle }}"><span class="ns-switch__track" style="display:inline-flex;align-items:center;width:2.35rem;height:1.3rem;border:1px solid var(--ns-border-strong);border-radius:var(--ns-radius-full);background:var(--ns-surface);padding:2px;transition:background 140ms ease,border-color 140ms ease"><span class="ns-switch__thumb" style="width:0.95rem;height:0.95rem;border-radius:var(--ns-radius-full);background:var(--ns-card);box-shadow:var(--ns-shadow-xs);transition:transform 140ms ease"></span></span></span>
+                <!-- connector + condition -->
+                <div class="ns-tbuild__wire" aria-hidden="true">
+                  <span class="ns-tbuild__wire-line"></span>
+                  <span class="ns-tbuild__cond">if {{ s9Builder.cond }}</span>
+                  <span class="ns-tbuild__wire-line"></span>
+                  <span class="ns-tbuild__wire-arrow">▶</span>
+                </div>
+                <!-- DO node -->
+                <div class="ns-tbuild__node" data-role="do" data-tone="{{ s9Builder.actTone }}">
+                  <span class="ns-tbuild__node-kicker">DO</span>
+                  <span class="ns-tbuild__node-head"><span class="ns-tbuild__node-glyph" aria-hidden="true">{{ s9Builder.actGlyph }}</span><span class="ns-tbuild__node-title">{{ s9Builder.actName }}</span></span>
+                  <span class="ns-tbuild__node-sub">{{ s9Builder.doesLabel }}</span>
+                  <button class="ns-tbuild__node-link" onClick="{{ s9Builder.openAction }}">open target →</button>
+                </div>
+              </div>
+              <!-- action-type palette (ref 21 component palette) -->
+              <div class="ns-tbuild__palette">
+                <span class="ns-tbuild__palette-label">action types</span>
+                <div class="ns-tbuild__palette-grid">
+                  <sc-for list="{{ s9Palette }}" as="p" hint-placeholder-count="4">
+                    <span class="ns-tbuild__chip" data-tone="{{ p.tone }}" data-state="{{ p.active }}">
+                      <span class="ns-tbuild__chip-glyph" aria-hidden="true">{{ p.glyph }}</span>{{ p.label }}
+                    </span>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- SCHEDULE STRIP: next-7-day day-strip + next-fire countdowns (ref 19) -->
+          <sc-if value="{{ s9HasSched }}" hint-placeholder-val="{{ true }}">
+          <section class="ns-panel" style="background:var(--ns-card)">
+            <div class="ns-panel__header" style="padding:var(--ns-space-4) var(--ns-space-5);border-bottom:1px solid var(--ns-border)">
+              <span class="ns-panel__title">Schedule &amp; next fires <span style="font-family:var(--ns-font-mono);font-weight:400;color:var(--ns-muted-fg);font-size:var(--ns-text-2xs)">tz Europe/Zurich · backfill honored</span></span>
+              <span class="ns-panel__description">Only time-driven triggers have a next fire — computed from declared cron / interval.</span>
+            </div>
+            <div class="ns-panel__body" style="padding:var(--ns-space-4) var(--ns-space-5);display:grid;gap:var(--ns-space-4)">
+              <div class="ns-tdaystrip">
+                <sc-for list="{{ s9Days }}" as="d" hint-placeholder-count="7">
+                  <div class="ns-tdaystrip__day" data-today="{{ d.isToday }}">
+                    <span class="ns-tdaystrip__dow">{{ d.dow }}</span>
+                    <span class="ns-tdaystrip__date">{{ d.date }}</span>
+                    <span class="ns-tdaystrip__fires">
+                      <sc-for list="{{ d.fires }}" as="f" hint-placeholder-count="2">
+                        <span class="ns-tdaystrip__pip" data-tone="{{ f.tone }}" title="{{ f.id }} · {{ f.at }}">{{ f.at }}</span>
+                      </sc-for>
+                    </span>
+                    <sc-if value="{{ d.hasPoll }}" hint-placeholder-val="{{ true }}">
+                      <span class="ns-tdaystrip__poll" title="poll.inventory-sync · every 30s"><span class="ns-tdaystrip__poll-track"></span>poll · 30s</span>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+              <div class="ns-tnext">
+                <sc-for list="{{ s9NextFires }}" as="n" hint-placeholder-count="3">
+                  <button class="ns-tnext__card" data-tone="{{ n.tone }}" onClick="{{ n.pick }}">
+                    <span class="ns-tnext__head">
+                      <span class="ns-tnext__id">{{ n.id }}</span>
+                      <span class="ns-tnext__kind" data-tone="{{ n.tone }}">{{ n.kindLabel }}</span>
+                    </span>
+                    <span class="ns-tnext__in">{{ n.nextIn }}</span>
+                    <span class="ns-tnext__prog" aria-hidden="true"><span class="ns-tnext__prog-fill" data-tone="{{ n.tone }}" style="width:{{ n.progressPct }}%"></span></span>
+                    <span class="ns-tnext__meta"><span class="ns-tnext__at">{{ n.span }}</span> → {{ n.does }}</span>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+          </section>
+          </sc-if>
+
+          <!-- FIRING-HISTORY TABLE: dense sortable console table (ref 11/13) -->
+          <section class="ns-panel" style="background:var(--ns-card)">
+            <div class="ns-panel__header" style="padding:var(--ns-space-4) var(--ns-space-5);border-bottom:1px solid var(--ns-border);display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:var(--ns-space-3);flex-wrap:wrap">
+              <div style="display:flex;align-items:baseline;gap:var(--ns-space-3);flex-wrap:wrap;min-width:0">
+                <span class="ns-panel__title">Firing history</span>
+                <span class="ns-panel__description">click a row for the action chain, payload &amp; schedule</span>
+              </div>
+              <div class="ns-feed-toolbar">
+                <span class="ns-livedot" data-state="{{ s9LiveState }}">sse</span>
+                <button class="ns-catfilter" data-active="{{ s9CatIsAll }}" onClick="{{ s9ClearCat }}">filter · {{ s9CatActive }}</button>
+              </div>
+            </div>
+            <!-- inline query toolbar (ref 11): quick-search + outcome + limit + add-filter -->
+            <div class="ns-thquery">
+              <div class="ns-thquery__search">
+                <span class="ns-thquery__search-glyph" aria-hidden="true">⌕</span>
+                <input class="ns-thquery__input" type="text" placeholder="Quick search — trigger or action…" value="{{ s9Query }}" onInput="{{ s9SetQuery }}" aria-label="Quick search firing history">
+                <sc-if value="{{ s9Query }}" hint-placeholder-val="{{ false }}">
+                  <button class="ns-thquery__clear" onClick="{{ s9ClearQuery }}" aria-label="Clear search">×</button>
+                </sc-if>
+              </div>
+              <label class="ns-thquery__field">
+                <span class="ns-thquery__field-label">outcome</span>
+                <select class="ns-thquery__select" value="{{ s9Outcome }}" onChange="{{ s9SetOutcome }}" aria-label="Filter by outcome">
+                  <option value="all">all outcomes</option>
+                  <option value="ok">completed</option>
+                  <option value="skipped">skipped</option>
+                  <option value="idle">idle</option>
+                  <option value="failed">failed</option>
+                </select>
+              </label>
+              <label class="ns-thquery__field">
+                <span class="ns-thquery__field-label">show</span>
+                <select class="ns-thquery__select" value="{{ s9Limit }}" onChange="{{ s9SetLimit }}" aria-label="Max results">
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+              </label>
+              <button class="ns-thquery__addfilter" onClick="{{ s9AddFilter }}"><span aria-hidden="true">+</span> Add JS filter</button>
+              <span class="ns-thquery__count">{{ s9HistCount }}</span>
+            </div>
+            <div class="ns-contable" style="border:0;border-radius:0;background:transparent">
+              <div class="ns-contable__scroll">
+                <table class="ns-contable__t ns-thist">
+                  <thead>
+                    <tr>
+                      <sc-for list="{{ s9SortCols }}" as="col" hint-placeholder-count="6">
+                        <th class="ns-contable__th ns-thist__th" data-active="{{ col.active }}" data-dir="{{ col.dir }}" onClick="{{ col.sort }}">{{ col.label }} <span class="ns-contable__sort">↕</span></th>
+                      </sc-for>
+                      <th class="ns-contable__th ns-thist__th--spark">24h</th>
+                      <th class="ns-contable__th ns-contable__th--r"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <sc-for list="{{ s9Hist }}" as="t" hint-placeholder-count="6">
+                      <tr class="ns-contable__row ns-thist__row" data-state="{{ t.selState }}" data-off="{{ t.on }}" onClick="{{ t.pick }}">
+                        <td class="ns-contable__td"><button class="ns-contable__name" onClick="{{ t.pick }}">{{ t.id }}</button></td>
+                        <td class="ns-contable__td"><span class="ns-tcatbadge" data-cat="{{ t.cat }}"><span class="ns-tcatbadge__glyph" aria-hidden="true">{{ t.catGlyph }}</span>{{ t.catLabel }}</span></td>
+                        <td class="ns-contable__td"><span class="ns-contable__sched">{{ t.lastAt }}</span></td>
+                        <td class="ns-contable__td"><span class="ns-contable__sched">{{ t.next }}</span><span class="ns-contable__sub">{{ t.nextIn }}</span></td>
+                        <td class="ns-contable__td"><span class="{{ t.sBadge }}">{{ t.outcome }}</span></td>
+                        <td class="ns-contable__td"><span class="ns-thist__lat">{{ t.lat }}</span></td>
+                        <td class="ns-contable__td"><span class="ns-trend" data-tone="{{ t.ttone }}" data-series="{{ t.series }}" aria-hidden="true"><svg viewBox="0 0 100 30" preserveAspectRatio="none"></svg></span></td>
+                        <td class="ns-contable__td ns-contable__td--r"><span style="position:relative;display:inline-flex;cursor:pointer" onClick="{{ t.toggle }}"><input type="checkbox" class="ns-switch" checked="{{ t.on }}" onChange="{{ t.toggle }}"><span class="ns-switch__track" style="display:inline-flex;align-items:center;width:2.35rem;height:1.3rem;border:1px solid var(--ns-border-strong);border-radius:var(--ns-radius-full);background:var(--ns-surface);padding:2px;transition:background 140ms ease,border-color 140ms ease"><span class="ns-switch__thumb" style="width:0.95rem;height:0.95rem;border-radius:var(--ns-radius-full);background:var(--ns-card);box-shadow:var(--ns-shadow-xs);transition:transform 140ms ease"></span></span></span></td>
+                      </tr>
+                    </sc-for>
+                    <sc-if value="{{ s9HistEmpty }}" hint-placeholder-val="{{ false }}">
+                      <tr class="ns-contable__row" style="cursor:default"><td class="ns-contable__td" colspan="8"><div class="ns-empty-state" style="border:0">No triggers in this category.</div></td></tr>
+                    </sc-if>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="ns-card__footer" style="display:flex;gap:var(--ns-space-2);padding:var(--ns-space-3) var(--ns-space-5);border-top:1px solid var(--ns-border);flex-wrap:wrap">
+              <button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ s9OpenRun }}">Open firing run</button>
+              <button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ s9OpenDlq }}">Trigger DLQ · 17 →</button>
+            </div>
+          </section>
+
+          <!-- SECONDARY: webhook ingress test + dead-letter mini panel -->
+          <div class="ns-tgrid2">
+            <section class="ns-panel" style="background:var(--ns-card)">
+              <div class="ns-panel__header" style="padding:var(--ns-space-4) var(--ns-space-5);border-bottom:1px solid var(--ns-border)">
+                <span class="ns-panel__title">Webhook ingress test</span>
+                <span class="ns-panel__description">Simulate an inbound delivery — distinct from Scalar’s app-route try-it</span>
+              </div>
+              <div class="ns-panel__body" style="padding:var(--ns-space-4) var(--ns-space-5);display:grid;gap:var(--ns-space-3)">
+                <div class="ns-tingress__route"><span class="ns-tingress__verb">POST</span><span class="ns-tingress__path">/webhooks/payment/test</span></div>
+                <textarea class="ns-textarea" id="ns-wh-payload" rows="4" style="width:100%;box-sizing:border-box;padding:var(--ns-space-2) var(--ns-space-3);border:1px solid var(--ns-border);border-radius:var(--ns-radius-md);background:var(--ns-surface);color:var(--ns-fg);font-family:var(--ns-font-mono);font-size:var(--ns-text-xs);resize:vertical" value="{{ s9Webhook }}" onChange="{{ s9SetWebhook }}"></textarea>
+                <button class="ns-btn ns-btn--primary ns-btn--sm" style="justify-self:start" onClick="{{ s9SendTest }}">Send test payload</button>
+              </div>
+            </section>
+
+            <section class="ns-panel" style="background:var(--ns-card)">
+              <div class="ns-panel__header" style="padding:var(--ns-space-4) var(--ns-space-5);border-bottom:1px solid var(--ns-border);display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:var(--ns-space-3);flex-wrap:wrap">
+                <div style="display:grid;gap:2px;min-width:0">
+                  <span class="ns-panel__title">Dead letters</span>
+                  <span class="ns-panel__description">Failed firings parked for reprocessing</span>
+                </div>
+                <span class="ns-tdlqsum" data-tone="warning"><span class="ns-tdlqsum__glyph" aria-hidden="true">⚠</span>redis 14 · memory 3</span>
+              </div>
+              <div class="ns-panel__body" style="padding:0">
+                <div class="ns-tdlt">
+                  <sc-for list="{{ s9DeadLetters }}" as="d" hint-placeholder-count="5">
+                    <div class="ns-tdlt__row" data-tone="{{ d.tone }}">
+                      <span class="ns-tdlt__bar" aria-hidden="true"></span>
+                      <span class="ns-tdlt__main">
+                        <span class="ns-tdlt__top">
+                          <span class="ns-tdlt__id">{{ d.id }}</span>
+                          <span class="ns-tdlt__q" data-q="{{ d.q }}">{{ d.q }}</span>
+                          <span class="ns-tdlt__age">{{ d.age }}</span>
+                        </span>
+                        <span class="ns-tdlt__err">{{ d.err }}</span>
+                        <span class="ns-tdlt__sub">{{ d.trig }} · retry {{ d.retry }}</span>
+                      </span>
+                      <span class="ns-tdlt__acts">
+                        <button class="ns-tdlt__act" onClick="{{ d.retryAction }}" aria-label="Retry">↻</button>
+                        <button class="ns-tdlt__act" onClick="{{ d.inspect }}" aria-label="Inspect">⇱</button>
+                      </span>
                     </div>
                   </sc-for>
                 </div>
-              </section>
-
-              <section class="ns-panel" style="background:var(--ns-card)">
-                <div class="ns-panel__header" style="padding:var(--ns-space-4) var(--ns-space-5);border-bottom:1px solid var(--ns-border)">
-                  <span class="ns-panel__title">Webhook test delivery</span>
-                  <span class="ns-panel__description">Ingress simulation — distinct from Scalar’s app-route try-it</span>
+                <div class="ns-tdlt__foot">
+                  <span class="ns-tdlt__note">top offender · <span style="font-family:var(--ns-font-mono)">analytics msg_88f</span></span>
+                  <button class="ns-btn ns-btn--secondary ns-btn--sm" onClick="{{ s9OpenDlq }}">Open Dead-Letter Queues →</button>
                 </div>
-                <div class="ns-panel__body" style="padding:var(--ns-space-4) var(--ns-space-5);display:grid;gap:var(--ns-space-3)">
-                  <label class="ns-label" style="font-size:var(--ns-text-xs);font-weight:500" for="ns-wh-payload">POST /webhooks/payment/test</label>
-                  <textarea class="ns-textarea" id="ns-wh-payload" rows="3" style="width:100%;box-sizing:border-box;padding:var(--ns-space-2) var(--ns-space-3);border:1px solid var(--ns-border);border-radius:var(--ns-radius-md);background:var(--ns-surface);color:var(--ns-fg);font-family:var(--ns-font-mono);font-size:var(--ns-text-xs);resize:vertical" value="{{ s9Webhook }}" onChange="{{ s9SetWebhook }}"></textarea>
-                  <button class="ns-btn ns-btn--primary ns-btn--sm" style="justify-self:start" onClick="{{ s9SendTest }}">Send test payload</button>
-                </div>
-              </section>
-
-              <section class="ns-panel" style="background:var(--ns-card)">
-                <div class="ns-panel__header" style="padding:var(--ns-space-4) var(--ns-space-5);border-bottom:1px solid var(--ns-border)">
-                  <span class="ns-panel__title">Dead letters</span>
-                </div>
-                <div class="ns-panel__body" style="padding:var(--ns-space-4) var(--ns-space-5)">
-                  <div class="ns-kv">
-                    <div class="ns-kv__row"><span class="ns-kv__key">redis DLQ depth</span><span class="ns-kv__val">14 · analytics msg_88f</span></div>
-                    <div class="ns-kv__row"><span class="ns-kv__key">total depth</span><span class="ns-kv__val">17</span></div>
-                  </div>
-                  <button class="ns-btn ns-btn--secondary ns-btn--sm" style="margin-top:var(--ns-space-3)" onClick="{{ s9OpenDlq }}">Open Dead-Letter Queues →</button>
-                </div>
-              </section>
-            </aside>
+              </div>
+            </section>
           </div>
         </div>
       </sc-if>
@@ -2588,6 +2751,70 @@
       </div>
     </div>
   </sc-if>
+  <sc-if value="{{ sheetIsS9 }}" hint-placeholder-val="{{ false }}">
+    <div class="ns-sheet-body">
+      <div class="ns-seamsheet-hero">
+        <span class="ns-tcatbadge" data-cat="{{ s9Detail.cat }}"><span class="ns-tcatbadge__glyph" aria-hidden="true">{{ s9Detail.catGlyph }}</span>{{ s9Detail.catLabel }}</span>
+        <span style="flex:1"></span>
+        <span class="{{ s9Detail.sBadge }}">{{ s9Detail.outcome }}</span>
+      </div>
+      <!-- when → do summary -->
+      <div class="ns-tdrawer__rule">
+        <span class="ns-tdrawer__rule-when">when {{ s9Detail.when }}</span>
+        <span class="ns-tdrawer__rule-arrow" aria-hidden="true">▶</span>
+        <span class="ns-tdrawer__rule-do">do {{ s9Detail.doesLabel }}</span>
+      </div>
+      <div class="ns-kv">
+        <div class="ns-kv__row"><span class="ns-kv__key">source</span><span class="ns-kv__val">{{ s9Detail.src }}</span></div>
+        <div class="ns-kv__row"><span class="ns-kv__key">condition</span><span class="ns-kv__val">{{ s9Detail.cond }}</span></div>
+        <div class="ns-kv__row"><span class="ns-kv__key">last fired</span><span class="ns-kv__val">{{ s9Detail.lastAt }} · {{ s9Detail.lat }}</span></div>
+        <div class="ns-kv__row"><span class="ns-kv__key">next fire</span><span class="ns-kv__val">{{ s9Detail.next }} · {{ s9Detail.nextIn }}</span></div>
+        <div class="ns-kv__row"><span class="ns-kv__key">fires · 24h</span><span class="ns-kv__val">{{ s9Detail.fires }}</span></div>
+        <div class="ns-kv__row"><span class="ns-kv__key">correlation</span><span class="ns-kv__val" style="color:var(--ns-primary)">{{ s9Detail.corr }}</span></div>
+      </div>
+      <!-- inner tabs (ref 11 drawer docs tabs) -->
+      <div class="ns-drawer__tabs" role="tablist">
+        <button class="ns-drawer__tab" role="tab" data-state="{{ s9Detail.tabIsChain }}" onClick="{{ s9Detail.tabChain }}">Action chain</button>
+        <button class="ns-drawer__tab" role="tab" data-state="{{ s9Detail.tabIsPayload }}" onClick="{{ s9Detail.tabPayload }}">Payload</button>
+        <sc-if value="{{ s9Detail.isSched }}" hint-placeholder-val="{{ false }}">
+          <button class="ns-drawer__tab" role="tab" data-state="{{ s9Detail.tabIsSched }}" onClick="{{ s9Detail.tabSched }}">Schedule</button>
+        </sc-if>
+      </div>
+      <sc-if value="{{ s9Detail.showChain }}" hint-placeholder-val="{{ true }}">
+        <div class="ns-achain">
+          <sc-for list="{{ s9Detail.chain }}" as="a" hint-placeholder-count="2">
+            <div class="ns-achain__row" data-state="{{ a.state }}">
+              <span class="ns-achain__dot" aria-hidden="true"></span>
+              <span class="ns-achain__type">{{ a.type }}</span>
+              <span>{{ a.detail }}</span>
+              <span>· {{ a.dur }}</span>
+              <sc-if value="{{ a.go }}" hint-placeholder-val="{{ false }}">
+                <button class="ns-achain__link" onClick="{{ a.go }}">{{ a.linkLabel }} →</button>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{ s9Detail.showPayload }}" hint-placeholder-val="{{ false }}">
+        <pre class="ns-tdrawer__payload">{{ s9Detail.payload }}</pre>
+      </sc-if>
+      <sc-if value="{{ s9Detail.showSched }}" hint-placeholder-val="{{ false }}">
+        <div class="ns-connector">
+          <sc-for list="{{ s9Detail.sched }}" as="p" hint-placeholder-count="3">
+            <div class="ns-connector__row" data-state="{{ p.state }}">
+              <span class="ns-connector__dot" aria-hidden="true"></span>
+              <span class="ns-connector__probe">{{ p.probe }}</span>
+              <span class="ns-connector__result">{{ p.result }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+      <div style="display:grid;gap:var(--ns-space-2)">
+        <button class="ns-btn ns-btn--primary" onClick="{{ s9Detail.openRun }}">Open firing run →</button>
+        <button class="ns-btn ns-btn--secondary" onClick="{{ s9Detail.toggle }}">{{ s9Detail.toggleLabel }}</button>
+      </div>
+    </div>
+  </sc-if>
   <sc-if value="{{ sheetIsS8 }}" hint-placeholder-val="{{ false }}">
     <div class="ns-sheet-body">
       <sc-if value="{{ s8PropsIsNode }}" hint-placeholder-val="{{ true }}">
@@ -2763,6 +2990,8 @@ class Component extends DCLogic {
       s9Open: { evt_2210: true },
       s9Enabled: { 'cron.nightly-reconcile': true, 'webhook.payment': true, 'file-watch.config': true, 'kv.cache-invalidate': true, 'poll.inventory-sync': true, 'sched.daily-digest': true, 'composite.order-guard': true, 'manual.reindex': false },
       s9Webhook: '{ "orderId": "ord_7f3k", "amount": 129.90 }',
+      s9Sel: 'webhook.payment', s9Cat: 'all', s9Sort: 'fired', s9SortDir: 'desc', s9SheetTab: 'chain',
+      s9Query: '', s9Outcome: 'all', s9Limit: '100',
       // S10
       s10Sel: 'msg_88f',
       s10Feed: [
@@ -4630,22 +4859,175 @@ class Component extends DCLogic {
     const s8HasEvidence = !!s8Evidence;
     if (s8Props.mode === 'node') s8Props.noEvidence = !s8HasEvidence;
 
-    // ----- S9 -----
-    // All 8 real trigger types: file · webhook · schedule · cron · kv · polling · composite · manual
-    const trigDefs = [
-      { id: 'cron.nightly-reconcile', kind: 'cron', human: 'Daily at 02:00' },
-      { id: 'webhook.payment', kind: 'webhook', human: 'Stripe ingress' },
-      { id: 'file-watch.config', kind: 'file', human: 'runtime-config/*.json' },
-      { id: 'kv.cache-invalidate', kind: 'kv', human: 'on key write' },
-      { id: 'poll.inventory-sync', kind: 'polling', human: 'every 30s' },
-      { id: 'sched.daily-digest', kind: 'schedule', human: '07:00 local' },
-      { id: 'composite.order-guard', kind: 'composite', human: 'webhook + kv' },
-      { id: 'manual.reindex', kind: 'manual', human: 'CLI / dashboard' },
+    // ----- S9 Triggers -----
+    // Triggers = event→action activation rules. Every trigger belongs to ONE of four
+    // activation categories (mechanism by which it fires), which drives the tinted
+    // category band, the builder "when" node, and the firing-history classification.
+    //   schedule = time-driven (cron · schedule · polling)
+    //   webhook  = inbound HTTP ingress
+    //   event    = internal signal (file-watch · kv-write · composite)
+    //   manual   = operator / CLI / dashboard invoked
+    const CAT = {
+      cron: 'schedule', schedule: 'schedule', polling: 'schedule',
+      webhook: 'webhook',
+      file: 'event', kv: 'event', composite: 'event',
+      manual: 'manual',
+    };
+    const CAT_META = {
+      schedule: { label: 'Schedule', glyph: '◷', blurb: 'time-driven · cron / interval' },
+      webhook: { label: 'Webhook', glyph: '⇲', blurb: 'inbound HTTP ingress' },
+      event: { label: 'Event', glyph: '◆', blurb: 'internal signal · file / kv' },
+      manual: { label: 'Manual', glyph: '⎇', blurb: 'operator / CLI invoked' },
+    };
+    // Full trigger fleet — the source of truth for every S9 section.
+    // fired24 = firing count sparkline (last 12 buckets); when = event source; does = wired action.
+    const trigFleet = [
+      { id: 'webhook.payment', kind: 'webhook', human: 'Stripe ingress', src: 'POST /webhooks/payment', when: 'PaymentWebhookReceived', cond: 'signature valid', does: 'publishSaga', doesLabel: 'PaymentWebhookSaga', last: 'processed', lastAt: '13:59:45', next: '—', nextIn: 'on inbound', lat: '4ms', fired24: [6,9,7,11,8,10,12,9,7,10,8,11], ttone: 'primary', fires: 148 },
+      { id: 'cron.nightly-reconcile', kind: 'cron', human: 'Daily at 02:00', src: '0 2 * * *', when: 'cron tick 02:00', cond: 'backfill honored', does: 'enqueueJob', doesLabel: 'reconcile-ledger', last: 'skipped', lastAt: '14:00:00', next: '02:00', nextIn: 'in 11h 58m', lat: '—', fired24: [1,1,1,0,1,1,0,1,1,1,0,1], ttone: 'muted', fires: 7 },
+      { id: 'file-watch.config', kind: 'file', human: 'runtime-config/*.json', src: 'fs.watch runtime-config/', when: 'file changed', cond: 'json parses', does: 'executeTask', doesLabel: 'reload-config', last: 'completed', lastAt: '13:58:03', next: '—', nextIn: 'on change', lat: '61ms', fired24: [0,2,0,1,0,3,1,0,2,1,0,1], ttone: 'warning', fires: 22 },
+      { id: 'kv.cache-invalidate', kind: 'kv', human: 'on key write', src: 'kv.watch cache:*', when: 'key write cache:*', cond: 'prefix match', does: 'executeBatch', doesLabel: 'purge-batch', last: 'completed', lastAt: '13:55:27', next: '—', nextIn: 'on write', lat: '210ms', fired24: [4,3,5,4,6,3,5,4,7,5,4,6], ttone: 'success', fires: 91 },
+      { id: 'poll.inventory-sync', kind: 'polling', human: 'every 30s', src: 'interval 30s', when: 'poll tick 30s', cond: 'delta > 0', does: 'enqueueJob', doesLabel: 'inventory-sync', last: 'completed', lastAt: '14:01:12', next: '30s', nextIn: 'in 18s', lat: '88ms', fired24: [12,11,13,12,10,13,12,11,13,12,11,12], ttone: 'primary', fires: 2880 },
+      { id: 'sched.daily-digest', kind: 'schedule', human: '07:00 local', src: '@daily 07:00', when: 'daily 07:00', cond: 'has recipients', does: 'publishSaga', doesLabel: 'DigestSaga', last: 'completed', lastAt: '07:00:00', next: '07:00', nextIn: 'in 16h 58m', lat: '1.2s', fired24: [1,0,0,0,0,0,1,0,0,0,0,0], ttone: 'muted', fires: 1 },
+      { id: 'composite.order-guard', kind: 'composite', human: 'webhook + kv', src: 'webhook ∧ kv', when: 'both conditions', cond: 'AND both', does: 'publishSaga', doesLabel: 'OrderGuardSaga', last: 'completed', lastAt: '13:52:41', next: '—', nextIn: 'on both', lat: '9ms', fired24: [2,1,3,2,1,2,3,1,2,2,1,3], ttone: 'success', fires: 43 },
+      { id: 'manual.reindex', kind: 'manual', human: 'CLI / dashboard', src: 'operator invoke', when: 'operator run', cond: 'confirm gate', does: 'executeTask', doesLabel: 'reindex-search', last: 'idle', lastAt: '—', next: '—', nextIn: 'on demand', lat: '—', fired24: [0,0,0,0,0,0,0,0,0,0,0,0], ttone: 'muted', fires: 0 },
     ];
-    const s9Trigs = trigDefs.map(t => ({
-      ...t, on: !!s.s9Enabled[t.id],
+    // enrich fleet with live enabled-state + category
+    const fleet = trigFleet.map(t => ({ ...t, cat: CAT[t.kind], on: !!s.s9Enabled[t.id] }));
+
+    // --- category band (bespoke triggers-health band, NOT plain number cards) ---
+    const s9Cats = ['schedule', 'webhook', 'event', 'manual'].map(cat => {
+      const members = fleet.filter(t => t.cat === cat);
+      const armed = members.filter(t => t.on).length;
+      const fires = members.reduce((a, t) => a + t.fires, 0);
+      // aggregate firing spark = element-wise sum of member sparks
+      const spark = [0,0,0,0,0,0,0,0,0,0,0,0].map((_, i) => members.reduce((a, t) => a + (t.on ? t.fired24[i] : 0), 0));
+      const max = Math.max(1, ...spark);
+      const disabled = members.length - armed;
+      // most-recent real last-fired time across members (— means never fired)
+      const lastAts = members.map(t => t.lastAt).filter(v => v && v !== '—').sort();
+      const lastAt = lastAts.length ? lastAts[lastAts.length - 1] : null;
+      const hasFires = fires > 0;
+      // meaningful foot line even for hollow categories (e.g. Manual · 0 fires):
+      // populated → "<n> fires · 24h"; never-fired + silenced → "silenced · CLI-only";
+      // never-fired + armed → "armed · awaiting invoke". No card is a void.
+      const firesLabel = fires >= 1000 ? (fires / 1000).toFixed(1) + 'k' : String(fires);
+      const emptyLabel = hasFires ? (firesLabel + ' fires · 24h')
+        : disabled >= members.length ? 'silenced · CLI-only'
+        : 'armed · awaiting invoke';
+      return {
+        cat, ...CAT_META[cat],
+        count: String(members.length), armed, disabled,
+        firesLabel,
+        bars: spark.map(v => ({ h: Math.round((v / max) * 100) })),
+        hollow: !hasFires ? 'hollow' : null, emptyLabel,
+        tone: disabled > 0 ? 'warning' : armed > 0 ? 'active' : 'muted',
+        selState: cat === s.s9Cat ? 'selected' : null,
+        pick: () => this.setState(st => ({ s9Cat: st.s9Cat === cat ? 'all' : cat })),
+        stateLabel: disabled > 0 ? disabled + ' silenced' : armed + ' armed',
+      };
+    });
+    const s9CatActive = s.s9Cat;
+
+    // --- selected trigger drives the builder + drawer ---
+    const s9SelTrig = fleet.find(t => t.id === s.s9Sel) || fleet[0];
+    const ACT_META = {
+      publishSaga: { glyph: '⤿', label: 'publish saga', tone: 'primary', route: 'sagas' },
+      enqueueJob: { glyph: '⚙', label: 'enqueue job', tone: 'success', route: 'runs' },
+      executeTask: { glyph: '❯', label: 'execute task', tone: 'warning', route: 'workers' },
+      executeBatch: { glyph: '▦', label: 'execute batch', tone: 'primary', route: null },
+    };
+    const s9Builder = {
+      id: s9SelTrig.id, cat: s9SelTrig.cat, catLabel: CAT_META[s9SelTrig.cat].label, catGlyph: CAT_META[s9SelTrig.cat].glyph,
+      when: s9SelTrig.when, whenSrc: s9SelTrig.src, cond: s9SelTrig.cond,
+      does: s9SelTrig.does, doesLabel: s9SelTrig.doesLabel,
+      actGlyph: (ACT_META[s9SelTrig.does] || {}).glyph, actName: (ACT_META[s9SelTrig.does] || {}).label,
+      actTone: (ACT_META[s9SelTrig.does] || {}).tone,
+      on: s9SelTrig.on, human: s9SelTrig.human,
+      openAction: () => { const r = (ACT_META[s9SelTrig.does] || {}).route; if (r) this.nav(r); },
+    };
+    // action-type palette (ref 21 component palette) — highlight the wired action
+    const s9Palette = Object.keys(ACT_META).map(k => ({
+      key: k, ...ACT_META[k], active: k === s9SelTrig.does ? 'active' : null,
+    }));
+
+    // --- schedule strip: next 7 days with cron/scheduled fire markers (ref 19) ---
+    const DAYW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const schedTrigs = fleet.filter(t => t.cat === 'schedule' && t.on);
+    const baseDay = 14; // Tue 2026-07-14
+    const hasPolling = schedTrigs.some(t => t.kind === 'polling');
+    const s9Days = Array.from({ length: 7 }, (_, i) => {
+      const dn = baseDay + i;
+      const idx = (2 + i) % 7; // Tue=2 for i=0
+      // discrete scheduled fires this day (daily ones fire every day)
+      const fires = schedTrigs.map(t => {
+        if (t.kind === 'polling') return null; // rendered as a continuous band, not a pip
+        if (t.id === 'sched.daily-digest') return { id: t.id, at: '07:00', tone: 'muted' };
+        if (t.id === 'cron.nightly-reconcile') return { id: t.id, at: '02:00', tone: 'primary' };
+        return null;
+      }).filter(Boolean);
+      return {
+        dow: DAYW[idx], date: String(dn), isToday: i === 0 ? 'today' : null,
+        fires, hasPoll: hasPolling ? 'yes' : null, count: String(fires.length),
+      };
+    });
+    // next-fire countdown cards (the scheduled triggers, soonest first)
+    // progressPct = elapsed fraction of the current interval toward the next fire.
+    // Presentational: derived from the declared cadence so the bar reads "how close".
+    const INTERVAL_META = {
+      'poll.inventory-sync': { pct: 40, span: 'every 30s', kindLabel: 'interval' },
+      'cron.nightly-reconcile': { pct: 50, span: 'daily 02:00', kindLabel: 'cron' },
+      'sched.daily-digest': { pct: 29, span: 'daily 07:00', kindLabel: 'schedule' },
+    };
+    const s9NextFires = schedTrigs
+      .map(t => {
+        const im = INTERVAL_META[t.id] || { pct: 60, span: t.src, kindLabel: 'schedule' };
+        const imminent = t.nextIn.startsWith('in ') && t.nextIn.includes('s') && !t.nextIn.includes('h') && !t.nextIn.includes('d');
+        return { id: t.id, kind: t.kind, next: t.next, nextIn: t.nextIn, does: t.doesLabel,
+          progressPct: im.pct, span: im.span, kindLabel: im.kindLabel,
+          tone: imminent ? 'primary' : 'muted',
+          pick: () => this.setState({ s9Sel: t.id }) };
+      });
+
+    // --- firing-history table (dense, sortable) ---
+    const catFilter = s.s9Cat === 'all' ? null : s.s9Cat;
+    const sortKey = s.s9Sort || 'fired';
+    const dir = s.s9SortDir === 'asc' ? 1 : -1;
+    const outcomeRank = { failed: 0, skipped: 1, idle: 2, queued: 3, completed: 4, processed: 5 };
+    // inline query toolbar (ref 11): quick-search by name + outcome filter + limit.
+    // Quick-search is WIRED (filters rendered rows); outcome filter maps grouped
+    // outcome families; limit caps the rendered row count.
+    const q9 = (s.s9Query || '').trim().toLowerCase();
+    const outFilter = s.s9Outcome || 'all';
+    const OUT_GROUP = { ok: ['completed', 'processed'], skipped: ['skipped'], idle: ['idle'], failed: ['failed'] };
+    const s9HistRaw = fleet
+      .filter(t => !catFilter || t.cat === catFilter)
+      .filter(t => !q9 || t.id.toLowerCase().includes(q9) || t.does.toLowerCase().includes(q9) || t.doesLabel.toLowerCase().includes(q9))
+      .filter(t => outFilter === 'all' || (OUT_GROUP[outFilter] || []).includes(t.last));
+    const s9SortCols = [
+      { key: 'name', label: 'Trigger' }, { key: 'cat', label: 'Type' },
+      { key: 'fired', label: 'Last fired' }, { key: 'next', label: 'Next fire' },
+      { key: 'outcome', label: 'Outcome' }, { key: 'lat', label: 'Latency' },
+    ].map(c => ({ ...c, dir: c.key === sortKey ? (s.s9SortDir || 'desc') : null,
+      active: c.key === sortKey ? 'sorted' : null,
+      sort: () => this.setState(st => ({ s9Sort: c.key, s9SortDir: st.s9Sort === c.key && st.s9SortDir === 'desc' ? 'asc' : 'desc' })) }));
+    const outcomeBadge = (o) => badge(o === 'processed' || o === 'completed' ? 'completed' : o === 'failed' ? 'failed' : o === 'skipped' ? 'queued' : o === 'idle' ? 'disabled' : 'queued');
+    const s9Hist = s9HistRaw.slice().sort((a, b) => {
+      let av, bv;
+      if (sortKey === 'name') { av = a.id; bv = b.id; return dir * av.localeCompare(bv); }
+      if (sortKey === 'cat') { av = a.cat; bv = b.cat; return dir * av.localeCompare(bv); }
+      if (sortKey === 'outcome') { av = outcomeRank[a.last] ?? 9; bv = outcomeRank[b.last] ?? 9; return dir * (av - bv); }
+      if (sortKey === 'lat') { av = a.lat === '—' ? -1 : parseFloat(a.lat) * (a.lat.includes('s') && !a.lat.includes('ms') ? 1000 : 1); bv = b.lat === '—' ? -1 : parseFloat(b.lat) * (b.lat.includes('s') && !b.lat.includes('ms') ? 1000 : 1); return dir * (av - bv); }
+      if (sortKey === 'next') { av = a.next === '—' ? 99 : parseInt(a.next); bv = b.next === '—' ? 99 : parseInt(b.next); return dir * (av - bv); }
+      av = a.lastAt === '—' ? '' : a.lastAt; bv = b.lastAt === '—' ? '' : b.lastAt; return dir * av.localeCompare(bv);
+    }).map(t => ({
+      id: t.id, cat: t.cat, catLabel: CAT_META[t.cat].label, catGlyph: CAT_META[t.cat].glyph,
+      lastAt: t.lastAt, next: t.next, nextIn: t.nextIn, lat: t.lat, on: t.on,
+      outcome: t.last, sBadge: outcomeBadge(t.last),
+      series: t.fired24.join(','), ttone: t.ttone,
+      selState: t.id === s.s9Sel ? 'selected' : null,
+      pick: () => this.setState({ s9Sel: t.id, sheet: 's9', s9SheetTab: 'chain' }),
       toggle: () => {
-        const on = s.s9Enabled[t.id];
+        const on = t.on;
         this.askConfirm({
           title: (on ? 'Disable' : 'Enable') + ' trigger',
           desc: on ? 'Silences this trigger locally without redeploy — a TriggerEnabledStateOverride, hot-reloaded.' : 'Re-enables firing immediately.',
@@ -4657,12 +5039,114 @@ class Component extends DCLogic {
         });
       },
     }));
-    const s9Preview = [
+    const s9Limit = parseInt(s.s9Limit || '100', 10);
+    const s9HistShown = s9Hist.slice(0, s9Limit);
+    const s9HistEmpty = s9HistShown.length === 0;
+    const s9HistCount = s9HistShown.length === fleet.length
+      ? String(fleet.length) + ' rules'
+      : s9HistShown.length + ' of ' + fleet.length;
+
+    // --- detail drawer (sheet s9) for the selected trigger ---
+    const selEvt = s.s9Events.find(e => e.trigger === s9SelTrig.id) || null;
+    const s9DrawerChain = ((selEvt && selEvt.chain) || [{ type: s9SelTrig.does, detail: s9SelTrig.doesLabel + ' — no recent firing', state: 'queued', dur: '—', link: (ACT_META[s9SelTrig.does] || {}).route }]).map(a => ({
+      ...a, glyph: (ACT_META[a.type] || {}).glyph || '·',
+      go: a.link ? () => this.nav(a.link) : null,
+      linkLabel: a.link === 'sagas' ? 'open saga' : a.link === 'runs' ? 'open run' : a.link === 'workers' ? 'open workers' : a.link === 'runtime' ? 'open override' : a.link ? 'open' : null,
+    }));
+    const s9Detail = {
+      id: s9SelTrig.id, cat: s9SelTrig.cat, catLabel: CAT_META[s9SelTrig.cat].label, catGlyph: CAT_META[s9SelTrig.cat].glyph,
+      on: s9SelTrig.on, human: s9SelTrig.human, src: s9SelTrig.src, when: s9SelTrig.when, cond: s9SelTrig.cond,
+      does: s9SelTrig.does, doesLabel: s9SelTrig.doesLabel, lat: s9SelTrig.lat, lastAt: s9SelTrig.lastAt,
+      next: s9SelTrig.next, nextIn: s9SelTrig.nextIn, fires: String(s9SelTrig.fires),
+      outcome: s9SelTrig.last, sBadge: outcomeBadge(s9SelTrig.last),
+      corr: selEvt ? selEvt.corr : '—',
+      payload: s9SelTrig.cat === 'webhook' ? '{\n  "orderId": "ord_7f3k",\n  "amount": 129.90,\n  "currency": "usd"\n}' : s9SelTrig.cat === 'schedule' ? '{\n  "tick": "' + s9SelTrig.src + '",\n  "tz": "Europe/Zurich",\n  "backfill": true\n}' : s9SelTrig.cat === 'event' ? '{\n  "source": "' + s9SelTrig.src + '",\n  "match": "' + s9SelTrig.cond + '"\n}' : '{\n  "invoked_by": "operator",\n  "confirm": true\n}',
+      chain: s9DrawerChain,
+      sched: s9SelTrig.cat === 'schedule' ? [
+        { probe: '2026-07-14 ' + (s9SelTrig.next !== '—' ? s9SelTrig.next : '—'), result: s9SelTrig.nextIn, state: 'ok' },
+        { probe: '2026-07-15 ' + (s9SelTrig.next !== '—' ? s9SelTrig.next : '—'), result: 'in 1d', state: 'ok' },
+        { probe: '2026-07-16 ' + (s9SelTrig.next !== '—' ? s9SelTrig.next : '—'), result: 'in 2d', state: 'ok' },
+      ] : [],
+      isSched: s9SelTrig.cat === 'schedule',
+      tabChain: () => this.setState({ s9SheetTab: 'chain' }),
+      tabPayload: () => this.setState({ s9SheetTab: 'payload' }),
+      tabSched: () => this.setState({ s9SheetTab: 'sched' }),
+      tabIsChain: (s.s9SheetTab || 'chain') === 'chain' ? 'active' : null,
+      tabIsPayload: s.s9SheetTab === 'payload' ? 'active' : null,
+      tabIsSched: s.s9SheetTab === 'sched' ? 'active' : null,
+      showChain: (s.s9SheetTab || 'chain') === 'chain', showPayload: s.s9SheetTab === 'payload', showSched: s.s9SheetTab === 'sched',
+      toggleLabel: s9SelTrig.on ? 'Silence this trigger' : 'Re-enable this trigger',
+      openRun: () => this.nav('/runs/ch_3QK9dR2eZ?primitive=run-trig'),
+      toggle: () => {
+        const on = s9SelTrig.on;
+        this.askConfirm({
+          title: (on ? 'Disable' : 'Enable') + ' trigger', desc: on ? 'Silences this trigger locally without redeploy — a TriggerEnabledStateOverride, hot-reloaded.' : 'Re-enables firing immediately.',
+          from: s9SelTrig.id + ' = ' + (on ? 'enabled' : 'disabled'), to: on ? 'disabled' : 'enabled',
+          cli: 'netscript triggers ' + (on ? 'disable' : 'enable') + ' ' + s9SelTrig.id,
+          feed: 'trigger ' + s9SelTrig.id + ' → ' + (on ? 'disabled' : 're-enabled'), feedTone: on ? 'warning' : 'success', action: on ? 'Disable' : 'Enable',
+          apply: () => this.setState(st => ({ s9Enabled: { ...st.s9Enabled, [s9SelTrig.id]: !on } })),
+        });
+      },
+    };
+
+    // --- console stat strip: iconified metric strip (ref 19 summary bar) ---
+    // Each metric = type glyph + value + a micro trend/spark where meaningful:
+    // armed → shield + armed/total bar; fires → flame + 12-bucket sparkline + trend
+    // arrow; dlq → alert + trend. Denser than five equal number boxes.
+    const armedTot = fleet.filter(t => t.on).length;
+    const firesSpark = [0,0,0,0,0,0,0,0,0,0,0,0].map((_, i) => fleet.reduce((a, t) => a + (t.on ? t.fired24[i] : 0), 0));
+    const firesMax = Math.max(1, ...firesSpark);
+    const s9StatTiles = [
+      { label: 'triggers', value: String(fleet.length), glyph: '⊞', tone: null,
+        sub: armedTot + ' wired rules' },
+      { label: 'armed', value: String(armedTot), glyph: '⛨', tone: 'primary',
+        meter: Math.round((armedTot / Math.max(1, fleet.length)) * 100), meterTone: 'primary',
+        sub: 'of ' + fleet.length + ' active' },
+      { label: 'silenced', value: String(fleet.length - armedTot), glyph: '⊘',
+        tone: fleet.length - armedTot > 0 ? 'warning' : null,
+        sub: (fleet.length - armedTot > 0 ? 'hot-reload override' : 'none silenced') },
+      { label: 'fires · 24h', value: '4.1k', glyph: '⚡', tone: null, sparkTone: 'primary',
+        spark: firesSpark.map(v => ({ h: Math.max(8, Math.round((v / firesMax) * 100)) })),
+        trend: '+6%', trendDir: 'up' },
+      { label: 'dlq depth', value: '17', glyph: '⚠', tone: 'warning',
+        trend: '+3', trendDir: 'up', sub: 'redis · memory' },
+    ];
+
+    // --- dead-letter mini-table (ref 11 record log) — last failed firings ------
+    // Compact rows: trigger · error snippet · age · retry-count · inline actions.
+    // Presentational (Retry/Inspect toast or nav). Keeps a one-line depth summary.
+    const s9DeadLetters = [
+      { id: 'analytics', trig: 'composite.order-guard', err: 'E_CONN sink unreachable', age: '2m', retry: '3/3', q: 'redis', tone: 'destructive' },
+      { id: 'reload-config', trig: 'file-watch.config', err: 'SyntaxError: bad JSON at :14', age: '9m', retry: '2/3', q: 'redis', tone: 'warning' },
+      { id: 'purge-batch', trig: 'kv.cache-invalidate', err: 'timeout after 30s', age: '21m', retry: '1/3', q: 'redis', tone: 'warning' },
+      { id: 'inventory-sync', trig: 'poll.inventory-sync', err: 'delta lock contended', age: '38m', retry: '1/3', q: 'memory', tone: 'muted' },
+      { id: 'DigestSaga', trig: 'sched.daily-digest', err: 'no recipients resolved', age: '1h', retry: '0/3', q: 'memory', tone: 'muted' },
+    ].map(d => ({
+      ...d,
+      retryAction: () => this.showToast('Would reprocess ' + d.id + ' from ' + d.q + ' DLQ', 'info'),
+      inspect: () => this.nav('/dlq/triggers?kind=trigger'),
+    }));
+
+    // --- fleet armed/disabled toggle rows (kept, compact) ---
+    const s9Trigs = fleet.map(t => ({
+      id: t.id, kind: t.kind, human: t.human, on: t.on, cat: t.cat,
+      toggle: () => {
+        const on = t.on;
+        this.askConfirm({
+          title: (on ? 'Disable' : 'Enable') + ' trigger',
+          desc: on ? 'Silences this trigger locally without redeploy — a TriggerEnabledStateOverride, hot-reloaded.' : 'Re-enables firing immediately.',
+          from: t.id + ' = ' + (on ? 'enabled' : 'disabled'), to: on ? 'disabled' : 'enabled',
+          cli: 'netscript triggers ' + (on ? 'disable' : 'enable') + ' ' + t.id,
+          feed: 'trigger ' + t.id + ' → ' + (on ? 'disabled' : 're-enabled'), feedTone: on ? 'warning' : 'success',
+          action: on ? 'Disable' : 'Enable',
+          apply: () => this.setState(st => ({ s9Enabled: { ...st.s9Enabled, [t.id]: !on } })),
+        });
+      },
+    }));
+    const s9Preview = s9Detail.isSched ? s9Detail.sched : [
       { probe: '2026-07-14 02:00', state: 'ok', result: 'in 11h 58m' },
       { probe: '2026-07-15 02:00', state: 'ok', result: 'in 1d 11h' },
       { probe: '2026-07-16 02:00', state: 'ok', result: 'in 2d 11h' },
-      { probe: '2026-07-17 02:00', state: 'ok', result: 'in 3d 11h' },
-      { probe: '2026-07-18 02:00', state: 'ok', result: 'in 4d 11h' },
     ];
     const sendWebhookTest = () => this.askConfirm({
       title: 'Send webhook test payload', desc: 'Runs the trigger ingress simulation with the payload shown above.',
@@ -5067,8 +5551,8 @@ class Component extends DCLogic {
       s1Sheet: s.detailSheet || { eyebrow: '', icon: '', tone: 'muted', value: '', title: '', pill: '', pillClass: 'ns-badge ns-badge--muted', desc: '', cta: 'Open', rows: [], go: () => {} },
       closeDetailSheet: () => this.setState({ detailSheet: null }),
       // sheet
-      sheetIsS2: s.sheet === 's2', sheetIsS13: s.sheet === 's13', sheetIsS7: s.sheet === 's7', sheetIsS8: s.sheet === 's8',
-      sheetTitle: s.sheet === 's2' ? selNode.name : s.sheet === 's7' ? s7Detail.name : s.sheet === 's8' ? (s8SelNode ? s8SelNode.name : s8.saga) : (selNode13 ? selNode13.name : ''),
+      sheetIsS2: s.sheet === 's2', sheetIsS13: s.sheet === 's13', sheetIsS7: s.sheet === 's7', sheetIsS8: s.sheet === 's8', sheetIsS9: s.sheet === 's9',
+      sheetTitle: s.sheet === 's2' ? selNode.name : s.sheet === 's7' ? s7Detail.name : s.sheet === 's8' ? (s8SelNode ? s8SelNode.name : s8.saga) : s.sheet === 's9' ? s9Detail.id : (selNode13 ? selNode13.name : ''),
       closeSheet: () => this.setState({ sheet: null }),
       // S1
       s1Stats, s1CmdGroups, s1Contribs, s1Teaser, s1Kpis, s1Hero, s1Ai,
@@ -5196,6 +5680,19 @@ class Component extends DCLogic {
       // S9
       s9Trigs, s9Preview,
       s9EventItems,
+      s9Cats, s9CatActive, s9CatIsAll: s.s9Cat === 'all',
+      s9StatTiles, s9DeadLetters,
+      s9Builder, s9Palette,
+      s9Days, s9NextFires, s9HasSched: s9NextFires.length > 0,
+      s9SortCols, s9Hist: s9HistShown, s9HistEmpty, s9HistCount,
+      s9Query: s.s9Query, s9Outcome: s.s9Outcome, s9Limit: s.s9Limit,
+      s9SetQuery: (e) => this.setState({ s9Query: e.target.value }),
+      s9ClearQuery: () => this.setState({ s9Query: '' }),
+      s9SetOutcome: (e) => this.setState({ s9Outcome: e.target.value }),
+      s9SetLimit: (e) => this.setState({ s9Limit: e.target.value }),
+      s9AddFilter: () => this.showToast('JS payload filters are a preview affordance in this build', 'info'),
+      s9Detail,
+      s9ClearCat: () => this.setState({ s9Cat: 'all' }),
       s9Follow: s.s9Follow, s9ToggleFollow: () => this.setState(st => ({ s9Follow: !st.s9Follow })),
       s9PendingCount: s.s9Pending.length, s9HasPending: s.s9Pending.length > 0,
       s9Catch: () => this.setState(st => ({ s9Events: [...st.s9Pending, ...st.s9Events].slice(0, 30), s9Pending: [], s9Follow: true })),
