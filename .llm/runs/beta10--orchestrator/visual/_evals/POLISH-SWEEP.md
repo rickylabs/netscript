@@ -36,3 +36,14 @@ DECLINED (gate was wrong): remove the failed-message checkboxes (breaks bulk tri
 queue-health fill-meters → semicircular gauges (kept horizontal ON PURPOSE so DLQ ≠ Migrations arc gauge);
 "How triage works" → tabbed docs (gold-plating). Note: gate under-credited existing micro-viz
 (by-queue split bar, exhausted pips, arrival sparkbar, cluster severity left-borders).
+
+## Catalog (gate 62 — ACCEPTED on verified quality; gate over-reached OFF-DOCTRINE)
+Only valid residual (sweep): tighten the "7 CONTRACTS REGISTERED" stat into a glued borderless metadata
+strip (REGISTERED / PROCEDURES / VERSIONS / COMPATIBILITY) under the title [ref 13]; nudge transport-reach bars.
+DECLINED — the gate prescribed changes that VIOLATE the design language / variety mandate:
+- green `#22c55e` primary buttons + green upsell banner [ref 07] → RAW HEX, off the copper/teal/amber palette
+- centered modal replacing the mobile bottom sheet → the whole system uses bottom sheets BY INTENT (owner ask)
+- convert the grouped registry rail → a generic Confluent-style table → kills the explorer idiom + echoes the consoles
+- add a side-by-side schema DIFF viewer → Config Resolution owns the diff pattern; Catalog steered away ON PURPOSE
+- "Add JS filter" code-drawer query language → gold-plating (search + kind/method/coverage chips already live-filter)
+Note: gate is now applying a fixed generic wishlist to strong screens; MUST filter against NS One + variety.

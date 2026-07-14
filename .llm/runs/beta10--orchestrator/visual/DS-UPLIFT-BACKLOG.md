@@ -743,3 +743,56 @@ Trigger DLQ single-message scope. Full 16-route regression clean. No edits to `s
 Real reprocess/purge execution (stays askConfirm→toast per satellite doctrine); in-place expandable
 cluster member lists (filter-the-table is the chosen affordance); a top-sources mini-list to fill the
 shorter right rail (candidate for a future pass); source avatars / SLA countdown timers (no such data).
+
+## Pass V10 — Catalog (Service & Contract Registry Explorer)
+
+Reframed the Catalog from a generic tree-nav + flat responsive table (a monitoring-console clone)
+into a bespoke **contract registry / explorer** — browse a grouped registry, drill into a contract's
+signature + schema + producer/consumer graph. Mined ref **13-devconsole-c** (schema registry
+breadcrumb + stat strip + line-numbered code + COMPATIBILITY), **11-devconsole-a** (registry →
+right detail drawer → mobile sheet), **07-chat-signin** (browse/detail rhythm + KV), with **03** and
+**19** as cross-pollination wildcards (channel-bar/ratio meters + grouped count rows).
+
+### New components (all `--ns-*` tokens, `ns-*` classes, warm-cream + dark, hard press shadow, DM Sans/Mono)
+- **`ns-cathead`** — header composite (NOT number cards): a glyph+value cell (`7 contracts`) +
+  **`ns-catchan`** kind-distribution channel-bar (click-to-filter, flex-bucket widths) +
+  **`ns-catratio`** describe()-coverage ratio meter (hatched thin backdrop, success fill, single-node
+  `71%`) + **`ns-catreach`** transport-reach tri-meter (REST/RPC/SDK reach bars).
+- **`ns-catbar`** — registry filter toolbar: search input + `ns-catchip` kind/method/coverage chips +
+  Reset. Drives live filtering (empty kind-groups hidden; no-results empty state).
+- **`ns-catreg`** — registry rail: **`ns-catreg__group`** (kind header + count + coverage micro-bar) →
+  **`ns-catreg__item`** compact selectable contract card (method chip + mono proc + `sigPreview`
+  input→output + **`ns-catdup`** duality tri-pip + coverage dot; method-tinted left border; selected =
+  press-shadow). Slim dashed **`ns-catreg__gated`** for the not-installed crons namespace.
+- **`ns-catdetail`** — contract detail: header (kind glyph + proc + provenance + **`ns-catver`**
+  version tag + compat chip) → method-strip (method/coverage badges + **`ns-catdup--lg`** labelled
+  duality with off-transports struck through) → **`ns-catsig`** line-numbered **type-colored** mono
+  signature → **`ns-catschema`** secondary line-numbered schema block (alternating row tint, scrolls)
+  → **`ns-catrel`** producer→consumer relationship strip (two columns + connector spine + kind hub).
+- **Type-color token set:** `.ns-catsig__tok[data-kind=kw|t|k|p|c]` (keyword=primary, type=copper,
+  field=teal, punctuation=muted, comment=amber-italic; dark-mode brightened copper/teal).
+- **Kind-tone / method-tone / transport-key** `data-*` → CSS custom-prop resolvers
+  (`[data-kind='sagas']{--catk:…}` etc.) so one card/hub/pip reads its accent from a data attribute.
+- **`sheetIsS4`** — mobile contract bottom-sheet reusing the shared `ns-sheet-dialog` (right drawer
+  desktop auto-hidden ≤720px → bottom sheet): hero + method-strip + signature + schema + relationships.
+- Geometry via shared **`--w0..--w20`** width-bucket classes (5% steps) for ratio/reach/coverage
+  fills — NO SVG `{{ }}` holes.
+
+### Data model (visual metadata only, fully derived)
+`s4Raw` extends the 7 existing contracts with `ver`/`compat`/`input`/`output`/`sig`(tokenized)/
+`schema`(tokenized)/`producers`/`consumers`. Derived: `s4Head` (total/kind-dist/coverage/reach),
+`s4Groups` (kind-grouped rows + per-group coverage%), `s4Detail` (selected), `s4KindChips`/
+`s4MethodChips`/`s4CovChips`, `s4Filtered`/`s4HasResults`/`s4NoResults`. New state
+`s4Sel`/`s4Kind`/`s4Method`/`s4Cov`/`s4Q`. `s4Tree`/`s4Summary` retained (now derived). No route/logic/
+copy-meaning change.
+
+### Verification
+0 `{{ }}` / 0 real console errors / 0 h-overflow across desktop 1440 + mobile 390 (both themes) plus
+contract-selected (complete + thin), coverage-filter narrowing, Routes tab, and mobile bottom-sheet
+(light+dark). Full 16-route regression clean. No edits to `support.js`, `_ns_styles.css`, `_ds/*`, or
+other screens' markup.
+
+### Declined (per satellite doctrine / no data-invention)
+Producer/consumer nodes stay non-interactive labels (no canonical target ids in the data); no v→v
+schema diff viewer (brief: schema is "secondary, not a giant diff" → single line-numbered block); the
+Routes secondary tab keeps the generic dense table (Contracts explorer carries the bespoke weight).

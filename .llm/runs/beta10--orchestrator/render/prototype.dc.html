@@ -788,16 +788,13 @@
 
       <!-- @S3-END -->
       <sc-if value="{{ isCatalog }}" hint-placeholder-val="{{ false }}">
-        <div class="ns-screen" data-screen-label="S4 Catalog">
+        <div class="ns-screen ns-catalog" data-screen-label="S4 Catalog">
           <header class="ns-page-header ns-page-header--console">
             <div class="ns-toolbar">
               <div style="display:grid;gap:var(--ns-space-2)">
+                <div class="ns-catcrumb" aria-hidden="true"><span class="ns-catcrumb__root">Contract registry</span><span class="ns-catcrumb__sep">›</span><span class="ns-catcrumb__leaf">{{ s4Detail.proc }}</span></div>
                 <h1>Service &amp; contract catalog</h1>
                 <p class="ns-lede">Provenance and coverage above the OpenAPI boundary — what Scalar cannot see. Reference and try-it stay in Scalar.</p>
-                <div style="display:flex;gap:var(--ns-space-2);flex-wrap:wrap">
-                  <span class="ns-badge ns-badge--warning">{{ s4Summary.thin }}</span>
-                  <span class="ns-badge ns-badge--warning">{{ s4Summary.unbound }}</span>
-                </div>
               </div>
               <div class="ns-seg" role="tablist" aria-label="Catalog view">
                 <button class="ns-seg__btn" role="tab" data-state="{{ s4TabContracts.state }}" onClick="{{ s4TabContracts.set }}">Contracts</button>
@@ -805,83 +802,211 @@
               </div>
             </div>
           </header>
-          <div class="ns-rail-grid ns-rail-grid--sm">
-            <aside style="min-width:0">
-              <div class="ns-mini-label" style="margin-bottom:var(--ns-space-2)">plugin › namespace</div>
-              <div class="ns-tree-nav">
-                <sc-for list="{{ s4Tree }}" as="g" hint-placeholder-count="4">
-                  <details class="ns-tree-nav__group" open="{{ true }}">
-                    <summary>{{ g.label }}<span class="ns-tree-nav__count">{{ g.count }}</span></summary>
-                  </details>
-                </sc-for>
-                <details class="ns-tree-nav__group" data-state="gated">
-                  <summary>crons › schedule<span class="ns-tree-nav__count">not installed</span></summary>
-                  <div class="ns-plugin-gated-view" data-state="not-installed" style="margin-top:var(--ns-space-2);padding:var(--ns-space-4)">
-                    <span class="ns-plugin-gated-view__desc" style="font-size:var(--ns-text-xs)">The crons plugin contributes a schedule namespace once installed.</span>
-                    <div class="ns-code ns-plugin-gated-view__cmd"><pre><code>netscript plugin install crons</code></pre></div>
-                  </div>
-                </details>
+
+          <sc-if value="{{ s4IsContracts }}" hint-placeholder-val="{{ true }}">
+            <!-- header composite: registry micro-viz, not number cards -->
+            <div class="ns-cathead">
+              <div class="ns-cathead__cell ns-cathead__cell--total">
+                <span class="ns-cathead__glyph" aria-hidden="true">▤</span>
+                <div class="ns-cathead__main">
+                  <span class="ns-cathead__value">{{ s4Head.total }}</span>
+                  <span class="ns-cathead__label">contracts registered</span>
+                </div>
+                <span class="ns-cathead__sub">{{ s4Head.versions }}</span>
               </div>
-            </aside>
-            <section style="min-width:0">
-              <sc-if value="{{ s4IsContracts }}" hint-placeholder-val="{{ true }}">
-                <div class="ns-responsive-table">
-                  <div class="ns-responsive-table__scroller">
-                    <table class="ns-responsive-table__table">
-                      <thead class="ns-responsive-table__head">
-                        <tr class="ns-responsive-table__row">
-                          <th class="ns-responsive-table__header">Procedure</th>
-                          <th class="ns-responsive-table__header">Provenance</th>
-                          <th class="ns-responsive-table__header">Method</th>
-                          <th class="ns-responsive-table__header">Coverage</th>
-                          <th class="ns-responsive-table__header">Duality</th>
-                          <th class="ns-responsive-table__header"></th>
-                        </tr>
-                      </thead>
-                      <tbody class="ns-responsive-table__body">
-                        <sc-for list="{{ s4Contracts }}" as="c" hint-placeholder-count="7">
-                          <tr class="ns-responsive-table__row">
-                            <td class="ns-responsive-table__cell"><span style="font-family:var(--ns-font-mono);font-size:var(--ns-text-xs)">{{ c.proc }}</span></td>
-                            <td class="ns-responsive-table__cell"><span class="ns-badge ns-badge--secondary">{{ c.plugin }} › {{ c.ns }}</span></td>
-                            <td class="ns-responsive-table__cell"><span class="{{ c.mBadge }}">{{ c.method }}</span></td>
-                            <td class="ns-responsive-table__cell"><span class="{{ c.covBadge }}">{{ c.covLabel }}</span></td>
-                            <td class="ns-responsive-table__cell"><span style="display:inline-flex;gap:var(--ns-space-1)"><sc-for list="{{ c.dualChips }}" as="d" hint-placeholder-count="3"><span class="ns-chip" data-on="1">{{ d.label }}</span></sc-for></span></td>
-                            <td class="ns-responsive-table__cell" style="text-align:right"><button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ c.scalar }}">Open in Scalar ↗</button></td>
-                          </tr>
-                        </sc-for>
-                      </tbody>
-                    </table>
+              <div class="ns-cathead__cell">
+                <span class="ns-cathead__label">by kind</span>
+                <div class="ns-catchan" role="img" aria-label="Contracts by kind">
+                  <sc-for list="{{ s4Head.kinds }}" as="k" hint-placeholder-count="4">
+                    <button class="ns-catchan__seg {{ k.wClass }}" data-kind="{{ k.key }}" data-active="{{ k.active }}" onClick="{{ k.go }}" title="{{ k.label }}: {{ k.n }}"><span class="ns-catchan__seg-n">{{ k.n }}</span></button>
+                  </sc-for>
+                </div>
+                <div class="ns-catchan__legend">
+                  <sc-for list="{{ s4Head.kinds }}" as="k" hint-placeholder-count="4">
+                    <span class="ns-catchan__key" data-kind="{{ k.key }}"><span class="ns-catchan__key-dot" aria-hidden="true">{{ k.glyph }}</span>{{ k.label }}</span>
+                  </sc-for>
+                </div>
+              </div>
+              <div class="ns-cathead__cell">
+                <span class="ns-cathead__label">describe() coverage</span>
+                <div class="ns-catratio" role="img" aria-label="Coverage ratio">
+                  <div class="ns-catratio__fill {{ s4Head.covWClass }}"></div>
+                  <span class="ns-catratio__pct">{{ s4Head.covPctLabel }}</span>
+                </div>
+                <div class="ns-catratio__legend">
+                  <span class="ns-catratio__key" data-tone="ok">{{ s4Head.completeN }} complete</span>
+                  <span class="ns-catratio__key" data-tone="thin">{{ s4Head.thinN }} thin</span>
+                </div>
+              </div>
+              <div class="ns-cathead__cell">
+                <span class="ns-cathead__label">transport reach</span>
+                <div class="ns-catreach">
+                  <sc-for list="{{ s4Head.reach }}" as="r" hint-placeholder-count="3">
+                    <div class="ns-catreach__row">
+                      <span class="ns-catreach__name" data-key="{{ r.key }}">{{ r.label }}</span>
+                      <span class="ns-catreach__track"><span class="ns-catreach__fill {{ r.wClass }}" data-key="{{ r.key }}"></span></span>
+                      <span class="ns-catreach__n">{{ r.n }}/{{ r.total }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+
+            <!-- filter toolbar (ref 11) -->
+            <div class="ns-catbar">
+              <div class="ns-catbar__search">
+                <span class="ns-catbar__search-ico" aria-hidden="true">⌕</span>
+                <input class="ns-catbar__input" type="search" placeholder="Search procedures, types…" value="{{ s4Q }}" onInput="{{ s4SetQ }}" aria-label="Search contracts">
+              </div>
+              <div class="ns-catbar__chips" role="group" aria-label="Kind filter">
+                <sc-for list="{{ s4KindChips }}" as="c" hint-placeholder-count="5"><button class="ns-catchip" data-state="{{ c.state }}" onClick="{{ c.set }}">{{ c.label }}</button></sc-for>
+              </div>
+              <div class="ns-catbar__chips" role="group" aria-label="Method filter">
+                <sc-for list="{{ s4MethodChips }}" as="c" hint-placeholder-count="5"><button class="ns-catchip ns-catchip--method" data-state="{{ c.state }}" onClick="{{ c.set }}">{{ c.label }}</button></sc-for>
+              </div>
+              <div class="ns-catbar__chips" role="group" aria-label="Coverage filter">
+                <sc-for list="{{ s4CovChips }}" as="c" hint-placeholder-count="3"><button class="ns-catchip" data-state="{{ c.state }}" onClick="{{ c.set }}">{{ c.label }}</button></sc-for>
+              </div>
+              <button class="ns-catbar__reset" onClick="{{ s4ResetFilters }}">Reset</button>
+            </div>
+
+            <div class="ns-catgrid">
+              <!-- registry rail: grouped, selectable contract cards -->
+              <aside class="ns-catreg" aria-label="Contract registry">
+                <sc-for list="{{ s4Groups }}" as="g" hint-placeholder-count="4">
+                  <div class="ns-catreg__group" data-kind="{{ g.key }}">
+                    <div class="ns-catreg__group-head">
+                      <span class="ns-catreg__group-glyph" data-kind="{{ g.key }}" aria-hidden="true">{{ g.glyph }}</span>
+                      <span class="ns-catreg__group-label">{{ g.label }}</span>
+                      <span class="ns-catreg__group-count">{{ g.count }}</span>
+                      <span class="ns-catreg__covbar" title="{{ g.complete }} complete · {{ g.thin }} thin"><span class="ns-catreg__covbar-fill {{ g.covClass }}"></span></span>
+                    </div>
+                    <sc-for list="{{ g.rows }}" as="c" hint-placeholder-count="2">
+                      <button class="ns-catreg__item" data-state="{{ c.selState }}" data-method="{{ c.mTone }}" onClick="{{ c.select }}">
+                        <span class="ns-catreg__method" data-method="{{ c.mTone }}">{{ c.method }}</span>
+                        <span class="ns-catreg__body">
+                          <span class="ns-catreg__proc">{{ c.proc }}</span>
+                          <span class="ns-catreg__sigpre">{{ c.sigPreview }}</span>
+                        </span>
+                        <span class="ns-catreg__meta">
+                          <span class="ns-catdup" aria-label="Transport duality">
+                            <sc-for list="{{ c.dualPips }}" as="d" hint-placeholder-count="3"><span class="ns-catdup__pip" data-on="{{ d.on }}" data-key="{{ d.key }}" title="{{ d.label }}"></span></sc-for>
+                          </span>
+                          <span class="ns-catreg__cov" data-cov="{{ c.cov }}" aria-hidden="true"></span>
+                        </span>
+                      </button>
+                    </sc-for>
+                  </div>
+                </sc-for>
+                <div class="ns-catreg__group" data-state="gated">
+                  <div class="ns-catreg__group-head">
+                    <span class="ns-catreg__group-glyph" data-kind="gated" aria-hidden="true">◌</span>
+                    <span class="ns-catreg__group-label">crons › schedule</span>
+                    <span class="ns-catreg__group-count" data-state="gated">not installed</span>
+                  </div>
+                  <div class="ns-catreg__gated">
+                    <span class="ns-catreg__gated-desc">Installs a schedule namespace of contracts.</span>
+                    <code class="ns-catreg__gated-cmd">netscript plugin install crons</code>
                   </div>
                 </div>
-              </sc-if>
-              <sc-if value="{{ s4IsRoutes }}" hint-placeholder-val="{{ false }}">
-                <div class="ns-responsive-table">
-                  <div class="ns-responsive-table__scroller">
-                    <table class="ns-responsive-table__table" style="min-width:36rem">
-                      <thead class="ns-responsive-table__head">
-                        <tr class="ns-responsive-table__row">
-                          <th class="ns-responsive-table__header">Page route</th>
-                          <th class="ns-responsive-table__header">Binding</th>
-                          <th class="ns-responsive-table__header">Authoring form</th>
-                          <th class="ns-responsive-table__header">Module / hint</th>
-                        </tr>
-                      </thead>
-                      <tbody class="ns-responsive-table__body">
-                        <sc-for list="{{ s4Routes }}" as="r" hint-placeholder-count="4">
-                          <tr class="ns-responsive-table__row">
-                            <td class="ns-responsive-table__cell"><span style="font-family:var(--ns-font-mono);font-size:var(--ns-text-xs)">{{ r.route }}</span></td>
-                            <td class="ns-responsive-table__cell"><span class="{{ r.sBadge }}">{{ r.status }}</span></td>
-                            <td class="ns-responsive-table__cell"><span style="font-family:var(--ns-font-mono);font-size:var(--ns-text-2xs);color:var(--ns-muted-fg)">{{ r.form }}</span></td>
-                            <td class="ns-responsive-table__cell"><span style="font-family:var(--ns-font-mono);font-size:var(--ns-text-2xs);color:var(--ns-muted-fg)">{{ r.target }}</span></td>
-                          </tr>
-                        </sc-for>
-                      </tbody>
-                    </table>
+                <sc-if value="{{ s4NoResults }}" hint-placeholder-val="{{ false }}">
+                  <div class="ns-catreg__empty">
+                    <span class="ns-catreg__empty-glyph" aria-hidden="true">⌕</span>
+                    <span class="ns-catreg__empty-title">No contracts match</span>
+                    <button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ s4ResetFilters }}">Clear filters</button>
+                  </div>
+                </sc-if>
+              </aside>
+
+              <!-- contract detail: signature + schema + producers→consumers -->
+              <section class="ns-catdetail" style="min-width:0">
+                <div class="ns-catdetail__head">
+                  <span class="ns-catdetail__kind" data-kind="{{ s4Detail.plugin }}" aria-hidden="true">{{ s4Detail.kindGlyph }}</span>
+                  <div class="ns-catdetail__title">
+                    <span class="ns-catdetail__proc">{{ s4Detail.proc }}</span>
+                    <span class="ns-catdetail__prov">{{ s4Detail.plugin }} › {{ s4Detail.ns }}</span>
+                  </div>
+                  <span class="ns-panel__flex" style="flex:1"></span>
+                  <span class="ns-catver">
+                    <span class="ns-catver__tag">{{ s4Detail.ver }}</span>
+                    <span class="ns-catver__compat" data-tone="{{ s4Detail.compatTone }}">compat · {{ s4Detail.compatLabel }}</span>
+                  </span>
+                </div>
+                <div class="ns-catdetail__method-strip">
+                  <span class="{{ s4Detail.mBadge }}">{{ s4Detail.method }}</span>
+                  <span class="{{ s4Detail.covBadge }}">{{ s4Detail.covLabel }}</span>
+                  <span class="ns-catdup ns-catdup--lg" aria-label="Transport duality">
+                    <sc-for list="{{ s4Detail.dualPips }}" as="d" hint-placeholder-count="3"><span class="ns-catdup__pip" data-on="{{ d.on }}" data-key="{{ d.key }}" title="{{ d.label }}"><span class="ns-catdup__pip-lbl">{{ d.label }}</span></span></sc-for>
+                  </span>
+                </div>
+
+                <div class="ns-catsig" aria-label="Type signature">
+                  <div class="ns-catsig__gutter" aria-hidden="true">1</div>
+                  <code class="ns-catsig__code"><sc-for list="{{ s4Detail.sigCells }}" as="t" hint-placeholder-count="8"><span class="ns-catsig__tok" data-kind="{{ t.k }}">{{ t.t }}</span></sc-for></code>
+                </div>
+
+                <div class="ns-catschema">
+                  <div class="ns-catschema__head"><span class="ns-drawer__section-label">schema</span><span class="ns-catschema__hint">{{ s4Detail.input }} · {{ s4Detail.output }}</span></div>
+                  <div class="ns-catschema__code">
+                    <sc-for list="{{ s4Detail.schemaLines }}" as="l" hint-placeholder-count="8">
+                      <div class="ns-catschema__line">
+                        <span class="ns-catschema__gutter" aria-hidden="true">{{ l.n }}</span>
+                        <code class="ns-catschema__src"><span class="ns-catsig__tok" data-kind="{{ l.kind }}">{{ l.name }}</span><span class="ns-catschema__rest">{{ l.rest }}</span></code>
+                      </div>
+                    </sc-for>
                   </div>
                 </div>
-              </sc-if>
-            </section>
-          </div>
+
+                <div class="ns-catrel" aria-label="Producers and consumers">
+                  <div class="ns-catrel__col ns-catrel__col--prod">
+                    <span class="ns-catrel__col-label">producers <span class="ns-catrel__col-n">{{ s4Detail.prodCount }}</span></span>
+                    <sc-for list="{{ s4Detail.producerNodes }}" as="p" hint-placeholder-count="2"><span class="ns-catrel__node" data-role="prod">{{ p.label }}</span></sc-for>
+                  </div>
+                  <div class="ns-catrel__spine" aria-hidden="true">
+                    <span class="ns-catrel__hub" data-kind="{{ s4Detail.plugin }}">{{ s4Detail.kindGlyph }}</span>
+                  </div>
+                  <div class="ns-catrel__col ns-catrel__col--cons">
+                    <span class="ns-catrel__col-label"><span class="ns-catrel__col-n">{{ s4Detail.consCount }}</span> consumers</span>
+                    <sc-for list="{{ s4Detail.consumerNodes }}" as="p" hint-placeholder-count="2"><span class="ns-catrel__node" data-role="cons">{{ p.label }}</span></sc-for>
+                  </div>
+                </div>
+
+                <div class="ns-catdetail__actions">
+                  <button class="ns-btn ns-btn--secondary ns-btn--sm" onClick="{{ s4Detail.scalar }}">Open in Scalar ↗</button>
+                </div>
+              </section>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ s4IsRoutes }}" hint-placeholder-val="{{ false }}">
+            <div class="ns-catroutes">
+              <div class="ns-catbar__summary"><span class="ns-badge ns-badge--warning">{{ s4Summary.unbound }}</span><span class="ns-catbar__summary-note">Fresh page routes that carry (or lack) a request contract.</span></div>
+              <div class="ns-responsive-table">
+                <div class="ns-responsive-table__scroller">
+                  <table class="ns-responsive-table__table" style="min-width:36rem">
+                    <thead class="ns-responsive-table__head">
+                      <tr class="ns-responsive-table__row">
+                        <th class="ns-responsive-table__header">Page route</th>
+                        <th class="ns-responsive-table__header">Binding</th>
+                        <th class="ns-responsive-table__header">Authoring form</th>
+                        <th class="ns-responsive-table__header">Module / hint</th>
+                      </tr>
+                    </thead>
+                    <tbody class="ns-responsive-table__body">
+                      <sc-for list="{{ s4Routes }}" as="r" hint-placeholder-count="4">
+                        <tr class="ns-responsive-table__row">
+                          <td class="ns-responsive-table__cell"><span style="font-family:var(--ns-font-mono);font-size:var(--ns-text-xs)">{{ r.route }}</span></td>
+                          <td class="ns-responsive-table__cell"><span class="{{ r.sBadge }}">{{ r.status }}</span></td>
+                          <td class="ns-responsive-table__cell"><span style="font-family:var(--ns-font-mono);font-size:var(--ns-text-2xs);color:var(--ns-muted-fg)">{{ r.form }}</span></td>
+                          <td class="ns-responsive-table__cell"><span style="font-family:var(--ns-font-mono);font-size:var(--ns-text-2xs);color:var(--ns-muted-fg)">{{ r.target }}</span></td>
+                        </tr>
+                      </sc-for>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </sc-if>
         </div>
       </sc-if>
 
@@ -3650,6 +3775,55 @@
       </div>
     </div>
   </sc-if>
+  <sc-if value="{{ sheetIsS4 }}" hint-placeholder-val="{{ false }}">
+    <div class="ns-sheet-body">
+      <div class="ns-catsheet__hero">
+        <span class="ns-catdetail__kind" data-kind="{{ s4Detail.plugin }}" aria-hidden="true">{{ s4Detail.kindGlyph }}</span>
+        <div class="ns-catsheet__hero-main">
+          <span class="ns-catdetail__prov">{{ s4Detail.plugin }} › {{ s4Detail.ns }}</span>
+          <span class="ns-catver__tag">{{ s4Detail.ver }}</span>
+        </div>
+        <span class="ns-panel__flex" style="flex:1"></span>
+        <span class="ns-catver__compat" data-tone="{{ s4Detail.compatTone }}">compat · {{ s4Detail.compatLabel }}</span>
+      </div>
+      <div class="ns-catdetail__method-strip">
+        <span class="{{ s4Detail.mBadge }}">{{ s4Detail.method }}</span>
+        <span class="{{ s4Detail.covBadge }}">{{ s4Detail.covLabel }}</span>
+        <span class="ns-catdup ns-catdup--lg" aria-label="Transport duality">
+          <sc-for list="{{ s4Detail.dualPips }}" as="d" hint-placeholder-count="3"><span class="ns-catdup__pip" data-on="{{ d.on }}" data-key="{{ d.key }}"><span class="ns-catdup__pip-lbl">{{ d.label }}</span></span></sc-for>
+        </span>
+      </div>
+      <div class="ns-catsig" aria-label="Type signature">
+        <div class="ns-catsig__gutter" aria-hidden="true">1</div>
+        <code class="ns-catsig__code"><sc-for list="{{ s4Detail.sigCells }}" as="t" hint-placeholder-count="8"><span class="ns-catsig__tok" data-kind="{{ t.k }}">{{ t.t }}</span></sc-for></code>
+      </div>
+      <div class="ns-catschema">
+        <div class="ns-catschema__head"><span class="ns-drawer__section-label">schema</span><span class="ns-catschema__hint">{{ s4Detail.input }} · {{ s4Detail.output }}</span></div>
+        <div class="ns-catschema__code">
+          <sc-for list="{{ s4Detail.schemaLines }}" as="l" hint-placeholder-count="8">
+            <div class="ns-catschema__line">
+              <span class="ns-catschema__gutter" aria-hidden="true">{{ l.n }}</span>
+              <code class="ns-catschema__src"><span class="ns-catsig__tok" data-kind="{{ l.kind }}">{{ l.name }}</span><span class="ns-catschema__rest">{{ l.rest }}</span></code>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div class="ns-catrel" aria-label="Producers and consumers">
+        <div class="ns-catrel__col ns-catrel__col--prod">
+          <span class="ns-catrel__col-label">producers <span class="ns-catrel__col-n">{{ s4Detail.prodCount }}</span></span>
+          <sc-for list="{{ s4Detail.producerNodes }}" as="p" hint-placeholder-count="2"><span class="ns-catrel__node" data-role="prod">{{ p.label }}</span></sc-for>
+        </div>
+        <div class="ns-catrel__spine" aria-hidden="true"><span class="ns-catrel__hub" data-kind="{{ s4Detail.plugin }}">{{ s4Detail.kindGlyph }}</span></div>
+        <div class="ns-catrel__col ns-catrel__col--cons">
+          <span class="ns-catrel__col-label"><span class="ns-catrel__col-n">{{ s4Detail.consCount }}</span> consumers</span>
+          <sc-for list="{{ s4Detail.consumerNodes }}" as="p" hint-placeholder-count="2"><span class="ns-catrel__node" data-role="cons">{{ p.label }}</span></sc-for>
+        </div>
+      </div>
+      <div style="display:grid;gap:var(--ns-space-2)">
+        <button class="ns-btn ns-btn--secondary" onClick="{{ s4Detail.scalar }}">Open in Scalar ↗</button>
+      </div>
+    </div>
+  </sc-if>
 </dialog>
 
 <dialog id="ns-detailsheet-dialog" data-part="content" data-side="bottom" class="ns-detailsheet">
@@ -3733,8 +3907,8 @@ class Component extends DCLogic {
       jobs3: [ { id: 'nightly-reconcile', disabled: true }, { id: 'cache-warm', disabled: true } ],
       trigs3: [ { id: 'noisy-filewatch', disabled: true } ],
       tasks3: [ { id: 'send-receipt', note: 'timeout 30s → 90s' }, { id: 'sync-ledger', note: 'retries 3 → 6' }, { id: 'export-csv', note: 'concurrency 4 → 1' } ],
-      // S4
-      s4Tab: 'contracts',
+      // S4 — Catalog: contract registry explorer (browse → drill)
+      s4Tab: 'contracts', s4Sel: 'order.fulfillment.start', s4Kind: 'all', s4Method: 'all', s4Cov: 'all', s4Q: '',
       // S5
       s5Sel: 'triggers', s5ShowCli: false,
       // S6
@@ -5274,30 +5448,135 @@ class Component extends DCLogic {
     } });
 
     // ----- S4 -----
-    const s4Contracts = [
-      { proc: 'order.fulfillment.start', plugin: 'sagas', ns: 'instances', method: 'POST', mBadge: 'ns-badge ns-badge--primary', cov: 'complete', dual: ['REST', 'RPC', 'SDK'] },
-      { proc: 'jobs.trigger', plugin: 'workers', ns: 'jobs', method: 'POST', mBadge: 'ns-badge ns-badge--primary', cov: 'complete', dual: ['REST', 'RPC', 'SDK'] },
-      { proc: 'jobs.executions.list', plugin: 'workers', ns: 'jobs', method: 'GET', mBadge: 'ns-badge ns-badge--muted', cov: 'thin', dual: ['RPC', 'SDK'] },
-      { proc: 'triggers.preview', plugin: 'triggers', ns: 'events', method: 'GET', mBadge: 'ns-badge ns-badge--muted', cov: 'complete', dual: ['REST', 'RPC', 'SDK'] },
-      { proc: 'triggers.enable', plugin: 'triggers', ns: 'events', method: 'PATCH', mBadge: 'ns-badge ns-badge--warning', cov: 'thin', dual: ['REST', 'RPC'] },
-      { proc: 'streams.delivery.get', plugin: 'streams', ns: 'delivery', method: 'GET', mBadge: 'ns-badge ns-badge--muted', cov: 'complete', dual: ['REST'] },
-      { proc: 'instances.cancel', plugin: 'sagas', ns: 'instances', method: 'DELETE', mBadge: 'ns-badge ns-badge--destructive', cov: 'complete', dual: ['REST', 'RPC'] },
-    ].map(c => ({
-      ...c, covBadge: badge(c.cov === 'complete' ? 'ok' : 'thin'),
+    // Contract registry — each row carries visual metadata (signature, schema, producers/consumers,
+    // version, compatibility) fully derived for the explorer. No routes/logic/copy meaning changed.
+    const S4_METHOD_TONE = { GET: 'get', POST: 'post', PATCH: 'patch', DELETE: 'delete' };
+    const S4_KIND_TONE = { sagas: 'copper', workers: 'teal', triggers: 'amber', streams: 'primary' };
+    const S4_KIND_GLYPH = { sagas: '⛓', workers: '⚙', triggers: '⚡', streams: '≈' };
+    const s4Raw = [
+      { proc: 'order.fulfillment.start', plugin: 'sagas', ns: 'instances', method: 'POST', cov: 'complete', dual: ['REST', 'RPC', 'SDK'],
+        ver: 'v4', compat: 'backward', input: 'StartFulfillmentInput', output: 'SagaInstanceRef',
+        sig: [['start', 'kw'], ['(input: ', 'p'], ['StartFulfillmentInput', 't'], [') → ', 'p'], ['Promise', 't'], ['<', 'p'], ['SagaInstanceRef', 't'], ['>', 'p']],
+        schema: [['StartFulfillmentInput', 't', '{'], ['  orderId', 'k', ': string'], ['  lines', 'k', ': LineItem[]'], ['  idempotencyKey', 'k', ': string'], ['', 'p', '}'], ['SagaInstanceRef', 't', '{'], ['  correlationId', 'k', ': string'], ['  status', 'k', ': SagaStatus'], ['', 'p', '}']],
+        producers: ['/checkout', 'orders SDK'], consumers: ['saga-order', 'ledger.export'] },
+      { proc: 'jobs.trigger', plugin: 'workers', ns: 'jobs', method: 'POST', cov: 'complete', dual: ['REST', 'RPC', 'SDK'],
+        ver: 'v3', compat: 'backward', input: 'TriggerJobInput', output: 'JobRef',
+        sig: [['trigger', 'kw'], ['(input: ', 'p'], ['TriggerJobInput', 't'], [') → ', 'p'], ['Promise', 't'], ['<', 'p'], ['JobRef', 't'], ['>', 'p']],
+        schema: [['TriggerJobInput', 't', '{'], ['  job', 'k', ': string'], ['  payload', 'k', ': Json'], ['  runAt', 'k', '?: string'], ['', 'p', '}'], ['JobRef', 't', '{'], ['  id', 'k', ': string'], ['  queuedAt', 'k', ': string'], ['', 'p', '}']],
+        producers: ['scheduler', 'jobs SDK', '/admin/reconcile'], consumers: ['worker-reserve'] },
+      { proc: 'jobs.executions.list', plugin: 'workers', ns: 'jobs', method: 'GET', cov: 'thin', dual: ['RPC', 'SDK'],
+        ver: 'v2', compat: 'none', input: 'ListExecutionsQuery', output: 'Execution[]',
+        sig: [['list', 'kw'], ['(query: ', 'p'], ['ListExecutionsQuery', 't'], [') → ', 'p'], ['Promise', 't'], ['<', 'p'], ['Execution[]', 't'], ['>', 'p']],
+        schema: [['// thin — missing .describe()', 'c', ''], ['ListExecutionsQuery', 't', '{'], ['  job', 'k', '?: string'], ['  limit', 'k', '?: number'], ['', 'p', '}'], ['Execution', 't', '{ … }']],
+        producers: ['jobs SDK'], consumers: ['Run Inspector'] },
+      { proc: 'triggers.preview', plugin: 'triggers', ns: 'events', method: 'GET', cov: 'complete', dual: ['REST', 'RPC', 'SDK'],
+        ver: 'v3', compat: 'full', input: 'PreviewTriggerQuery', output: 'TriggerPreview',
+        sig: [['preview', 'kw'], ['(query: ', 'p'], ['PreviewTriggerQuery', 't'], [') → ', 'p'], ['Promise', 't'], ['<', 'p'], ['TriggerPreview', 't'], ['>', 'p']],
+        schema: [['PreviewTriggerQuery', 't', '{'], ['  trigger', 'k', ': string'], ['  sample', 'k', '?: Json'], ['', 'p', '}'], ['TriggerPreview', 't', '{'], ['  matched', 'k', ': boolean'], ['  bindings', 'k', ': Binding[]'], ['', 'p', '}']],
+        producers: ['/triggers builder'], consumers: ['trig-webhook'] },
+      { proc: 'triggers.enable', plugin: 'triggers', ns: 'events', method: 'PATCH', cov: 'thin', dual: ['REST', 'RPC'],
+        ver: 'v3', compat: 'backward', input: 'EnableTriggerInput', output: 'TriggerState',
+        sig: [['enable', 'kw'], ['(input: ', 'p'], ['EnableTriggerInput', 't'], [') → ', 'p'], ['Promise', 't'], ['<', 'p'], ['TriggerState', 't'], ['>', 'p']],
+        schema: [['// thin — missing .describe()', 'c', ''], ['EnableTriggerInput', 't', '{'], ['  trigger', 'k', ': string'], ['  enabled', 'k', ': boolean'], ['', 'p', '}'], ['TriggerState', 't', '{ … }']],
+        producers: ['/admin', 'triggers SDK'], consumers: ['trig-webhook'] },
+      { proc: 'streams.delivery.get', plugin: 'streams', ns: 'delivery', method: 'GET', cov: 'complete', dual: ['REST'],
+        ver: 'v2', compat: 'full', input: 'DeliveryQuery', output: 'DeliveryReceipt',
+        sig: [['get', 'kw'], ['(query: ', 'p'], ['DeliveryQuery', 't'], [') → ', 'p'], ['Promise', 't'], ['<', 'p'], ['DeliveryReceipt', 't'], ['>', 'p']],
+        schema: [['DeliveryQuery', 't', '{'], ['  stream', 'k', ': string'], ['  messageId', 'k', ': string'], ['', 'p', '}'], ['DeliveryReceipt', 't', '{'], ['  status', 'k', ': DeliveryStatus'], ['  attempts', 'k', ': number'], ['', 'p', '}']],
+        producers: ['stream-pay'], consumers: ['DLQ triage'] },
+      { proc: 'instances.cancel', plugin: 'sagas', ns: 'instances', method: 'DELETE', cov: 'complete', dual: ['REST', 'RPC'],
+        ver: 'v4', compat: 'backward', input: 'CancelInstanceInput', output: 'SagaInstanceRef',
+        sig: [['cancel', 'kw'], ['(input: ', 'p'], ['CancelInstanceInput', 't'], [') → ', 'p'], ['Promise', 't'], ['<', 'p'], ['SagaInstanceRef', 't'], ['>', 'p']],
+        schema: [['CancelInstanceInput', 't', '{'], ['  correlationId', 'k', ': string'], ['  reason', 'k', '?: string'], ['', 'p', '}'], ['SagaInstanceRef', 't', '{ … }']],
+        producers: ['/orders/[id]', 'sagas SDK'], consumers: ['saga-order'] },
+    ];
+    const DUAL_ALL = ['REST', 'RPC', 'SDK'];
+    const s4Contracts = s4Raw.map(c => ({
+      ...c,
+      mBadge: 'ns-badge ns-badge--' + ({ POST: 'primary', GET: 'muted', PATCH: 'warning', DELETE: 'destructive' })[c.method],
+      mTone: S4_METHOD_TONE[c.method],
+      kindTone: S4_KIND_TONE[c.plugin], kindGlyph: S4_KIND_GLYPH[c.plugin],
+      covBadge: badge(c.cov === 'complete' ? 'ok' : 'thin'),
       covLabel: c.cov === 'complete' ? 'complete' : 'thin · missing .describe()',
       dualChips: c.dual.map(d => ({ label: d })),
+      dualPips: DUAL_ALL.map(d => ({ label: d, on: c.dual.includes(d) ? '1' : '0', key: d.toLowerCase() })),
+      sigPreview: c.input + ' → ' + c.output,
+      compatLabel: ({ full: 'full', backward: 'backward', none: 'none' })[c.compat],
+      compatTone: ({ full: 'success', backward: 'primary', none: 'warning' })[c.compat],
       scalar: () => this.showToast('Would open /api/docs#' + c.proc + ' (Scalar)', 'info'),
     }));
+    // Registry grouped by kind › namespace (browse structure)
+    const s4GroupDefs = [
+      { key: 'workers', label: 'workers › jobs' }, { key: 'sagas', label: 'sagas › instances' },
+      { key: 'triggers', label: 'triggers › events' }, { key: 'streams', label: 'streams › delivery' },
+    ];
+    // Filtering
+    const s4q = (s.s4Q || '').trim().toLowerCase();
+    const s4Match = (c) => (s.s4Kind === 'all' || c.plugin === s.s4Kind)
+      && (s.s4Method === 'all' || c.method === s.s4Method)
+      && (s.s4Cov === 'all' || c.cov === s.s4Cov)
+      && (!s4q || c.proc.toLowerCase().includes(s4q) || c.input.toLowerCase().includes(s4q) || c.output.toLowerCase().includes(s4q));
+    const s4Filtered = s4Contracts.filter(s4Match);
+    const s4Groups = s4GroupDefs.map(g => {
+      const rows = s4Filtered.filter(c => c.plugin === g.key).map(c => ({
+        ...c, selState: c.proc === s.s4Sel ? 'selected' : null,
+        select: () => this.setState(st => ({ s4Sel: c.proc, sheet: (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(max-width: 640px)').matches) ? 's4' : st.sheet })),
+      }));
+      const complete = rows.filter(c => c.cov === 'complete').length;
+      return { ...g, tone: S4_KIND_TONE[g.key], glyph: S4_KIND_GLYPH[g.key], rows,
+        count: String(rows.length), complete, thin: rows.length - complete,
+        covPct: rows.length ? Math.round(complete / rows.length * 100) : 0,
+        covClass: 'ns-catreg__covbar--w' + (rows.length ? Math.round(complete / rows.length * 20) : 0),
+        empty: rows.length === 0 };
+    }).filter(g => !s4q && s.s4Kind === 'all' && s.s4Method === 'all' && s.s4Cov === 'all' ? true : !g.empty);
+    const s4HasResults = s4Filtered.length > 0;
+    // Header composite metrics (derived — kind distribution, coverage ratio, duality reach)
+    const s4Total = s4Contracts.length;
+    const s4CompleteN = s4Contracts.filter(c => c.cov === 'complete').length;
+    const s4KindDist = s4GroupDefs.map(g => {
+      const n = s4Contracts.filter(c => c.plugin === g.key).length;
+      return { key: g.key, label: g.key, tone: S4_KIND_TONE[g.key], glyph: S4_KIND_GLYPH[g.key], n,
+        pct: Math.round(n / s4Total * 100), wClass: 'ns-catchan__seg--w' + Math.round(n / s4Total * 20),
+        active: s.s4Kind === g.key, go: () => this.setState(st => ({ s4Kind: st.s4Kind === g.key ? 'all' : g.key })) };
+    });
+    const s4Reach = DUAL_ALL.map(d => {
+      const n = s4Contracts.filter(c => c.dual.includes(d)).length;
+      return { label: d, key: d.toLowerCase(), n, total: s4Total, pct: Math.round(n / s4Total * 100),
+        wClass: 'ns-catreach__fill--w' + Math.round(n / s4Total * 20) };
+    });
+    const s4Head = {
+      total: String(s4Total),
+      completeN: s4CompleteN, thinN: s4Total - s4CompleteN,
+      covPct: Math.round(s4CompleteN / s4Total * 100),
+      covPctLabel: Math.round(s4CompleteN / s4Total * 100) + '%',
+      covWClass: 'ns-catratio__fill--w' + Math.round(s4CompleteN / s4Total * 20),
+      kinds: s4KindDist, reach: s4Reach,
+      versions: '17 procedures · 4 versions',
+    };
+    // Selected contract detail
+    const s4Selected = s4Contracts.find(c => c.proc === s.s4Sel) || s4Contracts[0];
+    const s4Detail = s4Selected ? {
+      ...s4Selected,
+      sigCells: s4Selected.sig.map(([t, k]) => ({ t, k })),
+      schemaLines: s4Selected.schema.map((row, i) => ({ n: String(i + 1), name: row[0], kind: row[1], rest: row[2] })),
+      producerNodes: s4Selected.producers.map(p => ({ label: p })),
+      consumerNodes: s4Selected.consumers.map(p => ({ label: p })),
+      prodCount: String(s4Selected.producers.length), consCount: String(s4Selected.consumers.length),
+    } : null;
+    // Filter chips
+    const s4KindChips = [{ v: 'all', label: 'All kinds' }, { v: 'workers', label: 'workers' }, { v: 'sagas', label: 'sagas' }, { v: 'triggers', label: 'triggers' }, { v: 'streams', label: 'streams' }]
+      .map(o => ({ ...o, state: s.s4Kind === o.v ? 'active' : null, set: () => this.setState({ s4Kind: o.v }) }));
+    const s4MethodChips = [{ v: 'all', label: 'All methods' }, { v: 'GET', label: 'GET' }, { v: 'POST', label: 'POST' }, { v: 'PATCH', label: 'PATCH' }, { v: 'DELETE', label: 'DELETE' }]
+      .map(o => ({ ...o, state: s.s4Method === o.v ? 'active' : null, set: () => this.setState({ s4Method: o.v }) }));
+    const s4CovChips = [{ v: 'all', label: 'Any coverage' }, { v: 'complete', label: 'complete' }, { v: 'thin', label: 'thin' }]
+      .map(o => ({ ...o, state: s.s4Cov === o.v ? 'active' : null, set: () => this.setState({ s4Cov: o.v }) }));
     const s4Routes = [
       { route: '/checkout', status: 'bound', form: 'inline · .withRouteContract()', target: 'checkout.page.tsx' },
       { route: '/orders/[id]', status: 'bound', form: 'sidecar · orders.route.ts', target: 'orders.page.tsx' },
       { route: '/admin/reconcile', status: 'unbound', form: '—', target: 'add reconcile.route.ts or bind inline' },
       { route: '/reports', status: 'unbound', form: '—', target: 'add reports.route.ts or bind inline' },
     ].map(r => ({ ...r, sBadge: badge(r.status) }));
-    const s4Tree = [
-      { label: 'workers › jobs', count: '2' }, { label: 'sagas › instances', count: '2' },
-      { label: 'triggers › events', count: '2' }, { label: 'streams › delivery', count: '1' },
-    ];
+    const s4Tree = s4GroupDefs.map(g => ({ label: g.label, count: String(s4Contracts.filter(c => c.plugin === g.key).length) }));
     const s4Summary = {
       thin: '4 of 17 procedures thin',
       unbound: '2 routes unbound',
@@ -6928,8 +7207,8 @@ class Component extends DCLogic {
       s1Sheet: s.detailSheet || { eyebrow: '', icon: '', tone: 'muted', value: '', title: '', pill: '', pillClass: 'ns-badge ns-badge--muted', desc: '', cta: 'Open', rows: [], go: () => {} },
       closeDetailSheet: () => this.setState({ detailSheet: null }),
       // sheet
-      sheetIsS2: s.sheet === 's2', sheetIsS13: s.sheet === 's13', sheetIsS7: s.sheet === 's7', sheetIsS8: s.sheet === 's8', sheetIsS9: s.sheet === 's9', sheetIsS11: s.sheet === 's11', sheetIsS12: s.sheet === 's12',
-      sheetTitle: s.sheet === 's2' ? selDef.key : s.sheet === 's7' ? s7Detail.name : s.sheet === 's8' ? (s8SelNode ? s8SelNode.name : s8.saga) : s.sheet === 's9' ? s9Detail.id : s.sheet === 's11' ? s11Detail.name : s.sheet === 's12' ? (s12Detail ? s12Detail.id : '') : (selNode13 ? selNode13.name : ''),
+      sheetIsS2: s.sheet === 's2', sheetIsS13: s.sheet === 's13', sheetIsS7: s.sheet === 's7', sheetIsS8: s.sheet === 's8', sheetIsS9: s.sheet === 's9', sheetIsS11: s.sheet === 's11', sheetIsS12: s.sheet === 's12', sheetIsS4: s.sheet === 's4',
+      sheetTitle: s.sheet === 's2' ? selDef.key : s.sheet === 's7' ? s7Detail.name : s.sheet === 's8' ? (s8SelNode ? s8SelNode.name : s8.saga) : s.sheet === 's9' ? s9Detail.id : s.sheet === 's11' ? s11Detail.name : s.sheet === 's12' ? (s12Detail ? s12Detail.id : '') : s.sheet === 's4' ? (s4Detail ? s4Detail.proc : '') : (selNode13 ? selNode13.name : ''),
       closeSheet: () => this.setState({ sheet: null }),
       // S1
       s1Stats, s1CmdGroups, s1Contribs, s1Teaser, s1Kpis, s1Hero, s1Ai,
@@ -6983,8 +7262,12 @@ class Component extends DCLogic {
       s3LiveState: s.s3Follow ? null : 'paused',
       s3SegAll: segBtn('s3View', 'all'), s3SegCompact: segBtn('s3View', 'compact'), s3SegJson: segBtn('s3View', 'json'),
       s3IsJson: s.s3View === 'json', s3ViewAttr: s.s3View === 'compact' ? 'compact' : 'all',
-      // S4
+      // S4 — Catalog: contract registry explorer
       s4Contracts, s4Routes, s4Tree, s4Summary,
+      s4Groups, s4Head, s4Detail, s4HasResults, s4NoResults: !s4HasResults,
+      s4KindChips, s4MethodChips, s4CovChips, s4Q: s.s4Q,
+      s4SetQ: (e) => this.setState({ s4Q: e.target.value }),
+      s4ResetFilters: () => this.setState({ s4Kind: 'all', s4Method: 'all', s4Cov: 'all', s4Q: '' }),
       s4TabContracts: { state: s.s4Tab === 'contracts' ? 'active' : null, set: () => this.updateQuery({ tab: 'contracts' }, { s4Tab: 'contracts' }) },
       s4TabRoutes: { state: s.s4Tab === 'routes' ? 'active' : null, set: () => this.updateQuery({ tab: 'routes' }, { s4Tab: 'routes' }) },
       s4IsContracts: s.s4Tab === 'contracts', s4IsRoutes: s.s4Tab === 'routes',
