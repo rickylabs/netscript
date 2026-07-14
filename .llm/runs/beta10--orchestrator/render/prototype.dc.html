@@ -3576,8 +3576,8 @@
             </div>
           </header>
 
-          <!-- ============ HEADER COMPOSITE: installed count + surface-distribution channel + enabled meter + compat alert ============ -->
-          <section class="ns-exthead" aria-label="Extensions overview">
+          <!-- ============ HEADER COMPOSITE: inventory + surface distribution + enabled facts + compatibility ============ -->
+          <section class="ns-card ns-exthead" aria-label="Extensions overview">
             <div class="ns-exthead__cell ns-exthead__cell--hero">
               <div class="ns-exthead__hero-main">
                 <span class="ns-exthead__hero-num">{{ extHead.installed }}<span class="ns-exthead__hero-unit">extensions</span></span>
@@ -3599,12 +3599,15 @@
             </div>
             <div class="ns-exthead__cell">
               <span class="ns-exthead__label">enabled coverage</span>
-              <div class="ns-extratio" data-tone="{{ extHead.enTone }}">
-                <span class="ns-extratio__fill {{ extHead.enWClass }}"></span>
+              <div class="ns-extcoverage">
+                <span class="ns-extcoverage__ratio">{{ extHead.enabled }} / {{ extHead.installed }}</span>
+                <span class="ns-extcoverage__label">enabled</span>
               </div>
-              <div class="ns-extratio__foot"><span>{{ extHead.enabled }} enabled</span><span class="ns-extratio__muted">{{ extHead.disabled }} disabled</span></div>
-              <div class="ns-exthead__tiers">
-                <sc-for list="{{ extHead.tierChips }}" as="tc" hint-placeholder-count="2"><span class="ns-exttier" data-tier="{{ tc.tier }}">{{ tc.label }} <b>{{ tc.n }}</b></span></sc-for>
+              <div class="ns-extcoverage__meta">
+                <span class="ns-extcoverage__disabled">{{ extHead.disabled }} disabled</span>
+                <div class="ns-exthead__tiers">
+                  <sc-for list="{{ extHead.tierChips }}" as="tc" hint-placeholder-count="2"><span class="ns-exttier" data-tier="{{ tc.tier }}">{{ tc.label }} <b>{{ tc.n }}</b></span></sc-for>
+                </div>
               </div>
             </div>
             <div class="ns-exthead__cell ns-exthead__cell--alert">
@@ -3621,40 +3624,39 @@
 
           <!-- ============ PROVIDERS: roster (contribution manifest per extension) + detail ============ -->
           <sc-if value="{{ extTabPanels }}" hint-placeholder-val="{{ true }}">
-            <div class="ns-extbar">
-              <span class="ns-extbar__label">show</span>
-              <div class="ns-extbar__chips">
-                <sc-for list="{{ extSurfChips }}" as="fc" hint-placeholder-count="4"><button class="ns-extbar__chip" data-kind="{{ fc.kind }}" data-state="{{ fc.state }}" onClick="{{ fc.set }}">{{ fc.label }}<span class="ns-extbar__chip-n">{{ fc.n }}</span></button></sc-for>
+            <div class="ns-extfilters">
+              <span class="ns-extfilters__label">show</span>
+              <div class="ns-extfilters__tabs">
+                <sc-for list="{{ extSurfChips }}" as="fc" hint-placeholder-count="4"><button class="ns-extfilters__tab" data-kind="{{ fc.kind }}" data-state="{{ fc.state }}" onClick="{{ fc.set }}">{{ fc.label }}<span class="ns-extfilters__tab-n">{{ fc.n }}</span></button></sc-for>
               </div>
               <span style="flex:1"></span>
-              <span class="ns-extbar__count">{{ extProvCount }} providers</span>
+              <span class="ns-extfilters__count">{{ extProvCount }} providers</span>
             </div>
             <div class="ns-extgrid">
-              <div class="ns-extroster" role="list" aria-label="Installed extensions">
+              <div class="ns-card ns-data-table ns-extroster" role="list" aria-label="Installed extensions">
+                <div class="ns-extroster__columns" aria-hidden="true">
+                  <span>provider</span><span>contributions</span><span>trust</span><span>source</span><span>status</span>
+                </div>
                 <sc-for list="{{ extProviders }}" as="e" hint-placeholder-count="6">
-                  <button class="ns-extprov" role="listitem" data-ext-id="{{ e.id }}" data-state="{{ e.selState }}" data-disabled="{{ e.disabled }}" onClick="{{ e.select }}">
-                    <div class="ns-extprov__main">
-                      <div class="ns-extprov__top">
+                  <button class="ns-data-table__row ns-extprov" role="listitem" data-ext-id="{{ e.id }}" data-state="{{ e.selState }}" data-disabled="{{ e.disabled }}" onClick="{{ e.select }}">
+                    <div class="ns-extprov__identity">
+                      <div class="ns-extprov__name-row">
                         <span class="ns-extprov__name">{{ e.name }}</span>
                         <span class="ns-extprov__ver">{{ e.version }}</span>
-                        <span class="ns-extprov__status" data-en="{{ e.enabled }}"><span class="ns-extprov__status-dot" aria-hidden="true"></span>{{ e.statusLbl }}</span>
-                      </div>
-                      <div class="ns-extprov__contribbar" aria-label="Contribution shape">
-                        <sc-for list="{{ e.barSegs }}" as="b" hint-placeholder-count="2"><span class="ns-extprov__barseg {{ b.wClass }}" data-kind="{{ b.kind }}" title="{{ b.title }}"></span></sc-for>
-                      </div>
-                      <div class="ns-extprov__pips">
-                        <sc-for list="{{ e.pips }}" as="pp" hint-placeholder-count="2"><span class="ns-extprov__pip" data-kind="{{ pp.kind }}">{{ pp.label }}</span></sc-for>
-                        <span class="ns-extprov__src">{{ e.source }}</span>
                       </div>
                     </div>
+                    <div class="ns-extprov__pips"><sc-for list="{{ e.pips }}" as="pp" hint-placeholder-count="2"><span class="ns-extprov__pip" data-kind="{{ pp.kind }}">{{ pp.label }}</span></sc-for></div>
+                    <span class="ns-extprov__trust">{{ e.tier }}</span>
+                    <span class="ns-extprov__src">{{ e.source }}</span>
+                    <span class="ns-extprov__status" data-en="{{ e.enabled }}"><span class="ns-extprov__status-dot" aria-hidden="true"></span>{{ e.statusLbl }}</span>
                   </button>
                 </sc-for>
               </div>
 
-              <aside class="ns-extmanifest" aria-label="Extension manifest">
+              <aside class="ns-card ns-extmanifest" aria-label="Extension manifest">
                 <div class="ns-extmanifest__head">
                   <div class="ns-extmanifest__id">
-                    <div class="ns-extmanifest__name-row"><span class="ns-extmanifest__name">{{ extSel.name }}</span><span class="ns-extmanifest__ver">{{ extSel.version }}</span><span class="{{ extSel.tierBadge }}">{{ extSel.tier }}</span></div>
+                    <div class="ns-extmanifest__name-row"><span class="ns-extmanifest__name">{{ extSel.name }}</span><span class="ns-extmanifest__ver">{{ extSel.version }}</span><span class="ns-extmanifest__tier">{{ extSel.tier }}</span></div>
                     <span class="ns-extmanifest__sub">{{ extSel.source }} · contributes to {{ extSel.surfLbl }}</span>
                   </div>
                   <span class="ns-extmanifest__status" data-en="{{ extSel.enabled }}"><span class="ns-extprov__status-dot" aria-hidden="true"></span>{{ extSel.statusLbl }}</span>
@@ -3697,68 +3699,60 @@
             </div>
           </sc-if>
 
-          <!-- ============ SURFACES: contribution-surface visualization (lanes by surface kind) ============ -->
+          <!-- ============ SURFACES: contribution records grouped by host surface ============ -->
           <sc-if value="{{ extTabActions }}" hint-placeholder-val="{{ false }}">
             <div class="ns-extlanes" aria-label="Contribution surfaces">
               <sc-for list="{{ extLanes }}" as="ln" hint-placeholder-count="3">
-                <section class="ns-extlane" data-kind="{{ ln.kind }}">
+                <section class="ns-card ns-extlane" data-kind="{{ ln.kind }}">
                   <header class="ns-extlane__head">
-                    <span class="ns-extlane__title">{{ ln.title }}</span>
-                    <span class="ns-extlane__n">{{ ln.n }}</span>
+                    <div class="ns-extlane__title-row"><span class="ns-extlane__title">{{ ln.title }}</span><span class="ns-extlane__n">{{ ln.n }}</span></div>
+                    <div class="ns-extlane__context"><span class="ns-extlane__mounts">{{ ln.mountSummary }}</span><span class="ns-extlane__summary">{{ ln.foot }}</span></div>
                   </header>
-                  <div class="ns-extlane__stat">
-                    <div class="ns-extlane__meter" aria-label="Share of contributions">
-                      <span class="ns-extlane__meter-fill {{ ln.shareWClass }}"></span>
-                    </div>
-                    <span class="ns-extlane__mounts">{{ ln.mountSummary }}</span>
-                  </div>
-                  <div class="ns-extlane__items">
+                  <div class="ns-data-table ns-extlane__items">
                     <sc-for list="{{ ln.items }}" as="it" hint-placeholder-count="3">
-                      <div class="ns-extmount-card">
-                        <div class="ns-extmount-card__top">
-                          <span class="ns-extmount-card__title">{{ it.title }}</span>
-                          <span class="ns-extmount-card__prov" data-tier="{{ it.tier }}">{{ it.plugin }}</span>
+                      <div class="ns-data-table__row ns-extsurface-row">
+                        <div class="ns-extsurface-row__identity">
+                          <span class="ns-extsurface-row__title">{{ it.title }}</span>
+                          <span class="ns-extsurface-row__path">{{ it.meta }}</span>
                         </div>
-                        <div class="ns-extmount-card__row">
-                          <span class="ns-extmount-card__path">{{ it.meta }}</span>
-                          <span class="ns-extmount-card__perm">{{ it.perm }}</span>
-                        </div>
+                        <span class="ns-extsurface-row__prov" data-tier="{{ it.tier }}">{{ it.plugin }}</span>
+                        <span class="ns-extsurface-row__perm">{{ it.perm }}</span>
                       </div>
                     </sc-for>
                   </div>
-                  <footer class="ns-extlane__foot">{{ ln.foot }}</footer>
                 </section>
               </sc-for>
             </div>
           </sc-if>
 
-          <!-- ============ AVAILABLE: install / quarantine with compat meter ============ -->
+          <!-- ============ AVAILABLE: install registry with categorical contract facts ============ -->
           <sc-if value="{{ extTabAvail }}" hint-placeholder-val="{{ false }}">
-            <div class="ns-extavail">
+            <div class="ns-card ns-data-table ns-extavail" role="list" aria-label="Available extensions">
+              <div class="ns-extavail__columns" aria-hidden="true">
+                <span>extension</span><span>contract</span><span>contributes</span><span>status / action</span>
+              </div>
               <sc-for list="{{ extAvailable }}" as="e" hint-placeholder-count="2">
-                <div class="ns-extavailcard" data-quar="{{ e.quarantine }}">
-                  <div class="ns-extavailcard__head">
-                    <div class="ns-extavailcard__id">
-                      <div class="ns-extavailcard__name-row"><span class="ns-extavailcard__name">{{ e.title }}</span><span class="ns-badge ns-badge--muted">{{ e.publisher }}</span></div>
-                      <span class="ns-extavailcard__desc">{{ e.desc }}</span>
-                    </div>
-                    <sc-if value="{{ e.quarantine }}" hint-placeholder-val="{{ false }}"><span class="ns-badge ns-badge--warning">held · contract v1</span></sc-if>
+                <div class="ns-data-table__row ns-extavailrow" role="listitem" data-quar="{{ e.quarantine }}">
+                  <div class="ns-extavailrow__id">
+                    <div class="ns-extavailrow__name-row"><span class="ns-extavailrow__name">{{ e.title }}</span><span class="ns-extavailrow__publisher">{{ e.publisher }}</span></div>
+                    <span class="ns-extavailrow__desc">{{ e.desc }}</span>
                   </div>
-                  <div class="ns-extcompatbar" aria-label="Contract compatibility">
-                    <div class="ns-extcompatbar__row"><span class="ns-extcompatbar__lbl">built for</span><span class="ns-extcompatbar__pin" data-ok="{{ e.builtOk }}">{{ e.builtFor }}</span></div>
-                    <div class="ns-extcompatbar__track"><span class="ns-extcompatbar__seg {{ e.compatWClass }}" data-ok="{{ e.builtOk }}"></span><span class="ns-extcompatbar__now" aria-hidden="true"></span></div>
-                    <div class="ns-extcompatbar__row"><span class="ns-extcompatbar__lbl">host</span><span class="ns-extcompatbar__pin" data-ok="true">contract v2</span></div>
+                  <div class="ns-extcontract" aria-label="Contract compatibility">
+                    <div class="ns-extcontract__fact"><span class="ns-extcontract__label">built for</span><span class="ns-extcontract__value" data-ok="{{ e.builtOk }}">{{ e.builtFor }}</span></div>
+                    <div class="ns-extcontract__fact"><span class="ns-extcontract__label">host</span><span class="ns-extcontract__value" data-ok="true">contract v2</span></div>
                   </div>
-                  <sc-if value="{{ e.quarantine }}" hint-placeholder-val="{{ false }}">
-                    <div class="ns-inline-notice ns-inline-notice--warning ns-extavailcard__hold">
-                      <span>Held: built for contract v1; host contract v2.</span>
+                  <div class="ns-extavailrow__adds">
+                    <sc-for list="{{ e.adds }}" as="ad" hint-placeholder-count="3"><span class="ns-extprov__pip" data-kind="{{ ad.kind }}">{{ ad.label }}</span></sc-for>
+                  </div>
+                  <div class="ns-extavailrow__action">
+                    <sc-if value="{{ e.quarantine }}" hint-placeholder-val="{{ false }}">
+                      <div class="ns-inline-notice ns-inline-notice--warning ns-extavailrow__hold">
+                        <span>Held: built for contract v1; host contract v2.</span>
+                      </div>
+                    </sc-if>
+                    <div class="ns-extavailrow__action-line">
+                      <button class="{{ e.actClass }}" onClick="{{ e.act }}">{{ e.actLabel }}</button>
                     </div>
-                  </sc-if>
-                  <div class="ns-extavailcard__foot">
-                    <div class="ns-extavailcard__adds">
-                      <sc-for list="{{ e.adds }}" as="ad" hint-placeholder-count="3"><span class="ns-extprov__pip" data-kind="{{ ad.kind }}">{{ ad.label }}</span></sc-for>
-                    </div>
-                    <button class="{{ e.actClass }}" onClick="{{ e.act }}">{{ e.actLabel }}</button>
                   </div>
                 </div>
               </sc-for>
