@@ -690,3 +690,56 @@ at runtime. Full 16-route regression clean (32 route-visits). No edits to `suppo
 Inline per-row DDL expanders in the ledger; tabbed docs accordion for the pending list; code-editor
 chrome (file tabs / line numbers) on the DDL diff (stays a secondary drawer tab); author avatars and
 a pre-flight-step pipeline (no such data).
+
+---
+
+## Pass V9 — Dead-Letter Queues (S12)
+
+Replaced the generic S12 screen (three plain "DEPTH / big-number" cards + a 2-row table with
+inline `<details>` payload expanders + dead space below) with a bespoke **operational triage
+console**. Only `render/prototype.dc.html` (S12 markup + JS model + a `sheetIsS12` inspector body)
+and `render/assets/ns-ext.css` (appended `ns-dlq*` block) were touched.
+
+### New components / tokens
+- **`ns-dlqstrip` / `ns-dlqstat`** — composite triage-strip tiles (accent-bar + glyph + value +
+  micro-viz + sub-label), replacing plain number cards. Includes **`ns-dlqsplit`** (by-queue split
+  micro-bar that sums to total parked), **`ns-dlqpips`** (retry-exhausted filled/empty pips), and a
+  reused **`ns-spark`** red arrival strip. Signatures tile is a click-to-clear button.
+- **`ns-dlqcluster` / `ns-dlqclusterlist`** — the screen's signature: **error-signature cluster
+  rows** (severity glyph + signature/message + ×count + source chips + `ns-spark` death sparkbar +
+  age range + per-cluster **Retry all / Purge**). Click filters the table (`data-sel='active'` ring).
+  This grouped-failure component is net-new to the kit.
+- **`ns-dlqtable` / `ns-dlqrow`** — dense triage grid: kind glyph, **`ns-dlqsig`** signature badge
+  (destructive/warning tones), inline retry pips (`ns-dlqpips` w/ `data-exh`), exhausted left-rail,
+  inline Inspect. Responsive collapse to per-message stacks < 720px.
+- **`ns-dlqbulk`** — sticky bulk-action bar (count + inline CLI hint + gated Purge/Reprocess).
+- **`ns-dlqfleet` / `ns-dlqqueue`** — queue-health cards: depth + **`ns-dlqmeter`** depth-vs-capacity
+  fill meter + trend sparkbar + oldest-age + severity pill (clear/low/elevated/critical);
+  click-to-filter non-empty queues. Horizontal fill meters chosen to stay distinct from the
+  Migrations arc gauge.
+- **`sheetIsS12` / `ns-dlqinsp`** — message inspector plugged into the shared `ns-sheet-dialog`
+  (auto right-drawer on desktop, bottom-sheet on mobile): signature+reason hero, KV panel, payload
+  JSON block, **retry-history step-timeline** (reuses `ns-step-timeline--data`), gated actions.
+- **`ns-dlqclear`** — all-clear empty state (success-toned press-shadow card).
+- Generic helpers added: **`ns-panel__head`** (horizontal panel head; DS `ns-panel__header` is a
+  vertical stack) + **`ns-panel__flex`** (spacer). Reusable across future screens.
+- Spark zero-buckets muted via `.ns-dlq .ns-spark__col[data-z='true']` (opacity 0.28).
+
+### Data model (visual metadata only, fully derived)
+`dlqCorpus` per scope (queue/trigger) carries `src/kind/sig/reason/q/ageMin/retry/max/corr/payload/
+hist`. Clusters derived by grouping on `sig`; queue-health derived from `queueDefs` (depth/cap/
+trend/oldest); triage strip derived (total, by-queue split, oldest, exhausted pips, arrival spark);
+`s12Detail` derived from the selected id. Sparkbar heights bucketed into the shared `--h1..--h20`
+classes (no `{{ }}` in geometry). New state: `s12Sel`, `s12Filter` (type sig/queue/src). Removed the
+old `s12Depths` plain-number-card binding.
+
+### Verification
+0 `{{ }}` / 0 real console errors / 0 h-overflow across desktop 1440 + mobile 390, both themes, plus
+cluster-filter+bulk-select, inspector drawer (light+dark), mobile bottom-sheet (light+dark), and the
+Trigger DLQ single-message scope. Full 16-route regression clean. No edits to `support.js`,
+`_ns_styles.css`, `_ds/*`, or other screens' markup.
+
+### Declined (gold-plating / data-invention, per brief)
+Real reprocess/purge execution (stays askConfirm→toast per satellite doctrine); in-place expandable
+cluster member lists (filter-the-table is the chosen affordance); a top-sources mini-list to fill the
+shorter right rail (candidate for a future pass); source avatars / SLA countdown timers (no such data).

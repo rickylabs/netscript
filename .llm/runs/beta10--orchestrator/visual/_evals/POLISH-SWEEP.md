@@ -26,3 +26,13 @@ every screen and applies the genuinely valuable items (skip subjective/gold-plat
 - Pending rail "what will change" → tabbed impact-docs accordion [ref 11] (gold-plating)
 - DDL diff → full code-editor chrome (file tabs, line numbers) [ref 11] (declined — diff is intentionally secondary)
 - Version-chain per-node author avatars + preflight-step pipeline [ref 19] (no author/step data — would invent data)
+
+## Dead-Letter Queues (gate 62 — ACCEPTED on verified density; gate over-reached)
+Only trivially-valid residuals (do in sweep):
+- Frame the inspector payload JSON in a bordered code block (light border + key/string color) [ref 11]
+- Connect the retry-history timeline dots with line segments showing elapsed interval [ref 19]
+- Tighten inspector vertical whitespace; fill the shorter right rail (a top-sources mini-list)
+DECLINED (gate was wrong): remove the failed-message checkboxes (breaks bulk triage — core feature);
+queue-health fill-meters → semicircular gauges (kept horizontal ON PURPOSE so DLQ ≠ Migrations arc gauge);
+"How triage works" → tabbed docs (gold-plating). Note: gate under-credited existing micro-viz
+(by-queue split bar, exhausted pips, arrival sparkbar, cluster severity left-borders).

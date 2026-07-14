@@ -2630,74 +2630,183 @@
 
       <!-- @S11-END -->
       <sc-if value="{{ isDlq }}" hint-placeholder-val="{{ false }}">
-        <div class="ns-screen" data-screen-label="S12 Dead-Letter Queues">
-          <header class="ns-page-header ns-page-header--console">
-            <div class="ns-toolbar">
-              <div style="display:grid;gap:var(--ns-space-2)">
+        <div class="ns-screen ns-dlq" data-screen-label="S12 Dead-Letter Queues">
+          <header class="ns-dlqhead">
+            <nav class="ns-conbread" aria-label="Breadcrumb"><span class="ns-conbread__crumb">Data</span><span class="ns-conbread__sep" aria-hidden="true">/</span><span class="ns-conbread__crumb ns-conbread__crumb--current">Dead-Letter Queues</span></nav>
+            <div class="ns-dlqhead__row">
+              <div class="ns-dlqhead__title">
                 <h1>Dead-letter queues</h1>
-                <p class="ns-lede">Why did messages die across KV / Redis / Postgres — depth, reason, and gated bulk replay.</p>
+                <p class="ns-lede">Triage failed messages parked across backends — cluster by error signature, inspect the payload + retry history, then reprocess or purge. Raw broker internals stay in Aspire.</p>
               </div>
-              <div class="ns-seg" role="tablist" aria-label="DLQ scope">
+              <div class="ns-seg ns-dlqhead__seg" role="tablist" aria-label="DLQ scope">
                 <button class="ns-seg__btn" role="tab" data-state="{{ s12TabQueue.state }}" onClick="{{ s12TabQueue.set }}">Queue DLQ</button>
                 <button class="ns-seg__btn" role="tab" data-state="{{ s12TabTrigger.state }}" onClick="{{ s12TabTrigger.set }}">Trigger DLQ</button>
               </div>
             </div>
           </header>
 
-          <div class="ns-stats-grid" style="margin-bottom:var(--ns-space-6);grid-template-columns:repeat(auto-fit,minmax(min(11rem,100%),1fr))">
-            <sc-for list="{{ s12Depths }}" as="d" hint-placeholder-count="3">
-              <div class="ns-card" style="background:var(--ns-card);padding:var(--ns-space-4)">
-                <div class="ns-stats-grid__header"><span class="ns-stats-grid__label">{{ d.label }} depth</span><span class="ns-statlink__dot" data-tone="{{ d.tone }}" aria-hidden="true"></span></div>
-                <div class="ns-stats-grid__value" style="font-family:var(--ns-font-mono);font-size:var(--ns-text-2xl)">{{ d.value }}</div>
-              </div>
-            </sc-for>
-          </div>
+          <sc-if value="{{ s12AllClear }}" hint-placeholder-val="{{ false }}">
+            <div class="ns-dlqclear">
+              <span class="ns-dlqclear__glyph" aria-hidden="true">✓</span>
+              <div class="ns-dlqclear__txt"><span class="ns-dlqclear__title">All clear — nothing dead-lettered</span><span class="ns-dlqclear__sub">Every backend queue is empty. Failed messages that exhaust their retries will surface here for triage.</span></div>
+            </div>
+          </sc-if>
 
-          <section class="ns-responsive-table">
-            <div class="ns-responsive-table__scroller">
-              <table class="ns-responsive-table__table" style="min-width:40rem">
-                <caption class="ns-responsive-table__caption">{{ s12Caption }}</caption>
-                <thead class="ns-responsive-table__head">
-                  <tr class="ns-responsive-table__row">
-                    <th class="ns-responsive-table__header" style="width:2rem"></th>
-                    <th class="ns-responsive-table__header">Message</th>
-                    <th class="ns-responsive-table__header">Source</th>
-                    <th class="ns-responsive-table__header">Reason</th>
-                    <th class="ns-responsive-table__header">Error code</th>
-                    <th class="ns-responsive-table__header">Dead at</th>
-                  </tr>
-                </thead>
-                <tbody class="ns-responsive-table__body">
-                  <sc-for list="{{ s12Rows }}" as="r" hint-placeholder-count="2">
-                    <tr class="ns-responsive-table__row">
-                      <td class="ns-responsive-table__cell"><input type="checkbox" checked="{{ r.checked }}" onChange="{{ r.toggle }}" aria-label="Select message" style="width:15px;height:15px;accent-color:var(--ns-primary);cursor:pointer"></td>
-                      <td class="ns-responsive-table__cell">
-                        <details>
-                          <summary style="font-family:var(--ns-font-mono);font-size:var(--ns-text-xs);cursor:pointer;list-style:none" onClick="{{ r.open }}">{{ r.id }} ▾</summary>
-                          <div class="ns-code" style="margin-top:var(--ns-space-2)"><pre><code>{{ r.payload }}</code></pre></div>
-                        </details>
-                      </td>
-                      <td class="ns-responsive-table__cell"><span style="font-family:var(--ns-font-mono);font-size:var(--ns-text-xs)">{{ r.src }}</span></td>
-                      <td class="ns-responsive-table__cell"><span style="font-size:var(--ns-text-xs)">{{ r.reason }}</span></td>
-                      <td class="ns-responsive-table__cell"><span class="ns-badge ns-badge--destructive">{{ r.code }}</span></td>
-                      <td class="ns-responsive-table__cell"><span style="font-family:var(--ns-font-mono);font-size:var(--ns-text-2xs);color:var(--ns-muted-fg)">{{ r.at }}</span></td>
-                    </tr>
+          <sc-if value="{{ s12NotEmpty }}" hint-placeholder-val="{{ true }}">
+            <!-- Triage strip: composite metrics with micro-viz, not plain number cards (refs 19 stat-strip / 04 gauge) -->
+            <div class="ns-dlqstrip">
+              <div class="ns-dlqstat" data-lead="true">
+                <div class="ns-dlqstat__head"><span class="ns-dlqstat__glyph" data-tone="destructive" aria-hidden="true">⊗</span><span class="ns-dlqstat__label">total parked</span></div>
+                <div class="ns-dlqstat__val">{{ s12Strip.total }}</div>
+                <div class="ns-dlqsplit" aria-label="by queue">
+                  <sc-for list="{{ s12Strip.split }}" as="sp" hint-placeholder-count="2">
+                    <span class="ns-dlqsplit__seg" data-tone="{{ sp.tone }}" style="{{ sp.style }}"><span class="ns-dlqsplit__n">{{ sp.n }}</span><span class="ns-dlqsplit__l">{{ sp.label }}</span></span>
                   </sc-for>
-                </tbody>
-              </table>
+                </div>
+              </div>
+              <button class="ns-dlqstat ns-dlqstat--btn" onClick="{{ s12ClearFilter }}">
+                <div class="ns-dlqstat__head"><span class="ns-dlqstat__glyph" data-tone="warning" aria-hidden="true">◫</span><span class="ns-dlqstat__label">signatures</span></div>
+                <div class="ns-dlqstat__val">{{ s12Strip.clusters }}</div>
+                <span class="ns-dlqstat__sub">distinct error clusters</span>
+              </button>
+              <div class="ns-dlqstat">
+                <div class="ns-dlqstat__head"><span class="ns-dlqstat__glyph" data-tone="warning" aria-hidden="true">◷</span><span class="ns-dlqstat__label">oldest parked</span></div>
+                <div class="ns-dlqstat__val">{{ s12Strip.oldest }}</div>
+                <span class="ns-dlqstat__sub">ago · first to expire</span>
+              </div>
+              <div class="ns-dlqstat">
+                <div class="ns-dlqstat__head"><span class="ns-dlqstat__glyph" data-tone="{{ s12Strip.exhaustTone }}" aria-hidden="true">⛔</span><span class="ns-dlqstat__label">retry-exhausted</span></div>
+                <div class="ns-dlqstat__val">{{ s12Strip.exhausted }}</div>
+                <div class="ns-dlqpips" aria-hidden="true"><sc-for list="{{ s12Strip.exhaustedPips }}" as="p" hint-placeholder-count="8"><span class="ns-dlqpip" data-on="{{ p.on }}"></span></sc-for></div>
+              </div>
+              <div class="ns-dlqstat">
+                <div class="ns-dlqstat__head"><span class="ns-dlqstat__glyph" aria-hidden="true">⚡</span><span class="ns-dlqstat__label">dead · 2h</span></div>
+                <div class="ns-dlqstat__spark ns-spark" data-tone="destructive" aria-hidden="true"><sc-for list="{{ s12Strip.totalTrend }}" as="c" hint-placeholder-count="12"><span class="ns-spark__col {{ c.cls }}" data-z="{{ c.z }}"></span></sc-for></div>
+                <span class="ns-dlqstat__sub">arrival rate rising</span>
+              </div>
             </div>
-            <div class="ns-data-table__footer" style="display:flex;align-items:center;gap:var(--ns-space-3)">
-              <span style="font-size:var(--ns-text-xs);color:var(--ns-muted-fg)">{{ s12Count }} selected</span>
-              <span style="flex:1"></span>
-              <button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ s12OpenRun }}">Open original run</button>
-              <sc-if value="{{ s12HasSel }}" hint-placeholder-val="{{ false }}">
-                <button class="ns-btn ns-btn--destructive ns-btn--sm" onClick="{{ reprocess }}">Reprocess selected</button>
-              </sc-if>
-              <sc-if value="{{ s12NoSel }}" hint-placeholder-val="{{ true }}">
-                <button class="ns-btn ns-btn--secondary ns-btn--sm" disabled="{{ true }}" style="opacity:0.5;cursor:not-allowed">Reprocess selected</button>
-              </sc-if>
+
+            <div class="ns-dlqgrid">
+              <div class="ns-dlqmain">
+                <!-- Error-signature clusters — the triage signature (group failures, not a flat list) -->
+                <section class="ns-panel ns-dlqclusters">
+                  <div class="ns-panel__head">
+                    <span class="ns-panel__title">Error-signature clusters</span>
+                    <span class="ns-dlqclusters__hint">bulk-triage a whole failure mode · click to filter the table</span>
+                  </div>
+                  <div class="ns-dlqclusterlist">
+                    <sc-for list="{{ s12Clusters }}" as="c" hint-placeholder-count="3">
+                      <div class="ns-dlqcluster" data-tone="{{ c.tone }}" data-sel="{{ c.selState }}">
+                        <button class="ns-dlqcluster__body" onClick="{{ c.filter }}">
+                          <span class="ns-dlqcluster__glyph" data-tone="{{ c.tone }}" aria-hidden="true">{{ c.glyph }}</span>
+                          <span class="ns-dlqcluster__id">
+                            <span class="ns-dlqcluster__sig">{{ c.sig }}</span>
+                            <span class="ns-dlqcluster__msg">{{ c.msg }}</span>
+                          </span>
+                          <span class="ns-dlqcluster__count" data-tone="{{ c.tone }}">×{{ c.count }}</span>
+                          <span class="ns-dlqcluster__srcs">
+                            <sc-for list="{{ c.srcChips }}" as="sc" hint-placeholder-count="2"><span class="ns-dlqsrcchip">{{ sc.name }}</span></sc-for>
+                            <sc-if value="{{ c.srcMore }}" hint-placeholder-val="{{ false }}"><span class="ns-dlqsrcchip ns-dlqsrcchip--more">{{ c.srcMore }}</span></sc-if>
+                          </span>
+                          <span class="ns-dlqcluster__spark ns-spark" data-tone="{{ c.tone }}" aria-hidden="true"><sc-for list="{{ c.spark }}" as="sp" hint-placeholder-count="8"><span class="ns-spark__col {{ sp.cls }}" data-z="{{ sp.z }}"></span></sc-for></span>
+                          <span class="ns-dlqcluster__age">{{ c.ageRange }}</span>
+                        </button>
+                        <span class="ns-dlqcluster__actions">
+                          <button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ c.retryAll }}">Retry all</button>
+                          <button class="ns-btn ns-btn--ghost ns-btn--sm ns-dlqcluster__purge" onClick="{{ c.purge }}">Purge</button>
+                        </span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </section>
+
+                <!-- Failed-message triage table (dense: retry pips, source chip, inline inspect) -->
+                <section class="ns-panel ns-dlqtablewrap">
+                  <div class="ns-panel__head">
+                    <span class="ns-panel__title">Failed messages</span>
+                    <sc-if value="{{ s12FilterActive }}" hint-placeholder-val="{{ false }}">
+                      <button class="ns-dlqfilterchip" onClick="{{ s12ClearFilter }}"><span class="ns-dlqfilterchip__x" aria-hidden="true">✕</span>{{ s12FilterLabel }}</button>
+                    </sc-if>
+                    <span class="ns-panel__flex"></span>
+                    <span class="ns-dlqtablewrap__cap">{{ s12Caption }}</span>
+                  </div>
+                  <div class="ns-dlqtable">
+                    <div class="ns-dlqtable__head" role="row">
+                      <span class="ns-dlqtable__hcell"><input type="checkbox" checked="{{ s12AllChecked }}" onChange="{{ s12ToggleAll }}" aria-label="Select all" class="ns-dlqcheck"></span>
+                      <span class="ns-dlqtable__hcell">message</span>
+                      <span class="ns-dlqtable__hcell">source</span>
+                      <span class="ns-dlqtable__hcell">signature</span>
+                      <span class="ns-dlqtable__hcell">retries</span>
+                      <span class="ns-dlqtable__hcell">age</span>
+                      <span class="ns-dlqtable__hcell"></span>
+                    </div>
+                    <sc-for list="{{ s12Rows }}" as="r" hint-placeholder-count="4">
+                      <div class="ns-dlqrow" data-sel="{{ r.checked }}" data-exhausted="{{ r.exhausted }}">
+                        <span class="ns-dlqrow__cell"><input type="checkbox" checked="{{ r.checked }}" onChange="{{ r.toggle }}" aria-label="Select message" class="ns-dlqcheck"></span>
+                        <button class="ns-dlqrow__cell ns-dlqrow__id" onClick="{{ r.open }}">{{ r.id }}</button>
+                        <span class="ns-dlqrow__cell ns-dlqrow__src"><span class="ns-dlqrow__kind" aria-hidden="true">{{ r.kindGlyph }}</span>{{ r.src }}</span>
+                        <span class="ns-dlqrow__cell"><span class="ns-dlqsig" data-tone="{{ r.sigTone }}">{{ r.sig }}</span></span>
+                        <span class="ns-dlqrow__cell ns-dlqrow__retry"><span class="ns-dlqpips" aria-hidden="true"><sc-for list="{{ r.pips }}" as="p" hint-placeholder-count="3"><span class="ns-dlqpip" data-on="{{ p.on }}" data-exh="{{ r.exhausted }}"></span></sc-for></span><span class="ns-dlqrow__retrylabel">{{ r.retryLabel }}</span></span>
+                        <span class="ns-dlqrow__cell ns-dlqrow__age">{{ r.age }}</span>
+                        <button class="ns-dlqrow__cell ns-dlqrow__inspect" onClick="{{ r.open }}">Inspect →</button>
+                      </div>
+                    </sc-for>
+                    <sc-if value="{{ s12Empty }}" hint-placeholder-val="{{ false }}">
+                      <div class="ns-dlqrow ns-dlqrow--empty"><span>No messages match this filter.</span><button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ s12ClearFilter }}">Clear filter</button></div>
+                    </sc-if>
+                  </div>
+                  <!-- Sticky bulk-action bar (select → reprocess / purge) + CLI hint -->
+                  <div class="ns-dlqbulk">
+                    <span class="ns-dlqbulk__count" data-has="{{ s12HasSel }}">{{ s12Count }} selected</span>
+                    <span class="ns-inline-code ns-dlqbulk__cli">{{ s12Cli }}</span>
+                    <span class="ns-panel__flex"></span>
+                    <button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ s12OpenRun }}">Open original run</button>
+                    <sc-if value="{{ s12HasSel }}" hint-placeholder-val="{{ false }}">
+                      <button class="ns-btn ns-btn--secondary ns-btn--sm" onClick="{{ purgeSelected }}">Purge</button>
+                      <button class="ns-btn ns-btn--destructive ns-btn--sm" onClick="{{ reprocess }}">Reprocess selected</button>
+                    </sc-if>
+                    <sc-if value="{{ s12NoSel }}" hint-placeholder-val="{{ true }}">
+                      <button class="ns-btn ns-btn--secondary ns-btn--sm" disabled="{{ true }}" style="opacity:0.45;cursor:not-allowed">Reprocess selected</button>
+                    </sc-if>
+                  </div>
+                </section>
+              </div>
+
+              <!-- Queue-health overview: per-backend depth + capacity fill meter + trend sparkbar + oldest age (ref 04 fill/gauge) -->
+              <aside class="ns-dlqside">
+                <section class="ns-panel ns-dlqfleet">
+                  <div class="ns-panel__head"><span class="ns-panel__title">Queue health</span><span class="ns-dlqfleet__hint">depth vs capacity</span></div>
+                  <div class="ns-dlqfleetlist">
+                    <sc-for list="{{ s12Queues }}" as="q" hint-placeholder-count="3">
+                      <button class="ns-dlqqueue" data-tone="{{ q.tone }}" data-empty="{{ q.empty }}" data-sel="{{ q.selState }}" onClick="{{ q.filter }}">
+                        <div class="ns-dlqqueue__top">
+                          <span class="ns-dlqqueue__dot" data-tone="{{ q.tone }}" aria-hidden="true"></span>
+                          <span class="ns-dlqqueue__name">{{ q.label }}</span>
+                          <span class="ns-dlqqueue__sev" data-tone="{{ q.tone }}">{{ q.sevLabel }}</span>
+                          <span class="ns-panel__flex"></span>
+                          <span class="ns-dlqqueue__depth">{{ q.depth }}</span>
+                        </div>
+                        <div class="ns-dlqmeter" aria-hidden="true"><span class="ns-dlqmeter__fill" data-tone="{{ q.tone }}" style="{{ q.fillStyle }}"></span></div>
+                        <div class="ns-dlqqueue__foot">
+                          <span class="ns-dlqqueue__cap">{{ q.cap }} · {{ q.pctLabel }}</span>
+                          <span class="ns-dlqqueue__spark ns-spark" data-tone="{{ q.tone }}" aria-hidden="true"><sc-for list="{{ q.spark }}" as="sp" hint-placeholder-count="12"><span class="ns-spark__col {{ sp.cls }}" data-z="{{ sp.z }}"></span></sc-for></span>
+                          <span class="ns-dlqqueue__oldest">oldest {{ q.oldest }}</span>
+                        </div>
+                      </button>
+                    </sc-for>
+                  </div>
+                </section>
+                <section class="ns-panel ns-dlqhow">
+                  <span class="ns-dlqhow__title">How triage works</span>
+                  <ol class="ns-dlqhow__steps">
+                    <li><b>Cluster</b> — failures group by error signature so you fix a mode, not a message.</li>
+                    <li><b>Inspect</b> — open a message for its payload, reason, and full retry history.</li>
+                    <li><b>Act</b> — reprocess to re-enqueue through the original source, or purge for good. Both gated.</li>
+                  </ol>
+                </section>
+              </aside>
             </div>
-          </section>
+          </sc-if>
         </div>
       </sc-if>
 
@@ -3501,6 +3610,46 @@
       </sc-if>
     </div>
   </sc-if>
+  <sc-if value="{{ sheetIsS12 }}" hint-placeholder-val="{{ false }}">
+    <div class="ns-sheet-body">
+      <div class="ns-dlqinsp__hero">
+        <span class="ns-dlqsig ns-dlqsig--lg" data-tone="{{ s12Detail.sigTone }}">{{ s12Detail.sig }}</span>
+        <span class="ns-dlqinsp__reason">{{ s12Detail.reason }}</span>
+        <span class="ns-panel__flex"></span>
+        <span class="ns-badge ns-badge--destructive">dead-lettered</span>
+      </div>
+      <div class="ns-kv">
+        <div class="ns-kv__row"><span class="ns-kv__key">source</span><span class="ns-kv__val"><span class="ns-dlqrow__kind" aria-hidden="true">{{ s12Detail.kindGlyph }}</span>{{ s12Detail.src }} · {{ s12Detail.kind }}</span></div>
+        <div class="ns-kv__row"><span class="ns-kv__key">queue</span><span class="ns-kv__val">{{ s12Detail.q }}</span></div>
+        <div class="ns-kv__row"><span class="ns-kv__key">retries</span><span class="ns-kv__val">{{ s12Detail.retryLabel }} · exhausted</span></div>
+        <div class="ns-kv__row"><span class="ns-kv__key">parked</span><span class="ns-kv__val">{{ s12Detail.age }} ago</span></div>
+        <div class="ns-kv__row"><span class="ns-kv__key">correlation</span><span class="ns-kv__val" style="color:var(--ns-primary)">{{ s12Detail.corr }}</span></div>
+      </div>
+      <div style="display:grid;gap:var(--ns-space-2)">
+        <span class="ns-drawer__section-label">payload</span>
+        <pre class="ns-dlqinsp__payload">{{ s12Detail.payload }}</pre>
+      </div>
+      <div style="display:grid;gap:var(--ns-space-2)">
+        <span class="ns-drawer__section-label">retry history</span>
+        <div class="ns-step-timeline ns-step-timeline--data" data-view="compact">
+          <sc-for list="{{ s12Detail.hist }}" as="h" hint-placeholder-count="3">
+            <div class="ns-step-timeline__step" data-state="failed">
+              <span class="ns-step-timeline__marker" aria-hidden="true"></span>
+              <div class="ns-step-timeline__main">
+                <div class="ns-step-timeline__title"><span style="font-family:var(--ns-font-mono);color:var(--ns-fg)">{{ h.n }}</span><span class="ns-step-timeline__datum">{{ h.out }}</span></div>
+                <div class="ns-step-timeline__meta"><span>{{ h.at }}</span></div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="display:grid;gap:var(--ns-space-2)">
+        <button class="ns-btn ns-btn--destructive" onClick="{{ s12Detail.reprocessOne }}">Reprocess this message</button>
+        <button class="ns-btn ns-btn--secondary" onClick="{{ s12Detail.purgeOne }}">Purge</button>
+        <button class="ns-btn ns-btn--ghost" onClick="{{ s12Detail.openRun }}">Open original run →</button>
+      </div>
+    </div>
+  </sc-if>
 </dialog>
 
 <dialog id="ns-detailsheet-dialog" data-part="content" data-side="bottom" class="ns-detailsheet">
@@ -3678,7 +3827,7 @@ class Component extends DCLogic {
         { obj: 'delivery_attempts', kind: 'table', has: '— missing —', wants: 'table + 4 columns', tone: 'warning', note: 'not created' },
       ],
       // S12
-      s12Tab: 'queue', s12Checked: {},
+      s12Tab: 'queue', s12Checked: {}, s12Sel: null, s12Filter: null,
       // S13
       s13Sel: 'ch_3QK9dR2eZ', s13Follow: true, s13Pending: 0, s13Node: 0, s13AssistKind: null,
       s13Route: 'all', s13Status: 'all',
@@ -6308,20 +6457,127 @@ class Component extends DCLogic {
     // kept for back-compat with any old binding
     const s11Diff = s11Detail.ddl;
 
-    // ----- S12 -----
-    const dlqRows = s.s12Tab === 'queue' ? [
-      { id: 'msg_5521', src: 'reserve-inventory', reason: 'handler threw', code: 'E_TIMEOUT', at: '13:22:41', payload: '{ "orderId": "ord_5xw1", "attempt": 3 }' },
-      { id: 'msg_5530', src: 'sync-ledger', reason: 'max attempts exceeded', code: 'E_CONN', at: '13:40:09', payload: '{ "captureId": "cap_991" }' },
+    // ----- S12 · Dead-Letter Queues — operational triage console ------------
+    // Signature = cluster failures by error signature, make queue depth/health
+    // legible, make a message inspectable + actionable. Div/CSS geometry only.
+    // Bucket a 0..1 ratio into the shared .ns-spark height classes (--h1..--h20).
+    const sparkH = (v, max) => { const r = max > 0 ? v / max : 0; return 'ns-spark__col--h' + Math.max(1, Math.min(20, Math.round(r * 20) || (v > 0 ? 1 : 1))); };
+    const sparkCols = (arr) => { const mx = Math.max(1, ...arr); return arr.map(v => ({ cls: sparkH(v, mx), z: v === 0 })); };
+    // Failed-message corpus per scope. Each carries the triage-relevant datum:
+    // source (which trigger/worker/saga produced it), error signature, retry
+    // history, queue backend, payload, and a first/last-seen age.
+    const dlqCorpus = s.s12Tab === 'queue' ? [
+      { id: 'msg_5521', src: 'reserve-inventory', kind: 'worker', sig: 'E_CONN', reason: 'sink unreachable', q: 'redis', ageMin: 2, retry: 3, max: 3, corr: 'ch_3QK9dR2eZ',
+        payload: '{\n  "orderId": "ord_5xw1",\n  "sku": "NS-100",\n  "attempt": 3\n}', hist: [ { n: 1, at: '13:14:02', out: 'E_CONN · +180ms', tone: 'destructive' }, { n: 2, at: '13:18:20', out: 'E_CONN · +2.1s backoff', tone: 'destructive' }, { n: 3, at: '13:22:41', out: 'E_CONN · dead-lettered', tone: 'destructive' } ] },
+      { id: 'msg_5530', src: 'sync-ledger', kind: 'worker', sig: 'E_CONN', reason: 'sink unreachable', q: 'redis', ageMin: 5, retry: 3, max: 3, corr: 'ch_5xw0',
+        payload: '{\n  "captureId": "cap_991",\n  "amount": 129.90\n}', hist: [ { n: 1, at: '13:31:11', out: 'E_CONN · +140ms', tone: 'destructive' }, { n: 2, at: '13:36:02', out: 'E_CONN · +2.0s backoff', tone: 'destructive' }, { n: 3, at: '13:40:09', out: 'E_CONN · dead-lettered', tone: 'destructive' } ] },
+      { id: 'msg_5540', src: 'reserve-inventory', kind: 'worker', sig: 'E_CONN', reason: 'sink unreachable', q: 'redis', ageMin: 9, retry: 3, max: 3, corr: 'ch_5xw3',
+        payload: '{\n  "orderId": "ord_5xw3",\n  "sku": "NS-220"\n}', hist: [ { n: 1, at: '13:03:41', out: 'E_CONN · +160ms', tone: 'destructive' }, { n: 2, at: '13:07:55', out: 'E_CONN · +1.9s backoff', tone: 'destructive' }, { n: 3, at: '13:12:30', out: 'E_CONN · dead-lettered', tone: 'destructive' } ] },
+      { id: 'msg_5502', src: 'reload-config', kind: 'trigger', sig: 'E_PARSE', reason: 'bad JSON at :14', q: 'redis', ageMin: 14, retry: 2, max: 3, corr: 'ch_cfg14',
+        payload: '{\n  "flags": { "checkout-v2": tru\n  "ttl": 300\n}', hist: [ { n: 1, at: '13:12:00', out: 'SyntaxError · line 14', tone: 'destructive' }, { n: 2, at: '13:20:41', out: 'SyntaxError · dead-lettered', tone: 'destructive' } ] },
+      { id: 'msg_5488', src: 'cache-invalidate', kind: 'worker', sig: 'E_TIMEOUT', reason: 'timed out after 30s', q: 'redis', ageMin: 21, retry: 1, max: 3, corr: 'ch_pg21',
+        payload: '{\n  "keys": ["cache:orders:*"],\n  "batch": 4200\n}', hist: [ { n: 1, at: '12:59:12', out: 'E_TIMEOUT · 30.0s', tone: 'destructive' } ] },
+      { id: 'msg_5470', src: 'sync-ledger', kind: 'worker', sig: 'E_TIMEOUT', reason: 'timed out after 30s', q: 'postgres', ageMin: 42, retry: 2, max: 3, corr: 'ch_pg42',
+        payload: '{\n  "captureId": "cap_812",\n  "amount": 54.10\n}', hist: [ { n: 1, at: '12:41:03', out: 'E_TIMEOUT · 30.0s', tone: 'destructive' }, { n: 2, at: '12:48:17', out: 'E_TIMEOUT · dead-lettered', tone: 'destructive' } ] },
+      { id: 'msg_5455', src: 'send-receipt', kind: 'worker', sig: 'E_5XX', reason: 'upstream 503', q: 'postgres', ageMin: 58, retry: 3, max: 3, corr: 'ch_pg58',
+        payload: '{\n  "receiptId": "rcp_20a",\n  "to": "ops@acme.dev"\n}', hist: [ { n: 1, at: '12:18:40', out: 'HTTP 503', tone: 'destructive' }, { n: 2, at: '12:24:11', out: 'HTTP 503 · +1.5s', tone: 'destructive' }, { n: 3, at: '12:31:22', out: 'HTTP 503 · dead-lettered', tone: 'destructive' } ] },
     ] : [
-      { id: 'evt_2188', src: 'webhook.payment', reason: 'retry exhausted', code: 'E_5XX', at: '12:58:12', payload: '{ "orderId": "ord_4aa0" }' },
+      { id: 'evt_2188', src: 'webhook.payment', kind: 'trigger', sig: 'E_5XX', reason: 'retry exhausted', q: 'trigger', ageMin: 12, retry: 5, max: 5, corr: 'ch_4aa0',
+        payload: '{\n  "event": "payment.captured",\n  "orderId": "ord_4aa0",\n  "amount": 88.40\n}', hist: [ { n: 1, at: '12:44:12', out: 'HTTP 503 · +200ms', tone: 'destructive' }, { n: 2, at: '12:47:40', out: 'HTTP 503 · +1.0s', tone: 'destructive' }, { n: 3, at: '12:51:05', out: 'HTTP 502 · +2.0s', tone: 'destructive' }, { n: 4, at: '12:54:31', out: 'HTTP 503 · +4.0s', tone: 'destructive' }, { n: 5, at: '12:58:12', out: 'HTTP 503 · dead-lettered', tone: 'destructive' } ] },
     ];
-    const s12Rows = dlqRows.map(r => ({
-      ...r, checked: !!s.s12Checked[r.id],
-      open: () => this.nav('/dlq/' + (s.s12Tab === 'queue' ? 'redis' : 'triggers') + '/messages/' + encodeURIComponent(r.id) + (s.s12Tab === 'trigger' ? '?kind=trigger' : '')),
-      toggle: () => this.setState(st => ({ s12Checked: { ...st.s12Checked, [r.id]: !st.s12Checked[r.id] } })),
-    }));
-    const s12Count = s12Rows.filter(r => r.checked).length;
+    const ageLabel = (m) => m < 60 ? m + 'm' : (Math.floor(m / 60) + 'h' + (m % 60 ? ' ' + (m % 60) + 'm' : ''));
+    const sigMeta = { E_CONN: { label: 'sink unreachable', glyph: '⇥', tone: 'destructive' }, E_PARSE: { label: 'malformed payload', glyph: '⧗', tone: 'warning' }, E_TIMEOUT: { label: 'handler timeout', glyph: '◷', tone: 'warning' }, E_5XX: { label: 'upstream 5xx', glyph: '⚠', tone: 'destructive' } };
+    const kindGlyph = { worker: '⚙', trigger: '⚡', saga: '↻' };
+    // Active filter (cluster signature / queue / source) → drives table + strip.
+    const s12Filter = s.s12Filter || null;
+    const filterMatch = (m) => !s12Filter ? true : (s12Filter.type === 'sig' ? m.sig === s12Filter.key : s12Filter.type === 'queue' ? m.q === s12Filter.key : s12Filter.type === 'src' ? m.src === s12Filter.key : true);
+    const setFilter = (f) => this.setState(st => ({ s12Filter: (st.s12Filter && f && st.s12Filter.type === f.type && st.s12Filter.key === f.key) ? null : f }));
+    const s12FilterActive = !!s12Filter;
+    const s12FilterLabel = s12Filter ? (s12Filter.type === 'sig' ? s12Filter.key + ' cluster' : s12Filter.type === 'queue' ? s12Filter.key + ' queue' : 'source ' + s12Filter.key) : '';
+    const s12ClearFilter = () => this.setState({ s12Filter: null });
+
+    // --- error-signature clusters (the signature grouping) -------------------
+    const clusterMap = new Map();
+    dlqCorpus.forEach(m => { const c = clusterMap.get(m.sig) || { sig: m.sig, members: [], srcs: new Set(), ages: [] }; c.members.push(m); c.srcs.add(m.src); c.ages.push(m.ageMin); clusterMap.set(m.sig, c); });
+    const clusterAgesMax = Math.max(1, ...dlqCorpus.map(m => m.ageMin));
+    const s12Clusters = Array.from(clusterMap.values()).sort((a, b) => b.members.length - a.members.length).map(c => {
+      const meta = sigMeta[c.sig] || { label: 'failure', glyph: '⚠', tone: 'warning' };
+      const srcs = Array.from(c.srcs);
+      const minA = Math.min(...c.ages), maxA = Math.max(...c.ages);
+      const exhausted = c.members.filter(m => m.retry >= m.max).length;
+      // 8-window sparkbar of when the members died (bucket by age)
+      const buckets = [0, 0, 0, 0, 0, 0, 0, 0];
+      c.ages.forEach(a => { const idx = Math.min(7, Math.floor((a / (clusterAgesMax + 1)) * 8)); buckets[7 - idx] += 1; });
+      const active = s12Filter && s12Filter.type === 'sig' && s12Filter.key === c.sig;
+      return {
+        sig: c.sig, glyph: meta.glyph, tone: meta.tone, msg: meta.label, count: String(c.members.length),
+        srcChips: srcs.slice(0, 3).map(sName => ({ name: sName })), srcMore: srcs.length > 3 ? '+' + (srcs.length - 3) : '',
+        ageRange: minA === maxA ? ageLabel(minA) : ageLabel(minA) + '–' + ageLabel(maxA),
+        exhaustedLabel: exhausted + '/' + c.members.length + ' exhausted', hasExhausted: exhausted > 0,
+        spark: sparkCols(buckets), selState: active ? 'active' : null,
+        filter: () => setFilter({ type: 'sig', key: c.sig }),
+        retryAll: () => this.askConfirm({ title: 'Reprocess ' + c.members.length + ' × ' + c.sig, desc: 'Bulk-replays every message in the ' + c.sig + ' cluster (' + meta.label + ') through its original source. Destructive replay — confirm required.', from: c.members.length + ' dead · ' + c.sig, to: 're-enqueued', cli: (s.s12Tab === 'queue' ? 'netscript queue dlq reprocess --backend redis' : 'netscript triggers dlq reprocess webhook.payment') + ' --signature ' + c.sig, action: 'Reprocess ' + c.members.length, danger: true, toast: c.members.length + ' × ' + c.sig + ' re-enqueued', apply: () => this.setState({ s12Checked: {} }) }),
+        purge: () => this.askConfirm({ title: 'Purge ' + c.members.length + ' × ' + c.sig, desc: 'Permanently drops every message in the ' + c.sig + ' cluster from the dead-letter queue. This cannot be undone.', from: c.members.length + ' parked · ' + c.sig, to: 'purged', cli: (s.s12Tab === 'queue' ? 'netscript queue dlq purge --backend redis' : 'netscript triggers dlq purge webhook.payment') + ' --signature ' + c.sig, action: 'Purge ' + c.members.length, danger: true, toast: c.members.length + ' × ' + c.sig + ' purged', apply: () => this.setState({ s12Checked: {} }) }),
+      };
+    });
+
+    // --- queue-health overview (per backend: depth + capacity fill + trend) --
+    const queueDefs = s.s12Tab === 'queue'
+      ? [ { key: 'redis', label: 'redis', depth: 14, cap: 32, trend: [1, 2, 1, 3, 2, 4, 5, 6, 8, 10, 12, 14], oldest: 21 },
+          { key: 'postgres', label: 'postgres', depth: 2, cap: 40, trend: [0, 0, 1, 0, 0, 1, 0, 1, 1, 2, 2, 2], oldest: 58 },
+          { key: 'kv', label: 'kv (memory)', depth: 0, cap: 16, trend: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], oldest: 0 } ]
+      : [ { key: 'trigger', label: 'trigger dlq', depth: 1, cap: 20, trend: [0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1], oldest: 12 } ];
+    const s12Queues = queueDefs.map(qd => {
+      const pct = Math.min(100, Math.round((qd.depth / qd.cap) * 100));
+      const tone = qd.depth === 0 ? 'success' : pct >= 60 ? 'destructive' : pct >= 25 ? 'warning' : 'primary';
+      const active = s12Filter && s12Filter.type === 'queue' && s12Filter.key === qd.key;
+      return {
+        key: qd.key, label: qd.label, depth: String(qd.depth), cap: 'cap ' + qd.cap, pct: String(pct), tone,
+        fillStyle: 'width:' + pct + '%', pctLabel: pct + '%',
+        oldest: qd.oldest > 0 ? ageLabel(qd.oldest) : '—', empty: qd.depth === 0,
+        spark: sparkCols(qd.trend), sevLabel: qd.depth === 0 ? 'clear' : pct >= 60 ? 'critical' : pct >= 25 ? 'elevated' : 'low',
+        selState: active ? 'active' : null,
+        filter: () => qd.depth > 0 ? setFilter({ type: 'queue', key: qd.key }) : this.showToast(qd.label + ' dead-letter queue is empty', 'success'),
+      };
+    });
+
+    // --- header triage strip (composite metrics, not plain number cards) -----
+    const totalParked = dlqCorpus.length;
+    const exhaustedTot = dlqCorpus.filter(m => m.retry >= m.max).length;
+    const oldestMin = dlqCorpus.length ? Math.max(...dlqCorpus.map(m => m.ageMin)) : 0;
+    // by-queue split reflects the actual parked corpus (sums to totalParked)
+    const byQueue = queueDefs.map(q => ({ label: q.label, key: q.key, n: dlqCorpus.filter(m => m.q === q.key).length })).filter(q => q.n > 0);
+    const queueTone = { redis: 'destructive', postgres: 'warning', kv: 'muted', trigger: 'warning' };
+    const s12Strip = {
+      total: String(totalParked),
+      totalTrend: sparkCols(s.s12Tab === 'queue' ? [2, 3, 2, 4, 3, 5, 6, 5, 7, 8, 7, 9] : [0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1]),
+      split: byQueue.map(q => ({ label: q.label, n: String(q.n), tone: queueTone[q.key] || 'warning', style: 'flex:' + q.n + ' ' + q.n + ' 0%' })),
+      clusters: String(s12Clusters.length),
+      oldest: oldestMin > 0 ? ageLabel(oldestMin) : '—',
+      exhausted: String(exhaustedTot),
+      exhaustedPips: Array.from({ length: Math.min(totalParked, 8) }, (_, i) => ({ on: i < exhaustedTot })),
+      exhaustTone: exhaustedTot > 0 ? 'destructive' : 'success',
+    };
+
+    // --- failed-message triage rows (dense, retry pips + inline actions) -----
+    const filtered = dlqCorpus.filter(filterMatch);
+    const s12Rows = filtered.map(r => {
+      const meta = sigMeta[r.sig] || { tone: 'warning' };
+      return {
+        ...r, checked: !!s.s12Checked[r.id], sigTone: meta.tone, kindGlyph: kindGlyph[r.kind] || '•',
+        age: ageLabel(r.ageMin), retryLabel: r.retry + '/' + r.max,
+        pips: Array.from({ length: r.max }, (_, i) => ({ on: i < r.retry })),
+        exhausted: r.retry >= r.max,
+        open: () => this.setState({ sheet: 's12', s12Sel: r.id }),
+        toggle: () => this.setState(st => ({ s12Checked: { ...st.s12Checked, [r.id]: !st.s12Checked[r.id] } })),
+      };
+    });
+    const s12AllChecked = filtered.length > 0 && filtered.every(r => s.s12Checked[r.id]);
+    const s12ToggleAll = () => this.setState(st => { const next = { ...st.s12Checked }; const all = filtered.every(r => next[r.id]); filtered.forEach(r => { if (all) delete next[r.id]; else next[r.id] = true; }); return { s12Checked: next }; });
+    const s12Count = dlqCorpus.filter(r => s.s12Checked[r.id]).length;
     const s12Backend = s.s12Tab === 'queue' ? 'redis' : 'trigger DLQ';
+    const s12Empty = filtered.length === 0;
+    const s12AllClear = totalParked === 0;
     const reprocess = () => this.askConfirm({
       title: 'Reprocess ' + s12Count + ' message' + (s12Count === 1 ? '' : 's') + ' from ' + s12Backend,
       desc: 'Bulk-replays the selected message' + (s12Count === 1 ? '' : 's') + ' through the original ' + (s.s12Tab === 'queue' ? 'queue' : 'trigger') + '. Destructive replay — confirm required.',
@@ -6331,10 +6587,35 @@ class Component extends DCLogic {
       toast: s12Count + ' message(s) re-enqueued',
       apply: () => this.setState({ s12Checked: {} }),
     });
-    const s12Depths = s.s12Tab === 'queue'
-      ? [ { label: 'KV', value: '0', tone: 'success' }, { label: 'Redis', value: '14', tone: 'warning' }, { label: 'Postgres', value: '2', tone: 'warning' } ]
-      : [ { label: 'Trigger DLQ', value: '1', tone: 'warning' } ];
-    const s12Caption = s.s12Tab === 'queue' ? 'showing 2 of 16 dead-lettered messages (redis 14 · postgres 2)' : 'showing 1 of 1 dead-lettered trigger event';
+    const purgeSelected = () => this.askConfirm({
+      title: 'Purge ' + s12Count + ' message' + (s12Count === 1 ? '' : 's') + ' from ' + s12Backend,
+      desc: 'Permanently drops the selected message' + (s12Count === 1 ? '' : 's') + ' from the dead-letter queue. This cannot be undone.',
+      from: s12Count + ' selected · parked', to: 'purged',
+      cli: s.s12Tab === 'queue' ? 'netscript queue dlq purge --backend redis --ids <selected>' : 'netscript triggers dlq purge webhook.payment',
+      action: 'Purge ' + s12Count, danger: true,
+      toast: s12Count + ' message(s) purged',
+      apply: () => this.setState({ s12Checked: {} }),
+    });
+    const s12Caption = s12FilterActive
+      ? 'filtered to ' + s12FilterLabel + ' · ' + filtered.length + ' of ' + totalParked + ' parked'
+      : (s.s12Tab === 'queue' ? 'all ' + totalParked + ' dead-lettered messages (redis 14 · postgres 2)' : totalParked + ' dead-lettered trigger event' + (totalParked === 1 ? '' : 's'));
+    const s12Cli = s.s12Tab === 'queue' ? 'netscript queue dlq reprocess --backend redis' : 'netscript triggers dlq reprocess webhook.payment';
+
+    // --- message inspector detail (drawer / mobile sheet) -------------------
+    const s12SelMsg = dlqCorpus.find(m => m.id === s.s12Sel) || dlqCorpus[0] || null;
+    const s12Detail = s12SelMsg ? (() => {
+      const meta = sigMeta[s12SelMsg.sig] || { label: 'failure', tone: 'warning' };
+      return {
+        id: s12SelMsg.id, sig: s12SelMsg.sig, sigTone: meta.tone, reason: s12SelMsg.reason,
+        src: s12SelMsg.src, kind: s12SelMsg.kind, kindGlyph: kindGlyph[s12SelMsg.kind] || '•',
+        q: s12SelMsg.q, corr: s12SelMsg.corr, payload: s12SelMsg.payload,
+        retryLabel: s12SelMsg.retry + '/' + s12SelMsg.max, age: ageLabel(s12SelMsg.ageMin),
+        hist: s12SelMsg.hist.map(h => ({ n: 'attempt ' + h.n, at: h.at, out: h.out, tone: h.tone })),
+        reprocessOne: () => this.askConfirm({ title: 'Reprocess ' + s12SelMsg.id, desc: 'Replays this single dead-lettered message through ' + s12SelMsg.src + '. Destructive replay — confirm required.', from: s12SelMsg.id + ' · dead', to: 're-enqueued', cli: s12Cli + ' --id ' + s12SelMsg.id, action: 'Reprocess', danger: true, toast: s12SelMsg.id + ' re-enqueued', apply: () => this.setState({ sheet: null }) }),
+        purgeOne: () => this.askConfirm({ title: 'Purge ' + s12SelMsg.id, desc: 'Permanently drops this message from the dead-letter queue. This cannot be undone.', from: s12SelMsg.id + ' · parked', to: 'purged', cli: (s.s12Tab === 'queue' ? 'netscript queue dlq purge --backend redis' : 'netscript triggers dlq purge webhook.payment') + ' --id ' + s12SelMsg.id, action: 'Purge', danger: true, toast: s12SelMsg.id + ' purged', apply: () => this.setState({ sheet: null }) }),
+        openRun: () => { this.setState({ s6Sel: 'run-job', sheet: null }); this.nav('runs'); },
+      };
+    })() : null;
 
     // ----- S13 -----
     const s13Flows = s.s13Flows.filter(f =>
@@ -6647,8 +6928,8 @@ class Component extends DCLogic {
       s1Sheet: s.detailSheet || { eyebrow: '', icon: '', tone: 'muted', value: '', title: '', pill: '', pillClass: 'ns-badge ns-badge--muted', desc: '', cta: 'Open', rows: [], go: () => {} },
       closeDetailSheet: () => this.setState({ detailSheet: null }),
       // sheet
-      sheetIsS2: s.sheet === 's2', sheetIsS13: s.sheet === 's13', sheetIsS7: s.sheet === 's7', sheetIsS8: s.sheet === 's8', sheetIsS9: s.sheet === 's9', sheetIsS11: s.sheet === 's11',
-      sheetTitle: s.sheet === 's2' ? selDef.key : s.sheet === 's7' ? s7Detail.name : s.sheet === 's8' ? (s8SelNode ? s8SelNode.name : s8.saga) : s.sheet === 's9' ? s9Detail.id : s.sheet === 's11' ? s11Detail.name : (selNode13 ? selNode13.name : ''),
+      sheetIsS2: s.sheet === 's2', sheetIsS13: s.sheet === 's13', sheetIsS7: s.sheet === 's7', sheetIsS8: s.sheet === 's8', sheetIsS9: s.sheet === 's9', sheetIsS11: s.sheet === 's11', sheetIsS12: s.sheet === 's12',
+      sheetTitle: s.sheet === 's2' ? selDef.key : s.sheet === 's7' ? s7Detail.name : s.sheet === 's8' ? (s8SelNode ? s8SelNode.name : s8.saga) : s.sheet === 's9' ? s9Detail.id : s.sheet === 's11' ? s11Detail.name : s.sheet === 's12' ? (s12Detail ? s12Detail.id : '') : (selNode13 ? selNode13.name : ''),
       closeSheet: () => this.setState({ sheet: null }),
       // S1
       s1Stats, s1CmdGroups, s1Contribs, s1Teaser, s1Kpis, s1Hero, s1Ai,
@@ -6839,11 +7120,14 @@ class Component extends DCLogic {
       s11DrawerDdl: s11DrawerTab === 'ddl', s11DrawerSummary: s11DrawerTab === 'summary',
       s11OpenDrawer: () => this.setState({ sheet: 's11', s11DrawerTab: 'summary' }),
       s11OpenAspire: () => this.showToast('Would open Aspire postgres resource ↗', 'info'),
-      // S12
-      s12Rows, s12Count, s12HasSel: s12Count > 0, s12NoSel: s12Count === 0, reprocess,
-      s12TabQueue: { state: s.s12Tab === 'queue' ? 'active' : null, set: () => this.updateQuery({ kind: 'queue' }, { s12Tab: 'queue', s12Checked: {} }) },
-      s12TabTrigger: { state: s.s12Tab === 'trigger' ? 'active' : null, set: () => this.updateQuery({ kind: 'trigger' }, { s12Tab: 'trigger', s12Checked: {} }) },
-      s12Depths, s12Caption,
+      // S12 · Dead-Letter Queues (operational triage console)
+      s12Rows, s12Count, s12HasSel: s12Count > 0, s12NoSel: s12Count === 0, reprocess, purgeSelected,
+      s12TabQueue: { state: s.s12Tab === 'queue' ? 'active' : null, set: () => this.updateQuery({ kind: 'queue' }, { s12Tab: 'queue', s12Checked: {}, s12Filter: null, s12Sel: null }) },
+      s12TabTrigger: { state: s.s12Tab === 'trigger' ? 'active' : null, set: () => this.updateQuery({ kind: 'trigger' }, { s12Tab: 'trigger', s12Checked: {}, s12Filter: null, s12Sel: null }) },
+      s12Caption, s12Cli, s12Strip, s12Queues, s12Clusters, s12Detail,
+      s12Empty, s12AllClear, s12NotEmpty: !s12Empty && !s12AllClear,
+      s12AllChecked, s12ToggleAll, s12FilterActive, s12FilterLabel, s12ClearFilter,
+      s12QueueScope: s.s12Tab === 'queue', s12TriggerScope: s.s12Tab === 'trigger',
       s12OpenRun: () => { this.setState({ s6Sel: 'run-job' }); this.nav('runs'); },
       // S13
       s13Flows, s13Nodes, s13Detail, s13Verdict, s13VerdictBadge, s13Assist, s13Hero,
