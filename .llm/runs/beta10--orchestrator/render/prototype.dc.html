@@ -1902,54 +1902,337 @@
 
       <!-- @S9-END -->
       <sc-if value="{{ isStreams }}" hint-placeholder-val="{{ false }}">
-        <div class="ns-screen" data-screen-label="S10 Streams">
+        <div class="ns-screen ns-streams" data-screen-label="S10 Streams">
+          <!-- Topic header: breadcrumb + tab row + streams-health composite strip (ref 11/13) -->
           <header class="ns-page-header ns-page-header--console">
-            <div class="ns-toolbar">
-              <div style="display:grid;gap:var(--ns-space-2)">
-                <h1>Streams</h1>
-                <span class="ns-chip" style="width:fit-content">contributed by the streams plugin</span>
-                <p class="ns-lede">Which subscribers received this message, and how many delivery attempts each took — invisible to Aspire and Scalar.</p>
+            <div class="ns-conhead">
+              <div class="ns-conbread">
+                <span class="ns-conbread__crumb">Capabilities</span>
+                <span class="ns-conbread__sep">›</span>
+                <span class="ns-conbread__crumb">Streams</span>
+                <span class="ns-conbread__sep">›</span>
+                <span class="ns-conbread__crumb ns-conbread__crumb--here" style="font-family:var(--ns-font-mono)">{{ s10TopicName }}</span>
+                <span class="ns-chip" style="margin-left:var(--ns-space-2)">contributed by the streams plugin</span>
+              </div>
+              <div class="ns-toolbar">
+                <div style="display:grid;gap:var(--ns-space-2);min-width:0">
+                  <h1 style="display:flex;align-items:center;gap:var(--ns-space-3);flex-wrap:wrap"><span style="font-family:var(--ns-font-mono)">{{ s10TopicName }}</span><span class="ns-strlive" aria-hidden="true"><span class="ns-strlive__dot"></span>live</span></h1>
+                  <p class="ns-lede">A durable, partitioned event log — read throughput, offsets, and consumer-group lag; tail records live and see who produces and who falls behind. Raw broker internals stay in Aspire.</p>
+                </div>
+              </div>
+              <!-- streams-health composite: throughput / lag / partitions / retention, each with a micro-viz -->
+              <div class="ns-strhealth">
+                <div class="ns-strhealth__tile" data-tone="primary">
+                  <div class="ns-strhealth__head"><span class="ns-strhealth__label">throughput</span><span class="ns-strhealth__unit">msgs/sec</span></div>
+                  <div class="ns-strhealth__val">{{ s10ThruNow }}<span class="ns-strhealth__val-sub">/s</span></div>
+                  <span class="ns-trend ns-strhealth__spark" data-series="{{ s10ThruSpark }}" aria-hidden="true"><svg viewBox="0 0 100 30" preserveAspectRatio="none"></svg></span>
+                </div>
+                <div class="ns-strhealth__tile" data-tone="warning">
+                  <div class="ns-strhealth__head"><span class="ns-strhealth__label">consumer lag</span><span class="ns-strhealth__unit">{{ s10LagHot }} hotspot</span></div>
+                  <div class="ns-strhealth__val">{{ s10TotalLag }}<span class="ns-strhealth__val-sub">msgs</span></div>
+                  <div class="ns-strhealth__bp" data-tone="{{ s10BackpressureTone }}"><span class="ns-strhealth__bp-dot" aria-hidden="true"></span>{{ s10Backpressure }}</div>
+                </div>
+                <div class="ns-strhealth__tile" data-tone="success">
+                  <div class="ns-strhealth__head"><span class="ns-strhealth__label">partitions</span><span class="ns-strhealth__unit">in-sync</span></div>
+                  <div class="ns-strhealth__val">{{ s10InSync }}<span class="ns-strhealth__val-sub">/ {{ s10Partitions }}</span></div>
+                  <div class="ns-strhealth__pips" aria-hidden="true">
+                    <sc-for list="{{ s10Parts }}" as="pp" hint-placeholder-count="6"><span class="ns-strhealth__pip" data-tone="{{ pp.lagTone }}"></span></sc-for>
+                  </div>
+                </div>
+                <div class="ns-strhealth__tile" data-tone="muted">
+                  <div class="ns-strhealth__head"><span class="ns-strhealth__label">retention</span><span class="ns-strhealth__unit">replication ×{{ s10Replication }}</span></div>
+                  <div class="ns-strhealth__val">{{ s10Retention }}</div>
+                  <div class="ns-strhealth__meta" style="font-family:var(--ns-font-mono)">{{ s10TopicBackend }}</div>
+                </div>
+              </div>
+              <div class="ns-contab" role="tablist" aria-label="Topic views">
+                <button class="ns-contab__btn" role="tab" data-state="{{ s10TabConsume.state }}" onClick="{{ s10TabConsume.set }}">Consume</button>
+                <button class="ns-contab__btn" role="tab" data-state="{{ s10TabParts.state }}" onClick="{{ s10TabParts.set }}">Partitions <span class="ns-contab__count">{{ s10Partitions }}</span></button>
+                <button class="ns-contab__btn" role="tab" data-state="{{ s10TabConsumers.state }}" onClick="{{ s10TabConsumers.set }}">Consumers <span class="ns-contab__count">3</span></button>
+                <button class="ns-contab__btn" role="tab" data-state="{{ s10TabConfig.state }}" onClick="{{ s10TabConfig.set }}">Config</button>
               </div>
             </div>
           </header>
-          <div class="ns-inline-notice ns-inline-notice--info" style="display:flex;gap:var(--ns-space-2);align-items:center;padding:var(--ns-space-2-5) var(--ns-space-4);border-radius:var(--ns-radius-md);margin-bottom:var(--ns-space-5)">
-            <span class="ns-inline-notice__icon" aria-hidden="true">ℹ</span>
-            <span class="ns-inline-notice__description" style="font-size:var(--ns-text-xs)">Streams telemetry is instrumented and exporting — the delivery read-model is served from the streams contract.</span>
-          </div>
-          <div class="ns-console-grid">
-            <aside style="min-width:0">
-              <div class="ns-mini-label" style="margin-bottom:var(--ns-space-2)">Messages · payment-events</div>
-              <div class="ns-entity-rail" role="listbox" aria-label="Stream messages">
-                <sc-for list="{{ s10Msgs }}" as="m" hint-placeholder-count="2">
-                  <button class="ns-entity-rail__item" role="option" data-state="{{ m.selState }}" onClick="{{ m.select }}">
-                    <span class="ns-entity-rail__title"><span>{{ m.id }}</span></span>
-                    <span class="ns-entity-rail__meta"><span class="{{ m.sBadge }}">{{ m.status }}</span><span>{{ m.time }}</span></span>
-                  </button>
-                </sc-for>
+
+          <!-- Throughput hero: JS-measured area chart + hover crosshair + OHLC footer (ref 04) -->
+          <div class="ns-strhero">
+            <div class="ns-strhero__main">
+              <div class="ns-strhero__head">
+                <div>
+                  <span class="ns-mini-label">live throughput · payment-events</span>
+                  <div class="ns-strhero__title"><span class="ns-strhero__now">{{ s10ThruNow }}</span><span class="ns-strhero__now-unit">msgs/sec</span></div>
+                </div>
+                <div class="ns-strhero__bp" data-tone="{{ s10BackpressureTone }}">
+                  <span class="ns-strhero__bp-dot" aria-hidden="true"></span>
+                  <span class="ns-strhero__bp-body"><span class="ns-strhero__bp-label">{{ s10Backpressure }}</span><span class="ns-strhero__bp-detail">{{ s10BackpressureDetail }}</span></span>
+                </div>
               </div>
-              <div style="margin-top:var(--ns-space-5)">
-                <div class="ns-mini-label" style="margin-bottom:var(--ns-space-2)">Subscribers (from wiring graph)</div>
-                <div class="ns-connector">
-                  <sc-for list="{{ s10Subs }}" as="sb" hint-placeholder-count="3">
-                    <div class="ns-connector__row" data-state="{{ sb.state }}">
-                      <span class="ns-connector__dot" aria-hidden="true"></span>
-                      <span class="ns-connector__probe">{{ sb.probe }}</span>
-                      <span class="ns-connector__result">{{ sb.result }}</span>
+              <div class="ns-strhero__chart ns-areachart" data-series="{{ s10ThruSeries }}" data-marker="{{ s10ThruMarker }}" data-crosshair="1">
+                <svg class="ns-areachart__svg ns-strhero__svg" viewBox="0 0 300 128" preserveAspectRatio="none"></svg>
+                <div class="ns-strhero__tip" aria-hidden="true"><span class="ns-strhero__tip-val"></span><span class="ns-strhero__tip-x"></span></div>
+              </div>
+              <div class="ns-strhero__ohlc">
+                <div class="ns-strhero__ohlc-item"><span class="ns-strhero__ohlc-k">peak</span><span class="ns-strhero__ohlc-v">{{ s10ThruPeak }}/s</span></div>
+                <span class="ns-strhero__ohlc-dot" aria-hidden="true"></span>
+                <div class="ns-strhero__ohlc-item"><span class="ns-strhero__ohlc-k">avg</span><span class="ns-strhero__ohlc-v">{{ s10ThruAvg }}/s</span></div>
+                <span class="ns-strhero__ohlc-dot" aria-hidden="true"></span>
+                <div class="ns-strhero__ohlc-item"><span class="ns-strhero__ohlc-k">floor</span><span class="ns-strhero__ohlc-v">{{ s10ThruFloor }}/s</span></div>
+                <span class="ns-strhero__ohlc-dot" aria-hidden="true"></span>
+                <div class="ns-strhero__ohlc-item"><span class="ns-strhero__ohlc-k">window</span><span class="ns-strhero__ohlc-v">2m</span></div>
+              </div>
+            </div>
+            <!-- Producer → consumer topology (div/CSS flow, not a canvas) -->
+            <div class="ns-strtopo">
+              <span class="ns-mini-label">producer → log → consumers</span>
+              <div class="ns-strtopo__flow">
+                <div class="ns-strtopo__col">
+                  <span class="ns-strtopo__col-label">producers</span>
+                  <sc-for list="{{ s10Producers }}" as="pr" hint-placeholder-count="2">
+                    <div class="ns-strtopo__node" data-role="producer">
+                      <span class="ns-strtopo__node-name">{{ pr.id }}</span>
+                      <span class="ns-strtopo__node-rate">{{ pr.rate }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+                <div class="ns-strtopo__spine" aria-hidden="true"><span class="ns-strtopo__spine-line"></span></div>
+                <div class="ns-strtopo__log" data-role="log">
+                  <span class="ns-strtopo__log-name" style="font-family:var(--ns-font-mono)">{{ s10TopicName }}</span>
+                  <span class="ns-strtopo__log-sub">{{ s10Partitions }} partitions · ×{{ s10Replication }}</span>
+                  <div class="ns-strtopo__log-bars" aria-hidden="true">
+                    <sc-for list="{{ s10Parts }}" as="pb" hint-placeholder-count="6"><span class="ns-strtopo__log-bar" data-tone="{{ pb.lagTone }}"></span></sc-for>
+                  </div>
+                </div>
+                <div class="ns-strtopo__spine ns-strtopo__spine--fan" aria-hidden="true"><span class="ns-strtopo__spine-line"></span></div>
+                <div class="ns-strtopo__col ns-strtopo__col--fan">
+                  <span class="ns-strtopo__col-label">consumer groups</span>
+                  <sc-for list="{{ s10Consumers }}" as="cn" hint-placeholder-count="3">
+                    <div class="ns-strtopo__leaf">
+                      <span class="ns-strtopo__stub" aria-hidden="true"></span>
+                      <div class="ns-strtopo__node" data-role="consumer" data-tone="{{ cn.lagTone }}">
+                        <span class="ns-strtopo__node-name">{{ cn.id }}</span>
+                        <span class="ns-strtopo__node-lag" data-tone="{{ cn.lagTone }}">lag {{ cn.lag }}</span>
+                      </div>
                     </div>
                   </sc-for>
                 </div>
               </div>
-            </aside>
-            <section style="min-width:0">
-              <div class="ns-panel" style="background:var(--ns-card)">
-                <div class="ns-panel__header" style="padding:var(--ns-space-4) var(--ns-space-5);border-bottom:1px solid var(--ns-border);flex-direction:row;align-items:center;gap:var(--ns-space-3);flex-wrap:wrap">
-                  <span class="ns-panel__title" style="display:flex;align-items:center;gap:var(--ns-space-2);flex-wrap:wrap">Fan-out · <span style="font-family:var(--ns-font-mono)">{{ s10SelId }}</span> <span class="{{ s10VerdictBadge }}">{{ s10Verdict }}</span></span>
-                  <span style="font-family:var(--ns-font-mono);font-size:var(--ns-text-2xs);color:var(--ns-muted-fg)">corr {{ s10Corr }}</span>
-                  <span style="flex:1"></span>
-                  <button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ s10OpenRun }}">Open full run</button>
-                  <button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ s10OpenTrace }}">View trace ↗</button>
+            </div>
+          </div>
+
+          <!-- Body: left = tab panel (records / partitions / consumers / config), right = live tail + drawer -->
+          <div class="ns-strbody">
+            <section class="ns-strbody__main" style="min-width:0">
+              <!-- CONSUME: partition & offset ledger (default) -->
+              <sc-if value="{{ s10IsConsume }}" hint-placeholder-val="{{ true }}">
+                <div class="ns-panel" style="background:var(--ns-card)">
+                  <div class="ns-strpanel__head">
+                    <span class="ns-panel__title">Partition &amp; offset ledger</span>
+                    <span class="ns-strpanel__hint">head → committed · lag heat inline</span>
+                  </div>
+                  <div class="ns-strledger">
+                    <div class="ns-strledger__head" role="row">
+                      <span class="ns-strledger__h">Part</span>
+                      <span class="ns-strledger__h">Leader</span>
+                      <span class="ns-strledger__h ns-strledger__h--num">Head</span>
+                      <span class="ns-strledger__h ns-strledger__h--num">Committed</span>
+                      <span class="ns-strledger__h">Lag</span>
+                      <span class="ns-strledger__h">Group</span>
+                    </div>
+                    <sc-for list="{{ s10Parts }}" as="p" hint-placeholder-count="6">
+                      <button class="ns-strledger__row" data-tone="{{ p.lagTone }}" onClick="{{ p.go }}">
+                        <span class="ns-strledger__part"><span class="ns-strledger__part-idx">{{ p.p }}</span><sc-if value="{{ p.inSync }}" hint-placeholder-val="{{ true }}"><span class="ns-strledger__sync" title="in-sync" aria-hidden="true">◆</span></sc-if></span>
+                        <span class="ns-strledger__leader">{{ p.leader }}</span>
+                        <span class="ns-strledger__num">{{ p.head }}</span>
+                        <span class="ns-strledger__num">{{ p.committed }}</span>
+                        <span class="ns-strledger__lag"><span class="ns-strledger__lagbar" data-tone="{{ p.lagTone }}" style="width:{{ p.lagPct }}%"></span><span class="ns-strledger__lagval">{{ p.lag }}</span></span>
+                        <span class="ns-strledger__group">{{ p.group }}</span>
+                      </button>
+                    </sc-for>
+                  </div>
                 </div>
-                <div class="ns-panel__body" style="padding:var(--ns-space-3) var(--ns-space-5) var(--ns-space-4)">
+                <!-- partition × time lag heatmap (ref 10 retention heat) -->
+                <div class="ns-panel" style="background:var(--ns-card);margin-top:var(--ns-space-5)">
+                  <div class="ns-strpanel__head">
+                    <span class="ns-panel__title">Lag heatmap</span>
+                    <span class="ns-strpanel__hint">partition × recent windows · darker = further behind</span>
+                  </div>
+                  <div class="ns-strheat">
+                    <sc-for list="{{ s10Heat }}" as="hr" hint-placeholder-count="6">
+                      <div class="ns-strheat__row">
+                        <span class="ns-strheat__plabel">p{{ hr.p }}</span>
+                        <div class="ns-strheat__cells">
+                          <sc-for list="{{ hr.cells }}" as="c" hint-placeholder-count="8">
+                            <span class="ns-strheat__cell" data-v="{{ c.v }}" aria-hidden="true"></span>
+                          </sc-for>
+                        </div>
+                      </div>
+                    </sc-for>
+                    <div class="ns-strheat__legend">
+                      <span class="ns-strheat__legend-label">lag</span>
+                      <span class="ns-strheat__cell" data-v="0" aria-hidden="true"></span>
+                      <span class="ns-strheat__cell" data-v="1" aria-hidden="true"></span>
+                      <span class="ns-strheat__cell" data-v="2" aria-hidden="true"></span>
+                      <span class="ns-strheat__cell" data-v="3" aria-hidden="true"></span>
+                      <span class="ns-strheat__cell" data-v="4" aria-hidden="true"></span>
+                      <span class="ns-strheat__legend-label">more</span>
+                    </div>
+                  </div>
+                </div>
+              </sc-if>
+
+              <!-- PARTITIONS: the ledger, focused -->
+              <sc-if value="{{ s10IsParts }}" hint-placeholder-val="{{ false }}">
+                <div class="ns-panel" style="background:var(--ns-card)">
+                  <div class="ns-strpanel__head">
+                    <span class="ns-panel__title">Partitions</span>
+                    <span class="ns-strpanel__hint">{{ s10InSync }} of {{ s10Partitions }} in-sync</span>
+                  </div>
+                  <div class="ns-strledger">
+                    <div class="ns-strledger__head" role="row">
+                      <span class="ns-strledger__h">Part</span>
+                      <span class="ns-strledger__h">Leader</span>
+                      <span class="ns-strledger__h ns-strledger__h--num">Head</span>
+                      <span class="ns-strledger__h ns-strledger__h--num">Committed</span>
+                      <span class="ns-strledger__h">Lag</span>
+                      <span class="ns-strledger__h">Group</span>
+                    </div>
+                    <sc-for list="{{ s10Parts }}" as="p" hint-placeholder-count="6">
+                      <button class="ns-strledger__row" data-tone="{{ p.lagTone }}" onClick="{{ p.go }}">
+                        <span class="ns-strledger__part"><span class="ns-strledger__part-idx">{{ p.p }}</span><sc-if value="{{ p.inSync }}" hint-placeholder-val="{{ true }}"><span class="ns-strledger__sync" title="in-sync" aria-hidden="true">◆</span></sc-if></span>
+                        <span class="ns-strledger__leader">{{ p.leader }}</span>
+                        <span class="ns-strledger__num">{{ p.head }}</span>
+                        <span class="ns-strledger__num">{{ p.committed }}</span>
+                        <span class="ns-strledger__lag"><span class="ns-strledger__lagbar" data-tone="{{ p.lagTone }}" style="width:{{ p.lagPct }}%"></span><span class="ns-strledger__lagval">{{ p.lag }}</span></span>
+                        <span class="ns-strledger__group">{{ p.group }}</span>
+                      </button>
+                    </sc-for>
+                  </div>
+                </div>
+                <!-- partition × time lag heatmap (also on Partitions tab — partition-centric) -->
+                <div class="ns-panel" style="background:var(--ns-card);margin-top:var(--ns-space-5)">
+                  <div class="ns-strpanel__head">
+                    <span class="ns-panel__title">Lag heatmap</span>
+                    <span class="ns-strpanel__hint">partition × recent windows · darker = further behind</span>
+                  </div>
+                  <div class="ns-strheat">
+                    <sc-for list="{{ s10Heat }}" as="hr" hint-placeholder-count="6">
+                      <div class="ns-strheat__row">
+                        <span class="ns-strheat__plabel">p{{ hr.p }}</span>
+                        <div class="ns-strheat__cells">
+                          <sc-for list="{{ hr.cells }}" as="c" hint-placeholder-count="8">
+                            <span class="ns-strheat__cell" data-v="{{ c.v }}" aria-hidden="true"></span>
+                          </sc-for>
+                        </div>
+                      </div>
+                    </sc-for>
+                    <div class="ns-strheat__legend">
+                      <span class="ns-strheat__legend-label">lag</span>
+                      <span class="ns-strheat__cell" data-v="0" aria-hidden="true"></span>
+                      <span class="ns-strheat__cell" data-v="1" aria-hidden="true"></span>
+                      <span class="ns-strheat__cell" data-v="2" aria-hidden="true"></span>
+                      <span class="ns-strheat__cell" data-v="3" aria-hidden="true"></span>
+                      <span class="ns-strheat__cell" data-v="4" aria-hidden="true"></span>
+                      <span class="ns-strheat__legend-label">more</span>
+                    </div>
+                  </div>
+                </div>
+              </sc-if>
+
+              <!-- CONSUMERS: consumer-group lag cards with a lag gauge -->
+              <sc-if value="{{ s10IsConsumers }}" hint-placeholder-val="{{ false }}">
+                <div class="ns-strgroups">
+                  <sc-for list="{{ s10Groups }}" as="g" hint-placeholder-count="3">
+                    <button class="ns-strgroup" data-tone="{{ g.lagTone }}" onClick="{{ g.go }}">
+                      <div class="ns-strgroup__gauge ns-gauge" data-value="{{ g.lagPct }}" data-tone="{{ g.lagTone }}">
+                        <span class="ns-gauge__ring" aria-hidden="true"></span>
+                        <span class="ns-strgroup__gauge-val">{{ g.lag }}</span>
+                      </div>
+                      <div class="ns-strgroup__body">
+                        <div class="ns-strgroup__top">
+                          <span class="ns-strgroup__name">{{ g.id }}</span>
+                          <span class="{{ g.sBadge }}">{{ g.status }}</span>
+                        </div>
+                        <div class="ns-strgroup__meta">
+                          <span class="ns-strgroup__kv"><span class="ns-strgroup__k">members</span><span class="ns-strgroup__v">{{ g.members }}</span></span>
+                          <span class="ns-strgroup__kv"><span class="ns-strgroup__k">partitions</span><span class="ns-strgroup__v">{{ g.parts }}</span></span>
+                          <span class="ns-strgroup__kv"><span class="ns-strgroup__k">guarantee</span><span class="ns-strgroup__v">{{ g.policy }}</span></span>
+                        </div>
+                        <span class="ns-strgroup__lagbar"><span class="ns-strgroup__lagbar-fill" data-tone="{{ g.lagTone }}" style="width:{{ g.lagPct }}%"></span></span>
+                      </div>
+                    </button>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <!-- CONFIG: topic configuration (KV) -->
+              <sc-if value="{{ s10IsConfig }}" hint-placeholder-val="{{ false }}">
+                <div class="ns-panel" style="background:var(--ns-card)">
+                  <div class="ns-strpanel__head"><span class="ns-panel__title">Topic configuration</span><span class="ns-strpanel__hint">payment-events</span></div>
+                  <div class="ns-strcfg">
+                    <div class="ns-strcfg__row"><span class="ns-strcfg__k">partitions</span><span class="ns-strcfg__v">{{ s10Partitions }}</span></div>
+                    <div class="ns-strcfg__row"><span class="ns-strcfg__k">replication.factor</span><span class="ns-strcfg__v">{{ s10Replication }}</span></div>
+                    <div class="ns-strcfg__row"><span class="ns-strcfg__k">retention</span><span class="ns-strcfg__v">{{ s10Retention }}</span></div>
+                    <div class="ns-strcfg__row"><span class="ns-strcfg__k">backend</span><span class="ns-strcfg__v">{{ s10TopicBackend }}</span></div>
+                    <div class="ns-strcfg__row"><span class="ns-strcfg__k">cleanup.policy</span><span class="ns-strcfg__v">delete</span></div>
+                    <div class="ns-strcfg__row"><span class="ns-strcfg__k">min.insync.replicas</span><span class="ns-strcfg__v">2</span></div>
+                  </div>
+                </div>
+                <!-- record schema (ref 13 line-numbered schema view) -->
+                <div class="ns-panel" style="background:var(--ns-card);margin-top:var(--ns-space-5)">
+                  <div class="ns-strpanel__head">
+                    <span class="ns-panel__title">Record schema</span>
+                    <span class="ns-strpanel__hint">avro · PaymentEvent · v3</span>
+                  </div>
+                  <div class="ns-strschema">
+                    <sc-for list="{{ s10Schema }}" as="ln" hint-placeholder-count="11">
+                      <div class="ns-strschema__line"><span class="ns-strschema__n">{{ ln.n }}</span><span class="ns-strschema__code">{{ ln.t }}</span></div>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
+            </section>
+
+            <!-- Right rail: live event tail (Consume) + stream detail drawer -->
+            <aside class="ns-strbody__rail" style="min-width:0">
+              <div class="ns-panel ns-strtail" style="background:var(--ns-card)">
+                <div class="ns-strpanel__head">
+                  <span class="ns-panel__title" style="display:flex;align-items:center;gap:var(--ns-space-2)"><span class="ns-strlive" aria-hidden="true"><span class="ns-strlive__dot"></span></span>Live event tail</span>
+                  <span class="ns-strpanel__hint">offset · part · key</span>
+                </div>
+                <div class="ns-strtail__list">
+                  <sc-for list="{{ s10Records }}" as="r" hint-placeholder-count="6">
+                    <div class="ns-strtail__row" data-tone="{{ r.tone }}">
+                      <span class="ns-strtail__marker" aria-hidden="true"></span>
+                      <div class="ns-strtail__cols">
+                        <div class="ns-strtail__line1"><span class="ns-strtail__off">{{ r.off }}</span><span class="ns-strtail__part">p{{ r.part }}</span><span class="ns-strtail__key">{{ r.key }}</span><span class="ns-strtail__age">{{ r.age }}</span></div>
+                        <div class="ns-strtail__val">{{ r.val }}</div>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+
+              <!-- Stream detail drawer (desktop) — tabbed, opens the fan-out story -->
+              <div class="ns-panel ns-strdrawer" style="background:var(--ns-card)">
+                <div class="ns-strdrawer__head">
+                  <div class="ns-strdrawer__title">
+                    <span class="ns-strdrawer__eyebrow">selected message</span>
+                    <span class="ns-strdrawer__id" style="font-family:var(--ns-font-mono)">{{ s10SelId }}</span>
+                  </div>
+                  <span class="{{ s10VerdictBadge }}">{{ s10Verdict }}</span>
+                </div>
+                <div class="ns-strdrawer__corr" style="font-family:var(--ns-font-mono)">corr {{ s10Corr }}</div>
+                <div class="ns-strdrawer__msgs">
+                  <sc-for list="{{ s10Msgs }}" as="m" hint-placeholder-count="2">
+                    <button class="ns-strdrawer__msg" data-state="{{ m.selState }}" onClick="{{ m.select }}">
+                      <span class="ns-strdrawer__msg-id" style="font-family:var(--ns-font-mono)">{{ m.id }}</span>
+                      <span class="{{ m.sBadge }}">{{ m.status }}</span>
+                      <span class="ns-strdrawer__msg-time">{{ m.time }}</span>
+                    </button>
+                  </sc-for>
+                </div>
+                <div class="ns-strdrawer__fan">
+                  <span class="ns-mini-label">fan-out delivery</span>
                   <div class="ns-step-timeline">
                     <sc-for list="{{ s10Fan }}" as="st" hint-placeholder-count="3">
                       <div class="ns-step-timeline__step" data-state="{{ st.state }}">
@@ -1959,31 +2242,14 @@
                             <sc-if value="{{ st.attempts }}" hint-placeholder-val="{{ false }}"><span class="ns-step-timeline__attempts">attempt {{ st.attempts }}</span></sc-if>
                           </div>
                           <div class="ns-step-timeline__meta"><span>{{ st.meta }}</span></div>
-                          <sc-if value="{{ st.io }}" hint-placeholder-val="{{ false }}">
-                            <details class="ns-step-timeline__body">
-                              <summary>payload</summary>
-                              <div class="ns-step-timeline__io"><div class="ns-code"><pre><code>{{ st.io }}</code></pre></div></div>
-                            </details>
-                          </sc-if>
                         </div>
                       </div>
                     </sc-for>
                   </div>
                 </div>
-              </div>
-            </section>
-            <aside style="min-width:0">
-              <div class="ns-panel" style="background:var(--ns-card)">
-                <div class="ns-panel__header" style="padding:var(--ns-space-3) var(--ns-space-4);border-bottom:1px solid var(--ns-border)"><span class="ns-panel__title">Delivery feed</span></div>
-                <div style="padding:var(--ns-space-2) var(--ns-space-4) var(--ns-space-3);max-height:26rem;overflow-y:auto">
-                  <div class="ns-activity-feed">
-                    <sc-for list="{{ s10FeedItems }}" as="f" hint-placeholder-count="5">
-                      <div class="ns-activity-feed__item" data-tone="{{ f.tone }}">
-                        <span class="ns-activity-feed__marker" aria-hidden="true"></span>
-                        <div class="ns-activity-feed__body"><span class="ns-activity-feed__text">{{ f.text }}</span><span class="ns-activity-feed__time">{{ f.time }}</span></div>
-                      </div>
-                    </sc-for>
-                  </div>
+                <div class="ns-strdrawer__actions">
+                  <button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ s10OpenRun }}">Open full run</button>
+                  <button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ s10OpenTrace }}">View trace ↗</button>
                 </div>
               </div>
             </aside>
@@ -2993,7 +3259,7 @@ class Component extends DCLogic {
       s9Sel: 'webhook.payment', s9Cat: 'all', s9Sort: 'fired', s9SortDir: 'desc', s9SheetTab: 'chain',
       s9Query: '', s9Outcome: 'all', s9Limit: '100',
       // S10
-      s10Sel: 'msg_88f',
+      s10Sel: 'msg_88f', s10Tab: 'consume',
       s10Feed: [
         F('destructive', 'payment-events msg_88f → analytics FAILED · attempt 3', '14:01:20'),
         F('warning', 'payment-events msg_88f → ledger-sync delivered · attempt 2', '14:00:41'),
@@ -3276,6 +3542,54 @@ class Component extends DCLogic {
     this.drawAreaCharts();
     this.drawLineCharts();
     this.drawBarCharts();
+    this.drawStreamsHero();
+  }
+
+  // Streams throughput hero: the area fill/line are drawn by drawAreaCharts; here
+  // we overlay a crosshair + marker dot at data-marker and wire hover so moving the
+  // pointer snaps the crosshair to the nearest sample and updates the value tip.
+  // All geometry is created imperatively — NO SVG {{ }} holes.
+  drawStreamsHero() {
+    const NS = 'http://www.w3.org/2000/svg';
+    document.querySelectorAll('.ns-strhero__chart[data-crosshair]').forEach(el => {
+      const svg = el.querySelector('svg'); if (!svg) return;
+      const pts = (el.getAttribute('data-series') || '').split(',').map(Number).filter(n => !isNaN(n));
+      if (pts.length < 2) return;
+      const vb = (svg.getAttribute('viewBox') || '0 0 300 128').split(' ').map(Number);
+      const W = vb[2] || 300, H = vb[3] || 128, padT = 8, padB = 2;
+      const max = Math.max(...pts), min = Math.min(...pts), span = (max - min) || 1;
+      const xs = pts.map((p, i) => (i / (pts.length - 1 || 1)) * W);
+      const ys = pts.map(p => padT + (1 - (p - min) / span) * (H - padT - padB));
+      const tip = el.querySelector('.ns-strhero__tip');
+      const tipVal = el.querySelector('.ns-strhero__tip-val');
+      const tipX = el.querySelector('.ns-strhero__tip-x');
+      // remove any prior overlay parts (deterministic rebuild)
+      svg.querySelectorAll('[data-part="hero-cross"],[data-part="hero-dot"]').forEach(n => n.remove());
+      const ch = document.createElementNS(NS, 'line'); ch.setAttribute('data-part', 'hero-cross');
+      const dot = document.createElementNS(NS, 'circle'); dot.setAttribute('data-part', 'hero-dot'); dot.setAttribute('r', '3.4');
+      svg.appendChild(ch); svg.appendChild(dot);
+      const place = (i) => {
+        const mx = xs[i], my = ys[i];
+        ch.setAttribute('x1', mx.toFixed(1)); ch.setAttribute('x2', mx.toFixed(1));
+        ch.setAttribute('y1', '0'); ch.setAttribute('y2', String(H));
+        dot.setAttribute('cx', mx.toFixed(1)); dot.setAttribute('cy', my.toFixed(1));
+        if (tip) { tip.style.left = ((mx / W) * 100).toFixed(1) + '%'; tip.style.top = ((my / H) * 100).toFixed(1) + '%'; }
+        if (tipVal) tipVal.textContent = pts[i] + ' msgs/s';
+        if (tipX) tipX.textContent = '−' + ((pts.length - 1 - i) * 5) + 's';
+      };
+      let mi = parseInt(el.getAttribute('data-marker'), 10);
+      if (isNaN(mi)) mi = pts.indexOf(max);
+      place(mi);
+      if (!el._nsHeroWired) {
+        el._nsHeroWired = true;
+        el.addEventListener('pointermove', (ev) => {
+          const r = el.getBoundingClientRect();
+          const frac = Math.max(0, Math.min(1, (ev.clientX - r.left) / (r.width || 1)));
+          place(Math.round(frac * (pts.length - 1)));
+        });
+        el.addEventListener('pointerleave', () => place(mi));
+      }
+    });
   }
 
   // Area path geometry over an explicit viewBox (used by the hero throughput card).
@@ -3522,7 +3836,7 @@ class Component extends DCLogic {
     if (hit.route === 'runs') { patch.s6Status = q('status', 'all'); patch.s6Cap = q('capability', 'all'); patch.s6Q = q('q', ''); patch.s6View = q('view', 'all'); patch.s6Sel = q('primitive', this.state.s6Sel); }
     if (hit.route === 'sagas' && hit.params.correlationId) patch.s8Sel = hit.params.correlationId === 'ch_3QK9dR2eZ' ? 'pw' : this.state.s8Sel;
     if (hit.route === 'triggers' && hit.params.eventId) patch.s9Open = { ...this.state.s9Open, [hit.params.eventId]: true };
-    if (hit.route === 'streams') patch.s10Sel = q('message', this.state.s10Sel);
+    if (hit.route === 'streams') { patch.s10Sel = q('message', this.state.s10Sel); patch.s10Tab = q('tab', this.state.s10Tab || 'consume'); }
     if (hit.route === 'flows') { if (hit.params.correlationId) patch.s13Sel = hit.params.correlationId; patch.s13Route = q('route', 'all'); patch.s13Status = q('status', 'all'); }
     if (hit.route === 'ai') { if (hit.params.runId) patch.aiSel = hit.params.runId; patch.aiTab = q('tab', 'activity'); }
     if (hit.route === 'dlq') patch.s12Tab = q('kind', 'queue');
@@ -5170,7 +5484,115 @@ class Component extends DCLogic {
       })),
     }));
 
-    // ----- S10 -----
+    // ----- S10 · Streams — topic console (payment-events) --------------------
+    // The screen is a durable-stream / topic console: live throughput, a partition
+    // & offset ledger, consumer-group lag, a partition×time lag heatmap, a
+    // producer→consumer topology, and a live record tail. All faithful to the one
+    // topic the streams plugin exposes (payment-events · 3 subscribers).
+    const s10Tab = s.s10Tab || 'consume';
+    const seg10 = (id) => ({ state: s10Tab === id ? 'active' : null, set: () => this.updateQuery({ tab: id }, { s10Tab: id }) });
+
+    // --- topic-level facts (streams-health composite header) ---
+    const s10Topic = { name: 'payment-events', partitions: 6, inSync: 5, replication: 3, retention: '7d', backend: 'durable-streams' };
+    // live throughput (msgs/sec) — extend the plugin trend into a denser series so
+    // the hero reads as a real time-window. Peak/avg/floor drive the OHLC footer.
+    const thruBase = [3, 4, 3, 5, 4, 6, 5, 4, 7, 8, 6, 9, 7, 11, 9, 8, 12, 10, 9, 13, 11, 10, 14, 12];
+    const thruSeries = thruBase.map(v => v + (s.s10Sel === 'msg_88f' ? 0 : 0)); // stable, data-driven
+    const thruPeak = Math.max(...thruSeries), thruFloor = Math.min(...thruSeries);
+    const thruAvg = Math.round(thruSeries.reduce((a, b) => a + b, 0) / thruSeries.length);
+    const thruNow = thruSeries[thruSeries.length - 1];
+    // marker default = peak index (crosshair sits there until hover moves it)
+    const thruMarker = thruSeries.indexOf(thruPeak);
+    // backpressure: analytics group is lagging → topic is under mild backpressure
+    const backpressure = { state: 'building', tone: 'warning', label: 'Backpressure building', detail: 'analytics group · 1 partition behind' };
+
+    // --- consumer groups (3, mirrors the 3 wired subscribers; analytics lags) ---
+    const s10Groups = [
+      { id: 'receipt-worker', members: 2, parts: '0-5', lag: 0, maxLag: 900, status: 'stable', policy: 'at-least-once' },
+      { id: 'ledger-sync', members: 1, parts: '0-5', lag: 128, maxLag: 900, status: 'stable', policy: 'at-least-once' },
+      { id: 'analytics', members: 1, parts: '3,4', lag: 842, maxLag: 900, status: 'lagging', policy: 'best-effort' },
+    ].map(g => ({
+      ...g,
+      sBadge: badge(g.status === 'stable' ? 'ok' : g.status === 'lagging' ? 'warning' : 'primary'),
+      lagPct: Math.min(100, Math.round((g.lag / g.maxLag) * 100)),
+      lagTone: g.lag === 0 ? 'success' : g.lag > 500 ? 'destructive' : 'warning',
+      go: () => this.nav('/streams/payment-events/subscribers/' + encodeURIComponent(g.id)),
+    }));
+    const s10TotalLag = s10Groups.reduce((a, g) => a + g.lag, 0);
+    const s10LagHot = s10Groups.filter(g => g.lag > 500).length;
+
+    // --- partition & offset ledger (6 partitions; lag heat encoded inline) ---
+    const partSeed = [
+      { p: 0, leader: 'node-a', head: 41207, committed: 41207, group: 'receipt-worker' },
+      { p: 1, leader: 'node-b', head: 39880, committed: 39880, group: 'receipt-worker' },
+      { p: 2, leader: 'node-a', head: 40551, committed: 40483, group: 'ledger-sync' },
+      { p: 3, leader: 'node-c', head: 38914, committed: 38470, group: 'analytics' },
+      { p: 4, leader: 'node-c', head: 42763, committed: 42365, group: 'analytics' },
+      { p: 5, leader: 'node-b', head: 37102, committed: 37042, group: 'ledger-sync' },
+    ];
+    const partMaxLag = Math.max(...partSeed.map(r => r.head - r.committed), 1);
+    const s10Parts = partSeed.map(r => {
+      const lag = r.head - r.committed;
+      return {
+        ...r, lag,
+        lagPct: Math.round((lag / partMaxLag) * 100),
+        lagTone: lag === 0 ? 'success' : lag > 300 ? 'destructive' : 'warning',
+        inSync: r.p === 5 ? null : '1',
+        go: () => this.nav('/streams/payment-events?partition=' + r.p),
+      };
+    });
+
+    // --- partition × time lag heatmap (6 partitions × 8 recent windows) ---
+    // magnitude 0..4 (tint intensity). analytics-owned partitions (3,4) run hot.
+    const heatRows = [
+      { p: 0, cells: [0, 0, 0, 0, 0, 0, 0, 0] },
+      { p: 1, cells: [0, 0, 1, 0, 0, 0, 0, 0] },
+      { p: 2, cells: [0, 1, 0, 0, 1, 0, 0, 0] },
+      { p: 3, cells: [1, 2, 2, 3, 3, 4, 3, 4] },
+      { p: 4, cells: [1, 1, 2, 2, 3, 3, 4, 3] },
+      { p: 5, cells: [0, 0, 0, 1, 0, 0, 1, 0] },
+    ];
+    const s10Heat = heatRows.map(r => ({
+      p: r.p,
+      cells: r.cells.map((v, i) => ({ v, cls: 'ns-strheat__cell', win: i })),
+    }));
+
+    // --- live event tail (recent records — Consume tab of a topic console) ---
+    const recSeed = [
+      { off: 42763, part: 4, key: 'ord_5xw1', val: '{ "event":"payment.captured", "amount":129.90 }', age: '0.4s', tone: 'primary' },
+      { off: 42762, part: 4, key: 'ord_5xw0', val: '{ "event":"payment.captured", "amount":54.10 }', age: '0.9s', tone: 'muted' },
+      { off: 41207, part: 0, key: 'ord_4aa9', val: '{ "event":"order.reserved", "sku":"A-14" }', age: '1.6s', tone: 'muted' },
+      { off: 38914, part: 3, key: 'ord_4aa8', val: '{ "event":"payment.captured", "amount":12.00 }', age: '2.1s', tone: 'warning' },
+      { off: 40551, part: 2, key: 'ord_4aa7', val: '{ "event":"order.reserved", "sku":"B-02" }', age: '2.8s', tone: 'muted' },
+      { off: 39880, part: 1, key: 'ord_4aa6', val: '{ "event":"payment.captured", "amount":88.40 }', age: '3.3s', tone: 'muted' },
+      { off: 38470, part: 3, key: 'ord_4aa5', val: '{ "event":"payment.captured", "amount":19.99 }', age: '4.0s', tone: 'destructive' },
+    ];
+    const s10Records = recSeed.map(r => ({ ...r }));
+
+    // --- producer → consumer topology (3-col flow: producers → log → groups) ---
+    const s10Producers = [
+      { id: 'webhook.payment', kind: 'trigger', rate: '9/s' },
+      { id: 'reconcile-job', kind: 'worker', rate: '2/s' },
+    ];
+    // consumer side reuses the group list; edge label = delivery guarantee + lag
+    const s10Consumers = s10Groups.map(g => ({ id: g.id, guarantee: g.policy, lag: g.lag, lagTone: g.lagTone, status: g.status, sBadge: g.sBadge }));
+
+    // --- record schema (Config tab · ref 13 line-numbered schema view) ---
+    const s10Schema = [
+      { t: '{' },
+      { t: '  "type": "record",' },
+      { t: '  "name": "PaymentEvent",' },
+      { t: '  "namespace": "app.streams",' },
+      { t: '  "fields": [' },
+      { t: '    { "name": "event",     "type": "string" },' },
+      { t: '    { "name": "orderId",   "type": "string" },' },
+      { t: '    { "name": "amount",    "type": ["null","double"] },' },
+      { t: '    { "name": "capturedAt","type": "long", "logicalType": "timestamp-millis" }' },
+      { t: '  ]' },
+      { t: '}' },
+    ].map((r, i) => ({ ...r, n: i + 1 }));
+
+    // --- message list + fan-out (kept — powers the detail drawer's Records tab) ---
     const s10Msgs = [
       { id: 'msg_88f', time: '14:00:10', status: 'failed', note: '2/3 delivered · analytics failed' },
       { id: 'msg_87c', time: '13:48:02', status: 'completed', note: '3/3 delivered' },
@@ -5702,7 +6124,7 @@ class Component extends DCLogic {
       s9SendTest: sendWebhookTest,
       s9OpenRun: () => this.nav('/runs/ch_3QK9dR2eZ?primitive=run-trig'),
       s9OpenDlq: () => this.nav('/dlq/triggers?kind=trigger'),
-      // S10
+      // S10 · Streams topic console
       s10Msgs, s10Fan, s10Subs,
       s10FeedItems: s.s10Feed,
       s10SelId: s.s10Sel,
@@ -5711,6 +6133,25 @@ class Component extends DCLogic {
       s10Corr: s.s10Sel === 'msg_88f' ? CORR : '7bd2e011-uuid',
       s10OpenRun: () => this.nav('/runs/ch_3QK9dR2eZ?primitive=run-stream'),
       s10OpenTrace: () => this.showToast('Would open Aspire /traces/tr_8e10 ↗', 'info'),
+      // topic-level composite
+      s10TopicName: s10Topic.name, s10TopicBackend: s10Topic.backend,
+      s10Partitions: s10Topic.partitions, s10InSync: s10Topic.inSync,
+      s10Replication: s10Topic.replication, s10Retention: s10Topic.retention,
+      // throughput hero (JS-measured, post-mount)
+      s10ThruSeries: thruSeries.join(','), s10ThruMarker: String(thruMarker),
+      s10ThruNow: thruNow, s10ThruPeak: thruPeak, s10ThruFloor: thruFloor, s10ThruAvg: thruAvg,
+      s10ThruSpark: thruSeries.slice(-12).join(','),
+      s10Backpressure: backpressure.label, s10BackpressureDetail: backpressure.detail, s10BackpressureTone: backpressure.tone,
+      // consumer groups + lag
+      s10Groups, s10TotalLag, s10LagHot,
+      s10Consumers, s10Producers,
+      // partitions + heatmap + records + schema
+      s10Parts, s10Heat, s10Records, s10Schema,
+      // tabs
+      s10TabConsume: seg10('consume'), s10TabParts: seg10('partitions'),
+      s10TabConsumers: seg10('consumers'), s10TabConfig: seg10('config'),
+      s10IsConsume: s10Tab === 'consume', s10IsParts: s10Tab === 'partitions',
+      s10IsConsumers: s10Tab === 'consumers', s10IsConfig: s10Tab === 'config',
       // S11
       s11Rows, s11HasPending, s11InSync: !s11HasPending, runMigrate, s11Diff,
       s11OpenAspire: () => this.showToast('Would open Aspire postgres resource ↗', 'info'),

@@ -429,3 +429,69 @@ hex, no SVG `{{ }}` holes. All CSS appended under the Pass V5 block in `ns-ext.c
   full-width, count drops its `margin-left:auto`); `ns-tdlt` rows keep their 3-col grid with
   tightened gutters. Verified 0 holes / 0 overflow / 0 errors at 390, both themes; 16-route
   regression clean.
+
+## Pass V6 — Streams
+
+Streams was rebuilt from a fan-out delivery inspector into a **durable-stream / topic console**
+(Kafka/Conduktor mental model, refs 11/12/13) with a live-throughput identity (ref 04) and a
+lag-heat treatment (ref 10). Every section is bespoke and stream-native; it shares no signature
+component with Sagas (canvas), Workers (registry), or Triggers (`ns-tmetric`/`ns-tdlt`). Only
+`prototype.dc.html` + `assets/ns-ext.css` changed; `support.js`/`_ds`/`_ns_styles` untouched.
+
+### New components
+- `ns-strhealth` — **streams-health composite header strip** (4 tiles, each with a micro-viz):
+  throughput + `ns-trend` sparkline, consumer-lag + backpressure dot, partition **pips**
+  (per-partition in-sync colour), retention + replication. Replaces plain number cards. (ref 11/13
+  stat strip.)
+- `ns-strhero` — **live throughput hero**: a JS-measured teal area chart (`drawStreamsHero()`,
+  post-mount, no SVG holes) with a **hover crosshair + floating value tip** (`x msgs/s · −Ns`) that
+  snaps to the nearest sample on `pointermove`, a peak/avg/floor/window **OHLC footer**, and a
+  pulsing **backpressure pill**. (ref 04 stock-tracker line + crosshair + OHLC.)
+- `ns-strtopo` — **producer → log → consumer topology** in div/CSS: producer nodes (copper edge) →
+  dashed lead → partitioned-`log` node (with lag-tinted partition bars) → a **fan bus** that taps
+  each consumer group node (teal/amber/red edge by lag). No canvas. (ref 21 flow feel.)
+- `ns-strledger` — **partition & offset ledger**: Part(idx+in-sync ◆)/Leader/Head/Committed/**inline
+  lag heat-bar + value**/Group, monospace; row `data-tone` from lag; horizontal scroll on mobile.
+  (ref 11/12 record table re-cast to partition rows.)
+- `ns-strheat` — **partition × time lag heatmap**: 6 rows × 8 window cells, `data-v` 0–4 tint from
+  `--ns-warning`→`--ns-destructive` via `color-mix`, plus a lag legend. On Consume + Partitions
+  tabs. (ref 10 retention heat-triangle.)
+- `ns-strgroup` — **consumer-group lag cards**: a shared `ns-gauge` **radial lag gauge** + status
+  badge + members/partitions/guarantee KV + a lag progress bar; red left edge when lagging.
+- `ns-strtail` — **live event tail**: offset·part·key·value·age, monospace, dense, tone-marked, with
+  a live-pulse header. (Consume-tab record stream.)
+- `ns-strdrawer` — **stream detail drawer** (desktop right rail): message picker + fan-out delivery
+  `ns-step-timeline` + Open-run / View-trace actions.
+- `ns-strschema` — **line-numbered Avro record schema** on the Config tab (ref 13 schema view).
+- `ns-strlive` — reusable live-pulse pill (teal dot, `ns-strpulse` keyframe, respects
+  `prefers-reduced-motion`).
+
+### New tokens
+- None. All surfaces reuse `--ns-primary` / `--ns-teal-5` / `--ns-copper-6` / `--ns-warning` /
+  `--ns-destructive` / `--ns-muted` / subtle variants via `color-mix`. Theme-blind, no hex.
+
+### New variants / data-attributes
+- `ns-strhealth__tile[data-tone]`, `ns-strhealth__pip[data-tone]`, `ns-strhealth__bp[data-tone]`;
+  `ns-strhero__chart[data-crosshair][data-marker]` (drives `drawStreamsHero`), hero svg parts
+  `[data-part='hero-cross'|'hero-dot']`; `ns-strtopo__node[data-role][data-tone]`,
+  `ns-strtopo__spine--fan`; `ns-strledger__row[data-tone]`, `ns-strledger__lagbar[data-tone]`;
+  `ns-strheat__cell[data-v='0..4']`; `ns-strgroup[data-tone]`, `ns-strgroup__lagbar-fill[data-tone]`;
+  `ns-strtail__row[data-tone]`.
+- S10 model gained topic facts (partitions/inSync/replication/retention/backend), a 24-pt throughput
+  series (+ peak/avg/floor/marker/spark), `s10Groups` (lag/status/gauge %), `s10Parts` (head/
+  committed/lag/tone), `s10Heat` (6×8), `s10Records`, `s10Producers`/`s10Consumers`, `s10Schema`,
+  and a `s10Tab` (`consume`/`partitions`/`consumers`/`config`) deep-linked via `?tab=`. The prior
+  message/fan-out/feed data is preserved and now feeds the drawer.
+
+### Mobile optimizations
+- `ns-strhealth` folds 4→2 (<720); `ns-contab` wraps; `ns-strhero` + `ns-strtopo` collapse to one
+  column (<1024 / <720, topology spine rotates); `ns-strledger` scrolls horizontally inside its
+  panel so the body never scrolls sideways; heatmap cells shrink; gauges + tail + drawer stack.
+  Verified 0 holes / 0 overflow / 0 non-404 errors at 1440 + 390, both themes; 16-route desktop +
+  7-route mobile regression clean.
+
+### Known follow-ups
+- Topology is a div/CSS flow, not a measured-connector horizontal graph (log node + consumer bus not
+  perfectly colinear at desktop width).
+- Throughput/heatmap/records are a data-driven snapshot, not wired to the live `tick()` sim yet.
+- Consumers tab left column slightly shorter than the right rail (mild whitespace).
