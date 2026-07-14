@@ -634,32 +634,23 @@
               <div style="display:grid;gap:var(--ns-space-2)">
                 <div class="ns-catcrumb" aria-hidden="true"><span class="ns-catcrumb__root">Override store</span><span class="ns-catcrumb__sep">›</span><span class="ns-catcrumb__leaf">current · {{ s3Head.rev }}</span></div>
                 <h1>Runtime config</h1>
-                <p class="ns-lede">The live override layer neither Aspire nor Scalar can know exists — the write side of config resolution, streamed as it changes, with gated controls to flip it back.</p>
               </div>
             </div>
           </header>
 
           <!-- header composite: override-store micro-viz (NOT number cards) -->
-          <div class="ns-rchead">
+          <div class="ns-card ns-card--console ns-rchead">
             <div class="ns-rchead__cell ns-rchead__cell--total">
-              <span class="ns-rchead__glyph" aria-hidden="true">⧉</span>
               <div class="ns-rchead__main">
                 <span class="ns-rchead__value">{{ s3Head.total }}</span>
                 <span class="ns-rchead__label">active overrides</span>
               </div>
-              <div class="ns-rchead__pips">
-                <sc-for list="{{ s3Head.pips }}" as="p" hint-placeholder-count="4">
-                  <span class="ns-rchead__pip" data-tone="{{ p.tone }}" title="{{ p.label }}: {{ p.n }}"><span class="ns-rchead__pip-g" aria-hidden="true">{{ p.glyph }}</span>{{ p.n }}</span>
-                </sc-for>
-              </div>
+              <span class="ns-rchead__sub">{{ s3Head.typeSummary }}</span>
             </div>
             <div class="ns-rchead__cell">
               <span class="ns-rchead__label">diverging from base</span>
-              <div class="ns-rchead__ratio" role="img" aria-label="Keys diverging from base">
-                <div class="ns-rchead__ratiofill {{ s3Head.divWClass }}"></div>
-                <span class="ns-rchead__ratiopct">{{ s3Head.divN }}<span class="ns-rchead__ratioof"> / {{ s3Head.baseN }} keys</span></span>
-              </div>
-              <span class="ns-rchead__sub">{{ s3Head.divPct }} of resolved keys overridden</span>
+              <div class="ns-rchead__proportion"><strong>{{ s3Head.divN }} / {{ s3Head.baseN }}</strong><span>keys · {{ s3Head.divPct }}</span></div>
+              <span class="ns-rchead__sub">resolved keys with a runtime value</span>
             </div>
             <div class="ns-rchead__cell">
               <span class="ns-rchead__label">last revision</span>
@@ -672,32 +663,29 @@
             <div class="ns-rchead__cell">
               <span class="ns-rchead__label">hot-reload</span>
               <div class="ns-rchead__reload" data-tone="{{ s3Head.reloadTone }}">
-                <span class="ns-rchead__reload-dot" aria-hidden="true"></span>
                 <span class="ns-rchead__reload-main">{{ s3Head.reloadLabel }}</span>
               </div>
-              <div class="ns-rchead__reload-bar" aria-hidden="true"><span class="ns-rchead__reload-live" style="flex:{{ s3Head.liveN }}"></span><span class="ns-rchead__reload-pend" style="flex:{{ s3Head.pendN }}"></span></div>
+              <span class="ns-rchead__sub">{{ s3Head.reloadDetail }}</span>
             </div>
           </div>
 
           <div class="ns-runtime__grid">
             <div class="ns-runtime__main">
               <!-- HERO: the live override set — one dense editable-looking store -->
-              <section class="ns-card ns-ovstore" style="background:var(--ns-card)">
-                <div class="ns-ovstore__head">
+              <section class="ns-card ns-card--console ns-data-table ns-data-table--console ns-ovstore" style="background:var(--ns-card)">
+                <div class="ns-card__header ns-data-table__header ns-ovstore__head">
                   <div class="ns-ovstore__head-l">
                     <span class="ns-card__title">Live override set</span>
-                    <span class="ns-ovstore__hint">key · base → override · provenance · hot-reload</span>
                   </div>
                   <span class="ns-livedot" data-state="{{ s3LiveState }}">sse</span>
                 </div>
                 <div class="ns-ovstore__cols" aria-hidden="true">
-                  <span>override key</span><span>base → value</span><span class="ns-ovstore__col-prov">applied</span><span class="ns-ovstore__col-rl">reload</span><span></span>
+                  <span>override key</span><span>base → value</span><span class="ns-ovstore__col-prov">applied</span><span class="ns-ovstore__col-rl">reload</span><span>actions</span>
                 </div>
-                <div class="ns-ovstore__body">
+                <div class="ns-data-table__body ns-ovstore__body">
                   <sc-for list="{{ s3Store }}" as="o" hint-placeholder-count="5">
-                    <div class="ns-ovrow" data-kind="{{ o.kind }}" data-sel="{{ o.selState }}">
+                    <div class="ns-data-table__row ns-ovrow" data-kind="{{ o.kind }}" data-sel="{{ o.selState }}">
                       <button class="ns-ovrow__key" onClick="{{ o.select }}">
-                        <span class="ns-ovrow__glyph" data-tone="{{ o.tone }}" aria-hidden="true">{{ o.glyph }}</span>
                         <span class="ns-ovrow__keytext">{{ o.key }}</span>
                       </button>
                       <div class="ns-ovrow__val">
@@ -709,7 +697,7 @@
                         <span class="ns-ovrow__by">{{ o.by }}</span>
                         <span class="ns-ovrow__at">{{ o.at }} · {{ o.rev }}</span>
                       </div>
-                      <span class="ns-ovrow__rl" data-state="{{ o.reload }}">{{ o.reloadLabel }}</span>
+                      <span class="ns-badge ns-badge--muted ns-ovrow__rl" data-state="{{ o.reload }}">{{ o.reloadLabel }}</span>
                       <button class="{{ o.actClass }} ns-ovrow__act" onClick="{{ o.act }}">{{ o.actLabel }}</button>
                     </div>
                   </sc-for>
@@ -720,16 +708,16 @@
               </section>
 
               <!-- Revision history — the config-store revision log with rollback -->
-              <section class="ns-card" style="background:var(--ns-card)">
+              <section class="ns-card ns-card--console" style="background:var(--ns-card)">
                 <div class="ns-card__header" style="padding:var(--ns-space-4) var(--ns-space-5);border-bottom:1px solid var(--ns-border);flex-direction:row;align-items:center;justify-content:space-between">
                   <div style="display:grid;gap:2px">
                     <span class="ns-card__title">Revision history</span>
                     <span style="font-family:var(--ns-font-mono);font-size:var(--ns-text-2xs);color:var(--ns-muted-fg)">store revisions over time · roll back to any</span>
                   </div>
-                  <div class="ns-seg" role="group" aria-label="Diff view">
-                    <button class="ns-seg__btn" data-state="{{ s3SegAll.state }}" onClick="{{ s3SegAll.set }}">All</button>
-                    <button class="ns-seg__btn" data-state="{{ s3SegCompact.state }}" onClick="{{ s3SegCompact.set }}">Compact</button>
-                    <button class="ns-seg__btn" data-state="{{ s3SegJson.state }}" onClick="{{ s3SegJson.set }}">JSON</button>
+                  <div class="ns-tabs--underline ns-rctabs" role="tablist" aria-label="Diff view">
+                    <button class="ns-rctabs__tab" role="tab" aria-selected="{{ s3SegAll.state }}" data-state="{{ s3SegAll.state }}" onClick="{{ s3SegAll.set }}">All</button>
+                    <button class="ns-rctabs__tab" role="tab" aria-selected="{{ s3SegCompact.state }}" data-state="{{ s3SegCompact.state }}" onClick="{{ s3SegCompact.set }}">Compact</button>
+                    <button class="ns-rctabs__tab" role="tab" aria-selected="{{ s3SegJson.state }}" data-state="{{ s3SegJson.state }}" onClick="{{ s3SegJson.set }}">JSON</button>
                   </div>
                 </div>
                 <div style="padding:var(--ns-space-3) var(--ns-space-5) var(--ns-space-4)">
@@ -740,13 +728,12 @@
                         <div class="ns-revchain__main">
                           <div class="ns-revchain__titlerow">
                             <span class="ns-revchain__title">{{ v.title }}</span>
-                            <sc-if value="{{ v.current }}" hint-placeholder-val="{{ false }}"><span class="ns-badge ns-badge--primary">current</span></sc-if>
+                            <sc-if value="{{ v.current }}" hint-placeholder-val="{{ false }}"><span class="ns-revchain__current">current</span></sc-if>
                           </div>
                           <div class="ns-revchain__meta">
                             <span class="ns-revchain__by">{{ v.by }}</span>
                             <span class="ns-revchain__sep">·</span>
                             <span>{{ v.meta }}</span>
-                            <span class="ns-revchain__pips" aria-hidden="true"><sc-for list="{{ v.pips }}" as="p" hint-placeholder-count="2"><span class="ns-revchain__pip"></span></sc-for></span>
                           </div>
                           <sc-if value="{{ v.showJson }}" hint-placeholder-val="{{ false }}">
                             <div class="ns-code" style="margin-top:var(--ns-space-2)"><div class="ns-code__head"><span class="ns-code__name">{{ v.v }}.json</span><span class="ns-code__lang">json</span></div><pre><code>{{ v.json }}</code></pre></div>
@@ -761,7 +748,7 @@
                           <div class="ns-revchain__acts">
                             <button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ v.toggle }}">{{ v.toggleLabel }}</button>
                             <sc-if value="{{ v.canRoll }}" hint-placeholder-val="{{ false }}">
-                              <button class="ns-btn ns-btn--secondary ns-btn--sm ns-revchain__roll" onClick="{{ v.rollback }}"><span aria-hidden="true">⟲</span> Roll back to {{ v.v }}</button>
+                              <button class="ns-btn ns-btn--secondary ns-btn--sm ns-revchain__roll" onClick="{{ v.rollback }}">Roll back to {{ v.v }}</button>
                             </sc-if>
                           </div>
                         </div>
@@ -774,88 +761,25 @@
 
             <aside class="ns-runtime__aside">
               <!-- Live override feed (write events streamed) -->
-              <section class="ns-card" style="background:var(--ns-card)">
-                <div class="ns-card__header" style="padding:var(--ns-space-3) var(--ns-space-4);border-bottom:1px solid var(--ns-border);flex-direction:row;align-items:center;justify-content:space-between">
+              <section class="ns-card ns-card--console ns-data-table ns-data-table--console ns-rcevents" style="background:var(--ns-card)">
+                <div class="ns-card__header ns-data-table__header" style="padding:var(--ns-space-3) var(--ns-space-4);border-bottom:1px solid var(--ns-border)">
                   <span class="ns-card__title">Live override feed</span>
                   <div class="ns-feed-toolbar">
                     <sc-if value="{{ s3HasPending }}" hint-placeholder-val="{{ false }}">
                       <button class="ns-newpill" onClick="{{ s3Catch }}">{{ s3PendingCount }} new changes</button>
                     </sc-if>
-                    <label class="ns-choice" style="align-items:center">
-                      <span style="position:relative;display:inline-flex"><input type="checkbox" class="ns-switch" checked="{{ s3Follow }}" onChange="{{ s3ToggleFollow }}"><span class="ns-switch__track" style="display:inline-flex;align-items:center;width:2.35rem;height:1.3rem;border:1px solid var(--ns-border-strong);border-radius:var(--ns-radius-full);background:var(--ns-surface);padding:2px;transition:background 140ms ease,border-color 140ms ease"><span class="ns-switch__thumb" style="width:0.95rem;height:0.95rem;border-radius:var(--ns-radius-full);background:var(--ns-card);box-shadow:var(--ns-shadow-xs);transition:transform 140ms ease"></span></span></span>
-                      <span class="ns-choice__label" style="font-size:var(--ns-text-xs)">Follow</span>
-                    </label>
+                    <button class="ns-btn ns-btn--ghost ns-btn--sm ns-rcevents__follow" aria-pressed="{{ s3Follow }}" onClick="{{ s3ToggleFollow }}">{{ s3FollowLabel }}</button>
                   </div>
                 </div>
-                <div style="padding:var(--ns-space-2) var(--ns-space-4) var(--ns-space-3);max-height:20rem;overflow-y:auto">
-                  <div class="ns-activity-feed ns-activity-feed--dense">
-                    <sc-for list="{{ s3FeedItems }}" as="f" hint-placeholder-count="4">
-                      <div class="ns-activity-feed__item" data-tone="{{ f.tone }}">
-                        <span class="ns-activity-feed__marker" aria-hidden="true"></span>
-                        <div class="ns-activity-feed__body">
-                          <span class="ns-activity-feed__text">{{ f.text }}</span>
-                          <span class="ns-activity-feed__time">{{ f.time }}</span>
-                        </div>
-                      </div>
-                    </sc-for>
-                  </div>
-                </div>
-              </section>
-
-              <!-- Pending hot-reloads — overrides written but needing a restart to take effect -->
-              <section class="ns-card ns-hotreload" style="background:var(--ns-card)">
-                <div class="ns-hotreload__head">
-                  <div class="ns-hotreload__head-l">
-                    <span class="ns-hotreload__dot" aria-hidden="true"></span>
-                    <span class="ns-card__title">Pending hot-reloads</span>
-                  </div>
-                  <span class="ns-hotreload__count">{{ s3Head.reloadLabel }}</span>
-                </div>
-                <div class="ns-hotreload__body">
-                  <sc-for list="{{ s3PendingReloads }}" as="p" hint-placeholder-count="2">
-                    <div class="ns-hotrow">
-                      <span class="ns-hotrow__glyph" data-tone="{{ p.tone }}" aria-hidden="true">{{ p.glyph }}</span>
-                      <div class="ns-hotrow__main">
-                        <span class="ns-hotrow__key">{{ p.key }}</span>
-                        <span class="ns-hotrow__note">needs restart to take effect</span>
-                      </div>
-                      <button class="ns-btn ns-btn--secondary ns-btn--sm ns-hotrow__act" onClick="{{ p.act }}" title="{{ p.actLabel }} · {{ p.by }} · {{ p.rev }}"><span aria-hidden="true">⟳</span> {{ p.actLabel }}</button>
+                <div class="ns-rcevents__cols" aria-hidden="true"><span>time</span><span>target</span><span>action</span></div>
+                <div class="ns-data-table__body ns-rcevents__body">
+                  <sc-for list="{{ s3FeedItems }}" as="f" hint-placeholder-count="4">
+                    <div class="ns-data-table__row ns-rcevents__row">
+                      <span class="ns-rcevents__time">{{ f.time }}</span>
+                      <span class="ns-rcevents__target">{{ f.target }}</span>
+                      <span class="ns-rcevents__action">{{ f.action }}</span>
                     </div>
                   </sc-for>
-                  <sc-if value="{{ s3NoPending }}" hint-placeholder-val="{{ false }}">
-                    <div class="ns-hotreload__clean"><span class="ns-hotreload__clean-glyph" aria-hidden="true">✓</span> All overrides are live — nothing awaiting a restart.</div>
-                  </sc-if>
-                </div>
-              </section>
-
-              <!-- Change authors — operators who applied overrides (derived from provenance) -->
-              <section class="ns-card ns-authors" style="background:var(--ns-card)">
-                <div class="ns-authors__head">
-                  <span class="ns-card__title">Change authors</span>
-                  <span class="ns-authors__hint">who applied the live overrides</span>
-                </div>
-                <div class="ns-authors__body">
-                  <sc-for list="{{ s3Authors }}" as="a" hint-placeholder-count="3">
-                    <div class="ns-authorrow">
-                      <span class="ns-authorrow__avatar" aria-hidden="true">{{ a.initials }}</span>
-                      <div class="ns-authorrow__main">
-                        <span class="ns-authorrow__by">{{ a.by }}</span>
-                        <span class="ns-authorrow__meta">last change {{ a.at }} · {{ a.rev }}</span>
-                      </div>
-                      <div class="ns-authorrow__stats">
-                        <span class="ns-authorrow__stat"><span class="ns-authorrow__stat-n">{{ a.n }}</span><span class="ns-authorrow__stat-l">ovr</span></span>
-                        <span class="ns-authorrow__stat"><span class="ns-authorrow__stat-n">{{ a.revN }}</span><span class="ns-authorrow__stat-l">rev</span></span>
-                      </div>
-                    </div>
-                  </sc-for>
-                </div>
-                <div class="ns-authors__drift">
-                  <span class="ns-authors__drift-label">base drift by type</span>
-                  <div class="ns-authors__drift-row">
-                    <sc-for list="{{ s3Drift }}" as="d" hint-placeholder-count="4">
-                      <span class="ns-driftchip" data-tone="{{ d.tone }}" title="{{ d.label }}: {{ d.n }} diverging"><span class="ns-driftchip__g" aria-hidden="true">{{ d.glyph }}</span><span class="ns-driftchip__n">{{ d.n }}</span><span class="ns-driftchip__l">{{ d.label }}</span></span>
-                    </sc-for>
-                  </div>
                 </div>
               </section>
             </aside>
@@ -871,9 +795,8 @@
               <div style="display:grid;gap:var(--ns-space-2)">
                 <div class="ns-catcrumb" aria-hidden="true"><span class="ns-catcrumb__root">Contract registry</span><span class="ns-catcrumb__sep">›</span><span class="ns-catcrumb__leaf">{{ s4Detail.proc }}</span></div>
                 <h1>Service &amp; contract catalog</h1>
-                <p class="ns-lede">Provenance and coverage above the OpenAPI boundary — what Scalar cannot see. Reference and try-it stay in Scalar.</p>
               </div>
-              <div class="ns-seg" role="tablist" aria-label="Catalog view">
+              <div class="ns-seg ns-tabs--underline ns-cat-tabs" role="tablist" aria-label="Catalog view">
                 <button class="ns-seg__btn" role="tab" data-state="{{ s4TabContracts.state }}" onClick="{{ s4TabContracts.set }}">Contracts</button>
                 <button class="ns-seg__btn" role="tab" data-state="{{ s4TabRoutes.state }}" onClick="{{ s4TabRoutes.set }}">Fresh route wiring</button>
               </div>
@@ -881,52 +804,13 @@
           </header>
 
           <sc-if value="{{ s4IsContracts }}" hint-placeholder-val="{{ true }}">
-            <!-- header composite: registry micro-viz, not number cards -->
-            <div class="ns-cathead">
-              <div class="ns-cathead__cell ns-cathead__cell--total">
-                <span class="ns-cathead__glyph" aria-hidden="true">▤</span>
-                <div class="ns-cathead__main">
-                  <span class="ns-cathead__value">{{ s4Head.total }}</span>
-                  <span class="ns-cathead__label">contracts registered</span>
-                </div>
-                <span class="ns-cathead__sub">{{ s4Head.versions }}</span>
-              </div>
-              <div class="ns-cathead__cell">
-                <span class="ns-cathead__label">by kind</span>
-                <div class="ns-catchan" role="img" aria-label="Contracts by kind">
-                  <sc-for list="{{ s4Head.kinds }}" as="k" hint-placeholder-count="4">
-                    <button class="ns-catchan__seg {{ k.wClass }}" data-kind="{{ k.key }}" data-active="{{ k.active }}" onClick="{{ k.go }}" title="{{ k.label }}: {{ k.n }}"><span class="ns-catchan__seg-n">{{ k.n }}</span></button>
-                  </sc-for>
-                </div>
-                <div class="ns-catchan__legend">
-                  <sc-for list="{{ s4Head.kinds }}" as="k" hint-placeholder-count="4">
-                    <span class="ns-catchan__key" data-kind="{{ k.key }}"><span class="ns-catchan__key-dot" aria-hidden="true">{{ k.glyph }}</span>{{ k.label }}</span>
-                  </sc-for>
-                </div>
-              </div>
-              <div class="ns-cathead__cell">
-                <span class="ns-cathead__label">describe() coverage</span>
-                <div class="ns-catratio" role="img" aria-label="Coverage ratio">
-                  <div class="ns-catratio__fill {{ s4Head.covWClass }}"></div>
-                  <span class="ns-catratio__pct">{{ s4Head.covPctLabel }}</span>
-                </div>
-                <div class="ns-catratio__legend">
-                  <span class="ns-catratio__key" data-tone="ok">{{ s4Head.completeN }} complete</span>
-                  <span class="ns-catratio__key" data-tone="thin">{{ s4Head.thinN }} thin</span>
-                </div>
-              </div>
-              <div class="ns-cathead__cell">
-                <span class="ns-cathead__label">transport reach</span>
-                <div class="ns-catreach">
-                  <sc-for list="{{ s4Head.reach }}" as="r" hint-placeholder-count="3">
-                    <div class="ns-catreach__row">
-                      <span class="ns-catreach__name" data-key="{{ r.key }}">{{ r.label }}</span>
-                      <span class="ns-catreach__track"><span class="ns-catreach__fill {{ r.wClass }}" data-key="{{ r.key }}"></span></span>
-                      <span class="ns-catreach__n">{{ r.n }}/{{ r.total }}</span>
-                    </div>
-                  </sc-for>
-                </div>
-              </div>
+            <!-- Ref 13: one compact registry metadata rail, exact facts only. -->
+            <div class="ns-cat2-meta" aria-label="Catalog summary">
+              <span><b>CONTRACTS</b><strong>{{ s4Head.total }}</strong><small>{{ s4Head.versions }}</small></span>
+              <span><b>DESCRIBE()</b><strong>{{ s4Head.covPctLabel }}</strong><small>{{ s4Head.completeN }} complete · {{ s4Head.thinN }} thin</small></span>
+              <sc-for list="{{ s4Head.reach }}" as="r" hint-placeholder-count="3">
+                <span><b>{{ r.label }}</b><strong>{{ r.n }} / {{ r.total }}</strong><small>contracts</small></span>
+              </sc-for>
             </div>
 
             <!-- filter toolbar (ref 11) -->
@@ -948,15 +832,14 @@
             </div>
 
             <div class="ns-catgrid">
-              <!-- registry rail: grouped, selectable contract cards -->
-              <aside class="ns-catreg" aria-label="Contract registry">
+              <!-- Ref 12: compact grouped registry records. -->
+              <aside class="ns-catreg ns-cat2-reg" aria-label="Contract registry">
                 <sc-for list="{{ s4Groups }}" as="g" hint-placeholder-count="4">
                   <div class="ns-catreg__group" data-kind="{{ g.key }}">
                     <div class="ns-catreg__group-head">
-                      <span class="ns-catreg__group-glyph" data-kind="{{ g.key }}" aria-hidden="true">{{ g.glyph }}</span>
                       <span class="ns-catreg__group-label">{{ g.label }}</span>
                       <span class="ns-catreg__group-count">{{ g.count }}</span>
-                      <span class="ns-catreg__covbar" title="{{ g.complete }} complete · {{ g.thin }} thin"><span class="ns-catreg__covbar-fill {{ g.covClass }}"></span></span>
+                      <span class="ns-cat2-group-fact">{{ g.complete }} complete · {{ g.thin }} thin</span>
                     </div>
                     <sc-for list="{{ g.rows }}" as="c" hint-placeholder-count="2">
                       <button class="ns-catreg__item" data-state="{{ c.selState }}" data-method="{{ c.mTone }}" onClick="{{ c.select }}">
@@ -966,10 +849,8 @@
                           <span class="ns-catreg__sigpre">{{ c.sigPreview }}</span>
                         </span>
                         <span class="ns-catreg__meta">
-                          <span class="ns-catdup" aria-label="Transport duality">
-                            <sc-for list="{{ c.dualPips }}" as="d" hint-placeholder-count="3"><span class="ns-catdup__pip" data-on="{{ d.on }}" data-key="{{ d.key }}" title="{{ d.label }}"></span></sc-for>
-                          </span>
-                          <span class="ns-catreg__cov" data-cov="{{ c.cov }}" aria-hidden="true"></span>
+                          <span class="ns-cat2-coverage" data-cov="{{ c.cov }}">{{ c.cov }}</span>
+                          <span class="ns-cat2-transports" aria-label="Transport support"><sc-for list="{{ c.dualPips }}" as="d" hint-placeholder-count="3"><span data-on="{{ d.on }}">{{ d.label }}</span></sc-for></span>
                         </span>
                       </button>
                     </sc-for>
@@ -977,7 +858,6 @@
                 </sc-for>
                 <div class="ns-catreg__group" data-state="gated">
                   <div class="ns-catreg__group-head">
-                    <span class="ns-catreg__group-glyph" data-kind="gated" aria-hidden="true">◌</span>
                     <span class="ns-catreg__group-label">crons › schedule</span>
                     <span class="ns-catreg__group-count" data-state="gated">not installed</span>
                   </div>
@@ -995,10 +875,9 @@
                 </sc-if>
               </aside>
 
-              <!-- contract detail: signature + schema + producers→consumers -->
-              <section class="ns-catdetail" style="min-width:0">
+              <!-- Ref 13: persistent signature/schema inspector. -->
+              <section class="ns-catdetail ns-cat2-detail" style="min-width:0">
                 <div class="ns-catdetail__head">
-                  <span class="ns-catdetail__kind" data-kind="{{ s4Detail.plugin }}" aria-hidden="true">{{ s4Detail.kindGlyph }}</span>
                   <div class="ns-catdetail__title">
                     <span class="ns-catdetail__proc">{{ s4Detail.proc }}</span>
                     <span class="ns-catdetail__prov">{{ s4Detail.plugin }} › {{ s4Detail.ns }}</span>
@@ -1006,15 +885,13 @@
                   <span class="ns-panel__flex" style="flex:1"></span>
                   <span class="ns-catver">
                     <span class="ns-catver__tag">{{ s4Detail.ver }}</span>
-                    <span class="ns-catver__compat" data-tone="{{ s4Detail.compatTone }}">compat · {{ s4Detail.compatLabel }}</span>
+                    <span class="ns-cat2-compat" data-tone="{{ s4Detail.compatTone }}">compat · {{ s4Detail.compatLabel }}</span>
                   </span>
                 </div>
                 <div class="ns-catdetail__method-strip">
-                  <span class="{{ s4Detail.mBadge }}">{{ s4Detail.method }}</span>
-                  <span class="{{ s4Detail.covBadge }}">{{ s4Detail.covLabel }}</span>
-                  <span class="ns-catdup ns-catdup--lg" aria-label="Transport duality">
-                    <sc-for list="{{ s4Detail.dualPips }}" as="d" hint-placeholder-count="3"><span class="ns-catdup__pip" data-on="{{ d.on }}" data-key="{{ d.key }}" title="{{ d.label }}"><span class="ns-catdup__pip-lbl">{{ d.label }}</span></span></sc-for>
-                  </span>
+                  <span class="ns-cat2-method">{{ s4Detail.method }}</span>
+                  <span class="ns-cat2-coverage" data-cov="{{ s4Detail.cov }}">{{ s4Detail.covLabel }}</span>
+                  <span class="ns-cat2-transports" aria-label="Transport support"><sc-for list="{{ s4Detail.dualPips }}" as="d" hint-placeholder-count="3"><span data-on="{{ d.on }}">{{ d.label }}</span></sc-for></span>
                 </div>
 
                 <div class="ns-catsig" aria-label="Type signature">
@@ -1034,17 +911,14 @@
                   </div>
                 </div>
 
-                <div class="ns-catrel" aria-label="Producers and consumers">
-                  <div class="ns-catrel__col ns-catrel__col--prod">
+                <div class="ns-cat2-rel" aria-label="Producers and consumers">
+                  <div>
                     <span class="ns-catrel__col-label">producers <span class="ns-catrel__col-n">{{ s4Detail.prodCount }}</span></span>
-                    <sc-for list="{{ s4Detail.producerNodes }}" as="p" hint-placeholder-count="2"><span class="ns-catrel__node" data-role="prod">{{ p.label }}</span></sc-for>
+                    <sc-for list="{{ s4Detail.producerNodes }}" as="p" hint-placeholder-count="2"><span>{{ p.label }}</span></sc-for>
                   </div>
-                  <div class="ns-catrel__spine" aria-hidden="true">
-                    <span class="ns-catrel__hub" data-kind="{{ s4Detail.plugin }}">{{ s4Detail.kindGlyph }}</span>
-                  </div>
-                  <div class="ns-catrel__col ns-catrel__col--cons">
+                  <div>
                     <span class="ns-catrel__col-label"><span class="ns-catrel__col-n">{{ s4Detail.consCount }}</span> consumers</span>
-                    <sc-for list="{{ s4Detail.consumerNodes }}" as="p" hint-placeholder-count="2"><span class="ns-catrel__node" data-role="cons">{{ p.label }}</span></sc-for>
+                    <sc-for list="{{ s4Detail.consumerNodes }}" as="p" hint-placeholder-count="2"><span>{{ p.label }}</span></sc-for>
                   </div>
                 </div>
 
@@ -2592,238 +2466,105 @@
             <div class="ns-toolbar">
               <div style="display:grid;gap:var(--ns-space-2)">
                 <h1>DB migrations &amp; drift</h1>
-                <p class="ns-lede">Aspire shows the DB resource is up; it never shows migration state — a frequent “why is my query failing” root cause.</p>
               </div>
-              <div class="ns-cluster ns-cluster--sm">
-                <button class="ns-btn ns-btn--ghost" onClick="{{ s11OpenAspire }}">Open DB resource in Aspire ↗</button>
-                <sc-if value="{{ s11HasPending }}" hint-placeholder-val="{{ true }}">
-                  <button class="ns-btn ns-btn--primary" onClick="{{ runMigrate }}">Run migrate</button>
-                </sc-if>
-              </div>
+              <div class="ns-cluster ns-cluster--sm"></div>
             </div>
           </header>
 
-          <!-- Header composite: schema state strip (ref-13 stat strip, tailored) — NOT four plain number cards -->
-          <div class="ns-mighead" data-tone="{{ s11Head.driftTone }}">
-            <div class="ns-mighead__lead">
-              <span class="ns-mighead__eyebrow">schema head</span>
-              <div class="ns-mighead__verline">
-                <span class="ns-migver ns-migver--lg" data-phase="applied">{{ s11Head.headVer }}</span>
-                <sc-if value="{{ s11HasPending }}" hint-placeholder-val="{{ true }}">
-                  <span class="ns-mighead__arrow" aria-hidden="true">→</span>
-                  <span class="ns-migver ns-migver--lg" data-phase="pending">{{ s11Head.targetVer }}</span>
-                </sc-if>
-              </div>
-              <span class="ns-mighead__behind" data-tone="{{ s11Head.driftTone }}">{{ s11Head.behind }}</span>
-            </div>
-            <div class="ns-mighead__strip">
-              <div class="ns-migstat">
-                <span class="ns-migstat__k">applied</span>
-                <span class="ns-migstat__top"><span class="ns-migstat__v">{{ s11Head.appliedN }}</span><span class="ns-migstat__of">of {{ s11Head.totalN }}</span></span>
-                <span class="ns-migstat__bar" aria-hidden="true"><span class="ns-migstat__bar-fill" style="width:{{ s11Head.appliedRatioPct }}%"></span></span>
-              </div>
-              <div class="ns-migstat" data-tone="{{ s11Head.driftTone }}">
-                <span class="ns-migstat__k">pending</span>
-                <span class="ns-migstat__top"><span class="ns-migstat__v">{{ s11Head.pendingN }}</span><span class="ns-migstat__of">queued</span></span>
-                <span class="ns-migstat__pips ns-migstat__pips--copper" aria-hidden="true"><sc-for list="{{ s11Head.pendingPips }}" as="p" hint-placeholder-count="1"><span class="ns-migpip" data-state="pending"></span></sc-for></span>
-              </div>
-              <div class="ns-migstat" data-tone="{{ s11Head.driftTone }}">
-                <span class="ns-migstat__k">drift</span>
-                <span class="ns-migstat__top"><span class="ns-migstat__v ns-migstat__v--sm">{{ s11Head.driftLabel }}</span></span>
-                <span class="ns-migstat__pips" aria-hidden="true"><sc-for list="{{ s11Head.driftPips }}" as="p" hint-placeholder-count="8"><span class="ns-migpip" data-state="{{ p.state }}"></span></sc-for></span>
-              </div>
-              <div class="ns-migstat">
-                <span class="ns-migstat__k">last applied</span>
-                <span class="ns-migstat__v ns-migstat__v--sm">{{ s11Head.lastAppliedName }}</span>
-                <span class="ns-migstat__sub"><span class="ns-migstat__rel">{{ s11Head.lastAppliedRel }}</span><span class="ns-migstat__at">{{ s11Head.lastAppliedAt }}</span></span>
-              </div>
-            </div>
-          </div>
+          <!-- Ref 13: compact metadata bar, no dashboard-sized numerals. -->
+          <section class="ns-mig3-meta" aria-label="Migration summary">
+            <span><b>LIVE HEAD</b><strong>{{ s11Head.headVer }}</strong></span>
+            <span><b>DECLARED</b><strong>{{ s11Head.targetVer }}</strong><small>{{ s11Head.behind }}</small></span>
+            <span><b>LEDGER</b><strong>{{ s11Head.appliedN }} / {{ s11Head.totalN }}</strong><small>applied</small></span>
+            <span><b>DRIFT</b><strong>{{ s11Gauge.driftedN }}</strong><small>of {{ s11Gauge.trackedN }} objects</small></span>
+            <span><b>DATABASE</b><strong>PostgreSQL</strong><small>my-app</small></span>
+          </section>
 
-          <div class="ns-miggrid">
-            <!-- LEFT: the SIGNATURE — version-chain timeline + ledger -->
-            <div class="ns-migmain">
-              <section class="ns-panel ns-migchain" style="background:var(--ns-card)">
-                <div class="ns-migchain__head">
-                  <span class="ns-panel__title">Version chain</span>
-                  <span class="ns-migchain__legend">
-                    <span class="ns-migchain__leg"><span class="ns-migchain__leg-dot" data-phase="applied"></span>applied</span>
-                    <span class="ns-migchain__leg"><span class="ns-migchain__leg-dot" data-phase="pending"></span>pending</span>
-                  </span>
+          <div class="ns-mig2-grid">
+            <main class="ns-mig2-main">
+              <!-- Ref 11: dense operational ledger with selection rail. -->
+              <section class="ns-data-table ns-data-table--console ns-mig3-pane ns-mig2-ledger">
+                <div class="ns-card__header ns-data-table__header ns-mig2-section-head">
+                  <div>
+                    <span class="ns-card__title">Migration ledger</span>
+                    <span class="ns-mig2__caption">newest first · select a record to inspect its schema change</span>
+                  </div>
+                  <span class="ns-mig3-count">{{ s11Head.pendingN }} queued</span>
                 </div>
-                <div class="ns-migchain__body">
-                  <!-- applied spine (oldest → newest) -->
-                  <div class="ns-migchain__spine">
-                    <sc-for list="{{ s11Timeline }}" as="n" hint-placeholder-count="3">
-                      <button class="ns-mignode" data-phase="{{ n.phase }}" data-sel="{{ n.sel }}" onClick="{{ n.select }}" data-ns-migselect>
-                        <span class="ns-mignode__rail" aria-hidden="true"><span class="ns-mignode__dot" data-phase="{{ n.phase }}"></span></span>
-                        <span class="ns-mignode__card">
-                          <span class="ns-mignode__top">
-                            <span class="ns-migver" data-phase="{{ n.phase }}">{{ n.ver }}</span>
-                            <span class="ns-mignode__title">{{ n.title }}</span>
-                            <span style="flex:1"></span>
-                            <span class="{{ n.sBadge }}">{{ n.statusLabel }}</span>
-                          </span>
-                          <span class="ns-mignode__name" style="font-family:var(--ns-font-mono)">{{ n.name }}</span>
-                          <span class="ns-mignode__meta">
-                            <span class="ns-mignode__chip"><span class="ns-mignode__chip-i" aria-hidden="true">◫</span>{{ n.tablesLabel }}</span>
-                            <span class="ns-mignode__chip"><span class="ns-mignode__chip-i" aria-hidden="true">≡</span>{{ n.rowsLabel }}</span>
-                            <span class="ns-mignode__chip"><span class="ns-mignode__chip-i" aria-hidden="true">◷</span>{{ n.durLabel }}</span>
-                            <span style="flex:1"></span>
-                            <span class="ns-mignode__at">{{ n.atLabel }}</span>
-                          </span>
-                        </span>
-                      </button>
-                    </sc-for>
+                <div class="ns-mig2-ledger__cols" aria-hidden="true">
+                  <span>version</span><span>migration</span><span>applied at</span><span>duration</span><span>rows</span><span>status</span>
+                </div>
+                <div class="ns-data-table__body">
+                  <sc-for list="{{ s11Rows }}" as="r" hint-placeholder-count="4">
+                    <button class="ns-data-table__row ns-mig2-ledger__row" data-sel="{{ r.sel }}" data-status="{{ r.status }}" onClick="{{ r.select }}" data-ns-migselect>
+                      <span class="ns-mig2-version">{{ r.ver }}</span>
+                      <span class="ns-mig2-ledger__name">{{ r.name }}</span>
+                      <span>{{ r.atShort }}</span>
+                      <span>{{ r.dur }}</span>
+                      <span>{{ r.rows }}</span>
+                      <span class="ns-mig3-status" data-status="{{ r.status }}">{{ r.statusLabel }}</span>
+                    </button>
+                  </sc-for>
+                </div>
+              </section>
+            </main>
+
+            <aside class="ns-mig2-aside">
+              <!-- Ref 13: selected schema change stays in the workspace. -->
+              <section class="ns-mig3-pane ns-mig3-inspector">
+                <div class="ns-card__header ns-mig2-section-head">
+                  <div>
+                    <span class="ns-mig2__label">selected migration</span>
+                    <span class="ns-card__title">{{ s11Detail.ver }} · {{ s11Detail.title }}</span>
                   </div>
-                  <!-- HEAD / drift divider: where the live DB actually sits -->
-                  <div class="ns-mighead-marker" data-tone="{{ s11Head.driftTone }}">
-                    <span class="ns-mighead-marker__rail" aria-hidden="true"><span class="ns-mighead-marker__glyph">◆</span></span>
-                    <span class="ns-mighead-marker__body">
-                      <span class="ns-mighead-marker__label">live DB · HEAD {{ s11Head.headVer }}</span>
-                      <span class="ns-mighead-marker__note" data-tone="{{ s11Head.driftTone }}">{{ s11Gauge.caption }}</span>
-                    </span>
+                  <span class="ns-mig3-status" data-status="{{ s11Detail.status }}">{{ s11Detail.statusLabel }}</span>
+                </div>
+                <dl class="ns-property-list ns-property-list--compact ns-mig3-facts">
+                  <div><dt>applied</dt><dd>{{ s11Detail.atLabel }}</dd></div>
+                  <div><dt>duration</dt><dd>{{ s11Detail.dur }}</dd></div>
+                  <div><dt>rows</dt><dd>{{ s11Detail.rows }}</dd></div>
+                </dl>
+                <p class="ns-mig2-detail__summary">{{ s11Detail.summary }}</p>
+                <div class="ns-mig3-diff-head">
+                  <span class="ns-card__title">DDL diff</span>
+                  <span>{{ s11Detail.name }}</span>
+                </div>
+                <div class="ns-diff ns-mig3-diff">
+                  <sc-for list="{{ s11Detail.ddl }}" as="d" hint-placeholder-count="6">
+                    <span class="ns-diff__line" data-op="{{ d.op }}">{{ d.text }}</span>
+                  </sc-for>
+                </div>
+                <sc-if value="{{ s11Detail.isPending }}" hint-placeholder-val="{{ true }}">
+                  <div class="ns-inline-notice ns-inline-notice--warning ns-mig2-notice">
+                    <strong>Pending schema change</strong>
+                    <code>netscript db migrate</code>
                   </div>
-                  <!-- pending queue (below HEAD) -->
-                  <sc-if value="{{ s11HasPending }}" hint-placeholder-val="{{ true }}">
-                    <div class="ns-migchain__queue">
-                      <span class="ns-migchain__queue-label">queued</span>
-                      <sc-for list="{{ s11Queue }}" as="n" hint-placeholder-count="1">
-                        <button class="ns-mignode ns-mignode--queued" data-phase="{{ n.phase }}" data-sel="{{ n.sel }}" onClick="{{ n.select }}" data-ns-migselect>
-                          <span class="ns-mignode__rail" aria-hidden="true"><span class="ns-mignode__dot" data-phase="{{ n.phase }}"></span></span>
-                          <span class="ns-mignode__card">
-                            <span class="ns-mignode__top">
-                              <span class="ns-migver" data-phase="{{ n.phase }}">{{ n.ver }}</span>
-                              <span class="ns-mignode__title">{{ n.title }}</span>
-                              <span style="flex:1"></span>
-                              <span class="{{ n.sBadge }}">{{ n.statusLabel }}</span>
-                            </span>
-                            <span class="ns-mignode__name" style="font-family:var(--ns-font-mono)">{{ n.name }}</span>
-                            <span class="ns-mignode__meta">
-                              <span class="ns-mignode__chip"><span class="ns-mignode__chip-i" aria-hidden="true">◫</span>{{ n.tablesLabel }}</span>
-                              <span class="ns-mignode__chip"><span class="ns-mignode__chip-i" aria-hidden="true">≡</span>{{ n.rowsLabel }}</span>
-                              <span class="ns-mignode__chip"><span class="ns-mignode__chip-i" aria-hidden="true">◷</span>{{ n.durLabel }}</span>
-                              <span style="flex:1"></span>
-                              <span class="ns-mignode__at">{{ n.atLabel }}</span>
-                            </span>
-                          </span>
-                        </button>
-                      </sc-for>
+                  <div class="ns-mig2-detail__actions">
+                    <button class="ns-btn ns-btn--secondary ns-btn--sm" onClick="{{ runMigrate }}">Apply migration</button>
+                  </div>
+                </sc-if>
+              </section>
+
+              <section class="ns-data-table ns-data-table--console ns-mig3-pane ns-mig2-drift">
+                <div class="ns-card__header ns-data-table__header ns-mig2-section-head">
+                  <div>
+                    <span class="ns-card__title">Schema drift</span>
+                    <span class="ns-mig2__caption">live database → declared schema</span>
+                  </div>
+                  <span class="ns-mig3-count">{{ s11Gauge.driftedN }} records</span>
+                </div>
+                <div class="ns-mig2-drift__cols" aria-hidden="true"><span>object</span><span>difference</span></div>
+                <div class="ns-data-table__body">
+                  <sc-for list="{{ s11DriftRows }}" as="d" hint-placeholder-count="2">
+                    <div class="ns-data-table__row ns-mig2-drift__row">
+                      <div><span class="ns-mig2-kind">{{ d.kind }}</span><strong>{{ d.obj }}</strong></div>
+                      <div><span>{{ d.has }}</span><span aria-hidden="true">→</span><strong>{{ d.wants }}</strong><small>{{ d.note }}</small></div>
                     </div>
-                  </sc-if>
+                  </sc-for>
                   <sc-if value="{{ s11InSync }}" hint-placeholder-val="{{ false }}">
-                    <div class="ns-migchain__insync"><span aria-hidden="true">✓</span> chain fully applied — nothing queued</div>
+                    <div class="ns-data-table__row ns-mig2-drift__empty">No drift records. Live DB matches the migration chain.</div>
                   </sc-if>
                 </div>
-              </section>
-
-              <!-- ledger (ref-11 dense table) — click a row → detail drawer -->
-              <section class="ns-panel ns-migledger" style="background:var(--ns-card)">
-                <div class="ns-migledger__head">
-                  <span class="ns-panel__title">Migration ledger</span>
-                  <span class="ns-migledger__hint">select a row for the DDL &amp; details</span>
-                </div>
-                <div class="ns-migledger__scroller">
-                  <table class="ns-migledger__table">
-                    <thead>
-                      <tr>
-                        <th class="ns-migledger__th ns-migledger__th--ver">Ver</th>
-                        <th class="ns-migledger__th">Migration</th>
-                        <th class="ns-migledger__th">Applied at</th>
-                        <th class="ns-migledger__th ns-migledger__th--num">Duration</th>
-                        <th class="ns-migledger__th ns-migledger__th--num">Rows</th>
-                        <th class="ns-migledger__th">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <sc-for list="{{ s11Rows }}" as="r" hint-placeholder-count="3">
-                        <tr class="ns-migledger__row" data-sel="{{ r.sel }}" data-status="{{ r.status }}" onClick="{{ r.open }}" data-ns-migselect>
-                          <td class="ns-migledger__td"><span class="ns-migver ns-migver--sm" data-phase="{{ r.status }}">{{ r.ver }}</span></td>
-                          <td class="ns-migledger__td"><span class="ns-migledger__name" style="font-family:var(--ns-font-mono)">{{ r.name }}</span></td>
-                          <td class="ns-migledger__td"><span class="ns-migledger__mono">{{ r.atShort }}</span></td>
-                          <td class="ns-migledger__td ns-migledger__td--num"><span class="ns-migledger__mono">{{ r.dur }}</span></td>
-                          <td class="ns-migledger__td ns-migledger__td--num"><span class="ns-migledger__mono">{{ r.rows }}</span></td>
-                          <td class="ns-migledger__td"><span class="{{ r.sBadge }}">{{ r.statusLabel }}</span></td>
-                        </tr>
-                      </sc-for>
-                    </tbody>
-                  </table>
-                </div>
-              </section>
-            </div>
-
-            <!-- RIGHT: drift panel (arc gauge, ref-04) + pending action + selected detail -->
-            <aside class="ns-migaside">
-              <section class="ns-panel ns-migdrift" style="background:var(--ns-card)" data-tone="{{ s11Gauge.tone }}">
-                <div class="ns-migdrift__head"><span class="ns-panel__title">Schema drift</span><span class="{{ s11Head.driftTone }}"></span></div>
-                <div class="ns-migdrift__gauge">
-                  <div class="ns-arcgauge" data-tone="{{ s11Gauge.tone }}" style="--ns-arc-deg:{{ s11Gauge.driftDeg }}deg">
-                    <div class="ns-arcgauge__track" aria-hidden="true"></div>
-                    <div class="ns-arcgauge__fill" aria-hidden="true"></div>
-                    <div class="ns-arcgauge__hub">
-                      <span class="ns-arcgauge__val" data-tone="{{ s11Gauge.tone }}">{{ s11Gauge.label }}</span>
-                      <span class="ns-arcgauge__cap">{{ s11Gauge.syncedN }} of {{ s11Gauge.trackedN }} objects in sync</span>
-                    </div>
-                  </div>
-                </div>
-                <sc-if value="{{ s11HasPending }}" hint-placeholder-val="{{ true }}">
-                  <div class="ns-migdrift__objs">
-                    <span class="ns-mini-label">drifted objects</span>
-                    <sc-for list="{{ s11DriftRows }}" as="d" hint-placeholder-count="2">
-                      <div class="ns-driftrow" data-tone="{{ d.tone }}">
-                        <span class="ns-driftrow__kind" data-kind="{{ d.kind }}">{{ d.kind }}</span>
-                        <div class="ns-driftrow__body">
-                          <span class="ns-driftrow__obj" style="font-family:var(--ns-font-mono)">{{ d.obj }}</span>
-                          <span class="ns-driftrow__delta"><span class="ns-driftrow__has">{{ d.has }}</span><span class="ns-driftrow__arrow" aria-hidden="true">→</span><span class="ns-driftrow__wants">{{ d.wants }}</span></span>
-                        </div>
-                        <span class="ns-driftrow__note">{{ d.note }}</span>
-                      </div>
-                    </sc-for>
-                  </div>
-                </sc-if>
-                <sc-if value="{{ s11InSync }}" hint-placeholder-val="{{ false }}">
-                  <div class="ns-migdrift__clean"><span aria-hidden="true">✓</span> Live DB matches the migration chain — no drift.</div>
-                </sc-if>
-              </section>
-
-              <!-- pending action / what will change (ref-06 action sheet feel, inline card) -->
-              <sc-if value="{{ s11HasPending }}" hint-placeholder-val="{{ true }}">
-                <section class="ns-panel ns-migapply" style="background:var(--ns-card)">
-                  <div class="ns-migapply__head">
-                    <span class="ns-migapply__glyph" aria-hidden="true">⛁</span>
-                    <div class="ns-migapply__txt">
-                      <span class="ns-migapply__title">1 migration pending</span>
-                      <span class="ns-migapply__sub">applying resolves the drift above</span>
-                    </div>
-                  </div>
-                  <div class="ns-migapply__preview">
-                    <span class="ns-mini-label">what will change</span>
-                    <span class="ns-migapply__line"><span class="ns-migapply__op" data-op="add">+</span> table <code>delivery_attempts</code></span>
-                    <span class="ns-migapply__line"><span class="ns-migapply__op" data-op="mod">~</span> <code>orders.status</code> → OrderStatus enum</span>
-                  </div>
-                  <div class="ns-migapply__actions">
-                    <button class="ns-btn ns-btn--primary ns-btn--sm" style="flex:1" onClick="{{ runMigrate }}">Apply migration</button>
-                    <button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ s11OpenDrawer }}">Details</button>
-                  </div>
-                  <div class="ns-migapply__cli"><span class="ns-migapply__cli-k">$</span><code>netscript db migrate</code></div>
-                </section>
-              </sc-if>
-
-              <!-- selected-migration detail (desktop rail; mobile → bottom sheet) -->
-              <section class="ns-panel ns-migdetail" style="background:var(--ns-card)">
-                <div class="ns-migdetail__head">
-                  <span class="ns-migver" data-phase="{{ s11Detail.status }}">{{ s11Detail.ver }}</span>
-                  <span class="ns-migdetail__name" style="font-family:var(--ns-font-mono)">{{ s11Detail.title }}</span>
-                  <span style="flex:1"></span>
-                  <span class="{{ s11Detail.sBadge }}">{{ s11Detail.statusLabel }}</span>
-                </div>
-                <div class="ns-migdetail__kv">
-                  <div class="ns-migdetail__kvrow"><span class="ns-migdetail__k">migration</span><span class="ns-migdetail__v" style="font-family:var(--ns-font-mono)">{{ s11Detail.name }}</span></div>
-                  <div class="ns-migdetail__kvrow"><span class="ns-migdetail__k">applied</span><span class="ns-migdetail__v" style="font-family:var(--ns-font-mono)">{{ s11Detail.atLabel }}</span></div>
-                  <div class="ns-migdetail__kvrow"><span class="ns-migdetail__k">duration</span><span class="ns-migdetail__v" style="font-family:var(--ns-font-mono)">{{ s11Detail.dur }}</span></div>
-                </div>
-                <p class="ns-migdetail__summary">{{ s11Detail.summary }}</p>
-                <button class="ns-btn ns-btn--secondary ns-btn--sm" onClick="{{ s11OpenDrawer }}" data-ns-migdrawer-open>Open detail &amp; DDL →</button>
               </section>
             </aside>
           </div>
@@ -3839,9 +3580,8 @@
     </div>
   </sc-if>
   <sc-if value="{{ sheetIsS3 }}" hint-placeholder-val="{{ false }}">
-    <div class="ns-sheet-body">
+    <div class="ns-sheet-body ns-ovsheet">
       <div class="ns-ovsheet__hero">
-        <span class="ns-ovsheet__glyph" data-tone="{{ s3Detail.tone }}" aria-hidden="true">{{ s3Detail.glyph }}</span>
         <div class="ns-ovsheet__hero-main">
           <span class="ns-ovsheet__eyebrow">{{ s3Detail.kind }} override</span>
           <div class="ns-ovsheet__transition">
@@ -3851,17 +3591,16 @@
           </div>
         </div>
       </div>
-      <div class="ns-ovsheet__reload" data-state="{{ s3Detail.reload }}">
-        <span class="ns-ovsheet__reload-dot" aria-hidden="true"></span>
+      <div class="ns-badge ns-badge--muted ns-ovsheet__reload" data-state="{{ s3Detail.reload }}">
         <span class="ns-ovsheet__reload-txt">{{ s3Detail.reloadLabel }}</span>
       </div>
       <p class="ns-ovsheet__note">{{ s3Detail.note }}</p>
-      <div class="ns-authkv">
+      <dl class="ns-property-list ns-property-list--compact ns-ovfacts">
         <sc-for list="{{ s3Detail.kv }}" as="kv" hint-placeholder-count="7">
-          <div class="ns-authkv__row"><span class="ns-authkv__k">{{ kv.k }}</span><span class="ns-authkv__v">{{ kv.v }}</span></div>
+          <div class="ns-ovfacts__row"><dt class="ns-ovfacts__key">{{ kv.k }}</dt><dd class="ns-ovfacts__value">{{ kv.v }}</dd></div>
         </sc-for>
-      </div>
-      <div style="display:grid;gap:var(--ns-space-2)">
+      </dl>
+      <div class="ns-ovsheet__actions">
         <button class="{{ s3Detail.actClass }}" onClick="{{ s3Detail.act }}">{{ s3Detail.actLabel }} override</button>
         <button class="ns-btn ns-btn--ghost" onClick="{{ s3Detail.go }}">Open in {{ s3Detail.goLabel }} →</button>
       </div>
@@ -4430,7 +4169,6 @@ class Component extends DCLogic {
             { op: 'add', text: '+   status OrderStatus @default(PENDING)' },
             { op: 'ctx', text: '}' },
             { op: 'add', text: '+ model DeliveryAttempt { id String @id … }' },
-            { op: 'add', text: '+ model Receipt { id String @id … }' },
           ] },
         { name: '20260706_add_receipts', ver: 'v3', title: 'add receipts', at: '2026-07-06 14:02', status: 'applied', dur: '38ms', rows: '9.1k', tables: ['receipts'],
           summary: 'Introduced the receipts table and a foreign key from receipts.order_id to orders.id.',
@@ -6036,7 +5774,7 @@ class Component extends DCLogic {
       selState: s.s3Ov === o.uid ? 'sel' : null,
       select: () => this.setState({ s3Ov: o.uid, sheet: 's3' }),
       act: ovConfirm(o.act), actLabel: o.actLabel,
-      actClass: 'ns-btn ns-btn--' + o.actKind + ' ns-btn--sm',
+      actClass: 'ns-btn ns-btn--ghost ns-btn--sm',
     }));
     const pendingReload = ovAll.filter(o => o.reload === 'pending').length;
     const liveReload = ovAll.length - pendingReload;
@@ -6045,7 +5783,7 @@ class Component extends DCLogic {
     const s3Detail = ovSel ? {
       kind: ovSel.kind, glyph: ovSel.glyph, key: ovSel.key, base: ovSel.base, val: ovSel.val,
       tone: ovSel.tone, reload: ovSel.reload, reloadLabel: ovSel.reload === 'pending' ? 'pending restart' : 'hot-reloaded · live',
-      note: ovSel.note, actLabel: ovSel.actLabel, actClass: 'ns-btn ns-btn--' + (ovSel.kind === 'flag' || ovSel.kind === 'task' ? 'destructive' : 'secondary'),
+      note: ovSel.note, actLabel: ovSel.actLabel, actClass: 'ns-btn ns-btn--secondary',
       act: ovConfirm(ovSel.act), goRoute: ovSel.goRoute, goLabel: ovSel.goLabel,
       go: go(ovSel.goRoute),
       kv: [
@@ -6072,11 +5810,16 @@ class Component extends DCLogic {
       divPct: Math.round(ovAll.length / 42 * 100) + '%',
       rev: 'v' + (s.verSeq - 1), revBy: s.flags.find(f => f.rev === 'v43') ? 'ada@ops' : 'ops',
       revAt: '14 min ago',
+      typeSummary: ovFlags.length + ' flags · ' + ovJobs.length + ' jobs · ' + ovTrigs.length + ' triggers · ' + ovTasks.length + ' tasks',
       liveN: String(liveReload), pendN: String(pendingReload),
       reloadTone: pendingReload > 0 ? 'warning' : 'success',
       reloadLabel: pendingReload > 0 ? pendingReload + ' pending restart' : 'all live',
+      reloadDetail: liveReload + ' hot-reloaded · ' + pendingReload + ' require restart',
     };
-    const s3FeedItems = s.s3Feed.map(f => ({ ...f }));
+    const s3FeedItems = s.s3Feed.map(f => {
+      const parts = String(f.text || '').split('→').map(x => x.trim());
+      return { ...f, target: parts[0] || f.text, action: parts.slice(1).join(' → ') || 'updated' };
+    });
     // --- derived aside widgets (right column) — no invented data ---
     // (a) Pending hot-reloads: overrides that need a restart to take effect.
     const s3PendingReloads = ovAll.filter(o => o.reload === 'pending').map(o => ({
@@ -8123,6 +7866,7 @@ class Component extends DCLogic {
       s3PendingReloads, s3NoPending, s3Authors, s3Drift,
       s3HasStore: s3Store.length > 0, s3NoStore: s3Store.length === 0,
       s3Follow: s.s3Follow,
+      s3FollowLabel: s.s3Follow ? 'Pause feed' : 'Follow feed',
       s3ToggleFollow: () => this.setState(st => ({ s3Follow: !st.s3Follow })),
       s3PendingCount: s.s3Pending.length, s3HasPending: s.s3Pending.length > 0,
       s3Catch: () => this.setState(st => ({ s3Feed: [...st.s3Pending, ...st.s3Feed].slice(0, 30), s3Pending: [], s3Follow: true })),
