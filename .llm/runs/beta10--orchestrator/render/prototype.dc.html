@@ -2385,7 +2385,7 @@
 
       <!-- @S10-END -->
       <sc-if value="{{ isMigrations }}" hint-placeholder-val="{{ false }}">
-        <div class="ns-screen" data-screen-label="S11 Migrations">
+        <div class="ns-screen ns-migscreen" data-screen-label="S11 Migrations">
           <header class="ns-page-header ns-page-header--console">
             <div class="ns-toolbar">
               <div style="display:grid;gap:var(--ns-space-2)">
@@ -2400,40 +2400,148 @@
               </div>
             </div>
           </header>
-          <div style="display:grid;gap:var(--ns-space-6);grid-template-columns:repeat(auto-fit,minmax(min(26rem,100%),1fr));align-items:start">
-            <div style="display:grid;gap:var(--ns-space-5);min-width:0">
-              <sc-if value="{{ s11HasPending }}" hint-placeholder-val="{{ true }}">
-                <div class="ns-alert ns-alert--warning" style="display:flex;gap:var(--ns-space-3)">
-                  <span class="ns-alert__icon" aria-hidden="true">⚠</span>
-                  <div class="ns-alert__body" style="display:grid;gap:var(--ns-space-1)">
-                    <span class="ns-alert__title" style="font-weight:600">Schema drift detected on table <span class="ns-inline-code">orders</span></span>
-                    <span class="ns-alert__description" style="font-size:var(--ns-text-sm);color:var(--ns-muted-fg)">column <span class="ns-inline-code">status</span> type mismatch — introspect diff below. Applying the pending migration resolves it.</span>
+
+          <!-- Header composite: schema state strip (ref-13 stat strip, tailored) — NOT four plain number cards -->
+          <div class="ns-mighead" data-tone="{{ s11Head.driftTone }}">
+            <div class="ns-mighead__lead">
+              <span class="ns-mighead__eyebrow">schema head</span>
+              <div class="ns-mighead__verline">
+                <span class="ns-migver ns-migver--lg" data-phase="applied">{{ s11Head.headVer }}</span>
+                <sc-if value="{{ s11HasPending }}" hint-placeholder-val="{{ true }}">
+                  <span class="ns-mighead__arrow" aria-hidden="true">→</span>
+                  <span class="ns-migver ns-migver--lg" data-phase="pending">{{ s11Head.targetVer }}</span>
+                </sc-if>
+              </div>
+              <span class="ns-mighead__behind" data-tone="{{ s11Head.driftTone }}">{{ s11Head.behind }}</span>
+            </div>
+            <div class="ns-mighead__strip">
+              <div class="ns-migstat">
+                <span class="ns-migstat__k">applied</span>
+                <span class="ns-migstat__top"><span class="ns-migstat__v">{{ s11Head.appliedN }}</span><span class="ns-migstat__of">of {{ s11Head.totalN }}</span></span>
+                <span class="ns-migstat__bar" aria-hidden="true"><span class="ns-migstat__bar-fill" style="width:{{ s11Head.appliedRatioPct }}%"></span></span>
+              </div>
+              <div class="ns-migstat" data-tone="{{ s11Head.driftTone }}">
+                <span class="ns-migstat__k">pending</span>
+                <span class="ns-migstat__top"><span class="ns-migstat__v">{{ s11Head.pendingN }}</span><span class="ns-migstat__of">queued</span></span>
+                <span class="ns-migstat__pips ns-migstat__pips--copper" aria-hidden="true"><sc-for list="{{ s11Head.pendingPips }}" as="p" hint-placeholder-count="1"><span class="ns-migpip" data-state="pending"></span></sc-for></span>
+              </div>
+              <div class="ns-migstat" data-tone="{{ s11Head.driftTone }}">
+                <span class="ns-migstat__k">drift</span>
+                <span class="ns-migstat__top"><span class="ns-migstat__v ns-migstat__v--sm">{{ s11Head.driftLabel }}</span></span>
+                <span class="ns-migstat__pips" aria-hidden="true"><sc-for list="{{ s11Head.driftPips }}" as="p" hint-placeholder-count="8"><span class="ns-migpip" data-state="{{ p.state }}"></span></sc-for></span>
+              </div>
+              <div class="ns-migstat">
+                <span class="ns-migstat__k">last applied</span>
+                <span class="ns-migstat__v ns-migstat__v--sm">{{ s11Head.lastAppliedName }}</span>
+                <span class="ns-migstat__sub"><span class="ns-migstat__rel">{{ s11Head.lastAppliedRel }}</span><span class="ns-migstat__at">{{ s11Head.lastAppliedAt }}</span></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="ns-miggrid">
+            <!-- LEFT: the SIGNATURE — version-chain timeline + ledger -->
+            <div class="ns-migmain">
+              <section class="ns-panel ns-migchain" style="background:var(--ns-card)">
+                <div class="ns-migchain__head">
+                  <span class="ns-panel__title">Version chain</span>
+                  <span class="ns-migchain__legend">
+                    <span class="ns-migchain__leg"><span class="ns-migchain__leg-dot" data-phase="applied"></span>applied</span>
+                    <span class="ns-migchain__leg"><span class="ns-migchain__leg-dot" data-phase="pending"></span>pending</span>
+                  </span>
+                </div>
+                <div class="ns-migchain__body">
+                  <!-- applied spine (oldest → newest) -->
+                  <div class="ns-migchain__spine">
+                    <sc-for list="{{ s11Timeline }}" as="n" hint-placeholder-count="3">
+                      <button class="ns-mignode" data-phase="{{ n.phase }}" data-sel="{{ n.sel }}" onClick="{{ n.select }}" data-ns-migselect>
+                        <span class="ns-mignode__rail" aria-hidden="true"><span class="ns-mignode__dot" data-phase="{{ n.phase }}"></span></span>
+                        <span class="ns-mignode__card">
+                          <span class="ns-mignode__top">
+                            <span class="ns-migver" data-phase="{{ n.phase }}">{{ n.ver }}</span>
+                            <span class="ns-mignode__title">{{ n.title }}</span>
+                            <span style="flex:1"></span>
+                            <span class="{{ n.sBadge }}">{{ n.statusLabel }}</span>
+                          </span>
+                          <span class="ns-mignode__name" style="font-family:var(--ns-font-mono)">{{ n.name }}</span>
+                          <span class="ns-mignode__meta">
+                            <span class="ns-mignode__chip"><span class="ns-mignode__chip-i" aria-hidden="true">◫</span>{{ n.tablesLabel }}</span>
+                            <span class="ns-mignode__chip"><span class="ns-mignode__chip-i" aria-hidden="true">≡</span>{{ n.rowsLabel }}</span>
+                            <span class="ns-mignode__chip"><span class="ns-mignode__chip-i" aria-hidden="true">◷</span>{{ n.durLabel }}</span>
+                            <span style="flex:1"></span>
+                            <span class="ns-mignode__at">{{ n.atLabel }}</span>
+                          </span>
+                        </span>
+                      </button>
+                    </sc-for>
                   </div>
+                  <!-- HEAD / drift divider: where the live DB actually sits -->
+                  <div class="ns-mighead-marker" data-tone="{{ s11Head.driftTone }}">
+                    <span class="ns-mighead-marker__rail" aria-hidden="true"><span class="ns-mighead-marker__glyph">◆</span></span>
+                    <span class="ns-mighead-marker__body">
+                      <span class="ns-mighead-marker__label">live DB · HEAD {{ s11Head.headVer }}</span>
+                      <span class="ns-mighead-marker__note" data-tone="{{ s11Head.driftTone }}">{{ s11Gauge.caption }}</span>
+                    </span>
+                  </div>
+                  <!-- pending queue (below HEAD) -->
+                  <sc-if value="{{ s11HasPending }}" hint-placeholder-val="{{ true }}">
+                    <div class="ns-migchain__queue">
+                      <span class="ns-migchain__queue-label">queued</span>
+                      <sc-for list="{{ s11Queue }}" as="n" hint-placeholder-count="1">
+                        <button class="ns-mignode ns-mignode--queued" data-phase="{{ n.phase }}" data-sel="{{ n.sel }}" onClick="{{ n.select }}" data-ns-migselect>
+                          <span class="ns-mignode__rail" aria-hidden="true"><span class="ns-mignode__dot" data-phase="{{ n.phase }}"></span></span>
+                          <span class="ns-mignode__card">
+                            <span class="ns-mignode__top">
+                              <span class="ns-migver" data-phase="{{ n.phase }}">{{ n.ver }}</span>
+                              <span class="ns-mignode__title">{{ n.title }}</span>
+                              <span style="flex:1"></span>
+                              <span class="{{ n.sBadge }}">{{ n.statusLabel }}</span>
+                            </span>
+                            <span class="ns-mignode__name" style="font-family:var(--ns-font-mono)">{{ n.name }}</span>
+                            <span class="ns-mignode__meta">
+                              <span class="ns-mignode__chip"><span class="ns-mignode__chip-i" aria-hidden="true">◫</span>{{ n.tablesLabel }}</span>
+                              <span class="ns-mignode__chip"><span class="ns-mignode__chip-i" aria-hidden="true">≡</span>{{ n.rowsLabel }}</span>
+                              <span class="ns-mignode__chip"><span class="ns-mignode__chip-i" aria-hidden="true">◷</span>{{ n.durLabel }}</span>
+                              <span style="flex:1"></span>
+                              <span class="ns-mignode__at">{{ n.atLabel }}</span>
+                            </span>
+                          </span>
+                        </button>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ s11InSync }}" hint-placeholder-val="{{ false }}">
+                    <div class="ns-migchain__insync"><span aria-hidden="true">✓</span> chain fully applied — nothing queued</div>
+                  </sc-if>
                 </div>
-              </sc-if>
-              <sc-if value="{{ s11InSync }}" hint-placeholder-val="{{ false }}">
-                <div class="ns-inline-notice ns-inline-notice--success" style="display:flex;gap:var(--ns-space-2);align-items:center;padding:var(--ns-space-2-5) var(--ns-space-4);border-radius:var(--ns-radius-md)">
-                  <span class="ns-inline-notice__icon" aria-hidden="true">✓</span>
-                  <span class="ns-inline-notice__description" style="font-size:var(--ns-text-sm)">Schema in sync — no drift, nothing pending.</span>
+              </section>
+
+              <!-- ledger (ref-11 dense table) — click a row → detail drawer -->
+              <section class="ns-panel ns-migledger" style="background:var(--ns-card)">
+                <div class="ns-migledger__head">
+                  <span class="ns-panel__title">Migration ledger</span>
+                  <span class="ns-migledger__hint">select a row for the DDL &amp; details</span>
                 </div>
-              </sc-if>
-              <section class="ns-responsive-table">
-                <div class="ns-responsive-table__scroller">
-                  <table class="ns-responsive-table__table" style="min-width:30rem">
-                    <caption class="ns-responsive-table__caption">Prisma migration status</caption>
-                    <thead class="ns-responsive-table__head">
-                      <tr class="ns-responsive-table__row">
-                        <th class="ns-responsive-table__header">Migration</th>
-                        <th class="ns-responsive-table__header">Applied at</th>
-                        <th class="ns-responsive-table__header">Status</th>
+                <div class="ns-migledger__scroller">
+                  <table class="ns-migledger__table">
+                    <thead>
+                      <tr>
+                        <th class="ns-migledger__th ns-migledger__th--ver">Ver</th>
+                        <th class="ns-migledger__th">Migration</th>
+                        <th class="ns-migledger__th">Applied at</th>
+                        <th class="ns-migledger__th ns-migledger__th--num">Duration</th>
+                        <th class="ns-migledger__th ns-migledger__th--num">Rows</th>
+                        <th class="ns-migledger__th">Status</th>
                       </tr>
                     </thead>
-                    <tbody class="ns-responsive-table__body">
+                    <tbody>
                       <sc-for list="{{ s11Rows }}" as="r" hint-placeholder-count="3">
-                        <tr class="ns-responsive-table__row">
-                          <td class="ns-responsive-table__cell"><button style="all:unset;cursor:pointer;color:var(--ns-primary);font-family:var(--ns-font-mono);font-size:var(--ns-text-xs)" onClick="{{ r.open }}">{{ r.name }}</button></td>
-                          <td class="ns-responsive-table__cell"><span style="font-family:var(--ns-font-mono);font-size:var(--ns-text-2xs);color:var(--ns-muted-fg)">{{ r.at }}</span></td>
-                          <td class="ns-responsive-table__cell"><span class="{{ r.sBadge }}">{{ r.status }}</span></td>
+                        <tr class="ns-migledger__row" data-sel="{{ r.sel }}" data-status="{{ r.status }}" onClick="{{ r.open }}" data-ns-migselect>
+                          <td class="ns-migledger__td"><span class="ns-migver ns-migver--sm" data-phase="{{ r.status }}">{{ r.ver }}</span></td>
+                          <td class="ns-migledger__td"><span class="ns-migledger__name" style="font-family:var(--ns-font-mono)">{{ r.name }}</span></td>
+                          <td class="ns-migledger__td"><span class="ns-migledger__mono">{{ r.atShort }}</span></td>
+                          <td class="ns-migledger__td ns-migledger__td--num"><span class="ns-migledger__mono">{{ r.dur }}</span></td>
+                          <td class="ns-migledger__td ns-migledger__td--num"><span class="ns-migledger__mono">{{ r.rows }}</span></td>
+                          <td class="ns-migledger__td"><span class="{{ r.sBadge }}">{{ r.statusLabel }}</span></td>
                         </tr>
                       </sc-for>
                     </tbody>
@@ -2441,20 +2549,80 @@
                 </div>
               </section>
             </div>
-            <aside style="display:grid;gap:var(--ns-space-5);min-width:0">
-              <div style="display:grid;gap:var(--ns-space-2)">
-                <span class="ns-mini-label">introspect diff</span>
-                <div class="ns-code"><div class="ns-code__head"><span class="ns-code__name">schema.prisma</span><span class="ns-code__lang">diff</span></div></div>
-                <div class="ns-diff" style="margin-top:calc(-1 * var(--ns-space-2));border-top-left-radius:0;border-top-right-radius:0">
-                  <sc-for list="{{ s11Diff }}" as="d" hint-placeholder-count="5">
-                    <span class="ns-diff__line" data-op="{{ d.op }}">{{ d.text }}</span>
-                  </sc-for>
+
+            <!-- RIGHT: drift panel (arc gauge, ref-04) + pending action + selected detail -->
+            <aside class="ns-migaside">
+              <section class="ns-panel ns-migdrift" style="background:var(--ns-card)" data-tone="{{ s11Gauge.tone }}">
+                <div class="ns-migdrift__head"><span class="ns-panel__title">Schema drift</span><span class="{{ s11Head.driftTone }}"></span></div>
+                <div class="ns-migdrift__gauge">
+                  <div class="ns-arcgauge" data-tone="{{ s11Gauge.tone }}" style="--ns-arc-deg:{{ s11Gauge.driftDeg }}deg">
+                    <div class="ns-arcgauge__track" aria-hidden="true"></div>
+                    <div class="ns-arcgauge__fill" aria-hidden="true"></div>
+                    <div class="ns-arcgauge__hub">
+                      <span class="ns-arcgauge__val" data-tone="{{ s11Gauge.tone }}">{{ s11Gauge.label }}</span>
+                      <span class="ns-arcgauge__cap">{{ s11Gauge.syncedN }} of {{ s11Gauge.trackedN }} objects in sync</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div style="display:grid;gap:var(--ns-space-2)">
-                <span class="ns-mini-label">CLI equivalent</span>
-                <div class="ns-code"><pre><code>netscript db migrate</code></pre></div>
-              </div>
+                <sc-if value="{{ s11HasPending }}" hint-placeholder-val="{{ true }}">
+                  <div class="ns-migdrift__objs">
+                    <span class="ns-mini-label">drifted objects</span>
+                    <sc-for list="{{ s11DriftRows }}" as="d" hint-placeholder-count="2">
+                      <div class="ns-driftrow" data-tone="{{ d.tone }}">
+                        <span class="ns-driftrow__kind" data-kind="{{ d.kind }}">{{ d.kind }}</span>
+                        <div class="ns-driftrow__body">
+                          <span class="ns-driftrow__obj" style="font-family:var(--ns-font-mono)">{{ d.obj }}</span>
+                          <span class="ns-driftrow__delta"><span class="ns-driftrow__has">{{ d.has }}</span><span class="ns-driftrow__arrow" aria-hidden="true">→</span><span class="ns-driftrow__wants">{{ d.wants }}</span></span>
+                        </div>
+                        <span class="ns-driftrow__note">{{ d.note }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ s11InSync }}" hint-placeholder-val="{{ false }}">
+                  <div class="ns-migdrift__clean"><span aria-hidden="true">✓</span> Live DB matches the migration chain — no drift.</div>
+                </sc-if>
+              </section>
+
+              <!-- pending action / what will change (ref-06 action sheet feel, inline card) -->
+              <sc-if value="{{ s11HasPending }}" hint-placeholder-val="{{ true }}">
+                <section class="ns-panel ns-migapply" style="background:var(--ns-card)">
+                  <div class="ns-migapply__head">
+                    <span class="ns-migapply__glyph" aria-hidden="true">⛁</span>
+                    <div class="ns-migapply__txt">
+                      <span class="ns-migapply__title">1 migration pending</span>
+                      <span class="ns-migapply__sub">applying resolves the drift above</span>
+                    </div>
+                  </div>
+                  <div class="ns-migapply__preview">
+                    <span class="ns-mini-label">what will change</span>
+                    <span class="ns-migapply__line"><span class="ns-migapply__op" data-op="add">+</span> table <code>delivery_attempts</code></span>
+                    <span class="ns-migapply__line"><span class="ns-migapply__op" data-op="mod">~</span> <code>orders.status</code> → OrderStatus enum</span>
+                  </div>
+                  <div class="ns-migapply__actions">
+                    <button class="ns-btn ns-btn--primary ns-btn--sm" style="flex:1" onClick="{{ runMigrate }}">Apply migration</button>
+                    <button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ s11OpenDrawer }}">Details</button>
+                  </div>
+                  <div class="ns-migapply__cli"><span class="ns-migapply__cli-k">$</span><code>netscript db migrate</code></div>
+                </section>
+              </sc-if>
+
+              <!-- selected-migration detail (desktop rail; mobile → bottom sheet) -->
+              <section class="ns-panel ns-migdetail" style="background:var(--ns-card)">
+                <div class="ns-migdetail__head">
+                  <span class="ns-migver" data-phase="{{ s11Detail.status }}">{{ s11Detail.ver }}</span>
+                  <span class="ns-migdetail__name" style="font-family:var(--ns-font-mono)">{{ s11Detail.title }}</span>
+                  <span style="flex:1"></span>
+                  <span class="{{ s11Detail.sBadge }}">{{ s11Detail.statusLabel }}</span>
+                </div>
+                <div class="ns-migdetail__kv">
+                  <div class="ns-migdetail__kvrow"><span class="ns-migdetail__k">migration</span><span class="ns-migdetail__v" style="font-family:var(--ns-font-mono)">{{ s11Detail.name }}</span></div>
+                  <div class="ns-migdetail__kvrow"><span class="ns-migdetail__k">applied</span><span class="ns-migdetail__v" style="font-family:var(--ns-font-mono)">{{ s11Detail.atLabel }}</span></div>
+                  <div class="ns-migdetail__kvrow"><span class="ns-migdetail__k">duration</span><span class="ns-migdetail__v" style="font-family:var(--ns-font-mono)">{{ s11Detail.dur }}</span></div>
+                </div>
+                <p class="ns-migdetail__summary">{{ s11Detail.summary }}</p>
+                <button class="ns-btn ns-btn--secondary ns-btn--sm" onClick="{{ s11OpenDrawer }}" data-ns-migdrawer-open>Open detail &amp; DDL →</button>
+              </section>
             </aside>
           </div>
         </div>
@@ -3282,6 +3450,57 @@
       </sc-if>
     </div>
   </sc-if>
+  <sc-if value="{{ sheetIsS11 }}" hint-placeholder-val="{{ false }}">
+    <div class="ns-sheet-body">
+      <div class="ns-migsheet__hero">
+        <span class="ns-migver" data-phase="{{ s11Detail.status }}">{{ s11Detail.ver }}</span>
+        <div class="ns-migsheet__hero-txt">
+          <span class="ns-migsheet__hero-name" style="font-family:var(--ns-font-mono)">{{ s11Detail.name }}</span>
+          <span class="ns-migsheet__hero-title">{{ s11Detail.title }}</span>
+        </div>
+        <span style="flex:1"></span>
+        <span class="{{ s11Detail.sBadge }}">{{ s11Detail.statusLabel }}</span>
+      </div>
+      <div class="ns-migsheet__stats">
+        <div class="ns-migsheet__stat"><span class="ns-migsheet__stat-k">applied</span><span class="ns-migsheet__stat-v" style="font-family:var(--ns-font-mono)">{{ s11Detail.atLabel }}</span></div>
+        <div class="ns-migsheet__stat"><span class="ns-migsheet__stat-k">duration</span><span class="ns-migsheet__stat-v" style="font-family:var(--ns-font-mono)">{{ s11Detail.dur }}</span></div>
+        <div class="ns-migsheet__stat"><span class="ns-migsheet__stat-k">rows</span><span class="ns-migsheet__stat-v" style="font-family:var(--ns-font-mono)">{{ s11Detail.rows }}</span></div>
+      </div>
+      <div class="ns-seg ns-migsheet__seg" role="tablist" aria-label="Migration detail">
+        <button class="ns-seg__btn" role="tab" data-state="{{ s11TabSummary.state }}" onClick="{{ s11TabSummary.set }}" data-ns-migdrawer-summary>Summary</button>
+        <button class="ns-seg__btn" role="tab" data-state="{{ s11TabDdl.state }}" onClick="{{ s11TabDdl.set }}" data-ns-migdrawer-ddl>DDL diff</button>
+      </div>
+      <sc-if value="{{ s11DrawerSummary }}" hint-placeholder-val="{{ true }}">
+        <div class="ns-migsheet__panel">
+          <p class="ns-migsheet__summary">{{ s11Detail.summary }}</p>
+          <div class="ns-migsheet__tables">
+            <span class="ns-mini-label">tables touched</span>
+            <div class="ns-migsheet__chips">
+              <sc-for list="{{ s11Detail.tables }}" as="t" hint-placeholder-count="2">
+                <span class="ns-migchip" style="font-family:var(--ns-font-mono)">{{ t.t }}</span>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ s11DrawerDdl }}" hint-placeholder-val="{{ false }}">
+        <div class="ns-migsheet__panel">
+          <div class="ns-code"><div class="ns-code__head"><span class="ns-code__name">schema.prisma</span><span class="ns-code__lang">diff</span></div></div>
+          <div class="ns-diff" style="margin-top:calc(-1 * var(--ns-space-2));border-top-left-radius:0;border-top-right-radius:0">
+            <sc-for list="{{ s11Detail.ddl }}" as="d" hint-placeholder-count="5">
+              <span class="ns-diff__line" data-op="{{ d.op }}">{{ d.text }}</span>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ s11Detail.isPending }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;gap:var(--ns-space-2)">
+          <button class="ns-btn ns-btn--primary" onClick="{{ runMigrate }}">Apply migration</button>
+          <button class="ns-btn ns-btn--ghost" onClick="{{ s11OpenAspire }}">Open DB resource in Aspire ↗</button>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
 </dialog>
 
 <dialog id="ns-detailsheet-dialog" data-part="content" data-side="bottom" class="ns-detailsheet">
@@ -3418,11 +3637,45 @@ class Component extends DCLogic {
         F('success', 'payment-events msg_87c → 3/3 delivered', '13:48:02'),
       ],
       // S11
+      s11Sel: '20260711_add_delivery_attempts',
       s11Rows: [
-        { name: '20260711_add_delivery_attempts', at: '—', status: 'pending' },
-        { name: '20260706_add_receipts', at: '2026-07-06 14:02', status: 'applied' },
-        { name: '20260703_add_orders', at: '2026-07-03 09:12', status: 'applied' },
-        { name: '20260701_init', at: '2026-07-01 16:40', status: 'applied' },
+        { name: '20260711_add_delivery_attempts', ver: 'v4', title: 'add delivery attempts', at: '—', status: 'pending', dur: '~40ms', rows: '~est. 12.4k', tables: ['orders', 'delivery_attempts'],
+          summary: 'Adds the delivery_attempts table and converts orders.status from a free String to the OrderStatus enum. This is the migration the live DB is missing — applying it clears the orders.status drift.',
+          ddl: [
+            { op: 'ctx', text: 'model Order {' },
+            { op: 'del', text: '-   status String' },
+            { op: 'add', text: '+   status OrderStatus @default(PENDING)' },
+            { op: 'ctx', text: '}' },
+            { op: 'add', text: '+ model DeliveryAttempt { id String @id … }' },
+            { op: 'add', text: '+ model Receipt { id String @id … }' },
+          ] },
+        { name: '20260706_add_receipts', ver: 'v3', title: 'add receipts', at: '2026-07-06 14:02', status: 'applied', dur: '38ms', rows: '9.1k', tables: ['receipts'],
+          summary: 'Introduced the receipts table and a foreign key from receipts.order_id to orders.id.',
+          ddl: [
+            { op: 'ctx', text: 'model Receipt {' },
+            { op: 'add', text: '+   id      String @id @default(cuid())' },
+            { op: 'add', text: '+   orderId String' },
+            { op: 'ctx', text: '}' },
+          ] },
+        { name: '20260703_add_orders', ver: 'v2', title: 'add orders', at: '2026-07-03 09:12', status: 'applied', dur: '112ms', rows: '41.2k', tables: ['orders', 'order_items'],
+          summary: 'Created the orders and order_items tables with the initial status String column.',
+          ddl: [
+            { op: 'ctx', text: 'model Order {' },
+            { op: 'add', text: '+   id     String @id @default(cuid())' },
+            { op: 'add', text: '+   status String' },
+            { op: 'ctx', text: '}' },
+          ] },
+        { name: '20260701_init', ver: 'v1', title: 'init', at: '2026-07-01 16:40', status: 'applied', dur: '54ms', rows: '0', tables: ['users', 'sessions'],
+          summary: 'Baseline schema — users and sessions tables, extensions, and the Prisma migration bookkeeping table.',
+          ddl: [
+            { op: 'add', text: '+ model User    { id String @id … }' },
+            { op: 'add', text: '+ model Session { id String @id … }' },
+          ] },
+      ],
+      // S11 drift — what the live DB has vs what the chain expects
+      s11Drift: [
+        { obj: 'orders.status', kind: 'column', has: 'String', wants: 'OrderStatus (enum)', tone: 'warning', note: 'type mismatch' },
+        { obj: 'delivery_attempts', kind: 'table', has: '— missing —', wants: 'table + 4 columns', tone: 'warning', note: 'not created' },
       ],
       // S12
       s12Tab: 'queue', s12Checked: {},
@@ -5929,9 +6182,122 @@ class Component extends DCLogic {
       { probe: 'analytics → streams', state: 'failed', result: 'sink unreachable' },
     ];
 
-    // ----- S11 -----
-    const s11Rows = s.s11Rows.map(r => ({ ...r, sBadge: badge(r.status), open: () => this.nav('/migrations/' + encodeURIComponent(r.name)) }));
-    const s11HasPending = pendingMig > 0;
+    // ----- S11 — bespoke migration version-chain + drift -----
+    const migStatusLabel = { applied: 'applied', pending: 'pending', failed: 'failed' };
+    const migAll = s.s11Rows;
+    const migApplied = migAll.filter(r => r.status === 'applied'); // newest-first in data
+    const migPending = migAll.filter(r => r.status === 'pending');
+    const migFailed = migAll.filter(r => r.status === 'failed');
+    const s11HasPending = migPending.length > 0;
+    const s11HasFailed = migFailed.length > 0;
+    // drift: derived from pending / declared drift objects
+    const driftObjs = s11HasPending ? s.s11Drift : [];
+    const s11DriftCount = driftObjs.length;
+    const s11InSync = s11DriftCount === 0 && !s11HasPending;
+    // schema HEAD = highest applied version; target = highest declared version
+    const headVer = migApplied.length ? migApplied[0].ver : '—';
+    const targetVer = migAll.length ? migAll[0].ver : '—';
+    const lastApplied = migApplied.length ? migApplied[0] : null;
+
+    const s11Sel = s.s11Sel;
+    const selMig = migAll.find(r => r.name === s11Sel) || migPending[0] || migApplied[0] || null;
+    const selectMig = (name) => this.setState({ s11Sel: name });
+
+    // --- version-chain timeline nodes (applied spine → HEAD divider → pending queue) ---
+    // ordered oldest→newest for the applied spine, then pending queued after HEAD
+    const appliedChrono = migApplied.slice().reverse(); // oldest → newest
+    const nodeOf = (r, phase) => {
+      const tablesN = (r.tables || []).length;
+      return {
+        name: r.name, ver: r.ver, title: r.title, at: r.at, dur: r.dur, status: r.status,
+        statusLabel: migStatusLabel[r.status] || r.status, sBadge: badge(r.status),
+        phase, // 'applied' | 'pending'
+        // per-node metadata surfaced as inline mono chips (real data — no invention)
+        tablesN, tablesLabel: tablesN + (tablesN === 1 ? ' obj' : ' objs'),
+        rows: r.rows, rowsLabel: (r.rows && r.rows !== '0' && r.rows !== '—') ? r.rows : (r.rows === '0' ? '0 rows' : r.rows),
+        durLabel: phase === 'pending' ? ('est ' + r.dur) : r.dur,
+        atLabel: r.at === '—' ? 'not applied' : r.at,
+        sel: r.name === s11Sel ? 'true' : 'false',
+        select: () => selectMig(r.name),
+      };
+    };
+    const s11Timeline = [
+      ...appliedChrono.map(r => nodeOf(r, 'applied')),
+    ];
+    const s11Queue = migPending.map(r => nodeOf(r, 'pending'));
+
+    // --- ledger rows (dense table, ref-11) ---
+    const s11Rows = migAll.map(r => ({
+      ...r, sBadge: badge(r.status), statusLabel: migStatusLabel[r.status] || r.status,
+      sel: r.name === s11Sel ? 'true' : 'false',
+      atShort: r.at === '—' ? 'not applied' : r.at,
+      select: () => selectMig(r.name),
+      open: () => { selectMig(r.name); this.setState({ sheet: 's11', s11DrawerTab: 'summary' }); },
+    }));
+
+    // --- drift gauge: objects in-sync vs drifted (ref-04 arc gauge) ---
+    // total tracked objects across the applied schema ≈ tables touched; drifted = driftObjs
+    const trackedObjs = 8; // users, sessions, orders, order_items, receipts, + expected: delivery_attempts, orders.status(enum)
+    const driftedN = s11DriftCount;
+    const syncedN = Math.max(0, trackedObjs - driftedN);
+    const syncPct = Math.round((syncedN / trackedObjs) * 100);
+    const s11Gauge = {
+      pct: syncPct, syncedN, driftedN, trackedN: trackedObjs,
+      // arc sweep 0..180deg for the drifted portion
+      driftDeg: Math.round((driftedN / trackedObjs) * 180),
+      tone: s11InSync ? 'success' : 'warning',
+      label: s11InSync ? 'in sync' : (driftedN + ' drifted'),
+      caption: s11InSync ? 'live DB matches the migration chain' : 'live DB is behind the chain',
+    };
+    const s11DriftRows = driftObjs.map(d => ({ ...d }));
+
+    // --- header composite metrics + light micro-viz (ratio bar, pips, rel-time) ---
+    // app "now" anchor = the pending-apply timestamp used by runMigrate (2026-07-13 14:02)
+    const nowAnchor = new Date('2026-07-13T14:02:00');
+    const relDays = (at) => {
+      if (!at || at === '—') return null;
+      const d = new Date(at.replace(' ', 'T'));
+      if (isNaN(d)) return null;
+      return Math.max(0, Math.round((nowAnchor - d) / 86400000));
+    };
+    const lastRelD = lastApplied ? relDays(lastApplied.at) : null;
+    const lastRel = lastRelD === null ? '' : (lastRelD === 0 ? 'today' : lastRelD === 1 ? '1d ago' : lastRelD + 'd ago');
+    const totalMig = migAll.length;
+    const appliedRatioPct = totalMig ? Math.round((migApplied.length / totalMig) * 100) : 0;
+    // drift pips = one pip per tracked object (n-of-8), filled = in-sync
+    const driftPips = Array.from({ length: s11Gauge.trackedN }, (_, i) => ({
+      state: i < s11Gauge.syncedN ? 'sync' : 'drift',
+    }));
+    const s11Head = {
+      headVer, targetVer,
+      appliedN: migApplied.length, pendingN: migPending.length,
+      totalN: totalMig, appliedRatioPct,
+      appliedRatio: migApplied.length + '/' + totalMig,
+      pendingPips: Array.from({ length: Math.max(migPending.length, 0) }, () => ({})),
+      driftPips, driftedN: s11Gauge.driftedN, trackedN: s11Gauge.trackedN,
+      driftLabel: s11InSync ? 'in sync' : (s11DriftCount + ' drifted'),
+      driftTone: s11InSync ? 'success' : 'warning',
+      lastAppliedName: lastApplied ? lastApplied.title : '—',
+      lastAppliedAt: lastApplied ? lastApplied.at : '—',
+      lastAppliedRel: lastRel,
+      behind: s11HasPending ? (migPending.length + ' behind') : 'up to date',
+    };
+
+    // --- selected-migration detail (drawer / inline) ---
+    const s11Detail = selMig ? {
+      name: selMig.name, ver: selMig.ver, title: selMig.title, at: selMig.at, dur: selMig.dur,
+      rows: selMig.rows, status: selMig.status, statusLabel: migStatusLabel[selMig.status] || selMig.status,
+      sBadge: badge(selMig.status), summary: selMig.summary,
+      tables: (selMig.tables || []).map(t => ({ t })),
+      atLabel: selMig.at === '—' ? 'not applied yet' : selMig.at,
+      ddl: selMig.ddl || [],
+      isPending: selMig.status === 'pending',
+    } : { name: '—', ver: '—', title: '—', at: '—', dur: '—', rows: '—', status: 'applied', statusLabel: 'applied', sBadge: badge('applied'), summary: '', tables: [], atLabel: '—', ddl: [], isPending: false };
+
+    const s11DrawerTab = s.s11DrawerTab || 'summary';
+    const s11TabSummary = { state: s11DrawerTab === 'summary' ? 'active' : null, set: () => this.setState({ s11DrawerTab: 'summary' }) };
+    const s11TabDdl = { state: s11DrawerTab === 'ddl' ? 'active' : null, set: () => this.setState({ s11DrawerTab: 'ddl' }) };
+
     const runMigrate = () => this.askConfirm({
       title: 'Apply pending migrations', desc: 'Applies the 1 pending Prisma migration to the database. The confirm shows the plan and the exact CLI before you execute.',
       from: '20260711_add_delivery_attempts · pending', to: 'applied',
@@ -5939,13 +6305,8 @@ class Component extends DCLogic {
       toast: 'Migration applied — schema in sync',
       apply: () => this.setState(st => ({ s11Rows: st.s11Rows.map(r => r.status === 'pending' ? { ...r, status: 'applied', at: '2026-07-13 14:02' } : r) })),
     });
-    const s11Diff = [
-      { op: 'ctx', text: 'model Order {' },
-      { op: 'del', text: '-   status String' },
-      { op: 'add', text: '+   status OrderStatus @default(PENDING)' },
-      { op: 'ctx', text: '}' },
-      { op: 'add', text: '+ model Receipt { id String @id … }' },
-    ];
+    // kept for back-compat with any old binding
+    const s11Diff = s11Detail.ddl;
 
     // ----- S12 -----
     const dlqRows = s.s12Tab === 'queue' ? [
@@ -6286,8 +6647,8 @@ class Component extends DCLogic {
       s1Sheet: s.detailSheet || { eyebrow: '', icon: '', tone: 'muted', value: '', title: '', pill: '', pillClass: 'ns-badge ns-badge--muted', desc: '', cta: 'Open', rows: [], go: () => {} },
       closeDetailSheet: () => this.setState({ detailSheet: null }),
       // sheet
-      sheetIsS2: s.sheet === 's2', sheetIsS13: s.sheet === 's13', sheetIsS7: s.sheet === 's7', sheetIsS8: s.sheet === 's8', sheetIsS9: s.sheet === 's9',
-      sheetTitle: s.sheet === 's2' ? selDef.key : s.sheet === 's7' ? s7Detail.name : s.sheet === 's8' ? (s8SelNode ? s8SelNode.name : s8.saga) : s.sheet === 's9' ? s9Detail.id : (selNode13 ? selNode13.name : ''),
+      sheetIsS2: s.sheet === 's2', sheetIsS13: s.sheet === 's13', sheetIsS7: s.sheet === 's7', sheetIsS8: s.sheet === 's8', sheetIsS9: s.sheet === 's9', sheetIsS11: s.sheet === 's11',
+      sheetTitle: s.sheet === 's2' ? selDef.key : s.sheet === 's7' ? s7Detail.name : s.sheet === 's8' ? (s8SelNode ? s8SelNode.name : s8.saga) : s.sheet === 's9' ? s9Detail.id : s.sheet === 's11' ? s11Detail.name : (selNode13 ? selNode13.name : ''),
       closeSheet: () => this.setState({ sheet: null }),
       // S1
       s1Stats, s1CmdGroups, s1Contribs, s1Teaser, s1Kpis, s1Hero, s1Ai,
@@ -6472,7 +6833,11 @@ class Component extends DCLogic {
       s10IsConsume: s10Tab === 'consume', s10IsParts: s10Tab === 'partitions',
       s10IsConsumers: s10Tab === 'consumers', s10IsConfig: s10Tab === 'config',
       // S11
-      s11Rows, s11HasPending, s11InSync: !s11HasPending, runMigrate, s11Diff,
+      s11Rows, s11HasPending, s11HasFailed, s11InSync, runMigrate, s11Diff,
+      s11Timeline, s11Queue, s11Head, s11Gauge, s11DriftRows, s11DriftCount,
+      s11Detail, s11TabSummary, s11TabDdl,
+      s11DrawerDdl: s11DrawerTab === 'ddl', s11DrawerSummary: s11DrawerTab === 'summary',
+      s11OpenDrawer: () => this.setState({ sheet: 's11', s11DrawerTab: 'summary' }),
       s11OpenAspire: () => this.showToast('Would open Aspire postgres resource ↗', 'info'),
       // S12
       s12Rows, s12Count, s12HasSel: s12Count > 0, s12NoSel: s12Count === 0, reprocess,

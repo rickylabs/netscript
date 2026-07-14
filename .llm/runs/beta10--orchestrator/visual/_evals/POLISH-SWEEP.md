@@ -20,3 +20,9 @@ every screen and applies the genuinely valuable items (skip subjective/gold-plat
 - Precedence rail → optional node-graph pipeline [ref 21] (declined — waterfall metaphor is stronger; revisit only if desired)
 - Right panel → inline quick-override <textarea> editor + docs accordion [ref 11] (out of visual-only scope; needs interactivity)
 - Category filter chips → connected tab bar [ref 11] (declined — chips are fine)
+
+## Migrations (gate 62 → node/header density fix)
+- Migration ledger → inline per-row DDL diff expander [ref 13] (declined — dense table + drawer already cover it)
+- Pending rail "what will change" → tabbed impact-docs accordion [ref 11] (gold-plating)
+- DDL diff → full code-editor chrome (file tabs, line numbers) [ref 11] (declined — diff is intentionally secondary)
+- Version-chain per-node author avatars + preflight-step pipeline [ref 19] (no author/step data — would invent data)

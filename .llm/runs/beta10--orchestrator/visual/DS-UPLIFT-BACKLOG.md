@@ -602,3 +602,91 @@ is unrelated to this markup (absent on clean load). CSS appended to `ns-ext.css`
 Gate items 5/8 (node-graph rail; inline `<textarea>` quick-override editor + docs accordion) NOT
 done — the brief forbids converting the waterfall to a node-graph, and an editable override would
 change behavior beyond a visual pass.
+
+## Pass V8 — Migrations
+
+Redesigned S11 (`DB migrations & drift`) from a plain 3-col table + a co-star introspect-diff into a
+bespoke migration control plane. Signature = the **version-chain timeline**; the diff is demoted to a
+secondary drawer tab (Config Resolution owns diff-as-hero).
+
+### New components (all `--ns-*` tokens, `ns-*` classes, appended to `ns-ext.css`)
+- **`ns-migver`** — reusable version glyph (`v1`…`v4`), phase-tinted (applied=teal, pending=dashed
+  copper, failed=destructive), `--lg`/`--sm` sizes; dark-mode fg/border step-up for contrast.
+- **`ns-mighead`** — header composite: HEAD `v3 → v4` glyphs + `behind` pill + a 4-tile stat strip
+  (applied / pending / drift / last-applied) with an accent left-rail tinted by drift tone. Replaces
+  four plain number cards (ref-13 stat strip).
+- **`ns-migchain` / `ns-mignode`** — the **version-chain timeline** (SIGNATURE): applied spine of
+  timed-event cards on a rail (filled teal status dots) → **`ns-mighead-marker`** ringed-diamond
+  live-DB HEAD/drift divider → **`ns-migchain__queue`** dashed copper pending nodes. Node card =
+  version glyph + title + mono name + timestamp·duration + status badge, selectable (ref-19).
+- **`ns-arcgauge`** — pure-CSS conic half-ring drift gauge (teal synced + amber drifted slice,
+  masked to a ring), centered value ("N drifted" / "in sync") + object-count caption (ref-04). No
+  SVG, no `{{ }}` holes.
+- **`ns-driftrow`** — drifted-object row: kind tag (column/table) + mono object + strike-through
+  `has → wants` delta + italic note.
+- **`ns-migledger`** — dense ledger table (ver / migration / applied-at / duration / rows / status);
+  row hover + selected inset-rail; row-click opens the detail drawer (ref-11).
+- **`ns-migapply`** — pending-apply card: glyph + "1 migration pending" + "what will change" (+/~ op
+  chips) + apply/details actions + dark CLI strip.
+- **`ns-migdetail`** rail + **`sheetIsS11`** drawer/bottom-sheet — Summary / DDL-diff **segmented
+  tabs** (`ns-seg` reused), stat tiles, tables-touched chips. Desktop right-drawer, mobile bottom
+  sheet via the shared `ns-sheet-dialog` (no new dialog).
+
+### Data model (visual metadata only — copy meaning unchanged)
+`s11Rows` enriched with `ver / title / dur / rows / tables / summary / ddl`; added `s11Drift`
+(drifted objects) and `s11Sel` (selection). All derived state (timeline nodes, ledger, gauge
+fractions, header metrics, detail, drawer tab) computed in the S11 view-model builder.
+
+### Verification
+0 `{{ }}` holes / 0 real console errors / 0 h-overflow across desktop 1440 + mobile 390, both themes,
+plus selected / drawer / DDL-tab / mobile-sheet / **in-sync** interaction states. Full 16-route
+regression clean. Pre-existing benign `/favicon.ico` 404 unrelated (present in `00-BEFORE`). No edits
+to `support.js`, `_ns_styles.css`, `_ds/*`, or other screens' markup.
+
+### Deliberately deferred
+No ledger-header sort wiring (visual hint only); no horizontal branch/fork viz (migration data is
+linear — a fork would be speculative); gauge denominator is a derived constant pending a real
+schema-object census; pending rows-affected is a labelled estimate.
+
+## Pass V8-fix — Migrations
+
+Scoped density tighten after the adversarial vision gate (62/100) flagged the one valid hit: the
+hero version-chain nodes were under-filled and the header tiles were plain number boxes. VISUAL +
+LAYOUT only; no route/logic/data/copy-meaning changes; no other screen touched.
+
+### Refinements
+- **`ns-mignode`** — cut internal padding ~35% (`space-2/2.5`, gap `3px`, dot/offset trimmed) and
+  added an **inline mono chip row** (`ns-mignode__chip` × 3 + `ns-mignode__at`): `◫ N objs` (from
+  `tables.length`), `≡ <rows>`, `◷ <duration>`, with applied-at right-aligned. Chips tint copper on
+  pending, neutral on applied — nodes now earn their height with real data instead of whitespace.
+  Card height 87→81px; per-node metadata 2 fields → 4.
+- **`ns-migstat` micro-viz** — every header tile now carries a supporting mini-viz (all from existing
+  data): **`ns-migstat__bar`** applied/total ratio meter, **`ns-migstat__pips` / `ns-migpip`** n-of-8
+  drift pips (teal sync / amber drift) + one copper pip per pending, **`ns-migstat__rel`** relative
+  time (`7d ago` / `today`) beside the absolute timestamp. Head + tile padding trimmed; big number
+  `text-2xl → text-xl`.
+- **`ns-mighead-marker`** — reworked from a big dashed ghost box into a **slim one-line marker**
+  (mono uppercase label + inline note on a thin tinted strip with a 2px copper/teal left accent).
+  Height 52→23px (doctrine rule 4: no orphaned ghost rows).
+- **`ns-driftrow`** — padding halved; `has → wants` delta and status note now share one compact row
+  (note pulled inline-right via a 3rd grid column) instead of an airy 3-line block.
+- **`ns-migsheet__stats`** — Applied / Duration / Rows kept as a **3-across grid at 390px** (was
+  collapsing to a 1-col stack at ≤560px); padding tightened so the Summary/DDL tabs sit above the
+  fold on a standard phone.
+
+### Data model (visual metadata only)
+`nodeOf` now exposes `tablesLabel` / `rowsLabel` / `durLabel` / `atLabel`. `s11Head` gains
+`appliedRatioPct`, `appliedRatio`, `pendingPips`, `driftPips` (n-of-8), and `lastAppliedRel`
+(relative-time from the `runMigrate` "now" anchor — derived, not invented).
+
+### Verification
+0 `{{ }}` / 0 real console errors / 0 h-overflow across desktop 1440 + mobile 390, both themes, plus
+selected / detail-drawer / DDL-tab / mobile-sheet / **in-sync** states. In-sync applied-only state
+(`4 of 4`, full teal bar, 8 teal pips, teal HEAD marker) confirmed by applying the pending migration
+at runtime. Full 16-route regression clean (32 route-visits). No edits to `support.js`,
+`_ns_styles.css`, `_ds/*`, or other screens.
+
+### Declined (gold-plating / data-invention, per brief)
+Inline per-row DDL expanders in the ledger; tabbed docs accordion for the pending list; code-editor
+chrome (file tabs / line numbers) on the DDL diff (stays a secondary drawer tab); author avatars and
+a pre-flight-step pipeline (no such data).

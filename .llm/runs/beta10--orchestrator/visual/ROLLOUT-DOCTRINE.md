@@ -95,3 +95,15 @@ Anthropic-skin drops images → `NO_VISION`). Feed the screen's shots + a DIVERS
 refs + 2 wildcards). Then dispatch an Opus fix pass that (a) kills dead space, (b) makes every generic
 section bespoke, (c) applies the prescribed concrete components. Screenshots to owner + commit + comment
 on PR #780 each pass.
+
+## Density defaults (front-loaded 2026-07-14 — the gate flags these on EVERY screen)
+
+Bake these into the FIRST pass so screens land ≥75 and need fewer fix passes:
+1. **No plain number-card stat rows.** A row of "LABEL / big-number" boxes always reads generic. Use a
+   composite header: icon/glyph + number + a supporting micro-viz (sparkline, ratio meter, pips, trend
+   arrow) + a short contextual sub-label. Tie metrics to click-to-filter where it fits.
+2. **Compact nodes/rows — no 100px+ padded cards for 3 lines.** Timeline/list nodes must earn their
+   height with real per-item metadata (counts, durations, deltas), not padding. Halve airy row heights.
+3. **Dense tables**: tight row height, monospace + type-color for values, inline mini-viz (sparkline /
+   heat-bar / status pill) per row rather than plain text cells.
+4. **No orphaned ghost rows**: dividers/markers should carry data or be slim, never a big empty dashed box.
