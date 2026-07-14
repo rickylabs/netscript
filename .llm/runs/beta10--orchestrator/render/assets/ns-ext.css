@@ -2766,3 +2766,313 @@
   .ns-strgroup { grid-template-columns: auto 1fr; gap: var(--ns-space-3); }
   .ns-strgroup__meta { gap: var(--ns-space-3); }
 }
+
+/* ==================================================================== *
+ * Pass V7 — Config Resolution (S2). Layered-precedence resolution:
+ * a value cascades down framework → package → profile → override; the
+ * highest-precedence layer WINS, lower contributions are SHADOWED.
+ * Signature = the precedence WATERFALL (no console table / canvas / flow
+ * clones from Workers/Sagas/Triggers/Streams). Tokens only; hard press
+ * shadow on the winning layer for NS One identity. Ref 13 (red/green
+ * diff), ref 11 (KV table + drawer), ref 19 (inline stat bar), ref 21
+ * (layered stack + edge labels).
+ * ==================================================================== */
+
+/* per-layer tone plumbing — one custom prop set the whole screen reads */
+.ns-config { --cfg: var(--ns-border-strong); --cfg-fg: var(--ns-fg); --cfg-subtle: var(--ns-surface); --cfg-border: var(--ns-border); }
+[data-tone='muted']   { --cfg: var(--ns-border-strong); --cfg-fg: var(--ns-muted-fg); --cfg-subtle: var(--ns-surface); --cfg-border: var(--ns-border); }
+[data-tone='primary'] { --cfg: var(--ns-primary); --cfg-fg: var(--ns-primary); --cfg-subtle: var(--ns-primary-subtle); --cfg-border: var(--ns-primary-border); }
+[data-tone='success'] { --cfg: var(--ns-success); --cfg-fg: var(--ns-success); --cfg-subtle: var(--ns-success-subtle); --cfg-border: var(--ns-success-border); }
+[data-tone='warning'] { --cfg: var(--ns-warning); --cfg-fg: var(--ns-warning); --cfg-subtle: var(--ns-warning-subtle); --cfg-border: var(--ns-warning-border); }
+
+/* ---- header composite: title block + inline stat bar + precedence legend (ref 19) ---- */
+.ns-cfghero { display: grid; gap: var(--ns-space-4); margin-bottom: var(--ns-space-5); }
+.ns-cfghero__lead { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--ns-space-4); flex-wrap: wrap; }
+.ns-cfghero__titles { display: grid; gap: var(--ns-space-2); max-width: 52ch; }
+.ns-cfghero__meta { display: flex; flex-direction: column; align-items: flex-end; gap: var(--ns-space-2); }
+.ns-cfghero__resolved { font-family: var(--ns-font-mono); font-size: var(--ns-text-3xs); color: var(--ns-muted-fg); text-align: right; }
+.ns-cfghero__resolved code { color: var(--ns-fg); }
+/* the stat bar is ONE rounded pressed slab split into cells (ref 19 pill-bar), not separate number cards */
+.ns-cfghero__strip { display: grid; grid-template-columns: 1fr; gap: 0; border: 1px solid var(--ns-border);
+  border-radius: var(--ns-radius-xl); background: var(--ns-card); box-shadow: var(--ns-shadow-sm); overflow: hidden; }
+.ns-cfghero__cell { display: grid; gap: 2px; padding: var(--ns-space-3) var(--ns-space-4);
+  border-bottom: 1px solid var(--ns-border); }
+.ns-cfghero__cell-label { font-family: var(--ns-font-mono); font-size: var(--ns-text-3xs); text-transform: uppercase;
+  letter-spacing: 0.09em; color: var(--ns-muted-fg); }
+.ns-cfghero__cell-value { font-family: var(--ns-font-mono); font-size: var(--ns-text-2xl); font-weight: 700; line-height: 1;
+  color: var(--ns-fg); font-variant-numeric: tabular-nums; }
+.ns-cfghero__cell-value[data-tone='warning'] { color: var(--ns-warning); }
+.ns-cfghero__cell-value[data-tone='primary'] { color: var(--ns-primary); }
+.ns-cfghero__cell-value[data-tone='success'] { color: var(--ns-success); }
+.ns-cfghero__cell-sub { font-size: var(--ns-text-3xs); color: var(--ns-muted-fg); }
+.ns-cfghero__legend { display: flex; align-items: center; flex-wrap: wrap; gap: var(--ns-space-2);
+  padding: var(--ns-space-3) var(--ns-space-4); background: var(--ns-surface); }
+.ns-cfghero__legend-label { font-family: var(--ns-font-mono); font-size: var(--ns-text-3xs); text-transform: uppercase;
+  letter-spacing: 0.09em; color: var(--ns-muted-fg); }
+@media (min-width: 720px) {
+  .ns-cfghero__strip { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .ns-cfghero__cell { border-bottom: 0; border-right: 1px solid var(--ns-border); }
+  .ns-cfghero__legend { grid-column: 1 / -1; border-top: 1px solid var(--ns-border); }
+}
+
+/* ---- layer chip: the atomic "which layer" token, reused across table/waterfall/diff/trail ---- */
+.ns-cfglayerchip { display: inline-flex; align-items: center; gap: 5px; padding: 2px var(--ns-space-2);
+  border-radius: var(--ns-radius-full); border: 1px solid var(--cfg-border); background: var(--cfg-subtle); color: var(--cfg-fg);
+  font-family: var(--ns-font-mono); font-size: var(--ns-text-3xs); font-weight: 600; white-space: nowrap; }
+.ns-cfglayerchip--sm { padding: 1px var(--ns-space-1-5); font-size: 0.62rem; }
+.ns-cfglayerchip__ord { display: inline-grid; place-items: center; width: 0.95rem; height: 0.95rem; border-radius: var(--ns-radius-full);
+  background: var(--cfg); color: var(--ns-card); font-size: 0.58rem; font-weight: 700; }
+.ns-cfglayerchip__glyph { color: var(--cfg); }
+
+/* ---- body split: ledger table (left) + resolution panel (right) ---- */
+.ns-config__body { display: grid; grid-template-columns: 1fr; gap: var(--ns-space-4); align-items: start; }
+@media (min-width: 1080px) { .ns-config__body { grid-template-columns: minmax(0, 27rem) minmax(0, 1fr); } }
+@media (min-width: 1440px) { .ns-config__body { grid-template-columns: minmax(0, 30rem) minmax(0, 1fr); gap: var(--ns-space-5); } }
+
+/* ---- effective-config ledger (ref 11 KV table, but a resolution ledger not a console clone) ---- */
+.ns-cfgtable { display: grid; gap: 0; border: 1px solid var(--ns-border); border-radius: var(--ns-radius-xl);
+  background: var(--ns-card); overflow: hidden; box-shadow: var(--ns-shadow-xs); }
+.ns-cfgtable__head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--ns-space-2);
+  padding: var(--ns-space-3) var(--ns-space-3-5); border-bottom: 1px solid var(--ns-border); }
+.ns-cfgtable__title { font-size: var(--ns-text-sm); font-weight: 700; color: var(--ns-fg); }
+.ns-cfgtable__count { font-family: var(--ns-font-mono); font-size: var(--ns-text-3xs); color: var(--ns-muted-fg); }
+.ns-cfgtable__filters { display: flex; flex-wrap: wrap; gap: var(--ns-space-1-5); padding: var(--ns-space-2-5) var(--ns-space-3);
+  border-bottom: 1px solid var(--ns-border); background: var(--ns-surface); }
+.ns-cfgnschip { display: inline-flex; align-items: center; gap: 5px; padding: 2px var(--ns-space-2); border-radius: var(--ns-radius-full);
+  border: 1px solid var(--ns-border); background: var(--ns-card); color: var(--ns-muted-fg); cursor: pointer;
+  font-family: var(--ns-font-mono); font-size: var(--ns-text-3xs); font: inherit; font-size: var(--ns-text-3xs); transition: border-color 120ms ease, color 120ms ease; }
+.ns-cfgnschip:hover { border-color: var(--ns-border-strong); color: var(--ns-fg); }
+.ns-cfgnschip[data-state='active'] { border-color: var(--ns-primary-border); background: var(--ns-primary-subtle); color: var(--ns-primary); font-weight: 600; }
+.ns-cfgnschip__count { display: inline-grid; place-items: center; min-width: 1rem; height: 1rem; padding: 0 3px; border-radius: var(--ns-radius-full);
+  background: var(--ns-surface); color: var(--ns-muted-fg); font-size: 0.58rem; }
+.ns-cfgnschip[data-state='active'] .ns-cfgnschip__count { background: var(--ns-card); color: var(--ns-primary); }
+.ns-cfgtable__cols { display: none; grid-template-columns: minmax(0, 1fr) auto minmax(8.5rem, auto); gap: var(--ns-space-3);
+  padding: var(--ns-space-1-5) var(--ns-space-3-5); border-bottom: 1px solid var(--ns-border); background: var(--ns-surface); }
+@media (min-width: 480px) { .ns-cfgtable__cols { display: grid; } }
+.ns-cfgtable__col { font-family: var(--ns-font-mono); font-size: var(--ns-text-3xs); text-transform: uppercase; letter-spacing: 0.06em; color: var(--ns-muted-fg); }
+.ns-cfgtable__col--val { text-align: right; }
+.ns-cfgtable__col--win { text-align: right; }
+.ns-cfgtable__rows { display: grid; gap: 0; }
+
+/* row reads left→right matching the header: KEY | EFFECTIVE | WINNING LAYER */
+.ns-cfgrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'key val' 'win win';
+  gap: var(--ns-space-1) var(--ns-space-3); align-items: center; padding: var(--ns-space-2-5) var(--ns-space-3-5);
+  border: 0; border-bottom: 1px solid var(--ns-border); background: transparent; text-align: left; cursor: pointer; font: inherit; width: 100%;
+  border-left: 2px solid transparent; transition: background 120ms ease, border-color 120ms ease; }
+.ns-cfgrow:last-child { border-bottom: 0; }
+.ns-cfgrow:hover { background: var(--ns-surface); }
+.ns-cfgrow[data-state='selected'] { background: var(--ns-primary-subtle); border-left-color: var(--ns-primary); }
+.ns-cfgrow__key { grid-area: key; display: grid; gap: 1px; min-width: 0; }
+.ns-cfgrow__ns { font-family: var(--ns-font-mono); font-size: 0.56rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ns-muted-fg); }
+.ns-cfgrow__name { font-family: var(--ns-font-mono); font-size: var(--ns-text-2xs); color: var(--ns-fg); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ns-cfgrow__val { grid-area: val; justify-self: end; font-family: var(--ns-font-mono); font-size: var(--ns-text-sm);
+  font-weight: 700; color: var(--ns-fg); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.ns-cfgrow__unit { font-size: var(--ns-text-3xs); color: var(--ns-muted-fg); margin-left: 1px; font-weight: 400; }
+.ns-cfgrow__win { grid-area: win; display: flex; align-items: center; gap: var(--ns-space-1-5); flex-wrap: wrap; }
+.ns-cfgrow__ovr { color: var(--ns-warning); font-size: var(--ns-text-2xs); }
+.ns-cfgrow__shadow { font-family: var(--ns-font-mono); font-size: 0.58rem; color: var(--ns-muted-fg); }
+/* wide table: three explicit columns so KEY | EFFECTIVE | WINNING LAYER line up under the header */
+@media (min-width: 480px) {
+  .ns-cfgrow { grid-template-columns: minmax(0, 1fr) auto minmax(8.5rem, auto); grid-template-areas: 'key val win';
+    gap: var(--ns-space-3); }
+  .ns-cfgrow__win { justify-content: flex-end; }
+  .ns-cfgrow__win { grid-column: auto; justify-content: flex-end; }
+}
+
+/* ---- resolution panel ---- */
+.ns-cfgres { display: grid; gap: var(--ns-space-4); min-width: 0; }
+.ns-cfgres__keyhead { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--ns-space-4); flex-wrap: wrap;
+  padding: var(--ns-space-4); border: 1px solid var(--ns-border); border-radius: var(--ns-radius-xl); background: var(--ns-card); box-shadow: var(--ns-shadow-xs); }
+.ns-cfgres__keyhead-main { display: grid; gap: var(--ns-space-2); min-width: 0; max-width: 46ch; }
+.ns-cfgres__eyebrow { font-family: var(--ns-font-mono); font-size: var(--ns-text-3xs); text-transform: uppercase; letter-spacing: 0.09em; color: var(--ns-muted-fg); }
+.ns-cfgres__key { font-family: var(--ns-font-mono); font-size: var(--ns-text-lg); font-weight: 700; color: var(--ns-fg); word-break: break-word; }
+.ns-cfgres__note { font-size: var(--ns-text-xs); color: var(--ns-muted-fg); line-height: 1.5; }
+.ns-cfgres__keyhead-eff { display: grid; gap: var(--ns-space-2); justify-items: end; text-align: right; }
+.ns-cfgres__eff-label { font-family: var(--ns-font-mono); font-size: var(--ns-text-3xs); text-transform: uppercase; letter-spacing: 0.09em; color: var(--ns-muted-fg); }
+.ns-cfgres__eff-value { font-family: var(--ns-font-mono); font-size: var(--ns-text-3xl); font-weight: 700; line-height: 1; color: var(--ns-fg); font-variant-numeric: tabular-nums; }
+.ns-cfgres__eff-unit { font-size: var(--ns-text-base); color: var(--ns-muted-fg); font-weight: 500; margin-left: 2px; }
+
+/* ---- HERO: precedence waterfall — the value cascading down through layers ---- */
+.ns-cfgwater { position: relative; display: grid; gap: var(--ns-space-3-5); padding: var(--ns-space-4) var(--ns-space-4) var(--ns-space-5);
+  border: 1px solid var(--ns-border); border-radius: var(--ns-radius-xl); background: var(--ns-surface); }
+/* the vertical spine the cascade descends along */
+.ns-cfgwater__spine { position: absolute; left: calc(var(--ns-space-4) + 0.72rem); top: var(--ns-space-5); bottom: var(--ns-space-5);
+  width: 2px; background: repeating-linear-gradient(var(--ns-border-strong) 0 5px, transparent 5px 10px); }
+.ns-cfgwater__layer { position: relative; display: grid; grid-template-columns: 1.6rem minmax(0, 1fr); gap: var(--ns-space-3); align-items: stretch; }
+.ns-cfgwater__rail { position: relative; display: grid; justify-items: center; gap: 3px; z-index: 1; }
+.ns-cfgwater__ord { display: inline-grid; place-items: center; width: 1.5rem; height: 1.5rem; border-radius: var(--ns-radius-full);
+  background: var(--ns-card); border: 1px solid var(--cfg-border); color: var(--cfg-fg); font-family: var(--ns-font-mono); font-size: var(--ns-text-3xs); font-weight: 700; }
+.ns-cfgwater__dot { flex: 1; width: 2px; background: var(--cfg); border-radius: 1px; min-height: 8px; }
+.ns-cfgwater__card { display: grid; gap: var(--ns-space-2); padding: var(--ns-space-3) var(--ns-space-3-5); border-radius: var(--ns-radius-lg);
+  border: 1px solid var(--ns-border); background: var(--ns-card); }
+.ns-cfgwater__card-head { display: flex; align-items: center; gap: var(--ns-space-2); flex-wrap: wrap; }
+.ns-cfgwater__glyph { color: var(--cfg-fg); font-size: var(--ns-text-sm); }
+.ns-cfgwater__layer-name { font-family: var(--ns-font-mono); font-size: var(--ns-text-2xs); font-weight: 600; color: var(--ns-fg); text-transform: uppercase; letter-spacing: 0.04em; }
+.ns-cfgwater__flex { flex: 1; }
+.ns-cfgwater__val { font-family: var(--ns-font-mono); font-size: var(--ns-text-base); font-weight: 700; color: var(--ns-fg); font-variant-numeric: tabular-nums; }
+.ns-cfgwater__val--shadowed { color: var(--ns-muted-fg); text-decoration: line-through; text-decoration-color: var(--ns-destructive); text-decoration-thickness: 1.5px; font-weight: 500; }
+/* .ns-cfgwater__silent retired in Pass V7-fix — silent layers now render as .ns-cfgwater__pip (collapsed) */
+.ns-cfgwater__winpill { padding: 1px var(--ns-space-1-5); border-radius: var(--ns-radius-full); background: var(--ns-warning); color: var(--ns-card);
+  font-family: var(--ns-font-mono); font-size: 0.56rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+.ns-cfgwater__shadowpill { padding: 1px var(--ns-space-1-5); border-radius: var(--ns-radius-full); border: 1px solid var(--ns-destructive-border);
+  background: var(--ns-destructive-subtle); color: var(--ns-destructive); font-family: var(--ns-font-mono); font-size: 0.56rem; font-weight: 600; }
+.ns-cfgwater__prov { display: flex; align-items: center; gap: var(--ns-space-1-5); font-family: var(--ns-font-mono); font-size: var(--ns-text-3xs); color: var(--ns-muted-fg); }
+.ns-cfgwater__prov-label { text-transform: uppercase; letter-spacing: 0.08em; }
+.ns-cfgwater__prov code { color: var(--cfg-fg); }
+/* the connector label floating between two layers (ref 21 branch labels) */
+.ns-cfgwater__edge { position: absolute; left: 1.6rem; bottom: calc(-1 * var(--ns-space-3-5) + 1px); transform: translateY(50%);
+  padding: 0 var(--ns-space-1-5); border-radius: var(--ns-radius-sm); background: var(--ns-surface); border: 1px solid var(--ns-border);
+  font-family: var(--ns-font-mono); font-size: 0.56rem; color: var(--ns-muted-fg); z-index: 2; white-space: nowrap; }
+/* WINNER: elevated card + hard NS press shadow keyed to warning (override tone) */
+.ns-cfgwater__layer[data-state='wins'] .ns-cfgwater__card { border-color: var(--cfg-border); background: var(--cfg-subtle);
+  box-shadow: 3px 3px 0 color-mix(in srgb, var(--cfg) 55%, var(--ns-gray-12)); transform: translateX(-1px); }
+.ns-cfgwater__layer[data-state='wins'] .ns-cfgwater__ord { background: var(--cfg); color: var(--ns-card); border-color: var(--cfg); }
+.ns-cfgwater__layer[data-state='wins'] .ns-cfgwater__val { color: var(--cfg-fg); }
+/* SHADOWED: dim the whole card so the eye skips it */
+.ns-cfgwater__layer[data-state='shadowed'] .ns-cfgwater__card { opacity: 0.72; border-style: dashed; }
+.ns-cfgwater__layer[data-state='silent'] .ns-cfgwater__card { opacity: 0.5; background: var(--ns-surface); border-style: dashed; }
+
+/* ---- override diff (ref 13): base value shadowed vs runtime override, line-numbered red/green ---- */
+.ns-cfgdiff { border: 1px solid var(--ns-border); border-radius: var(--ns-radius-xl); background: var(--ns-card); overflow: hidden; box-shadow: var(--ns-shadow-xs); }
+.ns-cfgdiff__head { display: flex; align-items: center; justify-content: space-between; gap: var(--ns-space-2); padding: var(--ns-space-2-5) var(--ns-space-3-5); border-bottom: 1px solid var(--ns-border); }
+.ns-cfgdiff__title { font-family: var(--ns-font-mono); font-size: var(--ns-text-2xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ns-fg); }
+.ns-cfgdiff__vers { display: inline-flex; align-items: center; gap: var(--ns-space-1-5); }
+.ns-cfgdiff__arrow { color: var(--ns-muted-fg); font-family: var(--ns-font-mono); font-size: var(--ns-text-2xs); }
+.ns-cfgdiff__panes { display: grid; grid-template-columns: 1fr; }
+@media (min-width: 620px) { .ns-cfgdiff__panes { grid-template-columns: 1fr 1fr; } }
+.ns-cfgdiff__pane { display: grid; gap: 0; padding: var(--ns-space-2) 0 var(--ns-space-2-5); border-bottom: 1px solid var(--ns-border); }
+@media (min-width: 620px) { .ns-cfgdiff__pane:first-child { border-bottom: 0; border-right: 1px solid var(--ns-border); } }
+.ns-cfgdiff__pane-src { padding: 0 var(--ns-space-3-5) var(--ns-space-2); font-family: var(--ns-font-mono); font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ns-muted-fg); }
+.ns-cfgdiff__line { display: grid; grid-template-columns: 2rem 1fr; align-items: baseline; padding: 2px var(--ns-space-3-5); font-family: var(--ns-font-mono); font-size: var(--ns-text-2xs); }
+.ns-cfgdiff__n { color: var(--ns-muted-fg); font-size: var(--ns-text-3xs); text-align: right; padding-right: var(--ns-space-2); user-select: none; }
+.ns-cfgdiff__code { color: var(--ns-fg); white-space: pre-wrap; word-break: break-word; }
+.ns-cfgdiff__line[data-op='del'] { background: var(--ns-destructive-subtle); }
+.ns-cfgdiff__line[data-op='del'] .ns-cfgdiff__code { color: var(--ns-destructive); }
+.ns-cfgdiff__line[data-op='del'] .ns-cfgdiff__code::before { content: '− '; color: var(--ns-destructive); }
+.ns-cfgdiff__line[data-op='add'] { background: var(--ns-success-subtle); }
+.ns-cfgdiff__line[data-op='add'] .ns-cfgdiff__code { color: var(--ns-success); }
+.ns-cfgdiff__line[data-op='add'] .ns-cfgdiff__code::before { content: '+ '; color: var(--ns-success); }
+.ns-cfgdiff__line[data-op='ctx'] .ns-cfgdiff__code::before { content: '  '; }
+
+/* ---- resolution trail / provenance strip ---- */
+.ns-cfgtrail { display: grid; gap: 0; border: 1px solid var(--ns-border); border-radius: var(--ns-radius-xl); background: var(--ns-card); overflow: hidden; box-shadow: var(--ns-shadow-xs); }
+.ns-cfgtrail__head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--ns-space-2); padding: var(--ns-space-2-5) var(--ns-space-3-5); border-bottom: 1px solid var(--ns-border); }
+.ns-cfgtrail__title { font-family: var(--ns-font-mono); font-size: var(--ns-text-2xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ns-fg); }
+.ns-cfgtrail__sub { font-family: var(--ns-font-mono); font-size: var(--ns-text-3xs); color: var(--ns-muted-fg); }
+.ns-cfgtrail__row { display: grid; grid-template-columns: 1.2rem minmax(6rem, auto) auto minmax(0, 1fr) auto; gap: var(--ns-space-2); align-items: center;
+  padding: var(--ns-space-2) var(--ns-space-3-5); border-bottom: 1px solid var(--ns-border); }
+.ns-cfgtrail__row:last-child { border-bottom: 0; }
+.ns-cfgtrail__row[data-state='wins'] { background: var(--cfg-subtle); }
+.ns-cfgtrail__glyph { color: var(--cfg-fg); font-size: var(--ns-text-2xs); }
+.ns-cfgtrail__layer { font-family: var(--ns-font-mono); font-size: var(--ns-text-3xs); color: var(--ns-fg); font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
+.ns-cfgtrail__val { font-family: var(--ns-font-mono); font-size: var(--ns-text-2xs); font-weight: 700; color: var(--ns-fg); }
+.ns-cfgtrail__val--shadowed { color: var(--ns-muted-fg); text-decoration: line-through; text-decoration-color: var(--ns-destructive); font-weight: 500; }
+.ns-cfgtrail__src { font-family: var(--ns-font-mono); font-size: var(--ns-text-3xs); color: var(--ns-muted-fg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; justify-self: start; }
+.ns-cfgtrail__win { padding: 1px var(--ns-space-1-5); border-radius: var(--ns-radius-full); background: var(--cfg); color: var(--ns-card); font-family: var(--ns-font-mono); font-size: 0.56rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+.ns-cfgtrail__actions { display: flex; flex-wrap: wrap; gap: var(--ns-space-2); padding: var(--ns-space-3) var(--ns-space-3-5); border-top: 1px solid var(--ns-border); background: var(--ns-surface); }
+
+/* ---- mobile sheet header ---- */
+.ns-cfgsheet-hero { display: flex; align-items: center; flex-wrap: wrap; gap: var(--ns-space-2); }
+.ns-cfgsheet-hero__eff { font-family: var(--ns-font-mono); font-size: var(--ns-text-2xl); font-weight: 700; color: var(--ns-fg); }
+.ns-cfgsheet__note { font-size: var(--ns-text-xs); color: var(--ns-muted-fg); line-height: 1.5; }
+.ns-cfgwater--sheet { padding: var(--ns-space-3); gap: var(--ns-space-3); }
+.ns-cfgwater--sheet .ns-cfgwater__spine { left: calc(var(--ns-space-3) + 0.72rem); }
+
+/* ---- responsive: below the two-col break, trail src truncates + waterfall stays tight ---- */
+@media (max-width: 640px) {
+  .ns-cfgres__keyhead { flex-direction: column; }
+  .ns-cfgres__keyhead-eff { justify-items: start; text-align: left; }
+  .ns-cfgres__eff-value { font-size: var(--ns-text-2xl); }
+  .ns-cfgtrail__row { grid-template-columns: 1.2rem 1fr auto; row-gap: 2px; }
+  .ns-cfgtrail__src { grid-column: 1 / -1; }
+  .ns-cfgtrail__win { grid-column: 3; grid-row: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ns-cfgrow, .ns-cfgnschip { transition: none; }
+}
+
+/* =====================================================================================
+ * Pass V7-fix — Config Resolution density remediation (adversarial vision gate 68→).
+ * Four surgical fixes; the precedence-waterfall metaphor is untouched except for #1.
+ *   1  collapse non-contributing (silent) waterfall layers into slim rail pips
+ *   2  KPI header: tighter cells + a supporting micro-viz per metric
+ *   3  override diff: framed side-by-side hunk with +/- gutter + context lines
+ *   4  effective-config table: tighter rows + DM Mono type-coloured values
+ * ===================================================================================== */
+
+/* ---- shared: value-type colouring (numbers amber · strings/enums teal · booleans copper) ---- */
+.ns-cfgval--num { color: var(--ns-amber-6); }
+.ns-cfgval--str { color: var(--ns-teal-6); }
+.ns-cfgval--bool { color: var(--ns-copper-6); }
+.ns-cfgval--none { color: var(--ns-muted-fg); }
+[data-theme='dark'] .ns-cfgval--num { color: var(--ns-amber-4); }
+[data-theme='dark'] .ns-cfgval--str { color: var(--ns-teal-3); }
+[data-theme='dark'] .ns-cfgval--bool { color: var(--ns-copper-3); }
+/* winner card keeps its own elevated fg — don't let the type colour override the win emphasis */
+.ns-cfgwater__layer[data-state='wins'] .ns-cfgwater__val { color: var(--cfg-fg); }
+
+/* ---- #2 KPI header: denser cells + supporting micro-viz so they aren't bare number boxes ---- */
+.ns-cfghero__cell { padding: var(--ns-space-2-5) var(--ns-space-3-5); gap: 3px; align-content: start; }
+.ns-cfghero__cell-figure { display: flex; align-items: baseline; gap: var(--ns-space-2); flex-wrap: wrap; min-height: 1.1rem; }
+.ns-cfghero__cell-value { font-size: var(--ns-text-xl); }
+/* shadowed/total meter (values shadowed) */
+.ns-cfghero__meter { position: relative; align-self: center; flex: 1 1 3.2rem; min-width: 2.6rem; max-width: 5rem; height: 5px;
+  border-radius: var(--ns-radius-full); background: var(--ns-border); overflow: hidden; }
+.ns-cfghero__meter-fill { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: var(--ns-primary); }
+.ns-cfghero__meter[data-tone='warning'] .ns-cfghero__meter-fill { background: var(--ns-warning); }
+.ns-cfghero__meter[data-tone='success'] .ns-cfghero__meter-fill { background: var(--ns-success); }
+/* override-source pips (overrides active) */
+.ns-cfghero__pips { display: inline-flex; align-items: center; gap: 3px; align-self: center; }
+.ns-cfghero__pip { width: 6px; height: 6px; border-radius: var(--ns-radius-full); background: var(--ns-warning);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--ns-warning), transparent 55%); }
+/* namespace-spread ticks (keys resolved) */
+.ns-cfghero__ticks { display: inline-flex; align-items: flex-end; gap: 2px; align-self: center; height: 0.8rem; }
+.ns-cfghero__tick { width: 3px; height: 0.55rem; border-radius: 1px; background: var(--ns-border-strong); }
+.ns-cfghero__tick:nth-child(3n+1) { height: 0.8rem; }
+.ns-cfghero__tick:nth-child(3n+2) { height: 0.45rem; }
+/* precedence-rank marker (profile) — 4 pips, the active layer filled */
+.ns-cfghero__rank { display: inline-flex; align-items: center; gap: 3px; align-self: center; }
+.ns-cfghero__rank-pip { width: 6px; height: 6px; border-radius: 1.5px; background: var(--ns-border-strong); transform: rotate(45deg); }
+.ns-cfghero__rank-pip[data-active='true'] { background: var(--ns-success); box-shadow: 0 0 0 1px color-mix(in oklab, var(--ns-success), transparent 50%); }
+
+/* ---- #4 effective-config table: tighter rows (values already type-coloured via .ns-cfgval--*) ---- */
+.ns-cfgrow { padding: var(--ns-space-2) var(--ns-space-3-5); }
+.ns-cfgrow__val { font-size: var(--ns-text-2xs); font-weight: 700; }
+/* keep the ellipsised key from crowding the type-coloured value */
+.ns-cfgrow__name { font-size: 0.72rem; }
+
+/* ---- #1 collapse silent waterfall layers into slim rail pips (TOP PRIORITY) ---- */
+/* a non-contributing layer is a single thin line on the rail, not a full padded card */
+.ns-cfgwater { gap: var(--ns-space-3); }
+.ns-cfgwater__layer[data-collapsed='true'] { align-items: center; }
+.ns-cfgwater__pip { grid-column: 2; display: inline-flex; align-items: baseline; gap: var(--ns-space-2); min-width: 0;
+  padding: 3px var(--ns-space-2-5); border-radius: var(--ns-radius-md);
+  border: 1px dashed var(--ns-border); background: color-mix(in oklab, var(--ns-surface), transparent 30%); }
+.ns-cfgwater__pip-name { font-family: var(--ns-font-mono); font-size: var(--ns-text-3xs); font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.04em; color: var(--ns-muted-fg); white-space: nowrap; }
+.ns-cfgwater__pip-note { font-family: var(--ns-font-mono); font-size: var(--ns-text-3xs); color: var(--ns-muted-fg); font-style: italic;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* the collapsed layer's rail marker shrinks to a hollow tick so the eye reads "skipped" */
+.ns-cfgwater__layer[data-collapsed='true'] .ns-cfgwater__ord { width: 1.05rem; height: 1.05rem; font-size: 0.5rem;
+  background: var(--ns-surface); color: var(--ns-muted-fg); border: 1px dashed var(--ns-border-strong); }
+.ns-cfgwater__layer[data-collapsed='true'] .ns-cfgwater__dot { min-height: 4px; opacity: 0.5; }
+/* bridge the spine across collapsed gaps: the gap shrinks, so contributing layers snap together */
+
+/* ---- #3 override diff: framed side-by-side hunk, +/- gutter, context lines ---- */
+.ns-cfgdiff__pane-src { display: flex; align-items: center; gap: var(--ns-space-2); padding-bottom: var(--ns-space-1-5); }
+.ns-cfgdiff__pane-src code { font-family: var(--ns-font-mono); font-size: 0.56rem; color: var(--ns-muted-fg);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ns-cfgdiff__pane-tag { flex: none; padding: 1px var(--ns-space-1-5); border-radius: var(--ns-radius-sm);
+  font-family: var(--ns-font-mono); font-size: 0.56rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+.ns-cfgdiff__pane-tag[data-side='base'] { background: var(--ns-destructive-subtle); color: var(--ns-destructive); }
+.ns-cfgdiff__pane-tag[data-side='over'] { background: var(--ns-success-subtle); color: var(--ns-success); }
+.ns-cfgdiff__hunk { display: block; padding: 2px var(--ns-space-3-5); font-family: var(--ns-font-mono); font-size: 0.6rem;
+  color: var(--ns-primary); background: var(--ns-primary-subtle); border-block: 1px solid var(--ns-border); }
+/* context lines get a faint zebra so the changed line is the one the eye lands on */
+.ns-cfgdiff__line[data-op='ctx'] { color: var(--ns-muted-fg); }
+.ns-cfgdiff__line[data-op='ctx'] .ns-cfgdiff__code { color: var(--ns-muted-fg); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ns-cfgwater__layer { transition: none; }
+}

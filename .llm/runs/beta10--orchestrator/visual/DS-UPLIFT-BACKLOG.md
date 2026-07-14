@@ -495,3 +495,110 @@ component with Sagas (canvas), Workers (registry), or Triggers (`ns-tmetric`/`ns
   perfectly colinear at desktop width).
 - Throughput/heatmap/records are a data-driven snapshot, not wired to the live `tick()` sim yet.
 - Consumers tab left column slightly shorter than the right rail (mild whitespace).
+
+## Pass V7 — Config Resolution
+
+Replaced the S2 topology stackmap (`ns-stackmap` node-canvas + tree-nav — a wiring view, not a config
+view) with a bespoke **layered-precedence resolution** screen centered on a **precedence waterfall**
+metaphor no other screen has. Deliberately distinct from all four capability consoles (no
+`ns-contable` / `ns-sgc` / `ns-tbuild` / `ns-strhero`/`ns-strtopo` reuse).
+
+### New components (all `--ns-*` tokens, `ns-*` classes, hard `3px 3px 0` press shadow, DM Sans/Mono)
+- **`ns-cfghero`** — header composite: title + inline **stat slab** (one pressed slab split into 4
+  divider cells: keys resolved / overrides active / values shadowed / profile) + an ordered
+  **precedence legend** of numbered layer chips (ref 19 stat-bar; ref 13 stat strip).
+- **`ns-cfglayerchip`** (+ `--sm`) — the atomic tone-driven "which layer" token (ordinal badge +
+  glyph + label), reused across header / ledger / diff / trail for consistent layer identity.
+- **`ns-cfgtable` / `ns-cfgrow` / `ns-cfgnschip`** — effective-config **ledger** (ref 11 KV table):
+  key + ns eyebrow · effective value · winning-layer chip · override ◆ · shadow count; namespace
+  filter chips; selected row gets copper left-accent + tint; header cols align at ≥480px, stack
+  below.
+- **`ns-cfgwater`** (+ `--sheet`) — **HERO precedence waterfall**: numbered rail + dashed spine,
+  per-layer card w/ `from source·line` provenance, **winner elevated w/ hard press shadow + "wins"
+  pill**, **shadowed values struck through** (destructive-red) + dimmed card, **silent layers**
+  dashed "— not set", and **connector labels** ("shadowed by"/"inherits"/"passes through") floating
+  between layers (ref 21).
+- **`ns-cfgdiff`** — ref-13 **override diff**: per-side layer chips (`shadowed → override`), per-pane
+  `source·line` label, **line-numbered red/green** (`−`/red base line vs `+`/green effective line);
+  renders **only** when the winner is a runtime override that shadows a base value.
+- **`ns-cfgtrail`** — **resolution trail / provenance**: every contributing layer as
+  `glyph · layer · value · source·line`, shadowed struck, winning row tinted + "winning" pill, footer
+  actions.
+- **Mobile bottom sheet** — tap a key < 1080px opens the shared `#ns-sheet-dialog` (right drawer
+  641–1079, **bottom sheet ≤640**) carrying the compact waterfall + actions.
+
+### Tokens / variants
+- One `[data-tone]` → `--cfg/--cfg-fg/--cfg-subtle/--cfg-border` custom-prop set colours every layer
+  (framework=muted, package=copper/primary, profile=teal/success, override=amber/warning);
+  theme-blind, recolours from one place.
+- Winning-layer highlight uses the canonical NS press shadow keyed to the layer tone:
+  `3px 3px 0 color-mix(in srgb, var(--cfg) 55%, var(--ns-gray-12))`.
+
+### Data model
+- New `s2ConfigDefs()` (9 keys across flags/jobs/tasks/workers/streams/telemetry/triggers/database/
+  sagas) + `s2LayerDefs()` (4 ordered layers). Each key declares its per-layer contribution (or
+  `null` = silent); a `resolve()` helper computes winner + shadow flags — resolution is **computed,
+  not hand-set**, so every edge state (no override, multi-shadow, silent, echo) is truthful.
+- Repurposed `s2Sel` from a node id to a config **key**; `/config/nodes/:nodeId` now deep-links a key.
+  Old `s2NodeDefs`/`s2EdgeDefs`/`scheduleEdgeMeasure` neutralized (edge-measure is now a guarded
+  no-op — no spinning interval, no SVG geometry).
+
+### Mobile optimizations
+- Header stat slab folds 4→1 (<720); ledger row goes 3-col→2-row (<480); resolution key-head stacks
+  (<640); diff panes stack 2→1 (<620); trail src truncates to its own row (<640); waterfall stays
+  single-column. Body never scrolls sideways. **Mobile h-overflow fixed 20px → 0** vs. old stackmap.
+- Verified 0 holes / 0 overflow / 0 non-404 console errors at 1440 + 390, both themes; 16-route
+  regression clean; `ns-cfgwater` confirmed loaded from `ns-ext.css`.
+
+### Known follow-ups
+- Waterfall connector-label logic is heuristic (correct for all 9 seeded keys; worth a truth-table
+  pass if unusual silent/present patterns are added).
+- Override diff is single-line/value-level (right for scalars); nested-object override would want a
+  multi-line diff — deferred until such data exists.
+- Some desktop whitespace below the left ledger when the right stack is taller (key with a diff);
+  a compact "layer coverage" mini-viz could fill it later.
+- Tablet 641–1079 uses the right-drawer sheet, not a 2-col inline; intentional, revisitable.
+
+## Pass V7-fix — Config Resolution
+
+Adversarial vision gate (`_evals/V7-config-adversarial-vision.md`) scored the screen **68/100**:
+metaphor is bespoke, but a few sections carried real dead space / generic chrome. Four surgical
+visual/layout fixes — no route/logic/data/copy-meaning change; the waterfall metaphor, namespace
+filter chips, per-key data adaptation, winning-layer chips, and trail structure are left intact.
+Report: `render/_visual-reports/V7-config-fix.md`. Shots:
+`render/_visual-reports/V7-config-shots/after-config-*`.
+
+### 1 (TOP) Collapse non-contributing waterfall layers
+Silent (`— not set`) layers were full-height padded rows eating ~30% of the waterfall in
+partial-resolution states. `cfgWater` now flags `collapsed`/`pipNote`; silent layers render a slim
+one-line `.ns-cfgwater__pip` with a hollow dashed rail tick, so contributing layers snap together.
+**Measured (package-wins key, desktop 1440):** silent row 47px→24px (−49%), silent dead-space
+94px→48px (−49%), waterfall 320px→268px (−16%). Pip ≈33% of a contributing card. Applied to both
+the desktop panel and the mobile sheet waterfall.
+
+### 2 KPI header micro-viz
+Four bare number boxes → denser cells (padding + value size down) each with a supporting micro-viz:
+namespace-spread ticks (keys resolved), one pip per active override (overrides active),
+shadowed/total meter + "N of M contributions outranked" sub (values shadowed), precedence-position
+diamonds (profile). Legend row unchanged.
+
+### 3 Override diff → framed side-by-side hunk
+`cfgDiff` now emits a `@@ <key> @@` hunk + 3 lines/pane (context / changed / context), contextual
+line numbers, `− SHADOWED`/`+ EFFECTIVE` colored pane tags with source paths. Reuses the existing
+pink/green `del`/`add` gutter. Still gated to override-wins keys only (`cfgHasDiff` unchanged).
+
+### 4 Effective-config table density + type color
+`cfgValType()` classifier drives DM Mono type colors (number→amber, string/enum→teal,
+boolean→copper; dark-mode step-up), reused for waterfall + trail values. Row padding + value size
+trimmed. Filter chips + winning-layer chips untouched.
+
+### Verification
+0 `{{ }}` holes / 0 real console errors / 0 h-overflow across all 8 Config variants + 2 mobile
+sheets; full 16-route regression clean at 1440 + 390. A single pre-existing benign background 404
+is unrelated to this markup (absent on clean load). CSS appended to `ns-ext.css`;
+`.ns-cfgwater__silent` retired.
+
+### Deliberately deferred
+Gate items 5/8 (node-graph rail; inline `<textarea>` quick-override editor + docs accordion) NOT
+done — the brief forbids converting the waterfall to a node-graph, and an editable override would
+change behavior beyond a visual pass.

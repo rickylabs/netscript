@@ -442,57 +442,183 @@
       </sc-if>
 
       <sc-if value="{{ isConfig }}" hint-placeholder-val="{{ false }}">
-        <div class="ns-screen" data-screen-label="S2 Config Resolution">
-          <header class="ns-page-header ns-page-header--console">
-            <div class="ns-toolbar">
-              <div style="display:grid;gap:var(--ns-space-2)">
-                <h1>Config resolution</h1><!-- node detail opens as a right sheet -->
-                <p class="ns-lede">Declared intent vs. running reality — capability wiring only. Aspire owns the resource graph; every node here jumps into it.</p>
+        <div class="ns-screen ns-config" data-screen-label="S2 Config Resolution">
+          <!-- ===== Header composite: title + inline resolution stat bar + precedence legend (ref 19) ===== -->
+          <header class="ns-cfghero">
+            <div class="ns-cfghero__lead">
+              <div class="ns-cfghero__titles">
+                <h1>Config resolution</h1>
+                <p class="ns-lede">How every effective value is resolved through layered sources — framework defaults, package defaults, the env profile, then runtime overrides. Highest precedence wins; the rest are shadowed.</p>
               </div>
-              <label class="ns-choice" style="align-items:center">
-                <span style="position:relative;display:inline-flex"><input type="checkbox" class="ns-switch" checked="{{ s2Coverage }}" onChange="{{ s2ToggleCoverage }}"><span class="ns-switch__track" style="display:inline-flex;align-items:center;width:2.35rem;height:1.3rem;border:1px solid var(--ns-border-strong);border-radius:var(--ns-radius-full);background:var(--ns-surface);padding:2px;transition:background 140ms ease,border-color 140ms ease"><span class="ns-switch__thumb" style="width:0.95rem;height:0.95rem;border-radius:var(--ns-radius-full);background:var(--ns-card);box-shadow:var(--ns-shadow-xs);transition:transform 140ms ease"></span></span></span>
-                <span class="ns-choice__label" style="font-size:var(--ns-text-sm)">Telemetry coverage</span>
-              </label>
+              <div class="ns-cfghero__meta">
+                <span class="ns-cfghero__resolved">resolved {{ clock }} · re-resolves on <code>netscript dev</code> reload</span>
+                <button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ s2OpenAspire }}">netscript.config ↗</button>
+              </div>
             </div>
-          </header>
-          <div class="ns-rail-grid ns-rail-grid--sm">
-            <aside style="min-width:0">
-              <div class="ns-mini-label" style="margin-bottom:var(--ns-space-2)">Declared intent</div>
-              <div class="ns-tree-nav">
-                <sc-for list="{{ s2Tree }}" as="g" hint-placeholder-count="4">
-                  <details class="ns-tree-nav__group" open="{{ true }}">
-                    <summary>{{ g.label }}<span class="ns-tree-nav__count">{{ g.count }}</span></summary>
-                    <div class="ns-tree-nav__items">
-                      <sc-for list="{{ g.items }}" as="i" hint-placeholder-count="3">
-                        <button class="ns-tree-nav__item">{{ i.name }}</button>
-                      </sc-for>
-                    </div>
-                  </details>
+            <div class="ns-cfghero__strip" role="group" aria-label="Resolution summary">
+              <sc-for list="{{ cfgHeadStats }}" as="st" hint-placeholder-count="4">
+                <div class="ns-cfghero__cell" data-viz="{{ st.viz }}">
+                  <span class="ns-cfghero__cell-label">{{ st.label }}</span>
+                  <div class="ns-cfghero__cell-figure">
+                    <span class="ns-cfghero__cell-value" data-tone="{{ st.tone }}">{{ st.value }}</span>
+                    <sc-if value="{{ st.meterPct }}" hint-placeholder-val="{{ false }}">
+                      <span class="ns-cfghero__meter" data-tone="{{ st.tone }}" aria-hidden="true"><span class="ns-cfghero__meter-fill" style="{{ 'width:' + st.meterPct }}"></span></span>
+                    </sc-if>
+                    <sc-if value="{{ st.pips }}" hint-placeholder-val="{{ false }}">
+                      <span class="ns-cfghero__pips" data-tone="{{ st.tone }}" aria-hidden="true"><sc-for list="{{ st.pips }}" as="p" hint-placeholder-count="3"><span class="ns-cfghero__pip"></span></sc-for></span>
+                    </sc-if>
+                    <sc-if value="{{ st.ticks }}" hint-placeholder-val="{{ false }}">
+                      <span class="ns-cfghero__ticks" aria-hidden="true"><sc-for list="{{ st.ticks }}" as="tk" hint-placeholder-count="6"><span class="ns-cfghero__tick"></span></sc-for></span>
+                    </sc-if>
+                    <sc-if value="{{ st.rankPips }}" hint-placeholder-val="{{ false }}">
+                      <span class="ns-cfghero__rank" data-tone="{{ st.tone }}" aria-hidden="true"><sc-for list="{{ st.rankPips }}" as="rp" hint-placeholder-count="4"><span class="ns-cfghero__rank-pip" data-active="{{ rp.active }}"></span></sc-for></span>
+                    </sc-if>
+                  </div>
+                  <span class="ns-cfghero__cell-sub">{{ st.sub }}</span>
+                </div>
+              </sc-for>
+              <div class="ns-cfghero__legend" aria-label="Precedence order, low to high">
+                <span class="ns-cfghero__legend-label">precedence →</span>
+                <sc-for list="{{ cfgLegend }}" as="lg" hint-placeholder-count="4">
+                  <span class="ns-cfglayerchip" data-tone="{{ lg.tone }}"><span class="ns-cfglayerchip__ord">{{ lg.ord }}</span><span class="ns-cfglayerchip__glyph" aria-hidden="true">{{ lg.glyph }}</span>{{ lg.label }}</span>
                 </sc-for>
               </div>
-            </aside>
-            <section style="min-width:0">
-              <div style="display:flex;align-items:baseline;gap:var(--ns-space-3);margin-bottom:var(--ns-space-2);flex-wrap:wrap">
-                <span class="ns-mini-label">Capability wiring — select a node</span>
-                <span style="flex:1"></span>
-                <span style="font-family:var(--ns-font-mono);font-size:var(--ns-text-3xs);color:var(--ns-muted-fg)">resolved {{ clock }} · re-resolves on netscript dev reload</span>
-                <button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ openAspire }}">netscript.config ↗</button>
+            </div>
+          </header>
+
+          <div class="ns-config__body">
+            <!-- ===== LEFT: effective-config ledger table (key → value → winning layer → source) (ref 11) ===== -->
+            <section class="ns-cfgtable" aria-label="Effective configuration">
+              <div class="ns-cfgtable__head">
+                <span class="ns-cfgtable__title">Effective config</span>
+                <span class="ns-cfgtable__count">{{ cfgSelLayerCount }} layers · select a key</span>
               </div>
-              <div class="ns-stackmap">
-                <div class="ns-stackmap__canvas" id="ns-stackmap-canvas">
-                  <svg class="ns-stackmap__edge-layer" id="ns-stackmap-edges" aria-hidden="true"></svg>
-                  <sc-for list="{{ s2Nodes }}" as="n" hint-placeholder-count="9">
-                    <button class="{{ n.nodeClass }}" data-node="{{ n.id }}" data-kind="{{ n.dataKind }}" data-state="{{ n.state }}" aria-pressed="{{ n.pressed }}" onClick="{{ n.select }}">
-                      <span class="ns-stackmap__node-title"><span class="ns-stackmap__node-icon" aria-hidden="true">{{ n.icon }}</span><span>{{ n.name }}</span><span class="ns-stackmap__node-state" aria-hidden="true"></span></span>
-                      <sc-if value="{{ n.epLine }}" hint-placeholder-val="{{ true }}">
-                        <span class="ns-stackmap__node-endpoints">→ {{ n.epLine }}</span>
-                        <span class="ns-stackmap__node-res"><sc-for list="{{ n.resChips }}" as="rc" hint-placeholder-count="1"><span class="ns-chip">{{ rc.label }}</span></sc-for></span>
-                      </sc-if>
-                      <sc-if value="{{ n.isTopic }}" hint-placeholder-val="{{ false }}">
-                        <span class="ns-stackmap__node-meta" style="color:color-mix(in oklab, var(--ns-bg), transparent 30%)"><span>pub/sub topic · {{ n.mode }}</span></span>
-                      </sc-if>
-                    </button>
-                  </sc-for>
+              <div class="ns-cfgtable__filters" role="tablist" aria-label="Namespace filter">
+                <sc-for list="{{ cfgNsChips }}" as="c" hint-placeholder-count="5">
+                  <button class="ns-cfgnschip" data-state="{{ c.state }}" onClick="{{ c.set }}">{{ c.label }}<span class="ns-cfgnschip__count">{{ c.count }}</span></button>
+                </sc-for>
+              </div>
+              <div class="ns-cfgtable__cols">
+                <span class="ns-cfgtable__col ns-cfgtable__col--key">key ▾</span>
+                <span class="ns-cfgtable__col ns-cfgtable__col--val">effective</span>
+                <span class="ns-cfgtable__col ns-cfgtable__col--win">winning layer</span>
+              </div>
+              <div class="ns-cfgtable__rows">
+                <sc-for list="{{ cfgRows }}" as="r" hint-placeholder-count="6">
+                  <button class="ns-cfgrow" data-state="{{ r.rowState }}" aria-pressed="{{ r.selected }}" onClick="{{ r.select }}">
+                    <span class="ns-cfgrow__key">
+                      <span class="ns-cfgrow__ns">{{ r.ns }}</span>
+                      <span class="ns-cfgrow__name">{{ r.key }}</span>
+                    </span>
+                    <span class="{{ r.valClass }}">{{ r.effective }}<span class="ns-cfgrow__unit">{{ r.unit }}</span></span>
+                    <span class="ns-cfgrow__win">
+                      <span class="ns-cfglayerchip ns-cfglayerchip--sm" data-tone="{{ r.winTone }}">{{ r.winLabel }}</span>
+                      <sc-if value="{{ r.hasOverride }}" hint-placeholder-val="{{ true }}"><span class="ns-cfgrow__ovr" title="runtime override active">◆</span></sc-if>
+                      <sc-if value="{{ r.shadowCount }}" hint-placeholder-val="{{ 1 }}"><span class="ns-cfgrow__shadow">{{ r.shadowCount }} shadowed</span></sc-if>
+                    </span>
+                  </button>
+                </sc-for>
+                <sc-if value="{{ cfgHasRows }}" hint-placeholder-val="{{ true }}"></sc-if>
+              </div>
+            </section>
+
+            <!-- ===== RIGHT: resolution panel — key header, HERO waterfall, override diff, provenance trail ===== -->
+            <section class="ns-cfgres" aria-label="Resolution detail">
+              <div class="ns-cfgres__keyhead">
+                <div class="ns-cfgres__keyhead-main">
+                  <span class="ns-cfgres__eyebrow">{{ cfgSelNs }} · {{ cfgSelType }}</span>
+                  <span class="ns-cfgres__key">{{ cfgSelKey }}</span>
+                  <span class="ns-cfgres__note">{{ cfgSelNote }}</span>
+                </div>
+                <div class="ns-cfgres__keyhead-eff">
+                  <span class="ns-cfgres__eff-label">effective</span>
+                  <span class="ns-cfgres__eff-value">{{ cfgSelEffective }}<span class="ns-cfgres__eff-unit">{{ cfgSelEffUnit }}</span></span>
+                  <span class="ns-cfglayerchip" data-tone="{{ cfgSelWinTone }}">wins · {{ cfgSelWinLabel }}</span>
+                </div>
+              </div>
+
+              <!-- HERO: layer-precedence waterfall — value cascades down; winner elevated, shadowed struck -->
+              <div class="ns-cfgwater" aria-label="Precedence waterfall">
+                <div class="ns-cfgwater__spine" aria-hidden="true"></div>
+                <sc-for list="{{ cfgWater }}" as="w" hint-placeholder-count="4">
+                  <div class="ns-cfgwater__layer" data-state="{{ w.state }}" data-tone="{{ w.tone }}" data-collapsed="{{ w.collapsed }}">
+                    <span class="ns-cfgwater__rail" aria-hidden="true">
+                      <span class="ns-cfgwater__ord">{{ w.ord }}</span>
+                      <span class="ns-cfgwater__dot"></span>
+                    </span>
+                    <sc-if value="{{ w.present }}" hint-placeholder-val="{{ true }}">
+                      <div class="ns-cfgwater__card">
+                        <div class="ns-cfgwater__card-head">
+                          <span class="ns-cfgwater__glyph" aria-hidden="true">{{ w.glyph }}</span>
+                          <span class="ns-cfgwater__layer-name">{{ w.label }}</span>
+                          <sc-if value="{{ w.isWinner }}" hint-placeholder-val="{{ true }}"><span class="ns-cfgwater__winpill">wins</span></sc-if>
+                          <sc-if value="{{ w.isShadowed }}" hint-placeholder-val="{{ false }}"><span class="ns-cfgwater__shadowpill">shadowed</span></sc-if>
+                          <span class="ns-cfgwater__flex"></span>
+                          <span class="{{ w.valClass }}">{{ w.value }}</span>
+                        </div>
+                        <sc-if value="{{ w.hasProv }}" hint-placeholder-val="{{ true }}">
+                          <span class="ns-cfgwater__prov"><span class="ns-cfgwater__prov-label">from</span><code>{{ w.provenance }}</code></span>
+                        </sc-if>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ w.silent }}" hint-placeholder-val="{{ false }}">
+                      <span class="ns-cfgwater__pip">
+                        <span class="ns-cfgwater__pip-name">{{ w.label }}</span>
+                        <span class="ns-cfgwater__pip-note">— {{ w.pipNote }}</span>
+                      </span>
+                    </sc-if>
+                    <sc-if value="{{ w.hasEdge }}" hint-placeholder-val="{{ true }}">
+                      <span class="ns-cfgwater__edge" aria-hidden="true">{{ w.edge }}</span>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+
+              <!-- Override diff (ref 13): base value the override shadows vs the runtime override -->
+              <sc-if value="{{ cfgHasDiff }}" hint-placeholder-val="{{ true }}">
+                <div class="ns-cfgdiff" aria-label="Override diff">
+                  <div class="ns-cfgdiff__head">
+                    <span class="ns-cfgdiff__title">override diff</span>
+                    <span class="ns-cfgdiff__vers">
+                      <span class="ns-cfglayerchip ns-cfglayerchip--sm" data-tone="{{ cfgDiff.baseTone }}">{{ cfgDiff.baseLabel }}</span>
+                      <span class="ns-cfgdiff__arrow" aria-hidden="true">→</span>
+                      <span class="ns-cfglayerchip ns-cfglayerchip--sm" data-tone="{{ cfgDiff.overTone }}">{{ cfgDiff.overLabel }}</span>
+                    </span>
+                  </div>
+                  <div class="ns-cfgdiff__panes">
+                    <div class="ns-cfgdiff__pane">
+                      <span class="ns-cfgdiff__pane-src"><span class="ns-cfgdiff__pane-tag" data-side="base">− shadowed</span><code>{{ cfgDiff.baseSrc }}</code></span>
+                      <span class="ns-cfgdiff__hunk">{{ cfgDiff.hunk }}</span>
+                      <sc-for list="{{ cfgDiff.baseLines }}" as="ln" hint-placeholder-count="3">
+                        <span class="ns-cfgdiff__line" data-op="{{ ln.op }}"><span class="ns-cfgdiff__n">{{ ln.n }}</span><span class="ns-cfgdiff__code">{{ ln.text }}</span></span>
+                      </sc-for>
+                    </div>
+                    <div class="ns-cfgdiff__pane">
+                      <span class="ns-cfgdiff__pane-src"><span class="ns-cfgdiff__pane-tag" data-side="over">+ effective</span><code>{{ cfgDiff.overSrc }}</code></span>
+                      <span class="ns-cfgdiff__hunk">{{ cfgDiff.hunk }}</span>
+                      <sc-for list="{{ cfgDiff.overLines }}" as="ln" hint-placeholder-count="3">
+                        <span class="ns-cfgdiff__line" data-op="{{ ln.op }}"><span class="ns-cfgdiff__n">{{ ln.n }}</span><span class="ns-cfgdiff__code">{{ ln.text }}</span></span>
+                      </sc-for>
+                    </div>
+                  </div>
+                </div>
+              </sc-if>
+
+              <!-- Resolution trail / provenance — every contributing layer, shadowed struck through -->
+              <div class="ns-cfgtrail" aria-label="Resolution trail">
+                <div class="ns-cfgtrail__head"><span class="ns-cfgtrail__title">resolution trail</span><span class="ns-cfgtrail__sub">{{ cfgSelShadowCount }} shadowed · {{ cfgSelLayerCount }} contributing</span></div>
+                <sc-for list="{{ cfgTrail }}" as="t" hint-placeholder-count="3">
+                  <div class="ns-cfgtrail__row" data-state="{{ t.state }}" data-tone="{{ t.tone }}">
+                    <span class="ns-cfgtrail__glyph" aria-hidden="true">{{ t.glyph }}</span>
+                    <span class="ns-cfgtrail__layer">{{ t.label }}</span>
+                    <span class="{{ t.valClass }}">{{ t.value }}</span>
+                    <code class="ns-cfgtrail__src">{{ t.src }}</code>
+                    <sc-if value="{{ t.isWin }}" hint-placeholder-val="{{ true }}"><span class="ns-cfgtrail__win">winning</span></sc-if>
+                  </div>
+                </sc-for>
+                <div class="ns-cfgtrail__actions">
+                  <button class="ns-btn ns-btn--secondary ns-btn--sm" onClick="{{ s2GoRuntime }}">Open override store →</button>
+                  <button class="ns-btn ns-btn--ghost ns-btn--sm" onClick="{{ s2ViewPlugin }}">View plugin</button>
                 </div>
               </div>
             </section>
@@ -2932,15 +3058,39 @@
   </div>
   <sc-if value="{{ sheetIsS2 }}" hint-placeholder-val="{{ false }}">
     <div class="ns-sheet-body">
-      <span class="{{ s2Sel.covBadge }}">{{ s2Sel.covLabel }}</span>
-      <div class="ns-kv">
-        <div class="ns-kv__row"><span class="ns-kv__key">backend</span><span class="ns-kv__val">{{ s2Sel.backend }}</span></div>
-        <div class="ns-kv__row"><span class="ns-kv__key">mode</span><span class="ns-kv__val">{{ s2Sel.mode }}</span></div>
-        <div class="ns-kv__row"><span class="ns-kv__key">contributed by</span><span class="ns-kv__val">{{ s2Sel.plugin }}</span></div>
-        <div class="ns-kv__row"><span class="ns-kv__key">coverage</span><span class="ns-kv__val">{{ s2Sel.covNote }}</span></div>
+      <div class="ns-cfgsheet-hero">
+        <span class="ns-cfgres__eyebrow">{{ cfgSelNs }} · {{ cfgSelType }}</span>
+        <span class="ns-cfgsheet-hero__eff">{{ cfgSelEffective }}<span class="ns-cfgres__eff-unit">{{ cfgSelEffUnit }}</span></span>
+        <span class="ns-cfglayerchip" data-tone="{{ cfgSelWinTone }}">wins · {{ cfgSelWinLabel }}</span>
+      </div>
+      <p class="ns-cfgsheet__note">{{ cfgSelNote }}</p>
+      <!-- compact waterfall in the sheet -->
+      <div class="ns-cfgwater ns-cfgwater--sheet" aria-label="Precedence waterfall">
+        <div class="ns-cfgwater__spine" aria-hidden="true"></div>
+        <sc-for list="{{ cfgWater }}" as="w" hint-placeholder-count="4">
+          <div class="ns-cfgwater__layer" data-state="{{ w.state }}" data-tone="{{ w.tone }}" data-collapsed="{{ w.collapsed }}">
+            <span class="ns-cfgwater__rail" aria-hidden="true"><span class="ns-cfgwater__ord">{{ w.ord }}</span><span class="ns-cfgwater__dot"></span></span>
+            <sc-if value="{{ w.present }}" hint-placeholder-val="{{ true }}">
+              <div class="ns-cfgwater__card">
+                <div class="ns-cfgwater__card-head">
+                  <span class="ns-cfgwater__glyph" aria-hidden="true">{{ w.glyph }}</span>
+                  <span class="ns-cfgwater__layer-name">{{ w.label }}</span>
+                  <sc-if value="{{ w.isWinner }}" hint-placeholder-val="{{ true }}"><span class="ns-cfgwater__winpill">wins</span></sc-if>
+                  <sc-if value="{{ w.isShadowed }}" hint-placeholder-val="{{ false }}"><span class="ns-cfgwater__shadowpill">shadowed</span></sc-if>
+                  <span class="ns-cfgwater__flex"></span>
+                  <span class="{{ w.valClass }}">{{ w.value }}</span>
+                </div>
+                <sc-if value="{{ w.hasProv }}" hint-placeholder-val="{{ true }}"><span class="ns-cfgwater__prov"><span class="ns-cfgwater__prov-label">from</span><code>{{ w.provenance }}</code></span></sc-if>
+              </div>
+            </sc-if>
+            <sc-if value="{{ w.silent }}" hint-placeholder-val="{{ false }}">
+              <span class="ns-cfgwater__pip"><span class="ns-cfgwater__pip-name">{{ w.label }}</span><span class="ns-cfgwater__pip-note">— {{ w.pipNote }}</span></span>
+            </sc-if>
+          </div>
+        </sc-for>
       </div>
       <div style="display:grid;gap:var(--ns-space-2)">
-        <button class="ns-btn ns-btn--secondary" onClick="{{ s2OpenAspire }}">Open in Aspire ↗</button>
+        <button class="ns-btn ns-btn--secondary" onClick="{{ s2GoRuntime }}">Open override store →</button>
         <button class="ns-btn ns-btn--ghost" onClick="{{ s2ViewPlugin }}">View plugin</button>
         <button class="ns-btn ns-btn--ghost" onClick="{{ s2ViewContracts }}">View contracts</button>
       </div>
@@ -3196,8 +3346,8 @@ class Component extends DCLogic {
       cmdkOpen: false, cmdkQ: '', cmdkIdx: 0,
       confirm: null, toast: null, sheet: null, detailSheet: null,
       clockS: 50531, // 14:02:11
-      // S2
-      s2Sel: 'saga-order', s2Coverage: false, s2Edges: [],
+      // S2 — Config Resolution: selected effective-config key (layered-precedence resolution)
+      s2Sel: 'flags.checkout-v2', s2Coverage: false, s2Edges: [], s2NsFilter: 'all',
       // S3 runtime config
       s3Follow: true, s3Pending: [],
       s3Feed: [
@@ -4262,20 +4412,58 @@ class Component extends DCLogic {
     ];
   }
 
+  // The four precedence layers, lowest → highest. Ordinal drives the waterfall order.
+  s2LayerDefs() {
+    return [
+      { id: 'framework', ord: 0, label: 'framework default', glyph: '◇', src: '@netscript/core', tone: 'muted' },
+      { id: 'package', ord: 1, label: 'package default', glyph: '◈', src: 'plugin manifest', tone: 'primary' },
+      { id: 'profile', ord: 2, label: 'env · profile', glyph: '⬖', src: 'netscript.config.ts', tone: 'success' },
+      { id: 'override', ord: 3, label: 'runtime override', glyph: '◆', src: 'override store', tone: 'warning' },
+    ];
+  }
+
+  // Effective config keys. Each carries the value CONTRIBUTED at each layer (or null if the
+  // layer is silent). The effective value = the highest-precedence non-null contribution; every
+  // lower non-null contribution is SHADOWED. Fully data-driven — resolution is computed, not hand-set.
+  s2ConfigDefs() {
+    // c(framework, package, profile, override) — null means the layer does not set the key.
+    const L = (framework, pkg, profile, override, src) => ({ framework, package: pkg, profile, override, src });
+    return [
+      { key: 'flags.checkout-v2', ns: 'flags', type: 'rollout', unit: '%',
+        c: L(null, '0', '10', '30', { package: 'sagas/manifest.ts:44', profile: 'netscript.config.ts:71', override: 'override/current:v43' }),
+        note: 'canary flag — override bumped it from the profiled 10% to 30% for the checkout revamp.' },
+      { key: 'jobs.nightly-reconcile.enabled', ns: 'jobs', type: 'boolean',
+        c: L('true', 'true', 'true', 'false', { framework: 'core/defaults.ts:12', package: 'workers/manifest.ts:20', profile: 'netscript.config.ts:88', override: 'override/current:v43' }),
+        note: 'disabled at runtime while the reconcile query is being tuned — reverts on override clear.' },
+      { key: 'tasks.send-receipt.timeoutMs', ns: 'tasks', type: 'duration', unit: 'ms',
+        c: L('30000', '45000', null, '90000', { framework: 'core/defaults.ts:31', package: 'streams/manifest.ts:58', override: 'override/current:v42' }),
+        note: 'receipt delivery is slow against the sandbox gateway; override tripled the package timeout.' },
+      { key: 'workers.reserve-inventory.retries', ns: 'workers', type: 'int',
+        c: L('1', '3', null, null, { framework: 'core/defaults.ts:9', package: 'workers/manifest.ts:16' }),
+        note: 'package default wins — no env or runtime override in play.' },
+      { key: 'streams.payment-events.delivery', ns: 'streams', type: 'enum',
+        c: L('best-effort', 'at-least-once', 'at-least-once', null, { framework: 'core/defaults.ts:40', package: 'streams/manifest.ts:33', profile: 'netscript.config.ts:52' }),
+        note: 'profile re-affirms the package default; no shadow drama, but provenance still lands on the profile.' },
+      { key: 'telemetry.sampleRatio', ns: 'telemetry', type: 'ratio',
+        c: L('0.1', null, '1.0', null, { framework: 'core/defaults.ts:61', profile: 'netscript.config.ts:14' }),
+        note: 'local profile samples everything; framework default of 0.1 is shadowed.' },
+      { key: 'triggers.webhook-payment.auth', ns: 'triggers', type: 'enum',
+        c: L('signature', 'signature', null, null, { framework: 'core/defaults.ts:52', package: 'triggers/manifest.ts:27' }),
+        note: 'framework and package agree — resolves to the framework default with a package echo.' },
+      { key: 'db.pool.max', ns: 'database', type: 'int',
+        c: L('10', null, '20', null, { framework: 'core/defaults.ts:18', profile: 'netscript.config.ts:29' }),
+        note: 'profile widens the pool for the dev Postgres container.' },
+      { key: 'sagas.order.compensation', ns: 'sagas', type: 'enum',
+        c: L('reverse', 'reverse', null, null, { framework: 'core/defaults.ts:47', package: 'sagas/manifest.ts:61' }),
+        note: 'compensation strategy — no override, package echoes the framework default.' },
+    ];
+  }
+
   scheduleEdgeMeasure() {
-    let tries = 0;
+    // Config Resolution no longer renders the stackmap canvas — precedence resolution is
+    // pure CSS/div geometry, so there are no measured SVG edges to draw here. Kept as a
+    // guarded no-op so route wiring that calls it stays inert instead of spinning an interval.
     clearInterval(this._edgeT);
-    this._edgeT = setInterval(() => {
-      tries++;
-      const canvas = document.getElementById('ns-stackmap-canvas');
-      const svg = document.getElementById('ns-stackmap-edges');
-      const nodesReady = canvas && canvas.querySelectorAll('[data-node]').length >= 9;
-      if (nodesReady) this.measureEdges();
-      const drawn = svg && svg.childElementCount > 0;
-      if ((nodesReady && drawn) || tries > 20 || this.state.route !== 'config') {
-        clearInterval(this._edgeT);
-      }
-    }, 80);
   }
 
   measureEdges() {
@@ -4443,28 +4631,153 @@ class Component extends DCLogic {
       { id: 'analytics-plus', title: 'analytics-plus', publisher: 'community', desc: 'Delivery-analytics panels. Built for contract v1 — the host is at v2.', quarantine: true, act: () => this.askConfirm({ title: 'Update analytics-plus to contract v2', desc: 'Re-pins the extension to the current contract version and lifts the quarantine hold.', from: 'contract v1 · held', to: 'contract v2 · active', cli: 'netscript plugin update analytics-plus --contract v2', action: 'Update', apply: () => this.setState(st => ({ extInstalled: [...new Set([...st.extInstalled, 'analytics-plus'])] })), toast: 'analytics-plus updated — quarantine lifted', resultPath: '/extensions/analytics-plus' }), actLabel: 'Update & lift hold', actClass: 'ns-btn ns-btn--secondary ns-btn--sm' },
     ];
 
-    // ----- S2 -----
-    const nodes = this.s2NodeDefs();
-    const selNode = nodes.find(n => n.id === s.s2Sel) || nodes[2];
-    const s2Nodes = nodes.map(n => ({
-      ...n,
-      pressed: n.id === s.s2Sel ? 'true' : 'false',
-      state: s.s2Coverage && n.coverage === 'unwired' ? 'degraded' : null,
-      covBadge: n.coverage === 'ok' ? 'ns-badge ns-badge--success' : 'ns-badge ns-badge--warning',
-      dataKind: n.kind === 'subscriber' ? 'container' : null,
-      isTopic: n.kind === 'topic',
-      nodeClass: n.kind === 'topic' ? 'ns-stackmap__node ns-stackmap__node--topic' : 'ns-stackmap__node',
-      epLine: n.ep ? String(n.ep.pub) + ' public · ' + n.ep.auth + ' auth · ' + n.ep.priv + ' private' : null,
-      resChips: (n.res || []).map(x => ({ label: x })),
-      select: () => { this.nav('/config/nodes/' + encodeURIComponent(n.id)); this.setState({ sheet: 's2' }); this.scheduleEdgeMeasure(); },
+    // ----- S2 : Config Resolution (layered-precedence) -----
+    const cfgLayers = this.s2LayerDefs();                 // low → high precedence
+    const cfgDefs = this.s2ConfigDefs();
+    const layerTone = { framework: 'muted', package: 'primary', profile: 'success', override: 'warning' };
+    const layerShort = { framework: 'framework', package: 'package', profile: 'profile', override: 'override' };
+    // value-type inference → drives the DM Mono type colouring so the grid reads as config, not a table.
+    // number/duration/ratio → amber · boolean → copper · string/enum → teal.
+    const cfgValType = (raw) => {
+      if (raw === null || raw === undefined || raw === '—') return 'none';
+      const v = String(raw).trim();
+      if (v === 'true' || v === 'false') return 'bool';
+      if (/^-?\d+(\.\d+)?$/.test(v)) return 'num';
+      return 'str';
+    };
+    // resolve(): compute winning layer + shadow flags for one key definition.
+    const resolve = (def) => {
+      const chain = cfgLayers.map(L => {
+        const v = def.c[L.id];
+        return { ...L, value: v, present: v !== null && v !== undefined,
+          src: (def.c.src && def.c.src[L.id]) || null };
+      });
+      const present = chain.filter(l => l.present);
+      const winner = present.length ? present[present.length - 1] : null;   // highest precedence present
+      const shadowed = present.filter(l => winner && l.ord < winner.ord);
+      // the value the winner directly shadows (next present layer below it) — drives the diff
+      const shadowedBelow = shadowed.length ? shadowed[shadowed.length - 1] : null;
+      return { chain, present, winner, shadowed, shadowedBelow };
+    };
+    const nsFilter = s.s2NsFilter || 'all';
+    // effective-config table rows
+    const cfgRows = cfgDefs.map(def => {
+      const r = resolve(def);
+      const w = r.winner;
+      return { key: def.key, ns: def.ns, type: def.type, unit: def.unit || '',
+        effective: w ? w.value : '—', winLayer: w ? w.id : 'framework',
+        valClass: 'ns-cfgrow__val ns-cfgval--' + cfgValType(w ? w.value : '—'),
+        winLabel: w ? layerShort[w.id] : '—', winTone: w ? layerTone[w.id] : 'muted',
+        source: w && w.src ? w.src : (w ? w.src : '—'),
+        shadowCount: r.shadowed.length,
+        hasOverride: def.c.override !== null && def.c.override !== undefined,
+        selected: def.key === s.s2Sel ? 'true' : 'false',
+        rowState: def.key === s.s2Sel ? 'selected' : null,
+        select: () => {
+          this.nav('/config/nodes/' + encodeURIComponent(def.key));
+          const mob = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(max-width: 1079px)').matches;
+          if (mob) this.setState({ sheet: 's2' });
+        },
+        selectSheet: () => { this.nav('/config/nodes/' + encodeURIComponent(def.key)); this.setState({ sheet: 's2' }); },
+      };
+    }).filter(r => nsFilter === 'all' || r.ns === nsFilter);
+    // namespace filter chips
+    const cfgNsList = ['all', ...Array.from(new Set(cfgDefs.map(d => d.ns)))];
+    const cfgNsChips = cfgNsList.map(ns => ({
+      ns, label: ns === 'all' ? 'all keys' : ns,
+      count: ns === 'all' ? String(cfgDefs.length) : String(cfgDefs.filter(d => d.ns === ns).length),
+      state: (s.s2NsFilter || 'all') === ns ? 'active' : null,
+      set: () => this.setState({ s2NsFilter: ns }),
     }));
-    const s2Edges = s.s2Edges.map(e => ({ d: e.d, label: e.label, flavor: e.flavor, lx: e.lx, ly: e.ly, state: (e.a === s.s2Sel || e.b === s.s2Sel) ? 'active' : null }));
-    const s2Tree = [
-      { label: 'Services', count: '3', items: ['web', 'api', 'eis-chat'] },
-      { label: 'Apps', count: '1', items: ['my-app'] },
-      { label: 'Databases', count: '2', items: ['postgres', 'redis'] },
-      { label: 'Plugins', count: '4', items: ['workers', 'sagas', 'triggers', 'streams'] },
-    ].map(g => ({ ...g, items: g.items.map(x => ({ name: x })) }));
+    // selected key resolution (hero waterfall)
+    const selDef = cfgDefs.find(d => d.key === s.s2Sel) || cfgDefs[0];
+    const selRes = resolve(selDef);
+    const selWinner = selRes.winner;
+    const cfgWater = selRes.chain.map((l, i) => {
+      const isWinner = selWinner && l.id === selWinner.id;
+      const isShadowed = l.present && selWinner && l.ord < selWinner.ord;
+      // connector label from this layer up to the next
+      const next = selRes.chain[i + 1];
+      let edge = null;
+      if (next) {
+        if (isWinner) edge = null;                                  // winner is top-most contributor visually
+        else if (l.present && next.present && next.ord > l.ord && selWinner && next.ord <= selWinner.ord) edge = 'shadowed by';
+        else if (l.present && !isShadowed && !isWinner) edge = 'inherits';
+        else edge = l.present ? 'shadowed by' : 'passes through';
+      }
+      // Non-contributing layers (silent — the value is not set at this layer) collapse to a slim
+      // one-line pip so the waterfall's vertical space is spent on the layers that actually resolve.
+      const collapsed = !l.present;
+      const state = isWinner ? 'wins' : (isShadowed ? 'shadowed' : (l.present ? 'contributes' : 'silent'));
+      return {
+        id: l.id, ord: String(l.ord + 1), label: l.label, glyph: l.glyph, src: l.src,
+        tone: layerTone[l.id],
+        value: l.present ? l.value : null, present: l.present,
+        provenance: l.src, hasProv: !!l.src && !collapsed,
+        state, collapsed: collapsed ? 'true' : 'false',
+        // pip text: what a non-contributing layer says on its single line
+        pipNote: (l.id === 'override' ? 'passes through' : (l.id === 'profile' ? 'passes through' : 'not set')),
+        isWinner, isShadowed, silent: !l.present,
+        edge, hasEdge: !!edge && !collapsed,
+        valClass: isShadowed
+          ? 'ns-cfgwater__val ns-cfgwater__val--shadowed'
+          : 'ns-cfgwater__val ns-cfgval--' + cfgValType(l.value),
+      };
+    });
+    // header composite stats
+    const cfgResolvedCount = cfgDefs.length;
+    const cfgOverrideCount = cfgDefs.filter(d => d.c.override !== null && d.c.override !== undefined).length;
+    const cfgShadowTotal = cfgDefs.reduce((n, d) => n + resolve(d).shadowed.length, 0);
+    // supporting micro-viz per KPI so they aren't four bare single-number boxes:
+    //  · keys resolved  → tiny per-namespace tick row (how the keys spread across namespaces)
+    //  · overrides active → one pip per active override (source dots)
+    //  · values shadowed  → shadowed / total-contributions meter
+    //  · profile          → precedence-position marker (which layer the active profile sits at)
+    const cfgTotalContribs = cfgDefs.reduce((n, d) => n + resolve(d).present.length, 0);
+    const cfgNsCount = new Set(cfgDefs.map(d => d.ns)).size;
+    const cfgHeadStats = [
+      { label: 'keys resolved', value: String(cfgResolvedCount), tone: null, sub: cfgNsCount + ' namespaces · my-app',
+        viz: 'ticks', ticks: Array.from({ length: Math.min(cfgNsCount, 8) }, (_, i) => ({ i })) },
+      { label: 'overrides active', value: String(cfgOverrideCount), tone: 'warning', sub: 'runtime override store',
+        viz: 'pips', pips: Array.from({ length: cfgOverrideCount }, (_, i) => ({ i })) },
+      { label: 'values shadowed', value: String(cfgShadowTotal), tone: 'primary', sub: cfgShadowTotal + ' of ' + cfgTotalContribs + ' contributions outranked',
+        viz: 'meter', meterPct: cfgTotalContribs ? Math.round(100 * cfgShadowTotal / cfgTotalContribs) + '%' : '0%' },
+      { label: 'profile', value: 'local', tone: 'success', sub: 'env · netscript dev',
+        viz: 'rank', rankPips: [{ id: 'framework' }, { id: 'package' }, { id: 'profile' }, { id: 'override' }].map(p => ({ active: p.id === 'profile' ? 'true' : 'false' })) },
+    ];
+    // precedence legend (ordered)
+    const cfgLegend = cfgLayers.map(l => ({ id: l.id, label: l.label, glyph: l.glyph, tone: layerTone[l.id], ord: String(l.ord + 1) }));
+    // override diff (ref 13) — only when the winner is a runtime override that shadows a value
+    const selHasDiff = !!(selWinner && selWinner.id === 'override' && selRes.shadowedBelow);
+    const diffBaseL = selRes.shadowedBelow;
+    // framed diff hunk: a couple of context lines (the enclosing namespace + neighbour keys) around
+    // the single changed line, so it reads as a real side-by-side diff viewer rather than one delta.
+    const diffNs = selDef.ns;
+    const diffQuote = (raw) => cfgValType(raw) === 'str' ? "'" + raw + "'" : String(raw);
+    const diffKeyLeaf = selDef.key.split('.').slice(1).join('.') || selDef.key;
+    const cfgDiff = selHasDiff ? {
+      hunk: '@@ ' + selDef.key + ' @@',
+      baseLabel: diffBaseL ? layerShort[diffBaseL.id] : '', baseSrc: diffBaseL ? diffBaseL.src : '',
+      baseTone: diffBaseL ? layerTone[diffBaseL.id] : 'muted',
+      overLabel: 'override', overSrc: selWinner.src, overTone: 'warning',
+      baseLines: [
+        { n: '14', text: diffNs + ': {', op: 'ctx' },
+        { n: '15', text: '  ' + diffKeyLeaf + ': ' + diffQuote(diffBaseL.value) + (selDef.unit ? '  // ' + selDef.unit : ''), op: 'del' },
+        { n: '16', text: '}', op: 'ctx' },
+      ],
+      overLines: [
+        { n: '14', text: diffNs + ': {', op: 'ctx' },
+        { n: '15', text: '  ' + diffKeyLeaf + ': ' + diffQuote(selWinner.value) + (selDef.unit ? '  // ' + selDef.unit : ''), op: 'add' },
+        { n: '16', text: '}', op: 'ctx' },
+      ],
+    } : null;
+    // resolution trail (provenance) — contributing layers, shadowed struck
+    const cfgTrail = selRes.chain.filter(l => l.present).map(l => ({
+      label: l.label, tone: layerTone[l.id], glyph: l.glyph, value: l.value, src: l.src || '—',
+      state: (selWinner && l.id === selWinner.id) ? 'wins' : 'shadowed',
+      isWin: !!(selWinner && l.id === selWinner.id),
+      valClass: (selWinner && l.ord < selWinner.ord) ? 'ns-cfgtrail__val ns-cfgtrail__val--shadowed' : 'ns-cfgtrail__val ns-cfgval--' + cfgValType(l.value),
+    }));
 
     // ----- S3 -----
     const s3Stats = [
@@ -5974,7 +6287,7 @@ class Component extends DCLogic {
       closeDetailSheet: () => this.setState({ detailSheet: null }),
       // sheet
       sheetIsS2: s.sheet === 's2', sheetIsS13: s.sheet === 's13', sheetIsS7: s.sheet === 's7', sheetIsS8: s.sheet === 's8', sheetIsS9: s.sheet === 's9',
-      sheetTitle: s.sheet === 's2' ? selNode.name : s.sheet === 's7' ? s7Detail.name : s.sheet === 's8' ? (s8SelNode ? s8SelNode.name : s8.saga) : s.sheet === 's9' ? s9Detail.id : (selNode13 ? selNode13.name : ''),
+      sheetTitle: s.sheet === 's2' ? selDef.key : s.sheet === 's7' ? s7Detail.name : s.sheet === 's8' ? (s8SelNode ? s8SelNode.name : s8.saga) : s.sheet === 's9' ? s9Detail.id : (selNode13 ? selNode13.name : ''),
       closeSheet: () => this.setState({ sheet: null }),
       // S1
       s1Stats, s1CmdGroups, s1Contribs, s1Teaser, s1Kpis, s1Hero, s1Ai,
@@ -6000,16 +6313,22 @@ class Component extends DCLogic {
       aiOpenGenAI: () => this.showToast('Would open Aspire GenAI telemetry view ↗', 'info'),
       aiOpenRun: () => this.nav('/workers/jobs/reserve-inventory/executions/job_4183'),
       aiOpenSaga: () => this.nav('/sagas/PaymentWebhookSaga/ch_3QK9dR2eZ'),
-      // S2
-      s2Nodes, s2Edges, s2Tree, s2Coverage: s.s2Coverage,
-      s2ToggleCoverage: () => { this.setState(st => ({ s2Coverage: !st.s2Coverage })); this.scheduleEdgeMeasure(); },
-      s2Sel: { name: selNode.name, backend: selNode.backend, mode: selNode.mode, plugin: selNode.plugin,
-        covBadge: selNode.coverage === 'ok' ? 'ns-badge ns-badge--success' : 'ns-badge ns-badge--warning',
-        covLabel: selNode.coverage === 'ok' ? 'telemetry wired' : 'unwired',
-        covNote: selNode.coverage === 'ok' ? 'instrumentation registered and exporting' : 'instrumentation registered — telemetry not yet wired on this node' },
-      s2OpenAspire: () => this.showToast('Would open Aspire resource ' + selNode.plugin + ' ↗', 'info'),
-      s2ViewPlugin: () => { this.setState({ s5Sel: selNode.plugin === 'subscriber' ? 'streams' : selNode.plugin }); this.nav('plugins'); },
+      // S2 — Config Resolution (layered precedence)
+      cfgRows, cfgNsChips, cfgWater, cfgHeadStats, cfgLegend, cfgTrail,
+      cfgHasRows: cfgRows.length > 0,
+      cfgDiff, cfgHasDiff: selHasDiff,
+      cfgSelKey: selDef.key, cfgSelNs: selDef.ns, cfgSelType: selDef.type,
+      cfgSelEffective: selWinner ? selWinner.value : '—',
+      cfgSelEffUnit: selDef.unit || '',
+      cfgSelWinLabel: selWinner ? layerShort[selWinner.id] : '—',
+      cfgSelWinTone: selWinner ? layerTone[selWinner.id] : 'muted',
+      cfgSelNote: selDef.note,
+      cfgSelShadowCount: String(selRes.shadowed.length),
+      cfgSelLayerCount: String(selRes.present.length),
+      s2OpenAspire: () => this.showToast('Would open netscript.config for ' + selDef.key + ' ↗', 'info'),
+      s2ViewPlugin: () => { this.setState({ s5Sel: selDef.ns === 'flags' || selDef.ns === 'jobs' ? 'workers' : (selDef.ns === 'streams' ? 'streams' : (selDef.ns === 'sagas' ? 'sagas' : (selDef.ns === 'triggers' ? 'triggers' : 'workers'))) }); this.nav('plugins'); },
       s2ViewContracts: go('catalog'),
+      s2GoRuntime: go('runtime'),
       // S3
       s3Stats, s3Flags, s3Jobs, s3Trigs, s3Tasks, s3FeedItems, s3Vers,
       s3HasJobs: s3Jobs.length > 0, s3HasTrigs: s3Trigs.length > 0, s3HasTasks: s3Tasks.length > 0,

@@ -15,3 +15,8 @@ every screen and applies the genuinely valuable items (skip subjective/gold-plat
 - Selected-message panel → accordion sections / denser; fan-out delivery → 4-col table [ref 12]  ← valuable
 - Consumer-lag stat → radial gauge (lag vs retention) [ref 04] (debatable)
 - Lag heatmap → finer grid + x-axis labels + gradient legend [ref 12] (minor)
+
+## Config Resolution (gate 68 → fix → concrete hits resolved)
+- Precedence rail → optional node-graph pipeline [ref 21] (declined — waterfall metaphor is stronger; revisit only if desired)
+- Right panel → inline quick-override <textarea> editor + docs accordion [ref 11] (out of visual-only scope; needs interactivity)
+- Category filter chips → connected tab bar [ref 11] (declined — chips are fine)
