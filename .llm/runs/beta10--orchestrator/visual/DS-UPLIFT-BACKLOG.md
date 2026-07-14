@@ -169,3 +169,158 @@ hero, dominant component, and grid rhythm so the two consoles never read as one 
 - Workers registry-row → **dedicated bottom sheet** (viewport-branched `data-side` = bottom < 640px).
 - `ns-smd` lanes wrap to multiple rows on narrow viewports (no h-scroll); rollback lane stays railed.
 - `ns-statstrip--5` steps 2→3→5; `ns-sagahero` → single column < 560px.
+
+## Pass V4b — Sagas canvas
+
+The V4 Sagas screen was rejected: the state machine was a mini-diagram (`ns-smd`) *inside* the shared
+3-column console template (list → hero card → transitions rail), so it read as the same screen as
+every other console. V4b promotes the state machine to a **full-bleed n8n / flow-builder node-graph
+canvas** (ref 21) with a **click-to-open properties sidebar**, making Sagas a fundamentally different
+*kind* of screen. The `ns-smd` mini-diagram remains in the ledger as the reusable small inline
+variant; `ns-sgc` is the new canvas-scale primitive.
+
+### New components
+- **`ns-sgc`** · `.ns-sgc` (frame: canvas + docked properties sidebar; stacks < 1024px) · the
+  **saga-graph-canvas screen frame** — a dominant canvas column + a 21–23rem properties sidebar. ·
+  Sagas; the reusable canvas-forward screen shell for any node-graph route (Config topology at
+  screen scale, a Trigger composite builder, a Journey composition).
+- **`ns-sgc__canvas` / `__stagewrap` / `__grid` / `__edges`** · dotted-grid full-bleed **canvas
+  stage** (two radial-gradient dot layers, theme-blind) with an absolute SVG **edge layer** drawn
+  post-mount from `getBoundingClientRect()` (no SVG `{{ }}` holes). · Sagas; the canvas substrate for
+  any spatial graph.
+- **`ns-sgc__node[data-lane][data-state][data-current][data-selected]`** · `__node-head` / `__tile`
+  / `__name` / `__dot` / `__cap` / `__foot` / `__metric` · a **state-node card** (icon tile + name +
+  live state dot + capability + timing/attempt foot), state-tinted, with a copper **selected ring**,
+  a dashed **current ring**, a **pulsing** live dot (running/retrying), and a warning left-rail for
+  compensation-lane nodes. · Sagas; the reusable graph-node card.
+- **`ns-sgc__switcher` / `__inst[data-state]` / `__inst-dot[data-tone]` / `__inst-corr`** · a slim
+  horizontal **instance switcher strip** (status-dot chips, selected = copper ring) that replaces the
+  fat left instance column. · Sagas; reusable wherever "which instance/run am I viewing" needs a
+  compact top control instead of a rail.
+- **`ns-sgc__toolbar` / `__tool[data-variant]` / `__tool-zoom` / `__tool-sep`** · a floating **canvas
+  toolbar** (zoom −/%/+, ⤢ fit, ✦ assist) pinned bottom-center (ref 21 bottom bar). · Sagas; reusable
+  on any canvas.
+- **`ns-sgc__props` / `__props-head` / `__props-eyebrow` / `__props-title` / `__props-tile` /
+  `__props-name` / `__props-section[-label]` / `__props-clear` / `__props-payload`** · the
+  **properties sidebar** — instance summary by default (gauge + KV + why-assist + instance actions),
+  node detail when a node is picked (status badge + KV of timing/attempt/lane + transitions + payload
+  + node action). · Sagas; the reusable "click node → configure" inspector, folds to a bottom sheet
+  < 1024px.
+- **`ns-sgc__trans` / `__trans-row[data-lane]` / `__trans-dir`** · in/out/compensation **transition
+  rows** (directional glyph `←`/`→`/`⇢`, warning-toned for the compensation edge). · Sagas; reusable
+  node-transition list.
+- **`ns-sgc__lane-tag[data-lane]`** · floating **lane rails** ("forward path" / "⟲ compensation ·
+  rollback lane") pinned to the canvas edge (JS-positioned above the rollback row); hidden on mobile.
+  · Sagas; reusable lane annotation for any multi-lane canvas.
+- **`ns-sgc__edge[data-lane][data-state]` / `__edge-arrow` / `__edge-label[-bg]`** · JS-measured
+  bezier **connectors** — forward (solid, arrow →), a **cross-edge** (dashed warning, arrow ↓, drops
+  the failed forward state into the rollback lane), a **reverse rollback lane** (dashed warning), each
+  with a floating branch **label + backing chip**; edges touching the selected node recolor copper. ·
+  Sagas; the reusable measured-connector layer (companion to `ns-stackmap`'s `measureEdges`).
+
+### Refinements to existing components
+- **generic right sheet** → now also serves the **Sagas node bottom sheet** on mobile (`sheet: 's8'`,
+  `sheetIsS8`): tapping a canvas node < 1024px opens the same properties content as a bottom sheet
+  (in addition to S2/S7/S13 reuse). One dialog, four screens.
+- **`ns-durabar`** → relocated into the Sagas page-header toolbar (durability tier as a header chip)
+  now that the left instance rail is gone; unchanged contract.
+- **`ns-sagahero` gauge / `ns-kv--split` / `ns-assist`** → recomposed **inside** the properties
+  sidebar (instance-summary mode) rather than as a standalone hero band, proving they compose in a
+  narrow inspector column, not just a wide hero.
+- **`measureEdges` pattern** → generalized into a second measured-geometry drawer
+  (`measureSagaEdges` / `scheduleSagaEdges`), wired to resize + route-enter + instance-switch +
+  node-select, and suppressed < 640px (single-column stack) exactly like the stackmap. Establishes
+  the measured-connector approach as a repeatable primitive, not a one-off.
+
+### New tokens
+- None. The dotted grid uses `radial-gradient(color-mix(in oklab, var(--ns-fg), transparent 88%) …)`;
+  node/edge tints reuse the existing success/warning/destructive/primary subtle + border families and
+  `color-mix`. Fully theme-blind, no raw hex.
+
+### New variants
+- `ns-sgc__node[data-lane='comp']` (warning-railed rollback node), `ns-sgc__edge[data-lane='comp']`
+  (dashed reverse) + `[data-lane='cross']` (dashed drop-in), `ns-sgc__inst[data-state='selected']`,
+  `ns-sgc__tool[data-variant='assist']`, properties sidebar `mode: 'summary' | 'node'`.
+
+### New options / data-attributes
+- `ns-sgc__node[data-col][data-row]` (grid placement → measured connector endpoints),
+  `[data-state]` (completed/running/retrying/failed/queued), `[data-current]`, `[data-selected]`,
+  `[data-lane]`; `ns-sgc__inst-dot[data-tone]`; `ns-sgc__edge[data-lane][data-state]` +
+  `ns-sgc__edge-arrow` / `ns-sgc__edge-label` mirrors; `ns-sgc__trans-row[data-lane]`;
+  `ns-sgc__lane-tag[data-lane]`. The saga node model gained `col`/`lane`/`timing`/`attempt`/`payload`/
+  `trans`/`action` fields (data-driven; no-compensation instances render only the forward lane).
+
+### Mobile optimizations
+- The canvas **stacks to a single readable column < 640px** (JS suppresses edge geometry, matching
+  the stackmap); comp nodes keep their warning left-rail so the rollback lane stays distinct without
+  the floating lane tags (which are hidden on mobile).
+- **Tapping a node opens a dedicated bottom sheet** (properties content) via the viewport-branched
+  generic sheet — the mobile equivalent of the desktop docked sidebar.
+- The instance switcher strip **scrolls horizontally** (body never scrolls); the properties sidebar
+  reflows to a full-width block under the canvas < 1024px.
+- Canvas toolbar stays pinned bottom-center at every width.
+
+## Pass V4b-fix — Sagas canvas density + bespoke surrounding sections
+
+Density pass answering the adversarial-vision gate (canvas was ~75–80% empty grid). Fills the void
+with tailored, data-driven, JS-measured content and elevates the surrounding sections from generic
+chrome into bespoke saga components. Visual + layout only; NS One tokens only (no raw hex); no SVG
+`{{ }}` holes. Canvas cell-coverage 29% → 47% (desktop 1440).
+
+### New components
+- `ns-sgc__minimap` / `ns-sgc__mm-*` — a **definition mini-map**: ~204×112 topology thumbnail docked
+  bottom-right, drawn post-mount by `drawSagaMinimap` from `machine.def`, with the current instance
+  path overlaid in teal (forward) / amber (rollback) and the selected node ringed copper. Reusable
+  bird's-eye navigator for any node-graph route.
+- `ns-sgc__lanestat` / `ns-sgc__lanestat-cell` — a **per-lane compensation-health stat strip** (ref-11
+  stat bar adapted to saga lanes): slim single-line `label:value` pill beside each lane tag, per
+  instance; the comp strip is JS-pinned above the rollback row and absent on no-rollback instances.
+- `ns-sgc__rail` / `ns-sgc__rail-pip` — a **step-execution rail**: left-edge pips (pending → … →
+  terminal), state-tinted, current step enlarged with a copper halo. Reusable playhead/scrub rail.
+- `ns-sgc__anno` (`annoCard`) — a **rich on-wire edge annotation card**: error badge + branch label +
+  payload snippet on the failing→compensating cross-wire (ref-21 labeled connectors).
+- `ns-sgc__legend` — a **canvas node-identity legend** (forward/compensation/terminal/ghost), balances
+  the mini-map bottom-left.
+- `ns-sghealth` / `ns-sghealth__*` — a **saga-health composite band** (replaces four plain number
+  cards): compensation-rate radial meter (conic `--v`), in-flight vs terminal split, instances-by-state
+  stacked channel bar + legend, forward↔rollback edge ratio.
+- `ns-sgtable` / `ns-sgtable__*` — a **dense sortable columnar step table** (ref-11): sortable headers
+  with caret, inline error badge, comp rows `↩`-marked + tinted. Replaces the airy step timeline.
+- `ns-sgc__tabs` / `ns-sgc__tab` / `ns-sgc__tabpanel` — a **tabbed node inspector** (State /
+  Transitions / Evidence / Actions; ref-11 drawer tabs, active = copper text + 2px underline). Drives
+  the desktop sidebar and the mobile bottom sheet.
+- `ns-sgstream` / `ns-sgstream__*` — a **typed transition stream** grouped by instance: rows are typed
+  transitions (advance `→` / compensate `↩` / terminal `◼` / fault `✕`), glyph-blocked + tone-coded +
+  timestamped, with a legend key. Replaces the generic activity-feed Transitions panel.
+
+### Refinements to existing components
+- `measureSagaEdges` gained an `annoCard` helper and a `drawSagaMinimap` call (drawn at any width, so
+  the mini-map folds into the mobile stack while edge geometry is suppressed).
+- `ns-sgc__node` gained a `[data-role]` chromatic-identity accent (teal/copper/neutral top strip) and a
+  `[data-ghost]` ~30%-opacity wireframe treatment for queued scope states — layered over the existing
+  state tints (the live dot still reads state).
+- `ns-sgc__canvas` firm `min-height` + larger bottom padding reserve a clean bottom band so the
+  mini-map never collides with a row-2 rollback node on short instances; grid `row-gap` widened so the
+  comp lane tag + health strip band fits between forward and rollback rows.
+
+### New tokens
+- None. All new tints are `color-mix` over existing `--ns-teal-*` / `--ns-copper-*` / `--ns-amber-*` /
+  success/warning/destructive/primary families. Theme-blind, no raw hex.
+
+### New variants / data-attributes
+- `ns-sgc__node[data-role='fwd'|'comp'|'terminal']`, `[data-ghost='1']`;
+  `ns-sgc__lanestat[data-lane]`, `ns-sgc__lanestat-val[data-tone]`;
+  `ns-sgc__rail-pip[data-rail][data-tone][data-now]`;
+  `ns-sgc__mm-node--{fwd,comp,active,sel}` / `ns-sgc__mm-edge--{comp,active}`;
+  `ns-sgc__tab[data-active]`; `ns-sgtable__th[data-active][data-dir]`, `ns-sgtable__row[data-comp]`;
+  `ns-sgstream__gl[data-type='advance'|'compensate'|'terminal'|'fault']`;
+  `ns-sghealth__seg[data-tone]` / `ns-sghealth__meter` (`--v` conic). Saga machine model gained
+  `def` (mini-map topology + current `path`), `laneHealth`, `rail`, `crossAnno` per instance;
+  view-model gained `s8Health`, `s8StepTable` (sortable via `s8SortKey`/`s8SortDir`), `s8FeedGroups`,
+  `s8Tabs`/`s8TabIs`/`s8Evidence`, `s8Rail`, `s8FwdHealth`/`s8CompHealth`.
+
+### Mobile optimizations
+- Mini-map folds to a static full-width block; lane-health strips + saga-health band stack; step rail
+  and canvas legend hide on the single-column stack. Step table scrolls inside `overflow-x:auto` (body
+  never scrolls). Node tap → the tabbed bottom sheet. All verified 0 holes / 0 overflow / 0 errors at
+  390 in both themes.

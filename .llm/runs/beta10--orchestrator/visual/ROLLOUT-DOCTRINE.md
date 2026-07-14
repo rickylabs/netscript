@@ -75,3 +75,23 @@ Each pass MUST look at its assigned refs (and browse the others) fresh and pull 
 - **Control plane:** **13** (version/code diff) → Runtime/Catalog/Migrations; **21** (node graph) →
   Config topology; 06 (sheets/forms) → DLQ/Auth actions.
 - **AI + Extensions + trigger builder:** **21** (flow + palette), 07 (thread/transcript).
+
+## Gate spec (mandatory per pass — added 2026-07-14, owner directive)
+
+Two failures the gate must now catch, beyond the hero/primary component:
+
+1. **EVERY SECTION bespoke, not just the hero.** A screen fails if its stat strip is plain number
+   cards, its lists are airy bullets, or its detail panel is a monolithic scroll — even when the
+   headline component (canvas, chart, graph) is excellent. Each section must answer *"what tailored
+   component best showcases THIS part of the feature?"* Redesign the generic sections too.
+
+2. **The adversarial gate must PRESCRIBE CONCRETE components from the reference screenshots.** Prior
+   gates gave abstract advice ("add a stat strip"). Not enough. The gate now REQUIRES a ≥8-row
+   **component-prescription table** naming the exact UI element in a named reference file and how to
+   adapt it — with ≥3 rows drawn from references the design has not yet used (cross-pollination).
+
+Run `visual/_evals/GATE-PROMPT.md` via **OpenCode Kimi K2.6 vision** (native; claude-print's
+Anthropic-skin drops images → `NO_VISION`). Feed the screen's shots + a DIVERSE reference set (assigned
+refs + 2 wildcards). Then dispatch an Opus fix pass that (a) kills dead space, (b) makes every generic
+section bespoke, (c) applies the prescribed concrete components. Screenshots to owner + commit + comment
+on PR #780 each pass.
