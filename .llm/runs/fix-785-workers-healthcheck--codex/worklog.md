@@ -60,6 +60,10 @@ Add a local worker job under `workers/jobs`, generate the runtime registry, and 
 | 2026-07-16 | 1 | Diagnose | Reproduced 40 passed / 1 failed and captured the doubled `workers/jobs/workers/jobs/health-check.ts` module path via `aspire logs workers`; stopped the AppHost. |
 | 2026-07-16 | 2 | Implement | Normalized local entrypoints already rooted under configured jobsDir; preserved jobs-dir-relative registry behavior. |
 | 2026-07-16 | 2 | Reconcile | Issue #785 remains open; draft PR #786 has `Closes #785`, requested taxonomy/milestone, and no new comments requiring readjustment. |
+| 2026-07-16 | 3 | Quality | `quality:gate` reached `quality:scan` and failed only on two unchanged baseline findings in streams/triggers; standalone `arch:check` passed with warnings. |
+| 2026-07-16 | 3 | Acceptance | Canonical cleanup run reached 42 passed / 1 failed. Correct entrypoint loaded, then the callback received 404 from the configured users URL. |
+| 2026-07-16 | 3 | Attribute | Live Aspire evidence showed `services__users__http__0=http://localhost:3001`; that URL was owned by Windows process `sco-web` and returned 404, while the healthy Aspire users target on its assigned port returned 200 for the same RPC path. |
+| 2026-07-16 | 3 | Concurrency | A separate workspace actor changed the Flow-B E2E fixture and extended the overlapping resolver test during a port-isolated diagnostic run. Preserved those uncommitted edits; the moving-source run failed generated type-check and is not acceptance evidence. |
 
 ## Decisions
 
@@ -74,6 +78,8 @@ Add a local worker job under `workers/jobs`, generate the runtime registry, and 
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
 | Parent harness artifacts and concrete Tier-D thread proof unavailable in checkout/session | significant | yes |
+| Canonical E2E port `3001` is occupied by an out-of-scope Windows process | significant | yes |
+| Concurrent uncommitted changes overlap the E2E fixture and resolver regression | significant | yes |
 
 ## Gate Results
 
@@ -90,21 +96,24 @@ Add a local worker job under `workers/jobs`, generate the runtime registry, and 
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Quality/doctrine | NOT_RUN | `deno task quality:gate` | Required after implementation |
+| Quality aggregate | FAIL_BASELINE | `deno task quality:gate` | `quality:scan` reported only unchanged findings in `plugins/streams/services/src/proxy.ts:180` and `plugins/triggers/streams/producer.ts:34` |
+| Architecture | PASS | `deno task arch:check` | Exit 0; warnings only |
 
 ### Runtime Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | Diagnostic scaffold runtime | FAIL_REPRODUCED | `.llm/tmp/785-repro*`; `aspire logs workers` | 40 passed / 1 failed; doubled path captured; AppHost stopped |
-| Acceptance scaffold runtime | NOT_RUN | canonical cleanup command | Final gate |
+| Acceptance scaffold runtime | FAIL_ENVIRONMENT | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | 42 passed / 1 failed; correct module loaded, callback hit unrelated `sco-web` on fixture-fixed port 3001 |
+| Port-isolated diagnostic | INVALIDATED | temporary uncommitted fixture port 3079, then restored | Concurrent source edits landed mid-run; generated type-check failed before runtime behavior |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Scaffolded workers runtime | NOT_RUN | `behavior.workers-executions` | Acceptance target |
+| Scaffolded workers runtime | BLOCKED | `behavior.workers-executions` | Workers resolver progressed to the handler; host port collision prevents canonical callback success |
 
 ## Handoff Notes
 
-- Evaluator should inspect `resolveLocalJobEntrypoint`, its two convention tests, the captured doubled-path evidence, and final `behavior.workers-executions` result first.
+- Evaluator should inspect `resolveLocalJobEntrypoint`, its convention tests, the captured doubled-path evidence, and the canonical callback attribution first.
+- Do not treat the port-isolated run as acceptance evidence. Re-run the canonical gate after port 3001 is free and after the concurrent Flow-B fixture edits are committed or removed by their owner.

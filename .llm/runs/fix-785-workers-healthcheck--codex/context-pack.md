@@ -6,13 +6,13 @@
 | --- | --- |
 | Run ID | `fix-785-workers-healthcheck--codex` |
 | Branch | `fix/785-workers-healthcheck` |
-| Current phase | `implement — source fix validated locally` |
+| Current phase | `implement — source fix validated locally; canonical acceptance blocked` |
 | Archetype | `5 — Plugin Package` |
 | Scope overlays | `service` |
 
 ## Current State
 
-Issue #785 was reproduced as 40 passed / 1 failed. Worker processor logs proved that local resolution doubled `workers/jobs`, producing `<project>/workers/jobs/workers/jobs/health-check.ts` and terminal `Not Found`. The framework resolver now recognizes project-root-qualified paths already under jobsDir while preserving the normal jobs-dir-relative convention; focused tests and scoped wrappers pass.
+Issue #785 was reproduced as 40 passed / 1 failed. Worker processor logs proved that local resolution doubled `workers/jobs`, producing `<project>/workers/jobs/workers/jobs/health-check.ts`. The framework resolver now recognizes project-root-qualified paths already under jobsDir while preserving the normal jobs-dir-relative convention; focused tests and scoped wrappers pass. A canonical post-fix run loaded the correct module but exposed a separate host collision: the fixture-fixed users URL on port 3001 is served by unrelated Windows process `sco-web`, while Aspire's generated users target is healthy and serves the same RPC with 200.
 
 ## Completed
 
@@ -23,13 +23,13 @@ Issue #785 was reproduced as 40 passed / 1 failed. Worker processor logs proved 
 
 ## In Progress
 
-- Framework quality gate and full runtime acceptance.
+- Settle concurrent overlapping fixture/test edits, free fixture port 3001 with owner authority, and re-run canonical runtime acceptance.
 
 ## Next Steps
 
-1. Commit/push the framework fix slice and post its PR evidence.
-2. Run `quality:gate` and the canonical full runtime smoke.
-3. Update PR acceptance evidence and hand off to separate evaluation.
+1. Have the owner of the concurrent Flow-B fixture/test edits commit or remove them.
+2. Free Windows port 3001 without disrupting unrelated work, then re-run the canonical full runtime smoke.
+3. Update PR acceptance evidence only if green, then hand off to separate evaluation.
 
 ## Key Decisions
 
@@ -51,17 +51,18 @@ Issue #785 was reproduced as 40 passed / 1 failed. Worker processor logs proved 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Static | pass | 5 focused tests; scoped check/lint/fmt over 93 files |
-| Fitness | pending | `quality:gate` |
-| Runtime | failure reproduced and diagnosed | `.llm/tmp/785-repro*`; Aspire worker logs |
-| Consumer | pending | full scaffold runtime |
+| Fitness | aggregate baseline failure; architecture pass | two unchanged scan findings; `arch:check` exit 0 |
+| Runtime | source failure fixed; environment blocker attributed | correct entrypoint, discovery URL 404, direct users target 200 |
+| Consumer | blocked | canonical fixture port 3001 occupied by unrelated Windows process |
 
 ## Open Questions
 
-- None for implementation; final runtime acceptance remains.
+- Who owns the concurrent Flow-B fixture/test edits, and when is the source tree stable for another gate?
+- May the Windows-side `sco-web` process on port 3001 be stopped for the canonical acceptance run?
 
 ## Drift and Debt
 
-- Drift: parent run/PLAN-EVAL and Tier-D daemon/thread proof unavailable locally; owner directly authorized this implementation slice.
+- Drift: parent run/PLAN-EVAL and Tier-D daemon/thread proof unavailable locally; canonical port collision; concurrent overlapping edits invalidated a diagnostic run.
 - Debt: no new or deepened architecture debt accepted.
 
 ## Commits
