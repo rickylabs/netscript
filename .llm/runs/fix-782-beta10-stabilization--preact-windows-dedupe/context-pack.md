@@ -6,16 +6,16 @@
 | ----- | ----- |
 | Run ID | `fix-782-beta10-stabilization--preact-windows-dedupe` |
 | Branch | `fix/782-beta10-stabilization` |
-| Current phase | `plan` |
+| Current phase | `evaluate` |
 | Archetype | `4 — Public DSL / Builder` |
 | Scope overlays | `frontend` |
 
 ## Current State
 
-Issue #782 is current and reproducible at the `@netscript/fresh/vite` resolver boundary. The branch
-and remote PR base both start at `0daa575b`. Existing Vite tests pass, but the NetScript resolver
-does not delegate Preact imports, so Windows backslash IDs are not canonicalized. Architecture and
-the one implementation slice are locked; no framework code has changed yet.
+Issue #782 is implemented at the `@netscript/fresh/vite` owner boundary. The plugin now returns
+Preact dedupe, delegates all required Preact specifier forms with `skipSelf`, preserves resolution
+metadata, and normalizes only the final ID. Focused and full Fresh runtime gates are green. Required
+package gates are complete, with unrelated baseline quality/doc debt explicitly attributed.
 
 ## Completed
 
@@ -26,18 +26,21 @@ the one implementation slice are locked; no framework code has changed yet.
 - Ran `deno doc` before broad Fresh source reads and `deno task deps:why vite`.
 - Reproduced the missing delegated normalization before implementation.
 - Recorded research, plan, Design checkpoint, and evaluator ownership.
+- Opened draft PR #789 against `feat/beta10-integration` with the required labels and milestone.
+- Proved the new regression red before changing framework code, then green after implementation.
+- Passed 9 focused Vite tests and all 199 Fresh package tests.
+- Passed scoped check/lint/fmt, scoped changed-source quality, root architecture, Fresh doctrine,
+  and publish dry-run gates.
 
 ## In Progress
 
-- S0 plan bootstrap commit, explicit push, and draft PR creation.
+- S1 commit/push and supervisor-owned IMPL-EVAL handoff.
 
 ## Next Steps
 
-1. Commit/push S0 and open the required draft PR against `feat/beta10-integration`.
-2. Add the production module-identity regression and record its pre-fix failure.
-3. Implement Preact dedupe plus delegated ID canonicalization and docs.
-4. Run the complete planned gate set and update run evidence.
-5. Commit/push S1, post evidence, and hand off at `status:impl-eval`.
+1. Commit/push S1 and update PR #789 body plus implementation evidence comment.
+2. Supervisor runs separate-session IMPL-EVAL and any native-Windows acceptance evidence.
+3. Keep the PR draft and do not merge until the close gate is satisfied.
 
 ## Key Decisions
 
@@ -53,26 +56,30 @@ the one implementation slice are locked; no framework code has changed yet.
 | Path | Status | Notes |
 | ---- | ------ | ----- |
 | `.llm/runs/fix-782-beta10-stabilization--preact-windows-dedupe/` | new | Harness bootstrap, research, plan, design, context, drift. |
+| `packages/fresh/src/application/vite/vite.ts` | changed | Preact dedupe and delegated normalized resolver. |
+| `packages/fresh/src/application/vite/vite.test.ts` | changed | Config, resolver, and production module-identity regressions. |
+| `packages/fresh/src/application/vite/README.md` | changed | Dedupe-versus-path-canonicalization rationale. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Static | baseline PASS | Existing Vite test: 7/7. |
-| Fitness | planned | quality/architecture gates deferred to S1. |
-| Runtime | expected pre-fix FAIL reproduced | Resolver returned null and never delegated Preact. |
-| Consumer | baseline PASS | Existing alias test and merged external workaround. |
+| Static | PASS | Scoped check/lint/fmt: 164 files, zero findings; publish dry-run PASS. |
+| Fitness | PASS with attributed baseline debt | Changed-source quality 0 findings; `arch:check` PASS; Fresh doctrine 0 failures. |
+| Runtime | PASS | Focused 9/9; Fresh 199/199. |
+| Consumer | PASS | Alias and merged dedupe/config coverage; external workaround mirrored. |
 
 ## Open Questions
 
-- None that block implementation. Native Windows browser evidence may be added by supervisor/CI.
+- None that block handoff. Native Windows browser/build evidence may be added by supervisor/CI.
 
 ## Drift and Debt
 
-- Drift: evaluator dispatch and daemon attachment are explicitly supervisor-owned/unclaimed.
-- Debt: none created or deepened.
+- Drift: evaluator dispatch/daemon attachment are supervisor-owned; Linux Vite pre-normalized the
+  controlled build ID, so the direct hook simulation is the deterministic red evidence.
+- Debt: none created or deepened. Repository quality findings and route doc-lint residue are
+  pre-existing, unchanged, and outside this slice.
 
 ## Commits
 
 - See the draft PR's commit list + per-slice PR comments after S0 opens it.
-

@@ -116,7 +116,7 @@ and user configuration merging.
 | F-1..F-19 applicable to Archetype 4 | yes | `deno task arch:check` plus manual diff review |
 | Code-quality scan | yes | `deno task quality:scan` |
 | F-19 scoped source gates | yes | scoped check/lint/fmt wrappers over `packages/fresh` |
-| F-5/F-7 public docs | yes | `deno task doc:lint --root packages/fresh --pretty` |
+| F-5/F-7 public docs | yes | `deno task doc:lint --root packages/fresh --pretty`; changed `./vite` entrypoint must remain clean, with existing route debt attributed separately |
 | F-6 publishability | yes | package `deno task publish:dry-run` |
 
 ## Arch-Debt Implications
@@ -147,7 +147,7 @@ and user configuration merging.
 | 5 | Scoped static | check/lint/fmt wrappers with `--root packages/fresh --ext ts,tsx` | Pass. |
 | 6 | Code quality | `deno task quality:scan` | Pass with no new suppressions. |
 | 7 | Doctrine | `deno task arch:check` | Pass. |
-| 8 | Docs | `deno task doc:lint --root packages/fresh --pretty` | Pass. |
+| 8 | Docs | `deno task doc:lint --root packages/fresh --pretty` | Changed `./vite` entrypoint has zero findings; any unrelated baseline findings are attributed and unchanged. |
 | 9 | Publish | `deno task publish:dry-run` from `packages/fresh` | Pass. |
 | 10 | Scaffold runtime | not run | N/A: scaffold output/runtime wiring is unchanged. |
 
@@ -163,4 +163,3 @@ and user configuration merging.
   rescope the regression rather than weakening it into a string-only assertion.
 - If implementation requires scaffold templates, public signatures, or general path normalization,
   stop and rescope because that is materially larger than the approved slice.
-
