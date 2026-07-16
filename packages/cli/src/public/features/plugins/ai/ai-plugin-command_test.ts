@@ -1,5 +1,9 @@
 import { assertEquals } from "@std/assert";
-import { createAiPluginCommand } from "./ai-plugin-command.ts";
+import { NETSCRIPT_RELEASE_VERSION } from "../../../../kernel/constants/jsr-specifiers.ts";
+import {
+  createAiPluginCommand,
+  dispatchAiPluginCommand,
+} from "./ai-plugin-command.ts";
 
 Deno.test("plugin ai forwards nested lifecycle verbs and flags", async () => {
   const calls: unknown[] = [];
@@ -19,5 +23,29 @@ Deno.test("plugin ai forwards nested lifecycle verbs and flags", async () => {
   assertEquals(calls, [{
     args: ["model", "add", "fast", "openrouter:model", "--json"],
     projectRoot: "/workspace/app",
+  }]);
+});
+
+Deno.test("plugin ai shells out to the lockstep-versioned plugin CLI", async () => {
+  const calls: unknown[] = [];
+  await dispatchAiPluginCommand(["doctor"], {
+    projectRoot: "/workspace/app",
+    processRunner: {
+      exec: (command, args, options) => {
+        calls.push({ command, args, cwd: options?.cwd });
+        return Promise.resolve({ code: 0, stdout: "", stderr: "" });
+      },
+    },
+  });
+
+  assertEquals(calls, [{
+    command: "deno",
+    args: [
+      "x",
+      "-A",
+      `jsr:@netscript/plugin-ai@${NETSCRIPT_RELEASE_VERSION}/cli`,
+      "doctor",
+    ],
+    cwd: "/workspace/app",
   }]);
 });

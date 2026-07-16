@@ -125,8 +125,11 @@ Deno.test('orchestration lanes run Opus 4.8 medium while Fable 5 is outside the 
   }
 });
 
-Deno.test('Fable 5 stays authorized on explicit owner request but is never auto-selected', () => {
-  const fableRoutes = CANONICAL_ROUTE_POLICY.filter((route) => route.model === 'fable-5');
+Deno.test('non-review Fable 5 routes stay approval-gated and are never auto-selected', () => {
+  const reviewLanes = new Set(['review_codex', 'review_codex_complex']);
+  const fableRoutes = CANONICAL_ROUTE_POLICY.filter((route) =>
+    route.model === 'fable-5' && !reviewLanes.has(route.lane)
+  );
   equal(fableRoutes.length > 0, true);
   for (const route of fableRoutes) {
     equal(route.subscriptionState, 'outside_plan');
@@ -188,4 +191,88 @@ Deno.test('Claude review stays opposite-family on GPT-5.6 Sol xhigh', () => {
     'gpt-5.6-sol',
     'xhigh',
   ]);
+});
+
+Deno.test('review-of-Codex ladder is effort-paired and Fable is reserved for medium+', () => {
+  const at = new Date('2026-07-16T00:00:00Z');
+  // Small slices → Opus 4.8 high; normal/complex → Fable 5 (low/medium), in-plan and
+  // auto-selectable per PR #784 (Fable 5 restored); fast → Opus medium.
+  const expected: Record<string, [string, string]> = {
+    review_codex_light: ['opus-4.8', 'high'],
+    review_codex: ['fable-5', 'low'],
+    review_codex_complex: ['fable-5', 'medium'],
+    review_codex_fast: ['opus-4.8', 'medium'],
+  };
+  for (const [lane, [model, effort]] of Object.entries(expected)) {
+    const route = resolveCanonicalRoute(lane as Parameters<typeof resolveCanonicalRoute>[0], at);
+    equal([route.agent, route.provider, route.model, route.effort], [
+      'claude',
+      'anthropic',
+      model,
+      effort,
+    ]);
+  }
+});
+
+Deno.test('every review-of-Codex route is opposite-family (Claude); Fable primaries are in-plan and auto-selectable', () => {
+  const reviewLanes = new Set([
+    'review_codex_light',
+    'review_codex',
+    'review_codex_complex',
+    'review_codex_fast',
+  ]);
+  const routes = CANONICAL_ROUTE_POLICY.filter((route) => reviewLanes.has(route.lane));
+  equal(routes.length > 0, true);
+  for (const route of routes) {
+    equal([route.agent, route.provider], ['claude', 'anthropic']);
+    if (route.model === 'fable-5') {
+      // Fable 5 restored (PR #784): review primaries are included, ungated, unconditional.
+      equal(route.subscriptionState, 'included');
+      equal(route.requiresExplicitApproval, undefined);
+      equal(route.condition, undefined);
+    }
+  }
+  // The auto-selected reviewer for the two medium+ pairings is Fable.
+  const fablePairings = routes.filter((route) => route.model === 'fable-5').map((r) => r.lane);
+  equal(fablePairings.includes('review_codex'), true);
+  equal(fablePairings.includes('review_codex_complex'), true);
+});
+
+Deno.test('token-limit review fallbacks stay Claude-family and are never primary', () => {
+  const fallbacks = CANONICAL_ROUTE_POLICY.filter((route) =>
+    route.condition === 'token_limit_fallback'
+  );
+  equal(
+    fallbacks.map((r) => [r.lane, r.model, r.effort]).toSorted(),
+    [
+      ['review_codex', 'opus-4.8', 'low'],
+      ['review_codex_complex', 'opus-4.8', 'medium'],
+      ['review_codex_fast', 'sonnet-5', 'high'],
+      ['review_codex_light', 'sonnet-5', 'high'],
+    ].toSorted(),
+  );
+  for (const route of fallbacks) {
+    equal([route.agent, route.provider], ['claude', 'anthropic']);
+    // A token-limit fallback is never returned as the canonical primary.
+    const primary = resolveCanonicalRoute(route.lane, new Date('2026-07-16T00:00:00Z'));
+    equal(primary.condition !== 'token_limit_fallback', true);
+  }
+});
+
+Deno.test('implementation lanes are effort-tiered on GPT-5.6 Sol', () => {
+  const at = new Date('2026-07-16T00:00:00Z');
+  const expected: Record<string, string> = {
+    light_implementation: 'low',
+    normal_implementation: 'medium',
+    complex_implementation: 'high',
+  };
+  for (const [lane, effort] of Object.entries(expected)) {
+    const route = resolveCanonicalRoute(lane as Parameters<typeof resolveCanonicalRoute>[0], at);
+    equal([route.agent, route.provider, route.model, route.effort], [
+      'codex',
+      'openai',
+      'gpt-5.6-sol',
+      effort,
+    ]);
+  }
 });

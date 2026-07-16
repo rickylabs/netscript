@@ -21,9 +21,8 @@ name: e2e-cli
 #     unverified and likely needs a debugging pass before this job is promoted to a
 #     required check via branch protection.
 #
-# Triggers: every PR to main, PLUS any PR carrying the `e2e-cli-gate` label (so the
-# durable-store / CLI-touching slices into the feat/framework-prime-time umbrella
-# can opt in before they reach main), PLUS manual dispatch.
+# Triggers: every PR to main or an integration branch (`feat/**`, `epic/**`), PLUS
+# any other PR carrying the `e2e-cli-gate` label, PLUS manual dispatch.
 #
 # Skip policy (see `.github/scripts/ci-classify-changes.ts`): the `classify` job
 # derives `run_static` / `run_runtime` from the PR diff and labels. Both expensive
@@ -63,11 +62,13 @@ concurrency:
 jobs:
   classify:
     name: classify changes
-    # Applicability gate (unchanged): only PRs to main, `e2e-cli-gate`-labeled
-    # PRs, or manual dispatch exercise this workflow at all.
+    # Applicability gate: PRs to main or integration branch families,
+    # `e2e-cli-gate`-labeled PRs, or manual dispatch exercise this workflow.
     if: >-
       github.event_name == 'workflow_dispatch' ||
       github.event.pull_request.base.ref == 'main' ||
+      startsWith(github.event.pull_request.base.ref, 'feat/') ||
+      startsWith(github.event.pull_request.base.ref, 'epic/') ||
       contains(github.event.pull_request.labels.*.name, 'e2e-cli-gate')
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -241,3 +242,51 @@ jobs:
             .llm/tmp/**/report*.ndjson
             **/e2e-report*.json
           if-no-files-found: ignore
+
+  lane-visibility:
+    name: scaffold CI lane visibility
+    needs: [classify, scaffold-static, scaffold-runtime]
+    if: ${{ always() && github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Summarize scaffold lane outcomes
+        env:
+          CLASSIFY_RESULT: ${{ needs.classify.result }}
+          RUN_STATIC: ${{ needs.classify.outputs.run_static }}
+          RUN_RUNTIME: ${{ needs.classify.outputs.run_runtime }}
+          STATIC_RESULT: ${{ needs.scaffold-static.result }}
+          RUNTIME_RESULT: ${{ needs.scaffold-runtime.result }}
+        run: |
+          describe_scaffold_lane() {
+            selected="$1"
+            result="$2"
+            if [ "$CLASSIFY_RESULT" = "success" ] && [ "$selected" != "true" ]; then
+              printf 'skipped by policy'
+            elif [ "$result" = "skipped" ]; then
+              printf 'not scheduled'
+            else
+              printf 'ran (%s)' "$result"
+            fi
+          }
+
+          if [ "$CLASSIFY_RESULT" = "skipped" ]; then
+            classify_outcome="not scheduled (unsupported base and no opt-in label)"
+          else
+            classify_outcome="ran ($CLASSIFY_RESULT)"
+          fi
+
+          static_outcome="$(describe_scaffold_lane "$RUN_STATIC" "$STATIC_RESULT")"
+          runtime_outcome="$(describe_scaffold_lane "$RUN_RUNTIME" "$RUNTIME_RESULT")"
+
+          {
+            echo "## Scaffold CI lane visibility"
+            echo
+            echo "A successful scaffold job can be a policy skip; this table uses classifier outputs to distinguish it from real execution."
+            echo
+            echo "| Lane | Outcome |"
+            echo "| --- | --- |"
+            printf '| `classify` | %s |\n' "$classify_outcome"
+            printf '| `scaffold-static` | %s |\n' "$static_outcome"
+            printf '| `scaffold-runtime` | %s |\n' "$runtime_outcome"
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -7,7 +7,7 @@
 | Model / effort | `opus-4.8` · medium |
 | Lane | `planning_decisions` / `mobile_orchestration` (same lane) |
 | Mode | Foreground interactive, remote control on |
-| Session id | _record on launch_ |
+| Session id | `session_01HTiQfrNFCVhjQFqbLKm5xo` (launched 2026-07-13) |
 | Host | WSL2 (`/home/codex`) |
 | Checkout | `/home/codex/repos/netscript-beta10` (worktree, cut from `origin/main`) |
 | Branch | `feat/beta10-integration` @ `0341c434` (baseline = `origin/main`) |

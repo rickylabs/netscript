@@ -1,4 +1,5 @@
 import { RemoteError } from '../../../../kernel/domain/errors/cli-exit-error.ts';
+import { NETSCRIPT_RELEASE_VERSION } from '../../../../kernel/constants/jsr-specifiers.ts';
 import type { ProcessPort } from '../../../../kernel/ports/process-port.ts';
 import type { ScaffoldResult } from '@netscript/plugin/protocol';
 import { EXIT_CODES } from '../host/plugin-loader.ts';
@@ -67,7 +68,11 @@ export function isFrameworkVerb(value: string): value is FrameworkVerb {
 
 /** Resolve the JSR CLI specifier for a plugin package. */
 export function resolvePluginCliSpecifier(pkg: string): string {
-  const spec = pkg.startsWith('jsr:') ? pkg : `jsr:${pkg}`;
+  let spec = pkg.startsWith('jsr:') ? pkg : `jsr:${pkg}`;
+  const netscriptPackage = /^(jsr:@netscript\/[^/@]+)(@[^/]+)?(\/.*)?$/.exec(spec);
+  if (netscriptPackage && !netscriptPackage[2]) {
+    spec = `${netscriptPackage[1]}@${NETSCRIPT_RELEASE_VERSION}${netscriptPackage[3] ?? ''}`;
+  }
   return spec.endsWith('/cli') ? spec : `${spec}/cli`;
 }
 
