@@ -154,8 +154,8 @@ builders also emit deprecated bare aliases where an old key already shipped. The
 
 ### AI telemetry adapter
 
-Inject the OpenTelemetry adapter into the AI runtime without adding an OTel
-dependency to `@netscript/ai`:
+Inject the OpenTelemetry adapter into the AI runtime without adding an OTel dependency to
+`@netscript/ai`:
 
 ```ts
 import { createAiRuntime } from '@netscript/ai';
@@ -164,10 +164,10 @@ import { createOtelAiTelemetryPort } from '@netscript/telemetry/ai';
 const ai = createAiRuntime({ telemetry: createOtelAiTelemetryPort() });
 ```
 
-Agent-loop chat operations become GenAI client spans, provider-reported usage
-is recorded as `gen_ai.usage.input_tokens` and `gen_ai.usage.output_tokens`, and
-tool-call signals become `execute_tool` spans. The adapter uses the global OTel
-tracer by default; tests and custom composition roots may inject a tracer.
+Agent-loop chat operations become GenAI client spans, provider-reported usage is recorded as
+`gen_ai.usage.input_tokens` and `gen_ai.usage.output_tokens`, and tool-call signals become
+`execute_tool` spans. The adapter uses the global OTel tracer by default; tests and custom
+composition roots may inject a tracer.
 
 ---
 

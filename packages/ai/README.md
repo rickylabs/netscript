@@ -60,14 +60,17 @@ operation that requests the full Markdown body from the injected source.
 ```ts
 import { createInMemorySkillContentSource, createSkillLoader } from '@netscript/ai/skills';
 
-const source = createInMemorySkillContentSource([{ id: 'review', markdown: `---
+const source = createInMemorySkillContentSource([{
+  id: 'review',
+  markdown: `---
 id: review
 name: Code review
 tags: [review, quality]
 description: Reviews a change for correctness.
 ---
 Inspect the diff and report actionable findings.
-` }]);
+`,
+}]);
 
 const skills = createSkillLoader(source);
 const summaries = await skills.list();
@@ -77,8 +80,8 @@ const document = await skills.load(matches[0]!.skill.id);
 
 Semantic matching is opt-in through an injected `EmbeddingProviderPort`. With semantic matching
 disabled—or with no provider supplied—the loader performs no embedding call and uses tag matching
-only. The shipped in-memory source uses caller-provided strings and requires no filesystem,
-network, git, or environment permission.
+only. The shipped in-memory source uses caller-provided strings and requires no filesystem, network,
+git, or environment permission.
 
 ## Model registry (self-registration)
 
@@ -236,8 +239,8 @@ subprocess and asserts the registry contains **exactly** that one provider.
 
 `composeSystemPrompt` orders opaque, app-owned sections by ascending numeric `precedence`; ties
 retain contribution order. It drops whitespace-only content, trims retained blocks, and joins them
-with exactly one blank line (`\n\n`). Duplicate section names throw
-`DuplicatePromptSectionError`, including when one duplicate is blank.
+with exactly one blank line (`\n\n`). Duplicate section names throw `DuplicatePromptSectionError`,
+including when one duplicate is blank.
 
 ```ts
 import { composeSystemPrompt } from '@netscript/ai';
