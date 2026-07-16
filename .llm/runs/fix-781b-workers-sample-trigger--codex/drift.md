@@ -19,3 +19,13 @@
 - **Severity:** minor
 - **Action:** accept and record; no launch workaround or ad-hoc WSL orchestration.
 - **Evidence:** `supervisor.md`.
+
+## 2026-07-16 — First scaffold runtime attempt invalidated by replaced Deno executable
+
+- **What:** The first canonical scaffold runtime run passed all plugin installs, including workers, then failed at database initialization when Prisma attempted to fork `/home/codex/.deno/bin/deno (deleted)` and received `ENOENT`.
+- **Source:** `.llm/tmp/cli-e2e/plugin-smoke-20260716-233711.log`; `Deno.execPath()` and filesystem inspection after the run.
+- **Expected:** Prisma forks the stable Deno executable during generated database migration.
+- **Actual:** The executable had been replaced while the process was alive, so Linux marked that process image deleted; the fresh path existed immediately afterward.
+- **Severity:** minor
+- **Action:** invalidate the environment-only attempt, preserve cleanup evidence, and rerun the identical canonical command from unchanged committed source.
+- **Evidence:** First run 16 passed / 1 failed at `database.init`; rerun from `29aa84e3` passed 60 / 60 with cleanup.

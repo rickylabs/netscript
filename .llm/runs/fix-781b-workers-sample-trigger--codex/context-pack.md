@@ -6,13 +6,13 @@
 | --- | --- |
 | Run ID | `fix-781b-workers-sample-trigger--codex` |
 | Branch | `fix/781b-workers-sample-trigger` |
-| Current phase | `implementation slice complete; acceptance gates pending` |
+| Current phase | `implementation complete — awaiting supervisor-triggered IMPL-EVAL` |
 | Archetype | `5 — Plugin Package` |
 | Scope overlays | `none` |
 
 ## Current State
 
-The branch is based on current `origin/feat/beta10-integration` (`7d353be2`; merge reported already up to date). The reusable `Worker` now resolves an empty frozen trigger list unless `WorkerOptions.queueTriggers` is explicitly supplied. The embedded export-notification schema/default is removed, and the colocated regression proves empty defaults plus defensive copying.
+The reusable `Worker` now resolves an empty frozen trigger list unless `WorkerOptions.queueTriggers` is explicitly supplied. The embedded export-notification schema/default is removed, and the colocated regression proves empty defaults plus defensive copying. Focused/scoped gates pass; architecture passes; changed-file quality is clean; the canonical scaffold runtime rerun passed 60 / 60 from committed source.
 
 ## Completed
 
@@ -20,16 +20,18 @@ The branch is based on current `origin/feat/beta10-integration` (`7d353be2`; mer
 - Locked the narrow option-resolution design and validation plan.
 - Pushed bootstrap commit `e5e9fa2b` and opened draft PR #793 with the required issue links, taxonomy, and milestone.
 - Implemented the worker-options slice; focused tests and scoped check/lint/fmt wrappers pass.
+- Passed changed-file quality and `arch:check`; repository-wide scan remains red only on two unchanged baseline findings.
+- Passed the canonical full scaffold runtime suite 60 / 60 after invalidating one environment-only attempt where a replaced Deno executable appeared as `(deleted)` to Prisma.
 
 ## In Progress
 
-- Quality, architecture, and canonical scaffold runtime gates.
+- Separate supervisor-triggered IMPL-EVAL.
 
 ## Next Steps
 
-1. Commit/push the implementation slice and post its PR evidence.
-2. Run quality, architecture, and canonical scaffold runtime gates.
-3. Hand off for supervisor-triggered IMPL-EVAL.
+1. Commit/push final gate evidence and update draft PR #793 to `status:impl-eval`.
+2. Parent supervisor dispatches separate IMPL-EVAL.
+3. Do not merge or mark ready until evaluator/close-gate requirements are satisfied.
 
 ## Key Decisions
 
@@ -52,9 +54,9 @@ The branch is based on current `origin/feat/beta10-integration` (`7d353be2`; mer
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Static | pass | focused regression 2/2; scoped check/lint/fmt zero findings |
-| Fitness | pending | not run |
-| Runtime | pending | not run |
-| Consumer | pending | not run |
+| Fitness | pass with repository baseline finding | changed workers files clean; `arch:check` exit 0; repo scan has two unchanged findings |
+| Runtime | pass | canonical `scaffold.runtime`: 60 passed / 0 failed |
+| Consumer | pass | worker install/readiness/health/jobs/tasks/executions and cleanup green |
 
 ## Open Questions
 
@@ -62,7 +64,7 @@ The branch is based on current `origin/feat/beta10-integration` (`7d353be2`; mer
 
 ## Drift and Debt
 
-- Drift: parent PLAN-EVAL artifact and daemon/thread proof are unavailable locally; owner brief authorizes implementation and reserves evaluator dispatch to the supervisor.
+- Drift: parent PLAN-EVAL artifact and daemon/thread proof are unavailable locally; first E2E attempt was invalidated by a replaced Deno executable, then the unchanged rerun passed 60/60.
 - Debt: no new or deepened architecture debt planned.
 
 ## Commits
