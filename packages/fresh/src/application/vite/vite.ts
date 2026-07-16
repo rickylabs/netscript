@@ -22,6 +22,14 @@ export type { NetScriptRouteManifestOptions } from '../route/manifest.ts';
 const ROUTE_MANIFEST_WATCH_DEBOUNCE_MS = 25;
 const ABSOLUTE_PATH_PATTERN = /^(?:[A-Za-z]:\/|\/)/;
 const PREACT_IMPORT_PATTERN = /^(?:npm:\/?)?preact(?:@[^/]+)?(?:\/|$)/;
+const PREACT_SIGNALS_IMPORT = '@preact/signals';
+const PREACT_SIGNALS_IMPORT_PATTERN = /^(?:npm:\/?)?@preact\/signals(?:@[^/]+)?(?<subpath>\/.*)?$/;
+
+function canonicalizePreactSignalsImport(source: string): string | undefined {
+  const match = PREACT_SIGNALS_IMPORT_PATTERN.exec(source);
+  if (!match) return undefined;
+  return `${PREACT_SIGNALS_IMPORT}${match.groups?.subpath ?? ''}`;
+}
 
 function resolveConfigPath(path: string): string {
   return ABSOLUTE_PATH_PATTERN.test(path) ? normalizePath(path) : normalizePath(resolve(path));
@@ -301,10 +309,11 @@ export function createNetScriptVitePlugin(
 
       config.resolve = {
         ...(aliasEntries.length > 0 ? { alias: aliasEntries } : {}),
-        // Dedupe selects one installed Preact package for linked/peer graphs.
+        // Dedupe selects one installed Preact runtime for linked/peer graphs.
         // The resolve hook below additionally canonicalizes slash variants of
-        // that package's final Windows module IDs.
-        dedupe: ['preact'],
+        // final Windows module IDs and converges Fresh's versioned Signals
+        // import on the app-owned import-map entry.
+        dedupe: ['preact', PREACT_SIGNALS_IMPORT],
       };
 
       if (allowFsPaths.length > 0) {
@@ -365,9 +374,13 @@ export function createNetScriptVitePlugin(
     async resolveId(source, importer, options) {
       const aliasImport = resolveAliasImport(source, aliasEntries);
       if (aliasImport) return aliasImport;
-      if (!PREACT_IMPORT_PATTERN.test(source)) return null;
+      const preactSignalsImport = canonicalizePreactSignalsImport(source);
+      if (!preactSignalsImport && !PREACT_IMPORT_PATTERN.test(source)) return null;
 
-      const resolved = await this.resolve(source, importer, { ...options, skipSelf: true });
+      const resolved = await this.resolve(preactSignalsImport ?? source, importer, {
+        ...options,
+        skipSelf: true,
+      });
       if (!resolved) return null;
 
       return { ...resolved, id: normalizePath(resolved.id) };
