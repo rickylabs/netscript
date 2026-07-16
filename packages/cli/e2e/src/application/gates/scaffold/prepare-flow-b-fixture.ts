@@ -7,7 +7,8 @@ if (!projectRoot) {
 }
 
 const mode = Deno.args[1] === 'published' ? 'published' : 'local';
-const healthJobPath = `${projectRoot}/workers/jobs/health-check.ts`;
+const flowBJobId = 'flow-b-callback';
+const flowBJobPath = `${projectRoot}/workers/jobs/${flowBJobId}.ts`;
 
 const denoConfigPath = `${projectRoot}/deno.json`;
 const denoConfig = JSON.parse(await Deno.readTextFile(denoConfigPath));
@@ -129,7 +130,24 @@ await Deno.writeTextFile(
     registerPlugins.slice(nextResourceIndex),
 );
 
-const healthJob = await Deno.readTextFile(healthJobPath);
+const workersCli = mode === 'published'
+  ? `jsr:@netscript/plugin-workers@${publishedVersion}/cli`
+  : `${sourceRoot}/plugins/workers/src/cli/composition/main.ts`;
+await runDeno(
+  [
+    'run',
+    '-A',
+    '--minimum-dependency-age=0',
+    workersCli,
+    'add',
+    'job',
+    flowBJobId,
+    '--topic=default',
+  ],
+  projectRoot,
+  'workers add job',
+);
+const flowBJob = await Deno.readTextFile(flowBJobPath);
 const callbackImports = [
   "import { UsersV1 } from '../../contracts/versions/v1/users.contract.ts';",
   "import { createServiceClient } from '@netscript/sdk/client';",
@@ -150,8 +168,8 @@ const callbackBody = [
   '  });',
 ].join('\n');
 
-let updatedHealthJob = healthJob;
-updatedHealthJob = updatedHealthJob
+let updatedFlowBJob = flowBJob;
+updatedFlowBJob = updatedFlowBJob
   .replace('  const flowBCorrelationId = context.correlationId ?? context.id;\n', '')
   .replace(
     "  await Deno.writeTextFile('.netscript/e2e/flow-b-correlation-id', flowBCorrelationId);\n",
@@ -161,23 +179,23 @@ updatedHealthJob = updatedHealthJob
     "attributes: { 'netscript.correlation.id': flowBCorrelationId }",
     "attributes: { 'netscript.correlation.id': context.correlationId ?? context.id }",
   );
-if (!updatedHealthJob.includes("from '@netscript/sdk/client'")) {
-  updatedHealthJob = `${callbackImports}\n${updatedHealthJob}`;
+if (!updatedFlowBJob.includes("from '@netscript/sdk/client'")) {
+  updatedFlowBJob = `${callbackImports}\n${updatedFlowBJob}`;
 }
-if (!updatedHealthJob.includes("'flow-b.callback'")) {
-  updatedHealthJob = updatedHealthJob.replace(
+if (!updatedFlowBJob.includes("'flow-b.callback'")) {
+  updatedFlowBJob = updatedFlowBJob.replace(
     'defineJobHandler((context) => {',
     'defineJobHandler(async (context) => {',
   );
   const marker = '  return createSuccessResult({';
-  const markerIndex = updatedHealthJob.indexOf(marker);
+  const markerIndex = updatedFlowBJob.indexOf(marker);
   if (markerIndex < 0) {
-    throw new Error('generated workers health job completion marker was not found');
+    throw new Error('generated Flow-B callback job completion marker was not found');
   }
-  updatedHealthJob = updatedHealthJob.slice(0, markerIndex) + callbackBody + '\n\n' +
-    updatedHealthJob.slice(markerIndex);
+  updatedFlowBJob = updatedFlowBJob.slice(0, markerIndex) + callbackBody + '\n\n' +
+    updatedFlowBJob.slice(markerIndex);
 }
-await Deno.writeTextFile(healthJobPath, updatedHealthJob);
+await Deno.writeTextFile(flowBJobPath, updatedFlowBJob);
 
 const registerBackgroundPath = `${projectRoot}/aspire/.helpers/register-background.mts`;
 const registerBackground = await Deno.readTextFile(registerBackgroundPath);
@@ -223,53 +241,56 @@ const triggerPath = `${projectRoot}/triggers/generic-inbound-webhook.ts`;
 const triggerSource = await Deno.readTextFile(triggerPath);
 const updatedTriggerSource = triggerSource.replaceAll(
   'workers-plugin-health-check',
-  'health-check',
-).replaceAll('Workers Health Check', 'Flow-B Health Check');
-if (updatedTriggerSource === triggerSource && !triggerSource.includes("id: 'health-check'")) {
-  throw new Error('generated trigger did not reference workers-plugin-health-check');
+  flowBJobId,
+).replaceAll('Workers Health Check', 'Flow-B Callback');
+if (updatedTriggerSource === triggerSource && !triggerSource.includes(`id: '${flowBJobId}'`)) {
+  throw new Error('generated trigger did not reference the Flow-B callback job');
 }
 await Deno.writeTextFile(triggerPath, updatedTriggerSource);
 
 const registryPath = `${projectRoot}/.netscript/generated/plugin-workers/job-registry.ts`;
-await Deno.mkdir(`${projectRoot}/.netscript/generated/plugin-workers`, { recursive: true });
-await Deno.writeTextFile(
-  registryPath,
-  [
-    "import type { RegisterJobInput, StaticJobRegistry } from '@netscript/plugin-workers-core/runtime';",
-    "import { healthCheckJob } from '../../../workers/jobs/health-check.ts';",
-    '',
-    'const definition = {',
-    "  id: 'health-check',",
-    "  name: 'Flow-B Health Check',",
-    "  entrypoint: './workers/jobs/health-check.ts',",
-    "  topic: 'default',",
-    "  source: 'local',",
-    "  executionType: 'deno',",
-    "  timezone: 'UTC',",
-    '  timeout: 300000,',
-    '  maxRetries: 1,',
-    '  retryDelay: 1000,',
-    '  maxConcurrency: 1,',
-    '  priority: 50,',
-    '  enabled: true,',
-    '  persist: true,',
-    "  tags: ['flow-b', 'e2e'],",
-    '  importMapUrl: new URL("../../e2e/flow-b-import-map.json", import.meta.url).href,',
-    '  permissions: { net: true, read: true, env: true },',
-    '} satisfies RegisterJobInput;',
-    '',
-    "export const jobRegistry: StaticJobRegistry = new Map([['health-check', healthCheckJob]]);",
-    'export const registry = jobRegistry;',
-    "export const jobDefinitions = new Map<string, RegisterJobInput>([['health-check', definition]]);",
-    'export const definitions = jobDefinitions;',
-    '',
-  ].join('\n'),
+const registrySource = await Deno.readTextFile(registryPath);
+const flowBEntrypoint = `./${flowBJobId}.ts`;
+const quotedEntrypoints = [JSON.stringify(flowBEntrypoint), `'${flowBEntrypoint}'`];
+const flowBDefinitionLine = registrySource.split('\n').find((line) =>
+  line.includes('createLocalJobDefinition(') &&
+  quotedEntrypoints.some((entrypoint) => line.includes(entrypoint))
 );
+if (!flowBDefinitionLine) {
+  throw new Error('generated workers registry did not contain the Flow-B callback job');
+}
+const configuredDefinitionLine = flowBDefinitionLine.replace(
+  'createLocalJobDefinition(',
+  'createFlowBJobDefinition(',
+);
+const configuredRegistrySource = registrySource.replace(
+  flowBDefinitionLine,
+  configuredDefinitionLine,
+) + [
+  '',
+  'function createFlowBJobDefinition(id: string, entrypoint: string): RegisterJobInput {',
+  '  return {',
+  '    ...createLocalJobDefinition(id, entrypoint),',
+  '    importMapUrl: new URL("../../e2e/flow-b-import-map.json", import.meta.url).href,',
+  '    permissions: { net: true, read: true, env: true },',
+  '    tags: ["flow-b", "e2e"],',
+  '  };',
+  '}',
+  '',
+].join('\n');
+await Deno.writeTextFile(registryPath, configuredRegistrySource);
 
 console.info('Flow-B generated callback fixture wired');
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+async function runDeno(args: readonly string[], cwd: string, label: string): Promise<void> {
+  const result = await new Deno.Command('deno', { args: [...args], cwd }).output();
+  if (result.success) return;
+  const stderr = new TextDecoder().decode(result.stderr).trim();
+  throw new Error(`${label} failed: ${stderr}`);
 }
 
 // Pre-warm the flow-b module graph before Aspire launches workers-api: the

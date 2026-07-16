@@ -23,3 +23,17 @@ Deno.test('jobs-dir-relative local job entrypoint keeps the generated registry c
 
   assertEquals(resolved, toFileUrl(resolve(projectRoot, 'workers/jobs/health-check.ts')).href);
 });
+
+Deno.test('project-root-qualified job uses the configured jobs directory without special cases', () => {
+  const projectRoot = resolve('fixture-project');
+  const resolved = resolveLocalJobEntrypoint(
+    projectRoot,
+    './background/inventory-jobs',
+    './background/inventory-jobs/sync-catalog.ts',
+  );
+
+  assertEquals(
+    resolved,
+    toFileUrl(resolve(projectRoot, 'background/inventory-jobs/sync-catalog.ts')).href,
+  );
+});
