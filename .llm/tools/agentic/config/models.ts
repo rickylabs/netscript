@@ -24,6 +24,8 @@ export const MODEL_IDS = {
   fable: 'fable-5',
   /** Anthropic/Claude documentation/workflow model. */
   opus: 'opus-4.8',
+  /** Anthropic/Claude cost-efficient docs / cleanup / easy-chore model. */
+  sonnet: 'sonnet-5',
   /** Google/Antigravity CLI identifier. */
   antigravity: 'agy',
 } as const;
