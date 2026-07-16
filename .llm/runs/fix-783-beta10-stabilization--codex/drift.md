@@ -46,3 +46,28 @@
 - **Severity:** significant
 - **Action:** accept as the written owner override; do not self-certify.
 - **Evidence:** User prompt and `supervisor.md`.
+
+## 2026-07-16 — Full local-source scratch scaffold cannot serve routes
+
+- **What:** The broad scratch scaffold production server returned a dependency-cycle error for
+  both the new Markdown route and the untouched root route.
+- **Source:** `.llm/tmp/issue-783-browser` production smoke.
+- **Expected:** Use the broad scaffold for the browser hydration proof.
+- **Actual:** The failure reproduced without the Markdown route, so an isolated minimal Fresh
+  fixture was used to prove this slice's build and hydration contract.
+- **Severity:** minor
+- **Action:** record; retain the required canonical `scaffold.runtime` gate as the final verdict.
+- **Evidence:** Minimal fixture built and hydrated with zero browser console messages.
+
+## 2026-07-16 — Repository quality scan has untouched plugin findings
+
+- **What:** `deno task quality:scan` exits 1 on an existing `@ts-ignore` in streams and an unsafe
+  cast in triggers.
+- **Source:** Required repository quality scan.
+- **Expected:** Exit 0.
+- **Actual:** The scanner covers `packages/cli/src` and `plugins`, not the touched
+  `packages/fresh-ui` root; both findings predate and are outside this slice.
+- **Severity:** minor
+- **Action:** record as external gate debt; do not broaden #783 into unrelated plugin fixes.
+- **Evidence:** `plugins/streams/services/src/proxy.ts:180` and
+  `plugins/triggers/streams/producer.ts:34`.

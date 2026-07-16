@@ -6,16 +6,17 @@
 | --- | --- |
 | Run ID | `fix-783-beta10-stabilization--codex` |
 | Branch | `fix/783-beta10-stabilization` |
-| Current phase | `plan` |
+| Current phase | `implementation` |
 | Archetype | `4 — Public DSL / Builder` |
 | Scope overlays | `frontend` |
 
 ## Current State
 
-Issue #783 was fetched through the required token resolver/API path and reproduced in a real local
-Fresh scaffold. Baseline copied Markdown fails type-check with three React-wrapper boundary errors.
-A research-only scratch direct `rehype-react` + Preact processor passes type-check and SSR contract
-assertions. No product source implementation has begun.
+Issue #783 was reproduced at the copied registry layer and fixed there. The Markdown item now uses
+an ordered unified pipeline ending in `rehype-react` with the Preact JSX runtime, declares only its
+direct renderer dependencies, and no longer installs React or `react-markdown`. Actual `ui:add`
+output type-checks, renders the content/security matrix, production-builds in Fresh, and hydrates in
+a browser with zero console messages.
 
 ## Completed
 
@@ -24,17 +25,19 @@ assertions. No product source implementation has begun.
 - Public surface inspected with `deno doc`.
 - Owning-layer reproduction and scratch feasibility proof captured.
 - Plan and Design checkpoint locked.
+- Direct renderer, registry dependency/docs, generated mirror, and regressions implemented.
+- Scoped check/lint/fmt, 137 package tests, architecture, production build, browser hydration,
+  doc-lint, and publish dry-run completed.
 
 ## In Progress
 
-- Bootstrap commit, explicit push, and draft PR creation.
+- Implementation slice commit/push and canonical full scaffold runtime gate.
 
 ## Next Steps
 
-1. Commit/push the harness bootstrap and open the required draft PR.
-2. Implement direct renderer/dependency/docs/generated/test slice.
-3. Add and run generated Fresh build/hydration regression.
-4. Run all scoped, quality, doctrine, package, and scaffold gates; update artifacts/PR.
+1. Commit and explicitly push the implementation slice; post phase evidence to draft PR #790.
+2. Run the canonical full `scaffold.runtime` gate.
+3. Update final artifacts and PR body without marking ready or self-certifying.
 
 ## Key Decisions
 
@@ -49,16 +52,19 @@ assertions. No product source implementation has begun.
 
 | Path | Status | Notes |
 | --- | --- | --- |
-| `.llm/runs/fix-783-beta10-stabilization--codex/*` | new | Harness bootstrap only. |
+| `packages/fresh-ui/registry/**` | modified | Direct renderer, helper typing/docs, generated mirror. |
+| `packages/fresh-ui/registry.manifest.ts` | modified | Direct dependency graph; React wrapper removed. |
+| `packages/fresh-ui/tests/registry/**` | modified/new | Helper, copied renderer, production-build regressions. |
+| `.llm/runs/fix-783-beta10-stabilization--codex/*` | modified | Harness evidence and drift. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | reproduction + scratch proof | baseline fail; candidate check pass |
-| Fitness | planned | doctrine/archetype selected; executable gates pending |
-| Runtime | scratch SSR pass | production/browser pending |
-| Consumer | baseline reproduced | fixed generated-app gate pending |
+| Static | pass | scoped check/lint/fmt; actual copied renderer check |
+| Fitness | pass with external scan debt | arch pass; quality scan finds two untouched plugin issues |
+| Runtime | pass | production client/SSR build and browser hydration |
+| Consumer | pass, final gate pending | actual `ui:add` render/build regressions; full scaffold pending |
 
 ## Open Questions
 
@@ -72,4 +78,3 @@ assertions. No product source implementation has begun.
 ## Commits
 
 - See the draft PR's commit list + per-slice PR comments after bootstrap push.
-
