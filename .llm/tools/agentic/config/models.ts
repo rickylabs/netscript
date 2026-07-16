@@ -24,6 +24,8 @@ export const MODEL_IDS = {
   fable: 'fable-5',
   /** Anthropic/Claude documentation/workflow model. */
   opus: 'opus-4.8',
+  /** Anthropic/Claude cost-efficient review model (token-limit fallback for Claude-family review pairings). */
+  sonnet: 'sonnet-5',
   /** Google/Antigravity CLI identifier. */
   antigravity: 'agy',
 } as const;
