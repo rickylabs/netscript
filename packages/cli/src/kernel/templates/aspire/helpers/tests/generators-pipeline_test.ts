@@ -158,6 +158,16 @@ describe('HelpersGeneratorPipeline', () => {
     assertStringIncludes(compat!.content, 'pathToFileURL(');
   });
 
+  it('should bound best-effort Garnet tool restore', async () => {
+    const pipeline = new HelpersGeneratorPipeline();
+    const files = await pipeline.execute({ config: fixtures.POPULATED_CONFIG });
+    const compat = files.find((f) => f.path === '.helpers/_aspire-compat.mts');
+
+    assert(compat, 'compat helper should exist in output');
+    assertStringIncludes(compat!.content, 'GARNET_TOOL_RESTORE_TIMEOUT_MS = 10_000');
+    assertStringIncludes(compat!.content, 'timeout: GARNET_TOOL_RESTORE_TIMEOUT_MS');
+  });
+
   it('should pass populated config through to Tier 1 generator content', async () => {
     const pipeline = new HelpersGeneratorPipeline();
     const files = await pipeline.execute({ config: fixtures.POPULATED_CONFIG });

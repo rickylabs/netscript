@@ -98,8 +98,8 @@ source `.template` assets when generated helper runtime behavior changes, run
 | --- | --- | --- | --- | --- |
 | Plan bootstrap | complete | `79ccd9bb` | Plan-Gate inputs prepared | pushed; PR #795 opened |
 | C1 executable emission | complete | `8336acff` | focused tests 8 suites / 80 steps; scoped CLI check/lint/fmt PASS | pushed; PR comment posted |
-| C2 environment projection | complete | pending | focused tests 12 suites / 94 steps; scoped Aspire/CLI check/lint/fmt PASS | pending |
-| C3 bounded restore | pending | pending | pending | pending |
+| C2 environment projection | complete | `cd015efd` | focused tests 12 suites / 94 steps; scoped Aspire/CLI check/lint/fmt PASS | pushed; PR comment posted |
+| C3 bounded restore | complete | pending | focused tests 2 suites / 16 steps; scoped CLI check/lint/fmt PASS | pending |
 
 ## Gate results
 
@@ -132,6 +132,18 @@ The former resource-workdir-relative SQLite assertions now require the generated
 `DB_PROVIDER` and `DATABASE_PROVIDER` from `PrimaryDatabase`; DB CLI/tool-relative URLs remain
 unchanged because those resources already execute inside their database directories.
 
+### C3 bounded Garnet restore
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Focused compat-pipeline tests | PASS | 2 suites / 16 steps, exit 0 |
+| Scoped check | PASS | CLI helper/assets roots, 23 files, 0 findings |
+| Scoped lint | PASS | CLI helper/assets roots, 23 files, 0 findings |
+| Scoped format | PASS | CLI helper/assets roots, 23 files, 0 findings |
+
+The generated runtime edge now passes a named 10-second timeout to the best-effort synchronous
+`dotnet tool restore`; its existing failure handling and lifecycle behavior are otherwise unchanged.
+
 ## Reconcile notes
 
 - Bootstrap: #791 is open at `status:impl`, milestone `0.0.1-beta.10`; #781 is open as the
@@ -145,3 +157,5 @@ unchanged because those resources already execute inside their database director
 - C2 reconcile: the environment fixes remain at the owning source/helper-template layers and the
   embedded asset was regenerated. No new suppression, dependency, public export, or architecture
   exception was introduced.
+- C3 reconcile: the bounded restore matches the locked plan without broadening into Garnet
+  lifecycle redesign. No new suppression, dependency, or architecture exception was introduced.

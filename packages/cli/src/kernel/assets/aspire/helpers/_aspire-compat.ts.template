@@ -91,6 +91,8 @@ export const RESOURCE_DEFAULTS = {
   HttpEndpointName: 'http',
 } as const;
 
+const GARNET_TOOL_RESTORE_TIMEOUT_MS = 10_000;
+
 // ============================================================================
 // Path helpers
 // ============================================================================
@@ -370,6 +372,7 @@ export function ensureGarnetToolManifest(
     execFileSync("dotnet", ["tool", "restore"], {
       cwd: appHostDir,
       stdio: "ignore",
+      timeout: GARNET_TOOL_RESTORE_TIMEOUT_MS,
     });
   } catch {
     // Restore failures surface when the executable resource starts; the
