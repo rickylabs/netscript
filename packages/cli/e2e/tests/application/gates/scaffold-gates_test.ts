@@ -4,7 +4,12 @@ import { createSmokeProject } from '../../../src/application/builders/workspace/
 import { createGeneratedCheckGates } from '../../../src/application/gates/scaffold/database-gates.ts';
 import { createScaffoldGates } from '../../../src/application/gates/scaffold/scaffold-gates.ts';
 import { GATE, SCAFFOLD } from '../../../src/domain/cli-surface.ts';
-import { DATABASE, PACKAGE_SOURCE, REPORT_FORMAT } from '../../../src/domain/extension-axes.ts';
+import {
+  DATABASE,
+  PACKAGE_SOURCE,
+  PLUGIN,
+  REPORT_FORMAT,
+} from '../../../src/domain/extension-axes.ts';
 import type { CommandGateDefinition } from '../../../src/domain/gate-definition.ts';
 import type { RunContext, RunOptions } from '../../../src/domain/run-context.ts';
 
@@ -69,6 +74,20 @@ Deno.test('scaffold contract add gate targets the generated workspace', () => {
       '/repo/.llm/tmp/cli-e2e/prod-local-test',
     ],
   );
+});
+
+Deno.test('published AI lifecycle gate reuses the published CLI version', () => {
+  const gate = createScaffoldGates({ plugins: [PLUGIN.AI], samples: false }).find((entry) =>
+    entry.id === GATE.SCAFFOLD_PLUGIN_AI_LIFECYCLE
+  );
+  if (!gate || gate.kind !== 'command') {
+    throw new Error('Expected AI lifecycle gate to be a command gate.');
+  }
+
+  const command = gate.command(
+    createContext('jsr:@netscript/cli@0.0.1-beta.9', PACKAGE_SOURCE.JSR),
+  );
+  assertEquals(command[3], 'jsr:@netscript/plugin-ai@0.0.1-beta.9/cli');
 });
 
 function scaffoldInitGate(): CommandGateDefinition {
