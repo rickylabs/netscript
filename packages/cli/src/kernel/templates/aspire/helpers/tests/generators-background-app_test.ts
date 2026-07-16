@@ -230,13 +230,13 @@ describe('generateRegisterApps', () => {
     assertStringIncludes(output, "from './_aspire-compat.mjs'");
   });
 
-  it('should register app type via addExecutable with default entrypoint', () => {
+  it('should register app type with valid deno task argv', () => {
     const output = generateRegisterApps({
       ...emptyOptions,
       apps: { frontend: fixtures.MINIMAL_APP },
     });
     assertStringIncludes(output, "builder.addExecutable('frontend', 'deno',");
-    assertStringIncludes(output, "'--minimum-dependency-age=0'");
+    assert(!output.includes('--minimum-dependency-age=0'));
     assertStringIncludes(output, "apps.set('frontend'");
   });
 
@@ -270,13 +270,13 @@ describe('generateRegisterApps', () => {
     assertStringIncludes(output, ".withHttpEndpoint({ port: 8000, env: 'PORT' })");
   });
 
-  it('should enable browser logs for app resources with HTTP endpoints', () => {
+  it('should not emit browser-log capabilities for generic executable apps', () => {
     const output = generateRegisterApps({
       ...emptyOptions,
       apps: { frontend: fixtures.MINIMAL_APP },
     });
 
-    assertStringIncludes(output, 'await frontend.withBrowserLogs();');
+    assert(!output.includes('withBrowserLogs'));
   });
 
   it('should use deno task for app registration', () => {
@@ -284,7 +284,7 @@ describe('generateRegisterApps', () => {
       ...emptyOptions,
       apps: { frontend: fixtures.MINIMAL_APP },
     });
-    assertStringIncludes(output, "['task', '--minimum-dependency-age=0', 'dev']");
+    assertStringIncludes(output, "['task', 'dev']");
   });
 
   it('should include VITE service-discovery injection for service references', () => {

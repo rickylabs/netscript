@@ -2,8 +2,9 @@
 
 ## Current state
 
-Research, re-baseline, plan, and Design checkpoint are complete on base `7d353be`. The run is ready
-for the supervisor-owned PLAN-EVAL. No framework implementation has begun.
+Research, re-baseline, plan, and Design checkpoint are complete on base `7d353be`. The supervisor
+recorded plan commit `79ccd9bb` and PR #795, then explicitly authorized implementation of the locked
+plan as a written Plan-Gate override. C1 implementation and focused gates are complete.
 
 ## Scope
 
@@ -38,5 +39,4 @@ Focused tests, asset parity, scoped check/lint/fmt wrappers over both touched pa
 
 ## Next action
 
-Supervisor PLAN-EVAL, then C1 implementation if the verdict is PASS.
-
+Commit, push, and comment C1 on PR #795, then implement C2 environment projection.

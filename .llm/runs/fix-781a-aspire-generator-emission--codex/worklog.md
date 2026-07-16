@@ -7,7 +7,7 @@
 | Run ID | `fix-781a-aspire-generator-emission--codex` |
 | Branch | `fix/781a-aspire-generator-emission` |
 | Baseline | `7d353be24ccdf0de656f1e70ae73167102da8528` |
-| Phase | Plan & Design — ready for supervisor PLAN-EVAL |
+| Phase | Implement — supervisor-authorized Plan-Gate override |
 
 ## Design
 
@@ -96,18 +96,34 @@ source `.template` assets when generated helper runtime behavior changes, run
 
 | Slice | Status | Commit | Focused gate | Push / PR comment |
 | --- | --- | --- | --- | --- |
-| Plan bootstrap | in progress | pending | Plan-Gate inputs prepared | pending |
-| C1 executable emission | pending | pending | pending | pending |
+| Plan bootstrap | complete | `79ccd9bb` | Plan-Gate inputs prepared | pushed; PR #795 opened |
+| C1 executable emission | complete | pending | focused tests 8 suites / 80 steps; scoped CLI check/lint/fmt PASS | pending |
 | C2 environment projection | pending | pending | pending | pending |
 | C3 bounded restore | pending | pending | pending | pending |
 
 ## Gate results
 
-Pending implementation.
+### C1 executable capability/argv emission
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Focused generator tests | PASS | 8 suites / 80 steps, exit 0 |
+| Scoped check | PASS | helper root, 20 files, 0 findings |
+| Scoped lint | PASS | helper root, 20 files, 0 findings |
+| Scoped format | PASS | helper root, 20 files, 0 findings |
+
+Existing invalid expectations were deliberately reversed: generic executable apps now assert no
+`withBrowserLogs()`, app/Tauri/task/tool argv assert valid `['task', taskName]` shapes, and DB CLI
+mode explicitly remains free of the unsupported dependency-age flag. Valid `deno run` dependency-
+age usage remains asserted, and plugin API resources now assert `--unstable-no-legacy-abort`.
 
 ## Reconcile notes
 
 - Bootstrap: #791 is open at `status:impl`, milestone `0.0.1-beta.10`; #781 is open as the
   coordinating parent. Final draft PR must close only #791 and reference #781 without a closing
   keyword.
-
+- Supervisor continuation: on 2026-07-16 the supervisor recorded plan commit `79ccd9bb` and draft
+  PR #795, then explicitly instructed this lane to implement the locked plan. This is the written
+  Plan-Gate override allowed by `run-loop.md`; this lane did not dispatch or self-certify PLAN-EVAL.
+- C1 reconcile: #791 and #781 have no new comments changing scope. The implementation matches the
+  locked executable-emission cluster; no dependency, export, debt, or suppression was introduced.

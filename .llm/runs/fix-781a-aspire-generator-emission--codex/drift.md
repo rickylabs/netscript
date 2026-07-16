@@ -36,3 +36,13 @@
 - **Severity:** minor workflow constraint.
 - **Action:** This session prepares artifacts and implementation evidence but does not dispatch or
   self-certify either evaluator pass.
+
+## 2026-07-16 — supervisor authorizes implementation without a plan-eval artifact
+
+- **What:** The implementation lane stopped after plan commit `79ccd9bb` because no separate-session
+  `plan-eval.md` existed.
+- **Actual:** The supervisor recorded the plan commit and PR #795, then explicitly instructed this
+  lane to continue the locked implementation while retaining evaluator dispatch externally.
+- **Severity:** significant workflow override.
+- **Action:** Treat the supervisor's written continuation as the user-authorized Plan-Gate waiver
+  permitted by `run-loop.md`; do not fabricate a PLAN-EVAL verdict or artifact.

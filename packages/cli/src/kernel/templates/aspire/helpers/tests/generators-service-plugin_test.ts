@@ -193,6 +193,7 @@ describe('generateRegisterPlugins', () => {
     });
     assertStringIncludes(output, "builder.addExecutable('auth', 'deno', workdir,");
     assertStringIncludes(output, "'--minimum-dependency-age=0'");
+    assertStringIncludes(output, "'--unstable-no-legacy-abort'");
     assertStringIncludes(output, '.withHttpEndpoint({ port: 4400');
     assertStringIncludes(output, "plugins.set('auth'");
   });
