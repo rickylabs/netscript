@@ -1,3 +1,5 @@
+import type { StandardSchemaV1 } from '@standard-schema/spec';
+
 /** Typed stream topic definition. */
 export interface StreamTopicDefinition<TPayload = never> {
   /** Durable stream topic name. */
@@ -69,16 +71,5 @@ export function defineStreamConsumer<TPayload>(
 }
 
 /** Package-owned structural payload schema accepted by stream topic definitions. */
-export interface StreamPayloadSchema<TPayload = unknown> {
-  /** Standard Schema-compatible metadata used by validators. */
-  readonly '~standard': {
-    /** Standard Schema version marker. */
-    readonly version: 1;
-    /** Schema vendor identifier. */
-    readonly vendor: string;
-    /** Validate an unknown payload value. */
-    readonly validate: (value: unknown) => unknown;
-    /** Optional input/output type witness carried by Standard Schema providers. */
-    readonly types?: unknown;
-  };
-}
+export interface StreamPayloadSchema<TPayload = unknown>
+  extends StandardSchemaV1<unknown, TPayload> {}

@@ -1,7 +1,42 @@
+/** Validation options accepted by Standard Schema validators. */
+export interface StreamSchemaValidationOptions {
+  /** Optional library-specific validation parameters. */
+  readonly libraryOptions?: Record<string, unknown>;
+}
+
+/** One validation issue returned by a Standard Schema validator. */
+export interface StreamSchemaIssue {
+  /** Human-readable validation failure. */
+  readonly message: string;
+  /** Optional property path associated with the failure. */
+  readonly path?: ReadonlyArray<PropertyKey | Readonly<{ key: PropertyKey }>>;
+}
+
+/** Result returned by a Standard Schema validator. */
+export type StreamSchemaValidationResult<T> =
+  | Readonly<{ value: T; issues?: undefined }>
+  | Readonly<{ issues: readonly StreamSchemaIssue[] }>;
+
+/** Package-owned Standard Schema surface used by durable stream collections. */
+export interface StreamStandardSchema<T = unknown> {
+  /** Standard Schema metadata and validator. */
+  readonly '~standard': {
+    /** Standard Schema version marker. */
+    readonly version: 1;
+    /** Schema provider identifier. */
+    readonly vendor: string;
+    /** Validate an unknown value into a collection entity. */
+    readonly validate: (
+      value: unknown,
+      options?: StreamSchemaValidationOptions,
+    ) => StreamSchemaValidationResult<T> | Promise<StreamSchemaValidationResult<T>>;
+  };
+}
+
 /** A single collection definition inside a durable stream schema. */
 export interface CollectionDefinition<T = unknown> {
   /** Standard Schema compatible validator used by durable-streams. */
-  readonly schema: DurableCollectionDefinition<T>['schema'];
+  readonly schema: StreamStandardSchema<T>;
   /** State Protocol type discriminator emitted for the collection. */
   readonly type: string;
   /** Property name used as the entity primary key. */
@@ -38,8 +73,8 @@ export type CollectionWithHelpers<T = unknown> =
 export type StreamStateDefinition = Record<string, CollectionDefinition>;
 
 /** Schema map returned by `defineStreamSchema`. */
-export type StateSchema<TDef extends StreamStateDefinition> = DurableStateSchema<TDef>;
-import type {
-  CollectionDefinition as DurableCollectionDefinition,
-  StateSchema as DurableStateSchema,
-} from '@durable-streams/state';
+export type StateSchema<TDef extends StreamStateDefinition> = {
+  readonly [K in keyof TDef]: CollectionWithHelpers<
+    TDef[K] extends CollectionDefinition<infer T> ? T : unknown
+  >;
+};

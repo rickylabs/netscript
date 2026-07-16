@@ -24,6 +24,9 @@ export type { StateSchema, StreamStateDefinition } from '../domain/stream-schema
  */
 export function defineStreamSchema<TDef extends StreamStateDefinition>(
   collections: TDef,
-): StateSchema<TDef> {
+): StateSchema<TDef>;
+export function defineStreamSchema(
+  collections: StreamStateDefinition,
+): ReturnType<typeof createStateSchema> {
   return createStateSchema(collections);
 }

@@ -1,5 +1,5 @@
 import { createDurableStream, type DurableStreamProducer } from '@netscript/plugin-streams-core';
-import { sagasStreamSchema } from './schema.ts';
+import { type SagasStreamDefinition, sagasStreamSchema } from './schema.ts';
 
 export type { DurableStreamProducer, StreamProducerPort } from '@netscript/plugin-streams-core';
 export type { SagasStreamDefinition, StateSchema, StreamStateDefinition } from './schema.ts';
@@ -7,7 +7,7 @@ export type { SagasStreamDefinition, StateSchema, StreamStateDefinition } from '
 const STREAM_PATH = '/sagas/instances';
 const PRODUCER_ID = 'sagas-service';
 
-let producer: DurableStreamProducer<typeof sagasStreamSchema> | undefined;
+let producer: DurableStreamProducer<SagasStreamDefinition> | undefined;
 let reconciliationStarted = false;
 
 /** Selected Prisma fields required to mirror saga instance state. */
@@ -59,7 +59,7 @@ export interface SagasStreamMirrorOptions {
 }
 
 /** Get or create the sagas stream producer. */
-export function getSagasStreamProducer(): DurableStreamProducer<typeof sagasStreamSchema> {
+export function getSagasStreamProducer(): DurableStreamProducer<SagasStreamDefinition> {
   if (!producer) {
     producer = createDurableStream({
       streamPath: STREAM_PATH,
@@ -79,7 +79,7 @@ export async function startSagasStreamMirror(
 }
 
 async function startSagaStateReconciliation(
-  streamProducer: DurableStreamProducer<typeof sagasStreamSchema>,
+  streamProducer: DurableStreamProducer<SagasStreamDefinition>,
   options: SagasStreamMirrorOptions,
 ): Promise<void> {
   if (reconciliationStarted || !options.prisma) {

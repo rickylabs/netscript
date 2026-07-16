@@ -1,12 +1,17 @@
 import {
   type CollectionDefinition,
   type CollectionEventHelpers,
+  type CollectionWithHelpers,
   defineStreamSchema,
   type StateSchema,
+  type StreamSchemaIssue,
+  type StreamSchemaValidationOptions,
+  type StreamSchemaValidationResult,
+  type StreamStandardSchema,
   type StreamStateDefinition,
 } from '@netscript/plugin-streams-core';
 import { z } from 'zod';
-import { SAGA_INSTANCE_STATUSES } from '../domain/mod.ts';
+import { SAGA_INSTANCE_STATUSES, type SagaInstanceStatus } from '../domain/mod.ts';
 
 /** Result returned by a stream entity schema parse attempt. */
 export type StreamSchemaResult<TOutput> =
@@ -14,25 +19,27 @@ export type StreamSchemaResult<TOutput> =
   | { readonly success: false; readonly error: unknown };
 
 /** Package-owned structural schema surface for durable stream entities. */
-export interface StreamSchema<TOutput = unknown, TInput = unknown> {
-  /** Parse an input value or throw a validation error. */
-  parse(input: TInput): TOutput;
-  /** Parse an input value and return a result object instead of throwing. */
-  safeParse(input: TInput): StreamSchemaResult<TOutput>;
-}
+export type StreamSchema<TOutput = unknown, TInput = TOutput> =
+  & CollectionDefinition<TOutput>['schema']
+  & {
+    /** Parse an input value or throw a validation error. */
+    parse(input: TInput): TOutput;
+    /** Parse an input value and return a result object instead of throwing. */
+    safeParse(input: TInput): StreamSchemaResult<TOutput>;
+  };
 
 /** Saga instance entity stored in the durable stream. */
-const SagaInstanceZodSchema = z.object({
+const SagaInstanceZodSchema: StreamSchema<SagaInstance, unknown> = z.object({
   instanceId: z.string().min(1),
   sagaId: z.string().min(1),
   correlationKey: z.string().min(1),
   status: z.enum(SAGA_INSTANCE_STATUSES),
-  state: z.record(z.string(), z.unknown()).default({}),
+  state: z.record(z.string(), z.unknown()),
   currentStep: z.string().optional(),
   message: z.record(z.string(), z.unknown()).optional(),
   error: z.string().optional(),
-  version: z.number().int().nonnegative().default(0),
-  messageCount: z.number().int().nonnegative().default(0),
+  version: z.number().int().nonnegative(),
+  messageCount: z.number().int().nonnegative(),
   lastMessageType: z.string().optional(),
   startedAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
@@ -46,7 +53,7 @@ export type SagaInstance = Readonly<{
   instanceId: string;
   sagaId: string;
   correlationKey: string;
-  status: (typeof SAGA_INSTANCE_STATUSES)[number];
+  status: SagaInstanceStatus;
   state: Record<string, unknown>;
   currentStep?: string;
   message?: Record<string, unknown>;
@@ -62,10 +69,7 @@ export type SagaInstance = Readonly<{
 }>;
 
 /** Standard Schema-compatible schema for saga instances. */
-export const SagaInstanceSchema: StreamSchema<
-  SagaInstance,
-  unknown
-> = SagaInstanceZodSchema;
+export const SagaInstanceSchema: StreamSchema<SagaInstance, unknown> = SagaInstanceZodSchema;
 
 /** Durable stream schema definition for saga instance entities. */
 export type SagasStreamDefinition = Readonly<{
@@ -85,8 +89,21 @@ const sagasStreamDefinition: SagasStreamDefinition = {
   },
 };
 
+/** Entity-based durable stream schema for saga instances. */
 export const sagasStreamSchema: StateSchema<SagasStreamDefinition> = defineStreamSchema(
   sagasStreamDefinition,
 );
 
-export type { CollectionDefinition, CollectionEventHelpers, StateSchema, StreamStateDefinition };
+export type {
+  CollectionDefinition,
+  CollectionEventHelpers,
+  CollectionWithHelpers,
+  SagaInstanceStatus,
+  StateSchema,
+  StreamSchemaIssue,
+  StreamSchemaValidationOptions,
+  StreamSchemaValidationResult,
+  StreamStandardSchema,
+  StreamStateDefinition,
+};
+export { SAGA_INSTANCE_STATUSES };

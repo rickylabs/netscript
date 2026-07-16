@@ -1,12 +1,5 @@
 import { STREAMS_RESOURCE_NAME, STREAMS_URL_PREFIX } from '../domain/constants.ts';
 
-declare global {
-  interface ImportMeta {
-    /** Environment values injected by browser bundlers such as Vite. */
-    readonly env?: Readonly<Record<string, string | undefined>>;
-  }
-}
-
 interface EnvReadState {
   readonly deniedKeys: string[];
 }
@@ -64,7 +57,7 @@ function getBrowserServiceEndpoint(
   index = 0,
 ): string | undefined {
   try {
-    const env = import.meta.env;
+    const env = readImportMetaEnvironment(import.meta);
     if (!env) return undefined;
 
     const fullKey = `VITE_services__${serviceName}__${protocol}__${index}`;
@@ -76,6 +69,22 @@ function getBrowserServiceEndpoint(
   } catch {
     return undefined;
   }
+}
+
+function readImportMetaEnvironment(
+  meta: ImportMeta,
+): Readonly<Record<string, string | undefined>> | undefined {
+  if (!('env' in meta) || !isEnvironmentRecord(meta.env)) return undefined;
+  return meta.env;
+}
+
+function isEnvironmentRecord(
+  value: unknown,
+): value is Readonly<Record<string, string | undefined>> {
+  return typeof value === 'object' && value !== null &&
+    Object.values(value).every((entry: unknown) =>
+      entry === undefined || typeof entry === 'string'
+    );
 }
 
 /**

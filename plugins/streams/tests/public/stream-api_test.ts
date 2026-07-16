@@ -13,9 +13,15 @@ const testSchema: StreamPayloadSchema<TestPayload> = {
   '~standard': {
     version: 1,
     vendor: 'test',
-    validate: (value: unknown) => value,
+    validate: (value: unknown) =>
+      isTestPayload(value) ? { value } : { issues: [{ message: 'Expected a test payload' }] },
   },
 };
+
+function isTestPayload(value: unknown): value is TestPayload {
+  return typeof value === 'object' && value !== null && 'id' in value &&
+    typeof value.id === 'string';
+}
 
 Deno.test('defineStreamProducer publish rejects instead of silently dropping payloads', async () => {
   const topic = defineStreamTopic<TestPayload>('test.events', testSchema);

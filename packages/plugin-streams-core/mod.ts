@@ -30,5 +30,9 @@ export type {
   Operation,
   StateEvent,
   StateSchema,
+  StreamSchemaIssue,
+  StreamSchemaValidationOptions,
+  StreamSchemaValidationResult,
+  StreamStandardSchema,
   StreamStateDefinition,
 } from './src/public/mod.ts';
