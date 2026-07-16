@@ -6,29 +6,30 @@
 | --- | --- |
 | Run ID | `fix-785-workers-healthcheck--codex` |
 | Branch | `fix/785-workers-healthcheck` |
-| Current phase | `implement — diagnostic reproduction` |
+| Current phase | `implement — source fix validated locally` |
 | Archetype | `5 — Plugin Package` |
 | Scope overlays | `service` |
 
 ## Current State
 
-Issue #785 is reproduced upstream as a post-delivery worker failure. Source inspection shows a likely doubled local entrypoint when a project-root-qualified path is combined with configured jobsDir. A diagnostic full runtime suite is running and will leave Aspire available for log capture.
+Issue #785 was reproduced as 40 passed / 1 failed. Worker processor logs proved that local resolution doubled `workers/jobs`, producing `<project>/workers/jobs/workers/jobs/health-check.ts` and terminal `Not Found`. The framework resolver now recognizes project-root-qualified paths already under jobsDir while preserving the normal jobs-dir-relative convention; focused tests and scoped wrappers pass.
 
 ## Completed
 
 - Read issue, named skills, doctrine/archetype material, core public API via `deno doc`, resolver, registry generator, and E2E flow fixture.
 - Locked a contract-preserving, framework-layer fix plan.
+- Captured the exact worker processor failure and stopped the diagnostic AppHost.
+- Added the resolver regression; focused tests and plugin-scoped check/lint/fmt pass.
 
 ## In Progress
 
-- Capture the exact worker processor entrypoint and terminal error.
+- Framework quality gate and full runtime acceptance.
 
 ## Next Steps
 
-1. Inspect worker logs and stop diagnostic runtime.
-2. Implement the narrow path fix and focused regression.
-3. Run scoped/static/fitness gates and the canonical full runtime smoke.
-4. Commit, push, open/update draft PR, apply requested taxonomy/milestone, post IMPL evidence, and hand off to separate evaluation.
+1. Commit/push the framework fix slice and post its PR evidence.
+2. Run `quality:gate` and the canonical full runtime smoke.
+3. Update PR acceptance evidence and hand off to separate evaluation.
 
 ## Key Decisions
 
@@ -42,19 +43,21 @@ Issue #785 is reproduced upstream as a post-delivery worker failure. Source insp
 | Path | Status | Notes |
 | --- | --- | --- |
 | `.llm/runs/fix-785-workers-healthcheck--codex/*` | new | Harness evidence |
+| `plugins/workers/worker/job-execution.ts` | changed | Local entrypoint normalization |
+| `plugins/workers/worker/job-execution_test.ts` | new | Exact doubled-prefix regression plus preserved convention |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | pending | focused regression and scoped wrappers |
+| Static | pass | 5 focused tests; scoped check/lint/fmt over 93 files |
 | Fitness | pending | `quality:gate` |
-| Runtime | diagnostic in progress | `.llm/tmp/785-repro*` |
+| Runtime | failure reproduced and diagnosed | `.llm/tmp/785-repro*`; Aspire worker logs |
 | Consumer | pending | full scaffold runtime |
 
 ## Open Questions
 
-- Exact module specifier and error origin, pending logs.
+- None for implementation; final runtime acceptance remains.
 
 ## Drift and Debt
 

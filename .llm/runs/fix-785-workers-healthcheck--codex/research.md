@@ -20,7 +20,11 @@
 - The generated runtime registry normally emits local file entrypoints relative to `jobsDir` (for example `./health-check.ts`).
 - The Flow-B E2E fixture registers `health-check` as local with entrypoint `./workers/jobs/health-check.ts` while the worker is configured with jobsDir `./workers/jobs`.
 - `resolveDenoEntrypoint` currently concatenates jobsDir and every `./` local entrypoint, so a project-root-relative entrypoint can become `<project>/workers/jobs/workers/jobs/health-check.ts`.
-- Leading hypothesis: the doubled path reaches WorkerPool module loading and is reduced to the terminal error `Not Found`. Runtime logs must confirm before the fix is locked.
+- Captured `aspire logs workers` confirmed the exact processor path:
+  - registry: `source=local, entrypoint=./workers/jobs/health-check.ts`
+  - resolved module: `<project>/workers/jobs/workers/jobs/health-check.ts`
+  - terminal processor message: `Job 'health-check' failed: Not Found`
+- Root cause: `resolveDenoEntrypoint` treated every relative local entrypoint as jobs-dir-relative, even when the registry entrypoint was already project-root-qualified under that jobs directory. The duplicated path failed dynamic import before the health-check handler ran.
 
 ## JSR surface scan
 
@@ -30,5 +34,5 @@
 
 ## Open questions
 
-- Must resolve now: exact resolved entrypoint and error origin from worker processor logs.
-- Safe to defer: broader normalization of task/polyglot entrypoints, unless the same resolver contract is demonstrably shared by the defect.
+- Resolved: the failure is entrypoint resolution, not the handler's HTTP callback or registry lookup.
+- Safe to defer: broader normalization of task/polyglot entrypoints; they do not use this local Deno job resolver.

@@ -57,6 +57,9 @@ Add a local worker job under `workers/jobs`, generate the runtime registry, and 
 | --- | --- | --- | --- |
 | 2026-07-16 | 1 | Research | Read issue #785, skills, doctrine, public Deno docs, worker resolver, registry generator, and E2E fixture. |
 | 2026-07-16 | 1 | Reproduce | Diagnostic `scaffold.runtime` run started without cleanup so Aspire processor logs remain available. |
+| 2026-07-16 | 1 | Diagnose | Reproduced 40 passed / 1 failed and captured the doubled `workers/jobs/workers/jobs/health-check.ts` module path via `aspire logs workers`; stopped the AppHost. |
+| 2026-07-16 | 2 | Implement | Normalized local entrypoints already rooted under configured jobsDir; preserved jobs-dir-relative registry behavior. |
+| 2026-07-16 | 2 | Reconcile | Issue #785 remains open; draft PR #786 has `Closes #785`, requested taxonomy/milestone, and no new comments requiring readjustment. |
 
 ## Decisions
 
@@ -64,6 +67,7 @@ Add a local worker job under `workers/jobs`, generate the runtime registry, and 
 | --- | --- | --- |
 | Keep handler and behavior assertion unchanged | Delivery succeeds; evidence points to module resolution | issue #785 and source inspection |
 | Fix the owning framework layer | Fixture-only changes would not protect consumers | owner task and A14 |
+| Resolve project-root-qualified paths only when they are already within jobsDir | Prevent duplicated prefixes without changing normal `./health-check.ts` resolution | processor logs and registry generator contract |
 
 ## Drift
 
@@ -77,8 +81,10 @@ Add a local worker job under `workers/jobs`, generate the runtime registry, and 
 
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
-| Focused regression | pending | NOT_RUN | Awaiting confirmed root cause |
-| Scoped check/lint/fmt | pending | NOT_RUN | After implementation |
+| Focused regression | `deno test --allow-all plugins/workers/worker/job-execution_test.ts plugins/workers/worker/job-dispatcher_test.ts` | PASS | 5 passed / 0 failed |
+| Scoped check | `.llm/tools/run-deno-check.ts --root plugins/workers --ext ts,tsx` | PASS | 93 files, zero diagnostics |
+| Scoped lint | `.llm/tools/run-deno-lint.ts --root plugins/workers --ext ts,tsx` | PASS | 93 files, zero findings |
+| Scoped fmt | `.llm/tools/run-deno-fmt.ts --root plugins/workers --ext ts,tsx` | PASS | 93 files, zero findings |
 
 ### Fitness Gates
 
@@ -90,7 +96,7 @@ Add a local worker job under `workers/jobs`, generate the runtime registry, and 
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Diagnostic scaffold runtime | IN_PROGRESS | `.llm/tmp/785-repro*` | Run intentionally leaves Aspire available for logs |
+| Diagnostic scaffold runtime | FAIL_REPRODUCED | `.llm/tmp/785-repro*`; `aspire logs workers` | 40 passed / 1 failed; doubled path captured; AppHost stopped |
 | Acceptance scaffold runtime | NOT_RUN | canonical cleanup command | Final gate |
 
 ### Consumer Gates
@@ -101,4 +107,4 @@ Add a local worker job under `workers/jobs`, generate the runtime registry, and 
 
 ## Handoff Notes
 
-- Evaluator should inspect the resolved entrypoint evidence, focused path regression, and final `behavior.workers-executions` result first.
+- Evaluator should inspect `resolveLocalJobEntrypoint`, its two convention tests, the captured doubled-path evidence, and final `behavior.workers-executions` result first.
