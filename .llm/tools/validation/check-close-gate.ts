@@ -94,6 +94,21 @@ export async function fetchGitHubJsonWithRetry<T>(
       throw new Error(`GitHub API ${url} failed: ${response.status} ${body}`);
     }
 
+    // GitHub can transiently fail only the token-authenticated edge while the
+    // same metadata remains available for a public repository. This gate is
+    // read-only, so an anonymous fallback is safe; private repositories simply
+    // return a non-success response and continue authenticated retries.
+    const publicResponse = await fetchImpl(url, {
+      headers: {
+        'accept': 'application/vnd.github+json',
+        'x-github-api-version': '2022-11-28',
+      },
+    });
+    if (publicResponse.ok) {
+      return await publicResponse.json() as T;
+    }
+    await publicResponse.body?.cancel();
+
     const retryAfterSeconds = Number(response.headers.get('retry-after'));
     const delay = Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0
       ? retryAfterSeconds * 1_000
