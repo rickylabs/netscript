@@ -111,7 +111,10 @@ describe('generateRegisterServices', () => {
     assertStringIncludes(output, '.withReference(infrastructure.primaryDatabase)');
     assertStringIncludes(output, '.waitFor(infrastructure.primaryDatabase)');
     assertStringIncludes(output, "sqliteDatabase?.Engine === 'Sqlite'");
-    assertStringIncludes(output, 'file:./database/${config.PrimaryDatabase}/');
+    assertStringIncludes(output, 'buildDatabaseProviderEnvVars(config)');
+    assertStringIncludes(output, 'Object.entries(databaseProviderEnv)');
+    assertStringIncludes(output, 'buildSqliteDatabaseUrl(appHostDir');
+    assert(!output.includes('file:./database/${config.PrimaryDatabase}/'));
   });
 
   it('should wire service references from the services map', () => {
@@ -266,7 +269,9 @@ describe('generateRegisterPlugins', () => {
     assertStringIncludes(output, 'infrastructure.primaryDatabase');
     assertStringIncludes(output, "withEnvironment('DATABASE_URL'");
     assertStringIncludes(output, "sqliteDatabase?.Engine === 'Sqlite'");
-    assertStringIncludes(output, 'file:./database/${config.PrimaryDatabase}/');
+    assertStringIncludes(output, 'buildDatabaseProviderEnvVars(config)');
+    assertStringIncludes(output, 'buildSqliteDatabaseUrl(appHostDir');
+    assert(!output.includes('file:./database/${config.PrimaryDatabase}/'));
   });
 
   it('should handle RequiresKv dependency via the withCacheReference seam', () => {

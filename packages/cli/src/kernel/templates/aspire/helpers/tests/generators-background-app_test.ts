@@ -133,7 +133,9 @@ describe('generateRegisterBackground', () => {
     assertStringIncludes(output, 'infrastructure.primaryDatabase');
     assertStringIncludes(output, "withEnvironment('DATABASE_URL'");
     assertStringIncludes(output, "workers_sqliteDatabase?.Engine === 'Sqlite'");
-    assertStringIncludes(output, 'file:./database/${config.PrimaryDatabase}/');
+    assertStringIncludes(output, 'buildDatabaseProviderEnvVars(config)');
+    assertStringIncludes(output, 'buildSqliteDatabaseUrl(appHostDir');
+    assert(!output.includes('file:./database/${config.PrimaryDatabase}/'));
   });
 
   it('should include KV cache dependency when RequiresKv is true', () => {

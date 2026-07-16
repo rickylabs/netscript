@@ -4,7 +4,7 @@
 
 Research, re-baseline, plan, and Design checkpoint are complete on base `7d353be`. The supervisor
 recorded plan commit `79ccd9bb` and PR #795, then explicitly authorized implementation of the locked
-plan as a written Plan-Gate override. C1 implementation and focused gates are complete.
+plan as a written Plan-Gate override. C1 and C2 implementation/focused gates are complete.
 
 ## Scope
 
@@ -39,4 +39,4 @@ Focused tests, asset parity, scoped check/lint/fmt wrappers over both touched pa
 
 ## Next action
 
-Commit, push, and comment C1 on PR #795, then implement C2 environment projection.
+Commit, push, and comment C2 on PR #795, then implement C3 bounded Garnet restore.

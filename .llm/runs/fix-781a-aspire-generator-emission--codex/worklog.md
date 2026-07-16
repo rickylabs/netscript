@@ -97,8 +97,8 @@ source `.template` assets when generated helper runtime behavior changes, run
 | Slice | Status | Commit | Focused gate | Push / PR comment |
 | --- | --- | --- | --- | --- |
 | Plan bootstrap | complete | `79ccd9bb` | Plan-Gate inputs prepared | pushed; PR #795 opened |
-| C1 executable emission | complete | pending | focused tests 8 suites / 80 steps; scoped CLI check/lint/fmt PASS | pending |
-| C2 environment projection | pending | pending | pending | pending |
+| C1 executable emission | complete | `8336acff` | focused tests 8 suites / 80 steps; scoped CLI check/lint/fmt PASS | pushed; PR comment posted |
+| C2 environment projection | complete | pending | focused tests 12 suites / 94 steps; scoped Aspire/CLI check/lint/fmt PASS | pending |
 | C3 bounded restore | pending | pending | pending | pending |
 
 ## Gate results
@@ -117,6 +117,21 @@ Existing invalid expectations were deliberately reversed: generic executable app
 mode explicitly remains free of the unsupported dependency-age flag. Valid `deno run` dependency-
 age usage remains asserted, and plugin API resources now assert `--unstable-no-legacy-abort`.
 
+### C2 database and Vite environment projection
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Focused generator/helper tests | PASS | 12 suites / 94 steps, exit 0 |
+| Scoped check | PASS | Aspire + CLI helper/assets roots, 68 files, 0 findings |
+| Scoped lint | PASS | Aspire + CLI helper/assets roots, 68 files, 0 findings |
+| Scoped format | PASS | Aspire + CLI helper/assets roots, 68 files, 0 findings |
+
+The former hyphen-preserving full Vite-key assertion now requires identifier-safe underscores.
+The former resource-workdir-relative SQLite assertions now require the generated workspace-root
+`pathToFileURL` helper and explicitly reject `file:./database/...`. Database consumers project both
+`DB_PROVIDER` and `DATABASE_PROVIDER` from `PrimaryDatabase`; DB CLI/tool-relative URLs remain
+unchanged because those resources already execute inside their database directories.
+
 ## Reconcile notes
 
 - Bootstrap: #791 is open at `status:impl`, milestone `0.0.1-beta.10`; #781 is open as the
@@ -127,3 +142,6 @@ age usage remains asserted, and plugin API resources now assert `--unstable-no-l
   Plan-Gate override allowed by `run-loop.md`; this lane did not dispatch or self-certify PLAN-EVAL.
 - C1 reconcile: #791 and #781 have no new comments changing scope. The implementation matches the
   locked executable-emission cluster; no dependency, export, debt, or suppression was introduced.
+- C2 reconcile: the environment fixes remain at the owning source/helper-template layers and the
+  embedded asset was regenerated. No new suppression, dependency, public export, or architecture
+  exception was introduced.

@@ -16,8 +16,7 @@ import { RESOURCE_DEFAULTS } from '../../constants.ts';
 export interface ViteEnvVarNames {
   /**
    * Full isomorphic format: `VITE_services__{name}__http__0`.
-   * Mirrors the server-side `services__{name}__http__0` pattern exactly.
-   * No uppercasing — the resource name is preserved as-is.
+   * Invalid identifier characters are replaced with underscores.
    */
   readonly full: string;
 
@@ -45,19 +44,22 @@ export interface ViteEnvVarNames {
  * // { full: "VITE_services__orders__http__0", shorthand: "VITE_ORDERS_URL" }
  *
  * buildViteEnvVarName('workers-api');
- * // { full: "VITE_services__workers-api__http__0", shorthand: "VITE_WORKERS_API_URL" }
+ * // { full: "VITE_services__workers_api__http__0", shorthand: "VITE_WORKERS_API_URL" }
  * ```
  */
 export function buildViteEnvVarName(
   resourceName: string,
   endpointName: string = RESOURCE_DEFAULTS.HttpEndpointName,
 ): ViteEnvVarNames {
-  // Full isomorphic format — exact same pattern as server-side, just VITE_ prefixed
-  const full = `VITE_services__${resourceName}__${endpointName}__0`;
+  const normalisedResource = normalizeViteIdentifierSegment(resourceName);
+  const normalisedEndpoint = normalizeViteIdentifierSegment(endpointName);
+  const full = `VITE_services__${normalisedResource}__${normalisedEndpoint}__0`;
 
-  // Shorthand — uppercased, hyphens → underscores
-  const normalised = resourceName.toUpperCase().replace(/-/g, '_');
-  const shorthand = `VITE_${normalised}_URL`;
+  const shorthand = `VITE_${normalisedResource.toUpperCase()}_URL`;
 
   return { full, shorthand };
+}
+
+function normalizeViteIdentifierSegment(value: string): string {
+  return value.replace(/[^a-zA-Z0-9_]/g, '_');
 }
