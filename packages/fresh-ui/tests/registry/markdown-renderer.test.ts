@@ -6,10 +6,16 @@ const CLI_ENTRY = join(REPO_ROOT, 'packages/cli/bin/netscript-dev.ts');
 const REGISTRY_ROOT = join(REPO_ROOT, 'packages/fresh-ui');
 const decoder = new TextDecoder();
 
+interface CommandResult {
+  readonly code: number;
+  readonly stdout: string;
+  readonly stderr: string;
+}
+
 async function run(
   cwd: string,
   args: readonly string[],
-): Promise<{ code: number; stdout: string; stderr: string }> {
+): Promise<CommandResult> {
   const output = await new Deno.Command(Deno.execPath(), {
     args: [...args],
     cwd,
@@ -22,6 +28,21 @@ async function run(
     stdout: decoder.decode(output.stdout),
     stderr: decoder.decode(output.stderr),
   };
+}
+
+function commandFailureMessage(
+  label: string,
+  args: readonly string[],
+  result: CommandResult,
+): string {
+  return [
+    `${label} failed with exit code ${result.code}`,
+    `Command: deno ${args.join(' ')}`,
+    '--- stdout ---',
+    result.stdout || '<empty>',
+    '--- stderr ---',
+    result.stderr || '<empty>',
+  ].join('\n');
 }
 
 Deno.test('copied Markdown type-checks and renders directly through Preact', async () => {
@@ -187,8 +208,13 @@ export default function MarkdownHydrationPage() {
     ]);
     assertEquals(check.code, 0, check.stderr || check.stdout);
 
-    const build = await run(dashboardRoot, ['task', 'build']);
-    assertEquals(build.code, 0, build.stderr || build.stdout);
+    const buildArgs = ['task', 'build'] as const;
+    const build = await run(dashboardRoot, buildArgs);
+    assertEquals(
+      build.code,
+      0,
+      commandFailureMessage('Fresh Markdown production build', buildArgs, build),
+    );
     const serverBundle = await Deno.stat(join(dashboardRoot, '_fresh/server.js'));
     assert(serverBundle.isFile, 'Fresh production server bundle was not emitted');
   } finally {

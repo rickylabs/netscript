@@ -90,6 +90,10 @@ Deno.test('createNetScriptVitePlugin returns config through official plugin hook
     config.resolve?.dedupe?.includes('preact'),
     'Expected Preact to be included in resolve.dedupe',
   );
+  assert(
+    config.resolve?.dedupe?.includes('@preact/signals'),
+    'Expected Preact Signals to be included in resolve.dedupe',
+  );
   assert(config.server?.fs?.allow?.includes('C:/repo'), 'Expected workspace root in fs.allow');
   assert(
     config.define?.['import.meta.env.VITE_USERS_URL'] === '"http://localhost:3000"',
@@ -183,13 +187,11 @@ Deno.test('createNetScriptVitePlugin resolves @app aliases via resolveId', async
   );
 });
 
-Deno.test('createNetScriptVitePlugin delegates Preact and Fresh Signals imports', async () => {
+Deno.test('createNetScriptVitePlugin delegates all Preact forms and preserves metadata', async () => {
   const plugin = createNetScriptVitePlugin({ appRoot: 'C:/repo/apps/chat' });
   assert(typeof plugin.resolveId === 'function', 'Expected plugin.resolveId hook');
   const delegatedId =
     'C:\\repo\\node_modules\\.deno\\preact@10.29.7\\node_modules\\preact\\hooks\\dist\\hooks.module.js';
-  const signalsId =
-    'C:\\repo\\node_modules\\.deno\\@preact+signals@2.9.1\\node_modules\\@preact\\signals\\dist\\signals.module.js';
   const delegatedSources: string[] = [];
   const delegatedImporters: Array<string | undefined> = [];
   const delegatedSkipSelf: Array<boolean | undefined> = [];
@@ -203,7 +205,7 @@ Deno.test('createNetScriptVitePlugin delegates Preact and Fresh Signals imports'
       delegatedImporters.push(importer);
       delegatedSkipSelf.push(options.skipSelf);
       return Promise.resolve({
-        id: source === '@preact/signals' ? signalsId : delegatedId,
+        id: delegatedId,
         meta: { fixture: 'preact-hooks' },
         moduleSideEffects: true,
       });
@@ -233,18 +235,6 @@ Deno.test('createNetScriptVitePlugin delegates Preact and Fresh Signals imports'
     );
   }
 
-  const resolvedSignals = await asResolveIdHook(plugin).call(
-    context,
-    'npm:@preact/signals@^2.5.1',
-    '\0deno::0::https://jsr.io/@fresh/core/2.3.3/src/runtime/client/reviver.ts',
-    { attributes: {}, custom: {}, isEntry: false },
-  );
-  assert(
-    typeof resolvedSignals === 'object' && resolvedSignals !== null,
-    'Expected Fresh Signals to resolve through the consumer import map',
-  );
-  assert(resolvedSignals.id === normalizePath(signalsId), 'Expected a normalized Signals ID');
-
   const similarlyPrefixed = await asResolveIdHook(plugin).call(
     context,
     'preact-render-to-string',
@@ -253,14 +243,76 @@ Deno.test('createNetScriptVitePlugin delegates Preact and Fresh Signals imports'
   );
   assert(similarlyPrefixed === null, 'Expected similarly prefixed packages to remain untouched');
   assert(
-    JSON.stringify(delegatedSources) === JSON.stringify([...preactSources, '@preact/signals']),
+    JSON.stringify(delegatedSources) === JSON.stringify(preactSources),
     `Unexpected delegated sources: ${JSON.stringify(delegatedSources)}`,
   );
   assert(
-    delegatedImporters.slice(0, preactSources.length).every((importer) =>
-      importer === 'C:/repo/apps/chat/islands/Chat.tsx'
-    ) && delegatedImporters.at(-1)?.includes('@fresh/core/2.3.3') === true,
+    delegatedImporters.every((importer) => importer === 'C:/repo/apps/chat/islands/Chat.tsx'),
     `Unexpected delegated importers: ${JSON.stringify(delegatedImporters)}`,
+  );
+  assert(
+    delegatedSkipSelf.every((skipSelf) => skipSelf === true),
+    `Expected all delegations to skip the NetScript resolver: ${JSON.stringify(delegatedSkipSelf)}`,
+  );
+});
+
+Deno.test('createNetScriptVitePlugin resolves versioned Preact Signals through the app import map', async () => {
+  const plugin = createNetScriptVitePlugin({ appRoot: 'C:/repo/apps/chat' });
+  assert(typeof plugin.resolveId === 'function', 'Expected plugin.resolveId hook');
+  const delegatedId =
+    'C:\\repo\\node_modules\\.deno\\@preact+signals@2.9.2\\node_modules\\@preact\\signals\\dist\\signals.module.js';
+  const delegatedSources: string[] = [];
+  const delegatedSkipSelf: Array<boolean | undefined> = [];
+  const context = {
+    resolve(
+      source: string,
+      _importer: string | undefined,
+      options: { skipSelf?: boolean },
+    ) {
+      delegatedSources.push(source);
+      delegatedSkipSelf.push(options.skipSelf);
+      return Promise.resolve({
+        id: delegatedId,
+        meta: { fixture: 'preact-signals' },
+        moduleSideEffects: true,
+      });
+    },
+  };
+
+  for (
+    const source of [
+      '@preact/signals',
+      'npm:@preact/signals@^2.5.1',
+      'npm:/@preact/signals@2.9.2',
+    ]
+  ) {
+    const resolved = await asResolveIdHook(plugin).call(
+      context,
+      source,
+      'https://jsr.io/@fresh/core/2.3.3/src/runtime/client/reviver.ts',
+      { attributes: {}, custom: {}, isEntry: false },
+    );
+
+    assert(typeof resolved === 'object' && resolved !== null, 'Expected Signals to resolve');
+    assert(resolved.id === normalizePath(delegatedId), `Unexpected resolved ID: ${resolved.id}`);
+    assert(resolved.meta?.fixture === 'preact-signals', 'Expected metadata to be retained');
+    assert(resolved.moduleSideEffects === true, 'Expected side-effect metadata to be retained');
+  }
+
+  const similarlyPrefixed = await asResolveIdHook(plugin).call(
+    context,
+    '@preact/signals-core',
+    'C:/repo/apps/chat/islands/Chat.tsx',
+    { attributes: {}, custom: {}, isEntry: false },
+  );
+  assert(similarlyPrefixed === null, 'Expected similarly prefixed packages to remain untouched');
+  assert(
+    JSON.stringify(delegatedSources) === JSON.stringify([
+      '@preact/signals',
+      '@preact/signals',
+      '@preact/signals',
+    ]),
+    `Unexpected delegated sources: ${JSON.stringify(delegatedSources)}`,
   );
   assert(
     delegatedSkipSelf.every((skipSelf) => skipSelf === true),
@@ -369,7 +421,9 @@ Deno.test('createNetScriptVitePlugin collapses Windows Preact slash variants in 
     `Expected one canonical hooks module ID, received ${JSON.stringify(loadedHooksIds)}`,
   );
   assert(
-    resolvedDedupe.includes('consumer-package') && resolvedDedupe.includes('preact'),
+    resolvedDedupe.includes('consumer-package') &&
+      resolvedDedupe.includes('preact') &&
+      resolvedDedupe.includes('@preact/signals'),
     `Unexpected merged dedupe: ${JSON.stringify(resolvedDedupe)}`,
   );
 });
