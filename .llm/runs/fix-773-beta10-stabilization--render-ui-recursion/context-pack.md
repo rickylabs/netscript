@@ -35,9 +35,9 @@ generated-asset freshness task. The slice awaits supervisor-triggered IMPL-EVAL.
 
 ## Next Steps
 
-1. Review the substantive diff and commit the implementation slice with updated run evidence.
-2. Push the explicit refspec and post the implementation phase comment on PR #788.
-3. Leave the draft PR at `status:impl-eval` for the external supervisor.
+1. External supervisor reviews the run artifacts, commit trail, and gate evidence.
+2. External supervisor triggers IMPL-EVAL in a separate session.
+3. Keep the PR draft and unmerged until the evaluator verdict is recorded.
 
 ## Key Decisions
 
@@ -77,4 +77,7 @@ generated-asset freshness task. The slice awaits supervisor-triggered IMPL-EVAL.
 
 ## Commits
 
-- See the draft PR's commit list + per-slice PR comments.
+- `295e0962` — harness research, plan, and design bootstrap.
+- `c19cd198` — shipped recursion fix, generated-layer regression, CI freshness, and gate evidence.
+- Remote branch and PR #788 both resolved to `c19cd1987c369ee8d729490325c4ac9013d29406`
+  before this final evidence-only handoff update.
