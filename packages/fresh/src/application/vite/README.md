@@ -28,11 +28,29 @@ export default defineConfig({
 
 - publishes `@app/*` aliases through Vite `resolve.alias`
 - resolves alias imports through `resolveId()` for plugin/tooling paths
+- dedupes Preact package copies in linked and peer-dependency graphs
+- canonicalizes delegated Preact module IDs before Windows production bundling
 - extends `server.fs.allow` for workspace packages
 - bridges selected process env values into `import.meta.env.*`
 - registers extra watch paths during dev
 - can generate app-local `.generated/manifest.ts` and `.generated/routes.ts` outputs from Fresh file
   routes
+
+## Preact module identity on Windows
+
+The plugin returns Vite's standard `resolve.dedupe: ['preact']` baseline so linked packages and
+dependencies that declare Preact as a peer converge on one installed package copy.
+
+Dedupe alone is insufficient when a Windows production build represents that one physical copy
+with two final module-ID strings, such as `C:\\...\\preact\\hooks` and
+`C:/.../preact/hooks`. Rollup keys modules by the resolved string, so slash variants can emit two
+hooks runtimes even though Deno reports one installed Preact version. The plugin therefore delegates
+bare, subpath, and versioned `npm:` Preact imports through Vite, preserves the complete resolution
+result, and applies Vite's `normalizePath()` to its final `id` before Rollup sees it.
+
+Fresh's dependency-optimizer policy remains unchanged. Fresh 2.3 disables dependency discovery to
+prevent pre-bundling duplicates; this normalization covers the separate Windows production Rollup
+identity path.
 
 ## Route manifest generation
 

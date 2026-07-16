@@ -5,7 +5,7 @@ import {
   type TaskDefinition,
   type TaskExecutionOptions,
 } from '@netscript/plugin-workers-core/runtime';
-import { toFileUrl } from '@std/path';
+import { isAbsolute, relative, resolve, SEPARATOR, toFileUrl } from '@std/path';
 import type { WorkerDispatchContext, WorkerJobResult } from './worker-options.ts';
 
 /** Execute a worker job with the correct runtime strategy. */
@@ -93,17 +93,27 @@ function resolveDenoEntrypoint(
     return toLocalModuleSpecifier(entrypoint);
   }
 
-  let resolvedJobsDir = context.jobsDir;
-  if (resolvedJobsDir.startsWith('./')) {
-    resolvedJobsDir = `${projectRoot}/${resolvedJobsDir.slice(2)}`;
-  } else if (!resolvedJobsDir.startsWith('/') && !resolvedJobsDir.match(/^[A-Za-z]:[/\\]/)) {
-    resolvedJobsDir = `${projectRoot}/${resolvedJobsDir}`;
-  }
+  return resolveLocalJobEntrypoint(projectRoot, context.jobsDir, jobEntrypoint);
+}
 
-  const entrypoint = jobEntrypoint.startsWith('./')
-    ? `${resolvedJobsDir}/${jobEntrypoint.slice(2)}`
-    : `${resolvedJobsDir}/${jobEntrypoint}`;
-  return toLocalModuleSpecifier(entrypoint);
+/** Resolve jobs-dir-relative and project-root-qualified local job entrypoints. */
+export function resolveLocalJobEntrypoint(
+  projectRoot: string,
+  jobsDir: string,
+  entrypoint: string,
+): string {
+  const resolvedJobsDir = resolve(projectRoot, jobsDir);
+  const projectRelativeEntrypoint = resolve(projectRoot, entrypoint);
+  const entrypointFromJobsDir = relative(resolvedJobsDir, projectRelativeEntrypoint);
+  const isWithinJobsDir = entrypointFromJobsDir === '' ||
+    (entrypointFromJobsDir !== '..' &&
+      !entrypointFromJobsDir.startsWith(`..${SEPARATOR}`) &&
+      !isAbsolute(entrypointFromJobsDir));
+  const resolvedEntrypoint = isWithinJobsDir
+    ? projectRelativeEntrypoint
+    : resolve(resolvedJobsDir, entrypoint);
+
+  return toLocalModuleSpecifier(resolvedEntrypoint);
 }
 
 function toLocalModuleSpecifier(pathOrSpecifier: string): string {
