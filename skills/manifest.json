@@ -1,0 +1,11 @@
+{
+  "name": "netscript-skills",
+  "version": "0.1.0",
+  "skills": ["netscript", "netscript-operate", "netscript-build"],
+  "files": [
+    "netscript/SKILL.md",
+    "netscript-operate/SKILL.md",
+    "netscript-build/SKILL.md",
+    "manifest.json"
+  ]
+}

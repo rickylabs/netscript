@@ -8,6 +8,12 @@ import type {
 } from '../../../domain/gate-definition.ts';
 import type { PluginSuiteState } from '../../builders/scaffold/plugin-suite-state.ts';
 import { cli, commandGate } from './gate-factory.ts';
+import { NETSCRIPT_RELEASE_VERSION } from '../../../../../src/kernel/constants/jsr-specifiers.ts';
+
+function publishedPluginCliSpecifier(cliEntrypoint: string, packageName: string): string {
+  const publishedVersion = /^jsr:@netscript\/cli@([^/]+)(?:\/.*)?$/.exec(cliEntrypoint)?.[1];
+  return `jsr:@netscript/${packageName}@${publishedVersion ?? NETSCRIPT_RELEASE_VERSION}/cli`;
+}
 
 function pluginName(kind: PluginKind): string {
   if (kind === PLUGIN.AUTH) return 'auth';
@@ -111,7 +117,7 @@ export function createPluginInstallGates(
             'deno',
             'x',
             '-A',
-            'jsr:@netscript/plugin-ai/cli',
+            publishedPluginCliSpecifier(context.project.cliEntrypoint, 'plugin-ai'),
             'add',
             'tool',
             'e2e-tool',

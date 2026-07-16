@@ -3,6 +3,7 @@ import { MemoryKvAdapter } from '@netscript/kv';
 import { KvJobRegistry, KvTaskRegistry } from '@netscript/plugin-workers-core/registry';
 import { KvExecutionState } from '@netscript/plugin-workers-core/state';
 import { KvWorkerIdempotencyStore } from '@netscript/plugin-workers-core/stores';
+import workersPackageJson from '../../deno.json' with { type: 'json' };
 import type { WorkersServiceRuntime } from './routers/router-context.ts';
 import {
   registerPluginJobs,
@@ -20,7 +21,10 @@ Deno.test('registerPluginJobs stores the built-in health job with the package so
   const job = await runtime.jobRegistry.get(WORKERS_PLUGIN_HEALTH_CHECK_JOB_ID);
   assertEquals(job?.entrypoint, WORKERS_PLUGIN_HEALTH_CHECK_ENTRYPOINT);
   assertEquals(job?.sourceUrl, WORKERS_PLUGIN_HEALTH_CHECK_SOURCE_URL);
-  assertEquals(job?.sourceUrl, 'jsr:@netscript/plugin-workers/jobs/health-check.ts');
+  assertEquals(
+    job?.sourceUrl,
+    `jsr:@netscript/plugin-workers@${workersPackageJson.version}/jobs/health-check.ts`,
+  );
   assertEquals(job?.source, 'plugin');
   assertEquals(job?.pluginId, 'workers');
 });
@@ -51,7 +55,7 @@ Deno.test('workers plugin export map exposes the built-in health job sourceUrl s
   }
 
   const sourceUrlSubpath = WORKERS_PLUGIN_HEALTH_CHECK_SOURCE_URL.replace(
-    'jsr:@netscript/plugin-workers',
+    `jsr:@netscript/plugin-workers@${workersPackageJson.version}`,
     '.',
   );
 

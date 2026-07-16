@@ -10,6 +10,7 @@ import { createPluginCommand } from '../plugins/plugins-group.ts';
 import { createServiceCommand } from '../services/services-group.ts';
 import { createUiAddCommand } from '../ui/add/add-ui-command.ts';
 import { createUiInitCommand } from '../ui/init/init-ui-command.ts';
+import { createAgentCommand } from '../agent/agent-group.ts';
 import { createUiListCommand } from '../ui/list/list-ui-command.ts';
 import { createUiUpdateCommand } from '../ui/update/update-ui-command.ts';
 import { createUiRemoveCommand } from '../ui/remove/remove-ui-command.ts';
@@ -47,6 +48,10 @@ export interface PublicCommandContext {
 export function createPublicCommandRegistry(): CliCommandRegistry<PublicCommandContext> {
   const registry = new CliCommandRegistry<PublicCommandContext>();
 
+  registry.register('agent', {
+    id: 'agent',
+    create: ({ host, dependencies }) => createAgentCommand(host, dependencies),
+  });
   registry.register('config', {
     id: 'config',
     create: ({ dependencies }) => createConfigCommand(dependencies),

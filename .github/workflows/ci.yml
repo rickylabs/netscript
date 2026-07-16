@@ -22,9 +22,9 @@ name: ci
 
 on:
   push:
-    branches: [main, "feat/package-quality"]
+    branches: [main, 'feat/package-quality']
   pull_request:
-    branches: [main, "feat/package-quality"]
+    branches: [main, 'feat/package-quality']
 
 permissions:
   contents: read
@@ -51,7 +51,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
-          deno-version: "2.9.0"
+          deno-version: '2.9.0'
 
       - name: Mirror structured acceptance evidence
         if: contains(github.event.pull_request.labels.*.name, 'status:ready-merge')
@@ -84,7 +84,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
-          deno-version: "2.9.0"
+          deno-version: '2.9.0'
 
       - name: Install workspace dependencies
         run: deno install
@@ -108,7 +108,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
-          deno-version: "2.9.0"
+          deno-version: '2.9.0'
 
       - name: Install workspace dependencies
         run: deno install
@@ -118,6 +118,9 @@ jobs:
 
       - name: Format check
         run: deno task fmt:check
+
+      - name: NetScript JSR emitted-specifier guard
+        run: deno task check:netscript-jsr-specifiers
 
       - name: Scaffold version guard (no preview pins)
         run: deno task check:scaffold-versions
@@ -138,7 +141,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
-          deno-version: "2.9.0"
+          deno-version: '2.9.0'
 
       - name: Install workspace dependencies
         run: deno install

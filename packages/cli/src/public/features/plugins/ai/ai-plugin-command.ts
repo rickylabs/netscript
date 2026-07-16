@@ -3,12 +3,13 @@ import type { CliffyCommand } from "../../../../kernel/presentation/command-type
 
 import { Command } from "@cliffy/command";
 import { CliCommand } from "../../../../kernel/application/abstracts/cli-command.ts";
+import { netscriptJsrSpecifier } from "../../../../kernel/constants/jsr-specifiers.ts";
 import type { ProcessPort } from "../../../../kernel/ports/process-port.ts";
 import { outputText } from "../../../../kernel/presentation/output/default-output.ts";
 import type { ProjectRootResolver } from "../../../presentation/support.ts";
 import { requireProjectRoot } from "../../../presentation/support.ts";
 
-const AI_CLI_SPECIFIER = "jsr:@netscript/plugin-ai/cli";
+const AI_CLI_SPECIFIER = netscriptJsrSpecifier("plugin-ai", "/cli");
 
 /** Dependencies for the AI plugin-owned command group. */
 export interface AiPluginCommandDependencies {

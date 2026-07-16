@@ -52,7 +52,7 @@ jobs:
 
       - name: Emit compose artifacts
         run: >
-          deno x -A jsr:@netscript/cli deploy compose plan
+          deno x -A {{netscriptCliSpecifier}} deploy compose plan
           --project-root .
           --output-dir .deploy/compose
           --environment "$DEPLOY_ENVIRONMENT"
@@ -65,7 +65,7 @@ jobs:
 
       - name: Deploy with Aspire without persisting plaintext state
         run: >
-          deno x -A jsr:@netscript/cli deploy docker up
+          deno x -A {{netscriptCliSpecifier}} deploy docker up
           --project-root .
           --environment "$DEPLOY_ENVIRONMENT"
           --clear-cache
