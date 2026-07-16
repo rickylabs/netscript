@@ -6,29 +6,30 @@
 | --- | --- |
 | Run ID | `fix-781b-workers-sample-trigger--codex` |
 | Branch | `fix/781b-workers-sample-trigger` |
-| Current phase | `implementation authorized; harness bootstrap ready` |
+| Current phase | `implementation slice complete; acceptance gates pending` |
 | Archetype | `5 — Plugin Package` |
 | Scope overlays | `none` |
 
 ## Current State
 
-The branch is rebased by merge against current `origin/feat/beta10-integration` (`7d353be2`; already up to date). Issue #792 and umbrella #781 were read through GitHub's API. The defect is the unconditional sample-domain trigger prepend in reusable `Worker` construction; scaffold defaults do not consume that queue/job mapping.
+The branch is based on current `origin/feat/beta10-integration` (`7d353be2`; merge reported already up to date). The reusable `Worker` now resolves an empty frozen trigger list unless `WorkerOptions.queueTriggers` is explicitly supplied. The embedded export-notification schema/default is removed, and the colocated regression proves empty defaults plus defensive copying.
 
 ## Completed
 
 - Loaded requested skills, harness workflow, Archetype 5, relevant doctrine, JSR audit guidance, and issue/API evidence.
 - Locked the narrow option-resolution design and validation plan.
+- Pushed bootstrap commit `e5e9fa2b` and opened draft PR #793 with the required issue links, taxonomy, and milestone.
+- Implemented the worker-options slice; focused tests and scoped check/lint/fmt wrappers pass.
 
 ## In Progress
 
-- Commit harness bootstrap, open draft PR, then implement the worker-options regression slice.
+- Quality, architecture, and canonical scaffold runtime gates.
 
 ## Next Steps
 
-1. Commit/push bootstrap and open draft PR.
-2. Implement and run focused/scoped gates.
-3. Run quality, architecture, and canonical scaffold runtime gates.
-4. Hand off for supervisor-triggered IMPL-EVAL.
+1. Commit/push the implementation slice and post its PR evidence.
+2. Run quality, architecture, and canonical scaffold runtime gates.
+3. Hand off for supervisor-triggered IMPL-EVAL.
 
 ## Key Decisions
 
@@ -42,12 +43,15 @@ The branch is rebased by merge against current `origin/feat/beta10-integration` 
 | Path | Status | Notes |
 | --- | --- | --- |
 | `.llm/runs/fix-781b-workers-sample-trigger--codex/*` | new | Harness identity, research, design, plan, and handoff state. |
+| `plugins/workers/worker/worker-options.ts` | changed | Removes embedded sample schema/default; adds internal option resolver. |
+| `plugins/workers/worker/worker.ts` | changed | Uses only explicitly resolved queue triggers. |
+| `plugins/workers/worker/worker-options_test.ts` | new | Locks empty default and defensive-copy behavior. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | pending | not run |
+| Static | pass | focused regression 2/2; scoped check/lint/fmt zero findings |
 | Fitness | pending | not run |
 | Runtime | pending | not run |
 | Consumer | pending | not run |

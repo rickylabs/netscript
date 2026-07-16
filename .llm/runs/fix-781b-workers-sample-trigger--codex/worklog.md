@@ -56,10 +56,22 @@ Add a queue-trigger mapping through `WorkerOptions.queueTriggers`, cover its opt
 | --- | --- | --- | --- |
 | 2026-07-16 | 1 | Bootstrap | Loaded requested skills/harness/doctrine, merged the latest integration base (already current), and read #792/#781 through the GitHub API token resolver. |
 | 2026-07-16 | 1 | Research | Confirmed the unconditional prepend and that scaffold defaults do not reference the embedded export-notification sample trigger. |
+| 2026-07-16 | 1 | Draft PR | Pushed bootstrap commit `e5e9fa2b` and opened draft PR #793 against `feat/beta10-integration` with `Closes #792`, `Part of #781`, implementation taxonomy, and beta.10 milestone. |
+| 2026-07-16 | 2 | Implement | Removed the embedded export-notification schema/default, resolved only explicit `queueTriggers`, and added omission/preservation/aliasing regressions at the worker-options layer. |
+| 2026-07-16 | 2 | Reconcile | Issue #792 remains open; draft PR #793 carries the correct closing keyword and umbrella reference. No new comments or scope changes require readjustment. |
 
 ## Gate Results
 
-All implementation, fitness, runtime, and consumer gates are pending.
+### Static Gates
+
+| Gate | Command or check | Result | Notes |
+| --- | --- | --- | --- |
+| Focused regression | `deno test plugins/workers/worker/worker-options_test.ts` | PASS | 2 passed / 0 failed |
+| Scoped check | `.llm/tools/run-deno-check.ts --root plugins/workers --ext ts,tsx` | PASS | 94 files, zero diagnostics |
+| Scoped lint | `.llm/tools/run-deno-lint.ts --root plugins/workers --ext ts,tsx` | PASS | 94 files, zero findings |
+| Scoped fmt | `.llm/tools/run-deno-fmt.ts --root plugins/workers --ext ts,tsx` | PASS | 94 files, zero findings after formatting the new test |
+
+Fitness, runtime, and consumer gates remain pending.
 
 ## Handoff Notes
 
