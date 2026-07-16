@@ -41,7 +41,7 @@ function renderRegistrySource(
       })],`,
     ],
     header: [
-      "import type { StaticJobRegistry } from '@netscript/plugin-workers-core/runtime';",
+      "import type { RegisterJobInput, StaticJobRegistry } from '@netscript/plugin-workers-core/runtime';",
     ],
     body: (entries) => [
       'type StaticJobHandler = StaticJobRegistry extends ReadonlyMap<string, infer THandler>',
@@ -54,6 +54,43 @@ function renderRegistrySource(
       '',
       'export const jobRegistry: StaticJobRegistry = new Map(entries);',
       'export const registry: StaticJobRegistry = jobRegistry;',
+      '',
+      'const jobDefinitionEntries: readonly [string, RegisterJobInput][] = [',
+      ...jobs.map((job) => {
+        const id = JSON.stringify(toJobId(job.relativePath));
+        const entrypoint = JSON.stringify(toJobEntrypoint(job.relativePath));
+        return `  [${id}, createLocalJobDefinition(${id}, ${entrypoint})],`;
+      }),
+      '];',
+      '',
+      'export const jobDefinitions = new Map<string, RegisterJobInput>(jobDefinitionEntries);',
+      'export const definitions = jobDefinitions;',
+      '',
+      'function createLocalJobDefinition(id: string, entrypoint: string): RegisterJobInput {',
+      '  return {',
+      '    id,',
+      '    name: toJobName(id),',
+      '    entrypoint,',
+      '    topic: "default",',
+      '    source: "local",',
+      '    executionType: "deno",',
+      '    timezone: "UTC",',
+      '    timeout: 300000,',
+      '    maxRetries: 3,',
+      '    retryDelay: 1000,',
+      '    maxConcurrency: 1,',
+      '    priority: 50,',
+      '    enabled: true,',
+      '    persist: true,',
+      '    tags: [],',
+      '  };',
+      '}',
+      '',
+      'function toJobName(id: string): string {',
+      '  return id.split("-").filter(Boolean).map((part) =>',
+      '    `${part.slice(0, 1).toUpperCase()}${part.slice(1)}`',
+      '  ).join(" ");',
+      '}',
       '',
       'function resolveJobHandler(module: Record<string, unknown>, path: string): StaticJobHandler {',
       '  const candidate = module.default ?? module.handler ?? firstFunctionExport(module);',
@@ -74,4 +111,9 @@ function renderRegistrySource(
 function toJobId(path: string): string {
   const fileName = path.split('/').at(-1) ?? path;
   return fileName.replace(/\.ts$/, '');
+}
+
+function toJobEntrypoint(path: string): string {
+  const relativePath = path.replace(/^workers\/jobs\//, '');
+  return relativePath.startsWith('.') ? relativePath : `./${relativePath}`;
 }

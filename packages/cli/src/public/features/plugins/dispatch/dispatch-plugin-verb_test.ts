@@ -14,6 +14,7 @@ import {
 } from './dispatch-plugin-verb.ts';
 import type { ValidatedPluginDescriptor } from '../install/jsr-plugin-validator-port.ts';
 import { verifyJsrPackageIntegrity } from '../../../infra/jsr/verify-jsr-package-integrity.ts';
+import { NETSCRIPT_RELEASE_VERSION } from '../../../../kernel/constants/jsr-specifiers.ts';
 
 const REPO_ROOT = resolve(dirname(fromFileUrl(import.meta.url)), '../../../../../../..');
 
@@ -78,6 +79,36 @@ describe('plugin verb dispatch', () => {
     assertEquals(
       resolvePluginCliSpecifier('jsr:@example/plugin-alpha/cli'),
       'jsr:@example/plugin-alpha/cli',
+    );
+    assertEquals(
+      resolvePluginCliSpecifier('@netscript/plugin-ai'),
+      `jsr:@netscript/plugin-ai@${NETSCRIPT_RELEASE_VERSION}/cli`,
+    );
+    assertEquals(
+      resolvePluginCliSpecifier('jsr:@netscript/plugin-ai/cli'),
+      `jsr:@netscript/plugin-ai@${NETSCRIPT_RELEASE_VERSION}/cli`,
+    );
+    assertEquals(
+      resolvePluginCliSpecifier('@netscript/plugin-ai@1.2.3'),
+      'jsr:@netscript/plugin-ai@1.2.3/cli',
+    );
+    assertEquals(
+      resolvePluginCliSpecifier('jsr:@netscript/plugin-ai@1.2.3/cli'),
+      'jsr:@netscript/plugin-ai@1.2.3/cli',
+    );
+  });
+
+  it('never shells out to a version-less first-party plugin CLI', async () => {
+    const processRunner = new RecordingProcess(0);
+
+    await dispatchPluginVerb('doctor', '@netscript/plugin-ai', [], {
+      projectRoot: '/workspace/app',
+      processRunner,
+    });
+
+    assertEquals(
+      processRunner.commands[0].args[2],
+      `jsr:@netscript/plugin-ai@${NETSCRIPT_RELEASE_VERSION}/cli`,
     );
   });
 });

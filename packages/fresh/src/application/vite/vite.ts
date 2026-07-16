@@ -21,6 +21,7 @@ export type { NetScriptRouteManifestOptions } from '../route/manifest.ts';
 
 const ROUTE_MANIFEST_WATCH_DEBOUNCE_MS = 25;
 const ABSOLUTE_PATH_PATTERN = /^(?:[A-Za-z]:\/|\/)/;
+const PREACT_IMPORT_PATTERN = /^(?:npm:\/?)?preact(?:@[^/]+)?(?:\/|$)/;
 
 function resolveConfigPath(path: string): string {
   return ABSOLUTE_PATH_PATTERN.test(path) ? normalizePath(path) : normalizePath(resolve(path));
@@ -298,11 +299,13 @@ export function createNetScriptVitePlugin(
       };
       const config: UserConfig = {};
 
-      if (aliasEntries.length > 0) {
-        config.resolve = {
-          alias: aliasEntries,
-        };
-      }
+      config.resolve = {
+        ...(aliasEntries.length > 0 ? { alias: aliasEntries } : {}),
+        // Dedupe selects one installed Preact package for linked/peer graphs.
+        // The resolve hook below additionally canonicalizes slash variants of
+        // that package's final Windows module IDs.
+        dedupe: ['preact'],
+      };
 
       if (allowFsPaths.length > 0) {
         config.server = {
@@ -359,8 +362,15 @@ export function createNetScriptVitePlugin(
 
       return config;
     },
-    resolveId(source: string) {
-      return resolveAliasImport(source, aliasEntries);
+    async resolveId(source, importer, options) {
+      const aliasImport = resolveAliasImport(source, aliasEntries);
+      if (aliasImport) return aliasImport;
+      if (!PREACT_IMPORT_PATTERN.test(source)) return null;
+
+      const resolved = await this.resolve(source, importer, { ...options, skipSelf: true });
+      if (!resolved) return null;
+
+      return { ...resolved, id: normalizePath(resolved.id) };
     },
     buildStart() {
       if (routeManifest) {

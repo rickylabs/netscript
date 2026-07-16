@@ -10,7 +10,6 @@ import type {
 } from '@netscript/plugin-workers-core/runtime';
 import type { TracedMessageContext } from '@netscript/telemetry/instrumentation';
 import type { Span } from '@netscript/telemetry/tracer';
-import { z } from 'zod';
 import type { WorkerPool, WorkerPoolOptions } from './job-runner-pool.ts';
 import type { WorkerListenerSnapshot } from './listener-supervisor.ts';
 
@@ -214,31 +213,9 @@ export interface WorkerQueueContext {
   listenerMaxBackoffMs: number;
 }
 
-/** Queue notification payload used by the default export trigger. */
-export const ExportNotificationSchema: WorkerPayloadSchema = z.object({
-  webhookPayload: z.object({
-    exportId: z.string(),
-    exportType: z.string(),
-    filePath: z.string().optional(),
-    fileName: z.string().optional(),
-    recordCount: z.number().optional(),
-    fileSize: z.number().optional(),
-    exportedAt: z.string().optional(),
-    triggeredBy: z.string().optional(),
-    jobId: z.string().optional(),
-    status: z.string().optional(),
-    completedAt: z.string().optional(),
-  }).passthrough(),
-  webhookPath: z.string().optional(),
-  _source: z.string().optional(),
-});
-
-/** Default queue triggers mapped to worker jobs. */
-export const DEFAULT_QUEUE_TRIGGERS: readonly QueueTriggerConfig[] = Object.freeze([
-  {
-    queueName: 'export-notifications',
-    jobId: 'notify-export-complete',
-    schema: ExportNotificationSchema,
-    concurrency: 2,
-  },
-]);
+/** Resolve explicitly configured worker queue triggers without retaining caller-owned state. */
+export function resolveWorkerQueueTriggers(
+  queueTriggers: readonly QueueTriggerConfig[] | undefined,
+): readonly QueueTriggerConfig[] {
+  return Object.freeze([...(queueTriggers ?? [])]);
+}

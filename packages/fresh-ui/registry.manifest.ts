@@ -635,8 +635,9 @@ export const freshUiRegistryManifest: RegistryManifest = {
       layer: 3,
       description:
         'Sanitized GFM + math + syntax-highlighted renderer for streamed assistant output — ' +
-        'react-markdown (preact/compat) with remark-gfm/remark-math/remarkCitations, ' +
-        'rehype-katex/rehype-highlight, and a MANDATORY rehype-sanitize pass applied last.',
+        'direct unified/rehype-react rendering through the Preact JSX runtime with ' +
+        'remark-gfm/remark-math/remarkCitations, rehype-katex/rehype-highlight, and a ' +
+        'MANDATORY rehype-sanitize content pass.',
       copyOwnership: 'app-owned-after-copy',
       author: 'NetScript',
       tags: ['ai', 'chat', 'markdown', 'component'],
@@ -656,9 +657,12 @@ export const freshUiRegistryManifest: RegistryManifest = {
       ],
       registryDependencies: ['theme-seed', 'citation-chip'],
       dependencies: [
-        'npm:react-markdown@^9',
+        'npm:unified@^11',
+        'npm:remark-parse@^11',
+        'npm:remark-rehype@^11',
         'npm:remark-gfm@^4',
         'npm:remark-math@^6',
+        'npm:rehype-react@^8',
         'npm:rehype-katex@^7',
         'npm:rehype-highlight@^7',
         'npm:rehype-sanitize@^6',
