@@ -17,18 +17,20 @@ Do not merge until the Plan-Gate and final separate-session evaluator pass are c
 - [x] Always-on summaries distinguish lanes that ran from lanes skipped by policy.
 - [x] `main` protection/rulesets audited read-only and required checks recorded below.
 - [x] Workflow YAML validation passes.
-- [ ] Separate-session PLAN-EVAL and IMPL-EVAL pass.
+- [x] Separate-session PLAN-EVAL and IMPL-EVAL pass.
 
 ## Slices
 
 - [x] S0 research, design, and ruleset audit — bootstrap commit
 - [x] S1 trigger and lane-visibility implementation — see the live commit list and IMPL phase comment
-- [ ] S2 opposite-family implementation evaluation and handoff
+- [x] S2 opposite-family implementation evaluation and handoff — `evaluate.md` PASS
 
 ## Validation
 
 - Workflow YAML parse + structural assertions — PASS (10 workflows)
 - Classifier tests — PASS (30 passed, 0 failed)
+- Live integration-base CI — PASS (`check-test`, `quality`, `close-gate`, `deps-report`, scaffold lanes, and both visibility jobs)
+- Separate IMPL-EVAL — PASS (Claude session `319e284e-b456-401d-a75a-c972bd6631e3`)
 - `actionlint` — unavailable on this host; focused diff and structural assertions used
 - TypeScript check — N/A unless TypeScript or Deno task wiring changes
 

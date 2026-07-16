@@ -6,15 +6,14 @@
 | --- | --- |
 | Run ID | `ci-774-integration-branch-ci--codex` |
 | Branch | `ci/774-integration-branch-ci` |
-| Current phase | `evaluate` |
+| Current phase | `close` |
 | Archetype | N/A — infrastructure-only |
 | Scope overlays | none |
 
 ## Current State
 
-Research and design are locked and PLAN-EVAL passed. Workflow implementation, local gates, and the
-separate substantive slice review are complete. The supervisor sign-off commit/push is next,
-followed by IMPL-EVAL.
+Run complete. PLAN-EVAL, implementation, local gates, A1 slice review, supervisor sign-off, live CI,
+and final IMPL-EVAL all passed. PR #787 remains draft at the owner-requested `status:impl-eval`.
 
 ## Completed
 
@@ -28,16 +27,20 @@ followed by IMPL-EVAL.
 - Implemented the two supported-base fixes and two dependency-free lane summaries.
 - Parsed all 10 workflows and passed 30/30 classifier tests without retained lock churn.
 - Substantive slice review passed in session `c8f83551-98cf-4b6c-a89b-72ef2d6450f8`.
+- Supervisor sign-off commit `e5924b481bb250a8c584647e5af062bfee89ff74` is on the remote branch.
+- PR #787 is labeled `status:impl-eval` and carries the per-slice IMPL evidence comment.
+- Final IMPL-EVAL passed in session `319e284e-b456-401d-a75a-c972bd6631e3`.
+- Live check runs on integration-base head `e5924b48` prove all core/scaffold/visibility lanes ran and passed.
 
 ## In Progress
 
-- Supervisor sign-off commit and explicit-refspec push.
+- Final tracked-artifact sign-off commit and PR verdict comment.
 
 ## Next Steps
 
-1. Supervisor commits/pushes slice 1 and the PR moves to `status:impl-eval`.
-2. Post the per-slice implementation evidence comment.
-3. Run a new, separate Claude-family IMPL-EVAL session.
+1. Supervisor commits/pushes the verdict and final artifacts.
+2. Post the structured IMPL-EVAL PASS comment and refresh the PR body.
+3. Leave the PR draft at `status:impl-eval` for owner-controlled next action.
 
 ## Key Decisions
 
@@ -62,10 +65,12 @@ followed by IMPL-EVAL.
 | Static | PASS | 10 YAML files parsed; 30/30 classifier tests; focused audit. |
 | Fitness | N/A | No package/plugin surface. |
 | Runtime | N/A | YAML-only slice. |
+| IMPL-EVAL | PASS | `evaluate.md`, session `319e284e-b456-401d-a75a-c972bd6631e3`. |
 
 ## Open Questions
 
-None.
+None. Two evaluator notes are low/non-blocking: a mechanical follow-up prompt lacks a SKILL chapter,
+and cancelled-lane wording is cosmetic while still exposing the raw result.
 
 ## Drift and Debt
 

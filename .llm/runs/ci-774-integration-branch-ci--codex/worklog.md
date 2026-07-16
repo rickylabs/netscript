@@ -68,6 +68,10 @@ come from `classify` outputs.
 | 2026-07-16 | 1 | Validate | Parsed all 10 workflows; classifier tests passed 30/30; `actionlint` unavailable. |
 | 2026-07-16 | 1 | Slice review | Separate Claude Opus session `c8f83551-98cf-4b6c-a89b-72ef2d6450f8` returned `PASS`. |
 | 2026-07-16 | 1 | Reconcile | #774 remains open with correct taxonomy/milestone; PR #787 carries `Closes #774`; no new comments required plan adjustment. |
+| 2026-07-16 | 1 | Sign-off | Tier-A supervisor committed/pushed `e5924b481bb250a8c584647e5af062bfee89ff74`; remote ref verified. |
+| 2026-07-16 | 1 | PR trail | Posted IMPL phase comment with slice scope, commit, and gate evidence; moved PR #787 to `status:impl-eval`. |
+| 2026-07-16 | 2 | IMPL-EVAL | Fresh Claude Opus session `319e284e-b456-401d-a75a-c972bd6631e3` returned `PASS`. |
+| 2026-07-16 | 2 | Live CI | Evaluator verified all core, scaffold, and both visibility jobs succeeded on integration-base PR #787 head `e5924b48`. |
 
 ## Decisions
 
@@ -94,6 +98,9 @@ come from `classify` outputs.
 | Focused trigger audit | Search all `.github/workflows` PR base filters and `base.ref` checks | PASS | Only `ci.yml` event filter and `e2e-cli.yml` applicability gate required widening; other PR workflows are unrestricted by base. |
 | TypeScript check | N/A | N/A | No TypeScript or Deno task wiring changed. |
 | Lock hygiene | Raw `git status --short` | PASS | Parser-induced `deno.lock` resolution was inspected and removed; lock is clean. |
+| Supervisor sign-off | Separate Claude session + raw remote ref check | PASS | Commit `e5924b481bb250a8c584647e5af062bfee89ff74` is pushed to the explicit branch ref. |
+| IMPL-EVAL | Separate Claude session | PASS | `evaluate.md`; session `319e284e-b456-401d-a75a-c972bd6631e3`. |
+| Live integration-base CI | GitHub check runs for `e5924b48` | PASS | `check-test`, `quality`, `close-gate`, `deps-report`, scaffold lanes, and both visibility jobs succeeded. |
 
 ### Fitness Gates
 
@@ -113,6 +120,7 @@ N/A — no local scaffold runtime requested or needed for workflow YAML.
 
 ## Handoff Notes
 
-- PLAN-EVAL should first verify the distinction between e2e event triggering and the job-level
-  `base.ref` applicability gate.
+- IMPL-EVAL passed for committed diff `e5924b481bb250a8c584647e5af062bfee89ff74`,
+  including independent three-state scaffold summary verification.
 - The branch-protection conclusion must cite ruleset `18459345`, not the legacy 404 alone.
+- PR #787 is the commit/comment trail; leave it draft at owner-requested `status:impl-eval`.
