@@ -64,6 +64,7 @@ Edit `registry/components/ui/markdown.tsx.template` for renderer composition,
 | 2026-07-16T21:00Z | 2 | implementation | Replaced the React wrapper with an ordered unified/rehype-react processor using the Preact JSX runtime; regenerated registry assets and added failing-layer coverage. |
 | 2026-07-16T21:06Z | 3 | browser proof | Minimal generated Fresh production build passed; citation interaction hydrated from `0` to `1` with zero browser console messages. |
 | 2026-07-16T21:12Z | 2/3 | scoped gates | Check/lint/fmt, focused tests, full package tests, architecture, doc-lint, and publish dry-run completed. Repository-wide quality scan exposed two unrelated existing plugin findings. |
+| 2026-07-16T21:18Z | 3 | merge-readiness | Canonical one-pass `scaffold.runtime --cleanup` completed: 60 passed, 0 failed, including generated UI check, Aspire runtime behavior, OTEL chain, and cleanup. |
 
 ## Decisions
 
@@ -112,7 +113,7 @@ Edit `registry/components/ui/markdown.tsx.template` for renderer composition,
 | Scratch SSR contract | PASS | direct render command | GFM, math, highlight, citation, sanitize verified. |
 | Generated production build | PASS | focused regression + minimal Fresh fixture | Client and SSR production bundles emitted. |
 | Browser hydration | PASS | Playwright named session `issue783` | Citation state `0 → 1`; zero console errors/warnings. |
-| Full `scaffold.runtime` | NOT_RUN | pending final gate | Required because copied registry output changed. |
+| Full `scaffold.runtime` | PASS | 60 passed, 0 failed | One-pass canonical command with cleanup; raw exit 0. |
 
 ### Consumer Gates
 
@@ -125,3 +126,5 @@ Edit `registry/components/ui/markdown.tsx.template` for renderer composition,
 
 - Evaluator should inspect sanitize/plugin order, absence of React graph requirements, actual copied
   renderer regression, generated Fresh build/hydration evidence, and the explicit root cause.
+- Implementation commits are `a0d44c2a` plus the final evidence-only commit following this entry;
+  the PR remains draft with `status:impl-eval` and must not be merged by this lane.

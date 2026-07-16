@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-783-beta10-stabilization--codex` |
 | Branch | `fix/783-beta10-stabilization` |
-| Current phase | `implementation` |
+| Current phase | `implementation complete — awaiting supervisor IMPL-EVAL` |
 | Archetype | `4 — Public DSL / Builder` |
 | Scope overlays | `frontend` |
 
@@ -31,13 +31,13 @@ a browser with zero console messages.
 
 ## In Progress
 
-- Implementation slice commit/push and canonical full scaffold runtime gate.
+- Final evidence commit/push and PR handoff to the supervisor-owned evaluator.
 
 ## Next Steps
 
-1. Commit and explicitly push the implementation slice; post phase evidence to draft PR #790.
-2. Run the canonical full `scaffold.runtime` gate.
-3. Update final artifacts and PR body without marking ready or self-certifying.
+1. Commit and explicitly push this final evidence update.
+2. Update draft PR #790 body/comment with the complete gate matrix.
+3. Stop at `status:impl-eval`; the supervisor owns evaluation and any later readiness transition.
 
 ## Key Decisions
 
@@ -64,7 +64,7 @@ a browser with zero console messages.
 | Static | pass | scoped check/lint/fmt; actual copied renderer check |
 | Fitness | pass with external scan debt | arch pass; quality scan finds two untouched plugin issues |
 | Runtime | pass | production client/SSR build and browser hydration |
-| Consumer | pass, final gate pending | actual `ui:add` render/build regressions; full scaffold pending |
+| Consumer | pass | actual `ui:add` render/build regressions; canonical scaffold runtime 60/60 |
 
 ## Open Questions
 
@@ -77,4 +77,6 @@ a browser with zero console messages.
 
 ## Commits
 
-- See the draft PR's commit list + per-slice PR comments after bootstrap push.
+- `b3b91648` — harness bootstrap and locked plan.
+- `a0d44c2a` — direct Preact renderer, registry graph/docs, generated mirror, and regressions.
+- Final evidence-only commit follows this context-pack update.
