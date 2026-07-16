@@ -183,11 +183,13 @@ Deno.test('createNetScriptVitePlugin resolves @app aliases via resolveId', async
   );
 });
 
-Deno.test('createNetScriptVitePlugin delegates all Preact forms and preserves metadata', async () => {
+Deno.test('createNetScriptVitePlugin delegates Preact and Fresh Signals imports', async () => {
   const plugin = createNetScriptVitePlugin({ appRoot: 'C:/repo/apps/chat' });
   assert(typeof plugin.resolveId === 'function', 'Expected plugin.resolveId hook');
   const delegatedId =
     'C:\\repo\\node_modules\\.deno\\preact@10.29.7\\node_modules\\preact\\hooks\\dist\\hooks.module.js';
+  const signalsId =
+    'C:\\repo\\node_modules\\.deno\\@preact+signals@2.9.1\\node_modules\\@preact\\signals\\dist\\signals.module.js';
   const delegatedSources: string[] = [];
   const delegatedImporters: Array<string | undefined> = [];
   const delegatedSkipSelf: Array<boolean | undefined> = [];
@@ -201,7 +203,7 @@ Deno.test('createNetScriptVitePlugin delegates all Preact forms and preserves me
       delegatedImporters.push(importer);
       delegatedSkipSelf.push(options.skipSelf);
       return Promise.resolve({
-        id: delegatedId,
+        id: source === '@preact/signals' ? signalsId : delegatedId,
         meta: { fixture: 'preact-hooks' },
         moduleSideEffects: true,
       });
@@ -231,6 +233,18 @@ Deno.test('createNetScriptVitePlugin delegates all Preact forms and preserves me
     );
   }
 
+  const resolvedSignals = await asResolveIdHook(plugin).call(
+    context,
+    'npm:@preact/signals@^2.5.1',
+    '\0deno::0::https://jsr.io/@fresh/core/2.3.3/src/runtime/client/reviver.ts',
+    { attributes: {}, custom: {}, isEntry: false },
+  );
+  assert(
+    typeof resolvedSignals === 'object' && resolvedSignals !== null,
+    'Expected Fresh Signals to resolve through the consumer import map',
+  );
+  assert(resolvedSignals.id === normalizePath(signalsId), 'Expected a normalized Signals ID');
+
   const similarlyPrefixed = await asResolveIdHook(plugin).call(
     context,
     'preact-render-to-string',
@@ -239,11 +253,13 @@ Deno.test('createNetScriptVitePlugin delegates all Preact forms and preserves me
   );
   assert(similarlyPrefixed === null, 'Expected similarly prefixed packages to remain untouched');
   assert(
-    JSON.stringify(delegatedSources) === JSON.stringify(preactSources),
+    JSON.stringify(delegatedSources) === JSON.stringify([...preactSources, '@preact/signals']),
     `Unexpected delegated sources: ${JSON.stringify(delegatedSources)}`,
   );
   assert(
-    delegatedImporters.every((importer) => importer === 'C:/repo/apps/chat/islands/Chat.tsx'),
+    delegatedImporters.slice(0, preactSources.length).every((importer) =>
+      importer === 'C:/repo/apps/chat/islands/Chat.tsx'
+    ) && delegatedImporters.at(-1)?.includes('@fresh/core/2.3.3') === true,
     `Unexpected delegated importers: ${JSON.stringify(delegatedImporters)}`,
   );
   assert(

@@ -22,6 +22,7 @@ export type { NetScriptRouteManifestOptions } from '../route/manifest.ts';
 const ROUTE_MANIFEST_WATCH_DEBOUNCE_MS = 25;
 const ABSOLUTE_PATH_PATTERN = /^(?:[A-Za-z]:\/|\/)/;
 const PREACT_IMPORT_PATTERN = /^(?:npm:\/?)?preact(?:@[^/]+)?(?:\/|$)/;
+const FRESH_PREACT_SIGNALS_IMPORT_PATTERN = /^npm:\/?@preact\/signals(?:@[^/]+)?$/;
 
 function resolveConfigPath(path: string): string {
   return ABSOLUTE_PATH_PATTERN.test(path) ? normalizePath(path) : normalizePath(resolve(path));
@@ -365,9 +366,17 @@ export function createNetScriptVitePlugin(
     async resolveId(source, importer, options) {
       const aliasImport = resolveAliasImport(source, aliasEntries);
       if (aliasImport) return aliasImport;
-      if (!PREACT_IMPORT_PATTERN.test(source)) return null;
+      const isFreshPreactSignalsImport = FRESH_PREACT_SIGNALS_IMPORT_PATTERN.test(source);
+      if (!PREACT_IMPORT_PATTERN.test(source) && !isFreshPreactSignalsImport) return null;
 
-      const resolved = await this.resolve(source, importer, { ...options, skipSelf: true });
+      // Fresh's virtual client reviver currently emits a versioned npm:
+      // specifier. Route it through the consuming app's import map so a cold
+      // DENO_DIR resolves the scaffold-owned @preact/signals version.
+      const delegatedSource = isFreshPreactSignalsImport ? '@preact/signals' : source;
+      const resolved = await this.resolve(delegatedSource, importer, {
+        ...options,
+        skipSelf: true,
+      });
       if (!resolved) return null;
 
       return { ...resolved, id: normalizePath(resolved.id) };
