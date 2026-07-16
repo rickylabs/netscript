@@ -32,7 +32,15 @@
 - The planned fix does not add or change a public export, package dependency, permission, or slow-type-bearing declaration.
 - Full publish dry-run is not a slice acceptance requirement because published shape is unchanged; scoped doc/check/quality gates remain required.
 
+## Second-layer attribution
+
+- Correcting the duplicated path allowed the handler to run, but the canonical suite still returned HTTP `Not Found`.
+- The generated `health-check.ts` was not the ordinary workers starter job at runtime: `prepare-flow-b-fixture.ts` rewrote it to call the users service and replaced the generated registry with a one-job, project-root-qualified special case.
+- This coupled two unrelated contracts: the workers install default and the Flow-B telemetry callback. It also prevented the suite from proving that the generic workers CLI can add another executable job.
+- The corrected fixture invokes `workers add job flow-b-callback --topic=default`; the generic CLI compiler now emits both handler and definition registries, after which the fixture applies Flow-B-only execution metadata to that new definition. `health-check.ts` remains unchanged and is registered with the standard local-job definition.
+- Root cause therefore had two layers: permissive local entrypoint interpretation exposed the fixture's rooted path, and the fixture's special treatment of `health-check` made the ordinary default job perform an unrelated HTTP callback.
+
 ## Open questions
 
-- Resolved: the failure is entrypoint resolution, not the handler's HTTP callback or registry lookup.
+- Resolved: registry lookup and queue delivery were healthy; both entrypoint normalization and the health-job callback special case contributed to the observed terminal error.
 - Safe to defer: broader normalization of task/polyglot entrypoints; they do not use this local Deno job resolver.

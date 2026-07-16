@@ -159,12 +159,14 @@ const callbackBody = [
   "    serviceName: 'users',",
   "    routerName: 'users',",
   '  });',
-  "  await withSpan(getTracer('@netscript/e2e-flow-b'), 'flow-b.callback', async (span) => {",
+  "  await withSpan(getTracer('@netscript/e2e-flow-b'), 'flow-b.callback', async () => {",
   '    await channelClient.health.check();',
-  "    span.setAttribute('netscript.flow_b.outcome', 'success');",
   '  }, {',
   '    kind: SpanKind.CLIENT,',
-  "    attributes: { 'netscript.correlation.id': context.correlationId ?? context.id },",
+  '    attributes: {',
+  "      'netscript.correlation.id': context.correlationId ?? context.id,",
+  "      'netscript.flow_b.outcome': 'success',",
+  '    },',
   '  });',
 ].join('\n');
 

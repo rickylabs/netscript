@@ -64,6 +64,12 @@ Add a local worker job under `workers/jobs`, generate the runtime registry, and 
 | 2026-07-16 | 3 | Acceptance | Canonical cleanup run reached 42 passed / 1 failed. Correct entrypoint loaded, then the callback received 404 from the configured users URL. |
 | 2026-07-16 | 3 | Attribute | Live Aspire evidence showed `services__users__http__0=http://localhost:3001`; that URL was owned by Windows process `sco-web` and returned 404, while the healthy Aspire users target on its assigned port returned 200 for the same RPC path. |
 | 2026-07-16 | 3 | Concurrency | A separate workspace actor changed the Flow-B E2E fixture and extended the overlapping resolver test during a port-isolated diagnostic run. Preserved those uncommitted edits; the moving-source run failed generated type-check and is not acceptance evidence. |
+| 2026-07-16 | 3 | Contract correction | Replaced the Flow-B fixture's health-check rewrite and one-off registry with `workers add job flow-b-callback`, ordinary runtime-registry generation, and Flow-B-only definition metadata. |
+| 2026-07-16 | 3 | Generic regression | Added an arbitrary `sync-catalog` case under configured `./background/inventory-jobs`, proving the resolver has no health-check or default-directory branch. |
+| 2026-07-16 | 3 | Acceptance retry 1 | Durable run stopped at `runtime.flow-b-fixture`: the gate grants `--allow-run=deno`, while the helper used an absolute executable path. Switched the wrapper to the granted upstream command name. |
+| 2026-07-16 | 3 | Acceptance retry 2 | `behavior.workers-executions` passed on the first poll and all product/runtime gates passed through Flow-B trace validation; final telemetry failed because the callback outcome set inside the async body was absent from exported attributes. Moved the outcome into span creation attributes. |
+| 2026-07-16 | 3 | CLI contract | The retained fixture proved `workers add job` emitted handlers but discarded runtime `jobDefinitions`. Extended the generic registry compiler and golden test so every CLI-scaffolded job remains registrable, including nested job paths. |
+| 2026-07-16 | 4 | Final acceptance | Canonical one-pass cleanup run passed 60 / 60. `behavior.workers-executions`, Flow-B telemetry, every other behavior gate, and cleanup were green. |
 
 ## Decisions
 
@@ -72,14 +78,16 @@ Add a local worker job under `workers/jobs`, generate the runtime registry, and 
 | Keep handler and behavior assertion unchanged | Delivery succeeds; evidence points to module resolution | issue #785 and source inspection |
 | Fix the owning framework layer | Fixture-only changes would not protect consumers | owner task and A14 |
 | Resolve project-root-qualified paths only when they are already within jobsDir | Prevent duplicated prefixes without changing normal `./health-check.ts` resolution | processor logs and registry generator contract |
+| Scaffold Flow-B as a separate ordinary job | The install default is product sample behavior, not an E2E callback extension point | owner clarification and generic workers CLI contract |
+| Have `add job` compile both handlers and runtime definitions | Runtime execution needs both static handlers and `RegisterJobInput` definitions; CLI consumers must not need a second special generator | workers runtime registry contract and compiler golden test |
 
 ## Drift
 
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
 | Parent harness artifacts and concrete Tier-D thread proof unavailable in checkout/session | significant | yes |
-| Canonical E2E port `3001` is occupied by an out-of-scope Windows process | significant | yes |
-| Concurrent uncommitted changes overlap the E2E fixture and resolver regression | significant | yes |
+| Canonical E2E port `3001` was temporarily occupied by an out-of-scope Windows process | resolved | yes |
+| Flow-B diagnostic edits were initially misattributed as concurrent external work | resolved | yes |
 
 ## Gate Results
 
@@ -87,10 +95,14 @@ Add a local worker job under `workers/jobs`, generate the runtime registry, and 
 
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
-| Focused regression | `deno test --allow-all plugins/workers/worker/job-execution_test.ts plugins/workers/worker/job-dispatcher_test.ts` | PASS | 5 passed / 0 failed |
+| Focused regression | `deno test --allow-all plugins/workers/worker/job-execution_test.ts plugins/workers/worker/job-dispatcher_test.ts` | PASS | 6 passed / 0 failed |
+| E2E builder tests | `deno test --allow-read --allow-env packages/cli/e2e/tests/application/builders/runtime-gates_test.ts` | PASS | 6 passed / 0 failed |
 | Scoped check | `.llm/tools/run-deno-check.ts --root plugins/workers --ext ts,tsx` | PASS | 93 files, zero diagnostics |
 | Scoped lint | `.llm/tools/run-deno-lint.ts --root plugins/workers --ext ts,tsx` | PASS | 93 files, zero findings |
 | Scoped fmt | `.llm/tools/run-deno-fmt.ts --root plugins/workers --ext ts,tsx` | PASS | 93 files, zero findings |
+| Scaffold-gate check/lint/fmt | scoped wrappers over `packages/cli/e2e/src/application/gates/scaffold` | PASS | 17 files, zero diagnostics/findings |
+| Registry compiler golden + resolver + gate builder | focused Deno tests | PASS | 10 passed / 0 failed after final compiler refinement |
+| Changed-file quality | `scan-code-quality.ts --changed-file ...` | PASS | zero findings, zero allowances |
 
 ### Fitness Gates
 
@@ -106,14 +118,15 @@ Add a local worker job under `workers/jobs`, generate the runtime registry, and 
 | Diagnostic scaffold runtime | FAIL_REPRODUCED | `.llm/tmp/785-repro*`; `aspire logs workers` | 40 passed / 1 failed; doubled path captured; AppHost stopped |
 | Acceptance scaffold runtime | FAIL_ENVIRONMENT | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | 42 passed / 1 failed; correct module loaded, callback hit unrelated `sco-web` on fixture-fixed port 3001 |
 | Port-isolated diagnostic | INVALIDATED | temporary uncommitted fixture port 3079, then restored | Concurrent source edits landed mid-run; generated type-check failed before runtime behavior |
+| Final acceptance scaffold runtime | PASS | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | 60 passed / 0 failed; cleanup passed |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Scaffolded workers runtime | BLOCKED | `behavior.workers-executions` | Workers resolver progressed to the handler; host port collision prevents canonical callback success |
+| Scaffolded workers runtime | PASS | canonical full-suite output | `behavior.workers-executions` passed; full Flow-B telemetry and cleanup also passed |
 
 ## Handoff Notes
 
-- Evaluator should inspect `resolveLocalJobEntrypoint`, its convention tests, the captured doubled-path evidence, and the canonical callback attribution first.
-- Do not treat the port-isolated run as acceptance evidence. Re-run the canonical gate after port 3001 is free and after the concurrent Flow-B fixture edits are committed or removed by their owner.
+- Evaluator should inspect `resolveLocalJobEntrypoint`, its generic custom-directory test, the handler+definition compiler golden, and the two-job generated fixture first.
+- Implementation acceptance is complete; separate opposite-family IMPL-EVAL remains required before merge.

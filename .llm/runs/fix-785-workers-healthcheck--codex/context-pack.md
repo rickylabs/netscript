@@ -6,13 +6,13 @@
 | --- | --- |
 | Run ID | `fix-785-workers-healthcheck--codex` |
 | Branch | `fix/785-workers-healthcheck` |
-| Current phase | `implement — source fix validated locally; canonical acceptance blocked` |
+| Current phase | `implementation complete — awaiting opposite-family IMPL-EVAL` |
 | Archetype | `5 — Plugin Package` |
 | Scope overlays | `service` |
 
 ## Current State
 
-Issue #785 was reproduced as 40 passed / 1 failed. Worker processor logs proved that local resolution doubled `workers/jobs`, producing `<project>/workers/jobs/workers/jobs/health-check.ts`. The framework resolver now recognizes project-root-qualified paths already under jobsDir while preserving the normal jobs-dir-relative convention; focused tests and scoped wrappers pass. A canonical post-fix run loaded the correct module but exposed a separate host collision: the fixture-fixed users URL on port 3001 is served by unrelated Windows process `sco-web`, while Aspire's generated users target is healthy and serves the same RPC with 200.
+Issue #785 was reproduced as 40 passed / 1 failed. Worker processor logs proved that local resolution doubled `workers/jobs`, producing `<project>/workers/jobs/workers/jobs/health-check.ts`. The framework resolver now recognizes project-root-qualified paths already under jobsDir while preserving the normal jobs-dir-relative convention. Flow-B now uses a separate job scaffolded through the ordinary workers CLI, leaving `health-check` pristine, and the generic compiler preserves both handlers and runtime definitions. Final canonical acceptance passed 60 / 60.
 
 ## Completed
 
@@ -20,16 +20,18 @@ Issue #785 was reproduced as 40 passed / 1 failed. Worker processor logs proved 
 - Locked a contract-preserving, framework-layer fix plan.
 - Captured the exact worker processor failure and stopped the diagnostic AppHost.
 - Added the resolver regression; focused tests and plugin-scoped check/lint/fmt pass.
+- Added a generic compiler golden regression and arbitrary custom-jobs-directory resolver case.
+- Passed the canonical one-pass runtime suite, including `behavior.workers-executions`, Flow-B telemetry, and cleanup.
 
 ## In Progress
 
-- Settle concurrent overlapping fixture/test edits, free fixture port 3001 with owner authority, and re-run canonical runtime acceptance.
+- Separate opposite-family IMPL-EVAL.
 
 ## Next Steps
 
-1. Have the owner of the concurrent Flow-B fixture/test edits commit or remove them.
-2. Free Windows port 3001 without disrupting unrelated work, then re-run the canonical full runtime smoke.
-3. Update PR acceptance evidence only if green, then hand off to separate evaluation.
+1. Push final implementation/evidence commits and update PR acceptance evidence.
+2. Run separate opposite-family IMPL-EVAL.
+3. Mirror issue acceptance only after evaluator approval.
 
 ## Key Decisions
 
@@ -45,24 +47,27 @@ Issue #785 was reproduced as 40 passed / 1 failed. Worker processor logs proved 
 | `.llm/runs/fix-785-workers-healthcheck--codex/*` | new | Harness evidence |
 | `plugins/workers/worker/job-execution.ts` | changed | Local entrypoint normalization |
 | `plugins/workers/worker/job-execution_test.ts` | new | Exact doubled-prefix regression plus preserved convention |
+| `plugins/workers/src/cli/registry-compiler.ts` | changed | Generic CLI output includes runtime definitions |
+| `plugins/workers/tests/cli/registry-compiler-golden_test.ts` | changed | Locks handler + definition registry contract |
+| `packages/cli/e2e/src/application/gates/scaffold/prepare-flow-b-fixture.ts` | changed | Scaffolds a separate Flow-B callback through the ordinary CLI |
+| `packages/cli/e2e/src/application/gates/scaffold/consume-flow-b-stream.ts` | changed | Correlates the separate Flow-B callback |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | pass | 5 focused tests; scoped check/lint/fmt over 93 files |
+| Static | pass | focused compiler/resolver/gate tests; scoped check/lint/fmt; changed-file quality clean |
 | Fitness | aggregate baseline failure; architecture pass | two unchanged scan findings; `arch:check` exit 0 |
-| Runtime | source failure fixed; environment blocker attributed | correct entrypoint, discovery URL 404, direct users target 200 |
-| Consumer | blocked | canonical fixture port 3001 occupied by unrelated Windows process |
+| Runtime | pass | canonical `scaffold.runtime`: 60 passed / 0 failed |
+| Consumer | pass | `behavior.workers-executions`, Flow-B stream/telemetry, and cleanup green |
 
 ## Open Questions
 
-- Who owns the concurrent Flow-B fixture/test edits, and when is the source tree stable for another gate?
-- May the Windows-side `sco-web` process on port 3001 be stopped for the canonical acceptance run?
+- None for implementation. Separate evaluator verdict remains intentionally outstanding.
 
 ## Drift and Debt
 
-- Drift: parent run/PLAN-EVAL and Tier-D daemon/thread proof unavailable locally; canonical port collision; concurrent overlapping edits invalidated a diagnostic run.
+- Drift: parent run/PLAN-EVAL and Tier-D daemon/thread proof unavailable locally; transient port collision and edit-ownership ambiguity were resolved without permanent fixture changes.
 - Debt: no new or deepened architecture debt accepted.
 
 ## Commits
