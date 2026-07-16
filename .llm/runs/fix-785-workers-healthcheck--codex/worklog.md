@@ -69,7 +69,7 @@ Add a local worker job under `workers/jobs`, generate the runtime registry, and 
 | 2026-07-16 | 3 | Acceptance retry 1 | Durable run stopped at `runtime.flow-b-fixture`: the gate grants `--allow-run=deno`, while the helper used an absolute executable path. Switched the wrapper to the granted upstream command name. |
 | 2026-07-16 | 3 | Acceptance retry 2 | `behavior.workers-executions` passed on the first poll and all product/runtime gates passed through Flow-B trace validation; final telemetry failed because the callback outcome set inside the async body was absent from exported attributes. Moved the outcome into span creation attributes. |
 | 2026-07-16 | 3 | CLI contract | The retained fixture proved `workers add job` emitted handlers but discarded runtime `jobDefinitions`. Extended the generic registry compiler and golden test so every CLI-scaffolded job remains registrable, including nested job paths. |
-| 2026-07-16 | 4 | Final acceptance | Canonical one-pass cleanup run passed 60 / 60. `behavior.workers-executions`, Flow-B telemetry, every other behavior gate, and cleanup were green. |
+| 2026-07-16 | 4 | Final acceptance | Canonical one-pass cleanup run from clean committed source `3b8c374` passed 60 / 60. `behavior.workers-executions`, Flow-B telemetry, every other behavior gate, and cleanup were green. |
 
 ## Decisions
 
@@ -118,7 +118,7 @@ Add a local worker job under `workers/jobs`, generate the runtime registry, and 
 | Diagnostic scaffold runtime | FAIL_REPRODUCED | `.llm/tmp/785-repro*`; `aspire logs workers` | 40 passed / 1 failed; doubled path captured; AppHost stopped |
 | Acceptance scaffold runtime | FAIL_ENVIRONMENT | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | 42 passed / 1 failed; correct module loaded, callback hit unrelated `sco-web` on fixture-fixed port 3001 |
 | Port-isolated diagnostic | INVALIDATED | temporary uncommitted fixture port 3079, then restored | Concurrent source edits landed mid-run; generated type-check failed before runtime behavior |
-| Final acceptance scaffold runtime | PASS | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | 60 passed / 0 failed; cleanup passed |
+| Final acceptance scaffold runtime | PASS | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` from `3b8c374` | 60 passed / 0 failed; `behavior.workers-executions` and cleanup passed |
 
 ### Consumer Gates
 
