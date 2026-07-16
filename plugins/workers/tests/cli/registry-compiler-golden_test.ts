@@ -29,7 +29,7 @@ Deno.test('compileWorkersRegistry emits the golden job registry module', async (
 });
 
 const EXPECTED_WORKERS_REGISTRY =
-  `import type { StaticJobRegistry } from '@netscript/plugin-workers-core/runtime';
+  `import type { RegisterJobInput, StaticJobRegistry } from '@netscript/plugin-workers-core/runtime';
 import * as job0 from "../../../workers/jobs/example-job.ts";
 import * as job1 from "../../../workers/jobs/health-check.ts";
 import * as job2 from "../../../workers/jobs/nested/deep-job.ts";
@@ -46,6 +46,41 @@ const entries: readonly [string, StaticJobHandler][] = [
 
 export const jobRegistry: StaticJobRegistry = new Map(entries);
 export const registry: StaticJobRegistry = jobRegistry;
+
+const jobDefinitionEntries: readonly [string, RegisterJobInput][] = [
+  ["example-job", createLocalJobDefinition("example-job", "./example-job.ts")],
+  ["health-check", createLocalJobDefinition("health-check", "./health-check.ts")],
+  ["deep-job", createLocalJobDefinition("deep-job", "./nested/deep-job.ts")],
+];
+
+export const jobDefinitions = new Map<string, RegisterJobInput>(jobDefinitionEntries);
+export const definitions = jobDefinitions;
+
+function createLocalJobDefinition(id: string, entrypoint: string): RegisterJobInput {
+  return {
+    id,
+    name: toJobName(id),
+    entrypoint,
+    topic: "default",
+    source: "local",
+    executionType: "deno",
+    timezone: "UTC",
+    timeout: 300000,
+    maxRetries: 3,
+    retryDelay: 1000,
+    maxConcurrency: 1,
+    priority: 50,
+    enabled: true,
+    persist: true,
+    tags: [],
+  };
+}
+
+function toJobName(id: string): string {
+  return id.split("-").filter(Boolean).map((part) =>
+    \`\${part.slice(0, 1).toUpperCase()}\${part.slice(1)}\`
+  ).join(" ");
+}
 
 function resolveJobHandler(module: Record<string, unknown>, path: string): StaticJobHandler {
   const candidate = module.default ?? module.handler ?? firstFunctionExport(module);
