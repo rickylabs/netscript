@@ -120,6 +120,9 @@ jobs:
       - name: Format check
         run: deno task fmt:check
 
+      - name: Generated asset freshness
+        run: deno task check:assets-barrel
+
       - name: Scaffold version guard (no preview pins)
         run: deno task check:scaffold-versions
 

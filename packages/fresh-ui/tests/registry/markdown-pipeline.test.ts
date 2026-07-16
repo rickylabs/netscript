@@ -173,3 +173,14 @@ Deno.test('extendSanitizeSchema never allows script or event handlers', () => {
   // The input schema is not mutated.
   assert(base.tagNames?.includes('script'), 'input schema must be left untouched');
 });
+
+Deno.test('extendSanitizeSchema accepts nullable upstream collections', () => {
+  const schema = extendSanitizeSchema({ tagNames: null, attributes: null });
+  assert(schema.tagNames?.includes(CITATION_ELEMENT));
+  assertEquals(schema.attributes?.[CITATION_ELEMENT], [
+    'index',
+    'source',
+    'className',
+    'class',
+  ]);
+});
