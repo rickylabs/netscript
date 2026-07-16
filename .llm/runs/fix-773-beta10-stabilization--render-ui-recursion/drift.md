@@ -24,3 +24,16 @@ documentation.
 - **Action:** defer
 - **Evidence:** filesystem search returned no paths; Fresh 2.x skill and package-local guidance were
   used instead.
+
+## 2026-07-16 — Repository quality scan has unrelated baseline findings
+
+- **What:** `deno task quality:scan` exits 1 on two existing plugin files.
+- **Source:** scanner JSON output.
+- **Expected:** The required framework quality scan would be green.
+- **Actual:** The default scanner covers `packages/cli/src` and `plugins`, not `packages/fresh-ui`,
+  and reports `plugins/streams/services/src/proxy.ts:180` plus
+  `plugins/triggers/streams/producer.ts:34`. A focused Fresh UI scan passes with zero findings and
+  zero allowances.
+- **Severity:** minor
+- **Action:** accept
+- **Evidence:** worklog fitness-gate table; no touched file is in the failing scanner roots.
