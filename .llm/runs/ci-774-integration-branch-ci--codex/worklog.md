@@ -63,6 +63,7 @@ come from `classify` outputs.
 | --- | --- | --- | --- |
 | 2026-07-16 | 0 | Research | Read issue #774, audited workflow filters, PR #770 checks, and `main` ruleset. |
 | 2026-07-16 | 0 | Tier-D proof | Matched managed remote-control app-server, rollout thread, and worktree. |
+| 2026-07-16 | 0 | PLAN-EVAL | Separate Claude Opus session `aa9cc799-5ffe-4c0d-bd5c-06d6f9f19cfc` returned `PASS`. |
 
 ## Decisions
 
@@ -79,7 +80,7 @@ come from `classify` outputs.
 
 ## Gate Results
 
-All implementation gates are `NOT_RUN` until PLAN-EVAL passes.
+PLAN-EVAL: `PASS`. Implementation gates remain `NOT_RUN` until slice 1 lands.
 
 ## Handoff Notes
 

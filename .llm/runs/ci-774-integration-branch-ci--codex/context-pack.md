@@ -6,14 +6,14 @@
 | --- | --- |
 | Run ID | `ci-774-integration-branch-ci--codex` |
 | Branch | `ci/774-integration-branch-ci` |
-| Current phase | `plan-eval` |
+| Current phase | `implement` |
 | Archetype | N/A — infrastructure-only |
 | Scope overlays | none |
 
 ## Current State
 
-Research and design are locked. No workflow implementation has begun. The next hard stop is a
-separate local Claude-family PLAN-EVAL.
+Research and design are locked. Separate local Claude-family PLAN-EVAL passed. No workflow
+implementation has begun yet.
 
 ## Completed
 
@@ -23,16 +23,17 @@ separate local Claude-family PLAN-EVAL.
 - Audited `main` branch protection/rulesets read-only: `quality`, `check-test`, and `deps-report` are
   required by active ruleset `18459345`.
 - Recorded Tier-D daemon, thread, worktree, and steering evidence.
+- PLAN-EVAL passed in session `aa9cc799-5ffe-4c0d-bd5c-06d6f9f19cfc`.
 
 ## In Progress
 
-- Bootstrap commit, draft PR, and PLAN-EVAL handoff.
+- Workflow trigger and lane-visibility implementation.
 
 ## Next Steps
 
-1. Commit/push the bootstrap artifacts and open the draft PR.
-2. Run separate local Claude-family PLAN-EVAL.
-3. Implement only after `PASS`.
+1. Implement slice 1 exactly as approved.
+2. Run YAML/action validation and focused audit.
+3. Commit/push/comment the slice, then run separate IMPL-EVAL.
 
 ## Key Decisions
 
@@ -51,7 +52,7 @@ separate local Claude-family PLAN-EVAL.
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Plan-Gate | pending | Awaiting separate evaluator. |
+| Plan-Gate | PASS | `plan-eval.md`, evaluator session `aa9cc799-5ffe-4c0d-bd5c-06d6f9f19cfc`. |
 | Static | not run | Implementation not started. |
 | Fitness | N/A | No package/plugin surface. |
 | Runtime | N/A | YAML-only slice. |
