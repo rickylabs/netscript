@@ -4,7 +4,9 @@
 
 Research, re-baseline, plan, and Design checkpoint are complete on base `7d353be`. The supervisor
 recorded plan commit `79ccd9bb` and PR #795, then explicitly authorized implementation of the locked
-plan as a written Plan-Gate override. C1–C3 implementation and focused gates are complete.
+plan as a written Plan-Gate override. C1–C3 implementation and the final gate matrix are complete.
+The required full runtime smoke passed 60/60. `quality:scan` reports two untouched baseline plugin
+findings; all other gates pass.
 
 ## Scope
 
@@ -39,4 +41,4 @@ Focused tests, asset parity, scoped check/lint/fmt wrappers over both touched pa
 
 ## Next action
 
-Commit, push, and comment C3 on PR #795, then run the locked final gate matrix and update the PR.
+Push the final evidence commit and hand the draft PR to the supervisor-owned IMPL-EVAL lane.

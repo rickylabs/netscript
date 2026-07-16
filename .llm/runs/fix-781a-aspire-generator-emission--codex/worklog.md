@@ -99,7 +99,7 @@ source `.template` assets when generated helper runtime behavior changes, run
 | Plan bootstrap | complete | `79ccd9bb` | Plan-Gate inputs prepared | pushed; PR #795 opened |
 | C1 executable emission | complete | `8336acff` | focused tests 8 suites / 80 steps; scoped CLI check/lint/fmt PASS | pushed; PR comment posted |
 | C2 environment projection | complete | `cd015efd` | focused tests 12 suites / 94 steps; scoped Aspire/CLI check/lint/fmt PASS | pushed; PR comment posted |
-| C3 bounded restore | complete | pending | focused tests 2 suites / 16 steps; scoped CLI check/lint/fmt PASS | pending |
+| C3 bounded restore | complete | `f897f41c` | focused tests 2 suites / 16 steps; scoped CLI check/lint/fmt PASS | pushed; PR comment posted |
 
 ## Gate results
 
@@ -159,3 +159,20 @@ The generated runtime edge now passes a named 10-second timeout to the best-effo
   exception was introduced.
 - C3 reconcile: the bounded restore matches the locked plan without broadening into Garnet
   lifecycle redesign. No new suppression, dependency, or architecture exception was introduced.
+
+## Final implementation gates
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Asset parity | PASS | `deno task check:assets-barrel`, exit 0 |
+| Scoped check/lint/fmt | PASS | Aspire + CLI helper/assets roots, 68 files, 0 findings |
+| Architecture | PASS | `deno task arch:check`, exit 0 (warnings only) |
+| Full-export doc lint | PASS | Aspire 9 exports + CLI 3 exports checked |
+| Publish dry-run | PASS | workspace dry-run and Aspire package dry-run, exit 0 |
+| Full scaffold runtime | PASS | 60 passed / 0 failed, cleanup completed |
+| Quality scan | BASELINE FAIL | two findings outside the slice: `plugins/streams/services/src/proxy.ts:180` and `plugins/triggers/streams/producer.ts:34` |
+
+`quality:scan` was run exactly as required. Neither reported path differs from the merge base and
+this slice adds no suppression; repairing unrelated plugin findings would violate the locked scope.
+The failure is therefore recorded transparently for the supervisor/evaluator rather than hidden or
+expanded into this PR.
