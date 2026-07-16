@@ -12,23 +12,24 @@ Do not merge until the Plan-Gate and final separate-session evaluator pass are c
 
 ## Definition of Done
 
-- [ ] Core `check-test`, `quality`, `deps-report`, and `close-gate` schedule for PRs into `main`, `feat/**`, and `epic/**`.
-- [ ] Scaffold applicability covers the same base families without weakening path/label policy.
-- [ ] Always-on summaries distinguish lanes that ran from lanes skipped by policy.
+- [x] Core `check-test`, `quality`, `deps-report`, and `close-gate` schedule for PRs into `main`, `feat/**`, and `epic/**`.
+- [x] Scaffold applicability covers the same base families without weakening path/label policy.
+- [x] Always-on summaries distinguish lanes that ran from lanes skipped by policy.
 - [x] `main` protection/rulesets audited read-only and required checks recorded below.
-- [ ] Workflow YAML validation passes.
+- [x] Workflow YAML validation passes.
 - [ ] Separate-session PLAN-EVAL and IMPL-EVAL pass.
 
 ## Slices
 
 - [x] S0 research, design, and ruleset audit — bootstrap commit
-- [ ] S1 trigger and lane-visibility implementation
+- [x] S1 trigger and lane-visibility implementation — see the live commit list and IMPL phase comment
 - [ ] S2 opposite-family implementation evaluation and handoff
 
 ## Validation
 
-- Workflow YAML parse — pending implementation
-- `actionlint` — pending availability check
+- Workflow YAML parse + structural assertions — PASS (10 workflows)
+- Classifier tests — PASS (30 passed, 0 failed)
+- `actionlint` — unavailable on this host; focused diff and structural assertions used
 - TypeScript check — N/A unless TypeScript or Deno task wiring changes
 
 ### Expected lane behavior
@@ -53,7 +54,7 @@ No settings were changed.
 ## Harness
 
 - Run dir: `.llm/runs/ci-774-integration-branch-ci--codex/`
-- Phase: plan-eval — see phase comments below.
+- Phase: impl-eval — see phase comments below.
 
 ## Drift / Debt
 

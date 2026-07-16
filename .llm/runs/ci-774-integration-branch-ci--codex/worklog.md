@@ -64,6 +64,10 @@ come from `classify` outputs.
 | 2026-07-16 | 0 | Research | Read issue #774, audited workflow filters, PR #770 checks, and `main` ruleset. |
 | 2026-07-16 | 0 | Tier-D proof | Matched managed remote-control app-server, rollout thread, and worktree. |
 | 2026-07-16 | 0 | PLAN-EVAL | Separate Claude Opus session `aa9cc799-5ffe-4c0d-bd5c-06d6f9f19cfc` returned `PASS`. |
+| 2026-07-16 | 1 | Implement | Widened core/e2e base applicability and added core/scaffold lane summaries. |
+| 2026-07-16 | 1 | Validate | Parsed all 10 workflows; classifier tests passed 30/30; `actionlint` unavailable. |
+| 2026-07-16 | 1 | Slice review | Separate Claude Opus session `c8f83551-98cf-4b6c-a89b-72ef2d6450f8` returned `PASS`. |
+| 2026-07-16 | 1 | Reconcile | #774 remains open with correct taxonomy/milestone; PR #787 carries `Closes #774`; no new comments required plan adjustment. |
 
 ## Decisions
 
@@ -80,7 +84,32 @@ come from `classify` outputs.
 
 ## Gate Results
 
-PLAN-EVAL: `PASS`. Implementation gates remain `NOT_RUN` until slice 1 lands.
+### Static Gates
+
+| Gate | Command or check | Result | Notes |
+| --- | --- | --- | --- |
+| YAML parse + structural assertions | `deno eval --no-lock` with `npm:yaml@2.8.1` | PASS | Parsed 10 workflows; confirmed core base list, e2e `startsWith` fragments, and both visibility jobs. |
+| Classifier behavior | `deno test --frozen --allow-read --allow-write --allow-env .github/scripts/ci-classify-changes.test.ts` | PASS | 30 passed, 0 failed; docs-only and `ci:skip-*` / `ci:full` precedence preserved. |
+| Action syntax | `command -v actionlint` | NOT_RUN | `actionlint` is not installed; compensated by YAML assertions and focused diff review. |
+| Focused trigger audit | Search all `.github/workflows` PR base filters and `base.ref` checks | PASS | Only `ci.yml` event filter and `e2e-cli.yml` applicability gate required widening; other PR workflows are unrestricted by base. |
+| TypeScript check | N/A | N/A | No TypeScript or Deno task wiring changed. |
+| Lock hygiene | Raw `git status --short` | PASS | Parser-induced `deno.lock` resolution was inspected and removed; lock is clean. |
+
+### Fitness Gates
+
+N/A — no package/plugin framework surface.
+
+### Runtime Gates
+
+N/A — no local scaffold runtime requested or needed for workflow YAML.
+
+### Consumer Gates
+
+| Consumer | Result | Evidence | Notes |
+| --- | --- | --- | --- |
+| PR → `main` | PASS (reasoned) | Trigger/filter diff | Core lanes schedule; scaffold classifier applies and retains existing selection policy. |
+| PR → `feat/beta10-integration` | PASS (reasoned) | `feat/**` trigger + `startsWith(..., 'feat/')` | Same honest coverage as `main`. |
+| Docs-only + `ci:skip-e2e` | PASS (tested/reasoned) | Classifier tests + summary logic | Core runs; scaffold jobs short-circuit and summary reports policy skips. |
 
 ## Handoff Notes
 
