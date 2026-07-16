@@ -6,15 +6,16 @@
 | ----- | ----- |
 | Run ID | `fix-790-md-hydration-ci--codex` |
 | Branch | `fix/790-md-hydration-ci` |
-| Current phase | `plan — owner-authorized evaluator override` |
+| Current phase | `gate — awaiting own-PR check-test` |
 | Archetype | `4 — Public DSL / Builder` |
 | Scope overlays | `frontend` |
 
 ## Current State
 
-The GitHub job log and an isolated local Deno cache reproduce the same production-build failure:
-Fresh core's versioned npm import of `@preact/signals` is not resolved by Vite on a clean runner.
-The existing NetScript Vite plugin owns Preact runtime identity but currently excludes Signals.
+The root cause is fixed at `@netscript/fresh/vite`: Fresh core's versioned Signals import now
+converges on the generated app's pinned bare import-map entry, Signals is deduped beside Preact, and
+future Markdown build failures print labeled stdout/stderr. A brand-new isolated Deno cache now
+passes the production-build gate.
 
 ## Completed
 
@@ -23,16 +24,21 @@ The existing NetScript Vite plugin owns Preact runtime identity but currently ex
 - Read GitHub job `87754952044` through the repository token resolver.
 - Reproduced the failure with an isolated `DENO_DIR`.
 - Locked the plan and Design checkpoint without source edits.
+- Opened draft PR #797 with the required base, labels, milestone, and non-closing issue context.
+- Captured a red focused resolver regression before implementation.
+- Implemented and documented package-owned Signals canonicalization/dedupe.
+- Passed clean-cache build, focused Markdown/Vite tests, all 200 Fresh tests, root/touched-root
+  checks, lint/fmt, scoped quality, architecture, and publish dry-run.
 
 ## In Progress
 
-- S0 artifact commit, explicit push, and draft PR opening.
+- S1 evidence update, commit, explicit push, and PR `check-test` acceptance.
 
 ## Next Steps
 
-1. Add the red resolver regression.
-2. Implement Signals canonicalization/dedupe and explicit build diagnostics.
-3. Run focused, isolated-cache, scoped, quality, and CI gates.
+1. Commit and explicitly push S1.
+2. Update PR #797 body/comment with the complete evidence.
+3. Wait for the PR's real `check-test` result; do not dispatch evals or merge.
 
 ## Key Decisions
 
@@ -47,15 +53,19 @@ The existing NetScript Vite plugin owns Preact runtime identity but currently ex
 | Path | Status | Notes |
 | ---- | ------ | ----- |
 | `.llm/runs/fix-790-md-hydration-ci--codex/**` | new | Harness research, plan, design, and evidence. |
+| `packages/fresh/src/application/vite/vite.ts` | changed | Signals canonicalization and dedupe at the owner boundary. |
+| `packages/fresh/src/application/vite/vite.test.ts` | changed | Red/green resolver, boundary, metadata, and merged-dedupe coverage. |
+| `packages/fresh/src/application/vite/README.md` | changed | Clean-cache hydration runtime policy. |
+| `packages/fresh-ui/tests/registry/markdown-renderer.test.ts` | changed | Explicit command/stdout/stderr failure output. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Static | planned | touched-root wrappers after S1 |
-| Fitness | planned | quality/architecture/package surface after S1 |
-| Runtime | baseline failure reproduced | GitHub job + isolated-cache local run |
-| Consumer | baseline failure reproduced | generated Fresh production build |
+| Static | pass | root check 2,304 files; touched-root check/lint/fmt clean |
+| Fitness | pass with attributed baseline residue | scoped quality and architecture pass; `./vite` docs clean; publish dry-run pass |
+| Runtime | pass | clean-cache build 1/1; Vite 10/10; Markdown 2/2; Fresh 200/200 |
+| Consumer | pass locally; CI pending | generated Fresh production build passes from new cache; PR #797 `check-test` pending |
 
 ## Open Questions
 
@@ -63,10 +73,10 @@ The existing NetScript Vite plugin owns Preact runtime identity but currently ex
 
 ## Drift and Debt
 
-- Drift: evaluator dispatch reserved to supervisor; warm cache masked the failure.
+- Drift: evaluator dispatch reserved to supervisor; warm cache masked the failure; untouched
+  repository quality/doc findings remain outside this slice.
 - Debt: none planned.
 
 ## Commits
 
 - See the draft PR's commit list + per-slice PR comments after S0.
-

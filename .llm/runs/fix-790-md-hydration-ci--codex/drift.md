@@ -23,3 +23,16 @@
 - **Action:** fix at the package-owned Vite resolver and preserve the clean-runner regression.
 - **Evidence:** `research.md` findings 2–5 and `worklog.md` baseline gates.
 
+## 2026-07-17 — Repository quality and doc gates retain untouched findings
+
+- **What:** The mandatory repository quality scan exits 1 and Fresh doc-lint reports 25 findings.
+- **Source:** `deno task quality:gate` and `deno task doc:lint --root packages/fresh --pretty`.
+- **Expected:** Framework gates are green when the changed source is compliant.
+- **Actual:** The quality findings are the inherited plugin suppressions at
+  `plugins/streams/services/src/proxy.ts:180` and `plugins/triggers/streams/producer.ts:34`; all doc
+  findings are in untouched route contract types. The changed Vite root has zero quality findings
+  or allowances and the `./vite` entrypoint has zero doc findings.
+- **Severity:** minor
+- **Action:** attribute the existing findings without adding suppressions or broadening this P0 CI
+  fix; retain root `arch:check`, scoped quality, and publish dry-run as the owned verdicts.
+- **Evidence:** `worklog.md` fitness gate table and byte-scoped diff review.
