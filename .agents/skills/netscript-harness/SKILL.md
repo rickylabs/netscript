@@ -304,6 +304,7 @@ User says "use harness"
 | `.llm/harness/workflow/activation.md`           | Every harness run           |
 | `.llm/harness/workflow/run-loop.md`             | Every harness run           |
 | `.llm/harness/workflow/lane-policy.md`          | Lane assignment + model bindings |
+| `.llm/harness/workflow/doc-audit.md`            | Docs-changeset runs — opposite-family Sol audit + Fable prose polish of Claude-generated docs |
 | `.llm/harness/workflow/supervisor.md`           | Multi-group supervisor runs |
 | `.llm/harness/workflow/seed-run.md`             | Planning-only board-seeding runs (discovery → roadmap → owner-ratified filing) |
 | `.llm/harness/gates/plan-gate.md`               | Plan-Gate checklist         |

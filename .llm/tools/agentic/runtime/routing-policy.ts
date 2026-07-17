@@ -1,7 +1,12 @@
 /** Pure policy data and guards for quota fallback route selection. */
 
 import type { RouteIdentity, SessionIdentity } from './contract.ts';
-import { MODEL_IDS, OPEN_EVALUATOR_MODEL_IDS, OPENCODE_MODEL_IDS } from '../config/models.ts';
+import {
+  MODEL_IDS,
+  OPEN_EVALUATOR_MODEL_IDS,
+  OPENCODE_MODEL_IDS,
+  OPENROUTER_MODEL_IDS,
+} from '../config/models.ts';
 import { OPENROUTER_PRESETS, type OpenRouterPresetId } from './provider-profiles.ts';
 
 export const MODEL_FAMILIES = ['anthropic', 'openai', 'google', 'open', 'other'] as const;
@@ -16,6 +21,8 @@ export const ROUTING_LANE_PURPOSES = [
   'claude_workflow',
   'research_extraction',
   'evaluation',
+  'docs_audit',
+  'docs_polish',
 ] as const;
 export type RoutingLanePurpose = typeof ROUTING_LANE_PURPOSES[number];
 
@@ -30,6 +37,8 @@ export const ROUTING_LANES = [
   'major_ui_ux_adversarial_review',
   'adversarial_design_eval',
   'documentation_review',
+  'docs_audit',
+  'docs_polish',
   'chore_code',
   'claude_workflow',
   'research_extraction',
@@ -61,6 +70,19 @@ export interface CanonicalRoutePolicy {
   readonly requiresExplicitApproval?: boolean;
   readonly evaluatesFamily?: ModelFamily;
   readonly evaluatorModelPolicy?: 'open_only';
+  /**
+   * Declared, machine-readable effort escalations for this route. Each entry
+   * names the condition under which the launcher may run the SAME route at a
+   * different effort (e.g. docs_audit `large_changeset` → high). Escalation
+   * never changes agent/provider/model — only effort — and any condition not
+   * declared here is rejected by {@link resolveCanonicalRouteEffort}.
+   */
+  readonly effortEscalations?: readonly EffortEscalation[];
+}
+
+export interface EffortEscalation {
+  readonly condition: string;
+  readonly effort: RouteIdentity['effort'];
 }
 
 const MAJOR_UI_UX_PRESET = OPENROUTER_PRESETS['claude-design-glm-5-2'];
@@ -189,6 +211,64 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     model: MODEL_IDS.codexLuna,
     effort: 'high',
     condition: 'fallback_on_sonnet_token_limit',
+  },
+  // --- Single-pass audit of a Claude-generated docs changeset ---------------------
+  // Owner-revised 2026-07-17. The whole changeset is audited in ONE pass by
+  // Codex · Sol · medium — OPPOSITE-FAMILY to the Claude generators, which
+  // restores family diversity for generated-docs accuracy. Use `high` for large
+  // changesets (auditor discretion, stated in workflow/doc-audit.md). Every accuracy
+  // gate is executed by the auditor (commands run, `deno doc` inspected) — verdicts
+  // from evidence, never from the generator's claims. There is NO cross-family
+  // fallback: the audit is defined by its opposite-family transport, so a fallback
+  // would defeat the lane. Profile: workflow/doc-audit.md.
+  {
+    lane: 'docs_audit',
+    purpose: 'docs_audit',
+    agent: 'codex',
+    provider: 'openai',
+    model: MODEL_IDS.codexSol,
+    effort: 'medium',
+    condition: 'single_pass_opposite_family_audit_of_generated_docs_changeset',
+    effortEscalations: [{ condition: 'large_changeset', effort: 'high' }],
+  },
+  // --- Final edit-only prose-polish pass, after audit + fixes land -----------------
+  // Owner-revised 2026-07-17. Runs LAST in the docs pipeline: Claude · Fable 5 ·
+  // medium edits prose in place for voice/flow/precision. It must not re-author
+  // documents from scratch or change technical claims — any accuracy doubt returns
+  // to the docs_audit lane. Fallback chain (depth 2): token-limit → Opus 4.8 ·
+  // xhigh (Claude-family); and only if NO Claude-agent surface is available at all,
+  // GLM 5.2 · xhigh over the `claude-openrouter` transport the design lanes use.
+  // GLM is a polish-fallback-of-last-resort ONLY here — this does not widen GLM
+  // beyond its design scope elsewhere. Profile: workflow/doc-audit.md.
+  {
+    lane: 'docs_polish',
+    purpose: 'docs_polish',
+    agent: 'claude',
+    provider: 'anthropic',
+    model: MODEL_IDS.fable,
+    effort: 'medium',
+    subscriptionState: 'included',
+    condition: 'edit_only_prose_polish_after_audit',
+  },
+  {
+    lane: 'docs_polish',
+    purpose: 'docs_polish',
+    agent: 'claude',
+    provider: 'anthropic',
+    model: MODEL_IDS.opus,
+    effort: 'xhigh',
+    condition: 'fallback_on_fable_token_limit',
+  },
+  {
+    lane: 'docs_polish',
+    purpose: 'docs_polish',
+    agent: 'claude',
+    provider: 'openrouter',
+    profileId: MAJOR_UI_UX_PRESET.profileId,
+    presetId: MAJOR_UI_UX_PRESET.id,
+    model: OPENROUTER_MODEL_IDS.glm,
+    effort: 'xhigh',
+    condition: 'fallback_no_claude_surface',
   },
   {
     lane: 'chore_code',
@@ -429,6 +509,28 @@ export function resolveCanonicalRoute(lane: RoutingLane, at: Date): CanonicalRou
   return primary;
 }
 
+/**
+ * Resolves the effort a launcher may use for a canonical route. With no
+ * escalation condition, the route's declared effort is returned. With one, the
+ * condition must be declared in the route's `effortEscalations` — undeclared
+ * escalations throw, so effort discretion lives in policy data, never in prose.
+ */
+export function resolveCanonicalRouteEffort(
+  route: CanonicalRoutePolicy,
+  escalationCondition?: string,
+): RouteIdentity['effort'] {
+  if (!escalationCondition) return route.effort;
+  const escalation = route.effortEscalations?.find((entry) =>
+    entry.condition === escalationCondition
+  );
+  if (!escalation) {
+    throw new Error(
+      `route ${route.lane} declares no effort escalation for ${escalationCondition}`,
+    );
+  }
+  return escalation.effort;
+}
+
 export interface FallbackCandidate {
   readonly route: RouteIdentity;
   readonly family: ModelFamily;
@@ -477,6 +579,10 @@ function candidateAllowed(
     return false;
   }
   if (context.purpose === 'evaluation' && candidate.family === context.authorFamily) return false;
+  // The docs_audit lane is defined by its opposite-family transport (OpenAI
+  // auditing Claude-generated docs) and has NO cross-family fallback: fail closed
+  // on any candidate outside the OpenAI family rather than trade the invariant.
+  if (context.purpose === 'docs_audit' && candidate.family !== 'openai') return false;
   if (
     (candidate.subscriptionState === 'outside_plan' || candidate.requiresExplicitApproval) &&
     !context.explicitPaidApproval
