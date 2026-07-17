@@ -3705,6 +3705,7 @@
         "dependencies": [
           "jsr:@fresh/core@^2.3.3",
           "jsr:@netscript/ai@0.0.1-beta.10",
+          "jsr:@netscript/sdk@0.0.1-beta.10",
           "jsr:@netscript/telemetry@0.0.1-beta.10",
           "jsr:@std/assert@1",
           "jsr:@std/http@1",
@@ -3713,6 +3714,7 @@
           "jsr:@zod/zod@4.4.3",
           "npm:@durable-streams/state@~0.3.1",
           "npm:@durable-streams/tanstack-ai-transport@^0.0.8",
+          "npm:@orpc/server@^1.14.6",
           "npm:@tanstack/ai-preact@~0.10.1",
           "npm:@tanstack/ai@0.39",
           "npm:preact-render-to-string@^6.7.0",

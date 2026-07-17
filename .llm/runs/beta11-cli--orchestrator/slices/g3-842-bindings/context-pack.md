@@ -2,23 +2,22 @@
 
 ## Run Metadata
 
-| Field          | Value                                                                               |
-| -------------- | ----------------------------------------------------------------------------------- |
-| Run ID         | `beta11-cli--orchestrator/slices/g3-842-bindings`                                   |
-| Branch         | `feat/desktop-frontend-842-bindings`                                                |
-| Draft PR       | [#853](https://github.com/rickylabs/netscript/pull/853) → `feat/desktop-frontend`   |
-| Current phase  | `plan-eval` — plan ready, supervisor-owned evaluator not dispatched by this session |
-| Archetype      | `4 — Public DSL / Builder` with adapter/runtime subtype gates                       |
-| Scope overlays | `frontend` browser/Aspire no-op; UI/route/visual gates N/A                          |
+| Field          | Value                                                                             |
+| -------------- | --------------------------------------------------------------------------------- |
+| Run ID         | `beta11-cli--orchestrator/slices/g3-842-bindings`                                 |
+| Branch         | `feat/desktop-frontend-842-bindings`                                              |
+| Draft PR       | [#853](https://github.com/rickylabs/netscript/pull/853) → `feat/desktop-frontend` |
+| Current phase  | `implement` — slice 2 complete, awaiting Tier-A review                            |
+| Archetype      | `4 — Public DSL / Builder` with adapter/runtime subtype gates                     |
+| Scope overlays | `frontend` browser/Aspire no-op; UI/route/visual gates N/A                        |
 
 ## Current State
 
-Research, plan, and the Design checkpoint are complete on integration baseline `e6e1be08`. Draft PR
-#853 targets `feat/desktop-frontend`, is draft, carries `Closes #842`, has the six requested labels
-with `status:plan` as the sole lifecycle label, and is assigned milestone 13 (`0.0.1-beta.11`). The
-public surfaces, three-operation bind protocol, per-window state ownership, typed oRPC composition,
-Fresh feature detection, three implementation slices, and all gates are locked. No SDK/Fresh
-implementation file has been created. The Plan-Gate hard stop is active.
+The group Plan-Gate passed D1–D16. Slice 1 (`a77b210c`) implemented the SDK transport and received
+Tier-A PASS. Slice 2 now implements `@netscript/fresh/desktop`: structural Desktop gating,
+`RPCHandler.upgrade`, per-window binding ownership, explicit disabled lifecycle, and idempotent
+close/unbind. Draft PR #853 still targets `feat/desktop-frontend`, carries `Closes #842`, remains
+draft on milestone 13, and uses `status:impl`; issue #842 was reconciled to the same lifecycle.
 
 ## Completed
 
@@ -39,18 +38,14 @@ implementation file has been created. The Plan-Gate hard stop is active.
 
 ## In Progress
 
-- Push this PR-handoff reconciliation, post `Plan & Design — READY FOR REVIEW`, and stop for
-  supervisor-owned Plan-Gate evaluation.
+- Commit and push slice 2, post its structured gate evidence, and pause for Tier-A review.
 
 ## Next Steps
 
-1. Supervisor dispatches a separate-session PLAN-EVAL and records `PASS` or `FAIL_PLAN` in
-   `plan-eval.md` and on the PR.
-2. If `FAIL_PLAN`, revise only the research/design artifacts and repeat the handoff.
-3. If `PASS`, supervisor transitions the sole lifecycle label to `status:impl` and explicitly
-   returns the implementation lane.
-4. Implement slice 1 only, run its complete gates, commit/push/comment, then pause for Tier-A
-   review.
+1. Supervisor performs the Tier-A slice-2 review; this session does not dispatch it.
+2. On PASS, implement slice 3 consumer/JSR closeout without adding capability.
+3. Run both full package tasks and the complete publication/quality/architecture gate set.
+4. Commit/push/comment slice 3, then pause for its Tier-A review and supervisor-owned IMPL-EVAL.
 
 ## Key Decisions
 
@@ -76,16 +71,18 @@ implementation file has been created. The Plan-Gate hard stop is active.
 | `.llm/runs/beta11-cli--orchestrator/slices/g3-842-bindings/drift.md`        | new    | Integration/toolchain/doc-baseline drift.                  |
 | `.llm/runs/beta11-cli--orchestrator/slices/g3-842-bindings/plan-eval.md`    | new    | Pending supervisor-owned evaluator placeholder.            |
 
-No product/package file is changed in the planning checkpoint.
+Slice 1 added `packages/sdk/src/desktop/**` and its tests/docs/export. Slice 2 adds
+`packages/fresh/src/runtime/desktop/**` plus Fresh README/export/task/dependency wiring. The draft
+PR commit list is the canonical exact file trail.
 
 ## Gates
 
-| Gate family | Current status                         | Evidence                                                                                                           |
-| ----------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Static      | BASELINED / implementation NOT_RUN     | Raw package dry-runs pass; implementation wrappers/full tests await Plan-Gate.                                     |
-| Fitness     | PLAN COMPLETE / implementation NOT_RUN | Doctrine mapping, anti-pattern controls, risk register, full gate set, and JSR baselines in research/plan/worklog. |
-| Runtime     | DESIGNED / NOT_RUN                     | Installed oRPC and official Deno behavior inspected; acceptance matrix locked.                                     |
-| Consumer    | DESIGNED / NOT_RUN                     | Public caller shapes locked; fixtures belong to slices 1–3.                                                        |
+| Gate family | Current status              | Evidence                                                                       |
+| ----------- | --------------------------- | ------------------------------------------------------------------------------ |
+| Static      | PASS through slice 2        | SDK 36/36, Fresh 206/206, and both scoped wrapper sets pass.                   |
+| Fitness     | PASS_WITH_BASELINES         | New entrypoints are doc-clean; quality/architecture/publish gates pass.        |
+| Runtime     | PASS through slice 2        | Strings, bytes, errors, isolation, no-op detection, and cleanup are exercised. |
+| Consumer    | SDK PASS / closeout pending | SDK type fixture passes; combined public consumer closeout remains slice 3.    |
 
 ## Open Questions
 

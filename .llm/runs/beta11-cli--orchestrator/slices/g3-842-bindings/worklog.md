@@ -156,6 +156,11 @@ port and extend the full acceptance matrix—never add a second binding declarat
 | 2026-07-18 01:15 CEST | gate  | group Plan-Gate PASS                | Supervisor approved D1–D16 as locked; D7 cast-free structural acceptance is a review-blocking bar. PR lifecycle moved from `status:plan` to `status:impl`.                   |
 | 2026-07-18 01:45 CEST | 1     | SDK desktop transport               | Implemented real-MessagePort bind shim, one receive pump, FIFO/per-window server state, exact-once close, native error rehydration, oRPC link, typed client, and byte codec. |
 | 2026-07-18 02:00 CEST | 1     | SDK authoritative gates             | Full SDK tests 36/36; scoped check/lint/fmt, exact/focused quality scans, architecture gates, desktop entrypoint doc lint, JSR audit, and raw publish dry-run pass.          |
+| 2026-07-18 02:15 CEST | 1     | Tier-A review PASS                  | Supervisor reviewed `a77b210c` and signed off D5/D6/D7, constants/types, isolation, FIFO, and close semantics.                                                               |
+| 2026-07-18 02:35 CEST | 2     | Fresh Desktop runtime               | Added structural capability gate, package-owned router/window types, `RPCHandler.upgrade`, per-window bind lifecycle, symmetric byte serializer, and exact-once unbind.      |
+| 2026-07-18 02:45 CEST | 2     | acceptance matrix                   | Fresh tests prove browser/Aspire no-op, missing window, name validation, typed string/bytes, procedure errors, two-window isolation, and idempotent cleanup.                 |
+| 2026-07-18 02:55 CEST | 2     | authoritative gates                 | Fresh 206/206 and SDK 36/36; Fresh 169-file wrappers, exact/focused quality, architecture, specifier, new-entrypoint doc lint, and raw publish dry-run pass.                 |
+| 2026-07-18 03:00 CEST | 2     | post-slice reconcile                | #842 and PR #853 remain open/draft on milestone 13; both now use sole `status:impl`; no new PR comments beyond the recorded S1 handoff; `Closes #842` remains correct.       |
 
 ## Decisions
 
@@ -182,25 +187,32 @@ port and extend the full acceptance matrix—never add a second binding declarat
 
 ### Static Gates
 
-| Gate                       | Command or check                                           | Result | Notes                                                          |
-| -------------------------- | ---------------------------------------------------------- | ------ | -------------------------------------------------------------- |
-| Baseline SDK raw dry-run   | `deno publish --dry-run --allow-dirty` in `packages/sdk`   | PASS   | Exit 0; intended G2 file list; no actual slow-type diagnostic. |
-| Baseline Fresh raw dry-run | `deno publish --dry-run --allow-dirty` in `packages/fresh` | PASS   | Exit 0; no actual slow-type diagnostic.                        |
-| SDK scoped check/lint/fmt  | repo wrappers over `packages/sdk`                          | PASS   | 75 TypeScript files; zero findings.                            |
-| SDK exact/focused quality  | `quality:scan` plus `--root packages/sdk`                  | PASS   | Zero findings; only intentional negative-fixture allowances.   |
-| SDK full package tests     | `deno task --cwd packages/sdk test`                        | PASS   | 36 passed, 0 failed; full test directory, not a curated list.  |
+| Gate                        | Command or check                                           | Result | Notes                                                          |
+| --------------------------- | ---------------------------------------------------------- | ------ | -------------------------------------------------------------- |
+| Baseline SDK raw dry-run    | `deno publish --dry-run --allow-dirty` in `packages/sdk`   | PASS   | Exit 0; intended G2 file list; no actual slow-type diagnostic. |
+| Baseline Fresh raw dry-run  | `deno publish --dry-run --allow-dirty` in `packages/fresh` | PASS   | Exit 0; no actual slow-type diagnostic.                        |
+| SDK scoped check/lint/fmt   | repo wrappers over `packages/sdk`                          | PASS   | 75 TypeScript files; zero findings.                            |
+| SDK exact/focused quality   | `quality:scan` plus `--root packages/sdk`                  | PASS   | Zero findings; only intentional negative-fixture allowances.   |
+| SDK full package tests      | `deno task --cwd packages/sdk test`                        | PASS   | 36 passed, 0 failed; full test directory, not a curated list.  |
+| Fresh scoped check/lint/fmt | repo wrappers over `packages/fresh`                        | PASS   | 169 TypeScript files; zero findings after formatting.          |
+| Fresh exact/focused quality | `quality:scan` plus `--root packages/fresh`                | PASS   | Zero new findings; one unrelated documented allowance.         |
+| Fresh full package tests    | `deno task --cwd packages/fresh test`                      | PASS   | 206 passed, 0 failed; full `src` + `tests` task.               |
 
 ### Fitness Gates
 
-| Gate                            | Result             | Evidence                                             | Notes                                                                                                                           |
-| ------------------------------- | ------------------ | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| SDK full-export doc baseline    | PASS_WITH_BASELINE | `deno task doc:lint --root packages/sdk --pretty`    | One unrelated transitive private ref; auto-update and root are clean.                                                           |
-| Fresh full-export doc baseline  | PASS_WITH_BASELINE | `deno task doc:lint --root packages/fresh --pretty`  | Existing 40: 23 private refs + 17 missing JSDoc in untouched graphs.                                                            |
-| SDK JSR helper                  | PASS_WITH_BASELINE | audit helper with `--allow-run`                      | Only known progress-banner warning.                                                                                             |
-| Fresh JSR helper                | FAIL_BASELINE      | audit helper with `--allow-run`                      | Existing missing module tags on `./ai`/`./vite`, AI cardinality warning, and banner warning. New desktop surface must add none. |
-| SDK desktop entrypoint doc lint | PASS               | `deno doc --lint src/desktop/mod.ts`                 | Independently clean; no private oRPC type leaks.                                                                                |
-| SDK JSR helper + raw dry-run    | PASS               | audit helper; `deno publish --dry-run --allow-dirty` | Intended files only; no actual slow-type finding.                                                                               |
-| SDK focused + root architecture | PASS_WITH_WARNINGS | `arch:check:repo`; `arch:check`                      | Exit 0; only recorded baseline cardinality/documentation warnings.                                                              |
+| Gate                              | Result             | Evidence                                             | Notes                                                                                                                           |
+| --------------------------------- | ------------------ | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| SDK full-export doc baseline      | PASS_WITH_BASELINE | `deno task doc:lint --root packages/sdk --pretty`    | One unrelated transitive private ref; auto-update and root are clean.                                                           |
+| Fresh full-export doc baseline    | PASS_WITH_BASELINE | `deno task doc:lint --root packages/fresh --pretty`  | Existing 40: 23 private refs + 17 missing JSDoc in untouched graphs.                                                            |
+| SDK JSR helper                    | PASS_WITH_BASELINE | audit helper with `--allow-run`                      | Only known progress-banner warning.                                                                                             |
+| Fresh JSR helper                  | FAIL_BASELINE      | audit helper with `--allow-run`                      | Existing missing module tags on `./ai`/`./vite`, AI cardinality warning, and banner warning. New desktop surface must add none. |
+| SDK desktop entrypoint doc lint   | PASS               | `deno doc --lint src/desktop/mod.ts`                 | Independently clean; no private oRPC type leaks.                                                                                |
+| SDK JSR helper + raw dry-run      | PASS               | audit helper; `deno publish --dry-run --allow-dirty` | Intended files only; no actual slow-type finding.                                                                               |
+| SDK focused + root architecture   | PASS_WITH_WARNINGS | `arch:check:repo`; `arch:check`                      | Exit 0; only recorded baseline cardinality/documentation warnings.                                                              |
+| Fresh desktop entrypoint doc lint | PASS               | `deno doc --lint src/runtime/desktop/mod.ts`         | Independently clean: zero private references and missing docs.                                                                  |
+| Fresh full doc baseline           | PASS_WITH_BASELINE | structured `doc:lint --root packages/fresh`          | Exactly 40 existing findings; new desktop entrypoint contributes zero.                                                          |
+| Fresh raw publish dry-run         | PASS               | `deno publish --dry-run --allow-dirty`               | Intended desktop production files included; tests excluded; no slow-type finding.                                               |
+| Fresh focused + root architecture | PASS_WITH_WARNINGS | `arch:check:repo`; `arch:check`                      | Exit 0; only recorded existing AI/route/cardinality/docs warnings.                                                              |
 
 ### Runtime Gates
 
@@ -209,26 +221,22 @@ port and extend the full acceptance matrix—never add a second binding declarat
 | Shipped adapter surface inspection | PASS   | `deno doc` and cached 1.14.6 code | Port requires post/message/close semantics; default serializer confirmed.            |
 | Deno bind capability model         | PASS   | official 2.9 docs                 | Promise, JSON/bytes, error shape, unbind, and per-window behavior confirmed.         |
 | SDK shim/oRPC behavior             | PASS   | full SDK test task                | Strings, bytes, errors, FIFO, isolation, close, and structural port acceptance pass. |
+| Fresh window integration           | PASS   | full Fresh test task              | Upgrade/bind, string/bytes, procedure error, isolation, no-op, and cleanup pass.     |
 
 ### Consumer Gates
 
-| Consumer                           | Result  | Evidence                | Notes                                                                     |
-| ---------------------------------- | ------- | ----------------------- | ------------------------------------------------------------------------- |
-| `@netscript/sdk/desktop` webview   | NOT_RUN | slice 1/3 fixture       | Must infer existing service client contract without ambient declarations. |
-| `@netscript/fresh/desktop` runtime | NOT_RUN | slice 2/3 fixture       | Must bind router/context only under Desktop capability.                   |
-| Browser/Aspire                     | NOT_RUN | slice 2 full Fresh task | Must be disabled with zero side effects.                                  |
+| Consumer                           | Result | Evidence                          | Notes                                                                     |
+| ---------------------------------- | ------ | --------------------------------- | ------------------------------------------------------------------------- |
+| `@netscript/sdk/desktop` webview   | PASS   | SDK type fixture + full task      | Existing contract infers the client without ambient declarations.         |
+| `@netscript/fresh/desktop` runtime | PASS   | full Fresh task + entrypoint lint | Existing routers bind only with Desktop capability; browser/Aspire inert. |
+| Browser/Aspire                     | PASS   | full Fresh task                   | Missing Desktop capability performs zero bind/unbind side effects.        |
 
 ## Handoff Notes
 
-- PLAN-EVAL should inspect D5–D7 first: the full-duplex state machine and cast-free oRPC
-  assignability are the most load-bearing design choices.
-- Then inspect D9–D14: error mapping, reuse of `ServiceClient<TContract>`, Fresh ownership,
-  browser/Aspire feature detection, cleanup, and no-transfer policy.
-- Confirm the evaluator accepts Archetype 4 with adapter/runtime subtype gates and the frontend
-  no-op overlay, rather than requiring route/visual gates for a runtime-only Fresh subpath.
-- Confirm every touched-package slice runs the full package test task and that focused tests are
-  never presented as the final verdict.
-- Draft PR #853 is the canonical review thread. Its next phase comment is this implementation
-  session's stop signal, not an evaluator dispatch.
-- No product implementation exists and no slice may begin until the supervisor records Plan-Gate
-  `PASS` in `plan-eval.md` and on the draft PR.
+- Tier-A slice 2 should inspect D11–D13: capability detection occurs before construction, upgrade
+  occurs before bind, every call owns isolated state, and close memoizes unbind.
+- The package-owned recursive router surface avoids leaking oRPC's undocumented `AnyRouter` alias
+  while accepting real oRPC procedure/router shapes without a cast.
+- Full SDK and Fresh package tasks are authoritative; focused tests were edit-loop evidence only.
+- Draft PR #853 is the canonical review thread. Do not dispatch a formal evaluator from this
+  implementation session; slice 3 begins only after supervisor Tier-A PASS.
