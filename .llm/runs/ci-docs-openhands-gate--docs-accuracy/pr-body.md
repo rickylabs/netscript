@@ -15,31 +15,36 @@ and blocking findings for hallucinated verbs, flags, or paths.
 ## Slices
 
 - [x] S0 Research, plan, and Design checkpoint
-- [ ] S1 Workflow, prompt, audit note, label taxonomy, and generated skill mirror
+- [x] S1 Workflow, prompt, audit note, label taxonomy, and generated skill mirror
 - [ ] S2 Separate-session implementation evaluation
 
 ## Definition of Done
 
-- [ ] Docs-labeled PR events post the exact guarded Minimax M3 trigger.
-- [ ] `docs-eval:skip` produces an explicit skipped-on-demand summary.
-- [ ] An identical unanswered trigger is not reposted for the same head SHA.
-- [ ] The prompt conditionally tests executable claims and always performs the mandatory accuracy review.
-- [ ] Label machine/source/mirror taxonomy is synchronized.
-- [ ] YAML structure, label schema, prompt contract, and mirror checks pass.
+- [x] Docs-labeled PR events post the exact guarded Minimax M3 trigger.
+- [x] `docs-eval:skip` produces an explicit skipped-on-demand summary.
+- [x] An identical unanswered trigger is not reposted for the same head SHA.
+- [x] The prompt conditionally tests executable claims and always performs the mandatory accuracy review.
+- [x] Label machine/source/mirror taxonomy is synchronized.
+- [x] YAML structure, label schema, prompt contract, and mirror checks pass.
 - [ ] Separate-session IMPL-EVAL is recorded; no OpenHands eval is dispatched by this run.
 
 ## Validation
 
 - PLAN-EVAL — PASS (`plan-eval.md`; separate local Qwen session)
-- YAML parse + structural assertions — pending implementation
-- labels.yml schema assertions — pending implementation
-- `deno task agentic:sync-claude:check` — pending implementation
+- YAML parse + structural assertions — PASS (11 workflows)
+- labels.yml schema assertions — PASS (69 unique labels)
+- prompt contract assertions — PASS
+- volatile config guard — PASS (4/4)
+- `deno task agentic:sync-claude:check` — PASS
+- focused new-file format + `git diff --check` — PASS
+- opposite-family A1 slice review — PASS (`slice-review.md`)
+- `actionlint` — not installed; YAML parse + structural assertions used
 - OpenHands live dispatch — intentionally not run (owner instruction)
 
 ## Harness
 
 - Run dir: `.llm/runs/ci-docs-openhands-gate--docs-accuracy/`
-- Phase: implement; PLAN-EVAL passed. Do not merge until the final evaluator pass is complete.
+- Phase: impl-eval; PLAN-EVAL and A1 slice review passed. Do not merge until the final evaluator pass is complete.
 
 ## Drift / Debt
 

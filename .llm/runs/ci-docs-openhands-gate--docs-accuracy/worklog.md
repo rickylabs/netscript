@@ -67,6 +67,11 @@ in the same reviewed slice.
 | 2026-07-17 | 0 | Research | Re-baselined clean target branch at current remote main; verified model, token, trigger, marker, mirror, and validation contracts. |
 | 2026-07-17 | 0 | Owner refinement | Locked conditional executable-claim testing while retaining mandatory full-set accuracy and hallucination review. |
 | 2026-07-17 | 0 | PLAN-EVAL | Fresh local Qwen session `d50d8e9b-a3f5-465a-8dcb-15785de620b7` evaluated the settled D1-D8 plan and returned `PASS`. |
+| 2026-07-17 | 0 | Draft PR | Committed/pushed planning slice `820f38a4`; opened draft PR #806 to `main`, applied milestone 13 and implementation-phase taxonomy, and posted the PLAN-EVAL phase comment. |
+| 2026-07-17 | 1 | Implement | Added the label-gated PAT-only workflow, trusted-base prompt, quick manual-test contract, fallback audit note, skip label, and synchronized skill mirror. |
+| 2026-07-17 | 1 | Validate | Parsed/asserted 11 workflows, 69 labels, and prompt contract; volatile-config tests 4/4; mirror and focused new-file format checks passed. |
+| 2026-07-17 | 1 | Slice review | Separate Claude Opus 4.8 high session `aecf5196-28e3-4e9e-9158-6f5ee4e2f3f2` returned `PASS` with no blockers. The first routing-id launch (`opus-4.8`) failed before review and is a non-verdict; the canonical native id `claude-opus-4-8` succeeded. |
+| 2026-07-17 | 1 | Reconcile | PR #806 remains draft at planning head `820f38a4`, milestone 13, exactly one `status:impl`, requested type/area/gate/priority labels, and no new reviewer/automation comments beyond PLAN-EVAL. No issue closing keyword applies. |
 
 ## Decisions
 
@@ -88,12 +93,21 @@ in the same reviewed slice.
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
 | PLAN-EVAL | separate local open-model session | PASS | `plan-eval.md`; session `d50d8e9b-a3f5-465a-8dcb-15785de620b7`. |
+| Workflow YAML + structure | `deno eval --no-lock` with `jsr:@std/yaml` | PASS | Parsed 11 workflows; asserted events, docs-label OR, skip summary, exact model/closed-model guard, PAT-only token, trusted-base prompt, and exact-body/head-SHA unanswered dedupe. |
+| Labels schema | same focused Deno assertion | PASS | 69 unique records; every label has name/color/description and six-digit color; `docs-eval:skip` contract exact. |
+| Prompt contract | same focused Deno assertion | PASS | `use harness`, skills, full changed-file read, focused manual execution, scaffold/snippet/output comparison, per-file verdicts, and blocking hallucination findings asserted. |
+| Volatile-config guard | `deno test --no-lock --allow-read .llm/tools/agentic/config/no-hardcoded-volatile_test.ts` | PASS | 4 passed, 0 failed. Initial invocation omitted `--allow-read` and was a permission non-verdict; corrected invocation passed. |
+| Skill mirror | `deno task agentic:sync-claude:check` | PASS | 17 skills / 21 mirrored files clean after regeneration. |
+| Focused formatting | `deno fmt --check` on the three new workflow/prompt/audit files | PASS | 3 files checked. Whole legacy labels/skill/run artifacts are not reformatted by this slice. |
+| Whitespace | `git diff --check` | PASS | No whitespace errors. |
+| Action syntax | `command -v actionlint` | NOT_RUN | `actionlint` is not installed; compensated by full YAML parse and focused structural assertions. |
+| A1 slice review | separate Claude Opus 4.8 high session | PASS | `slice-review.md`; no blocking findings, four low/info advisories documented. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Docs overlay | NOT_RUN | planned source alignment/link/terminology checks | Run after implementation. |
+| Docs overlay | PASS | source/model/token alignment, local path existence, terminology assertions | Audit note remains CI policy and points to pending PR #805 consolidation rather than duplicating agent doctrine. |
 
 ### Runtime Gates
 
@@ -105,9 +119,12 @@ in the same reviewed slice.
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| docs-labeled PR | NOT_RUN | structural assertions planned | Must post one trigger. |
-| skipped docs PR | NOT_RUN | structural assertions planned | Must write explicit summary. |
+| docs-labeled PR | PASS (structural) | workflow event/label/route/PAT/comment assertions | Posts the exact Minimax M3 trigger with a 100-iteration budget. |
+| duplicate event | PASS (structural) | concurrency + exact body/head marker + later-summary comparison | An identical unanswered trigger is not reposted. |
+| skipped docs PR | PASS (structural) | explicit skip step and guards on every dispatch step | Writes attributed “skipped on demand” summary and posts no trigger. |
 
 ## Handoff Notes
 
-- PLAN-EVAL should inspect D2/D4/D5/D6 and the conditional-vs-mandatory prompt split first.
+- A1 slice review passed. IMPL-EVAL should inspect the PAT-only chain guarantee, trusted-base prompt
+  fetch, exact-body dedupe semantics, and conditional-executable versus mandatory-full-review prompt
+  split first, then confirm the committed file set contains no lock or unrelated churn.

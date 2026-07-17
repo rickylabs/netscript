@@ -12,11 +12,11 @@
 
 ## Current State
 
-Research, Design, and PLAN-EVAL are complete against current `origin/main`. Fresh local Qwen
-session `d50d8e9b-a3f5-465a-8dcb-15785de620b7` evaluated the settled D1-D8 plan and returned
-`PASS`. No implementation file has been created. The owner refinement is locked: hand-testing is
-conditional on executable claims; every docs PR still requires full changed-set reading, per-file
-verdicts, low-hallucination prose review, and blocking hallucinated verb/flag/path findings.
+Research, Design, PLAN-EVAL, implementation, focused validation, and A1 slice review are complete.
+Draft PR #806 is open from planning commit `820f38a4`. Separate Claude Opus 4.8 high session
+`aecf5196-28e3-4e9e-9158-6f5ee4e2f3f2` returned slice-review `PASS` with no blockers. The new
+workflow uses a PAT-only comment, exact Minimax M3 guard, trusted-base prompt, explicit skip summary,
+and exact-body/head-SHA unanswered dedupe.
 
 ## Completed
 
@@ -24,16 +24,19 @@ verdicts, low-hallucination prose review, and blocking hallucinated verb/flag/pa
 - Clean branch/current-main/model/token/marker/mirror/fallback-doc facts verified.
 - Plan and Design checkpoint recorded.
 - PLAN-EVAL `PASS` recorded in `plan-eval.md`.
+- Planning commit pushed and draft PR #806 opened with milestone 13 and phase metadata.
+- Slice 1 implemented; workflow/schema/prompt assertions, volatile guard, skill mirror, and focused
+  formatting are green.
+- Opposite-family A1 slice review passed; PR state/comments reconciled with no plan adjustment.
 
 ## In Progress
 
-- Planning-slice commit/push and draft PR creation.
+- Supervisor sign-off commit and explicit-refspec push.
 
 ## Next Steps
 
-1. Commit/push the plan bootstrap and open the draft PR.
-2. Implement slice 1, validate, review, commit, push, and comment.
-3. Run separate-session IMPL-EVAL without dispatching OpenHands.
+1. Sign off, commit/push slice 1, update PR body/phase comment and reconcile metadata.
+2. Run separate-session IMPL-EVAL without dispatching OpenHands.
 
 ## Key Decisions
 
@@ -47,16 +50,22 @@ verdicts, low-hallucination prose review, and blocking hallucinated verb/flag/pa
 
 | Path | Status | Notes |
 | --- | --- | --- |
-| `.llm/runs/ci-docs-openhands-gate--docs-accuracy/*` | new | Harness bootstrap only. |
+| `.github/workflows/docs-openhands-eval.yml` | new | Guarded, skippable automatic trigger. |
+| `.llm/tools/agentic/openhands/docs-eval-prompt.md` | new | Cheap-and-quick evaluator prompt. |
+| `.llm/harness/workflow/doc-audit-openhands-gate.md` | new | Pending PR #805 consolidation pointer. |
+| `.github/labels.yml` | changed | Adds `docs-eval:skip`. |
+| `.agents/skills/netscript-pr/SKILL.md` | changed | Canonical taxonomy note. |
+| `.claude/skills/netscript-pr/SKILL.md` | generated | Synchronized mirror. |
+| `.llm/runs/ci-docs-openhands-gate--docs-accuracy/*` | changed | Harness evidence and handoff state. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | PLAN-EVAL PASS | `plan-eval.md` |
-| Fitness | pending | docs overlay |
+| Static | PASS | YAML/schema/prompt assertions; volatile guard; mirror; format; A1 review |
+| Fitness | PASS | docs overlay source/link/terminology review |
 | Runtime | N/A | no eval dispatch |
-| Consumer | pending | planned assertions |
+| Consumer | PASS (structural) | docs/skip/dedupe scenarios asserted |
 
 ## Open Questions
 
