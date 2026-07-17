@@ -9,7 +9,8 @@ export class ListTriggerEventsCommand extends TriggersCliCommand {
       name: 'events',
       category: 'inspection',
       description: 'List persisted trigger events from the running service.',
-      usage: 'ns-triggers events [<trigger-id>] [--status=<status> --limit=<n> --json]',
+      usage:
+        'deno x -A jsr:@netscript/plugin-triggers@<version>/cli events [<trigger-id>] [--status=<status> --limit=<n> --json]',
       flags: [
         { name: 'status', description: 'Filter by persisted event status.' },
         { name: 'limit', description: 'Maximum number of events to return.' },
@@ -28,7 +29,7 @@ export class UpdateTriggerCommand extends TriggersCliCommand {
       category: 'scaffolding',
       description: 'Update a code-defined trigger and rebuild its registry.',
       usage:
-        'ns-triggers update <trigger-id> [--cron=<expr> --timezone=<iana> --path=<path> --secret-env=<name>]',
+        'deno x -A jsr:@netscript/plugin-triggers@<version>/cli update <trigger-id> [--cron=<expr> --timezone=<iana> --path=<path> --secret-env=<name>]',
       flags: [
         { name: 'cron', description: 'Replacement five-field cron expression.' },
         { name: 'timezone', description: 'Replacement IANA timezone.' },
@@ -50,7 +51,7 @@ export class RemoveTriggerCommand extends TriggersCliCommand {
       name: 'remove',
       category: 'scaffolding',
       description: 'Remove a code-defined trigger and rebuild its registry.',
-      usage: 'ns-triggers remove <trigger-id>',
+      usage: 'deno x -A jsr:@netscript/plugin-triggers@<version>/cli remove <trigger-id>',
     }, backend);
   }
 }
