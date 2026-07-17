@@ -1,6 +1,6 @@
 {
   "name": "@netscript/telemetry",
-  "version": "0.0.1-beta.9",
+  "version": "0.0.1-beta.10",
   "description": "OpenTelemetry tracing primitives and NetScript instrumentation for jobs, queues, RPC, and SSE.",
   "license": "Apache-2.0",
   "exports": {
