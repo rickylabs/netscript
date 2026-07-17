@@ -118,3 +118,10 @@ group launch; this section fixes the supervisor's surface.
   ratified; steers: parity test imports the public SDK subpath; traversal tests include encoded
   separators). Implementation unlocked. Stage-F reviewer relaunched in detached worktree
   wt-g8-review (duplicate-sender guard on wt-g8-seed — distinct-session requirement preserved).
+- 2026-07-18 · G8 Stage F: 17 findings (9 BLOCKER) — plan returned to Stage E (fail cycle 1/2).
+  Headline: Deno Deploy Classic sunset 2026-07-20 invalidates the C2 cell; supersession folds
+  would falsely close #451/#453/#454/#455; Nitro host path bypassed shipped service lifecycle
+  hooks. All findings ACCEPTED (triage committed). Rework lanes running: resumed Stage-B thread
+  (evidence restore + new-Deno-Deploy re-research, disjoint files: research/ + evidence/) and an
+  Opus Stage-E rework agent (dispositions 2–14/16/17, disjoint: design/ + plan.md). G3 S1
+  sign-off (a77b210c, D7 no-cast bar proven); S2 in flight.
