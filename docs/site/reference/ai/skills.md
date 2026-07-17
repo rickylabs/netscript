@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: "@netscript/ai/skills"
+templateEngine: [vento, md]
 ---
 
 # `@netscript/ai/skills`
@@ -11,6 +12,31 @@ agent can discover cheaply by tags (or embeddings) and only fully disclose when 
 selected. This subpath is a **library surface only**: it has no CLI verbs and takes no
 `@netscript/*` runtime dependency. For the full package index return to the
 [`@netscript/ai` reference](/reference/ai/) or the [reference overview](/reference/).
+
+{{ comp callout { type: "note", title: "Library surface vs. installed skills" } }}
+This page is the <strong>loader API</strong> — the code you call to discover and
+disclose <code>SKILL.md</code> documents at runtime. It is distinct from the
+<strong>public skill bundle</strong> that <code>netscript agent init</code> installs
+for a coding agent (the next section). The library loads skills; the bundle is a set
+of three ready-made skills that teach an agent the NetScript vocabulary.
+{{ /comp }}
+
+## Installed NetScript skills
+
+`netscript agent init` writes three first-party skills into the detected agent host
+(for Claude Code, under `.claude/skills/`). They share one vocabulary with the
+`netscript` CLI and the [NetScript MCP tools](/capabilities/agent-tooling/#tool-catalog),
+so an agent routes to a workflow and then reaches for the matching CLI verb or MCP tool.
+
+| Skill | Role |
+| --- | --- |
+| `netscript` | Router. Dispatches a task to the build or operate skill (or to the Aspire skill for orchestration); it is not useful on its own. |
+| `netscript-build` | Scaffold and build with real `netscript` CLI verbs: `init`, the contract-first flow, the database lifecycle, adding and syncing plugins, adding services and UI, and generating registries. |
+| `netscript-operate` | Monitor, debug, and analyze a running app through the bounded MCP tools: health, recent runs, one execution end to end, recent errors, job results, service and database performance, and doc search. |
+
+These are the skills named in the bundle manifest and installed as an atomic set;
+re-running `netscript agent init` is idempotent. See
+[Agent tooling](/capabilities/agent-tooling/) for the CLI × skills × MCP combo.
 
 ```ts
 import {

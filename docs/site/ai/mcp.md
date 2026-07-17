@@ -12,13 +12,18 @@ next: { label: "Durable chat", href: "/ai/durable-chat/" }
 Protocol servers into typed tools your agent loop can call — transports, injected
 auth, multi-server pooling, and a safe rendering path for the `ui://` resources a
 tool result can carry. It is published as part of `@netscript/ai{{ releaseSpecifier }}` and
-installs with the engine: `deno add jsr:@netscript/ai`.
+installs with the engine: `deno add jsr:@netscript/ai{{ releaseSpecifier }}`.
 
-{{ comp callout { type: "note", title: "Client, not server" } }}
-NetScript's shipped MCP surface is <strong>client-side</strong>: your app
-<em>consumes</em> external MCP servers as agent tools. There is no scaffolded
-NetScript MCP server in this release — do not build on the assumption that
-<code>netscript</code> hosts one for you.
+{{ comp callout { type: "note", title: "Two different MCP surfaces — don't conflate them" } }}
+This page documents the <code>@netscript/ai/mcp</code> <strong>client library</strong>:
+your app <em>consumes</em> external MCP servers as agent tools. That is a separate
+surface from the NetScript MCP <strong>server</strong> — a standalone stdio server for
+coding agents that you run with <code>netscript agent mcp</code> and install with
+<code>netscript agent init</code>. The server exposes framework-aware diagnostics,
+telemetry summaries, and doc search <em>about</em> your project; the client library on
+this page wires <em>remote</em> MCP servers <em>into</em> your product's agent loop. See
+<a href="/capabilities/agent-tooling/">Agent tooling</a> and the
+<a href="/reference/mcp/"><code>@netscript/mcp</code> reference</a> for the server.
 {{ /comp }}
 
 ## The story: one config instead of a protocol integration
@@ -136,12 +141,15 @@ can land.
 
 Encore's MCP story points **inward**: it ships an MCP server that exposes a running
 Encore backend's introspection surface to coding agents, so an agent can inspect
-and verify the backend it is editing. NetScript's shipped MCP surface points
-**outward**: a client stack for consuming external MCP servers as tools inside
-your own agents, with a sandboxed path for the UI those tools return. The two
-solve different halves of the MCP picture — if you need your backend to *be* an
-MCP server today, NetScript does not scaffold that; if you need your product's
-agent to *use* MCP servers, that path is published and gate-tested.
+and verify the backend it is editing. NetScript ships **both halves**. The inward
+half is the `netscript agent mcp` server (documented under
+[Agent tooling](/capabilities/agent-tooling/) and the
+[`@netscript/mcp` reference](/reference/mcp/)): a stdio server that gives a coding
+agent framework-aware diagnostics, telemetry summaries, and doc search over the
+project it is editing. The outward half — this page — is the `@netscript/ai/mcp`
+client stack for consuming external MCP servers as tools inside your own product's
+agents, with a sandboxed path for the UI those tools return. Both paths are
+published and gate-tested.
 
 ## Where to go next
 

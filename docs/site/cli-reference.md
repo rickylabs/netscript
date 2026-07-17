@@ -220,7 +220,7 @@ at `/api/rpc/*`.
 {{ comp.apiTable({
   caption: "Services and contracts",
   rows: [
-    { name: "netscript service add", type: "netscript service add orders --service-port 3002", desc: "Add a new service workspace member and wire its contract. The example <code>users</code> service serves <code>/api/v1/users/*</code> (and oRPC at <code>/api/rpc/*</code>) on port 3001." },
+    { name: "netscript service add", type: "netscript service add --name orders --port 3002", desc: "Add a new service workspace member and wire its contract. The example <code>users</code> service serves <code>/api/v1/users/*</code> (and oRPC at <code>/api/rpc/*</code>) on port 3001." },
     { name: "netscript service list", type: "netscript service list", desc: "List the services configured in the workspace." },
     { name: "netscript service generate", type: "netscript service generate", desc: "Regenerate the Aspire helper files from your service configuration." },
     { name: "netscript contract add", type: "netscript contract add orders", desc: "Add a versioned oRPC contract (<code>oc.route().input(zod).output(zod)</code> + <code>implement()</code>) to the <code>contracts/</code> workspace." },

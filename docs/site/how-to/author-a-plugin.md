@@ -258,15 +258,15 @@ appear in the `plugins` array. **If you scaffolded through the CLI, this already
 wiring commands run a workspace mutator that adds the connector to `netscript.config.ts` for you:
 
 - `netscript plugin new <name>` — the greenfield generator from [Step 1](#step-1-scaffold-the-two-tier-skeleton) —
-  registers the connector it emits unless you pass `--no-register`.
+  registers the connector it emits; the `--register` flag defaults to on.
 - `netscript plugin install <kind> --name <name> --local-path <path>` — installs a plugin workspace
   from a local package directory and registers it as part of the same install.
 
 After either command, open `netscript.config.ts` and confirm the entry is present — the entries are
 **`./plugins/<name>/mod.ts`**, confirming `plugins/<name>/` as the canonical location.
 
-Only reach for the manual edit below if you are hand-authoring the connector without the CLI (or a
-previous run used `--no-register`): add the `mod.ts` path to the `plugins` array yourself.
+Only reach for the manual edit below if you are hand-authoring the connector without the CLI: add
+the `mod.ts` path to the `plugins` array yourself.
 
 {{ comp.tabbedCode({ tabs: [
   {

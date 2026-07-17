@@ -12,8 +12,50 @@ subcommand, and flag, spelled exactly as the installed CLI prints it. For the ge
 package API surface (the embeddable helpers, not the command tree) see the
 [`@netscript/cli` package page](/reference/cli/).
 
-Everything here is verified against `netscript <group> --help`. To confirm the exact
-spelling in your installed version, run `netscript --help` or `netscript <group> --help`.
+This page documents the **public `netscript` binary** — the CLI published as
+`@netscript/cli` and installed on your PATH — not any maintainer-only tree. Everything here
+is verified against `netscript <group> --help`. To confirm the exact spelling in your
+installed version, run `netscript --help` or `netscript <group> --help`.
+
+The top-level groups are `agent`, `config`, `deploy`, `init`, `contract`, `db`, `generate`,
+`marketplace`, `plugin`, `service`, and the `ui:*` commands — each has a section below.
+
+## `init` — scaffold a workspace
+
+`netscript init [name]` scaffolds a new NetScript workspace. The everyday walk-through is in
+the [quickstart](/quickstart/); every flag is:
+
+| Flag | Description |
+| --- | --- |
+| `--app-name <name>` | Frontend application name (kebab-case). |
+| `--db <engine>` | Database engine: `postgres`, `mysql`, `mssql`, `sqlite`, or `none`. |
+| `--service [enabled]` | Scaffold an example oRPC service. |
+| `--service-name <name>` | Example service name. |
+| `--model-name <name>` | Prisma model name for the scaffolded CRUD surface. |
+| `--service-port <port>` | Example service port. |
+| `--cache [enabled]` | Scaffold a shared cache resource. |
+| `--cache-backend <backend>` | Shared cache backend: `redis`, `garnet`, or `deno-kv`. |
+| `--editor <editor>` | Editor config: `none`, `zed`, or `vscode`. |
+| `--no-aspire` | Skip the Aspire orchestration layer. |
+| `--no-git` | Skip `git init` after scaffolding. |
+| `--force` | Overwrite an existing target directory (default `false`). |
+| `--ci` | Non-interactive mode (default `false`). |
+| `-y, --yes` | Accept defaults without prompting (default `false`). |
+| `--path <path>` | Target directory for scaffold output. |
+| `--dry-run` | Preview the scaffold plan without writing files (default `false`). |
+| `--json` | Emit a single machine-readable JSON result (default `false`). |
+| `--from <preset>` | Apply a named scaffold preset. |
+
+## `agent` — install and run agent tooling
+
+`netscript agent` installs and runs the shared CLI × skills × MCP tooling. See
+[Agent tooling](/capabilities/agent-tooling/) for the mental model and the
+[`@netscript/mcp` reference](/reference/mcp/) for the server's tool surface.
+
+| Command | Description |
+| --- | --- |
+| `netscript agent init` | Install NetScript MCP and skills for detected agent hosts — writes `.mcp.json` (Claude Code) and/or `.vscode/mcp.json` (VS Code), installs the `netscript` / `netscript-build` / `netscript-operate` skills, and updates the marked NetScript section in `AGENTS.md`. Flag: `--host <host>` (`claude`, `vscode`, or `all`). |
+| `netscript agent mcp` | Start the NetScript MCP server over standard input/output. Flags: `--endpoint <url>` (telemetry endpoint), `--project-root <path>`, `--docs-root <path>` (public documentation root). |
 
 ## `config` — inspect and mutate configuration
 
@@ -105,7 +147,7 @@ The common `service add`, `service list`, and `service generate` verbs are in th
 | `netscript service set <name>` | Update an existing service and regenerate Aspire helpers. Flags: `--port <port>`, `--enabled <enabled>`, `--project-root <path>`. |
 | `netscript service remove <name>` | Remove a service workspace and reverse its registrations. Flags: `--keep-contract` (retain paired contract files), `--project-root <path>`. |
 | `netscript service add-handler <service> <procedure>` | Bind a contract procedure with a compiling service handler stub. Flags: `--version <version>` (default `v1`), `--project-root <path>`. |
-| `netscript service ref add <caller> <callee>` | Add a service reference from `<caller>` to `<callee>`. |
+| `netscript service ref add <caller> <callee>` | Add a service reference from `<caller>` to `<callee>`. Flag: `--project-root <path>`. |
 | `netscript service ref remove <caller> <callee>` | Remove a service reference. |
 
 ## `contract` — extended verbs
