@@ -3,14 +3,14 @@ import type {
   CommandExecutionResult,
   CommandExecutorPort,
 } from '../domain/command-executor-port.ts';
-import mcpPackageJson from '../../deno.json' with { type: 'json' };
+import { MCP_PACKAGE_VERSION } from '../publish-assets.generated.ts';
 
 /** Public CLI invocation used when an outer composition does not inject one. */
 export const DEFAULT_CLI_COMMAND: readonly string[] = Object.freeze([
   'deno',
   'run',
   '-A',
-  `jsr:@netscript/cli@${mcpPackageJson.version}`,
+  `jsr:@netscript/cli@${MCP_PACKAGE_VERSION}`,
 ]);
 /** Default command deadline in milliseconds. */
 export const DEFAULT_COMMAND_TIMEOUT_MS = 120_000;

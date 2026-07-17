@@ -13,7 +13,7 @@
 
 import { definePlugin, type PluginManifest } from '@netscript/plugin';
 import type { StreamTopicContribution } from '@netscript/plugin';
-import denoJson from '../../deno.json' with { type: 'json' };
+import { PLUGIN_PACKAGE_VERSION } from '../package-metadata.generated.ts';
 import {
   PublicJobDefinitionSchema,
   PublicTaskDefinitionSchema,
@@ -49,7 +49,7 @@ function toTopicContribution(
 }
 
 /** Plugin package version, single-sourced from the package `deno.json`. */
-const VERSION: string = denoJson.version;
+const VERSION: string = PLUGIN_PACKAGE_VERSION;
 
 const workersManifest = definePlugin('@netscript/plugin-workers', VERSION)
   .withDisplayName('Background Workers')

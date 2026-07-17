@@ -3,6 +3,8 @@ import {
   coordinateVersionBump,
   findVersionResidue,
 } from '../deps/bump-version.ts';
+import { PUBLISH_ASSET_OUTPUTS } from '../generate-publish-assets.ts';
+import { join } from 'jsr:@std/path@^1.0.0';
 
 export interface CommandResult {
   readonly code: number;
@@ -41,6 +43,15 @@ export async function prepareRelease(
   const bump = await dependencies.bump(root, version);
   console.log(`${label} bumped ${bump.oldVersion} -> ${bump.newVersion}`);
 
+  await runGate(
+    label,
+    'gen:publish-assets',
+    'deno',
+    ['task', 'gen:publish-assets'],
+    root,
+    dependencies,
+  );
+
   const residue = await dependencies.findResidue(root, bump.oldVersion);
   if (residue.length > 0) {
     throw new Error(
@@ -60,7 +71,13 @@ export async function prepareRelease(
   );
   await runGate(label, 'publish:dry-run', 'deno', ['task', 'publish:dry-run'], root, dependencies);
   await runGate(label, 'deno ci --prod', 'deno', ['ci', '--prod'], root, dependencies);
-  return bump;
+  return {
+    ...bump,
+    files: [
+      ...bump.files,
+      ...PUBLISH_ASSET_OUTPUTS.map((path) => join(root, path)),
+    ],
+  };
 }
 
 export async function runCommand(

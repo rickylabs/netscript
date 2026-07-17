@@ -11,10 +11,10 @@ import {
   StreamUnsupportedOperationError,
   unsupportedStreamOperation,
 } from './stream-api.ts';
-import denoJson from '../../deno.json' with { type: 'json' };
+import { PLUGIN_PACKAGE_VERSION } from '../package-metadata.generated.ts';
 
 /** Plugin package version, single-sourced from the package `deno.json`. */
-const VERSION: string = denoJson.version;
+const VERSION: string = PLUGIN_PACKAGE_VERSION;
 
 const STREAMS_SERVICE_PERMISSIONS = [
   '--allow-net',

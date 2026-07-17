@@ -8,10 +8,10 @@ import { definePlugin, type PluginManifest } from '@netscript/plugin';
 import { streamsPlugin } from '@netscript/plugin-streams';
 import { workersPlugin } from '@netscript/plugin-workers';
 import { SAGAS_API_DEFAULT_PORT, SAGAS_API_SERVICE_NAME, SAGAS_PLUGIN_ID } from '../constants.ts';
-import denoJson from '../../deno.json' with { type: 'json' };
+import { PLUGIN_PACKAGE_VERSION } from '../package-metadata.generated.ts';
 
 /** Plugin package version, single-sourced from the package `deno.json`. */
-const VERSION: string = denoJson.version;
+const VERSION: string = PLUGIN_PACKAGE_VERSION;
 
 const SAGAS_SERVICE_PERMISSIONS = [
   '--unstable-kv',

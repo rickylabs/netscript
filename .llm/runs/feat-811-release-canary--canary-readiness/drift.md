@@ -52,3 +52,18 @@
   retained `IMPL_EVAL_VERDICT: PASS` because the errors were evidence transcription rather than
   implementation findings.
 - **Scope impact:** none.
+
+## 2026-07-17 — base drift omitted canonical #810 detector
+
+- **Phase:** supervisor IMPL-EVAL repair
+- **Severity:** significant (acceptance proof and mergeability)
+- **Observed:** PR #812 remained based on `a5adb706` after #810 landed at `8a8a9537`. Its composed
+  readiness correctly delegated to `release:preflight`, but that branch-local task did not yet
+  contain the import-attribute detector. A mocked readiness test proved message composition rather
+  than real detection. Current main also conflicted in `cut.ts` and both release-skill copies.
+- **Authorizing verdict:** supervisor-triggered Fable IMPL-EVAL returned `FAIL_FIX`; the earlier
+  generator-arranged Qwen PASS is retained but is non-authorizing for this repair cycle.
+- **Correction:** merge `origin/main` at `aa14e452`, resolve all three conflicts by composing both
+  sides, exercise the actual preflight CLI from the readiness test, and live-prove import-attribute,
+  versionless-specifier, and README-standard seeds red before restoring a green tree.
+- **Scope impact:** no rescope. The approved delegation design remains valid after the merge.

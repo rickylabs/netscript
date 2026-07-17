@@ -1,5 +1,31 @@
 import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
-import { scanFile } from './preflight-text-imports.ts';
+import { scanFile, scanSource } from './preflight-text-imports.ts';
+
+Deno.test('preflight rejects import attributes in publishable source', () => {
+  const findings = scanSource(
+    `import readme from './README.md' with { type: 'text' };`,
+    'seeded-import-attribute.ts',
+  );
+  assertEquals(findings.length, 1);
+  assertEquals(findings[0].check, 'import-attributes');
+  assertEquals(findings[0].line, 1);
+  assertStringIncludes(findings[0].message, 'generated TypeScript constant');
+  assertStringIncludes(findings[0].message, 'https://github.com/denoland/deno/issues/35546');
+  assertStringIncludes(findings[0].message, 'authenticated canary publish');
+});
+
+Deno.test('preflight ignores import-attribute text in inert source regions', () => {
+  const findings = scanSource(
+    [
+      `const quoted = "with { type: 'json' }";`,
+      `const emitted = \`import data from './data.json' with { type: 'json' };\`;`,
+      `// with { type: 'text' }`,
+      `/* with { type: 'json' } */`,
+    ].join('\n'),
+    'inert-import-attribute-text.ts',
+  );
+  assertEquals(findings, []);
+});
 
 const fixtureRoot = new URL('./tests/fixtures/', import.meta.url);
 
@@ -14,7 +40,7 @@ Deno.test('preflight flags cross-line import.meta-relative reads', async () => {
   assertStringIncludes(findings[0].message, 'scalarJsUrl');
 });
 
-Deno.test('preflight ignores URL constructors and text imports without Deno reads', async () => {
+Deno.test('preflight ignores URL constructors and generated constants without Deno reads', async () => {
   const findings = await scanFile(new URL('negative-url-composition.ts', fixtureRoot).pathname);
   assertEquals(findings, []);
 });

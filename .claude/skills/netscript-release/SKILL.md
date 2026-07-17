@@ -15,6 +15,16 @@ semantics and `netscript-pr` for branch, PR, and comment mechanics.
 - Confirm `deno task publish:readiness` is green before cutting. It composes publish-set
   completeness, lockstep/residue, versionless-import, first-publish, provisioning dry-check, and the
   canonical `release:preflight` verdict with structured per-check evidence.
+- Confirm `deno task release:preflight` is green before cutting. It enforces the JSR-safe bundled
+  asset rule: publishable source must use generated TypeScript string constants. Import attributes
+  (`with { type: ... }`) and `Deno.readTextFile(new URL(..., import.meta.url))`-style runtime reads
+  are rejected because the JSR registry can reject them even when local dry-run passes.
+- This import-attribute ban is conditional and carries its incident lineage: #138/#142 recorded the
+  alpha.6 half-publish, #143 recovered with string constants, and beta.10 partially published before
+  the same registry-side failure was tracked as
+  [denoland/deno#35546](https://github.com/denoland/deno/issues/35546). Lift the ban only after that
+  upstream issue is fixed, merged, and released **and** an authenticated canary publish of a
+  text-import probe is green.
 - Do not delete `deno.lock`, delete caches, or run `deno cache --reload`.
 - Do not publish from a local machine or hand-run the underlying publish scripts. Stable and canary
   publication stays in the checked-in GitHub Actions workflows through OIDC; ad-hoc publishing is
@@ -56,13 +66,16 @@ gate.
 1. Version validation refuses invalid semver and equal or older versions.
 2. Workspace bump sets the root version, every package/plugin `deno.json`, nested workspace
    `deno.json` files, and `deno.lock` `@netscript/*` ranges to the new version.
-3. Residue check aborts if the old version remains in JSON files or `deno.lock`.
-4. `publish:readiness` emits the composed pre-publish verdict and calls the canonical
-   `release:preflight` rather than duplicating its import-attribute scanner.
-5. `publish:dry-run` proves the package publish surface builds before the real publish.
-6. `deno ci --prod` proves the production dependency graph installs from the locked graph.
-7. Non-dry-run creates `release/cut-<version>`, stages only bumped files, commits
-   `chore(release): cut <version>`, pushes, and opens the release PR.
+3. `gen:publish-assets` regenerates the registry-safe TypeScript constants from the bumped manifests
+   and source assets; CI independently enforces `check:publish-assets` freshness.
+4. Residue check aborts if the old version remains in JSON files or `deno.lock`.
+5. `publish:readiness` emits the composed pre-publish verdict and calls the canonical
+   `release:preflight`, which blocks JSR-unsafe import attributes and import-meta-relative runtime
+   reads, rather than duplicating that scanner.
+6. `publish:dry-run` proves the package publish surface builds before the real publish.
+7. `deno ci --prod` proves the production dependency graph installs from the locked graph.
+8. Non-dry-run creates `release/cut-<version>`, stages the bumped manifests and regenerated publish
+   assets, commits `chore(release): cut <version>`, pushes, and opens the release PR.
 
 ## Mandatory Canary Pair
 
@@ -129,6 +142,19 @@ After the release PR merges:
    `jsr:@netscript/cli@<version>`, and runs the published CLI smoke and scaffold runtime suite.
 5. The manual `workflow_dispatch` path still accepts `published-version` for targeted rechecks.
 
+### Exact-version resolution and same-semver recovery
+
+- Production E2E must resolve the exact just-published semver. Published NetScript invocations use
+  `--minimum-dependency-age=0` because the release gate intentionally consumes artifacts that may be
+  only seconds old; leaving Deno's default minimum-age policy in place delays the verdict by roughly
+  24 hours. Where Deno 2.9's `deno x` re-exec drops that flag, invoke the published `cli.ts` URL via
+  `deno run --minimum-dependency-age=0` so the override reaches the resolving process.
+- A partial workspace publish is retried at the same semver after fixing the failing gate or member.
+  The publisher skips members already present at that exact version and continues the missing set;
+  do not delete immutable versions or introduce a replacement semver merely to hide a partial run.
+- Neither rule weakens preflight: every retry still runs composed `publish:readiness`, including the
+  canonical import-attribute detector and its denoland/deno#35546 authenticated-canary sunset.
+
 ## Hard Release Completion Gate
 
 A stable release may begin only when both canary verdicts are green for the exact content:
@@ -153,8 +179,8 @@ prerelease and repeat both gates. The release is not complete until the pair is 
 - #122: one command prevents manual root version, member version, and lockfile drift.
 - #123: `workflow_run` plus the run-id artifact removes the race where prod E2E installs before JSR
   has the just-published CLI version.
-- #133: text-import preflight catches the `import.meta.url` asset-read defect class that dry-run can
-  miss and real publish can reject.
+- #133: asset preflight catches import attributes and `import.meta.url` asset-read defects that
+  dry-run can miss and real publish can reject.
 - #146: `deno ci --prod` is already lockfile-frozen in Deno 2.9; an explicit extra flag is rejected.
 - #810: the import-attribute preflight remains mandatory until denoland/deno#35546 is fixed, merged,
   and present in the pinned Deno release **and** an authenticated canary text-import probe is green.

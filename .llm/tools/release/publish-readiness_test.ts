@@ -208,7 +208,7 @@ Deno.test('registry failure skips dependent first-publish checks instead of usin
   );
 });
 
-Deno.test('publish readiness calls canonical preflight for a seeded text import and carries #810 sunset', async () => {
+Deno.test('publish readiness exercises the real preflight for a seeded text import and carries #810 sunset', async () => {
   const root = await Deno.makeTempDir({ prefix: 'netscript-readiness-import-attribute-' });
   try {
     const seeded = `${root}/seeded.ts`;
@@ -217,21 +217,30 @@ Deno.test('publish readiness calls canonical preflight for a seeded text import 
       root,
       '0.0.2-canary.1',
       dependencies({
-        runCanonicalPreflight: async () => {
-          const source = await Deno.readTextFile(seeded);
-          if (source.includes("with { type: 'text' }")) {
-            throw new Error('seeded import-attribute violation');
-          }
-        },
+        runCanonicalPreflight: () => runRealImportAttributePreflight(seeded),
       }),
     );
-    assertFailed(report.checks, 'import-attribute-preflight', 'seeded import-attribute violation');
+    assertFailed(report.checks, 'import-attribute-preflight', 'import-attributes — FAIL');
+    assertFailed(report.checks, 'import-attribute-preflight', 'generated TypeScript constant');
     assertFailed(report.checks, 'import-attribute-preflight', 'denoland/deno#35546');
     assertFailed(report.checks, 'import-attribute-preflight', 'authenticated canary');
   } finally {
     await Deno.remove(root, { recursive: true });
   }
 });
+
+async function runRealImportAttributePreflight(file: string): Promise<void> {
+  const preflight = new URL('./preflight-text-imports.ts', import.meta.url).pathname;
+  const output = await new Deno.Command(Deno.execPath(), {
+    args: ['run', '--quiet', '--allow-read', preflight, '--file', file],
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  if (output.success) return;
+  const stderr = new TextDecoder().decode(output.stderr).trim();
+  const stdout = new TextDecoder().decode(output.stdout).trim();
+  throw new Error(stderr || stdout || `real preflight failed with exit ${output.code}`);
+}
 
 function dependencies(
   overrides: Partial<PublishReadinessDependencies> = {},

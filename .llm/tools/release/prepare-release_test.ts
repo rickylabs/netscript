@@ -1,4 +1,5 @@
 import { assertEquals, assertRejects } from 'jsr:@std/assert@^1';
+import { PUBLISH_ASSET_OUTPUTS } from '../generate-publish-assets.ts';
 import { prepareRelease, type PrepareReleaseDependencies } from './prepare-release.ts';
 
 Deno.test('shared release preparation runs the stable gate sequence in order', async () => {
@@ -24,8 +25,13 @@ Deno.test('shared release preparation runs the stable gate sequence in order', a
 
   const result = await prepareRelease('/repo', '0.0.1-canary.1', 'release:canary', dependencies);
   assertEquals(result.newVersion, '0.0.1-canary.1');
+  assertEquals(result.files, [
+    '/repo/deno.json',
+    ...PUBLISH_ASSET_OUTPUTS.map((path) => `/repo/${path}`),
+  ]);
   assertEquals(calls, [
     'bump:0.0.1-canary.1',
+    'deno task gen:publish-assets',
     'residue:0.0.1-beta.10',
     'deno task publish:readiness',
     'deno task publish:dry-run',
@@ -33,8 +39,8 @@ Deno.test('shared release preparation runs the stable gate sequence in order', a
   ]);
 });
 
-Deno.test('shared release preparation fails before gates when residue remains', async () => {
-  let gateRan = false;
+Deno.test('shared release preparation regenerates assets then stops when residue remains', async () => {
+  const calls: string[] = [];
   await assertRejects(
     () =>
       prepareRelease('/repo', '0.0.1-canary.1', 'release:canary', {
@@ -45,13 +51,13 @@ Deno.test('shared release preparation fails before gates when residue remains', 
             files: ['/repo/deno.json'],
           }),
         findResidue: () => Promise.resolve(['packages/example/deno.json']),
-        runCommand: () => {
-          gateRan = true;
+        runCommand: (command, args) => {
+          calls.push(`${command} ${args.join(' ')}`);
           return Promise.resolve({ code: 0, stdout: '', stderr: '' });
         },
       }),
     Error,
     'Version residue remains',
   );
-  assertEquals(gateRan, false);
+  assertEquals(calls, ['deno task gen:publish-assets']);
 });

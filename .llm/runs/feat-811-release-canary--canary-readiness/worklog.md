@@ -96,6 +96,11 @@ helper.
 | 2026-07-17 | 6     | evaluator route proof  | Canonical `claude-openrouter` live provider canary passed with Qwen tools, reasoning, and streaming after three discarded zero-turn/profile probes.                                    |
 | 2026-07-17 | 6     | IMPL-EVAL              | Separate direct-only Qwen session `a06700df-b15b-43e4-a35b-e9d0a97c2f06` independently witnessed 122/122 tests and returned `PASS` with no blocking findings.                           |
 | 2026-07-17 | 6     | evidence correction    | Same evaluator re-verified and corrected stale metadata in `evaluate.md`; the implementation verdict remained `PASS`.                                                                |
+| 2026-07-17 | 7     | supervisor IMPL-EVAL   | Authorizing Fable evaluator returned `FAIL_FIX`: branch predated #810's real detector and conflicted with current main.                                                                |
+| 2026-07-17 | 7     | merge repair           | Merged `origin/main` at `aa14e452`; composed generated-assets/preflight behavior into shared preparation and preserved both release-doctrine sides.                                    |
+| 2026-07-17 | 7     | real detector test     | Replaced the mocked detector throw with a subprocess call to the actual preflight CLI against a text-import fixture.                                                                  |
+| 2026-07-17 | 7     | live negative proofs   | Import attribute, versionless specifier, and nonstandard first-publish README each failed readiness with their required messages; all seeds removed.                                  |
+| 2026-07-17 | 7     | repair gates           | Release 61/61, release check/lint/fmt, skill sync, repair-file quality, and final clean readiness all passed.                                                                          |
 
 ## Decisions
 
@@ -113,6 +118,7 @@ helper.
 | Fable slice-review route unavailable | minor    | `drift.md`         |
 | IMPL-EVAL profile omitted initially  | minor    | `drift.md`         |
 | Evaluator evidence transcription     | minor    | `drift.md`         |
+| Base drift omitted #810 detector      | significant | `drift.md`      |
 
 ## Gate Results
 
@@ -139,7 +145,8 @@ helper.
 | touched TS lint/fmt    | scoped lint and format wrappers                                    | PASS   | 25 files, zero findings                                                        |
 | changed-file quality   | `quality:scan --max-allow 0`                                       | PASS   | 25 files, zero findings, zero allowances                                       |
 | implementation gates   | `final-gates.md`                                                   | PASS   | All requested local gates green                                                |
-| IMPL-EVAL              | `evaluate.md`                                                      | PASS   | Separate direct Qwen session; no blocking findings                             |
+| supervisor IMPL-EVAL   | external orchestrator `evaluate.md`                                | FAIL_FIX | F1/F2 repaired; fresh supervisor re-evaluation required                      |
+| repair evidence        | `repair-evidence.md`                                                | PASS   | Three live red probes plus 61/61 release suite                                 |
 
 ### Fitness Gates
 
@@ -164,7 +171,7 @@ helper.
 
 ## Handoff Notes
 
-- PLAN-EVAL and IMPL-EVAL are complete and `PASS`; the draft PR may move to `status:impl-eval` but
-  must not be merged by this run.
+- PLAN-EVAL remains `PASS`; supervisor IMPL-EVAL returned `FAIL_FIX`. F1/F2 are repaired and the
+  draft PR remains at `status:impl-eval` pending a fresh supervisor-triggered verdict. Do not merge.
 - Live canary publication, canary-pinned production E2E, repository workflow permissions, and JSR
   scope grants remain explicit post-merge OWNER actions.

@@ -126,6 +126,9 @@ jobs:
       - name: Generated asset freshness
         run: deno task check:assets-barrel
 
+      - name: Publish asset freshness
+        run: deno task check:publish-assets
+
       - name: NetScript JSR emitted-specifier guard
         run: deno task check:netscript-jsr-specifiers
 

@@ -25,6 +25,7 @@ const SOURCE_EXTENSIONS = new Set([
 ]);
 const NETSCRIPT_JSR_PREFIX = /jsr:@netscript\/([a-z0-9][a-z0-9-]*)/g;
 const ALLOW_MARKER = 'jsr-versionless-ok:';
+const MCP_PUBLISH_ASSETS = 'packages/mcp/src/publish-assets.generated.ts';
 
 export interface SpecifierFinding {
   readonly path: string;
@@ -122,6 +123,30 @@ function maskComments(source: string): string {
   return chars.join('');
 }
 
+function maskEmbeddedDocumentation(source: string, path: string): string {
+  if (path !== MCP_PUBLISH_ASSETS) return source;
+  const declaration = /export const MCP_PACKAGE_README(?::\s*string)?\s*=\s*/.exec(source);
+  if (!declaration) return source;
+  const start = declaration.index + declaration[0].length;
+  const quote = source[start];
+  if (quote !== "'" && quote !== '"' && quote !== '`') return source;
+
+  const chars = [...source];
+  let escaped = false;
+  for (let index = start; index < chars.length; index++) {
+    const current = chars[index]!;
+    if (index > start && !escaped && current === quote) {
+      chars[index] = ' ';
+      break;
+    }
+    if (current !== '\n' && current !== '\r') chars[index] = ' ';
+    if (index === start) continue;
+    if (escaped) escaped = false;
+    else if (current === '\\') escaped = true;
+  }
+  return chars.join('');
+}
+
 function lineNumber(source: string, offset: number): number {
   let line = 1;
   for (let index = 0; index < offset; index++) {
@@ -154,7 +179,7 @@ export async function scanNetscriptJsrSpecifiers(
       if (isExcluded(path) || !hasSourceExtension(path)) continue;
       scannedFiles++;
       const source = await Deno.readTextFile(entry.path);
-      const masked = maskComments(source);
+      const masked = maskEmbeddedDocumentation(maskComments(source), path);
 
       for (const [index, lineText] of source.split(/\r?\n/).entries()) {
         const markerIndex = lineText.indexOf(ALLOW_MARKER);

@@ -79,6 +79,8 @@
     "agentic:opencode-web": "deno run --no-lock --allow-read --allow-run --allow-env .llm/tools/agentic/opencode/opencode-web.ts",
     "gen:assets-barrel": "deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-cli-assets-barrel.ts",
     "check:assets-barrel": "deno task gen:assets-barrel && git diff --exit-code -- packages/cli/src/kernel/assets/embedded.generated.ts packages/plugin/src/kernel/assets/embedded.generated.ts packages/fresh-ui/registry.generated.ts packages/service/src/primitives/scalar.generated.ts",
+    "gen:publish-assets": "deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-publish-assets.ts",
+    "check:publish-assets": "deno task gen:publish-assets --check",
     "check:scaffold-versions": "deno run .llm/tools/validation/check-scaffold-versions.ts --pretty",
     "check:netscript-jsr-specifiers": "deno run --allow-read .llm/tools/validation/check-netscript-jsr-specifiers.ts --pretty",
     "release:preflight": "deno run --allow-read .llm/tools/release/preflight-text-imports.ts",

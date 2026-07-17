@@ -22,11 +22,11 @@ import { getAvailablePort } from '@std/net';
 import { healthChecks } from '@netscript/service';
 import { createPluginService } from '@netscript/plugin/service';
 import { DurableStreamTestServer } from '@durable-streams/server';
-import denoJson from '../../deno.json' with { type: 'json' };
+import { PLUGIN_PACKAGE_VERSION } from '../../src/package-metadata.generated.ts';
 import { createStreamsProxyHandler } from './proxy.ts';
 
 /** Connector version, single-sourced from the streams package `deno.json`. */
-const VERSION: string = denoJson.version;
+const VERSION: string = PLUGIN_PACKAGE_VERSION;
 
 const port = parseInt(
   Deno.env.get('PORT') ?? Deno.env.get('STREAMS_PORT') ?? '4437',

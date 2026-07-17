@@ -6,16 +6,17 @@
 | --- | --- |
 | Run ID | `feat-811-release-canary--canary-readiness` |
 | Branch | `feat/811-release-canary` |
-| Current phase | `implementation-evaluated` |
+| Current phase | `impl-eval-repair-complete` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | none |
 
 ## Current State
 
-The six planned slices are implemented at committed head `fbabeb6b`. PLAN-EVAL and separate
-direct-Qwen IMPL-EVAL both returned `PASS`; all requested local gates are green. Draft PR #812 is
-ready to move from `status:impl` to `status:impl-eval` after the evaluator artifact/final run records
-are committed and pushed. No merge is authorized.
+The original six slices were implemented, but the supervisor-triggered IMPL-EVAL returned
+`FAIL_FIX` because the branch predated #810's actual import-attribute detector and conflicted with
+current main. The branch now merges `origin/main` at `aa14e452`; both findings are repaired, the
+three requested live negative probes are red as required, and the seed-free tree is green. Draft PR
+#812 remains at `status:impl-eval` pending a fresh supervisor verdict. No merge is authorized.
 
 ## Completed
 
@@ -35,15 +36,13 @@ are committed and pushed. No merge is authorized.
 
 ## In Progress
 
-- Commit/push final evaluator and run evidence; update draft PR body/comment/label to
-  `status:impl-eval`.
+- Commit/push the merge repair and update the draft PR evidence for supervisor re-evaluation.
 
 ## Next Steps
 
-1. Keep PR #812 draft and unmerged for owner/reviewer handoff.
-2. OWNER confirms workflow permissions and JSR scope/package grants after merge.
-3. OWNER runs the first live canary publish plus canary-pinned production E2E pair and yanks any
-   failed/obsolete immutable canary versions.
+1. Fresh supervisor-triggered IMPL-EVAL verifies F1/F2 on the merged head; no self-evaluation.
+2. Keep PR #812 draft and unmerged until that authorizing verdict.
+3. After merge, OWNER confirms permissions/JSR grants and runs the first live canary pair.
 
 ## Key Decisions
 
@@ -73,7 +72,7 @@ are committed and pushed. No merge is authorized.
 | Fitness | PASS / scoped N/A | release/tooling gates and negative proofs satisfied |
 | Runtime | N/A in PR | no live publish authorized |
 | Consumer | PASS | stable cut, canary cut, publisher, and GitHub Release consumers verified |
-| IMPL-EVAL | PASS | separate Qwen evaluator; no blocking findings |
+| IMPL-EVAL | FAIL_FIX → repair complete | supervisor F1/F2 repaired; fresh verdict pending |
 
 ## Open Questions
 
@@ -81,8 +80,8 @@ are committed and pushed. No merge is authorized.
 
 ## Drift and Debt
 
-- Drift: invalid delegated PLAN-EVAL discarded; Fable review fallback; three zero-turn evaluator
-  profile probes discarded; evaluator evidence transcription corrected by the same evaluator.
+- Drift: earlier routing/evidence corrections plus significant base drift that omitted #810's
+  detector; repaired by merging current main and adding real/live detection proofs.
 - Debt: stale OIDC wiring entry resolved without claiming a live canary; no new debt.
 
 ## Commits
