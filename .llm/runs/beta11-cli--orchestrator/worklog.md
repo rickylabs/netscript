@@ -125,3 +125,7 @@ group launch; this section fixes the supervisor's surface.
   (evidence restore + new-Deno-Deploy re-research, disjoint files: research/ + evidence/) and an
   Opus Stage-E rework agent (dispositions 2–14/16/17, disjoint: design/ + plan.md). G3 S1
   sign-off (a77b210c, D7 no-cast bar proven); S2 in flight.
+- 2026-07-18 · G8 Stage G PLAN-EVAL PASS (Qwen high, separate session). Seed run PARKED at
+  Stage-H: owner must ratify F-1…F-17 + SC-1…SC-6 in-turn before any board mutation. Full
+  adversarial cycle closed (17→13 RESOLVED + residuals supervisor-fixed + recheck). G3 #842:
+  IMPL-EVAL PASS, boxes checked, merge-when-green loop running. G6: S3 signed off, S4 final.
