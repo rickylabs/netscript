@@ -128,6 +128,17 @@ aligned with SAP until cutover, an hourly cleanup of stale staging files. That i
 `@netscript/plugin-triggers-core/builders`. The `add-scheduled` verb uses the spaced
 `add scheduled` shell syntax and can scaffold the job action already wired:
 
+{{ comp callout { type: "note", title: "ns-triggers / ns-workers are shorthands you install once" } }}
+<code>ns-triggers</code> and <code>ns-workers</code> are names <em>you</em> give the triggers and
+workers plugin CLIs — the scaffold does not create them. Install them once, globally, and every
+shorthand command on this page works as written:
+<pre><code class="language-bash">deno install -gArf -n ns-triggers jsr:@netscript/plugin-triggers{{ releaseSpecifier }}/cli
+deno install -gArf -n ns-workers jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli</code></pre>
+Rather not install them? Each <code>ns-&lt;plugin&gt; &lt;verb …&gt;</code> is exactly
+<code>deno x -A jsr:@netscript/plugin-&lt;plugin&gt;{{ releaseSpecifier }}/cli &lt;verb …&gt;</code> —
+run that full form instead.
+{{ /comp }}
+
 ```sh
 ns-triggers add scheduled daily-resync-schedule \
   --cron="0 6 * * *" \

@@ -160,6 +160,16 @@ The framework also ships named presets so you do not hand-roll the object. `perm
 Start a new Deno task from the CLI, then tune the generated builder instead of creating its file by
 hand. The `add-task` verb uses the spaced `add task` shell syntax:
 
+{{ comp callout { type: "note", title: "ns-workers is a shorthand you install once" } }}
+<code>ns-workers</code> is a name <em>you</em> give the workers plugin's CLI — the scaffold does
+not create it. Install it once, globally, and every <code>ns-workers</code> command on this page
+works as written:
+<pre><code class="language-bash">deno install -gArf -n ns-workers jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli</code></pre>
+Rather not install it? Each <code>ns-workers &lt;verb …&gt;</code> is exactly
+<code>deno x -A jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli &lt;verb …&gt;</code> — run
+that full form instead.
+{{ /comp }}
+
 ```sh
 ns-workers add task charge-customer --runtime=deno
 ```

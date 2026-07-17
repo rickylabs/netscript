@@ -171,6 +171,16 @@ curl http://localhost:8093/health
 ns-workers executions --limit=10 --json
 ```
 
+{{ comp callout { type: "note", title: "ns-workers is a shorthand you install once" } }}
+<code>ns-workers</code> is a name <em>you</em> give the workers plugin's CLI — the scaffold does
+not create it. Install it once, globally, and the <code>ns-workers</code> command above
+works as written:
+<pre><code class="language-bash">deno install -gArf -n ns-workers jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli</code></pre>
+Rather not install it? <code>ns-workers &lt;verb …&gt;</code> is exactly
+<code>deno x -A jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli &lt;verb …&gt;</code> — run
+that full form instead.
+{{ /comp }}
+
 Expected: both health checks return healthy JSON, and the executions feed shows a completed
 `import-products` run for `products_live.csv`.
 

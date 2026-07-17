@@ -74,6 +74,17 @@ module default. Inside the handler you receive a `ctx` carrying the payload, do 
 a result built with `createSuccessResult` / `createFailureResult`. Create the job under the workers
 plugin. Let the CLI create the payload schema, handler wrapper, stable export, and registry entry:
 
+{{ comp callout { type: "note", title: "ns-workers / ns-triggers are shorthands you install once" } }}
+<code>ns-workers</code> and <code>ns-triggers</code> are names <em>you</em> give the workers and
+triggers plugin CLIs — the scaffold does not create them. Install them once, globally, and every
+shorthand command on this page works as written:
+<pre><code class="language-bash">deno install -gArf -n ns-workers jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli
+deno install -gArf -n ns-triggers jsr:@netscript/plugin-triggers{{ releaseSpecifier }}/cli</code></pre>
+Rather not install them? Each <code>ns-&lt;plugin&gt; &lt;verb …&gt;</code> is exactly
+<code>deno x -A jsr:@netscript/plugin-&lt;plugin&gt;{{ releaseSpecifier }}/cli &lt;verb …&gt;</code> —
+run that full form instead.
+{{ /comp }}
+
 ```sh
 ns-workers add job import-products
 ```
