@@ -54,3 +54,12 @@ group launch; this section fixes the supervisor's surface.
   `withDatabase`'s `healthCheckDb` arg silently removed the DB readiness probe (plan Non-Scope
   violation). Steer issued: restore readiness, avoid double-registration, add readiness regression
   test, hoist provider-alias pairs to constants. Awaiting fix slice before sign-off.
+- 2026-07-18 · G1 #826: readiness-probe fix landed (13f63490) exactly per steer — readiness
+  regression test (200→503), no double-registration, alias constants. All gates re-run green.
+  IMPL-EVAL dispatched (Qwen, separate session). G4 #452: implementation complete (c62a6949 +
+  2dc0c809, sub-PR #848 → feat/desktop-frontend); both steers executed with evidence (argv
+  verified on Deno 2.9.3 — no task-level `--`; build-order via waitForCompletion asserted in
+  generated source order); Tier-A review sign-off; IMPL-EVAL dispatched (Qwen, separate session).
+  G2 #841: Plan & Design delivered; Tier-A plan review PASS (D1–D13 locked; steers: pin
+  os-arch URL vocabulary in tests; resolver is sole Deno-global toucher); implementation
+  unlocked.
