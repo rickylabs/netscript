@@ -4,9 +4,10 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The deployable trigger-processing plugin for NetScript. It binds the host plugin system to webhook
-ingress, the durable trigger processor runtime, a Triggers API service, CLI commands, durable
-streams, and Aspire process wiring through a single declarative manifest.**
+**The deployable trigger-processing plugin for NetScript: bind webhook ingress, durable processing,
+a Triggers API service, CLI commands, and Aspire wiring through one manifest.**
+
+The declarative manifest also carries durable-stream contributions and trigger runtime metadata.
 
 ---
 
@@ -133,5 +134,5 @@ manifest gives you IntelliSense and validation in any schema-aware editor.
 
 ## 📝 License
 
-Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
-cryptographically verified provenance.
+Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
+JSR with cryptographically verified provenance.

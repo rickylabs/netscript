@@ -4,9 +4,10 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The plugin authoring contract for NetScript: a fluent `definePlugin` builder that assembles
-type-safe plugin manifests, declares contribution axes (services, processors, stream topics,
-schemas), and feeds them to host tooling that materializes Aspire resources.**
+**The plugin authoring contract for NetScript: a fluent `definePlugin` builder for type-safe
+manifests that host tooling turns into runtime files and Aspire resources.**
+
+Manifests declare contribution axes including services, processors, stream topics, and schemas.
 
 ---
 
@@ -74,5 +75,5 @@ hosts read to generate files, runtime services, and AppHost resources.
 
 ## 📝 License
 
-Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
-cryptographically verified provenance.
+Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
+JSR with cryptographically verified provenance.

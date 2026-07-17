@@ -4,9 +4,10 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The deployable saga-orchestration plugin for NetScript. It binds the host plugin system to
-long-running workflows with compensation, a Saga API service, CLI commands, saga runtime metadata,
-durable streams, and Aspire process wiring through a single declarative manifest.**
+**The deployable saga-orchestration plugin for NetScript: bind long-running workflows with
+compensation, a Saga API service, CLI commands, and Aspire wiring through one manifest.**
+
+The declarative manifest also carries saga runtime metadata and durable-stream contributions.
 
 ---
 
@@ -128,5 +129,5 @@ manifest gives you IntelliSense and validation in any schema-aware editor.
 
 ## 📝 License
 
-Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
-cryptographically verified provenance.
+Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
+JSR with cryptographically verified provenance.
