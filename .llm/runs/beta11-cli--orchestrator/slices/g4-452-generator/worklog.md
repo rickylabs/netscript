@@ -89,6 +89,7 @@ native packaging logic to the dev registration block.
 | --- | --- | --- | --- |
 | 2026-07-17 | plan | Research | Re-baselined live #452/#375/#456, source, doctrine, JSR surface, and existing debt. |
 | 2026-07-17 | plan | Design checkpoint | Locked public contract, opt-in semantics, generator behavior, three slices, and gate set. Implementation not started. |
+| 2026-07-17 | plan | Review-ready handoff | Pushed `40b56f18`, opened draft PR #848 against `feat/desktop-frontend`, applied the requested taxonomy/milestone, and posted PR comment `5007823117` with `Plan & Design — READY FOR REVIEW`. |
 
 ## Decisions
 
@@ -117,4 +118,4 @@ force.
 - The evaluator should challenge whether the predev task plus forwarded CEF args is a sufficient
   build-order contract and whether `PackageTaskName` is the smallest useful #456 hook.
 - No implementation file has been changed.
-
+- Review surface: https://github.com/rickylabs/netscript/pull/848

@@ -14,7 +14,8 @@
 
 Research, plan, and the Design checkpoint are complete against integration baseline `ca72db14`.
 No implementation source has changed. The run is stopped before implementation pending a
-supervisor-dispatched, separate-session group PLAN-EVAL PASS.
+supervisor-dispatched, separate-session group PLAN-EVAL PASS. Draft PR #848 is the review surface;
+comment `5007823117` carries `Plan & Design — READY FOR REVIEW`.
 
 ## Completed
 
@@ -26,8 +27,7 @@ supervisor-dispatched, separate-session group PLAN-EVAL PASS.
 
 ## In Progress
 
-- Commit/push Plan & Design artifacts, open the draft sub-PR, apply taxonomy/milestone, and post
-  `Plan & Design — READY FOR REVIEW`.
+- Waiting at the group Plan-Gate. The implementation agent does not dispatch the evaluator.
 
 ## Next Steps
 
@@ -71,5 +71,5 @@ supervisor-dispatched, separate-session group PLAN-EVAL PASS.
 
 ## Commits
 
-- See the draft PR's commit list + per-slice PR comments.
-
+- Plan & Design: `40b56f18` plus this checkpoint-bookkeeping commit.
+- See draft PR #848's commit list + per-slice PR comments for the live trail.
