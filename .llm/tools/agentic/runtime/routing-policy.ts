@@ -70,6 +70,19 @@ export interface CanonicalRoutePolicy {
   readonly requiresExplicitApproval?: boolean;
   readonly evaluatesFamily?: ModelFamily;
   readonly evaluatorModelPolicy?: 'open_only';
+  /**
+   * Declared, machine-readable effort escalations for this route. Each entry
+   * names the condition under which the launcher may run the SAME route at a
+   * different effort (e.g. docs_audit `large_changeset` → high). Escalation
+   * never changes agent/provider/model — only effort — and any condition not
+   * declared here is rejected by {@link resolveCanonicalRouteEffort}.
+   */
+  readonly effortEscalations?: readonly EffortEscalation[];
+}
+
+export interface EffortEscalation {
+  readonly condition: string;
+  readonly effort: RouteIdentity['effort'];
 }
 
 const MAJOR_UI_UX_PRESET = OPENROUTER_PRESETS['claude-design-glm-5-2'];
@@ -216,6 +229,7 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     model: MODEL_IDS.codexSol,
     effort: 'medium',
     condition: 'single_pass_opposite_family_audit_of_generated_docs_changeset',
+    effortEscalations: [{ condition: 'large_changeset', effort: 'high' }],
   },
   // --- Final edit-only prose-polish pass, after audit + fixes land -----------------
   // Owner-revised 2026-07-17. Runs LAST in the docs pipeline: Claude · Fable 5 ·
@@ -495,6 +509,28 @@ export function resolveCanonicalRoute(lane: RoutingLane, at: Date): CanonicalRou
   return primary;
 }
 
+/**
+ * Resolves the effort a launcher may use for a canonical route. With no
+ * escalation condition, the route's declared effort is returned. With one, the
+ * condition must be declared in the route's `effortEscalations` — undeclared
+ * escalations throw, so effort discretion lives in policy data, never in prose.
+ */
+export function resolveCanonicalRouteEffort(
+  route: CanonicalRoutePolicy,
+  escalationCondition?: string,
+): RouteIdentity['effort'] {
+  if (!escalationCondition) return route.effort;
+  const escalation = route.effortEscalations?.find((entry) =>
+    entry.condition === escalationCondition
+  );
+  if (!escalation) {
+    throw new Error(
+      `route ${route.lane} declares no effort escalation for ${escalationCondition}`,
+    );
+  }
+  return escalation.effort;
+}
+
 export interface FallbackCandidate {
   readonly route: RouteIdentity;
   readonly family: ModelFamily;
@@ -543,6 +579,10 @@ function candidateAllowed(
     return false;
   }
   if (context.purpose === 'evaluation' && candidate.family === context.authorFamily) return false;
+  // The docs_audit lane is defined by its opposite-family transport (OpenAI
+  // auditing Claude-generated docs) and has NO cross-family fallback: fail closed
+  // on any candidate outside the OpenAI family rather than trade the invariant.
+  if (context.purpose === 'docs_audit' && candidate.family !== 'openai') return false;
   if (
     (candidate.subscriptionState === 'outside_plan' || candidate.requiresExplicitApproval) &&
     !context.explicitPaidApproval

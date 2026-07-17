@@ -5,6 +5,7 @@ import {
   resolveCanonicalFormalEvaluatorRoute,
   resolveCanonicalOrdinaryReviewRoute,
   resolveCanonicalRoute,
+  resolveCanonicalRouteEffort,
   type RoutingPolicyContext,
   selectFallbackCandidate,
 } from './routing-policy.ts';
@@ -471,6 +472,43 @@ Deno.test('docs_audit is an opposite-family Codex Sol medium single pass with NO
   const auditRoutes = CANONICAL_ROUTE_POLICY.filter((entry) => entry.lane === 'docs_audit');
   equal(auditRoutes.length, 1);
   equal(auditRoutes.every((entry) => entry.agent === 'codex' && entry.provider === 'openai'), true);
+});
+
+Deno.test('docs_audit large-changeset high effort is declared policy data, not prose', () => {
+  const route = resolveCanonicalRoute('docs_audit', new Date('2026-07-17T00:00:00Z'));
+  // Default: the declared route effort.
+  equal(resolveCanonicalRouteEffort(route), 'medium');
+  // Declared escalation: large changesets audit at high on the SAME route.
+  equal(resolveCanonicalRouteEffort(route, 'large_changeset'), 'high');
+  equal(route.effortEscalations, [{ condition: 'large_changeset', effort: 'high' }]);
+  // Undeclared escalation conditions are rejected, not silently defaulted.
+  assertThrows(() => resolveCanonicalRouteEffort(route, 'because_i_felt_like_it'));
+});
+
+Deno.test('docs_audit fallback selection fails closed on any non-OpenAI-family candidate', () => {
+  // A Claude-family candidate must NEVER be selectable for docs_audit — the lane
+  // is defined by its opposite-family transport and has no cross-family fallback.
+  const claudeFallback = candidate({ purpose: 'docs_audit', family: 'anthropic' });
+  equal(
+    selectFallbackCandidate(
+      [claudeFallback],
+      context({ purpose: 'docs_audit', authorFamily: 'anthropic' }),
+    ),
+    { status: 'blocked', reason: 'route_unavailable' },
+  );
+  // A same-family (OpenAI) Codex candidate remains selectable.
+  const codexFallback = candidate({
+    purpose: 'docs_audit',
+    family: 'openai',
+    route: route('codex'),
+  });
+  equal(
+    selectFallbackCandidate(
+      [claudeFallback, codexFallback],
+      context({ purpose: 'docs_audit', authorFamily: 'anthropic' }),
+    ).status,
+    'selected',
+  );
 });
 
 Deno.test('docs_polish is Claude Fable 5 medium edit-only, with an ordered depth-2 fallback chain', () => {

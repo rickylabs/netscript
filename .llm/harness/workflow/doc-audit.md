@@ -24,7 +24,7 @@ The docs changeset moves through a fixed sequence:
    after fixes have landed.
 5. **Merge.**
 
-Stated as a sequence: **generate (Opus/Sonnet) → single-pass Sol audit → fixes by the SAME generator
+Stated as a sequence: **generate (Claude authoring lanes) → single-pass Sol audit → fixes by the SAME generator
 session (resumed) → repeat audit cycle if needed (2-failure escalation) → single-pass Fable · medium
 polish (edit-only) → merge.**
 
@@ -42,7 +42,9 @@ individual authoring agent.
 
 The changeset is audited by **Codex · GPT-5.6 Sol · medium** in **ONE SINGLE PASS over the entire
 changeset** — never one audit per authoring sub-agent. The auditor MAY use **`high` effort for large
-changesets** (auditor discretion; state the effort chosen in the run's audit artifact).
+changesets**: this is the declared `large_changeset` effort escalation on the `docs_audit` route in
+`routing-policy.ts` (resolved via `resolveCanonicalRouteEffort`), not free-floating discretion —
+state the effort chosen and the escalation condition in the run's audit artifact.
 
 **Rationale (the audit unit is the changeset).** The failure modes that actually matter — baseline
 drift, cross-page contradictions, and false completeness claims — only exist at _changeset_ scope. A

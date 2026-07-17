@@ -46,8 +46,9 @@ approval — and each Fable primary carries an in-plan token-limit fallback.
 
 The `major_ui_ux_*` GLM 5.2 lanes and the OpenCode vision-evidence lane are **dormant** while the
 Dev Dashboard is paused (epic #400 moved to `0.0.1-beta.13`); they remain the enforced route for any
-major UI/UX work that does run. GLM 5.2 stays scoped to **pure design work** — it is not an
-implementation or general-evaluation model.
+major UI/UX work that does run. GLM 5.2 stays scoped to **pure design work, plus exactly one named
+exception: the `docs_polish` no-Claude-surface last-resort fallback** (2026-07-17, above) — it is
+not an implementation or general-evaluation model.
 
 The issue-body "Gemini 3.5 Flash" reference for research/extraction was superseded by epic #574's
 2026-07-10 Antigravity reconciliation. A distinct Gemini-model lane is an owner open question, not
@@ -183,7 +184,9 @@ OpenRouter-backed routes driven through Claude Code are a **proven transport** (
 agentic tooling), not a distinct doctrine — it is the transport the local evaluator lane above runs
 on. The evaluator rules that govern OpenHands govern them identically: the generator session is
 never the evaluator session, and no lane self-certifies. GLM 5.2 remains scoped to **pure design
-work** (the `major_ui_ux_*` lanes); it is not an implementation or general-evaluation model.
+work** (the `major_ui_ux_*` lanes) **plus exactly one named exception — the `docs_polish`
+no-Claude-surface last-resort fallback (2026-07-17)**; it is not an implementation or
+general-evaluation model.
 
 **Capability, per model (drift D-4, amended).** Reasoning support on this transport is a
 **per-model** fact, not a client-wide one. Do not generalize from one model:
@@ -192,15 +195,16 @@ work** (the `major_ui_ux_*` lanes); it is not an implementation or general-evalu
 | --------------------------------- | --------------- | ------------ | ----------------- |
 | `minimax/minimax-m3`              | yes             | supported    | workflow fanout; approved open model |
 | `qwen/qwen3.7-max`                | yes             | supported    | bound formal evaluator |
-| `z-ai/glm-5.2`                    | **none**        | —            | design/UI-UX only |
+| `z-ai/glm-5.2`                    | **none**        | —            | design/UI-UX; sole other use: `docs_polish` last-resort fallback |
 
 The **evaluator lane is fully capable**: real reasoning trace, verified agentic turn (real tool
 calls), so it can run gates and its `effort` is genuine — **not** nominal.
 
 **GLM 5.2 is the exception, and only GLM.** It returns zero thinking blocks over OpenRouter, so
 **never cite "GLM 5.2 · xhigh reasoning" as gate evidence** — state "tools + streaming, no reasoning
-trace" instead. This caveat is scoped to the design-verification lane and must not be restated as a
-property of the transport.
+trace" instead. This caveat is scoped to the lanes GLM may run on — the design-verification lanes
+and the `docs_polish` last-resort fallback — and must not be restated as a property of the
+transport.
 
 ### OpenRouter through OpenCode
 
