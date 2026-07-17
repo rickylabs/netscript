@@ -8,6 +8,17 @@ const ROOT = new URL('../../', import.meta.url);
 const CHECK = Deno.args.includes('--check');
 const stalePaths: string[] = [];
 
+export const PUBLISH_ASSET_OUTPUTS = [
+  'packages/mcp/src/publish-assets.generated.ts',
+  'packages/cli/src/kernel/assets/publish-assets.generated.ts',
+  'plugins/ai/src/package-metadata.generated.ts',
+  'plugins/auth/src/package-metadata.generated.ts',
+  'plugins/sagas/src/package-metadata.generated.ts',
+  'plugins/streams/src/package-metadata.generated.ts',
+  'plugins/triggers/src/package-metadata.generated.ts',
+  'plugins/workers/src/package-metadata.generated.ts',
+] as const;
+
 async function readVersion(path: string): Promise<string> {
   const config = JSON.parse(await Deno.readTextFile(new URL(path, ROOT))) as PackageConfig;
   if (typeof config.version !== 'string' || !config.version.trim()) {
