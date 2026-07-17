@@ -20,3 +20,9 @@
 | `formal_evaluation` | Claude Code + OpenRouter / Qwen 3.7 Max / high | Separate PLAN-EVAL and IMPL-EVAL sessions |
 
 Reference `.llm/harness/workflow/lane-policy.md`. No route override is in force.
+
+## Current state
+
+- Phase: implementation, slice 2
+- PLAN-EVAL: `PASS`
+- Blocking gate: none

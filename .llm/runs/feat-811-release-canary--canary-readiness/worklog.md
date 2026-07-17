@@ -66,6 +66,7 @@ Add or change one readiness rule as a named evidence-producing check with a seed
 | --- | --- | --- | --- |
 | 2026-07-17 | 1 | research/design | Re-baselined at `a5adb706`; existing release suite 29/29 green; implementation blocked on PLAN-EVAL. |
 | 2026-07-17 | 1 | PLAN-EVAL retry | First Qwen evaluator attempted prohibited closed-model delegation and was interrupted; no verdict accepted. Fresh direct-only Qwen retry required. |
+| 2026-07-17 | 1 | PLAN-EVAL | PASS from a fresh OpenRouter/Qwen 3.7-max session; all 8 Plan-Gate items passed. Implementation unblocked. |
 
 ## Decisions
 
@@ -88,6 +89,7 @@ Add or change one readiness rule as a named evidence-producing check with a seed
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
 | release baseline tests | `deno test --allow-all .llm/tools/release/` | PASS | 29 passed, 0 failed before implementation |
+| PLAN-EVAL | `.llm/runs/feat-811-release-canary--canary-readiness/plan-eval.md` | PASS | Separate direct-only OpenRouter/Qwen session; no delegation |
 | implementation gates | planned commands in `plan.md` | NOT_RUN | Plan-Gate hard stop |
 
 ### Fitness Gates
