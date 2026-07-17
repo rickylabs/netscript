@@ -247,6 +247,8 @@ a board column reflect reality.
   `kv`, `sdk`, `service`, `config`, `telemetry`, `ai-core`, `plugin-ai`, `docs`
 - `priority:` — `p0` (release blocker), `p1`, `p2`, `p3`
 - `ci:` — `skip-e2e`, `skip-scaffold`, `full` (manual overrides for the path-filtered CI);
+  `docs-eval:skip` — on-demand escape hatch for the automatic OpenHands docs-accuracy gate (the
+  workflow records an attributed skipped summary rather than silently skipping);
   `gate:` — `e2e`, `jsr`
 - `epic:` — groups every issue/PR belonging to a program epic (e.g. `epic:ai-stack`,
   `epic:deployment`); the epic's own umbrella issue carries `type:umbrella`.
