@@ -65,6 +65,7 @@ Update the source README/schema/package metadata, run the publish-assets generat
 | 2026-07-17 | 3 | reconcile | PR #810 remains draft and correctly references closed #808 without auto-close; no new comments or issue state require scope changes. |
 | 2026-07-17 | 4 | ordinary review | Separate opposite-family Claude Opus session `12b534fe-2771-462a-b012-c61c91968f2a` found one latent release-cut drift path; final follow-up verdict is `REVIEW: PASS`. |
 | 2026-07-17 | 4 | review fix | `release:cut` now regenerates publish assets after the version bump and stages all eight generated outputs; CI runs `check:publish-assets` beside `check:assets-barrel`; release skill mirrors document both steps. |
+| 2026-07-17 | 4 | IMPL-EVAL | Separate local Qwen session `e12ca085-a89a-4bc7-b144-5482f8b4289f` independently reran the required gates and returned `PASS`; artifact `evaluate.md`. |
 
 ## Decisions
 

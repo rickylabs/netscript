@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-mcp-readme-text-import--beta10-jsr-hotfix` |
 | Branch | `fix/mcp-readme-text-import` |
-| Current phase | `impl-eval handoff` |
+| Current phase | `impl-eval PASS` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `none` |
 
@@ -26,13 +26,13 @@ Separate-session PLAN-EVAL passed. Slices 2–4 are implemented and ordinarily r
 
 ## In Progress
 
-- Separate-session IMPL-EVAL.
+- No implementation work remains; formal IMPL-EVAL passed.
 
 ## Next Steps
 
-1. Commit and explicitly push the final evaluator handoff.
-2. Dispatch separate-session IMPL-EVAL and address any findings.
-3. Post the formal verdict and leave the draft PR at `status:impl-eval`.
+1. Commit and explicitly push `evaluate.md` and the final run state.
+2. Post the formal PASS verdict and leave the draft PR at `status:impl-eval`.
+3. Do not merge; release-owner follow-up remains outside this run.
 
 ## Key Decisions
 
