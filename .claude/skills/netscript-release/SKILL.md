@@ -96,6 +96,27 @@ After the release PR merges:
    `jsr:@netscript/cli@<version>`, and runs the published CLI smoke and scaffold runtime suite.
 5. The manual `workflow_dispatch` path still accepts `published-version` for targeted rechecks.
 
+### Minimum-Dependency-Age At Release Time
+
+Deno 2.9's default ~24h minimum-dependency-age rejects a same-day publish: a package published
+minutes ago is treated as too fresh to depend on. This bit the beta.10 cut twice in the same
+release, back to back:
+
+- #813 pinned `--minimum-dependency-age=0` on every `jsr:@netscript/*` invocation the production E2E
+  harness runs — but the harness still failed the very next run
+  ([`29564434302`](https://github.com/rickylabs/netscript/actions/runs/29564434302)).
+- #817 found the real cause: `deno x` resolves and installs the JSR executable, then internally
+  re-invokes `deno run` in a **child process** that does not inherit the parent's
+  `--minimum-dependency-age` flag. The fix bypasses `deno x` for fresh-plugin resolution and runs
+  `deno run --minimum-dependency-age=0` directly against the resolved entrypoint, keeping fresh
+  plugin resolution in one Deno process.
+
+Both fixes are release-harness-only (`.llm/tools/release/` and the E2E suite). The same exposure
+exists in the **shipped CLI's** own `deno x` plugin dispatch — tracked separately as a user-facing
+product-policy decision in [#818](https://github.com/rickylabs/netscript/issues/818) (a project on a
+fresh release hits the 24h wall on every `jsr:@netscript/*` resolution for its first day), not
+silently patched here.
+
 ## Hard Release Completion Gate
 
 A release is **done only when both** of these independent workflow verdicts are green:
@@ -116,6 +137,68 @@ prerelease and repeat both gates. The release is not complete until the pair is 
 - #133: asset preflight catches import attributes and `import.meta.url` asset-read defects that
   dry-run can miss and real publish can reject.
 - #146: `deno ci --prod` is already lockfile-frozen in Deno 2.9; an explicit extra flag is rejected.
+
+## First-Publish Checklist
+
+`publish.yml` auto-provisions new JSR packages (`.llm/tools/release/jsr-provision-packages.ts`), but
+provisioning is not readiness. Before the first release that carries a brand-new workspace member,
+verify by hand:
+
+- README meets the production standard (Install / Quick example / Docs sections) — see #807 for the
+  bar `@netscript/mcp` was held to before its first publish.
+- Tagline stays under the JSR byte cap.
+- `license`, `exports`, and workspace `deno.json` config are complete and correct for the new
+  member.
+- The docs site has coverage for the new package (or an explicit stub with a tracked follow-up).
+- For a server or CLI package, do a live tool validation pass — actually run the published surface,
+  not just `publish:dry-run` (see the same-semver republish section below for why dry-run passing is
+  not sufficient).
+
+This checklist is manual today. #811/#812 track a `publish-readiness.ts` gate (new-package
+detection, README/tagline/license/exports checks, docs-site coverage pointer) that runs inside a
+mandatory canary-publish channel and will automate it — once #812 merges, prefer the automated
+`release:canary` verdict over this manual checklist.
+
+## Same-Semver Republish (Partial-Publish Recovery)
+
+Proven during the 0.0.1-beta.10 cut (2026-07-17,
+[run `29558968037`](https://github.com/rickylabs/netscript/actions/runs/29558968037)): a
+`publish.yml` run can partially succeed. 33 workspace members published, 10 more failed on a
+transient `invalidBearerToken` OIDC error, `@netscript/mcp` failed on the registry-rejected text
+import that #810 later fixed, and 26 further members were skipped as dependents of a failed publish
+— `@netscript/cli` among them.
+
+**JSR version immutability binds only to published members.** A member that failed or was skipped
+can still publish at the exact same semver, and workspace `deno publish` skips already-registered
+versions on the members that already succeeded (`Warning: Skipping, already published`) rather than
+re-publishing or failing on them. This makes recovery a **fix-forward**, not a version bump,
+whenever the fix does not touch content that already published.
+
+Recovery steps, as executed for beta.10:
+
+1. Fix forward to `main` with every version file unchanged since the cut. `8a8a9537` (#810) fixed
+   the `@netscript/mcp` text-import rejection two commits after the `a5adb706` release-cut commit,
+   still at `0.0.1-beta.10` everywhere.
+2. Fast-forward the release tag to the fixed commit. This is legitimate **only** when every
+   already-published member is byte-identical across the move — verify with
+   `git diff <old-tag-sha> <new-tag-sha> -- <published-member-paths>` before moving the tag; a
+   member whose published content changed cannot ride a tag move at the same semver.
+3. Re-dispatch `publish.yml` via its `workflow_dispatch` `tag` input set to the existing tag (for
+   example `v0.0.1-beta.10`) — do not create a new GitHub Release; that would demand a new semver.
+   The workflow checks out the fast-forwarded tag ref, so the 33 already-published members log
+   `Skipping, already published` and only the previously-failed/skipped members publish for the
+   first time.
+4. The Hard Release Completion Gate above still applies to the **re-dispatched** run, not the
+   original: beta.10's first `publish.yml` run failed
+   ([`29558968037`](https://github.com/rickylabs/netscript/actions/runs/29558968037)); the
+   re-dispatch on the fast-forwarded tag succeeded
+   ([`29562537123`](https://github.com/rickylabs/netscript/actions/runs/29562537123), `mcp` and
+   `cli` publishing for the first time); only that green run's artifact is what `e2e-cli-prod` is
+   allowed to validate against.
+
+**Fallback:** a semver-bump hotfix is required instead whenever the fix changes content in a member
+that is already published — same-semver republish can only ever fill in members that never reached
+the registry, never re-publish over one that did.
 
 ## Rollback And Retry
 
