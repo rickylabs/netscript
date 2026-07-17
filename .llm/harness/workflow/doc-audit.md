@@ -15,10 +15,18 @@ The docs changeset moves through a fixed sequence:
    workflow fleet on **Opus 4.8 · medium** / **Sonnet 5 · high**) produce the changeset.
 2. **Audit** — a single **opposite-family** pass by **Codex · GPT-5.6 Sol · medium** over the whole
    changeset, gates executed from evidence, findings and a `## Gate log` recorded.
-3. **Fix cycle(s)** — the generators fix what the audit found; re-audit as needed.
+3. **Fix cycle(s)** — the fixes are made by the **same generator session** (resumed) on the **same
+   model** that authored the changeset. Reusing its own context keeps fixes cheap and prevents
+   rewrite-drift by an agent that never saw the original authoring decisions. Spawning a **fresh**
+   fixer is the exception and MUST be justified in the run log (e.g. the original session was lost).
+   Re-audit after fixes; a second audit FAIL triggers the 2-failure escalation below.
 4. **Polish** — a single edit-only prose pass by **Claude · Fable 5 · medium** after the audit and
    after fixes have landed.
 5. **Merge.**
+
+Stated as a sequence: **generate (Opus/Sonnet) → single-pass Sol audit → fixes by the SAME generator
+session (resumed) → repeat audit cycle if needed (2-failure escalation) → single-pass Fable · medium
+polish (edit-only) → merge.**
 
 The two lanes are distinct on purpose: the audit is an accuracy gate run by the opposite model
 family; the polish is a prose pass by the Claude family. They never merge into one step.
