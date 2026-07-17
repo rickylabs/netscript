@@ -25,6 +25,12 @@ const SOURCE_EXTENSIONS = new Set([
 ]);
 const NETSCRIPT_JSR_PREFIX = /jsr:@netscript\/([a-z0-9][a-z0-9-]*)/g;
 const ALLOW_MARKER = 'jsr-versionless-ok:';
+const PATH_ALLOWANCES = new Map<string, string>([
+  [
+    'packages/mcp/src/publish-assets.generated.ts',
+    'generated embedded documentation strings are never emitted or executed as framework specifiers',
+  ],
+]);
 
 export interface SpecifierFinding {
   readonly path: string;
@@ -155,6 +161,7 @@ export async function scanNetscriptJsrSpecifiers(
       scannedFiles++;
       const source = await Deno.readTextFile(entry.path);
       const masked = maskComments(source);
+      const pathAllowance = PATH_ALLOWANCES.get(path);
 
       for (const [index, lineText] of source.split(/\r?\n/).entries()) {
         const markerIndex = lineText.indexOf(ALLOW_MARKER);
@@ -177,6 +184,10 @@ export async function scanNetscriptJsrSpecifiers(
         if (afterPackage === '@') continue;
         const line = lineNumber(masked, offset);
         const text = sourceLine(source, line);
+        if (pathAllowance) {
+          allowances.push({ path, line, reason: pathAllowance });
+          continue;
+        }
         const markerIndex = text.indexOf(ALLOW_MARKER);
         if (markerIndex >= 0) {
           const reason = text.slice(markerIndex + ALLOW_MARKER.length).trim();
