@@ -77,3 +77,7 @@ group launch; this section fixes the supervisor's surface.
 - 2026-07-18 · G1 #826 MERGED to main (squash 56cf84b5, PR #847) — CI ALL GREEN (close-gate
   passed after evidence-checked boxes), IMPL-EVAL PASS, Tier-A sign-off, standing owner merge
   authorization. #826 auto-closed. First milestone-13 issue shipped.
+- 2026-07-18 · G4 #452 MERGED into feat/desktop-frontend (merge f86a9191; CI ALL GREEN after the
+  schema fix; IMPL-EVAL PASS). #452/#375 stay open by design — their Closes keywords fire at the
+  wave→main PR. Integration branch synced with main (G1 fix folded in, b2248058, clean merge).
+  Free slot → launching G10 #802.
