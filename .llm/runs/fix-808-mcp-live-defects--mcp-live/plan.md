@@ -71,7 +71,7 @@ package-shipped docs default, and retained command-safety regressions.
 
 | ID | Decision | Rationale |
 | --- | --- | --- |
-| D1 | Fix OTLP envelope/nesting in `packages/telemetry` infrastructure and prove it through the MCP adapter boundary. | The parser is owned by the reusable telemetry adapter; duplicating it in MCP would violate wrap-not-reinvent. |
+| D1 | Fix OTLP envelope/nesting/kind normalization in `packages/telemetry` infrastructure; at the MCP infrastructure edge, load the local ASP.NET Dashboard CA for loopback HTTPS only; prove both through the MCP adapter boundary. | The parser is owned by the reusable telemetry adapter; local certificate discovery is MCP/Aspire edge composition. Duplicating parsing or globally disabling TLS verification would violate doctrine and security. |
 | D2 | Preserve the doctor cap; expose one top-level aggregate per family and bound detailed family checks with an explicit overflow summary. | Raising the cap weakens token discipline; pagination would be a breaking input/output contract for a one-shot diagnostic. |
 | D3 | Use the package-shipped README as the embedded default corpus; explicit flag/environment roots select the filesystem adapter. | It is always present in the published package, works over JSR via raw text import, and makes list/search/get useful immediately. |
 | D4 | A missing explicit filesystem corpus returns `docs_corpus_not_found` naming the path and `--docs-root` remediation. | Empty-by-default is no longer possible; explicit overrides must also fail explicitly rather than silently. |
@@ -91,6 +91,7 @@ package-shipped docs default, and retained command-safety regressions.
 | Risk | Mitigation |
 | --- | --- |
 | Live capture contains volatile IDs/timestamps or secrets. | Retain structural fields and representative real spans, redact only volatile identifiers/values, and document provenance. |
+| Local Dashboard TLS is made insecure globally. | Never disable verification; load only discovered ASP.NET development PEMs into a custom client and only for loopback HTTPS. |
 | Resource attributes are lost while flattening nested spans. | Propagate resource attributes into normalized span attributes only where absent; assert service classification in the MCP flow. |
 | Embedded raw asset fails over the publish graph. | Use `with { type: "text" }`, include README in publish dry-run, and run package/consumer checks. |
 | Doctor aggregation hides failures. | Compute status/counts over all original checks and add an explicit omitted-count summary with the worst omitted severity. |
@@ -143,4 +144,3 @@ package-shipped docs default, and retained command-safety regressions.
 
 - Any live response field incompatible with the report, any required public-contract change, any
   lockfile churn, or any need to alter scaffold output is significant drift and requires rescope.
-

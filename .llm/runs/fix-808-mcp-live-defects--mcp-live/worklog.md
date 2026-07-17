@@ -71,6 +71,10 @@ return checks, while `doctor-flow.ts` alone owns cross-family aggregation and bo
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-07-17 | 0 | Research/design | Issue/API, live report, doctrine, package surface, adapters, schemas, and composition re-baselined. |
+| 2026-07-17 | 1 | Live scaffold | Canonical no-cleanup run passed 58/58; detached restart died with its invocation, so capture continues on the validator-proven foreground transport. |
+| 2026-07-17 | 1 | Live capture | Fresh trigger returned `{"jobId":"health-check","triggered":true}`; Dashboard capture has `data,totalCount,returnedCount`, 2 resource groups, 8 scopes, 17 spans. Plain Deno TLS fails `UnknownIssuer`; custom client with the generated localhost PEM succeeds. |
+| 2026-07-17 | 1 | Telemetry implementation | Shared adapter now unwraps `data`, flattens `resourceSpans/scopeSpans/spans`, carries resource identity, and decodes OTLP kinds; MCP trusts discovered ASP.NET PEMs for loopback HTTPS only. Exact 13.4.6 captures are checked in as fixtures. |
+| 2026-07-17 | 1 | Telemetry verification | Telemetry package check + 52 tests and MCP package check + 41 tests pass. Direct query against the live Dashboard returns 21 spans, 11 resources, services `workers/workers-api`, and internal/producer/consumer/server kinds. |
 
 ## Decisions
 
@@ -79,6 +83,7 @@ return checks, while `doctor-flow.ts` alone owns cross-family aggregation and bo
 | Shared telemetry parser owner | Avoid duplicate/inconsistent external-system adapters. | Doctrine A6/A7; code dependency. |
 | Aggregate doctor, do not raise cap | Preserve token discipline and one-shot tool contract. | Issue #808; schema/runner ordering. |
 | Embedded README default | Publish-safe guaranteed corpus; explicit overrides remain. | JSR audit and `deno.json` publish list. |
+| Trust local Dashboard CA, never bypass TLS | Live Deno transport otherwise degrades to empty before parsing. | Live capture and security boundary. |
 
 ## Drift
 
@@ -121,4 +126,3 @@ return checks, while `doctor-flow.ts` alone owns cross-family aggregation and bo
 - Formal evaluators are owner-waived and must not be dispatched.
 - Inspect the live-capture provenance and telemetry nesting first, then doctor bounds and docs
   unavailable-state behavior.
-

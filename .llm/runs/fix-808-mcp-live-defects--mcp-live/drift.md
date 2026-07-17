@@ -35,3 +35,32 @@ Drift is append-only.
 - **Severity:** minor
 - **Action:** accept
 - **Evidence:** baseline fields in `supervisor.md`/`research.md`; PR #809 base SHA.
+
+## 2026-07-17 — Detached Aspire start does not survive tool invocation
+
+- **What:** `aspire start --non-interactive --isolated` returned a Dashboard URL, but the detached
+  AppHost processes exited when the command invocation ended and `aspire ps` returned `[]`.
+- **Source:** live capture setup against the generated scaffold.
+- **Expected:** The Aspire skill's preferred detached `aspire start` path would keep the AppHost
+  running for follow-up `aspire wait`/Dashboard requests.
+- **Actual:** The validator report's attached foreground `aspire run --non-interactive --isolated`
+  transport is required in this execution environment to keep the runtime alive.
+- **Severity:** minor
+- **Action:** accept
+- **Evidence:** Aspire 13.4.6 detached log
+  `/home/codex/.aspire/logs/cli_20260717T050036315_detach-child_7819f130deb240feab60e9e6e27d1ed3.log`;
+  empty `aspire ps` and absent PIDs.
+
+## 2026-07-17 — Telemetry blocker also includes local Dashboard TLS and OTLP enum semantics
+
+- **What:** The live report correctly identified the envelope/nesting loss but did not separately
+  name the preceding Deno TLS failure or the off-by-one OTLP numeric span-kind mapping.
+- **Source:** Fresh live Dashboard `https://localhost:43909` after a worker health-check trigger.
+- **Expected:** Fixing `{data:{resourceSpans}}` parsing alone would restore live MCP telemetry.
+- **Actual:** Default Deno fetch fails `UnknownIssuer` and is swallowed to empty; loading the
+  generated ASP.NET localhost PEM succeeds. The resulting live payload also proves
+  `1=internal … 5=consumer`, unlike the current mapping.
+- **Severity:** significant
+- **Action:** fix
+- **Evidence:** `.llm/tmp/mcp-808-live-spans.json`; Deno direct-fetch error; successful custom
+  `Deno.HttpClient({caCerts:[pem]})` request; `research.md` findings 9–10.

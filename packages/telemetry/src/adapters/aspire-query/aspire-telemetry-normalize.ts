@@ -151,10 +151,12 @@ function normalizeKind(value: unknown): TelemetrySpanKind {
       return lowered;
     }
   }
-  if (value === 1) return 'server';
-  if (value === 2) return 'client';
-  if (value === 3) return 'producer';
-  if (value === 4) return 'consumer';
+  // OpenTelemetry SpanKind numeric values reserve 0 for unspecified and use
+  // 1–5 for internal, server, client, producer, and consumer respectively.
+  if (value === 2) return 'server';
+  if (value === 3) return 'client';
+  if (value === 4) return 'producer';
+  if (value === 5) return 'consumer';
   return 'internal';
 }
 
@@ -315,10 +317,11 @@ export function normalizeResource(value: unknown): TelemetryResource | undefined
   }
   return {
     serviceName,
-    serviceInstanceId: readString(value, ['serviceInstanceId', 'service.instance.id']) ??
-      (typeof attributes['service.instance.id'] === 'string'
-        ? attributes['service.instance.id']
-        : undefined),
+    serviceInstanceId:
+      readString(value, ['serviceInstanceId', 'service.instance.id', 'instanceId']) ??
+        (typeof attributes['service.instance.id'] === 'string'
+          ? attributes['service.instance.id']
+          : undefined),
     attributes,
   };
 }
@@ -374,13 +377,76 @@ export function selectItems(value: unknown, keys: readonly string[]): readonly u
   if (!isObject(value)) {
     return [];
   }
+  const envelope = Reflect.get(value, 'data');
+  const source = isObject(envelope) || Array.isArray(envelope) ? envelope : value;
+  if (Array.isArray(source)) {
+    return source;
+  }
   for (const key of keys) {
-    const nested = Reflect.get(value, key);
+    const nested = Reflect.get(source, key);
     if (Array.isArray(nested)) {
       return nested;
     }
   }
-  return [value];
+  return [source];
+}
+
+/** Unwrap the Aspire Dashboard's `{ data: ... }` response envelope. */
+export function unwrapData(value: unknown): unknown {
+  if (!isObject(value)) {
+    return value;
+  }
+  const data = Reflect.get(value, 'data');
+  return isObject(data) || Array.isArray(data) ? data : value;
+}
+
+/**
+ * Select spans from flat responses or Aspire Dashboard OTLP resource/scope nesting.
+ *
+ * Resource attributes are prepended to each span so normalized spans retain the
+ * service identity required by downstream query consumers. Span attributes come
+ * last and therefore win if the same key appears at both levels.
+ */
+export function selectSpans(value: unknown): readonly unknown[] {
+  const source = unwrapData(value);
+  if (Array.isArray(source)) {
+    return source;
+  }
+  if (!isObject(source)) {
+    return [];
+  }
+
+  const resourceSpans = Reflect.get(source, 'resourceSpans');
+  if (!Array.isArray(resourceSpans)) {
+    return selectItems(source, ['spans', 'items']);
+  }
+
+  const spans: unknown[] = [];
+  for (const resourceEntry of resourceSpans) {
+    if (!isObject(resourceEntry)) {
+      continue;
+    }
+    const resource = readObject(resourceEntry, ['resource']);
+    const resourceAttributes = resource ? readArray(resource, ['attributes']) : [];
+    for (const scopeEntry of readArray(resourceEntry, ['scopeSpans'])) {
+      if (!isObject(scopeEntry)) {
+        continue;
+      }
+      for (const span of readArray(scopeEntry, ['spans'])) {
+        if (!isObject(span)) {
+          continue;
+        }
+        spans.push({
+          ...span,
+          attributes: [
+            ...resourceAttributes,
+            ...readArray(span, ['attributes']),
+          ],
+        });
+      }
+    }
+  }
+  return spans;
 }
 
 /** Append query parameters shared by Aspire telemetry endpoints. */

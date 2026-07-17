@@ -25,6 +25,8 @@
 | 6 | The package already publishes `README.md`, and Deno 2.9 raw text imports work for it; this is a publish-safe embedded default with no runtime filesystem lookup. | `deno eval 'import source from "./packages/mcp/README.md" with { type: "text" }'`; package dry-run file list. |
 | 7 | Correct live paths are 13 tool names, populated `list_commands`, allowed `plugin list`, and pre-spawn denied `deploy`. | Issue #808 and the carried live report; retain in live matrix. |
 | 8 | `packages/mcp` is an owner-accepted horizontal Archetype-6 thin protocol router; flows consume ports and external adapters remain in infrastructure. | `MCP-A6-V2-SHAPE` in `.llm/harness/debt/arch-debt.md`. |
+| 9 | Plain Deno `fetch` rejects the local Aspire Dashboard HTTPS certificate (`UnknownIssuer`), and the query adapter catches that failure as the same empty result. Loading the generated ASP.NET localhost PEM through a custom `Deno.HttpClient` succeeds. | Live `fetch` against `https://localhost:43909`; `/home/codex/.aspnet/dev-certs/trust/*.pem`. |
+| 10 | OTLP numeric span-kind normalization is off by one: live values use `1=internal, 2=server, 3=client, 4=producer, 5=consumer`, while current code maps 1–4 to server–consumer and treats 5 as internal. | Live capture plus `normalizeKind()` in `aspire-telemetry-normalize.ts`. |
 
 ## jsr-audit surface scan (package/plugin waves)
 
@@ -40,5 +42,6 @@
 
 ## Open questions
 
-- None that force rework. The exact live-capture fields are intentionally re-derived before S1 is
-  implemented; casing variants outside the observed Aspire 13.4.6 payload are safe to defer.
+- None that force rework. The live capture is now fixed at Dashboard `https://localhost:43909`,
+  Aspire 13.4.6, 2 resource groups / 8 scopes / 17 spans after a fresh health-check trigger.
+  Casing variants outside the observed Aspire 13.4.6 payload are safe to defer.
