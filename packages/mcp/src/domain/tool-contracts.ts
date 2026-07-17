@@ -14,6 +14,23 @@ const stringProperty = { type: 'string' } as const;
 const limitProperty = { type: 'integer', minimum: 1, maximum: 100 } as const;
 const searchLimitProperty = { type: 'integer', minimum: 1, maximum: 20 } as const;
 const isObject = (value: unknown): value is Record<string, unknown> => isRecord(value);
+const doctorCountsShape = objectSchema({
+  pass: { type: 'integer' },
+  warn: { type: 'integer' },
+  fail: { type: 'integer' },
+}, ['pass', 'warn', 'fail']);
+const doctorCheckShape = objectSchema({
+  name: stringProperty,
+  status: { enum: ['pass', 'warn', 'fail'] },
+  summary: stringProperty,
+  fix: stringProperty,
+}, ['name', 'status', 'summary']);
+const doctorFamilyShape = objectSchema({
+  name: { enum: ['telemetry', 'aspire', 'project', 'plugins'] },
+  status: { enum: ['pass', 'warn', 'fail'] },
+  counts: doctorCountsShape,
+  checks: { type: 'array', maxItems: 20, items: doctorCheckShape },
+}, ['name', 'status', 'counts', 'checks']);
 
 /** Compact diagnostic severity. */
 export type DoctorStatus = 'pass' | 'warn' | 'fail';
@@ -147,9 +164,9 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
   doctor: objectSchema({
     status: { enum: ['pass', 'warn', 'fail'] },
     endpoint: stringProperty,
-    counts: { type: 'object' },
-    checks: { type: 'array', maxItems: 20 },
-    families: { type: 'array', maxItems: 4 },
+    counts: doctorCountsShape,
+    checks: { type: 'array', maxItems: 20, items: doctorCheckShape },
+    families: { type: 'array', maxItems: 4, items: doctorFamilyShape },
   }, ['status', 'endpoint', 'counts', 'checks', 'families']),
   search_docs: objectSchema({
     count: { type: 'integer' },

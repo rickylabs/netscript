@@ -16,12 +16,12 @@ Deno.test("agent MCP adapters expose real verbs and non-stub plugin doctor resul
     Promise.resolve([{
       pluginName: "workers",
       status: "healthy",
-      checks: [{
-        id: "manifest",
-        title: "Manifest resolved",
-        status: "healthy",
+      checks: Array.from({ length: 25 }, (_, index) => ({
+        id: `manifest-${index}`,
+        title: `Manifest ${index} resolved`,
+        status: "healthy" as const,
         message: "workers",
-      }],
+      })),
     }])
   );
   const server = createMcpCliServer({
@@ -61,7 +61,9 @@ Deno.test("agent MCP adapters expose real verbs and non-stub plugin doctor resul
     params: { name: "doctor", arguments: {} },
   });
   const doctorText = JSON.stringify(diagnosis?.result);
-  assertStringIncludes(doctorText, "workers:manifest");
+  assertEquals(diagnosis?.error, undefined);
+  assertStringIncludes(doctorText, "workers:manifest-0");
+  assertStringIncludes(doctorText, "plugins_additional_checks");
   if (doctorText.includes("not wired")) {
     throw new Error("doctor used the unwired project stub");
   }

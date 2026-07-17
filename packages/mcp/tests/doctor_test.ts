@@ -1,8 +1,10 @@
-import { assertEquals, assertStringIncludes } from '@std/assert';
+import { assert, assertEquals, assertStringIncludes } from '@std/assert';
 import { createMcpServer } from '../mod.ts';
 import type { TelemetryProbePort } from '../mod.ts';
 import type { DoctorCheckFamily, DoctorResult } from '../mod.ts';
 import { createDoctorFlow } from '../src/application/flows/doctor-flow.ts';
+import { validateSchema } from '../src/domain/schema.ts';
+import { TOOL_OUTPUT_SCHEMAS } from '../src/domain/tool-contracts.ts';
 
 const unreachable: TelemetryProbePort = {
   probe: () => Promise.resolve({ reachable: false, message: 'connection refused' }),
@@ -72,4 +74,29 @@ Deno.test('doctor aggregation counts severities and isolates family failures', a
   assertEquals(doctor.status, 'fail');
   assertEquals(doctor.counts, { pass: 1, warn: 1, fail: 1 });
   assertEquals(doctor.families.map((family) => family.status), ['pass', 'warn', 'fail']);
+});
+
+Deno.test('real doctor flow stays within its advertised schema for large families', async () => {
+  const large: DoctorCheckFamily = {
+    name: 'plugins',
+    check: () =>
+      Promise.resolve(Array.from({ length: 25 }, (_, index) => ({
+        name: `plugin_check_${index}`,
+        status: index === 24 ? 'fail' as const : 'pass' as const,
+        summary: `check ${index}`,
+      }))),
+  };
+  const result = await createDoctorFlow(
+    { probe: () => Promise.resolve({ reachable: true, message: 'ready' }) },
+    {},
+    [large],
+  )({});
+  assert(result.ok);
+
+  const doctor = validateSchema(TOOL_OUTPUT_SCHEMAS.doctor, result.value) as DoctorResult;
+  assertEquals(doctor.checks.length, 2);
+  assertEquals(doctor.counts, { pass: 25, warn: 0, fail: 1 });
+  assertEquals(doctor.families[1]?.checks.length, 20);
+  assertEquals(doctor.families[1]?.checks[19]?.name, 'plugins_additional_checks');
+  assertEquals(doctor.families[1]?.checks[19]?.status, 'fail');
 });
