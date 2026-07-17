@@ -171,6 +171,18 @@ An unfiltered `--all-targets` includes `.dmg`, so run that complete matrix on ma
 use repeatable `--format` filters to omit it while still cross-compiling the remaining targets.
 Native installers are unsigned at this stage; signing and notarization remain external CI steps.
 
+Platform signing is separate from the Ed25519 update-manifest signature. CI should sign the native
+artifacts after packaging and before release preparation or hosting:
+
+- Windows: Authenticode-sign the generated `.msi` with `signtool`, including the organization's
+  SHA-256 timestamp authority, then verify the signature on a clean Windows runner.
+- macOS: codesign the `.app` and nested code with the appropriate Developer ID identity, create or
+  sign the `.dmg`, submit it to Apple's notary service, and staple/validate the notarization ticket.
+- Linux: apply the repository/distribution signing policy to `.deb` and `.rpm`; AppImage signing is
+  likewise an external release-policy step.
+
+The CLI intentionally does not accept certificate credentials or invoke those platform tools.
+
 Prepare a native update after CI has retained the current and previous runtime libraries:
 
 ```bash
@@ -206,6 +218,24 @@ Windows native apply remains unsupported upstream. Applications must handle the 
 `applyMode: "manual"` update-ready event and present its trusted `manualUpdateUrl`; this server may
 host the installer, but it does not claim or emulate automatic Windows replacement.
 
+```ts
+import { startAutoUpdate } from '@netscript/sdk/auto-update';
+
+startAutoUpdate({
+  release: {
+    baseUrl: 'https://releases.example.com/application',
+    publicKey: 'base64-ed25519-public-key',
+    manualUpdateUrl: 'https://releases.example.com/application/windows-installer',
+  },
+  policy: { checkOnLaunch: true },
+  onUpdateReady(event) {
+    if (event.applyMode === 'manual') showInstallerPrompt(event.manualUpdateUrl);
+  },
+});
+
+declare function showInstallerPrompt(url: string): void;
+```
+
 Cloud authentication and RBAC are deliberately **operator-owned**. NetScript does not mint cloud
 credentials, assign RBAC, or hand-author Helm, Bicep, Kubernetes, or Azure manifests: AppHost-backed
 targets delegate to Aspire after validation, and Cloud Run owns only the image build/push/apply seam.
@@ -221,10 +251,10 @@ A host binary embedding the deploy surface must grant:
 
 | Permission      | Why                                                                                                    |
 | --------------- | ------------------------------------------------------------------------------------------------------ |
-| `--allow-run`   | `deno compile` the service binaries; invoke `servy` / `systemctl` / `aspire` / `docker` / `gcloud`.    |
+| `--allow-run`   | Invoke desktop package tasks, bsdiff/zstd, and deploy tools such as `servy`, Aspire, Docker, or gcloud. |
 | `--allow-read`  | Read the workspace config, entrypoints, and release/secret files.                                      |
-| `--allow-write` | Emit compiled binaries, release directories, the `current` link, and env files.                        |
-| `--allow-net`   | Health-probe the activated service (`FetchHealthProbe`).                                               |
+| `--allow-write` | Emit compiled binaries, native artifacts, private high-water state, release files, and env files.     |
+| `--allow-net`   | Listen for release HTTP requests and health-probe activated services.                                 |
 | `--allow-sys`   | Resolve the host OS/triple to select the Servy vs. systemd adapter and compile target.                 |
 | `--allow-env`   | Read the deploy owner principal for the Windows secret-file ACL; provider CLIs read their auth tokens. |
 

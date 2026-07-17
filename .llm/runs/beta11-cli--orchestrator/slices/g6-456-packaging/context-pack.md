@@ -6,7 +6,7 @@
 | -------------- | -------------------------------------------------- |
 | Run ID         | `beta11-cli--orchestrator/slices/g6-456-packaging` |
 | Branch         | `feat/desktop-frontend-456-packaging`              |
-| Current phase  | `implement`                                        |
+| Current phase  | `evaluate`                                         |
 | Archetype      | `6 — CLI / Tooling`                                |
 | Scope overlays | `service` for the release HTTP handler             |
 
@@ -16,8 +16,9 @@ Research, the full plan, and the mandatory Design checkpoint are complete agains
 `e6e1be08`. Plan commit `f1a0d6c3` is pushed and draft PR
 [#854](https://github.com/rickylabs/netscript/pull/854) targets `feat/desktop-frontend` with the
 required metadata. The Tier-A Fable 5 supervisor approved D1–D21 and delivered group Plan-Gate
-`PASS`. Slice 1 commit `ffb7e896` and slice 2 commit `cc52e487` passed Tier-A review. Slice 3
-implementation and gates are complete and ready to commit, push, and stop for Tier-A review.
+`PASS`. All four locked implementation slices are complete. S1 `ffb7e896`, S2 `cc52e487`, and S3
+`ef0c585b` received Tier-A PASS. S4 final documentation and the full CLI/JSR/package gate set are
+complete; the run is ready for the supervisor-dispatched separate-session IMPL-EVAL.
 
 ## Completed
 
@@ -52,15 +53,21 @@ implementation and gates are complete and ready to commit, push, and stop for Ti
 - Proved real URL parity by importing public `@netscript/sdk/auto-update` and requesting the handler
   at `createReleaseClient(...).updateUrl + '/latest.json'`.
 - Passed 33 focused tests (12 steps), full CLI tests (411 / 424 steps), and all S3 gates.
+- Recorded Tier-A S3 PASS for the public-subpath real-handler parity proof, full traversal suite,
+  and D18/D19 hardened GET/HEAD handler.
+- Completed external platform-signing/notarization, Windows manual-event, permission, HTTPS, and
+  operator-custody documentation without implementing credentialed CI steps.
+- Re-ran the full final rubric: focused 33/12, full CLI 411/424, 712-file static wrappers, quality,
+  root architecture, doc lint, JSR audit/dry-run, dependency audit/why, and no-text-import scan.
 
 ## In Progress
 
-- Commit/push/comment slice 3, then pause without beginning slice 4.
+- Commit/push/comment S4, mark the PR ready with `status:impl-eval`, and stop.
 
 ## Next Steps
 
-1. Commit, push the explicit branch refspec, and post slice-3 evidence on PR #854.
-2. Stop for Tier-A review before slice 4.
+1. Supervisor dispatches IMPL-EVAL in a separate session and writes `evaluate.md`.
+2. No merge or release action before the required CI and evaluator gates.
 
 ## Key Decisions
 
@@ -89,7 +96,7 @@ implementation and gates are complete and ready to commit, push, and stop for Ti
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Static | PASS | 698-file check/lint/fmt; doc lint 0; dry-run exit 0 with baseline warnings. |
+| Static | PASS | 712-file check/lint/fmt; doc lint 0; dry-run exit 0 with baseline warnings. |
 | Fitness | PASS_WITH_BASELINE | quality and root arch pass; focused doctrine has baseline-only findings. |
 | Runtime | PASS | 33 focused tests / 12 steps; full CLI 411 tests / 424 steps. |
 | Consumer | S1–S3 PASS | Exact hook argv, native envelope, and real public-SDK handler URL parity. |
@@ -102,7 +109,7 @@ implementation and gates are complete and ready to commit, push, and stop for Ti
 ## Drift and Debt
 
 - Drift: Option A sequencing, native format support, upstream all-target omission, target-axis
-  placement, and guarded dependency edit are recorded in `drift.md`.
+  placement, guarded dependency edit, and release-server grouping are recorded in `drift.md`.
 - Debt: no new debt planned; existing CLI Restructure/vocabulary/cardinality baselines remain
   unchanged and must not grow.
 
@@ -112,5 +119,6 @@ implementation and gates are complete and ready to commit, push, and stop for Ti
   checkpoint, context, and drift).
 - `ffb7e896` — `feat(cli): add native desktop packaging pipeline` (Tier-A S1 PASS).
 - `cc52e487` — `feat(cli): prepare signed native desktop releases` (Tier-A S2 PASS).
+- `ef0c585b` — `feat(cli): serve native desktop releases` (Tier-A S3 PASS).
 - This metadata reconciliation commit records draft PR #854; after push, the PR commit list and
   phase comments are the canonical trail.

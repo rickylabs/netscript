@@ -131,6 +131,10 @@ envelope or route family.
 | 2026-07-18 04:08 CEST | 3 | security/parity proof | Public SDK import drives a real handler request; `%2e%2e`, `%2f`, dot/private, lexical and symlink escape tests pass. |
 | 2026-07-18 04:12 CEST | 3 | doctrine correction | Grouped four handler/transport files under `release/server/`, restoring focused doctrine from new WARN=43 to baseline WARN=42. |
 | 2026-07-18 04:20 CEST | 3 | gate set complete | Focused 33/12; full CLI 411/424; 712-file static, quality, arch, doc/JSR/publish and import scans pass. |
+| 2026-07-18 04:30 CEST | 3 | Tier-A PASS | Supervisor accepted `ef0c585b`, public-subpath real-handler parity, traversal defenses, and D18/D19. |
+| 2026-07-18 04:45 CEST | 4 | docs complete | Distinguished Ed25519 manifest trust from external Authenticode/notarization/package signing; added Windows manual-event and final permission posture. |
+| 2026-07-18 04:55 CEST | 4 | final gate set | Focused 33/12; full CLI 411/424; 712-file wrappers, quality, arch, doc lint, JSR audit/dry-run, deps audit/why and no-text scan complete. |
+| 2026-07-18 05:00 CEST | 4 | reconciliation | Live #456 and PR #854 re-read; scope/body/ref/base/milestone remain correct. Implementation complete; evaluator dispatch remains supervisor-owned. |
 
 ## Decisions
 
@@ -152,6 +156,7 @@ envelope or route family.
 | Upstream `--all-targets` omits Windows ARM64 despite explicit target support    | significant | yes                |
 | Feature nested under the existing deploy target axis                            | minor       | yes                |
 | Dependency entry applied mechanically after Deno minimum-age guard              | minor       | yes                |
+| Release HTTP files grouped under `release/server/` to preserve cardinality       | minor       | yes                |
 
 ## Gate Results
 
@@ -176,6 +181,10 @@ envelope or route family.
 | Slice-3 scoped static | check/lint/fmt wrappers | PASS | 712 files, zero findings. |
 | Public SDK URL parity | public `@netscript/sdk/auto-update` import + real handler request | PASS | Non-root base path and current native target return `latest.json`. |
 | Traversal defenses | focused adversarial handler tests | PASS | Encoded `%2e%2e`/`%2f`, private paths, resolve-under-root and symlink escape rejected. |
+| Slice-4 final focused/full tests | focused desktop + full CLI directory | PASS | 33/12 focused; 411/424 full CLI. |
+| Slice-4 final static | scoped check/lint/fmt wrappers | PASS | 712 files, zero findings. |
+| Slice-4 dependency proof | `deps:why @netscript/sdk`; `deps:audit` | PASS_WITH_BASELINE | SDK source use confirmed; audit exits 0 with nine workspace advisories unrelated to this dependency-free docs slice. |
+| Slice-4 no-text-import | targeted doctrine scan | PASS | No text/JSON import attributes. |
 
 ### Fitness Gates
 
@@ -203,7 +212,7 @@ envelope or route family.
 | Consumer                 | Result              | Evidence                          | Notes                                 |
 | ------------------------ | ------------------- | --------------------------------- | ------------------------------------- |
 | #452 task-hook consumer  | PASS | focused config/orchestration tests | Configured and default task names generate exact native argv. |
-| #841 URL/manual consumer | PASS (design proof) | SDK docs/source + G2 artifacts    | Parity/manual behavior belongs to S3. |
+| #841 URL/manual consumer | PASS | public subpath parity test + README manual event | Real handler path and Windows manual UX proven. |
 
 ## Handoff Notes
 
@@ -212,4 +221,5 @@ envelope or route family.
 - Review D12–D17 next: the signed payload is native-first, the graph lineage is a strict future
   superset, and high-water ordering is security-safe without beta.14 journal machinery.
 - Confirm the four slices remain inside #456 and that real installed E2E stays #457.
-- No implementation, evaluator dispatch, merge, release action, or milestone action has occurred.
+- **IMPLEMENTATION COMPLETE.** Await supervisor-dispatched IMPL-EVAL. No evaluator dispatch, merge,
+  release action, or milestone action has occurred.
