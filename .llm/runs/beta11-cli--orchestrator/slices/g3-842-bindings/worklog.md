@@ -153,6 +153,9 @@ port and extend the full acceptance matrix—never add a second binding declarat
 | 2026-07-18 00:46 CEST | plan  | package re-baseline                 | SDK/Fresh doc-lint, JSR helper, and raw dry-run evidence captured on the final plan baseline; worktree remained clean.                                                       |
 | 2026-07-18 00:50 CEST | plan  | Design checkpoint                   | Public API, wire state, ports, constants, three commit slices, risk mitigations, and complete gates locked. No implementation created.                                       |
 | 2026-07-18 00:57 CEST | plan  | draft PR handoff                    | Planning commit `2bdd882` pushed; draft PR #853 opened against `feat/desktop-frontend`, configured with `Closes #842`, requested labels, and milestone 13.                   |
+| 2026-07-18 01:15 CEST | gate  | group Plan-Gate PASS                | Supervisor approved D1–D16 as locked; D7 cast-free structural acceptance is a review-blocking bar. PR lifecycle moved from `status:plan` to `status:impl`.                   |
+| 2026-07-18 01:45 CEST | 1     | SDK desktop transport               | Implemented real-MessagePort bind shim, one receive pump, FIFO/per-window server state, exact-once close, native error rehydration, oRPC link, typed client, and byte codec. |
+| 2026-07-18 02:00 CEST | 1     | SDK authoritative gates             | Full SDK tests 36/36; scoped check/lint/fmt, exact/focused quality scans, architecture gates, desktop entrypoint doc lint, JSR audit, and raw publish dry-run pass.          |
 
 ## Decisions
 
@@ -179,30 +182,33 @@ port and extend the full acceptance matrix—never add a second binding declarat
 
 ### Static Gates
 
-| Gate                       | Command or check                                           | Result  | Notes                                                          |
-| -------------------------- | ---------------------------------------------------------- | ------- | -------------------------------------------------------------- |
-| Baseline SDK raw dry-run   | `deno publish --dry-run --allow-dirty` in `packages/sdk`   | PASS    | Exit 0; intended G2 file list; no actual slow-type diagnostic. |
-| Baseline Fresh raw dry-run | `deno publish --dry-run --allow-dirty` in `packages/fresh` | PASS    | Exit 0; no actual slow-type diagnostic.                        |
-| Implementation wrappers    | planned per slice                                          | NOT_RUN | Hard stop pending supervisor Plan-Gate PASS.                   |
-| Full package test tasks    | planned per affected slice                                 | NOT_RUN | No implementation exists.                                      |
+| Gate                       | Command or check                                           | Result | Notes                                                          |
+| -------------------------- | ---------------------------------------------------------- | ------ | -------------------------------------------------------------- |
+| Baseline SDK raw dry-run   | `deno publish --dry-run --allow-dirty` in `packages/sdk`   | PASS   | Exit 0; intended G2 file list; no actual slow-type diagnostic. |
+| Baseline Fresh raw dry-run | `deno publish --dry-run --allow-dirty` in `packages/fresh` | PASS   | Exit 0; no actual slow-type diagnostic.                        |
+| SDK scoped check/lint/fmt  | repo wrappers over `packages/sdk`                          | PASS   | 75 TypeScript files; zero findings.                            |
+| SDK exact/focused quality  | `quality:scan` plus `--root packages/sdk`                  | PASS   | Zero findings; only intentional negative-fixture allowances.   |
+| SDK full package tests     | `deno task --cwd packages/sdk test`                        | PASS   | 36 passed, 0 failed; full test directory, not a curated list.  |
 
 ### Fitness Gates
 
-| Gate                                    | Result             | Evidence                                            | Notes                                                                                                                           |
-| --------------------------------------- | ------------------ | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| SDK full-export doc baseline            | PASS_WITH_BASELINE | `deno task doc:lint --root packages/sdk --pretty`   | One unrelated transitive private ref; auto-update and root are clean.                                                           |
-| Fresh full-export doc baseline          | PASS_WITH_BASELINE | `deno task doc:lint --root packages/fresh --pretty` | Existing 40: 23 private refs + 17 missing JSDoc in untouched graphs.                                                            |
-| SDK JSR helper                          | PASS_WITH_BASELINE | audit helper with `--allow-run`                     | Only known progress-banner warning.                                                                                             |
-| Fresh JSR helper                        | FAIL_BASELINE      | audit helper with `--allow-run`                     | Existing missing module tags on `./ai`/`./vite`, AI cardinality warning, and banner warning. New desktop surface must add none. |
-| F-1..F-19 applicable implementation set | NOT_RUN            | `plan.md`                                           | No product file before Plan-Gate.                                                                                               |
+| Gate                            | Result             | Evidence                                             | Notes                                                                                                                           |
+| ------------------------------- | ------------------ | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| SDK full-export doc baseline    | PASS_WITH_BASELINE | `deno task doc:lint --root packages/sdk --pretty`    | One unrelated transitive private ref; auto-update and root are clean.                                                           |
+| Fresh full-export doc baseline  | PASS_WITH_BASELINE | `deno task doc:lint --root packages/fresh --pretty`  | Existing 40: 23 private refs + 17 missing JSDoc in untouched graphs.                                                            |
+| SDK JSR helper                  | PASS_WITH_BASELINE | audit helper with `--allow-run`                      | Only known progress-banner warning.                                                                                             |
+| Fresh JSR helper                | FAIL_BASELINE      | audit helper with `--allow-run`                      | Existing missing module tags on `./ai`/`./vite`, AI cardinality warning, and banner warning. New desktop surface must add none. |
+| SDK desktop entrypoint doc lint | PASS               | `deno doc --lint src/desktop/mod.ts`                 | Independently clean; no private oRPC type leaks.                                                                                |
+| SDK JSR helper + raw dry-run    | PASS               | audit helper; `deno publish --dry-run --allow-dirty` | Intended files only; no actual slow-type finding.                                                                               |
+| SDK focused + root architecture | PASS_WITH_WARNINGS | `arch:check:repo`; `arch:check`                      | Exit 0; only recorded baseline cardinality/documentation warnings.                                                              |
 
 ### Runtime Gates
 
-| Gate                               | Result  | Evidence                          | Notes                                                                        |
-| ---------------------------------- | ------- | --------------------------------- | ---------------------------------------------------------------------------- |
-| Shipped adapter surface inspection | PASS    | `deno doc` and cached 1.14.6 code | Port requires post/message/close semantics; default serializer confirmed.    |
-| Deno bind capability model         | PASS    | official 2.9 docs                 | Promise, JSON/bytes, error shape, unbind, and per-window behavior confirmed. |
-| Shim/oRPC/native-window behavior   | NOT_RUN | slices 1–2                        | Awaiting Plan-Gate.                                                          |
+| Gate                               | Result | Evidence                          | Notes                                                                                |
+| ---------------------------------- | ------ | --------------------------------- | ------------------------------------------------------------------------------------ |
+| Shipped adapter surface inspection | PASS   | `deno doc` and cached 1.14.6 code | Port requires post/message/close semantics; default serializer confirmed.            |
+| Deno bind capability model         | PASS   | official 2.9 docs                 | Promise, JSON/bytes, error shape, unbind, and per-window behavior confirmed.         |
+| SDK shim/oRPC behavior             | PASS   | full SDK test task                | Strings, bytes, errors, FIFO, isolation, close, and structural port acceptance pass. |
 
 ### Consumer Gates
 

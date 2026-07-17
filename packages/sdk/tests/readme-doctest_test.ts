@@ -30,6 +30,9 @@ declare function createServiceClient(config: unknown): {
   readonly get: (input: unknown) => Promise<unknown>;
   readonly getById: (input: unknown) => Promise<unknown>;
 };
+declare function createDesktopServiceClient(config: unknown): {
+  readonly get: (input: unknown) => Promise<unknown>;
+};
 declare function safe<T>(value: Promise<T>): Promise<[unknown, T | undefined]>;
 declare function isDefinedError(error: unknown): error is { readonly code: string; readonly data: unknown };
 declare function createQueryFactories(config: unknown): typeof queries;

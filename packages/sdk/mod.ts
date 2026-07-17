@@ -35,6 +35,11 @@
  * configure native updates without depending on moving Deno global names. It
  * stays a focused subpath and is intentionally not re-exported here.
  *
+ * Use `@netscript/sdk/desktop` inside a Deno Desktop webview to call an
+ * existing service contract over the window's native bind channel. The
+ * MessagePort shim and oRPC link stay a focused subpath and are intentionally
+ * not re-exported here.
+ *
  * @module
  */
 
