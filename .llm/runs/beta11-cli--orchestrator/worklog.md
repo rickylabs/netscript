@@ -109,3 +109,8 @@ group launch; this section fixes the supervisor's surface.
   ledger vs RFC #822). Stage C synthesis written + committed by supervisor (verdicts ratified,
   Stage-D fan-out: composition-host / capability-matrix / board-mechanics packs). Next: Stage-D
   pack agents (Opus 4.8 · medium, Tier B) when slots allow.
+- 2026-07-18 · G8 stages D+E complete: three packs committed (supervisor-reviewed, DRAFT H1s
+  verified), plan.md locked (L1–L10 + F-1…F-10 fork sweep + SC-1..5), stage comment on PR #850.
+  Next: Stage-F adversarial (Sol·max unoriented) then Stage-G PLAN-EVAL. G3 #842 plan reviewed:
+  PASS (D1–D16; hidden-scope protocol analysis excellent; D7 no-cast bar emphasized) —
+  implementation unlocked.
