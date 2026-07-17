@@ -97,6 +97,7 @@ native packaging logic to the dev registration block.
 | 2026-07-17 | S2 | Generator implementation | Added the explicit desktop branch, opt-in guard, Fresh build completion dependency, direct CEF argv, server-only service/plugin discovery, and endpoint suppression. |
 | 2026-07-17 | S2 | Unit proof | All five `generators-*_test.ts` files passed: 11 tests / 122 steps. The desktop test asserts build declaration → window declaration → `waitForCompletion(build)` source order and exact no-separator CEF argv. |
 | 2026-07-17 | S2 | Implementation handoff | Committed `2dc0c809`, pushed by explicit refspec, changed the PR lifecycle label to `status:impl`, and posted PR comment `5007903543` with scope and gate evidence. Full `scaffold.runtime` and evaluator dispatch remain supervisor-owned. |
+| 2026-07-18 | S2-fix | CI correction | Removed the conditional `AppEntryZod` transform because Zod cannot emit it as JSON Schema. Desktop opt-in remains enforced by the generated `=== true` guard; D3 boundary reduction is recorded in `drift.md`. |
 
 ## Decisions
 
@@ -143,6 +144,19 @@ native packaging logic to the dev registration block.
 | `quality:scan` | PASS | Exit 0, no findings. |
 | Root `arch:check` | PASS | Exit 0; dependency warnings are pre-existing. |
 | Full `scaffold.runtime` | SUPERVISOR-OWNED | Deliberately not dispatched or run, per Tier-A instruction. |
+| Lock hygiene | PASS | No `deno.lock` change. |
+
+### S2 CI correction
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Full Aspire package tests | PASS | `deno test --allow-all packages/aspire/tests/`: 18 passed / 63 steps, including `schema_test.ts` JSON Schema generation. |
+| Full CLI generator suite | PASS | 11 passed / 122 steps. |
+| Scoped check/lint/fmt | PASS | Seven affected public/generator source and test files; zero findings. |
+| `quality:scan` | PASS | Exit 0, no findings; seven existing allowances. |
+| Root `arch:check` | PASS | Exit 0; existing dependency warnings only. |
+| Aspire `doc:lint` | PASS | Zero combined diagnostics across the full export map. |
+| Aspire publish dry-run | PASS | Slow-type checks and publish simulation completed successfully. |
 | Lock hygiene | PASS | No `deno.lock` change. |
 
 ## Handoff Notes

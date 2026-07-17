@@ -66,11 +66,8 @@ Deno.test('config', async (t) => {
     assertEquals(AppTypeSchema.safeParse('native').success, false);
   });
 
-  await t.step('AppEntrySchema: defaults desktop disabled and existing types enabled', () => {
-    for (const type of ['app', 'tauri', 'task'] as const) {
-      assertEquals(AppEntrySchema.parse({ Type: type }).Enabled, true);
-    }
-    assertEquals(AppEntrySchema.parse({ Type: 'desktop' }).Enabled, false);
+  await t.step('AppEntrySchema: preserves optional desktop enablement', () => {
+    assertEquals(AppEntrySchema.parse({ Type: 'desktop' }).Enabled, undefined);
     assertEquals(AppEntrySchema.parse({ Type: 'desktop', Enabled: true }).Enabled, true);
   });
 

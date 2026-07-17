@@ -137,7 +137,9 @@ export interface ServiceEntry extends BaseEntry, ReferenceEntry {
 }
 
 /** Frontend, desktop, or task application entry. */
-export interface AppEntry extends BaseEntry, ReferenceEntry {
+export interface AppEntry extends Omit<BaseEntry, 'Enabled'>, ReferenceEntry {
+  /** Whether this app is enabled; desktop generators require an explicit `true`. */
+  Enabled?: boolean;
   /** Runtime used to launch the app. */
   Runtime: string;
   /** App variant. */
@@ -426,10 +428,7 @@ const AppEntryZod = z.object({
   TaskName: z.string().optional(),
   PackageTaskName: z.string().optional(),
   RequiresKv: z.boolean().default(false),
-}).transform((entry): AppEntry => ({
-  ...entry,
-  Enabled: entry.Enabled ?? entry.Type !== 'desktop',
-})).meta({
+}).meta({
   title: 'AppEntry',
   description: 'Configuration for a frontend or desktop application resource',
 });

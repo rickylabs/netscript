@@ -14,7 +14,8 @@
 
 Research, plan, and the Design checkpoint are complete against integration baseline `ca72db14`.
 The Tier-A supervisor reported group Plan-Gate `PASS` in-turn. Draft PR #848 is the review surface.
-S1 and S2 implementation are complete locally; evaluator/review dispatch remains supervisor-owned.
+S1 and S2 implementation are complete. A CI correction removes the non-JSON-Schema-compatible
+conditional Zod transform while retaining generator-boundary desktop opt-in enforcement.
 
 ## Completed
 
@@ -26,7 +27,7 @@ S1 and S2 implementation are complete locally; evaluator/review dispatch remains
 
 ## In Progress
 
-- S2 gate evidence, slice commit/push, and PR handoff.
+- S2 CI correction gates, commit/push, and PR handoff.
 
 ## Next Steps
 
