@@ -189,6 +189,8 @@ Seed/RFC run — the gate of record is PLAN-EVAL (Sol·max, separate session). N
 | 2026-07-17 | file | **One-shot board filing executed** (`.llm/tmp/rfc820/file-board.ts`) | milestone `0.0.1-beta.14` (#16) · label `epic:unified-runtime` (+labels.yml parity) · 17 new issues #823–#839 · 14 adjustments (#456/#457/#452 re-scopes; #451/#453/#454/#455 re-homed; #512/#516/#526/#543 amendments; #458→stable; **#349 closed**; #510/#327 epic updates) · zero failures · `FILING-LOG.md` + `filing-log.json` |
 | 2026-07-17 | rfc | **RFC rev 11** — rewritten in the ratified direction | Unified epic separated from desktop (§Abstract/§3); §4-F3 installer = `NetScript.Aspire.Packaging` #825 (ATS-exported NuGet — OF-D resolved); §5 ratified sequencing + live-numbered shipping table (beta.11 substrate+seed → beta.12 PM first → beta.13 unified → beta.14 desktop graph → stable); §8 = filed board state; §9 = decision log (OF-A..K all ratified/superseded); authority banner: GitHub + rfc.md win over plan.md rev-10 sequencing framing. PR #822 body + run-dir `rfc.md` updated |
 
+| 2026-07-17 | reconcile | #456 keep-open ruling + correction (owner-confirmed) | Owner asked duplicate-vs-not-planned → neither: #456 is the re-scoped beta.11 substrate that #831/#834/#837/#543 build on. Correction appended: hard #454 dep dropped (window-only artifact suffices); **beta.11 product story named: thin-client desktop** — window shipped to consumer machines + vendor-cloud services via remote `services__*` discovery (POC option-(b) topology); #456+#457+#825 cover it without PM |
+
 ## Handoff Notes
 
 - Evaluator: read kickoff.md, research.md, plan.md. Verdict scope = the RFC design (PLAN-EVAL on
