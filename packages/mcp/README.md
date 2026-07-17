@@ -39,9 +39,7 @@ documentation lookup.
 
 ---
 
-## 🚀 Quick Start
-
-### Installation
+## Install
 
 Most users never import this package. Install the server into a project with the CLI:
 
@@ -63,19 +61,46 @@ To embed the server in your own host process, add it as a library:
 deno add jsr:@netscript/mcp
 ```
 
-### Usage
+Run the standalone stdio entrypoint directly when you are integrating another MCP host:
 
-```ts
-import { createMcpCliServer, runMcpStdioServer } from '@netscript/mcp/cli';
-
-// The 80% path: run the full server (telemetry + docs + doctor + CLI trigger) on stdio.
-await runMcpStdioServer({ projectRoot: Deno.cwd(), endpoint: 'http://localhost:18888' });
-
-// Or drive it message by message.
-const server = createMcpCliServer({ projectRoot: Deno.cwd() });
-const response = await server.handle({ jsonrpc: '2.0', id: 1, method: 'tools/list' });
-console.log(response?.result);
+```bash
+deno x -A jsr:@netscript/mcp@<version>/cli
 ```
+
+Pin `<version>` to match your installed CLI; bare `jsr:@netscript/*` specifiers do not resolve on
+the pre-release line, and `netscript agent init` writes the correct pinned form for you.
+
+## Quick example
+
+`netscript agent init` writes the host configuration for you. The Claude Code form is equivalent to:
+
+```json
+{
+  "mcpServers": {
+    "netscript": {
+      "command": "deno",
+      "args": [
+        "run",
+        "-A",
+        "jsr:@netscript/cli@<version>",
+        "agent",
+        "mcp",
+        "--project-root",
+        "<project-root>"
+      ]
+    }
+  }
+}
+```
+
+The process speaks newline-delimited JSON-RPC over standard input and output. After MCP
+initialization, `tools/list` returns the 13 bounded NetScript tools for telemetry, diagnostics,
+documentation, and allowlisted CLI actions.
+
+## Docs
+
+- [MCP package reference](https://rickylabs.github.io/netscript/reference/mcp/)
+- [Agent tooling](https://rickylabs.github.io/netscript/capabilities/agent-tooling/)
 
 ---
 
