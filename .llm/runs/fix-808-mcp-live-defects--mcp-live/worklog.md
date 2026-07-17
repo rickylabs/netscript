@@ -76,6 +76,7 @@ return checks, while `doctor-flow.ts` alone owns cross-family aggregation and bo
 | 2026-07-17 | 1 | Telemetry implementation | Shared adapter now unwraps `data`, flattens `resourceSpans/scopeSpans/spans`, carries resource identity, and decodes OTLP kinds; MCP trusts discovered ASP.NET PEMs for loopback HTTPS only. Exact 13.4.6 captures are checked in as fixtures. |
 | 2026-07-17 | 1 | Telemetry verification | Telemetry package check + 52 tests and MCP package check + 41 tests pass. Direct query against the live Dashboard returns 21 spans, 11 resources, services `workers/workers-api`, and internal/producer/consumer/server kinds. |
 | 2026-07-17 | 2 | Doctor contract | Preserved the 20-check cap: top-level checks are family aggregates, family detail keeps 19 checks plus an explicit worst-severity overflow summary, and counts/status cover every original check. The real CLI-composed doctor with 25 plugin checks and direct schema validation both pass. MCP check + 42 tests pass. |
+| 2026-07-17 | 3 | Docs composition | CLI composition now indexes the package-shipped README as slug `mcp`; explicit flag/environment roots select the filesystem adapter. Missing or Markdown-empty overrides return `docs_corpus_not_found` with the resolved path and `--docs-root` remediation. MCP check + 45 tests, raw `deno doc --lint packages/mcp/cli.ts`, publish dry-run, and `arch:check` pass. |
 
 ## Decisions
 

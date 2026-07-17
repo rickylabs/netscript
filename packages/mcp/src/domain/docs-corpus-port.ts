@@ -1,6 +1,22 @@
 /** Maximum source characters retained for one indexed document. */
 export const MAX_INDEXED_DOC_LENGTH = 100_000;
 
+/** Explicit failure raised when a configured filesystem corpus does not exist. */
+export class DocsCorpusUnavailableError extends Error {
+  /** Stable tool-facing error code. */
+  readonly code = 'docs_corpus_not_found';
+
+  /** Missing corpus root. */
+  readonly root: string;
+
+  /** Create a missing-corpus failure with actionable CLI remediation. */
+  constructor(root: string) {
+    super(`Docs corpus not found at ${root}; pass --docs-root <path>.`);
+    this.name = 'DocsCorpusUnavailableError';
+    this.root = root;
+  }
+}
+
 /** Heading and stable fragment identifier within a document. */
 export interface DocsSection {
   /** Heading text shown to readers. */

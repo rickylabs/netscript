@@ -12,7 +12,9 @@ import {
 } from './src/infrastructure/telemetry-query-adapter.ts';
 import { runNewlineStdio } from './src/infrastructure/stdio-transport.ts';
 import { FilesystemDocsCorpus } from './src/infrastructure/filesystem-docs-corpus.ts';
+import { EmbeddedDocsCorpus } from './src/infrastructure/embedded-docs-corpus.ts';
 import { resolve } from '@std/path';
+import packageReadme from './README.md' with { type: 'text' };
 import { createGetAppStatusFlow } from './src/application/flows/get-app-status-flow.ts';
 import { createGetRecentErrorsFlow } from './src/application/flows/get-recent-errors-flow.ts';
 import { createGetRunFlow } from './src/application/flows/get-run-flow.ts';
@@ -36,6 +38,8 @@ import { createExecuteCommandFlow } from './src/application/flows/execute-comman
 import { StaticCommandCatalog } from './src/infrastructure/static-command-catalog.ts';
 import { SpawnCommandExecutor } from './src/infrastructure/spawn-command-executor.ts';
 
+export * from './mod.ts';
+
 /** Optional CLI trigger collaborators and policy supplied by an outer composition. */
 export interface McpCliOptions {
   /** Dynamic command catalog, supplied by the NetScript CLI in S7. */ readonly commandCatalog?:
@@ -49,23 +53,28 @@ export interface McpCliOptions {
   /** Explicit telemetry endpoint supplied by the outer CLI. */ readonly endpoint?: string;
 }
 
-/** Resolve the public documentation root from flags, environment, or the project directory. */
+/** Resolve an explicit public documentation override from flags or environment. */
 export function resolveDocsRoot(
   args: readonly string[] = Deno.args,
   environmentRoot: string | undefined = Deno.env.get('NETSCRIPT_DOCS_ROOT'),
   projectRoot: string = Deno.cwd(),
-): string {
+): string | undefined {
   const flagIndex = args.indexOf('--docs-root');
   const flagRoot = flagIndex >= 0 ? args[flagIndex + 1] : undefined;
   if (flagRoot) return resolve(projectRoot, flagRoot);
-  return resolve(projectRoot, environmentRoot || 'docs/site');
+  return environmentRoot ? resolve(projectRoot, environmentRoot) : undefined;
 }
 
 /** Run the MCP server on Deno standard input and output. */
 export async function runMcpStdioServer(
   options: McpCliOptions = {},
 ): Promise<void> {
-  const server = createMcpCliServer(options);
+  const projectRoot = options.projectRoot ?? Deno.cwd();
+  const docsRoot = options.docsRoot ?? resolveDocsRoot(Deno.args, undefined, projectRoot);
+  const server = createMcpCliServer({
+    ...options,
+    ...(docsRoot ? { docsRoot } : {}),
+  });
   await runNewlineStdio(server, Deno.stdin.readable, Deno.stdout.writable);
 }
 
@@ -77,9 +86,13 @@ export function createMcpCliServer(options: McpCliOptions = {}): McpServer {
     ...(options.endpoint ? { NETSCRIPT_TELEMETRY_ENDPOINT: options.endpoint } : {}),
   };
   const query = createResolvedTelemetryQuery(undefined, environment);
-  const docsCorpus = new FilesystemDocsCorpus({
-    root: options.docsRoot ?? resolveDocsRoot([], undefined, projectRoot),
-  });
+  const configuredDocsRoot = options.docsRoot ??
+    resolveDocsRoot([], Deno.env.get('NETSCRIPT_DOCS_ROOT'), projectRoot);
+  const docsCorpus = configuredDocsRoot
+    ? new FilesystemDocsCorpus({ root: configuredDocsRoot })
+    : new EmbeddedDocsCorpus({
+      documents: [{ slug: 'mcp', source: packageReadme }],
+    });
   const probe = new FetchTelemetryProbe();
   return createMcpServer({
     probe,

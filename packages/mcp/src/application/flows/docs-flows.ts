@@ -1,5 +1,9 @@
 import { isRecord } from '../../domain/schema.ts';
-import { type DocsCorpusPort, slugifyDocsHeading } from '../../domain/docs-corpus-port.ts';
+import {
+  type DocsCorpusPort,
+  DocsCorpusUnavailableError,
+  slugifyDocsHeading,
+} from '../../domain/docs-corpus-port.ts';
 import type { ToolExecutionResult, ToolFlow } from '../../domain/tool-types.ts';
 
 const DEFAULT_LIST_LIMIT = 20;
@@ -14,26 +18,39 @@ export function createDocsFlows(
   return {
     list_docs: async (input): Promise<ToolExecutionResult> => {
       const limit = boundedLimit(input, DEFAULT_LIST_LIMIT, MAX_LIST_LIMIT);
-      const docs = (await corpus.list()).slice(0, limit).map(({ slug, title, description }) => ({
-        slug,
-        title,
-        description,
-      }));
-      return { ok: true, value: { count: docs.length, docs } };
+      try {
+        const docs = (await corpus.list()).slice(0, limit).map(({ slug, title, description }) => ({
+          slug,
+          title,
+          description,
+        }));
+        return { ok: true, value: { count: docs.length, docs } };
+      } catch (error) {
+        return corpusFailure(error);
+      }
     },
     search_docs: async (input): Promise<ToolExecutionResult> => {
       if (!isRecord(input) || typeof input.query !== 'string' || !input.query.trim()) {
         return invalidInput('query must be a non-empty string');
       }
       const limit = boundedLimit(input, DEFAULT_SEARCH_LIMIT, MAX_SEARCH_LIMIT);
-      const matches = (await corpus.search(input.query)).slice(0, limit);
-      return { ok: true, value: { count: matches.length, matches } };
+      try {
+        const matches = (await corpus.search(input.query)).slice(0, limit);
+        return { ok: true, value: { count: matches.length, matches } };
+      } catch (error) {
+        return corpusFailure(error);
+      }
     },
     get_doc: async (input): Promise<ToolExecutionResult> => {
       if (!isRecord(input) || typeof input.slug !== 'string' || !input.slug.trim()) {
         return invalidInput('slug must be a non-empty string');
       }
-      const document = await corpus.get(input.slug);
+      let document;
+      try {
+        document = await corpus.get(input.slug);
+      } catch (error) {
+        return corpusFailure(error);
+      }
       if (!document) {
         return {
           ok: false,
@@ -83,4 +100,11 @@ function boundedLimit(input: unknown, fallback: number, maximum: number): number
 
 function invalidInput(message: string): ToolExecutionResult {
   return { ok: false, error: { code: 'invalid_input', message } };
+}
+
+function corpusFailure(error: unknown): ToolExecutionResult {
+  if (error instanceof DocsCorpusUnavailableError) {
+    return { ok: false, error: { code: error.code, message: error.message } };
+  }
+  throw error;
 }

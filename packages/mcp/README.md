@@ -195,10 +195,10 @@ publishes the executable composition that binds the real adapters.
 | `DEFAULT_TRUNCATION_POLICY`, `truncateResult`                               | `.`     | Server-side output bounds                                   |
 | `DEFAULT_COMMAND_POLICY`, `decideCommand`                                   | `.`     | The default-deny allowlist and its decision function        |
 | `TelemetryProbePort`, `DocsCorpusPort`, `ProjectDoctorPort`, …              | `.`     | Port contracts an embedder implements                       |
-| `FilesystemDocsCorpus`, `SpawnCommandExecutor`, `StaticCommandCatalog`      | `.`     | Default adapters                                            |
+| `EmbeddedDocsCorpus`, `FilesystemDocsCorpus`, process/command adapters      | `.`     | Default infrastructure adapters                             |
 | `createMcpCliServer()`                                                      | `./cli` | Full composition: telemetry, docs, doctor, CLI trigger      |
 | `runMcpStdioServer()`                                                       | `./cli` | Newline-delimited JSON-RPC stdio loop                       |
-| `resolveDocsRoot()`                                                         | `./cli` | Docs-root resolution from flag, environment, project root   |
+| `resolveDocsRoot()`                                                         | `./cli` | Explicit docs-root resolution from flag or environment      |
 
 Full symbol reference: [`deno doc jsr:@netscript/mcp`](https://jsr.io/@netscript/mcp/doc).
 
@@ -228,9 +228,15 @@ warning or failure result rather than a crash.
 | `commandExecutor` | Runs an allowed command, returning structured process data     |
 | `commandPolicy`   | Replaces the ordered allow/deny prefixes for `execute_command` |
 | `projectDoctor`   | Supplies typed project and plugin diagnostics                  |
-| `projectRoot`     | Root for docs, execution, and doctor flows                     |
-| `docsRoot`        | Selects the public Markdown corpus (default `docs/site`)       |
+| `projectRoot`     | Root for execution and doctor flows                            |
+| `docsRoot`        | Overrides the package-shipped docs with a public Markdown root |
 | `endpoint`        | Overrides telemetry endpoint discovery                         |
+
+Without an override, `list_docs`, `search_docs`, and `get_doc` index the README shipped with the
+installed `@netscript/mcp` package under the `mcp` slug. Set `--docs-root <path>` (or
+`NETSCRIPT_DOCS_ROOT`) to use a project or site corpus instead. A configured path that does not
+exist returns `docs_corpus_not_found` with the missing path and `--docs-root` remediation; it never
+silently reports an empty corpus.
 
 The generic `createMcpServer(options)` takes the lower-level seams instead — `probe`, `environment`,
 `flows`, and `truncation`, the last of which overrides the 50-item / 2,000-character output bounds.
