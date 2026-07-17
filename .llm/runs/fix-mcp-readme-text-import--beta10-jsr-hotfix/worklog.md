@@ -63,6 +63,8 @@ Update the source README/schema/package metadata, run the publish-assets generat
 | 2026-07-17 | 3 | guidance | Corrected release and JSR-audit guidance in `.agents` and `.claude`; mirror sync and hook lock check pass. |
 | 2026-07-17 | 3 | review | Supervisor reviewed lexical stripping against strings/comments/templates, line attribution, publish-rule reuse, failure output, and mirror parity; no suppression or false-green path introduced. |
 | 2026-07-17 | 3 | reconcile | PR #810 remains draft and correctly references closed #808 without auto-close; no new comments or issue state require scope changes. |
+| 2026-07-17 | 4 | ordinary review | Separate opposite-family Claude Opus session `12b534fe-2771-462a-b012-c61c91968f2a` found one latent release-cut drift path; final follow-up verdict is `REVIEW: PASS`. |
+| 2026-07-17 | 4 | review fix | `release:cut` now regenerates publish assets after the version bump and stages all eight generated outputs; CI runs `check:publish-assets` beside `check:assets-barrel`; release skill mirrors document both steps. |
 
 ## Decisions
 
@@ -104,6 +106,16 @@ Update the source README/schema/package metadata, run the publish-assets generat
 | release/JSR skill sync | PASS | `deno task agentic:check-claude` reports 17 skills / 21 mirrored files synchronized; lock unchanged |
 | focused wrapper fmt/lint | PASS | 3 release-tool TS files selected; 0 failed batches/findings |
 
+### Slice 4 — release-cut integration and review closure
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| opposite-family ordinary review | PASS | Claude Opus session `12b534fe-2771-462a-b012-c61c91968f2a`; F1/F4 resolved; no actionable finding remains |
+| release-cut tests | PASS | `.llm/tools/release/cut_test.ts`: 6 passed, 0 failed |
+| release-cut freshness integration | PASS | generator runs immediately after coordinated version bump; all `PUBLISH_ASSET_OUTPUTS` are included in release PR staging |
+| CI freshness integration | PASS | `.github/workflows/ci.yml` runs `deno task check:publish-assets` beside `check:assets-barrel` |
+| release skill sync | PASS | `.agents` and `.claude` release-skill mirrors are byte-identical and sync validation is green |
+
 ## Handoff Notes
 
-- Evaluator should compare `MCP_PACKAGE_README` to `packages/mcp/README.md`, inspect both negative proofs, and confirm remaining raw attributes are excluded tests/verifiers or inert generated template content rather than publishable syntax.
+- Evaluator should compare `MCP_PACKAGE_README` to `packages/mcp/README.md`, inspect both negative proofs, confirm remaining raw attributes are excluded tests/verifiers or inert generated template content rather than publishable syntax, and verify the next version bump cannot leave generated version constants stale.
