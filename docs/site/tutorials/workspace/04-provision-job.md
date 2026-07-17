@@ -111,6 +111,16 @@ Start from the workers scaffold instead of creating the module by hand:
 
 The workers CLI calls this the `add-job` verb; its shell syntax uses the spaced `add job` form:
 
+{{ comp callout { type: "note", title: "ns-workers is a shorthand you install once" } }}
+<code>ns-workers</code> is a name <em>you</em> give the workers plugin's CLI — the scaffold does
+not create it. Install it once, globally, and every <code>ns-workers</code> command on this page
+works as written:
+<pre><code class="language-bash">deno install -gArf -n ns-workers jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli</code></pre>
+Rather not install it? Each <code>ns-workers &lt;verb …&gt;</code> is exactly
+<code>deno x -A jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli &lt;verb …&gt;</code> — run
+that full form instead.
+{{ /comp }}
+
 ```sh
 ns-workers add job provision-member
 ```

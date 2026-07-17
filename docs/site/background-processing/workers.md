@@ -169,6 +169,16 @@ export default Object.assign(handler, { id: 'process-payment' });
 
 Once the workers API is up (Aspire first — see Production notes), enqueue a run by `id`:
 
+{{ comp callout { type: "note", title: "ns-workers is a shorthand you install once" } }}
+<code>ns-workers</code> is a name <em>you</em> give the workers plugin's CLI — the scaffold does
+not create it. Install it once, globally, and every <code>ns-workers</code> command on this page
+works as written:
+<pre><code class="language-bash">deno install -gArf -n ns-workers jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli</code></pre>
+Rather not install it? Each <code>ns-workers &lt;verb …&gt;</code> is exactly
+<code>deno x -A jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli &lt;verb …&gt;</code> — run
+that full form instead.
+{{ /comp }}
+
 ```bash
 # Enqueue through the workers API (port 8091), without hand-writing HTTP.
 ns-workers trigger process-payment \

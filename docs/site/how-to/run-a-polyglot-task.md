@@ -77,6 +77,16 @@ The subprocess returns structured data by printing **one JSON object as the last
 
 ### 3. Run it through the workers CLI
 
+{{ comp callout { type: "note", title: "ns-workers is a shorthand you install once" } }}
+<code>ns-workers</code> is a name <em>you</em> give the workers plugin's CLI — the scaffold does
+not create it. Install it once, globally, and every <code>ns-workers</code> command on this page
+works as written:
+<pre><code class="language-bash">deno install -gArf -n ns-workers jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli</code></pre>
+Rather not install it? Each <code>ns-workers &lt;verb …&gt;</code> is exactly
+<code>deno x -A jsr:@netscript/plugin-workers{{ releaseSpecifier }}/cli &lt;verb …&gt;</code> — run
+that full form instead.
+{{ /comp }}
+
 `ns-workers run-task` resolves the generated task metadata and delegates to the same
 `MultiRuntimeTaskExecutor` used by the worker runtime. Pass argv and environment as JSON; stdout and
 stderr stream while the subprocess runs, followed by the complete `TaskResult`.

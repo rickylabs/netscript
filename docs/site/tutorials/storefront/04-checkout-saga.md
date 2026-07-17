@@ -101,6 +101,16 @@ Start with the saga definition and config scaffold:
 
 The `add-saga` verb uses the spaced `add saga` shell syntax:
 
+{{ comp callout { type: "note", title: "ns-sagas is a shorthand you install once" } }}
+<code>ns-sagas</code> is a name <em>you</em> give the sagas plugin's CLI — the scaffold does
+not create it. Install it once, globally, and every <code>ns-sagas</code> command on this page
+works as written:
+<pre><code class="language-bash">deno install -gArf -n ns-sagas jsr:@netscript/plugin-sagas{{ releaseSpecifier }}/cli</code></pre>
+Rather not install it? Each <code>ns-sagas &lt;verb …&gt;</code> is exactly
+<code>deno x -A jsr:@netscript/plugin-sagas{{ releaseSpecifier }}/cli &lt;verb …&gt;</code> — run
+that full form instead.
+{{ /comp }}
+
 ```sh
 ns-sagas add saga checkout --message-type=OrderCreated --durability=t1 --topic=checkout
 ```
