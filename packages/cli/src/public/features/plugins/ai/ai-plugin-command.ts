@@ -3,7 +3,6 @@ import type { CliffyCommand } from "../../../../kernel/presentation/command-type
 
 import { Command } from "@cliffy/command";
 import { CliCommand } from "../../../../kernel/application/abstracts/cli-command.ts";
-import { netscriptJsrSpecifier } from "../../../../kernel/constants/jsr-specifiers.ts";
 import type { ProcessPort } from "../../../../kernel/ports/process-port.ts";
 import { outputText } from "../../../../kernel/presentation/output/default-output.ts";
 import { netscriptJsrSpecifier } from "../../../../kernel/constants/jsr-specifiers.ts";
