@@ -152,6 +152,7 @@ port and extend the full acceptance matrix—never add a second binding declarat
 | 2026-07-18 00:31 CEST | plan  | integration sync                    | Clean feature branch fast-forwarded from `b2248058` to integration `e6e1be08`, which now includes G2. No product/run file existed before the sync.                           |
 | 2026-07-18 00:46 CEST | plan  | package re-baseline                 | SDK/Fresh doc-lint, JSR helper, and raw dry-run evidence captured on the final plan baseline; worktree remained clean.                                                       |
 | 2026-07-18 00:50 CEST | plan  | Design checkpoint                   | Public API, wire state, ports, constants, three commit slices, risk mitigations, and complete gates locked. No implementation created.                                       |
+| 2026-07-18 00:57 CEST | plan  | draft PR handoff                    | Planning commit `2bdd882` pushed; draft PR #853 opened against `feat/desktop-frontend`, configured with `Closes #842`, requested labels, and milestone 13.                   |
 
 ## Decisions
 
@@ -221,5 +222,7 @@ port and extend the full acceptance matrix—never add a second binding declarat
   no-op overlay, rather than requiring route/visual gates for a runtime-only Fresh subpath.
 - Confirm every touched-package slice runs the full package test task and that focused tests are
   never presented as the final verdict.
+- Draft PR #853 is the canonical review thread. Its next phase comment is this implementation
+  session's stop signal, not an evaluator dispatch.
 - No product implementation exists and no slice may begin until the supervisor records Plan-Gate
   `PASS` in `plan-eval.md` and on the draft PR.

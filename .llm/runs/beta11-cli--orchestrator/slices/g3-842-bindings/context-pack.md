@@ -6,13 +6,16 @@
 | -------------- | ----------------------------------------------------------------------------------- |
 | Run ID         | `beta11-cli--orchestrator/slices/g3-842-bindings`                                   |
 | Branch         | `feat/desktop-frontend-842-bindings`                                                |
+| Draft PR       | [#853](https://github.com/rickylabs/netscript/pull/853) → `feat/desktop-frontend`   |
 | Current phase  | `plan-eval` — plan ready, supervisor-owned evaluator not dispatched by this session |
 | Archetype      | `4 — Public DSL / Builder` with adapter/runtime subtype gates                       |
 | Scope overlays | `frontend` browser/Aspire no-op; UI/route/visual gates N/A                          |
 
 ## Current State
 
-Research, plan, and the Design checkpoint are complete on integration baseline `e6e1be08`. The
+Research, plan, and the Design checkpoint are complete on integration baseline `e6e1be08`. Draft PR
+#853 targets `feat/desktop-frontend`, is draft, carries `Closes #842`, has the six requested labels
+with `status:plan` as the sole lifecycle label, and is assigned milestone 13 (`0.0.1-beta.11`). The
 public surfaces, three-operation bind protocol, per-window state ownership, typed oRPC composition,
 Fresh feature detection, three implementation slices, and all gates are locked. No SDK/Fresh
 implementation file has been created. The Plan-Gate hard stop is active.
@@ -31,11 +34,13 @@ implementation file has been created. The Plan-Gate hard stop is active.
 - Re-ran SDK/Fresh doc-lint, JSR helper, and raw publish dry-run baselines after that sync.
 - Locked all decisions, risks, anti-pattern controls, commit slices, public examples, and full
   package/JSR/quality/architecture gates.
+- Committed/pushed the seven planning artifacts and opened/configured draft PR #853 against the
+  integration branch.
 
 ## In Progress
 
-- Create the planning commit, open/configure the draft sub-PR, post
-  `Plan & Design — READY FOR REVIEW`, and stop for supervisor-owned Plan-Gate evaluation.
+- Push this PR-handoff reconciliation, post `Plan & Design — READY FOR REVIEW`, and stop for
+  supervisor-owned Plan-Gate evaluation.
 
 ## Next Steps
 
@@ -97,7 +102,10 @@ No product/package file is changed in the planning checkpoint.
 
 ## Commits
 
-- Planning commit and subsequent PR-handoff commit are recorded here after the draft PR is opened.
+- `2bdd882` — `docs(harness): plan desktop RPC bindings` (research, plan, Design checkpoint,
+  baselines, drift, and pending evaluator placeholder).
+- The immediately following documentation-only branch commit records PR #853 and the supervisor
+  handoff; its exact hash is canonical in the PR commit list and readiness comment.
 - See the draft PR's commit list + per-phase PR comment after handoff (V3 retired `commits.md`).
 
 ## Hard Stops
