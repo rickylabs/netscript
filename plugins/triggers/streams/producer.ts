@@ -31,7 +31,7 @@ export type TriggerStreamMutation = Readonly<{
 export function createTriggersStreamProducer(): TriggersStreamProducer {
   return createDurableStream({
     streamPath: STREAM_PATH,
-    schema: triggersStreamSchema as never,
+    schema: triggersStreamSchema,
     producerId: PRODUCER_ID,
   }) as TriggersStreamProducer;
 }

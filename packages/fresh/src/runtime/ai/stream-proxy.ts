@@ -191,19 +191,19 @@ export function createNetScriptChatStreamProxy(
     upstreamHeaders.set('accept-encoding', 'identity');
 
     const hasBody = request.body !== null;
-    const upstreamRequest = new Request(upstreamUrl, {
+    const requestInit: RequestInit & { duplex?: 'half' } = {
       method: request.method,
       headers: upstreamHeaders,
       body: request.body,
       // Deno requires `duplex: 'half'` to stream a request body.
-      // @ts-ignore `duplex` is a valid Deno RequestInit field.
       duplex: hasBody ? 'half' : undefined,
       redirect: 'manual',
       // Propagate client disconnect into the inner fetch: on abort the upstream
       // fetch is cancelled and its ReadableStream torn down — no dangling
       // stream (F-13, SR1 cancel-aware client half).
       signal: request.signal,
-    });
+    };
+    const upstreamRequest = new Request(upstreamUrl, requestInit);
 
     const upstream = await doFetch(upstreamRequest);
     // Unbuffered passthrough of the inner fetch's ReadableStream body.

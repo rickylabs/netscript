@@ -54,6 +54,70 @@ const CLOSING_KEYWORD_PATTERN =
 const CHECKBOX_PATTERN = /^\s*[-*]\s+\[( |x|X)\]\s+(.*)$/;
 const HEADING_PATTERN = /^(#{1,6})\s+(.+?)\s*#*\s*$/;
 const DEFAULT_OVERRIDE_LABEL = 'status:close-gate-override';
+const GITHUB_API_MAX_ATTEMPTS = 4;
+const GITHUB_API_RETRY_DELAY_MS = 1_000;
+
+interface GitHubFetchOptions {
+  fetch?: typeof fetch;
+  sleep?: (milliseconds: number) => Promise<void>;
+  maxAttempts?: number;
+}
+
+/** Fetch GitHub JSON while tolerating bounded transient API failures. */
+export async function fetchGitHubJsonWithRetry<T>(
+  url: string,
+  token: string,
+  options: GitHubFetchOptions = {},
+): Promise<T> {
+  const fetchImpl = options.fetch ?? fetch;
+  const sleep = options.sleep ?? ((milliseconds) =>
+    new Promise((resolve) => {
+      setTimeout(resolve, milliseconds);
+    }));
+  const maxAttempts = options.maxAttempts ?? GITHUB_API_MAX_ATTEMPTS;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const response = await fetchImpl(url, {
+      headers: {
+        'accept': 'application/vnd.github+json',
+        'authorization': `Bearer ${token}`,
+        'x-github-api-version': '2022-11-28',
+      },
+    });
+    if (response.ok) {
+      return await response.json() as T;
+    }
+
+    const body = await response.text();
+    const retryable = response.status === 429 || response.status >= 500;
+    if (!retryable || attempt === maxAttempts) {
+      throw new Error(`GitHub API ${url} failed: ${response.status} ${body}`);
+    }
+
+    // GitHub can transiently fail only the token-authenticated edge while the
+    // same metadata remains available for a public repository. This gate is
+    // read-only, so an anonymous fallback is safe; private repositories simply
+    // return a non-success response and continue authenticated retries.
+    const publicResponse = await fetchImpl(url, {
+      headers: {
+        'accept': 'application/vnd.github+json',
+        'x-github-api-version': '2022-11-28',
+      },
+    });
+    if (publicResponse.ok) {
+      return await publicResponse.json() as T;
+    }
+    await publicResponse.body?.cancel();
+
+    const retryAfterSeconds = Number(response.headers.get('retry-after'));
+    const delay = Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0
+      ? retryAfterSeconds * 1_000
+      : GITHUB_API_RETRY_DELAY_MS * attempt;
+    await sleep(delay);
+  }
+
+  throw new Error(`GitHub API ${url} exhausted retries`);
+}
 
 async function main(): Promise<void> {
   const options = parseArgs(Deno.args);
@@ -297,19 +361,8 @@ class GitHubClient {
   }
 
   private async getJson<T>(path: string): Promise<T> {
-    const response = await fetch(`https://api.github.com${path}`, {
-      headers: {
-        'accept': 'application/vnd.github+json',
-        'authorization': `Bearer ${this.token}`,
-        'x-github-api-version': '2022-11-28',
-      },
-    });
-    if (!response.ok) {
-      const body = await response.text();
-      throw new Error(`GitHub API ${path} failed: ${response.status} ${body}`);
-    }
-    return await response.json() as T;
+    return await fetchGitHubJsonWithRetry<T>(`https://api.github.com${path}`, this.token);
   }
 }
 
-await main();
+if (import.meta.main) await main();

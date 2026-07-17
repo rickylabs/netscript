@@ -48,8 +48,9 @@ const queryOptions = utils.orders.list.queryOptions({
   input: { page: 1, limit: 20 },
   staleTime: 1_000,
 });
+declare const queryContext: Parameters<typeof queryOptions.queryFn>[0];
 const queryData: Promise<ListOrdersOutput> | ListOrdersOutput = queryOptions.queryFn(
-  undefined as never,
+  queryContext,
 );
 const queryKey: readonly unknown[] = utils.orders.list.queryKey({
   input: { page: 1 },
@@ -72,20 +73,23 @@ const streamedOptions = utils.orders.watch.experimental_streamedOptions({
   input: { id: 'ord_123' },
   queryFnOptions: { refetchMode: 'append', maxChunks: 10 },
 });
+declare const streamedContext: Parameters<typeof streamedOptions.queryFn>[0];
 const streamedData: Promise<readonly OrderSummary[]> | readonly OrderSummary[] = streamedOptions
-  .queryFn(undefined as never);
+  .queryFn(streamedContext);
 
 const liveOptions = utils.orders.watch.experimental_liveOptions({
   input: { id: 'ord_123' },
 });
-const liveData: Promise<OrderSummary> | OrderSummary = liveOptions.queryFn(undefined as never);
+declare const liveContext: Parameters<typeof liveOptions.queryFn>[0];
+const liveData: Promise<OrderSummary> | OrderSummary = liveOptions.queryFn(liveContext);
 
 const infiniteOptions = utils.orders.list.infiniteOptions({
   input: (pageParam: number) => ({ page: pageParam }),
   initialPageParam: 1,
 });
+declare const infiniteContext: Parameters<typeof infiniteOptions.queryFn>[0];
 const pageData: Promise<ListOrdersOutput> | ListOrdersOutput = infiniteOptions.queryFn(
-  undefined as never,
+  infiniteContext,
 );
 
 void queryData;

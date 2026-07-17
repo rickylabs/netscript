@@ -28,9 +28,17 @@ import {
   useLiveQuery as useTanStackLiveQuery,
   useLiveSuspenseQuery as useTanStackLiveSuspenseQuery,
 } from '@tanstack/react-db';
+import type {
+  Context,
+  InferResultType,
+  InitialQueryBuilder,
+  QueryBuilder,
+} from '@tanstack/react-db';
 
 /** Function that builds a live query from the upstream query builder. */
-export type NetScriptLiveQueryFactory<TResult = unknown> = (queryBuilder: unknown) => TResult;
+export type NetScriptLiveQueryFactory<TContext extends Context = Context> = (
+  queryBuilder: InitialQueryBuilder,
+) => QueryBuilder<TContext>;
 
 /** Result returned by NetScript live-query wrappers. */
 export interface NetScriptLiveQueryResult<TData = unknown> {
@@ -45,37 +53,34 @@ export interface NetScriptLiveQueryResult<TData = unknown> {
 }
 
 /** Run a TanStack DB live query through the NetScript Fresh streams surface. */
-export function useLiveQuery<TData = unknown>(
-  queryFactory: NetScriptLiveQueryFactory,
+export function useLiveQuery<TContext extends Context>(
+  queryFactory: NetScriptLiveQueryFactory<TContext>,
   deps?: readonly unknown[],
-): NetScriptLiveQueryResult<TData> {
+): NetScriptLiveQueryResult<InferResultType<TContext>> {
   const result = useTanStackLiveQuery(
-    queryFactory as never,
+    queryFactory,
     deps ? [...deps] : undefined,
-  ) as Record<string, unknown>;
+  );
 
   return {
-    data: result.data as TData | undefined,
+    data: result.data,
     status: typeof result.status === 'string' ? result.status : undefined,
-    error: result.error,
-    details: result,
+    details: { ...result },
   };
 }
 
 /** Run a TanStack DB suspense live query through the NetScript Fresh streams surface. */
-export function useLiveSuspenseQuery<TData = unknown>(
-  queryFactory: NetScriptLiveQueryFactory,
+export function useLiveSuspenseQuery<TContext extends Context>(
+  queryFactory: NetScriptLiveQueryFactory<TContext>,
   deps?: readonly unknown[],
-): NetScriptLiveQueryResult<TData> {
+): NetScriptLiveQueryResult<InferResultType<TContext>> {
   const result = useTanStackLiveSuspenseQuery(
-    queryFactory as never,
+    queryFactory,
     deps ? [...deps] : undefined,
-  ) as Record<string, unknown>;
+  );
 
   return {
-    data: result.data as TData | undefined,
-    status: typeof result.status === 'string' ? result.status : undefined,
-    error: result.error,
-    details: result,
+    data: result.data,
+    details: { ...result },
   };
 }

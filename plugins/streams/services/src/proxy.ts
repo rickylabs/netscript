@@ -171,16 +171,15 @@ export function createStreamsProxyHandler(
   const { internalPort } = options;
   const liveCreateWait = options.liveCreateWait ?? resolveLiveCreateWaitConfig();
 
-  const forward = (c: Context, target: string): Promise<Response> =>
-    fetch(
-      new Request(target, {
-        method: c.req.method,
-        headers: c.req.raw.headers,
-        body: c.req.raw.body,
-        // @ts-ignore Deno supports duplex on Request
-        duplex: c.req.raw.body ? 'half' : undefined,
-      }),
-    );
+  const forward = (c: Context, target: string): Promise<Response> => {
+    const requestInit: RequestInit & { duplex?: 'half' } = {
+      method: c.req.method,
+      headers: c.req.raw.headers,
+      body: c.req.raw.body,
+      duplex: c.req.raw.body ? 'half' : undefined,
+    };
+    return fetch(new Request(target, requestInit));
+  };
 
   return async (c: Context): Promise<Response> => {
     const url = new URL(c.req.url);

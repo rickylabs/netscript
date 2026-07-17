@@ -1,5 +1,4 @@
 import { createStateSchema } from '@durable-streams/state';
-import type { StreamStateDefinition as DurableStreamStateDefinition } from '@durable-streams/state';
 import type { StateSchema, StreamStateDefinition } from '../domain/stream-schema.ts';
 
 export type { StateSchema, StreamStateDefinition } from '../domain/stream-schema.ts';
@@ -25,8 +24,9 @@ export type { StateSchema, StreamStateDefinition } from '../domain/stream-schema
  */
 export function defineStreamSchema<TDef extends StreamStateDefinition>(
   collections: TDef,
-): StateSchema<TDef> {
-  return createStateSchema(
-    collections as unknown as DurableStreamStateDefinition,
-  ) as unknown as StateSchema<TDef>;
+): StateSchema<TDef>;
+export function defineStreamSchema(
+  collections: StreamStateDefinition,
+): ReturnType<typeof createStateSchema> {
+  return createStateSchema(collections);
 }

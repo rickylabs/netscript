@@ -1,5 +1,6 @@
-import type { TriggerContext, TriggerDefinition, TriggerEvent } from '../domain/mod.ts';
+import type { TriggerEvent } from '../domain/mod.ts';
 import type {
+  ProcessableTriggerDefinition,
   TriggerProcessorPort,
   TriggerProcessorStopOptions,
   TriggerProcessResult,
@@ -18,7 +19,7 @@ export class InlineTriggerProcessor implements TriggerProcessorPort {
   }
 
   /** Process a trigger event by invoking the definition handler directly. */
-  async process<TDefinition extends TriggerDefinition<string, never, never>>(
+  async process<TDefinition extends ProcessableTriggerDefinition>(
     event: TriggerEvent,
     definition: TDefinition,
   ): Promise<TriggerProcessResult> {
@@ -26,16 +27,18 @@ export class InlineTriggerProcessor implements TriggerProcessorPort {
       throw new Error('Inline trigger processor is stopped.');
     }
     this.processed.push(event);
-    const processable = definition as unknown as TriggerDefinition<
-      string,
-      TriggerEvent,
-      TriggerContext
-    >;
-    const actions = await processable.handler(event, {
-      triggerId: event.triggerId,
-      now: this.#now,
-    });
-    const deferred = actions.some((action) => action.kind === 'defer');
+    const actions = await Reflect.apply(definition.handler, undefined, [
+      event,
+      { triggerId: event.triggerId, now: this.#now },
+    ]);
+    if (!Array.isArray(actions)) {
+      throw new TypeError('Inline trigger handler must return an array of actions.');
+    }
+    const deferred = actions.some(
+      (action) =>
+        typeof action === 'object' && action !== null && 'kind' in action &&
+        action.kind === 'defer',
+    );
     return {
       event,
       status: deferred ? 'deferred' : 'completed',

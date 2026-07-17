@@ -57,8 +57,7 @@ function getBrowserServiceEndpoint(
   index = 0,
 ): string | undefined {
   try {
-    // deno-lint-ignore no-explicit-any
-    const env = (import.meta as any).env as Record<string, string | undefined> | undefined;
+    const env = readImportMetaEnvironment(import.meta);
     if (!env) return undefined;
 
     const fullKey = `VITE_services__${serviceName}__${protocol}__${index}`;
@@ -70,6 +69,22 @@ function getBrowserServiceEndpoint(
   } catch {
     return undefined;
   }
+}
+
+function readImportMetaEnvironment(
+  meta: ImportMeta,
+): Readonly<Record<string, string | undefined>> | undefined {
+  if (!('env' in meta) || !isEnvironmentRecord(meta.env)) return undefined;
+  return meta.env;
+}
+
+function isEnvironmentRecord(
+  value: unknown,
+): value is Readonly<Record<string, string | undefined>> {
+  return typeof value === 'object' && value !== null &&
+    Object.values(value).every((entry: unknown) =>
+      entry === undefined || typeof entry === 'string'
+    );
 }
 
 /**

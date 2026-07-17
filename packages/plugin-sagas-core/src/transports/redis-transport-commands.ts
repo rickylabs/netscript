@@ -14,7 +14,7 @@ export interface RedisStreamClient extends RedisDelayedClient {
   /** Close the Redis client connection. */
   quit(): Promise<unknown>;
   /** Add a serialized message envelope to a Redis Stream. */
-  xadd(...args: (string | number)[]): Promise<unknown>;
+  xadd(key: string, ...args: (string | number)[]): Promise<unknown>;
   /** Acknowledge one Redis Stream message. */
   xack(streamKey: string, group: string, messageId: string): Promise<unknown>;
   /** Run an XGROUP command used to create consumer groups. */
@@ -165,7 +165,7 @@ export function redisXaddArgs(
   streamKey: string,
   envelope: string,
   options: ResolvedRedisTransportOptions,
-): (string | number)[] {
+): [key: string, ...args: (string | number)[]] {
   if (options.maxStreamLength <= 0) {
     return [streamKey, '*', 'data', envelope];
   }
@@ -285,7 +285,90 @@ export async function claimRedisPendingEntry(
 }
 
 function createDefaultRedisClient(connection: RedisConnectionOptions): RedisStreamClient {
-  return new Redis(connection) as unknown as RedisStreamClient;
+  return adaptRedisStreamClient(new Redis(connection));
+}
+
+function adaptRedisStreamClient(redis: Redis): RedisStreamClient {
+  return {
+    duplicate: () => adaptRedisStreamClient(redis.duplicate()),
+    quit: () => redis.quit(),
+    xadd: (key, ...args) => redis.xadd(key, ...args),
+    xack: (streamKey, group, messageId) => redis.xack(streamKey, group, messageId),
+    xgroup: (command, streamKey, group, id, mkstream) =>
+      redis.xgroup(command, streamKey, group, id, mkstream),
+    xreadgroup: async (
+      groupCommand,
+      group,
+      consumer,
+      countCommand,
+      count,
+      blockCommand,
+      blockMs,
+      streamsCommand,
+      ...keysAndIds
+    ) => {
+      const result: unknown = await redis.call(
+        'XREADGROUP',
+        groupCommand,
+        group,
+        consumer,
+        countCommand,
+        count,
+        blockCommand,
+        blockMs,
+        streamsCommand,
+        ...keysAndIds,
+      );
+      if (result === null || isRedisStreamReadGroupResult(result)) return result;
+      throw new TypeError('Redis XREADGROUP returned an invalid response.');
+    },
+    xpending: async (streamKey, group, start, end, count) => {
+      const result: unknown = await redis.xpending(streamKey, group, start, end, count);
+      if (isRedisPendingMessageResult(result)) return result;
+      throw new TypeError('Redis XPENDING returned an invalid response.');
+    },
+    xclaim: async (streamKey, group, consumer, minIdleMs, messageId) => {
+      const result: unknown = await redis.xclaim(
+        streamKey,
+        group,
+        consumer,
+        minIdleMs,
+        messageId,
+      );
+      if (isRedisClaimedMessageResult(result)) return result;
+      throw new TypeError('Redis XCLAIM returned an invalid response.');
+    },
+    zadd: (key, score, member) => redis.zadd(key, score, member),
+    zrangebyscore: (key, min, max) => redis.zrangebyscore(key, min, max),
+    zrem: (key, member) => redis.zrem(key, member),
+  };
+}
+
+function isRedisStreamReadGroupResult(value: unknown): value is RedisStreamReadGroupResult {
+  return Array.isArray(value) &&
+    value.every((stream: unknown) =>
+      Array.isArray(stream) && typeof stream[0] === 'string' && Array.isArray(stream[1]) &&
+      stream[1].every((message: unknown) =>
+        Array.isArray(message) && typeof message[0] === 'string' && Array.isArray(message[1]) &&
+        message[1].every((field: unknown) => typeof field === 'string')
+      )
+    );
+}
+
+function isRedisPendingMessageResult(value: unknown): value is RedisPendingMessageResult {
+  return Array.isArray(value) &&
+    value.every((entry: unknown) =>
+      Array.isArray(entry) && entry.length >= 4 && typeof entry[0] === 'string' &&
+      typeof entry[1] === 'string' && typeof entry[2] === 'number' && typeof entry[3] === 'number'
+    );
+}
+
+function isRedisClaimedMessageResult(value: unknown): value is RedisClaimedMessageResult {
+  return Array.isArray(value) &&
+    value.every((entry: unknown) =>
+      Array.isArray(entry) && typeof entry[0] === 'string' && Array.isArray(entry[1]) &&
+      entry[1].every((field: unknown) => typeof field === 'string')
+    );
 }
 
 function isBusyGroupError(error: unknown): boolean {
