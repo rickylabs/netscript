@@ -1,0 +1,548 @@
+[
+ {
+  "sha": "faf85e9ba3df1a166abe2585c86739a3aa5c9866",
+  "node_id": "C_kwDOTIdMCNoAKGZhZjg1ZTliYTNkZjFhMTY2YWJlMjU4NWM4NjczOWEzYWE1Yzk4NjY",
+  "commit": {
+   "author": {
+    "name": "Eric Chautems",
+    "email": "eric.chautems@eisberg.com",
+    "date": "2026-07-15T16:11:11Z"
+   },
+   "committer": {
+    "name": "Eric Chautems",
+    "email": "eric.chautems@eisberg.com",
+    "date": "2026-07-15T16:11:11Z"
+   },
+   "message": "prototype windows singleton desktop deployment",
+   "tree": {
+    "sha": "561f841b9f4a2609b0cc24eee12a49eaf6376442",
+    "url": "https://api.github.com/repos/rickylabs/eis-chat/git/trees/561f841b9f4a2609b0cc24eee12a49eaf6376442"
+   },
+   "url": "https://api.github.com/repos/rickylabs/eis-chat/git/commits/faf85e9ba3df1a166abe2585c86739a3aa5c9866",
+   "comment_count": 0,
+   "verification": {
+    "verified": false,
+    "reason": "unsigned",
+    "signature": null,
+    "payload": null,
+    "verified_at": null
+   }
+  },
+  "url": "https://api.github.com/repos/rickylabs/eis-chat/commits/faf85e9ba3df1a166abe2585c86739a3aa5c9866",
+  "html_url": "https://github.com/rickylabs/eis-chat/commit/faf85e9ba3df1a166abe2585c86739a3aa5c9866",
+  "comments_url": "https://api.github.com/repos/rickylabs/eis-chat/commits/faf85e9ba3df1a166abe2585c86739a3aa5c9866/comments",
+  "author": null,
+  "committer": null,
+  "parents": [
+   {
+    "sha": "a7e7d2809fdf4dfb285977a6d794156db66277a3",
+    "url": "https://api.github.com/repos/rickylabs/eis-chat/commits/a7e7d2809fdf4dfb285977a6d794156db66277a3",
+    "html_url": "https://github.com/rickylabs/eis-chat/commit/a7e7d2809fdf4dfb285977a6d794156db66277a3"
+   }
+  ]
+ },
+ {
+  "sha": "c46f8b69c9204b1d27979c7ad30c3b659eeda511",
+  "node_id": "C_kwDOTIdMCNoAKGM0NmY4YjY5YzkyMDRiMWQyNzk3OWM3YWQzMGMzYjY1OWVlZGE1MTE",
+  "commit": {
+   "author": {
+    "name": "Eric Chautems",
+    "email": "eric.chautems@eisberg.com",
+    "date": "2026-07-15T16:24:11Z"
+   },
+   "committer": {
+    "name": "Eric Chautems",
+    "email": "eric.chautems@eisberg.com",
+    "date": "2026-07-15T16:24:11Z"
+   },
+   "message": "work around desktop sidecar spawn handles",
+   "tree": {
+    "sha": "6714ed28a8c15b9301fef12ae4767933fecc0c2c",
+    "url": "https://api.github.com/repos/rickylabs/eis-chat/git/trees/6714ed28a8c15b9301fef12ae4767933fecc0c2c"
+   },
+   "url": "https://api.github.com/repos/rickylabs/eis-chat/git/commits/c46f8b69c9204b1d27979c7ad30c3b659eeda511",
+   "comment_count": 0,
+   "verification": {
+    "verified": false,
+    "reason": "unsigned",
+    "signature": null,
+    "payload": null,
+    "verified_at": null
+   }
+  },
+  "url": "https://api.github.com/repos/rickylabs/eis-chat/commits/c46f8b69c9204b1d27979c7ad30c3b659eeda511",
+  "html_url": "https://github.com/rickylabs/eis-chat/commit/c46f8b69c9204b1d27979c7ad30c3b659eeda511",
+  "comments_url": "https://api.github.com/repos/rickylabs/eis-chat/commits/c46f8b69c9204b1d27979c7ad30c3b659eeda511/comments",
+  "author": null,
+  "committer": null,
+  "parents": [
+   {
+    "sha": "faf85e9ba3df1a166abe2585c86739a3aa5c9866",
+    "url": "https://api.github.com/repos/rickylabs/eis-chat/commits/faf85e9ba3df1a166abe2585c86739a3aa5c9866",
+    "html_url": "https://github.com/rickylabs/eis-chat/commit/faf85e9ba3df1a166abe2585c86739a3aa5c9866"
+   }
+  ]
+ },
+ {
+  "sha": "0c3639157fe5a23ce47245a437741606036eb49b",
+  "node_id": "C_kwDOTIdMCNoAKDBjMzYzOTE1N2ZlNWEyM2NlNDcyNDVhNDM3NzQxNjA2MDM2ZWI0OWI",
+  "commit": {
+   "author": {
+    "name": "Eric Chautems",
+    "email": "eric.chautems@eisberg.com",
+    "date": "2026-07-15T20:49:38Z"
+   },
+   "committer": {
+    "name": "Eric Chautems",
+    "email": "eric.chautems@eisberg.com",
+    "date": "2026-07-15T20:49:38Z"
+   },
+   "message": "document deno 2.9.3 sidecar retest",
+   "tree": {
+    "sha": "5f6ac1999262172b51d5aaae6035ba0e2fb63edd",
+    "url": "https://api.github.com/repos/rickylabs/eis-chat/git/trees/5f6ac1999262172b51d5aaae6035ba0e2fb63edd"
+   },
+   "url": "https://api.github.com/repos/rickylabs/eis-chat/git/commits/0c3639157fe5a23ce47245a437741606036eb49b",
+   "comment_count": 0,
+   "verification": {
+    "verified": false,
+    "reason": "unsigned",
+    "signature": null,
+    "payload": null,
+    "verified_at": null
+   }
+  },
+  "url": "https://api.github.com/repos/rickylabs/eis-chat/commits/0c3639157fe5a23ce47245a437741606036eb49b",
+  "html_url": "https://github.com/rickylabs/eis-chat/commit/0c3639157fe5a23ce47245a437741606036eb49b",
+  "comments_url": "https://api.github.com/repos/rickylabs/eis-chat/commits/0c3639157fe5a23ce47245a437741606036eb49b/comments",
+  "author": null,
+  "committer": null,
+  "parents": [
+   {
+    "sha": "c46f8b69c9204b1d27979c7ad30c3b659eeda511",
+    "url": "https://api.github.com/repos/rickylabs/eis-chat/commits/c46f8b69c9204b1d27979c7ad30c3b659eeda511",
+    "html_url": "https://github.com/rickylabs/eis-chat/commit/c46f8b69c9204b1d27979c7ad30c3b659eeda511"
+   }
+  ]
+ },
+ {
+  "sha": "0d7ddcd009e40608f132569d0cf03173ba5af8bc",
+  "node_id": "C_kwDOTIdMCNoAKDBkN2RkY2QwMDllNDA2MDhmMTMyNTY5ZDBjZjAzMTczYmE1YWY4YmM",
+  "commit": {
+   "author": {
+    "name": "Eric Chautems",
+    "email": "eric.chautems@eisberg.com",
+    "date": "2026-07-15T21:08:04Z"
+   },
+   "committer": {
+    "name": "Eric Chautems",
+    "email": "eric.chautems@eisberg.com",
+    "date": "2026-07-15T21:08:04Z"
+   },
+   "message": "capture windows singleton diagnostics",
+   "tree": {
+    "sha": "3c9b110ac9220419858f6f707c2e14030b6fea0c",
+    "url": "https://api.github.com/repos/rickylabs/eis-chat/git/trees/3c9b110ac9220419858f6f707c2e14030b6fea0c"
+   },
+   "url": "https://api.github.com/repos/rickylabs/eis-chat/git/commits/0d7ddcd009e40608f132569d0cf03173ba5af8bc",
+   "comment_count": 0,
+   "verification": {
+    "verified": false,
+    "reason": "unsigned",
+    "signature": null,
+    "payload": null,
+    "verified_at": null
+   }
+  },
+  "url": "https://api.github.com/repos/rickylabs/eis-chat/commits/0d7ddcd009e40608f132569d0cf03173ba5af8bc",
+  "html_url": "https://github.com/rickylabs/eis-chat/commit/0d7ddcd009e40608f132569d0cf03173ba5af8bc",
+  "comments_url": "https://api.github.com/repos/rickylabs/eis-chat/commits/0d7ddcd009e40608f132569d0cf03173ba5af8bc/comments",
+  "author": null,
+  "committer": null,
+  "parents": [
+   {
+    "sha": "0c3639157fe5a23ce47245a437741606036eb49b",
+    "url": "https://api.github.com/repos/rickylabs/eis-chat/commits/0c3639157fe5a23ce47245a437741606036eb49b",
+    "html_url": "https://github.com/rickylabs/eis-chat/commit/0c3639157fe5a23ce47245a437741606036eb49b"
+   }
+  ]
+ },
+ {
+  "sha": "232a13f6015a2347b18fd05443dde1adf049276d",
+  "node_id": "C_kwDOTIdMCNoAKDIzMmExM2Y2MDE1YTIzNDdiMThmZDA1NDQzZGRlMWFkZjA0OTI3NmQ",
+  "commit": {
+   "author": {
+    "name": "Eric Chautems",
+    "email": "eric.chautems@eisberg.com",
+    "date": "2026-07-15T21:33:24Z"
+   },
+   "committer": {
+    "name": "Eric Chautems",
+    "email": "eric.chautems@eisberg.com",
+    "date": "2026-07-15T21:33:24Z"
+   },
+   "message": "run windows singleton without powershell",
+   "tree": {
+    "sha": "e5cc62f1a40dae5be2cb2bc8b2605f4bbc33a2d6",
+    "url": "https://api.github.com/repos/rickylabs/eis-chat/git/trees/e5cc62f1a40dae5be2cb2bc8b2605f4bbc33a2d6"
+   },
+   "url": "https://api.github.com/repos/rickylabs/eis-chat/git/commits/232a13f6015a2347b18fd05443dde1adf049276d",
+   "comment_count": 0,
+   "verification": {
+    "verified": false,
+    "reason": "unsigned",
+    "signature": null,
+    "payload": null,
+    "verified_at": null
+   }
+  },
+  "url": "https://api.github.com/repos/rickylabs/eis-chat/commits/232a13f6015a2347b18fd05443dde1adf049276d",
+  "html_url": "https://github.com/rickylabs/eis-chat/commit/232a13f6015a2347b18fd05443dde1adf049276d",
+  "comments_url": "https://api.github.com/repos/rickylabs/eis-chat/commits/232a13f6015a2347b18fd05443dde1adf049276d/comments",
+  "author": null,
+  "committer": null,
+  "parents": [
+   {
+    "sha": "0d7ddcd009e40608f132569d0cf03173ba5af8bc",
+    "url": "https://api.github.com/repos/rickylabs/eis-chat/commits/0d7ddcd009e40608f132569d0cf03173ba5af8bc",
+    "html_url": "https://github.com/rickylabs/eis-chat/commit/0d7ddcd009e40608f132569d0cf03173ba5af8bc"
+   }
+  ]
+ },
+ {
+  "sha": "fa23bf0e225ec0174b92c471988a72a3c3348717",
+  "node_id": "C_kwDOTIdMCNoAKGZhMjNiZjBlMjI1ZWMwMTc0YjkyYzQ3MTk4OGE3MmEzYzMzNDg3MTc",
+  "commit": {
+   "author": {
+    "name": "Eric Chautems",
+    "email": "eric.chautems@eisberg.com",
+    "date": "2026-07-16T08:52:33Z"
+   },
+   "committer": {
+    "name": "Eric Chautems",
+    "email": "eric.chautems@eisberg.com",
+    "date": "2026-07-16T08:52:33Z"
+   },
+   "message": "complete windows singleton stack and fix markdown hydration",
+   "tree": {
+    "sha": "de2e104a7fcd78a476ceba3e9b9660b8399c367d",
+    "url": "https://api.github.com/repos/rickylabs/eis-chat/git/trees/de2e104a7fcd78a476ceba3e9b9660b8399c367d"
+   },
+   "url": "https://api.github.com/repos/rickylabs/eis-chat/git/commits/fa23bf0e225ec0174b92c471988a72a3c3348717",
+   "comment_count": 0,
+   "verification": {
+    "verified": false,
+    "reason": "unsigned",
+    "signature": null,
+    "payload": null,
+    "verified_at": null
+   }
+  },
+  "url": "https://api.github.com/repos/rickylabs/eis-chat/commits/fa23bf0e225ec0174b92c471988a72a3c3348717",
+  "html_url": "https://github.com/rickylabs/eis-chat/commit/fa23bf0e225ec0174b92c471988a72a3c3348717",
+  "comments_url": "https://api.github.com/repos/rickylabs/eis-chat/commits/fa23bf0e225ec0174b92c471988a72a3c3348717/comments",
+  "author": null,
+  "committer": null,
+  "parents": [
+   {
+    "sha": "232a13f6015a2347b18fd05443dde1adf049276d",
+    "url": "https://api.github.com/repos/rickylabs/eis-chat/commits/232a13f6015a2347b18fd05443dde1adf049276d",
+    "html_url": "https://github.com/rickylabs/eis-chat/commit/232a13f6015a2347b18fd05443dde1adf049276d"
+   }
+  ]
+ },
+ {
+  "sha": "11f0125a9f0183cbd96667ec71750da4ea714a39",
+  "node_id": "C_kwDOTIdMCNoAKDExZjAxMjVhOWYwMTgzY2JkOTY2NjdlYzcxNzUwZGE0ZWE3MTRhMzk",
+  "commit": {
+   "author": {
+    "name": "Eric Chautems",
+    "email": "eric.chautems@eisberg.com",
+    "date": "2026-07-16T10:30:30Z"
+   },
+   "committer": {
+    "name": "Eric Chautems",
+    "email": "eric.chautems@eisberg.com",
+    "date": "2026-07-16T10:30:30Z"
+   },
+   "message": "fix singleton discovery and bundle Aspire dashboard",
+   "tree": {
+    "sha": "2ecffe64df62b16734304748243d5570e62ab698",
+    "url": "https://api.github.com/repos/rickylabs/eis-chat/git/trees/2ecffe64df62b16734304748243d5570e62ab698"
+   },
+   "url": "https://api.github.com/repos/rickylabs/eis-chat/git/commits/11f0125a9f0183cbd96667ec71750da4ea714a39",
+   "comment_count": 0,
+   "verification": {
+    "verified": false,
+    "reason": "unsigned",
+    "signature": null,
+    "payload": null,
+    "verified_at": null
+   }
+  },
+  "url": "https://api.github.com/repos/rickylabs/eis-chat/commits/11f0125a9f0183cbd96667ec71750da4ea714a39",
+  "html_url": "https://github.com/rickylabs/eis-chat/commit/11f0125a9f0183cbd96667ec71750da4ea714a39",
+  "comments_url": "https://api.github.com/repos/rickylabs/eis-chat/commits/11f0125a9f0183cbd96667ec71750da4ea714a39/comments",
+  "author": null,
+  "committer": null,
+  "parents": [
+   {
+    "sha": "fa23bf0e225ec0174b92c471988a72a3c3348717",
+    "url": "https://api.github.com/repos/rickylabs/eis-chat/commits/fa23bf0e225ec0174b92c471988a72a3c3348717",
+    "html_url": "https://github.com/rickylabs/eis-chat/commit/fa23bf0e225ec0174b92c471988a72a3c3348717"
+   }
+  ]
+ },
+ {
+  "sha": "4853b0e9bb9a3963261adc1b07f487cf7eadfb8a",
+  "node_id": "C_kwDOTIdMCNoAKDQ4NTNiMGU5YmI5YTM5NjMyNjFhZGMxYjA3ZjQ4N2NmN2VhZGZiOGE",
+  "commit": {
+   "author": {
+    "name": "Eric Chautems",
+    "email": "eric.chautems@eisberg.com",
+    "date": "2026-07-16T11:07:16Z"
+   },
+   "committer": {
+    "name": "Eric Chautems",
+    "email": "eric.chautems@eisberg.com",
+    "date": "2026-07-16T11:07:16Z"
+   },
+   "message": "fix compiled singleton telemetry and CI",
+   "tree": {
+    "sha": "8ef8870218442772348678c462b7edf314cf9047",
+    "url": "https://api.github.com/repos/rickylabs/eis-chat/git/trees/8ef8870218442772348678c462b7edf314cf9047"
+   },
+   "url": "https://api.github.com/repos/rickylabs/eis-chat/git/commits/4853b0e9bb9a3963261adc1b07f487cf7eadfb8a",
+   "comment_count": 0,
+   "verification": {
+    "verified": false,
+    "reason": "unsigned",
+    "signature": null,
+    "payload": null,
+    "verified_at": null
+   }
+  },
+  "url": "https://api.github.com/repos/rickylabs/eis-chat/commits/4853b0e9bb9a3963261adc1b07f487cf7eadfb8a",
+  "html_url": "https://github.com/rickylabs/eis-chat/commit/4853b0e9bb9a3963261adc1b07f487cf7eadfb8a",
+  "comments_url": "https://api.github.com/repos/rickylabs/eis-chat/commits/4853b0e9bb9a3963261adc1b07f487cf7eadfb8a/comments",
+  "author": null,
+  "committer": null,
+  "parents": [
+   {
+    "sha": "11f0125a9f0183cbd96667ec71750da4ea714a39",
+    "url": "https://api.github.com/repos/rickylabs/eis-chat/commits/11f0125a9f0183cbd96667ec71750da4ea714a39",
+    "html_url": "https://github.com/rickylabs/eis-chat/commit/11f0125a9f0183cbd96667ec71750da4ea714a39"
+   }
+  ]
+ },
+ {
+  "sha": "92ced5ade0351a9dff27dcd58e8f11badc7ab685",
+  "node_id": "C_kwDOTIdMCNoAKDkyY2VkNWFkZTAzNTFhOWRmZjI3ZGNkNThlOGYxMWJhZGM3YWI2ODU",
+  "commit": {
+   "author": {
+    "name": "Eric Chautems",
+    "email": "eric.chautems@eisberg.com",
+    "date": "2026-07-16T11:12:14Z"
+   },
+   "committer": {
+    "name": "Eric Chautems",
+    "email": "eric.chautems@eisberg.com",
+    "date": "2026-07-16T11:12:14Z"
+   },
+   "message": "normalize Deno npm specifiers in Vite",
+   "tree": {
+    "sha": "17617aa1a0eceec15d3aa8fcbb9a5a7545d42661",
+    "url": "https://api.github.com/repos/rickylabs/eis-chat/git/trees/17617aa1a0eceec15d3aa8fcbb9a5a7545d42661"
+   },
+   "url": "https://api.github.com/repos/rickylabs/eis-chat/git/commits/92ced5ade0351a9dff27dcd58e8f11badc7ab685",
+   "comment_count": 0,
+   "verification": {
+    "verified": false,
+    "reason": "unsigned",
+    "signature": null,
+    "payload": null,
+    "verified_at": null
+   }
+  },
+  "url": "https://api.github.com/repos/rickylabs/eis-chat/commits/92ced5ade0351a9dff27dcd58e8f11badc7ab685",
+  "html_url": "https://github.com/rickylabs/eis-chat/commit/92ced5ade0351a9dff27dcd58e8f11badc7ab685",
+  "comments_url": "https://api.github.com/repos/rickylabs/eis-chat/commits/92ced5ade0351a9dff27dcd58e8f11badc7ab685/comments",
+  "author": null,
+  "committer": null,
+  "parents": [
+   {
+    "sha": "4853b0e9bb9a3963261adc1b07f487cf7eadfb8a",
+    "url": "https://api.github.com/repos/rickylabs/eis-chat/commits/4853b0e9bb9a3963261adc1b07f487cf7eadfb8a",
+    "html_url": "https://github.com/rickylabs/eis-chat/commit/4853b0e9bb9a3963261adc1b07f487cf7eadfb8a"
+   }
+  ]
+ },
+ {
+  "sha": "f325a1d737d08bea8e17d1982837028bec1beb98",
+  "node_id": "C_kwDOTIdMCNoAKGYzMjVhMWQ3MzdkMDhiZWE4ZTE3ZDE5ODI4MzcwMjhiZWMxYmViOTg",
+  "commit": {
+   "author": {
+    "name": "Eric Chautems",
+    "email": "eric.chautems@eisberg.com",
+    "date": "2026-07-16T11:15:52Z"
+   },
+   "committer": {
+    "name": "Eric Chautems",
+    "email": "eric.chautems@eisberg.com",
+    "date": "2026-07-16T11:15:52Z"
+   },
+   "message": "resolve durable streams export in cold Vite builds",
+   "tree": {
+    "sha": "ddd3af214890276d7290850d98a645fb31f7afb3",
+    "url": "https://api.github.com/repos/rickylabs/eis-chat/git/trees/ddd3af214890276d7290850d98a645fb31f7afb3"
+   },
+   "url": "https://api.github.com/repos/rickylabs/eis-chat/git/commits/f325a1d737d08bea8e17d1982837028bec1beb98",
+   "comment_count": 0,
+   "verification": {
+    "verified": false,
+    "reason": "unsigned",
+    "signature": null,
+    "payload": null,
+    "verified_at": null
+   }
+  },
+  "url": "https://api.github.com/repos/rickylabs/eis-chat/commits/f325a1d737d08bea8e17d1982837028bec1beb98",
+  "html_url": "https://github.com/rickylabs/eis-chat/commit/f325a1d737d08bea8e17d1982837028bec1beb98",
+  "comments_url": "https://api.github.com/repos/rickylabs/eis-chat/commits/f325a1d737d08bea8e17d1982837028bec1beb98/comments",
+  "author": null,
+  "committer": null,
+  "parents": [
+   {
+    "sha": "92ced5ade0351a9dff27dcd58e8f11badc7ab685",
+    "url": "https://api.github.com/repos/rickylabs/eis-chat/commits/92ced5ade0351a9dff27dcd58e8f11badc7ab685",
+    "html_url": "https://github.com/rickylabs/eis-chat/commit/92ced5ade0351a9dff27dcd58e8f11badc7ab685"
+   }
+  ]
+ },
+ {
+  "sha": "bc44f266f23d563bfc030227338069677e0a7a65",
+  "node_id": "C_kwDOTIdMCNoAKGJjNDRmMjY2ZjIzZDU2M2JmYzAzMDIyNzMzODA2OTY3N2UwYTdhNjU",
+  "commit": {
+   "author": {
+    "name": "Eric Chautems",
+    "email": "eric.chautems@eisberg.com",
+    "date": "2026-07-16T11:19:17Z"
+   },
+   "committer": {
+    "name": "Eric Chautems",
+    "email": "eric.chautems@eisberg.com",
+    "date": "2026-07-16T11:19:17Z"
+   },
+   "message": "cover versioned durable streams imports",
+   "tree": {
+    "sha": "0634fafbcd84fd73304811d2e399f1efc2a1237f",
+    "url": "https://api.github.com/repos/rickylabs/eis-chat/git/trees/0634fafbcd84fd73304811d2e399f1efc2a1237f"
+   },
+   "url": "https://api.github.com/repos/rickylabs/eis-chat/git/commits/bc44f266f23d563bfc030227338069677e0a7a65",
+   "comment_count": 0,
+   "verification": {
+    "verified": false,
+    "reason": "unsigned",
+    "signature": null,
+    "payload": null,
+    "verified_at": null
+   }
+  },
+  "url": "https://api.github.com/repos/rickylabs/eis-chat/commits/bc44f266f23d563bfc030227338069677e0a7a65",
+  "html_url": "https://github.com/rickylabs/eis-chat/commit/bc44f266f23d563bfc030227338069677e0a7a65",
+  "comments_url": "https://api.github.com/repos/rickylabs/eis-chat/commits/bc44f266f23d563bfc030227338069677e0a7a65/comments",
+  "author": null,
+  "committer": null,
+  "parents": [
+   {
+    "sha": "f325a1d737d08bea8e17d1982837028bec1beb98",
+    "url": "https://api.github.com/repos/rickylabs/eis-chat/commits/f325a1d737d08bea8e17d1982837028bec1beb98",
+    "html_url": "https://github.com/rickylabs/eis-chat/commit/f325a1d737d08bea8e17d1982837028bec1beb98"
+   }
+  ]
+ },
+ {
+  "sha": "cf8887a403f5653179bbf47b9aa3749dea4516a5",
+  "node_id": "C_kwDOTIdMCNoAKGNmODg4N2E0MDNmNTY1MzE3OWJiZjQ3YjlhYTM3NDlkZWE0NTE2YTU",
+  "commit": {
+   "author": {
+    "name": "Eric Chautems",
+    "email": "eric.chautems@eisberg.com",
+    "date": "2026-07-16T11:22:51Z"
+   },
+   "committer": {
+    "name": "Eric Chautems",
+    "email": "eric.chautems@eisberg.com",
+    "date": "2026-07-16T11:22:51Z"
+   },
+   "message": "normalize versioned Deno npm imports",
+   "tree": {
+    "sha": "2179b3f9f27a02c00aae1b7320196c1788b94f64",
+    "url": "https://api.github.com/repos/rickylabs/eis-chat/git/trees/2179b3f9f27a02c00aae1b7320196c1788b94f64"
+   },
+   "url": "https://api.github.com/repos/rickylabs/eis-chat/git/commits/cf8887a403f5653179bbf47b9aa3749dea4516a5",
+   "comment_count": 0,
+   "verification": {
+    "verified": false,
+    "reason": "unsigned",
+    "signature": null,
+    "payload": null,
+    "verified_at": null
+   }
+  },
+  "url": "https://api.github.com/repos/rickylabs/eis-chat/commits/cf8887a403f5653179bbf47b9aa3749dea4516a5",
+  "html_url": "https://github.com/rickylabs/eis-chat/commit/cf8887a403f5653179bbf47b9aa3749dea4516a5",
+  "comments_url": "https://api.github.com/repos/rickylabs/eis-chat/commits/cf8887a403f5653179bbf47b9aa3749dea4516a5/comments",
+  "author": null,
+  "committer": null,
+  "parents": [
+   {
+    "sha": "bc44f266f23d563bfc030227338069677e0a7a65",
+    "url": "https://api.github.com/repos/rickylabs/eis-chat/commits/bc44f266f23d563bfc030227338069677e0a7a65",
+    "html_url": "https://github.com/rickylabs/eis-chat/commit/bc44f266f23d563bfc030227338069677e0a7a65"
+   }
+  ]
+ },
+ {
+  "sha": "8cdedd307a646cfb217e9e2b1928fac8467dc405",
+  "node_id": "C_kwDOTIdMCNoAKDhjZGVkZDMwN2E2NDZjZmIyMTdlOWUyYjE5MjhmYWM4NDY3ZGM0MDU",
+  "commit": {
+   "author": {
+    "name": "Eric Chautems",
+    "email": "eric.chautems@eisberg.com",
+    "date": "2026-07-16T12:00:37Z"
+   },
+   "committer": {
+    "name": "Eric Chautems",
+    "email": "eric.chautems@eisberg.com",
+    "date": "2026-07-16T12:00:37Z"
+   },
+   "message": "document verified singleton integration limits",
+   "tree": {
+    "sha": "529738e4cdbf19494791b95f2f96597b95a93df3",
+    "url": "https://api.github.com/repos/rickylabs/eis-chat/git/trees/529738e4cdbf19494791b95f2f96597b95a93df3"
+   },
+   "url": "https://api.github.com/repos/rickylabs/eis-chat/git/commits/8cdedd307a646cfb217e9e2b1928fac8467dc405",
+   "comment_count": 0,
+   "verification": {
+    "verified": false,
+    "reason": "unsigned",
+    "signature": null,
+    "payload": null,
+    "verified_at": null
+   }
+  },
+  "url": "https://api.github.com/repos/rickylabs/eis-chat/commits/8cdedd307a646cfb217e9e2b1928fac8467dc405",
+  "html_url": "https://github.com/rickylabs/eis-chat/commit/8cdedd307a646cfb217e9e2b1928fac8467dc405",
+  "comments_url": "https://api.github.com/repos/rickylabs/eis-chat/commits/8cdedd307a646cfb217e9e2b1928fac8467dc405/comments",
+  "author": null,
+  "committer": null,
+  "parents": [
+   {
+    "sha": "cf8887a403f5653179bbf47b9aa3749dea4516a5",
+    "url": "https://api.github.com/repos/rickylabs/eis-chat/commits/cf8887a403f5653179bbf47b9aa3749dea4516a5",
+    "html_url": "https://github.com/rickylabs/eis-chat/commit/cf8887a403f5653179bbf47b9aa3749dea4516a5"
+   }
+  ]
+ }
+]
