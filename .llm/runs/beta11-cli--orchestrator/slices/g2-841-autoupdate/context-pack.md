@@ -6,6 +6,7 @@
 | --- | --- |
 | Run ID | `beta11-cli--orchestrator/slices/g2-841-autoupdate` |
 | Branch | `feat/desktop-frontend-841-autoupdate` |
+| Draft PR | [#849](https://github.com/rickylabs/netscript/pull/849) → `feat/desktop-frontend` |
 | Current phase | `plan-eval` (awaiting supervisor-triggered separate session) |
 | Archetype | `4 — Public DSL / Builder` with integration/runtime subtype gates |
 | Scope overlays | none |
@@ -27,10 +28,13 @@ to integration except for these nested run artifacts. Implementation is hard-sto
 - Ran current SDK JSR/doc baseline and recorded the one unrelated transitive doc-lint diagnostic.
 - Locked three implementation slices and the complete Design checkpoint.
 
-## In Progress
+## Handoff State
 
-- Commit/push the plan artifacts, open the required draft sub-PR, apply metadata, and post
-  `Plan & Design — READY FOR REVIEW`.
+- Plan artifact commit `c7e61dcc` is pushed.
+- Draft PR #849 targets `feat/desktop-frontend`, is draft, carries `Closes #841`, has all five
+  required labels, and is assigned milestone 13 (`0.0.1-beta.11`).
+- After this metadata reconciliation is committed and pushed, post
+  `Plan & Design — READY FOR REVIEW` and stop.
 
 ## Next Steps
 
@@ -84,5 +88,7 @@ to integration except for these nested run artifacts. Implementation is hard-sto
 
 ## Commits
 
-- See the draft PR's commit list + per-slice PR comments after the plan commit is pushed.
-
+- `c7e61dcc` — `docs(harness): plan SDK auto-update seam` (research, plan, Design checkpoint,
+  baseline evidence, and pending evaluator placeholder).
+- The next plan-only commit records PR #849 and the supervisor handoff state; no implementation is
+  included.

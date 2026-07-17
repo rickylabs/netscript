@@ -6,6 +6,7 @@
 | --- | --- |
 | Run ID | `beta11-cli--orchestrator/slices/g2-841-autoupdate` |
 | Branch | `feat/desktop-frontend-841-autoupdate` |
+| Draft PR | [#849](https://github.com/rickylabs/netscript/pull/849) → `feat/desktop-frontend` |
 | Archetype | `4 — Public DSL / Builder` plus integration/runtime subtype gates |
 | Scope overlays | none |
 
@@ -107,6 +108,7 @@ code and release config do not change.
 | --- | --- | --- | --- |
 | 2026-07-17 23:46 CEST | plan | nested run activated | Required skills/run-loop/doctrine/gates read; branch confirmed exactly at integration baseline. |
 | 2026-07-17 23:55 CEST | plan | research and design checkpoint | Live issues/RFC/upstream state re-baselined; public contract, files, slices, and gates locked. No implementation created. |
+| 2026-07-18 00:03 CEST | plan | supervisor handoff prepared | Plan-only commit `c7e61dcc` pushed; draft PR #849 opened against integration with required labels and milestone 13. Readiness comment follows the final metadata commit. |
 
 ## Decisions
 
@@ -163,6 +165,7 @@ code and release config do not change.
   truthfulness are the load-bearing design decisions.
 - Confirm the evaluator accepts Archetype 4 with A2/A3 subtype gates rather than a package-wide
   reclassification.
+- Draft PR #849 is labeled `type:feat`, `area:sdk`, `wave:v1`, `priority:p1`, `status:plan`, carries
+  milestone `0.0.1-beta.11`, and closes only #841.
 - No implementation file exists and no implementation slice may begin until the supervisor records
   `PASS` in `plan-eval.md` and on the PR.
-
