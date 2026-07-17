@@ -84,3 +84,8 @@ group launch; this section fixes the supervisor's surface.
 - 2026-07-18 · G2 S2 sign-off (35f3b726) — resumed for final slice (consumer fixture + JSR
   evidence; IMPL-EVAL on completion). G8 seed run stage A complete: worktree wt-g8-seed, branch
   plan/unified-runtime @ 56cf84b5, supervisor.md with seed boundaries, draft PR opened.
+- 2026-07-18 · G2 #841 IMPLEMENTATION COMPLETE (3 slices, PR #849; S3 = consumer fixture +
+  README doctest + JSR evidence, Tier-A reviewed). IMPL-EVAL dispatched (Qwen). G8 stage-B
+  discovery agent launched into the freed slot (Sol·medium, wt-g8-seed): 6-topic cited corpus
+  (Nitro v3 live docs, adapter mapping, stale sagas-constraint verdict, oRPC/Fresh, market leg,
+  drift ledger). G10 #802: option (b) locked with codebase-grounded rationale; implementing.
