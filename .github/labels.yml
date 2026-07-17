@@ -193,6 +193,9 @@
 - name: "epic:process-manager"
   color: "5319e7"
   description: "Process manager plugin epic (bare-metal supervisor + admin console, child of #327)"
+- name: "epic:agentic-combo"
+  color: "5319e7"
+  description: "NetScript agentic combo epic (MCP server + public skills + CLI)"
 
 # ── wave: release-train bucket (maps to milestone) ───────────────────────────
 - name: "wave:v1"

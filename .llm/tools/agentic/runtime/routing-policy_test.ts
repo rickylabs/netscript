@@ -8,7 +8,7 @@ import {
   type RoutingPolicyContext,
   selectFallbackCandidate,
 } from './routing-policy.ts';
-import { MODEL_IDS, OPENROUTER_MODEL_IDS } from '../config/models.ts';
+import { MODEL_IDS, OPENCODE_MODEL_IDS, OPENROUTER_MODEL_IDS } from '../config/models.ts';
 import { assertEquals as equal, assertThrows } from '@std/assert';
 
 const worktree = '/home/codex/repos/routing-policy';
@@ -115,29 +115,122 @@ Deno.test('outside-plan and higher-effort Fable-shaped policy requires explicit 
   );
 });
 
-Deno.test('orchestration lanes run Opus 4.8 medium while Fable 5 is outside the subscription', () => {
-  const at = new Date('2026-07-13T00:00:00Z');
-  for (const lane of ['planning_decisions', 'mobile_orchestration'] as const) {
+Deno.test('orchestrator + complex-decision lanes default to Fable 5 low, in-plan', () => {
+  const at = new Date('2026-07-16T00:00:00Z');
+  for (const lane of ['planning_decisions', 'deep_analysis'] as const) {
     const route = resolveCanonicalRoute(lane, at);
     equal([route.agent, route.provider, route.model, route.effort], [
       'claude',
       'anthropic',
-      'opus-4.8',
-      'medium',
+      'fable-5',
+      'low',
+    ]);
+    equal(route.subscriptionState, 'included');
+    equal(route.requiresExplicitApproval ?? false, false);
+  }
+});
+
+Deno.test('Fable 5 is back on the subscription: every Fable route is in-plan and auto-selectable', () => {
+  const fableRoutes = CANONICAL_ROUTE_POLICY.filter((route) => route.model === 'fable-5');
+  equal(fableRoutes.length > 0, true);
+  for (const route of fableRoutes) {
+    equal(route.subscriptionState ?? 'included', 'included');
+    equal(route.requiresExplicitApproval ?? false, false);
+  }
+});
+
+Deno.test('there is no mobile_orchestration lane — the orchestrator session owns /rc', () => {
+  equal(
+    CANONICAL_ROUTE_POLICY.some((route) => (route.lane as string) === 'mobile_orchestration'),
+    false,
+  );
+});
+
+Deno.test('implementation stays Codex GPT-5.6 Sol — medium normal, high complex', () => {
+  const at = new Date('2026-07-16T00:00:00Z');
+  const normal = resolveCanonicalRoute('normal_implementation', at);
+  equal([normal.agent, normal.provider, normal.model, normal.effort], [
+    'codex',
+    'openai',
+    'gpt-5.6-sol',
+    'medium',
+  ]);
+  const complex = resolveCanonicalRoute('complex_implementation', at);
+  equal([complex.agent, complex.provider, complex.model, complex.effort], [
+    'codex',
+    'openai',
+    'gpt-5.6-sol',
+    'high',
+  ]);
+});
+
+Deno.test('adversarial review of Codex work is Fable, opposite-family, paired to effort', () => {
+  const at = new Date('2026-07-16T00:00:00Z');
+  const normal = resolveCanonicalRoute('review_codex', at);
+  equal([normal.agent, normal.provider, normal.model, normal.effort], [
+    'claude',
+    'anthropic',
+    'fable-5',
+    'low',
+  ]);
+  const complex = resolveCanonicalRoute('review_codex_complex', at);
+  equal([complex.agent, complex.provider, complex.model, complex.effort], [
+    'claude',
+    'anthropic',
+    'fable-5',
+    'medium',
+  ]);
+  // The token-limit fallback for a Codex review stays Claude-family (Opus), never
+  // the Codex author's own OpenAI family — opposite-family review is preserved.
+  for (const lane of ['review_codex', 'review_codex_complex'] as const) {
+    const fallback = CANONICAL_ROUTE_POLICY.find((route) =>
+      route.lane === lane && route.condition === 'token_limit_fallback'
+    );
+    equal(fallback?.provider, 'anthropic');
+    equal(fallback?.model, 'opus-4.8');
+  }
+});
+
+Deno.test('delegated chores: docs/cleanup on Sonnet 5 high, code chores on Opus 4.8 medium', () => {
+  const at = new Date('2026-07-16T00:00:00Z');
+  const docs = resolveCanonicalRoute('documentation_review', at);
+  equal([docs.agent, docs.provider, docs.model, docs.effort], [
+    'claude',
+    'anthropic',
+    'sonnet-5',
+    'high',
+  ]);
+  const code = resolveCanonicalRoute('chore_code', at);
+  equal([code.agent, code.provider, code.model, code.effort], [
+    'claude',
+    'anthropic',
+    'opus-4.8',
+    'medium',
+  ]);
+});
+
+Deno.test('orchestrator/decision Fable lanes carry a Codex Sol high token-limit fallback', () => {
+  for (const lane of ['planning_decisions', 'deep_analysis'] as const) {
+    const fallback = CANONICAL_ROUTE_POLICY.find((route) =>
+      route.lane === lane && route.condition === 'fallback_on_fable_token_limit'
+    );
+    equal([fallback?.agent, fallback?.provider, fallback?.model, fallback?.effort], [
+      'codex',
+      'openai',
+      'gpt-5.6-sol',
+      'high',
     ]);
   }
 });
 
-Deno.test('non-review Fable 5 routes stay approval-gated and are never auto-selected', () => {
-  const reviewLanes = new Set(['review_codex', 'review_codex_complex']);
-  const fableRoutes = CANONICAL_ROUTE_POLICY.filter((route) =>
-    route.model === 'fable-5' && !reviewLanes.has(route.lane)
-  );
-  equal(fableRoutes.length > 0, true);
-  for (const route of fableRoutes) {
-    equal(route.subscriptionState, 'outside_plan');
-    equal(route.requiresExplicitApproval, true);
-  }
+Deno.test('Claude Code workflow lane stays Opus 4.8 low', () => {
+  const route = resolveCanonicalRoute('claude_workflow', new Date('2026-07-16T00:00:00Z'));
+  equal([route.agent, route.provider, route.model, route.effort], [
+    'claude',
+    'anthropic',
+    'opus-4.8',
+    'low',
+  ]);
 });
 
 Deno.test('major UI/UX work is GLM-led or receives the mandatory GLM adversarial pass', () => {
@@ -161,6 +254,17 @@ Deno.test('major UI/UX work is GLM-led or receives the mandatory GLM adversarial
   }
   equal(lead.condition, 'lead_route_for_major_ui_ux_work');
   equal(adversarial.condition, 'required_before_merge_when_glm_not_lead');
+});
+
+Deno.test('OpenCode vision evaluation complements the mandatory GLM design pass', () => {
+  const route = resolveCanonicalRoute('adversarial_design_eval', new Date('2026-07-14T00:00:00Z'));
+  equal([route.agent, route.provider, route.model, route.effort], [
+    'opencode',
+    'openrouter',
+    OPENCODE_MODEL_IDS.visionEval,
+    'high',
+  ]);
+  equal(route.condition, 'vision_evidence_complements_required_glm_design_review');
 });
 
 Deno.test('deep-analysis Fable fallback requires classified Codex quota exhaustion', () => {

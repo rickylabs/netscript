@@ -15,6 +15,7 @@ import type { BuildResult } from '../../domain/deploy/compile-target.ts';
 import type { ResolvedConfig } from '../../domain/resolved-config.ts';
 import type { PublicCommandDependencies } from '../../../public/features/root/public-command-dependencies.ts';
 import { createDeployCommand } from '../../../public/features/deploy/deploy-group.ts';
+import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
 import type { InitPipelineContext } from './context.ts';
 import { scaffoldRoot } from './plan-init.ts';
 
@@ -125,7 +126,7 @@ function extractDeployInvocations(workflow: string): string[][] {
       continue;
     }
 
-    if (trimmed === 'deno x -A jsr:@netscript/cli "${args[@]}"') {
+    if (trimmed === `deno x -A ${netscriptJsrSpecifier('cli')} "\${args[@]}"`) {
       if (!shellArgs) throw new Error('Found args invocation before args array declaration.');
       invocations.push(shellArgs);
       if (optionalShellArgs.length > 0) {
@@ -134,7 +135,7 @@ function extractDeployInvocations(workflow: string): string[][] {
       continue;
     }
 
-    if (!trimmed.startsWith('deno x -A jsr:@netscript/cli ')) continue;
+    if (!trimmed.startsWith(`deno x -A ${netscriptJsrSpecifier('cli')} `)) continue;
 
     const commandLines = [trimmed];
     for (let cursor = index + 1; cursor < lines.length; cursor++) {
@@ -166,14 +167,17 @@ Deno.test('scaffoldRoot emits CI/CD workflow templates for shipped deploy target
   const bareMetal = scaffolder.files.get(bareMetalPath);
 
   assertStringIncludes(compose ?? '', 'deploy compose plan');
+  assertStringIncludes(compose ?? '', netscriptJsrSpecifier('cli'));
   assertStringIncludes(compose ?? '', '--clear-cache');
   assertStringIncludes(compose ?? '', 'ghcr.io');
   assert(!compose?.includes('~/.aspire/deployments'));
 
   assertStringIncludes(denoDeploy ?? '', 'deploy deno-deploy up');
+  assertStringIncludes(denoDeploy ?? '', netscriptJsrSpecifier('cli'));
   assertStringIncludes(denoDeploy ?? '', 'DENO_DEPLOY_TOKEN');
 
   assertStringIncludes(bareMetal ?? '', 'deploy build');
+  assertStringIncludes(bareMetal ?? '', netscriptJsrSpecifier('cli'));
   assertStringIncludes(bareMetal ?? '', '--output-dir');
   assertStringIncludes(bareMetal ?? '', 'actions/upload-artifact');
   assertEquals(scaffolder.directories.has('/workspace/deploy-app'), true);
