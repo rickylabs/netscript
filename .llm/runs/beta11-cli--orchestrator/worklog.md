@@ -35,3 +35,9 @@ group launch; this section fixes the supervisor's surface.
   inherited origin/main upstream (unset; explicit-refspec push rule), narrow fetch refspec
   (explicit fetch of the integration branch). G2/G4 stop at their group Plan & Design for the
   nested Plan-Gate; G1 is a single-scope fix on run-loop directly.
+- 2026-07-17 · G1 #826: Codex delivered Plan & Design (draft PR #847, commit 7d46741f, pushed).
+  Tier-A substantive plan review: PASS — archetype 4 + service overlay correct; additive optional
+  `configured` on `HealthCheck`, filter-before-invocation, per-adapter sentinel tests, no
+  name-based dispatch. Steer issued on resume (thread 019f720b-8290…): the knob must be wired by
+  host/composition/scaffold so the fix is end-to-end (a SQLite-only app really excludes MySQL),
+  scaffold.runtime assertion proves that shape. Implementation unlocked for G1.
