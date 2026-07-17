@@ -98,6 +98,7 @@ native packaging logic to the dev registration block.
 | 2026-07-17 | S2 | Unit proof | All five `generators-*_test.ts` files passed: 11 tests / 122 steps. The desktop test asserts build declaration → window declaration → `waitForCompletion(build)` source order and exact no-separator CEF argv. |
 | 2026-07-17 | S2 | Implementation handoff | Committed `2dc0c809`, pushed by explicit refspec, changed the PR lifecycle label to `status:impl`, and posted PR comment `5007903543` with scope and gate evidence. Full `scaffold.runtime` and evaluator dispatch remain supervisor-owned. |
 | 2026-07-18 | S2-fix | CI correction | Removed the conditional `AppEntryZod` transform because Zod cannot emit it as JSON Schema. Desktop opt-in remains enforced by the generated `=== true` guard; D3 boundary reduction is recorded in `drift.md`. |
+| 2026-07-18 | S2-fix | Fix handoff | Committed `f43b1345`, pushed by explicit refspec, and posted PR comment `5007974717` with root cause, drift rationale, and complete gate evidence. |
 
 ## Decisions
 
