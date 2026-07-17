@@ -60,6 +60,25 @@ execute kickoff deliverable 5 (the #820 comment + `drafts/` files) and stage-H r
 OF-A..OF-K. Resume via `context-pack.md`; the eval launch recipe is `.llm/tmp/rfc820/
 launch-eval.ts` + `plan-eval-brief.md` (route: Sol·max through the agentic app-server client).
 
+## Handoff — beta-11 orchestrator spawned (final act of this run, 2026-07-17 ~23:35 UTC)
+
+Owner directive: beta-11 is a go. Spawned the **beta-11 orchestrator** on the beta-10 pattern:
+
+- **Kickoff:** `.llm/runs/beta11-cli--orchestrator/kickoff.md` — charter = milestone 13
+  (`0.0.1-beta.11`, the re-prioritized board: Desktop Frontend epic #840 + #841/#842/#843 +
+  re-scoped #452/#456/#457 + #826 + unified seed #824); skills, lane-policy routing, agentic-
+  toolchain-only sub-agents, generator≠evaluator + Tier-A review; **hard stop-lines stated in
+  the kickoff AND required verbatim in every sub-brief** (beta-8 breach lesson): no main-merge
+  without CI-green + eval-PASS + authorization; HARD STOP before any release publish and before
+  closing milestone 13 (owner in-turn sign-off only); #824 seed drafts-only. Codex-reset
+  addendum included (routes unrestricted; 3 resets remain).
+- **Launch:** tmux session `beta11-orch`, cwd `/home/codex/repos/netscript-beta10-cli`,
+  `claude --model claude-fable-5 --effort low --permission-mode bypassPermissions
+  --session-id 86d308d5-c761-4e5d-a41f-8be959bc46d2` with the verbatim-kickoff prompt; /rc
+  enabled via tmux send-keys retry loop (link recorded in the worklog handoff row).
+- **Context handed:** this run dir, PR #822 (rfc.md rev 13), #820, epic addenda, verified
+  upstream facts.
+
 ## Record map
 
 `plan.md` rev 9 (the RFC) · `research.md` (forensics + gaps + re-baseline + debt) ·

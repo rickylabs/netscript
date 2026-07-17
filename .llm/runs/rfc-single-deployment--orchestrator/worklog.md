@@ -197,6 +197,8 @@ Seed/RFC run — the gate of record is PLAN-EVAL (Sol·max, separate session). N
 
 | 2026-07-17 | ratify+file | **Windows hybrid tier (owner-identified) incorporated** | Upstream verified: denoland/deno#33965 = `Deno.cron.persistent` API scaffold (schtasks/crontab/launchd registration, CF-style `default.scheduled`) — OPEN, backends pending → wrap-don't-block posture. Filed: **#844** PM-C Task Scheduler adapter (beta.13, #510 child — PM-19 compile splits by start policy: resident→Servy, cron→Scheduled Task) + **#845** hybrid tier (beta.13, #327 child — window app + OS-supervised sidecars; prosumer CLI install v1, no .NET dep; consumer MSI → #833/#825 @ beta.14); #510/#327 addenda; RFC rev 13 (§5 beta.13 row, OF-M, §8); PR #822 updated |
 
+| 2026-07-17 | handoff | **beta-11 orchestrator SPAWNED (final act)** | Owner: beta-11 is a go. kickoff `.llm/runs/beta11-cli--orchestrator/kickoff.md` (charter = milestone 13; skills + lane-policy routing + agentic-toolchain-only; hard stop-lines in kickoff + required in every sub-brief; Codex-reset addendum). tmux `beta11-orch`, `claude --model claude-fable-5 --effort low --permission-mode bypassPermissions --session-id 86d308d5-c761-4e5d-a41f-8be959bc46d2`; /rc live → **https://claude.ai/code/session_01Li9hR82jgy6Y6468Svbswd**. Confirmed initialized + executing (2 sub-agents, PR #822 in context). Context handed: this run dir + PR #822 + #820. closure.md handoff section written |
+
 ## Handoff Notes
 
 - Evaluator: read kickoff.md, research.md, plan.md. Verdict scope = the RFC design (PLAN-EVAL on
