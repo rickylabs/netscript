@@ -122,6 +122,10 @@ envelope or route family.
 | 2026-07-18 02:05 CEST | 1 | implementation | Added SDK-derived target/format contracts, pure invocation planner, #452 task-hook orchestration, CLI parser/group registration, docs, and 19 focused tests. |
 | 2026-07-18 02:15 CEST | 1 | gate set complete | Full CLI 397/416; 698-file static gates, quality, root arch, doc/JSR/publish and import scans pass. Focused doctrine is baseline-only at deploy count 14. |
 | 2026-07-18 02:18 CEST | 1 | reconciliation | Live #456/PR #854 swept; draft/base/body/labels/milestone correct, no new direction, status remains `status:impl`. |
+| 2026-07-18 02:30 CEST | 1 | Tier-A PASS | Supervisor accepted `ffb7e896`, including planner/DMG/hook fixtures, baseline attribution, and the single SDK lock line. |
+| 2026-07-18 03:00 CEST | 2 | implementation | Added bsdiff wrapper, SHA-256 native patch composition, exact-string Ed25519 signing, prepare CLI, and private route store. |
+| 2026-07-18 03:10 CEST | 2 | security proof | OS lock permits one concurrent winner; lower/equal rejected; manifest failure test proves patches then high-water and safe sequence burn. |
+| 2026-07-18 03:20 CEST | 2 | gate set complete | Focused 28/4; full CLI 406/416; 708-file static, quality, arch, doc/JSR/publish and import scans pass. |
 
 ## Decisions
 
@@ -159,6 +163,9 @@ envelope or route family.
 | Full CLI test directory | `deno task test` in `packages/cli` | PASS | 397 passed, 416 steps, 0 failed. |
 | Scoped check/lint/fmt | repo wrappers, `--root packages/cli --ext ts,tsx` | PASS | 698 selected; zero findings. |
 | Import attributes | targeted `rg` scan | PASS | No text/JSON import attributes. |
+| Slice-2 focused tests | `deno test --allow-all packages/cli/src/public/features/deploy/target/desktop/` | PASS | 28 passed, 4 steps, 0 failed. |
+| Slice-2 full CLI | `deno task test` in `packages/cli` | PASS | 406 passed, 416 steps, 0 failed. |
+| Slice-2 scoped static | check/lint/fmt wrappers | PASS | 708 files, zero findings. |
 
 ### Fitness Gates
 
@@ -179,6 +186,7 @@ envelope or route family.
 | Local Deno surface                  | PASS                   | Deno 2.9.3 `desktop --help`          | Six explicit targets and requested formats/options confirmed.     |
 | Native signed payload compatibility | PASS (source research) | current upstream `cli/rt/desktop.rs` | Dynamic trusted payload parsing confirms compatible extra fields. |
 | Product runtime tests               | PASS | focused + full CLI suites | 19 focused; full CLI 397/416. |
+| Release signing/sequence tests | PASS | generated WebCrypto keys + temp filesystem | Exact bytes verify; strict high-water/concurrency/burn rules pass. |
 
 ### Consumer Gates
 

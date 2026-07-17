@@ -16,8 +16,8 @@ Research, the full plan, and the mandatory Design checkpoint are complete agains
 `e6e1be08`. Plan commit `f1a0d6c3` is pushed and draft PR
 [#854](https://github.com/rickylabs/netscript/pull/854) targets `feat/desktop-frontend` with the
 required metadata. The Tier-A Fable 5 supervisor approved D1–D21 and delivered group Plan-Gate
-`PASS`. Slice 1 implementation and local gates are complete; it is ready to commit, push, and stop
-for Tier-A review.
+`PASS`. Slice 1 commit `ffb7e896` passed Tier-A review. Slice 2 implementation and gates are
+complete and ready to commit, push, and stop for Tier-A review.
 
 ## Completed
 
@@ -41,15 +41,20 @@ for Tier-A review.
   preflight, and typed process failures.
 - Passed 19 focused tests, the full CLI test directory (397 tests / 416 steps), scoped static gates,
   quality scan, root architecture check, doc lint, JSR audit/dry-run, and import-attribute scan.
+- Recorded Tier-A S1 PASS for planner purity, explicit expansion, DMG preflight, exact hook argv,
+  baseline attribution, and the intentional SDK lock line.
+- Implemented native release preparation: external bsdiff adapter, SHA-256 patch map, exact-string
+  WebCrypto Ed25519 envelope, private route high-water, OS file locking, and safe promotion order.
+- Passed 28 focused desktop tests, full CLI tests (406 / 416 steps), and the complete S2 gate set.
 
 ## In Progress
 
-- Commit/push/comment slice 1, then pause without beginning slice 2.
+- Commit/push/comment slice 2, then pause without beginning slice 3.
 
 ## Next Steps
 
-1. Commit, push the explicit branch refspec, and post slice-1 evidence on PR #854.
-2. Stop for Tier-A review before slice 2.
+1. Commit, push the explicit branch refspec, and post slice-2 evidence on PR #854.
+2. Stop for Tier-A review before slice 3.
 
 ## Key Decisions
 
@@ -80,8 +85,8 @@ for Tier-A review.
 | ----------- | -------------- | -------- |
 | Static | PASS | 698-file check/lint/fmt; doc lint 0; dry-run exit 0 with baseline warnings. |
 | Fitness | PASS_WITH_BASELINE | quality and root arch pass; focused doctrine has baseline-only findings. |
-| Runtime | PASS | 19 focused tests; full CLI 397 tests / 416 steps. |
-| Consumer | S1 PASS | Configured `PackageTaskName` and default hook tests; URL parity remains locked S3. |
+| Runtime | PASS | 28 focused tests; full CLI 406 tests / 416 steps. |
+| Consumer | S1–S2 PASS | Exact hook argv and native envelope/sequence composition; URL parity remains S3. |
 
 ## Open Questions
 
@@ -99,5 +104,6 @@ for Tier-A review.
 
 - `f1a0d6c3` — `docs(harness): plan native desktop packaging` (research, locked plan, Design
   checkpoint, context, and drift).
+- `ffb7e896` — `feat(cli): add native desktop packaging pipeline` (Tier-A S1 PASS).
 - This metadata reconciliation commit records draft PR #854; after push, the PR commit list and
   phase comments are the canonical trail.

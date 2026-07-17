@@ -171,6 +171,23 @@ An unfiltered `--all-targets` includes `.dmg`, so run that complete matrix on ma
 use repeatable `--format` filters to omit it while still cross-compiling the remaining targets.
 Native installers are unsigned at this stage; signing and notarization remain external CI steps.
 
+Prepare a native update after CI has retained the current and previous runtime libraries:
+
+```bash
+netscript deploy desktop release prepare \
+  --channel stable --target linux-x86_64 \
+  --version 1.2.0 --sequence 42 \
+  --current-runtime dist/1.2.0/libdenort.so \
+  --from 1.1.0=dist/1.1.0/libdenort.so \
+  --private-key-file .secrets/update-ed25519.pem
+```
+
+Preparation requires read access to the runtime libraries and PKCS#8 Ed25519 private key, write
+access to `.deploy/desktop/releases`, and run access to an external bsdiff 4.x-compatible
+executable. The key stays local to the authoring process. Each route keeps private strict-monotonic
+sequence state; a failed final manifest replacement burns that sequence, so retry with a higher
+number. Immutable patches are written first, private high-water second, and `latest.json` last.
+
 Cloud authentication and RBAC are deliberately **operator-owned**. NetScript does not mint cloud
 credentials, assign RBAC, or hand-author Helm, Bicep, Kubernetes, or Azure manifests: AppHost-backed
 targets delegate to Aspire after validation, and Cloud Run owns only the image build/push/apply seam.

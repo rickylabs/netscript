@@ -17,5 +17,11 @@ Deno.test('desktop deploy group exposes the native package command', () => {
     resolveProjectRoot: () => Promise.resolve('/project'),
   });
 
-  assertEquals(command.getCommands().map((entry) => entry.getName()), ['package']);
+  assertEquals(command.getCommands().map((entry) => entry.getName()), ['package', 'release']);
+  assertEquals(
+    command.getCommands().find((entry) => entry.getName() === 'release')?.getCommands().map((entry) =>
+      entry.getName()
+    ),
+    ['prepare'],
+  );
 });

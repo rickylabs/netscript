@@ -13,6 +13,7 @@ import type { FileSystemPort } from '../../../../../kernel/ports/file-system-por
 import { DesktopPackageError } from './package/desktop-package-contract.ts';
 import { createDesktopPackageCommand } from './package/package-desktop-command.ts';
 import { packageDesktop } from './package/package-desktop.ts';
+import { createDesktopReleaseCommand } from './release/release-group.ts';
 
 /** Dependencies required by the desktop deployment command group. */
 export interface DesktopDeployCommandDependencies {
@@ -63,5 +64,6 @@ export function createDesktopDeployCommand(
           });
         },
       }),
-    );
+    )
+    .command('release', createDesktopReleaseCommand(dependencies));
 }
