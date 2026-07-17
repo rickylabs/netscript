@@ -12,3 +12,17 @@
 - **Severity:** significant
 - **Action:** fix
 - **Evidence:** supervisor verdict in `plan-eval.md`; plan D6/D7; PR #847.
+
+## 2026-07-17 — Runtime probe upgraded from status-only to aggregate semantics
+
+- **What:** The existing `scaffold.runtime` users-service probe was retained and strengthened to
+  parse `/health`, require healthy aggregate status, and require exactly the selected database
+  adapter.
+- **Source:** Tier-A requirement that the scaffold assertion prove the SQLite end-to-end response
+  shape rather than only the package predicate.
+- **Expected:** A new health-path assertion might require adding another runtime service probe.
+- **Actual:** The canonical suite already discovers the generated users service via `aspire
+  describe`; only its response validation was missing.
+- **Severity:** minor
+- **Action:** fix
+- **Evidence:** `runtime-gates.ts` and its SQLite builder regression test.

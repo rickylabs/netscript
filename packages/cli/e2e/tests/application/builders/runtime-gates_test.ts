@@ -71,6 +71,24 @@ Deno.test('runtime gates skip database resource wait for sqlite', () => {
   assertEquals(gateIds.includes(GATE.RUNTIME_WAIT_GARNET), true);
 });
 
+Deno.test('runtime service health gate asserts only the selected sqlite adapter', () => {
+  const gate = createRuntimeGates(DATABASE.SQLITE).find((entry) =>
+    entry.id === GATE.BEHAVIOR_SERVICE_HEALTH
+  );
+  if (gate?.kind !== 'command') {
+    throw new Error('Expected service health gate to be a command gate.');
+  }
+
+  const command = gate.command({
+    project: { appHost: '/workspace/app/aspire/apphost.mts' },
+  } as RunContext);
+
+  assertEquals(command.at(-1), DATABASE.SQLITE);
+  assertEquals(command[2].includes('health.checks'), true);
+  assertEquals(command[2].includes('databaseChecks.length === 1'), true);
+  assertEquals(command[2].includes('database:${expectedDatabase}'), true);
+});
+
 Deno.test('runtime gates wait for mssql resource with extended timeout when mssql is selected', () => {
   const gateIds = createRuntimeGates(DATABASE.MSSQL).map((entry) => entry.id);
 

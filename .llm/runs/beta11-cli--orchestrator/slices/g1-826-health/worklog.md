@@ -63,6 +63,8 @@ them from execution, status, and details.
 | 2026-07-17 | 0     | plan-eval      | Tier-A supervisor reported PASS with required host-wiring expansion; plan and drift updated before implementation.                                                                                                                                             |
 | 2026-07-17 | 1     | implementation | Added pre-invocation filtering, adapter options, provider-aware `defineService` composition, and regression tests.                                                                                                                                             |
 | 2026-07-17 | 1     | gates          | Focused/full package tests, consumer compile, scoped wrappers, doc lint, quality scan, and architecture check pass. Initial format finding was corrected; an initial full-test invocation lacked `--allow-write`, then passed with the TLS fixture permission. |
+| 2026-07-17 | 2     | implementation | Extended the canonical `scaffold.runtime` users-service health gate to inspect aggregate JSON and require exactly the selected database adapter; SQLite now rejects any MySQL check in the runtime response. |
+| 2026-07-17 | 2     | focused gate   | Runtime-gate builder tests pass: 7 passed, 0 failed. Full `scaffold.runtime` remains supervisor-owned. |
 
 ## Decisions
 
@@ -91,6 +93,9 @@ them from execution, status, and details.
 | Scoped lint          | `run-deno-lint.ts --root packages/service --ext ts,tsx`  | PASS   | 40 files, zero diagnostics.                             |
 | Scoped format        | `run-deno-fmt.ts --root packages/service --ext ts,tsx`   | PASS   | 40 files, zero findings after correction.               |
 | Doc lint             | `deno task doc:lint --root packages/service --pretty`    | PASS   | Two entrypoints, zero diagnostics.                      |
+| CLI E2E scoped check | `run-deno-check.ts --root packages/cli/e2e --ext ts,tsx` | PASS   | 88 files, zero diagnostics.                             |
+| CLI E2E scoped lint  | `run-deno-lint.ts --root packages/cli/e2e --ext ts,tsx`  | PASS   | 88 files, zero findings.                                |
+| CLI E2E scoped fmt   | `run-deno-fmt.ts --root packages/cli/e2e --ext ts,tsx`   | PASS   | 88 files, zero findings.                                |
 
 ### Fitness Gates
 
@@ -105,6 +110,7 @@ them from execution, status, and details.
 | ----------------------- | ------- | ---------------- | --------------------------------------------------------------- |
 | focused service health  | PASS    | 12 focused tests | SQLite composition excludes unused MySQL with zero invocations. |
 | full `scaffold.runtime` | NOT_RUN | supervisor-owned | Expensive merge-readiness call.                                 |
+| runtime assertion unit | PASS    | 7 builder tests  | SQLite gate carries its database axis and asserts one matching database check. |
 
 ### Consumer Gates
 
@@ -117,6 +123,14 @@ them from execution, status, and details.
 Issue #826 remains open and PR #847 remains draft. No new feedback beyond the Tier-A PLAN-EVAL notes
 was found. The required scope expansion is reflected in `plan.md` and `drift.md`; no architecture
 debt was created.
+
+### Reconcile note — slice 2
+
+The canonical CLI E2E runner already probes the generated `users` resource through Aspire. The
+assertion now validates the aggregate body instead of accepting any 2xx response. It requires one
+database check named either `database` (single-client composition) or `database:<selected engine>`
+(multi-adapter composition), so a SQLite run fails if an unused MySQL adapter appears. The expensive
+runtime execution remains reserved for the supervisor merge-readiness pass.
 
 ## Handoff Notes
 
