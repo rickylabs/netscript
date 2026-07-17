@@ -73,4 +73,11 @@ comment (public-repo hygiene: eis-chat PR/issue numbers OK, no internal process 
 
 ## Commits
 
-- None — kickoff scoped this run to run-dir artifacts + a post-PASS #820 comment (never earned).
+- **Branch of record: `plan/rfc-single-deployment`** (fresh from `main` @ `ca72db14`) — commit
+  `11729a16` (the 63-file run record; cherry-pick of `9be5c7a5`) + the trail-update commit.
+  **Draft PR #822** (https://github.com/rickylabs/netscript/pull/822) carries the rev-10 revision
+  summary; docs-only labels incl. `ci:skip-e2e`/`ci:skip-scaffold`; Refs #820, no closing keyword.
+- History: the record was first pushed from the stale `feat/beta10-cli-integration` checkout by
+  mistake (PR #821 — closed with an explanatory comment; the accidental remote branch deleted;
+  local pointer reset to `f391190f`). Owner authorized the correction in-session.
+- The PR lands the record only — the #820 comment stays PASS-gated on the owner-run cycle-10 eval.
