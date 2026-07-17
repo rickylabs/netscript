@@ -50,7 +50,9 @@ entrypoint is the local public binary (`packages/cli/bin/netscript.ts`), while g
 resolve `@netscript/*` dependencies from JSR via `--source jsr`. This mode requires no JSR publish
 and no CLI install; it validates the branch's public CLI flow against already-published package
 versions. Public plugin dispatch uses Deno's `x` subcommand, with permissions before the JSR
-specifier.
+specifier. Published `jsr:@netscript/*` invocations also pass `--minimum-dependency-age=0`: release
+E2E deliberately tests lockstep artifacts published seconds earlier, so Deno's default supply-chain
+minimum-age window must not delay the production verdict by roughly 24 hours.
 
 Version pinning. The generated project pins `jsr:@netscript/*@<CLI deno.json version>`. The suite is
 green only when that version is already published on JSR. On `main`/alpha.4 -> published -> green.

@@ -87,7 +87,17 @@ Deno.test('published AI lifecycle gate reuses the published CLI version', () => 
   const command = gate.command(
     createContext('jsr:@netscript/cli@0.0.1-beta.9', PACKAGE_SOURCE.JSR),
   );
-  assertEquals(command[3], 'jsr:@netscript/plugin-ai@0.0.1-beta.9/cli');
+  assertEquals(command, [
+    'deno',
+    'x',
+    '-A',
+    '--minimum-dependency-age=0',
+    'jsr:@netscript/plugin-ai@0.0.1-beta.9/cli',
+    'add',
+    'tool',
+    'e2e-tool',
+    '--workspaceRoot=/repo/.llm/tmp/cli-e2e/prod-local-test',
+  ]);
 });
 
 function scaffoldInitGate(): CommandGateDefinition {

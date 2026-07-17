@@ -14,5 +14,22 @@
 
 ## Evidence
 
-Pending PLAN-EVAL.
+- PLAN-EVAL: PASS in separate local Qwen evaluator session; commit `4d9ca0f8`.
+- S1 implementation: direct published AI lifecycle `deno x` now carries the age override; the
+  anchored test asserts the complete array; README scopes the exception to release E2E.
+- Focused builder test: PASS, 5 passed / 0 failed.
+- Scoped check: PASS, 88 files, 0 findings (`--unstable-kv`).
+- Changed-file lint: PASS, 2 files, 0 findings.
+- Changed-file format check: PASS, 2 files, 0 findings.
+- Changed-file `quality:scan`: PASS, 2 files, 0 findings / allowances.
+- `arch:check`: PASS (exit 0); existing repository warnings only, no failures.
+- Opposite-family slice review: PASS from Claude Opus 4.8; independently confirmed command sweep,
+  flag placement, full-array test, README scope, and deferred call sites.
 
+## Reconcile
+
+- Draft PR #813 exists against `main`; no resolving issue was supplied, so no closing keyword is
+  appropriate.
+- Required taxonomy and milestone are applied; final phase status moves to `status:impl-eval` after
+  the slice push.
+- No reviewer comments required readjustment; no plan or doctrine drift discovered.
