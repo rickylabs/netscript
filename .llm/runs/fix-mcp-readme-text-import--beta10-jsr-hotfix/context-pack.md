@@ -12,7 +12,7 @@
 
 ## Current State
 
-Separate-session PLAN-EVAL passed. Slice 2 is implemented and reviewed: generated constants now carry MCP README, CLI schema/version, and affected plugin versions; publishable consumers no longer use import attributes.
+Separate-session PLAN-EVAL passed. Slices 2 and 3 are implemented and reviewed: generated constants replace publishable attributes, and release preflight plus mirrored release/JSR guidance now enforce the registry-safe rule.
 
 ## Completed
 
@@ -21,16 +21,17 @@ Separate-session PLAN-EVAL passed. Slice 2 is implemented and reviewed: generate
 - PLAN-EVAL passed in local Qwen session `f03ae1dd-da69-406a-b725-f3bf391255a8`.
 - Generated publish assets, all affected consumers, and the regeneration/freshness tasks are implemented.
 - MCP (45 tests), CLI, and six plugin checks pass; freshness is witnessed green and red; MCP publish dry-run and changed-file quality scan pass.
+- Release scanner tests pass; full preflight is green and an explicit seeded attribute is witnessed red; skill mirror sync passes.
 
 ## In Progress
 
-- Slice 3 release-preflight and release-guidance correction.
+- Slice 4 final evidence and separate IMPL-EVAL.
 
 ## Next Steps
 
-1. Commit, push, and comment slice 2.
-2. Finish and review the release-preflight/guidance slice.
-3. Run full fixed-tree and seeded-red release evidence.
+1. Commit, push, and comment slice 3.
+2. Re-run final required gates on the committed tree.
+3. Dispatch separate-session IMPL-EVAL and address any findings.
 
 ## Key Decisions
 
@@ -46,6 +47,8 @@ Separate-session PLAN-EVAL passed. Slice 2 is implemented and reviewed: generate
 | `.llm/runs/fix-mcp-readme-text-import--beta10-jsr-hotfix/` | new | Harness planning artifacts only. |
 | `.llm/tools/generate-publish-assets.ts`, `deno.json` | new/changed | Deterministic generation and freshness task. |
 | `packages/mcp`, `packages/cli`, `plugins/{ai,auth,sagas,streams,triggers,workers}` | changed | Generated assets and registry-safe consumers. |
+| `.llm/tools/release/preflight-text-imports.ts` + tests | changed | Publish-rule-aware import-attribute rejection and negative proof. |
+| `.agents/skills`, `.claude/skills` | changed | Corrected release/JSR registry guidance, synchronized mirrors. |
 
 ## Gates
 

@@ -58,6 +58,11 @@ Update the source README/schema/package metadata, run the publish-assets generat
 | 2026-07-17 | 2 | negative proof | Seeded stale plugin metadata made `check:publish-assets` exit 1; regeneration restored a green exit 0. |
 | 2026-07-17 | 2 | review | Supervisor reviewed generated source fidelity, consumer import paths, publish include coverage, and excluded test/verifier attributes; no scope gap found. |
 | 2026-07-17 | 2 | reconcile | #808 is closed and remains a non-closing `Refs #808`; PR #810 is draft with `status:impl`; no new reviewer comments required adjustment. |
+| 2026-07-17 | 3 | implement | Release preflight now rejects `with { type: ... }` syntax in publish-rule-filtered source and recommends generated constants for import-meta reads. |
+| 2026-07-17 | 3 | negative proof | Explicit seeded JSON attribute made the preflight CLI exit 1 with file/line evidence; the fixed full tree exits 0 with zero findings. |
+| 2026-07-17 | 3 | guidance | Corrected release and JSR-audit guidance in `.agents` and `.claude`; mirror sync and hook lock check pass. |
+| 2026-07-17 | 3 | review | Supervisor reviewed lexical stripping against strings/comments/templates, line attribution, publish-rule reuse, failure output, and mirror parity; no suppression or false-green path introduced. |
+| 2026-07-17 | 3 | reconcile | PR #810 remains draft and correctly references closed #808 without auto-close; no new comments or issue state require scope changes. |
 
 ## Decisions
 
@@ -89,6 +94,16 @@ Update the source README/schema/package metadata, run the publish-assets generat
 | MCP publish dry-run | PASS | `@netscript/mcp@0.0.1-beta.10` dry-run complete; generated README asset included |
 | architecture | PASS | `deno task arch:check` exit 0; baseline warnings only, no failures |
 
+### Slice 3 — release preflight and guidance
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| scanner tests | PASS | 7 passed, 0 failed; includes syntax seed and inert-region coverage |
+| fixed-tree preflight | PASS | text reads, import attributes, file URL conversions, and self-imports all report zero findings |
+| preflight negative proof | PASS | `.llm/tmp/seed-import-attribute.ts:1` produced `import-attributes — FAIL`, exit 1 |
+| release/JSR skill sync | PASS | `deno task agentic:check-claude` reports 17 skills / 21 mirrored files synchronized; lock unchanged |
+| focused wrapper fmt/lint | PASS | 3 release-tool TS files selected; 0 failed batches/findings |
+
 ## Handoff Notes
 
-- Evaluator should compare `MCP_PACKAGE_README` to `packages/mcp/README.md`, inspect generator check mode, and confirm remaining raw attributes are excluded tests/verifiers rather than publishable files.
+- Evaluator should compare `MCP_PACKAGE_README` to `packages/mcp/README.md`, inspect both negative proofs, and confirm remaining raw attributes are excluded tests/verifiers or inert generated template content rather than publishable syntax.
