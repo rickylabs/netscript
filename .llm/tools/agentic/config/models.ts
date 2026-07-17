@@ -24,7 +24,7 @@ export const MODEL_IDS = {
   fable: 'fable-5',
   /** Anthropic/Claude documentation/workflow model. */
   opus: 'opus-4.8',
-  /** Anthropic/Claude cost-efficient review model (token-limit fallback for Claude-family review pairings). */
+  /** Anthropic/Claude cost-efficient docs, chores, and token-limit review fallback. */
   sonnet: 'sonnet-5',
   /** Google/Antigravity CLI identifier. */
   antigravity: 'agy',
@@ -61,3 +61,9 @@ export const OPEN_EVALUATOR_MODEL_IDS: readonly [
   OPENROUTER_MODEL_IDS.qwen,
 ] as const;
 export type OpenEvaluatorModelId = typeof OPEN_EVALUATOR_MODEL_IDS[number];
+
+/** OpenRouter model ids invoked through the native OpenCode lane. */
+export const OPENCODE_MODEL_IDS = {
+  /** Vision-capable adversarial design evaluator. */
+  visionEval: 'openrouter/moonshotai/kimi-k2.6',
+} as const;

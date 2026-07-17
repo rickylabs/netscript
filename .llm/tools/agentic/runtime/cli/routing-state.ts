@@ -11,7 +11,9 @@ export function renderCanonicalEvaluatorRoutes(): string {
     ...routes.map((route) => {
       const constraint = route.evaluatorModelPolicy
         ? `policy=${route.evaluatorModelPolicy}`
-        : `evaluates=${route.evaluatesFamily}`;
+        : route.evaluatesFamily
+        ? `evaluates=${route.evaluatesFamily}`
+        : `condition=${route.condition ?? 'canonical'}`;
       return `  ${route.lane}: ${constraint} route=${route.agent}/${route.provider}/${route.model} effort=${route.effort}`;
     }),
   ].join('\n');

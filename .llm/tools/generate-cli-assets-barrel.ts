@@ -11,33 +11,41 @@
  *     .llm/tools/generate-cli-assets-barrel.ts
  */
 
-import { TEMPLATE_MANIFEST } from '../../packages/cli/src/kernel/assets/manifest.ts';
-import { freshUiRegistryManifest } from '../../packages/fresh-ui/registry.manifest.ts';
-import { PLUGIN_SKELETON_TEMPLATES } from '../../packages/plugin/src/kernel/assets/template-registry.ts';
+import { TEMPLATE_MANIFEST } from "../../packages/cli/src/kernel/assets/manifest.ts";
+import { freshUiRegistryManifest } from "../../packages/fresh-ui/registry.manifest.ts";
+import { PLUGIN_SKELETON_TEMPLATES } from "../../packages/plugin/src/kernel/assets/template-registry.ts";
 
 const CLI_OUTPUT_URL = new URL(
-  '../../packages/cli/src/kernel/assets/embedded.generated.ts',
+  "../../packages/cli/src/kernel/assets/embedded.generated.ts",
   import.meta.url,
 );
 const PLUGIN_OUTPUT_URL = new URL(
-  '../../packages/plugin/src/kernel/assets/embedded.generated.ts',
+  "../../packages/plugin/src/kernel/assets/embedded.generated.ts",
   import.meta.url,
 );
 const FRESH_UI_OUTPUT_URL = new URL(
-  '../../packages/fresh-ui/registry.generated.ts',
+  "../../packages/fresh-ui/registry.generated.ts",
   import.meta.url,
 );
 const SERVICE_OUTPUT_URL = new URL(
-  '../../packages/service/src/primitives/scalar.generated.ts',
+  "../../packages/service/src/primitives/scalar.generated.ts",
+  import.meta.url,
+);
+const SKILL_OUTPUT_URL = new URL(
+  "../../packages/cli/src/kernel/assets/skills.generated.ts",
+  import.meta.url,
+);
+const SKILL_MANIFEST_URL = new URL(
+  "../../skills/manifest.json",
   import.meta.url,
 );
 
 function importName(index: number): string {
-  return `template_${String(index).padStart(3, '0')}`;
+  return `template_${String(index).padStart(3, "0")}`;
 }
 
 function toImportSpecifier(path: string): string {
-  return path.startsWith('.') ? path : `./${path}`;
+  return path.startsWith(".") ? path : `./${path}`;
 }
 
 /**
@@ -53,7 +61,10 @@ function toImportSpecifier(path: string): string {
  * constants carry the same content with no import attribute, so they publish
  * cleanly and behave identically at runtime.
  */
-async function readAssetLiteral(baseUrl: URL, specifier: string): Promise<string> {
+async function readAssetLiteral(
+  baseUrl: URL,
+  specifier: string,
+): Promise<string> {
   const assetUrl = new URL(specifier, baseUrl);
   const content = await Deno.readTextFile(assetUrl);
   return JSON.stringify(content);
@@ -67,12 +78,12 @@ async function readAssetLiteral(baseUrl: URL, specifier: string): Promise<string
  * string literals, so regeneration reproduces the file byte-for-byte.
  */
 async function formatTypeScript(source: string): Promise<string> {
-  const command = new Deno.Command('deno', {
-    args: ['fmt', '--ext', 'ts', '-'],
-    cwd: new URL('../../', import.meta.url),
-    stdin: 'piped',
-    stdout: 'piped',
-    stderr: 'piped',
+  const command = new Deno.Command("deno", {
+    args: ["fmt", "--ext", "ts", "-"],
+    cwd: new URL("../../", import.meta.url),
+    stdin: "piped",
+    stdout: "piped",
+    stderr: "piped",
   });
   const process = command.spawn();
   const writer = process.stdin.getWriter();
@@ -80,7 +91,9 @@ async function formatTypeScript(source: string): Promise<string> {
   await writer.close();
   const { code, stdout, stderr } = await process.output();
   if (code !== 0) {
-    throw new Error(`deno fmt failed (exit ${code}): ${new TextDecoder().decode(stderr)}`);
+    throw new Error(
+      `deno fmt failed (exit ${code}): ${new TextDecoder().decode(stderr)}`,
+    );
   }
   return new TextDecoder().decode(stdout);
 }
@@ -90,7 +103,10 @@ async function renderCliEmbeddedContent(): Promise<string> {
 
   for (const [index, item] of TEMPLATE_MANIFEST.entries()) {
     const name = importName(index);
-    const literal = await readAssetLiteral(CLI_OUTPUT_URL, toImportSpecifier(item.path));
+    const literal = await readAssetLiteral(
+      CLI_OUTPUT_URL,
+      toImportSpecifier(item.path),
+    );
     entries.push(`const ${name} = ${literal};`);
   }
 
@@ -103,11 +119,11 @@ async function renderCliEmbeddedContent(): Promise<string> {
 
 import type { TemplateKey } from './manifest.ts';
 
-${entries.join('\n')}
+${entries.join("\n")}
 
 /** Embedded text content for every checked-in CLI template asset. */
 export const EMBEDDED_TEMPLATE_CONTENT: Record<TemplateKey, string> = {
-${map.join('\n')}
+${map.join("\n")}
 };
 `;
 }
@@ -118,7 +134,10 @@ async function renderPluginEmbeddedContent(): Promise<string> {
 
   for (const [index, path] of PLUGIN_SKELETON_TEMPLATES.entries()) {
     const name = importName(index);
-    const literal = await readAssetLiteral(PLUGIN_OUTPUT_URL, `../../templates/skeleton/${path}`);
+    const literal = await readAssetLiteral(
+      PLUGIN_OUTPUT_URL,
+      `../../templates/skeleton/${path}`,
+    );
     entries.push(`const ${name} = ${literal};`);
     map.push(`  '${path}': ${name},`);
   }
@@ -128,11 +147,11 @@ async function renderPluginEmbeddedContent(): Promise<string> {
 
 import type { PluginSkeletonTemplatePath } from './template-registry.ts';
 
-${entries.join('\n')}
+${entries.join("\n")}
 
 /** Embedded text content for every default plugin skeleton template asset. */
 export const PLUGIN_SKELETON_TEMPLATE_CONTENT: Record<PluginSkeletonTemplatePath, string> = {
-${map.join('\n')}
+${map.join("\n")}
 };
 `;
 }
@@ -140,7 +159,9 @@ ${map.join('\n')}
 async function renderFreshUiRegistryContent(): Promise<string> {
   const paths = [
     ...new Set(
-      freshUiRegistryManifest.items.flatMap((item) => item.files.map((file) => file.source)),
+      freshUiRegistryManifest.items.flatMap((item) =>
+        item.files.map((file) => file.source)
+      ),
     ),
   ].sort((left, right) => left.localeCompare(right));
   const entries: string[] = [];
@@ -156,17 +177,20 @@ async function renderFreshUiRegistryContent(): Promise<string> {
   return `// @generated by .llm/tools/generate-cli-assets-barrel.ts
 // Do not edit by hand. Run \`deno task gen:assets-barrel\`.
 
-${entries.join('\n')}
+${entries.join("\n")}
 
 /** Embedded text content for every file referenced by the Fresh UI registry manifest. */
 export const FRESH_UI_REGISTRY_CONTENT: Record<string, string> = {
-${map.join('\n')}
+${map.join("\n")}
 };
 `;
 }
 
 async function renderServiceEmbeddedContent(): Promise<string> {
-  const literal = await readAssetLiteral(SERVICE_OUTPUT_URL, '../../assets/scalar.min.js');
+  const literal = await readAssetLiteral(
+    SERVICE_OUTPUT_URL,
+    "../../assets/scalar.min.js",
+  );
 
   return `// @generated by .llm/tools/generate-cli-assets-barrel.ts
 // Do not edit by hand. Run \`deno task gen:assets-barrel\`.
@@ -176,19 +200,55 @@ export const SCALAR_MIN_JS: string = ${literal};
 `;
 }
 
+async function renderSkillEmbeddedContent(): Promise<string> {
+  const manifestText = await Deno.readTextFile(SKILL_MANIFEST_URL);
+  const manifest = JSON.parse(manifestText) as {
+    readonly files: readonly string[];
+  };
+  const files: Record<string, string> = {};
+  for (const path of manifest.files) {
+    files[path] = path === "manifest.json"
+      ? manifestText
+      : await Deno.readTextFile(
+        new URL(`../../skills/${path}`, import.meta.url),
+      );
+  }
+  const canonical = manifest.files.map((path) => `${path}\0${files[path]}`)
+    .join("\0");
+  const hashBytes = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(canonical),
+  );
+  const hash = [...new Uint8Array(hashBytes)].map((byte) =>
+    byte.toString(16).padStart(2, "0")
+  )
+    .join("");
+  return `// @generated by .llm/tools/generate-cli-assets-barrel.ts
+// Do not edit by hand. Run \`deno task gen:assets-barrel\`.
+
+/** Paths and content of the published NetScript agent skill bundle. */
+export const EMBEDDED_SKILL_FILES: Readonly<Record<string, string>> = ${
+    JSON.stringify(files)
+  };
+
+/** SHA-256 of canonical manifest-ordered skill paths and content. */
+export const EMBEDDED_SKILL_BUNDLE_HASH: string = '${hash}';
+`;
+}
+
 if (import.meta.main) {
-  if (Deno.args.includes('--help') || Deno.args.includes('-h')) {
+  if (Deno.args.includes("--help") || Deno.args.includes("-h")) {
     console.log(
       [
-        'generate-cli-assets-barrel.ts — regenerate embedded-asset barrels',
-        '(CLI, plugin, fresh-ui, service).',
-        '',
-        'Usage:',
-        '  deno run --allow-read --allow-write --allow-run \\',
-        '    .llm/tools/generate-cli-assets-barrel.ts',
-        '',
-        'Takes no flags (other than --help). Rewrites the *.generated.ts barrels in place.',
-      ].join('\n'),
+        "generate-cli-assets-barrel.ts — regenerate embedded-asset barrels",
+        "(CLI, plugin, fresh-ui, service).",
+        "",
+        "Usage:",
+        "  deno run --allow-read --allow-write --allow-run \\",
+        "    .llm/tools/generate-cli-assets-barrel.ts",
+        "",
+        "Takes no flags (other than --help). Rewrites the *.generated.ts barrels in place.",
+      ].join("\n"),
     );
     Deno.exit(0);
   }
@@ -208,5 +268,9 @@ if (import.meta.main) {
   await Deno.writeTextFile(
     SERVICE_OUTPUT_URL,
     await formatTypeScript(await renderServiceEmbeddedContent()),
+  );
+  await Deno.writeTextFile(
+    SKILL_OUTPUT_URL,
+    await formatTypeScript(await renderSkillEmbeddedContent()),
   );
 }

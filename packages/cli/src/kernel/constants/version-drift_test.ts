@@ -20,8 +20,10 @@ const PINNED_JSR_SPECIFIER = /jsr:@netscript\/[^@'"\s]+@0\.0\.1-alpha\.\d+/;
 const SRC_ROOT = fromFileUrl(new URL('../../', import.meta.url));
 const SELF_PATH = fromFileUrl(import.meta.url);
 const COMMAND_SOURCE_ROOTS = [
+  fromFileUrl(new URL('../../public/features/agent/', import.meta.url)),
   fromFileUrl(new URL('../../public/features/plugins/', import.meta.url)),
   fromFileUrl(new URL('../../../e2e/src/application/gates/', import.meta.url)),
+  fromFileUrl(new URL('../../../../mcp/src/', import.meta.url)),
 ] as const;
 const VERSIONLESS_NETSCRIPT_JSR_SPECIFIER =
   /(['"])jsr:@netscript\/[^@'"\s/]+(?:\/[^@'"\s]+)*\1/;
@@ -54,7 +56,7 @@ Deno.test('no hardcoded pinned NetScript JSR specifiers in CLI src', async () =>
   );
 });
 
-Deno.test('no version-less NetScript JSR specifiers in CLI command sources', async () => {
+Deno.test('no version-less NetScript JSR specifiers in framework command sources', async () => {
   const offenders: string[] = [];
 
   for (const root of COMMAND_SOURCE_ROOTS) {
@@ -73,8 +75,8 @@ Deno.test('no version-less NetScript JSR specifiers in CLI command sources', asy
   assertEquals(
     offenders,
     [],
-    `Found version-less NetScript JSR specifiers in CLI command sources. ` +
-      `Derive shell-out specifiers from the CLI release version:\n` +
+    `Found version-less NetScript JSR specifiers in framework command sources. ` +
+      `Derive emitted and spawned specifiers from a package release version:\n` +
       offenders.join('\n'),
   );
 });

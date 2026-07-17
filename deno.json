@@ -19,7 +19,7 @@
   "tasks": {
     "ci": "deno ci && deno task ci:quality && deno task coverage:functions && deno task publish:dry-run && deno task audit:critical",
     "ci:quality": {
-      "dependencies": ["check", "lint", "fmt:check", "deps:check"]
+      "dependencies": ["check", "lint", "fmt:check", "deps:check", "check:netscript-jsr-specifiers"]
     },
     "check": {
       "command": "deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(fresh-ui)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\"",
@@ -74,9 +74,13 @@
     "agentic:gh-watch": "deno run --no-lock --allow-env --allow-net .llm/tools/agentic/github/gh-watch.ts",
     "agentic:gh-token": "deno run --no-lock --allow-run --allow-env --allow-net .llm/tools/agentic/github/gh-token.ts",
     "agentic:claude-hook-log": "deno run --no-lock --allow-env --allow-write .llm/tools/agentic/claude/claude-hook-log.ts",
+    "agentic:opencode": "deno run --no-lock --allow-read --allow-run --allow-env .llm/tools/agentic/opencode/opencode-run.ts",
+    "agentic:opencode-eval": "deno run --no-lock --allow-read --allow-run --allow-env .llm/tools/agentic/opencode/opencode-eval.ts",
+    "agentic:opencode-web": "deno run --no-lock --allow-read --allow-run --allow-env .llm/tools/agentic/opencode/opencode-web.ts",
     "gen:assets-barrel": "deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-cli-assets-barrel.ts",
     "check:assets-barrel": "deno task gen:assets-barrel && git diff --exit-code -- packages/cli/src/kernel/assets/embedded.generated.ts packages/plugin/src/kernel/assets/embedded.generated.ts packages/fresh-ui/registry.generated.ts packages/service/src/primitives/scalar.generated.ts",
     "check:scaffold-versions": "deno run .llm/tools/validation/check-scaffold-versions.ts --pretty",
+    "check:netscript-jsr-specifiers": "deno run --allow-read .llm/tools/validation/check-netscript-jsr-specifiers.ts --pretty",
     "release:preflight": "deno run --allow-read .llm/tools/release/preflight-text-imports.ts",
     "release:cut": "deno run --allow-read --allow-write --allow-run --allow-env .llm/tools/release/cut.ts",
     "release:publish": "deno run --allow-net --allow-env --allow-run --allow-read .llm/tools/release/github-release.ts",
@@ -91,7 +95,7 @@
     "bench:conformance": "deno run --allow-all packages/bench/cli.ts conformance",
     "fmt": "deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" --write",
     "fmt:check": {
-      "command": "deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" --ignore-line-endings",
+      "command": "deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|packages/mcp/tests/fixtures/doctor/|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" --ignore-line-endings",
       "files": [
         "packages/**/*.ts",
         "packages/**/*.tsx",
@@ -102,7 +106,7 @@
       ]
     },
     "lint": {
-      "command": "deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(fresh-ui|cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\"",
+      "command": "deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(fresh-ui|cli)|packages/mcp/tests/fixtures/doctor/|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\"",
       "files": [
         "packages/**/*.ts",
         "packages/**/*.tsx",
@@ -136,7 +140,8 @@
     "exclude": [
       ".llm/",
       "tools/",
-      "packages/cli/"
+      "packages/cli/",
+      "packages/mcp/tests/fixtures/doctor/"
     ],
     "rules": {
       "tags": [
