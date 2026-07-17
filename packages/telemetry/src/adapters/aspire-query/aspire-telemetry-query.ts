@@ -20,6 +20,8 @@ import {
   normalizeSpan,
   normalizeTrace,
   selectItems,
+  selectSpans,
+  unwrapData,
 } from './aspire-telemetry-normalize.ts';
 
 /**
@@ -76,7 +78,7 @@ export class AspireTelemetryQuery implements TelemetryQueryPort {
       return traces;
     }
     return groupSpans(
-      selectItems(payload, ['spans', 'items'])
+      selectSpans(payload)
         .map(normalizeSpan)
         .filter((span) => span !== undefined),
     );
@@ -85,11 +87,11 @@ export class AspireTelemetryQuery implements TelemetryQueryPort {
   /** Return a single trace by identifier, or `undefined` when absent. */
   async getTrace(traceId: string): Promise<TelemetryTrace | undefined> {
     const payload = await this.#request(`traces/${encodeURIComponent(traceId)}`);
-    const trace = normalizeTrace(payload);
+    const trace = normalizeTrace(unwrapData(payload));
     if (trace) {
       return trace;
     }
-    const spans = selectItems(payload, ['spans', 'items'])
+    const spans = selectSpans(payload)
       .map(normalizeSpan)
       .filter((span) => span !== undefined);
     return groupSpans(spans).find((candidate) => candidate.traceId === traceId);
@@ -98,7 +100,7 @@ export class AspireTelemetryQuery implements TelemetryQueryPort {
   /** Return spans matching the supplied filter. */
   async querySpans(filter?: TraceQueryFilter): Promise<readonly TelemetrySpan[]> {
     const payload = await this.#request('spans', filter);
-    return selectItems(payload, ['spans', 'items'])
+    return selectSpans(payload)
       .map(normalizeSpan)
       .filter((span) => span !== undefined);
   }
@@ -130,8 +132,9 @@ export class AspireTelemetryQuery implements TelemetryQueryPort {
   /** Export matching traces as portable OTLP JSON. */
   async exportTraces(filter?: TraceQueryFilter): Promise<TelemetryOtlpJson> {
     const payload = await this.#request('traces/export', filter);
-    if (isObject(payload) && Array.isArray(Reflect.get(payload, 'resourceSpans'))) {
-      return { resourceSpans: Reflect.get(payload, 'resourceSpans') };
+    const data = unwrapData(payload);
+    if (isObject(data) && Array.isArray(Reflect.get(data, 'resourceSpans'))) {
+      return { resourceSpans: Reflect.get(data, 'resourceSpans') };
     }
     return { resourceSpans: [] };
   }

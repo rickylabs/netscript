@@ -68,7 +68,7 @@ Deno.test('AspireTelemetryQuery groups flat Aspire spans by trace id', async () 
           traceId: 'trace-a',
           spanId: 'span-1',
           name: 'queue.dequeue',
-          kind: 4,
+          kind: 5,
           startTimeUnixNano: '1000000000',
           statusCode: 1,
           attributes: { 'messaging.operation.name': 'dequeue' },
@@ -100,6 +100,47 @@ Deno.test('AspireTelemetryQuery groups flat Aspire spans by trace id', async () 
     seenUrls[0],
     'http://aspire.local/api/telemetry/traces?resource=workers&limit=20&follow=true',
   );
+});
+
+Deno.test('AspireTelemetryQuery flattens the live Dashboard OTLP envelope', async () => {
+  const query = new AspireTelemetryQuery({
+    fetch: () =>
+      Promise.resolve(jsonResponse({
+        data: {
+          resourceSpans: [{
+            resource: {
+              attributes: [
+                { key: 'service.name', value: { stringValue: 'workers' } },
+                { key: 'service.instance.id', value: { stringValue: 'workers-1' } },
+              ],
+            },
+            scopeSpans: [{
+              spans: [{
+                traceId: 'trace-live',
+                spanId: 'span-live',
+                name: 'job.execute',
+                kind: 5,
+                startTimeUnixNano: '1784264559849134500',
+                attributes: [{
+                  key: 'execution.id',
+                  value: { stringValue: 'execution-live' },
+                }],
+              }],
+            }],
+          }],
+        },
+        totalCount: 1,
+        returnedCount: 1,
+      })),
+  });
+
+  const spans = await query.querySpans();
+
+  assertEquals(spans.length, 1);
+  assertEquals(spans[0]?.kind, 'consumer');
+  assertEquals(spans[0]?.attributes['service.name'], 'workers');
+  assertEquals(spans[0]?.attributes['service.instance.id'], 'workers-1');
+  assertEquals(spans[0]?.attributes['execution.id'], 'execution-live');
 });
 
 Deno.test('AspireTelemetryQuery reads logs, resources, and metrics', async () => {

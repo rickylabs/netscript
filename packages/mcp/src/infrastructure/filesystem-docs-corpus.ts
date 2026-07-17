@@ -1,6 +1,7 @@
 import { extname, relative, resolve, SEPARATOR } from '@std/path';
 import {
   type DocsCorpusPort,
+  DocsCorpusUnavailableError,
   type DocsDocument,
   type DocsSearchMatch,
   type DocsSection,
@@ -67,8 +68,7 @@ export class FilesystemDocsCorpus implements DocsCorpusPort {
       rootReal = await Deno.realPath(this.#root);
     } catch (error) {
       if (error instanceof Deno.errors.NotFound) {
-        this.#documents = new Map();
-        return;
+        throw new DocsCorpusUnavailableError(this.#root);
       }
       throw error;
     }
@@ -86,13 +86,20 @@ export class FilesystemDocsCorpus implements DocsCorpusPort {
         const source = await Deno.readTextFile(realPath);
         cached = {
           mtime,
-          document: parseDocument(rootReal, realPath, source, this.#maxDocumentLength),
+          document: parseMarkdownDocument(
+            slugFromPath(relative(rootReal, realPath)),
+            source,
+            this.#maxDocumentLength,
+          ),
         };
         this.#cache.set(realPath, cached);
       }
       documents.set(cached.document.slug, cached.document);
     }
     for (const path of this.#cache.keys()) if (!seen.has(path)) this.#cache.delete(path);
+    if (documents.size === 0) {
+      throw new DocsCorpusUnavailableError(this.#root);
+    }
     this.#documents = documents;
   }
 }
@@ -112,15 +119,14 @@ async function* walkMarkdown(directory: string): AsyncGenerator<string> {
   }
 }
 
-function parseDocument(
-  root: string,
-  path: string,
+/** Parse one Markdown source into the shared docs document contract. */
+export function parseMarkdownDocument(
+  slug: string,
   source: string,
   maxLength: number,
 ): DocsDocument {
   const { attributes, body } = parseFrontMatter(source);
   const content = body.slice(0, maxLength);
-  const slug = slugFromPath(relative(root, path));
   const sections = parseSections(content);
   const firstHeading = sections.find((section) => section.level === 1)?.heading;
   const title = attributes.title || firstHeading || titleFromSlug(slug);
@@ -172,7 +178,8 @@ function parseSections(content: string): DocsSection[] {
   });
 }
 
-function rankDocument(
+/** Rank one parsed document against normalized lexical search terms. */
+export function rankDocument(
   document: DocsDocument,
   terms: readonly string[],
 ): DocsSearchMatch | undefined {
@@ -191,7 +198,8 @@ function rankDocument(
   return { slug: document.slug, title: document.title, snippet: snippet(body, firstTerm), score };
 }
 
-function tokenize(value: string): string[] {
+/** Normalize a free-text docs query into unique lexical terms. */
+export function tokenize(value: string): string[] {
   return [...new Set(value.toLocaleLowerCase().match(/[\p{Letter}\p{Number}]+/gu) ?? [])];
 }
 
@@ -220,7 +228,8 @@ function slugFromPath(path: string): string {
   return normalizeSlug(withoutIndex);
 }
 
-function normalizeSlug(slug: string): string {
+/** Normalize a docs lookup slug. */
+export function normalizeSlug(slug: string): string {
   return slug.trim().replace(/^\/+|\/+$/g, '').replace(/\.md$/i, '') || 'index';
 }
 
@@ -257,7 +266,8 @@ function isPublicDocsPath(path: string): boolean {
   );
 }
 
-function toSummary(document: DocsDocument): DocsSummary {
+/** Remove document bodies for bounded listing responses. */
+export function toSummary(document: DocsDocument): DocsSummary {
   const { content: _content, sectionContents: _sectionContents, ...summary } = document;
   return summary;
 }

@@ -20,6 +20,7 @@ Deno.test('project family passes valid workspace and generated plugin registry f
     ['plugin_registry', 'pass'],
     ['docs_root', 'pass'],
   ]);
+  assertStringIncludes(checks[1]?.summary ?? '', '3 module(s)');
 });
 
 Deno.test('project family fails invalid workspace and missing generated registry fixtures', async () => {

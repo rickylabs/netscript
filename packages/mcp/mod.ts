@@ -64,7 +64,11 @@ export type {
   TelemetryProbeResult,
 } from './src/domain/telemetry-probe-port.ts';
 export type { TelemetryEndpointEnvironment } from './src/domain/telemetry-endpoint.ts';
-export { MAX_INDEXED_DOC_LENGTH, slugifyDocsHeading } from './src/domain/docs-corpus-port.ts';
+export {
+  DocsCorpusUnavailableError,
+  MAX_INDEXED_DOC_LENGTH,
+  slugifyDocsHeading,
+} from './src/domain/docs-corpus-port.ts';
 export type {
   DocsCorpusPort,
   DocsDocument,
@@ -74,3 +78,8 @@ export type {
 } from './src/domain/docs-corpus-port.ts';
 export { FilesystemDocsCorpus } from './src/infrastructure/filesystem-docs-corpus.ts';
 export type { FilesystemDocsCorpusOptions } from './src/infrastructure/filesystem-docs-corpus.ts';
+export { EmbeddedDocsCorpus } from './src/infrastructure/embedded-docs-corpus.ts';
+export type {
+  EmbeddedDocsCorpusOptions,
+  EmbeddedDocsSource,
+} from './src/infrastructure/embedded-docs-corpus.ts';

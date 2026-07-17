@@ -7,6 +7,34 @@ export interface ProjectWiringDependencies {
   readonly exists: (path: string) => Promise<boolean>;
   /** Read UTF-8 project metadata. */
   readonly readText: (path: string) => Promise<string>;
+  /** List files below a generated-output directory, relative to that directory. */
+  readonly listFiles: (path: string) => Promise<readonly string[]>;
+}
+
+async function listFilesRecursively(root: string): Promise<readonly string[]> {
+  const files: string[] = [];
+  async function visit(directory: string, relativeDirectory = ''): Promise<void> {
+    const entries = [];
+    for await (const entry of Deno.readDir(directory)) entries.push(entry);
+    entries.sort((left, right) => left.name.localeCompare(right.name));
+    for (const entry of entries) {
+      const relativePath = relativeDirectory ? `${relativeDirectory}/${entry.name}` : entry.name;
+      if (entry.isDirectory) await visit(`${directory}/${entry.name}`, relativePath);
+      else if (entry.isFile) files.push(relativePath);
+    }
+  }
+  try {
+    await visit(root);
+  } catch (error) {
+    if (!(error instanceof Deno.errors.NotFound)) throw error;
+  }
+  return files;
+}
+
+function isGeneratedPluginRegistry(path: string): boolean {
+  const fileName = path.split('/').at(-1) ?? path;
+  return path === 'plugins.ts' || fileName.endsWith('.registry.ts') ||
+    fileName.endsWith('-registry.ts');
 }
 
 const defaultDependencies: ProjectWiringDependencies = {
@@ -20,6 +48,7 @@ const defaultDependencies: ProjectWiringDependencies = {
     }
   },
   readText: Deno.readTextFile,
+  listFiles: listFilesRecursively,
 };
 
 /** Check NetScript project metadata and generated plugin wiring. */
@@ -73,13 +102,16 @@ export class ProjectWiringDoctorFamily implements DoctorCheckFamily {
     if (await this.dependencies.exists(configPath)) {
       const configured = /\bplugins\s*:/.test(await this.dependencies.readText(configPath));
       if (configured) {
-        const registry = `${root}/.netscript/generated/plugins.ts`;
-        const present = await this.dependencies.exists(registry);
+        const generatedRoot = `${root}/.netscript/generated`;
+        const registries = (await this.dependencies.listFiles(generatedRoot)).filter(
+          isGeneratedPluginRegistry,
+        );
+        const present = registries.length > 0;
         checks.push({
           name: 'plugin_registry',
           status: present ? 'pass' : 'fail',
           summary: present
-            ? 'Generated plugin registry is present.'
+            ? `Generated plugin registries are present (${registries.length} module(s)).`
             : 'Plugins are configured but the generated registry is missing.',
           ...(present ? {} : { fix: 'Run `netscript generate plugins` from the project root.' }),
         });
