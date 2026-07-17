@@ -21,6 +21,7 @@ import {
   extractVerdict,
   type GitInfo,
   parseEvalVerdict,
+  parseGithubHostsOauthToken,
   parseOpenHandsStatusComment,
   parseRepoSlug,
   parseThreadInfo,
@@ -121,6 +122,22 @@ Deno.test('NETSCRIPT_WSL_USER/HOME override the defaults', () => {
     if (prevHome !== undefined) Deno.env.set('NETSCRIPT_WSL_HOME', prevHome);
     else Deno.env.delete('NETSCRIPT_WSL_HOME');
   }
+});
+
+Deno.test('gh hosts fallback extracts only github.com oauth_token without exposing siblings', () => {
+  const synthetic = [
+    'example.com:',
+    '    oauth_token: not-the-token',
+    'github.com:',
+    '    git_protocol: https',
+    '    users:',
+    '        octocat:',
+    '    oauth_token: "synthetic-secret"',
+    '    user: octocat',
+  ].join('\n');
+  assertEquals(parseGithubHostsOauthToken(synthetic), 'synthetic-secret');
+  assertEquals(parseGithubHostsOauthToken(synthetic, 'missing.example'), null);
+  assertEquals(parseGithubHostsOauthToken('github.com:\n    oauth_token:'), null);
 });
 
 // --- sq (bash single-quoting) --------------------------------------------

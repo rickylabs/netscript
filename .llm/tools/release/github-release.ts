@@ -34,9 +34,15 @@
  *   deno task release:publish -- 0.0.1-alpha.20 --message "One-line intro." --dry-run
  */
 
-import { githubRequest, resolveGithubToken } from '../agentic/lib/agentic-lib.ts';
+import {
+  githubRequest,
+  type GitHubResponse,
+  resolveGithubToken,
+} from '../agentic/lib/agentic-lib.ts';
+import { discoverVersionFiles } from '../deps/bump-version.ts';
 
 const DEFAULT_REPO = 'rickylabs/netscript';
+export const CANARY_PAIR_STATUS_CONTEXT = 'release/canary-pair';
 
 export interface ClosedIssue {
   readonly number: number;
@@ -103,6 +109,181 @@ export function toVersion(input: string): string {
 /** The canonical release tag for a version (`v` + bare version). */
 export function toTag(version: string): string {
   return `v${toVersion(version)}`;
+}
+
+export interface CanaryPairDependencies {
+  readonly revParse: (root: string, revision: string) => Promise<string>;
+  readonly changedFiles: (root: string) => Promise<readonly string[]>;
+  readonly versionFiles: (root: string) => Promise<readonly string[]>;
+  readonly fileAtRevision: (root: string, revision: string, path: string) => Promise<string>;
+  readonly request: typeof githubRequest;
+}
+
+const defaultCanaryPairDependencies: CanaryPairDependencies = {
+  revParse: runGitRevParse,
+  changedFiles: runGitChangedFiles,
+  versionFiles: discoverVersionFiles,
+  fileAtRevision: runGitFileAtRevision,
+  request: githubRequest,
+};
+
+/** True only when the current commit changed release-version files and nothing else. */
+export function isVersionOnlyReleaseDiff(
+  root: string,
+  changedFiles: readonly string[],
+  versionFiles: readonly string[],
+): boolean {
+  if (changedFiles.length === 0) return false;
+  const normalizedRoot = normalizeGitPath(root).replace(/\/$/, '');
+  const allowed = new Set(
+    versionFiles.map((path) => {
+      const normalized = normalizeGitPath(path);
+      return normalized.startsWith(`${normalizedRoot}/`)
+        ? normalized.slice(normalizedRoot.length + 1)
+        : normalized;
+    }),
+  );
+  return changedFiles.every((path) => allowed.has(normalizeGitPath(path)));
+}
+
+/** True only when every changed file is exactly the coordinated version replacement. */
+export function isExactVersionReplacement(
+  before: string,
+  after: string,
+  previousVersion: string,
+  nextVersion: string,
+): boolean {
+  // Keep this byte-for-byte rule aligned with deps/bump-version.ts::replaceVersionFiles.
+  return previousVersion !== nextVersion &&
+    before.replaceAll(previousVersion, nextVersion) === after;
+}
+
+/**
+ * Enforce the mandatory green canary-publish + canary-pinned production-E2E
+ * status for the same content. A stable version-only commit may inherit the
+ * evidence attached to its immediate parent; any source delta fails closed.
+ */
+export async function verifyGreenCanaryPair(
+  repo: string,
+  token: string,
+  root: string = Deno.cwd(),
+  dependencies: CanaryPairDependencies = defaultCanaryPairDependencies,
+): Promise<string> {
+  const current = await dependencies.revParse(root, 'HEAD');
+  if (await hasGreenCanaryPair(repo, token, current, dependencies.request)) return current;
+
+  const changed = await dependencies.changedFiles(root);
+  const versionFiles = await dependencies.versionFiles(root);
+  if (isVersionOnlyReleaseDiff(root, changed, versionFiles)) {
+    const parent = await dependencies.revParse(root, 'HEAD^');
+    const parentRoot = await dependencies.fileAtRevision(root, parent, 'deno.json');
+    const currentRoot = await dependencies.fileAtRevision(root, current, 'deno.json');
+    const previousVersion = readManifestVersion(parentRoot, `${parent}:deno.json`);
+    const nextVersion = readManifestVersion(currentRoot, `${current}:deno.json`);
+    const exactReplacement = await everyAsync(changed, async (path) => {
+      const before = await dependencies.fileAtRevision(root, parent, path);
+      const after = await dependencies.fileAtRevision(root, current, path);
+      return isExactVersionReplacement(before, after, previousVersion, nextVersion);
+    });
+    if (exactReplacement) {
+      if (await hasGreenCanaryPair(repo, token, parent, dependencies.request)) return parent;
+      throw new Error(
+        `Stable publication blocked: neither ${current} nor its exact version-only parent ${parent} ` +
+          `has a green ${CANARY_PAIR_STATUS_CONTEXT} status. Run release:canary for this content ` +
+          'and wait for the canary-pinned e2e-cli-prod workflow to pass.',
+      );
+    }
+    throw new Error(
+      `Stable publication blocked: ${current} changed release manifests beyond the exact coordinated ` +
+        'version replacement, so its parent canary evidence cannot authorize this content.',
+    );
+  }
+
+  throw new Error(
+    `Stable publication blocked: ${current} has no green ${CANARY_PAIR_STATUS_CONTEXT} status, ` +
+      'and the immediate parent cannot be used because the current commit contains non-version ' +
+      'changes. Run a new canary pair for this exact content.',
+  );
+}
+
+async function hasGreenCanaryPair(
+  repo: string,
+  token: string,
+  sha: string,
+  request: typeof githubRequest,
+): Promise<boolean> {
+  const response: GitHubResponse = await request(
+    'GET',
+    `/repos/${repo}/commits/${sha}/status`,
+    token,
+  );
+  if (!response.ok || !Array.isArray(response.body?.statuses)) {
+    throw new Error(
+      `Canary-pair status lookup failed for ${sha}: HTTP ${response.status} ` +
+        `${JSON.stringify(response.body)}. Stable publication fails closed.`,
+    );
+  }
+  const status = response.body.statuses.find(
+    (entry: unknown) => isRecord(entry) && entry.context === CANARY_PAIR_STATUS_CONTEXT,
+  );
+  return isRecord(status) && status.state === 'success';
+}
+
+async function runGitRevParse(root: string, revision: string): Promise<string> {
+  return await runGit(root, ['rev-parse', revision]);
+}
+
+async function runGitChangedFiles(root: string): Promise<readonly string[]> {
+  const output = await runGit(root, ['diff', '--name-only', 'HEAD^', 'HEAD']);
+  return output.split(/\r?\n/).map((path) => path.trim()).filter(Boolean);
+}
+
+async function runGitFileAtRevision(
+  root: string,
+  revision: string,
+  path: string,
+): Promise<string> {
+  return await runGit(root, ['show', `${revision}:${normalizeGitPath(path)}`], false);
+}
+
+async function runGit(root: string, args: readonly string[], trim = true): Promise<string> {
+  const result = await new Deno.Command('git', {
+    args: [...args],
+    cwd: root,
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  const decoded = new TextDecoder().decode(result.stdout);
+  const stdout = trim ? decoded.trim() : decoded;
+  if (!result.success) {
+    const stderr = new TextDecoder().decode(result.stderr).trim();
+    throw new Error(`git ${args.join(' ')} failed: ${stderr || `exit ${result.code}`}`);
+  }
+  return stdout;
+}
+
+function readManifestVersion(source: string, label: string): string {
+  const parsed: unknown = JSON.parse(source);
+  if (!isRecord(parsed) || typeof parsed.version !== 'string') {
+    throw new Error(`${label} does not declare a string version.`);
+  }
+  return parsed.version;
+}
+
+async function everyAsync<T>(
+  values: readonly T[],
+  predicate: (value: T) => Promise<boolean>,
+): Promise<boolean> {
+  for (const value of values) if (!(await predicate(value))) return false;
+  return true;
+}
+
+function normalizeGitPath(path: string): string {
+  return path.replaceAll('\\', '/').replace(/^\.\//, '');
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 // ---------------------------------------------------------------------------
@@ -325,6 +506,11 @@ async function main(): Promise<void> {
 
   const { token, source } = await resolveGithubToken({ wslUser: plan.wslUser });
   console.error(`[release:publish] token source: ${source}`);
+
+  const canaryContentSha = await verifyGreenCanaryPair(plan.repo, token);
+  console.error(
+    `[release:publish] green canary pair: ${canaryContentSha} (${CANARY_PAIR_STATUS_CONTEXT})`,
+  );
 
   const previous = plan.prevTag
     ? { tag: plan.prevTag, since: '' }

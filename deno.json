@@ -86,6 +86,7 @@
     "release:cut": "deno run --allow-read --allow-write --allow-run --allow-env .llm/tools/release/cut.ts",
     "release:canary": "deno run --allow-read --allow-write --allow-run --allow-net=jsr.io .llm/tools/release/canary.ts",
     "release:publish": "deno run --allow-net --allow-env --allow-run --allow-read .llm/tools/release/github-release.ts",
+    "release:verify-canary-pair": "deno run --allow-net=api.github.com --allow-env=GH_TOKEN --allow-run=git --allow-read .llm/tools/release/verify-canary-pair.ts",
     "surface:diff": "deno run --allow-read --allow-write --allow-run .llm/tools/release/surface-diff.ts",
     "surface:diff:test": "deno test --allow-read .llm/tools/release/surface-diff_test.ts",
     "publish:dry-run": "deno run --allow-read --allow-write --allow-run .llm/tools/release/run-publish-dry-run.ts",
