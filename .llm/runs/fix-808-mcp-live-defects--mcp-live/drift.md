@@ -77,3 +77,18 @@ Drift is append-only.
 - **Action:** fix
 - **Evidence:** First `.llm/tmp/mcp-808-live-driver.ts` run; schema regression added to the captured
   Aspire fixture flow test.
+
+## 2026-07-17 — Scoped lint wrapper cannot parse the root workspace with Deno 2.9.3
+
+- **What:** The required lint wrapper selected the intended files but Deno exited before linting.
+- **Source:** Final scoped static gate over `packages/mcp` and the CLI MCP composition directory.
+- **Expected:** `run-deno-lint.ts` would emit a scoped lint verdict.
+- **Actual:** `deno lint` rejected the root wildcard workspace with
+  `invalid type: string
+  "packages/*", expected struct WorkspaceConfig`; the wrapper correctly
+  classified this as a tooling failure with zero lint findings. The same explicit file selections
+  pass when supplied a package/standalone config that avoids root workspace discovery.
+- **Severity:** minor
+- **Action:** accept
+- **Evidence:** wrapper exit 1/tooling-failure report; explicit-config lint passes for 59 MCP and 6
+  CLI MCP TypeScript files. No source suppression or workspace edit was introduced.

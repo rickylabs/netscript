@@ -28,7 +28,8 @@ Deno.test("agent MCP adapters expose real verbs and non-stub plugin doctor resul
       })),
     }])
   );
-  const executed: Array<{ path: readonly string[]; args: readonly string[] }> = [];
+  const executed: Array<{ path: readonly string[]; args: readonly string[] }> =
+    [];
   const executor: CommandExecutorPort = {
     execute: (request) => {
       executed.push(request);
@@ -62,7 +63,9 @@ Deno.test("agent MCP adapters expose real verbs and non-stub plugin doctor resul
     method: "tools/list",
   });
   assertEquals(
-    (listed?.result as { tools: Array<{ name: string }> }).tools.map((tool) => tool.name),
+    (listed?.result as { tools: Array<{ name: string }> }).tools.map((tool) =>
+      tool.name
+    ),
     [...TOOL_NAMES],
   );
   const commands = await server.handle({
@@ -92,7 +95,10 @@ Deno.test("agent MCP adapters expose real verbs and non-stub plugin doctor resul
     jsonrpc: "2.0",
     id: 5,
     method: "tools/call",
-    params: { name: "execute_command", arguments: { command: "deploy", args: [] } },
+    params: {
+      name: "execute_command",
+      arguments: { command: "deploy", args: [] },
+    },
   });
   assertEquals(denied?.result?.isError, true);
   assertStringIncludes(JSON.stringify(denied?.result), "deny_deploy");

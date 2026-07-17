@@ -79,6 +79,7 @@ return checks, while `doctor-flow.ts` alone owns cross-family aggregation and bo
 | 2026-07-17 | 3     | Docs composition         | CLI composition now indexes the package-shipped README as slug `mcp`; explicit flag/environment roots select the filesystem adapter. Missing or Markdown-empty overrides return `docs_corpus_not_found` with the resolved path and `--docs-root` remediation. MCP check + 45 tests, raw `deno doc --lint packages/mcp/cli.ts`, publish dry-run, and `arch:check` pass.                                   |
 | 2026-07-17 | 4     | Correct-path regression  | CLI composition test now asserts the exact 13-name order, populated `list_commands`, allowed `plugin list`, denied-before-spawn `deploy`, and the 25-check doctor path.                                                                                                                                                                                                                                  |
 | 2026-07-17 | 4     | Live re-validation       | Local maintainer CLI over newline stdio returned 13/13 tool PASS. Telemetry observed 11 resources / 42 spans; two runs; successful `get_run`; fresh job found; performance had 15 samples; docs list/search/get used slug `mcp`; commands returned 100; allowed plugin list exited 0 and deploy hit `deny_deploy`. Doctor returned a schema-valid four-family diagnostic with four top-level aggregates. |
+| 2026-07-17 | 4     | Final gates              | `quality:scan`, `arch:check`, MCP/CLI scoped checks, explicit-config scoped lint/fmt, raw doc lint, package dry-run, focused suites, and the final cleanup-on scaffold runtime pass. Final runtime summary: 60 passed, 0 failed; `aspire ps` is empty.                                                                                                                                                   |
 
 ### Live tool matrix — 2026-07-17
 
@@ -113,6 +114,7 @@ return checks, while `doctor-flow.ts` alone owns cross-family aggregation and bo
 | --------------------------------------------- | ----------- | ------------------ |
 | Owner waived evaluator dispatch               | significant | yes                |
 | Existing `./cli` private-type refs discovered | minor       | yes                |
+| Deno 2.9.3 scoped lint wrapper config failure | minor       | yes                |
 
 ## Gate Results
 
@@ -123,25 +125,33 @@ return checks, while `doctor-flow.ts` alone owns cross-family aggregation and bo
 | Pre-change doc lint wrapper | `deno task doc:lint --root packages/mcp --pretty` | PASS with contradictory detail | Wrapper exit 0/combined 0, but per-entry details show 5 private refs. |
 | Pre-change raw doc lint     | `deno doc --lint packages/mcp/cli.ts`             | FAIL                           | Five existing `private-type-ref` findings recorded for correction.    |
 | Pre-change package dry-run  | `packages/mcp: deno task publish:dry-run`         | PASS                           | No slow types; intended files only.                                   |
+| Final quality scan          | `deno task quality:scan`                          | PASS                           | No findings; no new suppressions.                                     |
+| MCP scoped check            | `run-deno-check.ts --root packages/mcp`           | PASS                           | 60 files, zero diagnostics.                                           |
+| CLI MCP scoped check        | `run-deno-check.ts --root .../agent/mcp`          | PASS                           | 6 files, zero diagnostics.                                            |
+| Scoped lint wrapper         | `run-deno-lint.ts` over the same roots            | TOOLING FAILURE                | Root wildcard workspace rejected by Deno 2.9.3; logged in drift.      |
+| Explicit-config lint        | Same 59 MCP / 6 CLI TypeScript files              | PASS                           | Fallback avoids only workspace discovery.                             |
+| Scoped format               | Same 59 MCP / 6 CLI TypeScript files              | PASS                           | Package/default style configs; no unrelated formatting.               |
+| Final raw doc lint          | `deno doc --lint packages/mcp/cli.ts`             | PASS                           | Zero private-type or other diagnostics.                               |
+| Final package dry-run       | `packages/mcp: deno task publish:dry-run`         | PASS                           | README text asset included; no slow types.                            |
 
 ### Fitness Gates
 
-| Gate        | Result  | Evidence                             | Notes                                        |
-| ----------- | ------- | ------------------------------------ | -------------------------------------------- |
-| F-CLI-1..31 | NOT_RUN | planned `arch:check` + manual review | Accepted horizontal skeleton debt unchanged. |
+| Gate        | Result | Evidence                               | Notes                                                |
+| ----------- | ------ | -------------------------------------- | ---------------------------------------------------- |
+| F-CLI-1..31 | PASS   | `deno task arch:check` + manual review | Exit 0; accepted horizontal skeleton debt unchanged. |
 
 ### Runtime Gates
 
-| Gate                | Result  | Evidence                    | Notes                           |
-| ------------------- | ------- | --------------------------- | ------------------------------- |
-| Live capture        | NOT_RUN | planned no-cleanup scaffold | Must precede S1 implementation. |
-| 13-tool live matrix | NOT_RUN | planned stdio driver        | Acceptance is 13/13.            |
+| Gate                | Result | Evidence                                    | Notes                                               |
+| ------------------- | ------ | ------------------------------------------- | --------------------------------------------------- |
+| Live capture        | PASS   | no-cleanup scaffold + raw Dashboard capture | Initial suite 58/58; fresh 13.4.6 fixture captured. |
+| 13-tool live matrix | PASS   | newline stdio against live scaffold         | 13/13 with exact names and both command directions. |
 
 ### Consumer Gates
 
-| Consumer         | Result  | Evidence                   | Notes                       |
-| ---------------- | ------- | -------------------------- | --------------------------- |
-| Scaffold runtime | NOT_RUN | planned final cleanup gate | Canonical one-pass command. |
+| Consumer         | Result | Evidence                                                           | Notes                                |
+| ---------------- | ------ | ------------------------------------------------------------------ | ------------------------------------ |
+| Scaffold runtime | PASS   | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | 60 passed, 0 failed; Aspire stopped. |
 
 ## Handoff Notes
 
