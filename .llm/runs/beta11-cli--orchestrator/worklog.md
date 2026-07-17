@@ -134,3 +134,6 @@ group launch; this section fixes the supervisor's surface.
   G5 #843 (Sol·medium, plan-first) + G11 #818 (Sol·medium, direction (a)+docs). Remaining after:
   G7 #457 e2e (needs G6 merged + owner Windows host), wave-close PR, docs track G12–G14,
   release-cut PR (owner merges).
+- 2026-07-18 · G3 #842 MERGED into integration (637c3915). NOTE: G5's worktree was cut before
+  this merge — its base lacks the #842 surfaces the brief references; steer at G5's Plan-Gate:
+  rebase onto updated origin/feat/desktop-frontend before implementation.

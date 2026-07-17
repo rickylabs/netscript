@@ -7,7 +7,7 @@ Live status of milestone-13 phase groups. Statuses: `pending` → `active` → `
 | --- | --- | --- | --- | --- | --- |
 | G1 | #826 | `fix/826-aggregate-health` | 1 | merged | PR #847 · IMPL-EVAL PASS · awaiting CI-green merge · thread 019f720b-8290-7542-975e-fcac3f562dc7 · wt-g1-826 · Sol·low |
 | G2 | #841 | `feat/desktop-frontend-841-autoupdate` | 1 | merged | into integration e6e1be08; #841 closes at wave PR (box 2 = #457) |
-| G3 | #842 | `feat/desktop-frontend-842-bindings` | 1 | eval-pass | IMPL-EVAL PASS · PR #853 merge loop · #842 boxes checked |
+| G3 | #842 | `feat/desktop-frontend-842-bindings` | 1 | merged | into integration 637c3915; #842 closes at wave PR |
 | G4 | #452 | `feat/desktop-frontend-452-generator` | 1 | merged | into integration f86a9191; #452/#375 close at wave PR · thread 019f720b-9692-7bd2-bd66-e43066365b88 · wt-g4-452 · Sol·medium · plan-first |
 | G5 | #843 | `feat/desktop-frontend-843-ui` | 2 | active | Sol·medium plan-first · wt-g5-843 |
 | G6 | #456 | `feat/desktop-frontend-456-packaging` | 2 | eval-pass | IMPL-EVAL PASS · merge loop · Refs-only |
