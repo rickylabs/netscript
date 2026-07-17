@@ -24,6 +24,13 @@ export interface FileUrlImportMetaFinding {
   guardLine?: number;
 }
 
+export interface ImportAttributeFinding {
+  check: 'import-attributes';
+  path: string;
+  line: number;
+  message: string;
+}
+
 export interface SelfImportFinding {
   path: string;
   line: number;
@@ -32,7 +39,7 @@ export interface SelfImportFinding {
   message: string;
 }
 
-type PreflightFinding = TextImportFinding | FileUrlImportMetaFinding;
+type PreflightFinding = TextImportFinding | FileUrlImportMetaFinding | ImportAttributeFinding;
 
 interface Options {
   root: string;
@@ -51,7 +58,7 @@ interface PublishConfig {
 
 const sourceExtensions = new Set(['.ts', '.tsx']);
 
-/** Scan one source file for import.meta-relative file reads that should be text imports. */
+/** Scan one source file for registry-unsafe asset loading. */
 export async function scanFile(path: string): Promise<PreflightFinding[]> {
   const source = await Deno.readTextFile(path);
   return scanSource(source, normalize(path));
@@ -67,10 +74,77 @@ export function scanSource(source: string, path: string): PreflightFinding[] {
   const scannable = blankTemplateLiterals(source);
   const importMetaPaths = collectImportMetaPathIdentifiers(scannable);
   return [
+    ...findImportAttributes(source, path),
     ...findIdentifierReads(scannable, path, importMetaPaths),
     ...findInlineReads(scannable, path),
     ...findImportMetaFileUrlConversions(scannable, path),
   ];
+}
+
+function findImportAttributes(source: string, path: string): ImportAttributeFinding[] {
+  const findings: ImportAttributeFinding[] = [];
+  const code = blankStringsAndComments(source);
+  // This conditional registry guard preserves the release lineage: #138/#142 exposed the alpha.6
+  // half-publish, #143 recovered with generated string constants, and beta.10 reproduced a partial
+  // publish tracked upstream as https://github.com/denoland/deno/issues/35546.
+  for (const match of code.matchAll(/\bwith\s*\{\s*type\s*:/g)) {
+    if (match.index === undefined) continue;
+    findings.push({
+      check: 'import-attributes',
+      path,
+      line: lineAt(source, match.index),
+      message:
+        'Import attributes are conditionally banned in publishable source; embed the asset as a generated TypeScript constant. Lift this ban only when https://github.com/denoland/deno/issues/35546 is fixed, merged, and released, and an authenticated canary publish of a text-import probe is green.',
+    });
+  }
+  return findings;
+}
+
+/** Blank strings, comments, and template literals while preserving line numbers. */
+export function blankStringsAndComments(source: string): string {
+  const output = [...source];
+  let index = 0;
+  const blank = (position: number): void => {
+    if (output[position] !== '\n' && output[position] !== '\r') output[position] = ' ';
+  };
+  while (index < source.length) {
+    const current = source[index];
+    const next = source[index + 1];
+    if (current === '/' && next === '/') {
+      while (index < source.length && source[index] !== '\n') blank(index++);
+      continue;
+    }
+    if (current === '/' && next === '*') {
+      blank(index++);
+      blank(index++);
+      while (index < source.length) {
+        if (source[index] === '*' && source[index + 1] === '/') {
+          blank(index++);
+          blank(index++);
+          break;
+        }
+        blank(index++);
+      }
+      continue;
+    }
+    if (current === "'" || current === '"' || current === '`') {
+      const quote = current;
+      blank(index++);
+      while (index < source.length) {
+        if (source[index] === '\\') {
+          blank(index++);
+          if (index < source.length) blank(index++);
+          continue;
+        }
+        const closing = source[index] === quote;
+        blank(index++);
+        if (closing) break;
+      }
+      continue;
+    }
+    index += 1;
+  }
+  return output.join('');
 }
 
 /**
@@ -432,7 +506,7 @@ function findIdentifierReads(
       read,
       declarationLine: declaration.line,
       message:
-        `${read} reads ${identifier}, declared from new URL(..., import.meta.url) on line ${declaration.line}; use a text import instead.`,
+        `${read} reads ${identifier}, declared from new URL(..., import.meta.url) on line ${declaration.line}; use a generated TypeScript string constant instead.`,
     });
   }
   return findings;
@@ -452,7 +526,8 @@ function findInlineReads(source: string, path: string): TextImportFinding[] {
       path,
       line,
       read,
-      message: `${read} reads new URL(..., import.meta.url) inline; use a text import instead.`,
+      message:
+        `${read} reads new URL(..., import.meta.url) inline; use a generated TypeScript string constant instead.`,
     });
   }
   return findings;
@@ -494,6 +569,12 @@ function isFileUrlImportMetaFinding(
   finding: PreflightFinding,
 ): finding is FileUrlImportMetaFinding {
   return finding.check === 'file-url-import-meta';
+}
+
+function isImportAttributeFinding(
+  finding: PreflightFinding,
+): finding is ImportAttributeFinding {
+  return finding.check === 'import-attributes';
 }
 
 function lineAt(source: string, index: number): number {
@@ -583,17 +664,27 @@ async function main(): Promise<void> {
     : await scanPublishSurface(options.root);
   const textReadFindings = textImportFindings.filter(isTextImportFinding);
   const fileUrlFindings = textImportFindings.filter(isFileUrlImportMetaFinding);
+  const importAttributeFindings = textImportFindings.filter(isImportAttributeFinding);
   const selfImportFindings = options.files.length > 0 ? [] : await scanSelfImports(options.root);
 
   if (
-    textReadFindings.length === 0 && fileUrlFindings.length === 0 && selfImportFindings.length === 0
+    textReadFindings.length === 0 && fileUrlFindings.length === 0 &&
+    importAttributeFindings.length === 0 && selfImportFindings.length === 0
   ) {
     console.log('release:preflight text-imports — PASS');
+    console.log('release:preflight import-attributes — PASS (0 findings)');
     console.log('release:preflight file-url-import-meta — PASS (0 findings)');
     if (options.files.length === 0) {
       console.log('release:preflight self-imports — PASS (0 findings)');
     }
     return;
+  }
+
+  if (importAttributeFindings.length > 0) {
+    console.error('release:preflight import-attributes — FAIL');
+    for (const finding of importAttributeFindings) {
+      console.error(`${relative(Deno.cwd(), finding.path)}:${finding.line}: ${finding.message}`);
+    }
   }
 
   if (textReadFindings.length > 0) {

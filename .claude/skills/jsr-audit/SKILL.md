@@ -182,9 +182,9 @@ This reveals:
 
 **The dry-run is a static gate, not proof of a working publish.** It never loads the module over the
 real `https:`/`jsr:` graph, so it cannot catch the runtime-only publish failures listed in
-[JSR publish gotchas](#jsr-publish-gotchas-netscript-grounded) — a green `--dry-run` is necessary but
-not sufficient. The authoritative post-publish check is the production CLI e2e (`e2e-cli-prod`), which
-installs and runs the published package over the remote graph.
+[JSR publish gotchas](#jsr-publish-gotchas-netscript-grounded) — a green `--dry-run` is necessary
+but not sufficient. The authoritative post-publish check is the production CLI e2e (`e2e-cli-prod`),
+which installs and runs the published package over the remote graph.
 
 ### Step 5: Audit the File List
 
@@ -561,18 +561,25 @@ here as the canonical home; the `deno doc --lint` full-export-surface bar is cov
 **`deno publish --dry-run` is NOT publish-equivalent.** Every trap below passes a clean dry-run and
 only fails at real publish/install time, because the dry-run analyzes the local source graph rather
 than loading the module over the remote `https:`/`jsr:` graph a consumer resolves. Treat a green
-dry-run as a static pre-check, never as the release verdict — the verdict is a real-publish preflight
-plus `e2e-cli-prod` against the published package.
+dry-run as a static pre-check, never as the release verdict — the verdict is a real-publish
+preflight plus `e2e-cli-prod` against the published package.
 
-- **Embed assets via import attributes, never `readTextFile`/`fromFileUrl`.** A published module runs
-  over an `https:`/`jsr:` graph where there is no filesystem, so `Deno.readTextFile(...)` /
-  `fromFileUrl(new URL(..., import.meta.url))` crash at runtime. Bundle text/JSON assets with import
-  attributes instead (`import data from "./x.json" with { type: "json" }`, `with { type: "text" }`).
-  Guard: `deno lint` + the production CLI e2e (`e2e-cli-prod`) exercise the real remote graph.
-- **Top-level `import.meta`/`fromFileUrl` crashes over https.** Same root cause as above but even for
-  path resolution: a top-level `fromFileUrl(new URL("...", import.meta.url))` throws when the module
-  is imported over `https:`/`jsr:`. Make it lazy (resolve inside the function that needs it) and
-  guard on `import.meta.url`'s protocol before touching the filesystem.
+- **Embed assets as generated TypeScript constants, never import attributes or runtime file reads.**
+  The JSR registry can reject `with { type: "text" }` or `with { type: "json" }` while building the
+  module graph even when local `deno publish --dry-run` passes. A published module also runs over an
+  `https:`/`jsr:` graph where `Deno.readTextFile(...)` /
+  `fromFileUrl(new URL(..., import.meta.url))` have no package filesystem. Generate checked-in
+  `*.generated.ts` constants and protect them with a regeneration-plus-diff freshness gate. Guard:
+  `release:preflight` + `e2e-cli-prod`. This import-attribute ban is conditional and preserves the
+  incident lineage: #138/#142 captured the alpha.6 half-publish, #143 recovered with string
+  constants, and beta.10 partially published before the registry-side failure was tracked as
+  [denoland/deno#35546](https://github.com/denoland/deno/issues/35546). Lift the ban only after that
+  issue is fixed, merged, and released **and** an authenticated canary publish of a text-import
+  probe is green.
+- **Top-level `import.meta`/`fromFileUrl` crashes over https.** Same root cause as above but even
+  for path resolution: a top-level `fromFileUrl(new URL("...", import.meta.url))` throws when the
+  module is imported over `https:`/`jsr:`. Make it lazy (resolve inside the function that needs it)
+  and guard on `import.meta.url`'s protocol before touching the filesystem.
 - **Self-referential subpath import trap (#188).** A package that imports its OWN bare specifier
   (e.g. `@netscript/x/sub` from inside `@netscript/x`) resolves at publish time against the LATEST
   PUBLISHED version on JSR, not the in-repo source — so the publish graph fails or silently binds an
@@ -584,8 +591,8 @@ plus `e2e-cli-prod` against the published package.
   a PATCH to the package config; otherwise ensure the `@module` doc carries the intended landing
   content.
 - **Prerelease-only packages show `latest=null`.** A package with only prerelease versions has JSR
-  `latest = null`, which renders a blank version badge/README on the package page. This self-heals at
-  the first non-prerelease (stable) publish; no config fix is needed.
+  `latest = null`, which renders a blank version badge/README on the package page. This self-heals
+  at the first non-prerelease (stable) publish; no config fix is needed.
 
 ## Known Limitations (2024-2025)
 

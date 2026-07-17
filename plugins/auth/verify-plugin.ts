@@ -10,7 +10,7 @@ import {
   verifyPlugin,
 } from '@netscript/plugin';
 import { authPlugin } from './mod.ts';
-import denoJson from './deno.json' with { type: 'json' };
+import { PLUGIN_PACKAGE_VERSION } from './src/package-metadata.generated.ts';
 
 export type { InspectionReport } from '@netscript/plugin';
 
@@ -18,7 +18,7 @@ export type { InspectionReport } from '@netscript/plugin';
 export function verifyAuthPlugin(): PluginVerificationResult {
   return verifyPlugin(authPlugin, {
     name: '@netscript/plugin-auth',
-    version: denoJson.version,
+    version: PLUGIN_PACKAGE_VERSION,
     services: [{ name: 'auth-api', message: 'expected an auth-api service contribution' }],
     contractVersions: [{
       version: 'v1',

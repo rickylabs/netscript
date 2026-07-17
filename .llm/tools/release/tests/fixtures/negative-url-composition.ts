@@ -1,4 +1,4 @@
-import readmeText from './sample.txt' with { type: 'text' };
+const readmeText = 'generated fixture content';
 
 const routeModule = new URL('../routes/index.ts', import.meta.url);
 const httpTarget = new URL('/openapi.json', 'https://example.test');

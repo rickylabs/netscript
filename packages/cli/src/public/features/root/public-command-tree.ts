@@ -18,7 +18,7 @@ import {
   createPublicCommandDependencies,
   type PublicCommandDependencies,
 } from './public-command-dependencies.ts';
-import cliMeta from '../../../../deno.json' with { type: 'json' };
+import { CLI_PACKAGE_VERSION } from '../../../kernel/assets/publish-assets.generated.ts';
 
 /** Host services supplied by the binary edge. */
 export interface PublicCliHost {
@@ -118,7 +118,7 @@ export function createPublicCommandTree(host: PublicCliHost): PublicCliCommand {
 
   return registry.program({
     name: 'netscript',
-    version: cliMeta.version,
+    version: CLI_PACKAGE_VERSION,
     description: 'NetScript - enterprise-grade polyglot backend framework CLI',
     context: { host, dependencies },
   });

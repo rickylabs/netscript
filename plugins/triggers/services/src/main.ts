@@ -58,7 +58,7 @@ import {
   type WebhookTestDelivery,
 } from '@netscript/plugin-triggers-core/runtime';
 import { TRIGGERS_API_DEFAULT_PORT, TRIGGERS_API_SERVICE_NAME } from '../../src/constants.ts';
-import denoJson from '../../deno.json' with { type: 'json' };
+import { PLUGIN_PACKAGE_VERSION } from '../../src/package-metadata.generated.ts';
 import type { KvStore } from '@netscript/kv';
 import { loadProjectTriggerDefinitions } from '../../src/runtime/project-trigger-registry.ts';
 import { createRuntimeTriggerProcessor } from '../../src/runtime/trigger-runtime-processor.ts';
@@ -133,7 +133,7 @@ export type {
 export type { TriggerServiceContext } from './routers/v1-types.ts';
 
 /** Connector version, single-sourced from the triggers package `deno.json`. */
-const VERSION: string = denoJson.version;
+const VERSION: string = PLUGIN_PACKAGE_VERSION;
 
 /** Legacy event-list path preserved for scaffold runtime smoke gates. */
 const LEGACY_EVENTS_PATH = '/api/v1/events' as const;

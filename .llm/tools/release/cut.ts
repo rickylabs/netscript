@@ -12,6 +12,7 @@ import {
   type GitHubResponse,
   resolveGithubToken,
 } from '../agentic/lib/agentic-lib.ts';
+import { PUBLISH_ASSET_OUTPUTS } from '../generate-publish-assets.ts';
 import { runReleasePreflight } from './preflight-release.ts';
 
 export interface ReleaseCutOptions {
@@ -209,6 +210,13 @@ async function main(): Promise<void> {
   const bump = await coordinateVersionBump(options.root, options.version);
   console.log(`release:cut bumped ${bump.oldVersion} -> ${bump.newVersion}`);
 
+  await runGate(
+    'gen:publish-assets',
+    'deno',
+    ['task', 'gen:publish-assets'],
+    options.root,
+  );
+
   const residue = await findVersionResidue(options.root, bump.oldVersion);
   if (residue.length > 0) {
     throw new Error(
@@ -229,7 +237,11 @@ async function main(): Promise<void> {
     return;
   }
 
-  await createReleasePr(options.root, options.version, bump.files);
+  const releaseFiles = [
+    ...bump.files,
+    ...PUBLISH_ASSET_OUTPUTS.map((path) => join(options.root, path)),
+  ];
+  await createReleasePr(options.root, options.version, releaseFiles);
   console.log(
     `Post-merge: publish GitHub Release v${options.version}; CI will publish and verify.`,
   );

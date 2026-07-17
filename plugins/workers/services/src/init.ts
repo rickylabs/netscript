@@ -1,11 +1,11 @@
 import { emitJobToStream } from '../../streams/server.ts';
 import type { WorkersServiceRuntime } from './routers/router-context.ts';
-import workersPackageJson from '../../deno.json' with { type: 'json' };
+import { PLUGIN_PACKAGE_VERSION } from '../../src/package-metadata.generated.ts';
 
 export const WORKERS_PLUGIN_HEALTH_CHECK_JOB_ID = 'workers-plugin-health-check';
 export const WORKERS_PLUGIN_HEALTH_CHECK_ENTRYPOINT = './jobs/health-check.ts';
 export const WORKERS_PLUGIN_HEALTH_CHECK_SOURCE_URL: string =
-  `jsr:@netscript/plugin-workers@${workersPackageJson.version}/jobs/health-check.ts`;
+  `jsr:@netscript/plugin-workers@${PLUGIN_PACKAGE_VERSION}/jobs/health-check.ts`;
 
 /**
  * Register jobs defined in the workers plugin.

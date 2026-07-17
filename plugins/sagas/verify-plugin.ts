@@ -10,7 +10,7 @@ import {
   verifyPlugin,
 } from '@netscript/plugin';
 import { sagasPlugin } from './mod.ts';
-import denoJson from './deno.json' with { type: 'json' };
+import { PLUGIN_PACKAGE_VERSION } from './src/package-metadata.generated.ts';
 
 export type { InspectionReport } from '@netscript/plugin';
 
@@ -18,7 +18,7 @@ export type { InspectionReport } from '@netscript/plugin';
 export function verifySagasPlugin(): PluginVerificationResult {
   return verifyPlugin(sagasPlugin, {
     name: '@netscript/plugin-sagas',
-    version: denoJson.version,
+    version: PLUGIN_PACKAGE_VERSION,
     dependencies: [
       { alias: 'workers', message: 'expected workers plugin dependency' },
       { alias: 'streams', message: 'expected streams plugin dependency' },
