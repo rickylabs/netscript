@@ -96,6 +96,7 @@ native packaging logic to the dev registration block.
 | 2026-07-17 | S1 | Contract handoff | Committed `c62a6949`, pushed by explicit refspec, and posted PR comment `5007877315` with scope and gate evidence. |
 | 2026-07-17 | S2 | Generator implementation | Added the explicit desktop branch, opt-in guard, Fresh build completion dependency, direct CEF argv, server-only service/plugin discovery, and endpoint suppression. |
 | 2026-07-17 | S2 | Unit proof | All five `generators-*_test.ts` files passed: 11 tests / 122 steps. The desktop test asserts build declaration → window declaration → `waitForCompletion(build)` source order and exact no-separator CEF argv. |
+| 2026-07-17 | S2 | Implementation handoff | Committed `2dc0c809`, pushed by explicit refspec, changed the PR lifecycle label to `status:impl`, and posted PR comment `5007903543` with scope and gate evidence. Full `scaffold.runtime` and evaluator dispatch remain supervisor-owned. |
 
 ## Decisions
 
