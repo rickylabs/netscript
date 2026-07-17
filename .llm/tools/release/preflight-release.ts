@@ -1,5 +1,6 @@
 import { walk } from 'jsr:@std/fs@^1.0.0/walk';
 import { normalize, relative } from 'jsr:@std/path@^1.0.0';
+import { discoverWorkspaceMembers as discoverDeclaredWorkspaceMembers } from '../deps/workspace.ts';
 import { discoverWorkspaceMembers, type PublishableMember } from './publish-workspace.ts';
 
 type JsonObject = Record<string, unknown>;
@@ -35,7 +36,6 @@ export interface ReleasePreflightResult {
   readonly markdown: MarkdownPreflightResult;
 }
 
-const PUBLISH_PARENT_DIRS = ['packages', 'plugins'] as const;
 const JSR_SCOPE = '@netscript/';
 const DEFERRED_MARKDOWN_PREFIX = normalize('docs/site/');
 const MARKDOWN_PIN_PATTERN = /(@netscript\/[a-z0-9-]+)@\^?(0\.0\.1-[a-z]+\.\d+)/g;
@@ -47,6 +47,10 @@ export const INTENTIONAL_PUBLISH_EXCLUSIONS: readonly IntentionalPublishExclusio
   {
     path: 'packages/bench',
     reason: 'internal benchmark workspace; it is not a supported JSR consumer surface',
+  },
+  {
+    path: 'packages/cli/e2e',
+    reason: 'internal production-E2E fixture workspace; it is never published as a JSR package',
   },
 ];
 
@@ -143,22 +147,10 @@ export async function runReleasePreflight(
 }
 
 async function discoverIntendedMembers(root: string): Promise<PublishableMember[]> {
-  const members: PublishableMember[] = [];
-  for (const parent of PUBLISH_PARENT_DIRS) {
-    for await (const entry of Deno.readDir(`${root}/${parent}`)) {
-      if (!entry.isDirectory) continue;
-      const path = `${parent}/${entry.name}`;
-      try {
-        const config = parseJson(await Deno.readTextFile(`${root}/${path}/deno.json`));
-        if (typeof config.name === 'string' && config.name.startsWith(JSR_SCOPE)) {
-          members.push({ path, name: config.name });
-        }
-      } catch (error) {
-        if (!(error instanceof Deno.errors.NotFound)) throw error;
-      }
-    }
-  }
-  return members.sort((left, right) => left.path.localeCompare(right.path));
+  return (await discoverDeclaredWorkspaceMembers(root))
+    .filter((member) => member.name.startsWith(JSR_SCOPE))
+    .map((member) => ({ path: member.root, name: member.name }))
+    .sort((left, right) => left.path.localeCompare(right.path));
 }
 
 function validateExclusions(exclusions: readonly IntentionalPublishExclusion[]): void {

@@ -18,6 +18,7 @@ on:
 permissions:
   id-token: write
   contents: write
+  statuses: read
 
 jobs:
   publish:
@@ -55,19 +56,27 @@ jobs:
         uses: actions/checkout@v5
         with:
           ref: ${{ steps.release.outputs.tag || github.ref }}
+          # The stable tag is normally a version-only child of the exact
+          # canary-verified content. The canary-pair gate must inspect HEAD^.
+          fetch-depth: 0
 
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
           deno-version: "2.9.0"
 
+      - name: Require green canary pair for this content
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: deno task release:verify-canary-pair -- --repo "$GITHUB_REPOSITORY"
+
+      - name: Publish readiness
+        run: deno task publish:readiness
+
       - name: Ensure JSR packages exist
         env:
           JSR_API_TOKEN: ${{ secrets.JSR_API_TOKEN }}
         run: deno run --allow-net --allow-read --allow-env .llm/tools/release/jsr-provision-packages.ts
-
-      - name: Release preflight
-        run: deno task release:preflight
 
       - name: Publish dry-run
         run: deno run --allow-read --allow-write --allow-run .llm/tools/release/run-publish.ts --dry-run

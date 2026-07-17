@@ -24,6 +24,7 @@
  */
 
 import {
+  githubField,
   githubRequest,
   OPENHANDS_MARKER,
   type OpenHandsStatus,
@@ -204,13 +205,24 @@ async function remoteStatus(o: Options, number: number): Promise<number> {
         source: 'remote',
         ok: false,
         status: res.status,
-        error: res.body?.message ?? res.body,
+        error: githubField(res.body, 'message') ?? res.body,
       }),
     );
     return 1;
   }
   const comments: Array<{ body?: string; html_url?: string; updated_at?: string }> =
-    Array.isArray(res.body) ? res.body : [];
+    Array.isArray(res.body)
+      ? res.body.map((value) => {
+        const body = githubField(value, 'body');
+        const htmlUrl = githubField(value, 'html_url');
+        const updatedAt = githubField(value, 'updated_at');
+        return {
+          ...(typeof body === 'string' ? { body } : {}),
+          ...(typeof htmlUrl === 'string' ? { html_url: htmlUrl } : {}),
+          ...(typeof updatedAt === 'string' ? { updated_at: updatedAt } : {}),
+        };
+      })
+      : [];
   const ohComments = comments.filter((c) => (c.body ?? '').includes(OPENHANDS_MARKER));
   if (ohComments.length === 0) {
     console.log(

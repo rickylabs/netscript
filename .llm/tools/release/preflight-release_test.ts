@@ -47,6 +47,26 @@ Deno.test('publish-set audit accepts an explicitly reasoned internal exclusion',
   }
 });
 
+Deno.test('publish-set audit covers explicit nested workspace members and applies the durable exclusion', async () => {
+  const root = await fixtureRoot();
+  try {
+    const rootConfig = JSON.parse(await Deno.readTextFile(`${root}/deno.json`));
+    rootConfig.workspace.splice(1, 0, 'packages/cli/e2e');
+    await Deno.writeTextFile(`${root}/deno.json`, `${JSON.stringify(rootConfig)}\n`);
+    await member(root, 'packages/cli/e2e', '@netscript/cli-e2e', false);
+
+    const audit = await auditPublishSet(root);
+    assertEquals(audit.missing, []);
+    assertEquals(audit.extra, []);
+    assertEquals(
+      audit.excluded.some((entry) => entry.path === 'packages/cli/e2e' && entry.reason.length > 0),
+      true,
+    );
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
 Deno.test('markdown preflight separates stale, neutral, and deferred snippets', async () => {
   const root = await fixtureRoot();
   try {
@@ -75,7 +95,10 @@ async function fixtureRoot(): Promise<string> {
   const root = await Deno.makeTempDir({ prefix: 'netscript-release-preflight-' });
   await Deno.mkdir(`${root}/packages`, { recursive: true });
   await Deno.mkdir(`${root}/plugins`, { recursive: true });
-  await Deno.writeTextFile(`${root}/deno.json`, '{"version":"0.0.1-beta.6"}\n');
+  await Deno.writeTextFile(
+    `${root}/deno.json`,
+    '{"version":"0.0.1-beta.6","workspace":["packages/*","plugins/*"]}\n',
+  );
   return root;
 }
 
