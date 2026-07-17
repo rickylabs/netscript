@@ -6,15 +6,16 @@
 | --- | --- |
 | Run ID | `fix-808-mcp-live-defects--mcp-live` |
 | Branch | `fix/808-mcp-live-defects` |
-| Current phase | `plan` |
+| Current phase | `implementation follow-up` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `none` |
 
 ## Current State
 
-Branch is rebased and clean at the current `origin/main@7bc256a1` baseline. Issue #808, the full external live report,
-doctrine, prior MCP run context, public surface, owning adapters, schemas, and CLI composition have
-been re-baselined. Plan/design are locked; the owner explicitly waived evaluator dispatch.
+The original three #808 defects are live-verified. Round-two validation found one follow-up blocker:
+the project doctor assumed a monolithic `.netscript/generated/plugins.ts`, while the generator emits
+per-plugin registry modules beneath `.netscript/generated`. The owner again explicitly prohibited
+self-evaluation and merge.
 
 ## Completed
 
@@ -22,17 +23,18 @@ been re-baselined. Plan/design are locked; the owner explicitly waived evaluator
 - GitHub issue fetched through the repository token resolver/API.
 - Root causes and implementation decisions recorded.
 - Pre-change JSR/doc surface scan and package dry-run completed.
+- Original implementation, 13-tool live validation, and final cleanup-on scaffold runtime completed.
+- Round-two doctor root cause confirmed against the validator's real generated scaffold layout.
 
 ## In Progress
 
-- Harness bootstrap commit/draft PR, then no-cleanup live scaffold capture.
+- Fixing the doctor at its infrastructure filesystem seam and regression-guarding the captured layout.
 
 ## Next Steps
 
-1. Commit/push the harness bootstrap and open the draft PR.
-2. Run the no-cleanup scaffold, restart AppHost if required, trigger a job, and capture Dashboard
-   response provenance.
-3. Implement and commit each defect separately with its focused gates and PR comment.
+1. Run focused doctor tests and the real-flow schema regression.
+2. Commit and push the follow-up through the existing branch.
+3. Post implementation evidence to draft PR #809; do not dispatch evals or merge.
 
 ## Key Decisions
 
@@ -42,21 +44,24 @@ been re-baselined. Plan/design are locked; the owner explicitly waived evaluator
 | Aggregate doctor family output | plan D2 | Keep max 20. |
 | Embedded package README default | plan D3/D4 | Explicit missing override errors. |
 | No formal eval dispatch | owner directive | No verdict will be claimed. |
+| Discover generated registry modules recursively | generator emission contract | Accept generic `*.registry.ts`, official `*-registry.ts`, and legacy `plugins.ts`. |
 
 ## Files Changed
 
 | Path | Status | Notes |
 | --- | --- | --- |
-| `.llm/runs/fix-808-mcp-live-defects--mcp-live/*` | new | Harness bootstrap only. |
+| `packages/mcp/src/infrastructure/project-wiring-doctor-family.ts` | modified | Diagnose the generator's emitted layouts rather than one hardcoded file. |
+| `packages/mcp/tests/fixtures/doctor/healthy/.netscript/generated/*` | modified | Round-two canonical scaffold path capture. |
+| `packages/mcp/tests/doctor-families_test.ts` | modified | Assert all three captured modules are recognized. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | pre-change scanned | doc-lint wrapper + raw corroboration + package dry-run |
-| Fitness | pending | quality/architecture after implementation |
-| Runtime | pending | no-cleanup capture and 13-tool matrix |
-| Consumer | pending | final cleanup scaffold runtime |
+| Static | passed | Prior final package gates; follow-up focused checks pending. |
+| Fitness | passed | Prior `quality:scan` and `arch:check`. |
+| Runtime | round-two input | Original fixes live-verified; doctor follow-up awaiting external live rerun. |
+| Consumer | passed | Prior cleanup scaffold runtime: 60 passed, 0 failed. |
 
 ## Open Questions
 
@@ -64,7 +69,7 @@ been re-baselined. Plan/design are locked; the owner explicitly waived evaluator
 
 ## Drift and Debt
 
-- Drift: evaluator dispatch waived; existing `./cli` private-type refs discovered.
+- Drift: round-two live validation exposed a generator/doctor layout mismatch; evaluator dispatch waived.
 - Debt: `MCP-A6-V2-SHAPE` remains accepted and unchanged.
 
 ## Commits

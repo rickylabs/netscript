@@ -92,3 +92,17 @@ Drift is append-only.
 - **Action:** accept
 - **Evidence:** wrapper exit 1/tooling-failure report; explicit-config lint passes for 59 MCP and 6
   CLI MCP TypeScript files. No source suppression or workspace edit was introduced.
+
+## 2026-07-17 — Round-two doctor assumed a registry layout the generator does not emit
+
+- **What:** External live re-validation found `project/plugin_registry` failing on the canonical
+  E2E-green scaffold even after `generated.plugins-check` passed.
+- **Source:** Validator report section `Re-validation (post-#808 fixes)` and captured scaffold
+  `plugin-smoke-20260717-074108`.
+- **Expected:** Doctor derives registry presence from the generator's emitted module contract.
+- **Actual:** Doctor required only `.netscript/generated/plugins.ts`; the real generator emitted
+  nested `*.registry.ts` and `*-registry.ts` modules for AI and workers.
+- **Severity:** significant
+- **Action:** fix
+- **Evidence:** Captured three-path fixture in `packages/mcp/tests/fixtures/doctor/healthy` and focused
+  doctor regression.
