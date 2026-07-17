@@ -3642,6 +3642,7 @@
           "jsr:@netscript/fresh-ui@^0.0.1-beta.10",
           "jsr:@netscript/mcp@0.0.1-beta.10",
           "jsr:@netscript/plugin@0.0.1-beta.10",
+          "jsr:@netscript/sdk@^0.0.1-beta.10",
           "jsr:@std/async@1",
           "jsr:@std/cli@1",
           "jsr:@std/collections@1",

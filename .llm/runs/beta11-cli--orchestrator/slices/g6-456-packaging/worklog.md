@@ -78,9 +78,9 @@ runtime-read embedded string assets are used.
 
 | # | Slice                                                                                                                                                                                                              | Gate                                                                                                                                                                                | Files                                                                                                                                                                                                     |
 | - | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1 | Contract-first native package planner and CLI command: SDK-derived six-target matrix, format compatibility, task-hook config selection, explicit argv/output, compression/host preflight, parser tests, docs stub. | Focused planner/config/parser tests; full CLI tests; scoped check/lint/fmt; `quality:scan`; focused + root `arch:check`; dependency/lock inspection.                                | `packages/cli/deno.json` (+ lock only if Deno requires it), `src/public/features/deploy/desktop/package/**`, desktop group/deploy registration/dependencies, focused tests, README stub, nested artifacts |
-| 2 | Native release contract: bsdiff adapter, SHA-256 composition, exact Ed25519 signed envelope, strict sequence high-water and safe filesystem promotion ordering.                                                    | Manifest/signature verification tests with generated keys; bsdiff fake; reject lower/equal/concurrent sequence tests; full CLI tests; scoped static; `quality:scan`; `arch:check`.  | `src/public/features/deploy/desktop/release/{domain,signing,prepare,store}*`, focused tests, command wiring, nested artifacts                                                                             |
-| 3 | Release serving and SDK parity: hardened GET/HEAD handler, CLI lifecycle, release-root layout, URL-layout parity against `createReleaseClient`, installer hosting/manual event docs.                               | Handler traversal/cache/method/lifecycle tests; URL parity test; full CLI tests; scoped static; `quality:scan`; `arch:check`.                                                       | `src/public/features/deploy/desktop/release/{handler,server-command}*`, tests, dependencies/group wiring, docs, nested artifacts                                                                          |
+| 1 | Contract-first native package planner and CLI command: SDK-derived six-target matrix, format compatibility, task-hook config selection, explicit argv/output, compression/host preflight, parser tests, docs stub. | Focused planner/config/parser tests; full CLI tests; scoped check/lint/fmt; `quality:scan`; focused + root `arch:check`; dependency/lock inspection. | `packages/cli/deno.json` (+ lock only if Deno requires it), `src/public/features/deploy/target/desktop/package/**`, desktop group/deploy registration/dependencies, focused tests, README stub, nested artifacts |
+| 2 | Native release contract: bsdiff adapter, SHA-256 composition, exact Ed25519 signed envelope, strict sequence high-water and safe filesystem promotion ordering. | Manifest/signature verification tests with generated keys; bsdiff fake; reject lower/equal/concurrent sequence tests; full CLI tests; scoped static; `quality:scan`; `arch:check`. | `src/public/features/deploy/target/desktop/release/{domain,signing,prepare,store}*`, focused tests, command wiring, nested artifacts |
+| 3 | Release serving and SDK parity: hardened GET/HEAD handler, CLI lifecycle, release-root layout, URL-layout parity against `createReleaseClient`, installer hosting/manual event docs. | Handler traversal/cache/method/lifecycle tests; URL parity test; full CLI tests; scoped static; `quality:scan`; `arch:check`. | `src/public/features/deploy/target/desktop/release/{handler,server-command}*`, tests, dependencies/group wiring, docs, nested artifacts |
 | 4 | Package/publication and handoff proof: complete CLI docs, external signing/notarization and Windows posture, full JSR rubric, no-text-import scan, full package gates, merge-readiness handoff.                    | Full CLI test dir; consumer/parser docs checks; doc lint; audit helper; raw publish dry-run; scoped wrappers; `quality:scan`; `arch:check`; `e2e:cli` left to supervisor/evaluator. | `packages/cli/README.md`, applicable CLI/how-to reference docs, doc refinements, nested `worklog.md` + `context-pack.md`                                                                                  |
 
 Each implementation slice is contract-first and bounded. The mandatory cadence is commit →
@@ -101,7 +101,7 @@ supervisor.
 
 ### Contributor Path
 
-Start at `src/public/features/deploy/desktop/desktop-group.ts` for the command boundary. Package
+Start at `src/public/features/deploy/target/desktop/desktop-group.ts` for the command boundary. Package
 behavior flows through the pure target/format planner before the existing process port invokes the
 app's configured task. Release preparation flows from the typed native payload composer through the
 exact-string WebCrypto signer and high-water store. Serving is read-only through the request
@@ -118,6 +118,10 @@ envelope or route family.
 | 2026-07-18 00:56 CEST | plan  | JSR baseline         | CLI doc lint and raw publish dry-run pass; pre-existing audit/dynamic-import baselines recorded.                                                |
 | 2026-07-18 01:00 CEST | plan  | Design checkpoint    | Public commands, vocabulary, ports, constants, four commit slices, gates, and deferred beta.14 scope locked. No product implementation created. |
 | 2026-07-18 01:03 CEST | plan  | draft PR bootstrap   | Plan commit `f1a0d6c3` pushed; draft PR #854 opened against integration with `Refs #456`, required labels, `status:plan`, and milestone 13.     |
+| 2026-07-18 01:15 CEST | 1     | Plan-Gate PASS       | Tier-A supervisor approved D1–D21; public SDK-subpath parity and encoded traversal cases are mandatory later gates. Slice 1 begins.             |
+| 2026-07-18 02:05 CEST | 1 | implementation | Added SDK-derived target/format contracts, pure invocation planner, #452 task-hook orchestration, CLI parser/group registration, docs, and 19 focused tests. |
+| 2026-07-18 02:15 CEST | 1 | gate set complete | Full CLI 397/416; 698-file static gates, quality, root arch, doc/JSR/publish and import scans pass. Focused doctrine is baseline-only at deploy count 14. |
+| 2026-07-18 02:18 CEST | 1 | reconciliation | Live #456/PR #854 swept; draft/base/body/labels/milestone correct, no new direction, status remains `status:impl`. |
 
 ## Decisions
 
@@ -137,6 +141,8 @@ envelope or route family.
 | Owner Option A supersedes old snapshot-first sequencing for window-only beta.11 | significant | yes                |
 | Current native installer support is broader than older combined-MSI prose       | significant | yes                |
 | Upstream `--all-targets` omits Windows ARM64 despite explicit target support    | significant | yes                |
+| Feature nested under the existing deploy target axis                            | minor       | yes                |
+| Dependency entry applied mechanically after Deno minimum-age guard              | minor       | yes                |
 
 ## Gate Results
 
@@ -149,6 +155,10 @@ envelope or route family.
 | CLI export doc baseline  | `rtk proxy deno task doc:lint --root packages/cli --pretty`                                 | PASS               | 3 entrypoints; zero errors/private refs/missing JSDoc.                                 |
 | CLI raw publish baseline | `deno publish --dry-run --allow-dirty --no-check=remote` in `packages/cli`                  | PASS_WITH_BASELINE | Exit 0; three existing unanalyzable dynamic-import warnings. No publication.           |
 | Plan checkpoint push     | `git push origin HEAD:refs/heads/feat/desktop-frontend-456-packaging`                       | PASS               | Commit `f1a0d6c3`; draft PR #854 targets `feat/desktop-frontend`.                      |
+| Slice-1 focused tests | `deno test --allow-all packages/cli/src/public/features/deploy/target/desktop/` | PASS | 19 passed, 4 steps, 0 failed. |
+| Full CLI test directory | `deno task test` in `packages/cli` | PASS | 397 passed, 416 steps, 0 failed. |
+| Scoped check/lint/fmt | repo wrappers, `--root packages/cli --ext ts,tsx` | PASS | 698 selected; zero findings. |
+| Import attributes | targeted `rg` scan | PASS | No text/JSON import attributes. |
 
 ### Fitness Gates
 
@@ -157,6 +167,10 @@ envelope or route family.
 | Archetype/doctrine selection | PASS               | A6 + service overlay and doctrine verdict in plan        | No new export/package/service.                                                   |
 | JSR helper baseline          | PASS_WITH_BASELINE | `audit-jsr-package.ts --root packages/cli --text` exit 0 | Existing vocabulary/cardinality warnings; known slow-type-banner false positive. |
 | Plan/design completeness     | READY_FOR_REVIEW   | `research.md`, `plan.md`, this `## Design`               | Awaiting group Plan-Gate; no implementation allowed.                             |
+| Quality scan | PASS | `deno task quality:scan --root packages/cli` | No findings; six existing allowances. |
+| Focused doctrine | PASS_WITH_BASELINE | `check-doctrine.ts --root packages/cli` | Existing 46 FAIL/42 WARN; no touched-path finding; deploy remains baseline 14. |
+| Root architecture | PASS | `deno task arch:check` | Exit 0. |
+| JSR/doc/publish | PASS_WITH_BASELINE | doc runner, audit helper, raw dry-run | Doc lint zero; audit exit 0; three existing dynamic-import warnings. |
 
 ### Runtime Gates
 
@@ -164,13 +178,13 @@ envelope or route family.
 | ----------------------------------- | ---------------------- | ------------------------------------ | ----------------------------------------------------------------- |
 | Local Deno surface                  | PASS                   | Deno 2.9.3 `desktop --help`          | Six explicit targets and requested formats/options confirmed.     |
 | Native signed payload compatibility | PASS (source research) | current upstream `cli/rt/desktop.rs` | Dynamic trusted payload parsing confirms compatible extra fields. |
-| Product runtime tests               | NOT_RUN                | Plan-Gate hard stop                  | Run only in implementation slices after PASS.                     |
+| Product runtime tests               | PASS | focused + full CLI suites | 19 focused; full CLI 397/416. |
 
 ### Consumer Gates
 
 | Consumer                 | Result              | Evidence                          | Notes                                 |
 | ------------------------ | ------------------- | --------------------------------- | ------------------------------------- |
-| #452 task-hook consumer  | PASS (design proof) | current `AppEntry`/schema + G4 D6 | Exact invocation belongs to S1.       |
+| #452 task-hook consumer  | PASS | focused config/orchestration tests | Configured and default task names generate exact native argv. |
 | #841 URL/manual consumer | PASS (design proof) | SDK docs/source + G2 artifacts    | Parity/manual behavior belongs to S3. |
 
 ## Handoff Notes

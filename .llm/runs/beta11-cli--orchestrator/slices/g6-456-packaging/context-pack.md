@@ -6,7 +6,7 @@
 | -------------- | -------------------------------------------------- |
 | Run ID         | `beta11-cli--orchestrator/slices/g6-456-packaging` |
 | Branch         | `feat/desktop-frontend-456-packaging`              |
-| Current phase  | `plan-eval`                                        |
+| Current phase  | `implement`                                        |
 | Archetype      | `6 — CLI / Tooling`                                |
 | Scope overlays | `service` for the release HTTP handler             |
 
@@ -15,8 +15,9 @@
 Research, the full plan, and the mandatory Design checkpoint are complete against integration SHA
 `e6e1be08`. Plan commit `f1a0d6c3` is pushed and draft PR
 [#854](https://github.com/rickylabs/netscript/pull/854) targets `feat/desktop-frontend` with the
-required metadata. No product implementation exists. The next allowed event after the readiness
-signal is the supervisor's group Plan-Gate verdict; implementation must not begin before PASS.
+required metadata. The Tier-A Fable 5 supervisor approved D1–D21 and delivered group Plan-Gate
+`PASS`. Slice 1 implementation and local gates are complete; it is ready to commit, push, and stop
+for Tier-A review.
 
 ## Completed
 
@@ -33,18 +34,22 @@ signal is the supervisor's group Plan-Gate verdict; implementation must not begi
 - Captured the CLI JSR/doc/publish baseline and locked four contract-first commit slices.
 - Opened draft PR #854 with `Refs #456` (no closing keyword), the six requested labels including the
   sole `status:plan`, and milestone 13 (`0.0.1-beta.11`).
+- Recorded the supervisor's Plan-Gate `PASS`, including mandatory public-subpath URL parity and
+  encoded-separator/resolve-under-root traversal tests.
+- Implemented `netscript deploy desktop package` through #452's configured task hook with an
+  SDK-derived six-target catalog, native format validation, explicit outputs, compression/tool
+  preflight, and typed process failures.
+- Passed 19 focused tests, the full CLI test directory (397 tests / 416 steps), scoped static gates,
+  quality scan, root architecture check, doc lint, JSR audit/dry-run, and import-attribute scan.
 
 ## In Progress
 
-- Post the required readiness comment and stop.
+- Commit/push/comment slice 1, then pause without beginning slice 2.
 
 ## Next Steps
 
-1. Push this metadata reconciliation commit.
-2. Post `Plan & Design — READY FOR REVIEW` with artifact and baseline evidence.
-3. Stop. The Fable 5 supervisor owns Plan-Gate review/evaluator dispatch.
-4. After an explicit group Plan-Gate PASS, implement slice 1 only, then commit/push/comment/pause
-   for Tier-A review before any later slice.
+1. Commit, push the explicit branch refspec, and post slice-1 evidence on PR #854.
+2. Stop for Tier-A review before slice 2.
 
 ## Key Decisions
 
@@ -71,12 +76,12 @@ signal is the supervisor's group Plan-Gate verdict; implementation must not begi
 
 ## Gates
 
-| Gate family | Current status                  | Evidence                                                                       |
-| ----------- | ------------------------------- | ------------------------------------------------------------------------------ |
-| Static      | PLAN BASELINE PASS              | clean base; SDK `deno doc`; CLI doc lint and raw publish dry-run pass.         |
-| Fitness     | READY_FOR_REVIEW                | A6/service/doctrine selection; JSR baseline recorded; full gate matrix locked. |
-| Runtime     | RESEARCH PASS / PRODUCT NOT_RUN | Deno help/source verified; implementation blocked by Plan-Gate.                |
-| Consumer    | DESIGN PROOF                    | #452 hook and #841 client/manual seam verified; implementation tests planned.  |
+| Gate family | Current status | Evidence |
+| ----------- | -------------- | -------- |
+| Static | PASS | 698-file check/lint/fmt; doc lint 0; dry-run exit 0 with baseline warnings. |
+| Fitness | PASS_WITH_BASELINE | quality and root arch pass; focused doctrine has baseline-only findings. |
+| Runtime | PASS | 19 focused tests; full CLI 397 tests / 416 steps. |
+| Consumer | S1 PASS | Configured `PackageTaskName` and default hook tests; URL parity remains locked S3. |
 
 ## Open Questions
 
@@ -85,8 +90,8 @@ signal is the supervisor's group Plan-Gate verdict; implementation must not begi
 
 ## Drift and Debt
 
-- Drift: Option A sequencing, current native format support, and upstream all-target omission are
-  recorded in `drift.md`.
+- Drift: Option A sequencing, native format support, upstream all-target omission, target-axis
+  placement, and guarded dependency edit are recorded in `drift.md`.
 - Debt: no new debt planned; existing CLI Restructure/vocabulary/cardinality baselines remain
   unchanged and must not grow.
 

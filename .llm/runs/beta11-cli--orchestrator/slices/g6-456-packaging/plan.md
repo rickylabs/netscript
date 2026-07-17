@@ -23,7 +23,7 @@ CLI. The cryptographic and filesystem boundaries are folded Archetype 2 adapter 
 
 `@netscript/cli`: **Restructure**. The bounded A6 promotion debt is closed, but the static doctrine
 verdict and existing package vocabulary/cardinality debt remain. This run keeps all new behavior in
-one cohesive `src/public/features/deploy/desktop/` feature, reuses existing
+one cohesive `src/public/features/deploy/target/desktop/` feature on the existing target axis, reuses existing
 config/process/filesystem composition seams, adds no JSR export, and neither fixes nor deepens
 unrelated CLI debt.
 
@@ -202,7 +202,7 @@ No unresolved decision would force rework inside the planned implementation slic
 | Entry                                        | Action       | Notes                                                                                                                        |
 | -------------------------------------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------- |
 | `@netscript/cli` static Restructure verdict  | none         | Feature remains bounded; no package restructure in #456.                                                                     |
-| Existing CLI vocabulary/cardinality findings | none         | Baseline only; new `deploy/desktop` is one cohesive child and must not create forbidden `helpers/lib/interfaces` vocabulary. |
+| Existing CLI vocabulary/cardinality findings | none         | Baseline only; new `deploy/target/desktop` stays on the existing target axis and must not create forbidden `helpers/lib/interfaces` vocabulary. |
 | New #456 debt                                | none planned | Any gate exception or new warning is a stop-and-record event, not an implicit allowance.                                     |
 
 ## Validation Plan

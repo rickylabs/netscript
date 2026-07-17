@@ -49,3 +49,26 @@ owner-ratified Option-A scope and current Deno behavior.
   patch or fork Deno.
 - **Evidence:**
   [denoland/deno desktop tool source](https://github.com/denoland/deno/blob/main/cli/tools/desktop.rs).
+
+## 2026-07-18 — Desktop feature uses the existing deploy target axis
+
+- **What:** The approved plan named `deploy/desktop/` as the cohesive implementation directory.
+- **Source:** Slice-1 focused doctrine scan and the pre-existing `deploy/target/` axis.
+- **Expected:** Add a fifteenth immediate child under `deploy/`.
+- **Actual:** Nest the feature at `deploy/target/desktop/`, preserving the locked command and domain
+  contracts while keeping the immediate `deploy/` child count at its baseline of fourteen.
+- **Severity:** minor.
+- **Action:** fix the implementation location and reconcile research, plan, and contributor paths.
+- **Evidence:** focused doctrine scan recorded in `worklog.md`.
+
+## 2026-07-18 — Workspace dependency recorded after minimum-age guard
+
+- **What:** `deno add @netscript/sdk` was selected as the native dependency-edit path.
+- **Source:** Deno dependency-age policy and the workspace-local SDK package.
+- **Expected:** `deno add` records the workspace dependency directly.
+- **Actual:** Deno rejected resolution under the repository minimum-age policy and this CLI version
+  did not expose its suggested override flag. The equivalent workspace import entry was applied
+  narrowly, with lock and `deps:why` verification required before commit.
+- **Severity:** minor.
+- **Action:** accept the mechanical edit only if final dependency and lock gates prove workspace
+  resolution without unrelated churn.

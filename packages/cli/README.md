@@ -141,6 +141,36 @@ target cannot honour.
 | `kubernetes`, `azure-aca`, `azure-app-service`, `azure-aks` | Validates the generated TypeScript AppHost declares the matching hosting integration, then delegates to `aspire publish` / `deploy` / `destroy`.                                                                                  | `aspire add <target>`, a configured cluster/subscription context, and Helm 4.2+ for Kubernetes/AKS. |
 | `cloud-run`                                                 | Docker-image lane: `docker build` → `docker push` → `gcloud run deploy`.                                                                                                                                                          | Docker, Google Cloud CLI auth, and a reachable registry.                                            |
 
+### Native desktop packaging
+
+An enabled Aspire app with `Type: "desktop"` can package through its configured task hook:
+
+```json
+{
+  "Type": "desktop",
+  "Enabled": true,
+  "Workdir": "apps/storefront",
+  "PackageTaskName": "desktop:package"
+}
+```
+
+The task owns the desktop entrypoint and permissions. NetScript appends the native Deno flags:
+
+```bash
+netscript deploy desktop package --app storefront --all-targets \
+  --format app --format appimage --format deb --format rpm --format msi
+netscript deploy desktop package --app storefront \
+  --target x86_64-unknown-linux-gnu --format appimage --format deb
+```
+
+Every invocation uses an explicit target and output path. Omitted formats produce all formats for
+the selected OS: `.app`/`.dmg` on macOS, `.AppImage`/`.deb`/`.rpm` on Linux, and `.msi` on Windows.
+Runtime compression defaults to `xz`; select `--compression none|lzma|zstd` explicitly when needed.
+The `.dmg` format requires a macOS host, and `zstd` requires the external `zstd` executable.
+An unfiltered `--all-targets` includes `.dmg`, so run that complete matrix on macOS; other hosts can
+use repeatable `--format` filters to omit it while still cross-compiling the remaining targets.
+Native installers are unsigned at this stage; signing and notarization remain external CI steps.
+
 Cloud authentication and RBAC are deliberately **operator-owned**. NetScript does not mint cloud
 credentials, assign RBAC, or hand-author Helm, Bicep, Kubernetes, or Azure manifests: AppHost-backed
 targets delegate to Aspire after validation, and Cloud Run owns only the image build/push/apply seam.
