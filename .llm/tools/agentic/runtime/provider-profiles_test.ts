@@ -57,6 +57,7 @@ Deno.test('provider profiles are finite, frozen, and clear every rival credentia
 Deno.test('OpenRouter preset slugs and route purposes are locked', () => {
   assertEquals(OPENROUTER_PRESET_MODELS, [
     'minimax/minimax-m3',
+    'qwen/qwen3.7-max',
     'z-ai/glm-5.2',
     'x-ai/grok-4.5',
   ]);
@@ -68,6 +69,20 @@ Deno.test('OpenRouter preset slugs and route purposes are locked', () => {
   );
   assertEquals(OPENROUTER_PRESETS['claude-design-glm-5-2'].agenticTurn, 'supported');
   assertEquals(OPENROUTER_PRESETS['claude-design-glm-5-2'].transport, 'anthropic-messages');
+  assertEquals(OPENROUTER_PRESETS['claude-design-glm-5-2'].reasoningTrace, 'absent');
+  assertEquals(OPENROUTER_PRESETS['claude-fanout-minimax-m3'].agenticTurn, 'supported');
+  assertEquals(OPENROUTER_PRESETS['claude-fanout-minimax-m3'].reasoningTrace, 'present');
+  assertEquals(OPENROUTER_PRESETS['claude-evaluator-qwen-3-7-max'], {
+    id: 'claude-evaluator-qwen-3-7-max',
+    profileId: 'claude-openrouter',
+    model: 'qwen/qwen3.7-max',
+    effort: 'high',
+    purpose: 'evaluation',
+    agenticTurn: 'supported',
+    transport: 'anthropic-messages',
+    reasoningTrace: 'present',
+    incompatibility: null,
+  });
   assertEquals(matchOpenRouterPreset(route({ effort: 'medium' })), null);
   assertEquals(
     matchOpenRouterPreset(route({

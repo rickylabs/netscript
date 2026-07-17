@@ -1,5 +1,19 @@
 # Drift — beta.10 orchestrator
 
+## 2026-07-13 — evaluator route binding slice
+
+- **Severity:** process
+- **Plan-Gate:** The shared run directory had no slice-specific `context-pack.md`, `plan.md`,
+  `worklog.md`, or `plan-eval.md`. Implementation proceeded from the owner's locked slice brief and
+  OD-7; this is not a substitute for the required separate Claude-family IMPL-EVAL.
+- **Route shape:** Reused the existing `review_claude` evaluation lane, added only the missing
+  `review_codex` lane, and attached authored-family metadata to both. The broader
+  `documentation_review` lane was not aliased because its purpose is documentation rather than
+  evaluation.
+- **Gate invocation:** The requested bare `deno test .llm/tools/agentic/` lacks filesystem and
+  environment permissions required by existing tests (221 passed, 21 `NotCapable` failures).
+  `deno test -A .llm/tools/agentic/` is green (244 passed, 0 failed), including the volatile-value
+  guard.
 ## D-1 — `design:sync` converter cannot bundle the current fresh-ui registry (2026-07-13)
 
 **Filed plan says:** the design-sync system is production-grade and idempotent against the fresh-ui
@@ -299,3 +313,16 @@ Had Stream B run #715's cycle-2 re-eval naively, it would have received a blank 
 > **An exit code, a `subtype: success`, or a green tick is not evidence. Evidence is output you can
 > point at.** Assert on the **content**, never on the **status**. And a gate — or an evaluator — you
 > have never seen **fail** is not a gate.
+
+## 2026-07-17 — PR #776 advanced-base reconciliation
+
+- **Severity:** integration drift
+- **Base advance:** `feat/beta10-integration` gained the owner-ratified review-pairing ladder in
+  #794. Its `review_codex` primary is now Fable 5 low with an Opus 4.8 low token-limit fallback,
+  alongside distinct light, complex, and fast review lanes.
+- **Deliberately superseded:** PR #776's fixed `review_codex` → Opus 4.8 high route was dropped. The
+  ordinary evaluator resolver now selects the advanced base's canonical `review_codex` primary,
+  while retaining PR #776's generator/evaluator session separation and opposite-family checks.
+- **Preserved from PR #776:** the formal Claude + OpenRouter open-model evaluator route, typed Qwen
+  preset, approved-open-model allowlist, and hard rejection of closed or unsupported evaluator
+  routes.

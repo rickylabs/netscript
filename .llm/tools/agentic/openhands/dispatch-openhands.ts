@@ -34,7 +34,7 @@
  *   deno run --allow-read --allow-env --allow-net \
  *     .llm/tools/agentic/openhands/dispatch-openhands.ts \
  *     --repo rickylabs/netscript --pr 86 \
- *     --prompt-file <win-path> --model openrouter/qwen/qwen3.7-max \
+ *     --prompt-file <win-path> --model <open-model-id> \
  *     --output pr-comment --iterations 800 [--provider openrouter] \
  *     [--token-env GH_TOKEN] [--dry-run] [--pretty]
  *
@@ -52,6 +52,7 @@ import {
   validateHandoffContract,
 } from '../lib/agentic-lib.ts';
 import { requestedLaunchIdentity } from '../runtime/launch-route-identity.ts';
+import { OPENROUTER_MODEL_IDS } from '../config/models.ts';
 
 interface Options {
   repo: string;
@@ -81,7 +82,7 @@ function printHelp(): void {
     '  --pr <n>              Target PR number (checks out PR branch).',
     '  --issue <n>           Target issue number (checks out default branch).',
     '  --prompt-file <path>  Windows path to the dispatch prompt (validated for contract). Required.',
-    '  --model <id>          Literal LiteLLM model id (e.g. openrouter/qwen/qwen3.7-max).',
+    `  --model <id>          Literal LiteLLM model id (e.g. openrouter/${OPENROUTER_MODEL_IDS.qwen}).`,
     '  --output <mode>       pr-comment | respond-comments | thread-replies | summary-only.',
     '  --iterations <n>      Max agent iterations (50-3000).',
     '  --provider <name>     Provider gateway override (e.g. openrouter).',

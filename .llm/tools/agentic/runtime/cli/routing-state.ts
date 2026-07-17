@@ -2,6 +2,20 @@
 
 import { LocalRuntimeStateAdapter } from '../adapters/local-state-adapter.ts';
 import type { RoutingState } from '../routing-state-machine.ts';
+import { CANONICAL_ROUTE_POLICY } from '../routing-policy.ts';
+
+export function renderCanonicalEvaluatorRoutes(): string {
+  const routes = CANONICAL_ROUTE_POLICY.filter((route) => route.purpose === 'evaluation');
+  return [
+    'Canonical evaluator routes:',
+    ...routes.map((route) => {
+      const constraint = route.evaluatorModelPolicy
+        ? `policy=${route.evaluatorModelPolicy}`
+        : `evaluates=${route.evaluatesFamily}`;
+      return `  ${route.lane}: ${constraint} route=${route.agent}/${route.provider}/${route.model} effort=${route.effort}`;
+    }),
+  ].join('\n');
+}
 
 export function renderRoutingStateHuman(states: readonly RoutingState[]): string {
   if (states.length === 0) return 'No persisted routing transitions.';
@@ -34,7 +48,7 @@ async function main(): Promise<number> {
     console.log(
       Deno.args.includes('--json')
         ? JSON.stringify(states, null, 2)
-        : renderRoutingStateHuman(states),
+        : `${renderCanonicalEvaluatorRoutes()}\n${renderRoutingStateHuman(states)}`,
     );
     return 0;
   } catch {
