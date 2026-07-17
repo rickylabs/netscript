@@ -114,3 +114,7 @@ group launch; this section fixes the supervisor's surface.
   Next: Stage-F adversarial (Sol·max unoriented) then Stage-G PLAN-EVAL. G3 #842 plan reviewed:
   PASS (D1–D16; hidden-scope protocol analysis excellent; D7 no-cast bar emphasized) —
   implementation unlocked.
+- 2026-07-18 · G6 #456 plan reviewed: PASS (D1–D21; replay-safe high-water + one-lineage superset
+  ratified; steers: parity test imports the public SDK subpath; traversal tests include encoded
+  separators). Implementation unlocked. Stage-F reviewer relaunched in detached worktree
+  wt-g8-review (duplicate-sender guard on wt-g8-seed — distinct-session requirement preserved).
