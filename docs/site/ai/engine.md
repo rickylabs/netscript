@@ -14,10 +14,10 @@ vocabulary, the capability seams, the model registries, the tool system, the age
 loop, MCP transports, and opt-in provider adapters. It wraps `@tanstack/ai*` and
 `@standard-schema/spec` and adds no schema DSL of its own.
 
-{{ comp callout { type: "note", title: "Published in 0.0.1-beta.7" } }}
+{{ comp callout { type: "note", title: "Published in " + releaseVersion } }}
 <code>@netscript/ai</code> is <strong>published on JSR</strong> and installs today:
 <code>deno add jsr:@netscript/ai</code>. Every subpath on this page resolves against the
-published <strong>0.0.1-beta.7</strong> surface. The engine carries zero
+published <strong>{{ releaseVersion }}</strong> surface. The engine carries zero
 <code>@netscript/*</code> dependencies, so you can adopt it on its own — the
 <a href="/ai/durable-chat/">durable-chat runtime</a> and <a href="/ai/chat-ui/">chat UI</a>
 each stand alone and neither requires it.

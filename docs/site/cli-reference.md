@@ -8,10 +8,11 @@ prev: { label: "Glossary", href: "/glossary/" }
 # CLI reference
 
 A curated, task-grouped tour of the `netscript` commands you reach for daily. It is
-the human companion to the **generated** [`/reference/cli/`](/reference/cli/), which
-lists every command, subcommand, and flag verbatim from the published surface. When you
-need the exhaustive option spelling, go there — this page covers the common path and the
-order things happen in.
+the human companion to the [command reference](/reference/cli/commands/), which lists every
+command, subcommand, and flag verbatim. When you need the exhaustive option spelling, go
+there — this page covers the common path and the order things happen in. (The separate
+[`@netscript/cli` package reference](/reference/cli/) documents the embeddable TypeScript
+surface, not the terminal commands.)
 
 {{ comp callout { type: "note", title: "One CLI, public form" } }}
 Every command here uses the public <code>netscript &lt;cmd&gt;</code> form backed by the published
@@ -277,6 +278,7 @@ registry and runtime schemas stay in sync.
   rows: [
     { name: "netscript generate plugins", type: "netscript generate plugins", desc: "Generate the plugin registries from project source. Run this after every <code>plugin install</code> so the workspace picks up new contributions." },
     { name: "netscript generate runtime-schemas", type: "netscript generate runtime-schemas", desc: "Generate runtime configuration schemas from registered plugin metadata." },
+    { name: "netscript generate aspire", type: "netscript generate aspire", desc: "Regenerate the Aspire AppHost helpers from <code>appsettings.json</code> without re-scaffolding the project. Pass <code>--project-root &lt;path&gt;</code> to target a workspace outside the current directory." },
   ]
 }) }}
 
@@ -372,13 +374,13 @@ manifest via Servy.
 ## The full surface
 
 This page is curated for the common path. For every command, every subcommand, and every
-flag — generated directly from the published package — see the reference:
+flag, see the command reference:
 
 {{ comp.featureGrid({ items: [
   {
-    title: "Generated CLI reference",
-    body: "The exhaustive, always-current command surface — every flag and subcommand, from the @netscript/cli package.",
-    href: "/reference/cli/",
+    title: "Command reference",
+    body: "The exhaustive command surface — every command, subcommand, and flag verbatim.",
+    href: "/reference/cli/commands/",
     icon: "≡"
   },
   {

@@ -11,7 +11,7 @@ next: { label: "Durable chat", href: "/ai/durable-chat/" }
 `@netscript/ai/mcp` is the **MCP client stack**: it turns external Model Context
 Protocol servers into typed tools your agent loop can call — transports, injected
 auth, multi-server pooling, and a safe rendering path for the `ui://` resources a
-tool result can carry. It is published as part of `@netscript/ai@0.0.1-beta.7` and
+tool result can carry. It is published as part of `@netscript/ai{{ releaseSpecifier }}` and
 installs with the engine: `deno add jsr:@netscript/ai`.
 
 {{ comp callout { type: "note", title: "Client, not server" } }}
