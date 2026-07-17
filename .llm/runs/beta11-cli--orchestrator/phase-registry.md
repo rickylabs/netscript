@@ -13,7 +13,7 @@ Live status of milestone-13 phase groups. Statuses: `pending` → `active` → `
 | G6 | #456 | `feat/desktop-frontend-456-packaging` | 2 | active | Sol·high plan-first · wt-g6-456 · Refs-only (closes at wave PR) |
 | G7 | #457 | `feat/desktop-frontend-457-e2e` | 3 | pending | after G2+G6; Windows legs on owner host |
 | G8 | #824 | `plan/unified-runtime` | 1 | active | stage A done; run dir plan-unified-runtime--seed; drafts-only until owner stage-H |
-| G9 | #804 | `fix/804-dry-run-writes` | 1 | eval-pass | PR #852 merge loop running |
+| G9 | #804 | `fix/804-dry-run-writes` | 1 | merged | squash 5e5cea3d; #804 closed |
 | G10 | #802 | `fix/802-plugin-cli-help` | 1 | merged | squash 8cc6b21a; #802 closed |
 | G11 | #818 | `fix/818-min-dep-age-lockstep` | 2 | pending | direction (a)+docs |
 | G12 | #814 | `docs/814-mcp-readme` | 2 | pending | doc-audit pipeline |

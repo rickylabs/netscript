@@ -101,3 +101,6 @@ group launch; this section fixes the supervisor's surface.
   contains #452 hook + #841 seam; Refs-only keyword by design). G5 held for a free slot.
 - 2026-07-18 · G10 #802 MERGED to main (8cc6b21a), #802 closed. #852 merge loop still waiting on
   re-triggered required checks (same-head green already proven).
+- 2026-07-18 · G9 #804 MERGED to main (5e5cea3d), #804 closed. Wave-1 independent lanes fully
+  shipped: #826, #802, #804 closed. Integration branch carries #452 + #841. Active: G3 plan, G6
+  plan, G8 stage-B. Queued: G5, G11, G12.
