@@ -30,6 +30,8 @@
  */
 
 import {
+  type CommentLike,
+  githubField,
   githubRequest,
   parseEvalVerdict,
   parseOpenHandsStatusComment,
@@ -188,9 +190,12 @@ async function main(): Promise<void> {
         token,
       );
       if (runRes.ok && runRes.body) {
-        const runStatus = runRes.body.status as string | undefined; // queued|in_progress|completed
-        const conclusion = runRes.body.conclusion as string | null; // success|failure|cancelled|…
-        const runHtml = runRes.body.html_url as string | undefined;
+        const statusField = githubField(runRes.body, 'status');
+        const conclusionField = githubField(runRes.body, 'conclusion');
+        const htmlField = githubField(runRes.body, 'html_url');
+        const runStatus = typeof statusField === 'string' ? statusField : undefined;
+        const conclusion = typeof conclusionField === 'string' ? conclusionField : null;
+        const runHtml = typeof htmlField === 'string' ? htmlField : undefined;
         if (runStatus === 'completed' && conclusion && conclusion !== 'success') {
           line(
             o,
@@ -211,7 +216,15 @@ async function main(): Promise<void> {
       }
     }
 
-    const comments = Array.isArray(res.body) ? res.body : [];
+    const comments: CommentLike[] = Array.isArray(res.body)
+      ? res.body.flatMap((value) => {
+        const body = githubField(value, 'body');
+        const createdAt = githubField(value, 'created_at');
+        return typeof body === 'string'
+          ? [{ body, ...(typeof createdAt === 'string' ? { created_at: createdAt } : {}) }]
+          : [];
+      })
+      : [];
     const comment = selectLatestOpenHandsComment(comments);
     const body = comment?.body ?? '';
     const verdict = parseEvalVerdict(body);

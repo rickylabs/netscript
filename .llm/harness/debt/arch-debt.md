@@ -534,16 +534,19 @@ finding into a debt entry.
 
 ## release provenance — OIDC publish workflow deferred
 
-- **Reason:** JSR's provenance/SLSA score factor is publish-time only. The current CI workflow runs
-  publish dry-runs but explicitly states OIDC publish is deferred; AS7 therefore cannot assert a
-  wired provenance workflow without faking it.
+- **Reason:** JSR's provenance/SLSA score factor is publish-time only. AS7 originally found only
+  dry-runs and deferred OIDC publication.
 - **Owner:** Release process automation follow-up.
 - **Target:** Before first public auth package release.
 - **Linked plan:** `jsr-scorecard.md` in branch `feat/prime-time/auth-as7-fitness`.
 - **Created:** 2026-06-21
-- **Status:** open, DEBT_ACCEPTED.
+- **Status:** RESOLVED 2026-07-17 by #811 — stable and canary workflows use the checked-in
+  `run-publish.ts` real-publish path with `id-token: write`; canary-first readiness and exact
+  production-E2E evidence now gate stable publication. The first live canary remains runtime
+  acceptance evidence and does not reopen this obsolete wiring debt.
 - **Gate:** add a GitHub Actions publish workflow with `permissions: id-token: write` and JSR
-  provenance enabled; close when a dry-run/release rehearsal proves the workflow path.
+  provenance enabled; satisfied structurally by `publish.yml` and `release-canary.yml` plus their
+  workflow contract tests.
 
 ## packages/workers — AP-1 / doctrine verdict Restructure (task-executor.ts 1,287 LOC)
 

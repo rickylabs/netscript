@@ -45,6 +45,7 @@
 import {
   appendVerdictContractEpilogue,
   buildOpenHandsComment,
+  githubField,
   githubRequest,
   parseRepoSlug,
   requireValue,
@@ -272,11 +273,16 @@ async function main(): Promise<void> {
   const res = await githubRequest('POST', endpoint, token, { body: comment });
   if (!res.ok) {
     console.log(
-      JSON.stringify({ ok: false, status: res.status, error: res.body?.message ?? res.body }),
+      JSON.stringify({
+        ok: false,
+        status: res.status,
+        error: githubField(res.body, 'message') ?? res.body,
+      }),
     );
     Deno.exit(1);
   }
-  const url = res.body?.html_url ?? null;
+  const htmlUrl = githubField(res.body, 'html_url');
+  const url = typeof htmlUrl === 'string' ? htmlUrl : null;
   console.log(
     o.pretty
       ? `POSTED ${triggerLine} -> ${url}`

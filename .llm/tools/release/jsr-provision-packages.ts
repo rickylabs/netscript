@@ -77,7 +77,9 @@ if (import.meta.main) {
 
   console.log(`discovered ${packageNames.length} workspace members: ${packageNames.join(', ')}`);
 
-  const token = Deno.env.get('JSR_API_TOKEN')?.trim();
+  // A dry-check is intentionally credential-free; do not even request env
+  // permission on the first-publish readiness path.
+  const token = options.dryRun ? undefined : Deno.env.get('JSR_API_TOKEN')?.trim();
   if (!token && !options.dryRun) {
     console.log(
       'JSR_API_TOKEN not set — running public checks before deciding if writes are needed',

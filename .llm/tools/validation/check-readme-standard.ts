@@ -76,7 +76,7 @@ const HELP = [
   'Exit: 0 = all conform; 1 = non-conformant README; 2 = bad usage.',
 ].join('\n');
 
-interface Violation {
+export interface ReadmeViolation {
   rule: string;
   message: string;
 }
@@ -84,7 +84,7 @@ interface Violation {
 interface UnitResult {
   path: string;
   ok: boolean;
-  violations: Violation[];
+  violations: ReadmeViolation[];
 }
 
 /** Split a Markdown body into sections keyed by H2 heading text (lowercased, trimmed). */
@@ -120,8 +120,8 @@ function getSection(sections: Map<string, string>, ...names: string[]): string |
 const FENCE_RE = /```[\s\S]*?```/;
 const LINK_RE = /\[[^\]]+\]\([^)]+\)/;
 
-function checkContent(text: string): Violation[] {
-  const violations: Violation[] = [];
+export function validateReadmeStandard(text: string): ReadmeViolation[] {
+  const violations: ReadmeViolation[] = [];
   const lines = text.split(/\r?\n/);
 
   const h1 = lines.find((l) => /^#\s+/.test(l));
@@ -206,7 +206,7 @@ async function main(): Promise<void> {
       });
       continue;
     }
-    const violations = checkContent(text);
+    const violations = validateReadmeStandard(text);
     results.push({ path, ok: violations.length === 0, violations });
   }
 
@@ -243,4 +243,4 @@ async function main(): Promise<void> {
   Deno.exit(ok ? 0 : 1);
 }
 
-await main();
+if (import.meta.main) await main();

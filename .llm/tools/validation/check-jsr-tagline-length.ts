@@ -24,7 +24,7 @@ import { expandGlob } from 'jsr:@std/fs/expand-glob';
 import { relative } from 'jsr:@std/path';
 
 /** JSR validates the description in bytes and rejects/truncates past this. */
-const DESCRIPTION_MAX_BYTES = 250;
+export const DESCRIPTION_MAX_BYTES = 250;
 
 const DEFAULT_GLOBS = ['packages/*/README.md', 'plugins/*/README.md'];
 

@@ -1,0 +1,160 @@
+name: release-canary
+run-name: canary ${{ inputs.target-version }} from ${{ github.ref_name }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      target-version:
+        description: Stable version targeted by this canary, for example 0.0.1
+        required: true
+        type: string
+
+permissions:
+  actions: write
+  contents: write
+  id-token: write
+  statuses: write
+
+concurrency:
+  group: release-canary-${{ inputs.target-version }}
+  cancel-in-progress: false
+
+jobs:
+  publish-and-prove:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout complete history
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: "2.9.0"
+
+      - name: Record content SHA and pending pair
+        id: context
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          source_sha="$(git rev-parse HEAD)"
+          echo "source_sha=$source_sha" >> "$GITHUB_OUTPUT"
+          gh api --method POST \
+            "/repos/${GITHUB_REPOSITORY}/statuses/${source_sha}" \
+            -f state=pending \
+            -f context=release/canary-pair \
+            -f description='Canary publish and pinned production E2E are running' \
+            -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+
+      - name: Cut ephemeral canary branch and tag
+        id: canary
+        env:
+          TARGET_VERSION: ${{ inputs.target-version }}
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          deno task release:canary -- "$TARGET_VERSION"
+          version="$(jq -r '.version' deno.json)"
+          test -n "$version"
+          test "$version" != "null"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=v$version" >> "$GITHUB_OUTPUT"
+          echo "branch=release/canary-$version" >> "$GITHUB_OUTPUT"
+
+      - name: Publish readiness
+        run: deno task publish:readiness
+
+      - name: Ensure JSR packages exist
+        env:
+          JSR_API_TOKEN: ${{ secrets.JSR_API_TOKEN }}
+        run: deno run --allow-net --allow-read --allow-env .llm/tools/release/jsr-provision-packages.ts
+
+      - name: Publish dry-run
+        run: deno run --allow-read --allow-write --allow-run .llm/tools/release/run-publish.ts --dry-run
+
+      - name: Publish preflight (real graph build, no upload)
+        run: deno run --allow-read --allow-write --allow-run .llm/tools/release/run-publish.ts --preflight
+
+      - name: Publish canary through the production path
+        run: deno run --allow-read --allow-write --allow-run .llm/tools/release/run-publish.ts
+
+      - name: Dispatch exact canary production E2E
+        id: dispatch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CANARY_TAG: ${{ steps.canary.outputs.tag }}
+          CANARY_VERSION: ${{ steps.canary.outputs.version }}
+        run: |
+          set -euo pipefail
+          response="$(gh api --method POST \
+            "/repos/${GITHUB_REPOSITORY}/actions/workflows/e2e-cli-prod.yml/dispatches" \
+            -f ref="$CANARY_TAG" \
+            -F return_run_details=true \
+            -f "inputs[published-version]=$CANARY_VERSION")"
+          run_id="$(jq -er '.workflow_run_id' <<< "$response")"
+          run_url="$(jq -er '.html_url' <<< "$response")"
+          echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+          echo "run_url=$run_url" >> "$GITHUB_OUTPUT"
+
+      - name: Await canary-pinned production E2E
+        env:
+          GH_TOKEN: ${{ github.token }}
+          E2E_RUN_ID: ${{ steps.dispatch.outputs.run_id }}
+        run: gh run watch "$E2E_RUN_ID" --exit-status
+
+      - name: Delete ephemeral canary branch
+        id: cleanup
+        if: always() && steps.canary.outputs.branch != ''
+        continue-on-error: true
+        env:
+          CANARY_BRANCH: ${{ steps.canary.outputs.branch }}
+        run: git push origin --delete "$CANARY_BRANCH"
+
+      - name: Record green canary pair
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_SHA: ${{ steps.context.outputs.source_sha }}
+          RUN_URL: ${{ steps.dispatch.outputs.run_url }}
+          VERSION: ${{ steps.canary.outputs.version }}
+        run: |
+          gh api --method POST \
+            "/repos/${GITHUB_REPOSITORY}/statuses/${SOURCE_SHA}" \
+            -f state=success \
+            -f context=release/canary-pair \
+            -f description="Canary ${VERSION} publish + pinned production E2E passed" \
+            -f target_url="$RUN_URL"
+
+      - name: Record failed canary pair
+        if: failure() && steps.context.outputs.source_sha != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_SHA: ${{ steps.context.outputs.source_sha }}
+        run: |
+          gh api --method POST \
+            "/repos/${GITHUB_REPOSITORY}/statuses/${SOURCE_SHA}" \
+            -f state=failure \
+            -f context=release/canary-pair \
+            -f description='Canary publish or pinned production E2E failed' \
+            -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+
+      - name: Write green-pair summary
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+          VERSION: ${{ steps.canary.outputs.version }}
+          SOURCE_SHA: ${{ steps.context.outputs.source_sha }}
+          E2E_URL: ${{ steps.dispatch.outputs.run_url }}
+        run: |
+          {
+            echo '## Canary green-pair verdict'
+            echo
+            echo "- Canary version: ${VERSION:-not-created}"
+            echo "- Content SHA: ${SOURCE_SHA:-unknown}"
+            echo "- Canary publish + pinned production E2E: ${JOB_STATUS}"
+            echo "- Production E2E run: ${E2E_URL:-not-dispatched}"
+            echo "- Ephemeral branch cleanup: ${{ steps.cleanup.outcome }}"
+          } >> "$GITHUB_STEP_SUMMARY"

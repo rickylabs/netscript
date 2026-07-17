@@ -30,6 +30,7 @@
 
 import {
   extractVerdict,
+  githubField,
   githubRequest,
   parseRepoSlug,
   readTokenFromEnv,
@@ -144,7 +145,10 @@ async function fetchComments(
       token,
     );
     if (!res.ok) {
-      throw new GithubApiError(res.status, String(res.body?.message ?? res.body ?? 'unknown'));
+      throw new GithubApiError(
+        res.status,
+        String(githubField(res.body, 'message') ?? res.body ?? 'unknown'),
+      );
     }
     const items: unknown[] = Array.isArray(res.body) ? res.body : [];
     for (const item of items) {

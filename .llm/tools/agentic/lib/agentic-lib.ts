@@ -357,6 +357,12 @@ export interface TurnState {
   turnComplete: boolean;
 }
 
+function objectRecord(value: unknown): Record<string, unknown> | null {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : null;
+}
+
 /**
  * Decide whether a Codex thread's latest turn has completed, from the TAIL of its
  * session rollout `.jsonl`. The daemon writes one JSON record per line; a turn
@@ -376,11 +382,11 @@ export function parseTurnComplete(tail: string): TurnState {
   for (let i = lines.length - 1; i >= 0; i--) {
     let ev: string | null = null;
     try {
-      // deno-lint-ignore no-explicit-any
-      const o = JSON.parse(lines[i]) as any;
-      ev = (o?.payload && typeof o.payload === 'object' && typeof o.payload.type === 'string'
-        ? o.payload.type
-        : null) ?? (typeof o?.type === 'string' ? o.type : null);
+      const parsed: unknown = JSON.parse(lines[i]);
+      const record = objectRecord(parsed);
+      const payload = objectRecord(record?.payload);
+      ev = (typeof payload?.type === 'string' ? payload.type : null) ??
+        (typeof record?.type === 'string' ? record.type : null);
     } catch {
       continue; // truncated/partial line (e.g. the first sliced line) — skip it
     }
@@ -882,7 +888,11 @@ export function extractVerdict(comments: VerdictSourceComment[]): ExtractedVerdi
 
 /** Read a GitHub token from an env var the supervisor sets in-process. Never logged. */
 export function readTokenFromEnv(envName: string): string | null {
-  return Deno.env.get(envName) ?? null;
+  try {
+    return Deno.env.get(envName) ?? null;
+  } catch {
+    return null;
+  }
 }
 
 /** Env vars, in priority order, that may carry a GitHub token in this environment. */
@@ -916,6 +926,49 @@ export interface ResolveTokenOptions {
 }
 
 /**
+ * Extract github.com's OAuth token from the gh CLI hosts file without invoking
+ * a YAML tool or ever placing the credential in argv/log output.
+ */
+export function parseGithubHostsOauthToken(
+  source: string,
+  host = 'github.com',
+): string | null {
+  const lines = source.replaceAll('\r', '').split('\n');
+  let hostIndent = -1;
+  for (const line of lines) {
+    if (!line.trim() || line.trimStart().startsWith('#')) continue;
+    const indent = line.length - line.trimStart().length;
+    const hostMatch = /^([^:#][^:]*):\s*$/.exec(line.trim());
+    if (hostMatch && indent === 0) {
+      hostIndent = hostMatch[1].trim() === host ? indent : -1;
+      continue;
+    }
+    if (hostIndent < 0 || indent <= hostIndent) continue;
+    const tokenMatch = /^oauth_token:\s*(.*?)\s*$/.exec(line.trim());
+    if (!tokenMatch) continue;
+    const value = tokenMatch[1].trim();
+    if (!value) return null;
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      return value.slice(1, -1).trim() || null;
+    }
+    return value;
+  }
+  return null;
+}
+
+/** Read the durable gh hosts-file fallback in-process. Missing permission/file is non-fatal. */
+async function readGithubHostsToken(path: string): Promise<string | null> {
+  try {
+    return parseGithubHostsOauthToken(await Deno.readTextFile(path));
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Confirm a candidate token actually works by calling GET /user. Returns the
  * authenticated login on success, or null on any non-2xx / network error. The
  * token is used only as the Authorization header.
@@ -923,7 +976,8 @@ export interface ResolveTokenOptions {
 export async function validateGithubToken(token: string): Promise<string | null> {
   try {
     const res = await githubRequest('GET', '/user', token);
-    const login = res.ok && res.body && typeof res.body.login === 'string' ? res.body.login : null;
+    const loginField = githubField(res.body, 'login');
+    const login = res.ok && typeof loginField === 'string' ? loginField : null;
     return login;
   } catch {
     return null;
@@ -998,7 +1052,8 @@ async function gcmCredentialFill(timeoutMs: number): Promise<string | null> {
  * environment, validating each candidate against GET /user before accepting it.
  *
  * Tried in order: preferEnv → standard env candidates → `gh auth token`
- * (Windows, then WSL) → bounded GCM `git credential fill`. The first candidate
+ * (Windows, then WSL) → `~/.config/gh/hosts.yml` → bounded GCM
+ * `git credential fill`. The first candidate
  * that authenticates wins. `gh auth token` is the durable source: a one-time
  * `gh auth login` yields a credential gh keeps fresh, so it survives token
  * expiry that kills static PATs.
@@ -1049,6 +1104,11 @@ export async function resolveGithubToken(
     r = await accept(ghWsl, 'gh:wsl');
     if (r) return r;
 
+    const hostsPath = `${wslHome()}/.config/gh/hosts.yml`;
+    const hostsToken = await readGithubHostsToken(hostsPath);
+    r = await accept(hostsToken, 'gh:hosts-file');
+    if (r) return r;
+
     const gcm = await gcmCredentialFill(opts.gcmTimeoutMs ?? 20000);
     r = await accept(gcm, 'gcm:windows');
     if (r) return r;
@@ -1063,11 +1123,15 @@ export async function resolveGithubToken(
   );
 }
 
+/** Read one property from an unknown GitHub JSON response after object narrowing. */
+export function githubField(value: unknown, key: string): unknown {
+  return objectRecord(value)?.[key];
+}
+
 export interface GitHubResponse {
   status: number;
   ok: boolean;
-  // deno-lint-ignore no-explicit-any
-  body: any;
+  body: unknown;
 }
 
 /**

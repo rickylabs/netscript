@@ -1,10 +1,19 @@
-import { assertEquals, assertStringIncludes, assertThrows } from 'jsr:@std/assert@^1';
 import {
+  assertEquals,
+  assertRejects,
+  assertStringIncludes,
+  assertThrows,
+} from 'jsr:@std/assert@^1';
+import {
+  CANARY_PAIR_STATUS_CONTEXT,
   composeReleaseBody,
   formatClosedIssues,
+  isExactVersionReplacement,
+  isVersionOnlyReleaseDiff,
   parseArgs,
   toTag,
   toVersion,
+  verifyGreenCanaryPair,
 } from './github-release.ts';
 
 Deno.test('toVersion strips a single leading v; toTag re-adds it', () => {
@@ -12,6 +21,119 @@ Deno.test('toVersion strips a single leading v; toTag re-adds it', () => {
   assertEquals(toVersion('0.0.1-alpha.20'), '0.0.1-alpha.20');
   assertEquals(toTag('v0.0.1-alpha.20'), 'v0.0.1-alpha.20');
   assertEquals(toTag('0.0.1-alpha.20'), 'v0.0.1-alpha.20');
+});
+
+Deno.test('version-only diff accepts the complete release version surface only', () => {
+  const root = '/repo';
+  const versionFiles = ['/repo/deno.json', '/repo/deno.lock', '/repo/packages/a/deno.json'];
+  assertEquals(
+    isVersionOnlyReleaseDiff(root, ['deno.json', 'packages/a/deno.json'], versionFiles),
+    true,
+  );
+  assertEquals(
+    isVersionOnlyReleaseDiff(root, ['deno.json', 'packages/a/mod.ts'], versionFiles),
+    false,
+  );
+  assertEquals(isVersionOnlyReleaseDiff(root, [], versionFiles), false);
+  assertEquals(isExactVersionReplacement('{"version":"1"}', '{"version":"2"}', '1', '2'), true);
+  assertEquals(
+    isExactVersionReplacement(
+      '{"version":"1","exports":"./a.ts"}',
+      '{"version":"2","exports":"./b.ts"}',
+      '1',
+      '2',
+    ),
+    false,
+  );
+});
+
+Deno.test('green canary pair accepts current SHA or a version-only immediate parent', async () => {
+  const request = (
+    _method: string,
+    path: string,
+    _token: string,
+  ) =>
+    Promise.resolve({
+      status: 200,
+      ok: true,
+      body: {
+        statuses: path.includes('content-sha')
+          ? [{ context: CANARY_PAIR_STATUS_CONTEXT, state: 'success' }]
+          : [],
+      },
+    });
+  const base = {
+    changedFiles: () => Promise.resolve(['deno.json']),
+    versionFiles: () => Promise.resolve(['/repo/deno.json']),
+    fileAtRevision: (_root: string, revision: string) =>
+      Promise.resolve(revision === 'content-sha' ? '{"version":"1"}\n' : '{"version":"2"}\n'),
+    request,
+  };
+  assertEquals(
+    await verifyGreenCanaryPair('owner/repo', 'token', '/repo', {
+      ...base,
+      revParse: (_root, revision) =>
+        Promise.resolve(revision === 'HEAD' ? 'content-sha' : 'parent'),
+    }),
+    'content-sha',
+  );
+  assertEquals(
+    await verifyGreenCanaryPair('owner/repo', 'token', '/repo', {
+      ...base,
+      revParse: (_root, revision) =>
+        Promise.resolve(revision === 'HEAD' ? 'stable-version-sha' : 'content-sha'),
+    }),
+    'content-sha',
+  );
+});
+
+Deno.test('canary pair gate fails closed for source drift and API failure', async () => {
+  const noStatuses = () => Promise.resolve({ status: 200, ok: true, body: { statuses: [] } });
+  await assertRejects(
+    () =>
+      verifyGreenCanaryPair('owner/repo', 'token', '/repo', {
+        revParse: () => Promise.resolve('source-sha'),
+        changedFiles: () => Promise.resolve(['packages/a/mod.ts']),
+        versionFiles: () => Promise.resolve(['/repo/deno.json']),
+        fileAtRevision: () => Promise.resolve('{"version":"1"}\n'),
+        request: noStatuses,
+      }),
+    Error,
+    'contains non-version changes',
+  );
+  await assertRejects(
+    () =>
+      verifyGreenCanaryPair('owner/repo', 'token', '/repo', {
+        revParse: () => Promise.resolve('source-sha'),
+        changedFiles: () => Promise.resolve(['deno.json']),
+        versionFiles: () => Promise.resolve(['/repo/deno.json']),
+        fileAtRevision: () => Promise.resolve('{"version":"1"}\n'),
+        request: () => Promise.resolve({ status: 403, ok: false, body: { message: 'forbidden' } }),
+      }),
+    Error,
+    'fails closed',
+  );
+});
+
+Deno.test('parent canary evidence rejects seeded manifest drift inside a version file', async () => {
+  await assertRejects(
+    () =>
+      verifyGreenCanaryPair('owner/repo', 'token', '/repo', {
+        revParse: (_root, revision) =>
+          Promise.resolve(revision === 'HEAD' ? 'stable-sha' : 'content-sha'),
+        changedFiles: () => Promise.resolve(['deno.json']),
+        versionFiles: () => Promise.resolve(['/repo/deno.json']),
+        fileAtRevision: (_root, revision) =>
+          Promise.resolve(
+            revision === 'content-sha'
+              ? '{"version":"1","exports":"./a.ts"}\n'
+              : '{"version":"2","exports":"./b.ts"}\n',
+          ),
+        request: () => Promise.resolve({ status: 200, ok: true, body: { statuses: [] } }),
+      }),
+    Error,
+    'beyond the exact coordinated version replacement',
+  );
 });
 
 Deno.test('formatClosedIssues renders a bulleted list, empty when none', () => {

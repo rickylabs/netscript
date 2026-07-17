@@ -43,6 +43,7 @@ import {
   buildPullRequestBody,
   type CommentLike,
   type EvalVerdict,
+  githubField,
   githubRequest,
   type MergeMethod,
   parseEvalVerdict,
@@ -218,11 +219,24 @@ async function fetchLatestVerdict(
   );
   if (!res.ok) {
     console.log(
-      JSON.stringify({ ok: false, status: res.status, error: res.body?.message ?? res.body }),
+      JSON.stringify({
+        ok: false,
+        status: res.status,
+        error: githubField(res.body, 'message') ?? res.body,
+      }),
     );
     Deno.exit(1);
   }
-  const comment = selectLatestOpenHandsComment(res.body as CommentLike[]);
+  const comments: CommentLike[] = Array.isArray(res.body)
+    ? res.body.flatMap((value) => {
+      const body = githubField(value, 'body');
+      const createdAt = githubField(value, 'created_at');
+      return typeof body === 'string'
+        ? [{ body, ...(typeof createdAt === 'string' ? { created_at: createdAt } : {}) }]
+        : [];
+    })
+    : [];
+  const comment = selectLatestOpenHandsComment(comments);
   const body = comment?.body ?? '';
   const status = parseOpenHandsStatusComment(body);
   return {
@@ -297,16 +311,18 @@ async function main(): Promise<void> {
         JSON.stringify({
           ok: false,
           status: res.status,
-          error: res.body?.message ?? res.body,
-          errors: res.body?.errors,
+          error: githubField(res.body, 'message') ?? res.body,
+          errors: githubField(res.body, 'errors'),
         }),
       );
       Deno.exit(1);
     }
-    emit(o.pretty, [`CREATED PR #${res.body.number} -> ${res.body.html_url}`], {
+    const number = githubField(res.body, 'number');
+    const url = githubField(res.body, 'html_url');
+    emit(o.pretty, [`CREATED PR #${number} -> ${url}`], {
       ok: true,
-      number: res.body.number,
-      url: res.body.html_url,
+      number,
+      url,
       head: o.head,
       base: o.base,
     });
@@ -357,13 +373,22 @@ async function main(): Promise<void> {
   const prRes = await githubRequest('GET', `/repos/${owner}/${repo}/pulls/${o.pr}`, token);
   if (!prRes.ok) {
     console.log(
-      JSON.stringify({ ok: false, status: prRes.status, error: prRes.body?.message ?? prRes.body }),
+      JSON.stringify({
+        ok: false,
+        status: prRes.status,
+        error: githubField(prRes.body, 'message') ?? prRes.body,
+      }),
     );
     Deno.exit(1);
   }
-  const baseRef: string = prRes.body.base?.ref ?? '';
-  const headSha: string = prRes.body.head?.sha ?? '';
-  const mergeableState: string = prRes.body.mergeable_state ?? 'unknown';
+  const base = githubField(prRes.body, 'base');
+  const head = githubField(prRes.body, 'head');
+  const rawBaseRef = githubField(base, 'ref');
+  const rawHeadSha = githubField(head, 'sha');
+  const rawMergeableState = githubField(prRes.body, 'mergeable_state');
+  const baseRef = typeof rawBaseRef === 'string' ? rawBaseRef : '';
+  const headSha = typeof rawHeadSha === 'string' ? rawHeadSha : '';
+  const mergeableState = typeof rawMergeableState === 'string' ? rawMergeableState : 'unknown';
 
   if (baseRef === 'main' && !o.allowBaseMain) {
     console.error(
@@ -436,15 +461,21 @@ async function main(): Promise<void> {
   );
   if (!res.ok) {
     console.log(
-      JSON.stringify({ ok: false, status: res.status, error: res.body?.message ?? res.body }),
+      JSON.stringify({
+        ok: false,
+        status: res.status,
+        error: githubField(res.body, 'message') ?? res.body,
+      }),
     );
     Deno.exit(1);
   }
-  emit(o.pretty, [`MERGED PR #${o.pr} -> ${res.body.sha}  (${baseRef})`], {
+  const merged = githubField(res.body, 'merged');
+  const sha = githubField(res.body, 'sha');
+  emit(o.pretty, [`MERGED PR #${o.pr} -> ${sha}  (${baseRef})`], {
     ok: true,
     pr: o.pr,
-    merged: res.body.merged,
-    sha: res.body.sha,
+    merged,
+    sha,
     baseRef,
   });
   Deno.exit(0);
