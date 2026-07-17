@@ -145,11 +145,37 @@ Lessons for Promotion
 | Release cut regenerates after bump                           | A release-cut flow must re-run the asset generator after `coordinateVersionBump` and stage all generated outputs in the release PR. | Archetypes 5, 6 (release) | high       |
 | Preflight messages carry sunset criterion                    | A conditional ban's failure message names the upstream issue, the fix-release criterion, and the authenticated-canary verification. | All archetypes            | high       |
 
+## Follow-up: no-new-suppressions constraint (commit `17d287dc`)
+
+### Inspector finding
+
+The supervisor identified that commit `2c41803a` ("classify embedded MCP docs") introduced a blanket `PATH_ALLOWANCES` map entry for `packages/mcp/src/publish-assets.generated.ts`, which suppressed ALL versionless `jsr:@netscript/*` specifiers found anywhere in that file — including any that might exist outside the `MCP_PACKAGE_README` string initializer. This violated the user's explicit `no new suppressions` constraint.
+
+### Correction verified
+
+Commit `17d287dc` ("classify embedded docs without suppression") replaces the blanket path allowance with **semantic masking**: `maskEmbeddedDocumentation()` targets ONLY the `MCP_PACKAGE_README` string initializer (lines 126-148 in `check-netscript-jsr-specifiers.ts`), leaving all other content in the file scannable. The `PATH_ALLOWANCES` map is deleted entirely.
+
+### Independent re-verification
+
+| Gate                                          | Command                                                                 | Result | Evidence                                                                                                                      |
+| --------------------------------------------- | ----------------------------------------------------------------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| Focused validator test                        | `deno test .llm/tools/validation/check-netscript-jsr-specifiers_test.ts` | PASS   | 1 passed, 0 failed. Test asserts `result.allowances === []` (zero allowances) and 2 findings (README-excluded specifiers).   |
+| Full JSR specifier guard                      | `deno task check:netscript-jsr-specifiers`                              | PASS   | `scanned=2156 allowances=1 failures=0`. The sole allowance is the pre-existing scaffold import-map alias (line 29), not new.   |
+| No-new-suppressions in generated file         | `grep "jsr-versionless-ok:" publish-assets.generated.ts`                | PASS   | Zero matches; no suppression marker added to the generated file.                                                              |
+| Masking scope (non-README specifiers visible) | test fixture adds `export const EXECUTED = 'deno run jsr:@netscript/cli'` | PASS   | Test asserts this is reported as finding #1 (`specifier: 'jsr:@netscript/cli'`), proving masking is scoped to the README only. |
+
+### Constraint satisfaction
+
+- **No new `jsr-versionless-ok:` markers**: verified zero matches across all newly changed or generated files.
+- **No blanket path allowances**: `PATH_ALLOWANCES` map deleted; only inline markers on specific lines survive.
+- **Semantic masking, not suppression**: the `MCP_PACKAGE_README` initializer is masked by character-level replacement (quote-aware, escape-aware), leaving `MCP_PACKAGE_VERSION` and any other generated constants fully scannable.
+- **Test enforces zero new allowances**: `assertEquals(result.allowances, [])` at line 25 of the test is a regression lock against future blanket suppressions.
+
 ## Verdict
 
 | Field     | Value    |
 | --------- | -------- |
 | Verdict   | `PASS`   |
-| Rationale | Plan-Gate `PASS` precedes implementation; design checkpoint present and followed; 4 slices implemented in the design order with passing per-slice gates; MCP package checks, tests (45/45), focused scanner tests (7/7), release-cut tests (6/6), freshness green/red, preflight green/red, MCP publish dry-run, changed-file quality scan (0 findings), `arch:check` (baseline warnings only), and skill mirror sync all independently verified by the evaluator; consumer import paths correctly wired to generated constants; README and package metadata byte-identical to their sources; release cut regenerates publish assets after the version bump and stages all 8 generated outputs; CI enforces freshness on every PR. No new architecture debt created or deepened; `arch-debt.md` unchanged and correctly reflects the run. PR #810 metadata is correct: draft state, `status:impl-eval` label, no closing keyword for the already-closed #808 reference. Opposite-family ordinary review (session `12b534fe-2771-462a-b012-c61c91968f2a`) ended `REVIEW: PASS` after its release-cut finding was addressed via `169e2544`. The two-cycle IMPL-EVAL history (cycle 1 = FAIL_FIX for missing sunset criterion in preflight message and release-cut integration; both addressed by owner and verified by the ordinary review session) is consistent with the approved plan scope. |
+| Rationale | Plan-Gate `PASS` precedes implementation; design checkpoint present and followed; 4 slices implemented in the design order with passing per-slice gates; MCP package checks, tests (45/45), focused scanner tests (7/7), release-cut tests (6/6), freshness green/red, preflight green/red, MCP publish dry-run, changed-file quality scan (0 findings), `arch:check` (baseline warnings only), and skill mirror sync all independently verified by the evaluator; consumer import paths correctly wired to generated constants; README and package metadata byte-identical to their sources; release cut regenerates publish assets after the version bump and stages all 8 generated outputs; CI enforces freshness on every PR. No new architecture debt created or deepened; `arch-debt.md` unchanged and correctly reflects the run. PR #810 metadata is correct: draft state, `status:impl-eval` label, no closing keyword for the already-closed #808 reference. Opposite-family ordinary review (session `12b534fe-2771-462a-b012-c61c91968f2a`) ended `REVIEW: PASS` after its release-cut finding was addressed via `169e2544`. The two-cycle IMPL-EVAL history (cycle 1 = FAIL_FIX for missing sunset criterion in preflight message and release-cut integration; both addressed by owner and verified by the ordinary review session) is consistent with the approved plan scope. **The no-new-suppressions constraint is satisfied**: commit `17d287dc` replaces the concurrent blanket path allowance with scoped semantic masking of only the `MCP_PACKAGE_README` initializer; `check:netscript-jsr-specifiers` reports 0 failures and 1 allowance (the pre-existing scaffold import-map alias, not new); the focused test enforces zero new allowances and two live findings outside the embedded docs initializer. |
 
 OPENHANDS_VERDICT: PASS
