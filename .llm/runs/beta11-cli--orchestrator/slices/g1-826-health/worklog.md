@@ -2,12 +2,12 @@
 
 ## Run Metadata
 
-| Field | Value |
-| --- | --- |
-| Run ID | `beta11-cli--orchestrator/slices/g1-826-health` |
-| Branch | `fix/826-aggregate-health` |
-| Archetype | `4 - Public DSL / Builder` |
-| Scope overlays | `service` |
+| Field          | Value                                           |
+| -------------- | ----------------------------------------------- |
+| Run ID         | `beta11-cli--orchestrator/slices/g1-826-health` |
+| Branch         | `fix/826-aggregate-health`                      |
+| Archetype      | `4 - Public DSL / Builder`                      |
+| Scope overlays | `service`                                       |
 
 ## Design
 
@@ -36,11 +36,11 @@
 
 ### Commit Slices
 
-| # | Slice | Gate | Files |
-| - | --- | --- | --- |
-| 0 | Research, plan, and Design checkpoint | supervisor PLAN-EVAL | nested run-dir artifacts |
-| 1 | Aggregate predicate contract plus per-adapter-class regression coverage and consumer compile proof | focused service tests + scoped service wrappers | `packages/service/src/primitives/health.ts`, service tests, run artifacts |
-| 2 | `scaffold.runtime` health-path assertion | narrow E2E harness test/source gate; full suite deferred to supervisor | `.llm/tools/e2e/scaffold-e2e-test.ts`, owning test(s), run artifacts |
+| # | Slice                                                                                              | Gate                                                                   | Files                                                                     |
+| - | -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| 0 | Research, plan, and Design checkpoint                                                              | supervisor PLAN-EVAL                                                   | nested run-dir artifacts                                                  |
+| 1 | Aggregate predicate contract plus per-adapter-class regression coverage and consumer compile proof | focused service tests + scoped service wrappers                        | `packages/service/src/primitives/health.ts`, service tests, run artifacts |
+| 2 | `scaffold.runtime` health-path assertion                                                           | narrow E2E harness test/source gate; full suite deferred to supervisor | `.llm/tools/e2e/scaffold-e2e-test.ts`, owning test(s), run artifacts      |
 
 ### Deferred Scope
 
@@ -56,50 +56,67 @@ them from execution, status, and details.
 
 ## Progress Log
 
-| Time | Slice | Step | Notes |
-| --- | --- | --- | --- |
-| 2026-07-17 | 0 | research | Re-baselined branch and issue; located aggregate and four built-in adapter classes. |
-| 2026-07-17 | 0 | plan | Contract-first plan recorded before package edits. Awaiting supervisor PLAN-EVAL. |
+| Time       | Slice | Step           | Notes                                                                                                                                                                                                                                                          |
+| ---------- | ----- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-07-17 | 0     | research       | Re-baselined branch and issue; located aggregate and four built-in adapter classes.                                                                                                                                                                            |
+| 2026-07-17 | 0     | plan           | Contract-first plan recorded before package edits. Awaiting supervisor PLAN-EVAL.                                                                                                                                                                              |
+| 2026-07-17 | 0     | plan-eval      | Tier-A supervisor reported PASS with required host-wiring expansion; plan and drift updated before implementation.                                                                                                                                             |
+| 2026-07-17 | 1     | implementation | Added pre-invocation filtering, adapter options, provider-aware `defineService` composition, and regression tests.                                                                                                                                             |
+| 2026-07-17 | 1     | gates          | Focused/full package tests, consumer compile, scoped wrappers, doc lint, quality scan, and architecture check pass. Initial format finding was corrected; an initial full-test invocation lacked `--allow-write`, then passed with the TLS fixture permission. |
 
 ## Decisions
 
-| Decision | Reason | Source |
-| --- | --- | --- |
-| Archetype 4 + service overlay | Matches doctrine verdict and live HTTP consumer impact. | doctrine 10; archetype profile |
-| No evaluator dispatch from this lane | Explicit implementation-agent brief. | owner/supervisor instruction |
+| Decision                                                     | Reason                                                                               | Source                         |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------ | ------------------------------ |
+| Archetype 4 + service overlay                                | Matches doctrine verdict and live HTTP consumer impact.                              | doctrine 10; archetype profile |
+| No evaluator dispatch from this lane                         | Explicit implementation-agent brief.                                                 | owner/supervisor instruction   |
+| Provider-aware multi-adapter registration in `defineService` | Fix the first-match composition path that can select inactive MySQL in a SQLite app. | Tier-A review + code research  |
 
 ## Drift
 
-| Drift | Severity | Logged in drift.md |
-| --- | --- | --- |
-| None | minor | no |
+| Drift                                                         | Severity    | Logged in drift.md |
+| ------------------------------------------------------------- | ----------- | ------------------ |
+| Host/composition wiring added to original predicate-only plan | significant | yes                |
 
 ## Gate Results
 
 ### Static Gates
 
-| Gate | Command or check | Result | Notes |
-| --- | --- | --- | --- |
-| Plan artifact review | pending supervisor PLAN-EVAL | NOT_RUN | Implementation hard stop. |
+| Gate                 | Command or check                                         | Result | Notes                                                   |
+| -------------------- | -------------------------------------------------------- | ------ | ------------------------------------------------------- |
+| Plan artifact review | supervisor PLAN-EVAL                                     | PASS   | `plan-eval.md`; verdict received before implementation. |
+| Focused behavior     | `deno test ... health_test.ts define-service_test.ts`    | PASS   | 12 passed, 0 failed.                                    |
+| Full service tests   | `deno test ... packages/service/tests`                   | PASS   | 83 passed, 0 failed with required permissions.          |
+| Scoped check         | `run-deno-check.ts --root packages/service --ext ts,tsx` | PASS   | 40 files, zero diagnostics.                             |
+| Scoped lint          | `run-deno-lint.ts --root packages/service --ext ts,tsx`  | PASS   | 40 files, zero diagnostics.                             |
+| Scoped format        | `run-deno-fmt.ts --root packages/service --ext ts,tsx`   | PASS   | 40 files, zero findings after correction.               |
+| Doc lint             | `deno task doc:lint --root packages/service --pretty`    | PASS   | Two entrypoints, zero diagnostics.                      |
 
 ### Fitness Gates
 
-| Gate | Result | Evidence | Notes |
-| --- | --- | --- | --- |
-| F-1..F-19 applicable set | NOT_RUN | pending implementation | No package edit yet. |
+| Gate                 | Result | Evidence                        | Notes                                       |
+| -------------------- | ------ | ------------------------------- | ------------------------------------------- |
+| quality scan         | PASS   | `deno task quality:scan` exit 0 | No findings; existing allowances unchanged. |
+| architecture fitness | PASS   | `deno task arch:check` exit 0   | No failures; pre-existing warnings only.    |
 
 ### Runtime Gates
 
-| Gate | Result | Evidence | Notes |
-| --- | --- | --- | --- |
-| focused service health | NOT_RUN | pending implementation | |
-| full `scaffold.runtime` | NOT_RUN | supervisor-owned | Expensive merge-readiness call. |
+| Gate                    | Result  | Evidence         | Notes                                                           |
+| ----------------------- | ------- | ---------------- | --------------------------------------------------------------- |
+| focused service health  | PASS    | 12 focused tests | SQLite composition excludes unused MySQL with zero invocations. |
+| full `scaffold.runtime` | NOT_RUN | supervisor-owned | Expensive merge-readiness call.                                 |
 
 ### Consumer Gates
 
-| Consumer | Result | Evidence | Notes |
-| --- | --- | --- | --- |
-| existing `@netscript/service` consumer literal | NOT_RUN | pending implementation | |
+| Consumer                                       | Result | Evidence                               | Notes                                             |
+| ---------------------------------------------- | ------ | -------------------------------------- | ------------------------------------------------- |
+| existing `@netscript/service` consumer literal | PASS   | `type-assignability_test.ts`: 2 passed | Optional property preserves structural consumers. |
+
+### Reconcile note — slice 1
+
+Issue #826 remains open and PR #847 remains draft. No new feedback beyond the Tier-A PLAN-EVAL notes
+was found. The required scope expansion is reflected in `plan.md` and `drift.md`; no architecture
+debt was created.
 
 ## Handoff Notes
 
