@@ -43,3 +43,16 @@ or upstream expectations.
   structural and do not rely on patch-specific ambient types.
 - **Evidence:** command output recorded in `research.md`/`worklog.md`.
 
+## 2026-07-18 — Deno adapter shell moved forward one slice
+
+- **What:** The approved Plan-Gate note requires the structural resolver to be the only production
+  file touching the Deno global. Public `createReleaseClient(config)` also needs `Deno.build`, so
+  the build-target portion of the planned adapter landed in slice 1 instead of waiting for slice 2.
+- **Source:** Tier-A Plan-Gate PASS implementation note 2.
+- **Expected:** Create `deno-auto-update-adapter.ts` in slice 2 with all native-runtime behavior.
+- **Actual:** Slice 1 creates the adapter with build-target resolution only; slice 2 extends the
+  same file with legacy/namespaced updater resolution.
+- **Severity:** minor.
+- **Action:** Update the worklog slice table; keep D1–D13 and all public contracts unchanged.
+- **Evidence:** `release-client_test.ts` recursively scans executable auto-update source and proves
+  no other production file accesses `globalThis` or Deno update/build globals.

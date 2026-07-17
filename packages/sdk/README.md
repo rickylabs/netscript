@@ -77,6 +77,8 @@ wires discovery, clients, and queries together. Drop to a focused subpath (`@net
   `traceparent` header into the outgoing request, so client and server spans join one distributed
   trace per the #402 telemetry convention (`netscript.*` vs semconv). The middleware type surface
   lives on `@netscript/sdk/telemetry`.
+- **Native auto-update configuration**: `@netscript/sdk/auto-update` validates the app-pinned
+  release endpoint and Ed25519 key, then resolves the current Deno Desktop `os-arch` release URL.
 
 ---
 

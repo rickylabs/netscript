@@ -78,8 +78,8 @@ No public port or adapter type is exported. Consumers depend on NetScript events
 
 | # | Slice | Gate | Files |
 | --- | --- | --- | --- |
-| 1 | Prove the public release contract and per-channel/per-arch URL resolver, including HTTPS/trust validation and a documented subpath. | Release-client unit test; scoped check/lint/fmt; focused `quality:scan`; `arch:check:repo --root packages/sdk`; root `arch:check`. | `packages/sdk/src/auto-update/domain/constants.ts`, `packages/sdk/src/auto-update/domain/types.ts`, `packages/sdk/src/auto-update/application/release-client.ts`, `packages/sdk/src/auto-update/mod.ts`, `packages/sdk/deno.json`, `packages/sdk/tests/auto-update/release-client_test.ts`, SDK README module mention, nested `worklog.md` + `context-pack.md` |
-| 2 | Prove the upstream-churn seam, policy scheduling, plain-run no-op, Windows staged/manual event, automatic event, public-key forwarding, and rollback telemetry ordering. | Focused wrapper unit test; SDK test set; scoped check/lint/fmt; focused quality/doctrine; root `arch:check`. | `packages/sdk/src/auto-update/application/start-auto-update.ts`, `packages/sdk/src/auto-update/adapters/deno-auto-update-adapter.ts`, `packages/sdk/src/auto-update/adapters/netscript-rollback-telemetry.ts`, `packages/sdk/src/auto-update/mod.ts`, `packages/sdk/tests/auto-update/start-auto-update_test.ts`, nested `worklog.md` + `context-pack.md` (+ `drift.md` only if facts change) |
+| 1 | Prove the public release contract and per-channel/per-arch URL resolver, including HTTPS/trust validation and a documented subpath. | Release-client unit test; scoped check/lint/fmt; focused `quality:scan`; `arch:check:repo --root packages/sdk`; root `arch:check`. | `packages/sdk/src/auto-update/domain/constants.ts`, `packages/sdk/src/auto-update/domain/types.ts`, `packages/sdk/src/auto-update/application/release-client.ts`, the build-target portion of `packages/sdk/src/auto-update/adapters/deno-auto-update-adapter.ts`, `packages/sdk/src/auto-update/mod.ts`, `packages/sdk/mod.ts` documentation only, `packages/sdk/deno.json`, `packages/sdk/tests/auto-update/release-client_test.ts`, SDK README module mention, nested run artifacts |
+| 2 | Prove the upstream-churn seam, policy scheduling, plain-run no-op, Windows staged/manual event, automatic event, public-key forwarding, and rollback telemetry ordering. | Focused wrapper unit test; SDK test set; scoped check/lint/fmt; focused quality/doctrine; root `arch:check`. | `packages/sdk/src/auto-update/application/start-auto-update.ts`, extend `packages/sdk/src/auto-update/adapters/deno-auto-update-adapter.ts` with old/new updater resolution, `packages/sdk/src/auto-update/adapters/netscript-rollback-telemetry.ts`, `packages/sdk/src/auto-update/mod.ts`, `packages/sdk/tests/auto-update/start-auto-update_test.ts`, nested run artifacts (+ `drift.md` only if facts change) |
 | 3 | Prove the published consumer surface: public-subpath compile, README example, zero new doc diagnostics, clean publish list/slow types, and no text imports. | Consumer scoped check; README doctest; full SDK tests; doc lint; JSR audit helper; raw package dry-run; release preflight; scoped wrappers; quality/doctrine; root `arch:check`. | `packages/sdk/README.md`, `packages/sdk/tests/readme-doctest_test.ts`, `packages/sdk/tests/type-fixtures/auto-update-consumer_type.ts`, any doc-only refinements to `packages/sdk/src/auto-update/mod.ts`, nested `worklog.md` + `context-pack.md` |
 
 All implementation slices are <30, ordered contract-first, and include run-artifact reconciliation.
@@ -109,6 +109,7 @@ code and release config do not change.
 | 2026-07-17 23:46 CEST | plan | nested run activated | Required skills/run-loop/doctrine/gates read; branch confirmed exactly at integration baseline. |
 | 2026-07-17 23:55 CEST | plan | research and design checkpoint | Live issues/RFC/upstream state re-baselined; public contract, files, slices, and gates locked. No implementation created. |
 | 2026-07-18 00:03 CEST | plan | supervisor handoff prepared | Plan-only commit `c7e61dcc` pushed; draft PR #849 opened against integration with required labels and milestone 13. Readiness comment follows the final metadata commit. |
+| 2026-07-18 00:12 CEST | 1 | release contract and URL seam complete | Plan-Gate PASS recorded; literal `linux-x86_64` and `darwin-aarch64` URLs pinned; HTTPS/key validation and executable-source global-isolation proof pass. |
 
 ## Decisions
 
@@ -127,6 +128,7 @@ code and release config do not change.
 | Rev 10 updater authority superseded by owner Option A | significant | yes |
 | Proposed upstream namespace renames version property to `appVersion` | significant | yes |
 | Local Deno is 2.9.3 while the toolchain skill still states 2.9.0 | minor | yes |
+| Deno adapter build-target shell moved from slice 2 to slice 1 per Plan-Gate isolation note | minor | yes |
 
 ## Gate Results
 
@@ -136,14 +138,20 @@ code and release config do not change.
 | --- | --- | --- | --- |
 | Baseline package dry-run | `deno publish --dry-run --allow-dirty` in `packages/sdk` | PASS | Exit 0; no actual slow-type warning. |
 | Baseline full-export doc lint | `deno task doc:lint --root packages/sdk --pretty` | BASELINE | One unrelated transitive private ref; zero missing JSDoc. |
-| Implementation wrappers | planned per slice | NOT_RUN | Hard stop pending supervisor Plan-Gate PASS. |
+| Slice 1 unit | `deno test --allow-all packages/sdk/tests/auto-update/release-client_test.ts` | PASS | 4 passed; two literal target URLs, trust validation, and source-isolation proof. |
+| Slice 1 scoped check | `.llm/tools/run-deno-check.ts --root packages/sdk --ext ts --pretty` | PASS | 62 files, 0 diagnostics; wrapper supplied `--unstable-kv`. |
+| Slice 1 scoped lint | `.llm/tools/run-deno-lint.ts --root packages/sdk --ext ts --pretty` | PASS | 62 files, 0 findings. |
+| Slice 1 scoped format | `.llm/tools/run-deno-fmt.ts --root packages/sdk --ext ts --pretty` | PASS | 62 files, 0 findings. |
+| Slice 1 entrypoint doc lint | `deno doc --lint packages/sdk/src/auto-update/mod.ts` | PASS | 0 diagnostics after exporting the constant-derived target vocabularies. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | JSR baseline | PASS_WITH_BASELINE | research.md surface scan | New subpath must be independently clean. |
-| F-1..F-19 implementation set | NOT_RUN | plan.md | No implementation before PLAN-EVAL. |
+| Slice 1 quality scan | PASS | `deno task quality:scan --root packages/sdk` | No findings; one unrelated pre-existing test allowance. |
+| Slice 1 focused doctrine | PASS_WITH_BASELINE | `deno task arch:check:repo --root packages/sdk` | FAIL=0; existing README/A9 advisories only. |
+| Slice 1 root architecture | PASS_WITH_BASELINE | `deno task arch:check` | Exit 0; repository-wide pre-existing warnings only. |
 
 ### Runtime Gates
 
@@ -165,7 +173,12 @@ code and release config do not change.
   truthfulness are the load-bearing design decisions.
 - Confirm the evaluator accepts Archetype 4 with A2/A3 subtype gates rather than a package-wide
   reclassification.
-- Draft PR #849 is labeled `type:feat`, `area:sdk`, `wave:v1`, `priority:p1`, `status:plan`, carries
-  milestone `0.0.1-beta.11`, and closes only #841.
-- No implementation file exists and no implementation slice may begin until the supervisor records
-  `PASS` in `plan-eval.md` and on the PR.
+- Draft PR #849 opened with `type:feat`, `area:sdk`, `wave:v1`, `priority:p1`, `status:plan`,
+  milestone `0.0.1-beta.11`, and a closing keyword only for #841.
+- PR #849 now carries the sole lifecycle label `status:impl`; milestone and closing keyword are
+  unchanged.
+- Slice 1 initially found a comment-only false positive in the isolation assertion and private type
+  references in doc lint. The final test strips comments before scanning executable source, and the
+  target constants are public alongside their derived unions; both gates now pass.
+- Reconcile note: #841 remains open and correctly owned by draft PR #849; #457 remains the E2E
+  owner; no new PR comment changed scope. Stop for Tier-A substantive slice review before slice 2.

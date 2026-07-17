@@ -31,6 +31,10 @@
  * Use `@netscript/sdk/ports` for package-owned structural ports shared with
  * other NetScript packages. Ports stay upstream-type-free.
  *
+ * Use `@netscript/sdk/auto-update` from Deno Desktop app bootstrap code to
+ * configure native updates without depending on moving Deno global names. It
+ * stays a focused subpath and is intentionally not re-exported here.
+ *
  * @module
  */
 

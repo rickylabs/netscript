@@ -7,15 +7,16 @@
 | Run ID | `beta11-cli--orchestrator/slices/g2-841-autoupdate` |
 | Branch | `feat/desktop-frontend-841-autoupdate` |
 | Draft PR | [#849](https://github.com/rickylabs/netscript/pull/849) → `feat/desktop-frontend` |
-| Current phase | `plan-eval` (awaiting supervisor-triggered separate session) |
+| Current phase | `implement` — slice 1 awaiting Tier-A review |
 | Archetype | `4 — Public DSL / Builder` with integration/runtime subtype gates |
 | Scope overlays | none |
 
 ## Current State
 
-Research, the locked plan, and the Design checkpoint are complete. The branch is still code-identical
-to integration except for these nested run artifacts. Implementation is hard-stopped until the Fable
-5 supervisor triggers the group PLAN-EVAL and records `PASS`.
+The Tier-A supervisor recorded Plan-Gate `PASS` for D1–D13 and authorized implementation. Slice 1
+is implemented and green: public release configuration, literal Deno target vocabulary, URL
+construction, and the single Deno-global adapter boundary. It awaits substantive supervisor review
+before slice 2.
 
 ## Completed
 
@@ -28,20 +29,21 @@ to integration except for these nested run artifacts. Implementation is hard-sto
 - Ran current SDK JSR/doc baseline and recorded the one unrelated transitive doc-lint diagnostic.
 - Locked three implementation slices and the complete Design checkpoint.
 
-## Handoff State
+## Implementation State
 
 - Plan artifact commit `c7e61dcc` is pushed.
 - Draft PR #849 targets `feat/desktop-frontend`, is draft, carries `Closes #841`, has all five
   required labels, and is assigned milestone 13 (`0.0.1-beta.11`).
-- After this metadata reconciliation is committed and pushed, post
-  `Plan & Design — READY FOR REVIEW` and stop.
+- `Plan & Design — READY FOR REVIEW` was posted on PR #849.
+- Plan-Gate: `PASS` delivered by supervisor session
+  `86d308d5-c761-4e5d-a41f-8be959bc46d2` on 2026-07-18.
+- PR lifecycle label transitioned from `status:plan` to the sole `status:impl` label.
 
 ## Next Steps
 
-1. Supervisor triggers a separate open-model PLAN-EVAL; this session does not dispatch it.
-2. If verdict is `FAIL_PLAN`, revise only the plan/design and return for another supervisor gate.
-3. If verdict is `PASS`, implement slice 1 exactly as designed, then run gates and hand it to the
-   supervisor for substantive review before sign-off.
+1. Commit and push slice 1 with the explicit refspec, then post its evidence on PR #849.
+2. Tier-A supervisor substantively reviews slice 1 and records the review outcome.
+3. Only after that review, extend the Deno adapter and implement slice 2 behavior.
 
 ## Key Decisions
 
@@ -64,14 +66,19 @@ to integration except for these nested run artifacts. Implementation is hard-sto
 | `.llm/runs/beta11-cli--orchestrator/slices/g2-841-autoupdate/worklog.md` | new | Design checkpoint and baseline evidence. |
 | `.llm/runs/beta11-cli--orchestrator/slices/g2-841-autoupdate/context-pack.md` | new | Resumable state. |
 | `.llm/runs/beta11-cli--orchestrator/slices/g2-841-autoupdate/drift.md` | new | Rev 10/upstream/toolchain drift. |
-| `.llm/runs/beta11-cli--orchestrator/slices/g2-841-autoupdate/plan-eval.md` | new | Pending placeholder for supervisor-owned evaluator. |
+| `.llm/runs/beta11-cli--orchestrator/slices/g2-841-autoupdate/plan-eval.md` | modified | Tier-A Plan-Gate PASS and its two implementation notes. |
+| `packages/sdk/src/auto-update/` | new | Release domain, pure client, structural Deno target adapter, and public subpath. |
+| `packages/sdk/tests/auto-update/release-client_test.ts` | new | URL/trust/isolation tests. |
+| `packages/sdk/mod.ts` | modified | Documents the focused subpath without re-exporting it. |
+| `packages/sdk/deno.json` | modified | Adds `./auto-update` export and package check entrypoint. |
+| `packages/sdk/README.md` | modified | Names the focused native-update configuration capability. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | baseline only | SDK raw publish dry-run PASS; doc-lint baseline recorded. |
-| Fitness | planned | Complete F-/quality/architecture gate set in plan.md. |
+| Static | slice 1 PASS | Unit 4/4; scoped check/lint/fmt all zero findings. |
+| Fitness | slice 1 PASS_WITH_BASELINE | Quality clean; focused/root doctrine exit 0; existing advisories recorded. |
 | Runtime | planned | Fixture matrix in design; real native E2E belongs #457. |
 | Consumer | planned | Public subpath compile fixture in slice 3. |
 
@@ -90,5 +97,6 @@ to integration except for these nested run artifacts. Implementation is hard-sto
 
 - `c7e61dcc` — `docs(harness): plan SDK auto-update seam` (research, plan, Design checkpoint,
   baseline evidence, and pending evaluator placeholder).
-- The next plan-only commit records PR #849 and the supervisor handoff state; no implementation is
-  included.
+- `b03c0c07` — `docs(harness): record G2 plan handoff` (PR #849 and supervisor handoff state).
+- Slice 1 commit is the next PR commit; its exact hash is recorded in the PR slice comment, which is
+  the canonical commit trail.
