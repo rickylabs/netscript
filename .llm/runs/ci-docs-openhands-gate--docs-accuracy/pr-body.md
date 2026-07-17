@@ -1,9 +1,9 @@
 ## Summary
 
 Adds a skippable CI backstop that automatically asks OpenHands Minimax M3 to accuracy-check every
-docs-labeled PR. It keeps the cheap lane useful by conditionally hand-testing only executable claims,
-while always requiring full changed-set review, per-file verdicts, low-hallucination prose review,
-and blocking findings for hallucinated verbs, flags, or paths.
+docs-labeled PR. It keeps the cheap lane useful by conditionally hand-testing only executable
+claims, while always requiring full changed-set review, per-file verdicts, low-hallucination prose
+review, and blocking findings for hallucinated verbs, flags, or paths.
 
 ## Scope
 
@@ -16,17 +16,18 @@ and blocking findings for hallucinated verbs, flags, or paths.
 
 - [x] S0 Research, plan, and Design checkpoint
 - [x] S1 Workflow, prompt, audit note, label taxonomy, and generated skill mirror
-- [ ] S2 Separate-session implementation evaluation
+- [x] S2 Separate-session implementation evaluation
 
 ## Definition of Done
 
 - [x] Docs-labeled PR events post the exact guarded Minimax M3 trigger.
 - [x] `docs-eval:skip` produces an explicit skipped-on-demand summary.
 - [x] An identical unanswered trigger is not reposted for the same head SHA.
-- [x] The prompt conditionally tests executable claims and always performs the mandatory accuracy review.
+- [x] The prompt conditionally tests executable claims and always performs the mandatory accuracy
+      review.
 - [x] Label machine/source/mirror taxonomy is synchronized.
 - [x] YAML structure, label schema, prompt contract, and mirror checks pass.
-- [ ] Separate-session IMPL-EVAL is recorded; no OpenHands eval is dispatched by this run.
+- [x] Separate-session IMPL-EVAL is recorded; no OpenHands eval is dispatched by this run.
 
 ## Validation
 
@@ -38,13 +39,15 @@ and blocking findings for hallucinated verbs, flags, or paths.
 - `deno task agentic:sync-claude:check` — PASS
 - focused new-file format + `git diff --check` — PASS
 - opposite-family A1 slice review — PASS (`slice-review.md`)
+- separate-session IMPL-EVAL — PASS (`evaluate.md`; local Qwen session)
 - `actionlint` — not installed; YAML parse + structural assertions used
 - OpenHands live dispatch — intentionally not run (owner instruction)
 
 ## Harness
 
 - Run dir: `.llm/runs/ci-docs-openhands-gate--docs-accuracy/`
-- Phase: impl-eval; PLAN-EVAL and A1 slice review passed. Do not merge until the final evaluator pass is complete.
+- Phase: impl-eval; PLAN-EVAL, A1 slice review, and IMPL-EVAL passed. PR remains draft for owner
+  review.
 
 ## Drift / Debt
 
