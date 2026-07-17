@@ -41,3 +41,9 @@ group launch; this section fixes the supervisor's surface.
   name-based dispatch. Steer issued on resume (thread 019f720b-8290…): the knob must be wired by
   host/composition/scaffold so the fix is end-to-end (a SQLite-only app really excludes MySQL),
   scaffold.runtime assertion proves that shape. Implementation unlocked for G1.
+- 2026-07-17 · G4 #452: Plan & Design delivered (commits 40b56f18/76afeb6f). Tier-A plan review:
+  PASS — archetype 6, D1–D8 approved (fourth explicit dispatch, typed `PackageTaskName` hook for
+  #456, no-endpoint invariant, table-driven defaults); placeholder plan-eval/evaluate files
+  correctly non-self-certifying. Steers on resume: build-order gate must be asserted in generated
+  source (not just task-name string); verify real `deno task` argv forwarding semantics for
+  `--backend cef` before locking the emitted string. Implementation unlocked for G4.
