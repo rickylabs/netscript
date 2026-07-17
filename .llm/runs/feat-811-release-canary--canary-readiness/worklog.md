@@ -87,8 +87,10 @@ helper.
 | 2026-07-17 | 3     | composed readiness     | Added ordered publish-set, Markdown-pin, lockstep/residue, versionless-specifier, new-package, first-publish, provisioning, and canonical-preflight evidence.                          |
 | 2026-07-17 | 3     | negative proofs        | Seeded every readiness rule to fail, including PR #810's canonical preflight boundary and exact sunset criterion; focused suite passed 19/19.                                          |
 | 2026-07-17 | 3     | review repair          | Independent review initially failed on an orphaned Markdown audit; wired it into readiness, strengthened partial-registry and absent-only evidence, then received `SLICE_REVIEW_PASS`. |
-| 2026-07-17 | 4     | workflow + pair gate   | Added canary publish workflow, exact run dispatch/watch, stable-publish pair enforcement, commit-status evidence, and durable hosts-file token fallback.                              |
-| 2026-07-17 | 4     | review hardening       | Exact bump-only inheritance, full-history stable checkout, Actions-token handling, and best-effort cleanup were independently re-reviewed; `SLICE_REVIEW_PASS`.                       |
+| 2026-07-17 | 4     | workflow + pair gate   | Added canary publish workflow, exact run dispatch/watch, stable-publish pair enforcement, commit-status evidence, and durable hosts-file token fallback.                               |
+| 2026-07-17 | 4     | review hardening       | Exact bump-only inheritance, full-history stable checkout, Actions-token handling, and best-effort cleanup were independently re-reviewed; `SLICE_REVIEW_PASS`.                        |
+| 2026-07-17 | 5     | canary-first doctrine  | Made same-content green canary pair mandatory, documented scheme/yanking/no-ad-hoc policy and #810 sunset, closed stale OIDC wiring debt, and synchronized the Claude mirror.          |
+| 2026-07-17 | 5     | opposite-family review | Independent Opus review verified source/mirror, mandatory gates, policy, and honest debt closure; `SLICE_REVIEW_PASS`.                                                                 |
 
 ## Decisions
 
@@ -119,10 +121,12 @@ helper.
 | slice 3 focused tests  | focused readiness/preparation/preflight test command               | PASS    | 19 passed, 0 failed; every new readiness row has a seeded violation            |
 | slice 3 live readiness | `deno task publish:readiness`                                      | PASS    | 8 ordered checks green; `@netscript/mcp` correctly treated as first-publish    |
 | slice 3 review         | `slice-3-review.md`                                                | PASS    | Initial blocking Markdown-audit finding repaired and independently re-reviewed |
-| slice 4 focused tests  | workflow, GitHub release, verifier, and agentic-lib tests          | PASS    | 81 passed, 0 failed after review hardening                                      |
-| full release tests     | `deno test --allow-all .llm/tools/release/`                        | PASS    | 59 passed, 0 failed after slice 4                                                |
-| slice 4 YAML sanity    | `@std/yaml` parse on all three touched workflows                   | PASS    | canary, stable publish, and production-E2E workflows parsed                     |
-| slice 4 review         | `slice-4-review.md`                                                | PASS    | Independent Opus re-review; no blocking findings remain                         |
+| slice 4 focused tests  | workflow, GitHub release, verifier, and agentic-lib tests          | PASS    | 81 passed, 0 failed after review hardening                                     |
+| full release tests     | `deno test --allow-all .llm/tools/release/`                        | PASS    | 59 passed, 0 failed after slice 4                                              |
+| slice 4 YAML sanity    | `@std/yaml` parse on all three touched workflows                   | PASS    | canary, stable publish, and production-E2E workflows parsed                    |
+| slice 4 review         | `slice-4-review.md`                                                | PASS    | Independent Opus re-review; no blocking findings remain                        |
+| skill mirror sync      | `deno task agentic:sync-claude:check`                              | PASS    | 17 skills and 21 mirrored files synchronized                                   |
+| slice 5 review         | `slice-5-review.md`                                                | PASS    | Independent Opus review; no blocking findings                                  |
 | implementation gates   | remaining commands in `plan.md`                                    | NOT_RUN | Later slices/final gate                                                        |
 
 ### Fitness Gates
