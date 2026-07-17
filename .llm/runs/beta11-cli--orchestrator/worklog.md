@@ -47,3 +47,10 @@ group launch; this section fixes the supervisor's surface.
   correctly non-self-certifying. Steers on resume: build-order gate must be asserted in generated
   source (not just task-name string); verify real `deno task` argv forwarding semantics for
   `--backend cef` before locking the emitted string. Implementation unlocked for G4.
+- 2026-07-18 · G1 #826 Tier-A slice review (commits c74a277c, 2a99cd75): design matches D1–D5 and
+  the end-to-end steer (provider-aware candidate selection in defineService, filter-before-
+  allSettled, scaffold.runtime users-service probe upgraded to aggregate semantics with adapter
+  assertion — both drift entries properly logged). ONE review-blocking finding: dropping
+  `withDatabase`'s `healthCheckDb` arg silently removed the DB readiness probe (plan Non-Scope
+  violation). Steer issued: restore readiness, avoid double-registration, add readiness regression
+  test, hoist provider-alias pairs to constants. Awaiting fix slice before sign-off.
