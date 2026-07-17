@@ -6,28 +6,29 @@
 | --- | --- |
 | Run ID | `fix-mcp-readme-text-import--beta10-jsr-hotfix` |
 | Branch | `fix/mcp-readme-text-import` |
-| Current phase | `plan-eval` |
+| Current phase | `implement` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `none` |
 
 ## Current State
 
-The branch is based cleanly on `origin/main` at `a5adb706`. Research and a four-slice design are locked. No implementation source has changed; PLAN-EVAL is the hard stop.
+The branch is based on `origin/main` at `a5adb706`. Research and a four-slice design are locked. Separate-session PLAN-EVAL passed; implementation may begin.
 
 ## Completed
 
 - Named skills, harness routing, relevant doctrine, release gates, existing generator, publish surface, and preflight implementation were inspected.
 - Research, plan, design checkpoint, supervisor identity, and drift log were created.
+- PLAN-EVAL passed in local Qwen session `f03ae1dd-da69-406a-b725-f3bf391255a8`.
 
 ## In Progress
 
-- Separate-session formal PLAN-EVAL.
+- Slice 2 generated publish assets and publish-surface sweep.
 
 ## Next Steps
 
-1. Obtain PLAN-EVAL `PASS`.
-2. Commit/push the plan bootstrap and open the draft PR.
-3. Implement generated assets and the publish-surface sweep.
+1. Implement generated assets and the publish-surface sweep.
+2. Run freshness green/red and focused package gates.
+3. Commit, push, and comment slice 2.
 
 ## Key Decisions
 
@@ -46,7 +47,7 @@ The branch is based cleanly on `origin/main` at `a5adb706`. Research and a four-
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Plan | pending | formal evaluator not yet run |
+| Plan | PASS | `plan-eval.md`; session `f03ae1dd-da69-406a-b725-f3bf391255a8` |
 | Static | not run | blocked by Plan-Gate |
 | Fitness | not run | blocked by Plan-Gate |
 | Runtime | N/A | no runtime protocol change planned |
