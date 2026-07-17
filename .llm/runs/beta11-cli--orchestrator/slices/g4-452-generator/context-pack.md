@@ -14,7 +14,7 @@
 
 Research, plan, and the Design checkpoint are complete against integration baseline `ca72db14`.
 The Tier-A supervisor reported group Plan-Gate `PASS` in-turn. Draft PR #848 is the review surface.
-Implementation may proceed in S1→S2 order; evaluator/review dispatch remains supervisor-owned.
+S1 and S2 implementation are complete locally; evaluator/review dispatch remains supervisor-owned.
 
 ## Completed
 
@@ -26,14 +26,13 @@ Implementation may proceed in S1→S2 order; evaluator/review dispatch remains s
 
 ## In Progress
 
-- S1 public contract, including supervisor-requested verification of real task argv semantics and
-  generated Fresh build-before-window ordering.
+- S2 gate evidence, slice commit/push, and PR handoff.
 
 ## Next Steps
 
-1. Supervisor dispatches the formal PLAN-EVAL in a separate session.
-2. Do not start S1 until `plan-eval.md` records `PASS` and the PR carries the supervisor verdict.
-3. After PASS, implement S1, run its complete gate set, then commit/push/comment/update artifacts.
+1. Commit and push S2 through the explicit branch refspec and post its gate evidence on PR #848.
+2. Leave full `scaffold.runtime` and all evaluator/review dispatch to the supervisor.
+3. Do not merge, publish, tag, release, or close the milestone.
 
 ## Key Decisions
 
@@ -48,21 +47,21 @@ Implementation may proceed in S1→S2 order; evaluator/review dispatch remains s
 
 | Path | Status | Notes |
 | --- | --- | --- |
-| `.llm/runs/beta11-cli--orchestrator/slices/g4-452-generator/` | new | Plan & Design artifacts only. |
+| `packages/aspire/config.ts` + tests | committed | Public desktop contract and packaging hook. |
+| `packages/cli/.../generate-register-apps.ts` + tests | modified | Desktop generation semantics and unit proof. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Plan-Gate | awaiting supervisor evaluator | `research.md`, `plan.md`, `worklog.md#Design` ready |
-| Static | NOT_RUN | hard stop before implementation |
-| Fitness / JSR | planned | exact commands in `plan.md` |
-| Runtime / consumer | planned | generator tests, consumer compile, CLI E2E, scaffold.runtime |
+| Plan-Gate | PASS | Tier-A supervisor verdict recorded in `plan-eval.md` |
+| Static | PASS | Scoped check/lint/fmt wrappers |
+| Fitness / JSR | PASS with recorded baseline | `quality:scan`, root `arch:check`, doc-lint, raw publish dry-run |
+| Runtime / consumer | PASS for implementation-owned gates | 122 generator steps plus public consumer compile; full `scaffold.runtime` is supervisor-owned |
 
 ## Open Questions
 
-- None that force rework before implementation; PLAN-EVAL is invited to challenge the two explicit
-  seams (`desktop:predev`, `PackageTaskName`).
+- None.
 
 ## Drift and Debt
 

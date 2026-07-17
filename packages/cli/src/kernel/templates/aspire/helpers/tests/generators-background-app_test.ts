@@ -299,6 +299,70 @@ describe('generateRegisterApps', () => {
     assertStringIncludes(output, 'services__users__http__0');
   });
 
+  it('should register desktop only when explicitly enabled', () => {
+    const output = generateRegisterApps({
+      ...emptyOptions,
+      apps: { dashboard: fixtures.DESKTOP_APP },
+    });
+
+    assertStringIncludes(output, '// --- dashboard (desktop) ---');
+    assertStringIncludes(output, "config.Apps['dashboard']?.Enabled === true");
+  });
+
+  it('should make desktop launch wait for the Fresh build resource', () => {
+    const output = generateRegisterApps({
+      ...emptyOptions,
+      apps: { dashboard: fixtures.DESKTOP_APP },
+    });
+    const buildDeclaration =
+      "const dashboard_build = builder.addExecutable('dashboard-build', 'deno', dashboard_workdir, ['task', 'build']);";
+    const windowDeclaration =
+      "const dashboard = builder.addExecutable('dashboard', 'deno', dashboard_workdir, ['task', 'desktop:predev', '--backend', 'cef']);";
+    const buildDependency = 'await dashboard.waitForCompletion(dashboard_build);';
+
+    assertStringIncludes(output, buildDeclaration);
+    assertStringIncludes(output, windowDeclaration);
+    assertStringIncludes(output, buildDependency);
+    assert(output.indexOf(buildDeclaration) < output.indexOf(windowDeclaration));
+    assert(output.indexOf(windowDeclaration) < output.indexOf(buildDependency));
+    assert(!output.includes("['task', 'desktop:predev', '--', '--backend', 'cef']"));
+  });
+
+  it('should apply desktop build and predev task defaults', () => {
+    const output = generateRegisterApps({
+      ...emptyOptions,
+      apps: {
+        dashboard: {
+          ...fixtures.DESKTOP_APP,
+          Prebuild: undefined,
+          TaskName: undefined,
+        },
+      },
+    });
+
+    assertStringIncludes(output, "['task', 'build']");
+    assertStringIncludes(output, "['task', 'desktop:predev', '--backend', 'cef']");
+  });
+
+  it('should inject server-side discovery without an Aspire HTTP endpoint for desktop', () => {
+    const output = generateRegisterApps({
+      ...emptyOptions,
+      apps: { dashboard: fixtures.DESKTOP_APP },
+    });
+
+    assertStringIncludes(output, '// Server-side service-discovery injection');
+    assertStringIncludes(output, "getResourceEndpoint(services.get('users'), 'http')");
+    assertStringIncludes(output, "dashboard.withEnvironment('services__users__http__0', endpoint)");
+    assertStringIncludes(output, "getResourceEndpoint(plugins.get('workers-api'), 'http')");
+    assertStringIncludes(
+      output,
+      "dashboard.withEnvironment('services__workers-api__http__0', endpoint)",
+    );
+    assert(!output.includes('buildViteEnvVarName('));
+    assert(!output.includes('dashboard.withHttpEndpoint('));
+    assert(!output.includes("port: 8999, env: 'PORT'"));
+  });
+
   it('should annotate app type in comment', () => {
     const output = generateRegisterApps({
       ...emptyOptions,

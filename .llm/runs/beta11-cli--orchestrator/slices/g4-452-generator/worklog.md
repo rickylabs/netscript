@@ -93,6 +93,9 @@ native packaging logic to the dev registration block.
 | 2026-07-17 | S1 | Plan-Gate | Tier-A supervisor reported group verdict `PASS`; implementation hard stop cleared. |
 | 2026-07-17 | S1 | Deno argv verification | Deno 2.9.3 appends arguments after the task name directly. A task-level `--` is not required; option separation is owned by the invoked command. Since `deno desktop` owns `--backend`, emit `deno task <name> --backend cef`, not `-- --backend cef`. |
 | 2026-07-17 | S1 | Build-order API verification | Official Aspire 13.4 TypeScript API documents `ExecutableResource.waitForCompletion(dependency, exitCode = 0)`; S2 will make the desktop executable wait for a separate successful Fresh build resource. |
+| 2026-07-17 | S1 | Contract handoff | Committed `c62a6949`, pushed by explicit refspec, and posted PR comment `5007877315` with scope and gate evidence. |
+| 2026-07-17 | S2 | Generator implementation | Added the explicit desktop branch, opt-in guard, Fresh build completion dependency, direct CEF argv, server-only service/plugin discovery, and endpoint suppression. |
+| 2026-07-17 | S2 | Unit proof | All five `generators-*_test.ts` files passed: 11 tests / 122 steps. The desktop test asserts build declaration → window declaration → `waitForCompletion(build)` source order and exact no-separator CEF argv. |
 
 ## Decisions
 
@@ -124,6 +127,21 @@ native packaging logic to the dev registration block.
 | `quality:scan` | PASS | Exit 0, no findings; seven existing allowances reported. |
 | Root `arch:check` | PASS | Exit 0. |
 | Per-root doctrine scan | BASELINE | Aspire: 0 FAIL / 1 existing WARN; CLI: 46 FAIL / 42 WARN from the known broad scanner baseline, including existing test-framework/path findings. No new finding introduced by S1. |
+| Lock hygiene | PASS | No `deno.lock` change. |
+
+### S2 — generated desktop registration
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Generator suites | PASS | All `generators-*_test.ts`: 11 passed / 122 steps. Existing non-desktop generator coverage remains green. |
+| Build-order acceptance | PASS | Test asserts build resource declaration precedes window declaration, which precedes exact `await dashboard.waitForCompletion(dashboard_build)`. |
+| CEF argv acceptance | PASS | Exact `['task', 'desktop:predev', '--backend', 'cef']`; test rejects an inserted task-level `--`. |
+| Discovery / endpoint acceptance | PASS | Tests prove service and plugin `services__*` injection, no Vite injection, no `withHttpEndpoint`, and no configured `PORT`. |
+| Scoped check/lint/fmt | PASS | Repo wrappers passed for generator, tests, and typed fixture. |
+| Public consumer + JSR | PASS | Consumer is included in scoped check; Aspire `doc:lint` and raw publish dry-run both pass. S1 wrapper-baseline note remains unchanged. |
+| `quality:scan` | PASS | Exit 0, no findings. |
+| Root `arch:check` | PASS | Exit 0; dependency warnings are pre-existing. |
+| Full `scaffold.runtime` | SUPERVISOR-OWNED | Deliberately not dispatched or run, per Tier-A instruction. |
 | Lock hygiene | PASS | No `deno.lock` change. |
 
 ## Handoff Notes
