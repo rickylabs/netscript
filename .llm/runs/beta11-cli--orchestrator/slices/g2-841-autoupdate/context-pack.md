@@ -7,15 +7,15 @@
 | Run ID | `beta11-cli--orchestrator/slices/g2-841-autoupdate` |
 | Branch | `feat/desktop-frontend-841-autoupdate` |
 | Draft PR | [#849](https://github.com/rickylabs/netscript/pull/849) → `feat/desktop-frontend` |
-| Current phase | `implement` — slice 2 awaiting Tier-A review |
+| Current phase | `gate` — implementation complete, awaiting supervisor IMPL-EVAL dispatch |
 | Archetype | `4 — Public DSL / Builder` with integration/runtime subtype gates |
 | Scope overlays | none |
 
 ## Current State
 
-Slice 1 received Tier-A substantive review `PASS`. Slice 2 is implemented and green: policy
-orchestration, legacy/proposed namespace resolution, Windows manual classification, and
-telemetry-before-consumer rollback ordering. It awaits substantive supervisor review before slice 3.
+Slices 1 and 2 received Tier-A substantive review `PASS`. Slice 3 is implemented and green: the
+public consumer fixture, README/doctest, full JSR evidence set, full SDK test directory, and all
+static/fitness gates pass with only explicitly preserved unrelated baselines.
 
 ## Completed
 
@@ -39,12 +39,15 @@ telemetry-before-consumer rollback ordering. It awaits substantive supervisor re
 - PR lifecycle label transitioned from `status:plan` to the sole `status:impl` label.
 - S1 commit `d2321cae` received Tier-A sign-off.
 - S2 full SDK test directory passed 28/28 alongside all scoped quality gates.
+- S2 commit `35f3b726` received Tier-A sign-off.
+- S3 consumer compile, README doctest, full-export lint, raw publish dry-run, and no-text-import
+  preflight are complete.
 
 ## Next Steps
 
-1. Commit and push slice 2 with the explicit refspec, then post its evidence on PR #849.
-2. Tier-A supervisor substantively reviews slice 2 and records the review outcome.
-3. Only after that review, implement slice 3 consumer/docs/JSR proof.
+1. Commit and push slice 3 with the explicit refspec.
+2. Post `IMPLEMENTATION COMPLETE` with the final evidence table on PR #849.
+3. Stop; the supervisor dispatches the separate-session IMPL-EVAL.
 
 ## Key Decisions
 
@@ -72,23 +75,26 @@ telemetry-before-consumer rollback ordering. It awaits substantive supervisor re
 | `packages/sdk/tests/auto-update/release-client_test.ts` | new | URL/trust/isolation tests. |
 | `packages/sdk/mod.ts` | modified | Documents the focused subpath without re-exporting it. |
 | `packages/sdk/deno.json` | modified | Adds `./auto-update` export and package check entrypoint. |
-| `packages/sdk/README.md` | modified | Names the focused native-update configuration capability. |
 | `packages/sdk/src/auto-update/application/start-auto-update.ts` | new | Launch and interval orchestration over internal ports. |
 | `packages/sdk/src/auto-update/adapters/netscript-rollback-telemetry.ts` | new | NetScript rollback telemetry adapter. |
 | `packages/sdk/src/auto-update/adapters/deno-auto-update-adapter.ts` | modified | Resolves old and proposed native updater namespaces. |
 | `packages/sdk/src/auto-update/domain/constants.ts` | modified | Apply/status/reason/capability/telemetry constants. |
 | `packages/sdk/src/auto-update/domain/types.ts` | modified | Policies, events, callbacks, and start results. |
-| `packages/sdk/src/auto-update/mod.ts` | modified | Curates the new public orchestration surface. |
 | `packages/sdk/tests/auto-update/start-auto-update_test.ts` | new | Runtime, policy, platform, and telemetry matrix. |
+| `packages/sdk/tests/type-fixtures/auto-update-consumer_type.ts` | new | Real public-subpath consumer compile proof. |
+| `packages/sdk/tests/readme-doctest_test.ts` | modified | Type-checks the documented auto-update bootstrap example. |
+| `packages/sdk/README.md` | modified | Checked 80% path, permissions, platform behavior, and #457 boundary. |
+| `packages/sdk/src/auto-update/mod.ts` | modified | JSR landing example uses `startAutoUpdate`. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | slice 2 PASS | Full SDK 28/28; scoped check/lint/fmt all zero findings. |
-| Fitness | slice 2 PASS_WITH_BASELINE | Quality clean; focused/root doctrine exit 0; existing advisories recorded. |
+| Static | final PASS | Full SDK 28/28; consumer compile; scoped check/lint/fmt all zero findings. |
+| Fitness | final PASS_WITH_BASELINE | Quality clean; focused doctrine WARN=0; root architecture exit 0 with unrelated repository baselines. |
 | Runtime | slice 2 PASS at unit boundary | Complete structural/policy/platform matrix; native E2E remains #457. |
-| Consumer | planned | Public subpath compile fixture in slice 3. |
+| Consumer | PASS | Public subpath fixture and README doctest compile. |
+| JSR | PASS_WITH_BASELINE | Auto-update docs 0; raw dry-run clean; no text imports; unrelated transitive doc baseline preserved at 1. |
 
 ## Open Questions
 
@@ -107,5 +113,6 @@ telemetry-before-consumer rollback ordering. It awaits substantive supervisor re
   baseline evidence, and pending evaluator placeholder).
 - `b03c0c07` — `docs(harness): record G2 plan handoff` (PR #849 and supervisor handoff state).
 - `d2321cae` — `feat(sdk): prove native release target contract` (S1, Tier-A PASS).
-- Slice 2 commit is the next PR commit; its exact hash is recorded in the PR slice comment, which is
+- `35f3b726` — `feat(sdk): prove native update orchestration` (S2, Tier-A PASS).
+- Slice 3 commit is the next PR commit; its exact hash is recorded in the final PR comment, which is
   the canonical commit trail.

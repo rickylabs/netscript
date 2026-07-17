@@ -58,6 +58,42 @@ Each entry defaults its `serviceName` and TanStack query path to the map key, so
 wires discovery, clients, and queries together. Drop to a focused subpath (`@netscript/sdk/client`,
 `@netscript/sdk/query`, `@netscript/sdk/query-client`) when an app only needs part of the surface.
 
+### Desktop auto-update
+
+Window-only applications can start signed native update checks through the stable SDK seam:
+
+```ts
+import { startAutoUpdate } from '@netscript/sdk/auto-update';
+
+const update = startAutoUpdate({
+  release: {
+    baseUrl: 'https://releases.example.com/my-app',
+    publicKey: 'base64-ed25519-public-key',
+    manualUpdateUrl: 'https://example.com/downloads/my-app',
+  },
+  policy: { checkOnLaunch: true, intervalMs: 60 * 60 * 1_000 },
+  onUpdateReady(event) {
+    if (event.applyMode === 'manual') {
+      console.error(`Install the staged update from ${event.manualUpdateUrl}`);
+    }
+  },
+  onRollback(event) {
+    console.error(`Update rolled back: ${event.reason}`);
+  },
+});
+
+if (update.status === 'disabled') {
+  console.error(`Native updates unavailable: ${update.reason}`);
+}
+```
+
+The app-pinned release and manual-installer URLs must use HTTPS. The native Deno Desktop runtime
+owns manifest fetching, Ed25519 verification, patch staging, and writable-install checks; using
+this API therefore permits network access and native application-file updates. Under plain
+`deno run` the seam returns `disabled` without network access. Windows currently reports a staged
+update through the manual-installer event because upstream cannot apply it automatically; macOS
+and Linux apply on relaunch. Real packaged apply/rollback proof is tracked by #457.
+
 ---
 
 ## 📦 Key Capabilities
@@ -78,7 +114,8 @@ wires discovery, clients, and queries together. Drop to a focused subpath (`@net
   trace per the #402 telemetry convention (`netscript.*` vs semconv). The middleware type surface
   lives on `@netscript/sdk/telemetry`.
 - **Native auto-update configuration**: `@netscript/sdk/auto-update` validates the app-pinned
-  release endpoint and Ed25519 key, then resolves the current Deno Desktop `os-arch` release URL.
+  release endpoint and Ed25519 key, resolves the current Deno Desktop `os-arch` release URL, and
+  exposes typed staged/manual and rollback events without leaking moving runtime globals.
 
 ---
 

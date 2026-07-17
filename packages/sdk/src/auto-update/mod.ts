@@ -5,17 +5,26 @@
  * moving Deno Desktop globals. Release URLs are resolved from trusted app
  * configuration and the current native `os-arch` target.
  *
- * @example Build the current native release descriptor
+ * @example Start signed update checks from application bootstrap
  * ```ts
- * import { createReleaseClient } from '@netscript/sdk/auto-update';
+ * import { startAutoUpdate } from '@netscript/sdk/auto-update';
  *
- * const release = createReleaseClient({
- *   baseUrl: 'https://releases.example.com/my-app',
- *   channel: 'stable',
- *   publicKey: 'base64-ed25519-public-key',
- *   manualUpdateUrl: 'https://example.com/downloads/my-app',
+ * const result = startAutoUpdate({
+ *   release: {
+ *     baseUrl: 'https://releases.example.com/my-app',
+ *     publicKey: 'base64-ed25519-public-key',
+ *     manualUpdateUrl: 'https://example.com/downloads/my-app',
+ *   },
+ *   policy: { checkOnLaunch: true, intervalMs: 60 * 60 * 1_000 },
+ *   onUpdateReady(event) {
+ *     if (event.applyMode === 'manual') {
+ *       showInstallerPrompt(event.manualUpdateUrl);
+ *     }
+ *   },
  * });
- * console.log(release.updateUrl);
+ *
+ * declare function showInstallerPrompt(url: string): void;
+ * console.log(result.status);
  * ```
  *
  * @module

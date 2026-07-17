@@ -111,6 +111,7 @@ code and release config do not change.
 | 2026-07-18 00:03 CEST | plan | supervisor handoff prepared | Plan-only commit `c7e61dcc` pushed; draft PR #849 opened against integration with required labels and milestone 13. Readiness comment follows the final metadata commit. |
 | 2026-07-18 00:12 CEST | 1 | release contract and URL seam complete | Plan-Gate PASS recorded; literal `linux-x86_64` and `darwin-aarch64` URLs pinned; HTTPS/key validation and executable-source global-isolation proof pass. |
 | 2026-07-18 00:21 CEST | 2 | native runtime orchestration complete | S1 Tier-A review PASS recorded. Old/proposed namespace resolution, launch/interval policy, Windows manual event, and telemetry-first rollback are implemented; full SDK tests pass. |
+| 2026-07-18 00:27 CEST | 3 | consumer and JSR proof complete | S2 Tier-A review PASS recorded. Public-subpath fixture, checked README path, full export-map lint, audit helper, raw dry-run, and no-text-import preflight complete. |
 
 ## Decisions
 
@@ -150,6 +151,15 @@ code and release config do not change.
 | Slice 2 scoped lint | `.llm/tools/run-deno-lint.ts --root packages/sdk --ext ts --pretty` | PASS | 65 files, 0 findings. |
 | Slice 2 scoped format | `.llm/tools/run-deno-fmt.ts --root packages/sdk --ext ts --pretty` | PASS | 65 files, 0 findings. |
 | Slice 2 entrypoint doc lint | `deno doc --lint packages/sdk/src/auto-update/mod.ts` | PASS | 0 diagnostics across the expanded public surface. |
+| Slice 3 full SDK tests | `deno test --allow-all packages/sdk/tests/` | PASS | 28 passed, 0 failed; includes README doctest and all auto-update behavior. |
+| Slice 3 consumer compile | `deno check --unstable-kv packages/sdk/tests/type-fixtures/auto-update-consumer_type.ts` | PASS | Real `@netscript/sdk/auto-update` import, callback/result narrowing, no Deno globals. |
+| Slice 3 scoped check | `.llm/tools/run-deno-check.ts --root packages/sdk --ext ts --pretty` | PASS | 66 files, 0 diagnostics; includes the consumer fixture. |
+| Slice 3 scoped lint | `.llm/tools/run-deno-lint.ts --root packages/sdk --ext ts --pretty` | PASS | 66 files, 0 findings. |
+| Slice 3 scoped format | `.llm/tools/run-deno-fmt.ts --root packages/sdk --ext ts --pretty` | PASS | 66 files, 0 findings. |
+| Slice 3 full export doc lint | `deno task doc:lint --root packages/sdk --pretty` | PASS_WITH_BASELINE | Auto-update 0; root 0; combined 1 unrelated transitive `plugin-streams-core` private ref; 0 missing JSDoc. |
+| Slice 3 JSR audit helper | `audit-jsr-package.ts --root packages/sdk --text` | PASS_WITH_TOOL_NOTE | Publishable; 11 exports; helper counts the informational “Checking for slow types” banner as one warning. |
+| Slice 3 raw package dry-run | `deno publish --dry-run --allow-dirty` from `packages/sdk` | PASS | Success; all 11 entrypoints checked; no actual slow-type warning; tests excluded from publish list. |
+| Slice 3 no-text-import preflight | `deno task release:preflight` | PASS | Text imports, import attributes, file-URL import-meta, and self-import checks all 0 findings. |
 
 ### Fitness Gates
 
@@ -162,6 +172,9 @@ code and release config do not change.
 | Slice 2 quality scan | PASS | `deno task quality:scan --root packages/sdk` | No findings; one unrelated pre-existing test allowance. |
 | Slice 2 focused doctrine | PASS_WITH_BASELINE | `deno task arch:check:repo --root packages/sdk` | FAIL=0; existing README/A9 advisories only. |
 | Slice 2 root architecture | PASS_WITH_BASELINE | `deno task arch:check` | Exit 0; repository-wide pre-existing warnings only. |
+| Slice 3 quality scan | PASS | `deno task quality:scan --root packages/sdk` | No findings; one unrelated pre-existing test allowance. |
+| Slice 3 focused doctrine | PASS | `deno task arch:check:repo --root packages/sdk` | FAIL=0 WARN=0; only A9 informational architecture-doc note remains. |
+| Slice 3 root architecture | PASS_WITH_BASELINE | `deno task arch:check` | Exit 0; repository-wide pre-existing warnings only. |
 
 ### Runtime Gates
 
@@ -175,7 +188,7 @@ code and release config do not change.
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| `@netscript/sdk/auto-update` fixture | NOT_RUN | planned slice 3 | Awaiting implementation. |
+| `@netscript/sdk/auto-update` fixture | PASS | `auto-update-consumer_type.ts` + scoped wrapper | Public import and discriminated narrowing compile without upstream globals. |
 
 ## Handoff Notes
 
@@ -196,3 +209,8 @@ code and release config do not change.
   validation, and tuple constants explicitly accepted.
 - S2 reconcile note: #841 remains open with PR #849 as its only closing PR; milestone 13 and
   `status:impl` remain correct; #457 still owns native E2E. Stop for Tier-A review before slice 3.
+- S2 Tier-A review: `PASS` with sign-off for `35f3b726`; namespace precedence, rollback ordering,
+  Windows capability classification, discriminated events, and dependency injection accepted.
+- S3 reconcile note: #841 remains open with draft PR #849 as its sole closing PR; milestone 13 and
+  `status:impl` remain correct; #457 remains the native E2E owner. After final commit/push/comment,
+  stop for supervisor-dispatched IMPL-EVAL.
