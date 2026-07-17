@@ -917,3 +917,19 @@ that fails loudly when the claim and the artifact disagree.
 
 A supervisor who has internalised a rule is still a supervisor who will skip it. Automate the check or
 it does not exist.
+
+### PR #776 advanced-base reconciliation (2026-07-17)
+
+Merged `origin/feat/beta10-integration` into `feat/evaluator-route-binding`. Preserved all landed
+base work, including #794's effort-paired review ladder, and retained the PR's formal open-evaluator
+enforcement. Deliberately dropped the now-obsolete fixed Opus-high `review_codex` binding; the
+ordinary resolver and its test now consume the base's Fable-low canonical primary. Validation and
+the pushed merge commit are recorded in the PR #776 reconciliation comment.
+
+| Reconciliation gate | Result |
+| --- | --- |
+| Exact PR command: `deno test .llm/tools/agentic/` | Expected permission-only failure plus one stale combined-route snapshot; snapshot reconciled |
+| Permission-correct suite: `deno test -A .llm/tools/agentic/` | PASS — 250 passed, 0 failed |
+| Scoped check wrapper: `.llm/tools/run-deno-check.ts --root .llm/tools/agentic --ext ts,tsx` | PASS — 105 files, 0 findings |
+| Scoped format wrapper: `.llm/tools/run-deno-fmt.ts --root .llm/tools/agentic --ext ts,tsx` | PASS — 105 files, 0 findings |
+| Suppression scan + `git diff --check` | PASS — zero new suppressions; no whitespace errors |

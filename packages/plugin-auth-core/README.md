@@ -4,10 +4,11 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The reusable auth primitives for NetScript: domain schemas, the `AuthBackendPort` adapter seam,
-the oRPC v1 contract, durable stream schemas, and Zod config — the contract surface every auth
-backend implements and every service host wires, and the core that the deployable
-`@netscript/plugin-auth` plugin binds to the host.**
+**The reusable auth core for NetScript: domain and durable-stream schemas, Zod config, an
+`AuthBackendPort` adapter seam, and the oRPC v1 contract.**
+
+This is the contract surface every auth backend implements and every service host wires; the
+deployable `@netscript/plugin-auth` plugin binds it to the host.
 
 ---
 
@@ -80,5 +81,5 @@ const session = await backend.sessions.getSession({ token: 'opaque-session-token
 
 ## 📝 License
 
-Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
-cryptographically verified provenance.
+Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
+JSR with cryptographically verified provenance.

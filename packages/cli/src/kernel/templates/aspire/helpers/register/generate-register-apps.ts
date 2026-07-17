@@ -79,9 +79,6 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
       lines.push(``);
       lines.push(`    // HTTP endpoint`);
       lines.push(`    await ${id}.withHttpEndpoint({ port: ${entry.Port}, env: 'PORT' });`);
-      if (type === 'app') {
-        lines.push(`    await ${id}.withBrowserLogs();`);
-      }
     }
 
     // --- Common: KV cache dependency ---
@@ -195,7 +192,7 @@ function buildAppBlock(
 
   // Register via addExecutable — Vite dev server started via deno task
   lines.push(
-    `    const ${id} = builder.addExecutable('${name}', 'deno', ${id}_workdir, ['task', '--minimum-dependency-age=0', '${taskName}']);`,
+    `    const ${id} = builder.addExecutable('${name}', 'deno', ${id}_workdir, ['task', '${taskName}']);`,
   );
 }
 
@@ -214,7 +211,7 @@ function buildTauriBlock(
 
   lines.push(`    const ${id}_workdir = resolveWorkspacePath(appHostDir, '${workdir}');`);
   lines.push(
-    `    const ${id} = builder.addExecutable('${name}', 'deno', ${id}_workdir, ['task', '--minimum-dependency-age=0', '${taskName}']);`,
+    `    const ${id} = builder.addExecutable('${name}', 'deno', ${id}_workdir, ['task', '${taskName}']);`,
   );
 }
 
@@ -233,6 +230,6 @@ function buildTaskBlock(
 
   lines.push(`    const ${id}_workdir = resolveWorkspacePath(appHostDir, '${workdir}');`);
   lines.push(
-    `    const ${id} = builder.addExecutable('${name}', 'deno', ${id}_workdir, ['task', '--minimum-dependency-age=0', '${taskName}']);`,
+    `    const ${id} = builder.addExecutable('${name}', 'deno', ${id}_workdir, ['task', '${taskName}']);`,
   );
 }

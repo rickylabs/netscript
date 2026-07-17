@@ -56,7 +56,7 @@ export function generateRegisterTools(options: RegisterToolsOptions): string {
 
     // Register via addExecutable — tools are deno task wrappers
     lines.push(
-      `    let ${id} = await builder.addExecutable('${name}', 'deno', ${id}_workdir, ['task', '--minimum-dependency-age=0', '${taskName}']);`,
+      `    let ${id} = await builder.addExecutable('${name}', 'deno', ${id}_workdir, ['task', '${taskName}']);`,
     );
     lines.push(`    ${id} = await maybeWithProcessCommand(${id}, '${name}', '${taskName}');`);
 

@@ -32,7 +32,8 @@ documentation.
      but is absent from `OPENROUTER_MODEL_IDS` and `OPENROUTER_PRESET_MODELS`. Of the two
      policy-approved open models, only minimax M3 is expressible.
 - **Severity:** significant
-- **Action:** **RESOLVED** by the companion `routing-policy.ts` slice (Codex, 246 tests pass): it
+- **Action:** **RESOLVED** by the companion `routing-policy.ts` slice, landed as #776 at
+  `d3cf59c3` (250 tests pass): it
   adds `qwen/qwen3.7-max` to `OPENROUTER_MODEL_IDS`, binds a formal open-model evaluator route to
   the `claude-openrouter` profile, and makes `resolveCanonicalFormalEvaluatorRoute()` **throw**
   unless the route is Claude + OpenRouter + `open_only` with an approved open model — the
@@ -41,8 +42,9 @@ documentation.
   (`agenticTurn: 'unverified'`) was also **answered with evidence**: the preset's agentic turn is
   **supported** (verified by probe).
 - **Evidence:** `.llm/harness/workflow/lane-policy.md` § "The local evaluator now has a named
-  transport (2026-07-13)" and § "Machine binding"; baseline `routing-policy.ts`
-  L18/L33/L184-190/L255/L279-281; `provider-profiles.ts` L140/L148-157; `config/models.ts` L46-49.
+  transport (2026-07-13)" and § "Machine binding"; landed `formal_evaluation` policy and
+  `resolveCanonicalFormalEvaluatorRoute()` in `routing-policy.ts`; the Qwen evaluation preset in
+  `provider-profiles.ts`; and the approved model set in `config/models.ts`.
 - **Note:** the evaluator lane was the **only** lane in the repo living purely in prose — which is
   exactly why an unexamined assumption could persist in it. That is the durable lesson, independent
   of which transport wins: keep the route in the data.
@@ -90,6 +92,24 @@ documentation.
   transport is named, no OpenHands cloud capability was removed, and the CI-gate trigger template in
   `AGENTS.md` is untouched.
 - **Evidence:** `git diff` on branch `docs/evaluator-claude-codex`; `AGENTS.md` unchanged.
+
+## 2026-07-13 — evaluator route binding slice
+
+- **Severity:** process
+- **Plan-Gate:** The shared run directory had no slice-specific `context-pack.md`, `plan.md`,
+  `worklog.md`, or `plan-eval.md`. Implementation proceeded from the owner's locked slice brief and
+  OD-7; this is not a substitute for the required separate Claude-family IMPL-EVAL.
+- **Route shape:** The initial slice added authored-family-aware ordinary review routing. The final
+  squash merged as #776 additionally lands a distinct `formal_evaluation` lane backed by the Qwen
+  OpenRouter evaluation preset and guarded by `open_only`. Ordinary Codex review is governed by
+  #794's effort-paired `review_codex_light` / `review_codex` / `review_codex_complex` /
+  `review_codex_fast` ladder; formal evaluation is separate from that ladder.
+- **Gate invocation:** The requested bare `deno test .llm/tools/agentic/` lacks filesystem and
+  environment permissions required by existing tests (221 passed, 21 `NotCapable` failures).
+  `deno test -A .llm/tools/agentic/` was green at that point (244 passed, 0 failed), including the
+  volatile-value guard. The final #776 reconciliation result is 250 passed, 0 failed, as recorded
+  later in this log and in the PR comment.
+
 ## D-1 — `design:sync` converter cannot bundle the current fresh-ui registry (2026-07-13)
 
 **Filed plan says:** the design-sync system is production-grade and idempotent against the fresh-ui
@@ -389,3 +409,16 @@ Had Stream B run #715's cycle-2 re-eval naively, it would have received a blank 
 > **An exit code, a `subtype: success`, or a green tick is not evidence. Evidence is output you can
 > point at.** Assert on the **content**, never on the **status**. And a gate — or an evaluator — you
 > have never seen **fail** is not a gate.
+
+## 2026-07-17 — PR #776 advanced-base reconciliation
+
+- **Severity:** integration drift
+- **Base advance:** `feat/beta10-integration` gained the owner-ratified review-pairing ladder in
+  #794. Its `review_codex` primary is now Fable 5 low with an Opus 4.8 low token-limit fallback,
+  alongside distinct light, complex, and fast review lanes.
+- **Deliberately superseded:** PR #776's fixed `review_codex` → Opus 4.8 high route was dropped. The
+  ordinary evaluator resolver now selects the advanced base's canonical `review_codex` primary,
+  while retaining PR #776's generator/evaluator session separation and opposite-family checks.
+- **Preserved from PR #776:** the formal Claude + OpenRouter open-model evaluator route, typed Qwen
+  preset, approved-open-model allowlist, and hard rejection of closed or unsupported evaluator
+  routes.

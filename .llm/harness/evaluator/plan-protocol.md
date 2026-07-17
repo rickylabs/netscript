@@ -6,12 +6,13 @@ session** from the generator and from IMPL-EVAL.
 
 On a local-machine run PLAN-EVAL is a separate **local** session on the **Claude Code + OpenRouter**
 transport (`claude-openrouter` profile → `claude-print`) running an **OPEN model**
-(`minimax/minimax-m3`, `qwen/qwen3.7-max`) — an open model is adversarial to both the Claude and
-Codex families. It is triggered by the **supervisor**, never auto-dispatched by a sub-agent, and
+through the bound Qwen evaluation preset (`qwen/qwen3.7-max`) — an open model is adversarial to both
+the Claude and Codex families. Minimax M3 remains approved for open-model evaluation but is not
+currently bound to a local evaluation preset. It is triggered by the **supervisor**, never auto-dispatched by a sub-agent, and
 **closed/paid models (Claude/GPT/Gemini) are prohibited on it** (they burn paid OpenRouter credit).
 OpenHands remains the default automated **cloud** agent under the same open-models-only rule. Both
 approved open models return a **real reasoning trace** and have a **verified agentic turn** on this
-transport, so the evaluator can run gates and its `effort` is genuine (drift D-4 amended: the
+transport; the bound Qwen preset can run gates and its `effort` is genuine (drift D-4 amended: the
 zero-reasoning behaviour is **GLM-specific**, not a client-wide gap). See `evaluator/protocol.md`,
 `workflow/lane-policy.md`, and `.agents/skills/openhands-handoff/SKILL.md` "Routing policy".
 

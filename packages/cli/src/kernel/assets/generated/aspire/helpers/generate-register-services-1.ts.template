@@ -6,6 +6,8 @@ import type { NetScriptConfig } from '{{__slot2__}}';
 import type { InfrastructureContext } from './register-infrastructure.mjs';
 import {
   buildDatabaseUriEnvKey,
+  buildDatabaseProviderEnvVars,
+  buildSqliteDatabaseUrl,
   buildOtelEnvVars,
   extractPluginReferences,
   extractServiceReferences,
@@ -39,6 +41,7 @@ export async function registerServices(
 ): Promise<Map<string, ExecutableResource>> {
   const services = new Map<string, ExecutableResource>();
   const databaseEnvKey = buildDatabaseUriEnvKey(config);
+  const databaseProviderEnv = buildDatabaseProviderEnvVars(config);
 
   // --- Pass 1: Create all service resources ---
 {{__slot4__}}

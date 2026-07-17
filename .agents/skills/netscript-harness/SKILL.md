@@ -135,13 +135,14 @@ routing here — defer to that file. The items below are the parts of the contra
   self-certify.
 - **Wrong evaluator surface** — the generator session may never evaluate its own output. For a
   **local-machine run**, PLAN-EVAL/IMPL-EVAL is a **separate local session on Claude Code +
-  OpenRouter** (`claude-openrouter` profile → `claude-print`) running an **OPEN model**
-  (`minimax/minimax-m3`, `qwen/qwen3.7-max`) — an open model is adversarial to both the Claude and
-  Codex families. **Ordinary (non-formal) review** — the slice review gate, code/PR review — uses a
+  OpenRouter** (`claude-openrouter` profile → `claude-print`) running the bound **OPEN-model Qwen
+  evaluation preset** (`qwen/qwen3.7-max`) — an open model is adversarial to both the Claude and
+  Codex families. Minimax M3 remains in the approved open-model set but is not currently bound to a
+  local evaluation preset. **Ordinary (non-formal) review** — the slice review gate, code/PR review — uses a
   local **opposite-family** session instead (a Codex GPT-5.6 session reviews Claude-authored work; a
   Claude session reviews Codex-authored work). The **supervisor chooses when to trigger** — never
-  auto-dispatch a cloud evaluator from a sub-agent. **Both evaluator transports are open-models-only
-  (minimax M3 / Qwen 3.7); dispatching either with a closed model (Claude/GPT/Gemini) is prohibited
+  auto-dispatch a cloud evaluator from a sub-agent. **Both evaluator transports are open-models-only;
+  dispatching either with a closed model (Claude/GPT/Gemini) is prohibited
   (it burns paid OpenRouter credit).** OpenHands remains the default automated **cloud** agent. See
   `.agents/skills/openhands-handoff/SKILL.md` "Routing policy". If no evaluator surface is available,
   record a blocked launch in `drift.md`.

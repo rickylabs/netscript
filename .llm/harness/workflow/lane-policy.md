@@ -33,7 +33,7 @@ and endpoints live in `config/versions.ts` and `config/endpoints.ts`. See the "M
 | Review of Codex/OpenAI normal implementation (pairs with normal implementation)                         | Claude · Anthropic · Fable 5 · low — in-plan and auto-selectable (Fable 5 restored, PR #784). Token-limit fallback: Claude · Anthropic · Opus 4.8 · low (Claude-family only).                                                                             |
 | Review of Codex/OpenAI complex implementation (pairs with complex implementation)                       | Claude · Anthropic · Fable 5 · medium — in-plan and auto-selectable (Fable 5 restored, PR #784). Token-limit fallback: Claude · Anthropic · Opus 4.8 · medium (Claude-family only).                                                                       |
 | Review of Codex/OpenAI fast iteration (pairs with fast iteration, incl. swarm Codex sub-agents)         | Claude · Anthropic · Opus 4.8 · medium. Token-limit fallback: Claude · Anthropic · Sonnet 5 · high (Claude-family only).                                                                                                                                  |
-| **Local evaluator pass — PLAN-EVAL / IMPL-EVAL**                                                | Claude · OpenRouter · **OPEN model only** (`minimax/minimax-m3`, `qwen/qwen3.7-max`) · `claude-openrouter` profile / `claude-print`. **Closed/paid models (Claude/GPT/Gemini) are PROHIBITED** — they burn paid OpenRouter credit. Both open models return a real reasoning trace and have a verified agentic turn, so the evaluator can run gates. |
+| **Local evaluator pass — PLAN-EVAL / IMPL-EVAL**                                                | Claude · OpenRouter · bound **OPEN-model Qwen evaluation preset** (`qwen/qwen3.7-max`) · `claude-openrouter` profile / `claude-print`. **Closed/paid models (Claude/GPT/Gemini) are PROHIBITED** — they burn paid OpenRouter credit. Minimax M3 remains approved but its current local preset is workflow-fanout, not evaluation. |
 | Automated cloud agent (including cloud evaluator runs)                                         | OpenHands · open models only (minimax M3 / Qwen 3.7) · cloud-driven runs only. Unchanged; see `.agents/skills/openhands-handoff/SKILL.md`.                                                                                                                    |
 
 The issue-body “Gemini 3.5 Flash” reference for research/extraction was superseded by epic #574's
@@ -108,14 +108,15 @@ The doctrine already said the right thing: OpenHands is for **cloud-driven** run
 a **named local transport** — so it described a gap and told us to log it. The gap is now filled:
 
 **Local PLAN-EVAL / IMPL-EVAL runs on Claude Code + OpenRouter (`claude-openrouter` profile →
-`claude-print`) with an OPEN model.** An open model is neither Claude-family nor Codex-family, so it
+`claude-print`) with the bound open-model Qwen evaluation preset.** An open model is neither Claude-family nor Codex-family, so it
 is adversarial to **both** generators — the generator-≠-evaluator invariant is satisfied more
 robustly than by a family swap alone.
 
 **Nothing about OpenHands changes.** It remains the default automated **cloud** agent, and its model
 rules are inherited **verbatim** by the local lane:
 
-- **OPEN models only** — `minimax/minimax-m3`, `qwen/qwen3.7-max`.
+- **OPEN models only** — the approved set is `minimax/minimax-m3` and `qwen/qwen3.7-max`; the
+  currently bound local evaluation preset is Qwen, while Minimax's current preset is workflow-fanout.
 - **Closed/paid models (Claude/`sonnet`, GPT/`gpt`, Gemini) are PROHIBITED** on either evaluator
   transport. They bill the owner's OpenRouter balance and can silently burn it. This is a
   **cost-protection policy, not a runner implementation detail** — it survives the transport change
@@ -148,8 +149,8 @@ work** (the `major_ui_ux_*` lanes); it is not an implementation or general-evalu
 
 | Model on Claude Code + OpenRouter | Reasoning trace | Agentic turn | Lane              |
 | --------------------------------- | --------------- | ------------ | ----------------- |
-| `minimax/minimax-m3`              | yes             | supported    | evaluator         |
-| `qwen/qwen3.7-max`                | yes             | supported    | evaluator         |
+| `minimax/minimax-m3`              | yes             | supported    | workflow fanout; approved open model |
+| `qwen/qwen3.7-max`                | yes             | supported    | bound formal evaluator |
 | `z-ai/glm-5.2`                    | **none**        | —            | design/UI-UX only |
 
 The **evaluator lane is fully capable**: real reasoning trace, verified agentic turn (real tool

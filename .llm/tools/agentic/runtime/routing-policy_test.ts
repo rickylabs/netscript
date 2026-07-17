@@ -2,11 +2,14 @@ import type { RouteIdentity } from './contract.ts';
 import {
   CANONICAL_ROUTE_POLICY,
   type FallbackCandidate,
+  resolveCanonicalFormalEvaluatorRoute,
+  resolveCanonicalOrdinaryReviewRoute,
   resolveCanonicalRoute,
   type RoutingPolicyContext,
   selectFallbackCandidate,
 } from './routing-policy.ts';
-import { assertEquals as equal } from '@std/assert';
+import { MODEL_IDS, OPENROUTER_MODEL_IDS } from '../config/models.ts';
+import { assertEquals as equal, assertThrows } from '@std/assert';
 
 const worktree = '/home/codex/repos/routing-policy';
 const session = { agent: 'codex', sessionId: 'session-1', worktree, boundary: 'new' } as const;
@@ -191,6 +194,96 @@ Deno.test('Claude review stays opposite-family on GPT-5.6 Sol xhigh', () => {
     'gpt-5.6-sol',
     'xhigh',
   ]);
+});
+
+Deno.test('canonical evaluator lanes bind each authored family to its opposite-family route', () => {
+  const at = new Date('2026-07-16T00:00:00Z');
+  const claudeReview = resolveCanonicalOrdinaryReviewRoute({
+    authorFamily: 'anthropic',
+    generatorSession: { ...session, agent: 'claude', sessionId: 'claude-generator' },
+    evaluatorSession: { ...session, agent: 'codex', sessionId: 'codex-evaluator' },
+  }, at);
+  const codexReview = resolveCanonicalOrdinaryReviewRoute({
+    authorFamily: 'openai',
+    generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
+    evaluatorSession: { ...session, agent: 'claude', sessionId: 'claude-evaluator' },
+  }, at);
+  equal([claudeReview.lane, claudeReview.model, claudeReview.effort], [
+    'review_claude',
+    'gpt-5.6-sol',
+    'xhigh',
+  ]);
+  equal([codexReview.lane, codexReview.model, codexReview.effort], [
+    'review_codex',
+    'fable-5',
+    'low',
+  ]);
+});
+
+Deno.test('canonical evaluator resolution rejects self-certification', () => {
+  const at = new Date('2026-07-13T00:00:00Z');
+  const generatorSession = { ...session, agent: 'codex', sessionId: 'generator' } as const;
+  assertThrows(() =>
+    resolveCanonicalOrdinaryReviewRoute({
+      authorFamily: 'openai',
+      generatorSession,
+      evaluatorSession: generatorSession,
+    }, at)
+  );
+  assertThrows(() =>
+    resolveCanonicalOrdinaryReviewRoute({
+      authorFamily: 'openai',
+      generatorSession,
+      evaluatorSession: { ...session, agent: 'codex', sessionId: 'same-family-evaluator' },
+    }, at)
+  );
+});
+
+Deno.test('formal evaluator is Claude OpenRouter with the supported Qwen evaluation preset', () => {
+  const route = resolveCanonicalFormalEvaluatorRoute({
+    authorFamily: 'openai',
+    generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
+    evaluatorSession: { ...session, agent: 'claude', sessionId: 'open-evaluator' },
+  }, new Date('2026-07-13T00:00:00Z'));
+  equal([
+    route.lane,
+    route.agent,
+    route.provider,
+    route.profileId,
+    route.presetId,
+    route.model,
+    route.evaluatorModelPolicy,
+  ], [
+    'formal_evaluation',
+    'claude',
+    'openrouter',
+    'claude-openrouter',
+    'claude-evaluator-qwen-3-7-max',
+    OPENROUTER_MODEL_IDS.qwen,
+    'open_only',
+  ]);
+});
+
+Deno.test('formal evaluator rejects closed models and reused generator sessions', () => {
+  const at = new Date('2026-07-13T00:00:00Z');
+  const generatorSession = { ...session, agent: 'codex', sessionId: 'codex-generator' } as const;
+  const evaluatorSession = { ...session, agent: 'claude', sessionId: 'open-evaluator' } as const;
+  const route = resolveCanonicalRoute('formal_evaluation', at);
+  assertThrows(() =>
+    resolveCanonicalFormalEvaluatorRoute({
+      authorFamily: 'openai',
+      generatorSession,
+      evaluatorSession,
+      route: { ...route, model: MODEL_IDS.opus },
+    }, at)
+  );
+  assertThrows(() =>
+    resolveCanonicalFormalEvaluatorRoute({
+      authorFamily: 'openai',
+      generatorSession,
+      evaluatorSession: generatorSession,
+    }, at)
+  );
 });
 
 Deno.test('review-of-Codex ladder is effort-paired and Fable is reserved for medium+', () => {

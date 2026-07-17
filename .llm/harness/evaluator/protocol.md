@@ -11,8 +11,9 @@ the evaluator session, and no lane self-certifies. The transport is how that inv
 
 - **Local run (the default for harness work).** PLAN-EVAL/IMPL-EVAL runs in a separate **local**
   session on the **Claude Code + OpenRouter** transport (`claude-openrouter` provider profile,
-  driven via `claude-print`) with an **OPEN model** — `minimax/minimax-m3` or `qwen/qwen3.7-max`. An
-  open model is neither Claude-family nor Codex-family, so it is adversarial to **both** generators.
+  driven via `claude-print`) with the bound **OPEN-model Qwen evaluation preset** —
+  `qwen/qwen3.7-max`. Minimax M3 remains in the approved open-model set but its current local preset
+  is workflow-fanout, not evaluation. An open model is neither Claude-family nor Codex-family, so it is adversarial to **both** generators.
   **Closed/paid models (Claude/GPT/Gemini) are prohibited on this lane** — they burn paid OpenRouter
   credit. The **supervisor** triggers it; a sub-agent never auto-dispatches an evaluator.
 - **Cloud run.** OpenHands remains the default automated cloud agent, under its existing rules:
@@ -28,7 +29,7 @@ by both transports.
 
 **Capability (verified, drift D-4 amended).** The evaluator lane is fully capable on this transport:
 both approved open models return a **real reasoning trace** and have a **verified agentic turn**
-(they make real tool calls through Claude Code), so an open-model evaluator **can run gates** and
+(they make real tool calls through Claude Code), so the bound Qwen evaluator **can run gates** and
 its `effort` is genuine — not nominal.
 
 | Model on Claude Code + OpenRouter | Reasoning trace | Agentic turn |

@@ -83,7 +83,7 @@ Deno.test('helpers/vite', async (t) => {
   await t.step('buildViteEnvVarName: hyphenated name', () => {
     const result = buildViteEnvVarName('workers-api');
 
-    assertEquals(result.full, 'VITE_services__workers-api__http__0');
+    assertEquals(result.full, 'VITE_services__workers_api__http__0');
     assertEquals(result.shorthand, 'VITE_WORKERS_API_URL');
   });
 
@@ -92,6 +92,13 @@ Deno.test('helpers/vite', async (t) => {
 
     assertEquals(result.full, 'VITE_services__api__grpc__0');
     assertEquals(result.shorthand, 'VITE_API_URL');
+  });
+
+  await t.step('buildViteEnvVarName: normalizes every identifier segment', () => {
+    const result = buildViteEnvVarName('workers.api', 'http-2');
+
+    assertEquals(result.full, 'VITE_services__workers_api__http_2__0');
+    assertEquals(result.shorthand, 'VITE_WORKERS_API_URL');
   });
 });
 

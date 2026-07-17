@@ -4,9 +4,10 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The service runtime for NetScript: a fluent builder that turns an oRPC router into a Hono service
-with health probes, OpenAPI, Scalar docs, and graceful shutdown. `defineService()` wires the full
-surface in one call; `createService()` composes it step by step.**
+**The service runtime for NetScript: turn an oRPC router into a Hono service with health probes,
+OpenAPI, Scalar docs, and graceful shutdown.**
+
+`defineService()` wires the full surface in one call; `createService()` composes it step by step.
 
 ---
 

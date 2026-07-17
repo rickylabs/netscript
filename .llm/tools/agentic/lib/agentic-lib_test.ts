@@ -35,6 +35,7 @@ import {
   wslUser,
 } from './agentic-lib.ts';
 import { assert, assertEquals } from '@std/assert';
+import { OPENROUTER_MODEL_IDS } from '../config/models.ts';
 
 const here = new URL('.', import.meta.url).pathname;
 // On Windows the pathname is like /C:/...; strip the leading slash for Deno.readTextFile.
@@ -281,7 +282,7 @@ Deno.test('parseRepoSlug rejects malformed slugs', () => {
 // --- buildOpenHandsComment ------------------------------------------------
 Deno.test('buildOpenHandsComment emits the trigger line and body', () => {
   const body = buildOpenHandsComment({
-    model: 'openrouter/qwen/qwen3.7-max',
+    model: `openrouter/${OPENROUTER_MODEL_IDS.qwen}`,
     outputMode: 'pr-comment',
     iterations: 800,
     provider: 'openrouter',
@@ -290,7 +291,7 @@ Deno.test('buildOpenHandsComment emits the trigger line and body', () => {
   });
   const first = body.split('\n')[0];
   assert(first.startsWith('@openhands-agent'), 'mentions @openhands-agent');
-  assert(first.includes('model=openrouter/qwen/qwen3.7-max'), 'carries model');
+  assert(first.includes(`model=openrouter/${OPENROUTER_MODEL_IDS.qwen}`), 'carries model');
   assert(first.includes('output=pr-comment'), 'carries output');
   assert(first.includes('iterations=800'), 'carries iterations');
   assert(first.includes('provider=openrouter'), 'carries provider');
@@ -311,7 +312,7 @@ Deno.test('parseOpenHandsStatusComment parses a completed status', async () => {
   const s = parseOpenHandsStatusComment(body);
   assertEquals(s.heading, 'Completed');
   assertEquals(s.verdict, 'completed');
-  assertEquals(s.model, 'openrouter/qwen/qwen3.7-max');
+  assertEquals(s.model, `openrouter/${OPENROUTER_MODEL_IDS.qwen}`);
   assertEquals(s.provider, 'OPENROUTER');
   assertEquals(s.jobStatus, 'success');
   assert(s.isFinal, 'completed is final');
@@ -464,7 +465,7 @@ function c(
 const OH = '<!-- openhands-agent-summary -->';
 // A real-shaped trigger comment: quotes both template forms.
 const triggerComment = c(
-  '@openhands-agent model=openrouter/qwen/qwen3.7-max output=pr-comment iterations=800\n\n' +
+  `@openhands-agent model=openrouter/${OPENROUTER_MODEL_IDS.qwen} output=pr-comment iterations=800\n\n` +
     'use harness\n## SKILL\n- jsr-audit\n\nPost `**[PHASE: IMPL-EVAL] ' +
     '[VERDICT: <PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT>]**` and end with ' +
     'OPENHANDS_VERDICT: <verdict>.',

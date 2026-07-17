@@ -4,9 +4,10 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The deployable background-workers plugin for NetScript. It binds the host plugin system to
-background jobs, multi-runtime task execution, workflows, a Workers API service, CLI commands,
-durable streams, and Aspire process wiring through a single declarative manifest.**
+**The deployable background-workers plugin for NetScript: bind jobs, multi-runtime task execution,
+workflows, a Workers API service, CLI commands, and Aspire wiring through one manifest.**
+
+The declarative manifest also carries durable-stream contributions and worker runtime metadata.
 
 ---
 

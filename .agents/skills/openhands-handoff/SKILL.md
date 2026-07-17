@@ -43,8 +43,10 @@ A local run's PLAN-EVAL / IMPL-EVAL used to have no named transport — this ski
 and told you to log it. It is now filled:
 
 **Local PLAN-EVAL / IMPL-EVAL runs on Claude Code + OpenRouter** — the `claude-openrouter` provider
-profile driven via `claude-print` — with an **OPEN model** (`minimax/minimax-m3`,
-`qwen/qwen3.7-max`). **Rule 1 above applies verbatim to this lane: OPEN models only; closed/paid
+profile driven via `claude-print` — with the bound **OPEN-model Qwen evaluation preset**
+(`qwen/qwen3.7-max`). Minimax M3 remains in the approved open-model set and is valid for cloud
+evaluation, but its current local preset is workflow-fanout rather than evaluation. **Rule 1 above
+applies verbatim to this lane: OPEN models only; closed/paid
 models (Claude/`sonnet`, GPT/`gpt`, Gemini) are PROHIBITED** — they bill the owner's OpenRouter
 balance and can silently burn it. An open model is neither Claude-family nor Codex-family, so it is
 adversarial to **both** generators, which satisfies the generator-≠-evaluator invariant more
@@ -55,8 +57,8 @@ opposite-family** agent: Codex GPT-5.6 reviews Claude-authored work; a Claude se
 Codex-authored work. Do not conflate it with the formal evaluator pass.
 
 **Capability (verified; drift D-4 amended):** both approved open models return a **real reasoning
-trace** and have a **verified agentic turn** (real tool calls) on this transport, so the evaluator
-**can run gates** and its `effort` is genuine — not nominal. The zero-reasoning behaviour is
+trace** and have a **verified agentic turn** (real tool calls) on this transport. The currently
+bound Qwen evaluation preset can therefore run gates and its `effort` is genuine — not nominal. The zero-reasoning behaviour is
 **specific to GLM 5.2** over OpenRouter (a design-lane model), **not** a client-wide gap: never cite
 "GLM 5.2 · xhigh reasoning" as gate evidence, and do not restate that caveat as a property of the
 transport or of the evaluator lane.

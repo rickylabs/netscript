@@ -1,20 +1,22 @@
 # @netscript/bench
 
-The NetScript **self-bench instrument**: a clean-architecture harness that measures how effectively
-a coding agent builds a working NetScript service. It drives an agent through a task in an isolated
-sandbox, runs a frozen black-box HTTP suite after every turn, and scores the attempt on four axes.
+**The NetScript self-bench instrument: measure how effectively a coding agent builds a working
+NetScript service in an isolated sandbox.**
+
+The clean-architecture harness drives an agent through a task, runs a frozen black-box HTTP suite
+after every turn, and scores the attempt on four axes.
 
 > **Status.** This package ships the full instrument architecture, validated end-to-end by unit
-> tests with a deterministic **fake driver**. Committed golden references cover
-> `t1-storefront-api` and `t2-saga-queue-cron`; the real **conformance** gate boots both and runs
-> their frozen suites green over HTTP. Only the live paid agent run (`bench self` without `--fake`) remains gated
+> tests with a deterministic **fake driver**. Committed golden references cover `t1-storefront-api`
+> and `t2-saga-queue-cron`; the real **conformance** gate boots both and runs their frozen suites
+> green over HTTP. Only the live paid agent run (`bench self` without `--fake`) remains gated
 > pending the cost/key/cadence decision (OQ2). `publish: false`.
 
 ## Protocol
 
-1. A **task** (`tasks/t1-storefront-api/`, `tasks/t2-saga-queue-cron/`) provides an agent-facing `prompt.md`, per-lane
-   `context/AGENTS.md` guidance, a provisional `rubric.md`, and a **frozen** `tests/frozen-suite.ts`
-   the agent never sees.
+1. A **task** (`tasks/t1-storefront-api/`, `tasks/t2-saga-queue-cron/`) provides an agent-facing
+   `prompt.md`, per-lane `context/AGENTS.md` guidance, a provisional `rubric.md`, and a **frozen**
+   `tests/frozen-suite.ts` the agent never sees.
 2. The runner provisions a throwaway **sandbox** in the OS temp area (never the in-tree `.llm/tmp`)
    and seeds it with the agent-visible files only — the frozen suite and any golden reference are
    withheld.
