@@ -15,6 +15,7 @@ Date: 2026-07-17
 | Skill mirror              | PASS   | `agentic:sync-claude:check`: 17 skills, 21 mirrored files               |
 | Changed-file quality      | PASS   | 25 TypeScript files, 0 findings, 0 allowances                           |
 | Seeded negative checks    | PASS   | every composed readiness row has a witnessed failing fixture/test       |
+| Separate IMPL-EVAL        | PASS   | Qwen session `a06700df-b15b-43e4-a35b-e9d0a97c2f06`; no blockers       |
 
 The first quality scan identified two pre-existing `any` suppressions because this slice touched
 `agentic-lib.ts`. They were removed by narrowing rollout JSON as `unknown` and changing the GitHub

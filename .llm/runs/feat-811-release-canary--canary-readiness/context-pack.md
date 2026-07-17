@@ -6,13 +6,16 @@
 | --- | --- |
 | Run ID | `feat-811-release-canary--canary-readiness` |
 | Branch | `feat/811-release-canary` |
-| Current phase | `plan-eval` |
+| Current phase | `implementation-evaluated` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | none |
 
 ## Current State
 
-The branch is cleanly based on current `origin/main` at `a5adb706`. Issue/PR/release-tool research and a six-slice design are locked. No implementation file has been changed; PLAN-EVAL is the hard stop.
+The six planned slices are implemented at committed head `fbabeb6b`. PLAN-EVAL and separate
+direct-Qwen IMPL-EVAL both returned `PASS`; all requested local gates are green. Draft PR #812 is
+ready to move from `status:impl` to `status:impl-eval` after the evaluator artifact/final run records
+are committed and pushed. No merge is authorized.
 
 ## Completed
 
@@ -20,16 +23,27 @@ The branch is cleanly based on current `origin/main` at `a5adb706`. Issue/PR/rel
 - Read issue #811, PR #810 plus its owner correction, the full current PR #810 branch artifacts, the specified release scripts, workflows, tests, README/tagline standards, token resolver, workspace/version helpers, and relevant debt.
 - Verified baseline release tests: 29 passed, 0 failed.
 - Confirmed official JSR version metadata, prerelease/latest, yanking, GitHub workflow-dispatch, `GITHUB_TOKEN`, and commit-status semantics.
+- Implemented shared stable/canary preparation, collision-safe canary derivation, structured
+  readiness with a red proof for every row, the canary-pair workflow and fail-closed stable gates,
+  durable token fallback, and mandatory canary-first doctrine.
+- Integrated merged PR #810 by invoking its canonical `release:preflight` task and preserving its
+  exact denoland/deno#35546 plus authenticated-canary sunset.
+- Passed 59 release tests and 63 agentic tests; scoped check/lint/fmt, three-workflow YAML parse,
+  workflow contracts, skill sync, and changed-file quality all passed with zero findings/allowances.
+- Separate IMPL-EVAL session `a06700df-b15b-43e4-a35b-e9d0a97c2f06` returned `PASS` with no
+  blocking findings, then independently corrected its evidence transcription while retaining PASS.
 
 ## In Progress
 
-- Separate-session PLAN-EVAL.
+- Commit/push final evaluator and run evidence; update draft PR body/comment/label to
+  `status:impl-eval`.
 
 ## Next Steps
 
-1. Commit/push this bootstrap and open the draft PR.
-2. Run local Qwen PLAN-EVAL and obtain `PASS` before implementation.
-3. Implement slice 2 only after the pass.
+1. Keep PR #812 draft and unmerged for owner/reviewer handoff.
+2. OWNER confirms workflow permissions and JSR scope/package grants after merge.
+3. OWNER runs the first live canary publish plus canary-pinned production E2E pair and yanks any
+   failed/obsolete immutable canary versions.
 
 ## Key Decisions
 
@@ -44,17 +58,22 @@ The branch is cleanly based on current `origin/main` at `a5adb706`. Issue/PR/rel
 
 | Path | Status | Notes |
 | --- | --- | --- |
-| `.llm/runs/feat-811-release-canary--canary-readiness/` | new | Harness planning artifacts only |
+| `.llm/tools/release/`, `deno.json` | changed | Shared preparation, canary cut, readiness, pair verifier, tests, tasks |
+| `.github/workflows/` | changed | Canary publish/pair workflow and stable/production integrations |
+| `.llm/tools/agentic/` | changed | Durable token fallback and unknown-boundary narrowing |
+| `.agents/skills/`, `.claude/skills/` | changed | Mandatory canary-first release/JSR doctrine and mirror |
+| `.llm/runs/feat-811-release-canary--canary-readiness/` | new | Complete harness plan/reviews/gates/evaluation |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Plan | pending | separate Qwen evaluator |
-| Static | baseline PASS | release suite 29/29 |
-| Fitness | not run | blocked by Plan-Gate |
+| Plan | PASS | separate Qwen PLAN-EVAL |
+| Static | PASS | release 59/59; agentic 63/63; check/lint/fmt/YAML/sync/quality green |
+| Fitness | PASS / scoped N/A | release/tooling gates and negative proofs satisfied |
 | Runtime | N/A in PR | no live publish authorized |
-| Consumer | not run | blocked by Plan-Gate |
+| Consumer | PASS | stable cut, canary cut, publisher, and GitHub Release consumers verified |
+| IMPL-EVAL | PASS | separate Qwen evaluator; no blocking findings |
 
 ## Open Questions
 
@@ -62,8 +81,9 @@ The branch is cleanly based on current `origin/main` at `a5adb706`. Issue/PR/rel
 
 ## Drift and Debt
 
-- Drift: none.
-- Debt: one stale OIDC entry planned for closure; no new debt.
+- Drift: invalid delegated PLAN-EVAL discarded; Fable review fallback; three zero-turn evaluator
+  profile probes discarded; evaluator evidence transcription corrected by the same evaluator.
+- Debt: stale OIDC wiring entry resolved without claiming a live canary; no new debt.
 
 ## Commits
 

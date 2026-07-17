@@ -93,6 +93,9 @@ helper.
 | 2026-07-17 | 5     | opposite-family review | Independent Opus review verified source/mirror, mandatory gates, policy, and honest debt closure; `SLICE_REVIEW_PASS`.                                                                 |
 | 2026-07-17 | 6     | quality repair         | Changed-file scan exposed legacy `any` suppressions in touched `agentic-lib.ts`; replaced them with unknown-boundary narrowing across the internal GitHub transport consumers.         |
 | 2026-07-17 | 6     | final gates            | Release 59/59, agentic 63/63, check/lint/fmt, YAML, mirror sync, and changed-file quality with zero allowances all passed.                                                             |
+| 2026-07-17 | 6     | evaluator route proof  | Canonical `claude-openrouter` live provider canary passed with Qwen tools, reasoning, and streaming after three discarded zero-turn/profile probes.                                    |
+| 2026-07-17 | 6     | IMPL-EVAL              | Separate direct-only Qwen session `a06700df-b15b-43e4-a35b-e9d0a97c2f06` independently witnessed 122/122 tests and returned `PASS` with no blocking findings.                           |
+| 2026-07-17 | 6     | evidence correction    | Same evaluator re-verified and corrected stale metadata in `evaluate.md`; the implementation verdict remained `PASS`.                                                                |
 
 ## Decisions
 
@@ -108,6 +111,8 @@ helper.
 | ------------------------------------ | -------- | ------------------ |
 | Invalid evaluator delegation attempt | moderate | `drift.md`         |
 | Fable slice-review route unavailable | minor    | `drift.md`         |
+| IMPL-EVAL profile omitted initially  | minor    | `drift.md`         |
+| Evaluator evidence transcription     | minor    | `drift.md`         |
 
 ## Gate Results
 
@@ -133,7 +138,8 @@ helper.
 | touched TS check       | scoped `run-deno-check.ts`                                         | PASS   | 25 files, `--unstable-kv`, zero findings                                       |
 | touched TS lint/fmt    | scoped lint and format wrappers                                    | PASS   | 25 files, zero findings                                                        |
 | changed-file quality   | `quality:scan --max-allow 0`                                       | PASS   | 25 files, zero findings, zero allowances                                       |
-| implementation gates   | `final-gates.md`                                                   | PASS   | All requested local gates green; IMPL-EVAL pending                             |
+| implementation gates   | `final-gates.md`                                                   | PASS   | All requested local gates green                                                |
+| IMPL-EVAL              | `evaluate.md`                                                      | PASS   | Separate direct Qwen session; no blocking findings                             |
 
 ### Fitness Gates
 
@@ -158,5 +164,7 @@ helper.
 
 ## Handoff Notes
 
-- PLAN-EVAL should inspect the content-SHA rule, workflow-dispatch correlation, version precedence,
-  #810 ownership boundary, and whether every deliverable has a negative-proof gate.
+- PLAN-EVAL and IMPL-EVAL are complete and `PASS`; the draft PR may move to `status:impl-eval` but
+  must not be merged by this run.
+- Live canary publication, canary-pinned production E2E, repository workflow permissions, and JSR
+  scope grants remain explicit post-merge OWNER actions.
