@@ -65,6 +65,7 @@ Add or change one readiness rule as a named evidence-producing check with a seed
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-07-17 | 1 | research/design | Re-baselined at `a5adb706`; existing release suite 29/29 green; implementation blocked on PLAN-EVAL. |
+| 2026-07-17 | 1 | PLAN-EVAL retry | First Qwen evaluator attempted prohibited closed-model delegation and was interrupted; no verdict accepted. Fresh direct-only Qwen retry required. |
 
 ## Decisions
 
@@ -78,7 +79,7 @@ Add or change one readiness rule as a named evidence-producing check with a seed
 
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
-| none | minor | n/a |
+| Invalid evaluator delegation attempt | moderate | `drift.md` |
 
 ## Gate Results
 
