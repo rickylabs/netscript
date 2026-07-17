@@ -6,6 +6,8 @@ import type { NetScriptConfig } from '{{__slot2__}}';
 import type { InfrastructureContext } from './register-infrastructure.mjs';
 import {
   buildDatabaseUriEnvKey,
+  buildDatabaseProviderEnvVars,
+  buildSqliteDatabaseUrl,
   buildOtelEnvVars,
   resolvePermissions,
   resolveWorkspacePath,
@@ -41,6 +43,7 @@ export async function registerPlugins(
 ): Promise<Map<string, ExecutableResource>> {
   const plugins = new Map<string, ExecutableResource>();
   const databaseEnvKey = buildDatabaseUriEnvKey(config);
+  const databaseProviderEnv = buildDatabaseProviderEnvVars(config);
 
   // --- Pass 1: Create all plugin resources ---
 {{__slot4__}}

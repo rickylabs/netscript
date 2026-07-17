@@ -26,6 +26,8 @@ import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 import { renderTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
 import { netscriptJsrSpecifier } from '../../../../constants/jsr-specifiers.ts';
 
+const DENO_NO_LEGACY_ABORT_FLAG = '--unstable-no-legacy-abort';
+
 /**
  * Generates the `register-plugins.mts` file content.
  *
@@ -71,7 +73,7 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
 
     // Register via addExecutable with HTTP endpoint
     lines.push(
-      `    const resource = builder.addExecutable('${name}', 'deno', workdir, ['run', '--config', 'deno.json', '--minimum-dependency-age=0', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', ...perms, '${entrypoint}'])`,
+      `    const resource = builder.addExecutable('${name}', 'deno', workdir, ['run', '--config', 'deno.json', '--minimum-dependency-age=0', '${DENO_NO_LEGACY_ABORT_FLAG}', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', ...perms, '${entrypoint}'])`,
     );
     lines.push(
       `      .withHttpEndpoint({ port: ${entry.Port}, env: '${RESOURCE_DEFAULTS.PortEnvVar}' });`,
@@ -120,6 +122,9 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
     if (entry.RequiresDb) {
       lines.push(``);
       lines.push(`    // Database dependency`);
+      lines.push(`    for (const [key, value] of Object.entries(databaseProviderEnv)) {`);
+      lines.push(`      await resource.withEnvironment(key, value);`);
+      lines.push(`    }`);
       lines.push(`    if (infrastructure.primaryDatabase) {`);
       lines.push(
         `      let databaseBinding = resource.withEnvironment('DATABASE_URL', infrastructure.primaryDatabase);`,
@@ -138,7 +143,7 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
       );
       lines.push(`      if (sqliteDatabase?.Engine === 'Sqlite' && config.PrimaryDatabase) {`);
       lines.push(
-        `        const sqliteUrl = \`file:./database/\${config.PrimaryDatabase}/\${sqliteDatabase.DatabaseName ?? \`\${config.PrimaryDatabase}.db\`}\`;`,
+        `        const sqliteUrl = buildSqliteDatabaseUrl(appHostDir, config.PrimaryDatabase, sqliteDatabase.DatabaseName ?? \`\${config.PrimaryDatabase}.db\`);`,
       );
       lines.push(`        await resource.withEnvironment('DATABASE_URL', sqliteUrl);`);
       lines.push(`        if (databaseEnvKey) {`);

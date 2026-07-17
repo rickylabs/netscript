@@ -123,6 +123,9 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
     if (entry.RequiresDb) {
       lines.push(``);
       lines.push(`    // Database dependency`);
+      lines.push(`    for (const [key, value] of Object.entries(databaseProviderEnv)) {`);
+      lines.push(`      await ${id}.withEnvironment(key, value);`);
+      lines.push(`    }`);
       lines.push(`    if (infrastructure.primaryDatabase) {`);
       lines.push(
         `      let ${id}_databaseBinding = ${id}.withEnvironment('DATABASE_URL', infrastructure.primaryDatabase);`,
@@ -143,7 +146,7 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
         `      if (${id}_sqliteDatabase?.Engine === 'Sqlite' && config.PrimaryDatabase) {`,
       );
       lines.push(
-        `        const ${id}_sqliteUrl = \`file:./database/\${config.PrimaryDatabase}/\${${id}_sqliteDatabase.DatabaseName ?? \`\${config.PrimaryDatabase}.db\`}\`;`,
+        `        const ${id}_sqliteUrl = buildSqliteDatabaseUrl(appHostDir, config.PrimaryDatabase, ${id}_sqliteDatabase.DatabaseName ?? \`\${config.PrimaryDatabase}.db\`);`,
       );
       lines.push(`        await ${id}.withEnvironment('DATABASE_URL', ${id}_sqliteUrl);`);
       lines.push(`        if (databaseEnvKey) {`);

@@ -148,8 +148,24 @@ describe('HelpersGeneratorPipeline', () => {
 
     assert(compat, 'compat helper should exist in output');
     assertStringIncludes(compat!.content, 'export function buildViteEnvVarName(');
-    assertStringIncludes(compat!.content, 'VITE_services__${resourceName}__${endpointName}__0');
-    assertStringIncludes(compat!.content, 'VITE_${normalised}_URL');
+    assertStringIncludes(compat!.content, 'normalizeViteIdentifierSegment(resourceName)');
+    assertStringIncludes(compat!.content, 'normalizeViteIdentifierSegment(endpointName)');
+    assertStringIncludes(compat!.content, 'VITE_services__${normalisedResource}__${normalisedEndpoint}__0');
+    assertStringIncludes(compat!.content, 'VITE_${normalisedResource.toUpperCase()}_URL');
+    assertStringIncludes(compat!.content, 'export function buildDatabaseProviderEnvVars(');
+    assertStringIncludes(compat!.content, 'DATABASE_PROVIDER: config.PrimaryDatabase');
+    assertStringIncludes(compat!.content, 'export function buildSqliteDatabaseUrl(');
+    assertStringIncludes(compat!.content, 'pathToFileURL(');
+  });
+
+  it('should bound best-effort Garnet tool restore', async () => {
+    const pipeline = new HelpersGeneratorPipeline();
+    const files = await pipeline.execute({ config: fixtures.POPULATED_CONFIG });
+    const compat = files.find((f) => f.path === '.helpers/_aspire-compat.mts');
+
+    assert(compat, 'compat helper should exist in output');
+    assertStringIncludes(compat!.content, 'GARNET_TOOL_RESTORE_TIMEOUT_MS = 10_000');
+    assertStringIncludes(compat!.content, 'timeout: GARNET_TOOL_RESTORE_TIMEOUT_MS');
   });
 
   it('should pass populated config through to Tier 1 generator content', async () => {
