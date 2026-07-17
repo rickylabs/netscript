@@ -5,6 +5,7 @@
 - Failure: Actions run 29564434302, gate `scaffold.plugin.ai.lifecycle`
 - Root cause: Deno 2.9.3 `deno x` internal `deno run` re-exec drops minimum-age/config flags.
 - Chosen fix: direct published `cli.ts` URL under `deno run --minimum-dependency-age=0`.
-- Plan status: blocked at separate PLAN-EVAL because the canonical local evaluator credential is
-  unavailable; no implementation has started.
+- Plan status: owner explicitly waived PLAN-EVAL for S1 on 2026-07-17.
+- Implementation: S1 complete; focused/scoped/quality/architecture gates and beta.10 fresh-temp
+  consumer proof pass.
 - Product follow-up: real users on Deno 2.9.x encounter the same ~24h window.

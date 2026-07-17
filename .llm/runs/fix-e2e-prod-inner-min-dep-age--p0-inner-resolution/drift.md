@@ -7,10 +7,9 @@ inner resolution. Deno 2.9.3 reproduction showed the `deno x` JSR re-run ignores
 and explicit config. The plan therefore uses a direct `deno run` URL so the explicit flag governs
 the single resolver. No doctrine drift results.
 
-## D-2 — local formal evaluator credential unavailable
+## D-2 — Plan-Gate explicitly waived by owner
 
-The required `formal_evaluation` canary for `claude-openrouter` / `qwen/qwen3.7-max` returned
-`auth_required`: `OPENROUTER_API_KEY` is absent from the child environment. Harness policy forbids
-substituting a closed model or self-evaluation, and the OpenHands skill forbids converting this
-local run into an automatically dispatched cloud evaluation. Implementation remains stopped at the
-Plan-Gate pending evaluator availability or an explicit owner waiver.
+The local formal evaluator credential was unavailable. On 2026-07-17 the owner explicitly directed
+the implementation session to implement S1 without attempting PLAN-EVAL because evaluations are
+supervisor-dispatched. This instruction is the written Plan-Gate waiver required by the run loop;
+the implementation session did not self-evaluate.

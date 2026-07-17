@@ -19,4 +19,25 @@
 
 ## Evidence
 
-Pending Plan-Gate.
+| Gate | Result |
+| --- | --- |
+| Focused `scaffold-gates_test.ts` | PASS — 5 passed, 0 failed |
+| Scoped Deno check (`packages/cli/e2e`) | PASS — 88 files, 0 findings |
+| Scoped lint (`packages/cli/e2e`) | PASS — 88 files, 0 findings |
+| Scoped format (`packages/cli/e2e`) | PASS — 88 files, 0 findings |
+| `deno task quality:scan` | PASS — 0 findings |
+| `deno task arch:check` | PASS — exit 0; pre-existing warnings only |
+| Published beta.10 fresh-temp consumer proof | PASS — exit 0; tool and registry generated |
+
+Consumer proof output:
+
+```text
+{"code":0,"message":"add tool: 1 artifact(s).","data":{"status":"applied","createdFiles":["ai/tools/e2e-tool.ts"],"modifiedFiles":[],"databaseMigrationsAdded":false}}
+```
+
+## S1 reconcile
+
+PR #817 remains the only follow-up surface and references merged #813 without a closing keyword.
+Labels and beta.10 milestone remain correct. The PR body retains the explicit beta.11 seed for the
+shipped-CLI mitigation and generated-project policy decision. No new reviewer comments required a
+plan adjustment.

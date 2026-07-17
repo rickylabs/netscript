@@ -89,10 +89,10 @@ Deno.test('published AI lifecycle gate reuses the published CLI version', () => 
   );
   assertEquals(command, [
     'deno',
-    'x',
+    'run',
     '-A',
     '--minimum-dependency-age=0',
-    'jsr:@netscript/plugin-ai@0.0.1-beta.9/cli',
+    'https://jsr.io/@netscript/plugin-ai/0.0.1-beta.9/cli.ts',
     'add',
     'tool',
     'e2e-tool',
