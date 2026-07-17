@@ -2,12 +2,13 @@
 
 ## Run Metadata
 
-| Field          | Value                                              |
-| -------------- | -------------------------------------------------- |
-| Run ID         | `beta11-cli--orchestrator/slices/g6-456-packaging` |
-| Branch         | `feat/desktop-frontend-456-packaging`              |
-| Archetype      | `6 — CLI / Tooling`                                |
-| Scope overlays | `service` for the release HTTP handler             |
+| Field          | Value                                                                             |
+| -------------- | --------------------------------------------------------------------------------- |
+| Run ID         | `beta11-cli--orchestrator/slices/g6-456-packaging`                                |
+| Branch         | `feat/desktop-frontend-456-packaging`                                             |
+| Draft PR       | [#854](https://github.com/rickylabs/netscript/pull/854) → `feat/desktop-frontend` |
+| Archetype      | `6 — CLI / Tooling`                                                               |
+| Scope overlays | `service` for the release HTTP handler                                            |
 
 ## Design
 
@@ -116,6 +117,7 @@ envelope or route family.
 | 2026-07-18 00:48 CEST | plan  | live re-baseline     | Read all three #456 amendments, PR #822, G2/G4 seams, current SDK docs/source, Deno docs/help/source, and Windows upstream issue.               |
 | 2026-07-18 00:56 CEST | plan  | JSR baseline         | CLI doc lint and raw publish dry-run pass; pre-existing audit/dynamic-import baselines recorded.                                                |
 | 2026-07-18 01:00 CEST | plan  | Design checkpoint    | Public commands, vocabulary, ports, constants, four commit slices, gates, and deferred beta.14 scope locked. No product implementation created. |
+| 2026-07-18 01:03 CEST | plan  | draft PR bootstrap   | Plan commit `f1a0d6c3` pushed; draft PR #854 opened against integration with `Refs #456`, required labels, `status:plan`, and milestone 13.     |
 
 ## Decisions
 
@@ -146,6 +148,7 @@ envelope or route family.
 | Required SDK inspection  | `deno doc packages/sdk/src/auto-update/mod.ts`; `deno doc --filter createReleaseClient ...` | PASS               | Completed before server URL design.                                                    |
 | CLI export doc baseline  | `rtk proxy deno task doc:lint --root packages/cli --pretty`                                 | PASS               | 3 entrypoints; zero errors/private refs/missing JSDoc.                                 |
 | CLI raw publish baseline | `deno publish --dry-run --allow-dirty --no-check=remote` in `packages/cli`                  | PASS_WITH_BASELINE | Exit 0; three existing unanalyzable dynamic-import warnings. No publication.           |
+| Plan checkpoint push     | `git push origin HEAD:refs/heads/feat/desktop-frontend-456-packaging`                       | PASS               | Commit `f1a0d6c3`; draft PR #854 targets `feat/desktop-frontend`.                      |
 
 ### Fitness Gates
 
