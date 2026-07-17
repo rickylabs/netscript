@@ -46,6 +46,11 @@ interface DatabaseHealthCandidate {
   readonly configured: boolean;
 }
 
+const DATABASE_PROVIDER_ALIASES: readonly (readonly [string, string])[] = [
+  ['postgres', 'postgresql'],
+  ['mssql', 'sqlserver'],
+];
+
 /**
  * Extract a `$queryRaw`-capable client from a db context object.
  *
@@ -85,10 +90,10 @@ function databaseNamesMatch(name: string, provider: string): boolean {
   const normalizedName = name.toLowerCase().replaceAll(/[^a-z0-9]/g, '');
   const normalizedProvider = provider.toLowerCase().replaceAll(/[^a-z0-9]/g, '');
   if (normalizedName === normalizedProvider) return true;
-  return (normalizedName === 'postgres' && normalizedProvider === 'postgresql') ||
-    (normalizedName === 'postgresql' && normalizedProvider === 'postgres') ||
-    (normalizedName === 'mssql' && normalizedProvider === 'sqlserver') ||
-    (normalizedName === 'sqlserver' && normalizedProvider === 'mssql');
+  return DATABASE_PROVIDER_ALIASES.some(([left, right]) =>
+    (normalizedName === left && normalizedProvider === right) ||
+    (normalizedName === right && normalizedProvider === left)
+  );
 }
 
 function isDatabase(value: unknown): value is Database {
@@ -227,9 +232,15 @@ export async function defineService<T extends ServiceRouter>(
   if (options.db) {
     const databaseCandidates = findDatabaseHealthCandidates(options.db);
     const healthCheckDb = databaseCandidates.find((candidate) => candidate.configured)?.database;
-    builder.withDatabase(options.db);
+    const configuredCandidate = databaseCandidates.find((candidate) => candidate.configured);
+    builder.withDatabase(
+      options.db,
+      configuredCandidate?.database,
+      configuredCandidate === undefined ? undefined : { name: configuredCandidate.name },
+    );
 
     for (const candidate of databaseCandidates) {
+      if (candidate.configured) continue;
       builder.withHealthCheck(
         healthChecks.database(candidate.database, {
           name: candidate.name,

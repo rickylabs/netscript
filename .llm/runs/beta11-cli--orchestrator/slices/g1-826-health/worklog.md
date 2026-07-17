@@ -65,6 +65,9 @@ them from execution, status, and details.
 | 2026-07-17 | 1     | gates          | Focused/full package tests, consumer compile, scoped wrappers, doc lint, quality scan, and architecture check pass. Initial format finding was corrected; an initial full-test invocation lacked `--allow-write`, then passed with the TLS fixture permission. |
 | 2026-07-17 | 2     | implementation | Extended the canonical `scaffold.runtime` users-service health gate to inspect aggregate JSON and require exactly the selected database adapter; SQLite now rejects any MySQL check in the runtime response. |
 | 2026-07-17 | 2     | focused gate   | Runtime-gate builder tests pass: 7 passed, 0 failed. Full `scaffold.runtime` remains supervisor-owned. |
+| 2026-07-18 | 3     | review fix     | Tier-A found configured DB readiness was dropped when preset composition stopped passing the second `withDatabase` argument. Restored builder-owned readiness and aggregate registration with candidate naming; preset now adds only excluded candidates. |
+| 2026-07-18 | 3     | constants      | Retained the justified `DB_PROVIDER` / `DATABASE_PROVIDER` preset scope expansion and moved PostgreSQL/SQL Server alias pairs into the named `DATABASE_PROVIDER_ALIASES` constant. |
+| 2026-07-18 | 3     | gates          | Readiness regression, 84 service tests, consumer compile, runtime-gate tests, both scoped wrapper sets, doc lint, quality scan, and architecture check pass. |
 
 ## Decisions
 
@@ -131,6 +134,16 @@ assertion now validates the aggregate body instead of accepting any 2xx response
 database check named either `database` (single-client composition) or `database:<selected engine>`
 (multi-adapter composition), so a SQLite run fails if an unused MySQL adapter appears. The expensive
 runtime execution remains reserved for the supervisor merge-readiness pass.
+
+### Reconcile note — slice 3
+
+Tier-A correctly identified a readiness-contract regression in slice 1: calling
+`withDatabase(options.db)` without the configured client suppressed the builder's readiness check.
+The preset now passes the configured client and its candidate name back to `withDatabase`, which
+registers exactly one configured aggregate check and the readiness probe. The preset loop skips that
+configured candidate and registers only excluded candidates, preventing duplicate aggregate entries.
+Reading `DB_PROVIDER` / `DATABASE_PROVIDER` remains the intentional composition scope expansion
+recorded in `drift.md`; its provider aliases are now named constants.
 
 ## Handoff Notes
 

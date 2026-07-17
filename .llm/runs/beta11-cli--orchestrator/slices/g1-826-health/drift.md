@@ -26,3 +26,16 @@
 - **Severity:** minor
 - **Action:** fix
 - **Evidence:** `runtime-gates.ts` and its SQLite builder regression test.
+
+## 2026-07-18 — Readiness preservation corrected after Tier-A review
+
+- **What:** Restored the configured database argument to builder composition and extended the
+  optional builder health-check options so the builder retains readiness ownership while using the
+  selected candidate name for aggregate health.
+- **Source:** Tier-A review-blocking finding on PR #847.
+- **Expected:** Aggregate selection would leave liveness and readiness unchanged.
+- **Actual:** Slice 1 omitted the second `withDatabase` argument, which removed database readiness.
+- **Severity:** significant
+- **Action:** fixed before sign-off
+- **Evidence:** configured database readiness regression covers both resolving and throwing
+  `$queryRaw`; aggregate regression still asserts one `database:sqlite` entry.
