@@ -16,10 +16,6 @@ Deno.test('shared release preparation runs the stable gate sequence in order', a
       calls.push(`residue:${version}`);
       return Promise.resolve([]);
     },
-    releasePreflight: (_root, version) => {
-      calls.push(`set:${version}`);
-      return Promise.resolve(undefined);
-    },
     runCommand: (command, args) => {
       calls.push(`${command} ${args.join(' ')}`);
       return Promise.resolve({ code: 0, stdout: '', stderr: '' });
@@ -31,8 +27,7 @@ Deno.test('shared release preparation runs the stable gate sequence in order', a
   assertEquals(calls, [
     'bump:0.0.1-canary.1',
     'residue:0.0.1-beta.10',
-    'set:0.0.1-canary.1',
-    'deno task release:preflight',
+    'deno task publish:readiness',
     'deno task publish:dry-run',
     'deno ci --prod',
   ]);
@@ -50,11 +45,10 @@ Deno.test('shared release preparation fails before gates when residue remains', 
             files: ['/repo/deno.json'],
           }),
         findResidue: () => Promise.resolve(['packages/example/deno.json']),
-        releasePreflight: () => {
+        runCommand: () => {
           gateRan = true;
-          return Promise.resolve(undefined);
+          return Promise.resolve({ code: 0, stdout: '', stderr: '' });
         },
-        runCommand: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }),
       }),
     Error,
     'Version residue remains',

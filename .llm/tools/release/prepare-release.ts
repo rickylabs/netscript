@@ -3,7 +3,6 @@ import {
   coordinateVersionBump,
   findVersionResidue,
 } from '../deps/bump-version.ts';
-import { runReleasePreflight } from './preflight-release.ts';
 
 export interface CommandResult {
   readonly code: number;
@@ -20,14 +19,12 @@ export type ReleaseCommandRunner = (
 export interface PrepareReleaseDependencies {
   readonly bump: (root: string, version: string) => Promise<BumpResult>;
   readonly findResidue: (root: string, oldVersion: string) => Promise<readonly string[]>;
-  readonly releasePreflight: (root: string, version: string) => Promise<unknown>;
   readonly runCommand: ReleaseCommandRunner;
 }
 
 const defaultDependencies: PrepareReleaseDependencies = {
   bump: coordinateVersionBump,
   findResidue: findVersionResidue,
-  releasePreflight: runReleasePreflight,
   runCommand,
 };
 
@@ -53,12 +50,11 @@ export async function prepareRelease(
     );
   }
 
-  await dependencies.releasePreflight(root, version);
   await runGate(
     label,
-    'release:preflight',
+    'publish:readiness',
     'deno',
-    ['task', 'release:preflight'],
+    ['task', 'publish:readiness'],
     root,
     dependencies,
   );
