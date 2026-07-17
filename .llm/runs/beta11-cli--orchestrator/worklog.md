@@ -74,3 +74,6 @@ group launch; this section fixes the supervisor's surface.
   health assertion executed in the green scaffold-runtime CI lane). Monitor armed: on CI
   completion for head 711ac99f, close-gate auto-reruns; merge on ALL GREEN under the standing
   owner authorization.
+- 2026-07-18 · G1 #826 MERGED to main (squash 56cf84b5, PR #847) — CI ALL GREEN (close-gate
+  passed after evidence-checked boxes), IMPL-EVAL PASS, Tier-A sign-off, standing owner merge
+  authorization. #826 auto-closed. First milestone-13 issue shipped.
