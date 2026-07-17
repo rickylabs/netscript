@@ -89,3 +89,9 @@ group launch; this section fixes the supervisor's surface.
   discovery agent launched into the freed slot (Sol·medium, wt-g8-seed): 6-topic cited corpus
   (Nitro v3 live docs, adapter mapping, stale sagas-constraint verdict, oRPC/Fresh, market leg,
   drift ledger). G10 #802: option (b) locked with codebase-grounded rationale; implementing.
+- 2026-07-18 · G9 #804 impl complete (5e95d54e, PR #852): fix at the lowest shared seam
+  (`applyScaffoldPlan` in @netscript/plugin/cli), 10 add verbs, plan/real parity, full test dirs
+  green (131 passed). G10 #802 impl complete (bffeeae5, PR #851): option (b) throughout,
+  phantom-scan clean, streams verified already-correct. Tier-A reviews: both sign-off. IMPL-EVALs
+  dispatched for G2, G9, G10 (parallel Qwen sessions). G3 #842 launched (Sol·high, plan-first,
+  worktree off updated integration b2248058).
