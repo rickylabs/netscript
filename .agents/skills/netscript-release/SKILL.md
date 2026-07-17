@@ -150,9 +150,11 @@ verify by hand:
 - `license`, `exports`, and workspace `deno.json` config are complete and correct for the new
   member.
 - The docs site has coverage for the new package (or an explicit stub with a tracked follow-up).
-- For a server or CLI package, do a live tool validation pass — actually run the published surface,
-  not just `publish:dry-run` (see the same-semver republish section below for why dry-run passing is
-  not sufficient).
+- For a server or CLI package, do a live release-candidate/runtime validation pass, not just
+  `publish:dry-run` — matching #809: run the in-tree maintainer CLI against a real scaffolded app
+  (see the same-semver republish section below for why dry-run passing is not sufficient). Once
+  #812's canary channel exists, this step changes: live validation must run against the
+  canary-published surface and cite its pinned production E2E verdict, not the in-tree CLI.
 
 This checklist is manual today. #811/#812 track a `publish-readiness.ts` gate (new-package
 detection, README/tagline/license/exports checks, docs-site coverage pointer) that runs inside a
@@ -163,10 +165,17 @@ mandatory canary-publish channel and will automate it — once #812 merges, pref
 
 Proven during the 0.0.1-beta.10 cut (2026-07-17,
 [run `29558968037`](https://github.com/rickylabs/netscript/actions/runs/29558968037)): a
-`publish.yml` run can partially succeed. 33 workspace members published, 10 more failed on a
-transient `invalidBearerToken` OIDC error, `@netscript/mcp` failed on the registry-rejected text
-import that #810 later fixed, and 26 further members were skipped as dependents of a failed publish
-— `@netscript/cli` among them.
+`publish.yml` run can partially succeed. Keep the unauthenticated graph-preflight outcomes separate
+from the real Publish step's registry outcomes — they are two different steps in the same run and
+must not be summed:
+
+- **Publish preflight (real graph build, no upload)** deliberately runs with an invalid token to
+  build the full dependency graph without uploading. It reported 10 token failures and 25 skipped
+  dependents, then stopped at the auth boundary. None of these are registry outcomes — nothing was
+  uploaded.
+- **Publish** (the real upload) then ran: 33 of the 35 workspace members published, `@netscript/mcp`
+  failed on the registry-rejected text import that #810 later fixed, and `@netscript/cli` was
+  skipped as a dependent of the failed `mcp` publish.
 
 **JSR version immutability binds only to published members.** A member that failed or was skipped
 can still publish at the exact same semver, and workspace `deno publish` skips already-registered
@@ -174,18 +183,29 @@ versions on the members that already succeeded (`Warning: Skipping, already publ
 re-publishing or failing on them. This makes recovery a **fix-forward**, not a version bump,
 whenever the fix does not touch content that already published.
 
+Byte identity of every already-published member across the tag move is a **MANDATORY precondition**
+for step 2 below, not an aspiration. Verify it with
+`git diff <old-tag-sha> <new-tag-sha> -- <published-member-paths>` for every member that already
+published; if the diff is non-empty for even one of them, that member's published content changed
+and the tag move is not safe — use the semver-bump fallback instead.
+
 Recovery steps, as executed for beta.10:
 
-1. Fix forward to `main` with every version file unchanged since the cut. `8a8a9537` (#810) fixed
-   the `@netscript/mcp` text-import rejection two commits after the `a5adb706` release-cut commit,
-   still at `0.0.1-beta.10` everywhere.
-2. Fast-forward the release tag to the fixed commit. This is legitimate **only** when every
-   already-published member is byte-identical across the move — verify with
-   `git diff <old-tag-sha> <new-tag-sha> -- <published-member-paths>` before moving the tag; a
-   member whose published content changed cannot ride a tag move at the same semver.
+1. Fix forward to `main`. `8a8a9537` (#810) fixed the `@netscript/mcp` text-import rejection and is
+   the **direct child commit** of the `a5adb706` release-cut commit. Version **values** stayed at
+   `0.0.1-beta.10` in both commits, but this is not the same claim as "every version file
+   unchanged": `deno.json` itself changed between the two commits (its content differs even though
+   the version field does not).
+2. Fast-forward the release tag to the fixed commit — **only** after the byte-identity precondition
+   above passes. Applied literally to beta.10, it does not: `git diff a5adb706 8a8a9537` is
+   non-empty for six members that run `29558968037` had already published — `@netscript/plugin-ai`,
+   `plugin-auth`, `plugin-sagas`, `plugin-streams`, `plugin-triggers`, and `plugin-workers` —
+   because their publish-included `src/**`/`services/**` files changed alongside the `mcp` fix.
+   beta.10 is therefore not a compliant byte-identical precedent for this step; it is evidence for a
+   narrower claim (see below).
 3. Re-dispatch `publish.yml` via its `workflow_dispatch` `tag` input set to the existing tag (for
    example `v0.0.1-beta.10`) — do not create a new GitHub Release; that would demand a new semver.
-   The workflow checks out the fast-forwarded tag ref, so the 33 already-published members log
+   The workflow checks out the fast-forwarded tag ref, so already-published members log
    `Skipping, already published` and only the previously-failed/skipped members publish for the
    first time.
 4. The Hard Release Completion Gate above still applies to the **re-dispatched** run, not the
@@ -196,9 +216,18 @@ Recovery steps, as executed for beta.10:
    `cli` publishing for the first time); only that green run's artifact is what `e2e-cli-prod` is
    allowed to validate against.
 
-**Fallback:** a semver-bump hotfix is required instead whenever the fix changes content in a member
-that is already published — same-semver republish can only ever fill in members that never reached
-the registry, never re-publish over one that did.
+**What beta.10 actually demonstrates:** because JSR's `deno publish` skips already-registered
+versions on members that already succeeded and fills in members that never reached the registry, the
+re-dispatch on the fast-forwarded tag still completed the partial publish even though six
+already-published members were not byte-identical across the move — those six simply logged
+`Skipping, already published` with their pre-fix content permanently on the registry at
+`0.0.1-beta.10`. This is evidence that JSR skips existing versions and fills unpublished members; it
+is **not** evidence that a non-byte-identical tag move is safe. Do not repeat the beta.10 tag move
+as a template — treat it as the incident that motivated the mandatory precondition above.
+
+**Fallback:** a semver-bump hotfix is required instead whenever the byte-identity precondition fails
+for any already-published member — same-semver republish can only ever fill in members that never
+reached the registry, never re-publish over one that did.
 
 ## Rollback And Retry
 
