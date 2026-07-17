@@ -110,6 +110,7 @@ code and release config do not change.
 | 2026-07-17 23:55 CEST | plan | research and design checkpoint | Live issues/RFC/upstream state re-baselined; public contract, files, slices, and gates locked. No implementation created. |
 | 2026-07-18 00:03 CEST | plan | supervisor handoff prepared | Plan-only commit `c7e61dcc` pushed; draft PR #849 opened against integration with required labels and milestone 13. Readiness comment follows the final metadata commit. |
 | 2026-07-18 00:12 CEST | 1 | release contract and URL seam complete | Plan-Gate PASS recorded; literal `linux-x86_64` and `darwin-aarch64` URLs pinned; HTTPS/key validation and executable-source global-isolation proof pass. |
+| 2026-07-18 00:21 CEST | 2 | native runtime orchestration complete | S1 Tier-A review PASS recorded. Old/proposed namespace resolution, launch/interval policy, Windows manual event, and telemetry-first rollback are implemented; full SDK tests pass. |
 
 ## Decisions
 
@@ -143,6 +144,12 @@ code and release config do not change.
 | Slice 1 scoped lint | `.llm/tools/run-deno-lint.ts --root packages/sdk --ext ts --pretty` | PASS | 62 files, 0 findings. |
 | Slice 1 scoped format | `.llm/tools/run-deno-fmt.ts --root packages/sdk --ext ts --pretty` | PASS | 62 files, 0 findings. |
 | Slice 1 entrypoint doc lint | `deno doc --lint packages/sdk/src/auto-update/mod.ts` | PASS | 0 diagnostics after exporting the constant-derived target vocabularies. |
+| Slice 2 focused unit | `deno test --allow-all packages/sdk/tests/auto-update/start-auto-update_test.ts packages/sdk/tests/auto-update/release-client_test.ts` | PASS | 11 passed; old/proposed/fallback/no-op/policy/Windows/rollback matrix. |
+| Slice 2 full SDK tests | `deno test --allow-all packages/sdk/tests/` | PASS | 28 passed, 0 failed; complete directory run per G4 CI lesson. |
+| Slice 2 scoped check | `.llm/tools/run-deno-check.ts --root packages/sdk --ext ts --pretty` | PASS | 65 files, 0 diagnostics; wrapper supplied `--unstable-kv`. |
+| Slice 2 scoped lint | `.llm/tools/run-deno-lint.ts --root packages/sdk --ext ts --pretty` | PASS | 65 files, 0 findings. |
+| Slice 2 scoped format | `.llm/tools/run-deno-fmt.ts --root packages/sdk --ext ts --pretty` | PASS | 65 files, 0 findings. |
+| Slice 2 entrypoint doc lint | `deno doc --lint packages/sdk/src/auto-update/mod.ts` | PASS | 0 diagnostics across the expanded public surface. |
 
 ### Fitness Gates
 
@@ -152,13 +159,16 @@ code and release config do not change.
 | Slice 1 quality scan | PASS | `deno task quality:scan --root packages/sdk` | No findings; one unrelated pre-existing test allowance. |
 | Slice 1 focused doctrine | PASS_WITH_BASELINE | `deno task arch:check:repo --root packages/sdk` | FAIL=0; existing README/A9 advisories only. |
 | Slice 1 root architecture | PASS_WITH_BASELINE | `deno task arch:check` | Exit 0; repository-wide pre-existing warnings only. |
+| Slice 2 quality scan | PASS | `deno task quality:scan --root packages/sdk` | No findings; one unrelated pre-existing test allowance. |
+| Slice 2 focused doctrine | PASS_WITH_BASELINE | `deno task arch:check:repo --root packages/sdk` | FAIL=0; existing README/A9 advisories only. |
+| Slice 2 root architecture | PASS_WITH_BASELINE | `deno task arch:check` | Exit 0; repository-wide pre-existing warnings only. |
 
 ### Runtime Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | Plain-run structural probe | PASS | Deno 2.9.3 reported no desktop properties | Confirms missing-property path must no-op. |
-| Wrapper behavior | NOT_RUN | planned slice 2 | Awaiting Plan-Gate. |
+| Wrapper behavior | PASS | `start-auto-update_test.ts` + full SDK directory run | Plain-run no-op, namespace matrix, scheduling, manual/automatic events, and telemetry ordering pass. |
 | Real native apply/rollback | N/A | #457 | Explicitly outside this run. |
 
 ### Consumer Gates
@@ -182,3 +192,7 @@ code and release config do not change.
   target constants are public alongside their derived unions; both gates now pass.
 - Reconcile note: #841 remains open and correctly owned by draft PR #849; #457 remains the E2E
   owner; no new PR comment changed scope. Stop for Tier-A substantive slice review before slice 2.
+- S1 Tier-A review: `PASS` with sign-off for `d2321cae`; D1/D4, adapter isolation, HTTPS
+  validation, and tuple constants explicitly accepted.
+- S2 reconcile note: #841 remains open with PR #849 as its only closing PR; milestone 13 and
+  `status:impl` remain correct; #457 still owns native E2E. Stop for Tier-A review before slice 3.

@@ -22,15 +22,34 @@
  */
 
 export { createReleaseClient } from './application/release-client.ts';
+export { startAutoUpdate } from './application/start-auto-update.ts';
 export {
+  AUTO_UPDATE_APPLY_MODES,
   AUTO_UPDATE_ARCHITECTURES,
+  AUTO_UPDATE_DISABLED_REASONS,
   AUTO_UPDATE_OPERATING_SYSTEMS,
+  AUTO_UPDATE_START_STATUSES,
   DEFAULT_RELEASE_CHANNEL,
 } from './domain/constants.ts';
 export type {
+  AutomaticAutoUpdateReadyEvent,
+  AutoUpdateApplyMode,
   AutoUpdateArchitecture,
+  AutoUpdateDisabledReason,
+  AutoUpdateIntervalPolicy,
+  AutoUpdateLaunchPolicy,
   AutoUpdateOperatingSystem,
+  AutoUpdatePolicy,
+  AutoUpdateReadyEvent,
   AutoUpdateReleaseConfig,
   AutoUpdateReleaseTarget,
+  AutoUpdateRollbackEvent,
+  AutoUpdateStartResult,
+  AutoUpdateStartStatus,
+  DisabledAutoUpdateResult,
+  ManualAutoUpdateReadyEvent,
   ReleaseClient,
+  ScheduledAutoUpdateResult,
+  StartAutoUpdateOptions,
+  StartedAutoUpdateResult,
 } from './domain/types.ts';

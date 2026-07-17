@@ -7,16 +7,15 @@
 | Run ID | `beta11-cli--orchestrator/slices/g2-841-autoupdate` |
 | Branch | `feat/desktop-frontend-841-autoupdate` |
 | Draft PR | [#849](https://github.com/rickylabs/netscript/pull/849) → `feat/desktop-frontend` |
-| Current phase | `implement` — slice 1 awaiting Tier-A review |
+| Current phase | `implement` — slice 2 awaiting Tier-A review |
 | Archetype | `4 — Public DSL / Builder` with integration/runtime subtype gates |
 | Scope overlays | none |
 
 ## Current State
 
-The Tier-A supervisor recorded Plan-Gate `PASS` for D1–D13 and authorized implementation. Slice 1
-is implemented and green: public release configuration, literal Deno target vocabulary, URL
-construction, and the single Deno-global adapter boundary. It awaits substantive supervisor review
-before slice 2.
+Slice 1 received Tier-A substantive review `PASS`. Slice 2 is implemented and green: policy
+orchestration, legacy/proposed namespace resolution, Windows manual classification, and
+telemetry-before-consumer rollback ordering. It awaits substantive supervisor review before slice 3.
 
 ## Completed
 
@@ -38,12 +37,14 @@ before slice 2.
 - Plan-Gate: `PASS` delivered by supervisor session
   `86d308d5-c761-4e5d-a41f-8be959bc46d2` on 2026-07-18.
 - PR lifecycle label transitioned from `status:plan` to the sole `status:impl` label.
+- S1 commit `d2321cae` received Tier-A sign-off.
+- S2 full SDK test directory passed 28/28 alongside all scoped quality gates.
 
 ## Next Steps
 
-1. Commit and push slice 1 with the explicit refspec, then post its evidence on PR #849.
-2. Tier-A supervisor substantively reviews slice 1 and records the review outcome.
-3. Only after that review, extend the Deno adapter and implement slice 2 behavior.
+1. Commit and push slice 2 with the explicit refspec, then post its evidence on PR #849.
+2. Tier-A supervisor substantively reviews slice 2 and records the review outcome.
+3. Only after that review, implement slice 3 consumer/docs/JSR proof.
 
 ## Key Decisions
 
@@ -72,14 +73,21 @@ before slice 2.
 | `packages/sdk/mod.ts` | modified | Documents the focused subpath without re-exporting it. |
 | `packages/sdk/deno.json` | modified | Adds `./auto-update` export and package check entrypoint. |
 | `packages/sdk/README.md` | modified | Names the focused native-update configuration capability. |
+| `packages/sdk/src/auto-update/application/start-auto-update.ts` | new | Launch and interval orchestration over internal ports. |
+| `packages/sdk/src/auto-update/adapters/netscript-rollback-telemetry.ts` | new | NetScript rollback telemetry adapter. |
+| `packages/sdk/src/auto-update/adapters/deno-auto-update-adapter.ts` | modified | Resolves old and proposed native updater namespaces. |
+| `packages/sdk/src/auto-update/domain/constants.ts` | modified | Apply/status/reason/capability/telemetry constants. |
+| `packages/sdk/src/auto-update/domain/types.ts` | modified | Policies, events, callbacks, and start results. |
+| `packages/sdk/src/auto-update/mod.ts` | modified | Curates the new public orchestration surface. |
+| `packages/sdk/tests/auto-update/start-auto-update_test.ts` | new | Runtime, policy, platform, and telemetry matrix. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | slice 1 PASS | Unit 4/4; scoped check/lint/fmt all zero findings. |
-| Fitness | slice 1 PASS_WITH_BASELINE | Quality clean; focused/root doctrine exit 0; existing advisories recorded. |
-| Runtime | planned | Fixture matrix in design; real native E2E belongs #457. |
+| Static | slice 2 PASS | Full SDK 28/28; scoped check/lint/fmt all zero findings. |
+| Fitness | slice 2 PASS_WITH_BASELINE | Quality clean; focused/root doctrine exit 0; existing advisories recorded. |
+| Runtime | slice 2 PASS at unit boundary | Complete structural/policy/platform matrix; native E2E remains #457. |
 | Consumer | planned | Public subpath compile fixture in slice 3. |
 
 ## Open Questions
@@ -98,5 +106,6 @@ before slice 2.
 - `c7e61dcc` — `docs(harness): plan SDK auto-update seam` (research, plan, Design checkpoint,
   baseline evidence, and pending evaluator placeholder).
 - `b03c0c07` — `docs(harness): record G2 plan handoff` (PR #849 and supervisor handoff state).
-- Slice 1 commit is the next PR commit; its exact hash is recorded in the PR slice comment, which is
+- `d2321cae` — `feat(sdk): prove native release target contract` (S1, Tier-A PASS).
+- Slice 2 commit is the next PR commit; its exact hash is recorded in the PR slice comment, which is
   the canonical commit trail.
