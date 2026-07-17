@@ -2,17 +2,23 @@ import type { TelemetryProbePort, TelemetryProbeResult } from '../domain/telemet
 
 /** Fetch-backed short-timeout telemetry reachability adapter. */
 export class FetchTelemetryProbe implements TelemetryProbePort {
-  readonly #fetch: typeof fetch;
+  readonly #resolveFetch: (endpoint: string) => typeof fetch;
   readonly #timeoutMs: number;
-  constructor(fetcher: typeof fetch = fetch, timeoutMs = 1500) {
-    this.#fetch = fetcher;
+  constructor(
+    resolveFetch: (endpoint: string) => typeof fetch = () => fetch,
+    timeoutMs = 1500,
+  ) {
+    this.#resolveFetch = resolveFetch;
     this.#timeoutMs = timeoutMs;
   }
   async probe(endpoint: string): Promise<TelemetryProbeResult> {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), this.#timeoutMs);
     try {
-      const response = await this.#fetch(endpoint, { method: 'HEAD', signal: controller.signal });
+      const response = await this.#resolveFetch(endpoint)(endpoint, {
+        method: 'HEAD',
+        signal: controller.signal,
+      });
       return {
         reachable: true,
         status: response.status,

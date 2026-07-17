@@ -64,3 +64,16 @@ Drift is append-only.
 - **Action:** fix
 - **Evidence:** `.llm/tmp/mcp-808-live-spans.json`; Deno direct-fetch error; successful custom
   `Deno.HttpClient({caCerts:[pem]})` request; `research.md` findings 9–10.
+
+## 2026-07-17 — Live `get_run` success exposed an output-schema omission
+
+- **What:** The first repaired all-tool run reached `get_run` success, which the prior validation
+  could not exercise because `list_runs` was false-empty.
+- **Source:** Live MCP stdio call using the fresh health-check execution id.
+- **Expected:** The successful flow result validates against its advertised output schema.
+- **Actual:** The flow correctly emitted optional `traceId`, `outcome`, and `errorMessage` fields,
+  but the closed schema omitted them and returned JSON-RPC `-32603 invalid_tool_result`.
+- **Severity:** significant
+- **Action:** fix
+- **Evidence:** First `.llm/tmp/mcp-808-live-driver.ts` run; schema regression added to the captured
+  Aspire fixture flow test.

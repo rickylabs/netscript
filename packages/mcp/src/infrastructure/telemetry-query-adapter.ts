@@ -38,7 +38,8 @@ function readAspnetDevelopmentCertificates(directory: string | undefined): reado
   }
 }
 
-function createAspireDashboardFetch(
+/** Create a CA-verifying fetch for a loopback Aspire HTTPS dashboard when its PEM is available. */
+export function createAspireDashboardFetch(
   endpoint: string,
   options: ResolvedTelemetryQueryOptions,
 ): typeof fetch | undefined {

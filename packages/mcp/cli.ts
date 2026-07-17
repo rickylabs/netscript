@@ -7,6 +7,7 @@ import type { McpServer } from './src/application/runner/mcp-server.ts';
 import { createDocsFlows } from './src/application/flows/docs-flows.ts';
 import { FetchTelemetryProbe } from './src/infrastructure/fetch-telemetry-probe.ts';
 import {
+  createAspireDashboardFetch,
   createResolvedTelemetryQuery,
   readTelemetryEndpointEnvironment,
 } from './src/infrastructure/telemetry-query-adapter.ts';
@@ -93,7 +94,9 @@ export function createMcpCliServer(options: McpCliOptions = {}): McpServer {
     : new EmbeddedDocsCorpus({
       documents: [{ slug: 'mcp', source: packageReadme }],
     });
-  const probe = new FetchTelemetryProbe();
+  const probe = new FetchTelemetryProbe((endpoint) =>
+    createAspireDashboardFetch(endpoint, {}) ?? fetch
+  );
   return createMcpServer({
     probe,
     environment,

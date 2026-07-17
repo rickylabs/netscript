@@ -7,6 +7,8 @@ import { createGetRecentErrorsFlow } from '../src/application/flows/get-recent-e
 import { createGetRunFlow } from '../src/application/flows/get-run-flow.ts';
 import { createListRunsFlow } from '../src/application/flows/list-runs-flow.ts';
 import { createResolvedTelemetryQuery } from '../src/infrastructure/telemetry-query-adapter.ts';
+import { validateSchema } from '../src/domain/schema.ts';
+import { TOOL_OUTPUT_SCHEMAS } from '../src/domain/tool-contracts.ts';
 import {
   aspireDashboardResourcesFixture,
   aspireDashboardSpansFixture,
@@ -49,6 +51,7 @@ Deno.test('MCP adapter and telemetry flows consume the captured Aspire 13.4.6 sh
 
   const run = await createGetRunFlow(query)({ id: runs[0]!.id });
   assert(run.ok);
+  validateSchema(TOOL_OUTPUT_SCHEMAS.get_run, run.value);
   assert((run.value as { spans: readonly unknown[] }).spans.length > 0);
 
   const captureNow = 1_784_264_560_000;

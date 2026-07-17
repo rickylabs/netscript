@@ -27,8 +27,8 @@ export function createGetRunFlow(query: TelemetryQueryPort): ToolFlow {
         summary: error?.statusMessage ??
           (typeof outcome === 'string' ? outcome : 'Run telemetry found.'),
         traceId: match.traceId,
-        outcome: typeof outcome === 'string' ? outcome : undefined,
-        errorMessage: error?.statusMessage,
+        ...(typeof outcome === 'string' ? { outcome } : {}),
+        ...(error?.statusMessage ? { errorMessage: error.statusMessage } : {}),
         spans: summarizeSpanTree(spans),
         logs,
       },

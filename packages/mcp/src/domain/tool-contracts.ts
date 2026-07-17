@@ -113,6 +113,9 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
   get_run: objectSchema({
     id: stringProperty,
     summary: stringProperty,
+    traceId: stringProperty,
+    outcome: stringProperty,
+    errorMessage: stringProperty,
     spans: { type: 'array', maxItems: 50 },
     logs: { type: 'array', maxItems: 20 },
   }, ['id', 'summary']),
