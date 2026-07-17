@@ -117,6 +117,7 @@ export function createPluginInstallGates(
             'deno',
             'x',
             '-A',
+            '--minimum-dependency-age=0',
             publishedPluginCliSpecifier(context.project.cliEntrypoint, 'plugin-ai'),
             'add',
             'tool',
