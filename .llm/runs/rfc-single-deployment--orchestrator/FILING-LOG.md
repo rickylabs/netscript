@@ -65,3 +65,11 @@ authority banner: GitHub wins on conflict.
 | #456 / #457 / #452 | re-scoped | native-first: native formats + release server (native `latest.json` lineage) + wrapper wiring; e2e = macOS/Linux apply+rollback proof + Windows manual path; labeled into #840 |
 | #825 | milestone → **beta.14** | .NET/ATS packaging integration becomes load-bearing at the full-stack single-output tier (#833/#834); converges for free if upstream Windows apply lands |
 | #327 | body addendum | Option-A tiering + new child #840 |
+
+## Hybrid-tier pass (same day, owner-directed)
+
+| Item | Live | Notes |
+| --- | --- | --- |
+| PM-C Task Scheduler adapter | **#844** | beta.13, Part of #510 — cron-policy processes compile to Scheduled Tasks; wraps `schtasks` now; adopts `Deno.cron.persistent` (denoland/deno#33965 — verified: API scaffold open, backends pending) when upstream lands |
+| Windows hybrid tier | **#845** | beta.13, Part of #327 — window app + sidecars as Servy services & Scheduled Tasks; prosumer CLI install v1 (no .NET dep); consumer MSI variant folds into #833/#825 @ beta.14 |
+| #510 / #327 | body addenda | PM-C + hybrid-tier entries |

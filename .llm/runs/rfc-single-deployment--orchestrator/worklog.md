@@ -195,6 +195,8 @@ Seed/RFC run — the gate of record is PLAN-EVAL (Sol·max, separate session). N
 | 2026-07-17 | file | **Option-A board pass executed** (`file-desktop-frontend.ts`) | epic **#840** Desktop Frontend (beta.11) + **#841** SDK auto-update wrapper + **#842** type-safe bindings (oRPC MessagePort over a bind-channel shim) + **#843** fresh-ui desktop components; #452/#456/#457 re-scoped native-first + labeled in; **#825 → beta.14** w/ comment; #327 addendum; label `epic:desktop-frontend` + labels.yml parity; FILING-LOG Option-A section |
 | 2026-07-17 | rfc | **RFC rev 12** | F4 rewritten as TIERED update (native autoUpdate for window-only w/ honest Windows posture; snapshot transaction for combined; one server/manifest lineage); F5 gains type-safe-bindings pillar; §5 beta.11 row = Desktop Frontend wave; §8 Option-A board state; §9 decision row OF-L; PR #822 body updated |
 
+| 2026-07-17 | ratify+file | **Windows hybrid tier (owner-identified) incorporated** | Upstream verified: denoland/deno#33965 = `Deno.cron.persistent` API scaffold (schtasks/crontab/launchd registration, CF-style `default.scheduled`) — OPEN, backends pending → wrap-don't-block posture. Filed: **#844** PM-C Task Scheduler adapter (beta.13, #510 child — PM-19 compile splits by start policy: resident→Servy, cron→Scheduled Task) + **#845** hybrid tier (beta.13, #327 child — window app + OS-supervised sidecars; prosumer CLI install v1, no .NET dep; consumer MSI → #833/#825 @ beta.14); #510/#327 addenda; RFC rev 13 (§5 beta.13 row, OF-M, §8); PR #822 updated |
+
 ## Handoff Notes
 
 - Evaluator: read kickoff.md, research.md, plan.md. Verdict scope = the RFC design (PLAN-EVAL on
