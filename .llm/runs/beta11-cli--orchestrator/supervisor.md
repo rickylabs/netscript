@@ -39,8 +39,9 @@ Reference `.llm/harness/workflow/lane-policy.md`; do not copy its complete route
 
 ## Stop-lines (from kickoff.md — repeated verbatim in every sub-agent brief)
 
-1. NO merge to `main` for any PR without BOTH CI green AND an opposite-family eval PASS recorded
-   on the PR, and merge authorization per the harness flow.
+1. Merge requires CI green + opposite-family eval PASS on the PR. Owner granted standing beta-11
+   merge authorization (2026-07-17 in-turn) once that bar is met; terminal state = all
+   milestone-13 issues closed via merged PRs + release-cut PR prepared but NOT merged.
 2. HARD STOP before any release publish (`release:cut`, JSR publish, tag push, canary or stable)
    — owner sign-off in-turn only; a stale or relayed approval does not count.
 3. HARD STOP before closing milestone 13 — owner sign-off only.
