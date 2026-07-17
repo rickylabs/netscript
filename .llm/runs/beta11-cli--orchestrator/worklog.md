@@ -95,3 +95,7 @@ group launch; this section fixes the supervisor's surface.
   phantom-scan clean, streams verified already-correct. Tier-A reviews: both sign-off. IMPL-EVALs
   dispatched for G2, G9, G10 (parallel Qwen sessions). G3 #842 launched (Sol·high, plan-first,
   worktree off updated integration b2248058).
+- 2026-07-18 · G2 #841 MERGED into integration (e6e1be08) after Refs-keyword fix (partial-work
+  doctrine: #841's e2e box belongs to #457; wave PR carries the close). G9+G10 IMPL-EVAL PASS;
+  merge loops running on #852/#851. Wave 2 opened: G6 #456 launched (Sol·high, plan-first, base
+  contains #452 hook + #841 seam; Refs-only keyword by design). G5 held for a free slot.
