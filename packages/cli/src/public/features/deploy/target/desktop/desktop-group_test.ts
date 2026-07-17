@@ -22,6 +22,6 @@ Deno.test('desktop deploy group exposes the native package command', () => {
     command.getCommands().find((entry) => entry.getName() === 'release')?.getCommands().map((entry) =>
       entry.getName()
     ),
-    ['prepare'],
+    ['prepare', 'serve'],
   );
 });

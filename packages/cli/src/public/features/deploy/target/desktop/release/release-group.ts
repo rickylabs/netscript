@@ -6,6 +6,7 @@ import {
   createPrepareReleaseCommand,
   type PrepareReleaseCommandDependencies,
 } from './prepare-release-command.ts';
+import { createServeReleaseCommand } from './server/serve-release-command.ts';
 
 /** Create `netscript deploy desktop release`. */
 export function createDesktopReleaseCommand(
@@ -17,5 +18,9 @@ export function createDesktopReleaseCommand(
     .action(function () {
       this.showHelp();
     })
-    .command('prepare', createPrepareReleaseCommand(dependencies));
+    .command('prepare', createPrepareReleaseCommand(dependencies))
+    .command(
+      'serve',
+      createServeReleaseCommand({ resolveProjectRoot: dependencies.resolveProjectRoot }),
+    );
 }

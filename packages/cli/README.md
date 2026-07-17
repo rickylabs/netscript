@@ -188,6 +188,24 @@ executable. The key stays local to the authoring process. Each route keeps priva
 sequence state; a failed final manifest replacement burns that sequence, so retry with a higher
 number. Immutable patches are written first, private high-water second, and `latest.json` last.
 
+Serve the prepared tree at the same pathname used by the SDK release base URL:
+
+```bash
+netscript deploy desktop release serve \
+  --release-dir .deploy/desktop/releases \
+  --hostname 127.0.0.1 --port 8787 --base-path /application
+```
+
+For `baseUrl: "https://releases.example.com/application"`, the native manifest is
+`/application/<channel>/<os>-<arch>/latest.json`. Terminate public HTTPS at a trusted reverse proxy;
+the built-in listener is transport-neutral and intended for a protected origin. It serves only
+GET/HEAD allowlisted manifests, patches, and installers. Private high-water files, dot paths,
+traversal, encoded separators, and symlink escapes are never served.
+
+Windows native apply remains unsupported upstream. Applications must handle the public SDK seam's
+`applyMode: "manual"` update-ready event and present its trusted `manualUpdateUrl`; this server may
+host the installer, but it does not claim or emulate automatic Windows replacement.
+
 Cloud authentication and RBAC are deliberately **operator-owned**. NetScript does not mint cloud
 credentials, assign RBAC, or hand-author Helm, Bicep, Kubernetes, or Azure manifests: AppHost-backed
 targets delegate to Aspire after validation, and Cloud Run owns only the image build/push/apply seam.

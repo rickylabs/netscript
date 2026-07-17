@@ -16,8 +16,8 @@ Research, the full plan, and the mandatory Design checkpoint are complete agains
 `e6e1be08`. Plan commit `f1a0d6c3` is pushed and draft PR
 [#854](https://github.com/rickylabs/netscript/pull/854) targets `feat/desktop-frontend` with the
 required metadata. The Tier-A Fable 5 supervisor approved D1–D21 and delivered group Plan-Gate
-`PASS`. Slice 1 commit `ffb7e896` passed Tier-A review. Slice 2 implementation and gates are
-complete and ready to commit, push, and stop for Tier-A review.
+`PASS`. Slice 1 commit `ffb7e896` and slice 2 commit `cc52e487` passed Tier-A review. Slice 3
+implementation and gates are complete and ready to commit, push, and stop for Tier-A review.
 
 ## Completed
 
@@ -46,15 +46,21 @@ complete and ready to commit, push, and stop for Tier-A review.
 - Implemented native release preparation: external bsdiff adapter, SHA-256 patch map, exact-string
   WebCrypto Ed25519 envelope, private route high-water, OS file locking, and safe promotion order.
 - Passed 28 focused desktop tests, full CLI tests (406 / 416 steps), and the complete S2 gate set.
+- Recorded Tier-A S2 PASS for D13–D17 exact signing, concurrency, ordering, and crash-burn proof.
+- Implemented the abortable GET/HEAD release server with mutable/immutable cache policy, public-file
+  allowlist, SDK base-path mounting, and private/dot/traversal/symlink containment.
+- Proved real URL parity by importing public `@netscript/sdk/auto-update` and requesting the handler
+  at `createReleaseClient(...).updateUrl + '/latest.json'`.
+- Passed 33 focused tests (12 steps), full CLI tests (411 / 424 steps), and all S3 gates.
 
 ## In Progress
 
-- Commit/push/comment slice 2, then pause without beginning slice 3.
+- Commit/push/comment slice 3, then pause without beginning slice 4.
 
 ## Next Steps
 
-1. Commit, push the explicit branch refspec, and post slice-2 evidence on PR #854.
-2. Stop for Tier-A review before slice 3.
+1. Commit, push the explicit branch refspec, and post slice-3 evidence on PR #854.
+2. Stop for Tier-A review before slice 4.
 
 ## Key Decisions
 
@@ -85,8 +91,8 @@ complete and ready to commit, push, and stop for Tier-A review.
 | ----------- | -------------- | -------- |
 | Static | PASS | 698-file check/lint/fmt; doc lint 0; dry-run exit 0 with baseline warnings. |
 | Fitness | PASS_WITH_BASELINE | quality and root arch pass; focused doctrine has baseline-only findings. |
-| Runtime | PASS | 28 focused tests; full CLI 406 tests / 416 steps. |
-| Consumer | S1–S2 PASS | Exact hook argv and native envelope/sequence composition; URL parity remains S3. |
+| Runtime | PASS | 33 focused tests / 12 steps; full CLI 411 tests / 424 steps. |
+| Consumer | S1–S3 PASS | Exact hook argv, native envelope, and real public-SDK handler URL parity. |
 
 ## Open Questions
 
@@ -105,5 +111,6 @@ complete and ready to commit, push, and stop for Tier-A review.
 - `f1a0d6c3` — `docs(harness): plan native desktop packaging` (research, locked plan, Design
   checkpoint, context, and drift).
 - `ffb7e896` — `feat(cli): add native desktop packaging pipeline` (Tier-A S1 PASS).
+- `cc52e487` — `feat(cli): prepare signed native desktop releases` (Tier-A S2 PASS).
 - This metadata reconciliation commit records draft PR #854; after push, the PR commit list and
   phase comments are the canonical trail.

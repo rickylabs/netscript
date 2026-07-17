@@ -72,3 +72,13 @@ owner-ratified Option-A scope and current Deno behavior.
 - **Severity:** minor.
 - **Action:** accept the mechanical edit only if final dependency and lock gates prove workspace
   resolution without unrelated churn.
+
+## 2026-07-18 — Release server grouped below the release contract axis
+
+- **What:** The slice table described handler files directly under `release/`.
+- **Source:** Slice-3 focused doctrine scan.
+- **Expected:** Add the handler and transport files beside the preparation/store contracts.
+- **Actual:** That layout raised `release/` to fourteen immediate children. The four cohesive HTTP
+  handler/transport files live under `release/server/`, leaving the parent below the doctrine cap.
+- **Severity:** minor.
+- **Action:** fix before commit; command, route, and test contracts are unchanged.

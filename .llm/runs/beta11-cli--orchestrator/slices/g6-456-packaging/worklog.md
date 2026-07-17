@@ -126,6 +126,11 @@ envelope or route family.
 | 2026-07-18 03:00 CEST | 2 | implementation | Added bsdiff wrapper, SHA-256 native patch composition, exact-string Ed25519 signing, prepare CLI, and private route store. |
 | 2026-07-18 03:10 CEST | 2 | security proof | OS lock permits one concurrent winner; lower/equal rejected; manifest failure test proves patches then high-water and safe sequence burn. |
 | 2026-07-18 03:20 CEST | 2 | gate set complete | Focused 28/4; full CLI 406/416; 708-file static, quality, arch, doc/JSR/publish and import scans pass. |
+| 2026-07-18 03:30 CEST | 2 | Tier-A PASS | Supervisor accepted `cc52e487` against D13–D17 and authorized S3 only under the existing cadence. |
+| 2026-07-18 04:00 CEST | 3 | implementation | Added abortable serve command, GET/HEAD handler, cache/content policy, SDK base-path mounting, and Windows manual posture docs. |
+| 2026-07-18 04:08 CEST | 3 | security/parity proof | Public SDK import drives a real handler request; `%2e%2e`, `%2f`, dot/private, lexical and symlink escape tests pass. |
+| 2026-07-18 04:12 CEST | 3 | doctrine correction | Grouped four handler/transport files under `release/server/`, restoring focused doctrine from new WARN=43 to baseline WARN=42. |
+| 2026-07-18 04:20 CEST | 3 | gate set complete | Focused 33/12; full CLI 411/424; 712-file static, quality, arch, doc/JSR/publish and import scans pass. |
 
 ## Decisions
 
@@ -166,6 +171,11 @@ envelope or route family.
 | Slice-2 focused tests | `deno test --allow-all packages/cli/src/public/features/deploy/target/desktop/` | PASS | 28 passed, 4 steps, 0 failed. |
 | Slice-2 full CLI | `deno task test` in `packages/cli` | PASS | 406 passed, 416 steps, 0 failed. |
 | Slice-2 scoped static | check/lint/fmt wrappers | PASS | 708 files, zero findings. |
+| Slice-3 focused tests | `deno test --allow-all packages/cli/src/public/features/deploy/target/desktop/` | PASS | 33 passed, 12 steps, 0 failed. |
+| Slice-3 full CLI | `deno task test` in `packages/cli` | PASS | 411 passed, 424 steps, 0 failed. |
+| Slice-3 scoped static | check/lint/fmt wrappers | PASS | 712 files, zero findings. |
+| Public SDK URL parity | public `@netscript/sdk/auto-update` import + real handler request | PASS | Non-root base path and current native target return `latest.json`. |
+| Traversal defenses | focused adversarial handler tests | PASS | Encoded `%2e%2e`/`%2f`, private paths, resolve-under-root and symlink escape rejected. |
 
 ### Fitness Gates
 
