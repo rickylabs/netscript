@@ -38,8 +38,9 @@
   `false` for `Type: 'desktop'`, `true` for all existing variants.
 - Add optional `PackageTaskName` to `AppEntry`, preserved by `AppEntrySchema`. The convention
   defaults downstream to `desktop:package`; #452 does not implement the package/release pipeline.
-- Desktop dev registration uses `TaskName ?? 'desktop:predev'` and forwards `--backend cef` as
-  task arguments. The predev task is the one-step build-order seam proven by the POC.
+- Desktop registration creates a `Prebuild ?? 'build'` executable and uses Aspire 13.4
+  `waitForCompletion` so it must exit successfully before the window resource starts. The window
+  runs `TaskName ?? 'desktop:predev'` and forwards `--backend cef` as task arguments.
 - Desktop discovery emits only `services__<name>__http__0`; it never emits Vite aliases or an
   Aspire HTTP endpoint.
 
@@ -61,8 +62,7 @@
 | Question | Resolution |
 | --- | --- |
 | What is the #452 → #456 packaging hook? | `AppEntry.PackageTaskName?: string`, with downstream convention `desktop:package`; #456 owns invocation/output formats. |
-| How is build order encoded without depending on an unavailable dedicated Deno Aspire API? | Desktop launches a predev task (`TaskName ?? 'desktop:predev'`) and forwards `--backend cef`; tests assert both. No generated shell chain is invented. |
+| How is build order encoded without depending on an unavailable dedicated Deno Aspire API? | A build `addExecutable` runs `deno task <Prebuild ?? 'build'>`; desktop calls `waitForCompletion(buildResource)` before launch. No shell chain is invented. |
 | How is opt-in guaranteed despite the existing common default? | Conditional schema output default plus a desktop-specific generated `Enabled === true` guard. |
 | Should desktop accept `Port`? | The shared contract remains backward compatible, but generator ignores `Port` for desktop and tests prove no `withHttpEndpoint`/`PORT` emission. |
 | Does G4 implement native installers, signing, manifests, patches, or updates? | No. Those are #456/#841/#457 scope. |
-

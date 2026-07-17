@@ -80,7 +80,7 @@ native-package task hook for #456, while leaving every non-desktop scaffold unch
 | ID | Decision | Rationale |
 | --- | --- | --- |
 | D1 | `desktop` is an explicit fourth branch, never the catch-all. | Unknown variants must not silently become task resources; the closed union and readable dispatch stay coherent. |
-| D2 | Desktop dev argv is `['task', TaskName ?? 'desktop:predev', '--backend', 'cef']`. | Matches the POC predev seam, guarantees the CLI flag rather than ignored config, and extends the Tauri task pattern without a shell helper. |
+| D2 | Emit a separate `deno task <Prebuild ?? 'build'>` executable and make the desktop executable wait for its successful completion with `waitForCompletion`; desktop dev argv is `['task', TaskName ?? 'desktop:predev', '--backend', 'cef']`. | Encodes a real Fresh build-before-window relationship, matches Aspire 13.4's completion dependency API, preserves the POC predev seam, and guarantees the CLI flag rather than ignored config. Deno 2.9.3 verification shows no task-level `--` separator is required. |
 | D3 | Desktop omitted `Enabled` parses as false and generated desktop code gates on `=== true`. | Defense at both public config and emitted AppHost boundaries keeps headless/CI opt-in. Existing variants retain their true default and `!== false` guard. |
 | D4 | Desktop ignores `Port` and never calls `withHttpEndpoint`. | `deno desktop` owns a random `127.0.0.1` `DENO_SERVE_ADDRESS`; `PORT` is not the listener. |
 | D5 | Desktop service/plugin references receive only `services__<name>__http__0`. | Server-side Fresh discovery is needed; Vite aliases are an `app` concern and no endpoint is exported by desktop. |
@@ -96,7 +96,7 @@ native-package task hook for #456, while leaving every non-desktop scaffold unch
 | Native target/format/compression matrix | safe to defer | Explicit #456 scope. |
 | Future dedicated Aspire Deno API | safe to defer | Existing debt entry; `addExecutable()` is current authority. |
 | Whether `Port` is removed from desktop at the type level | safe to defer | Avoid a breaking discriminated-union rewrite; generator behavior enforces no endpoint now. |
-| Predev task definition authoring | resolved now | The configured app owns the task; generator selects the stable default and forwards CEF. No default scaffold desktop entry is created. |
+| Predev task definition authoring | resolved now | The configured app owns the launch task; the generator separately invokes `Prebuild ?? 'build'` and waits for successful completion before starting it. No default scaffold desktop entry is created. |
 
 No unresolved decision would force rework inside the two planned slices.
 
@@ -108,7 +108,7 @@ No unresolved decision would force rework inside the two planned slices.
 | Conditional default changes existing variants. | Add table-driven schema tests for omitted/explicit enablement across all four types. |
 | Common endpoint block accidentally exposes desktop. | Make endpoint condition explicit and test with a desktop fixture that intentionally includes `Port`. |
 | CEF is asserted only in comments/config. | Test exact generated argv contains separate `'--backend', 'cef'` tokens. |
-| Predev name does not prove `_fresh/` build. | Contract names the predev task and test asserts it; full native packaging execution remains #456/#457. Any need for generated task authoring is a rescope trigger. |
+| Predev name alone does not prove `_fresh/` build. | Generate a distinct build executable plus `waitForCompletion` relationship and assert both resources and their dependency in S2; full native packaging execution remains #456/#457. |
 | Hook name drifts before #456 begins. | Public type/schema test plus PR body calls out `PackageTaskName` as the downstream contract. |
 | Default scaffold output changes unintentionally. | Existing generator tests plus `scaffold.runtime` merge-readiness smoke; no edit to `generate-appsettings.ts`. |
 | Existing CLI/JSR debt makes broad gates red. | Record exact baseline attribution; no new allowance, `any`, lint ignore, or cast. New/deepened debt is a fail. |
@@ -184,4 +184,3 @@ No unresolved decision would force rework inside the two planned slices.
 - Any change to `origin/feat/desktop-frontend`, issue #452/#456 amendments, or public Aspire export
   map before implementation begins.
 - Any gate that shows the existing broad debt baseline has changed.
-

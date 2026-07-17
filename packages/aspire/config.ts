@@ -70,7 +70,7 @@ export type ResourceMode = 'Container' | 'External';
  */
 export type CacheMode = 'Local' | 'Container' | 'Executable' | 'External' | 'Auto';
 /** Application entry variants supported by the AppHost config. */
-export type AppType = 'app' | 'tauri' | 'task';
+export type AppType = 'app' | 'tauri' | 'task' | 'desktop';
 
 /** OpenTelemetry endpoint configuration. */
 export interface OtelConfig {
@@ -154,6 +154,8 @@ export interface AppEntry extends BaseEntry, ReferenceEntry {
   Port?: number;
   /** Deno task name for task apps. */
   TaskName?: string;
+  /** Deno task that packages a desktop app into its native artifact. */
+  PackageTaskName?: string;
   /** Whether the app requires Deno KV access. */
   RequiresKv: boolean;
 }
@@ -330,9 +332,9 @@ const CacheModeZod = z.enum(['Local', 'Container', 'Executable', 'External', 'Au
 export const CacheModeSchema: AspireSchema<CacheMode> = CacheModeZod;
 
 /** Application type variants for the Apps section. */
-const AppTypeZod = z.enum(['app', 'tauri', 'task']).meta({
+const AppTypeZod = z.enum(['app', 'tauri', 'task', 'desktop']).meta({
   title: 'AppType',
-  description: 'Application type: app (web), tauri (desktop), or task (deno task)',
+  description: 'Application type: app (web), tauri, task (deno task), or desktop (Deno Desktop)',
 });
 /** Application type schema. */
 export const AppTypeSchema: AspireSchema<AppType> = AppTypeZod;
@@ -412,6 +414,7 @@ export const ServiceEntrySchema: AspireSchema<ServiceEntry> = ServiceEntryZod;
 /** Application entry configuration. */
 const AppEntryZod = z.object({
   ...BaseEntryFields,
+  Enabled: z.boolean().optional(),
   ...ReferenceFields,
   Runtime: z.string().default('deno'),
   Type: AppTypeZod.default('app'),
@@ -421,8 +424,12 @@ const AppEntryZod = z.object({
   Remote: z.string().optional(),
   Port: z.number().int().positive().optional(),
   TaskName: z.string().optional(),
+  PackageTaskName: z.string().optional(),
   RequiresKv: z.boolean().default(false),
-}).meta({
+}).transform((entry): AppEntry => ({
+  ...entry,
+  Enabled: entry.Enabled ?? entry.Type !== 'desktop',
+})).meta({
   title: 'AppEntry',
   description: 'Configuration for a frontend or desktop application resource',
 });

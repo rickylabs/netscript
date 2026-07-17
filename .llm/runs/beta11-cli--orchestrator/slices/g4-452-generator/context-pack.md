@@ -6,16 +6,15 @@
 | --- | --- |
 | Run ID | `beta11-cli--orchestrator/slices/g4-452-generator` |
 | Branch | `feat/desktop-frontend-452-generator` |
-| Current phase | `plan-eval` |
+| Current phase | `implement` |
 | Archetype | `6 — CLI / Tooling` (folded Archetype 2 concern) |
 | Scope overlays | `none` |
 
 ## Current State
 
 Research, plan, and the Design checkpoint are complete against integration baseline `ca72db14`.
-No implementation source has changed. The run is stopped before implementation pending a
-supervisor-dispatched, separate-session group PLAN-EVAL PASS. Draft PR #848 is the review surface;
-comment `5007823117` carries `Plan & Design — READY FOR REVIEW`.
+The Tier-A supervisor reported group Plan-Gate `PASS` in-turn. Draft PR #848 is the review surface.
+Implementation may proceed in S1→S2 order; evaluator/review dispatch remains supervisor-owned.
 
 ## Completed
 
@@ -27,7 +26,8 @@ comment `5007823117` carries `Plan & Design — READY FOR REVIEW`.
 
 ## In Progress
 
-- Waiting at the group Plan-Gate. The implementation agent does not dispatch the evaluator.
+- S1 public contract, including supervisor-requested verification of real task argv semantics and
+  generated Fresh build-before-window ordering.
 
 ## Next Steps
 

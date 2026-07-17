@@ -90,6 +90,9 @@ native packaging logic to the dev registration block.
 | 2026-07-17 | plan | Research | Re-baselined live #452/#375/#456, source, doctrine, JSR surface, and existing debt. |
 | 2026-07-17 | plan | Design checkpoint | Locked public contract, opt-in semantics, generator behavior, three slices, and gate set. Implementation not started. |
 | 2026-07-17 | plan | Review-ready handoff | Pushed `40b56f18`, opened draft PR #848 against `feat/desktop-frontend`, applied the requested taxonomy/milestone, and posted PR comment `5007823117` with `Plan & Design — READY FOR REVIEW`. |
+| 2026-07-17 | S1 | Plan-Gate | Tier-A supervisor reported group verdict `PASS`; implementation hard stop cleared. |
+| 2026-07-17 | S1 | Deno argv verification | Deno 2.9.3 appends arguments after the task name directly. A task-level `--` is not required; option separation is owned by the invoked command. Since `deno desktop` owns `--backend`, emit `deno task <name> --backend cef`, not `-- --backend cef`. |
+| 2026-07-17 | S1 | Build-order API verification | Official Aspire 13.4 TypeScript API documents `ExecutableResource.waitForCompletion(dependency, exitCode = 0)`; S2 will make the desktop executable wait for a separate successful Fresh build resource. |
 
 ## Decisions
 
@@ -108,14 +111,24 @@ native packaging logic to the dev registration block.
 
 ## Gate Results
 
-All implementation gates are `NOT_RUN`: the group Plan-Gate has not passed and the hard stop is in
-force.
+### S1 — public contract
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Aspire config/type tests | PASS | `2 passed (35 steps)` |
+| CLI consumer compile | PASS | `deno check --unstable-kv` on `generators-test-support.ts` |
+| Scoped check/lint/fmt | PASS | Repo wrappers passed for the owned Aspire sources/tests and CLI fixture. |
+| `doc:lint` | PASS | `deno task doc:lint --root packages/aspire --pretty`, zero diagnostics. |
+| Publish dry-run | PASS | `deno publish --dry-run --allow-dirty` from `packages/aspire`; slow-type analysis completed without a diagnostic. |
+| JSR fitness wrapper | BASELINE | Wrapper exits 1 for four untouched missing `@module` tags (`application`, `adapters`, `testing`, `public`) and misclassifies the successful publish banner as a slow-type warning; authoritative doc-lint and publish dry-run are green. |
+| `quality:scan` | PASS | Exit 0, no findings; seven existing allowances reported. |
+| Root `arch:check` | PASS | Exit 0. |
+| Per-root doctrine scan | BASELINE | Aspire: 0 FAIL / 1 existing WARN; CLI: 46 FAIL / 42 WARN from the known broad scanner baseline, including existing test-framework/path findings. No new finding introduced by S1. |
+| Lock hygiene | PASS | No `deno.lock` change. |
 
 ## Handoff Notes
 
-- PLAN-EVAL should first inspect D2/D3/D6 in `plan.md`, the jsr-audit table in `research.md`, and
-  the exact S1→S2 dependency above.
-- The evaluator should challenge whether the predev task plus forwarded CEF args is a sufficient
-  build-order contract and whether `PackageTaskName` is the smallest useful #456 hook.
-- No implementation file has been changed.
+- Tier-A Plan-Gate PASS is recorded in `plan-eval.md`; implementation is active.
+- S1 establishes the public contract and typed CLI consumer fixture. S2 owns generated build-order,
+  CEF, discovery, and no-endpoint semantics.
 - Review surface: https://github.com/rickylabs/netscript/pull/848
