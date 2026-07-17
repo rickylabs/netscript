@@ -11,10 +11,10 @@
  *
  * This module imports NO npm packages on purpose: it carries the load-bearing,
  * security-relevant logic so it can be type-checked, published, and unit-tested
- * inside `@netscript/fresh-ui` without pulling `react-markdown` (or any of the
- * remark/rehype plugins) into the package's own import graph. The `markdown.tsx`
- * component wires these helpers into `react-markdown`; the npm dependencies live
- * only on the registry item and only land in the consuming app.
+ * inside `@netscript/fresh-ui` without pulling the unified/remark/rehype stack
+ * into the package's own import graph. The `markdown.tsx` component wires these
+ * helpers into a direct Preact processor; the npm dependencies live only on the
+ * registry item and only land in the consuming app.
  */
 
 /** Custom element name emitted for a recognized citation token. */
@@ -90,9 +90,9 @@ export type MdastTransformer = (tree: MdastRoot) => void;
  */
 export interface SanitizeSchema {
   /** Allowed tag names. */
-  tagNames?: string[];
+  tagNames?: string[] | null;
   /** Allowed attributes, keyed by tag name (or `*` for all elements). */
-  attributes?: Record<string, unknown[]>;
+  attributes?: Record<string, unknown[]> | null;
   /** Other schema fields passed through untouched (e.g. `protocols`, `clobber`). */
   [key: string]: unknown;
 }
@@ -149,7 +149,7 @@ function visit(node: MdastNode): void {
 /**
  * A remark plugin that rewrites `[n]` citation tokens in model output into
  * `citation-chip` render calls. Pair with `components={{ 'citation-chip': ... }}`
- * on `react-markdown` to render the sibling `citation-chip` registry item.
+ * on `rehype-react` to render the sibling `citation-chip` registry item.
  * @returns The mdast transformer.
  * @example
  * ```ts
@@ -271,14 +271,10 @@ export function parseStyleDeclarations(style: string): Record<string, string> {
 
 /**
  * A rehype plugin that replaces string `style` properties with parsed style
- * OBJECTS. `hast-util-to-jsx-runtime` (inside `react-markdown`) parses string
- * styles through the CJS-only `style-to-js` package; under ESM-first graphs
- * (Deno + Vite) that default-import interop can fail, and react-markdown's
- * `ignoreInvalidStyle` then silently DROPS every inline style — which
- * visibly breaks KaTeX vertical layout (struts/vlists collapse). Object
- * values are passed through untouched by the runtime, so pre-parsing here
- * makes rendering bundler-independent. Run this AFTER `rehype-sanitize`
- * (sanitize expects string attribute values).
+ * OBJECTS before the Preact JSX compiler. This keeps KaTeX vertical layout
+ * (struts/vlists) bundler-independent while avoiding any renderer-specific
+ * string-style parser. Object values are passed through untouched by the
+ * runtime. Run this AFTER `rehype-sanitize` (sanitize expects string values).
  * @returns The hast transformer.
  * @example
  * ```ts

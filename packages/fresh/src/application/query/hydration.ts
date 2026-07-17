@@ -12,7 +12,6 @@
  */
 
 import { dehydrate, hydrate } from '@tanstack/query-core';
-import type { QueryClient } from '@tanstack/query-core';
 import type { DehydratedState, IslandQueryClient } from './query-types.ts';
 
 /**
@@ -25,7 +24,7 @@ import type { DehydratedState, IslandQueryClient } from './query-types.ts';
  * @returns Serializable dehydrated state.
  */
 export function dehydrateQueryClient(queryClient: IslandQueryClient): DehydratedState {
-  return dehydrate(queryClient as QueryClient) as DehydratedState;
+  return dehydrate(queryClient) as DehydratedState;
 }
 
 /**
@@ -41,5 +40,5 @@ export function hydrateFromDehydrated(
   queryClient: IslandQueryClient,
   dehydratedState: DehydratedState,
 ): void {
-  hydrate(queryClient as QueryClient, dehydratedState);
+  hydrate(queryClient, dehydratedState);
 }

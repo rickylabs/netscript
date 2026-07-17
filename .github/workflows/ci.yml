@@ -10,8 +10,9 @@ name: ci
 #
 #   - `quality` — the S2 full quality lane the original header reserved: lint,
 #     fmt, scaffold-version guard, publish dry-run, and critical advisory audit.
-#     Additive and intended to become a required check (branch protection) once
-#     observed green; until then a red `quality` cannot block the merge gate.
+#     Required on `main` by the active `main-branch-protection` repository
+#     ruleset. A failure blocks only while that required-check rule remains in
+#     force; keeping a gate inside a non-required job would not enforce it.
 #
 #   - `deps-report` — non-blocking dependency-freshness report (informational).
 #
@@ -24,7 +25,7 @@ on:
   push:
     branches: [main, 'feat/package-quality']
   pull_request:
-    branches: [main, 'feat/package-quality']
+    branches: [main, "feat/**", "epic/**"]
 
 permissions:
   contents: read
@@ -119,6 +120,12 @@ jobs:
       - name: Format check
         run: deno task fmt:check
 
+      - name: JSR tagline length
+        run: deno task docs:tagline:check
+
+      - name: Generated asset freshness
+        run: deno task check:assets-barrel
+
       - name: NetScript JSR emitted-specifier guard
         run: deno task check:netscript-jsr-specifiers
 
@@ -149,3 +156,30 @@ jobs:
       - name: Dependency freshness (report-only)
         run: deno task deps:latest
         continue-on-error: true
+
+  lane-visibility:
+    name: core CI lane visibility
+    needs: [close-gate, check-test, quality, deps-report]
+    if: ${{ always() && github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Summarize core lane outcomes
+        env:
+          CLOSE_GATE_RESULT: ${{ needs.close-gate.result }}
+          CHECK_TEST_RESULT: ${{ needs.check-test.result }}
+          QUALITY_RESULT: ${{ needs.quality.result }}
+          DEPS_REPORT_RESULT: ${{ needs.deps-report.result }}
+        run: |
+          {
+            echo "## Core CI lane visibility"
+            echo
+            echo "These lanes were scheduled for this pull request; each outcome is the terminal job result."
+            echo
+            echo "| Lane | Outcome |"
+            echo "| --- | --- |"
+            printf '| `close-gate` | ran (%s) |\n' "$CLOSE_GATE_RESULT"
+            printf '| `check-test` | ran (%s) |\n' "$CHECK_TEST_RESULT"
+            printf '| `quality` | ran (%s) |\n' "$QUALITY_RESULT"
+            printf '| `deps-report` | ran (%s) |\n' "$DEPS_REPORT_RESULT"
+          } >> "$GITHUB_STEP_SUMMARY"

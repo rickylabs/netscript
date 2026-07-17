@@ -41,8 +41,9 @@ export interface SagaBuilder<
   durability(tier: SagaDurabilityTier): SagaBuilder<TId, TPhase, TState, TMessage>;
   /** Set the initial state. This must happen before registering handlers. */
   state<TNextState extends SagaState>(
+    this: TPhase extends 'initial' ? SagaBuilder<TId, TPhase, TState, TMessage> : never,
     initialState: TNextState,
-  ): TPhase extends 'initial' ? SagaBuilder<TId, 'state-set', TNextState, TMessage> : never;
+  ): SagaBuilder<TId, 'state-set', TNextState, TMessage>;
   /** Set a correlation extractor for incoming messages. */
   correlate<TNextMessage extends SagaMessage = TMessage>(
     correlate: SagaCorrelation<TNextMessage>,
@@ -55,85 +56,91 @@ export interface SagaBuilder<
   schedule(cron: string): SagaBuilder<TId, TPhase, TState, TMessage>;
   /** Register an event handler. Requires `.state()` first. */
   on<TType extends string, TPayload = unknown>(
+    this: TPhase extends 'state-set' | 'handler-set' ? SagaBuilder<TId, TPhase, TState, TMessage>
+      : never,
     eventType: TType,
     handler: SagaHandler<TState & SagaState, SagaEvent<TType, TPayload>>,
-  ): TPhase extends 'state-set' | 'handler-set'
-    ? SagaBuilder<TId, 'handler-set', TState, TMessage | SagaEvent<TType, TPayload>>
-    : never;
+  ): SagaBuilder<TId, 'handler-set', TState, TMessage | SagaEvent<TType, TPayload>>;
   /** Register a compensation handler for a failed event type. */
   compensate<TType extends string, TPayload = unknown>(
+    this: TPhase extends 'state-set' | 'handler-set' ? SagaBuilder<TId, TPhase, TState, TMessage>
+      : never,
     eventType: TType,
     handler: SagaHandler<TState & SagaState, SagaEvent<TType, TPayload>>,
-  ): TPhase extends 'state-set' | 'handler-set'
-    ? SagaBuilder<TId, TPhase, TState, TMessage | SagaEvent<TType, TPayload>>
-    : never;
+  ): SagaBuilder<TId, TPhase, TState, TMessage | SagaEvent<TType, TPayload>>;
   /** Register a reserved signal handler. Runtime dispatch is deferred. */
   onSignal<TPayload>(
+    this: TPhase extends 'state-set' | 'handler-set' ? SagaBuilder<TId, TPhase, TState, TMessage>
+      : never,
     signal: SignalDefinition<TPayload>,
     handler: SagaSignalHandler<TState & SagaState, TPayload>,
-  ): TPhase extends 'state-set' | 'handler-set' ? SagaBuilder<TId, TPhase, TState, TMessage>
-    : never;
+  ): SagaBuilder<TId, TPhase, TState, TMessage>;
   /** Register a reserved synchronous query handler. Runtime dispatch is deferred. */
   onQuery<TResult>(
+    this: TPhase extends 'state-set' | 'handler-set' ? SagaBuilder<TId, TPhase, TState, TMessage>
+      : never,
     query: QueryDefinition<TResult>,
     handler: (saga: Readonly<{ state: TState & SagaState }>) => SyncQueryResult<TResult>,
-  ): TPhase extends 'state-set' | 'handler-set' ? SagaBuilder<TId, TPhase, TState, TMessage>
-    : never;
+  ): SagaBuilder<TId, TPhase, TState, TMessage>;
   /** Build a frozen saga definition after at least one handler exists. */
-  build(): TPhase extends 'handler-set' ? SagaDefinition<TId, TState & SagaState, TMessage> : never;
+  build(
+    this: TPhase extends 'handler-set' ? SagaBuilder<TId, TPhase, TState, TMessage> : never,
+  ): SagaDefinition<TId, TState & SagaState, TMessage>;
 }
+
+type SagaBuilderData<TId extends string> = Readonly<{
+  id: TId;
+  durability: SagaDurabilityTier;
+  initialState?: SagaState;
+  correlations: readonly SagaCorrelationRule[];
+  handlers: ReadonlyMap<string, SagaHandler<SagaState, SagaMessage>>;
+  compensations: ReadonlyMap<string, SagaHandler<SagaState, SagaMessage>>;
+  signalHandlers: ReadonlyMap<string, SagaSignalHandler<SagaState>>;
+  queryHandlers: ReadonlyMap<string, SagaQueryHandler<SagaState>>;
+  concurrency?: SagaConcurrencyPolicy;
+  schedule?: string;
+}>;
 
 class SagaBuilderImpl<
   TId extends string,
   TPhase extends SagaBuilderPhase,
   TState,
   TMessage extends SagaMessage,
-> implements SagaBuilder<TId, TPhase, TState, TMessage> {
-  readonly #id: TId;
-  #durability: SagaDurabilityTier = DEFAULT_SAGA_DURABILITY_TIER;
-  #initialState?: SagaState;
-  #correlations: SagaCorrelationRule[] = [];
-  #handlers = new Map<string, SagaHandler<SagaState, SagaMessage>>();
-  #compensations = new Map<string, SagaHandler<SagaState, SagaMessage>>();
-  #signalHandlers = new Map<string, SagaSignalHandler<SagaState>>();
-  #queryHandlers = new Map<string, SagaQueryHandler<SagaState>>();
-  #concurrency?: SagaConcurrencyPolicy;
-  #schedule?: string;
+> {
+  readonly #data: SagaBuilderData<TId>;
 
-  constructor(id: TId) {
-    assertNonEmpty(id, 'Saga ID is required.');
-    this.#id = id.trim() as TId;
+  constructor(data: SagaBuilderData<TId>) {
+    this.#data = data;
   }
 
   durability(tier: SagaDurabilityTier): SagaBuilder<TId, TPhase, TState, TMessage> {
-    this.#durability = tier;
-    return this;
+    return new SagaBuilderImpl({ ...this.#data, durability: tier });
   }
 
   state<TNextState extends SagaState>(
+    this: TPhase extends 'initial' ? SagaBuilderImpl<TId, TPhase, TState, TMessage> : never,
     initialState: TNextState,
-  ): TPhase extends 'initial' ? SagaBuilder<TId, 'state-set', TNextState, TMessage> : never {
-    if (this.#initialState) {
-      throw SagasError.validationFailed(`Saga "${this.#id}" already has initial state.`);
-    }
-    this.#initialState = Object.freeze({ ...initialState });
-    return this as unknown as TPhase extends 'initial'
-      ? SagaBuilder<TId, 'state-set', TNextState, TMessage>
-      : never;
+  ): SagaBuilder<TId, 'state-set', TNextState, TMessage> {
+    return new SagaBuilderImpl<TId, 'state-set', TNextState, TMessage>({
+      ...this.#data,
+      initialState: Object.freeze({ ...initialState }),
+    });
   }
 
   correlate<TNextMessage extends SagaMessage = TMessage>(
     correlate: SagaCorrelation<TNextMessage>,
   ): SagaBuilder<TId, TPhase, TState, TMessage> {
-    this.#correlations = [
-      ...this.#correlations,
-      Object.freeze({
-        eventType: '*',
-        canStart: true,
-        correlate: correlate as SagaCorrelation<SagaMessage>,
-      }),
-    ];
-    return this;
+    return new SagaBuilderImpl({
+      ...this.#data,
+      correlations: [
+        ...this.#data.correlations,
+        Object.freeze({
+          eventType: '*',
+          canStart: true,
+          correlate: correlate as SagaCorrelation<SagaMessage>,
+        }),
+      ],
+    });
   }
 
   concurrency<TNextMessage extends SagaMessage = TMessage>(
@@ -142,110 +149,119 @@ class SagaBuilderImpl<
     if (!Number.isInteger(options.limit) || options.limit < 1) {
       throw SagasError.validationFailed('Saga concurrency limit must be a positive integer.');
     }
-    this.#concurrency = Object.freeze({
-      limit: options.limit,
-      key: options.key as ((message: SagaMessage) => string) | undefined,
+    return new SagaBuilderImpl({
+      ...this.#data,
+      concurrency: Object.freeze({
+        limit: options.limit,
+        key: options.key as ((message: SagaMessage) => string) | undefined,
+      }),
     });
-    return this;
   }
 
   schedule(cron: string): SagaBuilder<TId, TPhase, TState, TMessage> {
     assertNonEmpty(cron, 'Saga schedule must not be empty.');
-    this.#schedule = cron.trim();
-    return this;
+    return new SagaBuilderImpl({ ...this.#data, schedule: cron.trim() });
   }
 
   on<TType extends string, TPayload = unknown>(
+    this: TPhase extends 'state-set' | 'handler-set'
+      ? SagaBuilderImpl<TId, TPhase, TState, TMessage>
+      : never,
     eventType: TType,
     handler: SagaHandler<TState & SagaState, SagaEvent<TType, TPayload>>,
-  ): TPhase extends 'state-set' | 'handler-set'
-    ? SagaBuilder<TId, 'handler-set', TState, TMessage | SagaEvent<TType, TPayload>>
-    : never {
-    this.#requireState();
+  ): SagaBuilder<TId, 'handler-set', TState, TMessage | SagaEvent<TType, TPayload>> {
     assertNonEmpty(eventType, 'Saga event type must not be empty.');
-    this.#handlers.set(eventType, handler as SagaHandler<SagaState, SagaMessage>);
-    return this as unknown as TPhase extends 'state-set' | 'handler-set'
-      ? SagaBuilder<TId, 'handler-set', TState, TMessage | SagaEvent<TType, TPayload>>
-      : never;
+    return new SagaBuilderImpl<TId, 'handler-set', TState, TMessage | SagaEvent<TType, TPayload>>({
+      ...this.#data,
+      handlers: new Map(this.#data.handlers).set(
+        eventType,
+        handler as SagaHandler<SagaState, SagaMessage>,
+      ),
+    });
   }
 
   compensate<TType extends string, TPayload = unknown>(
+    this: TPhase extends 'state-set' | 'handler-set'
+      ? SagaBuilderImpl<TId, TPhase, TState, TMessage>
+      : never,
     eventType: TType,
     handler: SagaHandler<TState & SagaState, SagaEvent<TType, TPayload>>,
-  ): TPhase extends 'state-set' | 'handler-set'
-    ? SagaBuilder<TId, TPhase, TState, TMessage | SagaEvent<TType, TPayload>>
-    : never {
-    this.#requireState();
+  ): SagaBuilder<TId, TPhase, TState, TMessage | SagaEvent<TType, TPayload>> {
     assertNonEmpty(eventType, 'Saga compensation event type must not be empty.');
-    this.#compensations.set(eventType, handler as SagaHandler<SagaState, SagaMessage>);
-    return this as unknown as TPhase extends 'state-set' | 'handler-set'
-      ? SagaBuilder<TId, TPhase, TState, TMessage | SagaEvent<TType, TPayload>>
-      : never;
+    return new SagaBuilderImpl<TId, TPhase, TState, TMessage | SagaEvent<TType, TPayload>>({
+      ...this.#data,
+      compensations: new Map(this.#data.compensations).set(
+        eventType,
+        handler as SagaHandler<SagaState, SagaMessage>,
+      ),
+    });
   }
 
   onSignal<TPayload>(
+    this: TPhase extends 'state-set' | 'handler-set'
+      ? SagaBuilderImpl<TId, TPhase, TState, TMessage>
+      : never,
     signal: SignalDefinition<TPayload>,
     handler: SagaSignalHandler<TState & SagaState, TPayload>,
-  ): TPhase extends 'state-set' | 'handler-set' ? SagaBuilder<TId, TPhase, TState, TMessage>
-    : never {
-    this.#requireState();
+  ): SagaBuilder<TId, TPhase, TState, TMessage> {
     assertNonEmpty(signal.name, 'Saga signal name must not be empty.');
-    this.#signalHandlers.set(signal.name, handler as SagaSignalHandler<SagaState>);
-    return this as unknown as TPhase extends 'state-set' | 'handler-set'
-      ? SagaBuilder<TId, TPhase, TState, TMessage>
-      : never;
+    return new SagaBuilderImpl({
+      ...this.#data,
+      signalHandlers: new Map(this.#data.signalHandlers).set(
+        signal.name,
+        handler as SagaSignalHandler<SagaState>,
+      ),
+    });
   }
 
   onQuery<TResult>(
+    this: TPhase extends 'state-set' | 'handler-set'
+      ? SagaBuilderImpl<TId, TPhase, TState, TMessage>
+      : never,
     query: QueryDefinition<TResult>,
     handler: (saga: Readonly<{ state: TState & SagaState }>) => SyncQueryResult<TResult>,
-  ): TPhase extends 'state-set' | 'handler-set' ? SagaBuilder<TId, TPhase, TState, TMessage>
-    : never {
-    this.#requireState();
+  ): SagaBuilder<TId, TPhase, TState, TMessage> {
     assertNonEmpty(query.name, 'Saga query name must not be empty.');
-    this.#queryHandlers.set(query.name, handler as SagaQueryHandler<SagaState>);
-    return this as unknown as TPhase extends 'state-set' | 'handler-set'
-      ? SagaBuilder<TId, TPhase, TState, TMessage>
-      : never;
+    return new SagaBuilderImpl({
+      ...this.#data,
+      queryHandlers: new Map(this.#data.queryHandlers).set(
+        query.name,
+        handler as SagaQueryHandler<SagaState>,
+      ),
+    });
   }
 
-  build(): TPhase extends 'handler-set' ? SagaDefinition<TId, TState & SagaState, TMessage>
-    : never {
-    this.#requireState();
-    if (this.#handlers.size === 0) {
-      throw SagasError.validationFailed(`Saga "${this.#id}" requires at least one handler.`);
-    }
+  build(
+    this: TPhase extends 'handler-set' ? SagaBuilderImpl<TId, TPhase, TState, TMessage>
+      : never,
+  ): SagaDefinition<TId, TState & SagaState, TMessage> {
+    const initialState = this.#data.initialState;
+    if (!initialState) throw SagasError.validationFailed('Saga initial state is missing.');
 
     return createSagaDefinition({
-      id: this.#id as SagaId<TId>,
-      durability: this.#durability,
-      initialState: this.#initialState as TState & SagaState,
-      correlations: Object.freeze([...this.#correlations]),
-      handlers: new Map(this.#handlers) as ReadonlyMap<
+      id: this.#data.id as SagaId<TId>,
+      durability: this.#data.durability,
+      initialState: initialState as TState & SagaState,
+      correlations: Object.freeze([...this.#data.correlations]),
+      handlers: new Map(this.#data.handlers) as ReadonlyMap<
         TMessage['type'],
         SagaHandler<TState & SagaState, TMessage>
       >,
-      compensations: new Map(this.#compensations) as ReadonlyMap<
+      compensations: new Map(this.#data.compensations) as ReadonlyMap<
         TMessage['type'],
         SagaHandler<TState & SagaState, TMessage>
       >,
-      signalHandlers: new Map(this.#signalHandlers) as ReadonlyMap<
+      signalHandlers: new Map(this.#data.signalHandlers) as ReadonlyMap<
         string,
         SagaSignalHandler<TState & SagaState>
       >,
-      queryHandlers: new Map(this.#queryHandlers) as ReadonlyMap<
+      queryHandlers: new Map(this.#data.queryHandlers) as ReadonlyMap<
         string,
         SagaQueryHandler<TState & SagaState>
       >,
-      concurrency: this.#concurrency as SagaConcurrencyPolicy<TMessage> | undefined,
-      schedule: this.#schedule,
-    }) as TPhase extends 'handler-set' ? SagaDefinition<TId, TState & SagaState, TMessage> : never;
-  }
-
-  #requireState(): void {
-    if (!this.#initialState) {
-      throw SagasError.validationFailed(`Saga "${this.#id}" requires state() before handlers.`);
-    }
+      concurrency: this.#data.concurrency as SagaConcurrencyPolicy<TMessage> | undefined,
+      schedule: this.#data.schedule,
+    });
   }
 }
 
@@ -281,7 +297,16 @@ function createSagaDefinition<
 export function defineSaga<TId extends string>(
   id: TId,
 ): SagaBuilder<TId, 'initial', never, never> {
-  return new SagaBuilderImpl<TId, 'initial', never, never>(id);
+  assertNonEmpty(id, 'Saga ID is required.');
+  return new SagaBuilderImpl<TId, 'initial', never, never>({
+    id: id.trim() as TId,
+    durability: DEFAULT_SAGA_DURABILITY_TIER,
+    correlations: [],
+    handlers: new Map(),
+    compensations: new Map(),
+    signalHandlers: new Map(),
+    queryHandlers: new Map(),
+  });
 }
 
 function assertNonEmpty(value: string, message: string): void {

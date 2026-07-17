@@ -6,13 +6,18 @@ export type StreamTopicFixtureSchema = StateSchema<{
   readonly execution: CollectionDefinition<Record<string, unknown>>;
 }>;
 
-const passthroughSchema = {
+const passthroughSchema: CollectionDefinition<Record<string, unknown>>['schema'] = {
   '~standard': {
     version: 1,
     vendor: 'netscript-test',
-    validate: (value: unknown) => ({ value }),
+    validate: (value: unknown) =>
+      isRecord(value) ? { value } : { issues: [{ message: 'Expected a record value' }] },
   },
-} as const;
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
 
 /**
  * Create a small stream schema fixture with one `execution` collection.

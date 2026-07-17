@@ -115,7 +115,7 @@ function findJobExecuteCorrelation(value: unknown): string | undefined {
     const attributes = value.attributes;
     const jobId = attributeString(attributes, ['netscript.job.id', 'job.id']);
     const correlationId = attributeString(attributes, ['netscript.correlation.id']);
-    if (jobId === 'health-check' && correlationId) return correlationId;
+    if (jobId === 'flow-b-callback' && correlationId) return correlationId;
   }
   for (const child of Object.values(value)) {
     const found = findJobExecuteCorrelation(child);

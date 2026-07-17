@@ -102,7 +102,7 @@ Each chapter adds exactly one link in the durable-chat spine:
 ] }) }}
 
 {{ comp callout { type: "note", title: "What this track deliberately leaves out" } }}
-The tutorial stays on the durable-chat spine: durable chat, streaming markdown, tools (local and over MCP), sandboxed <code>ui://</code> widgets, and a live subscription. It does <strong>not</strong> cover the generative-UI renderer, agent memory / semantic recall, or RAG. The <a href="/ai/engine/">@netscript/ai engine</a> — model registry, agent loop, tool registry, and MCP transports — is published on JSR as of <code>0.0.1-beta.7</code>; this track wires the model call directly on <code>@tanstack/ai</code>, because the durable session plane persists and replays TanStack chunk streams. Chapter 2 shows where the engine fits, and chapter 5 uses its MCP client stack.
+The tutorial stays on the durable-chat spine: durable chat, streaming markdown, tools (local and over MCP), sandboxed <code>ui://</code> widgets, and a live subscription. It does <strong>not</strong> cover the generative-UI renderer, agent memory / semantic recall, or RAG. The <a href="/ai/engine/">@netscript/ai engine</a> — model registry, agent loop, tool registry, and MCP transports — is published on JSR as of <code>{{ releaseVersion }}</code>; this track wires the model call directly on <code>@tanstack/ai</code>, because the durable session plane persists and replays TanStack chunk streams. Chapter 2 shows where the engine fits, and chapter 5 uses its MCP client stack.
 {{ /comp }}
 
 ## What you built

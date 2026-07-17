@@ -21,9 +21,9 @@ import { processWorkerJob } from './job-dispatcher.ts';
 import { type WorkerListenerSnapshot, WorkerListenerSupervisor } from './listener-supervisor.ts';
 import { startQueueTriggerListeners, startTaskQueueListener } from './queue-consumer.ts';
 import {
-  DEFAULT_QUEUE_TRIGGERS,
   type JobExecutionContext,
   type QueueTriggerConfig,
+  resolveWorkerQueueTriggers,
   type WorkerDispatchContext,
   type WorkerExecutionState,
   type WorkerJobRegistry,
@@ -103,7 +103,7 @@ export class Worker {
     this.taskRegistry = options.taskRegistry;
     this.idempotency = options.idempotency;
     this.jobsDir = options.jobsDir ?? './jobs';
-    this.queueTriggers = [...DEFAULT_QUEUE_TRIGGERS, ...(options.queueTriggers ?? [])];
+    this.queueTriggers = resolveWorkerQueueTriggers(options.queueTriggers);
     this.listenerMaxRestarts = options.listenerMaxRestarts ?? 3;
     this.listenerInitialBackoffMs = options.listenerInitialBackoffMs ?? 100;
     this.listenerMaxBackoffMs = options.listenerMaxBackoffMs ?? 5_000;

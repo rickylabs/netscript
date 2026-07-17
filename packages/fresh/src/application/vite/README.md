@@ -28,11 +28,36 @@ export default defineConfig({
 
 - publishes `@app/*` aliases through Vite `resolve.alias`
 - resolves alias imports through `resolveId()` for plugin/tooling paths
+- dedupes Preact and Preact Signals copies in linked and peer-dependency graphs
+- canonicalizes delegated Preact runtime module IDs before production bundling
 - extends `server.fs.allow` for workspace packages
 - bridges selected process env values into `import.meta.env.*`
 - registers extra watch paths during dev
 - can generate app-local `.generated/manifest.ts` and `.generated/routes.ts` outputs from Fresh file
   routes
+
+## Preact runtime module identity
+
+The plugin returns Vite's standard `resolve.dedupe: ['preact', '@preact/signals']` baseline so
+linked packages and dependencies that declare the hydration runtime as a peer converge on one
+installed package copy.
+
+Dedupe alone is insufficient when a Windows production build represents that one physical copy
+with two final module-ID strings, such as `C:\\...\\preact\\hooks` and
+`C:/.../preact/hooks`. Rollup keys modules by the resolved string, so slash variants can emit two
+hooks runtimes even though Deno reports one installed Preact version. The plugin therefore delegates
+bare, subpath, and versioned `npm:` Preact imports through Vite, preserves the complete resolution
+result, and applies Vite's `normalizePath()` to its final `id` before Rollup sees it.
+
+Fresh's dependency-optimizer policy remains unchanged. Fresh 2.3 disables dependency discovery to
+prevent pre-bundling duplicates; this normalization covers the separate Windows production Rollup
+identity path.
+
+Fresh core's client runtime imports Preact Signals through a versioned `npm:` specifier. On a clean
+Deno cache, the Fresh Vite loader may not resolve that transitive spelling even though the generated
+app declares a direct `@preact/signals` import-map entry. The NetScript resolver canonicalizes bare,
+`npm:`, and `npm:/` Signals spellings to that app-owned entry before delegating to Vite. This keeps
+production hydration builds deterministic without cache prewarming or externalizing client code.
 
 ## Route manifest generation
 

@@ -4,9 +4,11 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The contract-first vocabulary shared across every NetScript package and plugin boundary: an oRPC
-base contract with a standard error map, Zod-backed pagination and error schemas, and
-CRUD/query/transform builders that keep service handlers and typed clients in sync.**
+**The contract-first vocabulary for NetScript boundaries: an oRPC base contract, Zod-backed
+pagination and error schemas, and builders that keep service handlers and typed clients in sync.**
+
+The base contract carries the standard error map; the reusable builder set covers CRUD, query, and
+transform contracts.
 
 ---
 
@@ -78,5 +80,5 @@ export const listItems = baseContract
 
 ## 📝 License
 
-Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
-cryptographically verified provenance.
+Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
+JSR with cryptographically verified provenance.

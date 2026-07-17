@@ -1,5 +1,6 @@
 import { resolve } from '@std/path';
 import {
+  build,
   type ConfigEnv,
   defineConfig,
   normalizePath,
@@ -49,7 +50,17 @@ function asResolveIdHook(plugin: ReturnType<typeof createNetScriptVitePlugin>) {
       isEntry: boolean;
       ssr?: boolean;
     },
-  ) => string | null | undefined | Promise<string | null | undefined>;
+  ) =>
+    | string
+    | { id: string; meta?: Record<string, unknown>; moduleSideEffects?: boolean }
+    | null
+    | undefined
+    | Promise<
+      | string
+      | { id: string; meta?: Record<string, unknown>; moduleSideEffects?: boolean }
+      | null
+      | undefined
+    >;
 }
 
 Deno.test('createNetScriptVitePlugin returns config through official plugin hooks', () => {
@@ -75,6 +86,14 @@ Deno.test('createNetScriptVitePlugin returns config through official plugin hook
   assert(config !== undefined && config !== null, 'Expected config hook to return config');
 
   assert(config.resolve?.alias !== undefined, 'Expected resolve.alias entries');
+  assert(
+    config.resolve?.dedupe?.includes('preact'),
+    'Expected Preact to be included in resolve.dedupe',
+  );
+  assert(
+    config.resolve?.dedupe?.includes('@preact/signals'),
+    'Expected Preact Signals to be included in resolve.dedupe',
+  );
   assert(config.server?.fs?.allow?.includes('C:/repo'), 'Expected workspace root in fs.allow');
   assert(
     config.define?.['import.meta.env.VITE_USERS_URL'] === '"http://localhost:3000"',
@@ -165,6 +184,247 @@ Deno.test('createNetScriptVitePlugin resolves @app aliases via resolveId', async
   assert(
     resolved === 'C:/repo/apps/playground/assets/tokens.css',
     `Unexpected resolved path: ${resolved}`,
+  );
+});
+
+Deno.test('createNetScriptVitePlugin delegates all Preact forms and preserves metadata', async () => {
+  const plugin = createNetScriptVitePlugin({ appRoot: 'C:/repo/apps/chat' });
+  assert(typeof plugin.resolveId === 'function', 'Expected plugin.resolveId hook');
+  const delegatedId =
+    'C:\\repo\\node_modules\\.deno\\preact@10.29.7\\node_modules\\preact\\hooks\\dist\\hooks.module.js';
+  const delegatedSources: string[] = [];
+  const delegatedImporters: Array<string | undefined> = [];
+  const delegatedSkipSelf: Array<boolean | undefined> = [];
+  const context = {
+    resolve(
+      source: string,
+      importer: string | undefined,
+      options: { skipSelf?: boolean },
+    ) {
+      delegatedSources.push(source);
+      delegatedImporters.push(importer);
+      delegatedSkipSelf.push(options.skipSelf);
+      return Promise.resolve({
+        id: delegatedId,
+        meta: { fixture: 'preact-hooks' },
+        moduleSideEffects: true,
+      });
+    },
+  };
+  const preactSources = [
+    'preact',
+    'preact/hooks',
+    'npm:preact@10.29.7/hooks',
+    'npm:/preact@10.29.7/hooks',
+  ];
+
+  for (const source of preactSources) {
+    const resolved = await asResolveIdHook(plugin).call(
+      context,
+      source,
+      'C:/repo/apps/chat/islands/Chat.tsx',
+      { attributes: {}, custom: {}, isEntry: false },
+    );
+
+    assert(typeof resolved === 'object' && resolved !== null, 'Expected a resolved Preact object');
+    assert(resolved.id === normalizePath(delegatedId), `Unexpected resolved ID: ${resolved.id}`);
+    assert(resolved.meta?.fixture === 'preact-hooks', 'Expected delegated metadata to be retained');
+    assert(
+      resolved.moduleSideEffects === true,
+      'Expected module-side-effect metadata to be retained',
+    );
+  }
+
+  const similarlyPrefixed = await asResolveIdHook(plugin).call(
+    context,
+    'preact-render-to-string',
+    'C:/repo/apps/chat/routes/index.tsx',
+    { attributes: {}, custom: {}, isEntry: false },
+  );
+  assert(similarlyPrefixed === null, 'Expected similarly prefixed packages to remain untouched');
+  assert(
+    JSON.stringify(delegatedSources) === JSON.stringify(preactSources),
+    `Unexpected delegated sources: ${JSON.stringify(delegatedSources)}`,
+  );
+  assert(
+    delegatedImporters.every((importer) => importer === 'C:/repo/apps/chat/islands/Chat.tsx'),
+    `Unexpected delegated importers: ${JSON.stringify(delegatedImporters)}`,
+  );
+  assert(
+    delegatedSkipSelf.every((skipSelf) => skipSelf === true),
+    `Expected all delegations to skip the NetScript resolver: ${JSON.stringify(delegatedSkipSelf)}`,
+  );
+});
+
+Deno.test('createNetScriptVitePlugin resolves versioned Preact Signals through the app import map', async () => {
+  const plugin = createNetScriptVitePlugin({ appRoot: 'C:/repo/apps/chat' });
+  assert(typeof plugin.resolveId === 'function', 'Expected plugin.resolveId hook');
+  const delegatedId =
+    'C:\\repo\\node_modules\\.deno\\@preact+signals@2.9.2\\node_modules\\@preact\\signals\\dist\\signals.module.js';
+  const delegatedSources: string[] = [];
+  const delegatedSkipSelf: Array<boolean | undefined> = [];
+  const context = {
+    resolve(
+      source: string,
+      _importer: string | undefined,
+      options: { skipSelf?: boolean },
+    ) {
+      delegatedSources.push(source);
+      delegatedSkipSelf.push(options.skipSelf);
+      return Promise.resolve({
+        id: delegatedId,
+        meta: { fixture: 'preact-signals' },
+        moduleSideEffects: true,
+      });
+    },
+  };
+
+  for (
+    const source of [
+      '@preact/signals',
+      'npm:@preact/signals@^2.5.1',
+      'npm:/@preact/signals@2.9.2',
+    ]
+  ) {
+    const resolved = await asResolveIdHook(plugin).call(
+      context,
+      source,
+      'https://jsr.io/@fresh/core/2.3.3/src/runtime/client/reviver.ts',
+      { attributes: {}, custom: {}, isEntry: false },
+    );
+
+    assert(typeof resolved === 'object' && resolved !== null, 'Expected Signals to resolve');
+    assert(resolved.id === normalizePath(delegatedId), `Unexpected resolved ID: ${resolved.id}`);
+    assert(resolved.meta?.fixture === 'preact-signals', 'Expected metadata to be retained');
+    assert(resolved.moduleSideEffects === true, 'Expected side-effect metadata to be retained');
+  }
+
+  const similarlyPrefixed = await asResolveIdHook(plugin).call(
+    context,
+    '@preact/signals-core',
+    'C:/repo/apps/chat/islands/Chat.tsx',
+    { attributes: {}, custom: {}, isEntry: false },
+  );
+  assert(similarlyPrefixed === null, 'Expected similarly prefixed packages to remain untouched');
+  assert(
+    JSON.stringify(delegatedSources) === JSON.stringify([
+      '@preact/signals',
+      '@preact/signals',
+      '@preact/signals',
+    ]),
+    `Unexpected delegated sources: ${JSON.stringify(delegatedSources)}`,
+  );
+  assert(
+    delegatedSkipSelf.every((skipSelf) => skipSelf === true),
+    `Expected all delegations to skip the NetScript resolver: ${JSON.stringify(delegatedSkipSelf)}`,
+  );
+});
+
+Deno.test('createNetScriptVitePlugin collapses Windows Preact slash variants in production builds', async () => {
+  const windowsHooksId =
+    'C:\\repo\\node_modules\\.deno\\preact@10.29.7\\node_modules\\preact\\hooks\\dist\\hooks.module.js';
+  const normalizedHooksId = normalizePath(windowsHooksId);
+  const loadedHooksIds: string[] = [];
+  const runtimeKey = `__netscriptPreactFixture${crypto.randomUUID().replaceAll('-', '')}`;
+  const resultKey = `${runtimeKey}Result`;
+  let resolvedDedupe: readonly string[] = [];
+
+  const fixtureResolver: Plugin = {
+    name: 'preact-windows-module-identity-fixture',
+    enforce: 'pre',
+    configResolved(config) {
+      resolvedDedupe = config.resolve.dedupe;
+    },
+    resolveId(source) {
+      if (source === 'virtual:entry') return '\0virtual:entry';
+      if (source === 'virtual:preact-peer') return '\0virtual:preact-peer';
+      if (source === 'preact/hooks') {
+        return {
+          id: windowsHooksId,
+          meta: { fixture: 'direct' },
+          moduleSideEffects: true,
+        };
+      }
+      if (source === 'npm:/preact@10.29.7/hooks') {
+        return {
+          id: normalizedHooksId,
+          meta: { fixture: 'peer' },
+          moduleSideEffects: true,
+        };
+      }
+      return null;
+    },
+    load(id) {
+      if (id === '\0virtual:entry') {
+        return [
+          "import { hookPatchCount as directHookPatchCount } from 'preact/hooks';",
+          "import { peerHookPatchCount } from 'virtual:preact-peer';",
+          `globalThis[${JSON.stringify(resultKey)}] = [directHookPatchCount, peerHookPatchCount];`,
+        ].join('\n');
+      }
+      if (id === '\0virtual:preact-peer') {
+        return [
+          "import { hookPatchCount } from 'npm:/preact@10.29.7/hooks';",
+          'export { hookPatchCount as peerHookPatchCount };',
+        ].join('\n');
+      }
+      if (id === windowsHooksId || id === normalizedHooksId) {
+        loadedHooksIds.push(id);
+        return [
+          `const state = globalThis[${JSON.stringify(runtimeKey)}] ??= { patches: 0 };`,
+          'state.patches += 1;',
+          'export const hookPatchCount = state.patches;',
+        ].join('\n');
+      }
+      return null;
+    },
+  };
+
+  const result = await build({
+    logLevel: 'silent',
+    resolve: { dedupe: ['consumer-package'] },
+    plugins: [
+      createNetScriptVitePlugin({
+        appRoot: 'C:/repo/apps/chat',
+        aliasEntries: [],
+      }),
+      fixtureResolver,
+    ],
+    build: {
+      minify: false,
+      write: false,
+      rollupOptions: { input: 'virtual:entry' },
+    },
+  });
+
+  assert(!('on' in result), 'Expected a completed Vite production build, not a watcher');
+  const outputs = Array.isArray(result) ? result : [result];
+  const chunks = outputs.flatMap((output) => output.output)
+    .filter((item) => item.type === 'chunk');
+  const entryChunk = chunks.find((chunk) => chunk.isEntry);
+  assert(entryChunk !== undefined, 'Expected one production entry chunk');
+
+  try {
+    await import(`data:text/javascript,${encodeURIComponent(entryChunk.code)}`);
+    const hookPatchCounts = Reflect.get(globalThis, resultKey);
+    assert(
+      JSON.stringify(hookPatchCounts) === '[1,1]',
+      `Expected one hooks runtime patch, received ${JSON.stringify(hookPatchCounts)}`,
+    );
+  } finally {
+    Reflect.deleteProperty(globalThis, runtimeKey);
+    Reflect.deleteProperty(globalThis, resultKey);
+  }
+
+  assert(
+    loadedHooksIds.length === 1 && loadedHooksIds[0] === normalizedHooksId,
+    `Expected one canonical hooks module ID, received ${JSON.stringify(loadedHooksIds)}`,
+  );
+  assert(
+    resolvedDedupe.includes('consumer-package') &&
+      resolvedDedupe.includes('preact') &&
+      resolvedDedupe.includes('@preact/signals'),
+    `Unexpected merged dedupe: ${JSON.stringify(resolvedDedupe)}`,
   );
 });
 

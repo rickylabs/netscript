@@ -3,6 +3,7 @@
 // Remove when Aspire 13.3 adds Deno runtime support (aspire#15812).
 
 import { join, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import process from "node:process";
@@ -90,6 +91,8 @@ export const RESOURCE_DEFAULTS = {
   HttpEndpointName: 'http',
 } as const;
 
+const GARNET_TOOL_RESTORE_TIMEOUT_MS = 10_000;
+
 // ============================================================================
 // Path helpers
 // ============================================================================
@@ -126,6 +129,26 @@ export function buildDatabaseUriEnvKey(config: Pick<NetScriptConfig, 'PrimaryDat
   return prefix ? `${prefix}_URI` : null;
 }
 
+export function buildDatabaseProviderEnvVars(
+  config: Pick<NetScriptConfig, 'PrimaryDatabase'>,
+): Record<string, string> {
+  if (!config.PrimaryDatabase) return {};
+  return {
+    DB_PROVIDER: config.PrimaryDatabase,
+    DATABASE_PROVIDER: config.PrimaryDatabase,
+  };
+}
+
+export function buildSqliteDatabaseUrl(
+  appHostDir: string,
+  databaseKey: string,
+  databaseName: string,
+): string {
+  return pathToFileURL(
+    resolveWorkspacePath(appHostDir, join('database', databaseKey, databaseName)),
+  ).href;
+}
+
 // ============================================================================
 // Permission resolution
 // ============================================================================
@@ -156,11 +179,16 @@ export function buildViteEnvVarName(
   resourceName: string,
   endpointName: string = RESOURCE_DEFAULTS.HttpEndpointName,
 ): ViteEnvVarNames {
-  const full = `VITE_services__${resourceName}__${endpointName}__0`;
-  const normalised = resourceName.toUpperCase().replace(/-/g, '_');
-  const shorthand = `VITE_${normalised}_URL`;
+  const normalisedResource = normalizeViteIdentifierSegment(resourceName);
+  const normalisedEndpoint = normalizeViteIdentifierSegment(endpointName);
+  const full = `VITE_services__${normalisedResource}__${normalisedEndpoint}__0`;
+  const shorthand = `VITE_${normalisedResource.toUpperCase()}_URL`;
 
   return { full, shorthand };
+}
+
+function normalizeViteIdentifierSegment(value: string): string {
+  return value.replace(/[^a-zA-Z0-9_]/g, '_');
 }
 
 // ============================================================================
@@ -344,6 +372,7 @@ export function ensureGarnetToolManifest(
     execFileSync("dotnet", ["tool", "restore"], {
       cwd: appHostDir,
       stdio: "ignore",
+      timeout: GARNET_TOOL_RESTORE_TIMEOUT_MS,
     });
   } catch {
     // Restore failures surface when the executable resource starts; the

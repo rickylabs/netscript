@@ -42,9 +42,7 @@ jobs:
           deno task doc:lint --root packages/cli --pretty
           deno doc --lint packages/plugin/src/config/mod.ts packages/plugin/src/protocol/mod.ts
 
-  # Repo-wide drift scan on push-to-main + schedule. Observational until the
-  # baseline-green epic (#746) clears the pre-existing whole-repo violations,
-  # then flip continue-on-error to false to make main-drift hard-blocking.
+  # Blocking repo-wide drift scan on push-to-main + schedule.
   code-quality-repo:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
@@ -53,6 +51,5 @@ jobs:
       - uses: denoland/setup-deno@v2
         with:
           deno-version: v2.9.0
-      - name: Repo-wide quality scan (observational until #746 closes)
-        continue-on-error: true
+      - name: Repo-wide quality scan
         run: deno task quality:scan:repo --pretty

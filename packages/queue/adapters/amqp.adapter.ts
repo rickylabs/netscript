@@ -8,6 +8,7 @@
 
 import { AmqpMessageQueue } from '@fedify/amqp';
 import { connect } from 'npm:amqplib@^0.10.3';
+import type { ChannelModel } from 'npm:amqplib@^0.10.3';
 import type {
   DeadLetterStorePort,
   EnqueueOptions,
@@ -34,7 +35,7 @@ export type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from
  */
 export class AmqpAdapter<T = unknown> implements MessageQueue<T> {
   private queue!: AmqpMessageQueue;
-  private readonly connection: Promise<unknown>;
+  private readonly connection: Promise<ChannelModel>;
   private listening = false;
   private abortController?: AbortController;
   private deadLetterStore: DeadLetterStorePort<T> | null = null;
@@ -60,7 +61,7 @@ export class AmqpAdapter<T = unknown> implements MessageQueue<T> {
     try {
       this.connection = connect(url);
       this.connection.then((connection) => {
-        this.queue = new AmqpMessageQueue(connection as never);
+        this.queue = new AmqpMessageQueue(connection);
       }).catch((error) => {
         throw new QueueConnectionError(
           `Failed to connect to RabbitMQ: ${

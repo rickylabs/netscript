@@ -48,7 +48,7 @@ describe('generateRegisterTools', () => {
     });
     assertStringIncludes(
       output,
-      "builder.addExecutable('prisma-studio', 'deno', prisma_studio_workdir, ['task', '--minimum-dependency-age=0', 'studio'])",
+      "builder.addExecutable('prisma-studio', 'deno', prisma_studio_workdir, ['task', 'studio'])",
     );
     assertStringIncludes(
       output,
@@ -56,6 +56,7 @@ describe('generateRegisterTools', () => {
     );
     assertStringIncludes(output, "const PROCESS_COMMANDS_FLAG = 'NETSCRIPT_ASPIRE_PROCESS_COMMANDS'");
     assertStringIncludes(output, 'Aspire 13.4 WithProcessCommand seam');
+    assert(!output.includes('--minimum-dependency-age=0'));
   });
 
   it('should use resource name as TaskName fallback', () => {
@@ -63,7 +64,7 @@ describe('generateRegisterTools', () => {
     const output = generateRegisterTools({
       tools: { migrate: toolNoTaskName },
     });
-    assertStringIncludes(output, "['task', '--minimum-dependency-age=0', 'migrate']");
+    assertStringIncludes(output, "['task', 'migrate']");
   });
 
   it('should convert hyphenated names to safe identifiers', () => {
@@ -187,6 +188,7 @@ describe('generateDbCliMode', () => {
     assertStringIncludes(output, "taskSuffix: 'mssql'");
     assertStringIncludes(output, "'sqlite': {");
     assertStringIncludes(output, "taskSuffix: 'sqlite'");
+    assert(!output.includes('--minimum-dependency-age=0'));
   });
 
   it('should short-circuit AppHost startup when a Prisma operation is present', () => {

@@ -1,10 +1,10 @@
 /** Pure policy data and guards for quota fallback route selection. */
 
 import type { RouteIdentity, SessionIdentity } from './contract.ts';
-import { MODEL_IDS, OPENCODE_MODEL_IDS } from '../config/models.ts';
+import { MODEL_IDS, OPEN_EVALUATOR_MODEL_IDS, OPENCODE_MODEL_IDS } from '../config/models.ts';
 import { OPENROUTER_PRESETS, type OpenRouterPresetId } from './provider-profiles.ts';
 
-export const MODEL_FAMILIES = ['anthropic', 'openai', 'google', 'other'] as const;
+export const MODEL_FAMILIES = ['anthropic', 'openai', 'google', 'open', 'other'] as const;
 export type ModelFamily = typeof MODEL_FAMILIES[number];
 
 export const ROUTING_LANE_PURPOSES = [
@@ -20,6 +20,7 @@ export const ROUTING_LANE_PURPOSES = [
 export type RoutingLanePurpose = typeof ROUTING_LANE_PURPOSES[number];
 
 export const ROUTING_LANES = [
+  'light_implementation',
   'normal_implementation',
   'complex_implementation',
   'fast_iteration',
@@ -32,9 +33,12 @@ export const ROUTING_LANES = [
   'chore_code',
   'claude_workflow',
   'research_extraction',
+  'formal_evaluation',
   'review_claude',
+  'review_codex_light',
   'review_codex',
   'review_codex_complex',
+  'review_codex_fast',
 ] as const;
 export type RoutingLane = typeof ROUTING_LANES[number];
 
@@ -55,12 +59,24 @@ export interface CanonicalRoutePolicy {
   readonly effectiveThrough?: string;
   readonly subscriptionState?: SubscriptionState;
   readonly requiresExplicitApproval?: boolean;
+  readonly evaluatesFamily?: ModelFamily;
+  readonly evaluatorModelPolicy?: 'open_only';
 }
 
 const MAJOR_UI_UX_PRESET = OPENROUTER_PRESETS['claude-design-glm-5-2'];
+const FORMAL_EVALUATOR_PRESET = OPENROUTER_PRESETS['claude-evaluator-qwen-3-7-max'];
 
 /** Canonical machine-readable route bindings rendered by the harness lane-policy document. */
 export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
+  {
+    lane: 'light_implementation',
+    purpose: 'implementation',
+    agent: 'codex',
+    provider: 'openai',
+    model: MODEL_IDS.codexSol,
+    effort: 'low',
+    condition: 'small_scoped_slices',
+  },
   {
     lane: 'normal_implementation',
     purpose: 'implementation',
@@ -76,6 +92,7 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     provider: 'openai',
     model: MODEL_IDS.codexSol,
     effort: 'high',
+    condition: 'large_or_cross_cutting_slices',
   },
   {
     lane: 'fast_iteration',
@@ -209,13 +226,49 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     effort: 'low',
   },
   {
+    lane: 'formal_evaluation',
+    purpose: 'evaluation',
+    agent: 'claude',
+    provider: 'openrouter',
+    profileId: FORMAL_EVALUATOR_PRESET.profileId,
+    presetId: FORMAL_EVALUATOR_PRESET.id,
+    model: FORMAL_EVALUATOR_PRESET.model,
+    effort: FORMAL_EVALUATOR_PRESET.effort,
+    evaluatorModelPolicy: 'open_only',
+  },
+  {
     lane: 'review_claude',
     purpose: 'evaluation',
     agent: 'codex',
     provider: 'openai',
     model: MODEL_IDS.codexSol,
     effort: 'xhigh',
-    condition: 'opposite_family_review_of_claude_work',
+    evaluatesFamily: 'anthropic',
+  },
+  // --- Adversarial review of Codex/OpenAI-authored work, effort-paired ------------
+  // Owner-ratified 2026-07-16, on the PR #784 doctrine: Fable 5 is back on the
+  // Anthropic plan, in-plan and auto-selectable — the prior Opus substitution is
+  // retired for these review lanes. Fable is reserved for medium+ pairings; every
+  // fallback stays Claude-family so opposite-family review is never traded away.
+  {
+    lane: 'review_codex_light',
+    purpose: 'evaluation',
+    agent: 'claude',
+    provider: 'anthropic',
+    model: MODEL_IDS.opus,
+    effort: 'high',
+    condition: 'pairs_with_light_implementation',
+    evaluatesFamily: 'openai',
+  },
+  {
+    lane: 'review_codex_light',
+    purpose: 'evaluation',
+    agent: 'claude',
+    provider: 'anthropic',
+    model: MODEL_IDS.sonnet,
+    effort: 'high',
+    condition: 'token_limit_fallback',
+    evaluatesFamily: 'openai',
   },
   {
     lane: 'review_codex',
@@ -225,7 +278,7 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     model: MODEL_IDS.fable,
     effort: 'low',
     subscriptionState: 'included',
-    condition: 'adversarial_review_of_normal_codex_work',
+    evaluatesFamily: 'openai',
   },
   {
     lane: 'review_codex',
@@ -234,7 +287,8 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     provider: 'anthropic',
     model: MODEL_IDS.opus,
     effort: 'low',
-    condition: 'fallback_on_fable_token_limit',
+    condition: 'token_limit_fallback',
+    evaluatesFamily: 'openai',
   },
   {
     lane: 'review_codex_complex',
@@ -242,9 +296,9 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     agent: 'claude',
     provider: 'anthropic',
     model: MODEL_IDS.fable,
-    effort: 'high',
+    effort: 'medium',
     subscriptionState: 'included',
-    condition: 'adversarial_review_of_complex_codex_work',
+    evaluatesFamily: 'openai',
   },
   {
     lane: 'review_codex_complex',
@@ -252,10 +306,112 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     agent: 'claude',
     provider: 'anthropic',
     model: MODEL_IDS.opus,
+    effort: 'medium',
+    condition: 'token_limit_fallback',
+    evaluatesFamily: 'openai',
+  },
+  {
+    lane: 'review_codex_fast',
+    purpose: 'evaluation',
+    agent: 'claude',
+    provider: 'anthropic',
+    model: MODEL_IDS.opus,
+    effort: 'medium',
+    condition: 'pairs_with_fast_iteration',
+    evaluatesFamily: 'openai',
+  },
+  {
+    lane: 'review_codex_fast',
+    purpose: 'evaluation',
+    agent: 'claude',
+    provider: 'anthropic',
+    model: MODEL_IDS.sonnet,
     effort: 'high',
-    condition: 'fallback_on_fable_token_limit',
+    condition: 'token_limit_fallback',
+    evaluatesFamily: 'openai',
   },
 ] as const;
+
+export interface EvaluatorAssignment {
+  readonly authorFamily: Exclude<ModelFamily, 'other'>;
+  readonly generatorSession: SessionIdentity;
+  readonly evaluatorSession: SessionIdentity;
+}
+
+export interface FormalEvaluatorAssignment {
+  readonly authorFamily: Exclude<ModelFamily, 'open' | 'other'>;
+  readonly generatorSession: SessionIdentity;
+  readonly evaluatorSession: SessionIdentity;
+  readonly route?: CanonicalRoutePolicy;
+}
+
+function sessionFamily(session: SessionIdentity): ModelFamily {
+  if (session.agent === 'claude') return 'anthropic';
+  if (session.agent === 'codex') return 'openai';
+  return 'google';
+}
+
+/** Resolves an ordinary opposite-family review while rejecting self-certification. */
+export function resolveCanonicalOrdinaryReviewRoute(
+  assignment: EvaluatorAssignment,
+  at: Date,
+): CanonicalRoutePolicy {
+  if (assignment.generatorSession.sessionId === assignment.evaluatorSession.sessionId) {
+    throw new Error('generator and evaluator sessions must differ');
+  }
+  if (sessionFamily(assignment.generatorSession) !== assignment.authorFamily) {
+    throw new Error('generator session family must match the authored slice');
+  }
+  const evaluatorFamily = sessionFamily(assignment.evaluatorSession);
+  if (evaluatorFamily === assignment.authorFamily) {
+    throw new Error('evaluator must use the opposite model family');
+  }
+  const lane = assignment.authorFamily === 'anthropic'
+    ? 'review_claude'
+    : assignment.authorFamily === 'openai'
+    ? 'review_codex'
+    : undefined;
+  if (!lane) {
+    throw new Error(
+      `no canonical evaluator route for ${assignment.authorFamily} at ${
+        at.toISOString().slice(0, 10)
+      }`,
+    );
+  }
+  const route = resolveCanonicalRoute(lane, at);
+  if (route.agent !== assignment.evaluatorSession.agent) {
+    throw new Error(`canonical evaluator route ${lane} does not match the evaluator session`);
+  }
+  return route;
+}
+
+/** Resolves the formal open-model evaluator and rejects paid closed-model routes. */
+export function resolveCanonicalFormalEvaluatorRoute(
+  assignment: FormalEvaluatorAssignment,
+  at: Date,
+): CanonicalRoutePolicy {
+  if (assignment.generatorSession.sessionId === assignment.evaluatorSession.sessionId) {
+    throw new Error('generator and evaluator sessions must differ');
+  }
+  if (sessionFamily(assignment.generatorSession) !== assignment.authorFamily) {
+    throw new Error('generator session family must match the authored slice');
+  }
+  const route = assignment.route ?? resolveCanonicalRoute('formal_evaluation', at);
+  const preset = route.presetId ? OPENROUTER_PRESETS[route.presetId] : undefined;
+  if (
+    route.purpose !== 'evaluation' || route.agent !== 'claude' ||
+    route.provider !== 'openrouter' || route.profileId !== 'claude-openrouter' ||
+    route.evaluatorModelPolicy !== 'open_only' ||
+    !OPEN_EVALUATOR_MODEL_IDS.some((model) => model === route.model) ||
+    !preset || preset.purpose !== 'evaluation' || preset.model !== route.model ||
+    preset.agenticTurn !== 'supported' || preset.reasoningTrace !== 'present'
+  ) {
+    throw new Error(
+      'formal evaluator requires a supported Claude OpenRouter evaluation preset with an approved open model',
+    );
+  }
+  return route;
+}
 
 /** Resolves dated routes without silently retaining an expired temporary override. */
 export function resolveCanonicalRoute(lane: RoutingLane, at: Date): CanonicalRoutePolicy {
@@ -266,7 +422,8 @@ export function resolveCanonicalRoute(lane: RoutingLane, at: Date): CanonicalRou
   );
   const primary = matches.find((route) =>
     !route.condition?.startsWith('fallback') &&
-    route.condition !== 'exceptional_paid_on_demand'
+    route.condition !== 'exceptional_paid_on_demand' &&
+    route.condition !== 'token_limit_fallback'
   );
   if (!primary) throw new Error(`no canonical route for ${lane} at ${day}`);
   return primary;

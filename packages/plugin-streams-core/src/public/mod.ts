@@ -28,6 +28,10 @@ export type {
   CollectionEventHelpers,
   CollectionWithHelpers,
   StateSchema,
+  StreamSchemaIssue,
+  StreamSchemaValidationOptions,
+  StreamSchemaValidationResult,
+  StreamStandardSchema,
   StreamStateDefinition,
 } from '../domain/stream-schema.ts';
 export type { ChangeEvent, ControlEvent, Operation, StateEvent } from '../domain/stream-event.ts';

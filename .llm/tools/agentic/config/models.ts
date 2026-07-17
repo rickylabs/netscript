@@ -24,7 +24,7 @@ export const MODEL_IDS = {
   fable: 'fable-5',
   /** Anthropic/Claude documentation/workflow model. */
   opus: 'opus-4.8',
-  /** Anthropic/Claude cost-efficient docs / cleanup / easy-chore model. */
+  /** Anthropic/Claude cost-efficient docs, chores, and token-limit review fallback. */
   sonnet: 'sonnet-5',
   /** Google/Antigravity CLI identifier. */
   antigravity: 'agy',
@@ -47,9 +47,20 @@ export const NATIVE_CANARY_MODEL_ARGS = {
  */
 export const OPENROUTER_MODEL_IDS = {
   minimax: 'minimax/minimax-m3',
+  qwen: 'qwen/qwen3.7-max',
   glm: 'z-ai/glm-5.2',
   grok: 'x-ai/grok-4.5',
 } as const;
+
+/** Open models approved for formal evaluation without paid closed-model routing. */
+export const OPEN_EVALUATOR_MODEL_IDS: readonly [
+  typeof OPENROUTER_MODEL_IDS.minimax,
+  typeof OPENROUTER_MODEL_IDS.qwen,
+] = [
+  OPENROUTER_MODEL_IDS.minimax,
+  OPENROUTER_MODEL_IDS.qwen,
+] as const;
+export type OpenEvaluatorModelId = typeof OPEN_EVALUATOR_MODEL_IDS[number];
 
 /** OpenRouter model ids invoked through the native OpenCode lane. */
 export const OPENCODE_MODEL_IDS = {

@@ -80,11 +80,7 @@ const STRUCTURAL_PATTERNS: readonly { name: string; re: RegExp }[] = [
  * Production sources (by suite-relative path) allowed to contain a specific
  * structural match, with the reason. Keep this tiny and justified.
  */
-const STRUCTURAL_ALLOWLIST: Readonly<Record<string, readonly string[]>> = {
-  // Illustrative-only help text and doc-comment example of a caller-supplied
-  // LiteLLM model id; there is no default and it is not a routing binding.
-  'openhands/dispatch-openhands.ts': ['openrouter/qwen/qwen3.7-max'],
-};
+const STRUCTURAL_ALLOWLIST: Readonly<Record<string, readonly string[]>> = {};
 
 /**
  * Test files that legitimately pin config-derived contract literals (asserting
@@ -112,6 +108,7 @@ const TESTS_ALLOWED_TO_PIN_CONTRACT_LITERALS = new Set<string>([
 const README_ILLUSTRATIVE_ALLOWLIST = new Set<string>([
   MODEL_IDS.codexSol,
   config.NATIVE_CANARY_MODEL_ARGS.codex,
+  config.OPENROUTER_MODEL_IDS.qwen,
   config.OPENCODE_MODEL_IDS.visionEval,
   OPENCODE_TOOL.openRouterEnvRelativePath,
 ]);

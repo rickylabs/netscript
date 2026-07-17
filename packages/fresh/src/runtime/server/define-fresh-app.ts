@@ -82,11 +82,11 @@ export function defineFreshApp<State>(options: DefineFreshAppOptions<State> = {}
 
   options.preConfigure?.(app);
 
-  if (shouldRegisterStaticFiles(options)) {
+  if (options.staticFiles !== false) {
     const staticMiddleware = options.staticFiles === undefined
-      ? freshStaticFiles()
+      ? freshStaticFiles<State>()
       : options.staticFiles;
-    app.use(staticMiddleware as never);
+    app.use(staticMiddleware);
   }
 
   if (options.middleware && options.middleware.length > 0) {
@@ -97,10 +97,6 @@ export function defineFreshApp<State>(options: DefineFreshAppOptions<State> = {}
   registerFsRoutes(app, options);
 
   return app;
-}
-
-function shouldRegisterStaticFiles<State>(options: DefineFreshAppOptions<State>): boolean {
-  return options.staticFiles !== false;
 }
 
 function registerFsRoutes<State>(app: App<State>, options: DefineFreshAppOptions<State>): void {

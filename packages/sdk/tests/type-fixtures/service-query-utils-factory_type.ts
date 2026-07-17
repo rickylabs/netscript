@@ -39,8 +39,9 @@ declare const serviceClient: ServiceClient<typeof serviceContract>;
 const utils = createServiceQueryUtils(serviceClient, { path: ['orders'] });
 const typedUtils: ServiceQueryUtils<typeof serviceContract> = utils;
 const queryOptions = typedUtils.orders.list.queryOptions({ input: { page: 1 } });
+declare const queryContext: Parameters<typeof queryOptions.queryFn>[0];
 const data: Promise<ListOrdersOutput> | ListOrdersOutput = queryOptions.queryFn(
-  undefined as never,
+  queryContext,
 );
 
 void data;

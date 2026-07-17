@@ -4,10 +4,13 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The contract-only core for the NetScript AI plugin: the oRPC `/v1/ai` route surface — an
-SSE-framed `chat` stream plus `models`, `tools/:name`, `embed`, and `transcribe` — that a connector
-implements and the typed client calls. Zero service implementation; the route shapes derive from the
-`@netscript/ai` engine vocabulary so plugin IO can never drift from the domain contracts.**
+**The contract-only core for the NetScript AI plugin: typed oRPC routes for streaming chat, models,
+tools, embeddings, and transcription, derived from the AI engine vocabulary.**
+
+The `/v1/ai` surface includes an SSE-framed `chat` stream plus `models`, `tools/:name`, `embed`, and
+`transcribe`. It ships no service implementation: a connector implements the routes and typed
+clients call them, while the shared `@netscript/ai` vocabulary keeps plugin IO aligned with domain
+contracts.
 
 ---
 

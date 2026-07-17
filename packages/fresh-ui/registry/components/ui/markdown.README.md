@@ -27,23 +27,26 @@ netscript ui:add ai
 `ui:add` merges these into the app's `deno.json` `imports` — they are **never** added to
 `@netscript/fresh-ui` itself:
 
-- `npm:react-markdown@^9`
+- `npm:unified@^11`
+- `npm:remark-parse@^11`
+- `npm:remark-rehype@^11`
 - `npm:remark-gfm@^4`
 - `npm:remark-math@^6`
+- `npm:rehype-react@^8`
 - `npm:rehype-katex@^7`
 - `npm:rehype-highlight@^7`
 - `npm:rehype-sanitize@^6`
 - `npm:katex@^0.16`
 - `npm:highlight.js@^11`
 
-The item also contributes three `@import` lines to the app's styles aggregator: its own
-`markdown.css`, `katex/dist/katex.min.css`, and `highlight.js/styles/github-dark.css`.
+The item also contributes two `@import` lines to the app's styles aggregator: its own
+`markdown.css` and `katex/dist/katex.min.css`. The registry-owned token palette in `markdown.css`
+styles highlight.js output in both themes.
 
 ### App wiring
 
-`react-markdown` runs under Preact via a standard `react` / `react-dom` -> `preact/compat` alias in
-the app's `deno.json` (the same alias every Fresh app that consumes React libraries uses). No other
-glue is required.
+The unified processor compiles its sanitized hast tree directly through `rehype-react` configured
+with `preact/jsx-runtime`. No React, React DOM, or `preact/compat` alias is required.
 
 ## Public surface
 
@@ -65,11 +68,12 @@ import { Markdown } from '../components/ui/markdown.tsx';
 | `activeCite` | `number`                  | Highlights the matching citation chip.              |
 | `class`      | `string`                  | Extra class names for the `.ns-markdown` wrapper.   |
 
-### Pipeline order (sanitize is LAST and unconditional)
+### Pipeline order (sanitize is unconditional)
 
-- **remark** (source -> mdast): `remark-gfm`, `remark-math`, `remarkCitations`.
-- **rehype** (mdast -> hast -> DOM): `rehype-katex`, `rehype-highlight`, then **`rehype-sanitize` as
-  the final plugin**.
+- **remark** (source -> mdast): `remark-parse`, `remark-gfm`, `remark-math`, `remarkCitations`.
+- **bridge** (mdast -> hast): `remark-rehype`.
+- **rehype** (hast -> Preact): `rehype-katex`, `rehype-highlight`, then **`rehype-sanitize` as the
+  final content transform**, `rehypeInlineStyles`, and `rehype-react` with the Preact JSX runtime.
 
 The sanitize pass is hard-wired as the last stage and is **never** exposed as a caller-toggled
 option. `script` is force-removed from the allow-list and no event-handler attribute is ever
@@ -79,9 +83,8 @@ only enough to keep citation chips, KaTeX MathML, and highlight.js class output 
 ### `markdown-pipeline.ts` (pure, dependency-free helpers)
 
 - `remarkCitations(): MdastTransformer` — rewrites `[n]` citation tokens (1–3 digits, the same
-  convention `message` uses) into `<citation-chip index="n">` render calls. Wire it with
-  `components={{ 'citation-chip': ... }}` on `react-markdown` to render the sibling `citation-chip`
-  item.
+  convention `message` uses) into `<citation-chip index="n">` render calls. The component map passed
+  to `rehype-react` renders the sibling `citation-chip` item.
 - `stripIncompleteSyntax(chunk: string): string` — repairs a truncated mid-stream chunk so partial
   syntax renders cleanly instead of leaking raw markers: it closes an unterminated fenced code
   block, inline code span, bold run, and inline/block math, and drops a dangling incomplete link at

@@ -88,7 +88,7 @@ for their full definitions.
 
 ### `@netscript/plugin-streams/cli` {#sub-path-cli}
 
-CLI command group for the plugin, mounted under `deno x -A jsr:@netscript/plugin-streams/cli`.
+CLI command group for the plugin, mounted under `deno x -A jsr:@netscript/plugin-streams{{ releaseSpecifier }}/cli`.
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |

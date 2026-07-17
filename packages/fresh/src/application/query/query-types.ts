@@ -28,10 +28,7 @@ export type QueryIslandChildren =
 export type QueryKey = readonly unknown[];
 
 /** Client handle returned by the island query-client factory. */
-export interface IslandQueryClient {
-  /** Clear cached queries and mutations from the underlying client. */
-  clear(): void;
-}
+export type IslandQueryClient = QueryClient;
 
 /** State produced by server-side query dehydration. */
 export interface DehydratedState {
@@ -222,7 +219,12 @@ export interface IslandLiveQueryResult<TData = unknown> {
 }
 
 /** Function that builds a live query from the upstream query builder. */
-export type IslandLiveQueryFactory<TResult = unknown> = (queryBuilder: unknown) => TResult;
+export type IslandLiveQueryFactory<TContext extends Context = Context> = (
+  queryBuilder: InitialQueryBuilder,
+) => QueryBuilder<TContext>;
+
+/** Data inferred from a TanStack DB live-query builder context. */
+export type IslandLiveQueryData<TContext extends Context> = InferResultType<TContext>;
 
 /** Resolve the awaited return value from a Fresh route loader. */
 export type LoaderData<TLoader extends (...args: never[]) => unknown> = Awaited<
@@ -231,3 +233,10 @@ export type LoaderData<TLoader extends (...args: never[]) => unknown> = Awaited<
 
 /** Extract initial data from a query-options object. */
 export type InitialDataFor<TOptions extends { initialData?: unknown }> = TOptions['initialData'];
+import type {
+  Context,
+  InferResultType,
+  InitialQueryBuilder,
+  QueryBuilder,
+} from '@tanstack/react-db';
+import type { QueryClient } from '@tanstack/query-core';

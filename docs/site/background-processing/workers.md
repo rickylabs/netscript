@@ -107,14 +107,12 @@ Add the workers plugin to a published workspace with the public package install 
 netscript plugin install @netscript/plugin-workers
 ```
 
-{{ comp callout { type: "caution", title: "Published-mode scaffolds on 0.0.1-beta.7: patch the root import map" } }}
-A project scaffolded with the published CLI (<code>--package-source jsr</code>) on
-<code>0.0.1-beta.7</code> generates a root <code>deno.json</code> whose import map omits the
-<code>@netscript/sdk</code> and <code>@netscript/sdk/client</code> entries, and the scaffolded
-worker runtime resolves against that root config — so the background worker fails to load jobs
-(<code>Import "@netscript/sdk/client" not a dependency and not in import map</code>) until you add
-those two entries to the root import map yourself. Local-source scaffolds are not affected. This is
-fixed on the main line and ships in the next release.
+{{ comp callout { type: "note", title: "Historical: import-map patch no longer required" } }}
+Projects scaffolded with an early published CLI (<code>--package-source jsr</code>) on
+<code>0.0.1-beta.7</code> generated a root <code>deno.json</code> whose import map omitted the
+<code>@netscript/sdk</code> and <code>@netscript/sdk/client</code> entries, requiring a manual patch
+before the background worker could load jobs. The scaffold generator now emits both entries in JSR
+mode, so no manual fix is needed on current releases.
 {{ /comp }}
 
 For local-source contributor work inside this monorepo, use the maintainer binary when you need

@@ -58,7 +58,7 @@ const typedClient: ServiceClient<typeof ordersContract> = serviceClient;
 const listFromClient: Promise<ListOrdersOutput> = typedClient.list({ page: 1 });
 const orderFromClient: Promise<Order> = typedClient.get({ id: 'ord_1' });
 
-// @ts-expect-error page must remain a number in the inferred service client.
+// @ts-expect-error page must remain a number in the inferred service client. // quality-allow: negative compile fixture requires TypeScript's expect-error directive to prove string input remains rejected
 typedClient.list({ page: '1' });
 
 const queryFactory = createQueryFactory('orders', ordersContract, serviceClient);
@@ -73,8 +73,9 @@ const mutationResult: Promise<Order> | Order | undefined = mutationOptions.mutat
 const serviceUtils = createServiceQueryUtils(serviceClient);
 const typedServiceUtils: ServiceQueryUtils<typeof ordersContract> = serviceUtils;
 const queryOptions = typedServiceUtils.list.queryOptions({ input: { page: 1 } });
+declare const queryContext: Parameters<typeof queryOptions.queryFn>[0];
 const listFromUtils: Promise<ListOrdersOutput> | ListOrdersOutput = queryOptions.queryFn(
-  undefined as never,
+  queryContext,
 );
 
 const queryClient = createNetScriptQueryClient();

@@ -107,6 +107,7 @@ export const PROVIDER_PROFILES: Readonly<Record<ProviderProfileId, ProviderProfi
 
 export const OPENROUTER_PRESET_IDS = [
   'claude-fanout-minimax-m3',
+  'claude-evaluator-qwen-3-7-max',
   'claude-design-glm-5-2',
   'codex-design-glm-5-2',
   'codex-long-medium-grok-4-5',
@@ -120,14 +121,18 @@ export const OPENROUTER_AGENTIC_TURN_STATUSES = [
 export type OpenRouterAgenticTurnStatus = typeof OPENROUTER_AGENTIC_TURN_STATUSES[number];
 export const OPENROUTER_TRANSPORTS = ['anthropic-messages', 'responses'] as const;
 export type OpenRouterTransport = typeof OPENROUTER_TRANSPORTS[number];
+export const OPENROUTER_REASONING_TRACE_STATUSES = ['present', 'absent', 'unverified'] as const;
+export type OpenRouterReasoningTraceStatus = typeof OPENROUTER_REASONING_TRACE_STATUSES[number];
 export const OPENROUTER_INCOMPATIBILITIES = ['codex-native-namespace-tool'] as const;
 export type OpenRouterIncompatibility = typeof OPENROUTER_INCOMPATIBILITIES[number];
 export const OPENROUTER_PRESET_MODELS: readonly [
   typeof OPENROUTER_MODEL_IDS.minimax,
+  typeof OPENROUTER_MODEL_IDS.qwen,
   typeof OPENROUTER_MODEL_IDS.glm,
   typeof OPENROUTER_MODEL_IDS.grok,
 ] = [
   OPENROUTER_MODEL_IDS.minimax,
+  OPENROUTER_MODEL_IDS.qwen,
   OPENROUTER_MODEL_IDS.glm,
   OPENROUTER_MODEL_IDS.grok,
 ];
@@ -137,9 +142,10 @@ export interface OpenRouterPreset {
   readonly profileId: Extract<ProviderProfileId, 'claude-openrouter' | 'codex-openrouter'>;
   readonly model: typeof OPENROUTER_PRESET_MODELS[number];
   readonly effort: Effort;
-  readonly purpose: 'workflow-fanout' | 'creative-design' | 'long-running-medium';
+  readonly purpose: 'workflow-fanout' | 'evaluation' | 'creative-design' | 'long-running-medium';
   readonly agenticTurn: OpenRouterAgenticTurnStatus;
   readonly transport: OpenRouterTransport;
+  readonly reasoningTrace: OpenRouterReasoningTraceStatus;
   readonly incompatibility: OpenRouterIncompatibility | null;
 }
 
@@ -151,8 +157,20 @@ export const OPENROUTER_PRESETS: Readonly<Record<OpenRouterPresetId, OpenRouterP
       model: OPENROUTER_MODEL_IDS.minimax,
       effort: 'high',
       purpose: 'workflow-fanout',
-      agenticTurn: 'unverified',
+      agenticTurn: 'supported',
       transport: 'anthropic-messages',
+      reasoningTrace: 'present',
+      incompatibility: null,
+    }),
+    'claude-evaluator-qwen-3-7-max': Object.freeze({
+      id: 'claude-evaluator-qwen-3-7-max',
+      profileId: 'claude-openrouter',
+      model: OPENROUTER_MODEL_IDS.qwen,
+      effort: 'high',
+      purpose: 'evaluation',
+      agenticTurn: 'supported',
+      transport: 'anthropic-messages',
+      reasoningTrace: 'present',
       incompatibility: null,
     }),
     'claude-design-glm-5-2': Object.freeze({
@@ -163,6 +181,7 @@ export const OPENROUTER_PRESETS: Readonly<Record<OpenRouterPresetId, OpenRouterP
       purpose: 'creative-design',
       agenticTurn: 'supported',
       transport: 'anthropic-messages',
+      reasoningTrace: 'absent',
       incompatibility: null,
     }),
     'codex-design-glm-5-2': Object.freeze({
@@ -173,6 +192,7 @@ export const OPENROUTER_PRESETS: Readonly<Record<OpenRouterPresetId, OpenRouterP
       purpose: 'creative-design',
       agenticTurn: 'unsupported',
       transport: 'responses',
+      reasoningTrace: 'unverified',
       incompatibility: 'codex-native-namespace-tool',
     }),
     'codex-long-medium-grok-4-5': Object.freeze({
@@ -183,6 +203,7 @@ export const OPENROUTER_PRESETS: Readonly<Record<OpenRouterPresetId, OpenRouterP
       purpose: 'long-running-medium',
       agenticTurn: 'unverified',
       transport: 'responses',
+      reasoningTrace: 'unverified',
       incompatibility: null,
     }),
   });

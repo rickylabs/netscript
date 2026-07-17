@@ -83,7 +83,7 @@ exit codes: `.llm/tools/agentic/README.md`.
 | **Watch — progress** | Wake on the worktree's next **git** event (commit/ref) — *slice made progress* | `codex-watch.ts --worktree <wt>` (**run inside WSL**) |
 | **Watch — finish** | Wake when the agent's **turn finishes** (rollout `task_complete`) — *agent is idle/done* | `codex-watch.ts --mode turn --thread-id <uuid>` (**run inside WSL**) |
 | **Steer** | Continue/correct an existing thread (never forks a rival) | `codex-resume.ts --thread-id <uuid> --message …` (`--dry-run`) |
-| **Evaluate** | Dispatch an `@openhands-agent` PLAN/IMPL-EVAL; read its verdict | `dispatch-openhands.ts`, `openhands-status.ts` |
+| **Evaluate** | Local PLAN/IMPL-EVAL runs on the open-model evaluator lane (Claude Code + OpenRouter — see `lane-policy.md`); for a **cloud** run, dispatch an `@openhands-agent` and read its verdict | `dispatch-openhands.ts`, `openhands-status.ts` (cloud) |
 | **Merge** | Eval-gated, clean-gated, base-guarded leaf-PR lifecycle | `gh-pr.ts create\|verdict\|merge` |
 
 **The watch distinction is the one that bites you.** `codex-watch` has two signals and they answer

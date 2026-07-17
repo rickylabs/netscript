@@ -35,7 +35,7 @@
     },
     "test": "deno test --allow-all",
     "quality:scan": "deno run --allow-read .llm/tools/quality/scan-code-quality.ts",
-    "quality:scan:repo": "deno run --allow-read .llm/tools/quality/scan-code-quality.ts --root packages/cli/src --root plugins",
+    "quality:scan:repo": "deno run --allow-read .llm/tools/quality/scan-code-quality.ts --root packages --root plugins",
     "quality:gate": "deno task quality:scan && deno task arch:check",
     "coverage:functions": "rm -rf .llm/tmp/coverage/functions && deno test --allow-all --coverage=.llm/tmp/coverage/functions --coverage-raw-data-only packages/contracts/tests/errors_test.ts packages/service/tests/_fixtures/readme-examples_test.ts && deno run --allow-read --allow-write .llm/tools/reporting/report-function-coverage.ts --coverage .llm/tmp/coverage/functions --out .llm/tmp/coverage/function-report.json --package packages/contracts --package packages/plugin-triggers-core --package packages/service --package packages/plugin",
     "audit:critical": "deno audit --level critical",
@@ -117,6 +117,7 @@
       ]
     },
     "docs:readme:check": "deno run --no-lock --allow-read .llm/tools/validation/check-readme-standard.ts --pretty",
+    "docs:tagline:check": "deno run --no-lock --allow-read .llm/tools/validation/check-jsr-tagline-length.ts --pretty",
     "arch:check": "deno task deps:check && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/plugin-auth-core && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/auth-workos && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/auth-better-auth && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/auth-kv-oauth && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root plugins/auth && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/plugin && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root plugins/workers && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root plugins/sagas && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root plugins/triggers && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root plugins/streams && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/plugin-sagas-core && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/plugin-triggers-core && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/plugin-workers-core && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/plugin-ai-core && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/ai && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root plugins/ai",
     "arch:check:repo": "deno run --allow-read .llm/tools/fitness/check-doctrine.ts"
   },
