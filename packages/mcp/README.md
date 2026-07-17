@@ -58,14 +58,17 @@ questions:
 To embed the server in your own host process, add it as a library:
 
 ```bash
-deno add jsr:@netscript/mcp@0.0.1-beta.10
+deno add jsr:@netscript/mcp
 ```
 
 Run the standalone stdio entrypoint directly when you are integrating another MCP host:
 
 ```bash
-deno x -A jsr:@netscript/mcp@0.0.1-beta.10/cli
+deno x -A jsr:@netscript/mcp@<version>/cli
 ```
+
+Pin `<version>` to match your installed CLI; bare `jsr:@netscript/*` specifiers do not resolve on
+the pre-release line, and `netscript agent init` writes the correct pinned form for you.
 
 ## Quick example
 
@@ -79,7 +82,7 @@ deno x -A jsr:@netscript/mcp@0.0.1-beta.10/cli
       "args": [
         "run",
         "-A",
-        "jsr:@netscript/cli@0.0.1-beta.10",
+        "jsr:@netscript/cli@<version>",
         "agent",
         "mcp",
         "--project-root",
