@@ -112,7 +112,9 @@ MessagePort link, and preserves oRPC's default string/binary serialization. `Uin
 native binary payload; transfer lists, `ArrayBuffer`, and other typed arrays are intentionally not
 advertised because Deno's bind channel does not preserve them. Bind handlers execute with the Deno
 process's permissions, so runtime routers must validate inputs and authorization at the same trust
-boundary as any other privileged service entrypoint.
+boundary as any other privileged service entrypoint. The matching runtime composition is
+`bindDesktopRpcWindow({ window, router, context })` from `@netscript/fresh/desktop`; browser and
+Aspire processes receive an inert disabled lifecycle rather than a native binding side effect.
 
 ---
 

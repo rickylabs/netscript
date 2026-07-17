@@ -145,22 +145,27 @@ port and extend the full acceptance matrix—never add a second binding declarat
 
 ## Progress Log
 
-| Time                  | Slice | Step                                | Notes                                                                                                                                                                        |
-| --------------------- | ----- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-07-18 00:05 CEST | plan  | nested run activated                | Required skills, run-loop, lane policy, Plan-Gate protocol, archetypes, doctrine, scope overlay, gate matrix, and templates read.                                            |
-| 2026-07-18 00:20 CEST | plan  | live-source and dependency research | Re-baselined #842/#840, PR #822 RFC/rev 10, official Deno/oRPC docs, installed oRPC 1.14.6, package public surfaces, and G2 pattern. `deno doc` preceded broad source reads. |
-| 2026-07-18 00:31 CEST | plan  | integration sync                    | Clean feature branch fast-forwarded from `b2248058` to integration `e6e1be08`, which now includes G2. No product/run file existed before the sync.                           |
-| 2026-07-18 00:46 CEST | plan  | package re-baseline                 | SDK/Fresh doc-lint, JSR helper, and raw dry-run evidence captured on the final plan baseline; worktree remained clean.                                                       |
-| 2026-07-18 00:50 CEST | plan  | Design checkpoint                   | Public API, wire state, ports, constants, three commit slices, risk mitigations, and complete gates locked. No implementation created.                                       |
-| 2026-07-18 00:57 CEST | plan  | draft PR handoff                    | Planning commit `2bdd882` pushed; draft PR #853 opened against `feat/desktop-frontend`, configured with `Closes #842`, requested labels, and milestone 13.                   |
-| 2026-07-18 01:15 CEST | gate  | group Plan-Gate PASS                | Supervisor approved D1–D16 as locked; D7 cast-free structural acceptance is a review-blocking bar. PR lifecycle moved from `status:plan` to `status:impl`.                   |
-| 2026-07-18 01:45 CEST | 1     | SDK desktop transport               | Implemented real-MessagePort bind shim, one receive pump, FIFO/per-window server state, exact-once close, native error rehydration, oRPC link, typed client, and byte codec. |
-| 2026-07-18 02:00 CEST | 1     | SDK authoritative gates             | Full SDK tests 36/36; scoped check/lint/fmt, exact/focused quality scans, architecture gates, desktop entrypoint doc lint, JSR audit, and raw publish dry-run pass.          |
-| 2026-07-18 02:15 CEST | 1     | Tier-A review PASS                  | Supervisor reviewed `a77b210c` and signed off D5/D6/D7, constants/types, isolation, FIFO, and close semantics.                                                               |
-| 2026-07-18 02:35 CEST | 2     | Fresh Desktop runtime               | Added structural capability gate, package-owned router/window types, `RPCHandler.upgrade`, per-window bind lifecycle, symmetric byte serializer, and exact-once unbind.      |
-| 2026-07-18 02:45 CEST | 2     | acceptance matrix                   | Fresh tests prove browser/Aspire no-op, missing window, name validation, typed string/bytes, procedure errors, two-window isolation, and idempotent cleanup.                 |
-| 2026-07-18 02:55 CEST | 2     | authoritative gates                 | Fresh 206/206 and SDK 36/36; Fresh 169-file wrappers, exact/focused quality, architecture, specifier, new-entrypoint doc lint, and raw publish dry-run pass.                 |
-| 2026-07-18 03:00 CEST | 2     | post-slice reconcile                | #842 and PR #853 remain open/draft on milestone 13; both now use sole `status:impl`; no new PR comments beyond the recorded S1 handoff; `Closes #842` remains correct.       |
+| Time                  | Slice | Step                                | Notes                                                                                                                                                                         |
+| --------------------- | ----- | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-07-18 00:05 CEST | plan  | nested run activated                | Required skills, run-loop, lane policy, Plan-Gate protocol, archetypes, doctrine, scope overlay, gate matrix, and templates read.                                             |
+| 2026-07-18 00:20 CEST | plan  | live-source and dependency research | Re-baselined #842/#840, PR #822 RFC/rev 10, official Deno/oRPC docs, installed oRPC 1.14.6, package public surfaces, and G2 pattern. `deno doc` preceded broad source reads.  |
+| 2026-07-18 00:31 CEST | plan  | integration sync                    | Clean feature branch fast-forwarded from `b2248058` to integration `e6e1be08`, which now includes G2. No product/run file existed before the sync.                            |
+| 2026-07-18 00:46 CEST | plan  | package re-baseline                 | SDK/Fresh doc-lint, JSR helper, and raw dry-run evidence captured on the final plan baseline; worktree remained clean.                                                        |
+| 2026-07-18 00:50 CEST | plan  | Design checkpoint                   | Public API, wire state, ports, constants, three commit slices, risk mitigations, and complete gates locked. No implementation created.                                        |
+| 2026-07-18 00:57 CEST | plan  | draft PR handoff                    | Planning commit `2bdd882` pushed; draft PR #853 opened against `feat/desktop-frontend`, configured with `Closes #842`, requested labels, and milestone 13.                    |
+| 2026-07-18 01:15 CEST | gate  | group Plan-Gate PASS                | Supervisor approved D1–D16 as locked; D7 cast-free structural acceptance is a review-blocking bar. PR lifecycle moved from `status:plan` to `status:impl`.                    |
+| 2026-07-18 01:45 CEST | 1     | SDK desktop transport               | Implemented real-MessagePort bind shim, one receive pump, FIFO/per-window server state, exact-once close, native error rehydration, oRPC link, typed client, and byte codec.  |
+| 2026-07-18 02:00 CEST | 1     | SDK authoritative gates             | Full SDK tests 36/36; scoped check/lint/fmt, exact/focused quality scans, architecture gates, desktop entrypoint doc lint, JSR audit, and raw publish dry-run pass.           |
+| 2026-07-18 02:15 CEST | 1     | Tier-A review PASS                  | Supervisor reviewed `a77b210c` and signed off D5/D6/D7, constants/types, isolation, FIFO, and close semantics.                                                                |
+| 2026-07-18 02:35 CEST | 2     | Fresh Desktop runtime               | Added structural capability gate, package-owned router/window types, `RPCHandler.upgrade`, per-window bind lifecycle, symmetric byte serializer, and exact-once unbind.       |
+| 2026-07-18 02:45 CEST | 2     | acceptance matrix                   | Fresh tests prove browser/Aspire no-op, missing window, name validation, typed string/bytes, procedure errors, two-window isolation, and idempotent cleanup.                  |
+| 2026-07-18 02:55 CEST | 2     | authoritative gates                 | Fresh 206/206 and SDK 36/36; Fresh 169-file wrappers, exact/focused quality, architecture, specifier, new-entrypoint doc lint, and raw publish dry-run pass.                  |
+| 2026-07-18 03:00 CEST | 2     | post-slice reconcile                | #842 and PR #853 remain open/draft on milestone 13; both now use sole `status:impl`; no new PR comments beyond the recorded S1 handoff; `Closes #842` remains correct.        |
+| 2026-07-18 03:10 CEST | 2     | Tier-A review PASS                  | Supervisor signed off D3/D11–D13: lifecycle handle, zero-side-effect browser/Aspire no-op, and full Fresh task.                                                               |
+| 2026-07-18 03:25 CEST | 3     | consumer/docs closeout              | Added public Fresh self-subpath/context fixture, paired SDK/Fresh documentation, and excluded the compile-only fixture from Fresh's published file list.                      |
+| 2026-07-18 03:40 CEST | 3     | complete JSR evidence               | Both entrypoints zero; SDK/Fresh full baselines unchanged at 1/40; raw dry-runs pass without slow types; specifier and text-import preflights pass; intended file lists only. |
+| 2026-07-18 03:45 CEST | 3     | final authoritative gates           | SDK 36/36, Fresh 206/206; both wrapper sets, exact/focused quality, focused/root architecture, consumer compilation, and all acceptance tests pass.                           |
+| 2026-07-18 03:50 CEST | 3     | post-slice reconcile                | #842's two gate boxes are provably covered, so `Closes #842` remains honest. #457 stays open and untouched; its packaged desktop deploy-e2e is explicitly outside #842.       |
 
 ## Decisions
 
@@ -197,6 +202,8 @@ port and extend the full acceptance matrix—never add a second binding declarat
 | Fresh scoped check/lint/fmt | repo wrappers over `packages/fresh`                        | PASS   | 169 TypeScript files; zero findings after formatting.          |
 | Fresh exact/focused quality | `quality:scan` plus `--root packages/fresh`                | PASS   | Zero new findings; one unrelated documented allowance.         |
 | Fresh full package tests    | `deno task --cwd packages/fresh test`                      | PASS   | 206 passed, 0 failed; full `src` + `tests` task.               |
+| Final SDK wrappers          | repo wrappers over `packages/sdk`                          | PASS   | 75 files; check/lint/fmt zero findings.                        |
+| Final Fresh wrappers        | repo wrappers over `packages/fresh`                        | PASS   | 170 files including consumer fixture; zero findings.           |
 
 ### Fitness Gates
 
@@ -214,6 +221,19 @@ port and extend the full acceptance matrix—never add a second binding declarat
 | Fresh raw publish dry-run         | PASS               | `deno publish --dry-run --allow-dirty`               | Intended desktop production files included; tests excluded; no slow-type finding.                                               |
 | Fresh focused + root architecture | PASS_WITH_WARNINGS | `arch:check:repo`; `arch:check`                      | Exit 0; only recorded existing AI/route/cardinality/docs warnings.                                                              |
 
+### Final JSR Rubric
+
+| Rubric item                         | SDK result        | Fresh result      | Evidence                                                                                  |
+| ----------------------------------- | ----------------- | ----------------- | ----------------------------------------------------------------------------------------- |
+| Package metadata/export map         | PASS              | PASS              | Existing metadata plus reachable `./desktop` exports.                                     |
+| New entrypoint documentation        | PASS — 0 findings | PASS — 0 findings | Focused `deno doc --lint` on both desktop modules.                                        |
+| Full-package documentation delta    | BASELINE — 1      | BASELINE — 40     | Structured scans unchanged; desktop entrypoints contribute zero.                          |
+| Slow public types                   | PASS              | PASS              | Raw publish dry-runs emit no slow-type diagnostic.                                        |
+| Published file list                 | PASS              | PASS              | Desktop production/docs included; tests and Fresh consumer fixture excluded.              |
+| Public consumer compilation         | PASS              | PASS              | SDK contract fixture and Fresh context/router self-subpath fixture.                       |
+| Dependency/specifier discipline     | PASS              | PASS              | Emitted-specifier guard; lock delta matches the two declared Fresh dependencies.          |
+| Text/JSON import-attribute doctrine | PASS              | PASS              | Release preflight reports zero text, import-attribute, file-URL, or self-import findings. |
+
 ### Runtime Gates
 
 | Gate                               | Result | Evidence                          | Notes                                                                                |
@@ -230,6 +250,13 @@ port and extend the full acceptance matrix—never add a second binding declarat
 | `@netscript/sdk/desktop` webview   | PASS   | SDK type fixture + full task      | Existing contract infers the client without ambient declarations.         |
 | `@netscript/fresh/desktop` runtime | PASS   | full Fresh task + entrypoint lint | Existing routers bind only with Desktop capability; browser/Aspire inert. |
 | Browser/Aspire                     | PASS   | full Fresh task                   | Missing Desktop capability performs zero bind/unbind side effects.        |
+
+## Implementation Completion
+
+All three locked slices are implemented and the complete generator-owned gate set is green. The
+implementation session stops here for supervisor-dispatched Tier-A slice-3 review and separate
+IMPL-EVAL. This is not an evaluator verdict and does not authorize merge, release, issue closure, or
+milestone closure.
 
 ## Handoff Notes
 

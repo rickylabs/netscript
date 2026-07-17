@@ -7,17 +7,16 @@
 | Run ID         | `beta11-cli--orchestrator/slices/g3-842-bindings`                                 |
 | Branch         | `feat/desktop-frontend-842-bindings`                                              |
 | Draft PR       | [#853](https://github.com/rickylabs/netscript/pull/853) → `feat/desktop-frontend` |
-| Current phase  | `implement` — slice 2 complete, awaiting Tier-A review                            |
+| Current phase  | `evaluate` — implementation complete; awaiting Tier-A S3 review and IMPL-EVAL     |
 | Archetype      | `4 — Public DSL / Builder` with adapter/runtime subtype gates                     |
 | Scope overlays | `frontend` browser/Aspire no-op; UI/route/visual gates N/A                        |
 
 ## Current State
 
-The group Plan-Gate passed D1–D16. Slice 1 (`a77b210c`) implemented the SDK transport and received
-Tier-A PASS. Slice 2 now implements `@netscript/fresh/desktop`: structural Desktop gating,
-`RPCHandler.upgrade`, per-window binding ownership, explicit disabled lifecycle, and idempotent
-close/unbind. Draft PR #853 still targets `feat/desktop-frontend`, carries `Closes #842`, remains
-draft on milestone 13, and uses `status:impl`; issue #842 was reconciled to the same lifecycle.
+The group Plan-Gate passed D1–D16. Slices 1 (`a77b210c`) and 2 (`71efb789`) received Tier-A PASS.
+Slice 3 completes public consumer fixtures, paired SDK/Fresh documentation, and the full JSR
+evidence set. Every #842 acceptance gate is now proven in PR #853, so `Closes #842` remains honest.
+#457's native packaged desktop deploy-e2e remains open, untouched, and outside #842's two boxes.
 
 ## Completed
 
@@ -38,14 +37,16 @@ draft on milestone 13, and uses `status:impl`; issue #842 was reconciled to the 
 
 ## In Progress
 
-- Commit and push slice 2, post its structured gate evidence, and pause for Tier-A review.
+- Commit/push slice 3, post `IMPLEMENTATION COMPLETE`, move the PR lifecycle to `status:impl-eval`,
+  and stop without dispatching the evaluator.
 
 ## Next Steps
 
-1. Supervisor performs the Tier-A slice-2 review; this session does not dispatch it.
-2. On PASS, implement slice 3 consumer/JSR closeout without adding capability.
-3. Run both full package tasks and the complete publication/quality/architecture gate set.
-4. Commit/push/comment slice 3, then pause for its Tier-A review and supervisor-owned IMPL-EVAL.
+1. Supervisor performs the Tier-A slice-3 review.
+2. Supervisor dispatches the separate-session IMPL-EVAL and records its verdict in `evaluate.md` and
+   the PR.
+3. If changes are requested, return only the bounded fix to this implementation lane.
+4. Merge/release/milestone actions remain behind their unchanged hard stop-lines.
 
 ## Key Decisions
 
@@ -77,12 +78,12 @@ PR commit list is the canonical exact file trail.
 
 ## Gates
 
-| Gate family | Current status              | Evidence                                                                       |
-| ----------- | --------------------------- | ------------------------------------------------------------------------------ |
-| Static      | PASS through slice 2        | SDK 36/36, Fresh 206/206, and both scoped wrapper sets pass.                   |
-| Fitness     | PASS_WITH_BASELINES         | New entrypoints are doc-clean; quality/architecture/publish gates pass.        |
-| Runtime     | PASS through slice 2        | Strings, bytes, errors, isolation, no-op detection, and cleanup are exercised. |
-| Consumer    | SDK PASS / closeout pending | SDK type fixture passes; combined public consumer closeout remains slice 3.    |
+| Gate family | Current status      | Evidence                                                                       |
+| ----------- | ------------------- | ------------------------------------------------------------------------------ |
+| Static      | PASS                | SDK 36/36, Fresh 206/206, and both final wrapper sets pass.                    |
+| Fitness     | PASS_WITH_BASELINES | Both new entrypoints clean; JSR/quality/architecture/preflight gates pass.     |
+| Runtime     | PASS                | Strings, bytes, errors, isolation, no-op detection, and cleanup are exercised. |
+| Consumer    | PASS                | Both published self-subpaths compile through package-owned public contracts.   |
 
 ## Open Questions
 

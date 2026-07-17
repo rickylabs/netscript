@@ -107,6 +107,9 @@ await desktopRpc.close();
 Each call owns isolated per-window transport state. The adapter upgrades a real `MessagePort` with
 oRPC before registering the promise-based native handler, and unbinds exactly once during cleanup.
 It does not create windows, declare ambient webview bindings, or enable transfer-list serialization.
+Pair this runtime binding with `createDesktopServiceClient({ contract })` from
+`@netscript/sdk/desktop` in the webview; both sides reuse the same oRPC contract instead of a
+hand-maintained `bindings.d.ts`.
 
 ---
 
