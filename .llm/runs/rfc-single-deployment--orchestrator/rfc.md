@@ -4,7 +4,7 @@
 | --- | --- |
 | **Status** | **Ratified** (owner, 2026-07-17) — direction + sequencing locked, board filed (§8); adversarially reviewed (9 cycles) |
 | **Tracking** | Refs #820 (charter) · #510 (Process Manager) · #327 (Deployment) · **#823 (Unified epic)** · **#830 (Desktop-graph epic)** · **#825 (Aspire packaging integration)** |
-| **Shipping order (ratified)** | beta.11 substrate + unified seed → **beta.12 PM ships first** → beta.13 Unified marquee → beta.14 desktop graph → stable hardening |
+| **Shipping order (ratified)** | beta.11 **Desktop Frontend wave (#840)** + unified seed → **beta.12 PM ships first** → beta.13 Unified marquee → beta.14 desktop graph + combined installers → stable hardening |
 | **Evidence base** | eis-chat#150 Windows singleton POC (merged, smoke-tested); Nitro v3 docs (live); Aspire "multi-language integrations" (ATS); full engineering spec in `plan.md` (this PR) |
 
 ---
@@ -95,9 +95,12 @@ Desktop targets are ordinary `DeployTargetPort` adapters in the existing registr
 - **Machine-wide port registry** (`%ProgramData%\NetScript\` / `/var/lib/netscript/`): installs reserve fixed ports transactionally and refuse with actionable diagnostics on conflict — two NetScript apps coexist or fail loudly, never silently.
 - **Installer authoring is a first-class .NET citizen of the Aspire stack** (#825, owner-ratified): no Deno-native combined-MSI path exists — `deno desktop`'s pure-Rust MSI packages only the window bundle (per-machine, no sidecars) and its docs punt to WiX/NSIS/Inno for more. So `NetScript.Aspire.Packaging` ships as a **C# Aspire hosting-integration NuGet annotated with ATS `[AspireExport]`**: the Aspire CLI generates a typed TypeScript SDK from it (JSON-RPC into the C# code at runtime), and the TS AppHost consumes it as decorators/publish-pipeline steps — the exact mechanism Aspire documents for multi-language integrations. WiX-class MSI authoring and the `signtool` hook live behind it; deb/rpm stays native-side. Build machines need the .NET SDK (already true in the POC); end users need nothing.
 
-### F4 · Update lifecycle (one mechanism, both modes, Windows included)
+### F4 · Update lifecycle (tiered — ratified Option A, 2026-07-17)
 
-Deno Desktop's own updater patches a single file and cannot apply on Windows. NetScript instead updates **the whole release atomically**:
+**Two apply mechanisms, one release-server/manifest lineage, each used where it's honest:**
+
+- **Window-only artifacts (the thin-client tier, beta.11 — epic #840):** native `Deno.autoUpdate()` — bsdiff deltas, Ed25519-signed `latest.json`, staged swap, self-healing rollback — wrapped by a typed SDK mechanism (#841) that pins keys, wires per-arch URLs, reports rollbacks to telemetry, and isolates upstream API churn (the `Deno.desktop` namespace move, denoland/deno#35939). **Windows caveat, stated honestly:** upstream apply is still unsupported (patches stage but never swap — tracked in denoland/deno#35269), so v1 ships staged-detection + a manual-update UX; if upstream lands apply, the tier converges for free.
+- **Combined artifacts (window + sidecars, beta.14):** the native mechanism patches one file and cannot cover N artifacts, so NetScript updates **the whole release atomically**:
 
 - **Immutable releases**: `releases/<version>/` + a `current` link; a stable installer-managed **bootstrap** resolves the release *journal-first* (by direct path), so recovery works even when `current` is missing after a crash — Windows' junction-swap non-atomicity becomes harmless.
 - **A durable journal** (append-only, checksummed, fsynced) drives every transition; recovery from any crash boundary — including a **cold reboot mid-switch** — is a deterministic table lookup, executed unattended by an installer-registered recovery unit before any workload starts.
@@ -105,7 +108,11 @@ Deno Desktop's own updater patches a single file and cannot apply on Windows. Ne
 - **Data safety**: pre-migration snapshots into a transaction area; irreversible migrations declare a **rollback barrier** — crossing one and failing lands in an explicit `maintenance` state with a documented `recover` path, never silent data loss.
 - **Supply-chain posture**: Ed25519-signed manifests against a key **pinned at install time**; a monotonic sequence high-water blocks replay/downgrade even across an authorized recovery; release/bootstrap version compatibility is enforced before staging.
 
-### F5 · Runtime surface (discovery, health, auth)
+The release server ships in the thin-client tier serving the **native manifest format**; the combined-artifact release manifest is a designed superset (same crypto) — one lineage, no fork.
+
+### F5 · Runtime surface (discovery, health, auth, window bindings)
+
+- **Type-safe window bindings (#842):** Deno Desktop's webview↔runtime bindings have no built-in type bridge (the docs prescribe a hand-maintained `bindings.d.ts`). NetScript replaces that with contract-first RPC: a port shim adapts the bind channel into a MessagePort pair, and **oRPC's Message Port adapter** runs the same typed contracts NetScript services already use across the window boundary — end-to-end types, browser/Aspire no-op parity. Desktop UI itself becomes NetScript components (#843: tray, menus, dialogs, notifications, window chrome — fresh-ui, desktop-gated).
 
 - **Discovery without port collisions**: per-user graphs allocate sidecar ports dynamically; browser code compiles against **port-free same-origin paths** (`/_svc/<name>`) proxied by the window — N users on one machine can't collide, and the build-time `import.meta.env` constraint is respected. Per-machine tenants use manifest-fixed, registry-reserved ports.
 - **End-user health awareness** (the POC's "silently broken" fix): a small SDK widget subscribes to the control plane — *"search is restarting (2/3)…"* instead of dead features.
@@ -123,10 +130,10 @@ Deno Desktop's own updater patches a single file and cannot apply on Windows. Ne
 
 | Milestone | Lane | Deliverables (live issues) |
 | --- | --- | --- |
-| **beta.11** | Substrate + unified planning | Single-artifact packaging + release server + the full F4 updater incl. real Windows apply (#456), proven by install→update→rollback e2e on both OSes (#457); generator desktop app-type + packaging hook (#452); **`NetScript.Aspire.Packaging` .NET/ATS integration (#825)**; health-aggregation fix (#826); **Unified seed run (#824)** |
+| **beta.11** | **Desktop Frontend wave (#840)** + unified planning | The full frontend as a desktop app, the NetScript way — native-first thin-client (window to consumer machines, services in the vendor's cloud): native packaging formats + release server + `Deno.autoUpdate` wiring (#456), thin-client e2e incl. macOS/Linux apply+rollback proof and the Windows manual path (#457), generator app-type + packaging hook (#452), **SDK auto-update mechanism (#841)**, **type-safe bindings via oRPC MessagePort (#842)**, **fresh-ui desktop components (#843)**; health-aggregation fix (#826); **Unified seed run (#824)** |
 | **beta.12** | **PM — the first shipping wave** | Epic #510 (engine, control plane, CLI, console) with POC-driven amendments (probe kinds #512, spawn env hygiene #516, renderer knobs #526); adoption contract (#827) + supervised-child helper (#828); plugin `./services` entrypoints (#829); PM console packaged window-only (#543) |
 | **beta.13** | **Unified — the marquee** | Epic #823 implementation (sub-issues filed by its seed #824): Nitro v3 single deploy output, adapter integration, cloud presets, macro-services splitting. Absorbs #451/#453/#454/#455 per the seed's re-scheduling |
-| **beta.14** | Desktop singleton-graph | Epic #830: manifest compiler + Aspire publish step (#831), desktop supervisor host (#832), installers/scopes/ACLs (#833), graph update transaction (#834), first-run provisioning (#835), health widget (#836), cross-mode conformance suite (#837), full-fault e2e (#838) |
+| **beta.14** | Desktop singleton-graph + combined installers | Epic #830: manifest compiler + Aspire publish step (#831), desktop supervisor host (#832), installers/scopes/ACLs (#833) with **`NetScript.Aspire.Packaging` #825** (the .NET/ATS integration — load-bearing once the full stack ships as one output), graph update transaction (#834), first-run provisioning (#835), health widget (#836), cross-mode conformance suite (#837), full-fault e2e (#838) |
 | **stable** | Hardening | Signing automation (#458), Linux OS containment backstop (#839), rollout rings |
 
 Every slice carries adversarially-derived fault gates (crash-mid-junction, torn journal, power-loss replay, barrier crashes, non-cooperative-process hard-kill, unattended reboot, two-app port conflict, replay/downgrade, cross-user proxy denial).
@@ -231,9 +238,9 @@ stateDiagram-v2
 
 Install-time-pinned Ed25519 trust root (re-pin only via installer/operator, never a downloaded manifest) · signed manifests + per-artifact hashes · monotonic sequence high-water (no replay/downgrade, survives authorized recovery) · elevation only inside the installer · updater/workload/user privilege separation enforced by ACLs and negatively tested · per-launch proxy tokens · OS-authenticated read-token minting for per-machine status.
 
-## 8. Board state — FILED 2026-07-17 (owner-ratified and owner-authorized)
+## 8. Board state — FILED 2026-07-17 (owner-ratified and owner-authorized; Option-A pass included)
 
-Full mapping in `FILING-LOG.md` (this PR). Summary: milestone **`0.0.1-beta.14`** created; label `epic:unified-runtime` created (+ `labels.yml` parity in this PR). **New:** Unified epic #823 + seed #824 · packaging integration #825 · health fix #826 · PM-A #827 · PM-B #828 · plugin entrypoints #829 · Desktop-graph epic #830 with #831–#838 + #839 (stable). **Adjusted:** #456/#457 re-titled + re-scoped as the single-artifact substrate; #452 re-scoped (+ public `./types` jsr gate); #451/#453/#454/#455 re-homed to #823 (Backlog/Triage pending the seed); PM-1/PM-5/PM-15 amended (#512/#516/#526); #543 Windows-caveat superseded; #458 → stable; **#349 closed** as superseded; #510 and #327 epic bodies updated with the ratified order.
+Full mapping in `FILING-LOG.md` (this PR). **Option-A pass:** Desktop Frontend epic **#840** (beta.11) with #841 (SDK auto-update wrapper), #842 (type-safe bindings via oRPC MessagePort), #843 (fresh-ui desktop components); #452/#456/#457 re-scoped native-first under it; **#825 → beta.14**; label `epic:desktop-frontend`. Base pass: milestone **`0.0.1-beta.14`** created; label `epic:unified-runtime` created (+ `labels.yml` parity for both in this PR). **New:** Unified epic #823 + seed #824 · packaging integration #825 · health fix #826 · PM-A #827 · PM-B #828 · plugin entrypoints #829 · Desktop-graph epic #830 with #831–#838 + #839 (stable). **Adjusted:** #456/#457 re-titled + re-scoped as the single-artifact substrate; #452 re-scoped (+ public `./types` jsr gate); #451/#453/#454/#455 re-homed to #823 (Backlog/Triage pending the seed); PM-1/PM-5/PM-15 amended (#512/#516/#526); #543 Windows-caveat superseded; #458 → stable; **#349 closed** as superseded; #510 and #327 epic bodies updated with the ratified order.
 
 ## 9. Decision log (all ratified 2026-07-17)
 
@@ -250,6 +257,8 @@ Full mapping in `FILING-LOG.md` (this PR). Summary: milestone **`0.0.1-beta.14`*
 | OF-I | May automatic updates change the installed graph? | Ratified — no: digest match or "installer required" |
 | OF-J | Sequence epoch on key re-pin | Ratified — high-water never lowers; reset only explicit |
 | OF-K | Windows per-machine containment | Ratified — Job-Object wrapper (Servy tree-kill unproven) |
+
+| OF-L | Thin-client update mechanism (Option A, ratified 2026-07-17 late) | **Native-first**: window-only tier uses `Deno.autoUpdate` via the SDK wrapper #841 (Windows = staged-detection + manual UX until upstream apply lands, denoland/deno#35269); the snapshot transaction stays the combined-artifact mechanism (beta.14); one release-server/manifest lineage; #825 → beta.14. Freed capacity funds the Desktop Frontend wave #840 (#841/#842/#843) |
 
 Remaining open decisions now live where they belong: the Unified epic's are produced by its seed run (#824); the desktop-graph slices carry theirs as implementation-time acceptance (#830 tree).
 

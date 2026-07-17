@@ -191,6 +191,10 @@ Seed/RFC run — the gate of record is PLAN-EVAL (Sol·max, separate session). N
 
 | 2026-07-17 | reconcile | #456 keep-open ruling + correction (owner-confirmed) | Owner asked duplicate-vs-not-planned → neither: #456 is the re-scoped beta.11 substrate that #831/#834/#837/#543 build on. Correction appended: hard #454 dep dropped (window-only artifact suffices); **beta.11 product story named: thin-client desktop** — window shipped to consumer machines + vendor-cloud services via remote `services__*` discovery (POC option-(b) topology); #456+#457+#825 cover it without PM |
 
+| 2026-07-17 | ratify | **Option A ratified + Desktop Frontend expansion** | Owner: native-first for thin-client (deno desktop formats + native autoUpdate), .NET #825 only for full-stack single output; freed room → wrap desktop features the NetScript way. Grounding: current auto_update docs re-verified (Windows apply STILL unsupported; tracker denoland/deno#35269; `Deno.desktop` namespace churn PR #35939); bindings docs (type-safety = manual d.ts — no built-in bridge); oRPC MessagePort adapter (RPCHandler.upgrade/RPCLink over port-likes) |
+| 2026-07-17 | file | **Option-A board pass executed** (`file-desktop-frontend.ts`) | epic **#840** Desktop Frontend (beta.11) + **#841** SDK auto-update wrapper + **#842** type-safe bindings (oRPC MessagePort over a bind-channel shim) + **#843** fresh-ui desktop components; #452/#456/#457 re-scoped native-first + labeled in; **#825 → beta.14** w/ comment; #327 addendum; label `epic:desktop-frontend` + labels.yml parity; FILING-LOG Option-A section |
+| 2026-07-17 | rfc | **RFC rev 12** | F4 rewritten as TIERED update (native autoUpdate for window-only w/ honest Windows posture; snapshot transaction for combined; one server/manifest lineage); F5 gains type-safe-bindings pillar; §5 beta.11 row = Desktop Frontend wave; §8 Option-A board state; §9 decision row OF-L; PR #822 body updated |
+
 ## Handoff Notes
 
 - Evaluator: read kickoff.md, research.md, plan.md. Verdict scope = the RFC design (PLAN-EVAL on

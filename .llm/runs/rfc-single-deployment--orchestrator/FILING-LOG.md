@@ -52,3 +52,16 @@ pointer): #349 → #823. Everything else: adjusted in place, nothing deleted.
 **After this filing, GitHub is the single source of truth**; run docs carrying stale milestone/
 sequencing claims (plan.md rev 10 §A.1/§E.2 beta.11 single-runtime-lane framing) are historical —
 authority banner: GitHub wins on conflict.
+
+## Option-A pass (same day, owner-ratified — native-first thin-client)
+
+| Item | Live | Notes |
+| --- | --- | --- |
+| Desktop Frontend epic | **#840** | beta.11 — "the full frontend as a desktop app, the NetScript way"; children #452/#456/#457 + D1/D2/D3 |
+| D1 SDK auto-update wrapper | **#841** | typed `Deno.autoUpdate` mechanism; isolates `Deno.desktop` churn (denoland/deno#35939); Windows staged-detection + manual UX (upstream apply tracked: denoland/deno#35269) |
+| D2 type-safe bindings | **#842** | port shim over the bind channel + oRPC MessagePort adapter — contract-first window RPC (replaces manual `bindings.d.ts`) |
+| D3 fresh-ui desktop components | **#843** | tray/menus/dialogs/notifications/window chrome, desktop-gated |
+| label | `epic:desktop-frontend` | + labels.yml parity |
+| #456 / #457 / #452 | re-scoped | native-first: native formats + release server (native `latest.json` lineage) + wrapper wiring; e2e = macOS/Linux apply+rollback proof + Windows manual path; labeled into #840 |
+| #825 | milestone → **beta.14** | .NET/ATS packaging integration becomes load-bearing at the full-stack single-output tier (#833/#834); converges for free if upstream Windows apply lands |
+| #327 | body addendum | Option-A tiering + new child #840 |
