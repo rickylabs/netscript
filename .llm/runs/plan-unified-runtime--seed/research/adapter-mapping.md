@@ -1,8 +1,8 @@
 # Nitro ↔ shipped NetScript adapter mapping
 
 Evidence date: 2026-07-18. `deno doc` command extracts are preserved at
-`.llm/tmp/docs/netscript-deno-doc-2026-07-18.md`; Nitro live-doc extracts are at
-`.llm/tmp/docs/nitro-v3-live-2026-07-18.md`.
+`../evidence/netscript-deno-doc-2026-07-18.md`; Nitro live-doc extracts are at
+`../evidence/nitro-v3-live-2026-07-18.md`.
 
 The task's “data” package is not a shipped package name. The shipped manifest is
 `@netscript/database`, with database ports and PostgreSQL/MSSQL/MySQL adapter exports

@@ -1,7 +1,7 @@
 # oRPC + Fresh 2 composition on Nitro v3
 
 Research date: 2026-07-18. Live-doc extracts are preserved in
-`.llm/tmp/docs/orpc-fresh-live-2026-07-18.md`; the original URLs remain the authority.
+`../evidence/orpc-fresh-live-2026-07-18.md`; the original URLs remain the authority.
 
 ## Existing request/response seams
 

@@ -2,7 +2,7 @@
 
 Research date: 2026-07-18. This ledger compares current evidence with PR #822 RFC §3/plan §D and the
 issue corpus. The PR files were retrieved from head `49bd014f11b44ae7fe8a461f936123e139016cbf`; a
-provenance extract is preserved at `.llm/tmp/docs/pr822-frame-2026-07-18.md`.
+provenance extract is preserved at `../evidence/pr822-frame-2026-07-18.md`.
 
 “Drift” here means a candidate the supervisor must resolve in the planning board. It does not by
 itself declare the older text wrong.

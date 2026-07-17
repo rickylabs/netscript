@@ -1,7 +1,7 @@
 # Market patterns for unified deployment
 
 Research date: 2026-07-18. This is the mandatory external leg of Stage B. Fetch extracts are saved
-at `.llm/tmp/docs/market-frameworks-live-2026-07-18.md`; original URLs remain the authority.
+at `../evidence/market-frameworks-live-2026-07-18.md`; original URLs remain the authority.
 
 ## Comparable models
 

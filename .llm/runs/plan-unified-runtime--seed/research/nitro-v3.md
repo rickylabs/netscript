@@ -1,7 +1,7 @@
 # Nitro v3 live validation
 
 Evidence date: 2026-07-18. The fetched live-doc digest is preserved at
-`.llm/tmp/docs/nitro-v3-live-2026-07-18.md`.
+`../evidence/nitro-v3-live-2026-07-18.md`.
 
 ## Verdict
 
