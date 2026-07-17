@@ -2,10 +2,10 @@
 
 | | |
 | --- | --- |
-| **Status** | Draft — adversarially reviewed (9 cycles), final review pass pending |
-| **Tracking** | Refs #820 (charter) · builds on #510 (Process Manager) · #327 (Deployment) |
-| **Target** | beta.11 (single-runtime lane) → beta.12 (PM foundation) → beta.13 (singleton-graph desktop) → stable (hardening) |
-| **Evidence base** | eis-chat#150 Windows singleton POC (merged, smoke-tested); full engineering spec in `plan.md` (this PR) |
+| **Status** | **Ratified** (owner, 2026-07-17) — direction + sequencing locked, board filed (§8); adversarially reviewed (9 cycles) |
+| **Tracking** | Refs #820 (charter) · #510 (Process Manager) · #327 (Deployment) · **#823 (Unified epic)** · **#830 (Desktop-graph epic)** · **#825 (Aspire packaging integration)** |
+| **Shipping order (ratified)** | beta.11 substrate + unified seed → **beta.12 PM ships first** → beta.13 Unified marquee → beta.14 desktop graph → stable hardening |
+| **Evidence base** | eis-chat#150 Windows singleton POC (merged, smoke-tested); Nitro v3 docs (live); Aspire "multi-language integrations" (ATS); full engineering spec in `plan.md` (this PR) |
 
 ---
 
@@ -20,6 +20,8 @@ netscript deploy desktop upgrade    # atomic, crash-recoverable, health-confirme
 ```
 
 The same contract covers **two composition modes**: **single-runtime** (all services composed into one process) and **singleton-graph** (a native window supervising an adjacent process graph — databases with exclusive locks, external tools, isolated workers). Both modes share one packaging pipeline, one manifest family, one update mechanism, and one first-run story; they diverge only where physics demands it.
+
+Single-runtime as a *product* is bigger than any single deployment target: it is the **Unified epic (#823)** — Nitro v3 as the runtime-agnostic single deploy output with cloud presets and its adapter surface (database, cache, KV, tasks, WebSocket), positioning NetScript as a Next.js/Nuxt-class contender while teams scale by splitting resources into "macro services" across deploy targets. This RFC owns the **foundations** (supervision, packaging, installation, update) and the **desktop targets**; the Unified epic owns the single-runtime product and starts with its own seed run (#824).
 
 ---
 
@@ -60,7 +62,7 @@ Every row above becomes a framework foundation below.
 | Needs the Process Manager | No (that's why it ships first) | Yes — the PM engine is its supervisor |
 | Artifact | window/app bundle (K = 0 sidecars) | window bundle + K compiled sidecars + staged tools |
 
-**The rule:** applications default to single-runtime and *earn* the graph — the framework treats the graph as the same app with K > 0 artifacts, not a different product. The enforcement point is a typed manifest family plus a cross-mode conformance suite that runs one reference app in **both** modes and asserts the shared behavior (discovery, data layout, provisioning, update, telemetry identity).
+**The rule:** applications default to single-runtime and *earn* the graph — the framework treats the graph as the same app with K > 0 artifacts, not a different product. The enforcement point is a typed manifest family plus a cross-mode conformance suite (#837) that runs one reference app in **both** modes and asserts the shared behavior (discovery, data layout, provisioning, update, telemetry identity).
 
 ## 4. Architecture — five foundations
 
@@ -91,7 +93,7 @@ Desktop targets are ordinary `DeployTargetPort` adapters in the existing registr
 - **Least-privilege by ACL**: the updater identity is the *only* writer of releases and the journal; the workload account gets read/execute on code and write on its data root only; installers grant service-control scoped to exactly this app's units.
 - **Journaled operations**: install (`staged → claiming → provisioning → registering → starting → confirmed`, with reverse-replay compensation from any failure), repair (journal-reconciling, idempotent), uninstall (retains data by default), and purge (a separate four-state, roll-forward-only operation whose journal lives *outside* the install root, so an explicit purge survives even the installer's own deletion).
 - **Machine-wide port registry** (`%ProgramData%\NetScript\` / `/var/lib/netscript/`): installs reserve fixed ports transactionally and refuse with actionable diagnostics on conflict — two NetScript apps coexist or fail loudly, never silently.
-- Realized as MSI (Windows) and deb/rpm (Linux) via installer adapters behind the target seam.
+- **Installer authoring is a first-class .NET citizen of the Aspire stack** (#825, owner-ratified): no Deno-native combined-MSI path exists — `deno desktop`'s pure-Rust MSI packages only the window bundle (per-machine, no sidecars) and its docs punt to WiX/NSIS/Inno for more. So `NetScript.Aspire.Packaging` ships as a **C# Aspire hosting-integration NuGet annotated with ATS `[AspireExport]`**: the Aspire CLI generates a typed TypeScript SDK from it (JSON-RPC into the C# code at runtime), and the TS AppHost consumes it as decorators/publish-pipeline steps — the exact mechanism Aspire documents for multi-language integrations. WiX-class MSI authoring and the `signtool` hook live behind it; deb/rpm stays native-side. Build machines need the .NET SDK (already true in the POC); end users need nothing.
 
 ### F4 · Update lifecycle (one mechanism, both modes, Windows included)
 
@@ -109,14 +111,23 @@ Deno Desktop's own updater patches a single file and cannot apply on Windows. Ne
 - **End-user health awareness** (the POC's "silently broken" fix): a small SDK widget subscribes to the control plane — *"search is restarting (2/3)…"* instead of dead features.
 - **Auth**: the window's proxy requires a per-launch token (another local user can't ride it); per-machine control-plane access mints per-user **read** tokens over an OS-authenticated channel; mutations require the admin/updater identity.
 
-## 5. How it ships
+## 5. Sequencing and how it ships (owner-ratified 2026-07-17)
 
-| Milestone | Lane | Deliverables |
+**The what-ships-first decision.** Three candidates were weighed: desktop multi-process without the PM, the Unified single-runtime epic, and the PM foundation. Resolution:
+
+1. **Desktop multi-process without the PM is rejected outright** — that is exactly the POC shipped as a product: launch-only supervision, silently dead features, orphaned graphs.
+2. **The PM ships first (beta.12)** — it is the only epic implementation-ready today (ratified, fully sliced), it hardens what NetScript already is (multi-process), and it is the prerequisite the desktop graph needs anyway.
+3. **The Unified epic is planned immediately and ships as the next marquee (beta.13)** — it is PM-independent, so its seed run (#824: Nitro v3 validation, adapter mapping against the shipped `@netscript` adapters, composition contract, epic decomposition) proceeds in parallel with PM implementation on a separate lane.
+4. **Desktop comes last and splits in two**: desktop-single-runtime (a window around the unified output) falls out of the Unified epic + the packaging substrate nearly for free; the desktop supervised-graph (#830) ships after both (beta.14).
+5. **The substrate starts now (beta.11)** — it serves all three consumers.
+
+| Milestone | Lane | Deliverables (live issues) |
 | --- | --- | --- |
-| **beta.11** | Single-runtime, complete (PM-independent) | In-process service links (#451), single-writer relocation (#453), true single-process mode (#454), offline sync (#455); generator desktop app-type + packaging hook (#452); **single-artifact packaging + release server + the full F4 updater incl. Windows apply** (#456a) proven by install→update→rollback e2e on both OSes (#457a) |
-| **beta.12** | The PM foundation | Epic #510 (engine, control plane, CLI, console) with small POC-driven amendments (probe kinds, spawn env hygiene); adoption contract + supervised-child helper (new PM-A/PM-B); plugin `./services` entrypoints (NS-P1); health-aggregation fix (NS-H1); PM console packaged window-only (#543) |
-| **beta.13** | Singleton-graph desktop | New epic under #327: manifest compiler + Aspire publish step (SD-2), desktop supervisor host (SD-1), installers/scopes/ACLs (SD-3), graph update transaction (SD-4), first-run provisioning (SD-5), health widget (SD-6), cross-mode conformance suite (SD-7), full-fault e2e — hard-kill, cold-reboot, multi-login, cross-session update (SD-8) |
-| **stable** | Hardening | Signing automation (#458), Linux OS-level containment backstop (SD-H), rollout rings |
+| **beta.11** | Substrate + unified planning | Single-artifact packaging + release server + the full F4 updater incl. real Windows apply (#456), proven by install→update→rollback e2e on both OSes (#457); generator desktop app-type + packaging hook (#452); **`NetScript.Aspire.Packaging` .NET/ATS integration (#825)**; health-aggregation fix (#826); **Unified seed run (#824)** |
+| **beta.12** | **PM — the first shipping wave** | Epic #510 (engine, control plane, CLI, console) with POC-driven amendments (probe kinds #512, spawn env hygiene #516, renderer knobs #526); adoption contract (#827) + supervised-child helper (#828); plugin `./services` entrypoints (#829); PM console packaged window-only (#543) |
+| **beta.13** | **Unified — the marquee** | Epic #823 implementation (sub-issues filed by its seed #824): Nitro v3 single deploy output, adapter integration, cloud presets, macro-services splitting. Absorbs #451/#453/#454/#455 per the seed's re-scheduling |
+| **beta.14** | Desktop singleton-graph | Epic #830: manifest compiler + Aspire publish step (#831), desktop supervisor host (#832), installers/scopes/ACLs (#833), graph update transaction (#834), first-run provisioning (#835), health widget (#836), cross-mode conformance suite (#837), full-fault e2e (#838) |
+| **stable** | Hardening | Signing automation (#458), Linux OS containment backstop (#839), rollout rings |
 
 Every slice carries adversarially-derived fault gates (crash-mid-junction, torn journal, power-loss replay, barrier crashes, non-cooperative-process hard-kill, unattended reboot, two-app port conflict, replay/downgrade, cross-user proxy denial).
 
@@ -220,26 +231,28 @@ stateDiagram-v2
 
 Install-time-pinned Ed25519 trust root (re-pin only via installer/operator, never a downloaded manifest) · signed manifests + per-artifact hashes · monotonic sequence high-water (no replay/downgrade, survives authorized recovery) · elevation only inside the installer · updater/workload/user privilege separation enforced by ACLs and negatively tested · per-launch proxy tokens · OS-authenticated read-token minting for per-machine status.
 
-## 8. Board impact (proposals — nothing filed until ratification)
+## 8. Board state — FILED 2026-07-17 (owner-ratified and owner-authorized)
 
-Splits: #456 → beta.11 substrate `#456a` + beta.13 graph extension; #457 → `#457a` + graph e2e. Re-scopes: #452 (dev resource + packaging hook; public `AppType` gains `"desktop"`). Small amendments to ratified PM slices (PM-1 probe kinds, PM-5 env hygiene, PM-15 renderer knobs). New drafts: PM-A (adoption contract), PM-B (supervised-child helper), NS-H1 (health-aggregation fix), NS-P1 (plugin service entrypoints), the beta.13 SD epic (8 slices), SD-H (Linux containment backstop, stable). #543 stays beta.12. Single-runtime lane (#451/#453/#454/#455) untouched.
+Full mapping in `FILING-LOG.md` (this PR). Summary: milestone **`0.0.1-beta.14`** created; label `epic:unified-runtime` created (+ `labels.yml` parity in this PR). **New:** Unified epic #823 + seed #824 · packaging integration #825 · health fix #826 · PM-A #827 · PM-B #828 · plugin entrypoints #829 · Desktop-graph epic #830 with #831–#838 + #839 (stable). **Adjusted:** #456/#457 re-titled + re-scoped as the single-artifact substrate; #452 re-scoped (+ public `./types` jsr gate); #451/#453/#454/#455 re-homed to #823 (Backlog/Triage pending the seed); PM-1/PM-5/PM-15 amended (#512/#516/#526); #543 Windows-caveat superseded; #458 → stable; **#349 closed** as superseded; #510 and #327 epic bodies updated with the ratified order.
 
-## 9. Open decisions for the owner (ratified at filing)
+## 9. Decision log (all ratified 2026-07-17)
 
-| Fork | Question | Recommendation |
+| Fork | Question | Resolution |
 | --- | --- | --- |
-| OF-A | New child epic vs growing #327 in place | child epic |
-| OF-B | Single-runtime lane milestone | keep beta.11 |
-| OF-C | Ratify the #456/#457 splits + "snapshot updater is the only mechanism" | adopt |
-| OF-D | Windows installer: second-pass adapter now vs upstream deno-desktop hook | adapter now, hook = watch |
-| OF-E | Per-machine scope in v1 | yes (Win + Linux), macOS out |
-| OF-F | Per-machine tenancy | one machine-wide tenant |
-| OF-G | Adoption-contract placement | PM epic (beta.12) |
-| OF-H | Linux containment bar for beta.13 | pipe/guardian layer + documented residual; OS backstop at stable |
-| OF-I | May automatic updates change the installed graph? | no — digest match or "installer required" |
-| OF-J | Sequence epoch on key re-pin | high-water never lowers; reset only explicit |
-| OF-K | Windows per-machine containment | Job-Object wrapper (Servy tree-kill is unproven) |
+| OF-A | New child epic vs growing #327 in place | **Ratified** — epics #823 + #830 filed |
+| OF-B | Single-runtime lane milestone | **Superseded** — lane re-homed to the Unified epic; its seed (#824) re-schedules |
+| OF-C | #456/#457 splits + "snapshot updater is the only mechanism" | **Ratified** — applied on the live issues |
+| OF-D | Windows installer realization | **Ratified** — first-class .NET Aspire hosting integration (#825, ATS-exported NuGet); upstream deno-desktop hook stays a watch item |
+| OF-E | Per-machine scope in v1 | Ratified — Win + Linux; macOS out |
+| OF-F | Per-machine tenancy | Ratified — one machine-wide tenant |
+| OF-G | Adoption-contract placement | Ratified — PM epic (#827, beta.12) |
+| OF-H | Linux containment bar | Ratified — universal pipe/guardian layer + documented residual; OS backstop #839 at stable |
+| OF-I | May automatic updates change the installed graph? | Ratified — no: digest match or "installer required" |
+| OF-J | Sequence epoch on key re-pin | Ratified — high-water never lowers; reset only explicit |
+| OF-K | Windows per-machine containment | Ratified — Job-Object wrapper (Servy tree-kill unproven) |
+
+Remaining open decisions now live where they belong: the Unified epic's are produced by its seed run (#824); the desktop-graph slices carry theirs as implementation-time acceptance (#830 tree).
 
 ---
 
-<sub>**Provenance.** Supersedes #821 (opened from a stale branch by mistake). This PR lands the full engineering record: `plan.md` rev 10 (the normative spec behind every section above), `research.md` (eis-chat#150 forensics + gap analysis), and a 9-cycle adversarial review trail (`plan-eval-cycle1..9.md`, GPT-5.6 Sol·max, separate sessions — final state: 6/8 plan-gate boxes PASS). The RFC comment on #820 remains gated on the owner-run final review. Refs #820 — no closing keyword. 🤖 Generated with [Claude Code](https://claude.com/claude-code) · https://claude.ai/code/session_016wV13zTE9bz2Yf1iR762qZ</sub>
+<sub>**Provenance.** Supersedes #821 (opened from a stale branch by mistake). This PR lands the full engineering record: `plan.md` rev 10 (the normative spec behind §4/§6/§7; where its beta.11 "single-runtime lane" framing conflicts with the ratified §5 order, **GitHub and this document win**), `research.md` (eis-chat#150 forensics + gap analysis), a 9-cycle adversarial review trail (`plan-eval-cycle1..9.md`, GPT-5.6 Sol·max, separate sessions — final: 6/8 plan-gate boxes PASS), and `FILING-LOG.md` (the 2026-07-17 owner-authorized board filing this document's §8 reflects). Refs #820 — no closing keyword. 🤖 Generated with [Claude Code](https://claude.com/claude-code) · https://claude.ai/code/session_016wV13zTE9bz2Yf1iR762qZ</sub>

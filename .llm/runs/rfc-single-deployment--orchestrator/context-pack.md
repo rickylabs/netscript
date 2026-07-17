@@ -1,4 +1,13 @@
-# Context Pack: RFC single deployment (issue #820) — rev 10 ready; final eval OWNER-RUN
+# Context Pack: RFC single deployment (issue #820) — DIRECTION RATIFIED, BOARD FILED (Turn 2)
+
+> **Board filed 2026-07-17** (owner-ratified + fully authorized): milestone beta.14, issues
+> #823–#839 created, 14 adjustments, #349 closed — `FILING-LOG.md` is the mapping;
+> **GitHub is now the single source of truth**; `rfc.md` rev 11 (= PR #822 body) is the ratified
+> document. Ratified order: **PM #510 (beta.12) first → unified #823 (beta.13, seed #824 first)
+> → desktop graph #830 (beta.14)**. Implementation is unblocked: PM wave + beta.11 substrate
+> (#456/#457/#452/#825/#826) + the unified seed run #824. The cycle-10 eval recipe below remains
+> available but is now optional (the owner's direct ratification superseded the posting gate;
+> #820 comment still unposted — rfc.md serves as the canonical text if wanted).
 
 ## Run Metadata
 

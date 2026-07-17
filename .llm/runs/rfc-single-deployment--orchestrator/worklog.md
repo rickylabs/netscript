@@ -178,6 +178,17 @@ Seed/RFC run — the gate of record is PLAN-EVAL (Sol·max, separate session). N
 | PLAN-EVAL cycle 9 | agentic app-server client · Sol·max · thread `019f7078…` | **FAIL_PLAN — 6/8 boxes PASS** (Decisions locked, board, risks, gates, deferred scope; failing: artifact currentness bookkeeping + PM-5/PM-15/SD-1 export classification) | `plan-eval-cycle9.md` |
 | PLAN-EVAL cycle 10 (final) | **OWNER-LAUNCHED** — recipe: `deno run --no-lock --allow-read --allow-run --allow-env .llm/tmp/rfc820/launch-eval.ts` (sends `plan-eval-brief.md` to a fresh Sol·max thread) | PENDING (owner) | on rev 10; verdict lands in `plan-eval.md` (cycles 1–9 archived) |
 
+## Turn 2 — Owner review, direction ratification, board filing (2026-07-17 evening)
+
+| Time (UTC) | Slice | Step | Notes |
+| --- | --- | --- | --- |
+| 2026-07-17 | review | Owner read the RFC; raised 2 caveats + the sequencing question | (1) MSI needs the .NET layer as a first-class Aspire citizen (eis-chat open PR uses .NET AOT); (2) single-runtime = its own epic (Nitro v3, netscript-start "unified" RFC), NOT desktop-tied; what ships first: desktop-no-PM vs unified vs PM? |
+| 2026-07-17 | ground | Evidence checks | Aspire docs "multi-language-integrations": C# hosting-integration NuGet + ATS `[AspireExport]` → generated TS SDK (JSON-RPC) — the exact first-class pattern; Nitro v3 docs LIVE with full adapter surface (owner screenshot) — the #327 D1 WATCH verdict (2026-07-03) is stale; deno desktop MSI = window-bundle-only (no Deno-native combined path) |
+| 2026-07-17 | recommend | Sequencing recommendation delivered | reject desktop-without-PM (ships the POC's failure); PM ships first (implementation-ready, foundational, beta.12); unified seeded NOW in parallel, ships as marquee (beta.13); desktop splits — single-runtime window rides unified, supervised graph last (beta.14); substrate starts beta.11 |
+| 2026-07-17 | ratify | **Owner ratified the direction + instructed execution** ("rewrite the RFC in that direction… update milestones… adjust existing issues, create the missing ones") + granted full authorization for the filing | stage-H executed by owner instruction — the drafts-only stop-line lifted for exactly this scope |
+| 2026-07-17 | file | **One-shot board filing executed** (`.llm/tmp/rfc820/file-board.ts`) | milestone `0.0.1-beta.14` (#16) · label `epic:unified-runtime` (+labels.yml parity) · 17 new issues #823–#839 · 14 adjustments (#456/#457/#452 re-scopes; #451/#453/#454/#455 re-homed; #512/#516/#526/#543 amendments; #458→stable; **#349 closed**; #510/#327 epic updates) · zero failures · `FILING-LOG.md` + `filing-log.json` |
+| 2026-07-17 | rfc | **RFC rev 11** — rewritten in the ratified direction | Unified epic separated from desktop (§Abstract/§3); §4-F3 installer = `NetScript.Aspire.Packaging` #825 (ATS-exported NuGet — OF-D resolved); §5 ratified sequencing + live-numbered shipping table (beta.11 substrate+seed → beta.12 PM first → beta.13 unified → beta.14 desktop graph → stable); §8 = filed board state; §9 = decision log (OF-A..K all ratified/superseded); authority banner: GitHub + rfc.md win over plan.md rev-10 sequencing framing. PR #822 body + run-dir `rfc.md` updated |
+
 ## Handoff Notes
 
 - Evaluator: read kickoff.md, research.md, plan.md. Verdict scope = the RFC design (PLAN-EVAL on

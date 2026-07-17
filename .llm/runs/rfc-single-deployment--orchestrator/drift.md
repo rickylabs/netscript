@@ -107,3 +107,26 @@ documentation.
 - **Action:** accept
 - **Evidence:** worklog authorize row 3, `plan.md` rev 10 header, `plan-eval-brief.md` cycle-10
   note, `context-pack.md` "How the owner runs cycle 10"
+
+## 2026-07-17 — Owner ratified a revised direction + authorized board filing (Turn 2)
+
+- **What:** After reading the RFC, the owner (1) mandated the .NET packaging layer as a
+  first-class Aspire citizen (ATS-exported NuGet → generated TS SDK — verified against aspire
+  docs "multi-language-integrations"), and (2) split single-runtime out as its OWN epic (Nitro
+  v3, Next/Nuxt-class positioning — netscript-start "unified" RFC lineage), not desktop-tied.
+  Ratified sequencing: **PM ships first (beta.12) → unified marquee (beta.13) → desktop graph
+  (beta.14)**; desktop-without-PM rejected. Owner instructed and fully authorized milestone
+  updates, issue adjustments, and creation of missing issues; the one-shot filing executed with
+  zero failures (`FILING-LOG.md`).
+- **Expected:** rev-10 §A.1/§E.2 framed a beta.11 "single-runtime lane" completing
+  install/update, and SD epic at beta.13; posting gated on a cycle-10 eval.
+- **Actual:** the single-runtime product moved to epic #823 (its seed #824 re-schedules
+  #451/#453/#454/#455, now Backlog/Triage); SD epic #830 landed at new milestone beta.14; the
+  substrate (#456/#457/#452/#825/#826) rides beta.11; the owner's direct ratification superseded
+  the cycle-10 gate for the board scope (the #820 RFC comment itself remains unposted — the RFC
+  now lives as PR #822 + rfc.md).
+- **Severity:** significant (sequencing + epic topology change — owner-directed, not drift from
+  plan error)
+- **Action:** accept; authority banner applied — **GitHub + rfc.md rev 11 win over plan.md
+  rev-10 sequencing framing** (plan.md §§B–D engineering content remains normative)
+- **Evidence:** `FILING-LOG.md`, `filing-log.json`, `rfc.md` rev 11, PR #822, worklog Turn 2

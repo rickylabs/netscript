@@ -1,5 +1,16 @@
 # Plan — RFC: single deployment (issue #820) — rev 10 (self-contained; final eval to be run BY THE OWNER)
 
+> **§J AUTHORITY BANNER — post-rev-10 owner ratification (2026-07-17 evening, Turn 2).** The owner
+> ratified a revised direction and the board was FILED (`FILING-LOG.md`): the single-runtime
+> product is its own epic **#823** (Nitro v3; seed **#824**; #451/#453/#454/#455 re-homed there —
+> this plan's beta.11 "single-runtime lane" framing in §A.1/§E.2 is SUPERSEDED); the desktop
+> singleton-graph epic is **#830** at new milestone **beta.14**; installer authoring is the
+> first-class .NET Aspire integration **#825** (ATS-exported NuGet — OF-D resolved); ratified
+> shipping order: **PM #510 (beta.12) → unified #823 (beta.13) → desktop graph #830 (beta.14)**.
+> **GitHub and `rfc.md` rev 11 win over this document on sequencing/milestones/board shape.** The
+> engineering designs in §§B–D (installer state machines, update transaction, containment,
+> composition contract) remain the normative spec the filed issues reference.
+
 Run `rfc-single-deployment--orchestrator` · generator Fable 5 · high · 2026-07-17.
 Seed/RFC run: this plan **is** the RFC design and **stands alone** (no reference to prior revs is
 normative). No implementation follows from this run; board changes stay drafts until stage-H
