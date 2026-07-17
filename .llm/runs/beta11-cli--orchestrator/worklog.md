@@ -63,3 +63,14 @@ group launch; this section fixes the supervisor's surface.
   G2 #841: Plan & Design delivered; Tier-A plan review PASS (D1–D13 locked; steers: pin
   os-arch URL vocabulary in tests; resolver is sole Deno-global toucher); implementation
   unlocked.
+- 2026-07-18 · G4 IMPL-EVAL PASS (Qwen; evaluator re-ran suites + doc-lint) BUT CI check-test on
+  #848 found what both generator and evaluator missed: the AppEntry Zod `.transform` breaks
+  `z.toJSONSchema` (schema_test.ts — 'Transforms cannot be represented in JSON Schema'). Fix
+  steer issued: drop the transform, keep `Enabled` optional, generated `=== true` stays the
+  desktop opt-in boundary; full `packages/aspire/tests/` now mandatory in the G4 gate set.
+  Lesson: the group gate set must include the FULL package test dir, not curated files.
+- 2026-07-18 · G1 IMPL-EVAL PASS (Qwen; readiness fix verified). close-gate on #847 requires
+  #826's acceptance boxes checked — checked with executed-evidence comment (unit/consumer gates +
+  health assertion executed in the green scaffold-runtime CI lane). Monitor armed: on CI
+  completion for head 711ac99f, close-gate auto-reruns; merge on ALL GREEN under the standing
+  owner authorization.
