@@ -64,3 +64,5 @@ All are **KEEP with zero filing-time close**; folds land later via each legacy i
 3. HARD STOP before closing milestone 13 — owner sign-off only.
 4. These stop-lines are repeated verbatim in EVERY sub-agent brief. A sub-brief without the stop-lines section is invalid.
 5. The #824 seed run is drafts-only until owner ratification; its board filing needs the owner in-turn.
+
+**F-12 branch-B delta (materialized):** per-cell split = UR-6a/b/c via the same Body template (cell substituted, markers slot:UR-6a|b|c); slot-map +3 rows; UR-12 deps update. (Recheck P12.)

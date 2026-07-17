@@ -1,6 +1,6 @@
 <!-- seed:plan-unified-runtime slot:UR-6 -->
 
-# UR-6 — Runtime-cell columns: three v1 cells + four-cell conformance suite
+# UR-6 — Runtime-cell columns: three v1 cells + three-cell conformance suite
 
 - **Slot:** UR-6
 - **Owning pack:** D2 capability-matrix (drafts D2-S3, D2-S5, D2-S6)
@@ -63,6 +63,8 @@
 **F-2 (v1 cell set — 3-cell vs re-proven `deno_deploy`).**
 - **A (default) — 3-cell v1:** ship `deno_server` + `node_server` + `cloudflare_module`; `deno_deploy`
   deferred to DD-RESEARCH at `0.0.1-stable`. Acceptance as written (three cells).
-- **B — re-prove and include `deno_deploy` in v1:** requires DD-RESEARCH to complete and pass on the
-  new platform first; the suite then becomes four cells and the withdrawn-column gate is replaced by a
-  fourth executed conformance case. Milestone impact: pulls DD-RESEARCH into the beta.13 train.
+- **B — re-prove and include `deno_deploy` later:** DD-RESEARCH runs first (it depends on UR-6's
+  three-cell suite existing, never the reverse); on PASS, a SEPARATE successor extension card
+  (UR-6-EXT, drafted at that point) adds the fourth executed conformance case. UR-6 itself stays
+  three-cell in both branches — no dependency cycle, no post-ratification rewrite of this card.
+  Milestone impact: DD-RESEARCH may be pulled from `0.0.1-stable` into the beta.13 train.

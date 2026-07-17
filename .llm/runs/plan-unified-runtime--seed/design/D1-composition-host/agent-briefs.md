@@ -56,8 +56,10 @@ Read: `netscript-harness`, `netscript-doctrine`, `aspire`/`deno-fresh` as applic
 `research/nitro-v3.md` Lifecycle row. Frame: proposal.md §2.
 
 - **Goal:** bind the graph into Nitro as a synchronous plugin; Nitro owns the sole listener + `error`
-  observation; `close` hook drains a disposal registry exactly once (idempotent).
-- **Contract first:** the disposer-registry interface + registration order; async construction resolved
+  observation; the `close` hook invokes the **UR-0 hostable-service lifecycle contract** (which
+  reuses the shipped `ServiceShutdownCoordinator` policy — idempotency, bounded drain, LIFO,
+  structured report). Do NOT invent a bespoke disposer registry (Stage-F finding 5).
+- **Contract first:** consume UR-0's exported build/start/stop surface; async construction resolved
   before synchronous plugin registration.
 - **Gates:** G-LISTEN, G-CLOSE (proposal.md §6) — include an idempotent double-close test.
 

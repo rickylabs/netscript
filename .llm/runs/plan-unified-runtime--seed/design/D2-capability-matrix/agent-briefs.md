@@ -61,9 +61,10 @@ opposite-family session**.
   `sagas-constraint.md` (full) + `proposal.md` §2.1.
 - **Scope:** implement `sagas: supported | externalized | rejected` per cell; wire in-process saga
   runtime shutdown to the composition root's `close` ordering (from D1); build-reject in-process
-  sagas on bounded-window cells absent an externalization target. Never substitute a Nitro task.
+  sagas on bounded-window cells absent an externalization target (v1 bounded-window cell = C4;
+  C2/deno_deploy is WITHDRAWN from v1 — DD-RESEARCH). Never substitute a Nitro task.
 - **Out of scope:** manifest/compiler mechanics (S1, consume it); macro-service topology authoring.
-- **Validation:** scoped check/lint; saga drain-on-close test; build-reject test on C2/C4.
+- **Validation:** scoped check/lint; saga drain-on-close test; build-reject test on C4 (C2 withdrawn).
 - **Stop-lines:**
 
 ## Stop-lines (HARD — read twice)
@@ -99,7 +100,8 @@ opposite-family session**.
 - **## SKILL:** `netscript-doctrine`, `netscript-deno-toolchain` (`deno doc` `DatabaseAdapter`).
   Read `drift-ledger.md` D-08 + `proposal.md` §2.5.
 - **Scope:** declared exclusive-lock/writer-ownership capability; supported on C1/C3, reject/
-  externalize on C2/C4; embedded-Turso default never silently overrides a topology constraint.
+  externalize on C4 (C2 withdrawn from v1 — DD-RESEARCH); embedded-Turso default never silently
+  overrides a topology constraint.
 - **Out of scope:** offline sync (S7), general DB adapter wiring (S3).
 - **Validation:** scoped check/lint; lock-capability build test per cell.
 - **Stop-lines:**

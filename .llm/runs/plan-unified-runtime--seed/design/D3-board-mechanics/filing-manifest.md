@@ -9,7 +9,9 @@
 
 Canonical issue bodies for **every** slot are the files under `design/canonical/UR-<n>.md` (+
 `DD-RESEARCH.md`); the draft→slot merge transforms are in `design/canonical/slot-map.md`. The filer
-copies bodies verbatim from those files — it does not compose prose.
+publishes each file's `## Body` section verbatim — it does not compose prose, and it never
+publishes the planning metadata (label tables, dependency notes, `## Fork deltas`) that surrounds
+the body.
 
 ---
 
@@ -78,10 +80,12 @@ Create in dependency order (below). For **each** slot, run this idempotent per-s
 1. **Search-before-create:** query issues for the exact slot marker
    `<!-- seed:plan-unified-runtime slot:UR-<n> -->`. If found → record the existing number, go to
    step 5 (verify) — do **not** create a duplicate.
-2. **Create** with title `[unified-runtime UR-<n>] <slice>`, body copied verbatim from
-   `design/canonical/UR-<n>.md` (includes `Part of #823` + the slot marker + `- [ ] gate:` boxes),
-   the **exact label set** from the canonical file (incl. exactly one `status:` = `status:plan`), and
-   the milestone from the canonical file.
+2. **Create** with the title from the canonical file's metadata table, and the body = ONLY the
+   canonical file's `## Body` section (which must contain `Part of #823`, exactly ONE slot marker,
+   and the `- [ ] gate:` boxes — planning metadata such as the label table, dependency notes, and
+   `## Fork deltas` is NEVER published). Preflight fails a slot whose `## Body` is missing or whose
+   marker count ≠ 1. Labels = the **exact label set** from the metadata table (incl. exactly one
+   `status:` = `status:plan`); milestone from the metadata table.
 3. **Read-after-write:** re-GET the created issue; assert title, **every** label (preflight fails if
    any requested label is absent from `.github/labels.yml`), the single `status:plan`, the milestone,
    and the slot marker are all present.
