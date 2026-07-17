@@ -1,0 +1,5 @@
+# Context Pack — mcp-skills--orchestrator/s6
+
+S6 implementation and generator gates are complete on branch `feat/netscript-mcp-skills-s6-clitrigger`, baseline `0b8ed075`. Preflight and separate opposite-family PLAN-EVAL cycle 1 passed. Three slices add MCP-owned command catalog/executor ports, immutable deny-wins/default-deny policy, list/execute flows, static catalog stub, subprocess executor, public exports, structured contracts, and additive CLI composition without importing `@netscript/cli`.
+
+The package remains Archetype 6 under accepted `MCP-A6-V2-SHAPE`. Default executor prefix is `deno run -A jsr:@netscript/cli` because generated apps do not define a `netscript` task. S7 owns the live registry-backed catalog and real outer wiring. Generator evidence: scoped check/lint/fmt pass, 39 tests pass, root architecture and direct MCP doctrine pass, full-export doc lint and package dry-run pass, consumer smoke reports 13 tools/17 allow rules. No lock/dependency churn. Fresh separate opposite-family IMPL-EVAL independently reran the gates and returned `PASS`; Tier-A substantive review remains the supervisor handoff.

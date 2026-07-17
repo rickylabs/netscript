@@ -3640,6 +3640,7 @@
           "jsr:@netscript/aspire@0.0.1-beta.9",
           "jsr:@netscript/config@^0.0.1-beta.9",
           "jsr:@netscript/fresh-ui@^0.0.1-beta.9",
+          "jsr:@netscript/mcp@0.0.1-beta.9",
           "jsr:@netscript/plugin@0.0.1-beta.9",
           "jsr:@std/async@1",
           "jsr:@std/cli@1",
@@ -3765,6 +3766,15 @@
           "jsr:@logtape/logtape@2",
           "jsr:@std/assert@1",
           "npm:@orpc/server@^1.14.6"
+        ]
+      },
+      "packages/mcp": {
+        "dependencies": [
+          "jsr:@netscript/aspire@0.0.1-beta.9",
+          "jsr:@netscript/telemetry@0.0.1-beta.9",
+          "jsr:@standard-schema/spec@1.1.0",
+          "jsr:@std/assert@1",
+          "jsr:@std/path@1"
         ]
       },
       "packages/plugin": {

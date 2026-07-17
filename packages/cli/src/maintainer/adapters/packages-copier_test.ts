@@ -13,6 +13,7 @@ const LOCAL_PACKAGES = [
   "fresh-ui",
   "kv",
   "logger",
+  "mcp",
   "plugin",
   "plugin-ai-core",
   "plugin-auth-core",

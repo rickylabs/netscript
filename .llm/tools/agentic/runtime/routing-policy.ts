@@ -1,7 +1,7 @@
 /** Pure policy data and guards for quota fallback route selection. */
 
 import type { RouteIdentity, SessionIdentity } from './contract.ts';
-import { MODEL_IDS, OPEN_EVALUATOR_MODEL_IDS } from '../config/models.ts';
+import { MODEL_IDS, OPEN_EVALUATOR_MODEL_IDS, OPENCODE_MODEL_IDS } from '../config/models.ts';
 import { OPENROUTER_PRESETS, type OpenRouterPresetId } from './provider-profiles.ts';
 
 export const MODEL_FAMILIES = ['anthropic', 'openai', 'google', 'open', 'other'] as const;
@@ -28,10 +28,11 @@ export const ROUTING_LANES = [
   'planning_decisions',
   'major_ui_ux_design',
   'major_ui_ux_adversarial_review',
+  'adversarial_design_eval',
   'documentation_review',
+  'chore_code',
   'claude_workflow',
   'research_extraction',
-  'mobile_orchestration',
   'formal_evaluation',
   'review_claude',
   'review_codex_light',
@@ -104,31 +105,21 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
   {
     lane: 'deep_analysis',
     purpose: 'analysis',
-    agent: 'codex',
-    provider: 'openai',
-    model: MODEL_IDS.codexSol,
-    effort: 'xhigh',
-    condition: 'primary',
+    agent: 'claude',
+    provider: 'anthropic',
+    model: MODEL_IDS.fable,
+    effort: 'low',
+    subscriptionState: 'included',
+    condition: 'default_complex_decision_subagent',
   },
   {
     lane: 'deep_analysis',
     purpose: 'analysis',
-    agent: 'claude',
-    provider: 'anthropic',
-    model: MODEL_IDS.fable,
-    effort: 'max',
-    condition: 'fallback_only_after_codex_quota_exhausted',
-    subscriptionState: 'outside_plan',
-    requiresExplicitApproval: true,
-  },
-  {
-    lane: 'planning_decisions',
-    purpose: 'orchestration',
-    agent: 'claude',
-    provider: 'anthropic',
-    model: MODEL_IDS.opus,
-    effort: 'medium',
-    condition: 'temporary_while_fable_outside_subscription',
+    agent: 'codex',
+    provider: 'openai',
+    model: MODEL_IDS.codexSol,
+    effort: 'high',
+    condition: 'fallback_on_fable_token_limit',
   },
   {
     lane: 'planning_decisions',
@@ -136,10 +127,18 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     agent: 'claude',
     provider: 'anthropic',
     model: MODEL_IDS.fable,
-    effort: 'medium',
-    condition: 'exceptional_paid_on_demand',
-    subscriptionState: 'outside_plan',
-    requiresExplicitApproval: true,
+    effort: 'low',
+    subscriptionState: 'included',
+    condition: 'default_orchestrator',
+  },
+  {
+    lane: 'planning_decisions',
+    purpose: 'orchestration',
+    agent: 'codex',
+    provider: 'openai',
+    model: MODEL_IDS.codexSol,
+    effort: 'high',
+    condition: 'fallback_on_fable_token_limit',
   },
   {
     lane: 'major_ui_ux_design',
@@ -164,13 +163,51 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     condition: 'required_before_merge_when_glm_not_lead',
   },
   {
+    lane: 'adversarial_design_eval',
+    purpose: 'evaluation',
+    agent: 'opencode',
+    provider: 'openrouter',
+    model: OPENCODE_MODEL_IDS.visionEval,
+    effort: 'high',
+    condition: 'vision_evidence_complements_required_glm_design_review',
+  },
+  {
     lane: 'documentation_review',
     purpose: 'documentation',
     agent: 'claude',
     provider: 'anthropic',
-    model: MODEL_IDS.opus,
+    model: MODEL_IDS.sonnet,
     effort: 'high',
-    condition: 'excludes_major_ui_ux_work',
+    subscriptionState: 'included',
+    condition: 'docs_cleanup_easy_chores',
+  },
+  {
+    lane: 'documentation_review',
+    purpose: 'documentation',
+    agent: 'codex',
+    provider: 'openai',
+    model: MODEL_IDS.codexLuna,
+    effort: 'high',
+    condition: 'fallback_on_sonnet_token_limit',
+  },
+  {
+    lane: 'chore_code',
+    purpose: 'implementation',
+    agent: 'claude',
+    provider: 'anthropic',
+    model: MODEL_IDS.opus,
+    effort: 'medium',
+    subscriptionState: 'included',
+    condition: 'delegated_code_chores',
+  },
+  {
+    lane: 'chore_code',
+    purpose: 'implementation',
+    agent: 'codex',
+    provider: 'openai',
+    model: MODEL_IDS.codexLuna,
+    effort: 'max',
+    condition: 'fallback_on_opus_token_limit',
   },
   {
     lane: 'claude_workflow',
@@ -187,26 +224,6 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     provider: 'google',
     model: MODEL_IDS.antigravity,
     effort: 'low',
-  },
-  {
-    lane: 'mobile_orchestration',
-    purpose: 'orchestration',
-    agent: 'claude',
-    provider: 'anthropic',
-    model: MODEL_IDS.opus,
-    effort: 'medium',
-    condition: 'temporary_while_fable_outside_subscription',
-  },
-  {
-    lane: 'mobile_orchestration',
-    purpose: 'orchestration',
-    agent: 'claude',
-    provider: 'anthropic',
-    model: MODEL_IDS.fable,
-    effort: 'high',
-    condition: 'exceptional_paid_on_demand',
-    subscriptionState: 'outside_plan',
-    requiresExplicitApproval: true,
   },
   {
     lane: 'formal_evaluation',
@@ -404,7 +421,7 @@ export function resolveCanonicalRoute(lane: RoutingLane, at: Date): CanonicalRou
     (!route.effectiveThrough || day <= route.effectiveThrough)
   );
   const primary = matches.find((route) =>
-    route.condition !== 'fallback_only_after_codex_quota_exhausted' &&
+    !route.condition?.startsWith('fallback') &&
     route.condition !== 'exceptional_paid_on_demand' &&
     route.condition !== 'token_limit_fallback'
   );

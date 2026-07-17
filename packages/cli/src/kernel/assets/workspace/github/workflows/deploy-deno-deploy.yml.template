@@ -53,4 +53,4 @@ jobs:
           if [ "${{ github.event.inputs.production }}" = "true" ]; then
             args+=(--prod)
           fi
-          deno x -A jsr:@netscript/cli "${args[@]}"
+          deno x -A {{netscriptCliSpecifier}} "${args[@]}"

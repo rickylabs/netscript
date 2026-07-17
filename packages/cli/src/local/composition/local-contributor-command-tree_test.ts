@@ -16,6 +16,7 @@ describe('local contributor CLI composition', () => {
       'probe',
       'test',
       'release',
+      'agent',
       'config',
       'deploy',
       'contract',

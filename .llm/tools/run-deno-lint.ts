@@ -43,6 +43,23 @@ interface LintGroup {
   }>;
 }
 
+/**
+ * A `deno lint` batch that exited non-zero **without** producing any parseable lint occurrence.
+ *
+ * This is the crash class (parse error, permission error, unsupported file, OOM) as opposed to the
+ * ordinary "lint found problems" non-zero exit, which always carries occurrences. Before this was
+ * modelled, such a batch propagated its exit code while its stderr was swallowed into the parser —
+ * producing an exit-1 report with an empty `groups[]` and no diagnostics at all.
+ */
+interface BatchFailure {
+  batchIndex: number;
+  exitCode: number;
+  fileCount: number;
+  files: string[];
+  stderr: string;
+  stdout: string;
+}
+
 interface OutputReport {
   source: {
     mode: 'file' | 'command';
@@ -61,6 +78,8 @@ interface OutputReport {
     uniquePaths: number;
   };
   groups: LintGroup[];
+  /** Batches that failed without lint occurrences. Present only when non-empty. */
+  failures?: BatchFailure[];
 }
 
 const DEFAULT_EXTENSIONS = new Set(['ts', 'tsx', 'js', 'jsx', 'mjs', 'mts']);
@@ -278,30 +297,79 @@ function chunk<T>(items: T[], size: number): T[][] {
   return chunks;
 }
 
-async function runLint(
+export interface BatchResult {
+  code: number;
+  stdout: string;
+  stderr: string;
+}
+
+export type BatchRunner = (files: string[], cwd: string) => Promise<BatchResult>;
+
+const denoLintRunner: BatchRunner = async (files, cwd) => {
+  const result = await new Deno.Command('deno', {
+    args: ['lint', ...files],
+    cwd,
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+
+  const decoder = new TextDecoder();
+  return {
+    code: result.code,
+    stdout: decoder.decode(result.stdout),
+    stderr: decoder.decode(result.stderr),
+  };
+};
+
+export interface LintRunResult {
+  text: string;
+  exitCode: number;
+  failures: BatchFailure[];
+}
+
+/**
+ * Run `deno lint` over the selected files in batches.
+ *
+ * A batch that exits non-zero is only an ordinary lint failure when its own output parses into at
+ * least one occurrence. A batch that exits non-zero with **no** parseable occurrence is a crash: its
+ * exit code, stderr, and file set are captured as a {@link BatchFailure} so the caller can surface
+ * them. Silently propagating that exit code with an empty report is the bug this models away.
+ */
+export async function runLint(
   files: string[],
-  options: Options,
-): Promise<{ text: string; exitCode: number }> {
+  options: Pick<Options, 'cwd' | 'batchSize'>,
+  runner: BatchRunner = denoLintRunner,
+): Promise<LintRunResult> {
   let text = '';
   let exitCode = 0;
+  const failures: BatchFailure[] = [];
+  const batches = chunk(files, options.batchSize);
 
-  for (const batch of chunk(files, options.batchSize)) {
-    const result = await new Deno.Command('deno', {
-      args: ['lint', ...batch],
-      cwd: options.cwd,
-      stdout: 'piped',
-      stderr: 'piped',
-    }).output();
-
-    const output = new TextDecoder().decode(result.stdout) +
-      new TextDecoder().decode(result.stderr);
+  for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+    const batch = batches[batchIndex];
+    const result = await runner(batch, options.cwd);
+    const output = result.stdout + result.stderr;
     text += output;
-    if (result.code !== 0 && !output.includes(NO_TARGET_FILES_MESSAGE)) {
-      exitCode = result.code;
+
+    if (result.code === 0) continue;
+    if (output.includes(NO_TARGET_FILES_MESSAGE)) continue;
+
+    exitCode = result.code;
+
+    // A non-zero batch with no parseable occurrence is a crash, not a lint finding.
+    if (parseOccurrences(output).length === 0) {
+      failures.push({
+        batchIndex,
+        exitCode: result.code,
+        fileCount: batch.length,
+        files: batch,
+        stderr: stripAnsi(result.stderr).trimEnd(),
+        stdout: stripAnsi(result.stdout).trimEnd(),
+      });
     }
   }
 
-  return { text, exitCode };
+  return { text, exitCode, failures };
 }
 
 function stripAnsi(text: string): string {
@@ -389,6 +457,32 @@ function groupOccurrences(occurrences: LintOccurrence[]): LintGroup[] {
   });
 }
 
+/**
+ * Render batch crashes for the human/CI log.
+ *
+ * The JSON report goes to stdout and is machine-consumed; this goes to stderr so a failing CI job
+ * shows the underlying error instead of an empty `groups[]`.
+ */
+export function formatFailures(failures: BatchFailure[]): string {
+  const lines: string[] = [
+    `${failures.length} deno lint batch(es) failed without producing lint occurrences.`,
+    'This is a tooling/parse/permission failure, not a lint finding.',
+  ];
+
+  for (const failure of failures) {
+    lines.push(
+      '',
+      `--- batch ${failure.batchIndex} — exit ${failure.exitCode} — ${failure.fileCount} file(s)`,
+    );
+    const sample = failure.files.slice(0, 10);
+    lines.push(`files: ${sample.join(', ')}${failure.files.length > sample.length ? ', …' : ''}`);
+    if (failure.stderr) lines.push('stderr:', failure.stderr);
+    if (failure.stdout) lines.push('stdout:', failure.stdout);
+  }
+
+  return lines.join('\n');
+}
+
 async function main(): Promise<void> {
   const options = parseArgs(Deno.args);
   if (!options) return;
@@ -400,6 +494,7 @@ async function main(): Promise<void> {
   let exitCode: number | undefined;
   let files: string[] | undefined;
   let batches: number | undefined;
+  let failures: BatchFailure[] = [];
 
   if (options.input) {
     text = await Deno.readTextFile(options.input);
@@ -409,6 +504,7 @@ async function main(): Promise<void> {
     const result = await runLint(files, options);
     text = result.text;
     exitCode = result.exitCode;
+    failures = result.failures;
   }
 
   const occurrences = parseOccurrences(text);
@@ -440,11 +536,23 @@ async function main(): Promise<void> {
       uniquePaths: uniquePaths.size,
     },
     groups,
+    failures: failures.length > 0 ? failures : undefined,
   };
 
   console.log(JSON.stringify(report, null, options.pretty ? 2 : undefined));
 
+  if (failures.length > 0) console.error(formatFailures(failures));
+
+  // Invariant: a non-zero exit must never be silent. If a batch failed but we captured neither an
+  // occurrence nor a failure record, say so loudly rather than exiting 1 with an empty report.
+  if (exitCode && exitCode !== 0 && groups.length === 0 && failures.length === 0) {
+    console.error(
+      `deno lint exited ${exitCode} but produced no lint occurrences and no captured batch error. ` +
+        'Re-run with --batch-size 1 to isolate the offending file.',
+    );
+  }
+
   if (exitCode && exitCode !== 0) Deno.exit(exitCode);
 }
 
-await main();
+if (import.meta.main) await main();
