@@ -35,6 +35,7 @@
  */
 
 import {
+  githubField,
   githubRequest,
   type GitHubResponse,
   resolveGithubToken,
@@ -217,13 +218,14 @@ async function hasGreenCanaryPair(
     `/repos/${repo}/commits/${sha}/status`,
     token,
   );
-  if (!response.ok || !Array.isArray(response.body?.statuses)) {
+  const statuses = githubField(response.body, 'statuses');
+  if (!response.ok || !Array.isArray(statuses)) {
     throw new Error(
       `Canary-pair status lookup failed for ${sha}: HTTP ${response.status} ` +
         `${JSON.stringify(response.body)}. Stable publication fails closed.`,
     );
   }
-  const status = response.body.statuses.find(
+  const status = statuses.find(
     (entry: unknown) => isRecord(entry) && entry.context === CANARY_PAIR_STATUS_CONTEXT,
   );
   return isRecord(status) && status.state === 'success';
@@ -403,9 +405,10 @@ async function fetchPreviousRelease(
     return null;
   }
   for (const release of res.body) {
-    const tag: unknown = release?.tag_name;
-    if (typeof tag === 'string' && tag !== currentTag && release?.draft !== true) {
-      const since: unknown = release?.published_at ?? release?.created_at;
+    if (!isRecord(release)) continue;
+    const tag = release.tag_name;
+    if (typeof tag === 'string' && tag !== currentTag && release.draft !== true) {
+      const since = release.published_at ?? release.created_at;
       return { tag, since: typeof since === 'string' ? since : '' };
     }
   }
@@ -430,7 +433,8 @@ async function generateWhatsChanged(
         'The release tag must exist on the default branch (merge the release PR first).',
     );
   }
-  return typeof res.body?.body === 'string' ? res.body.body : '';
+  const body = githubField(res.body, 'body');
+  return typeof body === 'string' ? body : '';
 }
 
 /** Issues (not PRs) closed since `since` (ISO timestamp), newest first. */
@@ -443,7 +447,7 @@ async function fetchClosedIssues(
   const query = `repo:${repo} is:issue is:closed${range}`;
   const path = `/search/issues?q=${encodeURIComponent(query)}&per_page=100&sort=updated&order=desc`;
   const res = await githubRequest('GET', path, token);
-  const items: unknown = res.body?.items;
+  const items = githubField(res.body, 'items');
   if (!res.ok || !Array.isArray(items)) {
     return [];
   }
@@ -480,7 +484,8 @@ async function createRelease(
   if (!res.ok) {
     throw new Error(`Create release failed: HTTP ${res.status} ${JSON.stringify(res.body)}`);
   }
-  return typeof res.body?.html_url === 'string' ? res.body.html_url : `${tag} created`;
+  const htmlUrl = githubField(res.body, 'html_url');
+  return typeof htmlUrl === 'string' ? htmlUrl : `${tag} created`;
 }
 
 // ---------------------------------------------------------------------------

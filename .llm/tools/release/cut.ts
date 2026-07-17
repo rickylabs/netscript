@@ -7,6 +7,7 @@ import {
 export { coordinateVersionBump, findVersionResidue, validateNewerVersion };
 import {
   buildPullRequestBody,
+  githubField,
   githubRequest,
   type GitHubResponse,
   resolveGithubToken,
@@ -108,10 +109,13 @@ export async function createReleasePullRequest(
     );
     if (!response.ok) {
       throw new Error(
-        `GitHub API returned ${response.status}: ${response.body?.message ?? response.body}`,
+        `GitHub API returned ${response.status}: ${
+          githubField(response.body, 'message') ?? response.body
+        }`,
       );
     }
-    const url = typeof response.body?.html_url === 'string' ? response.body.html_url : '';
+    const htmlUrl = githubField(response.body, 'html_url');
+    const url = typeof htmlUrl === 'string' ? htmlUrl : '';
     if (url) console.log(url);
     return true;
   } catch (error) {

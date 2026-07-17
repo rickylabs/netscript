@@ -357,6 +357,12 @@ export interface TurnState {
   turnComplete: boolean;
 }
 
+function objectRecord(value: unknown): Record<string, unknown> | null {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : null;
+}
+
 /**
  * Decide whether a Codex thread's latest turn has completed, from the TAIL of its
  * session rollout `.jsonl`. The daemon writes one JSON record per line; a turn
@@ -376,11 +382,11 @@ export function parseTurnComplete(tail: string): TurnState {
   for (let i = lines.length - 1; i >= 0; i--) {
     let ev: string | null = null;
     try {
-      // deno-lint-ignore no-explicit-any
-      const o = JSON.parse(lines[i]) as any;
-      ev = (o?.payload && typeof o.payload === 'object' && typeof o.payload.type === 'string'
-        ? o.payload.type
-        : null) ?? (typeof o?.type === 'string' ? o.type : null);
+      const parsed: unknown = JSON.parse(lines[i]);
+      const record = objectRecord(parsed);
+      const payload = objectRecord(record?.payload);
+      ev = (typeof payload?.type === 'string' ? payload.type : null) ??
+        (typeof record?.type === 'string' ? record.type : null);
     } catch {
       continue; // truncated/partial line (e.g. the first sliced line) — skip it
     }
@@ -970,7 +976,8 @@ async function readGithubHostsToken(path: string): Promise<string | null> {
 export async function validateGithubToken(token: string): Promise<string | null> {
   try {
     const res = await githubRequest('GET', '/user', token);
-    const login = res.ok && res.body && typeof res.body.login === 'string' ? res.body.login : null;
+    const loginField = githubField(res.body, 'login');
+    const login = res.ok && typeof loginField === 'string' ? loginField : null;
     return login;
   } catch {
     return null;
@@ -1116,11 +1123,15 @@ export async function resolveGithubToken(
   );
 }
 
+/** Read one property from an unknown GitHub JSON response after object narrowing. */
+export function githubField(value: unknown, key: string): unknown {
+  return objectRecord(value)?.[key];
+}
+
 export interface GitHubResponse {
   status: number;
   ok: boolean;
-  // deno-lint-ignore no-explicit-any
-  body: any;
+  body: unknown;
 }
 
 /**
